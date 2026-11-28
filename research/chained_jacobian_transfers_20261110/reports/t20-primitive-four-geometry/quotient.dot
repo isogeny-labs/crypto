@@ -1,0 +1,14 @@
+digraph {
+  graph [rankdir=TB,bgcolor="white",nodesep="0.5",ranksep="0.65",pad="0.15"];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=11,color="#456273",fillcolor="#edf4f4"];
+  edge [fontname="DejaVu Sans",fontsize=10,color="#4f8b6b",arrowsize=0.7];
+  A [label="E2 × F0 /F101\nE2:y²=x³+59x+27; F0:y²=x³+44x+21\nActual Q20:16anti4 points /256sums+Weil"];
+  C [label="Jac(C20)/F101\ny²=18x⁶+75x⁴+45x²+40\nSource branch Frobenius3+3"];
+  T [label="Jac(T20)/F101\ny²=76x⁶+62x⁵+52x⁴+63x³+69x²+3x+25\nTarget branch Frobenius6-cycle",fillcolor="#e4f2e8"];
+  {rank=same;C;T;}
+  A -> C [label="P20 · degree4\nkernel Gamma20=[2]Q20 (4points)"];
+  A -> T [label="quotient by Q20 · degree16\nglobal AV identification written",style=dashed];
+  C -> T [label="R20 · degree4 written\nactual K20=P20Q20 (4points)\nwhole Mumford evaluator next"];
+  N [shape=note,fillcolor="#fff5df",label="full39 /84454e · source626 unchanged · unsigned\nUnique of15matchings; stable monic determinants0,34,67\nSelected Delta67; commonq11 cube18; rawdelta95\nNormalized G_i=bracket(F_j,F_k)/delta\nCubic kernel algebra has square discriminant class"];
+  T -> N [style=invis];
+}

@@ -1,0 +1,17 @@
+{
+  "schema": "h4-n31-prime-subgroup-screen-v1",
+  "question": "Which of frozen H4 n31 instances zero through two first has a prime subgroup of order at least 2^25 suitable for a bounded pair-index scaling diagnostic?",
+  "source": "research/exotic_ecdlp_20261021/H4_prime_descent/run.py",
+  "source_sha256": "46fb1a8a311f36907427ac35b40066d88cc0948c7f8b522fbc87c8338682e11a",
+  "field_degree": 31,
+  "instance_indices": [0, 1, 2],
+  "subspace_dimension": 11,
+  "construction": "for each index replay original H4 Python and Sage seed formulas, defining polynomial, curve coefficients, and independent eleven-vector x-subspace basis; count exact curve order and factor it",
+  "selection_rule": "largest prime divisor r of exact group order, cofactor h=order/r; choose the first index with r>=33554432; preserve every screened instance; if none qualifies report no selection",
+  "process_cap_seconds": 120,
+  "observed_peak_rss_bytes": 8589934592,
+  "host": "ordinary local macOS checked Sage; source-instance and eligibility diagnostic",
+  "statistics": ["all_three_orders", "exact_factorizations", "largest_prime_divisors", "cofactors", "field_and_curve_coefficients", "subspace_bases", "selected_index", "wall_ns", "peak_rss_bytes"],
+  "claim_boundary": "group-order and subgroup eligibility screen only; later base and pair-index measurements require a separate frozen packet",
+  "status": "frozen before execution"
+}

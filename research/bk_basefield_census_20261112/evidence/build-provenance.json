@@ -1,0 +1,62 @@
+{
+  "schema": "bk-basefield-build/v1",
+  "compiled_source_commit": "b978fdd6c24e91b63fdcb05ffd75779b5c7294c5",
+  "source_pins": [
+    {
+      "path": "research/bk_basefield_census_20261112/native/census.cpp",
+      "git_blob": "4ff0085436042a7efd6decfa8d49f19a3fa278e6",
+      "sha256": "b626a730a62f00d45ae2d84e35b14b185c6a44073b74130103db92ad062d0479",
+      "bytes": 10413
+    },
+    {
+      "path": "research/bk_basefield_census_20261112/native/analyze.cpp",
+      "git_blob": "5a127a6d7a79ab4e0111000ffe39bd5f36928b80",
+      "sha256": "e0a40dff0b7115696e51ae2a19471911573840cb0755254b99752e7f6a76854b",
+      "bytes": 2642
+    },
+    {
+      "path": "research/bk_basefield_census_20261112/native/queries.sql",
+      "git_blob": "5b141cae3bdbb4a1f427619b4cd0b2b9e54a4e5f",
+      "sha256": "a0183c170c6410bfd6889723735ca6f99f2203e2b4973ad4886a7192499cd8e8",
+      "bytes": 10953
+    },
+    {
+      "path": "research/theorem_census_20261109/native/finite.hpp",
+      "git_blob": "3ad73267596985afc1d65dec1b63d91d0484528b",
+      "sha256": "52bc0de38bd477be7a5712d27ad28178156e2973c2de87083428abb869a58b75",
+      "bytes": 4223
+    }
+  ],
+  "compiler": "g++ (Debian 14.2.0-19) 14.2.0\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+  "census_flags": "-O3 -std=c++20 -Wall -Wextra -Werror; asserts enabled; one thread",
+  "analyzer_flags": "-O2 -std=c++20 -Wall -Wextra -Werror; cached sqlite3 header, existing libsqlite3.so.0",
+  "binary": {
+    "path": "/workspace/scratch/bk-base-native/census",
+    "sha256": "a2ee50e92372d19e918b5fb035e99f83ebfd392b95391eea1b6f5c3cfc46fddb"
+  },
+  "analyzer": {
+    "path": "/workspace/scratch/bk-base-native/analyze",
+    "sha256": "01c69adc79f35c12d228e99b46a38458535bcb3f7649e4b416958c758e1b39ec"
+  },
+  "sqlite_header": {
+    "path": "/home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libsqlite3-sys-0.30.1/sqlite3/sqlite3.h",
+    "sha256": "d088aa96aa70db50f02acc5c86eca61a5d17556e4c363b9c06079239bf7f87b1"
+  },
+  "sqlite_runtime": {
+    "path": "/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6",
+    "sha256": "14c4418a06c5c2e30f5fb57bc8add93762236ae17898c6708984cf15e680ca71"
+  },
+  "host": {
+    "uname": [
+      "Linux",
+      "2d18c814bc7e",
+      "6.18.57",
+      "#1 SMP Tue Oct 20 21:56:04 UTC 2026",
+      "x86_64",
+      ""
+    ],
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C"
+  },
+  "no_native_data_run": true,
+  "paid_compute": 0
+}

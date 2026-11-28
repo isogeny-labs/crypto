@@ -1,0 +1,11 @@
+# Actual finite elliptic and Richelot chain qualification
+
+Source269689ea was published and all26 complete inputs matched GitHub readback before first phases. All seven phases return0: tool versions, strict formatting, warning-free optimized Rust compile, Clippy and actual chains. Final source/copy/tool/ELF guards are empty. Unsigned data record35dbcf pins the complete7401B native stdout513abe4f and result/guard files. [pcc:unverified]
+
+The source is E/F3: Y²=X³+2X+1, all7 points. Pullback goes to C: y²=x6+x5+x²+1; two actual Richelot correspondences then give C0: y²=x6+x5+x3+x²+1 and C2: y²=2x6+x5+2x3+x²+1. Transfer functions consume points and geometric coefficients; scalar labels occur only in the reference driver. Each map has7 distinct valid canonical classes, identity exactly at O, multiplication by7 zero, actual F3 Frobenius fixedness, all49 addition pairs and7 scalar controls. All21 output divisors are in the complete raw file. [pcc:unverified]
+
+Arithmetic uses F729=F27[b]/(b²-2), F27=F3[a]/(a³-a-1), primitive element30. All531441 pairs of addition and multiplication are checked against independent tower/trit formulas, with729 inverse/Fq/square-root decisions and basis distributivity controls. Existing native Cantor bodies are reused at this new field instance. Each of the three actual charts passes the moving-basepoint Frobenius mutant/restoration control. [pcc:unverified]
+
+The pullback independently matches its two actual preimages, including the double preimage at u=0 and2 source infinities. Six omitted-scale mutants fail validity. Both smooth Richelot chains handle the full homogeneous ordinate numerator. Four degree-drop cases x20/25,y1/2 reject premature affine reduction; the regular x0,y1 positive counterpart remains valid and equal. The actual product kernel is rejected. [pcc:unverified]
+
+Original A formatting1 and complete25546B diagnostic remain unchanged. No prior census, J8 or codomain population was replayed. This is finite order7 map qualification; the actual Weil8 pairing, general Jacobian-domain maps, formal Mathlib bridge and comparative full costs remain open. Complete4678160B native-built/immutable qualifier share SHAfc5ff609 and remain in original RAM custody pending remote store/CI artifact retention. [pcc:unverified]

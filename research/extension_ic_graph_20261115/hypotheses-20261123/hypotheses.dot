@@ -1,0 +1,17 @@
+digraph hypotheses {
+  graph [rankdir=TB, bgcolor="white", fontname="DejaVu Sans", nodesep=0.3, ranksep=0.35, pad=0.15];
+  node [shape=box, style="rounded,filled", fillcolor="#eef3f8", color="#34566e", fontname="DejaVu Sans", fontsize=11, margin="0.16,0.11"];
+  edge [color="#526675", arrowsize=0.65];
+  input [label="Existing extension-field graph IC\nProposals below are unmeasured", fillcolor="#dce9f1"];
+  h1 [label="H1  Sparser action operator\nReduce every Krylov product"];
+  h2 [label="H2  Compiled elimination template\nReplace repeated F4 reductions"];
+  h3 [label="H3  Earlier collection stop\nCarry k kernel coordinates into descent"];
+  h4 [label="H4  Fixed-residual function family\nDegree-8 quotient; setup amortization"];
+  cost [label="Charge setup + failures + payload + reconstruction\nCheck independent equations and the target", fillcolor="#e0f0e8"];
+  input -> h1; input -> h2; input -> h3; input -> h4;
+  {rank=same; h1; h2;}
+  {rank=same; h3; h4;}
+  h1 -> h3 [style=invis];
+  h2 -> h4 [style=invis];
+  h1 -> cost; h2 -> cost; h3 -> cost; h4 -> cost;
+}

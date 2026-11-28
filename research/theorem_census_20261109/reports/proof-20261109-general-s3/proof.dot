@@ -1,0 +1,20 @@
+digraph GeneralS3 {
+  graph [rankdir=TB,bgcolor="white",pad=.12,nodesep=.25,ranksep=.32];
+  node [shape=box,style="rounded,filled",fillcolor="#eaf2f8",fontname="DejaVu Sans",fontsize=11];
+  edge [color="#34546a",fontname="DejaVu Sans",fontsize=9];
+  model [label="Actual general Weierstrass model\nAny characteristic; nonzero discriminant"];
+  chord [label="Distinct x\nChord intercept + Vieta elimination"];
+  tangent [label="Repeated x; D != 0\nGeneral tangent factor"];
+  vertical [label="Repeated x; D = 0\nNonsingularity: A != 0; no finite root"];
+  fixed [label="Actual fixed-lift criterion\nS3 = 0 iff x(P+Q) or x(P-Q)",fillcolor="#d4edda"];
+  lifts [label="Actual quadratic y-lifts\nAlgebraically closed field"];
+  full [label="Full affine zero-sum equivalence\nPrescribed x-coordinates and P+Q+R=0",fillcolor="#d4edda"];
+  forms [label="Checked specializations\nShort model; ordinary binary model"];
+  controls [label="Outside normal-form hypotheses\nActual F2/F3 geometric false-zero controls",fillcolor="#fff2cc"];
+  model -> {chord tangent vertical};
+  {chord tangent vertical} -> fixed;
+  fixed -> full;
+  lifts -> full;
+  full -> forms;
+  full -> controls;
+}

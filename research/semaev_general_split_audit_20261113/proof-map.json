@@ -1,0 +1,91 @@
+{
+  "namespace": "SemaevGeneralSplitAudit",
+  "proofs": [
+    {
+      "file": "RetainedInterchange.lean",
+      "claim": "Fully prescribed Fubini and arbitrary-map specialization",
+      "declarations": [
+        "fully_prescribed_interchange"
+      ]
+    },
+    {
+      "file": "CubicInterchange.lean",
+      "claim": "Actual S3 convolution transfer and proved even sign",
+      "declarations": [
+        "cubicConvolution_interchange"
+      ]
+    },
+    {
+      "file": "TowerEvaluation.lean",
+      "claim": "Actual canonical evaluation, symmetry and recurrence",
+      "declarations": [
+        "sourceKernel_succ",
+        "sourceValue_permute"
+      ]
+    },
+    {
+      "file": "ListPermutation.lean",
+      "claim": "Exact position equivalences, duplicates allowed",
+      "declarations": [
+        "sourceValue_ofFn_perm"
+      ]
+    },
+    {
+      "file": "KernelBase.lean",
+      "claim": "Literal S3 base and retained scalar evaluation",
+      "declarations": [
+        "sourceKernel_zero",
+        "cubicConvolution_eval"
+      ]
+    },
+    {
+      "file": "ListKernels.lean",
+      "claim": "Proof-dependent arity/cast bridges",
+      "declarations": [
+        "listKernel_cons",
+        "listValue_perm"
+      ]
+    },
+    {
+      "file": "SplitInduction.lean",
+      "claim": "All two-block splits with fixed dimensions",
+      "declarations": [
+        "all_list_splits"
+      ]
+    },
+    {
+      "file": "UniversalSplit.lean",
+      "claim": "Literal independent-variable polynomial binding",
+      "declarations": [
+        "universal_prescribed_split"
+      ]
+    },
+    {
+      "file": "NaturalDegree.lean",
+      "claim": "Injective variable coefficient maps and exact degrees",
+      "declarations": [
+        "sourceKernel_independent_degree",
+        "universal_natural_split"
+      ]
+    },
+    {
+      "file": "LastVariable.lean",
+      "claim": "Literal source-last partial evaluation bridge",
+      "declarations": [
+        "sourceLastKernel_eq",
+        "source_order_natural_split"
+      ]
+    },
+    {
+      "file": "SplitCertificate.lean",
+      "claim": "Closed source-index coverage and main with both controls",
+      "declarations": [
+        "source_index_coverage",
+        "actual_all_source_splits_certificate"
+      ]
+    }
+  ],
+  "local_gate": "82/0failures/0trusted",
+  "signed_standing": "not established",
+  "open": "Higher-arity absolute irreducibility and remaining all14 obligations."
+}

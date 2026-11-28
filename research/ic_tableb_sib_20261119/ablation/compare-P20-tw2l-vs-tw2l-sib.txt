@@ -1,0 +1,60 @@
+ops (ok): tw2l-sib / tw2l = 0.8022 [0.764, 0.843] (linearised_t, df 47) over 96 pairs on 48 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 0.8018, w=0.1: 0.8452, w=1: 1.0916): unresolved inside the band; wall: admitted ns/GAE tw2l-sib/tw2l 1.4162 [1.314, 1.527], no admitted A/A: not corrected for bias, noise test unavailable; end-to-end wall 1.1360 [1.049, 1.230]; ns/GAE of tw2l, tw2l-sib is an upper bound on its cost per operation (GAE is a lower bound)
+table work priced with the unpriced counters (the default since 2026-11-08): table_insert_attempts
+measurement quality: 0 / 100; paired attempts 96, verified 96, admitted 0; levels {"L0": 96}; p95 foreign busy unknown%, p95 run queue 2.02%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2; contention telemetry is incomplete
+arm tw2l: verified 96/96 (0 censored); max/median S 1.42, top run 1% of total; unpriced: projected_base_column_map_entries_uncharged=384, projected_base_dedup_probes_uncharged=192, projected_base_membership_checks_uncharged=192; table work (priced): table_insert_attempts=160863
+arm tw2l-sib: verified 96/96 (0 censored); max/median S 1.27, top run 1% of total; unpriced: projected_base_column_map_entries_uncharged=384, projected_base_dedup_probes_uncharged=192, projected_base_membership_checks_uncharged=192; table work (priced): sibling_lift_products=10369, sibling_second_points=82645, table_insert_attempts=165044
+| curve | log2 r | workloads | tw2l-sib / tw2l | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-fp20-t1293-3c2999ba | 20.00 | 48 | 0.8022 | [0.7636, 0.8426] | linearised_t |
+
+| workload | curve | log2 r | tw2l mean S | tw2l-sib mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W0763db81059b | icv1-fp20-t1293-3c2999ba | 20.00 | 3.3085 | 2.5647 | 0.7752 |
+| W0857231c332f | icv1-fp20-t1293-3c2999ba | 20.00 | 2.6884 | 2.2979 | 0.8548 |
+| W0a7512f140d2 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.8477 | 2.3844 | 0.8373 |
+| W0da6bfa7a113 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.6527 | 2.1377 | 0.8058 |
+| W0e6277e58308 | icv1-fp20-t1293-3c2999ba | 20.00 | 3.5425 | 2.1885 | 0.6178 |
+| W14c575666535 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.6908 | 2.2642 | 0.8415 |
+| W1bdc48606183 | icv1-fp20-t1293-3c2999ba | 20.00 | 3.3129 | 2.4646 | 0.7439 |
+| W1d3424cec838 | icv1-fp20-t1293-3c2999ba | 20.00 | 3.0451 | 2.3150 | 0.7603 |
+| W1dc1ed35778d | icv1-fp20-t1293-3c2999ba | 20.00 | 3.1623 | 2.2398 | 0.7083 |
+| W1ed151efe719 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.6381 | 2.1372 | 0.8101 |
+| W1f22db2eb6d0 | icv1-fp20-t1293-3c2999ba | 20.00 | 3.3905 | 2.4084 | 0.7103 |
+| W231453615f7c | icv1-fp20-t1293-3c2999ba | 20.00 | 3.2923 | 2.3214 | 0.7051 |
+| W2cf6b938e556 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.2721 | 2.2031 | 0.9697 |
+| W309898f3cb7c | icv1-fp20-t1293-3c2999ba | 20.00 | 3.2909 | 2.4792 | 0.7534 |
+| W30cc523d2fa8 | icv1-fp20-t1293-3c2999ba | 20.00 | 3.7605 | 2.0512 | 0.5455 |
+| W387030190fec | icv1-fp20-t1293-3c2999ba | 20.00 | 3.0607 | 2.5980 | 0.8488 |
+| W3c8140af7782 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.3444 | 2.4294 | 1.0362 |
+| W3d095e05c1c5 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.7480 | 2.3185 | 0.8437 |
+| W44a2baf69a3f | icv1-fp20-t1293-3c2999ba | 20.00 | 2.5383 | 2.0150 | 0.7938 |
+| W44ee955da095 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.4455 | 2.3551 | 0.9630 |
+| W4a3e5c4aa5ad | icv1-fp20-t1293-3c2999ba | 20.00 | 2.9787 | 2.4396 | 0.8190 |
+| W4a48d8140651 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.8223 | 2.3820 | 0.8440 |
+| W4e94b24f9710 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.3605 | 2.2984 | 0.9737 |
+| W542b199ab739 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.4919 | 2.1606 | 0.8670 |
+| W5b4c28bb7a2f | icv1-fp20-t1293-3c2999ba | 20.00 | 2.6986 | 2.2979 | 0.8515 |
+| W6130d181380a | icv1-fp20-t1293-3c2999ba | 20.00 | 3.0866 | 2.3883 | 0.7738 |
+| W62185d157483 | icv1-fp20-t1293-3c2999ba | 20.00 | 3.5303 | 2.1445 | 0.6075 |
+| W71167f1cf917 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.5545 | 2.4958 | 0.9770 |
+| W71244f1fe8d8 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.9928 | 2.5090 | 0.8384 |
+| W7851e5cca70d | icv1-fp20-t1293-3c2999ba | 20.00 | 2.7861 | 2.5286 | 0.9076 |
+| W7c580cc1c5d0 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.4196 | 2.6644 | 1.1012 |
+| W7ebb0c54b792 | icv1-fp20-t1293-3c2999ba | 20.00 | 3.7190 | 2.1406 | 0.5756 |
+| W7fe828ce3893 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.9098 | 2.2188 | 0.7625 |
+| W815b44436d90 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.1777 | 2.2403 | 1.0287 |
+| W82d0c984f010 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.9767 | 2.1938 | 0.7370 |
+| W8a629479c5ac | icv1-fp20-t1293-3c2999ba | 20.00 | 2.9967 | 2.1963 | 0.7329 |
+| W95c66fc27ed4 | icv1-fp20-t1293-3c2999ba | 20.00 | 3.7233 | 2.3023 | 0.6184 |
+| W9c97529c0e18 | icv1-fp20-t1293-3c2999ba | 20.00 | 3.5596 | 2.1259 | 0.5972 |
+| Wa14aafd79486 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.7235 | 2.6190 | 0.9616 |
+| Wb2809a290a93 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.3654 | 2.2041 | 0.9318 |
+| Wbdfd0d202cd4 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.9654 | 2.5310 | 0.8535 |
+| Wc2d7d9576c02 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.3370 | 2.3864 | 1.0211 |
+| Wc83db22ac7ca | icv1-fp20-t1293-3c2999ba | 20.00 | 2.8740 | 2.3356 | 0.8126 |
+| Wd69a161b6e86 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.1723 | 2.0658 | 0.9510 |
+| Wd98eabab2c18 | icv1-fp20-t1293-3c2999ba | 20.00 | 3.0177 | 2.3991 | 0.7950 |
+| Wecee2dd6888b | icv1-fp20-t1293-3c2999ba | 20.00 | 2.9073 | 2.3160 | 0.7966 |
+| Wf3f9cafc412b | icv1-fp20-t1293-3c2999ba | 20.00 | 3.1961 | 2.0614 | 0.6450 |
+| Wfe72659733a0 | icv1-fp20-t1293-3c2999ba | 20.00 | 2.1381 | 2.2901 | 1.0711 |

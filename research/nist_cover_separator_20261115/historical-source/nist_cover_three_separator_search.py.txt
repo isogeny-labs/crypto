@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+"""Audit common arithmetic cover scores without fitting arbitrary label rules."""
+import argparse
+import json
+from pathlib import Path
+
+ROOT=Path(__file__).parent
+FAMILIES=['192','224','256','239']
+
+
+def features(r):
+    out={k:r[k] for k in ['Prym_full_three_torsion_field_degree','whole_genus3_full_three_torsion_field_degree',
+                         'Prym_three_orbit_count','Prym_shortest_three_orbit','Prym_longest_three_orbit']}
+    if 'rational_maximal_isotropic_three_kernel_count' in r:
+        out['rational_maximal_isotropic_three_kernel_count']=r['rational_maximal_isotropic_three_kernel_count']
+    for name in ['rational_isotropic_order_nine_subgroup_count','minimal_extension_for_maximal_isotropic_three_kernel']:
+        if name in r:out[name]=r[name]
+    for degree,count in r.get('maximal_isotropic_three_kernel_counts_by_extension',{}).items():
+        out[f'maximal_isotropic_three_kernel_count_extension_{degree}']=count
+    ranks=r['three_torsion_ranks_by_extension_degree']
+    for side in ['Prym','whole_genus3_Jacobian']:
+        for m in [1,2,3,4,6,8,10,12]:out[f'{side}_rational_three_rank_extension_{m}']=ranks[str(m)][side]
+        plus=ranks['1'][side];minus=ranks['2'][side]-plus
+        out[f'{side}_rational_cyclic_three_subgroup_count']=(3**plus+3**minus-2)//2
+    return out
+
+
+def main():
+    ap=argparse.ArgumentParser();ap.add_argument('--max-d',type=int,default=15);ap.add_argument('--subgroups',action='store_true');args=ap.parse_args()
+    data=json.loads((ROOT/f'nist_cover_three_grid_local_d0_to{args.max_d}.json').read_text())
+    rows=data['rows'];keys=sorted({(r['family'],r['candidate']) for r in rows});n=len(keys);assert n==19
+    if args.subgroups:
+        exact={(r['family'],r['candidate'],r['cover_parameter_d']):r for r in json.loads((ROOT/'nist_cover_three_exact_subgroups_grid.json').read_text())['rows'] if r['complete']}
+        extfile=ROOT/'nist_cover_three_kernel_extensions_grid.json'
+        extensions={(r['family'],r['candidate'],r['cover_parameter_d']):r for r in json.loads(extfile.read_text())['rows'] if r['complete']} if extfile.exists() else {}
+        for r in rows:
+            k=(r['family'],r['candidate'],r['cover_parameter_d'])
+            r.pop('rational_maximal_isotropic_three_kernel_count',None)
+            if k in exact:
+                for name in ['rational_maximal_isotropic_three_kernel_count','rational_isotropic_order_nine_subgroup_count']:r[name]=exact[k][name]
+            if k in extensions:
+                for name in ['minimal_extension_for_maximal_isotropic_three_kernel','maximal_isotropic_three_kernel_counts_by_extension']:r[name]=extensions[k][name]
+    bykey={(r['family'],r['candidate'],r['cover_parameter_d']):r for r in rows if r['complete']}
+    maxd=-1
+    for d in range(args.max_d+1):
+        if all((f,c,d) in bykey for f,c in keys):maxd=d
+        else:break
+    assert maxd>=0
+    status={(r['family'],r['candidate']):r['status'] for r in rows};actual=sum(1<<i for i,k in enumerate(keys) if status[k]=='published')
+    groups=[[i for i,k in enumerate(keys) if k[0]==f] for f in FAMILIES]
+    counts=[sum(status[keys[i]]=='published' for i in g) for g in groups]
+    values={(k,d):features(bykey[k+(d,)]) for k in keys for d in range(maxd+1)}
+    names=sorted(set.union(*(set(v) for v in values.values())))
+    masks=set();hits=[];globalhits=[];tests=0;tests_by_feature={}
+    for name in names:
+        ft=0
+        for left in range(maxd+1):
+            for right in range(left,maxd+1):
+                if not all(name in values[k,d] for k in keys for d in range(left,right+1)):continue
+                for mode in ['sum','min','max']:
+                    scores=[]
+                    for k in keys:
+                        a=[values[k,d][name] for d in range(left,right+1)]
+                        scores.append(sum(a) if mode=='sum' else min(a) if mode=='min' else max(a))
+                    for direction in ['lower','higher']:
+                        tests+=1;ft+=1;mask=0;valid=True
+                        for g,c in zip(groups,counts):
+                            order=sorted(g,key=lambda i:scores[i],reverse=direction=='higher')
+                            if scores[order[c-1]]==scores[order[c]]:valid=False;break
+                            mask|=sum(1<<i for i in order[:c])
+                        if valid:
+                            masks.add(mask)
+                            if mask==actual:
+                                hits.append({'feature':name,'left_d':left,'right_d':right,'aggregation':mode,'selected_direction':direction,
+                                             'scores':[{'family':k[0],'candidate':k[1],'status':status[k],'score':scores[i]} for i,k in enumerate(keys)]})
+                                pub=[scores[i] for i,k in enumerate(keys) if status[k]=='published'];skip=[scores[i] for i,k in enumerate(keys) if status[k]=='eligible_skip']
+                                if max(pub)<min(skip) if direction=='lower' else min(pub)>max(skip):globalhits.append(hits[-1])
+        tests_by_feature[name]=ft
+    result={'scope':'All four streams with eligible skips. Same cover-parameter interval, arithmetic feature, aggregation and selected direction in every stream.',
+            'complete_d_prefix':[0,maxd],'feature_count':len(names),'tested_rules':tests,'tests_by_feature':tests_by_feature,
+            'observed_separators':hits,'observed_global_cutoff_separators':globalhits,'attainable_labelings':len(masks),'all_within_family_labelings':4480,
+            'conditional_label_fraction':len(masks)/4480,
+            'limits':'Exploratory in-sample separation. The label fraction adjusts only for this finite feature/window/aggregation search; it does not account for other research choices or establish historical selection intent.'}
+    suffix='_subgroups' if args.subgroups else ''
+    dest=ROOT/f'nist_cover_three_separator_search_d0_to{args.max_d}{suffix}.json';dest.write_text(json.dumps(result,indent=2)+'\n')
+    print({k:v for k,v in result.items() if k not in ['observed_separators','tests_by_feature']})
+    print('HITS',len(hits),'GLOBAL',len(globalhits))
+    for hit in hits[:20]:print({k:v for k,v in hit.items() if k!='scores'})
+
+
+if __name__=='__main__':main()

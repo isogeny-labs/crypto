@@ -1,0 +1,57 @@
+{
+  "id": "table-propagation-profile-20261116-v110",
+  "hypothesis": "Exact domain support propagation in a12bit quotient may remove at least10percent of actual necessary block tuples without losing solutions.",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "-m",
+    "research.table_propagation_20261116_v110.profile",
+    "table-propagation-profile-20261116-v110",
+    "profile_raw"
+  ],
+  "source_paths": [
+    "lab/runner.py",
+    "performance_gate.py",
+    "performance/GATE.md",
+    "research/residue_quotient_20261116_v99b/kernel.py",
+    "research/residue_quotient_20261116_v99b/problem.py",
+    "research/table_propagation_20261116_v110/common.py",
+    "research/table_propagation_20261116_v110/kernel.py",
+    "research/table_propagation_20261116_v110/oracles.py",
+    "research/table_propagation_20261116_v110/profile.py",
+    "research/table_propagation_20261116_v110/PROOF_AND_REVIEW.md"
+  ],
+  "input_paths": [
+    "research/table_propagation_20261116_v110/DATA.json",
+    "research/autolab_cycle_20261116_v110/SYNTAX_PREFLIGHT.json",
+    "research/residue_quotient_20261116_v99b/DATA.json",
+    "research/residue_quotient_20261116_v99b/snapshot/MATRIX.txt",
+    "research/residue_quotient_20261116_v99b/snapshot/research__residue_cover_certificate_20261116_v84b__raw.json"
+  ],
+  "expected_sha256": {
+    "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+    "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+    "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+    "research/residue_quotient_20261116_v99b/kernel.py": "79794f7b079b9a1dc2c2816b6768ba27ac5b623111f3907e76eefa843c0a21ba",
+    "research/residue_quotient_20261116_v99b/problem.py": "92849b9bf1ef547334678a641376a17e2751e2fc60293b264bef17e78a928d11",
+    "research/table_propagation_20261116_v110/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+    "research/table_propagation_20261116_v110/kernel.py": "4c62ac81588f570e4f23056d75460d737656b562105f8991a1c913b2973fee06",
+    "research/table_propagation_20261116_v110/oracles.py": "705ee1ae102b8004e4ddb41b1bac28c2a29be04c70c4829101a8c16da3a4c50d",
+    "research/table_propagation_20261116_v110/profile.py": "eed2e22beba56b6e8f2c46f569fadda32d58e9e71490c2297d4bc6ac4481ff39",
+    "research/table_propagation_20261116_v110/PROOF_AND_REVIEW.md": "0e2bb0f7671f885da2365bb4f5758a2ef9cf2412ec4416bb605c67cc49712a05",
+    "research/table_propagation_20261116_v110/DATA.json": "657db07e73131174ae5b3378e82597d7a698b58ac1ca6a414c83e5fdefd2bde6",
+    "research/autolab_cycle_20261116_v110/SYNTAX_PREFLIGHT.json": "5e0470328465404d304f4320990b5ef1a095a6ddd86fad033480e417b2cf3ab6",
+    "research/residue_quotient_20261116_v99b/DATA.json": "8cb31ef70939f7fc23fba519e691fba161e02506e83e5fb1ef732151af3ca015",
+    "research/residue_quotient_20261116_v99b/snapshot/MATRIX.txt": "d8a7a989e27b727e5560b609111b18baff88e22d53bcaceb13efd2882d21d2b8",
+    "research/residue_quotient_20261116_v99b/snapshot/research__residue_cover_certificate_20261116_v84b__raw.json": "b46f07ffe45289f98f3fd95159c8dfade3f4e4364d80425caf48dc94e971c98b"
+  },
+  "timeout_seconds": 90,
+  "memory_limit_mb": 4096,
+  "cpu": 0,
+  "depends_on": [
+    "table-propagation-oracles-20261116-v110"
+  ],
+  "artifact_paths": [
+    "research/table_propagation_20261116_v110/profile_raw.json",
+    "research/table_propagation_20261116_v110/domains.json"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T16:00:18Z",
+ "id": "PCC-20261118-224ceb",
+ "kind": "statement",
+ "producer": {
+  "commit": "b3911840d8ca5bda5b9feb069837698201e8d751",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/oracle-pre-call.sha256",
+    "sha256": "39f09b55c7e423635cda1e8a7a185ca09b84d524db9bf3b440a344846760e860"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/source-vectors.json",
+    "sha256": "0db8fbfc32efec7e71e748f1c7118aed572d8bd65dcbf0f2c6cf0e1643b9a144"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/wide-harness-20261118",
+ "statement": "The bounded PARI source-only oracle produced 32 shared-law scalar point vectors for each of the frozen 202-bit source and 96-bit pilot with empty build/runtime stderr. These are known-input source controls; the Rust adapter comparison has not yet executed and no quotient, map crossing or runtime is established."
+}

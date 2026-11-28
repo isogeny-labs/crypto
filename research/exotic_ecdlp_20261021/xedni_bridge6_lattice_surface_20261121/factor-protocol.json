@@ -1,0 +1,9 @@
+{
+  "schema": "xedni-bridge6-lattice-factor-protocol-v1",
+  "surface_result_sha256": "6ffc834c2af3b97bc490bf14e9c1213649beee07d9d27cef549b082fc5fbdfff",
+  "source": "the exact sparse numerator N(u,v,t) of x(6Q)-x(P) from the frozen full-lattice surface packet",
+  "sign_test": "reconstruct 6Q over Frac(QQ[u,v,t]); for each irreducible numerator factor compute its gcd over QQ[u,v,t] with the canceled numerators of y(6Q)+y(P)+a1*x(P)+a3 and y(6Q)-y(P)",
+  "output": "retain both full sparse factor coefficient streams and their digests, multiplicities, and exact sign-divisibility statuses",
+  "resource": "300-second hard checked-Sage process cap; retain all stage events and any timeout as incomplete",
+  "claim_boundary": "classification of generic x-coordinate factors for one fixed point pair and coefficient lattice; rational integer points and singular/denominator exceptions remain separate"
+}

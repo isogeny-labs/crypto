@@ -1,0 +1,33 @@
+# Raw combined correctness replay is preserved as one archive; retain named receipts.
+/evidence/e2e-v1/*
+!/evidence/e2e-v1/COMPLETE.txt
+!/evidence/e2e-v1/MANIFEST.sha256
+/evidence/e2e-v2/*
+!/evidence/e2e-v2/COMPLETE.txt
+!/evidence/e2e-v2/MANIFEST.sha256
+/evidence/geometry-e2e-v1/*
+!/evidence/geometry-e2e-v1/COMPLETE.txt
+!/evidence/geometry-e2e-v1/MANIFEST.sha256
+# Fresh recorded-kernel trees are archived after completion; keep status receipts visible.
+/evidence/kernel2-v1/replay/
+/evidence/kernel3-v1/replay/
+/evidence/kernel3-resume-v1/replay/
+/evidence/complete-maps-v1/qualifier
+/evidence/transpose-maps-v1/qualifier
+/evidence/closed-transpose-v1/qualifier
+/evidence/moving-transpose-v1/qualifier
+/evidence/pole-cases-v1/qualifier
+/evidence/complete-km-v1/qualifier
+/evidence/complete-km-v2/qualifier
+/evidence/complete-km-v3/qualifier
+/evidence/opaque-km-*/qualifier
+/evidence/opaque-km-primary-v1/build.stderr
+/evidence/relation-pipeline-*/producer
+/evidence/relation-pipeline-*/checker
+/evidence/relation-transfer-*/producer
+/evidence/relation-transfer-*/checker
+/evidence/relation-e2e-*/relations/producer
+/evidence/relation-e2e-*/relations/checker
+/evidence/relation-e2e-*/transfer/producer
+/evidence/relation-e2e-*/transfer/checker
+/evidence/relation-portable-*/reviewer

@@ -1,0 +1,124 @@
+{
+  "main": "BKCharFiveGeometricAudit.bk_char_five_geometric_certificate",
+  "binding": "a625348a8083ec690a7a7b8d5f09b3330f7df44e6f814806b1bd4b61e14b4ee3",
+  "custom_imports": {
+    "BaseCurve": "research/bk_char_five_geometric_audit_20261115/lean/BaseCurve.lean",
+    "FiveCoordinates": "research/bk_char_five_geometric_audit_20261115/lean/FiveCoordinates.lean",
+    "CharFiveCertificate": "research/bk_char_five_geometric_audit_20261115/lean/CharFiveCertificate.lean",
+    "Eliminant": "research/bk_char_five_geometric_audit_20261115/lean/Eliminant.lean",
+    "S3Roots": "research/bk_char_five_geometric_audit_20261115/lean/S3Roots.lean",
+    "GeometricDescent": "research/bk_char_five_geometric_audit_20261115/lean/GeometricDescent.lean",
+    "S3Completion": "research/bk_char_five_geometric_audit_20261115/lean/S3Completion.lean"
+  },
+  "credited_adapted_modules": [
+    "S3Roots",
+    "S3Completion"
+  ],
+  "claims": [
+    {
+      "declaration": "BKCharFiveGeometricAudit.eliminant_zero_of_double",
+      "conclusion": "Actual two repeated doubling polynomial relations imply eliminant zero."
+    },
+    {
+      "declaration": "BKCharFiveGeometricAudit.eliminant_polynomial_factor",
+      "conclusion": "Actual concrete F5 polynomial factorization checked coefficientwise in kernel."
+    },
+    {
+      "declaration": "BKCharFiveGeometricAudit.eliminant_factor",
+      "conclusion": "Generic characteristic5 scalar transport of the proved eliminant factorization."
+    },
+    {
+      "declaration": "BKCharFiveGeometricAudit.triple_nonzero_of_five",
+      "conclusion": "Actual nonzero5-torsion cannot have diagonal triple factor zero, via S3 and coprime3/5."
+    },
+    {
+      "declaration": "BKCharFiveGeometricAudit.five_x_coordinates",
+      "conclusion": "Every actual nonzero5-torsion has x1 or2."
+    },
+    {
+      "declaration": "BKCharFiveGeometricAudit.five_coordinates",
+      "conclusion": "Every actual nonzero5-torsion has x1/2 and y±1."
+    },
+    {
+      "declaration": "BKCharFiveGeometricAudit.base_delta",
+      "conclusion": "Actual F5 curve discriminant nonzero."
+    },
+    {
+      "declaration": "BKCharFiveGeometricAudit.base_count",
+      "conclusion": "Actual E(F5) point cardinality5 derived."
+    },
+    {
+      "declaration": "BKCharFiveGeometricAudit.base_point_order",
+      "conclusion": "Actual four nonzero listed basepoints have order5."
+    },
+    {
+      "declaration": "BKCharFiveGeometricAudit.all_geometric_five_rational",
+      "conclusion": "Every actual5-torsion point in every extension lies in actual base point-map image."
+    },
+    {
+      "declaration": "BKCharFiveGeometricAudit.geometricTorsionEquiv",
+      "conclusion": "Actual base point group bijection with the whole geometric5-torsion point kernel."
+    },
+    {
+      "declaration": "BKCharFiveGeometricAudit.geometric_five_card",
+      "conclusion": "Whole actual5-torsion point kernel cardinality5 in every extension, including algebraic closure."
+    },
+    {
+      "declaration": "BKCharFiveGeometricAudit.inclusion_paraphrase_false",
+      "conclusion": "Direct negation of actual full-geometric-point inclusion iffdivisibility paraphrase."
+    },
+    {
+      "declaration": "BKCharFiveGeometricAudit.no_modular_embedding",
+      "conclusion": "For everyk>0,5 doesnotdivide5^k-1."
+    },
+    {
+      "declaration": "BKCharFiveGeometricAudit.original_count_criterion",
+      "conclusion": "OriginalBK r²-count criterion bothsidesfalse survives in every actualfiniteextension."
+    }
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 61,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_log_advisories": 7,
+    "final_new_module_advisories": 0,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "two_credited_argument_cores_module_wrappers_adapted": true,
+    "original_argument_bodies_equal": true,
+    "actual_base_curve_count_and_pointorders_derived": true,
+    "actual_characteristic5_coordinate_restriction_proved": true,
+    "actual_point_map_descent_for_every_extension_proved": true,
+    "actual_whole_geometric_point_kernel_cardinality5_proved": true,
+    "actual_inclusion_paraphrase_disproved": true,
+    "original_BK_count_criterion_survives": true,
+    "nonreduced_p_torsion_group_scheme_proved": false,
+    "generalprime_BK_Weil_rank_determinant_proved": false,
+    "full_population_allk_census_complete": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

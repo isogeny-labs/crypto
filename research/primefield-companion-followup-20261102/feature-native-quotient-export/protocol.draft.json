@@ -1,0 +1,673 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "PF-source-quotient-paired-export-20261107",
+  "version": 1,
+  "created": "2026-11-07",
+  "repository": "crypto",
+  "study_dir": "research/primefield-companion-followup-20261102/feature-native-quotient-export",
+  "authors": [
+    "native prime-field research"
+  ],
+  "links": {
+    "status": "DRAFT: capture/export software validated on synthetic fixtures; no workload execution, freeze, admission or reserved funds."
+  },
+  "question": "Which quotient routes and weighted supports occur inside the source Fp kernel during the fixed617 cold-source public recovery cases?",
+  "claims": [
+    {
+      "id": "source-quotient-trace",
+      "text": "Exact source-only quotient histograms and separate quotient multiplication/inversion counts for617 fixed public targets.",
+      "class": "exact_computation",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "trace",
+      "role": "candidate",
+      "description": "Fresh Source for each target, one recover_traced call; source Fp quotient events only",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-O",
+            "-C",
+            "overflow-checks=yes",
+            "--cfg",
+            "quotient_trace",
+            "research/primefield-companion-followup-20261102/feature-native-quotient-trace/modes.rs",
+            "-o",
+            "collector"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "optimization": "3",
+          "overflow_checks": "yes",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "record_cap_per_target": 100000,
+        "source_lifetime": "fresh per target",
+        "mode_preparation": "once per curve, outside trace"
+      }
+    },
+    {
+      "id": "aa",
+      "role": "control_aa",
+      "description": "Second identical collector process, independently captured; requires exact transcript equality",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-O",
+            "-C",
+            "overflow-checks=yes",
+            "--cfg",
+            "quotient_trace",
+            "research/primefield-companion-followup-20261102/feature-native-quotient-trace/modes.rs",
+            "-o",
+            "collector"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "optimization": "3",
+          "overflow_checks": "yes",
+          "edition": "2021"
+        },
+        "env": {}
+      },
+      "parameters": {
+        "record_cap_per_target": 100000,
+        "source_lifetime": "fresh per target",
+        "mode_preparation": "once per curve, outside trace"
+      },
+      "same_instrument_as": "trace"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "repeat",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Synthetic software controls exercise all actual branches and known exact sparse products before collection; workload is descriptive, not detection of an unknown effect."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No null-population or statistical detection claim; synthetic dropped/error/malformed controls reject invalid records."
+    }
+  },
+  "variable_ledger": {
+    "independent": [],
+    "factors": [
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "Five existing fixtures, every scalar index only in target generation and validation",
+        "how": "Source receives public target only; tuple order and ascending index frozen in collector"
+      },
+      {
+        "name": "source_lifetime",
+        "treatment": "fixed",
+        "value": "Fresh per target",
+        "how": "Constructor outside capture; lazy preparation during recovery included only insofar as it invokes quotient"
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "Pinned Rust source closure/compiler/binary",
+        "how": "Production binding pending freeze"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Admitted one-thread CPU Spot",
+        "how": "Retain host/job metadata; no valid wall clock"
+      },
+      {
+        "name": "order_analyst",
+        "treatment": "fixed",
+        "value": "Deterministic order and unblinded strict parser",
+        "how": "All617 targets required; no adaptive selection"
+      },
+      {
+        "name": "layout_preemption",
+        "treatment": "measured",
+        "value": "No timing; no resume",
+        "how": "Retain complete or partial rows and failure receipt"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "repeat",
+        "arms": [
+          "trace",
+          "aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "absolute-source-trace",
+        "arms": [
+          "trace"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "617 verified targets; all declared records valid; zero drops/overflow"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Two identical deterministic processes, sequential order; no timing inference",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "nonce": null,
+      "note": "No pseudorandom generation; enumerate fixed fixture scalar indices outside measured source"
+    },
+    "instance_sampling": {
+      "rule": "r=19,47,79,191,281, all k=0..r-1,617 targets",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact event counts with fixed analysis and no sampling inference",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 617,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact fixed-fixture integer comparison; no population-power or significance claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "quotients",
+        "name": "quotients",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Calls entering canonical quotient helper inside source Fp kernel",
+        "source": "collector quotient rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "products",
+        "name": "products",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Poly::fm calls during quotient construction; excludes residual and other source work",
+        "source": "collector quotient rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "inversions",
+        "name": "inversions",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Poly::inverse entries during quotient construction",
+        "source": "collector quotient rows",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L1",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "counted",
+    "counters": [
+      "quotients",
+      "products",
+      "inversions"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel",
+      "binary_sha256",
+      "source_commit",
+      "protocol_sha256",
+      "image_digest",
+      "job_uid",
+      "pod_uid",
+      "environment",
+      "memory_layout",
+      "admission_receipt",
+      "raw_sha256",
+      "external_exit_status"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-spot",
+    "placement": {
+      "cpus": 1,
+      "memory_mib": 1024,
+      "spot": true,
+      "max_total_usd": 1,
+      "reservation_status": "PROPOSED ceiling including build, idle, failures, storage and transfer; no reserved funds, no submission authority",
+      "concurrency": 1
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 120,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Two identical617-target processes,1234 target rows total, one admitted attempt120s shared deadline, cap100000 events per target; no retry",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any missing/extra/reordered/malformed record, failed recovery, dropped events or counter overflow invalidates complete-panel analysis.",
+    "Every modulus must match source p; scalar-field mode/recovery polynomial events are out of scope.",
+    "Require canonical pre-data freeze, exact published source/binary, authentic admission, known remaining funds and successful external receipt.",
+    "Each stdout/stderr limited to16MiB by child RLIMIT_FSIZE. One shared120s deadline; failed/incomplete pairs remain raw receipts, no success export."
+  ],
+  "decision_rule": {
+    "text": "Require identical validated transcripts in both independent processes before reporting source-only histograms.",
+    "comparison_ids": [
+      "absolute-source-trace"
+    ],
+    "threshold": "All617 target headers and all declared events valid",
+    "statistic": "Exact integer histogram and per-target named sums",
+    "interval": "None, fixed census",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "No comparative effect estimate",
+    "verdict_vocabulary": [
+      "complete_fixed_panel",
+      "invalid_measurement"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "pair.py",
+      "sha256": "331b63cb27a22d25e218b8a5b836287a7c2bcb9c256754d23f25c309acfcb2fd"
+    },
+    "inputs": [
+      "Two collector CSVs, per-process stderr and shared attempt receipt; all source/binary/protocol pins"
+    ],
+    "outputs": [
+      "analysis.json and canonical export.json for complete identical pair only"
+    ],
+    "blinded": false,
+    "frozen_before_data": false
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Quotient length vs route/support, source-only"
+    ],
+    "report_dir": "future-panel-report"
+  },
+  "inadmissible": [
+    "Execution before freeze/publication/budget/admission",
+    "Treating environment opt-in as authorization",
+    "Using synthetic rows as workload observations",
+    "Combining source and scalar fields or claiming whole-source/timing cost",
+    "Replacing original4563 cohort or retrying under a renamed attempt"
+  ],
+  "literature": [
+    {
+      "ref": "../feature-native-weighted-quotient/DERIVATION.md",
+      "provenance": "internal",
+      "claim": "Weighted-support quotient bound and accounting scope",
+      "verified_by": "Source and proof review"
+    },
+    {
+      "ref": "../feature-native-resultant-protocol/authority/docs/experiment-protocol.md",
+      "provenance": "internal",
+      "claim": "Protocol freeze and export requirements",
+      "verified_by": "Read pinned authority"
+    },
+    {
+      "ref": "../feature-native-quotient-trace/README.md",
+      "provenance": "internal",
+      "claim": "Source vs scalar-field boundary, telemetry and collector fixtures",
+      "verified_by": "Source review"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  },
+  "extensions": {
+    "production_binding_status": "pending admitted production build/preflight/publication binding",
+    "reserved_usd": 0,
+    "collector_build_only": true,
+    "canonical_export_adapter_status": "implemented; synthetic validation only",
+    "canonical_authority": {
+      "repo": "isogeny-labs/crypto-autoresearcher",
+      "commit": "41bfaed260093c69da299cbad936205530909b6f",
+      "files": [
+        {
+          "path": "tools/experiment_protocol.py",
+          "git_blob": "9917acf83f0eeb37a249d3c822cbd422117d461a",
+          "sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+          "bytes": 64811
+        },
+        {
+          "path": "schemas/experiment-protocol.v1.json",
+          "git_blob": "9d8543e6b448264c333649e1a4dfd83a2a297bd5",
+          "sha256": "a9b948f2be323f862b98301eb7a5aa147ecc29db35041737f0aa3dfd03ad2443",
+          "bytes": 37583
+        },
+        {
+          "path": "schemas/experiment-export.v1.json",
+          "git_blob": "707ebf6f814d96bb44b36a9ccb3e25128e1aaf5e",
+          "sha256": "108f0ae9c1be3ed141bca3c22216eba049f2c76677f11013109a4740f19bd757",
+          "bytes": 11875
+        },
+        {
+          "path": "docs/experiment-protocol.md",
+          "git_blob": "0830f344b30e6d4386eec7be071d3cb7a94f4b3a",
+          "sha256": "111beee86ce91364cc23098ab232a151b1ece271eabdc544df49ba56067fecf2",
+          "bytes": 15572
+        }
+      ]
+    },
+    "bindings": {
+      "analysis": {
+        "path": "../feature-native-quotient-trace/analyze.py",
+        "sha256": "ee05059f97830455f1005ee95726aa65814c076fcf09d626f21cf6e02d787600"
+      },
+      "capture": {
+        "path": "capture.py",
+        "sha256": "b90a2993ceb17419eb643484693430d2288c71f92c2f083aab544c21d4047654"
+      },
+      "export": {
+        "path": "export.py",
+        "sha256": "05410241e644d28e450eed75dce08098fbb7fd157c7bbf163044c07a98c9492f"
+      },
+      "common": {
+        "path": "common.py",
+        "sha256": "32b0f40a894e16435746fb5f64f774adc188e5339423c13ffe0b824a453e4ad1"
+      },
+      "pair": {
+        "path": "pair.py",
+        "sha256": "331b63cb27a22d25e218b8a5b836287a7c2bcb9c256754d23f25c309acfcb2fd"
+      },
+      "admission_reference": {
+        "path": "../feature-native-resultant-protocol/capture.py",
+        "sha256": "13eb1f89251a0b9ac7a5b99b4674978be66f8306c23a5a11f8bfd99e016a2f06"
+      },
+      "common_reference": {
+        "path": "../feature-native-resultant-protocol/common.py",
+        "sha256": "1e8af5f95aa18b67a7003b049bb15d1663d3c7a4ccb1b8e133a654d8ab2cd4d0"
+      },
+      "canonical_authority": {
+        "path": "../feature-native-resultant-protocol/authority.json",
+        "sha256": "aa66f939fe8d47a0e25f4dfeadaf8ed8ded1ed6dcaea775b418a7ad5a8756c0a"
+      },
+      "source-000": {
+        "path": "../feature-native-half-gcd/polynomial.rs",
+        "sha256": "29c0cfc13dc353fa08fca5b58bbae771a53ecc259c7068dfee27a097bd94b2a9"
+      },
+      "source-001": {
+        "path": "../feature-native-half-gcd/polynomial.rs",
+        "sha256": "29c0cfc13dc353fa08fca5b58bbae771a53ecc259c7068dfee27a097bd94b2a9"
+      },
+      "source-002": {
+        "path": "../feature-native-half-gcd/polynomial.rs",
+        "sha256": "29c0cfc13dc353fa08fca5b58bbae771a53ecc259c7068dfee27a097bd94b2a9"
+      },
+      "source-003": {
+        "path": "../feature-native-half-gcd/residual.rs",
+        "sha256": "95a55a569f70b0022d121bcf09e290b059a815d90e43aaf9ef31be56daf998b4"
+      },
+      "source-004": {
+        "path": "../feature-native-joint-window/lib.rs",
+        "sha256": "8c3e6f2a4ed6fe7b98b32165737bdf8d9b75af9ac0b7599346b6686f0b2af05d"
+      },
+      "source-005": {
+        "path": "../feature-native-value-division/lib.rs",
+        "sha256": "7980eb7afe322fba43082432d95ea40a66cfce1edf3488cabf6f1f41bf333e93"
+      },
+      "source-006": {
+        "path": "../feature-native-standalone-source/lib.rs",
+        "sha256": "52feace2e3a5e3c07e6f0d6ec28ac8655b2b615fb895ca79be82e66d660a9c23"
+      },
+      "source-007": {
+        "path": "../feature-native-triple-moments/lib.rs",
+        "sha256": "89c1c8f8eef2d8b36e29f4d6d460f918f8584f61cb1a8170c6272947c910dcdb"
+      },
+      "source-008": {
+        "path": "../feature-orbit-local-terms/local.rs",
+        "sha256": "5408f64b5e60f8f0619376d7335c2703df74857cb86ca535cec6e613aaf4e5a2"
+      },
+      "source-009": {
+        "path": "../feature-native-inert-seed/lib.rs",
+        "sha256": "1fe68a36296d850dd7232526184deb565049f3fe28146dac071b66f25c257841"
+      },
+      "source-010": {
+        "path": "../feature-native-inert-seed/roots.rs",
+        "sha256": "673f0b600d4b90d89c0f2ea3493e50513dcaf4cd5ef52e0ac3de3ee665c6f90e"
+      },
+      "source-011": {
+        "path": "../feature-native-half-gcd/polynomial.rs",
+        "sha256": "29c0cfc13dc353fa08fca5b58bbae771a53ecc259c7068dfee27a097bd94b2a9"
+      },
+      "source-012": {
+        "path": "../feature-native-half-gcd/residual.rs",
+        "sha256": "95a55a569f70b0022d121bcf09e290b059a815d90e43aaf9ef31be56daf998b4"
+      },
+      "source-013": {
+        "path": "../feature-native-joint-window/lib.rs",
+        "sha256": "8c3e6f2a4ed6fe7b98b32165737bdf8d9b75af9ac0b7599346b6686f0b2af05d"
+      },
+      "source-014": {
+        "path": "../feature-native-value-division/lib.rs",
+        "sha256": "7980eb7afe322fba43082432d95ea40a66cfce1edf3488cabf6f1f41bf333e93"
+      },
+      "source-015": {
+        "path": "../feature-native-standalone-source/lib.rs",
+        "sha256": "52feace2e3a5e3c07e6f0d6ec28ac8655b2b615fb895ca79be82e66d660a9c23"
+      },
+      "source-016": {
+        "path": "../feature-orbit-local-terms/local.rs",
+        "sha256": "5408f64b5e60f8f0619376d7335c2703df74857cb86ca535cec6e613aaf4e5a2"
+      },
+      "source-017": {
+        "path": "../feature-native-fast-moment-roots/lib.rs",
+        "sha256": "5d10ba60b3afadedbf6bdad213b1699642d1568459cf8a151d9a92a368b0e5c4"
+      },
+      "source-018": {
+        "path": "../feature-native-fast-moment-roots/recovery.rs",
+        "sha256": "afe9cbb2527d0002ae376a85b468847feea7ad49c5ece366c7c5a02a1a999039"
+      },
+      "source-019": {
+        "path": "../feature-native-fast-moment-roots/roots.rs",
+        "sha256": "673f0b600d4b90d89c0f2ea3493e50513dcaf4cd5ef52e0ac3de3ee665c6f90e"
+      },
+      "source-020": {
+        "path": "../feature-native-hgcd-roots/gcd.rs",
+        "sha256": "9832817f5a0687ae8aa2b41a1970916f64e9b3beb531d74d536cd250e4b737b0"
+      },
+      "source-021": {
+        "path": "../feature-native-hgcd-roots/polynomial.rs",
+        "sha256": "16bd73956e56e82922decfdba6090ae471656b9bb901cf37c87162fff847c899"
+      },
+      "source-022": {
+        "path": "../feature-native-monomial-recovery/recovery.tsv",
+        "sha256": "1da82499ad1c6266b485283045d55337be74a4e95d1ef83f67c5c36bdb241d61"
+      },
+      "source-023": {
+        "path": "../feature-orbit-local-terms/local.rs",
+        "sha256": "5408f64b5e60f8f0619376d7335c2703df74857cb86ca535cec6e613aaf4e5a2"
+      },
+      "source-024": {
+        "path": "../feature-native-quotient-trace/adapter.rs",
+        "sha256": "8161633791e51e56d48e1451d9bca308e17d76459e271bacb273e7240a56bf5b"
+      },
+      "source-025": {
+        "path": "../feature-native-quotient-trace/adaptive.rs",
+        "sha256": "345b514b68da30fd3be1250a3c60eeeb599fc1f5d66853a97f30d7bec8ce773a"
+      },
+      "source-026": {
+        "path": "../feature-native-quotient-trace/allocation.rs",
+        "sha256": "5d13867149ba35212e7f8d32d2162074508a5e7b6145478df227c2cbee560e4b"
+      },
+      "source-027": {
+        "path": "../feature-native-quotient-trace/block-projection.rs",
+        "sha256": "81979b20cf5c10ed5f3eb7ee078b5f22479314b94bb44bd4003a00b2795299e7"
+      },
+      "source-028": {
+        "path": "../feature-native-quotient-trace/blocked-image.rs",
+        "sha256": "c72bd69d0c46621eef724f60c86e5e0d3dcb62fbf486fa306e78879a566d0837"
+      },
+      "source-029": {
+        "path": "../feature-native-quotient-trace/blocks.rs",
+        "sha256": "cff852625d82dcb619397aaaa2b96e92381e9eb607debd6b1fada6357989f3fc"
+      },
+      "source-030": {
+        "path": "../feature-native-quotient-trace/checks.rs",
+        "sha256": "7850a85408a3c01dde92fc7df887483665a36914a8776e0b285fc4fc1963981d"
+      },
+      "source-031": {
+        "path": "../feature-native-quotient-trace/class-source.rs",
+        "sha256": "93f7af6d4bbe2ca7429fa9c68b4c657dedbb7d1321afb7ea647fcda3e2273d91"
+      },
+      "source-032": {
+        "path": "../feature-native-quotient-trace/division.rs",
+        "sha256": "0b54ddf8e873541df619c618dca45a72a70c02eb3196d7aa715cdc6b5c9cbafc"
+      },
+      "source-033": {
+        "path": "../feature-native-quotient-trace/dynamic.rs",
+        "sha256": "dd7d1b16a657c5dafb21adfd94b1e78c3b87acfea1b10b0984e8466e6bbdcd46"
+      },
+      "source-034": {
+        "path": "../feature-native-quotient-trace/envelope.rs",
+        "sha256": "18d161fc1809dfabc4063f6b5ae29d7138d564836f1bd8b0834a94a78a6d67e0"
+      },
+      "source-035": {
+        "path": "../feature-native-quotient-trace/geometry.rs",
+        "sha256": "7e1c1aeebe7fc345f7835c8d33e7f1c7af7ada3c03393e74ee9c0f3e1de5c892"
+      },
+      "source-036": {
+        "path": "../feature-native-quotient-trace/history.rs",
+        "sha256": "d912ed99cfaaf21f4d5ecc9263836c6a32d156b16c25e03bd5915227c0717221"
+      },
+      "source-037": {
+        "path": "../feature-native-quotient-trace/lib.rs",
+        "sha256": "a1458df1d8be6827a7ced160d0e0c5a0cb50bf96ade92d137113295144c4ba86"
+      },
+      "source-038": {
+        "path": "../feature-native-quotient-trace/modes.rs",
+        "sha256": "8a5331a66ce4022c73469a24957b6a0b0b9136f017697249d705e5ad7ff72cef"
+      },
+      "source-039": {
+        "path": "../feature-native-quotient-trace/new-recovery.rs",
+        "sha256": "f3a390007d957f3d0f69075ddb1229dd99ed04b9ef2591813911b02c9df32ab2"
+      },
+      "source-040": {
+        "path": "../feature-native-quotient-trace/orbit.rs",
+        "sha256": "05865d37a397af1cf37e4b971c0c27735be66f7ec7e112ae19edcd5323c2ab30"
+      },
+      "source-041": {
+        "path": "../feature-native-quotient-trace/planned.rs",
+        "sha256": "cf58a29979d9358a261f2cced3686e46f4436f3dbf450247af6b84dc2c953803"
+      },
+      "source-042": {
+        "path": "../feature-native-quotient-trace/planner.rs",
+        "sha256": "f982c8cf5acc18512338b15fe0f5713e5af9de30d24c5de2aa46181620179dd9"
+      },
+      "source-043": {
+        "path": "../feature-native-quotient-trace/polynomial.rs",
+        "sha256": "afb7ee7879123bcb7493850b787758bc433517761ec97e7243b2acceba9bf0d7"
+      },
+      "source-044": {
+        "path": "../feature-native-quotient-trace/reference.rs",
+        "sha256": "6970b3421f864fe917eefee6bc81e934bc4a6ccbf1e8cd654bab45a3a57b3d50"
+      },
+      "source-045": {
+        "path": "../feature-native-quotient-trace/schedule.rs",
+        "sha256": "61623bbd89ebb71aed41b76d55a6c865f4ccc7cee110f4ceb6d4a2b4335b3706"
+      },
+      "source-046": {
+        "path": "../feature-native-quotient-trace/trace-adapter.rs",
+        "sha256": "6415e8f37272965fdfecdc283e58ba167162900f3640ca1f7d0809e0195a52bd"
+      },
+      "source-047": {
+        "path": "../feature-native-quotient-trace/trace-meter.rs",
+        "sha256": "fc8658b0a9975d11914c9c29acd27d9fbf7abe34f59f02408fd9797ed36303d7"
+      },
+      "source-048": {
+        "path": "../feature-native-quotient-trace/trace.rs",
+        "sha256": "73583ddc36db707e0edbee97bbb8cfb3eb86b744209db8e7e279e1dc9db25f53"
+      },
+      "source-049": {
+        "path": "../feature-native-quotient-trace/workspace-checks.rs",
+        "sha256": "971f9710ca26141367b28a1560cce26abb2e1512e0ec1644c332164c72ef3839"
+      }
+    },
+    "file_limit_bytes": 16777216
+  }
+}

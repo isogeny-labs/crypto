@@ -195,21 +195,10 @@ fn parse_hex(s: &str) -> Result<BigUint> {
     BigUint::parse_bytes(digits.as_bytes(), 16).ok_or_else(|| "invalid hexadecimal element".into())
 }
 
-fn polynomial_remainder(mut a: BigUint, b: &BigUint) -> BigUint {
-    while a != BigUint::default() && a.bits() >= b.bits() {
-        let shift = (a.bits() - b.bits()) as usize;
-        a ^= b << shift;
-    }
-    a
-}
-
-fn polynomial_gcd(mut a: BigUint, mut b: BigUint) -> BigUint {
-    while b != BigUint::default() {
-        let r = polynomial_remainder(a, &b);
-        a = b;
-        b = r;
-    }
-    a
+fn polynomial_gcd(a: BigUint, b: BigUint) -> BigUint {
+    // GF(2)[x] gcd by the shared bit-packed gcd (BigUint bit i = coeff of x^i).
+    let g = crypto_lib::gcd::gf2::gcd(&a.to_u64_digits(), &b.to_u64_digits());
+    BigUint::from_bytes_le(&g.iter().flat_map(|w| w.to_le_bytes()).collect::<Vec<u8>>())
 }
 
 /// Rabin's criterion; never interpret a quotient ring as a finite field silently.

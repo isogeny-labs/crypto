@@ -1,0 +1,17 @@
+{
+  "schema": "xedni-local-collision-crt-protocol-v1",
+  "source": "../xedni_coefficient_choice_20261120/source-rows-v2.jsonl.gz",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "input_law": "all 1722 ordered distinct nonidentity source pairs, selecting the 336 with distinct rational x coordinates and x collision at 7 or 11; the reduced-relation flag is excluded from decisions",
+  "collision_priority": "7 before 11 when both auxiliary x coordinates collide",
+  "local_policy": "at the collision prime enumerate all compatible a1,a2,a3,a4 residues with a6 from the first point; at the other prime use the original distinct-x two-point incidence rule; retain nonsingular curves of order 4 at 7 and order 6 at 11",
+  "crt_policy": "for each ordered pair of local witnesses choose centered k1,k2,k3 modulo 77 with ai=47ki; correct one lexicographically first effective ki by a centered multiple of 77 to match the collision-prime a4 residue; retain one corrected rational curve per local pair",
+  "local_correction": "the change in rational a4 modulo the collision prime is measured exactly for each unit shift, choosing the first nonzero slope; if all slopes vanish, retain the centered representative only when already matched",
+  "caps": {"crt_local_pairs_per_source_pair": 10000, "crt_local_pairs_total": 300000, "wall_seconds": 300},
+  "statuses": ["same_x_q_outside_law", "outside_collision_law", "constructed", "censored_pair_cap", "censored_total_cap", "censored_wall", "no_local_gate", "no_extra_digit"],
+  "checks": "exact rational point incidence, local coefficient residues and orders, rational discriminant, rational P1+2P2 relation; source reduced relation for analysis only",
+  "record": "all 336 selected pair statuses, every constructed candidate in deterministic compressed rows, every rational relation, source and candidate digests, cap and wall states",
+  "null": "rational relation rate under the same centered CRT policy on the 1344 locally distinct-x source pairs, 8/32256; no conditional rate is promoted to an algorithmic win",
+  "decision": "report complete count and exact rate if uncensored; otherwise report observed counts with cap and unknown full rate; compare with the prior 8/32256 construction rate without a speedup claim",
+  "claim_boundary": "target-independent curve-selection diagnostic, with no scalar recovery or rho timing; local collisions and one extra CRT digit only"
+}

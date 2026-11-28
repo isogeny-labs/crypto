@@ -1,0 +1,162 @@
+{
+  "branch": "claude/hyperelliptic-index-calculus-td1fdn",
+  "closed_utc": "2026-11-16T07:13:48+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/ic_positive_control_la_20261116/train.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T06:36:20+00:00",
+      "wall_s": 910.73
+    },
+    {
+      "argv": [
+        "research/ic_positive_control_la_20261116/test.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T06:51:53+00:00",
+      "wall_s": 1007.457
+    }
+  ],
+  "commit": "caae5eca9f200d6a872d53908b01f5469d5980cc",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T06:36:19+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261116-ic-positive-control-la"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261116T0636Z-ic-positive-control-la",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "la_mul_s_over_m_p32771",
+      "note": "paired on identical relations; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.325,
+        0.331
+      ],
+      "unit": "ratio",
+      "value": 0.328
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 8,
+      "name": "la_mul_n_over_m_p32771",
+      "note": "[pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.662,
+        0.673
+      ],
+      "unit": "ratio",
+      "value": 0.667
+    },
+    {
+      "baseline": 3.69,
+      "better": "lower",
+      "n": 8,
+      "name": "s_over_rho_w01_p32771",
+      "note": "baseline M 3.69; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.08,
+        3.71
+      ],
+      "unit": "ratio",
+      "value": 1.92
+    },
+    {
+      "baseline": 19.57,
+      "better": "lower",
+      "n": 8,
+      "name": "s_over_rho_w1_p32771",
+      "note": "baseline M 19.57; [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        5.55,
+        19.04
+      ],
+      "unit": "ratio",
+      "value": 9.85
+    }
+  ],
+  "problem": "prime-field-chained-transfer-no-advantage",
+  "raw": [
+    {
+      "bytes": 566802,
+      "path": "research/ic_positive_control_la_20261116/run.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/32/32f84615061eee303a60b28c4dc3a8b29f589b84104efbde9c56c348733aec25",
+      "sha256": "32f84615061eee303a60b28c4dc3a8b29f589b84104efbde9c56c348733aec25",
+      "uploaded": false
+    },
+    {
+      "bytes": 54528,
+      "path": "research/ic_positive_control_la_20261116/run.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8e/8eb5f2dac1cbac08fba4d645a9a04ff4d6664607abaacd69329fa8d04feffcd3",
+      "sha256": "8eb5f2dac1cbac08fba4d645a9a04ff4d6664607abaacd69329fa8d04feffcd3",
+      "uploaded": false
+    },
+    {
+      "bytes": 23618,
+      "path": "research/ic_positive_control_la_20261116/train_cc0.7.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/da/dacf3fb717d50453c03dc431e263151cc9d1d77f4eb1283d8efac1170a8b1b5f",
+      "sha256": "dacf3fb717d50453c03dc431e263151cc9d1d77f4eb1283d8efac1170a8b1b5f",
+      "uploaded": false
+    },
+    {
+      "bytes": 23654,
+      "path": "research/ic_positive_control_la_20261116/train_cc1.0.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e7/e71d1b97e819466fbe085537f09beeb7f973b815ccc1bfc75d5f95d8d403042b",
+      "sha256": "e71d1b97e819466fbe085537f09beeb7f973b815ccc1bfc75d5f95d8d403042b",
+      "uploaded": false
+    },
+    {
+      "bytes": 23650,
+      "path": "research/ic_positive_control_la_20261116/train_cc1.4.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9e/9e9fb3f8293a78348240d4894d9ce934b4469d57474377f212def574158b14c8",
+      "sha256": "9e9fb3f8293a78348240d4894d9ce934b4469d57474377f212def574158b14c8",
+      "uploaded": false
+    },
+    {
+      "bytes": 23705,
+      "path": "research/ic_positive_control_la_20261116/train_cc2.0.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5b/5b97e4d2ed1c0d570e7ea4a371b4b00ba8cb26fe2ce68d66e2a9cef6794e3349",
+      "sha256": "5b97e4d2ed1c0d570e7ea4a371b4b00ba8cb26fe2ce68d66e2a9cef6794e3349",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261116-ic-positive-control-la/REPORT.pdf",
+    "png": [
+      "benchmarks/20261116-ic-positive-control-la/figure.png"
+    ],
+    "svg": [
+      "benchmarks/20261116-ic-positive-control-la/figure.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-positive-control-la",
+  "status": "measured",
+  "summary": "Genus-3 positive control LA: coordinate Wiedemann on a square row subset cuts LA multiplications to 0.33x (paired); distance to matched rho at p=32771 w=0.1 3.69->1.92, w=1 19.6->9.85; 5a unresolved. [pcc:unverified]",
+  "validation": null
+}

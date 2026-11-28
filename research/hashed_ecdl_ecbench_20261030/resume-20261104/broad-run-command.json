@@ -1,0 +1,23 @@
+{
+  "schema": "hashed-native-ecbench.development-check/v1",
+  "base_commit": "e84d46bb5ac3e8de217578a186ff5b6acab3d904",
+  "patch": "broad-run-source.patch.gz",
+  "patch_uncompressed_sha256": "1ea7ae59befd29fc97934fc7bf697c03456f89667ec82e1fdc35e73730b50c57",
+  "manifest": "broad-run-source.sha256",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--release",
+    "--lib",
+    "--bin",
+    "ecbench",
+    "--test",
+    "ecbench"
+  ],
+  "environment": {
+    "RUST_TEST_THREADS": "2",
+    "CARGO_TARGET_DIR": "/tmp/hashed-ecbench-target"
+  },
+  "scope": "Broad local development invocation predates the optimization policy correction. A subsequent focused build covers that correction. No study measurement."
+}

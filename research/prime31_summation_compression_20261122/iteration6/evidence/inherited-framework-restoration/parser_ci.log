@@ -1,0 +1,15 @@
+error: this file contains an unclosed delimiter
+    --> /workspace/scratch/2f841b0b9a19/ci_ic_framework_audit/mod.ci.rs:4528:3
+     |
+ 561 | ) -> Result<(RunReport, FactorBase<G::Elt>), String> {
+     |                                                      - unclosed delimiter
+...
+ 601 |     if fb.index_elided() && oracle.name() != "mitm-frobenius-layout-counted" {
+     |                                                                              - this delimiter might not be properly closed...
+...
+1255 | }
+     | - ...as it matches this but it has different indentation
+...
+4528 | }
+     |  ^
+

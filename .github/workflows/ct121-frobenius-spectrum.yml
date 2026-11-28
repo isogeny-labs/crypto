@@ -1,0 +1,38 @@
+name: CT121 split and inert Frobenius spectrum
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct121/**'
+      - '.github/workflows/ct121-frobenius-spectrum.yml'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct121/**'
+      - '.github/workflows/ct121-frobenius-spectrum.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct121:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          sparse-checkout: |
+            research/cross_characteristic_global_torsion_20261112/ct121
+      - name: Independent odd-prime Frobenius orbit classifiers
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct121
+          python3 -B "$D/ct121_frob_complete.py" >/tmp/ct121-py.json
+          python3 -O -B "$D/ct121_frob_complete.py" >/tmp/ct121-pyo.json
+          node "$D/ct121_frob_complete_independent.js" >/tmp/ct121-js.json
+          node --no-opt "$D/ct121_frob_complete_independent.js" >/tmp/ct121-jso.json
+          cmp /tmp/ct121-py.json /tmp/ct121-pyo.json
+          cmp /tmp/ct121-py.json /tmp/ct121-js.json
+          cmp /tmp/ct121-py.json /tmp/ct121-jso.json
+          printf '%s  %s\n' 7ed47a628626ea5180e8a4ea2014cf5f49f68053ccab3319cbaf184e08bc79e1 /tmp/ct121-py.json | sha256sum -c

@@ -1,0 +1,29 @@
+   Compiling l03sim v0.1.0 (/home/user/crypto/research/g2plus_leads_20261116/L03_base_rebalance/sim)
+warning: unused import: `JDiv`
+  --> src/main.rs:11:44
+   |
+11 | use jac::{instance_from, Instance, JCurve, JDiv};
+   |                                            ^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `l03sim` (bin "l03sim" test) generated 1 warning (run `cargo fix --bin "l03sim" -p l03sim --tests` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 1.25s
+     Running unittests src/main.rs (target/release/deps/l03sim-4511cd1c74b3afee)
+
+running 12 tests
+test rng::tests::t1_mix64 ... ok
+test rng::tests::t2_rng ... ok
+test tests::t10_dsu ... ok
+test tests::t13_wiedemann ... ok
+test tests::t11_t12_curve ... ok
+test tests::t4_t5_fk ... ok
+test tests::t3_fb_size ... ok
+test tests::t6_mulmod ... ok
+test tests::t7_chi11 ... ok
+test tests::t8_t9_disc_split ... ok
+test tests::t15_crn ... ok
+test tests::t14_t16_end_to_end ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.73s
+

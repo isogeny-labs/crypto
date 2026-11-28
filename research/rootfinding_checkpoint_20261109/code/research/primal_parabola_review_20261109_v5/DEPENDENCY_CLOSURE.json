@@ -1,0 +1,83 @@
+{
+  "schema": "independent-static-include-closure/v1",
+  "scientific_execution": false,
+  "compilation": false,
+  "project_files": [
+    "research/primal_parabola_20261109_v5/native.cpp",
+    "research/primal_parabola_20261109_v5/frozen_lll_prefix.hpp",
+    "research/dual_lattice_20261109_v2/frozen_prefix.hpp",
+    "research/nist_sum_gmp_20261109_v1/gmp_field.hpp"
+  ],
+  "quoted_include_edges": [
+    [
+      "research/primal_parabola_20261109_v5/native.cpp",
+      "research/primal_parabola_20261109_v5/frozen_lll_prefix.hpp"
+    ],
+    [
+      "research/primal_parabola_20261109_v5/frozen_lll_prefix.hpp",
+      "research/dual_lattice_20261109_v2/frozen_prefix.hpp"
+    ],
+    [
+      "research/dual_lattice_20261109_v2/frozen_prefix.hpp",
+      "research/nist_sum_gmp_20261109_v1/gmp_field.hpp"
+    ],
+    [
+      "research/nist_sum_gmp_20261109_v1/gmp_field.hpp",
+      "/usr/include/gmpxx.h"
+    ]
+  ],
+  "inherited_global_names": [
+    "I",
+    "Field",
+    "Poly",
+    "Quad",
+    "Clock",
+    "need",
+    "fd",
+    "cd",
+    "str",
+    "Pt",
+    "Line",
+    "mul",
+    "divide",
+    "line",
+    "residual",
+    "l2",
+    "u2",
+    "l3",
+    "u3",
+    "qe",
+    "range",
+    "gmp_arithmetic_checks",
+    "gmp_root_checks",
+    "gmp_rounding_checks",
+    "backendcontrols",
+    "controls",
+    "Term",
+    "Row",
+    "Q",
+    "Vec",
+    "Mat",
+    "QVec",
+    "imod",
+    "nearest",
+    "GS",
+    "gram",
+    "lll"
+  ],
+  "new_global_names": [
+    "Enum",
+    "PrimalLeaf",
+    "primal_leaf",
+    "bits",
+    "enumerate",
+    "Sol",
+    "recover",
+    "vec",
+    "primal_controls",
+    "main"
+  ],
+  "intersection": [],
+  "checker_change": "original complete Fraction full-box enumeration, then parabola-filter before native comparison",
+  "input_sha256": "403db5080e81eda5e9b5643020babf54283472b338831f4f14d7655ef5955c93"
+}

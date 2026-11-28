@@ -1,0 +1,81 @@
+{
+  "schema": "prime31-run68-genuine-rhs-generic-control-v1",
+  "date_utc": "2026-11-22",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "h": 1,
+    "G": [
+      625037715,
+      2100627251
+    ]
+  },
+  "original_rust_source": "research/prime31_ic_20261115/native/examples/prime31_run68_rhs_control.rs",
+  "source_bound_commit": "197de2a7cd01d96c92151e38dca28938456e29c0",
+  "workflow": ".github/workflows/prime31-run68-rhs-control.yml",
+  "category": "GENERIC pair-table reference calibration; NOT qualifying non-generic index calculus",
+  "fixtures": {
+    "base_points": 677,
+    "free_ec_homogeneous_rows": 88,
+    "verified_original_rust_base_logs": 677,
+    "generic_signed_pair_sum_keys": 916469,
+    "real_rhs_walk": "kG, k=1,2,...",
+    "relation_shift_cap": 12000000
+  },
+  "results": [
+    {
+      "run": 45055226592,
+      "job": 137308851779,
+      "conclusion": "success",
+      "complete_target_logs_verified": 32,
+      "query_shifts": 8267474,
+      "genuine_pair_relation_hits": 3520,
+      "independent_affine_dsu_pair_rows": 672,
+      "free_rows_supplied": 88,
+      "setup_ms": 290.163,
+      "relation_collection_ms": 2353.42,
+      "target_online_ms": 56.177,
+      "full_pipeline_ms_including_harness": 2900.834,
+      "target_shifts": 178,
+      "leaves_at_hit_sum": 9429,
+      "bsgs_setup_ms": 13.386,
+      "bsgs_online32_ms": 187.098,
+      "bsgs_total_ms": 200.484,
+      "generic_control_to_bsgs_ratio": 14.469154645757266
+    },
+    {
+      "run": 45055266777,
+      "job": 137308981036,
+      "conclusion": "success",
+      "complete_target_logs_verified": 32,
+      "query_shifts": 8267474,
+      "genuine_pair_relation_hits": 3520,
+      "independent_affine_dsu_pair_rows": 672,
+      "free_rows_supplied": 88,
+      "setup_ms": 287.847,
+      "relation_collection_ms": 2327.579,
+      "target_online_ms": 55.397,
+      "full_pipeline_ms_including_harness": 2871.313,
+      "target_shifts": 178,
+      "leaves_at_hit_sum": 9429,
+      "bsgs_setup_ms": 13.37,
+      "bsgs_online32_ms": 186.56,
+      "bsgs_total_ms": 199.93,
+      "generic_control_to_bsgs_ratio": 14.361591557044965
+    }
+  ],
+  "independent_checks": {
+    "python_all_homogeneous_ec_rows": "88/88 passed with +2 coefficient in row30",
+    "original_rust_checks": "all 677 base logs and all 32 target logs each independently verified by scalar multiplication in each run",
+    "matched_bsgs": "32/32 outputs equal on same-process original Arithmetic"
+  },
+  "interpretation": "True labelled relations and complete target recovery are demonstrated only with an exhaustive generic pair-sum dictionary and a generic triple target lookup. This is a solver integration correctness calibration, not an admitted non-generic algorithm. Timing ratio compares one reference BSGS, not the optimized frontier. Same 32 deterministic targets and deterministic walk on both hosts; two CI reruns repeat a single input trajectory, not independent random trials.",
+  "next": [
+    "replace pair table with public-only unknown-index RR9/F3 polynomial root extractor #4822/#4812/#4692, keeping genuine RHS",
+    "measure failure attempts, independent rank, true RHS, verified 1/32/128/1024 target logs",
+    "same-host best existing index calculus vs optimized BSGS/negation rho, including all setup, failures, verification, memory"
+  ],
+  "pcc": "unverified"
+}

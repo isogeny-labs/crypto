@@ -1,0 +1,50 @@
+{
+  "schema": "trace-flat-confirmation/v1",
+  "parents": [
+    "PROTOCOL_HOLDOUT.json"
+  ],
+  "holdout": "480 fresh public known-answer targets,96 perB,32 percurve, seed0x484f4c444f555432. Private scalar validation never passed to solvers.",
+  "construction": "make-confirmation.cpp: eight new children for each original public fixture. Given-input target creation excluded identically from all arms.",
+  "candidate_modes": [
+    "ap2",
+    "ap4",
+    "ap8"
+  ],
+  "pair_kernels": [
+    "barrett"
+  ],
+  "current_rho_policies": [
+    "tuned8",
+    "tuned16",
+    "tuned"
+  ],
+  "current_reference_scope": "intact current prime_fast module compiled with sealed older crate for compatible ECC adapter types and primality. No rho/group code stubbed. Not a whole current root crate build. Full mixed-version test suite20pass/1root-oracle mismatch/1ignored; all rho/group tests pass, failing source/log retained.",
+  "qualification": "5760 old/flat cases match every point/label/order/count;1904640 affine label replays. Exact container collision-chain controls. All fresh target/mode full-flat and AP4 generation-only witness checks against frozen oracle.",
+  "matrix": {
+    "arms": 11,
+    "targets": 480,
+    "warmups": 1,
+    "measured_rounds": 5,
+    "rows": 31680
+  },
+  "execution": "rotate arm order by round, one allowed CPU, one process at a time, max4 pool attempts, max10million rho steps,45second row timeout, no automatic retry",
+  "timing": "complete per-target cold adapter incl given-input parsing, public checks, charged labels/steps/conversions/rejects, all misses, index construction, witness/scalar recovery and group check; process startup excluded, process RSS/time retained. No canonical online admission.",
+  "postcheck": "native independent affine replay plus private known-answer equality, strict trial/generation accounting, exact equal trial lists across kernels on each target/mode",
+  "report": "all arms and censors; completed-pair ratios conditional; strongest current whole-system rho and global Pareto optimality remain separate; no paper-root-kernel attribution",
+  "custody": "continued authorized temporary local checkpoint/raw, no paid allocations/S3 success claim",
+  "arms": [
+    "tree-ap2",
+    "tree-ap4",
+    "tree-ap8",
+    "flat-gen-ap4",
+    "flat-ap2",
+    "flat-ap4",
+    "flat-ap8",
+    "flat-ap4-aa",
+    "current-tuned8",
+    "current-tuned16",
+    "current-tuned"
+  ],
+  "statistical_criterion": "Primary descriptive complete-cost ratio is ratio of target-cluster means. Each target averages five rounds. Stratified bootstrap resamples32 targets with replacement independently in each of3 curves perB,10000 replicates, fixed seed0x464c41544349. Strict scoped wall-time parity requires no censors in either arm and one-sided95% upper candidate/reference mean-cost ratio<=1. All three AP scales and rho policies reported; no per-target winning-arm selection. No global Pareto/cryptographic-scale claim.",
+  "aa": "flat-ap4-aa uses identical binary/mode/seed as flat-ap4 to expose execution-order variability. Equal non-timing trial lists required."
+}

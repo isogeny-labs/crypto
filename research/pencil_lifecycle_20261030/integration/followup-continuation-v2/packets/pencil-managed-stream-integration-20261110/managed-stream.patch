@@ -1,0 +1,320 @@
+# Semantic source-review patch. The `@@` placeholders intentionally omit unchanged
+# copied-solver regions. Do not feed this file to git apply; an independently
+# reviewed application must expand the exact HEAD contexts and preserve the source
+# hashes in source-bindings.json. No frozen or root source is changed by this packet.
+diff --git a/src/cryptanalysis/ecbench/pencil_progress_native.rs b/src/cryptanalysis/ecbench/pencil_progress_native.rs
+index 87f3581c..PROPOSED 100644
+--- a/src/cryptanalysis/ecbench/pencil_progress_native.rs
++++ b/src/cryptanalysis/ecbench/pencil_progress_native.rs
+@@
+ use kernel::tracked_set::TrackedSet;
++use kernel::relation_stream as stream;
+@@
+-    fn relation(&mut self, points: &[[u64; 2]], a: u64, b: u64) -> Option<u64> {
++    fn relation(&mut self, points: &[[u64; 2]], a: u64, b: u64) -> Option<u64> {
++        self.relation_capture(points, a, b, None).0
++    }
++    fn relation_capture(
++        &mut self,
++        points: &[[u64; 2]],
++        a: u64,
++        b: u64,
++        context: Option<(u64, u64)>,
++    ) -> (Option<u64>, Option<stream::Relation>) {
+         let r = self.modulus;
+         let n = self.node_count;
+         let mut row = Vec::new();
+@@
+-        match self.collector.insert(&row).expect("bound columns") {
++        let admission = self.collector.insert(&row).expect("bound columns");
++        let answer = match admission {
+             Admission::StoppedWorkingCap => {
+                 self.failure = Some("symbolic_working_cap");
+-                return None;
++                None
+             }
+             Admission::StoppedRetainedCap => {
+                 self.failure = Some("symbolic_retained_cap");
+-                return None;
++                None
+             }
+             Admission::AlreadyStopped => panic!("terminal cap was ignored"),
+-            Admission::Independent => {}
+-            _ => return None,
+-        }
+-        let target_column = self.collector.small_columns().len() - 2;
+-        assert!(
+-            self.collector.basis().pivot(target_column + 1).is_none(),
+-            "inconsistent verified relation"
+-        );
+-        if let Some(row) = self.collector.basis().pivot(target_column) {
+-            return Some(
+-                row.get(&(target_column + 1))
+-                    .map(|&v| {
+-                        meter::collection(0, 1, 0, 0);
+-                        v
+-                    })
+-                    .unwrap_or(0),
+-            );
+-        }
+-        None
++            Admission::Independent => {
++                let target_column = self.collector.small_columns().len() - 2;
++                assert!(self.collector.basis().pivot(target_column + 1).is_none(),
++                    "inconsistent verified relation");
++                self.collector.basis().pivot(target_column).map(|pivot| {
++                    pivot.get(&(target_column + 1)).map(|&v| {
++                        meter::collection(0, 1, 0, 0); v
++                    }).unwrap_or(0)
++                })
++            }
++            _ => None,
++        };
++        let captured = context.map(|(walk_index, lambda)| stream::Relation {
++            walk_index,
++            lambda,
++            submitted: row,
++            admission: admission.into(),
++            // Output observation must not mutate the managed semantic ledger.
++            pending_constraint: self.collector.pending_constraint()
++                .map(kernel::sparse::TrackedMap::diagnostic_entries),
++            residual_rank: self.collector.basis().rank(),
++            candidate_scalar: answer,
++        });
++        (answer, captured)
+     }
+@@
+ impl std::error::Error for ValidationError {}
++
++fn trace_emit(
++    trace: &mut Option<&mut stream::Trace<'_>>,
++    event: stream::Event,
++    outer: &kernel::outer_primality::OuterValidation,
++) -> Result<(), Box<ValidationError>> {
++    if let Some(t) = trace.as_deref_mut() {
++        t.emit(event)
++            .map_err(|_| ValidationError::new("relation_trace_failure", outer.clone()))?;
++    }
++    Ok(())
++}
++fn trace_divisor(d: Divisor) -> stream::Divisor {
++    stream::Divisor { degree: d.degree, u: d.u, v: d.v }
++}
++fn trace_point(p: Point) -> stream::Point {
++    stream::Point { x: p.x, y: p.y, infinity: p.inf }
++}
+@@
+ pub fn solve_one_with_progress(
+@@
+     progress: &mut dyn super::progress::Sink,
+ ) -> Result<PencilResult, Box<ValidationError>> {
++    solve_one_with_progress_and_trace(inst, target, seed, config, observer, progress, None)
++}
++
++/// The managed body remains authoritative. Progress errors are diagnostic and
++/// nonfatal; relation trace errors fail this attempt and never dispatch a fallback.
++pub fn solve_one_with_progress_and_trace(
++    inst: &StudyInstance,
++    target: Point,
++    seed: u64,
++    config: Config,
++    observer: Option<&ObservedSystem>,
++    progress: &mut dyn super::progress::Sink,
++    mut trace: Option<&mut stream::Trace<'_>>,
++) -> Result<PencilResult, Box<ValidationError>> {
+@@
+     let (solver, mut graph) = measured(observer, &s, &mut phases, "solver_setup", || {
+@@
+     });
++    if let Some(t) = trace.as_deref_mut() {
++        let header = stream::Header {
++            schema: "pencil-relation-stream/v1".into(),
++            identity: t.identity().clone(),
++            convention: stream::Convention::PencilAugmentedRhs,
++            p, r, order, cofactor, seed,
++            source_coefficients: source.c.to_vec(),
++            polynomial: h.to_vec(),
++            generator: trace_point(generator),
++            target: trace_point(target),
++            x_to_column: graph.nodes.clone(),
++            nuisance_columns: graph.node_count,
++            small_columns: graph.collector.small_columns().to_vec(),
++            column_map_version: 0,
++            denominator,
++            coefficient_cap: matrix_coefficient_cap,
++        };
++        trace_emit(&mut trace, stream::Event::Header(header), &outer_primality)?;
++    }
+     measurement::begin_online(measurement::Phase::TargetQuery);
++    struct OnlineGuard;
++    impl Drop for OnlineGuard { fn drop(&mut self) { measurement::end_online(); } }
++    let online_guard = OnlineGuard;
+@@
+         if d.degree != 2 {
++            if trace.is_some() {
++                trace_emit(&mut trace, stream::Event::Candidate(stream::Candidate {
++                    walk_index, lambda: None, a, b, divisor: trace_divisor(d),
++                    points: vec![], disposition: stream::Disposition::DegreeSkip,
++                }), &outer_primality)?;
++            }
+             continue;
+         }
+@@
+             let Some(points) = points else {
+                 rejected_candidates += 1;
++                if trace.is_some() {
++                    trace_emit(&mut trace, stream::Event::Candidate(stream::Candidate {
++                        walk_index, lambda: Some(lambda), a, b,
++                        divisor: trace_divisor(d), points: vec![],
++                        disposition: stream::Disposition::Rejected,
++                    }), &outer_primality)?;
++                }
+                 completed_candidates += 1;
+@@
+             };
+diff --git a/research/pencil_large_prime_20261029/src/sparse.rs b/research/pencil_large_prime_20261029/src/sparse.rs
+--- a/research/pencil_large_prime_20261029/src/sparse.rs
++++ b/research/pencil_large_prime_20261029/src/sparse.rs
+@@
+ impl<V> TrackedMap<V> {
++    /// Output-only snapshot. Like the existing serde implementation, this does
++    /// not charge algorithmic map traversal. Allocation/serialization remains
++    /// observer work and must be retained outside finite-operation counts.
++    pub fn diagnostic_entries(&self) -> Vec<(usize, V)>
++    where
++        V: Copy,
++    {
++        self.0.iter().map(|(k, &v)| (k.0, v)).collect()
++    }
+ }
++            if trace.is_some() {
++                trace_emit(&mut trace, stream::Event::Candidate(stream::Candidate {
++                    walk_index, lambda: Some(lambda), a, b,
++                    divisor: trace_divisor(d), points: points.clone(),
++                    disposition: stream::Disposition::Verified,
++                }), &outer_primality)?;
++            }
+             verified_relations += 1;
+-            recovered = measured(observer, &s, &mut phases, "elimination", || {
+-                graph.relation(&points, a, b)
+-            });
++            let capture = trace.is_some();
++            let (answer, relation) = measured(observer, &s, &mut phases, "elimination", || {
++                if capture {
++                    graph.relation_capture(&points, a, b, Some((walk_index, lambda)))
++                } else {
++                    (graph.relation(&points, a, b), None)
++                }
++            });
++            recovered = answer;
++            if let Some(relation) = relation {
++                trace_emit(&mut trace, stream::Event::Relation(relation), &outer_primality)?;
++            }
+@@
+     let verified = if let Some(k) = recovered {
+@@
+     } else {
+         false
+     };
+-    measurement::end_online();
++    if trace.is_some() {
++        trace_emit(&mut trace, stream::Event::Terminal(stream::Terminal {
++            walks, candidate_lambdas, verified_relations, rejected_candidates,
++            submitted_rows: graph.collector.counts().submitted_rows.try_into()
++                .expect("bounded trace submissions fit u64"),
++            admitted_rows: graph.collector.counts().admitted_rows.try_into()
++                .expect("admissions bounded by trace submissions"),
++            recovered, source_verified: verified,
++            failure: failure.map(str::to_owned),
++        }), &outer_primality)?;
++    }
++    drop(online_guard);
+diff --git a/src/cryptanalysis/ecbench/pencil.rs b/src/cryptanalysis/ecbench/pencil.rs
+index c2eec86c..PROPOSED 100644
+--- a/src/cryptanalysis/ecbench/pencil.rs
++++ b/src/cryptanalysis/ecbench/pencil.rs
+@@
+ pub(super) fn solve_with_progress(
+@@
+     progress: Option<&mut dyn progress::Sink>,
+ ) -> Result<SolveReport, String> {
++    solve_with_progress_and_trace(m, inst, target, seed, progress, None)
++}
++
++/// Explicit managed composition. The caller owns trace identity, byte/record
++/// limits, durable-prefix publication, and retained-session attachment.
++pub(super) fn solve_with_progress_and_trace(
++    m: &ResolvedMethod,
++    inst: &StudyInstance,
++    target: Point,
++    seed: u64,
++    progress: Option<&mut dyn progress::Sink>,
++    trace: Option<&mut kernel::relation_stream::Trace<'_>>,
++) -> Result<SolveReport, String> {
++    if progress.is_none() && trace.is_some() {
++        return Err("relation trace requires the managed progress body".into());
++    }
+@@
+-        Some(sink) => NativeResult::Progress(
+-            progress_native::solve_one_with_progress(
++        Some(sink) => NativeResult::Progress(
++            progress_native::solve_one_with_progress_and_trace(
+                 inst,
+                 target,
+                 seed,
+@@
+                 None,
+                 sink,
++                trace,
+             )
+@@
+     };
+diff --git a/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-native-session-export/retained_export.rs.txt b/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-native-session-export/retained_export.rs.txt
+index 642995d6..PROPOSED 100644
+--- a/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-native-session-export/retained_export.rs.txt
++++ b/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/retained-native-session-export/retained_export.rs.txt
+@@
+ pub struct NativeFiles {
+@@
+ }
++pub struct AttemptFiles {
++ pub execution:u64, pub attempt:u64,
++ pub context:PathBuf, pub ordinary_record:Option<PathBuf>,
++ pub progress:Vec<PathBuf>, pub progress_totals:PathBuf,
++ pub relation_stream:Option<PathBuf>, pub relation_prefix:Option<PathBuf>,
++ pub resource_prefix:Option<PathBuf>, pub resource_tail:Option<PathBuf>,
++ pub process_observation:PathBuf, pub controller_receipt:PathBuf,
++ pub cost_record:PathBuf,
++}
+@@
++/// Every input is retained as exact bytes and a FilePin. Semantic admission is
++/// performed by the native validators and the full-cohort aggregator, never by
++/// substituting a present file for a passed gate.
++fn export_attempt(a:&AttemptFiles,out:&Path)->Result<Value,String>{
++ if a.relation_stream.is_some()==a.relation_prefix.is_some(){
++   return Err("pencil attempt requires exactly one terminal stream or durable prefix".into())
++ }
++ let mut total=0usize;
++ let mut pin=|label:&str,path:&Path,cap:usize|->Result<Value,String>{
++   let b=read(path,cap)?; total=total.checked_add(b.len()).ok_or("attempt byte overflow")?;
++   if total>64*1024*1024{return Err("attempt export byte bound".into())}
++   write(out,label,&b)
++ };
++ let context=pin("context.json",&a.context,65536)?;
++ let ordinary_record=a.ordinary_record.as_ref().map(|p|pin("record.json",p,4*1024*1024)).transpose()?;
++ let mut progress=Vec::new();
++ for (i,p) in a.progress.iter().enumerate(){progress.push(pin(&format!("progress-{i:03}.json"),p,65536)?)}
++ let progress_totals=pin("progress-totals.json",&a.progress_totals,65536)?;
++ let relation_stream=a.relation_stream.as_ref().map(|p|pin("relations.jsonl",p,64*1024*1024)).transpose()?;
++ let relation_prefix=a.relation_prefix.as_ref().map(|p|pin("relations.partial.jsonl",p,64*1024*1024)).transpose()?;
++ let resource_prefix=a.resource_prefix.as_ref().map(|p|pin("resource-prefix.json",p,65536)).transpose()?;
++ let resource_tail=a.resource_tail.as_ref().map(|p|pin("resource-tail.json",p,65536)).transpose()?;
++ Ok(json!({"schema":"ecbench.pencil-attempt-join/v1","execution":a.execution,
++   "attempt":a.attempt,"context":context,"ordinary_record":ordinary_record,
++   "progress_files":progress,"progress_totals":progress_totals,
++   "relation_stream":relation_stream,"relation_prefix":relation_prefix,
++   "resource_prefix":resource_prefix,"resource_tail":resource_tail,
++   "process":pin("process.json",&a.process_observation,65536)?,
++   "controller":pin("controller.json",&a.controller_receipt,256*1024)?,
++   "cost_record":pin("cost.json",&a.cost_record,4*1024*1024)?}))
++}

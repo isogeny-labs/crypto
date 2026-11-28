@@ -1,0 +1,13 @@
+# Indexed packet construction, complete costs
+
+[pcc:unverified] Freeze4c71783dc31 pushed before one invocation; input hashes pass, exit0. All24completecalls on12originalgenus-two targets pass fulltrace and bytepacket replay, allproducer/verifier/nativecontrol16vector replay, originalquotient/nativegroup checks, phase sums and exactrepeats. Bothverifiers reject84mutations and accept12originalcertificates. Action/multiplicity controls unchanged.
+
+Signed orbit index built once per packet replaces repeated allrepresentative scans per support; all index field arithmetic charged. Action witness still computed and sparse witness/rows/pivots unchanged, no producerlabels trusted in rowbuilder. This is engineering; ordered-map comparison/allocation costs remain unpriced, no timing/external-fastest claim.
+
+Atp601 packetconstruction baseREDC falls22500->1700,16620->1660,35100->1770,31200->1750 bytarget order(sm1case0,sm1case1,sm17case0,sm17case1). Subgroupconstruction falls24232->3432,17728->2768,37806->4476,33796->4346. Completecandidate previous/current ratios2.185-2.467base and4.733-6.729subgroup. Fullcost charges producer, packetconstruction, sparsewitness and certificateverification, replacing only observed nativefinalcontrol; conservative total retained.
+
+Against retainedarm0 atp601 candidate/base ratios0.811-1.501 and subgroup0.868-1.106. Against retainedarm1 base1.028-1.204 and subgroup4.817-7.357. Thus mixed outcome, not uniform acceleration against eithercontrol, and registered10xgate fails. Otherfields/targets retained in SUMMARY.tsv; no pooledmeans or mixedmodulus weights. Complete gain versus inefficient preceding builder does not establish the requested mathematical breakthrough.
+
+Priorleadscreen: v2/RESULTS.md proves restricted classical residualspan equivalence; its originalgenus2 subgrouporder screen gives zero useful anchor rank gain. Highergenus checker-scalar ranks are not useful subgroup equations. cyclotomic-lp/RESULTS.md qualifies formalLPstate/CRT but not a new nonsplit gain. New nonsplit reuse must show useful subgroup-rank/completion gain against those controls before another collector, not merely count more polynomialmatches.
+
+Next research obligation: target joint collection/proof work after this corrected baseline; a new relation mechanism must change mathematical work, not only storage/lookup. Genus3/4 truncatedquotient qualification does not supply complete solvers here. Independent signed review, externalcomparison and publicationartifacts remain open; no leaderboard promotion. Gitcustody,noS3/cloud/retry. Originalgenus2+10xgoal unchanged.

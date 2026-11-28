@@ -1,0 +1,159 @@
+[2026-11-16T19:49:44Z] CMD: bash -c python3 code/selftest.py > raw/selftest.txt 2>&1 | exit=0 | elapsed_s=5
+    sha256 a10ab56afa91c2ec7be027ce110c38a292c1f923ee3e750957699d552c3abb0c  raw/selftest.txt
+[2026-11-16T19:49:49Z] CMD: python3 code/select_instances.py --family F5 --bits 10,11,12,13,14 --out raw/instances_F5.jsonl | exit=0 | elapsed_s=3
+    sha256 f581f7da830f720757da60abb78169880f535150eeb5d7b0acaa8078229f4a61  raw/instances_F5.jsonl
+[2026-11-16T19:49:57Z] CMD: python3 code/select_instances.py --family F7 --bits 8,9,10 --out raw/instances_F7.jsonl | exit=0 | elapsed_s=31
+    sha256 87034c73c0d94e9b7fd634b9b45be067ed7ee110cfab190db9ec0c429d83f5f8  raw/instances_F7.jsonl
+[2026-11-16T19:50:28Z] CMD: python3 code/select_instances.py --family C5 --cm raw/instances_F5.jsonl --out raw/instances_C5.jsonl | exit=0 | elapsed_s=2
+    sha256 536177019c28db109dd322c5660da15660305c6c53868bb1a894a8985fe82237  raw/instances_C5.jsonl
+[2026-11-16T19:50:30Z] CMD: python3 code/select_instances.py --family C7 --cm raw/instances_F7.jsonl --out raw/instances_C7.jsonl | exit=0 | elapsed_s=19
+    sha256 15e3666ad3e846e3d62fcbed81b4ae7ec70b806beaac1f1fc441a817fba02d1c  raw/instances_C7.jsonl
+[2026-11-16T19:50:54Z] CMD: python3 code/gates.py --instances raw/instances_F5.jsonl,raw/instances_F7.jsonl,raw/instances_C5.jsonl,raw/instances_C7.jsonl --out raw/gates_instances.jsonl | exit=0 | elapsed_s=18
+    sha256 f9df71b737ec033da526a4bfb4e5f8f980e635bd03767e1d141637263d8a7268  raw/gates_instances.jsonl
+[2026-11-16T19:51:29Z] CMD: python3 code/run_ic.py --instances raw/instances_F5.jsonl --bits 10 --arm A0 --seeds 1,2,3 --out raw/ic_F5_b10_A0.jsonl | exit=0 | elapsed_s=2
+    sha256 0a46a5a18f36a72e00ab3c1d31eeaf08fef24c64a51161aaed9306e1d365512c  raw/ic_F5_b10_A0.jsonl
+[2026-11-16T19:51:31Z] CMD: python3 code/run_ic.py --instances raw/instances_F5.jsonl --bits 10 --arm A --seeds 1,2,3 --out raw/ic_F5_b10_A.jsonl | exit=0 | elapsed_s=1
+    sha256 5a9903763b313b83676add60fed4e4b241bdd7c75c76ec0e989c18be54de52bb  raw/ic_F5_b10_A.jsonl
+[2026-11-16T19:51:32Z] CMD: python3 code/run_ic.py --instances raw/instances_F5.jsonl --bits 10 --arm B --seeds 1,2,3 --out raw/ic_F5_b10_B.jsonl | exit=0 | elapsed_s=1
+    sha256 16961767836c305f41b66d72959d50befb0ae2ecc25d33b42b77ff9edf1a7089  raw/ic_F5_b10_B.jsonl
+[2026-11-16T19:51:33Z] CMD: python3 code/run_ic.py --instances raw/instances_F5.jsonl --bits 11 --arm A0 --seeds 1,2,3 --out raw/ic_F5_b11_A0.jsonl | exit=0 | elapsed_s=5
+    sha256 693612b2165550b1512a8b726cb9b423308e69f70432f8b95d046ae2106a5ec8  raw/ic_F5_b11_A0.jsonl
+[2026-11-16T19:51:38Z] CMD: python3 code/run_ic.py --instances raw/instances_F5.jsonl --bits 11 --arm A --seeds 1,2,3 --out raw/ic_F5_b11_A.jsonl | exit=0 | elapsed_s=3
+    sha256 aa62b91796edb840382819142bdd62799525bb74c759c4d3fc6745493f35ec9f  raw/ic_F5_b11_A.jsonl
+[2026-11-16T19:51:41Z] CMD: python3 code/run_ic.py --instances raw/instances_F5.jsonl --bits 11 --arm B --seeds 1,2,3 --out raw/ic_F5_b11_B.jsonl | exit=0 | elapsed_s=0
+    sha256 a4ebece7ec357408079cd7d98863f4496947867f792dcd895a8389a7bf25d63c  raw/ic_F5_b11_B.jsonl
+[2026-11-16T19:51:41Z] CMD: python3 code/run_ic.py --instances raw/instances_F5.jsonl --bits 12 --arm A0 --seeds 1,2,3 --out raw/ic_F5_b12_A0.jsonl | exit=0 | elapsed_s=10
+    sha256 66a548a27b974d8806890074ebbb44dffe17bbc98cf132bcc1a54475b1a1e635  raw/ic_F5_b12_A0.jsonl
+[2026-11-16T19:51:51Z] CMD: python3 code/run_ic.py --instances raw/instances_F5.jsonl --bits 12 --arm A --seeds 1,2,3 --out raw/ic_F5_b12_A.jsonl | exit=0 | elapsed_s=5
+    sha256 844f624cd1333aab2643fa42ecc346da567fd1e998e5e0832bd8cfd131f98d76  raw/ic_F5_b12_A.jsonl
+[2026-11-16T19:51:56Z] CMD: python3 code/run_ic.py --instances raw/instances_F5.jsonl --bits 12 --arm B --seeds 1,2,3 --out raw/ic_F5_b12_B.jsonl | exit=0 | elapsed_s=1
+    sha256 bf8e12944fc962b730e4073043f28907bdfcd6481c990eab068619a62b6bf1a7  raw/ic_F5_b12_B.jsonl
+[2026-11-16T19:51:57Z] CMD: python3 code/run_ic.py --instances raw/instances_F5.jsonl --bits 13 --arm A0 --seeds 1,2,3 --out raw/ic_F5_b13_A0.jsonl | exit=0 | elapsed_s=20
+    sha256 52de632787a54cbf5084dacf60c72757813fff6b8fe6cca1f3a2e7e263212fd9  raw/ic_F5_b13_A0.jsonl
+[2026-11-16T19:52:17Z] CMD: python3 code/run_ic.py --instances raw/instances_F5.jsonl --bits 13 --arm A --seeds 1,2,3 --out raw/ic_F5_b13_A.jsonl | exit=0 | elapsed_s=10
+    sha256 a512bb68d1c87cad2bcc80dcead5c545f3af2e8fb4791f816e31a75aa213910c  raw/ic_F5_b13_A.jsonl
+[2026-11-16T19:52:27Z] CMD: python3 code/run_ic.py --instances raw/instances_F5.jsonl --bits 13 --arm B --seeds 1,2,3 --out raw/ic_F5_b13_B.jsonl | exit=0 | elapsed_s=3
+    sha256 a4238cb1c7c4780144f160c53660c997e518642707109c93767f3f84c70eb2ad  raw/ic_F5_b13_B.jsonl
+[2026-11-16T19:52:30Z] CMD: python3 code/run_ic.py --instances raw/instances_F5.jsonl --bits 14 --arm A0 --seeds 1,2,3 --out raw/ic_F5_b14_A0.jsonl | exit=0 | elapsed_s=38
+    sha256 bb1781f9b754f975b9e4da71379d935f6cfad2ae0cf52b03c5e487e851148340  raw/ic_F5_b14_A0.jsonl
+[2026-11-16T19:53:08Z] CMD: python3 code/run_ic.py --instances raw/instances_F5.jsonl --bits 14 --arm A --seeds 1,2,3 --out raw/ic_F5_b14_A.jsonl | exit=0 | elapsed_s=19
+    sha256 9ef605b0875218f727ee3368d21a909096bfc74308e7cb5a253d9e7a31d3d6ee  raw/ic_F5_b14_A.jsonl
+[2026-11-16T19:53:27Z] CMD: python3 code/run_ic.py --instances raw/instances_F5.jsonl --bits 14 --arm B --seeds 1,2,3 --out raw/ic_F5_b14_B.jsonl | exit=0 | elapsed_s=4
+    sha256 baa13d7b664c4caa004c33c705127e3181f8c1b8cdce0bda549005e5f5ea46c2  raw/ic_F5_b14_B.jsonl
+[2026-11-16T19:53:31Z] CMD: python3 code/run_ic.py --instances raw/instances_F7.jsonl --bits 8 --arm A0 --seeds 1,2,3 --out raw/ic_F7_b8_A0.jsonl | exit=0 | elapsed_s=3
+    sha256 9e76449a010ae4b290e4b982dad27f8263d3bc92485e0a101f3fa9d0ca5ddd8d  raw/ic_F7_b8_A0.jsonl
+[2026-11-16T19:53:34Z] CMD: python3 code/run_ic.py --instances raw/instances_F7.jsonl --bits 8 --arm A --seeds 1,2,3 --out raw/ic_F7_b8_A.jsonl | exit=0 | elapsed_s=2
+    sha256 946303a9c1855c275f757c1fabd1f799ac9bb448438385e15e712cd383c634e3  raw/ic_F7_b8_A.jsonl
+[2026-11-16T19:53:36Z] CMD: python3 code/run_ic.py --instances raw/instances_F7.jsonl --bits 8 --arm B --seeds 1,2,3 --out raw/ic_F7_b8_B.jsonl | exit=0 | elapsed_s=1
+    sha256 5699042141c958c01df36bf91bcc9cf0364563d822cf7c6453df1eda05e7f94a  raw/ic_F7_b8_B.jsonl
+[2026-11-16T19:53:37Z] CMD: python3 code/run_ic.py --instances raw/instances_F7.jsonl --bits 9 --arm A0 --seeds 1,2,3 --out raw/ic_F7_b9_A0.jsonl | exit=0 | elapsed_s=6
+    sha256 151e083b8720b3d6b70ce145628142f0500912e79e9809ed0d4c8359356b8ddb  raw/ic_F7_b9_A0.jsonl
+[2026-11-16T19:53:43Z] CMD: python3 code/run_ic.py --instances raw/instances_F7.jsonl --bits 9 --arm A --seeds 1,2,3 --out raw/ic_F7_b9_A.jsonl | exit=0 | elapsed_s=4
+    sha256 6c18733b44d4f41b55a343ef11420c4f4d13a9b863e118a273bd8e74a2c45a50  raw/ic_F7_b9_A.jsonl
+[2026-11-16T19:53:47Z] CMD: python3 code/run_ic.py --instances raw/instances_F7.jsonl --bits 9 --arm B --seeds 1,2,3 --out raw/ic_F7_b9_B.jsonl | exit=0 | elapsed_s=2
+    sha256 2d099315f3f7d795e25568cbd48190aafa40569db2547a2a03127565afa5b7e0  raw/ic_F7_b9_B.jsonl
+[2026-11-16T19:53:49Z] CMD: python3 code/run_ic.py --instances raw/instances_F7.jsonl --bits 10 --arm A0 --seeds 1,2,3 --out raw/ic_F7_b10_A0.jsonl | exit=0 | elapsed_s=11
+    sha256 d9604dea1e8f03b9921109e1c7ad7eaec4f596eeff9beeba53e99e833f0b0e40  raw/ic_F7_b10_A0.jsonl
+[2026-11-16T19:54:00Z] CMD: python3 code/run_ic.py --instances raw/instances_F7.jsonl --bits 10 --arm A --seeds 1,2,3 --out raw/ic_F7_b10_A.jsonl | exit=0 | elapsed_s=7
+    sha256 c369ba4793ae4d9eeabd403c2aad49a9090849a3560248e058a39d3c462dc952  raw/ic_F7_b10_A.jsonl
+[2026-11-16T19:54:07Z] CMD: python3 code/run_ic.py --instances raw/instances_F7.jsonl --bits 10 --arm B --seeds 1,2,3 --out raw/ic_F7_b10_B.jsonl | exit=0 | elapsed_s=1
+    sha256 c34a7303bf4804953e81914bc4ca9b898be20414b6371ecace97f2162de74eab  raw/ic_F7_b10_B.jsonl
+[2026-11-16T19:54:08Z] CMD: python3 code/run_ic.py --instances raw/instances_C5.jsonl --bits 10 --arm A --seeds 1,2,3 --out raw/ic_C5_b10_A.jsonl | exit=0 | elapsed_s=2
+    sha256 f0f83461e4620c8dabe7885adb5c256dfed6d3c7cbe7fdf486912cc409077d11  raw/ic_C5_b10_A.jsonl
+[2026-11-16T19:54:10Z] CMD: python3 code/run_ic.py --instances raw/instances_C5.jsonl --bits 10 --arm B --seeds 1,2,3 --out raw/ic_C5_b10_B.jsonl | exit=0 | elapsed_s=2
+    sha256 59d0f0d101e5926f825c94669b0c93b4756807ffb994412fb4cdbe309faefe34  raw/ic_C5_b10_B.jsonl
+[2026-11-16T19:54:12Z] CMD: python3 code/run_ic.py --instances raw/instances_C5.jsonl --bits 11 --arm A --seeds 1,2,3 --out raw/ic_C5_b11_A.jsonl | exit=0 | elapsed_s=2
+    sha256 3e70a0f72bc9c0fa8b9e073b0b8f99aba10dd11effe0e34b314ae85cb8ecd075  raw/ic_C5_b11_A.jsonl
+[2026-11-16T19:54:14Z] CMD: python3 code/run_ic.py --instances raw/instances_C5.jsonl --bits 11 --arm B --seeds 1,2,3 --out raw/ic_C5_b11_B.jsonl | exit=0 | elapsed_s=3
+    sha256 527b8bde99695d516637f40cd53b8b03c99679ae93e271dce0bb9af099b2aa0f  raw/ic_C5_b11_B.jsonl
+[2026-11-16T19:54:17Z] CMD: python3 code/run_ic.py --instances raw/instances_C5.jsonl --bits 12 --arm A --seeds 1,2,3 --out raw/ic_C5_b12_A.jsonl | exit=0 | elapsed_s=5
+    sha256 9f5abdeb920fc425db6ec208d7d2d8fea699d6f738f4011897c8fffa570889d5  raw/ic_C5_b12_A.jsonl
+[2026-11-16T19:54:22Z] CMD: python3 code/run_ic.py --instances raw/instances_C5.jsonl --bits 12 --arm B --seeds 1,2,3 --out raw/ic_C5_b12_B.jsonl | exit=0 | elapsed_s=5
+    sha256 2bd95cb56aede8637f233d978d2150b8610924b7662c0c42b73ec1cd2c19f315  raw/ic_C5_b12_B.jsonl
+[2026-11-16T19:54:27Z] CMD: python3 code/run_ic.py --instances raw/instances_C5.jsonl --bits 13 --arm A --seeds 1,2,3 --out raw/ic_C5_b13_A.jsonl | exit=0 | elapsed_s=10
+    sha256 1a3d9f5ba3ec2071118372288a276975a99e3c7500f17ed52a3f21ea31f2c500  raw/ic_C5_b13_A.jsonl
+[2026-11-16T19:54:37Z] CMD: python3 code/run_ic.py --instances raw/instances_C5.jsonl --bits 13 --arm B --seeds 1,2,3 --out raw/ic_C5_b13_B.jsonl | exit=0 | elapsed_s=10
+    sha256 4757a4cdaad8627200a7ff1f3fbddc124e340c89cc6d49f662a1f06b66811cd9  raw/ic_C5_b13_B.jsonl
+[2026-11-16T19:54:47Z] CMD: python3 code/run_ic.py --instances raw/instances_C5.jsonl --bits 14 --arm A --seeds 1,2,3 --out raw/ic_C5_b14_A.jsonl | exit=0 | elapsed_s=19
+    sha256 849c7872d72407b932ec9c07ce981d71fe6efb88d4e2a06a9bd2280f9bf9dfff  raw/ic_C5_b14_A.jsonl
+[2026-11-16T19:55:06Z] CMD: python3 code/run_ic.py --instances raw/instances_C5.jsonl --bits 14 --arm B --seeds 1,2,3 --out raw/ic_C5_b14_B.jsonl | exit=0 | elapsed_s=19
+    sha256 8397b876cdddf7a36adb1f1da4289ba9ef8806df06f2e5f8d1514e843a2c2c14  raw/ic_C5_b14_B.jsonl
+[2026-11-16T19:55:25Z] CMD: python3 code/run_ic.py --instances raw/instances_C7.jsonl --bits 8 --arm A --seeds 1,2,3 --out raw/ic_C7_b8_A.jsonl | exit=0 | elapsed_s=2
+    sha256 d99c13521389ab4ac452e9d6ca6d11b870d9dd442567b88e681e143b02f1c44d  raw/ic_C7_b8_A.jsonl
+[2026-11-16T19:55:27Z] CMD: python3 code/run_ic.py --instances raw/instances_C7.jsonl --bits 8 --arm B --seeds 1,2,3 --out raw/ic_C7_b8_B.jsonl | exit=0 | elapsed_s=2
+    sha256 95cd4aa644b280ddaf22c0457873882881fe245020474e8352c599c6b2bc4e89  raw/ic_C7_b8_B.jsonl
+[2026-11-16T19:55:29Z] CMD: python3 code/run_ic.py --instances raw/instances_C7.jsonl --bits 9 --arm A --seeds 1,2,3 --out raw/ic_C7_b9_A.jsonl | exit=0 | elapsed_s=3
+    sha256 d92a2024c9129723efdea521a03e8e1098a0a66b38060c7ab866f22c91d1364f  raw/ic_C7_b9_A.jsonl
+[2026-11-16T19:55:32Z] CMD: python3 code/run_ic.py --instances raw/instances_C7.jsonl --bits 9 --arm B --seeds 1,2,3 --out raw/ic_C7_b9_B.jsonl | exit=0 | elapsed_s=4
+    sha256 1e367cc2b300df634625c8962fc83f9de24b8d1119336a060d44dbd3818daf30  raw/ic_C7_b9_B.jsonl
+[2026-11-16T19:55:36Z] CMD: python3 code/run_ic.py --instances raw/instances_C7.jsonl --bits 10 --arm A --seeds 1,2,3 --out raw/ic_C7_b10_A.jsonl | exit=0 | elapsed_s=6
+    sha256 93aae3b9542d9891368b64996d88dd69ae14a1a3550023d8609f6916cb1b4f84  raw/ic_C7_b10_A.jsonl
+[2026-11-16T19:55:42Z] CMD: python3 code/run_ic.py --instances raw/instances_C7.jsonl --bits 10 --arm B --seeds 1,2,3 --out raw/ic_C7_b10_B.jsonl | exit=0 | elapsed_s=6
+    sha256 98f5cf74cd56593fcdb56361d6c09fb07e3e4fbb534248cd9bcbd7924b5b59be  raw/ic_C7_b10_B.jsonl
+[2026-11-16T19:55:48Z] CMD: python3 code/run_rho.py --instances raw/instances_F5.jsonl --bits 10 --arm Rneg --seeds 1-24 --out raw/rho_F5_b10_Rneg.jsonl | exit=0 | elapsed_s=8
+    sha256 baa2d353e26940448d56002b8f4998d90a2e99ba91d78fc06b3d5bd76ea02bfb  raw/rho_F5_b10_Rneg.jsonl
+[2026-11-16T19:55:56Z] CMD: python3 code/run_rho.py --instances raw/instances_F5.jsonl --bits 10 --arm Raut --seeds 1-24 --out raw/rho_F5_b10_Raut.jsonl | exit=0 | elapsed_s=7
+    sha256 1eff3b31dbdf8ac86345138f0a8a1a0e2fd6b1b34cb89eca9dc3bb73941060a2  raw/rho_F5_b10_Raut.jsonl
+[2026-11-16T19:56:03Z] CMD: python3 code/run_rho.py --instances raw/instances_F5.jsonl --bits 11 --arm Rneg --seeds 1-24 --out raw/rho_F5_b11_Rneg.jsonl | exit=0 | elapsed_s=19
+    sha256 23f598d549341c4184399d4bf74698ad2fee3152ebbf6fe5e6304813c06ec032  raw/rho_F5_b11_Rneg.jsonl
+[2026-11-16T19:56:22Z] CMD: python3 code/run_rho.py --instances raw/instances_F5.jsonl --bits 11 --arm Raut --seeds 1-24 --out raw/rho_F5_b11_Raut.jsonl | exit=0 | elapsed_s=14
+    sha256 ddad8a5568212017ddff0433676a07625677623237d52b8506eba666e1d7c71d  raw/rho_F5_b11_Raut.jsonl
+[2026-11-16T19:56:36Z] CMD: python3 code/run_rho.py --instances raw/instances_F5.jsonl --bits 12 --arm Rneg --seeds 1-24 --out raw/rho_F5_b12_Rneg.jsonl | exit=0 | elapsed_s=22
+    sha256 0df30d241e9917ef8b36fcac5edae2d9a0353b838d8d36c5346ce58f0197b947  raw/rho_F5_b12_Rneg.jsonl
+[2026-11-16T19:56:58Z] CMD: python3 code/run_rho.py --instances raw/instances_F5.jsonl --bits 12 --arm Raut --seeds 1-24 --out raw/rho_F5_b12_Raut.jsonl | exit=0 | elapsed_s=15
+    sha256 734fc69639ab8ede9f4040804886cec661c2080e19337015249c9e1084a14c70  raw/rho_F5_b12_Raut.jsonl
+[2026-11-16T19:57:13Z] CMD: python3 code/run_rho.py --instances raw/instances_F5.jsonl --bits 13 --arm Rneg --seeds 1-24 --out raw/rho_F5_b13_Rneg.jsonl | exit=0 | elapsed_s=56
+    sha256 b2d7aa041ce586c61522546a135e5fe67b0e533d779698bb1a334d96c209866d  raw/rho_F5_b13_Rneg.jsonl
+[2026-11-16T19:58:09Z] CMD: python3 code/run_rho.py --instances raw/instances_F5.jsonl --bits 13 --arm Raut --seeds 1-24 --out raw/rho_F5_b13_Raut.jsonl | exit=0 | elapsed_s=34
+    sha256 7a55ece394d40532cfb9394b4740bb1ed400bef10a9feead921e33e3675ed4b8  raw/rho_F5_b13_Raut.jsonl
+[2026-11-16T19:58:43Z] CMD: python3 code/run_rho.py --instances raw/instances_F5.jsonl --bits 14 --arm Rneg --seeds 1-24 --out raw/rho_F5_b14_Rneg.jsonl | exit=0 | elapsed_s=51
+    sha256 d5de50c276ea8e7820f2dcced8f59b659d4f675e6c3b27e2f9aecd669d2e9c9a  raw/rho_F5_b14_Rneg.jsonl
+[2026-11-16T19:59:34Z] CMD: python3 code/run_rho.py --instances raw/instances_F5.jsonl --bits 14 --arm Raut --seeds 1-24 --out raw/rho_F5_b14_Raut.jsonl | exit=0 | elapsed_s=28
+    sha256 19201cbfa0c7df675ab105db815f9f2eb47423aa6864e7f8338a8cb6e1031156  raw/rho_F5_b14_Raut.jsonl
+[2026-11-16T20:00:02Z] CMD: python3 code/run_rho.py --instances raw/instances_F7.jsonl --bits 8 --arm Rneg --seeds 1-12 --out raw/rho_F7_b8_Rneg.jsonl | exit=0 | elapsed_s=19
+    sha256 e90cb29588c244ca5d303a0a85d22dd5a82444583de0c7dac83f6cf7fbfadff0  raw/rho_F7_b8_Rneg.jsonl
+[2026-11-16T20:00:21Z] CMD: python3 code/run_rho.py --instances raw/instances_F7.jsonl --bits 8 --arm Raut --seeds 1-12 --out raw/rho_F7_b8_Raut.jsonl | exit=0 | elapsed_s=13
+    sha256 159f1bb745ed859849eab8916accf3bc4888930e548d809caa9c6456e7740276  raw/rho_F7_b8_Raut.jsonl
+[2026-11-16T20:00:34Z] CMD: python3 code/run_rho.py --instances raw/instances_F7.jsonl --bits 9 --arm Rneg --seeds 1-12 --out raw/rho_F7_b9_Rneg.jsonl | exit=0 | elapsed_s=76
+    sha256 fd3714f3e5799d69437d11bfe3f787811999fb42d68400cc4b187e3aa7480ce0  raw/rho_F7_b9_Rneg.jsonl
+[2026-11-16T20:01:50Z] CMD: python3 code/run_rho.py --instances raw/instances_F7.jsonl --bits 9 --arm Raut --seeds 1-12 --out raw/rho_F7_b9_Raut.jsonl | exit=0 | elapsed_s=32
+    sha256 17060fdaea0b9105a84e5a47b343a6bdedabfe9d581d0dc5442ddad7662af1c6  raw/rho_F7_b9_Raut.jsonl
+[2026-11-16T20:02:22Z] CMD: python3 code/run_rho.py --instances raw/instances_F7.jsonl --bits 10 --arm Rneg --seeds 1-12 --out raw/rho_F7_b10_Rneg.jsonl | exit=0 | elapsed_s=212
+    sha256 ecca2f4009015204de20987c2483f4ff04c970422bc764f6af783b347b6a094a  raw/rho_F7_b10_Rneg.jsonl
+[2026-11-16T20:05:54Z] CMD: python3 code/run_rho.py --instances raw/instances_F7.jsonl --bits 10 --arm Raut --seeds 1-12 --out raw/rho_F7_b10_Raut.jsonl | exit=0 | elapsed_s=78
+    sha256 fe96c4d0ce376ea0918e860608936d23969f5a11239553a922c5789dea47abbe  raw/rho_F7_b10_Raut.jsonl
+[2026-11-16T20:07:12Z] CMD: python3 code/run_rho.py --instances raw/instances_C5.jsonl --bits 10 --arm Rneg --seeds 1-6 --out raw/rho_C5_b10_Rneg.jsonl | exit=0 | elapsed_s=3
+    sha256 14bad4c139c55e667b204afa0caa1e6685f29c87d2953d5779a754c693c9cef9  raw/rho_C5_b10_Rneg.jsonl
+[2026-11-16T20:07:15Z] CMD: python3 code/run_rho.py --instances raw/instances_C5.jsonl --bits 10 --arm Raut --seeds 1-6 --out raw/rho_C5_b10_Raut.jsonl | exit=0 | elapsed_s=4
+    sha256 92cbc55227b55da82c93d40b3ca702b59d61a287f5ea7a60caa2acd777ffa7bf  raw/rho_C5_b10_Raut.jsonl
+[2026-11-16T20:07:19Z] CMD: python3 code/run_rho.py --instances raw/instances_C5.jsonl --bits 11 --arm Rneg --seeds 1-6 --out raw/rho_C5_b11_Rneg.jsonl | exit=0 | elapsed_s=5
+    sha256 534f2492f7e32f463613e39f95baaafc6955c81cd3427d3fec9e67387efa8a50  raw/rho_C5_b11_Rneg.jsonl
+[2026-11-16T20:07:24Z] CMD: python3 code/run_rho.py --instances raw/instances_C5.jsonl --bits 11 --arm Raut --seeds 1-6 --out raw/rho_C5_b11_Raut.jsonl | exit=0 | elapsed_s=5
+    sha256 16d16cc5a5c0aa65baa1880041b049a6fe63d04e7a0619dd555bab881cfbf7c8  raw/rho_C5_b11_Raut.jsonl
+[2026-11-16T20:07:29Z] CMD: python3 code/run_rho.py --instances raw/instances_C5.jsonl --bits 12 --arm Rneg --seeds 1-6 --out raw/rho_C5_b12_Rneg.jsonl | exit=0 | elapsed_s=4
+    sha256 7c49e69bd90ddb7332856768401b98403636d87fe740499be219fc3ffba1ccff  raw/rho_C5_b12_Rneg.jsonl
+[2026-11-16T20:07:33Z] CMD: python3 code/run_rho.py --instances raw/instances_C5.jsonl --bits 12 --arm Raut --seeds 1-6 --out raw/rho_C5_b12_Raut.jsonl | exit=0 | elapsed_s=3
+    sha256 7be608c19106ff587a9432fd00fb543a64e3459214702b209ae65c724792a5df  raw/rho_C5_b12_Raut.jsonl
+[2026-11-16T20:07:36Z] CMD: python3 code/run_rho.py --instances raw/instances_C5.jsonl --bits 13 --arm Rneg --seeds 1-6 --out raw/rho_C5_b13_Rneg.jsonl | exit=0 | elapsed_s=13
+    sha256 f01a7fbfe8e7351ff178d11ac111e2b435206bede0069cd8fd82bdf968e6f875  raw/rho_C5_b13_Rneg.jsonl
+[2026-11-16T20:07:49Z] CMD: python3 code/run_rho.py --instances raw/instances_C5.jsonl --bits 13 --arm Raut --seeds 1-6 --out raw/rho_C5_b13_Raut.jsonl | exit=0 | elapsed_s=12
+    sha256 7a9d47248eb5fb9531ceffaa24ae0e92ccebfd860806789867c9a351cd35f5b7  raw/rho_C5_b13_Raut.jsonl
+[2026-11-16T20:08:01Z] CMD: python3 code/run_rho.py --instances raw/instances_C5.jsonl --bits 14 --arm Rneg --seeds 1-6 --out raw/rho_C5_b14_Rneg.jsonl | exit=0 | elapsed_s=12
+    sha256 36a4b53818261e937d7f9902b8782297181139cf3c9212df80cb7965c3d1edd3  raw/rho_C5_b14_Rneg.jsonl
+[2026-11-16T20:08:13Z] CMD: python3 code/run_rho.py --instances raw/instances_C5.jsonl --bits 14 --arm Raut --seeds 1-6 --out raw/rho_C5_b14_Raut.jsonl | exit=0 | elapsed_s=11
+    sha256 04fe63a30aca1c9c72cb0c337a02bbefb3b04607ebf6652036532941757af183  raw/rho_C5_b14_Raut.jsonl
+[2026-11-16T20:08:24Z] CMD: python3 code/run_rho.py --instances raw/instances_C7.jsonl --bits 8 --arm Rneg --seeds 1-6 --out raw/rho_C7_b8_Rneg.jsonl | exit=0 | elapsed_s=10
+    sha256 afa3566a838e5f08145923ad7dedc58a98345dc7732cb0ca24ee93f2c99787c6  raw/rho_C7_b8_Rneg.jsonl
+[2026-11-16T20:08:34Z] CMD: python3 code/run_rho.py --instances raw/instances_C7.jsonl --bits 8 --arm Raut --seeds 1-6 --out raw/rho_C7_b8_Raut.jsonl | exit=0 | elapsed_s=10
+    sha256 32175b7bc9a8c9badd22ca3686181a1eea75cb443572579b7ee2792bb40fe26a  raw/rho_C7_b8_Raut.jsonl
+[2026-11-16T20:08:44Z] CMD: python3 code/run_rho.py --instances raw/instances_C7.jsonl --bits 9 --arm Rneg --seeds 1-6 --out raw/rho_C7_b9_Rneg.jsonl | exit=0 | elapsed_s=17
+    sha256 ded566471e8fc93e513344ed9ef42f749b8e9e0b9858692f878ac51b6e43c2e2  raw/rho_C7_b9_Rneg.jsonl
+[2026-11-16T20:09:01Z] CMD: python3 code/run_rho.py --instances raw/instances_C7.jsonl --bits 9 --arm Raut --seeds 1-6 --out raw/rho_C7_b9_Raut.jsonl | exit=0 | elapsed_s=16
+    sha256 c47c444bc52be0c15187db18c11ab491919a9641e0bea94a21422053d44628c9  raw/rho_C7_b9_Raut.jsonl
+[2026-11-16T20:09:17Z] CMD: python3 code/run_rho.py --instances raw/instances_C7.jsonl --bits 10 --arm Rneg --seeds 1-6 --out raw/rho_C7_b10_Rneg.jsonl | exit=0 | elapsed_s=63
+    sha256 33332fed9fbbd230b09f5554970a05550e7a63704a81eddf03d9bab674c5400a  raw/rho_C7_b10_Rneg.jsonl
+[2026-11-16T20:10:20Z] CMD: python3 code/run_rho.py --instances raw/instances_C7.jsonl --bits 10 --arm Raut --seeds 1-6 --out raw/rho_C7_b10_Raut.jsonl | exit=0 | elapsed_s=64
+    sha256 c06648d57ea92e89ca4dbe77c28c0dd756af58e65adb42c3220316123735ab57  raw/rho_C7_b10_Raut.jsonl
+[2026-11-16T20:11:36Z] CMD: python3 code/analyze.py --raw raw --out raw/analysis.json --tsv raw/summary.tsv | exit=0 | elapsed_s=2
+    sha256 40bf9c577b9f178d635ec0dcc971a07e13dbeae0ce7f4276f01e7b3ff141ea2d  raw/analysis.json
+    sha256 f9a3c23a1e9a9e3377265b0cb2172d6fcffc52aff128fcb42dbd7803048871fc  raw/summary.tsv

@@ -1,0 +1,10 @@
+Root postassessment observation and corrective cleanup (not a worker result):
+Docker ps showed container590f17e66289/n83-native-775127-1792438252811216801
+in Created state after the guard's immediate absent cleanup snapshot.
+Full inspect saved in k2048-v8-delayed-container-inspect.json: Runningfalse,
+Pid0, StartedAt0001-01-01T00:00:00Z, ExitCode0, no execution established.
+Root executed docker rm --force for this exact task-owned name; command
+succeeded and returned that name. Subsequent exact-name ps -aq was empty.
+This is an additional later observation, not a rewrite of the guard snapshot.
+No peer container was removed. Bounded same-image /bin/true readiness then
+completed with exit0; saved stdout/stderr/exit files are actual captured output.

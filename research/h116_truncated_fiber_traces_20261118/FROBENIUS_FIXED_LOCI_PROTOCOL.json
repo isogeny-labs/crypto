@@ -1,0 +1,63 @@
+{
+  "schema": "h116.frobenius-fixed-loci-protocol/v1",
+  "protocol_id": "H116-FROBENIUS-FIXED-LOCI-001",
+  "status": "frozen-before-implementation-and-execution",
+  "question": "Do positive Frobenius-fixed loci exhaust each frozen finite extension point group exactly as required by the 119-theorem algebraic-point bridge, and what point-period strata are omitted by checking only the base locus or only proper periods?",
+  "parent_protocol_sha256": "36dbefbbd7d7efba055e94d1deaa427a63dc13a94ed6561bc38e1784a3efba4a",
+  "parent_result_sha256": "5c8f506a81280c650470dac6d2b32deca78c9e63a45282b1a579a6ace66368eb",
+  "cells": [
+    {"slug":"fp5-a2-b1-d2","p":5,"a":2,"b":1,"degree":2},
+    {"slug":"fp5-a2-b1-d3","p":5,"a":2,"b":1,"degree":3},
+    {"slug":"fp5-a2-b1-d4","p":5,"a":2,"b":1,"degree":4},
+    {"slug":"fp7-a1-b1-d2","p":7,"a":1,"b":1,"degree":2},
+    {"slug":"fp7-a1-b1-d3","p":7,"a":1,"b":1,"degree":3},
+    {"slug":"fp7-a1-b1-d4","p":7,"a":1,"b":1,"degree":4},
+    {"slug":"fp11-a1-b1-d2","p":11,"a":1,"b":1,"degree":2},
+    {"slug":"fp11-a1-b1-d3","p":11,"a":1,"b":1,"degree":3}
+  ],
+  "field_construction": {
+    "representation": "GF(p)[u] modulo the lexicographically first monic irreducible polynomial of the frozen degree",
+    "irreducibility_check": "deterministic Rabin criterion",
+    "maximum_field_size": 2401
+  },
+  "producer": {
+    "path": "h116_frobenius_fixed_loci.rs",
+    "build": "rustc --edition=2021 -O -D warnings",
+    "source_hash": "to be sealed by FROBENIUS_FIXED_LOCI_SOURCE_GATE.md before execution"
+  },
+  "independent_verifier": {
+    "path": "h116_frobenius_fixed_loci_verify.py",
+    "method": "separate Python polynomial-basis field and affine group implementation; reconstruct every point and Frobenius orbit from the frozen cell definitions",
+    "source_hash": "to be sealed by FROBENIUS_FIXED_LOCI_SOURCE_GATE.md before execution"
+  },
+  "positive_checks": [
+    "every enumerated point has a least positive Frobenius period r with 1<=r<=degree",
+    "every least period r divides the frozen extension degree",
+    "the period histogram sums to the complete enumerated point group",
+    "for each n from 1 through degree, the measured pi^n fixed count equals the sum of least-period strata whose period divides n",
+    "the degree-th fixed locus equals the complete point group",
+    "the first fixed locus equals the independently recomputed base-field point count",
+    "the characteristic expression pi^2-[t]pi+[p] has zero failures in every least-period stratum"
+  ],
+  "controls": [
+    "the period-one locus is a proper subset of every degree-greater-than-one extension group",
+    "the union of all proper-period strata is a proper subset of every extension group",
+    "the full-degree least-period stratum is nonempty in every cell",
+    "wrong trace t+1 rejects at least one enumerated point",
+    "wrong norm p+1 rejects at least one enumerated point"
+  ],
+  "measurements": [
+    "least-period histogram for r=1 through degree",
+    "pi^n fixed counts for n=1 through degree",
+    "period-one, proper-period-union, full-period, and total point counts",
+    "characteristic failures and coefficient-mutation rejections by least-period stratum",
+    "producer and independent-verifier elapsed nanoseconds as single-run diagnostics"
+  ],
+  "acceptance": {
+    "primary": "all positive checks pass in all eight cells",
+    "controls": "every frozen control rejects in every cell",
+    "failure_policy": "retain every row and every empty or unexpected stratum; do not replace a curve, degree, modulus rule, check, or control"
+  },
+  "claim_boundary": "A finite orbit-stratification test of the proved exhaustion interface. It does not prove the characteristic equation on arbitrary finite fixed loci, identify rational or scheme morphisms, solve ECDLP, or establish a runtime improvement.",
+  "filed_before_affected_data": true
+}

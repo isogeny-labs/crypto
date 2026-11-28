@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T11:14:13Z",
+ "id": "PCC-20261119-cbf30e",
+ "kind": "theorem",
+ "producer": {
+  "commit": "cdc23184024b51e8072ae6f5053e403e1819ab97",
+  "model": "Codex",
+  "session": "cubic-cm-norm-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "5789f2ff5b5a19716b9a4e559d462dcac8cd30471e6ce827845b9028f78dda79",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.shortCMLinearRelation_implies_norm_torsion"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This proves the additive cubic-CM coordinate action and the explicit norm-torsion implication. It does not construct a collision-derived linear relation, prove torsion-to-division-polynomial vanishing, construct or prove vanishing of the specialized Semaev polynomial, or establish a subexponential ECDLP runtime theorem.",
+ "statement": "On an elliptic short curve Y squared equals X cubed plus B over a field of characteristic not two, a nonidentity cubic root of unity defines an additive affine-point endomorphism zeta satisfying zeta squared plus zeta plus one equals zero; any relation a P plus b zeta(P) equals zero therefore makes the explicit Eisenstein norm a squared minus a b plus b squared annihilate P."
+}

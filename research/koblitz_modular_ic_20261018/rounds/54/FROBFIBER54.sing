@@ -1,0 +1,111 @@
+LIB "linalg.lib";
+proc require54(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump54(link out,string name,matrix A){int i;int j;write(out,"matrix "+name+"["+string(nrows(A))+"]["+string(ncols(A))+"];");for(i=1;i<=nrows(A);i++){for(j=1;j<=ncols(A);j++){if(A[i,j]!=0){write(out,name+"["+string(i)+","+string(j)+"]="+string(A[i,j])+";");}}}}
+execute(read("../fiber54-01/rr-fiber-equations54.sing"));
+number b54=1+1/a;
+require54(derived54[1]==l^4+b54*l+b54^2 && derived54[2]==n^4+b54^3*n+b54^4*(l+1),"FROBFIBER54_REDUCED_ACTUAL_EQUATIONS");
+matrix compareForward54=lift(derived54,comparison54);matrix compareReverse54=lift(comparison54,derived54);
+require54(matrix(derived54)*compareForward54==matrix(comparison54) && matrix(comparison54)*compareReverse54==matrix(derived54),"FROBFIBER54_DESCENDED_PRESENTATION_PRODUCTS");
+poly wBack54=n/b54;
+poly PBack54=wBack54^16+(1+b54)*wBack54^4+b54*wBack54+1+b54+b54^2;
+poly lambdaBack54=l+wBack54^4+wBack54+1;
+ideal backResiduals54=PBack54,lambdaBack54;
+matrix backLift54=lift(derived54,backResiduals54);
+require54(matrix(derived54)*backLift54==matrix(backResiduals54),"FROBFIBER54_PRIMITIVE_BACK_PRODUCTS");
+link backOut54="ASCII:w primitive-back54.sing";
+write(backOut54,"ring primitiveBackCertificate54=(2,a),(n,l),lp;minpoly=a^5+a^2+1;short=0;ideal source54="+string(derived54)+";ideal residuals54="+string(backResiduals54)+";");
+dump54(backOut54,"backLift54",backLift54);dump54(backOut54,"compareForward54",compareForward54);dump54(backOut54,"compareReverse54",compareReverse54);close(backOut54);
+execute(read("../fiber54-01/rr-fiber-certificate54.sing"));
+execute(read("../../../52/source-data/rr-table50.sing"));intmat parents54=parents50;
+ring primitive54=(2,a),(w),dp;minpoly=a^5+a^2+1;short=0;
+number b54=1+1/a;poly P54=w^16+(1+b54)*w^4+b54*w+1+b54+b54^2;
+ideal pGB54=std(ideal(P54));poly lambda54=w^4+w+1;poly nu54=b54*w;
+require54(diff(P54,w)==b54 && b54!=0,"FROBFIBER54_SEPARABILITY");
+map sourceMap54=rrFiberEquations54,nu54,lambda54;
+ideal forwardResiduals54=sourceMap54(derived54);
+matrix forwardLift54=lift(ideal(P54),forwardResiduals54);
+require54(matrix(ideal(P54))*forwardLift54==matrix(forwardResiduals54),"FROBFIBER54_PRIMITIVE_FORWARD_PRODUCTS");
+require54(subst(P54,w,w+1)==P54 && subst(lambda54,w,w+1)==lambda54 && subst(nu54,w,w+1)==nu54+b54,"FROBFIBER54_EXACT_DECK_PRODUCTS");
+map fiberMap54=rrFiberCertificate54,0;
+matrix coordinateInverse54=fiberMap54(F54);matrix one54=fiberMap54(one54);
+matrix lambdaVector54=fiberMap54(L54)*one54;matrix nuVector54=fiberMap54(N54)*one54;matrix vVector54=fiberMap54(V54)*one54;
+map tableMap54=tablePidCertificate50,a;matrix table54=tableMap54(table50);
+matrix monomials54[1][16];int i54;int j54;int k54;int col54=0;
+for(j54=0;j54<4;j54++){for(i54=0;i54<4;i54++){col54++;monomials54[1,col54]=reduce(lambda54^i54*nu54^j54,pGB54);}}
+matrix values54=monomials54*coordinateInverse54;
+for(j54=1;j54<=32;j54++){values54[1,j54]=reduce(values54[1,j54],pGB54);}
+// Independent Rabin tests; no second factorize call decides irreducibility.
+proc irreducible54(poly f,int q){
+ int degreeLocal54=deg(f);if(degreeLocal54<1){return(0);}
+ ideal gb=std(ideal(f));poly r=reduce(w,gb);list powersLocal54;int i;int p;int t;int primeLocal54;
+ for(i=1;i<=degreeLocal54;i++){r=reduce(r^q,gb);powersLocal54[i]=r;}
+ if(reduce(r+w,gb)!=0){return(0);}
+ for(p=2;p<=degreeLocal54;p++){
+  if(degreeLocal54%p==0){primeLocal54=1;for(t=2;t<p;t++){if(p%t==0){primeLocal54=0;break;}}
+   if(primeLocal54){if(deg(gcd(f,powersLocal54[degreeLocal54 div p]+w))>0){return(0);}}
+  }
+ }
+ return(1);
+}
+proc coefficientFrob54(poly p){poly result=0;poly term;intvec exps;while(p!=0){term=lead(p);exps=leadexp(term);result=result+leadcoef(term)^2*w^exps[1];p=p-term;}return(result);}
+list factorization54=factorize(P54);ideal factors54=factorization54[1];intvec multiplicities54=factorization54[2];
+poly rebuilt54=1;int factorsCount54=size(factors54)-1;int allQuartic54=1;int checkedProducts54=0;
+list norms54;int distinctNorms54=0;int normIrreducible54=0;
+poly factor54;poly norm54;poly conjugate54;poly residual54;poly remaining54;int duplicate54;
+matrix pointValues54[1][32];matrix temp54;ideal residuals54;matrix productLifts54;matrix corruptValues54;
+link factorsOut54="ASCII:w closed-factors54.sing";
+write(factorsOut54,"ring closedFactorsCertificate54=(2,a),(w),dp;minpoly=a^5+a^2+1;short=0;poly P54="+string(P54)+";ideal factors54="+string(factors54)+";intvec multiplicities54="+string(multiplicities54)+";");
+for(i54=1;i54<=size(factors54);i54++){
+ rebuilt54=rebuilt54*factors54[i54]^multiplicities54[i54];
+ if(i54>1){
+  factor54=factors54[i54];require54(multiplicities54[i54]==1 && irreducible54(factor54,32),"FROBFIBER54_FACTOR_RABIN");
+  if(deg(factor54)!=4){allQuartic54=0;}
+  ideal factorGB54=std(ideal(factor54));
+  for(j54=1;j54<=32;j54++){pointValues54[1,j54]=reduce(values54[1,j54],factorGB54);}
+  temp54=pointValues54*one54;require54(temp54[1,1]==1,"FROBFIBER54_POINT_UNIT");
+  temp54=pointValues54*lambdaVector54;require54(reduce(temp54[1,1]+lambda54,factorGB54)==0,"FROBFIBER54_POINT_LAMBDA");
+  temp54=pointValues54*nuVector54;require54(reduce(temp54[1,1]+nu54,factorGB54)==0,"FROBFIBER54_POINT_NU");
+  temp54=pointValues54*vVector54;require54(temp54[1,1]==(1+a^4+a)/(a+a^2),"FROBFIBER54_POINT_BASE");
+  residuals54=0;
+  for(j54=1;j54<=528;j54++){
+   residual54=pointValues54[1,parents54[j54,1]]*pointValues54[1,parents54[j54,2]];
+   for(k54=1;k54<=32;k54++){residual54=residual54+table54[k54,j54]*pointValues54[1,k54];}
+   require54(reduce(residual54,factorGB54)==0,"FROBFIBER54_RR_POINT_PRODUCT");residuals54[j54]=residual54;checkedProducts54++;
+  }
+  productLifts54=lift(ideal(factor54),residuals54);
+  require54(matrix(ideal(factor54))*productLifts54==matrix(residuals54),"FROBFIBER54_FULL_POINT_PRODUCT_LIFTS");
+  corruptValues54=pointValues54;
+  for(j54=1;j54<=32;j54++){if(one54[j54,1]!=0){corruptValues54[1,j54]=corruptValues54[1,j54]+1;break;}}
+  temp54=corruptValues54*one54;require54(temp54[1,1]!=1,"FROBFIBER54_BAD_POINT_UNIT_DETECTED");
+  link pointOut54="ASCII:w closed-point"+string(i54-1)+"54.sing";
+  write(pointOut54,"ring closedPointCertificate54=(2,a),(w),dp;minpoly=a^5+a^2+1;short=0;poly factor54="+string(factor54)+";ideal residuals54="+string(residuals54)+";");
+  dump54(pointOut54,"values54",pointValues54);dump54(pointOut54,"productLifts54",productLifts54);close(pointOut54);
+  norm54=1;conjugate54=factor54;
+  for(j54=0;j54<5;j54++){norm54=norm54*conjugate54;conjugate54=coefficientFrob54(conjugate54);}
+  require54(conjugate54==factor54,"FROBFIBER54_COEFFICIENT_CYCLE");
+  remaining54=norm54;while(remaining54!=0){require54(leadcoef(remaining54)^2==leadcoef(remaining54),"FROBFIBER54_NORM_F2_COEFFICIENTS");remaining54=remaining54-lead(remaining54);}
+  duplicate54=0;for(j54=1;j54<=size(norms54);j54++){if(norms54[j54]==norm54){duplicate54=1;}}
+  if(!duplicate54){distinctNorms54++;}norms54[size(norms54)+1]=norm54;
+  int observedNormIrred54=irreducible54(norm54,2);normIrreducible54=normIrreducible54+observedNormIrred54;
+  write(factorsOut54,"poly norm"+string(i54-1)+"54="+string(norm54)+";");
+  print("FROBFIBER54_POINT index="+string(i54-1)+" relative_degree="+string(deg(factor54))+" F2_residue_degree="+string(5*deg(factor54))+" norm_degree="+string(deg(norm54))+" norm_irreducible="+string(observedNormIrred54));
+ }
+}
+require54(rebuilt54==P54,"FROBFIBER54_COMPLETE_FACTOR_PRODUCT");close(factorsOut54);
+poly repeated54=factors54[2]^2;require54(!irreducible54(repeated54,32),"FROBFIBER54_REPEATED_FACTOR_REJECTED");
+matrix T54[16][16];matrix S54[16][16];poly p54;poly sigma54;intvec exp54;
+for(j54=0;j54<16;j54++){
+ p54=reduce((w^j54)^32,pGB54);sigma54=reduce((w+1)^j54,pGB54);
+ while(p54!=0){exp54=leadexp(p54);T54[exp54[1]+1,j54+1]=leadcoef(p54);p54=p54-lead(p54);}
+ while(sigma54!=0){exp54=leadexp(sigma54);S54[exp54[1]+1,j54+1]=leadcoef(sigma54);sigma54=sigma54-lead(sigma54);}
+}
+matrix I54=unitmat(16);matrix Z54[16][16];matrix T254=T54*T54;matrix T454=T254*T254;
+matrix trace54=I54+T54+T254+T254*T54;matrix anti54=I54+S54;
+int frob2Sign54=(T254==S54);int frob454=(T454==I54);int annihilates54=(anti54*trace54==Z54);
+int traceRank54=mat_rk(trace54);int antiRank54=mat_rk(anti54);
+if(annihilates54 && antiRank54>0){require54(anti54*(trace54+I54)!=Z54,"FROBFIBER54_CORRUPT_TRACE_DETECTED");}
+link out54="ASCII:w primitive-frobenius54.sing";
+write(out54,"ring primitiveFrobeniusCertificate54=(2,a),(w),dp;minpoly=a^5+a^2+1;short=0;poly P54="+string(P54)+";ideal forwardResiduals54="+string(forwardResiduals54)+";int frob2Sign54="+string(frob2Sign54)+";int frob454="+string(frob454)+";int annihilates54="+string(annihilates54)+";");
+dump54(out54,"forwardLift54",forwardLift54);dump54(out54,"T54",T54);dump54(out54,"S54",S54);dump54(out54,"trace54",trace54);dump54(out54,"anti54",anti54);close(out54);
+print("FROBFIBER54_RESULT factors="+string(factorsCount54)+" all_quartic="+string(allQuartic54)+" RR_products="+string(checkedProducts54)+" distinct_norms="+string(distinctNorms54)+" irreducible_norms="+string(normIrreducible54)+" frob2_sign="+string(frob2Sign54)+" frob4_identity="+string(frob454)+" trace_rank="+string(traceRank54)+" anti_rank="+string(antiRank54)+" anti_trace_zero="+string(annihilates54));
+print("FROBFIBER54_ALL_CHECKS_PASS");quit;

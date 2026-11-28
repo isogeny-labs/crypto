@@ -1,0 +1,87 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_tableb_fewcol_20261118 24-bit Table B curve: ksum5-sib incumbent vs ksum5-ps (STACK) and tw2l (FEWCOL)",
+ "description": "Round-2 leads L2-STACK and L2-FEWCOL. Generic decomposition track (bounded by sqrt(r); cannot beat rho). research/ic_tableb_fewcol_20261118/PROTOCOL.md. Public synthetic curve and targets; no security claim.",
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "ksum5-sib",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=11",
+     "oracle": "ksum:m=5,sib=1",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum5-ps",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=11",
+     "oracle": "ksum:m=5,prune=1,sib=1",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "tw2l",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "tw2l-aa",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+     "max_trials": "13528399621"
+    }
+   }
+  }
+ ],
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 10935329,
+    "a": 5320418,
+    "b": 8535318,
+    "group_order": 10933753,
+    "r": 10933753,
+    "gx": 258338,
+    "gy": 9805035
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261115241,
+  "target_kind": "public"
+ },
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261118424,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

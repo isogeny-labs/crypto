@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T06:10:36Z",
+ "id": "PCC-20261119-1bad7c",
+ "kind": "theorem",
+ "producer": {
+  "commit": "f2f5fcdeb3373dba5fc9d45ca0540dbce657def0",
+  "model": "Codex",
+  "session": "upstream-dilation-bridge-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "7ddf26cec055af3751f04fc5674eefea92030b90e317df4134489985df5280f0",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.upstreamDilationPolynomialFamily_implies_nondeg"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This binds directly to fast-ecdlp commit d1deb5abe008e981206ed58cbd83012b6afc3740 and its DilationNondeg definition. It does not construct the specialized Semaev family or prove its nonvanishing and vanishing laws.",
+ "statement": "For a finite field K, a tuple-indexed family of nonzero polynomials of degree at most D that vanishes at u^(-2) on every bad dilation in Kaarelson pinned predicate proves the exact upstream ECDLP.L49.DilationNondeg bound of at most 2D bad units."
+}

@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T19:52:08Z",
+ "id": "PCC-20261123-848c58",
+ "kind": "statement",
+ "producer": {
+  "commit": "f7bfd41405dc4d22f034f5197fb881c260c1e2cb",
+  "model": "",
+  "session": "codex-ecc2k-halftrace-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_halftrace_elimination_20261123/checks/leaderboard-existing-gate-failure.json",
+    "sha256": "411efebbd1156fe1174d363d021d686bbc7b72777b85847c40c5ad2b7a7e5d30"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_halftrace_elimination_20261123/checks/leaderboard-regenerate-22.txt",
+    "sha256": "d8dcc2bf5be1d8c4267e9d8e440a748458c21b2a5aaffce454b161cee1fac467"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "After restoring the exact historical inputs through Git and the original artifact reader, full leaderboard regeneration still refuses pre-existing E27 evidence. The unchanged validation gate rejects47 E27 headline relative tolerances, first0.0015290519892966362 above the1e-6 maximum; direct checks also reject174 E30 and162 E32 headline tolerances. No leaderboard output, old evidence or tolerance was changed. This is an unsigned producer observation of an existing publication dependency."
+}

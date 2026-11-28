@@ -1,0 +1,12 @@
+ℹ [320/323] Built Arithmetic (468ms)
+info: Arithmetic.lean:13:0: 'TorsionColumn.actual_inverse8_bezout' does not depend on any axioms
+info: Arithmetic.lean:14:0: 'TorsionColumn.toy_inverse8_bezout' does not depend on any axioms
+ℹ [322/323] Built Assembly (833ms)
+info: Assembly.lean:13:0: map_sub.{u_7, u_8, u_9} {G : Type u_7} {H : Type u_8} {F : Type u_9} [FunLike F G H] [AddGroup G] [SubtractionMonoid H]
+  [AddMonoidHomClass F G H] (f : F) (a b : G) : f (a - b) = f a - f b
+info: Assembly.lean:14:0: map_add.{u_4, u_5, u_9} {M : Type u_4} {N : Type u_5} {F : Type u_9} [Add M] [Add N] [FunLike F M N] [AddHomClass F M N]
+  (f : F) (x y : M) : f (x + y) = f x + f y
+info: Assembly.lean:15:0: sub_eq_zero.{u_3} {G : Type u_3} [AddGroup G] {a b : G} : a - b = 0 ↔ a = b
+info: Assembly.lean:16:0: 'map_sub' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Assembly.lean:17:0: 'map_add' does not depend on any axioms
+Build completed successfully (323 jobs).

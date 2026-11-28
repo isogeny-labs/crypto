@@ -1,0 +1,4817 @@
+{
+  "schema": "twist.interval-independent-audit/v1",
+  "status": "raw-counts-projections-or-scalars-and-independent-replay-verified",
+  "mode": "decomposition",
+  "requested_cells": 200,
+  "accepted_cells": 200,
+  "matched_output_cells": 200,
+  "configurations": 20,
+  "distinct_fixture_target_pairs": 10,
+  "independent_PARI_positive_and_negative_checks_each": 980,
+  "by_arm": [
+    {
+      "arm": "direct-aa",
+      "requested": 20,
+      "attempted": 20,
+      "accepted": 20
+    },
+    {
+      "arm": "direct-aa-propagate",
+      "requested": 20,
+      "attempted": 20,
+      "accepted": 20
+    },
+    {
+      "arm": "direct-chain",
+      "requested": 20,
+      "attempted": 20,
+      "accepted": 20
+    },
+    {
+      "arm": "direct-chain-propagate",
+      "requested": 20,
+      "attempted": 20,
+      "accepted": 20
+    },
+    {
+      "arm": "first-pair-invariant",
+      "requested": 20,
+      "attempted": 20,
+      "accepted": 20
+    },
+    {
+      "arm": "first-pair-invariant-propagate",
+      "requested": 20,
+      "attempted": 20,
+      "accepted": 20
+    },
+    {
+      "arm": "group-aa",
+      "requested": 20,
+      "attempted": 20,
+      "accepted": 20
+    },
+    {
+      "arm": "group-mitm",
+      "requested": 20,
+      "attempted": 20,
+      "accepted": 20
+    },
+    {
+      "arm": "hybrid-eight",
+      "requested": 20,
+      "attempted": 20,
+      "accepted": 20
+    },
+    {
+      "arm": "hybrid-eight-propagate",
+      "requested": 20,
+      "attempted": 20,
+      "accepted": 20
+    }
+  ],
+  "AA": [
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m2-s0",
+      "source_or_direct_spread": 0.0016579620615928647,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.0016579620615928647,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.0011012972209598821,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.00011164976708618033,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m3-s0",
+      "source_or_direct_spread": 0.00001725021005805712,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.00001725021005805712,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.000021699905396124366,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.0000349726436209898,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m2-s0",
+      "source_or_direct_spread": 0.000841690680272136,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.000841690680272136,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.0017218337429464855,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.00005472559966458503,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m3-s0",
+      "source_or_direct_spread": 0.000022962138846018106,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.000022962138846018106,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.00014899464130971172,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.0,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m2-s0",
+      "source_or_direct_spread": 0.00037949920250606887,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.00037949920250606887,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.002297028565627206,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.0,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m3-s0",
+      "source_or_direct_spread": 0.000029022824607009917,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.000029022824607009917,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.00011160117361946496,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.00006512595028435972,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m2-s0",
+      "source_or_direct_spread": 0.001171038130484259,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.001171038130484259,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 3.986956273854457e-6,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.00004398423253232181,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m3-s0",
+      "source_or_direct_spread": 0.000041046125972335576,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.000041046125972335576,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.00010762339833580406,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.00005769457495403248,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m2-s0",
+      "source_or_direct_spread": 0.000020685018875079725,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.000020685018875079725,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.002218348914593567,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.0001727925748562119,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m3-s0",
+      "source_or_direct_spread": 0.000048594829887699294,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.000048594829887699294,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.00017352257550639366,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.0000989213948881766,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m2-s0",
+      "source_or_direct_spread": 0.0036177954687091653,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.0036177954687091653,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.0005223568323029958,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.0002876416806492484,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m3-s0",
+      "source_or_direct_spread": 0.00001059918080247714,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.00001059918080247714,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.00010227710721112192,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.00006221708761812859,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m2-s0",
+      "source_or_direct_spread": 0.0014255122277821825,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.0014255122277821825,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.0020494037107288464,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.00006265827741952328,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m3-s0",
+      "source_or_direct_spread": 0.00014174887875427657,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.00014174887875427657,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.000016899724770319002,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 6.1185019215155284e-6,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+      "source_or_direct_spread": 0.00010599922871106673,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.00010599922871106673,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.0021418050541516247,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.00013394018092361323,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m3-s0",
+      "source_or_direct_spread": 0.000014033468338123145,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.000014033468338123145,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.000012600596717333397,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.000027031491687816305,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m2-s0",
+      "source_or_direct_spread": 0.0001468736315593356,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.0001468736315593356,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.0003715938278599962,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.0000996373910660845,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m3-s0",
+      "source_or_direct_spread": 0.00004492245694428524,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.00004492245694428524,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.00001222075301887745,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.00010616314645018154,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m2-s0",
+      "source_or_direct_spread": 0.0007406593952724448,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.0007406593952724448,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.00047055786759527695,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.00013692722851287248,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m3-s0",
+      "source_or_direct_spread": 0.00001744497641514445,
+      "transfer_spread": null,
+      "additional_pairs": [
+        {
+          "control": "direct-chain",
+          "repeat": "direct-aa",
+          "spread": 0.00001744497641514445,
+          "pass": true
+        },
+        {
+          "control": "direct-chain-propagate",
+          "repeat": "direct-aa-propagate",
+          "spread": 0.000015082719499909675,
+          "pass": true
+        },
+        {
+          "control": "group-mitm",
+          "repeat": "group-aa",
+          "spread": 0.0000780574379494722,
+          "pass": true
+        }
+      ],
+      "within_frozen_5_percent_gate": true
+    }
+  ],
+  "comparisons": [
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2082012,
+      "control_Ir": 2463031,
+      "candidate_to_control_ratio": 0.8453048296996668,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2121085,
+      "control_Ir": 2463031,
+      "candidate_to_control_ratio": 0.8611686170413608,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 564233,
+      "control_Ir": 2463031,
+      "candidate_to_control_ratio": 0.22908075456622348,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2464815,
+      "control_Ir": 2463031,
+      "candidate_to_control_ratio": 1.000724310818662,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2078083,
+      "control_Ir": 2463031,
+      "candidate_to_control_ratio": 0.8437096406825574,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2122005,
+      "control_Ir": 2463031,
+      "candidate_to_control_ratio": 0.8615421405577112,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2464815,
+      "control_Ir": 2463031,
+      "candidate_to_control_ratio": 1.000724310818662,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2464815,
+      "control_Ir": 564233,
+      "candidate_to_control_ratio": 4.368434671492096,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 2078083,
+      "control_Ir": 2082012,
+      "candidate_to_control_ratio": 0.9981128831149868,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2078083,
+      "control_Ir": 564233,
+      "candidate_to_control_ratio": 3.6830227937749123,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 2122005,
+      "control_Ir": 2121085,
+      "candidate_to_control_ratio": 1.0004337402791497,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2122005,
+      "control_Ir": 564233,
+      "candidate_to_control_ratio": 3.760866521454789,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 378139392,
+      "control_Ir": 1604082573,
+      "candidate_to_control_ratio": 0.23573561508918656,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 544168345,
+      "control_Ir": 1604082573,
+      "candidate_to_control_ratio": 0.3392396090821442,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 1029358,
+      "control_Ir": 1604082573,
+      "candidate_to_control_ratio": 0.0006417113540949865,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 1604033613,
+      "control_Ir": 1604082573,
+      "candidate_to_control_ratio": 0.9999694778804882,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 378064885,
+      "control_Ir": 1604082573,
+      "candidate_to_control_ratio": 0.23568916673219167,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 544139325,
+      "control_Ir": 1604082573,
+      "candidate_to_control_ratio": 0.3392215177441492,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 1604033613,
+      "control_Ir": 1604082573,
+      "candidate_to_control_ratio": 0.9999694778804882,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 1604033613,
+      "control_Ir": 1029358,
+      "candidate_to_control_ratio": 1558.2854682238833,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 378064885,
+      "control_Ir": 378139392,
+      "candidate_to_control_ratio": 0.9998029641936907,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 378064885,
+      "control_Ir": 1029358,
+      "candidate_to_control_ratio": 367.2822137681934,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 544139325,
+      "control_Ir": 544168345,
+      "candidate_to_control_ratio": 0.9999466709148618,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t47-852299b7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t47-852299b7",
+        "p": 647,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 544139325,
+      "control_Ir": 1029358,
+      "candidate_to_control_ratio": 528.6200962153109,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2129119,
+      "control_Ir": 2503429,
+      "candidate_to_control_ratio": 0.8504810801504656,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2168867,
+      "control_Ir": 2503429,
+      "candidate_to_control_ratio": 0.8663585026777272,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 566447,
+      "control_Ir": 2503429,
+      "candidate_to_control_ratio": 0.2262684501937143,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2504719,
+      "control_Ir": 2503429,
+      "candidate_to_control_ratio": 1.0005152932238142,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2120663,
+      "control_Ir": 2503429,
+      "candidate_to_control_ratio": 0.8471033130957578,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2164939,
+      "control_Ir": 2503429,
+      "candidate_to_control_ratio": 0.8647894547838185,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2504719,
+      "control_Ir": 2503429,
+      "candidate_to_control_ratio": 1.0005152932238142,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2504719,
+      "control_Ir": 566447,
+      "candidate_to_control_ratio": 4.4218064532074495,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 2120663,
+      "control_Ir": 2129119,
+      "candidate_to_control_ratio": 0.9960284042366819,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2120663,
+      "control_Ir": 566447,
+      "candidate_to_control_ratio": 3.7437977427720512,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 2164939,
+      "control_Ir": 2168867,
+      "candidate_to_control_ratio": 0.9981889161483853,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2164939,
+      "control_Ir": 566447,
+      "candidate_to_control_ratio": 3.8219621606257954,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 45906041,
+      "control_Ir": 256811107,
+      "candidate_to_control_ratio": 0.17875411050659892,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 83118178,
+      "control_Ir": 256811107,
+      "candidate_to_control_ratio": 0.32365491886610653,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 786760,
+      "control_Ir": 256811107,
+      "candidate_to_control_ratio": 0.0030635746607330346,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 256782051,
+      "control_Ir": 256811107,
+      "candidate_to_control_ratio": 0.9998868584761017,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 45901345,
+      "control_Ir": 256811107,
+      "candidate_to_control_ratio": 0.17873582469312746,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 83116331,
+      "control_Ir": 256811107,
+      "candidate_to_control_ratio": 0.32364772680957293,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 256782051,
+      "control_Ir": 256811107,
+      "candidate_to_control_ratio": 0.9998868584761017,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 256782051,
+      "control_Ir": 786760,
+      "candidate_to_control_ratio": 326.3791384920433,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 45901345,
+      "control_Ir": 45906041,
+      "candidate_to_control_ratio": 0.9998977040951974,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 45901345,
+      "control_Ir": 786760,
+      "candidate_to_control_ratio": 58.34224541156134,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 83116331,
+      "control_Ir": 83118178,
+      "candidate_to_control_ratio": 0.9999777786274382,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-t5-192cb216-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-t5-192cb216",
+        "p": 827,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 83116331,
+      "control_Ir": 786760,
+      "candidate_to_control_ratio": 105.64381895368346,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2064106,
+      "control_Ir": 2473844,
+      "candidate_to_control_ratio": 0.8343719329108868,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2122519,
+      "control_Ir": 2473844,
+      "candidate_to_control_ratio": 0.8579841736180616,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 564580,
+      "control_Ir": 2473844,
+      "candidate_to_control_ratio": 0.22821972606195054,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2475164,
+      "control_Ir": 2473844,
+      "candidate_to_control_ratio": 1.0005335825541142,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2071531,
+      "control_Ir": 2473844,
+      "candidate_to_control_ratio": 0.8373733347777791,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2123041,
+      "control_Ir": 2473844,
+      "candidate_to_control_ratio": 0.8581951812644613,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2475164,
+      "control_Ir": 2473844,
+      "candidate_to_control_ratio": 1.0005335825541142,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2475164,
+      "control_Ir": 564580,
+      "candidate_to_control_ratio": 4.38408020121152,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 2071531,
+      "control_Ir": 2064106,
+      "candidate_to_control_ratio": 1.0035971989810601,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2071531,
+      "control_Ir": 564580,
+      "candidate_to_control_ratio": 3.669154061426193,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 2123041,
+      "control_Ir": 2122519,
+      "candidate_to_control_ratio": 1.0002459341942287,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2123041,
+      "control_Ir": 564580,
+      "candidate_to_control_ratio": 3.7603900244429487,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 250912577,
+      "control_Ir": 730793522,
+      "candidate_to_control_ratio": 0.34334263981064683,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 293688614,
+      "control_Ir": 730793522,
+      "candidate_to_control_ratio": 0.40187632369297327,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 1059520,
+      "control_Ir": 730793522,
+      "candidate_to_control_ratio": 0.0014498212807091632,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 730973960,
+      "control_Ir": 730793522,
+      "candidate_to_control_ratio": 1.0002469069505517,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 251239878,
+      "control_Ir": 730793522,
+      "candidate_to_control_ratio": 0.34379051050208953,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 293585712,
+      "control_Ir": 730793522,
+      "candidate_to_control_ratio": 0.40173551511038164,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 730973960,
+      "control_Ir": 730793522,
+      "candidate_to_control_ratio": 1.0002469069505517,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 730973960,
+      "control_Ir": 1059520,
+      "candidate_to_control_ratio": 689.9104877680459,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 251239878,
+      "control_Ir": 250912577,
+      "candidate_to_control_ratio": 1.0013044423835318,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 251239878,
+      "control_Ir": 1059520,
+      "candidate_to_control_ratio": 237.12613070069466,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 293585712,
+      "control_Ir": 293688614,
+      "candidate_to_control_ratio": 0.9996496220994118,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp10-tm21-b87c79a9-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp10-tm21-b87c79a9",
+        "p": 751,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 293585712,
+      "control_Ir": 1059520,
+      "candidate_to_control_ratio": 277.0931289640592,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2131995,
+      "control_Ir": 2507416,
+      "candidate_to_control_ratio": 0.8502757420388161,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2159402,
+      "control_Ir": 2507416,
+      "candidate_to_control_ratio": 0.8612061181710574,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 568398,
+      "control_Ir": 2507416,
+      "candidate_to_control_ratio": 0.22668675640579783,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2508174,
+      "control_Ir": 2507416,
+      "candidate_to_control_ratio": 1.0003023032476461,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2130389,
+      "control_Ir": 2507416,
+      "candidate_to_control_ratio": 0.8496352420180776,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2173599,
+      "control_Ir": 2507416,
+      "candidate_to_control_ratio": 0.8668681224017075,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2508174,
+      "control_Ir": 2507416,
+      "candidate_to_control_ratio": 1.0003023032476461,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2508174,
+      "control_Ir": 568398,
+      "candidate_to_control_ratio": 4.4127072931291105,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 2130389,
+      "control_Ir": 2131995,
+      "candidate_to_control_ratio": 0.9992467149313202,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2130389,
+      "control_Ir": 568398,
+      "candidate_to_control_ratio": 3.7480585786719867,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 2173599,
+      "control_Ir": 2159402,
+      "candidate_to_control_ratio": 1.0065745053491661,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2173599,
+      "control_Ir": 568398,
+      "candidate_to_control_ratio": 3.8240792543253144,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 46025786,
+      "control_Ir": 256911369,
+      "candidate_to_control_ratio": 0.1791504446811772,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 83229814,
+      "control_Ir": 256911369,
+      "candidate_to_control_ratio": 0.3239631407670402,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 797279,
+      "control_Ir": 256911369,
+      "candidate_to_control_ratio": 0.003103323154219773,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 256872694,
+      "control_Ir": 256911369,
+      "candidate_to_control_ratio": 0.9998494617028801,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 46029674,
+      "control_Ir": 256911369,
+      "candidate_to_control_ratio": 0.17916557830494453,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 83221613,
+      "control_Ir": 256911369,
+      "candidate_to_control_ratio": 0.3239312192525042,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 256872694,
+      "control_Ir": 256911369,
+      "candidate_to_control_ratio": 0.9998494617028801,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 256872694,
+      "control_Ir": 797279,
+      "candidate_to_control_ratio": 322.1867050304849,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 46029674,
+      "control_Ir": 46025786,
+      "candidate_to_control_ratio": 1.000084474385728,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 46029674,
+      "control_Ir": 797279,
+      "candidate_to_control_ratio": 57.73345842546963,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 83221613,
+      "control_Ir": 83229814,
+      "candidate_to_control_ratio": 0.999901465597412,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t47-86777f32-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t47-86777f32",
+        "p": 2903,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 83221613,
+      "control_Ir": 797279,
+      "candidate_to_control_ratio": 104.3820456828789,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2095353,
+      "control_Ir": 2465527,
+      "candidate_to_control_ratio": 0.8498600907635568,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2122871,
+      "control_Ir": 2465527,
+      "candidate_to_control_ratio": 0.861021193440591,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 567105,
+      "control_Ir": 2465527,
+      "candidate_to_control_ratio": 0.23001370498072016,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2479815,
+      "control_Ir": 2465527,
+      "candidate_to_control_ratio": 1.0057951099298446,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2100770,
+      "control_Ir": 2465527,
+      "candidate_to_control_ratio": 0.8520571869624628,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2128477,
+      "control_Ir": 2465527,
+      "candidate_to_control_ratio": 0.8632949466787425,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2479815,
+      "control_Ir": 2465527,
+      "candidate_to_control_ratio": 1.0057951099298446,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2479815,
+      "control_Ir": 567105,
+      "candidate_to_control_ratio": 4.372761657894041,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 2100770,
+      "control_Ir": 2095353,
+      "candidate_to_control_ratio": 1.002585244586473,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2100770,
+      "control_Ir": 567105,
+      "candidate_to_control_ratio": 3.704375732888971,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 2128477,
+      "control_Ir": 2122871,
+      "candidate_to_control_ratio": 1.0026407633812888,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2128477,
+      "control_Ir": 567105,
+      "candidate_to_control_ratio": 3.7532326465116688,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 59197020,
+      "control_Ir": 308255756,
+      "candidate_to_control_ratio": 0.19203865247531662,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 95294468,
+      "control_Ir": 308255756,
+      "candidate_to_control_ratio": 0.3091409199833401,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 828982,
+      "control_Ir": 308255756,
+      "candidate_to_control_ratio": 0.0026892668956358433,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 308198282,
+      "control_Ir": 308255756,
+      "candidate_to_control_ratio": 0.9998135509268479,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 59174959,
+      "control_Ir": 308255756,
+      "candidate_to_control_ratio": 0.19196708527966627,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 95321332,
+      "control_Ir": 308255756,
+      "candidate_to_control_ratio": 0.30922806839655576,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 308198282,
+      "control_Ir": 308255756,
+      "candidate_to_control_ratio": 0.9998135509268479,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 308198282,
+      "control_Ir": 828982,
+      "candidate_to_control_ratio": 371.7792207792208,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 59174959,
+      "control_Ir": 59197020,
+      "candidate_to_control_ratio": 0.9996273292135314,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 59174959,
+      "control_Ir": 828982,
+      "candidate_to_control_ratio": 71.38268261554533,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 95321332,
+      "control_Ir": 95294468,
+      "candidate_to_control_ratio": 1.0002819051364031,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp12-t61-a9fcb1fd-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp12-t61-a9fcb1fd",
+        "p": 2879,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 95321332,
+      "control_Ir": 828982,
+      "candidate_to_control_ratio": 114.98600934640318,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2112172,
+      "control_Ir": 2491649,
+      "candidate_to_control_ratio": 0.8477004586119473,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2139629,
+      "control_Ir": 2491649,
+      "candidate_to_control_ratio": 0.8587200685168738,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 584144,
+      "control_Ir": 2491649,
+      "candidate_to_control_ratio": 0.23444072580046388,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2493200,
+      "control_Ir": 2491649,
+      "candidate_to_control_ratio": 1.0006224793299539,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2114836,
+      "control_Ir": 2491649,
+      "candidate_to_control_ratio": 0.8487696300722934,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2140090,
+      "control_Ir": 2491649,
+      "candidate_to_control_ratio": 0.8589050865511153,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2493200,
+      "control_Ir": 2491649,
+      "candidate_to_control_ratio": 1.0006224793299539,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2493200,
+      "control_Ir": 584144,
+      "candidate_to_control_ratio": 4.268125667643595,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 2114836,
+      "control_Ir": 2112172,
+      "candidate_to_control_ratio": 1.0012612609200386,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2114836,
+      "control_Ir": 584144,
+      "candidate_to_control_ratio": 3.6204018187296283,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 2140090,
+      "control_Ir": 2139629,
+      "candidate_to_control_ratio": 1.000215457913498,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2140090,
+      "control_Ir": 584144,
+      "candidate_to_control_ratio": 3.66363430934838,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 45809340,
+      "control_Ir": 256810939,
+      "candidate_to_control_ratio": 0.17837768195692005,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 82992667,
+      "control_Ir": 256810939,
+      "candidate_to_control_ratio": 0.3231664014125193,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 819736,
+      "control_Ir": 256810939,
+      "candidate_to_control_ratio": 0.0031919824100639263,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 256789203,
+      "control_Ir": 256810939,
+      "candidate_to_control_ratio": 0.9999153618608123,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 45844295,
+      "control_Ir": 256810939,
+      "candidate_to_control_ratio": 0.17851379376016377,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 82988492,
+      "control_Ir": 256810939,
+      "candidate_to_control_ratio": 0.3231501443168665,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 256789203,
+      "control_Ir": 256810939,
+      "candidate_to_control_ratio": 0.9999153618608123,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 256789203,
+      "control_Ir": 819736,
+      "candidate_to_control_ratio": 313.2584185640255,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 45844295,
+      "control_Ir": 45809340,
+      "candidate_to_control_ratio": 1.0007630539972854,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 45844295,
+      "control_Ir": 819736,
+      "candidate_to_control_ratio": 55.92568217084525,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 82988492,
+      "control_Ir": 82992667,
+      "candidate_to_control_ratio": 0.9999496943507069,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t113-1169939b-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t113-1169939b",
+        "p": 8501,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 82988492,
+      "control_Ir": 819736,
+      "candidate_to_control_ratio": 101.23807176944773,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2145836,
+      "control_Ir": 2523698,
+      "candidate_to_control_ratio": 0.8502744781665635,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2180039,
+      "control_Ir": 2523698,
+      "candidate_to_control_ratio": 0.8638272091193162,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 574563,
+      "control_Ir": 2523698,
+      "candidate_to_control_ratio": 0.22766709804421922,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2520100,
+      "control_Ir": 2523698,
+      "candidate_to_control_ratio": 0.9985743143593251,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2149231,
+      "control_Ir": 2523698,
+      "candidate_to_control_ratio": 0.8516197262905466,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2168550,
+      "control_Ir": 2523698,
+      "candidate_to_control_ratio": 0.8592747626697014,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2520100,
+      "control_Ir": 2523698,
+      "candidate_to_control_ratio": 0.9985743143593251,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2520100,
+      "control_Ir": 574563,
+      "candidate_to_control_ratio": 4.386116056898896,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 2149231,
+      "control_Ir": 2145836,
+      "candidate_to_control_ratio": 1.001582133956183,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2149231,
+      "control_Ir": 574563,
+      "candidate_to_control_ratio": 3.7406359267826157,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 2168550,
+      "control_Ir": 2180039,
+      "candidate_to_control_ratio": 0.9947299107951738,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2168550,
+      "control_Ir": 574563,
+      "candidate_to_control_ratio": 3.7742597417515573,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 46127071,
+      "control_Ir": 256789189,
+      "candidate_to_control_ratio": 0.17963011285494576,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 83291842,
+      "control_Ir": 256789189,
+      "candidate_to_control_ratio": 0.32435883428098683,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 817196,
+      "control_Ir": 256789189,
+      "candidate_to_control_ratio": 0.0031823613882748,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 256747574,
+      "control_Ir": 256789189,
+      "candidate_to_control_ratio": 0.9998379409968073,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 46127991,
+      "control_Ir": 256789189,
+      "candidate_to_control_ratio": 0.1796336955602909,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 83297196,
+      "control_Ir": 256789189,
+      "candidate_to_control_ratio": 0.32437968406839746,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 256747574,
+      "control_Ir": 256789189,
+      "candidate_to_control_ratio": 0.9998379409968073,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 256747574,
+      "control_Ir": 817196,
+      "candidate_to_control_ratio": 314.181143813724,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 46127991,
+      "control_Ir": 46127071,
+      "candidate_to_control_ratio": 1.0000199449039373,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 46127991,
+      "control_Ir": 817196,
+      "candidate_to_control_ratio": 56.446667629308024,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 83297196,
+      "control_Ir": 83291842,
+      "candidate_to_control_ratio": 1.0000642800047572,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp14-t33-d98086ae-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp14-t33-d98086ae",
+        "p": 10111,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 83297196,
+      "control_Ir": 817196,
+      "candidate_to_control_ratio": 101.93049892559435,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2271256,
+      "control_Ir": 2594496,
+      "candidate_to_control_ratio": 0.8754131823675967,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2242130,
+      "control_Ir": 2594496,
+      "candidate_to_control_ratio": 0.8641871099435112,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 574922,
+      "control_Ir": 2594496,
+      "candidate_to_control_ratio": 0.2215929413651052,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2594094,
+      "control_Ir": 2594496,
+      "candidate_to_control_ratio": 0.9998450566121513,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2272329,
+      "control_Ir": 2594496,
+      "candidate_to_control_ratio": 0.8758267501665064,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2240772,
+      "control_Ir": 2594496,
+      "candidate_to_control_ratio": 0.8636636942203804,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2594094,
+      "control_Ir": 2594496,
+      "candidate_to_control_ratio": 0.9998450566121513,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2594094,
+      "control_Ir": 574922,
+      "candidate_to_control_ratio": 4.512079899534197,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 2272329,
+      "control_Ir": 2271256,
+      "candidate_to_control_ratio": 1.000472425829585,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2272329,
+      "control_Ir": 574922,
+      "candidate_to_control_ratio": 3.9524126751107107,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 2240772,
+      "control_Ir": 2242130,
+      "candidate_to_control_ratio": 0.9993943259311459,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2240772,
+      "control_Ir": 574922,
+      "candidate_to_control_ratio": 3.8975234901430107,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 160854038,
+      "control_Ir": 711650868,
+      "candidate_to_control_ratio": 0.22602942711509488,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 249046162,
+      "control_Ir": 711650868,
+      "candidate_to_control_ratio": 0.34995553746728514,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 1331798,
+      "control_Ir": 711650868,
+      "candidate_to_control_ratio": 0.0018714204673744598,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 711311038,
+      "control_Ir": 711650868,
+      "candidate_to_control_ratio": 0.9995224765186403,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 160526125,
+      "control_Ir": 711650868,
+      "candidate_to_control_ratio": 0.22556864920454225,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 248838085,
+      "control_Ir": 711650868,
+      "candidate_to_control_ratio": 0.34966315111696034,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 711311038,
+      "control_Ir": 711650868,
+      "candidate_to_control_ratio": 0.9995224765186403,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 711311038,
+      "control_Ir": 1331798,
+      "candidate_to_control_ratio": 534.0982926840256,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 160526125,
+      "control_Ir": 160854038,
+      "candidate_to_control_ratio": 0.9979614251275433,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 160526125,
+      "control_Ir": 1331798,
+      "candidate_to_control_ratio": 120.53338794622007,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 248838085,
+      "control_Ir": 249046162,
+      "candidate_to_control_ratio": 0.999164504289771,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp6-tm7-fc20da94-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp6-tm7-fc20da94",
+        "p": 59,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 248838085,
+      "control_Ir": 1331798,
+      "candidate_to_control_ratio": 186.8437142870015,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2052841,
+      "control_Ir": 2389634,
+      "candidate_to_control_ratio": 0.8590608436270993,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2121304,
+      "control_Ir": 2389634,
+      "candidate_to_control_ratio": 0.8877108377266142,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 562066,
+      "control_Ir": 2389634,
+      "candidate_to_control_ratio": 0.23521007819607523,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2389262,
+      "control_Ir": 2389634,
+      "candidate_to_control_ratio": 0.9998443276250673,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2048259,
+      "control_Ir": 2389634,
+      "candidate_to_control_ratio": 0.8571433951810193,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2110699,
+      "control_Ir": 2389634,
+      "candidate_to_control_ratio": 0.883272919618653,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2389262,
+      "control_Ir": 2389634,
+      "candidate_to_control_ratio": 0.9998443276250673,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2389262,
+      "control_Ir": 562066,
+      "candidate_to_control_ratio": 4.250856660961524,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 2048259,
+      "control_Ir": 2052841,
+      "candidate_to_control_ratio": 0.997767971313901,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2048259,
+      "control_Ir": 562066,
+      "candidate_to_control_ratio": 3.6441610060028538,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 2110699,
+      "control_Ir": 2121304,
+      "candidate_to_control_ratio": 0.9950007165403921,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2110699,
+      "control_Ir": 562066,
+      "candidate_to_control_ratio": 3.755251162674846,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 179949289,
+      "control_Ir": 811327365,
+      "candidate_to_control_ratio": 0.2217961537634072,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 267002755,
+      "control_Ir": 811327365,
+      "candidate_to_control_ratio": 0.32909373764312755,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 1064456,
+      "control_Ir": 811327365,
+      "candidate_to_control_ratio": 0.0013119932174357266,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 810920615,
+      "control_Ir": 811327365,
+      "candidate_to_control_ratio": 0.9994986610614324,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 179605870,
+      "control_Ir": 811327365,
+      "candidate_to_control_ratio": 0.22137287332838823,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 266928717,
+      "control_Ir": 811327365,
+      "candidate_to_control_ratio": 0.3290024822471013,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 810920615,
+      "control_Ir": 811327365,
+      "candidate_to_control_ratio": 0.9994986610614324,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 810920615,
+      "control_Ir": 1064456,
+      "candidate_to_control_ratio": 761.816942175158,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 179605870,
+      "control_Ir": 179949289,
+      "candidate_to_control_ratio": 0.9980915790114625,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 179605870,
+      "control_Ir": 1064456,
+      "candidate_to_control_ratio": 168.73019645715746,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 266928717,
+      "control_Ir": 267002755,
+      "candidate_to_control_ratio": 0.9997227069810571,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm21-71e3bcb7-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm21-71e3bcb7",
+        "p": 211,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 266928717,
+      "control_Ir": 1064456,
+      "candidate_to_control_ratio": 250.76538344468912,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2122113,
+      "control_Ir": 2495998,
+      "candidate_to_control_ratio": 0.8502062101011298,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2157160,
+      "control_Ir": 2495998,
+      "candidate_to_control_ratio": 0.8642474873777943,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 562304,
+      "control_Ir": 2495998,
+      "candidate_to_control_ratio": 0.2252822317966601,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2494324,
+      "control_Ir": 2495998,
+      "candidate_to_control_ratio": 0.9993293263856782,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2123726,
+      "control_Ir": 2495998,
+      "candidate_to_control_ratio": 0.850852444593305,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2157938,
+      "control_Ir": 2495998,
+      "candidate_to_control_ratio": 0.8645591863455019,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 2494324,
+      "control_Ir": 2495998,
+      "candidate_to_control_ratio": 0.9993293263856782,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2494324,
+      "control_Ir": 562304,
+      "candidate_to_control_ratio": 4.435899442294559,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 2123726,
+      "control_Ir": 2122113,
+      "candidate_to_control_ratio": 1.0007600914748649,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2123726,
+      "control_Ir": 562304,
+      "candidate_to_control_ratio": 3.776828903938083,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 2157938,
+      "control_Ir": 2157160,
+      "candidate_to_control_ratio": 1.0003606593854883,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m2-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 2,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 2157938,
+      "control_Ir": 562304,
+      "candidate_to_control_ratio": 3.8376714375142273,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 144777143,
+      "control_Ir": 661732010,
+      "candidate_to_control_ratio": 0.21878515896488065,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 215277249,
+      "control_Ir": 661732010,
+      "candidate_to_control_ratio": 0.3253239162482105,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 973680,
+      "control_Ir": 661732010,
+      "candidate_to_control_ratio": 0.00147141136485146,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 663214312,
+      "control_Ir": 661732010,
+      "candidate_to_control_ratio": 1.002240033695816,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 144076551,
+      "control_Ir": 661732010,
+      "candidate_to_control_ratio": 0.217726434300798,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 215238912,
+      "control_Ir": 661732010,
+      "candidate_to_control_ratio": 0.325265981919176,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "paired_accepted": true,
+      "candidate_Ir": 663214312,
+      "control_Ir": 661732010,
+      "candidate_to_control_ratio": 1.002240033695816,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 663214312,
+      "control_Ir": 973680,
+      "candidate_to_control_ratio": 681.1419686139184,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "paired_accepted": true,
+      "candidate_Ir": 144076551,
+      "control_Ir": 144777143,
+      "candidate_to_control_ratio": 0.9951608935949233,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 144076551,
+      "control_Ir": 973680,
+      "candidate_to_control_ratio": 147.9711517130885,
+      "candidate_uses_fewer_instructions": false
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "paired_accepted": true,
+      "candidate_Ir": 215238912,
+      "control_Ir": 215277249,
+      "candidate_to_control_ratio": 0.9998219180141976,
+      "candidate_uses_fewer_instructions": true
+    },
+    {
+      "case": "icv1-fp8-tm5-23216e9c-b8-m3-s0",
+      "info": {
+        "fixture": "icv1-fp8-tm5-23216e9c",
+        "p": 251,
+        "B": 8,
+        "arity": 3,
+        "label": null
+      },
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "paired_accepted": true,
+      "candidate_Ir": 215238912,
+      "control_Ir": 973680,
+      "candidate_to_control_ratio": 221.05713581464136,
+      "candidate_uses_fewer_instructions": false
+    }
+  ],
+  "distributions": [
+    {
+      "candidate": "hybrid-eight",
+      "control": "direct-chain",
+      "requested_pairs": 20,
+      "accepted_pairs": 20,
+      "fewer_instruction_pairs": 20,
+      "ratio_min": 0.17837768195692005,
+      "ratio_median": 0.5888572863607668,
+      "ratio_max": 0.8754131823675967,
+      "descriptive_only": true
+    },
+    {
+      "candidate": "first-pair-invariant",
+      "control": "direct-chain",
+      "requested_pairs": 20,
+      "accepted_pairs": 20,
+      "fewer_instruction_pairs": 20,
+      "ratio_min": 0.3091409199833401,
+      "ratio_median": 0.6299302486555174,
+      "ratio_max": 0.8877108377266142,
+      "descriptive_only": true
+    },
+    {
+      "candidate": "group-mitm",
+      "control": "direct-chain",
+      "requested_pairs": 20,
+      "accepted_pairs": 20,
+      "fewer_instruction_pairs": 20,
+      "ratio_min": 0.0006417113540949865,
+      "ratio_median": 0.11239246188758457,
+      "ratio_max": 0.23521007819607523,
+      "descriptive_only": true
+    },
+    {
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "requested_pairs": 20,
+      "accepted_pairs": 40,
+      "fewer_instruction_pairs": 24,
+      "ratio_min": 0.9985743143593251,
+      "ratio_median": 0.999901110168457,
+      "ratio_max": 1.0057951099298446,
+      "descriptive_only": true
+    },
+    {
+      "candidate": "hybrid-eight-propagate",
+      "control": "direct-chain",
+      "requested_pairs": 20,
+      "accepted_pairs": 20,
+      "fewer_instruction_pairs": 20,
+      "ratio_min": 0.17851379376016377,
+      "ratio_median": 0.5905819226399343,
+      "ratio_max": 0.8758267501665064,
+      "descriptive_only": true
+    },
+    {
+      "candidate": "first-pair-invariant-propagate",
+      "control": "direct-chain",
+      "requested_pairs": 20,
+      "accepted_pairs": 20,
+      "fewer_instruction_pairs": 20,
+      "ratio_min": 0.30922806839655576,
+      "ratio_median": 0.6299653481874214,
+      "ratio_max": 0.883272919618653,
+      "descriptive_only": true
+    },
+    {
+      "candidate": "direct-chain-propagate",
+      "control": "direct-chain",
+      "requested_pairs": 20,
+      "accepted_pairs": 40,
+      "fewer_instruction_pairs": 24,
+      "ratio_min": 0.9985743143593251,
+      "ratio_median": 0.999901110168457,
+      "ratio_max": 1.0057951099298446,
+      "descriptive_only": true
+    },
+    {
+      "candidate": "direct-chain-propagate",
+      "control": "group-mitm",
+      "requested_pairs": 20,
+      "accepted_pairs": 20,
+      "fewer_instruction_pairs": 0,
+      "ratio_min": 4.250856660961524,
+      "ratio_median": 158.88524923177982,
+      "ratio_max": 1558.2854682238833,
+      "descriptive_only": true
+    },
+    {
+      "candidate": "hybrid-eight-propagate",
+      "control": "hybrid-eight",
+      "requested_pairs": 20,
+      "accepted_pairs": 20,
+      "fewer_instruction_pairs": 10,
+      "ratio_min": 0.9951608935949233,
+      "ratio_median": 0.9999588244995674,
+      "ratio_max": 1.0035971989810601,
+      "descriptive_only": true
+    },
+    {
+      "candidate": "hybrid-eight-propagate",
+      "control": "group-mitm",
+      "requested_pairs": 20,
+      "accepted_pairs": 20,
+      "fewer_instruction_pairs": 0,
+      "ratio_min": 3.6204018187296283,
+      "ratio_median": 29.93904742297798,
+      "ratio_max": 367.2822137681934,
+      "descriptive_only": true
+    },
+    {
+      "candidate": "first-pair-invariant-propagate",
+      "control": "first-pair-invariant",
+      "requested_pairs": 20,
+      "accepted_pairs": 20,
+      "fewer_instruction_pairs": 12,
+      "ratio_min": 0.9947299107951738,
+      "ratio_median": 0.9999481826327843,
+      "ratio_max": 1.0065745053491661,
+      "descriptive_only": true
+    },
+    {
+      "candidate": "first-pair-invariant-propagate",
+      "control": "group-mitm",
+      "requested_pairs": 20,
+      "accepted_pairs": 20,
+      "fewer_instruction_pairs": 0,
+      "ratio_min": 3.66363430934838,
+      "ratio_median": 52.56779762979537,
+      "ratio_max": 528.6200962153109,
+      "descriptive_only": true
+    }
+  ],
+  "records_sha256": "5ebd4aa189690c4672214eaf97fc9998fa9ef973f3516a89f7ae1519fcd584e5",
+  "plan_sha256": "53f0fe7fccbe284bb0b2e234b31f9b5c9a841b290ad6d435aa9a808f6cf516f7",
+  "CAS_receipt_sha256": "a7c6fa22fbe611dcf88a22195a9b181b9a832933ecb7f8b4dc1d4db52e705e43",
+  "unit": "Callgrind simulated guest instructions Ir",
+  "complete_IC_cost_or_fastest_claim": false,
+  "wall_time_admitted": false
+}

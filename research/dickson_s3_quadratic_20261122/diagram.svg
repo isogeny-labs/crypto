@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="770" viewBox="0 0 960 770" role="img" aria-labelledby="title desc">
+  <title id="title">Dickson selector ladders coupled through three S3 blocks</title>
+  <desc id="desc">A four-summand affine chain with three alternative representations per block. Selector ladders feed the same coordinate and point base into quartic, invariant, or chord-line blocks. Field extraction, curve lifting, sign reconciliation, and group replay precede any relation comparison. The scientific comparison remains pending admission.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#48576b"/></marker>
+    <style>
+      text{font-family:DejaVu Sans,Arial,sans-serif;fill:#15243a}
+      .title{font-size:25px;font-weight:700}.sub{font-size:14px;fill:#526174}
+      .head{font-size:17px;font-weight:700}.body{font-size:14px}.small{font-size:12px;fill:#526174}
+      .math{font-size:16px}.line{fill:none;stroke:#48576b;stroke-width:2;marker-end:url(#arrow)}
+      .join{fill:none;stroke:#48576b;stroke-width:2}.selector{fill:#e8f5f3;stroke:#3a9187;stroke-width:1.5}
+      .block{fill:#fff1df;stroke:#c58a36;stroke-width:1.5}.check{fill:#edf5e7;stroke:#6a9852;stroke-width:1.5}
+      .pending{fill:#f0f3f7;stroke:#99a6b8;stroke-width:1.5}.chip{fill:#fff;stroke:#d5dde7;stroke-width:1}
+    </style>
+  </defs>
+  <rect width="960" height="770" fill="#ffffff"/>
+  <text x="40" y="40" class="title">Keep the ladders; compare the coupling</text>
+  <text x="40" y="66" class="sub">Four-summand construction at p = 2³¹ − 1 · proposed matched comparison · PR #4946</text>
+
+  <rect x="40" y="100" width="260" height="112" rx="12" class="selector"/>
+  <text x="58" y="126" class="head">Selectors for x₁ and x₂</text>
+  <text x="58" y="155" class="math">zⱼ₊₁ = zⱼ² − 2; zℓ = 0</text>
+  <text x="58" y="183" class="body">Same actual point-base policy</text>
+  <text x="58" y="201" class="small">Curve and subgroup filters are retained</text>
+
+  <rect x="350" y="100" width="260" height="112" rx="12" class="selector"/>
+  <text x="368" y="126" class="head">Selector for x₃</text>
+  <text x="368" y="155" class="math">zⱼ₊₁ = zⱼ² − 2; zℓ = 0</text>
+  <text x="368" y="183" class="body">Same depth, roots, and digest</text>
+
+  <rect x="660" y="100" width="152" height="112" rx="12" class="selector"/>
+  <text x="675" y="126" class="head">Selector x₄</text>
+  <text x="675" y="155" class="math">Dₙ(x₄,1) = 0</text>
+  <text x="675" y="183" class="small">Zero fiber · n = 2^ℓ</text>
+  <rect x="830" y="119" width="90" height="74" rx="10" class="pending"/>
+  <text x="845" y="146" class="body">Public R</text>
+  <text x="845" y="172" class="math">fixed xᵣ</text>
+
+  <path d="M170 212 V260" class="line"/>
+  <path d="M480 212 V260" class="line"/>
+  <path d="M736 212 V260" class="line"/>
+  <path d="M875 193 V260" class="line"/>
+
+  <rect x="40" y="265" width="260" height="112" rx="12" class="block"/>
+  <text x="58" y="293" class="head">Coupling block 1</text>
+  <text x="58" y="322" class="math">(x₁, x₂, t₁)</text>
+  <text x="58" y="351" class="body">Quartic A / invariant Q / chord L</text>
+  <rect x="350" y="265" width="260" height="112" rx="12" class="block"/>
+  <text x="368" y="293" class="head">Coupling block 2</text>
+  <text x="368" y="322" class="math">(t₁, x₃, t₂)</text>
+  <text x="368" y="351" class="body">Same arm throughout the chain</text>
+  <rect x="660" y="265" width="260" height="112" rx="12" class="block"/>
+  <text x="678" y="293" class="head">Coupling block 3</text>
+  <text x="678" y="322" class="math">(t₂, x₄, xᵣ)</text>
+  <text x="678" y="351" class="body">Every auxiliary ranges over Fp</text>
+
+  <path d="M300 322 H346" class="line"/><text x="311" y="309" class="small">t₁</text>
+  <path d="M610 322 H656" class="line"/><text x="621" y="309" class="small">t₂</text>
+  <path d="M170 377 V407 H790 V377" class="join"/>
+  <path d="M480 377 V435" class="line"/>
+
+  <rect x="40" y="440" width="880" height="115" rx="12" class="check"/>
+  <text x="60" y="468" class="head">Compare canonical signed relations</text>
+  <text x="60" y="495" class="body">Fp root extraction → actual-base and curve checks → internal sign reconciliation</text>
+  <text x="60" y="520" class="body">Deduplicate auxiliary multiplicities → replay the complete group relation against R</text>
+  <text x="60" y="542" class="small">Keep twist-only roots, rejected witnesses, infinity exceptions, and capped attempts visible.</text>
+
+  <path d="M480 555 V578 H250 V595" class="line"/>
+  <path d="M480 578 H710 V595" class="line"/>
+  <rect x="40" y="600" width="420" height="108" rx="12" class="pending"/>
+  <text x="60" y="627" class="head">Development qualification</text>
+  <text x="60" y="653" class="body">Actual source · immutable executable</text>
+  <text x="60" y="677" class="body">Identity records · exceptional-case controls</text>
+  <rect x="500" y="600" width="420" height="108" rx="12" class="pending"/>
+  <text x="520" y="627" class="head">Scientific comparison: pending</text>
+  <text x="520" y="653" class="body">Published protocol · EKS admission</text>
+  <text x="520" y="677" class="body">Charged extraction work and independent yield</text>
+
+  <text x="40" y="742" class="small">Construction diagram, not measured performance. Source: PLAN.md and REPORT.md. Initial status: [pcc:unverified].</text>
+</svg>

@@ -1,0 +1,129 @@
+$ /Volumes/SSD990-2/build-tmp/prime-generic-target/release/ecbench verify --dir research/prime_generic_autolab_20261118/round-004/sessions/holdout-k32 --replay 12 --out research/prime_generic_autolab_20261118/round-004/analysis/verify-holdout-k32.json
+--- stdout ---
+{
+  "schema": "ecbench.audit/v1",
+  "session_id": "ECBS1h4ae73e7b227d",
+  "session_status": "complete",
+  "records_bound": true,
+  "ok": true,
+  "problems": [],
+  "checks": {
+    "arms": true,
+    "env_class": true,
+    "executions": true,
+    "executions_planned": true,
+    "host_hash": true,
+    "last_seq": true,
+    "plan_hash": true,
+    "record_count": true,
+    "records": true,
+    "records_hash": true,
+    "regraded": true,
+    "replays": true,
+    "session_build": true,
+    "session_complete": true,
+    "session_id": true,
+    "spec_id": true,
+    "status_counts": true,
+    "workloads": true
+  },
+  "records": 360,
+  "verified_records": 360,
+  "planned_executions": 360,
+  "regraded": true,
+  "replays": [
+    {
+      "seq": 149,
+      "record_id": "ECR1h789b1f89f163",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 154,
+      "record_id": "ECR1h33afa5c269f6",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 159,
+      "record_id": "ECR1hbc0097540450",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 193,
+      "record_id": "ECR1h5db919db2161",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 215,
+      "record_id": "ECR1h9610ba968fce",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 231,
+      "record_id": "ECR1he6ca32ef4179",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 235,
+      "record_id": "ECR1h00ee10abdd19",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 249,
+      "record_id": "ECR1hb27e7de0bb65",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 260,
+      "record_id": "ECR1h1f97d50b4cec",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 281,
+      "record_id": "ECR1h447377a448de",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 288,
+      "record_id": "ECR1hc57a31ef8d60",
+      "reproduced": true,
+      "detail": "identical"
+    },
+    {
+      "seq": 335,
+      "record_id": "ECR1h32c8dd2da1ee",
+      "reproduced": true,
+      "detail": "identical"
+    }
+  ],
+  "replay_selection": "sample",
+  "replay_seed": 111822823245727408,
+  "replay_candidates": 240,
+  "files": {
+    "host.json": "d30b341fde802131fd49488f43d52a79944ba4902252e347b962245c9b23cf29",
+    "plan.json": "7206e37817f24e110199dc1f8079470b3a862daf711beebb5ca4c76c546520b4",
+    "records.jsonl": "2604b07700365f5d3553abc0cd6068988a45b46cb9143a5c0a62d904d44bc9e2",
+    "session.json": "404416cf8f5aab92d89e37c3243411799aa230f4fc16822b7e47434d1b549e18",
+    "spec.json": "bcb2dc58ba3c3361ba2a457b77a39dcdbd2a2b4c577c3583452fcbd127552a47"
+  },
+  "auditor_binary_sha256": "5f53faa52d15bf8249d4b990928949e3a375b30cb82eda391deb22223f0223e4",
+  "auditor_env_class_id": "ECBENV3h32d7ea52a547",
+  "auditor_hardware_class_id": "ECBHW1h7d1934655eee",
+  "audited_unix_ms": 1795076418100
+}
+
+--- stderr ---
+receipt sha256 de3ce0cb233939d03a7812a5eeb5f8b7df6a375762b528f7e488ffa1c1a16408
+replay seed 111822823245727408 (240 eligible runs)
+audit OK: 360 records, 360 verified, 12 replays reproduced, 0 problems
+
+--- exit Some(0) ---

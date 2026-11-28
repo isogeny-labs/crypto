@@ -1,0 +1,15 @@
+[package]
+name = "rr5-b677-pcc-metadata"
+version = "0.1.0"
+edition = "2021"
+publish = false
+build = "build.rs"
+
+[workspace]
+
+[dependencies]
+serde_json = { version = "1.0.151", features = ["arbitrary_precision"] }
+sha2 = "0.10.9"
+
+[build-dependencies]
+sha2 = "0.10.9"

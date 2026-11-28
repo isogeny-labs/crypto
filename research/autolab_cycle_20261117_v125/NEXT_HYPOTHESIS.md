@@ -1,0 +1,7 @@
+# Next: exploit the degree-clipped triangular generator
+
+If C125 clipping passes, freeze its derived graph/hash and a changed cold native search using the identical63-parameter chart, all76-bit theta/q back-maps, raw product verification, numeric factor and original local/GF83 prefix controls. Compare total formulation time and RSS; preserve UNKNOWN as unresolved. Do not replace the original all-roots contract with a first model.
+
+Second prediction: the removed coefficient blocks expose smaller nonlinear dependencies than generic XOR rewriting. Profile per-precision live gates and exact block separators before selecting a new branching order. Branches cover every chart assignment; caps do not prune. This directly tests sparse block-triangular structure.
+
+Odd-characteristic derivation: for any exact coefficient field K, coprime monic leading factors give an invertible Sylvester correction map. If a valid factorization is known to obey coefficient-degree envelopes, induction also justifies omitting out-of-envelope corrections and exact final product equality. Implement and independently test GF3/GF5/GF9/GF25/GF27, repeated roots within a cluster and singular noncoprime leading forms (which must dispatch elsewhere). This theorem alone does not translate a prime-field integer interval into a polynomial prefix domain. Prime-interval carry/quotient lifts and NIST-field evidence remain separate requirements.

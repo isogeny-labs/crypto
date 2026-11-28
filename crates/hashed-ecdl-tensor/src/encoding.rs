@@ -1,6 +1,6 @@
 //! Linear-edge arithmetic and curve encodings from Bochum §2–3.
 
-use crate::arithmetic::inverse;
+use crate::arithmetic::{inverse, Seeded, SquareRootContext};
 use crate::canonical::{fourier_sum, PowerTable, PredicateProgram, TwistTable, ValueOperation};
 use crate::curve::{Curve, Point};
 use crate::finite::{Domain, PrimeDomain};
@@ -10,6 +10,7 @@ use crate::network::{
 use crate::reduction::FactorBase;
 use crate::{integrity, invalid, overflow, BigUint, Meter, Result};
 use num_traits::{One, ToPrimitive, Zero};
+use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
 /// The explicit parameters of the two-stage Fourier multiplication gadget.
@@ -85,6 +86,11 @@ pub enum Multiplier {
     Fourier,
     /// Schoolbook AND/ripple-adder gadget: Θ(d²) edges, every vertex of arity ≤ 5.
     Schoolbook,
+    /// Per product, whichever of the two gadgets has fewer graph ports for
+    /// these operands (their widths and which bits are constants); ties go to
+    /// Fourier. Schoolbook wins below roughly 20 bits, Fourier above, so large
+    /// fields keep Theorem 3's gadget. Same language either way.
+    Auto,
 }
 
 /// Words representing a point: one identity bit and canonical coordinates.
@@ -109,12 +115,86 @@ pub struct Encoder {
     steps: Vec<Step>,
     interface: Vec<usize>,
     semantic_region: Option<String>,
+    /// Checks already emitted for exactly these signals in this semantic
+    /// region. Re-emitting one adds an identical constraint (with uniquely
+    /// determined auxiliary bits), so it changes neither the language nor any
+    /// count; it only adds edges.
+    proven: HashSet<(Vec<Bit>, String, Option<String>)>,
+    /// Outputs of canonical modular operations on exactly these signals in this
+    /// semantic region. Each output and its auxiliary witnesses are uniquely
+    /// determined by the inputs, so reusing them preserves every count.
+    reused: HashMap<(Vec<Bit>, String, Option<String>), Word>,
     multiplier: Multiplier,
+    /// Indices of steps that only re-check the definition before them.
+    implied: Vec<usize>,
+    /// `Multiplier::Auto` choices by operand shape (None marks a signal bit).
+    multiplier_choice: HashMap<(Vec<Option<bool>>, Vec<Option<bool>>), Multiplier>,
 }
 impl Encoder {
     /// Start an empty encoding.
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Record that `check` holds on `words` in the current region; false if it
+    /// was already recorded, so the caller may skip re-emitting it.
+    fn first_proof(&mut self, check: String, words: &[&Word]) -> bool {
+        let bits = Self::key_bits(words);
+        self.proven
+            .insert((bits, check, self.semantic_region.clone()))
+    }
+
+    fn key_bits(words: &[&Word]) -> Vec<Bit> {
+        let mut bits = Vec::new();
+        for word in words {
+            // A width marker keeps (ab, c) and (a, bc) apart.
+            bits.push(Bit::Signal(usize::MAX - word.width()));
+            bits.extend(word.0.iter().copied());
+        }
+        bits
+    }
+
+    fn constant_value(word: &Word) -> BigUint {
+        let mut value = BigUint::zero();
+        for (i, bit) in word.0.iter().enumerate() {
+            if matches!(bit, Bit::Constant(true)) {
+                value.set_bit(i as u64, true);
+            }
+        }
+        value
+    }
+
+    /// A definition whose inputs are all constants (and at least one bit) has
+    /// constant outputs: return them as constant words, with no signal, step or
+    /// check. When the function fails or an output does not fit its width the
+    /// definition is built as before, so evaluation behaves exactly as it did.
+    fn fold(inputs: &[Word], widths: &[usize], function: &ValueFunction) -> Option<Vec<Word>> {
+        if inputs.iter().all(|word| word.0.is_empty())
+            || inputs
+                .iter()
+                .flat_map(|word| &word.0)
+                .any(|bit| matches!(bit, Bit::Signal(_)))
+        {
+            return None;
+        }
+        let values: Vec<BigUint> = inputs.iter().map(Self::constant_value).collect();
+        let outputs = function(&values, &mut Meter::new(crate::Limits::default())).ok()?;
+        if outputs.len() != widths.len() {
+            return None;
+        }
+        outputs
+            .iter()
+            .zip(widths)
+            .map(|(value, &width)| Self::constant(width, value).ok())
+            .collect()
+    }
+
+    fn reuse_key(&self, operation: String, words: &[&Word]) -> (Vec<Bit>, String, Option<String>) {
+        (
+            Self::key_bits(words),
+            operation,
+            self.semantic_region.clone(),
+        )
     }
 
     /// Choose the integer multiplication gadget behind `modular_multiply`.
@@ -133,7 +213,56 @@ impl Encoder {
         match self.multiplier {
             Multiplier::Fourier => self.integer_multiply(a, b, meter),
             Multiplier::Schoolbook => self.schoolbook_multiply(a, b, meter),
+            Multiplier::Auto => match self.smaller_multiplier(a, b, meter)? {
+                Multiplier::Schoolbook => self.schoolbook_multiply(a, b, meter),
+                _ => self.integer_multiply(a, b, meter),
+            },
         }
+    }
+
+    /// Build both gadgets on fresh inputs of this shape in a scratch encoder
+    /// and return the one with fewer graph ports. Cached per shape.
+    fn smaller_multiplier(&mut self, a: &Word, b: &Word, meter: &Meter) -> Result<Multiplier> {
+        let shape = |word: &Word| -> Vec<Option<bool>> {
+            word.0
+                .iter()
+                .map(|bit| match bit {
+                    Bit::Constant(value) => Some(*value),
+                    Bit::Signal(_) => None,
+                })
+                .collect()
+        };
+        let key = (shape(a), shape(b));
+        if let Some(&choice) = self.multiplier_choice.get(&key) {
+            return Ok(choice);
+        }
+        let ports = |multiplier: Multiplier| -> Result<usize> {
+            let mut scratch = Encoder::new();
+            let word = |pattern: &[Option<bool>], scratch: &mut Encoder| -> Result<Word> {
+                let mut bits = Vec::with_capacity(pattern.len());
+                for bit in pattern {
+                    bits.push(match bit {
+                        Some(value) => Bit::Constant(*value),
+                        None => scratch.input_word(1, meter)?.0[0],
+                    });
+                }
+                Ok(Word(bits))
+            };
+            let a = word(&key.0, &mut scratch)?;
+            let b = word(&key.1, &mut scratch)?;
+            match multiplier {
+                Multiplier::Schoolbook => scratch.schoolbook_multiply(&a, &b, meter)?,
+                _ => scratch.integer_multiply(&a, &b, meter)?,
+            };
+            Ok(scratch.vertices.iter().map(|v| v.edges.len()).sum())
+        };
+        let choice = if ports(Multiplier::Schoolbook)? < ports(Multiplier::Fourier)? {
+            Multiplier::Schoolbook
+        } else {
+            Multiplier::Fourier
+        };
+        self.multiplier_choice.insert(key, choice);
+        Ok(choice)
     }
 
     pub(crate) fn set_semantic_region(&mut self, region: &str) -> Result<()> {
@@ -224,6 +353,14 @@ impl Encoder {
             .flat_map(|w| w.0.iter().copied())
             .filter(|b| matches!(b, Bit::Signal(_)))
             .collect();
+        // A constraint on constants alone that holds restricts nothing. One that
+        // fails (or errors) is kept, so the language stays empty as before.
+        if active.is_empty() {
+            let values: Vec<BigUint> = words.iter().map(Self::constant_value).collect();
+            if let Ok(true) = function(&values, &mut Meter::new(crate::Limits::default())) {
+                return Ok(());
+            }
+        }
         let widths = words
             .iter()
             .map(|word| word.width().to_string())
@@ -354,6 +491,9 @@ impl Encoder {
         checked: bool,
         meter: &Meter,
     ) -> Result<Vec<Word>> {
+        if let Some(folded) = Self::fold(inputs, widths, &function) {
+            return Ok(folded);
+        }
         let outputs: Vec<_> = widths
             .iter()
             .map(|&width| self.fresh(width, false, meter))
@@ -364,6 +504,7 @@ impl Encoder {
             function: function.clone(),
         });
         if checked {
+            let define_step = self.steps.len() - 1;
             let mut ports = inputs.to_vec();
             ports.extend(outputs.clone());
             let count = inputs.len();
@@ -375,6 +516,10 @@ impl Encoder {
                     move |values, work| Ok(function(&values[..count], work)? == values[count..]),
                     meter,
                 )?;
+            }
+            // Exactly one check pushed directly after this definition.
+            if self.steps.len() == define_step + 2 {
+                self.implied.push(define_step + 1);
             }
         }
         Ok(outputs)
@@ -414,6 +559,9 @@ impl Encoder {
             return Err(invalid("equality word widths"));
         }
         for i in 0..left.width() {
+            if left.0[i] == right.0[i] {
+                continue;
+            }
             self.constraint(
                 &[Self::slice(left, i, 1), Self::slice(right, i, 1)],
                 |v, _| Ok(v[0] == v[1]),
@@ -432,6 +580,11 @@ impl Encoder {
     ) -> Result<()> {
         if selector.width() != 1 || left.width() != right.width() {
             return Err(invalid("gated equality widths"));
+        }
+        match selector.0[0] {
+            Bit::Constant(false) => return Ok(()),
+            Bit::Constant(true) => return self.assert_equal(left, right, meter),
+            Bit::Signal(_) => {}
         }
         for i in 0..left.width() {
             self.constraint(
@@ -467,6 +620,15 @@ impl Encoder {
         if a.width() != 1 || b.width() != 1 {
             return Err(invalid("selector width"));
         }
+        // x AND 1 = x, x AND 0 = 0: no new signal.
+        match (a.0[0], b.0[0]) {
+            (Bit::Constant(true), _) => return Ok(b.clone()),
+            (_, Bit::Constant(true)) => return Ok(a.clone()),
+            (Bit::Constant(false), _) | (_, Bit::Constant(false)) => {
+                return Self::constant(1, &BigUint::zero())
+            }
+            _ => {}
+        }
         Ok(self
             .define(
                 &[a.clone(), b.clone()],
@@ -482,6 +644,15 @@ impl Encoder {
     pub fn or(&mut self, a: &Word, b: &Word, meter: &Meter) -> Result<Word> {
         if a.width() != 1 || b.width() != 1 {
             return Err(invalid("selector width"));
+        }
+        // x OR 0 = x, x OR 1 = 1: no new signal.
+        match (a.0[0], b.0[0]) {
+            (Bit::Constant(false), _) => return Ok(b.clone()),
+            (_, Bit::Constant(false)) => return Ok(a.clone()),
+            (Bit::Constant(true), _) | (_, Bit::Constant(true)) => {
+                return Self::constant(1, &BigUint::one())
+            }
+            _ => {}
         }
         Ok(self
             .define(
@@ -533,6 +704,9 @@ impl Encoder {
         Ok(less)
     }
     fn canonical(&mut self, word: &Word, modulus: &BigUint, meter: &Meter) -> Result<()> {
+        if !self.first_proof(format!("canonical {modulus}"), &[word]) {
+            return Ok(());
+        }
         let bound = Self::constant(word.width(), modulus)?;
         let lt = self.less_than(word, &bound, meter)?;
         self.assert_equal(&lt, &Self::constant(1, &BigUint::one())?, meter)
@@ -546,6 +720,21 @@ impl Encoder {
         let mut carry = Self::constant(1, &BigUint::zero())?;
         let mut result = Vec::with_capacity(a.width() + 1);
         for i in 0..a.width() {
+            // x + 0 + 0 = x with no carry: two constant-zero addends need no
+            // full adder (an all-constant bit folds inside `define`).
+            let zeros = [a.0[i], b.0[i], carry.0[0]]
+                .iter()
+                .filter(|bit| matches!(bit, Bit::Constant(false)))
+                .count();
+            if zeros >= 2 {
+                let rest = [a.0[i], b.0[i], carry.0[0]]
+                    .into_iter()
+                    .find(|bit| !matches!(bit, Bit::Constant(false)))
+                    .unwrap_or(Bit::Constant(false));
+                result.push(rest);
+                carry = Self::constant(1, &BigUint::zero())?;
+                continue;
+            }
             let mut output = self.define(
                 &[Self::slice(a, i, 1), Self::slice(b, i, 1), carry],
                 &[1, 1],
@@ -803,6 +992,10 @@ impl Encoder {
         if x.width() != y.width() || q <= &BigUint::one() {
             return Err(invalid("modular addition shape"));
         }
+        let key = self.reuse_key(format!("modular_add {q}"), &[x, y]);
+        if let Some(word) = self.reused.get(&key) {
+            return Ok(word.clone());
+        }
         let modulus = q.clone();
         let z = self
             .define(
@@ -815,6 +1008,7 @@ impl Encoder {
             )?
             .remove(0);
         self.enforce_modular_add(x, y, &z, q, meter)?;
+        self.reused.insert(key, z.clone());
         Ok(z)
     }
     /// Canonical modular subtraction by checking `y+z=x`.
@@ -827,6 +1021,10 @@ impl Encoder {
     ) -> Result<Word> {
         if x.width() != y.width() || q <= &BigUint::one() {
             return Err(invalid("modular subtraction shape"));
+        }
+        let key = self.reuse_key(format!("modular_subtract {q}"), &[x, y]);
+        if let Some(word) = self.reused.get(&key) {
+            return Ok(word.clone());
         }
         self.canonical(x, q, meter)?;
         self.canonical(y, q, meter)?;
@@ -842,8 +1040,49 @@ impl Encoder {
             )?
             .remove(0);
         self.enforce_modular_add(y, &z, x, q, meter)?;
+        self.reused.insert(key, z.clone());
         Ok(z)
     }
+    /// x*c mod q for a canonical constant operand c whose double-and-add chain
+    /// has at most four modular additions: each addition is far smaller than a
+    /// Fourier product. The result is the same canonical word and the variable
+    /// operand is still checked canonical, so the language is unchanged. None
+    /// when neither operand qualifies.
+    fn multiply_by_small_constant(
+        &mut self,
+        x: &Word,
+        y: &Word,
+        q: &BigUint,
+        meter: &Meter,
+    ) -> Result<Option<Word>> {
+        let is_constant = |word: &Word| word.0.iter().all(|bit| matches!(bit, Bit::Constant(_)));
+        let (variable, constant) = match (is_constant(x), is_constant(y)) {
+            (false, true) => (x, Self::constant_value(y)),
+            (true, false) => (y, Self::constant_value(x)),
+            _ => return Ok(None),
+        };
+        if &constant >= q {
+            return Ok(None);
+        }
+        let bits = constant.bits();
+        let additions = bits.saturating_sub(1) + constant.count_ones().saturating_sub(1);
+        if additions > 4 {
+            return Ok(None);
+        }
+        self.canonical(variable, q, meter)?;
+        if constant.is_zero() {
+            return Ok(Some(Self::constant(variable.width(), &BigUint::zero())?));
+        }
+        let mut result = variable.clone();
+        for i in (0..bits - 1).rev() {
+            result = self.modular_add(&result, &result, q, meter)?;
+            if constant.bit(i) {
+                result = self.modular_add(&result, variable, q, meter)?;
+            }
+        }
+        Ok(Some(result))
+    }
+
     /// Canonical modular multiplication, with compact integer products and the
     /// unique quotient witness in `xy = theta*q + z`.
     pub fn modular_multiply(
@@ -855,6 +1094,14 @@ impl Encoder {
     ) -> Result<Word> {
         if x.width() != y.width() || q <= &BigUint::one() {
             return Err(invalid("modular multiplication shape"));
+        }
+        let key = self.reuse_key(format!("modular_multiply {q}"), &[x, y]);
+        if let Some(word) = self.reused.get(&key) {
+            return Ok(word.clone());
+        }
+        if let Some(z) = self.multiply_by_small_constant(x, y, q, meter)? {
+            self.reused.insert(key, z.clone());
+            return Ok(z);
         }
         self.canonical(x, q, meter)?;
         self.canonical(y, q, meter)?;
@@ -877,6 +1124,7 @@ impl Encoder {
         let quotient_product = self.multiply(&theta, &Self::constant(x.width(), q)?, meter)?;
         let sum = self.integer_add(&quotient_product, &Self::pad(&z, 2 * x.width())?, meter)?;
         self.assert_equal(&Self::pad(&product, sum.width())?, &sum, meter)?;
+        self.reused.insert(key, z.clone());
         Ok(z)
     }
 
@@ -1102,6 +1350,81 @@ impl Encoder {
         self.assert_equal(&left, &right, meter)
     }
 
+    /// A free affine point given by its abscissa and the parity of its
+    /// ordinate: `w + 1` free bits instead of `2w`. The other ordinate bits are
+    /// a defined witness, the square root of `x^3 + ax + b` with that parity,
+    /// and the usual validity constraints (canonical `x` and `y`, curve
+    /// equation) follow. For odd `q`, `y` and `q - y` differ in parity, so each
+    /// valid point has exactly one `(x, parity)` and its witness is unique:
+    /// the accepted points, their interface words and every count are those
+    /// of `input_point(curve, false, ..)`. Free words: `x`, then the parity.
+    pub fn input_point_compressed(&mut self, curve: &Curve, meter: &Meter) -> Result<PointWords> {
+        let point = self.input_point_compressed_unchecked(curve, meter)?;
+        self.valid_point(curve, &point, meter)?;
+        Ok(point)
+    }
+
+    /// `input_point_compressed` without its validity constraints, for a caller
+    /// that adds them itself with `assert_valid_point` (for example after a
+    /// cheaper filter on `x` and the parity bit, which are the free bits).
+    pub fn input_point_compressed_unchecked(
+        &mut self,
+        curve: &Curve,
+        meter: &Meter,
+    ) -> Result<PointWords> {
+        let p = curve.modulus().clone();
+        let width = p.bits() as usize;
+        if width < 2 || !p.bit(0) {
+            return Err(invalid("compressed point modulus"));
+        }
+        let x = self.input_word(width, meter)?;
+        let parity = self.input_word(1, meter)?;
+        let c = curve.clone();
+        let upper = self
+            .define(
+                &[x.clone(), parity.clone()],
+                &[width - 1],
+                Arc::new(move |v, work| {
+                    let p = c.modulus();
+                    let x = &v[0] % p;
+                    let rhs = (&x * &x % p * &x + c.a() * &x + c.b()) % p;
+                    // Only the root's sign depends on the randomness, and the
+                    // parity below fixes the sign, so a fixed seed is exact.
+                    let root = SquareRootContext::new(p)?.root(&rhs, &mut Seeded(1), work)?;
+                    let want = !v[1].is_zero();
+                    let y = root.map(|r| if r.bit(0) == want { r } else { (p - r) % p });
+                    // No root of this parity: any output fails the checks below.
+                    Ok(vec![match y {
+                        Some(y) if y.bit(0) == want => y >> 1,
+                        _ => BigUint::zero(),
+                    }])
+                }),
+                None,
+                false,
+                meter,
+            )?
+            .remove(0);
+        let mut y = parity.0.clone();
+        y.extend(upper.0.iter().copied());
+        Ok(PointWords {
+            infinity: Self::constant(1, &BigUint::zero())?,
+            x,
+            y: Word(y),
+        })
+    }
+
+    /// Constrain `point` to be a valid curve point (canonical coordinates, the
+    /// identity encoded as zeros, the curve equation otherwise). Emitted once
+    /// per point and region.
+    pub fn assert_valid_point(
+        &mut self,
+        curve: &Curve,
+        point: &PointWords,
+        meter: &Meter,
+    ) -> Result<()> {
+        self.valid_point(curve, point, meter)
+    }
+
     /// Hardcode a canonical curve point.
     pub fn constant_point(curve: &Curve, point: &Point) -> Result<PointWords> {
         if !curve.contains(point) {
@@ -1150,11 +1473,64 @@ impl Encoder {
         self.gated_equal(selector, &a.y, &b.y, meter)
     }
 
+    fn validity_key(
+        &self,
+        curve: &Curve,
+        point: &PointWords,
+    ) -> (Vec<Bit>, String, Option<String>) {
+        (
+            Self::key_bits(&[&point.infinity, &point.x, &point.y]),
+            format!(
+                "valid point {} {} {}",
+                curve.modulus(),
+                curve.a(),
+                curve.b()
+            ),
+            self.semantic_region.clone(),
+        )
+    }
+
+    /// Record that `point` is a valid curve point in this region; false if it
+    /// already was. Callers that record without checking must have proved it.
+    fn proven_valid(&mut self, curve: &Curve, point: &PointWords) -> bool {
+        let key = self.validity_key(curve, point);
+        self.proven.insert(key)
+    }
+
+    /// The negation (x, -y) of a point, with a canonical `-y`. A negated valid
+    /// point is valid (same x, (-y)^2 = y^2, identity maps to identity), so if
+    /// `point` was checked valid the result is recorded valid without a check.
+    pub fn negate_point(
+        &mut self,
+        curve: &Curve,
+        point: &PointWords,
+        meter: &Meter,
+    ) -> Result<PointWords> {
+        let width = curve.modulus().bits() as usize;
+        let negated = PointWords {
+            infinity: point.infinity.clone(),
+            x: point.x.clone(),
+            y: self.modular_subtract(
+                &Self::constant(width, &BigUint::zero())?,
+                &point.y,
+                curve.modulus(),
+                meter,
+            )?,
+        };
+        if self.proven.contains(&self.validity_key(curve, point)) {
+            self.proven_valid(curve, &negated);
+        }
+        Ok(negated)
+    }
+
     fn valid_point(&mut self, curve: &Curve, point: &PointWords, meter: &Meter) -> Result<()> {
         let p = curve.modulus();
         let width = p.bits() as usize;
         if point.infinity.width() != 1 || point.x.width() != width || point.y.width() != width {
             return Err(invalid("point word widths"));
+        }
+        if !self.proven_valid(curve, point) {
+            return Ok(());
         }
         self.canonical(&point.x, p, meter)?;
         self.canonical(&point.y, p, meter)?;
@@ -1220,7 +1596,12 @@ impl Encoder {
         let x = output.remove(0);
         let y = output.remove(0);
         let result = PointWords { infinity, x, y };
-        self.valid_point(curve, &result, meter)?;
+        // The result is valid by construction once the constraints below hold:
+        // every case pins it to the identity, to a valid input, or to the
+        // chord/tangent point (x3, y3) of the unique slope, which lies on the
+        // curve. Record that instead of re-checking it, so later additions
+        // that take this result as an input do not re-check it either.
+        self.proven_valid(curve, &result);
         let c = curve.clone();
         let slope = self
             .define(
@@ -1252,9 +1633,10 @@ impl Encoder {
             .remove(0);
         let p = curve.modulus();
         self.canonical(&slope, p, meter)?;
-        let dx = self.modular_subtract(&a.x, &b.x, p, meter)?;
+        // x2 - x1 is needed for the chord below; it is zero iff x1 - x2 is.
+        let x2_x1 = self.modular_subtract(&b.x, &a.x, p, meter)?;
         let sy = self.modular_add(&a.y, &b.y, p, meter)?;
-        let same_x = self.zero_test(&dx, meter)?;
+        let same_x = self.zero_test(&x2_x1, meter)?;
         let inverse_y = self.zero_test(&sy, meter)?;
         let finite_a = self.not(&a.infinity, meter)?;
         let finite_b = self.not(&b.infinity, meter)?;
@@ -1275,22 +1657,52 @@ impl Encoder {
             &Self::constant_point(curve, &Point::Infinity)?,
             meter,
         )?;
-        let x2_x1 = self.modular_subtract(&b.x, &a.x, p, meter)?;
         let y2_y1 = self.modular_subtract(&b.y, &a.y, p, meter)?;
         let generic_slope = self.modular_multiply(&slope, &x2_x1, p, meter)?;
         self.gated_equal(&sigma4, &generic_slope, &y2_y1, meter)?;
-        let two_y = self.modular_add(&a.y, &a.y, p, meter)?;
-        let square = self.modular_multiply(&a.x, &a.x, p, meter)?;
-        let three_square = self.modular_multiply(
-            &square,
-            &Self::constant(width, &(BigUint::from(3u8) % p))?,
-            p,
-            meter,
-        )?;
-        let tangent =
-            self.modular_add(&three_square, &Self::constant(width, curve.a())?, p, meter)?;
-        let doubling_slope = self.modular_multiply(&slope, &two_y, p, meter)?;
-        self.gated_equal(&sigma5, &doubling_slope, &tangent, meter)?;
+        let constant_tangent = match &a.y.0[..] {
+            bits if a
+                .x
+                .0
+                .iter()
+                .chain(bits)
+                .all(|b| matches!(b, Bit::Constant(_))) =>
+            {
+                // A constant first point: the tangent slope is the constant
+                // (3x^2 + a) / (2y), so slope * 2y = 3x^2 + a with 2y != 0 is
+                // the same constraint as slope = that constant.
+                let (x, y) = (Self::constant_value(&a.x), Self::constant_value(&a.y));
+                let two_y = (&y << 1u8) % p;
+                if two_y.is_zero() {
+                    None
+                } else {
+                    let tangent = (BigUint::from(3u8) * &x * &x + curve.a()) % p;
+                    Some(tangent * inverse(&two_y, p)? % p)
+                }
+            }
+            _ => None,
+        };
+        if let Some(slope_value) = constant_tangent {
+            self.gated_equal(
+                &sigma5,
+                &slope,
+                &Self::constant(width, &slope_value)?,
+                meter,
+            )?;
+        } else {
+            let two_y = self.modular_add(&a.y, &a.y, p, meter)?;
+            let square = self.modular_multiply(&a.x, &a.x, p, meter)?;
+            let three_square = self.modular_multiply(
+                &square,
+                &Self::constant(width, &(BigUint::from(3u8) % p))?,
+                p,
+                meter,
+            )?;
+            let tangent =
+                self.modular_add(&three_square, &Self::constant(width, curve.a())?, p, meter)?;
+            let doubling_slope = self.modular_multiply(&slope, &two_y, p, meter)?;
+            self.gated_equal(&sigma5, &doubling_slope, &tangent, meter)?;
+        }
         self.gated_equal(
             &active,
             &result.infinity,
@@ -1375,6 +1787,63 @@ impl Encoder {
         let hashed = self.modular_add(&multiplied, &Self::constant(width, beta)?, s, meter)?;
         let accepted = self.less_than(&hashed, &Self::constant(width, tau)?, meter)?;
         self.assert_equal(&accepted, &Self::constant(1, &BigUint::one())?, meter)
+    }
+
+    /// The structural proof behind `Program::implied_vertices`: None unless
+    /// every vertex is a Check step's vertex read through exactly its edges'
+    /// signals (each vertex at most once), or a vertex whose edges all carry one
+    /// signal and whose predicate accepts all-false and all-true.
+    fn implied_vertices(
+        vertices: &[Vertex],
+        steps: &[Step],
+        implied: &[bool],
+        edge_signals: &[usize],
+        meter: &Meter,
+    ) -> Result<Option<Vec<usize>>> {
+        let mut work = Meter::new(meter.limits.clone());
+        let mut covered = vec![false; vertices.len()];
+        let mut list = Vec::new();
+        for (index, step) in steps.iter().enumerate() {
+            let Step::Check { vertex, ports } = step else {
+                continue;
+            };
+            let Some(v) = vertices.get(*vertex) else {
+                return Ok(None);
+            };
+            if covered[*vertex]
+                || v.edges.len() != ports.len()
+                || v.edges.iter().zip(ports).any(|(&edge, port)| {
+                    edge_signals.get(edge).map(|&s| Bit::Signal(s)) != Some(*port)
+                })
+            {
+                return Ok(None);
+            }
+            covered[*vertex] = true;
+            if implied.get(index).copied().unwrap_or(false) {
+                list.push(*vertex);
+            }
+        }
+        for (id, v) in vertices.iter().enumerate() {
+            if covered[id] {
+                continue;
+            }
+            let Some(&first) = v.edges.first() else {
+                return Ok(None);
+            };
+            let signal = edge_signals.get(first);
+            if signal.is_none() || v.edges.iter().any(|&e| edge_signals.get(e) != signal) {
+                return Ok(None);
+            }
+            for value in [false, true] {
+                if !v
+                    .predicate
+                    .evaluate(&vec![value; v.edges.len()], &mut work)?
+                {
+                    return Ok(None);
+                }
+            }
+        }
+        Ok(Some(list))
     }
 
     /// Freeze shared signals into ordinary edges and constant-degree equality
@@ -1567,7 +2036,21 @@ impl Encoder {
         if self.vertices.iter().any(|v| v.edges.contains(&usize::MAX)) {
             return Err(integrity("unattached encoding port"));
         }
+        let mut implied = vec![false; self.steps.len()];
+        for &step in &self.implied {
+            // Only a check that directly follows its definition qualifies.
+            if matches!(self.steps.get(step), Some(Step::Check { .. }))
+                && step > 0
+                && matches!(self.steps[step - 1], Step::Define { .. })
+            {
+                implied[step] = true;
+            }
+        }
+        let implied_vertices =
+            Self::implied_vertices(&self.vertices, &self.steps, &implied, &edge_signals, meter)?;
         let program = Program {
+            implied,
+            implied_vertices,
             free: self.free,
             signals: self.uses.len(),
             steps: self.steps,
@@ -1707,6 +2190,331 @@ mod tests {
             Point::Affine {
                 x: read(graph, witness, 1, width),
                 y: read(graph, witness, 1 + width, width),
+            }
+        }
+    }
+    #[test]
+    fn repeated_checks_and_modular_operations_are_emitted_once_per_region() {
+        let mut meter = Meter::new(Limits {
+            steps: 500_000_000,
+            ..Limits::default()
+        });
+        let curve = crate::curve::tiny(&mut meter);
+        let q = curve.modulus().clone();
+        let width = q.bits() as usize;
+        let mut builder = Encoder::new();
+        let point = builder.input_point(&curve, false, &meter).unwrap();
+        let product = builder
+            .modular_multiply(&point.x, &point.y, &q, &meter)
+            .unwrap();
+        let vertices = builder.vertices.len();
+        // Same check or operation on the same signals: nothing new is emitted.
+        builder.valid_point(&curve, &point, &meter).unwrap();
+        builder.canonical(&point.x, &q, &meter).unwrap();
+        let again = builder
+            .modular_multiply(&point.x, &point.y, &q, &meter)
+            .unwrap();
+        assert_eq!(builder.vertices.len(), vertices);
+        assert_eq!(again.0, product.0);
+        // Different operands, or another semantic region, are emitted afresh.
+        let swapped = builder
+            .modular_multiply(&point.y, &point.x, &q, &meter)
+            .unwrap();
+        assert_ne!(swapped.0, product.0);
+        builder.set_semantic_region("other").unwrap();
+        let vertices = builder.vertices.len();
+        let other = builder
+            .modular_multiply(&point.x, &point.y, &q, &meter)
+            .unwrap();
+        assert!(builder.vertices.len() > vertices);
+        assert_ne!(other.0, product.0);
+        // P + P re-validates P inside point_add; the language is unchanged:
+        // exactly the affine points whose double is affine are accepted.
+        let mut builder = Encoder::new();
+        let point = builder.input_point(&curve, false, &meter).unwrap();
+        builder.mark_point_interface(&point, &meter).unwrap();
+        let double = builder.point_add(&curve, &point, &point, &meter).unwrap();
+        builder
+            .assert_equal(
+                &double.infinity,
+                &Encoder::constant(1, &BigUint::zero()).unwrap(),
+                &meter,
+            )
+            .unwrap();
+        let graph = builder.finish(&meter).unwrap();
+        let order = curve.order().to_u64().unwrap();
+        // Identity-free input: the free bits are x then y.
+        for k in 1..order {
+            let candidate = curve.mul(curve.generator(), &k.into(), &mut meter).unwrap();
+            let witness = graph
+                .witness_from_input_bits(&point_bits(&candidate, width)[1..], &mut meter)
+                .unwrap();
+            let doubled = curve.add(&candidate, &candidate, &mut meter).unwrap();
+            assert_eq!(witness.is_some(), doubled != Point::Infinity, "k = {k}");
+        }
+    }
+    #[test]
+    fn modular_multiply_by_every_constant_matches_the_product() {
+        let mut meter = Meter::new(Limits {
+            steps: 500_000_000,
+            ..Limits::default()
+        });
+        let q = BigUint::from(13u8);
+        for c in 0..13u8 {
+            for constant_first in [false, true] {
+                let mut builder = Encoder::new();
+                let x = builder.input_word(4, &meter).unwrap();
+                let c_word = Encoder::constant(4, &c.into()).unwrap();
+                let product = if constant_first {
+                    builder.modular_multiply(&c_word, &x, &q, &meter)
+                } else {
+                    builder.modular_multiply(&x, &c_word, &q, &meter)
+                }
+                .unwrap();
+                builder.mark_interface(&product, &meter).unwrap();
+                let graph = builder.finish(&meter).unwrap();
+                for value in 0..16u8 {
+                    let witness = graph
+                        .witness_from_input_bits(&bits(&value.into(), 4), &mut meter)
+                        .unwrap();
+                    match witness {
+                        Some(witness) => {
+                            assert!(value < 13, "non-canonical x = {value} accepted");
+                            assert_eq!(
+                                read(&graph, &witness, 0, 4),
+                                BigUint::from(u16::from(value) * u16::from(c) % 13),
+                                "{value} * {c}"
+                            );
+                        }
+                        None => assert!(value >= 13, "x = {value}, c = {c} rejected"),
+                    }
+                }
+            }
+        }
+    }
+    #[test]
+    fn point_add_graph_accepts_only_the_sum_as_output_for_every_pair() {
+        // point_add records its output as valid instead of re-checking it, so
+        // the graph's own constraints must pin every output bit. Exhaustively:
+        // take the honest witness for each input pair, overwrite every edge of
+        // the output's signals with each of the 2^(1+2w) values, and require
+        // the graph to accept exactly one value, a + b.
+        let mut meter = Meter::new(Limits {
+            steps: 2_000_000_000,
+            ..Limits::default()
+        });
+        let curves = [
+            crate::curve::tiny(&mut meter),
+            Curve::with_cofactor(
+                5u8.into(),
+                0u8.into(),
+                1u8.into(),
+                3u8.into(),
+                2u8.into(),
+                Point::Affine {
+                    x: 0u8.into(),
+                    y: 1u8.into(),
+                },
+                &mut meter,
+            )
+            .unwrap(),
+        ];
+        for curve in curves {
+            let width = curve.modulus().bits() as usize;
+            let mut builder = Encoder::new();
+            let a = builder.input_point(&curve, true, &meter).unwrap();
+            let b = builder.input_point(&curve, true, &meter).unwrap();
+            let output = builder.point_add(&curve, &a, &b, &meter).unwrap();
+            builder.mark_point_interface(&output, &meter).unwrap();
+            let graph = builder.finish(&meter).unwrap();
+            let edge_signals = &graph.model.as_ref().unwrap().edge_signals;
+            let output_signals: Vec<usize> = (0..1 + 2 * width)
+                .map(|k| edge_signals[graph.interface()[k]])
+                .collect();
+            let mut points = vec![Point::Infinity];
+            for x in 0..5u8 {
+                for y in 0..5u8 {
+                    let point = Point::Affine {
+                        x: x.into(),
+                        y: y.into(),
+                    };
+                    if curve.contains(&point) {
+                        points.push(point);
+                    }
+                }
+            }
+            for a in &points {
+                for b in &points {
+                    let inputs = [point_bits(a, width), point_bits(b, width)].concat();
+                    let witness = graph
+                        .witness_from_input_bits(&inputs, &mut meter)
+                        .unwrap()
+                        .unwrap();
+                    let mut accepted = Vec::new();
+                    for candidate in 0u32..1 << (1 + 2 * width) {
+                        let mut assignment = witness.clone();
+                        for (edge, signal) in edge_signals.iter().enumerate() {
+                            if let Some(k) = output_signals.iter().position(|s| s == signal) {
+                                assignment[edge] = candidate >> k & 1 == 1;
+                            }
+                        }
+                        if graph.evaluate(&assignment, &mut meter).unwrap() {
+                            accepted.push(candidate);
+                        }
+                    }
+                    let sum = curve.add(a, b, &mut meter).unwrap();
+                    let expected: u32 = point_bits(&sum, width)
+                        .iter()
+                        .enumerate()
+                        .map(|(i, &bit)| u32::from(bit) << i)
+                        .sum();
+                    assert_eq!(accepted, vec![expected], "{a:?} + {b:?}");
+                }
+            }
+        }
+    }
+    #[test]
+    fn compressed_point_accepts_exactly_one_input_per_affine_point() {
+        let mut meter = Meter::new(Limits {
+            steps: 500_000_000,
+            ..Limits::default()
+        });
+        let curves = [
+            crate::curve::tiny(&mut meter),
+            Curve::with_cofactor(
+                5u8.into(),
+                0u8.into(),
+                1u8.into(),
+                3u8.into(),
+                2u8.into(),
+                Point::Affine {
+                    x: 0u8.into(),
+                    y: 1u8.into(),
+                },
+                &mut meter,
+            )
+            .unwrap(),
+        ];
+        for curve in curves {
+            let p = curve.modulus().to_u64().unwrap();
+            let width = curve.modulus().bits() as usize;
+            let mut builder = Encoder::new();
+            let point = builder.input_point_compressed(&curve, &meter).unwrap();
+            builder.mark_point_interface(&point, &meter).unwrap();
+            let graph = builder.finish(&meter).unwrap();
+            assert_eq!(graph.input_bit_count(), Some(width + 1));
+            let mut accepted = Vec::new();
+            for x in 0..1u64 << width {
+                for parity in [false, true] {
+                    let mut bits = bits(&x.into(), width);
+                    bits.push(parity);
+                    if let Some(witness) = graph.witness_from_input_bits(&bits, &mut meter).unwrap()
+                    {
+                        let read_back = read_point(&graph, &witness, width);
+                        let Point::Affine { x: rx, y: ry } = &read_back else {
+                            panic!("identity accepted")
+                        };
+                        assert_eq!(rx, &BigUint::from(x));
+                        assert_eq!(ry.bit(0), parity);
+                        assert!(curve.contains(&read_back));
+                        accepted.push(read_back);
+                    }
+                }
+            }
+            let mut expected = Vec::new();
+            for x in 0..p {
+                for y in 0..p {
+                    let point = Point::Affine {
+                        x: x.into(),
+                        y: y.into(),
+                    };
+                    if curve.contains(&point) {
+                        expected.push(point);
+                    }
+                }
+            }
+            let key = |point: &Point| format!("{point:?}");
+            accepted.sort_by_key(key);
+            expected.sort_by_key(key);
+            assert_eq!(accepted, expected);
+        }
+    }
+    #[test]
+    fn point_add_with_constant_first_point_accepts_only_the_sum() {
+        // Constant first points take the constant-tangent path. For every
+        // constant T and free b, overwrite the output's edges with each of the
+        // 2^(1+2w) values: the graph must accept exactly T + b.
+        let mut meter = Meter::new(Limits {
+            steps: 2_000_000_000,
+            ..Limits::default()
+        });
+        let curves = [
+            crate::curve::tiny(&mut meter),
+            Curve::with_cofactor(
+                5u8.into(),
+                0u8.into(),
+                1u8.into(),
+                3u8.into(),
+                2u8.into(),
+                Point::Affine {
+                    x: 0u8.into(),
+                    y: 1u8.into(),
+                },
+                &mut meter,
+            )
+            .unwrap(),
+        ];
+        for curve in curves {
+            let width = curve.modulus().bits() as usize;
+            let mut points = vec![Point::Infinity];
+            for x in 0..5u8 {
+                for y in 0..5u8 {
+                    let point = Point::Affine {
+                        x: x.into(),
+                        y: y.into(),
+                    };
+                    if curve.contains(&point) {
+                        points.push(point);
+                    }
+                }
+            }
+            for constant in &points {
+                let mut builder = Encoder::new();
+                let a = Encoder::constant_point(&curve, constant).unwrap();
+                let b = builder.input_point(&curve, true, &meter).unwrap();
+                let output = builder.point_add(&curve, &a, &b, &meter).unwrap();
+                builder.mark_point_interface(&output, &meter).unwrap();
+                let graph = builder.finish(&meter).unwrap();
+                let edge_signals = &graph.model.as_ref().unwrap().edge_signals;
+                let output_signals: Vec<Option<usize>> = (0..1 + 2 * width)
+                    .map(|k| graph.interface().get(k).map(|&edge| edge_signals[edge]))
+                    .collect();
+                for b in &points {
+                    let witness = graph
+                        .witness_from_input_bits(&point_bits(b, width), &mut meter)
+                        .unwrap()
+                        .unwrap();
+                    let mut accepted = Vec::new();
+                    for candidate in 0u32..1 << (1 + 2 * width) {
+                        let mut assignment = witness.clone();
+                        for (edge, signal) in edge_signals.iter().enumerate() {
+                            if let Some(k) = output_signals.iter().position(|s| *s == Some(*signal))
+                            {
+                                assignment[edge] = candidate >> k & 1 == 1;
+                            }
+                        }
+                        if graph.evaluate(&assignment, &mut meter).unwrap() {
+                            accepted.push(candidate);
+                        }
+                    }
+                    let sum = curve.add(constant, b, &mut meter).unwrap();
+                    let expected: u32 = point_bits(&sum, width)
+                        .iter()
+                        .enumerate()
+                        .map(|(i, &bit)| u32::from(bit) << i)
+                        .sum();
+                    assert_eq!(accepted, vec![expected], "{constant:?} + {b:?}");
+                }
             }
         }
     }

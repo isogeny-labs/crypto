@@ -1,0 +1,116 @@
+{
+  "schema": "courtois.postmerge-custody/v1",
+  "claim_standing": "pcc:unverified",
+  "merge_commit": "08acc99defa8da5c8b2db3a5b139f0e0be97fe36",
+  "merge_actor": "aburan28 (GitHub timeline; no inferred authorization)",
+  "published_event_versions": [
+    {
+      "ref": "1af49ed8489a8cf95ccae0ff3a4e1419b79c8bd5",
+      "entries": 144,
+      "event": {
+        "at": "2026-11-15T20:50:50Z",
+        "body": {
+          "claim_id": "PCC-20261115-8d2645",
+          "claim_sha256": "2d26113869a92d732d06cb47ab33b067ffd8036dcb7aff119530f65ca8383fcf",
+          "path": "pcc/claims/PCC-20261115-8d2645.json"
+        },
+        "hash": "6eb355f2f236d8e3ecf23776a5e2ac0895a3c30d591e08e1b1b8a4abda3509b4",
+        "prev": "f84bcbbb4a0e58e8a97420325a833cca8392d48d22c4fae7b22c30a0bfef376b",
+        "schema": "pcc.ledger-entry/v1",
+        "seq": 143,
+        "type": "claim"
+      }
+    },
+    {
+      "ref": "29093722c9e04f25e9f1dcb6d1a62a284e018f29",
+      "entries": 145,
+      "event": {
+        "at": "2026-11-15T20:50:50Z",
+        "body": {
+          "claim_id": "PCC-20261115-8d2645",
+          "claim_sha256": "2d26113869a92d732d06cb47ab33b067ffd8036dcb7aff119530f65ca8383fcf",
+          "path": "pcc/claims/PCC-20261115-8d2645.json"
+        },
+        "hash": "339345474c6ac548bcc894f1f0504637bddf2f80261c3a0fa818a7faef16cbfb",
+        "prev": "1948f46b05d4a9e1c5b72a8bcbc52572284de80a0300bb2286ff4c3ddff944aa",
+        "schema": "pcc.ledger-entry/v1",
+        "seq": 144,
+        "type": "claim"
+      }
+    },
+    {
+      "ref": "67720b0c7b620fda9fcdec271e17c2d93c4dc488",
+      "entries": 163,
+      "event": {
+        "at": "2026-11-15T20:50:50Z",
+        "body": {
+          "claim_id": "PCC-20261115-8d2645",
+          "claim_sha256": "2d26113869a92d732d06cb47ab33b067ffd8036dcb7aff119530f65ca8383fcf",
+          "path": "pcc/claims/PCC-20261115-8d2645.json"
+        },
+        "hash": "dfc7911720479a777f86f8077971a2734632accf3b173249854dec92ff5e85aa",
+        "prev": "9dc0b2ab691ec60e8ba3b4cbb2e6ade629c89cc0cc3683cf9502f6ed9fdd2abc",
+        "schema": "pcc.ledger-entry/v1",
+        "seq": 162,
+        "type": "claim"
+      }
+    }
+  ],
+  "verifier": [
+    {
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "--repo",
+        "/workspace/courtois-review-20261115/crypto/../cryptanalysis",
+        "ledger",
+        "verify",
+        "--base",
+        "1af49ed8489a8cf95ccae0ff3a4e1419b79c8bd5"
+      ],
+      "base": "1af49ed8489a8cf95ccae0ff3a4e1419b79c8bd5",
+      "exit_status": 1,
+      "stdout": "ledger[143]: differs from the base branch (history rewritten)\nledger: 163 entries, BROKEN\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "--repo",
+        "/workspace/courtois-review-20261115/crypto/../cryptanalysis",
+        "ledger",
+        "verify",
+        "--base",
+        "29093722c9e04f25e9f1dcb6d1a62a284e018f29"
+      ],
+      "base": "29093722c9e04f25e9f1dcb6d1a62a284e018f29",
+      "exit_status": 1,
+      "stdout": "ledger[144]: differs from the base branch (history rewritten)\nledger: 163 entries, BROKEN\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "--repo",
+        "/workspace/courtois-review-20261115/crypto/../cryptanalysis",
+        "ledger",
+        "verify",
+        "--base",
+        "124c643c4de7c1a5f341cd35f4b255f10d173a56"
+      ],
+      "base": "124c643c4de7c1a5f341cd35f4b255f10d173a56",
+      "exit_status": 0,
+      "stdout": "ledger: 163 entries, chain ok\n",
+      "stderr": ""
+    }
+  ],
+  "unchanged_paths_since_published_head": [
+    "pcc/claims/PCC-20261115-8d2645.json",
+    "reports/courtois-getrandom-compat-20261115",
+    "bindings/rust/hashed-ecdl-tensor/src/arithmetic.rs",
+    "bindings/rust/hashed-ecdl-tensor/src/binary.rs",
+    "bindings/rust/hashed-ecdl-tensor/Cargo.lock"
+  ]
+}

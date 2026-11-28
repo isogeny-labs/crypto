@@ -1,0 +1,11 @@
+name = "mumford_fixed_genus_audit"
+version = "0.1.0"
+defaultTargets = ["MumfordFixedGenusAudit"]
+
+[[require]]
+name = "jacobian_smoothness_audit"
+path = "../../jacobian_smoothness_audit_20261109/lean"
+
+[[lean_lib]]
+name = "MumfordFixedGenusAudit"
+roots = ["ScalarExtension", "CantorTransport", "OddFields", "ImageGroup", "EvenControl", "FixedGenusCertificate"]

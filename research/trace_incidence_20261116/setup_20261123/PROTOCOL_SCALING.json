@@ -1,0 +1,46 @@
+{
+  "schema": "trace-sized-scaling/v1",
+  "parents": [
+    "PROTOCOL_FIELD.json"
+  ],
+  "construction": "Native C++ make-scaling using PARI Fp_ellcard, FLINT prime tests, affine group-order/known-target checks. Fixed seed0x5343414c45333101; B128/256/512/640, three ordinary prime-order curves per field,16 public targets percurve. B640 uses p=2147483647, including retained PRIME31 curve. Other fields are nextprime(8B^3-1). Private scalar validation separate and never supplied to solvers. Given-public-DLP construction excluded equally, not free algorithmic auxiliary-curve work.",
+  "shapes": {
+    "balanced": "B,B,8B",
+    "quarter": "C=ceil(ceil(sqrt(r))/4),m=ceil(sqrt(ceil(r/C))),sizes=m,m,C",
+    "half": "C=ceil(ceil(sqrt(r))/2),same m",
+    "one": "C=ceil(sqrt(r)),same m",
+    "two": "C=2ceil(sqrt(r)),same m"
+  },
+  "density": "All shapes target nominal first*second*third/r approximately1. Actual rounded density, misses and rejections reported. Progressions correlated; no iid density or new complexity theorem claimed. Unbalanced meet-in-the-middle time/memory balancing is known prior art.",
+  "arms": [
+    "baseline-balanced",
+    "field-balanced",
+    "direct-balanced",
+    "field-quarter",
+    "field-half",
+    "field-one",
+    "field-two",
+    "field-quarter-aa",
+    "current-tuned4",
+    "current-tuned8",
+    "current-tuned16",
+    "current-tuned32",
+    "current-tuned64",
+    "current-tuned128"
+  ],
+  "primary": "field-quarter; all alternatives fixed ablations, no best-per-target choice",
+  "rho": "Intact current prime_fast module with sealed older compatible adapter/primality crate. All six walker policies use current tuned table/negation/lookahead/short-coefficient/stride code and recomputed2percent DP-delay formula. Not a whole current root build or strongest-external claim. Broad root-oracle mismatch retained.",
+  "matrix": {
+    "arms": 14,
+    "targets": 192,
+    "warmups": 1,
+    "measured_rounds": 5,
+    "rows": 16128
+  },
+  "limits": "one pinned shared local CPU, one process at a time,4 pool attempts,10million rho steps,45second row limit,no retries. Explicit gen capacity first/second<=2048,third<=131072,total<=262144 and2total<r.",
+  "timing": "Complete cold target adapter: input, exact public checks, actual6 mixed starts/steps and resampling, projective steps, labels, all rejections, all attempts/misses, coordinate validation/index, witness/scalar recovery and public scalar replay. Process launch excluded and process RSS/time retained. Input curve/known-target creation is common excluded given input. No amortized setup or canonical counted-operation admission.",
+  "checks": "Before timing, every field/Bloom target/shape call recomputes every generated point from alpha/beta with retained affine arithmetic and checks hit/miss/scalar against frozen pair oracle. Baseline and losing direct/no-Bloom balanced variants separately qualify. Every timed recovered scalar subsequently matches both private answer and independent affine replay. Balanced baseline/field/direct and field-quarter A/A trial streams must match exactly.",
+  "statistics": "Within eachB,48 target clusters average five timing rounds. Bootstrap10000replicates resamples16 targets independently within each of3 fixed curves,seed0x464c41544349. Report candidate/reference ratio of means and one-sided95percent upper. Primary scoped parity requires no censors and upper<=1 against ALL six rho policies. Other shapes reported, no winner substitution. Fixed curves/host only; no cryptographic/global Pareto inference.",
+  "custody": "Continued authorized temporary local raw/checkpoint exception; no paid allocation or S3/signed-validation claim. Raw failure/build/source/dependency records retained. Canonical experiment-export schema currently encrypted/unreadable; native flow diagnostic retained without fabricating schema conformance.",
+  "source_choice": "After sixth matrix completed, preserve Bloom because no-Bloom regressed. Initial unexecuted scaling draft retained; all final sources/protocol frozen before scaling timings."
+}

@@ -1,0 +1,11 @@
+{
+  "schema": "xedni-crt-rank-protocol-v1",
+  "curve_coefficients": ["1081", "1034", "0", "-6816", "-3997"],
+  "selection": "among the 72 rational-relation records, minimum coefficient bit height, then minimum sum of absolute integer coefficients, then source index and coefficient tuple",
+  "source_pair_index": 425,
+  "points": [["14", "7"], ["17", "10"]],
+  "method": "checked Sage EllipticCurve(QQ).rank(use_database=False, proof=True, algorithm='pari', only_use_mwrank=True)",
+  "timeout_seconds": 60,
+  "status_rules": "retain complete, error, or timeout with stderr and elapsed time; no rank value on error or timeout",
+  "interpretation": "single selected-curve rank diagnostic for the r=2 lift family, not a uniform rank bound"
+}

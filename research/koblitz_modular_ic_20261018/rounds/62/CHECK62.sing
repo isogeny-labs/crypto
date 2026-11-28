@@ -1,0 +1,43 @@
+LIB "linalg.lib";
+proc require62(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../61/runs/field61-01/field-space61.sing"));
+execute(read("../matrix62-01/square-matrix62.sing"));
+execute(read("../split62-02/split-functions62.sing"));
+require62(size(sourceIdeal61)==size(cachedIdeal62) && size(sourceIdeal61)==size(splitIdeal62),"CHECK62_SOURCE_COUNTS");
+int i62;int j62;int k62;
+for(i62=1;i62<=size(sourceIdeal61);i62++){
+ require62(sourceIdeal61[i62]==cachedIdeal62[i62] && sourceIdeal61[i62]==splitIdeal62[i62],"CHECK62_EVERY_ACTUAL_SOURCE_EQUATION");
+}
+ideal GB62=std(sourceIdeal61);
+require62(dim(GB62)==0 && vdim(GB62)==32,"CHECK62_SOURCE_DIMENSION");
+require62(size(squareBasis62)==32 && nrows(square62)==32 && ncols(square62)==32 && nrows(inverse62)==32 && ncols(inverse62)==32,"CHECK62_OPERATOR_DIMENSIONS");
+require62(square62*inverse62==unitmat(32) && inverse62*square62==unitmat(32),"CHECK62_BOTH_INVERSE_PRODUCTS");
+poly rebuilt62;
+for(j62=1;j62<=32;j62++){
+ require62(squareBasis62[j62]==l^((j62-1)%16)*v^((j62-1) div 16),"CHECK62_ALL_BASIS_BINDINGS");
+ rebuilt62=0;
+ for(i62=1;i62<=32;i62++){
+  require62(square62[i62,j62]==leadcoef(square62[i62,j62]) && inverse62[i62,j62]==leadcoef(inverse62[i62,j62]),"CHECK62_ALL_COEFFICIENT_ENTRIES");
+  rebuilt62=rebuilt62+square62[i62,j62]*squareBasis62[i62];
+ }
+ require62(reduce(rebuilt62+squareBasis62[j62]^2,GB62)==0,"CHECK62_SQUARED_COLUMN_SOURCE_BINDING");
+}
+require62(size(inputs62)==435 && size(evenParts62)==435 && size(oddParts62)==435,"CHECK62_ALL435_SLOTS_PRESERVED");
+require62(size(cubicValues61)==324 && size(completeValues61)==76,"CHECK62_COMPLETE_SOURCE_COHORT");
+list expected62;
+for(i62=1;i62<=32;i62++){expected62[i62]=squareBasis62[i62];}
+expected62[33]=poly(1);expected62[34]=poly(u);expected62[35]=poly(u^2);
+for(i62=1;i62<=324;i62++){expected62[35+i62]=cubicValues61[i62];}
+for(i62=1;i62<=76;i62++){expected62[359+i62]=completeValues61[i62];}
+int zeroOdd62=0;
+for(i62=1;i62<=435;i62++){
+ require62(reduce(inputs62[i62]+expected62[i62],GB62)==0,"CHECK62_EVERY_INPUT_REBOUND_TO_ACTUAL_SOURCE");
+ require62(reduce(evenParts62[i62]^2+u*oddParts62[i62]^2+expected62[i62],GB62)==0,"CHECK62_EVERY_WHOLE_SOURCE_IDENTITY");
+ if(oddParts62[i62]==0){zeroOdd62=zeroOdd62+1;}
+}
+require62(evenParts62[33]==1 && oddParts62[33]==0 && evenParts62[34]==0 && oddParts62[34]==1 && evenParts62[35]==u && oddParts62[35]==0,"CHECK62_THREE_EXACT_CONTROLS");
+require62(reduce((evenParts62[34]+1)^2+u*oddParts62[34]^2+expected62[34],GB62)!=0,"CHECK62_CHANGED_ROOT_REJECTED");
+matrix changed62=square62;changed62[1,1]=changed62[1,1]+1;
+require62(changed62*inverse62!=unitmat(32),"CHECK62_CHANGED_MATRIX_REJECTED");
+print("CHECK62_RESULT source_bindings=435 whole_source_identities=435 cached_square_columns=32 inverse_products=2 zero_odd="+string(zeroOdd62)+" exact_controls=3 changed_root_rejected=1 changed_matrix_rejected=1");
+print("CHECK62_ALL_CHECKS_PASS");quit;

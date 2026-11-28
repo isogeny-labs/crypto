@@ -1392,6 +1392,17 @@
       "targets": "stride-generator"
      },
      "note": "two-seed target walk (tw=2) with chained jumps (cj=1) and lazy certification (lazy=1), x = 3.0, 16 jumps; every collision a row over (s1, s2, log Q), stop at rank 3, no probe phase (probes only on cap fallback). Owner ruling 2026-11-10: counts as index calculus for the ratchet. SNC panel PCC-20261110-978c29; seed=run"
+    },
+    {
+     "id": "tw2l-x20-j16-sib8",
+     "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run,sib=8,pool=64",
+     "default_f": 0.0001,
+     "n_min": 2,
+     "n_max": 2,
+     "params": {
+      "targets": "stride-generator"
+     },
+     "note": "tw2l-x20-j16 with sibling points: per parent a random 8-subset of a 64-jump product-set pool, 16 x-only children P +- J sharing one inversion (ideas/SIBLING-POINTS-20261110.md, siblings/STAGE0.md, siblings/SMOKE.md). Sibling-points panel PCC-20261121-abc3ad; ratchet read in bitop/v1 per the owner ruling of 2026-11-21."
     }
    ]
   },
@@ -1422,6 +1433,39 @@
      "oracle": "pkm-semaev:m=2,mode=full,guess=2",
      "default_f": 0.19,
      "note": "guess split 2"
+    }
+   ]
+  },
+  "c1-boundary": {
+   "factor_base": "prime-projected-abscissa:size={n},scan_cap={scan}",
+   "scan_factor": 32,
+   "n_grid": [
+    1.0
+   ],
+   "n_min": 1,
+   "n_max": 1,
+   "families": [
+    {
+     "id": "c1-lazy",
+     "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run",
+     "default_f": 0.0001,
+     "n_min": 1,
+     "n_max": 1,
+     "params": {
+      "targets": "stride-generator"
+     },
+     "note": "C = 1 boundary track: one seed plus the target, lazy certification (c1/README.md, PCC-20261107-301dd8). Whether a C = 1 walk counts as index calculus has not been ruled; rows here are boundary rows, never generic incumbents."
+    },
+    {
+     "id": "c1-lazy-sib8",
+     "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,lazy=1,seed=run,sib=8,pool=64",
+     "default_f": 0.0001,
+     "n_min": 1,
+     "n_max": 1,
+     "params": {
+      "targets": "stride-generator"
+     },
+     "note": "c1-lazy with sibling points (sib=8,pool=64). Sibling-points panel PCC-20261121-abc3ad: 0.88 to 0.91 of rho-neg in bitop/v1 per sqrt(r) at k = 24, 28, 32 and 1.04 at k = 20; boundary row only."
     }
    ]
   }

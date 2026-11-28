@@ -1,0 +1,624 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "CUBIC-NATIVE-COLD-20261105",
+  "version": 1,
+  "created": "2026-11-05",
+  "repository": "crypto",
+  "study_dir": "research/cubic_extension_transfer_20261025/native_end_to_end/measure",
+  "authors": [
+    "Native cubic benchmark continuation"
+  ],
+  "links": {
+    "launch_plan": "../benchmark_20261105/launch-plan.json",
+    "requirements": "../REQUIREMENTS.md",
+    "implementation": "../NATIVE_MAP.md",
+    "note": "Draft only. Analysis implementation, reference audit, qualified pilot estimates, immutable image, checkpoint admission, pricing and independent replay remain prerequisites. Earlier correctness pilots are disclosed; no new benchmark timing has been collected."
+  },
+  "question": "For the p109 and p157 public cubic-extension fixtures, what are the complete cold costs of the actual native transfer implementations and the named direct source-rho controls, under observed L2 and matched A/A?",
+  "claims": [
+    {
+      "id": "correctness",
+      "text": "Each accepted run must recover a scalar checked on its original source curve and against its separately held known-answer receipt.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "cold-comparison",
+      "text": "Compare the concrete full-transfer IC and target-rho implementations to the matched direct source-rho-neg implementation on each fixture, conditional on complete admission.",
+      "class": "comparative",
+      "decided_by": [
+        "C-ic",
+        "C-target-rho"
+      ]
+    },
+    {
+      "id": "scope",
+      "text": "Universal transfer coverage, asymptotic complexity, scaling from two fields, strongest-ever implementation and an overall ECDLP security conclusion are outside this experiment.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [],
+  "arms": [
+    {
+      "id": "source-rho",
+      "role": "baseline",
+      "description": "Direct native cubic source rho.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/cubic_extension_transfer_20261025/native_end_to_end/measure/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "runner": "cubic-native-measure",
+          "cpus": "inherit",
+          "diagnostic": "absent: strict mode",
+          "public_inputs": "Explicit hashes for public fixture, kernel data and applicable native libraries; check again after each execution."
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "pipeline": "source-rho",
+        "payload": "source_public",
+        "target_solver": null,
+        "payload_binary_sha256": null,
+        "library_sha256": null
+      },
+      "same_instrument_as": "source-rho-neg"
+    },
+    {
+      "id": "source-rho-neg",
+      "role": "reference",
+      "description": "Direct native cubic source rho with negation; named reference, strongest-applicable audit still pending.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/cubic_extension_transfer_20261025/native_end_to_end/measure/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "runner": "cubic-native-measure",
+          "cpus": "inherit",
+          "diagnostic": "absent: strict mode",
+          "public_inputs": "Explicit hashes for public fixture, kernel data and applicable native libraries; check again after each execution."
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "pipeline": "source-rho-neg",
+        "payload": "source_public",
+        "target_solver": null,
+        "payload_binary_sha256": null,
+        "library_sha256": null
+      }
+    },
+    {
+      "id": "source-rho-neg-aa",
+      "role": "control_aa",
+      "description": "Identical source-rho-neg command and algorithm seed under a second label.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/cubic_extension_transfer_20261025/native_end_to_end/measure/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "runner": "cubic-native-measure",
+          "cpus": "inherit",
+          "diagnostic": "absent: strict mode",
+          "public_inputs": "Explicit hashes for public fixture, kernel data and applicable native libraries; check again after each execution."
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "pipeline": "source-rho-neg",
+        "payload": "source_public",
+        "target_solver": null,
+        "payload_binary_sha256": null,
+        "library_sha256": null
+      },
+      "same_instrument_as": "source-rho-neg"
+    },
+    {
+      "id": "full-transfer-ic",
+      "role": "candidate",
+      "description": "Actual source-to-Jacobian transfer, IC, recovery and original-source check.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/cubic_extension_transfer_20261025/native_end_to_end/measure/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "runner": "cubic-native-measure",
+          "cpus": "inherit",
+          "diagnostic": "absent: strict mode",
+          "public_inputs": "Explicit hashes for public fixture, kernel data and applicable native libraries; check again after each execution."
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "pipeline": "full-transfer-ic",
+        "payload": "transfer_test",
+        "target_solver": "ic",
+        "payload_binary_sha256": null,
+        "library_sha256": null
+      },
+      "same_instrument_as": "source-rho-neg"
+    },
+    {
+      "id": "full-transfer-target-rho",
+      "role": "baseline",
+      "description": "Identical full transfer, with target rho instead of IC.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/cubic_extension_transfer_20261025/native_end_to_end/measure/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "runner": "cubic-native-measure",
+          "cpus": "inherit",
+          "diagnostic": "absent: strict mode",
+          "public_inputs": "Explicit hashes for public fixture, kernel data and applicable native libraries; check again after each execution."
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1",
+          "OPENBLAS_NUM_THREADS": "1",
+          "MKL_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "pipeline": "full-transfer-target-rho",
+        "payload": "transfer_test",
+        "target_solver": "rho",
+        "payload_binary_sha256": null,
+        "library_sha256": null
+      },
+      "same_instrument_as": "source-rho-neg"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Every target is independently generated with a withheld known scalar; each completed solve must pass original-source multiplication and a separate source_public verification, and match the held receipt. A wrong answer invalidates comparison."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "This measures costs of named implementations on public known-answer instances. No prevalence or null-population detection claim is made."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "pipeline_implementation",
+        "levels": [
+          "source-rho",
+          "source-rho-neg",
+          "full-transfer-ic",
+          "full-transfer-target-rho"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_fixtures",
+        "treatment": "crossed",
+        "value": [
+          "p109",
+          "p157"
+        ],
+        "how": "Stratify all estimates and decisions by original source curve; never pool the two fields as a scaling series."
+      },
+      {
+        "name": "public_targets",
+        "treatment": "fixed",
+        "value": "8 targets per curve; generation seeds 500001109 and 500001157",
+        "how": "source_public generate uses its frozen native law, independently of arm. Hold scalar receipts outside solver APIs."
+      },
+      {
+        "name": "measurement_instrument",
+        "treatment": "fixed",
+        "value": "one source-bound runner, observation library and OCI image",
+        "how": "All arms use the same runner and resident collector; selected algorithm payload is part of the concrete implementation treatment, not an algorithm-only causal claim."
+      },
+      {
+        "name": "payload_builds",
+        "treatment": "fixed",
+        "value": "same source revision and frozen release build recipes",
+        "how": "Pin every payload/library hash; verify actual executed inode and public input hashes before/after. No claim separates language or compiler effects from the concrete implementation."
+      },
+      {
+        "name": "nuisance_seed",
+        "treatment": "crossed",
+        "value": [
+          2026110501,
+          2026110502,
+          2026110503,
+          2026110504,
+          2026110505
+        ],
+        "how": "One explicit seed per measured round, shared across its arms. A/A uses exactly the same rho-neg seed."
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "Within each target/round, sort arm labels by SHA256 of the frozen order-domain/seed/prime/target/warmup/arm tuple; independent of observed results."
+      },
+      {
+        "name": "threads_and_resources",
+        "treatment": "fixed",
+        "value": "one algorithm thread; one 4-CPU/8Gi L2 Spot Job",
+        "how": "Guaranteed placement; native reservation, actual affinity and thread observations; default grading thresholds only."
+      },
+      {
+        "name": "cold_state",
+        "treatment": "fixed",
+        "value": "fresh process and fresh transfer/factor-base state for every row",
+        "how": "Warmups never supply retained algebraic state to a measured process."
+      },
+      {
+        "name": "host_conditions",
+        "treatment": "measured",
+        "how": "Host class, PSI, steal, intruders, scheduler delay, switches, IRQs, NUMA pages, binary identities and all blockers retained per execution."
+      },
+      {
+        "name": "spot_interruption",
+        "treatment": "measured",
+        "how": "Preserve an interrupted row and its counts, invalidate its clock and stop; do not silently resume or retry a timed interval."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Freeze native analysis code and its hash before affected data; pending in this draft."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-ic",
+        "arms": [
+          "source-rho-neg",
+          "full-transfer-ic"
+        ],
+        "differs_in": [
+          "pipeline_implementation"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-target-rho",
+        "arms": [
+          "source-rho-neg",
+          "full-transfer-target-rho"
+        ],
+        "differs_in": [
+          "pipeline_implementation"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "source-rho-neg",
+          "source-rho-neg-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": true
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        2026110500,
+        2026110501,
+        2026110502,
+        2026110503,
+        2026110504,
+        2026110505
+      ],
+      "nonce": null,
+      "note": "Warmup uses 2026110500. Measured round j uses 2026110500+j. Order keys are SHA256(UTF8('cubic-cold-order-v1|'+seed+'|'+prime+'|'+target_id+'|'+warmup_bit+'|'+arm_id)), sorted by hex digest then arm id. A/A shares the underlying rho-neg seed."
+    },
+    "instance_sampling": {
+      "rule": "Eight distinct nontrivial native source_public targets per curve, with seeds 500001109/500001157; retain the exact generator version and generated public input hashes.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Named implementation diagnostics; unblinded analysis and its limitations are declared before data.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 16,
+    "replicates": 5,
+    "warmups": 1,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 4,
+      "correction": "bonferroni",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": false,
+      "note": "Eight target clusters per field, all five repeated nuisance rounds within each cluster. A descriptive bounded panel; power for small effects is not established. Do not treat 40 repeats as 40 independent targets. Two candidate/reference comparisons in two strata form a four-comparison family."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "cold_process_ns",
+        "name": "Complete cold process wall interval",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "Parent interval immediately before spawning through wait4 reap: native runtime/load, public input parsing, all cold construction/calibration/failures/retries/inversion, target solving, recovery, in-process source verification and process exit. Target generation, harness preflight/hash work and separate audit verification are recorded outside this interval.",
+        "source": "record.json timing.process_wall_ns",
+        "aggregation": "paired_ratio",
+        "resolution": "1 ns recorded; actual monotonic clock resolution and A/A spread must be observed",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "algorithm_ns",
+        "name": "Resident native algorithm interval",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "Resident hook inside main before argument/input parsing to scope exit. Includes native setup/retries/verification, excludes runtime loader and collector publication; not an online-only interval.",
+        "source": "record.json child.algorithm_wall_ns",
+        "aggregation": "median",
+        "resolution": "1 ns recorded",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "max_rss",
+        "name": "Maximum child RSS",
+        "unit": "KiB",
+        "kind": "counted",
+        "definition": "Linux wait4 ru_maxrss of the child process; not cumulative allocation traffic.",
+        "source": "record.json timing.max_rss_kib",
+        "aggregation": "max",
+        "resolution": "1 KiB",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "randomized",
+    "clock": "monotonic",
+    "counters": [
+      "wait4 user/sys time and RSS",
+      "resident switches/faults/thread count",
+      "full checked PMU lifecycle, including unsupported/denied outcomes; no invented complete coverage"
+    ],
+    "record": [
+      "CPU/NUMA topology and environment class",
+      "native payload/library/input hashes before and after",
+      "per-execution grading version and blockers",
+      "affinity and actual child CPU",
+      "memory policy and anonymous page placement",
+      "host PSI/steal/intruders/IRQs/scheduler counters",
+      "all statuses, outputs, failures, chart retries and independent verification",
+      "original Job/Pod/request/image identities"
+    ],
+    "timed_primary_justification": "The user explicitly requested complete cold pipeline elapsed cost; current field and target-call counters do not price the entire FLINT/Singular/native path. Use observed L2 and matched A/A for clocks, preserve unknown complete GAE/PMU coverage and admit no S or security claim from these timers. Complete pricing/replay requirements still gate any performance promotion."
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-l2-spot",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "cpus": 4,
+      "memory": "8Gi",
+      "spot": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 21600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Fixed panel: 2 curves x 8 targets x 5 arms x 5 measured rounds = 400 executions, plus 80 fresh-process warmups.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stop at the original 21600-second global deadline, USD5 inclusive attempt ceiling, exhausted/unknown live shared budget, interruption, or a wrong source answer; retain every attempted and unattempted row. No automatic measurement retry.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any wrong answer, missing source check, failed A/A, missing/failed L2 or incomplete frozen instrument/analysis admission prevents a decisive comparison; do not cherry-pick surviving rows.",
+    "Timeouts and failures are reported as censored/incomplete outcomes, never replaced by the timeout bound as an exact solve cost.",
+    "Unpriced native work and partial target counters cannot become a complete GAE/S value. No comparative promotion before applicable pricing, matched-reference and independent replay requirements are met."
+  ],
+  "decision_rule": {
+    "text": "Draft decision plan: per curve, compare paired cold-process costs over eight independent target clusters, retaining five nuisance rounds per cluster. Report 95% descriptive cluster-bootstrap intervals and preregistered Bonferroni-adjusted 98.75% decision intervals (four comparisons). A directional descriptive effect must exceed the matched A/A envelope as well as exclude ratio 1. Invalid/incomplete measurement or pricing admission yields invalid_measurement/inconclusive, never a winner. Freeze the actual native analysis and strongest-applicable reference review before collecting affected timing data.",
+    "comparison_ids": [
+      "C-ic",
+      "C-target-rho"
+    ],
+    "threshold": "All admission gates; adjusted ratio interval excludes 1 and effect lies outside matched A/A envelope.",
+    "statistic": "Per-field ratio of summed paired cold times, with target-cluster resampling; no cross-field pooling.",
+    "interval": "10000 deterministic target-cluster bootstrap resamples; implementation and seed must be frozen before data.",
+    "multiple_comparison_correction": "bonferroni",
+    "effect_size_measure": "Cold process cost ratio and paired difference per field",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "within_control_distribution",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": null,
+    "inputs": [
+      "per-execution native record.json and raw outputs",
+      "withheld known-answer receipts and separate source verification",
+      "frozen job/image/protocol/source manifests"
+    ],
+    "outputs": [
+      "experiment.export/v1 and complete flow counts",
+      "per-field source/transfer cost table with A/A and uncertainty",
+      "all failed/censored rows and admission blockers"
+    ],
+    "blinded": false,
+    "frozen_before_data": false
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-field paired cold process costs with A/A interval"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Launching with unknown live budget/capacity or missing authorization.",
+    "Substituting synthetic Jacobian targets or the deployed validation fixture for the real native transfer.",
+    "Calling command-Job completion or an L2 placement label observed L2 admission.",
+    "Replacing complete cold cost with target-only/amortized/online-only cost.",
+    "Treating partial counters or non-admitted PMU records as complete native GAE/instruction pricing.",
+    "Selecting new targets/seeds/attempts or weakening grading after observing results.",
+    "Scaling, universal coverage, fastest-known or security conclusions from these two fields."
+  ],
+  "literature": [
+    {
+      "ref": "Tian, Cover attacks for elliptic curves with prime order, arXiv:2012.07173, Algorithms 1-2 and sections 3.1-3.2",
+      "provenance": "retrieved",
+      "claim": "Established cubic cover and divisor transfer requirements; no novelty claim.",
+      "verified_by": "Primary source reviewed earlier in this conversation."
+    },
+    {
+      "ref": "crypto:research/cubic_extension_transfer_20261025/native_end_to_end/{NATIVE_MAP,REQUIREMENTS}.md",
+      "provenance": "internal",
+      "claim": "Actual native transfer, prior correctness pilots, cold accounting and remaining qualification requirements.",
+      "verified_by": "Read in the continuation."
+    },
+    {
+      "ref": "crypto:src/cryptanalysis/ecbench/{isolation,measurement,record,host,signals}.rs",
+      "provenance": "internal",
+      "claim": "Shared frozen grading rules and actual process observations; new runner reuses them.",
+      "verified_by": "Source inspection and development tests; producer observations remain unverified."
+    },
+    {
+      "ref": "crypto-autoresearcher:.claude/skills/experiment-protocol/SKILL.md",
+      "provenance": "internal",
+      "claim": "Canonical preregistration, controls, power, export and freeze requirements.",
+      "verified_by": "Read through the connected repository; KB fallback unavailable."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}

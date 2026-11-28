@@ -1,0 +1,20 @@
+--- a/src/neogb/la_ff_32.c
++++ b/src/neogb/la_ff_32.c
+@@ -363,6 +363,8 @@
+         dts   = pivs[i];
+         printf("found reducer %d\n", i);
+         if (i < ncl) {
++            fprintf(stderr, "AUDIT_LOOKUP pivot=%u ncl=%u index=%u live_basis=%u\n",
++                    i, ncl, dts[COEFFS], bs->ld);
+             cfs   = bs->cf_32[dts[COEFFS]];
+             /* set corresponding bit of reducer in reducer bit array */
+             if (tr > 0) {
+@@ -2618,6 +2620,8 @@
+     }
+     j = nrl;
+     for (i = 0; i < mat->nru; ++i) {
++        fprintf(stderr, "AUDIT_REMAP row=%u old=%u new=%u live_basis=%u final=%d\n",
++                i, mat->rr[i][COEFFS], j, bs->ld, st->in_final_reduction_step);
+         mat->cf_32[j]      = bs->cf_32[mat->rr[i][COEFFS]];
+         mat->rr[i][COEFFS] = j;
+         ++j;

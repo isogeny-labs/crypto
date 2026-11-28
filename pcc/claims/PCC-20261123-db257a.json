@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T06:54:12Z",
+ "id": "PCC-20261123-db257a",
+ "kind": "statement",
+ "producer": {
+  "commit": "bb3f756f6e6ad768519d79e3e07322bbed8ba570",
+  "model": "gpt-6-astra-pro",
+  "session": "keyai-rank-derivative-integration-20261122"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/keyai_rank_derivative_20261122/evidence/root-library-baseline.json",
+    "sha256": "10fc630573f7e9af7d896f56e65e36b28f9d6506aab8bc38746a7a4b8a2eeb5a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/keyai_rank_derivative_20261122/evidence/root-library.post-call.txt",
+    "sha256": "fcc19316956acbab5be23f251768fdc61ef17ce5e909cfe9b43a7702fbd56d5b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/keyai_rank_derivative_20261122/evidence/root-library.stderr.log",
+    "sha256": "f4ffa8a2224a1598ca696aeb3ec0aeefeccd2367067c6fa65ae74b4db1d0b844"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/keyai_rank_derivative_20261122/evidence/root-baseline-parser.stderr.log",
+    "sha256": "8b53eca0a8712138288a101a3273bd8db48b4344c5199e4152b4d7c4524cea40"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "KeyAI integration PR #4980; native development gate, separate from the 15 focused correctness tests; source bytes and parser diagnostics attached",
+ "statement": "The full root-library command cargo test --locked --release --lib exited 101 before running tests, with delimiter parse errors in src/cryptanalysis/binary_hyperelliptic_index_calculus.rs. That untouched file is byte-equal to base commit 816f9c3a942efed569049618c056d12a0c56d693 and has Git blob f001a1b641abd48bb0130c1a9a246e37c28bcc3a; rustfmt also rejects an exact copy from that base commit. Frozen integration source hashes were unchanged. This is an inherited baseline blocker and is not a full-library test pass."
+}

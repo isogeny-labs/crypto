@@ -27,7 +27,7 @@
 //! sees exact decompositions as it does from the blind oracles.
 
 use crate::cryptanalysis::pq_groebner_f2::mask_low64;
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{BTreeMap, HashSet};
 use std::time::Duration;
 
 use super::plugins::{charge_lift, charge_system_build, lift_probes, SolverHarness};
@@ -36,8 +36,8 @@ use super::stages::{
     SystemShape, SystemSolver,
 };
 use crate::cryptanalysis::ic_boundary::{
-    lift_abscissae, BinaryGroup, BinaryInstance, CountedGroup, FactorBase, FrobeniusPairTable,
-    GroupOps, OracleCounters, PairTable,
+    fast_map, lift_abscissae, BinaryGroup, BinaryInstance, CountedGroup, FactorBase, FastMap,
+    FrobeniusPairTable, GroupOps, OracleCounters, PairTable,
 };
 use crate::cryptanalysis::koblitz_fast::{FastPoint, FrobeniusCanon};
 use crate::cryptanalysis::pq_descent_symbolic::{
@@ -337,7 +337,7 @@ fn fiber_counts<E>(fiber: Option<&CofactorFiber<E>>, build: FiberBuild) -> BTree
 /// fiber: keyed like [`PairTable`] (the group key without its sign bit),
 /// so one probe answers "is `±T` a pair sum up to the fiber".
 pub struct FiberPairTable {
-    map: HashMap<u64, (u32, u32, u16)>,
+    map: FastMap<(u32, u32, u16)>,
     pub kind: &'static str,
     pub entries: u64,
     pub build_ops: GroupOps,
@@ -353,7 +353,7 @@ impl FiberPairTable {
         negation_folded: bool,
     ) -> Self {
         let mut ops = GroupOps::default();
-        let mut map: HashMap<u64, (u32, u32, u16)> = HashMap::new();
+        let mut map: FastMap<(u32, u32, u16)> = fast_map(0);
         let mut attempts = 0u64;
         let mut insert = |i: usize, j: usize, ops: &mut GroupOps| {
             let s = g.add(ops, fb.points[i], fb.points[j]);
@@ -608,7 +608,7 @@ const FROB_INDEX_BITS: u32 = 26;
 /// the plain table carries over), which holds on every Koblitz instance
 /// and is checked in `build`.
 pub struct FiberFrobeniusPairTable {
-    map: HashMap<u64, (u32, u32, u16)>,
+    map: FastMap<(u32, u32, u16)>,
     canon: FrobeniusCanon,
     member_of: Vec<u32>,
     n: u32,
@@ -660,7 +660,7 @@ impl FiberFrobeniusPairTable {
         let mut ops = GroupOps::default();
         let mut canons = 0u64;
         let mut attempts = 0u64;
-        let mut map: HashMap<u64, (u32, u32, u16)> = HashMap::new();
+        let mut map: FastMap<(u32, u32, u16)> = fast_map(0);
         for (col, &rep) in rep_of_col.iter().enumerate() {
             if rep == usize::MAX {
                 continue;

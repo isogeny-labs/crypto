@@ -1,0 +1,61 @@
+[package]
+name = "shared-s3-integration-qualifier"
+version = "0.1.0"
+edition = "2021"
+publish = false
+build = "build.rs"
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
+
+# This package compiles a declared production-source closure. It does not
+# depend on, or claim to verify, the entire root library.
+[workspace]
+
+[lib]
+name = "crypto_lib"
+path = "src/lib.rs"
+test = false
+doctest = false
+
+[[bin]]
+name = "shared-s3-matrix"
+path = "../../../examples/shared_s3_matrix.rs"
+test = true
+bench = false
+
+[[bin]]
+name = "shared-s3-integration-source-manifest"
+path = "src/source_manifest.rs"
+test = false
+bench = false
+
+[features]
+default = []
+wide-vars = []
+
+[dependencies]
+certified-relations = { path = "../../../crates/certified-relations" }
+relation-replay-checker = { path = "../../../crates/relation-replay-checker" }
+num-bigint = { version = "0.4", features = ["rand"] }
+num-traits = "0.2"
+rand = { version = "0.8", features = ["small_rng"] }
+rayon = "1.10"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["arbitrary_precision", "raw_value"] }
+
+[build-dependencies]
+serde_json = { version = "1.0", features = ["arbitrary_precision", "raw_value"] }
+sha2 = "0.10"
+
+# This is a correctness qualifier, not an experiment profile. Restricting
+# optimization of the source closure reduces the compiler's memory demand;
+# its duration and counters are not comparative performance evidence.
+[profile.release]
+debug = 0
+lto = false
+
+[profile.release.package.shared-s3-integration-qualifier]
+opt-level = 0
+codegen-units = 256

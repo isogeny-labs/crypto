@@ -1,0 +1,60 @@
+{
+  "schema": "h116.pointwise-frobenius-charpoly-protocol/v1",
+  "protocol_id": "H116-POINTWISE-CHARPOLY-001",
+  "status": "frozen-before-execution",
+  "question": "On every point over selected small algebraic extensions, does coordinate Frobenius satisfy pi^2-[t]pi+[p]=0, and does the constructed pointwise V=[p]pi^-1 equal [t]-pi?",
+  "trace_definition": "t=p+1-#E(F_p), with the base-field count recomputed by exhaustive enumeration",
+  "cells": [
+    {"slug":"fp5-a2-b1-d2","p":5,"a":2,"b":1,"degree":2},
+    {"slug":"fp5-a2-b1-d3","p":5,"a":2,"b":1,"degree":3},
+    {"slug":"fp5-a2-b1-d4","p":5,"a":2,"b":1,"degree":4},
+    {"slug":"fp7-a1-b1-d2","p":7,"a":1,"b":1,"degree":2},
+    {"slug":"fp7-a1-b1-d3","p":7,"a":1,"b":1,"degree":3},
+    {"slug":"fp7-a1-b1-d4","p":7,"a":1,"b":1,"degree":4},
+    {"slug":"fp11-a1-b1-d2","p":11,"a":1,"b":1,"degree":2},
+    {"slug":"fp11-a1-b1-d3","p":11,"a":1,"b":1,"degree":3}
+  ],
+  "field_construction": {
+    "representation": "GF(p)[u] modulo the lexicographically first monic irreducible polynomial of the frozen degree",
+    "irreducibility_check": "deterministic Rabin criterion",
+    "maximum_field_size": 2401
+  },
+  "producer": {
+    "path": "h116_pointwise_charpoly.rs",
+    "build": "rustc --edition=2021 -O -D warnings",
+    "source_hash": "to be sealed by POINTWISE_CHARPOLY_SOURCE_GATE.md before execution"
+  },
+  "independent_verifier": {
+    "path": "h116_pointwise_charpoly_verify.py",
+    "method": "separate Python polynomial-basis field and affine group implementation; exhaustive replay from the result cell definitions",
+    "source_hash": "to be sealed by POINTWISE_CHARPOLY_SOURCE_GATE.md before execution"
+  },
+  "positive_checks": [
+    "curve discriminant is nonzero in F_p",
+    "selected modulus passes deterministic irreducibility checking",
+    "enumerated extension point count equals the trace recurrence N_d=p^d+1-s_d with s_0=2, s_1=t, s_d=t*s_(d-1)-p*s_(d-2)",
+    "pi^d is the identity on every enumerated extension point",
+    "pi^2(P)-[t]pi(P)+[p]P is infinity for every enumerated extension point",
+    "[p]pi^-1(P) equals [t]P-pi(P) for every enumerated extension point"
+  ],
+  "negative_controls": [
+    "replace t by t+1 in the characteristic equation; at least one enumerated point must reject",
+    "replace [p] by [p+1] in the pointwise V definition; at least one enumerated point must reject the equality with [t]-pi",
+    "replace pi^-1 by the identity in V; at least one degree-greater-than-one cell must reject"
+  ],
+  "measurements": [
+    "base-field and extension-field point counts",
+    "points checked",
+    "positive failures",
+    "rejection count for each mutation",
+    "exact producer operation counters by cell",
+    "producer and independent-verifier elapsed nanoseconds, reported as diagnostics only"
+  ],
+  "acceptance": {
+    "primary": "all positive checks pass in all eight frozen cells",
+    "controls": "every frozen negative control rejects in every applicable cell",
+    "failure_policy": "retain every row; do not replace a curve, extension degree, modulus-selection rule, or control after execution"
+  },
+  "claim_boundary": "Finite exhaustive evidence for the pointwise characteristic and Verschiebung identities. It is not a generic proof, a rational/scheme-map identification, an ECDLP decoder, or a runtime improvement.",
+  "filed_before_affected_data": true
+}

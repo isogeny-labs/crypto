@@ -1,0 +1,43 @@
+{
+  "schema": "native-cpu-preflight-plan/v1",
+  "created_utc": "2026-11-23T13:29:36.573Z",
+  "source_base_commit": "310d7fb0d908e9ca32c7d9282e31810b700d52cd",
+  "main_panel_started": false,
+  "phase": "Preflight/dry analysis only, before main protocol freeze; raw results are not pooled",
+  "planned_cells": 36,
+  "distinct_targets": 12,
+  "arms": {
+    "a": "staged-numerator parent",
+    "b": "current reverse-pass numerator candidate",
+    "c": "same parent binary A/A"
+  },
+  "native_worker_arm": "u",
+  "rounds": 1,
+  "all_rows_classified_warmup": true,
+  "measured_repetitions": 0,
+  "driver": "/tmp/ecdlp-cpu-comparison-20261123/qualified/driver-03-cpu-scratch-panel",
+  "auditor": "/tmp/ecdlp-cpu-comparison-20261123/qualified/driver-02-point-audit",
+  "checker": "/tmp/ecdlp-cpu-comparison-20261123/qualified/openssl-point-check",
+  "checks": "Full Native external replay, unchanged worker scalar-corruption assertion, all certificate/counter equality;36 OpenSSL positives/72 negatives planned",
+  "limits": {
+    "whole_phase_seconds": 300,
+    "worker_seconds": 120,
+    "external_replay_seconds": 60,
+    "worker_virtual_bytes": 4294967296,
+    "whole_cgroup_guard_bytes": 15032385536,
+    "worker_cpu": 4,
+    "attempts": 1,
+    "retries": 0
+  },
+  "main_prospective_design": {
+    "calls": 360,
+    "warmups": 36,
+    "measured": 324,
+    "rounds": 10,
+    "replicates_per_arm_target": 9,
+    "deadline_ceiling_seconds": 1800,
+    "runtime_feasibility_gate": "Preflight runtime estimate plus25percent margin must fit ceiling; otherwise record infeasibility and preserve original360-cell requirement for a later admitted continuation, no silent sample reduction"
+  },
+  "S3_used": false,
+  "external_spend": 0
+}

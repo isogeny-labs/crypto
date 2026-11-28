@@ -1,0 +1,21 @@
+{
+  "schema": "h4-n23-sage-rho-reference-v1",
+  "question": "How does installed Sage's 20-partition Pollard rho perform on the exact public point from the complete H4 n23 run, with five frozen fresh walk seeds and independent scalar replay?",
+  "candidate": "research/exotic_ecdlp_20261021/H4_prime_descent/full_pipeline_20261120/candidate.json",
+  "candidate_sha256": "9d15ec3b624d76d193fcaec362868fccd21897d55cd3cb3c253fe75635a4e48c",
+  "workload": "research/exotic_ecdlp_20261021/H4_prime_descent/full_pipeline_20261120/workload.json",
+  "workload_sha256": "2f71f03922d5b7525164cb86075c0fbe9a857e8cedbc0f2bc0c2d5e320de229b",
+  "original_result": "research/exotic_ecdlp_20261021/H4_prime_descent/full_pipeline_20261120/result.json",
+  "original_result_sha256": "e21e2a48468d60dfd23b0f5ce426b1d1b96c8467b44a9b4b24e5cb4d480b88d7",
+  "sage_function": "sage.groups.generic.discrete_log_rho",
+  "sage_function_source_sha256": "352617d5b92a42443a8d5e65bc86a4b32fe982858ea00ce3f413160cb40d7751",
+  "runner_sha256": "6881417e04c8c7cbaf8b11d961cf306b2c9f3ea2ed99fbd9fed3d235b3a78fd3",
+  "reference_method": "installed Sage's 20-partition r-adding Pollard rho, four stored distinguished states, up to ten internal restarts, additive group; deterministic coordinate hash; new Sage RNG seed for every call",
+  "walk_seeds": [92024, 92025, 92026, 92027, 92028],
+  "one_target": "same exact public point (62002,638929) and generator as the frozen H4 complete run; no cross-target table",
+  "per_run_cap_seconds": 30,
+  "statistics": ["status", "scalar", "wall_ns", "cpu_ns", "peak_rss_bytes", "target_point_sha256", "source_sha256"],
+  "host": "local macOS checked Sage; ordinary exploratory tier",
+  "claim_boundary": "same-target reference diagnostic on one reused point; no Tier 0/1 or five-distinct-target speedup claim",
+  "status": "frozen before execution"
+}

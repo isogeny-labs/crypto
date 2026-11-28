@@ -1,0 +1,71 @@
+digraph AttackBoundaries {
+  graph [rankdir=TB, newrank=true, bgcolor="white", pad="0.18",
+         nodesep="0.25", ranksep="0.38 equally",
+         fontname="DejaVu Sans",
+         label="Formal assumption-boundary map · PR #4597",
+         labelloc="t", fontsize=18];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=12.5,
+        margin="0.14,0.09", color="#52637e", fillcolor="#f7f9fc"];
+  edge [fontname="DejaVu Sans", fontsize=10.5, color="#52637e"];
+
+  zk_gap [label="1 · ZK omitted premise\nsimulation ⇒ soundness?",
+          fillcolor="#fff1b8", color="#9a6700"];
+  zk_cex [label="Always-accept model\nexact deterministic simulation\nbut unsound; no global witness",
+          fillcolor="#ffe4e1", color="#b42318"];
+  zk_pos [label="Sufficient premise\naccepted-pair witness assignment\n⇒ soundness",
+          fillcolor="#e7f6ec", color="#2f7d4a"];
+  {rank=same; zk_gap; zk_cex; zk_pos}
+  zk_gap -> zk_cex [color="#b42318"];
+  zk_gap -> zk_pos [color="#2f7d4a"];
+
+  sc_gap [label="2 · Schnorr omitted premise\nscalar map injective?",
+          fillcolor="#fff1b8", color="#9a6700"];
+  sc_cex [label="ZMod 6, multiplier 2\n3 ≠ 0 but 3·2 = 0·2",
+          fillcolor="#ffe4e1", color="#b42318"];
+  sc_pos [label="Sufficient coordinate premise\nprime modulus + nonzero factor\n⇒ injective by cancellation",
+          fillcolor="#e7f6ec", color="#2f7d4a"];
+  {rank=same; sc_gap; sc_cex; sc_pos}
+  sc_gap -> sc_cex [color="#b42318"];
+  sc_gap -> sc_pos [color="#2f7d4a"];
+
+  fs_gap [label="3 · Fiat–Shamir omitted premise\nraw concatenation canonical?",
+          fillcolor="#fff1b8", color="#9a6700"];
+  fs_cex [label="Distinct typed pairs\n[1]‖[2,3] = [1,2]‖[3]\nencoding alias; not hash collision",
+          fillcolor="#ffe4e1", color="#b42318"];
+  fs_pos [label="Sufficient codec structure\ndomain + tags + lengths + full use\nleft inverse ⇒ injective",
+          fillcolor="#e7f6ec", color="#2f7d4a"];
+  {rank=same; fs_gap; fs_cex; fs_pos}
+  fs_gap -> fs_cex [color="#b42318"];
+  fs_gap -> fs_pos [color="#2f7d4a"];
+
+  kz_gap [label="4 · KZG omitted premise\ntrapdoor remains hidden?",
+          fillcolor="#fff1b8", color="#9a6700"];
+  kz_cex [label="Known τ and z ≠ τ\nq=(c−y)/(τ−z)\naccepts chosen y in surrogate",
+          fillcolor="#ffe4e1", color="#b42318"];
+  kz_pos [label="Exceptional case / boundary\nat z=τ: acceptance ⇔ c=y\nproof term is irrelevant",
+          fillcolor="#e7f6ec", color="#2f7d4a"];
+  {rank=same; kz_gap; kz_cex; kz_pos}
+  kz_gap -> kz_cex [color="#b42318"];
+  kz_gap -> kz_pos [color="#2f7d4a"];
+
+  st_gap [label="5 · Survival omitted premise\nS(n)→0 ⇒ bounded tail?",
+          fillcolor="#fff1b8", color="#9a6700"];
+  st_cex [label="Harmonic survival\nS(n)=1/(n+1)→0\nbut partial sums→∞",
+          fillcolor="#ffe4e1", color="#b42318"];
+  st_pos [label="Sufficient premise\n0<δ≤1 and lower stopping hazard\n⇒ Σ[n<N]S(n) ≤ 1/δ",
+          fillcolor="#e7f6ec", color="#2f7d4a"];
+  {rank=same; st_gap; st_cex; st_pos}
+  st_gap -> st_cex [color="#b42318"];
+  st_gap -> st_pos [color="#2f7d4a"];
+
+  boundary [shape=note, fontsize=11.5,
+            label="Boundary: no concrete exploit, ROM reduction, hidden-trapdoor KZG break,\nor adaptive xedni correspondence follows from these scoped implications.",
+            fillcolor="#e8eef8", color="#52637e"];
+
+  // These edges align the three columns and stack the five comparison rows.
+  edge [style=invis, weight=100];
+  zk_gap -> sc_gap -> fs_gap -> kz_gap -> st_gap;
+  zk_cex -> sc_cex -> fs_cex -> kz_cex -> st_cex;
+  zk_pos -> sc_pos -> fs_pos -> kz_pos -> st_pos;
+  st_pos -> boundary;
+}

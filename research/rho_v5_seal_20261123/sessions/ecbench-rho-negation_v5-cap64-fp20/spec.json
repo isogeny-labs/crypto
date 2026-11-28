@@ -1,0 +1,91 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "rho-parity: rho.negation_v5 k<=64 vs rho fp20",
+  "description": "After pow2+cap64: rho.negation_v5 vs rho.negation multi-curve fp20. ABBA; [d]G=Q.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 10007
+      },
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 31415
+      },
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 27182
+      },
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 16180
+      },
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 42069
+      },
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 77777
+      },
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 99991
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 727
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    },
+    {
+      "name": "cand",
+      "role": "candidate",
+      "method": {
+        "id": "rho.negation_v5",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 4,
+    "warmup": 0,
+    "order": "alternate_measured",
+    "seed": 181,
+    "isolation_required": "L0",
+    "timeout_seconds": 7200
+  }
+}

@@ -1,0 +1,5 @@
+# R121: third F4 translation of y0 repeated edges
+
+Claim class: exact computation. Bind R120 result by SHA-256. On y0/e1 and y0/e3, follow their repeated positive eight-root edges with slopes -2 and -1. Determine the F4 leading correction `gamma` from the recorded leading constant and substitute `W=s^m(gamma+U)`. Divide by `s^(8m)` and recombine all five coefficient supports, carrying the minimum source cutoff. Report exact orders only below bounds; report a hull only if all rows resolve. Controls are Frobenius conjugacy, byte replay, changed-source rejection, independent F4 table arithmetic and finite Lean polygon checks if resolved. No timing, sampling, comparison or cloud cost. Commit this protocol and source before data.
+
+Prior work: R116–R120 local series and lifts. Sources: [Stacks Henselian lifting](https://stacks.math.columbia.edu/tag/04GE) and [Stoll's characteristic-p Newton polygon notes](https://www.mathe2.uni-bayreuth.de/stoll/teaching/pAdicAnalysis-WS2015/Skript-pAdicAnalysis-pub-print.pdf). Repeated edge roots require another translation; this calculation does not itself assert a global cover map.

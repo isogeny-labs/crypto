@@ -21,7 +21,7 @@
 //! 2-Sylow shape, 4-torsion, embedding degree bound, trace, `j`), so the
 //! report does not rest on recalled constants.  `family` generates the
 //! miniatures, checks every property, verifies the Montgomery summation
-//! polynomial `S₃` on random point triples, and writes an `ecbench.spec/v1`
+//! polynomial `S₃` on random point triples, and writes a diagnostic `ecbench.spec/v2`
 //! curve list in short Weierstrass form (`x_W = x_M + A/3`), the form
 //! `ecbench`'s `prime_explicit` workload takes.
 //!
@@ -410,103 +410,8 @@ fn build_miniature_at(k: u32, p: u64, a_cap: Option<u64>) -> Option<Miniature> {
     let mut a = 6u64; // A ≡ 2 (mod 4), A ≠ ±2
     loop {
         tried += 1;
-        let m = Mont { p, a };
-        // A² − 4 a non-square: one rational 2-torsion point, cyclic 2-Sylow.
-        if legendre(subm(mulm(a, a, p), 4, p), p) == -1 {
-            let (w, shift) = m.weier();
-            let n = w.order();
-            let nt = 2 * p + 2 - n;
-            if n % 8 == 0
-                && nt.is_multiple_of(4)
-                && is_prime_u64(n / 8)
-                && is_prime_u64(nt / 4)
-                && n / 8 > (1u64 << (k - 3))
-            {
-                // Cross-check the twist count independently.
-                assert_eq!(m.twist_weier().order(), nt, "twist order mismatch");
-                let r = n / 8;
-                // Smallest u ≥ 2 on E of order r.
-                let (u, g) = (2..p)
-                    .find_map(|u| {
-                        let y = sqrtm(m.rhs(u), p)?;
-                        let q = Pt {
-                            x: addm(u, shift, p),
-                            y: y.min(p - y),
-                            inf: false,
-                        };
-                        (w.mul(q, r).inf).then_some((u, q))
-                    })
-                    .unwrap();
-                assert!(w.on(g) && !g.inf && w.mul(g, r).inf);
-                let t0 = Pt {
-                    x: shift,
-                    y: 0,
-                    inf: false,
-                };
-                assert!(w.on(t0));
-                // A rational point of order 4 has Montgomery x = ±1.
-                let o4 = if legendre(addm(a, 2, p), p) == 1 {
-                    1
-                } else {
-                    p - 1
-                };
-                let trace = (p + 1) as i64 - n as i64;
-                let (d0, f) = cm_discriminant(trace, p);
-                // Embedding degree: smallest e with p^e ≡ 1 (mod r).
-                let mut e = 1u64;
-                let mut pe = p % r;
-                while pe != 1 && e < 1000 {
-                    pe = mulm(pe, p % r, r);
-                    e += 1;
-                }
-                // Summation polynomial checks on random triples P1 + P2 + P3 = O.
-                let mut s3_checks = 0;
-                let mut seed = 0x2551_9u64 ^ p;
-                for _ in 0..200 {
-                    seed = seed
-                        .wrapping_mul(6364136223846793005)
-                        .wrapping_add(1442695040888963407);
-                    let s1 = w.mul(g, (seed >> 11) % r);
-                    seed = seed
-                        .wrapping_mul(6364136223846793005)
-                        .wrapping_add(1442695040888963407);
-                    let s2 = w.mul(g, (seed >> 11) % r);
-                    let s3 = w.neg(w.add(s1, s2));
-                    if s1.inf || s2.inf || s3.inf {
-                        continue;
-                    }
-                    let mx = |q: Pt| subm(q.x, shift, p);
-                    assert_eq!(m.s3(mx(s1), mx(s2), mx(s3)), 0, "S3 must vanish");
-                    // And a perturbed abscissa must not (overwhelmingly).
-                    let bad = addm(mx(s3), 1, p);
-                    let other = w.add(s1, w.neg(s2));
-                    if !other.inf && mx(other) != bad {
-                        assert_ne!(m.s3(mx(s1), mx(s2), bad), 0);
-                    }
-                    s3_checks += 1;
-                }
-                return Some(Miniature {
-                    k,
-                    p,
-                    a_mont: a,
-                    order: n,
-                    r,
-                    twist_order: nt,
-                    r_twist: nt / 4,
-                    candidates_tried: tried,
-                    u_base: u,
-                    weier: w,
-                    shift,
-                    g,
-                    t0_weier: t0,
-                    order4_x_mont: o4,
-                    trace,
-                    cm_disc_fundamental: d0,
-                    cm_conductor: f,
-                    embedding_degree_gt: e,
-                    s3_checks,
-                });
-            }
+        if let Some(m) = miniature_for_a(k, p, a, tried, 1u64 << (k - 3)) {
+            return Some(m);
         }
         a += 4;
         match a_cap {
@@ -514,6 +419,159 @@ fn build_miniature_at(k: u32, p: u64, a_cap: Option<u64>) -> Option<Miniature> {
             _ => assert!(a < p, "no A found"),
         }
     }
+}
+
+/// The curve of the family at `(p, A)` if `A` passes the family's checks
+/// (`A² − 4` a non-square, `#E = 8 r` and `#E' = 4 r'` with `r`, `r'` prime,
+/// `r > r_above`), with every derived quantity of [`Miniature`].
+fn miniature_for_a(k: u32, p: u64, a: u64, tried: u64, r_above: u64) -> Option<Miniature> {
+    let m = Mont { p, a };
+    // A² − 4 a non-square: one rational 2-torsion point, cyclic 2-Sylow.
+    if legendre(subm(mulm(a, a, p), 4, p), p) == -1 {
+        let (w, shift) = m.weier();
+        let n = w.order();
+        let nt = 2 * p + 2 - n;
+        if n % 8 == 0
+            && nt.is_multiple_of(4)
+            && is_prime_u64(n / 8)
+            && is_prime_u64(nt / 4)
+            && n / 8 > r_above
+        {
+            // Cross-check the twist count independently.
+            assert_eq!(m.twist_weier().order(), nt, "twist order mismatch");
+            let r = n / 8;
+            // Smallest u ≥ 2 on E of order r.
+            let (u, g) = (2..p)
+                .find_map(|u| {
+                    let y = sqrtm(m.rhs(u), p)?;
+                    let q = Pt {
+                        x: addm(u, shift, p),
+                        y: y.min(p - y),
+                        inf: false,
+                    };
+                    (w.mul(q, r).inf).then_some((u, q))
+                })
+                .unwrap();
+            assert!(w.on(g) && !g.inf && w.mul(g, r).inf);
+            let t0 = Pt {
+                x: shift,
+                y: 0,
+                inf: false,
+            };
+            assert!(w.on(t0));
+            // A rational point of order 4 has Montgomery x = ±1.
+            let o4 = if legendre(addm(a, 2, p), p) == 1 {
+                1
+            } else {
+                p - 1
+            };
+            let trace = (p + 1) as i64 - n as i64;
+            let (d0, f) = cm_discriminant(trace, p);
+            // Embedding degree: smallest e with p^e ≡ 1 (mod r).
+            let mut e = 1u64;
+            let mut pe = p % r;
+            while pe != 1 && e < 1000 {
+                pe = mulm(pe, p % r, r);
+                e += 1;
+            }
+            // Summation polynomial checks on random triples P1 + P2 + P3 = O.
+            let mut s3_checks = 0;
+            let mut seed = 0x2551_9u64 ^ p;
+            for _ in 0..200 {
+                seed = seed
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                let s1 = w.mul(g, (seed >> 11) % r);
+                seed = seed
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                let s2 = w.mul(g, (seed >> 11) % r);
+                let s3 = w.neg(w.add(s1, s2));
+                if s1.inf || s2.inf || s3.inf {
+                    continue;
+                }
+                let mx = |q: Pt| subm(q.x, shift, p);
+                assert_eq!(m.s3(mx(s1), mx(s2), mx(s3)), 0, "S3 must vanish");
+                // And a perturbed abscissa must not (overwhelmingly).
+                let bad = addm(mx(s3), 1, p);
+                let other = w.add(s1, w.neg(s2));
+                if !other.inf && mx(other) != bad {
+                    assert_ne!(m.s3(mx(s1), mx(s2), bad), 0);
+                }
+                s3_checks += 1;
+            }
+            return Some(Miniature {
+                k,
+                p,
+                a_mont: a,
+                order: n,
+                r,
+                twist_order: nt,
+                r_twist: nt / 4,
+                candidates_tried: tried,
+                u_base: u,
+                weier: w,
+                shift,
+                g,
+                t0_weier: t0,
+                order4_x_mont: o4,
+                trace,
+                cm_disc_fundamental: d0,
+                cm_conductor: f,
+                embedding_degree_gt: e,
+                s3_checks,
+            });
+        }
+    }
+    None
+}
+
+/// Argument 0 of `f4sub` and `subcensus`: `K` (the family curve at `k` bits,
+/// [`build_miniature`]) or the explicit curve `p=<prime>,A=<A>` with
+/// `k` the bit length of `p`.  The flag says which form was given.
+fn curve_arg(s: &str) -> (Miniature, bool) {
+    let Some(rest) = s.strip_prefix("p=") else {
+        return (
+            build_miniature(s.parse().expect("K or p=<prime>,A=<A>")),
+            false,
+        );
+    };
+    let (ps, as_) = rest
+        .split_once(",A=")
+        .expect("explicit curve: p=<prime>,A=<A>");
+    let p: u64 = ps.parse().expect("p=<prime>: p must be an integer");
+    let a: u64 = as_.parse().expect("A=<A>: A must be an integer");
+    (miniature_explicit(p, a), true)
+}
+
+/// The family curve at an explicit `(p, A)`: the checks of
+/// [`build_miniature_at`] (without its search over `A` and its size bound
+/// on `r`), panicking with the failed check.
+fn miniature_explicit(p: u64, a: u64) -> Miniature {
+    assert!(
+        p > 8 && p < (1u64 << 32) && is_prime_u64(p) && p % 8 == 5,
+        "explicit curve: p = {p} must be a prime ≡ 5 (mod 8) below 2^32"
+    );
+    assert!(
+        a % 4 == 2 && a > 2 && a < p,
+        "explicit curve: A = {a} must satisfy A ≡ 2 (mod 4), 2 < A < p"
+    );
+    assert!(
+        legendre(subm(mulm(a, a, p), 4, p), p) == -1,
+        "explicit curve: A² − 4 must be a non-square mod p (p = {p}, A = {a})"
+    );
+    let k = 64 - p.leading_zeros();
+    miniature_for_a(k, p, a, (a - 2) / 4, 0).unwrap_or_else(|| {
+        panic!("explicit curve: #E = 8 r and #E' = 4 r' with r, r' prime fail at p = {p}, A = {a}")
+    })
+}
+
+/// Adds `"a_mont"` to an output object when the curve was given explicitly.
+fn with_a_mont(mut v: Value, m: &Miniature, explicit: bool) -> Value {
+    if explicit {
+        v["a_mont"] = json!(m.a_mont);
+    }
+    v
 }
 
 // ── the 255-bit audit (big integers) ──────────────────────────────────
@@ -1400,9 +1458,15 @@ fn support(k: u32, form: &str, t: u32) -> Value {
         }
         "isogeny" => {
             let mut ops = crypto_lib::cryptanalysis::ic_boundary::GroupOps::default();
-            crypto_lib::cryptanalysis::ic_framework::prime_tower::isogeny_tower(p, t, 0, &mut ops)
-                .expect("isogeny tower")
-                .v
+            crypto_lib::cryptanalysis::ic_framework::prime_tower::isogeny_tower(
+                p,
+                t,
+                0,
+                crypto_lib::cryptanalysis::ic_framework::prime_tower::AuxFamily::Any,
+                &mut ops,
+            )
+            .expect("isogeny tower")
+            .v
         }
         "kummer" => {
             if (p - 1) % span != 0 {
@@ -1609,7 +1673,8 @@ fn primitive_root(p: u64) -> u64 {
 }
 
 /// The subgroup/bits base of the exponent study, from the command line:
-/// `sub` (`d` = order, coset `w^gidx`) or `bits` (`d` = t).
+/// `sub` (`d` = order, coset `w^gidx`), `subflat` (the same set with one
+/// chain level, `y^d = 1`) or `bits` (`d` = t).
 fn study_base(
     m: &Miniature,
     kind: &str,
@@ -1625,6 +1690,16 @@ fn study_base(
     };
     match kind {
         "bits" => Base::Bits { t: d as u32, lo },
+        "subflat" => {
+            let w = primitive_root(m.p);
+            let zeta = primitive_root_of_unity(m.p, d).expect("d must divide p - 1");
+            Base::Subgroup {
+                factors: vec![u32::try_from(d).expect("subflat: d fits in u32")],
+                g: powm(w, gidx, m.p),
+                lo,
+                zeta,
+            }
+        }
         _ => {
             let w = primitive_root(m.p);
             let zeta = primitive_root_of_unity(m.p, d).expect("d must divide p - 1");
@@ -1638,12 +1713,15 @@ fn study_base(
     }
 }
 
-/// `f4sub <k> <sub|bits> <d|t> <gidx> <frame> <m> <sym|plain> <targets> <seed> <cap_s>`:
+/// `f4sub <k|p=<prime>,A=<A>> <sub|subflat|bits> <d|t> <gidx> <frame> <m>
+/// <sym|sym-efirst|plain> <targets> <seed> <cap_s>`:
 /// the decomposition system of the exponent study on `targets` random
 /// multiples of the generator, one F4 run each; one JSON object.
+/// `F4SUB_STEP_LOG=1` adds each run's per-step log to its `per_target` row.
 fn f4sub(args: &[String]) -> Value {
     use crypto_lib::cryptanalysis::ic_framework::subgroup_semaev::*;
-    let k: u32 = args[0].parse().unwrap();
+    let (m, explicit) = curve_arg(&args[0]);
+    let k = m.k;
     let kind = args[1].as_str();
     let d: u64 = args[2].parse().unwrap();
     let gidx: u64 = args[3].parse().unwrap();
@@ -1651,13 +1729,14 @@ fn f4sub(args: &[String]) -> Value {
     let msum: usize = args[5].parse().unwrap();
     let form = match args[6].as_str() {
         "sym" => Form::Sym,
+        "sym-efirst" => Form::SymEFirst,
         "plain" => Form::Plain,
         f => panic!("form {f}"),
     };
     let targets: u64 = args[7].parse().unwrap();
     let seed: u64 = args[8].parse().unwrap();
     let cap_s: u64 = args[9].parse().unwrap();
-    let m = build_miniature(k);
+    let step_log = std::env::var("F4SUB_STEP_LOG").as_deref() == Ok("1");
     let base = study_base(&m, kind, d, gidx, frame);
     let (a, b, p) = (m.weier.a, m.weier.b, m.p);
     let mut st = seed;
@@ -1680,16 +1759,35 @@ fn f4sub(args: &[String]) -> Value {
         sym_terms = sys.sym_terms;
         input_terms = sys.input_terms;
         input_degree = sys.input_degree;
-        let rep = solve_system(&sys, p, cap_s, 400);
+        let (rep, log) = if step_log {
+            let (rep, log) = solve_system_logged(&sys, p, cap_s, 400);
+            (rep, Some(log))
+        } else {
+            (solve_system(&sys, p, cap_s, 400), None)
+        };
         let complete = !rep.timed_out && rep.pairs_above_bound == 0;
-        rows.push(json!({
+        let mut row = json!({
             "target_x": t.x, "field_ops": rep.field_ops, "complete": complete,
             "inconsistent": rep.inconsistent, "timed_out": rep.timed_out,
             "solving_degree_max": rep.solving_degree_max, "solving_degree": rep.solving_degree,
             "degree_reached": rep.degree_reached, "steps": rep.steps,
             "max_rows": rep.max_rows, "max_cols": rep.max_cols, "ms": rep.ms,
             "basis_len": rep.basis.len(),
-        }));
+        });
+        if let Some(log) = log {
+            let steps: Vec<Value> = log
+                .steps
+                .iter()
+                .map(|s| {
+                    json!({"degree": s.degree, "pairs": s.pairs, "rows": s.rows,
+                           "all_rows": s.all_rows, "new_polys": s.new_polys, "ops": s.ops})
+                })
+                .collect();
+            row["step_log"] = json!(steps);
+            row["dropped_pairs"] = json!(log.dropped_pairs);
+            row["violated"] = json!(log.violated);
+        }
+        rows.push(row);
         if !complete {
             capped = true;
             break;
@@ -1697,7 +1795,7 @@ fn f4sub(args: &[String]) -> Value {
         tot_ops += u128::from(rep.field_ops);
         done += 1;
     }
-    json!({
+    let out = json!({
         "study": "curve25519_exponent_study_20261108", "k": k, "p": p, "base": kind,
         "d_or_t": d, "gidx": gidx, "frame": frame, "m": msum,
         "form": args[6], "levels": base.levels(), "v_size": base.size(),
@@ -1706,20 +1804,22 @@ fn f4sub(args: &[String]) -> Value {
         "seed": seed, "cap_s": cap_s, "capped": capped,
         "mean_field_ops": if done > 0 { Some(tot_ops as f64 / done as f64) } else { None },
         "per_target": rows,
-    })
+    });
+    with_a_mont(out, &m, explicit)
 }
 
-/// `subcensus <k> <sub|bits> <d|t> <gidx> <frame> <mmax>`: the factor base of
-/// the study's base and its exact m-sum coverage of the order-r subgroup.
+/// `subcensus <k|p=<prime>,A=<A>> <sub|subflat|bits> <d|t> <gidx> <frame> <mmax>`:
+/// the factor base of the study's base and its exact m-sum coverage of the
+/// order-r subgroup.
 fn subcensus(args: &[String]) -> Value {
     use std::collections::HashSet;
-    let k: u32 = args[0].parse().unwrap();
+    let (m, explicit) = curve_arg(&args[0]);
+    let k = m.k;
     let kind = args[1].as_str();
     let d: u64 = args[2].parse().unwrap();
     let gidx: u64 = args[3].parse().unwrap();
     let frame = args[4].as_str();
     let mmax: usize = args[5].parse().unwrap();
-    let m = build_miniature(k);
     let base = study_base(&m, kind, d, gidx, frame);
     let xs = base.abscissae(m.p);
     let mut pts: Vec<Pt> = Vec::new();
@@ -1758,8 +1858,10 @@ fn subcensus(args: &[String]) -> Value {
             cov.insert(format!("m{mm}"), json!(n));
         }
     }
-    json!({"k": k, "p": m.p, "r": m.r, "base": kind, "d_or_t": d, "gidx": gidx, "frame": frame,
-           "v_size": xs.len(), "columns": cols, "base_points": pts.len(), "covered_points": cov})
+    let out = json!({"k": k, "p": m.p, "r": m.r, "base": kind, "d_or_t": d, "gidx": gidx,
+           "frame": frame, "v_size": xs.len(), "columns": cols, "base_points": pts.len(),
+           "covered_points": cov});
+    with_a_mont(out, &m, explicit)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -1781,7 +1883,9 @@ fn f4cost_m(
         prime_factor_base, CountedGroup, GroupOps, OracleCounters, PrimeCurve, PrimeInstance,
     };
     use crypto_lib::cryptanalysis::ic_framework::pkm_semaev::PkmSemaevOracle;
-    use crypto_lib::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+    use crypto_lib::cryptanalysis::ic_framework::prime_tower::{
+        isogeny_tower, AuxFamily, PrimeIsogenyBase,
+    };
     use crypto_lib::cryptanalysis::ic_framework::stages::{
         DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params,
     };
@@ -1910,7 +2014,8 @@ fn f4cost_m(
             let fb = PrimeIsogenyBase { instance: &inst }
                 .build(&ctx, &params, &mut GroupOps::default())
                 .expect("isogeny base");
-            let tower = isogeny_tower(m.p, t, t0_lo, &mut GroupOps::default()).expect("tower");
+            let tower = isogeny_tower(m.p, t, t0_lo, AuxFamily::Any, &mut GroupOps::default())
+                .expect("tower");
             let steps = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
             (
                 fb,
@@ -1944,6 +2049,8 @@ fn f4cost_m(
     let started = std::time::Instant::now();
     let mut st = seed;
     let (mut done, mut hits, mut verified, mut exact) = (0u64, 0u64, 0u64, 0u64);
+    let trace_targets = std::env::var("F4COST_TARGET_TRACE").as_deref() == Ok("1");
+    let mut target_trace = Vec::new();
     for _ in 0..targets {
         if started.elapsed().as_secs() >= cap_s {
             break;
@@ -1957,13 +2064,18 @@ fn f4cost_m(
         if target.infinity {
             continue;
         }
+        let solver_before = trace_targets.then(|| oracle.solver_totals().unwrap_or_default());
+        let native_before = trace_targets.then(|| oracle.relation_counters());
         let mut ctr = OracleCounters::default();
+        let (mut hit_this, mut exact_this, mut verified_this) = (false, false, false);
         if let Some(idx) = oracle.decompose(&ctx, &fb, &mut ops, &mut ctr, target) {
             hits += 1;
+            hit_this = true;
             let s = idx.iter().fold(inst.curve.identity(), |acc, &i| {
                 inst.curve.add(&mut GroupOps::default(), acc, fb.points[i])
             });
-            exact += u64::from(s == target);
+            exact_this = s == target;
+            exact += u64::from(exact_this);
             // The pipeline writes rows over [h]P, so a lift R + K (K in E[h])
             // is accepted when the projected sums agree; without lifts the
             // sum must be R itself.
@@ -1976,12 +2088,42 @@ fn f4cost_m(
             };
             if ok {
                 verified += 1;
+                verified_this = true;
             }
+        }
+        if let (Some(before), Some(native_before)) = (solver_before, native_before) {
+            let after = oracle.solver_totals().unwrap_or_default();
+            let native_after = oracle.relation_counters();
+            let native_delta: std::collections::BTreeMap<String, u64> = native_after
+                .iter()
+                .filter_map(|(key, &value)| {
+                    let prior = native_before.get(key).copied().unwrap_or(0);
+                    (value != prior).then(|| (key.clone(), value - prior))
+                })
+                .collect();
+            target_trace.push(json!({
+                "target_index": done,
+                "scalar": a,
+                "target_x": target.x,
+                "target_y": target.y,
+                "f4_calls": after.calls - before.calls,
+                "f4_muladds": after.ops - before.ops,
+                "f4_wall_ns": after.wall_ns - before.wall_ns,
+                "budget_exceeded": after.budget_exceeded - before.budget_exceeded,
+                "hit": hit_this,
+                "exact": exact_this,
+                "verified": verified_this,
+                "group_adds": ops.adds,
+                "group_doubles": ops.doubles,
+                "lift_failures": ctr.lift_failures,
+                "unliftable_systems": ctr.unliftable_systems,
+                "native": native_delta,
+            }));
         }
         done += 1;
     }
     let tot = oracle.solver_totals().unwrap_or_default();
-    let native = oracle.relation_counters();
+    let native_random = oracle.relation_counters();
     let per_target = tot.ops as f64 / done.max(1) as f64;
     let learn_muladds = oracle
         .setup_native()
@@ -2028,6 +2170,7 @@ fn f4cost_m(
         p_done += 1;
     }
     let p_ops = oracle.solver_totals().map_or(0, |t| t.ops) - p_ops0;
+    let native_including_planted = oracle.relation_counters();
     // Exact coverage of the base at this m: the fraction of the subgroup that
     // is a sum of m base points (the hit rate an ideal oracle would see).
     let all = crypto_lib::cryptanalysis::ic_framework::pkm_semaev::decomposable_points(
@@ -2103,11 +2246,12 @@ fn f4cost_m(
         "muladds_per_hit": if hits > 0 { Some(tot.ops as f64 / hits as f64) } else { None },
         "setup_group_ops": setup_ops.adds + setup_ops.doubles,
         "setup_native": oracle.setup_native(),
-        "poly_terms_per_specialisation": native.get("pkm_system_terms").copied().unwrap_or(0) as f64
-            / native.get("pkm_system_specialisations").copied().unwrap_or(1).max(1) as f64,
+        "poly_terms_per_specialisation": native_random.get("pkm_system_terms").copied().unwrap_or(0) as f64
+            / native_random.get("pkm_system_specialisations").copied().unwrap_or(1).max(1) as f64,
         "hits": hits, "hits_verified": verified,
         "hit_rate": hits as f64 / done.max(1) as f64, "max_nnz_cap": max_nnz,
-        "native": native,
+        "native": native_random,
+        "native_including_planted": native_including_planted,
     });
     out["solver_extra"] = json!(tot.extra);
     out["covered_projected_points"] = json!(covered_projected);
@@ -2118,6 +2262,9 @@ fn f4cost_m(
     out["planted_hits"] = json!(p_hits);
     out["planted_exact"] = json!(p_exact);
     out["planted_muladds"] = json!(p_ops);
+    if trace_targets {
+        out["target_trace"] = json!(target_trace);
+    }
     out
 }
 
@@ -2185,7 +2332,8 @@ fn baseline_spec(k: u32, targets: u64, seed: u64) -> Value {
         ))
     };
     json!({
-        "schema": "ecbench.spec/v1",
+        "schema": "ecbench.spec/v2",
+        "curve_policy": {"mode": "diagnostic", "off_panel_reason": "Curve25519-family baseline requires generated miniature and cofactor-control curves"},
         "label": format!("Curve25519-family index-calculus baseline, k = {k}"),
         "description": "research/curve25519_ic_baseline_20261102/PROTOCOL.md (frozen before data). Curve 1: the k-bit Curve25519 miniature (Montgomery y^2 = x^3 + A x^2 + x, p = 5 mod 8, #E = 8r, #E' = 4r', smallest A by Curve25519's rule) in short Weierstrass form. Curve 2: cofactor-1 control, prime_search at the subgroup's bit length. Public synthetic curves and targets; no security claim.",
         "workloads": {
@@ -2532,6 +2680,50 @@ mod tests {
                     assert_eq!(root, expect, "x1={} x2={} x3={x3}", mx(s), mx(t));
                 }
             }
+        }
+    }
+
+    /// The explicit curve form at the family's own `(p, A)` for `k = 20`
+    /// builds the same curve as the family rule.
+    #[test]
+    fn explicit_curve_matches_family_rule() {
+        let fam = build_miniature(20);
+        assert_eq!((fam.p, fam.a_mont), (1048573, 926));
+        let (ex, explicit) = curve_arg("p=1048573,A=926");
+        assert!(explicit);
+        assert_eq!(ex.k, 20);
+        assert_eq!(ex.p, fam.p);
+        assert_eq!(ex.a_mont, fam.a_mont);
+        assert_eq!(ex.r, fam.r);
+        assert_eq!(ex.r_twist, fam.r_twist);
+        assert_eq!(ex.g.x, fam.g.x);
+        assert_eq!(ex.u_base, fam.u_base);
+        let (k20, explicit) = curve_arg("20");
+        assert!(!explicit);
+        assert_eq!((k20.p, k20.a_mont, k20.g.x), (fam.p, fam.a_mont, fam.g.x));
+    }
+
+    #[test]
+    #[should_panic(expected = "explicit curve")]
+    fn explicit_curve_rejects_a_bad_a() {
+        let _ = curve_arg("p=1048573,A=6");
+    }
+
+    /// `subflat` presents the set of `sub` with one chain level.
+    #[test]
+    fn subflat_has_the_abscissae_of_sub() {
+        let m = build_miniature(20);
+        assert_eq!(m.p, 1048573);
+        for gidx in [0u64, 1, 5] {
+            let sub = study_base(&m, "sub", 9, gidx, "mont");
+            let flat = study_base(&m, "subflat", 9, gidx, "mont");
+            assert_eq!(sub.levels(), 2);
+            assert_eq!(flat.levels(), 1);
+            assert_eq!(flat.size(), 9);
+            let a: std::collections::BTreeSet<u64> = sub.abscissae(m.p).into_iter().collect();
+            let b: std::collections::BTreeSet<u64> = flat.abscissae(m.p).into_iter().collect();
+            assert_eq!(a.len(), 9);
+            assert_eq!(a, b);
         }
     }
 }

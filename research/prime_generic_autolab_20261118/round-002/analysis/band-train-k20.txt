@@ -1,0 +1,35 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-t727-cd198a38 | 19.10 | inc | 12/12 | 4.028 | 4.493 | 8.676 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | mitm2-n56 | 12/12 | 10.121 | 11.450 | 23.418 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | rho-neg | 12/12 | 1.572 | 1.707 | 2.925 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | wsum-b12-n3 | 12/12 | 17.013 | 18.623 | 33.117 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | wsum-b20-n3 | 12/12 | 110.333 | 121.574 | 222.738 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | wsum-b5-n4 | 12/12 | 11.277 | 12.322 | 21.728 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | wsum-b8-n3 | 12/12 | 5.146 | 5.608 | 9.769 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-t727-cd198a38 | inc vs mitm2-n56 | inc < mitm2-n56 |
+| icv1-fp20-t727-cd198a38 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-t727-cd198a38 | inc vs wsum-b12-n3 | inc < wsum-b12-n3 |
+| icv1-fp20-t727-cd198a38 | inc vs wsum-b20-n3 | inc < wsum-b20-n3 |
+| icv1-fp20-t727-cd198a38 | inc vs wsum-b5-n4 | inc < wsum-b5-n4 |
+| icv1-fp20-t727-cd198a38 | inc vs wsum-b8-n3 | inc < wsum-b8-n3 |
+| icv1-fp20-t727-cd198a38 | mitm2-n56 vs rho-neg | rho-neg < mitm2-n56 |
+| icv1-fp20-t727-cd198a38 | mitm2-n56 vs wsum-b12-n3 | mitm2-n56 < wsum-b12-n3 |
+| icv1-fp20-t727-cd198a38 | mitm2-n56 vs wsum-b20-n3 | mitm2-n56 < wsum-b20-n3 |
+| icv1-fp20-t727-cd198a38 | mitm2-n56 vs wsum-b5-n4 | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | mitm2-n56 vs wsum-b8-n3 | wsum-b8-n3 < mitm2-n56 |
+| icv1-fp20-t727-cd198a38 | rho-neg vs wsum-b12-n3 | rho-neg < wsum-b12-n3 |
+| icv1-fp20-t727-cd198a38 | rho-neg vs wsum-b20-n3 | rho-neg < wsum-b20-n3 |
+| icv1-fp20-t727-cd198a38 | rho-neg vs wsum-b5-n4 | rho-neg < wsum-b5-n4 |
+| icv1-fp20-t727-cd198a38 | rho-neg vs wsum-b8-n3 | rho-neg < wsum-b8-n3 |
+| icv1-fp20-t727-cd198a38 | wsum-b12-n3 vs wsum-b20-n3 | wsum-b12-n3 < wsum-b20-n3 |
+| icv1-fp20-t727-cd198a38 | wsum-b12-n3 vs wsum-b5-n4 | wsum-b5-n4 < wsum-b12-n3 |
+| icv1-fp20-t727-cd198a38 | wsum-b12-n3 vs wsum-b8-n3 | wsum-b8-n3 < wsum-b12-n3 |
+| icv1-fp20-t727-cd198a38 | wsum-b20-n3 vs wsum-b5-n4 | wsum-b5-n4 < wsum-b20-n3 |
+| icv1-fp20-t727-cd198a38 | wsum-b20-n3 vs wsum-b8-n3 | wsum-b8-n3 < wsum-b20-n3 |
+| icv1-fp20-t727-cd198a38 | wsum-b5-n4 vs wsum-b8-n3 | wsum-b8-n3 < wsum-b5-n4 |

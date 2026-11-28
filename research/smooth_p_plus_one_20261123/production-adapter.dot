@@ -1,0 +1,16 @@
+digraph production_adapter {
+  graph [bgcolor="white",rankdir=TB,pad=0.16,nodesep=0.3,ranksep=0.35];
+  node [shape=box,fontname="Helvetica",fontsize=11,style="rounded,filled",fillcolor="#f1f5fb",color="#60809d",margin="0.16,0.10"];
+  edge [fontname="Helvetica",fontsize=10,color="#55718a"];
+  input [label="Public curve, ordered base and target\nNo pair dictionary enters discovery"];
+  native [label="Existing production cofactor extractor\nU W = h, native F4 and signed lifting"];
+  status [label="Complete / Empty only\nReject partial sets and limit refusals"];
+  replay [label="Separate point replay and label conversion\nFull set + regular Dickson projection"];
+  panels [label="13 fixed full-base queries\n8 symbolic / 5 matrix admission refusals\nAll remain undetermined",fillcolor="#f8eee9",color="#a17a69"];
+  positive [label="Separate planted four-leaf unit control\nExact signed set after conversion",fillcolor="#edf7f0",color="#54866a"];
+  input -> native;
+  native -> status;
+  status -> replay [label="complete"];
+  status -> panels [label="incomplete"];
+  replay -> positive;
+}

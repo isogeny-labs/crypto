@@ -1,0 +1,48 @@
+{
+  "schema": "h116.scalar-divpoly-coprimality-protocol/v1",
+  "protocol_id": "H116-SCALAR-DIVPOLY-COPRIMALITY-001",
+  "status": "frozen-before-producer-or-verifier-implementation-and-before-affected-gcd-data",
+  "question": "Are the displayed scalar x-map polynomials Phi_n and Psi_n^2 already coprime on a locked out-of-sample prime-field panel, with shared-factor and singular-cubic controls?",
+  "cells": [
+    {"slug":"fp13-a1-b1-n2","p":13,"a":1,"b":1,"scalar":2},
+    {"slug":"fp13-a1-b1-n3","p":13,"a":1,"b":1,"scalar":3},
+    {"slug":"fp13-a1-b1-n5","p":13,"a":1,"b":1,"scalar":5},
+    {"slug":"fp13-a1-b1-n7","p":13,"a":1,"b":1,"scalar":7},
+    {"slug":"fp17-a2-b3-n2","p":17,"a":2,"b":3,"scalar":2},
+    {"slug":"fp17-a2-b3-n3","p":17,"a":2,"b":3,"scalar":3},
+    {"slug":"fp17-a2-b3-n5","p":17,"a":2,"b":3,"scalar":5},
+    {"slug":"fp17-a2-b3-n7","p":17,"a":2,"b":3,"scalar":7},
+    {"slug":"fp19-a1-b4-n2","p":19,"a":1,"b":4,"scalar":2},
+    {"slug":"fp19-a1-b4-n3","p":19,"a":1,"b":4,"scalar":3},
+    {"slug":"fp19-a1-b4-n5","p":19,"a":1,"b":4,"scalar":5},
+    {"slug":"fp19-a1-b4-n7","p":19,"a":1,"b":4,"scalar":7}
+  ],
+  "primary_measurements": [
+    "numerator and denominator degrees and leading coefficients",
+    "monic gcd degree and complete coefficient vector",
+    "Euclidean remainder-step and base-field operation counts"
+  ],
+  "primary_acceptance": [
+    "the curve discriminant is nonzero",
+    "the numerator and denominator have nominal degrees n^2 and n^2-1",
+    "the monic gcd is exactly the constant polynomial one"
+  ],
+  "controls": [
+    "multiplying both polynomials by X+1 yields monic gcd X+1 in every primary cell",
+    "for y^2=x^3 over F_13 and scalar two, the displayed numerator and denominator have a positive-degree monic gcd"
+  ],
+  "implementations": {
+    "producer": "new Rust source using coefficient vectors and Euclidean division",
+    "independent_verifier": "separate Rust source with its own polynomial representation, recurrence and gcd"
+  },
+  "execution": {
+    "route": "isolab EKS Spot after committed source and launch gate",
+    "resources": {"cpu":1,"memory_gib":2,"timeout_minutes":10},
+    "budget_usd_max": 0.25,
+    "retries": 0
+  },
+  "failure_policy": "Retain all twelve primary rows and both controls without changing cells, scalars or thresholds after observing affected data.",
+  "claim_boundary": "Finite exact gcds do not prove generic division-polynomial coprimality or any ECDLP complexity claim.",
+  "filed_before_code": true,
+  "filed_before_data": true
+}

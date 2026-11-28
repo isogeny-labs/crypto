@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T21:27:28Z",
+ "id": "PCC-20261118-10f2e1",
+ "kind": "statement",
+ "producer": {
+  "commit": "c382f396d0dabfc6f4ecdf208e92aa00c26958c1",
+  "model": "codex",
+  "session": "conductor-fixture-audit-20261118"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/fixture-conductor-audit-20261118/integration.json",
+    "sha256": "55b2e0f5b97b942150c2fea063adc9be901219e6eeeb284e429cb3dd846f98ed"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/fixture-conductor-audit-20261118/runs.tar.xz",
+    "sha256": "0ce25e81ec1cf4f218427e2d890683d55a439c737eedd82875c2597f238261eb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/fixture-conductor-audit-20261118/runs.sha256",
+    "sha256": "e9109554538a5f278a25eaf6abec850ededf29cc25cbb8840c926bbf6d798229"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/fixture-conductor-audit-20261118/archive-check.stdout",
+    "sha256": "fd84825cec9cf4bf0b84f4d380f33ccb5ec762d59e305b1be40ea20fa8133fc1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/lessons/entries/O-b7942c25cbbb.json",
+    "sha256": "46e9fe3723e5946a012dca2f8882ac7d8de8142d29efa574eadb063d2e34489f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "retained-fixture-audit-packet",
+ "statement": "Both native fixture audit versions preserve their source/receipt subjects and verify as not_covered without signed independent verdicts. Raw archive extraction hashes and deterministic byte-identical repacking pass; both PDF pages were inspected. Production sources are unchanged and no benchmark/cloud trial was launched."
+}

@@ -39,3 +39,21 @@ Filled in after each dispatch: UTC time, workflow run ID, outcome.
 - **Fallback classification.** For a 403, `diagnose-failed-run` records `artifact_access = payload_read_unavailable` and classifies from the Kubernetes container exit code. With no exit code it reports `artifact_read_unavailable`. The classification is in the artifact and the run's step summary.
 - **Not read from this session.** The artifact download host (`*.blob.core.windows.net`) is refused by this session's egress proxy, so the classification has not been read here. It is still open.
 - **Lab-side problem.** Restoring the role's `s3:GetObject` on `runs/*/<pod>/{SHA256SUMS,job-exit.json,l2-gate.json,audit.json,control-comparison.json,...}` is a lab permission change and outside this PR.
+
+## Third route: RunPod CPU pod via REST v2 (2026-11-17, user asked "Use runpod", then "Rest v2")
+
+The Iso Lab route is blocked: CodeBuild queue limit 0, artifact-store keys invalid. This route runs the same four frozen specs, **unchanged**, on one RunPod pod.
+
+| field | value |
+|---|---|
+| API | `https://api.runpod.io/v2` (REST v2). The key is a proxy-injected network secret; `rest.runpod.io` (v1) answered 502 |
+| pod | `cpu5c`, 8 vCPU, image `runpod/base:1.0.2-ubuntu2404`, SECURE cloud, `sleep infinity`; deleted after the run |
+| binary | `ecbench` built locally at main `94479f7e3eb9de9ae59b764d2b2b50b3238f0a44`, SHA-256 `5bab9023013f06d18f5e54d390f39731667d36c9a8ec5284035d6dca7df39bc2`; streamed in gzip through `POST /v2/pods/{id}/exec` and SHA-checked on the pod |
+| specs | `reference-d2/d3/d4/d5.json` as frozen, run sequentially with `ecbench run --spec … --out …`, then `ecbench verify` per session |
+| isolation | A RunPod pod cannot reach L2. The specs still say L2, so the wall-time comparison is **not admitted**. The counted-operation (GAE) comparison, the headline statistic of `ecbench compare`, does not depend on isolation |
+| ceiling | USD 5, failures included |
+| resume checkpoint | S3 upload is unavailable; this pushed commit is the checkpoint |
+
+### RunPod outcome (2026-11-17T15:31Z)
+
+All four specs ran on pod `Z0jehpw47bv0s5` (d2 9 s, d3 9 s, d4 10 s, d5 15 s). Every session passed `ecbench verify --dir` with 0 problems. The d2 standard arms failed deterministically ("projected small factor base has no columns"). The pod was deleted. Results are in [`../runpod-20261117/README.md`](../runpod-20261117/README.md).

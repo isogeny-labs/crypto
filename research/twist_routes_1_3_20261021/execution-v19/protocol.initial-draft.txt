@@ -1,0 +1,870 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-sparse-substitution-confirmation-v1",
+  "version": 1,
+  "created": "2026-10-30",
+  "repository": "crypto",
+  "study_dir": "research/twist_routes_1_3_20261021/execution-v19",
+  "question": "Does sparse support substitution lower cold guest instructions while preserving identical ordinary/twist relation systems on fresh public targets?",
+  "claims": [
+    {
+      "id": "audit",
+      "text": "All admitted raw Ir totals and finite source/map/fiber results are independently checked.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "sparse",
+      "text": "Measure sparse substitution against dense and uncompressed augmented coordinates with identical mathematical systems.",
+      "class": "comparative",
+      "decided_by": [
+        "ordinary-sparse-over-dense",
+        "ordinary-sparse-over-full",
+        "twist-sparse-over-dense",
+        "twist-sparse-over-full"
+      ]
+    },
+    {
+      "id": "progression",
+      "text": "Measure ordinary/maximal-twist progression with matched information and workload.",
+      "class": "comparative",
+      "decided_by": [
+        "progression"
+      ]
+    },
+    {
+      "id": "map",
+      "text": "Measure degree17 map versus known scalar on the same equations.",
+      "class": "comparative",
+      "decided_by": [
+        "ordinary-map-over-scalar",
+        "twist-map-over-scalar"
+      ]
+    },
+    {
+      "id": "scope",
+      "text": "Finite new-target software-count diagnostic on existing toy models; no GAE/timing/novelty/asymptotic/NIST claim.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "ordinary-full",
+      "role": "baseline",
+      "description": "group;low-x;alpha=none;compression=false;sparse=false;evaluation=map",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      }
+    },
+    {
+      "id": "ordinary-dense",
+      "role": "candidate",
+      "description": "group;low-x;alpha=augment;compression=true;sparse=false;evaluation=map",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    },
+    {
+      "id": "ordinary-sparse",
+      "role": "candidate",
+      "description": "group;low-x;alpha=augment;compression=true;sparse=true;evaluation=map",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    },
+    {
+      "id": "ordinary-map",
+      "role": "candidate",
+      "description": "group;low-x;alpha=augment;compression=false;sparse=false;evaluation=map",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    },
+    {
+      "id": "ordinary-scalar",
+      "role": "candidate",
+      "description": "group;low-x;alpha=augment;compression=false;sparse=false;evaluation=scalar",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    },
+    {
+      "id": "twist-full",
+      "role": "candidate",
+      "description": "group;twist-max;alpha=none;compression=false;sparse=false;evaluation=map",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    },
+    {
+      "id": "twist-dense",
+      "role": "candidate",
+      "description": "group;twist-max;alpha=augment;compression=true;sparse=false;evaluation=map",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    },
+    {
+      "id": "twist-sparse",
+      "role": "candidate",
+      "description": "group;twist-max;alpha=augment;compression=true;sparse=true;evaluation=map",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    },
+    {
+      "id": "twist-map",
+      "role": "candidate",
+      "description": "group;twist-max;alpha=augment;compression=false;sparse=false;evaluation=map",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    },
+    {
+      "id": "twist-scalar",
+      "role": "candidate",
+      "description": "group;twist-max;alpha=augment;compression=false;sparse=false;evaluation=scalar",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    },
+    {
+      "id": "rho",
+      "role": "reference",
+      "description": "rho;reference;alpha=none;compression=false;sparse=false;evaluation=map",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    },
+    {
+      "id": "rho-negation",
+      "role": "reference",
+      "description": "rho-negation;reference;alpha=none;compression=false;sparse=false;evaluation=map",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    },
+    {
+      "id": "bsgs",
+      "role": "reference",
+      "description": "bsgs;reference;alpha=none;compression=false;sparse=false;evaluation=map",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    },
+    {
+      "id": "bsgs-negation",
+      "role": "reference",
+      "description": "bsgs-negation;reference;alpha=none;compression=false;sparse=false;evaluation=map",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    },
+    {
+      "id": "gp-elllog",
+      "role": "reference",
+      "description": "gp-elllog;reference;alpha=none;compression=false;sparse=false;evaluation=map",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    },
+    {
+      "id": "ordinary-aa",
+      "role": "control",
+      "description": "group;low-x;alpha=none;compression=false;sparse=false;evaluation=map",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    },
+    {
+      "id": "positive",
+      "role": "control_positive",
+      "description": "gp-poly;low-x;alpha=none;compression=false;sparse=false;evaluation=map",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "a2336e3e80f732b6e60584a9b41b13190245c454",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/validation-v17/Cargo.toml",
+            "--bin",
+            "twist-sparse-pipeline"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "ordinary-full"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "positive",
+      "expected_detection": "All12 Q2 workloads recover2 through GP full roots; the first6 also pass the native control/counter gate.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Matched ordinary and known-scalar modes are the finite baseline controls; no null-population or CM/general distribution claim."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "base construction",
+        "levels": [
+          "ordinary low-x",
+          "maximal-twist progression"
+        ]
+      },
+      {
+        "name": "known constraints representation",
+        "levels": [
+          "full",
+          "dense compressed",
+          "sparse support compressed"
+        ]
+      },
+      {
+        "name": "endomorphism evaluation",
+        "levels": [
+          "degree17 map",
+          "known scalar"
+        ]
+      },
+      {
+        "name": "reference",
+        "levels": [
+          "rho",
+          "negation rho",
+          "BSGS",
+          "negation BSGS",
+          "GP elllog"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One pinned worker, same old arithmetic/collectors/RREF, selected dense/sparse support implementation and actual GP backend.",
+        "how": "All arm source/binary/thread pins equal; every native/backend ROI instruction charged."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Current local L0 CPU0; no admitted clock.",
+        "how": "Fresh HOST.json and per-process resource records."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "36 same workload identities in17 arms:24 new public points and12 Q2 controls on12 previously used larger models.",
+        "how": "Native source-hash recipe and explicit immutable612-cell plan; no new target outcome selection."
+      },
+      {
+        "name": "order",
+        "treatment": "randomized",
+        "value": "Six known-answer GP positives first, source-hash interleaving thereafter.",
+        "how": "Immutable plan."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Unmasked finite count diagnostic; all comparisons and analysis frozen before new profiles.",
+        "how": "Native analysis source hash and independent complete-output replay."
+      },
+      {
+        "name": "fresh process nuisance",
+        "treatment": "measured",
+        "value": "Duplicate ordinary baseline on every public workload.",
+        "how": "A/A paired counts, not population variance."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "progression",
+        "arms": [
+          "ordinary-full",
+          "twist-full"
+        ],
+        "differs_in": [
+          "base construction"
+        ],
+        "design": "one_factor",
+        "threshold": "Same Q/B/queries/no-alpha/full coordinates; retain every failed case and report cold ratio on successful paired recoveries."
+      },
+      {
+        "id": "aa",
+        "arms": [
+          "ordinary-full",
+          "ordinary-aa"
+        ],
+        "differs_in": [
+          "fresh process nuisance"
+        ],
+        "design": "aa",
+        "threshold": "Report each identical-workload fresh-process Ir ratio and observed range; no confidence inference."
+      },
+      {
+        "id": "ordinary-sparse-over-dense",
+        "arms": [
+          "ordinary-dense",
+          "ordinary-sparse"
+        ],
+        "differs_in": [
+          "known constraints representation"
+        ],
+        "design": "one_factor",
+        "threshold": "Both original target scalars verified, all five nonnull problem hashes equal; report cold and matrix ratios separately, preserve unsuccessful attempts."
+      },
+      {
+        "id": "ordinary-sparse-over-full",
+        "arms": [
+          "ordinary-map",
+          "ordinary-sparse"
+        ],
+        "differs_in": [
+          "known constraints representation"
+        ],
+        "design": "one_factor",
+        "threshold": "Both original target scalars verified, all five nonnull problem hashes equal; report cold and matrix ratios separately, preserve unsuccessful attempts."
+      },
+      {
+        "id": "ordinary-map-over-scalar",
+        "arms": [
+          "ordinary-scalar",
+          "ordinary-map"
+        ],
+        "differs_in": [
+          "endomorphism evaluation"
+        ],
+        "design": "one_factor",
+        "threshold": "Both original target scalars verified, all five nonnull problem hashes equal; report cold and matrix ratios separately, preserve unsuccessful attempts."
+      },
+      {
+        "id": "twist-sparse-over-dense",
+        "arms": [
+          "twist-dense",
+          "twist-sparse"
+        ],
+        "differs_in": [
+          "known constraints representation"
+        ],
+        "design": "one_factor",
+        "threshold": "Both original target scalars verified, all five nonnull problem hashes equal; report cold and matrix ratios separately, preserve unsuccessful attempts."
+      },
+      {
+        "id": "twist-sparse-over-full",
+        "arms": [
+          "twist-map",
+          "twist-sparse"
+        ],
+        "differs_in": [
+          "known constraints representation"
+        ],
+        "design": "one_factor",
+        "threshold": "Both original target scalars verified, all five nonnull problem hashes equal; report cold and matrix ratios separately, preserve unsuccessful attempts."
+      },
+      {
+        "id": "twist-map-over-scalar",
+        "arms": [
+          "twist-scalar",
+          "twist-map"
+        ],
+        "differs_in": [
+          "endomorphism evaluation"
+        ],
+        "design": "one_factor",
+        "threshold": "Both original target scalars verified, all five nonnull problem hashes equal; report cold and matrix ratios separately, preserve unsuccessful attempts."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "First6 GP Q2 positives, then fixed hash interleaving of every arm/workload.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Frozen native source hash namespace, explicit Task seeds and plan permutation."
+    },
+    "instance_sampling": {
+      "rule": "Twelve existing verified larger models; Q2 plus two source-hashed new points each, excluding only previous input identities. All17 arms share every Q. No original E28 final labels.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Unmasked source/analysis fixed before all new target cost/recovery outcomes; no statistical population inference.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 36,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Fixed complete finite612-cell schedule. Case ranges only, no significance or confidence claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 3,
+      "threads": 1,
+      "estimated_total_seconds": 1836,
+      "measured_on": "Prior disjoint resource pilot and completed larger-model L0 runs; provisioning only, not clock performance."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "cold-Ir",
+        "name": "Cold one-target guest instructions",
+        "unit": "Ir",
+        "kind": "counted",
+        "definition": "Sum all exclusive native and actual resident-GP ROI intervals from setup to source verification; no launch/input/fixture/result-file work.",
+        "source": "ROWS.jsonl cost.total_ir",
+        "aggregation": "per_row",
+        "uncertainty": "range"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "peak-rss",
+        "name": "Sampled aggregate process-tree RSS",
+        "unit": "bytes",
+        "kind": "counted",
+        "definition": "Exact maximum of the25ms RSS samples for resource guard, with unmeasured between-sample peaks; not an exact process high-water mark.",
+        "source": "ROWS.jsonl max_sampled_tree_rss_bytes",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "randomized",
+    "clock": "none",
+    "counters": [
+      "native/backend exclusive Ir",
+      "all raw phase totals",
+      "source scalar or ambiguity outcome",
+      "sampled process-tree RSS",
+      "all failures/caps/underfills/unsupported cases"
+    ],
+    "record": [
+      "source commit",
+      "binary SHA256",
+      "argv",
+      "input/output hashes",
+      "actual exit/signal",
+      "resource caps",
+      "host metadata"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": 1,
+      "memory_GiB": 4,
+      "paid_resources_created": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 5400,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": 1,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly17 arms x36 workloads x1rep=612 profiles. Six GP Q2 controls first.180s per cell,3600s global,4GiB sampled RSS,500MB compressed raw tree. Counter/control failure stops; every failure/cap/unstarted case retained, no silent retry.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Report exact verified paired cold/matrix Ir and all failures on24 fresh targets;12 Q2 controls separately. No result-based selection or confidence inference.",
+    "comparison_ids": [
+      "progression",
+      "aa",
+      "ordinary-sparse-over-dense",
+      "ordinary-sparse-over-full",
+      "ordinary-map-over-scalar",
+      "twist-sparse-over-dense",
+      "twist-sparse-over-full",
+      "twist-map-over-scalar"
+    ],
+    "statistic": "Per-target B/A cold and matrix ratios; A/A; all five measured references and Ir/sqrt(r) without GAE conversion.",
+    "interval": "Observed case ranges only.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Sparse/dense, sparse/full, map/scalar, twist/ordinary ratios, successful pairs only with all unsuccessful statuses retained.",
+    "verdict_vocabulary": [
+      "lower guest count on stated cases",
+      "higher guest count on stated cases",
+      "unsuccessful DLP",
+      "incomplete or invalid experiment"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "../runner/src/bin/twist-sparse-experiment.rs",
+      "sha256": "925858d557b99a3baf7cfc6fbf638c9794bf7c88642733acda239cbf07bdbf1a"
+    },
+    "inputs": [
+      "immutable612-cell plan",
+      "raw trace/worker ledger",
+      "strict independent GP admission"
+    ],
+    "outputs": [
+      "SUMMARY.json",
+      "experiment.export.json",
+      "source-linked figure/report/PDF"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Fresh-target paired cold and matrix ratios; all arm statuses and reference gaps."
+    ],
+    "report_dir": "research/twist_routes_1_3_20261021/reports/sparse-compression-20261030"
+  },
+  "inadmissible": [
+    "Calling existing models newly held-out",
+    "Using Q2 controls in primary ratios",
+    "Changing target/method/representation after new outcomes",
+    "Dropping failed attempts",
+    "Omitting sparse-cache setup cost",
+    "GAE, wall-clock, novelty, asymptotic or NIST conclusions"
+  ],
+  "literature": [
+    {
+      "ref": "research/twist_routes_1_3_20261021/execution-v15/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Prior exact/cost records, primary Valgrind/Brent/PARI docs and parent accounting contract reviewed before implementation; Semaev primary PDF403 disclosed.",
+      "verified_by": "Installed help, primary manual/PDF reads and exact Git contract snapshot on2026-10-29."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": false
+  },
+  "extensions": {
+    "planned_profiles": 612,
+    "independent_fresh_DLP_targets": 24,
+    "positive_workloads": 12,
+    "existing_models": 12,
+    "original_E28_final_labels_opened": false,
+    "original_full_campaign_discharged": false,
+    "backend_authority": "Standing authorized bounded L0 fallback after fresh30October ECR denial.",
+    "canonical_schedule": "17 arms x36 identical instances x1rep; verifier processes are certificates, not additional measured observations."
+  }
+}

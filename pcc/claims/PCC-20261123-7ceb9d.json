@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T18:25:05Z",
+ "id": "PCC-20261123-7ceb9d",
+ "kind": "statement",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "gpt-6-astra-pro",
+  "session": "pplus-primefield-ic-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/pplus_primefield_ic_20261123/selector/evidence/attempt-02/normal.stdout",
+    "sha256": "8cd8cb2de7d879a15a1146b34e752558d264e5d70f43cf8ec9acb3ff60d3c380"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/pplus_primefield_ic_20261123/fft/evidence/attempt-01/native-output.jsonl",
+    "sha256": "189448210ea8bee9bed754d84909aa6f1408ae1496ca17ad935ea6ede1de67f9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/pplus_primefield_ic_20261123/fft/identity/evidence/attempt-01/issuer.stdout.jsonl",
+    "sha256": "bf8c71ac87240d5faac3925a40bb48d3653aac2d722bb736a8295bdcedfb83d2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/pplus_primefield_ic_20261123/fft/identity/evidence/attempt-01/checker.stdout.jsonl",
+    "sha256": "d0401cc727158d479fbc0eb6aec39a28714c110aa0c91f39d6e0e97e4801cfb5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/pplus_primefield_ic_20261123/PUBLICATION_MANIFEST.json",
+    "sha256": "b2d1c0670ea84782db3857992d60f798797af010b574cd0b0a664d88759bc4bf"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Only the finite domains, compiler, frozen sources, checks and custody in the attached producer records; no full production build or independent signing.",
+ "statement": "The preserved local Rust outputs report the Prime31 selector checks for 8191 roots, 32 line-FFT forward comparisons, 32 inverse roundtrips, 32 quotient products, and three finite identity-evaluation records with their stated negative controls. These are producer observations, not signed validation, formal proof, a timing result, or a complete ECDLP solve."
+}

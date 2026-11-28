@@ -1,0 +1,44 @@
+✖ [1869/1870] Building CoverDecodeExample (6.3s)
+trace: .> LEAN_PATH=/workspace/ecdlp-transfer/.lake/packages/Cli/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/batteries/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/Qq/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/aesop/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/plausible/.lake/build/lib/lean:/workspace/ecdlp-transfer/.lake/packages/mathlib/.lake/build/lib/lean:/workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.24.0/bin/lean /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/CoverDecodeExample.lean -o /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/lib/lean/CoverDecodeExample.olean -i /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/lib/lean/CoverDecodeExample.ilean -c /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/ir/CoverDecodeExample.c --setup /workspace/isogeny-crypto/examples/cross_characteristic_ecdlp/.lake/build/ir/CoverDecodeExample.setup.json --json
+error: CoverDecodeExample.lean:164:21: failed to synthesize
+  Finite curve.toAffine.Point
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+error: CoverDecodeExample.lean:163:38: unsolved goals
+⊢ Finite curve.toAffine.Point
+error: CoverDecodeExample.lean:208:44: `simp` made no progress
+error: CoverDecodeExample.lean:209:41: unsolved goals
+h3 : 3 • R = 3 • R
+⊢ 9 ≡ 2 [ZMOD 7]
+info: CoverDecodeExample.lean:239:14: Try this:
+  ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+warning: CoverDecodeExample.lean:239:10: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: CoverDecodeExample.lean:239:2: 'congr 1' tactic does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+info: CoverDecodeExample.lean:245:14: Try this:
+  ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+warning: CoverDecodeExample.lean:245:10: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: CoverDecodeExample.lean:245:2: 'congr 1' tactic does nothing
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+error: CoverDecodeExample.lean:267:0: Unexpected name `CoverFieldProbe` after `end`: The current section is unnamed
+
+Hint: Delete the name `CoverFieldProbe` to end the current unnamed scope; outer named scopes can then be closed using additional `end` command(s):
+  end ̵C̵o̵v̵e̵r̵F̵i̵e̵l̵d̵P̵r̵o̵b̵e̵
+error: Lean exited with code 1
+Some required targets logged failures:
+- CoverDecodeExample
+error: build failed

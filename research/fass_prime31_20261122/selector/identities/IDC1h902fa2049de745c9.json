@@ -1,0 +1,111 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h902fa2049de745c9",
+  "statement": {
+    "name": "Lucas even doubling in root-power coordinates",
+    "source": "selector/REPORT.md; universal ring derivation",
+    "variables": [
+      "u",
+      "v"
+    ],
+    "degree_bound": 2,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "u"
+            },
+            {
+              "op": "var",
+              "args": "u"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "v"
+            },
+            {
+              "op": "var",
+              "args": "v"
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "u"
+                },
+                {
+                  "op": "var",
+                  "args": "v"
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "u"
+                },
+                {
+                  "op": "var",
+                  "args": "v"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "const",
+                "args": 2
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "u"
+                  },
+                  {
+                    "op": "var",
+                    "args": "v"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261122,
+  "value_digest": "f1c3d2ea3b976363dccd688558ef211151ae77a50eb4f2ce5b9abe3565937bf5",
+  "independence": "producer-issued; checked by existing repository checker; no signed PCC or Lean proof",
+  "proof": null
+}

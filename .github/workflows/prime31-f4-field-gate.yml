@@ -1,0 +1,60 @@
+name: Prime31 F4 field-width smoke
+on:
+  push:
+    branches:
+      - research/prime31-f4-admission-run51-20261121
+  pull_request:
+    paths:
+      - 'examples/prime31_f4_field_gate.rs'
+      - 'examples/prime31_coset_xlift_f4.rs'
+      - 'examples/prime31_coset_cubic_factor.rs'
+      - 'examples/prime31_coset_signed25.rs'
+      - 'src/cryptanalysis/f4_fp.rs'
+      - '.github/workflows/prime31-f4-field-gate.yml'
+  workflow_dispatch:
+
+jobs:
+  field-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      CARGO_BUILD_JOBS: '4'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Cache Cargo dependencies and build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+      # Compile is separately timed. Previous run #44984788855 timed out while
+      # compiling dependencies inside its three-minute execution budget. A
+      # cold release build of the crypto library no longer fits 18 minutes on
+      # a hosted runner (2026-11-26/27 runs on several branches), so the
+      # compile budget is 40 minutes; the execution budgets below are unchanged.
+      - name: Build only the three Prime31 research examples
+        timeout-minutes: 40
+        run: |
+          cargo build --release \
+            --example prime31_coset_cubic_factor \
+            --example prime31_f4_field_gate \
+            --example prime31_coset_xlift_f4 \
+            --example prime31_coset_signed25
+      - name: Check exact seven-cubic factor-base roots with existing Rust CZ
+        timeout-minutes: 3
+        run: timeout 150s target/release/examples/prime31_coset_cubic_factor
+      - name: Run exact Prime31 field arithmetic smoke
+        timeout-minutes: 2
+        run: timeout 90s target/release/examples/prime31_f4_field_gate
+      - name: Validate signed25 ordinary affine chart in native Rust
+        timeout-minutes: 1
+        run: timeout 50s target/release/examples/prime31_coset_signed25
+      - name: Bounded F4 admission probe (incomplete degree is not UNSAT)
+        timeout-minutes: 2
+        continue-on-error: true
+        run: timeout 100s target/release/examples/prime31_coset_signed25 --bounded-f4
+      - name: Recover 8 split cosets with existing F4 solver
+        # Cold runners sometimes need >150s for the eight-coset F4 recover;
+        # 150s has been exit-124 flaky after the compile-budget raise.
+        timeout-minutes: 8
+        run: timeout 400s target/release/examples/prime31_coset_xlift_f4
+

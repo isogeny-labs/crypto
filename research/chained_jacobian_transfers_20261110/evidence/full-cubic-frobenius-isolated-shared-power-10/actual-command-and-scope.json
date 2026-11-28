@@ -1,0 +1,20 @@
+{
+  "commands": [
+    [
+      "timeout",
+      "--signal=TERM",
+      "--kill-after=5s",
+      "20",
+      "/home/agent/.elan/bin/lean",
+      "-j1",
+      "/workspace/scratch/ct432-isolated-embedding-induction/actual-embedding.lean"
+    ]
+  ],
+  "toolchains": [
+    "leanprover/lean4:v4.35.0",
+    "leanprover/lean4:v4.34.1"
+  ],
+  "exit_each": 0,
+  "scope": "isolated shared coefficient embedding declarations only, both print embed_pow axioms propext/Quot.sound; full module dual acceptance still pending",
+  "next": "changed full dual original gates j1/120s/default memory"
+}

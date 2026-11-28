@@ -1,0 +1,5 @@
+cwd=/workspace/cryptanalysis
+toolchain=leanprover/lean4:v4.34.1
+workers=1
+memory=original defaults unchanged
+timeout --signal=TERM --kill-after=5s 120 bash tools/lean/proof-gate.sh --out /workspace/scratch/ct433-full-cubic-frobenius-explicit-zero-original-dual-gates/Consumer434 .resume/cubic-full-frobenius-source-20261116-02/CubicFullFrobenius22302.lean

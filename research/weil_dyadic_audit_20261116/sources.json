@@ -1,0 +1,279 @@
+{
+  "schema": "weil-dyadic-source-plan/v1",
+  "created": "2026-11-16T20:38:18.606386+00:00",
+  "formal": {
+    "project": "research/weil_dyadic_audit_20261116/lean",
+    "theorem": "WeilDyadicAudit.actual_dyadic_pairing_certificate",
+    "statement": "theorem actual_dyadic_pairing_certificate : ActualDyadicNondegeneracy ∧ ActualDyadicCharacteristicCollapse ∧ ActualBinaryDyadicRadical ∧ ActualDyadicPositiveControls ∧ ¬UnguardedDyadicNondegeneracyReading",
+    "decl_sha256": "b8b914e0329bdb0bf62788d136a51e46816ba71e9a88baa92896f4a0511f518e",
+    "scope": "Actual existing geometric divisor Weil pairing at every dyadic level2^n is left/right nondegenerate for every nonsingular general Weierstrass model over every algebraically closed field with2nonzero; no assumed nondegeneracy/divisibility left in main. Actual level compatibility plus actual level2 proof and actual point dyadic division discharge composition induction. In characteristic2 all actual dyadic root values collapse, with actual ordinary binary nonzero radical at every positive dyadic level and explicit unguarded reading false. Actual qualified characteristic0/3 positives at every positive dyadic level. Known mathematics, not full isogeny-definition comparison/general odd levels/perfect-character duality/descent/Tate closure. All sources transitively pinned across2lossless dependency manifests; signedunverified/zero spend.",
+    "sources": [
+      {
+        "path": "research/weil_dyadic_audit_20261116/lean/DyadicCertificate.lean",
+        "bytes": 1797,
+        "sha256": "cf6cb92c0614a91e859934f478fb3184ff2013c4f54243aa9b733f954bc7b756"
+      },
+      {
+        "path": "research/weil_dyadic_audit_20261116/lean/DyadicCharacteristic.lean",
+        "bytes": 2565,
+        "sha256": "09413682b93ef1296469df3bc40f6a8089a95915fbc0e5deb36ceb22a04ab65d"
+      },
+      {
+        "path": "research/weil_dyadic_audit_20261116/lean/DyadicControls.lean",
+        "bytes": 1658,
+        "sha256": "64b8171645bc5a7810c5e199cafb3af165db28d4a9aa196f66a3f15349ac3c86"
+      },
+      {
+        "path": "research/weil_dyadic_audit_20261116/lean/DyadicImports.lean",
+        "bytes": 56,
+        "sha256": "ff1a8427c9d7218514497c6c4cfb4587e7bb76fae3869b440ae4822ecee91e7b"
+      },
+      {
+        "path": "research/weil_dyadic_audit_20261116/lean/DyadicNondegenerate.lean",
+        "bytes": 2924,
+        "sha256": "953963a57a3d8ab68c5b61e1cbbf621a830cc343a0ab37974fa3fd12effdeb4a"
+      },
+      {
+        "path": "research/weil_dyadic_audit_20261116/lean/DyadicTransport.lean",
+        "bytes": 1690,
+        "sha256": "e82549a800d6dbc8c8aa8ea785ef5caab80f6242fd59a13d97783e7c8b6358fa"
+      },
+      {
+        "path": "research/weil_dyadic_audit_20261116/lean/lake-manifest.json",
+        "bytes": 12267,
+        "sha256": "e61cf5b58144ee470cbae222e4ea84755932a2497fca2415406c9e23d00a1ef8"
+      },
+      {
+        "path": "research/weil_dyadic_audit_20261116/lean/lakefile.toml",
+        "bytes": 486,
+        "sha256": "c08bfd15c4610d31418da0236c90883b1ece20b1881054ba3f55efbba54ef251"
+      },
+      {
+        "path": "research/weil_dyadic_audit_20261116/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ],
+    "dependency_source_manifests": [
+      {
+        "path": "research/weil_dyadic_audit_20261116/evidence/dependency-sources.part01.json",
+        "bytes": 41440,
+        "sha256": "67c3eda383673af557c46a64e9e3cc05c166c51d44ced41c025caf0c04a94c7d",
+        "records": 198
+      },
+      {
+        "path": "research/weil_dyadic_audit_20261116/evidence/dependency-sources.part02.json",
+        "bytes": 40298,
+        "sha256": "c72865027a35bb58b6a12e17a5b8045dede1df3ad069b16029d6f9250f5f1a45",
+        "records": 197
+      }
+    ],
+    "root_source_files": 9,
+    "dependency_source_files": 395,
+    "full_formal_closure_files": 404
+  },
+  "artifacts": [
+    {
+      "path": "research/weil_dyadic_audit_20261116/evidence/attempts.tar.xz.part01",
+      "bytes": 64000,
+      "sha256": "8172ad7b794e416da73145cb8fa1bf6e3fe0521731ddafb7f062e7c459c2798b"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/evidence/attempts.tar.xz.part02",
+      "bytes": 64000,
+      "sha256": "95b6f4b6452faa27de5e151aba06954d223709dc240eec7d1be823051ef3d589"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/evidence/attempts.tar.xz.part03",
+      "bytes": 64000,
+      "sha256": "dbac2c1826c9a236257cbe741cebaef5326932f793326520f063b163d75ec635"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/evidence/attempts.tar.xz.part04",
+      "bytes": 10228,
+      "sha256": "b0cb10b408f728325e98aa580fcc86a0705f1efd80e02af2b3ff2cc5f168a7e8"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/evidence/attempts.tar.xz.sha256",
+      "bytes": 90,
+      "sha256": "d98316d36fdef6e26e0851e8a7c0a3191ef0cc30683f2acfabfed92acb93a2a8"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/evidence/attempts.json",
+      "bytes": 1263,
+      "sha256": "d1539459cac3cd6ac1eb486061b8c0776594712afcf1f789d8da7fb0805eaa63"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/evidence/gate.tar.gz",
+      "bytes": 28586,
+      "sha256": "d5dced8663033ffcc25ee08c3ac4ed790436f61ea44e0786fb9bbcd0e2ae6ff7"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/evidence/gate.json",
+      "bytes": 21198,
+      "sha256": "0677360f64099d5215e77cef06305e5486e76482b917abd31d13dc99e04ade34"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/evidence/source-review.json",
+      "bytes": 2412,
+      "sha256": "f199b1da79124996d59c24ddd3ad37bde2dd75ceb787885cb925c6f751fe55a8"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/evidence/binding-check.json",
+      "bytes": 2065,
+      "sha256": "a04bc492aef72018c08ef2dc343c6b56d9a9e37a7eac754c849cf80463d2180e"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/evidence/restore-check.json",
+      "bytes": 123,
+      "sha256": "b45da1bc42cc34784f8f68ed77c703273744071ab30d03e0ac26df48df19dfb3"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/proof-map.json",
+      "bytes": 51987,
+      "sha256": "53c1791f4048199f99661799f3060b932a817c444edb2bf2948c7d70a59dc563"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/render_report.py",
+      "bytes": 6272,
+      "sha256": "82f7bcde4f4bc0cd6d9671ad1322e7559bc211d8b610983310ae7c5b66c6ba85"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/restore_attempts.py",
+      "bytes": 1454,
+      "sha256": "ad4323d1a631009f5ab16d39ca7067ec39a5cbd7fc355f0723e58da5ac7adbfc"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/export_binding_input.py",
+      "bytes": 1375,
+      "sha256": "6199d0135f18df3490685c9b3d7af6d5b0a41443ed73588c6bb7a2b529d748f1"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/PROTOCOL.md",
+      "bytes": 6135,
+      "sha256": "c145ebed846864ef20cd70226ef749b39b1c431859f7dae4b4609ee33e76d1d0"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/preflight.json",
+      "bytes": 24566,
+      "sha256": "b63ef1f018ea61fb4fe631ebb6c6810916db31872cddcecc5561fab5466fe6d3"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/reports/dyadic-domains.svg",
+      "bytes": 2033,
+      "sha256": "d8705a5ffe9daae9e5d79550e2e03ac35492a1795cf8caa483f9e842a0906737"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/reports/layout.json",
+      "bytes": 302,
+      "sha256": "c44ace6b57039e4e431ffdfb1f5fff07d93bd672b7589f6fc4b4275d1e8ea748"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/reports/report.pdf",
+      "bytes": 46454,
+      "sha256": "ae104b2301e511fcaade691dc86f1260c46a3b3756cce5236c3d3ceef8f12119"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/reports/source-review.md",
+      "bytes": 2631,
+      "sha256": "bdda6f5ddf6d9a9ec0a7683bd30def5b54aed17311375d1ef6b8ab7111bcde0c"
+    },
+    {
+      "path": "research/weil_two_nondegeneracy_audit_20261116/sources.json",
+      "bytes": 65155,
+      "sha256": "3b9b6b4f2caa01728f445aa8962116412a3409d3b8e7574cc96a9b6977b9c73c"
+    },
+    {
+      "path": "research/elliptic_doubling_surjectivity_audit_20261116/sources.json",
+      "bytes": 55718,
+      "sha256": "b61fb114deb9621b8b6ac1f0880b4d75fa25863a9934df5ea1a896a6b9795b95"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/evidence/dependency-sources.part01.json",
+      "bytes": 41440,
+      "sha256": "67c3eda383673af557c46a64e9e3cc05c166c51d44ced41c025caf0c04a94c7d"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/evidence/dependency-sources.part02.json",
+      "bytes": 40298,
+      "sha256": "c72865027a35bb58b6a12e17a5b8045dede1df3ad069b16029d6f9250f5f1a45"
+    },
+    {
+      "path": "research/weil_dyadic_audit_20261116/evidence/dependency-sources.index.json",
+      "bytes": 774,
+      "sha256": "39d2fe03ad4551d579f5a54a8f3988a9f22345ff766a5aabb93aa58f2cdb9e38"
+    }
+  ],
+  "assurance": {
+    "schema": "weil-dyadic-preflight/v1",
+    "build_snapshots": 4,
+    "failed_states": [
+      "01",
+      "02",
+      "03"
+    ],
+    "successful_states": [
+      "04"
+    ],
+    "published_preservation_entries": 8164,
+    "additional_dependency_entries": 46,
+    "all_checked_entries": 8210,
+    "frozen_plans": 58,
+    "manifest_packages": 39,
+    "copied_import_modules": 0,
+    "hydration": 0,
+    "lake_update": false,
+    "registered_roots_from01": true,
+    "root_formal_files": 9,
+    "dependency_formal_files": 395,
+    "full_formal_closure_files": 404,
+    "lossless_dependency_source_manifest_parts": 2,
+    "actual_equal_level_point_transport": true,
+    "actual_integer_dyadic_point_surjectivity": true,
+    "actual_level_two_nondegeneracy_credited": true,
+    "actual_double_level_composition_all_premises_discharged": true,
+    "actual_all_dyadic_left_right_nondegeneracy": true,
+    "actual_characteristic_two_all_dyadic_roots_collapse": true,
+    "actual_ordinary_binary_nonzero_radical_all_positive_dyadic_levels": true,
+    "explicit_wrong_unguarded_dyadic_nondegeneracy_false": true,
+    "actual_qualified_char_zero_three_positives_all_positive_dyadic_levels": true,
+    "general_odd_levels_closed": false,
+    "general_Weil_nondegeneracy_proved": false,
+    "Scheme_isogeny_API_comparison": false,
+    "multiplication_isogeny_definition_comparison": false,
+    "perfect_character_duality_proved": false,
+    "descent_canonical_Tate_MOV_FR": false,
+    "novelty_claim": false,
+    "qualified_modern_source_refuted": false,
+    "signed_standing": "unverified",
+    "full14complete": false,
+    "paid_compute": 0,
+    "native_experiments": 0,
+    "gate_declarations": 13,
+    "new_modules": 6,
+    "new_concrete_modules": 5,
+    "official_import_bridge_modules": 1,
+    "pinned_custom_source_modules": 311,
+    "actually_imported_custom_modules": 307,
+    "actually_imported_frozen_modules": 301,
+    "additional_frozen_pinned_modules": 4,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "new_source_warnings": 0
+  },
+  "dependency_source_plans": [
+    "research/weil_two_nondegeneracy_audit_20261116/sources.json",
+    "research/elliptic_doubling_surjectivity_audit_20261116/sources.json"
+  ],
+  "preservation_scope": "56published sets8164entries plus46earlier canonical dependencies=8210;58initial plans;395formal dependencies losslessly split across2pinned metadata files. Known qualified Weil nondegeneracy credited; actual all-dyadic proof and ordinary characteristic2 radical family; no full isogeny-definition comparison or generaloddlevel closure."
+}

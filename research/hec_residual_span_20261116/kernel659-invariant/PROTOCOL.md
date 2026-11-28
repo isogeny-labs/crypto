@@ -1,0 +1,7 @@
+# Modular scalar bridge, exact ball persistence and absolute-simplicity gate
+
+Prospective [pcc:unverified]. Same3immutable perioddescriptors/source/partnerclass andsameprivateFLINT3.6runtime. Consumer retainsallprevious256/512period/thetacontrols, additionallycomputes S=sum36theta^8, P=product36theta, Sigma=sum_i product_j!=i theta_j^8 usingdivision-freeprefix/suffix. RequireS/Sigmaexclude0 todefine J=P²/S^9 andR=P^70/Sigma^9; sourceballscontain0, quotientballsexclude0. These are complexvalues, notp-adicdata. Persist everytheta andbothinvariants asexactarb_dump_file (previousprintdwasdiagnosticdecimalonly). SeparateCreader mustreloadall6invariantfiles andcheckprecision/partneroverlap; this isindependentserialization/replaypath, notindependentmathimplementation.
+
+Rust gate reusesexactcharacterformula, computesFrob14mod1009 andrequirespowerbasisrank6. UnderpriorK=Q(zeta7) Frobenius/Tatepremises andmu(K)=mu14, this preventsanycollisionofGaloisconjugates underanypower, henceabsolute simplicity. Numeric auxiliaryprime fixed1009, no searchifrankfails.
+
+Max5once-onlyprocesses120CPUeach: Rustabsolute,3Cconsumers,1comparatorifallinputsproduced. No rerun/overwrite, exactballfilescreate_new. Source/protocol/native/import/privateRuntime/prior/binaries hashfreeze pushGit beforeexecution. Allraw/exit/hashesretained,noS3/cloud/merge. Noexactalgebraicrecognition,421-adicvaluation,finitefieldcurve orspeedclaim. THEORY.md givesa sufficientreductioncriterion andmissingdenominator/embedding/Serreobstruction obligations.

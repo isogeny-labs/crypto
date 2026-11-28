@@ -1,0 +1,165 @@
+{
+  "main": "FiveTorsionRankAudit.actual_geometric_five_certificate",
+  "binding": "7cf18bb12120869fac57c17df562ecbdb06329a691fd1ae4446fe7ce97cc10df",
+  "custom_imports": {
+    "CharacteristicThree": "research/three_torsion_rank_audit_20261114/lean/CharacteristicThree.lean",
+    "DivisionQuartic": "research/three_torsion_rank_audit_20261114/lean/DivisionQuartic.lean",
+    "GeneralBasis": "research/three_torsion_rank_audit_20261114/lean/GeneralBasis.lean",
+    "GeneralCardinality": "research/three_torsion_rank_audit_20261114/lean/GeneralCardinality.lean",
+    "GeneralCertificate": "research/three_torsion_rank_audit_20261114/lean/GeneralCertificate.lean",
+    "GeneralRoots": "research/three_torsion_rank_audit_20261114/lean/GeneralRoots.lean",
+    "GeneralTriplePoint": "research/three_torsion_rank_audit_20261114/lean/GeneralTriplePoint.lean",
+    "GeometricCardinality": "research/three_torsion_rank_audit_20261114/lean/GeometricCardinality.lean",
+    "QuarticRoots": "research/three_torsion_rank_audit_20261114/lean/QuarticRoots.lean",
+    "TernaryBasis": "research/three_torsion_rank_audit_20261114/lean/TernaryBasis.lean",
+    "ThreeCertificate": "research/three_torsion_rank_audit_20261114/lean/ThreeCertificate.lean",
+    "TriplePoint": "research/three_torsion_rank_audit_20261114/lean/TriplePoint.lean",
+    "FiveBasis": "research/five_torsion_rank_audit_20261115/lean/FiveBasis.lean",
+    "FiveCardinality": "research/five_torsion_rank_audit_20261115/lean/FiveCardinality.lean",
+    "FiveCertificate": "research/five_torsion_rank_audit_20261115/lean/FiveCertificate.lean",
+    "FiveControls": "research/five_torsion_rank_audit_20261115/lean/FiveControls.lean",
+    "FiveConverse": "research/five_torsion_rank_audit_20261115/lean/FiveConverse.lean",
+    "FiveDuplication": "research/five_torsion_rank_audit_20261115/lean/FiveDuplication.lean",
+    "FiveForward": "research/five_torsion_rank_audit_20261115/lean/FiveForward.lean",
+    "FivePolynomial": "research/five_torsion_rank_audit_20261115/lean/FivePolynomial.lean",
+    "FiveRootData": "research/five_torsion_rank_audit_20261115/lean/FiveRootData.lean",
+    "FiveSeparable": "research/five_torsion_rank_audit_20261115/lean/FiveSeparable.lean"
+  },
+  "claims": [
+    {
+      "declaration": "FiveTorsionRankAudit.five_formula",
+      "conclusion": "LiteralofficialpreΨ5 recurrence."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.fourth_identity",
+      "conclusion": "UniversalH=TC−D²."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.five_derivative",
+      "conclusion": "UniversalUprime=5D(CH−T²)."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.root_derivative_identity",
+      "conclusion": "Smalluniversalroot-derivativeidentity."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.five_root_data",
+      "conclusion": "ActualnonsingularpointatUroot excludesD/Tzeros."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.five_point_iff",
+      "conclusion": "Actualnonsingularpoint5P0iffliteralUroot/everycharacteristic."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.five_separable",
+      "conclusion": "SeparableUforactualallnonsingularmodels/ACchar!=5."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.five_root_card",
+      "conclusion": "TwelvedistinctactualUroots."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.five_ordinate_card",
+      "conclusion": "TwoactualordinatespereveryUroot."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.pointFiveFiberEquiv",
+      "conclusion": "Actualkernel↔root-ordinatefibersplusidentity."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.geometric_five_card",
+      "conclusion": "Wholeactualgeometric5kernel25."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.geometric_five_finrank",
+      "conclusion": "ActualZMod5module rank2 derived."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.geometricFiveBasis",
+      "conclusion": "ActualFin2basis constructed."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.geometric_five_exact_card",
+      "conclusion": "Twentyfouractualpointsofexactorder5."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.scalar_extension_five_card",
+      "conclusion": "Actualalgclosedscalarextensioncurve kernel25."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.charFive_card",
+      "conclusion": "Actualeverychar5fieldcurve y²=x³+1/Δ3/Ueval−1/kernel1."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.binary_five_positive",
+      "conclusion": "Creditedactualchar2curve hasnew5kernel25/rank2."
+    },
+    {
+      "declaration": "FiveTorsionRankAudit.ternary_five_positive",
+      "conclusion": "Creditedactualchar3curve hasnew5kernel25/rank2."
+    }
+  ],
+  "prior_reused_claims": [
+    {
+      "path": "research/three_torsion_rank_audit_20261114",
+      "role": "Actualgeneral3-pointiff/literalquartic/root-denominator identity/ordinate polynomial/rootfinite/countmethod andactualbinary/ternarycurve/discriminants credited. Onefrozenlocalpathdependency12modules15formalconfigs31pins0copies/0hydration."
+    },
+    {
+      "path": "research/bk_char_five_geometric_audit_20261115",
+      "role": "KnownactualordinaryF5y²=x³+3x+2 geometric5kernel5/descent/allkparaphrasecounter credited. Notrederived/imported. Newchar5y²=x³+1 kernel1 controltargetsdeletedcoprimalityfromrank/count, notBKcount-divisibility ornovelty."
+    },
+    {
+      "path": "research/three_tangent_pairing_audit_20261115",
+      "role": "Generaldeterminantat3/actualtangentpairing credited separately, notgeneral5det."
+    },
+    {
+      "path": "research/bk_general_frobenius_audit_20261115",
+      "role": "Actualallrmodule/fixedfield bridge andoriginalF19knownsourcecontrol credited separately; no generalrankpremise imported."
+    }
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 50,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "literal_official_fifth_polynomial": true,
+    "universal_structured_derivative_identities": true,
+    "actual_five_point_iff_every_characteristic": true,
+    "separability_and_twelve_roots_derived": true,
+    "actual_point_root_fiber_bijection": true,
+    "actual_general_five_kernel25_rank2": true,
+    "actual_exactorder5_count24": true,
+    "actual_char2_char3_positive": true,
+    "actual_char5_kernel1_control": true,
+    "determinant_five": false,
+    "general_prime_ge7_rankdet": false,
+    "canonical_Weil_comparison": false,
+    "qualified_source_refuted": false,
+    "new_native_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

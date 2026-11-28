@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T19:58:34Z",
+ "id": "PCC-20261118-2b1b1d",
+ "kind": "statement",
+ "producer": {
+  "commit": "04b361ff2f5efd09bf77899ecbb8e1df99fe068a",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/publication/summary.json",
+    "sha256": "10a6f8008cc71fbba3d56a554bd7e7b5e595dbd2b2dc77fae52cceb4d6132818"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/publication/status",
+    "sha256": "97a58cc66d1cd6b51466af8ed52d6a38053b5572fee09a0ae8859c26b82bdf67"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/publication/response.xml",
+    "sha256": "e7ffcdeb2c36d29f655e9a7b60ee2350653bb6dd267d76d822d403ce394b37f9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/runs.tar.xz.sha256",
+    "sha256": "68c2edec1131a1d637192f04466a9fa64074d74e1677a217802633c0d4baeb56"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/archive-exclusions.txt",
+    "sha256": "98dea3fdbd691db48aed8b60f65393d3e57d9a8aff65053a1bc93f9dcf0885be"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/prepared-norm-20261118",
+ "statement": "Prepared-norm raw development archive is 8124 bytes, deterministic and byte-identical after extraction/repacking under its recorded exclusion list. A fresh public regional S3 GET again returns HTTP403 AllAccessDisabled for the existing wide-harness object; no authenticated access or upload was retried. The earlier S3 obligation remains unresolved and the overall PR remains draft. No target construction or performance result is established."
+}

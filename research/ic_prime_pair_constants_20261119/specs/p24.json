@@ -1,0 +1,298 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "prime pair-table pipeline constants, variants at the optimal |F|, curve p24",
+ "description": "research/ic_prime_pair_constants_20261119/PROTOCOL.md",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 16777199,
+    "a": 16777196,
+    "b": 31,
+    "group_order": 16782299,
+    "r": 16782299,
+    "gx": 2,
+    "gy": 5412647
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 20261120
+ },
+ "arms": [
+  {
+   "name": "rho",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "inc",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "inc_aa",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "o_mitm_nf",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm:negation_folded=1",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "o_mitm_unf",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "o_batch",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-batch:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "o_rfsub",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss",
+     "oracle": "rootfind-subtract:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "o_rfmitm",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss",
+     "oracle": "rootfind-mitm-prime-batch:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "o_sub",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss",
+     "oracle": "subtract:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "t_dg",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "stride-renew-deferred-guard"
+    }
+   }
+  },
+  {
+   "name": "t_stride",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "stride"
+    }
+   }
+  },
+  {
+   "name": "t_srenew",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "t_pfast",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "walk-prime-fast"
+    }
+   }
+  },
+  {
+   "name": "t_pb16",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "walk-prime-batch-16"
+    }
+   }
+  },
+  {
+   "name": "t_random",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "random"
+    }
+   }
+  },
+  {
+   "name": "dg_leader",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm:negation_folded=1",
+     "targets": "stride-renew-deferred-guard"
+    }
+   }
+  },
+  {
+   "name": "l_echelon",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss-echelon",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "l_fullrank",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=128",
+     "linalg": "incremental-gauss-full-rank",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "k3_a",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=24",
+     "linalg": "incremental-gauss",
+     "oracle": "ksum:m=3",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "k3_b",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=32",
+     "linalg": "incremental-gauss",
+     "oracle": "ksum:m=3",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "k3_c",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=48",
+     "linalg": "incremental-gauss",
+     "oracle": "ksum:m=3",
+     "targets": "walk"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate_measured",
+  "seed": 20261120,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

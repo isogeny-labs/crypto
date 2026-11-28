@@ -1,0 +1,845 @@
+{
+  "algorithm_substitutions": false,
+  "benchmark_executed_by_build_script": false,
+  "candidate_source_included": true,
+  "cargo_profile": "release",
+  "complete_hermetic_build_manifest": false,
+  "correctness_qualification_only": true,
+  "counter_stubs": false,
+  "evidence_status": "build provenance only; test results require a separate receipt; PCC-unverified",
+  "extracted_production_ranges": [
+    {
+      "generated_bytes": 1099,
+      "generated_name": "challenge_prime.rs",
+      "generated_sha256": "3637225cf7a90d3b44a070a1f16fb5efdef7274eb5d2ee2d1778fcd4db7efc98",
+      "inserted_bytes": 0,
+      "path": "src/cryptanalysis/challenge_ladder.rs",
+      "pinned_whole_source_sha256": "5dd3022fc9fe214b3d8775c55e5b04e5fa306b9442604f99ddd643d2fef7ccf2",
+      "ranges": [
+        {
+          "byte_end_exclusive": 2500,
+          "byte_start_inclusive": 1401,
+          "end_anchor": "/// Square root mod an odd prime by Tonelli–Shanks; `None` for a\n",
+          "generated_byte_end_exclusive": 1099,
+          "generated_byte_start_inclusive": 0,
+          "rewritten": false,
+          "scope": "mulm, powm, and actual challenge_ladder deterministic primality test",
+          "selected_bytes": 1099,
+          "selected_sha256": "3637225cf7a90d3b44a070a1f16fb5efdef7274eb5d2ee2d1778fcd4db7efc98",
+          "start_anchor": "/// `a·b mod m`.\n"
+        }
+      ],
+      "rewritten": false,
+      "selection": "concatenated_verbatim_byte_ranges",
+      "whole_source_bytes": 13529,
+      "whole_source_sha256": "5dd3022fc9fe214b3d8775c55e5b04e5fa306b9442604f99ddd643d2fef7ccf2"
+    },
+    {
+      "generated_bytes": 6069,
+      "generated_name": "glv_roots.rs",
+      "generated_sha256": "1d755812916dd0fdf488bc486e9611fbe029e48c365e0629c56dbe831faca19a",
+      "inserted_bytes": 0,
+      "path": "src/cryptanalysis/glv_invariant_base.rs",
+      "pinned_whole_source_sha256": "32c38ce6d7207030b50696b36e109fc7acebda7ba3ee518c7083e3fb08722336",
+      "ranges": [
+        {
+          "byte_end_exclusive": 5974,
+          "byte_start_inclusive": 5604,
+          "end_anchor": "/// The multiplicative order of `lambda` modulo the prime `r`, by\n",
+          "generated_byte_end_exclusive": 370,
+          "generated_byte_start_inclusive": 0,
+          "rewritten": false,
+          "scope": "mulm, addm, subm, and negm",
+          "selected_bytes": 370,
+          "selected_sha256": "ef3b6ba8fbc8cc9115eb0b9addf540faee952188f1ac2e34fa8afd238e73a1ba",
+          "start_anchor": "/// `a·b mod m` without overflow, `m < 2^63`.\n"
+        },
+        {
+          "byte_end_exclusive": 44821,
+          "byte_start_inclusive": 39122,
+          "end_anchor": "// ── Degree-2 CM endomorphisms by Vélu (type C)",
+          "generated_byte_end_exclusive": 6069,
+          "generated_byte_start_inclusive": 370,
+          "rewritten": false,
+          "scope": "complete polynomial helpers and exact rational-root extraction, including the actual deadline-aware randomized split",
+          "selected_bytes": 5699,
+          "selected_sha256": "9f290ad35bd805a22af32e596ec5d69fccb84c2d33487532a2812eb040379c21",
+          "start_anchor": "/// Coefficients low to high, no trailing zeros.\n"
+        }
+      ],
+      "rewritten": false,
+      "selection": "concatenated_verbatim_byte_ranges",
+      "whole_source_bytes": 74256,
+      "whole_source_sha256": "32c38ce6d7207030b50696b36e109fc7acebda7ba3ee518c7083e3fb08722336"
+    },
+    {
+      "generated_bytes": 1586,
+      "generated_name": "monomial_order.rs",
+      "generated_sha256": "6e778a51bac23df95521897998c2094fb07e046364ac5a13a8317952c0ce56f5",
+      "inserted_bytes": 0,
+      "path": "src/cryptanalysis/groebner_f4.rs",
+      "pinned_whole_source_sha256": "36b0bc3232df109b08feb246b0ff97d132397470a6897c84ac63500d5005974f",
+      "ranges": [
+        {
+          "byte_end_exclusive": 4508,
+          "byte_start_inclusive": 2922,
+          "end_anchor": "/// Leading monomial of `f` under `ord`, as `(exponent, coefficient)`.\n",
+          "generated_byte_end_exclusive": 1586,
+          "generated_byte_start_inclusive": 0,
+          "rewritten": false,
+          "scope": "actual Ordering enum and cmp_monomial",
+          "selected_bytes": 1586,
+          "selected_sha256": "6e778a51bac23df95521897998c2094fb07e046364ac5a13a8317952c0ce56f5",
+          "start_anchor": "// ── Monomial ordering"
+        }
+      ],
+      "rewritten": false,
+      "selection": "concatenated_verbatim_byte_ranges",
+      "whole_source_bytes": 21200,
+      "whole_source_sha256": "36b0bc3232df109b08feb246b0ff97d132397470a6897c84ac63500d5005974f"
+    },
+    {
+      "generated_bytes": 74218,
+      "generated_name": "ic_boundary.rs",
+      "generated_sha256": "7d08dfae90c782cd3d93c71600420b88ce4d87ff8a5751646328a38e3202f44a",
+      "inserted_bytes": 0,
+      "path": "src/cryptanalysis/ic_boundary.rs",
+      "pinned_whole_source_sha256": "7a7ff906dd2206b236a31155f0bdaa2d753b890b2edd79a67aaeb5cb52d72311",
+      "ranges": [
+        {
+          "byte_end_exclusive": 11284,
+          "byte_start_inclusive": 8302,
+          "end_anchor": "/// Nanoseconds per native unit, measured on the host for the instance at\n",
+          "generated_byte_end_exclusive": 2982,
+          "generated_byte_start_inclusive": 0,
+          "rewritten": false,
+          "scope": "complete FieldOps and GroupOps types and implementations",
+          "selected_bytes": 2982,
+          "selected_sha256": "6c0fb3e89c1a346b194ace4d6004be9c0fdcf50687e60759f28ca3ded6df05ca",
+          "start_anchor": "/// The field operations behind the group operations: modular\n"
+        },
+        {
+          "byte_end_exclusive": 78191,
+          "byte_start_inclusive": 42828,
+          "end_anchor": "fn mix(v: u64) -> u64 {",
+          "generated_byte_end_exclusive": 38345,
+          "generated_byte_start_inclusive": 2982,
+          "rewritten": false,
+          "scope": "actual map hasher, all word modular arithmetic, RowStatus, IncrementalGauss, SiblingPair, and complete CountedGroup trait",
+          "selected_bytes": 35363,
+          "selected_sha256": "dfddca8d826b072b868153b8e67af24fd645f9b9bb9b951e18b48e3e8b32b5cc",
+          "start_anchor": "// ── A fast hasher for point keys"
+        },
+        {
+          "byte_end_exclusive": 90687,
+          "byte_start_inclusive": 89648,
+          "end_anchor": "#[inline]\nfn negmod(a: u64, m: u64) -> u64 {",
+          "generated_byte_end_exclusive": 39384,
+          "generated_byte_start_inclusive": 38345,
+          "rewritten": false,
+          "scope": "actual pick_word architecture dispatch",
+          "selected_bytes": 1039,
+          "selected_sha256": "9e6eb6328c35c807e8d8187802f8f0b1d516954babfd40f127eb2f23ddbd4d8e",
+          "start_anchor": "/// `a` when `first`, else `b`, as one `cmov` where the target has one.  A\n"
+        },
+        {
+          "byte_end_exclusive": 97876,
+          "byte_start_inclusive": 95681,
+          "end_anchor": "impl RhoClasses<PrimeCurve> for CubicClasses {",
+          "generated_byte_end_exclusive": 41579,
+          "generated_byte_start_inclusive": 39384,
+          "rewritten": false,
+          "scope": "CubicClasses type and complete inherent implementation required by PrimeCurve's automorphism method; no rho class implementation",
+          "selected_bytes": 2195,
+          "selected_sha256": "34280bffedef9100183714ba18da3143d1e70df0573d253a1acff612ceb609d1",
+          "start_anchor": "pub struct CubicClasses {"
+        },
+        {
+          "byte_end_exclusive": 278472,
+          "byte_start_inclusive": 246407,
+          "end_anchor": "/// A prime-field instance: curve, prime-order subgroup, generator.\n",
+          "generated_byte_end_exclusive": 73644,
+          "generated_byte_start_inclusive": 41579,
+          "rewritten": false,
+          "scope": "complete PrimePoint, PrimeCurve, CountedFp, Jacobi helper, and full CountedGroup implementation including native walk overrides",
+          "selected_bytes": 32065,
+          "selected_sha256": "863271d3a95be39112929b52f7de8c7c6955085246d2267969879e3483aa4d2f",
+          "start_anchor": "// ── Prime-field curves on one word"
+        },
+        {
+          "byte_end_exclusive": 359560,
+          "byte_start_inclusive": 358986,
+          "end_anchor": "struct GuardLineSet {\n",
+          "generated_byte_end_exclusive": 74218,
+          "generated_byte_start_inclusive": 73644,
+          "rewritten": false,
+          "scope": "complete unchanged architecture-specific prefetch helper used by OpenCoefMap",
+          "selected_bytes": 574,
+          "selected_sha256": "61962b897e0b1dd481635f62e917406c43240a6a578c78b80a6be54a62c38ea0",
+          "start_anchor": "#[inline(always)]\n#[allow(unused_unsafe)]\nfn prefetch_cache_line<T>(lines: &[T], index: usize) {\n"
+        }
+      ],
+      "rewritten": false,
+      "selection": "concatenated_verbatim_byte_ranges",
+      "whole_source_bytes": 1000016,
+      "whole_source_sha256": "7a7ff906dd2206b236a31155f0bdaa2d753b890b2edd79a67aaeb5cb52d72311"
+    },
+    {
+      "generated_bytes": 451,
+      "generated_name": "mask_type.rs",
+      "generated_sha256": "85080af458c63076067d5b066b82a3befc3c37e021763c74c2026adc63c7c8c6",
+      "inserted_bytes": 0,
+      "path": "src/cryptanalysis/pq_groebner_f2.rs",
+      "pinned_whole_source_sha256": "2d014644853e7815a58fb34c29177dd4894b08588d59ad64dffa904bffd35056",
+      "ranges": [
+        {
+          "byte_end_exclusive": 4139,
+          "byte_start_inclusive": 3688,
+          "end_anchor": "/// The one-bit mask of variable `k`.\n",
+          "generated_byte_end_exclusive": 451,
+          "generated_byte_start_inclusive": 0,
+          "rewritten": false,
+          "scope": "actual Mask aliases and MASK_BITS for the unmodified fx_hash module; no Boolean solver",
+          "selected_bytes": 451,
+          "selected_sha256": "85080af458c63076067d5b066b82a3befc3c37e021763c74c2026adc63c7c8c6",
+          "start_anchor": "/// The bitmask a monomial is stored in: 64 bits, or 128 under the\n"
+        }
+      ],
+      "rewritten": false,
+      "selection": "concatenated_verbatim_byte_ranges",
+      "whole_source_bytes": 82853,
+      "whole_source_sha256": "2d014644853e7815a58fb34c29177dd4894b08588d59ad64dffa904bffd35056"
+    },
+    {
+      "generated_bytes": 25542,
+      "generated_name": "prime_fast.rs",
+      "generated_sha256": "4f72c21c5ae39b0b426d4bc2aa2d13642055e89ad492ef93e5d0df419963c769",
+      "inserted_bytes": 0,
+      "path": "src/cryptanalysis/prime_fast.rs",
+      "pinned_whole_source_sha256": "03397cbcd5146df5341eea15febe34912bfed346d25759343a33a7b123712731",
+      "ranges": [
+        {
+          "byte_end_exclusive": 17971,
+          "byte_start_inclusive": 2962,
+          "end_anchor": "    /// Adopt a crate [`CurveParams`] whose `p` and `n` fit in 62 bits.\n",
+          "generated_byte_end_exclusive": 15009,
+          "generated_byte_start_inclusive": 0,
+          "rewritten": false,
+          "scope": "complete actual Montgomery arithmetic, points, scratch types, and FastCurve constructors; existing impl opening retained",
+          "selected_bytes": 15009,
+          "selected_sha256": "139099aa0da1de21027c5abb78cc98dde5e529fd6aa99dc00dd93e021131a72b",
+          "start_anchor": "/// Largest field size the Montgomery layer supports (`p < 2^62` keeps\n"
+        },
+        {
+          "byte_end_exclusive": 18860,
+          "byte_start_inclusive": 18440,
+          "end_anchor": "    pub fn to_textbook(&self, p: Option<Pt>) -> Point {",
+          "generated_byte_end_exclusive": 15429,
+          "generated_byte_start_inclusive": 15009,
+          "rewritten": false,
+          "scope": "actual scalar_field, point, and canonical methods; unused from_params adapter omitted",
+          "selected_bytes": 420,
+          "selected_sha256": "869f09859458b60197b30f59ed5ab9ee36bd61faedf5e491e016054cca7b2bfe",
+          "start_anchor": "    /// Group-order field context (Montgomery mod `n`) for the linear\n"
+        },
+        {
+          "byte_end_exclusive": 29769,
+          "byte_start_inclusive": 19656,
+          "end_anchor": "fn biguint_to_u64(v: &BigUint) -> Option<u64> {",
+          "generated_byte_end_exclusive": 25542,
+          "generated_byte_start_inclusive": 15429,
+          "rewritten": false,
+          "scope": "all remaining FastCurve arithmetic methods including batched additions and existing impl closing brace; unused textbook conversion adapters omitted",
+          "selected_bytes": 10113,
+          "selected_sha256": "4eb89ea2b27a2cc36e33025afb8d54a6681f0d1d480a830caa14034200655394",
+          "start_anchor": "    pub fn is_on_curve(&self, p: Pt) -> bool {\n"
+        }
+      ],
+      "rewritten": false,
+      "selection": "concatenated_verbatim_byte_ranges",
+      "whole_source_bytes": 191725,
+      "whole_source_sha256": "03397cbcd5146df5341eea15febe34912bfed346d25759343a33a7b123712731"
+    },
+    {
+      "generated_bytes": 6402,
+      "generated_name": "residual_arithmetic.rs",
+      "generated_sha256": "49bcb68e58998ae67ae56477f86302824eaef5ee3c485eba6d61d7be3fc03f9e",
+      "inserted_bytes": 0,
+      "path": "src/cryptanalysis/residual_walk.rs",
+      "pinned_whole_source_sha256": "4e54e030cebfc873f9288e25c83153841724d1cc0d8c79417288aa9e74f507c9",
+      "ranges": [
+        {
+          "byte_end_exclusive": 11818,
+          "byte_start_inclusive": 5416,
+          "end_anchor": "fn isqrt(n: u64) -> u64 {",
+          "generated_byte_end_exclusive": 6402,
+          "generated_byte_start_inclusive": 0,
+          "rewritten": false,
+          "scope": "actual modular arithmetic, pow_mod/inv_mod with unchanged counting hooks, square root, and residual_walk primality test",
+          "selected_bytes": 6402,
+          "selected_sha256": "49bcb68e58998ae67ae56477f86302824eaef5ee3c485eba6d61d7be3fc03f9e",
+          "start_anchor": "// ── u64 modular arithmetic"
+        }
+      ],
+      "rewritten": false,
+      "selection": "concatenated_verbatim_byte_ranges",
+      "whole_source_bytes": 139432,
+      "whole_source_sha256": "4e54e030cebfc873f9288e25c83153841724d1cc0d8c79417288aa9e74f507c9"
+    },
+    {
+      "generated_bytes": 1408,
+      "generated_name": "semaev_fp.rs",
+      "generated_sha256": "c0e28396b7d714b2f0e29a93f2d3c1e1f95090b793541cc930e7f881e01a70e8",
+      "inserted_bytes": 0,
+      "path": "src/cryptanalysis/semaev_prime_poly.rs",
+      "pinned_whole_source_sha256": "e77ebb1576469b24e399cf2cd62059b80607eb65eeaa486847782e6f11714f9b",
+      "ranges": [
+        {
+          "byte_end_exclusive": 3026,
+          "byte_start_inclusive": 1618,
+          "end_anchor": "/// The curve `y² = x³ + ax + b` over `F_p`, coefficients reduced.\n",
+          "generated_byte_end_exclusive": 1408,
+          "generated_byte_start_inclusive": 0,
+          "rewritten": false,
+          "scope": "complete production Fp type and inherent arithmetic implementation",
+          "selected_bytes": 1408,
+          "selected_sha256": "c0e28396b7d714b2f0e29a93f2d3c1e1f95090b793541cc930e7f881e01a70e8",
+          "start_anchor": "/// `F_p` arithmetic for `p < 2^62`.\n"
+        }
+      ],
+      "rewritten": false,
+      "selection": "concatenated_verbatim_byte_ranges",
+      "whole_source_bytes": 35275,
+      "whole_source_sha256": "e77ebb1576469b24e399cf2cd62059b80607eb65eeaa486847782e6f11714f9b"
+    },
+    {
+      "generated_bytes": 9340,
+      "generated_name": "hyperelliptic_ops.rs",
+      "generated_sha256": "3bb1f742467c586d882b5158a520e28ceb9acc50e096cd62039f87bb4fad8f44",
+      "inserted_bytes": 0,
+      "path": "src/prime_hyperelliptic/ops.rs",
+      "pinned_whole_source_sha256": "668c2ea7804578fe09b8b3dc2dd905b1564be5ebbf0f5e6571d785fa7ad842f4",
+      "ranges": [
+        {
+          "byte_end_exclusive": 12055,
+          "byte_start_inclusive": 3893,
+          "end_anchor": "/// Words a hash of a divisor absorbs: one per 64-bit limb of each\n",
+          "generated_byte_end_exclusive": 8162,
+          "generated_byte_start_inclusive": 0,
+          "rewritten": false,
+          "scope": "actual counter types, tally operations, sort cost, and exponentiation charging used by jv_bitops",
+          "selected_bytes": 8162,
+          "selected_sha256": "49975e6af38d06ae8dc1139daa99786a75d7ebdafd98dd89db53f8bf9c4abaab",
+          "start_anchor": "use std::cell::Cell;\n"
+        },
+        {
+          "byte_end_exclusive": 13626,
+          "byte_start_inclusive": 12448,
+          "end_anchor": "#[cfg(test)]\nmod tests {",
+          "generated_byte_end_exclusive": 9340,
+          "generated_byte_start_inclusive": 8162,
+          "rewritten": false,
+          "scope": "remaining actual tally snapshots and phase guards; unused divisor_hash_words and legacy tests omitted",
+          "selected_bytes": 1178,
+          "selected_sha256": "534f212a87c236c2ce0547773ad7121ee303a16f092b4c15e4e4d627405a82db",
+          "start_anchor": "/// Everything this thread has tallied, by phase.\n"
+        }
+      ],
+      "rewritten": false,
+      "selection": "concatenated_verbatim_byte_ranges",
+      "whole_source_bytes": 18601,
+      "whole_source_sha256": "668c2ea7804578fe09b8b3dc2dd905b1564be5ebbf0f5e6571d785fa7ad842f4"
+    }
+  ],
+  "f4_solver_included": true,
+  "full_root_library_compiled": false,
+  "full_root_library_tests_included": false,
+  "integration_example_included": true,
+  "integration_example_rewritten": false,
+  "layout_preserving_f4_copy": {
+    "copied_files": [
+      {
+        "bytes": 493435,
+        "generated_relative_path": "f4_fp/mod.rs",
+        "path": "src/cryptanalysis/f4_fp.rs",
+        "rewritten": false,
+        "selection": "whole_file_verbatim_copy",
+        "source_and_copy_sha256": "a6a3ec89d2278e40553ab68fa52bb81d69a78510ce66b1bb163ec1dcac444843"
+      },
+      {
+        "bytes": 14025,
+        "generated_relative_path": "f4_fp/reuse.rs",
+        "path": "src/cryptanalysis/f4_fp/reuse.rs",
+        "rewritten": false,
+        "selection": "whole_file_verbatim_copy",
+        "source_and_copy_sha256": "95a1f501ff8437d9b534b3445b5a883317c35d14a2cf04bb7e26452bf099deaf"
+      },
+      {
+        "bytes": 8110,
+        "generated_relative_path": "f4_fp/pair_certificate.rs",
+        "path": "src/cryptanalysis/f4_fp/pair_certificate.rs",
+        "rewritten": false,
+        "selection": "whole_file_verbatim_copy",
+        "source_and_copy_sha256": "28ce87c569eb345fa8aae3db7e64989b556be01ec902b3b5b64d5b9ff63b4628"
+      },
+      {
+        "bytes": 16880,
+        "generated_relative_path": "f4_fp/certified.rs",
+        "path": "src/cryptanalysis/f4_fp/certified.rs",
+        "rewritten": false,
+        "selection": "whole_file_verbatim_copy",
+        "source_and_copy_sha256": "b15bc45c51e4e4680da90ef36cbe71d251ef3887fc255258d9d7bd8264bcb4a1"
+      }
+    ],
+    "generated_binding_contains_algorithm": false,
+    "generated_binding_sha256": "0a48ff3705b53fe50a1a9d15a944e22c89f3a81461dd440127d90914a9f1713f",
+    "reason": "preserve implicit child resolution of unchanged full F4 source"
+  },
+  "legacy_module_unit_tests_included": false,
+  "omitted_from_manifest": [
+    "registry package bodies (resolved checksums are in Cargo.lock)",
+    "rustc, linker, system libraries, CPU state, and environment flags",
+    "test-only fixture resources of path dependencies (their unit tests are not built)"
+  ],
+  "opt_level": "0",
+  "schema": "rr5-original-f4-source-manifest/v1",
+  "scope": "RR5 native extractor, public example, and identity-certificate target against the declared exact production-source closure",
+  "target": "x86_64-unknown-linux-musl",
+  "whole_files": [
+    {
+      "bytes": 29523,
+      "path": "src/cryptanalysis/identity_certificate.rs",
+      "role": "complete actual evaluated-identity issuer and checker; dependency unit tests remain disabled",
+      "selection": "whole_file",
+      "sha256": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270"
+    },
+    {
+      "bytes": 18239,
+      "path": "src/hash/sha256.rs",
+      "role": "complete actual SHA-256 used by identity certificates; dependency unit tests remain disabled",
+      "selection": "whole_file",
+      "sha256": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf"
+    },
+    {
+      "bytes": 493435,
+      "path": "src/cryptanalysis/f4_fp.rs",
+      "role": "complete actual F4 solver source",
+      "selection": "whole_file",
+      "sha256": "a6a3ec89d2278e40553ab68fa52bb81d69a78510ce66b1bb163ec1dcac444843"
+    },
+    {
+      "bytes": 14025,
+      "path": "src/cryptanalysis/f4_fp/reuse.rs",
+      "role": "complete actual F4 trace child",
+      "selection": "whole_file",
+      "sha256": "95a1f501ff8437d9b534b3445b5a883317c35d14a2cf04bb7e26452bf099deaf"
+    },
+    {
+      "bytes": 8110,
+      "path": "src/cryptanalysis/f4_fp/pair_certificate.rs",
+      "role": "complete actual F4 pair-certificate child",
+      "selection": "whole_file",
+      "sha256": "28ce87c569eb345fa8aae3db7e64989b556be01ec902b3b5b64d5b9ff63b4628"
+    },
+    {
+      "bytes": 16880,
+      "path": "src/cryptanalysis/f4_fp/certified.rs",
+      "role": "complete actual certified-relation adapter child",
+      "selection": "whole_file",
+      "sha256": "b15bc45c51e4e4680da90ef36cbe71d251ef3887fc255258d9d7bd8264bcb4a1"
+    },
+    {
+      "bytes": 5921,
+      "path": "src/cryptanalysis/fx_hash.rs",
+      "role": "complete actual F4 hasher",
+      "selection": "whole_file",
+      "sha256": "4b0c901ec9251b0e71ff7778f4f637c4925461d2b997b9ea82950ee09a0854fa"
+    },
+    {
+      "bytes": 21338,
+      "path": "src/cryptanalysis/jv_bitops.rs",
+      "role": "complete actual counter hooks",
+      "selection": "whole_file",
+      "sha256": "03b8215cd9f6bfed125a7d32e5b2ab765a2315c49097546b65d1da9f133a41f7"
+    },
+    {
+      "bytes": 7155,
+      "path": "src/cryptanalysis/jv_bitops_uniform.rs",
+      "role": "complete actual counter uniform-sampling child",
+      "selection": "whole_file",
+      "sha256": "3f15f1145e24378dd90f19d5aef5cd08db3a0ddfb4ee526dccba02d4c6eb22bc"
+    },
+    {
+      "bytes": 23283,
+      "path": "src/cryptanalysis/bitops.rs",
+      "role": "complete actual pricing definitions used by the counters",
+      "selection": "whole_file",
+      "sha256": "f4c15d1d79fe4752c32c9b46bb4fdecaebad7d41ffcaed1832dec3dc06fb28f0"
+    },
+    {
+      "bytes": 20403,
+      "path": "src/cryptanalysis/ic_measurement.rs",
+      "role": "complete actual measurement hooks; no substitute dump function",
+      "selection": "whole_file",
+      "sha256": "b2bc883f7a7cfc194ebcba78991b9aca901285acebf01187f56bd3e6fe57f980"
+    },
+    {
+      "bytes": 28146,
+      "path": "examples/prime31_rr5_quartic.rs",
+      "role": "actual public RR5 example bound directly by the Cargo example target",
+      "selection": "whole_file",
+      "sha256": "3533cd5ac59cfb78bf7250e78b8f7fc761b8c951cfe2eec9ad4accdc62e9993a"
+    },
+    {
+      "bytes": 943,
+      "path": "research/prime31_four_summand_20261122/native/Cargo.toml",
+      "role": "qualification package metadata",
+      "selection": "whole_file",
+      "sha256": "e75caf2b966cff9000e5d108d4ae17d76521caec401fca99641223e3baa66a10"
+    },
+    {
+      "bytes": 10105,
+      "path": "research/prime31_four_summand_20261122/native/Cargo.lock",
+      "role": "resolved package versions",
+      "selection": "whole_file",
+      "sha256": "9896516dc81af72ac556547d27771e24ca99e5df4962843355dbbb12286d7c93"
+    },
+    {
+      "bytes": 667,
+      "path": "research/prime31_four_summand_20261122/native/lib.rs",
+      "role": "candidate module bindings",
+      "selection": "whole_file",
+      "sha256": "58f52f34a28dbae2bf8d89d063249fa65f2aa00ea3e34ac4135c338ea5f6b8e5"
+    },
+    {
+      "bytes": 1251,
+      "path": "research/prime31_four_summand_20261122/native/build.rs",
+      "role": "verbatim selector for the actual production F4 public resource-limit tests",
+      "selection": "whole_file",
+      "sha256": "7e94c1c71a58a61bc28150accbd0cb94515a72219da1c8d684b6f410bfa10ed9"
+    },
+    {
+      "bytes": 29073,
+      "path": "research/prime31_four_summand_20261122/native/extractor.rs",
+      "role": "RR5 candidate source",
+      "selection": "whole_file",
+      "sha256": "fd573488ea7065a382d71c98819342287cc235de881595922bd94ecb6ffed951"
+    },
+    {
+      "bytes": 22925,
+      "path": "research/prime31_four_summand_20261122/native/relation_adapter.rs",
+      "role": "signed-RHS consumer",
+      "selection": "whole_file",
+      "sha256": "1915ef03235d68900b696c12a9abca5de51abd68f55d40ee568c4476124a7350"
+    },
+    {
+      "bytes": 224,
+      "path": "research/prime31_four_summand_20261122/native/main.rs",
+      "role": "qualification entry point",
+      "selection": "whole_file",
+      "sha256": "5842aa1c5e1e09038f5d6b337c8fc08257aabdf8f1a8cd8846713f3041e61f8d"
+    },
+    {
+      "bytes": 22576,
+      "path": "research/prime31_four_summand_20261122/native/independent_tests.rs",
+      "role": "independent integer group-law oracle and extractor-to-adapter tests",
+      "selection": "whole_file",
+      "sha256": "831b07ffcc9085c142f921772448965a47cc489ef1ade78aa0e80db1cd52da7d"
+    },
+    {
+      "bytes": 11782,
+      "path": "research/prime31_four_summand_20261122/native/b677_fixture.rs",
+      "role": "validated original B509 plus Y7 public hybrid base and exact selector certificates",
+      "selection": "whole_file",
+      "sha256": "3f491defbc7aa1643192db4d0c7144afcec1f84a41f03489355a866459329624"
+    },
+    {
+      "bytes": 8092,
+      "path": "research/prime31_four_summand_20261122/native/b677_controls.rs",
+      "role": "independent B677 fixture, frozen input and forced construction-stop controls",
+      "selection": "whole_file",
+      "sha256": "983129351b28b8e2933bac1261ab6f93f0fa9c932a81b3e65950e1b1184142a6"
+    },
+    {
+      "bytes": 15209,
+      "path": "research/prime31_four_summand_20261122/native/selector_circuit.rs",
+      "role": "quadratic quartic-modular membership circuit and independent dense-selector controls",
+      "selection": "whole_file",
+      "sha256": "ca3414d970325490aa4a4e6fd9e2752f6f87e16244037cdfbf09d15e950b783d"
+    },
+    {
+      "bytes": 18335,
+      "path": "research/prime31_four_summand_20261122/native/b677_gate.rs",
+      "role": "fixed bounded extraction driver with independent signed replay and authentic-RHS adapter",
+      "selection": "whole_file",
+      "sha256": "55688d3d2ef369893fa8f4fc912cba838af2ffa9e4322218fc826a6bec3b5d96"
+    },
+    {
+      "bytes": 24760,
+      "path": "research/cheap_ecdlp_cold_gate_20261123/src/bin/rr5_receipt_check.rs",
+      "role": "unchanged independently authored public-RHS receipt checker, separately compiled as a binary",
+      "selection": "whole_file",
+      "sha256": "2d19d979538ac2ef203e93795344ca18f9528fe1025db931ee2abd8240ab4342"
+    },
+    {
+      "bytes": 643,
+      "path": "research/cheap_ecdlp_cold_gate_20261123/rr5_grevlex_b8_producer_row.json",
+      "role": "historical B8 receipt used only by the independent checker's unit tests",
+      "selection": "whole_file",
+      "sha256": "9b1aa96c409343f42ee942da6e9eb954caa5de0e7f6bdf47156e80bb6e5bf0e2"
+    },
+    {
+      "bytes": 3456,
+      "path": "research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv",
+      "role": "unchanged exact public Y7 base input included in the compiled fixture",
+      "selection": "whole_file",
+      "sha256": "fc484615394ee423190747d05001cea526580fb0df0279fbcf789ab6cafc0c46"
+    },
+    {
+      "bytes": 6520,
+      "path": "research/prime31_four_summand_20261122/scaling-b677/PROTOCOL.md",
+      "role": "prospective frozen bounds, targets, controls, admission rules and interpretation",
+      "selection": "whole_file",
+      "sha256": "7c38c80b2a7261d8629c094a90c62b374fbc291357511afa488aa6abb5f63d36"
+    },
+    {
+      "bytes": 4296,
+      "path": "research/prime31_four_summand_20261122/native/identity_certificate.rs",
+      "role": "RR5 evaluated-identity certificate entry point using the actual production issuer and checker",
+      "selection": "whole_file",
+      "sha256": "e6a8a9f5054d625783fdbc85d4ac7ddc845629681a3755bc388ca887aa3fd8dd"
+    },
+    {
+      "bytes": 23766,
+      "path": "research/prime31_ic_20261115/native/lib.rs",
+      "role": "complete unchanged original prime-field arithmetic and solver library",
+      "selection": "whole_file",
+      "sha256": "52b30e41478b0306603db7d09bcb17377cae64efcfd78d4c34db7bf91325a867"
+    },
+    {
+      "bytes": 225690,
+      "path": "src/cryptanalysis/f4_fp_tower.rs",
+      "role": "complete original arithmetic dependency's included tower-F4 module",
+      "selection": "whole_file",
+      "sha256": "a204f31589057a164be3c0470771b3344f47b66a42dae7767cd409c9f59b3fdb"
+    },
+    {
+      "bytes": 65363,
+      "path": "src/cryptanalysis/sig_fp_tower.rs",
+      "role": "complete original arithmetic dependency's included signature module",
+      "selection": "whole_file",
+      "sha256": "2bc80dba669c623b39471da6f0c00ca0a4a4695f39e3a22239a8a0be1849770b"
+    },
+    {
+      "bytes": 421,
+      "path": "research/prime31_four_summand_20261122/native/original-native/Cargo.toml",
+      "role": "original arithmetic source metadata",
+      "selection": "whole_file",
+      "sha256": "d1c545f9b4b7cc98d585a7e53528428c00c07eb64c920be2bd84cc6c30b03b35"
+    },
+    {
+      "bytes": 881,
+      "path": "research/prime31_four_summand_20261122/native/f4-source/Cargo.toml",
+      "role": "original F4 closure metadata",
+      "selection": "whole_file",
+      "sha256": "3af805ce5011ebbdf591988e5ffc2fed577c006a2b3656abab4fe1215338b456"
+    },
+    {
+      "bytes": 24179,
+      "path": "research/prime31_four_summand_20261122/native/f4-source/build.rs",
+      "role": "reviewed source selector",
+      "selection": "whole_file",
+      "sha256": "2a3e98d9075273e8603d8e6a3ba2f9d880996cb7934198af437a949221160e86"
+    },
+    {
+      "bytes": 952,
+      "path": "research/prime31_four_summand_20261122/native/f4-source/src/lib.rs",
+      "role": "closure namespace",
+      "selection": "whole_file",
+      "sha256": "7a70a01efc2061f866e567e7791fb91610f0081d51227a5bb88aa26fab6def38"
+    },
+    {
+      "bytes": 1940,
+      "path": "research/prime31_four_summand_20261122/native/f4-source/src/cryptanalysis.rs",
+      "role": "original source bindings",
+      "selection": "whole_file",
+      "sha256": "b80023e139a84944217867dd39f83bb1ab783e7d1a2b22ceb0aca8b2cde4e628"
+    },
+    {
+      "bytes": 353,
+      "path": "crates/certified-relations/Cargo.toml",
+      "role": "actual path dependency manifest",
+      "selection": "whole_file",
+      "sha256": "79ec28ecedbe3dc424db898a692a90442100562095a86bcc35ac71645d0d91b3"
+    },
+    {
+      "bytes": 2787,
+      "path": "crates/certified-relations/src/cheap.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "d5bf10ad2025de513efecb842932af58cd5be142721bdf7321ee4c568374ce24"
+    },
+    {
+      "bytes": 13181,
+      "path": "crates/certified-relations/src/dag.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "fac42760e1a3063b74d9c44fb54858052b027760a9d8daf45af7bf64ac6ad3ab"
+    },
+    {
+      "bytes": 293,
+      "path": "crates/certified-relations/src/flat_constructor.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "dc35b4a777cba9eb88e2f91f1dd83eba56494a0dc226b0167a236bf8111d6845"
+    },
+    {
+      "bytes": 8783,
+      "path": "crates/certified-relations/src/flat_map.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "db5a1df5792064245b3fdc1f2674038606ca219a8f37be0a99fd870ef507f4c8"
+    },
+    {
+      "bytes": 8291,
+      "path": "crates/certified-relations/src/kernels/arithmetic.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "4a05cc7600886d4387c9e5d4d2fa988b1b1551efb58be37a200d33ff78fa6ed4"
+    },
+    {
+      "bytes": 6560,
+      "path": "crates/certified-relations/src/kernels/cheap.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "e88b4bcf37bb1e3100390ed33cb68a9a21a9fc52f6df5f1fbf600607720692a5"
+    },
+    {
+      "bytes": 1557,
+      "path": "crates/certified-relations/src/kernels/check.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "e7246f2be7bfbecbed73d7bd989aeae582ede6d53ac81b323d92e31dfcaf1af1"
+    },
+    {
+      "bytes": 17646,
+      "path": "crates/certified-relations/src/kernels/compact.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "064f132822ea5cdd9a1da9cd7095ca77cd06cf9ac393f6938bb8f6d838d6117f"
+    },
+    {
+      "bytes": 19863,
+      "path": "crates/certified-relations/src/kernels/projection.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "529ba3320d0605ac810d8b8df58c46b0ab3d96bacd7c9bc31e70fd94477147ee"
+    },
+    {
+      "bytes": 24212,
+      "path": "crates/certified-relations/src/kernels/quotient.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "50643d14d3dc072eded174b4bb443cdbd5da37b1f2ed419147f284ad025c84af"
+    },
+    {
+      "bytes": 53875,
+      "path": "crates/certified-relations/src/lib.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "da47a97b20f485785117d71e767d70183d85d370ef8dd0bc5f405cd2a7e5f511"
+    },
+    {
+      "bytes": 1583,
+      "path": "crates/certified-relations/src/monomial.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "8870db4d1d233532248e57281e794598418ccedb0cf4bdc7de732a0b93af6dbf"
+    },
+    {
+      "bytes": 17647,
+      "path": "crates/certified-relations/src/packed_body.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "c55664939a7b9e235282d805484ceca9b1b4284a9812b6b17eea2445576434a3"
+    },
+    {
+      "bytes": 288,
+      "path": "crates/certified-relations/src/packed_constructor.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "d38580e914c4ee906b5cc7f6a61df19be4668a5a6822cc7979537206f1cb8ffc"
+    },
+    {
+      "bytes": 9440,
+      "path": "crates/certified-relations/src/projection.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "8169bc97dde2a61a9d422809369a2f2a718a817630f04c8f7c7f492ce5519aa3"
+    },
+    {
+      "bytes": 9236,
+      "path": "crates/certified-relations/src/quotient/compact.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "62b144ba4aff72b09781d6377b406719db67f3546a84612353f3f949eedea095"
+    },
+    {
+      "bytes": 13006,
+      "path": "crates/certified-relations/src/quotient.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "d27ebfd58069597e297e3c84c9f2bc5139d94a90ae4d0150958b9599042935a8"
+    },
+    {
+      "bytes": 37899,
+      "path": "crates/certified-relations/src/replay.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "47e43919232c08c9f55ccbf225db4bdddbb9b9ea1335ab3e2fb7992e774ae623"
+    },
+    {
+      "bytes": 9977,
+      "path": "crates/certified-relations/src/workload.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "caad0aad06b00b8287d16a5de9157b2f7d4dbf45024a3e69614e3679e3016df6"
+    },
+    {
+      "bytes": 296,
+      "path": "crates/relation-replay-checker/Cargo.toml",
+      "role": "actual path dependency manifest",
+      "selection": "whole_file",
+      "sha256": "d5ccb207b3d8271306bd63bc3e716ad0a19f51e2dd609a3f2a4560bd4cd10498"
+    },
+    {
+      "bytes": 7288,
+      "path": "crates/relation-replay-checker/src/identities.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "d8b1c4fba21a87b310f1657ba9c94b7efe9d8e48de6139f5eeea614a25b09dd9"
+    },
+    {
+      "bytes": 17271,
+      "path": "crates/relation-replay-checker/src/lib.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "9dea7862502ec34b49d82ff577df9164a176058f6258fa5e6b0697a9925ef130"
+    },
+    {
+      "bytes": 642,
+      "path": "crates/relation-replay-checker/src/main.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "1d1e63285d623bb27daa94f598c460feec32d95381422adb0a270e926487df11"
+    },
+    {
+      "bytes": 16078,
+      "path": "crates/relation-replay-checker/src/packed.rs",
+      "role": "actual path dependency Rust source tree; test-only items remain disabled",
+      "selection": "whole_file",
+      "sha256": "844eaac082af3deec1b61dadb000eb0acc8d5f43ee450b3625f648e4f9585f25"
+    }
+  ],
+  "wide_vars_feature": false
+}

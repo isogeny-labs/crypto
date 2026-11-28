@@ -1,0 +1,31 @@
+{
+  "schema": "point-table-journal.retention/v1",
+  "at": "2026-11-16T00:07:31.191330+00:00",
+  "normalization": "Remove only conflict-marker lines and outer block newlines; retain every other byte of every block. Block identity is full SHA256, never heading. Common identical block occurrences are shared up to maximum parent multiplicity.",
+  "sources": [
+    {
+      "ref": "2615f313a6fb95cdeb441efeb6051c874be7ecca",
+      "raw_sha256": "ec9604c09470ba71e86cfb755dd9eabd8165ae7baeeeb8960f08975e378e932d",
+      "blob": "0982458ccd60a86b9b7b829f5f0354f98230000f",
+      "blocks": 285,
+      "complete_blocks_and_multiplicity_retained": true,
+      "parent_order_retained": true
+    },
+    {
+      "ref": "556ea9b79af1b2092efa5c245afdd7b725604a89",
+      "raw_sha256": "db90f29a2b4848bd812cd2b6375368a32405a1945c03c1c35148e35f3a576cd5",
+      "blob": "6e83ab0a9c42de624f732cef7618e74ccc640887",
+      "blocks": 344,
+      "complete_blocks_and_multiplicity_retained": true,
+      "parent_order_retained": true
+    }
+  ],
+  "result_blocks": 362,
+  "result_bytes": 735500,
+  "result_sha256": "9f77c6541fc25083fad74c1ee37bb984221cffab5d97039a9b25c1c3d7418717",
+  "conflict_markers": 0,
+  "ordering": "Stable topological union preserving each complete source block sequence; time priority between independent ready blocks only.",
+  "standing": "Producer retention controls; not signed scientific/execution evidence",
+  "path": "docs/session-logs/2026-11-15.md",
+  "today_journal_sha256": "76dec44ee32e2ae20ef5c092e6b49d33803d8b09c559eccf71e9d954a193a663"
+}

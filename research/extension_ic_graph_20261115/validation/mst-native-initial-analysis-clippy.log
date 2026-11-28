@@ -1,0 +1,33 @@
+    Checking cubic-graph-analysis v0.1.0 (/workspace/crypto/research/extension_ic_graph_20261115/native_analysis)
+error: this `if` statement can be collapsed
+   --> src/bin/cover-graph-analysis.rs:128:9
+    |
+128 | /         if m["budget_refusals"] == 0 {
+129 | |             if m["normalized_rows"].as_u64()
+130 | |                 != m["selected_edges"].as_u64().and_then(|e| {
+131 | |                     g["last_report"]["pivots"]
+...   |
+139 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+128 ~         if m["budget_refusals"] == 0
+129 ~             && (m["normalized_rows"].as_u64()
+130 |                 != m["selected_edges"].as_u64().and_then(|e| {
+...
+134 |                 })
+135 ~                 || m["selected_edges"] != g["last_report"]["merges"])
+136 |             {
+137 |                 return false;
+138 ~             }
+    |
+
+error: could not compile `cubic-graph-analysis` (bin "cover-graph-analysis") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `cubic-graph-analysis` (bin "cover-validation-analysis") due to 1 previous error
+error: could not compile `cubic-graph-analysis` (bin "cover-graph-analysis" test) due to 1 previous error
+error: could not compile `cubic-graph-analysis` (bin "cover-validation-analysis" test) due to 1 previous error

@@ -1,0 +1,11 @@
+first_command: rustfmt --edition 2021 --check research/quartic_ghs_strong_rho_20261114/strong_rho.rs research/quartic_ghs_strong_rho_20261114/main.rs && rustc --edition 2021 -O research/quartic_ghs_strong_rho_20261114/main.rs -o /tmp/ghs-strong-rho-round-b && /tmp/ghs-strong-rho-round-b selftest
+first_exit: 1
+first_error: rustfmt followed main.rs path modules and reported pre-existing formatting differences in frozen common.rs, ghs.rs, and rho2.rs; it also requested one local line wrap. No file was changed. The local line was corrected and the check was narrowed to the edited source.
+
+command: rustfmt --edition 2021 --check research/quartic_ghs_strong_rho_20261114/strong_rho.rs && rustc --edition 2021 -O research/quartic_ghs_strong_rho_20261114/main.rs -o /tmp/ghs-strong-rho-round-b && /tmp/ghs-strong-rho-round-b selftest
+exit: 0
+selftest: fast field matches frozen field
+selftest: batch inverse matches pointwise inversion
+selftest: fast and batched curve addition match frozen curve
+SELFTEST OK
+selftest: planted logs recovered at widths 1, 8, and 32

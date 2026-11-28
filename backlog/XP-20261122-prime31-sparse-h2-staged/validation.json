@@ -1,0 +1,49 @@
+{
+  "scope": "Backlog card metadata only; no source build, mathematical check, experiment execution, lease, or runner admission",
+  "recorded_date": "2026-11-23",
+  "card": "backlog/XP-20261122-prime31-sparse-h2-staged/card.json",
+  "card_sha256": "94199db63b04cd94375c15f4063acb28acff6d912ef4eb9b55c39bb7a74fd0da",
+  "native_backlog_validator": {
+    "available": false,
+    "executed": false,
+    "checks": [
+      "command -v backlog returned exit 1 with no path",
+      "rg --files --no-ignore found no backlog or backlog-hash executable under the workspace"
+    ],
+    "build_attempted": false,
+    "build_blocker": "The retained DEVELOPMENT_RECEIPT_v2.json records that the unchanged root Cargo.toml duplicate name key stops the root build before tests; no root build or manifest repair was attempted for this card",
+    "full_backlog_validate_pass_claimed": false
+  },
+  "schema_validation": {
+    "tool": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/jsonschema",
+    "version": "4.26.0",
+    "validator": "Draft202012Validator",
+    "schema_path": "backlog/schema/card.v1.json",
+    "schema_git_blob": "4d87ef178822276fdc601eb1c971718ffc6b886e",
+    "schema_sha256": "77027a1296ceea4752636cf205d1b8f95bffad4cf242a997d92e66003a3c9fe7",
+    "schema_read_method": "git show HEAD:backlog/schema/card.v1.json; tracked bytes were read through process substitution because the sparse checkout omits the file",
+    "command": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/jsonschema --validator Draft202012Validator --output pretty --instance backlog/XP-20261122-prime31-sparse-h2-staged/card.json <(git show HEAD:backlog/schema/card.v1.json)",
+    "shell": "/bin/bash",
+    "exit_code": 0,
+    "stdout": "===[SUCCESS]===(backlog/XP-20261122-prime31-sparse-h2-staged/card.json)===",
+    "warning": "The installed jsonschema CLI emitted its deprecation warning; schema validation completed successfully"
+  },
+  "additional_metadata_checks": {
+    "tool": "jq -e plus README existence check",
+    "exit_code": 0,
+    "result": true,
+    "checked": [
+      "Exact card ID and agreement of the ID date with created",
+      "Blocked status and nonempty typed blocker list",
+      "Decision-value paragraph has at least 25 words",
+      "Protocol path/blob and code commit remain null; code branch is lane/prime31-sparse-h2",
+      "run.argv is exactly [\"false\"] as a string argv sentinel",
+      "One single placeholder shard and matching cairn task name",
+      "Zero funding and explicit one-CPU/4096MiB/120s bounds",
+      "No floating-point JSON numbers and no scaffold TODO text",
+      "README.md exists"
+    ],
+    "limitations": "These targeted metadata checks are not a replacement for src/bin/backlog/card.rs, Git readiness/ancestry checks, canonical experiment admission, or independent scientific verification"
+  },
+  "status": "schema_and_targeted_metadata_checks_passed_native_validator_unavailable"
+}

@@ -1,0 +1,6 @@
+{
+  "stage": "public fixture constructor",
+  "reason": "Extra-offset test schedule0..16 contains noncanonical13..16 in F13; SingleRecovery::new rejects Domain",
+  "passed_before_failure": "dense compiler/image tests and larger prefixes; reciprocal test also passes",
+  "change": "Only test offset list bounded by min(17,r); production code unchanged"
+}

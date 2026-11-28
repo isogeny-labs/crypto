@@ -1,0 +1,133 @@
+--------------------------------------------------------------------------------
+Profile data file '/workspace/crypto-trace/research/trace_zero_rowmap_20261117/profiles/baseline-discovery/callgrind.out' (creator: callgrind-3.24.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 8395707
+Trigger: Program termination
+Profiled target:  /workspace/scratch/trace-rowmap-baseline one research/trace_zero_projected_20261115/inputs/scale-n131-d12-uniform.json kernel-lazy (PID 1093, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       99
+Include dirs:     
+User annotated:   
+Auto-annotation:  off
+
+--------------------------------------------------------------------------------
+Ir                  
+--------------------------------------------------------------------------------
+51,775,125 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                    file:function
+--------------------------------------------------------------------------------
+102,979,695 (198.9%)  ???:(below main) [/workspace/scratch/trace-rowmap-baseline]
+ 51,775,125 (100.0%)  ???:0x000000000001d2c0 [/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2]
+ 51,489,666 (99.45%)  ???:0x0000000000029c30 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+ 51,487,710 (99.44%)  ???:main [/workspace/scratch/trace-rowmap-baseline]
+ 51,487,698 (99.44%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/rt.rs:std::rt::lang_start_internal [/workspace/scratch/trace-rowmap-baseline]
+ 51,383,378 (99.24%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/ops/function.rs:std::rt::lang_start_internal
+ 51,383,377 (99.24%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/rt.rs:std::rt::lang_start::<()>::{closure#0} [/workspace/scratch/trace-rowmap-baseline]
+ 51,383,371 (99.24%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/sys/backtrace.rs:std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()> [/workspace/scratch/trace-rowmap-baseline]
+ 51,383,368 (99.24%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/ops/function.rs:std::sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+ 51,383,367 (99.24%)  /workspace/crypto-trace/research/trace_zero_kernel_20261116/native/src/main.rs:trace_zero_kernel::main
+ 48,649,106 (93.96%)  research/trace_zero_kernel_20261116/native/src/main.rs:trace_zero_kernel::main [/workspace/scratch/trace-rowmap-baseline]
+ 47,796,475 (92.32%)  /workspace/crypto-trace/research/trace_zero_kernel_20261116/native/src/lib.rs:trace_zero_kernel::execute
+ 37,259,174 (71.96%)  research/trace_zero_kernel_20261116/native/src/lib.rs:trace_zero_kernel::execute [/workspace/scratch/trace-rowmap-baseline]
+ 25,414,350 (49.09%)  /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_linearized.rs:full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized
+ 14,718,564 (28.43%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_linearized.rs:full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized [/workspace/scratch/trace-rowmap-baseline]
+ 11,773,270 (22.74%)  /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/trace_zero.rs:<full_trace_zero_backend::binary_ecc::trace_zero::TraceZeroVariety>::new
+ 11,287,012 (21.80%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/vec/spec_from_iter.rs:<full_trace_zero_backend::binary_ecc::trace_zero::TraceZeroVariety>::new
+ 11,023,513 (21.29%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:full_trace_zero_backend::binary_ecc::f2m::trace_tables [/workspace/scratch/trace-rowmap-baseline]
+ 10,965,481 (21.18%)  /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::trace
+ 10,944,361 (21.14%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::trace [/workspace/scratch/trace-rowmap-baseline]
+ 10,875,136 (21.00%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/vec/spec_from_iter_nested.rs:<alloc::vec::Vec<bool> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<bool, core::iter::adapters::map::Map<core::slice::iter::Iter<full_trace_zero_backend::binary_ecc::f2m::F2mElement>, <full_trace_zero_backend::binary_ecc::trace_zero::TraceZeroVariety>::new::{closure#1}>>>::from_iter [/workspace/scratch/trace-rowmap-baseline]
+ 10,873,969 (21.00%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/trace_zero.rs:<alloc::vec::Vec<bool> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<bool, core::iter::adapters::map::Map<core::slice::iter::Iter<full_trace_zero_backend::binary_ecc::f2m::F2mElement>, <full_trace_zero_backend::binary_ecc::trace_zero::TraceZeroVariety>::new::{closure#1}>>>::from_iter
+ 10,491,570 (20.26%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/vec/spec_from_iter.rs:trace_zero_kernel::execute
+ 10,491,568 (20.26%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/vec/spec_from_iter_nested.rs:<alloc::vec::Vec<full_trace_zero_backend::binary_ecc::curve::BinaryPoint> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<full_trace_zero_backend::binary_ecc::curve::BinaryPoint, core::iter::adapters::map::Map<core::slice::iter::Iter<core::option::Option<[alloc::string::String; 2]>>, trace_zero_kernel::execute::{closure#0}>>>::from_iter [/workspace/scratch/trace-rowmap-baseline]
+ 10,415,217 (20.12%)  research/trace_zero_kernel_20261116/native/src/lib.rs:<alloc::vec::Vec<full_trace_zero_backend::binary_ecc::curve::BinaryPoint> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<full_trace_zero_backend::binary_ecc::curve::BinaryPoint, core::iter::adapters::map::Map<core::slice::iter::Iter<core::option::Option<[alloc::string::String; 2]>>, trace_zero_kernel::execute::{closure#0}>>>::from_iter
+ 10,414,809 (20.12%)  /workspace/crypto-trace/research/trace_zero_experiments_20261109/native/src/lib.rs:trace_zero_experiments::unwire
+ 10,404,834 (20.10%)  research/trace_zero_experiments_20261109/native/src/lib.rs:trace_zero_experiments::unwire [/workspace/scratch/trace-rowmap-baseline]
+ 10,332,860 (19.96%)  /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_hex
+ 10,239,274 (19.78%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/vec/spec_from_iter.rs:full_trace_zero_backend::binary_ecc::f2m::trace_tables
+ 10,236,919 (19.77%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/vec/spec_from_iter_nested.rs:<alloc::vec::Vec<full_trace_zero_backend::binary_ecc::f2m::F2mElement> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<full_trace_zero_backend::binary_ecc::f2m::F2mElement, core::iter::adapters::map::Map<core::ops::range::Range<u32>, <full_trace_zero_backend::binary_ecc::f2m::TraceTables>::new::{closure#3}>>>::from_iter [/workspace/scratch/trace-rowmap-baseline]
+ 10,236,525 (19.77%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/iter/traits/iterator.rs:<alloc::vec::Vec<full_trace_zero_backend::binary_ecc::f2m::F2mElement> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<full_trace_zero_backend::binary_ecc::f2m::F2mElement, core::iter::adapters::map::Map<core::ops::range::Range<u32>, <full_trace_zero_backend::binary_ecc::f2m::TraceTables>::new::{closure#3}>>>::from_iter
+ 10,236,523 (19.77%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/iter/adapters/map.rs:<core::iter::adapters::map::Map<core::ops::range::Range<u32>, <full_trace_zero_backend::binary_ecc::f2m::TraceTables>::new::{closure#3}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<full_trace_zero_backend::binary_ecc::f2m::F2mElement, <alloc::vec::Vec<full_trace_zero_backend::binary_ecc::f2m::F2mElement>>::extend_trusted<core::iter::adapters::map::Map<core::ops::range::Range<u32>, <full_trace_zero_backend::binary_ecc::f2m::TraceTables>::new::{closure#3}>>::{closure#0}>::{closure#0}> [/workspace/scratch/trace-rowmap-baseline]
+  9,918,292 (19.16%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<core::iter::adapters::map::Map<core::ops::range::Range<u32>, <full_trace_zero_backend::binary_ecc::f2m::TraceTables>::new::{closure#3}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<full_trace_zero_backend::binary_ecc::f2m::F2mElement, <alloc::vec::Vec<full_trace_zero_backend::binary_ecc::f2m::F2mElement>>::extend_trusted<core::iter::adapters::map::Map<core::ops::range::Range<u32>, <full_trace_zero_backend::binary_ecc::f2m::TraceTables>::new::{closure#3}>>::{closure#0}>::{closure#0}>
+  9,644,935 (18.63%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::square_k_times [/workspace/scratch/trace-rowmap-baseline]
+  8,494,465 (16.41%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::square_k_times::{closure#0} [/workspace/scratch/trace-rowmap-baseline]
+  4,740,227 ( 9.16%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:full_trace_zero_backend::binary_ecc::f2m::reduce_words [/workspace/scratch/trace-rowmap-baseline]
+  4,440,369 ( 8.58%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/iter/traits/iterator.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_hex
+  4,436,373 ( 8.57%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/string.rs:<alloc::string::String as core::iter::traits::collect::FromIterator<char>>::from_iter::<core::iter::adapters::filter::Filter<core::str::iter::Chars, <full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_hex::{closure#0}>> [/workspace/scratch/trace-rowmap-baseline]
+  3,682,162 ( 7.11%)  /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/biguint.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_hex
+  3,594,385 ( 6.94%)  /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::residuals
+  3,439,525 ( 6.64%)  /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/biguint/convert.rs:<num_bigint::biguint::BigUint as num_traits::Num>::from_str_radix [/workspace/scratch/trace-rowmap-baseline]
+  3,342,381 ( 6.46%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::residuals [/workspace/scratch/trace-rowmap-baseline]
+  2,868,605 ( 5.54%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/num/uint_macros.rs:full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized
+  2,735,854 ( 5.28%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:full_trace_zero_backend::binary_ecc::f2m::fold_words_clmul_hw [/workspace/scratch/trace-rowmap-baseline]
+  2,731,326 ( 5.28%)  /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.154/src/de.rs:trace_zero_kernel::main
+  2,731,325 ( 5.28%)  /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.154/src/de.rs:serde_json::de::from_trait::<serde_json::read::SliceRead, trace_zero_experiments::Case> [/workspace/scratch/trace-rowmap-baseline]
+  2,731,265 ( 5.28%)  research/trace_zero_experiments_20261109/native/src/lib.rs:serde_json::de::from_trait::<serde_json::read::SliceRead, trace_zero_experiments::Case>
+  2,731,264 ( 5.28%)  /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.154/src/de.rs:<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_struct::<<trace_zero_experiments::Case as serde_core::de::Deserialize>::deserialize::__Visitor> [/workspace/scratch/trace-rowmap-baseline]
+  2,726,329 ( 5.27%)  /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_core-1.0.229/src/de/impls.rs:<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_struct::<<trace_zero_experiments::Case as serde_core::de::Deserialize>::deserialize::__Visitor>
+  2,725,285 ( 5.26%)  /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.154/src/de.rs:<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_seq::<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<core::option::Option<[alloc::string::String; 2]>>> [/workspace/scratch/trace-rowmap-baseline]
+  2,725,215 ( 5.26%)  /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_core-1.0.229/src/de/impls.rs:<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<core::option::Option<[alloc::string::String; 2]>> as serde_core::de::Visitor>::visit_seq::<serde_json::de::SeqAccess<serde_json::read::SliceRead>> [/workspace/scratch/trace-rowmap-baseline]
+  2,699,569 ( 5.21%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/raw_vec/mod.rs:<alloc::string::String as core::iter::traits::collect::FromIterator<char>>::from_iter::<core::iter::adapters::filter::Filter<core::str::iter::Chars, <full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_hex::{closure#0}>>
+  2,485,555 ( 4.80%)  /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_core-1.0.229/src/de/mod.rs:<<alloc::vec::Vec<_> as serde_core::de::Deserialize>::deserialize::VecVisitor<core::option::Option<[alloc::string::String; 2]>> as serde_core::de::Visitor>::visit_seq::<serde_json::de::SeqAccess<serde_json::read::SliceRead>>
+  2,482,929 ( 4.80%)  /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_core-1.0.229/src/de/impls.rs:<core::option::Option<[alloc::string::String; 2]> as serde_core::de::Deserialize>::deserialize::<&mut serde_json::de::Deserializer<serde_json::read::SliceRead>> [/workspace/scratch/trace-rowmap-baseline]
+  2,417,094 ( 4.67%)  /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.154/src/de.rs:<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_tuple::<serde_core::de::impls::ArrayVisitor<[alloc::string::String; 2]>> [/workspace/scratch/trace-rowmap-baseline]
+  2,351,485 ( 4.54%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/raw_vec/mod.rs:<alloc::raw_vec::RawVecInner<_>>::reserve::do_reserve_and_handle::<alloc::alloc::Global> [/workspace/scratch/trace-rowmap-baseline]
+  2,335,772 ( 4.51%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/raw_vec/mod.rs:<alloc::raw_vec::RawVecInner>::finish_grow [/workspace/scratch/trace-rowmap-baseline]
+  2,270,475 ( 4.39%)  ???:__rustc::__rust_dealloc [/workspace/scratch/trace-rowmap-baseline]
+  2,247,834 ( 4.34%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/sys/alloc/unix.rs:__rustc::__rdl_dealloc [/workspace/scratch/trace-rowmap-baseline]
+  2,225,583 ( 4.30%)  ???:free [/usr/lib/x86_64-linux-gnu/libc.so.6]
+  2,174,504 ( 4.20%)  /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:full_trace_zero_backend::binary_ecc::f2m::mul_words_into
+  2,072,131 ( 4.00%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/slice/iter/macros.rs:full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized
+  2,052,009 ( 3.96%)  /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_core-1.0.229/src/de/impls.rs:<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_tuple::<serde_core::de::impls::ArrayVisitor<[alloc::string::String; 2]>>
+  2,046,998 ( 3.95%)  /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.154/src/de.rs:<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_string::<serde_core::de::impls::StringVisitor> [/workspace/scratch/trace-rowmap-baseline]
+  1,959,952 ( 3.79%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/alloc.rs:<alloc::raw_vec::RawVecInner>::finish_grow
+  1,910,394 ( 3.69%)  ???:__rustc::__rust_alloc [/workspace/scratch/trace-rowmap-baseline]
+  1,887,753 ( 3.65%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/alloc.rs:__rustc::__rdl_alloc [/workspace/scratch/trace-rowmap-baseline]
+  1,865,112 ( 3.60%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/sys/alloc/unix.rs:__rustc::__rdl_alloc
+  1,719,900 ( 3.32%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:full_trace_zero_backend::binary_ecc::f2m::mul_words_hw [/workspace/scratch/trace-rowmap-baseline]
+  1,686,507 ( 3.26%)  ???:malloc [/usr/lib/x86_64-linux-gnu/libc.so.6]
+  1,671,969 ( 3.23%)  /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::admit
+  1,517,519 ( 2.93%)  ???:__rustc::__rust_realloc [/workspace/scratch/trace-rowmap-baseline]
+  1,511,645 ( 2.92%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/alloc.rs:__rustc::__rdl_realloc [/workspace/scratch/trace-rowmap-baseline]
+  1,464,653 ( 2.83%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/std/src/sys/alloc/unix.rs:__rustc::__rdl_realloc
+  1,459,997 ( 2.82%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_hex [/workspace/scratch/trace-rowmap-baseline]
+  1,436,677 ( 2.77%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::admit [/workspace/scratch/trace-rowmap-baseline]
+  1,392,065 ( 2.69%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/binary_ecc/f2m.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_biguint [/workspace/scratch/trace-rowmap-baseline]
+  1,383,192 ( 2.67%)  ???:realloc [/usr/lib/x86_64-linux-gnu/libc.so.6]
+  1,342,346 ( 2.59%)  ???:0x00000000000a0fe0 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+  1,335,478 ( 2.58%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::reduce [/workspace/scratch/trace-rowmap-baseline]
+  1,183,573 ( 2.29%)  /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/num-bigint-0.4.8/src/biguint/convert.rs:num_bigint::biguint::convert::from_bitwise_digits_le [/workspace/scratch/trace-rowmap-baseline]
+  1,000,590 ( 1.93%)  ???:0x00000000000a20c0 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+  1,000,544 ( 1.93%)  /home/agent/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.154/src/read.rs:<serde_json::read::SliceRead as serde_json::read::Read>::parse_str [/workspace/scratch/trace-rowmap-baseline]
+    979,543 ( 1.89%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/vec/spec_from_iter.rs:num_bigint::biguint::convert::from_bitwise_digits_le
+    971,547 ( 1.88%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/vec/spec_from_iter_nested.rs:<alloc::vec::Vec<u64> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<u64, core::iter::adapters::map::Map<core::slice::iter::Chunks<u8>, num_bigint::biguint::convert::from_bitwise_digits_le::{closure#0}>>>::from_iter [/workspace/scratch/trace-rowmap-baseline]
+    940,049 ( 1.82%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::square [/workspace/scratch/trace-rowmap-baseline]
+    873,240 ( 1.69%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/char/methods.rs:<alloc::string::String as core::iter::traits::collect::FromIterator<char>>::from_iter::<core::iter::adapters::filter::Filter<core::str::iter::Chars, <full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_hex::{closure#0}>>
+    856,599 ( 1.65%)  ???:0x00000000000a02e0 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+    852,716 ( 1.65%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/slice/cmp.rs:full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized
+    802,695 ( 1.55%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/ptr/mod.rs:core::ptr::drop_glue::<trace_zero_experiments::Case> [/workspace/scratch/trace-rowmap-baseline]
+    789,183 ( 1.52%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/slice/index.rs:full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized
+    776,728 ( 1.50%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/alloc.rs:core::ptr::drop_glue::<trace_zero_experiments::Case>
+    763,887 ( 1.48%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/alloc.rs:<&mut serde_json::de::Deserializer<serde_json::read::SliceRead> as serde_core::de::Deserializer>::deserialize_string::<serde_core::de::impls::StringVisitor>
+    758,919 ( 1.47%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/ptr/non_null.rs:full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized
+    748,188 ( 1.45%)  /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::mul
+    733,343 ( 1.42%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::mul [/workspace/scratch/trace-rowmap-baseline]
+    727,135 ( 1.40%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/slice/iter/macros.rs:full_trace_zero_backend::binary_ecc::f2m::reduce_words
+    646,440 ( 1.25%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/alloc.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_hex
+    629,887 ( 1.22%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/str/converts.rs:core::str::converts::from_utf8 [/workspace/scratch/trace-rowmap-baseline]
+    563,350 ( 1.09%)  ???:0x0000000000162880 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+    546,768 ( 1.06%)  research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized
+    528,069 ( 1.02%)  /workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend/src/../../../../../src/cryptanalysis/trace_zero_word_field.rs:<full_trace_zero_backend::cryptanalysis::trace_zero_word_field::WordField>::new
+    525,865 ( 1.02%)  ???:0x000000000009ebd0 [/usr/lib/x86_64-linux-gnu/libc.so.6]
+    525,390 ( 1.01%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/core/src/ops/control_flow.rs:full_trace_zero_backend::cryptanalysis::trace_zero_linearized::decompose_trace_zero_linearized
+    524,836 ( 1.01%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/vec/spec_from_iter.rs:<full_trace_zero_backend::binary_ecc::f2m::F2mElement>::from_biguint
+    520,840 ( 1.01%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/vec/spec_from_iter_nested.rs:<alloc::vec::Vec<u64> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<u64, num_bigint::biguint::iter::U64Digits>>::from_iter [/workspace/scratch/trace-rowmap-baseline]
+    490,317 ( 0.95%)  /rustc/58cf8f9c35b355199727627d07ae34a4e2846d67/library/alloc/src/alloc.rs:<num_bigint::biguint::BigUint as num_traits::Num>::from_str_radix
+

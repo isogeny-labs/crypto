@@ -1,0 +1,15 @@
+[package]
+name = "fass-coupled-rank-qualifier"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[[bin]]
+name = "fass-coupled-rank-qualifier"
+path = "main.rs"
+
+[dependencies]
+rand = { version = "=0.8.8", features = ["small_rng"] }
+

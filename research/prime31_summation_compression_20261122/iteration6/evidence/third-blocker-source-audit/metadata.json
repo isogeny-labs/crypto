@@ -1,0 +1,718 @@
+{
+  "repository": "isogeny-labs/crypto",
+  "path": "src/cryptanalysis/binary_hyperelliptic_index_calculus.rs",
+  "refs": {
+    "failed": "14a9f021b630fec0a7dd38cb724d71d68c99626b",
+    "base": "f0ca664eca0081a30adfcc79dcf62a32de40d2af",
+    "current": "816f9c3a942efed569049618c056d12a0c56d693",
+    "merge": "77d388738a48eb5a6e2abd80636c2e31cceab254",
+    "parent1": "a9d68fbd9c2dc5b6db267746c483febd22cb5501",
+    "parent2": "0d4721abfeb0c402cb7de6227e0f2108101162dc"
+  },
+  "bounded_history": [
+    {
+      "sha": "77d388738a48eb5a6e2abd80636c2e31cceab254",
+      "node_id": "C_kwDOSMdswNoAKDc3ZDM4ODczOGE0OGViNWE2ZTJhYmQ4MDYzNmMyZTMxY2NlYWIyNTQ",
+      "commit": {
+        "author": {
+          "name": "Adam Buran",
+          "email": "aburan28@gmail.com",
+          "date": "2026-11-23T02:12:27Z"
+        },
+        "committer": {
+          "name": "Adam Buran",
+          "email": "aburan28@gmail.com",
+          "date": "2026-11-23T02:12:27Z"
+        },
+        "message": "Merge main into prime-ic-mitm-20261118",
+        "tree": {
+          "sha": "99f42385f56912cd6aba7d873ced0aa5f7f5b74b",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/git/trees/99f42385f56912cd6aba7d873ced0aa5f7f5b74b"
+        },
+        "url": "https://api.github.com/repos/isogeny-labs/crypto/git/commits/77d388738a48eb5a6e2abd80636c2e31cceab254",
+        "comment_count": 0,
+        "verification": {
+          "verified": false,
+          "reason": "unsigned",
+          "signature": null,
+          "payload": null,
+          "verified_at": null
+        }
+      },
+      "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/77d388738a48eb5a6e2abd80636c2e31cceab254",
+      "html_url": "https://github.com/isogeny-labs/crypto/commit/77d388738a48eb5a6e2abd80636c2e31cceab254",
+      "comments_url": "https://api.github.com/repos/isogeny-labs/crypto/commits/77d388738a48eb5a6e2abd80636c2e31cceab254/comments",
+      "author": {
+        "login": "aburan28",
+        "id": 1086874,
+        "node_id": "MDQ6VXNlcjEwODY4NzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/aburan28",
+        "html_url": "https://github.com/aburan28",
+        "followers_url": "https://api.github.com/users/aburan28/followers",
+        "following_url": "https://api.github.com/users/aburan28/following{/other_user}",
+        "gists_url": "https://api.github.com/users/aburan28/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/aburan28/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/aburan28/subscriptions",
+        "organizations_url": "https://api.github.com/users/aburan28/orgs",
+        "repos_url": "https://api.github.com/users/aburan28/repos",
+        "events_url": "https://api.github.com/users/aburan28/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/aburan28/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "aburan28",
+        "id": 1086874,
+        "node_id": "MDQ6VXNlcjEwODY4NzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/aburan28",
+        "html_url": "https://github.com/aburan28",
+        "followers_url": "https://api.github.com/users/aburan28/followers",
+        "following_url": "https://api.github.com/users/aburan28/following{/other_user}",
+        "gists_url": "https://api.github.com/users/aburan28/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/aburan28/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/aburan28/subscriptions",
+        "organizations_url": "https://api.github.com/users/aburan28/orgs",
+        "repos_url": "https://api.github.com/users/aburan28/repos",
+        "events_url": "https://api.github.com/users/aburan28/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/aburan28/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "a9d68fbd9c2dc5b6db267746c483febd22cb5501",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/a9d68fbd9c2dc5b6db267746c483febd22cb5501",
+          "html_url": "https://github.com/isogeny-labs/crypto/commit/a9d68fbd9c2dc5b6db267746c483febd22cb5501"
+        },
+        {
+          "sha": "0d4721abfeb0c402cb7de6227e0f2108101162dc",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/0d4721abfeb0c402cb7de6227e0f2108101162dc",
+          "html_url": "https://github.com/isogeny-labs/crypto/commit/0d4721abfeb0c402cb7de6227e0f2108101162dc"
+        }
+      ]
+    },
+    {
+      "sha": "4c1acb888be6bd6bf0e69a6825e4770d2b866aec",
+      "node_id": "C_kwDOSMdswNoAKDRjMWFjYjg4OGJlNmJkNmJmMGU2OWE2ODI1ZTQ3NzBkMmI4NjZhZWM",
+      "commit": {
+        "author": {
+          "name": "Adam Buran",
+          "email": "info@adamburan.com",
+          "date": "2026-11-20T02:56:46Z"
+        },
+        "committer": {
+          "name": "Adam Buran",
+          "email": "info@adamburan.com",
+          "date": "2026-11-20T02:56:46Z"
+        },
+        "message": "feat(ecbench): add projected genus-3 cover solver",
+        "tree": {
+          "sha": "88baf48fd7c0a3ccd0fe1e6d91d8da58056eb8d7",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/git/trees/88baf48fd7c0a3ccd0fe1e6d91d8da58056eb8d7"
+        },
+        "url": "https://api.github.com/repos/isogeny-labs/crypto/git/commits/4c1acb888be6bd6bf0e69a6825e4770d2b866aec",
+        "comment_count": 0,
+        "verification": {
+          "verified": false,
+          "reason": "unsigned",
+          "signature": null,
+          "payload": null,
+          "verified_at": null
+        }
+      },
+      "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/4c1acb888be6bd6bf0e69a6825e4770d2b866aec",
+      "html_url": "https://github.com/isogeny-labs/crypto/commit/4c1acb888be6bd6bf0e69a6825e4770d2b866aec",
+      "comments_url": "https://api.github.com/repos/isogeny-labs/crypto/commits/4c1acb888be6bd6bf0e69a6825e4770d2b866aec/comments",
+      "author": null,
+      "committer": null,
+      "parents": [
+        {
+          "sha": "7ecc1162aa55a0f993808f221f4dc4d6143bae7a",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/7ecc1162aa55a0f993808f221f4dc4d6143bae7a",
+          "html_url": "https://github.com/isogeny-labs/crypto/commit/7ecc1162aa55a0f993808f221f4dc4d6143bae7a"
+        }
+      ]
+    },
+    {
+      "sha": "1e85fdf181a9e6a55b6a8cb86e177ab6c6d66ae1",
+      "node_id": "C_kwDOSMdswNoAKDFlODVmZGYxODFhOWU2YTU1YjZhOGNiODZlMTc3YWI2YzZkNjZhZTE",
+      "commit": {
+        "author": {
+          "name": "Adam Buran",
+          "email": "aburan28@gmail.com",
+          "date": "2026-11-16T23:58:36Z"
+        },
+        "committer": {
+          "name": "Adam Buran",
+          "email": "aburan28@gmail.com",
+          "date": "2026-11-16T23:58:36Z"
+        },
+        "message": "Restore main content deleted by sparse branch merges\n\nBetween 2026-11-16 23:19Z and 23:46Z, auto-merge landed a run of PRs whose\nbranch tips had been replaced by sparse tree snapshots. Each such merge\nremoved every path the branch did not materialize, taking main from 434,565\nfiles at c0b657b6d5 down to roughly 13k files.\n\nThis commit restores, onto the current main tree, every path that existed at\nc0b657b6d5 and is now missing (425,141 files, including the submodule\ngitlink). Paths added or modified after c0b657b6d5 are left untouched, so PR\npayloads merged in that window are preserved.\n\nRestores .github/scripts/ci-scope.mjs, tools/artifacts/, the research\narchives, the website snapshots and the workflow set that main's own CI and\ntooling require.\n\nOne path is deliberately not restored here:\n.github/workflows/pcc-gate.yml. Main already carries 147 claim records without\nthe mandatory claim_type (a pre-existing, documented PCC blocker), so\nreinstating that workflow would immediately fail the required `gate` check.\nIt should come back in a focused follow-up once those claim records are\nmigrated.",
+        "tree": {
+          "sha": "f8d5faf093e8ad6c3132029e52fd243a012d377c",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/git/trees/f8d5faf093e8ad6c3132029e52fd243a012d377c"
+        },
+        "url": "https://api.github.com/repos/isogeny-labs/crypto/git/commits/1e85fdf181a9e6a55b6a8cb86e177ab6c6d66ae1",
+        "comment_count": 0,
+        "verification": {
+          "verified": false,
+          "reason": "unsigned",
+          "signature": null,
+          "payload": null,
+          "verified_at": null
+        }
+      },
+      "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/1e85fdf181a9e6a55b6a8cb86e177ab6c6d66ae1",
+      "html_url": "https://github.com/isogeny-labs/crypto/commit/1e85fdf181a9e6a55b6a8cb86e177ab6c6d66ae1",
+      "comments_url": "https://api.github.com/repos/isogeny-labs/crypto/commits/1e85fdf181a9e6a55b6a8cb86e177ab6c6d66ae1/comments",
+      "author": {
+        "login": "aburan28",
+        "id": 1086874,
+        "node_id": "MDQ6VXNlcjEwODY4NzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/aburan28",
+        "html_url": "https://github.com/aburan28",
+        "followers_url": "https://api.github.com/users/aburan28/followers",
+        "following_url": "https://api.github.com/users/aburan28/following{/other_user}",
+        "gists_url": "https://api.github.com/users/aburan28/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/aburan28/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/aburan28/subscriptions",
+        "organizations_url": "https://api.github.com/users/aburan28/orgs",
+        "repos_url": "https://api.github.com/users/aburan28/repos",
+        "events_url": "https://api.github.com/users/aburan28/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/aburan28/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "aburan28",
+        "id": 1086874,
+        "node_id": "MDQ6VXNlcjEwODY4NzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/aburan28",
+        "html_url": "https://github.com/aburan28",
+        "followers_url": "https://api.github.com/users/aburan28/followers",
+        "following_url": "https://api.github.com/users/aburan28/following{/other_user}",
+        "gists_url": "https://api.github.com/users/aburan28/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/aburan28/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/aburan28/subscriptions",
+        "organizations_url": "https://api.github.com/users/aburan28/orgs",
+        "repos_url": "https://api.github.com/users/aburan28/repos",
+        "events_url": "https://api.github.com/users/aburan28/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/aburan28/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "d06c4a82808701ede1aca1a64ebb7f861b0eade5",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/d06c4a82808701ede1aca1a64ebb7f861b0eade5",
+          "html_url": "https://github.com/isogeny-labs/crypto/commit/d06c4a82808701ede1aca1a64ebb7f861b0eade5"
+        }
+      ]
+    },
+    {
+      "sha": "64f2445a7bf9ce7f9edbd43268d7aa4aaf676cbf",
+      "node_id": "C_kwDOSMdswNoAKDY0ZjI0NDVhN2JmOWNlN2Y5ZWRiZDQzMjY4ZDdhYTRhYWY2NzZjYmY",
+      "commit": {
+        "author": {
+          "name": "Adam Buran",
+          "email": "aburan28@gmail.com",
+          "date": "2026-11-16T21:16:23Z"
+        },
+        "committer": {
+          "name": "Adam Buran",
+          "email": "aburan28@gmail.com",
+          "date": "2026-11-16T21:16:23Z"
+        },
+        "message": "Merge branch 'main' into the pull request branch",
+        "tree": {
+          "sha": "94d4d6669a335cc260efddab0adb1803936f89d8",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/git/trees/94d4d6669a335cc260efddab0adb1803936f89d8"
+        },
+        "url": "https://api.github.com/repos/isogeny-labs/crypto/git/commits/64f2445a7bf9ce7f9edbd43268d7aa4aaf676cbf",
+        "comment_count": 0,
+        "verification": {
+          "verified": false,
+          "reason": "unsigned",
+          "signature": null,
+          "payload": null,
+          "verified_at": null
+        }
+      },
+      "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/64f2445a7bf9ce7f9edbd43268d7aa4aaf676cbf",
+      "html_url": "https://github.com/isogeny-labs/crypto/commit/64f2445a7bf9ce7f9edbd43268d7aa4aaf676cbf",
+      "comments_url": "https://api.github.com/repos/isogeny-labs/crypto/commits/64f2445a7bf9ce7f9edbd43268d7aa4aaf676cbf/comments",
+      "author": {
+        "login": "aburan28",
+        "id": 1086874,
+        "node_id": "MDQ6VXNlcjEwODY4NzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/aburan28",
+        "html_url": "https://github.com/aburan28",
+        "followers_url": "https://api.github.com/users/aburan28/followers",
+        "following_url": "https://api.github.com/users/aburan28/following{/other_user}",
+        "gists_url": "https://api.github.com/users/aburan28/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/aburan28/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/aburan28/subscriptions",
+        "organizations_url": "https://api.github.com/users/aburan28/orgs",
+        "repos_url": "https://api.github.com/users/aburan28/repos",
+        "events_url": "https://api.github.com/users/aburan28/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/aburan28/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "aburan28",
+        "id": 1086874,
+        "node_id": "MDQ6VXNlcjEwODY4NzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/aburan28",
+        "html_url": "https://github.com/aburan28",
+        "followers_url": "https://api.github.com/users/aburan28/followers",
+        "following_url": "https://api.github.com/users/aburan28/following{/other_user}",
+        "gists_url": "https://api.github.com/users/aburan28/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/aburan28/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/aburan28/subscriptions",
+        "organizations_url": "https://api.github.com/users/aburan28/orgs",
+        "repos_url": "https://api.github.com/users/aburan28/repos",
+        "events_url": "https://api.github.com/users/aburan28/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/aburan28/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "4207b14622adf9462edef301417b00886dd9a96f",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/4207b14622adf9462edef301417b00886dd9a96f",
+          "html_url": "https://github.com/isogeny-labs/crypto/commit/4207b14622adf9462edef301417b00886dd9a96f"
+        },
+        {
+          "sha": "c48ff675df6e88ef8e3affef53a26efa0bb683ee",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/c48ff675df6e88ef8e3affef53a26efa0bb683ee",
+          "html_url": "https://github.com/isogeny-labs/crypto/commit/c48ff675df6e88ef8e3affef53a26efa0bb683ee"
+        }
+      ]
+    },
+    {
+      "sha": "a9a69b05eb91f8aac64636bd88f59b312bd81243",
+      "node_id": "C_kwDOSMdswNoAKGE5YTY5YjA1ZWI5MWY4YWFjNjQ2MzZiZDg4ZjU5YjMxMmJkODEyNDM",
+      "commit": {
+        "author": {
+          "name": "Adam Buran",
+          "email": "aburan28@gmail.com",
+          "date": "2026-11-09T02:40:51Z"
+        },
+        "committer": {
+          "name": "Adam Buran",
+          "email": "aburan28@gmail.com",
+          "date": "2026-11-09T02:40:51Z"
+        },
+        "message": "ic: make hecx rustfmt- and clippy-clean\n\n- sort hec_dlp into the maintained module order\n- drop test-only unused imports and redundant local rebinding\n- use if-let for the single-pattern decomposition result\n- remove two unnecessary u32 casts and an op-ref comparison\n- make --json emit compact JSON and simplify parse_list",
+        "tree": {
+          "sha": "8645adfea2c970dd769eb11f9509159607a97b40",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/git/trees/8645adfea2c970dd769eb11f9509159607a97b40"
+        },
+        "url": "https://api.github.com/repos/isogeny-labs/crypto/git/commits/a9a69b05eb91f8aac64636bd88f59b312bd81243",
+        "comment_count": 0,
+        "verification": {
+          "verified": false,
+          "reason": "unsigned",
+          "signature": null,
+          "payload": null,
+          "verified_at": null
+        }
+      },
+      "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/a9a69b05eb91f8aac64636bd88f59b312bd81243",
+      "html_url": "https://github.com/isogeny-labs/crypto/commit/a9a69b05eb91f8aac64636bd88f59b312bd81243",
+      "comments_url": "https://api.github.com/repos/isogeny-labs/crypto/commits/a9a69b05eb91f8aac64636bd88f59b312bd81243/comments",
+      "author": {
+        "login": "aburan28",
+        "id": 1086874,
+        "node_id": "MDQ6VXNlcjEwODY4NzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/aburan28",
+        "html_url": "https://github.com/aburan28",
+        "followers_url": "https://api.github.com/users/aburan28/followers",
+        "following_url": "https://api.github.com/users/aburan28/following{/other_user}",
+        "gists_url": "https://api.github.com/users/aburan28/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/aburan28/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/aburan28/subscriptions",
+        "organizations_url": "https://api.github.com/users/aburan28/orgs",
+        "repos_url": "https://api.github.com/users/aburan28/repos",
+        "events_url": "https://api.github.com/users/aburan28/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/aburan28/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "aburan28",
+        "id": 1086874,
+        "node_id": "MDQ6VXNlcjEwODY4NzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/aburan28",
+        "html_url": "https://github.com/aburan28",
+        "followers_url": "https://api.github.com/users/aburan28/followers",
+        "following_url": "https://api.github.com/users/aburan28/following{/other_user}",
+        "gists_url": "https://api.github.com/users/aburan28/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/aburan28/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/aburan28/subscriptions",
+        "organizations_url": "https://api.github.com/users/aburan28/orgs",
+        "repos_url": "https://api.github.com/users/aburan28/repos",
+        "events_url": "https://api.github.com/users/aburan28/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/aburan28/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "9f917f9e0929bdbcd14b7e165c7650768fa45ce2",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/9f917f9e0929bdbcd14b7e165c7650768fa45ce2",
+          "html_url": "https://github.com/isogeny-labs/crypto/commit/9f917f9e0929bdbcd14b7e165c7650768fa45ce2"
+        }
+      ]
+    },
+    {
+      "sha": "9f917f9e0929bdbcd14b7e165c7650768fa45ce2",
+      "node_id": "C_kwDOSMdswNoAKDlmOTE3ZjllMDkyOWJkYmNkMTRiN2UxNjVjNzY1MDc2OGZhNDVjZTI",
+      "commit": {
+        "author": {
+          "name": "Adam Buran",
+          "email": "aburan28@gmail.com",
+          "date": "2026-11-09T00:09:36Z"
+        },
+        "committer": {
+          "name": "Adam Buran",
+          "email": "aburan28@gmail.com",
+          "date": "2026-11-09T00:12:25Z"
+        },
+        "message": "ic: add binary-field HECDLP index calculus and hecx front door\n\n- characteristic-two Jacobian IC: Artin-Schreier point construction, trace Cantor-Zassenhaus smoothness, factor-base walk, sparse linear algebra and threaded relation collection\n- generic BSGS / Pohlig-Hellman / CRT over prime and binary hyperelliptic groups\n- hecx CLI: list, inspect, estimate, run and demo for arbitrary genus, coefficients and subgroup orders\n- fast validated-once Jacobian arithmetic paths, sampled reduced prime bases, wide-prime support and large-field Hasse intervals\n- docs/ic/HECX.md and engine tests",
+        "tree": {
+          "sha": "95929ffce4910d27730f892b17ba9415f4b90946",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/git/trees/95929ffce4910d27730f892b17ba9415f4b90946"
+        },
+        "url": "https://api.github.com/repos/isogeny-labs/crypto/git/commits/9f917f9e0929bdbcd14b7e165c7650768fa45ce2",
+        "comment_count": 0,
+        "verification": {
+          "verified": false,
+          "reason": "unsigned",
+          "signature": null,
+          "payload": null,
+          "verified_at": null
+        }
+      },
+      "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/9f917f9e0929bdbcd14b7e165c7650768fa45ce2",
+      "html_url": "https://github.com/isogeny-labs/crypto/commit/9f917f9e0929bdbcd14b7e165c7650768fa45ce2",
+      "comments_url": "https://api.github.com/repos/isogeny-labs/crypto/commits/9f917f9e0929bdbcd14b7e165c7650768fa45ce2/comments",
+      "author": {
+        "login": "aburan28",
+        "id": 1086874,
+        "node_id": "MDQ6VXNlcjEwODY4NzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/aburan28",
+        "html_url": "https://github.com/aburan28",
+        "followers_url": "https://api.github.com/users/aburan28/followers",
+        "following_url": "https://api.github.com/users/aburan28/following{/other_user}",
+        "gists_url": "https://api.github.com/users/aburan28/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/aburan28/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/aburan28/subscriptions",
+        "organizations_url": "https://api.github.com/users/aburan28/orgs",
+        "repos_url": "https://api.github.com/users/aburan28/repos",
+        "events_url": "https://api.github.com/users/aburan28/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/aburan28/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "aburan28",
+        "id": 1086874,
+        "node_id": "MDQ6VXNlcjEwODY4NzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/aburan28",
+        "html_url": "https://github.com/aburan28",
+        "followers_url": "https://api.github.com/users/aburan28/followers",
+        "following_url": "https://api.github.com/users/aburan28/following{/other_user}",
+        "gists_url": "https://api.github.com/users/aburan28/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/aburan28/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/aburan28/subscriptions",
+        "organizations_url": "https://api.github.com/users/aburan28/orgs",
+        "repos_url": "https://api.github.com/users/aburan28/repos",
+        "events_url": "https://api.github.com/users/aburan28/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/aburan28/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "99ce97787286c77c27a1df8cc8ddf4d8b958a133",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/99ce97787286c77c27a1df8cc8ddf4d8b958a133",
+          "html_url": "https://github.com/isogeny-labs/crypto/commit/99ce97787286c77c27a1df8cc8ddf4d8b958a133"
+        }
+      ]
+    },
+    {
+      "sha": "670f20b52a7a125d5ad24ecc03ecd151d245c281",
+      "node_id": "C_kwDOSMdswNoAKDY3MGYyMGI1MmE3YTEyNWQ1YWQyNGVjYzAzZWNkMTUxZDI0NWMyODE",
+      "commit": {
+        "author": {
+          "name": "Adam Buran",
+          "email": "aburan28@gmail.com",
+          "date": "2026-11-09T00:09:36Z"
+        },
+        "committer": {
+          "name": "Adam Buran",
+          "email": "aburan28@gmail.com",
+          "date": "2026-11-09T00:09:36Z"
+        },
+        "message": "ic: add binary-field HECDLP index calculus and hecx front door\n\n- characteristic-two Jacobian IC: Artin-Schreier point construction, trace Cantor-Zassenhaus smoothness, factor-base walk, sparse linear algebra and threaded relation collection\n- generic BSGS / Pohlig-Hellman / CRT over prime and binary hyperelliptic groups\n- hecx CLI: list, inspect, estimate, run and demo for arbitrary genus, coefficients and subgroup orders\n- fast validated-once Jacobian arithmetic paths, sampled reduced prime bases, wide-prime support and large-field Hasse intervals\n- docs/ic/HECX.md and engine tests",
+        "tree": {
+          "sha": "f64092e6508f02e479d155c268f4359d9c89f0db",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/git/trees/f64092e6508f02e479d155c268f4359d9c89f0db"
+        },
+        "url": "https://api.github.com/repos/isogeny-labs/crypto/git/commits/670f20b52a7a125d5ad24ecc03ecd151d245c281",
+        "comment_count": 0,
+        "verification": {
+          "verified": false,
+          "reason": "unsigned",
+          "signature": null,
+          "payload": null,
+          "verified_at": null
+        }
+      },
+      "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/670f20b52a7a125d5ad24ecc03ecd151d245c281",
+      "html_url": "https://github.com/isogeny-labs/crypto/commit/670f20b52a7a125d5ad24ecc03ecd151d245c281",
+      "comments_url": "https://api.github.com/repos/isogeny-labs/crypto/commits/670f20b52a7a125d5ad24ecc03ecd151d245c281/comments",
+      "author": {
+        "login": "aburan28",
+        "id": 1086874,
+        "node_id": "MDQ6VXNlcjEwODY4NzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/aburan28",
+        "html_url": "https://github.com/aburan28",
+        "followers_url": "https://api.github.com/users/aburan28/followers",
+        "following_url": "https://api.github.com/users/aburan28/following{/other_user}",
+        "gists_url": "https://api.github.com/users/aburan28/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/aburan28/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/aburan28/subscriptions",
+        "organizations_url": "https://api.github.com/users/aburan28/orgs",
+        "repos_url": "https://api.github.com/users/aburan28/repos",
+        "events_url": "https://api.github.com/users/aburan28/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/aburan28/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "aburan28",
+        "id": 1086874,
+        "node_id": "MDQ6VXNlcjEwODY4NzQ=",
+        "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/aburan28",
+        "html_url": "https://github.com/aburan28",
+        "followers_url": "https://api.github.com/users/aburan28/followers",
+        "following_url": "https://api.github.com/users/aburan28/following{/other_user}",
+        "gists_url": "https://api.github.com/users/aburan28/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/aburan28/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/aburan28/subscriptions",
+        "organizations_url": "https://api.github.com/users/aburan28/orgs",
+        "repos_url": "https://api.github.com/users/aburan28/repos",
+        "events_url": "https://api.github.com/users/aburan28/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/aburan28/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "be424692d4edc8622734d233cd93f52ba7058b53",
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/be424692d4edc8622734d233cd93f52ba7058b53",
+          "html_url": "https://github.com/isogeny-labs/crypto/commit/be424692d4edc8622734d233cd93f52ba7058b53"
+        }
+      ]
+    }
+  ],
+  "comparison": {
+    "status": "diverged",
+    "merge_base": "86f17c632710b1cd6c6ed06a0a9dc6952293cca1",
+    "mergebase_source_fetch": "404 NOT_FOUND; no source union or restoration is asserted"
+  },
+  "job": {
+    "total_count": 1,
+    "jobs": [
+      {
+        "id": 137492117014,
+        "run_id": 45113871392,
+        "workflow_name": "Prime31 rational chain original-lock correctness",
+        "head_branch": "lane/prime31-rational-chain-correctness",
+        "run_url": "https://api.github.com/repos/isogeny-labs/crypto/actions/runs/45113871392",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOSMdswM8AAAAgAys2Fg",
+        "head_sha": "14a9f021b630fec0a7dd38cb724d71d68c99626b",
+        "url": "https://api.github.com/repos/isogeny-labs/crypto/actions/jobs/137492117014",
+        "html_url": "https://github.com/isogeny-labs/crypto/actions/runs/45113871392/job/137492117014",
+        "status": "completed",
+        "conclusion": "failure",
+        "created_at": "2026-11-23T04:46:54Z",
+        "started_at": "2026-11-23T04:46:56Z",
+        "completed_at": "2026-11-23T04:56:20Z",
+        "name": "original-lock-correctness",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-11-23T04:46:56Z",
+            "completed_at": "2026-11-23T04:46:57Z"
+          },
+          {
+            "name": "Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-11-23T04:46:57Z",
+            "completed_at": "2026-11-23T04:48:24Z"
+          },
+          {
+            "name": "Run dtolnay/rust-toolchain@1.100.0",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-11-23T04:48:24Z",
+            "completed_at": "2026-11-23T04:48:32Z"
+          },
+          {
+            "name": "Run Swatinem/rust-cache@v2",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-11-23T04:48:32Z",
+            "completed_at": "2026-11-23T04:49:03Z"
+          },
+          {
+            "name": "Record original source and lock identities",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-11-23T04:49:03Z",
+            "completed_at": "2026-11-23T04:49:03Z"
+          },
+          {
+            "name": "Restored inherited spec regression tests",
+            "status": "completed",
+            "conclusion": "failure",
+            "number": 6,
+            "started_at": "2026-11-23T04:49:03Z",
+            "completed_at": "2026-11-23T04:56:10Z"
+          },
+          {
+            "name": "Existing malformed-plugin boundary regression",
+            "status": "completed",
+            "conclusion": "failure",
+            "number": 7,
+            "started_at": "2026-11-23T04:56:10Z",
+            "completed_at": "2026-11-23T04:56:11Z"
+          },
+          {
+            "name": "Fixed rational-chain and original imported tests",
+            "status": "completed",
+            "conclusion": "failure",
+            "number": 8,
+            "started_at": "2026-11-23T04:56:11Z",
+            "completed_at": "2026-11-23T04:56:11Z"
+          },
+          {
+            "name": "Complete deterministic correctness receipt without timings",
+            "status": "completed",
+            "conclusion": "failure",
+            "number": 9,
+            "started_at": "2026-11-23T04:56:11Z",
+            "completed_at": "2026-11-23T04:56:11Z"
+          },
+          {
+            "name": "Native identity issuance and separate-seed replay",
+            "status": "completed",
+            "conclusion": "failure",
+            "number": 10,
+            "started_at": "2026-11-23T04:56:11Z",
+            "completed_at": "2026-11-23T04:56:12Z"
+          },
+          {
+            "name": "Retain source-bound correctness evidence",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11,
+            "started_at": "2026-11-23T04:56:12Z",
+            "completed_at": "2026-11-23T04:56:12Z"
+          },
+          {
+            "name": "Post Run Swatinem/rust-cache@v2",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 21,
+            "started_at": "2026-11-23T04:56:12Z",
+            "completed_at": "2026-11-23T04:56:18Z"
+          },
+          {
+            "name": "Post Run actions/checkout@v4",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 22,
+            "started_at": "2026-11-23T04:56:18Z",
+            "completed_at": "2026-11-23T04:56:19Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 23,
+            "started_at": "2026-11-23T04:56:19Z",
+            "completed_at": "2026-11-23T04:56:19Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/isogeny-labs/crypto/check-runs/137492117014",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000503919,
+        "runner_name": "GitHub Actions 1000503919",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      }
+    ]
+  },
+  "parent1_git_diff_numstat": {
+    "exit": 1,
+    "stdout": "154\t395\tterminal-build-audit/{parent1.rs => merge.rs}\n",
+    "stderr": ""
+  },
+  "parent2_git_diff_numstat": {
+    "exit": 1,
+    "stdout": "173\t479\tterminal-build-audit/{parent2.rs => merge.rs}\n",
+    "stderr": ""
+  }
+}

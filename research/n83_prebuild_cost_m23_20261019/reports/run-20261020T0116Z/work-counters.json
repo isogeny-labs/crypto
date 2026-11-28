@@ -1,0 +1,88 @@
+{
+  "schema": "n83.xor-cache-work-counter-run/v1",
+  "run_id": "xor-cache-v2-20261020T011634Z",
+  "started_utc": "2026-10-20T01:16:34Z",
+  "completed_utc": "2026-10-20T02:00:10Z",
+  "status": "COMPLETE_BOUNDED",
+  "source_commit": "1de47a9d4186bff08abc84c224a111183e820106",
+  "driver_revision": "f1667c313910a1021daed455c9e48cd03524f42a",
+  "policy": "small-m4-xor-cache/v1",
+  "conflict_cap": 10000,
+  "natural_attempts": 16,
+  "outcome": "All 16 UNKNOWN_search_cap at 10,000 conflicts",
+  "environment": {
+    "host_class": "authorized shared Spot SSH runner",
+    "architecture": "x86_64",
+    "cpu_pin": 31,
+    "cpu_quota": 1,
+    "memory_limit_bytes": 4294967296,
+    "swap_bytes": 0,
+    "worker_network": false,
+    "isolation": "L0"
+  },
+  "controls": {
+    "constructed_controls_passed": 4,
+    "independent_general_field_replays_passed": 4
+  },
+  "archive": {
+    "path": "runs/xor-cache-v2-final.tar.xz",
+    "sha256": "cf3310c7cb597c144b30a427683ed41d37cf4e2ec2425945d259a1173e776abd",
+    "files_manifest": "runs/xor-cache-v2-final.files.sha256",
+    "files_manifest_sha256": "55a87e7e0ca6561c48d1ad558ec8b3d8ba385e4cb4c26a6b6188688732eea4ee"
+  },
+  "cells": [
+    {
+      "base": "K2048",
+      "target_index": 0,
+      "replicates": 2,
+      "off_repivots": 59469058,
+      "on_repivots": 8705524,
+      "cache_skips": 50763534,
+      "decisions": 37942,
+      "restarts": 43,
+      "xor_passes": 101087,
+      "row_ops": 9346237,
+      "row_scans": 302579749
+    },
+    {
+      "base": "D12",
+      "target_index": 0,
+      "replicates": 2,
+      "off_repivots": 52417870,
+      "on_repivots": 8741736,
+      "cache_skips": 43676134,
+      "decisions": 31779,
+      "restarts": 43,
+      "xor_passes": 91497,
+      "row_ops": 8131482,
+      "row_scans": 271867188
+    },
+    {
+      "base": "K2048",
+      "target_index": 1,
+      "replicates": 2,
+      "off_repivots": 57293217,
+      "on_repivots": 8664828,
+      "cache_skips": 48628389,
+      "decisions": 37931,
+      "restarts": 43,
+      "xor_passes": 98153,
+      "row_ops": 9221780,
+      "row_scans": 293792777
+    },
+    {
+      "base": "D12",
+      "target_index": 1,
+      "replicates": 2,
+      "off_repivots": 51204462,
+      "on_repivots": 8725194,
+      "cache_skips": 42479268,
+      "decisions": 31795,
+      "restarts": 43,
+      "xor_passes": 89997,
+      "row_ops": 9757009,
+      "row_scans": 267151225
+    }
+  ],
+  "interpretation": "Within every cell, A1=A2 and B1=B2 across recorded counters. Cache-on repivot visits plus cache skips equal cache-off repivot visits. No wall-time, natural-yield, or rank conclusion."
+}

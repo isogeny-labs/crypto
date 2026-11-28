@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T07:43:04Z",
+ "id": "PCC-20261116-7cb04a",
+ "kind": "statement",
+ "producer": {
+  "commit": "2d54889ac1032d59fe8b5410ad26ff705cec5bd7",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/fetched-Git-pack-storage-custody-02/original-command.py",
+    "sha256": "929c64080632e69aa3a68b80fead4eb1ee2728bccc05b1beb38c520504d5c989"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/fetched-Git-pack-storage-custody-02/whole-byte-storage-custody.json",
+    "sha256": "42ce6a9e8017d4244eed272da1cbd32832cbbac43d7c5b8af7e6fcb5d635e205"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Near-full overlay Git-cache storage recovery: all4 complete files of the recently auto-fetched32.7MB genuine-merge pack and its indices/promisor metadata are copied whole with SHA/size equality to RAM, original paths atomically become exact whole-byte symlinks. Original/current published HEAD/tree/published-ledger/working-ledger identities remain exact before/after, no source/research/raw/Git object bytes deleted or histories rewritten. Earlier split-index custodybfeb59 remains unchanged. The pack was fetched by original genuine5ae1 read, not a new research computation. Cache loss requires authenticated re-fetch of published immutable objects, preserving working data and never repeating scientific populations."
+}

@@ -1,0 +1,40 @@
+{
+  "schema": "chained-artifact-policy-followup/v1",
+  "recorded": "2026-11-23T16:47:43.256988+00:00",
+  "published_scientific_head": "0ac5a67ea5f4cf31aed018b12f92097ba0df4a8d",
+  "first_check": {
+    "exit": 1,
+    "finding": "Owned sparse checkout omitted existing .artifacts/config.json; default policy flagged ledger/stdout/report."
+  },
+  "exact_existing_policy_restored": {
+    "blob": "1987fd52fead84a2f7d38b8b12e24ad34d92a36f",
+    "bytes": 6109,
+    "mutation": "Restored exact HEAD bytes only, no policy edit."
+  },
+  "restored_policy_check": {
+    "exit": 1,
+    "complete_stderr": "1 data file(s) belong in the store, not Git. 82374 research/chained_cm19_hermitian_20261123/first-C-native/similitudes.stdout",
+    "finding": "Real raw exceeds64KiB threshold; ledger and PDFs allowed by existing keep list."
+  },
+  "approved_store_push": {
+    "command": "ARTIFACTS_CACHE=/dev/shm/ct23-approved-artifact-cache python canonical/tools/artifacts/artifacts.py push research/chained_cm19_hermitian_20261123/first-C-native/similitudes.stdout --jobs 1",
+    "exit": 2,
+    "complete_stdout": "",
+    "complete_stderr": "artifacts: `aws` not found; install the AWS CLI or set ARTIFACTS_AWS\n",
+    "index_unchanged": true,
+    "stdout_original_unchanged": true,
+    "manifest_or_gitignore_created": false,
+    "credentials_present": false
+  },
+  "original_stdout": {
+    "bytes": 82374,
+    "sha256": "484eca83180791abc44cafa7d5712c0babddd88b36223055bdfb41adea211ba8"
+  },
+  "normal_existing_workflow": {
+    "path": ".github/workflows/artifact-autofix.yml",
+    "inspected_at_head": "0ac5a67ea5f4cf31aed018b12f92097ba0df4a8d",
+    "behavior": "Existing pull_request_target opened/synchronize workflow uses trusted base tool/policy, configured repository S3 secrets, remote byte replay and non-force pointer commit. It was not manually dispatched or rerun.",
+    "status": "No early CI status read; wait normal>=50min cadence after final push/ready or observed later substantive bot push."
+  },
+  "merge_status": "Artifact migration is required and remains open. No data deletion, policy/verifier/lock change, alternate destination or merge waiver."
+}

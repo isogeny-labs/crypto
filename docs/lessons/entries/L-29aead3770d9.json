@@ -1,0 +1,14 @@
+{
+  "action": "Retain the original warning and input; preregister a separately named even-round packet of at least six rounds while preserving the requested minimum, and audit endpoint order and algorithm-seed pairing separately.",
+  "created": "2026-11-18T17:20:52Z",
+  "evidence": [
+    "research/prime_conductor_gap80_20261031/wide-harness-20261118/results/cli-a/plan.stderr"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "ecbench-measure"
+  ],
+  "trigger": "Current ecbench warns that alternate arm order with five measured rounds and one warmup is unbalanced.",
+  "why": "The actual CLI planning warning caught an arm-order issue that the older pinned consumer did not flag; no timing run is needed to correct the proposed schedule."
+}

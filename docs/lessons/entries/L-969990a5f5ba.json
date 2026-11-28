@@ -1,0 +1,14 @@
+{
+  "action": "Check the validation exit status and end the script on nonzero before invoking the mutation; use explicit early exit or a guarded shell && chain. Keep independent read batching separate.",
+  "created": "2026-11-15T18:31:03Z",
+  "evidence": [
+    "research/single_relation_reduction_20261115/CONTINUATION.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "*"
+  ],
+  "trigger": "A tool orchestration validates text before a dependent publication or mutation",
+  "why": "The first PR15 body lint found an untagged phrase, but the next tool call still created the PR because the orchestrator did not inspect exit_code. The corrected body and consumer update use an explicit guard."
+}

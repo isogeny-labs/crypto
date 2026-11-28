@@ -1,0 +1,14 @@
+# Raw payloads are app-published then migrated to artifact manifests.
+/raw-*.tar.xz
+/reporter-*.tar.xz
+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)
+!.artifacts.json
+/raw-star-first-n10-s7.tar.xz
+/raw-star-first-n12-s7.tar.xz
+/raw-star-first-n16-s7.tar.xz
+/raw-star-last-n10-s7.tar.xz
+/raw-star-last-n12-s7.tar.xz
+/raw-star-last-n16-s7.tar.xz
+/reporter-executable-01.tar.xz
+/summary.json
+# <<< artifacts

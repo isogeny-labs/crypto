@@ -1,0 +1,21 @@
+\\ Bounded P-192 ideal-class relation screen; run: gp -q cm_mixed_ideal_gate.gp
+die(msg) = { print("FAIL: ", msg); quit(1); };
+p = 6277101735386680763835789423207666416083908700390324961279;
+r = 6277101735386680763835789423176059013767194773182842284081;
+t = p + 1 - r;
+D = t^2 - 4*p;
+if(D != -24109379060336110122544161233113975664949272517896865359515, die("unexpected discriminant"));
+if(kronecker(D, 13) != 1 || kronecker(D, 23) != 1, die("split-prime check failed"));
+for(i=1, 3, if(kronecker(D, [5, 11, 31][i]) != 0, die("ramified-prime check failed")));
+f13 = qfbprimeform(D, 13);
+f23 = qfbprimeform(D, 23);
+f5 = qfbprimeform(D, 5);
+f11 = qfbprimeform(D, 11);
+f31 = qfbprimeform(D, 31);
+principal = qfbpow(f13, 0);
+for(i=1, 3, if(qfbpow([f5, f11, f31][i], 2) != principal, die("ramified class not of order two")));
+A = vector(2001, k, qfbpow(f13, k - 1001));
+B = vector(2001, k, qfbpow(f23, k - 1001));
+R = vector(8, k, qfbcomp(qfbcomp(qfbpow(f5, (k - 1) % 2), qfbpow(f11, ((k - 1) \ 2) % 2)), qfbpow(f31, ((k - 1) \ 4) % 2)));
+for(i=-1000, 1000, for(j=-1000, 1000, c = qfbcomp(A[i + 1001], B[j + 1001]); for(k=1, 8, if(c == R[k] && (i != 0 || j != 0 || k != 1), die(Str("mixed relation ", [i, j, k - 1]))))));
+print("no relation 13^i 23^j 5^e5 11^e11 31^e31 = 1 for |i|,|j|<=1000 and e5,e11,e31 in {0,1}, except identity");

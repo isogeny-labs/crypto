@@ -1,0 +1,30 @@
+digraph structure {
+  graph [rankdir=LR, bgcolor="transparent", pad="0.25", nodesep="0.35", ranksep="0.55", fontname="DejaVu Sans"];
+  node [shape=box, style="rounded,filled", fillcolor="#ffffff", color="#5d6d7e", fontname="DejaVu Sans", fontsize=10];
+  edge [color="#5d6d7e", arrowsize=0.7, fontname="DejaVu Sans", fontsize=9];
+
+  inputs [label="Curve + lifted input points\n(point-origin specialization)", fillcolor="#d6eaf8"];
+  coeff [label="Materialize coefficients\nquadratic / subproduct tree", fillcolor="#f8f1d4"];
+  generic [label="Generic all-roots\nfactorization", fillcolor="#eadcf4"];
+  all [label="Structure-aware all roots\nMITM / affine tree / projective / workspace", fillcolor="#d5f5e3"];
+  one [label="Any one root\none signed point sum", fillcolor="#d5f5e3"];
+  target [label="Target-set membership\nbatched target-aware MITM", fillcolor="#fdebd0"];
+  auto [label="Special-curve automorphism audit\nquotient only invariant inputs", fillcolor="#f5cba7"];
+  negative [label="Recorded negative control:\nregressed beyond tiny degree", fillcolor="#fadbd8"];
+  output [label="Finite x-roots +\nroots at infinity", fillcolor="#d6eaf8"];
+  excluded [label="Excluded from timing and claim scope:\npoint lifting · relation collection · sparse linear algebra\nfull index calculus / ECDLP", shape=note, fillcolor="#eeeeee", color="#922b21"];
+
+  inputs -> coeff;
+  coeff -> generic [label="coefficient-only"];
+  inputs -> all;
+  inputs -> one;
+  inputs -> target;
+  inputs -> auto;
+  auto -> negative;
+  generic -> output;
+  all -> output;
+  one -> output;
+  target -> output;
+  negative -> output [style=dashed];
+  excluded -> inputs [style=dashed, dir=none, color="#922b21"];
+}

@@ -1,0 +1,78 @@
+{
+  "checks": {
+    "baseline_derived_fields_recomputed": true,
+    "baseline_rows_checked": 48,
+    "headline_table_matches_rounded_raw_rows": true,
+    "kernel_rows_schema_checked": 5,
+    "probe_prime_matches_baseline": true,
+    "recorded_filter_hit_counts_match": true
+  },
+  "controls": {
+    "aa_cells": 9,
+    "aa_ratio_max": 1.0564395351201166,
+    "aa_ratio_min": 0.8938093256346119,
+    "abscissa_mismatches": 0,
+    "abscissae_checked": 172032,
+    "recorded_exact_hits": 2601,
+    "recorded_exact_hits_through_filter": 2601
+  },
+  "errata": {
+    "results_md_table_build_target_equivalent": {
+      "build_s_median": 0.110216525,
+      "default_ns_per_target_median": 195751.72265625,
+      "recomputed_targets": 563.0424269294724,
+      "reported_approximate_targets": 1100
+    }
+  },
+  "inputs": {
+    "RESULTS.md": "3d4d36c3645890503170f4ce1c010d8bc55c498fa8b7792b15f3c504ca6ab1cf",
+    "baseline-2.jsonl": "c2126a3a45b4c88c7bc61f121b85dfe7104cb1ba9d7828a86f8db474a2a29b3f",
+    "baseline.jsonl": "aa13a6bbc511ad2cacb7f93e9841bf0a52551a085db8422fc35a3e64c63c8b07",
+    "floor-probe.jsonl": "7a85658418e35cd04cffff50e6914a5906eff48fc2677f0aae4c5b0dc3254064"
+  },
+  "reference": {
+    "baseline_isolation": "none",
+    "baseline_targets_per_cell": 256,
+    "bits": 32,
+    "cells": [
+      {
+        "abscissae": 64,
+        "default_ns_per_point": 109.67059326171876,
+        "probe_ns_per_point": 11.064373016357422,
+        "ratio_gap_to_50x": 5.04436635532431,
+        "recorded_exact_hits": 0,
+        "subtract_ns_per_point": 24.912384033203125,
+        "target_50x_ns_per_point": 2.1934118652343755,
+        "timing_ratio_default_to_probe": 9.912047713827365,
+        "timing_ratio_subtract_to_probe": 2.251585697298255
+      },
+      {
+        "abscissae": 256,
+        "default_ns_per_point": 118.09038580612612,
+        "probe_ns_per_point": 9.99928092956543,
+        "ratio_gap_to_50x": 4.2337404782391275,
+        "recorded_exact_hits": 39,
+        "subtract_ns_per_point": 25.774804052762377,
+        "target_50x_ns_per_point": 2.3618077161225224,
+        "timing_ratio_default_to_probe": 11.80988779472749,
+        "timing_ratio_subtract_to_probe": 2.5776657575998874
+      },
+      {
+        "abscissae": 1024,
+        "default_ns_per_point": 133.63032521972863,
+        "probe_ns_per_point": 14.386661529541016,
+        "ratio_gap_to_50x": 5.383007751378662,
+        "recorded_exact_hits": 2562,
+        "subtract_ns_per_point": 45.11116158059678,
+        "target_50x_ns_per_point": 2.672606504394573,
+        "timing_ratio_default_to_probe": 9.288487460787014,
+        "timing_ratio_subtract_to_probe": 3.1356240284076513
+      }
+    ],
+    "family": "prime",
+    "p": 3466697909,
+    "probe_targets_per_cell": 2048
+  },
+  "schema": "rootfind.baseline-validation/v1",
+  "status": "native producer-independent recomputation; pcc unverified"
+}

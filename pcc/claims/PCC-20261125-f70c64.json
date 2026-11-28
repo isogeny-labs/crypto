@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-25T00:28:14Z",
+ "id": "PCC-20261125-f70c64",
+ "kind": "statement",
+ "producer": {
+  "commit": "5f69c1ea75c17fac64376b220f9513559de3bfe8",
+  "model": "GPT-6",
+  "session": "smooth-p-plus-one-20261125"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/full_cutoff_v1/identity_issue.json",
+    "sha256": "50ece892540e6ddb5780e3e07c985fb3f78a7a3ab904abf6e5869596541a1903"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/full_cutoff_v1/identity_replay.jsonl",
+    "sha256": "f8db71767a46c148eefbda31088051fe82174a69511df9da5db7606afd9ef3a8"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-full-cutoff",
+ "statement": "The unchanged native identity-certificate implementation issues and replays IDC1h2ed7d95dc884eb62 for the classical quartic root pushforward by x squared minus two, retaining multiplicities, at 32 statement-derived and 16 additional finite-field points. The right-hand-side plus one mutation is rejected. This is evaluated unsigned evidence over the certificate field and does not formally prove the general partition or its computational cost."
+}

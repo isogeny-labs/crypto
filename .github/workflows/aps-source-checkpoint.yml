@@ -1,0 +1,95 @@
+name: APS approved source checkpoint
+
+on:
+  push:
+    branches: [codex/aps-cost-leads-20261106]
+    paths: [research/aps_cost_leads_20261106/CHECKPOINT_ADMISSION.json]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aps-approved-source-checkpoint
+  cancel-in-progress: false
+
+jobs:
+  checkpoint:
+    if: github.repository == 'isogeny-labs/crypto'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      SOURCE_REVISION: ${{ github.sha }}
+      CHECKPOINT_BUCKET: setec-astronomy-artifacts
+      CHECKPOINT_PREFIX: checkpoints
+      CHECKPOINT_AWS_REGION: us-east-2
+      CHECKPOINT_SESSION: aps-approved-source-only
+      CHECKPOINT_TOKEN_FILE: /dev/null
+      AWS_EC2_METADATA_DISABLED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: blob:none
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.gitignore
+            /scripts/checkpoint.sh
+            /scripts/checkpoint_presign.py
+            /research/aps_cost_leads_20261106/
+            /tools/aps-export/
+            /src/cryptanalysis/aps_single_relation.rs
+            /src/cryptanalysis/aps_single_relation/leads.rs
+            /src/cryptanalysis/f4_fp.rs
+            /src/cryptanalysis/f4_fp/reuse.rs
+            /src/cryptanalysis/ic_measurement.rs
+            /src/cryptanalysis/ecbench/aps/
+            /src/cryptanalysis/ecbench/callgrind.rs
+            /src/cryptanalysis/ecbench/methods.rs
+            /src/cryptanalysis/ecbench/optimization.rs
+            /src/cryptanalysis/ecbench/registry_audit_tests.rs
+            /tests/aps_cost_leads.rs
+            /examples/aps_scalar_check.rs
+            /.github/scripts/aps_checkpoint_source.py
+            /.github/scripts/test_aps_checkpoint_source.py
+            /.github/workflows/aps-source-checkpoint.yml
+            /.github/workflows/aps-export.yml
+            /.github/workflows/aps-single-relation.yml
+            /docs/ecbench/README.md
+            /problems/aps-single-relation-complete-cost.md
+      - name: Test administrative source custody
+        run: python3 -B .github/scripts/test_aps_checkpoint_source.py
+      - name: Review exact source closure and bounded native lease window
+        env:
+          CHECKPOINT_UPLOAD_TOKEN: ${{ secrets.CHECKPOINT_UPLOAD_TOKEN }}
+        run: |
+          python3 -B .github/scripts/aps_checkpoint_source.py prepare \
+            --source "$SOURCE_REVISION" --out "$RUNNER_TEMP/aps-checkpoint-preflight.json"
+      - name: Run the unchanged standard gate without launching an experiment
+        env:
+          CHECKPOINT_UPLOAD_TOKEN: ${{ secrets.CHECKPOINT_UPLOAD_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+        run: |
+          set -euo pipefail
+          python3 -B .github/scripts/aps_checkpoint_source.py deadline
+          set +e
+          timeout --kill-after=5 120 bash scripts/checkpoint.sh gate > "$RUNNER_TEMP/aps-checkpoint-gate.private.log" 2>&1
+          gate_exit=$?
+          set -e
+          python3 -B .github/scripts/aps_checkpoint_source.py finish \
+            --source "$SOURCE_REVISION" --gate-exit "$gate_exit" \
+            --log "$RUNNER_TEMP/aps-checkpoint-gate.private.log" \
+            --out "$RUNNER_TEMP/aps-checkpoint-receipt.json"
+          exit "$gate_exit"
+      - name: Retain normalized custody and gate outcome only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aps-source-checkpoint-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/aps-checkpoint-preflight.json
+            ${{ runner.temp }}/aps-checkpoint-receipt.json
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,11 @@
+name = "injective_box_audit"
+version = "0.1.0"
+defaultTargets = ["InjectiveBoxAudit"]
+
+[[require]]
+name = "hildebrand_cell_audit"
+path = "../../hildebrand_cell_audit_20261114/lean"
+
+[[lean_lib]]
+name = "InjectiveBoxAudit"
+roots = ["UniformEvents", "InjectiveSampling", "GeneralSupports", "IntegerCounts", "PrimeFieldBoxes", "SamplingCertificate"]

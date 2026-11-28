@@ -1,0 +1,21 @@
+{
+  "schema": "operational-binding-review/v1",
+  "status": "bindings_match_pending_publication_release",
+  "source_packet": "branch-helper-final-binding-20261109",
+  "execution_performed": false,
+  "new_freeze_sha256": "73e8ac05216643331d21dff877677b2a605a5731920546100046a01080891eca",
+  "old_freeze_sha256": "1c4b9f6d93e9ac27b6abcf6f1de3b21866729118ec965dc39207b93491864fa0",
+  "checks": [
+    "The final freeze differs from the reviewed prospective freeze in exactly two fields: prior debit null to18240seconds; remaining before attempt null to24960seconds. All frozen source hashes, runtime pins, controls, five-call order and resource limits are unchanged.",
+    "Current ledger reconciles43200=18240charged+2400reserved+22560unreserved. The helper reservation remains2400seconds (900pre,600compiler,900post),1CPU8GiB,no swap,one attempt.",
+    "Root v4 failed after reaching its full-suite phase; four exact controls passed, full suite incomplete. Completion status failed with seal passed is preserved. Its captured matching invocation has MainPID0 and absent cgroup; this is terminal custody, not a successful full-suite result.",
+    "Original materializer terminal/post-stop hashes and latest root terminal/completion hashes match the serial receipt. Coordinator records no overlapping payload. Helper fence T2070epoch1 matches its maintained lease readback.",
+    "Prior source review4409cc21 still applies to the unchanged runner. The old admission-plan remains a historical conditional plan; final-binding.json and current-ledger.json carry the actual completed-root state. The release draft is deliberately false; it is not execution admission."
+  ],
+  "findings": [],
+  "remaining": [
+    "Coordinator publishes and reads back this exact final freeze and review, binds current lease/ledger/terminal receipts into the final release, and maintains the serial owner during the single attempt."
+  ],
+  "kb": "Existing exact prior review, frozen source and native receipt bindings used; no new research claim.",
+  "trust": "Read-only numerical/source binding review; no payload, compiler or experimental measurement performed."
+}

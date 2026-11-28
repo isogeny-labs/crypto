@@ -1,0 +1,15 @@
+digraph Descent {
+ rankdir=LR;
+ graph [bgcolor="white",pad="0.15",ranksep="0.4",nodesep="0.4"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf5fc",color="#315c83",fontname="DejaVu Sans",fontsize=11];
+ edge [fontname="DejaVu Sans",fontsize=10,color="#315c83"];
+ kernel [label="Actual R0 / R1 / R2\nstable scheme kernel\npolarization norm 2"];
+ signs [label="Same quotient + target Aut ±1\nsigma(R) = R or -R\nGalois action on Hom"];
+ cubic [label="Coefficients in F101^3\nsigma^3(R) = R\nodd sign cycle"];
+ base [label="2R = 0 impossible in Hom\nsigma(R) = R\nF101 descent + adjoint",fillcolor="#e6f4e8",color="#39734b"];
+ twist [label="Even-degree negative control\ns^2=2 in F101^2\nphi(x,y)=(2x,2s y)",fillcolor="#fff2df",color="#a46b25"];
+ negative [label="sigma(phi)=-phi, sigma^2(phi)=phi\nE(F101)=109, twist(F101)=95\nno F101 isomorphism",fillcolor="#fff2df",color="#a46b25"];
+ kernel -> signs -> cubic -> base;
+ signs -> twist [label="oddness cannot be dropped"];
+ twist -> negative;
+}

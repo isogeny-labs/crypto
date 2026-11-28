@@ -1,0 +1,53 @@
+{
+  "archive": "research/general_translation_audit_20261115/evidence/gate.tar.gz",
+  "files": 5,
+  "unique_objects": 5,
+  "losslessly_deduplicated": false,
+  "roundtrip_equal": true,
+  "inventory": [
+    {
+      "member": "research_general_translation_audit_20261115_lean/audit.log",
+      "bytes": 9672,
+      "sha256": "496f3db1b5a2580fa4cf915f8ed66e610a7898e4559ee9e7fc9f0025a78fd96b"
+    },
+    {
+      "member": "research_general_translation_audit_20261115_lean/build.log",
+      "bytes": 39988,
+      "sha256": "5af25a258f97c38bb5ce02ed9d239cee896868f5842062a51bd046acc7a93b0a"
+    },
+    {
+      "member": "research_general_translation_audit_20261115_lean/cache.log",
+      "bytes": 138,
+      "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+    },
+    {
+      "member": "research_general_translation_audit_20261115_lean/source-build.log",
+      "bytes": 39988,
+      "sha256": "9415fb6f711afc4174b386bd76ef2e0f4824c59fde111ad97b66c8c6afb9f7f1"
+    },
+    {
+      "member": "research_general_translation_audit_20261115_lean/status",
+      "bytes": 5,
+      "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+    }
+  ],
+  "declarations": 92,
+  "failing": 0,
+  "trusted_native": 0,
+  "new_modules": 12,
+  "new_concrete_modules": 12,
+  "credited_dependency_modules": 105,
+  "credited_prior_gates": [
+    78,
+    82,
+    536
+  ],
+  "new_source_warnings": 0,
+  "inherited_advisories": {
+    "build.log": [],
+    "source-build.log": [],
+    "audit.log": [
+      "/workspace/crypto-audit/tools/lean/AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead"
+    ]
+  }
+}

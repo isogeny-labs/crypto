@@ -1,0 +1,135 @@
+Diff in /dev/shm/ct23-cm19-f7-first-A/source/research/chained_genus3_quartic_20261123/cm19_f7/main_a.rs:19:
+ }
+ 
+ fn scale(a: &Form, coefficient: usize) -> Form {
+-    a.iter().filter_map(|(&key, &value)| {
+-        let v = value * coefficient % 7;
+-        (v != 0).then_some((key, v))
+-    }).collect()
++    a.iter()
++        .filter_map(|(&key, &value)| {
++            let v = value * coefficient % 7;
++            (v != 0).then_some((key, v))
++        })
++        .collect()
+ }
+ 
+ fn product(a: &Form, b: &Form) -> Form {
+Diff in /dev/shm/ct23-cm19-f7-first-A/source/research/chained_genus3_quartic_20261123/cm19_f7/main_a.rs:47:
+     let z = scale(&u, 2);
+     let x2 = product(&x, &x);
+     let y2 = product(&y, &y);
+-    let g = plus(&plus(&product(&z, &z), &scale(&x2, 6)), &plus(&scale(&product(&x, &y), 3), &y2));
+-    let d = product(&y, &plus(&plus(&product(&x2, &x), &scale(&product(&x, &y2), 2)), &scale(&product(&y2, &y), 6)));
++    let g = plus(
++        &plus(&product(&z, &z), &scale(&x2, 6)),
++        &plus(&scale(&product(&x, &y), 3), &y2),
++    );
++    let d = product(
++        &y,
++        &plus(
++            &plus(&product(&x2, &x), &scale(&product(&x, &y2), 2)),
++            &scale(&product(&y2, &y), 6),
++        ),
++    );
+     let transformed = plus(&product(&g, &g), &scale(&d, 6));
+     let inv9 = (1usize..7).find(|&x| 9 * x % 7 == 1).unwrap();
+     let inv3 = (1usize..7).find(|&x| 3 * x % 7 == 1).unwrap();
+Diff in /dev/shm/ct23-cm19-f7-first-A/source/research/chained_genus3_quartic_20261123/cm19_f7/main_a.rs:104:
+ }
+ 
+ fn smooth(poly: &[usize]) -> usize {
+-    let mut derivative: Vec<_> = poly.iter().enumerate().skip(1).map(|(i, &v)| i * v % 7).collect();
++    let mut derivative: Vec<_> = poly
++        .iter()
++        .enumerate()
++        .skip(1)
++        .map(|(i, &v)| i * v % 7)
++        .collect();
+     trim(&mut derivative);
+     let mut a = poly.to_vec();
+     let mut b = derivative.clone();
+Diff in /dev/shm/ct23-cm19-f7-first-A/source/research/chained_genus3_quartic_20261123/cm19_f7/main_a.rs:147:
+ }
+ 
+ fn poly(field: &Field, coefficients: &[usize], x: usize) -> usize {
+-    coefficients.iter().rev().fold(0, |a, &b| field.add(field.mul(a, x), b))
++    coefficients
++        .iter()
++        .rev()
++        .fold(0, |a, &b| field.add(field.mul(a, x), b))
+ }
+ 
+ fn valid(field: &Field, point: [usize; 3], kappa: usize) -> bool {
+Diff in /dev/shm/ct23-cm19-f7-first-A/source/research/chained_genus3_quartic_20261123/cm19_f7/main_a.rs:154:
+     let [x, y, z] = point;
+-    let g = field.add(field.add(field.mul(6, field.square(x)), field.mul(3, field.mul(x, y))), field.square(y));
++    let g = field.add(
++        field.add(field.mul(6, field.square(x)), field.mul(3, field.mul(x, y))),
++        field.square(y),
++    );
+     let v = field.add(field.mul(kappa, field.square(z)), g);
+-    let d = field.mul(y, field.add(field.add(field.pow(x, 3), field.mul(2, field.mul(x, field.square(y)))), field.mul(6, field.pow(y, 3))));
++    let d = field.mul(
++        y,
++        field.add(
++            field.add(field.pow(x, 3), field.mul(2, field.mul(x, field.square(y)))),
++            field.mul(6, field.pow(y, 3)),
++        ),
++    );
+     field.square(v) == d
+ }
+ 
+Diff in /dev/shm/ct23-cm19-f7-first-A/source/research/chained_genus3_quartic_20261123/cm19_f7/main_a.rs:172:
+         let d = poly(field, &[6, 2, 0, 1], x);
+         for z in 0..field.q {
+             let z2 = field.square(z);
+-            let expanded = field.sub(field.add(field.add(field.mul(field.square(kappa), field.square(z2)), field.mul(field.mul(2, kappa), field.mul(g, z2))), field.square(g)), d);
++            let expanded = field.sub(
++                field.add(
++                    field.add(
++                        field.mul(field.square(kappa), field.square(z2)),
++                        field.mul(field.mul(2, kappa), field.mul(g, z2)),
++                    ),
++                    field.square(g),
++                ),
++                d,
++            );
+             if expanded == 0 {
+                 direct += 1;
+                 if field.q == 7 {
+Diff in /dev/shm/ct23-cm19-f7-first-A/source/research/chained_genus3_quartic_20261123/cm19_f7/main_a.rs:249:
+     println!("SMOOTH\th={h:?}\tgcd/Sylvester=0\tx2 negative rejects\tPASS");
+     assert!((0usize..7).all(|x| x * x % 7 != 3));
+     assert!((0usize..7).all(|x| (x * x * x + 2 * x + 1) % 7 != 0));
+-    let fields = [Field::new(7, 1, vec![0]), Field::new(7, 2, vec![3, 0]), Field::new(7, 3, vec![6, 5, 0])];
++    let fields = [
++        Field::new(7, 1, vec![0]),
++        Field::new(7, 2, vec![3, 0]),
++        Field::new(7, 3, vec![6, 5, 0]),
++    ];
+     let mut all_counts = [[0; 3]; 2];
+     let mut prime_points = Vec::new();
+     for (index, field) in fields.iter().enumerate() {
+Diff in /dev/shm/ct23-cm19-f7-first-A/source/research/chained_genus3_quartic_20261123/cm19_f7/main_a.rs:258:
+             let (n, e, points) = counts(field, kappa);
+             assert_eq!(e, [11, 55, 308][index]);
+             all_counts[kindex][index] = n;
+-            println!("COUNT\tq={}\tkappa={kappa}\tC={n}\tE={e}\tdirect=fibre\tpointsF7={points:?}", field.q);
++            println!(
++                "COUNT\tq={}\tkappa={kappa}\tC={n}\tE={e}\tdirect=fibre\tpointsF7={points:?}",
++                field.q
++            );
+             if index == 0 && kappa == 1 {
+                 prime_points = points;
+             }
+Diff in /dev/shm/ct23-cm19-f7-first-A/source/research/chained_genus3_quartic_20261123/cm19_f7/field_a.rs:48:
+         for k in (self.degree..product.len()).rev() {
+             let coefficient = product[k];
+             for (i, &r) in self.reduction.iter().enumerate() {
+-                product[k - self.degree + i] = (product[k - self.degree + i] + coefficient * r) % self.p;
++                product[k - self.degree + i] =
++                    (product[k - self.degree + i] + coefficient * r) % self.p;
+             }
+             product[k] = 0;
+         }

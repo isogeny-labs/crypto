@@ -1,0 +1,811 @@
+{
+ "experiment": "EXP-EXOTIC-H0-001",
+ "seed": 20261022,
+ "primes": [
+  1009,
+  65537,
+  1048583
+ ],
+ "T": 2000,
+ "K": 100000,
+ "m_max": 6,
+ "ks_replicates": 200,
+ "cells": {
+  "1009": {
+   "p": 1009,
+   "a": 527,
+   "b": 564,
+   "N": 983,
+   "ell": 983,
+   "cofactor": 1,
+   "G": [
+    105,
+    176
+   ],
+   "F_size": 18,
+   "sqrt_p": 31.76476034853718,
+   "ceil_sqrt_p": 32,
+   "F_over_sqrt_p": 0.5666656950185028,
+   "vadd_matches_sage": true,
+   "rho_m": {
+    "1": 0.017,
+    "2": 0.1815,
+    "3": 0.65,
+    "4": 0.9825,
+    "5": 1.0,
+    "6": 1.0
+   },
+   "rho_m_null_random_draws": {
+    "1": 1.0,
+    "2": 1.0,
+    "3": 1.0,
+    "4": 1.0,
+    "5": 1.0,
+    "6": 1.0
+   },
+   "rho_m_combinatorial_bound": {
+    "1": 0.018311291963377416,
+    "2": 0.17395727365208546,
+    "3": 1.0,
+    "4": 1.0,
+    "5": 1.0,
+    "6": 1.0
+   },
+   "rho_m_distinct_sums_cum": 982,
+   "rank_one_random_Q": {
+    "mean": 0.5080978691774034,
+    "median": 0.5009910802775025,
+    "min": 0.0,
+    "n": 2000
+   },
+   "ks_one_random_Q": {
+    "D": 0.029390485629335994,
+    "p_value": 0.06197441120349164
+   },
+   "rank_all_pairs": {
+    "mean": 0.5080348254597512,
+    "median": 0.5029732408325074,
+    "min": 0.0,
+    "n": 36000
+   },
+   "ks_all_pairs_dependent": {
+    "D": 0.02501076423301396,
+    "p_value": 5.200870455534377e-20
+   },
+   "rank_min_over_Q": {
+    "mean": 0.07301883052527255,
+    "median": 0.0599603567888999,
+    "min": 0.0,
+    "n": 2000
+   },
+   "rank_min_over_Q_null_mean": 0.05263157894736842,
+   "rank_min_over_Q_null_median": 0.037776163105854854,
+   "ks_min_over_Q_vs_beta1n": {
+    "D": 0.2536850316467274,
+    "p_value": 7.761304828330078e-113
+   },
+   "ks_replicates": {
+    "n_tests": 200,
+    "batch": 500,
+    "frac_p_lt_0.01": 0.02,
+    "frac_p_lt_0.05": 0.075,
+    "min_p": 0.0026944866589883724,
+    "ks_of_pvalues_vs_uniform_p": 4.420178843607399e-05
+   },
+   "recursion": {
+    "walks": 2000,
+    "steps": 10,
+    "mean_rank_by_step": [
+     0.5050128840436072,
+     0.07476858275520343,
+     0.0644571357779979,
+     0.040061694747274536,
+     0.047241328047571945,
+     0.03775297324083242,
+     0.047022299306243895,
+     0.03773885034687801,
+     0.047022299306243895,
+     0.03773885034687801,
+     0.047022299306243895
+    ],
+    "median_rank_by_step": [
+     0.501982160555005,
+     0.06095143706640238,
+     0.06095143706640238,
+     0.038156590683845394,
+     0.03914767096134787,
+     0.03617443012884044,
+     0.03914767096134787,
+     0.03617443012884044,
+     0.03914767096134787,
+     0.03617443012884044,
+     0.03914767096134787
+    ],
+    "null_mean_rank_after_greedy_step": 0.05263157894736842,
+    "slope_steps_1_to_10": -0.0025526038381836202,
+    "slope_se": 0.00011541569776627101,
+    "slope_z": -22.116608811332693,
+    "slope_steps_0_to_10_incl_start": -0.02268400982070457,
+    "slope_relative_to_null_mean": -0.048499472925488785,
+    "frac_strict_decrease_by_step_1to9": [
+     0.5815,
+     0.6165,
+     0.305,
+     0.3925,
+     0.202,
+     0.3785,
+     0.2005,
+     0.3785,
+     0.2005
+    ],
+    "hit_rate_lands_in_F": 0.421,
+    "cost": {
+     "ops_per_step": 18,
+     "walks": 2000,
+     "successes": 842,
+     "total_ops_all_walks": 251190,
+     "median_ops_successful_walk": 54.0,
+     "mean_ops_successful_walk": 50.771971496437054,
+     "amortized_ops_per_decomposition": 298.3254156769596,
+     "decomposition_length_hist": {
+      "1": 34,
+      "2": 323,
+      "3": 276,
+      "4": 181,
+      "5": 25,
+      "6": 3,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0
+     },
+     "decomposition_length_median": 3.0,
+     "decomposition_length_max": 6
+    },
+    "convention": "slope of normalized label-rank vs step; negative = decreases"
+   },
+   "recursion_hashed": {
+    "walks": 2000,
+    "steps": 10,
+    "mean_rank_by_step": [
+     0.5007229930624383,
+     0.05374975222993095,
+     0.05843508424182383,
+     0.03356788899900904,
+     0.04848463825569923,
+     0.03150148662041629,
+     0.04795738354806804,
+     0.03138007928642221,
+     0.04795738354806804,
+     0.03138007928642221,
+     0.04795738354806804
+    ],
+    "median_rank_by_step": [
+     0.4950445986124876,
+     0.04509415262636274,
+     0.051040634291377604,
+     0.031219028741328047,
+     0.042120911793855305,
+     0.031219028741328047,
+     0.042120911793855305,
+     0.031219028741328047,
+     0.042120911793855305,
+     0.031219028741328047,
+     0.042120911793855305
+    ],
+    "null_mean_rank_after_greedy_step": 0.05263157894736842,
+    "slope_steps_1_to_10": -0.0012389494549058474,
+    "slope_se": 7.228626689198469e-05,
+    "slope_z": -17.139485938002228,
+    "slope_steps_0_to_10_incl_start": -0.021724024686908726,
+    "slope_relative_to_null_mean": -0.0235400396432111,
+    "frac_strict_decrease_by_step_1to9": [
+     0.4325,
+     0.6555,
+     0.3885,
+     0.599,
+     0.379,
+     0.597,
+     0.379,
+     0.597,
+     0.379
+    ],
+    "hit_rate_lands_in_F": 0.024,
+    "cost": {
+     "ops_per_step": 18,
+     "walks": 2000,
+     "successes": 48,
+     "total_ops_all_walks": 352476,
+     "median_ops_successful_walk": 18.0,
+     "mean_ops_successful_walk": 23.25,
+     "amortized_ops_per_decomposition": 7343.25,
+     "decomposition_length_hist": {
+      "1": 34,
+      "2": 14,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0
+     },
+     "decomposition_length_median": 1.0,
+     "decomposition_length_max": 2
+    },
+    "convention": "slope of normalized label-rank vs step; negative = decreases"
+   },
+   "slope_diff_real_minus_hashed": -0.0013136543832777728,
+   "slope_diff_z": -9.646171189689694,
+   "recursion_slope": -0.0025526038381836202,
+   "recursion_slope_z": -22.116608811332693,
+   "ks_p_primary": 0.06197441120349164,
+   "validation": {
+    "generator_order_prime_factor_ok": true,
+    "vadd_matches_sage": true
+   },
+   "elapsed_s": 1.773944616317749
+  },
+  "65537": {
+   "p": 65537,
+   "a": 42909,
+   "b": 45088,
+   "N": 65523,
+   "ell": 21841,
+   "cofactor": 3,
+   "G": [
+    28092,
+    53007
+   ],
+   "F_size": 264,
+   "sqrt_p": 256.0019531175495,
+   "ceil_sqrt_p": 257,
+   "F_over_sqrt_p": 1.0312421322769285,
+   "vadd_matches_sage": true,
+   "rho_m": {
+    "1": 0.0045,
+    "2": 0.394,
+    "3": 0.8665,
+    "4": 0.9695,
+    "5": 0.9935,
+    "6": 0.999
+   },
+   "rho_m_null_random_draws": {
+    "1": 0.7826359423455246,
+    "2": 0.9527528664399819,
+    "3": 0.9897301713368515,
+    "4": 0.9977677083703618,
+    "5": 0.9995147800335137,
+    "6": 0.9998945306192296
+   },
+   "rho_m_combinatorial_bound": {
+    "1": 0.004029119545808342,
+    "2": 0.5338583398196053,
+    "3": 1.0,
+    "4": 1.0,
+    "5": 1.0,
+    "6": 1.0
+   },
+   "rho_m_distinct_sums_cum": 65432,
+   "rank_one_random_Q": {
+    "mean": 0.5060525733555091,
+    "median": 0.5093916413628943,
+    "min": 0.0004501274089445657,
+    "n": 2000
+   },
+   "ks_one_random_Q": {
+    "D": 0.017752407037246135,
+    "p_value": 0.5505239810752233
+   },
+   "rank_all_pairs": {
+    "mean": 0.5003459215699805,
+    "median": 0.501678441185895,
+    "min": 0.0,
+    "n": 528000
+   },
+   "ks_all_pairs_dependent": {
+    "D": 0.0033136905430705133,
+    "p_value": 1.8345186078596438e-05
+   },
+   "rank_min_over_Q": {
+    "mean": 0.004963879182751729,
+    "median": 0.00445549842073943,
+    "min": 0.0,
+    "n": 2000
+   },
+   "rank_min_over_Q_null_mean": 0.0037735849056603774,
+   "rank_min_over_Q_null_median": 0.0026221137406131634,
+   "ks_min_over_Q_vs_beta1n": {
+    "D": 0.21530480822023185,
+    "p_value": 2.1404537390299237e-81
+   },
+   "ks_replicates": {
+    "n_tests": 200,
+    "batch": 500,
+    "frac_p_lt_0.01": 0.01,
+    "frac_p_lt_0.05": 0.045,
+    "min_p": 0.0027295809842700636,
+    "ks_of_pvalues_vs_uniform_p": 0.5014663453189582
+   },
+   "recursion": {
+    "walks": 2000,
+    "steps": 10,
+    "mean_rank_by_step": [
+     0.49601958435692756,
+     0.005041114179776326,
+     0.002846636251277913,
+     0.0014383897645604818,
+     0.0012148938767413862,
+     0.0009613615209728884,
+     0.0010731800357050248,
+     0.0009250194546592029,
+     0.0010676602529868654,
+     0.000924473961273787,
+     0.0010676602529868654
+    ],
+    "median_rank_by_step": [
+     0.4976196652272762,
+     0.0044936448113279525,
+     0.0006179715275340648,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "null_mean_rank_after_greedy_step": 0.0037735849056603774,
+    "slope_steps_1_to_10": -0.00031410711321525064,
+    "slope_se": 8.484467883027392e-06,
+    "slope_z": -37.021427571621885,
+    "slope_steps_0_to_10_incl_start": -0.02270665058044935,
+    "slope_relative_to_null_mean": -0.08323838500204142,
+    "frac_strict_decrease_by_step_1to9": [
+     0.8375,
+     0.509,
+     0.2425,
+     0.156,
+     0.0825,
+     0.1,
+     0.066,
+     0.0965,
+     0.0655
+    ],
+    "hit_rate_lands_in_F": 0.8335,
+    "cost": {
+     "ops_per_step": 264,
+     "walks": 2000,
+     "successes": 1667,
+     "total_ops_all_walks": 2118336,
+     "median_ops_successful_walk": 792.0,
+     "mean_ops_successful_walk": 743.380923815237,
+     "amortized_ops_per_decomposition": 1270.747450509898,
+     "decomposition_length_hist": {
+      "1": 10,
+      "2": 804,
+      "3": 497,
+      "4": 237,
+      "5": 85,
+      "6": 27,
+      "7": 6,
+      "8": 1,
+      "9": 0,
+      "10": 0
+     },
+     "decomposition_length_median": 3.0,
+     "decomposition_length_max": 8
+    },
+    "convention": "slope of normalized label-rank vs step; negative = decreases"
+   },
+   "recursion_hashed": {
+    "walks": 2000,
+    "steps": 10,
+    "mean_rank_by_step": [
+     0.5092370798175077,
+     0.003718502525291069,
+     0.0034364099668889444,
+     0.001731869020553281,
+     0.002413972259944772,
+     0.0015488350092314315,
+     0.002367090345911478,
+     0.0015392793383890067,
+     0.0023633863313853322,
+     0.0015360597830233354,
+     0.0023623716373956777
+    ],
+    "median_rank_by_step": [
+     0.5204617239116834,
+     0.0026168423943726446,
+     0.0024337397195477364,
+     0.001121503883302562,
+     0.001365640783069106,
+     0.0009841768771838809,
+     0.001335123670598288,
+     0.0009841768771838809,
+     0.001335123670598288,
+     0.0009841768771838809,
+     0.001335123670598288
+    ],
+    "null_mean_rank_after_greedy_step": 0.0037735849056603774,
+    "slope_steps_1_to_10": -0.00014639918879966486,
+    "slope_se": 6.577752687489066e-06,
+    "slope_z": -22.25671832845239,
+    "slope_steps_0_to_10_incl_start": -0.023152313127768213,
+    "slope_relative_to_null_mean": -0.03879578503191119,
+    "frac_strict_decrease_by_step_1to9": [
+     0.521,
+     0.644,
+     0.4325,
+     0.574,
+     0.4015,
+     0.561,
+     0.397,
+     0.5595,
+     0.395
+    ],
+    "hit_rate_lands_in_F": 0.0475,
+    "cost": {
+     "ops_per_step": 264,
+     "walks": 2000,
+     "successes": 95,
+     "total_ops_all_walks": 5118168,
+     "median_ops_successful_walk": 792.0,
+     "mean_ops_successful_walk": 936.5052631578948,
+     "amortized_ops_per_decomposition": 53875.45263157895,
+     "decomposition_length_hist": {
+      "1": 10,
+      "2": 22,
+      "3": 26,
+      "4": 12,
+      "5": 10,
+      "6": 8,
+      "7": 1,
+      "8": 4,
+      "9": 0,
+      "10": 2
+     },
+     "decomposition_length_median": 3.0,
+     "decomposition_length_max": 10
+    },
+    "convention": "slope of normalized label-rank vs step; negative = decreases"
+   },
+   "slope_diff_real_minus_hashed": -0.00016770792441558579,
+   "slope_diff_z": -15.621668453183606,
+   "recursion_slope": -0.00031410711321525064,
+   "recursion_slope_z": -37.021427571621885,
+   "ks_p_primary": 0.5505239810752233,
+   "validation": {
+    "generator_order_prime_factor_ok": true,
+    "vadd_matches_sage": true
+   },
+   "elapsed_s": 2.933058738708496
+  },
+  "1048583": {
+   "p": 1048583,
+   "a": 531841,
+   "b": 941644,
+   "N": 1047385,
+   "ell": 209477,
+   "cofactor": 5,
+   "G": [
+    397975,
+    454752
+   ],
+   "F_size": 1060,
+   "sqrt_p": 1024.0034179630456,
+   "ceil_sqrt_p": 1025,
+   "F_over_sqrt_p": 1.0351527948105477,
+   "vadd_matches_sage": true,
+   "rho_m": {
+    "1": 0.0005,
+    "2": 0.085,
+    "3": 0.1645,
+    "4": 0.2385,
+    "5": 0.3055,
+    "6": 0.362
+   },
+   "rho_m_null_random_draws": {
+    "1": 0.09105971100182175,
+    "2": 0.17382755103590808,
+    "3": 0.24905857547624555,
+    "4": 0.317439084572675,
+    "5": 0.37959288427262605,
+    "6": 0.4360869769342345
+   },
+   "rho_m_combinatorial_bound": {
+    "1": 0.0010120442817111185,
+    "2": 0.5368894914477484,
+    "3": 1.0,
+    "4": 1.0,
+    "5": 1.0,
+    "6": 1.0
+   },
+   "rho_m_distinct_sums_cum": 392305,
+   "rank_one_random_Q": {
+    "mean": 0.4901941234027254,
+    "median": 0.4857283591284619,
+    "min": 0.0003457046318698663,
+    "n": 2000
+   },
+   "ks_one_random_Q": {
+    "D": 0.025117150001478183,
+    "p_value": 0.1580772756812236
+   },
+   "rank_all_pairs": {
+    "mean": 0.5000415677739244,
+    "median": 0.5001640308873976,
+    "min": 0.0,
+    "n": 2120000
+   },
+   "ks_all_pairs_dependent": {
+    "D": 0.0005510642520465958,
+    "p_value": 0.540197384274015
+   },
+   "rank_min_over_Q": {
+    "mean": 0.001266150843566985,
+    "median": 0.0011324806906081826,
+    "min": 0.0,
+    "n": 2000
+   },
+   "rank_min_over_Q_null_mean": 0.000942507068803016,
+   "rank_min_over_Q_null_median": 0.0006536986803492573,
+   "ks_min_over_Q_vs_beta1n": {
+    "D": 0.2379031455200475,
+    "p_value": 2.761845811148894e-99
+   },
+   "ks_replicates": {
+    "n_tests": 200,
+    "batch": 500,
+    "frac_p_lt_0.01": 0.0,
+    "frac_p_lt_0.05": 0.05,
+    "min_p": 0.01182015489108648,
+    "ks_of_pvalues_vs_uniform_p": 0.11300950039857433
+   },
+   "recursion": {
+    "walks": 2000,
+    "steps": 10,
+    "mean_rank_by_step": [
+     0.5037148237192485,
+     0.0012150497385519303,
+     0.0006481375341770746,
+     0.0002813089187980349,
+     0.0002207881970239838,
+     0.00017470910743355562,
+     0.0001932112193312308,
+     0.0001664946885463526,
+     0.0001920448834283981,
+     0.0001664946885463526,
+     0.0001920448834283981
+    ],
+    "median_rank_by_step": [
+     0.5073174941802414,
+     0.0011100694937835154,
+     0.00014257335852288277,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    "null_mean_rank_after_greedy_step": 0.000942507068803016,
+    "slope_steps_1_to_10": -7.981358912672886e-05,
+    "slope_se": 1.979803581288674e-06,
+    "slope_z": -40.31389269170702,
+    "slope_steps_0_to_10_incl_start": -0.02294030543426874,
+    "slope_relative_to_null_mean": -0.08468221806345932,
+    "frac_strict_decrease_by_step_1to9": [
+     0.8515,
+     0.5105,
+     0.249,
+     0.113,
+     0.065,
+     0.075,
+     0.052,
+     0.071,
+     0.052
+    ],
+    "hit_rate_lands_in_F": 0.877,
+    "cost": {
+     "ops_per_step": 1060,
+     "walks": 2000,
+     "successes": 1754,
+     "total_ops_all_walks": 7846120,
+     "median_ops_successful_walk": 3180.0,
+     "mean_ops_successful_walk": 2986.613454960091,
+     "amortized_ops_per_decomposition": 4473.27251995439,
+     "decomposition_length_hist": {
+      "1": 0,
+      "2": 848,
+      "3": 499,
+      "4": 320,
+      "5": 61,
+      "6": 18,
+      "7": 8,
+      "8": 0,
+      "9": 0,
+      "10": 0
+     },
+     "decomposition_length_median": 3.0,
+     "decomposition_length_max": 7
+    },
+    "convention": "slope of normalized label-rank vs step; negative = decreases"
+   },
+   "recursion_hashed": {
+    "walks": 2000,
+    "steps": 10,
+    "mean_rank_by_step": [
+     0.5026071898934084,
+     0.0009513295561724727,
+     0.0009194512976082973,
+     0.0004880340898145416,
+     0.0007124569538129084,
+     0.00045445258029169056,
+     0.0006985796546386897,
+     0.0004534593351217803,
+     0.0006985281565693904,
+     0.0004534593351217803,
+     0.0006985281565693904
+    ],
+    "median_rank_by_step": [
+     0.49549487260426694,
+     0.0006899787618147538,
+     0.0006556467156152636,
+     0.00035714864726969634,
+     0.0004916158282176995,
+     0.0003313996126200787,
+     0.0004715888012679969,
+     0.0003313996126200787,
+     0.0004715888012679969,
+     0.0003313996126200787,
+     0.0004715888012679969
+    ],
+    "null_mean_rank_after_greedy_step": 0.000942507068803016,
+    "slope_steps_1_to_10": -3.0409404738094026e-05,
+    "slope_se": 1.549345963712115e-06,
+    "slope_z": -19.627252692636453,
+    "slope_steps_0_to_10_incl_start": -0.022838914416364316,
+    "slope_relative_to_null_mean": -0.03226437842711776,
+    "frac_strict_decrease_by_step_1to9": [
+     0.52,
+     0.646,
+     0.436,
+     0.589,
+     0.42,
+     0.581,
+     0.4175,
+     0.58,
+     0.4175
+    ],
+    "hit_rate_lands_in_F": 0.0025,
+    "cost": {
+     "ops_per_step": 1060,
+     "walks": 2000,
+     "successes": 5,
+     "total_ops_all_walks": 21158660,
+     "median_ops_successful_walk": 2120.0,
+     "mean_ops_successful_walk": 2332.0,
+     "amortized_ops_per_decomposition": 4231732.0,
+     "decomposition_length_hist": {
+      "1": 0,
+      "2": 4,
+      "3": 1,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0
+     },
+     "decomposition_length_median": 2.0,
+     "decomposition_length_max": 3
+    },
+    "convention": "slope of normalized label-rank vs step; negative = decreases"
+   },
+   "slope_diff_real_minus_hashed": -4.940418438863484e-05,
+   "slope_diff_z": -19.651781469757854,
+   "recursion_slope": -7.981358912672886e-05,
+   "recursion_slope_z": -40.31389269170702,
+   "ks_p_primary": 0.1580772756812236,
+   "validation": {
+    "generator_order_prime_factor_ok": true,
+    "vadd_matches_sage": true
+   },
+   "elapsed_s": 5.81826376914978
+  }
+ },
+ "recursion_slope_definition": "slope of mean normalized x(R-Q*) rank vs greedy step (steps 1..10); negative = decreases. Compared against a hashed-label control (fixed random permutation of [0,p)); decision uses real-minus-hashed slope z. Top-level value = most negative real slope over p.",
+ "validation": {
+  "fields_built": true,
+  "generator_order_prime_factor_ok": true,
+  "vadd_matches_sage": true,
+  "all_cells_completed": true
+ },
+ "total_elapsed_s": 10.52936315536499,
+ "recursion_slope": -0.0025526038381836202,
+ "recursion_slope_by_p": {
+  "1009": -0.0025526038381836202,
+  "65537": -0.00031410711321525064,
+  "1048583": -7.981358912672886e-05
+ },
+ "ks_p_by_p": {
+  "1009": 0.06197441120349164,
+  "65537": 0.5505239810752233,
+  "1048583": 0.1580772756812236
+ },
+ "cost_exponent": {
+  "c_amortized_ops_per_decomposition": 0.4539147342433136,
+  "c_median_ops_successful_walk": 0.5013651595759698,
+  "fit_primary": "p in {65537,1048583} (2 points; p=1009 excluded as finite-size: |F|=18, |F|/sqrt p=0.57)",
+  "c_amortized_3pt_all_p": 0.38641211392470537,
+  "c_median_3pt_all_p": 0.591263787834751,
+  "reference_sqrtN_exponent": 0.5,
+  "amortized_ops_by_p": {
+   "1009": 298.3254156769596,
+   "65537": 1270.747450509898,
+   "1048583": 4473.27251995439
+  },
+  "median_ops_by_p": {
+   "1009": 54.0,
+   "65537": 792.0,
+   "1048583": 3180.0
+  },
+  "ops_over_sqrt_p_amortized": {
+   "1009": 9.391709945348225,
+   "65537": 4.9638193577624925,
+   "1048583": 4.368415614132083
+  },
+  "decomposition_length_median_by_p": {
+   "1009": 3.0,
+   "65537": 3.0,
+   "1048583": 3.0
+  },
+  "note": "few-point log-log fits; indicative only"
+ },
+ "decision_inputs": {
+  "ks_uniform_at_all_p(p>0.01)": true,
+  "c_amortized": 0.4539147342433136,
+  "c_median": 0.5013651595759698,
+  "c_amortized_3pt": 0.38641211392470537,
+  "c_median_3pt": 0.591263787834751,
+  "slope_real_sig_more_negative_than_hashed_all_p (demoted, confounded)": true
+ },
+ "control_summary": {
+  "1009": {
+   "real_slope": -0.0025526038381836202,
+   "real_z": -22.116608811332693,
+   "hashed_slope": -0.0012389494549058474,
+   "hashed_z": -17.139485938002228,
+   "diff_z": -9.646171189689694,
+   "hit_real": 0.421,
+   "hit_hashed": 0.024
+  },
+  "65537": {
+   "real_slope": -0.00031410711321525064,
+   "real_z": -37.021427571621885,
+   "hashed_slope": -0.00014639918879966486,
+   "hashed_z": -22.25671832845239,
+   "diff_z": -15.621668453183606,
+   "hit_real": 0.8335,
+   "hit_hashed": 0.0475
+  },
+  "1048583": {
+   "real_slope": -7.981358912672886e-05,
+   "real_z": -40.31389269170702,
+   "hashed_slope": -3.0409404738094026e-05,
+   "hashed_z": -19.627252692636453,
+   "diff_z": -19.651781469757854,
+   "hit_real": 0.877,
+   "hit_hashed": 0.0025
+  }
+ },
+ "verdict_rule": "cost rule: KILL if c>=0.45 (ops/decomposition ~ sqrt(p) or worse); WIN only if c<0.45 and decomposition length does not grow with p; else inconclusive. Slope comparison demoted (confounded: F is x-defined).",
+ "verdict_literal_3pt_amortized_fit": "win",
+ "verdict": "kill"
+}

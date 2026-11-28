@@ -1,0 +1,12 @@
+digraph fibre {
+  rankdir=LR;
+  graph [bgcolor="transparent",pad="0.1",ranksep="0.3",nodesep="0.15"];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=12,color="#58718e",fillcolor="#edf3f9",margin="0.12,0.1"];
+  edge [color="#58718e",arrowsize=0.65];
+  target [label="Public R/Q\nFixed relative labels"];
+  equation [label="Free multiplier sigma(c)\nTwo-leaf degree <= 8\nWritten, unqualified"];
+  roots [label="Rational roots and lift\nShifted base S_sigma\nUnimplemented"];
+  gate [label="Shared geometric columns\nrank[M | b] > rank(M)\nRequired recovery gate",fillcolor="#f8eedc"];
+  cost [label="Cold family/cost/yield\nOriginal acceptance open",style="rounded,dashed"];
+  target -> equation -> roots -> gate -> cost;
+}

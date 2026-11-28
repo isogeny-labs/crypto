@@ -1,0 +1,390 @@
+{
+  "main": "MarkovGreenUpperAudit.actual_green_upper_envelope_certificate",
+  "binding": "28f396a4cd16557abd05803143f203b1bd0c6aee358a5177ce995f27bda734b0",
+  "custom_imports": {
+    "FirstCollision": "research/rho_collision_audit_20261110/lean/FirstCollision.lean",
+    "CollisionCertificate": "research/static_hash_collision_audit_20261114/lean/CollisionCertificate.lean",
+    "CollisionTails": "research/static_hash_collision_audit_20261114/lean/CollisionTails.lean",
+    "Cylinder": "research/static_hash_collision_audit_20261114/lean/Cylinder.lean",
+    "PathAgreement": "research/static_hash_collision_audit_20261114/lean/PathAgreement.lean",
+    "PostCollisionControl": "research/static_hash_collision_audit_20261114/lean/PostCollisionControl.lean",
+    "Survival": "research/static_hash_collision_audit_20261114/lean/Survival.lean",
+    "WalkBoundary": "research/walk_audit_20261109/lean/WalkBoundary.lean",
+    "WalkWeighted": "research/walk_audit_20261109/lean/WalkWeighted.lean",
+    "WalkWeightedGeneral": "research/walk_audit_20261109/lean/WalkWeightedGeneral.lean",
+    "BirthdayBound": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayBound.lean",
+    "BirthdayCertificate": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayCertificate.lean",
+    "BirthdayImports": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayImports.lean",
+    "BirthdayLaw": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayLaw.lean",
+    "BirthdayWords": "research/markov_birthday_rounding_audit_20261116/lean/BirthdayWords.lean",
+    "GreenMoment": "research/markov_birthday_rounding_audit_20261116/lean/GreenMoment.lean",
+    "KMPTCounter": "research/markov_birthday_rounding_audit_20261116/lean/KMPTCounter.lean",
+    "MarkovCollision": "research/markov_birthday_rounding_audit_20261116/lean/MarkovCollision.lean",
+    "UniformChain": "research/markov_birthday_rounding_audit_20261116/lean/UniformChain.lean",
+    "GreenBound": "research/markov_green_bound_audit_20261116/lean/GreenBound.lean",
+    "GreenCertificate": "research/markov_green_bound_audit_20261116/lean/GreenCertificate.lean",
+    "GreenControls": "research/markov_green_bound_audit_20261116/lean/GreenControls.lean",
+    "GreenCore": "research/markov_green_bound_audit_20261116/lean/GreenCore.lean",
+    "GreenImports": "research/markov_green_bound_audit_20261116/lean/GreenImports.lean",
+    "GreenKernel": "research/markov_green_bound_audit_20261116/lean/GreenKernel.lean",
+    "GreenUniformFamily": "research/markov_green_bound_audit_20261116/lean/GreenUniformFamily.lean",
+    "GreenAsymptotic": "research/markov_green_upper_audit_20261116/lean/GreenAsymptotic.lean",
+    "GreenEnvelope": "research/markov_green_upper_audit_20261116/lean/GreenEnvelope.lean",
+    "UpperCertificate": "research/markov_green_upper_audit_20261116/lean/UpperCertificate.lean",
+    "WeightedGeometric": "research/markov_green_upper_audit_20261116/lean/WeightedGeometric.lean"
+  },
+  "actually_imported_custom_modules": [
+    "BirthdayImports",
+    "CollisionCertificate",
+    "CollisionTails",
+    "Cylinder",
+    "FirstCollision",
+    "GreenAsymptotic",
+    "GreenBound",
+    "GreenCertificate",
+    "GreenControls",
+    "GreenCore",
+    "GreenEnvelope",
+    "GreenImports",
+    "GreenKernel",
+    "GreenUniformFamily",
+    "PathAgreement",
+    "PostCollisionControl",
+    "Survival",
+    "UniformChain",
+    "UpperCertificate",
+    "WalkBoundary",
+    "WalkWeighted",
+    "WalkWeightedGeneral",
+    "WeightedGeometric"
+  ],
+  "additional_frozen_pinned_modules": [
+    "BirthdayBound",
+    "BirthdayCertificate",
+    "BirthdayLaw",
+    "BirthdayWords",
+    "GreenMoment",
+    "KMPTCounter",
+    "MarkovCollision"
+  ],
+  "claims": [
+    {
+      "declaration": "MarkovGreenUpperAudit.remainder_nonnegative",
+      "source": "research/markov_green_upper_audit_20261116/lean/GreenAsymptotic.lean",
+      "statement": "theorem remainder_nonnegative (e : ℕ → ℝ) (t : ℕ) : 0≤remainder e t",
+      "section_variables": [
+        "variable {S : ℕ → Type*} [∀ t, Fintype (S t)] [∀ t, DecidableEq (S t)] [∀ t, Nonempty (S t)]"
+      ],
+      "omitted_section_variables": [],
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovGreenUpperAudit.remainder_limit",
+      "source": "research/markov_green_upper_audit_20261116/lean/GreenAsymptotic.lean",
+      "statement": "theorem remainder_limit (e : ℕ → ℝ) (he : e =o[atTop] (fun t : ℕ => 1/(t : ℝ)^2)) : Tendsto (remainder e) atTop (𝓝 0)",
+      "section_variables": [
+        "variable {S : ℕ → Type*} [∀ t, Fintype (S t)] [∀ t, DecidableEq (S t)] [∀ t, Nonempty (S t)]"
+      ],
+      "omitted_section_variables": [],
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovGreenUpperAudit.asymptotic_green_upper",
+      "source": "research/markov_green_upper_audit_20261116/lean/GreenAsymptotic.lean",
+      "statement": "theorem asymptotic_green_upper (P : ∀ t, Matrix (S t) (S t) ℝ) (hP : ∀ t, P t ∈ doublyStochastic ℝ (S t)) (e : ℕ → ℝ) (d : ℝ) (hd : 0≤d) (hd1 : d<1) (he : e =o[atTop] (fun t : ℕ => 1/(t : ℝ)^2)) (henv : ∀ t j : ℕ, j≤t → ∀ x y : S t, (P t^j) x y ≤ e t+d^j) : Tendsto (remainder e) atTop (𝓝 0) ∧ ∀ t : ℕ, rowMaximum (P t) t ≤ 2/(1-d)^2+remainder e t ∧ columnMaximum (P t) t ≤ 2/(1-d)^2+remainder e t",
+      "section_variables": [
+        "variable {S : ℕ → Type*} [∀ t, Fintype (S t)] [∀ t, DecidableEq (S t)] [∀ t, Nonempty (S t)]"
+      ],
+      "omitted_section_variables": [],
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovGreenUpperAudit.eventual_epsilon_green_upper",
+      "source": "research/markov_green_upper_audit_20261116/lean/GreenAsymptotic.lean",
+      "statement": "theorem eventual_epsilon_green_upper (P : ∀ t, Matrix (S t) (S t) ℝ) (hP : ∀ t, P t ∈ doublyStochastic ℝ (S t)) (e : ℕ → ℝ) (d : ℝ) (hd : 0≤d) (hd1 : d<1) (he : e =o[atTop] (fun t : ℕ => 1/(t : ℝ)^2)) (henv : ∀ t j : ℕ, j≤t → ∀ x y : S t, (P t^j) x y ≤ e t+d^j) : ∀ ε : ℝ, 0<ε → ∀ᶠ t in atTop, rowMaximum (P t) t ≤ 2/(1-d)^2+ε ∧ columnMaximum (P t) t ≤ 2/(1-d)^2+ε",
+      "section_variables": [
+        "variable {S : ℕ → Type*} [∀ t, Fintype (S t)] [∀ t, DecidableEq (S t)] [∀ t, Nonempty (S t)]"
+      ],
+      "omitted_section_variables": [],
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovGreenUpperAudit.source_rhs_envelope",
+      "source": "research/markov_green_upper_audit_20261116/lean/GreenEnvelope.lean",
+      "statement": "theorem source_rhs_envelope (P : Matrix S S ℝ) (T : ℕ) (c d : ℝ) (hd : 0≤d) (hd1 : d<1) (he : ∀ j : ℕ, j≤T → ∀ x y : S, (P^j) x y ≤ c+d^j) : sourceRHS P T ≤ c*((T : ℝ)+1)*((T : ℝ)+2)+2/(1-d)^2",
+      "section_variables": [
+        "variable {S : Type*} [Fintype S] [DecidableEq S] [Nonempty S]"
+      ],
+      "omitted_section_variables": [],
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovGreenUpperAudit.finite_green_envelope",
+      "source": "research/markov_green_upper_audit_20261116/lean/GreenEnvelope.lean",
+      "statement": "theorem finite_green_envelope (P : Matrix S S ℝ) (hP : P ∈ doublyStochastic ℝ S) (T : ℕ) (c d : ℝ) (hd : 0≤d) (hd1 : d<1) (he : ∀ j : ℕ, j≤T → ∀ x y : S, (P^j) x y ≤ c+d^j) : rowMaximum P T ≤ c*((T : ℝ)+1)*((T : ℝ)+2)+2/(1-d)^2 ∧ columnMaximum P T ≤ c*((T : ℝ)+1)*((T : ℝ)+2)+2/(1-d)^2",
+      "section_variables": [
+        "variable {S : Type*} [Fintype S] [DecidableEq S] [Nonempty S]"
+      ],
+      "omitted_section_variables": [],
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovGreenUpperAudit.strict_family_upper_control",
+      "source": "research/markov_green_upper_audit_20261116/lean/UpperCertificate.lean",
+      "statement": "theorem strict_family_upper_control (t : ℕ) : familyRow t ≤ 8+remainder familyError t ∧ familyColumn t ≤ 8+remainder familyError t",
+      "section_variables": [],
+      "omitted_section_variables": [],
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovGreenUpperAudit.weighted_geometric_identity",
+      "source": "research/markov_green_upper_audit_20261116/lean/WeightedGeometric.lean",
+      "statement": "theorem weighted_geometric_identity (d : ℝ) (n : ℕ) : (1-d)^2*weightedGeometric d n = 1-((n : ℝ)+1)*d^n+(n : ℝ)*d^(n+1)",
+      "section_variables": [],
+      "omitted_section_variables": [],
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovGreenUpperAudit.weighted_geometric_bound",
+      "source": "research/markov_green_upper_audit_20261116/lean/WeightedGeometric.lean",
+      "statement": "theorem weighted_geometric_bound (d : ℝ) (hd : 0≤d) (hd1 : d<1) (n : ℕ) : weightedGeometric d n ≤ 1/(1-d)^2",
+      "section_variables": [],
+      "omitted_section_variables": [],
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovGreenUpperAudit.linear_weight_sum",
+      "source": "research/markov_green_upper_audit_20261116/lean/WeightedGeometric.lean",
+      "statement": "theorem linear_weight_sum (n : ℕ) : 2*(∑ j ∈ Finset.range n, ((j : ℝ)+1)) = (n : ℝ)*((n : ℝ)+1)",
+      "section_variables": [],
+      "omitted_section_variables": [],
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovGreenUpperAudit.envelope_weight_sum",
+      "source": "research/markov_green_upper_audit_20261116/lean/WeightedGeometric.lean",
+      "statement": "theorem envelope_weight_sum (c d : ℝ) (n : ℕ) : 2*(∑ j ∈ Finset.range n, ((j : ℝ)+1)*(c+d^j)) = c*(n : ℝ)*((n : ℝ)+1)+2*weightedGeometric d n",
+      "section_variables": [],
+      "omitted_section_variables": [],
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovGreenUpperAudit.weighted_zero_terms",
+      "source": "research/markov_green_upper_audit_20261116/lean/WeightedGeometric.lean",
+      "statement": "theorem weighted_zero_terms (d : ℝ) : weightedGeometric d 0 = 0",
+      "section_variables": [],
+      "omitted_section_variables": [],
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovGreenUpperAudit.weighted_one_term",
+      "source": "research/markov_green_upper_audit_20261116/lean/WeightedGeometric.lean",
+      "statement": "theorem weighted_one_term (d : ℝ) : weightedGeometric d 1 = 1",
+      "section_variables": [],
+      "omitted_section_variables": [],
+      "verification": "same-host Lean gate, signedunverified"
+    },
+    {
+      "declaration": "MarkovGreenUpperAudit.weighted_zero_ratio",
+      "source": "research/markov_green_upper_audit_20261116/lean/WeightedGeometric.lean",
+      "statement": "theorem weighted_zero_ratio (n : ℕ) : weightedGeometric 0 (n+1) = 1",
+      "section_variables": [],
+      "omitted_section_variables": [],
+      "verification": "same-host Lean gate, signedunverified"
+    }
+  ],
+  "prior_review": {
+    "recorded_at": "2026-11-16T10:09:34.714832+00:00",
+    "kb_available": false,
+    "kb_calls": 6,
+    "all_kb_exits": 127,
+    "kb_receipt_labels": [
+      "adjacent",
+      "application",
+      "mechanism",
+      "negative",
+      "status",
+      "theorems"
+    ],
+    "kb_exact_initial_script": "review_queries.sh retained",
+    "followup_scope": "Valid finite weighted geometric/Green envelope and explicit vanishing upper remainder on varying actual finite stochastic kernels",
+    "no_retrieval_or_absence_claim": true,
+    "primary": {
+      "authors": [
+        "Kim",
+        "Montenegro",
+        "Peres",
+        "Tetali"
+      ],
+      "title": "A Birthday Paradox for Markov chains with an optimal bound for collision in the Pollard Rho algorithm for discrete logarithm",
+      "doi": "10.1214/09-AAP625",
+      "journal": "Annals of Applied Probability20(2),495–521(2010)",
+      "url": "https://arxiv.org/pdf/0712.0220",
+      "version": "arXiv0712.0220v2,27Sep2010,electronicreprint; pagination/typography differ from original",
+      "bytes": 300644,
+      "sha256": "67bd4313585101da1138a8e08bf3a3045b6347fe289d4bd076594b9d57f91b07",
+      "pdf_pages": 29,
+      "complete_bounded_text_pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "partial_text_pages": [
+        9
+      ],
+      "complete_individual_visuals": [
+        6,
+        7,
+        8
+      ],
+      "full_paper_read": false,
+      "scope": "Bounded p8 weighted geometric finite calculation and upper estimate re-read; replace false literal equality by checked upper bound. No full general collision second-moment or integer-block repair."
+    },
+    "access_failures": [
+      "Euclid download returned HTML despite curl0; PDF tools rejected, no source read from it",
+      "AMS Teske403/curl22; original Teske source unread"
+    ],
+    "metadata_checks": [
+      "Crossref exact title/DOI lookup",
+      "OpenAlex actual arXiv location",
+      "Crossref3-hit corrections query found two paper versions and unrelated entropy paper; no absence conclusion"
+    ],
+    "prior": [
+      "Canonical frozen GreenCertificate/GreenBound/PMF/actual finite maxima",
+      "Credited actual uniform prime-state family and literal printed equality counter",
+      "Earlier literal finite birthday counter and exact integer controls remain frozen"
+    ],
+    "official": [
+      "IsLittleO definition and quotient limit",
+      "squeeze_zero_prime with explicit comparison sequence",
+      "tendsto_order and gt_mem_nhds",
+      "Finite range sums/actual matrix powers and source Green bound"
+    ],
+    "mathematical_scope": "Prove valid finite and asymptotic upper-bound replacement with nonnegative explicit remainder and eventualepsilon quantifiers; healthy actual uniform primefamily remains strictly below displayed constant; no equality assertion/generalcollisionrepair.",
+    "preservation_entries": 6190,
+    "static_hash_dependency_pins": 36,
+    "all_checked_entries": 6226,
+    "frozen_plans": 49,
+    "packages": 15,
+    "copies": 0,
+    "hydration": 0,
+    "lake_update": false,
+    "novelty_claim": false,
+    "paid_compute": 0,
+    "conductor_calls": 1,
+    "conductor_exits": [
+      127
+    ],
+    "protocol_receipt_count_correction": null,
+    "fresh_current_review": {
+      "complete_bounded_page8_calculation_text": true,
+      "credited_previous_complete_visuals": [
+        6,
+        7,
+        8
+      ],
+      "current_new_visual_read": false
+    }
+  },
+  "transparent_proposition_bundles": {
+    "source": "lean/UpperCertificate.lean",
+    "names": [
+      "ActualWeightedGeometric",
+      "ActualFiniteGreenUpper",
+      "ActualAsymptoticGreenUpper",
+      "ActualStrictUpperControl"
+    ],
+    "semantics": "Definitions expose actual quantified objects/laws/controls, not assumptions."
+  },
+  "individual_headers": "Supplemental full written-header metadata with section/omit context; main frozen exporter unchanged and separately bound.",
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "schema": "markov-green-upper-preflight/v1",
+    "build_snapshots": 8,
+    "failed_states": [
+      "01",
+      "02",
+      "03",
+      "04",
+      "05",
+      "06",
+      "07"
+    ],
+    "successful_states": [
+      "08"
+    ],
+    "dependency_plans": 1,
+    "old_formal_files": 44,
+    "static_hash_dependency_pins": 36,
+    "published_preservation_entries": 6190,
+    "all_checked_entries": 6226,
+    "frozen_plans": 49,
+    "copied_modules": 0,
+    "hydrated_modules": 0,
+    "manifest_packages": 15,
+    "all6226pins_checked_every_state_and_gate": true,
+    "exact_source_roots_from01": true,
+    "all_failed_states_retained": true,
+    "known_source_methods_credited": true,
+    "actual_PMF_and_Green_predecessor_reused": true,
+    "exact_finite_weighted_geometric_identity": true,
+    "finite_weighted_geometric_bound": true,
+    "actual_finite_Green_envelope": true,
+    "c_arbitrary_real": true,
+    "actual_varying_finite_state_spaces": true,
+    "actual_IsLittleO_error": true,
+    "explicit_nonnegative_remainder": true,
+    "actual_remainder_limit_zero": true,
+    "eventual_epsilon_upper_bound": true,
+    "actual_prime_family_healthy_strict_control": true,
+    "earlier_literal_equality_counter_retained": true,
+    "zero_terms_one_term_zero_ratio_controls": true,
+    "transparent_pinned_proposition_bundles": true,
+    "source_upper_bound_refuted": false,
+    "asymptotic_equality_inferred": false,
+    "general_Markov_collision_integer_block_repair": false,
+    "practical_hash_or_scalar_runtime": false,
+    "full14complete": false,
+    "novelty_claim": false,
+    "paid_compute_and_agent_upload": 0,
+    "gate_declarations": 17,
+    "new_modules": 4,
+    "new_concrete_modules": 4,
+    "official_import_bridge_modules": 0,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "same_host_prover": true,
+    "signed_standing": "unverified",
+    "pinned_custom_source_modules": 30,
+    "actually_imported_custom_modules": 23,
+    "actually_imported_frozen_modules": 19,
+    "additional_frozen_modules_retained_as_pins": 7
+  }
+}

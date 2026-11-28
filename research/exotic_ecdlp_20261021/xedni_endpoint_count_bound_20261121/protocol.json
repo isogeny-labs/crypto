@@ -1,0 +1,11 @@
+{
+  "schema": "xedni-endpoint-count-bound-protocol-v1",
+  "source_rows_sha256": "add3918e7f865dc7bb1dee56d2523fa43970c5db63c2f6f240d484dd143bbd07",
+  "source_summary_sha256": "af2e1588fe7fa242b91726c0a63b7ce6b333862e4eb84d46ed779af643ae6f9f",
+  "field_order": 43,
+  "nonzero_target_law": "uniform scalar k in {1,...,42}; public point kQ on the fixed order-43 group",
+  "endpoint_law": "for n=1..M and multipliers c in {1,2,6}, include both c*n and -c*n modulo 43",
+  "prefixes": [1, 21],
+  "generic_bound": "for an arbitrary finite endpoint map from Fin M x Fin C x Bool into target points, at most 2*M*C distinct targets are covered; for uniform N-element targets, hit probability is at most min(1,2*M*C/N)",
+  "measured_outputs": ["exact_covered_count_each_prefix", "first_full_coverage_prefix", "comparison_to_generic_bound", "cross_check_previous_rank_and_height_prefix"]
+}

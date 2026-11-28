@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T00:42:32Z",
+ "id": "PCC-20261124-5b707d",
+ "kind": "statement",
+ "producer": {
+  "commit": "589cc2801d8cfc8cf5d005957514f40de0236100",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/collection_preflight_20261124/PROTOCOL.md",
+    "sha256": "f5d185b2ff503689224aefb04b085e4dbf33fd1c403d485edf61bd18fc20b349"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/collection_preflight_20261124/preflight.cpp",
+    "sha256": "bfa169cbdc77d5d2704dd392bbd1c8b7640ff143d97855c0455fcd4153769ad9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/collection_preflight_20261124/typed_json.hpp",
+    "sha256": "a7692eb441c56743a7971cd3334777c4db5c4d7636d5ff14c15963ac1302cd0d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/collection_preflight_20261124/pins.hpp",
+    "sha256": "3bb67cca31cf8214d28bb4fda12a2c2589aff299150f4302eb9b974010a27498"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/collection_preflight_20261124/evidence/qualification-v1/self-test-result.json",
+    "sha256": "a0f78795614c33c464b25361f3ad3babdce248560749ef7a460c50a828aa5203"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/collection_preflight_20261124/evidence/qualification-v1/check-result.json",
+    "sha256": "9e17b1978b8c8993eb5e77cdc36b489e950a65455dbc36c14b4fdd3ea5f733b8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/collection_preflight_20261124/evidence/qualification-v1/pre-call-manifest.sha256",
+    "sha256": "5cc5ee62e0e269d56beb19c4b93e9f09d7e772e549435630bbca95153df45e6c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "p192-frozen-input-preflight",
+ "statement": "Preflight qualification-v1 strictly builds the native typed-JSON/hash guard. Recorded reference/local baseline and metadata-only variation pass across17 deterministic fields and3 exact construction input hashes. Twelve semantic mutations and4 exact-pin mutations reject;2 typed-parser controls pass. Both self-test and actual check modes finish0 on recorded inputs. Unknown/ambiguous/collision calls finish1 and existing output bytes remain unchanged. No curve/Jacobian arithmetic,new points,admission validation or production collection. Producer unsigned;input-consistency scope only."
+}

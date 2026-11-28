@@ -1,0 +1,1385 @@
+{
+  "schema": "twist.two-base-pins/v1",
+  "repo_files": {
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/README.md": "6ffc397d27629df6b84ed3a23d7e09477fbd1b1270fa5c94a31e323281b39460",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/TwoBase.lean": "1b31a1aaae6a1e9a45854b9900f0cabc6f2ba0256d775103aa4d20fffea7b761",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/analyze.cpp": "eba0d27efaa88c845e499671d3c5b59b2ce0653ffa89fc3d6d6c4fa541b84eda",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/audit.rs": "d68171f3d3a49e21c3813f079147451f28fdabda8fa71e1926ef661caa0ef20d",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/controls/false-filter.lean": "5e4c5f2d608d0fc9dd4e2636ed10ef28877feb3b990aae38ee734ef2031a7b5f",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/controls/false-sign.lean": "8ed617806907a50c433cb30c83651ae325e89ef24738fb2317cdbe3f084d7c5b",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/counter.cpp": "6cca36b217a51d7661370daef1384a8908c68ec48691eb031b7ff2de3dc61043",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/idc/Cargo.lock": "d5a4d035b28ba42bc3dd1b612226fb312a9502fa2eb22fb1db39f028a65ac81c",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/idc/Cargo.toml": "496186469a16c22cb79b09225a52caa2429739470900a865909e79a86b363a8b",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/idc/main.rs": "1abb413a6c3c3cee926b3df64efb764f65031c070fb25a3069072ca56712ed1b",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/math-audit.rs": "525cf592f2652316b79cfcf113fe4eecfc1770287c317b55880c2533d7bda42f",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/pack-bytes.py": "e592f51ac03f79d6206e95cbd6646a21f553ac13a53cafdc9180612719144eed",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/qualify.cpp": "a8ba3736fe74a95e49422ee6fe2b1d555d67aef5b481c8b703ac5754f72d0600",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/references.cpp": "e552cb88ec9e4fc7362ebf6bd56c66e9cb8eda03764cf264338246042b7ca863",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/run.sh": "ad0d2ee85a68b003723aa5c03d686ab18b404bf373893b824674136823d7a994",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/source-cap2-probe.rs": "da1045c7dec2125919bcfc6a8b5eb9d50619f7eab0f7d0d91f83fc46c78441fb",
+    "research/quadratic_twist_field_cost_20261116/projective/two-base/two-base.cpp": "11866f89b5b570be492a5a282f0a88a82bcd04168d6ad6a45c1a2c51a6dc2ccc",
+    "research/quadratic_twist_field_cost_20261116/projective/first-row/first-row.cpp": "e3200cccb75d43c8bbdc54cc79dc1c8696089a21deb54cc7497af51ab134b752",
+    "research/quadratic_twist_field_cost_20261116/projective/first-row/math-audit.rs": "1aab0d0b753541efbdf332a6931f8ff4fd3f28daf83f4eb46ae8ec40278bf4f5",
+    "research/quadratic_twist_field_cost_20261116/projective/setup-rank/setup-rank.cpp": "f56ce317e5ac651156088d3b465c3c929fc9c545a9f1cce922a766e09ddbf231",
+    "research/quadratic_twist_field_cost_20261116/projective/setup-rank/math-audit.rs": "61a7c36f9bcd750953226910c362dbcc46898b326c30d9477a3f618e25730635"
+  },
+  "external_files": {
+    "/tmp/twist-first-row-run01-20261116/math-audit.json.xz": "bd599f62f7c394fbdf5dc48cb222e62edaf325413af3235bc40fbeeb66fccf34",
+    "/tmp/twist-first-row-run01-20261116/post-call-manifest.json": "a32349e5d525a383de8ce4476bfa6d8fe37d13e57fefbcb6e5625a50a5c34318",
+    "/tmp/twist-setup-rank-run02-20261116/math-audit.json.xz": "e85cb402dfe53fcbd6cfcdbd488acb6f7d40de95b2cdbe03539d9f560c2509d8",
+    "/tmp/twist-setup-rank-run02-20261116/post-call-manifest.json": "f34f4096fe1c68c45e9f8f9fdafcdcecec695e94b43a6570722fa12eb9592841",
+    "/workspace/twist-native-run02-20261116/audit.json": "9e48248cede5094609574f2ff78bf4f85901ae04a931bcd08755520f032ef95b",
+    "/workspace/twist-callgrind-20261116/install/bin/valgrind": "9a65689a096e74335ef43ad33bec6eb44318c12c9fa174a29b396d4af159be3c",
+    "/workspace/twist-native-tooling/rustup/toolchains/1.85.1-x86_64-unknown-linux-gnu/bin/rustc": "f8d033fd72e878ec60493788c8bffec2e6c154dcab6f0cb4c145af8ada26a7ed",
+    "/workspace/canonical-protocol-20261115/tools/experiment_protocol.py": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+    "/workspace/twist-rootcover-20261116/empty-legacy-controls.json": "715669b6894789f736958ebc7cc70c9fe25b4ee509cccc38d0908dcd1c6268af",
+    "/tmp/twist-two-base-20261116/mathlib-inventory-full.json": "656610ef09454eff5b4496dc3528c3ddc2e119bbb16ff65703342d20725db1e8",
+    "/tmp/twist-two-base-20261116/rust-dependency-inventory.json": "3715af9750689c508abf9f1a4bde5e287544a92d09fc53f67ceef433b58451b8",
+    "/tmp/twist-two-base-20261116/canonical/sha256.rs": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf",
+    "/tmp/twist-two-base-20261116/canonical/identity_certificate.rs": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270",
+    "/tmp/twist-two-base-20261116/official/trusted-native.txt": "934d0322ac07faec9502186b206c289cdeed7fb9a54f700cc097124476b6bf15",
+    "/tmp/twist-two-base-20261116/official/AuditAxioms.lean": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929",
+    "/tmp/twist-two-base-20261116/official/proof-gate.sh": "2fe88bb302db587bbb6ede217fc646cf8fa35f9b9a2980e4a15dae273b8df6eb"
+  },
+  "mathlib_inventory": "/tmp/twist-two-base-20261116/mathlib-inventory-full.json",
+  "rust_dependency_inventory": "/tmp/twist-two-base-20261116/rust-dependency-inventory.json",
+  "legacy_controls_manifest": "/workspace/twist-rootcover-20261116/empty-legacy-controls.json",
+  "stage_plan": [
+    {
+      "name": "qualifier-build",
+      "expected_exit": 0
+    },
+    {
+      "name": "cpp-build",
+      "expected_exit": 0
+    },
+    {
+      "name": "semantic-build",
+      "expected_exit": 0
+    },
+    {
+      "name": "rust-build",
+      "expected_exit": 0
+    },
+    {
+      "name": "references-build",
+      "expected_exit": 0
+    },
+    {
+      "name": "analysis-build",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-audit-build",
+      "expected_exit": 0
+    },
+    {
+      "name": "cap-probe-build",
+      "expected_exit": 0
+    },
+    {
+      "name": "idc-build",
+      "expected_exit": 0
+    },
+    {
+      "name": "protocol-check",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-qualifier-head",
+      "expected_exit": 101
+    },
+    {
+      "name": "reject-qualifier-source",
+      "expected_exit": 101
+    },
+    {
+      "name": "proof-A",
+      "expected_exit": 0
+    },
+    {
+      "name": "proof-B",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-proof-false-sign",
+      "expected_exit": 1
+    },
+    {
+      "name": "reject-proof-false-filter",
+      "expected_exit": 1
+    },
+    {
+      "name": "identity-issue",
+      "expected_exit": 0
+    },
+    {
+      "name": "identity-check",
+      "expected_exit": 0
+    },
+    {
+      "name": "identity-reject-issue",
+      "expected_exit": 101
+    },
+    {
+      "name": "identity-forge-sign",
+      "expected_exit": 0
+    },
+    {
+      "name": "identity-reject-sign",
+      "expected_exit": 101
+    },
+    {
+      "name": "identity-forge-degree",
+      "expected_exit": 0
+    },
+    {
+      "name": "identity-reject-degree",
+      "expected_exit": 101
+    },
+    {
+      "name": "identity-forge-digest",
+      "expected_exit": 0
+    },
+    {
+      "name": "identity-reject-digest",
+      "expected_exit": 101
+    },
+    {
+      "name": "source-cap2-cpp",
+      "expected_exit": 0
+    },
+    {
+      "name": "source-cap2-rust",
+      "expected_exit": 0
+    },
+    {
+      "name": "source-cap2-agree",
+      "expected_exit": 0
+    },
+    {
+      "name": "quadratic-selftest",
+      "expected_exit": 0
+    },
+    {
+      "name": "quadratic-selftest-audit",
+      "expected_exit": 0
+    },
+    {
+      "name": "semantic-C",
+      "expected_exit": 0
+    },
+    {
+      "name": "semantic-A",
+      "expected_exit": 0
+    },
+    {
+      "name": "semantic-B",
+      "expected_exit": 0
+    },
+    {
+      "name": "semantic-audit",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-corrupt-source",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-source",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-source",
+      "expected_exit": 101
+    },
+    {
+      "name": "math-corrupt-columns",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-columns",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-columns",
+      "expected_exit": 101
+    },
+    {
+      "name": "math-corrupt-cap",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-cap",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-cap",
+      "expected_exit": 101
+    },
+    {
+      "name": "math-corrupt-witness",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-witness",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-witness",
+      "expected_exit": 101
+    },
+    {
+      "name": "math-corrupt-root",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-root",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-root",
+      "expected_exit": 101
+    },
+    {
+      "name": "math-corrupt-row",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-row",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-row",
+      "expected_exit": 101
+    },
+    {
+      "name": "math-corrupt-scalar",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-scalar",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-scalar",
+      "expected_exit": 101
+    },
+    {
+      "name": "math-corrupt-log",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-log",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-log",
+      "expected_exit": 101
+    },
+    {
+      "name": "math-corrupt-cost",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-cost",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-cost",
+      "expected_exit": 101
+    },
+    {
+      "name": "math-corrupt-rank",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-rank",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-rank",
+      "expected_exit": 101
+    },
+    {
+      "name": "math-corrupt-branch",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-branch",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-branch",
+      "expected_exit": 101
+    },
+    {
+      "name": "math-corrupt-missing-query",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-missing-query",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-missing-query",
+      "expected_exit": 101
+    },
+    {
+      "name": "math-corrupt-missing-policy",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-missing-policy",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-missing-policy",
+      "expected_exit": 101
+    },
+    {
+      "name": "math-corrupt-missing-empty-branch",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-missing-empty-branch",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-missing-empty-branch",
+      "expected_exit": 101
+    },
+    {
+      "name": "math-corrupt-drop-proportional",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-drop-proportional",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-drop-proportional",
+      "expected_exit": 101
+    },
+    {
+      "name": "math-corrupt-premature-setup-stop",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-hash-false-premature-setup-stop",
+      "expected_exit": 0
+    },
+    {
+      "name": "math-reject-premature-setup-stop",
+      "expected_exit": 101
+    },
+    {
+      "name": "make-reference",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-00",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-00",
+      "expected_exit": 0
+    },
+    {
+      "name": "corrupt-cost",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-cost",
+      "expected_exit": 101
+    },
+    {
+      "name": "pack-false-cost",
+      "expected_exit": 0
+    },
+    {
+      "name": "corrupt-raw-summary",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-raw-summary",
+      "expected_exit": 101
+    },
+    {
+      "name": "pack-false-raw-summary",
+      "expected_exit": 0
+    },
+    {
+      "name": "corrupt-missing",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-missing",
+      "expected_exit": 101
+    },
+    {
+      "name": "pack-false-missing",
+      "expected_exit": 0
+    },
+    {
+      "name": "corrupt-source",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-source",
+      "expected_exit": 101
+    },
+    {
+      "name": "pack-false-source",
+      "expected_exit": 0
+    },
+    {
+      "name": "corrupt-scalar",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-scalar",
+      "expected_exit": 101
+    },
+    {
+      "name": "pack-false-scalar",
+      "expected_exit": 0
+    },
+    {
+      "name": "corrupt-witness",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-witness",
+      "expected_exit": 101
+    },
+    {
+      "name": "pack-false-witness",
+      "expected_exit": 0
+    },
+    {
+      "name": "corrupt-uncharged-method",
+      "expected_exit": 0
+    },
+    {
+      "name": "reject-uncharged-method",
+      "expected_exit": 101
+    },
+    {
+      "name": "pack-false-uncharged-method",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-original-again",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-00",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-37",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-37",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-37",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-01",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-01",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-01",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-36",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-36",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-36",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-02",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-02",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-02",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-35",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-35",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-35",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-03",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-03",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-03",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-34",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-34",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-34",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-04",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-04",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-04",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-33",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-33",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-33",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-05",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-05",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-05",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-32",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-32",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-32",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-06",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-06",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-06",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-31",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-31",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-31",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-07",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-07",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-07",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-30",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-30",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-30",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-08",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-08",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-08",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-29",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-29",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-29",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-09",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-09",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-09",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-28",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-28",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-28",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-10",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-10",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-10",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-27",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-27",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-27",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-11",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-11",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-11",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-26",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-26",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-26",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-12",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-12",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-12",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-25",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-25",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-25",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-13",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-13",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-13",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-24",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-24",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-24",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-14",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-14",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-14",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-23",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-23",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-23",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-15",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-15",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-15",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-22",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-22",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-22",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-16",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-16",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-16",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-21",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-21",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-21",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-17",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-17",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-17",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-20",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-20",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-20",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-18",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-18",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-18",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-19",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-19",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-19",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-19",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-19",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-19",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-18",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-18",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-18",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-20",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-20",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-20",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-17",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-17",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-17",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-21",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-21",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-21",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-16",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-16",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-16",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-22",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-22",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-22",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-15",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-15",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-15",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-23",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-23",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-23",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-14",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-14",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-14",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-24",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-24",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-24",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-13",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-13",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-13",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-25",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-25",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-25",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-12",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-12",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-12",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-26",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-26",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-26",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-11",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-11",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-11",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-27",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-27",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-27",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-10",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-10",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-10",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-28",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-28",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-28",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-09",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-09",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-09",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-29",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-29",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-29",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-08",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-08",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-08",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-30",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-30",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-30",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-07",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-07",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-07",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-31",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-31",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-31",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-06",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-06",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-06",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-32",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-32",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-32",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-05",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-05",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-05",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-33",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-33",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-33",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-04",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-04",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-04",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-34",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-34",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-34",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-03",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-03",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-03",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-35",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-35",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-35",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-02",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-02",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-02",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-36",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-36",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-36",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-01",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-01",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-01",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-A-37",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-A-37",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-A-37",
+      "expected_exit": 0
+    },
+    {
+      "name": "count-B-00",
+      "expected_exit": 0
+    },
+    {
+      "name": "audit-B-00",
+      "expected_exit": 0
+    },
+    {
+      "name": "pack-B-00",
+      "expected_exit": 0
+    },
+    {
+      "name": "analyze",
+      "expected_exit": 0
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "record_type": "post_call",
+  "created_utc": "2026-11-25T05:44:47Z",
+  "pre_call": "WS68_RS_RECORD.pre-call.json",
+  "conductor_task": "T-12327",
+  "compile_exit_code": 0,
+  "run_exit_code": 0,
+  "source_sha256_after": "9cb0c60000b34504293cac855d7e3564e8ad60dabd31bb714cd7571e974fe18b",
+  "qualifier_sha256_after": "9cb0c60000b34504293cac855d7e3564e8ad60dabd31bb714cd7571e974fe18b",
+  "binary": {"path": "WS68_RS_RECORD.bin", "sha256": "1f3a125968d1b060d595d218f74d4b37d5a4b993ad711169f17089da23edf567", "custody": "local_only_not_staged"},
+  "stdout": {"path": "WS68_RS_RECORD.stdout", "sha256": "6cf213cbd4fff425e5b4f93b842bd1f7de620982440113174daa75c6c6467a13"},
+  "stderr": {"path": "WS68_RS_RECORD.stderr", "bytes": 0, "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+  "observed": {"ec_rows": 6, "two_erasure_repairs": 6, "one_error_repairs": 6, "error_index_identified": 2, "group_identities_reverified": 6, "checksum_detected_errors": 6, "checksum_recovered_erasures": 0},
+  "storage_symbols_per_row": {"raw": 4, "raw_plus_checksum": 5, "rs_6_4": 6},
+  "counted_encode_operations_per_row": {"field_multiplications": 18, "field_additions": 18},
+  "decoder": {"interpolation_attempts_per_row": 6, "field_operations": "unpriced"},
+  "erratum": "Frozen source opening comment says systematic, but encode evaluates the degree<4 message polynomial at x=1..6. This is a nonsystematic evaluation RS(6,4) code. Source was preserved byte-for-byte; only the claim is corrected here.",
+  "claim_boundary": "Record storage repair of already discovered exact EC relations; no relation discovery or end-to-end gain measured. Local-bypass result [pcc:unverified]."
+}

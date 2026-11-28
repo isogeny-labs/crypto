@@ -1,0 +1,116 @@
+import MixedGeneric
+import Doubling
+set_option autoImplicit false
+namespace MixedPositiveDistinct
+open Polynomial MixedCancellation
+variable {K : Type*} [Field K]
+
+def doubled (a0 a1 a2 a3 : K) (a : WeightedAdd11.Input K) : D2 K :=
+ let c := WeightedDoubling.output a0 a1 a2 a3 a.x a.y a.z a.w
+ ⟨c.q,c.r,c.s,c.t,c.z,c.w⟩
+
+theorem positive_nonzero (a : WeightedAdd11.Input K) (b : D2 K)
+ (hc : a.y*rawW3 b ≠ -(rawY3 a b*a.w))
+ (hp : a.y*rawW3 b = rawY3 a b*a.w) : (2:K) ≠ 0 ∧ a.y ≠ 0 := by
+ have hn : a.y*rawW3 b ≠ -(a.y*rawW3 b) := by simpa only [←hp] using hc
+ constructor
+ · intro hz
+   apply hn
+   apply eq_neg_of_add_eq_zero_left
+   calc
+    a.y*rawW3 b+a.y*rawW3 b = 2*(a.y*rawW3 b) := by ring
+    _ = 0 := by rw [hz,zero_mul]
+ · intro hy
+   apply hn
+   simp [hy]
+
+theorem point_value (a0 a1 a2 a3 : K) (a : WeightedAdd11.Input K)
+ (ha : validPoint (MixedGeneric.curve a0 a1 a2 a3) a) :
+ WeightedDoubling.value a0 a1 a2 a3 (WeightedAdd11.nx a)=(WeightedAdd11.ny a)^2 := by
+ let x := WeightedAdd11.nx a
+ let y := WeightedAdd11.ny a
+ have hid : MixedGeneric.curve a0 a1 a2 a3-(C y)^2 =
+  (X-C x)*(X^4+C x*X^3+C (x^2+a3)*X^2+C (x^3+a3*x+a2)*X+C (x^4+a3*x^2+a2*x+a1))+
+  C (WeightedDoubling.value a0 a1 a2 a3 x-y^2) := by
+  simp only [MixedGeneric.curve,WeightedDoubling.value,C_add,C_sub,C_mul,C_pow]
+  ring
+ have hd : (X-C x) ∣ C (WeightedDoubling.value a0 a1 a2 a3 x-y^2) := by
+  have hh := dvd_sub ha (dvd_mul_right (X-C x) (X^4+C x*X^3+C (x^2+a3)*X^2+C (x^3+a3*x+a2)*X+C (x^4+a3*x^2+a2*x+a1)))
+  rw [hid] at hh
+  simpa using hh
+ have hz := eq_zero_of_dvd_of_natDegree_lt hd (by rw [natDegree_C,natDegree_X_sub_C]; decide)
+ have hv : WeightedDoubling.value a0 a1 a2 a3 x-y^2=0 := by
+  simpa only [coeff_C_zero,coeff_zero] using congrArg (fun P : K[X] => P.coeff 0) hz
+ exact sub_eq_zero.mp hv
+
+theorem distinct_normalized (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z ≠ 0) (hbz : b.z ≠ 0)
+ (hd : a.x*(b.z*b.z) ≠ (other a b).x) : WeightedAdd11.nx (other a b) ≠ WeightedAdd11.nx a := by
+ intro he
+ apply hd
+ have hz : (other a b).z ≠ 0 := mul_ne_zero haz hbz
+ calc
+  a.x*(b.z*b.z) = WeightedAdd11.nx a * (other a b).z^2 := by
+   dsimp [WeightedAdd11.nx,other]; field_simp
+  _ = WeightedAdd11.nx (other a b)*(other a b).z^2 := by rw [he]
+  _ = (other a b).x := by unfold WeightedAdd11.nx; exact div_mul_cancel₀ _ (pow_ne_zero 2 hz)
+
+theorem doubled_valid (a0 a1 a2 a3 : K) (a : WeightedAdd11.Input K)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (h2 : (2:K) ≠ 0) (hy : a.y ≠ 0)
+ (ha : validPoint (MixedGeneric.curve a0 a1 a2 a3) a) :
+ (doubled a0 a1 a2 a3 a).z ≠ 0 ∧ (doubled a0 a1 a2 a3 a).w ≠ 0 ∧
+ validTwo (MixedGeneric.curve a0 a1 a2 a3) (doubled a0 a1 a2 a3 a) := by
+ have hv := WeightedDoubling.weighted_preserves a0 a1 a2 a3 a.x a.y a.z a.w haz haw h2 hy (point_value a0 a1 a2 a3 a ha)
+ exact hv
+
+theorem generic_second_nonzero (a0 a1 a2 a3 : K) (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+ (h2 : (2:K) ≠ 0) (hy : a.y ≠ 0)
+ (hd : a.x*(b.z*b.z) ≠ (other a b).x) :
+ MixedGeneric.genericK (other a b) (doubled a0 a1 a2 a3 a) ≠ 0 := by
+ have hoz : (other a b).z ≠ 0 := mul_ne_zero haz hbz
+ have how : (other a b).w ≠ 0 := hbw
+ obtain ⟨dz,dw,_,hq,hr,_,_⟩ := WeightedDoubling.normalized_output a0 a1 a2 a3 a.x a.y a.z a.w haz haw h2 hy
+ have hdq : nq (doubled a0 a1 a2 a3 a) = -2*WeightedAdd11.nx a := hq
+ have hdr : nr (doubled a0 a1 a2 a3 a) = (WeightedAdd11.nx a)^2 := hr
+ have hroot : (WeightedAdd11.nx (other a b))^2+nq (doubled a0 a1 a2 a3 a)*WeightedAdd11.nx (other a b)+nr (doubled a0 a1 a2 a3 a) ≠ 0 := by
+  rw [hdq,hdr]
+  have hid : (WeightedAdd11.nx (other a b))^2+(-2*WeightedAdd11.nx a)*WeightedAdd11.nx (other a b)+(WeightedAdd11.nx a)^2 = (WeightedAdd11.nx (other a b)-WeightedAdd11.nx a)^2 := by ring
+  rw [hid]
+  exact pow_ne_zero 2 (sub_ne_zero.mpr (distinct_normalized a b haz hbz hd))
+ rw [MixedGeneric.genericK_same,(scales (other a b) (doubled a0 a1 a2 a3 a) hoz how dz dw).1]
+ exact mul_ne_zero (mul_ne_zero (mul_ne_zero (pow_ne_zero 4 hoz) (pow_ne_zero 4 dz)) how) hroot
+
+theorem positive_distinct_preserves (a0 a1 a2 a3 : K) (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+ (ha : validPoint (MixedGeneric.curve a0 a1 a2 a3) a)
+ (hb : validTwo (MixedGeneric.curve a0 a1 a2 a3) b)
+ (hk : rawK a b = 0)
+ (hc : a.y*rawW3 b ≠ -(rawY3 a b*a.w))
+ (hp : a.y*rawW3 b = rawY3 a b*a.w)
+ (hd : a.x*(b.z*b.z) ≠ (other a b).x) :
+ let d := doubled a0 a1 a2 a3 a
+ let c := MixedGeneric.output (other a b) d a3
+ (2:K) ≠ 0 ∧ a.y ≠ 0 ∧ MixedGeneric.genericK (other a b) d ≠ 0 ∧
+ c.z ≠ 0 ∧ c.w ≠ 0 ∧ validTwo (MixedGeneric.curve a0 a1 a2 a3) c := by
+ obtain ⟨h2,hy⟩ := positive_nonzero a b hc hp
+ obtain ⟨_,hoz,how,hov⟩ := shared_support_conclusions (MixedGeneric.curve a0 a1 a2 a3) a b haz haw hbz hbw ha hb hk
+ obtain ⟨dz,dw,dv⟩ := doubled_valid a0 a1 a2 a3 a haz haw h2 hy ha
+ have hg := generic_second_nonzero a0 a1 a2 a3 a b haz haw hbz hbw h2 hy hd
+ exact ⟨h2,hy,hg,MixedGeneric.weighted_generic_preserves a0 a1 a2 a3 (other a b) (doubled a0 a1 a2 a3 a) hoz how dz dw hg hov dv⟩
+theorem source_branch_preserves [DecidableEq K] (a0 a1 a2 a3 : K) (a : WeightedAdd11.Input K) (b : D2 K)
+ (haz : a.z ≠ 0) (haw : a.w ≠ 0) (hbz : b.z ≠ 0) (hbw : b.w ≠ 0)
+ (ha : validPoint (MixedGeneric.curve a0 a1 a2 a3) a)
+ (hb : validTwo (MixedGeneric.curve a0 a1 a2 a3) b)
+ (hk : rawK a b = 0)
+ (hc : a.y*rawW3 b ≠ -(rawY3 a b*a.w))
+ (hd : a.x*(b.z*b.z) ≠ (other a b).x) :
+ let d := doubled a0 a1 a2 a3 a
+ let c := MixedGeneric.output (other a b) d a3
+ classify a b = .positiveCoincidence ∧ (2:K) ≠ 0 ∧ a.y ≠ 0 ∧
+ MixedGeneric.dispatch (other a b) d a3 = some c ∧
+ c.z ≠ 0 ∧ c.w ≠ 0 ∧ validTwo (MixedGeneric.curve a0 a1 a2 a3) c := by
+ have hp := ((shared_support_conclusions (MixedGeneric.curve a0 a1 a2 a3) a b haz haw hbz hbw ha hb hk).1).resolve_left hc
+ obtain ⟨h2,hy,hg,hz,hw,hv⟩ := positive_distinct_preserves a0 a1 a2 a3 a b haz haw hbz hbw ha hb hk hc hp hd
+ exact ⟨by simp only [classify,hk,ne_eq,not_true_eq_false,ite_false]; rw [if_neg hc]; simp [hp],h2,hy,MixedGeneric.generic_dispatch _ _ _ hg,hz,hw,hv⟩
+end MixedPositiveDistinct

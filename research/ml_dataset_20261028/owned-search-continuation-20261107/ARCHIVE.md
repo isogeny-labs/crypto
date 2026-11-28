@@ -1,0 +1,1 @@
+The S3 object in S3_RECEIPT.json preserves this incremental software packet including test executables. The full1457-file base is preserved by BASE_S3_RECEIPT.json; hash-bound overlays reproduce1458files. Git omits test executables and full assembled source. Follow REPLAY.md to verify archives and reconstruct into a fresh directory. No new scientific data was generated.

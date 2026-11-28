@@ -1,0 +1,31 @@
+{
+  "protocol_publication_commit": "52f55f958a681aa8a62da269bf8afd59e8049637",
+  "pr": "https://github.com/isogeny-labs/crypto/pull/4487",
+  "driver": "/workspace/relation-native-qualifiers/identity-driver-12dab54dc-60",
+  "raw": "/workspace/identity-development-results-60",
+  "monitor": "/workspace/identity-development-monitor-60.jsonl",
+  "benchrec": "benchmarks/records/20261117T0340Z-native-identity-20261117.json",
+  "command": [
+    "python3",
+    "/workspace/relation-native-qualifiers/direct-monitor-20261117/isolated_bench.py",
+    "reserve",
+    "--cpus",
+    "0",
+    "--out",
+    "/workspace/identity-development-monitor-60.jsonl",
+    "--label",
+    "identity-development-60",
+    "--",
+    "taskset",
+    "-c",
+    "0",
+    "/workspace/relation-native-qualifiers/identity-driver-12dab54dc-60",
+    "identity-paired",
+    "/workspace/identity-development-results-60",
+    "research/relation_degree_trace_20261115/native-identity-20261117/config-60.json",
+    "development"
+  ],
+  "planned_answers": 816,
+  "no_retries": true,
+  "standing": "unsigned; planned not completed"
+}

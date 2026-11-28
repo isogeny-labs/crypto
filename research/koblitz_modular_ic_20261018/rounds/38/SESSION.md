@@ -1,0 +1,21 @@
+# R38 scoped session, 2026-10-30
+
+## What was done
+ConductorR38scopeclear.Literature-firstreuseofR35actualQalgebraandKM
+RepresentationB.Frozen3075basis/inverseinputpassesunder4GiBvirtual/1200s,
+includingactualcoefficientembedding,all3075inverse/pivotrecombinations and
+corruptcontrols.One615precisioncoefficient-liftLeanlemmacompiles/auditsclean.
+
+## Decisions made
+SameQ/F32embedding/U=t1024;largeralgebranotapromiseoflargercompleteRRspaces.
+D1=4D0degree512isprospectivebaseforordinary367/460;615Qdegree3075exceeds
+L6D1polebound3072.Expected452/1476/3012RRdimensionsnotconstructedhere.
+
+## Open threads
+615sourcejets,complete452/1476/3012spaces,largerproperdivisorsandfactoraction.
+367padding29Qfits;460gap52needsadditionalcertifiedsupport/trivialization.
+GlobalmetricsintegrationpendingT-865exclusivepath;scopedpatchonly.
+
+## Errors
+No rejected/cappednativeorLeanattemptinR38.Maintainoriginalresourcecaps,
+managedjobownershipandallbroadercompletioncriteria.

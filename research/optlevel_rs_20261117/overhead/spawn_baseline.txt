@@ -1,0 +1,14 @@
+ 20:34:15 up  1:05,  0 user,  load average: 0.27, 1.08, 1.32
+posix_spawn /bin/true: min 801 us, median 962 us, p90 1062 us (n=200)
+fork+exec /bin/true: min 859 us, median 1098 us, p90 1413 us (n=200)
+optlevel measure --no-pin /bin/true: min 1026 us, median 1386 us (n=40)
+optlevel measure pinned /bin/true: min 1180 us, median 1634 us (n=40)
+posix_spawn /bin/true: min 825 us, median 1191 us, p90 1399 us (n=200)
+fork+exec /bin/true: min 883 us, median 1033 us, p90 1456 us (n=200)
+optlevel measure --no-pin /bin/true: min 895 us, median 1045 us (n=40)
+optlevel measure pinned /bin/true: min 1131 us, median 1498 us (n=40)
+posix_spawn /bin/true: min 733 us, median 978 us, p90 1335 us (n=200)
+fork+exec /bin/true: min 899 us, median 1096 us, p90 1433 us (n=200)
+optlevel measure --no-pin /bin/true: min 886 us, median 1075 us (n=40)
+optlevel measure pinned /bin/true: min 1526 us, median 1662 us (n=40)
+ 20:34:17 up  1:05,  0 user,  load average: 0.27, 1.08, 1.32

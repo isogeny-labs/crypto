@@ -1,0 +1,1 @@
+sha256sum /home/runner/work/_temp/prime31-group-admission-qualification/m31-retained-capture/mutations/field.json /home/runner/work/_temp/prime31-group-admission-qualification/m31-retained-capture/mutations/query.json /home/runner/work/_temp/prime31-group-admission-qualification/m31-retained-capture/mutations/sign.json 

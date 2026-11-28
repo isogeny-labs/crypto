@@ -143,3 +143,159 @@ Publish/review finalv3bindings then fulltests. Branchfour-step correction requir
 
 ## Errors
 Branch failedsource localaxiomprint includes sorryAx; planned13name audit and maincandidate were notreached. Rootv3earlierepoch1 heartbeat409expired, no payloadusedit; currentepoch3fresh.
+
+## What was done — 18:39 UTC
+Published finalv3admissione06e and all bound inputs at df85767861d8558043bf64c596a291c159674ca7, verified GitHubref equality. Launched one bounded full-library attempt, callerPID87723/session34684, invocation15d1304b26834459b62bd6adf6039d07. Initial maintainedlease heartbeat passed; native supervisor now maintainsT1992epoch3. Coordination-only prelaunchheartbeat53014 stopfile set; completedbranchheartbeat59286 stopped and T1984released.
+
+## Decisions made
+Keep1,800reserved and unchanged2CPU/16GiB/zero-swap/full4controls+unfilteredlibrary gate. Next correctedbranchreplay remains prospective and serial.
+
+## Open threads
+Native preinputcheck/build/tests; prospectivepivot/swap kernelreplay and unioncomposition source review. Source-only five-lane reconciliation identifies alreadycompletedcomponents before any further construction.
+
+## Errors
+No newv3error observed at launch. Priorfailedattempts and costs remain immutable.
+
+## What was done — 19:04 UTC
+Rootv3attempt failed duringcompile afterworkerobservedexpiredsupervisorpermit. Compile630.008572s/attempt991.712661s, allnativeowners terminal, failedcompletion/passedseal, full1800charged. Exactexpiredreadwasnotretained; successfulleaseheartbeats/finalfreshpermit do notproveacause. PublishedparentPR3770 ismerged. Newcontinuationbranch codex/pencil-proof-continuation-20261109 created.
+
+## Decisions made
+Actualdebit12660, reserve3600correctedbranchv2,26940unreserved. Source-onlyv4repairpreserves10-secondpermit and15-secondlease margin, addsboundedfreshread/observability andownercheckedrenewalbeforemetadata; awaitsreview/qualification/newcachebinding. Branchv2T1998epoch3maintained bycoordination-onlysession31508.
+
+## Open threads
+Publish/review branchv2finalbindingsandrunserially. Source-reviewedpivotandroot-cardinality replay protocols ready; producer-eventqualification andliteralUInt64caller construction remainprospective.
+
+## Errors
+No root testinventory/controls/fullsuite reached. Frozenfailureevidenceisarchivedwith PDF/SVG/CSV/JSON,notreplaced.
+
+## What was done — 19:10 UTC
+Published source and correctedbranch release at3d8095a319c080f75442880ee97e6b03f3464e28, verifiedremote ref. PR3771 created/attached, auto-mergeenabled. One correctedbranchreplay launched(session71339), freeze4974f967/release4b81c8df; precheckpassed103.900759s andcompileractive. Campaign12660charged+3600reserved=26940unreserved remainsunchanged.
+
+## Decisions made
+V4 permit repair and actualproducer qualification stay source-only untilindependentreview/frozenbindings. Acceptedsourceplans forpivot/rootcardinality willrunseriallywithinremainingallowance; no duplicateDiem/EKS submissions.
+
+## Open threads
+Correctedbranchcompiler/readback/post; v4softwarequalification/cache/fullsuite; reviewednewformalcontrols andeventadapter realproducerqualification.
+
+## Errors
+No correctedbrancherrorobserved yet. PreviousRust compile failures and branchfourgoal failure remain distinctarchived attempts.
+
+## What was done — 19:30 UTC
+Corrected branch v2 ended with13 successful calls and failed BranchRootMultiplicity. Pre/post custody matched; total532.083336seconds, full3600charged. Archived result7ac00b3a and preserved all failures. V4 permit source independently reviewed,24 qualification cases prospective.
+
+## Decisions made
+Campaign16260charged,0reserved,26940remaining; one payload at a time. T2031epoch3 heartbeat59167 maintains source/qualification coordination. Publish exact v4 source before qualification.
+
+## Open threads
+Permit qualification/cache snapshot/full library; minimal branch helper and independent polynomial route; pivot/cardinality replay; affine caller and native event producer qualification.
+
+## Errors
+Branch main theorem, controls and final readback not reached. No new scientific execution or duplicate external owner.
+
+## What was done — 19:33 UTC
+Publishedcd96a80ff2033731335d2f58a75257b902037357 and verifiedremote ref. Exactlyone permitqualification exited1 after0.064546608s at fakeclockfixture class declaration beforecases. Callerreceipt retained, processreaped, no snapshot.
+
+## Decisions made
+Charge full60seconds:16320charged,0reserved,26880remaining. Minimalfixture successor requires independent review and separate release; frozenv4source remainsunchanged.
+
+## Open threads
+Qualificationfix and archive, then snapshot/fullsuite. Mathematical source/replay reviews proceed inparallel withoutpayloads.
+
+## Errors
+Classlocal datetime=DateTime shadowsmodulename beforetimezone=datetime.timezone, causingAttributeError. No permitbehavior result.
+
+## What was done — qualification scope correction
+Source readback places the failingDTclass declaration after14workerfixture testcalls. Reachingline64 supports thosecalls returned; no durablecase/result filewaswritten.
+
+## Decisions made
+Correct earlier wording beforecases: incomplete qualification before supervisorscenarios and finalserialization. No completed24case result.
+
+## Open threads
+Successorqualification review.
+
+## Errors
+Earlierprogress wording impliedzerofixtures executed; the traceback/source order supports partialexecution only.
+
+## What was done — 19:36 UTC
+Correctedfixturequalification passed24/24 withdurablerows, exit0;0.064985912scaller/full60charged. Exactsourceandreview published9c30e081236d842a7ee90701e88e7a5a2a1da6ca.
+
+## Decisions made
+16380charged, reserve60freshsnapshot,26760unreserved. Releaseonesnapshot usingpublished unchangedscript/newunit; no otherpayload.
+
+## Open threads
+Snapshotcustody andfinalrootvalidationbindings.
+
+## Errors
+Priorfixture failure retained separately; successfulsuccessor doesnoteraseit.
+
+## What was done — 19:40 UTC
+Freshcache snapshotpassed2142files2386041734bytes, SHA c6e7c61773d7dcbce42f11ecacf160026799d929e7b949247c1fed481c15edfc. Native4.016078406s/caller4.313697150s; exactinvocation0ccbeafd8115473d938ee363331e694d stopped, cgroupabsent. Originalimmutableinput andfreshcache externalized withfullremoteGET hashverification.
+
+## Decisions made
+16440charged, reserve1800one manualrootv4validation,24960unreserved. Finaladmission5adfda70 binds actual24casequalification and cache; independent operationalbindingreview beforepublication/launch.
+
+## Open threads
+FullRustvalidation; reviewedhelper/pivot/cardinality/directreplays; affine137callrebuild; nativeproducerqualification.
+
+## Errors
+Priorroot/branch/fixtureattempts remain chargedandimmutable. No extra cloudsubmission.
+
+## What was done — 19:42 UTC
+Publishedfinalv4admissionandreviewsatd97d50bb1c8549a4d71bc4df75e601cbb8818618, verifiedremoteequality. Launchedoneserialboundedrootvalidation, session79995/caller322556, invocationa80ba03158b54687892e12b9e78f7c70. Supervisorinitialandsecondleaseheartbeatpassed, capturedsamecgroup; noinitialerror.
+
+## Decisions made
+Native supervisor nowmaintainsT2031epoch3; prelaunchheartbeat59167stopfileset.16440charged+1800reservedunchanged; otherpayloadsqueued.
+
+## Open threads
+Preinputs/build/fourcontrols/fullsuite, then queuedformalreplays.
+
+## Errors
+No newruntimeerrorobservedatthisreadback; earlierfailuresretained.
+
+## What was done — 20:12 UTC
+Rootv4terminalfailedatworkdeadline; compile1024.496249s,listandfourcontrols passed. Fullsuiteinterruptedafter460.254020s; postcustodynotreached. Completion1761.112730s/sealpassed, sameownerMainPID0/cgroupabsentconfirmed.
+
+## Decisions made
+Charge1800:18240total, reserve2400reviewedhelperreplay,22560unreserved. Preservecompiledcache forlaterqualification; noautomaticrootretry. Bindonlytwohelperfreeze accountingfields, preserveprospectivefreezebytes.
+
+## Open threads
+Finalhelperbindingreview/publication then5calls. Completefullsuite requiresnewboundedmanualplanusingretainedcompiledcache.
+
+## Errors
+Fullsuitecapped; nopostinputreceipt andnocompletefullsuitepass claimed. No permiterrorrecorded.
+
+## What was done — 20:14 UTC
+Finalrootv4archive counted6179inventorytests; partialfullsuite2142ok45ignored18FAILED, unfinishedpkm_semaevbit_interval_m3. All18failure names andno-final-summary retained. Resulta0f596fc, archived29native/callerfilesremoteGET/hashverified.
+
+## Decisions made
+Describeattemptaspartial-suitefailuresplusdeadline, nottimeout-only. Source-onlytriageof18prerequisites started; no test rerun. Helperfinalnumericreviewe5bd6c67 passesunchanged5callsource.
+
+## Open threads
+Publishhelperfinalfreeze/rootfailurepacket; releasehelperafterexactreadback. Triagefailedtestdependencies.
+
+## Errors
+18fullsuiteFAILEDrows newlycounted; causalclassification pending. Fourseparateexactcontrolpassesunchanged.
+
+## What was done — 20:17 UTC
+Publishedhelperfinalfreeze/releaseat5670c04498715e7f23d40b26148e59065e37fbf5 and verifiedremote. One5callhelperreplaylaunchedsession91402, freeze73e8ac05/release466cd4fb; maintainedT2070epoch1heartbeat88479 fresh.
+
+## Decisions made
+18240charged+2400reserved+22560unreserved unchanged. No otherpayload. All18fullsuitefailures archived; broader135file/runtimeprerequisiteaudit preparedsourceonly.
+
+## Open threads
+Helperpre/compile/readback/post. Runtimefixturematerialization/cachedsuite continuationrequiresreviewed additiveview andseparatecharge; noautomaticretry.
+
+## Errors
+Earlierpartiallibrarysuite remainsfailed/incomplete, notoverwrittenbyhelperwork.
+
+## What was done — 20:21 UTC
+HelperreplayfailedfirstmoduleatENatnumeralcastnormalizationline153. Priorfourrepairedproofstepspassed; theorem/readbacknotcomplete, localfaileddeclarationprintsorryAxretained. Pre47.846993/compiler35.763581/post27.499790s, total111.225177s; allthreephaseownersterminal, pre/postcustodypassed.
+
+## Decisions made
+Full2400charged:20640total,0reserved,22560remaining. Source-onlyminimalcastsuccessorproposedundernew600s cap; prospectivebudgetamendment/independentreviewrequiredbeforeanyreplay.
+
+## Open threads
+Otherreviewedformalreplays; fixtureview/librarysuitecontinuation; signed/driver qualification.
+
+## Errors
+Singlecoercionnormalizationerror preventsbranchtheoremacceptance; preservefailureanddonotusefailedcompiledartifact.

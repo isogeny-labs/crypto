@@ -1,0 +1,37 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T16:36:57Z",
+ "id": "PCC-20261116-480062",
+ "kind": "statement",
+ "producer": {
+  "commit": "c3e37518608246c3baee8b47bd581194625ab876",
+  "model": "GPT-6",
+  "session": "vieta-polynomial-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vieta_coset_rust_20261115/continuation-20261116/SPLIT_TOWER_BOUND.md",
+    "sha256": "7f65b68d53e7d6b19659669305c6db2164ab697cfd30c655d064cffb69429fb7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vieta_coset_rust_20261115/continuation-20261116/split-tower-certificate.json",
+    "sha256": "801a38445209b21b0f0fc5dfb2ba9a38fdcdd9fb8f08b244c389b5f00fa5f723"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vieta_coset_rust_20261115/native/split_tower_certificate.rs",
+    "sha256": "517f00a8bdc58f2205e37bfd98c6b2828031af4af7bdecdb52de5ea77870580e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/vieta_coset_rust_20261115/continuation-20261116/SPLIT_TOWER_BOUND.md",
+ "statement": "Hand argument proposes last fall degree at most 2*sum(q_i-1)+2 for two fully split rational membership towers with coprime N_i,D_i, deg N_i=q_i, deg D_i<=q_i-1, plus the written quadratic Vieta core over F_p, p>3. Binary towers give2*log2(M)+2. Includes a homogeneous interpolation-free target-evaluator construction and an exact F17 polynomial/prime-curve example. General proof awaits independent/formal validation; no general rational-tower Rust solver, cheap-construction or running-time claim."
+}

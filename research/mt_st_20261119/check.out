@@ -1,0 +1,18 @@
+# Pre-run checks, 2026-11-19T17:36:29Z
+THP: always [madvise] never; CPU: Intel(R) Xeon(R) Processor @ 2.10GHz
+new binary (examples/mt_fieldops.rs at f47b6e9d42) sha256 13c602068d1f424a; table-build round binary 198a6e49e740e53d
+build: rustc --edition 2021 -C opt-level=3 -C codegen-units=16 --crate-type bin examples/mt_fieldops.rs -L dependency=target/release/deps --extern rand=librand-995139fa871833e1.rlib --extern serde_json=libserde_json-15598c5810c24e49.rlib
+## 1. multi-target behaviour unchanged vs the table-build round binary (MTF_HP=1 MTF_Z=1; all fields but times)
+ic5b mt_fieldops_v5_20261112/instances/W28-0.json 1024 43 0.85 4 1.2 flatf 128 bi rel,ib : identical PASS
+ic5b mt_ic_scale_20261115/instances/W36-0.json 1024 43 0.85 4 1.2 flatf 128 bi rel,ib : identical PASS
+rhodpb mt_fieldops_v5_20261112/instances/W28-0.json 1024 43 0.0 0 64 : identical PASS
+rhodpb mt_ic_scale_20261115/instances/W36-0.json 1024 43 0.0 0 64 : identical PASS
+## 2. blk is exact (same table, trials, relations, p1_trials; every target)
+  W32-4.json T=1 {'table': 189988, 'trials': 6220, 'relations': 34, 'p1_trials': 378794} I [33289, 30254] PASS
+  W36-0.json T=1 {'table': 810160, 'trials': 43994, 'relations': 41, 'p1_trials': 1999532} I [137278, 115644] PASS
+  W32-4.json T=1024 {'table': 6123452, 'trials': 364448, 'relations': 70, 'p1_trials': 25392} I [333290, 331255] PASS
+## 3. st recovers the target at T = 1 (seeds 1..8; lanes 16/32/64)
+  W24-0.json: 24/24 recovered PASS
+  W32-4.json: 24/24 recovered PASS
+  W36-0.json: 24/24 recovered PASS
+  W40-0.json: 24/24 recovered PASS

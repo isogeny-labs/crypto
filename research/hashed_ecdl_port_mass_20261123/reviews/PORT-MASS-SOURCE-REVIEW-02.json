@@ -1,0 +1,90 @@
+{
+  "schema": "port-mass-native-implementation-source-review/v1",
+  "review_id": "PORT-MASS-SOURCE-REVIEW-02",
+  "created_utc": "2026-11-23T17:12:40.544Z",
+  "reviewer_scope": "Same-root-team read-only native source/control review. This is not independent execution,formal/native qualification,PCC standing or a signed experiment review.",
+  "evidence_manifest": {
+    "path": "port-mass-source-evidence-02.json",
+    "bytes": 5879,
+    "sha256": "7ae026d03d01f3b6bd2e5e6f756c124a626f9eeb22ad8b0248ca3c26da25e6b3",
+    "entries": 12
+  },
+  "disposition": "No remaining concrete source/control defect found in the exact reviewed v2 implementation. Source-only acceptance; actual constructor outcomes and resource completion remain outside this review.",
+  "source_identity": {
+    "native_source_sha256": "8dd661b57073c21f6acc21b89de677290a9c4e1870c6a8f3a0183ef0b3cfbbff",
+    "native_source_bytes": 20219,
+    "frozen_v2_copy_exact": true,
+    "retained_v1_source_sha256": "02064e6d55b90fc46905f138a7b40cf9f0b9daaa0397bc4afa76d9c01bf33999",
+    "publication_binding": "None: local finalized source bytes only; no committed-publication addendum is supplied here."
+  },
+  "findings": [
+    {
+      "id": "PM02-01",
+      "status": "corrected_in_v2",
+      "retained_v1_issue": "Family4 right=(e/3+e)%2 with left=e%3 repeats only (0,0),(1,1),(2,0).",
+      "reviewed_v2": "right=e%2 produces all six distinct 3-by-2 incidence pairs in each six-edge cycle. The M=8,12,16 base fixtures include all six; smaller M use prefixes."
+    },
+    {
+      "id": "PM02-02",
+      "status": "corrected_in_v2",
+      "retained_v1_issue": "Any Err accepted by packet negatives could misclassify resource exhaustion as expected malformed-coverage rejection.",
+      "reviewed_v2": "Wrong beta requires exact Invalid(mode exponent tuple). Omission errors must be Integrity(unattached bipartite port); duplicate errors must be Integrity(bipartite port ordering). Unexpected errors panic; each mutant must refuse at least one group. Groups unaffected by the mutation may correctly return Ok."
+    },
+    {
+      "id": "PM02-03",
+      "status": "source_control_sound",
+      "reviewed_v2": "A separate valid-packing call uses a fresh vector=0 Meter,requires actual Error::Limit,and explicitly requires false for both coverage classifications. Group0 has retained endpoint ports,so it is nonempty; a vector guard rejects no later than its first child edge. This is a planned source-backed negative control,not an observed result."
+    }
+  ],
+  "implementation_fidelity": {
+    "scope": "The cfg(test) module uses actual pack_labels,Cauchy::new,modes,next_tuple and deformation::child. The recursive.rs change is only its test-module registration; recursive,packing,deformation and contraction source identities also match the already frozen review01 inputs.",
+    "base_graphs": "Matching,parallel,left-star,right-star and corrected shared-incidence graphs include deliberate isolated vertices and validated reciprocal ports. Base M values are 0,1,2,3,4,8,12,16; four label schedules and all coordinates of eight written geometries are used.",
+    "tuple_domain": "All-zero plus selected first-mode prefix states come from actual next_tuple. The first-mode cap is min(floor((7-1)/weight),packet-target row count). Deduplication leaves at most three states; independent weight<7 and per-target usage checks are present. This is not all multivariate tuples.",
+    "independent_accounting": "Endpoint-edge histograms are compared with a separate old-vertex degree histogram. For M>0,row-only vector and edge-once aggregate models must differ. Packet ownership checks require each original edge exactly once.",
+    "graph_binding": "Each returned child is validated by its constructor. The control compares selected old vertex order,Arc identity,arity and retained creation precision3; new packet creation precision equals working ring precision7. Sorted full incidence triples include retained vertex,original port and packet identity,so parallel endpoints remain distinct.",
+    "mass": "Every group child is constructed for each tested fixed tuple; group edge counts equal endpoint counts,full sum equals2M,and common-precision weighted sum equals2M*7. Old vertices and isolates partition once; packet vertices total radix*packet_count. Histograms are compared across selected beta states.",
+    "early_stop_limit": "The control deliberately constructs the full group family. Production evaluate_at may stop at a zero product or earlier error; only a visited nonnegative prefix bound<=2M follows there. This source control does not measure actual traversal or prove its total cost."
+  },
+  "planned_census": {
+    "base_contexts": 2080,
+    "base_group_call_cap": 46560,
+    "balanced_group_calls": 64,
+    "negative_child_calls": 6,
+    "negative_breakdown": {
+      "wrong_beta": 1,
+      "packet_mutants_groups": 4,
+      "separate_resource_limit": 1
+    },
+    "census_status": "Source-derived denominators only. No observed execution counts accepted in this review."
+  },
+  "balanced_fixture": {
+    "parameters": "M8192 matching,radix64,a1,u1,length2,array4096,z0;pack_labels enforces its balance bounds;still forced component parameters without Setup admission.",
+    "source_assertions": {
+      "packets": 4096,
+      "group_edges_each": 256,
+      "total_child_edges": 16384,
+      "old_vertices": 16386,
+      "old_isolates": 2,
+      "new_packet_vertices": 262144,
+      "zero_port_packet_vertices": 254016,
+      "total_child_vertices": 278530,
+      "maximum_degree_at_most": 4
+    },
+    "modes": "Source asserts modes empty for z0; one beta tuple. The stronger 8*child_edges<=M assertion is fixture-specific,not a consequence of mass conservation.",
+    "status": "These are exact reviewed assertions and written expected counts,not reviewer-observed native outcomes."
+  },
+  "qualification_limits": {
+    "execution": "Reviewer ran no compiler,build,test,native constructor,checker,Lean,solver or replay. Producer-reported v2 build/Clippy results were not inspected or independently attested here; no test result is relabeled passed.",
+    "mathlib": "Review01 retained counting-law/source findings remain as scoped. Retained Mathlib56 and owner-default cfc are different transitive environments despite the same counting-theorem file and Lean4.35. Default-pin and full shared-library qualification are not established here. This review does not extend formal qualification to newly reported gate outputs.",
+    "mathematics": "Fixed-tuple edge and vertex identities are structural accounting. They do not price all beta/modes/evaluation nodes,packet descriptions,zero-port vertices,coefficient extraction,interpolation,integer widths or recursion-history bit work.",
+    "algorithm_scope": "No graph/Setup admission,contraction value,public-root path,full counter complexity,novelty,runtime gain,candidate comparison or authenticated execution claim.",
+    "pcc": "No signed verdict or authenticated execution provenance established."
+  },
+  "preservation": {
+    "prior_review01_sha256": "e94ba43ae9ac2ec01e14be9049b0f04f88b61b55a42e9d8f5f4e25fd3f867c66",
+    "prior_manifest01_sha256": "0693218bf8d5c633a67bfdc9713e3b114c1c22180d1e2357bcc643f990e21a68",
+    "prior_snapshot_entries_rechecked": 14,
+    "failed": 0,
+    "older_records": "No repository file,retained v1 source,old root review or earlier port-mass review/snapshot was modified. Only new exclusive review02 files were written."
+  }
+}

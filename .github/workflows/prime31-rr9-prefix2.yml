@@ -1,0 +1,69 @@
+name: Prime31 RR9 two-known-prefix hybrid original curve
+on:
+  push:
+    branches:
+      - automation/prime31-rr9-prefix2-cost-20261119
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_prefix2_gate.rs
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_prefix2.py
+      - research/prime31_ic_20261115/rr9/RR9_TWO_PREFIX_PROTOCOL_20261119.md
+      - .github/workflows/prime31-rr9-prefix2.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_prefix2_gate.rs
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_prefix2.py
+      - .github/workflows/prime31-rr9-prefix2.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prefix2-prime31-source-specific:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+      - name: Pin original prime31 arithmetic and dependencies
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: original
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis/f4_fp_tower.rs
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay candidate example only
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_prefix2_gate.rs \
+            original/research/prime31_ic_20261115/native/examples/prime31_rr9_prefix2_gate.rs
+          git rev-parse HEAD
+          git -C original rev-parse HEAD
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_rr9_prefix2_gate.rs
+      - name: Reused original Rust library regression
+        run: cargo +1.100.0 test --release --locked --manifest-path original/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Native two-prefix exact resultants and cost-scope tests
+        run: cargo +1.100.0 test --release --locked --manifest-path original/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_prefix2_gate
+      - name: Original curve 16 OLD and 16 TERNARY fixture execution
+        run: |
+          cargo +1.100.0 run --release --quiet --locked \
+            --manifest-path original/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_prefix2_gate > prime31-rr9-prefix2.json
+          test -s prime31-rr9-prefix2.json
+      - name: Independent Python group arithmetic and dual-number Jacobian replay
+        run: python3 research/prime31_ic_20261115/native/verify_prime31_rr9_prefix2.py prime31-rr9-prefix2.json
+      - name: Preserve raw producer record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-prefix2-original-curve-source-specific
+          path: prime31-rr9-prefix2.json
+          if-no-files-found: warn
+          retention-days: 30

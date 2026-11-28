@@ -1,0 +1,142 @@
+{
+  "reviewed_utc": "2026-11-15T05:34:34.042178+00:00",
+  "independent_replay": {
+    "schema": "recorded-frobenius52-verification/v1",
+    "verified": true,
+    "method": "independent field/polynomial arithmetic; reconstruct both full coordinate constraint matrices and ranks/kernels/maps, equal complete k sets; every recorded norm/remainder/alias; source-only anchor scan; no new roots/candidates searched",
+    "family_proofs": [
+      {
+        "method": "U52",
+        "cell": 0,
+        "anchor": 1,
+        "variables": 52,
+        "rank": 48,
+        "nullity": 4,
+        "candidates": 16
+      },
+      {
+        "method": "U52",
+        "cell": 1,
+        "anchor": 1,
+        "variables": 52,
+        "rank": 48,
+        "nullity": 4,
+        "candidates": 16
+      },
+      {
+        "method": "U52",
+        "cell": 2,
+        "anchor": 3,
+        "variables": 52,
+        "rank": 48,
+        "nullity": 4,
+        "candidates": 16
+      },
+      {
+        "method": "U52",
+        "cell": 3,
+        "anchor": 3,
+        "variables": 52,
+        "rank": 48,
+        "nullity": 4,
+        "candidates": 16
+      },
+      {
+        "method": "k83",
+        "cell": 0,
+        "anchor": 1,
+        "variables": 83,
+        "rank": 79,
+        "nullity": 4,
+        "candidates": 16
+      },
+      {
+        "method": "k83",
+        "cell": 1,
+        "anchor": 1,
+        "variables": 83,
+        "rank": 79,
+        "nullity": 4,
+        "candidates": 16
+      },
+      {
+        "method": "k83",
+        "cell": 2,
+        "anchor": 3,
+        "variables": 83,
+        "rank": 79,
+        "nullity": 4,
+        "candidates": 16
+      },
+      {
+        "method": "k83",
+        "cell": 3,
+        "anchor": 3,
+        "variables": 83,
+        "rank": 79,
+        "nullity": 4,
+        "candidates": 16
+      }
+    ],
+    "raw_receipt_occurrences": 384,
+    "unique_norm_receipts": 64,
+    "unique_cubics": 64,
+    "unique_rejected_norm_parameters": 64,
+    "unique_supported_norm_parameters": 0,
+    "generic_anchor_a": 3,
+    "scan_decisions": 2,
+    "outside_order4": true,
+    "raw_sha256": "96d326908f74534096ae2d1397bb6e8814e9b967f8c9e573731f993f880388d4",
+    "seconds": 0.9274815520002448,
+    "qualified_speedup": null,
+    "global_original_root_complete": false
+  },
+  "small_controls": {
+    "fields": [
+      {
+        "n": 2,
+        "positive": 1,
+        "regular_cells": 4
+      },
+      {
+        "n": 3,
+        "positive": 3,
+        "regular_cells": 4
+      },
+      {
+        "n": 4,
+        "positive": 2,
+        "regular_cells": 4
+      }
+    ],
+    "positive_norm_cases": 6,
+    "synthetic_alpha_zero_cases": 28
+  },
+  "median_total_seconds": {
+    "U52": 0.43292081099934876,
+    "k83": 0.43280687399965245
+  },
+  "median_stages": {
+    "k83": {
+      "cache_seconds": 0.0038068140001996653,
+      "formulation_solve_seconds": 0.022295265000138897,
+      "setup_seconds": 0.3045731080001133,
+      "extract_verify_seconds": 0.1058676499997091
+    },
+    "U52": {
+      "cache_seconds": 0.017222490001586266,
+      "formulation_solve_seconds": 0.017281357999308966,
+      "setup_seconds": 0.29327450999880966,
+      "extract_verify_seconds": 0.10568364299979294
+    }
+  },
+  "internal_total_ratio": 0.9997368179195791,
+  "conclusion": "exact representation compression verified; no total speed gain observed",
+  "worker_wall_seconds": 3.0852533930010395,
+  "worker_peak_process_rss_kib": 160488,
+  "raw_bytes": 14626,
+  "raw_uncompressed_bytes": 48753,
+  "qualified_speedup": null,
+  "original_global_complete": false,
+  "novelty_claim": false
+}

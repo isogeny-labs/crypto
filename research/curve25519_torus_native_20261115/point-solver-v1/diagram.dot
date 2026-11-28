@@ -1,0 +1,13 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",pad="0.16",nodesep="0.35",ranksep="0.3"];
+ node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=12,color="#365773",fillcolor="#eef4f8",margin="0.14,0.10"];
+ edge [color="#627888",fontname="Helvetica",fontsize=10];
+ p [label="Public Spec, R, Q=[8]R"];
+ a [label="Original point circuit\nSum of eightfold images = Q\n327 vars / 357 equations"];
+ b [label="Section circuit\nRaw pretarget sector fixed by R\nEarlier capped query preserved"];
+ p -> a; p -> b;
+ r [label="Complete candidate -> original equations\n-> raw-index / sign / group replay",fillcolor="#e8f2e9"];
+ a -> r [label="after SAT only"];
+ n [label="NEXT: exact section-kernel elimination\nUnknown point rows; guarded pivots / jets\nSector completeness and cost remain open",fillcolor="#fff1d8",color="#a67c30"];
+ a -> n [style=dashed]; b -> n [style=dashed];
+}

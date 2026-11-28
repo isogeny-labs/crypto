@@ -1,0 +1,92 @@
+{
+  "schema": "rr5.qualification-summary/v1",
+  "classification": "local_development_correctness",
+  "evidence_status": "unsigned_producer",
+  "runs": [
+    {
+      "directory": "qualification-initial",
+      "status": "passed",
+      "tests_passed": 14,
+      "tests_failed": 0,
+      "exit_status": 0,
+      "scope": "initial B4 component"
+    },
+    {
+      "directory": "qualification-04",
+      "status": "passed",
+      "tests_passed": 16,
+      "tests_failed": 0,
+      "exit_status": 0,
+      "scope": "revised B4 extraction and adapter"
+    },
+    {
+      "directory": "qualification-05",
+      "status": "passed",
+      "tests_passed": 16,
+      "tests_failed": 0,
+      "tests_filtered": 2,
+      "exit_status": 0,
+      "scope": "pre-product B4 component; B8 executed separately"
+    },
+    {
+      "directory": "b8-positive-01",
+      "status": "inconclusive_gate_failed",
+      "tests_passed": 0,
+      "tests_failed": 1,
+      "exit_status": 101,
+      "scope": "expanded B8 positive"
+    },
+    {
+      "directory": "b8-empty-01",
+      "status": "inconclusive_gate_failed",
+      "tests_passed": 0,
+      "tests_failed": 1,
+      "exit_status": 101,
+      "scope": "expanded B8 empty"
+    },
+    {
+      "directory": "public-example-01",
+      "status": "passed",
+      "tests_passed": 8,
+      "tests_failed": 0,
+      "exit_status": 0,
+      "scope": "public example through declared production closure"
+    },
+    {
+      "directory": "qualification-06",
+      "status": "passed",
+      "tests_passed": 17,
+      "tests_failed": 0,
+      "tests_filtered": 2,
+      "exit_status": 0,
+      "scope": "final B4/adapter plus quotient construction; B8 executed separately"
+    },
+    {
+      "directory": "b8-positive-02",
+      "status": "passed",
+      "tests_passed": 1,
+      "tests_failed": 0,
+      "exit_status": 0,
+      "scope": "compact B8 positive"
+    },
+    {
+      "directory": "b8-empty-02",
+      "status": "passed",
+      "tests_passed": 1,
+      "tests_failed": 0,
+      "exit_status": 0,
+      "scope": "compact B8 empty"
+    },
+    {
+      "directory": "identity-01",
+      "status": "evaluated_unsigned",
+      "exit_status": 0,
+      "scope": "32 certificate points plus32 additional points over2^61-1; false cross term rejected"
+    }
+  ],
+  "benchmark_completed": false,
+  "full_root_library_completed": false,
+  "requested_B677_completed": false,
+  "phase_accounting_complete": false,
+  "source_of_values": "Frozen raw outputs in each named directory; no timing comparison or new numerical analysis."
+}

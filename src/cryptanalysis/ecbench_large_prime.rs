@@ -504,6 +504,11 @@ pub struct SolveOptions {
     /// find, without a trial cap, how many trials a given verified rank takes.
     /// Filter arms only.
     pub trajectory: Option<TrajectoryRequest>,
+    /// Keep a copy of the exact `lpf::PartialRelation` batch handed to the
+    /// large-prime filter in [`FilterPipelineReport::relations`] (filter arms
+    /// only; never serialized), so graph tools can be evaluated on the real
+    /// stream (`large_prime_graph::eval`).
+    pub capture_relations: bool,
     /// Test hook: damage one entry of the finished orbit table *after* its
     /// self-checks, to show that the replays (not the table build) are what
     /// catch a wrong coefficient.  Never set outside tests.
@@ -691,6 +696,9 @@ pub struct FilterPipelineReport {
     /// Only with [`SolveOptions::trajectory`].
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trajectory: Option<RankTrajectory>,
+    /// Only with [`SolveOptions::capture_relations`]; never serialized.
+    #[serde(skip)]
+    pub relations: Option<Vec<lpf::PartialRelation>>,
 }
 
 /// The accepted-decomposition stream of one run.
@@ -1362,6 +1370,7 @@ fn run_filter_pipeline(
         });
     }
     drop(stored);
+    let captured = extras.capture_relations.then(|| inputs.clone());
 
     // Group element of every column id in the shifted indexing.
     let mut points = Vec::with_capacity(base.column_points.len() + 1);
@@ -1442,6 +1451,7 @@ fn run_filter_pipeline(
         stream: extras.stream,
         post_collect: extras.post_collect,
         trajectory,
+        relations: captured,
     })
 }
 
@@ -1450,6 +1460,7 @@ struct PipelineExtras<'a> {
     stream: Option<StreamReport>,
     post_collect: Option<PostCollectReport>,
     trajectory: Option<&'a TrajectoryRequest>,
+    capture_relations: bool,
 }
 
 #[derive(Default)]
@@ -1926,7 +1937,6 @@ fn solve_with_verification(
             }
         }
     }
-    measurement::end_online();
     let filter_pipeline = if graph.uses_filter() {
         let cpu = PhaseCpuNs {
             setup: cpu_after_setup.saturating_sub(cpu_start),
@@ -1948,6 +1958,7 @@ fn solve_with_verification(
                 }),
                 post_collect: post_collect_report.take(),
                 trajectory: options.trajectory.as_ref(),
+                capture_relations: options.capture_relations,
             },
         )?;
         recovered = matrix.pinned(d_col);
@@ -1966,6 +1977,12 @@ fn solve_with_verification(
     if let Some(report) = &filter_pipeline {
         counters.lp_merge_ops_uncharged = report.filter.merges as u64;
     }
+    // The charged v2 final check belongs to the target-dependent interval.
+    // Keep the clock open through a deferred filter, which can pin d only
+    // after collection, and through the final verification itself.
+    let check_in_online = verify_candidate || charge_checks;
+    let _recovery_check = (check_in_online && recovered.is_some())
+        .then(|| measurement::scope(measurement::Phase::RecoveryCheck));
     if charge_checks {
         if let Some(d) = recovered {
             counters.final_checks = 1;
@@ -1976,10 +1993,12 @@ fn solve_with_verification(
     }
     phase_group_ops.insert("relations".into(), rel_ops);
     phase_group_ops.insert("verification".into(), verify_ops);
-    let verified_fast = verify_candidate
+    let verified_fast = check_in_online
         && recovered.is_some_and(|d| instance.fast.mul_u64(instance.generator, d) == target);
-    let verified_independent = verify_candidate
+    let verified_independent = check_in_online
         && recovered.is_some_and(|d| independent_verify(instance, target, d).is_ok());
+    drop(_recovery_check);
+    measurement::end_online();
     Ok(LargePrimeReport {
         trace_evidence: options.abscissa_basis.map(|basis| trace_line::Evidence {
             basis,
@@ -1991,7 +2010,7 @@ fn solve_with_verification(
         exhausted: recovered.is_none(),
         verified_fast,
         verified_independent,
-        verification_performed: verify_candidate,
+        verification_performed: check_in_online,
         config,
         factor_base: base.report,
         mitm: decomposer.report,

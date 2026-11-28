@@ -43,6 +43,14 @@ use super::jv_cover::{
 };
 use super::residual_walk::inv_mod;
 
+#[path = "jv_sieve_graph.rs"]
+mod graph_filter;
+pub use graph_filter::{SieveGraphOptions, SieveGraphStats};
+
+/// Adapted two-large-prime collection over a reduced Fp-abscissa base.
+#[path = "jv_sieve_two_large_prime.rs"]
+pub mod two_large_prime;
+
 /// The harness's price of one `F_p` inversion, as in `jv_cover`.
 const INV_COST: u64 = 16;
 
@@ -1255,8 +1263,20 @@ pub fn sieve_line(
     all_counts: Option<&mut Vec<u8>>,
     shared: Option<&SharedB>,
 ) -> (Vec<u64>, SieveCost) {
+    sieve_line_threshold(ring, setup, line, ctr, all_counts, shared, setup.m as u8)
+}
+
+fn sieve_line_threshold(
+    ring: &FpRing,
+    setup: &SieveSetup,
+    line: &Line,
+    ctr: &mut Counters,
+    all_counts: Option<&mut Vec<u8>>,
+    shared: Option<&SharedB>,
+    minimum: u8,
+) -> (Vec<u64>, SieveCost) {
     let p = setup.p;
-    let m = setup.m as u8;
+    let m = minimum;
     let mut cost = SieveCost::default();
     ctr.id = ctr.id.wrapping_add(1);
     if ctr.id == u32::MAX {
@@ -1426,7 +1446,6 @@ pub fn relation_from_hit(
     s: u64,
     rng: &mut StdRng,
 ) -> Option<SieveRel> {
-    let p = setup.p;
     let f = line_poly(ring, line, s);
     if fdeg(&f) != setup.m as isize {
         return None;
@@ -1435,6 +1454,20 @@ pub fn relation_from_hit(
     if roots.len() != setup.m {
         return None;
     }
+    relation_from_roots(ring, fq, setup, base, by_x, line, s, &roots)
+}
+
+fn relation_from_roots(
+    ring: &FpRing,
+    fq: &Fq,
+    setup: &SieveSetup,
+    base: &[BaseEl],
+    by_x: &HashMap<u64, usize>,
+    line: &Line,
+    s: u64,
+    roots: &[u64],
+) -> Option<SieveRel> {
+    let p = setup.p;
     // √s ∈ F_q: in F_p if s is a square, else t·√(s/ω)
     let sq = if setup.sqrt[s as usize] != u64::MAX {
         E2([setup.sqrt[s as usize], 0])
@@ -1447,7 +1480,7 @@ pub fn relation_from_hit(
         E2([0, r])
     };
     let mut terms = Vec::with_capacity(setup.m);
-    for &x in &roots {
+    for &x in roots {
         super::jv_bitops::probe(1);
         let &idx = by_x.get(&x)?;
         super::jv_bitops::words(4);
@@ -1550,8 +1583,46 @@ pub fn sieve_core(rels: &[SparseRel], ncols: usize) -> Option<super::gaudry_cubi
 
 // ── The method end to end ────────────────────────────────────────────────
 
+/// Capture only the solver invocation. Its answer check remains in the
+/// existing verification phase; no projection/replay work is folded in here.
+fn observed_solve(
+    rows: &[SparseRel],
+    columns: usize,
+    modulus: u64,
+    rng: &mut StdRng,
+    ops: &mut u64,
+    kind: &str,
+    attempt: u64,
+    work: &mut Option<Vec<serde_json::Value>>,
+) -> Option<Vec<u64>> {
+    let before = work.as_ref().map(|_| super::jv_bitops::snapshot());
+    let answer = wiedemann_u64(rows, columns, modulus, rng, ops);
+    if let (Some(before), Some(work)) = (before, work) {
+        let primitives = super::jv_bitops::snapshot().since(&before).total();
+        work.push(serde_json::json!({
+            "schema":"cover.sieve.solve-work/v1", "complete":false,
+            "marker":"counted:cover_solve_subtotals", "kind":kind,
+            "attempt":attempt,
+            "rows":rows.len(), "columns":columns,
+            "nonzeros":rows.iter().map(|r|r.cols.len()).sum::<usize>(),
+            "returned_solution":answer.is_some(),
+            "primitives":super::jv_bitops::prims_json(&primitives),
+            "known_uncounted":"solver native bookkeeping remains incomplete"
+        }));
+    }
+    answer
+}
+
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct SieveDlpReport {
+    /// Opt-in graph projection; absent under the historical default.
+    /// Its modular/native costs are in cold wall, not legacy multiplication totals.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub graph_filter: Option<SieveGraphStats>,
+    /// Observed solver-call primitives, only when operation hooks are enabled.
+    /// Native bookkeeping remains incomplete; these are not complete totals.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub work_native: Option<Vec<serde_json::Value>>,
     /// Factor-base line search (`JV_FB_LINE=n`, `JV_FB_LINE_MODE`); its
     /// multiplications are inside `setup_muls`, its additions and lookups in
     /// `total_plus`.  Absent when off, so the default record is unchanged.
@@ -1836,6 +1907,83 @@ pub fn run_cover_sieve_dlp_on(
     m_override: Option<usize>,
     trace: bool,
 ) -> SieveDlpReport {
+    run_cover_sieve_dlp_on_with_filter(
+        spec, seed, rho_runs, rho_s_ref, stop, margin, m_override, trace, None,
+    )
+    .0
+}
+
+/// Same verified cover/sieve route with an explicit graph projection option.
+/// Returns the recovered scalar separately for external replay. The planted
+/// answer is used only by the existing final correctness flag. Graph work is
+/// fully charged in cold wall; legacy primitive totals omit graph arithmetic.
+#[allow(clippy::too_many_arguments)]
+pub fn run_cover_sieve_dlp_on_with_filter(
+    spec: &Spec,
+    seed: u64,
+    rho_runs: usize,
+    rho_s_ref: f64,
+    stop: Option<usize>,
+    margin: f64,
+    m_override: Option<usize>,
+    trace: bool,
+    graph_options: Option<&SieveGraphOptions>,
+) -> (SieveDlpReport, Option<u64>) {
+    run_cover_sieve_dlp_on_with_filter_mode(
+        spec,
+        seed,
+        rho_runs,
+        rho_s_ref,
+        stop,
+        margin,
+        m_override,
+        trace,
+        graph_options,
+        false,
+    )
+}
+
+/// Additive opt-in MST mode; original API/options/default reports stay intact.
+/// Its dimension/nonzero guard is a work proxy, not a wall-time guarantee.
+#[allow(clippy::too_many_arguments)]
+pub fn run_cover_sieve_dlp_on_with_mst_filter(
+    spec: &Spec,
+    seed: u64,
+    rho_runs: usize,
+    rho_s_ref: f64,
+    stop: Option<usize>,
+    margin: f64,
+    m_override: Option<usize>,
+    trace: bool,
+    graph_options: Option<&SieveGraphOptions>,
+) -> (SieveDlpReport, Option<u64>) {
+    run_cover_sieve_dlp_on_with_filter_mode(
+        spec,
+        seed,
+        rho_runs,
+        rho_s_ref,
+        stop,
+        margin,
+        m_override,
+        trace,
+        graph_options,
+        true,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn run_cover_sieve_dlp_on_with_filter_mode(
+    spec: &Spec,
+    seed: u64,
+    rho_runs: usize,
+    rho_s_ref: f64,
+    stop: Option<usize>,
+    margin: f64,
+    m_override: Option<usize>,
+    trace: bool,
+    graph_options: Option<&SieveGraphOptions>,
+    mst: bool,
+) -> (SieveDlpReport, Option<u64>) {
     use super::jv_bitops::{enter, Phase};
     let start = Instant::now();
     // Opt-in: JV_FB_LINE=n moves the instance to the best of n factor-base
@@ -1874,6 +2022,8 @@ pub fn run_cover_sieve_dlp_on(
         .and_then(|v| v.parse().ok())
         .unwrap_or(0);
     let mut rep = SieveDlpReport {
+        graph_filter: graph_options.map(|_| SieveGraphStats::new()),
+        work_native: super::jv_bitops::enabled().then(Vec::new),
         fb_line,
         p,
         seed,
@@ -1896,13 +2046,16 @@ pub fn run_cover_sieve_dlp_on(
     // ── the residual stream for the descent: R = aG′ + bQ′, R₀ + i·M
     ctx.f.reset_muls();
     let stream_guard = enter(Phase::Descent);
-    let (al, be) = (rng.gen_range(1..l), rng.gen_range(1..l));
+    let (al, be) = (
+        super::jv_bitops::uniform_mod_u64(&mut rng, 1, l),
+        super::jv_bitops::uniform_mod_u64(&mut rng, 1, l),
+    );
     let step = jac.add(
         &jac.mul(&spec.gj, al as u128),
         &jac.mul(&spec.qj, be as u128),
     );
-    let mut a = rng.gen_range(0..l);
-    let mut b = rng.gen_range(1..l);
+    let mut a = super::jv_bitops::uniform_mod_u64(&mut rng, 0, l);
+    let mut b = super::jv_bitops::uniform_mod_u64(&mut rng, 1, l);
     let mut r = jac.add(&jac.mul(&spec.gj, a as u128), &jac.mul(&spec.qj, b as u128));
     rep.setup_muls = ctx.f.muls() + spec.transfer_muls + line_muls;
     drop(stream_guard);
@@ -2083,8 +2236,10 @@ pub fn run_cover_sieve_dlp_on(
             let idx = rep.descent_residuals + batch.len() as u64;
             batch.push((a, b, r.clone(), idx));
             r = jac.add(&r, &step);
-            a = (a + al) % l;
-            b = (b + be) % l;
+            // Both labels are reduced modulo l < 2^63. The shared helper
+            // preserves the stream and charges its scalar additions.
+            a = am(a, al, l);
+            b = am(b, be, l);
         }
         rep.descent_stream_muls += ctx.f.muls();
         ctx.f.reset_muls();
@@ -2171,6 +2326,7 @@ pub fn run_cover_sieve_dlp_on(
     let mut la_ops = 0u64;
     let mut next_attempt = small;
     let descent_cap = 400u64 * 720 * 4;
+    let mut recovered = None;
     'collect: loop {
         if !sieve_round(&mut rep, &mut sieve_rows, &mut sieve_rels) {
             rep.exhausted = true;
@@ -2219,13 +2375,56 @@ pub fn run_cover_sieve_dlp_on(
             .collect();
         sel.extend(usable.iter().map(|r| mapped(r)));
         let before = la_ops;
-        let x = wiedemann_u64(&sel, sel.len(), l, &mut rng, &mut la_ops);
-        let dd = x.map(|x| x[k]);
-        let _verify = enter(Phase::Verification);
-        let ec = super::jv_cover::EllE::new(&ctx.f, &spec.alpha);
-        if dd.is_some_and(|dd| ec.mul(&spec.g, dd) == spec.q) {
+        let projection = graph_options.and_then(|options| {
+            if mst {
+                graph_filter::project_mst(&sel, l, options, rep.graph_filter.as_mut().unwrap())
+            } else {
+                graph_filter::project(&sel, l, options, rep.graph_filter.as_mut().unwrap())
+            }
+        });
+        let verified_scalar = |dd: Option<u64>| {
+            let _verify = enter(Phase::Verification);
+            let ec = super::jv_cover::EllE::new(&ctx.f, &spec.alpha);
+            dd.filter(|&dd| ec.mul(&spec.g, dd) == spec.q)
+        };
+        let mut dd = None;
+        if let Some((projected, target)) = &projection {
+            dd = verified_scalar(
+                observed_solve(
+                    projected,
+                    projected.len(),
+                    l,
+                    &mut rng,
+                    &mut la_ops,
+                    "projected",
+                    rep.la_attempts,
+                    &mut rep.work_native,
+                )
+                .map(|x| x[*target]),
+            );
+        }
+        if dd.is_none() {
+            if let Some(stats) = &mut rep.graph_filter {
+                stats.fallback_solves += 1;
+            }
+            dd = verified_scalar(
+                observed_solve(
+                    &sel,
+                    sel.len(),
+                    l,
+                    &mut rng,
+                    &mut la_ops,
+                    "original",
+                    rep.la_attempts,
+                    &mut rep.work_native,
+                )
+                .map(|x| x[k]),
+            );
+        }
+        if dd.is_some() {
             rep.solved = true;
             rep.correct = dd == Some(spec.d);
+            recovered = dd;
             rep.unknowns = sel.len();
             rep.filtered_out = sieve_rows.len() + 1 - core.rows.len();
             rep.la_ops_last = la_ops - before;
@@ -2293,12 +2492,51 @@ pub fn run_cover_sieve_dlp_on(
     rep.descent_over_rho = rep.descent_muls as f64 / rho_muls;
     rep.la_over_rho = rep.la_muls as f64 / rho_muls;
     rep.wall_ms = start.elapsed().as_secs_f64() * 1e3;
-    rep
+    (rep, recovered)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn observed_solver_call_matches_its_hooked_subtotal() {
+        use super::super::jv_bitops::{self, Phase};
+        jv_bitops::enable(true);
+        jv_bitops::claim();
+        jv_bitops::set_moduli(103, 101);
+        let rows = vec![
+            SparseRel {
+                cols: vec![(0, 1), (1, 2)],
+                rhs: 8,
+            },
+            SparseRel {
+                cols: vec![(0, 3), (1, 4)],
+                rhs: 18,
+            },
+        ];
+        let mut work = Some(Vec::new());
+        let mut rng = StdRng::seed_from_u64(17);
+        let mut ops = 0;
+        let before = jv_bitops::snapshot();
+        let _phase = jv_bitops::enter(Phase::LinearAlgebra);
+        assert_eq!(
+            observed_solve(&rows, 2, 101, &mut rng, &mut ops, "original", 1, &mut work),
+            Some(vec![2, 3])
+        );
+        let actual = jv_bitops::prims_json(&jv_bitops::snapshot().since(&before).total());
+        let call = &work.unwrap()[0];
+        assert_eq!(call["primitives"], actual);
+        assert_eq!(call["complete"], false);
+        assert_eq!(call["rows"], 2);
+        assert_eq!(call["nonzeros"], 4);
+        assert_eq!(call["returned_solution"], true);
+        assert!(call["primitives"]["modr_mul"].as_u64().unwrap() > 0);
+        assert!(serde_json::to_value(SieveDlpReport::default())
+            .unwrap()
+            .get("work_native")
+            .is_none());
+    }
     use crate::cryptanalysis::jv_cover::Hyp;
 
     fn ring_and_rng(p: u64) -> (FpRing, StdRng) {

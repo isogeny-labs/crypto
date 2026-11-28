@@ -1,0 +1,14 @@
+digraph signed_queries {
+    graph [bgcolor="transparent", rankdir=TB, nodesep=0.25, ranksep=0.29, pad=0.10]
+    node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, margin="0.14,0.09", color="#9AAFB9", fillcolor="#F0F6F9", fontcolor="#193341"]
+    edge [color="#5F7885", arrowsize=0.62]
+    hashes [label="Prime inverse slopes\nOne short variable per slot"]
+    pair [label="Signed pair equation\nExact ordinates from chord coefficients"]
+    comp [label="Full-arity signed existence\nProof open", fillcolor="#FAF0DF", color="#BC9D62"]
+    window [label="Convolution window count\nBoth operand masks"]
+    full [label="Full product with pinned output\nBoth operand masks remain open", fillcolor="#FAF0DF", color="#BC9D62"]
+    hashes -> pair -> comp
+    window -> full
+    {rank=same; pair; window}
+    {rank=same; comp; full}
+}

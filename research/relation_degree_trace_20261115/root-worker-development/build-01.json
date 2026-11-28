@@ -1,0 +1,18 @@
+{
+  "schema": "relation-root-worker-build/v1",
+  "class": "development qualification, not benchmark",
+  "source_commit": "6ff21fd8711d33d84fa8c3eb2856e2d71899ac07",
+  "worker": {
+    "path": "/workspace/relation-native-qualifiers/root-worker-6ff21fd87-01",
+    "sha256": "9f75f4dbeb965e30644ba1debbf0df0fda40446280489197ec64dfc30c00fa7a",
+    "bytes": 17808576
+  },
+  "qualifier": {
+    "path": "/workspace/relation-native-qualifiers/root-worker-tests-6ff21fd87-01",
+    "sha256": "b3c85534c04f78c6977eedfe65301647b7a70f7e2921ee7f40c389a2575ff668",
+    "bytes": 2170040
+  },
+  "transform": "separate copies, strip --strip-debug, chmod 555 before hashing",
+  "build_command": "cargo test --locked --no-run --test root_worker --manifest-path research/relation_degree_trace_20261115/rust-integration/Cargo.toml --target-dir target --message-format=json",
+  "toolchain": "rustc 1.100.0 (0ef1bc386 2026-11-09)"
+}

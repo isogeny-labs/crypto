@@ -1,0 +1,116 @@
+error: expected pattern, found keyword `show`
+  ┌─ report.typ:5:5
+  │
+5 │ #let show(v)=if v==none {[not recorded]} else if type(v)==bool {repr(v)} else {str(v)}
+  │      ^^^^
+  │
+  = hint: keyword `show` is not allowed as an identifier; try `show_` instead
+
+error: expected semicolon or line break
+  ┌─ report.typ:5:12
+  │
+5 │ #let show(v)=if v==none {[not recorded]} else if type(v)==bool {repr(v)} else {str(v)}
+  │             ^
+
+error: expected colon
+   ┌─ report.typ:15:7
+   │
+15 │  [#show(s.planned_executions) / #show(s.attempted_executions) / #show(s.completed_executions)],
+   │        ^
+
+error: the character `#` is not valid in code
+   ┌─ report.typ:15:32
+   │
+15 │  [#show(s.planned_executions) / #show(s.attempted_executions) / #show(s.completed_executions)],
+   │                                 ^
+   │
+   = hint: you are already in code mode
+   = hint: try removing the `#`
+
+error: expected semicolon or line break
+   ┌─ report.typ:15:33
+   │
+15 │  [#show(s.planned_executions) / #show(s.attempted_executions) / #show(s.completed_executions)],
+   │                                  ^
+
+error: expected colon
+   ┌─ report.typ:15:69
+   │
+15 │  [#show(s.planned_executions) / #show(s.attempted_executions) / #show(s.completed_executions)],
+   │                                                                      ^
+
+error: expected colon
+   ┌─ report.typ:17:7
+   │
+17 │  [#show(s.observed_process_exit) / #show(s.full_recovery_validation_passed)],
+   │        ^
+
+error: the character `#` is not valid in code
+   ┌─ report.typ:17:35
+   │
+17 │  [#show(s.observed_process_exit) / #show(s.full_recovery_validation_passed)],
+   │                                    ^
+   │
+   = hint: you are already in code mode
+   = hint: try removing the `#`
+
+error: expected semicolon or line break
+   ┌─ report.typ:17:36
+   │
+17 │  [#show(s.observed_process_exit) / #show(s.full_recovery_validation_passed)],
+   │                                     ^
+
+error: expected colon
+   ┌─ report.typ:18:39
+   │
+18 │  [Comparative follow-up allowed],[#show(s.allows_new_frozen_comparison)],
+   │                                        ^
+
+error: expected colon
+   ┌─ report.typ:27:18
+   │
+27 │  ([#raw(k)],[#show(sampler(a).at(k))],[#show(sampler(b).at(k))])).flatten(),
+   │                   ^
+
+error: expected colon
+   ┌─ report.typ:27:44
+   │
+27 │  ([#raw(k)],[#show(sampler(a).at(k))],[#show(sampler(b).at(k))])).flatten(),
+   │                                             ^
+
+error: expected colon
+   ┌─ report.typ:29:7
+   │
+29 │  [#show(sampler(a).known_native_priced_bitops)],
+   │        ^
+
+error: expected colon
+   ┌─ report.typ:30:7
+   │
+30 │  [#show(sampler(b).known_native_priced_bitops)],
+   │        ^
+
+error: expected colon
+   ┌─ report.typ:32:27
+   │
+32 │  ([Unpriced #raw(k)],[#show(sampler(a).unpriced_native.at(k))],
+   │                            ^
+
+error: expected colon
+   ┌─ report.typ:33:7
+   │
+33 │  [#show(sampler(b).unpriced_native.at(k))])).flatten(),
+   │        ^
+
+error: expected colon
+   ┌─ report.typ:35:26
+   │
+35 │  [Recovered scalar],[#show(a.recovered_scalar)],[#show(b.recovered_scalar)],
+   │                           ^
+
+error: expected colon
+   ┌─ report.typ:35:54
+   │
+35 │  [Recovered scalar],[#show(a.recovered_scalar)],[#show(b.recovered_scalar)],
+   │                                                       ^
+

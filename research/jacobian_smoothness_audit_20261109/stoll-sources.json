@@ -1,0 +1,57 @@
+{
+  "schema": "theorem-audit-source-plan/v1",
+  "status": "Preissue draft; no Stoll supplement/packet issued. Whole cycle gate pending.",
+  "formal": {
+    "lean": "leanprover/lean4:v4.35.0",
+    "mathlib_revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "theorem": "MumfordStollCycleGroupAudit.stoll_cycle_audit_certificate",
+    "decl_sha256": "49d8de4ecf3e004c4cda593684b3a5c2f543a9398e5e3fa3c9a8ae123d0da511",
+    "statement": "theorem stoll_cycle_audit_certificate : Nat.Prime 5 \u2227 (5:\u2115)\u22603 \u2227 addOrderOf (cycleMap 1)=5 \u2227 (cycleMap 1).val.u=X \u2227 (cycleMap 1).val.v=1 \u2227 Fintype.card ReducedPair=10 \u2227 Fintype.card {P : ReducedPair // P.u.Splits}=8 \u2227 Fintype.card CyclePair=5 \u2227 Fintype.card {P : CyclePair // P.val.u.Splits}=5 \u2227 (\u00ac \u2200 P : ReducedPair, \u2203 Q : CyclePair, Q.val=P) \u2227 (\u2200 P Q : CyclePair, ExplicitCantorStep P.val Q.val (P+Q).val) \u2227 (\u2200 P Q : CyclePair, \u2203 d U : K[X], d=gcd (gcd P.val.u Q.val.u) (P.val.v+Q.val.v) \u2227 d.Monic \u2227 U.Monic \u2227 d^2*U=P.val.u*Q.val.u) \u2227 cycleFraction=1 \u2227 ambientFraction=4/5 \u2227 cycleFraction\u2260ambientFraction",
+    "sources": [
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordStoll.lean",
+        "sha256": "f33f37aa97450b83ddec77c38e8e46bbfc0b280b089ebee5f967723ac7e79e13",
+        "bytes": 14531
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordStollCantor.lean",
+        "sha256": "dd3d8df8d1ce55f3aa380b8f8950343678c82c5b8d3bd7da9d5b4a0101a526cf",
+        "bytes": 8134
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordStollCycleGroup.lean",
+        "sha256": "7ed577d0e275f1d690d423c85f483611a27a6819f436088319aff7475258f287",
+        "bytes": 7609
+      }
+    ],
+    "scope": "Complete ten-pair model and actual Cantor-matched five-pair cyclic arithmetic image; no full ten-pair ambient group or geometric Picard identification."
+  },
+  "identity_plan": {
+    "status": "Source/plan commit required before issue.",
+    "source": {
+      "path": "research/jacobian_smoothness_audit_20261109/identity/src/bin/mumford_stoll.rs",
+      "sha256": "9cfc18ca37e1db3c4cdefc60fb727809fc77eb39c39946ed74ff1c2576f24a87",
+      "bytes": 2921
+    },
+    "cargo_lock": {
+      "path": "research/jacobian_smoothness_audit_20261109/identity/Cargo.lock",
+      "sha256": "8f6ee1f1edd91391f7468c6b46f0b7536c05752132fe0cd3f18de92f341c3b61",
+      "bytes": 2880
+    },
+    "variables": 5,
+    "total_degree": 5,
+    "seed_hex": "0x202611092245",
+    "points": 32,
+    "extra_seed_hex": "0x5e4ae098",
+    "extra_points": 11,
+    "scope": "Only scalar x5-plus-one quadratic quotient/remainder identity; count, splitting, actual gcd, all25Cantorsteps, generation/order/proportion rest on Lean."
+  },
+  "primary_source": {
+    "url": "https://www.mathe2.uni-bayreuth.de/stoll/teaching/ArithHypKurven-SS2014/Skript-ArithHypCurves-pub-screen.pdf",
+    "pdf_sha256": "619150b20644d44b3fee4aeda6ece57d4e5a2d5b1343d0dc2dcbafd1bb9cb321",
+    "scopes_read": "Definition2.2p5; Lemmas4.16\u20134.17/Theorem4.18pp23\u201325; Example4.19pp25\u201326; Lemma5.2p30. Prior source notes in cantor-sources.json.",
+    "original_cantor_1987": "Publisher403; unread, not substituted by notes."
+  },
+  "native_population_protocol_sha256": "a7bc5ba9f6af90f196155a4ff30093f4bd47701568c4c58cfc01b3bfc42828dc",
+  "paid_spend": 0
+}

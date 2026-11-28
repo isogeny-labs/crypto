@@ -12,8 +12,14 @@
 //!
 //! - `mode=chain` (default, `m = 3`): `S₃(x_1, x_2, u_1)`, …,
 //!   `S₃(u_{m−2}, x_m, x_R)` with free unknowns `u_k`.
+//! - `mode=projective` (`m = 3`): the same split with a homogeneous
+//!   intermediate `(X:Z)`, a Boolean chart selector, and `(1:0)` for the
+//!   identity branch. Both adjacent `S₃` equations are bihomogenised; no
+//!   division by `Z` is performed.
 //! - `mode=full` (`m = 2`, or `m = 3` on request): `S_{m+1}` itself; `S₄` is the resultant
 //!   `Res_U(S₃(x_1, x_2, U), S₃(x_3, x_R, U))` by the two-quadratic formula.
+//! - `mode=sym` (`m ≤ 4`): `S_{m+1}` through elementary symmetric
+//!   auxiliaries and a target-specialised symmetric Semaev polynomial.
 //! - `engine=exhaustive` replaces F4 by the grid reference of the note's
 //!   §4.4: every unordered `(x_1, …, x_m) ∈ V^m` is tested against
 //!   `S_{m+1} = 0`, `F_p` multiplications counted.  It is the cross-check
@@ -43,7 +49,7 @@
 //! The target-independent work (the symbolic system and its tower normal
 //! forms) is done once in `prepare` and reported as setup native work.
 
-use std::collections::{BTreeMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
@@ -53,10 +59,14 @@ use super::stages::{
     DecompositionOracle, InstanceCtx, Params, SolverCost, SolverTotals, SystemShape,
 };
 use crate::cryptanalysis::f4_fp_tower::{
-    f4_tower, mono, F4Trace, Fp, RPoly, SquareRule, TowerF4Options, TowerRing, MAX_FREE,
+    degree_of, f4_tower, free_of, mask_of, mono, F4Trace, Fp, RPoly, SquareRule, TowerF4Options,
+    TowerF4Report, TowerRing, TowerWeights, MAX_FREE, ONE,
 };
 use crate::cryptanalysis::ic_boundary::{
     lift_abscissae, CountedGroup, FactorBase, GroupOps, OracleCounters, PrimeCurve, PrimePoint,
+};
+use crate::cryptanalysis::symmetrized_semaev::{
+    eval_s3_u64, eval_s4_counted, eval_s5_counted, ParamSymmetricSemaev,
 };
 
 fn mulm(a: u64, b: u64, p: u64) -> u64 {
@@ -164,6 +174,25 @@ fn s3_in_u(x1: &Pol, x2: &Pol, a: u64, b: u64, p: u64) -> [Pol; 3] {
 fn s3(x1: &Pol, x2: &Pol, x3: &Pol, a: u64, b: u64, p: u64) -> Pol {
     let [al, be, ga] = s3_in_u(x1, x2, a, b, p);
     al.mul(x3, p).mul(x3, p).add(&be.mul(x3, p), p).add(&ga, p)
+}
+
+/// `S₃(N₁/D₁, N₂/D₂, N₃/D₃)` with all three squared denominators
+/// cleared. This is the bihomogeneous projective closure of `S₃`; in
+/// particular `(N₃:D₃) = (1:0)` is the identity chart used by the
+/// split-chain oracle.
+fn s3_frac(
+    x1: (&Pol, &Pol),
+    x2: (&Pol, &Pol),
+    (n3, d3): (&Pol, &Pol),
+    a: u64,
+    b: u64,
+    p: u64,
+) -> Pol {
+    let [al, be, ga] = s3_in_u_frac(x1, x2, a, b, p);
+    al.mul(n3, p)
+        .mul(n3, p)
+        .add(&be.mul(n3, p).mul(d3, p), p)
+        .add(&ga.mul(d3, p).mul(d3, p), p)
 }
 
 /// `S₄(x1, x2, x3, x4) = Res_U(S₃(x1, x2, U), S₃(x3, x4, U))`, by
@@ -696,22 +725,123 @@ pub fn t0_factor_base(
     fb
 }
 
+/// Abscissae of a Dickson / `T_2`-torus 2-power tower over `F_p`:
+/// `y_{t-1}² = c_top + 2`, `y_j² = y_{j+1} + 2`, `x = (y_0 + lo) mod p`.
+/// Requires `2^t` distinct `F_p` roots (e.g. `p ≡ 3 (mod 4)` with `2^{t+2} | p + 1`
+/// and `c_top = 0`, such as `M31 = 2^31 − 1` for `1 ≤ t ≤ 29`).
+pub fn dickson_abscissae(p: u64, t: u32, lo: u64, c_top: u64) -> Result<Vec<u64>, String> {
+    if t == 0 || t >= 30 {
+        return Err(format!(
+            "pkm-semaev: dickson tower height t = {t} must be in 1..30"
+        ));
+    }
+    let dummy_curve = PrimeCurve { p, a: 0, b: 1 };
+    let mut layer = vec![c_top % p];
+    for step in (0..t).rev() {
+        let mut next = Vec::with_capacity(layer.len() * 2);
+        for &u in &layer {
+            let rhs = addm(u, 2 % p, p);
+            if rhs == 0 {
+                return Err(format!(
+                    "pkm-semaev: dickson tower ramifies (rhs = 0) at level {step} mod {p}"
+                ));
+            }
+            let Some(r) = dummy_curve.sqrt(rhs) else {
+                return Err(format!(
+                    "pkm-semaev: dickson tower fails to split in F_{p} at level {step}"
+                ));
+            };
+            let r0 = r.min(p - r);
+            let r1 = p - r0;
+            next.push(r0);
+            if r1 != r0 {
+                next.push(r1);
+            }
+        }
+        layer = next;
+    }
+    let xs: Vec<u64> = layer.into_iter().map(|y0| addm(y0, lo % p, p)).collect();
+    let uniq: HashSet<u64> = xs.iter().copied().collect();
+    if uniq.len() != (1usize << t) {
+        return Err(format!(
+            "pkm-semaev: dickson tower produced {} distinct roots instead of 2^{t}",
+            uniq.len()
+        ));
+    }
+    Ok(xs)
+}
+
+/// Factor base carried by a Dickson / `T_2`-torus tower of height `t`.
+pub fn dickson_factor_base(
+    inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
+    t: u32,
+    lo: u64,
+    c_top: u64,
+) -> Result<FactorBase<PrimePoint>, String> {
+    let curve = &inst.curve;
+    let xs = dickson_abscissae(curve.p, t, lo, c_top)?;
+    let mut fb = FactorBase::empty(format!("Dickson/T2 tower t={t}, lo={lo}, c_top={c_top}"));
+    for x in xs {
+        let rhs = curve.rhs(x);
+        let Some(y) = curve.sqrt(rhs) else { continue };
+        let y = if y == 0 { 0 } else { y.min(curve.p - y) };
+        let pt = PrimePoint::affine(x, y);
+        let qn = curve.neg(pt);
+        let col = fb.abscissae;
+        let i = fb.points.len();
+        fb.points.push(pt);
+        fb.col_of.push(col);
+        fb.coef_of.push(1);
+        if qn != pt {
+            fb.points.push(qn);
+            fb.col_of.push(col);
+            fb.coef_of.push(inst.r - 1);
+            fb.neg_index.push(i + 1);
+            fb.neg_index.push(i);
+            fb.x_index.insert(x, vec![i, i + 1]);
+        } else {
+            fb.neg_index.push(i);
+            fb.x_index.insert(x, vec![i]);
+        }
+        fb.abscissae += 1;
+    }
+    fb.columns = fb.abscissae;
+    for (i, pt) in fb.points.iter().enumerate() {
+        fb.point_index.insert(curve.key(pt), i);
+    }
+    fb.abscissa_list = fb.x_index.keys().copied().collect();
+    fb.abscissa_list.sort_unstable();
+    Ok(fb)
+}
+
 // ── The oracle ───────────────────────────────────────────────────────
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PkmMode {
     Chain,
+    /// Bihomogeneous split chain with a normalized identity chart (`m = 3`).
+    Projective,
     Full,
+    /// Symmetrised `S_{m+1}` via `e_1 … e_m` and curve-once `ParamSymmetricSemaev` (`m ≤ 4`).
+    Sym,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PkmEngine {
     F4,
     Exhaustive,
+    /// `m = 2` univariate elimination: `R(X) = Res_Y(F_V(Y), S₃(Y, x_R, X))
+    /// = ∏_{v ∈ V} S₃(v, x_R, X)` by a Karatsuba product tree, then
+    /// `gcd(R, F_V)` by Euclid, `F_V = ∏_{v ∈ V}(X − v)` built once.
+    ResGcd,
+    /// `m = 2` per-element scan: for each `v ∈ V` solve the quadratic
+    /// `S₃(v, X, x_R) = 0` and test `X ∈ V` by hash lookup — `O(|V|)`
+    /// quadratic solves, the algebraic engines' `O~(|V|)` comparator.
+    Scan,
 }
 
 /// What a prepared run holds: the ring, the system split by powers of
-/// `x_R`, and the grid.
+/// `x_R`, and the carrier table.
 struct Prepared {
     ring: TowerRing,
     /// `eqs[e][k]`: the part of equation `e` with `x_R^k`, in tower normal
@@ -719,8 +849,19 @@ struct Prepared {
     eqs: Vec<Vec<RPoly>>,
     tower_eqs: usize,
     degrees: Vec<u32>,
-    /// `V`, in the order `g·ζ^k`.
+    /// `V`, in canonical tower order.
     v: Vec<u64>,
+    /// Map from `x ∈ V` to its first index in `v` (canonical solution ordering).
+    v_rank: HashMap<u64, u32>,
+    /// For branches with dropped top tower variables on summand 0, the fixed values
+    /// of `(0, j)` for `t - g_dropped .. t`.
+    fixed_s0_top: Vec<(usize, u64)>,
+    /// Curve-once `X_R`-power-split symmetric polynomial (`PkmMode::Sym`).
+    param_sym: Option<Arc<ParamSymmetricSemaev>>,
+    /// Static roots of each distinct tower square-rule `(a,b,c,d)` over `F_p`.
+    /// Filled once in `prepare` so descent DFS does not re-run Tonelli–Shanks
+    /// on every branch (the tiny-`t` Dickson `grid()` crossover).
+    rule_roots: HashMap<(u64, u64, u64, u64), Vec<u64>>,
 }
 
 /// How each summand's abscissa is tied to its `t` tower variables
@@ -776,6 +917,9 @@ pub enum Membership {
     /// (research/curve25519_torsion_leads_20261103).  Each `x_i` has degree
     /// 2 in its `w_i`, so `S₃` has degree 4 per summand in the bits.
     SquareBits { lo: u64, shift: Option<u64> },
+    /// Dickson / `T_2`-torus 2-power tower: `x = y_0 + lo`,
+    /// `y_j² = y_{j+1} + 2`, `y_{t-1}² = c_top + 2`.
+    Dickson { lo: u64, c_top: u64 },
 }
 
 /// The oracle.  Built by the harness with the base's `t` and `g`, which it
@@ -790,18 +934,29 @@ pub struct PkmSemaevOracle {
     membership: Membership,
     mode: PkmMode,
     engine: PkmEngine,
+    /// `F_V = ∏_{v ∈ V}(X − v)` for `engine=resgcd`, built on first use.
+    resgcd_fv: Option<Vec<u64>>,
     max_degree: u32,
     max_nnz: Option<u64>,
     stop_staircase: Option<usize>,
     budget: Option<Duration>,
     crosscheck: bool,
-    /// Hybrid guessing (bits, digits and isogeny forms): the top `guess`
-    /// bits (digits, tower levels) of the first summand are enumerated, one
-    /// F4 system per assignment.
+    /// Hybrid guessing: the top `guess` tower levels / bits of the first
+    /// summand are split.
     guess: u32,
-    /// F4 trace (`trace=1`): learn one refutation trace per branch system at
-    /// `prepare`, replay it per target, fall back to plain F4 when it fails.
+    /// Explicit `trace=0|1` override (`None` = auto-enable on `p >= 2^16`).
+    trace_explicit: Option<bool>,
+    /// F4 trace (`trace=1` or default on `p >= 2^16`): learn one minimal-1-witness
+    /// refutation trace per branch system at `prepare`, replay per target, and
+    /// fall back cleanly to plain F4 on pivot vanish or non-refutation.
     trace: bool,
+    /// Parent-to-child `F_p` basis inheritance when `guess > 0` runs plain F4.
+    inherit: bool,
+    /// Algebraic tower/quotient root descent instead of `O(|V|^m)` `grid()` fallback.
+    descent: bool,
+    /// `|V|^m` at or below which `grid()` replaces descent (`grid_crossover=`; 0 forces
+    /// descent on every domain, which the descent-versus-grid gate uses).
+    grid_crossover: u64,
     /// One learned trace per branch system (one entry without guessing).
     traces: Vec<Option<Arc<F4Trace>>>,
     /// Learning cost and shape counters, reported as setup native work.
@@ -836,7 +991,70 @@ pub struct PkmSemaevOracle {
     dataset_artifact: Option<serde_json::Value>,
 }
 
+#[derive(Default)]
+struct BasisDfsStats {
+    visited_nodes: u64,
+    root_split_branches: u64,
+    terminal_leaves: u64,
+    algebraic_tuples: u64,
+    peak_live_basis_cache_terms: u64,
+    branch_copy_basis_terms: u64,
+    branch_copy_state_slots: u64,
+}
+
 impl PkmSemaevOracle {
+    fn record_basis_dfs(&mut self, stats: BasisDfsStats) {
+        self.bump("pkm_basis_dfs_visited_nodes", stats.visited_nodes);
+        self.bump(
+            "pkm_basis_dfs_root_split_branches",
+            stats.root_split_branches,
+        );
+        self.bump("pkm_basis_dfs_terminal_leaves", stats.terminal_leaves);
+        self.bump("pkm_basis_dfs_algebraic_tuples", stats.algebraic_tuples);
+        let peak = self
+            .native
+            .entry("pkm_basis_dfs_peak_live_basis_cache_terms_lower_bound_max".into())
+            .or_default();
+        *peak = (*peak).max(stats.peak_live_basis_cache_terms);
+        self.bump(
+            "pkm_basis_dfs_branch_copy_basis_terms",
+            stats.branch_copy_basis_terms,
+        );
+        self.bump(
+            "pkm_basis_dfs_branch_copy_state_slots",
+            stats.branch_copy_state_slots,
+        );
+    }
+    /// Record which normalized projective chart supplied an exact, signed
+    /// relation. Classification is made from the lifted points, not from an
+    /// algebraic root alone: the first two summands reach `(1:0)` exactly
+    /// when they are inverses. The zero-valued invalid-row counter is
+    /// materialized as well so evidence consumers need not interpret a
+    /// missing key as a successful verification.
+    fn record_projective_chart(
+        &mut self,
+        curve: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        idx: &[usize],
+    ) {
+        if self.mode != PkmMode::Projective || idx.len() != 3 {
+            return;
+        }
+        self.native.entry("pkm_invalid_rows".into()).or_insert(0);
+        let p = curve.p;
+        let a = fb.points[idx[0]];
+        let b = fb.points[idx[1]];
+        let identity = !a.infinity && !b.infinity && a.x == b.x && addm(a.y, b.y, p) == 0;
+        self.bump(
+            if identity {
+                "pkm_projective_identity_chart_hits"
+            } else {
+                "pkm_projective_affine_chart_hits"
+            },
+            1,
+        );
+    }
+
     /// `m` summands over the Kummer tower `g·μ_{2^t}`.
     pub fn new(m: u32, t: u32, g: u64) -> Self {
         PkmSemaevOracle {
@@ -846,13 +1064,18 @@ impl PkmSemaevOracle {
             membership: Membership::Kummer,
             mode: PkmMode::Chain,
             engine: PkmEngine::F4,
+            resgcd_fv: None,
             max_degree: 12,
             max_nnz: None,
             stop_staircase: None,
             budget: None,
             crosscheck: false,
             guess: 0,
+            trace_explicit: None,
             trace: false,
+            inherit: true,
+            descent: true,
+            grid_crossover: Self::DESCENT_GRID_CROSSOVER,
             traces: Vec::new(),
             trace_setup: BTreeMap::new(),
             lifts: false,
@@ -915,6 +1138,14 @@ impl PkmSemaevOracle {
         o
     }
 
+    /// `m` summands over a Dickson / `T_2`-torus tower (`y_j² = y_{j+1} + 2`,
+    /// `y_{t-1}² = c_top + 2`, `x = y_0 + lo`).
+    pub fn new_dickson(m: u32, t: u32, lo: u64, c_top: u64) -> Self {
+        let mut o = Self::new(m, t, 1);
+        o.membership = Membership::Dickson { lo, c_top };
+        o
+    }
+
     /// The oracle a pipeline spec names, on the tower its factor base was
     /// built from: `prime-kummer:t,g` (the `μ_{2^t}` coset), PKM's isogeny
     /// form `prime-isogeny:t,seed,aux` (the tower is rebuilt
@@ -929,7 +1160,7 @@ impl PkmSemaevOracle {
         spec: &super::PipelineSpec,
         inst: &crate::cryptanalysis::ic_boundary::PrimeInstance,
     ) -> Result<Self, String> {
-        use super::prime_tower::{isogeny_tower, supersingular_tower, AuxKind};
+        use super::prime_tower::{isogeny_tower, supersingular_tower, AuxFamily, AuxKind};
         let fb = &spec.factor_base_params;
         let oracle = match spec.factor_base.as_str() {
             "prime-kummer" => Self::new(m, fb.u64("t")? as u32, fb.u64_or("g", 1)?),
@@ -940,7 +1171,7 @@ impl PkmSemaevOracle {
                 let kind = AuxKind::parse(fb.get("aux").unwrap_or("ordinary"), p)?;
                 let mut scratch = GroupOps::default();
                 let tower = if kind == AuxKind::Ordinary {
-                    isogeny_tower(p, t, seed, &mut scratch)?
+                    isogeny_tower(p, t, seed, AuxFamily::Any, &mut scratch)?
                 } else {
                     supersingular_tower(p, t, seed, kind, &mut scratch)?
                 };
@@ -987,6 +1218,12 @@ impl PkmSemaevOracle {
             _ if spec.oracle_params.get("edwards_bits").is_some() => {
                 Self::new_edwards_bits(m, spec.oracle_params.u64("edwards_bits")? as u32)
             }
+            _ if spec.oracle_params.get("dickson").is_some() => Self::new_dickson(
+                m,
+                spec.oracle_params.u64("dickson")? as u32,
+                spec.oracle_params.u64_or("lo", 0)?,
+                spec.oracle_params.u64_or("c_top", 0)?,
+            ),
             other => {
                 return Err(format!(
                     "oracle `pkm-semaev` solves on prime-kummer or prime-isogeny, or on any base \
@@ -1048,14 +1285,24 @@ impl PkmSemaevOracle {
         Some(serde_json::json!({"schema":"pkm-prepared-system/v1",
             "modulus":prep.ring.p.to_string(),"m":self.m,"t":self.t,"g":self.g.to_string(),
             "mode":format!("{:?}",self.mode),"tower_variables":prep.ring.n_tower(),
-            "free_variables":prep.ring.n_free,"variable_order":"tower blocks by summand, then chain auxiliaries",
+            "free_variables":prep.ring.n_free,"variable_order":match self.mode {
+                PkmMode::Chain => "tower blocks by summand, then chain auxiliaries",
+                PkmMode::Projective => "tower blocks by summand, then projective Z selectors, then projective X auxiliaries",
+                PkmMode::Full => "tower blocks by summand",
+                PkmMode::Sym => "tower blocks by summand, then elementary symmetric auxiliaries",
+            },
             "summand_map":"x_i = g * y_(i,0)",
             "square_rule_convention":"y_j^2 = a*y_j*y_next + b*y_next + c*y_j + d",
             "square_rules":prep.ring.rules.iter().map(|r|serde_json::json!({"next":r.next,
                 "a":r.a.to_string(),"b":r.b.to_string(),"c":r.c.to_string(),"d":r.d.to_string()})).collect::<Vec<_>>(),
             "equations_by_target_x_power":prep.eqs.iter().map(|parts|parts.iter().map(Self::polynomial_artifact).collect::<Vec<_>>()).collect::<Vec<_>>(),
             "grid_x":prep.v.iter().map(ToString::to_string).collect::<Vec<_>>(),"original_equation_degrees":prep.degrees,
-            "original_equation_recipe":if self.mode==PkmMode::Chain{"chained S3 with affine intermediate x coordinates"}else{"S_(m+1), m=2 S3 or m=3 S4 resultant"},
+            "original_equation_recipe":match self.mode {
+                PkmMode::Chain => "chained S3 with affine intermediate x coordinates",
+                PkmMode::Projective => "bihomogeneous chained S3 with normalized projective intermediates and explicit identity charts",
+                PkmMode::Full => "S_(m+1), m=2 S3 or m=3 S4 resultant",
+                PkmMode::Sym => "S_(m+1) through elementary symmetric auxiliaries",
+            },
             "trace_gaps":["private internal row/pivot operations and pair rejection witnesses"]}))
     }
 
@@ -1068,16 +1315,31 @@ impl PkmSemaevOracle {
             None if self.m >= 3 => PkmMode::Chain,
             None => PkmMode::Full,
             Some("chain") => PkmMode::Chain,
+            Some("projective") => PkmMode::Projective,
             Some("full") => PkmMode::Full,
-            Some(o) => return Err(format!("pkm-semaev: mode is chain or full, not {o}")),
+            Some("sym") => PkmMode::Sym,
+            Some(o) => {
+                return Err(format!(
+                    "pkm-semaev: mode is chain, projective, full or sym, not {o}"
+                ))
+            }
         };
         self.engine = match params.get("engine") {
             None | Some("f4") => PkmEngine::F4,
             Some("exhaustive") => PkmEngine::Exhaustive,
-            Some(o) => return Err(format!("pkm-semaev: engine is f4 or exhaustive, not {o}")),
+            Some("resgcd") => PkmEngine::ResGcd,
+            Some("scan") => PkmEngine::Scan,
+            Some(o) => {
+                return Err(format!(
+                    "pkm-semaev: engine is f4, exhaustive, resgcd or scan, not {o}"
+                ))
+            }
         };
-        if self.engine == PkmEngine::Exhaustive {
-            self.totals.solver = "tower-exhaustive".into();
+        match self.engine {
+            PkmEngine::Exhaustive => self.totals.solver = "tower-exhaustive".into(),
+            PkmEngine::ResGcd => self.totals.solver = "univariate-resultant-gcd".into(),
+            PkmEngine::Scan => self.totals.solver = "quadratic-scan".into(),
+            PkmEngine::F4 => {}
         }
         self.max_degree = params.u64_or("degree", 12)? as u32;
         self.max_nnz = params
@@ -1090,14 +1352,30 @@ impl PkmSemaevOracle {
             .transpose()?;
         self.crosscheck = params.flag("crosscheck");
         self.guess = params.u64_or("guess", 0)? as u32;
-        self.trace = match params.u64_or("trace", 0)? {
-            0 => false,
-            1 => true,
-            o => return Err(format!("pkm-semaev: trace is 0 or 1, not {o}")),
+        self.trace_explicit = match params.get("trace") {
+            None => None,
+            Some(_) => match params.u64("trace")? {
+                0 => Some(false),
+                1 => Some(true),
+                o => return Err(format!("pkm-semaev: trace is 0 or 1, not {o}")),
+            },
         };
-        if self.trace && (self.engine != PkmEngine::F4 || self.stop_staircase.is_some()) {
+        if self.trace_explicit == Some(true)
+            && (self.engine != PkmEngine::F4 || self.stop_staircase.is_some())
+        {
             return Err("pkm-semaev: trace=1 needs engine=f4 and no staircase stop".into());
         }
+        self.inherit = match params.u64_or("inherit", 1)? {
+            0 => false,
+            1 => true,
+            o => return Err(format!("pkm-semaev: inherit is 0 or 1, not {o}")),
+        };
+        self.descent = match params.u64_or("descent", 1)? {
+            0 => false,
+            1 => true,
+            o => return Err(format!("pkm-semaev: descent is 0 or 1, not {o}")),
+        };
+        self.grid_crossover = params.u64_or("grid_crossover", Self::DESCENT_GRID_CROSSOVER)?;
         let lifts = params.u64_or("lifts", 0)?;
         if lifts > 2 {
             return Err(format!("pkm-semaev: lifts is 0, 1 or 2, not {lifts}"));
@@ -1105,35 +1383,72 @@ impl PkmSemaevOracle {
         self.lifts = lifts >= 1;
         self.shared_req = lifts == 2;
         if self.shared_req
-            && (self.engine != PkmEngine::F4 || self.stop_staircase.is_some() || self.m != 2)
+            && (self.engine != PkmEngine::F4
+                || self.stop_staircase.is_some()
+                || self.m != 2
+                || matches!(self.mode, PkmMode::Projective | PkmMode::Sym))
         {
             return Err(
-                "pkm-semaev: lifts=2 (shared system) needs engine=f4, m=2 and no staircase stop"
+                "pkm-semaev: lifts=2 (shared system) needs engine=f4, m=2, mode=chain|full and no staircase stop"
                     .into(),
             );
         }
-        if self.guess > 0 {
-            if matches!(self.membership, Membership::Kummer) {
-                return Err("pkm-semaev: guess=G applies to the bits and isogeny forms".into());
-            }
-            if self.guess >= self.t || self.guess > 12 {
-                return Err(format!(
-                    "pkm-semaev: guess = {} must be below the tower height {} and at most 12",
-                    self.guess, self.t
-                ));
-            }
+        if self.guess > 0 && (self.guess >= self.t || self.guess > 12) {
+            return Err(format!(
+                "pkm-semaev: guess = {} must be below the tower height {} and at most 12",
+                self.guess, self.t
+            ));
         }
-        // The grid that reads a consistent system's solutions takes m ≤ 3.
-        if !(2..=3).contains(&self.m) {
-            return Err(format!("pkm-semaev: m is 2 or 3, not {}", self.m));
+        if self.mode == PkmMode::Projective && self.m != 3 {
+            return Err("pkm-semaev: projective mode currently needs m=3".into());
         }
         if self.mode == PkmMode::Chain && self.m < 3 {
             self.mode = PkmMode::Full; // m = 2: S₃ alone, no free unknown
         }
-        if self.t == 0 || (self.m * self.t) as usize > 64 {
+        if self.mode == PkmMode::Projective && self.m != 3 {
+            return Err("pkm-semaev: projective mode currently needs m=3".into());
+        }
+        if self.engine == PkmEngine::Scan && self.m != 2 {
             return Err(format!(
-                "pkm-semaev: m·t = {} tower variables; the engine takes 1 to 64",
-                self.m * self.t
+                "pkm-semaev: engine=scan takes m = 2, not {}",
+                self.m
+            ));
+        }
+        if self.engine == PkmEngine::ResGcd && !(2..=3).contains(&self.m) {
+            return Err(format!(
+                "pkm-semaev: engine=resgcd takes m = 2 or 3, not {}",
+                self.m
+            ));
+        }
+        if self.engine != PkmEngine::F4 || !self.descent || self.crosscheck {
+            if !(2..=3).contains(&self.m) {
+                return Err(format!(
+                    "pkm-semaev: grid/crosscheck modes take m in 2..=3, not {}",
+                    self.m
+                ));
+            }
+        } else {
+            let max_m = match self.mode {
+                PkmMode::Full => 3,
+                PkmMode::Projective => 3,
+                PkmMode::Sym => 4,
+                PkmMode::Chain => 5,
+            };
+            if !(2..=max_m).contains(&self.m) {
+                return Err(format!(
+                    "pkm-semaev: mode {:?} takes m in 2..={max_m}, not {}",
+                    self.mode, self.m
+                ));
+            }
+        }
+        if self.mode == PkmMode::Sym && matches!(self.membership, Membership::EdwardsBits { .. }) {
+            return Err("pkm-semaev: mode=sym is not supported with edwards_bits".into());
+        }
+        let selectors = usize::from(self.mode == PkmMode::Projective);
+        let tower_variables = (self.m * self.t) as usize + selectors;
+        if self.t == 0 || tower_variables > 64 {
+            return Err(format!(
+                "pkm-semaev: {tower_variables} tower variables including projective selectors; the engine takes 1 to 64"
             ));
         }
         Ok(())
@@ -1142,27 +1457,65 @@ impl PkmSemaevOracle {
     /// Build the ring and the system with `x_R` as a variable, then split
     /// by powers of `x_R`.
     fn finish_prepare(&mut self, curve: &PrimeCurve, check_mults: u64) -> Result<(), String> {
-        let prep = self.build_system(curve);
+        self.trace = match self.trace_explicit {
+            Some(on) => on,
+            None => {
+                curve.p >= (1 << 16)
+                    && self.engine == PkmEngine::F4
+                    && self.stop_staircase.is_none()
+                    && !self.dataset_trace
+            }
+        };
+        let (a, b) = self.s3_coefficients(curve);
+        let param_sym = if self.mode == PkmMode::Sym {
+            Some(Arc::new(ParamSymmetricSemaev::build(
+                self.m as usize,
+                a,
+                b,
+                curve.p,
+            )?))
+        } else {
+            None
+        };
+        let prep = self.build_system_with_sym(curve, param_sym.clone());
         let n_vars = prep.ring.n_vars();
         let mut degrees = prep.degrees.clone();
+        if let Some(sym) = &param_sym {
+            degrees.push((1u32 << (sym.m - 1)) * 2);
+        }
         degrees.extend(std::iter::repeat_n(2, prep.tower_eqs));
         if self.shared {
             degrees.push(self.fiber.as_ref().map_or(1, |f| f.size() as u32));
         }
         self.shape = Some(SystemShape {
             n_vars,
-            n_equations: prep.eqs.len() + prep.tower_eqs + usize::from(self.shared),
+            n_equations: prep.eqs.len()
+                + usize::from(param_sym.is_some())
+                + prep.tower_eqs
+                + usize::from(self.shared),
             degrees,
             semi_regular_degree: None,
         });
         self.setup_mults = check_mults;
-        self.branches = (0..(1u64 << self.guess))
-            .filter(|_| self.guess > 0)
-            .map(|a| self.build_system_fixed(curve, Some(a)))
-            .collect();
+        self.branches = if self.guess == 0 {
+            Vec::new()
+        } else if matches!(
+            self.membership,
+            Membership::Kummer | Membership::Dickson { .. }
+        ) {
+            Self::build_dropped_tower_branches(&prep, curve, self.t as usize, self.guess as usize)?
+        } else {
+            (0..(1u64 << self.guess))
+                .map(|idx| self.build_system_fixed(curve, Some(idx), param_sym.clone()))
+                .collect()
+        };
         self.prepared = Some(prep);
         self.traces.clear();
         self.trace_setup.clear();
+        if let Some(sym) = &param_sym {
+            self.trace_setup
+                .insert("pkm_param_sym_setup_mults".into(), sym.setup_fp_mults);
+        }
         if self.trace {
             self.learn_traces();
         }
@@ -1321,17 +1674,169 @@ impl PkmSemaevOracle {
         }
     }
 
-    fn build_system(&self, curve: &PrimeCurve) -> Prepared {
-        self.build_system_fixed(curve, None)
+    fn build_system_with_sym(
+        &self,
+        curve: &PrimeCurve,
+        param_sym: Option<Arc<ParamSymmetricSemaev>>,
+    ) -> Prepared {
+        self.build_system_fixed(curve, None, param_sym)
+    }
+
+    fn tower_rule_roots(curve: &PrimeCurve, r: &SquareRule) -> Vec<u64> {
+        let p = curve.p;
+        let inv2 = p.div_ceil(2);
+        let half_c = mulm(r.c % p, inv2, p);
+        let disc = addm(mulm(half_c, half_c, p), r.d % p, p);
+        if disc == 0 {
+            vec![half_c]
+        } else if let Some(s) = curve.sqrt(disc) {
+            let s0 = s.min(p - s);
+            let mut out = vec![addm(half_c, s0, p), subm(half_c, s0, p)];
+            out.sort_unstable();
+            out.dedup();
+            out
+        } else {
+            Vec::new()
+        }
+    }
+
+    #[inline]
+    fn rule_abcd(r: &SquareRule) -> (u64, u64, u64, u64) {
+        (r.a, r.b, r.c, r.d)
+    }
+
+    /// Exhaustive `grid()` beats algebraic descent when `|V|^m` is tiny
+    /// (measured Dickson `m=3,t=3` crossover: `|V|=8` → 512 triples still
+    /// cheaper than descent DFS even after prepare()-time root caching).
+    const DESCENT_GRID_CROSSOVER: u64 = 512;
+
+    /// Prefer legacy `grid()` extraction over basis-root descent.
+    /// `grid()` only implements `m ≤ 3`, so larger `m` always stays on descent.
+    fn prefer_grid_extraction(&self) -> bool {
+        if self.m > 3 {
+            return false;
+        }
+        let Some(prep) = self.prepared.as_ref() else {
+            return false;
+        };
+        let v = prep.v.len() as u64;
+        v.saturating_pow(self.m) <= self.grid_crossover
+    }
+
+    /// `descent=1` and the domain is large enough that descent wins.
+    fn use_descent_extraction(&self) -> bool {
+        self.descent && !self.prefer_grid_extraction()
+    }
+
+    /// Precompute Tonelli–Shanks roots for every distinct square-rule shape
+    /// in `ring` (and any extra rules passed in).
+    fn build_rule_root_cache(
+        curve: &PrimeCurve,
+        ring: &TowerRing,
+        extra: &[SquareRule],
+    ) -> HashMap<(u64, u64, u64, u64), Vec<u64>> {
+        let mut map = HashMap::new();
+        for r in ring.rules.iter().chain(extra.iter()) {
+            let k = Self::rule_abcd(r);
+            map.entry(k)
+                .or_insert_with(|| Self::tower_rule_roots(curve, r));
+        }
+        map
+    }
+
+    /// Look up cached roots; fall back to a one-shot Tonelli–Shanks if missing.
+    fn lookup_rule_roots(
+        cache: &HashMap<(u64, u64, u64, u64), Vec<u64>>,
+        curve: &PrimeCurve,
+        r: &SquareRule,
+    ) -> Vec<u64> {
+        cache
+            .get(&Self::rule_abcd(r))
+            .cloned()
+            .unwrap_or_else(|| Self::tower_rule_roots(curve, r))
+    }
+
+    /// Build `2^g` leaf `Prepared` branches for `Kummer` / `Dickson` by dropping
+    /// the top `g` tower variables of summand 0 (`t - 1` down to `t - g`).
+    fn build_dropped_tower_branches(
+        root: &Prepared,
+        curve: &PrimeCurve,
+        t: usize,
+        g: usize,
+    ) -> Result<Vec<Prepared>, String> {
+        let mut states: Vec<(TowerRing, Vec<Vec<RPoly>>, Vec<(usize, u64)>)> =
+            vec![(root.ring.clone(), root.eqs.clone(), Vec::new())];
+        for depth in 0..g {
+            let var = t - 1 - depth;
+            let mut next_states = Vec::with_capacity(states.len() * 2);
+            for (ring, eqs, fixed_so_far) in states {
+                let roots = Self::lookup_rule_roots(&root.rule_roots, curve, &ring.rules[var]);
+                if roots.len() != 2 {
+                    return Err(format!(
+                        "pkm-semaev: summand-0 tower level {var} has {} roots in F_{} instead of 2",
+                        roots.len(),
+                        curve.p
+                    ));
+                }
+                for rt in roots {
+                    let (mut child_ring, _, _, _) =
+                        ring.specialize_drop_top_var(&[], var, rt, TowerWeights::UNIT);
+                    let mut child_eqs = Vec::with_capacity(eqs.len());
+                    for parts in &eqs {
+                        let mut c_parts = Vec::with_capacity(parts.len());
+                        for part in parts {
+                            let (r2, mut spec_vec, _, _) = ring.specialize_drop_top_var(
+                                std::slice::from_ref(part),
+                                var,
+                                rt,
+                                TowerWeights::UNIT,
+                            );
+                            child_ring = r2;
+                            let p_poly = spec_vec.pop().unwrap_or_else(|| RPoly {
+                                monos: Vec::new(),
+                                coefs: Vec::new(),
+                            });
+                            c_parts.push(p_poly);
+                        }
+                        child_eqs.push(c_parts);
+                    }
+                    let mut f2 = fixed_so_far.clone();
+                    f2.push((var, rt));
+                    next_states.push((child_ring, child_eqs, f2));
+                }
+            }
+            states = next_states;
+        }
+        Ok(states
+            .into_iter()
+            .map(|(ring, eqs, fixed_s0_top)| Prepared {
+                tower_eqs: ring.n_tower(),
+                ring,
+                eqs,
+                degrees: root.degrees.clone(),
+                v: root.v.clone(),
+                v_rank: root.v_rank.clone(),
+                fixed_s0_top,
+                param_sym: root.param_sym.clone(),
+                rule_roots: root.rule_roots.clone(),
+            })
+            .collect())
     }
 
     /// The system, with the top `guess` bits of the first summand fixed to
-    /// `fixed` when it is given (bits form; hybrid guessing).
-    fn build_system_fixed(&self, curve: &PrimeCurve, fixed: Option<u64>) -> Prepared {
+    /// `fixed` when it is given (bits/isogeny form; hybrid guessing).
+    fn build_system_fixed(
+        &self,
+        curve: &PrimeCurve,
+        fixed: Option<u64>,
+        param_sym: Option<Arc<ParamSymmetricSemaev>>,
+    ) -> Prepared {
         let p = curve.p;
         let (a, b) = self.s3_coefficients(curve);
         let (m, t) = (self.m as usize, self.t as usize);
-        let n_t = m * t;
+        let n_membership = m * t;
+        let n_selectors = usize::from(self.mode == PkmMode::Projective);
+        let n_t = n_membership + n_selectors;
         // Isogeny guessing: the group (sub-tower) summand 1 is restricted to.
         let iso_group: Option<(u64, Vec<u64>)> = match (&self.membership, fixed) {
             (Membership::Isogeny { .. }, Some(a)) => {
@@ -1339,10 +1844,10 @@ impl PkmSemaevOracle {
             }
             _ => None,
         };
-        let n_free_base = if self.mode == PkmMode::Chain {
-            m - 2
-        } else {
-            0
+        let n_free_base = match self.mode {
+            PkmMode::Chain | PkmMode::Projective => m - 2,
+            PkmMode::Full => 0,
+            PkmMode::Sym => m,
         };
         // Shared system (`lifts=2`): the third abscissa is one more free
         // ring variable X (after the chain unknowns), not a parameter.
@@ -1351,6 +1856,9 @@ impl PkmSemaevOracle {
         let xr_var = n - 1;
         let x = |i: usize| match &self.membership {
             Membership::Kummer => Pol::var(n, i * t).scale(self.g, p),
+            Membership::Dickson { lo, .. } => {
+                Pol::var(n, i * t).add(&Pol::constant(n, lo % p, p), p)
+            }
             Membership::Isogeny { .. } => Pol::var(n, i * t),
             Membership::Bits { .. }
             | Membership::Digits { .. }
@@ -1434,6 +1942,24 @@ impl PkmSemaevOracle {
                     p,
                 )],
                 (PkmMode::Full, _) => unreachable!("checked in read_params"),
+                (PkmMode::Projective, 3) => {
+                    let z = Pol::var(n, n_membership);
+                    let u = Pol::var(n, n_t);
+                    let one = Pol::constant(n, 1, p);
+                    vec![
+                        s3_frac(
+                            (&fr[0].0, &fr[0].1),
+                            (&fr[1].0, &fr[1].1),
+                            (&u, &z),
+                            a,
+                            b,
+                            p,
+                        ),
+                        s3_frac((&u, &z), (&fr[2].0, &fr[2].1), (&xr_f.0, &xr_f.1), a, b, p),
+                        one.sub(&z, p).mul(&u.sub(&one, p), p),
+                    ]
+                }
+                (PkmMode::Projective, _) => unreachable!("checked in read_params"),
                 (PkmMode::Chain, _) => {
                     let u = |k: usize| Pol::var(n, n_t + k);
                     let mut eqs = vec![quad(tri(&fr[0], &fr[1]), &u(0))];
@@ -1443,12 +1969,24 @@ impl PkmSemaevOracle {
                     eqs.push(quad(tri(&plain(u(m - 3)), &fr[m - 1]), &xr));
                     eqs
                 }
+                (PkmMode::Sym, _) => unreachable!("checked in read_params"),
             }
         } else {
             match (self.mode, m) {
                 (PkmMode::Full, 2) => vec![s3(&x(0), &x(1), &xr, a, b, p)],
                 (PkmMode::Full, 3) => vec![s4(&x(0), &x(1), &x(2), &xr, a, b, p)],
                 (PkmMode::Full, _) => unreachable!("checked in read_params"),
+                (PkmMode::Projective, 3) => {
+                    let z = Pol::var(n, n_membership);
+                    let u = Pol::var(n, n_t);
+                    let one = Pol::constant(n, 1, p);
+                    vec![
+                        s3_frac((&x(0), &one), (&x(1), &one), (&u, &z), a, b, p),
+                        s3_frac((&u, &z), (&x(2), &one), (&xr, &one), a, b, p),
+                        one.sub(&z, p).mul(&u.sub(&one, p), p),
+                    ]
+                }
+                (PkmMode::Projective, _) => unreachable!("checked in read_params"),
                 (PkmMode::Chain, _) => {
                     let u = |k: usize| Pol::var(n, n_t + k);
                     let mut eqs = vec![s3(&x(0), &x(1), &u(0), a, b, p)];
@@ -1458,18 +1996,55 @@ impl PkmSemaevOracle {
                     eqs.push(s3(&u(m - 3), &x(m - 1), &xr, a, b, p));
                     eqs
                 }
+                (PkmMode::Sym, _) => {
+                    // Elementary symmetric definitions `e_k − σ_k(x_0, …, x_{m−1}) = 0`
+                    // built ONCE per curve; `S̃_{m+1}(e_1..e_m; x_R)` is specialised in O(1)
+                    // scalar operations per target via `ParamSymmetricSemaev::specialize`.
+                    let mut sigma = vec![Pol::zero(n); m + 1];
+                    sigma[0] = Pol::constant(n, 1, p);
+                    for i in 0..m {
+                        let xi = x(i);
+                        for k in (1..=i + 1).rev() {
+                            let prod = sigma[k - 1].mul(&xi, p);
+                            sigma[k] = sigma[k].add(&prod, p);
+                        }
+                    }
+                    (1..=m)
+                        .map(|k| Pol::var(n, n_t + k - 1).sub(&sigma[k], p))
+                        .collect()
+                }
             }
         };
         let mut rules = Vec::with_capacity(n_t);
         for i in 0..m {
             for j in 0..t {
                 let top = j + 1 == t;
+                if let Membership::Dickson { c_top, .. } = &self.membership {
+                    rules.push(if top {
+                        SquareRule {
+                            next: None,
+                            a: 0,
+                            b: 0,
+                            c: 0,
+                            d: addm(*c_top % p, 2 % p, p),
+                        }
+                    } else {
+                        SquareRule {
+                            next: Some((i * t + j + 1) as u8),
+                            a: 0,
+                            b: 1,
+                            c: 0,
+                            d: 2 % p,
+                        }
+                    });
+                    continue;
+                }
                 if let Membership::Isogeny { steps, c, .. } = &self.membership {
                     let (xi, tau) = (steps[j].0 % p, steps[j].1 % p);
                     // Guessed summand: the sub-tower tops out at level t − G
                     // with that group's value; the levels above are unused.
                     let (top, c) = match &iso_group {
-                        Some((cg, _)) if i == 0 => (j + 1 == t - self.guess as usize, cg),
+                        Some((cg, _)) if i == 0 => (j + 1 >= t - self.guess as usize, cg),
                         _ => (top, c),
                     };
                     rules.push(if top {
@@ -1524,6 +2099,17 @@ impl PkmSemaevOracle {
                     }
                 });
             }
+        }
+        if self.mode == PkmMode::Projective {
+            // z² = z selects the affine chart z=1 or the normalized identity
+            // chart (x:z)=(1:0). The normalization polynomial is in `raw`.
+            rules.push(SquareRule {
+                next: None,
+                a: 0,
+                b: 0,
+                c: 1,
+                d: 0,
+            });
         }
         let ring = TowerRing { p, rules, n_free };
         ring.check();
@@ -1581,13 +2167,25 @@ impl PkmSemaevOracle {
                 let s = q.expect("t0 quotient resolved in prepare").s;
                 (0..(1u64 << t)).map(|k| (lo + k + s) % p).collect()
             }
+            Membership::Dickson { lo, c_top } => {
+                dickson_abscissae(p, self.t, *lo, *c_top).expect("checked in prepare")
+            }
         };
+        let mut v_rank = HashMap::with_capacity(v.len());
+        for (idx, &vx) in v.iter().enumerate() {
+            v_rank.entry(vx).or_insert(idx as u32);
+        }
+        let rule_roots = Self::build_rule_root_cache(curve, &ring, &[]);
         Prepared {
             ring,
             eqs,
             tower_eqs: n_t,
             degrees,
             v,
+            v_rank,
+            fixed_s0_top: Vec::new(),
+            param_sym,
+            rule_roots,
         }
     }
 
@@ -1609,7 +2207,7 @@ impl PkmSemaevOracle {
         let p = prep.ring.p;
         let fp = Fp::new(p);
         let mut mults = 0u64;
-        let mut out = Vec::with_capacity(prep.eqs.len());
+        let mut out = Vec::with_capacity(prep.eqs.len() + usize::from(prep.param_sym.is_some()));
         for parts in &prep.eqs {
             let mut terms = Vec::new();
             let mut pw = 1u64;
@@ -1628,6 +2226,15 @@ impl PkmSemaevOracle {
                     terms.push((mo, v));
                 }
             }
+            out.push(RPoly::from_terms(fp, terms));
+        }
+        if let Some(sym) = &prep.param_sym {
+            let (sym_terms, sym_mults) = sym.specialize(x_r);
+            mults += sym_mults;
+            let terms: Vec<_> = sym_terms
+                .into_iter()
+                .map(|(exp4, coef)| (mono(0, exp4), coef))
+                .collect();
             out.push(RPoly::from_terms(fp, terms));
         }
         // Shared system: P_R(X) = Π (X − root) over the lift abscissae,
@@ -1777,11 +2384,1435 @@ impl PkmSemaevOracle {
     }
 }
 
+/// Counted univariate polynomial arithmetic over `F_p` (`p < 2^31`) for
+/// `engine=resgcd`. Coefficients low to high; every `F_p` multiplication is
+/// added to `*mults`; an inversion retains the historical `UG_INV_MULTS`
+/// estimate. The quadratic extraction path counts its actual powering work.
+const UG_INV_MULTS: u64 = 32;
+const UG_KARATSUBA_MIN: usize = 24;
+
+fn ug_trim(a: &mut Vec<u64>) {
+    while a.last() == Some(&0) {
+        a.pop();
+    }
+}
+
+fn ug_school(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> Vec<u64> {
+    if a.is_empty() || b.is_empty() {
+        return Vec::new();
+    }
+    let mut out = vec![0u64; a.len() + b.len() - 1];
+    for (i, &x) in a.iter().enumerate() {
+        if x == 0 {
+            continue;
+        }
+        for (j, &y) in b.iter().enumerate() {
+            out[i + j] = addm(out[i + j], mulm(x, y, p), p);
+        }
+        *mults += b.len() as u64;
+    }
+    out
+}
+
+fn ug_karatsuba(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> Vec<u64> {
+    let n = a.len().max(b.len());
+    if a.is_empty() || b.is_empty() {
+        return Vec::new();
+    }
+    if a.len().min(b.len()) < UG_KARATSUBA_MIN {
+        return ug_school(a, b, p, mults);
+    }
+    let h = n / 2;
+    let split = |x: &[u64]| -> (Vec<u64>, Vec<u64>) {
+        if x.len() <= h {
+            (x.to_vec(), Vec::new())
+        } else {
+            (x[..h].to_vec(), x[h..].to_vec())
+        }
+    };
+    let (a0, a1) = split(a);
+    let (b0, b1) = split(b);
+    let add = |x: &[u64], y: &[u64]| -> Vec<u64> {
+        let mut o = vec![0u64; x.len().max(y.len())];
+        for (i, v) in o.iter_mut().enumerate() {
+            *v = addm(*x.get(i).unwrap_or(&0), *y.get(i).unwrap_or(&0), p);
+        }
+        o
+    };
+    let z0 = ug_karatsuba(&a0, &b0, p, mults);
+    let z2 = ug_karatsuba(&a1, &b1, p, mults);
+    let z1 = ug_karatsuba(&add(&a0, &a1), &add(&b0, &b1), p, mults);
+    let mut out = vec![0u64; a.len() + b.len() - 1];
+    for (i, &c) in z0.iter().enumerate() {
+        out[i] = addm(out[i], c, p);
+    }
+    for (i, &c) in z2.iter().enumerate() {
+        out[i + 2 * h] = addm(out[i + 2 * h], c, p);
+    }
+    // z1 − z0 − z2 over the longest of the three: any of them may have been
+    // trimmed shorter by a cancellation mod p, and a z0/z2 coefficient past
+    // z1's length must still be subtracted.
+    for i in 0..z0.len().max(z1.len()).max(z2.len()) {
+        let mid = subm(
+            subm(*z1.get(i).unwrap_or(&0), *z0.get(i).unwrap_or(&0), p),
+            *z2.get(i).unwrap_or(&0),
+            p,
+        );
+        if mid != 0 {
+            out[i + h] = addm(out[i + h], mid, p);
+        }
+    }
+    ug_trim(&mut out);
+    out
+}
+
+/// Product of all `leaves` by a balanced tree of Karatsuba products.
+fn ug_product_tree(mut level: Vec<Vec<u64>>, p: u64, mults: &mut u64) -> Vec<u64> {
+    if level.is_empty() {
+        return vec![1];
+    }
+    while level.len() > 1 {
+        let mut next = Vec::with_capacity(level.len().div_ceil(2));
+        let mut it = level.into_iter();
+        while let Some(x) = it.next() {
+            match it.next() {
+                Some(y) => next.push(ug_karatsuba(&x, &y, p, mults)),
+                None => next.push(x),
+            }
+        }
+        level = next;
+    }
+    level.pop().expect("non-empty")
+}
+
+/// `a` scaled to leading coefficient 1 (one inversion, `deg a` products).
+fn ug_monic(a: &mut [u64], p: u64, mults: &mut u64) {
+    let Some(&lead) = a.last() else { return };
+    if lead == 1 {
+        return;
+    }
+    let inv = crate::cryptanalysis::residual_walk::pow_mod(lead, p - 2, p);
+    *mults += UG_INV_MULTS + (a.len() as u64 - 1);
+    let n = a.len();
+    for c in a[..n - 1].iter_mut() {
+        *c = mulm(*c, inv, p);
+    }
+    a[n - 1] = 1;
+}
+
+/// `a mod b` for monic non-constant `b`: classical division.
+fn ug_rem_monic(mut a: Vec<u64>, b: &[u64], p: u64, mults: &mut u64) -> Vec<u64> {
+    let db = b.len() - 1;
+    ug_trim(&mut a);
+    while a.len() > db {
+        let top = a.len() - 1;
+        let q = a[top];
+        if q != 0 {
+            let shift = top - db;
+            for j in 0..db {
+                a[shift + j] = subm(a[shift + j], mulm(q, b[j], p), p);
+            }
+            *mults += db as u64;
+        }
+        a.pop();
+        ug_trim(&mut a);
+    }
+    a
+}
+
+/// Monic `gcd(a, b)` for monic `a` with `deg a ≥ 1`, by Euclid.
+fn ug_gcd_monic(a: Vec<u64>, b: Vec<u64>, p: u64, mults: &mut u64) -> Vec<u64> {
+    let mut r0 = a;
+    let mut r1 = ug_rem_monic(b, &r0, p, mults);
+    while !r1.is_empty() {
+        ug_monic(&mut r1, p, mults);
+        if r1.len() == 1 {
+            return vec![1];
+        }
+        let r2 = ug_rem_monic(r0, &r1, p, mults);
+        r0 = r1;
+        r1 = r2;
+    }
+    r0
+}
+
 impl PkmSemaevOracle {
+    /// `engine=resgcd` (`m = 2`): every unordered `(x_1, x_2) ∈ V²` with
+    /// `S₃(x_1, x_2, x_R) = 0`, in `grid()` order, and the `F_p`
+    /// multiplications spent on this target.
+    ///
+    /// `R(X) = Res_Y(F_V(Y), S₃(Y, x_R, X)) = ∏_{v ∈ V} S₃(v, x_R, X)`
+    /// (`F_V` monic), so the `x_2 ∈ V` that pair with some `x_1 ∈ V` are
+    /// exactly the roots of `G = gcd(R, F_V)`; by the symmetry of `S₃`
+    /// every solution has both coordinates among them. `deg G = 0` is a
+    /// refutation; otherwise the roots are read off `V` (`|V| · deg G`
+    /// products) and the pairs among them tested.
+    fn resgcd(&mut self, curve: &PrimeCurve, x_r: u64) -> (Vec<Vec<u64>>, u64) {
+        if self.m == 3 {
+            return self.resgcd_m3(curve, x_r);
+        }
+        let p = curve.p;
+        let (a, b) = self.s3_coefficients(curve);
+        let v = self.prepared.as_ref().expect("prepared").v.clone();
+        if self.resgcd_fv.is_none() {
+            let mut setup = 0u64;
+            let leaves: Vec<Vec<u64>> = v.iter().map(|&x| vec![subm(0, x, p), 1]).collect();
+            let fv = ug_product_tree(leaves, p, &mut setup);
+            self.bump("pkm_resgcd_setup_fp_mults", setup);
+            self.resgcd_fv = Some(fv);
+        }
+        let fv = self.resgcd_fv.clone().expect("built");
+        let mut mults = 0u64;
+        let s3c = |x1: u64, x2: u64, mults: &mut u64| -> (u64, u64, u64) {
+            *mults += 6;
+            let d = subm(x1, x2, p);
+            let s = addm(x1, x2, p);
+            let pr = mulm(x1, x2, p);
+            let al = mulm(d, d, p);
+            let be = mulm(p - 2, addm(mulm(s, addm(pr, a, p), p), mulm(2, b, p), p), p);
+            let q = subm(pr, a, p);
+            let ga = subm(mulm(q, q, p), mulm(mulm(4, b, p), s, p), p);
+            (al, be, ga)
+        };
+        let leaves: Vec<Vec<u64>> = v
+            .iter()
+            .map(|&x| {
+                let (al, be, ga) = s3c(x, x_r, &mut mults);
+                let mut l = vec![ga, be, al];
+                ug_trim(&mut l);
+                l
+            })
+            .collect();
+        let tree0 = mults;
+        let r = ug_product_tree(leaves, p, &mut mults);
+        let tree = mults - tree0;
+        let g = ug_gcd_monic(fv, r, p, &mut mults);
+        let gcd_mults = mults - tree0 - tree;
+        self.bump("pkm_resgcd_tree_fp_mults", tree);
+        self.bump("pkm_resgcd_gcd_fp_mults", gcd_mults);
+        let mut out = Vec::new();
+        if g.len() <= 1 {
+            return (out, mults);
+        }
+        self.bump("pkm_resgcd_nontrivial_gcd", 1);
+        let horner = |x: u64, mults: &mut u64| -> u64 {
+            *mults += g.len() as u64 - 1;
+            g.iter()
+                .rev()
+                .fold(0u64, |acc, &c| addm(mulm(acc, x, p), c, p))
+        };
+        let idx: Vec<usize> = (0..v.len())
+            .filter(|&i| horner(v[i], &mut mults) == 0)
+            .collect();
+        for (k, &i) in idx.iter().enumerate() {
+            let (al, be, ga) = s3c(v[i], x_r, &mut mults);
+            for &j in &idx[k..] {
+                mults += 2;
+                let x2 = v[j];
+                let val = addm(
+                    addm(mulm(mulm(al, x2, p), x2, p), mulm(be, x2, p), p),
+                    ga,
+                    p,
+                );
+                if val == 0 {
+                    out.push(vec![v[i], x2]);
+                }
+            }
+        }
+        (out, mults)
+    }
+
+    /// `F_V = ∏_{v ∈ V}(X − v)`, built once and charged as setup.
+    fn resgcd_fv(&mut self, p: u64) -> Vec<u64> {
+        if self.resgcd_fv.is_none() {
+            let v = self.prepared.as_ref().expect("prepared").v.clone();
+            let mut setup = 0u64;
+            let leaves: Vec<Vec<u64>> = v.iter().map(|&x| vec![subm(0, x, p), 1]).collect();
+            let fv = ug_product_tree(leaves, p, &mut setup);
+            self.bump("pkm_resgcd_setup_fp_mults", setup);
+            self.resgcd_fv = Some(fv);
+        }
+        self.resgcd_fv.clone().expect("built")
+    }
+
+    /// `engine=resgcd` at `m = 3`: every unordered `(x_1, x_2, x_3) ∈ V³`
+    /// with `S₄(x_1, x_2, x_3, x_R) = 0`, as `grid()` returns them (sorted
+    /// by index, `x_3` the largest), and the multiplications spent.
+    ///
+    /// For each `w ∈ V` (the largest-index summand), `S₄(Y, X, w, x_R) =
+    /// Res_U(S₃(Y, X, U), S₃(w, x_R, U))` has degree ≤ 4 in `X` for fixed
+    /// `Y`, so `R_w(X) = ∏_{v ∈ V} S₄(v, X, w, x_R)` (degree ≤ 4|V|) is
+    /// built by the product tree and `gcd(R_w, F_V)` gives every `x ∈ V`
+    /// that pairs with some `y ∈ V` against `w`. By the symmetry of `S₄`
+    /// both members of a pair are among its roots, which are read off `V`
+    /// and tested pairwise. `|V|` such eliminations per target.
+    fn resgcd_m3(&mut self, curve: &PrimeCurve, x_r: u64) -> (Vec<Vec<u64>>, u64) {
+        let p = curve.p;
+        let (a, b) = self.s3_coefficients(curve);
+        let fv = self.resgcd_fv(p);
+        let v = self.prepared.as_ref().expect("prepared").v.clone();
+        let mut mults = 0u64;
+        let (mut tree, mut gcdm, mut nontrivial) = (0u64, 0u64, 0u64);
+        // Numeric S₃(x1, x2, U) coefficients (α, β, γ) of U², U, 1.
+        let s3c = |x1: u64, x2: u64, mults: &mut u64| -> (u64, u64, u64) {
+            *mults += 6;
+            let d = subm(x1, x2, p);
+            let s = addm(x1, x2, p);
+            let pr = mulm(x1, x2, p);
+            let al = mulm(d, d, p);
+            let be = mulm(p - 2, addm(mulm(s, addm(pr, a, p), p), mulm(2, b, p), p), p);
+            let q = subm(pr, a, p);
+            let ga = subm(mulm(q, q, p), mulm(mulm(4, b, p), s, p), p);
+            (al, be, ga)
+        };
+        // S₃(v, X, U) as polynomials in X (degree ≤ 2) for each U-power,
+        // target-independent given v: α(X) = (v − X)², β(X) = −2((v + X)(vX + a) + 2b),
+        // γ(X) = (vX − a)² − 4b(v + X).
+        let two_b = mulm(2, b, p);
+        let four_b = mulm(4, b, p);
+        let sym: Vec<[Vec<u64>; 3]> = v
+            .iter()
+            .map(|&y| {
+                let al = vec![mulm(y, y, p), subm(0, mulm(2, y, p), p), 1];
+                // (v + X)(vX + a) = a v + (v² + a) X + v X²
+                let inner = [addm(mulm(a, y, p), two_b, p), addm(mulm(y, y, p), a, p), y];
+                let be: Vec<u64> = inner.iter().map(|&c| mulm(p - 2, c, p)).collect();
+                // (vX − a)² − 4b(v + X) = a² − 4bv + (−2av − 4b) X + v² X²
+                let ga = vec![
+                    subm(mulm(a, a, p), mulm(four_b, y, p), p),
+                    subm(0, addm(mulm(mulm(2, a, p), y, p), four_b, p), p),
+                    mulm(y, y, p),
+                ];
+                [al, be, ga]
+            })
+            .collect();
+        mults += 12 * v.len() as u64; // target-independent; charged per call for simplicity
+        let lin = |x: &[u64], c: u64, y: &[u64], d: u64, mults: &mut u64| -> Vec<u64> {
+            // c·x − d·y, coefficientwise
+            *mults += (x.len() + y.len()) as u64;
+            (0..x.len().max(y.len()))
+                .map(|i| {
+                    subm(
+                        mulm(c, *x.get(i).unwrap_or(&0), p),
+                        mulm(d, *y.get(i).unwrap_or(&0), p),
+                        p,
+                    )
+                })
+                .collect()
+        };
+        let mut found: Vec<(usize, usize, usize)> = Vec::new();
+        for k in 0..v.len() {
+            let (al2, be2, ga2) = s3c(v[k], x_r, &mut mults);
+            // Res_U(αU²+βU+γ, α₂U²+β₂U+γ₂) = (αγ₂−α₂γ)² − (αβ₂−α₂β)(βγ₂−β₂γ)
+            let t0 = mults;
+            let leaves: Vec<Vec<u64>> = sym
+                .iter()
+                .map(|[al, be, ga]| {
+                    let ag = lin(al, ga2, ga, al2, &mut mults);
+                    let ab = lin(al, be2, be, al2, &mut mults);
+                    let bg = lin(be, ga2, ga, be2, &mut mults);
+                    let sq = ug_school(&ag, &ag, p, &mut mults);
+                    let pr = ug_school(&ab, &bg, p, &mut mults);
+                    let mut l: Vec<u64> = (0..sq.len().max(pr.len()))
+                        .map(|i| subm(*sq.get(i).unwrap_or(&0), *pr.get(i).unwrap_or(&0), p))
+                        .collect();
+                    ug_trim(&mut l);
+                    l
+                })
+                .collect();
+            let r = if leaves.iter().any(|l| l.is_empty()) {
+                Vec::new() // a leaf vanishes identically: R ≡ 0, every v is a root
+            } else {
+                ug_product_tree(leaves, p, &mut mults)
+            };
+            let t1 = mults;
+            tree += t1 - t0;
+            let g = ug_gcd_monic(fv.clone(), r, p, &mut mults);
+            gcdm += mults - t1;
+            if g.len() <= 1 {
+                continue;
+            }
+            nontrivial += 1;
+            let idx: Vec<usize> = (0..=k)
+                .filter(|&i| {
+                    mults += g.len() as u64 - 1;
+                    g.iter()
+                        .rev()
+                        .fold(0u64, |acc, &c| addm(mulm(acc, v[i], p), c, p))
+                        == 0
+                })
+                .collect();
+            for (s, &i) in idx.iter().enumerate() {
+                for &j in &idx[s..] {
+                    let (al, be, ga) = s3c(v[i], v[j], &mut mults);
+                    mults += 8;
+                    let ag = subm(mulm(al, ga2, p), mulm(al2, ga, p), p);
+                    let ab = subm(mulm(al, be2, p), mulm(al2, be, p), p);
+                    let bg = subm(mulm(be, ga2, p), mulm(be2, ga, p), p);
+                    if subm(mulm(ag, ag, p), mulm(ab, bg, p), p) == 0 {
+                        found.push((i, j, k));
+                    }
+                }
+            }
+        }
+        self.bump("pkm_resgcd_tree_fp_mults", tree);
+        self.bump("pkm_resgcd_gcd_fp_mults", gcdm);
+        self.bump("pkm_resgcd_nontrivial_gcd", nontrivial);
+        // grid() order: i, then j, then k ascending.
+        found.sort_unstable();
+        let out = found
+            .into_iter()
+            .map(|(i, j, k)| vec![v[i], v[j], v[k]])
+            .collect();
+        (out, mults)
+    }
+
+    /// `engine=scan` (`m = 2`): for each `x_1 ∈ V`, the roots `X` of the
+    /// quadratic `S₃(x_1, X, x_R)` (one square root), kept when `X ∈ V`
+    /// with index at least `x_1`'s, in `grid()` order. Lookups are counted
+    /// separately (`pkm_scan_lookups`), not as multiplications.
+    fn scan(&mut self, curve: &PrimeCurve, x_r: u64) -> (Vec<Vec<u64>>, u64) {
+        let (a, b) = self.s3_coefficients(curve);
+        let prep = self.prepared.as_ref().expect("prepared");
+        let v = &prep.v;
+        let rank = &prep.v_rank;
+        let mut mults = 0u64;
+        let mut lookups = 0u64;
+        let mut out = Vec::new();
+        for i in 0..v.len() {
+            let roots = Self::solve_s3_for_middle(curve, a, b, v[i], x_r, &mut mults);
+            let mut js: Vec<usize> = Vec::new();
+            for x in roots {
+                lookups += 1;
+                if let Some(&j) = rank.get(&x) {
+                    let j = j as usize;
+                    if j >= i && !js.contains(&j) {
+                        js.push(j);
+                    }
+                }
+            }
+            js.sort_unstable();
+            for j in js {
+                out.push(vec![v[i], v[j]]);
+            }
+        }
+        self.bump("pkm_scan_lookups", lookups);
+        (out, mults)
+    }
+}
+
+impl PkmSemaevOracle {
+    /// Solve `S_3(x1, X, x3) ≡ 0 (mod p)` for `X ∈ F_p`. On any smooth Weierstrass
+    /// curve `E`, `X ↦ S_3(x1, X, x3)` is never identically zero (`deg_X ∈ {0, 1, 2}`),
+    /// returning at most 2 roots in `F_p`.
+    fn solve_s3_for_middle(
+        curve: &PrimeCurve,
+        a: u64,
+        b: u64,
+        x1: u64,
+        x3: u64,
+        mults: &mut u64,
+    ) -> Vec<u64> {
+        let p = curve.p;
+        // Five coefficient products. Multiplication by two or four is
+        // implemented by addition, rather than counted as a product.
+        *mults += 5;
+        let d = subm(x1 % p, x3 % p, p);
+        let s = addm(x1 % p, x3 % p, p);
+        let pr = mulm(x1 % p, x3 % p, p);
+        let al = mulm(d, d, p);
+        let twice_b = addm(b, b, p);
+        let half_be = addm(mulm(s, addm(pr, a, p), p), twice_b, p);
+        let be = subm(0, addm(half_be, half_be, p), p);
+        let q = subm(pr, a, p);
+        let ga = subm(mulm(q, q, p), mulm(addm(twice_b, twice_b, p), s, p), p);
+        // residual_walk::pow_mod performs one square per exponent bit
+        // and one product per set bit. Charge the actual prime's cost.
+        let inverse_muls =
+            u64::from(64 - (p - 2).leading_zeros()) + u64::from((p - 2).count_ones());
+        if al == 0 {
+            if be == 0 {
+                return Vec::new();
+            }
+            *mults += inverse_muls + 1;
+            let inv = crate::cryptanalysis::residual_walk::pow_mod(be, p - 2, p);
+            return vec![subm(0, mulm(ga, inv, p), p)];
+        }
+        // Reject nonsquares before the inversion. sqrt_counted charges
+        // failed square-root attempts too, unlike the former fixed estimate.
+        *mults += 2;
+        let al_ga = mulm(al, ga, p);
+        let twice_al_ga = addm(al_ga, al_ga, p);
+        let disc = subm(mulm(be, be, p), addm(twice_al_ga, twice_al_ga, p), p);
+        let Some(rt) = curve.sqrt_counted(disc, mults) else {
+            return Vec::new();
+        };
+        *mults += inverse_muls + 1;
+        let inv_2al = crate::cryptanalysis::residual_walk::pow_mod(addm(al, al, p), p - 2, p);
+        let neg_be = subm(0, be, p);
+        let r0 = mulm(addm(neg_be, rt, p), inv_2al, p);
+        if rt == 0 {
+            vec![r0]
+        } else {
+            *mults += 1;
+            let r1 = mulm(subm(neg_be, rt, p), inv_2al, p);
+            vec![r0.min(r1), r0.max(r1)]
+        }
+    }
+
+    fn semaev_zero_m(
+        curve: &PrimeCurve,
+        a: u64,
+        b: u64,
+        xs: &[u64],
+        x_r: u64,
+        mults: &mut u64,
+    ) -> bool {
+        let p = curve.p;
+        match xs.len() {
+            2 => {
+                *mults += 8;
+                eval_s3_u64(xs[0], xs[1], x_r, a, b, p) == 0
+            }
+            3 => eval_s4_counted(xs[0], xs[1], xs[2], x_r, a, b, p, mults) == 0,
+            4 => eval_s5_counted(xs[0], xs[1], xs[2], xs[3], x_r, a, b, p, mults) == 0,
+            m if m >= 5 => {
+                let mut states: Vec<Option<u64>> = vec![Some(xs[0] % p)];
+                for &xk_raw in &xs[1..m - 1] {
+                    let xk = xk_raw % p;
+                    let mut next = Vec::new();
+                    for st in states {
+                        match st {
+                            None => next.push(Some(xk)),
+                            Some(u) => {
+                                if u == xk {
+                                    next.push(None);
+                                }
+                                for w in Self::solve_s3_for_middle(curve, a, b, u, xk, mults) {
+                                    next.push(Some(w));
+                                }
+                            }
+                        }
+                    }
+                    next.sort_unstable();
+                    next.dedup();
+                    states = next;
+                    if states.is_empty() {
+                        return false;
+                    }
+                }
+                let x_last = xs[m - 1] % p;
+                states.into_iter().any(|st| match st {
+                    None => x_last == x_r % p,
+                    Some(u) => {
+                        *mults += 8;
+                        eval_s3_u64(u, x_last, x_r, a, b, p) == 0
+                    }
+                })
+            }
+            _ => false,
+        }
+    }
+
+    fn specialize_basis_at_free_var(
+        p: u64,
+        basis: &[RPoly],
+        fk: usize,
+        val: u64,
+    ) -> (Vec<RPoly>, u64) {
+        let fp = Fp::new(p);
+        let val = val % p;
+        let mut mults = 0u64;
+        let mut out = Vec::with_capacity(basis.len());
+        for g in basis {
+            if !g.monos.iter().any(|&m| free_of(m)[fk] > 0) {
+                if !g.is_empty() {
+                    out.push(g.clone());
+                }
+                continue;
+            }
+            let mut terms = Vec::with_capacity(g.len());
+            for (&m, &c) in g.monos.iter().zip(&g.coefs) {
+                let mut f = free_of(m);
+                let deg = f[fk] as usize;
+                f[fk] = 0;
+                let mut coef = u64::from(c);
+                if deg > 0 {
+                    if val == 0 {
+                        continue;
+                    }
+                    for _ in 0..deg {
+                        mults += 1;
+                        coef = mulm(coef, val, p);
+                    }
+                }
+                terms.push((mono(mask_of(m), f), coef));
+            }
+            let poly = RPoly::from_terms(fp, terms);
+            if !poly.is_empty() {
+                out.push(poly);
+            }
+        }
+        (out, mults)
+    }
+
+    fn eval_free_only_poly_at_u0(p: u64, g: &RPoly, u0: u64, mults: &mut u64) -> u64 {
+        let mut acc = 0u64;
+        for (&m, &c) in g.monos.iter().zip(&g.coefs) {
+            let deg = free_of(m)[0] as usize;
+            let mut term = u64::from(c);
+            for _ in 0..deg {
+                *mults += 1;
+                term = mulm(term, u0, p);
+            }
+            acc = addm(acc, term, p);
+        }
+        acc
+    }
+
+    fn abscissa_of_summand(&self, p: u64, vals: &[Option<u64>], mults: &mut u64) -> Option<u64> {
+        match &self.membership {
+            Membership::Kummer => {
+                *mults += 1;
+                Some(mulm(self.g % p, vals[0]? % p, p))
+            }
+            Membership::Dickson { lo, .. } => Some(addm(vals[0]? % p, lo % p, p)),
+            Membership::Isogeny { .. } => Some(vals[0]? % p),
+            Membership::Bits { lo }
+            | Membership::Digits { lo, .. }
+            | Membership::SquareBits { lo, .. }
+            | Membership::T0Bits { lo, .. } => {
+                let mut acc = *lo % p;
+                for (j, slot) in vals.iter().enumerate() {
+                    let b = slot.as_ref().copied()? % p;
+                    if b > 1 {
+                        return None;
+                    }
+                    if b == 1 {
+                        let c = match &self.membership {
+                            Membership::Digits { digits, .. } => digits[j] % p,
+                            _ => (1u64 << j) % p,
+                        };
+                        acc = addm(acc, c, p);
+                    }
+                }
+                match &self.membership {
+                    Membership::SquareBits { shift, .. } => {
+                        *mults += 1;
+                        Some(addm(mulm(acc, acc, p), shift.unwrap_or(0) % p, p))
+                    }
+                    Membership::T0Bits { q, .. } => Some(addm(acc, q.unwrap().s, p)),
+                    _ => Some(acc),
+                }
+            }
+            Membership::EdwardsBits { shift } => {
+                let mut y = 0u64;
+                for (j, slot) in vals.iter().enumerate() {
+                    let b = slot.as_ref().copied()? % p;
+                    if b > 1 {
+                        return None;
+                    }
+                    if b == 1 {
+                        y = addm(y, (1u64 << j) % p, p);
+                    }
+                }
+                if y == 1 % p {
+                    return None;
+                }
+                *mults += 32;
+                let inv = crate::cryptanalysis::residual_walk::pow_mod(subm(1, y, p), p - 2, p);
+                Some(addm(mulm(addm(1, y, p), inv, p), shift.unwrap_or(0) % p, p))
+            }
+        }
+    }
+
+    /// Extract all canonical `(x_0, …, x_{m-1}) ∈ V^m` solutions directly from
+    /// an F4 tower basis via linear-RREF cascade + upward tower rule propagation
+    /// + quadratic tower root splitting (zero `O(|V|^m)` grid scan).
+    #[allow(clippy::too_many_arguments)]
+    fn extract_solutions_from_basis(
+        &self,
+        curve: &PrimeCurve,
+        branch_idx: Option<usize>,
+        init_ring: &TowerRing,
+        init_basis: &[RPoly],
+        init_fixed_s0: &[(usize, u64)],
+        x_r: u64,
+        shared_lift_xs: Option<&[u64]>,
+    ) -> (Vec<Vec<u64>>, Vec<Vec<Vec<u64>>>, u64, BasisDfsStats) {
+        let (a, b) = self.s3_coefficients(curve);
+        let m = self.m as usize;
+        let t = self.t as usize;
+        let root_prep = self.prepared.as_ref().expect("prepared");
+        let root_v_rank = &root_prep.v_rank;
+        let rule_roots = &root_prep.rule_roots;
+        let branch_v_set: Option<HashSet<u64>> = branch_idx.map(|br| {
+            self.branches
+                .get(br)
+                .map(|bp| bp.v.iter().copied().collect())
+                .unwrap_or_default()
+        });
+
+        let mut mults = 0u64;
+        let mut cur_ring = init_ring.clone();
+        let mut cur_basis: Vec<RPoly> = init_basis
+            .iter()
+            .filter(|g| !g.is_empty())
+            .cloned()
+            .collect();
+        let mut fixed_tower: Vec<Vec<Option<u64>>> = vec![vec![None; t]; m];
+
+        for &(lvl, val) in init_fixed_s0 {
+            fixed_tower[0][lvl] = Some(val);
+        }
+
+        // Membership variables map back to `(summand, level)`. Projective
+        // selectors are quotient-ring variables too, but do not belong to a
+        // summand and therefore carry `None`.
+        let mut orig_of_cur: Vec<Option<(usize, usize)>> = Vec::with_capacity(cur_ring.n_tower());
+        if !init_fixed_s0.is_empty() {
+            let g_dropped = init_fixed_s0.len();
+            for j in 0..(t - g_dropped) {
+                orig_of_cur.push(Some((0, j)));
+            }
+            for s in 1..m {
+                for j in 0..t {
+                    orig_of_cur.push(Some((s, j)));
+                }
+            }
+        } else {
+            for s in 0..m {
+                for j in 0..t {
+                    orig_of_cur.push(Some((s, j)));
+                }
+            }
+            // If `branch_idx` came from `build_system_fixed` (`Bits`/`Digits`/…/`Isogeny`),
+            // drop the unused top `guess` dummy variables of summand 0 right away.
+            if let Some(br) = branch_idx {
+                let g = self.guess as usize;
+                for depth in 0..g {
+                    let lvl = t - 1 - depth;
+                    let k = lvl - (t - g);
+                    let bit_val = ((br as u64) >> k) & 1;
+                    let dummy_val = if matches!(self.membership, Membership::Isogeny { .. }) {
+                        let r = &cur_ring.rules[lvl];
+                        Self::lookup_rule_roots(rule_roots, curve, r)
+                            .into_iter()
+                            .next()
+                            .unwrap_or(0)
+                    } else {
+                        bit_val
+                    };
+                    let (r2, b2, _, sm) = cur_ring.specialize_drop_top_var(
+                        &cur_basis,
+                        lvl,
+                        dummy_val,
+                        TowerWeights::UNIT,
+                    );
+                    mults += sm;
+                    cur_ring = r2;
+                    cur_basis = b2;
+                    let (s_idx, l_idx) = orig_of_cur
+                        .remove(lvl)
+                        .expect("guessed tower variable belongs to summand 0");
+                    fixed_tower[s_idx][l_idx] = Some(dummy_val);
+                }
+            }
+        }
+        while orig_of_cur.len() < cur_ring.n_tower() {
+            orig_of_cur.push(None);
+        }
+
+        let n_shared = shared_lift_xs.map_or(0, <[u64]>::len);
+        let mut found_standard: Vec<Vec<u64>> = Vec::new();
+        let mut found_shared: Vec<Vec<Vec<u64>>> = vec![Vec::new(); n_shared];
+        let free_done_init = vec![false; cur_ring.n_free];
+        let cache_root_terms = rule_roots.values().map(|roots| roots.len() as u64).sum();
+        let mut stats = BasisDfsStats::default();
+
+        #[allow(clippy::too_many_arguments)]
+        fn dfs(
+            oracle: &PkmSemaevOracle,
+            curve: &PrimeCurve,
+            a: u64,
+            b: u64,
+            x_r: u64,
+            shared_lift_xs: Option<&[u64]>,
+            root_v_rank: &HashMap<u64, u32>,
+            rule_roots: &HashMap<(u64, u64, u64, u64), Vec<u64>>,
+            branch_v_set: &Option<HashSet<u64>>,
+            mut cur_ring: TowerRing,
+            mut cur_basis: Vec<RPoly>,
+            mut orig_of_cur: Vec<Option<(usize, usize)>>,
+            mut fixed_tower: Vec<Vec<Option<u64>>>,
+            mut free_done: Vec<bool>,
+            mults: &mut u64,
+            stats: &mut BasisDfsStats,
+            stack_basis_terms: u64,
+            cache_root_terms: u64,
+            found_standard: &mut Vec<Vec<u64>>,
+            found_shared: &mut [Vec<Vec<u64>>],
+        ) {
+            let p = curve.p;
+            let m = oracle.m as usize;
+            stats.visited_nodes += 1;
+            let basis_terms = cur_basis.iter().map(|g| g.len() as u64).sum::<u64>();
+            stats.peak_live_basis_cache_terms = stats
+                .peak_live_basis_cache_terms
+                .max(stack_basis_terms + basis_terms + cache_root_terms);
+
+            // Step 1: Linear RREF + upward tower propagation + free-var cascade.
+            loop {
+                if cur_basis.iter().any(|g| g.len() == 1 && g.monos[0] == ONE) {
+                    return;
+                }
+                let n_t = cur_ring.n_tower();
+                let n_f = cur_ring.n_free;
+                let n_vars = n_t + n_f;
+                if n_vars == 0 {
+                    break;
+                }
+
+                // Collect degree-<=1 equations: row length `n_vars + 1` (`v_0..v_{n_vars-1} | rhs`).
+                let mut rows: Vec<Vec<u64>> = Vec::new();
+                for g in &cur_basis {
+                    if g.is_empty() || degree_of(g.monos[0]) > 1 {
+                        continue;
+                    }
+                    let mut row = vec![0u64; n_vars + 1];
+                    for (&mo, &cf) in g.monos.iter().zip(&g.coefs) {
+                        let c = u64::from(cf);
+                        if mo == ONE {
+                            row[n_vars] = subm(row[n_vars], c, p);
+                        } else {
+                            let msk = mask_of(mo);
+                            if msk != 0 {
+                                let j = msk.trailing_zeros() as usize;
+                                row[j] = addm(row[j], c, p);
+                            } else {
+                                let fr = free_of(mo);
+                                if let Some(fk) = fr.iter().position(|&e| e == 1) {
+                                    row[n_t + fk] = addm(row[n_t + fk], c, p);
+                                }
+                            }
+                        }
+                    }
+                    rows.push(row);
+                }
+
+                let mut progressed = false;
+                if !rows.is_empty() {
+                    let mut piv_row = 0usize;
+                    let mut piv_cols: Vec<(usize, usize)> = Vec::new();
+                    for col in 0..n_vars {
+                        if piv_row >= rows.len() {
+                            break;
+                        }
+                        let Some(sel) = (piv_row..rows.len()).find(|&r| rows[r][col] != 0) else {
+                            continue;
+                        };
+                        rows.swap(piv_row, sel);
+                        let pv = rows[piv_row][col];
+                        if pv != 1 {
+                            *mults += 32;
+                            let inv = crate::cryptanalysis::residual_walk::pow_mod(pv, p - 2, p);
+                            for v in &mut rows[piv_row][col..=n_vars] {
+                                if *v != 0 {
+                                    *mults += 1;
+                                    *v = mulm(*v, inv, p);
+                                }
+                            }
+                        }
+                        for r in 0..rows.len() {
+                            if r == piv_row || rows[r][col] == 0 {
+                                continue;
+                            }
+                            let factor = rows[r][col];
+                            rows[r][col] = 0;
+                            for c_idx in (col + 1)..=n_vars {
+                                let pv_c = rows[piv_row][c_idx];
+                                if pv_c != 0 {
+                                    *mults += 1;
+                                    rows[r][c_idx] = subm(rows[r][c_idx], mulm(factor, pv_c, p), p);
+                                }
+                            }
+                        }
+                        piv_cols.push((piv_row, col));
+                        piv_row += 1;
+                    }
+                    for r in piv_row..rows.len() {
+                        if rows[r][n_vars] != 0 {
+                            return;
+                        }
+                    }
+
+                    // Try uniquely determined tower variables first.
+                    for &(pr, col) in &piv_cols {
+                        if col >= n_t {
+                            continue;
+                        }
+                        if rows[pr][(col + 1)..n_vars].iter().any(|&x| x != 0) {
+                            continue;
+                        }
+                        let val0 = rows[pr][n_vars];
+                        // Propagate upward along `next` to top of summand tower.
+                        let mut chain = vec![(col, val0)];
+                        let mut cur_j = col;
+                        let mut cur_v = val0;
+                        let mut reached_top = false;
+                        loop {
+                            let rl = cur_ring.rules[cur_j];
+                            match rl.next {
+                                None => {
+                                    *mults += 2;
+                                    let lhs = mulm(cur_v, cur_v, p);
+                                    let rhs = addm(mulm(rl.c % p, cur_v, p), rl.d % p, p);
+                                    if lhs != rhs {
+                                        return;
+                                    }
+                                    reached_top = true;
+                                    break;
+                                }
+                                Some(nxt_u8) => {
+                                    let nxt = usize::from(nxt_u8);
+                                    *mults += 3;
+                                    let lhs = subm(
+                                        mulm(cur_v, cur_v, p),
+                                        addm(mulm(rl.c % p, cur_v, p), rl.d % p, p),
+                                        p,
+                                    );
+                                    let den = addm(mulm(rl.a % p, cur_v, p), rl.b % p, p);
+                                    if den == 0 {
+                                        if lhs != 0 {
+                                            return;
+                                        }
+                                        break;
+                                    }
+                                    *mults += 32;
+                                    let inv_den =
+                                        crate::cryptanalysis::residual_walk::pow_mod(den, p - 2, p);
+                                    let nxt_v = mulm(lhs, inv_den, p);
+                                    chain.push((nxt, nxt_v));
+                                    cur_j = nxt;
+                                    cur_v = nxt_v;
+                                }
+                            }
+                        }
+                        if reached_top {
+                            for &(drop_j, drop_v) in chain.iter().rev() {
+                                let (r2, b2, _, sm) = cur_ring.specialize_drop_top_var(
+                                    &cur_basis,
+                                    drop_j,
+                                    drop_v,
+                                    TowerWeights::UNIT,
+                                );
+                                *mults += sm;
+                                cur_ring = r2;
+                                cur_basis = b2;
+                                if let Some((s_idx, l_idx)) = orig_of_cur.remove(drop_j) {
+                                    fixed_tower[s_idx][l_idx] = Some(drop_v);
+                                }
+                            }
+                            progressed = true;
+                            break;
+                        }
+                    }
+
+                    // Otherwise try uniquely determined free variables.
+                    if !progressed {
+                        for &(pr, col) in &piv_cols {
+                            if col < n_t {
+                                continue;
+                            }
+                            let fk = col - n_t;
+                            if free_done[fk] || rows[pr][(col + 1)..n_vars].iter().any(|&x| x != 0)
+                            {
+                                continue;
+                            }
+                            let val = rows[pr][n_vars];
+                            free_done[fk] = true;
+                            let (b2, sm) = PkmSemaevOracle::specialize_basis_at_free_var(
+                                p, &cur_basis, fk, val,
+                            );
+                            *mults += sm;
+                            cur_basis = b2;
+                            progressed = true;
+                            break;
+                        }
+                    }
+                }
+                if !progressed {
+                    break;
+                }
+            }
+
+            // Validate every summand whose tower variables are all fixed.
+            let mut known_x: Vec<Option<u64>> = vec![None; m];
+            for s in 0..m {
+                if fixed_tower[s].iter().all(Option::is_some) {
+                    let Some(xs) = oracle.abscissa_of_summand(p, &fixed_tower[s], mults) else {
+                        return;
+                    };
+                    if !root_v_rank.contains_key(&xs) {
+                        return;
+                    }
+                    if s == 0 {
+                        if let Some(bset) = branch_v_set {
+                            if !bset.contains(&xs) {
+                                return;
+                            }
+                        }
+                    }
+                    known_x[s] = Some(xs);
+                } else if matches!(
+                    oracle.membership,
+                    Membership::Kummer | Membership::Dickson { .. } | Membership::Isogeny { .. }
+                ) && fixed_tower[s][0].is_some()
+                {
+                    let Some(xs) = oracle.abscissa_of_summand(p, &fixed_tower[s], mults) else {
+                        return;
+                    };
+                    if !root_v_rank.contains_key(&xs) {
+                        return;
+                    }
+                }
+            }
+
+            // Fast algebraic exit for `m == 2` (`!shared`): once one summand is known
+            // and the remaining summand spans full `V`, solve `S_3(x_known, X, x_R) = 0` directly!
+            if m == 2 && shared_lift_xs.is_none() {
+                if let (Some(x0), None) = (known_x[0], known_x[1]) {
+                    for x1 in PkmSemaevOracle::solve_s3_for_middle(curve, a, b, x0, x_r, mults) {
+                        if root_v_rank.contains_key(&x1) {
+                            stats.algebraic_tuples += 1;
+                            found_standard.push(vec![x0, x1]);
+                        }
+                    }
+                    return;
+                }
+                if let (None, Some(x1)) = (known_x[0], known_x[1]) {
+                    if branch_v_set.is_none() {
+                        for x0 in PkmSemaevOracle::solve_s3_for_middle(curve, a, b, x1, x_r, mults)
+                        {
+                            if root_v_rank.contains_key(&x0) {
+                                stats.algebraic_tuples += 1;
+                                found_standard.push(vec![x0, x1]);
+                            }
+                        }
+                        return;
+                    }
+                }
+            }
+
+            // Leaf: all tower variables fixed!
+            if cur_ring.n_tower() == 0 {
+                stats.terminal_leaves += 1;
+                let xs: Vec<u64> = known_x.into_iter().map(|o| o.unwrap()).collect();
+                if let Some(lift_xs) = shared_lift_xs {
+                    for (li, &lx) in lift_xs.iter().enumerate() {
+                        *mults += 8;
+                        if eval_s3_u64(xs[0], xs[1], lx, a, b, p) != 0 {
+                            continue;
+                        }
+                        let ok = cur_basis.iter().all(|g| {
+                            PkmSemaevOracle::eval_free_only_poly_at_u0(p, g, lx % p, mults) == 0
+                        });
+                        if ok {
+                            stats.algebraic_tuples += 1;
+                            found_shared[li].push(xs.clone());
+                        }
+                    }
+                } else if PkmSemaevOracle::semaev_zero_m(curve, a, b, &xs, x_r, mults) {
+                    stats.algebraic_tuples += 1;
+                    found_standard.push(xs);
+                }
+                return;
+            }
+
+            // Branching: choose a top-level tower variable (`next.is_none()`), preferring
+            // the summand with the fewest remaining unfixed tower variables so summands
+            // complete one at a time and cascade linearly.
+            let mut rem_per_summand = vec![0usize; m];
+            for &mapping in &orig_of_cur {
+                if let Some((s, _)) = mapping {
+                    rem_per_summand[s] += 1;
+                }
+            }
+            let mut var_freq = vec![0usize; cur_ring.n_tower()];
+            for g in &cur_basis {
+                if g.len() <= 8 {
+                    for &mo in &g.monos {
+                        let mut msk = mask_of(mo);
+                        while msk != 0 {
+                            let j = msk.trailing_zeros() as usize;
+                            if j < var_freq.len() {
+                                var_freq[j] += 1;
+                            }
+                            msk &= msk - 1;
+                        }
+                    }
+                }
+            }
+            let chosen_var = (0..cur_ring.n_tower())
+                .filter(|&v| cur_ring.rules[v].next.is_none())
+                .min_by_key(|&v| {
+                    if let Some((s, _)) = orig_of_cur[v] {
+                        (1, rem_per_summand[s], usize::MAX - var_freq[v], v)
+                    } else {
+                        // Resolve chart selectors before walking membership
+                        // towers; they do not contribute a factor-base x.
+                        (0, 0, usize::MAX - var_freq[v], v)
+                    }
+                })
+                .expect("at least one top tower variable exists");
+
+            let rule = &cur_ring.rules[chosen_var];
+            let cached = rule_roots.contains_key(&PkmSemaevOracle::rule_abcd(rule));
+            let roots = PkmSemaevOracle::lookup_rule_roots(rule_roots, curve, rule);
+            stats.root_split_branches += roots.len() as u64;
+            let parent_terms = cur_basis.iter().map(|g| g.len() as u64).sum::<u64>();
+            stats.peak_live_basis_cache_terms = stats
+                .peak_live_basis_cache_terms
+                .max(stack_basis_terms + parent_terms + cache_root_terms);
+            // Cached prepare()-time roots cost nothing at runtime; a miss still
+            // pays a one-shot Tonelli–Shanks (~34 Fp mults on a 31-bit prime).
+            if !cached {
+                *mults += 34;
+            }
+            for rt in roots {
+                let (c_ring, c_basis, _, sm) = cur_ring.specialize_drop_top_var(
+                    &cur_basis,
+                    chosen_var,
+                    rt,
+                    TowerWeights::UNIT,
+                );
+                *mults += sm;
+                let mut c_orig = orig_of_cur.clone();
+                let mut c_fixed = fixed_tower.clone();
+                if let Some((s_idx, l_idx)) = c_orig.remove(chosen_var) {
+                    c_fixed[s_idx][l_idx] = Some(rt);
+                }
+                stats.branch_copy_basis_terms +=
+                    c_basis.iter().map(|g| g.len() as u64).sum::<u64>();
+                stats.branch_copy_state_slots += (c_orig.len()
+                    + c_fixed.iter().map(Vec::len).sum::<usize>()
+                    + free_done.len()) as u64;
+                dfs(
+                    oracle,
+                    curve,
+                    a,
+                    b,
+                    x_r,
+                    shared_lift_xs,
+                    root_v_rank,
+                    rule_roots,
+                    branch_v_set,
+                    c_ring,
+                    c_basis,
+                    c_orig,
+                    c_fixed,
+                    free_done.clone(),
+                    mults,
+                    stats,
+                    stack_basis_terms + parent_terms,
+                    cache_root_terms,
+                    found_standard,
+                    found_shared,
+                );
+            }
+        }
+
+        dfs(
+            self,
+            curve,
+            a,
+            b,
+            x_r,
+            shared_lift_xs,
+            root_v_rank,
+            rule_roots,
+            &branch_v_set,
+            cur_ring,
+            cur_basis,
+            orig_of_cur,
+            fixed_tower,
+            free_done_init,
+            &mut mults,
+            &mut stats,
+            0,
+            cache_root_terms,
+            &mut found_standard,
+            &mut found_shared,
+        );
+
+        let canonicalize = |list: &mut Vec<Vec<u64>>| {
+            for xs in list.iter_mut() {
+                xs.sort_by_key(|x| root_v_rank.get(x).copied().unwrap_or(u32::MAX));
+            }
+            list.sort_by(|u, w| {
+                let ku: Vec<u32> = u
+                    .iter()
+                    .map(|x| root_v_rank.get(x).copied().unwrap_or(u32::MAX))
+                    .collect();
+                let kw: Vec<u32> = w
+                    .iter()
+                    .map(|x| root_v_rank.get(x).copied().unwrap_or(u32::MAX))
+                    .collect();
+                ku.cmp(&kw)
+            });
+            list.dedup();
+        };
+        canonicalize(&mut found_standard);
+        for fl in &mut found_shared {
+            canonicalize(fl);
+        }
+        (found_standard, found_shared, mults, stats)
+    }
+
+    /// Parent-to-child `F_p` basis inheritance across the `G`-level summand-0
+    /// guess tree when running plain F4 (`!self.trace && self.inherit && self.guess > 0`).
+    /// Returns all consistent leaf `(TowerRing, TowerF4Report, Vec<(usize, u64)>, bool)`
+    /// lazily in branch order, or an empty `Vec` paired with the last refutation report.
+    #[allow(clippy::result_large_err)]
+    fn run_inherited_guess_leaf(
+        &mut self,
+        curve: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        ops: &mut GroupOps,
+        counters: &mut OracleCounters,
+        point: PrimePoint,
+        x_r: u64,
+        roots: Option<&[u64]>,
+    ) -> Result<Option<Vec<usize>>, (TowerF4Report, bool)> {
+        let sys_root = self.specialise_branch(None, x_r, roots);
+        let root_ring = self.prepared.as_ref().expect("prepared").ring.clone();
+        let g_total = self.guess as usize;
+        let t = self.t as usize;
+        let shape = self.shape.clone().unwrap_or_default();
+
+        // Low-degree parent pass once at the unsplit root.
+        let mut parent_opts = self.f4_options();
+        parent_opts.max_degree = self.max_degree.min(3);
+        let mut parent_rep = f4_tower(&sys_root, &root_ring, &parent_opts);
+        if parent_rep.inconsistent {
+            let mut extra = BTreeMap::new();
+            extra.insert("max_cols_max".to_string(), parent_rep.max_cols as u64);
+            extra.insert("max_rows_max".to_string(), parent_rep.max_rows as u64);
+            extra.insert("max_nnz_max".to_string(), parent_rep.max_nnz);
+            extra.insert("steps".to_string(), parent_rep.steps as u64);
+            extra.insert("refutations".to_string(), 1);
+            extra.insert("staircase_stops".to_string(), 0);
+            let cost = SolverCost {
+                ops: parent_rep.muladds,
+                op_unit: "F_p multiply-adds (elimination only)".into(),
+                wall_ns: (parent_rep.ms * 1e6) as u64,
+                degree_reached: Some(parent_rep.degree_reached),
+                solving_degree: Some(parent_rep.solving_degree_max),
+                timed_out: parent_rep.timed_out,
+                extra,
+                ..Default::default()
+            };
+            self.totals.absorb(&shape, Some(&cost), false);
+            self.bump("pkm_guess_branches_solved", 1);
+            return Err((parent_rep, false));
+        }
+
+        let mut pending_ops = parent_rep.muladds;
+        let mut pending_ms = parent_rep.ms;
+        let mut last_rep: Option<(TowerF4Report, bool)> = None;
+        let mut any_extracted = false;
+        let mut any_undecided = false;
+
+        // Iterative DFS stack over `(depth, ring, basis, fixed_s0_top)`.
+        let init_basis = std::mem::take(&mut parent_rep.basis);
+        let mut stack: Vec<(usize, TowerRing, Vec<RPoly>, Vec<(usize, u64)>)> =
+            vec![(0, root_ring, init_basis, Vec::new())];
+        while let Some((depth, cur_ring, cur_basis, fixed_s0)) = stack.pop() {
+            if depth == g_total {
+                let opts = self.f4_options();
+                let rep = f4_tower(&cur_basis, &cur_ring, &opts);
+                let undecided = !rep.inconsistent
+                    && rep.staircase_at_stop.is_none()
+                    && (rep.timed_out || rep.oversize || rep.pairs_above_bound > 0);
+                let mut extra = BTreeMap::new();
+                extra.insert("max_cols_max".to_string(), rep.max_cols as u64);
+                extra.insert("max_rows_max".to_string(), rep.max_rows as u64);
+                extra.insert("max_nnz_max".to_string(), rep.max_nnz);
+                extra.insert("steps".to_string(), rep.steps as u64);
+                extra.insert("refutations".to_string(), u64::from(rep.inconsistent));
+                extra.insert(
+                    "staircase_stops".to_string(),
+                    u64::from(rep.staircase_at_stop.is_some()),
+                );
+                let cost = SolverCost {
+                    ops: rep.muladds + std::mem::take(&mut pending_ops),
+                    op_unit: "F_p multiply-adds (elimination only)".into(),
+                    wall_ns: ((rep.ms + std::mem::take(&mut pending_ms)) * 1e6) as u64,
+                    degree_reached: Some(rep.degree_reached),
+                    solving_degree: (!undecided).then_some(rep.solving_degree_max),
+                    timed_out: rep.timed_out,
+                    extra,
+                    ..Default::default()
+                };
+                self.totals.absorb(&shape, Some(&cost), undecided);
+                self.bump("pkm_guess_branches_solved", 1);
+
+                if rep.inconsistent {
+                    last_rep = Some((rep, false));
+                    continue;
+                }
+                any_undecided |= undecided;
+                if !self.use_descent_extraction() {
+                    // Legacy grid: `descent=0`, or tiny `|V|^m` where grid wins.
+                    if self.descent && self.prefer_grid_extraction() {
+                        self.bump("pkm_descent_deferred_to_grid", 1);
+                    }
+                    last_rep = Some((rep, undecided));
+                    break;
+                }
+                if !self.shared_pts.is_empty() {
+                    let lift_xs: Vec<u64> = self.shared_pts.iter().map(|pt| pt.x).collect();
+                    let (_, per_lift, m_ext, dfs) = self.extract_solutions_from_basis(
+                        curve,
+                        None,
+                        &cur_ring,
+                        &rep.basis,
+                        &fixed_s0,
+                        x_r,
+                        Some(&lift_xs),
+                    );
+                    self.bump("pkm_grid_fp_mults_uncharged", m_ext);
+                    self.record_basis_dfs(dfs);
+                    let pts = self.shared_pts.clone();
+                    for (li, t_pt) in pts.iter().enumerate() {
+                        for xs in &per_lift[li] {
+                            any_extracted = true;
+                            if xs.iter().all(|x| fb.x_index.contains_key(x)) {
+                                if let Some(idx) = lift_abscissae(curve, fb, ops, xs, *t_pt) {
+                                    if li != 0 {
+                                        self.bump("pkm_lift_hits_nonidentity", 1);
+                                    }
+                                    self.bump("pkm_consistent_systems", 1);
+                                    self.bump("pkm_basis_dfs_verified_tuples", 1);
+                                    return Ok(Some(idx));
+                                }
+                            }
+                            counters.lift_failures += 1;
+                        }
+                    }
+                    last_rep = Some((rep, undecided));
+                    continue;
+                }
+
+                let (sols, _, m_ext, dfs) = self.extract_solutions_from_basis(
+                    curve, None, &cur_ring, &rep.basis, &fixed_s0, x_r, None,
+                );
+                self.bump("pkm_grid_fp_mults_uncharged", m_ext);
+                self.record_basis_dfs(dfs);
+                for xs in &sols {
+                    any_extracted = true;
+                    if let Membership::T0Bits { q: Some(q), .. } = self.membership {
+                        if let Some(idx) = self.t0_lift(curve, fb, ops, &q, xs, point) {
+                            self.bump("pkm_consistent_systems", 1);
+                            self.bump("pkm_basis_dfs_verified_tuples", 1);
+                            return Ok(Some(idx));
+                        }
+                        counters.lift_failures += 1;
+                        continue;
+                    }
+                    if xs.iter().all(|x| fb.x_index.contains_key(x)) {
+                        if let Some(idx) = lift_abscissae(curve, fb, ops, xs, point) {
+                            self.bump("pkm_consistent_systems", 1);
+                            self.bump("pkm_basis_dfs_verified_tuples", 1);
+                            return Ok(Some(idx));
+                        }
+                    }
+                    counters.lift_failures += 1;
+                }
+                last_rep = Some((rep, undecided));
+                continue;
+            }
+
+            let var = t - 1 - depth;
+            let prep_roots = self
+                .prepared
+                .as_ref()
+                .map(|p| &p.rule_roots)
+                .expect("prepared");
+            let mut rts = Self::lookup_rule_roots(prep_roots, curve, &cur_ring.rules[var]);
+            rts.reverse(); // push in reverse so smaller root is popped first
+            for rt in rts {
+                let (c_ring, mut c_basis, _, sm) =
+                    cur_ring.specialize_drop_top_var(&cur_basis, var, rt, TowerWeights::UNIT);
+                self.bump("pkm_system_fp_mults_uncharged", sm);
+                if c_basis.iter().any(|g| g.len() == 1 && g.monos[0] == ONE) {
+                    continue;
+                }
+                if g_total - 1 - depth >= 1 {
+                    let mut mid_opts = self.f4_options();
+                    mid_opts.max_degree = self.max_degree.min(3);
+                    let mid_rep = f4_tower(&c_basis, &c_ring, &mid_opts);
+                    pending_ops += mid_rep.muladds;
+                    pending_ms += mid_rep.ms;
+                    if mid_rep.inconsistent {
+                        continue;
+                    }
+                    c_basis = mid_rep.basis;
+                }
+                let mut f2 = fixed_s0.clone();
+                f2.push((var, rt));
+                stack.push((depth + 1, c_ring, c_basis, f2));
+            }
+        }
+
+        if pending_ops > 0 && last_rep.is_none() {
+            let cost = SolverCost {
+                ops: pending_ops,
+                op_unit: "F_p multiply-adds (elimination only)".into(),
+                wall_ns: (pending_ms * 1e6) as u64,
+                degree_reached: Some(parent_rep.degree_reached),
+                solving_degree: Some(parent_rep.solving_degree_max),
+                ..Default::default()
+            };
+            self.totals.absorb(&shape, Some(&cost), false);
+            self.bump("pkm_guess_branches_solved", 1);
+            return Err((
+                TowerF4Report {
+                    inconsistent: true,
+                    ..parent_rep
+                },
+                false,
+            ));
+        }
+
+        let (rep, undec) = last_rep.unwrap_or((
+            TowerF4Report {
+                inconsistent: true,
+                ..parent_rep
+            },
+            false,
+        ));
+        if rep.inconsistent {
+            return Err((rep, false));
+        }
+        if !self.use_descent_extraction() {
+            return Err((rep, undec));
+        }
+        if any_undecided {
+            self.bump("pkm_undecided_systems", 1);
+        } else if !any_extracted {
+            self.bump("pkm_consistent_without_grid_solution", 1);
+        } else {
+            self.bump("pkm_consistent_systems", 1);
+            counters.unliftable_systems += 1;
+        }
+        Ok(None)
+    }
+
     /// The shared system was not refuted (consistent, or undecided): read
-    /// the solutions of each lift's grid, in the order `lifts=1` tries the
+    /// the solutions of each lift, in the order `lifts=1` tries the
     /// lifts, and return the first relation that lifts to that lift target.
-    /// The grid is exact, so the verdict equals the per-lift one.
+    #[allow(clippy::too_many_arguments)]
     fn read_shared(
         &mut self,
         ctx: &InstanceCtx<PrimeCurve>,
@@ -1789,25 +3820,61 @@ impl PkmSemaevOracle {
         ops: &mut GroupOps,
         counters: &mut OracleCounters,
         undecided: bool,
+        basis_info: Option<(Option<usize>, &TowerRing, &[RPoly], &[(usize, u64)])>,
     ) -> Option<Vec<usize>> {
         let curve = ctx.group;
         let pts = self.shared_pts.clone();
         let mut any = false;
-        for (i, t) in pts.iter().enumerate() {
-            let (sols, mults) = self.grid(curve, t.x, false);
+        if let (true, Some((br_idx, ring, basis, fixed_s0))) =
+            (self.use_descent_extraction(), basis_info)
+        {
+            let lift_xs: Vec<u64> = pts.iter().map(|t| t.x).collect();
+            let (_, per_lift, mults, dfs) = self.extract_solutions_from_basis(
+                curve,
+                br_idx,
+                ring,
+                basis,
+                fixed_s0,
+                0,
+                Some(&lift_xs),
+            );
             self.bump("pkm_grid_fp_mults_uncharged", mults);
-            for xs in &sols {
-                any = true;
-                if xs.iter().all(|x| fb.x_index.contains_key(x)) {
-                    if let Some(idx) = lift_abscissae(curve, fb, ops, xs, *t) {
-                        if i != 0 {
-                            self.bump("pkm_lift_hits_nonidentity", 1);
+            self.record_basis_dfs(dfs);
+            for (i, t) in pts.iter().enumerate() {
+                for xs in &per_lift[i] {
+                    any = true;
+                    if xs.iter().all(|x| fb.x_index.contains_key(x)) {
+                        if let Some(idx) = lift_abscissae(curve, fb, ops, xs, *t) {
+                            self.record_projective_chart(curve, fb, &idx);
+                            if i != 0 {
+                                self.bump("pkm_lift_hits_nonidentity", 1);
+                            }
+                            self.bump("pkm_consistent_systems", 1);
+                            self.bump("pkm_basis_dfs_verified_tuples", 1);
+                            return Some(idx);
                         }
-                        self.bump("pkm_consistent_systems", 1);
-                        return Some(idx);
                     }
+                    counters.lift_failures += 1;
                 }
-                counters.lift_failures += 1;
+            }
+        } else {
+            for (i, t) in pts.iter().enumerate() {
+                let (sols, mults) = self.grid(curve, t.x, false);
+                self.bump("pkm_grid_fp_mults_uncharged", mults);
+                for xs in &sols {
+                    any = true;
+                    if xs.iter().all(|x| fb.x_index.contains_key(x)) {
+                        if let Some(idx) = lift_abscissae(curve, fb, ops, xs, *t) {
+                            self.record_projective_chart(curve, fb, &idx);
+                            if i != 0 {
+                                self.bump("pkm_lift_hits_nonidentity", 1);
+                            }
+                            self.bump("pkm_consistent_systems", 1);
+                            return Some(idx);
+                        }
+                    }
+                    counters.lift_failures += 1;
+                }
             }
         }
         if undecided {
@@ -1854,6 +3921,9 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             Membership::T0Bits { lo, .. } => format!(
                 "T0-invariant bits: w = z + d/z = {lo} + Σ 2^j b_j, b_j² = b_j (S₃ of E/⟨T₀⟩)"
             ),
+            Membership::Dickson { lo, c_top } => format!(
+                "Dickson/T2 tower: x = y_0 + {lo}, y_j² = y_(j+1) + 2, y_(t-1)² = {c_top} + 2"
+            ),
         };
         format!(
             "Semaev S_(m+1) over F_p with each x_i on {} (PKM), m = {}, t = {}, mode {}, engine {}",
@@ -1869,10 +3939,10 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
 
     fn parameters(&self) -> &[(&str, &str)] {
         &[
-            ("m", "summands, 2 or 3"),
+            ("m", "summands, 2 to the selected mode's maximum"),
             (
                 "mode",
-                "chain (default for m ≥ 3: S₃ links with free u) or full (S_(m+1))",
+                "chain (default for m ≥ 3: affine S₃ links), projective (m=3: homogeneous link with identity chart), full (S_(m+1)), or sym (m≤4: elementary-symmetric form)",
             ),
             (
                 "engine",
@@ -1886,6 +3956,10 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             (
                 "staircase",
                 "stop F4 once at most this many standard monomials remain",
+            ),
+            (
+                "grid_crossover",
+                "|V|^m at or below which grid() replaces root descent (default 512; 0 forces descent)",
             ),
             (
                 "crosscheck",
@@ -2069,6 +4143,16 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 }
                 return self.finish_prepare(curve, 0);
             }
+            Membership::Dickson { lo, c_top } => {
+                let xs = dickson_abscissae(p, self.t, *lo, *c_top)?;
+                let set: HashSet<u64> = xs.into_iter().collect();
+                if let Some(x) = fb.abscissa_list.iter().find(|x| !set.contains(x)) {
+                    return Err(format!(
+                        "pkm-semaev: abscissa {x} of the base is not in the Dickson/T2 tower"
+                    ));
+                }
+                return self.finish_prepare(curve, 0);
+            }
         }
         primitive_two_power_root(p, self.t)
             .ok_or_else(|| format!("pkm-semaev: 2^{} does not divide p − 1", self.t))?;
@@ -2119,6 +4203,15 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         counters: &mut OracleCounters,
         point: PrimePoint,
     ) -> Option<Vec<usize>> {
+        self.native.entry("pkm_invalid_rows".into()).or_insert(0);
+        if self.mode == PkmMode::Projective {
+            self.native
+                .entry("pkm_projective_affine_chart_hits".into())
+                .or_insert(0);
+            self.native
+                .entry("pkm_projective_identity_chart_hits".into())
+                .or_insert(0);
+        }
         if !self.in_lift {
             self.shared_pts.clear();
             if let Some(ks) = self
@@ -2212,6 +4305,51 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             }
         }
         let solutions = match self.engine {
+            PkmEngine::ResGcd | PkmEngine::Scan => {
+                let started = Instant::now();
+                let (sols, mults) = if self.engine == PkmEngine::ResGcd {
+                    self.resgcd(curve, x_r)
+                } else {
+                    self.scan(curve, x_r)
+                };
+                let wall_ns = started.elapsed().as_nanos() as u64;
+                if self.crosscheck {
+                    let (mut want, gm) = self.grid(curve, x_r, false);
+                    self.bump("pkm_crosscheck_fp_mults", gm);
+                    let mut got = sols.clone();
+                    for s in want.iter_mut().chain(got.iter_mut()) {
+                        s.sort_unstable();
+                    }
+                    want.sort();
+                    got.sort();
+                    if want != got {
+                        self.bump("pkm_crosscheck_disagreements", 1);
+                    }
+                    self.bump("pkm_crosscheck_systems", 1);
+                }
+                let unit = if self.engine == PkmEngine::ResGcd {
+                    "F_p multiplications (resultant-gcd)"
+                } else {
+                    "F_p multiplications (quadratic scan)"
+                };
+                let shape = self.shape.clone().unwrap_or_default();
+                // Unlike the grid, these multiplications are the solver's
+                // own count and are priced in the solver block, as F4's
+                // multiply-adds are.
+                let cost = SolverCost {
+                    ops: mults,
+                    op_unit: unit.into(),
+                    wall_ns,
+                    ..Default::default()
+                };
+                self.totals.op_unit = unit.into();
+                self.totals.absorb(&shape, Some(&cost), false);
+                if sols.is_empty() {
+                    return None;
+                }
+                self.bump("pkm_consistent_systems", 1);
+                sols
+            }
             PkmEngine::Exhaustive => {
                 let started = Instant::now();
                 let (sols, mults) = self.grid(curve, x_r, false);
@@ -2243,163 +4381,289 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 sols
             }
             PkmEngine::F4 => {
-                // Hybrid guessing: one F4 system per assignment of the guessed
-                // bits; the first consistent branch goes to the grid, and the
-                // target is refuted only when every branch is.
-                let n_branches = self.branches.len().max(1);
-                let mut last = None;
-                for br in 0..n_branches {
-                    let branch = (!self.branches.is_empty()).then_some(br);
+                // The T0 quotient admits raw interval roots without base-curve
+                // preimages. Parent-basis inheritance can falsely refute one
+                // of those roots; the independent guess branches do not.
+                if !self.trace
+                    && self.inherit
+                    && self.guess > 0
+                    && !self.dataset_trace
+                    && !matches!(&self.membership, Membership::T0Bits { .. })
+                {
                     let shared_roots: Vec<u64> = self.shared_pts.iter().map(|t| t.x).collect();
                     let roots = self.shared.then_some(&shared_roots[..]);
-                    let sys = self.specialise_branch(branch, x_r, roots);
-                    if let Some(snapshot) = &mut self.dataset_artifact {
-                        snapshot["specialized_equations"] = serde_json::json!(sys
-                            .iter()
-                            .map(Self::polynomial_artifact)
-                            .collect::<Vec<_>>());
-                    }
-                    let ring = match branch {
-                        Some(b) => self.branches[b].ring.clone(),
-                        None => self.prepared.as_ref().expect("prepared").ring.clone(),
-                    };
-                    let opts = self.f4_options();
-                    let mut extra_ops = 0u64;
-                    let mut extra_ms = 0.0f64;
-                    let rep = if self.trace {
-                        let tr = self.traces.get(br).cloned().flatten();
-                        match tr {
-                            None => {
-                                self.bump("pkm_trace_untraced_branch_runs", 1);
-                                f4_tower(&sys, &ring, &opts)
-                            }
-                            Some(tr) => {
-                                let mut ropts = opts.clone();
-                                ropts.replay = Some(tr);
-                                let r = f4_tower(&sys, &ring, &ropts);
-                                self.bump("pkm_trace_replays", 1);
-                                self.bump("pkm_trace_replay_muladds", r.muladds);
-                                if r.inconsistent {
-                                    self.bump("pkm_trace_refuted", 1);
-                                    r
-                                } else {
-                                    let why = r
-                                        .replay_failure
-                                        .unwrap_or("no refutation")
-                                        .replace(' ', "_");
-                                    self.bump(&format!("pkm_trace_failure_{why}"), 1);
-                                    if let Some((s, g, w)) = r.replay_mismatch {
-                                        self.bump(
-                                            &format!("pkm_trace_mismatch_step{s}_got{g}_want{w}"),
-                                            1,
-                                        );
+                    match self.run_inherited_guess_leaf(curve, fb, ops, counters, point, x_r, roots)
+                    {
+                        Ok(res) => return res,
+                        Err((rep, undecided)) => {
+                            if rep.inconsistent {
+                                if self.crosscheck {
+                                    let xs: Vec<u64> = if self.shared_pts.is_empty() {
+                                        vec![x_r]
+                                    } else {
+                                        self.shared_pts.iter().map(|t| t.x).collect()
+                                    };
+                                    for x in xs {
+                                        let (sols, mults) = self.grid(curve, x, true);
+                                        self.bump("pkm_crosscheck_fp_mults", mults);
+                                        if !sols.is_empty() {
+                                            self.bump("pkm_crosscheck_disagreements", 1);
+                                        }
                                     }
-                                    let plain = f4_tower(&sys, &ring, &opts);
-                                    self.bump("pkm_trace_fallbacks", 1);
-                                    self.bump("pkm_trace_fallback_plain_muladds", plain.muladds);
-                                    extra_ops = r.muladds;
-                                    extra_ms = r.ms;
-                                    plain
+                                }
+                                return None;
+                            }
+                            // Only reached when `self.descent == false`: fall back to legacy grid.
+                            if !self.shared_pts.is_empty() {
+                                return self.read_shared(ctx, fb, ops, counters, undecided, None);
+                            }
+                            let (sols, mults) = self.grid(curve, x_r, false);
+                            self.bump("pkm_grid_fp_mults_uncharged", mults);
+                            if undecided {
+                                self.bump("pkm_undecided_systems", 1);
+                            } else if sols.is_empty() {
+                                self.bump("pkm_consistent_without_grid_solution", 1);
+                            } else {
+                                self.bump("pkm_consistent_systems", 1);
+                            }
+                            if sols.is_empty() {
+                                return None;
+                            }
+                            sols
+                        }
+                    }
+                } else {
+                    let n_branches = self.branches.len().max(1);
+                    let mut last = None;
+                    let mut gathered_sols: Vec<Vec<u64>> = Vec::new();
+                    let mut any_undecided = false;
+                    for br in 0..n_branches {
+                        let branch = (!self.branches.is_empty()).then_some(br);
+                        let shared_roots: Vec<u64> = self.shared_pts.iter().map(|t| t.x).collect();
+                        let roots = self.shared.then_some(&shared_roots[..]);
+                        let sys = self.specialise_branch(branch, x_r, roots);
+                        if let Some(snapshot) = &mut self.dataset_artifact {
+                            snapshot["specialized_equations"] = serde_json::json!(sys
+                                .iter()
+                                .map(Self::polynomial_artifact)
+                                .collect::<Vec<_>>());
+                        }
+                        let (ring, fixed_s0) = match branch {
+                            Some(b) => (
+                                self.branches[b].ring.clone(),
+                                self.branches[b].fixed_s0_top.clone(),
+                            ),
+                            None => (
+                                self.prepared.as_ref().expect("prepared").ring.clone(),
+                                Vec::new(),
+                            ),
+                        };
+                        let opts = self.f4_options();
+                        let mut extra_ops = 0u64;
+                        let mut extra_ms = 0.0f64;
+                        let rep = if self.trace {
+                            let tr = self.traces.get(br).cloned().flatten();
+                            match tr {
+                                None => {
+                                    self.bump("pkm_trace_untraced_branch_runs", 1);
+                                    f4_tower(&sys, &ring, &opts)
+                                }
+                                Some(tr) => {
+                                    let mut ropts = opts.clone();
+                                    ropts.replay = Some(tr);
+                                    let r = f4_tower(&sys, &ring, &ropts);
+                                    self.bump("pkm_trace_replays", 1);
+                                    self.bump("pkm_trace_replay_muladds", r.muladds);
+                                    if r.inconsistent {
+                                        self.bump("pkm_trace_refuted", 1);
+                                        r
+                                    } else {
+                                        let why = r
+                                            .replay_failure
+                                            .unwrap_or("no refutation")
+                                            .replace(' ', "_");
+                                        self.bump(&format!("pkm_trace_failure_{why}"), 1);
+                                        if let Some((s, g, w)) = r.replay_mismatch {
+                                            self.bump(
+                                                &format!(
+                                                    "pkm_trace_mismatch_step{s}_got{g}_want{w}"
+                                                ),
+                                                1,
+                                            );
+                                        }
+                                        let plain = f4_tower(&sys, &ring, &opts);
+                                        self.bump("pkm_trace_fallbacks", 1);
+                                        self.bump(
+                                            "pkm_trace_fallback_plain_muladds",
+                                            plain.muladds,
+                                        );
+                                        extra_ops = r.muladds;
+                                        extra_ms = r.ms;
+                                        plain
+                                    }
+                                }
+                            }
+                        } else {
+                            f4_tower(&sys, &ring, &opts)
+                        };
+                        if let Some(snapshot) = &mut self.dataset_artifact {
+                            snapshot["f4_basis"] = serde_json::json!(rep
+                                .basis
+                                .iter()
+                                .map(Self::polynomial_artifact)
+                                .collect::<Vec<_>>());
+                            snapshot["f4_report"] = serde_json::json!({"inconsistent":rep.inconsistent,
+                                "timed_out":rep.timed_out,"oversize":rep.oversize,"degree_reached":rep.degree_reached,
+                                "observed_productive_degree_max":rep.solving_degree_max,"pairs_above_bound":rep.pairs_above_bound,
+                                "elimination_fp_muladds":rep.muladds,"max_rows":rep.max_rows,"max_cols":rep.max_cols,
+                                "max_nnz":rep.max_nnz,"critical_pairs_reduced":rep.critical_pairs_reduced,
+                                "tower_pairs_reduced":rep.tower_pairs_reduced,"pairs_product_skipped":rep.pairs_product_skipped,
+                                "pairs_chain_skipped":rep.pairs_chain_skipped,"reducer_rows":rep.reducer_rows,
+                                "full_exposed_native_report_debug":format!("{rep:#?}")});
+                        }
+                        let undecided = !rep.inconsistent
+                            && rep.staircase_at_stop.is_none()
+                            && (rep.timed_out || rep.oversize || rep.pairs_above_bound > 0);
+                        let mut extra = BTreeMap::new();
+                        extra.insert("max_cols_max".to_string(), rep.max_cols as u64);
+                        extra.insert("max_rows_max".to_string(), rep.max_rows as u64);
+                        extra.insert("max_nnz_max".to_string(), rep.max_nnz);
+                        extra.insert("steps".to_string(), rep.steps as u64);
+                        extra.insert("refutations".to_string(), u64::from(rep.inconsistent));
+                        extra.insert(
+                            "staircase_stops".to_string(),
+                            u64::from(rep.staircase_at_stop.is_some()),
+                        );
+                        let cost = SolverCost {
+                            ops: rep.muladds + extra_ops,
+                            op_unit: "F_p multiply-adds (elimination only)".into(),
+                            wall_ns: ((rep.ms + extra_ms) * 1e6) as u64,
+                            peak_bytes: 0,
+                            degree_reached: Some(rep.degree_reached),
+                            solving_degree: (!undecided).then_some(rep.solving_degree_max),
+                            timed_out: rep.timed_out,
+                            extra,
+                            ..Default::default()
+                        };
+                        let shape = self.shape.clone().unwrap_or_default();
+                        self.totals.absorb(&shape, Some(&cost), undecided);
+                        if branch.is_some() {
+                            self.bump("pkm_guess_branches_solved", 1);
+                        }
+                        if rep.inconsistent {
+                            last = Some((rep, ring, fixed_s0, branch, undecided));
+                            continue;
+                        }
+                        any_undecided |= undecided;
+                        if !self.use_descent_extraction() || !self.shared_pts.is_empty() {
+                            if self.descent && self.prefer_grid_extraction() {
+                                self.bump("pkm_descent_deferred_to_grid", 1);
+                            }
+                            last = Some((rep, ring, fixed_s0, branch, undecided));
+                            break;
+                        }
+                        let (br_sols, _, m_ext, dfs) = self.extract_solutions_from_basis(
+                            curve, branch, &ring, &rep.basis, &fixed_s0, x_r, None,
+                        );
+                        self.bump("pkm_grid_fp_mults_uncharged", m_ext);
+                        self.record_basis_dfs(dfs);
+                        // Check if any extracted tuple on this branch lifts to `fb` before stopping
+                        // multi-branch search (so an accidental twist root on branch 0 never masks
+                        // a curve solution on a later branch!).
+                        let branch_has_carrier = br_sols.iter().any(|xs| match &self.membership {
+                            Membership::T0Bits { q: Some(q), .. } => xs
+                                .iter()
+                                .all(|&xw| self.t0_map.contains_key(&subm(xw, q.s, curve.p))),
+                            _ => xs.iter().all(|x| fb.x_index.contains_key(x)),
+                        });
+                        gathered_sols.extend(br_sols);
+                        last = Some((rep, ring, fixed_s0, branch, undecided));
+                        if branch.is_none() || branch_has_carrier {
+                            break;
+                        }
+                    }
+                    let (rep, ring, fixed_s0, branch, undecided) =
+                        last.expect("at least one branch");
+                    if rep.inconsistent && gathered_sols.is_empty() {
+                        if self.crosscheck {
+                            let xs: Vec<u64> = if self.shared_pts.is_empty() {
+                                vec![x_r]
+                            } else {
+                                self.shared_pts.iter().map(|t| t.x).collect()
+                            };
+                            for x in xs {
+                                let (sols, mults) = self.grid(curve, x, true);
+                                self.bump("pkm_crosscheck_fp_mults", mults);
+                                if !sols.is_empty() {
+                                    self.bump("pkm_crosscheck_disagreements", 1);
                                 }
                             }
                         }
-                    } else {
-                        f4_tower(&sys, &ring, &opts)
-                    };
-                    if let Some(snapshot) = &mut self.dataset_artifact {
-                        snapshot["f4_basis"] = serde_json::json!(rep
-                            .basis
-                            .iter()
-                            .map(Self::polynomial_artifact)
-                            .collect::<Vec<_>>());
-                        snapshot["f4_report"] = serde_json::json!({"inconsistent":rep.inconsistent,
-                            "timed_out":rep.timed_out,"oversize":rep.oversize,"degree_reached":rep.degree_reached,
-                            "observed_productive_degree_max":rep.solving_degree_max,"pairs_above_bound":rep.pairs_above_bound,
-                            "elimination_fp_muladds":rep.muladds,"max_rows":rep.max_rows,"max_cols":rep.max_cols,
-                            "max_nnz":rep.max_nnz,"critical_pairs_reduced":rep.critical_pairs_reduced,
-                            "tower_pairs_reduced":rep.tower_pairs_reduced,"pairs_product_skipped":rep.pairs_product_skipped,
-                            "pairs_chain_skipped":rep.pairs_chain_skipped,"reducer_rows":rep.reducer_rows,
-                            "full_exposed_native_report_debug":format!("{rep:#?}")});
+                        return None;
                     }
-                    let undecided = !rep.inconsistent
-                        && rep.staircase_at_stop.is_none()
-                        && (rep.timed_out || rep.oversize || rep.pairs_above_bound > 0);
-                    let mut extra = BTreeMap::new();
-                    extra.insert("max_cols_max".to_string(), rep.max_cols as u64);
-                    extra.insert("max_rows_max".to_string(), rep.max_rows as u64);
-                    extra.insert("max_nnz_max".to_string(), rep.max_nnz as u64);
-                    extra.insert("steps".to_string(), rep.steps as u64);
-                    extra.insert("refutations".to_string(), u64::from(rep.inconsistent));
-                    extra.insert(
-                        "staircase_stops".to_string(),
-                        u64::from(rep.staircase_at_stop.is_some()),
-                    );
-                    let cost = SolverCost {
-                        ops: rep.muladds + extra_ops,
-                        op_unit: "F_p multiply-adds (elimination only)".into(),
-                        wall_ns: ((rep.ms + extra_ms) * 1e6) as u64,
-                        peak_bytes: 0,
-                        degree_reached: Some(rep.degree_reached),
-                        solving_degree: (!undecided).then_some(rep.solving_degree_max),
-                        timed_out: rep.timed_out,
-                        extra,
-                    };
-                    let shape = self.shape.clone().unwrap_or_default();
-                    self.totals.absorb(&shape, Some(&cost), undecided);
-                    if branch.is_some() {
-                        self.bump("pkm_guess_branches_solved", 1);
+                    if !self.shared_pts.is_empty() {
+                        return self.read_shared(
+                            ctx,
+                            fb,
+                            ops,
+                            counters,
+                            undecided,
+                            Some((branch, &ring, &rep.basis, &fixed_s0)),
+                        );
                     }
-                    let stop = !rep.inconsistent;
-                    last = Some((rep, undecided));
-                    if stop {
-                        break;
-                    }
-                }
-                let (rep, undecided) = last.expect("at least one branch");
-                if rep.inconsistent {
-                    if self.crosscheck {
-                        let xs: Vec<u64> = if self.shared_pts.is_empty() {
-                            vec![x_r]
-                        } else {
-                            self.shared_pts.iter().map(|t| t.x).collect()
-                        };
-                        for x in xs {
-                            let (sols, mults) = self.grid(curve, x, true);
-                            self.bump("pkm_crosscheck_fp_mults", mults);
-                            if !sols.is_empty() {
-                                self.bump("pkm_crosscheck_disagreements", 1);
-                            }
+                    let sols = if self.use_descent_extraction() {
+                        let root_v_rank = &self.prepared.as_ref().expect("prepared").v_rank;
+                        gathered_sols.sort_by(|u, w| {
+                            let ku: Vec<u32> = u
+                                .iter()
+                                .map(|x| root_v_rank.get(x).copied().unwrap_or(u32::MAX))
+                                .collect();
+                            let kw: Vec<u32> = w
+                                .iter()
+                                .map(|x| root_v_rank.get(x).copied().unwrap_or(u32::MAX))
+                                .collect();
+                            ku.cmp(&kw)
+                        });
+                        gathered_sols.dedup();
+                        if let Some(snapshot) = &mut self.dataset_artifact {
+                            snapshot["grid_extraction_attempted"] = serde_json::json!(true);
+                            snapshot["grid_root_x"] = serde_json::json!(gathered_sols
+                                .iter()
+                                .map(|xs| xs.iter().map(ToString::to_string).collect::<Vec<_>>())
+                                .collect::<Vec<_>>());
+                            snapshot["grid_fp_multiplies"] = serde_json::json!(self
+                                .native
+                                .get("pkm_grid_fp_mults_uncharged")
+                                .copied()
+                                .unwrap_or(0));
                         }
+                        gathered_sols
+                    } else {
+                        // `descent=0`, or adaptive tiny-`|V|^m` deferral to grid.
+                        let (sols, mults) = self.grid(curve, x_r, false);
+                        if let Some(snapshot) = &mut self.dataset_artifact {
+                            snapshot["grid_extraction_attempted"] = serde_json::json!(true);
+                            snapshot["grid_root_x"] = serde_json::json!(sols
+                                .iter()
+                                .map(|xs| xs.iter().map(ToString::to_string).collect::<Vec<_>>())
+                                .collect::<Vec<_>>());
+                            snapshot["grid_fp_multiplies"] = serde_json::json!(mults);
+                        }
+                        self.bump("pkm_grid_fp_mults_uncharged", mults);
+                        sols
+                    };
+                    if any_undecided {
+                        self.bump("pkm_undecided_systems", 1);
+                    } else if sols.is_empty() {
+                        self.bump("pkm_consistent_without_grid_solution", 1);
+                    } else {
+                        self.bump("pkm_consistent_systems", 1);
                     }
-                    return None;
+                    if sols.is_empty() {
+                        return None;
+                    }
+                    sols
                 }
-                if !self.shared_pts.is_empty() {
-                    return self.read_shared(ctx, fb, ops, counters, undecided);
-                }
-                // Consistent, or undecided: the grid reads the solutions.
-                let (sols, mults) = self.grid(curve, x_r, false);
-                if let Some(snapshot) = &mut self.dataset_artifact {
-                    snapshot["grid_extraction_attempted"] = serde_json::json!(true);
-                    snapshot["grid_root_x"] = serde_json::json!(sols
-                        .iter()
-                        .map(|xs| xs.iter().map(ToString::to_string).collect::<Vec<_>>())
-                        .collect::<Vec<_>>());
-                    snapshot["grid_fp_multiplies"] = serde_json::json!(mults);
-                }
-                self.bump("pkm_grid_fp_mults_uncharged", mults);
-                if undecided {
-                    self.bump("pkm_undecided_systems", 1);
-                } else if sols.is_empty() {
-                    // F4 stopped short of a certificate (staircase stop) on
-                    // a system with no grid solution.
-                    self.bump("pkm_consistent_without_grid_solution", 1);
-                } else {
-                    self.bump("pkm_consistent_systems", 1);
-                }
-                if sols.is_empty() {
-                    return None;
-                }
-                sols
             }
         };
         if let Some(snapshot) = &mut self.dataset_artifact {
@@ -2413,6 +4677,9 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
         for xs in &solutions {
             if let Membership::T0Bits { q: Some(q), .. } = self.membership {
                 if let Some(idx) = self.t0_lift(curve, fb, ops, &q, xs, point) {
+                    if self.engine == PkmEngine::F4 && self.use_descent_extraction() {
+                        self.bump("pkm_basis_dfs_verified_tuples", 1);
+                    }
                     return Some(idx);
                 }
                 counters.lift_failures += 1;
@@ -2420,6 +4687,10 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             }
             if xs.iter().all(|x| fb.x_index.contains_key(x)) {
                 if let Some(idx) = lift_abscissae(curve, fb, ops, xs, point) {
+                    if self.engine == PkmEngine::F4 && self.use_descent_extraction() {
+                        self.bump("pkm_basis_dfs_verified_tuples", 1);
+                    }
+                    self.record_projective_chart(curve, fb, &idx);
                     return Some(idx);
                 }
             }
@@ -2478,6 +4749,82 @@ mod tests {
     use crate::cryptanalysis::ic_framework::prime_tower::PrimeKummerBase;
     use crate::cryptanalysis::ic_framework::stages::FactorBaseBuilder;
     use rand::{rngs::StdRng, Rng, SeedableRng};
+
+    #[test]
+    fn quadratic_extraction_matches_every_small_smooth_curve() {
+        for p in [5u64, 7, 11] {
+            for a in 0..p {
+                for b in 0..p {
+                    if (4 * a * a * a + 27 * b * b).is_multiple_of(p) {
+                        continue;
+                    }
+                    let curve = PrimeCurve { p, a, b };
+                    for x1 in 0..p {
+                        for x3 in 0..p {
+                            let want: Vec<_> = (0..p)
+                                .filter(|&x2| eval_s3_u64(x1, x2, x3, a, b, p) == 0)
+                                .collect();
+                            let got =
+                                PkmSemaevOracle::solve_s3_for_middle(&curve, a, b, x1, x3, &mut 0);
+                            assert_eq!(got, want, "p={p} a={a} b={b} x1={x1} x3={x3}");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn quadratic_extraction_charges_failed_roots_without_inversion() {
+        let curve = PrimeCurve { p: 11, a: 1, b: 1 };
+        let mut checked = 0;
+        for x1 in 0..curve.p {
+            for x3 in 0..curve.p {
+                if x1 == x3 {
+                    continue;
+                }
+                let want: Vec<_> = (0..curve.p)
+                    .filter(|&x2| eval_s3_u64(x1, x2, x3, curve.a, curve.b, curve.p) == 0)
+                    .collect();
+                if !want.is_empty() {
+                    continue;
+                }
+                let mut muls = 0;
+                assert!(PkmSemaevOracle::solve_s3_for_middle(
+                    &curve, curve.a, curve.b, x1, x3, &mut muls
+                )
+                .is_empty());
+                // Five coefficient products, two discriminant products,
+                // four products for n^3 and one verification square.
+                assert_eq!(muls, 12);
+                checked += 1;
+            }
+        }
+        assert!(checked > 0);
+    }
+
+    /// Karatsuba equals schoolbook, over a tiny prime where the top
+    /// coefficients of `(a0 + a1)(b0 + b1)` cancel often (the t = 11
+    /// resgcd disagreements came from a cancelled `z1` leaving `z0`/`z2`
+    /// overhang unsubtracted), on balanced and unbalanced lengths.
+    #[test]
+    fn karatsuba_matches_schoolbook_under_cancellation() {
+        let mut rng = StdRng::seed_from_u64(11);
+        for p in [3u64, 5, 7, 65_521] {
+            for _ in 0..400 {
+                let la = rng.gen_range(1..200usize);
+                let lb = rng.gen_range(1..200usize);
+                let mut a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+                let mut b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+                *a.last_mut().unwrap() = 1;
+                *b.last_mut().unwrap() = 1;
+                let mut want = ug_school(&a, &b, p, &mut 0);
+                ug_trim(&mut want);
+                let got = ug_karatsuba(&a, &b, p, &mut 0);
+                assert_eq!(got, want, "p = {p}, lengths {la} × {lb}");
+            }
+        }
+    }
 
     /// A 24-bit prime-order curve `y² = x³ − 3x + b` with `2^7 | p − 1`
     /// (curve e3-c2 of experiment E3, from
@@ -2553,7 +4900,12 @@ mod tests {
         let fb = base(&inst, 3);
         assert!(fb.columns >= 3, "the t = 3 tower carries points");
         let mut rng = StdRng::seed_from_u64(7);
-        for spec in ["m=3", "m=3,mode=full", "m=3,engine=exhaustive"] {
+        for spec in [
+            "m=3",
+            "m=3,mode=projective",
+            "m=3,mode=full",
+            "m=3,engine=exhaustive",
+        ] {
             let mut o = oracle(&inst, &fb, 3, 3, spec);
             for _ in 0..6 {
                 let idx: Vec<usize> = (0..3).map(|_| rng.gen_range(0..fb.points.len())).collect();
@@ -2588,6 +4940,7 @@ mod tests {
         let decomposable = decomposable_points(curve, &fb, 3, &mut GroupOps::default());
         let mut rng = StdRng::seed_from_u64(11);
         let mut f4 = oracle(&inst, &fb, 3, 3, "m=3,crosscheck=1");
+        let mut projective = oracle(&inst, &fb, 3, 3, "m=3,mode=projective,crosscheck=1");
         let mut full = oracle(&inst, &fb, 3, 3, "m=3,mode=full");
         let mut grid = oracle(&inst, &fb, 3, 3, "m=3,engine=exhaustive");
         let g = inst.generator_point();
@@ -2614,8 +4967,14 @@ mod tests {
                 )
                 .is_some()
             };
-            let (a, b, c) = (run(&mut f4), run(&mut full), run(&mut grid));
+            let (a, p, b, c) = (
+                run(&mut f4),
+                run(&mut projective),
+                run(&mut full),
+                run(&mut grid),
+            );
             assert_eq!(a, c, "chain F4 against the grid, target {k}");
+            assert_eq!(p, c, "projective F4 against the grid, target {k}");
             assert_eq!(b, c, "full F4 against the grid, target {k}");
             assert_eq!(c, decomposable.contains(&curve.key(&target)), "target {k}");
             hits += usize::from(c);
@@ -2627,6 +4986,253 @@ mod tests {
             0
         );
         assert!(n["pkm_system_fp_mults_uncharged"] > 0);
+    }
+
+    /// Exercise the algebraic basis extractor at t=3 directly. The public
+    /// oracle intentionally uses its grid crossover at this size, so a normal
+    /// decompose() differential test would not exercise basis root descent.
+    /// The complete 100-point affine census includes all six base targets,
+    /// which also have witnesses of the form (P, -P, R).
+    #[test]
+    fn kummer_m3_basis_descent_complete_small_curve_census() {
+        let inst = PrimeInstance {
+            name: "pkm-kummer-census-f97".into(),
+            curve: PrimeCurve { p: 97, a: 3, b: 15 },
+            group_order: 101,
+            r: 101,
+            cofactor: 1,
+            generator: (4, 24),
+            representation: None,
+        };
+        let curve = &inst.curve;
+        let fb = base(&inst, 3);
+        assert_eq!(fb.columns, 3);
+        let mut o = oracle(
+            &inst,
+            &fb,
+            3,
+            3,
+            "m=3,mode=chain,engine=f4,descent=1,trace=0,degree=12",
+        );
+        assert!(
+            o.prefer_grid_extraction(),
+            "this test must bypass the public crossover"
+        );
+        let independent: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../research/pkm_nonenum_decomp_20261125/f97_independent_census.json"
+        ))
+        .expect("independent F97 point and scalar census");
+        let verdicts = independent["verdicts"]
+            .as_array()
+            .expect("100 census verdicts");
+        assert_eq!(verdicts.len(), 100);
+
+        let mut exact = HashSet::new();
+        for &p in &fb.points {
+            for &q in &fb.points {
+                for &r in &fb.points {
+                    let target = curve.add(
+                        &mut GroupOps::default(),
+                        curve.add(&mut GroupOps::default(), p, q),
+                        r,
+                    );
+                    if !target.infinity {
+                        exact.insert(curve.key(&target));
+                    }
+                }
+            }
+        }
+        assert_eq!(
+            exact.len(),
+            28,
+            "independently enumerated F97 three-sum count"
+        );
+
+        let ring = o
+            .prepared
+            .as_ref()
+            .expect("prepared Kummer tower")
+            .ring
+            .clone();
+        let mut targets = 0usize;
+        let mut descents = 0usize;
+        let mut cancellation_targets = 0usize;
+        for x in 0..curve.p {
+            let Some(y) = curve.sqrt(curve.rhs(x)) else {
+                continue;
+            };
+            let sys = o.specialise_branch(None, x, None);
+            let rep = f4_tower(
+                &sys,
+                &ring,
+                &TowerF4Options::new(12)
+                    .with_budget(Duration::from_secs(2))
+                    .with_max_nnz(1_000_000),
+            );
+            assert!(
+                !rep.timed_out && !rep.oversize && rep.pairs_above_bound == 0,
+                "F4 censored at target x={x}: {rep:?}"
+            );
+            let basis_xs = if rep.inconsistent {
+                Vec::new()
+            } else {
+                descents += 1;
+                o.extract_solutions_from_basis(curve, None, &ring, &rep.basis, &[], x, None)
+                    .0
+            };
+            let grid_xs = o.grid(curve, x, false).0;
+            for target in [
+                PrimePoint::affine(x, y),
+                PrimePoint::affine(x, (curve.p - y) % curve.p),
+            ] {
+                if y == 0 && target.y != y {
+                    continue;
+                }
+                targets += 1;
+                if fb.x_index.contains_key(&x) {
+                    cancellation_targets += 1;
+                    let p = fb.points[0];
+                    let cancelled = curve.add(&mut GroupOps::default(), p, curve.neg(p));
+                    assert!(cancelled.infinity);
+                    assert_eq!(
+                        curve.add(&mut GroupOps::default(), cancelled, target),
+                        target
+                    );
+                }
+                let basis_hit = basis_xs.iter().any(|xs| {
+                    lift_abscissae(curve, &fb, &mut GroupOps::default(), xs, target).is_some()
+                });
+                let grid_hit = grid_xs.iter().any(|xs| {
+                    lift_abscissae(curve, &fb, &mut GroupOps::default(), xs, target).is_some()
+                });
+                let expected = exact.contains(&curve.key(&target));
+                let independent_expected = verdicts
+                    .iter()
+                    .find(|row| {
+                        row["point"][0].as_u64() == Some(target.x)
+                            && row["point"][1].as_u64() == Some(target.y)
+                    })
+                    .expect("target in independent F97 census")["direct_three_sum"]
+                    .as_bool()
+                    .expect("census verdict");
+                assert_eq!(
+                    expected, independent_expected,
+                    "Rust and independent F97 census at {target:?}"
+                );
+                assert_eq!(
+                    grid_hit, expected,
+                    "independent point census vs grid at {target:?}"
+                );
+                assert_eq!(
+                    basis_hit, expected,
+                    "F4 basis descent vs point census at {target:?}"
+                );
+            }
+        }
+        assert_eq!(targets, 100);
+        assert_eq!(cancellation_targets, fb.points.len());
+        assert!(
+            descents > 0,
+            "basis extraction must run on a consistent system"
+        );
+    }
+
+    #[test]
+    fn zero_grid_crossover_uses_public_basis_descent_path() {
+        let inst = PrimeInstance {
+            name: "pkm-kummer-forced-f97".into(),
+            curve: PrimeCurve { p: 97, a: 3, b: 15 },
+            group_order: 101,
+            r: 101,
+            cofactor: 1,
+            generator: (4, 24),
+            representation: None,
+        };
+        let fb = base(&inst, 3);
+        let target = sum(&inst.curve, &fb, &[0, 0, 0]);
+        let mut o = oracle(
+            &inst,
+            &fb,
+            3,
+            3,
+            "m=3,mode=chain,engine=f4,descent=1,grid_crossover=0,trace=0,degree=12",
+        );
+        assert!(!o.prefer_grid_extraction());
+        assert!(o.use_descent_extraction());
+        let indices = o
+            .decompose(
+                &ctx(&inst),
+                &fb,
+                &mut GroupOps::default(),
+                &mut OracleCounters::default(),
+                target,
+            )
+            .expect("forced basis descent must recover a planted relation");
+        assert_eq!(sum(&inst.curve, &fb, &indices), target);
+        let dfs = o.relation_counters();
+        assert!(dfs["pkm_basis_dfs_visited_nodes"] > 0);
+        assert!(dfs["pkm_basis_dfs_terminal_leaves"] > 0);
+        // The basis can force every tower variable before a root split is needed.
+        assert_eq!(dfs["pkm_basis_dfs_verified_tuples"], 1);
+        assert!(
+            dfs["pkm_basis_dfs_terminal_leaves"] <= (1u64 << (3 * 3)),
+            "the basis extractor may not enumerate more leaves than the full grid"
+        );
+        assert_eq!(
+            dfs.get("pkm_descent_deferred_to_grid")
+                .copied()
+                .unwrap_or(0),
+            0
+        );
+    }
+
+    /// The normalized projective closure retains the intermediate identity:
+    /// `S₃(x(P),x(-P),(1:0)) = 0` and
+    /// `S₃((1:0),x(Q),x(Q)) = 0`. Its normalization rejects `(0:0)`.
+    #[test]
+    fn projective_chain_keeps_identity_and_rejects_zero_coordinates() {
+        let inst = instance();
+        let curve = &inst.curve;
+        let p = curve.p;
+        let fb = base(&inst, 3);
+        assert!(fb.points.len() >= 4);
+        let g = fb.points[0];
+        let q = fb
+            .points
+            .iter()
+            .copied()
+            .find(|pt| pt.x != g.x)
+            .expect("two factor-base abscissae");
+        assert!(!q.infinity);
+
+        let n = 1;
+        let one = Pol::constant(n, 1, p);
+        let zero = Pol::constant(n, 0, p);
+        let xp = Pol::constant(n, g.x, p);
+        let xq = Pol::constant(n, q.x, p);
+        let first = s3_frac((&xp, &one), (&xp, &one), (&one, &zero), curve.a, curve.b, p);
+        let second = s3_frac((&one, &zero), (&xq, &one), (&xq, &one), curve.a, curve.b, p);
+        assert!(
+            first.terms.is_empty(),
+            "inverse pair reaches the identity chart"
+        );
+        assert!(second.terms.is_empty(), "identity plus Q reaches Q");
+
+        let invalid = one.sub(&zero, p).mul(&zero.sub(&one, p), p);
+        assert!(!invalid.terms.is_empty(), "normalization excludes (0:0)");
+
+        let mut projective = oracle(&inst, &fb, 3, 3, "m=3,mode=projective");
+        let mut ops = GroupOps::default();
+        let got = projective
+            .decompose(
+                &ctx(&inst),
+                &fb,
+                &mut ops,
+                &mut OracleCounters::default(),
+                q,
+            )
+            .expect("the projective oracle returns an exact decomposition when one exists");
+        assert_eq!(sum(curve, &fb, &got), q);
     }
 
     /// F4 on a membership form against the grid and the exact set of
@@ -2663,6 +5269,8 @@ mod tests {
         };
         let mut f4 = prep(&format!("m=2,crosscheck=1{extra}"));
         let mut grid = prep("m=2,engine=exhaustive");
+        let mut resgcd = prep("m=2,engine=resgcd,crosscheck=1");
+        let mut scan = prep("m=2,engine=scan,crosscheck=1");
         let mut rng = StdRng::seed_from_u64(29);
         let g = inst.generator_point();
         let mut hits = 0;
@@ -2696,6 +5304,16 @@ mod tests {
             let (a, c) = (run(&mut f4), run(&mut grid));
             assert_eq!(a, c, "{label}: F4 against the grid, target {k}");
             assert_eq!(
+                run(&mut resgcd),
+                c,
+                "{label}: resgcd against the grid, target {k}"
+            );
+            assert_eq!(
+                run(&mut scan),
+                c,
+                "{label}: scan against the grid, target {k}"
+            );
+            assert_eq!(
                 c,
                 decomposable.contains(&curve.key(&target)),
                 "{label}: target {k}"
@@ -2703,6 +5321,18 @@ mod tests {
             hits += usize::from(c);
         }
         assert!(hits >= 5, "{label}: planted targets decompose ({hits})");
+        for (name, o) in [("resgcd", &resgcd), ("scan", &scan)] {
+            let n = o.relation_counters();
+            assert!(
+                n["pkm_crosscheck_systems"] > 0,
+                "{label}: {name} crosschecked"
+            );
+            assert_eq!(
+                n.get("pkm_crosscheck_disagreements").copied().unwrap_or(0),
+                0,
+                "{label}: {name} solution sets equal the grid's"
+            );
+        }
         let n = f4.relation_counters();
         assert_eq!(
             n.get("pkm_crosscheck_disagreements").copied().unwrap_or(0),
@@ -2719,7 +5349,9 @@ mod tests {
     /// the base's Vélu chain, and F4 matches the grid.
     #[test]
     fn isogeny_tower_form_agrees_with_grid() {
-        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+        use crate::cryptanalysis::ic_framework::prime_tower::{
+            isogeny_tower, AuxFamily, PrimeIsogenyBase,
+        };
         let inst = instance();
         let t = 4;
         let b = PrimeIsogenyBase { instance: &inst };
@@ -2728,7 +5360,8 @@ mod tests {
         let fb = b
             .build(&ctx(&inst), &params, &mut GroupOps::default())
             .expect("isogeny base");
-        let tower = isogeny_tower(inst.curve.p, t, 0, &mut GroupOps::default()).unwrap();
+        let tower =
+            isogeny_tower(inst.curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
         // Every zero of the rules is a zero of the chain: L(x) = c on V.
         for &x in &tower.v {
             assert_eq!(tower.eval(x), Some(tower.c));
@@ -2752,7 +5385,9 @@ mod tests {
     #[test]
     fn trace_agrees_with_plain_f4_and_grid() {
         use crate::cryptanalysis::ic_boundary::prime_factor_base;
-        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+        use crate::cryptanalysis::ic_framework::prime_tower::{
+            isogeny_tower, AuxFamily, PrimeIsogenyBase,
+        };
         let inst = instance();
         let curve = &inst.curve;
         let t = 4;
@@ -2762,7 +5397,7 @@ mod tests {
         let fb = b
             .build(&ctx(&inst), &params, &mut GroupOps::default())
             .expect("isogeny base");
-        let tower = isogeny_tower(curve.p, t, 0, &mut GroupOps::default()).unwrap();
+        let tower = isogeny_tower(curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
         let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
         let (v, c) = (tower.v.clone(), tower.c);
         let bits_fb = prime_factor_base(&inst, 6);
@@ -2884,7 +5519,9 @@ mod tests {
     /// decomposable set with 1 and 2 guessed levels; `G ≥ t` is refused.
     #[test]
     fn isogeny_guessing_agrees_with_grid() {
-        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+        use crate::cryptanalysis::ic_framework::prime_tower::{
+            isogeny_tower, AuxFamily, PrimeIsogenyBase,
+        };
         let inst = instance();
         let t = 4;
         let b = PrimeIsogenyBase { instance: &inst };
@@ -2893,7 +5530,8 @@ mod tests {
         let fb = b
             .build(&ctx(&inst), &params, &mut GroupOps::default())
             .expect("isogeny base");
-        let tower = isogeny_tower(inst.curve.p, t, 0, &mut GroupOps::default()).unwrap();
+        let tower =
+            isogeny_tower(inst.curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
         let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
         let (v, c) = (tower.v.clone(), tower.c);
         for g in [1, 2] {
@@ -3121,6 +5759,7 @@ mod tests {
         let mut chain = prep(&format!("m=3,mode=chain,crosscheck=1{extra}"));
         let mut full = prep(&format!("m=3,mode=full,crosscheck=1{extra}"));
         let mut grid = prep("m=3,engine=exhaustive");
+        let mut resgcd = prep("m=3,engine=resgcd,crosscheck=1");
         let mut rng = StdRng::seed_from_u64(31);
         let g = inst.generator_point();
         let mut hits = 0;
@@ -3156,6 +5795,11 @@ mod tests {
             assert_eq!(a, c, "{label}: chain F4 against the grid, target {k}");
             assert_eq!(b, c, "{label}: full F4 against the grid, target {k}");
             assert_eq!(
+                run(&mut resgcd),
+                c,
+                "{label}: resgcd against the grid, target {k}"
+            );
+            assert_eq!(
                 c,
                 decomposable.contains(&curve.key(&target)),
                 "{label}: target {k}"
@@ -3163,6 +5807,16 @@ mod tests {
             hits += usize::from(c);
         }
         assert!(hits >= 5, "{label}: planted targets decompose ({hits})");
+        let n = resgcd.relation_counters();
+        assert!(
+            n["pkm_crosscheck_systems"] > 0,
+            "{label}: resgcd m=3 crosschecked"
+        );
+        assert_eq!(
+            n.get("pkm_crosscheck_disagreements").copied().unwrap_or(0),
+            0,
+            "{label}: resgcd m=3 solution sets equal the grid's"
+        );
         for o in [&chain, &full] {
             let n = o.relation_counters();
             assert_eq!(
@@ -3185,7 +5839,9 @@ mod tests {
     /// `m = 3` on PKM's isogeny tower, both presentations.
     #[test]
     fn isogeny_tower_m3_agrees_with_grid() {
-        use crate::cryptanalysis::ic_framework::prime_tower::{isogeny_tower, PrimeIsogenyBase};
+        use crate::cryptanalysis::ic_framework::prime_tower::{
+            isogeny_tower, AuxFamily, PrimeIsogenyBase,
+        };
         let inst = instance();
         let t = 3;
         let b = PrimeIsogenyBase { instance: &inst };
@@ -3194,7 +5850,8 @@ mod tests {
         let fb = b
             .build(&ctx(&inst), &params, &mut GroupOps::default())
             .expect("isogeny base");
-        let tower = isogeny_tower(inst.curve.p, t, 0, &mut GroupOps::default()).unwrap();
+        let tower =
+            isogeny_tower(inst.curve.p, t, 0, AuxFamily::Any, &mut GroupOps::default()).unwrap();
         let steps: Vec<(u64, u64)> = tower.steps.iter().map(|s| (s.xi, s.tau)).collect();
         let (v, c) = (tower.v.clone(), tower.c);
         agrees_with_grid_m3(
@@ -3321,31 +5978,35 @@ mod tests {
             ),
         ];
         for (fb_spec, or_spec, builder) in arms {
-            let (fb_name, factor_base_params) = Params::parse_spec(fb_spec).unwrap();
-            let (oracle, oracle_params) = Params::parse_spec(or_spec).unwrap();
-            let spec = PipelineSpec {
-                factor_base: fb_name,
-                factor_base_params,
-                oracle,
-                oracle_params,
-                targets: Targets::Random,
-                linalg: "incremental-gauss".into(),
-                max_trials: 20_000,
-                seed: 11,
-                ..Default::default()
-            };
-            let mut o = PkmSemaevOracle::from_spec(2, &spec, &inst).unwrap();
-            let report = run_pipeline(
-                &ictx,
-                &spec,
-                builder,
-                &mut o,
-                planted,
-                &Calibration::default(),
-                Some(1.0),
-            )
-            .unwrap_or_else(|e| panic!("{fb_spec}: {e}"));
-            assert!(report.verified, "{fb_spec}: {report:?}");
+            for engine in ["f4", "scan"] {
+                let (fb_name, factor_base_params) = Params::parse_spec(fb_spec).unwrap();
+                let (oracle, oracle_params) =
+                    Params::parse_spec(&format!("{or_spec},engine={engine}")).unwrap();
+                let spec = PipelineSpec {
+                    factor_base: fb_name,
+                    factor_base_params,
+                    oracle,
+                    oracle_params,
+                    targets: Targets::Random,
+                    linalg: "incremental-gauss".into(),
+                    max_trials: 20_000,
+                    seed: 11,
+                    ..Default::default()
+                };
+                let mut o = PkmSemaevOracle::from_spec(2, &spec, &inst).unwrap();
+                let report = run_pipeline(
+                    &ictx,
+                    &spec,
+                    builder,
+                    &mut o,
+                    planted,
+                    &Calibration::default(),
+                    Some(1.0),
+                )
+                .unwrap_or_else(|e| panic!("{fb_spec}: {e}"));
+                assert!(report.verified, "{fb_spec} engine={engine}: {report:?}");
+                assert_eq!(report.recovered, Some(planted));
+            }
         }
 
         // A base the oracle cannot solve on is refused, not silently run.
@@ -4436,6 +7097,88 @@ mod tests {
                 )
             };
             assert_eq!(run(&mut o1), run(&mut o0));
+        }
+    }
+
+    /// Lead 1A-3 gate: with descent forced on every domain
+    /// (`grid_crossover=0`, so `grid()` never decides a consistent system),
+    /// the tower-basis root extraction misses no decomposition: its verdict
+    /// equals the exact decomposable set on planted and random targets at
+    /// `m = 3` (also against the grid engine) and at `m = 4`, where `grid()`
+    /// does not exist and the exact set is the ground truth.
+    #[test]
+    fn descent_roots_match_ground_truth_at_m3() {
+        descent_gate(3, 3, 12, 12);
+    }
+
+    /// `m = 4` half of the gate, on the `t = 2` tower (8 ring variables plus
+    /// the chain unknowns) so the debug-profile F4 stays tractable.
+    #[test]
+    fn descent_roots_match_ground_truth_at_m4() {
+        descent_gate(4, 2, 6, 4);
+    }
+
+    fn descent_gate(m: u32, t: u32, planted: u64, random: u64) {
+        let inst = instance();
+        let curve = &inst.curve;
+        let fb = base(&inst, t);
+        let g = inst.generator_point();
+        {
+            let exact = decomposable_points(curve, &fb, m, &mut GroupOps::default());
+            let mut descent = oracle(&inst, &fb, m, t, &format!("m={m},grid_crossover=0"));
+            let mut grid = (m == 3).then(|| oracle(&inst, &fb, 3, t, "m=3,engine=exhaustive"));
+            let mut rng = StdRng::seed_from_u64(0x1a3 + u64::from(m));
+            let mut hits = 0;
+            for k in 0..planted + random {
+                let target = if k < planted {
+                    let idx: Vec<usize> =
+                        (0..m).map(|_| rng.gen_range(0..fb.points.len())).collect();
+                    sum(curve, &fb, &idx)
+                } else {
+                    let s = rng.gen_range(1..inst.r);
+                    curve.mul(&mut GroupOps::default(), g, s)
+                };
+                if target.infinity {
+                    continue;
+                }
+                let want = exact.contains(&curve.key(&target));
+                eprintln!("descent gate m={m} t={t} target {k} want={want}");
+                let got = descent.decompose(
+                    &ctx(&inst),
+                    &fb,
+                    &mut GroupOps::default(),
+                    &mut OracleCounters::default(),
+                    target,
+                );
+                if let Some(idx) = &got {
+                    assert_eq!(idx.len(), m as usize);
+                    assert_eq!(sum(curve, &fb, idx), target, "m={m} target {k}");
+                }
+                assert_eq!(got.is_some(), want, "m={m}: descent verdict, target {k}");
+                if let Some(gr) = grid.as_mut() {
+                    let gv = gr
+                        .decompose(
+                            &ctx(&inst),
+                            &fb,
+                            &mut GroupOps::default(),
+                            &mut OracleCounters::default(),
+                            target,
+                        )
+                        .is_some();
+                    assert_eq!(gv, got.is_some(), "m=3: grid against descent, target {k}");
+                }
+                hits += usize::from(want);
+            }
+            assert!(hits >= 3, "m={m}: planted targets must decompose ({hits})");
+            let n = descent.relation_counters();
+            assert_eq!(
+                n.get("pkm_descent_deferred_to_grid").copied().unwrap_or(0),
+                0
+            );
+            assert!(
+                n.get("pkm_consistent_systems").copied().unwrap_or(0) >= hits as u64,
+                "m={m}: descent decided the consistent systems"
+            );
         }
     }
 }

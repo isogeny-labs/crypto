@@ -1,0 +1,302 @@
+{
+  "schema": "miller-finite-point-source-plan/v1",
+  "created": "2026-11-15T06:14:05.982299+00:00",
+  "formal": {
+    "project": "research/miller_finite_point_audit_20261115/lean",
+    "theorem": "MillerFinitePointAudit.miller_finite_point_certificate",
+    "statement": "theorem miller_finite_point_certificate : (∀ (K : Type) [Field K] [DecidableEq K] (W : WeierstrassCurve.Affine K), (∀ (x y : K) (h : W.Nonsingular x y), IsDiscreteValuationRing (PointLocalRing W x y h.1) ∧ IsFractionRing (PointLocalRing W x y h.1) W.FunctionField ∧ IsLocalRing.maximalIdeal (PointLocalRing W x y h.1) = Ideal.span {pointParameter W h}) ∧ (∀ (x₁ y₁ x₂ y₂ : K) (h₁ : W.Nonsingular x₁ y₁) (h₂ : W.Nonsingular x₂ y₂) (hxy : ¬ (x₁ = x₂ ∧ y₁ = W.negY x₂ y₂)), principalPointDivisor W (MillerNormValuationAudit.lineFunction W x₁ y₁ (W.slope x₁ x₂ y₁ y₂)) (chord_support_finite W h₁ h₂ hxy) = chordDivisor W (Point.some x₁ y₁ h₁) (Point.some x₂ y₂ h₂)) ∧ (∀ (x y : K) (h : W.Nonsingular x y), principalPointDivisor W (MillerNormValuationAudit.verticalFunction W x) (vertical_support_finite W h) = verticalDivisor W (Point.some x y h)) ∧ (∀ (x y : K) (h : W.Nonsingular x y) (h3 : (3 : ℕ) • Point.some x y h = 0), principalPointDivisor W (MillerNormValuationAudit.lineFunction W x y (W.slope x x y y)) (chord_support_finite W h h (fun hn => three_tangent_nonvertical W h h3 hn.2)) = Finsupp.single (Point.some x y h) 3 - Finsupp.single 0 3)) ∧ controlCurve.Δ ≠ 0 ∧ IsLocalRing.maximalIdeal (PointLocalRing controlCurve 4 0 control_two_nonsingular.1) ≠ Ideal.span {localU controlCurve control_two_nonsingular.1} ∧ -WithZero.log (finiteAdic controlCurve control_negative_nonsingular (MillerNormValuationAudit.lineFunction controlCurve 2 2 (controlCurve.slope 2 2 2 2))) = (2 : ℤ) ∧ -WithZero.log (finiteAdic controlCurve control_positive_nonsingular (MillerNormValuationAudit.lineFunction controlCurve 2 2 (controlCurve.slope 2 2 2 2))) = (1 : ℤ)",
+    "decl_sha256": "140ca58f39c177a432e21f1aee49ae26a9e3075c50cced761301751b1db04b09",
+    "scope": "Actual finite-point local DVRs and full function-field embeddings, exact normalized chord/tangent/vertical orders and corresponding actual point divisors for every field and general Weierstrass model. Actual evaluation kernel is the actual coordinate point ideal, maximal/surjective. Shifted actual curve equation and one nonzero partial derivative derive a nonzero principal maximal ideal and actual local DVR; no regularity/DVR premise. Explicit injective localization map and full actual FunctionField fraction-ring equality proved. Official normalized height-one adic valuation of this actual local ring gives exact order from actual principal ideal powers. Existing actual chord/negative-point principal ideal identities localize: equal-point ideal maps to maximal, different-point ideal to unit ideal, so all finite multiplicities count repeated intersection points. Combine actual infinity-chart pole orders -3/-2 to prove finite support and actual Finsupp principal point divisors line=(P)+(Q)+(-P-Q)-3(O), vertical=(P)+(-P)-2(O), and actual three-torsion tangent=3(P)-3(O). Actual F5 y²=x³+1 controls: X-xP not a local uniformizer at two-torsion(4,0), ordinary tangent at(2,2) has order2 there and another simple zero at(0,1), so deleting three-torsion makes the actual tangent divisor assertion false. The point-divisor is defined from actual normalized local valuations, not an arbitrary postulated multiplicity function. Over arbitraryK it is on actual nonsingular K-points; for an elliptic curve over algebraically closedK these are all geometric points. Separate Mathlib projective Scheme.localRing/Divisor interoperability, general all-function divisor finiteness, translation/Weil reciprocity/isogeny/Lang/Cartier/Jacobian/canonical Weil-Tate/MOV-FR/all14 remain open. Twenty-seven modules include nineteen exact credited earlier modules and eight new modules. Same host/prover/Mathlib; full-header audit procedural only, no independent compiler/parser/physicalhost assurance. Qualified source statements survive; no novelty/canonical promotion/signed-standing claim.",
+    "sources": [
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/ChartAdicValuation.lean",
+        "bytes": 3767,
+        "sha256": "b8f6b793ef7d2a3805885417979e737e93265d56a02a03bf402979ac17d32078"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/ChartAlgebra.lean",
+        "bytes": 5144,
+        "sha256": "211969ef3498e5d786030a97b8783bd07a9b9d5434f2238114cf1b448c3f737a"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/ChartCertificate.lean",
+        "bytes": 2296,
+        "sha256": "b191e8c77a5364b9bf9d06c7216ba954c38493ff60470390451b5cc9289f85bd"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/ChartFractionField.lean",
+        "bytes": 5097,
+        "sha256": "3c0f5414072a7da74490335bff5f7224d833fdcc36c2c4c6be7f137d7c71dea7"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/ChartLocalization.lean",
+        "bytes": 4824,
+        "sha256": "6fd5bf89c3d69e4ca7d8c9bb3fbdc9a617c8a9151283890be0cbff26506d5112"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/DVRIdentification.lean",
+        "bytes": 3372,
+        "sha256": "964e3c213cdd1296bb3fffc2229ca2d4ed96f5dfce9c8b79f9cf2e55693ad0fc"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/DiscreteValuation.lean",
+        "bytes": 2448,
+        "sha256": "f6738d685680882f75f7c108344b5e9ac0893dcdbd2af8ae4a20da3327a27d7d"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/FieldValuation.lean",
+        "bytes": 3643,
+        "sha256": "163d20cb0fc845f2edbc23f2c8ee5b980398496522a97bc0e97ec8a17afdf57b"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/FiniteControls.lean",
+        "bytes": 4550,
+        "sha256": "6d89f39552273975fcb78c48e379a5d545a92809fd9f3adadaae75f141e57056"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/FiniteDVR.lean",
+        "bytes": 6827,
+        "sha256": "4b1ca398165e92d3562300d43f03f946c56d5d681b5a245c86c8733f7465caa1"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/FiniteFractionField.lean",
+        "bytes": 3133,
+        "sha256": "b5c768debd68ab967466a30e623d4d8ab720b1d9e4482100c2598ed2b746ff20"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/FinitePointCertificate.lean",
+        "bytes": 3225,
+        "sha256": "e1982dcd3f71270e748979792f672bd3748bfec428af31c553423bd298fbed2b"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/FiniteValuation.lean",
+        "bytes": 4354,
+        "sha256": "7afdecddd0bde0b2aecaa9ae632a09fb4602dc2d8d07c5af5062e0c06a50b0eb"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/GuardControls.lean",
+        "bytes": 2953,
+        "sha256": "d993b8a271d0b45b877f0f0c03ae970934500a70981549df266473b43d83d366"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/LineEvaluation.lean",
+        "bytes": 2628,
+        "sha256": "59405f70efc92e408edb087790965f3dc7d8559dd3b55fe0deb122e859de49ef"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/LineIdeals.lean",
+        "bytes": 5086,
+        "sha256": "f14f02c6998c132789cb332a5879cb57bb0ed6f17c1664bfd5fbabf98678d097"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/LineMultiplicity.lean",
+        "bytes": 5708,
+        "sha256": "f63e57417708ec7f8d809b169567a332365b4e8f00db30483d1ff8662442aca2"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/LocalComparison.lean",
+        "bytes": 3873,
+        "sha256": "cb0cedd56066bd863244da6aca7c0b921b0ff8bebd286b257db98aadd7aa5075"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/LocalOriginEvaluation.lean",
+        "bytes": 2050,
+        "sha256": "3692803fda5ecbb3185199a0b9e045ffb42ea6ce62e2ffc04122b3bc71d939c7"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/MillerFunctions.lean",
+        "bytes": 4605,
+        "sha256": "274cc4f86af5b0e939d99af53fa5c4db1105d66f097736ff7894a4e5325fc57b"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/NormDegree.lean",
+        "bytes": 4835,
+        "sha256": "b5fa20da01cfda772c8a08f89ca606ff9e5e7aff6a4a523cb3f951165e012523"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/Normalization.lean",
+        "bytes": 5458,
+        "sha256": "44c85d6dc162812ed51585bb40fda49b96b2e0a2e691fe9c2c33952e222e1a5a"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/OriginEvaluation.lean",
+        "bytes": 5686,
+        "sha256": "5f183c7d2306ea8a6f4874e4e226ae6c47f8919399a8f7bd8a439f630941adb0"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/PointDivisor.lean",
+        "bytes": 6952,
+        "sha256": "1c501f52d0a66d4c8118c3555f279b2599a121806af2c44518db608bd0086986"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/PointLocalization.lean",
+        "bytes": 4265,
+        "sha256": "9bf6c929fb31a34187a82ed3d3ddb7d9d3fba5f7f1b6b332fa43d578ccfb6594"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/ResidueNormalization.lean",
+        "bytes": 2544,
+        "sha256": "32f900d3a371477a41a28a3e7d6f6b9e099524b443ad40a0d82bf1e4f3efe4a4"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/ValuationCertificate.lean",
+        "bytes": 2235,
+        "sha256": "0985573e46e42c4e289927ab0ca314de33924b64c7cdc0ea89591e445d355fdf"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/lakefile.toml",
+        "bytes": 820,
+        "sha256": "17087d5821413ad0e63aadec193ad5d8eb5fe05ede64b1bd5f8d5e1630463be0"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/lake-manifest.json",
+        "bytes": 3179,
+        "sha256": "24aa990385d3efa7cb32b33104fb4ec7fcb57b54a4ef488d0d2ecfe4ed22ff1c"
+      },
+      {
+        "path": "research/miller_finite_point_audit_20261115/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "ChartAdicValuation",
+    "ChartAlgebra",
+    "ChartCertificate",
+    "ChartFractionField",
+    "ChartLocalization",
+    "DVRIdentification",
+    "DiscreteValuation",
+    "FieldValuation",
+    "FiniteControls",
+    "FiniteDVR",
+    "FiniteFractionField",
+    "FinitePointCertificate",
+    "FiniteValuation",
+    "GuardControls",
+    "LineEvaluation",
+    "LineIdeals",
+    "LineMultiplicity",
+    "LocalComparison",
+    "LocalOriginEvaluation",
+    "MillerFunctions",
+    "NormDegree",
+    "Normalization",
+    "OriginEvaluation",
+    "PointDivisor",
+    "PointLocalization",
+    "ResidueNormalization",
+    "ValuationCertificate"
+  ],
+  "artifacts": [
+    {
+      "path": "research/miller_finite_point_audit_20261115/evidence/attempts.tar.xz",
+      "bytes": 31408,
+      "sha256": "92578fcd3232f2385e22be2f85ce334da14fdec9e45761824ce41cf7cb36675b"
+    },
+    {
+      "path": "research/miller_finite_point_audit_20261115/evidence/attempts.tar.xz.sha256",
+      "bytes": 82,
+      "sha256": "34280c3bb8ac269d382ed8b1bb3d69552b0af94f19217b10ea306d6958e40400"
+    },
+    {
+      "path": "research/miller_finite_point_audit_20261115/evidence/attempts.json",
+      "bytes": 229,
+      "sha256": "a03b1f3d8ac93e99c02cbbd0810ae4a321a1704bfc4d57f234c30e6d91f54170"
+    },
+    {
+      "path": "research/miller_finite_point_audit_20261115/evidence/gate.tar.gz",
+      "bytes": 3543,
+      "sha256": "c5b984109132e6c471c91f5874b4448d5c1003faa879a83f5e9a05324288546f"
+    },
+    {
+      "path": "research/miller_finite_point_audit_20261115/evidence/gate.json",
+      "bytes": 1432,
+      "sha256": "fa70c3f7e26b66b812b4e6fe0b37d604348ddeb49c0f59d8112ee022e81cc170"
+    },
+    {
+      "path": "research/miller_finite_point_audit_20261115/evidence/source-review.json",
+      "bytes": 7234,
+      "sha256": "64ad46d97f80fb22e94ccad17e7fbd6f4f9e7639d77bb436d8a39d6073dfbb73"
+    },
+    {
+      "path": "research/miller_finite_point_audit_20261115/evidence/binding-check.json",
+      "bytes": 6914,
+      "sha256": "123b58be225bf7326899ee6b22655be2d28f1ad0e513ac00f758847242016137"
+    },
+    {
+      "path": "research/miller_finite_point_audit_20261115/proof-map.json",
+      "bytes": 7045,
+      "sha256": "0c9e0d163dfb0428e250fb24b4bb531cd42eea0680662a7e2321baef5a14ed5f"
+    },
+    {
+      "path": "research/miller_finite_point_audit_20261115/render_report.py",
+      "bytes": 6964,
+      "sha256": "e09e06665c3087713aded95f515130d1ede59d7635627afe669e75d37f284955"
+    },
+    {
+      "path": "research/miller_finite_point_audit_20261115/restore_attempts.py",
+      "bytes": 1015,
+      "sha256": "1a82efef1d9b42a1c5bbb5f44f5adb6c7fb5413d4a4d01b29017d9e27db23031"
+    },
+    {
+      "path": "research/miller_finite_point_audit_20261115/export_binding_input.py",
+      "bytes": 1752,
+      "sha256": "01a540f648d43267f27fd709a5c7ee5cb09e17ca68df4f7ac40288b0b6d523c7"
+    },
+    {
+      "path": "research/miller_finite_point_audit_20261115/reports/layout.json",
+      "bytes": 268,
+      "sha256": "ba6712ccfe2bc8e0ab3879405284f02e0f648d04a246b551d05144c7be2a804c"
+    },
+    {
+      "path": "research/miller_finite_point_audit_20261115/reports/local-divisor.svg",
+      "bytes": 1387,
+      "sha256": "db0049ffbb8a9175f233001d60dec3bb05b3a1722535274c3f146f9d24aed265"
+    },
+    {
+      "path": "research/miller_finite_point_audit_20261115/reports/report.pdf",
+      "bytes": 47123,
+      "sha256": "855fb66d8cee6b165ee3662a9abd3c7a0267bd3ef794efab849726294fd7f262"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 224,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "exact_reused_credited_modules": 19,
+    "new_modules": 8,
+    "actual_finite_point_local_DVR_derived": true,
+    "actual_full_function_field_fraction_ring_proved": true,
+    "actual_official_normalized_adic_multiplicities": true,
+    "actual_chord_vertical_three_torsion_point_divisors": true,
+    "actual_two_torsion_uniformizer_guard_counterexample": true,
+    "actual_three_torsion_divisor_guard_counterexample": true,
+    "arbitrary_field_scope": "Actual nonsingular K-points; for elliptic model over algebraically closedK, all geometric points.",
+    "mathlib_projective_Scheme_localRing_Divisor_comparison": false,
+    "general_all_function_divisor_finiteness": false,
+    "full_pairing_or_original14_completion": false,
+    "independent_implementation_or_physicalhost_validation": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

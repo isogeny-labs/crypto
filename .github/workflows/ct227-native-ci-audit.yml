@@ -1,0 +1,29 @@
+name: CT227 native composite-J CI cost audit
+
+on:
+  push:
+    paths:
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct227_native_ci_pairs.json'
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct227_native_ci_cost_audit.py'
+      - '.github/workflows/ct227-native-ci-audit.yml'
+  pull_request:
+    paths:
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct227_native_ci_pairs.json'
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct227_native_ci_cost_audit.py'
+      - '.github/workflows/ct227-native-ci-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  native-cost-record-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify frozen CI rows, phase accounting and six tamper controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct227_native_ci_cost_audit.py --self-test | tee /tmp/ct227-audit.log
+          grep -Fx 'CT227_SELFTEST_PASS 6 6' /tmp/ct227-audit.log

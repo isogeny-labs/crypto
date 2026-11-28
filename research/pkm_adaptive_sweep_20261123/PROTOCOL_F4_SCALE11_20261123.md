@@ -1,0 +1,7 @@
+# Degree-16 PKM scale-11 diagnostic — frozen 2026-11-23 12:05 PST
+
+After the six-abscissa degree-16 map passed a random-scalar component gate at a generic 10-bit instance, test the same construction at the generic 11-bit instance. This is a scale diagnostic, not an extrapolation to s59 or NIST.
+
+Run a one-trial `subtract` preflight for `prime-abscissa:below=16` to learn its actual lifting base size and subgroup order. Search `prime-isogeny:t=4,seed=S,aux=ordinary` in ascending S=0..31 with one-trial size-only preflights; choose the first exact size match, without inspecting runtime or relation output. If no match, record that and stop. Draw 32 distinct subgroup scalars uniformly without replacement using Python `random.Random(20261123).sample(range(1,r),32)`; pass CLI seed `scalar−1`, pinning the list before any F4 call.
+
+Use the old SHA-256-pinned `ic` binary `06439ae5119b5ed69c413df90e7a65dc67541dd1dfb9f6ac8d77cf2bd4441c59`, generic 11-bit instance, cold m=2 Semaev F4 degree bound 8 chain mode, max-trials=1000, one rho context run, five-second solver-call and ten-second outer arm caps. Preserve complete JSON, commands, status, wall and child CPU. Every pair must complete and verify the selected scalar, instance and equal base size before computing a cost ratio. Report ratio of summed total GAE and external wall/CPU, number of trials and F4 work. If incomplete, report the censoring and do not compare a subtotal as a gain. This 32-pair diagnostic has no confirmatory performance gate; a promising result needs a separately frozen larger panel.

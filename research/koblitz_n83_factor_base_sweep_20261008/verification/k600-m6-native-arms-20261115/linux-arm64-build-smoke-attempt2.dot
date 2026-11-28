@@ -1,0 +1,9 @@
+digraph smoke_attempt2 {
+  graph [rankdir=TB, bgcolor="white", label="N83 K600 Linux ARM64 build smoke / attempt 2", labelloc=t, fontsize=18];
+  node [shape=box, style="rounded,filled", fillcolor="#e8eef6", color="#24364b", fontname="Helvetica", fontsize=14];
+  source [label="Committed source 1ae9333dd861…\nread-only, warm partial target"];
+  build [label="Rust 1.99.1 / linux-arm64\n6 GiB cgroup, 4 CPUs, -j 1\n5 example binaries requested"];
+  oom [label="Observed: crypto library rustc SIGKILL\nDocker oom event at 17:17:09 UTC\nCargo exit 101", fillcolor="#fbe1dc"];
+  pending [label="0 of 5 requested binaries\ncharged build receipt pending", fillcolor="#fff0ca"];
+  source -> build -> oom -> pending;
+}

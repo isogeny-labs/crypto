@@ -1,0 +1,42 @@
+--- /home/ec2-user/ml-dataset-resume-20261029/original-owned-search-exclusion-integration-20261107/original_boolean_search.rs
++++ /home/ec2-user/ml-dataset-resume-20261029/owning-search-composed-source-20261107/overlay/src/ml_dataset/original_boolean_search.rs
+@@ -3,6 +3,9 @@
+ use provenance::boolean_equations as equations;
+ use provenance::{checked_model, signed_lift, Admission, CheckedMap, Error, Quote};
+ use std::mem::size_of;
++#[path="capture_projection.rs"] pub(in crate::ml_dataset::solvers) mod capture_projection;
++#[path="original_boolean_search_policy.rs"] mod policy;
++pub(in crate::ml_dataset::solvers) use policy::ProposedPolicy;
+ mod sparse {
+     pub use super::equations::{Charge, Monomial, Polynomial};
+     pub trait Owner {fn reserve(&mut self,q:Charge)->Result<(),()>;fn check(&mut self)->Result<(),()>;}
+@@ -250,15 +253,17 @@
+ impl OriginalOwner<'_>{
+     /// Move, never clone or reconstruct. Both successful and failed admission
+     /// return custody of every preexisting owner field and the actual sink.
+-    pub(super) fn into_boolean_search(mut self,sink:capture::CaptureEmitter,caps:Caps)->OwnedAttempt{
++    pub(super) fn into_boolean_search(mut self,sink:capture::CaptureEmitter,choice:ProposedPolicy)->OwnedAttempt{
+         let repeated=self.boolean_attempted;self.boolean_attempted=true;let mut diagnostic=None;
+-        let admission=(||->Result<(),Stop>{
++        let admission=(||->Result<Caps,Stop>{
+             if repeated||!self.map_published||self.map_ack.is_none()||self.checked.is_none(){return self.budget.fail(Stop::Phase)}
+             self.budget.reserve_checking(8192,size_of::<OwnedAttempt>() as u64+65536,Instant::now())?;
+             let Some(binding)=self.original.binding else{return self.budget.fail(Stop::InvalidLimits)};
+             if let Err(e)=sink.verify_directory(&self.original.root.join("live")){diagnostic=Some(e);return self.budget.fail(Stop::Observer)}
+             if let Err(e)=sink.verify_attempt_limits(binding,&self.capture_limits){diagnostic=Some(e);return self.budget.fail(Stop::Observer)}
+-            self.budget.check(Instant::now())
++            let caps=policy::for_owner(&self,choice)?;
++            self.budget.check(Instant::now())?;
++            Ok(caps)
+         })();
+         let OriginalOwner{original,budget,binding,launch_sha256,math,checked,retained_unchecked,pattern,retained_bytes,map_ack,publication_attempted,map_published,boolean_attempted,capture_limits}=self;
+         let original_deadline=budget.deadline;
+@@ -268,7 +273,7 @@
+             continuation:None,coverage:None,exclusion_audit:None,original_deadline,failure:None,
+             lift_records:Vec::new(),accepted_record:None,
+         };
+-        if let Err(s)=admission{out.fail(Failure::Admission(s),s);return out}
++        let caps=match admission{Ok(c)=>c,Err(s)=>{out.fail(Failure::Admission(s),s);return out}};
+         out.run(caps);out
+     }
+ }

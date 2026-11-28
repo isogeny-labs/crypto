@@ -42,6 +42,9 @@ fn point_bucket(mut key: u64, mask: usize) -> usize {
 }
 struct Suffix {
     slots: Vec<(u64, usize)>,
+    // A set bit only admits the exact lookup; it never establishes membership.
+    // Low compressed-point bits avoid computing the full hash on clear misses.
+    occupied: Vec<u64>,
     rows: usize,
     unique: usize,
 }
@@ -50,6 +53,7 @@ impl Suffix {
         if points.is_empty() {
             return Ok(Self {
                 slots: vec![],
+                occupied: vec![],
                 rows: 0,
                 unique: 0,
             });
@@ -64,14 +68,23 @@ impl Suffix {
             .try_reserve_exact(size)
             .map_err(|_| Error::Limit("CPU suffix index allocation"))?;
         slots.resize(size, (u64::MAX, 0));
+        let words = size.div_ceil(64);
+        let mut occupied = Vec::new();
+        occupied
+            .try_reserve_exact(words)
+            .map_err(|_| Error::Limit("CPU suffix filter allocation"))?;
+        occupied.resize(words, 0);
         let mut out = Self {
             slots,
+            occupied,
             rows: points.len(),
             unique: 0,
         };
         // Tuple order is lexicographic: retain the first ID on duplicate sums.
         for (id, point) in points.into_iter().enumerate() {
             let key = point_key(point);
+            let bit = (key as usize) & (size - 1);
+            out.occupied[bit / 64] |= 1u64 << (bit % 64);
             let mut i = point_bucket(key, size - 1);
             loop {
                 let entry = &mut out.slots[i];
@@ -94,6 +107,10 @@ impl Suffix {
         }
         let key = point_key(point);
         let mask = self.slots.len() - 1;
+        let bit = (key as usize) & mask;
+        if self.occupied[bit / 64] & (1u64 << (bit % 64)) == 0 {
+            return None;
+        }
         let mut i = point_bucket(key, mask);
         loop {
             let (stored, id) = self.slots[i];
@@ -190,7 +207,8 @@ impl CachedMitm {
         self.stats.built_rows += total as u64;
         self.stats.peak_table_bytes = self.stats.peak_table_bytes.max(
             prefix.capacity() * std::mem::size_of::<Point>()
-                + suffix.slots.capacity() * std::mem::size_of::<(u64, usize)>(),
+                + suffix.slots.capacity() * std::mem::size_of::<(u64, usize)>()
+                + suffix.occupied.capacity() * std::mem::size_of::<u64>(),
         );
         self.prepared = Some(Prepared {
             curve: curve_key(curve),
@@ -327,7 +345,6 @@ fn sub(a: u64, b: u64, p: u64) -> u64 {
 struct Scratch {
     prefix: Vec<u64>,
     denominators: Vec<u64>,
-    numerators: Vec<u64>,
     output: Vec<Point>,
 }
 impl Scratch {
@@ -348,48 +365,67 @@ impl Scratch {
         let mul = |a, b| mul(a, b, p, reciprocal);
         self.prefix.clear();
         self.denominators.clear();
-        self.numerators.clear();
         let mut product = 1;
-        let mut active = false;
+        let mut first_active = None;
         for (i, point) in points.iter().enumerate() {
-            let (num, den) = match *point {
+            let den = match *point {
                 None => {
                     self.output[i] = target;
-                    (0, 0)
+                    0
                 }
                 Some((xx, yy)) => {
                     let yy = sub(0, yy, p);
                     if x == xx && (y + yy == 0 || y + yy == p) {
                         self.output[i] = None;
-                        (0, 0)
+                        0
                     } else if x == xx {
-                        ((3 * mul(x, x) + curve.coefficients().0) % p, 2 * y % p)
+                        2 * y % p
                     } else {
-                        (sub(yy, y, p), sub(xx, x, p))
+                        sub(xx, x, p)
                     }
                 }
             };
             self.prefix.push(product);
             self.denominators.push(den);
-            self.numerators.push(num);
             if den != 0 {
-                product = mul(product, den);
-                active = true;
+                if first_active.is_none() {
+                    // The first nonzero factor needs no multiplication by one.
+                    first_active = Some(i);
+                    product = den;
+                } else {
+                    product = mul(product, den);
+                }
             }
         }
-        if !active {
+        let Some(first_active) = first_active else {
             return 0;
-        }
+        };
         let mut inverse = curve.field_inverse(product);
         for i in (0..points.len()).rev() {
             let den = self.denominators[i];
             if den == 0 {
                 continue;
             }
-            let iz = mul(inverse, self.prefix[i]);
-            inverse = mul(inverse, den);
-            let slope = mul(self.numerators[i], iz);
-            let xx = points[i].unwrap().0;
+            // At the first active entry the prefix is one, and the updated
+            // running inverse would never be consumed. This also covers a
+            // single ordinary residual surrounded by exceptional points.
+            let iz = if i == first_active {
+                inverse
+            } else {
+                let iz = mul(inverse, self.prefix[i]);
+                inverse = mul(inverse, den);
+                iz
+            };
+            // The reverse pass already needs the original x coordinate.
+            // Derive the numerator here instead of storing a second stream
+            // of field elements through the batch-inversion passes.
+            let (xx, yy) = points[i].unwrap();
+            let num = if x == xx {
+                (3 * mul(x, x) + curve.coefficients().0) % p
+            } else {
+                sub(sub(0, yy, p), y, p)
+            };
+            let slope = mul(num, iz);
             let nx = sub(sub(mul(slope, slope), x, p), xx, p);
             self.output[i] = Some((nx, sub(mul(slope, sub(x, nx, p)), y, p)));
         }
@@ -460,6 +496,26 @@ mod tests {
     }
 
     #[test]
+    fn suffix_filter_collisions_never_accept_absent_points() {
+        let (c, p) = fixture();
+        let points: Vec<_> = (0..199).map(|k| c.mul(p, k).unwrap()).collect();
+        // Exercise short bitmaps, word boundaries, duplicate first witnesses,
+        // identity, and saturation (every lookup passes the filter).
+        for size in [1, 2, 31, 32, 33, 63, 64, 65, 150] {
+            let mut input = points[..size].to_vec();
+            input.extend_from_slice(&points[..size]);
+            let mut index = Suffix::new(input.clone()).unwrap();
+            for &point in &points {
+                assert_eq!(index.find(point), input.iter().position(|&x| x == point));
+            }
+            index.occupied.fill(u64::MAX);
+            for &point in &points {
+                assert_eq!(index.find(point), input.iter().position(|&x| x == point));
+            }
+        }
+    }
+
+    #[test]
     fn batched_subtraction_matches_every_group_pair() {
         let (c, p) = fixture();
         let points: Vec<_> = (0..199).map(|k| c.mul(p, k).unwrap()).collect();
@@ -472,6 +528,54 @@ mod tests {
             }
         }
     }
+    #[test]
+    fn batch_endpoints_handle_exceptional_prefixes_and_scratch_reuse() {
+        for (p, a, b, r, generator) in [
+            (211, 0, 7, 199, Some((3, 33))),
+            (65521, 65518, 3, 65563, Some((0, 64894))),
+            (
+                68719476731,
+                68719476728,
+                33,
+                68719022539,
+                Some((2, 51741851039)),
+            ),
+        ] {
+            let c = Curve::with_order_witness(p, a, b, r, generator).unwrap();
+            let mut scratch = Scratch::default();
+            for scalar in 1..=24 {
+                let target = c.mul(generator, scalar).unwrap();
+                let neg = target.map(|(x, y)| (x, sub(0, y, p)));
+                let other = c.mul(generator, scalar + 1).unwrap();
+                for points in [
+                    vec![other],
+                    vec![neg],
+                    vec![],
+                    vec![None, target],
+                    vec![None, target, other, None, target],
+                    vec![None, target, neg, other, target, None],
+                ] {
+                    let expected_count =
+                        u64::from(points.iter().any(|&q| q.is_some() && q != target));
+                    assert_eq!(scratch.subtract(&c, target, &points), expected_count);
+                    let expected: Vec<_> = points
+                        .iter()
+                        .map(|&q| c.add(target, q.map(|(x, y)| (x, sub(0, y, p)))).unwrap())
+                        .collect();
+                    assert_eq!(scratch.output, expected);
+                    assert_eq!(scratch.subtract(&c, None, &points), 0);
+                    assert_eq!(
+                        scratch.output,
+                        points
+                            .iter()
+                            .map(|q| q.map(|(x, y)| (x, sub(0, y, p))))
+                            .collect::<Vec<_>>()
+                    );
+                }
+            }
+        }
+    }
+
     #[test]
     fn wide_field_batch_and_tuple_witnesses_match_checked_reference() {
         let c = Curve::with_order_witness(

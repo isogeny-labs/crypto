@@ -1,0 +1,24 @@
+[package]
+name = "prime31-specialized-incumbent"
+version = "0.1.0"
+edition = "2021"
+publish = false
+build = "build.rs"
+autobins = false
+autoexamples = false
+autobenches = false
+
+[lib]
+name = "prime31_specialized_incumbent"
+path = "src/lib.rs"
+test = false
+doctest = false
+
+[dependencies]
+rand = { version = "0.8", features = ["small_rng"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["arbitrary_precision", "raw_value"] }
+
+[build-dependencies]
+serde_json = { version = "1.0", features = ["arbitrary_precision", "raw_value"] }
+sha2 = "0.10"

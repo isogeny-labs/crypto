@@ -1,0 +1,81 @@
+"""Static report/diagram/CI inputs from accepted original66/0 proof metadata."""
+from pathlib import Path
+import hashlib,json,subprocess
+r=Path('/workspace/crypto');p=r/'research/chained_jacobian_transfers_20261110';e=p/'evidence/native-norm-Euclidean-complete-types-final-05';d=json.loads((e/'ACTUAL_NATIVE_NORM_EUCLID_COMPLETE_SCOPE.json').read_text());bindings=json.loads((e/'exact-seventeen-complete-statement-bindings.json').read_text());sha=d['source_sha256'];o=p/'report-native-norm-Euclidean-09';o.mkdir();g=p/'evidence/native-norm-Euclidean-report-CI-06';g.mkdir()
+md='''# Literal raw norm and actual Euclidean base inverse
+
+The q223 source-level model proves the literal native norm expression and the actual original signed extended-Euclidean base inverse. Both unchanged original Lean4.35/4.34.1 gates audit66 declarations/0 failing/0 trusted; seventeen statement bindings are complete, data35c3a5. Claims remain unsigned. [pcc:unverified]
+
+## Exact source and arithmetic boundary
+
+The entire accepted64 source and fullWord07 prefix remain byte-identical. rawNormBlock preserves the original t0=a*p0%223, t3=(b*p2+c*p1)%223, result=(t0+3*t3)%223 expression order. Under normalized words<223, each product≤49284, the unreduced pair sum≤98568 and final sum≤888, so no UInt64 overflow occurs. The model proves the exact toNat expression and canonical output, then the decoded polynomial and exact raw cofactor norm value. These statements cover the original norm's actual unsigned expression order. [pcc:unverified]
+
+The original Fp.inv does not call powmod. It initializes(t,nt,r,nr)=(0,1,223,n), computes qq=trunc(r/nr), updates(t,nt,r,nr)=(nt,t−qq*nt,nr,r−qq*nr), stops at nr=0, and adds223 once when t<0 before its unsigned cast. The model preserves those operations. The mathematical N^221 inverse certificate08 is a separate proof and is not substituted for the original algorithm. Original counter charges and native source832fd288/candidatec29c9665 remain unchanged. [pcc:unverified]
+
+The bounded arithmetic model returns None for the original zero guard and for fuel exhaustion. Sixteen is a proved sufficient unrolling bound for every canonical nonzero base input, never an accepted truncated value. Kernel certificates over only223 base elements establish success, terminal nr=0/gcd1, normalized coefficient in[0,223), and the returned word's multiplicative inverse property. Structural lemmas expose the actual returned value after successful checking. No cubic coefficient population is enumerated. [pcc:unverified]
+
+Every visited state has signed64-safe t,nt,r,nr; every executed quotient/product/subtraction is also within signed64 bounds. State remainders are nonnegative and each actual divisor is positive. The model uses Int.tdiv directly for Rust's toward-zero quotient; the original Std Int.tdiv_eq_ediv_of_nonneg lemma also proves its agreement with Euclidean division on these states. Final normalization is proved nonnegative and<223, so the final unsigned cast fits. This is a bounded source-arithmetic model, not a Rust compiler/ABI/counter/runtime proof. [pcc:unverified]
+
+## Controls and exact type bindings
+
+Zero and zero-fuel nonterminal computations return None. Input2 reaches t=−111 and normalizes to112, with112*2=1 in Fin223; input222 returns222. A noncanonical2^63-times2 norm example wraps and rejects unconditional decoded multiplicativity. All controls are kernel checked under the same original gates. [pcc:unverified]
+
+The audit counts42 old+19 new named+5 new generated=66. Four inherited deprecated-if warnings per build and the original auditor warning remain. First9e7844 fails the Fin223 constant3 value simplification; the full source/outputs and rejected sorryAx are retained. Explicit original constant-value rfl repairs only the proof. [pcc:unverified]
+
+Accepted64 source576848 first exposed the original PCC extractor stopping at let p := in two theorem types. Three already-created raw-norm bindings are complete and reused. Both original proved let-typed declarations remain unchanged and unbound; two explicit equivalent no-let corollaries provide full hypotheses/conclusions. All seventeen complete bindings are checked with the unchanged original extractor, fourteen on final66 and three on retained64 source. No truncated record is promoted and no verifier is edited. [pcc:unverified]
+
+| Complete declaration | Unsigned binding |
+| --- | --- |
+'''
+for x in bindings:md+=f"| `{x['theorem']}` | `{Path(x['claim']).stem}`. [pcc:unverified] |\n"
+md+='''
+Source SHA256 SOURCEHASH. Both original gates use j1/120s/default memory/default tactic limits and standard foundations only, no native decision/custom axiom. Entire source/callers/builds/audits/pins/times/bindings are retained in native-norm-Euclidean-complete-types-final-05. [pcc:unverified]
+
+Primary preregistratione0cb48 reads exact original common.rs/candidate/Word07/finite08; complete official Rust Reference operator source blob3b63884a5e445787078c19422fe627105e2a4933, including overflow/division/cast rules; and the actual installed Std division lemma. Full official source/tool response/Git-blob verification and all byte pins are retained. KB status/exact/negative/adjacent/theorem wrappers/conductor127, locked atlas unread; no novelty/absence inference. [pcc:unverified]
+
+Next is a single typed composition of universal norm08 and this actual raw arithmetic model, or a reviewed nontrivial Jacobian-map lead; actual cubic field/compiler/Jacobian/group-map and matched-cost obligations remain separate. Canonical chain/cubic/F101 diagrams are unchanged. Active278/12cc ownCI20:55 and original authenticated whole-store/gates still control normal integration. No native experiment, benchmark or original full scientific population was executed. [pcc:unverified]
+'''.replace('SOURCEHASH',sha)
+(p/'NATIVE_NORM_EUCLIDEAN_09.md').write_text(md)
+(o/'actual-Euclidean-state.dot').write_text('''digraph E {
+ graph [rankdir=LR,bgcolor="white",pad="0.2",ranksep="0.3"];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf3fa",color="#456987",fontname="DejaVu Sans",fontsize=11,margin="0.12,0.10"];
+ edge [color="#456987",fontname="DejaVu Sans",fontsize=10];
+ start [label="n in 1..222\n(0,1,223,n)"];
+ step [label="qq=trunc(r/nr)\n(nt,t-qq*nt,nr,r-qq*nr)"];
+ done [label="nr=0, r=1\nnormalize t into 0..222",fillcolor="#eaf5ed"];
+ start -> step;step -> step [label="nr nonzero\nall intermediates signed64-safe"];
+ step -> done [label="proved termination\nwithin16 steps"];
+}'''+ '\n');subprocess.run(['dot','-Tsvg',str(o/'actual-Euclidean-state.dot'),'-o',str(o/'actual-Euclidean-state.svg')],check=True);f=o/'actual-Euclidean-state.svg';f.write_text('\n'.join(x.rstrip()for x in f.read_text().splitlines()).rstrip()+'\n')
+(o/'report.typ').write_text('''#set page(paper: "a4", margin: 17mm)
+#set text(size: 10pt, font: "DejaVu Sans")
+#set par(justify: false, leading: 0.6em, spacing: 0.7em)
+#set heading(numbering: none)
+= Literal norm and actual Euclidean inverse
+#text("Both unchanged original Lean4.35/4.34.1 gates audit66/0 failing/0 trusted, with seventeen complete statement bindings35c3a5. This proves normalized raw norm and actual signed Euclid arithmetic at223. Claims remain unsigned. [pcc:unverified]")
+== Original unsigned norm expression
+#text("Keep t0=a*p0%223, t3=(b*p2+c*p1)%223, result=(t0+3*t3)%223. For canonical words<223, products≤49284, pair sum≤98568 and final sum≤888. The source proves no-overflow/exact toNat expression, canonical output, decoded polynomial and exact raw cofactor norm value. [pcc:unverified]")
+== Actual original base inverse
+#text("Fp.inv initializes(t,nt,r,nr)=(0,1,223,n), uses qq=trunc(r/nr), updates(nt,t−qq*nt,nr,r−qq*nr), stops at nr=0 and adds223 once if t<0. It does not use powmod; the earlier mathematical N^221 certificate is not substituted for this algorithm. Original source/counters remain unchanged. [pcc:unverified]")
+#image("actual-Euclidean-state.svg", width: 100%)
+#text("The model returns None for zero guard/fuel exhaustion. Kernel certificates over only223 base inputs prove every nonzero input succeeds, terminalnr0/gcd1, normalized output in[0,223), and the returned word's inverse identity. Sixteen is a proved sufficient bound, never an accepted truncated loop. No cubic coefficient population is enumerated. [pcc:unverified]")
+#text("Every visited state and quotient/product/subtraction fits signed64. Remainders are nonnegative; actual divisors positive. Int.tdiv models toward-zero division, and the original Std lemma proves agreement with Euclidean division here. Final normalization is nonnegative/<223, so the unsigned cast fits. Structural lemmas expose actual returned values. [pcc:unverified]")
+#pagebreak()
+= Controls, complete bindings and scope
+#table(columns: (36%,64%), inset: 6pt,
+ [Zero/exhaustion], [Zero guard and zero-fuel nonterminal computation return None.],
+ [Negative normalization], [Input2: t=−111, normalized112,112*2=1. Input222 returns222.],
+ [Overflow boundary], [Noncanonical2^63 times2 wraps in the norm; unconditional decode multiplicativity is rejected.],
+ [Exact audit], [42old+19new named+5generated=66. Seventeen complete types; four inherited deprecated-if warnings per build/original auditor warning retained.],
+ [Resources], [Both original gatesj1/120s/default memory/default tactics; standard foundations only, no native decision/custom axiom.],
+)
+== Preserved source and binding failures
+#text("First9e7844 leaves Fin223 constant3 value unreduced; entire source/outputs/rejected sorryAx retained. Explicit original value/rfl repairs only proof. Accepted64 source576848 then exposes the original extractor stopping at let p := in two types. Three complete raw-norm records are reused; original two proved let declarations remain unbound. Two explicit equivalent no-let corollaries supply full hypotheses/conclusions. Final66 preserves the entire accepted64 source prefix, no verifier/hypothesis/gate change. [pcc:unverified]")
+== Primary sources and next bridge
+#text("Preregistratione0cb48: exact original common.rs/candidate/Word07/finite08, full official Rust Reference operator source blob3b63884a5e445787078c19422fe627105e2a4933 (overflow/division/casts), actual Std division lemma, full response/byte pins retained. KBfive/conductor127, locked atlas unread; no novelty/absence inference. [pcc:unverified]")
+#text("Final source SHA256 SOURCEHASH. Whole sources/callers/builds/audits/bindings/pins/times are retained in complete-types-final-05; additive exact-source CI replays both original gates. [pcc:unverified]")
+#text("This is source-level arithmetic, not compiled Rust/ABI/counter/runtime execution. A single typed composition with universal finite08, full cubic field/Jacobian/group maps and matched costs remain separate. Existing chain/cubic/F101 graphs stay unchanged. Active278/12cc ownCI20:55/original authenticated whole-store/gates still control integration. No native experiment, benchmark or original full population ran. [pcc:unverified]")
+'''.replace('SOURCEHASH',sha))
+s=(r/'.github/workflows/chained-transfer-cubic-frobenius-trace-proof-05.yml').read_text()
+for a,z in [('Cubic Frobenius trace descent original dual gates05','Literal native norm and Euclid original dual gates09'),('CubicFrobeniusTraceDescent05','CubicNativeNormEuclid22309'),('cubic-Frobenius-trace-descent-final-04','native-norm-Euclidean-complete-types-final-05'),('chained-transfer-cubic-frobenius-trace-proof-05','chained-transfer-native-norm-euclid-proof-09'),('cubic-frobenius-trace-proof-custody','native-norm-euclid-proof-custody'),('cubic-frobenius-trace-original-gates','native-norm-euclid-original-gates'),('46e4993775a2c0c64f1aa079b28fb1d13b6e671df035a182f038a16f2e07ef43',sha)]:s=s.replace(a,z)
+assert 'CubicFrobeniusTraceDescent05'not in s and 'cubic-Frobenius-trace-descent-final-04'not in s;wf=r/'.github/workflows/chained-transfer-native-norm-euclid-proof-09.yml';wf.write_text(s)
+(g/'ACTUAL_STATIC_REPORT_CI_INPUTS.json').write_text(json.dumps(dict(source=sha,workflow_sha256=hashlib.sha256(wf.read_bytes()).hexdigest(),scope_claim='35c3a5',canonical_graphs=[dict(path=str((p/x).relative_to(r)),sha256=hashlib.sha256((p/x).read_bytes()).hexdigest())for x in ['chain.dot','cubic.dot','reports/prime-field-actual-04/psi.dot']],scope='static report/CI, no repeated proof/native/benchmark run'),indent=2)+'\n');print('documented',sha)

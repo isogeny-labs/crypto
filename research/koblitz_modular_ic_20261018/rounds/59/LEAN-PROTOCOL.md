@@ -1,0 +1,4 @@
+# R59 quotient/jet implications, frozen before compile
+Five authored claims: commuting fourth annihilator; fourth-power idempotent lift inchar2; fourth-power orthogonality; nilpotence from surjective intertwinedJordanmodel; left-inverse preservation under coefficient extension. Nativecokernel/full18leftinverses andJordan/CRT/sourcearrays remain suppliedpremises;actualcurve,DVRjetinterpretation/properness/constantfieldfactsremain geometricpremises. RetainedR55/R57genericexactkernel/recovery/injectivityimplicationsapply,notrecompiledasdimension-specificduplicates.
+
+PinnedLean4.34.1/mathlibd13f23b723b8a846827a245b89c10fc7d3f11612,-j1 -M4096,separate1200secondcompile/audit,noVMcap. Existingproofcache.One mathematicaljobatatime. Immutablecopiedsource/driver/auditor/protocols;allfailedattemptsretainedandrepairsfrozenbeforefreshattempt. No sorry,newaxiom,native_decideortrusteddeclaration.

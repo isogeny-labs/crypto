@@ -1,0 +1,105 @@
+{
+  "schema": "conductor-gap.authoring-ci-snapshot/v1",
+  "collected_at": "2026-10-27T01:57:06Z",
+  "pr": 2684,
+  "head": "133e90f0743f9b270353ad8a595809bfd2e359d0",
+  "base": "2efb7830fb732928a5da8451648dc1fa40adaef7",
+  "all_event_workflows_reported": 5,
+  "all_event_workflows_retrieved": 5,
+  "jobs_reported": 5,
+  "jobs_retrieved": 5,
+  "jobs": [
+    {
+      "id": 121962213167,
+      "name": "recompute",
+      "status": "completed",
+      "conclusion": "failure",
+      "runner_id": 0,
+      "steps": [],
+      "run": 40435234380,
+      "failure_annotations": [
+        {
+          "annotation_level": "failure",
+          "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+        }
+      ]
+    },
+    {
+      "id": 121962212615,
+      "name": "gate",
+      "status": "completed",
+      "conclusion": "failure",
+      "runner_id": 0,
+      "steps": [],
+      "run": 40435233874,
+      "failure_annotations": [
+        {
+          "annotation_level": "failure",
+          "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+        }
+      ]
+    },
+    {
+      "id": 121962212449,
+      "name": "current",
+      "status": "completed",
+      "conclusion": "failure",
+      "runner_id": 0,
+      "steps": [],
+      "run": 40435234022,
+      "failure_annotations": [
+        {
+          "annotation_level": "failure",
+          "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+        }
+      ]
+    },
+    {
+      "id": 121962213370,
+      "name": "review",
+      "status": "completed",
+      "conclusion": "failure",
+      "runner_id": 0,
+      "steps": [],
+      "run": 40435233829,
+      "failure_annotations": [
+        {
+          "annotation_level": "failure",
+          "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+        }
+      ]
+    },
+    {
+      "id": 121962210413,
+      "name": "migrate",
+      "status": "completed",
+      "conclusion": "failure",
+      "runner_id": 0,
+      "steps": [],
+      "run": 40435233410,
+      "failure_annotations": [
+        {
+          "annotation_level": "failure",
+          "message": "The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings"
+        }
+      ]
+    }
+  ],
+  "submitted_reviews": 0,
+  "inline_comments": 0,
+  "review_threads": 0,
+  "codex_summary": {
+    "comment_id": 6431786010,
+    "head": "133e90f0743f9b270353ad8a595809bfd2e359d0",
+    "status": "running",
+    "approval_confirmed": false
+  },
+  "mergeable": true,
+  "merged": false,
+  "complete_required_gate_set_confirmed": false,
+  "notes": [
+    "All five failures have runner_id zero, no steps and an account-payment/spending-limit annotation.",
+    "Actions alone does not establish all required checks/reviews/rules.",
+    "Denied combined-status and GraphQL rollup routes were not retried or bypassed."
+  ]
+}

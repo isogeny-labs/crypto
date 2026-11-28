@@ -1,56 +1,101 @@
 //! Versioned synthetic research datasets with explicit capabilities and durable receipts.
-pub mod budget;
-pub mod capture;
-mod cost_labels;
-pub mod curves;
 pub mod custody;
+
+pub mod budget;
+
+pub mod capture;
+
+pub mod legacy_budget;
+
+pub mod live;
+
+pub mod snapshot;
+
+pub mod curves;
+
 mod execution;
+
 pub mod export;
+
+pub mod factor_bases;
+
 pub mod relations;
+
 pub mod report;
+
 pub mod restore;
+
 pub mod s3_budget;
+
 pub mod solvers;
+
 mod startup_gate;
+
 pub mod storage;
+
 pub mod telemetry;
+
 pub mod types;
+#[cfg(target_os = "macos")]
+mod worker_process_macos;
 
 use budget::{
     BudgetScope, BudgetSession, CampaignLedger, CampaignPolicy, GrantRequest, LaunchBinding,
     LaunchRequest, OwnerIdentity, Resources, RunBinding, WorkerGrant,
 };
+
 use clap::{Args, Subcommand};
+
 use s3_budget::S3BudgetContext;
+
 use serde::{Deserialize, Serialize};
+
 use serde_json::{json, Value};
+
 use std::collections::{BTreeMap, BTreeSet};
-#[cfg(target_os = "linux")]
-use std::ffi::OsString;
+
 use std::fs::{self, File, OpenOptions};
+
 use std::path::{Path, PathBuf};
-#[cfg(not(target_os = "linux"))]
-use std::process::Child;
-#[cfg(not(target_os = "linux"))]
-use std::process::Command;
-use std::process::{ExitStatus, Stdio};
+
 use std::sync::Arc;
+
 use std::time::{Duration, Instant};
-#[cfg(target_os = "linux")]
-use telemetry::pmu_containment;
-#[cfg(target_os = "linux")]
-use telemetry::whole_worker::{Collector, GatedWorker};
-use types::{Artifact, CaseConfig};
+
+use types::{Artifact, CaseConfig, FactorBasePolicy};
 
 #[derive(Args)]
 pub struct DatasetArgs {
+    /// Independently bounded owned-search capture and row replay allowance.
+    #[arg(long,global=true,requires="owned_replay_receipt",conflicts_with_all=["sat_replay_policy","affine_replay_policy","search_replay_policy"])]
+    pub owned_replay_policy: Option<PathBuf>,
+    #[arg(long, global = true, requires = "owned_replay_policy")]
+    pub owned_replay_receipt: Option<PathBuf>,
+    #[arg(long,global=true,requires="search_replay_receipt",conflicts_with_all=["sat_replay_policy","affine_replay_policy"])]
+    pub search_replay_policy: Option<PathBuf>,
+    #[arg(long, global = true, requires = "search_replay_policy")]
+    pub search_replay_receipt: Option<PathBuf>,
+    /// Independently authorized finite historical SAT replay allowance.
+    #[arg(long, global = true, requires = "sat_replay_receipt")]
+    pub sat_replay_policy: Option<PathBuf>,
+    #[arg(long, global = true, requires = "sat_replay_policy")]
+    pub sat_replay_receipt: Option<PathBuf>,
+    #[arg(
+        long,
+        global = true,
+        requires = "affine_replay_receipt",
+        conflicts_with = "sat_replay_policy"
+    )]
+    pub affine_replay_policy: Option<PathBuf>,
+    #[arg(long, global = true, requires = "affine_replay_policy")]
+    pub affine_replay_receipt: Option<PathBuf>,
     #[command(subcommand)]
     pub command: DatasetCommand,
 }
 
 #[derive(Subcommand)]
 pub enum DatasetCommand {
-    /// Create, verify, or locally restore a restricted full-run custody bundle.
+    /// Create, verify, publish or restore a restricted full-run custody bundle.
     Custody(custody::CustodyArgs),
     /// Validate a delivered launch grant and start the frozen bounded worker.
     Start {
@@ -103,6 +148,13 @@ pub enum DatasetCommand {
         remote: Option<String>,
         #[command(flatten)]
         budget: BudgetArgs,
+    },
+    /// Restore retained partial artifacts without resuming a solver.
+    RestorePartial(live::RestorePartialArgs),
+    #[command(hide = true)]
+    SnapshotWorker {
+        #[arg(long)]
+        request: PathBuf,
     },
     /// Show actual method support and instrumentation limits.
     Capabilities,
@@ -244,6 +296,9 @@ pub enum BudgetCommand {
 
 #[derive(Args)]
 pub struct PlanArgs {
+    /// Strict immutable optional channel request JSON; selects plan/v3.
+    #[arg(long)]
+    pub channels: Option<PathBuf>,
     #[arg(long)]
     pub out: PathBuf,
     #[arg(long, default_value = "23-31,47-61")]
@@ -268,6 +323,9 @@ pub struct PlanArgs {
     pub seed: u64,
     #[arg(long, default_value_t = 8)]
     pub factor_base_size: usize,
+    /// JSON array of explicit factor-base recipes; selects plan/v2. Omit for exact legacy plan/v1.
+    #[arg(long)]
+    pub factor_base_policies: Option<PathBuf>,
     #[arg(long, default_value_t = 3)]
     pub degree_bound: u32,
     #[arg(long, default_value_t = 100000)]
@@ -313,11 +371,23 @@ pub struct GenerateArgs {
     /// Finite Resources reservation charged once per cell, with requests spent inside it.
     #[arg(long)]
     pub budget_cell_envelope: Option<PathBuf>,
+    /// Publish acknowledged partial artifacts at this interval when --publish is set.
+    #[arg(long, default_value_t = 30)]
+    pub snapshot_seconds: u64,
+    /// Bound each snapshot helper; the solver deadline remains independently enforced.
+    #[arg(long, default_value_t = 120)]
+    pub snapshot_timeout_seconds: u64,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct DatasetPlan {
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "types::present_channels"
+    )]
+    pub channels: Option<types::ChannelRequests>,
     pub schema: String,
     pub field_sizes: Vec<u32>,
     pub arities: Vec<usize>,
@@ -333,10 +403,26 @@ pub struct DatasetPlan {
     pub twists: bool,
     pub protocol_sha256: Option<String>,
     pub split_rule: String,
+    /// Empty and absent for frozen plan/v1. Explicit nonempty policy axis for plan/v2.
+    #[serde(
+        default,
+        deserialize_with = "nonempty_policy_axis",
+        skip_serializing_if = "Vec::is_empty"
+    )]
+    pub factor_base_policies: Vec<FactorBasePolicy>,
 }
 
-const NATURAL_PLAN_SCHEMA: &str = "crypto.ml-dataset.plan/v1";
-const PLANTED_PLAN_SCHEMA: &str = "crypto.ml-dataset.plan/planted-pdp-v1";
+fn nonempty_policy_axis<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> Result<Vec<FactorBasePolicy>, D::Error> {
+    let policies = Vec::<FactorBasePolicy>::deserialize(deserializer)?;
+    if policies.is_empty() || policies.len() > 32 {
+        return Err(serde::de::Error::custom(
+            "a present policy axis must contain 1..32 recipes",
+        ));
+    }
+    Ok(policies)
+}
 
 impl DatasetPlan {
     fn planted(&self) -> bool {
@@ -351,12 +437,31 @@ impl DatasetPlan {
     }
 
     pub fn validate(&self) -> Result<(), String> {
-        if !matches!(
-            self.schema.as_str(),
-            NATURAL_PLAN_SCHEMA | PLANTED_PLAN_SCHEMA
-        ) || !self.twists
-        {
-            return Err("expected natural or planted PDP plan with paired twists".into());
+        if let Some(c) = &self.channels {
+            c.validate()?;
+        }
+        let policy_plan = match self.schema.as_str() {
+            "crypto.ml-dataset.plan/v3" if self.channels.is_some() => {
+                !self.factor_base_policies.is_empty()
+            }
+            "crypto.ml-dataset.plan/v1" | "crypto.ml-dataset.plan/planted-pdp-v1"
+                if self.channels.is_none() && self.factor_base_policies.is_empty() =>
+            {
+                false
+            }
+            "crypto.ml-dataset.plan/v2"
+                if self.channels.is_none() && !self.factor_base_policies.is_empty() =>
+            {
+                true
+            }
+            _ => {
+                return Err(
+                    "expected legacy plan/v1, policy plan/v2 or requested-channel plan/v3".into(),
+                )
+            }
+        };
+        if !self.twists {
+            return Err("expected paired twists".into());
         }
         if self.field_sizes.is_empty()
             || self.field_sizes.iter().any(|n| !(3..=61).contains(n))
@@ -382,6 +487,7 @@ impl DatasetPlan {
                     "root",
                     "pkm",
                     "double-large-prime",
+                    "f4-wide-dynamic-v1",
                 ][..],
             ),
         ] {
@@ -427,6 +533,20 @@ impl DatasetPlan {
         if self.split_rule != "curve-twist-component-sha256-v1" {
             return Err("unknown split rule".into());
         }
+        if policy_plan {
+            if self.factor_base_policies.len() > 32 {
+                return Err("at most 32 factor-base policies are supported per plan".into());
+            }
+            let mut recipes = BTreeSet::new();
+            for policy in &self.factor_base_policies {
+                for &n in &self.field_sizes {
+                    policy.validate(n)?;
+                }
+                if !recipes.insert(serde_json::to_vec(policy).map_err(|e| e.to_string())?) {
+                    return Err("duplicate factor-base policy recipe".into());
+                }
+            }
+        }
         if let Some(hash) = &self.protocol_sha256 {
             crate::store::index::validate_sha256(hash)?;
         }
@@ -444,6 +564,7 @@ impl DatasetPlan {
             self.generators,
             self.keys,
             2,
+            self.factor_base_policies.len().max(1) as u64,
         ]
         .into_iter()
         .try_fold(1u64, |a, b| {
@@ -462,6 +583,14 @@ impl DatasetPlan {
             d
         };
         let solver = self.solvers[digit(self.solvers.len() as u64) as usize].clone();
+        let factor_base_policy = if self.factor_base_policies.is_empty() {
+            None
+        } else {
+            Some(
+                self.factor_base_policies[digit(self.factor_base_policies.len() as u64) as usize]
+                    .clone(),
+            )
+        };
         let twist = digit(2) == 1;
         let m = self.arities[digit(self.arities.len() as u64) as usize];
         let key_index = digit(self.keys);
@@ -470,6 +599,7 @@ impl DatasetPlan {
         let n = self.field_sizes[digit(self.field_sizes.len() as u64) as usize];
         let family = self.families[digit(self.families.len() as u64) as usize].clone();
         Ok(CaseConfig {
+            channels: self.channels.clone(),
             family,
             n,
             m,
@@ -479,6 +609,7 @@ impl DatasetPlan {
             key_index,
             seed: self.seed,
             factor_base_size: self.factor_base_size,
+            factor_base_policy,
             degree_bound: self.degree_bound,
             work_limit: self.work_limit,
             solver,
@@ -978,6 +1109,16 @@ fn fetch_budget_object(
 }
 
 pub fn run(args: &DatasetArgs) -> Result<(), String> {
+    owned_replay_caller::invoke(args, || {
+        search_replay_caller::invoke(args, || {
+            sat_replay_caller::invoke(args, || {
+                affine_replay_caller::invoke(args, || run_dispatch(args))
+            })
+        })
+    })
+}
+
+fn run_dispatch(args: &DatasetArgs) -> Result<(), String> {
     match &args.command {
         DatasetCommand::Custody(a) => println!("{}", custody::run(a)?),
         DatasetCommand::Start { resume } => {
@@ -989,11 +1130,51 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
         }
         DatasetCommand::Budget { command } => println!("{}", run_budget_command(command)?),
         DatasetCommand::Plan(a) => {
+            let channels = a
+                .channels
+                .as_ref()
+                .map(|p| {
+                    let meta = fs::metadata(p).map_err(|e| e.to_string())?;
+                    if meta.len() > 4096 {
+                        return Err("channel request exceeds 4096 bytes".into());
+                    }
+                    let bytes = fs::read(p).map_err(|e| e.to_string())?;
+                    if bytes.len() > 4096 {
+                        return Err("channel request exceeds 4096 bytes".into());
+                    }
+                    let c: types::ChannelRequests =
+                        serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+                    c.validate()?;
+                    Ok::<_, String>(c)
+                })
+                .transpose()?;
+            let factor_base_policies: Vec<FactorBasePolicy> = a
+                .factor_base_policies
+                .as_ref()
+                .map(|path| read_json(path))
+                .transpose()?
+                .unwrap_or_default();
+            if a.factor_base_policies.is_some() && factor_base_policies.is_empty() {
+                return Err("explicit factor-base policy array must not be empty".into());
+            }
             let plan = DatasetPlan {
-                schema: match a.population.as_str() {
-                    "natural" => NATURAL_PLAN_SCHEMA,
-                    "planted-pdp-v1" => PLANTED_PLAN_SCHEMA,
-                    _ => return Err("unknown dataset population".into()),
+                channels: channels.clone(),
+                schema: if a.population == "planted-pdp-v1" {
+                    if channels.is_some() || !factor_base_policies.is_empty() {
+                        return Err(
+                            "planted plans require their original absent policy/channel axes"
+                                .into(),
+                        );
+                    }
+                    PLANTED_PLAN_SCHEMA
+                } else if a.population != "natural" {
+                    return Err("unknown dataset population".into());
+                } else if channels.is_some() {
+                    "crypto.ml-dataset.plan/v3"
+                } else if factor_base_policies.is_empty() {
+                    "crypto.ml-dataset.plan/v1"
+                } else {
+                    "crypto.ml-dataset.plan/v2"
                 }
                 .into(),
                 field_sizes: numbers(&a.n)?,
@@ -1010,6 +1191,7 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
                 twists: true,
                 protocol_sha256: a.protocol_sha256.clone(),
                 split_rule: "curve-twist-component-sha256-v1".into(),
+                factor_base_policies,
             };
             plan.validate()?;
             let parent = a
@@ -1027,7 +1209,7 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
             println!(
                 "{}",
                 json!({"plan":a.out,"sha256":artifact.sha256,"plan_sha256":plan.binding_sha256()?,"planned_cells":plan.cell_count()?,
-                "generated_cells":0,"twists_included":true,"population":a.population})
+                "generated_cells":0,"twists_included":true})
             );
         }
         DatasetCommand::Generate(a) => generate(a)?,
@@ -1063,9 +1245,7 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
         DatasetCommand::Status { out } => {
             println!("{}", verify_run(out, false)?);
         }
-        DatasetCommand::CostLabels { out } => {
-            println!("{}", cost_labels::report_run(out)?);
-        }
+        DatasetCommand::CostLabels { out } => println!("{}", cost_labels::report_run(out)?),
         DatasetCommand::Report { out, destination } => {
             println!("{}", report::report_run(out, destination)?);
         }
@@ -1100,6 +1280,8 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
                 finalize_budget(out, context.as_ref(), Some(&remote), true),
             )?;
         }
+        DatasetCommand::RestorePartial(args) => println!("{}", live::restore_partial(args)?),
+        DatasetCommand::SnapshotWorker { request } => live::snapshot_worker(request)?,
         DatasetCommand::Capabilities => println!("{}", solvers::capabilities()),
         DatasetCommand::Export { out, destination } => {
             println!("{}", export::export(out, destination)?)
@@ -1125,6 +1307,7 @@ pub fn run(args: &DatasetArgs) -> Result<(), String> {
 struct Lease {
     _file: File,
 }
+
 impl Lease {
     fn acquire(root: &Path) -> Result<Self, String> {
         let root = checked_directory(root, true)?;
@@ -1218,6 +1401,7 @@ struct SupervisedChild {
     #[cfg(not(target_os = "linux"))]
     finished: bool,
 }
+
 impl SupervisedChild {
     fn pid(&self) -> u32 {
         #[cfg(target_os = "linux")]
@@ -1267,6 +1451,7 @@ impl SupervisedChild {
         Ok(exit)
     }
 }
+
 impl Drop for SupervisedChild {
     fn drop(&mut self) {
         #[cfg(not(target_os = "linux"))]
@@ -1346,11 +1531,153 @@ fn verify_capture_context(dir: &Path, artifacts: &[Artifact]) -> Result<(), Stri
     Ok(())
 }
 
+fn worker_reserved_artifact_path(path: &str) -> bool {
+    [
+        "config.json",
+        "public.json",
+        "witness.json",
+        "factor-base.json",
+        "result.json",
+        "manifest.json",
+        "stdout.log",
+        "stderr.log",
+        "plan.json",
+        "run.json",
+        "protocol.json",
+        "attempt.json",
+        "worker-process.json",
+        "whole-worker-counter.json",
+        "host.json",
+        "worker-artifacts.json",
+        "measurement-policy.json",
+        "capture-binding.json",
+        "capture-limits.json",
+        execution::PATH,
+    ]
+    .contains(&path)
+        || path.starts_with("publication/")
+        || path.starts_with("telemetry/")
+}
+
+/// Adopt validated stored roots before pending validation; retain them when a
+/// later pending write fails. No payload/root/capture write occurs for stored.
+fn adopt_worker_solver_artifacts(
+    out: &Path,
+    registry: &mut Vec<Artifact>,
+    data: types::SolverData,
+    stored: Vec<Artifact>,
+) -> Result<Value, String> {
+    if stored.len() > solvers::WORKER_STORED_RECEIPT_MAX {
+        return Err("stored worker receipt count exceeds admission".into());
+    }
+    // Bounded stored channel uses capacity reserved before solver execution.
+    if registry.capacity() - registry.len() < stored.len() {
+        return Err("worker receipt registry capacity was not reserved".into());
+    }
+    // Authenticate the stored channel first. Pending validation must not erase
+    // successful root writes that have already happened.
+    for (i, artifact) in stored.iter().enumerate() {
+        if worker_reserved_artifact_path(&artifact.path)
+            || registry.iter().any(|a| a.path == artifact.path)
+            || stored[..i].iter().any(|a| a.path == artifact.path)
+        {
+            return Err("stored solver artifact collides with reserved output".into());
+        }
+    }
+    registry.extend(stored);
+    // Check the entire pending list before any new write, against the adopted
+    // roots as well as worker outputs and earlier pending identities.
+    for (i, artifact) in data.artifacts.iter().enumerate() {
+        if worker_reserved_artifact_path(&artifact.path)
+            || registry.iter().any(|a| a.path == artifact.path)
+            || data.artifacts[..i].iter().any(|a| a.path == artifact.path)
+        {
+            return Err("pending solver artifact collides with reserved output".into());
+        }
+    }
+    for artifact in data.artifacts {
+        registry.push(storage::write_bytes(
+            out,
+            &artifact.path,
+            &artifact.role,
+            &artifact.encoding,
+            &artifact.bytes,
+        )?);
+    }
+    Ok(data.outcome)
+}
+
+/// Preserve native retained evidence when post-operation telemetry fails.
+/// Generic legacy failures retain their existing error behavior.
+fn finish_retained_worker_output(
+    out: &Path,
+    registry: &mut Vec<Artifact>,
+    output: solvers::WorkerSolveOutput,
+    measurement: Result<(), String>,
+    retained: &mut solvers::WorkerResidualCustody,
+) -> Result<Value, String> {
+    let (data, stored, residual) = output.into_parts();
+    *retained = residual;
+    if retained.boolean_search_report_unavailable() {
+        return Err("Boolean matrix search report publication is not admitted".into());
+    }
+    if retained.boolean_rows_report_unavailable() {
+        return Err("Boolean finite-row report publication is not admitted".into());
+    }
+    if retained.sat_report_unavailable() {
+        return Err("SAT initial terminal report was not admitted or already consumed".into());
+    }
+    finish_worker_solver_artifacts(out, registry, data, stored, measurement)
+}
+
+fn finish_worker_solver_artifacts(
+    out: &Path,
+    registry: &mut Vec<Artifact>,
+    mut data: types::SolverData,
+    stored: Vec<Artifact>,
+    measurement: Result<(), String>,
+) -> Result<Value, String> {
+    if let Err(error) = measurement {
+        let native = ["koblitz-m3-native-v1", "binary-m3-native-v1"]
+            .into_iter()
+            .any(|id| data.outcome["adapter_id"] == id && data.outcome["strategy"] == id);
+        // No new pending writes after a telemetry failure. Already acknowledged
+        // roots remain in the registry before handling the censored outcome.
+        data.artifacts.clear();
+        let mut outcome = adopt_worker_solver_artifacts(out, registry, data, stored)?;
+        if !native {
+            return Err(error);
+        }
+        outcome["status"] = json!("worker_failed");
+        for key in [
+            "solver_completed",
+            "pdp_witness_verified",
+            "certificate_durably_persisted",
+            "group_domain_complete",
+            "exhaustive_no_decomposition",
+            "native_backend_invoked",
+            "algebra_completed",
+            "native_statistics_complete",
+            "scalar_recovered_without_witness",
+        ] {
+            outcome[key] = json!(false);
+        }
+        // Keep retained_pdp_witness_verified and original ledger/custody fields.
+        // Preserve prior persistence errors rather than replacing them.
+        outcome["worker_telemetry_error"] = json!(error);
+        return Ok(outcome);
+    }
+    adopt_worker_solver_artifacts(out, registry, data, stored)
+}
+
 fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     let out = checked_directory(out, false)?;
     let (plan, _, _) = bound_run(&out)?;
     let mut registry = Vec::<Artifact>::new();
     let capture_context = admit_capture_context(&out)?;
+    if config.channels.is_some() && capture_context.is_none() {
+        return Err("requested channels require original bound execution".into());
+    }
     let execution_context = execution::admit(&out)?;
     if telemetry::checked::policy_present(&out)? {
         capture::AttemptBinding::from_cell_files(&out)?;
@@ -1361,6 +1688,9 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
     }
     let mut known_answer = false;
     let mut factor_base_verified = false;
+    // Keep residual owner bytes and actual rejected receipts alive through
+    // result/registry finalization, including telemetry failure. No retry.
+    let mut retained_solver_custody = solvers::WorkerResidualCustody::default();
     let result = (|| {
         let case = telemetry::measured(&out, &mut registry, "curve-construction", || {
             if plan.planted() {
@@ -1369,45 +1699,31 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
                 curves::generate(config)
             }
         })?;
-        telemetry::measured(&out, &mut registry, "known-answer-replay", || {
-            curves::verify(&case.public_instance, &case.private_witness)
-        })?;
-        telemetry::measured(&out, &mut registry, "factor-base-replay", || {
-            if plan.planted() {
-                curves::verify_planted(config, &case)
-            } else {
-                curves::verify_factor_base(&case.public_instance, &case.factor_base)
-            }
-        })?;
-        registry.push(storage::write_json(
+        let verified_originals = solvers::verify_and_store_worker_originals(
+            config,
+            &case,
             &out,
-            "public.json",
-            "public-instance",
-            &case.public_instance,
-        )?);
-        registry.push(storage::write_json(
-            &out,
-            "witness.json",
-            "restricted-known-answer",
-            &case.private_witness,
-        )?);
-        registry.push(storage::write_json(
-            &out,
-            "factor-base.json",
-            "factor-base",
-            &case.factor_base,
-        )?);
+            capture_context.as_ref().map(|(binding, _)| binding),
+            &mut registry,
+        )?;
         known_answer = true;
         factor_base_verified = true;
-        let solved = telemetry::measured(&out, &mut registry, "solver", || {
-            if let Some((binding, limits)) = &capture_context {
-                solvers::solve_with_bound_event_sink_context(
+        // Worker setup reservation, before producer execution. Adapter receipt
+        // admission separately accounts its transport Vec in the original budget.
+        registry
+            .try_reserve_exact(solvers::WORKER_STORED_RECEIPT_MAX + 2)
+            .map_err(|e| e.to_string())?;
+        let mut produced = None;
+        let measurement = telemetry::measured(&out, &mut registry, "solver", || {
+            let output = if let Some((binding, limits)) = &capture_context {
+                solvers::solve_with_verified_worker_originals(
                     config,
                     &case,
                     &out.join("live"),
                     binding.clone(),
                     limits.clone(),
                     execution_context.as_ref(),
+                    &verified_originals,
                 )
             } else {
                 solvers::solve_with_event_sink_context(
@@ -1416,54 +1732,36 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
                     &out.join("live"),
                     execution_context.as_ref(),
                 )
+                .map(solvers::WorkerSolveOutput::legacy)
+            }?;
+            // Keep custody outside measured: its terminal telemetry write may fail.
+            produced = Some(output);
+            Ok(())
+        });
+        let solved = match produced {
+            Some(solved) => solved,
+            None => {
+                return Err(measurement
+                    .err()
+                    .unwrap_or_else(|| "solver returned no output".into()))
             }
-        })?;
-        let mut names = BTreeSet::new();
-        for artifact in solved.artifacts {
-            if [
-                "config.json",
-                "public.json",
-                "witness.json",
-                "factor-base.json",
-                "result.json",
-                "manifest.json",
-                "stdout.log",
-                "stderr.log",
-                "plan.json",
-                "run.json",
-                "protocol.json",
-                "attempt.json",
-                "worker-process.json",
-                "whole-worker-counter.json",
-                "host.json",
-                "worker-artifacts.json",
-                "measurement-policy.json",
-                "capture-binding.json",
-                "capture-limits.json",
-                execution::PATH,
-            ]
-            .contains(&artifact.path.as_str())
-                || artifact.path.starts_with("publication/")
-                || artifact.path.starts_with("telemetry/")
-                || !names.insert(artifact.path.clone())
-            {
-                return Err("solver artifact collides with reserved output".into());
-            }
-            registry.push(storage::write_bytes(
-                &out,
-                &artifact.path,
-                &artifact.role,
-                &artifact.encoding,
-                &artifact.bytes,
-            )?);
-        }
-        Ok::<Value, String>(solved.outcome)
+        };
+        finish_retained_worker_output(
+            &out,
+            &mut registry,
+            solved,
+            measurement,
+            &mut retained_solver_custody,
+        )
     })();
     let mut outcome = match result {
         Ok(v) => v,
         Err(e) => json!({"status":"error","reason":e,
         "solver_completed":false,"scalar_recovered_without_witness":false}),
     };
+    if let Some(disposition) = solvers::requested_channel_disposition(config)? {
+        outcome["requested_channels"] = disposition;
+    }
     outcome["known_answer_verified"] = json!(known_answer);
     outcome["factor_base_verified"] = json!(factor_base_verified);
     registry.push(storage::write_json(
@@ -1478,6 +1776,9 @@ fn worker(config: &CaseConfig, out: &Path) -> Result<(), String> {
         "artifact-registry",
         &registry,
     )?;
+    // Owner destruction is after finalization; failed raw storage is recorded
+    // as censored in the outcome, never silently retried or called durable.
+    drop(retained_solver_custody);
     Ok(())
 }
 
@@ -1529,6 +1830,7 @@ fn collect_cell_artifacts(dir: &Path) -> Result<Vec<Artifact>, String> {
                 "capture-limits.json" => ("partial-capture-limits", "json"),
                 execution::PATH => (execution::ROLE, "json"),
                 "stdout.log" | "stderr.log" => ("process-log", "utf8"),
+                "publication-failure.json" => ("local-publication-failure", "json"),
                 _ => ("unregistered-partial-artifact", "native"),
             }
         };
@@ -1583,6 +1885,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
         || a.seconds_per_case == 0
         || a.memory_mib < 128
         || a.trace_mib == 0
+        || (a.publish && (a.snapshot_seconds == 0 || a.snapshot_timeout_seconds == 0))
     {
         return Err("invalid cell, shard, time, memory or trace limit".into());
     }
@@ -1641,12 +1944,28 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
         })?;
     }
     let context = budget_transport(session)?;
-    let binding = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":plan_sha,
+    let mut binding = json!({"schema":"crypto.ml-dataset.run/v1","plan_sha256":plan_sha,
         "source_commit":source,"binary_sha256":binary_sha,"shard_index":a.shard_index,
         "shard_count":a.shard_count,"seconds_per_case":a.seconds_per_case,"memory_mib":a.memory_mib,
         "trace_mib":a.trace_mib,"execution_context_required":cfg!(target_os = "linux"),"output_budget_scope":"all_cell_files_before_manifest_seal",
         "clock_valid_for_comparison":false});
+    if a.publish {
+        binding["partial_capture"] = json!({
+            "schema":"crypto.ml-dataset.capture-policy/v1",
+            "interval_seconds":a.snapshot_seconds,
+            "helper_timeout_seconds":a.snapshot_timeout_seconds,
+            "limits":live::capture_limits(a.trace_mib)?,
+            "snapshot_limits":snapshot::SnapshotLimits::default(),
+            "solver_state_restorable":false,
+            "budget_policy_sha256":context.as_ref().map(|c| c.session().grant().policy_sha256.clone()),
+        });
+    }
     let result = (|| {
+        // Gate independently authorized replay before dispatch, not after generating evidence.
+        sat_replay_caller::authorize_generation(&plan, &binding)?;
+        affine_replay_caller::authorize_generation(&plan, &binding)?;
+        search_replay_caller::authorize_generation(&plan, &binding)?;
+        owned_replay_caller::authorize_generation(&plan, &binding)?;
         storage::write_json(&out, "run.json", "run-binding", &binding)?;
         storage::write_json(&out, "plan.json", "frozen-plan", &plan)?;
         storage::write_bytes(&out, "protocol.json", "frozen-protocol", "json", &protocol)?;
@@ -1677,6 +1996,10 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                     "cell {index} has an incomplete attempt; reconcile it before retrying"
                 ));
             }
+            sat_replay_caller::authorize_cell_dispatch(index, &config)?;
+            affine_replay_caller::authorize_cell_dispatch(index, &config)?;
+            search_replay_caller::authorize_cell_dispatch(index, &config)?;
+            owned_replay_caller::authorize_cell_dispatch(index, &config)?;
             let scope = cell_budget_scope(context.as_ref(), envelope.as_ref(), &plan_sha, index)?;
             fs::create_dir(&dir).map_err(|e| e.to_string())?;
             sync_dir(&cells)?;
@@ -1719,6 +2042,16 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 "partial-capture-limits",
                 &capture::capture_limits(a.trace_mib)?,
             )?;
+            // Commit the original partial-capture context before the worker's
+            // launch clock begins, using this cell's existing owner admission.
+            let mut live_capture = if a.publish {
+                let mut capture =
+                    live::LiveSupervisor::new_with_budget(&out, &dir, a, context.as_ref())?;
+                capture.flush(snapshot::AttemptStatus::Running, None, None)?;
+                Some(capture)
+            } else {
+                None
+            };
             let stdout = OpenOptions::new()
                 .write(true)
                 .create_new(true)
@@ -1810,6 +2143,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             "worker_pid":child.pid(),"supervisor_pid":std::process::id(),
             "output":dir,"process_group":child.pid()}),
             )?;
+
             #[cfg(target_os = "linux")]
             let (collector, attach_status, attach_error) = match Collector::attach(child.pid()) {
                 Ok(collector) => (Some(collector), "observed", None),
@@ -1837,6 +2171,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 format!("worker gate release failed: {error}")
             })?;
             let mut stop_reason = None;
+            let mut publication_failure = None;
             let exit = loop {
                 let polled = child.poll()?;
                 // A successful exit observed at/after the original deadline is
@@ -1855,6 +2190,23 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 if let Some(status) = polled {
                     break status;
                 }
+                if let Some(capture) = live_capture.as_mut() {
+                    if let Err(error) = capture.poll() {
+                        publication_failure = Some(error);
+                        break child.stop()?;
+                    }
+                    match capture.capture_stopped() {
+                        Ok(true) => stop_reason = Some("capture_budget_exhausted"),
+                        Ok(false) => {}
+                        Err(error) => {
+                            publication_failure = Some(error);
+                            break child.stop()?;
+                        }
+                    }
+                    if capture.capacity_exhausted() {
+                        stop_reason = Some("snapshot_chain_limit");
+                    }
+                }
                 let bytes = tree_bytes_while_running(&dir)?;
                 if bytes > a.trace_mib.saturating_mul(1024 * 1024) {
                     stop_reason = Some("trace_budget_exhausted");
@@ -1864,6 +2216,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 }
                 std::thread::sleep(Duration::from_millis(100));
             };
+            let worker_elapsed = start.elapsed();
             #[cfg(target_os = "linux")]
             let counter_status = {
                 let cgroup_diagnostic = match cgroup_start {
@@ -1923,9 +2276,84 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 )?;
                 status
             };
+            if let Some(error) = publication_failure {
+                storage::write_json(
+                    &dir,
+                    "publication-failure.json",
+                    "local-publication-failure",
+                    &json!({
+                        "schema":"crypto.ml-dataset.publication-failure/v1", "reason":error,
+                        "worker_exit_code":exit.code(), "worker_elapsed_ms_diagnostic":start.elapsed().as_secs_f64()*1000.0,
+                        "remote_terminal_observation_verified":false, "local_artifacts_retained":true, "wave_stopped":true
+                    }),
+                )?;
+                return Err(format!("partial publication failed; worker stopped and local artifacts retained: {error}"));
+            }
+            if let Some(capture) = live_capture.as_mut() {
+                if capture.capture_stopped()? {
+                    stop_reason = Some("capture_budget_exhausted");
+                }
+                let status = if stop_reason.is_some() || !exit.success() {
+                    snapshot::AttemptStatus::Interrupted
+                } else {
+                    snapshot::AttemptStatus::Exited
+                };
+                if let Err(error) = capture.flush(status, exit.code(), stop_reason) {
+                    storage::write_json(
+                        &dir,
+                        "publication-failure.json",
+                        "local-publication-failure",
+                        &json!({
+                            "schema":"crypto.ml-dataset.publication-failure/v1", "reason":error,
+                            "worker_exit_code":exit.code(), "remote_terminal_observation_verified":false,
+                            "local_artifacts_retained":true, "wave_stopped":true
+                        }),
+                    )?;
+                    return Err(error);
+                }
+            }
             let final_bytes = tree_bytes_while_running(&dir)?;
             if final_bytes > a.trace_mib.saturating_mul(1024 * 1024) {
                 stop_reason = Some("trace_budget_exhausted");
+            }
+            if let Some(error) = publication_failure {
+                storage::write_json(
+                    &dir,
+                    "publication-failure.json",
+                    "local-publication-failure",
+                    &json!({
+                        "schema":"crypto.ml-dataset.publication-failure/v1", "reason":error,
+                        "worker_exit_code":exit.code(), "worker_elapsed_ms_diagnostic":worker_elapsed.as_secs_f64()*1000.0,
+                        "remote_terminal_observation_verified":false,
+                        "local_artifacts_retained":true,"wave_stopped":true,
+                    }),
+                )?;
+                return Err(format!(
+                    "partial publication failed; worker stopped and local artifacts retained: {error}"
+                ));
+            }
+            if let Some(capture) = live_capture.as_mut() {
+                if capture.capture_stopped()? {
+                    stop_reason = Some("capture_budget_exhausted");
+                }
+                let status = if stop_reason.is_some() || !exit.success() {
+                    snapshot::AttemptStatus::Interrupted
+                } else {
+                    snapshot::AttemptStatus::Exited
+                };
+                if let Err(error) = capture.flush(status, exit.code(), stop_reason) {
+                    storage::write_json(
+                        &dir,
+                        "publication-failure.json",
+                        "local-publication-failure",
+                        &json!({
+                            "schema":"crypto.ml-dataset.publication-failure/v1","reason":error,
+                            "worker_exit_code":exit.code(),"remote_terminal_observation_verified":false,
+                            "local_artifacts_retained":true,"wave_stopped":true,
+                        }),
+                    )?;
+                    return Err(error);
+                }
             }
             let mut outcome: Value = if dir.join("result.json").exists() {
                 read_json(&dir.join("result.json"))?
@@ -1934,13 +2362,16 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             };
             outcome =
                 execution::terminal_outcome(outcome, stop_reason, exit.success(), exit.code());
+            if let Some(disposition) = solvers::requested_channel_disposition(&config)? {
+                outcome["requested_channels"] = disposition;
+            }
             #[cfg(target_os = "linux")]
             let instruction_counter_status =
                 format!("whole_worker_raw_{counter_status}; solve_cost_unadmitted");
             #[cfg(not(target_os = "linux"))]
             let instruction_counter_status =
                 "whole_worker_not_counted; see phase telemetry for available hardware counts";
-            outcome["supervisor"] = json!({"exit_code":exit.code(),"elapsed_ms_diagnostic":start.elapsed().as_secs_f64()*1000.0,
+            outcome["supervisor"] = json!({"exit_code":exit.code(),"elapsed_ms_diagnostic":worker_elapsed.as_secs_f64()*1000.0,
             "clock_valid_for_comparison":false,"retired_instructions":null,
             "instruction_counter_status":instruction_counter_status,"memory_limit_bytes":memory,
             "worker_output_bytes_before_seal":final_bytes,"output_budget_bytes":a.trace_mib.saturating_mul(1024*1024),
@@ -1974,6 +2405,14 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
             "worker_output_bytes_before_seal":final_bytes,"sealed_manifest_bytes":manifest_bytes,
             "publication_metadata_bytes":publication_bytes})
             );
+            if matches!(
+                stop_reason,
+                Some("capture_budget_exhausted" | "snapshot_chain_limit")
+            ) {
+                return Err(
+                    "capture stopped; retained the acknowledged prefix and stopped the wave".into(),
+                );
+            }
         }
         println!("{}", verify_run(&out, true)?);
         Ok(())
@@ -2039,6 +2478,13 @@ fn verify_protocol(plan: &DatasetPlan, bytes: &[u8]) -> Result<(), String> {
     let mut value = protocol_unique_json(text, 0)?;
     if value["schema"] != "experiment.protocol/v1" {
         return Err("expected experiment.protocol/v1 protocol".into());
+    }
+    if let Some(channels) = &plan.channels {
+        if value["extensions"]["dataset_channels"]
+            != serde_json::to_value(channels).map_err(|e| e.to_string())?
+        {
+            return Err("frozen protocol does not authorize exact requested channels".into());
+        }
     }
     let freeze = value.get("freeze").ok_or("protocol has no freeze record")?;
     if freeze["status"] != "frozen" || freeze["filed_before_affected_data"] != true {
@@ -2306,13 +2752,12 @@ fn process_entry<T>(pid: u32, result: std::io::Result<T>) -> Result<Option<T>, S
     }
 }
 
-#[cfg(target_os = "linux")]
-fn assert_no_workers(root: &Path) -> Result<(), String> {
-    let root = checked_directory(root, false)?;
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+fn assert_no_retained_worker_groups(root: &Path) -> Result<(), String> {
     // A worker's external descendants may outlive a supervisor killed before
     // its guard runs. Refuse reconciliation while any recorded process group
     // remains, even if its original worker command has disappeared.
-    for dir in cell_directories(&root)? {
+    for dir in cell_directories(root)? {
         let identity = dir.join("worker-process.json");
         if !identity.exists() || dir.join("manifest.json").exists() {
             continue;
@@ -2329,6 +2774,13 @@ fn assert_no_workers(root: &Path) -> Result<(), String> {
             ));
         }
     }
+    Ok(())
+}
+
+#[cfg(target_os = "linux")]
+fn assert_no_workers(root: &Path) -> Result<(), String> {
+    let root = checked_directory(root, false)?;
+    assert_no_retained_worker_groups(&root)?;
     'processes: for entry in
         fs::read_dir("/proc").map_err(|e| format!("cannot inspect live workers: {e}"))?
     {
@@ -2393,7 +2845,14 @@ fn assert_no_workers(root: &Path) -> Result<(), String> {
     Ok(())
 }
 
-#[cfg(not(target_os = "linux"))]
+#[cfg(target_os = "macos")]
+fn assert_no_workers(root: &Path) -> Result<(), String> {
+    let root = checked_directory(root, false)?;
+    assert_no_retained_worker_groups(&root)?;
+    worker_process_macos::assert_no_workers(&root)
+}
+
+#[cfg(not(any(target_os = "linux", target_os = "macos")))]
 fn assert_no_workers(_root: &Path) -> Result<(), String> {
     Err("safe worker reconciliation currently requires Linux /proc".into())
 }
@@ -2748,113 +3207,36 @@ fn verify_root_outcome(outcome: &Value, certificate: &Value, scope: &str) -> Res
     Ok(())
 }
 
-fn verify_whole_worker_counter(
-    dir: &Path,
-    artifacts: &[Artifact],
-    outcome: &Value,
-) -> Result<(), String> {
-    let counter = artifacts
-        .iter()
-        .find(|a| a.path == "whole-worker-counter.json");
-    let Some(artifact) = counter else {
-        if outcome["supervisor"]["instruction_counter_status"]
-            .as_str()
-            .is_some_and(|s| s.starts_with("whole_worker_raw_"))
-        {
-            return Err("whole-worker counter status lacks its restricted artifact".into());
-        }
-        return Ok(()); // Historical cells predate the staged collector.
-    };
-    if artifact.role != "restricted-whole-worker-counter/v1" || artifact.encoding != "json" {
-        return Err("whole-worker counter has the wrong reserved role".into());
-    }
-    let counter: Value = read_json(&dir.join("whole-worker-counter.json"))?;
-    let process: Value = read_json(&dir.join("worker-process.json"))?;
-    let binding = serde_json::to_value(capture::AttemptBinding::from_cell_files(dir)?)
-        .map_err(|e| e.to_string())?;
-    let pid = process["worker_pid"]
-        .as_u64()
-        .filter(|n| *n > 0)
-        .ok_or("worker process lacks positive PID")?;
-    let status = counter["status"].as_str().ok_or("counter lacks status")?;
-    let event_id = counter["event_id"].as_u64();
-    #[cfg(target_os = "linux")]
-    if let Some(diagnostic) = counter.get("cgroup_diagnostic") {
-        pmu_containment::verify_diagnostic(diagnostic, pid)?;
-    }
-    let observation = &counter["observation"];
-    let valid_status = match status {
-        "perf_unavailable" | "attach_failed" => {
-            counter["event_id"].is_null()
-                && counter["attr_size"].is_null()
-                && counter["attr_flags"].is_null()
-                && observation.is_null()
-                && counter["error"].as_str().is_some_and(|s| !s.is_empty())
-        }
-        "read_failed" => {
-            event_id.is_some_and(|id| id > 0)
-                && observation.is_null()
-                && counter["error"].as_str().is_some_and(|s| !s.is_empty())
-        }
-        "observed" | "multiplexed" | "not_running" => {
-            event_id.is_some_and(|id| id > 0)
-                && observation["event_id"].as_u64() == event_id
-                && observation["raw_instructions"].as_u64().is_some()
-                && observation["time_enabled_ns"].as_u64().is_some()
-                && observation["time_running_ns"].as_u64().is_some()
-                && counter["error"].is_null()
-                && match status {
-                    "observed" => {
-                        observation["time_enabled_ns"]
-                            .as_u64()
-                            .is_some_and(|n| n > 0)
-                            && observation["time_running_ns"] == observation["time_enabled_ns"]
-                    }
-                    "not_running" => observation["time_enabled_ns"] == 0,
-                    "multiplexed" => {
-                        observation["time_enabled_ns"]
-                            .as_u64()
-                            .is_some_and(|n| n > 0)
-                            && observation["time_running_ns"] != observation["time_enabled_ns"]
-                    }
-                    _ => false,
-                }
-        }
-        _ => false,
-    };
-    // v1 collector fixes the Linux perf_event_attr to 112 bytes with
-    // disabled|inherit|exclude_kernel|exclude_hv|enable_on_exec (0x1063).
-    let valid_attr = matches!(status, "perf_unavailable" | "attach_failed")
-        || (counter["attr_size"] == 112 && counter["attr_flags"] == 0x1063);
-    if counter["schema"] != "crypto.ml-dataset.whole-worker-counter/v1"
-        || counter["attempt_binding"] != binding
-        || counter["gate_pid"].as_u64() != Some(pid)
-        || counter["process_group"].as_u64() != Some(pid)
-        || process["process_group"].as_u64() != Some(pid)
-        || !counter["worker_exit_success"].is_boolean()
-        || counter["worker_exit_success"]
-            != outcome["supervisor"]["exit_code"]
-                .as_i64()
-                .map(|n| n == 0)
-                .unwrap_or(false)
-        || counter["worker_exit_code"] != outcome["supervisor"]["exit_code"]
-        || counter["descendants_terminated_and_accounted"] != false
-        || counter["platform_admitted"] != false
-        || !counter["eligible_instructions"].is_null()
-        || !outcome["supervisor"]["retired_instructions"].is_null()
-        || outcome["supervisor"]["instruction_counter_status"]
-            != format!("whole_worker_raw_{status}; solve_cost_unadmitted")
-        || !valid_status
-        || !valid_attr
-    {
-        return Err(
-            "whole-worker counter differs from original attempt or unadmitted scope".into(),
-        );
-    }
-    Ok(())
+fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
+    verify_cell_with_boolean_projection(dir, replay, false).map(|(m, _)| m)
 }
 
-fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
+#[path = "sat_replay_caller.rs"]
+mod sat_replay_caller;
+
+#[path = "affine_replay_caller.rs"]
+mod affine_replay_caller;
+
+#[path = "search_replay_caller.rs"]
+mod search_replay_caller;
+
+fn verify_cell_with_boolean_projection(
+    dir: &Path,
+    replay: bool,
+    project: bool,
+) -> Result<(CellManifest, Option<solvers::BooleanProjection>), String> {
+    sat_replay_caller::with_current(|session| {
+        verify_cell_with_replay_session(dir, replay, project, session)
+    })
+}
+
+fn verify_cell_with_replay_session(
+    dir: &Path,
+    replay: bool,
+    project: bool,
+    sat_session: Option<&mut sat_replay_caller::Session>,
+) -> Result<(CellManifest, Option<solvers::BooleanProjection>), String> {
+    let mut boolean_projection = None;
     checked_directory(dir, false)?;
     let metadata = fs::symlink_metadata(dir.join("manifest.json")).map_err(|e| e.to_string())?;
     if !metadata.is_file() || metadata.file_type().is_symlink() {
@@ -2890,7 +3272,160 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
     {
         return Err("cell provenance differs from frozen plan".into());
     }
+    solvers::verify_requested_channel_disposition(&manifest.config, &manifest.outcome)?;
+    let owned_present = solvers::needs_owned_search_replay(
+        &manifest.config,
+        &manifest.outcome,
+        &manifest.artifacts,
+    );
+    if owned_present {
+        if solvers::has_sat_initial_disposition(&manifest.outcome)
+            || solvers::needs_search_replay(&manifest.config, &manifest.outcome)
+            || solvers::needs_affine_row_replay(
+                &manifest.config,
+                &manifest.outcome,
+                &manifest.artifacts,
+            )
+            || manifest
+                .config
+                .channels
+                .as_ref()
+                .is_some_and(|c| c.sat_initial.is_some() || c.boolean_consequence.is_some())
+        {
+            return Err("mixed owned-search and legacy replay modes".into());
+        }
+        if manifest.outcome["strategy"] == "original-boolean-search-unsupported" {
+            solvers::verify_owned_search_unsupported(
+                &manifest.config,
+                &manifest.outcome,
+                &manifest.artifacts,
+            )?;
+        } else {
+            owned_replay_caller::with_current(|session| {
+                session
+                    .ok_or("explicit cumulative owned-search replay policy required")?
+                    .verify(dir, &manifest)
+            })?;
+        }
+    }
+    let search_present = solvers::needs_search_replay(&manifest.config, &manifest.outcome);
+    if search_present && manifest.outcome["strategy"] != "sat-search-unsupported" {
+        if manifest.config.channels.as_ref().is_some_and(|c| {
+            c.affine_boolean_row.is_some()
+                || c.sat_initial.is_some()
+                || c.boolean_consequence.is_some()
+        }) {
+            return Err("mixed search/initial/row modes".into());
+        }
+        search_replay_caller::with_current(|session| {
+            session
+                .ok_or("explicit cumulative search replay policy required")?
+                .verify(dir, &manifest)
+        })?;
+    }
+    if search_present
+        && manifest.outcome["strategy"] == "sat-search-unsupported"
+        && (solvers::search_request_supported(&manifest.config)
+            || manifest.artifacts.iter().any(|a| {
+                a.role == "sat-original-gate-map" || a.path.contains("sat-original-pattern-")
+            })
+            || manifest.outcome["status"] != "unsupported"
+            || manifest.outcome["solver_completed"] != false
+            || manifest.outcome["scalar_recovered_without_witness"] != false)
+    {
+        return Err("unsupported search overclaim".into());
+    }
+    let affine_present =
+        solvers::needs_affine_row_replay(&manifest.config, &manifest.outcome, &manifest.artifacts);
+    if manifest
+        .config
+        .channels
+        .as_ref()
+        .is_some_and(|c| c.affine_boolean_row.is_some())
+        && !affine_present
+        && (manifest.outcome["strategy"] != "original-affine-unit-row-unsupported"
+            || manifest.outcome["status"] != "unsupported"
+            || manifest.outcome["solver_completed"] != false
+            || manifest.outcome["full_span_search"] != false)
+    {
+        return Err("unsupported affine request carries an execution claim".into());
+    }
+
+    if affine_present {
+        affine_replay_caller::with_current(|session| {
+            session
+                .ok_or("explicit cumulative affine replay policy required")?
+                .verify(dir, &manifest)
+        })?;
+    }
+
+    if !owned_present
+        && !search_present
+        && !affine_present
+        && solvers::needs_sat_initial_replay(
+            &manifest.config,
+            &manifest.outcome,
+            &manifest.artifacts,
+        )
+    {
+        let session =
+            sat_session.ok_or("explicit independently bounded SAT replay policy required")?;
+        session.verify(dir, &manifest)?;
+    }
     // Bind the original cell before admitting any specialized replay claim.
+    let dynamic_replay = solvers::verify_dynamic_cell(
+        dir,
+        &manifest.config,
+        &manifest.outcome,
+        &manifest.artifacts,
+    )?;
+    // Reserved Koblitz artifacts must be checked even if strategy/labels were
+    // stripped, and even when optional known-answer replay was not requested.
+    solvers::verify_koblitz_m3_cell(
+        dir,
+        &manifest.config,
+        &manifest.outcome,
+        &manifest.artifacts,
+    )?;
+    // Reserved ordinary paths/roles cannot evade semantic replay by removing
+    // strategy labels or disabling optional known-answer replay.
+    let channel_present = manifest
+        .config
+        .channels
+        .as_ref()
+        .is_some_and(|c| c.boolean_consequence.is_some())
+        || manifest.artifacts.iter().any(|a| {
+            a.path == "binary-m3-boolean-check.json" || a.path == "binary-m3-boolean-anchor.json"
+        });
+    if affine_present
+        && (solvers::is_ordinary_m3_native_source(&manifest.outcome, &manifest.artifacts)
+            || solvers::is_koblitz_m3_native_source(&manifest.outcome, &manifest.artifacts)
+            || manifest.artifacts.iter().any(|a| {
+                a.role == "boolean-original-unit-row"
+                    || a.path.contains("boolean-original-pattern-")
+            }))
+    {
+        return Err("mixed affine and legacy row/native evidence".into());
+    }
+    if !affine_present {
+        if project && channel_present {
+            solvers::verify_ordinary_m3_cell_with_projection(
+                dir,
+                &manifest.config,
+                &manifest.outcome,
+                &manifest.artifacts,
+                &mut boolean_projection,
+            )?;
+        } else {
+            solvers::verify_ordinary_m3_cell(
+                dir,
+                &manifest.config,
+                &manifest.outcome,
+                &manifest.artifacts,
+            )?;
+        }
+    }
+
     let wide_prime_replay = solvers::verify_prime_f4_wide(
         dir,
         &manifest.config,
@@ -3056,19 +3591,32 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
                 factor_base: read_json(&dir.join("factor-base.json"))?,
             },
         )?;
-    } else if replay && complete_known_answer && !plan.planted() {
+    } else if replay
+        && !plan.planted()
+        && complete_known_answer
+        && (dynamic_replay != solvers::DynamicReplayDisposition::RawPrefix
+            || manifest.outcome["known_answer_verified"] == true)
+    {
         curves::verify(
             &read_json(&dir.join("public.json"))?,
             &read_json(&dir.join("witness.json"))?,
         )?;
     }
-    if replay && complete_factor_base {
+    if replay
+        && complete_factor_base
+        && (dynamic_replay != solvers::DynamicReplayDisposition::RawPrefix
+            || manifest.outcome["factor_base_verified"] == true)
+    {
         let public = read_json(&dir.join("public.json"))?;
         let base = read_json(&dir.join("factor-base.json"))?;
         if !plan.planted() {
-            curves::verify_factor_base(&public, &base)?;
+            curves::verify_factor_base_config(&manifest.config, &public, &base)?;
         }
-        if has("prime-f4-input.json") && !censored_m3_prefix {
+        if has("prime-f4-input.json")
+            && !censored_m3_prefix
+            && !verified_dynamic
+            && dynamic_replay == solvers::DynamicReplayDisposition::Ordinary
+        {
             let input: Value = read_json(&dir.join("prime-f4-input.json"))?;
             // The m=2 reference uses the same filename with a legacy schema.
             // A declared chain may not evade reconstruction by changing schema.
@@ -3133,12 +3681,14 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
             }
             if artifact.role == "large-prime-elimination-transcript" {
                 let transcript: Value = read_json(&dir.join(&artifact.path))?;
-                let requested_work =
-                    if transcript["schema"] == "ml-ecdlp-generic-large-prime-transcript/v1" {
-                        transcript["requested_work"].as_u64()
-                    } else {
-                        transcript["requested_work_limit"].as_u64()
-                    };
+                let requested_work = if transcript["schema"]
+                    == "ml-ecdlp-generic-large-prime-transcript/v1"
+                    || transcript["schema"] == "ml-ecdlp-generic-large-prime-transcript/v2"
+                {
+                    transcript["requested_work"].as_u64()
+                } else {
+                    transcript["requested_work_limit"].as_u64()
+                };
                 if requested_work != Some(manifest.config.work_limit) {
                     return Err("relation transcript work limit differs from frozen cell".into());
                 }
@@ -3159,7 +3709,10 @@ fn verify_cell(dir: &Path, replay: bool) -> Result<CellManifest, String> {
             }
         }
     }
-    Ok(manifest)
+    if let Some(seal) = boolean_projection.as_mut() {
+        seal.finish_admission(dir, &manifest.artifacts)?;
+    }
+    Ok((manifest, boolean_projection))
 }
 
 fn publication_confirmations(dir: &Path, manifest_sha: &str) -> Result<usize, String> {
@@ -3305,7 +3858,7 @@ fn verify_run(root: &Path, replay: bool) -> Result<Value, String> {
     let mut known_answer_cells = 0usize;
     let mut independently_solved_cells = 0usize;
     for dir in completed_cells(root)? {
-        let m = verify_cell(&dir, replay)?;
+        let m = verify_cell_with_boolean_projection(&dir, replay, false)?.0;
         if m.plan_sha256 != hash
             || m.config != plan.cell(m.cell_index)?
             || m.cell_index % shard_count != shard_index
@@ -4009,6 +4562,7 @@ mod tests {
         assert!(!temp.0.join("unbudgeted-index.json").exists());
         assert_eq!(wire.calls.lock().unwrap().len(), 2);
     }
+
     #[test]
     fn lab_receipt_routing_rejects_legacy_bucket_before_generation() {
         assert!(
@@ -4026,6 +4580,7 @@ mod tests {
 
     fn plan() -> DatasetPlan {
         DatasetPlan {
+            channels: None,
             schema: "crypto.ml-dataset.plan/v1".into(),
             field_sizes: vec![23, 31],
             arities: vec![2, 15],
@@ -4041,8 +4596,10 @@ mod tests {
             twists: true,
             protocol_sha256: None,
             split_rule: "curve-twist-component-sha256-v1".into(),
+            factor_base_policies: Vec::new(),
         }
     }
+
     #[cfg(target_os = "linux")]
     #[test]
     fn vanished_procfs_entries_do_not_block_worker_inspection() {
@@ -4114,6 +4671,7 @@ mod tests {
         assert_eq!(cells.len(), 576);
         assert!(p.cell(576).is_err());
     }
+
     #[test]
     fn reject_invalid_and_duplicate_axes() {
         let mut p = plan();
@@ -4126,12 +4684,14 @@ mod tests {
         p.solvers.push("fiction".into());
         assert!(p.validate().is_err());
     }
+
     #[test]
     fn ranges_are_bounded() {
         assert_eq!(numbers("2-4,15").unwrap(), vec![2, 3, 4, 15]);
         assert!(numbers("3-2").is_err());
         assert!(numbers("0-4294967295").is_err());
     }
+
     #[test]
     fn matched_backends_do_not_change_instance_seed() {
         let p = plan();
@@ -4141,7 +4701,150 @@ mod tests {
         assert_eq!(a, b);
     }
 
+    #[test]
+    fn frozen_720_cell_pilot_keeps_bytes_and_legacy_mapping() {
+        let bytes = br###"{
+  "arities": [
+    2,
+    4,
+    15
+  ],
+  "curve_seeds": 1,
+  "degree_bound": 3,
+  "factor_base_size": 4,
+  "families": [
+    "koblitz",
+    "binary",
+    "prime"
+  ],
+  "field_sizes": [
+    23
+  ],
+  "generators": 2,
+  "keys": 2,
+  "protocol_sha256": "05a54dacc052b49bf7b9d6ffd776c461f49757e01488088c9a79bbf136f11604",
+  "schema": "crypto.ml-dataset.plan/v1",
+  "seed": 20261027,
+  "solvers": [
+    "bsgs",
+    "enumerate",
+    "root",
+    "sat",
+    "f4",
+    "f5",
+    "f6",
+    "weil",
+    "pkm",
+    "double-large-prime"
+  ],
+  "split_rule": "curve-twist-component-sha256-v1",
+  "twists": true,
+  "work_limit": 20000
+}
+"###;
+        assert_eq!(
+            digest(bytes),
+            "d698efdad6d674e944ebf3741962eb71b38829bdaf882fb8a8407a7fc57f753a"
+        );
+        let plan: DatasetPlan = serde_json::from_slice(bytes).unwrap();
+        plan.validate().unwrap();
+        assert_eq!(plan.cell_count().unwrap(), 720);
+        assert_eq!(
+            digest(&serde_json::to_vec(&plan).unwrap()),
+            "c905e878e3dcb29e407e743874d18b6b7091c097984f829820f26673ccd47f21"
+        );
+        let mut with_empty_axis = serde_json::to_value(&plan).unwrap();
+        with_empty_axis["factor_base_policies"] = json!([]);
+        assert!(serde_json::from_value::<DatasetPlan>(with_empty_axis).is_err());
+        let solvers = [
+            "bsgs",
+            "enumerate",
+            "root",
+            "sat",
+            "f4",
+            "f5",
+            "f6",
+            "weil",
+            "pkm",
+            "double-large-prime",
+        ];
+        for i in 0..720 {
+            let c = plan.cell(i).unwrap();
+            assert_eq!(c.solver, solvers[(i % 10) as usize]);
+            assert_eq!(c.twist, (i / 10) % 2 == 1);
+            assert_eq!(c.m, [2, 4, 15][((i / 20) % 3) as usize]);
+            assert_eq!(c.key_index, (i / 60) % 2);
+            assert_eq!(c.generator_index, (i / 120) % 2);
+            assert_eq!(c.curve_seed, 0);
+            assert_eq!(c.family, ["koblitz", "binary", "prime"][(i / 240) as usize]);
+            assert!(c.factor_base_policy.is_none());
+            assert!(!serde_json::to_string(&c)
+                .unwrap()
+                .contains("factor_base_policy"));
+        }
+        assert_eq!(
+            serde_json::to_string(&plan.cell(0).unwrap()).unwrap(),
+            r#"{"family":"koblitz","n":23,"m":2,"twist":false,"curve_seed":0,"generator_index":0,"key_index":0,"seed":20261027,"factor_base_size":4,"degree_bound":3,"work_limit":20000,"solver":"bsgs"}"#
+        );
+        assert_eq!(
+            serde_json::to_string(&plan.cell(719).unwrap()).unwrap(),
+            r#"{"family":"prime","n":23,"m":15,"twist":true,"curve_seed":0,"generator_index":1,"key_index":1,"seed":20261027,"factor_base_size":4,"degree_bound":3,"work_limit":20000,"solver":"double-large-prime"}"#
+        );
+    }
+
+    #[test]
+    fn policy_axis_preserves_every_matched_problem_and_rejects_ambiguous_versions() {
+        let legacy = plan();
+        let mut explicit = legacy.clone();
+        explicit.schema = "crypto.ml-dataset.plan/v2".into();
+        assert!(explicit.validate().is_err());
+        explicit.factor_base_policies = vec![
+            FactorBasePolicy::Legacy {},
+            FactorBasePolicy::SampledXProjectedControl {
+                candidate_limit: 256,
+            },
+            FactorBasePolicy::BinarySubspaceIntersection {
+                basis: vec![1, 2, 4],
+                candidate_limit: 8,
+            },
+        ];
+        explicit.validate().unwrap();
+        assert_eq!(
+            explicit.cell_count().unwrap(),
+            3 * legacy.cell_count().unwrap()
+        );
+        let solvers = legacy.solvers.len() as u64;
+        for index in 0..legacy.cell_count().unwrap() {
+            for policy_index in 0..3 {
+                let new_index =
+                    (index / solvers) * (solvers * 3) + policy_index * solvers + index % solvers;
+                let mut cell = explicit.cell(new_index).unwrap();
+                assert_eq!(
+                    cell.factor_base_policy.take().unwrap(),
+                    explicit.factor_base_policies[policy_index as usize]
+                );
+                assert_eq!(
+                    serde_json::to_vec(&cell).unwrap(),
+                    serde_json::to_vec(&legacy.cell(index).unwrap()).unwrap()
+                );
+            }
+        }
+        explicit.schema = legacy.schema.clone();
+        assert!(explicit.validate().is_err());
+        explicit.schema = "crypto.ml-dataset.plan/v2".into();
+        explicit
+            .factor_base_policies
+            .push(FactorBasePolicy::Legacy {});
+        assert!(explicit.validate().is_err());
+        explicit.factor_base_policies = vec![FactorBasePolicy::BinarySubspaceIntersection {
+            basis: vec![1, 2, 3],
+            candidate_limit: 8,
+        }];
+        assert!(explicit.validate().is_err());
+    }
+
     struct TempRun(PathBuf);
+
     impl TempRun {
         fn new() -> Self {
             let root = std::env::temp_dir().join(format!(
@@ -4175,9 +4878,18 @@ mod tests {
             (p, binding, protocol)
         }
         fn failed_cell(&self, p: &DatasetPlan, binding: &Value, protocol: &[u8]) -> PathBuf {
-            let dir = self.0.join("cells/000000000001");
+            self.failed_cell_at(p, binding, protocol, 1)
+        }
+        fn failed_cell_at(
+            &self,
+            p: &DatasetPlan,
+            binding: &Value,
+            protocol: &[u8],
+            index: u64,
+        ) -> PathBuf {
+            let dir = self.0.join(format!("cells/{index:012}"));
             fs::create_dir_all(&dir).unwrap();
-            let config = p.cell(1).unwrap();
+            let config = p.cell(index).unwrap();
             let mut artifacts = vec![
                 storage::write_json(&dir, "plan.json", "plan", p).unwrap(),
                 storage::write_json(&dir, "run.json", "run", binding).unwrap(),
@@ -4191,15 +4903,85 @@ mod tests {
                 artifacts.push(storage::write_bytes(&dir, path, "log", "utf8", b"").unwrap());
             }
             storage::write_json(&dir,"manifest.json","manifest",&CellManifest {
-                schema:"crypto.ml-dataset.cell/v1".into(),cell_index:1,plan_sha256:binding["plan_sha256"].as_str().unwrap().into(),
+                schema:"crypto.ml-dataset.cell/v1".into(),cell_index:index,plan_sha256:binding["plan_sha256"].as_str().unwrap().into(),
                 config,outcome:json!({"status":"worker_failed","known_answer_verified":false,"solver_completed":false}),artifacts,
             }).unwrap();
             dir
         }
     }
+
     impl Drop for TempRun {
         fn drop(&mut self) {
             let _ = fs::remove_dir_all(&self.0);
+        }
+    }
+
+    #[test]
+    fn legacy_plan_wire_bytes_omit_unselected_axes() {
+        let legacy = plan();
+        let value = serde_json::to_value(&legacy).unwrap();
+        assert!(value.get("channels").is_none());
+        assert!(value.get("factor_base_policies").is_none());
+        let restored: DatasetPlan = serde_json::from_value(value).unwrap();
+        restored.validate().unwrap();
+        assert_eq!(
+            restored.binding_sha256().unwrap(),
+            legacy.binding_sha256().unwrap()
+        );
+        for index in [0, legacy.cell_count().unwrap() - 1] {
+            assert_eq!(restored.cell(index).unwrap(), legacy.cell(index).unwrap());
+        }
+    }
+
+    #[test]
+    fn policy_axis_binds_every_cell_and_rejects_ambiguous_plans() {
+        let legacy = plan();
+        let mut policies = legacy.clone();
+        policies.schema = "crypto.ml-dataset.plan/v2".into();
+        policies.factor_base_policies = vec![
+            FactorBasePolicy::Legacy {},
+            FactorBasePolicy::SampledXProjectedControl {
+                candidate_limit: 64,
+            },
+        ];
+        policies.validate().unwrap();
+        assert_eq!(
+            policies.cell_count().unwrap(),
+            2 * legacy.cell_count().unwrap()
+        );
+        assert_ne!(
+            policies.binding_sha256().unwrap(),
+            legacy.binding_sha256().unwrap()
+        );
+        let solvers = legacy.solvers.len() as u64;
+        for index in 0..legacy.cell_count().unwrap() {
+            let original = legacy.cell(index).unwrap();
+            for (axis, policy) in policies.factor_base_policies.iter().enumerate() {
+                let expanded_index =
+                    (index / solvers * 2 + axis as u64) * solvers + index % solvers;
+                let mut cell = policies.cell(expanded_index).unwrap();
+                assert_eq!(cell.factor_base_policy.take().as_ref(), Some(policy));
+                assert_eq!(cell, original);
+            }
+        }
+        policies.schema = NATURAL_PLAN_SCHEMA.into();
+        assert!(policies.validate().is_err());
+        policies.schema = PLANTED_PLAN_SCHEMA.into();
+        assert!(policies.validate().is_err());
+        policies.schema = "crypto.ml-dataset.plan/v2".into();
+        policies.factor_base_policies[1] = policies.factor_base_policies[0].clone();
+        assert!(policies.validate().unwrap_err().contains("duplicate"));
+    }
+
+    #[test]
+    fn explicit_empty_policy_axis_and_null_channels_are_rejected() {
+        for (field, value) in [
+            ("factor_base_policies", json!([])),
+            ("channels", Value::Null),
+        ] {
+            let mut encoded = serde_json::to_value(plan()).unwrap();
+            encoded[field] = value;
+            assert!(serde_json::from_value::<DatasetPlan>(encoded).is_err());
         }
     }
 
@@ -4401,30 +5183,6 @@ mod tests {
                 );
             }
         }
-    }
-
-    #[test]
-    fn prime_root_m2_rejects_injected_affine_infinity_label() {
-        let certificate = json!({"found_pdp":false,"censored":true,
-            "queries":[],"charged_work":0,"root_queries_completed":false,
-            "execution_trace_complete_verified":false,"total_operation_count_verified":false});
-        let outcome = json!({"root_certificate_scope":solvers::PRIME_ROOT_CERTIFICATE_SCOPE,
-            "root_execution_trace_complete_verified":false,"root_total_operation_count_verified":false,
-            "trace_complete":false,"scalar_recovered_without_witness":false,
-            "scalar_replay_verified":false,"ecdlp_pipeline_completed":false,
-            "pdp_witness_verified":false,"solver_completed":false,"status":"budget_exhausted",
-            "counters":{"aggregate_root_field_and_group_work":0,"root_solver_calls":0,
-                "acknowledged_native_events":0,"acknowledged_native_event_bytes":0}});
-        verify_prime_root_outcome(&outcome, &certificate, 2).unwrap();
-        let mut injected_certificate = certificate.clone();
-        let mut injected_outcome = outcome.clone();
-        injected_certificate["infinity_prefix_encountered"] = json!(true);
-        injected_outcome["status"] = json!("partial");
-        injected_outcome["root_termination_cause"] = json!("affine_infinity_prefix");
-        assert!(verify_prime_root_outcome(&injected_outcome, &injected_certificate, 2).is_err());
-        injected_certificate["strategy"] = json!("prime-affine-s3-chain-prefix-root/v1");
-        injected_certificate["m"] = json!(3);
-        assert!(verify_prime_root_outcome(&injected_outcome, &injected_certificate, 2).is_err());
     }
 
     #[test]
@@ -4919,6 +5677,222 @@ mod tests {
     fn wide_prime_f4_cell_fixture(fixture: &TempRun, twist: bool) -> PathBuf {
         wide_prime_f4_cell_fixture_kind(fixture, twist, false)
     }
+
+    fn dynamic_frozen_cell_fixture(fixture: &TempRun, twist: bool, m: usize) -> PathBuf {
+        let (mut plan, mut binding, protocol) = fixture.bound();
+        plan.field_sizes = vec![47];
+        plan.arities = vec![m];
+        plan.solvers = vec!["f4-wide-dynamic-v1".into()];
+        plan.curve_seeds = 8;
+        plan.generators = 2;
+        plan.keys = 2;
+        plan.seed = 42;
+        plan.factor_base_size = 2;
+        plan.degree_bound = 12;
+        plan.work_limit = 16384;
+        plan.validate().unwrap();
+        let index = 62 + u64::from(twist);
+        let config = plan.cell(index).unwrap();
+        assert_eq!(
+            (config.curve_seed, config.generator_index, config.key_index),
+            (7, 1, 1)
+        );
+        binding["plan_sha256"] = json!(plan.binding_sha256().unwrap());
+        binding["shard_index"] = json!(0);
+        binding["shard_count"] = json!(1);
+        binding["seconds_per_case"] = json!(30);
+        binding["memory_mib"] = json!(256);
+        binding["trace_mib"] = json!(128);
+        binding["execution_context_required"] = json!(true);
+
+        let mut case = curves::generate(&config).unwrap();
+        case.private_witness = Value::Null;
+        let arithmetic = curves::arithmetic(&case.public_instance).unwrap();
+        let point = curves::point_words(&case.factor_base["points"][0]).unwrap();
+        let mut sum = None;
+        for _ in 0..m {
+            sum = arithmetic.reference_add(sum, point);
+            assert!(sum.is_some());
+        }
+        case.public_instance["target"] = curves::point_json(sum);
+        case.public_instance["population"] = json!("software-test-public-planted-pdp");
+        case.public_instance["known_answer_verified"] = json!(false);
+        curves::verify_public(&case.public_instance).unwrap();
+        curves::verify_factor_base(&case.public_instance, &case.factor_base).unwrap();
+        assert!(case.private_witness.is_null());
+
+        let dir = fixture
+            .0
+            .join(format!("cell-dynamic-frozen-twist{twist}-m{m}"));
+        fs::create_dir(&dir).unwrap();
+        let mut artifacts = vec![
+            storage::write_json(&dir, "plan.json", "plan", &plan).unwrap(),
+            storage::write_json(&dir, "run.json", "run", &binding).unwrap(),
+            storage::write_bytes(&dir, "protocol.json", "protocol", "json", &protocol).unwrap(),
+            storage::write_json(&dir, "config.json", "config", &config).unwrap(),
+            storage::write_json(
+                &dir,
+                "public.json",
+                "public-instance",
+                &case.public_instance,
+            )
+            .unwrap(),
+            storage::write_json(&dir, "factor-base.json", "factor-base", &case.factor_base)
+                .unwrap(),
+        ];
+        for path in ["attempt.json", "worker-process.json"] {
+            artifacts.push(
+                storage::write_json(&dir, path, "provenance", &if path=="attempt.json" {json!({"schema":"crypto.ml-dataset.attempt/v1","cell_index":index,"plan_sha256":plan.binding_sha256().unwrap()})} else {json!({"software_test":true})})
+                    .unwrap(),
+            );
+        }
+        for path in ["stdout.log", "stderr.log"] {
+            artifacts.push(storage::write_bytes(&dir, path, "log", "utf8", b"").unwrap());
+        }
+        let launch = execution::create(&dir).unwrap();
+        let (sha256, bytes) = crate::store::hash_file(&dir.join(execution::PATH)).unwrap();
+        artifacts.push(Artifact {
+            path: execution::PATH.into(),
+            role: execution::ROLE.into(),
+            encoding: "json".into(),
+            sha256,
+            bytes,
+        });
+        artifacts.push(telemetry::checked::install_policy(&dir).unwrap());
+        let capture_binding = capture::AttemptBinding::from_cell_files(&dir).unwrap();
+        let capture_limits = capture::capture_limits(128).unwrap();
+        artifacts.push(
+            storage::write_json(
+                &dir,
+                "capture-binding.json",
+                "partial-capture-binding",
+                &capture_binding,
+            )
+            .unwrap(),
+        );
+        artifacts.push(
+            storage::write_json(
+                &dir,
+                "capture-limits.json",
+                "partial-capture-limits",
+                &capture_limits,
+            )
+            .unwrap(),
+        );
+        let context = execution::admit(&dir).unwrap().unwrap();
+        assert_eq!(context.launch, launch);
+        let solved = solvers::solve_with_bound_event_sink_context(
+            &config,
+            &case,
+            &dir.join("live"),
+            capture_binding,
+            capture_limits,
+            Some(&context),
+        )
+        .unwrap();
+        if m == 4 {
+            assert_eq!(
+                solved.outcome["pdp_witness_verified"], true,
+                "{}",
+                solved.outcome
+            );
+            assert_eq!(
+                solved.outcome["native_backend_invoked"], true,
+                "{}",
+                solved.outcome
+            );
+        } else {
+            assert_eq!(
+                solved.outcome["status"], "unsupported",
+                "{}",
+                solved.outcome
+            );
+            assert_eq!(solved.outcome["pdp_witness_verified"], false);
+        }
+        for payload in solved.artifacts {
+            artifacts.push(
+                storage::write_bytes(
+                    &dir,
+                    &payload.path,
+                    &payload.role,
+                    &payload.encoding,
+                    &payload.bytes,
+                )
+                .unwrap(),
+            );
+        }
+        artifacts.push(
+            storage::write_json(&dir, "result.json", "solver-outcome", &solved.outcome).unwrap(),
+        );
+        artifacts.extend(
+            collect_cell_artifacts(&dir)
+                .unwrap()
+                .into_iter()
+                .filter(|a| a.path.starts_with("live/")),
+        );
+        storage::write_json(
+            &dir,
+            "manifest.json",
+            "manifest",
+            &CellManifest {
+                schema: "crypto.ml-dataset.cell/v1".into(),
+                cell_index: index,
+                plan_sha256: plan.binding_sha256().unwrap(),
+                config,
+                outcome: solved.outcome,
+                artifacts,
+            },
+        )
+        .unwrap();
+        assert!(!dir.join("witness.json").exists());
+        verify_cell(&dir, true).unwrap();
+        dir
+    }
+
+    #[test]
+    fn dynamic_frozen_run_replay_both_twists_and_censored_outcomes() {
+        let fixture = TempRun::new();
+        for twist in [false, true] {
+            let dir = dynamic_frozen_cell_fixture(&fixture, twist, 4);
+            let unsupported = dynamic_frozen_cell_fixture(&fixture, twist, 2);
+            assert_eq!(
+                verify_cell(&unsupported, true).unwrap().outcome["status"],
+                "unsupported"
+            );
+            for status in ["timeout", "trace_budget_exhausted", "worker_failed"] {
+                let changed = altered_cell(
+                    &dir,
+                    &fixture.0.join(format!("dynamic-{twist}-{status}")),
+                    |_, manifest| {
+                        manifest.outcome = json!({"status":status,"solver_completed":false});
+                    },
+                );
+                verify_cell(&changed, true).unwrap();
+            }
+            let changed = altered_cell(
+                &dir,
+                &fixture.0.join(format!("dynamic-{twist}-bad-input")),
+                |path, manifest| {
+                    manifest.outcome.as_object_mut().unwrap().remove("strategy");
+                    alter_json(&path.join("prime-f4-input.json"), |value| {
+                        value["schema"] = json!("invalid");
+                    });
+                },
+            );
+            assert!(verify_cell(&changed, true).is_err());
+            let changed = altered_cell(
+                &dir,
+                &fixture.0.join(format!("dynamic-{twist}-wrong-attempt")),
+                |path, _| {
+                    alter_json(&path.join("capture-binding.json"), |value| {
+                        value["attempt_sha256"] = json!("8".repeat(64));
+                    });
+                },
+            );
+            assert!(verify_cell(&changed, true).is_err());
+        }
+    }
+
     fn wide_prime_f4_cell_fixture_kind(fixture: &TempRun, twist: bool, negative: bool) -> PathBuf {
         let m = 2;
         let (mut plan, mut binding, protocol) = fixture.bound();
@@ -6521,9 +7495,12 @@ mod tests {
             }
         });
         verify_cell(&bad, false).unwrap();
-        assert!(verify_cell(&bad, true)
-            .unwrap_err()
-            .contains("frozen cell configuration"));
+        // The shared original-input guard now rejects the transplanted public
+        // arity before the later prime-chain reconstruction guard runs.
+        assert_eq!(
+            verify_cell(&bad, true).unwrap_err(),
+            "factor base or public identity differs from frozen config"
+        );
 
         let changed_config = altered_cell(&m3, &first.0.join("changed-config"), |dir, manifest| {
             manifest.config.m = 4;
@@ -6847,6 +7824,124 @@ mod tests {
     }
 
     #[test]
+    fn lease_is_exclusive_and_released_on_drop() {
+        let f = TempRun::new();
+        let lease = Lease::acquire(&f.0).unwrap();
+        assert!(Lease::acquire(&f.0).is_err());
+        drop(lease);
+        Lease::acquire(&f.0).unwrap();
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn output_and_lock_symlinks_are_rejected() {
+        use std::os::unix::fs::symlink;
+        let f = TempRun::new();
+        fs::create_dir(f.0.join("real")).unwrap();
+        symlink(f.0.join("real"), f.0.join("alias")).unwrap();
+        assert!(Lease::acquire(&f.0.join("alias")).is_err());
+        fs::write(f.0.join("original"), b"unchanged").unwrap();
+        symlink(f.0.join("original"), f.0.join(".writer.lock")).unwrap();
+        assert!(Lease::acquire(&f.0).is_err());
+        assert_eq!(fs::read(f.0.join("original")).unwrap(), b"unchanged");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn plain_snapshot_guard_reaps_child_on_error_path() {
+        use std::os::unix::process::CommandExt;
+        use std::process::Command;
+        let child = Command::new("sleep")
+            .arg("30")
+            .process_group(0)
+            .spawn()
+            .unwrap();
+        let pid = child.id();
+        let start = Instant::now();
+        drop(live::snapshot_child_for_test(child));
+        assert!(start.elapsed() < Duration::from_secs(3));
+        let mut status = 0;
+        assert_eq!(
+            unsafe { libc::waitpid(pid as i32, &mut status, libc::WNOHANG) },
+            -1
+        );
+        assert_eq!(
+            std::io::Error::last_os_error().raw_os_error(),
+            Some(libc::ECHILD)
+        );
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn reconciliation_refuses_surviving_external_process_group() {
+        let f = TempRun::new();
+        let dir = f.0.join("cells/000000000000");
+        fs::create_dir_all(&dir).unwrap();
+        let mut child = GatedWorker::spawn("/bin/sleep", &["30"]).unwrap();
+        child.release().unwrap();
+        let guard = SupervisedChild { child };
+        storage::write_json(
+            &dir,
+            "worker-process.json",
+            "identity",
+            &json!({"process_group":guard.pid()}),
+        )
+        .unwrap();
+        assert!(assert_no_workers(&f.0)
+            .unwrap_err()
+            .contains("process group"));
+        drop(guard);
+        assert_no_workers(&f.0).unwrap();
+    }
+
+    #[test]
+    fn reconciliation_retains_partial_bytes_and_does_not_reuse_attempt_names() {
+        let f = TempRun::new();
+        let dir = f.0.join("cells/000000000000");
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(dir.join("partial.bin"), b"incomplete but valuable trace").unwrap();
+        let first = retain_interrupted(&f.0, 0, &json!({"reason":"test stopped worker"})).unwrap();
+        assert!(!dir.exists());
+        assert_eq!(
+            fs::read(first.join("partial.bin")).unwrap(),
+            b"incomplete but valuable trace"
+        );
+        fs::create_dir(&dir).unwrap();
+        fs::write(dir.join("partial.bin"), b"second attempt").unwrap();
+        let second =
+            retain_interrupted(&f.0, 0, &json!({"reason":"test second stopped worker"})).unwrap();
+        assert_ne!(first, second);
+        assert_eq!(
+            fs::read(first.join("partial.bin")).unwrap(),
+            b"incomplete but valuable trace"
+        );
+    }
+
+    #[test]
+    fn prime_root_m2_rejects_injected_affine_infinity_label() {
+        let certificate = json!({"found_pdp":false,"censored":true,
+            "queries":[],"charged_work":0,"root_queries_completed":false,
+            "execution_trace_complete_verified":false,"total_operation_count_verified":false});
+        let outcome = json!({"root_certificate_scope":solvers::PRIME_ROOT_CERTIFICATE_SCOPE,
+            "root_execution_trace_complete_verified":false,"root_total_operation_count_verified":false,
+            "trace_complete":false,"scalar_recovered_without_witness":false,
+            "scalar_replay_verified":false,"ecdlp_pipeline_completed":false,
+            "pdp_witness_verified":false,"solver_completed":false,"status":"budget_exhausted",
+            "counters":{"aggregate_root_field_and_group_work":0,"root_solver_calls":0,
+                "acknowledged_native_events":0,"acknowledged_native_event_bytes":0}});
+        verify_prime_root_outcome(&outcome, &certificate, 2).unwrap();
+        let mut injected_certificate = certificate.clone();
+        let mut injected_outcome = outcome.clone();
+        injected_certificate["infinity_prefix_encountered"] = json!(true);
+        injected_outcome["status"] = json!("partial");
+        injected_outcome["root_termination_cause"] = json!("affine_infinity_prefix");
+        assert!(verify_prime_root_outcome(&injected_outcome, &injected_certificate, 2).is_err());
+        injected_certificate["strategy"] = json!("prime-affine-s3-chain-prefix-root/v1");
+        injected_certificate["m"] = json!(3);
+        assert!(verify_prime_root_outcome(&injected_outcome, &injected_certificate, 2).is_err());
+    }
+
+    #[test]
     fn whole_worker_counter_replay_rejects_mutated_identity_and_admission() {
         let f = TempRun::new();
         let (p, binding, protocol) = f.bound();
@@ -6938,29 +8033,6 @@ mod tests {
         verify_whole_worker_counter(&dir, &[artifact], &unavailable_outcome).unwrap();
     }
 
-    #[test]
-    fn lease_is_exclusive_and_released_on_drop() {
-        let f = TempRun::new();
-        let lease = Lease::acquire(&f.0).unwrap();
-        assert!(Lease::acquire(&f.0).is_err());
-        drop(lease);
-        Lease::acquire(&f.0).unwrap();
-    }
-
-    #[cfg(unix)]
-    #[test]
-    fn output_and_lock_symlinks_are_rejected() {
-        use std::os::unix::fs::symlink;
-        let f = TempRun::new();
-        fs::create_dir(f.0.join("real")).unwrap();
-        symlink(f.0.join("real"), f.0.join("alias")).unwrap();
-        assert!(Lease::acquire(&f.0.join("alias")).is_err());
-        fs::write(f.0.join("original"), b"unchanged").unwrap();
-        symlink(f.0.join("original"), f.0.join(".writer.lock")).unwrap();
-        assert!(Lease::acquire(&f.0).is_err());
-        assert_eq!(fs::read(f.0.join("original")).unwrap(), b"unchanged");
-    }
-
     #[cfg(target_os = "linux")]
     #[test]
     fn supervisor_guard_reaps_child_on_error_path() {
@@ -6980,50 +8052,519 @@ mod tests {
             Some(libc::ECHILD)
         );
     }
+}
 
-    #[cfg(target_os = "linux")]
+#[cfg(test)]
+mod worker_receipt_adoption_tests {
+    use super::*;
+    fn data(paths: &[&str]) -> types::SolverData {
+        types::SolverData {
+            outcome: json!({"status":"partial"}),
+            artifacts: paths
+                .iter()
+                .map(|path| types::ArtifactPayload {
+                    path: (*path).into(),
+                    role: "test-payload".into(),
+                    encoding: "native".into(),
+                    bytes: b"new".to_vec(),
+                })
+                .collect(),
+        }
+    }
+    fn record(path: &str) -> Artifact {
+        Artifact {
+            path: path.into(),
+            role: "test-receipt".into(),
+            encoding: "native".into(),
+            sha256: digest(b"stored"),
+            bytes: 6,
+        }
+    }
     #[test]
-    fn reconciliation_refuses_surviving_external_process_group() {
-        let f = TempRun::new();
-        let dir = f.0.join("cells/000000000000");
-        fs::create_dir_all(&dir).unwrap();
-        let mut child = GatedWorker::spawn("/bin/sleep", &["30"]).unwrap();
-        child.release().unwrap();
-        let guard = SupervisedChild { child };
-        storage::write_json(
-            &dir,
-            "worker-process.json",
-            "identity",
-            &json!({"process_group":guard.pid()}),
+    fn worker_receipt_union_rejects_reserved_and_duplicate_paths_before_writes() {
+        let absent = std::env::temp_dir().join("worker-receipt-validation-must-not-create");
+        for path in [
+            "result.json",
+            "public.json",
+            "telemetry/x",
+            "publication/x",
+            execution::PATH,
+        ] {
+            for stored_channel in [false, true] {
+                let mut registry = Vec::with_capacity(32);
+                let (pending, stored) = if stored_channel {
+                    (data(&[]), vec![record(path)])
+                } else {
+                    (data(&[path]), vec![])
+                };
+                assert!(
+                    adopt_worker_solver_artifacts(&absent, &mut registry, pending, stored).is_err()
+                );
+                assert!(registry.is_empty());
+            }
+        }
+        for mode in 0..4 {
+            let mut registry = Vec::with_capacity(32);
+            if mode == 3 {
+                registry.push(record("same.bin"));
+            }
+            let stored = if mode == 0 {
+                vec![record("same.bin"), record("same.bin")]
+            } else if mode == 2 || mode == 3 {
+                vec![record("same.bin")]
+            } else {
+                vec![]
+            };
+            let pending = if mode == 1 {
+                data(&["same.bin", "same.bin"])
+            } else if mode == 2 {
+                data(&["same.bin"])
+            } else {
+                data(&[])
+            };
+            let before = registry.clone();
+            assert!(
+                adopt_worker_solver_artifacts(&absent, &mut registry, pending, stored).is_err()
+            );
+            if mode == 2 {
+                assert_eq!(registry, vec![record("same.bin")]);
+            } else {
+                assert_eq!(registry, before);
+            }
+        }
+    }
+    #[test]
+    fn worker_receipts_survive_pending_validation_failures_without_new_writes() {
+        let root = std::env::temp_dir().join(format!(
+            "worker-receipt-validation-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let stored =
+            storage::write_bytes(&root, "ack.bin", "test-receipt", "native", b"stored").unwrap();
+        for paths in [
+            vec!["first.bin", "result.json"],
+            vec!["first.bin", "duplicate.bin", "duplicate.bin"],
+            vec!["first.bin", "ack.bin"],
+        ] {
+            let mut registry = Vec::with_capacity(32);
+            assert!(adopt_worker_solver_artifacts(
+                &root,
+                &mut registry,
+                data(&paths),
+                vec![stored.clone()]
+            )
+            .is_err());
+            assert_eq!(registry, vec![stored.clone()]);
+            storage::verify_manifest(&root, &registry).unwrap();
+            assert_eq!(fs::read(root.join("ack.bin")).unwrap(), b"stored");
+            assert!(!root.join("first.bin").exists());
+            assert!(!root.join("duplicate.bin").exists());
+            assert!(!root.join("result.json").exists());
+            assert_eq!(fs::read_dir(&root).unwrap().count(), 1);
+        }
+        fs::remove_dir_all(root).unwrap();
+    }
+    #[test]
+    fn real_terminal_telemetry_failure_retains_native_receipt_and_censors_outcome() {
+        let root = std::env::temp_dir().join(format!(
+            "worker-telemetry-censor-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        // Real legacy telemetry backend: its final immutable write fails after
+        // the operation has produced and stored an artifact.
+        storage::write_bytes(
+            &root,
+            "telemetry/solver.json",
+            "control-conflict",
+            "native",
+            b"occupied",
         )
         .unwrap();
-        assert!(assert_no_workers(&f.0)
-            .unwrap_err()
-            .contains("process group"));
-        drop(guard);
-        assert_no_workers(&f.0).unwrap();
+        let mut registry = Vec::with_capacity(40);
+        let mut produced = None;
+        let measurement = telemetry::measured(&root, &mut registry, "solver", || {
+            let receipt =
+                storage::write_bytes(&root, "ack.bin", "test-receipt", "native", b"stored")?;
+            let mut output = data(&["must-not-write.bin"]);
+            output.outcome = json!({
+                "adapter_id":"koblitz-m3-native-v1", "strategy":"koblitz-m3-native-v1",
+                "status":"verified", "solver_completed":true,
+                "pdp_witness_verified":true,"retained_pdp_witness_verified":true,
+                "certificate_durably_persisted":true,"group_domain_complete":true,
+                "native_backend_invoked":true,"native_statistics_complete":true,
+                "algebra_completed":true,"performed_group_additions":195,
+                "live_persistence_errors":["earlier retained condition"]
+            });
+            produced = Some((output, vec![receipt]));
+            Ok(())
+        });
+        assert!(measurement.is_err());
+        let (data, roots) = produced.expect("operation ran before terminal telemetry failed");
+        let outcome =
+            finish_worker_solver_artifacts(&root, &mut registry, data, roots, measurement).unwrap();
+        assert_eq!(outcome["status"], "worker_failed");
+        for key in [
+            "solver_completed",
+            "pdp_witness_verified",
+            "certificate_durably_persisted",
+            "group_domain_complete",
+            "native_backend_invoked",
+            "native_statistics_complete",
+            "algebra_completed",
+        ] {
+            assert_eq!(outcome[key], false, "{key}");
+        }
+        assert_eq!(outcome["retained_pdp_witness_verified"], true);
+        assert_eq!(outcome["performed_group_additions"], 195);
+        assert_eq!(
+            outcome["live_persistence_errors"],
+            json!(["earlier retained condition"])
+        );
+        assert!(outcome["worker_telemetry_error"].is_string());
+        assert_eq!(registry.iter().filter(|a| a.path == "ack.bin").count(), 1);
+        storage::verify_manifest(&root, &registry).unwrap();
+        assert!(!root.join("must-not-write.bin").exists());
+        assert_eq!(
+            fs::read(root.join("telemetry/solver.json")).unwrap(),
+            b"occupied"
+        );
+        fs::remove_dir_all(root).unwrap();
     }
 
     #[test]
-    fn reconciliation_retains_partial_bytes_and_does_not_reuse_attempt_names() {
-        let f = TempRun::new();
-        let dir = f.0.join("cells/000000000000");
-        fs::create_dir_all(&dir).unwrap();
-        fs::write(dir.join("partial.bin"), b"incomplete but valuable trace").unwrap();
-        let first = retain_interrupted(&f.0, 0, &json!({"reason":"test stopped worker"})).unwrap();
-        assert!(!dir.exists());
-        assert_eq!(
-            fs::read(first.join("partial.bin")).unwrap(),
-            b"incomplete but valuable trace"
-        );
-        fs::create_dir(&dir).unwrap();
-        fs::write(dir.join("partial.bin"), b"second attempt").unwrap();
-        let second =
-            retain_interrupted(&f.0, 0, &json!({"reason":"test second stopped worker"})).unwrap();
-        assert_ne!(first, second);
-        assert_eq!(
-            fs::read(first.join("partial.bin")).unwrap(),
-            b"incomplete but valuable trace"
-        );
+    fn worker_receipts_survive_later_pending_storage_failure() {
+        let root = std::env::temp_dir().join(format!(
+            "worker-receipt-adoption-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let stored =
+            storage::write_bytes(&root, "ack.bin", "test-receipt", "native", b"stored").unwrap();
+        storage::write_bytes(&root, "conflict.bin", "test-conflict", "native", b"old").unwrap();
+        let mut registry = Vec::with_capacity(32);
+        assert!(adopt_worker_solver_artifacts(
+            &root,
+            &mut registry,
+            data(&["conflict.bin"]),
+            vec![stored.clone()]
+        )
+        .is_err());
+        assert_eq!(registry, vec![stored]);
+        assert_eq!(fs::read(root.join("ack.bin")).unwrap(), b"stored");
+        assert_eq!(fs::read(root.join("conflict.bin")).unwrap(), b"old");
+        storage::verify_manifest(&root, &registry).unwrap();
+        fs::remove_dir_all(root).unwrap();
     }
 }
+
+#[cfg(test)]
+mod channel_plan_tests {
+    use super::*;
+
+    fn legacy() -> DatasetPlan {
+        serde_json::from_value(json!({"schema":"crypto.ml-dataset.plan/v1",
+            "field_sizes":[23,31,47,61],"arities":[2,3,4,5,6,7,8,9,10,11,12,13,14,15],
+            "families":["binary","koblitz","prime"],"solvers":["f4","f5","sat"],
+            "curve_seeds":1,"generators":1,"keys":1,"seed":20261027,
+            "factor_base_size":4,"degree_bound":3,"work_limit":16384,"twists":true,
+            "protocol_sha256":null,"split_rule":"curve-twist-component-sha256-v1"}))
+        .unwrap()
+    }
+
+    fn request() -> types::ChannelRequests {
+        serde_json::from_value(json!({"schema":"crypto.ml-dataset.channel-requests/v1",
+            "boolean_consequence":{"mode":"produce","row_index":0},
+            "sat_initial":{"mode":"capture_and_check_initial"}}))
+        .unwrap()
+    }
+
+    #[test]
+    fn frozen_protocol_requires_exact_channels_in_canonical_extensions() {
+        fn frozen(plan: &mut DatasetPlan, mut body: serde_json::Value) -> Vec<u8> {
+            let body_hash = digest(&protocol_canonical_bytes(&body).unwrap());
+            body["freeze"] = json!({"status":"frozen","protocol_sha256":body_hash,
+                "filed_before_affected_data":true,"frozen_at":"2026-11-02T00:00:00Z"});
+            let bytes = serde_json::to_vec(&body).unwrap();
+            plan.protocol_sha256 = Some(digest(&bytes));
+            bytes
+        }
+        let mut plan = legacy();
+        plan.schema = "crypto.ml-dataset.plan/v3".into();
+        plan.channels = Some(request());
+        let body = json!({"schema":"experiment.protocol/v1",
+            "extensions":{"dataset_channels":request()}});
+        let bytes = frozen(&mut plan, body.clone());
+        assert_eq!(verify_protocol(&plan, &bytes), Ok(()));
+        let mut wrong_row = body.clone();
+        wrong_row["extensions"]["dataset_channels"]["boolean_consequence"]["row_index"] = json!(1);
+        let mut missing_sat = body.clone();
+        missing_sat["extensions"]["dataset_channels"]
+            .as_object_mut()
+            .unwrap()
+            .remove("sat_initial");
+        for mismatch in [
+            wrong_row,
+            missing_sat,
+            json!({"schema":"experiment.protocol/v1","extensions":{}}),
+            json!({"schema":"experiment.protocol/v1","dataset_channels":request()}),
+        ] {
+            // Recompute BOTH hashes: each rejection must be authorization, not stale custody.
+            let bytes = frozen(&mut plan, mismatch);
+            assert_eq!(
+                verify_protocol(&plan, &bytes),
+                Err("frozen protocol does not authorize exact requested channels".into())
+            );
+        }
+        let mut legacy_plan = legacy();
+        let bytes = frozen(&mut legacy_plan, json!({"schema":"experiment.protocol/v1"}));
+        assert_eq!(verify_protocol(&legacy_plan, &bytes), Ok(()));
+    }
+
+    #[test]
+    fn requested_plan_preserves_full_axes_and_changes_identity() {
+        let original = legacy();
+        original.validate().unwrap();
+        let bytes = serde_json::to_vec(&original).unwrap();
+        assert!(!String::from_utf8(bytes.clone())
+            .unwrap()
+            .contains("channels"));
+        assert_eq!(
+            serde_json::to_vec(&serde_json::from_slice::<DatasetPlan>(&bytes).unwrap()).unwrap(),
+            bytes
+        );
+        let mut enabled = original.clone();
+        enabled.channels = Some(request());
+        assert!(enabled.validate().is_err());
+        enabled.schema = "crypto.ml-dataset.plan/v3".into();
+        enabled.validate().unwrap();
+        assert_eq!(
+            enabled.cell_count().unwrap(),
+            original.cell_count().unwrap()
+        );
+        assert_ne!(
+            enabled.binding_sha256().unwrap(),
+            original.binding_sha256().unwrap()
+        );
+        for i in 0..enabled.cell_count().unwrap() {
+            let mut new = enabled.cell(i).unwrap();
+            let old = original.cell(i).unwrap();
+            assert_eq!(new.channels, enabled.channels);
+            new.channels = None;
+            assert_eq!(new, old);
+        }
+        for policy in [
+            types::FactorBasePolicy::Legacy {},
+            types::FactorBasePolicy::SampledXProjectedControl {
+                candidate_limit: 64,
+            },
+            types::FactorBasePolicy::BinarySubspaceIntersection {
+                basis: vec![1, 2],
+                candidate_limit: 64,
+            },
+            types::FactorBasePolicy::BinaryFrobeniusUnionIntersection {
+                basis: vec![1, 2],
+                candidate_limit: 64,
+            },
+        ] {
+            enabled.factor_base_policies = vec![policy.clone()];
+            enabled.validate().unwrap();
+            assert_eq!(enabled.cell(0).unwrap().factor_base_policy, Some(policy));
+        }
+        enabled.channels = None;
+        assert!(enabled.validate().is_err());
+    }
+
+    #[test]
+    fn actual_plan_command_roundtrips_frozen_request() {
+        let path = std::env::temp_dir().join(format!(
+            "channel-plan-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir(&path).unwrap();
+        let request_path = path.join("request.json");
+        let plan_path = path.join("plan.json");
+        fs::write(&request_path, serde_json::to_vec(&request()).unwrap()).unwrap();
+        run(&DatasetArgs {
+            owned_replay_policy: None,
+            owned_replay_receipt: None,
+            search_replay_policy: None,
+            search_replay_receipt: None,
+            affine_replay_policy: None,
+            affine_replay_receipt: None,
+            sat_replay_policy: None,
+            sat_replay_receipt: None,
+            command: DatasetCommand::Plan(PlanArgs {
+                channels: Some(request_path),
+                out: plan_path.clone(),
+                n: "23-31,47-61".into(),
+                m: "2-15".into(),
+                families: "binary,koblitz,prime".into(),
+                solvers: "f4,f5,sat".into(),
+                curve_seeds: 1,
+                generators: 1,
+                keys: 1,
+                seed: 20261027,
+                factor_base_size: 4,
+                factor_base_policies: None,
+                degree_bound: 3,
+                work_limit: 16384,
+                protocol_sha256: None,
+                population: "natural".into(),
+            }),
+        })
+        .unwrap();
+        let plan: DatasetPlan = read_json(&plan_path).unwrap();
+        assert_eq!(plan.schema, "crypto.ml-dataset.plan/v3");
+        assert_eq!(plan.arities, (2..=15).collect::<Vec<_>>());
+        assert_eq!(plan.channels, Some(request()));
+        fs::remove_dir_all(path).unwrap();
+    }
+}
+
+mod cost_labels;
+
+#[cfg(target_os = "linux")]
+use std::ffi::OsString;
+
+#[cfg(not(target_os = "linux"))]
+use std::process::Child;
+
+#[cfg(not(target_os = "linux"))]
+use std::process::Command;
+
+use std::process::{ExitStatus, Stdio};
+
+#[cfg(target_os = "linux")]
+use telemetry::pmu_containment;
+
+#[cfg(target_os = "linux")]
+use telemetry::whole_worker::{Collector, GatedWorker};
+
+#[cfg(test)]
+const NATURAL_PLAN_SCHEMA: &str = "crypto.ml-dataset.plan/v1";
+
+const PLANTED_PLAN_SCHEMA: &str = "crypto.ml-dataset.plan/planted-pdp-v1";
+
+fn verify_whole_worker_counter(
+    dir: &Path,
+    artifacts: &[Artifact],
+    outcome: &Value,
+) -> Result<(), String> {
+    let counter = artifacts
+        .iter()
+        .find(|a| a.path == "whole-worker-counter.json");
+    let Some(artifact) = counter else {
+        if outcome["supervisor"]["instruction_counter_status"]
+            .as_str()
+            .is_some_and(|s| s.starts_with("whole_worker_raw_"))
+        {
+            return Err("whole-worker counter status lacks its restricted artifact".into());
+        }
+        return Ok(()); // Historical cells predate the staged collector.
+    };
+    if artifact.role != "restricted-whole-worker-counter/v1" || artifact.encoding != "json" {
+        return Err("whole-worker counter has the wrong reserved role".into());
+    }
+    let counter: Value = read_json(&dir.join("whole-worker-counter.json"))?;
+    let process: Value = read_json(&dir.join("worker-process.json"))?;
+    let binding = serde_json::to_value(capture::AttemptBinding::from_cell_files(dir)?)
+        .map_err(|e| e.to_string())?;
+    let pid = process["worker_pid"]
+        .as_u64()
+        .filter(|n| *n > 0)
+        .ok_or("worker process lacks positive PID")?;
+    let status = counter["status"].as_str().ok_or("counter lacks status")?;
+    let event_id = counter["event_id"].as_u64();
+    #[cfg(target_os = "linux")]
+    if let Some(diagnostic) = counter.get("cgroup_diagnostic") {
+        pmu_containment::verify_diagnostic(diagnostic, pid)?;
+    }
+    let observation = &counter["observation"];
+    let valid_status = match status {
+        "perf_unavailable" | "attach_failed" => {
+            counter["event_id"].is_null()
+                && counter["attr_size"].is_null()
+                && counter["attr_flags"].is_null()
+                && observation.is_null()
+                && counter["error"].as_str().is_some_and(|s| !s.is_empty())
+        }
+        "read_failed" => {
+            event_id.is_some_and(|id| id > 0)
+                && observation.is_null()
+                && counter["error"].as_str().is_some_and(|s| !s.is_empty())
+        }
+        "observed" | "multiplexed" | "not_running" => {
+            event_id.is_some_and(|id| id > 0)
+                && observation["event_id"].as_u64() == event_id
+                && observation["raw_instructions"].as_u64().is_some()
+                && observation["time_enabled_ns"].as_u64().is_some()
+                && observation["time_running_ns"].as_u64().is_some()
+                && counter["error"].is_null()
+                && match status {
+                    "observed" => {
+                        observation["time_enabled_ns"]
+                            .as_u64()
+                            .is_some_and(|n| n > 0)
+                            && observation["time_running_ns"] == observation["time_enabled_ns"]
+                    }
+                    "not_running" => observation["time_enabled_ns"] == 0,
+                    "multiplexed" => {
+                        observation["time_enabled_ns"]
+                            .as_u64()
+                            .is_some_and(|n| n > 0)
+                            && observation["time_running_ns"] != observation["time_enabled_ns"]
+                    }
+                    _ => false,
+                }
+        }
+        _ => false,
+    };
+    // v1 collector fixes the Linux perf_event_attr to 112 bytes with
+    // disabled|inherit|exclude_kernel|exclude_hv|enable_on_exec (0x1063).
+    let valid_attr = matches!(status, "perf_unavailable" | "attach_failed")
+        || (counter["attr_size"] == 112 && counter["attr_flags"] == 0x1063);
+    if counter["schema"] != "crypto.ml-dataset.whole-worker-counter/v1"
+        || counter["attempt_binding"] != binding
+        || counter["gate_pid"].as_u64() != Some(pid)
+        || counter["process_group"].as_u64() != Some(pid)
+        || process["process_group"].as_u64() != Some(pid)
+        || !counter["worker_exit_success"].is_boolean()
+        || counter["worker_exit_success"]
+            != outcome["supervisor"]["exit_code"]
+                .as_i64()
+                .map(|n| n == 0)
+                .unwrap_or(false)
+        || counter["worker_exit_code"] != outcome["supervisor"]["exit_code"]
+        || counter["descendants_terminated_and_accounted"] != false
+        || counter["platform_admitted"] != false
+        || !counter["eligible_instructions"].is_null()
+        || !outcome["supervisor"]["retired_instructions"].is_null()
+        || outcome["supervisor"]["instruction_counter_status"]
+            != format!("whole_worker_raw_{status}; solve_cost_unadmitted")
+        || !valid_status
+        || !valid_attr
+    {
+        return Err(
+            "whole-worker counter differs from original attempt or unadmitted scope".into(),
+        );
+    }
+    Ok(())
+}
+
+#[path = "owned_replay_caller.rs"]
+mod owned_replay_caller;

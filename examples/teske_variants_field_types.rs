@@ -51,11 +51,7 @@ use std::time::Instant;
 // Integer helpers
 
 fn gcd(a: u64, b: u64) -> u64 {
-    if b == 0 {
-        a
-    } else {
-        gcd(b, a % b)
-    }
+    crypto_lib::gcd::int::gcd_u64(a, b)
 }
 
 fn lcm(a: u64, b: u64) -> u64 {
@@ -566,45 +562,20 @@ fn poly_powmod(a: &[u32], mut e: u64, f: &[u32], p: u32) -> Vec<u32> {
 }
 
 fn inv_mod_p(a: u32, p: u32) -> u32 {
-    powmod(a as u64, p as u64 - 2, p as u64) as u32
-}
-
-fn poly_rem(a: &[u32], b: &[u32], p: u32) -> Vec<u32> {
-    let mut r = a.to_vec();
-    poly_trim(&mut r);
-    let db = b.len() - 1;
-    let inv = inv_mod_p(b[db], p);
-    while r.len() > db {
-        let k = r.len() - 1;
-        let c = r[k] * inv % p;
-        if c != 0 {
-            for i in 0..=db {
-                r[k - db + i] = (r[k - db + i] + p - (c * b[i]) % p) % p;
-            }
-        }
-        r.pop();
-        poly_trim(&mut r);
-    }
-    r
+    // Shared inverse; a non-unit (a ≡ 0) keeps the old Fermat value a^(p-2).
+    crypto_lib::gcd::int::inv_mod_u64(a as u64 % p as u64, p as u64)
+        .unwrap_or_else(|| powmod(a as u64, p as u64 - 2, p as u64)) as u32
 }
 
 fn poly_gcd(a: &[u32], b: &[u32], p: u32) -> Vec<u32> {
-    let mut a = a.to_vec();
-    let mut b = b.to_vec();
-    poly_trim(&mut a);
-    poly_trim(&mut b);
-    while !b.is_empty() {
-        let r = poly_rem(&a, &b, p);
-        a = b;
-        b = r;
-    }
-    if let Some(&lc) = a.last() {
-        let inv = inv_mod_p(lc, p);
-        for c in a.iter_mut() {
-            *c = *c * inv % p;
-        }
-    }
-    a
+    // Monic gcd over F_p through the shared module (empty if both zero).
+    let f = crypto_lib::gcd::poly::Fp64::new(p as u64);
+    let a: Vec<u64> = a.iter().map(|&c| c as u64).collect();
+    let b: Vec<u64> = b.iter().map(|&c| c as u64).collect();
+    crypto_lib::gcd::poly::gcd(&f, &a, &b)
+        .into_iter()
+        .map(|c| c as u32)
+        .collect()
 }
 
 fn poly_sub(a: &[u32], b: &[u32], p: u32) -> Vec<u32> {
@@ -1873,23 +1844,41 @@ fn gfp_powmod(g: &Gf, a: &[u32], mut e: u64, m: &[u32]) -> Vec<u32> {
     r
 }
 
+/// The log/Zech table field as a coefficient field of the shared
+/// polynomial GCD (`zero` is the log sentinel `nn`, `one` is log 0).
+struct GfField<'a>(&'a Gf);
+
+impl crypto_lib::gcd::poly::PolyField for GfField<'_> {
+    type E = u32;
+    fn zero(&self) -> u32 {
+        self.0.zero()
+    }
+    fn one(&self) -> u32 {
+        0
+    }
+    fn add(&self, a: u32, b: u32) -> u32 {
+        self.0.add(a, b)
+    }
+    fn sub(&self, a: u32, b: u32) -> u32 {
+        self.0.sub(a, b)
+    }
+    fn mul(&self, a: u32, b: u32) -> u32 {
+        self.0.mul(a, b)
+    }
+    fn inv(&self, a: u32) -> u32 {
+        self.0.inv(a)
+    }
+    fn is_zero(&self, a: u32) -> bool {
+        self.0.is_zero(a)
+    }
+    fn neg(&self, a: u32) -> u32 {
+        self.0.neg(a)
+    }
+}
+
 fn gfp_gcd(g: &Gf, a: &[u32], b: &[u32]) -> Vec<u32> {
-    let mut a = a.to_vec();
-    let mut b = b.to_vec();
-    gfp_trim(g, &mut a);
-    gfp_trim(g, &mut b);
-    while !b.is_empty() {
-        let r = gfp_rem(g, &a, &b);
-        a = b;
-        b = r;
-    }
-    if let Some(&lc) = a.last() {
-        let inv = g.inv(lc);
-        for c in a.iter_mut() {
-            *c = g.mul(*c, inv);
-        }
-    }
-    a
+    // Monic gcd through the shared module (empty if both zero).
+    crypto_lib::gcd::poly::gcd(&GfField(g), a, b)
 }
 
 fn gfp_div_exact(g: &Gf, a: &[u32], b: &[u32]) -> Vec<u32> {

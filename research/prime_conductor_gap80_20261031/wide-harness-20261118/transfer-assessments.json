@@ -1,0 +1,388 @@
+[
+  {
+    "format": "correspondence-assessment-draft-v1",
+    "assessment_state": "draft",
+    "authority": "companion artifact; not a ledger record or independent certificate",
+    "source": {
+      "object_uid": null,
+      "representation_uid": null,
+      "equations": {
+        "short_weierstrass_coefficients": [
+          "4794168233664648458988367110514316682522236917173341621535611",
+          "784"
+        ]
+      },
+      "field": {
+        "characteristic": "4794168233664648458988367110514316682522236917173341621535751",
+        "extension_degree": 1,
+        "defining_polynomial": null
+      },
+      "dimension": 1,
+      "subgroup_order": "1125023250121",
+      "canonical_identity": {
+        "slug": "icv1-fp202-t4379117826074525589863646596544-d75a15a8",
+        "icv1": "ICV1:fp-4794168233664648458988367110514316682522236917173341621535751:4379117826074525589863646596544:4794168233664648458988367110509937564696162391583477974939208:4794168233664648458988367110514316682522236917173341621532376:unk:unk:r:d75a15a839dc",
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      }
+    },
+    "destination": {
+      "object_uid": null,
+      "representation_uid": null,
+      "equations": {
+        "short_weierstrass_coefficients": [
+          "4794168233664648458988367110514316682522236917173341621533371",
+          "44688"
+        ]
+      },
+      "field": {
+        "characteristic": "4794168233664648458988367110514316682522236917173341621535751",
+        "extension_degree": 1,
+        "defining_polynomial": null
+      },
+      "dimension": 1,
+      "ambient_group_order": "4794168233664648458988367110509937564696162391583477974939208",
+      "order_status": "source supplied; quotient inherited by rational isogeny, not recounted",
+      "canonical_identity": {
+        "slug": "icv1-fp202-t4379117826074525589863646596544-20f63a94",
+        "icv1": "ICV1:fp-4794168233664648458988367110514316682522236917173341621535751:4379117826074525589863646596544:4794168233664648458988367110509937564696162391583477974939208:16581375:unk:unk:r:20f63a94d5b2",
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      }
+    },
+    "transformation": {
+      "kind": "elliptic_isogeny",
+      "family": "normalized Velu",
+      "degree": 2,
+      "field_of_definition": "4794168233664648458988367110514316682522236917173341621535751",
+      "formulas": {
+        "x": "x+448/(x+14)",
+        "y": "y*(1-448/(x+14)^2)",
+        "exceptions": [
+          "O",
+          "(-14,0)"
+        ],
+        "cleared_integer_equation": "0"
+      },
+      "exceptional_cases": [
+        "kernel points",
+        "infinity"
+      ],
+      "normalization": "PARI coefficient/image agreement; coordinate control u=2 is separate"
+    },
+    "obligations": {
+      "existence": {
+        "state": "supported",
+        "evidence": [
+          "paired-map-packets.json"
+        ],
+        "scope": "fixed small-degree public control"
+      },
+      "explicit_construction": {
+        "state": "supported",
+        "evidence": [
+          "two_map_control.cpp",
+          "five_map_control.cpp",
+          "results/two-map.pari",
+          "results/five-map.pari"
+        ],
+        "scope": "degree 2 or 5 only"
+      },
+      "map_correctness": {
+        "state": "supported",
+        "evidence": [
+          "paired-map-packets.json"
+        ],
+        "scope": "35 native/PARI inputs per case and 32 transported scalar identities; known Velu construction, not independent execution certification"
+      },
+      "subgroup_preservation": {
+        "state": "supported",
+        "evidence": [
+          "paired-map-packets.json"
+        ],
+        "scope": "fixed prime-order generator image is nonzero of order r; kernel degree coprime to r"
+      },
+      "computational_advantage": {
+        "state": "unknown",
+        "evidence": [],
+        "scope": "no measurement"
+      },
+      "scaling_support": {
+        "state": "unknown",
+        "evidence": [],
+        "scope": "these fixed small degrees do not establish large-degree evaluation"
+      }
+    },
+    "preservation_certificate": {
+      "identity": "phi([s]G)=[s]H, 32 checked nonzero scalars",
+      "kernel_intersection": "trivial on the specified r-subgroup: kernel degree 2 or 5 is coprime to prime r",
+      "recovery_map": "the recovered coefficient relative to H applies to G; point inverse/dual not computed",
+      "scalar_multiplier": null,
+      "proof_artifact": "paired-map-packets.json; unsigned PCC producer evidence"
+    },
+    "mechanism": {
+      "proposed_benefit": "input and map validation only; no speed benefit asserted",
+      "prediction": "exact source, transported and coordinate-control point rows agree with the canonical harness",
+      "falsification_condition": "any quotient, image, subgroup or row mismatch invalidates this control",
+      "assumptions": [
+        "supplied source ambient order is correct; no fresh recount",
+        "field/subgroup primality checked by PARI",
+        "known normalized Velu construction"
+      ]
+    },
+    "cost_comparison": {
+      "workload": "32 shared-scalar targets per endpoint plus coordinate control",
+      "baseline": "same source subgroup and scalars",
+      "units": "seconds, bytes, field/group operations when measured",
+      "construction": null,
+      "transfer": null,
+      "destination": null,
+      "recovery": null,
+      "verification": null,
+      "failed_attempts_and_duplicates": "compiler/plan failures and bounded kernel-lift attempts retained",
+      "memory_and_data": null,
+      "setup_reuse": "same map reused for 32 targets; no amortized time reported",
+      "uncertainty": null,
+      "evidence_label": "unmeasured"
+    },
+    "controls": [
+      "source/PARI arithmetic",
+      "transported targets",
+      "u=2 coordinate isomorphism with explicit inverse",
+      "kernel and infinity",
+      "off-curve generator rejection",
+      "native exact-row comparison",
+      "tampered-row rejection",
+      "unsupported-IC rejection"
+    ],
+    "protocol": {
+      "parameter_scope": "frozen 202-bit and 96-bit source fields; degrees 2 and 5",
+      "sample_selection": "uniform_scalar_sha256_shared_v1, seed 20261118, 32 distinct values per case",
+      "stopping_rules": "fixed bounded control and fresh output paths; no retries on unchanged failed inputs",
+      "invalidation_rules": "any native/PARI or codec mismatch",
+      "hardware_manifest": "results/toolchain and pre-call manifests; no timing admission",
+      "execution_route": "native development controls; measured campaigns remain EKS-only pending admission"
+    },
+    "exploration_boundary": {
+      "families": [
+        "fixed normalized rational degree-2 map",
+        "complete native degree-5 map"
+      ],
+      "parameters": "supplied frozen fields and exact packet values",
+      "completed_scope": "control arithmetic and planning only",
+      "completeness_claim": "none"
+    },
+    "composition": {
+      "edge_ids": [],
+      "junction_compatibility": "same field and specified prime subgroup; no field extension or restriction of scalars",
+      "weakest_open_obligation": "full 80-bit target construction and admitted repeated measurement"
+    },
+    "sources": [
+      "isogeny_algos/src/kernel/velu.rs::velu_general",
+      "https://pari.math.u-bordeaux.fr/dochtml/html/Elliptic_curves.html",
+      "../MEASUREMENT_PROTOCOL.md"
+    ],
+    "open_obligations": [
+      "independent execution/math review",
+      "ambient order evidence binding",
+      "registry registration",
+      "wide-field IC",
+      "endpoint order and algorithm-seed pairing",
+      "construction/conversion/recovery/verification cost measurements",
+      "full frozen 80-bit target"
+    ],
+    "recommended_next_action": "bind the final source/image and endpoint evidence, then obtain cloud admission for the existing measured protocol",
+    "official_status_change": "none"
+  },
+  {
+    "format": "correspondence-assessment-draft-v1",
+    "assessment_state": "draft",
+    "authority": "companion artifact; not a ledger record or independent certificate",
+    "source": {
+      "object_uid": null,
+      "representation_uid": null,
+      "equations": {
+        "short_weierstrass_coefficients": [
+          "18274853889642953323454959912",
+          "32133284755955526260408304513"
+        ]
+      },
+      "field": {
+        "characteristic": "78125000378223625457769953627",
+        "extension_degree": 1,
+        "defining_polynomial": null
+      },
+      "dimension": 1,
+      "subgroup_order": "125000000302579",
+      "canonical_identity": {
+        "slug": "icv1-fp96-tm125000000302577-0b06b926",
+        "icv1": "ICV1:fp-78125000378223625457769953627:-125000000302577:78125000378223750457770256205:78125000378223625457769068891:unk:unk:r:0b06b926cae3",
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      }
+    },
+    "destination": {
+      "object_uid": null,
+      "representation_uid": null,
+      "equations": {
+        "short_weierstrass_coefficients": [
+          "15990497153433373631697108307",
+          "48428362807562559250646568586"
+        ]
+      },
+      "field": {
+        "characteristic": "78125000378223625457769953627",
+        "extension_degree": 1,
+        "defining_polynomial": null
+      },
+      "dimension": 1,
+      "ambient_group_order": "78125000378223750457770256205",
+      "order_status": "source supplied; quotient inherited by rational isogeny, not recounted",
+      "canonical_identity": {
+        "slug": "icv1-fp96-tm125000000302577-2550b472",
+        "icv1": "ICV1:fp-78125000378223625457769953627:-125000000302577:78125000378223750457770256205:78125000378223625457769068891:unk:unk:r:2550b4723dd2",
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      }
+    },
+    "transformation": {
+      "kind": "elliptic_isogeny",
+      "family": "normalized Velu",
+      "degree": 5,
+      "field_of_definition": "78125000378223625457769953627",
+      "formulas": "results/five-map.pari and five_map_control.cpp using the complete native evaluator",
+      "exceptional_cases": [
+        "kernel points",
+        "infinity"
+      ],
+      "normalization": "PARI coefficient/image agreement; coordinate control u=2 is separate"
+    },
+    "obligations": {
+      "existence": {
+        "state": "supported",
+        "evidence": [
+          "paired-map-packets.json"
+        ],
+        "scope": "fixed small-degree public control"
+      },
+      "explicit_construction": {
+        "state": "supported",
+        "evidence": [
+          "two_map_control.cpp",
+          "five_map_control.cpp",
+          "results/two-map.pari",
+          "results/five-map.pari"
+        ],
+        "scope": "degree 2 or 5 only"
+      },
+      "map_correctness": {
+        "state": "supported",
+        "evidence": [
+          "paired-map-packets.json"
+        ],
+        "scope": "35 native/PARI inputs per case and 32 transported scalar identities; known Velu construction, not independent execution certification"
+      },
+      "subgroup_preservation": {
+        "state": "supported",
+        "evidence": [
+          "paired-map-packets.json"
+        ],
+        "scope": "fixed prime-order generator image is nonzero of order r; kernel degree coprime to r"
+      },
+      "computational_advantage": {
+        "state": "unknown",
+        "evidence": [],
+        "scope": "no measurement"
+      },
+      "scaling_support": {
+        "state": "unknown",
+        "evidence": [],
+        "scope": "these fixed small degrees do not establish large-degree evaluation"
+      }
+    },
+    "preservation_certificate": {
+      "identity": "phi([s]G)=[s]H, 32 checked nonzero scalars",
+      "kernel_intersection": "trivial on the specified r-subgroup: kernel degree 2 or 5 is coprime to prime r",
+      "recovery_map": "the recovered coefficient relative to H applies to G; point inverse/dual not computed",
+      "scalar_multiplier": null,
+      "proof_artifact": "paired-map-packets.json; unsigned PCC producer evidence"
+    },
+    "mechanism": {
+      "proposed_benefit": "input and map validation only; no speed benefit asserted",
+      "prediction": "exact source, transported and coordinate-control point rows agree with the canonical harness",
+      "falsification_condition": "any quotient, image, subgroup or row mismatch invalidates this control",
+      "assumptions": [
+        "supplied source ambient order is correct; no fresh recount",
+        "field/subgroup primality checked by PARI",
+        "known normalized Velu construction"
+      ]
+    },
+    "cost_comparison": {
+      "workload": "32 shared-scalar targets per endpoint plus coordinate control",
+      "baseline": "same source subgroup and scalars",
+      "units": "seconds, bytes, field/group operations when measured",
+      "construction": null,
+      "transfer": null,
+      "destination": null,
+      "recovery": null,
+      "verification": null,
+      "failed_attempts_and_duplicates": "compiler/plan failures and bounded kernel-lift attempts retained",
+      "memory_and_data": null,
+      "setup_reuse": "same map reused for 32 targets; no amortized time reported",
+      "uncertainty": null,
+      "evidence_label": "unmeasured"
+    },
+    "controls": [
+      "source/PARI arithmetic",
+      "transported targets",
+      "u=2 coordinate isomorphism with explicit inverse",
+      "kernel and infinity",
+      "off-curve generator rejection",
+      "native exact-row comparison",
+      "tampered-row rejection",
+      "unsupported-IC rejection"
+    ],
+    "protocol": {
+      "parameter_scope": "frozen 202-bit and 96-bit source fields; degrees 2 and 5",
+      "sample_selection": "uniform_scalar_sha256_shared_v1, seed 20261118, 32 distinct values per case",
+      "stopping_rules": "fixed bounded control and fresh output paths; no retries on unchanged failed inputs",
+      "invalidation_rules": "any native/PARI or codec mismatch",
+      "hardware_manifest": "results/toolchain and pre-call manifests; no timing admission",
+      "execution_route": "native development controls; measured campaigns remain EKS-only pending admission"
+    },
+    "exploration_boundary": {
+      "families": [
+        "fixed normalized rational degree-2 map",
+        "complete native degree-5 map"
+      ],
+      "parameters": "supplied frozen fields and exact packet values",
+      "completed_scope": "control arithmetic and planning only",
+      "completeness_claim": "none"
+    },
+    "composition": {
+      "edge_ids": [],
+      "junction_compatibility": "same field and specified prime subgroup; no field extension or restriction of scalars",
+      "weakest_open_obligation": "full 80-bit target construction and admitted repeated measurement"
+    },
+    "sources": [
+      "isogeny_algos/src/kernel/velu.rs::velu_general",
+      "https://pari.math.u-bordeaux.fr/dochtml/html/Elliptic_curves.html",
+      "../MEASUREMENT_PROTOCOL.md"
+    ],
+    "open_obligations": [
+      "independent execution/math review",
+      "ambient order evidence binding",
+      "registry registration",
+      "wide-field IC",
+      "endpoint order and algorithm-seed pairing",
+      "construction/conversion/recovery/verification cost measurements",
+      "full frozen 80-bit target"
+    ],
+    "recommended_next_action": "bind the final source/image and endpoint evidence, then obtain cloud admission for the existing measured protocol",
+    "official_status_change": "none"
+  }
+]

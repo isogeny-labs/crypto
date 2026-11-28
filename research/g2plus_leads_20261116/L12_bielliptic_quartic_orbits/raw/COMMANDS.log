@@ -1,0 +1,26 @@
+### 2026-11-16T21:22:26Z  CMD: python3 --version > raw/python_version.txt 2>&1
+EXIT: 0
+12162c47c88cf7ca169474b404c0d8bf22203099f01452797ab5d96e71a148aa  raw/python_version.txt
+### 2026-11-16T21:22:28Z  CMD: python3 -m unittest discover -s code -p 'test_*.py' -v > raw/unittest.log 2>&1
+EXIT: 0
+0f67046ba397bab7fd393e9a3601cb86a3725ecc8dc5b42110c0d1a00692751d  raw/unittest.log
+### 2026-11-16T21:23:22Z  CMD: python3 code/select_instances.py --out raw/instances.jsonl --rejects raw/rejects.tsv > raw/select.log 2>&1
+EXIT: 0
+0d995fcdee3b846307b1c01af985b87f0a590a162eeb0655c7156268324b933e  raw/instances.jsonl
+f342b802e4587b64bfa486e22331e059b207acb5d6a0472d6deae1185fa071ce  raw/rejects.tsv
+4ecd30ad9a870843f1ca562822071a92f3a21aca1db7ac2f296ef9ef77927d53  raw/select.log
+### 2026-11-16T21:32:36Z  CMD: python3 code/run_matrix.py --instances raw/instances.jsonl --outdir raw/runs --log raw/run_matrix.log
+EXIT: 0
+866bbd1f009e03670882728baa686d3ca8cb02a8c5cf01d6ad28e27936b459bb  raw/run_matrix.log
+### 2026-11-16T21:32:44Z  CMD: python3 code/analyze.py --instances raw/instances.jsonl --runs raw/runs --summary raw/summary.tsv --decision raw/decision.json > raw/analyze.log 2>&1
+EXIT: 0
+c948d188955e550ded91c87c5596fd733fd6a3b94d1ac5259e571c111c695255  raw/summary.tsv
+6ee40d405db261f8b4e578b3ffd1d11931e59e9fee5e25aa7e8aa9a5ea3d8bfe  raw/decision.json
+fc034e84e8dac55b6b75e66395c390bfeacc59dfb4781b6d4f1947b6a889b4a6  raw/analyze.log
+### 2026-11-16T21:32:44Z  CMD: sha256sum raw/instances.jsonl raw/summary.tsv raw/decision.json raw/runs/*.json > raw/outputs.sha256
+EXIT: 0
+0614102b2348352752474a66a90927e5d85e47d132a695ea4fc90dfab2b6ba27  raw/outputs.sha256
+### 2026-11-16T21:33:47Z  CMD: python3 code/make_results.py > raw/results_tables.stdout
+EXIT: 0
+eaab04d810ad08d340138f3271f1498f9efa2fb625df3983c7d4ee085415bd4b  plot.svg
+0f9701173b5bcd7417d9e76489f780e6d9cb75f3a53c78a7f928cba68803005c  raw/results_tables.md

@@ -1,0 +1,7 @@
+# Direct polynomial route — prospective source only
+
+Implement the independently reviewed derivative argument (review ba726fcf25e13be7d4659e860d1c4ba2bd0cba3da7a03c410d97528fc85d38be). Preserve the exact actual-coefficientData theorem hypotheses and conclusions in a new namespace. Prove the generic identity route, derive nonzero factors, then specialize. Reuse the existing rational controls with only import/namespace changes; add explicit premise-removal controls. No compiler or payload execution is authorized here.
+
+Prospective execution must bind the exact successful Nonbranch source/olean and transitive runtime custody from the current branch-v2 native receipts; it must not infer completion from filenames or regenerate old geometry. The derivative route imports Nonbranch, FieldDivision and RingDivision, and the existing Ring/NormNum/Omega tactics. Independent source review, exact source publication and coordinator release precede any bounded replay. Current campaign remains43,200seconds with absolute deadline2026-11-10T05:11:39Z; this packet does not allocate a new runtime reservation. Actual remaining ledger/runtime artifact hashes are pending.
+
+Expected validation: compile new module and controls, then separate named axiom readback; preserve failures. No new axioms, sorry, assumed multiplicity conclusion, or altered original geometry files. The derivative route supports the base-polynomial conclusion only.

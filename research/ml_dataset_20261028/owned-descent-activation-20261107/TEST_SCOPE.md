@@ -1,0 +1,1 @@
+Focused original-descent suite imports the installed production checker directly. Existing fixture uses a structural CheckedMap and frozen actual sparse-equation wrapper/kernel, with unrelated child modules omitted. This is not full original cell authentication or assembled Rust/CLI compilation. Parent owns concurrent prefix edits; these tests keep the existing frozen decoder.

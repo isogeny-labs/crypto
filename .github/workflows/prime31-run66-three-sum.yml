@@ -1,0 +1,32 @@
+name: Prime31 run66 original-Rust three-summand support admission
+on:
+  push:
+    branches:
+      - research/prime31-f4-admission-run51-20261121
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_run66_three_sum_support.rs"
+      - "research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv"
+      - ".github/workflows/prime31-run66-three-sum.yml"
+  pull_request:
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_run66_three_sum_support.rs"
+      - "research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv"
+      - ".github/workflows/prime31-run66-three-sum.yml"
+  workflow_dispatch:
+
+jobs:
+  original-rust-3sum-support:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/prime31_ic_20261115/native
+      - name: Verify frozen 168-leaf input fingerprint
+        run: |
+          echo "fc484615394ee423190747d05001cea526580fb0df0279fbcf789ab6cafc0c46  research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv" | sha256sum --check
+      - name: Original Rust Prime31 B509/B677 three-sum support gate
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo run --locked --release --example prime31_run66_three_sum_support

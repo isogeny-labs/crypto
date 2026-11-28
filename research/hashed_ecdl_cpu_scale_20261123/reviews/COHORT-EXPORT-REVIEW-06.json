@@ -1,0 +1,146 @@
+{
+  "schema": "native-cpu-cohort-export-metadata-review/v1",
+  "created_utc": "2026-11-23T12:38:09.897Z",
+  "review_id": "COHORT-EXPORT-REVIEW-06",
+  "scope": "Read-only exact JSON metadata/source/receipt review. No converter,canonical checker,test,Clippy,solver,EC replay or other audit program was rerun. Node/shell only inspected/hashed files and compared JSON with numeric lexemes protected from floating-point conversion. No source,export,old snapshot or mutable producer file was edited.",
+  "supplements": {
+    "review": "COHORT-REVIEW-05.json",
+    "review_sha256": "841fae26a3c2f44350baeb084b28f1a469ee1d17e7a848c6e96259f0a8a2831d",
+    "manifest_sha256": "1f90ef79635f5e2e709814976975cabd1b3a5bfd58a87fbeedbdaf7f1843a491",
+    "all301_original_input_entries_rechecked": true,
+    "interpretation": "05 was explicitly artifact consistency and said the captured export-schema validator was not run by that reviewer. It is not relabeled as canonical-export acceptance. Original raw recovery evidence and05 remain unchanged."
+  },
+  "artifacts": {
+    "original": {
+      "path": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_scale_20261123/export.json",
+      "sha256": "ec8e0e8dd6865c543ce088886ddff3e2c044163a5a12e7ac911010637d0adb19",
+      "bytes": 121658,
+      "canonical_check": "Recorded FAIL:12 duplicate execution-cell findings"
+    },
+    "v2": {
+      "path": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_scale_20261123/export-v2.json",
+      "sha256": "60e735e394ab0425028dfcf185b9a8516311341e04fda9dda434782e47baa242",
+      "bytes": 122947,
+      "canonical_check": "Recorded captured check-export OK:0findings",
+      "exact_measurement_preservation": "FAIL:five unintended numeric measurement changes"
+    },
+    "converter": {
+      "source": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_20261030/native-panel-tools/src/bin/scale-export-canonical.rs",
+      "source_sha256": "964fe564eb69a1563c3cb5a9aadc86f83011964d0ea0d5e2310f5d663ca401cb",
+      "qualified_binary_sha256": "ab0142966fadfb871dc6b930c19fdebe4a9b3a218e9e4d23009d17d5313f320a",
+      "role": "Post-run metadata-only intended adapter; source reads/parses JSON and emits a separate exclusive output,with no solver/EC calls."
+    }
+  },
+  "disposition": {
+    "old_cohort_artifact_consistency": "unchanged within05 scope; original records remain valid/unaltered",
+    "canonical_cell_identity_correction": "supported within scope:24unique cells replace12colliding cell identities",
+    "exact_metadata_only_fidelity": "refuted_within_scope for frozen v2:five measurements changed unintentionally",
+    "v2_acceptance": "Do not accept v2 as an exact metadata-only preservation successor merely because its canonical checker reports0findings.",
+    "independent_session_or_execution": "Not established; no official independent-session experiment.review/v1 assertion or execution attestation",
+    "publication": "New metadata source/output remain local; publication binding separate."
+  },
+  "canonical_identity_review": {
+    "captured_rule": "Canonical execution cell=(arm,instance_id,replicate,warmup); seed is omitted. Original24runs have24unique run_ids but only12unique cell keys because both declared seeds use raw native replicate0.",
+    "mapping": "Declared seed101->ordinal0;seed202->ordinal1. All24runs keep their arm,curve instance_id,seed,run_id,status and artifacts. Raw replicate0 is retained as measurements.counters.native_replicate0.",
+    "semantics": "The two slots within each curve are DISTINCT PUBLIC TARGETS,not repeated observations of one target. Their public identity is(curve case,seed). The ordinal mapping adds no target,solver call,independent observation or statistical replication. Identicalu/x arms still give A/A repetitions of the same public target.",
+    "counts": {
+      "runs_before": 24,
+      "runs_after": 24,
+      "old_unique_canonical_cells": 12,
+      "new_unique_canonical_cells": 24,
+      "duplicate_findings_before": 12,
+      "recorded_findings_after": 0
+    },
+    "frozen_protocol": "f4154a35224588ece8fd2b6a6c6d089a95907c9f1c5e468322c2098e88350bad unchanged; sample selection,N,outcomes and decision rules were not revised."
+  },
+  "exact_delta": {
+    "method": "Administrative JSON comparison preserves every original numeric token as a tagged string before parsing; no float conversion is used in the fidelity comparison.",
+    "changes_total": 44,
+    "allowed_changes": {
+      "top_export_id_and_created": 2,
+      "appended_note": 1,
+      "seed202_replicate0_to1": 12,
+      "added_native_replicate0_counters": 24
+    },
+    "allowed_total": 39,
+    "unexpected_measurement_changes": 5,
+    "unexpected_changes": [
+      {
+        "path": "/runs/16/measurements/counters/oracle_seconds",
+        "before": "1.9122045619999999",
+        "after": "1.912204562"
+      },
+      {
+        "path": "/runs/16/measurements/counters/wall_seconds",
+        "before": "1.9178180999999999",
+        "after": "1.9178181"
+      },
+      {
+        "path": "/runs/16/measurements/wall_seconds",
+        "before": "1.9178180999999999",
+        "after": "1.9178181"
+      },
+      {
+        "path": "/runs/18/measurements/counters/wall_seconds",
+        "before": "3.6425995650000003",
+        "after": "3.642599565"
+      },
+      {
+        "path": "/runs/18/measurements/wall_seconds",
+        "before": "3.6425995650000003",
+        "after": "3.642599565"
+      }
+    ],
+    "affected_run_ids": {
+      "16": "u-4-101",
+      "18": "u-4-202"
+    },
+    "interpretation": "The source does not intentionally calculate new measurements,but its generic serde_json Value parse/serialize round-trip changes five recorded decimal numbers. The changes are small rounding differences,still outside the explicit no-measurement-change requirement. All other JSON fields match after accounting for the39allowed changes and these5differences. Raw CSV,certificates,measurement source values and original export are preserved."
+  },
+  "recorded_checks": [
+    {
+      "id": "original-snapshot",
+      "result": "pass",
+      "detail": "Original05 review/manifest hashes and all301 input-file hashes match exactly,including originalexport and originalpostrun validation source."
+    },
+    {
+      "id": "canonical-rule-cause",
+      "result": "pass",
+      "detail": "Read captured checker source confirms seed is omitted from the duplicate-cell key. Recorded v1 log contains12 duplicate keys,matching the12 actual collisions; v2 now has24unique cells."
+    },
+    {
+      "id": "exact-preservation",
+      "result": "fail",
+      "detail": "Numeric-token-preserving recursive diff finds the five measurement changes listed above,not just metadata changes. Full canonical-format validation does not enforce equality to the parent export."
+    },
+    {
+      "id": "recorded-native-qualification",
+      "result": "pass_as_recorded",
+      "detail": "Phase06 exits0/stop0 and recorded final formatting,strict Clippy,4metadata tests/build pass. Phase07 exits0/stop0,consumes exact original digest and emits separatev2. Qualified binary before-call hash and after-call OK agree. Reviewer reran none of these tools."
+    },
+    {
+      "id": "test-coverage-limit",
+      "result": "not_covered",
+      "detail": "The4tests cover ordinal mapping,preservation of an integer/string fixture,duplicate seed rejection,failed-row rejection and already-normalized rejection. They do not include fractional lexical-preservation cases or enforce recursive all-field equality on the actual export; their pass did not catch numeric drift."
+    },
+    {
+      "id": "captured-canonical-result",
+      "result": "pass_as_recorded",
+      "detail": "Existing export-v2-schema-check.stdout says0findings and stderr is empty. User reports the captured check-export used--verify-files. No fresh-current live canonical tool access or new canonical tool execution was performed by reviewer; this record is distinct from lossless-delta acceptance."
+    }
+  ],
+  "recommendation": {
+    "action": "preserve_and_create_lossless_successor",
+    "detail": "Retain originalexport,v2,converter source/qualified binary and both schema logs unchanged. Produce a separately named successor with lossless JSON-number handling,then require exact recursive whitelisting of only export_id/created/appended notes/seed-slot replicate/native_replicate fields. Include the recorded fractional edge cases in meaningful preservation tests. No solver or EC replay is needed for this metadata correction; the original05 payload remains the reference."
+  },
+  "errata": "Forthcoming publication should disclose both the original canonical-cell collision and v2 numeric-drift failure. Do not silently replace either output or claim that05 accepted a canonical export.",
+  "asserts_nothing_about": [
+    "official research status",
+    "fresh independent-session review",
+    "independently authenticated execution",
+    "changes to original solver recovery outcomes",
+    "performance,asymptotic improvement or novelty"
+  ],
+  "evidence_manifest": "cohort-export-evidence-06.sha256",
+  "evidence_manifest_sha256": "ba2ba0ef0aa08891891cad522c92c102a2babcfde26d5214362d2dfdd724de7c"
+}

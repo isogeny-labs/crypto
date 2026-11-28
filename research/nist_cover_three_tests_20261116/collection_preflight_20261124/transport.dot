@@ -1,0 +1,14 @@
+digraph transport {
+  graph [rankdir=LR,bgcolor="transparent",pad=0.08,nodesep=0.15,ranksep=0.2];
+  node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=12,fillcolor="#eef1f4",color="#62788b",margin=0.1];
+  edge [color="#62788b",arrowsize=0.6];
+  baseline [label="Recorded baseline\nStub transport"];
+  guard [label="Native preflight\nReal guard",fillcolor="#d7ebed"];
+  collector [label="Collector\nSentinel only"];
+  checker [label="Checker\nSentinel only"];
+  stop [label="Changed baseline\nStop before sentinels",fillcolor="#f1dedc",color="#9c5b57"];
+  baseline -> guard;
+  guard -> collector [label="match",fontname="Helvetica",fontsize=10];
+  collector -> checker;
+  guard -> stop [label="drift",fontname="Helvetica",fontsize=10,color="#9c5b57"];
+}

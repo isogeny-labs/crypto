@@ -1,0 +1,13 @@
+{
+  "schema": "xedni-local-selector-protocol-v1",
+  "source_packed_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "full_law_pair_rows_raw_sha256": "9d269c3a789589684822edc561462b819ade32c27c13ff23b342490ca5de7954",
+  "input_law": "all 1722 ordered distinct nonidentity pairs of the fixed 43-point E(F47)",
+  "crt_policy": "the existing full-law centered CRT curve stream, with no reduced-relation filtering",
+  "selector": "for every local gate curve and point pair independently, enumerate k residues 0..11 satisfying P+kQ=O; intersect the 7 and 11 sets for every centered CRT curve; union across that pair's CRT curves",
+  "coefficient_domain": "k=1..41, the unique reduced coefficient for every distinct nonidentity target and generator on the 43-point group",
+  "analysis_only": "after the local selector is frozen, compute the true reduced k by exhaustive group additions and compare it with the local union; never use true k to select a curve or residue",
+  "records": "one row per source pair with local residue union, candidate set size, true k, and all exclusions; one row per CRT candidate with local residue set; exact raw hashes",
+  "resource": "complete finite local enumeration on all 32256 centered CRT candidates; no rational relations or wall-time comparison",
+  "claim_boundary": "quantifies ambiguity of this finite local selector; cannot imply a rational relation or a discrete-log speedup"
+}

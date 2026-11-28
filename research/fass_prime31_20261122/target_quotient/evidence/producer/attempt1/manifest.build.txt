@@ -1,0 +1,25 @@
+scope=bounded_native_target_quotient_correctness_only
+base=f0ca664eca0081a30adfcc79dcf62a32de40d2af
+protocol_sha256=3eafeab5c2dc73c0add918bb23c9e8cdac1cf82d567d18a49792fd84aee0b20f
+command=timeout 60s; ulimit -v 2097152; cargo build --release --offline --locked --jobs 1 from immutable source snapshot
+source_snapshot=evidence/producer/attempt1/source
+2026-11-23T04:18:38Z
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+a524f3acb1263d26626f08f93dcc95f316a4f349533a5c5fe7bd6d3d4bbce23c  main.rs
+77d935654429df6990bde72a7492ec24f4c0fbff1ae384b698203bb6d5d626d8  oracle.rs
+60e572ba5e60cc8ad72a6ce2efabab97c8d8fbe6e91f4fe5433b5ed2a8359f38  Cargo.toml
+ef756f37fdadba9caaa055986891e5301806cb840d8ee605e3206ef084597a7c  Cargo.lock
+3eafeab5c2dc73c0add918bb23c9e8cdac1cf82d567d18a49792fd84aee0b20f  ../PROTOCOL.md
+c8249ba825c946dbdb37fa5d6762f8f32d15320344693443e8af0d52f122784a  ../../../../src/cryptanalysis/semaev_prime_poly.rs
+a524f3acb1263d26626f08f93dcc95f316a4f349533a5c5fe7bd6d3d4bbce23c  ../evidence/producer/attempt1/source/research/fass_prime31_20261122/target_quotient/native/main.rs
+77d935654429df6990bde72a7492ec24f4c0fbff1ae384b698203bb6d5d626d8  ../evidence/producer/attempt1/source/research/fass_prime31_20261122/target_quotient/native/oracle.rs
+60e572ba5e60cc8ad72a6ce2efabab97c8d8fbe6e91f4fe5433b5ed2a8359f38  ../evidence/producer/attempt1/source/research/fass_prime31_20261122/target_quotient/native/Cargo.toml
+ef756f37fdadba9caaa055986891e5301806cb840d8ee605e3206ef084597a7c  ../evidence/producer/attempt1/source/research/fass_prime31_20261122/target_quotient/native/Cargo.lock
+c8249ba825c946dbdb37fa5d6762f8f32d15320344693443e8af0d52f122784a  ../evidence/producer/attempt1/source/src/cryptanalysis/semaev_prime_poly.rs

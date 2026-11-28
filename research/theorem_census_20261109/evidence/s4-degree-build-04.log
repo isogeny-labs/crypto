@@ -1,0 +1,77 @@
+S4Degree.lean:56:4: warning: This simp argument is unused:
+  Polynomial.coeff_mul_ofNat
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [← Polynomial.C_ofNat, ← Polynomial.C_pow, ← Polynomial.C_mul, mul_assoc, Polynomial.coeff_add,
+    Polynomial.coeff_sub, Polynomial.coeff_neg, Polynomial.coeff_C_mul, Polynomial.coeff_mul_C,
+    Polynomial.coeff_ofNat_mul, Polynomial.coeff_X_pow, Polynomial.coeff_X, Polynomial.coeff_C]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+S4Degree.lean:56:31: warning: This simp argument is unused:
+  Polynomial.coeff_ofNat_mul
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [← Polynomial.C_ofNat, ← Polynomial.C_pow, ← Polynomial.C_mul, mul_assoc, Polynomial.coeff_add,
+    Polynomial.coeff_sub, Polynomial.coeff_neg, Polynomial.coeff_C_mul, Polynomial.coeff_mul_C,
+    Polynomial.coeff_mul_ofNat, Polynomial.coeff_X_pow, Polynomial.coeff_X, Polynomial.coeff_C]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+S4Degree.lean:59:33: warning: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+S4Degree.lean:59:33: warning: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+S4Degree.lean:145:67: error: unsolved goals
+⊢ 1 + C 4 * X * 4 + C 4 * X * C 2 * 2 + C 4 * X ^ 2 * C 2 * 2 + C 4 * X ^ 2 * C 2 ^ 2 - C 4 * X ^ 2 * C 2 ^ 3 -
+                                                                                  C 4 * X ^ 3 * 4 -
+                                                                                C 4 * X ^ 3 * C 2 * 6 +
+                                                                              C 4 * X ^ 3 * C 2 ^ 3 +
+                                                                            C 4 * X ^ 4 * C 2 * 2 -
+                                                                          C 4 * C 2 ^ 2 -
+                                                                        C 4 ^ 2 * 2 +
+                                                                      C 4 ^ 2 * X * C 2 * 2 +
+                                                                    C 4 ^ 2 * X * C 2 ^ 2 -
+                                                                  C 4 ^ 2 * X * C 2 ^ 3 +
+                                                                C 4 ^ 2 * X ^ 2 * 8 -
+                                                              C 4 ^ 2 * X ^ 2 * C 2 * 4 +
+                                                            C 4 ^ 2 * X ^ 2 * C 2 ^ 2 -
+                                                          C 4 ^ 2 * X ^ 2 * C 2 ^ 3 * 2 -
+                                                        C 4 ^ 2 * X ^ 3 * C 2 * 2 +
+                                                      C 4 ^ 2 * X ^ 3 * C 2 ^ 2 +
+                                                    C 4 ^ 2 * X ^ 4 * 2 +
+                                                  C 4 ^ 2 * X ^ 4 * C 2 ^ 2 +
+                                                C 4 ^ 2 * C 2 ^ 2 * 2 -
+                                              C 4 ^ 3 * X * 4 -
+                                            C 4 ^ 3 * X * C 2 * 6 +
+                                          C 4 ^ 3 * X * C 2 ^ 3 -
+                                        C 4 ^ 3 * X ^ 2 * C 2 * 2 +
+                                      C 4 ^ 3 * X ^ 2 * C 2 ^ 2 +
+                                    C 4 ^ 3 * X ^ 3 * 12 +
+                                  C 4 ^ 3 * X ^ 3 * C 2 * 2 -
+                                C 4 ^ 3 * X ^ 3 * C 2 ^ 2 * 2 +
+                              C 4 ^ 3 * X ^ 4 * C 2 * 2 -
+                            C 4 ^ 3 * C 2 ^ 2 +
+                          C 4 ^ 4 +
+                        C 4 ^ 4 * X * C 2 * 2 +
+                      C 4 ^ 4 * X ^ 2 * 2 +
+                    C 4 ^ 4 * X ^ 2 * C 2 ^ 2 +
+                  C 4 ^ 4 * X ^ 3 * C 2 * 2 +
+                C 4 ^ 4 * X ^ 4 -
+              X * C 2 ^ 2 -
+            X ^ 2 * 2 +
+          X ^ 2 * C 2 ^ 2 * 2 -
+        X ^ 3 * C 2 ^ 2 +
+      X ^ 4 =
+    1
+'S4DegreeAudit.quartic_coeff_four' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.quartic_natDegree_four_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.curveLast_natDegree_four_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.fullySymbolicLast_natDegree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S4DegreeAudit.actual_specialization_degree_zero' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

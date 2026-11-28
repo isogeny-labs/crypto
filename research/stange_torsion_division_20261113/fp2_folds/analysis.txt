@@ -1,0 +1,177 @@
+## checks
+- tors_variant_streams_identical: 180/180
+- base_naive_vs_table_same_trials: 90/90
+- ext_field_target0_reproduced: 30/30
+- logs_checked: 450 IC targets (every mode) and 1350 rho runs asserted equal to the planted log
+
+## base: gap to matched rho (ratio of means over curves), I = 3M, lookups 0
+| p | log2 r | rho steps/sqrt r | IC trials/sqrt r | trials/rho steps | rels/trial | B0 ext_field oracle | B1 +shift (s^p mod F) | B2 +shift+window | B3 +shift+Jacobi | B4 +shift+sqrt table |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 251 | 15.9 | 0.83 | 0.575 | 0.689 | 0.513 | 17.78 | 15.64 | 15.24 | 15.26 | 13.17 |
+| 1019 | 20.0 | 0.90 | 0.508 | 0.568 | 0.507 | 18.26 | 15.85 | 15.29 | 15.38 | 13.07 |
+| 4091 | 24.0 | 0.88 | 0.491 | 0.560 | 0.496 | 21.31 | 18.32 | 17.61 | 17.72 | 14.94 |
+| 16363 | 28.0 | 0.77 | 0.471 | 0.611 | 0.499 | 26.37 | 22.76 | 21.78 | 21.99 | 18.45 |
+| 65519 | 32.0 | 0.96 | 0.501 | 0.520 | 0.500 | 25.93 | 22.01 | 20.97 | 21.18 | 17.77 |
+| 262139 | 36.0 | 0.93 | 0.449 | 0.484 | 0.498 | 27.37 | 23.17 | 21.93 | 22.27 | 18.37 |
+
+### base, I=1.5log2p,wl=0
+| p | log2 r | B0 ext_field oracle | B1 +shift (s^p mod F) | B2 +shift+window | B3 +shift+Jacobi | B4 +shift+sqrt table |
+|---|---|---|---|---|---|---|
+| 251 | 15.9 | 13.15 | 11.81 | 11.56 | 11.84 | 10.27 |
+| 1019 | 20.0 | 12.14 | 10.80 | 10.49 | 10.80 | 9.25 |
+| 4091 | 24.0 | 12.85 | 11.36 | 11.00 | 11.34 | 9.67 |
+| 16363 | 28.0 | 14.61 | 12.97 | 12.52 | 12.95 | 11.01 |
+| 65519 | 32.0 | 13.19 | 11.55 | 11.12 | 11.51 | 9.79 |
+| 262139 | 36.0 | 12.87 | 11.26 | 10.78 | 11.21 | 9.41 |
+
+### base, I=3M,wl=1
+| p | log2 r | B0 ext_field oracle | B1 +shift (s^p mod F) | B2 +shift+window | B3 +shift+Jacobi | B4 +shift+sqrt table |
+|---|---|---|---|---|---|---|
+| 251 | 15.9 | 16.76 | 14.75 | 14.37 | 14.40 | 12.65 |
+| 1019 | 20.0 | 17.19 | 14.93 | 14.41 | 14.49 | 12.50 |
+| 4091 | 24.0 | 20.05 | 17.24 | 16.58 | 16.69 | 14.24 |
+| 16363 | 28.0 | 24.80 | 21.42 | 20.50 | 20.69 | 17.56 |
+| 65519 | 32.0 | 24.38 | 20.70 | 19.73 | 19.92 | 16.88 |
+| 262139 | 36.0 | 25.72 | 21.78 | 20.62 | 20.94 | 17.43 |
+
+### base, I=3M,wl=0.1
+| p | log2 r | B0 ext_field oracle | B1 +shift (s^p mod F) | B2 +shift+window | B3 +shift+Jacobi | B4 +shift+sqrt table |
+|---|---|---|---|---|---|---|
+| 251 | 15.9 | 17.68 | 15.54 | 15.15 | 15.17 | 13.12 |
+| 1019 | 20.0 | 18.14 | 15.75 | 15.20 | 15.29 | 13.01 |
+| 4091 | 24.0 | 21.18 | 18.20 | 17.50 | 17.61 | 14.87 |
+| 16363 | 28.0 | 26.20 | 22.62 | 21.65 | 21.85 | 18.36 |
+| 65519 | 32.0 | 25.77 | 21.87 | 20.84 | 21.04 | 17.68 |
+| 262139 | 36.0 | 27.19 | 23.03 | 21.80 | 22.13 | 18.27 |
+
+### base, I=1.5log2p,wl=1
+| p | log2 r | B0 ext_field oracle | B1 +shift (s^p mod F) | B2 +shift+window | B3 +shift+Jacobi | B4 +shift+sqrt table |
+|---|---|---|---|---|---|---|
+| 251 | 15.9 | 12.68 | 11.39 | 11.15 | 11.42 | 10.05 |
+| 1019 | 20.0 | 11.74 | 10.45 | 10.15 | 10.45 | 9.06 |
+| 4091 | 24.0 | 12.47 | 11.03 | 10.68 | 11.01 | 9.48 |
+| 16363 | 28.0 | 14.21 | 12.62 | 12.19 | 12.60 | 10.81 |
+| 65519 | 32.0 | 12.86 | 11.27 | 10.85 | 11.23 | 9.62 |
+| 262139 | 36.0 | 12.57 | 11.00 | 10.53 | 10.95 | 9.26 |
+
+### base: M per trial (I per trial, lookups per trial)
+| p | B0 ext_field oracle | B1 +shift (s^p mod F) | B2 +shift+window | B3 +shift+Jacobi | B4 +shift+sqrt table |
+|---|---|---|---|---|---|
+| 251 | 364 (7.9, 2.0) | 317 (7.9, 2.0) | 308 (7.9, 2.0) | 306 (7.9, 2.0) | 263 (7.9, 6.9) |
+| 1019 | 458 (7.9, 2.0) | 395 (7.9, 2.0) | 380 (7.9, 2.0) | 380 (7.9, 2.0) | 321 (7.9, 6.9) |
+| 4091 | 547 (7.8, 2.0) | 467 (7.8, 2.0) | 448 (7.8, 2.0) | 448 (7.8, 2.0) | 376 (7.8, 6.8) |
+| 16363 | 623 (7.9, 2.0) | 535 (7.9, 2.0) | 511 (7.9, 2.0) | 513 (7.9, 2.0) | 429 (7.9, 6.8) |
+| 65519 | 725 (7.9, 2.0) | 612 (7.9, 2.0) | 582 (7.9, 2.0) | 585 (7.9, 2.0) | 489 (7.9, 6.8) |
+| 262139 | 824 (7.9, 2.0) | 694 (7.9, 2.0) | 656 (7.9, 2.0) | 663 (7.9, 2.0) | 545 (7.9, 6.8) |
+
+## tors: gap to matched rho (ratio of means over curves), I = 3M, lookups 0
+| p | log2 r | rho steps/sqrt r | IC trials/sqrt r | trials/rho steps | rels/trial | T0n tors sym oracle, no T fold | T0 tors sym oracle + T fold | T1 +sqrt-with-check, sigma memo | T1w +window | T1j +Jacobi | T2 +sqrt table | T2n sqrt table, no T fold |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 503 | 15.9 | 0.85 | 0.562 | 0.663 | 0.495 | 11.80 | 8.82 | 7.17 | 6.64 | 6.91 | 4.08 | 5.56 |
+| 2039 | 20.0 | 0.86 | 0.547 | 0.635 | 0.483 | 13.66 | 9.96 | 7.91 | 7.15 | 7.57 | 3.92 | 5.49 |
+| 8191 | 24.0 | 0.78 | 0.491 | 0.633 | 0.513 | 14.79 | 10.54 | 7.36 | 7.19 | 6.84 | 4.00 | 5.73 |
+| 32719 | 28.0 | 0.87 | 0.496 | 0.570 | 0.500 | 16.09 | 11.40 | 8.74 | 7.75 | 8.24 | 3.58 | 5.20 |
+| 131071 | 32.0 | 0.95 | 0.503 | 0.527 | 0.502 | 14.79 | 10.66 | 7.05 | 6.87 | 6.45 | 3.31 | 4.70 |
+| 524287 | 36.0 | 0.94 | 0.471 | 0.503 | 0.500 | 15.76 | 11.15 | 7.23 | 7.01 | 6.56 | 3.17 | 4.59 |
+
+### tors, I=1.5log2p,wl=0
+| p | log2 r | T0n tors sym oracle, no T fold | T0 tors sym oracle + T fold | T1 +sqrt-with-check, sigma memo | T1w +window | T1j +Jacobi | T2 +sqrt table | T2n sqrt table, no T fold |
+|---|---|---|---|---|---|---|---|---|
+| 503 | 15.9 | 8.54 | 6.36 | 5.39 | 5.08 | 5.40 | 3.57 | 4.86 |
+| 2039 | 20.0 | 9.01 | 6.54 | 5.46 | 5.06 | 5.45 | 3.36 | 4.70 |
+| 8191 | 24.0 | 9.14 | 6.48 | 4.97 | 4.89 | 4.93 | 3.37 | 4.83 |
+| 32719 | 28.0 | 9.05 | 6.37 | 5.21 | 4.78 | 5.20 | 2.97 | 4.31 |
+| 131071 | 32.0 | 7.89 | 5.65 | 4.21 | 4.13 | 4.17 | 2.71 | 3.85 |
+| 524287 | 36.0 | 7.85 | 5.52 | 4.07 | 3.99 | 4.03 | 2.57 | 3.71 |
+
+### tors, I=3M,wl=1
+| p | log2 r | T0n tors sym oracle, no T fold | T0 tors sym oracle + T fold | T1 +sqrt-with-check, sigma memo | T1w +window | T1j +Jacobi | T2 +sqrt table | T2n sqrt table, no T fold |
+|---|---|---|---|---|---|---|---|---|
+| 503 | 15.9 | 11.18 | 8.35 | 6.86 | 6.37 | 6.62 | 4.21 | 5.73 |
+| 2039 | 20.0 | 12.92 | 9.42 | 7.55 | 6.84 | 7.23 | 4.05 | 5.65 |
+| 8191 | 24.0 | 13.99 | 9.96 | 7.04 | 6.88 | 6.55 | 4.14 | 5.91 |
+| 32719 | 28.0 | 15.19 | 10.76 | 8.32 | 7.39 | 7.85 | 3.70 | 5.36 |
+| 131071 | 32.0 | 13.96 | 10.06 | 6.72 | 6.55 | 6.16 | 3.43 | 4.85 |
+| 524287 | 36.0 | 14.87 | 10.52 | 6.89 | 6.69 | 6.26 | 3.28 | 4.73 |
+
+### tors, I=3M,wl=0.1
+| p | log2 r | T0n tors sym oracle, no T fold | T0 tors sym oracle + T fold | T1 +sqrt-with-check, sigma memo | T1w +window | T1j +Jacobi | T2 +sqrt table | T2n sqrt table, no T fold |
+|---|---|---|---|---|---|---|---|---|
+| 503 | 15.9 | 11.74 | 8.77 | 7.13 | 6.61 | 6.88 | 4.09 | 5.57 |
+| 2039 | 20.0 | 13.59 | 9.91 | 7.87 | 7.12 | 7.53 | 3.93 | 5.51 |
+| 8191 | 24.0 | 14.71 | 10.48 | 7.32 | 7.16 | 6.81 | 4.02 | 5.75 |
+| 32719 | 28.0 | 16.00 | 11.33 | 8.70 | 7.71 | 8.20 | 3.59 | 5.21 |
+| 131071 | 32.0 | 14.71 | 10.59 | 7.01 | 6.83 | 6.42 | 3.32 | 4.72 |
+| 524287 | 36.0 | 15.67 | 11.09 | 7.19 | 6.98 | 6.53 | 3.18 | 4.60 |
+
+### tors, I=1.5log2p,wl=1
+| p | log2 r | T0n tors sym oracle, no T fold | T0 tors sym oracle + T fold | T1 +sqrt-with-check, sigma memo | T1w +window | T1j +Jacobi | T2 +sqrt table | T2n sqrt table, no T fold |
+|---|---|---|---|---|---|---|---|---|
+| 503 | 15.9 | 8.29 | 6.17 | 5.27 | 4.98 | 5.28 | 3.67 | 4.99 |
+| 2039 | 20.0 | 8.76 | 6.36 | 5.35 | 4.96 | 5.34 | 3.44 | 4.82 |
+| 8191 | 24.0 | 8.92 | 6.32 | 4.88 | 4.81 | 4.85 | 3.46 | 4.94 |
+| 32719 | 28.0 | 8.84 | 6.22 | 5.12 | 4.70 | 5.11 | 3.04 | 4.41 |
+| 131071 | 32.0 | 7.72 | 5.53 | 4.14 | 4.08 | 4.11 | 2.78 | 3.93 |
+| 524287 | 36.0 | 7.70 | 5.41 | 4.01 | 3.94 | 3.97 | 2.62 | 3.79 |
+
+### tors: M per trial (I per trial, lookups per trial)
+| p | T0n tors sym oracle, no T fold | T0 tors sym oracle + T fold | T1 +sqrt-with-check, sigma memo | T1w +window | T1j +Jacobi | T2 +sqrt table | T2n sqrt table, no T fold |
+|---|---|---|---|---|---|---|---|
+| 503 | 183 (4.2, 2.0) | 190 (4.3, 2.0) | 152 (4.3, 3.5) | 140 (4.3, 3.5) | 144 (4.3, 3.5) | 80 (4.3, 9.6) | 79 (4.2, 9.2) |
+| 2039 | 213 (4.2, 2.0) | 223 (4.3, 2.0) | 175 (4.3, 3.4) | 157 (4.3, 3.4) | 165 (4.3, 3.4) | 80 (4.3, 9.5) | 78 (4.2, 9.0) |
+| 8191 | 226 (4.3, 2.0) | 237 (4.4, 2.0) | 162 (4.4, 3.5) | 158 (4.4, 3.5) | 147 (4.4, 3.5) | 82 (4.4, 9.8) | 80 (4.3, 9.3) |
+| 32719 | 272 (4.3, 2.0) | 287 (4.4, 2.0) | 217 (4.4, 3.5) | 191 (4.4, 3.5) | 202 (4.4, 3.5) | 81 (4.4, 9.7) | 79 (4.3, 9.2) |
+| 131071 | 277 (4.3, 2.0) | 290 (4.4, 2.0) | 187 (4.4, 3.5) | 182 (4.4, 3.5) | 168 (4.4, 3.5) | 81 (4.4, 9.7) | 79 (4.3, 9.2) |
+| 524287 | 304 (4.3, 2.0) | 320 (4.4, 2.0) | 203 (4.4, 3.5) | 196 (4.4, 3.5) | 181 (4.4, 3.5) | 81 (4.4, 9.8) | 79 (4.3, 9.3) |
+
+## best variants with 95% curve-bootstrap CI, I = 3M, lookups 0
+- B0 ext_field oracle: 15.9: 17.78 (15.44-21.52); 20.0: 18.26 (15.06-21.46); 24.0: 21.31 (19.64-23.70); 28.0: 26.37 (22.75-31.22); 32.0: 25.93 (24.60-27.58); 36.0: 27.37 (22.32-33.87)
+- B4 +shift+sqrt table: 15.9: 13.17 (11.46-15.87); 20.0: 13.07 (10.80-15.35); 24.0: 14.94 (13.75-16.59); 28.0: 18.45 (15.91-21.85); 32.0: 17.77 (16.87-18.89); 36.0: 18.37 (14.99-22.74)
+- T0 tors sym oracle + T fold: 15.9: 8.82 (7.91-9.96); 20.0: 9.96 (9.46-10.47); 24.0: 10.54 (9.54-11.64); 28.0: 11.40 (9.70-13.33); 32.0: 10.66 (9.24-12.02); 36.0: 11.15 (9.61-14.10)
+- T2 +sqrt table: 15.9: 4.08 (3.66-4.60); 20.0: 3.92 (3.72-4.12); 24.0: 4.00 (3.62-4.42); 28.0: 3.58 (3.04-4.19); 32.0: 3.31 (2.87-3.74); 36.0: 3.17 (2.73-4.01)
+
+## tors extra
+- p=503: nofold trials / fold trials = 1.390; curve tries 69.0
+- p=2039: nofold trials / fold trials = 1.436; curve tries 36.8
+- p=8191: nofold trials / fold trials = 1.472; curve tries 59.4
+- p=32719: nofold trials / fold trials = 1.493; curve tries 25.6
+- p=131071: nofold trials / fold trials = 1.456; curve tries 63.0
+- p=524287: nofold trials / fold trials = 1.486; curve tries 64.4
+
+## slopes of log2(gap) against log2 r
+- B0 ext_field oracle [I=3M,wl=0]: +0.035 +- 0.006
+- B0 ext_field oracle [I=1.5log2p,wl=0]: +0.003 +- 0.006
+- B0 ext_field oracle [I=3M,wl=1]: +0.035 +- 0.006
+- B1 +shift (s^p mod F) [I=3M,wl=0]: +0.033 +- 0.006
+- B1 +shift (s^p mod F) [I=1.5log2p,wl=0]: +0.001 +- 0.006
+- B1 +shift (s^p mod F) [I=3M,wl=1]: +0.032 +- 0.006
+- B2 +shift+window [I=3M,wl=0]: +0.031 +- 0.006
+- B2 +shift+window [I=1.5log2p,wl=0]: -0.000 +- 0.006; straight-line parity at log2 r = 7684
+- B2 +shift+window [I=3M,wl=1]: +0.030 +- 0.006
+- B3 +shift+Jacobi [I=3M,wl=0]: +0.031 +- 0.006
+- B3 +shift+Jacobi [I=1.5log2p,wl=0]: +0.001 +- 0.006
+- B3 +shift+Jacobi [I=3M,wl=1]: +0.031 +- 0.006
+- B4 +shift+sqrt table [I=3M,wl=0]: +0.029 +- 0.006
+- B4 +shift+sqrt table [I=1.5log2p,wl=0]: -0.001 +- 0.006; straight-line parity at log2 r = 2348
+- B4 +shift+sqrt table [I=3M,wl=1]: +0.028 +- 0.006
+- T0n tors sym oracle, no T fold [I=3M,wl=0]: +0.018 +- 0.006
+- T0n tors sym oracle, no T fold [I=1.5log2p,wl=0]: -0.009 +- 0.005; straight-line parity at log2 r = 390
+- T0n tors sym oracle, no T fold [I=3M,wl=1]: +0.018 +- 0.006
+- T0 tors sym oracle + T fold [I=3M,wl=0]: +0.015 +- 0.005
+- T0 tors sym oracle + T fold [I=1.5log2p,wl=0]: -0.012 +- 0.004; straight-line parity at log2 r = 245
+- T0 tors sym oracle + T fold [I=3M,wl=1]: +0.015 +- 0.005
+- T1 +sqrt-with-check, sigma memo [I=3M,wl=0]: -0.001 +- 0.008; straight-line parity at log2 r = 2227
+- T1 +sqrt-with-check, sigma memo [I=1.5log2p,wl=0]: -0.022 +- 0.006; straight-line parity at log2 r = 130
+- T1 +sqrt-with-check, sigma memo [I=3M,wl=1]: -0.002 +- 0.008; straight-line parity at log2 r = 1737
+- T1w +window [I=3M,wl=0]: +0.002 +- 0.005
+- T1w +window [I=1.5log2p,wl=0]: -0.019 +- 0.004; straight-line parity at log2 r = 143
+- T1w +window [I=3M,wl=1]: +0.002 +- 0.005
+- T1j +Jacobi [I=3M,wl=0]: -0.006 +- 0.009; straight-line parity at log2 r = 521
+- T1j +Jacobi [I=1.5log2p,wl=0]: -0.023 +- 0.006; straight-line parity at log2 r = 126
+- T1j +Jacobi [I=3M,wl=1]: -0.006 +- 0.008; straight-line parity at log2 r = 487
+- T2 +sqrt table [I=3M,wl=0]: -0.019 +- 0.003; straight-line parity at log2 r = 123
+- T2 +sqrt table [I=1.5log2p,wl=0]: -0.025 +- 0.003; straight-line parity at log2 r = 91
+- T2 +sqrt table [I=3M,wl=1]: -0.019 +- 0.003; straight-line parity at log2 r = 126
+- T2n sqrt table, no T fold [I=3M,wl=0]: -0.016 +- 0.004; straight-line parity at log2 r = 178
+- T2n sqrt table, no T fold [I=1.5log2p,wl=0]: -0.021 +- 0.004; straight-line parity at log2 r = 126
+- T2n sqrt table, no T fold [I=3M,wl=1]: -0.016 +- 0.004; straight-line parity at log2 r = 182

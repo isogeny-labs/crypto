@@ -1,0 +1,568 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "TZL-20261115-symmetric-residual",
+  "version": 1,
+  "created": "2026-11-15",
+  "repository": "crypto",
+  "study_dir": "research/trace_zero_linearized_20261115",
+  "question": "On original and larger heldout bases, compare repeated-admission sliced SAT, prepared sliced SAT, symmetric residual binary linearization and a fresh classical reference, with exact complete-query validation.",
+  "claims": [
+    {
+      "id": "correctness",
+      "text": "Every Found result replays and every Refuted result agrees with an independent complete pair-table known answer.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "completion",
+      "text": "Report exact valid completion and native counted-work differences on the complete frozen panel and distinct-x holdouts; no population or timing claim.",
+      "class": "comparative",
+      "decided_by": [
+        "admission",
+        "linear",
+        "classical"
+      ]
+    },
+    {
+      "id": "speed",
+      "text": "Natural-target full ECDLP performance and asymptotic speed are not established.",
+      "class": "out_of_scope",
+      "decided_by": []
+    },
+    {
+      "id": "nontrivial",
+      "text": "Every new distinct-x planted target is nonidentity and outside its actual base, constructed from three distinct x values before candidate data; successful tuples replay in the original group.",
+      "class": "exact_computation",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "sliced-original",
+      "role": "baseline",
+      "description": "sliced-original full original-point oracle with setup and replay",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "10c60753c9f96c5576bcbf1883915f149991ea3a",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_linearized_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "1f4d989f22da1f4ba5e3cbd4fcb1477d8021e856eb625354f6cf3a05db9ad589",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "sliced-original",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      }
+    },
+    {
+      "id": "prepared-sliced",
+      "role": "candidate",
+      "description": "prepared-sliced full original-point oracle with setup and replay",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "10c60753c9f96c5576bcbf1883915f149991ea3a",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_linearized_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "1f4d989f22da1f4ba5e3cbd4fcb1477d8021e856eb625354f6cf3a05db9ad589",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "prepared-sliced",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      },
+      "same_instrument_as": "sliced-original"
+    },
+    {
+      "id": "linearized",
+      "role": "candidate",
+      "description": "linearized full original-point oracle with setup and replay",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "10c60753c9f96c5576bcbf1883915f149991ea3a",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_linearized_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "1f4d989f22da1f4ba5e3cbd4fcb1477d8021e856eb625354f6cf3a05db9ad589",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "linearized",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      },
+      "same_instrument_as": "sliced-original"
+    },
+    {
+      "id": "linearized-aa",
+      "role": "control_aa",
+      "description": "linearized-aa full original-point oracle with setup and replay",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "10c60753c9f96c5576bcbf1883915f149991ea3a",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_linearized_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "1f4d989f22da1f4ba5e3cbd4fcb1477d8021e856eb625354f6cf3a05db9ad589",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "linearized-aa",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      },
+      "same_instrument_as": "sliced-original"
+    },
+    {
+      "id": "pair-table",
+      "role": "reference",
+      "description": "pair-table full original-point oracle with setup and replay",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "10c60753c9f96c5576bcbf1883915f149991ea3a",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_linearized_20261115/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "1f4d989f22da1f4ba5e3cbd4fcb1477d8021e856eb625354f6cf3a05db9ad589",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "pair-table",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      },
+      "same_instrument_as": "sliced-original"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Every n5,d0 pilot must Found/replay; all pilot rows valid. Distinct-x planted controls are retained at every heldout size; every wide cap is censored rather than claimed detector success."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "An independently refuted n5 signed-base control is embedded in every arm, and uniform_scalar_below_order targets in the stated generated subgroup are common to all arms. This is a paired encoding comparison, not a claim of unusual target structure."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "strategy",
+        "levels": [
+          "sliced-original",
+          "prepared-sliced",
+          "linearized",
+          "pair-table"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "1f4d989f22da1f4ba5e3cbd4fcb1477d8021e856eb625354f6cf3a05db9ad589",
+        "how": "One native executable and actual production arithmetic/SAT modules; code and binary hashes pinned before affected data."
+      },
+      {
+        "name": "instances",
+        "treatment": "fixed",
+        "how": "All49 previous anchors plus16 predeclared scale cases at n83/131,d10/12. Inputs fixed before this new solver data; report new heldouts separately."
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "Rotate five arms by case index+replicate."
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Single-threaded native solver; one CPU allocation and2GiB process address-space ceiling for the proposed local exception."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Shared development environment recorded; no timing metric. A750ms safety fuse can censor rows, assessed with A/A; no isolation claim."
+      },
+      {
+        "name": "cache_and_layout",
+        "treatment": "measured",
+        "how": "Fresh Solver per call; field-table caches shared and arm order interleaved. No warmup discarded."
+      },
+      {
+        "name": "preemption",
+        "treatment": "fixed",
+        "how": "No retry; flushed JSONL prefix retained. Global600-second guard; unattempted rows reported separately."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Compiled deterministic summary is hashed before affected data, with no adaptive sample selection or population inference."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "admission",
+        "arms": [
+          "sliced-original",
+          "prepared-sliced"
+        ],
+        "differs_in": [
+          "strategy"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "linear",
+        "arms": [
+          "prepared-sliced",
+          "linearized"
+        ],
+        "differs_in": [
+          "strategy"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "classical",
+        "arms": [
+          "pair-table",
+          "linearized"
+        ],
+        "differs_in": [
+          "strategy"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "aa",
+        "arms": [
+          "linearized",
+          "linearized-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "Deterministic rotation i+replicate avoids putting one arm first throughout.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "All49 anchors plus n83/131,d10/12 by two distinct-x planted, one uniform and one cancellation; seed202611151000+100*n+10*d+kind_index, pinned StdRng."
+    },
+    "instance_sampling": {
+      "rule": "All49 anchors plus n83/131,d10/12 by two distinct-x planted, one uniform and one cancellation; seed202611151000+100*n+10*d+kind_index, pinned StdRng.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Descriptive finite panel only; deterministic Rust summary and decision rules frozen before affected data, arm labels retained for reproducibility. No adaptive interpretation or population test.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 65,
+    "replicates": 2,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 3,
+      "correction": "other",
+      "passes": true,
+      "note": "Exact complete fixed-panel simultaneous tabulation only, no population p-values or rejection; all contrasts shown, repeated targets not independent."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 65.71277260780334,
+      "per_sample_seconds": 0.1307331937384615,
+      "threads": 1,
+      "estimated_total_seconds": 150.6893485378033,
+      "measured_on": "Stratified45-call CPU0 engineering pilot, fixed field/ceiling-dimension map; fixed includes known-answer pilot setup. Planning only, no performance claim."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "decided",
+        "name": "Valid decided oracle query",
+        "unit": "queries",
+        "kind": "counted",
+        "definition": "One for Found with original-group replay or Refuted matching independent truth; zero for Inconclusive; wrong answers invalidate. Includes the complete oracle call, but counts neither setup field operations nor time.",
+        "source": "rows.jsonl decided",
+        "aggregation": "sum",
+        "resolution": "1 query",
+        "uncertainty": "range"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "conflicts",
+        "name": "SAT conflicts",
+        "unit": "conflicts",
+        "kind": "counted",
+        "definition": "Cumulative solver conflicts over attempted identity patterns; capped rows remain censored, never imputed as completed.",
+        "source": "rows.jsonl conflicts",
+        "aggregation": "distribution",
+        "resolution": "1 conflict",
+        "uncertainty": "range"
+      },
+      {
+        "id": "peak_variables",
+        "name": "Peak SAT variables",
+        "unit": "variables",
+        "kind": "exact",
+        "definition": "Maximum allocated SAT variables in the query; a circuit-size count, not a runtime proxy.",
+        "source": "rows.jsonl peak_variables",
+        "aggregation": "distribution",
+        "resolution": "1 variable",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "group_ops",
+        "name": "Native group additions and doublings",
+        "unit": "group operations",
+        "kind": "counted",
+        "definition": "Thread-local actual additions+doublings across preprocessing, solve, admission, lifts and final replay. Field/ANF construction, non-group inversions, Frobenius squaring and SAT work uncharged; no full-cost claim.",
+        "source": "rows.jsonl group_ops",
+        "aggregation": "distribution",
+        "resolution": "1 group addition or doubling",
+        "uncertainty": "range"
+      },
+      {
+        "id": "linear_columns",
+        "name": "Binary linear coefficient columns",
+        "unit": "linear columns",
+        "kind": "exact",
+        "definition": "dim span(B_x)+dim span(B_x*B_x); distinct from SAT variables and zero for other algorithms.",
+        "source": "rows.jsonl linear_columns",
+        "aggregation": "distribution",
+        "resolution": "1 coefficient column",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "none",
+    "counters": [
+      "decided",
+      "conflicts",
+      "peak_variables"
+    ],
+    "record": [
+      "binary_sha256",
+      "kernel",
+      "cpu_model",
+      "threads",
+      "instance",
+      "seed",
+      "replicate",
+      "arm",
+      "truth",
+      "verification",
+      "outcome",
+      "reason",
+      "group_ops",
+      "all_group_ops",
+      "linear_columns"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "state": "explicit_user_exception_authorized",
+      "cpus": 1,
+      "max_address_space_bytes": 2147483648,
+      "cloud_spend_usd": 0
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Fixed65cases x5arms x2repetitions=650 primary rows; separate45-call engineering pilot.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stop on any invalid Found/Refuted result, preserving all rows.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "Global600-second guard,2000 conflicts and750ms safety fuse per oracle query;2GiB process ceiling; no retries.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Report exact complete-panel and new-scale holdout decision/work tables, same-case repeat spread and linear A/A discrepancies. All caps retained. Column counts are not SAT-variable counts or full-work metrics; no timing/population/scaling inference.",
+    "comparison_ids": [
+      "admission",
+      "linear",
+      "classical"
+    ],
+    "statistic": "Exact valid completion counts and paired outcome table",
+    "interval": "Range over the two paired repeats plus certified A/A discrepancies; no population confidence interval",
+    "multiple_comparison_correction": "other",
+    "effect_size_measure": "Difference in valid decided queries on the identical finite panel",
+    "verdict_vocabulary": [
+      "descriptive_difference",
+      "within_aa_discrepancy",
+      "inconclusive",
+      "invalid"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/src/lib.rs",
+      "sha256": "a8a9fa12b2477256608ab513b8841fd4aa5c97f68cbfaffc365a2f095e419713"
+    },
+    "inputs": [
+      "rows.jsonl"
+    ],
+    "outputs": [
+      "summary.json",
+      "export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "No timing, scaling, population, full-DLP or challenge-recovery claim.",
+    "UNKNOWN is not UNSAT; no row deletion, adaptive seeds or comparison of unpaired favorable subsets.",
+    "Native group counters exclude field/ANF, non-group inversions and SAT work; they are not a complete cost unit."
+  ],
+  "literature": [
+    {
+      "ref": "Kosters-Yeo arXiv1503.08001",
+      "provenance": "retrieved",
+      "claim": "Linear trace equations may assist solving; first fall degree is not solving degree."
+    },
+    {
+      "ref": "crypto-autoresearcher knowledge/leads/ecdlp/ic-binary/LEAD-ICB-decomposition-encoding-and-sat.yaml",
+      "provenance": "retrieved",
+      "claim": "Existing encoding/basis effects and measured limits; no novelty or scale claim."
+    },
+    {
+      "ref": "research/trace_zero_leads_20261109/README.md",
+      "provenance": "internal",
+      "claim": "Prior certified-domain and restricted-q implementation, explicit UNKNOWN controls and exact scope."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "24f91347723baadc352584244b33361443acf47718c3900f0d93612fcb10348e",
+    "commit": "10c60753c9f96c5576bcbf1883915f149991ea3a",
+    "frozen_at": "2026-11-15T06:14:17Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "workload_path": "workload.json",
+    "workload_sha256": "2a1712a97cb882ddd26e0a6c37a17c70a5ba9fc8fb57bb0a2d681331e0cabeb5",
+    "planned_rows": 650,
+    "authorization": "User keep-going instruction extends the already accepted capped local/no-paid-resource workflow;1CPU/2GiB/600seconds per panel, zero retries.",
+    "preflight": "45calls, n5d0,n7/9d4,n83/131d5/8/12; n5positive3base0,other classes separate full-width pilot scalars,seed202611154000+100*n+d. All valid,n5Found/replay. Known-answer pilot preparation within outer600seconds.",
+    "runtime_planning": "Before pilot: n5/7/9 use sole field representative; n83/131 smallest pilot dimension>=case dimension (4->5,6->8,10->12). Sum per-arm costs of all650 planned rows, plus actual pilot/setup elapsed. No samples or methods omitted.",
+    "input_preparation": "Native no-candidate known-answer construction, separately capped at CPU0/2GiB/600seconds; complete65-case file before this protocol."
+  }
+}

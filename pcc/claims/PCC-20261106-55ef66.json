@@ -1,0 +1,29 @@
+{
+ "created_at": "2026-11-06T21:22:47Z",
+ "id": "PCC-20261106-55ef66",
+ "kind": "statement",
+ "producer": {
+  "commit": "63f168e4aaad06dc1d6999d8e814891140c081ee",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_cost_leads_20261106/validation/report-checks.json",
+    "sha256": "ad47764cae7051dabd40c8516a3dd869f74498bffd22f21619a2b52f5c22e232"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_cost_leads_20261106/validation/development-policy.json",
+    "sha256": "83b108b42d4a138d48ab50e4b4f393363a3bb663d7fed71dc6a41d1f100eee22"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "APS component report and administrative source custody; excludes whole-repository validation",
+ "statement": "Scoped producer report/custody/policy observations: the three-page source-linked report was rendered and inspected with layout-normalized semantic text equality; scoped Rust formatting, actionlint, twelve administrative custody tests and local size/artifact policies passed. Whole-tree curve-name/wiring/benchmark limitations are retained. No hosted-check, upload, execution or performance result is asserted."
+}

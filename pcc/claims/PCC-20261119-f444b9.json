@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T18:00:03Z",
+ "id": "PCC-20261119-f444b9",
+ "kind": "theorem",
+ "producer": {
+  "commit": "bf915e69adba12bfa6ede2a7872e855ae9e76a4a",
+  "model": "Codex",
+  "session": "a-zero-interval-galois-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "048b202a8834ad401521dbdd8eec86b8d9718cbafbccefafad5330bd27a3697f",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.zmodShortCubicIntervalGaloisPairCollision_implies_CMNormTorsion"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This discharges the abstract duplicate-character and separator premises: square product gives identical Galois signs, while any third square-product partner would complete a forbidden cubic orbit. It still assumes the selected roots, lifted point data, and transformed relations; it does not construct the specialized Semaev relation, prove torsion-to-division-polynomial vanishing, or establish the subexponential ECDLP runtime theorem.",
+ "statement": "For the A equals zero short curve over a prime field, positive injective interval scales bounded by X with 3X less than p, one square-product collision, selected square roots in a finite Galois extension, lifted affine points, and the Galois-transformed point relations imply a nonidentity cubic CM ratio and an explicit Eisenstein norm that annihilates the chosen point."
+}

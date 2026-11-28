@@ -1,0 +1,20 @@
+{
+  "schema": "vieta-next-build/v1",
+  "source_commit": "9d2106eb2a9f65ffe94020b237301ce910a799e1",
+  "qualifier_sha256": "42d0cfd089122041b85c935f55ed7a4cf548c157c439889073ba574106f41e78",
+  "analysis_path": "native/next_compare.rs",
+  "analysis_sha256": "fc4b55c92195ebf596d0176406b3a8fb5d235e54bfa78b610190597cff82e3a5",
+  "command": [
+    "cargo",
+    "build",
+    "--release",
+    "--locked",
+    "--manifest-path",
+    "research/vieta_coset_rust_20261115/native/Cargo.toml",
+    "--bins"
+  ],
+  "build_log": "evidence/native-build.log",
+  "compiler": "evidence/rustc.txt",
+  "binary_custody": "immutable local ignored cache; no remote archive assertion",
+  "source_custody": "Git checkpoints, no S3"
+}

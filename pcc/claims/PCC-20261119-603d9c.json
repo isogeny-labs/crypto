@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T05:43:17Z",
+ "id": "PCC-20261119-603d9c",
+ "kind": "theorem",
+ "producer": {
+  "commit": "f7c592e225884de304b42dae0f5ea80f3c91f0d3",
+  "model": "Codex",
+  "session": "semaev-cubic-scaling-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "e00c830ad34036b0e0a41c1f95148feaa0482e1c95bedf489e3134a99598d018",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.shortCubicPolynomial_scale_classification"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This checks the coefficient-classification core of Lemma 5.4. It does not prove the preceding square-product-to-scaling-symmetry implication or construct Kummer characters.",
+ "statement": "For an odd-characteristic field, any nonzero nonidentity scaling symmetry of X^3 + A X + B forces B = 0 and r = -1 when A is nonzero, while for A = 0 and B nonzero it forces r^3 = 1."
+}

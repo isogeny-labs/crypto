@@ -1,0 +1,151 @@
+{
+  "created": "2026-11-17T06:11:02Z",
+  "round": 38,
+  "rules": {
+    "exploration_slots": 0,
+    "families_enabled": [
+      "mitm2",
+      "ksum3",
+      "ksum4",
+      "ksum5",
+      "rfmitm2",
+      "mitmbatch",
+      "mitmblocked",
+      "ksum3f",
+      "ksum4f",
+      "ksum5f",
+      "wsum-b4",
+      "wsum-b5",
+      "wsum-b12",
+      "wsum-b20",
+      "wsum-b8",
+      "wsum-b16",
+      "wsum-b24",
+      "wsum-b30",
+      "wsum2-b30",
+      "wsum2-b60",
+      "wsum2-b120",
+      "wsum2-b200",
+      "wsum2-b15",
+      "wsum2-b20",
+      "wsum2-b40",
+      "wsum2-b45",
+      "wsum2-b50",
+      "wsum2-b75",
+      "wsum2-b90",
+      "wsum2-b100",
+      "wsum2-b140",
+      "wsum2-b160",
+      "wsum2g-b20",
+      "wsum2g-b30",
+      "wsum2g-b45",
+      "wsum2g-b60",
+      "wsum2g-b90",
+      "wsum2g-b120",
+      "wsum2g-b10",
+      "wsum2g-b15",
+      "wsum2g-b160",
+      "wsum2g-b180",
+      "wwalkGg-x09-sr",
+      "wwalkG-x06-sr",
+      "wwalkG-x05-sr",
+      "wwalkG-x07-sr",
+      "wwalkG-x08-sr",
+      "wwalkG-x10-sr",
+      "wwalkG-x12-sr",
+      "wwalkG-x15-sr",
+      "wwalkGg-x05-sr",
+      "wwalkGg-x07-sr",
+      "wwalkGg-x08-sr",
+      "wwalkGg-x10-sr",
+      "wwalkGg-x12-sr",
+      "wwalkGg-x15-sr",
+      "tw2l-x10-j8",
+      "tw2l-x10-j16",
+      "tw2l-x15-j16",
+      "tw2l-x20-j8",
+      "tw2l-x20-j16",
+      "tw2l-x20-j32",
+      "tw2l-x30-j16"
+    ],
+    "max_candidates": 6,
+    "n_grid": [
+      0.5,
+      0.7,
+      0.85,
+      1.2,
+      1.4,
+      2.0
+    ]
+  },
+  "schema": "ic_autolab.panel/v1",
+  "sizes": {
+    "20": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x09-sr",
+            "n": 2,
+            "name": "wwalkGg-x09-sr-n2",
+            "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "cross-size transfer: wwalkGg-x09-sr-n2 is the k = 28 incumbent at N / N_a = 0.010"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "wsum2g-b15",
+        "n": 2,
+        "name": "wsum2g-b15-n2",
+        "oracle": "wsum:coef=15,free=1",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "incumbent_s": [
+        2.5745780660849693,
+        2.691211404585748,
+        3.740911451092766
+      ],
+      "tried_before": 124
+    },
+    "24": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "wwalkGg-x09-sr",
+            "n": 2,
+            "name": "wwalkGg-x09-sr-n2",
+            "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "reason": "cross-size transfer: wwalkGg-x09-sr-n2 is the k = 28 incumbent at N / N_a = 0.010"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j32",
+        "n": 2,
+        "name": "tw2l-x20-j32-n2",
+        "oracle": "wwalk:x=2.0,jumps=32,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "incumbent_s": [
+        2.016048700383613,
+        2.188772264813193,
+        3.7432843446794113
+      ],
+      "tried_before": 137
+    }
+  },
+  "track": "generic"
+}

@@ -1,0 +1,35 @@
+name: Rootfinding Round118 source-exact Rust inverse A/B
+on:
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_radical_root.rs'
+      - 'research/amm_digit_perf_20261118/round118_inv_ab.py'
+      - 'research/amm_digit_perf_20261118/round118_small_leading_ab.py'
+      - '.github/workflows/radical-root-round118.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-rust-inverse:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src/cryptanalysis/prime_radical_root.rs
+            research/amm_digit_perf_20261118/round118_inv_ab.py
+            research/amm_digit_perf_20261118/round118_small_leading_ab.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Source-exact Rust correctness and paired root benchmarks
+        run: |
+          set -euo pipefail
+          rustc --version
+          python3 research/amm_digit_perf_20261118/round118_inv_ab.py | tee round118_native_rust.txt
+          python3 research/amm_digit_perf_20261118/round118_small_leading_ab.py | tee -a round118_native_rust.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rootfind-round118-rust-ab
+          path: round118_native_rust.txt
+          if-no-files-found: warn

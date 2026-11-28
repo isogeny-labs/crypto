@@ -1,0 +1,77 @@
+{
+  "schema": "ic.prime-workload/v1",
+  "curve": {
+    "field": {
+      "kind": "prime",
+      "modulus": "0x11"
+    },
+    "a": "0x2",
+    "b": "0x2",
+    "group_order": "0x13",
+    "subgroup_order": "0x13",
+    "cofactor": "0x1",
+    "generator": {
+      "x": "0x5",
+      "y": "0x1"
+    }
+  },
+  "sampling": "sha256-counter/rejection-v1; domain=pkm-large-v1/unit-test; seed=20261123; count=8",
+  "targets": [
+    {
+      "scalar": 7,
+      "point": {
+        "x": "0x0",
+        "y": "0x6"
+      }
+    },
+    {
+      "scalar": 13,
+      "point": {
+        "x": "0x10",
+        "y": "0x4"
+      }
+    },
+    {
+      "scalar": 6,
+      "point": {
+        "x": "0x10",
+        "y": "0xd"
+      }
+    },
+    {
+      "scalar": 16,
+      "point": {
+        "x": "0xa",
+        "y": "0xb"
+      }
+    },
+    {
+      "scalar": 5,
+      "point": {
+        "x": "0x9",
+        "y": "0x10"
+      }
+    },
+    {
+      "scalar": 8,
+      "point": {
+        "x": "0xd",
+        "y": "0x7"
+      }
+    },
+    {
+      "scalar": 1,
+      "point": {
+        "x": "0x5",
+        "y": "0x1"
+      }
+    },
+    {
+      "scalar": 10,
+      "point": {
+        "x": "0x7",
+        "y": "0xb"
+      }
+    }
+  ]
+}

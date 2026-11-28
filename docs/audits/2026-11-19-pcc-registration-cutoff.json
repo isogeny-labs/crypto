@@ -1,0 +1,43 @@
+{
+  "schema": "engineering.pcc-registration-cutoff/v1",
+  "at": "2026-11-20T00:13:27.191387+00:00",
+  "baseline_source_head": "2840fd656d69f2b20ca0822944d5f6823405e436",
+  "baseline_source_sha256": "6425961f9cfb565920593eabefaac2802109bd826f401b130cc9d5507291b60f",
+  "candidate_sources": {
+    "tools/pcc/pcc.py": "79f69ea92d5ce4225b295f44e5b8e7734259af2a3cc95effa4f9f929cfb54c69",
+    "tools/pcc/test_pcc.py": "ee808a18c6d47e41e9199d4866e2f2f4e4695d01b9521d6454b79faec3d079ce"
+  },
+  "defect": "Direct verification ignored the first ledger registration date when applying the existing claim_type cutoff. Backdated payload dates could therefore yield passing direct and signed verdicts while standing was failed.",
+  "baseline_regression": {
+    "tests": 5,
+    "failures": 3,
+    "errors": 0,
+    "positive_controls_passed": 2
+  },
+  "candidate_full_suite": {
+    "tests": 40,
+    "failures": 0,
+    "errors": 0,
+    "exit_code": 0
+  },
+  "candidate_canaries": {
+    "classes": 70,
+    "all_expected_results": true,
+    "exit_code": 0
+  },
+  "current_metadata_comparison": {
+    "claims": 3584,
+    "rejected": 151,
+    "same_rejected_payload_set": true,
+    "same_payload_hashes": true,
+    "full_proof_verification": false
+  },
+  "changes_frozen_artifacts": false,
+  "changes_gate_policy": false,
+  "performance_claim": null,
+  "remaining_requirements": [
+    "Final-source hosted PCC, parity and required CI checks",
+    "Existing 151 frozen schema rejections remain failed and ineligible; strict verify-all acceptance policy is unchanged",
+    "Owner-first consumer synchronization and gated merge"
+  ]
+}

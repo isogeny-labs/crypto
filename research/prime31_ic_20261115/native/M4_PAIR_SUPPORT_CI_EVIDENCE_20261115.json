@@ -1,0 +1,66 @@
+{
+  "date_utc": "2026-11-15",
+  "standing": "[pcc:unverified]",
+  "source_commit": "4ecd0327b43c7e036fb422b9f9a523e74cd0d5b6",
+  "workflow_commit": "4ecd0327b43c7e036fb422b9f9a523e74cd0d5b6",
+  "workflow_run_id": 43746776862,
+  "job_id": 132911707466,
+  "workflow_url": "https://github.com/isogeny-labs/crypto/actions/runs/43746776862",
+  "workflow_conclusion": "success",
+  "narrow_example_tests": {
+    "passed": 2,
+    "failed": 0,
+    "includes": "m4_pair_support_resultant_on_same_prime31_curve"
+  },
+  "reused_library_tests": {
+    "passed": 40,
+    "failed": 0
+  },
+  "source_bounded_result": {
+    "candidate_factorization_performed": true,
+    "complete_ECDLP_recovery": false,
+    "curve": "ordinary full-prime-order F_(2^31-1)",
+    "known_group_sums_in_polynomial_stage": false,
+    "known_ordinates_in_polynomial_stage": false,
+    "pair_support_B31_build_ns": 1543934,
+    "pair_support_B31_degree": 961,
+    "pair_support_B31_squarefree": true,
+    "pair_support_B4_degree": 16,
+    "positive_eliminant_degree": 6,
+    "positive_eliminant_ns": 56254,
+    "positive_exceptional": false,
+    "positive_four_index_tuples": 6,
+    "positive_ordered_uv": 6,
+    "positive_signed_rows": 1,
+    "positive_target": [
+      1418256770,
+      748935662
+    ],
+    "positive_validation_group_additions": 384,
+    "public_17G_target": [
+      269688432,
+      1935681762
+    ],
+    "public_eliminant_degree": 0,
+    "public_eliminant_ns": 56403,
+    "public_exceptional": false,
+    "public_four_index_tuples": 0,
+    "public_ordered_uv": 0,
+    "public_signed_rows": 0,
+    "signed_relation_extraction_performed": true,
+    "standing": "[pcc:unverified]",
+    "study": "m4 finite pair-support resultant; algebraic membership only"
+  },
+  "independent_producer_local_python": {
+    "B4_K_degree": 16,
+    "B4_distinct_signed_pair_x": 16,
+    "B4_K_squarefree": true,
+    "B4_positive_D_degree": 6,
+    "B4_positive_D_linear_roots": 6,
+    "B4_signed_unique_four_point_rows": 1,
+    "B4_public_17G_D_degree": 0,
+    "B31_K_degree": 961,
+    "B31_K_squarefree": true
+  },
+  "measurement_warning": "Single-host single-run development stage; B31 support build and B4 eliminant are NOT full m4 relation-search or complete cold ECDLP costs; no independent scientific PCC, no EC-rho comparison. Polynomial K construction scales quadratically in degree; factoring and signed replay charges are excluded from eliminant-only ns."
+}

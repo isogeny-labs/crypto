@@ -131,15 +131,9 @@ impl Rng {
 // ---------------------------------------------------------------- modular helpers
 
 fn modinv(a: u64, r: u64) -> u64 {
-    let (mut t, mut nt) = (0i64, 1i64);
-    let (mut x, mut nx) = (r as i64, a as i64);
-    while nx != 0 {
-        let q = x / nx;
-        (t, nt) = (nt, t - q * nt);
-        (x, nx) = (nx, x - q * nx);
-    }
-    debug_assert_eq!(x, 1);
-    t.rem_euclid(r as i64) as u64
+    let inv = crypto_lib::gcd::int::inv_mod_u64(a, r);
+    debug_assert!(inv.is_some(), "not invertible");
+    inv.unwrap_or(0)
 }
 
 fn is_prime(n: u64) -> bool {

@@ -1,0 +1,116 @@
+#set page(paper:"a4",margin:15mm)
+#set text(font:"DejaVu Sans",size:9.3pt)
+#set par(leading:0.5em)
+#set heading(numbering:none)
+= Prime-field T20 degree-four elliptic norms
+2026-11-12 · full43/85436f · written proofbfa422 · unsigned
+
+The actual M=N\_C20 R20† is now evaluated on every12317 rational balanced
+T20 input using F101 arithmetic and no input-support roots. Both actual
+adjoint compositions are[4],with public9238 recovery,group/Frobenius and
+all109+113 scalar images/exact orders checked. [pcc:unverified]
+
+#image("chain.svg",width:92%)
+
+For raw T20 Y²=f(z),the two covers have X=n/q²,Y\_E=Y·m/q³:
+
+#table(columns:(1fr,3fr),inset:5pt,
+ [E2(59,27)],[q=z²+38; n=10z⁴+54z²+52z+53; m=2z³+55z²+47z+44; infinity+=(10,100).],
+ [F0(44,21)],[q=z²+46; n=71z⁴+96z³+92z²+49; m=5z³+53z²+17z+87; infinity+=(71,48).])
+
+Y=50·y\_monic fixes the raw leading76 by a square coordinate isomorphism.
+The two curve covers have global degree4;the induced Jacobian norm pair
+has degree16. Constructor setup still uses and must charge the existing
+F101¹² factory. No timing/cost result is claimed. [pcc:unverified]
+
+#pagebreak()
+= Complete input domain and controls
+#image("counts.svg",width:100%)
+
+Full43 retains every old41 test,reference/legacy guards,fmt/strictClippy,
+all628 input hashes and byte-identical geometry6141/kernel24475 JSONs.
+Static1bbfec,geometry58b615 and whole90601c are separately retained.
+Full43 has original start/finish/exit0/afterguards;its whole18-file tree
+is one57652-byte standardtar.xz with member/raw/archive hashes and exact
+roundtrip. Source freeze ended only after all receipts. [pcc:unverified]
+
+Geometry controls include120 rational point classes,six branches,eight
+actual pole points,both signed infinities,128 actual repeated Mumford
+doubles,Frobenius/coherent-translation invariance and six malformed
+mutants. Actual16 kernel classes/all256 sums/all killed4/exactly4 killed2
+check the(4,4) type;degree16 alone does not imply that type.
+[pcc:unverified]
+
+The input adapter checks canonical F101/model tags,monic degree≤2,
+ordinate/infinity counts and the curve relation. Every actual class
+converts and roundtrips through an explicit rho50 Chart. Runtime evaluates
+the two coordinates in F101[z]/u with existing invmod and symmetric
+elliptic sums,including coincident/opposite/repeated jets. It removes only
+actual completed pole support,with multiplicity,and retains original
+degree in(2n+degree−2)·image(infinity+). [pcc:unverified]
+
+The runtime type contains Zp,Vec(u64),Curve(u64),Pt(u64);it accepts no
+extension context,root cache,index or logarithm label. Existing field/
+poly/elliptic/Cantor engines are reused. Extension routines belong to
+setup/reference geometry controls;no arbitrary F101¹² Jacobian input
+domain is inferred. [pcc:unverified]
+
+The wrong global adjoint sign differs on12316 classes and agrees only at
+identity. Each cover has238 applicable missing-infinity-correction
+mismatches and two actual pole inputs. Coherent cover translation is a
+positive norm-invariance control,not a mislabeled failed map.
+[pcc:unverified]
+
+#pagebreak()
+= Exact proofs, comparison and evidence boundary
+Fourteen faithful Lean statements include both actual characteristic101
+curve equations,explicit Bezout witnesses for numerator/q coprimality,
+quadratic/linear/translation algebra,conditional norm4/recovery and
+constants. Final full40module gate52bbc7 audits238 compiled/212 written/
+0trusted/all44 hashes unchanged. Its entire171-file tree is one39344-byte
+standardtar.xz with complete member/raw/archive hashes/exact roundtrip.
+[pcc:unverified]
+
+Explicit coprimality and degree4 of n/q² give degree4 of the curve covers
+by the function-field tower. The actual proper reverse fibre,derived
+adjoint sign and two-torsion translation descend the functions. Constants
+cancel on degree-zero divisors,so these covers induce N\_C20 R20†.
+Picard/polarization/descent/projective completion and elliptic-jet/group
+bridges remain written/native;the Lean statements do not formalize the
+complete Jacobian construction. [pcc:unverified]
+
+Algebra02/9214e7 passes24 tests(old23 retained),eleven outputs,all ten
+old payloads byte-identical,24 guards and the new mutation rejection.
+IDC1h6de045a64b58c1c8 checks a universal linear-image ordinate identity
+over fixed2⁶¹−1;the characteristic101 equations have separate symbolic
+Lean proofs. Candidate01 and full40/236 gate4a3e09 stay immutable after
+proof strengthening. Identity ID is stable;the ProofRef payload changes.
+[pcc:unverified]
+
+All12317 actual C0 classes satisfy M R20 Phi49=
+[2]diag(alpha49,id)N\_C0. Public normalization2 on the odd rational
+groups recovers the existing direct norm/isogeny bridge. It is not a
+global inverse isogeny. No additional solving advantage follows from this
+comparison. Complete setup/conversion/transfer/solve/recovery/verification
+costs and matched external references remain unmeasured. [pcc:unverified]
+
+The first proof-binding batch5176f3 returned not\_covered2 because Lean
+was absent from that exec's PATH,despite the standalone10-theorem gate
+passing. The partial c20986 claim/source/verdict/error are retained;
+correct-PATH12 bindings and the two new degree bindings pass separately.
+No failed or partial batch is promoted;no frozen report is overwritten.
+[pcc:unverified]
+
+Local Linuxx86\_64/Rust1.99.1/Lean4.35.0 correctness/development,no benchmark
+isolation. Own new-root CI is next;old consumer8072 all4CIb3c8f1 is settled
+at its own41 scope. Source-linked REPORT.md lists every custody,exact
+statement binding,old/new certificate and editable figure/data/renderer.
+Canonical IC graphs/catalog rows stay unchanged:no measured cost gain.
+[pcc:unverified]
+
+Sources:BD0902.3480§2 Lemma2.6/§7 Lemma7.5/§8;Galbraith8.3.8/8.3.10;
+720a59/b24be8/DirectNorms/ClosedFibres/native engines;external CT50 primary
+dd4077d1,its scripts not adopted. Actual KB127 receipts retained,no novelty
+inference. Protocolc05a75 preceded code;next distinct consumer pin/replay
+and independent F101 checks after commit. Scientific standing unsigned.
+[pcc:unverified]

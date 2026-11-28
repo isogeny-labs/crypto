@@ -194,13 +194,8 @@ fn binary_curve_identity(
     })
 }
 
-fn gcd_big(mut left: BigUint, mut right: BigUint) -> BigUint {
-    while !right.is_zero() {
-        let remainder = &left % &right;
-        left = right;
-        right = remainder;
-    }
-    left
+fn gcd_big(left: BigUint, right: BigUint) -> BigUint {
+    crate::gcd::int::gcd_big(&left, &right)
 }
 
 fn mul_mod_u64(left: u64, right: u64, modulus: u64) -> u64 {
@@ -350,13 +345,10 @@ fn gf2_square_mod(value: &BigUint, modulus: &BigUint) -> BigUint {
     gf2_rem(square, modulus)
 }
 
-fn gf2_gcd(mut left: BigUint, mut right: BigUint) -> BigUint {
-    while !right.is_zero() {
-        let remainder = gf2_rem(left, &right);
-        left = right;
-        right = remainder;
-    }
-    left
+fn gf2_gcd(left: BigUint, right: BigUint) -> BigUint {
+    // GF(2)[x] gcd by the shared bit-packed gcd (BigUint bit i = coeff of x^i).
+    let g = crate::gcd::gf2::gcd(&left.to_u64_digits(), &right.to_u64_digits());
+    BigUint::from_bytes_le(&g.iter().flat_map(|w| w.to_le_bytes()).collect::<Vec<u8>>())
 }
 
 fn certify_field_polynomial() -> bool {
@@ -613,17 +605,8 @@ fn bsgs_prime_order(
 }
 
 fn inverse_mod_u64(value: u64, modulus: u64) -> Result<u64, String> {
-    let (mut old_r, mut r) = (value as i128, modulus as i128);
-    let (mut old_s, mut s) = (1i128, 0i128);
-    while r != 0 {
-        let quotient = old_r / r;
-        (old_r, r) = (r, old_r - quotient * r);
-        (old_s, s) = (s, old_s - quotient * s);
-    }
-    if old_r != 1 {
-        return Err("CRT modulus is not invertible".into());
-    }
-    Ok(old_s.rem_euclid(modulus as i128) as u64)
+    crate::gcd::int::inv_mod_u64(value, modulus)
+        .ok_or_else(|| "CRT modulus is not invertible".into())
 }
 
 fn crt(residues: &[(u64, u64)]) -> Result<(u128, u128), String> {

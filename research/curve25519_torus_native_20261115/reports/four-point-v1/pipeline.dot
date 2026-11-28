@@ -1,0 +1,15 @@
+digraph pipeline {
+  graph [rankdir=TB,bgcolor="white",fontname="Helvetica",nodesep=0.18,ranksep=0.3];
+  node [shape=box,style="rounded,filled",fillcolor="#edf5ff",fontname="Helvetica",fontsize=11,margin="0.13,0.10"];
+  edge [fontname="Helvetica",fontsize=9,color="#526277"];
+  base [label="Actual Curve25519 field\n4 torus cosets; M = 12,965,132,697,890,207\nRaw indexed coordinates L = 4M"];
+  tree [label="Four leaves + S3 summation tree\n454 variables; 455 quadratic constraints\nKnown-witness construction checked; solver not run"];
+  raw [label="Eight raw target sections\nEach clears by [8] to the same prime target\nMembership, rational lifts and signs require checks"];
+  geom [label="PROPOSED average collision bound\nRandom admissible multiplier; E[C] < 25 W0\nArithmetic checked; geometric proof/review open",fillcolor="#fff4d7",color="#a36d00",style="rounded,filled,dashed"];
+  cost [label="OPEN: decomposition cost D = soft-O(B^gamma)\nNeed gamma < 1; yield/rank/phase bounds also open\nNo measured gamma or changed exponent",fillcolor="#fff4d7",color="#a36d00",style="rounded,filled,dashed"];
+  base -> tree [label="public input"];
+  tree -> raw [label="candidate systems"];
+  base -> geom [label="separate mathematical obligation",style=dashed];
+  raw -> cost [label="checked recovered roots still needed"];
+  geom -> cost [label="conditional distribution bridge",style=dashed];
+}

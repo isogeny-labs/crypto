@@ -1,0 +1,76 @@
+{
+  "schema": "source-review-findings/v1",
+  "execution_performed": false,
+  "snapshot": [
+    {
+      "path": "durable-worker.py",
+      "sha256": "b3de879c3d030edc33441300cbdfb5558b17fcc423bd894feadf8968c0928e95",
+      "bytes": 11544
+    },
+    {
+      "path": "durable-launcher.py",
+      "sha256": "83d75479e2903b2795e037293ec8b685b383187feda62772c81526b4895a9f92",
+      "bytes": 12545
+    },
+    {
+      "path": "qualify-permit.py",
+      "sha256": "93a046e734f0ddf27eda73a4762690f9accce4266d6a5161c0ed8804e73ca7e9",
+      "bytes": 6378
+    },
+    {
+      "path": "PLAN.md",
+      "sha256": "400b22ccc6f4eecacb9cf026df5dff6e3acdd45a5448b9be5c34d7d8b7241aca",
+      "bytes": 4081
+    },
+    {
+      "path": "recipe-proposal.json",
+      "sha256": "de62ff93aa27d24f52cf6631c3cefe7c1625ff7bd165f44ff348e7d8b1f28337",
+      "bytes": 2837
+    },
+    {
+      "path": "admission-draft.json",
+      "sha256": "7f4b64b260900bffe730f4a30c388f4b9ee34dae6be6da11557bbff0e9f81610",
+      "bytes": 3752
+    }
+  ],
+  "findings": [
+    {
+      "id": "R1",
+      "finding": "Active matching InvocationID with absent current ControlGroup can mint permit because current cgroup check is conditional.",
+      "requested": "Require nonempty current cgroup before publication; add missing and changed cgroup controls."
+    },
+    {
+      "id": "R2",
+      "finding": "Fixtures do not advance wall time across read, leaving the explicit final-expiry joint untested.",
+      "requested": "Add first/second read crosses expiry fixtures; retain final wall check."
+    },
+    {
+      "id": "R3",
+      "finding": "Copied recipe proposal carries old T1970 owner and old5340/37860 budget despite v4 admission draft correctly null.",
+      "requested": "Mark copied metadata historical or replace with pending v4 fields."
+    }
+  ],
+  "static_checks": {
+    "unchanged_v3_files": [
+      "snapshot-cache.py",
+      "durable_io.py",
+      "candidate-pencil.rs",
+      "candidate.patch",
+      "fixture.json",
+      "source-bindings.json"
+    ],
+    "unchanged_four_controls": true,
+    "worker_changed_functions": [
+      "check_permit"
+    ],
+    "worker_added_functions": [
+      "read_permit_snapshot",
+      "retain_permit_anomaly"
+    ],
+    "launcher_changed_functions": [
+      "heartbeat",
+      "show",
+      "permit"
+    ]
+  }
+}

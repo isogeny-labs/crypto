@@ -1,0 +1,13 @@
+[package]
+name = "nagao_bootstrap_replay"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+# Same rand line as the frozen library's Cargo.lock at fcda1e22 (rand 0.8.8,
+# rand_chacha 0.3.1, rand_core 0.6.4); used only to replay the producer's
+# preregistered bootstrap draw sequence, not for any independent statistic.
+[dependencies]
+rand = "=0.8.8"
+
+[workspace]

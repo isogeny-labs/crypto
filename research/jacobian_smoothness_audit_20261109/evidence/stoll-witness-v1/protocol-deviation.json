@@ -1,0 +1,14 @@
+{
+  "schema": "audit.protocol-deviation/v1",
+  "discovered_at": "2026-11-10T00:15:00Z",
+  "protocol_sha256": "cd194533e8d3d6766e15cbb0de25ecbb8a9f5f505d02dcfa65f86aaa5060de46",
+  "frozen_protocol_unchanged": true,
+  "affected_fields": ["arms[0].parameters.polynomial", "arms[1].parameters.polynomial", "arms[0].parameters.mode", "arms[1].parameters.mode"],
+  "frozen_parameter_values": {"polynomial": "X^5-X", "mode": "fixture"},
+  "actual_input": {"polynomial": "X^5+1", "p": 3, "model": 1, "arm_modes": ["cycle", "full"]},
+  "source_evidence": "Pinned src/main.rs150-151 selects model1 and asserts p3, f=[1,0,0,0,0,1],10pairs,8smooth; immutable protocol question/instrument flags/raw hash/analysis all name the same Stoll model.",
+  "classification": "Frozen protocol contains contradictory parameter metadata. Native rows are not claimed fully protocol-conformant; retain exact candidate checks at actual input scope only.",
+  "formal_effect": "None on mathematical statement: Lean independently fixes curvePolynomial=X^5+1 and checks every equation. No kernel acceptance follows from native run metadata.",
+  "correction_policy": "Do not edit frozen protocol/source/data. Any future new native experiment needs a new protocol version before its calls.",
+  "scientific_standing": "unsigned/unverified"
+}

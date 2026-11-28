@@ -9,11 +9,40 @@ import { catalogSnapshotBytes, legacyFormulaSnapshotBytes } from "./catalog_snap
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(SCRIPT_DIR, "..");
 const OUTPUT_PATH = "docs/curves/cover-transfer-assessments.json";
-const ASSESSMENT_DATE = "2026-10-24";
+const ASSESSMENT_DATE = "2026-11-18";
 const CATALOG_COMMIT = "728304718cb0ab6df70da620a908a5f76f175293";
 const LEGACY_FORMULA_COMMIT = "0c82a7dd1d1e6e3c847b49f8446d29d405beb0c5";
 const MAP_HASH_DOMAIN = "cover-transfer-assessments/v2/map_base";
 const SUBGROUP_HASH_DOMAIN = "cover-transfer-assessments/v2/subgroup_base";
+const U64_EXCLUSIVE_BOUND = 1n << 64n;
+const PSI13_EXCLUSIVE_BOUND = 3317044064679887385961981n;
+const DETERMINISTIC_U64_BASES = [
+  2n,
+  325n,
+  9375n,
+  28178n,
+  450775n,
+  9780504n,
+  1795265022n,
+];
+const PRIME_BASES_THROUGH_53 = [
+  2n,
+  3n,
+  5n,
+  7n,
+  11n,
+  13n,
+  17n,
+  19n,
+  23n,
+  29n,
+  31n,
+  37n,
+  41n,
+  43n,
+  47n,
+  53n,
+];
 
 function sha256Bytes(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -54,6 +83,81 @@ function compareText(left, right) {
   if (left < right) return -1;
   if (left > right) return 1;
   return 0;
+}
+
+function modularPower(base, exponent, modulus) {
+  let result = 1n;
+  let factor = base % modulus;
+  let power = exponent;
+  while (power > 0n) {
+    if ((power & 1n) === 1n) result = (result * factor) % modulus;
+    factor = (factor * factor) % modulus;
+    power >>= 1n;
+  }
+  return result;
+}
+
+function passesStrongMillerRabin(n, base) {
+  const reducedBase = base % n;
+  if (reducedBase === 0n) return true;
+  let oddPart = n - 1n;
+  let twos = 0;
+  while ((oddPart & 1n) === 0n) {
+    oddPart >>= 1n;
+    twos += 1;
+  }
+  let residue = modularPower(reducedBase, oddPart, n);
+  if (residue === 1n || residue === n - 1n) return true;
+  for (let index = 1; index < twos; index += 1) {
+    residue = (residue * residue) % n;
+    if (residue === n - 1n) return true;
+  }
+  return false;
+}
+
+// Keep the generated ledger's catalog partition byte-for-byte aligned with
+// src/prime_hyperelliptic/primality.rs. Passing the wide screen proves
+// primality only below the strict Sorenson--Webster psi_13 bound.
+function primeProofStatus(decimal) {
+  const n = BigInt(decimal);
+  if (n < 2n) return "composite";
+  if (n === 2n || n === 3n) return "proved_u64";
+  if ((n & 1n) === 0n) return "composite";
+  if (n < U64_EXCLUSIVE_BOUND) {
+    return DETERMINISTIC_U64_BASES.every((base) =>
+      passesStrongMillerRabin(n, base)
+    )
+      ? "proved_u64"
+      : "composite";
+  }
+  for (const base of PRIME_BASES_THROUGH_53) {
+    if (n === base) return "proved_u64";
+    if (n % base === 0n) return "composite";
+  }
+  if (!PRIME_BASES_THROUGH_53.every((base) => passesStrongMillerRabin(n, base))) {
+    return "composite";
+  }
+  return n < PSI13_EXCLUSIVE_BOUND
+    ? "proved_psi13"
+    : "unsupported_without_primality_certificate";
+}
+
+function assertPrimeProofGateControls() {
+  assert(primeProofStatus("59") === "proved_u64", "u64 prime control");
+  assert(primeProofStatus("15") === "composite", "u64 composite control");
+  assert(
+    primeProofStatus("5902977611310272157103") === "proved_psi13",
+    "psi13 pilot-prime control",
+  );
+  assert(
+    primeProofStatus("318665857834031151167461") === "composite",
+    "psi12 pseudoprime must be rejected by the psi13 bases",
+  );
+  assert(
+    primeProofStatus("3317044064679887385962123") ===
+      "unsupported_without_primality_certificate",
+    "above-psi13 probable-prime control",
+  );
 }
 
 function sortedUnique(values, label) {
@@ -136,13 +240,25 @@ const obligations = [
   {
     id: "independent_map_oracle",
     description:
-      "Replay pullback additivity and composition with an independent CAS or separately implemented divisor-class oracle.",
+      "Extend the separately implemented F2 20-class pilot to the full fixed-GF(8) 486-class source law and then to representative catalog fields; the F2 pilot alone is not a catalog-wide map oracle.",
     status: "unknown",
   },
   {
     id: "prime_balanced_jacobian",
     description:
-      "Implement balanced two-infinity odd-characteristic Jacobian arithmetic and induced maps for the degree-two family.",
+      "Extend the implemented direct-prime balanced two-infinity arithmetic and induced maps to extension fields and independently validate the source law and both composition identities.",
+    status: "unknown",
+  },
+  {
+    id: "prime_primality_certificates",
+    description:
+      "Add verified primality-certificate ingestion for direct prime moduli at or above the strict psi_13 bound; passing a fixed-base screen outside that bound is not proof.",
+    status: "unknown",
+  },
+  {
+    id: "normalized_prime_transfer_backend",
+    description:
+      "Implement and verify induced maps through the catalog Montgomery and Edwards normalizations, including affine exceptional points and projective behavior; the current CLI fails closed.",
     status: "unknown",
   },
   {
@@ -259,8 +375,8 @@ const resultTemplates = {
     scope:
       "Independent pullback additivity and composition replay for every exact catalog member.",
     rationale:
-      "The current checks are native and implementation-internal; no independent CAS or separately implemented divisor-map oracle covers the full catalog.",
-    evidence_refs: [],
+      "A separately implemented F2 oracle exhausts 20 source classes, 400 sums, 8,000 associativity triples, both induced maps, and both composition identities for one prime-field specialization of the binary formula. It is deliberately partial: it is not the fixed-GF(8) 486-class oracle and does not cover every exact catalog member.",
+    evidence_refs: ["tests/binary_cover_transfer_f2_source_oracle.rs"],
     obligation_id: "independent_map_oracle",
   },
   "map.binary-arbitrary-pushforward.supported": {
@@ -268,7 +384,7 @@ const resultTemplates = {
     scope:
       "Arbitrary reduced Mumford classes of degree at most three for every catalog binary cubic cover, including irreducible degree-two and degree-three support.",
     rationale:
-      "The public entry point factors the support over the base field, evaluates nonsplit points in the corresponding residue field, traces Frobenius orbits to the elliptic target, and cross-checks all 486 classes of the independent fixed-GF(8) presentation.",
+      "The public entry point factors the support over the base field, evaluates nonsplit points in the corresponding residue field, and traces Frobenius orbits to the elliptic target. The fixed-GF(8) replay cross-checks map values on all 486 classes but still uses production source addition; the separate F2 pilot supplies a genuinely independent source law only for its 20-class specialization.",
     evidence_refs: [
       "src/binary_ecc/cover_transfer.rs#pushforward_arbitrary_jacobian_class",
       "src/binary_ecc/cover_transfer.rs#image_endomorphism_certificate",
@@ -318,24 +434,106 @@ const resultTemplates = {
       "docs/curves/COVERS.md",
     ],
   },
-  "map.prime-jacobian.refuted": {
-    status: "refuted",
+  "map.prime-balanced.supported": {
+    status: "supported",
     scope:
-      "Claim that the current odd-prime one-infinity Jacobian implementation accepts the even sextic sources in the quadratic-pullback catalog.",
+      "Direct short-Weierstrass prime-field quadratic covers whose modulus is proved either by the deterministic u64 test or by the strict p < 3317044064679887385961981 psi_13 theorem gate.",
     rationale:
-      "The implementation requires monic degree 2g+1 and one rational infinity; every catalog source in this family has degree 2g+2 and two rational infinities.",
+      "The separate split-sextic backend supplies canonical balanced (u,v,n_plus) representatives with validation, reduction, equality, negation, addition, and scalar multiplication for monic squarefree genus-two sextics with two labelled rational infinities.",
     evidence_refs: [
-      "src/prime_hyperelliptic/curve.rs",
-      "docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md",
+      "src/prime_hyperelliptic/balanced.rs",
+      "src/prime_hyperelliptic/primality.rs",
     ],
   },
-  "map.prime-transfer.unknown": {
-    status: "unknown",
+  "map.prime-pullback.supported": {
+    status: "supported",
     scope:
-      "Pullback, pushforward, and phi_*phi^*=[2] on divisor classes for the two-infinity odd-characteristic source family.",
+      "Rational point classes on supported direct short-Weierstrass prime-field targets, including identity and ramified fibers.",
     rationale:
-      "No compatible balanced Jacobian representation or induced-map implementation is present; cover geometry alone does not certify these operations.",
-    evidence_refs: [],
+      "The checked direct-prime cover API constructs and validates the balanced pullback class for pi(u,v)=(u^2+c,v).",
+    evidence_refs: ["src/prime_hyperelliptic/cover_transfer.rs#pullback_point_class"],
+  },
+  "map.prime-pushforward.supported": {
+    status: "supported",
+    scope:
+      "Every canonical balanced genus-two class accepted by the supported direct-prime backend.",
+    rationale:
+      "The checked API evaluates the norm of the balanced support polynomial and returns a validated point on the direct short-Weierstrass target.",
+    evidence_refs: [
+      "src/prime_hyperelliptic/cover_transfer.rs#pushforward_arbitrary_balanced_class",
+    ],
+  },
+  "map.prime-composition.supported": {
+    status: "supported",
+    scope:
+      "Validated inputs in the supported direct-prime backend: pi_*pi^*=[2] on target point classes and pi^*pi_*=1+deck_* on canonical balanced source classes.",
+    rationale:
+      "The implementation exposes checked certificates for both exact functorial identities, including infinity, ramification, shared support, and non-deck-invariant controls.",
+    evidence_refs: [
+      "src/prime_hyperelliptic/cover_transfer.rs#pull_push_composition_certificate",
+      "src/prime_hyperelliptic/cover_transfer.rs#push_pull_composition_certificate",
+    ],
+  },
+  "map.prime-proof-backend.refuted": {
+    status: "refuted",
+    scope:
+      "Claim that the balanced direct-prime backend accepts a probable-prime modulus at or above the exclusive psi_13 bound without a separate primality certificate.",
+    rationale:
+      "The shared proof gate returns unsupported_without_primality_certificate outside its theorem range, even when all configured strong Miller--Rabin bases pass. A witness still establishes compositeness.",
+    evidence_refs: [
+      "src/prime_hyperelliptic/primality.rs",
+      "src/prime_hyperelliptic/balanced.rs",
+    ],
+    obligation_id: "prime_primality_certificates",
+  },
+  "map.prime-proof-transfer.refuted": {
+    status: "refuted",
+    scope:
+      "Claim that induced maps execute for a direct prime-field row whose modulus lacks a deterministic u64 or strict psi_13 proof.",
+    rationale:
+      "Construction geometry remains recorded, but the runtime constructor and transfer command fail closed with unsupported_without_primality_certificate.",
+    evidence_refs: [
+      "src/prime_hyperelliptic/primality.rs",
+      "src/prime_hyperelliptic/cover_transfer.rs",
+      "src/bin/hyperelliptic_cover.rs",
+    ],
+    obligation_id: "prime_primality_certificates",
+  },
+  "map.prime-normalized-transfer.refuted": {
+    status: "refuted",
+    scope:
+      "Claim that short-Weierstrass induced-map coordinates are accepted as coordinates on the original catalog Montgomery or Edwards target.",
+    rationale:
+      "The standalone CLI and sweeper explicitly return unsupported_normalized_target_transfer_backend. The algebraic degree-one normalization certificate proves geometry but does not supply an all-point induced-map adapter or exceptional-point handling.",
+    evidence_refs: [
+      "src/bin/hyperelliptic_cover.rs",
+      "src/bin/curve_transfer_sweep.rs",
+      "src/bin/curve_cover_check/models.rs",
+    ],
+    obligation_id: "normalized_prime_transfer_backend",
+  },
+  "map.prime-extension-balanced.refuted": {
+    status: "refuted",
+    scope:
+      "Claim that the current balanced backend accepts the catalog's odd-characteristic polynomial-basis extension fields.",
+    rationale:
+      "The balanced representation and arithmetic currently operate only over checked prime fields; extension-field cover geometry does not instantiate that backend.",
+    evidence_refs: [
+      "src/prime_hyperelliptic/balanced.rs",
+      "src/bin/hyperelliptic_cover.rs",
+    ],
+    obligation_id: "prime_balanced_jacobian",
+  },
+  "map.prime-extension-transfer.refuted": {
+    status: "refuted",
+    scope:
+      "Claim that the current induced-map implementation accepts the catalog's odd-characteristic polynomial-basis extension fields.",
+    rationale:
+      "The checked induced maps use BigUint prime-field arithmetic and the standalone command reports the extension-field transfer backend as unimplemented.",
+    evidence_refs: [
+      "src/prime_hyperelliptic/cover_transfer.rs",
+      "src/bin/hyperelliptic_cover.rs",
+    ],
     obligation_id: "prime_balanced_jacobian",
   },
   "map.same-field.not-applicable": {
@@ -378,11 +576,11 @@ const resultTemplates = {
   "map.prime-pipeline.refuted": {
     status: "refuted",
     scope:
-      "Claim that the current implementation provides arithmetic and induced maps for the odd-characteristic two-infinity source family.",
+      "Claim that the implemented direct-prime balanced arithmetic and induced maps constitute an end-to-end logarithm solver or measured transfer advantage.",
     rationale:
-      "The sources are outside the one-infinity prime Jacobian implementation and no balanced substitute or induced maps are present.",
+      "The supported direct-prime subset now has checked balanced arithmetic and both induced maps, but no relation collector, verified linear algebra, target decomposition, arbitrary-result recovery run, or matched total-runtime comparison consumes those maps.",
     evidence_refs: [
-      "src/prime_hyperelliptic/curve.rs",
+      "src/prime_hyperelliptic/cover_transfer.rs",
       "docs/curves/HYPERELLIPTIC_INFRASTRUCTURE.md",
     ],
   },
@@ -524,9 +722,12 @@ const resultTemplates = {
     scope:
       "Pullback validity, image order, kernel intersection, composition, and degree-inverse recovery for linked degree-two maps.",
     rationale:
-      "Coprimality of 2 and the catalog order value would be useful after a compatible pullback/composition certificate, but neither induced map is implemented for the two-infinity sources.",
-    evidence_refs: [],
-    obligation_id: "prime_balanced_jacobian",
+      "Compatible induced maps now exist for the direct prime rows inside the deterministic u64 or strict psi_13 proof domain. This base subgroup profile also contains proof-unsupported, normalized-target, and extension-field rows, however, and no catalog-wide native replay proves generator membership, annihilation, exact order, or the composition identity on all 837 linked triples.",
+    evidence_refs: [
+      "src/prime_hyperelliptic/cover_transfer.rs",
+      "src/prime_hyperelliptic/primality.rs",
+    ],
+    obligation_id: "catalog_generator_validation",
   },
   "subgroup.arbitrary-recovery.unknown": {
     status: "unknown",
@@ -610,32 +811,86 @@ const profiles = {
     boundary:
       "Supported as a same-field genus-three cover with checked one-infinity arithmetic, arbitrary-class norm, and image/Prym projector. Not an end-to-end discrete-log solver.",
   },
-  "map.odd-prime-quadratic.direct": {
+  "map.odd-prime-quadratic.direct.proved-u64": {
     kind: "map_base",
-    predicate_id: "odd_prime_quadratic_direct_same_field",
+    predicate_id: "odd_prime_quadratic_direct_proved_u64",
     hypotheses: [
       "certificate.construction=prime_quadratic_pullback_v1",
       "declared field has no extension modulus",
       "certificate.target_model_map is absent",
-      "base-field primality remains the catalog's stated input assumption",
+      "p < 2^64 and the complete deterministic u64 witness set proves p prime",
     ],
     claims: {
       cover_existence: "map.geometry.catalog-supported",
       explicit_construction: "map.prime-construction.supported",
       curve_map_correctness: "map.geometry.catalog-supported",
-      jacobian_arithmetic_for_cover: "map.prime-jacobian.refuted",
-      pullback_point_classes: "map.prime-transfer.unknown",
+      jacobian_arithmetic_for_cover: "map.prime-balanced.supported",
+      pullback_point_classes: "map.prime-pullback.supported",
       independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
-      pushforward_point_divisors: "map.prime-transfer.unknown",
-      arbitrary_jacobian_pushforward: "map.prime-transfer.unknown",
-      composition_on_typed_domain: "map.prime-transfer.unknown",
+      pushforward_point_divisors: "map.prime-pushforward.supported",
+      arbitrary_jacobian_pushforward: "map.prime-pushforward.supported",
+      composition_on_typed_domain: "map.prime-composition.supported",
       alternate_target_model_map: "map.direct-target.not-applicable",
       field_extension_or_descent: "map.same-field.not-applicable",
       computational_advantage: "map.advantage.unknown",
     },
     full_transfer_pipeline: "map.prime-pipeline.refuted",
     boundary:
-      "Supported as explicit same-field genus-two cover geometry only. Balanced/two-infinity Jacobian arithmetic, induced maps, and transfer advantage remain unavailable or unknown.",
+      "Supported direct-prime genus-two geometry, canonical balanced arithmetic, arbitrary-class pushforward, and both functorial identities. Catalog-wide subgroup preservation, an independent oracle, and transfer advantage remain unknown.",
+  },
+  "map.odd-prime-quadratic.direct.proved-psi13": {
+    kind: "map_base",
+    predicate_id: "odd_prime_quadratic_direct_proved_psi13",
+    hypotheses: [
+      "certificate.construction=prime_quadratic_pullback_v1",
+      "declared field has no extension modulus",
+      "certificate.target_model_map is absent",
+      "2^64 <= p < 3317044064679887385961981 and p passes the first sixteen prime-base strong Miller--Rabin tests, including the first thirteen required by the strict psi_13 theorem",
+    ],
+    claims: {
+      cover_existence: "map.geometry.catalog-supported",
+      explicit_construction: "map.prime-construction.supported",
+      curve_map_correctness: "map.geometry.catalog-supported",
+      jacobian_arithmetic_for_cover: "map.prime-balanced.supported",
+      pullback_point_classes: "map.prime-pullback.supported",
+      independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
+      pushforward_point_divisors: "map.prime-pushforward.supported",
+      arbitrary_jacobian_pushforward: "map.prime-pushforward.supported",
+      composition_on_typed_domain: "map.prime-composition.supported",
+      alternate_target_model_map: "map.direct-target.not-applicable",
+      field_extension_or_descent: "map.same-field.not-applicable",
+      computational_advantage: "map.advantage.unknown",
+    },
+    full_transfer_pipeline: "map.prime-pipeline.refuted",
+    boundary:
+      "Exactly two 73-bit catalog rows are admitted by this strict theorem-bounded pilot. Passing the same bases at or above the exclusive psi_13 bound is not a primality proof and does not enter this profile.",
+  },
+  "map.odd-prime-quadratic.direct.unsupported-proof": {
+    kind: "map_base",
+    predicate_id: "odd_prime_quadratic_direct_unsupported_without_primality_certificate",
+    hypotheses: [
+      "certificate.construction=prime_quadratic_pullback_v1",
+      "declared field has no extension modulus",
+      "certificate.target_model_map is absent",
+      "the modulus is at or above the exclusive psi_13 bound and no separate primality certificate is supplied",
+    ],
+    claims: {
+      cover_existence: "map.geometry.catalog-supported",
+      explicit_construction: "map.prime-construction.supported",
+      curve_map_correctness: "map.geometry.catalog-supported",
+      jacobian_arithmetic_for_cover: "map.prime-proof-backend.refuted",
+      pullback_point_classes: "map.prime-proof-transfer.refuted",
+      independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
+      pushforward_point_divisors: "map.prime-proof-transfer.refuted",
+      arbitrary_jacobian_pushforward: "map.prime-proof-transfer.refuted",
+      composition_on_typed_domain: "map.prime-proof-transfer.refuted",
+      alternate_target_model_map: "map.direct-target.not-applicable",
+      field_extension_or_descent: "map.same-field.not-applicable",
+      computational_advantage: "map.advantage.unknown",
+    },
+    full_transfer_pipeline: "map.prime-pipeline.refuted",
+    boundary:
+      "Cover geometry remains explicit under the catalog's input assumption. Arithmetic and induced maps fail closed until proof-grade primality evidence is supplied; this is not evidence that a cover or transfer cannot exist.",
   },
   "map.odd-prime-quadratic.normalized": {
     kind: "map_base",
@@ -650,19 +905,19 @@ const profiles = {
       cover_existence: "map.geometry.catalog-supported",
       explicit_construction: "map.prime-construction.supported",
       curve_map_correctness: "map.geometry.catalog-supported",
-      jacobian_arithmetic_for_cover: "map.prime-jacobian.refuted",
-      pullback_point_classes: "map.prime-transfer.unknown",
+      jacobian_arithmetic_for_cover: "map.prime-proof-backend.refuted",
+      pullback_point_classes: "map.prime-normalized-transfer.refuted",
       independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
-      pushforward_point_divisors: "map.prime-transfer.unknown",
-      arbitrary_jacobian_pushforward: "map.prime-transfer.unknown",
-      composition_on_typed_domain: "map.prime-transfer.unknown",
+      pushforward_point_divisors: "map.prime-normalized-transfer.refuted",
+      arbitrary_jacobian_pushforward: "map.prime-normalized-transfer.refuted",
+      composition_on_typed_domain: "map.prime-normalized-transfer.refuted",
       alternate_target_model_map: "map.prime-normalization.supported",
       field_extension_or_descent: "map.same-field.not-applicable",
       computational_advantage: "map.advantage.unknown",
     },
     full_transfer_pipeline: "map.prime-pipeline.refuted",
     boundary:
-      "Supported cover geometry includes the degree-one target normalization. This does not supply balanced Jacobian arithmetic or induced transfer maps.",
+      "Supported cover geometry includes the degree-one target normalization. Every row in this dated profile is also outside the strict primality-proof range, and induced maps fail closed independently because no all-point Montgomery/Edwards coordinate adapter is implemented.",
   },
   "map.odd-extension-quadratic.direct": {
     kind: "map_base",
@@ -677,19 +932,19 @@ const profiles = {
       cover_existence: "map.geometry.catalog-supported",
       explicit_construction: "map.extension-construction.supported",
       curve_map_correctness: "map.geometry.catalog-supported",
-      jacobian_arithmetic_for_cover: "map.prime-jacobian.refuted",
-      pullback_point_classes: "map.prime-transfer.unknown",
+      jacobian_arithmetic_for_cover: "map.prime-extension-balanced.refuted",
+      pullback_point_classes: "map.prime-extension-transfer.refuted",
       independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
-      pushforward_point_divisors: "map.prime-transfer.unknown",
-      arbitrary_jacobian_pushforward: "map.prime-transfer.unknown",
-      composition_on_typed_domain: "map.prime-transfer.unknown",
+      pushforward_point_divisors: "map.prime-extension-transfer.refuted",
+      arbitrary_jacobian_pushforward: "map.prime-extension-transfer.refuted",
+      composition_on_typed_domain: "map.prime-extension-transfer.refuted",
       alternate_target_model_map: "map.direct-target.not-applicable",
       field_extension_or_descent: "map.extension-descent.unknown",
       computational_advantage: "map.advantage.unknown",
     },
     full_transfer_pipeline: "map.prime-pipeline.refuted",
     boundary:
-      "Supported as geometry over the exact declared extension field. Proper-subfield descent, balanced Jacobian arithmetic, and induced maps remain unproved or unavailable.",
+      "Supported as geometry over the exact declared extension field. Proper-subfield descent remains unknown; the current prime-field balanced arithmetic and induced maps explicitly do not accept these extension fields.",
   },
   "subgroup.binary-degree3": {
     kind: "subgroup_base",
@@ -728,7 +983,7 @@ const profiles = {
     hypotheses: [
       "the exact EC1/curve UID record links to an odd-characteristic quadratic map",
       "the catalog subgroup-order integer is odd and therefore coprime to 2",
-      "no balanced two-infinity induced-map implementation is inferred from coprimality",
+      "map-runtime support is determined separately by direct coordinates, field representation, and the deterministic primality-proof gate",
     ],
     claims: {
       subgroup_identity: "subgroup.identity.supported",
@@ -748,11 +1003,11 @@ const profiles = {
       computational_advantage: "map.advantage.unknown",
     },
     boundary:
-      "The exact subgroup identities and degree/order coprimality are catalog-wide facts. Without compatible induced maps, no kernel, image-order, or recovery result follows.",
+      "The exact subgroup identities and degree/order coprimality are catalog-wide facts. Compatible maps exist for the proved direct-prime subset, but this unsplit subgroup profile has no catalog-wide generator/order/composition replay, so no kernel, image-order, or recovery claim is promoted.",
   },
 };
 
-function classifyMap(coverRow) {
+function classifyMap(coverRow, targetModel) {
   const certificate = coverRow.certificate;
   if (certificate.construction === "binary_cubic_pullback_v1") {
     assert(coverRow.field_relation === "same_field", `${coverRow.slug}: binary field relation`);
@@ -771,8 +1026,26 @@ function classifyMap(coverRow) {
   const normalized = certificate.target_model_map != null;
   assert(!(extension && normalized), `${coverRow.slug}: unmodeled normalized extension row`);
   if (extension) return "map.odd-extension-quadratic.direct";
-  if (normalized) return "map.odd-prime-quadratic.normalized";
-  return "map.odd-prime-quadratic.direct";
+  const proofStatus = primeProofStatus(targetModel.p);
+  assert(proofStatus !== "composite", `${coverRow.slug}: composite prime-field modulus`);
+  if (normalized) {
+    assert(
+      proofStatus === "unsupported_without_primality_certificate",
+      `${coverRow.slug}: normalized profile proof boundary changed`,
+    );
+    return "map.odd-prime-quadratic.normalized";
+  }
+  if (proofStatus === "proved_u64") {
+    return "map.odd-prime-quadratic.direct.proved-u64";
+  }
+  if (proofStatus === "proved_psi13") {
+    return "map.odd-prime-quadratic.direct.proved-psi13";
+  }
+  assert(
+    proofStatus === "unsupported_without_primality_certificate",
+    `${coverRow.slug}: unexpected prime proof status ${proofStatus}`,
+  );
+  return "map.odd-prime-quadratic.direct.unsupported-proof";
 }
 
 function freshness(status, scope, rationale, evidenceRefs, obligationId) {
@@ -862,7 +1135,7 @@ async function buildSourceArtifacts() {
       "generated curve-level geometry catalog",
       freshness(
         "supported",
-        "all 15,791 current verified-over-declared-field geometry rows",
+        "all 15,791 verified-over-declared-field geometry rows in the pinned catalog snapshot",
         "The ledger derives every map profile predicate from this exact file.",
         ["docs/curves/covers.json"],
       ),
@@ -895,6 +1168,16 @@ async function buildSourceArtifacts() {
         "exact profile predicates, joins, sorted memberships, and domain-separated membership hashes",
         "The script provides byte-exact --write and --check modes using Node built-ins only.",
         ["scripts/build_cover_transfer_assessments.mjs"],
+      ),
+    ),
+    sourceArtifact(
+      "scripts/test_cover_transfer_assessment.mjs",
+      "catalog-membership and prime-proof partition negative controls",
+      freshness(
+        "supported",
+        "missing, duplicate, misbound, composite, psi12-pseudoprime, above-psi13, and normalized-boundary mutations",
+        "The fixtures require the generator to reject malformed joins and to preserve the strict proved-u64/proved-psi13/unsupported partition. An above-bound all-passing value is never promoted to proved primality.",
+        ["scripts/test_cover_transfer_assessment.mjs"],
       ),
     ),
     sourceArtifact(
@@ -939,12 +1222,173 @@ async function buildSourceArtifacts() {
     ),
     sourceArtifact(
       "src/bin/hyperelliptic_cover.rs",
-      "standalone CLI and native binary subgroup batch certificate",
+      "standalone construction, arithmetic, transfer, and catalog command plus native binary subgroup batch certificate",
       freshness(
         "supported",
-        "all 142 exact linked binary EC1 triples at the pinned source revision",
-        "The batch test is cited only for the checks it performs; it is not proof of every numeric order's primality.",
-        ["src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses"],
+        "all 142 exact linked binary EC1 triples, direct short-Weierstrass prime-field rows inside the deterministic proof gate, and explicit fail-closed responses outside that runtime boundary",
+        "The batch test is cited only for the checks it performs; it is not proof of every numeric order's primality. Direct-prime support requires proved_u64 or proved_psi13, normalized targets fail closed, and extension fields retain geometry without a transfer backend.",
+        [
+          "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses",
+          "src/bin/hyperelliptic_cover.rs#strict_psi13_wide_prime_reaches_arithmetic_and_transfer_but_fails_closed_above_bound",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "docs/curves/binary-subgroup-transfer-certificates.json",
+      "binary named-subgroup transfer certificate corpus",
+      freshness(
+        "supported",
+        "the exact 500,924-byte corpus identity, 174 map records, 150 named bindings, 102 proved exact-order records, 48 unknown-order records, and zero recorded transfer failures",
+        "The artifact digest pins the saved corpus and its bounded named-subgroup witnesses. It does not convert unknown orders into proofs, extend the certificates to arbitrary classes, independently replay arithmetic, attest a build, or establish a solver or computational advantage.",
+        ["docs/curves/binary-subgroup-transfer-certificates.json"],
+      ),
+    ),
+    sourceArtifact(
+      "docs/curves/binary-subgroup-transfer-certificates.schema.json",
+      "machine-readable binary transfer certificate corpus contract",
+      freshness(
+        "supported",
+        "the exact corpus shape, typed dispositions, witness fields, and producer metadata contract",
+        "The schema digest pins validation semantics only; schema conformance is not independent arithmetic or build evidence.",
+        ["docs/curves/binary-subgroup-transfer-certificates.schema.json"],
+      ),
+    ),
+    sourceArtifact(
+      "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
+      "binary catalog canonical same-implementation replay receipt",
+      freshness(
+        "supported",
+        "byte-exact native replay of the 500,924-byte binary corpus with zero failed named-subgroup records",
+        "The receipt records same-implementation canonical replay and is separately exercised from the staged package layout. It is not an independent arithmetic oracle, open build attestation, signed standing, solver, or advantage result.",
+        [
+          "docs/curves/binary-subgroup-transfer-certificates.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "scripts/verify_binary_transfer_source.mjs",
+      "fail-closed binary transfer producer Git-tree verifier",
+      freshness(
+        "supported",
+        "the recorded 21-path binary transfer producer closure at the corpus producer commit",
+        "The verifier disables Git replacement objects, checks each displayed source path against its normalized include_str target, reads the exact commit blobs, and recomputes the framed source digest. This binds source provenance only; it does not attest an executable build or independently replay arithmetic.",
+        [
+          "scripts/verify_binary_transfer_source.mjs",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "scripts/test_verify_binary_transfer_source.mjs",
+      "binary producer-source mutation and substitution controls",
+      freshness(
+        "supported",
+        "closure order, include-target drift, Git replacement objects, malformed metadata, missing/non-UTF-8 blobs, framing, bounds, and atomic-output controls",
+        "These tests exercise the provenance verifier's fail-closed behavior. They do not validate cover, Jacobian, transfer, subgroup, solver, or performance claims.",
+        ["scripts/test_verify_binary_transfer_source.mjs"],
+      ),
+    ),
+    sourceArtifact(
+      "docs/curves/binary-subgroup-transfer-source-verification.schema.json",
+      "machine-readable binary producer-source receipt contract",
+      freshness(
+        "supported",
+        "the exact 21-file receipt shape and claim boundary",
+        "The schema fixes ordered paths, required checks, and provenance-only status; schema conformance alone is not execution or mathematical evidence.",
+        ["docs/curves/binary-subgroup-transfer-source-verification.schema.json"],
+      ),
+    ),
+    sourceArtifact(
+      "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json",
+      "deterministic binary transfer producer Git-tree receipt",
+      freshness(
+        "supported",
+        "the binary corpus source digest and reviewed 21-path closure at producer commit 5c6e43a6f0cffe0afc4c962ff54056716cf6437e",
+        "The receipt binds the saved source digest to exact Git blobs and the verifier version. It does not prove that the packaged executable was built from that commit, supply independent arithmetic, signed standing, a solver, or computational advantage.",
+        [
+          "docs/curves/binary-subgroup-transfer-certificates.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json",
+      "pre-source-verifier standalone Linux GNU package-run receipt",
+      freshness(
+        "supported",
+        "the successful Rust GNU package job and installed-layout catalog replay at evidence head b98fb11df2353c3daf0200956190ba0764c5fff7",
+        "The receipt distinguishes the successful package lane from the cancelled aggregate workflow and records the proxy-blocked independent download. It is same-implementation job-side evidence, not an independent artifact replay, source-to-binary attestation, mathematical oracle, solver, or advantage result.",
+        [
+          "research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json",
+      "source-verifier standalone Linux GNU package-run receipt",
+      freshness(
+        "supported",
+        "the successful Rust GNU package job, 21-file producer-source replay, installed-layout catalog replay, and upload at evidence head 98e4fbfef3f7887bafc87900ec636d7d88f5648b",
+        "The receipt distinguishes the successful package lane from the cancelled aggregate workflow and records the repeated proxy-blocked independent download. It is same-implementation job-side evidence, not an independent artifact replay, source-to-binary attestation, mathematical oracle, solver, or advantage result.",
+        [
+          "research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json",
+      "odd transfer catalog canonical replay receipt",
+      freshness(
+        "supported",
+        "the exact 17,879,292-byte odd corpus regeneration and its recorded 22,243-map, 940-binding supported/unsupported/failure partition",
+        "This is a same-implementation canonical replay with an intentionally incomplete named-subgroup status. It does not independently verify catalog-wide Jacobian arithmetic, source custody, a relation solver, or computational advantage.",
+        [
+          "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json",
+      "odd transfer producer Git-tree receipt",
+      freshness(
+        "supported",
+        "the odd corpus framed source digest, reviewed 29-path closure, and conditional Lean artifact at producer commit 8c94831426fa35040fa7b38b1379299bf6e6d957",
+        "The receipt binds saved source and proof-artifact bytes to the recorded Git tree. It does not provide signed standing, independently prove the concrete geometry or arithmetic, implement a solver, or establish computational advantage.",
+        [
+          "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "research/curve_transfer_infrastructure_20261118/standalone-package-run-44605953074.json",
+      "latest post-run standalone Linux GNU package receipt",
+      freshness(
+        "supported",
+        "the successful Rust GNU package job, 8/8 producer-source controls, 21-file Git-tree binding, installed-layout catalog replays, two prior staged package receipts, and artifact upload at evidence head 3f4706b21cbd25d11387de6799c4200fbfad3a1f",
+        "This receipt was created after the run and was not included in the observed archive. It distinguishes the successful package lane from the cancelled aggregate workflow and records the proxy-blocked independent download. It is same-implementation job-side evidence, not an independent artifact replay, source-to-binary attestation, mathematical oracle, solver, or advantage result.",
+        [
+          "research/curve_transfer_infrastructure_20261118/standalone-package-run-44605953074.json",
+          "research/curve_transfer_infrastructure_20261118/standalone-package-run-44585934651.json",
+          "research/curve_transfer_infrastructure_20261118/standalone-package-run-44596599220.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-canonical-replay-5c6e43a6.json",
+          "research/curve_transfer_infrastructure_20261118/binary-transfer-catalog-source-replay-5c6e43a6.json",
+          "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-canonical-replay-8c948314.json",
+          "research/curve_transfer_infrastructure_20261118/odd-transfer-catalog-source-replay-8c948314.json",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "src/bin/curve_transfer_sweep.rs",
+      "parameter sweeper and runtime-constructor cross-check",
+      freshness(
+        "supported",
+        "catalog and supplied direct-prime candidates, with explicit normalized, extension, and primality-proof support statuses",
+        "The sweeper instantiates the same checked direct-prime runtime constructor and compares its sextic with the geometry certificate. It records unsupported outcomes without treating a failed search or unavailable backend as nonexistence.",
+        ["src/bin/curve_transfer_sweep.rs"],
       ),
     ),
     sourceArtifact(
@@ -978,8 +1422,8 @@ async function buildSourceArtifacts() {
       "general binary pullback, arbitrary-class norm, image/Prym projector, and composition implementation",
       freshness(
         "supported",
-        "the binary cubic profile's arbitrary reduced Mumford classes of degree at most three, including nonsplit support, plus the independent fixed-GF(8), a=1, b=3, d=7 all-class presentation",
-        "The digest pins the exact current transfer API, its residue-field norm for every checked binary cubic cover, the image/Prym projector, and the exhaustive 486-class comparison with the independent fixed-fixture presentation. The fixture target has order 6 with six fibers of size 81, so degree 3 is not coprime to the full target order and no full-group injectivity claim follows.",
+        "the binary cubic profile's arbitrary reduced Mumford classes of degree at most three, including nonsplit support, plus the fixed-GF(8), a=1, b=3, d=7 all-class map-value presentation",
+        "The digest pins the exact current transfer API, its residue-field norm for every checked binary cubic cover, the image/Prym projector, and the exhaustive 486-class map-value comparison. That replay still obtains source sums from production, so it is not an independent source-law oracle. The fixture target has order 6 with six fibers of size 81, so degree 3 is not coprime to the full target order and no full-group injectivity claim follows.",
         ["src/binary_ecc/cover_transfer.rs"],
       ),
     ),
@@ -994,13 +1438,133 @@ async function buildSourceArtifacts() {
       ),
     ),
     sourceArtifact(
+      "tests/binary_cover_transfer_f2_source_oracle.rs",
+      "separately implemented exact F2 source-law and induced-map pilot",
+      freshness(
+        "supported",
+        "the single F2 fixture E: y^2+xy=x^3+1 and H: v^2+u^2v=u^7+u, with 20 source classes",
+        "The test independently reconstructs the group through principal divisors, checks all 400 sums, 8,000 associativity triples, transfer maps, target fibers, and both composition identities before differential comparison with production. It is partial evidence, not the required full 486-class fixed-GF(8) oracle and not a catalog-wide subgroup certificate.",
+        ["tests/binary_cover_transfer_f2_source_oracle.rs"],
+      ),
+    ),
+    sourceArtifact(
       "src/prime_hyperelliptic/curve.rs",
       "odd-prime one-infinity Jacobian model boundary",
       freshness(
         "supported",
-        "evidence that the catalog's even sextics are outside the current one-infinity model",
-        "The model contract requires degree 2g+1 and cannot be silently applied to the two-infinity sources.",
+        "evidence that the catalog's even sextics remain outside the separate one-infinity model",
+        "The model contract requires degree 2g+1 and cannot be silently applied to the two-infinity sources; those sources now use the distinct balanced backend.",
         ["src/prime_hyperelliptic/curve.rs"],
+      ),
+    ),
+    sourceArtifact(
+      "src/prime_hyperelliptic/primality.rs",
+      "shared deterministic prime-proof gate and serializable proof evidence",
+      freshness(
+        "supported",
+        "complete deterministic u64 primality and the strict p < 3317044064679887385961981 psi_13 theorem range",
+        "The first sixteen prime-base strong Miller--Rabin tests include the first thirteen required by the theorem. All-passing values at or above the exclusive bound remain unsupported without a separate certificate; witnesses still prove compositeness.",
+        ["src/prime_hyperelliptic/primality.rs"],
+      ),
+    ),
+    sourceArtifact(
+      "src/prime_hyperelliptic/balanced.rs",
+      "canonical balanced arithmetic for split even-sextic genus-two Jacobians",
+      freshness(
+        "supported",
+        "direct prime fields admitted by the shared deterministic proof gate",
+        "The implementation validates the source, canonical (u,v,n_plus) representatives, reduction, equality, negation, addition, and scalar multiplication with both rational infinities explicit.",
+        ["src/prime_hyperelliptic/balanced.rs"],
+      ),
+    ),
+    sourceArtifact(
+      "src/prime_hyperelliptic/cover_transfer.rs",
+      "checked direct-prime quadratic-cover pullback, arbitrary-class pushforward, and composition certificates",
+      freshness(
+        "supported",
+        "direct short-Weierstrass prime-field covers admitted by the shared deterministic proof gate",
+        "The implementation supplies pi^*, pi_*, pi_*pi^*=[2], and pi^*pi_*=1+deck_* on their validated domains. It excludes extension fields, normalized Montgomery/Edwards coordinates, exact subgroup-order proofs, and any solver claim.",
+        ["src/prime_hyperelliptic/cover_transfer.rs"],
+      ),
+    ),
+    sourceArtifact(
+      "src/prime_hyperelliptic/model_transfer.rs",
+      "checked projective Montgomery/short-Weierstrass target-model isomorphism",
+      freshness(
+        "supported",
+        "smooth Montgomery prime-field targets admitted by the shared deterministic proof gate",
+        "The implementation validates both models, every projective point map, and the degree-one inverse identities. Edwards affine charts and their exceptional points remain outside this adapter.",
+        ["src/prime_hyperelliptic/model_transfer.rs"],
+      ),
+    ),
+    sourceArtifact(
+      "src/prime_hyperelliptic/normalized_cover_transfer.rs",
+      "typed composition of the quadratic cover with the projective Montgomery target isomorphism",
+      freshness(
+        "supported",
+        "Montgomery prime-field covers admitted by the shared deterministic proof gate, with original-coordinate target inputs and outputs",
+        "The implementation supplies target arithmetic, pi^*, pi_*, pi_*pi^*=[2], and pi^*pi_*=1+deck_* after the degree-one model change. Its bounded F7 fixtures do not establish a catalog-wide independent oracle, exact subgroup orders, solver integration, scaling, or advantage.",
+        ["src/prime_hyperelliptic/normalized_cover_transfer.rs"],
+      ),
+    ),
+    sourceArtifact(
+      "tests/prime_montgomery_transfer_adapter.rs",
+      "bounded projective Montgomery adapter differential and malformed-input controls",
+      freshness(
+        "supported",
+        "all smooth Montgomery parameter choices over p=5,7,11 for projective-map bijections and one complete p=11,A=3,B=2 independent group-law comparison",
+        "The test is bounded adapter evidence. It does not exercise the genus-two cover, live wide-prime rows, Edwards exceptional points, a solver, or computational advantage.",
+        ["tests/prime_montgomery_transfer_adapter.rs"],
+      ),
+    ),
+    sourceArtifact(
+      "tests/prime_montgomery_composed_transfer.rs",
+      "public-API exhaustive F7 Montgomery cover-composition control",
+      freshness(
+        "supported",
+        "the p=7,A=3,B=1,c=0 fixture with 12 target points and 72 balanced source classes",
+        "The test exhausts pullback and pushforward homomorphism pairs and both compositions through the public API. It reuses production arithmetic and is therefore not an independent divisor-map oracle or catalog-wide result.",
+        ["tests/prime_montgomery_composed_transfer.rs"],
+      ),
+    ),
+    sourceArtifact(
+      "tests/common/prime_split_sextic_oracle.rs",
+      "shared production-independent split-sextic Picard-class oracle core",
+      freshness(
+        "supported",
+        "exactly the direct F5 wrapper and the composed-Montgomery F7 wrapper configured by the two separately bound test sources",
+        "The shared core constructs its own finite-field arithmetic, Picard-class table, target group law, divisor maps, and both composition identities before any production comparison. Its evidence is exhaustive only for the two configured tiny-field fixtures; it does not establish family-wide, catalog-wide, scaling, solver, subgroup, or advantage claims.",
+        [
+          "tests/common/prime_split_sextic_oracle.rs",
+          "tests/prime_cover_transfer_oracle.rs",
+          "tests/prime_montgomery_composed_transfer_oracle.rs",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "tests/prime_cover_transfer_oracle.rs",
+      "direct F5 configuration wrapper for the shared independent split-sextic oracle",
+      freshness(
+        "supported",
+        "the single direct fixture p=5, E: y^2=x^3+1, C: v^2=u^6+1, with 36 Picard classes and 6 target points",
+        "Together with the shared core, this wrapper fixes the field, source, target, extension, order, principal-divisor, and support-counter expectations for the exhaustive direct fixture. It is not evidence for another field, curve, catalog row, subgroup, solver, or computational advantage.",
+        [
+          "tests/common/prime_split_sextic_oracle.rs",
+          "tests/prime_cover_transfer_oracle.rs",
+        ],
+      ),
+    ),
+    sourceArtifact(
+      "tests/prime_montgomery_composed_transfer_oracle.rs",
+      "composed-Montgomery F7 configuration wrapper for the shared independent split-sextic oracle",
+      freshness(
+        "supported",
+        "the single p=7 Montgomery fixture A=3, B=2, c=1, with short model y^2=x^3+3x+1 and source v^2=u^6+3u^4+6u^2+5",
+        "The wrapper fixes N1=14, N2=58, #Jac=120, and #E=12. With the shared core it exhausts 14,400 source sums, 1,728,000 associativity triples, every pullback and pushforward, both compositions, 2,608 principal zero divisors, 21 irreducible-quadratic classes, 12 repeated-support classes, 1,989 shared-support pairs, and 1,989 conjugate-support pairs before production comparison. This one fixture promotes none of the seven proof-gated live Montgomery bindings and supplies no family-wide, catalog-wide, scaling, solver, subgroup, or advantage claim.",
+        [
+          "tests/common/prime_split_sextic_oracle.rs",
+          "tests/prime_montgomery_composed_transfer_oracle.rs",
+        ],
       ),
     ),
     ...IMPLEMENTATION_VERSION_PATHS.map(implementationVersionArtifact),
@@ -1009,7 +1573,7 @@ async function buildSourceArtifacts() {
       "immutable detailed evidence for the two retained exact overlays",
       freshness(
         "unknown",
-        "full applicability of the historical replay to every current catalog row",
+        "full applicability of the historical replay to every row in the pinned catalog snapshot",
         "The two exact identities remain useful overlays, but the historical run is not promoted to catalog-wide execution evidence.",
         ["research/hyperelliptic_cover_infrastructure_20261006/evidence.json"],
         "independent_map_oracle",
@@ -1127,19 +1691,89 @@ function membership(profileId, members, domain) {
 }
 
 async function buildLedger() {
-  const [covers, graph] = await Promise.all([
+  assertPrimeProofGateControls();
+  const [registry, covers, graph] = await Promise.all([
+    readJson("docs/curves/registry.json"),
     readJson("docs/curves/covers.json"),
     readJson("docs/curves/cover-links.yaml"),
   ]);
+
+  const registryRowsByModel = new Map(
+    registry.curves.map((row) => [sha256Bytes(row.model_json), row]),
+  );
+  const coverRowsByModel = new Map(
+    covers.curves.map((row) => [row.model_sha256, row]),
+  );
+  const graphRowsByModel = new Map(
+    graph.curves.map((row) => [row.model_sha256, row]),
+  );
+  assert(
+    registryRowsByModel.size === registry.curves.length,
+    "duplicate registry model",
+  );
+  assert(
+    coverRowsByModel.size === covers.curves.length,
+    "duplicate cover model",
+  );
+  assert(
+    graphRowsByModel.size === graph.curves.length,
+    "duplicate graph model",
+  );
+
+  const sortedModelHashes = (rowsByModel) => [...rowsByModel.keys()].sort(compareText);
+  const registryModelHashes = sortedModelHashes(registryRowsByModel);
+  assert(
+    canonicalJson(sortedModelHashes(coverRowsByModel)) === canonicalJson(registryModelHashes),
+    "cover rows: not the exact catalog membership",
+  );
+  assert(
+    canonicalJson(sortedModelHashes(graphRowsByModel)) === canonicalJson(registryModelHashes),
+    "graph rows: not the exact catalog membership",
+  );
+
+  const comparableRepresentation = (representation) => ({
+    ec1: representation.ec1,
+    curve_uid: representation.curve_uid,
+    field: representation.field,
+    curve: representation.curve,
+  });
+  for (const [modelHash, registryRow] of registryRowsByModel) {
+    const graphRow = graphRowsByModel.get(modelHash);
+    assert(graphRow.icv1_identity.slug === registryRow.slug, "registry slug binding mismatch");
+    assert(graphRow.model_json === registryRow.model_json, "registry model binding mismatch");
+    const registryRepresentations = registryRow.representations
+      .map(comparableRepresentation)
+      .sort((left, right) => compareText(left.ec1, right.ec1));
+    const graphRepresentations = graphRow.representations
+      .map(comparableRepresentation)
+      .sort((left, right) => compareText(left.ec1, right.ec1));
+    assert(
+      canonicalJson(graphRepresentations) === canonicalJson(registryRepresentations),
+      "registry representation binding mismatch",
+    );
+  }
+
+  const linkedMapUids = sortedUnique(
+    graph.curves.flatMap((curve) => curve.cover_links.map((link) => link.map_uid)),
+    "curve map links",
+  );
+  assert(
+    canonicalJson(Object.keys(graph.maps).sort(compareText)) === canonicalJson(linkedMapUids),
+    "typed map bindings: not the exact catalog membership",
+  );
+  const linkedCoverUids = [...new Set(
+    graph.curves.flatMap((curve) => curve.cover_links.map((link) => link.cover_uid)),
+  )].sort(compareText);
+  assert(
+    canonicalJson(Object.keys(graph.covers).sort(compareText)) === canonicalJson(linkedCoverUids),
+    "typed cover bindings: not the exact catalog membership",
+  );
+
+  assert(registry.curves.length === 15791, "unexpected registry row count");
   assert(covers.curves.length === 15791, "unexpected covers row count");
   assert(Object.keys(graph.maps).length === 15791, "unexpected graph map count");
   assert(Object.keys(graph.covers).length === 15789, "unexpected graph cover count");
   assert(graph.curves.length === 15791, "unexpected graph curve count");
-
-  const coverRowsByModel = new Map(
-    covers.curves.map((row) => [row.model_sha256, row]),
-  );
-  assert(coverRowsByModel.size === 15791, "cover rows must have unique model hashes");
 
   const mapMembers = new Map(
     Object.entries(profiles)
@@ -1175,10 +1809,10 @@ async function buildLedger() {
     assert(row != null, `${curve.icv1_identity.slug}: missing covers row`);
     assert(row.slug === curve.icv1_identity.slug, `${curve.icv1_identity.slug}: slug mismatch`);
     assert(row.status === "verified_over_declared_field", `${row.slug}: geometry status`);
-    const mapProfileId = classifyMap(row);
+    const targetModel = JSON.parse(curve.model_json);
+    const mapProfileId = classifyMap(row, targetModel);
     mapMembers.get(mapProfileId).push(link.map_uid);
 
-    const targetModel = JSON.parse(curve.model_json);
     const targetFieldRecord = targetDeclaredFieldRecord(targetModel);
     assert(
       canonicalJson(sourceCover.record.field) === canonicalJson(targetFieldRecord),
@@ -1263,7 +1897,9 @@ async function buildLedger() {
   assert(typedMapBindings.size === 15791, `typed map binding count is ${typedMapBindings.size}`);
   const expectedMapCounts = new Map([
     ["map.binary-cubic.same-field", 165],
-    ["map.odd-prime-quadratic.direct", 14272],
+    ["map.odd-prime-quadratic.direct.proved-u64", 14012],
+    ["map.odd-prime-quadratic.direct.proved-psi13", 2],
+    ["map.odd-prime-quadratic.direct.unsupported-proof", 258],
     ["map.odd-prime-quadratic.normalized", 30],
     ["map.odd-extension-quadratic.direct", 1324],
   ]);
@@ -1430,7 +2066,7 @@ async function buildLedger() {
           "research/hyperelliptic_cover_infrastructure_20261006/README.md",
         ],
         boundary:
-          "Exact overlay for ICV1 icv1-fp10-t5-192cb216 and its F_827 two-infinity source; induced maps remain unknown.",
+          "Exact overlay for ICV1 icv1-fp10-t5-192cb216 and its F_827 two-infinity source. Its direct-prime map lies inside the deterministic-u64 balanced-transfer profile; catalog subgroup preservation and advantage remain separate unknowns.",
       },
       {
         overlay_id: "subgroup.prime-fp827-order823",
@@ -1459,7 +2095,7 @@ async function buildLedger() {
       map_profiles: mapBase.length,
       subgroup_profiles: subgroupBase.length,
       scope_note:
-        "Every current map UID and every exact [EC1, curve UID, map UID] triple has one base profile. Assessment means each claim receives an explicit supported, refuted, unknown, or not-applicable result; it does not mean every transfer capability is supported.",
+        "Every map UID in the pinned catalog snapshot and every exact [EC1, curve UID, map UID] triple in that snapshot has one base profile. Assessment means each claim receives an explicit supported, refuted, unknown, or not-applicable result; it does not mean every transfer capability is supported or that later live-catalog additions are covered.",
     },
     global_cost_accounting: [
       ["cover_construction", null, null, "Executable constructors exist, but no calibrated operation count or timing is claimed."],
@@ -1467,7 +2103,7 @@ async function buildLedger() {
       ["duplicate_candidates", null, "candidates", "No candidate-deduplication cost ledger was produced."],
       ["geometry_verification", null, null, "Verification is replayable but uncalibrated."],
       ["jacobian_arithmetic", null, null, "Correctness receipts are not performance measurements."],
-      ["pullback_and_pushforward", null, null, "Bounded binary formulas are implemented, but measured conversion cost is absent."],
+      ["pullback_and_pushforward", null, null, "Binary formulas and the proved direct-prime subset are implemented, but measured conversion cost is absent."],
       ["subgroup_recovery", null, null, "Typed-domain correctness is not a calibrated recovery benchmark."],
       ["reusable_preprocessing", null, null, "No reusable-preprocessing or amortization ledger exists."],
       ["peak_memory", null, "bytes", "Peak memory was not measured."],
@@ -1520,25 +2156,39 @@ async function buildLedger() {
         control: "arithmetic_internal",
         assessment: freshness(
           "supported",
-          "the implemented one-infinity prime and binary fixtures, not the even-sextic prime catalog sources",
-          "Retained tests cover canonicality, closure, inverses, scalar multiplication, exceptional divisors, and shared support.",
+          "the implemented binary one-infinity fixtures, odd-prime one-infinity fixtures, and direct-prime balanced even-sextic fixtures admitted by the deterministic proof gate",
+          "Retained tests cover canonicality, closure, inverses, scalar multiplication, exceptional divisors, shared support, both infinity points, and the strict psi_13 pilot.",
           [
             "src/binary_ecc/hyperelliptic.rs",
+            "src/prime_hyperelliptic/balanced.rs",
+            "src/prime_hyperelliptic/cover_transfer.rs",
+            "src/prime_hyperelliptic/primality.rs",
             "research/hyperelliptic_cover_infrastructure_20261006/evidence.json",
           ],
         ),
-        command: "cargo test --lib hyperelliptic",
+        command:
+          "cargo test --lib hyperelliptic && cargo test --lib prime_hyperelliptic::balanced && cargo test --lib prime_hyperelliptic::cover_transfer && cargo test --lib prime_hyperelliptic::primality",
       },
       {
         control: "arithmetic_independent_oracle",
         assessment: freshness(
           "unknown",
           "independent CAS or separately implemented divisor-class comparison across the catalog",
-          "Current arithmetic and transfer checks are implementation-internal.",
-          [],
+          "The separately implemented F2 pilot is exact on 20 classes, but the full fixed-GF(8) 486-class source-law oracle and catalog-representative independent checks remain open.",
+          ["tests/binary_cover_transfer_f2_source_oracle.rs"],
           "independent_map_oracle",
         ),
         command: null,
+      },
+      {
+        control: "binary_f2_source_law_pilot",
+        assessment: freshness(
+          "supported",
+          "one F2 specialization with exactly 20 source classes; not the fixed-GF(8) 486-class fixture and not catalog-wide",
+          "A separately implemented byte-polynomial field, place enumeration, principal-divisor law, target group, and induced maps check all 400 additions, 8,000 associativity triples, exceptional supports, target fibers, and both composition identities before production differential comparison.",
+          ["tests/binary_cover_transfer_f2_source_oracle.rs"],
+        ),
+        command: "cargo test --test binary_cover_transfer_f2_source_oracle",
       },
       {
         control: "binary_catalog_subgroups",
@@ -1556,12 +2206,63 @@ async function buildLedger() {
           "cargo test --bin hyperelliptic-cover every_binary_ec1_generator_has_checked_typed_transfer_hypotheses",
       },
       {
-        control: "odd_degree2_transfer",
+        control: "odd_degree2_direct_transfer_runtime",
         assessment: freshness(
-          "refuted",
-          "claim that the current one-infinity odd-prime implementation supports the 15,626 even-sextic source models",
-          "The current model contract and the catalog infinity configuration are structurally incompatible.",
-          ["src/prime_hyperelliptic/curve.rs", "docs/curves/covers.json"],
+          "supported",
+          "14,014 direct short-Weierstrass prime-field maps in the dated catalog: 14,012 proved_u64 rows and exactly two proved_psi13 73-bit rows",
+          "The generator independently reproduces the shared proof partition. The checked balanced and cover-transfer backends supply source arithmetic, pullback, arbitrary-class pushforward, and both composition certificates for this runtime domain.",
+          [
+            "scripts/build_cover_transfer_assessments.mjs",
+            "src/prime_hyperelliptic/primality.rs",
+            "src/prime_hyperelliptic/balanced.rs",
+            "src/prime_hyperelliptic/cover_transfer.rs",
+            "src/bin/hyperelliptic_cover.rs",
+          ],
+        ),
+        command:
+          "cargo test --bin hyperelliptic-cover strict_psi13_wide_prime_reaches_arithmetic_and_transfer_but_fails_closed_above_bound",
+      },
+      {
+        control: "odd_degree2_primality_fail_closed",
+        assessment: freshness(
+          "supported",
+          "258 direct prime-field maps in the dated catalog whose moduli are outside the strict psi_13 proof range",
+          "The rows retain explicit geometry under the catalog input assumption, while balanced arithmetic and induced maps return unsupported_without_primality_certificate. This is a runtime support boundary, not a nonexistence result.",
+          [
+            "scripts/build_cover_transfer_assessments.mjs",
+            "src/prime_hyperelliptic/primality.rs",
+            "src/bin/hyperelliptic_cover.rs",
+          ],
+        ),
+        command:
+          "cargo test --bin hyperelliptic-cover strict_psi13_wide_prime_reaches_arithmetic_and_transfer_but_fails_closed_above_bound",
+      },
+      {
+        control: "odd_degree2_normalized_fail_closed",
+        assessment: freshness(
+          "supported",
+          "all 30 normalized prime-field maps in the dated catalog",
+          "The degree-one normalization remains geometry evidence only. Transfer requests return unsupported_normalized_target_transfer_backend, preventing short-Weierstrass coordinates from being mislabeled as original Montgomery or Edwards coordinates.",
+          [
+            "src/bin/hyperelliptic_cover.rs",
+            "src/bin/curve_transfer_sweep.rs",
+            "src/bin/curve_cover_check/models.rs",
+          ],
+        ),
+        command:
+          "cargo test --bin hyperelliptic-cover normalized_montgomery_cover_reaches_verified_construction",
+      },
+      {
+        control: "odd_degree2_extension_fail_closed",
+        assessment: freshness(
+          "supported",
+          "all 1,324 odd-characteristic extension-field maps in the dated catalog",
+          "Geometry remains checked over the exact declared extension field, while the balanced and induced-map backends explicitly remain prime-field-only.",
+          [
+            "src/prime_hyperelliptic/balanced.rs",
+            "src/prime_hyperelliptic/cover_transfer.rs",
+            "src/bin/hyperelliptic_cover.rs",
+          ],
         ),
         command: null,
       },
@@ -1569,7 +2270,7 @@ async function buildLedger() {
         control: "published_artifact",
         assessment: freshness(
           "refuted",
-          "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 15,791 current catalog models",
+          "claim that the published v0.1.0-main.1371 artifact provides executable evidence for direct construction on all 15,791 models in the pinned catalog snapshot",
           "Direct artifact replay covered only its bundled 592-row registry. The historical static comparison classified 746 of the earlier 2,100 forms as inside the pinned source allowlist (160 binary and 586 direct prime-field) and 1,354 as outside it. That comparison has not been rerun against the expanded catalog and is not a 15,791-command artifact receipt. Current source accepts the new forms, but this artifact does not contain it.",
           [
             "research/cover_transfer_assessment_20261013/release_replay.txt",
@@ -1628,9 +2329,10 @@ async function buildLedger() {
     ],
     exploration_boundary: [
       "No search for production targets, private keys, or discrete logarithms was performed.",
-      "All 15,791 map rows and all 979 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
-      "The 165 catalog binary maps now have arbitrary-class norms and image/Prym projectors in the current source, including nonsplit support; catalog-wide independent-oracle replay and an end-to-end solver remain open.",
-      "The 15,626 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
+      "All 15,791 map rows and all 979 linked EC1 representations in the pinned catalog snapshot are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
+      "The 165 catalog binary maps have arbitrary-class norms and image/Prym projectors in the current source, including nonsplit support. The F2 20-class independent source-law pilot is partial; the fixed-GF(8) 486-class source law, catalog-wide independent replay, and an end-to-end solver remain open.",
+      "Of 15,626 odd-characteristic maps in the dated catalog, 14,012 direct rows are admitted by deterministic u64 primality, exactly two 73-bit direct rows by the strict psi_13 theorem gate, 258 direct rows fail closed without a primality certificate, 30 normalized rows fail closed without a target-coordinate transfer backend, and 1,324 extension-field rows have geometry but no balanced transfer backend.",
+      "The strict psi_13 support boundary is p < 3317044064679887385961981 after the configured strong Miller--Rabin tests; passing those bases at or above the exclusive bound is not proof.",
       "Generator checks and [r]G=O do not by themselves prove that every catalog integer r is the exact source order.",
       "Formula-screen outputs in jacobian-transfers.json were not promoted to executable or measured claims.",
       "A full cover-integrated Jacobian index-calculus solver, relation collection, linear algebra, and target decomposition remain a separate deliverable. The bounded odd-prime one-infinity solver library is outside these catalog-cover paths.",

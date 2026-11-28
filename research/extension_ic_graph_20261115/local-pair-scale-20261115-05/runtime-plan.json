@@ -1,0 +1,35 @@
+{
+  "schema": "gaudry.cubic.local-run/v1",
+  "backend": "local_user_authorized",
+  "source_revision": "2c429244393ef019eb224e184fca94862c236a69",
+  "binary_sha256": "381b2800d43103c9017d4f2c0a3e5a371d6f6dd3c032faae45d0d1e6b8b4ac82",
+  "primes": [
+    127,
+    523,
+    1039
+  ],
+  "seeds": [
+    17,
+    23,
+    37
+  ],
+  "oracles": [
+    "SymmetricPairOnly"
+  ],
+  "oracle_cli": "symmetric-pair",
+  "rounds": 5,
+  "warmup_rounds": 1,
+  "max_residuals": 2000000,
+  "timeout_seconds": 900,
+  "memory_gib": 8,
+  "automatic_retries": 0,
+  "aa_tolerance": 1.10,
+  "bootstrap_draws": 10000,
+  "bootstrap_seed": 20261115,
+  "parity_min_subgroup_order": 1073741824,
+  "reference_scope": "existing_cubic_radding_reference_not_fastest_external",
+  "purpose": "fresh_scaling_holdouts_after_matched_sampler_p67",
+  "sampler": "r-adding",
+  "component_hashes": "validation/sampling-scale-source.sha256",
+  "pinned_cpu": "0"
+}

@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T12:24:16Z",
+ "id": "PCC-20261123-069ec5",
+ "kind": "statement",
+ "producer": {
+  "commit": "7d5a29e3c5fa7902cf2ce0fd868ad5deec8a3a73",
+  "model": "",
+  "session": "2026-11-23"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_realcurve_torsion_20261123/coordinates/ACTUAL_FIRST_B_COMPILE_FAILURE.json",
+    "sha256": "6a60c4bbebb9c9442c343c184e03ed2b2767ca26eea4938843bbd4db8efadcd5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_realcurve_torsion_20261123/coordinates/SOURCE_LOCK_C.json",
+    "sha256": "ef65c64a9126ca1d9c67c6745e25bcad2a9657f4534a2fa1897fa1e06c982eb1"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "coordinate-B-compile-negative-C-prospective",
+ "statement": "First coordinate B passes format but strict compilation1 rejects an unused Fld import; complete379B compiler stderr and unchanged guards retained, Clippy/coordinates not reached. Prospective C removes exactly that unused import in a new main, reusing unchanged B field/chart and exact inherited Cantor source under identical strict science/resource criteria."
+}

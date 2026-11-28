@@ -1,0 +1,25 @@
+ValidatorFoundation.lean:35:41: error: Type mismatch
+  Polynomial.map_ne_zero ?m.84
+has type
+  map ?m.83 ?m.82 ≠ 0
+but is expected to have type
+  (algebraMap F K) a ≠ 0
+ValidatorFoundation.lean:46:8: error(lean.unknownIdentifier): Unknown constant `Polynomial.irreducible_of_degree_le_three_of_not_isRoot`
+ValidatorFoundation.lean:47:2: error: No goals to be solved
+ValidatorFoundation.lean:52:67: error: unsolved goals
+F : Type u_1
+inst✝ : Field F
+d : F
+⊢ (AdjoinRoot.powerBasis ⋯).dim = 2
+ValidatorFoundation.lean:58:2: warning: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+'IndependentS3Audit.base_element_isSquare' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'IndependentS3Audit.extensionPolynomial_irreducible' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'IndependentS3Audit.extension_cardinality' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'IndependentS3Audit.actual_pair_oracle_equivalence' depends on axioms: [propext, Classical.choice, Quot.sound]

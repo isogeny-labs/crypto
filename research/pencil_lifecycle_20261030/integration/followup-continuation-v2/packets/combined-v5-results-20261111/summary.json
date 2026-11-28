@@ -1,0 +1,40 @@
+{
+  "schema": "research.terminal-result/v1",
+  "attempt": "signed-kummer-combined-v5-20261111",
+  "status": "failed",
+  "seal_status": "passed",
+  "cleanup_complete": true,
+  "sealed_after_owned_cgroup_empty": true,
+  "commands_executed": [
+    "materialize"
+  ],
+  "command_exit_code": 1,
+  "command_reaped": true,
+  "compiler_invoked": false,
+  "tests_invoked": false,
+  "failure": "Materializer failed lstat on first declared packet overlay; all8declared overlays absent at subsequent readback, exactv3bytes independently matched.",
+  "missing_overlay_count": 8,
+  "prior_exact_copies_verified": 8,
+  "elapsed_seconds": {
+    "materializer": 35.954419924994,
+    "worker": 36.29052228300134,
+    "supervisor_before_seal": 37.10872812697198,
+    "completion": 37.277378939965274,
+    "caller": 37.39649287197972
+  },
+  "nested_intervals_not_additive": true,
+  "attempt_charge_seconds": 2400,
+  "campaign_charged_seconds": 13380,
+  "campaign_remaining_seconds": 116220,
+  "deadline_utc": "2026-11-11T12:00:00Z",
+  "peak_observed_target_bytes": 2547773710,
+  "cpu_quota": "200%",
+  "memory_max_bytes": 17179869184,
+  "caller_exit_code": 1,
+  "automatic_retry": false,
+  "raw_files": 16,
+  "raw_terminal_entries_rehashed": 9,
+  "cache_or_staged_source_modified_by_reporter": false,
+  "dollar_cost": null,
+  "scientific_cost_ratio": null
+}

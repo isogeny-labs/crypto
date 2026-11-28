@@ -1,0 +1,39 @@
+{
+  "schema": "prime31-root-library-gate-summary/v1",
+  "gate_passed": false,
+  "attempts": [
+    {
+      "attempt": 1,
+      "exit_code": 101,
+      "observation": "Tracked path dependencies not materialized; no compilation."
+    },
+    {
+      "attempt": 2,
+      "exit_code": 124,
+      "observation": "180-second compile deadline reached before library tests."
+    },
+    {
+      "attempt": 3,
+      "exit_code": 130,
+      "observation": "Session interrupted when main reconciliation changed six root-library source files during dependency compilation."
+    },
+    {
+      "attempt": 4,
+      "exit_code": null,
+      "observation": "Executor reported Unknown process id84025. No terminal result or finished timestamp exists; no timeout, OOM or source-failure exit inferred."
+    }
+  ],
+  "archive": {
+    "path": "research/prime31_aux_matched_20261122/fiber-domain-followup/evidence/root-library-attempts-metadata.tar.gz",
+    "sha256": "ce42484cf5b85e3d3ffc92c179ae8447e206fa997e44757aec85ed3c62c9fada",
+    "bytes": 4276,
+    "excludes": "Source-tree inventory is retained separately as a path-addressed audit input."
+  },
+  "campaign_executed": false,
+  "performance_evidence": false,
+  "source_tree_inventory": {
+    "path": "research/prime31_aux_matched_20261122/fiber-domain-followup/evidence/root-library-attempt4-tracked-source-tree-before.txt",
+    "sha256": "8e60048482710a79f6872ff10ffb12d743d3b77ce24cafb5524d2f226f32b114",
+    "bytes": 211191
+  }
+}

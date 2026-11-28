@@ -1,0 +1,1 @@
+cd / && sha256sum -c /opt/nist/PAYLOAD.sha256 && /opt/nist/bin/journal_tests /opt/nist/source/strict_elkies_20261029/inputs.tsv /work/compute/toy-fixtures && bash /opt/nist/source/journal_qualification_20261104/test-cli.sh /opt/nist/bin && bash /opt/nist/source/baseline_runtime_20261107/test-launcher.sh

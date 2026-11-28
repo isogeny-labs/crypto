@@ -6,6 +6,52 @@ Missing times are `null`, not zero or a partial-tile estimate.
 
 ## What prevents execution now
 
+### Status addendum, 2026-11-18
+
+The paragraphs below describe the older codomain-only implementation. The
+current [`native/complete_pipeline.cpp`](native/complete_pipeline.cpp) accepts
+GMP prime degrees and computes quotient coefficients and point images, with
+complete coverage checks demonstrated on small public inputs. Explicit baby
+windows and bounded projective walks are implemented; the earlier width and
+codomain-only limitations are not descriptions of that new source.
+
+The full frozen 80-bit target has still not been constructed or evaluated.
+The current complete schedule's work and memory feasibility remains open;
+bounded target-field coordinate prefixes are not map evaluations. See
+[`batch-walk-20261118/README.md`](batch-walk-20261118/README.md).
+
+The new [`native/paired_ecbench_export.cpp`](native/paired_ecbench_export.cpp)
+prepares transported known-answer targets and prospective ecbench inputs.
+Current ecbench `PrimeExplicit` fields are u64 with p restricted to
+`5 <= p < 2^62`; both the actual 202-bit field and 96-bit pilot require
+additional harness integration. Exact-width guards reject both before large
+construction. The small preparation/recovery controls are documented in
+[`paired-driver-20261118/README.md`](paired-driver-20261118/README.md).
+
+The prospective spec matches scalars, but alternating arms does not establish
+alternating endpoint order or matched algorithm seeds. Those, scalar timing
+integration, the strongest supported wall reference, registry identity and
+live cloud admission remain prerequisites. No recorded timing is available.
+All measurement requirements below remain in force.
+
+The later [wide-field harness component](wide-harness-20261118/README.md)
+adds a separate `prime_mont4_explicit` path with exact four-limb coordinates,
+u64 subgroup orders, counted rho and full-point-key BSGS. Corrected-source
+development tests cover the actual 202-bit source and 96-bit pilot fields;
+degree-2 and degree-5 controls supply fully evaluated paired input data.
+The earlier word-only exporter's guard and historical receipts are unchanged.
+These small control degrees do not evaluate either large target kernel.
+[pcc:unverified]
+
+The current CLI warns that five measured rounds with alternating arm order
+are unbalanced. The separately qualified planning packet therefore uses six
+rounds and one warmup; the original at-least-five requirement is preserved.
+Endpoint order/algorithm-seed pairing, native scalar timing, registration,
+wide-field IC, strongest wall reference, full target construction and cloud
+admission remain open. No measured wide-field session has executed.
+
+### Earlier implementation audit (retained history)
+
 The existing native codomain constructor
 [`sqrt_velu_batched_v4.cpp`](../conductor_gap_cm_orbits_20261015/native/sqrt_velu_batched_v4.cpp)
 reads `ell` into `uint64_t`. Its included
@@ -37,6 +83,13 @@ native/build/measurement_preflight 729845429276318409687041 137438953472
 ```
 
 ## Required measurements once prerequisites pass
+
+The [source construction audit](construction-audit-20261118/README.md)
+checks CM stability and full-two-power-torsion extension orders using the
+frozen CM trace. Its degree-2 source endomorphisms and kernel pairing are
+not evaluations of the requested degree-ell map. Neither that audit nor
+the separate larger Frobenius conductor certificate closes any measurement
+item below. Other smooth-torsion constructions remain open.
 
 1. **Construction.** Freeze source/binary hashes and exact parameters.
    Record complete setup, quotient construction, verification, peak RSS,
@@ -80,3 +133,21 @@ matched endpoint ECDLP measurements satisfy the requested crossing category.
 A global largest-known claim additionally needs a source-based record
 comparison. The existing source/kernel and local correctness checks remain
 valid components; this protocol does not promote or replace them.
+
+
+## 18 November paired planner checkpoint
+
+`paired_curves_v1` now implements the versioned endpoint-order and shared
+algorithm-seed law in the actual ecbench planner. Corrected-source focused
+integration and CLI compatibility checks pass; the full frozen two-field
+panel plans 192 workloads/4032 executions without running a performance
+session. The packet and exact acceptance/results are in
+[paired-schedule-20261118](paired-schedule-20261118/README.md).
+PCC-20261118-219d4a is an unsigned producer statement, unverified/not_covered.
+[pcc:unverified]
+
+Endpoint-statistics joining, measured scalar multiplication, wall-reference
+admission, wide-field IC and live cloud/S3 access remain separate gates.
+The minimum 80-bit quotient/non-kernel images are still required before the
+original conductor-crossing experiment can be measured. Existing timing
+criteria and accounting boundaries are unchanged.

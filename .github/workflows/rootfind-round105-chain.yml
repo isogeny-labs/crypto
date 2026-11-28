@@ -1,0 +1,33 @@
+name: Rootfind round105 p61 quartic source-exact A/B
+on:
+  push:
+    branches: ['automation/rootfind-column-accumulator-round89-20261121']
+    paths:
+      - 'src/cryptanalysis/prime_root_trace.rs'
+      - 'research/amm_digit_perf_20261118/round105_full_ab.py'
+      - '.github/workflows/rootfind-round105-mersenne.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  round105-source-exact:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round105_full_ab.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Production Rust Round104 baseline vs Round105 candidate
+        env:
+          ROOTFIND_BASELINE_REF: ba3b4de3936d78adfcd2a47eb0d518e4fe38ac32
+          ROOTFIND_AB_OUTPUT: research/amm_digit_perf_20261118/round105_full_results.csv
+        run: python3 research/amm_digit_perf_20261118/round105_full_ab.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rootfind-round105-source-exact-results
+          path: research/amm_digit_perf_20261118/round105_full_results.csv

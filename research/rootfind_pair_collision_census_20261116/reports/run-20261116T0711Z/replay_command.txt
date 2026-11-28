@@ -1,0 +1,2 @@
+/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc -O replay_rank.rs -o /tmp/rootfind-pair-replay-rank-20261116
+jq -r '.rows[].row | join(" ")' <cell>.json | /tmp/rootfind-pair-replay-rank-20261116 <subgroup_order> <columns>

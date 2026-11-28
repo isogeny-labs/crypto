@@ -1,0 +1,327 @@
+{
+  "H7": {
+    "extreme_wilson_disjoint": true,
+    "kill_condition_met": true,
+    "max_over_min_rate": 27.338235294117645,
+    "max_sampler": "S2",
+    "min_sampler": "S3",
+    "pairs": [
+      {
+        "pair": "S1-S2",
+        "ratio": 7.435999999999999,
+        "wilson_disjoint": true
+      },
+      {
+        "pair": "S1-S3",
+        "ratio": 3.676470588235294,
+        "wilson_disjoint": true
+      },
+      {
+        "pair": "S2-S3",
+        "ratio": 27.338235294117645,
+        "wilson_disjoint": true
+      }
+    ],
+    "vs_published": [
+      {
+        "ratio_to_published": 0.7886435331230284,
+        "sampler": "S1",
+        "wilson_disjoint_from_published": true
+      },
+      {
+        "ratio_to_published": 5.864353312302838,
+        "sampler": "S2",
+        "wilson_disjoint_from_published": true
+      },
+      {
+        "ratio_to_published": 0.21451104100946372,
+        "sampler": "S3",
+        "wilson_disjoint_from_published": true
+      }
+    ]
+  },
+  "constants": {
+    "B": 8,
+    "B2": 64,
+    "BIT_CAP": 4194304,
+    "DOUBLINGS": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "FILTER_PRIME_START": 1009,
+    "LLL_DELTA": 0.99,
+    "NEIGH_RADIUS": 1,
+    "N_FILTER_PRIMES": 6,
+    "P": 17,
+    "P0": [
+      3,
+      1
+    ],
+    "POOL": 8,
+    "R_BOX": 16,
+    "curve": "y^2=x^3+2x+2",
+    "group_order": 19,
+    "mu2_range": [
+      2,
+      17
+    ],
+    "neighbourhood_size": 243
+  },
+  "experiment": "A7 P1.6/Q018 xedni p=17 Experiment A, three samplers",
+  "per_sampler": [
+    {
+      "B": 8,
+      "B2": 64,
+      "certificate_contradictions": 0,
+      "coefficient_abs_counts_0_to_8": [
+        0,
+        238,
+        222,
+        29,
+        5,
+        0,
+        0,
+        6,
+        0
+      ],
+      "decided": 100000,
+      "dependent": 250,
+      "dependent_B2": 250,
+      "dependent_rate": 0.0025,
+      "dependent_rate_B2": 0.0025,
+      "dependent_rate_B2_wilson95": [
+        0.002209017131750767,
+        0.0028292039152693575
+      ],
+      "dependent_rate_among_decided": 0.0025,
+      "dependent_rate_among_decided_wilson95": [
+        0.002209017131750767,
+        0.0028292039152693575
+      ],
+      "dependent_rate_wilson95": [
+        0.002209017131750767,
+        0.0028292039152693575
+      ],
+      "independent": 99750,
+      "independent_runs_by_doublings_used": {
+        "3": 98634,
+        "4": 1099,
+        "5": 14,
+        "6": 3
+      },
+      "lift_resamples_total": 0,
+      "log2_a002_disc_height_all": {
+        "max": 96.88077679726455,
+        "mean": 53.645574888197956,
+        "min": 11.094737505048094
+      },
+      "log2_a002_disc_height_dependent": {
+        "max": 60.00216472288115,
+        "mean": 36.56384308315461,
+        "min": 14.264662506490406
+      },
+      "log2_abs_disc_integral_model_all": {
+        "max": 125.87548780293278,
+        "mean": 78.74011291668032,
+        "min": 17.836364775828923
+      },
+      "log2_abs_disc_integral_model_dependent": {
+        "max": 99.02749573354295,
+        "mean": 58.763150156571335,
+        "min": 30.89059678826787
+      },
+      "n": 100000,
+      "regulator_interval_excludes_zero_on_dependent_runs": 0,
+      "relation_abs_forms": {
+        "(1,2)": 94,
+        "(1,3)": 2,
+        "(2,1)": 116,
+        "(2,3)": 6,
+        "(3,1)": 21,
+        "(4,1)": 5,
+        "(7,2)": 6
+      },
+      "relations_of_form_P1_eq_pm2P2_or_2P1_eq_pmP2": 210,
+      "sampler": "S1",
+      "seconds_per_run": {
+        "max": 0.115447266,
+        "mean": 0.0013243275907300037,
+        "min": 0.000531707
+      },
+      "undecided": 0,
+      "undecided_B2": 0,
+      "undecided_rate": 0.0
+    },
+    {
+      "B": 8,
+      "B2": 64,
+      "certificate_contradictions": 0,
+      "coefficient_abs_counts_0_to_8": [
+        0,
+        1695,
+        1859,
+        164,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "decided": 100000,
+      "dependent": 1859,
+      "dependent_B2": 1859,
+      "dependent_rate": 0.01859,
+      "dependent_rate_B2": 0.01859,
+      "dependent_rate_B2_wilson95": [
+        0.01777113553186952,
+        0.01944584938118768
+      ],
+      "dependent_rate_among_decided": 0.01859,
+      "dependent_rate_among_decided_wilson95": [
+        0.01777113553186952,
+        0.01944584938118768
+      ],
+      "dependent_rate_wilson95": [
+        0.01777113553186952,
+        0.01944584938118768
+      ],
+      "independent": 98141,
+      "independent_runs_by_doublings_used": {
+        "3": 83793,
+        "4": 13518,
+        "5": 830
+      },
+      "lift_resamples_total": 0,
+      "log2_a002_disc_height_all": {
+        "max": 47.34529880474219,
+        "mean": 28.996267450053537,
+        "min": 10.256208688527387
+      },
+      "log2_a002_disc_height_dependent": {
+        "max": 38.69336267823662,
+        "mean": 26.41783425026793,
+        "min": 13.772623866460279
+      },
+      "log2_abs_disc_integral_model_all": {
+        "max": 107.51413484601916,
+        "mean": 72.55177130810365,
+        "min": 17.836364775828923
+      },
+      "log2_abs_disc_integral_model_dependent": {
+        "max": 86.31319031225203,
+        "mean": 66.95552435725239,
+        "min": 47.66154086622573
+      },
+      "n": 100000,
+      "regulator_interval_excludes_zero_on_dependent_runs": 0,
+      "relation_abs_forms": {
+        "(1,2)": 1126,
+        "(2,1)": 569,
+        "(3,2)": 164
+      },
+      "relations_of_form_P1_eq_pm2P2_or_2P1_eq_pmP2": 1695,
+      "sampler": "S2",
+      "seconds_per_run": {
+        "max": 0.081573542,
+        "mean": 0.006031699493309969,
+        "min": 0.003359487
+      },
+      "undecided": 0,
+      "undecided_B2": 0,
+      "undecided_rate": 0.0
+    },
+    {
+      "B": 8,
+      "B2": 64,
+      "certificate_contradictions": 0,
+      "coefficient_abs_counts_0_to_8": [
+        0,
+        68,
+        67,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "decided": 100000,
+      "dependent": 68,
+      "dependent_B2": 68,
+      "dependent_rate": 0.00068,
+      "dependent_rate_B2": 0.00068,
+      "dependent_rate_B2_wilson95": [
+        0.0005364811931075771,
+        0.0008618796776423499
+      ],
+      "dependent_rate_among_decided": 0.00068,
+      "dependent_rate_among_decided_wilson95": [
+        0.0005364811931075771,
+        0.0008618796776423499
+      ],
+      "dependent_rate_wilson95": [
+        0.0005364811931075771,
+        0.0008618796776423499
+      ],
+      "independent": 99932,
+      "independent_runs_by_doublings_used": {
+        "3": 99693,
+        "4": 237,
+        "5": 2
+      },
+      "lift_resamples_total": 0,
+      "log2_a002_disc_height_all": {
+        "max": 111.94886041318661,
+        "mean": 66.64640150548469,
+        "min": 11.498849206531725
+      },
+      "log2_a002_disc_height_dependent": {
+        "max": 76.47404780459428,
+        "mean": 47.44161352895324,
+        "min": 17.804099502228823
+      },
+      "log2_abs_disc_integral_model_all": {
+        "max": 147.52744338938382,
+        "mean": 97.2225911347801,
+        "min": 22.26642055093143
+      },
+      "log2_abs_disc_integral_model_dependent": {
+        "max": 127.81914322314994,
+        "mean": 82.5486307110487,
+        "min": 43.09243972052562
+      },
+      "n": 100000,
+      "regulator_interval_excludes_zero_on_dependent_runs": 0,
+      "relation_abs_forms": {
+        "(1,2)": 31,
+        "(2,1)": 36,
+        "(3,1)": 1
+      },
+      "relations_of_form_P1_eq_pm2P2_or_2P1_eq_pmP2": 67,
+      "sampler": "S3",
+      "seconds_per_run": {
+        "max": 0.142564609,
+        "mean": 0.006437969358550019,
+        "min": 0.003248591
+      },
+      "undecided": 0,
+      "undecided_B2": 0,
+      "undecided_rate": 0.0
+    }
+  ],
+  "protocol": "PROTOCOLS.md section A7",
+  "published": {
+    "dependent": 317,
+    "n": 100000,
+    "rate": 0.00317,
+    "wilson95": [
+      0.002840161032237316,
+      0.0035380085412119473
+    ]
+  },
+  "seed": 20261125,
+  "threads": 4,
+  "wall_seconds": 354.243881823
+}

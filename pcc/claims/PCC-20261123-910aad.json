@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T06:49:50Z",
+ "id": "PCC-20261123-910aad",
+ "kind": "execution",
+ "producer": {
+  "commit": "02d296ba3c80034a4a8a806d627db10d596b96cb",
+  "model": "gpt-6-astra",
+  "session": "fass-signed-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/signed_extraction/evidence/independent/READOUT.md",
+    "sha256": "9ee62e83bb04f78825ed09eb099908c2198f62a7ca47f5afe01c759bc7053062"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/signed_extraction/evidence/independent/replay/stdout.jsonl",
+    "sha256": "aac7736e0977f829eb2b638fc3a0ec45a134ebf9dd034c2103c4682c2b1dd7f8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/signed_extraction/evidence/independent/reader/stdout.json",
+    "sha256": "1cac4c477f2b1d54d82bc06f07a734ed74416dc1c01049fe5cb79b1f354242c6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/signed_extraction/evidence/independent/controls/stdout.json",
+    "sha256": "46b50f164716ab98314c8d8932c943b3d5d8a032f0686674a44e20b98c5114d4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/signed_extraction/evidence/independent/identity-read/stdout.json",
+    "sha256": "ff31a0bbc7ebae5b3943200d4e8a74d236f34fc6aa833372a157f8018dec4ad6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/signed_extraction/evidence/producer/attempt1/identity-issue/identity.json",
+    "sha256": "78f84d871060866bdfae1deb8509bd3b246516e69b99c99342fed78813dffcc3"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/fass_prime31_20261122/signed_extraction; independent review of the fixed component qualification",
+ "statement": "The separate signed-extraction review role replayed the fixed132-case qualifier with the identical immutable executable and reproduced the full raw stream and84 saved files byte-for-byte. Its saved-output reader checked all42 retained pairs and bound all132 raw registry entries; its frozen controls rejected91 mutations and accepted3 positives. The separately saved diagonal certificate passed exact statement binding and32original plus32extra fixed evaluations, rejecting coefficient and digest mutations. All four bounded calls returned0 with unchanged source, executable and input artifacts. These are unsigned same-host finite checks; the42-pair reader does not reconstruct90nonpersisted outputs, and no formal proof, independent rank, complete cost or adversarial probability is asserted."
+}

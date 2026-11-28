@@ -1,0 +1,16 @@
+{
+  "action": "check the IC arm's own walk for the same per-step work and charge it the same way, or list it as unpriced on the IC side too",
+  "created": "2026-11-18T11:18:31Z",
+  "evidence": [
+    "research/genus4_followup_20261118/validation/out/band.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "controlled-experiment",
+    "ecbench-measure"
+  ],
+  "trigger": "a reading charges rho closed-form per-step work its walk does not emit (partition hash, coefficient additions mod r)",
+  "why": "genus_ladder Q4 charged rho 1 hash + 2 coefficient additions per step; the IC unit-T walk does mix64 + 2 addm per step uncharged (genus_ladder.rs ~1508-1512 at ae36cdc6e4), +0.5% on arm x in Q4"
+}

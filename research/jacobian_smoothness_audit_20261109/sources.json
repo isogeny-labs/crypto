@@ -1,0 +1,95 @@
+{
+  "schema": "theorem-source-audit/v1",
+  "created": "2026-11-09T19:54:37.289Z",
+  "scope": "Complete actual reduced Mumford polynomial-pair model over F3 for y^2=x^5-x; eight valid representatives/seven split u-polynomials, finite fraction7/8 and error3/8 from1/2. No formal geometric Picard identification or cyclic-subgroup group law.",
+  "sources": [
+    {
+      "id": "Gaudry2000",
+      "url": "https://doi.org/10.1007/3-540-45539-6_2",
+      "pdf_sha256": "26dd52fc0d82e6fadb971b1e044c7c44f6a10957a105816733e80cc89cb662f8",
+      "text_sha256": "2de847a06db22c426d15930b7af8b0fe457c39f8906ce162b88054d296b5cd5c",
+      "read_scope": "Definition2-4/bookpp21-22: prime means u irreducible;1smooth means u splits; factor basis all degree1primes. Section2.3large-prime subgroup; Proposition4/bookp25 fixed-genus q-to-infinity limit1/g!, not exact finite equality.",
+      "pdf_url": "https://link.springer.com/content/pdf/10.1007/3-540-45539-6_2.pdf"
+    },
+    {
+      "id": "MMT2002",
+      "url": "https://doi.org/10.1112/S1461157000000723",
+      "pdf_url": "https://www.cambridge.org/core/services/aop-cambridge-core/content/view/D4B264D082FF67354EE9968D9803102A/S1461157000000723a.pdf/analysis_of_the_ghs_weil_descent_attack_on_the_ecdlp_over_characteristic_two_finite_fields_of_composite_degree.pdf",
+      "pdf_sha256": "4b48baeb3908f67bad482ab1660fcdcad0d9043bf64368f2bb83bce4104f314b",
+      "text_sha256": "c0bd7c40d70cff8121e8402313780066d56ec9e05bd8fe69123ef814effc0dee",
+      "read_scope": "Sections4.2-4.3printedpp133-134/PDF7-8: prime-r setup, reduced prime/smooth definitions, inverse-pair factor base, explicit subgroup-proportion heuristic beforeeq13. PDFpage8visually inspected; eq12starts at i=1 and omits identity."
+    },
+    {
+      "id": "corpus",
+      "path": "docs/ecdlp-hardness-corpus/lit-covers.json",
+      "node": "HEUR-WD-SUBGROUP-SMOOTHNESS",
+      "evidence_class": "asymptotic_heuristic",
+      "read_scope": "Exact statement, no listed assumptions, source locations. A small finite difference is not a refutation of typical/asymptotic or large-prime behavior."
+    },
+    {
+      "id": "Mathlib",
+      "revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+      "paths": [
+        "Mathlib/Algebra/Polynomial/Div.lean",
+        "Mathlib/Algebra/Polynomial/Monic.lean",
+        "Mathlib/Algebra/Polynomial/Degree/Support.lean",
+        "Mathlib/Algebra/Polynomial/Splits.lean",
+        "Mathlib/FieldTheory/Separable.lean"
+      ],
+      "read_scope": "Actual monic division uniqueness, coefficient expansion from degree bounds, splitting/root criterion and separability/Bezout definition. Kernel enumeration only after proving actual division equivalent to a computable coefficient test."
+    }
+  ],
+  "formal": {
+    "lean": "leanprover/lean4:v4.35.0",
+    "source": "research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean",
+    "source_sha256": "1ebb9df7ecd8c67df17b2a58e44afd95576ccf8f1c218e284260f8773d817bd7",
+    "binding": "MumfordSmoothnessAudit.mumford_count_audit_certificate",
+    "decl_sha256": "e81b758c8e060f8b35cb7616197a5512522832c403d9ebd309896926a079e7c2",
+    "semantics": "ReducedPair ranges over all actual monic u/degree<=2, deg v<deg u, u divides v^2-f. Explicit completeness and injectivity establish a bijection with the canonical coefficient candidates; splitting is actual Polynomial.Splits. Counts are not assertions about a hand-selected list.",
+    "gate": {
+      "path": "evidence/mumford-count-gate.log",
+      "declarations": 80,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Finite polynomial-pair model only. Does not prove a Picard/Jacobian identification, ambient Cantor group law, subgroup proportion counterexample, asymptotic failure or a scaling-family theorem."
+  },
+  "identity_plan": {
+    "status": "Planned; local source/plan commit must precede issue.",
+    "source": "research/jacobian_smoothness_audit_20261109/identity/src/bin/mumford_count.rs",
+    "source_sha256": "a6f57faa3fc00fce42fd09e37ba12ee8aa3c60ef101e4d32f6c8e14f85b50401",
+    "cargo_lock_sha256": "8f6ee1f1edd91391f7468c6b46f0b7536c05752132fe0cd3f18de92f341c3b61",
+    "variables": 5,
+    "degree_bound": 5,
+    "seed_hex": "0x202611091950",
+    "points": 32,
+    "extra_seed_hex": "0x5e4ae095",
+    "extra_points": 11,
+    "scope": "Scalar quotient/remainder rewrite only; not a proof of F3 model completeness/counts/splitting or geometry. Native population still not run.",
+    "checker_sources": [
+      {
+        "path": "src/cryptanalysis/identity_certificate.rs",
+        "sha256": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270"
+      },
+      {
+        "path": "src/hash/sha256.rs",
+        "sha256": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf"
+      }
+    ]
+  },
+  "native_API_review": {
+    "repository": "isogeny-labs/cryptanalysis",
+    "revision": "fe751b09b08bc274d60cb22cfba25b13983b2b6e",
+    "paths": [
+      "suite/src/prime_hyperelliptic/curve.rs",
+      "suite/src/prime_hyperelliptic/fp_poly.rs",
+      "suite/src/prime_hyperelliptic/fp2.rs"
+    ],
+    "read_scope": "Selected constructor/validation/Cantor/enumeration functions and dependencies; not a full native implementation audit. MIT license retained in scratch review; any future vendoring must preserve it.",
+    "implementation_used_for_population": false
+  },
+  "kb": "No connected research-kb tools found; earlier executable lookup unavailable. Narrow primary and pinned-source fallback, no novelty claim.",
+  "new_native_curve_population": false,
+  "frozen_prior_data_changed": false,
+  "paid_spend": 0
+}

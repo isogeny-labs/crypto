@@ -1,0 +1,20 @@
+{
+  "schema": "xedni-coefficient-budget-protocol-v1",
+  "source": "../xedni_coefficient_choice_20261120/source-rows-v2.jsonl.gz",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "arithmetic": "../xedni_coefficient_choice_20261120/audit.py",
+  "input_law": "all 1,722 ordered distinct nonidentity pairs on fixed E(F_47): y^2=x^3-x-2, order 43, centered coordinate lifts",
+  "nested_budgets": [1, 2],
+  "coefficient_rule": "for distinct centered x, a1,a2,a3=47*(k1,k2,k3), each ki in [-K,K] integers; solve a4,a6 exactly from the two point equations",
+  "order": "scan [-2,2]^3 lexicographically; select the first passing choice separately within each nested budget and gate arm",
+  "same_x": "42 pairs with equal centered x have no uniquely solved a4,a6 and remain explicit zero-choice rows",
+  "gates": {
+    "7": "integral coefficients, good reduction, point-incidence rank 2, #E(F_7)=4",
+    "11_strict": "integral coefficients, good reduction, point-incidence rank 2, #E(F_11)=6",
+    "11_weak": "integral coefficients, good reduction, point-incidence rank 2, #E(F_11)=7"
+  },
+  "relation": "source reduced P1+2P2 flag; rational and both local point sums for every selected candidate",
+  "record": "all 1,722 per-pair rows with both budget status counts and first selections; gzip with exact raw SHA-256 and candidate-stream digest",
+  "run_cap": "complete 210,000 maximum-budget candidates; no wall-time performance claim",
+  "control": "K=1 rows and selections must exactly replay the prior full-law result"
+}

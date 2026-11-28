@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T21:50:58Z",
+ "id": "PCC-20261124-b0e9a1",
+ "kind": "statement",
+ "producer": {
+  "commit": "b67f9770de7c11e89435535fff9246ed3c423871",
+  "model": "GPT-6",
+  "session": "smooth-p-plus-one-separating-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/separating_v1/adapter_tests.txt",
+    "sha256": "8c63fbb8171b687c9c2873be6e8c6c57ee98edefc6f1bf136b445045beda6db2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/separating_v1/default_tests.txt",
+    "sha256": "ab193dad5b170969db83ad027f4186a5799abc1449c8927e69ffe4a7253815e6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/native/fixtures/nonseparating.ms",
+    "sha256": "f51d58231994fb8603cce38af68922878d12366a714c4ad083e3a7ca1c1b175b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/native/fixtures/separating.ms",
+    "sha256": "bce9efefdbdababb63a30c482e98ad1247df643da87be23ecb68bfa450b02a0f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/separating_v1/nonseparating.stderr",
+    "sha256": "0ac2809b096962e3ff48bd58925c5e3cf96831f15718f05b27f8d710370b8729"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/separating_v1/separating.rur",
+    "sha256": "b84e33543034d9b4bdebc441a7155a735fb43269c1177b14d4862ac1a417f2d0"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-separating-forms",
+ "statement": "Local development controls: fifteen production-feature adapter tests and six default tests pass after the RUR dimension guard and bounded fixed forms. The retained degree-nine/dimension-ten RUR is rejected. A known separation failure advances once, then unrelated solver exit stops; actual msolve -c 0 nonseparating unit input returns exit zero and empty RUR while the A=x fixture returns dimension and degree two. No cost or signed verification claim."
+}

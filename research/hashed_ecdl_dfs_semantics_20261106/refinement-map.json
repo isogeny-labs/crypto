@@ -1,0 +1,313 @@
+{
+  "schema": "hashed-ecdl.packet-entry-refinement-audit/v1",
+  "claim": "PCC-20261106-d6132b",
+  "standing": "unverified",
+  "source_revision": "75309f57ba69d7683006108e151a21233a04bb48",
+  "status": "written source-review argument; not an executable model or a checked theorem",
+  "semantic_target": "D.4.6 target: beta coefficient of product_i(c_i+sum_j d_ij Z_j), then outgoing powers in creation ring",
+  "signed_coefficients": {
+    "row_true": [
+      "local column sum",
+      "stored incoming coefficient"
+    ],
+    "row_false": [
+      "one minus local column sum",
+      "negative incoming coefficient"
+    ]
+  },
+  "preconditions": [
+    "fixed commutative creation ring with faithful operations/zero test, no domain assumption",
+    "R local rows each length C; q incoming coefficient lists each length R; outgoing indices<C",
+    "bit arity R+C; R+C,R+1,q+1,E=sum(beta) representable; successful allocations",
+    "incoming/outgoing exponents are nonnegative; target labels remain indexed",
+    "only successful local transitions/Ok results are refined; Err state is discarded"
+  ],
+  "invariants": [
+    {
+      "id": "I-prefix",
+      "statement": "0<=row<=R; only chosen[k] for k<row is committed; suffix may be stale"
+    },
+    {
+      "id": "I-residual",
+      "statement": "left_j=beta_j-count_j(chosen[0:row])>=0; remaining=sum(left)"
+    },
+    {
+      "id": "I-capacity",
+      "statement": "remaining<=R-row after initial degree guard and on every admitted loop frontier"
+    },
+    {
+      "id": "I-product",
+      "statement": "prefix[row] is ordered product of active chosen factors; prefix[0]=1"
+    },
+    {
+      "id": "I-cursor",
+      "statement": "choices[row] is next unused label under fixed active ancestors; reset only upon a new child prefix"
+    },
+    {
+      "id": "I-sum",
+      "statement": "sum contains every closed eligible indexed leaf once; pruned subtrees have zero target coefficient"
+    }
+  ],
+  "source_sites": [
+    {
+      "id": "prepare",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "let mut constants = Vec::with_capacity(rows);",
+      "occurrence_within_entry": 0,
+      "line_start": 281,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L281"
+    },
+    {
+      "id": "residual",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "let mut remaining: usize = left.iter().sum();",
+      "occurrence_within_entry": 0,
+      "line_start": 309,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L309"
+    },
+    {
+      "id": "entry_degree_guard",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "if remaining > rows {",
+      "occurrence_within_entry": 0,
+      "line_start": 310,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L310"
+    },
+    {
+      "id": "leaf",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "if row == rows {",
+      "occurrence_within_entry": 0,
+      "line_start": 320,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L320"
+    },
+    {
+      "id": "leaf_filter",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "if remaining == 0 {",
+      "occurrence_within_entry": 0,
+      "line_start": 321,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L321"
+    },
+    {
+      "id": "leaf_pop",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "row -= 1;",
+      "occurrence_within_entry": 0,
+      "line_start": 327,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L327"
+    },
+    {
+      "id": "scan",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "while choices[row] <= self.incoming.len() {",
+      "occurrence_within_entry": 0,
+      "line_start": 335,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L335"
+    },
+    {
+      "id": "mode_full",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "if left[choice - 1] == 0 {",
+      "occurrence_within_entry": 0,
+      "line_start": 342,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L342"
+    },
+    {
+      "id": "zero_factor",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "if factor.is_zero() {",
+      "occurrence_within_entry": 0,
+      "line_start": 347,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L347"
+    },
+    {
+      "id": "consume",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "left[choice - 1] -= 1;",
+      "occurrence_within_entry": 0,
+      "line_start": 351,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L351"
+    },
+    {
+      "id": "degree_prune",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "if remaining > rows - row - 1 {",
+      "occurrence_within_entry": 0,
+      "line_start": 354,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L354"
+    },
+    {
+      "id": "guarded_mode_undo",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "left[choice - 1] += 1;",
+      "occurrence_within_entry": 0,
+      "line_start": 356,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L356"
+    },
+    {
+      "id": "commit",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "prefix[row + 1] = self.ring.mul(&prefix[row], factor, meter)?;",
+      "occurrence_within_entry": 0,
+      "line_start": 361,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L361"
+    },
+    {
+      "id": "new_row_cursor",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "choices[row] = 0;",
+      "occurrence_within_entry": 0,
+      "line_start": 365,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L365"
+    },
+    {
+      "id": "exhaustion_pop",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "row -= 1;",
+      "occurrence_within_entry": 1,
+      "line_start": 376,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L376"
+    },
+    {
+      "id": "zero_coefficient",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "if sum.is_zero() {",
+      "occurrence_within_entry": 0,
+      "line_start": 382,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L382"
+    },
+    {
+      "id": "outgoing",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "for mode in &self.outgoing {",
+      "occurrence_within_entry": 0,
+      "line_start": 385,
+      "url": "https://github.com/isogeny-labs/crypto/blob/75309f57ba69d7683006108e151a21233a04bb48/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L385"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "initialize",
+      "source_site": "residual",
+      "source_action": "Set beta residuals/prefix; admit E<=R",
+      "review_argument": "Empty-prefix predicates and capacity hold",
+      "status": "unverified producer argument"
+    },
+    {
+      "id": "mode_skip",
+      "source_site": "mode_full",
+      "source_action": "Reject left_j=0 before consumption",
+      "review_argument": "Cannot complete target with another use",
+      "status": "unverified producer argument"
+    },
+    {
+      "id": "factor_skip",
+      "source_site": "zero_factor",
+      "source_action": "Reject zero factor before consumption",
+      "review_argument": "Every descendant product zero; does not test prefix zero",
+      "status": "unverified producer argument"
+    },
+    {
+      "id": "mode_trial",
+      "source_site": "consume",
+      "source_action": "Consume one exponent before degree test",
+      "review_argument": "Remaining decreases by one; under capacity cannot fail degree test",
+      "status": "unverified producer argument"
+    },
+    {
+      "id": "degree_reject",
+      "source_site": "degree_prune",
+      "source_action": "Reject remaining>R-row-1",
+      "review_argument": "Under capacity iff constant choice and pre-trial remaining=R-row",
+      "status": "unverified producer argument"
+    },
+    {
+      "id": "defensive_undo",
+      "source_site": "guarded_mode_undo",
+      "source_action": "Source would restore nonzero trial at same row",
+      "review_argument": "Unreachable under admitted capacity invariant; guard retained",
+      "status": "unverified producer argument"
+    },
+    {
+      "id": "push",
+      "source_site": "commit",
+      "source_action": "Write product and chosen; increase row; reset next cursor",
+      "review_argument": "Commit prefix, counters and reduced capacity",
+      "status": "unverified producer argument"
+    },
+    {
+      "id": "leaf",
+      "source_site": "leaf_filter",
+      "source_action": "Add prefix[R] if remaining=0",
+      "review_argument": "Target exponent vector used exactly; ordered multiplicity retained",
+      "status": "unverified producer argument"
+    },
+    {
+      "id": "leaf_return",
+      "source_site": "leaf_pop",
+      "source_action": "Decrease row then restore nonzero committed parent",
+      "review_argument": "Remove parent from prefix exactly once",
+      "status": "unverified producer argument"
+    },
+    {
+      "id": "exhaustion_return",
+      "source_site": "exhaustion_pop",
+      "source_action": "Decrease row then restore nonzero parent after exhausting current row",
+      "review_argument": "Do not restore stale current-depth chosen again",
+      "status": "unverified producer argument"
+    },
+    {
+      "id": "outgoing",
+      "source_site": "outgoing",
+      "source_action": "Apply sparse source forms/powers in creation ring",
+      "review_argument": "No factorial normalization, cancellation or early lift",
+      "status": "unverified producer argument"
+    },
+    {
+      "id": "error_scope",
+      "source_site": "commit",
+      "source_action": "Ring operation may Err after trial consumption",
+      "review_argument": "No Ok result/suspended continuation, local arrays discarded",
+      "status": "unverified producer argument"
+    }
+  ],
+  "reachability": {
+    "site": "guarded_mode_undo",
+    "source_branch_retained": true,
+    "claim": "under I-capacity, mode trial changes m to m-1<=k-1; only constant m=k can fail degree guard",
+    "status": "unverified reachability argument, not executed coverage"
+  },
+  "symbolic_walkthroughs": [
+    {
+      "rows": 2,
+      "incoming_records": 1,
+      "target_exponent": 1,
+      "leaves": [
+        "constant,incoming",
+        "incoming,constant"
+      ],
+      "status": "hand-derived indexed source trace; not executed"
+    },
+    {
+      "rows": 2,
+      "incoming_records": 1,
+      "target_exponent": 2,
+      "constant_choices": "degree rejected at both rows",
+      "mode_undo": "not reached under capacity invariant",
+      "status": "hand-derived pruning trace; not executed"
+    }
+  ],
+  "formal_status": {
+    "lean": "unavailable on PATH; no build",
+    "declarations": [],
+    "kernel_axiom_audit": "not performed",
+    "identity_certificate": "not issued; existing source semantic target, no new identity claim",
+    "remaining": [
+      "faithful coefficient/choice-tree formal model",
+      "imperative usize/slice transition refinement and Ok/Err distinction",
+      "caller and Ring arithmetic soundness",
+      "aggregate bit-cost/retention induction"
+    ]
+  }
+}

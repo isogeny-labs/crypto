@@ -1,0 +1,67 @@
+name: Prime31 RR9 original-curve rank-one graph update exactness gate
+on:
+  push:
+    branches:
+      - automation/prime31-rr9-rowupdate-gate-20261119
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_rowupdate.rs
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_rowupdate.py
+      - research/prime31_ic_20261115/rr9/RR9_RANKONE_UPDATE_PROTOCOL_20261119.md
+      - .github/workflows/prime31-rr9-rowupdate.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_rowupdate.rs
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_rowupdate.py
+      - .github/workflows/prime31-rr9-rowupdate.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pinned-prime31-rankone:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+      - name: Checkout original Prime31 arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only candidate RR9 algebraic examples
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_rowupdate.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_rowupdate.rs
+      - name: Original Rust library regression tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Exact synthetic and B8 original curve chart replacement tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_rowupdate
+      - name: Preregistered A-B-B-A 500-iteration same-runner chart-only diagnostic
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_rowupdate > prime31-rr9-rankone-raw.json
+      - name: Independent Python BigInt full 128-case verification
+        run: python3 research/prime31_ic_20261115/native/verify_prime31_rr9_rowupdate.py prime31-rr9-rankone-raw.json
+      - name: Preserve original-curve evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-rankone-raw
+          path: prime31-rr9-rankone-raw.json
+          if-no-files-found: warn
+          retention-days: 30

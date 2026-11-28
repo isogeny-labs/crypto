@@ -1,0 +1,102 @@
+{
+  "experiment_id": "PRIME31-RR9-GRAPH-CHART-ABBA-20261119",
+  "date_utc": "2026-11-19",
+  "status": "source-specific native Rust CI passed; independent Python BigInt arithmetic replay passed; independent signed PCC unverified",
+  "pr": "https://github.com/isogeny-labs/crypto/pull/4780",
+  "source_ci_run": "https://github.com/isogeny-labs/crypto/actions/runs/44452737502",
+  "source_sha": "122f6d9c830d4111c0c3261eb2209fc24743858c",
+  "pinned_original_arithmetic_sha": "1df714645aa683cf975bc76fcacb9842cb4780fd",
+  "raw_artifact_id": 14496176710,
+  "raw_artifact_sha256": "e3fe6eeee64d2b9bf21b913bcd6173788ed9b6b7daa164ff58a8d65c3b7cd1fa",
+  "p": 2147483647,
+  "curve_a": 847514846,
+  "curve_b": 2087444724,
+  "group_order": 2147446831,
+  "group_cofactor": 1,
+  "generator": [
+    625037715,
+    2100627251
+  ],
+  "weights": [
+    1,
+    3,
+    5,
+    7,
+    11,
+    13,
+    17,
+    19
+  ],
+  "b4_half_assignments": 4096,
+  "b4_negative_pairs": 16777216,
+  "graph_pair_field_products": 30,
+  "exterior_pair_field_products": 70,
+  "graph_half_pair_vector_coordinates": 16,
+  "exterior_half_pair_vector_coordinates": 70,
+  "b4_both_half_graph_bytes": 1048576,
+  "b4_both_half_exterior_bytes": 4587520,
+  "b8_both_half_graph_bytes": 16777216,
+  "b8_both_half_exterior_bytes": 73400320,
+  "b8_full_negative_graph_pairs": 4294967296,
+  "b8_full_negative_graph_coordinate_products": 128849018880,
+  "b8_full_negative_exterior_coordinate_products": 300647710720,
+  "b8_1024_full_negative_graph_coordinate_products": 131941395333120,
+  "sequence": "EXTERIOR GRAPH GRAPH EXTERIOR, two complete candidate executions each, same runner",
+  "exact_source_rust_library_tests_passed": 40,
+  "exact_source_rust_example_tests_passed": 4,
+  "independent_python_bigint_target_conditioned_residues": 62,
+  "trial_ms": {
+    "exterior_first": {
+      "planted_positive": 289.090905,
+      "full_natural_negative": 2025.929563
+    },
+    "graph_first": {
+      "planted_positive": 5.426871,
+      "full_natural_negative": 1444.170124
+    },
+    "graph_second": {
+      "planted_positive": 5.35273,
+      "full_natural_negative": 1446.774604
+    },
+    "exterior_second": {
+      "planted_positive": 289.880874,
+      "full_natural_negative": 2022.829508
+    }
+  },
+  "mean_ms": {
+    "exterior": {
+      "planted_positive": 289.4858895,
+      "full_natural_negative": 2024.3795355
+    },
+    "graph": {
+      "planted_positive": 5.3898005,
+      "full_natural_negative": 1445.472364
+    }
+  },
+  "exhaustive_negative_speedup_graph_over_exterior": 1.4004968797175843,
+  "exhaustive_negative_time_reduction_percent": 28.596770583190878,
+  "planted_positive_diagnostic_ratio": 53.70994520112572,
+  "planted_positive_caveat": "all-zero slot labels generate first enumerated candidate, not a natural positive-hit distribution; chart/exterior preprocessing dominates",
+  "independent_b4_truth": {
+    "planted_positive": {
+      "witness": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "natural_G_negative": {
+      "witness": null,
+      "verified_negative_after_full_16777216_pair_exhaustion": true
+    }
+  },
+  "whole_solver_speedup_claim": false,
+  "nonenumerative_signed_index_extraction_claim": false,
+  "signed_pcc": "unverified",
+  "extra_notes": "Pair product counts exclude preprocessing, field inversions, 2x2 subtraction/addition work, and group-oracle grading. Wall times include per-query algebraic precomputation but omit independent out-of-band group grader. Comparisons apply only to B4 algebraic candidate and use two runs per method."
+}

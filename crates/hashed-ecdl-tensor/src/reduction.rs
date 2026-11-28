@@ -125,12 +125,14 @@ pub fn decomposition_network(
     target: &Point,
     meter: &mut Meter,
 ) -> Result<Network> {
-    Ok(decomposition_network_impl(curve, bases, target, false, Multiplier::Fourier, meter)?.0)
+    Ok(decomposition_network_impl(curve, bases, target, false, Multiplier::Auto, true, meter)?.0)
 }
 
 /// The same language with the integer multiplication gadget chosen explicitly
-/// (`Multiplier::Fourier` reproduces `decomposition_network`). Only the Boolean
-/// graph changes: the accepted assignments, counts and witnesses do not.
+/// (`Fourier` is Theorem 3's gadget throughout). Only the Boolean graph
+/// changes: the accepted assignments, counts and witnesses do not. Free points
+/// keep the plain `(x, y)` input layout here; `decomposition_network` (Auto
+/// multiplier) enumerates prime-order free points as `(x, parity of y)`.
 pub fn decomposition_network_with_multiplier(
     curve: &Curve,
     bases: &[FactorBase],
@@ -138,7 +140,7 @@ pub fn decomposition_network_with_multiplier(
     multiplier: Multiplier,
     meter: &mut Meter,
 ) -> Result<Network> {
-    Ok(decomposition_network_impl(curve, bases, target, false, multiplier, meter)?.0)
+    Ok(decomposition_network_impl(curve, bases, target, false, multiplier, false, meter)?.0)
 }
 
 /// Build the same decomposition language with semantic slot regions and return
@@ -154,7 +156,15 @@ pub fn decomposition_network_with_semantic_cut(
     target: &Point,
     meter: &mut Meter,
 ) -> Result<(Network, Vec<usize>)> {
-    decomposition_network_impl(curve, bases, target, true, Multiplier::Fourier, meter)
+    decomposition_network_impl(
+        curve,
+        bases,
+        target,
+        true,
+        Multiplier::Fourier,
+        false,
+        meter,
+    )
 }
 
 /// The same language as the general construction, with the last slot computed
@@ -170,6 +180,7 @@ fn derived_last_slot_network(
     bases: &[FactorBase],
     target: &Point,
     multiplier: Multiplier,
+    compressed: bool,
     meter: &mut Meter,
 ) -> Result<Network> {
     let (last, free) = bases
@@ -177,9 +188,16 @@ fn derived_last_slot_network(
         .ok_or_else(|| invalid("decomposition target or arity"))?;
     let mut encoder = Encoder::new();
     encoder.set_multiplier(multiplier);
-    let mut sum = Encoder::constant_point(curve, &Point::Infinity)?;
+    let mut sum: Option<PointWords> = None;
     for base in free {
-        let point = encoder.input_point(curve, false, meter)?;
+        let point = if compressed {
+            encoder.input_point_compressed_unchecked(curve, meter)?
+        } else {
+            encoder.input_point(curve, false, meter)?
+        };
+        // The hash reads only x and the low ordinate bit, both free when
+        // compressed, so it runs before the costlier curve equation; the
+        // constraints are a conjunction, so the order changes no language.
         encoder.hash_member(
             curve,
             &point,
@@ -189,20 +207,17 @@ fn derived_last_slot_network(
             &base.threshold,
             meter,
         )?;
+        encoder.assert_valid_point(curve, &point, meter)?;
         encoder.mark_point_interface(&point, meter)?;
-        sum = encoder.point_add(curve, &sum, &point, meter)?;
+        // O + A_1 = A_1: the first free point starts the sum directly instead
+        // of passing through a whole addition network with a constant identity.
+        sum = Some(match sum {
+            None => point,
+            Some(sum) => encoder.point_add(curve, &sum, &point, meter)?,
+        });
     }
-    let width = curve.modulus().bits() as usize;
-    let negated = PointWords {
-        infinity: sum.infinity.clone(),
-        x: sum.x.clone(),
-        y: encoder.modular_subtract(
-            &Encoder::constant(width, &BigUint::zero())?,
-            &sum.y,
-            curve.modulus(),
-            meter,
-        )?,
-    };
+    let sum = sum.ok_or_else(|| invalid("decomposition target or arity"))?;
+    let negated = encoder.negate_point(curve, &sum, meter)?;
     let point = encoder.point_add(
         curve,
         &Encoder::constant_point(curve, target)?,
@@ -228,6 +243,7 @@ fn decomposition_network_impl(
     target: &Point,
     semantic_cut: bool,
     multiplier: Multiplier,
+    compressed: bool,
     meter: &mut Meter,
 ) -> Result<(Network, Vec<usize>)> {
     if bases.len() < 2 || !curve.in_subgroup(target, meter)? {
@@ -235,7 +251,7 @@ fn decomposition_network_impl(
     }
     if !semantic_cut && curve.cofactor().is_one() {
         return Ok((
-            derived_last_slot_network(curve, bases, target, multiplier, meter)?,
+            derived_last_slot_network(curve, bases, target, multiplier, compressed, meter)?,
             Vec::new(),
         ));
     }
@@ -339,10 +355,13 @@ pub fn decompose_with(
     mut witness: impl FnMut(&Network, &mut Meter) -> Result<Option<Vec<bool>>>,
     meter: &mut Meter,
 ) -> Result<Option<Vec<Point>>> {
+    crate::metrics::phase("network_build")?;
     let network = decomposition_network(curve, bases, target, meter)?;
+    crate::metrics::phase("contraction")?;
     let Some(word) = witness(&network, meter)? else {
         return Ok(None);
     };
+    crate::metrics::phase("witness_check")?;
     let width = curve.modulus().bits() as usize;
     let stride = 1usize
         .checked_add(
@@ -500,7 +519,7 @@ json_record!(
     optional {}
 );
 
-fn threshold(
+pub(crate) fn threshold(
     curve: &Curve,
     prime: &BigUint,
     config: &Config,
@@ -525,7 +544,7 @@ fn threshold(
 
 // Streaming elimination stores at most N pivot rows and their expression in
 // the input rows. It selects the first dependency deterministically from M only.
-fn row_dependency(
+pub(crate) fn row_dependency(
     matrix: &[Vec<BigUint>],
     modulus: &BigUint,
     meter: &mut Meter,
@@ -572,7 +591,7 @@ fn row_dependency(
     Err(integrity("N+1 rows lacked a dependency"))
 }
 
-fn indexed_bases(
+pub(crate) fn indexed_bases(
     curve: &Curve,
     bases: &[FactorBase],
     rng: &mut impl RandomSource,
@@ -593,7 +612,7 @@ fn indexed_bases(
     Ok(indexes)
 }
 
-fn matrix_row(
+pub(crate) fn matrix_row(
     relation: &Relation,
     indexes: &[BTreeMap<Point, usize>],
     columns: usize,
@@ -611,7 +630,7 @@ fn matrix_row(
     Ok(row)
 }
 
-fn combined_scalars(
+pub(crate) fn combined_scalars(
     relations: &[Relation],
     dependency: &[BigUint],
     modulus: &BigUint,
@@ -664,6 +683,7 @@ pub fn solve_with_oracle(
         &mut |curve, bases, point, work| {
             let answer = oracle(curve, bases, point, work)?;
             if let Some(points) = &answer {
+                crate::metrics::phase("witness_check")?;
                 if points.len() != bases.len() {
                     return Err(integrity("oracle slot count"));
                 }
@@ -692,13 +712,71 @@ fn solve_using(
     oracle: &mut impl FnMut(&Curve, &[FactorBase], &Point, &mut Meter) -> Result<Option<Vec<Point>>>,
     meter: &mut Meter,
 ) -> Result<Certificate> {
-    if config.slots < 2 || config.trials == 0 || !curve.in_subgroup(target, meter)? {
+    solve_with_preparation(
+        curve,
+        target,
+        config,
+        rng,
+        |_, _, _, _| Ok(()),
+        |c, bases, _, query, work| oracle(c, bases, query, work),
+        meter,
+    )
+}
+
+// The indexes are complete enumerations owned by this reduction, never a
+// caller-supplied partial table. Prepare only once per nonempty fresh trial.
+pub(crate) fn solve_with_preparation<State>(
+    curve: &Curve,
+    target: &Point,
+    config: &Config,
+    rng: &mut impl RandomSource,
+    prepare: impl FnMut(&Curve, &[FactorBase], &[BTreeMap<Point, usize>], &mut Meter) -> Result<State>,
+    oracle: impl FnMut(
+        &Curve,
+        &[FactorBase],
+        &mut State,
+        &Point,
+        &mut Meter,
+    ) -> Result<Option<Vec<Point>>>,
+    meter: &mut Meter,
+) -> Result<Certificate> {
+    solve_with_target_preparation(curve, target, config, rng, prepare, oracle, false, meter)
+}
+
+// Joint targets are an explicit alternative; the original collector stays the
+// control. Coefficients never enter the decomposition oracle.
+pub(crate) fn solve_with_target_preparation<State>(
+    curve: &Curve,
+    target: &Point,
+    config: &Config,
+    rng: &mut impl RandomSource,
+    mut prepare: impl FnMut(
+        &Curve,
+        &[FactorBase],
+        &[BTreeMap<Point, usize>],
+        &mut Meter,
+    ) -> Result<State>,
+    mut oracle: impl FnMut(
+        &Curve,
+        &[FactorBase],
+        &mut State,
+        &Point,
+        &mut Meter,
+    ) -> Result<Option<Vec<Point>>>,
+    joint_targets: bool,
+    meter: &mut Meter,
+) -> Result<Certificate> {
+    if config.slots < 2 || config.trials == 0 {
         return Err(invalid("reduction input"));
     }
     meter.vector(config.slots, "factor-base slots")?;
     config.validate_hash_prime(curve, meter)?;
     // Identity has an immediate, independently checkable certificate.
     if target == &Point::Infinity {
+        crate::metrics::phase("target_validation")?;
+        if !curve.in_subgroup(target, meter)? {
+            return Err(invalid("reduction input"));
+        }
         return Ok(Certificate {
             version: 1,
             prime: BigUint::zero(),
@@ -709,7 +787,10 @@ fn solve_using(
             scalar: BigUint::zero(),
         });
     }
+    let mut joint_table = None;
+    let mut target_validated = false;
     for _ in 0..config.trials {
+        crate::metrics::phase("factor_base")?;
         meter.charge(1, "fresh-seed trial")?;
         let prime = if let Some(prime) = &config.hash_prime {
             prime.clone()
@@ -755,13 +836,42 @@ fn solve_using(
             .ok_or_else(|| overflow("relation attempts"))?;
         let mut relations = Vec::with_capacity(required);
         let mut matrix = Vec::with_capacity(required);
+        let mut oracle_state = prepare(curve, &bases, &indexes, meter)?;
+        // Original per-target contract: initial bases and oracle setup are
+        // reusable, but subgroup validation, target tables and later retries
+        // belong to the same online interval.
+        if !target_validated {
+            crate::metrics::phase("target_validation")?;
+            if !curve.in_subgroup(target, meter)? {
+                return Err(invalid("reduction input"));
+            }
+            target_validated = true;
+        }
         for _ in 0..attempts {
+            crate::metrics::phase("relation_target")?;
             let u = random_below(curve.order(), rng, meter)?;
             let v = random_below(curve.order(), rng, meter)?;
-            let left = curve.mul(curve.generator(), &u, meter)?;
-            let right = curve.mul(target, &v, meter)?;
-            let point = curve.add(&left, &right, meter)?;
-            if let Some(points) = oracle(curve, &bases, &point, meter)? {
+            let point = if joint_targets {
+                if joint_table.is_none() {
+                    joint_table = Some(crate::joint::JointTable::from_subgroup_points(
+                        curve,
+                        curve.generator(),
+                        target,
+                        meter,
+                    )?);
+                }
+                joint_table
+                    .as_ref()
+                    .expect("initialized joint table")
+                    .evaluate(&u, &v, meter)?
+            } else {
+                let left = curve.mul(curve.generator(), &u, meter)?;
+                let right = curve.mul(target, &v, meter)?;
+                curve.add(&left, &right, meter)?
+            };
+            crate::metrics::phase("relation_search")?;
+            if let Some(points) = oracle(curve, &bases, &mut oracle_state, &point, meter)? {
+                crate::metrics::phase("matrix_build")?;
                 let relation = Relation { u, v, points };
                 matrix.push(matrix_row(&relation, &indexes, columns)?);
                 relations.push(relation);
@@ -773,11 +883,13 @@ fn solve_using(
         if relations.len() != required {
             continue;
         }
+        crate::metrics::phase("linear_algebra")?;
         let dependency = row_dependency(&matrix, curve.order(), meter)?;
         let (u, v) = combined_scalars(&relations, &dependency, curve.order());
         if v.is_zero() {
             continue;
         }
+        crate::metrics::phase("recovery_check")?;
         let scalar = (curve.order() - u) * inverse(&v, curve.order())? % curve.order();
         if curve.mul(curve.generator(), &scalar, meter)? != *target {
             return Err(integrity("recovered scalar replay"));

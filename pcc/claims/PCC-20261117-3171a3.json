@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T05:21:55Z",
+ "id": "PCC-20261117-3171a3",
+ "kind": "statement",
+ "producer": {
+  "commit": "94479f7e3eb9de9ae59b764d2b2b50b3238f0a44",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/pr-closure-4502-20261117/FACTS.json",
+    "sha256": "5a109171586327f7c499e356a96f88f93b8c628938d74da1945fb70be5e80c3a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/pr-closure-4502-20261117/PR_CHECKS_REVIEWS_STATUSES.json.xz",
+    "sha256": "2541d123645c8febb17f840fbe5f074b53470c7aad14cc6a2892b5f6c5fbcfea"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/pr-closure-4502-20261117/MERGE_TIMELINE.json",
+    "sha256": "ac4d8fab962f30617d75752a251f2f39232ce314513b20bb1c0ac6aafde8738e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/pr-closure-4502-20261117/PUBLISHED_SOURCE_SUFFIX.jsonl",
+    "sha256": "b9156a1e606a02a452d5a35e5c91cf687536a95b77b47306c1e0c1a04c96b889"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "4502 terminal publication facts and published event divergence",
+ "statement": "PR4502 merged04:27:58Z before required checks began;guarded CLI auto did not establish queued-only state. Owned claim bodies/subjects remain unchanged;1293published prefix lost after1290common rows,with three IDs retained under different hashes in1352-row canonical ledger. Exact old suffix archived,not replayed here. Episode publication-only;no all-green,original-session attribution or signed science."
+}

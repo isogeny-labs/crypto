@@ -1,0 +1,283 @@
+card: CARD-conductor-gap-main-20261025-1 (sha256 3e3f0e93f4b5fb1a2caf630ce8b017db0817d2d78c62f3093fcd5deec83e829e)
+commit: 68e6c8b12d9185824bc071d7bc29ce2c2b5a2372
+receipt: research/conductor_gap_replication_20261025/cards/CARD-conductor-gap-main-20261025-1.receipt.json sha256 b63f0ffb38aa7ee34c3a5eeb365c8646d8828223efe5221d1ec42ee2f38541ab
+status: completed
+command 1 (a-run-controls): ["./target/release/examples/conductor_gap_replication", "run-controls", "research/conductor_gap_replication_20261025/prepared-a"] exit 0 (895.318 s) succeeded
+  stdout sha256 1ccd38081e33cc176d0d30eff6e0087572c4ce517142b96c32eeb0c81ea55979; last 8 lines:
+    a-c0-controls: recorded
+    a-c1-controls: recorded
+    a-c2-controls: recorded
+    a-c3-controls: recorded
+    a-c4-controls: recorded
+    a-c5-controls: recorded
+    a-c6-controls: recorded
+    a-c7-controls: recorded
+  output research/conductor_gap_replication_20261025/sessions/a-c0-controls/records.jsonl: d7132b0aef18838b4c8a0620c9854b880a994c195bc11aeaff63683875af13b3
+  output research/conductor_gap_replication_20261025/sessions/a-c0-controls/session.json: 6c9d73e5b87d1e8faf90e0624e900160bdba257c7eabf0b289a99ebe1420ec2b
+  output research/conductor_gap_replication_20261025/sessions/a-c1-controls/records.jsonl: 272884aaad27812bd57261fa9ff9a9285b26b4d3e56d4aca94fd844502ac5c64
+  output research/conductor_gap_replication_20261025/sessions/a-c1-controls/session.json: 7b022f5e392453fdf2653de0b67aca8f9445d3e13758dacbe58a597e27c636eb
+  output research/conductor_gap_replication_20261025/sessions/a-c2-controls/records.jsonl: ad87c639f38c6dfe953525c5c9fecb49dd41a9f36027bc8c16a34499b3b2202b
+  output research/conductor_gap_replication_20261025/sessions/a-c2-controls/session.json: 8abbe8dbc97f8c4a20cffee74ab26af5c3bbb2924c34c7c5885c64e8c70cc7f6
+  output research/conductor_gap_replication_20261025/sessions/a-c3-controls/records.jsonl: f929c77fecf1de35bfc19b7673d3d44d993cd32dfd7cf64abe3cfa8f3f82dd73
+  output research/conductor_gap_replication_20261025/sessions/a-c3-controls/session.json: f9a81c5f7d5e982b1b9063a40a7b2ba922c60b215b61af7361fdc87003c2a495
+  output research/conductor_gap_replication_20261025/sessions/a-c4-controls/records.jsonl: 278ece2d32d1bd819149744ddd6480dda88fa4f5a0ba105d62b02400035aca80
+  output research/conductor_gap_replication_20261025/sessions/a-c4-controls/session.json: 17506e7ff6a55ba634cc8d91c4da978b15cd04781726c820f631e80c1b0186e3
+  output research/conductor_gap_replication_20261025/sessions/a-c5-controls/records.jsonl: 13a0c8afcda39cb5cc4db63db7fe73557af567b231f5541cc1e70fb49a00e78e
+  output research/conductor_gap_replication_20261025/sessions/a-c5-controls/session.json: 6871e09ce0ca8ccdc42e4583c52647c9ddad16f6032644738c0a2c045e1f7dab
+  output research/conductor_gap_replication_20261025/sessions/a-c6-controls/records.jsonl: 8c4c27929445df0a7197c4d4d86626020148730333a884245b6110b31973cea0
+  output research/conductor_gap_replication_20261025/sessions/a-c6-controls/session.json: b05e4af6f9f4445719845a55058c759550cb40168b7a016fcb7ef4085b153701
+  output research/conductor_gap_replication_20261025/sessions/a-c7-controls/records.jsonl: 8876a66cb69ebcde9bc08ca2ac87f9bec1f940183f99d3b004b0a71b182c163a
+  output research/conductor_gap_replication_20261025/sessions/a-c7-controls/session.json: b98ad63017eaed3ed7a64831cd0fe14e56785fb7d22f3b7320ef58199a2effaa
+command 2 (a-audit-controls): ["./target/release/examples/conductor_gap_replication", "audit-controls", "research/conductor_gap_replication_20261025/prepared-a"] exit 0 (37.832 s) succeeded
+  stdout sha256 3ca6256704dc90d717b30a6728b397ed2ec0d9b065347b8f7158c4ca102b4c66; last 8 lines:
+    a-c0-controls: replayed
+    a-c1-controls: replayed
+    a-c2-controls: replayed
+    a-c3-controls: replayed
+    a-c4-controls: replayed
+    a-c5-controls: replayed
+    a-c6-controls: replayed
+    a-c7-controls: replayed
+  output research/conductor_gap_replication_20261025/sessions/a-c0-controls.audit.json: 22f67c4b2af4d6863e04591a69cb9eabdf1fb8f351cb5bc30d1baa2dcc371fda
+  output research/conductor_gap_replication_20261025/sessions/a-c1-controls.audit.json: 6c73b7f67973f110ae0d590bd0088c74c79e13ab3fb4b44e3cdba916c352373b
+  output research/conductor_gap_replication_20261025/sessions/a-c2-controls.audit.json: 46b11ca944db3de2ca704fd51ee8227d418f410f63011dba7fe48577cbc818ea
+  output research/conductor_gap_replication_20261025/sessions/a-c3-controls.audit.json: 2c4134d9327d6ffe432446d848ba016adcfdb4236dbd4cccdffd5c36812385ed
+  output research/conductor_gap_replication_20261025/sessions/a-c4-controls.audit.json: fe5b6de4b83a7a2ae762f8e71116c581a91082655f453dd14b01f11f694f2678
+  output research/conductor_gap_replication_20261025/sessions/a-c5-controls.audit.json: 1374e839fee296f587b25582df276e967b1b1ae3380b181c368dab18d3230d8b
+  output research/conductor_gap_replication_20261025/sessions/a-c6-controls.audit.json: 9b91c7c945f4e4458eba37c37af15252ae353fd9b5c56ebfdbd664ce028201b4
+  output research/conductor_gap_replication_20261025/sessions/a-c7-controls.audit.json: def442be34132eba2a02b57eed2abff81ba095fbdbbb067f94a3102e88a91cf4
+command 3 (a-positive-control-gate): ["./target/release/examples/conductor_gap_replication", "gate-a", "research/conductor_gap_replication_20261025/prepared-a"] exit 0 (0.441 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  output research/conductor_gap_replication_20261025/positive-control-gate.json: a4a071a8b1bda28e1ef510e92bdb876ae5ff273b959457697d496c159e00228c
+command 4 (a-run-primary): ["./target/release/examples/conductor_gap_replication", "run-primary", "research/conductor_gap_replication_20261025/prepared-a"] exit 0 (3700.344 s) succeeded
+  stdout sha256 dfea614525287688f2a69fd6a2bbcc79b69c34be5ffe28402848c3c6216b3608; last 20 lines:
+    a-c4-level4: recorded
+    a-c4-bsgs: recorded
+    a-c5-level0: recorded
+    a-c5-level1: recorded
+    a-c5-level2: recorded
+    a-c5-level3: recorded
+    a-c5-level4: recorded
+    a-c5-bsgs: recorded
+    a-c6-level0: recorded
+    a-c6-level1: recorded
+    a-c6-level2: recorded
+    a-c6-level3: recorded
+    a-c6-level4: recorded
+    a-c6-bsgs: recorded
+    a-c7-level0: recorded
+    a-c7-level1: recorded
+    a-c7-level2: recorded
+    a-c7-level3: recorded
+    a-c7-level4: recorded
+    a-c7-bsgs: recorded
+  output research/conductor_gap_replication_20261025/sessions/a-c0-bsgs/records.jsonl: a61138900577ba03c4a87b0d48ea21c231e3dbeff42687900f8ec07281e6debb
+  output research/conductor_gap_replication_20261025/sessions/a-c0-bsgs/session.json: 1849c33d6c8f2731f15768fd5709b4c8eeb32ad32f193d9a9b3a4aaf04140b3f
+  output research/conductor_gap_replication_20261025/sessions/a-c0-level0/records.jsonl: 553442136b4af38040b2acc56ba53bedeb096b6fb606b969266c194ff7f0f9ec
+  output research/conductor_gap_replication_20261025/sessions/a-c0-level0/session.json: 442383f2a7234f8666c6f2c91e3f06565c0aad64988f6ef0c3da78ff7cec8482
+  output research/conductor_gap_replication_20261025/sessions/a-c0-level1/records.jsonl: a414ce52ec11861d05c49f24d80edae0634870ef915044b1ae94d121fe3712f8
+  output research/conductor_gap_replication_20261025/sessions/a-c0-level1/session.json: 4f1565d8e894d66352011ea724c2ef90d314b6b63517dc83d38e8a92d1375ba4
+  output research/conductor_gap_replication_20261025/sessions/a-c0-level2/records.jsonl: 23a7ca1d91c79a9cb710dcf73741cc343bc42ed4b6704397f0666d6a1858497a
+  output research/conductor_gap_replication_20261025/sessions/a-c0-level2/session.json: 68bd8eb30a3dcf7d1dc1169e729007f7348da7239f2385f2586c033bb7d851dc
+  output research/conductor_gap_replication_20261025/sessions/a-c0-level3/records.jsonl: 1d8f5bf83bf5ed6ed99835c6cbd8f2fa077e5d81de148a28f59f09efd826205f
+  output research/conductor_gap_replication_20261025/sessions/a-c0-level3/session.json: 5e7e584773443eff43be376350cbee5883bd4bd985b5ca69ad41efc7c49a3997
+  output research/conductor_gap_replication_20261025/sessions/a-c0-level4/records.jsonl: 366f2b6d37d82d3a0f223eda0b510be88b85ef8df8888c739e30d7659f929f58
+  output research/conductor_gap_replication_20261025/sessions/a-c0-level4/session.json: d1dc059a25cf31b7792653847cbf19a36b67d09a2a417a7d683649755ca92281
+  output research/conductor_gap_replication_20261025/sessions/a-c1-bsgs/records.jsonl: 8e6e2012ba57568e6e3e2c922ede59991b9fe0c92880e53d5662bbd72e2160fe
+  output research/conductor_gap_replication_20261025/sessions/a-c1-bsgs/session.json: b7f683a48a46b2c3d249422a342eba8f4e77e11bc2b71cf9be8a903275734c93
+  output research/conductor_gap_replication_20261025/sessions/a-c1-level0/records.jsonl: da1fc9ab2c5e67525a6b24748d210f49177f43d16da3540c7d5c3732b4faf5c5
+  output research/conductor_gap_replication_20261025/sessions/a-c1-level0/session.json: 9d71bb9fd19c3a903d28f8ab2397256c0f64d119d2269aed018f990d04d4a839
+  output research/conductor_gap_replication_20261025/sessions/a-c1-level1/records.jsonl: 74ff682ef4b87ab6124eae1411f24daf86e569c362a7f0f67722aa7c95dab196
+  output research/conductor_gap_replication_20261025/sessions/a-c1-level1/session.json: 73bd6bdef06446829ae29558709736df0195d66629ea5362ab00f32346e8751d
+  output research/conductor_gap_replication_20261025/sessions/a-c1-level2/records.jsonl: f5eb5b308d20574d2e2d36983dec5788edf2a82087174f07428f12dc054284bb
+  output research/conductor_gap_replication_20261025/sessions/a-c1-level2/session.json: d8cca0ee167b299b1366af4250376b5269ec765ecaf47a1922a3158c6f1d22f8
+  output research/conductor_gap_replication_20261025/sessions/a-c1-level3/records.jsonl: b680968efccdb827f1562013930531e063f52ceee55a4dbb25fca34b90dad750
+  output research/conductor_gap_replication_20261025/sessions/a-c1-level3/session.json: c3e60417b91def10122e386197d76c2d2609b1bc7692b68210f0a68f1ec0c7de
+  output research/conductor_gap_replication_20261025/sessions/a-c1-level4/records.jsonl: 60d3e138f90c3ac80f820b8da07d691d6b68177d1db54456c2be2a8280dffa19
+  output research/conductor_gap_replication_20261025/sessions/a-c1-level4/session.json: 4550de37e500d37e6a754218e01a4769cc09d8de738c1560e7789214fd1cc1ef
+  output research/conductor_gap_replication_20261025/sessions/a-c2-bsgs/records.jsonl: 9aa7dd6b2984c27e63aa04510f95cfbdbbb679725aa003cba65e7a7e045bac6e
+  output research/conductor_gap_replication_20261025/sessions/a-c2-bsgs/session.json: d4e7239e6b4f19ec797179863e2962183c863944478ed18255049c7ecd677d11
+  output research/conductor_gap_replication_20261025/sessions/a-c2-level0/records.jsonl: cc58fe297544491b9bed58430963a4377724fd6f0e0aa5c977607c8e6026017a
+  output research/conductor_gap_replication_20261025/sessions/a-c2-level0/session.json: a70bb999f11c872c5a986e204daa9d7348127954f183ba9f214f884b49b50763
+  output research/conductor_gap_replication_20261025/sessions/a-c2-level1/records.jsonl: a58ba6e430d00674a7d2b914f4245e73954657ededff60d637eb9b0d53a0c08f
+  output research/conductor_gap_replication_20261025/sessions/a-c2-level1/session.json: 97324eb3f095f6115e8648e70ca68d79d9640468934551a1839b976aa57e0c57
+  output research/conductor_gap_replication_20261025/sessions/a-c2-level2/records.jsonl: cfb83b039525339bf00302de4e45fb341d6228a25065239f3c1db60958919ef6
+  output research/conductor_gap_replication_20261025/sessions/a-c2-level2/session.json: ca7fb624b6f1db3f7018927d06e137ab118f5d23019d2fff3855feb14097fc19
+  output research/conductor_gap_replication_20261025/sessions/a-c2-level3/records.jsonl: b2a5342582f421584a4e48adb53054c03782e95e2ce6a6b82849942908343a8a
+  output research/conductor_gap_replication_20261025/sessions/a-c2-level3/session.json: 42e337939b9f9f8fbb713c3ab59d0adc717012480f7a49e07475d4daa15027ed
+  output research/conductor_gap_replication_20261025/sessions/a-c2-level4/records.jsonl: 96eea212f6f022d182bcc93b63f2e65950a749c5fb50e360498fb5de27c63395
+  output research/conductor_gap_replication_20261025/sessions/a-c2-level4/session.json: 98e0c088c397b19171f1087b5993aa47f57ffcf36f19aa7e5237072710e17e15
+  output research/conductor_gap_replication_20261025/sessions/a-c3-bsgs/records.jsonl: 7f9ac54da4bb8284171c34fa15938366d40af0ebb69813ebd8fbb782b48dcc04
+  output research/conductor_gap_replication_20261025/sessions/a-c3-bsgs/session.json: 0853d2b398800578854e71fed53dd5f04bad9bcba4c24feafa97b266fcf5cc66
+  output research/conductor_gap_replication_20261025/sessions/a-c3-level0/records.jsonl: 8ddcd9d48f7273de729535f88bd00ce32b48bc6885ab1147436a6d01db9d5b90
+  output research/conductor_gap_replication_20261025/sessions/a-c3-level0/session.json: f90c3efde74d898f102a590496cf018cc2d5b20c9d185a32f1b14c703d35d3b7
+  output research/conductor_gap_replication_20261025/sessions/a-c3-level1/records.jsonl: 3802ae4c25cc1586041cc9a1b257092574f943463f4f409308eb86a7be9e2790
+  output research/conductor_gap_replication_20261025/sessions/a-c3-level1/session.json: 5aa0e1c140dddeac52f14a58594dbc539929490e0bb4fbd763a2313db049e445
+  output research/conductor_gap_replication_20261025/sessions/a-c3-level2/records.jsonl: 09276d84100a5c356dbf746e7a20b498df89e348c3f96383f6575d0817abf41f
+  output research/conductor_gap_replication_20261025/sessions/a-c3-level2/session.json: b09c3b4fe9afe8d6407fd80a0b86695eadb6fa1fb2ea0856901004fb0d13350b
+  output research/conductor_gap_replication_20261025/sessions/a-c3-level3/records.jsonl: 8a2ac6508fdff7fca5ae387f904d43c25970c21cbf71298910a18cbcb8725e1b
+  output research/conductor_gap_replication_20261025/sessions/a-c3-level3/session.json: ae5d04e7a9d7cf0960be21f927a77986b93f7c83e4aa094a5b7ad263bebc855e
+  output research/conductor_gap_replication_20261025/sessions/a-c3-level4/records.jsonl: c27e3c15409d7b39de89ec05e30d30f32e6f62e8411f926ecca0051d5052ac2f
+  output research/conductor_gap_replication_20261025/sessions/a-c3-level4/session.json: e1be1214d7b9d7b285a12ee0e467078ecd72e125a4949f7559889435d07985ef
+  output research/conductor_gap_replication_20261025/sessions/a-c4-bsgs/records.jsonl: 64f4a3ab6e210ff29ce07e82155793b6244deaf1224c2dfa6a9791907899ce74
+  output research/conductor_gap_replication_20261025/sessions/a-c4-bsgs/session.json: fb0d18e691891910b957995c148478cd384c7620134c5c3b5c2f581ab2971aab
+  output research/conductor_gap_replication_20261025/sessions/a-c4-level0/records.jsonl: 2c18aa90d6aa2bef5db1bfd5dd84b7e71fa936e8bc6621aa4c532ce837799297
+  output research/conductor_gap_replication_20261025/sessions/a-c4-level0/session.json: 6c00df3b342443b87e818520e57b1fba87c5e79c8f06b52c8a766ad720d219ec
+  output research/conductor_gap_replication_20261025/sessions/a-c4-level1/records.jsonl: 2219eb6a1fc45990f6a244c8ca41a59a513464a6c04db33ed8afaa196c5a1b5a
+  output research/conductor_gap_replication_20261025/sessions/a-c4-level1/session.json: e25a64a66c5d94b9c65f926457c87966a517bb5525c6e85f642cd5bd597b5e87
+  output research/conductor_gap_replication_20261025/sessions/a-c4-level2/records.jsonl: eddefb6ad10563531c3a182c34378c78c70c16f06e73caef54d968fd20b944f0
+  output research/conductor_gap_replication_20261025/sessions/a-c4-level2/session.json: 42a4c82411819ccd7ef9b93c92b972fd9e163062ae29653089bfc0963be43ce0
+  output research/conductor_gap_replication_20261025/sessions/a-c4-level3/records.jsonl: 01108ec38f2d5c82a580a4b091ff996f0448d208dd240d2f03762cef018377bd
+  output research/conductor_gap_replication_20261025/sessions/a-c4-level3/session.json: fc4fdc9db26d59c612aa5f48dbdca6309d6f821767c72d8d3a9e1922ebad1636
+  output research/conductor_gap_replication_20261025/sessions/a-c4-level4/records.jsonl: b72dc4fc7ce1ca91545634d4779e85494487dccee373ef867bd5dd7eee50427e
+  output research/conductor_gap_replication_20261025/sessions/a-c4-level4/session.json: ffcf1ba2debb1eea545f582af2d53ec3ed7b849d97bd45ba4e00657dd826954c
+  output research/conductor_gap_replication_20261025/sessions/a-c5-bsgs/records.jsonl: 017b93cd7827c4c4d9f00c11c4e38570c6deeb37064647aaedd73ea0f6d2bd44
+  output research/conductor_gap_replication_20261025/sessions/a-c5-bsgs/session.json: b48c6ab60e856ec6563b54db1a979fd9e66338ea376b5dd593e5958a63f3dae3
+  output research/conductor_gap_replication_20261025/sessions/a-c5-level0/records.jsonl: ff4d9163130806e9175dd7a517dc4e966350a479edf45c759d1d442020b7da78
+  output research/conductor_gap_replication_20261025/sessions/a-c5-level0/session.json: 0143001f24c0cc99ff7c5ca29823e5bf39edc40ceafa44aa3ae69484a9630fc0
+  output research/conductor_gap_replication_20261025/sessions/a-c5-level1/records.jsonl: 0dc882bf2c3964a2a94df2cd20fbf1cd9e26137879a26fa9ad84686da7aa7f72
+  output research/conductor_gap_replication_20261025/sessions/a-c5-level1/session.json: 958864cfb0670ec17be4c9313f1a97619549553e787d999be0d428518dcea96f
+  output research/conductor_gap_replication_20261025/sessions/a-c5-level2/records.jsonl: e064d2e65cb714326f4840ed2ff3ce4d0c1f7fabbb85ccbaa02484ed558c1938
+  output research/conductor_gap_replication_20261025/sessions/a-c5-level2/session.json: fb5934220be68158d072598428796de6bb0328f2721eb7d73d592b70ca226432
+  output research/conductor_gap_replication_20261025/sessions/a-c5-level3/records.jsonl: ce6663b98e639ec881606765c8fbc20d1385e49c338cca02e6ef3778c03424d0
+  output research/conductor_gap_replication_20261025/sessions/a-c5-level3/session.json: 3265f5467e0afb7061dd2470ca38f598757cafa32ef42b3bc93e76c46678caea
+  output research/conductor_gap_replication_20261025/sessions/a-c5-level4/records.jsonl: 1057ebfde135424ac77aec15cf579296b76de6c993449ae7895b1606bfb578a8
+  output research/conductor_gap_replication_20261025/sessions/a-c5-level4/session.json: e14f46f932d1215de5a35ccff42df3f6b54fd52e8581ab0e15d103cdeb801e42
+  output research/conductor_gap_replication_20261025/sessions/a-c6-bsgs/records.jsonl: 01d24b0fc12ee46487242343c2fd19ea3b80192431239dffab7aae1f221a788d
+  output research/conductor_gap_replication_20261025/sessions/a-c6-bsgs/session.json: 95a8e2a1579ab3db8ccc43fcb3a19d5b1798fa85fa5f95821134ee1b61bf7868
+  output research/conductor_gap_replication_20261025/sessions/a-c6-level0/records.jsonl: f113f0d51d69cb43eca04302cdf8039b0ca24bf4bce7bb6a37d62b2fb7637a95
+  output research/conductor_gap_replication_20261025/sessions/a-c6-level0/session.json: 88f3e0721f11b59ff7fb775e4e80aff0743e37266971af4e1cd0fa4564cde3db
+  output research/conductor_gap_replication_20261025/sessions/a-c6-level1/records.jsonl: 9d33910d4692da73d35415751fd32ac3320336b7b262795ca9210bd5aa7777dc
+  output research/conductor_gap_replication_20261025/sessions/a-c6-level1/session.json: 0bd5409271b955d994c0e2ec7c0010aa9a208f24f048a99b7946161a41e9aeb5
+  output research/conductor_gap_replication_20261025/sessions/a-c6-level2/records.jsonl: 11093efad4bb04cee65cf0fffab6026e7921d576039b5084f817c35ae19b8600
+  output research/conductor_gap_replication_20261025/sessions/a-c6-level2/session.json: 46d07f9864de9515bb7d2396d4b08bda7feca896fbde636b2c341c75a15fc99d
+  output research/conductor_gap_replication_20261025/sessions/a-c6-level3/records.jsonl: 1b67fb7319ee606f34fc8cc653580e8fcd014050383c1a7f6f58a3ea5a95697b
+  output research/conductor_gap_replication_20261025/sessions/a-c6-level3/session.json: 277342b5a08067bedf9e9fd72f2250bdcf6ec22db4f02ea91bcbf36f42096f05
+  output research/conductor_gap_replication_20261025/sessions/a-c6-level4/records.jsonl: e2dbe3bcd3946f429a6cb5a1d3379baa3e4cb2d0a6177ff28a96fe6d594eebd7
+  output research/conductor_gap_replication_20261025/sessions/a-c6-level4/session.json: 3295d638f3adbc142422e42e411e4e4d715fb71a28212da970862ebbe306e029
+  output research/conductor_gap_replication_20261025/sessions/a-c7-bsgs/records.jsonl: 2217a55ead259f991832b50daee12540a8479a8852407745ce78aca8734bf28d
+  output research/conductor_gap_replication_20261025/sessions/a-c7-bsgs/session.json: 6e84e8f76012cdefdf99f403d311c701a3c590c02b3ad3ab315b039bba892d61
+  output research/conductor_gap_replication_20261025/sessions/a-c7-level0/records.jsonl: 4fcf98c9d15f63fc3d5858b982a4df45b2d6f9e4a1726bcfe364895c2f096541
+  output research/conductor_gap_replication_20261025/sessions/a-c7-level0/session.json: 9758bf72afe6f2744253bc6322b7b1cd5d975f0b8e20f8cb7457e5215c716f13
+  output research/conductor_gap_replication_20261025/sessions/a-c7-level1/records.jsonl: 580c4ca103363d3b551ae0f208f48f1018764f6dd3077c6e00d016ea1f6d52c5
+  output research/conductor_gap_replication_20261025/sessions/a-c7-level1/session.json: bc6d3fcbd6ea03f7c377d06d28ed7fb71b5f7fcf8a2abfd9b86a0f2af59dbaab
+  output research/conductor_gap_replication_20261025/sessions/a-c7-level2/records.jsonl: d498fbb27b4ad9996b91d3ee193d2d0acaefc50df6d9e79691df1d861a07acb5
+  output research/conductor_gap_replication_20261025/sessions/a-c7-level2/session.json: ee84ad4c86ae4d12da8960b756a2685743d4c0eae9668d686a895233abf8ebff
+  output research/conductor_gap_replication_20261025/sessions/a-c7-level3/records.jsonl: be799bdfdc6a29bae3351913af1c030d5452a6e088e2987f9a3d72d7df6846c0
+  output research/conductor_gap_replication_20261025/sessions/a-c7-level3/session.json: 51a57194e3b010af5486cf9122e4620545065c3a674dd2c7953bbd9b84994408
+  output research/conductor_gap_replication_20261025/sessions/a-c7-level4/records.jsonl: 1604518d37c63680dba06b33429d0241811353cb3ce04663b82736e89adbad5e
+  output research/conductor_gap_replication_20261025/sessions/a-c7-level4/session.json: 015afd19bfb762d255f5fcf5b8a5ebf7be8386998c0d26a73e9e8dec2962cd28
+command 5 (a-audit-primary): ["./target/release/examples/conductor_gap_replication", "audit-primary", "research/conductor_gap_replication_20261025/prepared-a"] exit 0 (162.052 s) succeeded
+  stdout sha256 25992753dea4634e97999785889ff9d5d2f1385cee81811a484d9076ac7406cf; last 20 lines:
+    a-c4-level4: replayed
+    a-c4-bsgs: replayed
+    a-c5-level0: replayed
+    a-c5-level1: replayed
+    a-c5-level2: replayed
+    a-c5-level3: replayed
+    a-c5-level4: replayed
+    a-c5-bsgs: replayed
+    a-c6-level0: replayed
+    a-c6-level1: replayed
+    a-c6-level2: replayed
+    a-c6-level3: replayed
+    a-c6-level4: replayed
+    a-c6-bsgs: replayed
+    a-c7-level0: replayed
+    a-c7-level1: replayed
+    a-c7-level2: replayed
+    a-c7-level3: replayed
+    a-c7-level4: replayed
+    a-c7-bsgs: replayed
+  output research/conductor_gap_replication_20261025/sessions/a-c0-bsgs.audit.json: b8dbdbde9fcc9ecb75d406654b608652d78fa5b6ced425c0aa741cfafca7a132
+  output research/conductor_gap_replication_20261025/sessions/a-c0-level0.audit.json: de8ddb4692be75daff2dc765e6e6cefc219917e4a38a47e8935ccdc96fa8059d
+  output research/conductor_gap_replication_20261025/sessions/a-c0-level1.audit.json: d2c81d24a215a3655738bd37050e229312cfadc2a0edfbf1dff49b5ce1e86af8
+  output research/conductor_gap_replication_20261025/sessions/a-c0-level2.audit.json: 07504fc7a7b6a5695682e0f9eaa78f761394b5b73b9c0de71ab9a4bc16142cc1
+  output research/conductor_gap_replication_20261025/sessions/a-c0-level3.audit.json: e33486fd30f6bb2525ce79064cc268a0abcdc674eeec5db629c6787856121c56
+  output research/conductor_gap_replication_20261025/sessions/a-c0-level4.audit.json: 3c0e902c29417da37cb63ecc73162d2611a0a259ebc492b976cb16a45b1cc9e2
+  output research/conductor_gap_replication_20261025/sessions/a-c1-bsgs.audit.json: b3bce97ccdaf89eb7a0d5be6700de925583bd971d3e05442d057e0ac848cb31a
+  output research/conductor_gap_replication_20261025/sessions/a-c1-level0.audit.json: 55b752f0b986dfad663eef1d077b9b4a4dcbc96c3cdc80a93942fcdac15bce58
+  output research/conductor_gap_replication_20261025/sessions/a-c1-level1.audit.json: c9ead58d8b6ef155a16eab44dbcafbb6d8f4c3bed386834d6e05a3ab3bb90c0a
+  output research/conductor_gap_replication_20261025/sessions/a-c1-level2.audit.json: 2928d27dc62db3cbedddbe859cc43d7e75ee8fc339a4494233c646c3669125d0
+  output research/conductor_gap_replication_20261025/sessions/a-c1-level3.audit.json: cb2e51cd225de502d0a127cb8ead4b1d42a5e702133baa6156898e88b31ce422
+  output research/conductor_gap_replication_20261025/sessions/a-c1-level4.audit.json: ffd25c60b7ed6c720899a8f2d7e84a476d24faae40f7f2f0b079414cea31ab01
+  output research/conductor_gap_replication_20261025/sessions/a-c2-bsgs.audit.json: 4d217a9f750ac5326eea2cee31202cc2da8ab32d55477c9d22e2f6a2091c1967
+  output research/conductor_gap_replication_20261025/sessions/a-c2-level0.audit.json: b40ee24d319dbfd4f0680ed91b8d4cb82dbdaeec4338d190d194d678f4e9aa75
+  output research/conductor_gap_replication_20261025/sessions/a-c2-level1.audit.json: 99fe7d50b8274513563c9999e81e166eecedab4d36daabc4c3c46223641d1864
+  output research/conductor_gap_replication_20261025/sessions/a-c2-level2.audit.json: c6a94d3337f1ea96e80fa2ed74b591dbfb9f9e2f39fb3aa8d1fa8495b306985d
+  output research/conductor_gap_replication_20261025/sessions/a-c2-level3.audit.json: 45a668b33d15c062a9ee970a0239d8df66031f189fe5f945ac5d18455d279f07
+  output research/conductor_gap_replication_20261025/sessions/a-c2-level4.audit.json: bcec48434f5e3122a72458600bdfc6aca01ed7b9eec4b911533c4cf48a1cd8ae
+  output research/conductor_gap_replication_20261025/sessions/a-c3-bsgs.audit.json: 1220f78c092a9123ce9f124e3c78007139bf9cc34eed6207d1061c1d8a066467
+  output research/conductor_gap_replication_20261025/sessions/a-c3-level0.audit.json: 6601ec3469dc56774e1aea3882b5c4896b155ebb3736ccafd766894b98e92e8b
+  output research/conductor_gap_replication_20261025/sessions/a-c3-level1.audit.json: 0ccecaba15f02347e472bb73d9c1b7f26f6dc503eedc820dcb783b4aef018c7a
+  output research/conductor_gap_replication_20261025/sessions/a-c3-level2.audit.json: f819f70cdc798c045be1a984a710dbd2ec54c1bcf9ccbfb46babfe851fc64e5c
+  output research/conductor_gap_replication_20261025/sessions/a-c3-level3.audit.json: bf08bbb252590c263238ef44e0eaf86bc8d2f9122ef6658e3ee75d9b44fd39be
+  output research/conductor_gap_replication_20261025/sessions/a-c3-level4.audit.json: 498a383e470ce25d5c72381892182c3e65acee97eb4740d61129b34cf6c2224d
+  output research/conductor_gap_replication_20261025/sessions/a-c4-bsgs.audit.json: f54e98dee313d318aec64eccfda0959b897604e927761b9f3d358c0e0a66c44a
+  output research/conductor_gap_replication_20261025/sessions/a-c4-level0.audit.json: 573cace447557cd3ca4f815572374fff5e254a62c88583a4ab65419d6df94841
+  output research/conductor_gap_replication_20261025/sessions/a-c4-level1.audit.json: 777997dc33cf74249680597f324994867acab3303b0ac818b95d489567485602
+  output research/conductor_gap_replication_20261025/sessions/a-c4-level2.audit.json: db3339b9d3791673eca53d8e187e32f42bfa2d83661fa719d1872c282871f44b
+  output research/conductor_gap_replication_20261025/sessions/a-c4-level3.audit.json: 4f7b05ba3a94331695114fbaa1812714337c5e5f1b54b7e3738c1d94672b0151
+  output research/conductor_gap_replication_20261025/sessions/a-c4-level4.audit.json: 7fe3d8e48435eb093647967006b6d7d46d9d1bd2521d4273e15b62e36f96d7d8
+  output research/conductor_gap_replication_20261025/sessions/a-c5-bsgs.audit.json: 8ece1bc25d441d801818bd3f319ac0512ed417ea67392f019d5db28a632e1289
+  output research/conductor_gap_replication_20261025/sessions/a-c5-level0.audit.json: 15c561720500ad8d84cc880acd13b8f1add0354fa41c403f640ea5dc7f02a415
+  output research/conductor_gap_replication_20261025/sessions/a-c5-level1.audit.json: 8df6a8ac9bfba7d5c4b2159a7131df7e30da7e8a81ae71c2ada38f79c1492f06
+  output research/conductor_gap_replication_20261025/sessions/a-c5-level2.audit.json: 799099cc7a2ca9037b774cc642af724cbde040e8ecb6a2ad311e4fd19167d9bc
+  output research/conductor_gap_replication_20261025/sessions/a-c5-level3.audit.json: cf1063adb49fb67939618926eaf0a0b9252f6d04299de4457f5884dc067b3509
+  output research/conductor_gap_replication_20261025/sessions/a-c5-level4.audit.json: ae38d4dc04fb79583a1e24d9e36bbb01325adb9180513508bfcce6db5b1e7ff8
+  output research/conductor_gap_replication_20261025/sessions/a-c6-bsgs.audit.json: 9a1e5f3738205955d91d2b89124941729021be07499cd59a568cbebb4922260f
+  output research/conductor_gap_replication_20261025/sessions/a-c6-level0.audit.json: 7acaa59e207eb383c1d145ac5657d5731f480db12cd4e59dc4cd164be565db0c
+  output research/conductor_gap_replication_20261025/sessions/a-c6-level1.audit.json: 16c6faf623462db6a290721862055339f58954179c3a3d4ca7c696e906d4609a
+  output research/conductor_gap_replication_20261025/sessions/a-c6-level2.audit.json: 8d79ad47a189453c1d811fde2bb19b2f34ce3172120a5d0b885dbd9fb3c66c2d
+  output research/conductor_gap_replication_20261025/sessions/a-c6-level3.audit.json: 771ccbdb6b2961c467e5ac4a43e5e82b7502673498b7df0d399f23ee3604975a
+  output research/conductor_gap_replication_20261025/sessions/a-c6-level4.audit.json: 51b9195156d3a0eb344e4341b26fb80759b5078c52b07a49b724fb5f306b36fe
+  output research/conductor_gap_replication_20261025/sessions/a-c7-bsgs.audit.json: a16e755686216c7c2f485b9a92527c5fb1f4e434c3061549e36348bd0bea00c2
+  output research/conductor_gap_replication_20261025/sessions/a-c7-level0.audit.json: 6d1e3c936a95d3be48946636a4af2b80f7b5db88f3561284a3e65b1bb2db309f
+  output research/conductor_gap_replication_20261025/sessions/a-c7-level1.audit.json: 4bc5e88e6963170b90a5c77424338889d1fdb1f1d1918bcb93f0654e2839506b
+  output research/conductor_gap_replication_20261025/sessions/a-c7-level2.audit.json: 339adcfa9195e0bc48f0efa1d09650d78ca409a27a3bc8587a9de8fe838db310
+  output research/conductor_gap_replication_20261025/sessions/a-c7-level3.audit.json: 6d1adddaa378b819b891eea80ab79d1f038e9969b7a70358c139e7ab826d3efc
+  output research/conductor_gap_replication_20261025/sessions/a-c7-level4.audit.json: 9e1e8b17702d8bf63acbfb4bd5e8b9ca7842c83c845c085e9589c4afd56298ae
+command 6 (b-run): ["./target/release/examples/conductor_gap_replication", "run", "research/conductor_gap_replication_20261025/prepared-b-v2"] exit 0 (231.613 s) succeeded
+  stdout sha256 c62cdcae5606944cc62626f2df1e66c03522d43686a81c0a9de4fc649549dc29; last 8 lines:
+    b-c0: recorded
+    b-c0-velu: recorded
+    b-c1: recorded
+    b-c1-velu: recorded
+    b-c2: recorded
+    b-c2-velu: recorded
+    b-c3: recorded
+    b-c3-velu: recorded
+  output research/conductor_gap_replication_20261025/sessions/b-c0-velu/records.jsonl: b8d10d05e952e599cf8345c247cf12d2481bb6e3e5a47f8dfcc14b3cd3072751
+  output research/conductor_gap_replication_20261025/sessions/b-c0-velu/session.json: 5ae5d89a479ec9bd52bb5c4f5337c637d7d8fb40226418257bff62078361df0a
+  output research/conductor_gap_replication_20261025/sessions/b-c0/records.jsonl: 9837087359c03cf6455b4a0b73a52d0ff064980a05664e81ca3f8194ce873cd2
+  output research/conductor_gap_replication_20261025/sessions/b-c0/session.json: b7ea5c24b71192a43d0792afd03296c5907899bf4def85cd41f31b7cfdbd4d61
+  output research/conductor_gap_replication_20261025/sessions/b-c1-velu/records.jsonl: 2b835a10043aeadcd29633ab97a241c6a3045959f6c60c38016c2fb7b221b20e
+  output research/conductor_gap_replication_20261025/sessions/b-c1-velu/session.json: 4b7bb577049d985b5f2e711f14497ecaff06e5978a5e9ce29c9c8f612891c604
+  output research/conductor_gap_replication_20261025/sessions/b-c1/records.jsonl: b7162b34c1082eb8b64068dd89d76f12452a2876c5661c2d54fde7a2d52fd6b8
+  output research/conductor_gap_replication_20261025/sessions/b-c1/session.json: e43cf5ae336b6511cbeb3c201228015ce56041e57839c6640478b198c2c3def3
+  output research/conductor_gap_replication_20261025/sessions/b-c2-velu/records.jsonl: efd36e95a2ab2a298470238c874006464a1fd75bab660bf53a0b13b43b10ad96
+  output research/conductor_gap_replication_20261025/sessions/b-c2-velu/session.json: 743233d00bd9bc9987d1164ffb5a3f7d09b63c06bad28202101d9a8998bae6c7
+  output research/conductor_gap_replication_20261025/sessions/b-c2/records.jsonl: 549d37e0009389d7c834ca8caed6eadab83675b13b9f4d0776c9315fe6fdadf2
+  output research/conductor_gap_replication_20261025/sessions/b-c2/session.json: 000cec5981b243312e12ccc5eb7384e603451b141377eb9202fd0e9cf448b589
+  output research/conductor_gap_replication_20261025/sessions/b-c3-velu/records.jsonl: 22d81caad981624eb840cf06e16e7e3911fd9cd7774d4fb0953aa8bc2d374037
+  output research/conductor_gap_replication_20261025/sessions/b-c3-velu/session.json: 23a61bb2cd4013e14cdeff75154c7f094dd868ba07ddd020a1a8e5dd3f25d4fa
+  output research/conductor_gap_replication_20261025/sessions/b-c3/records.jsonl: d37ffa77aa580faa6f1a55e4aa200cb44093593a9e599d92f371d82909c67708
+  output research/conductor_gap_replication_20261025/sessions/b-c3/session.json: 02810834faae9ea43b6bd3aaa726c3772afc5a5195fb7f138ae2e6691461ffc3
+command 7 (b-audit): ["./target/release/examples/conductor_gap_replication", "audit", "research/conductor_gap_replication_20261025/prepared-b-v2"] exit 0 (28.727 s) succeeded
+  stdout sha256 7ea6d88f6199bf82c834aa68b2b97b9ef152289ac2889e910307445f18d79d0f; last 8 lines:
+    b-c0: replayed
+    b-c0-velu: replayed
+    b-c1: replayed
+    b-c1-velu: replayed
+    b-c2: replayed
+    b-c2-velu: replayed
+    b-c3: replayed
+    b-c3-velu: replayed
+  output research/conductor_gap_replication_20261025/sessions/b-c0-velu.audit.json: 7c2124eedadb1078a2d2ea5b1f2156d3820b6bd606fbca7645a8082cf778abdb
+  output research/conductor_gap_replication_20261025/sessions/b-c0.audit.json: 95eeed98e9fdb3fb4f9d3ebca24433a33bdc7731cee205c5ca4aae6abedf90e2
+  output research/conductor_gap_replication_20261025/sessions/b-c1-velu.audit.json: 0d1ebdc8d5524d18fd7ae0d165e101506501ba61c350b255190f94786940336f
+  output research/conductor_gap_replication_20261025/sessions/b-c1.audit.json: 11b1960b34fec508898fa7b5ecefe765e4f56e6f3bce7b4c63e550ccb0819a81
+  output research/conductor_gap_replication_20261025/sessions/b-c2-velu.audit.json: 354017366f463d0b0aacb9a326c4f786d933c948acc3611a2d83597f0dc721db
+  output research/conductor_gap_replication_20261025/sessions/b-c2.audit.json: 2ab3736d6726e091345db2218dd778d82be75ab1f12f770d7e459a25ecb44bba
+  output research/conductor_gap_replication_20261025/sessions/b-c3-velu.audit.json: 3d5054f0301920249769d2fa9afdc44ec7d3aae7fc24570e0b52e40e5f324c8e
+  output research/conductor_gap_replication_20261025/sessions/b-c3.audit.json: 8fd04cea3604bcb8c7287eea22b906067e0644f1b10e734e23c357451ddfc39c

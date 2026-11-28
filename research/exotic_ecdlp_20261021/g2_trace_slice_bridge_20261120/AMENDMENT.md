@@ -1,0 +1,5 @@
+# Output-coordinate trace correction
+
+The first producer execution stopped before any rank call because it applied the archived polynomial-basis trace mask to equations already transformed into normal coordinates. A second premeasurement attempt used the plain output trace mask in normal coordinates and stopped at the same relation check. The relevant functional is `Tr(S3/q²)`, whose normal-coordinate mask depends on `q`. The final protocol computes it from each target with independent binary-field arithmetic and drops the lowest set coordinate. Both failures occurred before row construction or rank calls. The source and rule were re-frozen before the measured run; the parameters, leaf substitution, column map, and rank schedule are retained.
+
+A third premeasurement attempt stopped while checking the mapped column support. The implementation treated a pivot's position in the 41,449-column Macaulay ordering as if it were itself a monomial bitmask. It now looks up that position in the frozen degree-four monomial ordering before applying the substitution. This correction was frozen before rank measurement.

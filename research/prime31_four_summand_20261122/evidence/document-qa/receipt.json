@@ -1,0 +1,27 @@
+{
+  "schema": "rr5.document-qa/v1",
+  "scope": "document layout and link readability only; no research execution or proof validation",
+  "pdf_pages": 6,
+  "visually_inspected_pages": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "result": "All six final rendered pages inspected; equations, tables, diagram and footers readable without clipping or overlap.",
+  "render_command": "PYTHONPATH=<installed Typst module> ./render-report.sh",
+  "inspection_command": "pdftoppm -scale-to 1050 -png REPORT.pdf <scratch>/release-page",
+  "renderer": "Typst 0.15.1 via Pandoc; Graphviz SVG; Poppler PNG inspection",
+  "files": {
+    "REPORT.md": "421fe5e7f58bdbf798e09f894c7c0b8ed3db69f67ded7e8b73036da3470560bb",
+    "REPORT.pdf": "58fd451604b6670ff016f65c71c1e97d39b297f98f1998d92f2717ccdceac5aa",
+    "REPORT.typ": "31b7f640a0fe43ffda003bf54cc3e9a8309248bb3e237384f434ad2182a38414",
+    "report-style.typ": "542249f550e4a24741831a745c790a94ad12416230e5e9ceec6e2bfb72fb5ad3",
+    "report-template.typ": "c65ab9d4defeae6f2c8677ae2f66d421789ced795a60f6e68ab82b5161f10fb2",
+    "render-report.sh": "0d19d1c563b72e0bd1254ac63125c212becc60e36aab2d5c769c3159ece0084e",
+    "figures/qualification.dot": "15499c63adedf02eb2daf35fe6e754440f8ee90462d1c9a5eeac564cd50c0313",
+    "figures/qualification.svg": "5e29c94fe04bc6cc7e712084fd4e69305ba4cf52cc607c9a1516f0517190ebd6"
+  }
+}

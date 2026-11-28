@@ -1,0 +1,24 @@
+ m bits    |D|  tgt |  root mul scan  root mul frob   ratio |   F4 field_ops  F4 share | wall scan wall frob   ratio | auto/scan wall
+ 2   16     64   16 |         524288         728409    0.7x |           3216      0.6% |    0.008s    0.018s    0.5x | 0.97  (planted found 8, solutions 18)
+   batched | total fmul scan       527504 frob       731625 batch        71950 | wall scan    0.008s frob    0.018s batch    0.001s | scan/batch    5.6x frob/batch   12.2x | children 1024 fallbacks 0
+ 2   16    256   16 |        8388608        2914627    2.9x |          12432      0.1% |    0.063s    0.070s    0.9x | 1.12  (planted found 8, solutions 69)
+   batched | total fmul scan      8401040 frob      2927059 batch       287347 | wall scan    0.063s frob    0.070s batch    0.005s | scan/batch   13.1x frob/batch   14.6x | children 4096 fallbacks 0
+ 2   20    256   16 |        8388608        3678558    2.3x |              0      0.0% |    0.054s    0.076s    0.7x | 1.36  (planted found 8, solutions 20)
+   batched | total fmul scan      8388608 frob      3678558 batch       360588 | wall scan    0.054s frob    0.076s batch    0.005s | scan/batch    9.8x frob/batch   13.8x | children 4096 fallbacks 0
+ 2   20   1024    8 |       67108864        7442442    9.0x |              0      0.0% |    0.366s    0.147s    2.5x | 0.40  (planted found 4, solutions 40)
+   batched | total fmul scan     67108864 frob      7442442 batch       721176 | wall scan    0.366s frob    0.147s batch    0.010s | scan/batch   34.9x frob/batch   14.1x | children 8192 fallbacks 0
+ 2   24   1024    8 |       67108864        8942083    7.5x |              0      0.0% |    0.378s    0.181s    2.1x | 0.45  (planted found 4, solutions 12)
+   batched | total fmul scan     67108864 frob      8942083 batch       835668 | wall scan    0.378s frob    0.181s batch    0.012s | scan/batch   32.1x frob/batch   15.3x | children 8192 fallbacks 0
+ 2   31   1024    8 |       67108864       11909735    5.6x |              0      0.0% |    0.421s    0.254s    1.7x | 0.66  (planted found 4, solutions 8)
+   batched | total fmul scan     67108864 frob     11909735 batch       868408 | wall scan    0.421s frob    0.254s batch    0.017s | scan/batch   24.9x frob/batch   15.0x | children 8192 fallbacks 0
+ 2   31   4096    4 |      536870912       23800840   22.6x |              0      0.0% |    3.176s    0.525s    6.1x | 0.16  (planted found 2, solutions 4)
+   batched | total fmul scan    536870912 frob     23800840 batch      1736732 | wall scan    3.176s frob    0.525s batch    0.030s | scan/batch  106.7x frob/batch   17.6x | children 16384 fallbacks 0
+ 3   16     16    8 |         507904        2822840    0.2x |         234117     31.6% |    0.100s    0.148s    0.7x | 1.00  (planted found 4, solutions 30)
+   batched | total fmul scan       742021 frob      3056957 batch       644404 | wall scan    0.100s frob    0.148s batch    0.022s | scan/batch    4.5x frob/batch    6.7x | children 2176 fallbacks 128
+ 3   20     32    6 |        3096576       10904975    0.3x |         512640     14.2% |    0.258s    0.425s    0.6x | 1.00  (planted found 3, solutions 18)
+   batched | total fmul scan      3609216 frob     11417615 batch      2185596 | wall scan    0.258s frob    0.425s batch    0.056s | scan/batch    4.6x frob/batch    7.6x | children 6336 fallbacks 192
+ 3   31     32    6 |        3096576       17434767    0.2x |         512640     14.2% |    0.323s    0.589s    0.5x | 1.00  (planted found 3, solutions 18)
+   batched | total fmul scan      3609216 frob     17947407 batch      2510460 | wall scan    0.323s frob    0.589s batch    0.071s | scan/batch    4.6x frob/batch    8.3x | children 6336 fallbacks 192
+ 3   31     64    4 |       16646144       47226203    0.4x |        1289728      7.2% |    0.891s    1.594s    0.6x | 1.03  (planted found 2, solutions 12)
+   batched | total fmul scan     17935872 frob     48515931 batch      6664872 | wall scan    0.891s frob    1.594s batch    0.175s | scan/batch    5.1x frob/batch    9.1x | children 16640 fallbacks 256
+every mode visited the identical solution sequence on every target (batched: the identical set, and the identical sequence at m = 2)

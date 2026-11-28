@@ -1,0 +1,50 @@
+option(redSB);short=0;
+proc divide50(poly ff50,poly gg50)
+{
+ poly remainder50=ff50;poly quotient50=0;poly factor50;int previousDegree50;
+ if(gg50==0){ERROR("FORWARD50_ZERO_DIVISOR");return(list());}
+ while(remainder50!=0 && deg(remainder50)>=deg(gg50)){
+  previousDegree50=deg(remainder50);
+  factor50=(leadcoef(remainder50)/leadcoef(gg50))*t^(deg(remainder50)-deg(gg50));
+  quotient50=quotient50+factor50;remainder50=remainder50+factor50*gg50;
+  if(remainder50!=0 && deg(remainder50)>=previousDegree50){ERROR("FORWARD50_DIVISION_DEGREE_DROP");return(list());}
+ }
+ if(ff50!=quotient50*gg50+remainder50){ERROR("FORWARD50_DIVISION_FULL_PRODUCT");return(list());}
+ return(list(quotient50,remainder50));
+}
+if(x50*a50+y50*b50!=1 || b50*inverseB50+1+x50^2*norm50!=0){ERROR("FORWARD50_DENOMINATOR_WITNESS");quit;}
+ideal minStd50=std(ideal(monic50));
+list divisionControl50=divide50((t+u)*monic50,monic50);
+if(size(divisionControl50)!=2 || divisionControl50[1]!=t+u || divisionControl50[2]!=0){ERROR("FORWARD50_DIVISION_CONTROL");quit;}
+link forwardOut50="ASCII:w forward-certificate50.sing";open(forwardOut50);
+write(forwardOut50,"ring forwardCertificate50=(2,u),(t),dp;short=0;poly monic50="+string(monic50)+";ideal images50;ideal quotients50;intvec powers50;");
+ring homogeneousSource50=(2,u),(n,l,v,h),dp;short=0;
+poly control50=n^2+l+v+1;
+if(homog(control50,h)!=n^2+(l+v)*h+h^2){ERROR("FORWARD50_HOMOG_CONTROL");quit;}
+map sourceToHomogeneous50=affine49,n,l,v,u;
+ideal actualSource50=sourceToHomogeneous50(sourceIdeal49);
+int index50;int clearingPower50;
+poly homogeneous50;
+for(index50=1;index50<=size(actualSource50);index50++){
+ clearingPower50=deg(actualSource50[index50]);
+ homogeneous50=homog(actualSource50[index50],h);
+ if(subst(homogeneous50,h,1)!=actualSource50[index50]){ERROR("FORWARD50_DEHOMOG_IDENTITY");quit;}
+ print("FORWARD50_STAGE original_generator="+string(index50)+" clearing_power="+string(clearingPower50)+" evaluation_begin=true");
+ setring rationalCandidate50;
+ map clearedMap50=homogeneousSource50,nNumerator50,t*b50,a50,b50;
+ poly image50=clearedMap50(homogeneous50);
+ list division50=divide50(image50,monic50);
+ if(size(division50)!=2 || division50[2]!=0){ERROR("FORWARD50_NONZERO_REMAINDER");quit;}
+ poly quotient50=division50[1];
+ if(quotient50*monic50!=image50){ERROR("FORWARD50_COMPLETE_SOURCE_IDENTITY");quit;}
+ if(reduce(image50+b50^clearingPower50,minStd50)==0){ERROR("FORWARD50_CORRUPTED_SOURCE_ACCEPTED");quit;}
+ write(forwardOut50,"images50["+string(index50)+"]="+string(image50)+";");
+ write(forwardOut50,"quotients50["+string(index50)+"]="+string(quotient50)+";");
+ write(forwardOut50,"powers50["+string(index50)+"]="+string(clearingPower50)+";");
+ print("FORWARD50_SOURCE_IDENTITY index="+string(index50)+" complete_product_checked=true corrupted_equation_rejected=true image_degree="+string(deg(image50))+" quotient_degree="+string(deg(quotient50)));
+ setring homogeneousSource50;
+}
+close(forwardOut50);
+if(size(actualSource50)!=4){ERROR("FORWARD50_EXPECTED_COMPLETE_SOURCE_COUNT");quit;}
+print("FORWARD50_RESULT original_generators=4 complete_denominator_cleared_products=4 corrupted_equations_rejected=4 rational_source_map_verified=true");
+print("FORWARD50_ALL_CHECKS_PASS");quit;

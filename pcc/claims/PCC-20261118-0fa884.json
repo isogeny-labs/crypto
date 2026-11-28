@@ -1,0 +1,23 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-18T07:32:14Z",
+ "id": "PCC-20261118-0fa884",
+ "kind": "theorem",
+ "producer": {
+  "commit": "57744e17afa5f81d48af3896b49490647824b30d",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "docs/leads/2026-11-18/prime-field-ecdlp-theorem/REPORT.md",
+    "sha256": "50241af9f6e97e9fa027547e0e98b9c864579d216ec727a8e580003230c1a0cc"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Prime fields p>3, nonsingular curves, arbitrary cyclic subgroup and promised valid target. Hand proof using cited encoding and graded parity bounds. No kernel verification or practical crossover.",
+ "statement": "One Las Vegas classical prime-field index calculus returns a scalar in expected total bit time 2^{O(b/(log b)^beta)} for beta=0.5 log_2(1/H_2(3/4)), without a supplied base-point order or cofactor restriction. The bound includes setup, parity witnesses, integer elimination and scalar recovery."
+}

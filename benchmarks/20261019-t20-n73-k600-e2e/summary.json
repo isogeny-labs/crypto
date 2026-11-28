@@ -1,0 +1,35 @@
+{
+ "schema": "crypto.t20_n73_k600_e2e/v1",
+ "date": "2026-10-20",
+ "class": "engineering",
+ "claim": "cold end-to-end wall of the landed n=73 K=600 single-target IC row, old wide producer against the landed one, same binary, same frozen base, target and rank seed, 3 pinned cores, 20 matched rho draws; counted S unchanged (identical probes and relations), no rho win",
+ "n": 73,
+ "k": 600,
+ "host": "4 vCPU Xeon 2.80 GHz KVM guest, 15 GiB, no PMU; IC pinned to cores 1-3, rho to core 1 via tools/isolated_bench.py; 41 isolated runs, 0 flagged contended",
+ "arms_wall_s": {"O1_old": 9304.659, "N1_landed": 4622.001, "N2_landed_AA": 4559.385},
+ "arms_cpu_s": {"O1_old": 24853.4, "N1_landed": 12331.4, "N2_landed_AA": 12206.4},
+ "old_over_new": {
+  "end_to_end_wall": {"point": 2.027, "lo": 2.014, "hi": 2.037},
+  "rank_stage_wall": {"point": 2.035, "lo": 2.023, "hi": 2.045},
+  "A_A_N1_over_N2_end_to_end_wall": {"point": 1.014, "lo": 1.005, "hi": 1.020}
+ },
+ "kill_condition": "end-to-end ratio < 1.1; not triggered",
+ "counted_S_old_over_new": 1.0,
+ "phases_s": {
+  "O1_old": {"index_build": 92.4, "rank_stage": 9207.7},
+  "N1_landed": {"index_build": 60.1, "rank_stage": 4557.4},
+  "N2_landed_AA": {"index_build": 63.2, "rank_stage": 4491.7}
+ },
+ "rho": {"draws": 20, "wall_s_mean": 173.3, "wall_s_mean_lo": 127.5, "wall_s_mean_hi": 227.4, "cpu_s_mean": 172.0},
+ "ic_over_rho": {
+  "old_wall": {"point": 53.7, "lo": 40.7, "hi": 73.2},
+  "landed_wall": {"point": 26.5, "lo": 20.1, "hi": 35.7},
+  "old_cpu": {"point": 144.5, "lo": 109.7, "hi": 195.7},
+  "landed_cpu": {"point": 71.3, "lo": 54.3, "hi": 96.9}
+ },
+ "band_5a": {"w": [0.0, 0.1, 1.0], "ic_S_lower_bound": [0.0, 43.1, 431.2], "rho_S": [0.092, 1.459, 13.76], "verdict": "unresolved at w=0; rho ahead for w>=0.1; no cross-method win"},
+ "controls": "A/A N1/N2 1.014; scan positive control new/old 0.458 (3 rounds); estimator positive control x1.10 recovered 1.113 (1.109-1.118); replay of all three rows passes",
+ "report": "benchmarks/20261019-t20-n73-k600-e2e/t20_n73_k600_e2e_report.pdf",
+ "study": "research/t20_n73_k600_e2e_20261019/",
+ "caveats": ["one old-producer run (A/A on the landed arm only)", "rho draws 2-12 regenerated after the IC runs (records lost to a cleanup mistake), so rho does not bracket IC", "N2 rerun after a container restart", "IC 3 cores vs rho 1 core (cpu-second ratio is the matched one)", "IC group additions not emitted: IC S is a lower bound"]
+}

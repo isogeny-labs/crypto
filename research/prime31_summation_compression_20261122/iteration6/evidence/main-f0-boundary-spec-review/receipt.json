@@ -1,0 +1,146 @@
+{
+  "schema": "prime31.current-main-source-rebase-audit/v1",
+  "repository": "isogeny-labs/crypto",
+  "main_commit": "f0ca664eca0081a30adfcc79dcf62a32de40d2af",
+  "disposition": "no_op_historical_boundary_restoration_already_upstream",
+  "historical_boundary_audit": {
+    "source_commit": "fc184b03d47e13ec922c9b489f3b3f8a976a8bd9",
+    "source_blob": "9cf97a9f56846ff39b574967a49a0703733ae028",
+    "candidate_blob": "d57e6de59cc01de91e860d3ee32dcd849bbdbd67",
+    "candidate_sha256": "9abe0bdcc7bb7940515bad9cc72418a779272002b5a84e23de87c2674793ab7c",
+    "receipt_sha256": "2c63edc5f9324d11bb03cc6eeb5e5992d4d681c1ed87d432c303c9605b347b86",
+    "patch_sha256": "70238dbd62bbaf0676c3d3539cf8044cb86cfdc119aa9755b972b23aec36b19d"
+  },
+  "boundary": {
+    "current_blob": "0b0d7fb149307d484075529bfb9852621aaa4ff0",
+    "candidate_blob": "0b0d7fb149307d484075529bfb9852621aaa4ff0",
+    "sha256": "ee70c40d611bea2a86e782e8513d6e18be49ca575e1159a42512afb18dc346ce",
+    "bytes": 999509,
+    "lines": 25340,
+    "exact_source_delta": {
+      "insertions": 0,
+      "deletions": 0
+    },
+    "all_eleven_historical_lines_already_present": true,
+    "restored_prefix_bytes": 469052,
+    "historical_test_count": 100,
+    "current_test_count": 104,
+    "added_upstream_tests": [
+      "matches_hashmap_with_exact_hint",
+      "matches_hashmap_when_the_hint_is_too_small",
+      "matches_hashmap_above_the_prefault_threshold",
+      "edge_keys_round_trip"
+    ],
+    "current_candidate_test_inventory_identical": true,
+    "historical_test_names_preserved": true,
+    "upstream_delta_from_historical_candidate": {
+      "insertions": 286,
+      "deletions": 5,
+      "sha256": "02cc19cc271f255f09b2ace2f1990fbf465d76aecc08eb9c8d36d10d77062d36"
+    }
+  },
+  "spec": {
+    "blob": "6878f0b872ef6349324e7ba43c8a6d61d7ffcedf",
+    "sha256": "d073eb9f7fb448a7a8fa3d0e3cb7b141e6267153ade2ae74aa8da2250a634dca",
+    "bytes": 57343,
+    "lines": 1407,
+    "baseline_blob": "ed85acbb242a11a1412da7c842cef70872235dcc",
+    "modified_by_this_audit": false,
+    "upstream_delta": {
+      "insertions": 88,
+      "deletions": 12,
+      "sha256": "0c349c624083a49158bde337bec3ae3998041ececfbb38a5573c5d304be8cfae"
+    },
+    "test_count": 15,
+    "test_module_byte_identical_to_historical_restored_source": true,
+    "test_names": [
+      "plan_rejects_an_arm_its_curve_cannot_run",
+      "plan_pairs_seeds_and_alternates",
+      "default_seed_round_preserves_legacy_serialization_and_expansion",
+      "measured_seed_round_preserves_streams_across_warmup_counts",
+      "alternate_measured_counts_measured_rounds_only",
+      "existing_alternate_expansion_is_unchanged_and_odd_rounds_only_warn",
+      "a_committed_sessions_plan_still_expands_identically",
+      "label_does_not_change_the_spec_id",
+      "a_curve_listed_twice_is_refused",
+      "prime_only_arm_on_a_binary_curve_is_refused_at_plan_time",
+      "koblitz_only_arm_on_a_prime_curve_is_refused",
+      "v2_requires_an_explicit_curve_policy_while_v1_remains_replayable",
+      "phase_policy_uses_panel_cells_and_enforces_public_target_count",
+      "field_five_fixture_is_smoke_only_not_a_phase_measurement",
+      "new_binary_groebner_runs_require_the_canonical_field_profile"
+    ],
+    "reviewed_change": "PairedCurvesV1 execution-order/seed policy above unchanged historical tests; no inherited syntax omission observed"
+  },
+  "parser": {
+    "version": "rustfmt 1.11.0-stable (0ef1bc3860 2026-11-09)",
+    "command": "rustfmt --edition 2021 --emit stdout --config skip_children=true <complete-direct-module>",
+    "outcomes": {
+      "ic_boundary.current.rs": {
+        "exit": 0,
+        "stderr_bytes": 0
+      },
+      "spec.current.rs": {
+        "exit": 0,
+        "stderr_bytes": 0
+      }
+    }
+  },
+  "historical_patch_roundtrip": {
+    "steps": [
+      {
+        "args": [
+          "apply",
+          "--reverse",
+          "--check",
+          "<historical_patch>"
+        ],
+        "exit": 0,
+        "stderr": ""
+      },
+      {
+        "args": [
+          "apply",
+          "--reverse",
+          "<historical_patch>"
+        ],
+        "exit": 0,
+        "stderr": ""
+      },
+      {
+        "args": [
+          "apply",
+          "--check",
+          "<historical_patch>"
+        ],
+        "exit": 0,
+        "stderr": ""
+      },
+      {
+        "args": [
+          "apply",
+          "<historical_patch>"
+        ],
+        "exit": 0,
+        "stderr": ""
+      }
+    ],
+    "exact_upstream_bytes_preserved": true
+  },
+  "empty_patch": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "reason": "All eleven restoration lines already exist on current main; do not apply the historical patch twice"
+  },
+  "limits": {
+    "tests_executed": false,
+    "cryptographic_code_executed": false,
+    "typecheck_performed": false,
+    "workspace_compile_performed": false,
+    "remote_mutations": false,
+    "repo_audit_mutations": false,
+    "pcc_mutations": false,
+    "main_input_mutations": false,
+    "signed_verification": false
+  }
+}

@@ -1,0 +1,38 @@
+import ZeroTest
+set_option autoImplicit false
+namespace NativeDivision
+open Polynomial ScaleTrim MonicRemainder MonicTermination MonicZeroTest
+variable {K:Type*} [CommRing K]
+noncomputable def writeCoeff (q:K[X]) (j:Nat) (c:K) : K[X] := q+C (c-q.coeff j)*X^j
+
+theorem write_at (q:K[X]) (j:Nat) (c:K) : (writeCoeff q j c).coeff j=c := by
+ simp only [writeCoeff,coeff_add,coeff_C_mul,coeff_X_pow]
+ simp
+theorem write_other (q:K[X]) (j i:Nat) (c:K) (hi:i≠j) :
+ (writeCoeff q j c).coeff i=q.coeff i := by
+ simp only [writeCoeff,coeff_add,coeff_C_mul,coeff_X_pow]
+ simp [hi,Ne.symm hi]
+theorem fresh_write (q:K[X]) (j:Nat) (c:K) (h:q.coeff j=0) :
+ writeCoeff q j c=q+C c*X^j := by simp [writeCoeff,h]
+
+def Fresh (b r:List UInt64) (q:K[X]) : Prop := ∀i,i+b.length≤r.length→q.coeff i=0
+
+theorem zero_fresh (b r:List UInt64) : Fresh b r (0:K[X]) := by intro i h; simp
+
+theorem next_fresh (b r out:List UInt64) (q:K[X]) (c:K)
+ (hl:b.length≤r.length) (hd:out.length<r.length) (hf:Fresh b r q) :
+ Fresh b out (writeCoeff q (r.length-b.length) c) := by
+ intro i hi
+ have hn:i≠r.length-b.length := by omega
+ rw [write_other q _ i c hn]
+ exact hf i (by omega)
+
+theorem quotient_step (p:UInt64) [Fact p.toNat.Prime] (b r:List UInt64)
+ (q: (ZMod p.toNat)[X]) (hr:r≠[]) (hl:b.length≤r.length)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b) (hrs:Canon p r)
+ (hf:Fresh b r q) :
+ writeCoeff q (r.length-b.length) ((r.getLast hr).toNat:ZMod p.toNat)*wordsPoly p b+
+ wordsPoly p (selected p b r hr hl)=q*wordsPoly p b+wordsPoly p r := by
+ rw [fresh_write q _ _ (hf _ (by omega)),(selected_correct p b r hr hl hp hb hbs hrs).2]
+ ring
+end NativeDivision

@@ -61,6 +61,8 @@ jobs:
             /src/bin/isolated_bench.rs
             /src/bin/isolated_bench/
             /src/bin/icprog/json.rs
+            /tools/artifacts/
+            /.artifacts/
       - uses: dtolnay/rust-toolchain@1.98
       - name: Freeze both baseline algorithms with the same measurement harness
         id: build

@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T13:48:34Z",
+ "id": "PCC-20261112-2fb170",
+ "kind": "statement",
+ "producer": {
+  "commit": "0796b36df6ee9712bfa335d81191abc26ed937ce",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-closure-publication-30/artifact-gate.txt",
+    "sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-closure-publication-30/ci-initial.json",
+    "sha256": "cde538b8a5371169ab903d34ca91f710c9ad7cfb96c8d55141613dca146e9c3d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-closure-publication-30/objects.txt",
+    "sha256": "9eee0a6d194a0aba5fefe4bfaae441cce88e69444b9ed655d1d43db66dff6fad"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/source-closure-publication-30/publication.json",
+    "sha256": "d29a25701350476ba7756ea159c837925a6a0a7dc818f81d70d915d307902400"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned exact two-commit source input closure publication: dd03 tracks tested Cargo.lock and 0796b36df6ee9712bfa335d81191abc26ed937ce adds unchanged JSON fixture checkout/checksum. Expected16c nonforced CAS to0796, ref confirmed, exact objects and artifact gate retained. Fresh own four-job CI43230599875 in progress at initial observation; next check14:37 UTC. No completion asserted. Both earlier failed source heads and full failed logs retained. Correctness unchanged and full isolated replay03 separately pinned."
+}

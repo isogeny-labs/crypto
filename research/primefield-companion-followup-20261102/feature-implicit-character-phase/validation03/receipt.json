@@ -1,0 +1,47 @@
+{
+  "scope": "Standalone exact quotient-phase and compressed-observation controls; no end-to-end recovery or timing claim",
+  "build_exit": 0,
+  "check_exit": 0,
+  "limits_seconds": {
+    "build": 90,
+    "check": 60
+  },
+  "commands": [
+    "rustc --edition=2021 -O -C overflow-checks=yes --emit=link,dep-info driver.rs -o /tmp/t1925-v3-check",
+    "/tmp/t1925-v3-check"
+  ],
+  "source_hashes": {
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-implicit-character-phase/driver.rs": {
+      "sha256": "230ca941cc4db9a059daf21114aa365f711218fc07671b4ece73b01554ba0e94",
+      "artifact": "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-implicit-character-phase/driver.rs"
+    },
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-implicit-character-phase/engine.rs": {
+      "sha256": "a02647e8ea0d19f869166403e9ec06a9d2adcd20c4e6ba640ad81f5665d2d488",
+      "artifact": "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-implicit-character-phase/engine.rs"
+    },
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-implicit-character-phase/gcd.rs": {
+      "sha256": "9832817f5a0687ae8aa2b41a1970916f64e9b3beb531d74d536cd250e4b737b0",
+      "artifact": "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-implicit-character-phase/gcd.rs"
+    },
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-implicit-character-phase/implicit.rs": {
+      "sha256": "5f62a2b1f1bc851de2ead4e961bdc7b4202d43eb55d9952b48e77baa855375c0",
+      "artifact": "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-implicit-character-phase/implicit.rs"
+    },
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-implicit-character-phase/observation.rs": {
+      "sha256": "062e974ac7b156a57ceb6f3f17568de64e04fd5894bc556acd0393e40a8c4bea",
+      "artifact": "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-implicit-character-phase/observation.rs"
+    },
+    "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-implicit-character-phase/checks.rs": {
+      "sha256": "1ba44edc365bb8edf03860cdcd805b95cf86c443942e479db3bf840776bf6359",
+      "artifact": "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-implicit-character-phase/checks.rs"
+    }
+  },
+  "logs": {
+    "check.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build.stderr": "5e35c123eb73d115f689e5b45b74f8c960361138041adf9dd1391a62f03f21e5",
+    "build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "check.stdout": "fb34537541249665025857dae9e77a4c5202a3898851ba867604777fb34b6962"
+  },
+  "copied_sources": 2,
+  "binary_sha256": "5a02d4a697c7c4cb9a0a6992998778e044b5d62ee2e504c54ed0a13311014966"
+}

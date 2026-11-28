@@ -1,0 +1,56 @@
+   Compiling certified-relations v0.1.0 (/workspace/crypto-integrate/crates/certified-relations)
+    Finished `release` profile [optimized] target(s) in 5.94s
+     Running unittests src/lib.rs (crates/certified-relations/target/release/build/certified-relations/2b57a8dc32477a11/out/certified_relations-2b57a8dc32477a11)
+
+running 48 tests
+test cheap::tests::refuses_invalid_or_degenerate_pairs ... ok
+test cheap::tests::scale_and_variable_embedding_preserve_certificates ... ok
+test cheap::tests::direct_cubic_retains_the_threshold_without_a_scout ... ok
+test projection::tests::no_shared_vertex_falls_back_to_cubics ... ok
+test projection::tests::direct_quadratic_identity_agrees_with_sylvester_in_degenerate_and_scaled_cases ... ok
+test cheap::tests::cancellations_and_small_prime_parameters_keep_exact_certificates ... ok
+test projection::tests::selected_root_caches_edges_when_higher_vertices_are_ineligible ... ok
+test projection::tests::selected_root_skips_unused_and_single_incident_vertices ... ok
+test quotient::compact::tests::rejects_circular_forged_missing_and_malformed_chain_data ... ok
+test quotient::compact::tests::research_capacity_is_explicit_and_bounded ... ok
+test quotient::compact::tests::sufficient_subset_keeps_full_checked_star_ideals ... ok
+test quotient::compact::tests::wrong_final_ideal_and_shape_are_not_accepted ... ok
+test quotient::tests::dependence_requires_exact_linear_membership ... ok
+test quotient::tests::missing_rules_fail_and_forged_rules_cannot_pass_final_check ... ok
+test quotient::tests::nonunits_are_not_inverted_and_unit_identity_is_exact ... ok
+test quotient::tests::polynomial_containment_keeps_full_remainders_and_rejects_nonzero_inputs ... ok
+test projection::tests::edge_projection_is_certified_and_reused_vertex_gcds_are_quartic ... ok
+test quotient::compact::tests::compact_chain_keeps_existing_fixed_case_bases_and_smaller_six_cycle_proofs ... ok
+test quotient::tests::unsupported_shapes_are_explicit_failures ... ok
+test replay::tests::native_completion_variants_preserve_exact_wire_bytes ... ok
+test replay::tests::noncoprime_product_marker_is_rejected_by_consumer ... ok
+test replay::tests::opt_in_native_product_verification_keeps_complete_original_ideals ... ok
+test replay::tests::original_input_and_both_constructor_certificates_have_complete_witnesses ... ok
+test replay::tests::product_criterion_preserves_legacy_wire_and_complete_pair_coverage ... ok
+test replay::tests::reject_future_nodes_missing_coverage_and_malformed_shapes ... ok
+test replay::tests::reject_true_but_nonstandard_trivial_s_pair_identity ... ok
+test replay::tests::unverified_native_wire_rejects_unsupported_consumer_scope ... ok
+test tests::caps_do_not_become_degrees ... ok
+test tests::certified_consequence_changes_threshold ... ok
+test tests::fast_verifier_and_product_criterion_keep_all_contracts ... ok
+test tests::fixed_ec_systems_match_historical_regressions_and_certificates ... ok
+test tests::guarded_m31_products_match_wide_remainder_at_boundaries_and_fallbacks ... ok
+test tests::guarded_m31_products_match_wide_remainder_on_fixed_differential_corpus ... ok
+test tests::hilbert_control_and_nonartinian ... ok
+test tests::interreduced_engine_matches_raw_and_projection_bases ... ok
+test tests::partial_source_budget_retains_incomplete_degree ... ok
+test tests::prime_and_exact_53_bit_arithmetic ... ok
+test tests::reference_rejects_missing_or_forged_basis ... ok
+test tests::reject_bad_modulus_and_input ... ok
+test tests::three_variable_linear_system ... ok
+test workload::tests::explicit_graphs_preserve_witnesses_and_original_input_identities ... ok
+test workload::tests::graph_entry_matches_legacy_cycle_interface_on_both_fields ... ok
+test workload::tests::graph_validation_rejects_bad_shapes_before_point_generation ... ok
+test workload::tests::scale_entry_keeps_old_admission_and_legacy_values ... ok
+test workload::tests::shared_point_inputs_have_valid_witnesses_and_certificates ... ok
+test quotient::tests::six_variable_development_basis_fits_unchanged_caps ... ok
+test projection::tests::quadratic_projection_preserves_full_ideal_on_both_requested_fields ... ok
+test quotient::tests::quotient_basis_matches_full_reference_on_both_fields ... ok
+
+test result: ok. 48 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.94s
+

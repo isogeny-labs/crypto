@@ -28,6 +28,7 @@
 //! collect `B + 1` relations at the exact yield, and Pollard rho on the same
 //! machine, both in seconds.
 
+use std::cell::RefCell;
 use std::collections::HashSet;
 use std::time::Instant;
 
@@ -40,6 +41,12 @@ use super::prime_small_x::{
 
 // ── Binary fields ──────────────────────────────────────────────────
 
+struct BinaryS3Scratch<const L: usize> {
+    dens: Vec<Elem<L>>,
+    prefix: Vec<Elem<L>>,
+    invs: Vec<Elem<L>>,
+}
+
 /// The S₃ decision for a binary curve and a fixed base.
 pub struct BinaryS3<'a, const L: usize> {
     c: &'a BinCurve<L>,
@@ -48,11 +55,13 @@ pub struct BinaryS3<'a, const L: usize> {
     set: HashSet<Elem<L>>,
     trace_mask: Elem<L>,
     half_trace: Vec<Elem<L>>,
+    scratch: RefCell<BinaryS3Scratch<L>>,
 }
 
 impl<'a, const L: usize> BinaryS3<'a, L> {
     pub fn new(c: &'a BinCurve<L>, base: &[BPt<L>]) -> Self {
         let f = &c.f;
+        let n = base.len();
         let xs: Vec<Elem<L>> = base.iter().map(|p| p.x).collect();
         let inv_xs = xs.iter().map(|x| f.inv(x)).collect();
         let set = xs.iter().copied().collect();
@@ -80,6 +89,11 @@ impl<'a, const L: usize> BinaryS3<'a, L> {
             set,
             trace_mask,
             half_trace,
+            scratch: RefCell::new(BinaryS3Scratch {
+                dens: vec![f.zero(); n],
+                prefix: vec![f.zero(); n + 1],
+                invs: vec![f.zero(); n],
+            }),
         }
     }
 
@@ -103,36 +117,58 @@ impl<'a, const L: usize> BinaryS3<'a, L> {
     }
 
     /// Whether `X = w ≠ 0` is `x(±a ± b)` for base points `a, b`, by solving
-    /// `S₃(u, ·, w)` for every base abscissa `u`.
+    /// `S₃(u, ·, w)` for every base abscissa `u` with zero per-trial heap
+    /// allocation and a single shared field inversion across `w` and all `u + w`.
     pub fn decide(&self, w: &Elem<L>) -> bool {
         let f = &self.c.f;
-        let iw = f.inv(w);
         let n = self.xs.len();
-        // 1/(u + w) for all u by one inversion (zeros, u = w, are skipped).
-        let dens: Vec<Elem<L>> = self.xs.iter().map(|u| f.add(u, w)).collect();
-        let mut prefix: Vec<Elem<L>> = Vec::with_capacity(n);
+        if n == 0 {
+            return false;
+        }
+        let mut sc = self.scratch.borrow_mut();
+        if sc.dens.len() < n {
+            sc.dens.resize(n, f.zero());
+            sc.prefix.resize(n + 1, f.zero());
+            sc.invs.resize(n, f.zero());
+        }
+        // Fold 1/w and 1/(u_k + w) for all k into one Montgomery inversion.
         let mut acc = f.one();
-        for d in &dens {
-            if !f.is_zero(d) {
-                acc = f.mul(&acc, d);
+        for k in 0..n {
+            let d = f.add(&self.xs[k], w);
+            sc.dens[k] = d;
+            sc.prefix[k] = acc;
+            if !f.is_zero(&d) {
+                acc = f.mul(&acc, &d);
             }
-            prefix.push(acc);
+        }
+        sc.prefix[n] = acc;
+        if !f.is_zero(w) {
+            acc = f.mul(&acc, w);
         }
         let mut inv_acc = f.inv(&acc);
-        let mut invs = vec![f.zero(); n];
+        let iw = if f.is_zero(w) {
+            f.zero()
+        } else {
+            let before = sc.prefix[n];
+            let iw_val = f.mul(&inv_acc, &before);
+            inv_acc = f.mul(&inv_acc, w);
+            iw_val
+        };
         for k in (0..n).rev() {
-            if f.is_zero(&dens[k]) {
+            let d = sc.dens[k];
+            if f.is_zero(&d) {
+                sc.invs[k] = f.zero();
                 continue;
             }
-            let before = if k == 0 { f.one() } else { prefix[k - 1] };
-            invs[k] = f.mul(&inv_acc, &before);
-            inv_acc = f.mul(&inv_acc, &dens[k]);
+            let before = sc.prefix[k];
+            sc.invs[k] = f.mul(&inv_acc, &before);
+            inv_acc = f.mul(&inv_acc, &d);
         }
         for k in 0..n {
             let u = &self.xs[k];
             let uw = f.mul(u, w);
             let c0 = f.add(&f.sqr(&uw), &self.c.b);
-            let d = &dens[k];
+            let d = &sc.dens[k];
             if f.is_zero(d) {
                 // u = w: A = 0, the equation is linear: x₂ = C/B.
                 let v = f.mul(&c0, &f.mul(&self.inv_xs[k], &iw));
@@ -149,7 +185,7 @@ impl<'a, const L: usize> BinaryS3<'a, L> {
             }
             let t = self.half_trace_of(&z);
             // x₂ = (B/A)·t with B/A = uw/(u + w)², and the other root adds B/A.
-            let ratio = f.mul(&uw, &f.sqr(&invs[k]));
+            let ratio = f.mul(&uw, &f.sqr(&sc.invs[k]));
             let v1 = f.mul(&ratio, &t);
             if self.set.contains(&v1) || self.set.contains(&f.add(&v1, &ratio)) {
                 return true;
@@ -236,25 +272,291 @@ pub fn s3_cost_binary<const L: usize>(
 
 // ── Prime fields ───────────────────────────────────────────────────
 
+struct PrimeS3Scratch<E> {
+    dens: Vec<E>,
+    prefix: Vec<E>,
+    invs: Vec<E>,
+}
+
 /// The S₃ decision for a prime-field curve and a fixed base.
 pub struct PrimeS3<'a, F: PrimeField> {
     c: &'a Curve<F>,
     xs: Vec<F::E>,
+    ys: Vec<F::E>,
+    /// Precomputed `w == u_k` linear-branch membership (`x(2·P_k) ∈ base`).
+    double_hit: Vec<bool>,
+    /// Indices `k` where `y_k == 0` (2-torsion base points; at most 3).
+    zero_y: Vec<usize>,
     set: HashSet<F::K>,
+    scratch: RefCell<PrimeS3Scratch<F::E>>,
 }
 
 impl<'a, F: PrimeField> PrimeS3<'a, F> {
     pub fn new(c: &'a Curve<F>, base: &[PPt<F::E>]) -> Self {
-        let f = &c.field;
+        let mut f = c.field.clone();
+        let n = base.len();
+        let xs: Vec<F::E> = base.iter().map(|p| p.x).collect();
+        let ys: Vec<F::E> = base.iter().map(|p| p.y).collect();
+        let set: HashSet<F::K> = base.iter().map(|p| f.key(p.x)).collect();
+        let two = f.embed_u64(2);
+        let four = f.embed_u64(4);
+        let two_b = f.mul(two, c.b);
+        let four_b = f.mul(four, c.b);
+        let a2 = f.sqr(c.a);
+        let mut double_hit = vec![false; n];
+        let mut zero_y = Vec::new();
+        for (k, (&u, &y)) in xs.iter().zip(&ys).enumerate() {
+            if f.is_zero(y) {
+                zero_y.push(k);
+                continue;
+            }
+            // Linear branch w = u: −2t·x₂ + C = 0 with t = 2(u³ + au + b) = 2y².
+            let sum = f.add(u, u);
+            let u2 = f.sqr(u);
+            let t = {
+                let p = f.mul(u2, sum);
+                let q = f.mul(c.a, sum);
+                let pq = f.add(p, q);
+                f.add(pq, two_b)
+            };
+            let cc = {
+                let ua = f.mul(u, c.a);
+                let inner = f.add(ua, two_b);
+                let mid = f.mul(u, inner);
+                let two_mid = f.mul(two, mid);
+                let u4 = f.sqr(u2);
+                let u4_minus = f.sub(u4, two_mid);
+                let first = f.add(u4_minus, a2);
+                let fbu = f.mul(four_b, u);
+                f.sub(first, fbu)
+            };
+            let two_t = f.mul(two, t);
+            if let Some(inv) = f.inv(two_t) {
+                let v = f.mul(cc, inv);
+                double_hit[k] = set.contains(&f.key(v));
+            }
+        }
+        let z = f.zero();
         Self {
             c,
-            xs: base.iter().map(|p| p.x).collect(),
-            set: base.iter().map(|p| f.key(p.x)).collect(),
+            xs,
+            ys,
+            double_hit,
+            zero_y,
+            set,
+            scratch: RefCell::new(PrimeS3Scratch {
+                dens: vec![z; n],
+                prefix: vec![z; n],
+                invs: vec![z; n],
+            }),
         }
     }
 
     /// Whether the abscissa `w` is `x(±a ± b)` for base points `a, b`.
+    ///
+    /// Exploits the exact Semaev discriminant identity
+    /// `t_k² − A_k·C_k ≡ 4·(u_k³ + a·u_k + b)·(w³ + a·w + b) = 4·y_k²·f(w)`,
+    /// reducing Tonelli–Shanks square roots from `B` per trial to at most `1`,
+    /// eliminating all per-trial heap allocations via reusable scratch buffers,
+    /// and computing the roots as `((s_w ∓ y_k)/(w − u_k))² − (w + u_k)` from
+    /// one batched inversion of `(w − u_k)`.
     pub fn decide(&self, f: &mut F, w: F::E) -> bool {
+        let n = self.xs.len();
+        if n == 0 {
+            return false;
+        }
+        let fw = self.c.rhs(f, w);
+        let Some(sw) = self.c.sqrt(f, fw) else {
+            // f(w) is a non-residue: 4·y_k²·f(w) is a square in F_p iff y_k == 0.
+            if self.zero_y.is_empty() {
+                return false;
+            }
+            let (a, b) = (self.c.a, self.c.b);
+            let two = f.embed_u64(2);
+            let two_b = f.mul(two, b);
+            for &k in &self.zero_y {
+                let u = self.xs[k];
+                let d = f.sub(w, u);
+                if f.is_zero(d) {
+                    continue;
+                }
+                let uw = f.mul(u, w);
+                let sum = f.add(u, w);
+                let uw_sum = f.mul(uw, sum);
+                let a_sum = f.mul(a, sum);
+                let mid = f.add(uw_sum, a_sum);
+                let t = f.add(mid, two_b);
+                let d2 = f.sqr(d);
+                if let Some(inv_a) = f.inv(d2) {
+                    let v = f.mul(t, inv_a);
+                    if self.set.contains(&f.key(v)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        };
+
+        let mut sc = self.scratch.borrow_mut();
+        if sc.dens.len() < n {
+            let z = f.zero();
+            sc.dens.resize(n, z);
+            sc.prefix.resize(n, z);
+            sc.invs.resize(n, z);
+        }
+        let mut acc = f.one();
+        let mut any_nonzero = false;
+        for k in 0..n {
+            let d = f.sub(w, self.xs[k]);
+            sc.dens[k] = d;
+            sc.prefix[k] = acc;
+            if f.is_zero(d) {
+                if self.double_hit[k] {
+                    return true;
+                }
+            } else {
+                acc = f.mul(acc, d);
+                any_nonzero = true;
+            }
+        }
+        if !any_nonzero {
+            return false;
+        }
+        let mut inv_acc = f.inv(acc).expect("product of nonzero elements");
+        let z = f.zero();
+        for k in (0..n).rev() {
+            let d = sc.dens[k];
+            if f.is_zero(d) {
+                sc.invs[k] = z;
+                continue;
+            }
+            let before = sc.prefix[k];
+            sc.invs[k] = f.mul(inv_acc, before);
+            inv_acc = f.mul(inv_acc, d);
+        }
+        let sw_zero = f.is_zero(sw);
+        for k in 0..n {
+            if f.is_zero(sc.dens[k]) {
+                continue;
+            }
+            let u = self.xs[k];
+            let y = self.ys[k];
+            let inv_d = sc.invs[k];
+            let sum_wu = f.add(w, u);
+            let num1 = f.sub(sw, y);
+            let lam1 = f.mul(num1, inv_d);
+            let lam1_sq = f.sqr(lam1);
+            let v1 = f.sub(lam1_sq, sum_wu);
+            if self.set.contains(&f.key(v1)) {
+                return true;
+            }
+            if !sw_zero && !f.is_zero(y) {
+                let num2 = f.add(sw, y);
+                let lam2 = f.mul(num2, inv_d);
+                let lam2_sq = f.sqr(lam2);
+                let v2 = f.sub(lam2_sq, sum_wu);
+                if self.set.contains(&f.key(v2)) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    /// Decide a batch of curve points `targets` sharing a single Montgomery
+    /// batch inversion across all `targets.len() * B` differences `w_m − u_k`
+    /// and zero `sqrt` calls (since `targets[m].y` is already `±√f(w_m)`).
+    pub fn decide_points_batch(&self, f: &mut F, targets: &[PPt<F::E>], out: &mut Vec<bool>) {
+        let n = self.xs.len();
+        let m = targets.len();
+        out.clear();
+        out.resize(m, false);
+        if n == 0 || m == 0 {
+            return;
+        }
+        let total = m * n;
+        let mut sc = self.scratch.borrow_mut();
+        let z = f.zero();
+        if sc.dens.len() < total {
+            sc.dens.resize(total, z);
+            sc.prefix.resize(total, z);
+            sc.invs.resize(total, z);
+        }
+        let mut acc = f.one();
+        let mut any_nonzero = false;
+        for (ti, pt) in targets.iter().enumerate() {
+            let base_off = ti * n;
+            let mut hit_linear = false;
+            for k in 0..n {
+                let d = f.sub(pt.x, self.xs[k]);
+                sc.dens[base_off + k] = d;
+                sc.prefix[base_off + k] = acc;
+                if f.is_zero(d) {
+                    if self.double_hit[k] {
+                        hit_linear = true;
+                    }
+                } else {
+                    acc = f.mul(acc, d);
+                    any_nonzero = true;
+                }
+            }
+            if hit_linear {
+                out[ti] = true;
+            }
+        }
+        if !any_nonzero {
+            return;
+        }
+        let mut inv_acc = f.inv(acc).expect("product of nonzero elements");
+        for idx in (0..total).rev() {
+            let d = sc.dens[idx];
+            if f.is_zero(d) {
+                sc.invs[idx] = z;
+                continue;
+            }
+            sc.invs[idx] = f.mul(inv_acc, sc.prefix[idx]);
+            inv_acc = f.mul(inv_acc, d);
+        }
+        for (ti, pt) in targets.iter().enumerate() {
+            if out[ti] {
+                continue;
+            }
+            let (w, sw) = (pt.x, pt.y);
+            let sw_zero = f.is_zero(sw);
+            let base_off = ti * n;
+            for k in 0..n {
+                if f.is_zero(sc.dens[base_off + k]) {
+                    continue;
+                }
+                let u = self.xs[k];
+                let y = self.ys[k];
+                let inv_d = sc.invs[base_off + k];
+                let sum_wu = f.add(w, u);
+                let num1 = f.sub(sw, y);
+                let lam1 = f.mul(num1, inv_d);
+                let lam1_sq = f.sqr(lam1);
+                let v1 = f.sub(lam1_sq, sum_wu);
+                if self.set.contains(&f.key(v1)) {
+                    out[ti] = true;
+                    break;
+                }
+                if !sw_zero && !f.is_zero(y) {
+                    let num2 = f.add(sw, y);
+                    let lam2 = f.mul(num2, inv_d);
+                    let lam2_sq = f.sqr(lam2);
+                    let v2 = f.sub(lam2_sq, sum_wu);
+                    if self.set.contains(&f.key(v2)) {
+                        out[ti] = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    /// Reference unfactored `S₃` quadratic solver (`B` square roots per trial),
+    /// kept for parity testing and A/B benchmarking.
+    pub fn decide_legacy(&self, f: &mut F, w: F::E) -> bool {
         let n = self.xs.len();
         let (a, b) = (self.c.a, self.c.b);
         let two = f.embed_u64(2);
@@ -262,8 +564,6 @@ impl<'a, F: PrimeField> PrimeS3<'a, F> {
         let two_b = f.mul(two, b);
         let four_b = f.mul(four, b);
         let a2 = f.sqr(a);
-        let w2 = f.sqr(w);
-        // Per u: A = (w − u)², t, and t² − A·C.
         let mut cap_a = Vec::with_capacity(n);
         let mut ts = Vec::with_capacity(n);
         let mut disc = Vec::with_capacity(n);
@@ -295,8 +595,6 @@ impl<'a, F: PrimeField> PrimeS3<'a, F> {
             ts.push(t);
             disc.push(f.sub(t2, ac));
         }
-        let _ = w2;
-        // 1/A for all u with A ≠ 0 by one inversion.
         let mut prefix = Vec::with_capacity(n);
         let mut acc = f.one();
         for &big_a in &cap_a {
@@ -317,9 +615,6 @@ impl<'a, F: PrimeField> PrimeS3<'a, F> {
         }
         for k in 0..n {
             if f.is_zero(cap_a[k]) {
-                // u = w: A = 0, the equation is linear, −2t·x₂ + C = 0, and
-                // t² − A·C = t²: x₂ = C/(2t) with C = (t² − disc)/A undefined,
-                // so recompute C directly.
                 let u = self.xs[k];
                 let ua = f.mul(u, a);
                 let inner = f.add(ua, two_b);

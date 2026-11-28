@@ -51,11 +51,7 @@ fn order_mod(a: u64, p: u64) -> u64 {
 }
 
 fn gcd(a: u64, b: u64) -> u64 {
-    if b == 0 {
-        a
-    } else {
-        gcd(b, a % b)
-    }
+    crypto_lib::gcd::int::gcd_u64(a, b)
 }
 
 /// Least type `T` of a Gaussian normal basis of `GF(2^m)`.

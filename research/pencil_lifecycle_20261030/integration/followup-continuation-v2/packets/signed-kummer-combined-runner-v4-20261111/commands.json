@@ -1,0 +1,106 @@
+{
+  "status": "prospective_not_released",
+  "working_directory": "/var/tmp/pencil-signed-kummer-combined-v4-20261111/source",
+  "build_env": {
+    "PATH": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:/usr/bin:/bin",
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "CARGO_BUILD_JOBS": "1",
+    "RUST_TEST_THREADS": "1",
+    "CARGO_HOME": "/var/tmp/pencil-signed-kummer-combined-v4-20261111/cache/cargo-home",
+    "CARGO_TARGET_DIR": "/var/tmp/pencil-signed-kummer-combined-v4-20261111/cache/target",
+    "TMPDIR": "/var/tmp/pencil-signed-kummer-combined-v4-20261111/cache/tmp",
+    "RUSTC": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "QUAL_SOURCE_REVISION": "29861c9a55f9ae5a33e1e09b3866aa397fbde605",
+    "QUAL_SOURCE_SHA256": "a9423e8a2b468c159402c65f9608b870058a423f82ca1ba06d63223ceab50871"
+  },
+  "build_argv": [
+    "cargo",
+    "test",
+    "--release",
+    "--lib",
+    "--locked",
+    "--offline",
+    "--no-run",
+    "--message-format=json"
+  ],
+  "exact_tests": [
+    "cryptanalysis::three_leads_followup::native_event_qualification::actual_signed_panel_identity_duplicate_terminal_and_faults",
+    "cryptanalysis::three_leads_followup::native_event_qualification::actual_kummer_labels_results_counters_and_early_returns"
+  ],
+  "test_argv_template": [
+    "EXACT_HASH_BOUND_ROOT_TEST_BINARY",
+    "EXACT_TEST_NAME",
+    "--exact",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "acceptance": "Nonzero exactly one test result per call, both tests pass, fixed coverage summary present; no entire-library invocation needed for this narrowly scoped draft unless coordinator broadens validation.",
+  "staging": [
+    "Apply only reviewed existing schema/consumer hunks from signed-event-adapter candidate to isolated materialized source. Do not apply historical Kummer packet hunk.",
+    "Stage exact new qualification packet including labels-root.rs and fixtures into its repository-relative path.",
+    "Apply native-tests.patch to exact bound native followup source; its cfg(test) integration changes no production code.",
+    "Bind full staged source/toolchain/cache and actual remaining ledger; publish/read back exact candidate+command before bounded native launch."
+  ],
+  "materialization_argv": [
+    "/usr/bin/python3",
+    "-B",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v4-20261111/materialize.py"
+  ],
+  "phase_clock_start": "build deadline starts before materialization and all input/hash/cache verification",
+  "build_artifact_selection": {
+    "reason": "compiler-artifact",
+    "target_name": "crypto_lib",
+    "target_kind_contains": "lib",
+    "profile_test": true,
+    "target_src_path": "/var/tmp/pencil-signed-kummer-combined-v4-20261111/source/src/lib.rs",
+    "unique_executable_under": "/var/tmp/pencil-signed-kummer-combined-v4-20261111/cache/target/",
+    "require_build_finished_success": true,
+    "record_binary_sha256_before_execution": true
+  },
+  "execution_phase_seconds": 600,
+  "build_phase_seconds": 1800,
+  "pass_requirements": {
+    "signed_final_summary": {
+      "completed": 28,
+      "identity_cases_min": 1,
+      "duplicate_cases_min": 1
+    },
+    "signed_per_row_is_not_completion": true,
+    "kummer_exact_cases": [
+      "informative_same",
+      "informative_opposite",
+      "redundant_same",
+      "redundant_opposite",
+      "invalid_zero_target",
+      "invalid_wrong_candidate",
+      "noncanonical"
+    ],
+    "both_exit_codes": 0,
+    "each_test_summary": "test result ok with1passed0failed0ignored0measured",
+    "full_source_postcheck_required": true,
+    "immutable_vendor_toolchain_postcheck_required": true
+  },
+  "containment_argv": [
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "2395s",
+    "/usr/bin/python3",
+    "-B",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v4-20261111/durable-launcher.py"
+  ],
+  "source_identity_semantics": "source_revision is canonical29861base; source_sha256 binds the complete staged candidate source manifest, including all overlays. Original native7986123f digest remains provenance only.",
+  "driver_tests": [
+    "pruned::driver_controls::actual_driver_original_disabled_observed_and_fixed_faults",
+    "pruned::driver_controls::actual_forced_fallback_and_zero_vector_lift_are_recorded"
+  ],
+  "adapter_negative_tests": [
+    "relation_stream::kummer_driver_protocol_controls::missing_call_result_rejected",
+    "relation_stream::kummer_driver_protocol_controls::changed_call_number_rejected",
+    "relation_stream::kummer_driver_protocol_controls::changed_signed_labels_rejected",
+    "relation_stream::kummer_driver_protocol_controls::missing_lift_disposition_rejected"
+  ],
+  "combined_scope": "28 signed +7 Labels +11 maximum full739 driver calls +2 forced native probes +4 adapter negatives; qualification only",
+  "build_scope": "Root lib, equivalence bin tests and reporting-adapter dependency lib tests all share1800seconds including staging; no separate allowance."
+}

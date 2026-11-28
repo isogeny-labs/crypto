@@ -1,0 +1,15 @@
+{
+  "action": "Keep executable and study-output paths separate; verify the executable path/hash instead of replacing the study suffix across the full script.",
+  "created": "2026-11-19T19:31:48Z",
+  "evidence": [
+    "benchmarks/records/20261119T1918Z-conductor33555419-scalars.json",
+    "research/prime_conductor_gap80_20261031/twist-transport-20261119/SCALAR_LAUNCH_AMENDMENT.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "ecbench-measure"
+  ],
+  "trigger": "Cloning a frozen launcher into a new study directory",
+  "why": "A broad replacement changed the qualified scalar binary directory and caused an exit127 before native execution; an explicit-path successor ran the unchanged binary successfully."
+}

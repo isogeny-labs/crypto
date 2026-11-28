@@ -1,0 +1,203 @@
+{
+  "standing": "[pcc:unverified]",
+  "scope": "exact GitHub Actions Rust development output, not signed PCC or a cold solver",
+  "source_run_url": "https://github.com/isogeny-labs/crypto/actions/runs/43719826200",
+  "source_run_id": 43719826200,
+  "source_job_id": 132829172004,
+  "source_head_sha": "1b337218c5b5bd0d2339fe6446afd601fcc160dc",
+  "development_job_conclusion": "success",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831
+  },
+  "reuse": "existing src/cryptanalysis/f4_fp_tower.rs; balanced m8 S4/S3 example",
+  "finding": "pair-S3 constraint alone reaches the exact same degree-6/5-step/26,618-entry dense B'-block stop as the full four-constraint ideal, before the public target S4 equation can differentiate cases at the frozen 15,000 cap.",
+  "limitations": "Reduced-ideal ablation, not a proof of formal ideal decomposition or lower bound on a competitive solver. Internal F4 timing and muladds exclude other work; no root extraction, complete ECDLP, or matched rho.",
+  "controls": {
+    "identical_core_metrics": [
+      "pair_s3_only",
+      "three_fixed_constraints",
+      "all_four_constraints"
+    ],
+    "pair_s3_oversize": true,
+    "all_four_oversize": true,
+    "input_independent_stop": true,
+    "target_only_zero_steps": true
+  },
+  "raw": {
+    "ablation_arms": [
+      {
+        "arm": "left_s4_only",
+        "input_polynomials": 1,
+        "result": {
+          "basis_elements": 7,
+          "budget_seconds": 5,
+          "degree_cap": 12,
+          "degree_reached": 10,
+          "dense_cap": 15000,
+          "inconsistent": false,
+          "max_cols": 1289,
+          "max_dense_entries": 2571,
+          "max_nnz": 5186,
+          "muladds": 14129,
+          "nnz_cap": 15000,
+          "oversize": true,
+          "pairs_above_bound": 0,
+          "reported_ms": 4.058745,
+          "root_extraction": "not_implemented",
+          "scope": "bounded F4 pilot only; no target logarithm recovered",
+          "solving_degree_max": 10,
+          "staircase_at_stop": null,
+          "steps": 2,
+          "timed_out": false,
+          "verdict": "undetermined"
+        }
+      },
+      {
+        "arm": "right_s4_only",
+        "input_polynomials": 1,
+        "result": {
+          "basis_elements": 7,
+          "budget_seconds": 5,
+          "degree_cap": 12,
+          "degree_reached": 10,
+          "dense_cap": 15000,
+          "inconsistent": false,
+          "max_cols": 1289,
+          "max_dense_entries": 2571,
+          "max_nnz": 5186,
+          "muladds": 14129,
+          "nnz_cap": 15000,
+          "oversize": true,
+          "pairs_above_bound": 0,
+          "reported_ms": 3.362885,
+          "root_extraction": "not_implemented",
+          "scope": "bounded F4 pilot only; no target logarithm recovered",
+          "solving_degree_max": 10,
+          "staircase_at_stop": null,
+          "steps": 2,
+          "timed_out": false,
+          "verdict": "undetermined"
+        }
+      },
+      {
+        "arm": "pair_s3_only",
+        "input_polynomials": 1,
+        "result": {
+          "basis_elements": 21,
+          "budget_seconds": 5,
+          "degree_cap": 12,
+          "degree_reached": 6,
+          "dense_cap": 15000,
+          "inconsistent": false,
+          "max_cols": 429,
+          "max_dense_entries": 26618,
+          "max_nnz": 11446,
+          "muladds": 30943,
+          "nnz_cap": 15000,
+          "oversize": true,
+          "pairs_above_bound": 0,
+          "reported_ms": 0.9888180000000001,
+          "root_extraction": "not_implemented",
+          "scope": "bounded F4 pilot only; no target logarithm recovered",
+          "solving_degree_max": 5,
+          "staircase_at_stop": null,
+          "steps": 5,
+          "timed_out": false,
+          "verdict": "undetermined"
+        }
+      },
+      {
+        "arm": "target_s4_only",
+        "input_polynomials": 1,
+        "result": {
+          "basis_elements": 1,
+          "budget_seconds": 5,
+          "degree_cap": 12,
+          "degree_reached": 0,
+          "dense_cap": 15000,
+          "inconsistent": false,
+          "max_cols": 0,
+          "max_dense_entries": 0,
+          "max_nnz": 0,
+          "muladds": 0,
+          "nnz_cap": 15000,
+          "oversize": false,
+          "pairs_above_bound": 0,
+          "reported_ms": 0.005338000000000001,
+          "root_extraction": "not_implemented",
+          "scope": "bounded F4 pilot only; no target logarithm recovered",
+          "solving_degree_max": 0,
+          "staircase_at_stop": null,
+          "steps": 0,
+          "timed_out": false,
+          "verdict": "basis_computed_without_root_extraction"
+        }
+      },
+      {
+        "arm": "three_fixed_constraints",
+        "input_polynomials": 3,
+        "result": {
+          "basis_elements": 23,
+          "budget_seconds": 5,
+          "degree_cap": 12,
+          "degree_reached": 6,
+          "dense_cap": 15000,
+          "inconsistent": false,
+          "max_cols": 429,
+          "max_dense_entries": 26618,
+          "max_nnz": 11446,
+          "muladds": 30943,
+          "nnz_cap": 15000,
+          "oversize": true,
+          "pairs_above_bound": 0,
+          "reported_ms": 1.038443,
+          "root_extraction": "not_implemented",
+          "scope": "bounded F4 pilot only; no target logarithm recovered",
+          "solving_degree_max": 5,
+          "staircase_at_stop": null,
+          "steps": 5,
+          "timed_out": false,
+          "verdict": "undetermined"
+        }
+      },
+      {
+        "arm": "all_four_constraints",
+        "input_polynomials": 4,
+        "result": {
+          "basis_elements": 24,
+          "budget_seconds": 5,
+          "degree_cap": 12,
+          "degree_reached": 6,
+          "dense_cap": 15000,
+          "inconsistent": false,
+          "max_cols": 429,
+          "max_dense_entries": 26618,
+          "max_nnz": 11446,
+          "muladds": 30943,
+          "nnz_cap": 15000,
+          "oversize": true,
+          "pairs_above_bound": 0,
+          "reported_ms": 1.038133,
+          "root_extraction": "not_implemented",
+          "scope": "bounded F4 pilot only; no target logarithm recovered",
+          "solving_degree_max": 5,
+          "staircase_at_stop": null,
+          "steps": 5,
+          "timed_out": false,
+          "verdict": "undetermined"
+        }
+      }
+    ],
+    "degree_cap": 12,
+    "dense_cap": 15000,
+    "public_Q": [
+      1547953785,
+      1667575595
+    ],
+    "scope": "F4 matrix-stop ablation only; reduced ideals NOT an m8 relation oracle, no ECDLP",
+    "standing": "[pcc:unverified]"
+  }
+}

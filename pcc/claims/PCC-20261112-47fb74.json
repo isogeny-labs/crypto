@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T11:47:54Z",
+ "id": "PCC-20261112-47fb74",
+ "kind": "theorem",
+ "producer": {
+  "commit": "92cc496cd5b371080ac3c0dbd3dfe01f208121df",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "cb1d768f1c08e59714c7121ef7f29f16055257be73ccce244ce8fa69c9497c28",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean",
+   "theorem": "QuarticGluing.quotient_kernel_saturated"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Faithful ring/structural consequences:h4duplication,injectivefactor kernelprojection,bijectionofkernels undercommutingsquare,and saturatedTate-lattice implications. Actual varieties,Picard,polarization,finitecardinality,Tate exactness/classification remain written;failed01 retained.",
+ "statement": "theorem quotient_kernel_saturated {M Q : Type} [IntModule M] [IntModule Q] (q : M \u2192 Q) (linear : \u2200 n : Int, \u2200 a, q (n \u2022 a)=n \u2022 q a) (torsionfree : \u2200 n : Int, n\u22600 \u2192 \u2200 b : Q, n \u2022 b=0 \u2192 b=0) (n : Int) (hn : n\u22600) (a : M) (ha : q (n \u2022 a)=0) : q a=0"
+}

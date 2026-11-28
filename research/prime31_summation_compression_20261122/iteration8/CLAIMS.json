@@ -1,0 +1,64 @@
+{
+  "schema": "prime31-iteration8-unsigned-claims/v1",
+  "date_local": "2026-11-22",
+  "time_zone": "America/Los_Angeles",
+  "tracking_pr": "https://github.com/isogeny-labs/crypto/pull/4941",
+  "parent_prs": [
+    {
+      "number": 4928,
+      "status": "merged"
+    },
+    {
+      "number": 4924,
+      "status": "merged"
+    }
+  ],
+  "note": "EXACT_CONTRACTION_AND_YIELD.md",
+  "protocol": "NATURAL_TARGET_PROTOCOL.md",
+  "source_execution": "none; no Rust installed or native source checkout in this runtime",
+  "pcc_standing": "unverified; local claim records do not mint global PCC IDs",
+  "claims": [
+    {
+      "id": "I8-C1",
+      "statement": "Exact N[G] four-tuple contraction with all signs, identity subtotals, complete output and certified misses; scoped affine comb reconstruction",
+      "status": "written proof",
+      "signed_independent_verification": false,
+      "cryptographic_execution": false
+    },
+    {
+      "id": "I8-C2",
+      "statement": "Exact uniform-target first moment, cancellation-based zero-sum correction, Markov empty bound and rank-attempt necessary bound",
+      "status": "written proof",
+      "signed_independent_verification": false,
+      "cryptographic_execution": false
+    },
+    {
+      "id": "I8-C3",
+      "statement": "Exact pair-table dimension/cost recurrence and scoped full-scan exponent obstruction; no universal lower bound",
+      "status": "written proof",
+      "signed_independent_verification": false,
+      "cryptographic_execution": false
+    },
+    {
+      "id": "I8-C4",
+      "statement": "Conditional relation of guaranteed growing Dickson fibre exponent beta, Linnik exponent Lambda and admissible full-cost model",
+      "status": "written proof conditional on existing density theorem and prime-source assumptions",
+      "signed_independent_verification": false,
+      "cryptographic_execution": false
+    },
+    {
+      "id": "I8-C5",
+      "statement": "Current two merged PR snapshots and three distinct CI failures before current candidate tests",
+      "status": "observed GitHub metadata/logs",
+      "signed_independent_verification": false,
+      "source_runs": [
+        45096187034,
+        45097885135,
+        45100829948
+      ]
+    }
+  ],
+  "performance_result": null,
+  "complete_ecdlp_speedup": false,
+  "next_obligation": "Implement specific exact Q1-Q3 solver in original Rust with certified empty outputs, source-bound CI and fully charged matched end-to-end study after EKS admission."
+}

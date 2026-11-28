@@ -1,0 +1,15 @@
+{
+  "action": "Pin a versioned immutable source snapshot or receipt; preserve that path and put later implementation in a distinct active module",
+  "created": "2026-11-24T23:01:31Z",
+  "evidence": [
+    "research/smooth_p_plus_one_20261123/evidence/cold_accounting_v1/pcc_source_binding_before.json",
+    "research/smooth_p_plus_one_20261123/evidence/cold_accounting_v1/layout_identity.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "smooth-p-plus-one"
+  ],
+  "trigger": "An attestation is about source that will continue evolving",
+  "why": "A live production.rs pin broke CI after later legitimate additions. Restoring the historical bytes and compiling the unchanged active module under a separate path removed the mismatch without editing the claim or verifier."
+}

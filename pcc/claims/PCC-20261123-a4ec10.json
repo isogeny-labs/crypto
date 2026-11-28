@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T17:55:36Z",
+ "id": "PCC-20261123-a4ec10",
+ "kind": "statement",
+ "producer": {
+  "commit": "746db9161fe54d85a621a7303abe013fd2a33535",
+  "model": "GPT-6",
+  "session": "chained-transfers-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cm19_jacobian_gram_20261123/maintenance/PR5007_FINAL_CI.json",
+    "sha256": "be846844f201110efbf2a1d8ca7ba5e8676bbd1a00236292c4a6214d09c381ec"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cm19_jacobian_gram_20261123/maintenance/PR5012_FINAL_CI.json",
+    "sha256": "7d142679679164c83747872945324e4d13d3059da04562afac6b94d394e236fe"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cm19_jacobian_gram_20261123/maintenance/FINAL_CI_LOG_INVENTORY.json",
+    "sha256": "3beeb1ddc13125c25337ee2427796c276a52b6065df5bf7cb202dce208679e84"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cm19_jacobian_gram_20261123/maintenance/CLOSURE_ATTRIBUTION_PENDING.json",
+    "sha256": "a9dc64cdbee7e3d37e7b1300b2151f2d3399fa7e8850c0645bb3760f621c5fb5"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Actual final merged-head CI inventories:5007 final6c27checks21all-event runs4failed1cancelled;5012 final10f26checks20runs4failed, after50min; full8 failed decoded logs retained with hashes, zero-job failed push workflows included. Partial closure episodes/outcomes; timestamped intervention attribution incomplete, no green-at-merge or autonomy-rate claim. [pcc:unverified]"
+}

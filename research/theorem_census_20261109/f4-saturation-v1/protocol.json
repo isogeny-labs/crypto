@@ -1,0 +1,420 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "f4-saturation-boundary-20261110",
+  "version": 1,
+  "created": "2026-11-10",
+  "repository": "crypto",
+  "study_dir": "research/theorem_census_20261109/f4-saturation-v1",
+  "authors": [
+    "Codex theorem audit"
+  ],
+  "links": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/3743",
+    "formal_source": "../lean/F4ExpectedOutputs.lean"
+  },
+  "question": "On the fixed Boolean ideal over F101, does the ordinary printed basis equal (xy,x^2-x,y^2-y), while -S by x prints (x-1,y), exhibiting the proved ordinary-F4Run domain boundary?",
+  "claims": [
+    {
+      "id": "C1",
+      "class": "theorem",
+      "text": "Every actual original F4Run remains in its input ideal; y belongs to this saturation but is outside the ideal. Decided only by Lean.",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "class": "exact_computation",
+      "text": "The two fixed native calls print the registered bases, verified by exact polynomial arithmetic and known-answer comparisons.",
+      "decided_by": [
+        "known-answers"
+      ]
+    },
+    {
+      "id": "C3",
+      "class": "out_of_scope",
+      "text": "Full C refinement, row-by-row traces, runtime, distributions, security, other-machine independence and signed execution are outside scope.",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "ordinary",
+      "role": "reference",
+      "description": "Ordinary reduced grevlex basis",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "../../solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "2",
+          "verbosity": "0",
+          "print_gb": "2",
+          "genericity": "0",
+          "SIMD": "disabled"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu"
+        }
+      },
+      "parameters": {
+        "mode": "ordinary",
+        "fixture": "boolean-F101",
+        "saturating_polynomial": null
+      }
+    },
+    {
+      "id": "saturation",
+      "role": "candidate",
+      "description": "Saturation by final generator x, reduced grevlex basis",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "../../solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "2",
+          "verbosity": "0",
+          "print_gb": "2",
+          "genericity": "0",
+          "SIMD": "disabled"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu"
+        }
+      },
+      "parameters": {
+        "mode": "saturation",
+        "fixture": "boolean-F101",
+        "saturating_polynomial": "x"
+      },
+      "same_instrument_as": "ordinary"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact fixed known answers, no noise, variance, timing or sampling inference; no A/A required."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Both calls are known-answer controls. Pre-freeze synthetic analyzer calibration rejects wrong x+1, zero basis element and wrong/duplicate characteristic headers; it does not execute msolve."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "No population hypothesis. Ordinary basis is the ideal-preserving control; exact Lean evaluation at(0,1) separates y from the ideal."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "mode",
+        "levels": [
+          "ordinary",
+          "saturation"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "how": "Same pinned binary, dependencies, thread1 and full reduced grevlex output."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": {
+          "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+          "hostname": "762f5fc120c9",
+          "isolation": "none; shared local host"
+        },
+        "how": "Provenance; no clock evidence or hardware comparison."
+      },
+      {
+        "name": "input_and_mode",
+        "treatment": "crossed",
+        "value": "ordinary first3; saturation first3 plus final saturating x",
+        "how": "The appended polynomial is the documented argument of -S, not another ordinary generator."
+      },
+      {
+        "name": "order_layout_warmup",
+        "treatment": "fixed",
+        "value": "ordinary then saturation; no warmups",
+        "how": "Exact deterministic polynomial comparison, no time claim."
+      },
+      {
+        "name": "internal_randomness",
+        "treatment": "fixed",
+        "value": "genericity0; sparse exact linear algebra2",
+        "how": "No random-form distribution inference; capture all raw output."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded known answers",
+        "how": "Frozen analyzer/expected bases before affected output."
+      },
+      {
+        "name": "preemption",
+        "treatment": "fixed",
+        "value": "local timeout30s per call; no retries",
+        "how": "Two call outcomes retained, zero paid spend."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "known-answers",
+        "arms": [
+          "ordinary",
+          "saturation"
+        ],
+        "differs_in": [
+          "input_and_mode"
+        ],
+        "design": "absolute",
+        "threshold": "Each arm equals its own fixed expected polynomial basis; no causal speed comparison."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "No sampled instance or random form; genericity disabled, exact sparse algebra. Any undocumented internal randomness is not used for inference."
+    },
+    "instance_sampling": {
+      "rule": "One explicitly specified Boolean ideal F101, two documented modes; no population sampling.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Literal known answers and exact arithmetic; no subjective inclusion or fit."
+    },
+    "arm_order_reason": "Exact known-answer checks only, no timing inference; fixed ordinary then saturation."
+  },
+  "sample_size": {
+    "instances": 2,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Two fixed input/mode cells, one call each; no inferential test. Alpha is schema metadata only."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 30,
+      "threads": 1,
+      "estimated_total_seconds": 60,
+      "measured_on": "Hard upper budget, not an empirical timing estimate. Existing ordinary small-system calibration in prior pinned study; saturation not preflighted to keep affected data unseen. No runtime conclusion."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "basis_ok",
+        "name": "Literal known-answer basis",
+        "unit": "exact integer or Boolean",
+        "kind": "exact",
+        "definition": "Normalized basis equals registered expected rows, field101 header, exit0, S-pairs zero, original input reductions zero.",
+        "source": "evidence/analysis.jsonl:basis_matches",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "dimension",
+        "name": "Known quotient dimension",
+        "unit": "exact integer or Boolean",
+        "kind": "exact",
+        "definition": "Bounded standard-monomial staircase equals3 ordinary and1 saturation.",
+        "source": "evidence/analysis.jsonl:standard_monomials",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "support",
+        "name": "Known base-field support",
+        "unit": "exact integer or Boolean",
+        "kind": "exact",
+        "definition": "Exhaustive F101^2 zero count equals3 ordinary and1 saturation.",
+        "source": "evidence/analysis.jsonl:points",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "boundary",
+        "name": "Evaluation witness",
+        "unit": "exact integer or Boolean",
+        "kind": "exact",
+        "definition": "Ordinary rows vanish at(0,1); saturation contains y and does not vanish there.",
+        "source": "evidence/analysis.jsonl:vanishes_at_zero_one",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [],
+    "record": [
+      "binary/source/input/analyzer hashes",
+      "argv",
+      "stdout/stderr/output/exit",
+      "UTC start/end timestamps (provenance only)",
+      "host and compiler provenance"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 30,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly one ordinary and one saturation call; preserve both outcomes and all diagnostics.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "30seconds hard timeout each; do not retry on outcome.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Missing/malformed output, timeout or nonzero exit is not_validated; no silent exclusion.",
+    "No parser/source fix after affected data under this protocol; preserve and label new version if correction needed."
+  ],
+  "decision_rule": {
+    "text": "fixture_pass only when every exact registered check passes for the arm; otherwise discrepancy or not_validated.",
+    "comparison_ids": [
+      "known-answers"
+    ],
+    "threshold": "zero discrepancies",
+    "statistic": "exact polynomial equality and finite integer checks",
+    "interval": "none; exact known answers",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "integer discrepancy from known answer",
+    "verdict_vocabulary": [
+      "fixture_pass",
+      "discrepancy",
+      "not_validated"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/analyze.cpp",
+      "sha256": "7f670b97d0b4db3df56f7f133410228ab29db3f15dd2576c92e040bf5e9b044b"
+    },
+    "inputs": [
+      "inputs/*.ms",
+      "evidence/runs/*"
+    ],
+    "outputs": [
+      "evidence/analysis.jsonl",
+      "export.json",
+      "report.pdf"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "ideal-boundary.svg"
+    ],
+    "report_dir": "."
+  },
+  "inadmissible": [
+    "Promoting this fixture to general ordinary msolve F4Run refinement.",
+    "Calling saturation output an ordinary ideal consequence.",
+    "Claiming timing, statistics, independent-host validation or signed execution.",
+    "Suppressing any outcome or changing frozen expected rows/parser."
+  ],
+  "literature": [
+    {
+      "ref": "../f4-model-imports.json; original04 F4Containment/SubspaceCriterion and original08 SolvingDegreeBound",
+      "provenance": "internal",
+      "claim": "Actual F4Run invariant and exact original model bytes."
+    },
+    {
+      "ref": "msolve@5e72b9d99eaea55fe87eb8ac945ec9e914a69327 main.c -S; msolve.c basis output2230-2252 and saturation3816-3844; f4sat.c429-458",
+      "provenance": "retrieved",
+      "claim": "-S saturates first k-1 input polys by last; -g2 returns full basis; simplify reading belongs to saturation path."
+    },
+    {
+      "ref": "Mathlib56a00585 MvPolynomial/Ideal.span; ../lean/F4SaturationBoundary.lean and F4ExpectedOutputs.lean",
+      "provenance": "internal",
+      "claim": "Actual ideal membership, evaluation nonmembership and power-witness saturation; expected modular coefficients bound in Lean."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "637a5a3b29fecdd04fd841012757104c846fee85c239ca61ae1282261537b6f2",
+    "commit": "83737796fbbf6da377a22b32a34c13842fa7ff13",
+    "frozen_at": "2026-11-10T07:20:54Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "analysis_binary_sha256": "b5009874cbbdada2980fa3925962413a5b8f3c0bfcc139f21d7cf01220a38ddf",
+    "provenance_sha256": "49a5ab61231a6d69ab29f4a7539e13dbe39d6272319a5ef45b33ecaca13e8ad2",
+    "preflight_scope": "Synthetic analyzer calibration only; no native affected fixture run. Earlier ordinary calibration only; saturation runtime remains unmeasured.",
+    "original_items": [
+      12,
+      14
+    ],
+    "checkpoint_exception": "User-approved zero-paid local bounded calls, durable independent call artifacts.",
+    "protocol_tool_commit": "005a7d7758844f97980b90c7ccd41b5cdcf9e048"
+  }
+}

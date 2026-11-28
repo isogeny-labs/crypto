@@ -1,0 +1,91 @@
+{
+  "arms": [
+    {
+      "artifacts": {
+        "basis": {
+          "bytes": 720,
+          "file": "sum_coordinate_basis.txt",
+          "sha256": "505dd626b61eb178fc2bd22d722265873714e4c4319b0d69eb5e935b9d842986"
+        },
+        "stderr": {
+          "bytes": 9133,
+          "file": "sum_coordinate_stderr.txt",
+          "sha256": "5431cd2062d2917fffd74b2a04020fc22bd6981ff66584335d66ff1775c333ef"
+        },
+        "stdout": {
+          "bytes": 0,
+          "file": "sum_coordinate_stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "command": [
+        "/opt/homebrew/Cellar/msolve/0.11.0/bin/msolve",
+        "-g",
+        "2",
+        "-t",
+        "1",
+        "-v",
+        "2",
+        "-m",
+        "256",
+        "-f",
+        "/Volumes/SSD990/cryptanalysis/experiments/g2-n31-ordinary-residual-sum-coordinate-20261010/sum_coordinate.ms",
+        "-o",
+        "/Volumes/SSD990/cryptanalysis/.sage-build-tmp/g2-sparse-sum_coordinate-y85zbr0t/msolve.out"
+      ],
+      "dyld_library_path": "/opt/homebrew/Cellar/flint/3.6.0/lib",
+      "exit_code": 0,
+      "input_sha256": "cd4f13954d342cae5592921000ee3e91ab5cbd0081751dc8650296cb7487e1aa",
+      "name": "sum_coordinate",
+      "peak_process_tree_rss_bytes": 524812288,
+      "rss_samples": 562,
+      "status": "COMPLETED",
+      "wall_ns_exploratory": 67278778458
+    },
+    {
+      "artifacts": {
+        "basis": {
+          "bytes": 794,
+          "file": "control_after_basis.txt",
+          "sha256": "3ddcf15591e30017351b908131c3eb35024b5ddb792107f7c5c7d255b1a37c9a"
+        },
+        "stderr": {
+          "bytes": 10266,
+          "file": "control_after_stderr.txt",
+          "sha256": "328074b027707b939086bcf6770c3d1960e955235d0d6f8550ad576d4991f27e"
+        },
+        "stdout": {
+          "bytes": 0,
+          "file": "control_after_stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "command": [
+        "/opt/homebrew/Cellar/msolve/0.11.0/bin/msolve",
+        "-g",
+        "2",
+        "-t",
+        "1",
+        "-v",
+        "2",
+        "-m",
+        "256",
+        "-f",
+        "/Volumes/SSD990/cryptanalysis/experiments/g2-n31-ordinary-residual-f4-r2-20261010/slice.ms",
+        "-o",
+        "/Volumes/SSD990/cryptanalysis/.sage-build-tmp/g2-sparse-control_after-_t2_0z8z/msolve.out"
+      ],
+      "dyld_library_path": "/opt/homebrew/Cellar/flint/3.6.0/lib",
+      "exit_code": 0,
+      "input_sha256": "53839cd5d2834097266db7a557d2dbdd328bf402740677bd2a24660c1e704ba2",
+      "name": "control_after",
+      "peak_process_tree_rss_bytes": 591855616,
+      "rss_samples": 754,
+      "status": "COMPLETED",
+      "wall_ns_exploratory": 92511831791
+    }
+  ],
+  "control_before_sha256": "0577715ea291fc37b76d94ffcea2c37f9468cde67ef91e57c590c22504d9ba2a",
+  "protocol_sha256": "cd60c66a409af186d8a742da2b21f9260d18e2ca5452bfdcb1d710eb25f8ff35",
+  "status": "COMPLETED"
+}

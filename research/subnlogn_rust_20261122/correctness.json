@@ -1,0 +1,202 @@
+{
+  "schema": "subnlogn.correctness/v1",
+  "recorded_at_utc": "2026-11-22T19:43:13Z",
+  "repository": "isogeny-labs/crypto",
+  "base_commit": "ce396efc7129c8fc90409fbdb2720461272a366b",
+  "branch": "codex/subnlogn-rust-integration-20261122",
+  "pr": 4916,
+  "toolchain": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5",
+  "standing": "unsigned_native_observation",
+  "signed_execution_evidence": false,
+  "performance_experiment": false,
+  "scope": {
+    "implemented": [
+      "bounded scalar XOR motif",
+      "symbolic arithmetic on published rank formulas",
+      "bounded exact finite-field synthetic convolution",
+      "bounded exact unsigned integer reconstruction",
+      "opt-in Field::conv_long adapter"
+    ],
+    "not_implemented": [
+      "full rank-saving tensor schedule",
+      "certified Gaussian resampling",
+      "complete published integer assembly and Turing bound"
+    ],
+    "reference_field_operations": "O(t*r^2 + t*r*log(t)), r=max(t/2,2)"
+  },
+  "source_files": [
+    {
+      "path": "isogeny_algos/Cargo.toml",
+      "sha256": "6d5fed3f1934e143a2275961bf0b5c4c1a464205b3f439a6890e1186fcb6f018",
+      "bytes": 851
+    },
+    {
+      "path": "isogeny_algos/Cargo.lock",
+      "sha256": "99980c0e43c16ed82db530f3d78a4724a4e5f86d1c14533fd97628826c1a8b81",
+      "bytes": 157
+    },
+    {
+      "path": "isogeny_algos/src/lib.rs",
+      "sha256": "00251489da7b1c5c31e5b7f5267ce97c20704355894aa6e998c6ee735464ca3f",
+      "bytes": 1590
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/mod.rs",
+      "sha256": "2d8a731d5d86f6d02a6f1718b1ff056e0d3d25ecd8aeea043423f2241e34c96d",
+      "bytes": 11452
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/motif.rs",
+      "sha256": "34353adb726febc867c7ecd124d0231f82b17e7f52ec3127f6858851f20d1f15",
+      "bytes": 23113
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/synthetic.rs",
+      "sha256": "57e550ee6d5abb27f7957491fcd23eba97f391ca15bfc22ca631634cdfad86e0",
+      "bytes": 18939
+    },
+    {
+      "path": "isogeny_algos/tests/subnlogn.rs",
+      "sha256": "ecc50e3ee3719130f814077419c48e60174d9fc36621f2b0a5e33fdc8e463b26",
+      "bytes": 13187
+    },
+    {
+      "path": "isogeny_algos/examples/subnlogn.rs",
+      "sha256": "da996fcea4cd40db68f456ebedc876f45d73045d2abbca45732011fc90043392",
+      "bytes": 3676
+    },
+    {
+      "path": ".github/workflows/isogeny-algos.yml",
+      "sha256": "0a9fc9781b7791e17873ff71705bc974569edebd11e7d8934b9ea18216470e92",
+      "bytes": 4472
+    }
+  ],
+  "primary_source": {
+    "repository": "openai/math",
+    "commit": "4eaee87548250b2682affda7d05d947c05554bae",
+    "sections": [
+      {
+        "name": "03-motifs.tex",
+        "git_blob": "cdb0ba527aa8df5d57c151183fd3893c1a7e21ab"
+      },
+      {
+        "name": "06-transforms.tex",
+        "git_blob": "de073e9292d58573f7065a3cd4f214e0d05f3444"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "command": "cargo test --release --lib --manifest-path isogeny_algos/Cargo.toml",
+      "exit_code": 0,
+      "scope": "initial default-feature library baseline",
+      "passed": 53,
+      "failed": 0,
+      "ignored": 1,
+      "evidence": "session command output; aggregate observation only"
+    },
+    {
+      "command": "cargo test --release --locked --manifest-path isogeny_algos/Cargo.toml --features experimental-subnlogn --lib --test subnlogn --example subnlogn",
+      "exit_code": 0,
+      "results": [
+        {
+          "target": "lib",
+          "passed": 64,
+          "failed": 0,
+          "ignored": 1
+        },
+        {
+          "target": "subnlogn integration",
+          "passed": 9,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "target": "subnlogn example",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "log": {
+        "path": "research/subnlogn_rust_20261122/correctness-tests.log",
+        "sha256": "0e7c68e38cef031a251d3f8c3f1d555e21d62c96d0de8248c3842081b91fe6a3",
+        "bytes": 6678
+      }
+    },
+    {
+      "command": "cargo test --release --manifest-path isogeny_algos/Cargo.toml --features experimental-subnlogn --test polyfast --test powmod --test ntt --example subnlogn",
+      "exit_code": 0,
+      "results": [
+        {
+          "target": "ntt",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "target": "polyfast",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "target": "powmod",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "target": "subnlogn example (duplicate smoke)",
+          "passed": 1,
+          "failed": 0
+        }
+      ],
+      "log": {
+        "path": "research/subnlogn_rust_20261122/polynomial-regressions.log",
+        "sha256": "669999b9612681d002e6439eda3b80568330c8eb1211a45de44fc967f8e92a30",
+        "bytes": 1840
+      }
+    },
+    {
+      "command": "cargo clippy --manifest-path isogeny_algos/Cargo.toml --locked --features experimental-subnlogn --lib --test subnlogn --example subnlogn -- -D warnings",
+      "exit_code": 0
+    }
+  ],
+  "preexisting_ignored_test": "eigen_seta_toy::tests::two_halves_middle_automorphism_oracle",
+  "independent_integer_fixtures": {
+    "word_lengths": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "products": 48,
+    "families": [
+      "all maximum limbs",
+      "alternating bits",
+      "deterministic random"
+    ],
+    "oracle": "separate u128 word-schoolbook implementation anchored by explicit identities"
+  },
+  "initial_failures": [
+    {
+      "stage": "two child Cargo attempts before example existed",
+      "exit_code": 101,
+      "resolution": "created planned example; subsequent complete tests passed"
+    },
+    {
+      "stage": "focused clippy on example",
+      "diagnostic": "clone_on_copy for Zp",
+      "resolution": "used Copy value directly; focused clippy passed"
+    },
+    {
+      "stage": "PCC ledger preflight in sparse checkout",
+      "diagnostic": "missing base schema rejection manifest and referenced immutable claims",
+      "resolution": "materialized the existing pcc tree; final ledger verification recorded separately"
+    }
+  ],
+  "limitations": [
+    "No benchmark or practical speedup was measured.",
+    "Native test logs are not a signed execution proof.",
+    "Recomputing published rank counts does not independently prove their mathematical rank labels.",
+    "Existing isogeny CI pins Rust 1.98; these local commands used Rust 1.100.0."
+  ]
+}

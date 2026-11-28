@@ -1,0 +1,7 @@
+# Next: full-chain rationalization and exact branch reconstruction
+
+Test the stronger hypothesis that the actual target guards eliminate nonrational finite-chain roots even when source coordinates repeat. G1/G2 exclude anti-counts three/four and rational torsion sub-sums. For A=0,B=1,odd extension degree, the candidate order-four x=1 has rational lifts, excluding an anti-rational pair summing to T. The remaining anti-pair cancels; finite ground-field intermediate restrictions may then exclude it. This is a proof candidate requiring explicit audit, not an already validated promotion.
+
+Freeze exhaustive GF32 (A=0,B=1) five-source original-chain oracles on prefix domains, including positive target cases satisfying the guards. Compare every original tuple against rational group reconstruction, retain poles/infinite partial sums, repeated x, torsion and all intermediate branches. Also use a field/curve control where anti-rational order-four points exist; the reduction must refuse that control or preserve its ghost branch.
+
+If the full-chain claim fails, retain the current proved distinct-source route and build a multiplicity-partition fallback. If it passes, implement a target-driven exact 2+3 component join on small fields; measure component-image size, surviving fiber count, time and RAM. Do not claim a large-field algorithm until those costs are bounded. Keep prime/odd-extension backends separate and the full F4/F5/F6 20-instance release gate unchanged.

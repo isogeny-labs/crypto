@@ -1,0 +1,11 @@
+name = "elliptic_field_norm_audit"
+version = "0.1.0"
+defaultTargets = ["EllipticFieldNormAudit"]
+
+[[require]]
+name = "elliptic_tame_symbol_audit"
+path = "../../elliptic_tame_symbol_audit_20261115/lean"
+
+[[lean_lib]]
+name = "EllipticFieldNormAudit"
+roots = ["NormImports", "FieldNormBase", "FieldNormLocalization", "FieldNormQuadratic", "FieldNormWrongBase", "FieldNormMinpoly", "FieldNormSeparable", "FieldNormGalois", "FieldNormControls", "FieldNormConjugation", "FieldNormCertificate"]

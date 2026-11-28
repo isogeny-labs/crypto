@@ -1,0 +1,67 @@
+Independent commit-bound capsule validation
+Date: 2026-11-19 UTC
+Scope: q=223 correctness and deterministic counters only
+Timing/frontier disposition: retained, not interpreted; no performance claim
+
+COMMAND
+rustc --edition 2021 -D warnings research/quartic_ghs_r0_r99_20261119/prototypes/commit_bound_validate.rs -o /tmp/commit_bound_validate
+EXIT 0
+STDOUT empty
+STDERR empty
+
+COMMAND
+rustfmt --edition 2021 research/quartic_ghs_r0_r99_20261119/prototypes/commit_bound_validate.rs && rustc --edition 2021 -D warnings research/quartic_ghs_r0_r99_20261119/prototypes/commit_bound_validate.rs -o /tmp/commit_bound_validate
+EXIT 0
+STDOUT empty
+STDERR empty
+
+COMMAND
+/tmp/commit_bound_validate --selftest . research/quartic_ghs_r0_r99_20261119/receipts/commit_bound_manifest.json research/quartic_ghs_r0_r99_20261119/receipts/commit_bound_q223.jsonl research/quartic_ghs_r0_r99_20261119/receipts/commit_bound_selftest.stdout.txt research/quartic_ghs_r0_r99_20261119/receipts/commit_bound_selftest.stderr.txt research/quartic_ghs_r0_r99_20261119/prototypes/rebuild_commit_bound.sh research/quartic_ghs_r0_r99_20261119/receipts/commit_bound_rebuild.txt
+EXIT 0
+OUTPUT
+commit-bound q=223 capsule validation PASS
+source_commit=95297ce1d098e124e72d45effc07fe8c640de82b
+source_tree=aaf30505039899dfce2125579cf1256d308ecd1b
+git_source_files=6 blobs=6 sha256=6
+record_sha256=761bdf3a2ef4d85a587f952e7cfc1e1313b8f3aadab01b6578a6b7ad2925bc6b lines=10 rho_arms=8
+selftest_stdout_sha256=a375a9767b166ca9b90914835eef192a5f7cd2acba5a09d7b5f16a008ecd5e38
+selftest_stderr_sha256=e04b10c45ecf697666f0172d84c5d1e3eb79af1c255b4cc4e3b9b648ffb228fd
+rebuild_script_sha256=f78661498666b53ca6d28cfbd32e447b73b4c6c0b95967a3ff827ebf4dbb4f9b
+rebuild_receipt_sha256=30f06f45904cbd47ea3b081822ad1d2ed44c659406b120792ce939ff42136f63
+recorded_binary_sha256=cbd81182cd5bf6d91ebb53e45d3b353644fae48372eaddc856415808124f28b5 independently_rebuilt_in_separate_receipt=true
+recovered_scalar=1765657 trajectory_arms=8 strong_arms=6 alias_pairs=2
+pinned_field_vectors=18 pinned_native_vectors=16 authority_rows=8
+tamper_rejections=17/17
+timing_fields=retained_finite_not_interpreted
+performance_or_frontier_claim=none
+
+COMMAND
+sha256sum research/quartic_ghs_r0_r99_20261119/prototypes/commit_bound_validate.rs
+EXIT 0
+OUTPUT
+63554301d69849c7455e2b5029eb54a8c63e12b94bd3e44ff048ea26adc67466  research/quartic_ghs_r0_r99_20261119/prototypes/commit_bound_validate.rs
+
+SEPARATE INDEPENDENT REBUILD CHECK
+COMMAND
+bash research/quartic_ghs_r0_r99_20261119/prototypes/rebuild_commit_bound.sh
+EXIT 0
+OUTPUT
+source_commit=95297ce1d098e124e72d45effc07fe8c640de82b
+source_tree=aaf30505039899dfce2125579cf1256d308ecd1b
+source_files_verified=6
+toolchain_sha256=be69adad9137eaa0bdac1dd07e2fe286b1831fc8bad193ea27806ca0c7c8e7c6
+archive_rebuilds=2
+binary_sha256=cbd81182cd5bf6d91ebb53e45d3b353644fae48372eaddc856415808124f28b5
+binary_bytes=848736
+cross_path_binary_equal=true
+selftest_stdout_sha256=a375a9767b166ca9b90914835eef192a5f7cd2acba5a09d7b5f16a008ecd5e38
+selftest_stderr_sha256=e04b10c45ecf697666f0172d84c5d1e3eb79af1c255b4cc4e3b9b648ffb228fd
+SELFTEST OK
+
+STATUS
+- strict capsule validation: VERIFIED
+- Git commit/tree/blob and per-source SHA-256 binding: VERIFIED
+- two-path reproducible binary rebuild: VERIFIED SEPARATELY
+- exact eight-arm correctness/accounting contract: VERIFIED
+- representative fail-closed corruptions: 17/17 REJECTED
+- timing or performance inference: NOT ATTEMPTED / NOT ADMISSIBLE

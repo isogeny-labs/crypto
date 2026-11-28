@@ -1,0 +1,28 @@
+scope=fixed_d6_k2_cusp_remainder_identity_over_2^61-1_evaluated_only
+base=f0ca664eca0081a30adfcc79dcf62a32de40d2af
+protocol_sha256=3eafeab5c2dc73c0add918bb23c9e8cdac1cf82d567d18a49792fd84aee0b20f
+command=timeout 60s; ulimit -v 2097152; cargo build --release --offline --locked --jobs 1 from immutable source snapshot
+statement=h_6(T)=1-12T+66T^2-220T^3+T^4*q(T), q from closed binomial coefficients
+modulus=2305843009213693951
+points=32
+producer_extra_points=32
+proof=null
+negative_controls=rhs_plus_one_prevents_issue; altered_value_digest_rejected
+2026-11-23T04:21:03Z
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+e8f9f046fb2d70190e5b304d7b9588c3de3c041cb4351af141059efd1eef7adb  main.rs
+1dd61b1d673c94967aad4251f0b60bfc875ad1c2c9d1368a5fc354d6a1384675  Cargo.toml
+b61277dc8134c4e77140f590ae681439ac1df68c10e52dcf43412c36ab8200ff  Cargo.lock
+3eafeab5c2dc73c0add918bb23c9e8cdac1cf82d567d18a49792fd84aee0b20f  ../../PROTOCOL.md
+d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270  ../../../../../src/cryptanalysis/identity_certificate.rs
+2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf  ../../../../../src/hash/sha256.rs
+e8f9f046fb2d70190e5b304d7b9588c3de3c041cb4351af141059efd1eef7adb  ../../evidence/producer/certificate-attempt1/source/research/fass_prime31_20261122/target_quotient/native/certificate/main.rs
+d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270  ../../evidence/producer/certificate-attempt1/source/src/cryptanalysis/identity_certificate.rs
+2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf  ../../evidence/producer/certificate-attempt1/source/src/hash/sha256.rs

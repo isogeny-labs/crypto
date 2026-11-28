@@ -1,0 +1,24 @@
+{
+  "observed_utc": "2026-11-11T03:43:52.530155+00:00",
+  "completion": {
+    "path": "/home/ec2-user/pencil-validation-receipts/signed-kummer-combined-v8-20261111/completion.json",
+    "sha256": "49d4b9675822d69a9fcaf08870f687fe2b4e97c2154247f4fdff272fa9c9d513"
+  },
+  "terminal_ledger": {
+    "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/campaign-renewal-20261110/ledger-combined-v8-terminal.json",
+    "sha256": "e2c74383dfc61229cb935528a5db19052fb408d932dd9f4b9570b448c64942d5"
+  },
+  "all_prior_phase_owners_terminal": true,
+  "active_pencil_units": [],
+  "idle_unit_query": [
+    "systemctl",
+    "list-units",
+    "--all",
+    "--plain",
+    "--no-legend",
+    "pencil-*",
+    "--state=active,activating,deactivating"
+  ],
+  "prospective_workspace_absent": true,
+  "prospective_outer_absent": true
+}

@@ -1,0 +1,11 @@
+name = "pairing_composite_order"
+version = "0.1.0"
+defaultTargets = ["PairingAudit"]
+
+[[require]]
+name = "theorem_refutations"
+path = "../../theorem_census_20261109/lean"
+
+[[lean_lib]]
+name = "PairingAudit"
+roots = ["BilinearObstruction", "CompositeTateThree", "CompositeTateFive", "CompositeTateCertificate"]

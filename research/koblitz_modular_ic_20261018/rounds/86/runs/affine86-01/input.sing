@@ -1,0 +1,21 @@
+proc require86(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+ring affine86=2,(z,V,l),dp;
+poly E86=V^2+z^2*V+z+z^3;
+ideal EStd86=std(ideal(E86));
+poly g86=1+z+z^2+V;
+poly c86=z*(1+z)*g86;
+poly b86=z^7+z^6+z^4+z^2+(z^5+z^3+z^2+z)*V;
+require86(reduce(c86^2+z*(b86+c86),EStd86)==0,"AFF86_ORIGINAL_U_COORDINATE");
+require86(reduce(V*(1+z)*c86+b86+z^3*c86,EStd86)==0,"AFF86_ORIGINAL_V_COORDINATE");
+require86(reduce(c86^2+z*(b86+1+c86),EStd86)!=0,"AFF86_CORRUPTED_B_ACCEPTED");
+poly k86=b86+(1+c86)*c86;
+require86(reduce(z*k86+(1+z)*c86^2,EStd86)==0,"AFF86_K_SIMPLIFICATION");
+poly affineN86=l+(1+z)^2*g86;
+poly affineD86=z^2*g86;
+poly diamondN86=(l*c86+k86)*k86;
+poly diamondD86=c86^4;
+require86(reduce(affineD86*diamondN86+diamondD86*affineN86,EStd86)==0,"AFF86_LAMBDA_CROSS_PRODUCT");
+require86(reduce(affineD86*diamondN86+diamondD86*(affineN86+1),EStd86)!=0,"AFF86_CORRUPTED_LAMBDA_ACCEPTED");
+print("AFF86_RESULT original_base_coordinates=2 k_simplification=1 affine_lambda_cross_product=1 corrupted_controls=2 rational_update_only=1");
+print("AFFINE86_ALL_CHECKS_PASS");
+quit;

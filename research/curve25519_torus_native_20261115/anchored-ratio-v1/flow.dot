@@ -1,0 +1,14 @@
+digraph Anchored {
+ graph [rankdir=TB,bgcolor="white",pad="0.15",nodesep="0.3",ranksep="0.4"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf2f7",fontname="Helvetica",fontsize=11];
+ edge [color="#506279",arrowsize=.65];
+ old [label="Supplied old columns\nvalidate full list (L)",fillcolor="#f2e6cc"];
+ inv [label="Try P signs and T-P\n<=32 inverse encodings each"];
+ ratio [label="Original coset j + r^q=h^q\nno q-element ratio list",fillcolor="#dcebf2"];
+ circuit [label="Original arity2 circuit\nchecked witness"];
+ index [label="Separate numeric t adapter\n14600 actual-field babies"];
+ cycle [label="Tree / zero-tag / useful closure\nseparate synthetic audit",fillcolor="#e2eddc"];
+ {rank=same;old;inv;ratio;}
+ {rank=same;circuit;index;cycle;}
+ old -> inv -> ratio -> circuit -> index -> cycle;
+}

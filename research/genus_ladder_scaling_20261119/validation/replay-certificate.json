@@ -1,0 +1,224 @@
+{
+ "schema": "replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "study": "research/genus_ladder_scaling_20261119",
+ "commit_validated": "469f5bf73199cfb69e01426df46170bd976bdb88",
+ "freeze_commit": "b5971d86ddcdd3fb00fddedb506e7f806d12b104",
+ "binary": {
+  "frozen": {
+   "path": "/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/bin/genus_ladder.po",
+   "sha256": "493ee2942473b8708a0b52f40ab10095c4da83ab0f0755ed3e5dbc02771b6921",
+   "binary_sha256_file": "493ee2942473b8708a0b52f40ab10095c4da83ab0f0755ed3e5dbc02771b6921",
+   "mtime": "2026-11-18T16:45:27.652856+00:00",
+   "match": true
+  },
+  "log_sources": {
+   "genus4": {
+    "path": "scratchpad/val4po/bin/val_po",
+    "sha256": "81bbb7452728a377bbe809c2616fa72cf4e61fd3843be0b4ac9c38dff4b19c1d",
+    "source": "research/genus4_prime_order_20261118/validation/scripts/val_po.rs (prior validator's harness on the ca72267899 library)"
+   },
+   "genus5": {
+    "path": "scratchpad/bin/genus_ladder.blpt",
+    "sha256": "e210549a18937be8bce65521f40093e1dbac765174ed481901f7d848460342fd",
+    "source": "research/block_lanczos_pretest_20261120/binary.sha256 (genus_ladder with the GENUS_LADDER_EXPORT_CORE dump); bound to the committed runs by identical rows"
+   }
+  }
+ },
+ "nonce": "f22ec7a6c4996832db2d625dd608ea77",
+ "plan": "validation/out/plan.json",
+ "comparison": "every field except wall_ns / wall_s / search_wall_s equal to the committed row; instance rows equal",
+ "summary": {
+  "run_rows_compared": 38,
+  "run_rows_identical": 38,
+  "jobs": 17,
+  "jobs_identical": 17,
+  "by_binary": {
+   "po": 26,
+   "blpt": 12
+  }
+ },
+ "runs": [
+  {
+   "tag": "b4_p54293_cc2.0_1206_k5",
+   "binary": "po",
+   "status": "identical",
+   "rows_identical": 2,
+   "rows": 2,
+   "file": "validation/out/replay/b4_p54293_cc2.0_1206_k5.jsonl"
+  },
+  {
+   "tag": "b4_p54293_cc1.4_1375_k4",
+   "binary": "po",
+   "status": "identical",
+   "rows_identical": 2,
+   "rows": 2,
+   "file": "validation/out/replay/b4_p54293_cc1.4_1375_k4.jsonl"
+  },
+  {
+   "tag": "b4_p54293_cc1.4_1375_k2",
+   "binary": "po",
+   "status": "identical",
+   "rows_identical": 2,
+   "rows": 2,
+   "file": "validation/out/replay/b4_p54293_cc1.4_1375_k2.jsonl"
+  },
+  {
+   "tag": "b5_p2357_x5_1215_k1",
+   "binary": "po",
+   "status": "identical",
+   "rows_identical": 2,
+   "rows": 2,
+   "file": "validation/out/replay/b5_p2357_x5_1215_k1.jsonl"
+  },
+  {
+   "tag": "b5_p2357_x5_1215_k1_blpt",
+   "binary": "blpt",
+   "status": "identical",
+   "rows_identical": 2,
+   "rows": 2,
+   "file": "validation/out/replay/b5_p2357_x5_1215_k1_blpt.jsonl"
+  },
+  {
+   "tag": "b5_p2357_x5star_466_k1",
+   "binary": "po",
+   "status": "identical",
+   "rows_identical": 2,
+   "rows": 2,
+   "file": "validation/out/replay/b5_p2357_x5star_466_k1.jsonl"
+  },
+  {
+   "tag": "b5_p2357_x5star_466_k1_blpt",
+   "binary": "blpt",
+   "status": "identical",
+   "rows_identical": 2,
+   "rows": 2,
+   "file": "validation/out/replay/b5_p2357_x5star_466_k1_blpt.jsonl"
+  },
+  {
+   "tag": "b5_p2357_x5star_1520_k0",
+   "binary": "po",
+   "status": "identical",
+   "rows_identical": 2,
+   "rows": 2,
+   "file": "validation/out/replay/b5_p2357_x5star_1520_k0.jsonl"
+  },
+  {
+   "tag": "b5_p2357_x5star_1520_k0_blpt",
+   "binary": "blpt",
+   "status": "identical",
+   "rows_identical": 2,
+   "rows": 2,
+   "file": "validation/out/replay/b5_p2357_x5star_1520_k0_blpt.jsonl"
+  },
+  {
+   "tag": "b5_p4099_x5_330_k1",
+   "binary": "po",
+   "status": "identical",
+   "rows_identical": 2,
+   "rows": 2,
+   "file": "validation/out/replay/b5_p4099_x5_330_k1.jsonl"
+  },
+  {
+   "tag": "b5_p4099_x5_330_k1_blpt",
+   "binary": "blpt",
+   "status": "identical",
+   "rows_identical": 2,
+   "rows": 2,
+   "file": "validation/out/replay/b5_p4099_x5_330_k1_blpt.jsonl"
+  },
+  {
+   "tag": "b5_p4099_x5star_330_k5",
+   "binary": "po",
+   "status": "identical",
+   "rows_identical": 2,
+   "rows": 2,
+   "file": "validation/out/replay/b5_p4099_x5star_330_k5.jsonl"
+  },
+  {
+   "tag": "b5_p4099_x5star_330_k5_blpt",
+   "binary": "blpt",
+   "status": "identical",
+   "rows_identical": 2,
+   "rows": 2,
+   "file": "validation/out/replay/b5_p4099_x5star_330_k5_blpt.jsonl"
+  },
+  {
+   "tag": "b5_p4099_x5star_330_k0",
+   "binary": "po",
+   "status": "identical",
+   "rows_identical": 2,
+   "rows": 2,
+   "file": "validation/out/replay/b5_p4099_x5star_330_k0.jsonl"
+  },
+  {
+   "tag": "b5_p4099_x5star_330_k0_blpt",
+   "binary": "blpt",
+   "status": "identical",
+   "rows_identical": 2,
+   "rows": 2,
+   "file": "validation/out/replay/b5_p4099_x5star_330_k0_blpt.jsonl"
+  },
+  {
+   "tag": "tune5_cc2.8_2254_k0",
+   "binary": "po",
+   "status": "identical",
+   "rows_identical": 4,
+   "rows": 4,
+   "file": "validation/out/replay/tune5_cc2.8_2254_k0.jsonl"
+  },
+  {
+   "tag": "tune5_cc1.0_2254_k0",
+   "binary": "po",
+   "status": "identical",
+   "rows_identical": 4,
+   "rows": 4,
+   "file": "validation/out/replay/tune5_cc1.0_2254_k0.jsonl"
+  }
+ ],
+ "logarithm_certificates": {
+  "keys": 8,
+  "logs_checked": 16,
+  "all_logs_eq_t_and_LG_eq_T": true,
+  "all_keys_ok": true,
+  "genus4_keys": 2,
+  "genus5_keys": 6,
+  "evidence": "validation/out/certs.json",
+  "method": "validator rebuilds (G, t, T) from the seeds with its own Cantor arithmetic (jac.py), checks [r]G = 0, T = [t]G, and that the solver's recovered log L satisfies L = t and [L]G = T; harness/export counts equal the committed rows; tamper controls L+1 and one T coefficient caught"
+ },
+ "extra_replays": {
+  "saturation_cc4.0_vs_committed_cc2.8": {
+   "runs": 4,
+   "identical": 4,
+   "instance_identical": true
+  },
+  "rho5_seed1": {
+   "runs": 1,
+   "identical": 1,
+   "instance_identical": true
+  }
+ },
+ "curve_certificates": {
+  "g4_p54293": {
+   "381": true,
+   "1206": true,
+   "1375": true,
+   "1453": true
+  },
+  "g5_p2357": {
+   "466": true,
+   "1215": true,
+   "1520": true,
+   "1973": true,
+   "2254": true
+  },
+  "g5_p4099": {
+   "330": true,
+   "538": true,
+   "574": true,
+   "1086": true
+  }
+ }
+}

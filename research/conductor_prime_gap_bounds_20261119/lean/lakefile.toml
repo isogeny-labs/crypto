@@ -1,0 +1,23 @@
+name = "conductor_prime_gap_bounds"
+version = "0.1.0"
+defaultTargets = ["ConductorPrimeGapBounds"]
+
+[[require]]
+name = "CryptoLean"
+git = "https://github.com/aburan28/crypto-lean.git"
+rev = "01750b4044989583e70e4886b4ab5a79fe83f128"
+
+# TransferBound / DeepGap from the 2026-10 conductor-gap studies, by path.
+[[require]]
+name = "deep_gap"
+path = "../../deep_volcano_prime_gap_20261022/lean"
+
+[[lean_lib]]
+name = "ConductorPrimeGapBounds"
+roots = [
+  "ConductorOrthogonality",
+  "HasseTransferCeiling",
+  "ScalarFrobeniusOracle",
+  "FloorObstructionAndDensity",
+  "ConductorGapEndpoints",
+]

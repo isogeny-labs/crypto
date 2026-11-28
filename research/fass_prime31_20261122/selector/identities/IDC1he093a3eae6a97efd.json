@@ -1,0 +1,158 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1he093a3eae6a97efd",
+  "statement": {
+    "name": "Lucas odd doubling in root-power coordinates",
+    "source": "selector/REPORT.md; u=alpha^n,v=beta^n",
+    "variables": [
+      "u",
+      "v",
+      "alpha",
+      "beta"
+    ],
+    "degree_bound": 3,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "alpha"
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "u"
+                },
+                {
+                  "op": "var",
+                  "args": "u"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "beta"
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "v"
+                },
+                {
+                  "op": "var",
+                  "args": "v"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "u"
+                },
+                {
+                  "op": "var",
+                  "args": "v"
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "alpha"
+                    },
+                    {
+                      "op": "var",
+                      "args": "u"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "beta"
+                    },
+                    {
+                      "op": "var",
+                      "args": "v"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "alpha"
+                  },
+                  {
+                    "op": "var",
+                    "args": "beta"
+                  }
+                ]
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "u"
+                  },
+                  {
+                    "op": "var",
+                    "args": "v"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261123,
+  "value_digest": "989f8fa58e0170ab70b937ff28aa23759093a2a39a4b337799e1e692f0662df9",
+  "independence": "producer-issued; checked by existing repository checker; no signed PCC or Lean proof",
+  "proof": null
+}

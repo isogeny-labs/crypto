@@ -1,0 +1,15 @@
+name = "jv_source_field_audit"
+version = "0.1.0"
+defaultTargets = ["JVSourceFieldAudit"]
+
+[[require]]
+name = "jv_macaulay_certificate"
+path = "../../jv_macaulay_certificate_20261113/lean"
+
+[[require]]
+name = "theorem_audit"
+path = "../../theorem_audit_20261108/lean"
+
+[[lean_lib]]
+name = "JVSourceFieldAudit"
+roots = ["SourceField", "ActualCurve", "SourceDescent", "ActualDecomposition"]

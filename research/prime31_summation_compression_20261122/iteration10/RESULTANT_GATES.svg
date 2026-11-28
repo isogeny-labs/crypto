@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="590" viewBox="0 0 1000 590" role="img" aria-label="S3 pair-spectrum double-resultant gates and cost">
+<title>Prime31 S3 double-resultant: exact algebra is not a fast empty query</title>
+<rect width="1000" height="590" fill="#f7f8fa"/>
+<text x="40" y="55" font-family="sans-serif" font-size="27" font-weight="bold" fill="#16324f">S3 pair-spectrum contraction: exact, but not free</text>
+<text x="40" y="82" font-family="sans-serif" font-size="15" fill="#42536a">A={±P_i}, B leaf abscissae; X=x((A+A)\{O}), D≤B²; source subgroup odd-order</text>
+<g font-family="sans-serif">
+<rect x="48" y="113" width="390" height="78" rx="12" fill="#e5efff" stroke="#547ab0"/>
+<text x="68" y="145" font-size="20" font-weight="bold" fill="#173e75">Source: D rational pair abscissae</text>
+<text x="68" y="173" font-size="16" fill="#173e75">H(V) = ∏(V − u), B ≤ D ≤ B²</text>
+<rect x="565" y="113" width="385" height="78" rx="12" fill="#e5efff" stroke="#547ab0"/>
+<text x="585" y="145" font-size="20" font-weight="bold" fill="#173e75">S3 matrix pencil</text>
+<text x="585" y="173" font-size="16" fill="#173e75">M_ij(r) = S3(u_i,u_j,r), rank ≤ 3</text>
+<path d="M438 152 L559 152" stroke="#547ab0" stroke-width="2" fill="none"/>
+<path d="M552 146 L563 152 L552 158" stroke="#547ab0" stroke-width="2" fill="none"/>
+<rect x="48" y="231" width="420" height="116" rx="12" fill="#f0ebff" stroke="#7b60ba"/>
+<text x="68" y="262" font-size="19" font-weight="bold" fill="#4e378f">Correct double resultant</text>
+<text x="68" y="292" font-size="17" fill="#4e378f">Δ(r) = diag(r) × off(r)²</text>
+<text x="68" y="320" font-size="16" fill="#4e378f">deg Δ = 2D² − D; dense output Ω(D²)</text>
+<rect x="565" y="231" width="385" height="116" rx="12" fill="#ffeded" stroke="#cb7777"/>
+<text x="585" y="262" font-size="19" font-weight="bold" fill="#973c3c">Invalid shortcut</text>
+<text x="585" y="292" font-size="17" fill="#973c3c">det M(r) ≡ 0 when D ≥ 4</text>
+<text x="585" y="320" font-size="16" fill="#973c3c">Even when every entry is nonzero</text>
+<path d="M242 191 L242 225" stroke="#7b60ba" stroke-width="2"/>
+<path d="M236 219 L242 230 L248 219" stroke="#7b60ba" stroke-width="2" fill="none"/>
+<path d="M749 191 L749 225" stroke="#cb7777" stroke-width="2"/>
+<path d="M743 219 L749 230 L755 219" stroke="#cb7777" stroke-width="2" fill="none"/>
+<rect x="48" y="391" width="902" height="142" rx="12" fill="#e8f5ee" stroke="#5a9a7b"/>
+<text x="70" y="425" font-size="19" font-weight="bold" fill="#226549">Target support predicate: Q(r)=H(r) × diag(r) × off(r)</text>
+<text x="70" y="456" font-size="17" fill="#226549">deg Q = D² + D; nonidentity four-sum exists exactly when Q(x(R)) = 0</text>
+<text x="70" y="487" font-size="16" fill="#226549">Direct complement: O(D) group additions/query + output. Dense Q index: Ω(D²) setup/slots.</text>
+<text x="70" y="513" font-size="15" fill="#226549">B=31: ≥99.9685% of uniform nonidentity targets are misses (counting upper bound).</text>
+<path d="M255 347 L255 385" stroke="#5a9a7b" stroke-width="2"/>
+<path d="M249 379 L255 390 L261 379" stroke="#5a9a7b" stroke-width="2" fill="none"/>
+<text x="48" y="566" font-size="14" fill="#586779">Mathematical derivation only · unsigned / PCC unverified · no native benchmark · next: charged sublinear empty-query index</text>
+</g>
+</svg>

@@ -1,0 +1,12 @@
+digraph N {
+ graph [rankdir=LR,bgcolor="white",pad="0.2",ranksep="0.35"];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf3fa",color="#456987",fontname="DejaVu Sans",fontsize=11,margin="0.12,0.10"];
+ edge [color="#456987",fontname="DejaVu Sans",fontsize=10];
+ n [label="Assume N(a,b,c)=0"];
+ p [label="p1³ = 3 p2³
+Base units + no cube root3"];
+ z [label="p2=p1=0
+b³=3c³"];
+ a [label="c=b=a=0",fillcolor="#eaf5ed"];
+ n -> p; p -> z; z -> a [label="same ratio contradiction"];
+}

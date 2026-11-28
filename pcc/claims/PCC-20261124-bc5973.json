@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T02:36:09Z",
+ "id": "PCC-20261124-bc5973",
+ "kind": "statement",
+ "producer": {
+  "commit": "bd2b17ed598804ef695d75ff5ca163d1722e63bd",
+  "model": "",
+  "session": "codex-ecc2k-cold50x-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50x_20261124/inline/grid-audit.json",
+    "sha256": "07b24dedae26f4a4b1937d1cd098e1facf338c08dbe5bf59738fd3e7c6b243d4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50x_20261124/inline/summary.json",
+    "sha256": "ae21d77b1471ba3517ae391611a84114c1226ee1e355ccf557c4b0cbe95a548d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50x_20261124/inline/polynomial-replay.json",
+    "sha256": "ae3bc7429484d776a95c2b7294f2a3201204550ebc5bb8af2c1cac0b07d6297d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50x_20261124/inline/checks/source-final.json",
+    "sha256": "b29c0836a8aa186d006c3b6150e101399d7a943a9f30bd8cc4b231932b000207"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "The inline dense dictionary completes all120 frozen rows with exact common outputs, all six control guards pass and source inventory unchanged. Uniform n131 median20,006,773Ir is1.066986x lower-cost than matched previous best (6.278064% fewer whole instructions); complete oracle12,458,426Ir is9.709558% fewer. This misses the unchanged50x/427,207Ir target. Separate schoolbook replay is retained. No native-time or warmed-throughput claim."
+}

@@ -77,16 +77,8 @@ fn reduce_by(r: u64, modp: u64, n: u32) -> u64 {
     r
 }
 
-fn poly_gcd_f2(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        let db = 63 - b.leading_zeros();
-        while a != 0 && 63 - a.leading_zeros() >= db {
-            let da = 63 - a.leading_zeros();
-            a ^= b << (da - db);
-        }
-        std::mem::swap(&mut a, &mut b);
-    }
-    a
+fn poly_gcd_f2(a: u64, b: u64) -> u64 {
+    crypto_lib::gcd::gf2::gcd_word(a, b)
 }
 
 fn prime_factors(mut x: u64) -> Vec<u64> {

@@ -1,0 +1,110 @@
+name: Hourly Koblitz relation-finding monitor
+
+on:
+  push:
+    branches: [hourly-runs]
+    paths:
+      - ".github/workflows/hourly-relation-finding.yml"
+      - "results/hourly_triggers/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: hourly-koblitz-relation-finding
+  cancel-in-progress: true
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      CARGO_INCREMENTAL: "0"
+      CARGO_PROFILE_RELEASE_DEBUG: "0"
+      RUSTFLAGS: "-C debuginfo=0"
+    steps:
+      - name: Free space for the Rust build
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL \
+            /usr/local/share/powershell || true
+          df -h /
+      - uses: actions/checkout@v4
+        with:
+          ref: hourly-runs
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/*/
+            /Cargo.toml
+            /Cargo.lock
+            /src/
+            /examples/
+            /scripts/
+            /crates/
+            /tools/
+            /isogeny_algos/
+            /research/pencil_large_prime_20261029/Cargo.toml
+            /research/pencil_large_prime_20261029/src/
+            /results/
+      - name: Expand Rust source and path dependencies only
+        run: |
+          bash scripts/sparse-checkout.sh apply --profile minimal --path results/
+          df -h /
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+      - name: Test telemetry contract
+        run: python3 scripts/test_hourly_relation_finding.py
+      - name: Run frozen n=23 relation-yield benchmark and record CSV
+        id: benchmark
+        continue-on-error: true
+        run: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+      - name: Preserve raw producer output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hourly-relation-raw-${{ github.run_id }}
+          path: ${{ runner.temp }}/hourly_relation_result.json
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Commit and push new CSV and baseline on hourly-runs
+        if: always()
+        shell: bash
+        run: |
+          if [ -f results/hourly_log.csv ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            # Other research sessions may push while this benchmark runs.
+            # Fast-forward before staging the new CSV row, so the log push
+            # does not discard their branch changes.
+            git fetch origin hourly-runs
+            git merge --ff-only origin/hourly-runs
+            git add -f results/hourly_log.csv
+            if [ -f results/relation_baseline.json ]; then
+              git add -f results/relation_baseline.json
+            fi
+            if ! git diff --cached --quiet; then
+              git commit -m "data: append hourly n23 relation yield measurement"
+              git push origin HEAD:hourly-runs
+            fi
+          fi
+      - name: Open a GitHub issue on run failure or >20% change
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if [ -s results/hourly_alert.md ]; then
+            gh issue create --repo "$GITHUB_REPOSITORY" \
+              --title "[relation-monitor] n23 relation-yield failed or changed >20% (run $GITHUB_RUN_ID)" \
+              --body-file results/hourly_alert.md
+          fi
+      - name: Surface a benchmark failure to CI
+        if: steps.benchmark.outcome == 'failure'
+        run: exit 1

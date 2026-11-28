@@ -1,0 +1,43 @@
+{
+  "recorded_at_utc": "2026-11-23T16:25:05.768143+00:00",
+  "classification": "Confirmed compiler syntax failure in unchanged tracked baseline source",
+  "root_sha": "7d61e3b45de6e93d235345a0061dae08db1f8b44",
+  "path": "src/prime_ecc/efd/tests.rs",
+  "immutable_source_url": "https://github.com/isogeny-labs/crypto/blob/7d61e3b45de6e93d235345a0061dae08db1f8b44/src/prime_ecc/efd/tests.rs",
+  "git_tree_entry": "100644 blob 8775006f852a63c729c2b286fbf89b5c4a0781c9\tsrc/prime_ecc/efd/tests.rs",
+  "source_sha256": "263331ae1bba9bad8d85a34bf6fbc5bab97f73538ceb5726e88c72f75bb89b19",
+  "working_file_byte_identical_to_committed_blob": true,
+  "compiler_errors": [
+    {
+      "kind": "mismatched closing delimiter )",
+      "line": 370,
+      "closure_line": 395
+    },
+    {
+      "kind": "mismatched closing delimiter }",
+      "line": 775,
+      "closure_line": 780
+    },
+    {
+      "kind": "mismatched closing delimiter )",
+      "line": 769,
+      "closure_line": 780
+    },
+    {
+      "kind": "unclosed delimiters",
+      "line": 875,
+      "earliest_reported_open_line": 37
+    }
+  ],
+  "cargo_exit_code": 101,
+  "tests_executed": false,
+  "no_source_fix_or_rerun": true,
+  "result_sha256": "d25abd61330b1d6417cc4df463b21102de71d86a4c230d0f09f58379c970ab75",
+  "log_sha256": "a3057cb8872a657a557776e028bafb8e3d9b6ca73cfc7783c8d452aba92cf1b8",
+  "attempt02_missing_file_evidence_sha256": "38654b71598b258a35b4ff802ba3d0eab76a4744a268803ab06f1da0220f0d96",
+  "cargo_locks_after": {
+    "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate/target/release/.cargo-lock": "available",
+    "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate/target/release/.cargo-artifact-lock": "available",
+    "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate/target/release/.cargo-build-lock": "available"
+  }
+}

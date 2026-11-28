@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T00:50:40Z",
+ "id": "PCC-20261124-6b6a41",
+ "kind": "statement",
+ "producer": {
+  "commit": "589cc2801d8cfc8cf5d005957514f40de0236100",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/collection_preflight_20261124/PORTABILITY_NOTES.md",
+    "sha256": "a1e9a45423c865e655d643c690010807f5d3e0b0b5f328665186c3d2fa8a977e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/collection_preflight_20261124/replay_transport.py",
+    "sha256": "67d53deb724d6e604e75bcb3ef1a57759104be96cf95409c8a568182e9ba003e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/collection_preflight_20261124/evidence/portable-v1/source-bindings.json",
+    "sha256": "311372e7ffacc2e3e7a84dc5744b415266964cd775b1e2abc5db5e718bd69932"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/collection_preflight_20261124/evidence/portable-v1/result.json",
+    "sha256": "9631cbff4f6dfcc1ba0fd87dba3661520c0427573f1da968ae2b4381aded6aa4"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "p192-preflight-portable-transport",
+ "statement": "Portable-v1 metadata wrapper stages the provided native qualification into a fresh isolated mirror and runs the unchanged original transport helper/driver. Source bindings require driver/helper byte equality and bind native binary. Both frozen cases preserve outcomes:recorded baseline passes real guard and only stub sentinels;rank-field drift stops first. No original evidence directory or ignored binary is modified;no real curve/field/Jacobian worker,provider launch or valid admission. Producer unsigned;transport-only scope."
+}

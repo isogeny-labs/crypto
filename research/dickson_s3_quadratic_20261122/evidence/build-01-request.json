@@ -1,0 +1,12 @@
+{
+  "schema": "dickson-s3-build-request/v1",
+  "created_at_utc": "2026-11-23T03:03:59Z",
+  "base_commit": "e95645aede904b21421683d917b29b622140da1e",
+  "working_tree_changes": true,
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
+  "input_inventory_sha256": "f0d3c62ff1475b5a1269fab1c10f9cf1ff032f405c335e883a63602f2d723972",
+  "command": "CARGO_BUILD_JOBS=1 CARGO_TARGET_DIR=/workspace/scratch/108b275c78dd/dickson-qualifier-target timeout 300s cargo build --release --locked --offline --manifest-path research/dickson_s3_quadratic_20261122/qualifier/Cargo.toml --bins",
+  "purpose": "development build only; no qualifier calls",
+  "science_executed": false
+}

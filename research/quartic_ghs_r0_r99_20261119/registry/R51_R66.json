@@ -1,0 +1,294 @@
+{
+  "schema": "ghs-r0-r99-range/v1",
+  "range": [
+    51,
+    66
+  ],
+  "claim_scope": "producer-side deterministic screens only",
+  "lanes": [
+    {
+      "id": "R51",
+      "title": "Quotient-hash cache reuse",
+      "mechanism": "Retain the x-derived quotient hash in each walker and invalidate it only when the point changes.",
+      "target": "strong_rho.rs Walker::h and the main walk loop",
+      "prerequisites": [
+        "trajectory oracle",
+        "hash authority counter"
+      ],
+      "deterministic_falsifier": "Any cached and recomputed hash, partition, or final answer differs on a known-answer trajectory.",
+      "measurement_gate": "Source-bound profile followed by isolated A/A and interleaved A/B on the composed binary.",
+      "status": "integrated; deterministic source selftest passed [pcc:unverified]",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_20261114/round-c-integration/RESULTS.md",
+        "research/quartic_ghs_r0_r99_20261119/receipts/r51_66.txt"
+      ],
+      "state": "implemented-unmeasured"
+    },
+    {
+      "id": "R52",
+      "title": "Power-of-two partition mask",
+      "mechanism": "Use h & (r-1) for power-of-two branch counts and retain modulo for every other count.",
+      "target": "strong_rho.rs partition_index",
+      "prerequisites": [
+        "nonzero branch count"
+      ],
+      "deterministic_falsifier": "Mask and h mod r disagree for any tested h and power-of-two r.",
+      "measurement_gate": "Count-neutral source-bound wall comparison after the partition count is frozen.",
+      "status": "integrated; 900000 partition cases passed in the range oracle [pcc:unverified]",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/prototypes/r51_66.rs",
+        "research/quartic_ghs_r0_r99_20261119/receipts/r51_66.txt"
+      ],
+      "state": "implemented-unmeasured"
+    },
+    {
+      "id": "R53",
+      "title": "Invariant reciprocal partition reduction",
+      "mechanism": "Replace non-power-of-two h mod r with a precomputed exact reciprocal reduction while retaining modulo as oracle.",
+      "target": "strong_rho.rs partition_index and StrongOpts",
+      "prerequisites": [
+        "frozen non-power-of-two partition arm",
+        "exact widened reducer"
+      ],
+      "deterministic_falsifier": "Reciprocal reduction differs from h mod r on boundaries or deterministic random u64 inputs.",
+      "measurement_gate": "Only an isolated wall gain on a preregistered non-power-of-two arm can admit it.",
+      "status": "specified; no non-power-of-two primary arm is frozen",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R51_R66.md"
+      ],
+      "state": "screened"
+    },
+    {
+      "id": "R54",
+      "title": "Look-ahead candidate-hash carry",
+      "mechanism": "Carry the accepted candidate hash from batch look-ahead into the walker update instead of hashing the point twice.",
+      "target": "strong_rho.rs WalkScratch::next_hash and batched_lookahead_step",
+      "prerequisites": [
+        "candidate point/hash pairing invariant"
+      ],
+      "deterministic_falsifier": "Carried and recomputed hashes differ or alter the trajectory/native hash count.",
+      "measurement_gate": "Composed deterministic parity, then source-bound isolated wall comparison.",
+      "status": "integrated; deterministic source selftest passed [pcc:unverified]",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_20261114/round-c-integration/RESULTS.md",
+        "research/quartic_ghs_r0_r99_20261119/receipts/r51_66.txt"
+      ],
+      "state": "implemented-unmeasured"
+    },
+    {
+      "id": "R55",
+      "title": "Stable active-lane retry compaction",
+      "mechanism": "Compact pending look-ahead lanes into stable order without changing per-lane jump attempts or discarded-work accounting.",
+      "target": "strong_rho.rs batched_lookahead_step pending/next scratch",
+      "prerequisites": [
+        "lane-order certificate",
+        "complete retry charge"
+      ],
+      "deterministic_falsifier": "Any lane selects a different jump, point, coefficient, retry count, or discarded operation.",
+      "measurement_gate": "Complete walk cost must improve under every preregistered addition-price band or the trade must be reported.",
+      "status": "specified; not implemented",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_20261114/ROUND_C_RETRY.md"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R56",
+      "title": "Two-level retry slab",
+      "mechanism": "Evaluate the first two retry levels together to reduce nonempty retry batches.",
+      "target": "historical strong-b8-retry2 diagnostic arm",
+      "prerequisites": [
+        "exact lane-choice parity",
+        "complete tail charge"
+      ],
+      "deterministic_falsifier": "Candidate raises complete counted cost or changes any trajectory field.",
+      "measurement_gate": "A redesigned candidate must beat the composed baseline in complete cost before wall testing.",
+      "status": "screened count-negative and excluded from production [pcc:unverified]",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_20261114/round-c-retry/RESULTS.md",
+        "research/quartic_ghs_strong_rho_20261114/round-c-integration/RESULTS.md"
+      ],
+      "state": "executed-reject"
+    },
+    {
+      "id": "R57",
+      "title": "Lazy quotient sign",
+      "mechanism": "Carry an orientation bit and defer coefficient/point negation while transitions operate on the canonical quotient representative.",
+      "target": "diagnostic LazyWalker beside strong_rho.rs Walker",
+      "prerequisites": [
+        "signed-state invariant",
+        "collision equation for both orientations"
+      ],
+      "deterministic_falsifier": "Eager and lazy quotient keys, partitions, DP decisions, cycle repeats, or recovered scalar differ.",
+      "measurement_gate": "Elliptic-curve diagnostic arm with exact x/partition/DP trajectory, followed by isolated wall A/B.",
+      "status": "cyclic-group state oracle passed; elliptic-curve arm not implemented [pcc:unverified]",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/prototypes/r51_66.rs",
+        "research/quartic_ghs_r0_r99_20261119/receipts/r51_66.txt"
+      ],
+      "state": "screened"
+    },
+    {
+      "id": "R58",
+      "title": "Signed jump-table application",
+      "mechanism": "Apply each canonical jump with the walker's deferred orientation so the quotient transition matches eager canonicalization.",
+      "target": "lazy-sign diagnostic jump table",
+      "prerequisites": [
+        "R57 signed-state invariant",
+        "canonical jump coefficients"
+      ],
+      "deterministic_falsifier": "After any transition lazy coefficients are not orientation times eager coefficients.",
+      "measurement_gate": "Full elliptic-curve transition parity across the frozen deterministic panel.",
+      "status": "1048576 cyclic-group transitions passed; elliptic-curve arm not implemented [pcc:unverified]",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/prototypes/r51_66.rs",
+        "research/quartic_ghs_r0_r99_20261119/receipts/r51_66.txt"
+      ],
+      "state": "screened"
+    },
+    {
+      "id": "R59",
+      "title": "Quotient-key cycle snapshots",
+      "mechanism": "Store cycle snapshots by canonical quotient key and retain orientation-aware coefficient state separately.",
+      "target": "Walker::snapshot and lazy-sign diagnostic state",
+      "prerequisites": [
+        "R57",
+        "cycle-length parity oracle"
+      ],
+      "deterministic_falsifier": "Eager and lazy walkers detect a repeated quotient state at different steps.",
+      "measurement_gate": "Identical cycle counts, lengths, escape points, and final scalar in the elliptic-curve arm.",
+      "status": "1035705 repeated cyclic quotient states had parity; elliptic-curve arm not implemented [pcc:unverified]",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/prototypes/r51_66.rs",
+        "research/quartic_ghs_r0_r99_20261119/receipts/r51_66.txt"
+      ],
+      "state": "screened"
+    },
+    {
+      "id": "R60",
+      "title": "Canonical-minimum cycle escape",
+      "mechanism": "Return to the quotient cycle's canonical minimum before the escape addition so lane snapshot phase cannot split a merged walk.",
+      "target": "strong_rho.rs single_lookahead_step and cycle traversal",
+      "prerequisites": [
+        "cycle snapshot parity",
+        "escape trajectory oracle"
+      ],
+      "deterministic_falsifier": "Equivalent snapshot phases escape to different quotient states.",
+      "measurement_gate": "Known-answer exact trajectory plus multi-seed statistical rho-constant control if the transition changes.",
+      "status": "integrated in the composed source; deterministic source selftest passed [pcc:unverified]",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_20261114/strong_rho.rs",
+        "research/quartic_ghs_r0_r99_20261119/receipts/r51_66.txt"
+      ],
+      "state": "implemented-unmeasured"
+    },
+    {
+      "id": "R61",
+      "title": "Distinguished predicate on quotient key",
+      "mechanism": "Classify distinguished points from the sign-invariant x-derived hash and reuse that value for the table key.",
+      "target": "strong_rho.rs DP test and table lookup",
+      "prerequisites": [
+        "quotient-hash authority",
+        "negation invariance"
+      ],
+      "deterministic_falsifier": "Opposite representatives receive different DP decisions or table keys.",
+      "measurement_gate": "Exact DP sequence/table-operation parity in the elliptic-curve diagnostic arm.",
+      "status": "1048576 eager/lazy DP decisions matched in the cyclic oracle [pcc:unverified]",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/prototypes/r51_66.rs",
+        "research/quartic_ghs_r0_r99_20261119/receipts/r51_66.txt"
+      ],
+      "state": "screened"
+    },
+    {
+      "id": "R62",
+      "title": "Packed distinguished-point record",
+      "mechanism": "Store only the canonical quotient key, coefficients, orientation, and provenance needed for replay and collision recovery.",
+      "target": "strong_rho.rs distinguished table value",
+      "prerequisites": [
+        "replay schema",
+        "orientation-aware collision verifier"
+      ],
+      "deterministic_falsifier": "Packing loses enough information to replay a DP, distinguish sterile collisions, or recover the scalar.",
+      "measurement_gate": "Byte-count and peak-RSS reduction plus unchanged collision replay on the matched panel.",
+      "status": "specified; low priority on the q=223 control and not implemented",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_parallel_20261118/NEXT_LEADS.md"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R63",
+      "title": "Single-probe DP table fusion",
+      "mechanism": "Fuse distinguished lookup, sterile-collision classification, and insertion around one retained hash probe.",
+      "target": "strong_rho.rs DP table update",
+      "prerequisites": [
+        "table semantic oracle",
+        "reserved capacity"
+      ],
+      "deterministic_falsifier": "Fused and baseline tables differ in insertion, collision pair, sterile count, or recovered scalar.",
+      "measurement_gate": "Source-bound table-phase profile and isolated wall comparison; abstract table_ops stay unchanged.",
+      "status": "specified; not implemented",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R51_R66.md"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R64",
+      "title": "Fully native-counter-free production walk",
+      "mechanism": "Const-specialize NativeCounts updates out of the same mathematical walk body and separate native/field authority bits.",
+      "target": "strong_rho.rs NativeCounts call chain, main.rs schema, analyzer authority checks, optimized-IR gate",
+      "prerequisites": [
+        "NativeCounter<const COUNT: bool>",
+        "independent IR scanner"
+      ],
+      "deterministic_falsifier": "Any native-counter load/store/increment survives in the uncounted walk or mathematical output differs.",
+      "measurement_gate": "Zero independent native-counter IR markers, then isolated counted-versus-counter-free wall diagnostics.",
+      "status": "implemented_unmeasured_production_control_and_ir_gates_passed",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/receipts/r51_66.txt",
+        "research/quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md",
+        "ranges/R64_PRODUCTION.md",
+        "receipts/r64_validation.txt"
+      ],
+      "state": "implemented-unmeasured"
+    },
+    {
+      "id": "R65",
+      "title": "Structure-of-arrays walker state",
+      "mechanism": "Split points, coefficients, cached hashes, tail state, and snapshots into aligned lane arrays without changing lane order.",
+      "target": "strong_rho.rs Walker batch and WalkScratch",
+      "prerequisites": [
+        "stable lane identity",
+        "allocation diagnostic",
+        "SIMD profile target"
+      ],
+      "deterministic_falsifier": "AoS and SoA arms differ in any per-lane transition, retry, cycle, DP, collision, or answer.",
+      "measurement_gate": "Profile-guided implementation followed by isolated A/A and A/B; no wall claim from layout alone.",
+      "status": "specified; profile-dependent and not implemented",
+      "evidence": [
+        "research/quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md"
+      ],
+      "state": "blocked"
+    },
+    {
+      "id": "R66",
+      "title": "Orientation-aware trajectory and collision oracle",
+      "mechanism": "Independently verify quotient trajectory parity and solve collisions using both representatives' orientation signs.",
+      "target": "standalone native verifier, then elliptic-curve replay validator",
+      "prerequisites": [
+        "R57",
+        "known planted scalar"
+      ],
+      "deterministic_falsifier": "The orientation-normalized collision equation fails to recover the planted scalar or accepts a wrong scalar.",
+      "measurement_gate": "Independent elliptic-curve replay of every lazy-sign matched-grid collision.",
+      "status": "79954 nonsterile cyclic collision equations recovered the planted scalar; elliptic-curve validator remains open [pcc:unverified]",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/prototypes/r51_66.rs",
+        "research/quartic_ghs_r0_r99_20261119/receipts/r51_66.txt"
+      ],
+      "state": "screened"
+    }
+  ]
+}

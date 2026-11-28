@@ -59,7 +59,8 @@ use super::residual_walk::inv_mod;
 #[derive(Clone, Debug, Default, Serialize)]
 pub struct FastStats {
     pub delta: usize,
-    /// Columns of `M_{x_n}` that are not shifts, and their non-zeros.
+    /// Columns of the selected multiplication matrix that are not shifts,
+    /// and their non-zeros. The default selects `M_{x_n}`.
     pub dense_cols: usize,
     pub nnz: usize,
     /// Normal-form rows computed (memoised non-standard monomials).
@@ -1231,22 +1232,48 @@ pub fn fast_stage(
     rng: &mut StdRng,
     st: &mut FastStats,
 ) -> Option<Vec<Vec<u64>>> {
+    fast_stage_with_action(basis, input, n, p, n.saturating_sub(1), rng, st)
+}
+
+/// The same sparse linear stage with an explicit multiplication coordinate.
+///
+/// `action_variable` is zero-based in the original input coordinate order.
+/// The Gröbner basis and its monomial ordering are unchanged. A coordinate
+/// that does not separate the quotient causes `None`, just as in the default
+/// stage; callers must retain their general fallback. Invalid coordinates
+/// also return `None` before consuming RNG state.
+#[allow(clippy::too_many_arguments)]
+pub fn fast_stage_with_action(
+    basis: &[Poly],
+    input: &[Poly],
+    n: usize,
+    p: u64,
+    action_variable: usize,
+    rng: &mut StdRng,
+    st: &mut FastStats,
+) -> Option<Vec<Vec<u64>>> {
     let t0 = Instant::now();
-    let out = fast_inner(basis, input, n, p, rng, st);
+    let out = fast_inner(basis, input, n, p, action_variable, rng, st);
     st.total_ms = t0.elapsed().as_secs_f64() * 1e3;
     out
 }
 
+#[allow(clippy::too_many_arguments)]
 fn fast_inner(
     basis: &[Poly],
     input: &[Poly],
     n: usize,
     p: u64,
+    action_variable: usize,
     rng: &mut StdRng,
     st: &mut FastStats,
 ) -> Option<Vec<Vec<u64>>> {
     if !(2..=8).contains(&n) || !(3..(1u64 << 32)).contains(&p) {
         st.gave_up = Some("shape");
+        return None;
+    }
+    if action_variable >= n {
+        st.gave_up = Some("action variable out of range");
         return None;
     }
     let fp = Fp::new(p);
@@ -1304,8 +1331,9 @@ fn fast_inner(
         rows: Vec::new(),
         muls: 0,
     };
-    // the columns of M = M_{x_n}: a shift target, or a sparse normal form
-    let xn = n - 1;
+    // The columns of M = M_{x_action}: a shift target, or a normal form.
+    // Keep the original coordinate indices throughout the read-out.
+    let xn = action_variable;
     let unit = 1u64 << (8 * xn);
     // shift columns as (position, source); dense columns as rows of `dmat`
     let mut shifts: Vec<(u32, u32)> = Vec::with_capacity(delta);
@@ -1341,9 +1369,9 @@ fn fast_inner(
             }
         }
     }
-    // the functionals read: NF(1) and NF(x_i), i < n − 1, as sparse vectors
+    // Read NF(1) in slot `xn`, and NF(x_i) in every other coordinate slot.
     let mut reads: Vec<Vec<(usize, u64)>> = Vec::with_capacity(n);
-    for i in 0..=xn {
+    for i in 0..n {
         let m = if i == xn { 0 } else { 1u64 << (8 * i) };
         let v = match tab.nf(m) {
             None => {
@@ -1360,7 +1388,7 @@ fn fast_inner(
         };
         reads.push(v);
     }
-    // reads[xn] is NF(1); reads[i] is NF(x_i) for i < xn
+    // reads[xn] is NF(1); reads[i] is NF(x_i) for every i != xn.
     st.nf_rows = tab.rows.len();
     st.nf_muls = tab.muls;
     drop(tab);
@@ -1489,8 +1517,10 @@ fn fast_inner(
         }
         let di = fp.inv(den);
         let mut sol = vec![0u64; n];
-        for i in 0..xn {
-            sol[i] = fp.mul(psi(&seqs[i]), di);
+        for i in 0..n {
+            if i != xn {
+                sol[i] = fp.mul(psi(&seqs[i]), di);
+            }
         }
         sol[xn] = xi;
         st.readout_muls += (n * delta) as u64;

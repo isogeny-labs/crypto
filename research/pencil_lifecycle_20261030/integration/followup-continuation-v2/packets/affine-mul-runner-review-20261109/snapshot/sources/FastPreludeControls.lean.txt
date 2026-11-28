@@ -1,0 +1,33 @@
+import FastPreludeDecode
+set_option autoImplicit false
+namespace FastPreludeControls
+open FastPrelude
+instance : Fact (17:UInt64).toNat.Prime := ⟨by decide⟩
+instance : Fact (3:UInt64).toNat.Prime := ⟨by decide⟩
+def sample : Inputs := ⟨1,2,1,2,0,1,4,6⟩
+def small : Inputs := ⟨0,0,0,1,0,1,1,1⟩
+
+theorem literal_prelude : normWord 17 sample=2 ∧ s1Word 17 sample=16 ∧ s0Word 17 sample=7 := by decide
+
+theorem complete_batch_joint :
+ ((FastBatch.si 17 (normWord 17 sample) (s1Word 17 sample)).toNat : ZMod (17:UInt64).toNat)=
+ (s1Field 17 sample)⁻¹ := by
+ obtain ⟨_,_,_,_,_,_,h⟩ := guarded_batch_from_inputs 17 sample
+  (by decide) (by decide) (by unfold Inputs.canonical;decide) (by decide) (by decide)
+ exact h
+
+theorem smallest_odd_prime_joint :
+ ((FastBatch.si 3 (normWord 3 small) (s1Word 3 small)).toNat : ZMod (3:UInt64).toNat)=
+ (s1Field 3 small)⁻¹ := by
+ obtain ⟨_,_,_,_,_,_,h⟩ := guarded_batch_from_inputs 3 small
+  (by decide) (by decide) (by unfold Inputs.canonical;decide) (by decide) (by decide)
+ exact h
+
+theorem same_support_zero_norm : normWord 17 ⟨1,2,1,2,1,2,4,6⟩=0 := by decide
+
+theorem zero_slope_guard : normWord 17 ⟨0,0,0,1,0,1,0,2⟩=1 ∧ s1Word 17 ⟨0,0,0,1,0,1,0,2⟩=0 := by decide
+
+theorem ordinate_orientation : s1Word 17 ⟨1,2,4,6,0,1,1,2⟩=1 ∧ s1Word 17 sample≠1 := by decide
+
+theorem noncanonical_excluded : ¬ (Inputs.canonical 17 ⟨17,2,1,2,0,1,4,6⟩) := by unfold Inputs.canonical;decide
+end FastPreludeControls

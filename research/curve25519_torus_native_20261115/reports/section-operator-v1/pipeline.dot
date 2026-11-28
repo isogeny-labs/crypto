@@ -1,0 +1,15 @@
+digraph section {
+  graph [rankdir=TB,bgcolor="white",pad="0.15",nodesep="0.25",ranksep="0.3"];
+  node [shape=box,style="rounded,filled",fillcolor="#edf3fa",color="#52718d",fontname="DejaVu Sans",fontsize=11,margin="0.12,0.08"];
+  edge [color="#52718d",arrowsize=0.7];
+  input [label="Six supplied points + target\nDistinct raw IDs; aliases allowed"];
+  jets [label="Local sections + confluent jets\nPoles and multiplicities"];
+  matrix [label="6 x 6 evaluation\nNormalized null section"];
+  replay [label="Fixed native comparison\n600 matches; 60 sections\n360 mutations + 33 refusals",fillcolor="#e2f0df"];
+  open [label="OPEN: discover unknown columns\nImplicit construction + zero extraction\nNo B^3 triple enumeration",fillcolor="#fff0cc"];
+  {rank=same; input; jets; matrix;}
+  {rank=same; open; replay;}
+  input -> jets -> matrix;
+  matrix -> replay;
+  open -> input [style=dashed,constraint=false,label="not implemented",fontname="DejaVu Sans",fontsize=10];
+}

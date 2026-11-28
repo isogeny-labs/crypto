@@ -1,0 +1,169 @@
+{
+  "branch": "codex/native-certified-relation-integration-20261115",
+  "closed_utc": "2026-11-16T08:23:55+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python",
+        "tools/isolated_bench.py",
+        "reserve",
+        "--cpus",
+        "0",
+        "--out",
+        "/workspace/m31-screen-isolation-ecf74b246-01.jsonl",
+        "--label",
+        "m31-sixteen-workflow-screen",
+        "--",
+        "/workspace/relation-native-qualifiers/m31-driver-ecf74b246-10",
+        "m31-screen",
+        "/workspace/root-paid-inputs-723f4c2dd-01",
+        "/workspace/m31-paid-results-ecf74b246-01",
+        "research/relation_degree_trace_20261115/m31-development/capture-config-10.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T08:19:43+00:00",
+      "wall_s": 31.617
+    }
+  ],
+  "commit": "c9d27bcd79775f0bc19c67600e0258e2c2c55728",
+  "commit_dirty": false,
+  "created_utc": "2026-11-16T08:19:19+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "bc0ac39ff549",
+    "isolation": "L0",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261116T0819Z-m31-complete-paid-screen-20261116",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "complete_matching_answers",
+      "note": "Six development cases,16 workflows each; one-call screen, no confidence interval",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 96.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "paid_recoveries",
+      "note": "All failed work and fresh recovery charged; no candidate recovery",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 4.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "monitor_contended_samples",
+      "note": "Default local CPU0 reservation monitor, PSI unavailable; unsigned L0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    }
+  ],
+  "problem": "kernel:certified-relations-grevlex",
+  "raw": [
+    {
+      "bytes": 11412,
+      "path": "research/relation_degree_trace_20261115/m31-screen-01/raw-run.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/19/19b0f35b91952950029741b742ad84da0967d597569a225e33b0db06638a9fa5",
+      "sha256": "19b0f35b91952950029741b742ad84da0967d597569a225e33b0db06638a9fa5",
+      "uploaded": false
+    },
+    {
+      "bytes": 994536,
+      "path": "research/relation_degree_trace_20261115/m31-screen-01/raw-star-first-n10-s7.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/34/34c5975bf24341db8906e6c79b7a240533e58105dafd99b63690b9abe2b59bcf",
+      "sha256": "34c5975bf24341db8906e6c79b7a240533e58105dafd99b63690b9abe2b59bcf",
+      "uploaded": false
+    },
+    {
+      "bytes": 702028,
+      "path": "research/relation_degree_trace_20261115/m31-screen-01/raw-star-first-n12-s7.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bf/bf9d8091163c97473b4db1a4ddcbc24ba935f41855841d4ebabd71628fe07da4",
+      "sha256": "bf9d8091163c97473b4db1a4ddcbc24ba935f41855841d4ebabd71628fe07da4",
+      "uploaded": false
+    },
+    {
+      "bytes": 1140780,
+      "path": "research/relation_degree_trace_20261115/m31-screen-01/raw-star-first-n16-s7.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8d/8dbaf941b28aa4814d28dcd6a9281f4f327c0008ab2fdf944218f5abc6e0391c",
+      "sha256": "8dbaf941b28aa4814d28dcd6a9281f4f327c0008ab2fdf944218f5abc6e0391c",
+      "uploaded": false
+    },
+    {
+      "bytes": 914160,
+      "path": "research/relation_degree_trace_20261115/m31-screen-01/raw-star-last-n10-s7.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/86/863d35e0a73462647c3eda8632a1c0950b720ab33f15fbd5995a4a1a34726069",
+      "sha256": "863d35e0a73462647c3eda8632a1c0950b720ab33f15fbd5995a4a1a34726069",
+      "uploaded": false
+    },
+    {
+      "bytes": 831888,
+      "path": "research/relation_degree_trace_20261115/m31-screen-01/raw-star-last-n12-s7.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a7/a702da2161af5de366a1d7f6a059f9bdb0eef5e731a6c891935520093e298de9",
+      "sha256": "a702da2161af5de366a1d7f6a059f9bdb0eef5e731a6c891935520093e298de9",
+      "uploaded": false
+    },
+    {
+      "bytes": 1046364,
+      "path": "research/relation_degree_trace_20261115/m31-screen-01/raw-star-last-n16-s7.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0f/0fa29a98240cbcce76a8e96f41a1636e605f9f1488c4816f4f1365a5a38c08fc",
+      "sha256": "0fa29a98240cbcce76a8e96f41a1636e605f9f1488c4816f4f1365a5a38c08fc",
+      "uploaded": false
+    },
+    {
+      "bytes": 1684,
+      "path": "research/relation_degree_trace_20261115/m31-screen-01/archive-envelope.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/24/24ccef8c5900f159ca03118a8e5c67288f5ab4de9d9eb840aca27bbd6e42d77a",
+      "sha256": "24ccef8c5900f159ca03118a8e5c67288f5ab4de9d9eb840aca27bbd6e42d77a",
+      "uploaded": false
+    },
+    {
+      "bytes": 2419,
+      "path": "research/relation_degree_trace_20261115/m31-screen-01/isolation.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7c/7c45c410df78bf96c34c888c8eaf49b90d04c99acc4d211f7d0550d5ef4586b4",
+      "sha256": "7c45c410df78bf96c34c888c8eaf49b90d04c99acc4d211f7d0550d5ef4586b4",
+      "uploaded": false
+    },
+    {
+      "bytes": 2174027,
+      "path": "research/relation_degree_trace_20261115/m31-screen-01/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e7/e76a53021b7e62e0d30e508c3bd0e6b80a9662b686682bbb18347d4db0422d8a",
+      "sha256": "e76a53021b7e62e0d30e508c3bd0e6b80a9662b686682bbb18347d4db0422d8a",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/relation_degree_trace_20261115/m31-screen-01/report-01/report.pdf",
+    "png": [
+      "research/relation_degree_trace_20261115/m31-screen-01/report-01/costs.png"
+    ],
+    "svg": [
+      "research/relation_degree_trace_20261115/m31-screen-01/report-01/costs.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "m31-complete-paid-screen-20261116",
+  "status": "measured",
+  "summary": "Six known fixtures,96 complete matching outputs,4 paid recoveries,0 monitor contention; first-star-n16 selected only. Primary26.978/17.578 vs oldroot1.027, no paired confirmation; regressions retained. PCC5449c2/68f7f0 unsigned L0.",
+  "validation": null
+}

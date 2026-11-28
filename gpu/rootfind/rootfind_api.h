@@ -44,7 +44,12 @@ typedef struct rf_relation {
 } rf_relation;   /* 16 bytes */
 
 enum rf_backend { RF_BACKEND_AUTO = 0, RF_BACKEND_EMULATE = 1, RF_BACKEND_CUDA = 2 };
-enum rf_lookup  { RF_LOOKUP_AUTO = 0, RF_LOOKUP_SORTED = 1, RF_LOOKUP_HASH = 2 };
+/* RF_LOOKUP_HASH_DEVICE (sessions only): the hash table of the lookup set is built on the
+ * device (CUDA backend; packed slots, one atomicCAS insert per key) instead of on the host.
+ * The table answers the same lookups; only slot order may differ.  Emulation builds it on
+ * the host. */
+enum rf_lookup  { RF_LOOKUP_AUTO = 0, RF_LOOKUP_SORTED = 1, RF_LOOKUP_HASH = 2, RF_LOOKUP_HASH_DEVICE = 3,
+                  RF_LOOKUP_PAIRS_DEVICE = 4 /* rf64_session_create_pairs only */ };
 
 /* Library default for chunk == 0, per field.  The slice length sets the
  * per-thread register footprint (2 * chunk field elements live during
@@ -96,6 +101,49 @@ int rf256_decompose(const uint64_t *fb_x, const uint64_t *fb_y, uint32_t n_fb,
                     const uint64_t *tx, const uint64_t *ty, uint32_t n_targets,
                     rf_relation *out, uint32_t cap,
                     const rf_options *opt, rf_result *res);
+
+/* Persistent 64-bit session (the rootfind_serve worker): the factor base
+ * and its lookup table are set up once and kept (on the device for the
+ * CUDA backend); each rf64_session_decompose call then takes one batch of
+ * at most `max_targets` targets.  Results and their meaning are those of
+ * rf64_decompose on the same factor base and targets; `cap` bounds the
+ * relations one batch may report (overflow returns RF_ERR_OVERFLOW with
+ * res->n_found set, and the caller may retry with a smaller batch).
+ *
+ * probe_x (n_probe canonical abscissae) selects probe mode: each candidate
+ * x(R -/+ F_i) is looked up in that set instead of the factor base, and every
+ * hit is reported as (target, i, j = index into probe_x, eps, tau = +1), with no
+ * j >= i filter -- the three-summand sweep against a pair table's abscissae.
+ * probe_x = NULL: the factor base, exactly as rf64_decompose. */
+typedef struct rf64_session rf64_session;
+int rf64_session_create(uint64_t p, const uint64_t *fb_x, const uint64_t *fb_y, uint32_t n_fb,
+                        const uint64_t *probe_x, uint32_t n_probe, uint32_t max_targets, uint32_t cap, const rf_options *opt,
+                        rf64_session **out, rf_result *info);
+int rf64_session_decompose(rf64_session *s, const uint64_t *tx, const uint64_t *ty,
+                           uint32_t n_targets, rf_relation *out, uint32_t cap, rf_result *res);
+void rf64_session_destroy(rf64_session *s);
+/* Probe mode against the negation-folded pair table of the base itself, built by
+ * the library (on the device for the CUDA backend): the abscissae of P_ai +/- P_bi,
+ * bi >= ai, first pair per abscissa in build order (rootfind.cuh rf_pair_x).  Each
+ * reported hit (tau != 0) carries j = that first pair's build index
+ * b = rf_pair_offset(ai, n) + 2 (bi - ai) + s.  curve_a: the curve's a (canonical);
+ * every base y must be non-zero.  *n_entries: distinct abscissae in the table. */
+int rf64_session_create_pairs(uint64_t p, uint64_t curve_a, const uint64_t *fb_x, const uint64_t *fb_y,
+                              uint32_t n_fb, uint32_t max_targets, uint32_t cap, const rf_options *opt,
+                              rf64_session **out, rf_result *info, uint32_t *n_entries);
+
+/* Create the CUDA context now when the CUDA backend is available (0 on success
+ * or when there is nothing to do). */
+int rf_warmup(void);
+
+/* Threads the emulation backend runs on (RF_EMU_THREADS, else the CPU count capped by a
+ * cgroup quota). */
+unsigned rf_emu_threads(void);
+
+/* CUDA only: the pair-table key kernels (per cell, batched runs) on a random base of n
+ * abscissae over p: device times of each and the count of cells whose keys differ.
+ * -1 without the CUDA backend. */
+int rf_pairs_bench(uint64_t p, uint32_t n, uint64_t seed, double *t_cell, double *t_run, uint64_t *mismatch);
 
 /* 1 if the CUDA backend is compiled in and at least one device answers. */
 int rf_cuda_available(void);

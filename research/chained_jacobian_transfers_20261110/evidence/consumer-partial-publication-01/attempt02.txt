@@ -1,0 +1,16 @@
+{"directory": "experiments/chained-transfer-reference/reports/partial-frobenius-replay", "tree": "28ee8d15edbb902f04c036af1b51d576d6d03749", "entries": 5}
+{"directory": "experiments/chained-transfer-reference/evidence/partial-admissions-01", "tree": "a38a9a6490a2cf43b05b54594e3f5f8385f67c1d", "entries": 10}
+{"directory": "experiments/chained-transfer-reference/reports/independent-ci-f656-success", "tree": "60131c843cbc79c67c83e6bfc73ac816a975b58d", "entries": 5}
+{"directory": "experiments/chained-transfer-reference/evidence/partial-packaging-01", "tree": "38b039a7b4c572db3be664f3b454125ae008a74b", "entries": 6}
+{"directory": "experiments/chained-transfer-reference/evidence/partial-positive-01", "tree": "9cd981f9a039f135c624a204505c60b219ae83cb", "entries": 2}
+{"directory": "experiments/chained-transfer-reference/evidence/ci-f656-success-01", "tree": "2866feef52a8803ee495179e31217ab1825543f2", "entries": 4}
+Traceback (most recent call last):
+  File "/workspace/scratch/publish_checkpoint_trees_v2.py", line 79, in <module>
+    tree=publish_tree_bottom_up(commit,paths)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/publish_checkpoint_trees_v2.py", line 58, in publish_tree_bottom_up
+    result=api('git/trees',dict(tree=children))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/publish_checkpoint_trees_v2.py", line 28, in api
+    raise RuntimeError(p.stderr.strip())
+RuntimeError: gh: Server Error (HTTP 502)

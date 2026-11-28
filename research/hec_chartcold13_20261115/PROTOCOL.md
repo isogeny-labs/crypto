@@ -1,0 +1,15 @@
+# Runtime-chart cold IC integration correctness gate
+
+Goal: integrate the independently tested tangent-residual chart into the actual genus-three cold pipeline. Engineering classification, F127, one public source instance from PUBLIC.txt. No duration measurement, performance or novelty claim. Prior source, kernel, fiber, relation and inverse algorithms are unchanged from hec_coldfiber13_20261115 V2 except target-chart consumers.
+
+Input public curve, D1, B and ell only. Fresh setup uses source recurrence and exact lift, kernels, alpha and quotient construction. Chart discovery reads that runtime QF through mandatory HEC_SETUP_DIR; no archived target chart, anchor table or section model assertion. Each process deterministically rediscovers the same chart. Exact section source comes from the frozen hec_chart13_20261115 gate. Independent point enumeration remains a control.
+
+Alignment and recovered-class verification use the same discovered origin O, point list and four-point canonical divisor K. Center H=2(Dinf−3O)−(K−4O), beta=H/2 in the odd subgroup. The equation generator uses the corresponding eight sections and fresh control points. Keep original twelve-training/four-heldout fit, corrupt matrix, exact all-equation RUR, public adjacency sign, corrupt adjacency, fresh point logs, independent conic identity, source/destination scalar verification and k+1 negative control.
+
+Conic anchor pool is first five discovered points (not required to equal O). K0 is sum of all four canonical point logs relative to O. For E=Dinf+X−beta and E+A+B+R~2K, the centered identity gives log X=3/2 log(K−4O)−log A−log B−sum log R. Thus previous scalar centering coefficient 3/2 remains, while the old two-point tangent residual is replaced consistently by K. Independently check the actual divisor identity in the Jacobian for every accepted descent.
+
+One run, write-once run/, fixed existing calibration fiber and offsets1..4, msolve threads2 and each solve cap300s, stage cap600s, stop first unexpected failure. Three systems: positive control, D1 and B. A missing-setup subprocess must reject specifically at loader. Record all stdout/stderr/status and exclusions. No silent rerun, anchor tuning, cap changes or failed case omission; amendments require separate source/binary freeze and output directory.
+
+Before execution: successful release build, locked dependencies and source committed, public-input/binary/private-solver hashes committed, S3 checkpoint push and gate. No old run data are inputs. Retain producer compile failures (missing module dependencies) separately from scientific outcomes. Rust arithmetic only. Runtime chart discovery, exact coefficient controls and final dense47-column core do not establish general field scaling; genus two/four and the mathematical tenfold objective remain open.
+
+Primary mathematical source: Tian2020 section4.2.3, https://arxiv.org/html/2007.03172, and previous registered tangent-residual gate. Its checks are finite-field evidence; prior Lean lemmas do not formalize this complete geometry.

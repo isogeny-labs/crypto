@@ -1,0 +1,17 @@
+   Compiling libc v0.2.190
+   Compiling zerocopy v0.8.60
+   Compiling cfg-if v1.0.5
+   Compiling getrandom v0.2.17
+   Compiling rand_core v0.6.4
+   Compiling ppv-lite86 v0.2.21
+   Compiling rand_chacha v0.3.1
+   Compiling rand v0.8.8
+   Compiling fass-coupled-rank-qualifier v0.1.0 (/workspace/scratch/457a488177fc/crypto-coupled/research/fass_prime31_20261122/coupled/native)
+error[E0433]: cannot find module or crate `serde` in this scope
+   --> ../../../../src/cryptanalysis/semaev_prime_poly.rs:623:24
+    |
+623 | #[derive(Clone, Debug, serde::Serialize)]
+    |                        ^^^^^ use of unresolved module or unlinked crate `serde`
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `fass-coupled-rank-qualifier` (bin "fass-coupled-rank-qualifier") due to 1 previous error

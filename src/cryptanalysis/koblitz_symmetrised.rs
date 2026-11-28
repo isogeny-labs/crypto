@@ -128,6 +128,65 @@ pub fn artin_schreier(u: &F2mElement, kc: &KoblitzCurve) -> F2mElement {
     u.square(&kc.curve.irreducible).add(u)
 }
 
+// ── `bitop/v1` charges of the helpers this module calls but does not
+// instrument (`koblitz_index_calculus`, whose source frozen replays pin) ──
+
+/// One `points_with_x` over `F_{2^n}`, as `koblitz_index_calculus`'s
+/// `lift_candidate` charges it: `1/x`, `b/x²`, the half-trace's `(n − 1)/2`
+/// double squarings and additions, the admission test, `y = x·u` and the
+/// negation.
+fn tally_points_with_x(n: u32) {
+    let n = u64::from(n);
+    crate::cryptanalysis::bitop_tally::field_ops(
+        2 + n.saturating_sub(1) / 2 + 1 + 1,
+        3,
+        1 + n.saturating_sub(1),
+        1,
+    );
+}
+
+/// `span_f2` over `ell` basis elements: a bit test a basis element for
+/// each of the `2^ell` masks, and an `F_{2^n}` addition for each set bit.
+fn tally_span_f2(ell: usize) {
+    let masks = 1u64 << ell;
+    crate::cryptanalysis::bitop_tally::word_ops(masks * ell as u64);
+    crate::cryptanalysis::bitop_tally::field_ops(masks / 2 * ell as u64, 0, 0, 0);
+}
+
+/// The divisor of `xⁿ − 1` the indices name, as a bitmask polynomial over
+/// `F_2`; `None` past 64 bits or for an index off the list.
+fn divisor_mask(n: u32, divisor_indices: &[usize]) -> Option<u64> {
+    let factors = all_factors_of_x_n_minus_1(n);
+    let mut f = 1u64;
+    for &i in divisor_indices {
+        let g = *factors.get(i)?;
+        let mut acc = 0u64;
+        for k in 0..64 {
+            if (g >> k) & 1 == 1 {
+                if f.leading_zeros() < k {
+                    return None;
+                }
+                acc ^= f << k;
+            }
+        }
+        f = acc;
+    }
+    Some(f)
+}
+
+/// `subspace_basis_for_divisor`: the kernel of the linearised polynomial
+/// `Σ_k x^{2^k}` over the exponents `k` set in `f`, found from the images
+/// of the `n` polynomial-basis elements (`k` squarings and one addition a
+/// term each) and an `F_2` Gauss–Jordan over `n` two-word rows against `n`
+/// pivots.
+fn tally_kernel_basis(n: u32, f: u64) {
+    let n64 = u64::from(n);
+    let terms = u64::from(f.count_ones());
+    let squarings: u64 = (0..64).filter(|k| (f >> k) & 1 == 1).sum();
+    crate::cryptanalysis::bitop_tally::field_ops(n64 * terms, 0, n64 * squarings, 0);
+    crate::cryptanalysis::bitop_tally::word_ops(2 * n64 * n64);
+}
+
 // ── Factor base in the u-frame ─────────────────────────────────────
 
 /// `F_u = { P : u(P) ∈ V }` with its bases.
@@ -200,8 +259,12 @@ pub fn build_symmetrised_factor_base(
     divisor_indices: &[usize],
 ) -> Option<SymmetrisedFactorBase> {
     let n = kc.n;
+    tally_kernel_basis(n, divisor_mask(n, divisor_indices)?);
     let raw = subspace_basis_for_divisor(n, divisor_indices, &kc.curve.irreducible)?;
+    tally_span_f2(raw.len());
     let span = span_f2(&raw, n);
+    // `bitop/v1`: one insert a span element, and the lookup of 1
+    crate::cryptanalysis::bitop_tally::hash_probes(span.len() as u64 + 1);
     let span_bits: std::collections::HashSet<u64> = span.iter().map(bits_of).collect();
     if !span_bits.contains(&1) {
         return None;
@@ -211,9 +274,14 @@ pub fn build_symmetrised_factor_base(
     let mut current: std::collections::HashSet<u64> = [0u64, 1].into_iter().collect();
     for b in &raw {
         let bb = bits_of(b);
+        // `bitop/v1`: the membership probe; then a XOR and an insert per
+        // element of the span so far
+        crate::cryptanalysis::bitop_tally::hash_probes(1);
         if current.contains(&bb) {
             continue;
         }
+        crate::cryptanalysis::bitop_tally::word_ops(current.len() as u64);
+        crate::cryptanalysis::bitop_tally::hash_probes(current.len() as u64);
         let added: Vec<u64> = current.iter().map(|&c| c ^ bb).collect();
         current.extend(added);
         v_basis.push(b.clone());
@@ -244,7 +312,11 @@ pub fn build_symmetrised_factor_base_from_basis(
     if v_basis.first().map(bits_of) != Some(1) {
         return None;
     }
+    tally_span_f2(v_basis.len());
     let span = span_f2(&v_basis, n);
+    // `bitop/v1`: one insert a span element, and the size compare
+    crate::cryptanalysis::bitop_tally::hash_probes(span.len() as u64);
+    crate::cryptanalysis::bitop_tally::word_ops(1);
     let span_bits: std::collections::HashSet<u64> = span.iter().map(bits_of).collect();
     if span_bits.len() != 1 << v_basis.len() {
         return None;
@@ -260,25 +332,37 @@ fn finish_symmetrised_factor_base(
     let n = kc.n;
     let ell = v_basis.len();
     let w_basis: Vec<F2mElement> = v_basis[1..].iter().map(|b| artin_schreier(b, kc)).collect();
+    tally_span_f2(ell - 1);
     if span_f2(&w_basis, n).len() != 1 << (ell - 1) {
         return None;
     }
     let mut points = Vec::new();
     for u in &span {
+        // `bitop/v1`: the zero test, then the frame change and the lift
+        crate::cryptanalysis::bitop_tally::word_ops(1);
         if u.is_zero() {
             continue;
         }
         let x = x_of_u(u, kc)?;
+        tally_points_with_x(n);
         points.extend(points_with_x(&kc.curve, &x));
     }
+    // `bitop/v1`: a point's key is two words, then one insert
+    crate::cryptanalysis::bitop_tally::word_ops(2 * points.len() as u64);
+    crate::cryptanalysis::bitop_tally::hash_probes(points.len() as u64);
     let index_of: HashMap<(BigUint, BigUint), usize> = points
         .iter()
         .enumerate()
         .map(|(i, p)| (point_key(p), i))
         .collect();
+    // `bitop/v1`: `T`'s ordinate is `b^{2^{n−1}}`, `n − 1` squarings; then
+    // its key and lookup
+    crate::cryptanalysis::bitop_tally::field_ops(0, 0, u64::from(n) - 1, 0);
     let two_torsion = points_with_x(&kc.curve, &F2mElement::zero(n))
         .into_iter()
         .next()?;
+    crate::cryptanalysis::bitop_tally::word_ops(2);
+    crate::cryptanalysis::bitop_tally::hash_probes(1);
     let two_torsion_index = *index_of.get(&point_key(&two_torsion))?;
     Some(SymmetrisedFactorBase {
         v_basis,
@@ -302,7 +386,9 @@ fn finish_symmetrised_factor_base(
 /// relation collection and `n²` in the matrix.
 pub fn symmetrised_abscissae(kc: &KoblitzCurve, fb: &SymmetrisedFactorBase) -> Vec<F2mElement> {
     let mut out = Vec::with_capacity(1 << fb.ell);
+    tally_span_f2(fb.v_basis.len());
     for u in span_f2(&fb.v_basis, kc.n) {
+        crate::cryptanalysis::bitop_tally::word_ops(1);
         if u.is_zero() {
             continue; // x = ∞
         }
@@ -330,7 +416,43 @@ pub fn frobenius_view_of_symmetrised(
     kc: &KoblitzCurve,
     fb: &SymmetrisedFactorBase,
 ) -> Option<FrobeniusFactorBase> {
-    build_explicit_frobenius_orbit_factor_base(kc, &symmetrised_abscissae(kc, fb))
+    let abscissae = symmetrised_abscissae(kc, fb);
+    let view = build_explicit_frobenius_orbit_factor_base(kc, &abscissae)?;
+    tally_frobenius_view(kc, abscissae.len(), &view);
+    Some(view)
+}
+
+/// `bitop/v1` of `build_explicit_frobenius_orbit_factor_base` over `reps`
+/// representatives, from the sizes of what it built (its source is pinned
+/// by the frozen replays, so it is charged here, not there).  The orbit
+/// closure: a conversion (two words) a representative, then `e = n/k`
+/// steps of one map insert and the `k` squarings of `π` on `x`.  The ambient basis:
+/// a word a bit.  The lifts: one `points_with_x` an abscissa.  The orbit
+/// maps over `p` points: a packed lift (two words) and a key insert a
+/// point; the `π`-walk's lookup a point and a closing lookup an orbit,
+/// with `2k` squarings a step; the signed walk's `n` steps a signed orbit,
+/// each two lookups, a negation and `2k` squarings, and its closing
+/// compare.
+fn tally_frobenius_view(kc: &KoblitzCurve, reps: usize, view: &FrobeniusFactorBase) {
+    use crate::cryptanalysis::bitop_tally::{field_ops, hash_probes, word_ops};
+    let n = u64::from(kc.n);
+    let e = u64::from(kc.extension_degree().max(1));
+    let k = n / e;
+    let reps = reps as u64;
+    let p = view.points.len() as u64;
+    let orbits = view.orbits.len() as u64;
+    let signed = view.signed_orbits.len() as u64;
+    word_ops(2 * reps + n + 2 * p + signed);
+    hash_probes(reps * e + p + p + orbits + signed * n * 2);
+    field_ops(
+        signed * n,
+        0,
+        reps * e * k + p * 2 * k + signed * n * 2 * k,
+        0,
+    );
+    for _ in 0..view.subspace.len() {
+        tally_points_with_x(kc.n);
+    }
 }
 
 /// Index translation from [`SymmetrisedFactorBase::points`] to
@@ -491,13 +613,19 @@ pub fn plain_terms(m: usize) -> Option<Vec<Vec<u32>>> {
 /// `v^e` for a symbolic field element: `e = 2^k` is `k` linear squarings,
 /// odd exponents multiply once more.
 fn sym_pow(v: &SymElement, e: u32, st: &FieldStructure) -> SymElement {
+    // `bitop/v1`: a copy is one word a term
+    let terms = |x: &SymElement| x.coords.iter().map(|p| p.terms.len() as u64).sum::<u64>();
     let mut result: Option<SymElement> = None;
+    crate::cryptanalysis::bitop_tally::word_ops(terms(v));
     let mut base = v.clone();
     let mut e = e;
     while e > 0 {
         if e & 1 == 1 {
             result = Some(match result {
-                None => base.clone(),
+                None => {
+                    crate::cryptanalysis::bitop_tally::word_ops(terms(&base));
+                    base.clone()
+                }
                 Some(r) => r.mul(&base, st),
             });
         }
@@ -618,6 +746,9 @@ pub fn build_symmetrised_system(
         ));
     }
     let mut eps_el = SymElement::zero(n, n_vars);
+    crate::cryptanalysis::bitop_tally::word_ops(
+        crate::cryptanalysis::bitop_tally::poly::from_monos(1),
+    );
     eps_el.coords[0] = F2BoolPoly::from_monos(vec![F2BoolMono::var(eps)], n_vars);
     s = s.add(&eps_el);
     vars.push(s);
@@ -813,15 +944,7 @@ fn lift_signs_all(
             }
             return;
         }
-        // `bitop/v1` for `points_with_x`, as in `koblitz_index_calculus`'s
-        // `lift_candidate`
-        let n = u64::from(kc.n);
-        crate::cryptanalysis::bitop_tally::field_ops(
-            2 + n.saturating_sub(1) / 2 + 1 + 1,
-            3,
-            1 + n.saturating_sub(1),
-            1,
-        );
+        tally_points_with_x(kc.n);
         for p in points_with_x(&kc.curve, &xs[depth]) {
             crate::cryptanalysis::bitop_tally::hash_probes(1);
             let Some(&idx) = index_of.get(&point_key(&p)) else {
@@ -885,6 +1008,8 @@ pub struct OracleOutcome {
 }
 
 fn system_degree(eqs: &[F2BoolPoly]) -> u32 {
+    // `bitop/v1`: a popcount a term
+    crate::cryptanalysis::bitop_tally::word_ops(eqs.iter().map(|p| p.terms.len() as u64).sum());
     eqs.iter()
         .flat_map(|p| p.terms.iter())
         .map(|t| t.mask.count_ones())

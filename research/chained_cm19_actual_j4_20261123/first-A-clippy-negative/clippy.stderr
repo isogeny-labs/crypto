@@ -1,0 +1,12 @@
+error: manual implementation of `.is_multiple_of()`
+  --> /dev/shm/ct23-actual-j4-firstA-native/source/research/chained_cm19_actual_j4_20261123/cm_a.rs:47:8
+   |
+47 |     if (i + j) % 2 == 0 {
+   |        ^^^^^^^^^^^^^^^^ help: replace with: `(i + j).is_multiple_of(2)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+   = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: aborting due to 1 previous error
+

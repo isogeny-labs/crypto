@@ -1,0 +1,97 @@
+   Compiling version_check v0.9.5
+   Compiling proc-macro2 v1.0.107
+   Compiling typenum v1.20.1
+   Compiling autocfg v1.5.1
+   Compiling generic-array v0.14.7
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling num-traits v0.2.19
+   Compiling serde_core v1.0.229
+   Compiling cfg-if v1.0.5
+   Compiling zmij v1.0.23
+   Compiling syn v3.0.10
+   Compiling serde_json v1.0.154
+   Compiling serde v1.0.229
+   Compiling num-integer v0.1.47
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling digest v0.10.7
+   Compiling cpufeatures v0.2.17
+   Compiling itoa v1.0.19
+   Compiling memchr v2.8.3
+   Compiling sha2 v0.10.9
+   Compiling serde_derive v1.0.229
+   Compiling num-bigint v0.4.8
+   Compiling crc32fast v1.5.5
+   Compiling adler2 v2.0.1
+   Compiling simd-adler32 v0.3.10
+   Compiling miniz_oxide v0.9.1
+   Compiling hex v0.4.3
+   Compiling flate2 v1.1.11
+   Compiling torus-s4 v0.1.0 (/workspace/isogeny-labs/crypto-section-query-20261123/tools/torus-s4)
+   Compiling torus-s4-tree v0.1.0 (/workspace/isogeny-labs/crypto-section-query-20261123/tools/torus-s4-tree)
+   Compiling torus-section-operator v0.1.0 (/workspace/isogeny-labs/crypto-section-query-20261123/tools/torus-section-operator)
+   Compiling torus-coset-circuit v0.1.0 (/workspace/isogeny-labs/crypto-section-query-20261123/tools/torus-coset-circuit)
+   Compiling torus-quotient-query v0.1.0 (/workspace/isogeny-labs/crypto-section-query-20261123/tools/torus-quotient-query)
+   Compiling torus-section-radical v0.1.0 (/workspace/isogeny-labs/crypto-section-query-20261123/tools/torus-section-radical)
+   Compiling torus-section-compiler v0.1.0 (/workspace/isogeny-labs/crypto-section-query-20261123/tools/torus-section-compiler)
+error[E0277]: the trait bound `BigUint: From<i32>` is not satisfied
+  --> src/gates.rs:43:26
+   |
+43 |             b.constant(i.into());
+   |                          ^^^^ the trait `From<i32>` is not implemented for `BigUint`
+   |
+   = help: `BigUint` implements trait `From<T>`:
+             From<bool>
+             From<u128>
+             From<u16>
+             From<u32>
+             From<u64>
+             From<u8>
+             From<usize>
+   = note: required for `i32` to implement `Into<BigUint>`
+
+error[E0277]: the trait bound `BigUint: From<i32>` is not satisfied
+  --> src/lib.rs:69:33
+   |
+69 |         || s.curve_a != Some(ca.into())
+   |                                 ^^^^ the trait `From<i32>` is not implemented for `BigUint`
+   |
+   = help: `BigUint` implements trait `From<T>`:
+             From<bool>
+             From<u128>
+             From<u16>
+             From<u32>
+             From<u64>
+             From<u8>
+             From<usize>
+   = note: required for `i32` to implement `Into<BigUint>`
+
+error[E0277]: the trait bound `BigUint: From<i32>` is not satisfied
+  --> src/lib.rs:87:15
+   |
+87 |         a: ca.into(),
+   |               ^^^^ the trait `From<i32>` is not implemented for `BigUint`
+   |
+   = help: `BigUint` implements trait `From<T>`:
+             From<bool>
+             From<u128>
+             From<u16>
+             From<u32>
+             From<u64>
+             From<u8>
+             From<usize>
+   = note: required for `i32` to implement `Into<BigUint>`
+
+warning: unused import: `num_traits::Zero`
+ --> src/arithmetic.rs:8:5
+  |
+8 | use num_traits::Zero;
+  |     ^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+For more information about this error, try `rustc --explain E0277`.
+warning: `torus-section-compiler` (lib) generated 1 warning
+error: could not compile `torus-section-compiler` (lib) due to 3 previous errors; 1 warning emitted
+warning: build failed, waiting for other jobs to finish...

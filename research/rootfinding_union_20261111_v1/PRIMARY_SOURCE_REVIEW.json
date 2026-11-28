@@ -1,0 +1,34 @@
+{
+  "schema": "primary_source_scope_review_v1",
+  "retrieved_utc": "2026-11-11T21:10:57Z",
+  "url": "https://github.com/fplll/fplll/blob/a48096bbd19792eed4267025f924b5095f079e29/README.md",
+  "commit": "a48096bbd19792eed4267025f924b5095f079e29",
+  "scope": "Maintainer primary implementation documentation, not exhaustive literature novelty review.",
+  "findings": [
+    {
+      "claim": "fplll provides floating-point LLL variants and a wrapper choosing a sequence with guaranteed output.",
+      "consequence": "Exact GMP LLL in our prototype is not the strongest implementation reference. Use pinned fplll wrapper/proved arm before fastest-specialized claims."
+    },
+    {
+      "claim": "Documentation offers unimodular-transform output and guaranteed weakened delta/eta for wrapper/proved settings.",
+      "consequence": "Independently validate lattice membership/determinant, range certificate and exact resulting output; numerical reduction is discovery only, so an approximate reducer cannot exclude roots without exact replay."
+    },
+    {
+      "claim": "The default documentation names LLL82, NS09, MSV09 and Stehle09.",
+      "consequence": "LLL reduction and exact lattice basis changes are classical; present field/chart construction as a hypothesis, no novelty certification."
+    }
+  ],
+  "bounded_next_experiment": {
+    "mechanism": "fplll discovers short vectors, exact replay proves exclusion; non-certifying results fall back to complete fixed-h solver",
+    "input": "New disjoint post-result training block ladder fixed before timings, all five NIST fields, width8/16/32, all contexts retained",
+    "metrics": "Full conditional all-u union; setup, executable startup, reduction, exact replay, survivor solves, serialization, wall and per-process peak RSS; compare same-output all-h baseline",
+    "limits": {
+      "seconds": 90,
+      "memory_mb": 4096,
+      "cores": 1
+    },
+    "promotion": "Only if complete identical conditional unions and lower paid whole-arm costs; release remains separately unqualified"
+  },
+  "novelty_established": false,
+  "release_claim": false
+}

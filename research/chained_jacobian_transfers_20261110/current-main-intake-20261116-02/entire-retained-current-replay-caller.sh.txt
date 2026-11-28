@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -uo pipefail
+cd /workspace/crypto-chained-main || exit 3
+out=/workspace/scratch/ct588-current-Root-auditor-replay
+mkdir -p "$out"
+export PATH=/dev/shm/ct267-cubic-norm-final-dual-gates/proof-bin:/home/agent/.elan/bin:$PATH
+export ELAN_TOOLCHAIN=leanprover/lean4:v4.35.0
+export LEAN_GATE_TRUSTED=/workspace/crypto-chained-main/research/chained_jacobian_transfers_20261110/current-main-intake-20261116-01/whole-proof-dependencies/current-Root/trusted-native.txt
+gate=research/chained_jacobian_transfers_20261110/current-main-intake-20261116-01/whole-proof-dependencies/current-Root/proof-gate.sh
+sha256sum "$gate" "${gate%/*}/AuditAxioms.lean" "$LEAN_GATE_TRUSTED" > "$out/exact-current-tools.sha256"
+for source in CubicFiniteNorm22308 CubicNativeNormEuclid22309; do
+  date -u +%FT%TZ > "$out/$source.start"
+  printf '%s\n' "ELAN_TOOLCHAIN=leanprover/lean4:v4.35.0 timeout120 bash current-Root/proof-gate.sh --out $out/$source research/chained_jacobian_transfers_20261110/lean/$source.lean; wrapperj1; exact trust manifest in pins" > "$out/$source.actual-command.txt"
+  timeout 120 bash "$gate" --out "$out/$source" "research/chained_jacobian_transfers_20261110/lean/$source.lean" > "$out/$source.entire-caller.stdout.txt" 2> "$out/$source.entire-caller.stderr.txt"
+  code=$?
+  printf '%s\n' "$code" > "$out/$source.exit"
+  date -u +%FT%TZ > "$out/$source.finish"
+  test "$code" -eq 0 || exit "$code"
+done
+date -u +%FT%TZ > "$out/finish.txt"

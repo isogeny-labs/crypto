@@ -1,0 +1,7 @@
+# Exact Mersenne modular powers in arbitrary quotient rings
+
+For r_k=a^(2^k-1), r_(2k)=r_k*(r_k)^(2^k) and r_(k+1)=r_k^2*a. Binary expansion of k computes the exact exponent with k-1 squarings and floor(log2 k)+popcount(k)-1 multiplications for k>=1. Exponent zero returns one. These identities hold for every base in K[X]/H, including zero, nonunits and repeated H; no inverse, squarefree assumption or dropped root is introduced.
+
+The dispatcher applies this only when n+1 is a power of two; all other exponents use the byte-preserved frozen generic routine. P521 uses k=521 for p and k=520 for its Euler exponent. Other NIST fields are retained as fallback/overhead controls. Only modular powering and the static Prime import differ in the copied exact solver. Every common auxiliary, finite interval, bounded split failure and original residual check is preserved. This is a specialized backend optimization, not a new generalized search proof or genuine GB comparison.
+
+Independent oracle: for H=(X-r)^t and base X+c, truncated Taylor coefficients are binomial(n,j)*(r+c)^(n-j) modulo p. Re-expand (X-r)^j and compare canonical remainder coefficients. This separately exercises zero/nonunit bases, repeated roots, characteristic three and the full 521-bit exponents without using the modular-power implementation. Full small polynomial roots are independently enumerated. Cold runs charge startup through final stdout; timeouts/late outputs remain unresolved.

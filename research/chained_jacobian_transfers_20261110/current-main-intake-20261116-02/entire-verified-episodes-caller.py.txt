@@ -1,0 +1,25 @@
+"""Record limited PR-stewardship episodes, hashing human follow-ups only."""
+from pathlib import Path
+from datetime import datetime,timezone,timedelta
+import hashlib,json,subprocess
+r=Path('/workspace/crypto-chained-main-validated');i=r/'research/chained_jacobian_transfers_20261110/current-main-intake-20261116-02'
+records=[]
+for repo,pr,start,end in [('crypto',4425,'2026-11-16T14:28:24Z','2026-11-16T20:13:00Z'),('cryptanalysis',1670,'2026-11-16T18:35:26Z','2026-11-16T20:17:54Z')]:
+ task='Chained ECDLP PR stewardship segment '+repo+'#'+str(pr)+' from opening until externally performed owner merge; substantive scoped proofs/tests retained, original CI failures unresolved'
+ a=['python3','tools/autonomy_report.py','add-episode','--session','chained-transfers-resume-20261116','--task',task,'--task-class','research','--pr',str(pr),'--started',start,'--ended',end,'--result','partial','--merged','--evidence','https://github.com/isogeny-labs/'+repo+'/pull/'+str(pr),'--evidence','research/chained_jacobian_transfers_20261110/current-main-intake-20261116-02/whole-actual-merged-head-CI/ACTUAL_COMPLETE_MERGED_HEAD_SCOPE.json']
+ q=subprocess.run(a,cwd=r,capture_output=True,text=True);assert q.returncode==0,(q.stdout,q.stderr);episode=q.stdout.strip()
+ records.append(dict(repo=repo,pr=pr,episode=episode,scope='PR interval only; project continues. Actual GitHub opening/merge timestamps, CIgreen false, partial result. Complete incident-count reconstruction unavailable and no self-recovery-rate claim.'))
+# The three human follow-ups after the first prompt are undated in the available transcript.
+# ts is explicitly an ingestion-time proxy, not an invented historical message time.
+followups=['Keep going','Resume','Resume'];interventions=[];observed=datetime.now(timezone.utc)
+for index,body in enumerate(followups,1):
+ digest=hashlib.sha256(body.encode()).hexdigest();ts=(observed+timedelta(microseconds=index)).isoformat()
+ a=['python3','tools/autonomy_report.py','add-intervention','--episode',records[0]['episode'],'--ts',ts,'--class','nudge','--text-sha256',digest,'--classifier','rule']
+ q=subprocess.run(a,cwd=r,capture_output=True,text=True);assert q.returncode==0,(q.stdout,q.stderr)
+ interventions.append(dict(record=q.stdout.strip(),source_message_order=index,text_sha256=digest,timestamp_scope='ingestion-time proxy; original message timestamp unavailable in current transcript',classification='rule-based nudge per current tool definition; Haiku classification/audit not available, not claimed'))
+note=dict(time=datetime.now(timezone.utc).isoformat(),episodes=records,human_interventions=interventions,transcript_text_persisted=False,automated_environment_context='not a human research intervention; excluded',limitations='Only visible current three human follow-ups; no claim that compacted earlier transcript contains no others. Larger project ongoing; CI failures make both episodes ineligible for unsupervised success. No fourteen-day revert verdict yet; check after2026-11-30T20:18Z from actual Git history. Classifier rule and ingestion timestamp proxies explicitly scoped; no Haiku/human audit claimed.')
+(i/'ACTUAL_PR_EPISODES_AND_INTERVENTION_LIMITS.json').write_text(json.dumps(note,indent=2)+'\n')
+for scope,task,result in [('chained-transfers','Close Root4425 and Consumer1670 stewardship segments after external owner merges, preserve complete failures','partial'),('lean-instance-gate','Intake existing byte-identical coefficients/word certificates, record missing semantic field assembly before new Lean','partial')]:
+ a=['python3','tools/lessons.py','outcome','--scope',scope,'--task',task,'--result',result,'--evidence','research/chained_jacobian_transfers_20261110/current-main-intake-20261116-02/ACTUAL_VERIFIED_BASE_INTAKE_AND_CORRECTION.json','--note','Scoped archival proof/CI intake complete; original signing/store/field/Jacobian/runtime/cost obligations remain.']
+ q=subprocess.run(a,cwd=r,capture_output=True,text=True);assert q.returncode==0,(q.stdout,q.stderr);print(scope,q.stdout.strip())
+print(json.dumps(dict(episodes=[x['episode']for x in records],interventions=len(interventions))),flush=True)

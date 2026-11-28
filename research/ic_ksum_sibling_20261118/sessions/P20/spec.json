@@ -1,0 +1,75 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_ksum_sibling_20261118 20-bit Table B curve: ksum:m=5 vs ksum:m=5,sib=1",
+ "description": "P2 KSUM-SIB: last-level x-only siblings in the k-sum table build. Generic decomposition track (bounded by sqrt(r); cannot beat rho). research/ic_ksum_sibling_20261118/PROTOCOL.md. Public synthetic curve and targets; no security claim.",
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "ksum5",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=9",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum5-sib",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=9",
+     "oracle": "ksum:m=5,sib=1",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum5-aa",
+   "role": "control",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=9",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  }
+ ],
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 1048291,
+    "a": 1,
+    "b": 11,
+    "group_order": 1046999,
+    "r": 1046999,
+    "gx": 1,
+    "gy": 123004
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261115201,
+  "target_kind": "public"
+ },
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261118201,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

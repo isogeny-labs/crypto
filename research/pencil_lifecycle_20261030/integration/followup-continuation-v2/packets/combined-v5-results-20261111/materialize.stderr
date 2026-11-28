@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v5-20261111/materialize.py", line 70, in <module>
+    dst=SOURCE/row['path'];src=P/row['overlay_path'];expected={'sha256':row['post_sha256'],'bytes':row['post_bytes']};checked(src,expected)
+  File "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v5-20261111/materialize.py", line 28, in checked
+    path=Path(path);st=path.lstat()
+  File "/usr/lib64/python3.9/pathlib.py", line 1298, in lstat
+    return self._accessor.lstat(self)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v5-20261111/overlay/research/pencil_large_prime_20261029/src/relation_stream.rs'

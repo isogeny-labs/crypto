@@ -1,0 +1,1381 @@
+{
+ "tag": "smoke",
+ "label": "(smoke, not data)",
+ "runs": {
+  "exhaustive_k9_std": {
+   "verdicts": [
+    {
+     "id": "P1",
+     "text": "(E,twist) pairs with any F_p root = 0",
+     "n": 258856,
+     "observed": 0,
+     "upper95_rate": 1.15894551410823e-05,
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P2",
+     "text": "(Z,E) pairs: exactly 1 root, on E; (Z,T) pairs: exactly 1 root, on twist; x1 != x2",
+     "detail": [
+      {
+       "pair_class": "ZE",
+       "n": 1572,
+       "good": 1572
+      },
+      {
+       "pair_class": "ZT",
+       "n": 1482,
+       "good": 1482
+      }
+     ],
+     "verdict": "PASS"
+    },
+    {
+     "id": "P3",
+     "text": "(E,E) and (T,T) pairs with x1 != x2: 100% have exactly 2 distinct F_p roots",
+     "detail": [
+      {
+       "pair_class": "EE",
+       "n": 137026,
+       "with_two_roots": 137026,
+       "fraction": 1.0
+      },
+      {
+       "pair_class": "TT",
+       "n": 121771,
+       "with_two_roots": 121771,
+       "fraction": 1.0
+      }
+     ],
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P4",
+     "text": "roots of (E,E) pairs on twist = 0; roots of (T,T) pairs on E = 0",
+     "observed": {
+      "EE_roots_on_twist": 0,
+      "TT_roots_on_E": 0
+     },
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P5",
+     "text": "pairs with a root on Z: counts equal the x(P+T) = phi_t(x) prediction exactly",
+     "observed": {
+      "EE": 786,
+      "TT": 735,
+      "ET": 0
+     },
+     "predicted": {
+      "EE": 786,
+      "TT": 735,
+      "ET": 0,
+      "diag_x_with_phi_x_eq_x": 6
+     },
+     "verdict": "PASS"
+    },
+    {
+     "id": "P6",
+     "text": "x1 == x2 pairs: exactly one finite root x(2P) on the point's own curve (or Z); the other root is infinity",
+     "detail": [
+      {
+       "pair_class": "EE",
+       "n": 524,
+       "with_one_finite_root": 524,
+       "roots_on_E": 524,
+       "roots_on_twist": 0
+      },
+      {
+       "pair_class": "TT",
+       "n": 494,
+       "with_one_finite_root": 494,
+       "roots_on_E": 0,
+       "roots_on_twist": 488
+      }
+     ],
+     "verdict": "PASS"
+    }
+   ],
+   "table": [
+    {
+     "pair_class": "EE",
+     "x1_eq_x2": false,
+     "pairs": 137026,
+     "roots0": 0,
+     "roots1": 0,
+     "roots2": 137026,
+     "root_on_E": 273266,
+     "root_on_twist": 0,
+     "root_on_Z": 786
+    },
+    {
+     "pair_class": "EE",
+     "x1_eq_x2": true,
+     "pairs": 524,
+     "roots0": 0,
+     "roots1": 524,
+     "roots2": 0,
+     "root_on_E": 524,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ET",
+     "x1_eq_x2": false,
+     "pairs": 258856,
+     "roots0": 258856,
+     "roots1": 0,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "TT",
+     "x1_eq_x2": false,
+     "pairs": 121771,
+     "roots0": 0,
+     "roots1": 0,
+     "roots2": 121771,
+     "root_on_E": 0,
+     "root_on_twist": 242804,
+     "root_on_Z": 738
+    },
+    {
+     "pair_class": "TT",
+     "x1_eq_x2": true,
+     "pairs": 494,
+     "roots0": 0,
+     "roots1": 494,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 488,
+     "root_on_Z": 6
+    },
+    {
+     "pair_class": "ZE",
+     "x1_eq_x2": false,
+     "pairs": 1572,
+     "roots0": 0,
+     "roots1": 1572,
+     "roots2": 0,
+     "root_on_E": 1572,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZT",
+     "x1_eq_x2": false,
+     "pairs": 1482,
+     "roots0": 0,
+     "roots1": 1482,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 1482,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZZ",
+     "x1_eq_x2": false,
+     "pairs": 3,
+     "roots0": 0,
+     "roots1": 3,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 0,
+     "root_on_Z": 3
+    },
+    {
+     "pair_class": "ZZ",
+     "x1_eq_x2": true,
+     "pairs": 3,
+     "roots0": 3,
+     "roots1": 0,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    }
+   ],
+   "npairs": 521731,
+   "cpu_seconds": 0.11700201034545898,
+   "complete": true
+  },
+  "sample_k9_std": {
+   "verdicts": [
+    {
+     "id": "P1",
+     "text": "(E,twist) pairs with any F_p root = 0",
+     "n": 100000,
+     "observed": 0,
+     "upper95_rate": 3e-05,
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P2",
+     "text": "(Z,E) pairs: exactly 1 root, on E; (Z,T) pairs: exactly 1 root, on twist; x1 != x2",
+     "detail": [
+      {
+       "pair_class": "ZE",
+       "n": 1572,
+       "good": 1572
+      },
+      {
+       "pair_class": "ZT",
+       "n": 1482,
+       "good": 1482
+      }
+     ],
+     "verdict": "PASS"
+    },
+    {
+     "id": "P3",
+     "text": "(E,E) and (T,T) pairs with x1 != x2: 100% have exactly 2 distinct F_p roots",
+     "detail": [
+      {
+       "pair_class": "EE",
+       "n": 99834,
+       "with_two_roots": 99834,
+       "fraction": 1.0
+      },
+      {
+       "pair_class": "TT",
+       "n": 99789,
+       "with_two_roots": 99789,
+       "fraction": 1.0
+      }
+     ],
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P4",
+     "text": "roots of (E,E) pairs on twist = 0; roots of (T,T) pairs on E = 0",
+     "observed": {
+      "EE_roots_on_twist": 0,
+      "TT_roots_on_E": 0
+     },
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P5",
+     "text": "sampled pairs with a root on Z: rate equals phi_t prediction within 4 sigma; ET: 0",
+     "detail": [
+      {
+       "pair_class": "EE",
+       "n": 99834,
+       "observed": 578,
+       "expected": 571.5687022900763,
+       "sigma": 23.90750305427307,
+       "z": 0.26900750343203217
+      },
+      {
+       "pair_class": "TT",
+       "n": 99789,
+       "observed": 571,
+       "expected": 601.099141110328,
+       "sigma": 24.51732328600184,
+       "z": -1.227668320852672
+      }
+     ],
+     "predicted": {
+      "EE": 786,
+      "TT": 735,
+      "ET": 0,
+      "diag_x_with_phi_x_eq_x": 6
+     },
+     "verdict": "PASS"
+    },
+    {
+     "id": "P6",
+     "text": "x1 == x2 pairs: exactly one finite root x(2P) on the point's own curve (or Z); the other root is infinity",
+     "detail": [
+      {
+       "pair_class": "EE",
+       "n": 166,
+       "with_one_finite_root": 166,
+       "roots_on_E": 166,
+       "roots_on_twist": 0
+      },
+      {
+       "pair_class": "TT",
+       "n": 211,
+       "with_one_finite_root": 211,
+       "roots_on_E": 0,
+       "roots_on_twist": 207
+      }
+     ],
+     "verdict": "PASS"
+    }
+   ],
+   "table": [
+    {
+     "pair_class": "EE",
+     "x1_eq_x2": false,
+     "pairs": 99834,
+     "roots0": 0,
+     "roots1": 0,
+     "roots2": 99834,
+     "root_on_E": 199090,
+     "root_on_twist": 0,
+     "root_on_Z": 578
+    },
+    {
+     "pair_class": "EE",
+     "x1_eq_x2": true,
+     "pairs": 166,
+     "roots0": 0,
+     "roots1": 166,
+     "roots2": 0,
+     "root_on_E": 166,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ET",
+     "x1_eq_x2": false,
+     "pairs": 100000,
+     "roots0": 100000,
+     "roots1": 0,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "TT",
+     "x1_eq_x2": false,
+     "pairs": 99789,
+     "roots0": 0,
+     "roots1": 0,
+     "roots2": 99789,
+     "root_on_E": 0,
+     "root_on_twist": 199004,
+     "root_on_Z": 574
+    },
+    {
+     "pair_class": "TT",
+     "x1_eq_x2": true,
+     "pairs": 211,
+     "roots0": 0,
+     "roots1": 211,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 207,
+     "root_on_Z": 4
+    },
+    {
+     "pair_class": "ZE",
+     "x1_eq_x2": false,
+     "pairs": 1572,
+     "roots0": 0,
+     "roots1": 1572,
+     "roots2": 0,
+     "root_on_E": 1572,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZT",
+     "x1_eq_x2": false,
+     "pairs": 1482,
+     "roots0": 0,
+     "roots1": 1482,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 1482,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZZ",
+     "x1_eq_x2": false,
+     "pairs": 6,
+     "roots0": 0,
+     "roots1": 6,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 0,
+     "root_on_Z": 6
+    },
+    {
+     "pair_class": "ZZ",
+     "x1_eq_x2": true,
+     "pairs": 3,
+     "roots0": 3,
+     "roots1": 0,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    }
+   ],
+   "npairs": 303063,
+   "cpu_seconds": 0.05775189399719238,
+   "complete": true
+  },
+  "exhaustive_k16_std": {
+   "verdicts": [
+    {
+     "id": "P1",
+     "text": "(E,twist) pairs with any F_p root = 0",
+     "n": 13011705,
+     "observed": 0,
+     "upper95_rate": 2.3056163661872138e-07,
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P2",
+     "text": "(Z,E) pairs: exactly 1 root, on E; (Z,T) pairs: exactly 1 root, on twist; x1 != x2",
+     "detail": [
+      {
+       "pair_class": "ZE",
+       "n": 32835,
+       "good": 32835
+      },
+      {
+       "pair_class": "ZT",
+       "n": 32601,
+       "good": 32601
+      }
+     ],
+     "verdict": "PASS"
+    },
+    {
+     "id": "P3",
+     "text": "(E,E) and (T,T) pairs with x1 != x2: 100% have exactly 2 distinct F_p roots",
+     "detail": [
+      {
+       "pair_class": "EE",
+       "n": 6971064,
+       "with_two_roots": 6971064,
+       "fraction": 1.0
+      },
+      {
+       "pair_class": "TT",
+       "n": 6046395,
+       "with_two_roots": 6046395,
+       "fraction": 1.0
+      }
+     ],
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P4",
+     "text": "roots of (E,E) pairs on twist = 0; roots of (T,T) pairs on E = 0",
+     "observed": {
+      "EE_roots_on_twist": 0,
+      "TT_roots_on_E": 0
+     },
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P6",
+     "text": "x1 == x2 pairs: exactly one finite root x(2P) on the point's own curve (or Z); the other root is infinity",
+     "detail": [
+      {
+       "pair_class": "EE",
+       "n": 213,
+       "with_one_finite_root": 213,
+       "roots_on_E": 212,
+       "roots_on_twist": 0
+      },
+      {
+       "pair_class": "TT",
+       "n": 186,
+       "with_one_finite_root": 186,
+       "roots_on_E": 0,
+       "roots_on_twist": 186
+      }
+     ],
+     "verdict": "PASS"
+    }
+   ],
+   "table": [
+    {
+     "pair_class": "EE",
+     "x1_eq_x2": false,
+     "pairs": 6971064,
+     "roots0": 0,
+     "roots1": 0,
+     "roots2": 6971064,
+     "root_on_E": 13941916,
+     "root_on_twist": 0,
+     "root_on_Z": 212
+    },
+    {
+     "pair_class": "EE",
+     "x1_eq_x2": true,
+     "pairs": 213,
+     "roots0": 0,
+     "roots1": 213,
+     "roots2": 0,
+     "root_on_E": 212,
+     "root_on_twist": 0,
+     "root_on_Z": 1
+    },
+    {
+     "pair_class": "ET",
+     "x1_eq_x2": false,
+     "pairs": 13011705,
+     "roots0": 13011705,
+     "roots1": 0,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "TT",
+     "x1_eq_x2": false,
+     "pairs": 6046395,
+     "roots0": 0,
+     "roots1": 0,
+     "roots2": 6046395,
+     "root_on_E": 0,
+     "root_on_twist": 12092605,
+     "root_on_Z": 185
+    },
+    {
+     "pair_class": "TT",
+     "x1_eq_x2": true,
+     "pairs": 186,
+     "roots0": 0,
+     "roots1": 186,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 186,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZE",
+     "x1_eq_x2": false,
+     "pairs": 32835,
+     "roots0": 0,
+     "roots1": 32835,
+     "roots2": 0,
+     "root_on_E": 32835,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZT",
+     "x1_eq_x2": false,
+     "pairs": 32601,
+     "roots0": 0,
+     "roots1": 32601,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 32601,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZZ",
+     "x1_eq_x2": true,
+     "pairs": 1,
+     "roots0": 1,
+     "roots1": 0,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    }
+   ],
+   "npairs": 26095000,
+   "cpu_seconds": 4.1056602001190186,
+   "complete": false
+  },
+  "sample_k16_std": {
+   "verdicts": [
+    {
+     "id": "P1",
+     "text": "(E,twist) pairs with any F_p root = 0",
+     "n": 200000,
+     "observed": 0,
+     "upper95_rate": 1.5e-05,
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P2",
+     "text": "(Z,E) pairs: exactly 1 root, on E; (Z,T) pairs: exactly 1 root, on twist; x1 != x2",
+     "detail": [
+      {
+       "pair_class": "ZE",
+       "n": 32835,
+       "good": 32835
+      },
+      {
+       "pair_class": "ZT",
+       "n": 32601,
+       "good": 32601
+      }
+     ],
+     "verdict": "PASS"
+    },
+    {
+     "id": "P3",
+     "text": "(E,E) and (T,T) pairs with x1 != x2: 100% have exactly 2 distinct F_p roots",
+     "detail": [
+      {
+       "pair_class": "EE",
+       "n": 199993,
+       "with_two_roots": 199993,
+       "fraction": 1.0
+      },
+      {
+       "pair_class": "TT",
+       "n": 199991,
+       "with_two_roots": 199991,
+       "fraction": 1.0
+      }
+     ],
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P4",
+     "text": "roots of (E,E) pairs on twist = 0; roots of (T,T) pairs on E = 0",
+     "observed": {
+      "EE_roots_on_twist": 0,
+      "TT_roots_on_E": 0
+     },
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P5",
+     "text": "sampled pairs with a root on Z: rate equals phi_t prediction within 4 sigma; ET: 0",
+     "detail": [
+      {
+       "pair_class": "EE",
+       "n": 199993,
+       "observed": 2,
+       "expected": 6.0906626816451865,
+       "sigma": 2.467926798275262,
+       "z": -1.6575299901536753
+      },
+      {
+       "pair_class": "TT",
+       "n": 199991,
+       "observed": 5,
+       "expected": 6.134316907301109,
+       "sigma": 2.4767553184158317,
+       "z": -0.45798504957955816
+      }
+     ],
+     "predicted": {
+      "EE": 16417,
+      "TT": 16300,
+      "ET": 0,
+      "diag_x_with_phi_x_eq_x": 2
+     },
+     "verdict": "PASS"
+    },
+    {
+     "id": "P6",
+     "text": "x1 == x2 pairs: exactly one finite root x(2P) on the point's own curve (or Z); the other root is infinity",
+     "detail": [
+      {
+       "pair_class": "EE",
+       "n": 7,
+       "with_one_finite_root": 7,
+       "roots_on_E": 7,
+       "roots_on_twist": 0
+      },
+      {
+       "pair_class": "TT",
+       "n": 9,
+       "with_one_finite_root": 9,
+       "roots_on_E": 0,
+       "roots_on_twist": 9
+      }
+     ],
+     "verdict": "PASS"
+    }
+   ],
+   "table": [
+    {
+     "pair_class": "EE",
+     "x1_eq_x2": false,
+     "pairs": 199993,
+     "roots0": 0,
+     "roots1": 0,
+     "roots2": 199993,
+     "root_on_E": 399984,
+     "root_on_twist": 0,
+     "root_on_Z": 2
+    },
+    {
+     "pair_class": "EE",
+     "x1_eq_x2": true,
+     "pairs": 7,
+     "roots0": 0,
+     "roots1": 7,
+     "roots2": 0,
+     "root_on_E": 7,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ET",
+     "x1_eq_x2": false,
+     "pairs": 200000,
+     "roots0": 200000,
+     "roots1": 0,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "TT",
+     "x1_eq_x2": false,
+     "pairs": 199991,
+     "roots0": 0,
+     "roots1": 0,
+     "roots2": 199991,
+     "root_on_E": 0,
+     "root_on_twist": 399977,
+     "root_on_Z": 5
+    },
+    {
+     "pair_class": "TT",
+     "x1_eq_x2": true,
+     "pairs": 9,
+     "roots0": 0,
+     "roots1": 9,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 9,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZE",
+     "x1_eq_x2": false,
+     "pairs": 32835,
+     "roots0": 0,
+     "roots1": 32835,
+     "roots2": 0,
+     "root_on_E": 32835,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZT",
+     "x1_eq_x2": false,
+     "pairs": 32601,
+     "roots0": 0,
+     "roots1": 32601,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 32601,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZZ",
+     "x1_eq_x2": true,
+     "pairs": 1,
+     "roots0": 1,
+     "roots1": 0,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    }
+   ],
+   "npairs": 665437,
+   "cpu_seconds": 0.1488018035888672,
+   "complete": true
+  },
+  "sample_k20_std": {
+   "verdicts": [
+    {
+     "id": "P1",
+     "text": "(E,twist) pairs with any F_p root = 0",
+     "n": 200000,
+     "observed": 0,
+     "upper95_rate": 1.5e-05,
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P2",
+     "text": "(Z,E) pairs: exactly 1 root, on E; (Z,T) pairs: exactly 1 root, on twist; x1 != x2",
+     "detail": [
+      {
+       "pair_class": "ZE",
+       "n": 524811,
+       "good": 524811
+      },
+      {
+       "pair_class": "ZT",
+       "n": 523761,
+       "good": 523761
+      }
+     ],
+     "verdict": "PASS"
+    },
+    {
+     "id": "P3",
+     "text": "(E,E) and (T,T) pairs with x1 != x2: 100% have exactly 2 distinct F_p roots",
+     "detail": [
+      {
+       "pair_class": "EE",
+       "n": 200000,
+       "with_two_roots": 200000,
+       "fraction": 1.0
+      },
+      {
+       "pair_class": "TT",
+       "n": 200000,
+       "with_two_roots": 200000,
+       "fraction": 1.0
+      }
+     ],
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P4",
+     "text": "roots of (E,E) pairs on twist = 0; roots of (T,T) pairs on E = 0",
+     "observed": {
+      "EE_roots_on_twist": 0,
+      "TT_roots_on_E": 0
+     },
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P5",
+     "text": "sampled pairs with a root on Z: rate equals phi_t prediction within 4 sigma; ET: 0",
+     "detail": [
+      {
+       "pair_class": "EE",
+       "n": 200000,
+       "observed": 2,
+       "expected": 0.38108884705241847,
+       "sigma": 0.6173239401257807,
+       "z": 2.6224661765388944
+      },
+      {
+       "pair_class": "TT",
+       "n": 200000,
+       "observed": 0,
+       "expected": 0.3818528262823018,
+       "sigma": 0.617942413402982,
+       "z": -0.617942413402982
+      }
+     ],
+     "predicted": {
+      "EE": 262405,
+      "TT": 261880,
+      "ET": 0,
+      "diag_x_with_phi_x_eq_x": 2
+     },
+     "verdict": "PASS"
+    },
+    {
+     "id": "P6",
+     "text": "x1 == x2 pairs: exactly one finite root x(2P) on the point's own curve (or Z); the other root is infinity",
+     "detail": [
+      {
+       "pair_class": "EE",
+       "n": 0,
+       "with_one_finite_root": 0,
+       "roots_on_E": 0,
+       "roots_on_twist": 0
+      },
+      {
+       "pair_class": "TT",
+       "n": 0,
+       "with_one_finite_root": 0,
+       "roots_on_E": 0,
+       "roots_on_twist": 0
+      }
+     ],
+     "verdict": "PASS"
+    }
+   ],
+   "table": [
+    {
+     "pair_class": "EE",
+     "x1_eq_x2": false,
+     "pairs": 200000,
+     "roots0": 0,
+     "roots1": 0,
+     "roots2": 200000,
+     "root_on_E": 399998,
+     "root_on_twist": 0,
+     "root_on_Z": 2
+    },
+    {
+     "pair_class": "ET",
+     "x1_eq_x2": false,
+     "pairs": 200000,
+     "roots0": 200000,
+     "roots1": 0,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "TT",
+     "x1_eq_x2": false,
+     "pairs": 200000,
+     "roots0": 0,
+     "roots1": 0,
+     "roots2": 200000,
+     "root_on_E": 0,
+     "root_on_twist": 400000,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZE",
+     "x1_eq_x2": false,
+     "pairs": 524811,
+     "roots0": 0,
+     "roots1": 524811,
+     "roots2": 0,
+     "root_on_E": 524811,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZT",
+     "x1_eq_x2": false,
+     "pairs": 523761,
+     "roots0": 0,
+     "roots1": 523761,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 523761,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZZ",
+     "x1_eq_x2": true,
+     "pairs": 1,
+     "roots0": 1,
+     "roots1": 0,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    }
+   ],
+   "npairs": 1648573,
+   "cpu_seconds": 0.9117321968078613,
+   "complete": true
+  },
+  "sample_k20_given": {
+   "verdicts": [
+    {
+     "id": "P1",
+     "text": "(E,twist) pairs with any F_p root = 0",
+     "n": 200000,
+     "observed": 0,
+     "upper95_rate": 1.5e-05,
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P2",
+     "text": "(Z,E) pairs: exactly 1 root, on E; (Z,T) pairs: exactly 1 root, on twist; x1 != x2",
+     "detail": [
+      {
+       "pair_class": "ZE",
+       "n": 524811,
+       "good": 524811
+      },
+      {
+       "pair_class": "ZT",
+       "n": 523761,
+       "good": 523761
+      }
+     ],
+     "verdict": "PASS"
+    },
+    {
+     "id": "P3",
+     "text": "(E,E) and (T,T) pairs with x1 != x2: 100% have exactly 2 distinct F_p roots",
+     "detail": [
+      {
+       "pair_class": "EE",
+       "n": 199998,
+       "with_two_roots": 199998,
+       "fraction": 1.0
+      },
+      {
+       "pair_class": "TT",
+       "n": 200000,
+       "with_two_roots": 200000,
+       "fraction": 1.0
+      }
+     ],
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P4",
+     "text": "roots of (E,E) pairs on twist = 0; roots of (T,T) pairs on E = 0",
+     "observed": {
+      "EE_roots_on_twist": 0,
+      "TT_roots_on_E": 0
+     },
+     "verdict": "PASS",
+     "exceptions": []
+    },
+    {
+     "id": "P6",
+     "text": "x1 == x2 pairs: exactly one finite root x(2P) on the point's own curve (or Z); the other root is infinity",
+     "detail": [
+      {
+       "pair_class": "EE",
+       "n": 2,
+       "with_one_finite_root": 2,
+       "roots_on_E": 2,
+       "roots_on_twist": 0
+      },
+      {
+       "pair_class": "TT",
+       "n": 0,
+       "with_one_finite_root": 0,
+       "roots_on_E": 0,
+       "roots_on_twist": 0
+      }
+     ],
+     "verdict": "PASS"
+    }
+   ],
+   "table": [
+    {
+     "pair_class": "EE",
+     "x1_eq_x2": false,
+     "pairs": 199998,
+     "roots0": 0,
+     "roots1": 0,
+     "roots2": 199998,
+     "root_on_E": 399996,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "EE",
+     "x1_eq_x2": true,
+     "pairs": 2,
+     "roots0": 0,
+     "roots1": 2,
+     "roots2": 0,
+     "root_on_E": 2,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ET",
+     "x1_eq_x2": false,
+     "pairs": 200000,
+     "roots0": 200000,
+     "roots1": 0,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "TT",
+     "x1_eq_x2": false,
+     "pairs": 200000,
+     "roots0": 0,
+     "roots1": 0,
+     "roots2": 200000,
+     "root_on_E": 0,
+     "root_on_twist": 400000,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZE",
+     "x1_eq_x2": false,
+     "pairs": 524811,
+     "roots0": 0,
+     "roots1": 524811,
+     "roots2": 0,
+     "root_on_E": 524811,
+     "root_on_twist": 0,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZT",
+     "x1_eq_x2": false,
+     "pairs": 523761,
+     "roots0": 0,
+     "roots1": 523761,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 523761,
+     "root_on_Z": 0
+    },
+    {
+     "pair_class": "ZZ",
+     "x1_eq_x2": false,
+     "pairs": 1,
+     "roots0": 0,
+     "roots1": 1,
+     "roots2": 0,
+     "root_on_E": 0,
+     "root_on_twist": 0,
+     "root_on_Z": 1
+    }
+   ],
+   "npairs": 1648573,
+   "cpu_seconds": 1.28269624710083,
+   "complete": true
+  }
+ },
+ "controls": {
+  "9": [
+   {
+    "id": "P7a",
+    "text": "explicit point arithmetic: roots == {x(P1+P2), x(P1-P2)} for 100% of (E,E) and (T,T) sample pairs",
+    "observed": {
+     "EE": {
+      "tested": 498,
+      "match": 498
+     },
+     "TT": {
+      "tested": 500,
+      "match": 500
+     }
+    },
+    "verdict": "PASS"
+   },
+   {
+    "id": "P7b",
+    "text": "mixed pairs in F_p^2: both x(P1+-P2) are S3 roots, conjugate, not in F_p, for 100% of sampled pairs",
+    "observed": {
+     "tested": 500,
+     "both_roots_verified": 500,
+     "conjugate": 500,
+     "not_in_Fp": 500,
+     "Fp_roots_found_by_counter": 0
+    },
+    "verdict": "PASS"
+   },
+   {
+    "id": "P8",
+    "text": "sensitivity: with the true A the F_p-root fractions are 0 (ET), 1 (EE, TT); with A+1 all three are in [0.47, 0.53]",
+    "observed": {
+     "ET": {
+      "true_A": {
+       "frac_with_Fp_root": 0.0,
+       "n": 50000
+      },
+      "wrong_A_plus1": {
+       "frac_with_Fp_root": 0.50184,
+       "n": 50000
+      }
+     },
+     "EE": {
+      "true_A": {
+       "frac_with_Fp_root": 1.0,
+       "n": 50000
+      },
+      "wrong_A_plus1": {
+       "frac_with_Fp_root": 0.508,
+       "n": 50000
+      }
+     },
+     "TT": {
+      "true_A": {
+       "frac_with_Fp_root": 1.0,
+       "n": 50000
+      },
+      "wrong_A_plus1": {
+       "frac_with_Fp_root": 0.50678,
+       "n": 50000
+      }
+     }
+    },
+    "verdict": "PASS"
+   },
+   {
+    "id": "P9",
+    "text": "identities: disc/4 = 4 f(x1) f(x2); task-text S3 roots are the inverses of the standard S3 roots",
+    "observed": {
+     "disc_equals_4_f1_f2": true,
+     "same_root_count_std_vs_given": true,
+     "given_roots_are_inverses": {
+      "tested": 20000,
+      "match": 20000
+     }
+    },
+    "verdict": "PASS"
+   }
+  ],
+  "16": [
+   {
+    "id": "P7a",
+    "text": "explicit point arithmetic: roots == {x(P1+P2), x(P1-P2)} for 100% of (E,E) and (T,T) sample pairs",
+    "observed": {
+     "EE": {
+      "tested": 1999,
+      "match": 1999
+     },
+     "TT": {
+      "tested": 2000,
+      "match": 2000
+     }
+    },
+    "verdict": "PASS"
+   },
+   {
+    "id": "P7b",
+    "text": "mixed pairs in F_p^2: both x(P1+-P2) are S3 roots, conjugate, not in F_p, for 100% of sampled pairs",
+    "observed": {
+     "tested": 2000,
+     "both_roots_verified": 2000,
+     "conjugate": 2000,
+     "not_in_Fp": 2000,
+     "Fp_roots_found_by_counter": 0
+    },
+    "verdict": "PASS"
+   },
+   {
+    "id": "P8",
+    "text": "sensitivity: with the true A the F_p-root fractions are 0 (ET), 1 (EE, TT); with A+1 all three are in [0.47, 0.53]",
+    "observed": {
+     "ET": {
+      "true_A": {
+       "frac_with_Fp_root": 0.0,
+       "n": 200000
+      },
+      "wrong_A_plus1": {
+       "frac_with_Fp_root": 0.49933,
+       "n": 200000
+      }
+     },
+     "EE": {
+      "true_A": {
+       "frac_with_Fp_root": 1.0,
+       "n": 200000
+      },
+      "wrong_A_plus1": {
+       "frac_with_Fp_root": 0.499895,
+       "n": 200000
+      }
+     },
+     "TT": {
+      "true_A": {
+       "frac_with_Fp_root": 1.0,
+       "n": 200000
+      },
+      "wrong_A_plus1": {
+       "frac_with_Fp_root": 0.49935,
+       "n": 200000
+      }
+     }
+    },
+    "verdict": "PASS"
+   },
+   {
+    "id": "P9",
+    "text": "identities: disc/4 = 4 f(x1) f(x2); task-text S3 roots are the inverses of the standard S3 roots",
+    "observed": {
+     "disc_equals_4_f1_f2": true,
+     "same_root_count_std_vs_given": true,
+     "given_roots_are_inverses": {
+      "tested": 20000,
+      "match": 20000
+     }
+    },
+    "verdict": "PASS"
+   }
+  ],
+  "20": [
+   {
+    "id": "P7a",
+    "text": "explicit point arithmetic: roots == {x(P1+P2), x(P1-P2)} for 100% of (E,E) and (T,T) sample pairs",
+    "observed": {
+     "EE": {
+      "tested": 2000,
+      "match": 2000
+     },
+     "TT": {
+      "tested": 2000,
+      "match": 2000
+     }
+    },
+    "verdict": "PASS"
+   },
+   {
+    "id": "P7b",
+    "text": "mixed pairs in F_p^2: both x(P1+-P2) are S3 roots, conjugate, not in F_p, for 100% of sampled pairs",
+    "observed": {
+     "tested": 2000,
+     "both_roots_verified": 2000,
+     "conjugate": 2000,
+     "not_in_Fp": 2000,
+     "Fp_roots_found_by_counter": 0
+    },
+    "verdict": "PASS"
+   },
+   {
+    "id": "P8",
+    "text": "sensitivity: with the true A the F_p-root fractions are 0 (ET), 1 (EE, TT); with A+1 all three are in [0.47, 0.53]",
+    "observed": {
+     "ET": {
+      "true_A": {
+       "frac_with_Fp_root": 0.0,
+       "n": 200000
+      },
+      "wrong_A_plus1": {
+       "frac_with_Fp_root": 0.499595,
+       "n": 200000
+      }
+     },
+     "EE": {
+      "true_A": {
+       "frac_with_Fp_root": 1.0,
+       "n": 200000
+      },
+      "wrong_A_plus1": {
+       "frac_with_Fp_root": 0.499325,
+       "n": 200000
+      }
+     },
+     "TT": {
+      "true_A": {
+       "frac_with_Fp_root": 1.0,
+       "n": 200000
+      },
+      "wrong_A_plus1": {
+       "frac_with_Fp_root": 0.50006,
+       "n": 200000
+      }
+     }
+    },
+    "verdict": "PASS"
+   },
+   {
+    "id": "P9",
+    "text": "identities: disc/4 = 4 f(x1) f(x2); task-text S3 roots are the inverses of the standard S3 roots",
+    "observed": {
+     "disc_equals_4_f1_f2": true,
+     "same_root_count_std_vs_given": true,
+     "given_roots_are_inverses": {
+      "tested": 20000,
+      "match": 20000
+     }
+    },
+    "verdict": "PASS"
+   }
+  ]
+ }
+}

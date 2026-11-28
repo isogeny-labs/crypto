@@ -1,0 +1,16 @@
+{
+  "action": "treat the fingerprint of a {1} basis as vacuous (it is identical across fresh seeds); require a hash of the step matrices, or of a consistent system's basis, for the cases that carry the claimed gain",
+  "created": "2026-11-17T00:19:45Z",
+  "evidence": [
+    "research/f4_groebner_speed_leads_20261116/redteam/fpcheck.jsonl",
+    "research/f4_groebner_speed_leads_20261116/redteam/verdicts.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "red-team",
+    "controlled-experiment"
+  ],
+  "trigger": "an F4/Groebner correctness check rests on an output-basis fingerprint and some cases are overdetermined or inconsistent",
+  "why": "f4_fp_bench overdet_n12 basis_fp 3333741564c1aa21 for seed_xor 0, 2, deadbeef, 5eed5eed, c0ffee; f4-memory's largest measured effect (1.67x at 4 threads) is on overdet_n12"
+}

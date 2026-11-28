@@ -1,0 +1,13 @@
+# Single-anchor scaling obstruction and the normalization requirement
+
+Let orbit variables Y∈F_ell^r represent the projected factor-base logarithms relative to public source D, and targetlog k satisfy T=kD. Fix one anchor R=aD+bT with b nonzero. Every residual decomposition of −R yields e_i·Y+b*k=−a. No independent source-normalization equation is assumed.
+
+For any solution(Y,k) and any s∈F_ell, define Y'=sY and k'=s*k+(s−1)*a/b. Then e_i·Y'+b*k'=s*(−a)+(s−1)*a=−a for EVERY row from this anchor. If a+b*k!=0, k' varies with s. Therefore however many decompositions are harvested, this isolated anchor's linear system cannot uniquely determine k. The exceptional case a+b*k=0 means the anchor has zero projection in the target subgroup; it must be handled separately and is not a general solver. Even s=0 provides the spurious formal solution Y'=0,k'=−a/b unless it coincides with the actualanswer. Source verification rejects that artifact; it does not manufacture missing rank.
+
+The coefficientrank/drop-targetrank criterion independently tests uniqueness for a consistent system: k is determined iff rank(A)>rank(A without targetcolumn). For a nonzero singleanchor and nootherconstraints these ranks must be equal. Homogeneous differences of decompositions cannot fix the logscale. Their rank is at most r−1 when the true Y is nonzero; relationyield is not normalization information.
+
+A valid independent source equation d·Y=1, derived from a PUBLIC fullysmooth Mumford representation of D, breaks the scaling symmetry because s must equal1. It is neither a supplied sourcepointindex nor a known factorbaselog table. This removes this specific obstruction, but does not guarantee enough rank. Alternatively two anchors with b1,b2 nonzero and distincta1/b1,a2/b2 force the same scalingparameter to1 if a commonrescaling preserves bothsystems. Again this does not provefullrank or10xspeedup.
+
+Algorithmic consequence: repeated pencils/automorphismtransforms of one nonzeroanchor cannot recover k through homogeneousorbitrows alone. A cheap, explicitlycharged publicsource normalization can permit singleanchor completion; otherwise distinctcoefficient anchors are necessary for that route. Reusing source equations across targets would be amortized/manytargetaccounting and cannot be hidden in a single-target claim.
+
+This is elementary linear-algebra analysis of classical pencil relations, not a novelty or general index-calculus lowerbound. It does not rule out methods with extra information or nonlinear verification/search. Qualification uses independent dense coefficient/augmented/drop-targetranks and native target-onlysolving, with publicsource decomposition positivecontrols.

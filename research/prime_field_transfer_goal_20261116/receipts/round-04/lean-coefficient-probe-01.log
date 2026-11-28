@@ -1,0 +1,19 @@
+/tmp/round04-coefficient-probe.lean:8:64: error: unsolved goals
+⊢ C (1 / 2) * 2 + C (1 / 2) * X * 2 = 1 + X
+/tmp/round04-coefficient-probe.lean:11:2: error: Tactic `decide` failed for proposition
+  C (1 / 2) * (2 * X + 2) = X + 1
+because its `Decidable` instance
+  instDecidableEq ℚ (C (1 / 2) * (2 * X + 2)) (X + 1)
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decidable_of_decidable_of_iff`, `decidable_of_iff`, `instDecidableAnd`, `Equiv.decidableEq`, `Finset.decidableEq`, `Finsupp.instDecidableEq`, `Multiset.decidableEq`, `instDecidableEq`, and `Function.Injective.decidableEq`, reduction got stuck at the `Decidable` instance
+  ⋯ ▸
+    (Quot.lift
+        (Quot.indep fun a =>
+          (fun a =>
+              Quot.recOnSubsingleton ((toFinsuppIso ℚ).toEquiv (X + 1)).support.val fun a_1 =>
+                (fun x x_1 => decidable_of_iff' (x ≈ x_1) ⋯) a a_1)
+            a)
+        ⋯ ((toFinsuppIso ℚ).toEquiv (C (1 / 2) * (2 * X + 2))).support.val).snd
+
+Hint: Reduction got stuck on `▸` (Eq.rec), which suggests that one of the `Decidable` instances is defined using tactics such as `rw` or `simp`. To avoid tactics, make use of functions such as `inferInstanceAs` or `decidable_of_decidable_of_iff` to alter a proposition.

@@ -1,0 +1,10 @@
+FIXTURE case=0 source_multiple=1 source=Div { u: Poly { c: [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], n: 3 }, v: Poly { c: [1, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], n: 2 } } target=Div { u: Poly { c: [14, 19, 5, 13, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], n: 5 }, v: Poly { c: [0, 24, 5, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], n: 4 } }
+RUN case=0 arm=0 answer=Some(122246) ns=735417
+SOURCE stop=10 slopes={26616}
+VERIFY source_slope=26616 source_witness=[2, 10] target_witness=[37, 38] candidates_checked=1 source_anchors=10 target_anchors=39 k=122246
+RUN case=0 arm=1 answer=Some(122246) ns=207671875
+FIXTURE case=1 source_multiple=17 source=Div { u: Poly { c: [20, 5, 28, 20, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], n: 5 }, v: Poly { c: [10, 17, 18, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], n: 4 } } target=Div { u: Poly { c: [27, 15, 18, 15, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], n: 5 }, v: Poly { c: [9, 28, 3, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], n: 4 } }
+SOURCE stop=48 slopes={212719}
+VERIFY source_slope=212719 source_witness=[38, 48] target_witness=[31, 152] candidates_checked=1 source_anchors=48 target_anchors=153 k=226885
+RUN case=1 arm=1 answer=Some(226885) ns=912224958
+RUN case=1 arm=0 answer=Some(226885) ns=1038417

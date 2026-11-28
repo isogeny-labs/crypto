@@ -1,0 +1,44 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R92-RANK32-RR-MULTIPLICATION",
+  "version": 1,
+  "goal": "test unit membership and all 528 unordered products of the accepted R50 rank-32 RR module",
+  "claims": [{"id":"rank32_ring_closure92","class":"exact_computation","statement":"the unit and all 528 basis products have polynomial coordinates with full PID products and corrupted-coordinate rejection"}],
+  "arms": {
+    "reference": "R50 PID basis and source embedding B*S=F I",
+    "candidate": "all products of actual normalized R50 generators in the accepted degree-32 source field",
+    "positive": ["unit membership", "528 reduced pair products", "528 reconstructed power vectors", "528 full module products", "16896 polynomial-coordinate checks"],
+    "negative": ["one corrupted coordinate per pair"],
+    "baseline": {"not_applicable_reason":"exact algebraic closure"},
+    "A_A": {"not_applicable_reason":"deterministic CAS computation"}
+  },
+  "variables": {
+    "fixed": ["F2 source field degree 32", "R50 rank-32 basis, denominator degree 37 and index 376", "all 528 unordered pairs", "one Singular/FLINT thread", "1200 seconds", "4 GiB virtual memory"],
+    "measured": ["source and donor hashes", "unit coordinates", "pair index and factors", "full products", "polynomial coefficients", "corruption rejections", "native exit/errors"],
+    "statistical": "not applicable"
+  },
+  "randomization": {"method":"fixed","reason":"exhaustive exact algebra","seeds":[92]},
+  "blinding": {"method":"none","reason":"exact algebra"},
+  "sample_size": {"instances":528,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics": ["unit membership", "528 pair products", "16896 polynomial coordinates", "528 corruption rejections", "complete certificate export"],
+  "execution": {
+    "launchers": ["REPLAY_CAS.sh multiply92-01 MULTIPLY92.sing MULTIPLY92_ALL_CHECKS_PASS"],
+    "backend":"authorized local Singular",
+    "backend_reason":"pinned native CAS continuation; digest-pinned EKS Singular image not yet available",
+    "timeout_seconds_per_program":1200,
+    "virtual_KiB_native":4194304,
+    "threads":1,
+    "seed":92,
+    "queue":"one serial exact-algebra job",
+    "source_gate":"committed Git bytes and SHA-256/byte-count donor manifest",
+    "checkpoint":"existing checkpoint gate and immutable raw copy"
+  },
+  "stopping": {
+    "accept":"exit 0, exact marker, zero native ? errors, unit and 528 pairs with full products and corruption controls, complete export and independent ideal-free replay",
+    "failure":"retain raw and freeze repair under a new attempt ID"
+  },
+  "analysis": {
+    "method":"F2(z) quotient-field multiplication and rank-32 PID embedding",
+    "scope":"ring closure of accepted inverse-base chart module; normality and proper boundary separate"
+  }
+}

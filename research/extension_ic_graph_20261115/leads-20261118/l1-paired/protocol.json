@@ -1,0 +1,337 @@
+{
+ "schema": "experiment.protocol/v1",
+ "protocol_id": "EXT-IC-GRAPH-L1-PAIRED-20261119",
+ "version": 1,
+ "created": "2026-11-19",
+ "repository": "crypto",
+ "study_dir": "research/extension_ic_graph_20261115/leads-20261118/l1-paired",
+ "authors": [
+  "Claude Opus 5.5 (l1-paired protocol lane; written before any data)"
+ ],
+ "pcc": "unverified",
+ "status_note": "Frozen by the commit that first adds this file at this path. No data existed when it was written. Runner: a separate session, run.sh only.",
+ "links": {
+  "human_readable": "PROTOCOL.md",
+  "prior": "../l1-steps-2-3/README.md",
+  "lead": "../scout-graph-ic/LEADS.md#L1",
+  "critic": "../CRITIC_ROUND2.md",
+  "generator": "../fresh-scaling/gen"
+ },
+ "question": "Does accepting (1^4,2), (1^2,2^2) and (2^3) descent solutions whose quadratic classes are in D_exact (graph anchors at the kernel checkpoint) raise the measured descent success rate by at least 1.5x the measured full-split rate, on fresh public p1009 targets?",
+ "claims": [
+  {
+   "id": "C1",
+   "class": "comparative",
+   "text": "rho = M/F pooled over the measured fresh targets, with its 95% envelope interval; verdict PROMOTE / KILL / INCONCLUSIVE / INVALID per decision_rule.",
+   "decided_by": [
+    "primary"
+   ]
+  },
+  {
+   "id": "C2",
+   "class": "exact computation",
+   "text": "Every counted row satisfies the group identity, anchor identity, kernel projection and elliptic replay [d]G = Q.",
+   "decided_by": [
+    "gates"
+   ]
+  }
+ ],
+ "hypotheses": {
+  "H1": "rho >= 1.5",
+  "H0": "rho < 1.5",
+  "kill_line_origin": "registered in ../scout-graph-ic/LEADS.md L1 step 3 before any data; unchanged"
+ },
+ "family": {
+  "curve": "jv_cover weak cover y^2 = x(x-alpha)(x-sigma alpha) over F_{q^3}, q = p^2",
+  "p": 1009,
+  "cofactor": 4,
+  "l_bound": "l < 2^62 (G-dom)",
+  "same_as": "Run50 public.json (passes the generator checker)"
+ },
+ "targets": {
+  "generator": "fresh-scaling-gen (../fresh-scaling/gen), scheme fresh-scaling/v1|family=jv-weak-cover-fp6, kind public",
+  "nonce_scheme": {
+   "command": "fresh-scaling-gen nonce --protocol-sha256 H --commit C --drand-round R --drand-randomness X",
+   "H": "sha256 of protocol.json at the freeze commit",
+   "C": "first commit adding protocol.json at study_dir",
+   "R": "first drand mainnet default-chain round (chain 8990e7a9aaed2ffed73dbd7092123d6f289930540d7651336225dc172e51b2ce, genesis 1595431050, period 30) with time >= committer time of C + 3600 s",
+   "X": "round randomness from api.drand.sh / api2.drand.sh / drand.cloudflare.com (round number checked)",
+   "fallback": "R = 0, X = tree id of C; disclosed as grindable; recorded as drand_source=fallback:freeze-tree"
+  },
+  "worker_seeds": {
+   "command": "fresh-scaling-gen seed --nonce NONCE --p 1009 --index i --role ROLE",
+   "roles": {
+    "l1p-collect": "collection seed = primary stream seed",
+    "l1p-aa-stream": "A/A stream seed",
+    "l1p-bootstrap": "index 0; analysis bootstrap seed"
+   }
+  },
+  "candidates": "indices 0.. in order, generated in batches (T+16, then +16), cap 160",
+  "admission": [
+   "fresh-scaling-gen check ok",
+   "check_unseen.py: not equal to and no shared (p, alpha) with any git-tracked *public*.json, both dry-run tarballs, or an earlier candidate",
+   "pipeline public transfer spec_from_curve succeeds (runner exit 10 = refused)"
+  ],
+  "measured_set": "first T admitted indices; collection-not-rank-ready (exit 11) counts toward T and contributes no rows",
+  "T": 96,
+  "planted_controls": {
+   "nonce": "fresh-scaling-gen pilot-nonce --protocol-sha256 H",
+   "indices": [
+    0,
+    1
+   ],
+   "kind": "planted"
+  }
+ },
+ "arms": [
+  {
+   "id": "A",
+   "role": "baseline",
+   "definition": "pipeline-materializer (1^6) decomposition, verify_dec, replay-verified"
+  },
+  {
+   "id": "B",
+   "role": "candidate",
+   "definition": "an arm A row or an L1 row (conditions of ../l1-steps-2-3/partial_match.rs plus group and anchor identities), replay-verified"
+  },
+  {
+   "id": "AA",
+   "role": "a_a_control",
+   "definition": "independent stream seed, same collection, first 24 targets"
+  }
+ ],
+ "pairing": "both arms counted on the same residuals, Weil systems and F_p-solutions of one stream per target",
+ "instrument": {
+  "binary": "l1_paired (l1_paired.rs) over the 11c9a031 deferred-pair modules and the Root41-equivalent fcda1e22 closure, assembled by ../l1-steps-2-3/build",
+  "pipeline_options": {
+   "b_count": 1018081,
+   "max_descent_residuals": 8192,
+   "max_accepted_descents": 32,
+   "max_split_records": 524288,
+   "max_deferred_edges": 262144,
+   "threads": 1,
+   "env": {
+    "JV_ADDS_INC": "1",
+    "JV_ADDS_SHARE": "1",
+    "JV_SIEVE_PROGRESS": "1"
+   }
+  },
+  "toolchain": "rustc/cargo 1.98.1, CARGO_INCREMENTAL=0, -j 1, --offline --locked --release",
+  "analysis": "l1p_analyze.rs (std only), rustc --edition 2021 -O -C overflow-checks=on",
+  "compile_check_before_freeze": {
+   "l1_paired_binary_sha256_informational": "f573585651d0fb5c0cda993a33c1743147ea2b97ba50e368c1485ec182b5e0d6",
+   "warnings": 0
+  }
+ },
+ "controls": {
+  "positive": [
+   {
+    "id": "PC1",
+    "what": "Run50 public.json, seeds 389/389, N 30000, PRIMARY_N 3415",
+    "pass": "compare_pc1.py: every Run50 / run50-control.json pipeline number, D_exact sha256 d72462239991e6214c3e3f39fa07fdcac5bddc764f9a5bfa24410203b5fe6480, rows file sha256 61ced7abac794a742722fe21409d52c9ccbeaf39ff9e8045669b9c4dc9d87cde, both tallies; F = 31 and M = 57 (47 + 10 + 0) all replayed; 57/57 flips refused"
+   },
+   {
+    "id": "PC2",
+    "what": "2 planted fresh targets",
+    "pass": "pipeline scalar = owner answer; every replayed candidate = owner answer; replay_fail_M = 0; all flips refused"
+   }
+  ],
+  "negative": [
+   {
+    "id": "NC",
+    "what": "every L1 row replayed with its first class's sign flipped",
+    "pass": "all flipped rows refused by the elliptic replay"
+   }
+  ],
+  "a_a": {
+   "id": "AA",
+   "targets": 24,
+   "pass": "99% intervals contain 1 for F_aa/F_p (conditional CP), M_aa/M_p (conditional CP), rho_aa/rho_p (log-Wald z 2.5758)"
+  },
+  "determinism": {
+   "id": "DC",
+   "pass": "first measured target run twice; target.tsv, dexact.jsonl, rows.primary.jsonl, accepted.primary.jsonl byte-identical"
+  }
+ },
+ "replay_checks_per_row": [
+  "group identity (verify_dec / R + sum P + sum D = 0)",
+  "anchor witness integer incidence and anchor identity sum small_i B_i + D_key = 0",
+  "affine row: target coefficient l - b, RHS a; L1 substitution c_i = e_i + sum_j coef_j small_{j,i}",
+  "kernel projection Quotient::project of the pipeline's certified quotient; pipeline projected rows reproduced",
+  "CountedRelationSystem two-column solve with partner; elliptic replay [d]G = Q",
+  "affine consistency with the pipeline's verified (kappa*, d*) (recorded)"
+ ],
+ "variable_ledger": {
+  "arm": "paired, same stream and binary",
+  "target": "nonce-derived fresh curves; cluster bootstrap",
+  "seeds": "derived per target and role",
+  "host_order_spot": "irrelevant to counts (deterministic; DC)",
+  "analyst": "frozen program",
+  "stopping": "fixed T, N; budget stop reads CPU only"
+ },
+ "randomization": {
+  "seed_derivation": {
+   "method": "nonce_after_freeze"
+  },
+  "instance_sampling": {
+   "rule": "first T admitted indices",
+   "independent_of_arm": true
+  },
+  "blinding": {
+   "note": "counts are produced by the runner and read only by the frozen analysis program; no adaptive inspection"
+  }
+ },
+ "sample_size": {
+  "T": 96,
+  "N_residuals_per_target": 4096,
+  "aa_targets": 24,
+  "min_successes_per_arm": 100,
+  "expected": {
+   "F": 406,
+   "F_conservative_rate_1_over_1400": 281,
+   "M_if_rho_1.84": 750,
+   "P_F_below_100": "< 1e-6"
+  },
+  "power_table": "power-design.csv (l1p_analyze power 1000 2000)",
+  "power_summary": {
+   "rho_1.84": {
+    "P_PROMOTE": 0.912
+   },
+   "rho_1.2": {
+    "P_KILL": 0.882
+   },
+   "rho_1.51": {
+    "P_PROMOTE": 0.024,
+    "P_KILL": 0.014
+   }
+  }
+ },
+ "budget": {
+  "hard_cpu_hours": 8,
+  "model_cpu_hours": 3.8,
+  "model_cpu_hours_if_collection_2x": 5.3,
+  "local_only": true,
+  "threads": 1,
+  "paid_compute": false,
+  "network": "drand fetch only"
+ },
+ "metrics": {
+  "primary": {
+   "id": "rho",
+   "definition": "sum M / sum F over measured targets (replay-verified rows)",
+   "interval": "outer envelope of Clopper-Pearson conditional binomial (M | M+F) and target-cluster percentile bootstrap B=20000, both 95%"
+  },
+  "secondary": [
+   "S_B/S_A residual-level gain with bootstrap",
+   "restricted mean residuals to first/second success per arm (censored at N)",
+   "class match rate f and random-sextic rho model",
+   "expected vs observed M by pattern given per-target f",
+   "F per solution vs 1/720"
+  ]
+ },
+ "decision_rule": {
+  "order": [
+   "KILL (correctness) if replay_fail_M > 0",
+   "INVALID if any validity gate fails",
+   "INVALID if A/A fails",
+   "INCONCLUSIVE (underpowered) if F < 100 or F + M < 100",
+   "PROMOTE if L >= 1.5 (tier clears-2.0-line if L >= 2.0)",
+   "KILL if U < 1.5",
+   "INCONCLUSIVE otherwise"
+  ],
+  "kill_line": 1.5,
+  "strong_line": 2.0,
+  "wording": "KILL refuses L1 as registered (>= 1.5x); the measured 1 + rho is always reported"
+ },
+ "gates": {
+  "zero": [
+   "group_bad",
+   "anchor_bad",
+   "anchor_replay_bad",
+   "replay_fail_F",
+   "affine_inconsistent"
+  ],
+  "one_per_target": [
+   "pipeline_rows_match",
+   "pipeline_consistency"
+  ],
+  "flips_refused_equals_total": true,
+  "max_unreplayable_share": 0.01,
+  "controls_pass": [
+   "pc1",
+   "pc2",
+   "dc",
+   "unseen"
+  ],
+  "reported_not_gated": [
+   "decs_vs_pattern_mismatch"
+  ]
+ },
+ "stopping_rules": [
+  "budget: before each target stop if spent + 1.5 x max target CPU > 8 h - 600 s; analyze completed targets with budget_truncated=1",
+  "PC1/PC2/DC failure: stop, no verdict, amendment required",
+  "runner exit other than 0/10/11: stop",
+  "no stop on F, M or rho"
+ ],
+ "invalidation_rules": [
+  "any change to a file in SOURCES.sha256 after the freeze without a prior amendment",
+  "a re-run under the same nonce after any data were seen, except the DC rerun",
+  "targets not derived from the frozen nonce scheme"
+ ],
+ "inadmissible": [
+  "model full-split rate n/720 as the decision denominator",
+  "combined descent-saving or cost figures (critic F6)",
+  "any timing claim from wall fields"
+ ],
+ "recording": {
+  "scratch": "$S: per-target pipeline summaries, dexact/rows/accepted jsonl.gz, logs; SHA-256 in $S/RAW.sha256",
+  "committed": "run.sh stages $S/commit/ (targets.tsv, aa.tsv, analysis.json, controls.kv, pc1.json, refused.tsv, publics.jsonl, nonce.txt, freeze.txt, cpu.tsv, build.log, RAW.sha256, COMMIT.sha256); each <= 64 KiB, larger split into .partNN"
+ },
+ "execution": {
+  "commands": [
+   "export S=<scratchpad>/l1-paired-run && mkdir -p $S",
+   "cd research/extension_ic_graph_20261115/leads-20261118/l1-paired",
+   "sha256sum -c SOURCES.sha256",
+   "bash run.sh"
+  ]
+ },
+ "sources_sha256": {
+  "l1_paired.rs": "4a7cafcdc5da5e6196f6fcec218c75f205b691f89d3ec47cbd7b5b42a16871bc",
+  "l1p_analyze.rs": "02fbe173b40ce704dbb1808661595123f7e74b3b5f8c3185eee8d85b5a31c6ff",
+  "run.sh": "65262ee993035d134be082d67b2bd694a646df9d36162bc4959ad002ccbce7e5",
+  "build/build.sh": "f90c1b6cd4093ba22fdb14c470998e1301aa7a0e9e7dc4fc20d4b6a6ef750773",
+  "build/Cargo.toml.in": "474b7f9e402327246e523e3659c6d1640dc109dda057433f71dce6ed4994c0bd",
+  "compare_pc1.py": "3f7a8d884810bba877137c2f1532abe47eaf69250ca75f33001d5210c7b8bcb5",
+  "check_unseen.py": "1e159effad9fb3e3992b72a40cd19d3f5193e942e99f9330adb388251f9acd4d",
+  "power-design.csv": "143be103aee600522939ba866455fa09f15847452cc099c5f03720378c1baf66",
+  "../l1-steps-2-3/ffield.rs": "756fbc6100e9bde25c8e266fd7ea9ba3eee28d367aec508a4d996dd2fc4d105d",
+  "../l1-steps-2-3/build/fetch.sh": "5944120c4b89ec781f6b8d2b7587fb02c2b49508f710ab4bef9e3495b7bef553",
+  "../l1-steps-2-3/build/assemble.py": "dd636759b3459f8f47edf48249507359dbc69b8f461911d6b4d57122ce62e4f1",
+  "../l1-steps-2-3/build/extract_helper.py": "771fd263648d626b8f3d4d454dca59b153508a049391d05c2f8aeace4482d7de",
+  "../l1-steps-2-3/build/Cargo.lock": "e971af3a65581e7c49a5c315bc2028eb98d57b987fcab9ed70f7e74c27ed5f89",
+  "../l1-steps-2-3/runs/run50-control.json": "f70ed5afc6463fd96066e89cae476ebd838aa037d583cb0e29f20961a9616a1d",
+  "../l1-steps-2-3/runs/match-n3415.summary.json": "8fe820f4d464ec2cf78b980addaaa5d54690984d90fcf732e1363c54751b68ff",
+  "../l1-steps-2-3/runs/match-n30000.summary.json": "221f868bad391a8353ad08c6fa686942542049fdebd65ecef6721285992c15ba",
+  "../l1-steps-2-3/runs/RAW.sha256": "c7671e52b15bfd0581a316cefc57b617bbb24a040f94b139ece22178aa760aad",
+  "../fresh-scaling/gen/src/curve.rs": "657aa0a0f3b11d7ff59559cd45d7e0fe53d2390a56407348d20dbf6f202143f6",
+  "../fresh-scaling/gen/src/field.rs": "d1139f5216f5dbfdbd29752ba16aa54fd7f2aa77c5c44da12d27dc1a995d547d",
+  "../fresh-scaling/gen/src/gen.rs": "e54e0f4692bcc2e15ec34d39fc70fe05f23d0d60b5eda1fe42ab213cf0b65389",
+  "../fresh-scaling/gen/src/json.rs": "2c003d606104937d1101bc80cd1814d5dae3aa80b882438afdb0e70a48a28e70",
+  "../fresh-scaling/gen/src/main.rs": "b2a1e0bca9baf4e4caa7f8900280c1ae483c9e80347d6dc4c7a087280b433d32",
+  "../fresh-scaling/gen/src/sha256.rs": "3ce19a92a24612b6c0060fa7f4510b677957d62d2bfa77a4d34ded5b56120052",
+  "../fresh-scaling/gen/Cargo.toml": "2e3a778c36b01cabd05cba6b59e280ce55e8e669ed58a4e980c4e3b3dbc84318",
+  "../fresh-scaling/gen/Cargo.lock": "857420fe07e8cafb7ed877b44e8dcc8173e6bdbf98eda46c424f43ffb2a2f74e",
+  "../../runpod-deferred-pair-20261117-50/public.json": "b3ae4f93974456bdd6a772caf7daa0208d64c17f7341f70ee4187d327fd6462e",
+  "../../nagao-e2e/library-overlay/jv_cover.rs": "efc554a4a7f7d8e84d06bf3860c7ef99a294721103a041b4a4dd314c30a60f17",
+  "../../validation/extension-pipeline-source.sha256": "a671577a1fa692deba5b9a2990155c8d355e2a97144f8d9513ca5072e0836a68",
+  "../../validation/deferred50-source.sha256": "5bba805017c884ce6708355fea8b4e98a197f642530d4003ac099b5fca424f5d"
+ },
+ "knowledge_base": "research-kb and ecdb not queried; no literature, novelty or curve-database claim is made.",
+ "amendments": [],
+ "freeze": {
+  "status": "frozen-by-first-commit",
+  "protocol_sha256": "computed by run.sh from the freeze commit",
+  "commit": "first commit adding this file",
+  "filed_before_affected_data": true
+ }
+}

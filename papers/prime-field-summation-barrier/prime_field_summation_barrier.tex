@@ -1,0 +1,711 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,booktabs,array,microtype,hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\F}{\mathbb F}
+\newcommand{\A}{\mathbb A}
+\newcommand{\cB}{\mathcal B}
+\newcommand{\cF}{\mathcal F}
+\newcommand{\cR}{\mathcal R}
+\newcommand{\OO}{\mathcal O}
+\newcommand{\softO}{\widetilde O}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\length}{\operatorname{length}}
+\newcommand{\im}{\operatorname{im}}
+
+\title{Prime-Field Summation-Polynomial Index Calculus:\\
+An Entropy--Degree Audit and a Conditional-Class Barrier}
+\author{Anonymous}
+\date{26 November 2026}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+\fbox{\parbox{0.92\linewidth}{\textbf{Research-draft status.}
+This manuscript is not peer reviewed and its new claims are
+\texttt{[pcc:unverified]}.  The barrier applies only to the explicitly defined
+candidate/collision and quotient-materializing classes.  It does not prove a % [pcc:unverified]
+lower bound for unrestricted arithmetic or rational circuits, or for ECDLP in
+general.}}
+\end{center}
+
+\begin{abstract}
+Let $E/\F_p$ be an ordinary, non-anomalous elliptic curve and let a prime-order
+subgroup $G\subseteq E(\F_p)$ have order $n=\Theta(p)$.  We audit index-calculus
+attacks that seek decompositions through Semaev polynomials with factor-base
+$x$-set $F\subseteq\F_p$, $|F|=N$.  The audit separates three statements which
+are often conflated.  First, the probability calculation is an exact averaging
+upper bound; the usual asymptotic equality is a distribution heuristic.
+Second, a finite faithful algebraic encoding of $F$ has scheme length at least
+$N$, even when all its equations are quadratic.  Consequently $m$ independent
+leaves have ambient quotient length at least $N^m$.  Third, this length is a
+lower bound for algorithms that materialize the quotient, a multiplication
+matrix, a Macaulay normal-form space, or all candidate sums, but it is not an
+unconditional arithmetic-circuit lower bound for every possible solver.
+
+For an explicitly defined class consisting of (i) generic candidate/collision
+search, and (ii) faithful quotient-materializing Macaulay/resultant elimination,
+we prove a square-root barrier.  In the stronger batched candidate model, for % [pcc:unverified]
+fixed $m$ the optimal relation-collection exponent is at least
+$m/(2m-1)>1/2$; as $m\to\infty$ it approaches $1/2$ from above.  We then audit
+intervals, small-height rational reconstruction, multiplicative cosets,
+cyclotomic and Dickson encodings, isogeny or torsion fibres, split $S_3$ trees,
+and multipoint batching.  None escapes the stated class barrier.  We explicitly
+identify the unproved escape hatch: a non-generic algorithm which exploits the
+arithmetic circuit of a summation polynomial on a compact, positive-variable
+encoding without enumerating or materializing its $N^m$ states.  Ruling that
+out unconditionally would go substantially beyond current generic-group and
+algebraic-elimination lower bounds.  Thus the result is a sharp barrier theorem
+for a broad, auditable class, not a claimed unconditional lower bound for the
+ECDLP itself.
+\end{abstract}
+
+\section{Setting and conventions}
+
+Let
+\[
+ E: y^2=x^3+Ax+B,\qquad 4A^3+27B^2\ne0,
+\]
+over $\F_p$, where $p>3$.  We work in a cyclic subgroup $G=\langle P\rangle$
+of prime order $n=\Theta(p)$ and are given $Q=qP$.  The qualifications
+``non-anomalous'' and ``non-supersingular'' exclude familiar special attacks;
+they do not by themselves imply a lower bound.
+
+The $r$th Semaev polynomial $S_r$ is symmetric, absolutely irreducible in the
+generic setting, and has degree $2^{r-2}$ in each coordinate.  In particular,
+the equation for $m$ factor-base points and a fixed target is
+\[
+ S_{m+1}(X_1,\ldots,X_m,x_0)=0,
+ \qquad \deg_{X_i}S_{m+1}=2^{m-1}.                 \tag{1}
+\]
+This corrects a common one-index shift: $2^{m-2}$ is the coordinate degree of
+$S_m$, not $S_{m+1}$.  Nothing below depends on the convention; one may retain
+the symbol $\delta_m=\deg_{X_i}S_{m+1}$.  A dense box treating the $m$
+coordinate degrees independently has size
+$\delta_m^m=2^{m(m-1)}$.  This is the source of the familiar
+$2^{\Theta(m^2)}$ resultant/Macaulay estimate; it is not, by itself, a lower
+bound for every possible solver.
+
+Semaev introduced the prime-field bounded-coordinate approach
+\cite{Semaev2004}; Gaudry and Diem developed the successful Weil-restriction
+setting over extension fields \cite{Gaudry2009,Diem2011}.  Prime-field
+algebraic encodings were studied by Petit--Kosters--Messeng
+\cite{PetitKostersMesseng2016} and Amadori--Pintore--Sala
+\cite{AmadoriPintoreSala2018}.  Existing lower-bound analyses for the naive
+method use additional statistical hypotheses on Gr\"obner-basis behaviour
+\cite{YokoyamaEtAl2020}.  Our claims below are deliberately different: they
+are unconditional for the explicitly defined materialization/collision class,
+and make no claim outside it.
+
+Let $F\subseteq\F_p$ have size $N=p^{\alpha+o(1)}$.  For each $x\in F$ for
+which $x^3+Ax+B$ is a square, choose either both points or a fixed sign.  Denote
+the resulting point factor base by $\cB$ and put $t=|\cB|=\Theta(N)$.  Constants
+of two and factors $m!$ never change a fixed-$m$ exponent, but we retain them
+when they explain a probability.
+
+\section{The exact cost and probability audit}
+
+\subsection{Success probability: what is exact and what is heuristic}
+
+Let $\Sigma_m$ be the set of admissible unordered multisets of $m$ factor-base
+points (including whatever sign convention the algorithm uses), and let
+\[
+ \sigma_m:\Sigma_m\longrightarrow G,\qquad
+ \{B_1,\ldots,B_m\}\longmapsto B_1+\cdots+B_m.
+\]
+For a uniformly random target $R=aP+bQ$, $R$ is exactly uniform in $G$ as soon
+as either $a$ or $b$ is uniform.  Therefore
+\[
+ P_{\rm rel}=\Pr[R\in\im(\sigma_m)]
+ =\frac{|\im(\sigma_m)|}{n}
+ \le \min\left\{1,\frac{|\Sigma_m|}{n}\right\}
+ \le \min\left\{1,\frac{\binom{t+m-1}{m}}{n}\right\}.               \tag{2}
+\]
+This is unconditional.  If repetitions are negligible and the sum map has
+nearly Poisson fibres, then
+\[
+ P_{\rm rel}\sim 1-\exp\left(-\frac{t^m}{m!n}\right)
+ \sim \frac{t^m}{m!n}\quad(t^m=o(n)),                               \tag{3}
+\]
+but both asymptotic equivalences are heuristics.  The barrier results below use
+only (2), or exact expectation over independently uniform targets.
+
+\subsection{The total cost equation}
+
+The often written expression $P_{\rm rel}^{-1}T_{\rm solve}+T_{\rm LA}$ is the
+cost of obtaining one successful target plus linear algebra; it omits the
+number of independent rows required.  Let
+\begin{itemize}
+ \item $M\ge t+1$ be the number of accepted rows (including oversampling),
+ \item $\rho\le1$ be the conditional probability that an accepted row raises
+       the rank,
+ \item $h\ge1$ be the expected number of usable rows returned by one successful
+       solve, and
+ \item $T_{\rm trial}$ include target generation, system construction, solving,
+       rationality filtering, and verification.
+\end{itemize}
+Then the auditable classical cost is
+\[
+ \boxed{\quad
+ T_{\rm total}=T_{\rm FB}+T_{\rm pre}
+ +\frac{M}{\rho hP_{\rm rel}}T_{\rm trial}
+ +T_{\rm LA}(t,M).\quad}                                             \tag{4}
+\]
+For a solver returning at most one row, $h=1$.  With a sparse $M\times t$
+matrix having $O(m)$ nonzeros per row, Wiedemann/Lanczos gives the standard
+upper estimate
+\[
+ T_{\rm LA}=\softO(mt^2)=p^{2\alpha+o(1)}                            \tag{5}
+\]
+field operations; dense elimination gives $O(t^\omega)$.  Equation (5) is an
+algorithmic cost model, not a proven lower bound for arbitrary structured
+linear algebra.  At least $t$ independent scalar unknowns must nevertheless be
+resolved in the traditional fixed-factor-base formulation.
+
+Using the heuristic sparse-fibre value (3), (4) becomes
+\[
+ T_{\rm rel}=p^{1-(m-1)\alpha+o(1)}T_{\rm trial}                    \tag{6}
+\]
+for $M=\Theta(N)$ and $h,\rho=p^{o(1)}$.  Thus a claimed exponent must include
+the exponent of $T_{\rm trial}$; setting it to $p^{o(1)}$ is exactly the
+unjustified step in most prime-field proposals.
+
+\section{Faithful encodings and the invariant that degree alone misses}
+
+\begin{definition}[Faithful finite encoding]
+A faithful finite encoding of $F$ is a zero-dimensional affine $\F_p$-scheme
+$Z\subseteq\A^k$, together with a rational map $\pi:Z\dashrightarrow\A^1$
+defined at all relevant rational points, such that $\pi(Z(\F_p))=F$.  Extension
+points and extra rational witnesses are permitted, so this definition is
+favourable to an attacker.  A solver is \emph{quotient-materializing} if it
+constructs a basis of $\F_p[Z]$, the product algebra $\F_p[Z]^{\otimes m}$, a
+multiplication matrix on it, or a Macaulay/resultant object containing an
+equivalent normal-form space.
+\end{definition}
+
+\begin{lemma}[Entropy--length lemma]\label{lem:length}
+Every faithful finite encoding satisfies
+\[
+ \deg Z=\length_{\overline{\F}_p}(Z)\ge |Z(\F_p)|\ge |F|=N.          \tag{7}
+\]
+For $m$ independently selected leaves,
+\[
+ \length(Z^m)=(\length Z)^m\ge N^m.                                 \tag{8}
+\]
+Consequently every quotient-materializing solver performs
+$\Omega(N^m)$ scalar writes or operations merely to materialize such a basis
+or matrix domain.
+\end{lemma}
+
+\begin{proof}
+The length of a zero-dimensional scheme over an algebraic closure is the sum
+of its local multiplicities and is at least its number of distinct rational
+points.  Surjectivity gives at least one rational witness for every element of
+$F$.  Length is multiplicative under products.  The last sentence follows
+from the definition of quotient-materializing.
+\end{proof}
+
+This lemma deliberately does \emph{not} say that one equation has degree $N$.
+For example, if $N=2^k<p$, the interval $\{0,\ldots,N-1\}$ has the quadratic
+encoding
+\[
+ b_j^2-b_j=0\ (0\le j<k),\qquad
+ x=\sum_{j=0}^{k-1}2^jb_j.                                          \tag{9}
+\]
+All equations have degree two, but the Boolean scheme has length $2^k=N$.
+For $m$ leaves its product quotient has the $N^m$ square-free monomials
+$\prod b_{ij}^{e_{ij}}$ as a basis.  A total-degree Macaulay construction can
+be still larger; a perfectly multigraded implementation reaches, but does not
+beat, this entropy dimension.  Circuit lifting can similarly replace any % [pcc:unverified]
+high-degree computation by quadratics while increasing the number of
+variables.  Hence maximum equation degree is not an invariant; scheme length
+and the relevant Hilbert function are.
+
+For a univariate exact encoding the familiar statement remains true.
+
+\begin{lemma}[Univariate and fibre degree]
+If a nonzero $g\in\F_p[X]$ vanishes on $F$, then $\deg g\ge N$.  If $F$ is
+contained in one fibre of a rational map $\phi:\mathbb P^1\dashrightarrow
+\mathbb P^1$ of degree $d$, away from poles, then $N\le d$.  More generally,
+the union of $r$ fibres has at most $rd$ geometric points counted without
+multiplicity.
+\end{lemma}
+
+\begin{proof}
+The first assertion is the root bound.  A fibre of a degree-$d$ map has scheme
+length $d$; taking a union gives the last assertion.
+\end{proof}
+
+Thus $X^p-X$ contributes degree $p$ and does not help.  Replacing it by
+$g_F(X)=\prod_{a\in F}(X-a)$ contributes degree $N$.  Multiple bounded-degree
+variables can reduce individual degrees, as (9) shows, but cannot reduce the
+finite scheme length.
+
+\section{A precise barrier class}
+
+No unconditional $p^{1/2-o(1)}$ lower bound is known for arbitrary algorithms
+using the coordinates of a general elliptic curve.  Such a result would be a
+major ECDLP lower bound.  We therefore state exactly the class covered.
+
+\begin{definition}[Audited prime-field summation class $\mathsf{APS}$]
+An attack is in $\mathsf{APS}$ if it uses a fixed factor base of size
+$t=\Theta(N)$ and every relation-finding stage is a composition of the
+following operations.
+\begin{enumerate}
+ \item A faithful finite encoding of each factor-base leaf, with direct
+       $S_{m+1}$, a split addition tree, or any bounded-fibre algebraic
+       correspondence whose exceptional components are saturated away.
+ \item Either (E) explicit generation/materialization of candidate group sums
+       and target group elements followed by equality, hashing, sorting, or
+       multipoint comparison; or (Q) quotient-materializing Macaulay,
+       resultant, multiplication-matrix, or normal-form elimination as in
+       Lemma~\ref{lem:length}.
+ \item Precomputation is charged once, target batching is allowed, and every
+       generated relation and every output coefficient is charged.  Generic
+       group operations may be arranged arbitrarily.
+\end{enumerate}
+Algorithms that exploit a special coordinate circuit without materializing
+candidate states or the finite quotient are, intentionally, outside the
+class.  This boundary is necessary rather than cosmetic.
+\end{definition}
+
+\subsection{The batched collision theorem}
+
+Suppose a batch materializes $D$ distinct unordered candidate tuples, each
+carrying its group sum, and $B$ distinct, uniform target elements (their
+coefficients in $P,Q$ are retained).  Candidate sums may coincide: candidate
+tuples are counted with multiplicity precisely so that several decompositions
+of one group element are not lost.  Conditional on the tuples, the exact
+expected number of candidate-tuple--target matches is at most $DB/n$.
+Target--target collisions can directly solve the DLP, but in the generic group
+model they already require square-root work and do not create an exception.
+
+\begin{theorem}[Batched candidate barrier]\label{thm:batch}
+In mode (E), collecting $N$ candidate--target matches has expected materialized
+work
+\[
+ C\ge 2\sqrt{Nn}=p^{(1+\alpha)/2+o(1)}.                              \tag{10}
+\]
+If at most
+\[
+ K\le\binom{t+m-1}{m}=p^{m\alpha+o(1)}                              \tag{11}
+\]
+different unordered $m$-leaf candidates exist, the sharper exponent is
+\[
+ c_m(\alpha)=
+ \begin{cases}
+ 1-(m-1)\alpha,& \alpha<1/(2m-1),\\[2mm]
+ (1+\alpha)/2,& \alpha\ge1/(2m-1).
+ \end{cases}                                                        \tag{12}
+\]
+For fixed $m$, optimizing the factor-base exponent gives
+\[
+ \min_{\alpha\ge0}c_m(\alpha)=\frac{m}{2m-1}>\frac12,\qquad
+ \alpha_{\rm opt}=\frac1{2m-1}.                                   \tag{13}
+\]
+The bound tends to $1/2$ from above as $m\to\infty$.
+\end{theorem}
+
+\begin{proof}
+For batches indexed by $j$, exact averaging gives at most
+$\sum_jD_jB_j/n$ expected matches.  If
+$C=\sum_j(D_j+B_j)$, then
+$\sum_jD_jB_j\le C^2/4$ (concentrating the budget in one balanced batch only
+increases the product).  Requiring expected output $N$ yields (10).
+
+In one optimal batch one must have $DB\ge Nn$ and $D\le K$.  If
+$K\ge\sqrt{Nn}$, the balanced choice has cost exponent $(1+\alpha)/2$.  If
+$K<\sqrt{Nn}$, the best possible choice $D=K$, $B=Nn/K$ is dominated by
+$B=p^{1-(m-1)\alpha+o(1)}$.  The boundary is
+$m\alpha=(1+\alpha)/2$, namely $\alpha=1/(2m-1)$; both branches there equal
+$m/(2m-1)$.
+\end{proof}
+
+This theorem already grants arbitrary batching and shared evaluation.  It is
+therefore stronger than analysing one target at a time.  It is also compatible
+with the Nechaev--Shoup generic-group lower bound: an entirely generic ECDLP
+algorithm needs $\Omega(\sqrt n)$ group operations.  The extra factor
+$N^{1/2}$ in (10) comes from demanding $N$ traditional factor-base rows.
+
+\begin{theorem}[Barrier for $\mathsf{APS}$]\label{thm:main}
+Let $n=\Theta(p)$ and $N=p^{\alpha+o(1)}$.
+\begin{enumerate}
+ \item Every mode-(E) attack has relation-collection exponent at least
+       $c_m(\alpha)$ in (12), and at least $m/(2m-1)>1/2$ after optimizing
+       $\alpha$ for fixed $m$.
+ \item Every mode-(Q) attack materializing the independent-leaf quotient has
+       an ambient algebraic state space of dimension at least $N^m$.  A fresh
+       per-target elimination is already that expensive.  Even granting a
+       reusable table/eliminant and constant-time query and recovery, its cost
+       plus the number of random target queries needed for $N$ rows is at least
+       \[
+          N^m+\frac{Nn}{N^m}
+          =p^{m\alpha+o(1)}+p^{1-(m-1)\alpha+o(1)},
+       \]
+       whose optimized exponent is $m/(2m-1)$.  Splitting, quadratic circuit
+       lifting, sparsity of the leaf equations, and variable changes do not
+       alter this length.
+ \item Allowing $m\to\infty$ can make the mode-(E) exponent
+       $1/2+o(1)$ but never $1/2-\eps$.  Factors $m!$, torsion symmetries, and
+       bounded-degree correspondences only change the $p^{o(1)}$ term when
+       $m=p^{o(1)}$ and the multiset count is used exactly.
+\end{enumerate}
+Hence no attack in $\mathsf{APS}$ has total cost $p^{1/2-\eps}$ for fixed
+$\eps>0$.  In particular it has no $L_p[1,c]$ complexity with $c<1/2$.
+\end{theorem}
+
+\begin{proof}
+Part 1 is Theorem~\ref{thm:batch}; adding factor-base construction and linear
+algebra cannot lower a cost.  For Part 2, Lemma~\ref{lem:length} charges the
+materialized quotient.  Equation (2) bounds success by $N^m/n$ up to
+$p^{o(1)}$ symmetry factors, so even free post-precomputation queries require
+at least $Nn/N^m$ trials for $N$ rows.  Balancing the two terms gives
+$m\alpha=1-(m-1)\alpha$, hence $\alpha=1/(2m-1)$ and exponent
+$m/(2m-1)$.  Part 3 follows from the same exponent.  The final claim follows by
+taking the minimum over the two permitted modes, with a direct generic
+target--target collision covered by the $\Omega(\sqrt n)$ bound
+\cite{Shoup1997}.
+\end{proof}
+
+The theorem is unconditional \emph{inside its stated computational class}.
+It is not a lower bound for a solver outside that class, and it does not use a
+semi-regularity or first-fall-degree assumption.
+
+\section{Audit of the proposed structural instruments}
+
+\subsection{Direct substitution and lifting}
+
+Let $x=\phi(u_1,\ldots,u_k)$ be a polynomial map of degree $d$.  Direct
+substitution changes the coordinate degree $\delta_m$ of (1) to at most
+$d\delta_m$ in the corresponding parameter block (and generically attains
+that product).  A rational map $x=a(u)/b(u)$ has the same effect after clearing
+denominators.  Introducing $x$ and the equation $b(u)x-a(u)=0$ avoids this
+syntactic multiplication, but it does not change the finite-domain length.
+If the parameters range over finite sets $U_j$, exact algebraic constraints
+have product-scheme length $\prod_j|U_j|$, at least $N$ divided by the maximal
+fibre size of $\phi$.  Thus substitution pays in degree; faithful lifting pays
+in variables and quotient length.
+
+If the $u_j$ range freely over $\F_p$, the equations $u_j^p-u_j$ have degree
+$p$, and a nonconstant bounded-degree map normally has an image of order $p$,
+not $p^\alpha$.  If the parameter variety is left positive-dimensional over
+$\overline{\F}_p$, it is not a finite factor base.  Solving over the algebraic
+closure then admits extension-field points which must be rejected; imposing
+$\F_p$-rationality restores the degree-$p$ field equations or an equivalent
+finite encoding.
+
+\subsection{Integer intervals and Boolean encodings}
+
+For $F=\{0,\ldots,N-1\}$, the univariate vanishing polynomial has degree $N$.
+Substitution by an integer parameter does not make ``smallness'' algebraic:
+without a range constraint one solves over all of $\F_p$.  The Boolean encoding % [pcc:unverified]
+(9) is the best response to this objection: it has $k=\lceil\log_2N\rceil$
+quadratic constraints and a linear map to $x$.  It genuinely decouples maximum
+equation degree from density.
+
+However, for $m$ leaves the Boolean quotient has dimension $2^{km}\ge N^m$.
+Branching enumerates those states, a meet-in-the-middle is a candidate method,
+and full Macaulay/normal-form elimination materializes the quotient.  All fall
+under Theorem~\ref{thm:main}.  A new solver exploiting the particular circuit
+$S_{m+1}(\sum2^jb_{1j},\ldots,x_0)$ without doing any of these things is outside
+the theorem and is the clearest remaining research target.  No regularity
+claim about that Boolean system is made here.
+
+\subsection{Small-height rational reconstruction}
+
+Take
+\[
+ x=u/v\pmod p,\qquad 1\le |u|,|v|\le L,\quad v\ne0.               \tag{14}
+\]
+For $L^2<p/2$, congruent reduced fractions are equal over the integers, and the
+number of distinct ratios is $\Theta(L^2)$ (up to the usual coprimality
+constant).  Thus $N=\Theta(L^2)$.  Exact interval constraints for $u$ and $v$
+have length $\Theta(L^2)$ per leaf.  After clearing denominators, the Semaev
+equation need not have degree $L$, but the product quotient has length
+$L^{2m}=\Theta(N^m)$.  Bit-decomposing $u,v$ merely converts this to the Boolean
+case.  If $L\ge p^{1/2}$, modular collisions become abundant and the image is
+already a positive fraction of $\F_p$, so it is not a small factor base.
+
+\subsection{Multiplicative subgroups, cosets, cyclotomic and Dickson sets}
+
+If $H\le\F_p^*$ has order $N$, a coset is cut out by the sparse polynomial
+$X^N-c$.  Sparsity makes membership testing fast, but its zero-dimensional
+coordinate algebra still has dimension $N$; $m$ copies have dimension $N^m$.
+An FFT over $H^m$ evaluates all states in essentially $N^m$ time, while partial
+sum tables are mode (E).
+
+There is no hidden algebraic homomorphism converting multiplicative convolution
+to addition on a general elliptic curve.  Indeed a rational map
+$\mathbb G_m\dashrightarrow E$ extends, because $E$ is proper, to a morphism
+$\mathbb P^1\to E$, and Riemann--Hurwitz forces it to be constant.  The same is
+true for $\mathbb G_a$.  Over the prime field, moreover, the only additive
+subgroups of $(\F_p,+)$ are $\{0\}$ and $\F_p$.  Cyclotomic and Dickson
+polynomials can compress the description or expose a $\mathbb G_m$ quotient;
+they do not supply the missing homomorphism.  Their root count is still bounded
+by degree and their faithful finite scheme still has length at least $N$.
+
+This does not prove that every sparse-polynomial algorithm is slow.  It proves % [pcc:unverified]
+that sparse membership alone supplies no entropy reduction; a successful
+algorithm would have to exploit a further, non-generic interaction with the
+elliptic addition circuit.
+
+\subsection{Torsion shifts, isogenies, and modular correspondences}
+
+Translation by a fixed torsion point and symmetrization can reduce constants,
+monomial counts, or a finite symmetry factor.  A fixed-degree isogeny
+$\psi:E'\to E$ is a group homomorphism, but a fibre has length $\deg\psi$.
+Obtaining $N$ factor-base elements from $r$ selected fibres requires
+$r\deg\psi\ge N$.  If the isogeny degree grows like $N$, its rational maps and
+division polynomials carry the same growing degree; if it is bounded, the
+entropy remains in the number of selected fibres.  A bounded-bidegree
+correspondence has the identical fibre-degree obstruction.  Exceptional curves
+with special endomorphisms are outside the stated ``general curve'' target and
+must be analysed separately; bounded automorphism groups only change constants.
+
+\subsection{Split trees of S3 equations}
+
+For reference,
+\begin{align*}
+S_3(X_1,X_2,Z)={}&(X_1-X_2)^2Z^2
+-2\big((X_1+X_2)(X_1X_2+A)+2B\big)Z\\
+&+(X_1X_2-A)^2-4B(X_1+X_2),
+\end{align*}
+which is quadratic in each variable.  A chain or balanced tree replaces (1)
+by $m-1$ copies of $S_3$ and $m-2$ internal $x$-variables (with the fixed target
+at the root).  Before factor constraints, it has
+\[
+ 2m-2\text{ variables},\quad m-1\text{ equations},\quad
+ \dim=m-1,                                                         \tag{15}
+\]
+the same dimension as one equation in the $m$ leaf variables.  The lift has
+distributed the eliminant degree; it has not made the leaf choices finite.
+
+After attaching faithful leaf encodings, the ambient leaf algebra still has
+length at least $N^m$.  For each nonsingular leaf tuple the internal variables
+have only $2^{O(m)}$ sign witnesses.  Saturating addition denominators and the
+vertical/2-torsion exceptional loci removes parasitic components but cannot
+reduce leaf entropy.  Conversely, failing to saturate can only add spurious
+components and optimistic timings.
+
+There is a rationality subtlety.  $S_r=0$ characterizes points over
+$\overline{\F}_p$.  Leaf $x$-coordinates must first be certified to lift to
+$E(\F_p)$, and internal roots returned in extensions must be rejected unless
+one uses explicit rational addition variables.  Adding $Z^p-Z$ certifies an
+internal $x$ but reintroduces degree $p$.  This filtering never raises the
+success probability and therefore cannot improve an exponent. % [pcc:unverified]
+
+\subsection{Target batching and multipoint resultants}
+
+Suppose $D$ leaf tuples are evaluated once and compared with $B$ targets.
+Multipoint evaluation, hashing, and product trees can reduce logarithmic
+factors, but exact averaging still gives at most $DB/n$ expected matches.
+Theorem~\ref{thm:batch} already optimizes $D+B$ subject to producing $N$
+matches.  An alleged sublinear-in-$B$ batch solver must at least avoid
+materializing its $B$ target coefficients or its outputs; if it produces
+$\Theta(B)$ distinct rows, output size alone is $\Omega(B)$.
+
+On the elimination side, the norm/resultant of the relation function over
+$Z^m$ is a determinant on an algebra of dimension at least $N^m$.  Fast
+multipoint evaluation amortizes evaluating a precomputed eliminant but does not
+make that eliminant free.  A method that represents and interrogates this norm
+by a smaller special-purpose circuit without materialization is, again, the
+explicitly open escape hatch rather than an audited speedup. % [pcc:unverified]
+
+\section{Macaulay, Hilbert, and zero-dimensionality audit}
+
+For a box encoding with variables $u_1,\ldots,u_k$ and constraints
+$g_j(u_j)=0$, $\deg g_j=L_j$, the pre-relation quotient has the normal monomial
+basis
+\[
+ u_1^{e_1}\cdots u_k^{e_k},\qquad 0\le e_j<L_j,                    \tag{16}
+\]
+of size $\prod_jL_j$.  Across $m$ leaves the multigraded Hilbert function
+therefore stabilizes at $(\prod_jL_j)^m\ge N^m$.  A dense total-degree Macaulay
+matrix at degree $D$ has
+\[
+ \binom{r+D}{r}                                                     \tag{17}
+\]
+columns for $r$ variables, often much larger than the multigraded bound.  We do
+not assert a semi-regular formula for the degree of regularity: split Semaev
+systems are special, and first-fall degree is not a proved proxy for regularity. % [pcc:unverified]
+
+The same invariant appears in classical elimination.  Let $A$ be the product
+coordinate algebra of the $m$ leaf encodings and let
+$d_A=\dim_{\F_p}A\ge N^m$.  For a target-dependent relation polynomial $f_T$,
+the norm eliminant is
+\[
+ \operatorname{Norm}_{A/\F_p}(f_T)=\det(m_{f_T}),                  \tag{18}
+\]
+where $m_{f_T}$ is a $d_A\times d_A$ multiplication matrix.  A Macaulay or
+resultant implementation that constructs this normal-form action therefore
+has at least $d_A$ independent basis columns (usually many more before
+reduction).  A special-purpose circuit representing and querying the same norm
+without materializing this space is outside mode (Q), exactly as required by
+the stated boundary of the theorem.
+
+A proposed system must pass all of the following tests.
+\begin{enumerate}
+ \item \textbf{Dimension.}  Without finite leaf constraints, the direct or
+ split relation variety has dimension $m-1$.  A positive-dimensional solver
+ output is not a factor-base decomposition algorithm.
+ \item \textbf{Rationality.}  Solutions over $\overline{\F}_p$ are not
+ automatically in $\F_p$.  Field equations, certified parameter domains, or
+ post-verification must be charged.
+ \item \textbf{Saturation.}  Denominators, vertical additions, repeated leaves,
+ and torsion exceptional loci must be saturated or handled separately.
+ \item \textbf{Symmetry.}  Permuting $m$ leaves gives at most an $m!$ factor.
+ Quotienting this symmetry changes fixed-$m$ constants, not the exponent.
+ \item \textbf{Rank.}  Counting polynomial zeros is not counting independent
+ relation rows.  The factors $\rho$ and $h$ in (4) must be measured or bounded.
+\end{enumerate}
+
+\section{Small-parameter sanity checks}
+
+Take first the common constant-success choice $N=p^{1/m+o(1)}$.  Then
+$N^m\asymp p$, so (3) predicts constant success, but a quotient-materializing
+solver already sees $p^{1+o(1)}$ ambient states.  The strongest explicit
+candidate batching lower bound is $p^{(m+1)/(2m)+o(1)}$.  If $N$ is optimized
+instead, Theorem~\ref{thm:batch} gives $N=p^{1/(2m-1)}$ and exponent
+$m/(2m-1)$.
+
+\begin{center}
+\small
+\begin{tabular}{c c c c c c}
+\toprule
+$m$ & polynomial & coordinate degree & constant-success $\alpha$
+& batched exponent & optimized exponent\\
+\midrule
+3 & $S_4$ & $4$ & $1/3$ & $2/3$ & $3/5$\\
+4 & $S_5$ & $8$ & $1/4$ & $5/8$ & $4/7$\\
+5 & $S_6$ & $16$& $1/5$ & $3/5$ & $5/9$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+For $m=3$, a split target equation uses two $S_3$ nodes and one internal
+variable.  With $N=p^{1/3}$, its leaf quotient has length $N^3=p$; explicit
+batching needs at least $p^{2/3}$ work.  Optimizing at $N=p^{1/5}$ balances
+$D=N^3$ candidates and $B=p/N^2$ targets, both $p^{3/5}$.
+
+For $m=4$, a balanced target tree may use
+\[
+ S_3(x_1,x_2,z_1)=S_3(x_3,x_4,z_2)=S_3(z_1,z_2,x_0)=0.
+\]
+It has six variables and three equations before leaf constraints, hence
+dimension three.  At $N=p^{1/4}$ the quotient length is $p$ and the candidate
+bound is $p^{5/8}$.  The optimized choice $N=p^{1/7}$ gives $p^{4/7}$.
+
+For $m=5$, any chain or balanced tree has eight variables and four $S_3$
+equations before constraints, hence dimension four.  At $N=p^{1/5}$ the
+candidate bound is $p^{3/5}$; optimizing at $N=p^{1/9}$ gives $p^{5/9}$.
+In every row the sparse-linear-algebra estimate $p^{2\alpha}$ is below the
+optimized collection exponent, so it does not rescue or invalidate the
+barrier.
+
+\section{What has and has not been proved} % [pcc:unverified]
+
+The following conclusions require no regularity heuristic.
+\begin{enumerate}
+ \item The exact average success upper bound is (2), and the complete cost is
+       (4), not a one-relation expression.
+ \item Every faithful finite algebraic encoding has length at least $N$ per
+       leaf.  Low individual degree is possible only by paying in variables;
+       the $m$-leaf product length remains at least $N^m$.
+ \item Split trees preserve the positive dimension before leaf constraints and
+       preserve leaf entropy afterwards.
+ \item Explicit candidate generation, even with arbitrary target batching,
+       has fixed-$m$ optimum exponent $m/(2m-1)>1/2$.
+ \item Intervals, rational reconstruction, subgroup/cyclotomic/Dickson sets,
+       bounded-degree fibres, torsion symmetries, and multipoint evaluation do
+       not escape these invariants.
+\end{enumerate}
+
+What is \emph{not} proved is that every arithmetic circuit solving a faithfully % [pcc:unverified]
+encoded summation system must enumerate candidates or materialize the quotient.
+Proving such a statement would require new lower bounds for a highly structured
+family of finite-field polynomial systems and, if made broad enough, would
+subsume a non-generic ECDLP lower bound.  Likewise, no claim is made that a
+first-fall degree equals a degree of regularity, or that Semaev restrictions
+behave as random Boolean functions.
+
+Accordingly, the answer to the successor target is (B), with an explicit class:
+there is a sharp $p^{1/2}$ barrier for generic candidate/collision attacks and
+faithful quotient-materializing algebraic elimination, and every proposed
+mechanism in the question falls into that class unless it supplies a genuinely
+new non-materializing circuit algorithm.  The most concrete research problem
+left open is therefore:
+\begin{quote}
+Given the Boolean or small-height circuit encoding of $F$, can one solve the
+one-parameter family of restricted $S_{m+1}$ equations in
+$p^{1/2-\eps}$ total time without enumerating candidate sums, materializing a
+$N^m$ quotient, or using an unproved regularity assumption?
+\end{quote}
+No presently justified mechanism in the audited families does so.
+
+\begin{thebibliography}{99}
+\bibitem{Semaev2004}
+I. Semaev,
+\emph{Summation polynomials and the discrete logarithm problem on elliptic curves},
+IACR ePrint 2004/031, 2004.
+\url{https://eprint.iacr.org/2004/031}
+
+\bibitem{Diem2011}
+C. Diem,
+\emph{On the discrete logarithm problem in elliptic curves},
+Compositio Mathematica 147 (2011), 75--104.
+\url{https://doi.org/10.1112/S0010437X10005075}
+
+\bibitem{Gaudry2009}
+P. Gaudry,
+\emph{Index calculus for abelian varieties of small dimension and the elliptic
+curve discrete logarithm problem},
+Journal of Symbolic Computation 44 (2009), 1690--1702.
+\url{https://doi.org/10.1016/j.jsc.2008.08.005}
+
+\bibitem{PetitKostersMesseng2016}
+C. Petit, M. Kosters, and A. Messeng,
+\emph{Algebraic approaches for the elliptic curve discrete logarithm problem
+over prime fields}, PKC 2016, LNCS 9615, 3--18.
+\url{https://doi.org/10.1007/978-3-662-49387-8_1}
+
+\bibitem{AmadoriPintoreSala2018}
+A. Amadori, F. Pintore, and M. Sala,
+\emph{On the discrete logarithm problem for prime-field elliptic curves},
+Finite Fields and Their Applications 51 (2018), 168--182.
+\url{https://doi.org/10.1016/j.ffa.2018.01.009}
+
+\bibitem{YokoyamaEtAl2020}
+K. Yokoyama, M. Yasuda, Y. Takahashi, and J. Kogure,
+\emph{Complexity bounds on Semaev's naive index calculus method for ECDLP},
+Journal of Mathematical Cryptology 14 (2020), 460--485.
+\url{https://doi.org/10.1515/jmc-2019-0029}
+
+\bibitem{HuangKostersYeo2015}
+M.-D. A. Huang, M. Kosters, and S. L. Yeo,
+\emph{Notes on summation polynomials}, arXiv:1503.08001.
+\url{https://arxiv.org/abs/1503.08001}
+
+\bibitem{Shoup1997}
+V. Shoup,
+\emph{Lower bounds for discrete logarithms and related problems},
+EUROCRYPT 1997, LNCS 1233, 256--266.
+\url{https://www.shoup.net/papers/dlbounds1.pdf}
+
+\bibitem{FaugereEtAl2014}
+J.-C. Faug\`ere, L. Huot, A. Joux, G. Renault, and V. Vitse,
+\emph{Symmetrized summation polynomials: using small order torsion points to
+speed up elliptic curve index calculus}, EUROCRYPT 2014, LNCS 8441, 40--57.
+\url{https://www.iacr.org/archive/eurocrypt2014/84410158/84410158.pdf}
+\end{thebibliography}
+
+\end{document}

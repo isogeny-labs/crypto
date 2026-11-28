@@ -1,0 +1,158 @@
+{
+  "schema": "prime31-specialized-incumbent-upstream/v1",
+  "repository": "isogeny-labs/cryptanalysis",
+  "upstream_revision": "457ae1818aaf8134bd833ad9c1b9d57015264510",
+  "scope": "Exact specialized prime-batch oracle source snapshots; build and execution qualification are separate.",
+  "snapshots": [
+    {
+      "path": "research/prime31_aux_matched_20261122/fiber-domain-followup/upstream/cryptanalysis_ic_boundary.rs",
+      "upstream_path": "suite/src/cryptanalysis/ic_boundary.rs",
+      "git_blob": "ceb34fe324d4c1f3df17e2adc3e44b35dbd68502",
+      "sha256": "ab7e23ff6891a1bbd8ae90566b2e36720caaec4c7c27ec773798d1f3d1b9170c",
+      "bytes": 378140,
+      "rewritten": false
+    },
+    {
+      "path": "research/prime31_aux_matched_20261122/fiber-domain-followup/upstream/cryptanalysis_prime_batch.rs",
+      "upstream_path": "suite/src/cryptanalysis/ic_boundary/prime_batch.rs",
+      "git_blob": "319ead436ba8fc4a9873a83d2d7f6d1ab2db1a65",
+      "sha256": "fd85c1a9f9afb2bbe76830e2082d89d8aa0f933830532fffe95521fbbccb6921",
+      "bytes": 26825,
+      "rewritten": false
+    },
+    {
+      "path": "research/prime31_aux_matched_20261122/fiber-domain-followup/upstream/cryptanalysis_stages.rs",
+      "upstream_path": "suite/src/cryptanalysis/ic_framework/stages.rs",
+      "git_blob": "2e68ce715a21070488b471617426fc7cdd6fb952",
+      "sha256": "a6f822427ad9979747221d989c5f859d75019c51fcab89a22ee9963d633f4dc4",
+      "bytes": 21522,
+      "rewritten": false
+    },
+    {
+      "path": "research/prime31_aux_matched_20261122/fiber-domain-followup/upstream/cryptanalysis_prime_batch_mitm.rs",
+      "upstream_path": "suite/src/cryptanalysis/ic_framework/prime_batch_mitm.rs",
+      "git_blob": "b77edb2569cf0bdde83f0456434d559ea84460fd",
+      "sha256": "a678809e8e0c7bdb0637aa878e7efc29d66b305d64c838808d89d1354e7645ef",
+      "bytes": 14491,
+      "rewritten": false
+    }
+  ],
+  "selections": [
+    {
+      "path": "research/prime31_aux_matched_20261122/fiber-domain-followup/upstream/cryptanalysis_ic_boundary.rs",
+      "generated_name": "ic_boundary.rs",
+      "ranges": [
+        {
+          "start_anchor": "/// Exact group-operation ledger.",
+          "end_anchor": "/// Nanoseconds per native unit, measured on the host for the instance at",
+          "scope": "complete native group-operation ledger"
+        },
+        {
+          "start_anchor": "/// Cost of one phase: what it did (exact), what it took (wall) and what",
+          "end_anchor": "/// One variant of one regime on one instance, priced end to end.",
+          "scope": "complete PhaseCost"
+        },
+        {
+          "start_anchor": "// ── A fast hasher for point keys",
+          "end_anchor": "// ── Incremental Gauss–Jordan over Z/rZ",
+          "scope": "complete native hasher and word modular arithmetic"
+        },
+        {
+          "start_anchor": "pub trait CountedGroup {",
+          "end_anchor": "    /// One counted addition per pair, with a complete scalar default.",
+          "scope": "CountedGroup opening and primitive operations; unrelated pairwise defaults omitted"
+        },
+        {
+          "start_anchor": "    fn double(&self, ops: &mut GroupOps, p: Self::Elt) -> Self::Elt;",
+          "end_anchor": "fn mix(v: u64) -> u64 {",
+          "scope": "remaining essential CountedGroup methods and original closing brace"
+        },
+        {
+          "start_anchor": "// ── Prime-field curves on one word",
+          "end_anchor": "    /// One counted addition per pair; the lanes share one inversion",
+          "scope": "complete PrimePoint, PrimeCurve inherent arithmetic, order helpers and CountedGroup implementation opening"
+        },
+        {
+          "start_anchor": "    fn double(&self, ops: &mut GroupOps, p: PrimePoint) -> PrimePoint {",
+          "end_anchor": "/// A prime-field instance: curve, prime-order subgroup, generator.",
+          "scope": "remaining native PrimeCurve CountedGroup methods and original closing brace; unused pairwise override omitted"
+        },
+        {
+          "start_anchor": "/// A materialised factor base with its column map.",
+          "end_anchor": "/// The prime-field base: the `size` smallest abscissae that are on the",
+          "scope": "complete native FactorBase and inherent accessors"
+        },
+        {
+          "start_anchor": "/// What building a table cost, folded into the factor-base phase of",
+          "end_anchor": "fn compact_pair_storage_shape(degree: u32, points: usize) -> bool {",
+          "scope": "TableCost and complete PairWitnessMap enum; binary eligibility helpers omitted"
+        },
+        {
+          "start_anchor": "impl PairWitnessMap {",
+          "end_anchor": "    /// The identical ordered negation-folded table, using bounded batches of",
+          "scope": "complete native witness-map storage, PairTable and implementation opening with diagnostics"
+        },
+        {
+          "start_anchor": "    pub fn build<G: CountedGroup>(g: &G, fb: &FactorBase<G::Elt>) -> Self {",
+          "end_anchor": "/// Bits of a table entry that hold the second index; the rotation that",
+          "scope": "native scalar table references, cost, probe and original closing brace; binary vector builders omitted"
+        },
+        {
+          "start_anchor": "/// Native counters of the oracle, per phase.",
+          "end_anchor": "/// Resolve the signs of a witness of abscissae: which points above them",
+          "scope": "complete native OracleCounters"
+        },
+        {
+          "start_anchor": "/// Meet in the middle on a built pair table: one probe for `m = 2`,",
+          "end_anchor": "/// Meet in the middle on the Frobenius-folded table: the same loop as",
+          "scope": "complete scalar decomposition reference and identity fallback"
+        }
+      ]
+    },
+    {
+      "path": "research/prime31_aux_matched_20261122/fiber-domain-followup/upstream/cryptanalysis_prime_batch.rs",
+      "generated_name": "prime_batch.rs",
+      "ranges": [
+        {
+          "start_anchor": "use super::{invmod, FactorBase, GroupOps, PairTable, PairWitnessMap, PrimeCurve, PrimePoint};",
+          "end_anchor": "/// Scratch the counted group's pairwise addition keeps between batches.",
+          "scope": "complete prime Montgomery arithmetic, specialized table builder and signed probe candidates; unused pairwise path and tests omitted"
+        }
+      ]
+    },
+    {
+      "path": "research/prime31_aux_matched_20261122/fiber-domain-followup/upstream/cryptanalysis_stages.rs",
+      "generated_name": "stages.rs",
+      "ranges": [
+        {
+          "start_anchor": "/// Free-form parameters a plug-in reads its configuration from.",
+          "end_anchor": "/// A boolean polynomial system, the common currency between an",
+          "scope": "complete Params, InstanceCtx, factor-base/decomposition traits and native accounting structs"
+        },
+        {
+          "start_anchor": "/// What a solver call cost, in the engine's own units plus the ones",
+          "end_anchor": "/// **Stage 3b — the polynomial system solver.**",
+          "scope": "complete SolverCost required by trait accounting"
+        }
+      ]
+    },
+    {
+      "path": "research/prime31_aux_matched_20261122/fiber-domain-followup/upstream/cryptanalysis_prime_batch_mitm.rs",
+      "generated_name": "prime_batch_mitm.rs",
+      "ranges": [
+        {
+          "start_anchor": "use std::collections::BTreeMap;",
+          "end_anchor": "#[cfg(test)]",
+          "scope": "complete maintained PrimeBatchMitmOracle implementation without its module tests"
+        }
+      ]
+    }
+  ],
+  "omissions": [
+    "binary-group and vector pair builders",
+    "unused pairwise group defaults and overrides",
+    "Boolean systems and unrelated framework stages",
+    "upstream module tests"
+  ],
+  "algorithm_substitutions": false
+}

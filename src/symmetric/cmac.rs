@@ -18,13 +18,14 @@
 //!    final ciphertext block is the tag.
 
 use super::aes::AesKey;
+use super::gf128::double_be as double;
 use super::modes::cipher::BlockCipher128;
 
 /// 16-byte authentication tag.
 pub type CmacTag = [u8; 16];
 
 #[inline]
-fn enc<C: BlockCipher128>(cipher: &C, block: &[u8; 16]) -> [u8; 16] {
+fn enc<C: BlockCipher128 + ?Sized>(cipher: &C, block: &[u8; 16]) -> [u8; 16] {
     let mut b = *block;
     cipher.encrypt_block(&mut b);
     b
@@ -33,7 +34,7 @@ fn enc<C: BlockCipher128>(cipher: &C, block: &[u8; 16]) -> [u8; 16] {
 /// CMAC generic over any 16-byte block cipher (NIST SP 800-38B).
 /// AES-CMAC is the canonical instance; this is the same algorithm
 /// keyed on Camellia, Twofish, Serpent, etc.
-pub fn cmac<C: BlockCipher128>(cipher: &C, message: &[u8]) -> CmacTag {
+pub fn cmac<C: BlockCipher128 + ?Sized>(cipher: &C, message: &[u8]) -> CmacTag {
     let l = enc(cipher, &[0u8; 16]);
     let k1 = double(&l);
     let k2 = double(&k1);
@@ -79,22 +80,6 @@ pub fn cmac<C: BlockCipher128>(cipher: &C, message: &[u8]) -> CmacTag {
 /// AES-CMAC — thin wrapper over the generic [`cmac`] for an AES key.
 pub fn aes_cmac(key: &AesKey, message: &[u8]) -> CmacTag {
     cmac(key, message)
-}
-
-/// Double in `GF(2¹²⁸)` with reduction polynomial
-/// `x¹²⁸ + x⁷ + x² + x + 1`.  The big-endian convention SP 800-38B uses.
-fn double(input: &[u8; 16]) -> [u8; 16] {
-    let mut out = [0u8; 16];
-    let mut carry = 0u8;
-    for i in (0..16).rev() {
-        let new_carry = input[i] >> 7;
-        out[i] = (input[i] << 1) | carry;
-        carry = new_carry;
-    }
-    if carry != 0 {
-        out[15] ^= 0x87; // x^7 + x^2 + x + 1
-    }
-    out
 }
 
 #[cfg(test)]

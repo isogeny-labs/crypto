@@ -1,0 +1,92 @@
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:37:23: error: reference to ‘SSL’ is ambiguous
+   37 | std::string ssl_query(SSL& ssl,const Point& a,const Point& b0,int coefficient,int sign) {
+      |                       ^~~
+In file included from /usr/include/openssl/ec.h:21,
+                 from /workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit_arithmetic.hpp:2,
+                 from /workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/signed_words_arithmetic.hpp:1,
+                 from /workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:1:
+/usr/include/openssl/types.h:198:23: note: candidates are: ‘typedef struct ssl_st SSL’
+  198 | typedef struct ssl_st SSL;
+      |                       ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit_arithmetic.hpp:42:8: note:                 ‘struct audit::SSL’
+   42 | struct SSL {
+      |        ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:37:28: error: ‘ssl’ was not declared in this scope
+   37 | std::string ssl_query(SSL& ssl,const Point& a,const Point& b0,int coefficient,int sign) {
+      |                            ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:37:32: error: expected primary-expression before ‘const’
+   37 | std::string ssl_query(SSL& ssl,const Point& a,const Point& b0,int coefficient,int sign) {
+      |                                ^~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:37:47: error: expected primary-expression before ‘const’
+   37 | std::string ssl_query(SSL& ssl,const Point& a,const Point& b0,int coefficient,int sign) {
+      |                                               ^~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:37:63: error: expected primary-expression before ‘int’
+   37 | std::string ssl_query(SSL& ssl,const Point& a,const Point& b0,int coefficient,int sign) {
+      |                                                               ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:37:79: error: expected primary-expression before ‘int’
+   37 | std::string ssl_query(SSL& ssl,const Point& a,const Point& b0,int coefficient,int sign) {
+      |                                                                               ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:37:89: error: expected ‘,’ or ‘;’ before ‘{’ token
+   37 | std::string ssl_query(SSL& ssl,const Point& a,const Point& b0,int coefficient,int sign) {
+      |                                                                                         ^
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp: In function ‘int two_row::run(int, char**)’:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:62:5: error: reference to ‘SSL’ is ambiguous
+   62 |     SSL ssl;
+      |     ^~~
+/usr/include/openssl/types.h:198:23: note: candidates are: ‘typedef struct ssl_st SSL’
+  198 | typedef struct ssl_st SSL;
+      |                       ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit_arithmetic.hpp:42:8: note:                 ‘struct audit::SSL’
+   42 | struct SSL {
+      |        ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:66:9: error: ‘ssl’ was not declared in this scope
+   66 |         ssl.make(q);base.push_back(q);symbols.push_back(q);symbols.push_back(negative(q));
+      |         ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:72:56: error: ‘ssl’ was not declared in this scope
+   72 |         require(on_curve(q),"recorded curve equation");ssl.make(q);
+      |                                                        ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:79:13: error: ‘ssl’ was not declared in this scope
+   79 |     auto sk=ssl.make({});
+      |             ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:92:30: error: no matching function for call to ‘std::vector<audit::Item>::push_back(<brace-enclosed initializer list>)’
+   92 |         doubles_ssl.push_back({{int(i),-1},ssl_query(ssl,symbols[i],symbols[i],1,1),""});
+      |         ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/c++/14/vector:66,
+                 from /workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/json.hpp:9,
+                 from /workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/identity_arithmetic.hpp:2,
+                 from /workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/rank_arithmetic.hpp:1,
+                 from /workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit_arithmetic.hpp:1:
+/usr/include/c++/14/bits/stl_vector.h:1283:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(const value_type&) [with _Tp = audit::Item; _Alloc = std::allocator<audit::Item>; value_type = audit::Item]’
+ 1283 |       push_back(const value_type& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/14/bits/stl_vector.h:1283:35: note:   no known conversion for argument 1 from ‘<brace-enclosed initializer list>’ to ‘const std::vector<audit::Item>::value_type&’ {aka ‘const audit::Item&’}
+ 1283 |       push_back(const value_type& __x)
+      |                 ~~~~~~~~~~~~~~~~~~^~~
+/usr/include/c++/14/bits/stl_vector.h:1300:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(value_type&&) [with _Tp = audit::Item; _Alloc = std::allocator<audit::Item>; value_type = audit::Item]’
+ 1300 |       push_back(value_type&& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/14/bits/stl_vector.h:1300:30: note:   no known conversion for argument 1 from ‘<brace-enclosed initializer list>’ to ‘std::vector<audit::Item>::value_type&&’ {aka ‘audit::Item&&’}
+ 1300 |       push_back(value_type&& __x)
+      |                 ~~~~~~~~~~~~~^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp: In lambda function:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:135:15: error: inconsistent deduction for ‘auto’: ‘const std::__cxx11::basic_string<char>’ and then ‘<type error>’
+  135 |         const auto gkey=key(t),skey=ssl_query(ssl,traces[i],traces[j],coefficient,sign);
+      |               ^~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:138:15: error: inconsistent deduction for ‘auto’: ‘const std::vector<std::array<int, 2> >’ and then ‘<type error>’
+  138 |         const auto left=table.lookup(gkey),right=table.lookup(skey);
+      |               ^~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/two_row_20261124/evidence/qualification-v1/source/audit.cpp:143:40: error: no matching function for call to ‘std::vector<audit::Item>::push_back(<brace-enclosed initializer list>)’
+  143 |         (mixed?ab_ssl:aa_ssl).push_back({{indices[i],indices[j]},skey,tag});
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/usr/include/c++/14/bits/stl_vector.h:1283:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(const value_type&) [with _Tp = audit::Item; _Alloc = std::allocator<audit::Item>; value_type = audit::Item]’
+ 1283 |       push_back(const value_type& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/14/bits/stl_vector.h:1283:35: note:   no known conversion for argument 1 from ‘<brace-enclosed initializer list>’ to ‘const std::vector<audit::Item>::value_type&’ {aka ‘const audit::Item&’}
+ 1283 |       push_back(const value_type& __x)
+      |                 ~~~~~~~~~~~~~~~~~~^~~
+/usr/include/c++/14/bits/stl_vector.h:1300:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(value_type&&) [with _Tp = audit::Item; _Alloc = std::allocator<audit::Item>; value_type = audit::Item]’
+ 1300 |       push_back(value_type&& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/14/bits/stl_vector.h:1300:30: note:   no known conversion for argument 1 from ‘<brace-enclosed initializer list>’ to ‘std::vector<audit::Item>::value_type&&’ {aka ‘audit::Item&&’}
+ 1300 |       push_back(value_type&& __x)
+      |                 ~~~~~~~~~~~~~^~~

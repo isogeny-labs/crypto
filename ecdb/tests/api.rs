@@ -77,6 +77,16 @@ async fn migrate_import_and_query() {
     ] {
         assert!(r.problems.is_empty(), "results problems: {:?}", r.problems);
     }
+    for r in import::research::import(&ctx).await.unwrap() {
+        assert!(r.problems.is_empty(), "research problems: {:?}", r.problems);
+    }
+    // Idempotent: saved definitions and plans add nothing on a second import.
+    for r in import::research::import(&ctx).await.unwrap() {
+        for key in ["feature_definitions", "sweeps", "cells", "datasets", "dataset_features"] {
+            assert_eq!(r.counts.get(key).copied().unwrap_or(0), 0, "research import was not idempotent: {r:?}");
+        }
+        assert!(r.problems.is_empty(), "research reimport problems: {:?}", r.problems);
+    }
     let session = "research/ecbench_rho_optimized_20261014/sessions/run-20261014T012000Z";
     let eb = import::ecbench::import_dirs(&ctx, &[session]).await.unwrap();
     assert_eq!(eb.counts.get("sessions"), Some(&1));
@@ -97,6 +107,8 @@ async fn migrate_import_and_query() {
     assert_eq!(doc["genus1_invariants"]["j_invariant"], "0");
     assert_eq!(doc["frobenius"]["cm_discriminant"], -3);
     assert_eq!(doc["endomorphism_ring"]["is_maximal"], true);
+    assert_eq!(doc["ml_features"]["curve_id"], Value::Null);
+    assert_eq!(doc["ml_features"]["cm_discriminant"], -3);
     // 256-bit group order survives as an exact decimal string
     assert_eq!(
         doc["isogeny_class"]["order_value"],
@@ -165,6 +177,20 @@ async fn migrate_import_and_query() {
     assert_eq!(s, StatusCode::OK);
     assert!(!meas["ic_leaderboard"].as_array().unwrap().is_empty());
 
+    let (s, features) = get(&app, "/v1/features?scope=factor_base_measurement&limit=100").await;
+    assert_eq!(s, StatusCode::OK);
+    assert!(features["items"].as_array().unwrap().len() >= 15);
+    let (s, curve_features) = get(&app, "/v1/curves/secp256k1/features").await;
+    assert_eq!(s, StatusCode::OK);
+    assert_eq!(curve_features["structural"]["cm_discriminant"], -3);
+    let (s, sweep) = get(&app, "/v1/sweeps/prime-ladder").await;
+    assert_eq!(s, StatusCode::OK);
+    assert_eq!(sweep["cells"].as_array().unwrap().len(), 7);
+    let (s, dataset) = get(&app, "/v1/datasets/fbm1-solver-outcomes").await;
+    assert_eq!(s, StatusCode::OK);
+    assert_eq!(dataset["subject_scope"], "factor_base_measurement");
+    assert!(dataset["features"].as_array().unwrap().len() >= 10);
+
     // MCP: handshake, tool list, a tool call routed to the REST API
     let (s, init) = post(
         &app,
@@ -175,7 +201,7 @@ async fn migrate_import_and_query() {
     assert_eq!(s, StatusCode::OK);
     assert_eq!(init["result"]["protocolVersion"], "2025-06-18");
     let (_, list) = post(&app, "/mcp", r#"{"jsonrpc":"2.0","id":2,"method":"tools/list"}"#).await;
-    assert_eq!(list["result"]["tools"].as_array().unwrap().len(), 11);
+    assert_eq!(list["result"]["tools"].as_array().unwrap().len(), 13);
     let (_, call) = post(
         &app,
         "/mcp",

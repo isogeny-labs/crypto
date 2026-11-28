@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T16:12:40Z",
+ "id": "PCC-20261123-ee4187",
+ "kind": "statement",
+ "producer": {
+  "commit": "50a9820906698926868f7c97a6f7ed23755ee29d",
+  "model": "GPT-6 Astra Pro",
+  "session": "vitse-prime31-compatibility-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/identity-tests-01/summary.json",
+    "sha256": "28894f796cc34ffadd0fe7f17080120b043689ee4821afab8d712f4fec103fdb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/identity-tests-01/postcall.json",
+    "sha256": "df1f4c2c62365ce0e70607d7d31348df3074beeeaed94acefcb31029ea6b1b50"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/identity-tests-01/stdout.txt",
+    "sha256": "5e32cf7af95879a5687384e4ce3e1d64168a0697e684e8547ba4d2cbd3828e26"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Complete standalone identity/SHA test closure after supplying the exact baseline cfg(test) fixture; same-team unsigned development evidence",
+ "statement": "After adding the exact baseline Schoenhage certificate fixture without changing production modules or earlier records, the separately frozen offline standalone Cargo test completed22 existing production tests:9 identity-certificate and13 SHA tests, with zero failures or ignored tests. Build/test exits were zero and actual/frozen test-binary hashes, source/dependency pins and prior S3 certificate bytes stayed unchanged. This does not close the root-library gate."
+}

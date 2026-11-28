@@ -1,0 +1,4347 @@
+{
+  "date_utc": "2026-11-16",
+  "standing": "[pcc:unverified]",
+  "evidence_scope": "GitHub Actions producer-development Rust release run; not an isolated or signed independent scientific benchmark",
+  "repo": "isogeny-labs/crypto",
+  "pr": 4391,
+  "run_id": 43804327344,
+  "job_id": 133091508151,
+  "source_commit_sha": "998c4b7a6e5787da993d55626e088563586f7be2",
+  "source_file_commit_sha": "c815d27a17616bbd2026ce5f1f2e27e371d603d2",
+  "workflow_commit_sha": "9b35b48bc3e936afa67f87365569053d522a8013",
+  "url": "https://github.com/isogeny-labs/crypto/actions/runs/43804327344",
+  "command": "cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --mersenne-confirm",
+  "exact_output": {
+    "T": 1536,
+    "algebraic_S3_pair_queries": [
+      6744576,
+      6744576,
+      6744576
+    ],
+    "all_success_gate": true,
+    "arms": [
+      "u128_mod",
+      "mersenne",
+      "mersenne_repeat"
+    ],
+    "cases_detail": [
+      {
+        "case": 0,
+        "known_answer_caller_verification_only": 71931761,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 271872,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 79364064,
+                "algebraic_batch_field_inversions": 177,
+                "algebraic_cold_wall_until_output_ns": 83087928,
+                "algebraic_field_square_roots": 271872,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 271872,
+                "ec_group_additions_candidate_verification_only": 48,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3333687,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 790097027,
+                  "beta": 697795798,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 71931761,
+                  "partition_indices": [
+                    176,
+                    852,
+                    1116
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 83087928,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3333687",
+            "position": 0,
+            "public_target": [
+              672816823,
+              1339015743
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 71931761
+          },
+          {
+            "algebraic_pair_quadratics": 271872,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 42751106,
+                "algebraic_batch_field_inversions": 177,
+                "algebraic_cold_wall_until_output_ns": 46324960,
+                "algebraic_field_square_roots": 271872,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 271872,
+                "ec_group_additions_candidate_verification_only": 48,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3204796,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 790097027,
+                  "beta": 697795798,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 71931761,
+                  "partition_indices": [
+                    176,
+                    852,
+                    1116
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 46324960,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3204796",
+            "position": 1,
+            "public_target": [
+              672816823,
+              1339015743
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 71931761
+          },
+          {
+            "algebraic_pair_quadratics": 271872,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 42939286,
+                "algebraic_batch_field_inversions": 177,
+                "algebraic_cold_wall_until_output_ns": 46499736,
+                "algebraic_field_square_roots": 271872,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 271872,
+                "ec_group_additions_candidate_verification_only": 48,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3201581,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 790097027,
+                  "beta": 697795798,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 71931761,
+                  "partition_indices": [
+                    176,
+                    852,
+                    1116
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 46499736,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3201581",
+            "position": 2,
+            "public_target": [
+              672816823,
+              1339015743
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 71931761
+          }
+        ],
+        "public_target": [
+          672816823,
+          1339015743
+        ]
+      },
+      {
+        "case": 1,
+        "known_answer_caller_verification_only": 1505639136,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 637440,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 101120147,
+                "algebraic_batch_field_inversions": 415,
+                "algebraic_cold_wall_until_output_ns": 104691466,
+                "algebraic_field_square_roots": 637440,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 637440,
+                "ec_group_additions_candidate_verification_only": 56,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3202162,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 601925398,
+                  "beta": 2034976362,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1505639136,
+                  "partition_indices": [
+                    414,
+                    862,
+                    1096
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 104691466,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3202162",
+            "position": 0,
+            "public_target": [
+              1132569868,
+              1397726050
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1505639136
+          },
+          {
+            "algebraic_pair_quadratics": 637440,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 101429834,
+                "algebraic_batch_field_inversions": 415,
+                "algebraic_cold_wall_until_output_ns": 105007065,
+                "algebraic_field_square_roots": 637440,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 637440,
+                "ec_group_additions_candidate_verification_only": 56,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3205769,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 601925398,
+                  "beta": 2034976362,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1505639136,
+                  "partition_indices": [
+                    414,
+                    862,
+                    1096
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 105007065,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3205769",
+            "position": 1,
+            "public_target": [
+              1132569868,
+              1397726050
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1505639136
+          },
+          {
+            "algebraic_pair_quadratics": 637440,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 185673107,
+                "algebraic_batch_field_inversions": 415,
+                "algebraic_cold_wall_until_output_ns": 189245078,
+                "algebraic_field_square_roots": 637440,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 637440,
+                "ec_group_additions_candidate_verification_only": 56,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3203294,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 601925398,
+                  "beta": 2034976362,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1505639136,
+                  "partition_indices": [
+                    414,
+                    862,
+                    1096
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 189245078,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3203294",
+            "position": 2,
+            "public_target": [
+              1132569868,
+              1397726050
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1505639136
+          }
+        ],
+        "public_target": [
+          1132569868,
+          1397726050
+        ]
+      },
+      {
+        "case": 2,
+        "known_answer_caller_verification_only": 258064645,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 356352,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 102864089,
+                "algebraic_batch_field_inversions": 232,
+                "algebraic_cold_wall_until_output_ns": 106422685,
+                "algebraic_field_square_roots": 356352,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 356352,
+                "ec_group_additions_candidate_verification_only": 44,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3199657,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1670126260,
+                  "beta": 660371321,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 258064645,
+                  "partition_indices": [
+                    231,
+                    743,
+                    322
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 106422685,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3199657",
+            "position": 0,
+            "public_target": [
+              98178949,
+              1819327150
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 258064645
+          },
+          {
+            "algebraic_pair_quadratics": 356352,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 57942115,
+                "algebraic_batch_field_inversions": 232,
+                "algebraic_cold_wall_until_output_ns": 61525086,
+                "algebraic_field_square_roots": 356352,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 356352,
+                "ec_group_additions_candidate_verification_only": 44,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3221478,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1670126260,
+                  "beta": 660371321,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 258064645,
+                  "partition_indices": [
+                    231,
+                    743,
+                    322
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 61525086,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3221478",
+            "position": 1,
+            "public_target": [
+              98178949,
+              1819327150
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 258064645
+          },
+          {
+            "algebraic_pair_quadratics": 356352,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 56165081,
+                "algebraic_batch_field_inversions": 232,
+                "algebraic_cold_wall_until_output_ns": 59729538,
+                "algebraic_field_square_roots": 356352,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 356352,
+                "ec_group_additions_candidate_verification_only": 44,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3205458,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1670126260,
+                  "beta": 660371321,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 258064645,
+                  "partition_indices": [
+                    231,
+                    743,
+                    322
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 59729538,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3205458",
+            "position": 2,
+            "public_target": [
+              98178949,
+              1819327150
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 258064645
+          }
+        ],
+        "public_target": [
+          98178949,
+          1819327150
+        ]
+      },
+      {
+        "case": 3,
+        "known_answer_caller_verification_only": 460331970,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 69120,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 11072719,
+                "algebraic_batch_field_inversions": 45,
+                "algebraic_cold_wall_until_output_ns": 14647527,
+                "algebraic_field_square_roots": 69120,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 69120,
+                "ec_group_additions_candidate_verification_only": 51,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3206169,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 464098027,
+                  "beta": 699291946,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 460331970,
+                  "partition_indices": [
+                    44,
+                    353,
+                    94
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 14647527,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3206169",
+            "position": 0,
+            "public_target": [
+              446758716,
+              458780087
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 460331970
+          },
+          {
+            "algebraic_pair_quadratics": 69120,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 10895198,
+                "algebraic_batch_field_inversions": 45,
+                "algebraic_cold_wall_until_output_ns": 14455818,
+                "algebraic_field_square_roots": 69120,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 69120,
+                "ec_group_additions_candidate_verification_only": 51,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3202031,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 464098027,
+                  "beta": 699291946,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 460331970,
+                  "partition_indices": [
+                    44,
+                    353,
+                    94
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 14455818,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3202031",
+            "position": 1,
+            "public_target": [
+              446758716,
+              458780087
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 460331970
+          },
+          {
+            "algebraic_pair_quadratics": 69120,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 20012081,
+                "algebraic_batch_field_inversions": 45,
+                "algebraic_cold_wall_until_output_ns": 23562641,
+                "algebraic_field_square_roots": 69120,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 69120,
+                "ec_group_additions_candidate_verification_only": 51,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3191952,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 464098027,
+                  "beta": 699291946,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 460331970,
+                  "partition_indices": [
+                    44,
+                    353,
+                    94
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 23562641,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3191952",
+            "position": 2,
+            "public_target": [
+              446758716,
+              458780087
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 460331970
+          }
+        ],
+        "public_target": [
+          446758716,
+          458780087
+        ]
+      },
+      {
+        "case": 4,
+        "known_answer_caller_verification_only": 1567286204,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 172032,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 49697089,
+                "algebraic_batch_field_inversions": 112,
+                "algebraic_cold_wall_until_output_ns": 53268189,
+                "algebraic_field_square_roots": 172032,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 172032,
+                "ec_group_additions_candidate_verification_only": 54,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3201140,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 772738836,
+                  "beta": 974243433,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1567286204,
+                  "partition_indices": [
+                    111,
+                    692,
+                    1087
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 53268189,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3201140",
+            "position": 0,
+            "public_target": [
+              2079774406,
+              257066433
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1567286204
+          },
+          {
+            "algebraic_pair_quadratics": 172032,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 27246171,
+                "algebraic_batch_field_inversions": 112,
+                "algebraic_cold_wall_until_output_ns": 30818653,
+                "algebraic_field_square_roots": 172032,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 172032,
+                "ec_group_additions_candidate_verification_only": 54,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3204256,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 772738836,
+                  "beta": 974243433,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1567286204,
+                  "partition_indices": [
+                    111,
+                    692,
+                    1087
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 30818653,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3204256",
+            "position": 1,
+            "public_target": [
+              2079774406,
+              257066433
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1567286204
+          },
+          {
+            "algebraic_pair_quadratics": 172032,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 27960201,
+                "algebraic_batch_field_inversions": 112,
+                "algebraic_cold_wall_until_output_ns": 31529679,
+                "algebraic_field_square_roots": 172032,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 172032,
+                "ec_group_additions_candidate_verification_only": 54,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3200529,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 772738836,
+                  "beta": 974243433,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1567286204,
+                  "partition_indices": [
+                    111,
+                    692,
+                    1087
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 31529679,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3200529",
+            "position": 2,
+            "public_target": [
+              2079774406,
+              257066433
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1567286204
+          }
+        ],
+        "public_target": [
+          2079774406,
+          257066433
+        ]
+      },
+      {
+        "case": 5,
+        "known_answer_caller_verification_only": 363761370,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 241152,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 38357869,
+                "algebraic_batch_field_inversions": 157,
+                "algebraic_cold_wall_until_output_ns": 41945043,
+                "algebraic_field_square_roots": 241152,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 241152,
+                "ec_group_additions_candidate_verification_only": 52,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3227693,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1461392140,
+                  "beta": 1180771633,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 363761370,
+                  "partition_indices": [
+                    156,
+                    753,
+                    2
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 41945043,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3227693",
+            "position": 0,
+            "public_target": [
+              738389716,
+              1037334860
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 363761370
+          },
+          {
+            "algebraic_pair_quadratics": 241152,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 37886868,
+                "algebraic_batch_field_inversions": 157,
+                "algebraic_cold_wall_until_output_ns": 41444297,
+                "algebraic_field_square_roots": 241152,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 241152,
+                "ec_group_additions_candidate_verification_only": 52,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3198669,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1461392140,
+                  "beta": 1180771633,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 363761370,
+                  "partition_indices": [
+                    156,
+                    753,
+                    2
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 41444297,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3198669",
+            "position": 1,
+            "public_target": [
+              738389716,
+              1037334860
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 363761370
+          },
+          {
+            "algebraic_pair_quadratics": 241152,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 69403701,
+                "algebraic_batch_field_inversions": 157,
+                "algebraic_cold_wall_until_output_ns": 72995033,
+                "algebraic_field_square_roots": 241152,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 241152,
+                "ec_group_additions_candidate_verification_only": 52,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3217344,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1461392140,
+                  "beta": 1180771633,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 363761370,
+                  "partition_indices": [
+                    156,
+                    753,
+                    2
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 72995033,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3217344",
+            "position": 2,
+            "public_target": [
+              738389716,
+              1037334860
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 363761370
+          }
+        ],
+        "public_target": [
+          738389716,
+          1037334860
+        ]
+      },
+      {
+        "case": 6,
+        "known_answer_caller_verification_only": 140474323,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 476160,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 137538981,
+                "algebraic_batch_field_inversions": 310,
+                "algebraic_cold_wall_until_output_ns": 141114224,
+                "algebraic_field_square_roots": 476160,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 476160,
+                "ec_group_additions_candidate_verification_only": 50,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3205181,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1326461597,
+                  "beta": 1652119309,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 140474323,
+                  "partition_indices": [
+                    309,
+                    1024,
+                    1366
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 141114224,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3205181",
+            "position": 0,
+            "public_target": [
+              2140139319,
+              2138792736
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 140474323
+          },
+          {
+            "algebraic_pair_quadratics": 476160,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 74481331,
+                "algebraic_batch_field_inversions": 310,
+                "algebraic_cold_wall_until_output_ns": 78048447,
+                "algebraic_field_square_roots": 476160,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 476160,
+                "ec_group_additions_candidate_verification_only": 50,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3207434,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1326461597,
+                  "beta": 1652119309,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 140474323,
+                  "partition_indices": [
+                    309,
+                    1024,
+                    1366
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 78048447,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3207434",
+            "position": 1,
+            "public_target": [
+              2140139319,
+              2138792736
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 140474323
+          },
+          {
+            "algebraic_pair_quadratics": 476160,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 76580895,
+                "algebraic_batch_field_inversions": 310,
+                "algebraic_cold_wall_until_output_ns": 80141549,
+                "algebraic_field_square_roots": 476160,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 476160,
+                "ec_group_additions_candidate_verification_only": 50,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3201754,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1326461597,
+                  "beta": 1652119309,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 140474323,
+                  "partition_indices": [
+                    309,
+                    1024,
+                    1366
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 80141549,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3201754",
+            "position": 2,
+            "public_target": [
+              2140139319,
+              2138792736
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 140474323
+          }
+        ],
+        "public_target": [
+          2140139319,
+          2138792736
+        ]
+      },
+      {
+        "case": 7,
+        "known_answer_caller_verification_only": 1900716133,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 909312,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 143083504,
+                "algebraic_batch_field_inversions": 592,
+                "algebraic_cold_wall_until_output_ns": 146642355,
+                "algebraic_field_square_roots": 909312,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 909312,
+                "ec_group_additions_candidate_verification_only": 48,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3199871,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1213277760,
+                  "beta": 41110601,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1900716133,
+                  "partition_indices": [
+                    591,
+                    1221,
+                    485
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 146642355,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3199871",
+            "position": 0,
+            "public_target": [
+              1164115092,
+              12141433
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1900716133
+          },
+          {
+            "algebraic_pair_quadratics": 909312,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 142980271,
+                "algebraic_batch_field_inversions": 592,
+                "algebraic_cold_wall_until_output_ns": 146539493,
+                "algebraic_field_square_roots": 909312,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 909312,
+                "ec_group_additions_candidate_verification_only": 48,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3200211,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1213277760,
+                  "beta": 41110601,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1900716133,
+                  "partition_indices": [
+                    591,
+                    1221,
+                    485
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 146539493,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3200211",
+            "position": 1,
+            "public_target": [
+              1164115092,
+              12141433
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1900716133
+          },
+          {
+            "algebraic_pair_quadratics": 909312,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 261400000,
+                "algebraic_batch_field_inversions": 592,
+                "algebraic_cold_wall_until_output_ns": 264978598,
+                "algebraic_field_square_roots": 909312,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 909312,
+                "ec_group_additions_candidate_verification_only": 48,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3209919,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1213277760,
+                  "beta": 41110601,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1900716133,
+                  "partition_indices": [
+                    591,
+                    1221,
+                    485
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 264978598,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3209919",
+            "position": 2,
+            "public_target": [
+              1164115092,
+              12141433
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1900716133
+          }
+        ],
+        "public_target": [
+          1164115092,
+          12141433
+        ]
+      },
+      {
+        "case": 8,
+        "known_answer_caller_verification_only": 1319701153,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 86016,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 24800070,
+                "algebraic_batch_field_inversions": 56,
+                "algebraic_cold_wall_until_output_ns": 28394397,
+                "algebraic_field_square_roots": 86016,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 86016,
+                "ec_group_additions_candidate_verification_only": 48,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3225488,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1977158256,
+                  "beta": 1519466945,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1319701153,
+                  "partition_indices": [
+                    55,
+                    361,
+                    1487
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 28394397,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3225488",
+            "position": 0,
+            "public_target": [
+              982907979,
+              636921079
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1319701153
+          },
+          {
+            "algebraic_pair_quadratics": 86016,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 13611168,
+                "algebraic_batch_field_inversions": 56,
+                "algebraic_cold_wall_until_output_ns": 17166744,
+                "algebraic_field_square_roots": 86016,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 86016,
+                "ec_group_additions_candidate_verification_only": 48,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3196905,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1977158256,
+                  "beta": 1519466945,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1319701153,
+                  "partition_indices": [
+                    55,
+                    361,
+                    1487
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 17166744,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3196905",
+            "position": 1,
+            "public_target": [
+              982907979,
+              636921079
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1319701153
+          },
+          {
+            "algebraic_pair_quadratics": 86016,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 13762341,
+                "algebraic_batch_field_inversions": 56,
+                "algebraic_cold_wall_until_output_ns": 17322063,
+                "algebraic_field_square_roots": 86016,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 86016,
+                "ec_group_additions_candidate_verification_only": 48,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3201092,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1977158256,
+                  "beta": 1519466945,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1319701153,
+                  "partition_indices": [
+                    55,
+                    361,
+                    1487
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 17322063,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3201092",
+            "position": 2,
+            "public_target": [
+              982907979,
+              636921079
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1319701153
+          }
+        ],
+        "public_target": [
+          982907979,
+          636921079
+        ]
+      },
+      {
+        "case": 9,
+        "known_answer_caller_verification_only": 1069615758,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 176640,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 27997154,
+                "algebraic_batch_field_inversions": 115,
+                "algebraic_cold_wall_until_output_ns": 31587925,
+                "algebraic_field_square_roots": 176640,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 176640,
+                "ec_group_additions_candidate_verification_only": 49,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3222021,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1232350055,
+                  "beta": 559125394,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1069615758,
+                  "partition_indices": [
+                    114,
+                    611,
+                    725
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 31587925,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3222021",
+            "position": 0,
+            "public_target": [
+              1665830318,
+              997633447
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1069615758
+          },
+          {
+            "algebraic_pair_quadratics": 176640,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 28341498,
+                "algebraic_batch_field_inversions": 115,
+                "algebraic_cold_wall_until_output_ns": 31902674,
+                "algebraic_field_square_roots": 176640,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 176640,
+                "ec_group_additions_candidate_verification_only": 49,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3202425,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1232350055,
+                  "beta": 559125394,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1069615758,
+                  "partition_indices": [
+                    114,
+                    611,
+                    725
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 31902674,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3202425",
+            "position": 1,
+            "public_target": [
+              1665830318,
+              997633447
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1069615758
+          },
+          {
+            "algebraic_pair_quadratics": 176640,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 51259430,
+                "algebraic_batch_field_inversions": 115,
+                "algebraic_cold_wall_until_output_ns": 54818172,
+                "algebraic_field_square_roots": 176640,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 176640,
+                "ec_group_additions_candidate_verification_only": 49,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3199861,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1232350055,
+                  "beta": 559125394,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1069615758,
+                  "partition_indices": [
+                    114,
+                    611,
+                    725
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 54818172,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3199861",
+            "position": 2,
+            "public_target": [
+              1665830318,
+              997633447
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1069615758
+          }
+        ],
+        "public_target": [
+          1665830318,
+          997633447
+        ]
+      },
+      {
+        "case": 10,
+        "known_answer_caller_verification_only": 515395387,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 207360,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 59353428,
+                "algebraic_batch_field_inversions": 135,
+                "algebraic_cold_wall_until_output_ns": 62930273,
+                "algebraic_field_square_roots": 207360,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 207360,
+                "ec_group_additions_candidate_verification_only": 49,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3217754,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 728858602,
+                  "beta": 728004969,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 515395387,
+                  "partition_indices": [
+                    134,
+                    410,
+                    783
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 62930273,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3217754",
+            "position": 0,
+            "public_target": [
+              1686212928,
+              1083603631
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 515395387
+          },
+          {
+            "algebraic_pair_quadratics": 207360,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 32878468,
+                "algebraic_batch_field_inversions": 135,
+                "algebraic_cold_wall_until_output_ns": 36439253,
+                "algebraic_field_square_roots": 207360,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 207360,
+                "ec_group_additions_candidate_verification_only": 49,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3201944,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 728858602,
+                  "beta": 728004969,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 515395387,
+                  "partition_indices": [
+                    134,
+                    410,
+                    783
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 36439253,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3201944",
+            "position": 1,
+            "public_target": [
+              1686212928,
+              1083603631
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 515395387
+          },
+          {
+            "algebraic_pair_quadratics": 207360,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 33029459,
+                "algebraic_batch_field_inversions": 135,
+                "algebraic_cold_wall_until_output_ns": 36596116,
+                "algebraic_field_square_roots": 207360,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 207360,
+                "ec_group_additions_candidate_verification_only": 49,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3198037,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 728858602,
+                  "beta": 728004969,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 515395387,
+                  "partition_indices": [
+                    134,
+                    410,
+                    783
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 36596116,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3198037",
+            "position": 2,
+            "public_target": [
+              1686212928,
+              1083603631
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 515395387
+          }
+        ],
+        "public_target": [
+          1686212928,
+          1083603631
+        ]
+      },
+      {
+        "case": 11,
+        "known_answer_caller_verification_only": 1254482924,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 36864,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 6001446,
+                "algebraic_batch_field_inversions": 24,
+                "algebraic_cold_wall_until_output_ns": 9561269,
+                "algebraic_field_square_roots": 36864,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 36864,
+                "ec_group_additions_candidate_verification_only": 52,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3201163,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1936900697,
+                  "beta": 881475826,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1254482924,
+                  "partition_indices": [
+                    23,
+                    820,
+                    914
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 9561269,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3201163",
+            "position": 0,
+            "public_target": [
+              602110223,
+              1093957779
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1254482924
+          },
+          {
+            "algebraic_pair_quadratics": 36864,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 5923821,
+                "algebraic_batch_field_inversions": 24,
+                "algebraic_cold_wall_until_output_ns": 9490668,
+                "algebraic_field_square_roots": 36864,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 36864,
+                "ec_group_additions_candidate_verification_only": 52,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3197826,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1936900697,
+                  "beta": 881475826,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1254482924,
+                  "partition_indices": [
+                    23,
+                    820,
+                    914
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 9490668,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3197826",
+            "position": 1,
+            "public_target": [
+              602110223,
+              1093957779
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1254482924
+          },
+          {
+            "algebraic_pair_quadratics": 36864,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 10681994,
+                "algebraic_batch_field_inversions": 24,
+                "algebraic_cold_wall_until_output_ns": 14244623,
+                "algebraic_field_square_roots": 36864,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 36864,
+                "ec_group_additions_candidate_verification_only": 52,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3204048,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1936900697,
+                  "beta": 881475826,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1254482924,
+                  "partition_indices": [
+                    23,
+                    820,
+                    914
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 14244623,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3204048",
+            "position": 2,
+            "public_target": [
+              602110223,
+              1093957779
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1254482924
+          }
+        ],
+        "public_target": [
+          602110223,
+          1093957779
+        ]
+      },
+      {
+        "case": 12,
+        "known_answer_caller_verification_only": 749819566,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 9216,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 2719182,
+                "algebraic_batch_field_inversions": 6,
+                "algebraic_cold_wall_until_output_ns": 6302379,
+                "algebraic_field_square_roots": 9216,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 9216,
+                "ec_group_additions_candidate_verification_only": 54,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3214267,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 290494964,
+                  "beta": 374297776,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 749819566,
+                  "partition_indices": [
+                    5,
+                    380,
+                    752
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 6302379,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3214267",
+            "position": 0,
+            "public_target": [
+              34963670,
+              1379598633
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 749819566
+          },
+          {
+            "algebraic_pair_quadratics": 9216,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 1541060,
+                "algebraic_batch_field_inversions": 6,
+                "algebraic_cold_wall_until_output_ns": 5099170,
+                "algebraic_field_square_roots": 9216,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 9216,
+                "ec_group_additions_candidate_verification_only": 54,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3199479,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 290494964,
+                  "beta": 374297776,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 749819566,
+                  "partition_indices": [
+                    5,
+                    380,
+                    752
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 5099170,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3199479",
+            "position": 1,
+            "public_target": [
+              34963670,
+              1379598633
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 749819566
+          },
+          {
+            "algebraic_pair_quadratics": 9216,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 1558202,
+                "algebraic_batch_field_inversions": 6,
+                "algebraic_cold_wall_until_output_ns": 5126211,
+                "algebraic_field_square_roots": 9216,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 9216,
+                "ec_group_additions_candidate_verification_only": 54,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3208567,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 290494964,
+                  "beta": 374297776,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 749819566,
+                  "partition_indices": [
+                    5,
+                    380,
+                    752
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 5126211,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3208567",
+            "position": 2,
+            "public_target": [
+              34963670,
+              1379598633
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 749819566
+          }
+        ],
+        "public_target": [
+          34963670,
+          1379598633
+        ]
+      },
+      {
+        "case": 13,
+        "known_answer_caller_verification_only": 1143234226,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 889344,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 140018656,
+                "algebraic_batch_field_inversions": 579,
+                "algebraic_cold_wall_until_output_ns": 143606251,
+                "algebraic_field_square_roots": 889344,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 889344,
+                "ec_group_additions_candidate_verification_only": 50,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3228865,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 251971276,
+                  "beta": 1819668579,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1143234226,
+                  "partition_indices": [
+                    578,
+                    452,
+                    1200
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 143606251,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3228865",
+            "position": 0,
+            "public_target": [
+              475103237,
+              607159151
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1143234226
+          },
+          {
+            "algebraic_pair_quadratics": 889344,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 140513621,
+                "algebraic_batch_field_inversions": 579,
+                "algebraic_cold_wall_until_output_ns": 144082051,
+                "algebraic_field_square_roots": 889344,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 889344,
+                "ec_group_additions_candidate_verification_only": 50,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3209308,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 251971276,
+                  "beta": 1819668579,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1143234226,
+                  "partition_indices": [
+                    578,
+                    452,
+                    1200
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 144082051,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3209308",
+            "position": 1,
+            "public_target": [
+              475103237,
+              607159151
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1143234226
+          },
+          {
+            "algebraic_pair_quadratics": 889344,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 258614804,
+                "algebraic_batch_field_inversions": 579,
+                "algebraic_cold_wall_until_output_ns": 262183574,
+                "algebraic_field_square_roots": 889344,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 889344,
+                "ec_group_additions_candidate_verification_only": 50,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3209809,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 251971276,
+                  "beta": 1819668579,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1143234226,
+                  "partition_indices": [
+                    578,
+                    452,
+                    1200
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 262183574,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3209809",
+            "position": 2,
+            "public_target": [
+              475103237,
+              607159151
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1143234226
+          }
+        ],
+        "public_target": [
+          475103237,
+          607159151
+        ]
+      },
+      {
+        "case": 14,
+        "known_answer_caller_verification_only": 1056100622,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 279552,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 80657434,
+                "algebraic_batch_field_inversions": 182,
+                "algebraic_cold_wall_until_output_ns": 84234879,
+                "algebraic_field_square_roots": 279552,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 279552,
+                "ec_group_additions_candidate_verification_only": 53,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3218415,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 653306662,
+                  "beta": 1599797885,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1056100622,
+                  "partition_indices": [
+                    181,
+                    146,
+                    355
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 84234879,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3218415",
+            "position": 0,
+            "public_target": [
+              1789008023,
+              794122470
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1056100622
+          },
+          {
+            "algebraic_pair_quadratics": 279552,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 44395341,
+                "algebraic_batch_field_inversions": 182,
+                "algebraic_cold_wall_until_output_ns": 47971094,
+                "algebraic_field_square_roots": 279552,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 279552,
+                "ec_group_additions_candidate_verification_only": 53,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3207324,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 653306662,
+                  "beta": 1599797885,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1056100622,
+                  "partition_indices": [
+                    181,
+                    146,
+                    355
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 47971094,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3207324",
+            "position": 1,
+            "public_target": [
+              1789008023,
+              794122470
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1056100622
+          },
+          {
+            "algebraic_pair_quadratics": 279552,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 45106762,
+                "algebraic_batch_field_inversions": 182,
+                "algebraic_cold_wall_until_output_ns": 48689287,
+                "algebraic_field_square_roots": 279552,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 279552,
+                "ec_group_additions_candidate_verification_only": 53,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3213907,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 653306662,
+                  "beta": 1599797885,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1056100622,
+                  "partition_indices": [
+                    181,
+                    146,
+                    355
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 48689287,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3213907",
+            "position": 2,
+            "public_target": [
+              1789008023,
+              794122470
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1056100622
+          }
+        ],
+        "public_target": [
+          1789008023,
+          794122470
+        ]
+      },
+      {
+        "case": 15,
+        "known_answer_caller_verification_only": 487751194,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 15360,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 2540077,
+                "algebraic_batch_field_inversions": 10,
+                "algebraic_cold_wall_until_output_ns": 6109838,
+                "algebraic_field_square_roots": 15360,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 15360,
+                "ec_group_additions_candidate_verification_only": 52,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3210760,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 308879731,
+                  "beta": 2100831648,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 487751194,
+                  "partition_indices": [
+                    9,
+                    334,
+                    232
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 6109838,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3210760",
+            "position": 0,
+            "public_target": [
+              440047922,
+              1109346043
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 487751194
+          },
+          {
+            "algebraic_pair_quadratics": 15360,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 2505383,
+                "algebraic_batch_field_inversions": 10,
+                "algebraic_cold_wall_until_output_ns": 6072649,
+                "algebraic_field_square_roots": 15360,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 15360,
+                "ec_group_additions_candidate_verification_only": 52,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3198167,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 308879731,
+                  "beta": 2100831648,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 487751194,
+                  "partition_indices": [
+                    9,
+                    334,
+                    232
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 6072649,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3198167",
+            "position": 1,
+            "public_target": [
+              440047922,
+              1109346043
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 487751194
+          },
+          {
+            "algebraic_pair_quadratics": 15360,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 4463161,
+                "algebraic_batch_field_inversions": 10,
+                "algebraic_cold_wall_until_output_ns": 8049614,
+                "algebraic_field_square_roots": 15360,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 15360,
+                "ec_group_additions_candidate_verification_only": 52,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3218265,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 308879731,
+                  "beta": 2100831648,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 487751194,
+                  "partition_indices": [
+                    9,
+                    334,
+                    232
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 8049614,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3218265",
+            "position": 2,
+            "public_target": [
+              440047922,
+              1109346043
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 487751194
+          }
+        ],
+        "public_target": [
+          440047922,
+          1109346043
+        ]
+      },
+      {
+        "case": 16,
+        "known_answer_caller_verification_only": 903335114,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 113664,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 32775445,
+                "algebraic_batch_field_inversions": 74,
+                "algebraic_cold_wall_until_output_ns": 36352000,
+                "algebraic_field_square_roots": 113664,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 113664,
+                "ec_group_additions_candidate_verification_only": 54,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3202516,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1491458928,
+                  "beta": 1766142687,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 903335114,
+                  "partition_indices": [
+                    73,
+                    221,
+                    1203
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 36352000,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3202516",
+            "position": 0,
+            "public_target": [
+              2067147996,
+              993425394
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 903335114
+          },
+          {
+            "algebraic_pair_quadratics": 113664,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 18200586,
+                "algebraic_batch_field_inversions": 74,
+                "algebraic_cold_wall_until_output_ns": 21760229,
+                "algebraic_field_square_roots": 113664,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 113664,
+                "ec_group_additions_candidate_verification_only": 54,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3200932,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1491458928,
+                  "beta": 1766142687,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 903335114,
+                  "partition_indices": [
+                    73,
+                    221,
+                    1203
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 21760229,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3200932",
+            "position": 1,
+            "public_target": [
+              2067147996,
+              993425394
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 903335114
+          },
+          {
+            "algebraic_pair_quadratics": 113664,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 18185898,
+                "algebraic_batch_field_inversions": 74,
+                "algebraic_cold_wall_until_output_ns": 21743247,
+                "algebraic_field_square_roots": 113664,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 113664,
+                "ec_group_additions_candidate_verification_only": 54,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3198669,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1491458928,
+                  "beta": 1766142687,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 903335114,
+                  "partition_indices": [
+                    73,
+                    221,
+                    1203
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 21743247,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3198669",
+            "position": 2,
+            "public_target": [
+              2067147996,
+              993425394
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 903335114
+          }
+        ],
+        "public_target": [
+          2067147996,
+          993425394
+        ]
+      },
+      {
+        "case": 17,
+        "known_answer_caller_verification_only": 320604093,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 1256448,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 200285391,
+                "algebraic_batch_field_inversions": 818,
+                "algebraic_cold_wall_until_output_ns": 203864028,
+                "algebraic_field_square_roots": 1256448,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 1256448,
+                "ec_group_additions_candidate_verification_only": 52,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3210139,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1672448215,
+                  "beta": 1420043396,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 320604093,
+                  "partition_indices": [
+                    817,
+                    1523,
+                    841
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 203864028,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3210139",
+            "position": 0,
+            "public_target": [
+              1716087923,
+              506204824
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 320604093
+          },
+          {
+            "algebraic_pair_quadratics": 1256448,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 200320537,
+                "algebraic_batch_field_inversions": 818,
+                "algebraic_cold_wall_until_output_ns": 203896750,
+                "algebraic_field_square_roots": 1256448,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 1256448,
+                "ec_group_additions_candidate_verification_only": 52,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3206542,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1672448215,
+                  "beta": 1420043396,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 320604093,
+                  "partition_indices": [
+                    817,
+                    1523,
+                    841
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 203896750,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3206542",
+            "position": 1,
+            "public_target": [
+              1716087923,
+              506204824
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 320604093
+          },
+          {
+            "algebraic_pair_quadratics": 1256448,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 362747522,
+                "algebraic_batch_field_inversions": 818,
+                "algebraic_cold_wall_until_output_ns": 366320339,
+                "algebraic_field_square_roots": 1256448,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 1256448,
+                "ec_group_additions_candidate_verification_only": 52,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3204289,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1672448215,
+                  "beta": 1420043396,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 320604093,
+                  "partition_indices": [
+                    817,
+                    1523,
+                    841
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 366320339,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3204289",
+            "position": 2,
+            "public_target": [
+              1716087923,
+              506204824
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 320604093
+          }
+        ],
+        "public_target": [
+          1716087923,
+          506204824
+        ]
+      },
+      {
+        "case": 18,
+        "known_answer_caller_verification_only": 506458809,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 301056,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 87357014,
+                "algebraic_batch_field_inversions": 196,
+                "algebraic_cold_wall_until_output_ns": 90922028,
+                "algebraic_field_square_roots": 301056,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 301056,
+                "ec_group_additions_candidate_verification_only": 50,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3205220,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 346242236,
+                  "beta": 281704417,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 506458809,
+                  "partition_indices": [
+                    195,
+                    426,
+                    187
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 90922028,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3205220",
+            "position": 0,
+            "public_target": [
+              1548627230,
+              961029745
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 506458809
+          },
+          {
+            "algebraic_pair_quadratics": 301056,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 48190906,
+                "algebraic_batch_field_inversions": 196,
+                "algebraic_cold_wall_until_output_ns": 51775816,
+                "algebraic_field_square_roots": 301056,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 301056,
+                "ec_group_additions_candidate_verification_only": 50,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3226059,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 346242236,
+                  "beta": 281704417,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 506458809,
+                  "partition_indices": [
+                    195,
+                    426,
+                    187
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 51775816,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3226059",
+            "position": 1,
+            "public_target": [
+              1548627230,
+              961029745
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 506458809
+          },
+          {
+            "algebraic_pair_quadratics": 301056,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 47458657,
+                "algebraic_batch_field_inversions": 196,
+                "algebraic_cold_wall_until_output_ns": 51043116,
+                "algebraic_field_square_roots": 301056,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 301056,
+                "ec_group_additions_candidate_verification_only": 50,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3213656,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 346242236,
+                  "beta": 281704417,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 506458809,
+                  "partition_indices": [
+                    195,
+                    426,
+                    187
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 51043116,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3213656",
+            "position": 2,
+            "public_target": [
+              1548627230,
+              961029745
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 506458809
+          }
+        ],
+        "public_target": [
+          1548627230,
+          961029745
+        ]
+      },
+      {
+        "case": 19,
+        "known_answer_caller_verification_only": 1232569179,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 4608,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 844598,
+                "algebraic_batch_field_inversions": 3,
+                "algebraic_cold_wall_until_output_ns": 4408880,
+                "algebraic_field_square_roots": 4608,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 4608,
+                "ec_group_additions_candidate_verification_only": 56,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3205491,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 193969125,
+                  "beta": 345121010,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1232569179,
+                  "partition_indices": [
+                    2,
+                    1060,
+                    1126
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 4408880,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3205491",
+            "position": 0,
+            "public_target": [
+              388531893,
+              278751126
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1232569179
+          },
+          {
+            "algebraic_pair_quadratics": 4608,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 814653,
+                "algebraic_batch_field_inversions": 3,
+                "algebraic_cold_wall_until_output_ns": 4382771,
+                "algebraic_field_square_roots": 4608,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 4608,
+                "ec_group_additions_candidate_verification_only": 56,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3208767,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 193969125,
+                  "beta": 345121010,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1232569179,
+                  "partition_indices": [
+                    2,
+                    1060,
+                    1126
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 4382771,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3208767",
+            "position": 1,
+            "public_target": [
+              388531893,
+              278751126
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1232569179
+          },
+          {
+            "algebraic_pair_quadratics": 4608,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 1443518,
+                "algebraic_batch_field_inversions": 3,
+                "algebraic_cold_wall_until_output_ns": 5011696,
+                "algebraic_field_square_roots": 4608,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 4608,
+                "ec_group_additions_candidate_verification_only": 56,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3199008,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 193969125,
+                  "beta": 345121010,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1232569179,
+                  "partition_indices": [
+                    2,
+                    1060,
+                    1126
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 5011696,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3199008",
+            "position": 2,
+            "public_target": [
+              388531893,
+              278751126
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1232569179
+          }
+        ],
+        "public_target": [
+          388531893,
+          278751126
+        ]
+      },
+      {
+        "case": 20,
+        "known_answer_caller_verification_only": 1629970543,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 142848,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 41350151,
+                "algebraic_batch_field_inversions": 93,
+                "algebraic_cold_wall_until_output_ns": 44944859,
+                "algebraic_field_square_roots": 142848,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 142848,
+                "ec_group_additions_candidate_verification_only": 50,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3225709,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 864310993,
+                  "beta": 1298911321,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1629970543,
+                  "partition_indices": [
+                    92,
+                    435,
+                    918
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 44944859,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3225709",
+            "position": 0,
+            "public_target": [
+              1266727302,
+              1612916162
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1629970543
+          },
+          {
+            "algebraic_pair_quadratics": 142848,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 22815100,
+                "algebraic_batch_field_inversions": 93,
+                "algebraic_cold_wall_until_output_ns": 26388989,
+                "algebraic_field_square_roots": 142848,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 142848,
+                "ec_group_additions_candidate_verification_only": 50,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3204710,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 864310993,
+                  "beta": 1298911321,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1629970543,
+                  "partition_indices": [
+                    92,
+                    435,
+                    918
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 26388989,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3204710",
+            "position": 1,
+            "public_target": [
+              1266727302,
+              1612916162
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1629970543
+          },
+          {
+            "algebraic_pair_quadratics": 142848,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 23146399,
+                "algebraic_batch_field_inversions": 93,
+                "algebraic_cold_wall_until_output_ns": 26723534,
+                "algebraic_field_square_roots": 142848,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 142848,
+                "ec_group_additions_candidate_verification_only": 50,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3218285,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 864310993,
+                  "beta": 1298911321,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1629970543,
+                  "partition_indices": [
+                    92,
+                    435,
+                    918
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 26723534,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3218285",
+            "position": 2,
+            "public_target": [
+              1266727302,
+              1612916162
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1629970543
+          }
+        ],
+        "public_target": [
+          1266727302,
+          1612916162
+        ]
+      },
+      {
+        "case": 21,
+        "known_answer_caller_verification_only": 259016972,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 7680,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 1390549,
+                "algebraic_batch_field_inversions": 5,
+                "algebraic_cold_wall_until_output_ns": 4956493,
+                "algebraic_field_square_roots": 7680,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 7680,
+                "ec_group_additions_candidate_verification_only": 42,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3207033,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 89620699,
+                  "beta": 1525201201,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 259016972,
+                  "partition_indices": [
+                    4,
+                    1262,
+                    1199
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 4956493,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3207033",
+            "position": 0,
+            "public_target": [
+              1347872231,
+              1943926726
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 259016972
+          },
+          {
+            "algebraic_pair_quadratics": 7680,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 1314938,
+                "algebraic_batch_field_inversions": 5,
+                "algebraic_cold_wall_until_output_ns": 4884880,
+                "algebraic_field_square_roots": 7680,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 7680,
+                "ec_group_additions_candidate_verification_only": 42,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3211272,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 89620699,
+                  "beta": 1525201201,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 259016972,
+                  "partition_indices": [
+                    4,
+                    1262,
+                    1199
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 4884880,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3211272",
+            "position": 1,
+            "public_target": [
+              1347872231,
+              1943926726
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 259016972
+          },
+          {
+            "algebraic_pair_quadratics": 7680,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 2300920,
+                "algebraic_batch_field_inversions": 5,
+                "algebraic_cold_wall_until_output_ns": 5857948,
+                "algebraic_field_square_roots": 7680,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 7680,
+                "ec_group_additions_candidate_verification_only": 42,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3198408,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 89620699,
+                  "beta": 1525201201,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 259016972,
+                  "partition_indices": [
+                    4,
+                    1262,
+                    1199
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 5857948,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3198408",
+            "position": 2,
+            "public_target": [
+              1347872231,
+              1943926726
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 259016972
+          }
+        ],
+        "public_target": [
+          1347872231,
+          1943926726
+        ]
+      },
+      {
+        "case": 22,
+        "known_answer_caller_verification_only": 102657828,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 44544,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 12839096,
+                "algebraic_batch_field_inversions": 29,
+                "algebraic_cold_wall_until_output_ns": 16415229,
+                "algebraic_field_square_roots": 44544,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 44544,
+                "ec_group_additions_candidate_verification_only": 49,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3217543,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1622220802,
+                  "beta": 1113454475,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 102657828,
+                  "partition_indices": [
+                    28,
+                    14,
+                    790
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 16415229,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3217543",
+            "position": 0,
+            "public_target": [
+              1636169820,
+              840486498
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 102657828
+          },
+          {
+            "algebraic_pair_quadratics": 44544,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 7242906,
+                "algebraic_batch_field_inversions": 29,
+                "algebraic_cold_wall_until_output_ns": 10804913,
+                "algebraic_field_square_roots": 44544,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 44544,
+                "ec_group_additions_candidate_verification_only": 49,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3203538,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1622220802,
+                  "beta": 1113454475,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 102657828,
+                  "partition_indices": [
+                    28,
+                    14,
+                    790
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 10804913,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3203538",
+            "position": 1,
+            "public_target": [
+              1636169820,
+              840486498
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 102657828
+          },
+          {
+            "algebraic_pair_quadratics": 44544,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 7071296,
+                "algebraic_batch_field_inversions": 29,
+                "algebraic_cold_wall_until_output_ns": 10631139,
+                "algebraic_field_square_roots": 44544,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 44544,
+                "ec_group_additions_candidate_verification_only": 49,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3201123,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1622220802,
+                  "beta": 1113454475,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 102657828,
+                  "partition_indices": [
+                    28,
+                    14,
+                    790
+                  ],
+                  "signs": [
+                    -1,
+                    1,
+                    1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 10631139,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3201123",
+            "position": 2,
+            "public_target": [
+              1636169820,
+              840486498
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 102657828
+          }
+        ],
+        "public_target": [
+          1636169820,
+          840486498
+        ]
+      },
+      {
+        "case": 23,
+        "known_answer_caller_verification_only": 1804647798,
+        "outcomes": [
+          {
+            "algebraic_pair_quadratics": 39936,
+            "arm": "mersenne",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 6363934,
+                "algebraic_batch_field_inversions": 26,
+                "algebraic_cold_wall_until_output_ns": 9930880,
+                "algebraic_field_square_roots": 39936,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 39936,
+                "ec_group_additions_candidate_verification_only": 51,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3207555,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1535555801,
+                  "beta": 679125027,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1804647798,
+                  "partition_indices": [
+                    25,
+                    1077,
+                    20
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 9930880,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3207555",
+            "position": 0,
+            "public_target": [
+              1423315942,
+              401745712
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1804647798
+          },
+          {
+            "algebraic_pair_quadratics": 39936,
+            "arm": "mersenne_repeat",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 6510648,
+                "algebraic_batch_field_inversions": 26,
+                "algebraic_cold_wall_until_output_ns": 10075981,
+                "algebraic_field_square_roots": 39936,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 39936,
+                "ec_group_additions_candidate_verification_only": 51,
+                "field_multiplier": "mersenne_fold",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3197075,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1535555801,
+                  "beta": 679125027,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1804647798,
+                  "partition_indices": [
+                    25,
+                    1077,
+                    20
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 10075981,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3197075",
+            "position": 1,
+            "public_target": [
+              1423315942,
+              401745712
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1804647798
+          },
+          {
+            "algebraic_pair_quadratics": 39936,
+            "arm": "u128_mod",
+            "attempts": [
+              {
+                "algebraic_S3_pair_roots_ns": 11660743,
+                "algebraic_batch_field_inversions": 26,
+                "algebraic_cold_wall_until_output_ns": 15230464,
+                "algebraic_field_square_roots": 39936,
+                "algebraic_matching_x_candidates": 1,
+                "algebraic_signed_candidates": 1,
+                "algebraic_unusable_beta": 0,
+                "algebraic_visited_pairs": 39936,
+                "ec_group_additions_candidate_verification_only": 51,
+                "field_multiplier": "u128_mod",
+                "generic_direct_join_control": null,
+                "points_per_partition": 1536,
+                "precompute_labels_ns": 3211332,
+                "public_label_source": "public_additive_walk",
+                "public_seed": "4150535f50523331",
+                "rejected_global_duplicate_x": 0,
+                "rejected_identity": 0,
+                "round": 0,
+                "solution": {
+                  "alpha": 1535555801,
+                  "beta": 679125027,
+                  "identity_equation": "alpha + beta * log = 0 (mod n)",
+                  "log": 1804647798,
+                  "partition_indices": [
+                    25,
+                    1077,
+                    20
+                  ],
+                  "signs": [
+                    -1,
+                    -1,
+                    -1
+                  ],
+                  "status": "verified"
+                },
+                "source_point_generation_group_additions": 10798
+              }
+            ],
+            "cold_wall_ns": 15230464,
+            "complete_target_scalar_recovered": true,
+            "paid_source_setup_ns": "3211332",
+            "position": 2,
+            "public_target": [
+              1423315942,
+              401745712
+            ],
+            "rounds": 1,
+            "source_group_additions": 10798,
+            "unresolved_within_three_rounds": false,
+            "verified_log": 1804647798
+          }
+        ],
+        "public_target": [
+          1423315942,
+          401745712
+        ]
+      }
+    ],
+    "classification": "APS 2018 one-relation index-calculus methodology; still generic pair-MITM equivalent",
+    "cofactor": 1,
+    "cold_total_ns": [
+      "2036886850",
+      "1156075309",
+      "1158010312"
+    ],
+    "experimental_status": "producer-development Rust paired complete-solver panel, not independent EKS L2/PCC",
+    "fresh_public_targets": 24,
+    "n": 2147446831,
+    "p": 2147483647,
+    "paired_design": "alternate original-fast-fast and fast-fast-original; identical walk sources and full cold cost",
+    "round_cap": 3,
+    "scientific_limit": "same-sources old/new Rust, producer only; no independent PCC or external IC-frontier claim",
+    "source_setup_total_ns": [
+      "77134106",
+      "77007777",
+      "76900720"
+    ],
+    "standing": "[pcc:unverified]",
+    "successes": [
+      24,
+      24,
+      24
+    ]
+  },
+  "derived_summary": {
+    "old_total_ns": 2036886850,
+    "mersenne_total_ns": 1156075309,
+    "mersenne_repeat_total_ns": 1158010312,
+    "old_over_mersenne": 1.7618980650680085,
+    "fast_repeat_ratio": 1.0016737689880029,
+    "fast_paired_wins": 24,
+    "fast_paired_losses": 0,
+    "median_paired_ratio": 1.727715592976445,
+    "old_algebraic_ns": 1950977024,
+    "fast_algebraic_ns": 1070372302,
+    "repeat_algebraic_ns": 1072401747,
+    "total_pairs_each_arm": 6744576,
+    "all_completed": true
+  },
+  "caveats": [
+    "Both arms use identical public source generation, root candidate trace and successful unknown scalar replay; factor base and all failures/retries are charged.",
+    "The APS m3 S3 pair enumeration remains mathematically generic meet-in-the-middle equivalent; this is a field-arithmetic engineering improvement, not a novel non-generic algorithm.",
+    "No current external mature PKM/APS/F4/CAS match, no independent signed PCC or L2 isolated timing."
+  ]
+}

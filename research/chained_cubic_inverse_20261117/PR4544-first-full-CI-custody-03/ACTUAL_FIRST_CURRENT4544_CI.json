@@ -1,0 +1,922 @@
+{
+  "recorded": "2026-11-17T11:06:33.293608+00:00",
+  "PR": 4544,
+  "cadence": "first all-event/check metadata read once after50min; logs completed from this same observation; no workflow retry or busy poll",
+  "heads": {
+    "tracking6f": {
+      "head": "6f1815b9f90b71f407f68e77901d3cc6f12cb8f9",
+      "workflow_runs": 18,
+      "events": {
+        "pull_request": 15,
+        "pull_request_target": 2,
+        "push": 1
+      },
+      "check_runs": 28,
+      "conclusions": {
+        "skipped": 25,
+        "success": 1,
+        "failure": 2
+      },
+      "all_workflow_ids": [
+        44052678730,
+        44052678691,
+        44052678732,
+        44052677697,
+        44052678488,
+        44052678664,
+        44052678855,
+        44052678471,
+        44052677628,
+        44052678675,
+        44052678448,
+        44052678495,
+        44052678522,
+        44052678466,
+        44052678834,
+        44052678467,
+        44052678501,
+        44052650608
+      ],
+      "all_checks": [
+        {
+          "id": 133934202450,
+          "name": "factor-base sweep CLI",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934202279,
+          "name": "harness",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934199257,
+          "name": "check",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934198135,
+          "name": "recompute",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934195120,
+          "name": "Native full library (manual)",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934186840,
+          "name": "learning",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934185533,
+          "name": "clippy (${{ matrix.crate }})",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934175830,
+          "name": "current",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934125446,
+          "name": "replay_plan",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934125211,
+          "name": "exhaustive_replay",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934125134,
+          "name": "long_replay",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934124778,
+          "name": "replay_sentinels_pr",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934124753,
+          "name": "evidence_audit_pr",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934124634,
+          "name": "review",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934124144,
+          "name": "parity",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934123873,
+          "name": "corpus",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934123831,
+          "name": "rustfmt (changed files)",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934123581,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934122887,
+          "name": "size",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934122577,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934122418,
+          "name": "records",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934122377,
+          "name": "full-tier",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934122343,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934122285,
+          "name": "merges",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934121740,
+          "name": "artifacts",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133934121737,
+          "name": "migrate",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133934119460,
+          "name": "names",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 133934119301,
+          "name": "gate",
+          "status": "completed",
+          "conclusion": "failure"
+        }
+      ]
+    },
+    "result2160": {
+      "head": "2160eb2a523fb0e60709aabaf6dd53c7f7fd32a3",
+      "workflow_runs": 34,
+      "events": {
+        "pull_request": 30,
+        "pull_request_target": 3,
+        "push": 1
+      },
+      "check_runs": 56,
+      "conclusions": {
+        "skipped": 36,
+        "success": 10,
+        "cancelled": 6,
+        "failure": 4
+      },
+      "all_workflow_ids": [
+        44057074719,
+        44057074425,
+        44057074580,
+        44057074266,
+        44057074264,
+        44057074198,
+        44057074170,
+        44057074148,
+        44057074196,
+        44057074402,
+        44057074390,
+        44057074611,
+        44057074363,
+        44057074525,
+        44057073716,
+        44056739039,
+        44056739208,
+        44056738851,
+        44056738661,
+        44056739034,
+        44056738901,
+        44056739472,
+        44056739144,
+        44056738910,
+        44056739003,
+        44056738799,
+        44056739341,
+        44056738959,
+        44056739047,
+        44056739040,
+        44056738830,
+        44056732201,
+        44056732223,
+        44056727095
+      ],
+      "all_checks": [
+        {
+          "id": 133949667884,
+          "name": "check",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133949531656,
+          "name": "replay_plan",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133949531175,
+          "name": "evidence_audit_pr",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133949531141,
+          "name": "long_replay",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133949531065,
+          "name": "exhaustive_replay",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133949529937,
+          "name": "replay_sentinels_pr",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133949529928,
+          "name": "factor-base sweep CLI",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133949529473,
+          "name": "harness",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133949431074,
+          "name": "rustfmt (changed files)",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133949428976,
+          "name": "clippy (crypto)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133949428922,
+          "name": "clippy (cd_attack)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133949070503,
+          "name": "review",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133949069366,
+          "name": "Native full library (manual)",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133949068796,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133949067724,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133949067637,
+          "name": "replay",
+          "status": "completed",
+          "conclusion": "cancelled"
+        },
+        {
+          "id": 133949067440,
+          "name": "full-tier",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133949067117,
+          "name": "corpus",
+          "status": "completed",
+          "conclusion": "cancelled"
+        },
+        {
+          "id": 133949067025,
+          "name": "learning",
+          "status": "completed",
+          "conclusion": "cancelled"
+        },
+        {
+          "id": 133949066804,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133949066781,
+          "name": "records",
+          "status": "completed",
+          "conclusion": "cancelled"
+        },
+        {
+          "id": 133949066767,
+          "name": "recompute",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 133949066737,
+          "name": "parity",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 133949066721,
+          "name": "merges",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133949066225,
+          "name": "artifacts",
+          "status": "completed",
+          "conclusion": "cancelled"
+        },
+        {
+          "id": 133949065905,
+          "name": "size",
+          "status": "completed",
+          "conclusion": "cancelled"
+        },
+        {
+          "id": 133949065673,
+          "name": "current",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133948033641,
+          "name": "artifacts",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133948029996,
+          "name": "replay",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133948014874,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133948013437,
+          "name": "harness",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133948011290,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133948008310,
+          "name": "size",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133948004759,
+          "name": "merges",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947997461,
+          "name": "factor-base sweep CLI",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947993518,
+          "name": "parity",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947956749,
+          "name": "evidence_audit_pr",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947948577,
+          "name": "exhaustive_replay",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947947905,
+          "name": "learning",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947947476,
+          "name": "replay_plan",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947947034,
+          "name": "long_replay",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947946669,
+          "name": "rustfmt (changed files)",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947946466,
+          "name": "replay_sentinels_pr",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947946328,
+          "name": "recompute",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947945926,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947945824,
+          "name": "check",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947945790,
+          "name": "records",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947945780,
+          "name": "clippy (${{ matrix.crate }})",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947944875,
+          "name": "corpus",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947944283,
+          "name": "current",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947943645,
+          "name": "Native full library (manual)",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947943473,
+          "name": "full-tier",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133947942920,
+          "name": "names",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 133947942919,
+          "name": "gate",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 133947928427,
+          "name": "migrate",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133947928195,
+          "name": "review",
+          "status": "completed",
+          "conclusion": "skipped"
+        }
+      ]
+    },
+    "latestDA": {
+      "head": "da590ab79c5d46248644c734bac15f264d750e71",
+      "workflow_runs": 19,
+      "events": {
+        "pull_request": 16,
+        "pull_request_target": 2,
+        "push": 1
+      },
+      "check_runs": 30,
+      "conclusions": {
+        "skipped": 10,
+        "success": 13,
+        "failure": 7
+      },
+      "all_workflow_ids": [
+        44057572748,
+        44057573131,
+        44057573022,
+        44057572890,
+        44057573021,
+        44057573055,
+        44057572675,
+        44057573017,
+        44057573015,
+        44057572878,
+        44057572762,
+        44057573065,
+        44057572986,
+        44057572844,
+        44057572760,
+        44057573038,
+        44057570294,
+        44057570298,
+        44057564733
+      ],
+      "all_checks": [
+        {
+          "id": 133951255265,
+          "name": "check",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133951237341,
+          "name": "exhaustive_replay",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133951237187,
+          "name": "replay_sentinels_pr",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133951236918,
+          "name": "evidence_audit_pr",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133951236647,
+          "name": "replay_plan",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133951236388,
+          "name": "long_replay",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133951235858,
+          "name": "factor-base sweep CLI",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133951235095,
+          "name": "harness",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133951103766,
+          "name": "rustfmt (changed files)",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133951101274,
+          "name": "clippy (cd_attack)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133951101250,
+          "name": "clippy (crypto)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133950880488,
+          "name": "records",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 133950801952,
+          "name": "corpus",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 133950800970,
+          "name": "learning",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133950800871,
+          "name": "replay",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133950799205,
+          "name": "size",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133950798477,
+          "name": "artifacts",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 133950770386,
+          "name": "Native full library (manual)",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 133950768451,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133950768440,
+          "name": "full-tier",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133950768052,
+          "name": "gate",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 133950768037,
+          "name": "recompute",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 133950767668,
+          "name": "names",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 133950767557,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133950767245,
+          "name": "scope",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133950767156,
+          "name": "parity",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 133950766965,
+          "name": "current",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133950766352,
+          "name": "merges",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133950765113,
+          "name": "migrate",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 133950763465,
+          "name": "review",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    }
+  },
+  "all_seven_current_failed_job_logs_retained": true,
+  "full_success_logs_retained": [
+    "learning",
+    "large-files"
+  ],
+  "failures": {
+    "artifacts": "added/modified data policy check passes; workflow store pull wiring reports35 existing workflows stale or missing pulls",
+    "gate": "86 tests/1 committed-tree failure;90 additional diagnostics abbreviated by unittest, with missing raw_data and curve registry mismatch",
+    "records": "58+8 tests pass; AWS credential configuration rejects invalid security token",
+    "corpus": "no Git-history object matches store manifest SHA256 for claims.tsv; no S3 contacted",
+    "names": "no Git-history object matches manifest for quadratic-twist-native-20261021.json; no S3 contacted",
+    "recompute": "12 tamper cases and missing-row control caught; committed currency file is not current",
+    "parity": "25 skill pairs pass; shared-code lock for tools/artifacts/artifacts.py mismatches"
+  },
+  "unchanged_base_input_subtrees": {
+    "base": "c5cbb67b19fe39864da7f8c9b29726696ba01580",
+    "current_PR_head": "da590ab79c5d46248644c734bac15f264d750e71",
+    "entire_input_subtrees_byte_tree_equal": [
+      ".github",
+      ".artifacts",
+      "tools",
+      "scripts",
+      "docs/shared-code.lock.json",
+      "docs/curves",
+      "docs/ic",
+      "docs/ecdlp-hardness-corpus"
+    ],
+    "git_diff_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "comparison_is_source_tree_equality_not_a_rerun_of_all_baseline_checks": true
+  },
+  "historical_result2160_check_budget_violation_preserved": 56,
+  "current_DA_check_budget": 30,
+  "current_head_has_not_passed_all_gates": true,
+  "CI_failures_not_waived_or_hidden": true,
+  "complete_logs": [
+    {
+      "job_id": 133950798477,
+      "full_decoded_bytes": 68854,
+      "sha256": "0a3aa18c69a6c894b4580f45639178caa56f82f10548474e30fda9b9623fe23e",
+      "no_excerpt_or_tail_replacement": true
+    },
+    {
+      "job_id": 133950768052,
+      "full_decoded_bytes": 40227,
+      "sha256": "10b2844f83d8881b0c4caff804ae5ee4e7b568d0da0462dabcbda7535463e6a3",
+      "no_excerpt_or_tail_replacement": true
+    },
+    {
+      "job_id": 133950800970,
+      "full_decoded_bytes": 419369,
+      "sha256": "587f56fbb4570aae3da5932f3e51ef27e3f031989a1d3ccc8dd4b81ee32bc9e2",
+      "no_excerpt_or_tail_replacement": true
+    },
+    {
+      "job_id": 133950799205,
+      "full_decoded_bytes": 21236,
+      "sha256": "763df109689b05311af0aa58f8608d062fb5943b95a1d722d2d75cb4b4484174",
+      "no_excerpt_or_tail_replacement": true
+    },
+    {
+      "job_id": 133950880488,
+      "full_decoded_bytes": 418600,
+      "sha256": "cacab32907b6e97183fd637a21b88ffe992a7e9b0fc53874a05a4cbd25d86658",
+      "no_excerpt_or_tail_replacement": true
+    },
+    {
+      "job_id": 133950801952,
+      "full_decoded_bytes": 21779,
+      "sha256": "017e6d7fa11e4ff14163efd34b873769c0292f74db1418f57b2c271c057bfb9f",
+      "no_excerpt_or_tail_replacement": true
+    },
+    {
+      "job_id": 133950768037,
+      "full_decoded_bytes": 417501,
+      "sha256": "da5b3fff29fe03f6b14b7f6fb2e00365a12e6ffdc3d6f5ae6b625662cbe285c0",
+      "no_excerpt_or_tail_replacement": true
+    },
+    {
+      "job_id": 133950767668,
+      "full_decoded_bytes": 29526,
+      "sha256": "67925d49453ef89d756afa22e7f4fcf7526a0d207024201a016c9d69a084708e",
+      "no_excerpt_or_tail_replacement": true
+    },
+    {
+      "job_id": 133950767156,
+      "full_decoded_bytes": 20523,
+      "sha256": "1beda1d073f029b50f27de1271eb9e041360027a9e346cdc76ddda872c137e7e",
+      "no_excerpt_or_tail_replacement": true
+    }
+  ],
+  "whole_packet": {
+    "path": "/dev/net/chained-transfers-owned-storage-20261117/native15-complete-packets/entire-first-PR4544-three-heads-all-APIs-nine-full-logs.tar.xz",
+    "bytes": 158856,
+    "sha256": "a6f318b12984358e3ada06471960aa561daa0e31f3c8eb3d5ae8c2a6cba52ea7",
+    "members": 35,
+    "all_full_bytes_and_modes_compared": true
+  },
+  "publication_status": "full raw archive retained privately; unchanged store policy, no new inline compressed dataset; full immutable CI job/run references and custody metadata published",
+  "next_unchanged_head_CI_read_no_earlier_than": "2026-11-17T14:40:07Z",
+  "new_substantive_head_requires50min_before_first_CI_read": true
+}

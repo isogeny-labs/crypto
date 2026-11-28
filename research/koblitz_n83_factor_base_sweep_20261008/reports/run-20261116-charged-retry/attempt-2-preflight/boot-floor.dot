@@ -1,0 +1,10 @@
+digraph boot_floor {
+  graph [rankdir=LR, bgcolor="white", pad="0.16", nodesep="0.28", ranksep="0.44"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=12, penwidth=1.3];
+  edge [color="#8b98a8", penwidth=1.2];
+  source [label="Clean source\n59404f9e124b", color="#456b8b", fillcolor="#ecf4fb"];
+  boot [label="Boot floor 20 GiB\nfollow-up 16.2 GiB", color="#a56e33", fillcolor="#fff1df"];
+  stop [label="Host exit 96\nno receipt", color="#a56e33", fillcolor="#fff1df"];
+  build [label="No container\nno build output", color="#398c62", fillcolor="#eaf7ef"];
+  source -> boot -> stop -> build;
+}

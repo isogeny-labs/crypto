@@ -1,0 +1,168 @@
+{
+  "branch": "claude/hyperelliptic-index-calculus-td1fdn",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/genus4_followup_20261118/resume.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-18T09:10:51+00:00",
+      "wall_s": 4755.244
+    }
+  ],
+  "commit": "ae36cdc6e47d374389a65b9d93e4c2f31a2a3741",
+  "commit_dirty": true,
+  "created_utc": "2026-11-18T07:10:18+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261118-genus4-followup"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v595-x86_64-with-glibc2.39"
+  },
+  "id": "20261118T0710Z-genus4-followup",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 108,
+      "name": "x_over_plain_rho_q3_w1_p16411",
+      "note": "[pcc:unverified] arm x / R_rho_plain_nowin; upper bound below 1 at only 36% of 50 bootstrap seeds (post hoc)",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        0.7666,
+        0.9996
+      ],
+      "unit": "ratio",
+      "value": 0.874
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 108,
+      "name": "x_over_ideal_negation_w1_p16411",
+      "note": "[pcc:unverified] post hoc vs sqrt(pi r/4); distance remaining",
+      "reference": 1.0,
+      "reference_kind": "unmatched_rho",
+      "spread": [
+        1.185,
+        1.3009
+      ],
+      "unit": "ratio",
+      "value": 1.2405
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 108,
+      "name": "w_over_plain_rho_q3_w1_p16411",
+      "note": "[pcc:unverified]",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        1.4069,
+        1.8371
+      ],
+      "unit": "ratio",
+      "value": 1.6046
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 36,
+      "name": "x_cc1_over_cc2_p8209",
+      "note": "[pcc:unverified] part A; cc*=2.0",
+      "reference": 1.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.296
+    }
+  ],
+  "problem": "prime-field-chained-transfer-no-advantage",
+  "raw": [
+    {
+      "bytes": 5849,
+      "path": "research/genus4_followup_20261118/a_cc0.5.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8f/8fa56f57d52917f95804a3bf31fabdfa107fefe53c376e53ace749f74059bb49",
+      "sha256": "8fa56f57d52917f95804a3bf31fabdfa107fefe53c376e53ace749f74059bb49",
+      "uploaded": false
+    },
+    {
+      "bytes": 5944,
+      "path": "research/genus4_followup_20261118/a_cc0.7.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c6/c6214ab1b55c75b10316e5a67312341d2f1acff253ed767e8bdc36c0f2f37577",
+      "sha256": "c6214ab1b55c75b10316e5a67312341d2f1acff253ed767e8bdc36c0f2f37577",
+      "uploaded": false
+    },
+    {
+      "bytes": 5974,
+      "path": "research/genus4_followup_20261118/a_cc1.0.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d9/d9116c11c395cc046a6332d998c09798d6eea668d9a77708ec9fdc19732b4c89",
+      "sha256": "d9116c11c395cc046a6332d998c09798d6eea668d9a77708ec9fdc19732b4c89",
+      "uploaded": false
+    },
+    {
+      "bytes": 6005,
+      "path": "research/genus4_followup_20261118/a_cc1.4.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/44/44b52cf99b5bd53e7e8d3f79b2ddbf2558109a37ef6e92b0935cb70ebb5a3d0a",
+      "sha256": "44b52cf99b5bd53e7e8d3f79b2ddbf2558109a37ef6e92b0935cb70ebb5a3d0a",
+      "uploaded": false
+    },
+    {
+      "bytes": 6123,
+      "path": "research/genus4_followup_20261118/a_cc2.0.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b6/b692f0c1f1a47fb9428bd34ce7abb91f0b14a08c9ac474573e4cfce68ab62aba",
+      "sha256": "b692f0c1f1a47fb9428bd34ce7abb91f0b14a08c9ac474573e4cfce68ab62aba",
+      "uploaded": false
+    },
+    {
+      "bytes": 25782,
+      "path": "research/genus4_followup_20261118/b_wx.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/93/93b828692674845218852760d48dec855e2ac635ee0b787016d2ed8d042153dc",
+      "sha256": "93b828692674845218852760d48dec855e2ac635ee0b787016d2ed8d042153dc",
+      "uploaded": false
+    },
+    {
+      "bytes": 4553,
+      "path": "research/genus4_followup_20261118/b_q.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ed/ed9ce7be5a9bb011a6f0a3e991c061880cb13826525d40412913d9e3f17c013c",
+      "sha256": "ed9ce7be5a9bb011a6f0a3e991c061880cb13826525d40412913d9e3f17c013c",
+      "uploaded": false
+    },
+    {
+      "bytes": 2436,
+      "path": "research/genus4_followup_20261118/b_q.jsonl.r1.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/aa/aa4efe1918d13db934b35e20c441168fcc8bf8fc46c68db4e874ce2fd637ec22",
+      "sha256": "aa4efe1918d13db934b35e20c441168fcc8bf8fc46c68db4e874ce2fd637ec22",
+      "uploaded": false
+    },
+    {
+      "bytes": 538,
+      "path": "research/genus4_followup_20261118/b_q_g3.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/20/2015ed534c67f674308dc0195220ce8a86ea1f5506362ab407fc6ba5984e5524",
+      "sha256": "2015ed534c67f674308dc0195220ce8a86ea1f5506362ab407fc6ba5984e5524",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "genus4-followup",
+  "status": "open",
+  "summary": "",
+  "validation": null
+}

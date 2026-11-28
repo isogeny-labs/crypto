@@ -1,0 +1,50 @@
+{
+  "recorded_at_utc": "2026-11-23T16:34:16.701435+00:00",
+  "classification": "Confirmed E0428 duplicate module in unchanged exact current-main source",
+  "root_sha": "71408278696c957d4b5983d4049bdac3e1bc98ba",
+  "path": "src/cryptanalysis/prime_radical_root.rs",
+  "immutable_source_url": "https://github.com/isogeny-labs/crypto/blob/71408278696c957d4b5983d4049bdac3e1bc98ba/src/cryptanalysis/prime_radical_root.rs",
+  "git_tree_entry": "100644 blob fad8c9f6a1e49621c89ec2772c73e57914dcf02c\tsrc/cryptanalysis/prime_radical_root.rs",
+  "source_sha256": "0c7e2e8ead138d085adcccbaab612e1804560d2e428758e677c2cf4b69b7de11",
+  "working_file_byte_identical_to_committed_blob": true,
+  "compiler_error": "E0428",
+  "duplicate_module": "round73_mersenne_single_fold",
+  "definition_lines": [
+    5097,
+    5409
+  ],
+  "source_excerpts": [
+    {
+      "start_line": 5095,
+      "lines": [
+        "",
+        "#[cfg(test)]",
+        "mod round73_mersenne_single_fold {",
+        "    use super::*;",
+        "",
+        "    #[test]"
+      ]
+    },
+    {
+      "start_line": 5407,
+      "lines": [
+        "",
+        "#[cfg(test)]",
+        "mod round73_mersenne_single_fold {",
+        "    use super::*;",
+        "",
+        "    // Test the actual production arithmetic against an independent wide oracle."
+      ]
+    }
+  ],
+  "cargo_exit_code": 101,
+  "tests_executed": false,
+  "no_source_fix_or_rerun": true,
+  "result_sha256": "05a2ce5da8a5c9581896d3f95736fbe366267ac6e4705cd82f34a246d5f16643",
+  "log_sha256": "435d6cf1f658b32f72e8d66bc311085f6b7a4c0d8777d5bd38db8fb4b7deb357",
+  "cargo_locks_after": {
+    "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate/target/release/.cargo-lock": "available",
+    "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate/target/release/.cargo-artifact-lock": "available",
+    "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate/target/release/.cargo-build-lock": "available"
+  }
+}

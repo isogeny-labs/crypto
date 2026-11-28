@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T20:22:51Z",
+ "id": "PCC-20261118-3ca541",
+ "kind": "statement",
+ "producer": {
+  "commit": "960d00782d5872360297d724bd608c93667dd10e",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/memory-frontier-20261118/metric-development-qualification.json",
+    "sha256": "357d33e65c5015e3624935f71c48ccc1c8f0f4253e80b55144501c6bec08e2c6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "tools/progress_metrics.py",
+    "sha256": "fc0d695de1f8aa9d499d3d41eb3f9af646b77a2f083054a59b56adf30a3bfb5d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/memory-frontier-20261118",
+ "statement": "The new neutral source-model progress metrics preserve exact native values and label them not RSS/timing/crossing. Development controls emit three rows for the qualified fixed target, none for missing source and none for seven negative proof/input controls. This is metadata qualification only; full exporter standing remains separate and no benchmark/record result is promoted."
+}

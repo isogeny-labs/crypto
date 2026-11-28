@@ -1,0 +1,42 @@
+name: Rootfinding radical round114 source-exact benchmarks
+
+on:
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_radical_root.rs'
+      - 'research/amm_digit_perf_20261118/round114_radical_isolated.py'
+      - '.github/workflows/radical-root-round114.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-exact-rust:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            src/cryptanalysis/prime_radical_root.rs
+            research/amm_digit_perf_20261118/round114_radical_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compile source-exact Rust, check roots and record 13-trial A/B medians
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "runner=$(uname -a)"
+            echo "rustc=$(rustc --version)"
+            echo "sha=$(git rev-parse HEAD)"
+            python3 research/amm_digit_perf_20261118/round114_radical_isolated.py
+          } | tee "$RUNNER_TEMP/round114-native-rust.txt"
+          cat "$RUNNER_TEMP/round114-native-rust.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round114-native-rust
+          path: ${{ runner.temp }}/round114-native-rust.txt
+          if-no-files-found: ignore

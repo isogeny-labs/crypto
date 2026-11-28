@@ -1,0 +1,22 @@
+target_weil.cpp: In member function ‘TSpace TargetWeil::conditions(const std::vector<FiniteDivisor>&, const std::vector<std::array<T24, 3> >&) const’:
+target_weil.cpp:65:9: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   65 |         for(auto& p:infinity)out.push_back(infinity_constraint(p));return out;
+      |         ^~~
+target_weil.cpp:65:68: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   65 |         for(auto& p:infinity)out.push_back(infinity_constraint(p));return out;
+      |                                                                    ^~~~~~
+target_weil.cpp: In member function ‘std::array<std::array<T24, 6>, 3> TargetWeil::weil_basis(int)’:
+target_weil.cpp:96:9: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+   96 |         for(int i=0;i<3;++i)std::copy(basis[i].begin(),basis[i].end(),out[i].begin());return out;
+      |         ^~~
+target_weil.cpp:96:87: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   96 |         for(int i=0;i<3;++i)std::copy(basis[i].begin(),basis[i].end(),out[i].begin());return out;
+      |                                                                                       ^~~~~~
+target_weil.cpp: In function ‘int main(int, char**)’:
+target_weil.cpp:126:5: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+  126 |     for(size_t i=0;i<heldout.size();++i)std::cout<<(i?",":"")<<heldout[i];std::cout<<"],\"scales\":[";for(size_t i=0;i<scales.size();++i){if(i)std::cout<<',';emit_t24(scales[i]);}
+      |     ^~~
+target_weil.cpp:126:75: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+  126 |     for(size_t i=0;i<heldout.size();++i)std::cout<<(i?",":"")<<heldout[i];std::cout<<"],\"scales\":[";for(size_t i=0;i<scales.size();++i){if(i)std::cout<<',';emit_t24(scales[i]);}
+      |                                                                           ^~~
+cc1plus: all warnings being treated as errors

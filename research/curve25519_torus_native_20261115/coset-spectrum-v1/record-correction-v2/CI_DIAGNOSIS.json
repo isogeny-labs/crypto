@@ -1,0 +1,68 @@
+{
+  "head": "1ef6277f7e975fac1cbe548d4fd63e8ccf4373d4",
+  "base": "da7777094392d3ccd37db78dcfc761c32e7e7813",
+  "introduced_failure": {
+    "job": 137952785754,
+    "claim": "PCC-20261123-8d8628",
+    "cause": "all three lean proof objects omit required decl_sha256; the claim writer did not derive it",
+    "failed_before_kernel_recheck": true,
+    "producer_error": true
+  },
+  "auxiliary_baseline_failures": {
+    "jobs": [
+      137952787942,
+      137952783766
+    ],
+    "cause": "unchanged frozen-source snippet assertions before native compilation",
+    "exact_input_blobs": [
+      {
+        "path": "research/amm_digit_perf_20261118/round123_quad_ab.py",
+        "base_blob": "920a0519653658e680527f56ef5b715d4dcd07b9",
+        "head_blob": "920a0519653658e680527f56ef5b715d4dcd07b9",
+        "equal": true
+      },
+      {
+        "path": "research/amm_digit_perf_20261118/round124_native_trace_ab.py",
+        "base_blob": "a1e07ce4c3378b07a12247133e3922cda0114eb2",
+        "head_blob": "a1e07ce4c3378b07a12247133e3922cda0114eb2",
+        "equal": true
+      },
+      {
+        "path": "src/cryptanalysis/prime_radical_root.rs",
+        "base_blob": "1580d66d72b17ca508359c44c5ac38bdde34a654",
+        "head_blob": "1580d66d72b17ca508359c44c5ac38bdde34a654",
+        "equal": true
+      },
+      {
+        "path": "src/cryptanalysis/prime_root_trace.rs",
+        "base_blob": "27be9d2730fc0f75c68c615376ca596ccd365122",
+        "head_blob": "27be9d2730fc0f75c68c615376ca596ccd365122",
+        "equal": true
+      }
+    ]
+  },
+  "logs": [
+    {
+      "job": 137952785754,
+      "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/record-correction-v2/ci-1ef-137952785754.log",
+      "bytes": 59687,
+      "sha256": "974121ae3fa09f86dda56e8be3f73152eaad28914394ba468703fc9b86581041",
+      "provenance": "complete connector-decoded UTF8, exact transport; not raw HTTP/server-wire or signed execution receipt"
+    },
+    {
+      "job": 137952787942,
+      "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/record-correction-v2/ci-1ef-137952787942.log",
+      "bytes": 35881,
+      "sha256": "f3ae796486d40939d86d77a209f89584f2bca3177d8b91302e39021d640cb2be",
+      "provenance": "complete connector-decoded UTF8, exact transport; not raw HTTP/server-wire or signed execution receipt"
+    },
+    {
+      "job": 137952783766,
+      "path": "research/curve25519_torus_native_20261115/coset-spectrum-v1/record-correction-v2/ci-1ef-137952783766.log",
+      "bytes": 35915,
+      "sha256": "781ae597d8f4aa979d401558e63aa3a66ba1bf453a430002e5690834a742ed0f",
+      "provenance": "complete connector-decoded UTF8, exact transport; not raw HTTP/server-wire or signed execution receipt"
+    }
+  ],
+  "later_pending_gate_outcomes": "not inferred"
+}

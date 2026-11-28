@@ -1,0 +1,13 @@
+{
+  "id": "marked23-r119-f4-edge-translation-v1",
+  "claim_class": "exact_computation",
+  "result118_sha256": "3840eb0fae9e2242abda0f33b411b39f2cfba983a88fd621ef16bda8536c9150",
+  "places": ["y0_e1", "y0_e3", "y1_e1", "y1_e2"],
+  "edge_k": {"y0_e1": 10, "y0_e3": 7, "y1_e1": 0, "y1_e2": 0},
+  "f4_modulus": "a^2+a+1",
+  "roots": [2, 3],
+  "decision_rule": "Report a coefficient order only below its minimum source cutoff; report a hull only if all orders are exact",
+  "controls": ["Frobenius conjugacy", "byte-identical replay", "changed-input rejection", "independent F4 constant evaluation", "Lean finite arithmetic if resolved"],
+  "backend": "local exact finite-field arithmetic",
+  "cloud_cost_usd": 0
+}

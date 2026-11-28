@@ -1,0 +1,633 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 57,
+  "runs": [
+    {
+      "attempt": "check57-01",
+      "source_revision": "99848ef1b44299e49cf00399fc92eadb73baf391",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "CHECK57_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "CHECK57_RESULT constraint_rank=44 complete_dimension=24 independent_jets=68 field_degree=32 field_reconstructions=24 division_products=24 sigma_nilpotent_rank=10 corrupted_kernel_rejected=1"
+      ],
+      "point_results": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-11-01T04:58:42Z",
+      "finished_utc": "2026-11-01T04:58:43Z",
+      "native_wall_seconds": 1.0
+    },
+    {
+      "attempt": "field57-01",
+      "source_revision": "add069f7737889bf3f9453b7f2de1bc416442d88",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FIELD57_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "FIELD57_RESULT source_degree=32 complete_sections=24 divided_sections=24 full_A_inverse=1 actual_descended_controls=4 changed_section_rejected=1"
+      ],
+      "point_results": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-11-01T04:54:11Z",
+      "finished_utc": "2026-11-01T04:54:11Z",
+      "native_wall_seconds": 0.0
+    },
+    {
+      "attempt": "match57-01",
+      "source_revision": "bd6c15d1e622aa0ef15d05c3ddc235ce22ce9620",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "MATCH57_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 2,
+      "first_errors": [
+        "   ? `ideal` == `ideal` failed",
+        "   ? error occurred in or before input.sing line 6: `riginalFromArtifact57==original57,\"MATCH57_ALL_68_ORIGINAL_BASIS_NUMERATORS\");`"
+      ],
+      "native_results": [
+        "MATCH57_DESCENT sections=68 original_artifact_bindings=68 full_polynomial_identities=68 coefficient_field=F4 changed_numerator_rejected=1",
+        "MATCH57_RESULT original_sections=68 literal_descent=68 cusp_charts=20 ambient_degree=128 target_degree=80 exact_binary_constraints=48 A_cusp_Q0=1 B_cusp_Q1=1"
+      ],
+      "point_results": [],
+      "status": "rejected",
+      "outcome": "native_error",
+      "started_utc": "2026-11-01T04:47:30Z",
+      "finished_utc": "2026-11-01T04:47:32Z",
+      "native_wall_seconds": 2.0
+    },
+    {
+      "attempt": "match57-02",
+      "source_revision": "4436be27fcb0386b94cf9bcd9f4a8f285f60636e",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "MATCH57_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "MATCH57_DESCENT sections=68 original_artifact_bindings=68 full_polynomial_identities=68 coefficient_field=F4 changed_numerator_rejected=1",
+        "MATCH57_RESULT original_sections=68 literal_descent=68 cusp_charts=20 ambient_degree=128 target_degree=80 exact_binary_constraints=48 A_cusp_Q0=1 B_cusp_Q1=1"
+      ],
+      "point_results": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-11-01T04:48:17Z",
+      "finished_utc": "2026-11-01T04:48:19Z",
+      "native_wall_seconds": 2.0
+    },
+    {
+      "attempt": "restriction-lean57-01",
+      "source_revision": "add069f7737889bf3f9453b7f2de1bc416442d88",
+      "kind": "Lean",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "audited_declarations": [],
+      "authored_claims": [],
+      "generated_equation_declarations": [],
+      "status": "rejected"
+    },
+    {
+      "attempt": "restriction-lean57-02",
+      "source_revision": "cdfb58225f0f48f3d7d99ad0edb9a60dcd1ebeb8",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": [
+        "Restriction57.complete_kernel",
+        "Restriction57.kernel_coordinates_injective",
+        "Restriction57.restricted_involution",
+        "Restriction57.row_change_kernel"
+      ],
+      "authored_claims": [
+        "Restriction57.complete_kernel",
+        "Restriction57.kernel_coordinates_injective",
+        "Restriction57.restricted_involution",
+        "Restriction57.row_change_kernel"
+      ],
+      "generated_equation_declarations": [],
+      "status": "accepted"
+    },
+    {
+      "attempt": "space57-01",
+      "source_revision": "c2c98c5a03e75afcc8d96aa0a19c8bc84080955a",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "SPACE57_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 12,
+      "first_errors": [
+        "   ? error occurred in or before ::cache57 line 6: `r=lm(lpw(uu,16),lpw(la(uu,lc(1)),16));list invden=li(denominator);list common;`",
+        "   ? last reserved name was `denominator`",
+        "   ? leaving ::cache57 (5)",
+        "   ? leaving ::cache57 (5)",
+        "   ? SPACE57_COMPLETE_CHART_AND_PAIR_COUNTS",
+        "   ? leaving ::require57 (0)",
+        "   ? SPACE57_AMBIENT_INDEPENDENCE",
+        "   ? leaving ::require57 (0)"
+      ],
+      "native_results": [
+        "SPACE57_RESULT ambient=68 local_conditions=48 constraint_rank=0 kernel_dimension=68 cusp_evaluations=1360 paired_charts=4 descent_row_isomorphism=1 complete_splitting=1 control_b_nonzero_rows=0 sigma_nilpotent_rank=34"
+      ],
+      "point_results": [],
+      "status": "rejected",
+      "outcome": "native_error",
+      "started_utc": "2026-11-01T04:50:11Z",
+      "finished_utc": "2026-11-01T04:50:13Z",
+      "native_wall_seconds": 2.0
+    },
+    {
+      "attempt": "space57-02",
+      "source_revision": "0f75cad3a16c1c5f012446359fa8ee4f3b98cefc",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "SPACE57_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "SPACE57_RESULT ambient=68 local_conditions=48 constraint_rank=44 kernel_dimension=24 cusp_evaluations=1360 paired_charts=4 descent_row_isomorphism=1 complete_splitting=1 control_b_nonzero_rows=6 sigma_nilpotent_rank=10"
+      ],
+      "point_results": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-11-01T04:51:16Z",
+      "finished_utc": "2026-11-01T04:52:31Z",
+      "native_wall_seconds": 75.0
+    },
+    {
+      "attempt": "trace57-01",
+      "source_revision": "3e7c7da9f67ff400056d7ccb8caabeec032c1129",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "TRACE57_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 48,
+      "first_errors": [
+        "   ? TRACE57_ACTUAL_CONTROL_TRACE_PREIMAGE",
+        "   ? leaving ::require57 (0)",
+        "   ? TRACE57_ACTUAL_CONTROL_TRACE_PREIMAGE",
+        "   ? leaving ::require57 (0)",
+        "   ? TRACE57_LAMBDA_TRACES_TO_A",
+        "   ? leaving ::require57 (0)",
+        "   ? matrix size not compatible(24x24, 6x1) in *",
+        "   ? error occurred in or before input.sing line 59: `uire57(N57*lambdaColumn57==AColumn57,\"TRACE57_EXACT_REGISTERED_LAMBDA_TRACE\");`"
+      ],
+      "native_results": [
+        "TRACE57_RESULT space_dimension=24 fixed_dimension=14 trace_dimension=10 fixed_mod_trace_dimension=4 actual_source_involution_checks=24 actual_fixed_functions=4 actual_trace_preimages=10 constant1_is_trace=0 A_is_trace=0"
+      ],
+      "point_results": [],
+      "status": "rejected",
+      "outcome": "native_error",
+      "started_utc": "2026-11-01T05:02:44Z",
+      "finished_utc": "2026-11-01T05:02:45Z",
+      "native_wall_seconds": 1.0
+    },
+    {
+      "attempt": "trace57-02",
+      "source_revision": "4b72c7a99facc716c69c666aa77cf7b7c14e3168",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "TRACE57_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "native_results": [
+        "TRACE57_RESULT space_dimension=24 fixed_dimension=14 trace_dimension=10 fixed_mod_trace_dimension=4 actual_source_involution_checks=24 actual_fixed_functions=4 actual_trace_preimages=10 constant1_is_trace=1 A_is_trace=1"
+      ],
+      "point_results": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-11-01T05:04:55Z",
+      "finished_utc": "2026-11-01T05:04:55Z",
+      "native_wall_seconds": 0.0
+    }
+  ],
+  "input_pins": [
+    {
+      "attempt": "check57-01",
+      "artifact": "input.sing",
+      "revision": "99848ef1b44299e49cf00399fc92eadb73baf391",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/CHECK57.sing",
+      "sha256": "e36217aa757438003d0fd0e433a82d7788502a26c045d61e3f4ed7dbfc4558c0"
+    },
+    {
+      "attempt": "check57-01",
+      "artifact": "driver.sh",
+      "revision": "99848ef1b44299e49cf00399fc92eadb73baf391",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/NATIVE_DRIVER.sh",
+      "sha256": "3f6d2f8483d1e15ea164245c1008cd6f119cdd65136d35f34afdf1c42ec1001c"
+    },
+    {
+      "attempt": "check57-01",
+      "artifact": "launcher.sh",
+      "revision": "99848ef1b44299e49cf00399fc92eadb73baf391",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "check57-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "99848ef1b44299e49cf00399fc92eadb73baf391",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/PROTOCOL.md",
+      "sha256": "06f6d852ec1c9dc6986c97892a0899470046d12303932c0c5c8e60497f1b4f09"
+    },
+    {
+      "attempt": "check57-01",
+      "artifact": "protocol.json",
+      "revision": "99848ef1b44299e49cf00399fc92eadb73baf391",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/protocol.json",
+      "sha256": "74f23d5bc76723576332ae28d15ceb69e57c0346af6bec5d5a04e13078b8da96"
+    },
+    {
+      "attempt": "check57-01",
+      "artifact": "donors.json",
+      "revision": "99848ef1b44299e49cf00399fc92eadb73baf391",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/donors.json",
+      "sha256": "05aafaeb510169aaa5d3231d85a6c6b4e4f0554bdcf56df01fef516981265c5f"
+    },
+    {
+      "attempt": "field57-01",
+      "artifact": "input.sing",
+      "revision": "add069f7737889bf3f9453b7f2de1bc416442d88",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/FIELD57.sing",
+      "sha256": "6f9b5df98eb6a2ae55ddc80988b92ceef366b21290b2b61eb103902a43611703"
+    },
+    {
+      "attempt": "field57-01",
+      "artifact": "driver.sh",
+      "revision": "add069f7737889bf3f9453b7f2de1bc416442d88",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/NATIVE_DRIVER.sh",
+      "sha256": "3f6d2f8483d1e15ea164245c1008cd6f119cdd65136d35f34afdf1c42ec1001c"
+    },
+    {
+      "attempt": "field57-01",
+      "artifact": "launcher.sh",
+      "revision": "add069f7737889bf3f9453b7f2de1bc416442d88",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "field57-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "add069f7737889bf3f9453b7f2de1bc416442d88",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/PROTOCOL.md",
+      "sha256": "c330c320dc6a5ea050be54df53dfa34eb1d445f047902b3f596958004af79a15"
+    },
+    {
+      "attempt": "field57-01",
+      "artifact": "protocol.json",
+      "revision": "add069f7737889bf3f9453b7f2de1bc416442d88",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/protocol.json",
+      "sha256": "6f5784a28e632b2a2e8a1a58ac2796c9e293593b49ddd0b18c4ff65e095914d2"
+    },
+    {
+      "attempt": "field57-01",
+      "artifact": "donors.json",
+      "revision": "add069f7737889bf3f9453b7f2de1bc416442d88",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/donors.json",
+      "sha256": "0987313cbebc40cbb3ecfdaecb9418f918f6961dbf60af9553356f1c9e0f4f48"
+    },
+    {
+      "attempt": "match57-01",
+      "artifact": "input.sing",
+      "revision": "bd6c15d1e622aa0ef15d05c3ddc235ce22ce9620",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/MATCH57.sing",
+      "sha256": "d3d2f1d1e3471a0834c4d03fd92610690d971d0c2d23f462ad5ee5153852032e"
+    },
+    {
+      "attempt": "match57-01",
+      "artifact": "driver.sh",
+      "revision": "bd6c15d1e622aa0ef15d05c3ddc235ce22ce9620",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/NATIVE_DRIVER.sh",
+      "sha256": "3f6d2f8483d1e15ea164245c1008cd6f119cdd65136d35f34afdf1c42ec1001c"
+    },
+    {
+      "attempt": "match57-01",
+      "artifact": "launcher.sh",
+      "revision": "bd6c15d1e622aa0ef15d05c3ddc235ce22ce9620",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "match57-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "bd6c15d1e622aa0ef15d05c3ddc235ce22ce9620",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/PROTOCOL.md",
+      "sha256": "aa42fe0edcec5b8b09dced2e9b3f37a068ef1b1f55b347a45bcfb85ca6a9da04"
+    },
+    {
+      "attempt": "match57-01",
+      "artifact": "protocol.json",
+      "revision": "bd6c15d1e622aa0ef15d05c3ddc235ce22ce9620",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/protocol.json",
+      "sha256": "156c2711d147379896e3936df9e2af533302217da66db4549e4cf8ce9f5627f0"
+    },
+    {
+      "attempt": "match57-01",
+      "artifact": "donors.json",
+      "revision": "bd6c15d1e622aa0ef15d05c3ddc235ce22ce9620",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/donors.json",
+      "sha256": "fe62014bfb89d0d33587201519e86a0268570f01821b4f00a68d6d5b3ef08158"
+    },
+    {
+      "attempt": "match57-02",
+      "artifact": "input.sing",
+      "revision": "4436be27fcb0386b94cf9bcd9f4a8f285f60636e",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/MATCH57.sing",
+      "sha256": "496ccbcff21b324c1105b720160a86e3ce727af931602ed5caa834da901bd9da"
+    },
+    {
+      "attempt": "match57-02",
+      "artifact": "driver.sh",
+      "revision": "4436be27fcb0386b94cf9bcd9f4a8f285f60636e",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/NATIVE_DRIVER.sh",
+      "sha256": "3f6d2f8483d1e15ea164245c1008cd6f119cdd65136d35f34afdf1c42ec1001c"
+    },
+    {
+      "attempt": "match57-02",
+      "artifact": "launcher.sh",
+      "revision": "4436be27fcb0386b94cf9bcd9f4a8f285f60636e",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "match57-02",
+      "artifact": "PROTOCOL.md",
+      "revision": "4436be27fcb0386b94cf9bcd9f4a8f285f60636e",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/PROTOCOL.md",
+      "sha256": "aa42fe0edcec5b8b09dced2e9b3f37a068ef1b1f55b347a45bcfb85ca6a9da04"
+    },
+    {
+      "attempt": "match57-02",
+      "artifact": "protocol.json",
+      "revision": "4436be27fcb0386b94cf9bcd9f4a8f285f60636e",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/protocol.json",
+      "sha256": "dfe84d97e480ef93631ae26796b0f2468abe0f7453efdc82797beefa9f7cde8a"
+    },
+    {
+      "attempt": "match57-02",
+      "artifact": "donors.json",
+      "revision": "4436be27fcb0386b94cf9bcd9f4a8f285f60636e",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/donors.json",
+      "sha256": "fe62014bfb89d0d33587201519e86a0268570f01821b4f00a68d6d5b3ef08158"
+    },
+    {
+      "attempt": "restriction-lean57-01",
+      "artifact": "driver.sh",
+      "revision": "add069f7737889bf3f9453b7f2de1bc416442d88",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/LEAN_DRIVER.sh",
+      "sha256": "31d7974506dbf79dd8370b5176ed0243fc68fa6fd40421f06f1190fe5e45d2d7"
+    },
+    {
+      "attempt": "restriction-lean57-01",
+      "artifact": "launcher.sh",
+      "revision": "add069f7737889bf3f9453b7f2de1bc416442d88",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/REPLAY_LEAN.sh",
+      "sha256": "cfbf76cf225565d70807e17030a1431c8d9ae0040e3cb51761b07e15253e9e37"
+    },
+    {
+      "attempt": "restriction-lean57-01",
+      "artifact": "Restriction57.lean",
+      "revision": "add069f7737889bf3f9453b7f2de1bc416442d88",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/lean/Restriction57.lean",
+      "sha256": "3e1ae2a82b71dc716e47383f6a4376e20c1447534a3951f151aeb7b63033f85c"
+    },
+    {
+      "attempt": "restriction-lean57-01",
+      "artifact": "LEAN-PROTOCOL.md",
+      "revision": "add069f7737889bf3f9453b7f2de1bc416442d88",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/LEAN-PROTOCOL.md",
+      "sha256": "9c4e4d89a91d1bea6b17a3d3ae52f50ab5bbc4353e79427afff01e5c1a7be5a5"
+    },
+    {
+      "attempt": "restriction-lean57-01",
+      "artifact": "AuditAxioms.lean",
+      "revision": "add069f7737889bf3f9453b7f2de1bc416442d88",
+      "git_source": "tools/lean/AuditAxioms.lean",
+      "sha256": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929"
+    },
+    {
+      "attempt": "restriction-lean57-02",
+      "artifact": "driver.sh",
+      "revision": "cdfb58225f0f48f3d7d99ad0edb9a60dcd1ebeb8",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/LEAN_DRIVER.sh",
+      "sha256": "31d7974506dbf79dd8370b5176ed0243fc68fa6fd40421f06f1190fe5e45d2d7"
+    },
+    {
+      "attempt": "restriction-lean57-02",
+      "artifact": "launcher.sh",
+      "revision": "cdfb58225f0f48f3d7d99ad0edb9a60dcd1ebeb8",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/REPLAY_LEAN.sh",
+      "sha256": "cfbf76cf225565d70807e17030a1431c8d9ae0040e3cb51761b07e15253e9e37"
+    },
+    {
+      "attempt": "restriction-lean57-02",
+      "artifact": "Restriction57.lean",
+      "revision": "cdfb58225f0f48f3d7d99ad0edb9a60dcd1ebeb8",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/lean/Restriction57.lean",
+      "sha256": "5b2ceb5734c207146e6547a026ec2496d776744e2491a4864f41983a56be7427"
+    },
+    {
+      "attempt": "restriction-lean57-02",
+      "artifact": "LEAN-PROTOCOL.md",
+      "revision": "cdfb58225f0f48f3d7d99ad0edb9a60dcd1ebeb8",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/LEAN-PROTOCOL.md",
+      "sha256": "4df3e7064657e6a3b3cffd0a70efb4b3d35371e4ebafaa42425e503c06670300"
+    },
+    {
+      "attempt": "restriction-lean57-02",
+      "artifact": "AuditAxioms.lean",
+      "revision": "cdfb58225f0f48f3d7d99ad0edb9a60dcd1ebeb8",
+      "git_source": "tools/lean/AuditAxioms.lean",
+      "sha256": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929"
+    },
+    {
+      "attempt": "space57-01",
+      "artifact": "input.sing",
+      "revision": "c2c98c5a03e75afcc8d96aa0a19c8bc84080955a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/SPACE57.sing",
+      "sha256": "79e340bedb7af7040aa7eea4d73bcbb9aaa0ebfbe5b545b51e4d3930f9ab8f4a"
+    },
+    {
+      "attempt": "space57-01",
+      "artifact": "driver.sh",
+      "revision": "c2c98c5a03e75afcc8d96aa0a19c8bc84080955a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/NATIVE_DRIVER.sh",
+      "sha256": "3f6d2f8483d1e15ea164245c1008cd6f119cdd65136d35f34afdf1c42ec1001c"
+    },
+    {
+      "attempt": "space57-01",
+      "artifact": "launcher.sh",
+      "revision": "c2c98c5a03e75afcc8d96aa0a19c8bc84080955a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "space57-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "c2c98c5a03e75afcc8d96aa0a19c8bc84080955a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/PROTOCOL.md",
+      "sha256": "6e4ba51a2202b6a8a1958c27155b1f549b6d9309691830e36aeb5230e02e82c3"
+    },
+    {
+      "attempt": "space57-01",
+      "artifact": "protocol.json",
+      "revision": "c2c98c5a03e75afcc8d96aa0a19c8bc84080955a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/protocol.json",
+      "sha256": "e40c32edae09ace530a047394730e0b7183ba196ca2ca87ae4938896e06447ba"
+    },
+    {
+      "attempt": "space57-01",
+      "artifact": "donors.json",
+      "revision": "c2c98c5a03e75afcc8d96aa0a19c8bc84080955a",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/donors.json",
+      "sha256": "fe62014bfb89d0d33587201519e86a0268570f01821b4f00a68d6d5b3ef08158"
+    },
+    {
+      "attempt": "space57-02",
+      "artifact": "input.sing",
+      "revision": "0f75cad3a16c1c5f012446359fa8ee4f3b98cefc",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/SPACE57.sing",
+      "sha256": "a9d4750f4abb317f322895e139db12be9448e79166a1c7f6abb1d873030797ec"
+    },
+    {
+      "attempt": "space57-02",
+      "artifact": "driver.sh",
+      "revision": "0f75cad3a16c1c5f012446359fa8ee4f3b98cefc",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/NATIVE_DRIVER.sh",
+      "sha256": "3f6d2f8483d1e15ea164245c1008cd6f119cdd65136d35f34afdf1c42ec1001c"
+    },
+    {
+      "attempt": "space57-02",
+      "artifact": "launcher.sh",
+      "revision": "0f75cad3a16c1c5f012446359fa8ee4f3b98cefc",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "space57-02",
+      "artifact": "PROTOCOL.md",
+      "revision": "0f75cad3a16c1c5f012446359fa8ee4f3b98cefc",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/PROTOCOL.md",
+      "sha256": "6e4ba51a2202b6a8a1958c27155b1f549b6d9309691830e36aeb5230e02e82c3"
+    },
+    {
+      "attempt": "space57-02",
+      "artifact": "protocol.json",
+      "revision": "0f75cad3a16c1c5f012446359fa8ee4f3b98cefc",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/protocol.json",
+      "sha256": "fcabbe8e92bfedb9ddb2a5544a5b86a3bddd1df3ecc4f8284e7679a120a91f88"
+    },
+    {
+      "attempt": "space57-02",
+      "artifact": "donors.json",
+      "revision": "0f75cad3a16c1c5f012446359fa8ee4f3b98cefc",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/donors.json",
+      "sha256": "fe62014bfb89d0d33587201519e86a0268570f01821b4f00a68d6d5b3ef08158"
+    },
+    {
+      "attempt": "trace57-01",
+      "artifact": "input.sing",
+      "revision": "3e7c7da9f67ff400056d7ccb8caabeec032c1129",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/TRACE57.sing",
+      "sha256": "a4648c70e97041ef5844b6a464547663cde4496672245aba15364c4d2be17c29"
+    },
+    {
+      "attempt": "trace57-01",
+      "artifact": "driver.sh",
+      "revision": "3e7c7da9f67ff400056d7ccb8caabeec032c1129",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/NATIVE_DRIVER.sh",
+      "sha256": "3f6d2f8483d1e15ea164245c1008cd6f119cdd65136d35f34afdf1c42ec1001c"
+    },
+    {
+      "attempt": "trace57-01",
+      "artifact": "launcher.sh",
+      "revision": "3e7c7da9f67ff400056d7ccb8caabeec032c1129",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "trace57-01",
+      "artifact": "PROTOCOL.md",
+      "revision": "3e7c7da9f67ff400056d7ccb8caabeec032c1129",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/PROTOCOL.md",
+      "sha256": "211cb48e07d31aed74bba5e808a13a69ff79f683c9b36f7dc8c955cb59c630e0"
+    },
+    {
+      "attempt": "trace57-01",
+      "artifact": "protocol.json",
+      "revision": "3e7c7da9f67ff400056d7ccb8caabeec032c1129",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/protocol.json",
+      "sha256": "2d5edf71c4a677f50403bc5bf711f012b54b1113bcd58a6070c0bb5e2121278f"
+    },
+    {
+      "attempt": "trace57-01",
+      "artifact": "donors.json",
+      "revision": "3e7c7da9f67ff400056d7ccb8caabeec032c1129",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/donors.json",
+      "sha256": "05aafaeb510169aaa5d3231d85a6c6b4e4f0554bdcf56df01fef516981265c5f"
+    },
+    {
+      "attempt": "trace57-02",
+      "artifact": "input.sing",
+      "revision": "4b72c7a99facc716c69c666aa77cf7b7c14e3168",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/TRACE57.sing",
+      "sha256": "4e56f10baac704675bd1cbfae4d09ec6bc5f719ca75b4e31c4fbc882c821984f"
+    },
+    {
+      "attempt": "trace57-02",
+      "artifact": "driver.sh",
+      "revision": "4b72c7a99facc716c69c666aa77cf7b7c14e3168",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/NATIVE_DRIVER.sh",
+      "sha256": "3f6d2f8483d1e15ea164245c1008cd6f119cdd65136d35f34afdf1c42ec1001c"
+    },
+    {
+      "attempt": "trace57-02",
+      "artifact": "launcher.sh",
+      "revision": "4b72c7a99facc716c69c666aa77cf7b7c14e3168",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/REPLAY_CAS.sh",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "trace57-02",
+      "artifact": "PROTOCOL.md",
+      "revision": "4b72c7a99facc716c69c666aa77cf7b7c14e3168",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/PROTOCOL.md",
+      "sha256": "211cb48e07d31aed74bba5e808a13a69ff79f683c9b36f7dc8c955cb59c630e0"
+    },
+    {
+      "attempt": "trace57-02",
+      "artifact": "protocol.json",
+      "revision": "4b72c7a99facc716c69c666aa77cf7b7c14e3168",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/protocol.json",
+      "sha256": "13b769a8bdb7ed857385c5a89b037a383c87e7ff78d9fd1c8a29429ac5dc399a"
+    },
+    {
+      "attempt": "trace57-02",
+      "artifact": "donors.json",
+      "revision": "4b72c7a99facc716c69c666aa77cf7b7c14e3168",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/57/donors.json",
+      "sha256": "05aafaeb510169aaa5d3231d85a6c6b4e4f0554bdcf56df01fef516981265c5f"
+    }
+  ],
+  "authored_proved_claims": [
+    "Restriction57.complete_kernel",
+    "Restriction57.kernel_coordinates_injective",
+    "Restriction57.restricted_involution",
+    "Restriction57.row_change_kernel"
+  ],
+  "audited_declarations": [
+    "Restriction57.complete_kernel",
+    "Restriction57.kernel_coordinates_injective",
+    "Restriction57.restricted_involution",
+    "Restriction57.row_change_kernel"
+  ]
+}

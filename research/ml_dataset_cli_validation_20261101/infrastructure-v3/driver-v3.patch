@@ -1,0 +1,64 @@
+--- a/driver.v2.py
++++ b/driver.v3.py
+@@ -217,7 +217,8 @@
+         return d
+ 
+     def git(self, name, source, *args):
+-        d = self.command(name, ["git", "-C", source, *args])
++        timeout = 120 if name == "source-clean" and args == ("status", "--porcelain=v1", "--untracked-files=all") else 45
++        d = self.command(name, ["git", "-C", source, *args], timeout=timeout)
+         return (d / "stdout").read_bytes()
+ 
+ def source_gate(runner, source, commit, tree):
+@@ -400,7 +401,7 @@
+ def amendment_binding_guard(a):
+     """Read-only admission before fixture creation, commands or freezing."""
+     body = load(a.protocol_draft)
+-    require(body.get("version") == 2 and body.get("freeze", {}).get("status") == "draft", "expected version2 draft")
++    require(body.get("version") == 3 and body.get("freeze", {}).get("status") == "draft", "expected version3 draft")
+     require("PENDING" not in json.dumps(body), "unresolved amendment binding")
+     repair = body["extensions"]["repair_amendment"]
+     binding = body["extensions"]["software_binding"]
+@@ -435,6 +436,27 @@
+     reconciliation = prior["derived_reconciliation"]
+     require(sha(Path(reconciliation["path"])) == reconciliation["sha256"], "prior reconciliation changed or absent")
+     require(repair["prior_attempt_file"] == "prior-attempt.json", "unsafe prior-attempt destination")
++    infra = body["extensions"]["infrastructure_amendment"]
++    require(infra["source_clean_timeout_seconds"] == 120 and infra["previous_timeout_seconds"] == 45,
++            "unexpected infrastructure allowance")
++    prior_v2_path = Path(infra["prior_v2_source_path"])
++    require(sha(prior_v2_path) == infra["prior_v2_sha256"], "prior v2 manifest changed")
++    prior_v2 = load(prior_v2_path)
++    require(prior_v2["version"] == 2 and prior_v2["verdict"] == "FAIL_BEFORE_DATA"
++            and prior_v2["no_dataset_commands"] is True and prior_v2["represented_rows"] == 0,
++            "prior v2 is not a zero-data infrastructure failure")
++    old_fixture = Path(prior_v2["fixture"])
++    for rel, digest in prior_v2["files"].items():
++        require(not Path(rel).is_absolute() and ".." not in Path(rel).parts, "unsafe prior v2 path")
++        require(sha(old_fixture/rel) == digest, "prior v2 evidence changed or absent")
++    failed = load(old_fixture/"execution-failed.json")
++    require(failed["no_retry"] is True and failed["cleanup"]["settled"] is True, "prior v2 cleanup unresolved")
++    failed_command = load(old_fixture/"commands/011-source-clean/receipt.json")
++    require(failed_command["timed_out"] is True and failed_command["exit_code"] == 124
++            and failed_command["cleanup"]["settled"] is True, "prior v2 failure differs")
++    require(load(old_fixture/"failure.experiment.export.json")["runs"] == [], "prior v2 has represented attempts")
++    for command in (old_fixture/"commands").iterdir():
++        require("dataset" not in load(command/"argv.json"), "prior v2 contains dataset command")
+     return body, prior_bytes
+ 
+ def prepare(a):
+@@ -452,6 +474,14 @@
+         retained_prior.flush()
+         os.fsync(retained_prior.fileno())
+     require(sha(fixture / "prior-attempt.json") == body["extensions"]["repair_amendment"]["prior_attempt_sha256"], "prior-attempt copy mismatch")
++    infra = body["extensions"]["infrastructure_amendment"]
++    prior_v2_bytes = Path(infra["prior_v2_source_path"]).read_bytes()
++    require(hashlib.sha256(prior_v2_bytes).hexdigest() == infra["prior_v2_sha256"], "prior v2 manifest changed after admission")
++    with (fixture / "prior-v2-attempt.json").open("xb") as retained_v2:
++        retained_v2.write(prior_v2_bytes)
++        retained_v2.flush()
++        os.fsync(retained_v2.fileno())
++    require(sha(fixture / "prior-v2-attempt.json") == infra["prior_v2_sha256"], "prior v2 copy mismatch")
+     runner = Runner(fixture, binary, a.binary_sha256)
+     try:
+         fs_type = runner.command("local-filesystem", ["stat", "-f", "-c", "%T", fixture])

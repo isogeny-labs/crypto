@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T22:18:16Z",
+ "id": "PCC-20261116-e62893",
+ "kind": "theorem",
+ "producer": {
+  "commit": "90ea6cb42434698be3fac9d2d012a579f298b961",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "1140da9015a88f3857f35ba285ada58af0eafcfcfb5179c5e9040e259cdf1fe6",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/finite-cubic-norm-final-04/CubicFiniteNorm22308.lean",
+   "theorem": "CubicFiniteNorm22308.cofactor_cubic_relation"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Canonical new record for byte-identical frozen legacy coefficient/word certificate from sourceeb3e882c; full original gate/type/negative provenance retained. No new Lean declaration, field/library instance, compiler/Jacobian/runtime/cost or signed promotion, and no legacy ledger reconciliation.",
+ "statement": "theorem cofactor_cubic_relation {R : Type} [CommRing R] (a b c : R) : (3*c^2-a*b)^3-3*(b^2-a*c)^3 = (a^3+3*b^3+9*c^3-9*a*b*c)*(3*c^3-b^3)"
+}

@@ -1,0 +1,58 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-20T18:41:47Z",
+ "id": "PCC-20261120-a79787",
+ "kind": "theorem",
+ "producer": {
+  "commit": "5f6b97f2041111efe4380ba0fcea3773dd8de27f",
+  "model": "Composer",
+  "session": "pr-4841"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "50a570982479ecdfadfaba55d7de89b28c615433d54d0766abc835bdf263f7e2",
+   "kind": "lean",
+   "project": "research/floor_crater_ecdlp_gap_20261120/lean",
+   "theorem": "floor_crater_valid_step"
+  },
+  {
+   "decl_sha256": "ef5c414a54b16860d8412737d077209582016d47792723ed4d4e2f6700180db4",
+   "kind": "lean",
+   "project": "research/floor_crater_ecdlp_gap_20261120/lean",
+   "theorem": "floor_crater_valuation_gap"
+  },
+  {
+   "decl_sha256": "fef5bfbe538c1a706d1330d84ada25f0628d1d37e92ccfdf31e0344619f3a950",
+   "kind": "lean",
+   "project": "research/floor_crater_ecdlp_gap_20261120/lean",
+   "theorem": "floor_crater_forces_large_step"
+  },
+  {
+   "decl_sha256": "c7d202a45dd2023407ff3f2ccd69a1bfc743f139ec88c9e823ddb4ee4340116b",
+   "kind": "lean",
+   "project": "research/floor_crater_ecdlp_gap_20261120/lean",
+   "theorem": "floor_crater_dlp_within_isogeny_cost"
+  },
+  {
+   "decl_sha256": "f4835b1aa4020367f7d6b4a8a9a8ce4e34a7360dece55ddf09ff592e5e66bad4",
+   "kind": "lean",
+   "project": "research/floor_crater_ecdlp_gap_20261120/lean",
+   "theorem": "floor_crater_transfer_overhead"
+  },
+  {
+   "decl_sha256": "8128ee9714b8a5d62fbe2cbd9baac2ad772aaa18cd23f5cfae1a7b8513c6c7f7",
+   "kind": "lean",
+   "project": "research/floor_crater_ecdlp_gap_20261120/lean",
+   "theorem": "floor_crater_bridge_overhead_ge"
+  },
+  {
+   "decl_sha256": "b12e8f5597d7fcf41fdbaaa02c431940661c3302058b14b43b6743f95da1fa3d",
+   "kind": "lean",
+   "project": "research/floor_crater_ecdlp_gap_20261120/lean",
+   "theorem": "floor_crater_velu_vs_rho"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Lean 4.35.0 / CryptoLean 01750b40 / TransferBound+DeepGap; End(E)\u2243O_f and Robert Remark 4.5 remain unformalized bridges. Standing unverified until CI signs on main.",
+ "statement": "On a large prime conductor gap between crater conductor 1 and floor conductor \u2113, always-correct ECDLP solvers differ by at most twice the degree-\u2113 isogeny evaluation cost: there is a mutual ValidConductorStep of degree \u2113, the padicValNat valuations differ, any conductor walk must include a step with \u2113|d and \u2113\u2264d, TransferBound gives the within_isogeny_cost and transfer_cost ceilings, and under a linear-V\u00e9lu lower bound the bridge overhead is at least 2\u2113 (comparable to \u221aq under Hasse). This does not assert that Pollard rho or other heuristic solvers are harder on the floor than the crater."
+}

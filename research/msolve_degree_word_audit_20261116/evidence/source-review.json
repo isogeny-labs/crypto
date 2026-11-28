@@ -1,0 +1,123 @@
+{
+  "recorded_at": "2026-11-16T16:06:50.732529+00:00",
+  "kb_available": false,
+  "kb_calls": 9,
+  "kb_labels": [
+    "status",
+    "mechanism",
+    "negative",
+    "application",
+    "adjacent",
+    "theorems",
+    "word_bounds",
+    "word_negative",
+    "word_theorems"
+  ],
+  "kb_exits": {
+    "status": "127",
+    "mechanism": "127",
+    "negative": "127",
+    "application": "127",
+    "adjacent": "127",
+    "theorems": "127",
+    "word_bounds": "127",
+    "word_negative": "127",
+    "word_theorems": "127"
+  },
+  "conductor_calls": 2,
+  "conductor_exits": [
+    "127",
+    "127"
+  ],
+  "source_commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+  "source_clean": true,
+  "primary_code_files": [
+    {
+      "path": "src/neogb/data.h",
+      "bytes": 19248,
+      "sha256": "e158f041fff9aa4ffbdfab4478b48cf8c162e0585938773daacfc100fe1c9535"
+    },
+    {
+      "path": "src/neogb/io.c",
+      "bytes": 43663,
+      "sha256": "cbfc511510e14f6c4101796e8d3bc59b9e872f2ea166412c77ce2f50c65b0ce5"
+    },
+    {
+      "path": "src/neogb/hash.c",
+      "bytes": 36641,
+      "sha256": "b99e5e377f857b917e6fd25a230a1433b964462c658f589a27ccfa971e4e7630"
+    },
+    {
+      "path": "src/neogb/symbol.c",
+      "bytes": 22577,
+      "sha256": "33c5466bfada78d2bb8707312ee4864b944986637e136c9151b97de6baf24062"
+    },
+    {
+      "path": "src/neogb/f4.c",
+      "bytes": 23520,
+      "sha256": "1b78cc3be2bc82f39e52a21ad4fe4859c18a063d1732213a20087a356548ae14"
+    },
+    {
+      "path": "src/neogb/f4sat.c",
+      "bytes": 24360,
+      "sha256": "218a6e1432969cb3b944ed79e8a934ef7c1aba9469b83c3d3f2746e651b3ae7d"
+    },
+    {
+      "path": "src/neogb/tools.c",
+      "bytes": 6456,
+      "sha256": "238b39a5ef06642062436a3585d7750abefc321ab3cc47cc4178ffeb328d3502"
+    },
+    {
+      "path": "src/neogb/la_ff_32.c",
+      "bytes": 140527,
+      "sha256": "6e9ddfe626154bfaeeffc867fc245cde8edccfca103e91e51cad23951372f447"
+    }
+  ],
+  "bounded_source_ranges": {
+    "data": "uint16_t exp_t and exponent layout",
+    "io": "25-59 import casts;735-860 full metadata validation",
+    "hash": "409 mask;1125-1165 multiplied insertion;1315-1358 LCM;1379-1400 row conversion",
+    "symbol": "198-363 selection;491-694 preprocessing/trace;764-772 trace bypass",
+    "f4": "350-455 and570-643 init/degree cap/LA/final reduction",
+    "f4sat": "429-458 saturation-specific simplify idea",
+    "tools": "41-120 trace construction; not scalar row-operation certificate"
+  },
+  "source_scope": "No range guard in read metadata function; not a global absence claim. C conformance and full trace authenticity remain open.",
+  "upstream_snapshot": {
+    "commit": "ef2e6aa39cca7b25f63a9a15a0779bf516718b3c",
+    "path": "src/neogb/data.h",
+    "range": "75-98",
+    "blob": "460c47d4aa3309120de76b9d1ebf5599d19fcfd0",
+    "reading": "Also uint16; previously reviewed snapshot, not today main or novelty claim"
+  },
+  "paper": {
+    "title": "A new efficient algorithm for computing Groebner bases (F4)",
+    "doi": "10.1016/s0022-4049(99)00005-5",
+    "access": "Crossref metadata read; author503/curl22 and Elsevier403/curl22",
+    "full_primary_read": false
+  },
+  "c_standard": {
+    "url": "https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf",
+    "access": "503/curl22; unread",
+    "full_C_semantics_proved": false
+  },
+  "canonical_model": [
+    "research/theorem_census_20261109/lean/F4Containment.lean",
+    "research/theorem_census_20261109/lean/SubspaceCriterion.lean",
+    "research/theorem_census_20261109/lean/F4SaturationBoundary.lean",
+    "research/theorem_census_20261109/lean/F4ExpectedOutputs.lean",
+    "research/theorem_audit_20261108/lean/SolvingDegreeBound.lean"
+  ],
+  "legacy_record": "Actual historical f4-model-sources statement is truncated at ordinaryRows=booleanGenerators (K; preserve and test separately, rebind full7clauses in new transparent bundle.",
+  "official": [
+    "Lean Init/Data/UInt/Lemmas.lean UInt16 actual modulo/ofNat/add/toNat lemmas",
+    "Mathlib actual MvPolynomial coefficients/totalDegree, Finsupp single/sum interfaces"
+  ],
+  "native_scope": "Instrumented/repaired source variant; control passes, boundary timeout124 despite expected written basis/predicted recorded wrap. Frozen normal-completion criterion fails. Captured prefix/decoded finite mathematical objects only.",
+  "protocol_tool": {
+    "commit": "005a7d7758844f97980b90c7ccd41b5cdcf9e048",
+    "version_limit": "Fetched main5d7c27e reviewed paths opaqueVLT1; use pinned existing unmodified plaintext canonical tool, no latest-version claim"
+  },
+  "novelty_claim": false,
+  "paid_compute": 0
+}

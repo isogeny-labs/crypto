@@ -1,0 +1,15 @@
+digraph backmap {
+  graph [rankdir=LR,bgcolor="white",pad=0.2,ranksep=0.4];
+  node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=11,fillcolor="#e7f2ff",color="#235e8a"];
+  edge [fontname="Helvetica",fontsize=10,color="#276749"];
+  graph [label="Remaining implementation: generic transpose dual and individual descent",labelloc=b,fontname="Helvetica",fontsize=11];
+  quartic [label="Actual kernel3 quartic / Fp\nGlobal rational-map identity\n320 unused series checks"];
+  degree [label="Degree certificate\nn=14: 120 columns, rank108\nn=15: 136 columns, rank124\nCommon base divisor: 12"];
+  elliptic [label="Original P-192 / Fp\n226 point images\n225 nonzero projected points"];
+  rows [label="Restricted setup relations\n6 principal rows\nProjected rank6"];
+  pull [label="4 public fiber classes\nNorm[6], doubling, cancellation\nF(Q) = 37 F(G)"];
+  quartic -> elliptic [label="explicit f, degree6"];
+  degree -> quartic [label="12 / 2 = 6"];
+  elliptic -> rows [label="actual point norms"];
+  elliptic -> pull [label="executed f* on public G,Q"];
+}

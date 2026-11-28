@@ -1,0 +1,35 @@
+name: Rootfind round83 verifier replay and in-place factors A/B
+on:
+  push:
+    branches:
+      - 'automation/rootfind-replay-inplace-round83-20261121'
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_root_trace.rs'
+      - 'research/amm_digit_perf_20261118/round83_full_ab.py'
+      - '.github/workflows/rootfind-trace-round83-full.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full-solve-verify-ab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round83_full_ab.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Round83 source-exact full rootfind and verifier-only A/B
+        run: |
+          set -euo pipefail
+          cargo --version
+          python3 research/amm_digit_perf_20261118/round83_full_ab.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round83-solve-verify-raw-csv
+          path: research/amm_digit_perf_20261118/round83_full_ab_results.csv

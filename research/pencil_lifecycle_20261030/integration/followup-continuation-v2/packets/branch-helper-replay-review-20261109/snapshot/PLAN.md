@@ -1,0 +1,9 @@
+# Five-call helper successor: prospective protocol
+
+Compile corrected BranchRootMultiplicity, unchanged BranchCoefficientMultiplicity, IndependentControls, Readback and ExpectedFailure in this order. Expected exit codes 0,0,0,0,1. Thirteen final named declarations must have only propext/Classical.choice/Quot.sound; negative control must be the existing single unsolved False goal, not an environment or elaboration error.
+
+The precheck copies exactly thirteen .olean artifacts and their thirteen sources into a fresh private retained-imports directory. Source and artifact hashes are independent. Only eligible modules from thirteen successful v2 calls are listed; no failed helper artifact is copied. Import precedence is new workspace, private retained imports, then frozen baseline roots. A helper failure stops before any target call, preventing fallback use of a failed helper. Extra entries or symlinks in retained cache fail admission. Source originals and copied files are byte-checked before compile, after compile, and in the mandatory postcheck, including after compiler failure. The v2 bundle stays immutable.
+
+Shared dependency and runtime custody, process-group cleanup, exact systemd invocation ownership, finite deadlines and no-retry behavior inherit the previously exercised runner. Precheck 900, compiler 600, postcheck 900 seconds; total 2400. One CPU, 8 GiB, no swap, 128 tasks. Parent serial admission and latest ledger remain unset; absolute deadline stays 2026-11-10 05:11:39 UTC. No execution without publication, independent review and explicit release.
+
+The preceding 14-call compiler phase 397.613 seconds informs scheduling only. No success or speed forecast is made. Nonbranch compiled with warnings but no named print in v2; forty named outputs across twelve other successful modules were inspected. Final target readback covers transitively used declarations; no separate blanket module audit is added.

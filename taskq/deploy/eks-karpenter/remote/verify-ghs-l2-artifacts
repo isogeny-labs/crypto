@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+REQUEST=${1:?usage: verify-ghs-l2-artifacts REQUEST.json STATUS.json POD_UID ARTIFACT_DIR [--contract-test-only]}
+STATUS=${2:?usage: verify-ghs-l2-artifacts REQUEST.json STATUS.json POD_UID ARTIFACT_DIR [--contract-test-only]}
+POD_UID=${3:?usage: verify-ghs-l2-artifacts REQUEST.json STATUS.json POD_UID ARTIFACT_DIR [--contract-test-only]}
+ARTIFACT_DIR=${4:?usage: verify-ghs-l2-artifacts REQUEST.json STATUS.json POD_UID ARTIFACT_DIR [--contract-test-only]}
+MODE=${5:-}
+[[ -z "$MODE" || "$MODE" == --contract-test-only ]] || { echo "unknown mode: $MODE" >&2; exit 2; }
+
+"$ROOT/remote/validate-ghs-l2-request" "$REQUEST" >/dev/null
+[[ -f "$STATUS" ]] || { echo "missing status: $STATUS" >&2; exit 2; }
+[[ -d "$ARTIFACT_DIR" ]] || { echo "missing artifact directory: $ARTIFACT_DIR" >&2; exit 2; }
+[[ "$POD_UID" =~ ^[0-9a-f-]{36}$ ]] || { echo "invalid pod UID" >&2; exit 2; }
+
+required=(
+  build-info.json control-comparison.json input-request.json job-exit.json
+  l2-gate.json replay.json session.jsonl validation.json warmup.json SHA256SUMS
+)
+for name in "${required[@]}"; do
+  [[ -f "$ARTIFACT_DIR/$name" && ! -L "$ARTIFACT_DIR/$name" ]] || {
+    echo "missing or linked artifact: $name" >&2
+    exit 2
+  }
+done
+if find "$ARTIFACT_DIR" -type l -print -quit | grep -q .; then
+  echo "artifact tree contains a symbolic link" >&2
+  exit 2
+fi
+
+# SHA256SUMS must bind every artifact except itself, exactly once, and may not
+# address a parent or absolute path.  This is the S3-readback integrity gate.
+expected_names=$(printf '%s\n' "${required[@]}" | grep -v '^SHA256SUMS$' | sort)
+manifest_names=$(awk '{print $2}' "$ARTIFACT_DIR/SHA256SUMS" | sed 's/^\*//' | sort)
+[[ "$manifest_names" == "$expected_names" ]] || {
+  echo "SHA256SUMS does not enumerate the exact required artifact set" >&2
+  exit 2
+}
+if awk '$2 ~ /(^\/|\.\.)/ { bad=1 } END { exit !bad }' "$ARTIFACT_DIR/SHA256SUMS"; then
+  echo "unsafe path in SHA256SUMS" >&2
+  exit 2
+fi
+(cd "$ARTIFACT_DIR" && sha256sum --strict -c SHA256SUMS >/dev/null)
+
+cmp -s "$REQUEST" "$ARTIFACT_DIR/input-request.json" || {
+  echo "input-request.json is not byte-identical to the validated request" >&2
+  exit 2
+}
+
+request_sha=$(sha256sum "$REQUEST" | awk '{print $1}')
+source_revision=$(jq -r '.job.build.source_revision' "$REQUEST")
+binary_sha=$(jq -r '.job.build.binary_sha256' "$REQUEST")
+runner_sha=$(jq -r '.job.runner.sha256' "$REQUEST")
+validator_sha=$(jq -r '.job.build.validator_sha256' "$REQUEST")
+image_uri=$(jq -r '.job.build.image_uri' "$REQUEST")
+rounds=$(jq -r '.job.spec.measurement.rounds' "$REQUEST")
+warmup=$(jq -r '.job.spec.measurement.warmup' "$REQUEST")
+arm_count=$(jq -r '.job.spec.arms | length' "$REQUEST")
+measured=$((rounds * arm_count))
+warmed=$((warmup * arm_count))
+
+# Bind the live Pod status to the requested digest, exact Pod UID, successful
+# termination, and zero restarts.  An image tag is never accepted.
+jq -e --arg uid "$POD_UID" --arg image "$image_uri" '
+  [.pods[] | select(.uid == $uid)] as $p |
+  ($p | length == 1) and
+  ($p[0].status.containerStatuses | length == 1) and
+  ($p[0].status.containerStatuses[0].imageID == ("docker-pullable://" + $image)) and
+  ($p[0].status.containerStatuses[0].restartCount == 0) and
+  ($p[0].status.containerStatuses[0].state.terminated.exitCode == 0)
+' "$STATUS" >/dev/null || { echo "Pod status does not bind the requested image/UID/exit" >&2; exit 2; }
+
+jq -e --arg src "$source_revision" --arg b "$binary_sha" --arg r "$runner_sha" --arg v "$validator_sha" '
+  .schema == "ghs.l2.build-info/v1" and .source_revision == $src and
+  .binary_sha256 == $b and .runner_sha256 == $r and .validator_sha256 == $v
+' "$ARTIFACT_DIR/build-info.json" >/dev/null || { echo "build identity mismatch" >&2; exit 2; }
+
+jq -e --arg uid "$POD_UID" '
+  .schema == "ghs.l2.job-exit/v1" and .pod_uid == $uid and
+  .exit_code == 0 and .retries == 0
+' "$ARTIFACT_DIR/job-exit.json" >/dev/null || { echo "job-exit gate failed" >&2; exit 2; }
+
+jq -e --arg sha "$request_sha" --arg src "$source_revision" --argjson n "$warmed" '
+  .schema == "ghs.l2.warmup/v1" and .request_sha256 == $sha and
+  .source_revision == $src and .expected == $n and .completed == $n and
+  .failures == 0
+' "$ARTIFACT_DIR/warmup.json" >/dev/null || { echo "warmup gate failed" >&2; exit 2; }
+
+jq -e --arg sha "$request_sha" --arg src "$source_revision" --argjson n "$measured" '
+  .schema == "ghs.l2.validation/v1" and .request_sha256 == $sha and
+  .source_revision == $src and .ok == true and .records == $n and
+  .verified == $n and .wrong_answers == 0 and .failures == 0
+' "$ARTIFACT_DIR/validation.json" >/dev/null || { echo "native validation gate failed" >&2; exit 2; }
+
+jq -e --arg sha "$request_sha" --argjson n "$measured" '
+  .schema == "ghs.l2.replay/v1" and .request_sha256 == $sha and
+  .all == true and .ok == true and .records == $n and .reproduced == $n and
+  .mismatches == 0
+' "$ARTIFACT_DIR/replay.json" >/dev/null || { echo "replay-all gate failed" >&2; exit 2; }
+
+jq -e --arg sha "$request_sha" --arg uid "$POD_UID" --argjson n "$measured" '
+  .schema == "ghs.l2.gate/v1" and .request_sha256 == $sha and
+  .pod_uid == $uid and .accepted == true and .isolation == "L2" and
+  .executions == $n and .below_l2 == [] and .invalid_outcomes == []
+' "$ARTIFACT_DIR/l2-gate.json" >/dev/null || { echo "L2 observation gate failed" >&2; exit 2; }
+
+jq -e --arg sha "$request_sha" --argjson rounds "$rounds" '
+  .schema == "ghs.l2.control-comparison/v1" and .request_sha256 == $sha and
+  .wall.status == "admitted" and .wall.pairs == $rounds and
+  .wall.pairs_below_level == 0 and
+  (.wall.ratio_ci95 | type == "array" and length == 2 and
+    .[0] >= 0.9 and .[0] <= 1.0 and .[1] >= 1.0 and .[1] <= 1.1)
+' "$ARTIFACT_DIR/control-comparison.json" >/dev/null || { echo "reference/control A/A gate failed" >&2; exit 2; }
+
+# One canonical record per measured arm execution.  Each record is required
+# to carry the request, source, Pod, L2, and correctness bindings.
+jq -se --arg sha "$request_sha" --arg src "$source_revision" --arg uid "$POD_UID" --argjson n "$measured" '
+  length == $n and all(.[];
+    .schema == "ghs.l2.record/v1" and .request_sha256 == $sha and
+    .source_revision == $src and .pod_uid == $uid and
+    .isolation == "L2" and .outcome == "ok" and .validated == true)
+' "$ARTIFACT_DIR/session.jsonl" >/dev/null || { echo "session record gate failed" >&2; exit 2; }
+
+if [[ "$MODE" == --contract-test-only ]]; then
+  echo "verified GHS package structure only; NOT L2-admitted (contract test mode)"
+  exit 0
+fi
+
+# Deliberately fail closed.  l2-gate.json and the session records are produced
+# inside the measured Pod and are not an independent native isolation grade.
+# A future trusted launcher must bind cpu-l2-spot Pod+node evidence and invoke
+# the native isolation grader before this verifier may return an admitting 0.
+echo "NOT ADMITTED: external native isolation grade is not implemented for the standalone GHS bridge" >&2
+exit 3

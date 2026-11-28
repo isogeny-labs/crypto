@@ -1,0 +1,160 @@
+{
+  "branch": "lane/ecc2k-ic-half-trace-setup",
+  "closed_utc": "2026-11-24T00:05:58+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/trace_zero_cold50_20261123/candidate3/checks/run-primary.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-23T23:51:52+00:00",
+      "wall_s": 63.91
+    }
+  ],
+  "commit": "0a2e495ef2d5ec76f9a4c2a8ef5c200f93a6e7f4",
+  "commit_dirty": false,
+  "created_utc": "2026-11-23T23:51:35+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261123-ecc2k-cold50"
+  ],
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpus_online": 5,
+    "hostname": "49d6f53fbd3b",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261123T2351Z-ecc2k-cold50-primary",
+  "metrics": [
+    {
+      "baseline": 44038338.0,
+      "better": "lower",
+      "n": 5,
+      "name": "n131_uniform_cold_ir",
+      "note": "Fixed d12 relation query, simultaneous matched original. Fixed historical44023404 ceiling separately retained; unsigned producer evidence.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        21360373.0,
+        21360373.0
+      ],
+      "unit": "ir",
+      "value": 21360373.0
+    },
+    {
+      "baseline": 25029194.0,
+      "better": "lower",
+      "n": 5,
+      "name": "n131_uniform_setup_ir",
+      "note": "Fixed d12 relation query, simultaneous matched original. Fixed historical44023404 ceiling separately retained; unsigned producer evidence.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        6623882.0,
+        6623882.0
+      ],
+      "unit": "ir",
+      "value": 6623882.0
+    },
+    {
+      "baseline": 18083340.0,
+      "better": "lower",
+      "n": 5,
+      "name": "n131_uniform_oracle_ir",
+      "note": "Fixed d12 relation query, simultaneous matched original. Fixed historical44023404 ceiling separately retained; unsigned producer evidence.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        13811466.0,
+        13811466.0
+      ],
+      "unit": "ir",
+      "value": 13811466.0
+    }
+  ],
+  "problem": "kernel:ecc2k130-ic-cold50",
+  "raw": [
+    {
+      "bytes": 141535,
+      "path": "research/trace_zero_cold50_20261123/candidate3/rows.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fd/fddd964793f1d33566072e96d77b5a07a579fbd5c58736729bc31bd3b3bf73b6",
+      "sha256": "fddd964793f1d33566072e96d77b5a07a579fbd5c58736729bc31bd3b3bf73b6",
+      "uploaded": false
+    },
+    {
+      "bytes": 29849,
+      "path": "research/trace_zero_cold50_20261123/candidate3/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/80/80b6ecddb1fae6b6869d99c8a11c4d12cc38602901f7533d82cd1e14e1c125ac",
+      "sha256": "80b6ecddb1fae6b6869d99c8a11c4d12cc38602901f7533d82cd1e14e1c125ac",
+      "uploaded": false
+    },
+    {
+      "bytes": 4073,
+      "path": "research/trace_zero_cold50_20261123/candidate3/grid-audit.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f4/f4eeb237f2dc0d01f6d1c954ecb40e162229978ca3601473156c2e78ef3594e1",
+      "sha256": "f4eeb237f2dc0d01f6d1c954ecb40e162229978ca3601473156c2e78ef3594e1",
+      "uploaded": false
+    },
+    {
+      "bytes": 3707,
+      "path": "research/trace_zero_cold50_20261123/candidate3/polynomial-replay.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/21/2185f953a9903680ad0c1f508112cbfb78f33c0b791ba167f09979e19ef15998",
+      "sha256": "2185f953a9903680ad0c1f508112cbfb78f33c0b791ba167f09979e19ef15998",
+      "uploaded": false
+    },
+    {
+      "bytes": 273,
+      "path": "research/trace_zero_cold50_20261123/candidate3/frozen-reference.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a7/a73644f3778278643a51246f795e62954f54024ccac3c27fcc30df7ec139ec08",
+      "sha256": "a73644f3778278643a51246f795e62954f54024ccac3c27fcc30df7ec139ec08",
+      "uploaded": false
+    },
+    {
+      "bytes": 145294,
+      "path": "research/trace_zero_cold50_20261123/candidate3/export.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/06/065c7bdc24cb22cbe4e18f32259420e80698ef58b35f130efb4569be42be9067",
+      "sha256": "065c7bdc24cb22cbe4e18f32259420e80698ef58b35f130efb4569be42be9067",
+      "uploaded": false
+    },
+    {
+      "bytes": 797160,
+      "path": "research/trace_zero_cold50_20261123/RAW-ALL.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/15/158e3ca86f7ac738c007583d61d2cde0361a21b1c263702958998de8096bc4fb",
+      "sha256": "158e3ca86f7ac738c007583d61d2cde0361a21b1c263702958998de8096bc4fb",
+      "uploaded": false
+    },
+    {
+      "bytes": 29377892,
+      "path": "research/trace_zero_cold50_20261123/FROZEN-EXECUTABLES.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/46/464993b8899f6ac411a0562be887d4bcdfb675cdf8e64c44ac10bd6479d9bb42",
+      "sha256": "464993b8899f6ac411a0562be887d4bcdfb675cdf8e64c44ac10bd6479d9bb42",
+      "uploaded": false
+    },
+    {
+      "bytes": 626946,
+      "path": "research/trace_zero_cold50_20261123/archive-members.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/16/16ae181fd2e09991a1b46d180317a3b34455cdf5680cf7d283baf6d13b450426",
+      "sha256": "16ae181fd2e09991a1b46d180317a3b34455cdf5680cf7d283baf6d13b450426",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261123-ecc2k-cold50/report.pdf",
+    "png": [
+      "benchmarks/20261123-ecc2k-cold50/instructions.png"
+    ],
+    "svg": [
+      "benchmarks/20261123-ecc2k-cold50/instructions.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ecc2k-cold50-primary",
+  "status": "measured",
+  "summary": "Fixed n131 uniform final21360373Ir,51.48% below unchanged original44023404 (matched baseline44038338:51.50%). Oracle23.62% lower.120 matched rows/all controls pass;80 tuple replays. Producer unsigned; integration/custody/admission/historical gates pending.",
+  "validation": null
+}

@@ -1,0 +1,281 @@
+{
+  "schema": "pairing-miller-source-plan/v1",
+  "created": "2026-11-10T18:36:14.980991+00:00",
+  "status": "Preissue frozen sources; whole126gatePASS/0failures/0trusted.",
+  "formal": {
+    "project": "research/pairing_miller_audit_20261110/lean",
+    "theorem": "PairingMillerCertificateAudit.concrete_miller_audit_certificate",
+    "statement": "theorem concrete_miller_audit_certificate : Fintype.card F25=25 ∧ curve.Δ≠0 ∧ Nat.card threeTorsion=9 ∧ Nat.card Right=9 ∧ Nat.card ExtTarget=3 ∧ Nat.card cubeRoots=3 ∧ (Nat.Coprime 3 5 ∧ ¬3∣5-1 ∧ 3∣25-1) ∧ (∀ u v : Index, weilMiller (indexedPoint u) (indexedPoint v)=omega^(determinant u v).val ∧ reducedTateMiller (indexedPoint u) (indexedPoint v)=omega^(2*determinant u v).val) ∧ (∀ U V W : threeTorsion, weilUnits (U+V) W=weilUnits U W*weilUnits V W ∧ weilUnits U (V+W)=weilUnits U V*weilUnits U W) ∧ (∀ U V : threeTorsion,∀ z w : Right, tateClass (U+V) z=tateClass U z*tateClass V z ∧ tateClass U (z+w)=tateClass U z*tateClass U w) ∧ (∀ U : threeTorsion,(∀ V,weilUnits U V=1) → U=0) ∧ (∀ V : threeTorsion,(∀ U,weilUnits U V=1) → V=0) ∧ (∀ U : threeTorsion,(∀ z,tateClass U z=1) → U=0) ∧ (∀ z : Right,(∀ U,tateClass U z=1) → z=0) ∧ (∀ U : threeTorsion,BaseRational U.val ↔ ∃ a : ZMod 3,rationalPoint a=U) ∧ ¬BaseRational Q ∧ (¬∀ U : threeTorsion,BaseRational U.val → (∀ V : threeTorsion,BaseRational V.val → weilUnits U V=1) → U=0) ∧ (∀ z : BaseTarget,z=1) ∧ (¬∃ e : baseThreeTorsion→baseCurve.Point→BaseTarget, ∀ U,(∀ V,e U V=1) → U=0) ∧ (∀ U : threeTorsion,InflectionCertificate U.val) ∧ rootValue (weilUnits torsionP torsionQ)=omega ∧ rootValue (reducedUnits torsionP (torsionToRight torsionQ))=omega^2",
+    "decl_sha256": "b81f031148b0f0aa1948f87e139a40ff02d2f7bb0a9ba775bdcaae6623222f77",
+    "sources": [
+      {
+        "path": "research/bk_actual_case_audit_20261110/lean/ThreeTorsion.lean",
+        "bytes": 4730,
+        "sha256": "ce0fe4bbd4a5e65d5ab060af8d2afe2c7662e78cedb67caf61c48cef5ff56a8f"
+      },
+      {
+        "path": "research/bk_actual_case_audit_20261110/lean/lake-manifest.json",
+        "bytes": 4086,
+        "sha256": "b8ded4aa6492ea60d20bb5a779c806b0db824040243e44b0400a2ed126c256e8"
+      },
+      {
+        "path": "research/bk_actual_case_audit_20261110/lean/lakefile.toml",
+        "bytes": 309,
+        "sha256": "6b8d5eebef309c5dcb04e13274fa377499ed0a105b8dca2857503560c798d652"
+      },
+      {
+        "path": "research/bk_actual_case_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/BaseDescent.lean",
+        "bytes": 3645,
+        "sha256": "2e206215da8994af1a94e3285d2f32a4b57d5f2a0eb8b8da8fd6373e0c7414dd"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/MillerCertificate.lean",
+        "bytes": 3477,
+        "sha256": "bae1fdf0235518598869646c218fc6c23222db82120d0f0589b1318df01f19c8"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/MillerCurve.lean",
+        "bytes": 2458,
+        "sha256": "689300e3c8e6ecf23da0ed27b455193d8ca8c530d259b7e91ed8757b471325b9"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/MillerExpressions.lean",
+        "bytes": 2286,
+        "sha256": "b9fb8a504e1fdfa078809837286c3510e48e6dd9030fc9fd8f0f6d9f86e09422"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/MillerProperties.lean",
+        "bytes": 4708,
+        "sha256": "04a2175047c9ce4b71de46515b7d8d6c8f023fd3b187fac703263d367f121122"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/MillerTable.lean",
+        "bytes": 2299,
+        "sha256": "e9d9633cb202a583f1c7692f58b43a0021d915d9caf9d346c3b2388e8e739ef0"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/TangentCertificate.lean",
+        "bytes": 2998,
+        "sha256": "d7175fee80e0509aff462bb679f1c50dd19bb7a494de05b1dac0d47492b8be1b"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/TateClassPairing.lean",
+        "bytes": 4113,
+        "sha256": "e7b59ba1dcd403a9dfb655806523ad232c0ef2d7459b41471202c2ea639b1d55"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/TateQuotient.lean",
+        "bytes": 4328,
+        "sha256": "10e2963e7c2caf88e7ba0887d68258d9888c73a82721b569bad726fec05c26cd"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/TorsionIndex.lean",
+        "bytes": 2783,
+        "sha256": "b1a98b1b2be6726b1495b84eb3b5f22108ae76b91b1bdae4818d330b30b9abd4"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/UnitsTarget.lean",
+        "bytes": 2162,
+        "sha256": "644e2a3f4d399a1f3604e2907e3aa173f36c2f1058b4976a9480f2291a531349"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/WeilTarget.lean",
+        "bytes": 2797,
+        "sha256": "ce3b941da845ab0d2c74337820c77a46222de261a82d0280a09376d46048f366"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/lake-manifest.json",
+        "bytes": 4361,
+        "sha256": "f45033ad3c0a4c2f8a8dc4c6bb541ba5b96c8cc3e475e063ac2613f96e745d9d"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/lakefile.toml",
+        "bytes": 442,
+        "sha256": "9aaa76b75ee1fd64591cdba9367e8b0c2b09c562d000c740cf50081f1f8fae9c"
+      },
+      {
+        "path": "research/pairing_miller_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Completion.lean",
+        "bytes": 9866,
+        "sha256": "465ba5d784463f0f54fcfb87547cbb0b0d5e3581a9d874ea462c06bfff084b8b"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/StructuralAudit.lean",
+        "bytes": 4216,
+        "sha256": "fa6f8c3383b7b1ec9249155287c1e9bb4602c4b747aeea390d2684affa474e86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusFiniteExtension.lean",
+        "bytes": 8610,
+        "sha256": "71cc43700fceabc138db6ad52f4e41449c1a7b440f92054d582836e2571eeb9a"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/FrobeniusPointDescent.lean",
+        "bytes": 6808,
+        "sha256": "772180baf24ea48b16ba3cae5c2039e2cf21d925ed1e7f1370b906711d60dc72"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RationalCounterexample.lean",
+        "bytes": 1477,
+        "sha256": "780be0d45d23fc0198e8bc5a77003cd473d4cdc1cf7d14c5fa9abe1cf5190eb1"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/TorsionBoundaries.lean",
+        "bytes": 11120,
+        "sha256": "8cce3dc81692549da50df802c41178c9ef908bb39cbf065f4d82cb8323afff47"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lake-manifest.json",
+        "bytes": 3396,
+        "sha256": "184f14175ff3bef6113ade64fb2d0b3b849770f2a51b46edcc7ef22d672b449f"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lakefile.toml",
+        "bytes": 1038,
+        "sha256": "7a607847ad1f457ed8fc93699c13d81c398d6b585896f990f3bc6b656d5815ec"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ],
+    "scope": "ActualF25field/curvepoints, exhaustive9point3torsion and81Weil/81Tateexpressionvalues/nonzeroevaluationproofs. Raw/reducedMillerclasses onactualE(L)[3] x E(L)/3E(L) to L*/cubes or cubeRoots, actualfinalexponent8isomorphism, bilateralbilinearity/nondegeneracy. ActualbaseF5imageequalscyclicPline, Qnonrational, directrestrictedNDfalse andtrivialbaseunitquotientnoNDmap. Tripleintersectionpolynomialcertificates included. Canonicaldivisor/valuationpairingidentification, genericMOV/FR/geometricrank and complexity remain open."
+  },
+  "artifacts": [
+    {
+      "path": "research/pairing_miller_audit_20261110/evidence/attempts.tar.gz",
+      "bytes": 16220,
+      "sha256": "2ac2b41bb56930bd22d231dc01b0a5e9ce91f3b61b7a7b893c46c4c2208b07bd"
+    },
+    {
+      "path": "research/pairing_miller_audit_20261110/evidence/attempts.json",
+      "bytes": 8485,
+      "sha256": "8293d1c8047fcda245da6e2389cf34fc78459c95552fdb762a22080fb2211d97"
+    },
+    {
+      "path": "research/pairing_miller_audit_20261110/evidence/gate.tar.gz",
+      "bytes": 3810,
+      "sha256": "50db5b0fbf4f88bdc4c052279a33e3630cc58723659c8d9abad97d288f11a71c"
+    },
+    {
+      "path": "research/pairing_miller_audit_20261110/evidence/gate.json",
+      "bytes": 1159,
+      "sha256": "e7cabbc35de4a9c6b89cd3fffd710929702300c901ae17505cb1cb1b9cdbf6db"
+    },
+    {
+      "path": "research/pairing_miller_audit_20261110/evidence/source-review.json",
+      "bytes": 2966,
+      "sha256": "ebeb2847b12a1f77fc038b4e14c130c1a28f88955ed38b309c70bedb97c1db61"
+    },
+    {
+      "path": "research/pairing_miller_audit_20261110/evidence/source-review-prework.json",
+      "bytes": 1640,
+      "sha256": "9b0bcfa8133cfb2efe454ba5715967d3664d1bd70f6fa46fe91be3e4957ca573"
+    },
+    {
+      "path": "research/pairing_miller_audit_20261110/evidence/frey-ruck-crossref.json",
+      "bytes": 14362,
+      "sha256": "f6693b073613666898e3370992be52e13713b506dde5e76d31252f94a3a52e9c"
+    }
+  ],
+  "gate": {
+    "archive": "research/pairing_miller_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 126,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/pairing_miller_audit_20261110/evidence/attempts.tar.gz",
+    "files": 51,
+    "roundtrip_equal": true
+  },
+  "source_review": {
+    "schema": "miller-source-review/v1",
+    "book": {
+      "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch26.pdf",
+      "sha256": "c06cf2df9b8003e19694a4ebfe298a1557d61169f87ec01542258438ceac015e",
+      "read_scope": "Reread26.2alternativeWeildefinition(26.1),26.3Tate(26.2),Miller29andorder-three tangent simplification,26.3.2reducedTate; actual divisor support/quotient conditions retained."
+    },
+    "Frey2009": {
+      "url": "https://www.numdam.org/item/AMBP_2009__16_1_1_0.pdf",
+      "sha256": "fa738a102376551aa104dc14e99aabfa504e03cf936ae9c778829b08f57c2b20",
+      "read_scope": "Selected3.1.1–3.4 and5.7–5.10 only, not fullpaper.",
+      "effect": "Local/cohomological pairing domains differ from finitefieldquotient expression; do not substituteone forother."
+    },
+    "original_FR94": {
+      "doi": "10.1090/s0025-5718-1994-1218343-6",
+      "metadata_receipt": "frey-ruck-crossref.json",
+      "old_catalog_suffix": "-3",
+      "status": "CorrectDOIprimaryAMS403, unread. No originalread/refutationclaim; oldsealedcatalog left historical."
+    },
+    "KB": "UnavailableMCP/wrapper127; bounded repository, primary, Mathlib fallback.",
+    "target": "Actual F25computablefield, actualcurvepoints/3torsion and prescribedWeil/TateMillerexpressionsat embedding2, basefielddegeneracycontrol. Canonical divisor/functionfield bridge kept separately open.",
+    "approach": "Reuse frozen actual3torsioncoordinateclassification; define tangent-line3Miller expression and evaluate with order2auxiliary; prove exact finite table, group/domain claims where actualbridgesavailable. No customaxiom/nativedecide/paidcompute/nativeexperiment.",
+    "created": "2026-11-10T18:36:14.980672+00:00",
+    "result_scope": "ActualF25field/curvepoints, exhaustive9point3torsion and81Weil/81Tateexpressionvalues/nonzeroevaluationproofs. Raw/reducedMillerclasses onactualE(L)[3] x E(L)/3E(L) to L*/cubes or cubeRoots, actualfinalexponent8isomorphism, bilateralbilinearity/nondegeneracy. ActualbaseF5imageequalscyclicPline, Qnonrational, directrestrictedNDfalse andtrivialbaseunitquotientnoNDmap. Tripleintersectionpolynomialcertificates included. Canonicaldivisor/valuationpairingidentification, genericMOV/FR/geometricrank and complexity remain open.",
+    "source_effect": "Keep book support/quotient/root hypotheses and orientation, prove finiteexpressions without importing sourcepairingnondegeneracy. Frey2009localcohomologydifferentdomains; FR94originalunread, no false source promotion.",
+    "Mathlib": "Pinned actual WeierstrassCurve.Affine.Pointgroup/map APIs, actualFrobeniusdescent/3torsionclassification from frozenparents, QuadraticAlgebrafield/Fintype, quotient homomorphisms and first isomorphism theorem. Polynomial map_C/natural-cast and universal ring proofs replace noncomputable polynomial equality decisions.",
+    "no_new_native_experiment": true,
+    "novelty": "Concrete formal check of established Miller expressions/domains, no novelty or general source refutation claim."
+  },
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "native_decide": false,
+    "custom_axioms": false,
+    "native_experiment": false,
+    "paid_compute": 0,
+    "waivers": false,
+    "added_elaboration_options": false,
+    "canonical_divisor_bridge_proved": false,
+    "source_nondegeneracy_assumed": false,
+    "lean4checker": "Unavailable; actual kernel and transitive axiom gate.",
+    "build_memory": "New source imports serialize heavy fieldproof branches; no elaboration limits raised, issuedparentsunchanged."
+  },
+  "proof_outline": [
+    "ActualF25field and actualP/Q/auxiliaryorders, exhaustiveactual3torsionindexhom/surjection andcardinality9.",
+    "Computeall81orderedMillerWeilvalues,81Tatevalues andusednonzeroevaluations, thenprove determinant formulas andbilinear/nondegenerate root-valued maps.",
+    "Actualallpoint6R=0, canonical3torsioninclusionintoE/3E isbijective; Rightcard9 from actualoperations.",
+    "Actualunitfinalexponent8 haskernelcubes andissurjectiveontocuberoots; both quotient/rootscard3. RawMillerunitclassesandreducedmapsbilinear/nondegenerateonproperactualquotientdomains.",
+    "ActualFrobenius(a,b)=(a,-b), baseimageexactPline, Qnonrational, universalbaseWeilrestrictionNDnegation. ActualbaseunitcubequotienttrivialprecludesanyleftNDmap.",
+    "Actualnonzero3torsiontangentpolynomialsubstitutionequals(X-x)^3, fromfinitefieldcoefficientproofsanduniversalpolynomialringidentity. No assumedcanonicaldivisor/valuationidentification."
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "charged_label_acquisition": {
+    "cap_draws": 413900,
+    "complete": true,
+    "counter_scope": "Actual public mixed-label rejection sampling; all misses and duplicate accepted points charged.",
+    "counters": {
+      "affine_additions": 88875,
+      "affine_doublings": 178715,
+      "field_inversions": 267590,
+      "field_multiplications": 535180,
+      "field_squarings": 446305,
+      "group_add_calls": 283824,
+      "scalar_bits": 178715,
+      "scalar_multiplications": 16234
+    },
+    "cpu_seconds": 0.45147162399999985,
+    "draws": 8117,
+    "labelled_points": 5,
+    "total_points": 5,
+    "wall_seconds": 0.45186467799976526
+  },
+  "curve": {
+    "P": [
+      5,
+      1500
+    ],
+    "Q": [
+      509,
+      219
+    ],
+    "a": 1952,
+    "b": 2061,
+    "p": 4099,
+    "r": 4139
+  },
+  "expected_uniform_public_draws_per_accepted_point": 413.9,
+  "id": "b008_c1_structured",
+  "mixed_labels_available": false,
+  "nominal_B": 8,
+  "points": [
+    {
+      "x": 5,
+      "y": 1500
+    },
+    {
+      "x": 6,
+      "y": 602
+    },
+    {
+      "x": 7,
+      "y": 583
+    },
+    {
+      "x": 10,
+      "y": 853
+    },
+    {
+      "x": 11,
+      "y": 1909
+    }
+  ],
+  "policy": "0 <= x < 2*nominal_B; canonical ordinate; no mixed labels supplied",
+  "random_label_draw_acceptance_probability": 0.0024160425223483935,
+  "schema": "structured-label-separation/v1",
+  "scope": "Rejection-sampling cost is for this explicit method, not a lower bound for all label-construction algorithms.",
+  "setup": {
+    "cpu_seconds": 0.00021276500000000365,
+    "interval_length": 16,
+    "liftable_abscissae": 5,
+    "signed_points": 10,
+    "wall_seconds": 0.00022237600023800042
+  }
+}

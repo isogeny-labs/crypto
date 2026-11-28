@@ -1,0 +1,22 @@
+[
+ {
+  "name": "BalancedChart.linear_support_transform",
+  "claim_path": "pcc/claims/PCC-20261112-db2184.json",
+  "statement": "theorem linear_support_transform {K : Type} [CommRing K] (x a l w u0 inverse : K) (hu : x+u0=0) (hchart : (x-a)*w=l) (hi : (a+u0)*inverse=1) : w+l*inverse=0",
+  "proof": {
+   "path": "research/chained_jacobian_transfers_20261110/lean/BalancedChart.lean",
+   "theorem": "BalancedChart.linear_support_transform",
+   "decl_sha256": "1c1d0caab3dc70c4ad89fbf0eabcaff2fe14adf7dc19bedf8fbb58bf0d2b09b5"
+  }
+ },
+ {
+  "name": "BalancedChart.balanced_infinity_images",
+  "claim_path": "pcc/claims/PCC-20261112-9fd61b.json",
+  "statement": "theorem balanced_infinity_images {H : Type} [IntModule H] (finite qplus qminus : H) (m n : Int) (hminus : qminus = -qplus) : finite+(n-1) \u2022 qplus+(1-m-n) \u2022 qminus = finite+(2*n+m-2) \u2022 qplus",
+  "proof": {
+   "path": "research/chained_jacobian_transfers_20261110/lean/BalancedChart.lean",
+   "theorem": "BalancedChart.balanced_infinity_images",
+   "decl_sha256": "383ffb084bcc66b536c853d05152f2b39366f7e65176ff8c52c39b98c437e70e"
+  }
+ }
+]

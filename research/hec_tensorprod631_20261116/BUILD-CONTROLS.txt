@@ -1,0 +1,25 @@
+   Compiling hec-tensorprod631 v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_tensorprod631_20261116)
+warning: function `add` is never used
+ --> ../hec_inverse631_20261116/verify_poly.rs:9:4
+  |
+9 | fn add(a: &[u64], b: &[u64], minus: bool) -> U {
+  |    ^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `inverse` is never used
+  --> ../hec_inverse631_20261116/verify_poly.rs:78:4
+   |
+78 | fn inverse(a: &[u64], m: &[u64]) -> U {
+   |    ^^^^^^^
+
+warning: function `reduce` is never used
+   --> ../hec_inverse631_20261116/verify_poly.rs:115:4
+    |
+115 | fn reduce(a: &[u64], m: &[u64]) -> U {
+    |    ^^^^^^
+
+warning: `hec-tensorprod631` (bin "tensorprod631") generated 3 warnings
+warning: `hec-tensorprod631` (bin "check-tensorprod631") generated 3 warnings (3 duplicates)
+warning: `hec-tensorprod631` (bin "baseline-phase631") generated 3 warnings (3 duplicates)
+    Finished `release` profile [optimized] target(s) in 1.86s

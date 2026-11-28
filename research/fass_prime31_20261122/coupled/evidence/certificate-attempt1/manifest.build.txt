@@ -1,0 +1,27 @@
+scope=fixed_d6_univariate_identity_over_2^61-1_evaluated_only
+original_module_base=e68f631c492c15bb54d79b96714e56ff72cf9f9d
+compile_command=timeout 60s cargo build --release --offline --locked
+runtime_limit_seconds=60
+runtime_virtual_memory_kib=2097152
+issue_points=32
+extra_points=32
+proof=null
+alpha=(1-T)^2; beta=-2T(1+T); gamma=T^2
+U_0=2; U_1=-beta; U_j=-beta*U_(j-1)-alpha*gamma*U_(j-2)
+lhs=alpha^6+gamma^6-U_6
+rhs=(T-1)^12+T^12-2T^6*sum_(j=0)^6 binom(12,2j)*T^j
+negative_controls=rhs_plus_one_must_reject; changed_digest_must_reject
+2026-11-23T01:48:05Z
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+cargo 1.100.0 (3acc79c0c 2026-11-05)
+83eb7414aedc7bf4f9b970dd5750236ee3af04d116e30e481865c15b30fcb923  main.rs
+3cf8e1d24430ef679c6d5bb7670556ef4e9f8578de291c7090e499b6f02bbb9d  Cargo.toml
+58166b220974d64440fcfb906490d75b5f4f5ff7bc9ab7e9bd243b9070f87462  Cargo.lock
+d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270  ../../../../../src/cryptanalysis/identity_certificate.rs
+2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf  ../../../../../src/hash/sha256.rs

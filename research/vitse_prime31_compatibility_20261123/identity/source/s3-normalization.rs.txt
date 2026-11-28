@@ -1,0 +1,19 @@
+pub fn s3(e: &Curve, x1: u64, x2: u64, x3: u64) -> u64 {
+    let p = e.p;
+    let d = subm(x1, x2, p);
+    let s = addm(x1, x2, p);
+    let pr = mulm(x1, x2, p);
+    let t0 = mulm(mulm(d, d, p), mulm(x3, x3, p), p);
+    let t1 = mulm(
+        2,
+        mulm(
+            addm(mulm(s, addm(pr, e.a, p), p), mulm(2, e.b, p), p),
+            x3,
+            p,
+        ),
+        p,
+    );
+    let pa = subm(pr, e.a, p);
+    let t2 = subm(mulm(pa, pa, p), mulm(4, mulm(e.b, s, p), p), p);
+    addm(subm(t0, t1, p), t2, p)
+}

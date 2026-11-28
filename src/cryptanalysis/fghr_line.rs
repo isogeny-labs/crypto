@@ -1258,6 +1258,7 @@ impl DecompositionOracle<Fp3Curve> for FghrOracle<'_> {
             solving_degree: None,
             timed_out: false,
             extra: Default::default(),
+            ..Default::default()
         };
         let shape = SystemShape {
             n_vars: 3,
@@ -1372,6 +1373,7 @@ impl DecompositionOracle<Fp3Curve> for YLineS4Oracle<'_> {
             solving_degree: Some(10),
             timed_out: false,
             extra: Default::default(),
+            ..Default::default()
         };
         let shape = SystemShape {
             n_vars: 3,

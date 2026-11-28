@@ -1,0 +1,269 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "log2_r": 23.974409950711376,
+      "arm": "inc",
+      "runs": 12,
+      "verified": 12,
+      "mean_s": [
+        3.0592179591472326,
+        3.419579585383215,
+        6.662834221507066
+      ],
+      "charged_sum": 149039.0,
+      "native_sum": 175561,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 7812.0
+      }
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "log2_r": 23.974409950711376,
+      "arm": "ksum5f-n13",
+      "runs": 12,
+      "verified": 12,
+      "mean_s": [
+        8.478815756969022,
+        9.273214027528653,
+        16.42279846256532
+      ],
+      "charged_sum": 413071.0,
+      "native_sum": 387015,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 20592.0
+      }
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "log2_r": 23.974409950711376,
+      "arm": "mitmbatch-n160",
+      "runs": 12,
+      "verified": 12,
+      "mean_s": [
+        13.289357433347321,
+        15.235522867401592,
+        32.75101177389002
+      ],
+      "charged_sum": 647431.0,
+      "native_sum": 948133,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 25600.0
+      }
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "log2_r": 23.974409950711376,
+      "arm": "mitmblocked-n160",
+      "runs": 12,
+      "verified": 12,
+      "mean_s": [
+        13.289357433347321,
+        15.235522867401592,
+        32.75101177389002
+      ],
+      "charged_sum": 647431.0,
+      "native_sum": 948133,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 25600.0
+      }
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "log2_r": 23.974409950711376,
+      "arm": "rho-neg",
+      "runs": 12,
+      "verified": 12,
+      "mean_s": [
+        1.5168108368222002,
+        1.659292036653282,
+        2.9416228351330176
+      ],
+      "charged_sum": 73896.0,
+      "native_sum": 69414,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "log2_r": 23.974409950711376,
+      "arm": "wsum-b12-n4",
+      "runs": 12,
+      "verified": 12,
+      "mean_s": [
+        48.45175688029405,
+        53.27516238355656,
+        96.68581191291925
+      ],
+      "charged_sum": 2360473.0,
+      "native_sum": 2349867,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 195312.0
+      }
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "log2_r": 23.974409950711376,
+      "arm": "wsum-b20-n4",
+      "runs": 12,
+      "verified": 12,
+      "mean_s": [
+        470.45753122886396,
+        515.8011518921033,
+        923.8937378612594
+      ],
+      "charged_sum": 22919753.0,
+      "native_sum": 22090508,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 1412880.0
+      }
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "inc",
+      "b": "ksum5f-n13",
+      "verdict": "inc < ksum5f-n13"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "inc",
+      "b": "mitmbatch-n160",
+      "verdict": "inc < mitmbatch-n160"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "inc",
+      "b": "mitmblocked-n160",
+      "verdict": "inc < mitmblocked-n160"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "inc",
+      "b": "rho-neg",
+      "verdict": "rho-neg < inc"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "inc",
+      "b": "wsum-b12-n4",
+      "verdict": "inc < wsum-b12-n4"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "inc",
+      "b": "wsum-b20-n4",
+      "verdict": "inc < wsum-b20-n4"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "ksum5f-n13",
+      "b": "mitmbatch-n160",
+      "verdict": "ksum5f-n13 < mitmbatch-n160"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "ksum5f-n13",
+      "b": "mitmblocked-n160",
+      "verdict": "ksum5f-n13 < mitmblocked-n160"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "ksum5f-n13",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum5f-n13"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "ksum5f-n13",
+      "b": "wsum-b12-n4",
+      "verdict": "ksum5f-n13 < wsum-b12-n4"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "ksum5f-n13",
+      "b": "wsum-b20-n4",
+      "verdict": "ksum5f-n13 < wsum-b20-n4"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "mitmbatch-n160",
+      "b": "mitmblocked-n160",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "mitmbatch-n160",
+      "b": "rho-neg",
+      "verdict": "rho-neg < mitmbatch-n160"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "mitmbatch-n160",
+      "b": "wsum-b12-n4",
+      "verdict": "mitmbatch-n160 < wsum-b12-n4"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "mitmbatch-n160",
+      "b": "wsum-b20-n4",
+      "verdict": "mitmbatch-n160 < wsum-b20-n4"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "mitmblocked-n160",
+      "b": "rho-neg",
+      "verdict": "rho-neg < mitmblocked-n160"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "mitmblocked-n160",
+      "b": "wsum-b12-n4",
+      "verdict": "mitmblocked-n160 < wsum-b12-n4"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "mitmblocked-n160",
+      "b": "wsum-b20-n4",
+      "verdict": "mitmblocked-n160 < wsum-b20-n4"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "rho-neg",
+      "b": "wsum-b12-n4",
+      "verdict": "rho-neg < wsum-b12-n4"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "rho-neg",
+      "b": "wsum-b20-n4",
+      "verdict": "rho-neg < wsum-b20-n4"
+    },
+    {
+      "curve": "icv1-fp24-t1059-6df599df",
+      "a": "wsum-b12-n4",
+      "b": "wsum-b20-n4",
+      "verdict": "wsum-b12-n4 < wsum-b20-n4"
+    }
+  ]
+}

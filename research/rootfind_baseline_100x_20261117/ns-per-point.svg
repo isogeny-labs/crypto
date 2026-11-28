@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" width="760" height="430" font-family="system-ui,-apple-system,Segoe UI,sans-serif">
+<rect width="760" height="430" fill="#ffffff"/>
+<text x="20" y="28" font-size="16" font-weight="600" fill="#1f2933">Time per signed point R ∓ P_k, one thread, 32-bit prime curve</text>
+<text x="20" y="48" font-size="12" fill="#6b7280">Nanoseconds, lower is better. Local diagnostic on a shared VM, not isolated [pcc:unverified].</text>
+<text x="20" y="84" font-size="13" font-weight="600" fill="#1f2933">Factor base A = 256</text>
+<line x1="300.0" y1="90" x2="300.0" y2="238" stroke="#e5e7eb" stroke-width="1"/>
+<text x="300.0" y="252" font-size="10" fill="#6b7280" text-anchor="middle">0</text>
+<line x1="435.7" y1="90" x2="435.7" y2="238" stroke="#e5e7eb" stroke-width="1"/>
+<text x="435.7" y="252" font-size="10" fill="#6b7280" text-anchor="middle">50</text>
+<line x1="571.4" y1="90" x2="571.4" y2="238" stroke="#e5e7eb" stroke-width="1"/>
+<text x="571.4" y="252" font-size="10" fill="#6b7280" text-anchor="middle">100</text>
+<text x="290" y="107" font-size="12" fill="#1f2933" text-anchor="end">rootfind-pairs (no table)</text>
+<rect x="300" y="94" width="276.1" height="18" rx="3" fill="#2f6fb0"><title>rootfind-pairs (no table): 101.7 ns per point</title></rect>
+<text x="582.1" y="107" font-size="12" fill="#1f2933">101.7</text>
+<text x="290" y="137" font-size="12" fill="#1f2933" text-anchor="end">rootfind-mitm (default)</text>
+<rect x="300" y="124" width="320.5" height="18" rx="3" fill="#2f6fb0"><title>rootfind-mitm (default): 118.1 ns per point</title></rect>
+<text x="626.5" y="137" font-size="12" fill="#1f2933">118.1</text>
+<text x="290" y="167" font-size="12" fill="#1f2933" text-anchor="end">rootfind-mitm-prime-batch</text>
+<rect x="300" y="154" width="135.2" height="18" rx="3" fill="#2f6fb0"><title>rootfind-mitm-prime-batch: 49.8 ns per point</title></rect>
+<text x="441.2" y="167" font-size="12" fill="#1f2933">49.8</text>
+<text x="290" y="197" font-size="12" fill="#1f2933" text-anchor="end">rootfind-subtract (best existing)</text>
+<rect x="300" y="184" width="70.0" height="18" rx="3" fill="#2f6fb0"><title>rootfind-subtract (best existing): 25.8 ns per point</title></rect>
+<text x="376.0" y="197" font-size="12" fill="#1f2933">25.8</text>
+<text x="290" y="227" font-size="12" fill="#1f2933" text-anchor="end">prototype: shared denominators + filter</text>
+<rect x="300" y="214" width="27.1" height="18" rx="3" fill="#2f6fb0"><title>prototype: shared denominators + filter: 10.0 ns per point</title></rect>
+<text x="333.1" y="227" font-size="12" fill="#1f2933">10.0</text>
+<text x="20" y="284" font-size="13" font-weight="600" fill="#1f2933">Factor base A = 1024</text>
+<line x1="300.0" y1="290" x2="300.0" y2="408" stroke="#e5e7eb" stroke-width="1"/>
+<text x="300.0" y="422" font-size="10" fill="#6b7280" text-anchor="middle">0</text>
+<line x1="435.7" y1="290" x2="435.7" y2="408" stroke="#e5e7eb" stroke-width="1"/>
+<text x="435.7" y="422" font-size="10" fill="#6b7280" text-anchor="middle">50</text>
+<line x1="571.4" y1="290" x2="571.4" y2="408" stroke="#e5e7eb" stroke-width="1"/>
+<text x="571.4" y="422" font-size="10" fill="#6b7280" text-anchor="middle">100</text>
+<text x="290" y="307" font-size="12" fill="#1f2933" text-anchor="end">rootfind-mitm (default)</text>
+<rect x="300" y="294" width="362.7" height="18" rx="3" fill="#2f6fb0"><title>rootfind-mitm (default): 133.6 ns per point</title></rect>
+<text x="668.7" y="307" font-size="12" fill="#1f2933">133.6</text>
+<text x="290" y="337" font-size="12" fill="#1f2933" text-anchor="end">rootfind-mitm-prime-batch</text>
+<rect x="300" y="324" width="164.8" height="18" rx="3" fill="#2f6fb0"><title>rootfind-mitm-prime-batch: 60.7 ns per point</title></rect>
+<text x="470.8" y="337" font-size="12" fill="#1f2933">60.7</text>
+<text x="290" y="367" font-size="12" fill="#1f2933" text-anchor="end">rootfind-subtract (best existing)</text>
+<rect x="300" y="354" width="122.4" height="18" rx="3" fill="#2f6fb0"><title>rootfind-subtract (best existing): 45.1 ns per point</title></rect>
+<text x="428.4" y="367" font-size="12" fill="#1f2933">45.1</text>
+<text x="290" y="397" font-size="12" fill="#1f2933" text-anchor="end">prototype: shared denominators + filter</text>
+<rect x="300" y="384" width="39.0" height="18" rx="3" fill="#2f6fb0"><title>prototype: shared denominators + filter: 14.4 ns per point</title></rect>
+<text x="345.0" y="397" font-size="12" fill="#1f2933">14.4</text>
+</svg>

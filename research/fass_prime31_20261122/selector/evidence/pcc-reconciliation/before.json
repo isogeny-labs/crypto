@@ -1,0 +1,61 @@
+{
+  "schema": "fass-selector.pcc-reconciliation-before/v1",
+  "remote_head": "dda2a143d639526060d1feaf12bfa87269fe932e",
+  "source_commit": "883e2d2dda223ae1b8eafdc83b289a49fa178855",
+  "original_metadata_commit": "a2569c6234f4896b19bf99a9036f7698199061da",
+  "original_ledger_blob": "77a6b44d7782b8ad61a7efb084ee426d22050c17",
+  "original_ledger_sha256": "ac3bfe67341891def728cef0b26b7e08e801cbbb56155e376d9e3b29258a54ee",
+  "original_ledger_bytes": 863752,
+  "original_entries": 1473,
+  "canonical_prefix_sha256": "9d0dc5f06b1bc7073fb0d7a97a12104f859953c4904279ef2573a46bb9347aff",
+  "canonical_prefix_bytes": 865082,
+  "canonical_prefix_entries": 1477,
+  "common_prefix_entries": 1470,
+  "common_prefix_sha256": "fff1a6103c6fd2bf7cd548e530389db2ac39770754cc784ba8c73b88e64b779f",
+  "original_suffix": {
+    "path": "research/fass_prime31_20261122/selector/evidence/pcc-reconciliation/original-unsigned-suffix.jsonl",
+    "sha256": "7fdea3bc09b0aa7bd4807022b8e511fc77ba79fab35e8545e6f75af9e7cb784f",
+    "bytes": 1498
+  },
+  "claims": [
+    {
+      "id": "PCC-20261123-f307d3",
+      "original": {
+        "path": "pcc/claims/PCC-20261123-f307d3.json",
+        "sha256": "fd243cf62f9e79d43b359d29baf02a8f89524ef877f4fe8322a5cfb19396f400",
+        "bytes": 927
+      },
+      "archive": {
+        "path": "research/fass_prime31_20261122/selector/evidence/pcc-reconciliation/PCC-20261123-f307d3.json",
+        "sha256": "fd243cf62f9e79d43b359d29baf02a8f89524ef877f4fe8322a5cfb19396f400",
+        "bytes": 927
+      },
+      "canonical_claim_digest": "08691877f788eb50abd89d715c33694e36d1531e5fb26bc4dffcd176c3891af6"
+    },
+    {
+      "id": "PCC-20261123-b6b455",
+      "original": {
+        "path": "pcc/claims/PCC-20261123-b6b455.json",
+        "sha256": "0a59b1a78216e5fd51660b6de8abbb331a87281fc6f650a1ec1b28bd0158a5f4",
+        "bytes": 1067
+      },
+      "archive": {
+        "path": "research/fass_prime31_20261122/selector/evidence/pcc-reconciliation/PCC-20261123-b6b455.json",
+        "sha256": "0a59b1a78216e5fd51660b6de8abbb331a87281fc6f650a1ec1b28bd0158a5f4",
+        "bytes": 1067
+      },
+      "canonical_claim_digest": "f74f6b9b80f03bcfcd3c0b25bd4ee45d5f658ad68cf7eae0893fcc127528aa78"
+    }
+  ],
+  "administrative_api": {
+    "origin": "dda2a143d639526060d1feaf12bfa87269fe932e:tools/pcc/pcc.py",
+    "git_blob": "66e1c71ce94edd434804912e78c3858a9b24d007",
+    "sha256": "85d787ed7cec0c02a0e2cb81cf435691d448221c1d46e3a4cecb54e64d674fcb",
+    "entrypoint": "append_entry; maintained Python administrative API"
+  },
+  "precedent": [
+    "docs/session-logs/2026-11-08.md: Local chart build checkpoint and concurrent-ledger reconciliation",
+    "docs/session-logs/2026-11-09.md: 20:20 UTC concurrent main ledger reconciled without changing evidence"
+  ],
+  "standing": "unsigned administrative reconciliation; no validation promotion"
+}

@@ -1,0 +1,9 @@
+392a393,400
+>     /* r7/m8 patch: degree-truncated F4 (stop when all remaining pairs have degree > c) */
+>     {
+>         const char *tdeg = getenv("MSOLVE_TRUNC_DEG");
+>         if (tdeg != NULL && *tdeg != '\0') {
+>             md->max_gb_degree = (deg_t)atoi(tdeg);
+>             fprintf(stderr, "[r7m8] MSOLVE_TRUNC_DEG=%d\n", (int)md->max_gb_degree);
+>         }
+>     }

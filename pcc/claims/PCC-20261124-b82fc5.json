@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T04:01:49Z",
+ "id": "PCC-20261124-b82fc5",
+ "kind": "execution",
+ "producer": {
+  "commit": "3a89657e2a59db9198dc5e641f54f92fcbf80d7e",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/forced-divisor-h6-20261124/unit-fiber-01/validation/tests-final.log",
+    "sha256": "132a21b359800b95a297a1296ad69f454684024be5dd9c9b6e7693c2e6b94e71"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/forced-divisor-h6-20261124/unit-fiber-01/source-worker-inputs.sha256",
+    "sha256": "e6b0723a133d2524df0ff880e414ab71094ebf371eb913c6be54141ce851547e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "src/cryptanalysis/jv_forced_divisor_unit.rs",
+    "sha256": "80543518abe77f605cef07473186cf8f4148c7c061a8b33b8687304b1d61822f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Exact-source H6 unit substitution has11 passing native controls, including off-variety nonzero constant tests, retained positive lift, existing support/group controls, known six-variable roots/traces and expired deadline. Worker and tests strict Clippy pass. Scoped build uses pinned Root41 dependencies and is not a whole-root build. Source-only qualification, no saved-fiber solve or cost conclusion; producer-unsigned."
+}

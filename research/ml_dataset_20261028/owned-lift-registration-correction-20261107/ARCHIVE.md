@@ -1,0 +1,1 @@
+Complete frozen packet is in S3_RECEIPT.json. This Git review subset omits full worker reference and scratch copies. Verify archive SHA-256 and byte count, extract, then run sha256sum -c SHA256SUMS at archive root. Nested original manifests describe complete packets, not this subset. All checks are source preparation; assembled Rust compile remains pending.

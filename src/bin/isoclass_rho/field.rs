@@ -571,6 +571,7 @@ pub struct F2m {
     pub poly: u64,
     tail: u64,
     mask: u64,
+    #[cfg(target_arch = "x86_64")]
     clmul: bool,
 }
 
@@ -629,13 +630,12 @@ impl F2m {
         );
         #[cfg(target_arch = "x86_64")]
         let clmul = is_x86_feature_detected!("pclmulqdq");
-        #[cfg(not(target_arch = "x86_64"))]
-        let clmul = false;
         F2m {
             m,
             poly,
             tail: poly ^ (1 << m),
             mask: (1u64 << m) - 1,
+            #[cfg(target_arch = "x86_64")]
             clmul,
         }
     }

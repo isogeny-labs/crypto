@@ -1,0 +1,23 @@
+   Compiling certified-relations v0.1.0 (/workspace/crypto-integrate/crates/certified-relations)
+   Compiling compact-speed-analysis v0.1.0 (/workspace/crypto-integrate/research/relation_degree_trace_20261115/rust-protocol)
+error[E0433]: too many leading `super` keywords within `crate`
+  --> src/bin/replay-qualifier.rs:17:5
+   |
+17 | pub(super) fn save(path: &Path, bytes: &[u8]) -> Result<()> {
+   |     ^^^^^ this `super` would go above the crate root
+
+error[E0433]: too many leading `super` keywords within `crate`
+  --> src/bin/replay-qualifier.rs:25:5
+   |
+25 | pub(super) fn call(
+   |     ^^^^^ this `super` would go above the crate root
+
+error[E0433]: too many leading `super` keywords within `crate`
+  --> src/bin/replay-qualifier.rs:93:5
+   |
+93 | pub(super) fn non_gb() -> (System, Witness) {
+   |     ^^^^^ this `super` would go above the crate root
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `compact-speed-analysis` (bin "replay-qualifier" test) due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...

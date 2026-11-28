@@ -1,0 +1,56 @@
+execute(read("../../source-data/compact-pid51.sing"));execute(read("../../source-data/compact-field51.sing"));execute(read("../../source-data/relative-infinity50.sing"));
+execute(read("../nu51-01/nu-field-certificate51.sing"));execute(read("../nu51-01/nu-pid-certificate51.sing"));execute(read("../twist51-02/universal-twisted51.sing"));
+setring compactPid51;short=0;
+map oldPid51=nuPidCertificate51,u;matrix oldH51=oldPid51(H51);matrix oldLift51=oldPid51(lift51);vector oldTarget51=oldPid51(target51);matrix targetMatrix51[32][1];
+int row51;int degree51=0;for(row51=1;row51<=32;row51++){targetMatrix51[row51,1]=oldTarget51[row51];if(deg(oldLift51[row51,1])>degree51){degree51=deg(oldLift51[row51,1]);}}
+if(oldH51!=matrix(basis51) || oldH51*oldLift51!=targetMatrix51){ERROR("DIAMONDNU51_FULL_SERIALIZED_NU_PID_BINDING");quit;}
+int clearing51=62+degree51;
+setring compactField51;short=0;
+map actualSourceMap51=relativeInfinity50,l,v,u;ideal source51=actualSourceMap51(relativeInfinityIdeal50);ideal EStandard51=std(ideal(source51[1]));
+proc nf51(poly a){return(reduce(a,EStandard51));}
+proc power51(poly a,int k){poly result51=1;while(k>0){if(k%2==1){result51=nf51(result51*a);}k=k div 2;if(k>0){a=nf51(a^2);}}return(result51);}
+map oldField51=nuFieldCertificate51,l,v;ideal oldSource51=oldField51(source51);
+if(oldSource51[1]!=source51[1] || oldSource51[2]!=source51[2]){ERROR("DIAMONDNU51_ACTUAL_SOURCE_BINDING");quit;}
+poly nu51=oldField51(nu51);poly oldC51=oldField51(C51);poly oldNumerator51=oldField51(numerator51);
+poly oldResidual51=oldField51(nuResidual51);poly oldQuotient51=oldField51(nuQuotient51);
+if(oldResidual51!=oldC51*nu51+oldNumerator51 || source51[1]*oldQuotient51!=oldResidual51){ERROR("DIAMONDNU51_FULL_SERIALIZED_NU_SOURCE_PRODUCT");quit;}
+map pidField51=compactPid51,u;poly D51=pidField51(commonDenominator51);vector oldCoefficients51=pidField51(oldTarget51);
+poly reconstructed51=0;for(row51=1;row51<=32;row51++){reconstructed51=reconstructed51+oldCoefficients51[row51]*l^((row51-1)%16)*v^((row51-1) div 16);}
+if(reconstructed51!=D51*nu51){ERROR("DIAMONDNU51_FULL_FIELD_PID_LINK");quit;}
+link inverseOut51="ASCII:w diamond-nu-inverses51.sing";open(inverseOut51);write(inverseOut51,"ring diamondNuInverseCertificate51=(2,u),(l,v),dp;short=0;ideal denominators51;ideal conjugates51;ideal norms51;ideal betas51;");int inverseCount51=0;
+proc inverse51(poly a){
+ a=nf51(a);poly alpha51=subst(a,v,0);poly beta51=(a+alpha51)/v;
+ if(a==0 || subst(a,l,0)!=a || subst(beta51,v,0)!=beta51){ERROR("DIAMONDNU51_INVERSE_SHAPE");return(poly(0));}
+ poly conjugate51=alpha51+beta51*(v+u^2);poly norm51=alpha51^2+u^2*alpha51*beta51+(u+u^3)*beta51^2;
+ if(norm51==0 || norm51!=leadcoef(norm51) || a*conjugate51+norm51!=beta51^2*source51[1]){ERROR("DIAMONDNU51_FULL_NORM_PRODUCT");return(poly(0));}
+ poly result51=conjugate51/leadcoef(norm51);if(nf51(a*result51)!=1 || nf51(a*(result51+1))==1){ERROR("DIAMONDNU51_INVERSE_CORRUPTION");return(poly(0));}
+ inverseCount51++;write(inverseOut51,"denominators51["+string(inverseCount51)+"]="+string(a)+";conjugates51["+string(inverseCount51)+"]="+string(conjugate51)+";norms51["+string(inverseCount51)+"]="+string(norm51)+";betas51["+string(inverseCount51)+"]="+string(beta51)+";");return(result51);
+}
+poly R51=(1+u)*v+u^3;poly b51=nf51(u*R51*(R51+1));poly c51=nf51(u*(R51+1));poly A51=1+c51;
+map currentN51=universalTwistedCertificate51,0,l,b51,c51;
+if(nf51(currentN51(N51))!=oldNumerator51 || nf51(A51^2*b51^3*(b51+c51*A51^3))!=oldC51){ERROR("DIAMONDNU51_ACTUAL_UNIVERSAL_NU_BINDING");quit;}
+poly k51=nf51(b51+A51*c51);poly s51=nf51(c51^3*inverse51(k51));poly ell51=nf51(k51*inverse51(c51));poly invS51=inverse51(s51);
+poly zImage51=forwardImages51[3];poly vImage51=forwardImages51[2];poly lImage51=forwardImages51[1];
+poly newR51=nf51((1+zImage51)*vImage51+power51(zImage51,3));poly newB51=nf51(zImage51*newR51*(newR51+1));poly newC51=nf51(zImage51*(newR51+1));
+if(nf51(lImage51*s51+l+ell51)!=0 || nf51(newB51*s51^3+b51*c51)!=0 || nf51((1+newC51)*s51+A51)!=0){ERROR("DIAMONDNU51_ACTUAL_TATE_COORDINATE_CHANGE");quit;}
+poly transportedNu51=nf51((nu51+l*b51+b51*c51)*power51(invS51,3));
+map targetN51=universalTwistedCertificate51,transportedNu51,lImage51,newB51,newC51;
+poly transportResidual51=targetN51(N51);matrix transportLift51=lift(ideal(source51[1]),ideal(transportResidual51));
+poly targetC51=nf51((1+newC51)^2*newB51^3*(newB51+newC51*(1+newC51)^3));poly targetInverse51=inverse51(targetC51);
+if(source51[1]*transportLift51[1,1]!=transportResidual51 || nf51(transportResidual51+targetC51)==0){ERROR("DIAMONDNU51_FULL_ACTUAL_NU_TRANSPORT");quit;}
+map sign51=compactField51,l+A51,v;poly signResidual51=sign51(nu51)+nu51+b51;matrix signLift51=lift(ideal(source51[1]),ideal(signResidual51));
+if(source51[1]*signLift51[1,1]!=signResidual51){ERROR("DIAMONDNU51_FULL_FIFTH_ITERATE_SIGN");quit;}close(inverseOut51);
+poly h51=u+v;if(nf51(zImage51*h51+1)!=0){ERROR("DIAMONDNU51_CLEARING_OPEN_BINDING");quit;}
+poly clearedNu51=nf51(power51(h51,clearing51)*transportedNu51);poly remaining51=D51*clearedNu51;vector coefficients51=0;intvec exponent51;int position51;number coefficient51;
+while(remaining51!=0){exponent51=leadexp(remaining51);coefficient51=leadcoef(remaining51);if(exponent51[1]>=16 || exponent51[2]>=2 || denominator(coefficient51)!=1){ERROR("DIAMONDNU51_CLEARED_VECTOR_NOT_INTEGRAL");quit;}position51=exponent51[1]+16*exponent51[2]+1;coefficients51=coefficients51+coefficient51*gen(position51);remaining51=remaining51-lead(remaining51);}
+reconstructed51=0;for(row51=1;row51<=32;row51++){reconstructed51=reconstructed51+coefficients51[row51]*l^((row51-1)%16)*v^((row51-1) div 16);}
+if(reconstructed51!=D51*clearedNu51){ERROR("DIAMONDNU51_COMPLETE_CLEARED_FIELD_VECTOR");quit;}
+link fieldOut51="ASCII:w diamond-nu-field51.sing";open(fieldOut51);
+write(fieldOut51,"ring diamondNuFieldCertificate51=(2,u),(l,v),dp;short=0;ideal source51="+string(source51)+";poly nu51="+string(nu51)+";poly transportedNu51="+string(transportedNu51)+";poly transportResidual51="+string(transportResidual51)+";poly transportQuotient51="+string(transportLift51[1,1])+";poly signResidual51="+string(signResidual51)+";poly signQuotient51="+string(signLift51[1,1])+";poly h51="+string(h51)+";poly D51="+string(D51)+";vector coefficients51="+string(coefficients51)+";int clearing51="+string(clearing51)+";");close(fieldOut51);
+string targetString51=string(coefficients51);setring compactPid51;execute("vector image51="+targetString51+";");module imageModule51=image51;matrix imageLift51=lift(basis51,imageModule51);matrix imageTarget51[32][1];
+for(row51=1;row51<=32;row51++){imageTarget51[row51,1]=image51[row51];}
+if(matrix(basis51)*imageLift51!=imageTarget51){ERROR("DIAMONDNU51_FULL_TRANSPORT_PID_LIFT");quit;}
+matrix bad51=imageLift51;bad51[1,1]=bad51[1,1]+1;if(matrix(basis51)*bad51==imageTarget51){ERROR("DIAMONDNU51_PID_CORRUPTION_ACCEPTED");quit;}
+link pidOut51="ASCII:w diamond-nu-pid51.sing";open(pidOut51);write(pidOut51,"ring diamondNuPidCertificate51=2,(u),(c,dp);short=0;vector image51="+targetString51+";matrix imageLift51[32][1];");for(row51=1;row51<=32;row51++){write(pidOut51,"imageLift51["+string(row51)+",1]="+string(imageLift51[row51,1])+";");}close(pidOut51);
+print("DIAMONDNU51_RESULT original_serialized_PID_and_source_products_rechecked=true original_field_PID_link_entries=32 actual_Tate_coordinate_identities=3 full_nu_transport_product=true full_sign_product=true normal_chart_clearing_power="+string(clearing51)+" source_coefficient_max_degree="+string(degree51)+" complete_transport_PID_entries=32 corruption_controls=true generic_Hecke3_correspondence_not_claimed=true");
+print("DIAMONDNU51_ALL_CHECKS_PASS");quit;

@@ -1,0 +1,6 @@
+# Exact conditional orbit solver
+The input fixes three ordered source offsets, a binary field, shift subspace U, target z and B. Output is every (T,V) satisfying the two original S3 equations. The source-offset shape is fixed; independent source variables are not being searched.
+
+Every valid shift is a root of the monic degree-12 resultant. gcd(R,L_U) retains exactly its distinct permitted shifts because L_U is squarefree. Exact prefix-coset GCD splitting recovers every root using cached tower residues. All common finite intermediates are roots of the degree-at-most-two polynomial GCD, including linear, proportional, square-root and Artin-Schreier cases. The F2-linear AS solver works in odd and even extension degrees. A zero-polynomial auxiliary is enumerated only in small fields; a larger free output raises an unresolved exception. Nonzero B avoids that case on cryptographic inputs.
+
+The competing ANF/zeta scanner is exact: T^k has Boolean degree at most popcount(k), so weight-at-most-three evaluations determine its coefficients for degree-12 R. XOR zeta transformation then computes every shift value. Allocation is capped before materialization. Setup and all auxiliary recovery are charged. Literal small-field enumeration and complete prefix-12 Horner checks precede timing. A conditional speed gain is not genuine GB or twenty-hard-field qualification.

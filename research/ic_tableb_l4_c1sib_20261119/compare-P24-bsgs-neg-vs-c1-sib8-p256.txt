@@ -1,0 +1,60 @@
+ops (ok): c1-sib8-p256 / bsgs-neg = 1.1050 [1.011, 1.208] (linearised_t, df 47) over 96 pairs on 48 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); band (w=0: 1.1035, w=0.1: 1.1838, w=1: 1.5461): c1-sib8-p256 > bsgs-neg at every weight; wall: admitted ns/GAE c1-sib8-p256/bsgs-neg 3.6641 [3.422, 3.923], no admitted A/A: not corrected for bias, noise test unavailable; end-to-end wall 4.0488 [3.700, 4.431]; ns/GAE of bsgs-neg, c1-sib8-p256 is an upper bound on its cost per operation (GAE is a lower bound)
+table work priced with the unpriced counters (the default since 2026-11-08): table_insert_attempts
+measurement quality: 0 / 100; paired attempts 96, verified 96, admitted 0; levels {"L0": 96}; p95 foreign busy unknown%, p95 run queue 4.50%
+quality notes: A/A bonus unavailable: the spec permits wall runs below L2; contention telemetry is incomplete
+arm bsgs-neg: verified 96/96 (0 censored); max/median S 1.37, top run 1% of total; unpriced: inserts_uncharged=158880, lookups_uncharged=174928; table work (priced): none
+arm c1-sib8-p256: verified 96/96 (0 censored); max/median S 1.58, top run 2% of total; unpriced: projected_base_column_map_entries_uncharged=192, projected_base_dedup_probes_uncharged=96, projected_base_membership_checks_uncharged=96; table work (priced): sibling_lift_products=26612, sibling_second_points=212040, table_insert_attempts=424232
+| curve | log2 r | workloads | c1-sib8-p256 / bsgs-neg | 95% interval | interval |
+|---|---:|---:|---:|---|---|
+| icv1-fp24-t1577-77336155 | 23.38 | 48 | 1.1050 | [1.0109, 1.2079] | linearised_t |
+
+| workload | curve | log2 r | bsgs-neg mean S | c1-sib8-p256 mean S | ratio |
+|---|---|---:|---:|---:|---:|
+| W00ab888c9c9b | icv1-fp24-t1577-77336155 | 23.38 | 1.2049 | 1.0376 | 0.8612 |
+| W08068dd49e3b | icv1-fp24-t1577-77336155 | 23.38 | 1.3449 | 1.1203 | 0.8330 |
+| W085b7b5957d2 | icv1-fp24-t1577-77336155 | 23.38 | 0.6018 | 1.2927 | 2.1479 |
+| W0e3e2565c953 | icv1-fp24-t1577-77336155 | 23.38 | 0.9735 | 1.1756 | 1.2076 |
+| W138b5a39e904 | icv1-fp24-t1577-77336155 | 23.38 | 0.6762 | 1.2154 | 1.7974 |
+| W17fac1bfac8a | icv1-fp24-t1577-77336155 | 23.38 | 0.8271 | 1.3978 | 1.6899 |
+| W181cc51985a5 | icv1-fp24-t1577-77336155 | 23.38 | 1.4262 | 0.9263 | 0.6495 |
+| W2a105eb757a7 | icv1-fp24-t1577-77336155 | 23.38 | 1.1168 | 0.9366 | 0.8386 |
+| W2a5be942b7eb | icv1-fp24-t1577-77336155 | 23.38 | 1.2402 | 0.9996 | 0.8060 |
+| W2aca74f3ff78 | icv1-fp24-t1577-77336155 | 23.38 | 1.4120 | 0.8746 | 0.6194 |
+| W2d087ab1effa | icv1-fp24-t1577-77336155 | 23.38 | 0.8734 | 1.2888 | 1.4756 |
+| W3e851a790354 | icv1-fp24-t1577-77336155 | 23.38 | 1.3787 | 1.0182 | 0.7385 |
+| W417e68a8eb15 | icv1-fp24-t1577-77336155 | 23.38 | 1.3403 | 1.2429 | 0.9273 |
+| W4493f53eb9ef | icv1-fp24-t1577-77336155 | 23.38 | 1.1144 | 1.1778 | 1.0568 |
+| W44ed0446d34a | icv1-fp24-t1577-77336155 | 23.38 | 0.8652 | 1.0509 | 1.2146 |
+| W47ed3ff2c276 | icv1-fp24-t1577-77336155 | 23.38 | 1.2856 | 1.4185 | 1.1034 |
+| W4813f1359619 | icv1-fp24-t1577-77336155 | 23.38 | 0.5577 | 1.3721 | 2.4604 |
+| W4af7f9ddedd3 | icv1-fp24-t1577-77336155 | 23.38 | 1.1610 | 1.1029 | 0.9500 |
+| W4d494e05c5b2 | icv1-fp24-t1577-77336155 | 23.38 | 0.7866 | 1.3588 | 1.7274 |
+| W52c0daff0781 | icv1-fp24-t1577-77336155 | 23.38 | 1.3821 | 1.5038 | 1.0881 |
+| W582682897029 | icv1-fp24-t1577-77336155 | 23.38 | 0.9124 | 1.1773 | 1.2903 |
+| W5840e6dd59f3 | icv1-fp24-t1577-77336155 | 23.38 | 1.4970 | 1.0483 | 0.7003 |
+| W5f74c437e6cd | icv1-fp24-t1577-77336155 | 23.38 | 0.9532 | 1.2472 | 1.3083 |
+| W67076bf710d5 | icv1-fp24-t1577-77336155 | 23.38 | 0.8480 | 1.1274 | 1.3295 |
+| W68516075ccb0 | icv1-fp24-t1577-77336155 | 23.38 | 0.7669 | 1.1808 | 1.5396 |
+| W6adc1b930649 | icv1-fp24-t1577-77336155 | 23.38 | 1.5036 | 1.0396 | 0.6914 |
+| W6cca6653b981 | icv1-fp24-t1577-77336155 | 23.38 | 1.1737 | 1.2590 | 1.0726 |
+| W8398434378bf | icv1-fp24-t1577-77336155 | 23.38 | 0.8631 | 1.1220 | 1.2999 |
+| W84d80a017c2e | icv1-fp24-t1577-77336155 | 23.38 | 0.7343 | 1.1392 | 1.5514 |
+| W8f814365940f | icv1-fp24-t1577-77336155 | 23.38 | 0.5982 | 1.0069 | 1.6832 |
+| W947cc02a7a4f | icv1-fp24-t1577-77336155 | 23.38 | 0.6493 | 0.8395 | 1.2929 |
+| W9dec90377688 | icv1-fp24-t1577-77336155 | 23.38 | 0.5211 | 0.9978 | 1.9149 |
+| Wa178eccb4e6b | icv1-fp24-t1577-77336155 | 23.38 | 1.3606 | 1.3935 | 1.0242 |
+| Wa9bb82166bf4 | icv1-fp24-t1577-77336155 | 23.38 | 1.2638 | 0.9582 | 0.7582 |
+| Wacbfc367fe93 | icv1-fp24-t1577-77336155 | 23.38 | 0.7301 | 1.2500 | 1.7123 |
+| Wb6fdc105bd2e | icv1-fp24-t1577-77336155 | 23.38 | 1.3573 | 1.2888 | 0.9495 |
+| Wca7c3c1a3784 | icv1-fp24-t1577-77336155 | 23.38 | 1.4571 | 1.1669 | 0.8008 |
+| Wd1596adeafcf | icv1-fp24-t1577-77336155 | 23.38 | 0.7576 | 1.0622 | 1.4022 |
+| Wd32742b173c0 | icv1-fp24-t1577-77336155 | 23.38 | 1.0376 | 1.1899 | 1.1467 |
+| Wd99c38ccd18d | icv1-fp24-t1577-77336155 | 23.38 | 1.3875 | 1.2434 | 0.8961 |
+| We11e92c7dbee | icv1-fp24-t1577-77336155 | 23.38 | 0.8882 | 1.0447 | 1.1762 |
+| We173fe9d08c2 | icv1-fp24-t1577-77336155 | 23.38 | 1.2578 | 1.3272 | 1.0552 |
+| Wec161b9d48df | icv1-fp24-t1577-77336155 | 23.38 | 0.9484 | 1.2677 | 1.3367 |
+| Wed3f2ae2dd6c | icv1-fp24-t1577-77336155 | 23.38 | 0.7464 | 1.2466 | 1.6701 |
+| Wf297c25967c6 | icv1-fp24-t1577-77336155 | 23.38 | 1.0842 | 1.1283 | 1.0407 |
+| Wf32d9af70962 | icv1-fp24-t1577-77336155 | 23.38 | 1.1323 | 1.2612 | 1.1139 |
+| Wf516a8029931 | icv1-fp24-t1577-77336155 | 23.38 | 1.2802 | 1.2017 | 0.9387 |
+| Wfc15c874bd0f | icv1-fp24-t1577-77336155 | 23.38 | 1.4293 | 1.3061 | 0.9139 |

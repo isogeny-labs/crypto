@@ -1,0 +1,18 @@
+{
+  "schema": "h116-chiral-binary-quartic-invariant-parity-launch/v1",
+  "protocol_id": "H116-CHIRAL-BINARY-QUARTIC-INVARIANT-PARITY-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and exact hashes in CHIRAL_BINARY_QUARTIC_INVARIANT_PARITY_SOURCE_GATE.md",
+  "quartic_pairs": [[0, 2], [1, 3], [4, 6], [5, 7]],
+  "feature_order": ["model0_I", "model0_J", "model1_I", "model1_J", "model2_I", "model2_J", "model3_I", "model3_J"],
+  "bit_convention": {"nonzero_square_invariant": 1, "nonsquare_invariant": 0, "singular_or_zero_invariant": "abstain"},
+  "rules": 512,
+  "target": "canonical_scalar_mod_2",
+  "replicates": 4096,
+  "commands": {
+    "build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_chiral_branch_residual_parity.rs", "-o", "/tmp/h116_chiral_binary_quartic_invariant_parity"],
+    "selftest": ["/tmp/h116_chiral_binary_quartic_invariant_parity", "--selftest"],
+    "run": ["/tmp/h116_chiral_binary_quartic_invariant_parity", "--run-invariants", "CHIRAL_BINARY_QUARTIC_INVARIANT_PARITY_RESULT.json"]
+  },
+  "outputs": ["CHIRAL_BINARY_QUARTIC_INVARIANT_PARITY_RESULT.json", "CHIRAL_BINARY_QUARTIC_INVARIANT_PARITY_RUN.txt", "CHIRAL_BINARY_QUARTIC_INVARIANT_PARITY_SHA256SUMS"],
+  "measurement_scope": "all 512 affine Boolean rules on ordered quadratic characters of classical I,J invariants of four target-tethered binary quartics, with exact invariant/discriminant, inherited branch/resultant/genus-one, and family-wise shuffle controls"
+}

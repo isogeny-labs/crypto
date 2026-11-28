@@ -1,0 +1,43 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T09:27:10Z",
+ "id": "PCC-20261117-b4ee50",
+ "kind": "measurement",
+ "producer": {
+  "commit": "1426d3e5ffaed09cac917b0de1d9326d48bf9d5a",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "replay",
+   "path": "research/vieta_coset_rust_20261115/speedup-20261117/evidence/primary-replay.json",
+   "sha256": "bd3daf601ad3a73282ca12da5549e5400c91fc6f810306b82bfdf92fe36b288b"
+  },
+  {
+   "kind": "replay",
+   "path": "research/vieta_coset_rust_20261115/speedup-20261117/evidence/budget-replay.json",
+   "sha256": "8932f7cbe3f303a372ba3667c610a975672986b286f8acf4a9a7c54ea960a072"
+  },
+  {
+   "kind": "recompute",
+   "path": "research/vieta_coset_rust_20261115/speedup-20261117/evidence/primary-summary.json",
+   "sha256": "9a8fd35d2d8d2ccc6f1575cd3861c3673206da8a562686e0705b05d05ef720f4"
+  },
+  {
+   "kind": "recompute",
+   "path": "research/vieta_coset_rust_20261115/speedup-20261117/evidence/budget-summary.json",
+   "sha256": "94d71c9775201388d4a5d2dc0414764de13c925a06af3a72487f49e726e114ef"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vieta_coset_rust_20261115/speedup-20261117/evidence/control-audit.json",
+    "sha256": "eec829887eca1f74a00f25543be3eae4930bb59baab0d5c80aee4f21bdddf722"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "vieta-native-reported-observations",
+ "statement": "Producer local cold paired median Newton/candidate ratios, separate cohorts:no pooling. Word16384 7.559-7.609,word32768 13.818-13.827 under separate8b protocol,P224coset2048 12.085-12.605,rational512 36.466-38.281. First192call cohort inconclusive with176successful replays/16cap failures;new48call word cohort all replayed, frozen local controls pass, optimized lookup remains cheaper. BelowL2 and unverified, no general degree proof or admitted/independent speedup."
+}

@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T15:17:27Z",
+ "id": "PCC-20261116-74d5d0",
+ "kind": "theorem",
+ "producer": {
+  "commit": "575b3cf41082596ebf8757a4974d1a27bdcd0301",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "52d0bfb03418b22886e6f91e2edb5d7ac68fce8599a6079b989132fa51fafed1",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+   "theorem": "CubicBasisInjectivity22303.three_coefficient_separation"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact generic CommRing characteristic223 coefficient transport/separation and cubic basis injectivity under z^3=3, fixed-expression equivalence without assumed injectivity. Six typed corollaries fully bind old embedding statements with unchanged original extractor; original limited records preserved. Zero-generator counterexample documents cubic-relation dependency. Both original gates37 audited0 trusted, standard foundations only, no field construction/native refinement/Jacobian/cost or signed standing.",
+ "statement": "theorem three_coefficient_separation {R : Type} [CommRing R] [IsCharP R 223] (a b c d e f : R) (h0 : a+b+c=d+e+f) (h1 : a+183*b+39*c=d+183*e+39*f) (h2 : a+39*b+183*c=d+39*e+183*f) : a=d \u2227 b=e \u2227 c=f"
+}

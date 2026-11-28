@@ -92,7 +92,7 @@ fn curve_rows(out: &mut String, w: &crate::cryptanalysis::ecbench::workload::Wor
         ts(&c.group_order.to_string()),
         ts(&c.r.to_string()),
         ts(&c.cofactor.to_string()),
-        f(Some((c.r as f64).log2())),
+        f(Some((c.r.to_f64()).log2())),
         c.automorphisms_available,
         f(Some(floor_s(c.automorphisms_available))),
         b(c.registered),
@@ -307,7 +307,7 @@ fn run_rows(out: &mut String, r: &Record) {
     if let Some(sv) = &r.solver {
         let _ = writeln!(
             out,
-            "INSERT INTO run_solver VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (record_id) DO NOTHING;",
+            "INSERT INTO run_solver VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}) ON CONFLICT (record_id) DO NOTHING;",
             ts(&r.record_id),
             ts(&sv.name),
             sv.calls,
@@ -329,6 +329,12 @@ fn run_rows(out: &mut String, r: &Record) {
             i(sv.sat_conflicts),
             i(sv.sat_decisions),
             i(sv.sat_propagations),
+            i(sv.first_fall_degree),
+            i(sv.last_fall_degree),
+            i(sv.solving_degree_sum),
+            i(sv.degree_of_regularity_observed),
+            t(sv.degree_story.as_deref()),
+            json_text(&sv.degree_trace),
             json_text(&sv.extra),
         );
     }
@@ -480,7 +486,7 @@ fn dump_rows(out: &mut String, d: &FactorBaseDump) {
         ts(&c.group_order.to_string()),
         ts(&c.r.to_string()),
         ts(&c.cofactor.to_string()),
-        f(Some((c.r as f64).log2())),
+        f(Some((c.r.to_f64()).log2())),
         c.automorphisms_available,
         f(Some(floor_s(c.automorphisms_available))),
         b(c.registered),

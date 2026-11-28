@@ -1,0 +1,27 @@
+name: Prime31 run63 affine-coordinate probe cost
+on:
+  push:
+    branches:
+      - research/prime31-f4-admission-run51-20261121
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_run63_normalized_probe.rs"
+      - ".github/workflows/prime31-run63-normalized-probe.yml"
+  pull_request:
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_run63_normalized_probe.rs"
+      - ".github/workflows/prime31-run63-normalized-probe.yml"
+  workflow_dispatch:
+
+jobs:
+  normalized-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/prime31_ic_20261115/native
+      - name: Original-prime31 arithmetic correctness and paired Rust performance
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo run --locked --release --example prime31_run63_normalized_probe

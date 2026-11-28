@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T03:47:36Z",
+ "id": "PCC-20261117-4ff1c3",
+ "kind": "statement",
+ "producer": {
+  "commit": "2043bee6aee1cef2444c48e8fd3a1b2368c6db38",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/closed_transpose.cpp",
+    "sha256": "8ff8addb690cc361a1ccbd68f78a6b25f54a05a21d526d3ab7c4c2247feefd0f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/CLOSED_TRANSPOSE_PROTOCOL.md",
+    "sha256": "92034a3bd6bef3adfada6c2d21505817b4ca203de7d33450e56795786a26b8e0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/closed-transpose-v1/result.json",
+    "sha256": "2cbc5ac4a651205f8ea631e51c085e55b3d9c41fba68d8b0539ff40dc4469bf8"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "nist-cover-complete-maps",
+ "statement": "Producer native P192 closed-target transpose uses actual irreducible factor fields, multiplicities and Frobenius trace; all six pinned source fixtures satisfy psi(phi(D))=3D by exact source Mumford equality, including the repeated-support fixture, plus zero and altered-input/composition controls. Projective reverse input remains open; not independent verification."
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "xedni-public-lift-curve-family-protocol-v1",
+  "family": "E_t/Q: y^2=x^3+t*x+1 with Q=(0,1), integer t from 1 through 64; reduce at each fixed prime p",
+  "primes": [1009, 1013],
+  "selection_rule": "for each p, test t ascending from 1 through 64; select first two with nonzero discriminant modulo p, prime #E_t(F_p)=q, and reduced Q of order q; retain every eligibility decision; do not inspect lift or rho outcomes during selection",
+  "selected_per_prime": 2,
+  "height_cap": 4096,
+  "control_scalars": [1, 2],
+  "seeded_targets_per_curve": 3,
+  "seed": "xedni-curve-family-public-lift-v1-20261120",
+  "seed_rule": "for j=0,1,2 choose k=1+int(SHA256(UTF8(seed+':'+p+':'+t+':'+j)).hexdigest(),16) mod (q-1), require distinct and outside controls; construct T=k*Qbar outside timing; pass only public coordinates to lift search",
+  "lift_law": "x=a/b^2,y=c/b^3; increasing H=max(abs(a),b) from 1 to 4096, then b and a; b>=1, gcd(abs(a),b)=1, b not divisible by p; modular x filter, exact integral discriminant for c^2=a^3+t*a*b^4+b^6, both c signs; first point reducing to the supplied public (x,y)",
+  "arm_order": "for even zero-based target index lift then rho, for odd index rho then lift",
+  "lift_wall_cap_seconds": 120,
+  "rho_wall_cap_seconds": 120,
+  "rho_source": "research/exotic_ecdlp_20261021/xedni_fresh_target_pair_20261120/run_sage.py",
+  "rho_source_sha256": "b35b225581e7994121e60277c1956c37eaa0b132ab8a84c3fbf50da3344b2907",
+  "measurement_boundary": "ordinary-host diagnostic; lift online interval is target-dependent point search through verification or cap, rho online interval is same-public-point scalar walk through verification; setup and target fixture construction excluded; stage and full-solve outputs remain distinct",
+  "claim_boundary": "finite selected four-curve family panel; empirical bounded-height statuses and same-point rho references, no general curve-family impossibility theorem"
+}

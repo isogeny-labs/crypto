@@ -1,0 +1,16 @@
+{
+  "command": [
+    "cargo",
+    "clippy",
+    "--release",
+    "--all-targets",
+    "--offline",
+    "--manifest-path",
+    "tools/torus-rowspace-audit/Cargo.toml",
+    "--",
+    "-D",
+    "warnings"
+  ],
+  "exit": 0,
+  "native_original_audit_called": false
+}

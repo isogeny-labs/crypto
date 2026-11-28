@@ -1,0 +1,20 @@
+digraph FrontierGate {
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.35", ranksep="0.50", fontname="DejaVu Sans", labelloc="t", label="GHS / ECBench frontier workstreams 3–7 — evidence state, 2026-11-19"];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, color="#314158", fontcolor="#162032", margin="0.16,0.10"];
+  edge [color="#61738a", penwidth=1.2, arrowsize=0.7, fontname="DejaVu Sans", fontsize=9];
+
+  boundary [label="Standing admitted boundary\nGeneric prime / random binary / Koblitz: rho-led\nRestricted GHS-weak E0/F(q^3): IC-led exception", fillcolor="#e8eef5"];
+  ws3 [label="WS3 — partial\nProduction-math DP controls pass\nThreaded run-parallel + L2 wall absent", fillcolor="#fff1cc"];
+  ws4 [label="WS4 — implemented, unverified\n14-arm R17 / R36 / R64 composition\nNo admitted execution", fillcolor="#e7f5ea"];
+  ws5 [label="WS5 — implemented, unverified\n11 sizes; 141 primary + 27 diagnostic runs frozen\nRunner / L2 / results absent", fillcolor="#e7f5ea"];
+  ws6 [label="WS6 — partial\n111 live methods + 37 nested algorithms inventoried\nFrozen specs cover only a minority", fillcolor="#fff1cc"];
+  admission [label="Admission — blocked\nNo AWS identity, checkpoint, or trusted custom GHS L2 grader\nOffline contract refuses admission", fillcolor="#f9dddd"];
+  ws7 [label="WS7 — fail closed\n35 corruption classes rejected\nCurrent fixture: 76 blockers", fillcolor="#e7f5ea"];
+  result [label="Outcome\n0 new timing observations\n0 frontier / leaderboard promotions", fillcolor="#f9dddd", penwidth=1.6];
+
+  boundary -> {ws3 ws4 ws5 ws6};
+  {ws3 ws4 ws5 ws6} -> admission [label="source-bound execution"];
+  admission -> ws7 [label="L2 + replay + independent evidence"];
+  ws7 -> result [label="authorization refused"];
+}
+

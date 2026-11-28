@@ -1,0 +1,47 @@
+--- pivot/replay.py
++++ findroot/replay.py
+@@ -1,7 +1,7 @@
+ from pathlib import Path
+ import os,sys,json,hashlib,time,signal,subprocess,resource,re,shutil
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-solve4-pivot-swap-20261109')
++W=Path('/home/ec2-user/pencil-native-find-root-cardinality-20261109')
+ ABSOLUTE_DEADLINE=1794287499  # 2026-11-10T05:11:39Z
+ OWNED=False
+ progress={'phase':None,'stage':'initialization','checked_files':0,'checked_bytes':0,'current_path':None,'current_bytes_read':0,'declared_files':16736,'declared_bytes':3111892318}
+@@ -110,7 +110,7 @@
+   progress['stage']='compiler'
+   pre=json.loads((W/'pre-receipt.json').read_text());assert pre['status']=='passed'
+   roots=F['lean_roots'];lean=F['lean']
+-  for n in ('EliminationField','PivotSwap','Controls','Readback','ExpectedFailure'):
++  for n in ('GraphAlgebra', 'Find', 'Cycles', 'Union', 'Forest', 'Composition', 'UnionSize', 'FindRootCardinality', 'Controls', 'Readback', 'ExpectedFailure'):
+    (W/(n+'.lean')).write_bytes((P/(n+'.lean.txt')).read_bytes())
+   env={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','LEAN_SYSROOT':str(Path(lean).parent.parent),'LEAN_PATH':':'.join([str(W)]+roots),'TMPDIR':str(W)}
+   assert {k:sha(k) for k in F['runtime']}==F['runtime']
+@@ -119,7 +119,7 @@
+    try:audit(bad,['x'])
+    except AssertionError:pass
+    else:raise AssertionError('audit accepted malformed evidence')
+-  for name in ('EliminationField','PivotSwap','Controls','Readback','ExpectedFailure'):
++  for name in ('GraphAlgebra', 'Find', 'Cycles', 'Union', 'Forest', 'Composition', 'UnionSize', 'FindRootCardinality', 'Controls', 'Readback', 'ExpectedFailure'):
+    boundary();cmd=[lean,'-j1','-M3500','-s16384','-o',str(W/(name+'.olean')),str(W/(name+'.lean'))]
+    row={'module':name,'argv':cmd,'expected_exit':1 if name=='ExpectedFailure' else 0};rows.append(row)
+    with (W/(name+'.stdout')).open('xb') as so,(W/(name+'.stderr')).open('xb') as se:
+@@ -145,7 +145,7 @@
+   neg=(W/'ExpectedFailure.stdout').read_text()
+   errs=[line for line in neg.splitlines() if 'error:' in line]
+   assert len(errs)==1 and 'unsolved goals' in errs[0], 'not the intended single mathematical rejection'
+-  assert re.search(r'⊢\s*False\b',neg), 'expected simplified false prefix goal absent'
++  assert re.search(r'⊢\s*False\b',neg), 'expected simplified false child-size goal absent'
+   forbidden=['unknown identifier','unknown constant','unexpected token','failed to synthesize',
+    'type mismatch','application type mismatch','maximum recursion','maximum number of heartbeats',
+    'out of memory','failed to create thread','object file','invalid import','resource exhausted',
+@@ -153,7 +153,7 @@
+   assert not any(x in neg.lower() for x in forbidden), 'negative syntax/elaboration/environment failure'
+   assert not (W/'ExpectedFailure.stderr').read_text().strip(),'unexpected negative stderr'
+   durable(W/'axioms.json',{'names':got,'allowed':['propext','Classical.choice','Quot.sound']})
+-  for n in ('EliminationField','PivotSwap','Controls','Readback','ExpectedFailure'):assert sha(W/(n+'.lean'))==F['files'][n+'.lean.txt']
++  for n in ('GraphAlgebra', 'Find', 'Cycles', 'Union', 'Forest', 'Composition', 'UnionSize', 'FindRootCardinality', 'Controls', 'Readback', 'ExpectedFailure'):assert sha(W/(n+'.lean'))==F['files'][n+'.lean.txt']
+   assert {k:sha(k) for k in F['runtime']}==F['runtime']
+  for n,h in F['files'].items():assert sha(P/n)==h
+  assert sha(P/'freeze.json')==EXPECTED_FREEZE,'final freeze pin mismatch'

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="380" viewBox="0 0 960 380">
+  <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="#286357"/></marker></defs>
+  <rect width="960" height="380" rx="18" fill="#f4f7f6"/>
+  <g font-family="DejaVu Sans, sans-serif" fill="#17332d">
+    <text x="480" y="32" text-anchor="middle" font-size="23" font-weight="bold">Bigger fields, an exact order-7 transfer</text>
+    <text x="480" y="58" text-anchor="middle" font-size="14">Field cardinalities: 65,537 → 2²⁵⁶ · characteristic 65,537 → 2</text>
+    <rect x="24" y="77" width="344" height="218" rx="12" fill="white" stroke="#b9d1c9"/>
+    <rect x="592" y="77" width="344" height="218" rx="12" fill="white" stroke="#b9d1c9"/>
+    <text x="196" y="107" text-anchor="middle" font-size="21" font-weight="bold">F₆₅₅₃₇</text>
+    <text x="764" y="107" text-anchor="middle" font-size="21" font-weight="bold">GF(2²⁵⁶)</text>
+    <text x="196" y="132" text-anchor="middle" font-size="16">y² − xy − 4y = x³ − 4x²</text>
+    <text x="764" y="132" text-anchor="middle" font-size="16">y² + ωy = x³ + ωx²</text>
+    <g text-anchor="middle" font-size="20">
+      <text x="196" y="176">P = (0, 0)</text><text x="764" y="176">R = (0, 0)</text>
+      <text x="196" y="224">[2]P = (4, 8)</text><text x="764" y="224">[2]R = (ω, ω)</text>
+      <text x="196" y="272">Q = [3]P = (2, 2)</text><text x="764" y="272">S = [3]R = (1, ω + 1)</text>
+    </g>
+    <g stroke="#286357" stroke-width="2" marker-end="url(#arrow)">
+      <path d="M383 170H577"/><path d="M383 218H577"/><path d="M383 266H577"/>
+    </g>
+    <g text-anchor="middle" font-size="13">
+      <text x="480" y="160">scalar 1</text><text x="480" y="208">scalar 2</text><text x="480" y="256">scalar 3</text>
+      <text x="480" y="321" font-size="16">S = [k]R ⇔ Q = [k]P ⇔ 3 ≡ k (mod 7)</text>
+      <text x="480" y="346">ω² + ω + 1 = 0 · ω is outside F₂ · chosen points and coefficients lie in F₄</text>
+      <text x="480" y="368">Large ambient field · small subgroup · abstract transfer without a general efficient evaluator</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,64 @@
+{
+  "protocol_sha256": "91c7c108554d52d54fd541c2a277433c411248b874a96ead05b504d4e211a10d",
+  "records": [
+    {
+      "arm": "planted",
+      "cases": [
+        {
+          "input_file": "planted_pair_sum.ms",
+          "input_sha256": "e3347e3abb08fe278bbb8bf030a4abba3d270d4f107614977ec7c4ae0f4dca05",
+          "kind": "pair_sum",
+          "max_boolean_degree": 6,
+          "max_source_terms": 5076,
+          "source_terms": 82885,
+          "term_ratio": 1.045405814466797
+        },
+        {
+          "input_file": "planted_total_sum.ms",
+          "input_sha256": "d6be12b71e94d1346b7a948034673af6c543bd82cbdf89a17b14ae7c04abeb37",
+          "kind": "total_sum",
+          "max_boolean_degree": 6,
+          "max_source_terms": 4938,
+          "source_terms": 81737,
+          "term_ratio": 1.0309264047423852
+        }
+      ],
+      "original": {
+        "max_boolean_degree": 6,
+        "max_source_terms": 4852,
+        "source_terms": 79285
+      }
+    },
+    {
+      "arm": "random",
+      "cases": [
+        {
+          "input_file": "random_pair_sum.ms",
+          "input_sha256": "ecacb0bf5b67f681e5f3feec046481d1b3d6a06235d33d4b9e5358ab6c18bdd3",
+          "kind": "pair_sum",
+          "max_boolean_degree": 6,
+          "max_source_terms": 5098,
+          "source_terms": 83285,
+          "term_ratio": 1.0458341181641237
+        },
+        {
+          "input_file": "random_total_sum.ms",
+          "input_sha256": "dc02e980f1c8ea2f317bb8503316b8770fb7468e8bcf74eda2fdda34e423c79a",
+          "kind": "total_sum",
+          "max_boolean_degree": 6,
+          "max_source_terms": 4960,
+          "source_terms": 82133,
+          "term_ratio": 1.0313681170339675
+        }
+      ],
+      "original": {
+        "max_boolean_degree": 6,
+        "max_source_terms": 4853,
+        "source_terms": 79635
+      }
+    }
+  ],
+  "selected_transform": null,
+  "selection_rule": "at least 10 percent term reduction in both arms and no maximum-degree increase",
+  "status": "PASS"
+}

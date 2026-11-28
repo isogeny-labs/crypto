@@ -1,0 +1,11 @@
+digraph admission {
+  graph [rankdir=LR, bgcolor="white", fontname="Helvetica", label="N83 V5 Linux exporter | attempt 5", labelloc=t];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", color="#344054", fillcolor="#eef2f6"];
+  source [label="Pinned source + registry\nread-only; offline", fillcolor="#dcfce7"];
+  mount [label="Boot output virtiofs\nwriteable; 2 GiB stop floor", fillcolor="#dbeafe"];
+  build [label="Release build PASS\n17 min 27 s receipt", fillcolor="#dcfce7"];
+  binary [label="Linux ARM64 ELF\nSHA-256 87fdd7af…", fillcolor="#dcfce7"];
+  next [label="V5 binding + IC controls\nnot run in this attempt", fillcolor="#f3f4f6", color="#98a2b3"];
+  source -> mount -> build -> binary [color="#15803d"];
+  binary -> next [style=dashed, color="#98a2b3", label="separate frozen gate"];
+}

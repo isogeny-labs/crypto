@@ -856,7 +856,9 @@ fn signed_scalar_key(scalar: &BigUint, modulus: &BigUint) -> BigUint {
 }
 
 fn mod_inverse(value: &BigUint, modulus: &BigUint) -> BigUint {
-    value.modpow(&(modulus - 2u8), modulus)
+    // Was Fermat value^(modulus-2); every modulus here is prime (P-256 p or n,
+    // 101 in tests), so the shared inverse is equal, and 0 for value ≡ 0 as before.
+    crypto_lib::gcd::int::modinv_big(value, modulus).unwrap_or_else(BigUint::zero)
 }
 
 fn run(cli: &Cli) -> Result<ResultFile, String> {

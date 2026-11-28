@@ -1,0 +1,14 @@
+{
+  "action": "grep the research dir README/amendments for prior wall-time measurements of the same feature and check the lane reports their outcome; counted multiplications omit the feature's own overhead",
+  "created": "2026-11-18T04:18:37Z",
+  "evidence": [
+    "research/extension_ic_graph_20261115/README.md:399-406; leads-20261118/descent-finder/CANDIDATES.md:158 (worktree wf_8b7b71c2-376-2 commit 06c7058fe9)"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "red-team"
+  ],
+  "trigger": "a lane reports a counted-work speedup from enabling an existing engine feature (F4 trace replay, reuse pools, caches)",
+  "why": "descent-finder cited AMENDMENT_13 as read but omitted that certified trace reuse lost 2.981-16.086x to fresh F4 on all 33 controlled cases while headlining a 2.29x F4-multiplication cut"
+}

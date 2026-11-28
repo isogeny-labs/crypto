@@ -1,0 +1,9 @@
+# Prepared C130: fixed variable-order control for compressed correction polynomials
+
+UNEXECUTED. Static AST/global-name preflight only. ZDD storage size is order-dependent,a known feature documented by PolyBoRi. This experiment preserves the exact Boolean polynomial while changing only representation order. It is a concrete changed assumption after capped flat expansion or a fixed-order compressed profile; it is not a larger unchanged timeout.
+
+The adapter maps each original chart selector to its declared rank. Evaluation explicitly maps the original assignment to ranked bits; monomial export maps rank masks back to original selector masks. With that permutation, gate induction gives identical functions,accepted source assignments and root outputs. Data/graph artifacts must carry the full permutation. Degree and monomial count are order invariant; node/cache/work counts need not be. The frequency heuristic uses only conservative structural dependency unions to choose an order. It is not an affine-rank or pruning certificate.
+
+Preregister natural,reverse,and descending structural-frequency orders;exhaust small truth tables and original-coordinate monomial sets before actual profiles. Use the same frozen first1/2/4/8correction wires and100k-node/500k-cache/2M-callcaps. Retain every failed order. No cap supplies a final polynomial degree or emptiness claim. Completed representations can motivate a separately verified whole-cell restriction test; final raw product and original source/U/outer/allfields/matchingF4/F5/F6requirements remain.
+
+Fresh review restricts permutation entries to actual integers;floating/bool indices otherwise compare equal to ints but can break bit shifts. Preserve prepared source unchanged and test invalid permutations before profiles. Orders are computed once on the entire8wire cone and used unchanged across all prefixes.

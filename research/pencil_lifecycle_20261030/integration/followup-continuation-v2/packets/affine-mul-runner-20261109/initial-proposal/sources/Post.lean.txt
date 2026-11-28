@@ -1,0 +1,22 @@
+import Connect
+set_option autoImplicit false
+namespace RemainderPolynomial
+open Polynomial CoefficientTraversal ScaleTrim TraversalPolynomial
+
+theorem trimmed_polynomial_step {n : Nat} (p c : UInt64) [Fact p.toNat.Prime]
+ (j : Nat) (bs : List UInt64) (h : j+bs.length≤n) (xs : State n)
+ (hp : 0<p.toNat) (hb : p.toNat<2^31) (hc : c.toNat<p.toNat)
+ (hx : Good p xs) (hbs : ∀b∈bs,b.toNat<p.toNat) :
+ let out:=(RemainderWord.run p c (events j bs h) xs).val.toList
+ wordsPoly p (trimFuel out.length out)=
+ decodedPoly p xs-C (c.toNat : ZMod p.toNat)*X^j*wordsPoly p bs := by
+ dsimp only
+ rw [trim_preserves,wordsPoly_array]
+ exact generated_polynomial_step p c j bs h xs hp hb hc hx hbs
+
+theorem event_operands {n : Nat} (j : Nat) (bs : List UInt64) (h : j+bs.length≤n) :
+ (events j bs h).map Prod.snd=bs := by
+ induction bs generalizing j with
+ | nil => simp [events]
+ | cons b bs ih => simp [events,ih]
+end RemainderPolynomial

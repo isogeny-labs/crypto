@@ -1,0 +1,8 @@
+digraph proof {
+rankdir=LR;node[shape=box,fontname="Helvetica",fontsize=11];
+a[label="Original equations\np31 / p53, seed7"];
+b[label="Native construction\noriginal-generator proof DAG"];
+c[label="Independent packed replay\nmembership + input containment\nall standard/product S-pairs"];
+d[label="Checked complete basis\nraw proof retained"];
+a->b->c->d;
+}

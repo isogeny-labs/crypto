@@ -1,0 +1,55 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "Koblitz v5 (jump-index tally) vs strong: a=0 n=23",
+ "description": "Frozen in research/koblitz_v5_tally_remeasure_20261119/PROTOCOL.md before its data. Re-measurement of rho.signed_frobenius_v5 with its per-step jump-index tally against rho.signed_frobenius_strong; reference measurement, no IC change, no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 0,
+    "n": 23
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261119604,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-strong",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "rho-strong-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "rho-v5",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_v5"
+   }
+  },
+  {
+   "name": "rho-v5-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.signed_frobenius_v5"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261120604,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

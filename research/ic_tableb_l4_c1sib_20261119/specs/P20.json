@@ -1,0 +1,96 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_tableb_l4_c1sib_20261119 20-bit Table B curve: C = 1 wwalk arms with x-only siblings",
+ "description": "Round-4 lead L4-C1SIB. C = 1 boundary track (classification as index calculus pending an owner ruling) beside the C = 2 incumbent. research/ic_tableb_l4_c1sib_20261119/PROTOCOL.md. Public synthetic curve and targets; no security claim.",
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "bsgs-neg",
+   "role": "reference",
+   "method": {
+    "id": "bsgs.negation"
+   }
+  },
+  {
+   "name": "sib8-p256",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "max_trials": "13528399621",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=2,cj=1,seed=run,lazy=1,sib=8,pool=256",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "max_trials": "13528399621",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=1,cj=1,seed=run,lazy=1"
+    }
+   }
+  },
+  {
+   "name": "c1-sib8-p256",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "max_trials": "13528399621",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=1,cj=1,seed=run,lazy=1,sib=8,pool=256"
+    }
+   }
+  },
+  {
+   "name": "c1-sib8-p256-sg",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "max_trials": "13528399621",
+     "oracle": "wwalk:x=2.0,g=1,grow=2,tw=1,cj=1,seed=run,lazy=1,sib=8,pool=256",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 1048291,
+    "a": 1,
+    "b": 11,
+    "group_order": 1046999,
+    "r": 1046999,
+    "gx": 1,
+    "gy": 123004
+   }
+  ],
+  "targets_per_curve": 48,
+  "target_seed": 20261115201,
+  "target_kind": "public"
+ },
+ "measurement": {
+  "rounds": 2,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 20261119430,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

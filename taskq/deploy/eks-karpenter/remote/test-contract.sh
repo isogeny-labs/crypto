@@ -6,12 +6,14 @@ trap 'rm -rf "$tmp"' EXIT
 valid='{"schema":"isolab.eks.request/v1","job":{"job_name":"contract-test"}}'
 printf '%s\n' "$valid" > "$tmp/request.json"
 "$here/validate-request" "$tmp/request.json" | jq -e '.job.instance_type=="c8a.2xlarge" and .job.seconds==900 and .job.memory=="4Gi"' >/dev/null
+jq '.job.seconds=4800' "$tmp/request.json" > "$tmp/max-request.json"
+"$here/validate-request" "$tmp/max-request.json" | jq -e '.job.seconds==4800' >/dev/null
 cases=(
   '.schema="unknown"'
   '.job.job_name="../../escape"'
   '.job.job_name="-option"'
   '.job.seconds=0'
-  '.job.seconds=3601'
+  '.job.seconds=4801'
   '.job.seconds=1.5'
   '.job.seconds=false'
   '.job.seconds=null'

@@ -1,0 +1,16 @@
+digraph decomposition_routes {
+    graph [bgcolor="transparent", rankdir=TB, nodesep=0.32, ranksep=0.30, pad=0.12]
+    node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, margin="0.14,0.10", color="#99AFBC", fillcolor="#F0F6F9", fontcolor="#17313F"]
+    edge [color="#597382", arrowsize=0.64]
+    query [label="Hashed decomposition query"]
+    box [label="Exact short-box representation\nAffine hashes and signed point checks"]
+    phase [label="Phase-local carry counting\nLinear Fourier layers with pins"]
+    roots [label="Exact signed decision remains open\nUniform cost on empty queries", fillcolor="#FAF0DF", color="#BC9D62"]
+    product [label="Joint product contraction remains open\nStandalone boundary rank is exponential", fillcolor="#FAF0DF", color="#BC9D62"]
+    {rank=same; box; phase}
+    {rank=same; roots; product}
+    query -> box
+    query -> phase
+    box -> roots
+    phase -> product
+}

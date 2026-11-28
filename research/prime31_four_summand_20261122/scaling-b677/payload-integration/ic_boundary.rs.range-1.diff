@@ -1,0 +1,22 @@
+--- 307c514f39a8602d4ba1c5c0821a4c410159615d:src/cryptanalysis/ic_boundary.rs:range1
++++ 3dd555c5d9b54c5bc0f3507eb6a917a5cf64e1f6:src/cryptanalysis/ic_boundary.rs:range1
+@@ -63,6 +63,19 @@
+         // `_key_bound` retained so call sites can pass `abscissa_key_bound`
+         // without a second API; dense arrays are intentionally unused.
+         Self::with_capacity(slots)
++    }
++
++    // Complete occupied-entry views used by the original collision-ledger tests.
++    #[cfg(test)]
++    fn iter(&self) -> impl Iterator<Item = (u64, (u128, u64, u64))> + '_ {
++        self.keys.iter().enumerate().filter_map(move |(i, &key)| {
++            (key != 0).then(|| (key, (self.us[i], self.zs[i], self.bs[i])))
++        })
++    }
++
++    #[cfg(test)]
++    fn values(&self) -> impl Iterator<Item = (u128, u64, u64)> + '_ {
++        self.iter().map(|(_, value)| value)
+     }
+ 
+     #[inline(always)]

@@ -1,0 +1,42 @@
+{
+  "id": "odd-cached-quadratic-20261116-v94b",
+  "hypothesis": "Cache odd-field square classes and normalized roots per source;batch nonzero inverses;retain every original S3 root incl twist/repeated/torsion and char3.",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "-m",
+    "research.odd_cached_quadratic_20261116_v94b.worker",
+    "odd-cached-quadratic-20261116-v94b",
+    "raw"
+  ],
+  "source_paths": [
+    "lab/runner.py",
+    "performance_gate.py",
+    "performance/GATE.md",
+    "research/twist_auxiliary_20261116_v86/algebra.py",
+    "research/odd_cached_quadratic_20261116_v94b/PROOF_AND_REVIEW.md",
+    "research/odd_cached_quadratic_20261116_v94b/worker.py",
+    "research/odd_cached_quadratic_20261116_v94b/kernel.py",
+    "research/odd_cached_quadratic_20261116_v94b/common.py"
+  ],
+  "input_paths": [
+    "research/odd_cached_quadratic_20261116_v94b/DATA.json"
+  ],
+  "expected_sha256": {
+    "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+    "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+    "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+    "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+    "research/odd_cached_quadratic_20261116_v94b/PROOF_AND_REVIEW.md": "9b771b8bcb8c7dda637c9a71d0bdf3518b7834d9ae9be43206fbb4d23756f20e",
+    "research/odd_cached_quadratic_20261116_v94b/worker.py": "e8fa62641d01a80be5f4d5bb6c0e511d23a92a7804f796d669834d76f2931418",
+    "research/odd_cached_quadratic_20261116_v94b/kernel.py": "8557d67949924122999dbc08b0dc98a5923b73afe7125392aec3479ebdacd3d1",
+    "research/odd_cached_quadratic_20261116_v94b/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+    "research/odd_cached_quadratic_20261116_v94b/DATA.json": "b77c839d2063cfd276f21da46cc547d747ca94df0f392fbcba1998ac604d3a73"
+  },
+  "timeout_seconds": 90,
+  "memory_limit_mb": 4096,
+  "cpu": 0,
+  "depends_on": [],
+  "artifact_paths": [
+    "research/odd_cached_quadratic_20261116_v94b/raw.json"
+  ]
+}

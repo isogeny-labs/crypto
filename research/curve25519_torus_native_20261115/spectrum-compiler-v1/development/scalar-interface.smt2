@@ -1,0 +1,7 @@
+(set-logic QF_FF)
+(set-option :produce-models true)
+(define-sort F () (_ FiniteField 101))
+(declare-const x F)
+(assert (= (ff.mul x x) (as ff9 F)))
+(check-sat)
+(get-value (x))

@@ -1,0 +1,27 @@
+--- signed-kummer-combined-runner-v4-20261111/durable-worker.py
++++ signed-kummer-combined-runner-v5-20261111/durable-worker.py
+@@ -91,9 +91,12 @@
+     if time.monotonic()-durable_last>5:
+      durable_last=time.monotonic();checkpoint('running-'+label)
+     if time.monotonic()-last>1:
+-     last=time.monotonic(); total=0;target=STAGE/'target';assert not target.is_symlink(),str(target)
+-     if target.exists():
+-      assert stat.S_ISDIR(target.lstat().st_mode),str(target)
++     last=time.monotonic(); total=0;target=STAGE/'target'
++     try:target_mode=target.lstat().st_mode
++     except FileNotFoundError:
++      assert label=='materialize','target absent after materialization';target_mode=None
++     if target_mode is not None:
++      assert stat.S_ISDIR(target_mode),str(target)
+       for base,dirs,names in os.walk(target,onerror=traversal_error):
+        for name in names:
+         f=Path(base)/name
+@@ -101,8 +104,6 @@
+         except FileNotFoundError:continue
+         assert stat.S_ISREG(st.st_mode),str(f)
+         total+=st.st_size
+-     else:
+-      assert label=='materialize','target absent after materialization'
+      row['peak_observed_target_bytes']=max(row.get('peak_observed_target_bytes',0),total)
+      assert total<=6*1024**3,'6GiB target threshold'
+      workspace_bytes=0

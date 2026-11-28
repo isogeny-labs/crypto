@@ -1,0 +1,23 @@
+# CT330 — source-pinned F103 paired rho/BSGS diagnostic (preregistered)
+
+2026-11-23 UTC. [pcc:unverified]. Scope: extend the existing draft [crypto #4973](https://github.com/isogeny-labs/crypto/pull/4973), **not** launch a new curve search, alter root code, replace original CT327 IC/rho/BSGS triplets or enter the 695/701-record norm-reuse lane.
+
+## Prior work, ownership and freeze
+
+- Source: original `tests/ct238_native_cubic_norm_compression.rs` Git blob **`234e14f2aea35b8ef3203065a5e2468aae9eb71f`**, containing `direct_bsgs`, `ct327::rho_public`, and the 109-target correctness test. Keep these bytes unchanged, and reuse the original CT328 source-hash-checked Rust extractor plus CT329 full-add accounting.
+- Prior results: CT241/243 15 frozen native cold IC/BSGS pairs; CT326 phase feasibility; CT328 exact-source 109/109 rho correctness; CT329 109/109 BSGS correctness and Q73 full `ec_add` count 34 (the original partial count is 17). See those committed reports and [transfer queue #3904](https://github.com/isogeny-labs/crypto/issues/3904). CT327 full-root IC/BSGS/rho test remains blocked by **unowned** malformed `src/cryptanalysis/binary_hyperelliptic_index_calculus.rs`; do not alter that source.
+- Literature: Bos, Kleinjung and Lenstra, *On the Use of the Negation Map in the Pollard Rho Method* (ANTS IX, 2010, https://infoscience.epfl.ch/entities/publication/78564706-286d-4c6a-8a13-25c5d38fe72c): fruitless cycles require caution, so our deterministic 16-jump rho is only a diagnostic, **not** the strongest optimized rho.
+- Research-KB MCP and local wrapper were unavailable in this connector-only session; primary current repository source and cited literature were inspected. Conductor/native subagent slots unavailable. The norm reuse and cost16 lane is separately owned by crypto #4990; no duplicate fixture work.
+
+## Fixed workload and falsifiable claims
+
+Original public E/F103: `y²=x³+x+24`, cyclic order `r=109`, `G=(1,51)`, `Q=(42,71)=[73]G`. This new source-only adapter must compile unchanged F103 EC/rho and BSGS functions into a dependency-free Rust executable **without** the root library. Append one new test within the generated `ct327` module; no modifications to the original tests or arithmetic.
+
+1. Execute exactly three alternating same-host, single-process **paired calls**: first `RHO,BSGS`, then `BSGS,RHO`, then `RHO,BSGS`. Each call fully constructs its own original source rho jump table / seen table or BSGS baby table and independently verifies `[log]G=Q`; reject any failure. Do not precompute shared solve tables. Keep deterministic rho seed/jump parameters unchanged. The original separate 109-target test must still pass.
+2. Measure nanoseconds of whole `rho_public` and `direct_bsgs` calls using Rust `Instant`. Print all six raw timings, explicit order, `rho_total_ns`, `rho_setup_ns`, `rho_walk_ns`, `rho_verification_ns`, `rho_unclassified_ns`, full rho `ec_adds`, walk steps / restarts / table entries and capacity, original partial BSGS operations, CT329 known complete BSGS Q73 count 34, and **process-wide only** VmHWM. Do not report process VmHWM as an arm's peak RSS. Do not compare aggregate 48,147 EC additions from the all-target test to a single Q73 solve.
+3. Recover and verify 73 in both solvers every round. A separate Python checker shall parse exactly the three result records, verify order and positive times, compute per-round BSGS/rho ratios, and explicitly refuse missing/duplicate/incorrect JSON, mismatched target or invalid stage sum. All claimed paired ratios remain provisional until independent native replay. One three-pair toy sample is **not** a confidence interval.
+4. Source-gate the original Git blob and an intentionally mutated source. Test the original 109/109-rho correctness plus new timed test in one **<=10 minute, one-job GitHub-hosted** CI. Retain first compiler failure; do not silently alter workload or retry. No paid EKS or cloud resources, no strong-optimized-rho claim, no PR merge.
+
+## Completion boundaries
+
+This is a better **matched direct-baseline diagnostic** than unpaired toy numbers, but **not a full cold IC measurement**, a native Cantor/Jacobian replay, original 695/701 authenticated norm-point reuse, cross-characteristic map, Prime31 complete solver or ECDLP speedup. Original full-root CT327 remains dependent on root owner repair and job reservations. All source setup, transfer, relation finding, linear algebra, recovery, verification, field pricing and memory for a genuine transfer attack remain required; independently signed PCC is open. Preserve CT241/243 frozen artifacts and all failed checks.

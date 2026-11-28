@@ -1,0 +1,52 @@
+{
+  "schema": "graph-ic.pcc-registration/v1",
+  "mode": "append",
+  "claim_path": "pcc/claims/PCC-20261124-fcc0a3.json",
+  "claim_sha256": "fb0d4e504ab84427588affb44758f7f8558988a4cd7e3a1c12c1aab827bc3704",
+  "entry_sha256": "f2ce167e59f407942e948ce0dd8bfe08479d5aa4296663b84ad8d25e91fb628c",
+  "receipt_sha256": "ff8511ec06d9011a9a496f40d850f648a0f35b140cd01e79e44ec18afc01dc3e",
+  "contract_source_sha256": "85d787ed7cec0c02a0e2cb81cf435691d448221c1d46e3a4cecb54e64d674fcb",
+  "base_entries_hash_checked": 1846,
+  "appended_entries": 1,
+  "standing": "unverified",
+  "standing_source": "unsigned metadata only; no standing verifier executed",
+  "verifier_run": false,
+  "signature_created": false,
+  "python_executed": false,
+  "claim": {
+    "schema": "pcc.claim/v1",
+    "id": "PCC-20261124-fcc0a3",
+    "kind": "statement",
+    "claim_type": "data",
+    "statement": "Native retained-input M31 replay at source 3ba271b1f7100bdfd06eafbac8af283ec9d55094, run 45309117216 / job 138160138786, records 645 group-replayed rows, 613 admitted rows and 32 replayed arity exclusions. For source-order prefixes 256 / 512 / 613, original forest, pivot and MST each record useful and augmented ranks 131 / 355 / 452, accepted arms and zero source replay failures or inconsistent rows. Three corrupted copies of the same M31 input exit 1 with empty stdout. The exact receipt, native outputs and artifact identities are retained. This is unsigned producer development evidence; independent signed verification, timing, target recovery and complete cold-cost comparison remain outside its scope. [pcc:unverified]",
+    "scope": "Unsigned producer development records for Prime31 graph-admission qualification. Source review is within the same assistant team. No signed scientific verification, performance result, or complete-cost comparison is asserted. [pcc:unverified]",
+    "proofs": [
+      {
+        "kind": "attestation",
+        "subject": {
+          "path": "research/lp_graph_algorithms_20261123/evidence/native-m31-capture-20261124/receipt.json",
+          "sha256": "ff8511ec06d9011a9a496f40d850f648a0f35b140cd01e79e44ec18afc01dc3e"
+        }
+      }
+    ],
+    "producer": {
+      "commit": "add6ae761780f9f06a452e0557039cdb5d4b1f01",
+      "session": "graph-ic-m31-retained-capture-20261124",
+      "model": "GPT-6 Astra Pro"
+    },
+    "created_at": "2026-11-24T02:17:49Z"
+  },
+  "ledger_entry": {
+    "at": "2026-11-24T02:17:49Z",
+    "body": {
+      "claim_id": "PCC-20261124-fcc0a3",
+      "claim_sha256": "fb0d4e504ab84427588affb44758f7f8558988a4cd7e3a1c12c1aab827bc3704",
+      "path": "pcc/claims/PCC-20261124-fcc0a3.json"
+    },
+    "hash": "f2ce167e59f407942e948ce0dd8bfe08479d5aa4296663b84ad8d25e91fb628c",
+    "prev": "8c6e40d3a9814ae2d4810242b338eb8738f16e58ff843e2eec2368ba5402854a",
+    "schema": "pcc.ledger-entry/v1",
+    "seq": 1846,
+    "type": "claim"
+  }
+}

@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T01:04:42Z",
+ "id": "PCC-20261112-94f071",
+ "kind": "theorem",
+ "producer": {
+  "commit": "1e4f8e795f770ea39320ab694623cafe8b7563ad",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "2d0c10bdbf7eb83d4e8946815a5d4daaed40de3c64a7189da8067cc9dbb3310c",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/OddFieldDescent.lean",
+   "theorem": "OddFieldDescent.cubic_sign_descent"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Formal conditional algebra only;actual finite fields,Galois action,Hom groups and geometric descent remain written bridges.",
+ "statement": "theorem cubic_sign_descent {H : Type} [IntModule H] (f : H \u2192 H) (a : H) (hneg : \u2200 x, f (-x) = -f x) (htorsion : \u2200 x : H, (2 : Int) \u2022 x=0 \u2192 x=0) (hne : a \u2260 0) (choices : f a=a \u2228 f a = -a) (hfixed : f (f (f a))=a) : f a=a"
+}

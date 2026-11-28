@@ -1,0 +1,5 @@
+# Domain-aware modular scalar continuation
+
+Prospective [pcc:unverified]. Original kernel659-invariant sourcefailed beforeR at anunnecessarySnonzeroassert; quotientprocesses andabsoluterankpassed, allrawretained. Sameimmutable3descriptors/privateFLINT/symplectic/thetacontrols/256+512bits. Correctdomainhandling: JdefinedonlywhenSball excludes0, otherwiseexplicitundefinedflag/indeterminatepayload. Rcomputedindependently, Sigma140mustexclude0. SourceJmustbeundefined andRcontain0; quotientsbothJ/Rdefined/nonzero. Comparatorreloadsflags/exactballs, comparesdefinedvaluesonly andpartnerJ/R. No E4divisionbyzero, no inventedsourceJ. Priorabsolute-rankcertificate reusednotrerun.
+
+This is mathematicaldomaincorrection, not relaxedfinitefield/10xcriterion. Sourceautomorphism explanation andmissingvaluationconditions inpreviousTHEORY remain. Exactly3consumerprocesses+1comparatorifoutputsproduced, each120CPU, newfilescreate_new/nooverwrite. Allsource/native/oldraw/descriptors/runtime/newbinary/protocol hashes pushGitbeforeexecution. Preserve allfailures/exits/no scientificretry/S3/cloud/merge.

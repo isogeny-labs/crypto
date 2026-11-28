@@ -1,0 +1,5 @@
+# Producer correction before accepted measurement
+
+The first execution returned exit code 10 after computing quotient rank six. Its pivot-order assertion compared a compressed omitted-column index with the preceding original-column index. The corrected assertion compares original indices on both sides. The failed run produced no result receipt. The updated producer digest was frozen in `protocol.json` before the next run. No input, selection rule, cap, or target changed.
+
+The next execution produced full-rank repairs for both cases, but inspection found that the declared 2-GiB address-space cap had not been applied to child processes. An amended runner attempted `RLIMIT_AS`, but this macOS host returned `ValueError: current limit exceeds maximum limit` before the child launched. The final protocol therefore uses a 120-second process timeout and checks each child's observed peak RSS against 2 GiB. The corresponding producer and runner digests were frozen before the final replay. Earlier outputs were replaced and are not used for the reported result.

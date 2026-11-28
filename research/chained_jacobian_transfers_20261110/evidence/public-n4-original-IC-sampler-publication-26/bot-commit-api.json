@@ -1,0 +1,89 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Action completed."
+    }
+  ],
+  "structuredContent": {
+    "commit": {
+      "sha": "b7bc54fcba9ad9a7ac901037c263c0b8e8a300a8",
+      "message": "Move PR data files to the artifact store",
+      "url": "https://api.github.com/repos/isogeny-labs/crypto/commits/b7bc54fcba9ad9a7ac901037c263c0b8e8a300a8",
+      "html_url": "https://github.com/isogeny-labs/crypto/commit/b7bc54fcba9ad9a7ac901037c263c0b8e8a300a8",
+      "diff": "@@ -0,0 +1,14 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"original-fixed-model-IC-whole100.json.xz\": {\"sha256\": \"30756bcbaf800be1b554ad87a4fdb80fd203b8b8237dbe5fc9175de5f296d8e2\", \"bytes\": 239344},\n+  \"original-fixed-model-sampler-whole101.json.xz\": {\"sha256\": \"26b86d15ddca1c99a90806c692286a3a2804a72cff89431b1d81c86f9a7538b2\", \"bytes\": 273288},\n+  \"whole-closed-science-26.tar.xz.part-0000\": {\"sha256\": \"44d74068eebb052f5f06fe45229c499e4760cc46c81b79eee44039847f851aed\", \"bytes\": 33554432},\n+  \"whole-closed-science-26.tar.xz.part-0001\": {\"sha256\": \"e1f8b08a3c8377b7b3e4816e1286a15b755d20513206a7ed5f62c8727eaea163\", \"bytes\": 33554432},\n+  \"whole-closed-science-26.tar.xz.part-0002\": {\"sha256\": \"8fb1f92f4f5a3feb7a29f797621634aafe93698bc357c529061b6f2308f3b52d\", \"bytes\": 33554432},\n+  \"whole-closed-science-26.tar.xz.part-0003\": {\"sha256\": \"974d09d4a397deb020bb7143c89df5ff7f44ec8829021833d412face5f8c37a5\", \"bytes\": 33554432},\n+  \"whole-closed-science-26.tar.xz.part-0004\": {\"sha256\": \"d5213e1efefbe8e28bca1c8fc68482c970a09444519361b420d97fda787bf2d4\", \"bytes\": 2354428},\n+  \"whole-current-inputs.json.xz\": {\"sha256\": \"e6ec6f637c52c73c6d7be8880bf901270234cf4879f62ae758ca006ba2fb89ef\", \"bytes\": 746684},\n+  \"whole-members.json\": {\"sha256\": \"649f776a065294abd09673201513cd06234cb1f8ca6a2c3d81a0be937dd2ab03\", \"bytes\": 3392080}\n+ }\n+}\n@@ -0,0 +1,12 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/original-fixed-model-IC-whole100.json.xz\n+/original-fixed-model-sampler-whole101.json.xz\n+/whole-closed-science-26.tar.xz.part-0000\n+/whole-closed-science-26.tar.xz.part-0001\n+/whole-closed-science-26.tar.xz.part-0002\n+/whole-closed-science-26.tar.xz.part-0003\n+/whole-closed-science-26.tar.xz.part-0004\n+/whole-current-inputs.json.xz\n+/whole-members.json\n+# <<< artifacts\n\n\n\n\n\n\n\n\n",
+      "files": [
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-IC-sampler-handoff-26/.artifacts.json",
+          "patch": "@@ -0,0 +1,14 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"original-fixed-model-IC-whole100.json.xz\": {\"sha256\": \"30756bcbaf800be1b554ad87a4fdb80fd203b8b8237dbe5fc9175de5f296d8e2\", \"bytes\": 239344},\n+  \"original-fixed-model-sampler-whole101.json.xz\": {\"sha256\": \"26b86d15ddca1c99a90806c692286a3a2804a72cff89431b1d81c86f9a7538b2\", \"bytes\": 273288},\n+  \"whole-closed-science-26.tar.xz.part-0000\": {\"sha256\": \"44d74068eebb052f5f06fe45229c499e4760cc46c81b79eee44039847f851aed\", \"bytes\": 33554432},\n+  \"whole-closed-science-26.tar.xz.part-0001\": {\"sha256\": \"e1f8b08a3c8377b7b3e4816e1286a15b755d20513206a7ed5f62c8727eaea163\", \"bytes\": 33554432},\n+  \"whole-closed-science-26.tar.xz.part-0002\": {\"sha256\": \"8fb1f92f4f5a3feb7a29f797621634aafe93698bc357c529061b6f2308f3b52d\", \"bytes\": 33554432},\n+  \"whole-closed-science-26.tar.xz.part-0003\": {\"sha256\": \"974d09d4a397deb020bb7143c89df5ff7f44ec8829021833d412face5f8c37a5\", \"bytes\": 33554432},\n+  \"whole-closed-science-26.tar.xz.part-0004\": {\"sha256\": \"d5213e1efefbe8e28bca1c8fc68482c970a09444519361b420d97fda787bf2d4\", \"bytes\": 2354428},\n+  \"whole-current-inputs.json.xz\": {\"sha256\": \"e6ec6f637c52c73c6d7be8880bf901270234cf4879f62ae758ca006ba2fb89ef\", \"bytes\": 746684},\n+  \"whole-members.json\": {\"sha256\": \"649f776a065294abd09673201513cd06234cb1f8ca6a2c3d81a0be937dd2ab03\", \"bytes\": 3392080}\n+ }\n+}"
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-IC-sampler-handoff-26/.gitignore",
+          "patch": "@@ -0,0 +1,12 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/original-fixed-model-IC-whole100.json.xz\n+/original-fixed-model-sampler-whole101.json.xz\n+/whole-closed-science-26.tar.xz.part-0000\n+/whole-closed-science-26.tar.xz.part-0001\n+/whole-closed-science-26.tar.xz.part-0002\n+/whole-closed-science-26.tar.xz.part-0003\n+/whole-closed-science-26.tar.xz.part-0004\n+/whole-current-inputs.json.xz\n+/whole-members.json\n+# <<< artifacts"
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-IC-sampler-handoff-26/original-fixed-model-IC-whole100.json.xz",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-IC-sampler-handoff-26/original-fixed-model-sampler-whole101.json.xz",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-IC-sampler-handoff-26/whole-closed-science-26.tar.xz.part-0000",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-IC-sampler-handoff-26/whole-closed-science-26.tar.xz.part-0001",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-IC-sampler-handoff-26/whole-closed-science-26.tar.xz.part-0002",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-IC-sampler-handoff-26/whole-closed-science-26.tar.xz.part-0003",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-IC-sampler-handoff-26/whole-closed-science-26.tar.xz.part-0004",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-IC-sampler-handoff-26/whole-current-inputs.json.xz",
+          "patch": null
+        },
+        {
+          "filename": "research/chained_jacobian_transfers_20261110/evidence/public-n4-original-IC-sampler-handoff-26/whole-members.json",
+          "patch": null
+        }
+      ],
+      "repository_full_name": "isogeny-labs/crypto",
+      "comments": null,
+      "author": {
+        "login": "github-actions[bot]",
+        "name": null,
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+        "id": 41898282
+      },
+      "committer": {
+        "login": "github-actions[bot]",
+        "name": null,
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/in/15368?v=4",
+        "id": 41898282
+      },
+      "created_at": "2026-11-15T13:45:08Z",
+      "git_author_email": null,
+      "display_url": "https://github.com/isogeny-labs/crypto/commit/b7bc54fcba9ad9a7ac901037c263c0b8e8a300a8",
+      "display_title": "Move PR data files to the artifact store"
+    },
+    "url": "https://github.com/isogeny-labs/crypto/commit/b7bc54fcba9ad9a7ac901037c263c0b8e8a300a8",
+    "title": "Move PR data files to the artifact store",
+    "diff": "@@ -0,0 +1,14 @@\n+{\n+ \"schema\": \"artifacts.manifest/v1\",\n+ \"files\": {\n+  \"original-fixed-model-IC-whole100.json.xz\": {\"sha256\": \"30756bcbaf800be1b554ad87a4fdb80fd203b8b8237dbe5fc9175de5f296d8e2\", \"bytes\": 239344},\n+  \"original-fixed-model-sampler-whole101.json.xz\": {\"sha256\": \"26b86d15ddca1c99a90806c692286a3a2804a72cff89431b1d81c86f9a7538b2\", \"bytes\": 273288},\n+  \"whole-closed-science-26.tar.xz.part-0000\": {\"sha256\": \"44d74068eebb052f5f06fe45229c499e4760cc46c81b79eee44039847f851aed\", \"bytes\": 33554432},\n+  \"whole-closed-science-26.tar.xz.part-0001\": {\"sha256\": \"e1f8b08a3c8377b7b3e4816e1286a15b755d20513206a7ed5f62c8727eaea163\", \"bytes\": 33554432},\n+  \"whole-closed-science-26.tar.xz.part-0002\": {\"sha256\": \"8fb1f92f4f5a3feb7a29f797621634aafe93698bc357c529061b6f2308f3b52d\", \"bytes\": 33554432},\n+  \"whole-closed-science-26.tar.xz.part-0003\": {\"sha256\": \"974d09d4a397deb020bb7143c89df5ff7f44ec8829021833d412face5f8c37a5\", \"bytes\": 33554432},\n+  \"whole-closed-science-26.tar.xz.part-0004\": {\"sha256\": \"d5213e1efefbe8e28bca1c8fc68482c970a09444519361b420d97fda787bf2d4\", \"bytes\": 2354428},\n+  \"whole-current-inputs.json.xz\": {\"sha256\": \"e6ec6f637c52c73c6d7be8880bf901270234cf4879f62ae758ca006ba2fb89ef\", \"bytes\": 746684},\n+  \"whole-members.json\": {\"sha256\": \"649f776a065294abd09673201513cd06234cb1f8ca6a2c3d81a0be937dd2ab03\", \"bytes\": 3392080}\n+ }\n+}\n@@ -0,0 +1,12 @@\n+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)\n+!.artifacts.json\n+/original-fixed-model-IC-whole100.json.xz\n+/original-fixed-model-sampler-whole101.json.xz\n+/whole-closed-science-26.tar.xz.part-0000\n+/whole-closed-science-26.tar.xz.part-0001\n+/whole-closed-science-26.tar.xz.part-0002\n+/whole-closed-science-26.tar.xz.part-0003\n+/whole-closed-science-26.tar.xz.part-0004\n+/whole-current-inputs.json.xz\n+/whole-members.json\n+# <<< artifacts\n\n\n\n\n\n\n\n\n",
+    "display_url": "https://github.com/isogeny-labs/crypto/commit/b7bc54fcba9ad9a7ac901037c263c0b8e8a300a8",
+    "display_title": "Move PR data files to the artifact store"
+  },
+  "isError": false
+}

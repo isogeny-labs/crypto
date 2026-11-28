@@ -1,0 +1,282 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1ha31d00e9a1842a62",
+  "statement": {
+    "name": "Cubic kernel polynomial denominator clearing with N=xD",
+    "source": "EVEN_KERNEL_CERTIFICATE_PROTOCOL.md;Galbraithch9divisionpolynomials;Lean EvenKernels.cubic_homogenization",
+    "variables": [
+      "a",
+      "b",
+      "c",
+      "e",
+      "x",
+      "d"
+    ],
+    "degree_bound": 7,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "a"
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "d"
+                },
+                {
+                  "op": "var",
+                  "args": "d"
+                },
+                {
+                  "op": "var",
+                  "args": "d"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "b"
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x"
+                },
+                {
+                  "op": "var",
+                  "args": "d"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "d"
+                },
+                {
+                  "op": "var",
+                  "args": "d"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "c"
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "d"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "d"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "d"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "e"
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "d"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "d"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "d"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "d"
+            },
+            {
+              "op": "var",
+              "args": "d"
+            },
+            {
+              "op": "var",
+              "args": "d"
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "a"
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "b"
+                },
+                {
+                  "op": "var",
+                  "args": "x"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "c"
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "x"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "e"
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "x"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 18241,
+  "value_digest": "bd793895627e71d551864aca89f7e61980734c719822f9e3a74dad99785fd624",
+  "independence": "Same producer issues;existing repository checker code plus domain-separated64extra points;scientific standing unsigned",
+  "proof": {
+    "kind": "lean4;pointer only;requires separate proof gate",
+    "path": "research/chained_jacobian_transfers_20261110/lean/EvenKernels.lean",
+    "sha256": "3fda57703a8acdae0af2066392bfdd2e1bb8b8dc81613dd252c1f5ed6a042976"
+  }
+}

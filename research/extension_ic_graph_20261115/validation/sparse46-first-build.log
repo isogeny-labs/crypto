@@ -1,0 +1,15 @@
+error[E0603]: function `opts_for` is private
+    --> examples/../src/cryptanalysis/jv_extension_sparse_dlp.rs:532:27
+     |
+ 532 |         let opts = cover::opts_for(24, 600.0, Some(64));
+     |                           ^^^^^^^^ private function
+     |
+note: the function `opts_for` is defined here
+    --> src/cryptanalysis/jv_cover.rs:2736:1
+     |
+2736 | pub(crate) fn opts_for(max_degree: u32, budget_secs: f64, stop: Option<usize>) -> F4Options {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0603`.

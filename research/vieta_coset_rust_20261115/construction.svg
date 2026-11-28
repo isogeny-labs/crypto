@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="650" viewBox="0 0 1100 650">
+<rect width="1100" height="650" fill="#f6f8fc"/>
+<g font-family="sans-serif" fill="#15253c">
+<text x="45" y="53" font-size="27" font-weight="bold">Vieta + smooth prime-field cosets: native Rust port</text>
+<text x="45" y="84" font-size="17">Construction and development coverage — producer observations [pcc:unverified]</text>
+<g fill="white" stroke="#a8bbd0" stroke-width="2">
+<rect x="45" y="120" width="300" height="125" rx="12"/>
+<rect x="395" y="120" width="300" height="125" rx="12"/>
+<rect x="745" y="120" width="310" height="125" rx="12"/>
+<rect x="45" y="295" width="475" height="125" rx="12"/>
+<rect x="575" y="295" width="480" height="125" rx="12"/>
+</g>
+<g font-size="19" font-weight="bold">
+<text x="65" y="155">1. Quadratic Vieta core</text>
+<text x="415" y="155">2. Composed remainder</text>
+<text x="765" y="155">3. Exact root extraction</text>
+<text x="65" y="332">Development checks</text>
+<text x="595" y="332">Planned scale panel — NOT RUN</text>
+</g>
+<g font-size="17">
+<text x="65" y="188">Q(Z) = Z² − s(L)Z + v(L)</text>
+<text x="65" y="217">Membership: x^m = c^m</text>
+<text x="415" y="188">Z^m mod Q = a(L)Z + b(L)</text>
+<text x="415" y="217">No interpolation step</text>
+<text x="765" y="188">gcd(a, b − c^m), plus diagonal</text>
+<text x="765" y="217">Recover and check point pairs</text>
+<text x="65" y="364">62-bit field: m = 4,096; P-224: m = 1,024</text>
+<text x="65" y="395">Complete outputs agree with two lookup controls</text>
+<text x="595" y="364">17 / 31 / 62 / 224 bits; m up to 8,192</text>
+<text x="595" y="395">Cold setup, warm queries, A/A, failures, replay</text>
+</g>
+<g stroke="#336da5" stroke-width="3"><path d="M350 182h36m-9-8 9 8-9 8" fill="none"/><path d="M700 182h36m-9-8 9 8-9 8" fill="none"/></g>
+<rect x="45" y="460" width="1010" height="140" rx="12" fill="#e6edf7"/>
+<text x="65" y="494" font-size="20" font-weight="bold">Scope and remaining gates</text>
+<text x="65" y="527" font-size="17">Dense elimination degrees grow with m. This port does not prove a last-fall-degree upper bound.</text>
+<text x="65" y="557" font-size="17">Performance runs need checkpoint credentials, live budget/capacity access and a component image/runner.</text>
+<text x="65" y="582" font-size="15">Study: research/vieta_coset_rust_20261115 · See PROTOCOL.md and draft protocol.json · No scale timing claimed.</text>
+</g></svg>

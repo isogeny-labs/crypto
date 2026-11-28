@@ -1,0 +1,191 @@
+{
+  "input": {
+    "admitted_prefix_blob": "f1b02205745a74d1771578a68f0f1f435f4a8823",
+    "declared_large_prime_pool_size": 168,
+    "historical_source_seed": "0x7033315f6d340101",
+    "path": "research/ic_natural_cycle_stream_20261126/input/m31-first-512.jsonl",
+    "producer_blob": "7fd27b9888058399d8814cef373d373243e6a1e5",
+    "producer_commit": "577d6c2c1c4a527604d965e6fb62c44df7902f36",
+    "rows": 512,
+    "sha256": "cc7aee3ebe57ce951e36f3a2c264857f8f1ed52aa4d76eb5c1fc587542945bd3"
+  },
+  "modulus": 2147446831,
+  "panels": {
+    "all_admitted": {
+      "augmented_rank": 355,
+      "consistent": true,
+      "dependency_count": 355,
+      "distinct_large_columns_observed": 157,
+      "events": {
+        "first_balanced_simple_cycle": null,
+        "first_exact_target_uniqueness": null,
+        "first_graph_cycle": null,
+        "first_lp_dependency": {
+          "lp_rank": 2,
+          "observed_large_columns": 2,
+          "panel_position": 3,
+          "projected_rhs": 732241239,
+          "projected_small_nonzeros": 5,
+          "projected_target_coefficient": 41837151,
+          "source_position": 3,
+          "witness": [
+            [
+              2,
+              1
+            ]
+          ]
+        },
+        "first_nonzero_target_projection": {
+          "lp_rank": 2,
+          "observed_large_columns": 2,
+          "panel_position": 3,
+          "projected_rhs": 732241239,
+          "projected_small_nonzeros": 5,
+          "projected_target_coefficient": 41837151,
+          "source_position": 3,
+          "witness": [
+            [
+              2,
+              1
+            ]
+          ]
+        },
+        "first_projected_rank_increase": {
+          "lp_rank": 2,
+          "observed_large_columns": 2,
+          "panel_position": 3,
+          "projected_rhs": 732241239,
+          "projected_small_nonzeros": 5,
+          "projected_target_coefficient": 41837151,
+          "source_position": 3,
+          "witness": [
+            [
+              2,
+              1
+            ]
+          ]
+        }
+      },
+      "lp_left_nullity": 355,
+      "lp_rank": 157,
+      "panel_rows": 512,
+      "projected_rank": 355,
+      "projected_rank_without_target": 355,
+      "selection": "all_admitted_arity_le_2",
+      "source_censor_position": 540,
+      "source_rows_observed": 512,
+      "target_projecting_dependencies": 348,
+      "target_unique_at_censor": false
+    },
+    "two_lp_only": {
+      "augmented_rank": 2,
+      "consistent": true,
+      "dependency_count": 2,
+      "distinct_large_columns_observed": 125,
+      "events": {
+        "first_balanced_simple_cycle": {
+          "panel_position": 97,
+          "source_position": 457
+        },
+        "first_exact_target_uniqueness": null,
+        "first_graph_cycle": {
+          "panel_position": 97,
+          "source_position": 457
+        },
+        "first_lp_dependency": {
+          "lp_rank": 96,
+          "observed_large_columns": 113,
+          "panel_position": 97,
+          "projected_rhs": 1846896350,
+          "projected_small_nonzeros": 9,
+          "projected_target_coefficient": 744325019,
+          "source_position": 457,
+          "witness": [
+            [
+              12,
+              2147446830
+            ],
+            [
+              38,
+              1
+            ],
+            [
+              40,
+              2147446830
+            ],
+            [
+              456,
+              1
+            ]
+          ]
+        },
+        "first_nonzero_target_projection": {
+          "lp_rank": 96,
+          "observed_large_columns": 113,
+          "panel_position": 97,
+          "projected_rhs": 1846896350,
+          "projected_small_nonzeros": 9,
+          "projected_target_coefficient": 744325019,
+          "source_position": 457,
+          "witness": [
+            [
+              12,
+              2147446830
+            ],
+            [
+              38,
+              1
+            ],
+            [
+              40,
+              2147446830
+            ],
+            [
+              456,
+              1
+            ]
+          ]
+        },
+        "first_projected_rank_increase": {
+          "lp_rank": 96,
+          "observed_large_columns": 113,
+          "panel_position": 97,
+          "projected_rhs": 1846896350,
+          "projected_small_nonzeros": 9,
+          "projected_target_coefficient": 744325019,
+          "source_position": 457,
+          "witness": [
+            [
+              12,
+              2147446830
+            ],
+            [
+              38,
+              1
+            ],
+            [
+              40,
+              2147446830
+            ],
+            [
+              456,
+              1
+            ]
+          ]
+        }
+      },
+      "lp_left_nullity": 2,
+      "lp_rank": 111,
+      "panel_rows": 113,
+      "projected_rank": 2,
+      "projected_rank_without_target": 2,
+      "selection": "exactly_two_large",
+      "source_censor_position": 540,
+      "source_rows_observed": 512,
+      "target_projecting_dependencies": 2,
+      "target_unique_at_censor": false
+    }
+  },
+  "schema": "ic-natural-cycle-stopping/v1",
+  "target_column": 4294967295
+}

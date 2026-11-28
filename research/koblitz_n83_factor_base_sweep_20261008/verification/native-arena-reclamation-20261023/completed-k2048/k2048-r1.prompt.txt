@@ -1,0 +1,6 @@
+Act as executor-mechanical. From /home/ec2-user/crypto-n83-resume execute exactly the shell command below using an elevated exec tool for Docker access. Do not modify the card, compute results, retry, or run Python. If the tool yields a running session, wait for that session. The frozen shell redirection saves actual stdout verbatim as the relay; do not regenerate it. Return the relay path and its SHA256 only. The command enforces frozen deadlines and writes the receipt. Read no unrelated files.
+
+set -o noclobber
+'/usr/bin/sudo' '-n' 'env' 'PATH=/home/ec2-user/scratch/n83-docker-sweep-20261018/bin:/home/ec2-user/.cargo/bin:/home/ec2-user/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin' '/home/ec2-user/scratch/n83-arena-reclamation-20261022/bin/runner-arena-final-v1' 'card-run' '/home/ec2-user/scratch/n83-arena-reclamation-20261022/cards/k2048-r1.json' > 'research/koblitz_n83_factor_base_sweep_20261008/verification/native-arena-reclamation-20261023/exec/k2048-r1.relay.json'
+
+Card SHA256: f727f13df1e7a4cc7f92f0e53b3b97a3df2ce02e9c0e9407f70f06231f92b42b

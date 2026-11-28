@@ -1,0 +1,34 @@
+{
+  "schema": "twist.publication-library-validation/v1",
+  "scope": "repository metadata and artifact transport update; library sources unchanged",
+  "source_base_revision": "99efbf3c517f95230c17a2f690ddeaaefcc3f980",
+  "command": [
+    "cargo",
+    "+1.90.0",
+    "test",
+    "--release",
+    "--locked",
+    "--offline",
+    "--lib"
+  ],
+  "initial_attempt": {
+    "passed": 4483,
+    "failed": 9,
+    "ignored": 119,
+    "exit_code": 101,
+    "cause": "sandbox denied local socket binding with EPERM",
+    "stdout_sha256": "7ff79da1edcfe97628cfc4bb42855f90c3874abe93b863f12799c2c0fef1c772",
+    "stderr_sha256": "7c564f450eb5635c14c65f83c4a033898ac93e943fe51fa208497c07cb21b959"
+  },
+  "network_enabled_replay": {
+    "passed": 4492,
+    "failed": 0,
+    "ignored": 119,
+    "exit_code": 0,
+    "stdout_sha256": "a0fb88686980b7f4cd39d9dd7ee3e7ae7bf2bd8d0175deb18628eb0f1c4b2aad",
+    "stderr_sha256": "d372ebcdaf165dac03860141bea1b1b492e4732f0f390662075d1034345ada61",
+    "same_sources_and_assertions": true
+  },
+  "backlog_cards_validated": 16,
+  "scientific_results_changed": false
+}

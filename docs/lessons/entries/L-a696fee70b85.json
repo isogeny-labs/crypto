@@ -1,0 +1,14 @@
+{
+  "action": "Stage the raw rows (or their hashes and a reachable copy) for the validator before dispatch; otherwise the row-level replay is insufficient_evidence",
+  "created": "2026-11-21T21:01:15Z",
+  "evidence": [
+    "research/genus_ladder_sge_20261115/VALIDATION_REPORT.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "A study's raw rows were moved to the artifact store before validation",
+  "why": "C5 could not compare sge_g34.jsonl row by row: no S3 access from the container"
+}

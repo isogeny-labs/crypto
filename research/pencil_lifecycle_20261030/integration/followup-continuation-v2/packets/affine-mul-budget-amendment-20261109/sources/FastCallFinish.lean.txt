@@ -1,0 +1,49 @@
+import FastCallQuotient
+set_option autoImplicit false
+namespace FastCalls
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest FastPrelude FastPayload PencilWordRefinement
+
+theorem monic_stored_shape (p : UInt64) (xs : List UInt64) [Fact p.toNat.Prime]
+ (hp : 1<p.toNat) (hc : Canon p xs) (hn : Normal xs)
+ (hm : (wordsPoly p xs).Monic) (hd : (wordsPoly p xs).natDegree=2) :
+ xs.length=3 ∧ xs.getLast?=some 1 := by
+ have he : xs≠[] := by intro hz;apply hm.ne_zero;simp [hz,wordsPoly,listPoly]
+ have hlen := ReductionWord.normal_natDegree p xs hp hc hn he
+ have hpos := List.length_pos_iff.mpr he
+ have hl : xs.length=3 := by omega
+ have hlastc := hc _ (List.getLast_mem he)
+ have hcast : ((xs.getLast he).toNat : ZMod p.toNat)=1 := by
+  rw [←MonicTermination.last_coefficient p xs he,←hlen]
+  exact hm
+ have hn1 : (xs.getLast he).toNat=1 :=
+  (canonical_equality p.toNat _ 1 hlastc hp).mp (by simpa using hcast)
+ have hl1 : xs.getLast he=1 := UInt64.toNat.inj (by simpa using hn1)
+ exact ⟨hl,by rw [List.getLast?_eq_some_getLast he,hl1]⟩
+
+theorem fast_output_exists (p : UInt64) (w : Inputs) (f : List UInt64) [Fact p.toNat.Prime]
+ (hp : 2<p.toNat) (hb : p.toNat<2^31) (hw : w.canonical p)
+ (hn : normWord p w≠0) (hs : s1Word p w≠0) (hfc : Canon p f)
+ (hfd : (wordsPoly p f).natDegree=5)
+ (ha : FastCRT.support (w.qa.toNat : ZMod p.toNat) w.ra.toNat ∣
+ wordsPoly p f-(FastCRT.delta (w.sa.toNat : ZMod p.toNat) w.ta.toNat)^2)
+ (hbv : FastCRT.support (w.qb.toNat : ZMod p.toNat) w.rb.toNat ∣
+ wordsPoly p f-(FastCRT.delta (w.sb.toNat : ZMod p.toNat) w.tb.toNat)^2) :
+ ∃ q r, FallbackWord.exactDiv p (ResidualWord.residual p f (v p w)) (u p w)=some q ∧
+ FallbackGeometry.remainder p (ResidualWord.pneg p (v p w)) (scaled p w q)=some r ∧
+ Canon p q ∧ Normal q ∧ Canon p (scaled p w q) ∧ Normal (scaled p w q) ∧ Canon p r ∧ Normal r ∧
+ (scaled p w q).length=3 ∧ (scaled p w q).getLast?=some 1 ∧ r.length≤2 ∧
+ MumfordValidity.Valid (wordsPoly p f) (wordsPoly p (scaled p w q)) (wordsPoly p r) := by
+ obtain ⟨q,hq,hqc,hqn,hoc,hon,hom,hod,hov⟩ := scaled_exists p w f hp hb hw hn hs hfc hfd ha hbv
+ obtain ⟨hlen,hlast⟩ := monic_stored_shape p _ (by omega) hoc hon hom hod
+ have hvc := (prepared_decode p w hp hb hw hn hs).2.2.1
+ have hneg := ResidualWord.neg_correct p (v p w) (by omega) hvc
+ obtain ⟨r,hr,hrc,hrn,hrs,hrdiv⟩ := FallbackGeometry.remainder_total p _ _ (by omega) hb hneg.1 hoc hon hom.ne_zero
+ have hnv : wordsPoly p (scaled p w q) ∣ wordsPoly p f-
+  wordsPoly p (ResidualWord.pneg p (v p w))*wordsPoly p (ResidualWord.pneg p (v p w)) := by
+  simpa [hneg.2,pow_two] using hov
+ have hvalid := FallbackGeometry.remainder_valid _ _ _ _ hnv hrdiv
+ have hrs2 : r.length≤2 := by omega
+ have hmum := ResidualAcceptance.shape_valid p 2 (scaled p w q) r (wordsPoly p f)
+  (by decide) hlen hrs2 hlast (by simpa [pow_two] using hvalid)
+ exact ⟨q,r,hq,hr,hqc,hqn,hoc,hon,hrc,hrn,hlen,hlast,hrs2,hmum⟩
+end FastCalls

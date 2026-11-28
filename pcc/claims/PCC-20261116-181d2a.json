@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T23:03:47Z",
+ "id": "PCC-20261116-181d2a",
+ "kind": "statement",
+ "producer": {
+  "commit": "3ca90fab9d30a44deb34fbdb4a441921ced449c1",
+  "model": "",
+  "session": "codex-20261116-nist-global-correspondence"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/global_identity.cpp",
+    "sha256": "5c956e6343a90ff2acae3a782badff0e199250b65a2694840ca2d0dac4633e32"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/check-global-identity.sh",
+    "sha256": "0e53ac00fa39f796baf71de4ff49b49a79937b1bf6b827b28b873c93c992b980"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/global-identity-v1/adjugate-row1.identity.json",
+    "sha256": "03e6fb6b55b964f2da1b98560076d9924d7102278e237476f1b2fc9c80a45ed1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/global-identity-v1/adjugate-row2.identity.json",
+    "sha256": "cf6b205938914fd698306a346e8badc34aae304523e40591d29f64baed1af7ac"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "Two generic adjugate-column annihilation identities pass32 derived-point evaluations and added-one corruption controls in identity.certificate/v1 field2^61-1. These structural receipts do not verify actual P192 arithmetic or certify the full isogeny. Producer-unverified."
+}

@@ -1,0 +1,53 @@
+{
+  "schema": "fass-coupled.whole-library-development-attempt/v1",
+  "attempt": 2,
+  "reviewer": "map_cost_audit",
+  "standing": "unsigned same-host development evidence; PCC unverified",
+  "started_at_utc": "2026-11-23T01:56:05Z",
+  "completed_at_utc": "2026-11-23T02:01:05Z",
+  "head": "ae5de9b066e936671a2da66667c50fdbd7727273",
+  "head_tree": "c8811002b1cac9918fb442688cd1b986507fc634",
+  "command": "timeout 300s cargo test --release --lib --locked --offline",
+  "environment": {
+    "CARGO_BUILD_JOBS": "2",
+    "RUST_TEST_THREADS": "2",
+    "ulimit_virtual_memory_kib": 2097152,
+    "memory_limit_scope": "per-process virtual address space; no aggregate RSS assertion"
+  },
+  "outcome": {
+    "timeout_wrapper_exit_status": 124,
+    "whole_library_passed": false,
+    "root_tests_executed": false,
+    "stdout_empty": true,
+    "compiler_error": "aws-sdk-s3: failed to create encoded metadata from file: Cannot allocate memory (os error 12)",
+    "terminal_state": "Cargo reported compilation failure and waited for another job until the timeout wrapper reached its fixed deadline",
+    "source_hashes_unchanged": true,
+    "source_edits": false,
+    "additional_sparse_materialization": false,
+    "further_retry": false
+  },
+  "source_sha256": {
+    "Cargo.toml": "0ff5c45fed9171bdb94d5dbfc9d72c8d5f3acfddec04ed7f7883596df9852119",
+    "Cargo.lock": "192c1d7e8bf2c3bbfb084721d192a6ab08d86d67adbb452cc3f79cff70ccfec0",
+    "src/lib.rs": "a730550ab748d47d7f5b4118485ef828ec9562dd8f3be7309470ef79d6b2b9e7",
+    "src/cryptanalysis/mod.rs": "2657030f5da1b52a4c301d8836109ae62390689863eff43697237c51a8499594",
+    "src/cryptanalysis/semaev_prime_poly.rs": "c8249ba825c946dbdb37fa5d6762f8f32d15320344693443e8af0d52f122784a"
+  },
+  "artifacts": {
+    "pre_call_manifest": "manifest.pre-call.txt",
+    "stdout": "root-tests.stdout.log",
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr": "root-tests.stderr.log",
+    "stderr_sha256": "febb7d4fa692fe38d58b30bec05c509fd4479c9f4f72db416a7f1b6bd6a537cb",
+    "exit_status": "root-tests.exit-status",
+    "source_pre_call": "source.pre-call.sha256",
+    "source_post_call": "source.post-call.sha256",
+    "source_stability_exit_status": "source-stability.exit-status"
+  },
+  "formal_tools": {
+    "lean_found_on_path": false,
+    "lake_found_on_path": false,
+    "evidence": "../tool-availability.txt"
+  },
+  "separate_focused_gate": "9/9 standalone native tests passed in a separately recorded replay; this does not discharge the whole-library gate"
+}

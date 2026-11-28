@@ -1,0 +1,29 @@
+--------------------------------------------------------------------------------
+Profile data file 'research/f4_f5_ecbench_20261019/profiles/solve-f4-0-prepared/region.callgrind.1' (creator: callgrind-3.19.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 231561160
+Trigger: Client Request: ["solve-f4",23,230,0,0]
+Profiled target:  /home/ec2-user/crypto-boolean-perf-target/release/examples/f4_f5_boolean_perf --profile 1 --arm solve-f4 --n 23 --seed 230 --random 0 --matrix-runtime prepared (PID 45, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       92
+Include dirs:     
+User annotated:   
+Auto-annotation:  off
+
+--------------------------------------------------------------------------------
+Ir                     
+--------------------------------------------------------------------------------
+1,505,322,837 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                    file:function
+--------------------------------------------------------------------------------
+881,254,304 (58.54%)  ???:crypto_lib::cryptanalysis::koblitz_groebner::matrix_f4_f2_counted_impl [/home/ec2-user/crypto-boolean-perf-target/release/examples/f4_f5_boolean_perf]
+320,215,946 (21.27%)  ???:<crypto_lib::cryptanalysis::koblitz_groebner::F4ColumnIndex>::get [/home/ec2-user/crypto-boolean-perf-target/release/examples/f4_f5_boolean_perf]
+215,194,229 (14.30%)  ???:crypto_lib::cryptanalysis::koblitz_groebner::pack_polynomials_flat_direct [/home/ec2-user/crypto-boolean-perf-target/release/examples/f4_f5_boolean_perf]
+

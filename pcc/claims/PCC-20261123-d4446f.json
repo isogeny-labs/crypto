@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T08:59:19Z",
+ "id": "PCC-20261123-d4446f",
+ "kind": "execution",
+ "producer": {
+  "commit": "9c9a7b18e1b4c3e1de1535c07deb4154e73051d1",
+  "model": "Codex",
+  "session": "trace-setup-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/scaling-construction.json",
+    "sha256": "c69824db405ae5a84a63c5d0e7dfd2d3b6e1085423f6b3861a2d2ec74e480fcc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/test-incidence-moments.json",
+    "sha256": "9761dc58e2617f1a15b57caa318c2ca47ce567515df42afd516ccff62b18a998"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/setup_20261123",
+ "statement": "Native scaling constructor emits192 public targets on12 ordinary prime-order curves over four growing prime fields, including three curves atp2147483647, with private scalars separate. PARI cardinalities, FLINT primality and independent affine order/target checks retained. Finite coefficient-rank/exact-moment sanity test passes; unsigned producer execution, not general formal proof."
+}

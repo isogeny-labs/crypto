@@ -1,0 +1,10 @@
+# Binary per-cell outputs exceed the 64 KB data-file policy and the artifact store refuses uploads from this runtime.
+# They stay on the run host; data/SHA256SUMS records them and data/json/ holds lossless JSON mirrors (exported after the run).
+data/**/*.npz
+data/*.npz
+analysis/gains.csv
+# appended by the L5 lead (phase 2): line-delimited outputs are also ignored; their lossless JSON mirrors are in data_json/
+data/**/*.jsonl
+data/*.jsonl
+__pycache__/
+# correction (append-only): the lossless JSON mirrors are in data_json/, not data/json/

@@ -89,7 +89,7 @@ pub struct S3BudgetContext {
 }
 
 impl S3BudgetContext {
-    #[cfg(test)]
+    #[cfg(all(test, target_os = "linux"))]
     pub(super) fn test_context(
         session: Arc<BudgetSession>,
         http_client: SharedHttpClient,

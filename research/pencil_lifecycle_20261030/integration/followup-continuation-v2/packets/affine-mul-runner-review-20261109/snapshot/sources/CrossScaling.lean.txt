@@ -1,0 +1,156 @@
+import WordClassifier
+set_option autoImplicit false
+namespace PencilWordRefinement
+
+inductive MulExpr where
+  | leaf : UInt64 → MulExpr
+  | mul : MulExpr → MulExpr → MulExpr
+
+def MulExpr.good (p : UInt64) : MulExpr → Prop
+  | .leaf a => a.toNat < p.toNat
+  | .mul a b => a.good p ∧ b.good p
+
+def MulExpr.word (p : UInt64) : MulExpr → UInt64
+  | .leaf a => a
+  | .mul a b => (a.word p * b.word p)%p
+
+def MulExpr.field (p : UInt64) : MulExpr → ZMod p.toNat
+  | .leaf a => (a.toNat : ZMod p.toNat)
+  | .mul a b => a.field p * b.field p
+
+theorem MulExpr.composition (p : UInt64) (hp : 0 < p.toNat)
+    (hb : p.toNat < 2^31) (e : MulExpr) (hg : e.good p) :
+    (e.word p).toNat < p.toNat ∧ ((e.word p).toNat : ZMod p.toNat) = e.field p := by
+  induction e with
+  | leaf a => exact ⟨hg, rfl⟩
+  | mul a b ia ib =>
+    have ha := ia hg.1
+    have hb' := ib hg.2
+    constructor
+    · exact uint64_mul_canonical p (a.word p) (b.word p) hp
+    · change ((((a.word p)*(b.word p))%p).toNat : ZMod p.toNat) = a.field p*b.field p
+      rw [uint64_mul_decode p (a.word p) (b.word p) hb ha.1 hb'.1, ha.2, hb'.2]
+
+-- Literal straight-line operations from the Rust prelude, one side using the OTHER weights.
+def scaledWords (p q r s t z w : UInt64) : UInt64 × UInt64 × UInt64 × UInt64 :=
+  let z2 := (z*z)%p
+  let z3 := (z2*z)%p
+  let z4 := (z2*z2)%p
+  let z5 := (z4*z)%p
+  ((q*z2)%p, (r*z4)%p, (((s*z3)%p)*w)%p, (((t*z5)%p)*w)%p)
+
+def scaledExpr (q r s t z w : UInt64) : MulExpr × MulExpr × MulExpr × MulExpr :=
+  let z2 := MulExpr.mul (.leaf z) (.leaf z)
+  let z3 := MulExpr.mul z2 (.leaf z)
+  let z4 := MulExpr.mul z2 z2
+  let z5 := MulExpr.mul z4 (.leaf z)
+  (.mul (.leaf q) z2, .mul (.leaf r) z4, .mul (.mul (.leaf s) z3) (.leaf w),
+    .mul (.mul (.leaf t) z5) (.leaf w))
+
+theorem scaled_composition (p q r s t z w : UInt64) (hp : 0 < p.toNat)
+    (hb : p.toNat < 2^31)
+    (hq : q.toNat < p.toNat) (hr : r.toNat < p.toNat)
+    (hs : s.toNat < p.toNat) (ht : t.toNat < p.toNat)
+    (hz : z.toNat < p.toNat) (hw : w.toNat < p.toNat) :
+    let v := scaledWords p q r s t z w
+    v.1.toNat < p.toNat ∧ v.2.1.toNat < p.toNat ∧
+    v.2.2.1.toNat < p.toNat ∧ v.2.2.2.toNat < p.toNat ∧
+    (v.1.toNat : ZMod p.toNat) = (q.toNat : ZMod p.toNat)*(z.toNat : ZMod p.toNat)^2 ∧
+    (v.2.1.toNat : ZMod p.toNat) = (r.toNat : ZMod p.toNat)*(z.toNat : ZMod p.toNat)^4 ∧
+    (v.2.2.1.toNat : ZMod p.toNat) = (s.toNat : ZMod p.toNat)*(z.toNat : ZMod p.toNat)^3*(w.toNat : ZMod p.toNat) ∧
+    (v.2.2.2.toNat : ZMod p.toNat) = (t.toNat : ZMod p.toNat)*(z.toNat : ZMod p.toNat)^5*(w.toNat : ZMod p.toNat) := by
+  have g1 : (scaledExpr q r s t z w).1.good p := by simp [scaledExpr, MulExpr.good, hq, hz]
+  have g2 : (scaledExpr q r s t z w).2.1.good p := by simp [scaledExpr, MulExpr.good, hr, hz]
+  have g3 : (scaledExpr q r s t z w).2.2.1.good p := by simp [scaledExpr, MulExpr.good, hs, hz, hw]
+  have g4 : (scaledExpr q r s t z w).2.2.2.good p := by simp [scaledExpr, MulExpr.good, ht, hz, hw]
+  have h1 := MulExpr.composition p hp hb _ g1
+  have h2 := MulExpr.composition p hp hb _ g2
+  have h3 := MulExpr.composition p hp hb _ g3
+  have h4 := MulExpr.composition p hp hb _ g4
+  refine ⟨h1.1,h2.1,h3.1,h4.1,?_,?_,?_,?_⟩
+  all_goals
+    first | rw [show ((scaledWords p q r s t z w).1.toNat : ZMod p.toNat) = _ from h1.2]
+          | rw [show ((scaledWords p q r s t z w).2.1.toNat : ZMod p.toNat) = _ from h2.2]
+          | rw [show ((scaledWords p q r s t z w).2.2.1.toNat : ZMod p.toNat) = _ from h3.2]
+          | rw [show ((scaledWords p q r s t z w).2.2.2.toNat : ZMod p.toNat) = _ from h4.2]
+    simp only [scaledExpr, MulExpr.field]
+    ring
+
+structure WeightedWord where
+  q : UInt64
+  r : UInt64
+  s : UInt64
+  t : UInt64
+  z : UInt64
+  w : UInt64
+
+def WeightedWord.canonical (p : UInt64) (a : WeightedWord) : Prop :=
+  a.q.toNat < p.toNat ∧ a.r.toNat < p.toNat ∧ a.s.toNat < p.toNat ∧
+  a.t.toNat < p.toNat ∧ a.z.toNat < p.toNat ∧ a.w.toNat < p.toNat
+
+def crossClassifyWord (p : UInt64) (a b : WeightedWord) : ProjectiveLawRuntime.Branch22Prelude :=
+  let l := scaledWords p a.q a.r a.s a.t b.z b.w
+  let r := scaledWords p b.q b.r b.s b.t a.z a.w
+  classifyWord p l.2.2.1 l.2.2.2 r.2.2.1 r.2.2.2
+
+theorem cross_classifier_decode (p : UInt64) (a b : WeightedWord) [Fact p.toNat.Prime]
+    (hfive : 5 ≤ p.toNat) (hbound : p.toNat < 2^31)
+    (ha : a.canonical p) (hb : b.canonical p) :
+    crossClassifyWord p a b = ProjectiveLawRuntime.classifySameU22
+      ((a.s.toNat : ZMod p.toNat)*(b.z.toNat : ZMod p.toNat)^3*(b.w.toNat : ZMod p.toNat))
+      ((a.t.toNat : ZMod p.toNat)*(b.z.toNat : ZMod p.toNat)^5*(b.w.toNat : ZMod p.toNat))
+      ((b.s.toNat : ZMod p.toNat)*(a.z.toNat : ZMod p.toNat)^3*(a.w.toNat : ZMod p.toNat))
+      ((b.t.toNat : ZMod p.toNat)*(a.z.toNat : ZMod p.toNat)^5*(a.w.toNat : ZMod p.toNat)) := by
+  have hp : 0 < p.toNat := by omega
+  rcases ha with ⟨aq,ar,as',at',az,aw⟩
+  rcases hb with ⟨bq,br,bs,bt,bz,bw⟩
+  rcases scaled_composition p a.q a.r a.s a.t b.z b.w hp hbound aq ar as' at' bz bw with
+    ⟨lq,lr,ls,lt,dq,dr,ds,dt⟩
+  rcases scaled_composition p b.q b.r b.s b.t a.z a.w hp hbound bq br bs bt az aw with
+    ⟨rq,rr,rs,rt,eq,er,es,et⟩
+  unfold crossClassifyWord
+  rw [word_classifier_decode p _ _ _ _ hfive hbound ls lt rs rt, ds, dt, es, et]
+
+
+def crossPreludeWord (p : UInt64) (a b : WeightedWord) : Option ProjectiveLawRuntime.Branch22Prelude :=
+  let l := scaledWords p a.q a.r a.s a.t b.z b.w
+  let r := scaledWords p b.q b.r b.s b.t a.z a.w
+  if l.1 = r.1 ∧ l.2.1 = r.2.1 then some (crossClassifyWord p a b) else none
+
+def crossPreludeField (p : UInt64) (a b : WeightedWord) [Fact p.toNat.Prime] :
+    Option ProjectiveLawRuntime.Branch22Prelude :=
+  if (a.q.toNat : ZMod p.toNat)*(b.z.toNat : ZMod p.toNat)^2 =
+      (b.q.toNat : ZMod p.toNat)*(a.z.toNat : ZMod p.toNat)^2 ∧
+     (a.r.toNat : ZMod p.toNat)*(b.z.toNat : ZMod p.toNat)^4 =
+      (b.r.toNat : ZMod p.toNat)*(a.z.toNat : ZMod p.toNat)^4 then
+    some (ProjectiveLawRuntime.classifySameU22
+      ((a.s.toNat : ZMod p.toNat)*(b.z.toNat : ZMod p.toNat)^3*(b.w.toNat : ZMod p.toNat))
+      ((a.t.toNat : ZMod p.toNat)*(b.z.toNat : ZMod p.toNat)^5*(b.w.toNat : ZMod p.toNat))
+      ((b.s.toNat : ZMod p.toNat)*(a.z.toNat : ZMod p.toNat)^3*(a.w.toNat : ZMod p.toNat))
+      ((b.t.toNat : ZMod p.toNat)*(a.z.toNat : ZMod p.toNat)^5*(a.w.toNat : ZMod p.toNat)))
+  else none
+
+theorem cross_prelude_decode (p : UInt64) (a b : WeightedWord) [Fact p.toNat.Prime]
+    (hfive : 5 ≤ p.toNat) (hbound : p.toNat < 2^31)
+    (ha : a.canonical p) (hb : b.canonical p) :
+    crossPreludeWord p a b = crossPreludeField p a b := by
+  have hp : 0 < p.toNat := by omega
+  rcases ha with ⟨aq,ar,as',at',az,aw⟩
+  rcases hb with ⟨bq,br,bs,bt,bz,bw⟩
+  rcases scaled_composition p a.q a.r a.s a.t b.z b.w hp hbound aq ar as' at' bz bw with
+    ⟨lq,lr,ls,lt,dq,dr,ds,dt⟩
+  rcases scaled_composition p b.q b.r b.s b.t a.z a.w hp hbound bq br bs bt az aw with
+    ⟨rq,rr,rs,rt,eq,er,es,et⟩
+  have gq : (scaledWords p a.q a.r a.s a.t b.z b.w).1 =
+      (scaledWords p b.q b.r b.s b.t a.z a.w).1 ↔
+      (a.q.toNat : ZMod p.toNat)*(b.z.toNat : ZMod p.toNat)^2 =
+        (b.q.toNat : ZMod p.toNat)*(a.z.toNat : ZMod p.toNat)^2 := by
+    rw [← UInt64.toNat_inj, ← canonical_equality p.toNat _ _ lq rq, dq, eq]
+  have gr : (scaledWords p a.q a.r a.s a.t b.z b.w).2.1 =
+      (scaledWords p b.q b.r b.s b.t a.z a.w).2.1 ↔
+      (a.r.toNat : ZMod p.toNat)*(b.z.toNat : ZMod p.toNat)^4 =
+        (b.r.toNat : ZMod p.toNat)*(a.z.toNat : ZMod p.toNat)^4 := by
+    rw [← UInt64.toNat_inj, ← canonical_equality p.toNat _ _ lr rr, dr, er]
+  simp only [crossPreludeWord, crossPreludeField, gq, gr,
+    cross_classifier_decode p a b hfive hbound ⟨aq,ar,as',at',az,aw⟩ ⟨bq,br,bs,bt,bz,bw⟩]
+end PencilWordRefinement

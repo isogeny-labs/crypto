@@ -1,0 +1,12 @@
+{
+  "context": "independent-validation 2026-11-18: validator reads every record key with a required accessor (panics on a missing key); all keys present in nagao summary, Run50 qualified/run-study/raw and descent-finder summaries/rows. Producer descent_breakdown.rs uses a null-default get() but expect() on numeric reads; its values agree with the strict recomputation.",
+  "created": "2026-11-18T17:59:26Z",
+  "evidence": [
+    "research/extension_ic_graph_20261115/leads-20261118/independent-validation/validate.rs",
+    "research/extension_ic_graph_20261115/leads-20261118/independent-validation/results/descent.txt"
+  ],
+  "kind": "test",
+  "lesson": "L-99ee952350b2",
+  "outcome": "confirm",
+  "schema": "crypto.lesson/v1"
+}

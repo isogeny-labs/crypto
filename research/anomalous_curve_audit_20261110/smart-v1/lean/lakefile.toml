@@ -1,0 +1,11 @@
+name = "smart_known_answer"
+version = "0.1.0"
+defaultTargets = ["SmartAudit"]
+
+[[require]]
+name = "anomalous_known_answer"
+path = "../../lean"
+
+[[lean_lib]]
+name = "SmartAudit"
+roots = ["SmartArithmetic", "SmallControl"]

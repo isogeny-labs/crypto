@@ -435,21 +435,8 @@ fn compare_source_run(root: &Path, manifest: &Manifest) -> Result<(), String> {
     Ok(())
 }
 
-fn publish_bundle(
-    out: &Path,
-    bundle: &Path,
-    remote: &RemoteSpec,
-    context: &Arc<S3BudgetContext>,
-) -> Result<Value, String> {
-    let root = super::checked_directory(out, false)?;
-    let bundle = super::checked_directory(bundle, false)?;
-    let _lease = super::Lease::acquire(&root)?;
-    #[cfg(target_os = "linux")]
-    super::assert_no_workers(&root)?;
-    let manifest = read_manifest(&bundle)?;
-    replay_members(&bundle, &manifest, None)?;
-    compare_source_run(&root, &manifest)?;
-    let (_, binding, _) = super::bound_run(&root)?;
+fn verify_custody_run_identity(root: &Path, manifest: &Manifest) -> Result<(), String> {
+    let (_, binding, _) = super::bound_run(root)?;
     for (name, expected) in [
         ("plan.json", &manifest.plan_file_sha256),
         ("protocol.json", &manifest.protocol_file_sha256),
@@ -464,6 +451,24 @@ fn publish_bundle(
     {
         return Err("custody producer differs from bound run".into());
     }
+    Ok(())
+}
+
+fn publish_bundle(
+    out: &Path,
+    bundle: &Path,
+    remote: &RemoteSpec,
+    context: &Arc<S3BudgetContext>,
+) -> Result<Value, String> {
+    let root = super::checked_directory(out, false)?;
+    let bundle = super::checked_directory(bundle, false)?;
+    let _lease = super::Lease::acquire(&root)?;
+    #[cfg(target_os = "linux")]
+    super::assert_no_workers(&root)?;
+    let manifest = read_manifest(&bundle)?;
+    replay_members(&bundle, &manifest, None)?;
+    compare_source_run(&root, &manifest)?;
+    verify_custody_run_identity(&root, &manifest)?;
     super::verify_run(&root, true)?;
     let objects = bundle_objects(&bundle, &manifest)?;
     let custody_manifest = objects
@@ -653,6 +658,7 @@ fn restore_local(bundle: &Path, destination: &Path) -> Result<Value, String> {
             .map_err(|e| e.to_string())?;
     }
     let bytes = replay_members(&bundle, &manifest, Some(destination))?;
+    verify_custody_run_identity(&destination.join("run"), &manifest)?;
     let replay = super::verify_run(&destination.join("run"), true)?;
     Ok(
         json!({"schema":"crypto.ml-dataset.restricted-custody-restore/v1",
@@ -806,6 +812,7 @@ fn restore_remote(
         ..manifest.clone()
     };
     replay_members(bundle, &preflight_manifest, Some(&preflight))?;
+    verify_custody_run_identity(&preflight.join("run"), &preflight_manifest)?;
     super::validate_budget_run(context.session(), &preflight.join("run"))?;
     fs::remove_dir_all(&preflight).map_err(|e| e.to_string())?;
     verify_receipt_records(bundle, &remote, context, &receipt)?;

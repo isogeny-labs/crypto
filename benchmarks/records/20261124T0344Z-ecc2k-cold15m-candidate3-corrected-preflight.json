@@ -1,0 +1,54 @@
+{
+  "branch": "lane/ecc2k-ic-half-trace-setup",
+  "closed_utc": "2026-11-24T03:47:15+00:00",
+  "commands": [
+    {
+      "argv": [
+        "timeout",
+        "600",
+        "bash",
+        "research/trace_zero_cold15m_20261124/candidate3/checks/run-preflight.sh"
+      ],
+      "cwd": ".",
+      "exit": 101,
+      "started_utc": "2026-11-24T03:45:05+00:00",
+      "wall_s": 0.02
+    }
+  ],
+  "commit": "8e1b512678661e7ce7864adbf71e9c2b9c45513d",
+  "commit_dirty": true,
+  "created_utc": "2026-11-24T03:44:57+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpus_online": 5,
+    "hostname": "49d6f53fbd3b",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261124T0344Z-ecc2k-cold15m-candidate3-corrected-preflight",
+  "metrics": [],
+  "problem": "ecc2k130-index-calculus-cold-query",
+  "raw": [
+    {
+      "bytes": 246,
+      "path": "research/trace_zero_cold15m_20261124/candidate3/launch-failure-v2/calibration.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/37/371fe673793135abf006238673fc43f9584155bc40b7d15751ff4c5701e970e8",
+      "sha256": "371fe673793135abf006238673fc43f9584155bc40b7d15751ff4c5701e970e8",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ecc2k-cold15m-candidate3-corrected-preflight",
+  "status": "invalid",
+  "summary": "Double-prefixed absolute control path refused exec before any child. Bytes/config retained; structural executable path checks corrected before data with same original deadline.",
+  "validation": null
+}

@@ -1,0 +1,13 @@
+digraph {
+ graph [rankdir=TB,bgcolor="white",pad="0.1"];
+ node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=12,fillcolor="#fff5df",color="#846a42"];
+ edge [fontname="DejaVu Sans",fontsize=11];
+ A [label="Standalone first Lean gate:10 theorems /0trusted PASS"];
+ B [label="First exact binding c20986
+PCC not_covered2:Lean absent from exec PATH
+Batch stops;NOT accepted ·5176f3"];
+ C [label="New correct-PATH batch
+12 exact local passes;later two Bezout passes
+Old12 declaration digests unchanged",fillcolor="#e4f2e8"];
+ A -> B;B -> C;
+}

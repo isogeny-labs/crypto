@@ -1,0 +1,122 @@
+{
+  "schema": "chained-model-isomorphism-first-failure/v1",
+  "profile": "D",
+  "source_commit": "23f752de934360015e7ed023ac63aaeccc44f846",
+  "phases": {
+    "clippy.phase": {
+      "recorded": "2026-11-23T15:07:20.845462+00:00",
+      "name": "clippy",
+      "expected_exit": 0,
+      "exit": 1,
+      "complete_stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 703,
+        "sha256": "26791d36a160141e55e9de3cbf94bb6a1ac54fb64cdaea4bd7dc9f4a4f416d89",
+        "mode": 384
+      }
+    },
+    "compile.phase": {
+      "recorded": "2026-11-23T15:07:20.508157+00:00",
+      "name": "compile",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    "format.phase": {
+      "recorded": "2026-11-23T15:07:13.907915+00:00",
+      "name": "format",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    "rustfmt-version.phase": {
+      "recorded": "2026-11-23T15:07:13.765560+00:00",
+      "name": "rustfmt-version",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 46,
+        "sha256": "5599925a145edaa750ffdd40d2dc1adb031362d0932dd5935e20440a5f51d2be",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    "clippy-version.phase": {
+      "recorded": "2026-11-23T15:07:13.677121+00:00",
+      "name": "clippy-version",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 38,
+        "sha256": "514f4171a1bed07e7d27a872fc29ebb3e32360eb297e28acf00ab796f80e1038",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    "rustc-version.phase": {
+      "recorded": "2026-11-23T15:07:13.584691+00:00",
+      "name": "rustc-version",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 36,
+        "sha256": "55cd0529c005d3f62869ea6e2271bfa9d5196f56dc65a8be00a371af114a4a98",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    }
+  },
+  "outer_exit": 1,
+  "guard_failures": [],
+  "complete_clippy_diagnostic": {
+    "bytes": 703,
+    "sha256": "26791d36a160141e55e9de3cbf94bb6a1ac54fb64cdaea4bd7dc9f4a4f416d89",
+    "private_path": "/dev/shm/ct23-model-isomorphism-first-D/clippy.stderr"
+  },
+  "compiled_ELF_private_custody_pending": {
+    "bytes": 4783760,
+    "sha256": "ed5a4f19e7933b4627686f7a3e2e1adfbf244f20e29c1632ff3ee9099bc70a66",
+    "private_path": "/dev/shm/ct23-model-isomorphism-first-D/native-built"
+  },
+  "ELF_executed": false,
+  "unreached": [
+    "copied immutable qualifier",
+    "pre-call manifest",
+    "projective/isomorphism/cross-chain/twist arithmetic"
+  ],
+  "scope": "Strict Clippy rejects fixed chunks_exact(3), recommends as_chunks::<3>().0. No warning suppression or geometric result."
+}

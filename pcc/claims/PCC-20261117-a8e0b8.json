@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T08:57:11Z",
+ "id": "PCC-20261117-a8e0b8",
+ "kind": "execution",
+ "producer": {
+  "commit": "e4bda647fd01b8c1e8b4a66f80b805dd664b7557",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "/tmp/ic-discriminant49-native/worker-tests.log",
+    "sha256": "ad71fc18648810f275e4e317b6a7c0bec4f51ed4ea417264c16ad33f3c96018f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "/tmp/ic-discriminant49-native/checker-tests.log",
+    "sha256": "098b897c8c46accec412502af198fd918c11dedc8d1c162174102ec502c34123"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "/tmp/ic-discriminant49-native/transport.log",
+    "sha256": "8c65af6a42ad900c5de12e859e8bf38f037d33f5891b0060e9a472e225633c66"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Discriminant screen integrated as separate public Rust entrypoint; original unscreened entrypoint keeps its old schema/path. Initial36combined worker and147combined qualifier controls pass. Four-arm transport simulation passes including exact524288pair caps and failure/repeat handling. Final expanded controls/builds and Runpod49source freeze remain pending; no49allocation/scientific call."
+}

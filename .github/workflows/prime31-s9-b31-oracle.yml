@@ -1,0 +1,57 @@
+name: Prime31 signed B31 4+4 exact oracle (Rust)
+on:
+  push:
+    branches:
+      - research/prime31-aps-walk-source-20261116
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_s9_b31_half_sum_oracle.rs
+      - .github/workflows/prime31-s9-b31-oracle.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-eight-leaf-membership:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Run reused native Rust library tests
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Four-sum integer counting and B4/B8 exact-image tests
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle
+      - name: B31 exact eight-sum membership on natural and planted public targets
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_b31_half_sum_oracle > prime31-s9-b31-four-plus-four.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          j = json.loads(Path("prime31-s9-b31-four-plus-four.json").read_text())
+          assert j["schema"] == "prime31.s9.b31_four_plus_four_oracle.v2"
+          assert len(j["panels"]) == 2
+          assert [x["base_kind"] for x in j["panels"]] == [
+              "first31_rational_x_control", "actual_dickson_depth6_31_algebraic_base"]
+          for panel in j["panels"]:
+              assert panel["signed_four_word_multisets"] == 677040
+              assert panel["signed_four_net_integer_signatures"] == 618885
+              assert len(panel["first_rational_x_base_or_special_fibre"]) == 31
+              assert len(panel["per_target"]) == 41
+              assert panel["planted_hits"] == 16 and panel["identity_control_hits"] == 1
+              assert sum(x["found"] for x in panel["per_target"] if x["type"]=="natural_unknown_k_for_oracle") == panel["natural_eight_leaf_hits"]
+              assert all(x["full_original_curve_sum_replay"] for x in panel["per_target"] if x["found"])
+              assert all(x["fully_exhausted_on_absence"] for x in panel["per_target"] if not x["found"])
+              print(panel["base_kind"], {k:panel[k] for k in [
+                  "distinct_four_leaf_group_points","extra_collisions_of_distinct_net_signatures",
+                  "four_set_build_group_additions","natural_eight_leaf_hits","planted_hits"]})
+          PY
+      - name: Upload source-specific producer output (not PCC)
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-s9-b31-four-plus-four
+          path: prime31-s9-b31-four-plus-four.json
+          retention-days: 30

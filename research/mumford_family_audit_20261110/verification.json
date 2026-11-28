@@ -1,0 +1,48 @@
+{
+  "schema": "mumford-growing-family-verification/v1",
+  "created": "2026-11-10T13:10:04.114629+00:00",
+  "source_commit": "9e23de041ab1c37441faae697175d070d019bee1",
+  "source_plan": "sources.json",
+  "all_source_and_artifact_pins_match": true,
+  "full_gate": {
+    "archive": "research/mumford_family_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 91,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/mumford_family_audit_20261110/evidence/attempts.tar.gz",
+    "files": 39,
+    "roundtrip_equal": true
+  },
+  "actual_local_verdict": {
+    "claim_id": "PCC-20261110-156a3c",
+    "claim_sha256": "27ae95edb4a17dd88e933bab8b5e3273a3bf0a26adf99e3a5367e98dad6eb29d",
+    "commit": "9e23de041ab1c37441faae697175d070d019bee1",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/mumford_family_audit_20261110/lean (FamilyCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-10T13:09:19Z",
+    "verifier_host": "762f5fc120c9"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261110-156a3c",
+    "claim_sha256": "27ae95edb4a17dd88e933bab8b5e3273a3bf0a26adf99e3a5367e98dad6eb29d",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "scope": "Actual polynomial reduced-pair universe overF3 with f=X^(24t+5)+1,g=12t+2. Unique normalized addition-by-(X,1) runs, exact24t+5cycles and unequal smooth fractions. No all-pair ambient group law or geometric Picard identification assumed or proved.",
+  "report_inspection": "Both final PDF pages visually inspected; final rendering rechecked after exact packet/time wording."
+}

@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 560" width="920" height="560" role="img" aria-label="optlevel controls: roofline, operations per second against operations per byte">
+<style>text{font-family:system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif}.surface{fill:#fcfcfb}.t1{fill:#0b0b0b}.t2{fill:#52514e}.mut{fill:#898781}.grid{stroke:#e4e3dd}.axis{stroke:#c3c2b7}.ring{stroke:#fcfcfb}.halo{stroke:#fcfcfb}.l0{stroke:#2a78d6}.f0{fill:#2a78d6}.l1{stroke:#eb6834}.f1{fill:#eb6834}.l2{stroke:#1baf7a}.f2{fill:#1baf7a}.l3{stroke:#898781}.f3{fill:#898781}@media (prefers-color-scheme: dark){.surface{fill:#1a1a19}.t1{fill:#f0efec}.t2{fill:#c3c2b7}.mut{fill:#898781}.grid{stroke:#2c2c2a}.axis{stroke:#383835}.ring{stroke:#1a1a19}.halo{stroke:#1a1a19}.l0{stroke:#3987e5}.f0{fill:#3987e5}.l1{stroke:#d95926}.f1{fill:#d95926}.l2{stroke:#199e70}.f2{fill:#199e70}.l3{stroke:#898781}.f3{fill:#898781}}</style>
+<rect class="surface" x="0" y="0" width="920" height="560" fill="#fcfcfb"/>
+<text class="t1" x="86" y="24" font-size="16" font-weight="600" fill="#0b0b0b">optlevel controls</text>
+<text class="t2" x="86" y="42" font-size="11.5" fill="#52514e">host Intel(R) Xeon(R) Processor @ 2.10GHz (44113cdb2d87e834); attainment = marker / roof at its intensity; not a speed claim</text>
+<line class="grid" x1="86.0" y1="54" x2="86.0" y2="498" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="86.0" y="516" font-size="11" text-anchor="middle" fill="#898781">0.001</text>
+<line class="grid" x1="232.0" y1="54" x2="232.0" y2="498" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="232.0" y="516" font-size="11" text-anchor="middle" fill="#898781">0.01</text>
+<line class="grid" x1="378.0" y1="54" x2="378.0" y2="498" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="378.0" y="516" font-size="11" text-anchor="middle" fill="#898781">0.1</text>
+<line class="grid" x1="524.0" y1="54" x2="524.0" y2="498" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="524.0" y="516" font-size="11" text-anchor="middle" fill="#898781">1</text>
+<line class="grid" x1="670.0" y1="54" x2="670.0" y2="498" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="670.0" y="516" font-size="11" text-anchor="middle" fill="#898781">10</text>
+<line class="grid" x1="86" y1="498.0" x2="670" y2="498.0" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="78" y="502.0" font-size="11" text-anchor="end" fill="#898781">1M</text>
+<line class="grid" x1="86" y1="424.0" x2="670" y2="424.0" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="78" y="428.0" font-size="11" text-anchor="end" fill="#898781">10M</text>
+<line class="grid" x1="86" y1="350.0" x2="670" y2="350.0" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="78" y="354.0" font-size="11" text-anchor="end" fill="#898781">100M</text>
+<line class="grid" x1="86" y1="276.0" x2="670" y2="276.0" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="78" y="280.0" font-size="11" text-anchor="end" fill="#898781">1G</text>
+<line class="grid" x1="86" y1="202.0" x2="670" y2="202.0" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="78" y="206.0" font-size="11" text-anchor="end" fill="#898781">10G</text>
+<line class="grid" x1="86" y1="128.0" x2="670" y2="128.0" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="78" y="132.0" font-size="11" text-anchor="end" fill="#898781">100G</text>
+<line class="grid" x1="86" y1="54.0" x2="670" y2="54.0" stroke="#e4e3dd" stroke-width="1"/>
+<text class="mut" x="78" y="58.0" font-size="11" text-anchor="end" fill="#898781">1T</text>
+<line class="axis" x1="86" y1="498" x2="670" y2="498" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t2" x="378.0" y="546" font-size="12" text-anchor="middle" fill="#52514e">arithmetic intensity (operations per byte of memory traffic)</text>
+<text class="t2" transform="translate(18 276.0) rotate(-90)" font-size="12" text-anchor="middle" fill="#52514e">operations per second</text>
+<path class="l0" d="M86.0,402.9 L419.3,234.0 L670.0,234.0" fill="none" stroke="#2a78d6" stroke-width="2"><title>modmuladd_p31 roof, 1 core(s): peak 3.7G ops/s, bandwidth 19.3G B/s</title></path>
+<path class="l0" d="M86.0,359.1 L417.8,191.0 L670.0,191.0" fill="none" stroke="#2a78d6" stroke-width="2" stroke-dasharray="6 4"><title>modmuladd_p31 roof, 4 core(s): peak 14.1G ops/s, bandwidth 75.3G B/s</title></path>
+<path class="l1" d="M86.0,402.9 L574.0,155.6 L670.0,155.6" fill="none" stroke="#eb6834" stroke-width="2"><title>fma_f64 roof, 1 core(s): peak 42.4G ops/s, bandwidth 19.3G B/s</title></path>
+<path class="l1" d="M86.0,359.1 L574.7,111.4 L670.0,111.4" fill="none" stroke="#eb6834" stroke-width="2" stroke-dasharray="6 4"><title>fma_f64 roof, 4 core(s): peak 168G ops/s, bandwidth 75.3G B/s</title></path>
+<path class="l2" d="M86.0,402.9 L302.9,292.9 L670.0,292.9" fill="none" stroke="#1baf7a" stroke-width="2"><title>ptr_hop roof, 1 core(s): peak 590M ops/s, bandwidth 19.3G B/s</title></path>
+<path class="l2" d="M86.0,359.1 L301.5,249.9 L670.0,249.9" fill="none" stroke="#1baf7a" stroke-width="2" stroke-dasharray="6 4"><title>ptr_hop roof, 4 core(s): peak 2.25G ops/s, bandwidth 75.3G B/s</title></path>
+<line class="l0" x1="660.0" y1="191.7" x2="660.0" y2="189.2" stroke="#2a78d6" stroke-width="2"/>
+<circle class="l0 surface" cx="660.0" cy="190.5" r="5" fill="#fcfcfb" stroke="#2a78d6" stroke-width="2"><title>aa-repeat (full, 4 thread(s), T-timing): 14.3G ops/s [13.8G, 14.9G], attainment 1.014; working set in cache, no DRAM traffic, drawn at the right edge</title></circle>
+<path class="axis" d="M653.0,190.5 L642.0,190.5" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="638.0" y="194.5" font-size="11" text-anchor="end" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">aa-repeat 4t: 1.01 (in cache)</text>
+<line class="l0" x1="660.0" y1="195.0" x2="660.0" y2="190.1" stroke="#2a78d6" stroke-width="2"/>
+<circle class="l0 surface" cx="660.0" cy="191.3" r="5" fill="#fcfcfb" stroke="#2a78d6" stroke-width="2"><title>positive-simd-incache (full, 4 thread(s), T-timing): 13.9G ops/s [12.4G, 14.5G], attainment 0.989; working set in cache, no DRAM traffic, drawn at the right edge</title></circle>
+<path class="axis" d="M653.0,191.3 L642.0,204.5" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="638.0" y="208.5" font-size="11" text-anchor="end" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">positive-simd-incache 4t: 0.99 (in cache)</text>
+<line class="l0" x1="660.0" y1="236.0" x2="660.0" y2="232.7" stroke="#2a78d6" stroke-width="2"/>
+<circle class="f0 ring" cx="660.0" cy="234.6" r="5.5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>aa-repeat (single, 1 thread(s), T-timing): 3.63G ops/s [3.47G, 3.85G], attainment 0.981; working set in cache, no DRAM traffic, drawn at the right edge</title></circle>
+<path class="axis" d="M653.0,234.6 L642.0,234.6" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="638.0" y="238.6" font-size="11" text-anchor="end" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">aa-repeat 1t: 0.98 (in cache)</text>
+<line class="l0" x1="660.0" y1="239.1" x2="660.0" y2="232.9" stroke="#2a78d6" stroke-width="2"/>
+<circle class="f0 ring" cx="660.0" cy="236.7" r="5.5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>positive-simd-incache (single, 1 thread(s), T-timing): 3.4G ops/s [3.15G, 3.83G], attainment 0.918; working set in cache, no DRAM traffic, drawn at the right edge</title></circle>
+<path class="axis" d="M653.0,236.7 L642.0,248.6" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="638.0" y="252.6" font-size="11" text-anchor="end" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">positive-simd-incache 1t: 0.92 (in cache)</text>
+<line class="l1" x1="322.5" y1="240.6" x2="322.5" y2="239.1" stroke="#eb6834" stroke-width="2"/>
+<circle class="l1 surface" cx="322.5" cy="240.1" r="5" fill="#fcfcfb" stroke="#eb6834" stroke-width="2"><title>stream-daxpy (full, 4 thread(s), T-timing): 3.06G ops/s [3.01G, 3.15G], attainment 0.974</title></circle>
+<path class="axis" d="M329.5,240.1 L340.5,240.1" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="344.5" y="244.1" font-size="11" text-anchor="start" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">stream-daxpy 4t: 0.97</text>
+<line class="l0" x1="660.0" y1="254.0" x2="660.0" y2="245.9" stroke="#2a78d6" stroke-width="2"/>
+<circle class="l0 surface" cx="660.0" cy="246.6" r="5" fill="#fcfcfb" stroke="#2a78d6" stroke-width="2"><title>scalar-incache (full, 4 thread(s), T-timing): 2.5G ops/s [1.98G, 2.55G], attainment 0.177; working set in cache, no DRAM traffic, drawn at the right edge</title></circle>
+<path class="axis" d="M653.0,246.6 L642.0,262.6" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="638.0" y="266.6" font-size="11" text-anchor="end" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">scalar-incache 4t: 0.18 (in cache)</text>
+<line class="l1" x1="322.5" y1="287.2" x2="322.5" y2="282.5" stroke="#eb6834" stroke-width="2"/>
+<circle class="f1 ring" cx="322.5" cy="283.0" r="5.5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>stream-daxpy (single, 1 thread(s), T-timing): 805M ops/s [706M, 818M], attainment 1.002</title></circle>
+<path class="axis" d="M329.5,283.0 L340.5,283.0" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="344.5" y="287.0" font-size="11" text-anchor="start" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">stream-daxpy 1t: 1.00</text>
+<line class="l0" x1="660.0" y1="293.4" x2="660.0" y2="288.6" stroke="#2a78d6" stroke-width="2"/>
+<circle class="f0 ring" cx="660.0" cy="291.0" r="5.5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>scalar-incache (single, 1 thread(s), T-timing): 627M ops/s [582M, 677M], attainment 0.170; working set in cache, no DRAM traffic, drawn at the right edge</title></circle>
+<path class="axis" d="M653.0,291.0 L642.0,291.0" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="638.0" y="295.0" font-size="11" text-anchor="end" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">scalar-incache 1t: 0.17 (in cache)</text>
+<line class="l0" x1="660.0" y1="292.6" x2="660.0" y2="291.7" stroke="#2a78d6" stroke-width="2"/>
+<circle class="l0 surface" cx="660.0" cy="292.1" r="5" fill="#fcfcfb" stroke="#2a78d6" stroke-width="2"><title>serial-dependency (full, 4 thread(s), T-timing): 605M ops/s [597M, 613M], attainment 0.043; working set in cache, no DRAM traffic, drawn at the right edge</title></circle>
+<path class="axis" d="M653.0,292.1 L642.0,305.0" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="638.0" y="309.0" font-size="11" text-anchor="end" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">serial-dependency 4t: 0.04 (in cache)</text>
+<line class="l0" x1="660.0" y1="336.8" x2="660.0" y2="336.0" stroke="#2a78d6" stroke-width="2"/>
+<circle class="f0 ring" cx="660.0" cy="336.5" r="5.5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>serial-dependency (single, 1 thread(s), T-timing): 152M ops/s [151M, 155M], attainment 0.041; working set in cache, no DRAM traffic, drawn at the right edge</title></circle>
+<path class="axis" d="M653.0,336.5 L642.0,336.5" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="638.0" y="340.5" font-size="11" text-anchor="end" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">serial-dependency 1t: 0.04 (in cache)</text>
+<line class="l2" x1="260.3" y1="394.1" x2="260.3" y2="392.6" stroke="#1baf7a" stroke-width="2"/>
+<circle class="l2 surface" cx="260.3" cy="393.3" r="5" fill="#fcfcfb" stroke="#1baf7a" stroke-width="2"><title>pointer-chase (full, 4 thread(s), T-timing): 26M ops/s [25.3M, 26.5M], attainment 0.022</title></circle>
+<path class="axis" d="M267.3,393.3 L278.3,393.3" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="282.3" y="397.3" font-size="11" text-anchor="start" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">pointer-chase 4t: 0.02</text>
+<line class="l2" x1="260.3" y1="439.8" x2="260.3" y2="437.1" stroke="#1baf7a" stroke-width="2"/>
+<circle class="f2 ring" cx="260.3" cy="438.6" r="5.5" fill="#1baf7a" stroke="#fcfcfb" stroke-width="2"><title>pointer-chase (single, 1 thread(s), T-timing): 6.34M ops/s [6.12M, 6.64M], attainment 0.021</title></circle>
+<path class="axis" d="M267.3,438.6 L278.3,438.6" fill="none" stroke="#c3c2b7" stroke-width="1"/>
+<text class="t1 halo" x="282.3" y="442.6" font-size="11" text-anchor="start" fill="#0b0b0b" stroke="#fcfcfb" stroke-width="3" paint-order="stroke" stroke-linejoin="round">pointer-chase 1t: 0.02</text>
+<text class="t2" x="688" y="60" font-size="11.5" font-weight="600" fill="#52514e">roof per operation class</text>
+<line class="l0" x1="688" y1="76" x2="714" y2="76" stroke="#2a78d6" stroke-width="2"/>
+<text class="t1" x="720" y="80" font-size="11.5" fill="#0b0b0b">modmuladd_p31</text>
+<line class="l1" x1="688" y1="96" x2="714" y2="96" stroke="#eb6834" stroke-width="2"/>
+<text class="t1" x="720" y="100" font-size="11.5" fill="#0b0b0b">fma_f64</text>
+<line class="l2" x1="688" y1="116" x2="714" y2="116" stroke="#1baf7a" stroke-width="2"/>
+<text class="t1" x="720" y="120" font-size="11.5" fill="#0b0b0b">ptr_hop</text>
+<text class="t2" x="688" y="150" font-size="11" fill="#52514e">solid: 1 core</text>
+<text class="t2" x="688" y="166" font-size="11" fill="#52514e">dashed: all 4 cores</text>
+<text class="t2" x="688" y="182" font-size="11" fill="#52514e">filled marker: single thread</text>
+<text class="t2" x="688" y="198" font-size="11" fill="#52514e">ring: full parallelism</text>
+<text class="t2" x="688" y="214" font-size="11" fill="#52514e">bar: min to max over runs</text>
+<text class="t2" x="688" y="230" font-size="11" fill="#52514e">label: attainment</text>
+<text class="t2" x="688" y="246" font-size="11" fill="#52514e">in cache: no DRAM traffic (right edge)</text>
+<text class="t2" x="688" y="262" font-size="11" fill="#52514e">*: traffic unknown (right edge)</text>
+</svg>

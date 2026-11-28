@@ -1,0 +1,15 @@
+{
+  "record_type":"post_call",
+  "created_utc":"2026-11-25T21:18:37Z",
+  "pre_call":"WS68_YIELD_BASE.pre-call.json",
+  "conductor_task":"T-21",
+  "compile_exit_code":0,
+  "run_exit_code":0,
+  "source_sha256_after":"01469bc286c04c2017552d77ffd08effe9eb895ce8bc1a23848e8ad24ddf4404",
+  "qualifier_sha256_after":"01469bc286c04c2017552d77ffd08effe9eb895ce8bc1a23848e8ad24ddf4404",
+  "binary":{"path":"WS68_YIELD_BASE.bin","sha256":"84551924b898edc19f70aa6129a319bc9e425bfce773cfc5324f786c1369010c","custody":"local_only_not_staged"},
+  "stdout":{"path":"WS68_YIELD_BASE.stdout","bytes":331949,"sha256":"9a56dd485f4c84456673f68bed2930522eb642b12f6ae77e796ff0de8ed93e31"},
+  "stderr":{"path":"WS68_YIELD_BASE.stderr","bytes":0,"sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+  "observed":{"frozen_candidate_lines":4096,"targets":8,"policies_per_target":3,"arms":24,"target_pinned_and_scalar_verified":24,"censored":0,"yield_decisions":{"expand":5,"stay":3},"yield_vs_better_fixed_per_target":{"strict_wins":0,"ties":2,"losses":6},"total_counted_group_additions":{"fixed8":28130,"fixed16":16519,"yield64":23774},"total_attempts":{"fixed8":1859,"fixed16":1025,"yield64":1518}},
+  "limits":"Setup pair-table and trial group additions counted separately per arm. Factor-base y tests and x scans reported but not reduced to group-add totals. Modular elimination field operations, duplicate accounting, wall time and target descent are unpriced. Prior V2 used the same streams, so this is not a held-out policy comparison. No natural E(F_p) partial-relation collector is present in the checked binary-field and Jacobian records. Local bypass [pcc:unverified]."
+}

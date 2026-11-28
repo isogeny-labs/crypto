@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T17:06:54Z",
+ "id": "PCC-20261118-f0f516",
+ "kind": "statement",
+ "producer": {
+  "commit": "a1ceeeeadc82a3e86b074d17c8d758e0d8f04067",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/five-map-pre-call.sha256",
+    "sha256": "6c1dd18d842f45487aee3a54c3b0035d1efa5e32bb9600adf00ce5fae4619a9c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/results/five-map.json",
+    "sha256": "269b5b786e789f4130f8a70c77cf31a672b87a31f89b8c704c91bfb97993e142"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/results/five-map.pari",
+    "sha256": "eb33789293eeba839cedcf9ec1cd2692b692449e8c1f4225fabc11042396e77d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/results/five-map-exit.json",
+    "sha256": "8105264899a6cef65d89313cb15b88d73fd58d892a3de899d3767c0698a98cf7"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/wide-harness-20261118",
+ "statement": "The unchanged complete native polynomial evaluator passes a degree-5 correctness control over the frozen 96-bit pilot field: quotient coefficients and 35 generator/target/kernel/infinity images agree with PARI, 32 transported scalar identities and coordinate controls pass, and the image generator retains the supplied prime order. This uses a bounded order-5 kernel, not the pilot 47-bit kernel or goal 80-bit kernel. No conductor classification or runtime is established."
+}

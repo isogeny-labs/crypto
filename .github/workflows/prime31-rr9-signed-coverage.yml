@@ -1,0 +1,71 @@
+name: Prime31 RR9 signed cancellation exact support
+on:
+  push:
+    branches:
+      - automation/prime31-sign-cancellation-coverage-20261119
+    paths:
+      - ".github/workflows/prime31-rr9-signed-coverage.yml"
+      - "research/prime31_ic_20261115/native/examples/prime31_rr9_signed_coverage.rs"
+  pull_request:
+    paths:
+      - ".github/workflows/prime31-rr9-signed-coverage.yml"
+      - "research/prime31_ic_20261115/native/examples/prime31_rr9_signed_coverage.rs"
+permissions:
+  contents: read
+jobs:
+  native-original-curve:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Candidate checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Original Prime31 Rust arithmetic checkout
+        uses: actions/checkout@v4
+        with:
+          repository: isogeny-labs/crypto
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only the new exact support example
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_signed_coverage.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_signed_coverage.rs
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_rr9_signed_coverage.rs
+      - name: Original library tests
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path \
+            pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Original-curve focused tests
+        run: |
+          cargo +1.100.0 test --locked --release --manifest-path \
+            pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_signed_coverage
+      - name: Print and assert exact signed support JSON
+        run: |
+          cargo +1.100.0 run --locked --release --manifest-path \
+            pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_signed_coverage > prime31-rr9-signed-coverage.json
+          cat prime31-rr9-signed-coverage.json
+          jq -e '
+            .p == 2147483647 and .n == 2147446831 and
+            .x == [0,1,2,3,5,6,8,9] and
+            .l1_even_shells == [1,128,2816,27008,157184] and
+            .signed_net_vector_count == 187137 and
+            .unweighted_sums_distinct_exact == 187137 and
+            .fixed_squarefree_8x_distinct_exact == 256 and
+            .generic_enumeration_grading_only == true and
+            .candidate_unknown_index_extraction == false and
+            .ecdlp_logs_recovered == 0 and
+            .complete_solver_timing_measured == false
+          ' prime31-rr9-signed-coverage.json
+          sha256sum prime31-rr9-signed-coverage.json
+      - name: Upload exact raw output
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-signed-coverage
+          path: prime31-rr9-signed-coverage.json
+          if-no-files-found: error

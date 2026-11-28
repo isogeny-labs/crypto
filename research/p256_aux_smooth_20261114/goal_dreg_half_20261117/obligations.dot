@@ -1,0 +1,13 @@
+digraph G {
+  graph [rankdir=LR, bgcolor="white", fontname="Helvetica"];
+  node [shape=box, style="rounded,filled", fillcolor="#eaf3ef", fontname="Helvetica", fontsize=11];
+  dense [label="Dense full fibre\n16 abscissae\nMembership D=16"];
+  tower [label="Quadratic tower\n4 coordinates + H\nMembership D=5"];
+  retained [label="Actual FB1 retained base\n9 abscissae\nMembership D=9", fillcolor="#fcf2de"];
+  cubic [label="Append target cubic\nFull dense18 / tower7\nRetained dense11"];
+  complete [label="Complete relation systems\nm=2–7, finite targets\nRegularity UNKNOWN", fillcolor="#eeeeee"];
+  dense -> tower [label="Exact affine full-fibre correspondence"];
+  retained -> tower [style=dashed, label="Fp equivalence only\nextension points differ"];
+  tower -> cubic [label="CI regular-sequence argument"];
+  cubic -> complete [style=dashed, label="No implication for\nregularity after group law"];
+}

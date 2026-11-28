@@ -1,0 +1,132 @@
+rootfind-kmitm vs ksum  bits=24 |Fx|=128 targets=128  [pcc:unverified]
+m= 3  split 2/1  kmitm build    1166093 ns  left 16375    right_pre 0       probe     4312.7 ns/tgt  lanes4     4257.7 ns/tgt (1.01x)  thr1/2/4     4187.6/    3742.4/    1939.2 (1.12x/2.16x) hits 14/14/14/14/14   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a
+m= 4  split 3/1  kmitm build  171303706 ns  left 1258461  right_pre 0       probe     3160.9 ns/tgt  lanes4     2785.2 ns/tgt (1.13x)  thr1/2/4     2427.0/    5359.3/    3138.3 (0.45x/0.77x) hits 128/128/128/128/128   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a
+m= 5  split 4/1  kmitm build 15395432756 ns  left 8240872  right_pre 0       probe     3410.7 ns/tgt  lanes4     2822.3 ns/tgt (1.21x)  thr1/2/4     2359.1/    4166.1/    2858.4 (0.57x/0.83x) hits 128/128/128/128/128   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a
+m= 6  skip m=6: estimated left table ~34359738368 over |Fx|=128 (host OOM guard)
+m= 8  skip m=8: estimated left table ~562949953421312 over |Fx|=128 (host OOM guard)
+m=10  skip m=10: estimated left table ~9223372036854775808 over |Fx|=128 (host OOM guard)
+m=12  skip m=12: estimated left table ~9223372036854775808 over |Fx|=128 (host OOM guard)
+{
+  "abscissae": 128,
+  "bits": 24,
+  "classification": "engineering",
+  "factor_base_size": 128,
+  "pcc": "unverified",
+  "rows": [
+    {
+      "abscissae": 128,
+      "build_speedup_ksum_over_kmitm": null,
+      "kmitm_build_ns": 1166093.0,
+      "kmitm_hits": 14,
+      "kmitm_hits_lanes4": 14,
+      "kmitm_hits_thr1": 14,
+      "kmitm_hits_thr2": 14,
+      "kmitm_hits_thr4": 14,
+      "kmitm_lanes4_speedup": 1.0129215039735184,
+      "kmitm_left_entries": 16375,
+      "kmitm_probe_ns_per_target": 4312.6953125,
+      "kmitm_probe_ns_per_target_lanes4": 4257.6796875,
+      "kmitm_probe_ns_per_target_thr1": 4187.625,
+      "kmitm_probe_ns_per_target_thr2": 3742.3515625,
+      "kmitm_probe_ns_per_target_thr4": 1939.203125,
+      "kmitm_right_precomputed": 0,
+      "kmitm_thr2_speedup": 1.1189822575628208,
+      "kmitm_thr4_speedup": 2.1594566066925043,
+      "ksum_build_ns": null,
+      "ksum_hits": null,
+      "ksum_insert_attempts": null,
+      "ksum_ok": false,
+      "ksum_probe_ns_per_target": null,
+      "left_k": 2,
+      "m": 3,
+      "probe_speedup_ksum_over_kmitm": null,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 128,
+      "build_speedup_ksum_over_kmitm": null,
+      "kmitm_build_ns": 171303706.0,
+      "kmitm_hits": 128,
+      "kmitm_hits_lanes4": 128,
+      "kmitm_hits_thr1": 128,
+      "kmitm_hits_thr2": 128,
+      "kmitm_hits_thr4": 128,
+      "kmitm_lanes4_speedup": 1.1348745753964136,
+      "kmitm_left_entries": 1258461,
+      "kmitm_probe_ns_per_target": 3160.8828125,
+      "kmitm_probe_ns_per_target_lanes4": 2785.2265625,
+      "kmitm_probe_ns_per_target_thr1": 2427.046875,
+      "kmitm_probe_ns_per_target_thr2": 5359.3125,
+      "kmitm_probe_ns_per_target_thr4": 3138.265625,
+      "kmitm_right_precomputed": 0,
+      "kmitm_thr2_speedup": 0.4528653395374873,
+      "kmitm_thr4_speedup": 0.7733720357084177,
+      "ksum_build_ns": null,
+      "ksum_hits": null,
+      "ksum_insert_attempts": null,
+      "ksum_ok": false,
+      "ksum_probe_ns_per_target": null,
+      "left_k": 3,
+      "m": 4,
+      "probe_speedup_ksum_over_kmitm": null,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 128,
+      "build_speedup_ksum_over_kmitm": null,
+      "kmitm_build_ns": 15395432756.0,
+      "kmitm_hits": 128,
+      "kmitm_hits_lanes4": 128,
+      "kmitm_hits_thr1": 128,
+      "kmitm_hits_thr2": 128,
+      "kmitm_hits_thr4": 128,
+      "kmitm_lanes4_speedup": 1.2084698939256373,
+      "kmitm_left_entries": 8240872,
+      "kmitm_probe_ns_per_target": 3410.6796875,
+      "kmitm_probe_ns_per_target_lanes4": 2822.3125,
+      "kmitm_probe_ns_per_target_thr1": 2359.0859375,
+      "kmitm_probe_ns_per_target_thr2": 4166.078125,
+      "kmitm_probe_ns_per_target_thr4": 2858.3515625,
+      "kmitm_right_precomputed": 0,
+      "kmitm_thr2_speedup": 0.5662606093110651,
+      "kmitm_thr4_speedup": 0.8253309244565677,
+      "ksum_build_ns": null,
+      "ksum_hits": null,
+      "ksum_insert_attempts": null,
+      "ksum_ok": false,
+      "ksum_probe_ns_per_target": null,
+      "left_k": 4,
+      "m": 5,
+      "probe_speedup_ksum_over_kmitm": null,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 128,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "skip m=6: estimated left table ~34359738368 over |Fx|=128 (host OOM guard)",
+      "m": 6
+    },
+    {
+      "abscissae": 128,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "skip m=8: estimated left table ~562949953421312 over |Fx|=128 (host OOM guard)",
+      "m": 8
+    },
+    {
+      "abscissae": 128,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "skip m=10: estimated left table ~9223372036854775808 over |Fx|=128 (host OOM guard)",
+      "m": 10
+    },
+    {
+      "abscissae": 128,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "skip m=12: estimated left table ~9223372036854775808 over |Fx|=128 (host OOM guard)",
+      "m": 12
+    }
+  ],
+  "targets": 128
+}

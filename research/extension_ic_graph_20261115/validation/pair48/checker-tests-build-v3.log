@@ -1,0 +1,24 @@
+error[E0603]: function `peval` is private
+   --> examples/jv_sieve_quadratic_pair_check.rs:342:50
+    |
+342 |             crypto_lib::cryptanalysis::jv_cover::peval(&f, &jac.h, &f.from_fp(base[0].x))
+    |                                                  ^^^^^ private function
+    |
+note: the function `peval` is defined here
+   --> src/cryptanalysis/jv_cover.rs:579:1
+    |
+579 | pub(crate) fn peval<F: Fld>(f: &F, a: &[F::E], x: &F::E) -> F::E {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: unused import: `crypto_lib::cryptanalysis`
+ --> examples/jv_sieve_quadratic_pair_relation_controls.rs:2:9
+  |
+2 | pub use crypto_lib::cryptanalysis;
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `-D unused-imports` implied by `-D warnings`
+  = help: to override `-D warnings` add `#[allow(unused_imports)]`
+
+error: aborting due to 2 previous errors
+
+For more information about this error, try `rustc --explain E0603`.

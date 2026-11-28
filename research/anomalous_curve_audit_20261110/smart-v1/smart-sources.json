@@ -1,0 +1,208 @@
+{
+  "schema": "smart-concrete-source-plan/v1",
+  "created": "2026-11-10T09:42:43.173542+00:00",
+  "status": "Preissue frozen source plan; whole gates PASS28predata/51concrete,0failing,0trusted.",
+  "formal": {
+    "project": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean",
+    "theorem": "SmartConcreteAudit.concrete_attack_certificate",
+    "statement": "theorem concrete_attack_certificate : Nat.Prime p ∧ 2^159≤p ∧ p<2^160 ∧ formulaCurve.Δ≠0 ∧ addOrderOf G=p ∧ (∃ (hG : formulaCurve.Nonsingular (gx:F) (gy:F)) (hQ : formulaCurve.Nonsingular (qx:F) (qy:F)), G=.some (gx:F) (gy:F) hG ∧ Q=.some (qx:F) (qy:F) hQ) ∧ (∀ i : Fin 4, ∃ d : ℕ, publicAttempt i=some d ∧ d<p ∧ d • G=Q) ∧ (binaryOps p).length=210",
+    "decl_sha256": "f0aa6b108db9d64ea63ee9b18249d730432e87582be2d04ef2b522c809b89947",
+    "sources": [
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean/SmartCertificate.lean",
+        "bytes": 2919,
+        "sha256": "b3984536031feff07f1f5266959ba1987064ef71bda0bcc14c37e96368a750d1"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean/SmartLargeLift0G.lean",
+        "bytes": 121142,
+        "sha256": "81c40e6cd44d67a6ea6bb35236fddaf32ba240f31bd72d2687c5056f3563dead"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean/SmartLargeLift0Q.lean",
+        "bytes": 121397,
+        "sha256": "08059e66b06c679d4db27323f4a99d17834aabbfaabf62eadf8f39cdf3aed6a1"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean/SmartLargeLift1G.lean",
+        "bytes": 121155,
+        "sha256": "3f9add9f57ec7a5fc23a9b887f307ddec16f99955544045f34bc67bca96d75d5"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean/SmartLargeLift1Q.lean",
+        "bytes": 121406,
+        "sha256": "05307eb2239f00c99e1b5f4b34bab1f64197fc2baa15be5efbb1b6cd350d2168"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean/SmartLargeLift2G.lean",
+        "bytes": 121133,
+        "sha256": "906d379a398bff9a5c2bc4897b549d4ac25873f42a08e5123e866bd5cdfd8f60"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean/SmartLargeLift2Q.lean",
+        "bytes": 121401,
+        "sha256": "506a23fce5251dd7d3c480bca70d89fe392ef45125e24792e17f5c9467469623"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean/SmartLargeLift3G.lean",
+        "bytes": 121170,
+        "sha256": "944ad6671a9962f6c58cf373495c16e35b9d3aecf107df8c20cd98f953b8d241"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean/SmartLargeLift3Q.lean",
+        "bytes": 121410,
+        "sha256": "347f8769c0ea1ac3f77004f4e6fb4eebda0eed179da2255080776ac1ac696d14"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean/SmartLargeRecovery.lean",
+        "bytes": 5444,
+        "sha256": "dcd6147b21e9925e8de26df17ce4aef3852d51e55253f932b343cb931f501509"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean/SmartSpecification.lean",
+        "bytes": 2749,
+        "sha256": "dcecc7a50a46997ea2b03fed337e64488328d268d1ec627a23a103e60b5fbaa1"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean/lakefile.toml",
+        "bytes": 433,
+        "sha256": "041b2f5406a99656c5d0017f551c92dc890f5f2bc8c7b0514ff919fb2f472737"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean/lake-manifest.json",
+        "bytes": 4311,
+        "sha256": "5c7a2cebf58d558838f3280463153aed7a69d970121f332f5e41df7122a3d92e"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/certificate-lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/lean/SmartArithmetic.lean",
+        "bytes": 3948,
+        "sha256": "b3370dc0e28c5ba4101435683b722734a59e5ecc36bf262469523ccae6fe5e1e"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/smart-v1/lean/SmallControl.lean",
+        "bytes": 1858,
+        "sha256": "b92810587054270e88c8df9403211d9aa6fce696b7c07bf9ac50ddad49f57d3f"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/lean/AffineCertificates.lean",
+        "bytes": 1928,
+        "sha256": "98666778dc23561bd080aa911780f4fd680f83e505cfa28baaab6c6c2085a9e9"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/lean/AnomalousPrime.lean",
+        "bytes": 22550,
+        "sha256": "116092e7d601559bfe132d3ea27b9098a50554eae0c5ea44ce4472a9cb74f9db"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/lean/CurveData.lean",
+        "bytes": 2678,
+        "sha256": "3d041db780c57a6e97ecd96d8c2b13c5f33ab9ff60ad3abe851b8a4aaccd1352"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/lean/PointTrace.lean",
+        "bytes": 469137,
+        "sha256": "21250b694ff0c30e15c0047f16cb0b638d28d69c00b946b9e88894094f56a6d8"
+      },
+      {
+        "path": "research/anomalous_curve_audit_20261110/lean/PrattCertificate.lean",
+        "bytes": 688,
+        "sha256": "0a66bc5ec0e671a683b2ec9cce0e0b6d4198f87166cd36d7fa2a1b433a8cf56e"
+      }
+    ],
+    "scope": "Four fixed public-input finite-ring attempts return a scalar satisfying the actual Mathlib point relation on a nonsingular curve with exact160-bit prime-orderG. No genericp-adictransfer,wholecurvepointcount,nativeexecutionrefinement,securitycostorbenchmarkclaim."
+  },
+  "gate": {
+    "predata_public_theorems": 28,
+    "concrete_public_theorems": 51,
+    "failing": 0,
+    "trusted_native": 0,
+    "archive": "research/anomalous_curve_audit_20261110/smart-v1/evidence/smart-gate.tar.gz",
+    "roundtrip_equal": true,
+    "private": "All explicit transitions compiled and all reachable private proof dependencies audited transitively; public count includes generated declarations."
+  },
+  "artifacts": [
+    {
+      "path": "research/anomalous_curve_audit_20261110/smart-v1/native/emit_smart_witnesses.mjs",
+      "bytes": 4915,
+      "sha256": "84310b67220a67fce2269a211986edf7f3c792bb3458385479c41b55a75c761e"
+    },
+    {
+      "path": "research/anomalous_curve_audit_20261110/smart-v1/export.json",
+      "bytes": 35600,
+      "sha256": "f4225d64948c98455a3ad3bc08336067315608204ba6d7b1a9d797a8b3404c80"
+    },
+    {
+      "path": "research/anomalous_curve_audit_20261110/smart-v1/protocol.json",
+      "bytes": 17650,
+      "sha256": "8744d94607219d6744547ad13d78269782300d5ec204c73c8223b7148cdb88fa"
+    },
+    {
+      "path": "research/anomalous_curve_audit_20261110/smart-v1/provenance.json",
+      "bytes": 4041,
+      "sha256": "f24fabc7b0a77d660ff41795ac3b3f00051285ef6b721c566b33c6cb700bda66"
+    },
+    {
+      "path": "research/anomalous_curve_audit_20261110/smart-v1/frozen-files.sha256",
+      "bytes": 915,
+      "sha256": "f21991c8c02c3947031bdd00463378ae30bd2dcdbe1df2ab65dc5d9713fa8d2b"
+    },
+    {
+      "path": "research/anomalous_curve_audit_20261110/smart-v1/evidence/smart-gate.tar.gz",
+      "bytes": 2901,
+      "sha256": "54f0dbd74fda22e931b764e4df3a1d4f3e175a612531354c669807f2005b3d30"
+    },
+    {
+      "path": "research/anomalous_curve_audit_20261110/smart-v1/evidence/mathematical-attempts.tar.gz",
+      "bytes": 88817,
+      "sha256": "2cff66b67ed94db6d8df708407d50b42160a3b4610f4957a2f665dbab9cb9de4"
+    },
+    {
+      "path": "research/anomalous_curve_audit_20261110/smart-v1/evidence/frozen-native-runs.tar.gz",
+      "bytes": 272458,
+      "sha256": "43ea7bc6faea0153e72580077e1e2493fff450a272b331d99ee98b0267d557be"
+    },
+    {
+      "path": "research/anomalous_curve_audit_20261110/smart-v1/evidence/formatter-replay.json",
+      "bytes": 145,
+      "sha256": "6c5abb2ab07064cf5d3128d302ca66531c9659e91167d709109f7e135e719309"
+    },
+    {
+      "path": "research/anomalous_curve_audit_20261110/smart-v1/evidence/post-proof-export-check-02.log",
+      "bytes": 60,
+      "sha256": "5156db401215b433b60dfbf9f71569ebc36e262738afe172a60fe2d0896ace24"
+    }
+  ],
+  "native": {
+    "protocol_sha256": "00e7a4a76936914ded10c4bf2f40a1762e8eaec591af6d8abe5c316380684c56",
+    "measurement_packet": "PCC-20261110-162b83",
+    "actual_local_verdict": "not_covered",
+    "signed_standing": "unverified",
+    "flow": {
+      "planned": 3,
+      "attempted": 3,
+      "completed": 3,
+      "excluded": 0
+    },
+    "large_trace_nodes": 1688,
+    "large_transitions": 1680,
+    "frozen_export_file_check": "PASS0findings after restoring original configuration."
+  },
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "lean4checker": "unavailable",
+    "paid_compute": 0,
+    "kb_conductor": "Unavailable; prior primary/repository/Mathlib fallback retained."
+  },
+  "source_review": "Smart HPL-97-128; actual EFD add-1998-cmo/dbl-1998-cmo formulas; anomalous original/authorerratum; NIST800-1863.1.2/C.1, prior read scopes and hashes retained in frozen protocol/provenance/parent plan."
+}

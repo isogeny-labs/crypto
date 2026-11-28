@@ -1,0 +1,128 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T07:26:03Z",
+ "id": "PCC-20261117-b77508",
+ "kind": "statement",
+ "producer": {
+  "commit": "727d40ab01bd306807836d762f4ac51ee429e37e",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/PROTOCOL.md",
+    "sha256": "2c7b1666238bab187e0876d5e755634636f26fd452e354e025ab2a548886c8a6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/SOURCES.sha256",
+    "sha256": "8b3b9764c172aecbd69757494292522cccda75f522b013a932f270610a8ba3c2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/SOURCE_QUALIFICATION.json",
+    "sha256": "f2d948e9196f0b50b4fde4786011a63fa2eda7a0d0f884c5ad47676fa030b43e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/source-v1.tar.xz",
+    "sha256": "cb9aa8c5d953c4616695f72b4a6a92470fa60ad1963cdd8ad8e8c0b7c95ed056"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/PRECALL.json",
+    "sha256": "f06ce47119905b465a7b59d9768ada0d080002272ffea5e32a43fc7af2ee08f2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/QUALIFIER.json",
+    "sha256": "71746f9dfe7bdde6c6e0b5ee6bc2f1a7c400fa523fb6267de7c9234d4da03bb9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/POSTCALL.json",
+    "sha256": "86cff2de1d526d6317960404de180bc17fb4742103d4390e4dbdf22c2cd59563"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/ARCHIVE_READBACK.json",
+    "sha256": "efb410ff03bd1078538724a2513e71c9bfaf669794dccf2e2a5739e186b61910"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/TOOLCHAIN.json",
+    "sha256": "3e13abdaeedd52e7ec93c58efc97d3b8338cb8152e597921d87f24f5e369b549"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/FROZEN.md",
+    "sha256": "bdf6b9591863b40115a4a7227c8bf337cea64c9a0c63bd3596066286dfe3b0d1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/native-v1/controls.json.gz",
+    "sha256": "eb6f5804066ed2c58f67656641838e2893c8d8cd86096094021214a1c2d05e9e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/native-v1/SUMMARY.json",
+    "sha256": "438da818abe1a8270a8377d6731e83bc821e31bb881933f1e7f5ff62938cc408"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/native-v1/NAIVE_COUNTEREXAMPLES.json",
+    "sha256": "699fe6c77172f882390083da729b651d4c898b726caa956e14a2cd5a4337ceb4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/native-v1/native-final.stdout",
+    "sha256": "730f1db3b8e13005817779d97dbaf5797d412f6f44ede302542569bb46d3a865"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/native-v1/native-final.stderr",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-operator-v1/native-v1/COMMITTED_SOURCE.json",
+    "sha256": "c89cb878442cdae4ad68022d70e9432a1a164addb68d46719c3da6d9b82ce01e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "qualified fixed six-candidate section predicate controls",
+ "statement": "Rust section predicate on admitted Fp101/Curve25519-field candidates matches separate existing group addition on600 fixed decisions, with60 checked normalized sections,360 coefficient mutations refused,33 malformed/unsupported/certificate refusals and4 reproduced naive false positives. One pre-call-committed native controls dispatch; source9/binary unchanged. Given candidates only, not original-base discovery, yield, timing, novelty or exponent evidence."
+}

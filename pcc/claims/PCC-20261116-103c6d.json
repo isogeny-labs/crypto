@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T17:32:15Z",
+ "id": "PCC-20261116-103c6d",
+ "kind": "theorem",
+ "producer": {
+  "commit": "b8462a65d882de1069dd863a3b8de4a3b6ba8cbb",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "aaff984f98f8ed5ee5b0fb011bcd2941947f6d8353125c84d5d1c0ae6ab2ae95",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-relative-norm-final-03/CubicRelativeNorm22304.lean",
+   "theorem": "CubicRelativeNorm22304.coefficient_embedding_sub"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact characteristic223 commutative ring/cubic-relation encoding arithmetic, full relative trace/norm/cofactor, schoolbook product and conditional two-sided inverse with an explicitly supplied base-norm inverse; finite norm multiplicativity/nonadditivity/zero controls. Both unchanged original gates55/0 underj1/120s/default memory. No field/nonzero-norm/native program/Jacobian/ECDLP/cost or signed standing.",
+ "statement": "theorem coefficient_embedding_sub {R : Type} [CommRing R] [IsCharP R 223] (a b : Fin 223) : (embed (a-b) : R)=embed a-embed b"
+}

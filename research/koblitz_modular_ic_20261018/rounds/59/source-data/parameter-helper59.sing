@@ -1,0 +1,7 @@
+short=0;
+proc inverseParameter59(number a){
+ poly nn=numerator(a);poly dd=denominator(a);
+ poly changedN=subst(nn,u,1/u);poly changedD=subst(dd,u,1/u);
+ if(changedD==0){ERROR("RR_PID50_PARAMETER_ZERO_DENOMINATOR");return(number(0));}
+ return(leadcoef(changedN)/leadcoef(changedD));
+}

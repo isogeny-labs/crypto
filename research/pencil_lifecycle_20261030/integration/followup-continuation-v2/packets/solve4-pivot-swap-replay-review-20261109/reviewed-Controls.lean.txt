@@ -1,0 +1,22 @@
+-- Prospective exact witnesses; not compiled.
+import PivotSwap
+import Lean.Elab.Tactic.Decide
+import Mathlib.Tactic.NormNum
+namespace Solve4PivotSwapControls
+open Solve4PivotSwap Solve4Stage
+def M : WordMatrix := fun i j =>
+  if i = 0 then (if j = 0 then 1 else 0)
+  else if i = 1 then (if j = 4 then 5 else 0)
+  else if i = 2 then (if j = 1 then 2 else if j = 4 then 6 else 0)
+  else (if j = 1 then 3 else if j = 4 then 9 else 0)
+theorem first_hit : nativePivot M 1 = some 2 := by decide
+theorem swapped_pivot : swapRows M 1 2 1 1 = 2 := by decide
+theorem rhs_moves_with_row : swapRows M 1 2 1 4 = 6 := by decide
+theorem zero_prefix : swapRows M 1 2 1 0 = 0 := by decide
+theorem earlier_row_unchanged : swapRows M 1 2 0 = M 0 := by decide
+theorem exhausted_search : nativePivot (fun _ _ => 0) 2 = none := by decide
+theorem zero_prefix_is_not_automatic :
+  swapRows (fun _ _ => 1) 1 2 1 0 ≠ 0 := by decide
+-- At x1=3, moving the coefficient 2 but retaining RHS5 changes residual0 to1.
+theorem rhs_omission_changes_equation : (2 : ℚ)*3-6 = 0 ∧ (2 : ℚ)*3-5 ≠ 0 := by norm_num
+end Solve4PivotSwapControls

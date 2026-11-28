@@ -1,0 +1,72 @@
+--- a/src/ml_dataset/solvers.rs
++++ b/src/ml_dataset/solvers.rs
+@@ -367,6 +367,8 @@
+ /// performs no storage retry and makes no durable-publication claim.
+ #[derive(Default)]
+ pub(super) struct WorkerResidualCustody {
++    boolean_search:Option<koblitz_m3::sat_original_owner::boolean_search::OwnedAttempt>,
++    boolean_search_report_unavailable:bool,
+     search:Option<koblitz_m3::sat_original_owner::search_worker::Custody>,
+     items: Vec<WorkerResidualArtifact>,
+     // Moves the existing admitted owners; no Box, sink reopening or ledger reset.
+@@ -394,7 +396,7 @@
+         items
+             .try_reserve_exact(Self::CAPACITY)
+             .map_err(|e| e.to_string())?;
+-        Ok(Self { items, search:None,sat: None, sat_report_unavailable: false, boolean_rows: None, boolean_rows_report_unavailable: false, affine_rows:None, affine_rows_report_unavailable:false })
++        Ok(Self { items, search:None,boolean_search:None,boolean_search_report_unavailable:false,sat: None, sat_report_unavailable: false, boolean_rows: None, boolean_rows_report_unavailable: false, affine_rows:None, affine_rows_report_unavailable:false })
+     }
+     fn retain(&mut self, item: WorkerResidualArtifact) -> Result<(), WorkerResidualArtifact> {
+         if self.items.len() == Self::CAPACITY || self.items.capacity() < Self::CAPACITY {
+@@ -403,6 +405,7 @@
+         self.items.push(item);
+         Ok(())
+     }
++    pub(super) fn boolean_search_report_unavailable(&self)->bool{self.boolean_search_report_unavailable}
+     pub(super) fn boolean_rows_report_unavailable(&self) -> bool { self.boolean_rows_report_unavailable || self.affine_rows_report_unavailable }
+     pub(super) fn affine_rows_report_unavailable(&self)->bool {self.affine_rows_report_unavailable}
+     pub(super) fn sat_report_unavailable(&self) -> bool {
+@@ -420,6 +423,13 @@
+     residual: WorkerResidualCustody,
+ }
+ impl WorkerSolveOutput {
++    // Lifetime-free actual ownership, but no report admitted until durable
++    // publication and original-source replay are implemented.
++    fn from_original_boolean_search(custody:koblitz_m3::sat_original_owner::boolean_search::OwnedAttempt)->Self{
++        Self{data:SolverData{outcome:Value::Null,artifacts:Vec::new()},stored:Vec::new(),
++            residual:WorkerResidualCustody{boolean_search:Some(custody),boolean_search_report_unavailable:true,..Default::default()}}
++    }
++
+     fn from_search_custody(mut custody:koblitz_m3::sat_original_owner::search_worker::Custody)->Self {
+         let outcome=custody.outcome();let unavailable=outcome.is_none();
+         Self{data:SolverData{outcome:outcome.unwrap_or(Value::Null),artifacts:Vec::new()},stored:Vec::new(),
+@@ -448,7 +458,7 @@
+         let unavailable=outcome.is_none();
+         Self { data: SolverData { outcome:outcome.unwrap_or(Value::Null), artifacts:Vec::new() },
+             stored:Vec::new(), residual:WorkerResidualCustody {
+-                items:Vec::new(),sat:None,search:None,sat_report_unavailable:false,
++                items:Vec::new(),sat:None,search:None,boolean_search:None,boolean_search_report_unavailable:false,sat_report_unavailable:false,
+                 boolean_rows:Some(custody),boolean_rows_report_unavailable:unavailable, affine_rows:None, affine_rows_report_unavailable:false,
+             } }
+     }
+@@ -461,7 +471,7 @@
+             data: SolverData { outcome: outcome.unwrap_or(Value::Null), artifacts: Vec::new() },
+             stored: Vec::new(),
+             residual: WorkerResidualCustody {
+-                items: Vec::new(), search:None,sat: Some(custody), sat_report_unavailable: unavailable, boolean_rows: None, boolean_rows_report_unavailable: false, affine_rows:None, affine_rows_report_unavailable:false,
++                items: Vec::new(), search:None,boolean_search:None,boolean_search_report_unavailable:false,sat: Some(custody), sat_report_unavailable: unavailable, boolean_rows: None, boolean_rows_report_unavailable: false, affine_rows:None, affine_rows_report_unavailable:false,
+             },
+         }
+     }
+--- a/src/ml_dataset/mod.rs
++++ b/src/ml_dataset/mod.rs
+@@ -1446,6 +1446,9 @@
+ ) -> Result<Value, String> {
+     let (data, stored, residual) = output.into_parts();
+     *retained = residual;
++    if retained.boolean_search_report_unavailable(){
++        return Err("Boolean matrix search report publication is not admitted".into());
++    }
+     if retained.boolean_rows_report_unavailable() {
+         return Err("Boolean finite-row report publication is not admitted".into());
+     }

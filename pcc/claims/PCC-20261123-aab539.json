@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T20:26:27Z",
+ "id": "PCC-20261123-aab539",
+ "kind": "statement",
+ "producer": {
+  "commit": "f23014aadcb56d2d60494dcd551e1757fcfa32bf",
+  "model": "Codex",
+  "session": "cohort-validation-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/hashed_ecdl_cohort_validation_20261123/cohort/evidence/SOURCE-ISOLATION.json",
+    "sha256": "c9d5b4c6579efcf81f7b3ec1b8f6c9592d17550064bea3f0f4422076ddfa2294"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/hashed_ecdl_cohort_validation_20261123/cohort/runs.tar.xz",
+    "sha256": "eeb9f5f1ba18cfb6f74d0a4b989e57fed3473531caa4b056ed0f15ee8a575ca6"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/hashed_ecdl_cohort_validation_20261123/cohort",
+ "statement": "Expanded-cohort source metadata readback:108paths per arm; every solver/library path is unchanged from its frozen original, only identical scale.rs input/target-only edits are new. The original parent/candidate differ solely at CPUlib. Of108frozen-parent historical paths,107match base310d7fb0d908e9ca32c7d9282e31810b700d52cd; the differing CPUlib variants are supplied verbatim, with no unavailable paths. Deterministic41576-byte raw qualification archive extracts without differences and repacks byte-identically, SHA256eeb9f5f1ba18cfb6f74d0a4b989e57fed3473531caa4b056ed0f15ee8a575ca6. Unsigned producer source/archive readback, not execution authentication."
+}

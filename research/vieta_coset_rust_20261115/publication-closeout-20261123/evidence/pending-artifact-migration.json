@@ -1,0 +1,22 @@
+{
+  "schema": "vieta-progress-artifact-migration/v1",
+  "source_commit": "1c9248e5222c7e4a6a6138b6028c4051b8c4dab1",
+  "files": [
+    {
+      "path": "benchmarks/progress/progress.json",
+      "bytes": 2157933,
+      "sha256": "03eed7a526adad687a7b342d317e68c614f73f892092f296d76a7c000e9a105d",
+      "git_blob": "222699dbf21d2a0ab2b356cbf4b2963b5b3a6641"
+    },
+    {
+      "path": "benchmarks/progress/progress.pdf",
+      "bytes": 143419,
+      "sha256": "647c6679df5f00db88a64bce4b50d837e9fe20ed9fb5bb32da6d2a98b05211db",
+      "git_blob": "cb3b2784717978d8d74d8b0e04a88e4aa66a0d24"
+    }
+  ],
+  "local_policy": "fails on these two existing generated outputs changed by official close helper",
+  "required_action": "official same-repository bot migration; audit against exact Git blobs/manifests",
+  "local_s3_operation": false,
+  "s3_availability_claim": false
+}

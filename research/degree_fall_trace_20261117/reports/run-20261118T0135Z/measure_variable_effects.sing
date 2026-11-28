@@ -1,0 +1,128 @@
+// Replay the fixed degree-fall toy family and two synthetic controls.
+ring toy = 101,(x,y,z),dp;
+
+proc standard_monomials(ideal equations)
+{
+  ideal basis = std(equations);
+  if (dim(basis) != 0)
+  {
+    ERROR("expected a proper zero-dimensional toy ideal");
+  }
+  return(kbase(basis));
+}
+
+proc observed_degree(ideal equations)
+{
+  return(deg(standard_monomials(equations)) + 1);
+}
+
+proc check_baseline(ideal equations, intvec expected)
+{
+  ideal monomials = standard_monomials(equations);
+  if (deg(monomials) + 2 != size(expected))
+  {
+    ERROR("unexpected toy baseline degree");
+  }
+  intvec counts;
+  int slot;
+  int index;
+  for (index = 1; index <= size(expected); index++)
+  {
+    counts[index] = 0;
+  }
+  for (index = 1; index <= size(monomials); index++)
+  {
+    slot = deg(monomials[index]) + 1;
+    counts[slot] = counts[slot] + 1;
+  }
+  if (counts != expected)
+  {
+    ERROR("toy baseline Hilbert counts differ from the reference");
+  }
+}
+
+// Count equations where a unit change from the anchor in source changes
+// the polynomial dependence on receiver. The other variables stay symbolic.
+proc changed_relations(ideal equations, int source, int receiver)
+{
+  int count = 0;
+  int index;
+  poly delta;
+  for (index = 1; index <= size(equations); index++)
+  {
+    delta = subst(equations[index], var(source), 2)
+          - subst(equations[index], var(source), 1);
+    if (diff(delta, var(receiver)) != 0)
+    {
+      count++;
+    }
+  }
+  return(count);
+}
+
+proc emit_rows(string fixture, ideal equations)
+{
+  int index;
+  for (index = 1; index <= size(equations); index++)
+  {
+    if (subst(subst(subst(equations[index], x, 1), y, 1), z, 1) != 0)
+    {
+      ERROR("toy anchor must solve every equation");
+    }
+  }
+  int baseline = observed_degree(equations);
+  int source, receiver, pinned;
+  string row;
+  for (source = 1; source <= 3; source++)
+  {
+    pinned = observed_degree(equations + ideal(var(source)-1));
+    row = fixture + "," + string(size(equations)) + "," + string(var(source))
+        + "," + string(baseline) + "," + string(pinned);
+    for (receiver = 1; receiver <= 3; receiver++)
+    {
+      if (receiver != source)
+      {
+        row = row + "," + string(changed_relations(equations, source, receiver));
+      }
+      else
+      {
+        row = row + ",";
+      }
+    }
+    print(row);
+  }
+}
+
+// Coefficients from the previous trace's 0x20261117 LCG and (1,1,1) anchor.
+ideal quadrics =
+  97+86*z+2*z^2+99*y+44*y*z+28*y^2+20*x+99*x*z+65*x*y+66*x^2,
+  23+55*z+4*z^2+31*y+70*y*z+35*y^2+64*x+9*x*z+69*x*y+44*x^2,
+  89+92*z+36*z^2+15*y+18*y*z+14*y^2+14*x+17*x*z+67*x*y+42*x^2,
+  50+56*z+27*z^2+63*y+13*y*z+17*y^2+90*x+47*x*z+84*x*y+58*x^2,
+  84*z+52*z^2+60*y+9*y*z+8*y^2+94*x+83*x*z+49*x*y+66*x^2,
+  60+60*z+68*z^2+28*y+39*y*z+y^2+26*x+40*x*z+4*x*y+78*x^2;
+
+print("fixture,relations,variable,baseline,pinned,to_x,to_y,to_z");
+ideal prefix = quadrics[1], quadrics[2];
+int relation_count;
+for (relation_count = 3; relation_count <= 6; relation_count++)
+{
+  prefix = prefix + ideal(quadrics[relation_count]);
+  if (relation_count == 3)
+  {
+    check_baseline(prefix, intvec(1,3,3,1,0));
+  }
+  else
+  {
+    check_baseline(prefix, intvec(1,0));
+  }
+  emit_rows("dense", prefix);
+}
+
+ideal diagonal = x^2-1, y^2-1, z-1;
+check_baseline(diagonal, intvec(1,2,1,0));
+emit_rows("diagonal", diagonal);
+
+ideal chain = x^2-1, y^2-1+(x-1)*(y-1), z^2-1+(y-1)*(z-1);
+emit_rows("chain", chain);
+quit;

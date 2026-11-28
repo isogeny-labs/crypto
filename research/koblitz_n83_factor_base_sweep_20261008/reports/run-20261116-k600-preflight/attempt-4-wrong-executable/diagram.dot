@@ -1,0 +1,9 @@
+digraph G {
+ graph [rankdir=LR, bgcolor="white", label="N83 K600 zero-trial attempt 1 · 2026-11-16 08:17 UTC", labelloc=t, fontsize=16];
+ node [shape=box, style="rounded,filled", fillcolor="#edf4ff", color="#3970a3", fontname="Helvetica", fontsize=13];
+ a [label="Committed lock H1\nsource C, image, inputs"];
+ b [label="Fresh S3 GET\n3,025,798 B, SHA-256 pass", fillcolor="#e5f5ec", color="#3a8a63"];
+ c [label="Mixed-orbit ELF\nmode absent", fillcolor="#fff1e8", color="#ba5d2d"];
+ d [label="worker exit 1\nPREFLIGHT_ONLY absent", fillcolor="#fce7e7", color="#bb3e3e"];
+ a -> b -> c -> d;
+}

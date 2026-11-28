@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "120",
+    "bash",
+    "tools/lean/proof-gate.sh",
+    "--out",
+    "/workspace/scratch/ct428-full-cubic-frobenius-original-dual-gates/Root435",
+    "research/chained_jacobian_transfers_20261110/lean/CubicFullFrobenius22302.lean"
+  ],
+  "cwd": "/workspace/crypto",
+  "toolchain": "leanprover/lean4:v4.35.0",
+  "source_sha256": "bd154c7ea8081f51c1c31fb6c3304d60713d1d5294468593d9f089a768f1ac62",
+  "workers": 1,
+  "memory": "original default, no override"
+}

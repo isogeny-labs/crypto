@@ -1,0 +1,127 @@
+--- a/src/ml_dataset/dynamic_boolean_search_scheduler.rs
++++ b/src/ml_dataset/dynamic_boolean_search_scheduler.rs
+@@ -67,10 +67,26 @@
+ /// Bounded degree-batch matrix scheduler. All admitted rows and operations remain
+ /// owned by the attempt. Complete means queued ordinary/Boolean pairs exhausted;
+ /// no reduced-basis, F5, solution-search, or original-source admission claim.
++#[derive(Debug,Clone,Copy,PartialEq,Eq)]
++pub enum CheckpointStop{InvalidPolicy,SnapshotCap,Callback,Precheck(Failure),Postcheck(Failure)}
++/// Single live invocation controller; never reconstructed by a child node.
++pub struct CheckpointControl{every_batches:u64,max_snapshots:u64,batches:u64,snapshots:u64,stop:Option<CheckpointStop>}
++impl CheckpointControl{
++ pub fn new(every_batches:u64,max_snapshots:u64)->Result<Self,CheckpointStop>{if every_batches==0||max_snapshots==0{return Err(CheckpointStop::InvalidPolicy)}Ok(Self{every_batches,max_snapshots,batches:0,snapshots:0,stop:None})}
++ pub fn snapshots(&self)->u64{self.snapshots}
++ pub fn stop(&self)->Option<CheckpointStop>{self.stop}
++}
+ pub fn run(n:u32,g:&[Polynomial],limits:Limits,deadline:Instant,owner:&mut impl Owner)->Attempt{
++ run_inner(n,g,limits,deadline,owner,None)
++}
++pub fn run_with_checkpoint<T:Owner>(n:u32,g:&[Polynomial],limits:Limits,deadline:Instant,owner:&mut T,control:&mut CheckpointControl,hook:&mut impl FnMut(&Attempt,&mut T)->Result<(),()>)->Attempt{
++ run_inner(n,g,limits,deadline,owner,Some((control,hook)))
++}
++fn run_inner<T:Owner>(n:u32,g:&[Polynomial],limits:Limits,deadline:Instant,owner:&mut T,mut checkpoint:Option<(&mut CheckpointControl,&mut dyn FnMut(&Attempt,&mut T)->Result<(),()>)>)->Attempt{
+  let mut a=Attempt{batches:Vec::new(),result:Ok(()),complete:false,basis:Vec::new(),pending:Vec::new(),active:None,current:Row::default(),charge:Charge::default(),completed:0,row_xors:0,symbolic_reducers:0,field_tasks:0,ordinary_tasks:0,last_degree:0};
+  let mut m=Meter{owner,limits,deadline,charge:Charge::default()};
+  a.result=(||{
++  if checkpoint.as_ref().is_some_and(|(c,_)|c.stop.is_some()){return Err(Failure::Owner)}
+   m.pay(1,0)?;if n>limits.variables||g.len()>limits.generators||g.len()>limits.tasks{return Err(Failure::Cap)}
+   if !g.is_empty()&&limits.proof==0{return Err(Failure::Cap)}
+   for p in g{m.pay(1,0)?;m.validate(p,n)?}
+@@ -153,6 +169,17 @@
+    m.scan(a.pending.len().checked_add(b.staged_tasks.len()).and_then(|x|x.checked_add(b.staged_basis.len())).ok_or(Failure::Overflow)?)?;
+    a.pending.retain(|t|t.degree!=degree);a.pending.append(&mut b.staged_tasks);a.basis.append(&mut b.staged_basis);
+    a.completed=completed;a.field_tasks=fields;a.ordinary_tasks=pairs;b.stage=Stage::Committed;a.active=None;
++   if let Some((control,hook))=checkpoint.as_mut(){
++    if control.stop.is_some(){return Err(Failure::Owner)}
++    control.batches=control.batches.checked_add(1).ok_or(Failure::Overflow)?;
++    if control.batches%control.every_batches==0{
++     if control.snapshots>=control.max_snapshots{control.stop=Some(CheckpointStop::SnapshotCap);return Err(Failure::Owner)}
++     if let Err(e)=m.pay(1,0){control.stop=Some(CheckpointStop::Precheck(e));return Err(Failure::Owner)}a.charge=m.charge;control.snapshots+=1;
++     if hook(&a,&mut *m.owner).is_err(){control.stop=Some(CheckpointStop::Callback);return Err(Failure::Owner)}
++     if let Err(e)=m.pay(0,0){control.stop=Some(CheckpointStop::Postcheck(e));return Err(Failure::Owner)}
++    }
++   }
++
+   }
+  })();a.charge=m.charge;a
+ }
+--- a/src/ml_dataset/dynamic_boolean_search.rs
++++ b/src/ml_dataset/dynamic_boolean_search.rs
+@@ -19,10 +19,13 @@
+ /// Stops at the first exactly evaluated Boolean witness. A witness is not a signed
+ /// ECDLP relation. UnsatDerived requires every visited branch leaf to contain an
+ /// actual retained constant-one row; source identity checker is a separate gate.
+-pub fn solve(n:u32,g:&[Polynomial],limits:SearchLimits,deadline:Instant,owner:&mut impl Owner)->SearchAttempt{
++pub fn solve(n:u32,g:&[Polynomial],limits:SearchLimits,deadline:Instant,owner:&mut impl Owner)->SearchAttempt{solve_inner(n,g,limits,deadline,owner,None)}
++pub fn solve_with_checkpoint<T:Owner>(n:u32,g:&[Polynomial],limits:SearchLimits,deadline:Instant,owner:&mut T,control:&mut super::CheckpointControl,hook:&mut impl FnMut(&SearchAttempt,usize,&Attempt,Charge,&mut T)->Result<(),()>)->SearchAttempt{solve_inner(n,g,limits,deadline,owner,Some((control,hook)))}
++fn solve_inner<T:Owner>(n:u32,g:&[Polynomial],limits:SearchLimits,deadline:Instant,owner:&mut T,mut checkpoint:Option<(&mut super::CheckpointControl,&mut dyn FnMut(&SearchAttempt,usize,&Attempt,Charge,&mut T)->Result<(),()>)>)->SearchAttempt{
+  let mut a=SearchAttempt{result:Ok(()),verdict:Verdict::Unknown,nodes:Vec::new(),queue:Vec::new(),active:None,witness_node:None,charge:Charge::default()};
+  let mut m=Meter{owner,limits:limits.native,deadline,charge:Charge::default()};
+  a.result=(||{
++  if checkpoint.as_ref().is_some_and(|(c,_)|c.stop().is_some()){return Err(Failure::Owner)}
+   m.pay(1,0)?;if n>limits.native.variables||g.len()>limits.native.generators||limits.nodes==0{return Err(Failure::Cap)}
+   for p in g{m.pay(1,0)?;m.validate(p,n)?}
+   a.nodes=m.alloc(limits.nodes)?;a.queue=m.alloc(limits.nodes)?;
+@@ -32,7 +35,16 @@
+   loop{
+    m.pay(1,0)?;let Some(&idx)=a.queue.last()else{a.verdict=Verdict::UnsatDerived;a.active=None;return Ok(())};let queue_slot=a.queue.len()-1;a.active=Some(idx);
+    a.nodes[idx].status=NodeStatus::Running;
+-   let mut bridge=NativeOwner{meter:&mut m,failure:None};let native=super::run(n,&a.nodes[idx].equations,limits.native,deadline,&mut bridge);let failure=bridge.failure;
++   a.charge=m.charge;
++   let mut bridge=NativeOwner{meter:&mut m,failure:None};
++   let native=if let Some((control,hook))=checkpoint.as_mut(){
++    super::run_with_checkpoint(n,&a.nodes[idx].equations,limits.native,deadline,&mut bridge,control,&mut |native,owner|{
++     owner.meter.pay(0,0).map_err(|_|())?;
++     let result=hook(&a,idx,native,owner.meter.charge,&mut *owner.meter.owner);
++     if result.is_err(){return result}owner.meter.pay(0,0).map_err(|_|())
++    })
++   }else{super::run(n,&a.nodes[idx].equations,limits.native,deadline,&mut bridge)};
++   let failure=bridge.failure;
+    let result=native.result;a.nodes[idx].native=Some(native);
+    if let Some(e)=failure{a.nodes[idx].native_disposition=Some(NativeDisposition::Stopped);return Err(e)}
+    match result{
+--- a/src/ml_dataset/dynamic_boolean_continuation.rs
++++ b/src/ml_dataset/dynamic_boolean_continuation.rs
+@@ -34,7 +34,14 @@
+  pub fn next(&mut self)->Result<Outcome,Failure>{
+   if let Some(e)=self.attempt.failure{return Err(e)}
+   let mut m=Meter{owner:self.owner,limits:self.limits,deadline:self.deadline,charge:self.attempt.charge};
+-  let result=next(self.n,self.original,&mut self.attempt,&mut m);self.attempt.charge=m.charge;
++  let result=next(self.n,self.original,&mut self.attempt,&mut m,None);self.attempt.charge=m.charge;
++  if let Err(e)=result{self.attempt.failure=Some(e);self.attempt.outcome=Outcome::Unknown}result
++ }
++ pub fn next_with_checkpoint(&mut self,control:&mut scheduler::CheckpointControl,hook:&mut impl FnMut(&Attempt,usize,&search::SearchAttempt,usize,&scheduler::Attempt,Charge,Charge,&mut T)->Result<(),()>)->Result<Outcome,Failure>{
++  if let Some(e)=self.attempt.failure{return Err(e)}
++  if control.stop().is_some(){self.attempt.failure=Some(Failure::Owner);self.attempt.outcome=Outcome::Unknown;return Err(Failure::Owner)}
++  let mut m=Meter{owner:self.owner,limits:self.limits,deadline:self.deadline,charge:self.attempt.charge};
++  let result=next(self.n,self.original,&mut self.attempt,&mut m,Some((control,hook)));self.attempt.charge=m.charge;
+   if let Err(e)=result{self.attempt.failure=Some(e);self.attempt.outcome=Outcome::Unknown}result
+  }
+  /// Caller-requested exclusion, explicitly not a cryptographic certificate.
+@@ -87,7 +94,7 @@
+   let mut q=Vec::new();m.reserve(&mut q,if *value{2}else{1})?;if *value{q.push(Vec::new())}let mut t=Vec::new();m.reserve(&mut t,1)?;t.push(v);q.push(t);p.equations.push(q);
+  }p.status=Status::Ready;Ok(())
+ }
+-fn next<T:Owner>(n:u32,g:&[Polynomial],a:&mut Attempt,m:&mut Meter<T>)->Result<Outcome,Failure>{
++fn next<T:Owner>(n:u32,g:&[Polynomial],a:&mut Attempt,m:&mut Meter<T>,mut checkpoint:Option<(&mut scheduler::CheckpointControl,&mut dyn FnMut(&Attempt,usize,&search::SearchAttempt,usize,&scheduler::Attempt,Charge,Charge,&mut T)->Result<(),()>)>)->Result<Outcome,Failure>{
+  m.pay(1,0)?;
+  if a.outcome==Outcome::CandidateRetained{return Ok(a.outcome)}
+  if a.outcome==Outcome::RemainingBooleanModelsExhaustedUnderRecordedExclusions{return Ok(a.outcome)}
+@@ -100,7 +107,16 @@
+   m.pay(1,0)?;let Some(&id)=a.queue.last()else{a.active=None;a.outcome=Outcome::RemainingBooleanModelsExhaustedUnderRecordedExclusions;return Ok(a.outcome)};
+   a.active=Some(id);let p=&mut a.partitions[id];
+   if p.status==Status::Building{build(g,p,m)?}if p.status!=Status::Ready{return Err(Failure::State)}p.status=Status::Running;
+-  let mut bridge=Bridge{meter:m,failure:None};let s=search::solve(n,&p.equations,bridge.meter.limits.search,bridge.meter.deadline,&mut bridge);let failed=bridge.failure;let result=s.result;p.search=Some(s);
++  a.charge=m.charge;
++  let mut bridge=Bridge{meter:m,failure:None};
++  let s=if let Some((control,hook))=checkpoint.as_mut(){
++   search::solve_with_checkpoint(n,&a.partitions[id].equations,bridge.meter.limits.search,bridge.meter.deadline,&mut bridge,control,&mut |search,node,native,search_charge,owner|{
++    owner.meter.pay(0,0).map_err(|_|())?;
++    let result=hook(a,id,search,node,native,owner.meter.charge,search_charge,&mut *owner.meter.owner);
++    if result.is_err(){return result}owner.meter.pay(0,0).map_err(|_|())
++   })
++  }else{search::solve(n,&a.partitions[id].equations,bridge.meter.limits.search,bridge.meter.deadline,&mut bridge)};
++  let failed=bridge.failure;let result=s.result;let p=&mut a.partitions[id];p.search=Some(s);
+   if let Some(e)=failed{return Err(e)}if result.is_err(){return Err(Failure::Native)}
+   let mut bridge=Bridge{meter:m,failure:None};let v=check::verify(n,&p.equations,p.search.as_ref().unwrap(),bridge.meter.limits.audit,bridge.meter.deadline,&mut bridge);let failed=bridge.failure;let result=v.result;p.audit=Some(v);
+   if let Some(e)=failed{return Err(e)}if result.is_err(){return Err(Failure::Audit)}

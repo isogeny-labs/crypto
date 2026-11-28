@@ -1,0 +1,15 @@
+{
+  "study_id":"m31-shared-chain-capacity-v1",
+  "record_type":"build manifest assembled after execution from the retained pre-execution compiler identity and binary hashes",
+  "reconstruction_notice":"This JSON wrapper was written after the run. build.txt and build-sha256.txt were written before tests and formula evaluation; pre-call.json is the original frozen pre-call record.",
+  "compiler":"rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "compiler_commit":"0ef1bc386059596dada8fb65b50425aab2ea637a",
+  "target":"x86_64-unknown-linux-gnu",
+  "llvm":"23.1.5",
+  "compile_test_arguments":["--edition=2021","-O","--test","frozen/exact_bounds.rs","-o","bin/exact_bounds_tests"],
+  "compile_release_arguments":["--edition=2021","-O","frozen/exact_bounds.rs","-o","bin/exact_bounds"],
+  "qualifier_sha256":"e5ab263df42beedee1c350f9ffc853b0d0d738a9a9bc1a58c8aec5cb1705e83d",
+  "release_binary_sha256":"0b26c6e6d9ec24434aba0b16ee916a4315bcbc114e8287f711a635269d6e077f",
+  "test_binary_sha256":"f537dd02f901d788117a69fa29ba9b750d266bc1c924e3603c5bda734a0c09e0",
+  "exit_status":0
+}

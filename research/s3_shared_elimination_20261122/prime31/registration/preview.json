@@ -1,0 +1,52 @@
+{
+  "schema": "s3-shared-elimination.pcc-registration/v1",
+  "mode": "preview",
+  "claim_path": "pcc/claims/PCC-20261122-95c625.json",
+  "claim_sha256": "d9ad28a3d858767f9ee4802097dd3d7ef6b5a96d00da6f7b15acbba45a8f8f36",
+  "entry_sha256": "940122e0959dc32a7503866647627ed3fc3f8358f9bcfca9f38642524aa1fa5b",
+  "receipt_sha256": "95c6250d6bfceb15409b9cdd94f05d6659310791a0ca4f2b4e1123baecf12c54",
+  "contract_source_sha256": "5c798abb69e415371dbe71da694703041ad208042100d6c95bded7dbf4c500fc",
+  "base_entries_hash_checked": 1369,
+  "appended_entries": 0,
+  "standing": "unverified",
+  "standing_source": "unsigned metadata only; no standing verifier executed",
+  "verifier_run": false,
+  "signature_created": false,
+  "python_executed": false,
+  "claim": {
+    "schema": "pcc.claim/v1",
+    "id": "PCC-20261122-95c625",
+    "kind": "statement",
+    "claim_type": "data",
+    "statement": "Local Prime31 correctness records at p=2147483647 with relation modulus r=2147446831: the actual-source integration qualifier reports 12 passing tests; original F4 and fresh/shared preconditioning report nine identical complete finite-chart solutions; Integer, FMA and Split16 preconditioning each recover k=7 from the supplied public Q through three F4 relations plus one explicit G anchor, with rank four and final group equality checked. The curve, G/2G/4G base and Q=7G form a structured known-answer fixture. This is unsigned producer evidence, not a uniform-target, full-library or performance conclusion. [pcc:unverified]",
+    "scope": "Unsigned producer development records for exact modular matrices and shared S3 elimination. Source review is within the same assistant team. No signed scientific verification, performance result, or complete-cost comparison is asserted. [pcc:unverified]",
+    "proofs": [
+      {
+        "kind": "attestation",
+        "subject": {
+          "path": "research/s3_shared_elimination_20261122/prime31/development-receipt.json",
+          "sha256": "95c6250d6bfceb15409b9cdd94f05d6659310791a0ca4f2b4e1123baecf12c54"
+        }
+      }
+    ],
+    "producer": {
+      "commit": "26f6880421d5fcb85cb33c68ec2f56aedfae6803",
+      "session": "/root/prime31-20261122",
+      "model": "GPT-6 Astra Pro"
+    },
+    "created_at": "2026-11-22T22:39:12Z"
+  },
+  "ledger_entry": {
+    "at": "2026-11-22T22:39:12Z",
+    "body": {
+      "claim_id": "PCC-20261122-95c625",
+      "claim_sha256": "d9ad28a3d858767f9ee4802097dd3d7ef6b5a96d00da6f7b15acbba45a8f8f36",
+      "path": "pcc/claims/PCC-20261122-95c625.json"
+    },
+    "hash": "940122e0959dc32a7503866647627ed3fc3f8358f9bcfca9f38642524aa1fa5b",
+    "prev": "e03d95684ad1e73aca98f20d06003ce4ce51548155e8bc5b439aa08015f45962",
+    "schema": "pcc.ledger-entry/v1",
+    "seq": 1369,
+    "type": "claim"
+  }
+}

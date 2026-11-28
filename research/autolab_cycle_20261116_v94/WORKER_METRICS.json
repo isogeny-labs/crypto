@@ -1,0 +1,98 @@
+{
+  "degree-block-oracles-20261116-v94": {
+    "wall_seconds": 1.667212963104248,
+    "peak_process_rss_kib": 84536,
+    "status": "ok",
+    "scope": "development diagnostic; isolation must be established separately"
+  },
+  "degree-block-cold-20261116-v94": {
+    "wall_seconds": 3.833801507949829,
+    "peak_process_rss_kib": 89868,
+    "status": "ok",
+    "scope": "development diagnostic; isolation must be established separately"
+  },
+  "odd-cached-quadratic-20261116-v94b": {
+    "wall_seconds": 4.465470314025879,
+    "peak_process_rss_kib": 85680,
+    "status": "ok",
+    "scope": "development diagnostic; isolation must be established separately"
+  },
+  "cold": {
+    "processes": 36,
+    "native_calls": 6,
+    "medians": {
+      "relaxed_0": {
+        "symmetric": 0.032517167,
+        "F4": 0.239730068,
+        "F5": 0.232875737
+      },
+      "supported_0": {
+        "symmetric": 0.031973816,
+        "F4": 0.234071002,
+        "F5": 0.231686041
+      },
+      "u_linear": {
+        "symmetric": 0.035820873,
+        "F4": 0.038033683,
+        "F5": 0.035823507
+      },
+      "tiny_residual_u0": {
+        "symmetric": 0.032582194,
+        "F4": 0.035773251,
+        "F5": 0.034499499
+      }
+    },
+    "rss_kib_range": [
+      12288,
+      12544
+    ],
+    "qualified": false
+  },
+  "nist": {
+    "P-192": {
+      "root_count": 244,
+      "medians": {
+        "direct": 0.04243823199067265,
+        "cached": 0.007866925006965175
+      },
+      "internal_warm_ratio": 5.394513352180034,
+      "scope": "three internal repetitions; shared warm process; no GB comparison or isolated memory"
+    },
+    "P-224": {
+      "root_count": 256,
+      "medians": {
+        "direct": 0.16718183599004988,
+        "cached": 0.024641932002850808
+      },
+      "internal_warm_ratio": 6.78444514702454,
+      "scope": "three internal repetitions; shared warm process; no GB comparison or isolated memory"
+    },
+    "P-256": {
+      "root_count": 244,
+      "medians": {
+        "direct": 0.06734947900986299,
+        "cached": 0.01057756200316362
+      },
+      "internal_warm_ratio": 6.36720247914591,
+      "scope": "three internal repetitions; shared warm process; no GB comparison or isolated memory"
+    },
+    "P-384": {
+      "root_count": 240,
+      "medians": {
+        "direct": 0.1664624209952308,
+        "cached": 0.026004117011325434
+      },
+      "internal_warm_ratio": 6.401387169682874,
+      "scope": "three internal repetitions; shared warm process; no GB comparison or isolated memory"
+    },
+    "P-521": {
+      "root_count": 256,
+      "medians": {
+        "direct": 0.36331484399852343,
+        "cached": 0.04490273699047975
+      },
+      "internal_warm_ratio": 8.09115141635026,
+      "scope": "three internal repetitions; shared warm process; no GB comparison or isolated memory"
+    }
+  }
+}

@@ -1,0 +1,1278 @@
+{
+  "schema": "subnlogn.construction-native-observation/v1",
+  "recorded_at_utc": "2026-11-22T23:30:30.250152+00:00",
+  "repository": "isogeny-labs/crypto",
+  "branch": "codex/subnlogn-rust-integration-20261122",
+  "pr": 4916,
+  "standing": "unsigned_native_observation",
+  "signed_execution_evidence": false,
+  "performance_experiment": false,
+  "native_producer_commit": "db270b54ac9cf05bcd9e39e024e855ff65808229",
+  "native_producer_tree": "91ca547dda751394e959b7ae7f3fe4ddcb6613f8",
+  "published_implementation_commit": "ab0a3fee4ad85036897593b4a790597e5dddf3a7",
+  "published_implementation_tree": "91ca547dda751394e959b7ae7f3fe4ddcb6613f8",
+  "crate_tree": "842fe630743d4bf5de613eeb91cb5b06edb470d0",
+  "toolchain": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5",
+  "source_files": [
+    {
+      "path": "isogeny_algos/Cargo.lock",
+      "sha256": "99980c0e43c16ed82db530f3d78a4724a4e5f86d1c14533fd97628826c1a8b81",
+      "bytes": 157
+    },
+    {
+      "path": "isogeny_algos/Cargo.toml",
+      "sha256": "7ec1000d8b14a752dd0ae64d59674f47a92bb833d920ff08ffb5c8f542b1e7d8",
+      "bytes": 938
+    },
+    {
+      "path": "isogeny_algos/examples/bench_compare.rs",
+      "sha256": "887c05729d2cd5dd2f2f45701c1e5d419b2f56316c02e9ea843fcb0634994408",
+      "bytes": 3890
+    },
+    {
+      "path": "isogeny_algos/examples/binary_gls_scan.rs",
+      "sha256": "237d197cf215a3844382c9856fe7f2ab5ac6031ffa9f64244bc6f758604bb982",
+      "bytes": 13274
+    },
+    {
+      "path": "isogeny_algos/examples/binary_gls_validate.rs",
+      "sha256": "4e1198710612a2c39ba7fbe700fbc6ccc1200717912a62cf160139a09612c80e",
+      "bytes": 12043
+    },
+    {
+      "path": "isogeny_algos/examples/binary_level_yield.rs",
+      "sha256": "4c8ae11a944c7c1e8d8c69063f2bc18d5c3e2004f5097c49a0354669e7e7e362",
+      "bytes": 17573
+    },
+    {
+      "path": "isogeny_algos/examples/csidh512_once.rs",
+      "sha256": "93df9077b0cbf9c6d932c581d2febe3f09b8c6244e9888f69c8b65a13f019a21",
+      "bytes": 441
+    },
+    {
+      "path": "isogeny_algos/examples/eigen_seta_toy.rs",
+      "sha256": "819d4b9895201220d5d9edc864ba33d9ddbe41cc024a18577cf1e69cf8c307a9",
+      "bytes": 2317
+    },
+    {
+      "path": "isogeny_algos/examples/ext_compare.rs",
+      "sha256": "aa1bdfecce798797320888aefa91ebd86b86c0c563f3b60506656607c0da9dbb",
+      "bytes": 7102
+    },
+    {
+      "path": "isogeny_algos/examples/ext_families.rs",
+      "sha256": "789e62c7f960a6e802a3fe66f53d1f3013538d85559f7d52894e4ab07720dc0d",
+      "bytes": 7770
+    },
+    {
+      "path": "isogeny_algos/examples/ext_summary.rs",
+      "sha256": "ee40c4c39c18769f511ad847f400e3a8bc0f8df5c9a4d16ae7462364d74ee0c6",
+      "bytes": 8816
+    },
+    {
+      "path": "isogeny_algos/examples/fixed_degree_report.rs",
+      "sha256": "5c35e5f269354d9edd1f743d634b94a52f41449c96882b03efad58685e33a178",
+      "bytes": 12411
+    },
+    {
+      "path": "isogeny_algos/examples/gls_loop_bench.rs",
+      "sha256": "f3921889702f4589008fd1c5cc60e131ebba6a32ae7f658a301d61799c0d7d0b",
+      "bytes": 25443
+    },
+    {
+      "path": "isogeny_algos/examples/gls_loop_validate.rs",
+      "sha256": "60743e829e303d04729d164192d111d80ae7a2a6d80f5809af2b598a7475ef1f",
+      "bytes": 14783
+    },
+    {
+      "path": "isogeny_algos/examples/klpt_once.rs",
+      "sha256": "d3047acd4a2b0557f09daae1e3dafd648064023fbdc15482ceef6334bb285db0",
+      "bytes": 2816
+    },
+    {
+      "path": "isogeny_algos/examples/p192_p224_large_degree_search.rs",
+      "sha256": "8c62756762de68cbd5fbe5569af8aac9f34f1fb2bc035d0e5ba0568e36134744",
+      "bytes": 16126
+    },
+    {
+      "path": "isogeny_algos/examples/profile_csidh.rs",
+      "sha256": "9c065de78758e977ad6aa609a4bb154dfc169bfc3c9142e5e699249dce364e72",
+      "bytes": 1415
+    },
+    {
+      "path": "isogeny_algos/examples/profile_eig.rs",
+      "sha256": "e00250d0d60f52a0464ac5b26b73f5b47a69d693f3f0b082d8922b54d4e1f60b",
+      "bytes": 2447
+    },
+    {
+      "path": "isogeny_algos/examples/profile_large_ell.rs",
+      "sha256": "5e99720c089dd2bc38b5ef2cca986b77e3282eeb914f326ec4615e4d96b90e9a",
+      "bytes": 2703
+    },
+    {
+      "path": "isogeny_algos/examples/profile_ntt.rs",
+      "sha256": "35a45c22280562e224a1dfc0ba486f80374359f6fbf388714e9fe97fe9cf1f1f",
+      "bytes": 2306
+    },
+    {
+      "path": "isogeny_algos/examples/profile_powmod.rs",
+      "sha256": "000b62bae10531485f218b334e950444d7a6fdd4267114e6dc851f4b2771ede0",
+      "bytes": 2243
+    },
+    {
+      "path": "isogeny_algos/examples/profile_sea.rs",
+      "sha256": "350a5fd17996ffa2e7cdd71da6ec2799b1fc035eeee322c581c73a79d866de7d",
+      "bytes": 4433
+    },
+    {
+      "path": "isogeny_algos/examples/profile_sqr.rs",
+      "sha256": "5bddf23a60b3d5192d79492c9918f35119ad3bb13d67eb135cdfd7696fe68af1",
+      "bytes": 1756
+    },
+    {
+      "path": "isogeny_algos/examples/profile_tree_vs_direct.rs",
+      "sha256": "46a936e55ebc63f1623b841e7fb405bc2a21c9b239418c88d3b2d85b4a0d6b2e",
+      "bytes": 2447
+    },
+    {
+      "path": "isogeny_algos/examples/profile_weier.rs",
+      "sha256": "3561d49d0cbbfa5290b8c7c5f082279c5990c906aa0b7f9897d33427a5c832f6",
+      "bytes": 1940
+    },
+    {
+      "path": "isogeny_algos/examples/sqrtvelu_once.rs",
+      "sha256": "5bbaa71a7241c88445b32dcb406d399de0859947842e23bdc53cfef472fb4e62",
+      "bytes": 875
+    },
+    {
+      "path": "isogeny_algos/examples/subnlogn.rs",
+      "sha256": "b6abb4c96ff73ddab418b6772bfad948c0b80d4860ed0d0787697ddd8c4f0e97",
+      "bytes": 4721
+    },
+    {
+      "path": "isogeny_algos/examples/subnlogn_full_flow.rs",
+      "sha256": "14bd6f4b3d0821769f9b363a68794e014463af38403e8fda1904dad1972e8cb7",
+      "bytes": 3037
+    },
+    {
+      "path": "isogeny_algos/src/adx_gen.rs",
+      "sha256": "ad88b9ae8a1a64012eb64b39221b42235c0e89e5b9c0ab52ff2e9f9190e61e4f",
+      "bytes": 3220
+    },
+    {
+      "path": "isogeny_algos/src/api.rs",
+      "sha256": "f5d9765cfe5d17f21cb146935ed271c335b2ae80e9ce1b81d3700614b0c7a62a",
+      "bytes": 33601
+    },
+    {
+      "path": "isogeny_algos/src/api/families.rs",
+      "sha256": "9d4360a97d8d42c252346cc776f70d6ac239133ae4d01d66e39c4c89cb301851",
+      "bytes": 41128
+    },
+    {
+      "path": "isogeny_algos/src/api/small_char.rs",
+      "sha256": "d89b49f0b54bec0ff77509d3c6d7003d8156662cb956b067954d9c02ec97d0da",
+      "bytes": 9027
+    },
+    {
+      "path": "isogeny_algos/src/bigint.rs",
+      "sha256": "18c60e514a13bc8ce89f8b2c166cde0de866a551291d237a18b1ed42f3f58ba2",
+      "bytes": 13774
+    },
+    {
+      "path": "isogeny_algos/src/bin/bench.rs",
+      "sha256": "c6038766e8eb72abe8d645f979eeb01d69f152a0d8479abb2cb9193984124a8d",
+      "bytes": 134375
+    },
+    {
+      "path": "isogeny_algos/src/bin/gen_mont_adx.rs",
+      "sha256": "31672346d0ba2e2cc76e7df818803efb085e05f4ef788843355c1bb0a851eb60",
+      "bytes": 154
+    },
+    {
+      "path": "isogeny_algos/src/bin/isobench.rs",
+      "sha256": "2f44adbf82e81bcb75eb078414b14e41dd3bff9b28e86e8b4815ee5e51d1c8d6",
+      "bytes": 19793
+    },
+    {
+      "path": "isogeny_algos/src/bin/isogeny-algos.rs",
+      "sha256": "fb1671eb8d2b5d882be1d5312cb6c5fcc87d51c54a8bcc264088eeb798de36fa",
+      "bytes": 37765
+    },
+    {
+      "path": "isogeny_algos/src/bin/isogeny-perf.rs",
+      "sha256": "5fdb96d626746bb74177c3ddf7e1147577d7047fd411cfb252b1894b48edb16e",
+      "bytes": 27608
+    },
+    {
+      "path": "isogeny_algos/src/bin/micro.rs",
+      "sha256": "52ded9da7a332913cf17e0478dd475d38d9d05fd75c264b0d7d184810395fa1d",
+      "bytes": 9397
+    },
+    {
+      "path": "isogeny_algos/src/bin/perf_campaign/mod.rs",
+      "sha256": "c831a98aa33a63fcbca859ee8626264bc79ccd9d13d745a012b4d1cb70ee3e16",
+      "bytes": 13741
+    },
+    {
+      "path": "isogeny_algos/src/bin/perf_kernel/mod.rs",
+      "sha256": "43dbd4d56f716dfee28a478fb1c4abd1f767b597d558d8c5818e14fdb83d3a7a",
+      "bytes": 8607
+    },
+    {
+      "path": "isogeny_algos/src/bin/report.rs",
+      "sha256": "af53eb003cbbf75ecb37b524accb41bfb773297c5acb311cf307907c5d58839e",
+      "bytes": 21163
+    },
+    {
+      "path": "isogeny_algos/src/binary.rs",
+      "sha256": "2912b87c8b25748b36292b74db1e64176560b32f28f6b907cd661b3b7e47768a",
+      "bytes": 15073
+    },
+    {
+      "path": "isogeny_algos/src/binary_volcano.rs",
+      "sha256": "36f296a54e26409ac6359af7d28a33920d3177835ab00ac7dcf3b71fe469a5ed",
+      "bytes": 32614
+    },
+    {
+      "path": "isogeny_algos/src/cm.rs",
+      "sha256": "95822ac767ce114f7310125f7a22c48d73f1d5860186bbd62b4a08a1fcc6552c",
+      "bytes": 13088
+    },
+    {
+      "path": "isogeny_algos/src/curve.rs",
+      "sha256": "a2605c163f96c93cb32743df3f1e076bf99cf859ca607ce2bc241265a5bbb78f",
+      "bytes": 12334
+    },
+    {
+      "path": "isogeny_algos/src/eigen_seta.rs",
+      "sha256": "8bfec4c139034171335b4448ece26a4a58c1d90ef512eedd517bf251535c8c03",
+      "bytes": 6298
+    },
+    {
+      "path": "isogeny_algos/src/eigen_seta_toy.rs",
+      "sha256": "2098a99d5bde08a68b47dad35a7a973360db3a6c2cc5c929ea02f4d6004a1603",
+      "bytes": 63196
+    },
+    {
+      "path": "isogeny_algos/src/ext.rs",
+      "sha256": "b3fa4a38880d42bfeef8f3da6b68942a52a5344cbad5775627ff25e304e8986c",
+      "bytes": 3001
+    },
+    {
+      "path": "isogeny_algos/src/field.rs",
+      "sha256": "2ef63932b77597df24ddc6d1af2b5de39892379d8cb735418ec1b45c8def2047",
+      "bytes": 33559
+    },
+    {
+      "path": "isogeny_algos/src/find/bmss.rs",
+      "sha256": "4a5d672a5201776b9c20d965f0a7e20745c568cc9adb1f83d3a7e6cc6bc696ef",
+      "bytes": 24994
+    },
+    {
+      "path": "isogeny_algos/src/find/divpoly.rs",
+      "sha256": "518f902239f59ac96b21149c1ec58bf64d5e3da42e977e89c6eee097c4a2874f",
+      "bytes": 4204
+    },
+    {
+      "path": "isogeny_algos/src/find/dual.rs",
+      "sha256": "29800189203ab1da8fc153eba1b157f129a241ad9624bfccbea22011ecd54c5d",
+      "bytes": 2268
+    },
+    {
+      "path": "isogeny_algos/src/find/elkies.rs",
+      "sha256": "fc60050f0c585aafd7f7751a0d6a97a503f5e96afd178996afc574e2f13acfb5",
+      "bytes": 7884
+    },
+    {
+      "path": "isogeny_algos/src/find/mod.rs",
+      "sha256": "aee787c29b68bf02e81f531bd5d8fa16ed06d791a0b88eb4c2128ab904392cae",
+      "bytes": 150
+    },
+    {
+      "path": "isogeny_algos/src/find/modpoly.rs",
+      "sha256": "202d72a0da674f5f2e517e42d33887fca748c38840a9eae348846ffed9fe48e2",
+      "bytes": 22812
+    },
+    {
+      "path": "isogeny_algos/src/find/p_torsion.rs",
+      "sha256": "cee0edb30bdb0a2f1282fed87f5becf185738e2ee054fc06da1d88d6eefddb6a",
+      "bytes": 14623
+    },
+    {
+      "path": "isogeny_algos/src/find/sea.rs",
+      "sha256": "d357da61df58fa18a88ef57621af0d0a84792f20f779975959055eb332c598b7",
+      "bytes": 36356
+    },
+    {
+      "path": "isogeny_algos/src/find/small_char.rs",
+      "sha256": "8f5b458f04317512d0d368fbc3f44bd475363ccddd51f1f391da236cdbba78a0",
+      "bytes": 12140
+    },
+    {
+      "path": "isogeny_algos/src/find/sutherland.rs",
+      "sha256": "4c03073cdcf732e3bc3a8b12045acb09c561e844059a60c2316c2b00b3f4f851",
+      "bytes": 16979
+    },
+    {
+      "path": "isogeny_algos/src/find/sutherland/cm.rs",
+      "sha256": "912e04ee04472a627536cdb3e69105503535e11378da755b6d63e3c96dc78eec",
+      "bytes": 24052
+    },
+    {
+      "path": "isogeny_algos/src/find/sutherland/crt.rs",
+      "sha256": "693ecd5de6a3361e267359870c6b49e158f769f55685a65ed631e4b6ffffa9ed",
+      "bytes": 6072
+    },
+    {
+      "path": "isogeny_algos/src/fixed_degree/baselines.rs",
+      "sha256": "942241c7fbca68f2f7700c27c013c27dd48dd76c3236fcf5375fa3fb2aec821f",
+      "bytes": 20702
+    },
+    {
+      "path": "isogeny_algos/src/fixed_degree/connecting.rs",
+      "sha256": "d64170d5b6aca25e4cb9b303740fea7d78afd2a694adbbbf406be7116941a592",
+      "bytes": 3653
+    },
+    {
+      "path": "isogeny_algos/src/fixed_degree/coppersmith.rs",
+      "sha256": "812b8e4f0ba0da92524c314af86a1c9d392e2a40f78393d907c862d13f13184e",
+      "bytes": 35809
+    },
+    {
+      "path": "isogeny_algos/src/fixed_degree/cornacchia.rs",
+      "sha256": "78053867cdaaa871ae1811d0cb2faa037efa474dc188b1fbe1cec60d7194523c",
+      "bytes": 12961
+    },
+    {
+      "path": "isogeny_algos/src/fixed_degree/endring.rs",
+      "sha256": "df487341ee38598a8e8d43c4f6e8560b5acd3bb86bcf065ce695c4ef60f42e72",
+      "bytes": 8983
+    },
+    {
+      "path": "isogeny_algos/src/fixed_degree/factor.rs",
+      "sha256": "b3c3a9832bc572c3d6d9e04174c1bd3f674100835dd5a071379934e742b2ca6c",
+      "bytes": 10332
+    },
+    {
+      "path": "isogeny_algos/src/fixed_degree/hybrid.rs",
+      "sha256": "3c8258a6c0afe59e05161673d9361691a4b240d158797569115ff366d6307eab",
+      "bytes": 3202
+    },
+    {
+      "path": "isogeny_algos/src/fixed_degree/mod.rs",
+      "sha256": "f9351f6c090a18a051dcbe978c645ab39e7b56453eb4313b3b40dc703c7bd29d",
+      "bytes": 394
+    },
+    {
+      "path": "isogeny_algos/src/fixed_degree/pipeline.rs",
+      "sha256": "a00ad051a789e665a4c21a7ad62e0e378b76dec22fe439994af8569cd2a1afb0",
+      "bytes": 9667
+    },
+    {
+      "path": "isogeny_algos/src/fixed_degree/represent.rs",
+      "sha256": "021f5172ae7d42f70d140c48a4ea78e9988dcf27c9065174f3b8f85a7ed25788",
+      "bytes": 25754
+    },
+    {
+      "path": "isogeny_algos/src/fp2.rs",
+      "sha256": "cf6de8bd8ce20f60e6c9b1d663f4388dfd93ac5450548f3ca287dd5b96b6d62f",
+      "bytes": 2598
+    },
+    {
+      "path": "isogeny_algos/src/fpm.rs",
+      "sha256": "8f9f68f82bad6a0112115acb0e6b6eef3fc001ad57b3705d1c53402fdefd098e",
+      "bytes": 63083
+    },
+    {
+      "path": "isogeny_algos/src/fpr.rs",
+      "sha256": "3c47be46a2145a01a5060e1ea715f2d00aa4407fce53ac2881f38d4c37115f75",
+      "bytes": 13196
+    },
+    {
+      "path": "isogeny_algos/src/genus2.rs",
+      "sha256": "2aa7606c9f04249af5b43fae85859c631dde3d027089d4af66016b3d747d3aa7",
+      "bytes": 22904
+    },
+    {
+      "path": "isogeny_algos/src/gf2n.rs",
+      "sha256": "b0c21e3ca83a5adea9c79039949726e8437baceb2a4493b6187c47f784cb71bf",
+      "bytes": 12440
+    },
+    {
+      "path": "isogeny_algos/src/gf3n.rs",
+      "sha256": "428178235c1cc9423a9b7791243f07fe3d8d128d764efb0f6f953cd197a2abd1",
+      "bytes": 20200
+    },
+    {
+      "path": "isogeny_algos/src/gls_loop.rs",
+      "sha256": "321557906fe9ef731fe4cda9fa7c74245664dc0361eea2a9baed32c9f3f70632",
+      "bytes": 31532
+    },
+    {
+      "path": "isogeny_algos/src/icv1.rs",
+      "sha256": "9c080022e3ce7751095808a553f0a40ad64bd08f97b8fe21354eed9a817bb28f",
+      "bytes": 2704
+    },
+    {
+      "path": "isogeny_algos/src/int.rs",
+      "sha256": "9b5502b9a714154974d7af9c8659d4a83c3a6d86429031a5b0b325ea1afe4187",
+      "bytes": 9767
+    },
+    {
+      "path": "isogeny_algos/src/isobench/bounds.rs",
+      "sha256": "03e75fa252e1340f33f71c3fa16a09a9342e9cdd1d00b232e82c28216e419e6b",
+      "bytes": 29235
+    },
+    {
+      "path": "isogeny_algos/src/isobench/counted.rs",
+      "sha256": "31ea97e6241c3380e74b2130c54800a4c2c965b8ceec5ce6f2ead083d828ca9c",
+      "bytes": 16697
+    },
+    {
+      "path": "isogeny_algos/src/isobench/harness.rs",
+      "sha256": "dc4388e0204247733cefdd21070ab8da20bceac6eafc287836e07f23f8ee580f",
+      "bytes": 20702
+    },
+    {
+      "path": "isogeny_algos/src/isobench/mod.rs",
+      "sha256": "f8ed91e70f6ace559118b6e4df03c662db26682a13b74181be41f0c28147e3ff",
+      "bytes": 506
+    },
+    {
+      "path": "isogeny_algos/src/isobench/problems.rs",
+      "sha256": "4b3b66b69a405824e812b6b1fc21647e37de54ef0dca63c2cf7c7a01f45c5cb9",
+      "bytes": 55484
+    },
+    {
+      "path": "isogeny_algos/src/json.rs",
+      "sha256": "165e6f6c69e3e3f1ecb4c9f1152edbdc0a8837c2b9a697ae61af792421a4e478",
+      "bytes": 8700
+    },
+    {
+      "path": "isogeny_algos/src/kernel/chain.rs",
+      "sha256": "bcb3b5c6b1b580a914c4eef9adb25c038f83ef847c77438b9042f786a44610c6",
+      "bytes": 6877
+    },
+    {
+      "path": "isogeny_algos/src/kernel/hessian.rs",
+      "sha256": "181076de1917dd0fe36c10ea62a632822e3426a8de04b1ca2a40a358c6d2fd26",
+      "bytes": 6529
+    },
+    {
+      "path": "isogeny_algos/src/kernel/kohel.rs",
+      "sha256": "3ec6e4699d86739d88e4d2a94e920ca5c17b5ad5f0399f2c49c8699443f16d9a",
+      "bytes": 4426
+    },
+    {
+      "path": "isogeny_algos/src/kernel/mod.rs",
+      "sha256": "6c8db3561c716bec7156a574a55fff4d042b727b00689f9c888333b4b8792763",
+      "bytes": 233
+    },
+    {
+      "path": "isogeny_algos/src/kernel/models.rs",
+      "sha256": "e3eadacd2b01504b42159beb6efa758a7de9c59a291e544d8d81f634f1e6959d",
+      "bytes": 9541
+    },
+    {
+      "path": "isogeny_algos/src/kernel/montgomery.rs",
+      "sha256": "da19ded672a98f55a9e61b1236d9b6455b075f68febf6926f0a13d79cfd7423c",
+      "bytes": 8022
+    },
+    {
+      "path": "isogeny_algos/src/kernel/radical.rs",
+      "sha256": "82d6daedad7b912154b5f3bc32f8b04faeb958121120112c9d46d24c564e03c7",
+      "bytes": 7272
+    },
+    {
+      "path": "isogeny_algos/src/kernel/sqrt_mult.rs",
+      "sha256": "df653411d33830de5434a962d05f694c65df20ebb900dc228b4318882f9a7f77",
+      "bytes": 11687
+    },
+    {
+      "path": "isogeny_algos/src/kernel/sqrt_velu.rs",
+      "sha256": "5d74ee607ed8ad6daefd4b24a0c43e138bdf307f938fa0e0ce3a939a53e8efec",
+      "bytes": 24191
+    },
+    {
+      "path": "isogeny_algos/src/kernel/sqrt_velu_irr.rs",
+      "sha256": "7a704a74f7653ce2a9675a8ab34b83bfd4663a211a06fb365fa4b572bdf8761e",
+      "bytes": 24577
+    },
+    {
+      "path": "isogeny_algos/src/kernel/sqrt_velu_mont.rs",
+      "sha256": "6d763a6b6ca95112060d2d1247391842037fdaaa1718455e4abbf8d1933fe663",
+      "bytes": 14566
+    },
+    {
+      "path": "isogeny_algos/src/kernel/two_power.rs",
+      "sha256": "27b0e637be0d31ea1b252aeac7c6a38c2faa5870a2e7e62c8eaa0a297eba9345",
+      "bytes": 5873
+    },
+    {
+      "path": "isogeny_algos/src/kernel/velu.rs",
+      "sha256": "0af3e74a838d61f95d5cd685eebddd6805b70fb899c341afdcaad03071aa7c82",
+      "bytes": 6107
+    },
+    {
+      "path": "isogeny_algos/src/kernel/xonly.rs",
+      "sha256": "55a4328ecb1e19251cbc5c454ca924d486d56b2d09fe32db4f49a81e681b6fc0",
+      "bytes": 8380
+    },
+    {
+      "path": "isogeny_algos/src/lattice.rs",
+      "sha256": "8d38fe4faa97c5b0f5145fdbeedbc6ba1d28490fb46cb18e625858ea1b2067aa",
+      "bytes": 26080
+    },
+    {
+      "path": "isogeny_algos/src/lib.rs",
+      "sha256": "00251489da7b1c5c31e5b7f5267ce97c20704355894aa6e998c6ee735464ca3f",
+      "bytes": 1590
+    },
+    {
+      "path": "isogeny_algos/src/mpoly.rs",
+      "sha256": "f26b118f61568096c9ce63f05d8543210e52c0cbd4f23501a9a3fb70df652945",
+      "bytes": 42239
+    },
+    {
+      "path": "isogeny_algos/src/ntt.rs",
+      "sha256": "4c4273175c2bfff47f6fb5736ec07e45fc09edee6a3ed482b41519fe4ae0c374",
+      "bytes": 40404
+    },
+    {
+      "path": "isogeny_algos/src/padic.rs",
+      "sha256": "efeb8a454da4b40005bd141af5e634dd100cf65866c3c35999568e6ff29d1199",
+      "bytes": 24669
+    },
+    {
+      "path": "isogeny_algos/src/path/couveignes.rs",
+      "sha256": "6c62bf4e119442a879a8c56ab536eba23b35958f6a3b1911155a1ffa8c7018dd",
+      "bytes": 6863
+    },
+    {
+      "path": "isogeny_algos/src/path/csidh.rs",
+      "sha256": "f8ac96d766669ff3cfbed9a6a1ded9a237165b2dc1260f8904c90271e5a53542",
+      "bytes": 16420
+    },
+    {
+      "path": "isogeny_algos/src/path/csurf.rs",
+      "sha256": "a0f9f26e40c8f185c53f2a6df37dd7db911c7b57ac211b0eb0e73f13754cbc7f",
+      "bytes": 16941
+    },
+    {
+      "path": "isogeny_algos/src/path/delfs_galbraith.rs",
+      "sha256": "549d85eaf03fa622aadf70618575e89b74176b10f20f157131ca9678410cf5f9",
+      "bytes": 2367
+    },
+    {
+      "path": "isogeny_algos/src/path/endo.rs",
+      "sha256": "93e712e2fd7811d425f9bb6a6a4057d89668069e532e55c056350f97331b10e4",
+      "bytes": 3060
+    },
+    {
+      "path": "isogeny_algos/src/path/galbraith.rs",
+      "sha256": "8dbcf368e53cbc5acc2f181d948e0bb9e24707895e2d288556df99a2a63cc4c5",
+      "bytes": 2877
+    },
+    {
+      "path": "isogeny_algos/src/path/ghs.rs",
+      "sha256": "30a97669331fb37a04c04e52f5fd2ef735f3aa7456497272ea8d9396ac1a974a",
+      "bytes": 8968
+    },
+    {
+      "path": "isogeny_algos/src/path/graph.rs",
+      "sha256": "57b44ba3e779af9150f393e8280f19334e0287fd58a06bdf389b1c7c93911a59",
+      "bytes": 4107
+    },
+    {
+      "path": "isogeny_algos/src/path/mod.rs",
+      "sha256": "25cc30fa7cb56470d5229acacb601f4570ab510fe73ace8528dbccf247327f4e",
+      "bytes": 171
+    },
+    {
+      "path": "isogeny_algos/src/path/relation.rs",
+      "sha256": "094d48d6974cda5a09fd243e017b6539beb6a128b3fc55dd71c0162377db41e3",
+      "bytes": 16310
+    },
+    {
+      "path": "isogeny_algos/src/path/volcano.rs",
+      "sha256": "6a46674a88596a935211c08033e24167b584f342b3989e22f73b4ddf5e288699",
+      "bytes": 6116
+    },
+    {
+      "path": "isogeny_algos/src/poly.rs",
+      "sha256": "615b2c306e2fd2a014de3f00984f56b6aa99e7e85121385944c47e3e01d7e005",
+      "bytes": 36350
+    },
+    {
+      "path": "isogeny_algos/src/quat/brandt.rs",
+      "sha256": "e0eb493f169e286ffff4463d06bc9c5c81b7cca916301e9e8d2376f58b39723f",
+      "bytes": 9323
+    },
+    {
+      "path": "isogeny_algos/src/quat/deuring.rs",
+      "sha256": "f836952c458b969501cac09df7f0c2fd20646d7d653bdefa4cca80783e60d817",
+      "bytes": 17251
+    },
+    {
+      "path": "isogeny_algos/src/quat/klpt.rs",
+      "sha256": "5fd2b0805da00c9e653e4097020d6e9e10640690c59cbff96ba7cf568fb4c5b0",
+      "bytes": 14627
+    },
+    {
+      "path": "isogeny_algos/src/quat/mod.rs",
+      "sha256": "59e9441e9297a37c30f9a95b99ce7f437fccf8655c1ea391ce18ad0894a489ac",
+      "bytes": 19131
+    },
+    {
+      "path": "isogeny_algos/src/series.rs",
+      "sha256": "213b91a0f41bf6ece0882af508f869ebc2a86fdfdf54256dee15742ee1114a30",
+      "bytes": 2880
+    },
+    {
+      "path": "isogeny_algos/src/sha256.rs",
+      "sha256": "72074cc8c527b9f6fbda953e8ae7082519fdb66f8213f1ef49835efb6c38b767",
+      "bytes": 3189
+    },
+    {
+      "path": "isogeny_algos/src/strassen.rs",
+      "sha256": "a46cf24b885706c5ba4918d749abe4aadadca079ea1b77deac3f783f27fa1c9a",
+      "bytes": 14542
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/assembly.rs",
+      "sha256": "1c6aac43a717d35d59d66c97f430f3edb4a8da08acbe57fd27a929f74561d60d",
+      "bytes": 21416
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/certified.rs",
+      "sha256": "6558ba04bbb6192de3c3bb6c20bfd0a3cdcec94d72edf564030e8539483e5aeb",
+      "bytes": 27032
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/crt.rs",
+      "sha256": "084d5a7672253be6f822dda6489c35acbaa61aa8331a515d87a406fe5b6833fc",
+      "bytes": 15850
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/fastdiv.rs",
+      "sha256": "b6cbaea31ea33bd0fd39bea54f5a578070fe29e2c0bfa67f9093e2867d267f29",
+      "bytes": 9082
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/fastint.rs",
+      "sha256": "c558df4322edcab2439c2e6d7c4b28fab65bb01c829aec4db6cd35c853a90b61",
+      "bytes": 15356
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/mod.rs",
+      "sha256": "942deb920af23341ea438b916c0ec88017fd981187d1717177a675f68109ff94",
+      "bytes": 15852
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/motif.rs",
+      "sha256": "34353adb726febc867c7ecd124d0231f82b17e7f52ec3127f6858851f20d1f15",
+      "bytes": 23113
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/parameters.rs",
+      "sha256": "9bc5c1484214403840249210110422ae40f453f5b95883808e3ba764dacf175a",
+      "bytes": 12369
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/resampling.rs",
+      "sha256": "d1d8b383d7cac1544e7a4c170d32b884fb11d88aac686dc1e2d8716f1287b123",
+      "bytes": 18534
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/ring.rs",
+      "sha256": "fbf2288b2625fa4055939297dea6fa93b4524852146a05578266ca8a0c58a215",
+      "bytes": 7650
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/swap.rs",
+      "sha256": "004ab03ed3268e7177fab3837487b721789ccae7261bb23c8cfe96fbae15e664",
+      "bytes": 72849
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/synthetic.rs",
+      "sha256": "57e550ee6d5abb27f7957491fcd23eba97f391ca15bfc22ca631634cdfad86e0",
+      "bytes": 18939
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/tape.rs",
+      "sha256": "fd43f324ae9bf353d0998980c17aa2d31d9425ce5462e18b328b737c48558cf9",
+      "bytes": 23059
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/tensor.rs",
+      "sha256": "24df7c70a3c4be5c6d9b4268f857eea902dd0a3db762cbd7a9eb3ce85b1825c1",
+      "bytes": 96825
+    },
+    {
+      "path": "isogeny_algos/src/subnlogn/transforms.rs",
+      "sha256": "b3ee88952342e8a5f862f9125e098ad0048f3fa131cc46a29bd0c5fef7179753",
+      "bytes": 20797
+    },
+    {
+      "path": "isogeny_algos/src/testdata.rs",
+      "sha256": "995e52e0d18bcb95fa06e79928a6744d9a19306be7cf0168c18e8f2d5a20ece8",
+      "bytes": 16097
+    },
+    {
+      "path": "isogeny_algos/src/theta.rs",
+      "sha256": "2eef0d79a91c419f5d2217ff0a2b71207048ad3c7c6aff03fb99382c8392f531",
+      "bytes": 38599
+    },
+    {
+      "path": "isogeny_algos/src/theta_g.rs",
+      "sha256": "66acd4358474454b9201a78cc5503b67fc5f1376c3fc05542b44a4f119cb359b",
+      "bytes": 26962
+    },
+    {
+      "path": "isogeny_algos/src/weier.rs",
+      "sha256": "f8ecf962d14eee7abe675c8f31e4670c71eeaf7dad61b697179ef2e55c98bff9",
+      "bytes": 17002
+    },
+    {
+      "path": "isogeny_algos/tests/adx_gen.rs",
+      "sha256": "2eae2f530fc0cde32879eee7d904597e22c1859a3f694e2b3bf003922bcee413",
+      "bytes": 479
+    },
+    {
+      "path": "isogeny_algos/tests/api.rs",
+      "sha256": "320bdaa5ec8ef4ab7a1099300ccce58fd3946c6e9df7e8ab5deac7c11a726ee7",
+      "bytes": 11101
+    },
+    {
+      "path": "isogeny_algos/tests/api_families.rs",
+      "sha256": "4d1085a305ec74352cc626a1a8aedf888c9d8a3812094f05f1d8c9d72c397c70",
+      "bytes": 7389
+    },
+    {
+      "path": "isogeny_algos/tests/bigfield.rs",
+      "sha256": "0f76542146da3293f026edd9a4c7e23014ea5008954619e8915b8d2ee1f8b4af",
+      "bytes": 2011
+    },
+    {
+      "path": "isogeny_algos/tests/binary.rs",
+      "sha256": "81c1b32f1b7f8b2d45c91deeeb3de4139f89d6e6f0bb38cc80f1eb2a89d14470",
+      "bytes": 9810
+    },
+    {
+      "path": "isogeny_algos/tests/bmss.rs",
+      "sha256": "39e0d8ab878a2f7badf4c88f98e35728e5adc01afa8ecf345a0026deb3311a15",
+      "bytes": 7703
+    },
+    {
+      "path": "isogeny_algos/tests/chain.rs",
+      "sha256": "f4775e52b744157c3f0f9a38b3a176e9b38187a74082f445d99335cd54e90ffb",
+      "bytes": 5407
+    },
+    {
+      "path": "isogeny_algos/tests/coppersmith.rs",
+      "sha256": "c27230791a3524e4cd757717925a6ac20169c227da772055a62a4a95a313d928",
+      "bytes": 12354
+    },
+    {
+      "path": "isogeny_algos/tests/csidh.rs",
+      "sha256": "099f76edf22f96b01c47cde057de513e4b4885cd2b42e39d31c63380a1653c9c",
+      "bytes": 5730
+    },
+    {
+      "path": "isogeny_algos/tests/ct19_degree7.rs",
+      "sha256": "804e914a43ffd3d741aa6a003b203c715676ea95a89e87eeabf8df71001d4a93",
+      "bytes": 7088
+    },
+    {
+      "path": "isogeny_algos/tests/ct20_f101_gluing.rs",
+      "sha256": "bfa78de28144011063d70423a72da8e1e6f93a90d1ae75b4e0f38b684223c934",
+      "bytes": 5089
+    },
+    {
+      "path": "isogeny_algos/tests/dot.rs",
+      "sha256": "12594f976315a09cd8b5a8a31a3a3d0a8c493c38f4cb4e7053ab69a1298c1b2c",
+      "bytes": 3501
+    },
+    {
+      "path": "isogeny_algos/tests/dual.rs",
+      "sha256": "fc5410c16b5c8e5b07d0d5697784340d7633b544d2e8a4aab0800e07f4e8fe36",
+      "bytes": 1546
+    },
+    {
+      "path": "isogeny_algos/tests/endo.rs",
+      "sha256": "17de8a408463d4ce553f096fbceca720365bf2f9772e07c943527b6a45190b89",
+      "bytes": 2446
+    },
+    {
+      "path": "isogeny_algos/tests/find.rs",
+      "sha256": "698ba32955556ae1b4d2a89bbb1006b09dd918ae8e9e7ce53bc752fd0eba738f",
+      "bytes": 4057
+    },
+    {
+      "path": "isogeny_algos/tests/fixed_degree_pipeline.rs",
+      "sha256": "63842302bedb5532742947d4c6dc6e4621337f8b59e77c95fd2dfb08ddbaf5ac",
+      "bytes": 16182
+    },
+    {
+      "path": "isogeny_algos/tests/fixed_degree_solvers.rs",
+      "sha256": "bed91655de58dbd84deb1c7b4402d27cfb63ffe71d7251f70425f62edbf896ec",
+      "bytes": 20157
+    },
+    {
+      "path": "isogeny_algos/tests/fpm.rs",
+      "sha256": "a81b7041356bb77037c26d7ce074cfb8a2257221500848ca279dd6f7b3e93fb5",
+      "bytes": 3693
+    },
+    {
+      "path": "isogeny_algos/tests/fpm_inv.rs",
+      "sha256": "e5754d42ccbbc544c81707253e3b9d19f8b58711068d11d63d56d301a8edf836",
+      "bytes": 4517
+    },
+    {
+      "path": "isogeny_algos/tests/fpr.rs",
+      "sha256": "a0024889b9a0fa82ec3644448623bed18d1e3bf0a0146c21a491fd7b5db99f6e",
+      "bytes": 1727
+    },
+    {
+      "path": "isogeny_algos/tests/genus2.rs",
+      "sha256": "4c68cf25928ab86dadea623b66223e62b83c356642c185bb57a60bb8eca8acd8",
+      "bytes": 7985
+    },
+    {
+      "path": "isogeny_algos/tests/gf3n.rs",
+      "sha256": "6561e6d4a72808e9a580c09165199c9f283fd10f1a31d9554d772673ca020153",
+      "bytes": 1657
+    },
+    {
+      "path": "isogeny_algos/tests/hessian.rs",
+      "sha256": "e22be8dd15a55560e344053d3aed985ce9ae3380d1335ff8c9ccd166b8b65215",
+      "bytes": 4455
+    },
+    {
+      "path": "isogeny_algos/tests/icv1.rs",
+      "sha256": "ba5ee99c4a3a3493414c5847843a8f55ebe97aeff2090cf46c4059951ed0db32",
+      "bytes": 1698
+    },
+    {
+      "path": "isogeny_algos/tests/int.rs",
+      "sha256": "16a23c4c216271eee4475e502c83014238ad1825e11685ac369f3ee23faed204",
+      "bytes": 5009
+    },
+    {
+      "path": "isogeny_algos/tests/isobench.rs",
+      "sha256": "158605847a2d179e9c9c50df2517e30e813bb3c52fd06efb297713cd5a378436",
+      "bytes": 13510
+    },
+    {
+      "path": "isogeny_algos/tests/kernel.rs",
+      "sha256": "271d468fe6015d817fdf0ab4e5ccd24bfd13c4f57e7296b3c6c717f06d04ac6d",
+      "bytes": 2295
+    },
+    {
+      "path": "isogeny_algos/tests/kernel2.rs",
+      "sha256": "ca721038feaaa8b0d15be04db3d00807ec5b7442ca84d8720392fdd90e37ac11",
+      "bytes": 8953
+    },
+    {
+      "path": "isogeny_algos/tests/models.rs",
+      "sha256": "1e975f256d10b7cb5a744d601ef8bb79bf894eb410ab640bf23291789d8c6087",
+      "bytes": 7242
+    },
+    {
+      "path": "isogeny_algos/tests/mont.rs",
+      "sha256": "0cebf36d2b7d482c03835d39e747c5ec0957c0917dcdca67be241a56e9d1660b",
+      "bytes": 2693
+    },
+    {
+      "path": "isogeny_algos/tests/ntt.rs",
+      "sha256": "b3d1248af12078483c1893d453d2414eb6fd72e2f4b3d77dd6f961f7e99315ad",
+      "bytes": 3566
+    },
+    {
+      "path": "isogeny_algos/tests/path.rs",
+      "sha256": "25e1d5058de3f882eea28805d965e6ae32c208383407a320061d52b9df62a04f",
+      "bytes": 6071
+    },
+    {
+      "path": "isogeny_algos/tests/phi_fast.rs",
+      "sha256": "7c84f4eb5a33cbec9c52ea74dcf4ede8d7dcfcff6bff24b3ccd4cf75e03ddddf",
+      "bytes": 1018
+    },
+    {
+      "path": "isogeny_algos/tests/polyfast.rs",
+      "sha256": "7323974ebd17d4e0a7857a7c5991e5712ab1d76ae11f1fbb58181d7a81e67491",
+      "bytes": 7090
+    },
+    {
+      "path": "isogeny_algos/tests/powmod.rs",
+      "sha256": "7bebc282d0b62fea0d0d3463f339b13dd15bd18f1caf1c416ff53dbd02d89cc9",
+      "bytes": 3794
+    },
+    {
+      "path": "isogeny_algos/tests/quat.rs",
+      "sha256": "ce234fdcada9630345a2939c00482646aa13ac055e6a62e5c7fd30d5fcf7a137",
+      "bytes": 10076
+    },
+    {
+      "path": "isogeny_algos/tests/radical.rs",
+      "sha256": "0ea0bc62b51c546437f46ea2335780993a8122a36d14cc017ea7884e8c527395",
+      "bytes": 7257
+    },
+    {
+      "path": "isogeny_algos/tests/relation.rs",
+      "sha256": "b6c20fbf4e00e9434b3a49bfeef2dcc3319ae62aed0863e1a2aa53ec0a2f9c75",
+      "bytes": 3718
+    },
+    {
+      "path": "isogeny_algos/tests/report.rs",
+      "sha256": "46e6df56c8bfbcbffa8a4d2abe2f5479767f602a4cad1ba9eba271d6731749d7",
+      "bytes": 733
+    },
+    {
+      "path": "isogeny_algos/tests/sea.rs",
+      "sha256": "db0a9652e1509a29b3a8534bb417a850e2a4ac28a8ca4b7d931ef468308dfb57",
+      "bytes": 16127
+    },
+    {
+      "path": "isogeny_algos/tests/small_char.rs",
+      "sha256": "bae63a9bd8d2c86e72615db3fa8bd509edf52688cf2626c9e38f940341fa59fe",
+      "bytes": 8148
+    },
+    {
+      "path": "isogeny_algos/tests/sqr.rs",
+      "sha256": "b90ed82afe0ce7af4df8bce73baaf34b5844c2875491e55d1e3e70ab31b4c4ff",
+      "bytes": 3498
+    },
+    {
+      "path": "isogeny_algos/tests/sqrt_velu_gaps.rs",
+      "sha256": "fe8d2e7347628027ce2e5e4c8d86a754d95b063cdca4d118e6bc74f7fa11abcd",
+      "bytes": 32478
+    },
+    {
+      "path": "isogeny_algos/tests/sqrt_velu_mont.rs",
+      "sha256": "357d2ac742f46e3df2dda973733912448422a4af84af4fcf8e86df3bed29d58e",
+      "bytes": 4028
+    },
+    {
+      "path": "isogeny_algos/tests/subnlogn.rs",
+      "sha256": "753b030adf92f3564340d3ca777548a36732ccdce5d0890ffccde4c33d201c6b",
+      "bytes": 14718
+    },
+    {
+      "path": "isogeny_algos/tests/sutherland.rs",
+      "sha256": "31b5f1b81d1afbc76571216a1ffe613a16dd81f2de237ff960a16ce164352de2",
+      "bytes": 1626
+    },
+    {
+      "path": "isogeny_algos/tests/theta.rs",
+      "sha256": "1b696d905f267be207a0f4679ec59bbe6abd35b01358aa8813961fa710d7edcc",
+      "bytes": 14542
+    },
+    {
+      "path": "isogeny_algos/tests/theta_g.rs",
+      "sha256": "df72d51ef294536235e15d1ec30d4e3e02168a02e1c999a08609e2a583fb4eef",
+      "bytes": 2628
+    },
+    {
+      "path": "isogeny_algos/tests/two_power.rs",
+      "sha256": "5ef76647e994761fa6fda739f9bf163f5801c60bcfb7c4752ee7fbc312a59ee7",
+      "bytes": 3915
+    },
+    {
+      "path": "isogeny_algos/tests/weier.rs",
+      "sha256": "c21b87c1590fe192b8c33b0988179444b02156db9c297598eb3569be99f6190c",
+      "bytes": 5107
+    },
+    {
+      "path": "isogeny_algos/tests/znring.rs",
+      "sha256": "dfd1ec57c2cce3e80c95bfe20cf46daa334bcbebb6a3f2bdc400cd5bb37aa3ca",
+      "bytes": 1563
+    }
+  ],
+  "checks": [
+    {
+      "name": "default-lib",
+      "command": "cargo test --release --locked --manifest-path isogeny_algos/Cargo.toml --lib",
+      "started_at_utc": "2026-11-22T23:20:19.152075+00:00",
+      "exit_code": 0,
+      "results": [
+        {
+          "passed": 53,
+          "failed": 0,
+          "ignored": 1,
+          "filtered": 0
+        }
+      ],
+      "log": {
+        "path": "research/subnlogn_rust_20261122/construction-default-lib.log",
+        "sha256": "e7a9137642ec605123cbcde97bb379074e069a1d82cbea375144be56a280665c",
+        "bytes": 4259
+      }
+    },
+    {
+      "name": "feature",
+      "command": "cargo test --release --locked --manifest-path isogeny_algos/Cargo.toml --features experimental-subnlogn --lib --test subnlogn --example subnlogn --example subnlogn_full_flow",
+      "started_at_utc": "2026-11-22T23:21:03.112568+00:00",
+      "exit_code": 0,
+      "results": [
+        {
+          "passed": 117,
+          "failed": 0,
+          "ignored": 1,
+          "filtered": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        }
+      ],
+      "log": {
+        "path": "research/subnlogn_rust_20261122/construction-feature.log",
+        "sha256": "aa7e96ed7770f2148434798ff64def667702adc1f1a150f9f59f03bcfb94d42c",
+        "bytes": 11737
+      }
+    },
+    {
+      "name": "regressions",
+      "command": "cargo test --release --locked --manifest-path isogeny_algos/Cargo.toml --features experimental-subnlogn --test polyfast --test powmod --test ntt",
+      "started_at_utc": "2026-11-22T23:26:53.355458+00:00",
+      "exit_code": 0,
+      "results": [
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0
+        }
+      ],
+      "log": {
+        "path": "research/subnlogn_rust_20261122/construction-regressions.log",
+        "sha256": "92f88dde80b819e9100f519c01bee33cf759e54fb702119d9d9bc3c6ffe34c9a",
+        "bytes": 1305
+      }
+    },
+    {
+      "name": "clippy",
+      "command": "cargo clippy --locked --manifest-path isogeny_algos/Cargo.toml --features experimental-subnlogn --lib --test subnlogn --example subnlogn --example subnlogn_full_flow -- -D warnings",
+      "started_at_utc": "2026-11-22T23:27:23.000549+00:00",
+      "exit_code": 0,
+      "results": [],
+      "log": {
+        "path": "research/subnlogn_rust_20261122/construction-clippy.log",
+        "sha256": "37331d7e9ef2cd667b5a279c3cb77c90292603ecfd9a420212aee904c5ce45c8",
+        "bytes": 161
+      }
+    },
+    {
+      "name": "format",
+      "command": "rustfmt --check --edition 2021 isogeny_algos/src/subnlogn/mod.rs isogeny_algos/tests/subnlogn.rs isogeny_algos/examples/subnlogn.rs isogeny_algos/examples/subnlogn_full_flow.rs",
+      "started_at_utc": "2026-11-22T23:27:24.916351+00:00",
+      "exit_code": 0,
+      "results": [],
+      "log": {
+        "path": "research/subnlogn_rust_20261122/construction-format.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "name": "literal-example",
+      "command": "cargo run --release --locked --manifest-path isogeny_algos/Cargo.toml --features experimental-subnlogn --example subnlogn -- --full",
+      "started_at_utc": "2026-11-22T23:27:25.016558+00:00",
+      "exit_code": 0,
+      "results": [],
+      "log": {
+        "path": "research/subnlogn_rust_20261122/construction-literal-example.log",
+        "sha256": "f489b6af3b63f5c922bc648f220605284982033bf2650ba15cfa6650811b030b",
+        "bytes": 506
+      },
+      "demonstration": [
+        {
+          "scope": "literal_published_parameter_dispatch",
+          "route": "base_case",
+          "reason": "DimensionBelowTwo { dimension: 1 }",
+          "rank_saving_transform_executed": false,
+          "native_asymptotic_bound_verified": false,
+          "prerequisite_transform_nodes": 0,
+          "schoolbook_leaves": 1,
+          "integer_matches_known_answer": true
+        }
+      ]
+    },
+    {
+      "name": "full-flow-example",
+      "command": "cargo run --release --locked --manifest-path isogeny_algos/Cargo.toml --features experimental-subnlogn --example subnlogn_full_flow",
+      "started_at_utc": "2026-11-22T23:27:25.395584+00:00",
+      "exit_code": 0,
+      "results": [],
+      "log": {
+        "path": "research/subnlogn_rust_20261122/construction-full-flow-example.log",
+        "sha256": "c841969cea8d6819f07e170de986b35a14429b2f1b9fe294e14fbf1608a97829",
+        "bytes": 886
+      },
+      "demonstration": [
+        {
+          "scope": "whole_numerical_flow_at_explicit_parameters",
+          "published_asymptotic_regime": false,
+          "known_answer_matches": true,
+          "input_bits": 128,
+          "radix_bits": 8,
+          "precision": 128,
+          "source_shape": [
+            5,
+            7
+          ],
+          "target_shape": [
+            8,
+            16
+          ],
+          "source_transforms": 3,
+          "source_volume_factors": 2,
+          "gaussian_expansions": 45,
+          "gaussian_compressions": 63,
+          "polynomial_products": 24,
+          "simultaneous_layer_calls": 27,
+          "recursive_layer_nodes": "0",
+          "recursive_transform_swap_nodes": "0",
+          "coefficient_error_numerator": "2636820987943761210865195050598400",
+          "coefficient_error_denominator": "340282366920938463463374607431768211456",
+          "product": "115792089237316195423570985008687907852589419931798687112530834793049593217025"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "construction_stages_in_source": [
+      "literal parameter selection",
+      "rational rank-labelled address interchanges",
+      "complex residual compiler and recursive tensor layers",
+      "sequential tape schedule and active-parent parking",
+      "certified phases and Gaussian line maps",
+      "retained-layout synthetic transforms",
+      "signed packed ring products",
+      "CRT layout and widened inverse transport",
+      "whole integer recovery with both source-volume factors"
+    ],
+    "observed_scopes": [
+      "native literal base-case dispatch",
+      "explicit-parameter whole numerical flow",
+      "fixed large-coordinate basis program",
+      "small composed rational shear through the production executor",
+      "division and independent Fermat prerequisite",
+      "existing polynomial dispatch and regressions"
+    ],
+    "not_established": [
+      "native sub-nlogn runtime bound",
+      "full h100 network execution",
+      "complete finite-table certificate",
+      "formal verification of the complete algorithm",
+      "production crossover or speedup",
+      "execution in the literal asymptotic parameter regime"
+    ],
+    "native_tape_host_gap": "Per-row arbitrary-precision cursor/length serialization and growing segment names are outside the logical movement recurrence; fixed-width/payload row families can incur Theta(V log V) header work.",
+    "native_literal_family": "Every usize input length yields d=1 under epsilon=2^-75, hence an explicitly reported conventional base case.",
+    "diagnostic_parameters": {
+      "radix_bits": 8,
+      "precision": 128,
+      "source_lengths": [
+        5,
+        7
+      ],
+      "target_lengths": [
+        8,
+        16
+      ],
+      "alpha": 4,
+      "chunk_bits": 1
+    },
+    "preexisting_ignored_test": "eigen_seta_toy::tests::two_halves_middle_automorphism_oracle"
+  },
+  "primary_source": {
+    "repository": "openai/math",
+    "commit": "4eaee87548250b2682affda7d05d947c05554bae",
+    "path": "preprints/Integer-multiplication-below-n-log-n-September-23-2026",
+    "sections": [
+      {
+        "name": "00-introduction.tex",
+        "git_blob": "aa9048eef857c3e694989f5bb5020109e6422502"
+      },
+      {
+        "name": "01-history.tex",
+        "git_blob": "7c6f033138f97315c80e64afb6cc446a1d590538"
+      },
+      {
+        "name": "02-streams.tex",
+        "git_blob": "088fceea1867abc76271d7efe7532b779fee9039"
+      },
+      {
+        "name": "03-motifs.tex",
+        "git_blob": "cdb0ba527aa8df5d57c151183fd3893c1a7e21ab"
+      },
+      {
+        "name": "04-swap.tex",
+        "git_blob": "951e792b1768e6509561380b8bbfb1d1ccb64c08"
+      },
+      {
+        "name": "05-layers.tex",
+        "git_blob": "5ce8b3c83c455f221bb84858a97230b0285644aa"
+      },
+      {
+        "name": "06-transforms.tex",
+        "git_blob": "de073e9292d58573f7065a3cd4f214e0d05f3444"
+      },
+      {
+        "name": "07-resampling.tex",
+        "git_blob": "256243bf9416baefb82bf9203f80215b9ebe28f2"
+      },
+      {
+        "name": "08-assembly.tex",
+        "git_blob": "337810a1d9a58a2ecf14123420923c039ba322a6"
+      },
+      {
+        "name": "09-exact-arithmetic.tex",
+        "git_blob": "4c7a1d63c912d081f70f5b166e9cab92d7774ee6"
+      },
+      {
+        "name": "10-transposition.tex",
+        "git_blob": "e69cc8276220edb8617a371ae9044a911fbc0767"
+      },
+      {
+        "name": "11-grouped-rectangles.tex",
+        "git_blob": "44439c716c6290cd6e512ffac91253443b37d3ab"
+      }
+    ]
+  },
+  "preserved_reference_receipt": {
+    "path": "research/subnlogn_rust_20261122/correctness.json",
+    "sha256": "f202348012b9306f3f2644df407e62f6047dd3c375fe8e09fa81c368c29915a8",
+    "pcc_claim": "PCC-20261122-5140c7"
+  },
+  "interpretation": "These are producer-recorded native observations, not a signed execution receipt or a proof of the claimed asymptotic bound. Full recursive branches are structurally implemented and reviewed, but not exercised at published scale."
+}

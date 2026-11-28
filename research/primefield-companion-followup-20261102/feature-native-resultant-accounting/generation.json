@@ -1,0 +1,884 @@
+[
+  {
+    "arm": "scalar",
+    "source": "feature-native-resultant-product/polynomial.rs",
+    "source_sha256": "4bcc7533cef662b917be8fc5ffa3aa235fa2f0320bbb942366dda687c9a49db2",
+    "generated_sha256": "978093fb1bdd5e847f6c094e241b6524486bff1e065ec609a57f4c8d346f54cb",
+    "edits": [
+      {
+        "old": "((a as u128*b as u128)%self.p as u128)as u64",
+        "new": "{crate::meter::hit(0);((a as u128*b as u128)%self.p as u128)as u64}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_0__"
+      },
+      {
+        "old": "(self.p-x%self.p)%self.p",
+        "new": "{crate::meter::hit(4);crate::meter::hit(3);(self.p-x%self.p)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_1__"
+      },
+      {
+        "old": "(self.p-points[0]%self.p)%self.p",
+        "new": "{crate::meter::hit(4);crate::meter::hit(3);(self.p-points[0]%self.p)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_2__"
+      },
+      {
+        "old": "(self.p-tree.polynomial[0])%self.p",
+        "new": "{crate::meter::hit(3);(self.p-tree.polynomial[0])%self.p}",
+        "occurrences": 2,
+        "token": "__INSTRUMENT_3__"
+      },
+      {
+        "old": "(c[i]+x)%self.p",
+        "new": "{crate::meter::hit(1);(c[i]+x)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_4__"
+      },
+      {
+        "old": "(c[i+j]+self.fm(x,y))%self.p",
+        "new": "{crate::meter::hit(1);(c[i+j]+self.fm(x,y))%self.p}",
+        "occurrences": 2,
+        "token": "__INSTRUMENT_5__"
+      },
+      {
+        "old": "(result[k+i]+v)%self.p",
+        "new": "{crate::meter::hit(1);(result[k+i]+v)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_6__"
+      },
+      {
+        "old": "(result[2*k+i]+v)%self.p",
+        "new": "{crate::meter::hit(1);(result[2*k+i]+v)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_7__"
+      },
+      {
+        "old": "(self.fm(value,x)+coefficient%self.p)%self.p",
+        "new": "{crate::meter::hit(4);crate::meter::hit(1);(self.fm(value,x)+coefficient%self.p)%self.p}",
+        "occurrences": 2,
+        "token": "__INSTRUMENT_8__"
+      },
+      {
+        "old": "(a.get(i).copied().unwrap_or(0)+self.p-low.get(i).copied().unwrap_or(0))%self.p",
+        "new": "{crate::meter::hit(2);(a.get(i).copied().unwrap_or(0)+self.p-low.get(i).copied().unwrap_or(0))%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_9__"
+      },
+      {
+        "old": "a%self.p",
+        "new": "{crate::meter::hit(4);a%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_10__"
+      },
+      {
+        "old": "x%self.p",
+        "new": "{crate::meter::hit(4);x%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_11__"
+      },
+      {
+        "old": "c%self.p",
+        "new": "{crate::meter::hit(4);c%self.p}",
+        "occurrences": 2,
+        "token": "__INSTRUMENT_12__"
+      },
+      {
+        "old": "x.rem_euclid(self.p as i128)",
+        "new": "{crate::meter::hit(4);x.rem_euclid(self.p as i128)}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_13__"
+      },
+      {
+        "old": "while s!=0{",
+        "new": "while s!=0{crate::meter::hit(6);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_14__"
+      },
+      {
+        "old": "fn polynomial(&self)->&[u64]{",
+        "new": "fn polynomial(&self)->&[u64]{crate::meter::hit(41);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_15__"
+      },
+      {
+        "old": "fn new(p:u64)->Result<Self,Error>{",
+        "new": "fn new(p:u64)->Result<Self,Error>{crate::meter::hit(8);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_16__"
+      },
+      {
+        "old": "fn fm(&self,a:u64,b:u64)->u64{",
+        "new": "fn fm(&self,a:u64,b:u64)->u64{crate::meter::hit(9);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_17__"
+      },
+      {
+        "old": "fn inverse(&self,a:u64)->Result<u64,Error>{",
+        "new": "fn inverse(&self,a:u64)->Result<u64,Error>{crate::meter::hit(10);crate::meter::hit(5);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_18__"
+      },
+      {
+        "old": "fn trim(&self,a:&[u64])->Vec<u64>{",
+        "new": "fn trim(&self,a:&[u64])->Vec<u64>{crate::meter::hit(11);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_19__"
+      },
+      {
+        "old": "fn add(&self,a:&[u64],b:&[u64])->Vec<u64>{",
+        "new": "fn add(&self,a:&[u64],b:&[u64])->Vec<u64>{crate::meter::hit(12);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_20__"
+      },
+      {
+        "old": "fn sub(&self,a:&[u64],b:&[u64])->Vec<u64>{",
+        "new": "fn sub(&self,a:&[u64],b:&[u64])->Vec<u64>{crate::meter::hit(13);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_21__"
+      },
+      {
+        "old": "fn mul(&mut self,a:&[u64],b:&[u64])->Vec<u64>{",
+        "new": "fn mul(&mut self,a:&[u64],b:&[u64])->Vec<u64>{crate::meter::hit(14);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_22__"
+      },
+      {
+        "old": "fn mul_low(&mut self,a:&[u64],b:&[u64],n:usize)->Vec<u64>{",
+        "new": "fn mul_low(&mut self,a:&[u64],b:&[u64],n:usize)->Vec<u64>{crate::meter::hit(15);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_23__"
+      },
+      {
+        "old": "fn inv_series(&mut self,a:&[u64],n:usize)->Result<Vec<u64>,Error>{",
+        "new": "fn inv_series(&mut self,a:&[u64],n:usize)->Result<Vec<u64>,Error>{crate::meter::hit(16);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_24__"
+      },
+      {
+        "old": "fn divrem(&mut self,a:&[u64],b:&[u64])->Result<(Vec<u64>,Vec<u64>),Error>{",
+        "new": "fn divrem(&mut self,a:&[u64],b:&[u64])->Result<(Vec<u64>,Vec<u64>),Error>{crate::meter::hit(17);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_25__"
+      },
+      {
+        "old": "fn product_tree(&mut self,points:&[u64])->Result<Tree,Error>{",
+        "new": "fn product_tree(&mut self,points:&[u64])->Result<Tree,Error>{crate::meter::hit(18);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_26__"
+      },
+      {
+        "old": "fn monic_remainder(&mut self,a:&[u64],b:&[u64])->Result<Vec<u64>,Error>{",
+        "new": "fn monic_remainder(&mut self,a:&[u64],b:&[u64])->Result<Vec<u64>,Error>{crate::meter::hit(19);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_27__"
+      },
+      {
+        "old": "fn values(&mut self,a:&[u64],tree:&Tree)->Result<Vec<u64>,Error>{",
+        "new": "fn values(&mut self,a:&[u64],tree:&Tree)->Result<Vec<u64>,Error>{crate::meter::hit(20);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_28__"
+      },
+      {
+        "old": "fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{",
+        "new": "fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{crate::meter::hit(21);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_29__"
+      },
+      {
+        "old": "fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{",
+        "new": "fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{crate::meter::hit(22);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_30__"
+      }
+    ],
+    "reverse_exact": true,
+    "uncovered_modular_sites": 0
+  },
+  {
+    "arm": "euclid",
+    "source": "feature-native-resultant-class/polynomial.rs",
+    "source_sha256": "e0f87c029e828f918b111a832234ea4abc158eaf051ff119c699a0bbdf097ac4",
+    "generated_sha256": "81c327ea821163701f0a9fdd29a8a2c6db9e3ea78b509ecac194dd8d73c2b85b",
+    "edits": [
+      {
+        "old": "((a as u128*b as u128)%self.p as u128)as u64",
+        "new": "{crate::meter::hit(0);((a as u128*b as u128)%self.p as u128)as u64}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_0__"
+      },
+      {
+        "old": "((self.representative as u128*other.representative as u128)%self.p as u128)as u64",
+        "new": "{crate::meter::hit(0);((self.representative as u128*other.representative as u128)%self.p as u128)as u64}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_1__"
+      },
+      {
+        "old": "((self.representative as u128*self.representative as u128)%self.p as u128)as u64",
+        "new": "{crate::meter::hit(0);((self.representative as u128*self.representative as u128)%self.p as u128)as u64}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_2__"
+      },
+      {
+        "old": "((v as u128*a as u128)%self.p as u128)as u64",
+        "new": "{crate::meter::hit(0);((v as u128*a as u128)%self.p as u128)as u64}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_3__"
+      },
+      {
+        "old": "((a as u128*a as u128)%self.p as u128)as u64",
+        "new": "{crate::meter::hit(0);((a as u128*a as u128)%self.p as u128)as u64}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_4__"
+      },
+      {
+        "old": "(self.p-x%self.p)%self.p",
+        "new": "{crate::meter::hit(4);crate::meter::hit(3);(self.p-x%self.p)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_5__"
+      },
+      {
+        "old": "(self.p-points[0]%self.p)%self.p",
+        "new": "{crate::meter::hit(4);crate::meter::hit(3);(self.p-points[0]%self.p)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_6__"
+      },
+      {
+        "old": "(self.p-roots[0]%self.p)%self.p",
+        "new": "{crate::meter::hit(4);crate::meter::hit(3);(self.p-roots[0]%self.p)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_7__"
+      },
+      {
+        "old": "(self.p-self.representative)%self.p",
+        "new": "{crate::meter::hit(3);(self.p-self.representative)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_8__"
+      },
+      {
+        "old": "(self.p-tree.polynomial[0])%self.p",
+        "new": "{crate::meter::hit(3);(self.p-tree.polynomial[0])%self.p}",
+        "occurrences": 2,
+        "token": "__INSTRUMENT_9__"
+      },
+      {
+        "old": "(c[i]+x)%self.p",
+        "new": "{crate::meter::hit(1);(c[i]+x)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_10__"
+      },
+      {
+        "old": "(c[i+j]+self.fm(x,y))%self.p",
+        "new": "{crate::meter::hit(1);(c[i+j]+self.fm(x,y))%self.p}",
+        "occurrences": 2,
+        "token": "__INSTRUMENT_11__"
+      },
+      {
+        "old": "(result[k+i]+v)%self.p",
+        "new": "{crate::meter::hit(1);(result[k+i]+v)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_12__"
+      },
+      {
+        "old": "(result[2*k+i]+v)%self.p",
+        "new": "{crate::meter::hit(1);(result[2*k+i]+v)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_13__"
+      },
+      {
+        "old": "(self.fm(value,x)+coefficient%self.p)%self.p",
+        "new": "{crate::meter::hit(4);crate::meter::hit(1);(self.fm(value,x)+coefficient%self.p)%self.p}",
+        "occurrences": 2,
+        "token": "__INSTRUMENT_14__"
+      },
+      {
+        "old": "(a.get(i).copied().unwrap_or(0)+self.p-low.get(i).copied().unwrap_or(0))%self.p",
+        "new": "{crate::meter::hit(2);(a.get(i).copied().unwrap_or(0)+self.p-low.get(i).copied().unwrap_or(0))%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_15__"
+      },
+      {
+        "old": "a%self.p",
+        "new": "{crate::meter::hit(4);a%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_16__"
+      },
+      {
+        "old": "x%self.p",
+        "new": "{crate::meter::hit(4);x%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_17__"
+      },
+      {
+        "old": "c%self.p",
+        "new": "{crate::meter::hit(4);c%self.p}",
+        "occurrences": 2,
+        "token": "__INSTRUMENT_18__"
+      },
+      {
+        "old": "v%self.p",
+        "new": "{crate::meter::hit(4);v%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_19__"
+      },
+      {
+        "old": "x.rem_euclid(self.p as i128)",
+        "new": "{crate::meter::hit(4);x.rem_euclid(self.p as i128)}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_20__"
+      },
+      {
+        "old": "while s!=0{",
+        "new": "while s!=0{crate::meter::hit(6);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_21__"
+      },
+      {
+        "old": "fn polynomial(&self)->&[u64]{",
+        "new": "fn polynomial(&self)->&[u64]{crate::meter::hit(41);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_22__"
+      },
+      {
+        "old": "fn reset_projections(){",
+        "new": "fn reset_projections(){crate::meter::hit(42);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_23__"
+      },
+      {
+        "old": "fn projections()->usize{",
+        "new": "fn projections()->usize{crate::meter::hit(43);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_24__"
+      },
+      {
+        "old": "fn combine(self,other:Self)->Result<Self,Error>{",
+        "new": "fn combine(self,other:Self)->Result<Self,Error>{crate::meter::hit(23);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_25__"
+      },
+      {
+        "old": "fn square(self)->Self{",
+        "new": "fn square(self)->Self{crate::meter::hit(24);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_26__"
+      },
+      {
+        "old": "fn negate(self)->Self{",
+        "new": "fn negate(self)->Self{crate::meter::hit(25);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_27__"
+      },
+      {
+        "old": "fn is_zero(&self)->bool{",
+        "new": "fn is_zero(&self)->bool{crate::meter::hit(26);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_28__"
+      },
+      {
+        "old": "fn project(self)->u64{",
+        "new": "fn project(self)->u64{crate::meter::hit(27);crate::meter::hit(7);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_29__"
+      },
+      {
+        "old": "fn new(p:u64)->Result<Self,Error>{",
+        "new": "fn new(p:u64)->Result<Self,Error>{crate::meter::hit(8);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_30__"
+      },
+      {
+        "old": "fn fm(&self,a:u64,b:u64)->u64{",
+        "new": "fn fm(&self,a:u64,b:u64)->u64{crate::meter::hit(9);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_31__"
+      },
+      {
+        "old": "fn inverse(&self,a:u64)->Result<u64,Error>{",
+        "new": "fn inverse(&self,a:u64)->Result<u64,Error>{crate::meter::hit(10);crate::meter::hit(5);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_32__"
+      },
+      {
+        "old": "fn trim(&self,a:&[u64])->Vec<u64>{",
+        "new": "fn trim(&self,a:&[u64])->Vec<u64>{crate::meter::hit(11);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_33__"
+      },
+      {
+        "old": "fn add(&self,a:&[u64],b:&[u64])->Vec<u64>{",
+        "new": "fn add(&self,a:&[u64],b:&[u64])->Vec<u64>{crate::meter::hit(12);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_34__"
+      },
+      {
+        "old": "fn sub(&self,a:&[u64],b:&[u64])->Vec<u64>{",
+        "new": "fn sub(&self,a:&[u64],b:&[u64])->Vec<u64>{crate::meter::hit(13);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_35__"
+      },
+      {
+        "old": "fn mul(&mut self,a:&[u64],b:&[u64])->Vec<u64>{",
+        "new": "fn mul(&mut self,a:&[u64],b:&[u64])->Vec<u64>{crate::meter::hit(14);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_36__"
+      },
+      {
+        "old": "fn mul_low(&mut self,a:&[u64],b:&[u64],n:usize)->Vec<u64>{",
+        "new": "fn mul_low(&mut self,a:&[u64],b:&[u64],n:usize)->Vec<u64>{crate::meter::hit(15);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_37__"
+      },
+      {
+        "old": "fn inv_series(&mut self,a:&[u64],n:usize)->Result<Vec<u64>,Error>{",
+        "new": "fn inv_series(&mut self,a:&[u64],n:usize)->Result<Vec<u64>,Error>{crate::meter::hit(16);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_38__"
+      },
+      {
+        "old": "fn divrem(&mut self,a:&[u64],b:&[u64])->Result<(Vec<u64>,Vec<u64>),Error>{",
+        "new": "fn divrem(&mut self,a:&[u64],b:&[u64])->Result<(Vec<u64>,Vec<u64>),Error>{crate::meter::hit(17);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_39__"
+      },
+      {
+        "old": "fn product_tree(&mut self,points:&[u64])->Result<Tree,Error>{",
+        "new": "fn product_tree(&mut self,points:&[u64])->Result<Tree,Error>{crate::meter::hit(18);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_40__"
+      },
+      {
+        "old": "fn monic_remainder(&mut self,a:&[u64],b:&[u64])->Result<Vec<u64>,Error>{",
+        "new": "fn monic_remainder(&mut self,a:&[u64],b:&[u64])->Result<Vec<u64>,Error>{crate::meter::hit(19);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_41__"
+      },
+      {
+        "old": "fn values(&mut self,a:&[u64],tree:&Tree)->Result<Vec<u64>,Error>{",
+        "new": "fn values(&mut self,a:&[u64],tree:&Tree)->Result<Vec<u64>,Error>{crate::meter::hit(20);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_42__"
+      },
+      {
+        "old": "fn resultant_class(&mut self,a:&[u64],b:&[u64])->Result<ResultantClass,Error>{",
+        "new": "fn resultant_class(&mut self,a:&[u64],b:&[u64])->Result<ResultantClass,Error>{crate::meter::hit(28);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_43__"
+      },
+      {
+        "old": "fn image_class(&self,v:u64)->Result<ResultantClass,Error>{",
+        "new": "fn image_class(&self,v:u64)->Result<ResultantClass,Error>{crate::meter::hit(29);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_44__"
+      },
+      {
+        "old": "fn projected_resultant(&mut self,a:&[u64],b:&[u64])->Result<u64,Error>{",
+        "new": "fn projected_resultant(&mut self,a:&[u64],b:&[u64])->Result<u64,Error>{crate::meter::hit(30);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_45__"
+      },
+      {
+        "old": "fn root_product(&mut self,roots:&[u64])->Result<Vec<u64>,Error>{",
+        "new": "fn root_product(&mut self,roots:&[u64])->Result<Vec<u64>,Error>{crate::meter::hit(31);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_46__"
+      },
+      {
+        "old": "fn root_resultant_class(&mut self,roots:&[u64],points:&[u64])->Result<ResultantClass,Error>{",
+        "new": "fn root_resultant_class(&mut self,roots:&[u64],points:&[u64])->Result<ResultantClass,Error>{crate::meter::hit(32);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_47__"
+      },
+      {
+        "old": "fn root_projected_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{",
+        "new": "fn root_projected_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{crate::meter::hit(33);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_48__"
+      },
+      {
+        "old": "fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{",
+        "new": "fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{crate::meter::hit(21);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_49__"
+      },
+      {
+        "old": "fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{",
+        "new": "fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{crate::meter::hit(22);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_50__"
+      }
+    ],
+    "reverse_exact": true,
+    "uncovered_modular_sites": 0
+  },
+  {
+    "arm": "half",
+    "source": "feature-native-half-gcd/polynomial.rs",
+    "source_sha256": "29c0cfc13dc353fa08fca5b58bbae771a53ecc259c7068dfee27a097bd94b2a9",
+    "generated_sha256": "96afe40aeab98356548528bce6074bcf9886f997e49082ab37193d0b5879fb20",
+    "edits": [
+      {
+        "old": "((a as u128*b as u128)%self.p as u128)as u64",
+        "new": "{crate::meter::hit(0);((a as u128*b as u128)%self.p as u128)as u64}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_0__"
+      },
+      {
+        "old": "((self.representative as u128*other.representative as u128)%self.p as u128)as u64",
+        "new": "{crate::meter::hit(0);((self.representative as u128*other.representative as u128)%self.p as u128)as u64}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_1__"
+      },
+      {
+        "old": "((self.representative as u128*self.representative as u128)%self.p as u128)as u64",
+        "new": "{crate::meter::hit(0);((self.representative as u128*self.representative as u128)%self.p as u128)as u64}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_2__"
+      },
+      {
+        "old": "((v as u128*a as u128)%self.p as u128)as u64",
+        "new": "{crate::meter::hit(0);((v as u128*a as u128)%self.p as u128)as u64}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_3__"
+      },
+      {
+        "old": "((a as u128*a as u128)%self.p as u128)as u64",
+        "new": "{crate::meter::hit(0);((a as u128*a as u128)%self.p as u128)as u64}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_4__"
+      },
+      {
+        "old": "(self.p-x%self.p)%self.p",
+        "new": "{crate::meter::hit(4);crate::meter::hit(3);(self.p-x%self.p)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_5__"
+      },
+      {
+        "old": "(self.p-points[0]%self.p)%self.p",
+        "new": "{crate::meter::hit(4);crate::meter::hit(3);(self.p-points[0]%self.p)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_6__"
+      },
+      {
+        "old": "(self.p-roots[0]%self.p)%self.p",
+        "new": "{crate::meter::hit(4);crate::meter::hit(3);(self.p-roots[0]%self.p)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_7__"
+      },
+      {
+        "old": "(self.p-self.representative)%self.p",
+        "new": "{crate::meter::hit(3);(self.p-self.representative)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_8__"
+      },
+      {
+        "old": "(self.p-tree.polynomial[0])%self.p",
+        "new": "{crate::meter::hit(3);(self.p-tree.polynomial[0])%self.p}",
+        "occurrences": 2,
+        "token": "__INSTRUMENT_9__"
+      },
+      {
+        "old": "(c[i]+x)%self.p",
+        "new": "{crate::meter::hit(1);(c[i]+x)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_10__"
+      },
+      {
+        "old": "(c[i+j]+self.fm(x,y))%self.p",
+        "new": "{crate::meter::hit(1);(c[i+j]+self.fm(x,y))%self.p}",
+        "occurrences": 2,
+        "token": "__INSTRUMENT_11__"
+      },
+      {
+        "old": "(result[k+i]+v)%self.p",
+        "new": "{crate::meter::hit(1);(result[k+i]+v)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_12__"
+      },
+      {
+        "old": "(result[2*k+i]+v)%self.p",
+        "new": "{crate::meter::hit(1);(result[2*k+i]+v)%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_13__"
+      },
+      {
+        "old": "(self.fm(value,x)+coefficient%self.p)%self.p",
+        "new": "{crate::meter::hit(4);crate::meter::hit(1);(self.fm(value,x)+coefficient%self.p)%self.p}",
+        "occurrences": 2,
+        "token": "__INSTRUMENT_14__"
+      },
+      {
+        "old": "(a.get(i).copied().unwrap_or(0)+self.p-low.get(i).copied().unwrap_or(0))%self.p",
+        "new": "{crate::meter::hit(2);(a.get(i).copied().unwrap_or(0)+self.p-low.get(i).copied().unwrap_or(0))%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_15__"
+      },
+      {
+        "old": "a%self.p",
+        "new": "{crate::meter::hit(4);a%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_16__"
+      },
+      {
+        "old": "x%self.p",
+        "new": "{crate::meter::hit(4);x%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_17__"
+      },
+      {
+        "old": "c%self.p",
+        "new": "{crate::meter::hit(4);c%self.p}",
+        "occurrences": 2,
+        "token": "__INSTRUMENT_18__"
+      },
+      {
+        "old": "v%self.p",
+        "new": "{crate::meter::hit(4);v%self.p}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_19__"
+      },
+      {
+        "old": "x.rem_euclid(self.p as i128)",
+        "new": "{crate::meter::hit(4);x.rem_euclid(self.p as i128)}",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_20__"
+      },
+      {
+        "old": "while s!=0{",
+        "new": "while s!=0{crate::meter::hit(6);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_21__"
+      },
+      {
+        "old": "fn polynomial(&self)->&[u64]{",
+        "new": "fn polynomial(&self)->&[u64]{crate::meter::hit(41);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_22__"
+      },
+      {
+        "old": "fn reset_projections(){",
+        "new": "fn reset_projections(){crate::meter::hit(42);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_23__"
+      },
+      {
+        "old": "fn projections()->usize{",
+        "new": "fn projections()->usize{crate::meter::hit(43);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_24__"
+      },
+      {
+        "old": "fn combine(self,other:Self)->Result<Self,Error>{",
+        "new": "fn combine(self,other:Self)->Result<Self,Error>{crate::meter::hit(23);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_25__"
+      },
+      {
+        "old": "fn square(self)->Self{",
+        "new": "fn square(self)->Self{crate::meter::hit(24);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_26__"
+      },
+      {
+        "old": "fn negate(self)->Self{",
+        "new": "fn negate(self)->Self{crate::meter::hit(25);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_27__"
+      },
+      {
+        "old": "fn is_zero(&self)->bool{",
+        "new": "fn is_zero(&self)->bool{crate::meter::hit(26);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_28__"
+      },
+      {
+        "old": "fn project(self)->u64{",
+        "new": "fn project(self)->u64{crate::meter::hit(27);crate::meter::hit(7);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_29__"
+      },
+      {
+        "old": "fn degree(a:&[u64])->Option<usize>{",
+        "new": "fn degree(a:&[u64])->Option<usize>{crate::meter::hit(40);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_30__"
+      },
+      {
+        "old": "fn identity()->Matrix{",
+        "new": "fn identity()->Matrix{crate::meter::hit(39);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_31__"
+      },
+      {
+        "old": "fn reset_batches(){",
+        "new": "fn reset_batches(){crate::meter::hit(44);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_32__"
+      },
+      {
+        "old": "fn batches()->usize{",
+        "new": "fn batches()->usize{crate::meter::hit(45);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_33__"
+      },
+      {
+        "old": "fn new(p:u64)->Result<Self,Error>{",
+        "new": "fn new(p:u64)->Result<Self,Error>{crate::meter::hit(8);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_34__"
+      },
+      {
+        "old": "fn fm(&self,a:u64,b:u64)->u64{",
+        "new": "fn fm(&self,a:u64,b:u64)->u64{crate::meter::hit(9);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_35__"
+      },
+      {
+        "old": "fn inverse(&self,a:u64)->Result<u64,Error>{",
+        "new": "fn inverse(&self,a:u64)->Result<u64,Error>{crate::meter::hit(10);crate::meter::hit(5);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_36__"
+      },
+      {
+        "old": "fn trim(&self,a:&[u64])->Vec<u64>{",
+        "new": "fn trim(&self,a:&[u64])->Vec<u64>{crate::meter::hit(11);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_37__"
+      },
+      {
+        "old": "fn add(&self,a:&[u64],b:&[u64])->Vec<u64>{",
+        "new": "fn add(&self,a:&[u64],b:&[u64])->Vec<u64>{crate::meter::hit(12);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_38__"
+      },
+      {
+        "old": "fn sub(&self,a:&[u64],b:&[u64])->Vec<u64>{",
+        "new": "fn sub(&self,a:&[u64],b:&[u64])->Vec<u64>{crate::meter::hit(13);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_39__"
+      },
+      {
+        "old": "fn mul(&mut self,a:&[u64],b:&[u64])->Vec<u64>{",
+        "new": "fn mul(&mut self,a:&[u64],b:&[u64])->Vec<u64>{crate::meter::hit(14);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_40__"
+      },
+      {
+        "old": "fn mul_low(&mut self,a:&[u64],b:&[u64],n:usize)->Vec<u64>{",
+        "new": "fn mul_low(&mut self,a:&[u64],b:&[u64],n:usize)->Vec<u64>{crate::meter::hit(15);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_41__"
+      },
+      {
+        "old": "fn inv_series(&mut self,a:&[u64],n:usize)->Result<Vec<u64>,Error>{",
+        "new": "fn inv_series(&mut self,a:&[u64],n:usize)->Result<Vec<u64>,Error>{crate::meter::hit(16);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_42__"
+      },
+      {
+        "old": "fn divrem(&mut self,a:&[u64],b:&[u64])->Result<(Vec<u64>,Vec<u64>),Error>{",
+        "new": "fn divrem(&mut self,a:&[u64],b:&[u64])->Result<(Vec<u64>,Vec<u64>),Error>{crate::meter::hit(17);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_43__"
+      },
+      {
+        "old": "fn product_tree(&mut self,points:&[u64])->Result<Tree,Error>{",
+        "new": "fn product_tree(&mut self,points:&[u64])->Result<Tree,Error>{crate::meter::hit(18);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_44__"
+      },
+      {
+        "old": "fn monic_remainder(&mut self,a:&[u64],b:&[u64])->Result<Vec<u64>,Error>{",
+        "new": "fn monic_remainder(&mut self,a:&[u64],b:&[u64])->Result<Vec<u64>,Error>{crate::meter::hit(19);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_45__"
+      },
+      {
+        "old": "fn values(&mut self,a:&[u64],tree:&Tree)->Result<Vec<u64>,Error>{",
+        "new": "fn values(&mut self,a:&[u64],tree:&Tree)->Result<Vec<u64>,Error>{crate::meter::hit(20);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_46__"
+      },
+      {
+        "old": "fn matrix_mul(&mut self,a:&Matrix,b:&Matrix)->Matrix{",
+        "new": "fn matrix_mul(&mut self,a:&Matrix,b:&Matrix)->Matrix{crate::meter::hit(34);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_47__"
+      },
+      {
+        "old": "fn matrix_apply(&mut self,m:&Matrix,a:&[u64],b:&[u64])->(Vec<u64>,Vec<u64>){",
+        "new": "fn matrix_apply(&mut self,m:&Matrix,a:&[u64],b:&[u64])->(Vec<u64>,Vec<u64>){crate::meter::hit(35);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_48__"
+      },
+      {
+        "old": "fn step_matrix(&self,q:&[u64])->Matrix{",
+        "new": "fn step_matrix(&self,q:&[u64])->Matrix{crate::meter::hit(36);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_49__"
+      },
+      {
+        "old": "fn lifted(&mut self,mut batch:Batch,a:&[u64],b:&[u64],shift:usize)->Result<Batch,Error>{",
+        "new": "fn lifted(&mut self,mut batch:Batch,a:&[u64],b:&[u64],shift:usize)->Result<Batch,Error>{crate::meter::hit(37);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_50__"
+      },
+      {
+        "old": "fn half_gcd(&mut self,a:&[u64],b:&[u64])->Result<Batch,Error>{",
+        "new": "fn half_gcd(&mut self,a:&[u64],b:&[u64])->Result<Batch,Error>{crate::meter::hit(38);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_51__"
+      },
+      {
+        "old": "fn resultant_class(&mut self,a:&[u64],b:&[u64])->Result<ResultantClass,Error>{",
+        "new": "fn resultant_class(&mut self,a:&[u64],b:&[u64])->Result<ResultantClass,Error>{crate::meter::hit(28);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_52__"
+      },
+      {
+        "old": "fn image_class(&self,v:u64)->Result<ResultantClass,Error>{",
+        "new": "fn image_class(&self,v:u64)->Result<ResultantClass,Error>{crate::meter::hit(29);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_53__"
+      },
+      {
+        "old": "fn projected_resultant(&mut self,a:&[u64],b:&[u64])->Result<u64,Error>{",
+        "new": "fn projected_resultant(&mut self,a:&[u64],b:&[u64])->Result<u64,Error>{crate::meter::hit(30);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_54__"
+      },
+      {
+        "old": "fn root_product(&mut self,roots:&[u64])->Result<Vec<u64>,Error>{",
+        "new": "fn root_product(&mut self,roots:&[u64])->Result<Vec<u64>,Error>{crate::meter::hit(31);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_55__"
+      },
+      {
+        "old": "fn root_resultant_class(&mut self,roots:&[u64],points:&[u64])->Result<ResultantClass,Error>{",
+        "new": "fn root_resultant_class(&mut self,roots:&[u64],points:&[u64])->Result<ResultantClass,Error>{crate::meter::hit(32);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_56__"
+      },
+      {
+        "old": "fn root_projected_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{",
+        "new": "fn root_projected_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{crate::meter::hit(33);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_57__"
+      },
+      {
+        "old": "fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{",
+        "new": "fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{crate::meter::hit(21);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_58__"
+      },
+      {
+        "old": "fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{",
+        "new": "fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{crate::meter::hit(22);",
+        "occurrences": 1,
+        "token": "__INSTRUMENT_59__"
+      }
+    ],
+    "reverse_exact": true,
+    "uncovered_modular_sites": 0
+  }
+]

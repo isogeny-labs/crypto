@@ -1,0 +1,11 @@
+name = "hildebrand_box_asymptotic_audit"
+version = "0.1.0"
+defaultTargets = ["HildebrandBoxAsymptoticAudit"]
+
+[[require]]
+name = "injective_box_audit"
+path = "../../injective_box_audit_20261114/lean"
+
+[[lean_lib]]
+name = "HildebrandBoxAsymptoticAudit"
+roots = ["DenominatorLimits", "SourceWidths", "BoxAsymptotic", "BoxAsymptoticCertificate"]

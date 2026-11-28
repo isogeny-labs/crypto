@@ -1,0 +1,45 @@
+{
+  "schema": "m31-projection-immutable-qualifiers/v1",
+  "phase": "pre-call",
+  "created_utc": "2026-11-24T16:39:37.689Z",
+  "binaries": [
+    {
+      "name": "tests-cli",
+      "path": "/workspace/scratch/04738cbc9e23/projection-qualification-01/bin/tests-cli",
+      "sha256": "8c2d58c48d55de6e5356dcfff5330f85bd17290168ff30bd935d381d74502435"
+    },
+    {
+      "name": "tests-lib",
+      "path": "/workspace/scratch/04738cbc9e23/projection-qualification-01/bin/tests-lib",
+      "sha256": "7e4bd6a0db1b9bab6c0b8410901fb0d1c7ef358754b8c1cc42e6480ebcaf0c63"
+    },
+    {
+      "name": "m31-projective-preclosure",
+      "path": "/workspace/scratch/04738cbc9e23/projection-qualification-01/bin/m31-projective-preclosure",
+      "sha256": "8a4784edae482310b09b44b630eb90042c21517b10e82b78c576ca5bd9e6446e"
+    }
+  ],
+  "calls": [
+    {
+      "name": "tests-lib",
+      "arguments": [
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "timeout_seconds": 120,
+      "planned_calls": 1
+    },
+    {
+      "name": "tests-cli",
+      "arguments": [
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "timeout_seconds": 30,
+      "planned_calls": 1
+    }
+  ],
+  "native_single_instance_command_calls": 0,
+  "scientific_campaign_calls": 0,
+  "unique_coupled_semaev_instances": 1
+}

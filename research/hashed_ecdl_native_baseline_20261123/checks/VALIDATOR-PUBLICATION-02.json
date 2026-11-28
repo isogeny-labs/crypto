@@ -1,0 +1,91 @@
+{
+  "schema": "native-qualification-publication-review/v1",
+  "created_utc": "2026-11-23T09:28:37.598Z",
+  "publication": {
+    "repository": "isogeny-labs/crypto",
+    "commit": "371019835c0c03a50f29889fbce1be1b05aa9403",
+    "tree": "65dee0dab7df199a781821e3c1265d323231ef64",
+    "branch": "lane/hashed-ecdl-native-baseline-20261123-codex",
+    "observed_remote_tracking_ref": "371019835c0c03a50f29889fbce1be1b05aa9403",
+    "pr": 4996,
+    "evidence_directory": "research/hashed_ecdl_native_baseline_20261123"
+  },
+  "scope": "Read-only comparison against fetched immutable Git objects. No tests, cryptographic computations, certificate replay, builds, experiments, cloud/S3 operations, or secret reads. New outputs are exclusive administrative review records only.",
+  "prior_review": {
+    "local_path": "/tmp/ecdlp-native-bootstrap-20261123/review/VALIDATOR-LOCAL-01.json",
+    "published_path": "research/hashed_ecdl_native_baseline_20261123/checks/VALIDATOR-LOCAL-01.json",
+    "sha256": "9c4628a02c022c860d0aa397402a860e0e5b38a25952507bc115bd6816ce94f4",
+    "evidence_manifest_sha256": "29ead3214cfc8d5a3a084228e14ab3cfa915b4f477e551927654fcad30c6413c",
+    "unchanged": true
+  },
+  "disposition": {
+    "committed_subset": "supported_within_scope: published artifact consistency",
+    "broader_execution_claim": "insufficient_evidence for independent execution attestation or complete remotely reproducible build provenance",
+    "pcc": "Unverified producer claims remain unverified. This unsigned same-team review creates no signed verdict or execution attestation.",
+    "new_discrepancies": []
+  },
+  "checks": [
+    {
+      "requirement": "Frozen committed artifact set",
+      "status": "pass_within_scope",
+      "detail": "97 study files are present in the exact commit. All96 SHA256SUMS entries match Git blob bytes; every study file except SHA256SUMS itself is listed."
+    },
+    {
+      "requirement": "Exact publication of reviewed local subset",
+      "status": "pass_within_scope",
+      "detail": "86 exact copy pairs match byte for byte: all56 raw test stdout/stderr files;13 qualification records;6 build/source/compiler records; frozen-input check;2 toolchain records; original review and evidence manifest;6 reproduction scripts. No original review or local evidence bytes were changed."
+    },
+    {
+      "requirement": "Committed raw output accounting",
+      "status": "pass_within_scope",
+      "detail": "All28 schedule identities, row exits/statuses, and post-call stdout/stderr digests agree with committed raw outputs. Reparsed summaries give245 passed,0 failed,0 ignored,0 measured,0 filtered out. Eleven harnesses contain zero tests. These are recorded regression outputs, not independent proof that execution occurred."
+    },
+    {
+      "requirement": "Published native source identities",
+      "status": "pass_within_scope",
+      "detail": "All87 native-source manifest entries match native source blobs at publication commit. No crate file differs from tested HEAD1f71987723a5c2d069e22abd4f99fc3303f51fee; that qualified source was unchanged from main816f9c3a942efed569049618c056d12a0c56d693."
+    },
+    {
+      "requirement": "Build evidence publication boundary",
+      "status": "pass_with_explicit_limit",
+      "detail": "Published build stderr, exit0 record and plan match originals. Raw compiler JSON is not present in the published study: only a receipt pins66102 local bytes by SHA256 fbae4715bfd75f041fa53363b3e7f972b23bcb1f1e873b657f7736370dd2ea9e, which agrees with the already reviewed local file. Its local terminal build-finished success:true/artifact enumeration is preserved as reviewed local evidence, not remotely published raw execution data."
+    },
+    {
+      "requirement": "Report scope",
+      "status": "consistent",
+      "detail": "Published README and TeX describe software qualification,11 empty harnesses, distinct historical/current/CPU baselines, incomplete84-case panel, unsigned standing and local raw compiler data. PDF is byte-pinned here and reports2 pages via pdfinfo; parent visual inspection is not represented as a new visual review by this validator."
+    },
+    {
+      "requirement": "PCC admission",
+      "status": "insufficient_evidence_for_attestation",
+      "detail": "Publication appends two claim rows to the exact main-pin ledger prefix; no verdict is appended. Keyring bytes are unchanged. Both claims have no proofs. No PCC signing key or trusted execution verifier was used or inspected by this reviewer."
+    }
+  ],
+  "retained_limits": [
+    "Raw compiler JSON and all42 native executable originals/copies remain local-only; committed hashes and before/after OK text do not independently establish binary execution, binary-to-compiler provenance, or remote availability of binary payloads.",
+    "Downloaded toolchain archives were deleted by the installer. This reviewer checked saved channel/plan/receipt consistency and installed executable hashes locally; original archive payloads could not be independently rehashed. The saved full channel TOML also remains in the local capsule.",
+    "The original124-path evidence manifest is an immutable local-snapshot receipt with absolute paths, not a claim that every listed payload was published. The new publication manifest names the97 committed study paths explicitly.",
+    "Doctests, strict lint, Rust1.78/MSRV compatibility and full-root regression were not run in this qualification. Prior historical checks do not discharge these current gates.",
+    "No full84-case solve or matched comparison was executed here. Historical two-case sizing, retained failures/timeouts and later CPU L0 studies retain their own source, workload and provenance boundaries.",
+    "No general counter proof, new algorithm improvement, novelty, L2 admission, scaling result, challenge scalar, independent certificate replay or breakthrough disposition is supplied.",
+    "Two compiler jobs, one test thread and sampled whole-cgroup memory/deadline guards are orchestration conditions, not hard CPU reservations, process peak-RSS measurements or isolation attestation."
+  ],
+  "key_hashes": {
+    "SHA256SUMS": "3dced890a77db9bbc285a2314c33a660bc73d63f726678b0cb4a28dd9251473a",
+    "README.md": "7a25013bd3e708027409c61476bff70dd8fd30dad67d2b521908d19309e254de",
+    "report.tex": "81f3a7174a6534a24e65eff7f166773befdf24196d56287df4d69e6e66220e46",
+    "report.pdf": "728db517093ec14d782b2113496b37331508bfcf6c7a1ab3fdb8ad598887c51e",
+    "checks/VALIDATOR-LOCAL-01.json": "9c4628a02c022c860d0aa397402a860e0e5b38a25952507bc115bd6816ce94f4",
+    "checks/evidence-01.sha256": "29ead3214cfc8d5a3a084228e14ab3cfa915b4f477e551927654fcad30c6413c",
+    "checks/pre-call.json": "73455383fdbeb57962fde912e3b3f995756d54d8847ebee677cf83711a7d5abd",
+    "checks/post-call.json": "c05ad73f6a2ecc852ee0cb33ca9c404a3ba90ec12a09c4e37d371876eb2bcccb",
+    "checks/native-source.sha256": "8090c1767895e7b2139e7fb611214e337cba21b235ad19fe8cfd27a82ba221b3",
+    "checks/rows.tsv": "622ec84af820810680407af049531a41af305c16e871301498641c16bf4b9871",
+    "checks/build.stderr": "0d36a4b66b69ec0ebffd0def619f54600c2fbcaaeaedfa5cf9d2951f6774f48f",
+    "checks/build-exit-code.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "checks/build-json-receipt.json": "2077c81c890dbfb2f546f5fc47f1a0632210febdc9c476bc93bf92e1eed86d1d"
+  },
+  "publication_evidence_manifest": "publication-evidence-02.sha256",
+  "publication_evidence_manifest_sha256": "fdb2bf4d713c3d5554b753b27272cc24fc5da7cfddf4839333062a4bedee3d98",
+  "original_review_bytes_preserved": true
+}

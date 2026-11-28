@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T03:52:19Z",
+ "id": "PCC-20261124-807b8e",
+ "kind": "statement",
+ "producer": {
+  "commit": "9e2d87e27ffdf129456ca4cae36dc834f1c8d27a",
+  "model": "",
+  "session": "codex-ecc2k-cold15m-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold15m_20261124/candidate3/grid-audit.json",
+    "sha256": "4678af1e1928f7cfd4effc9485a5d68c88555d4cb3f5b102cd4f0076fa01e369"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold15m_20261124/candidate3/summary.json",
+    "sha256": "d102e900130ca1e600d9a30369e63371cad535a8033e8a60b6cb664c2bbaadd3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold15m_20261124/candidate3/polynomial-replay.json",
+    "sha256": "d5df425b86e6fe59106d14025b89dc1996c6cd55ac56c0a2c6f09e7b8b23dc96"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold15m_20261124/candidate3/checks/source-final.json",
+    "sha256": "91e5e3cbb938e731748fd770b6207f41771abd5982a5e2bd8940063cceee953d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Corrects the baseline transcription in PCC-20261124-3c7b50: the actual frozen n131 d12 uniform matched baseline median is20,779,444Ir, not20,779,447Ir. Candidate median14,688,697Ir (five identical repetitions), all120 rows complete, all six controls pass,80 tuples replay and unchanged sources; strict15M cold instruction target is met. The older claim is retained as erroneous in that one baseline transcription and must not be cited as the baseline value. Unsigned producer checks only."
+}

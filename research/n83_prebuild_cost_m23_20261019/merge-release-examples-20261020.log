@@ -1,0 +1,16 @@
+    Blocking waiting for file lock on artifact directory
+   Compiling crypto v0.1.0 (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019)
+error: couldn't read `examples/../research/koblitz_n83_factor_base_sweep_20261008/../n83_xor_decided_cache_20261019/worker.rs`: No such file or directory (os error 2)
+    --> examples/../research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs:4272:9
+     |
+4272 |         include_bytes!("../n83_xor_decided_cache_20261019/worker.rs");
+     |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `examples/../research/koblitz_n83_factor_base_sweep_20261008/../n83_xor_decided_cache_20261019/worker.rs`: No such file or directory (os error 2)
+    --> examples/../research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs:4273:5
+     |
+4273 |     include!("../n83_xor_decided_cache_20261019/worker.rs");
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: could not compile `crypto` (example "koblitz_n83_factor_base_export" test) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

@@ -1,0 +1,73 @@
+{
+  "schema": "expanded-bernstein-input-rule/v1",
+  "panel": "research/width5_domain_expansion_plan_20261112_v1/UNOPENED_INPUTS.json",
+  "panel_sha256": "534edd6f5cad10dbb5da99bc4b5d2754f18ed6972bd861f3a86f96894eceac5e",
+  "fields": [
+    "P-192",
+    "P-224",
+    "P-256",
+    "P-384",
+    "P-521"
+  ],
+  "dimensions": [
+    41,
+    48,
+    54,
+    80,
+    107
+  ],
+  "H": 15,
+  "arms": [
+    "all",
+    "old",
+    "bern"
+  ],
+  "order": [
+    [
+      "all",
+      "old",
+      "bern"
+    ],
+    [
+      "bern",
+      "old",
+      "all"
+    ],
+    [
+      "old",
+      "all",
+      "bern"
+    ]
+  ],
+  "pool": "same deterministic25vector fresh5Dnative permaskedarm; no crossarm reuse",
+  "gate": "Apply Bernstein only to old aggregate unknown u; record all25candidate ranges there.",
+  "bounds": "closed10 plus independent generic27 integer-scaled transform; exact C and gamma/delta preserved",
+  "controls": {
+    "primes": [
+      5,
+      7,
+      11,
+      13,
+      17
+    ],
+    "M": 2,
+    "H": 8,
+    "direct_states": 1215,
+    "dense_fibers": 45,
+    "batches": [
+      40,
+      5
+    ],
+    "old_bulk172057_reused_not_rerun": true
+  },
+  "caps": {
+    "worker_seconds": 90,
+    "memory_mb": 4096,
+    "cores": 1,
+    "native_nodes_per_fiber": 100000,
+    "max_recovered_fibers_per_arm": 80,
+    "max_candidate_u_per_maskarm": 2000
+  },
+  "scope": "complete conditional source/k unions only",
+  "qualified_gain_claim": false
+}

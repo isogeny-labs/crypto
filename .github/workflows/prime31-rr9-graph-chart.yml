@@ -1,0 +1,86 @@
+name: Prime31 RR9 Grassmann graph-chart exact original-curve benchmark
+on:
+  push:
+    branches:
+      - automation/prime31-rr9-grassmann-chart-20261119
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_graph_chart.rs
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_graph_chart.py
+      - research/prime31_ic_20261115/rr9/RR9_GRAPH_CHART_PROTOCOL_20261119.md
+      - .github/workflows/prime31-rr9-graph-chart.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_graph_chart.rs
+      - research/prime31_ic_20261115/native/verify_prime31_rr9_graph_chart.py
+      - .github/workflows/prime31-rr9-graph-chart.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pinned-original-prime31-graph-chart:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+      - name: Checkout unchanged original Prime31 Rust arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install source-bound Rust toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only algebraic examples onto original arithmetic
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_exterior4.rs
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_graph_chart.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_graph_chart.rs
+      - name: Original 40 Rust library tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Exact Schur complement, two-by-two Laplace, and original-curve identity tests
+        run: cargo +1.100.0 test --locked --release --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_graph_chart
+      - name: Original exterior-4 B4 reference, same runner
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_exterior4 > exterior-reference.json
+          python3 research/prime31_ic_20261115/native/verify_prime31_rr9_exterior4.py exterior-reference.json
+      - name: Graph-chart B4 candidate, same runner
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_graph_chart > graph-chart.json
+          python3 research/prime31_ic_20261115/native/verify_prime31_rr9_graph_chart.py graph-chart.json
+      - name: Reverse order paired replay (GRAPH then EXTERIOR) on same runner
+        run: |
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_graph_chart > graph-chart-replay.json
+          python3 research/prime31_ic_20261115/native/verify_prime31_rr9_graph_chart.py graph-chart-replay.json
+          cargo +1.100.0 run --locked --release \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_exterior4 > exterior-reference-replay.json
+          python3 research/prime31_ic_20261115/native/verify_prime31_rr9_exterior4.py exterior-reference-replay.json
+      - name: Preserve both original-curve candidate records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-graph-chart-and-exterior-reference
+          path: |
+            exterior-reference.json
+            graph-chart.json
+            graph-chart-replay.json
+            exterior-reference-replay.json
+          if-no-files-found: warn
+          retention-days: 30

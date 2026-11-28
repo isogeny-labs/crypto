@@ -1,0 +1,91 @@
+{
+  "arms": [
+    {
+      "artifacts": {
+        "basis": {
+          "bytes": 794,
+          "file": "control_basis.txt",
+          "sha256": "3ddcf15591e30017351b908131c3eb35024b5ddb792107f7c5c7d255b1a37c9a"
+        },
+        "stderr": {
+          "bytes": 10266,
+          "file": "control_stderr.txt",
+          "sha256": "619fb17151477dd21016017ad949533c3aeb5eca671763fe54cce8d629ef8aa3"
+        },
+        "stdout": {
+          "bytes": 0,
+          "file": "control_stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "command": [
+        "/opt/homebrew/Cellar/msolve/0.11.0/bin/msolve",
+        "-g",
+        "2",
+        "-t",
+        "1",
+        "-v",
+        "2",
+        "-m",
+        "256",
+        "-f",
+        "/Volumes/SSD990/cryptanalysis/experiments/g2-n31-ordinary-residual-f4-r2-20261010/slice.ms",
+        "-o",
+        "/Volumes/SSD990/cryptanalysis/.sage-build-tmp/g2-sparse-control-jn699fi4/msolve.out"
+      ],
+      "dyld_library_path": "/opt/homebrew/Cellar/flint/3.6.0/lib",
+      "exit_code": 0,
+      "input_sha256": "53839cd5d2834097266db7a557d2dbdd328bf402740677bd2a24660c1e704ba2",
+      "name": "control",
+      "peak_process_tree_rss_bytes": 661028864,
+      "rss_samples": 766,
+      "status": "COMPLETED",
+      "wall_ns_exploratory": 92416157375
+    },
+    {
+      "artifacts": {
+        "basis": {
+          "bytes": 794,
+          "file": "sparsified_basis.txt",
+          "sha256": "3ddcf15591e30017351b908131c3eb35024b5ddb792107f7c5c7d255b1a37c9a"
+        },
+        "stderr": {
+          "bytes": 10266,
+          "file": "sparsified_stderr.txt",
+          "sha256": "296271306bb2a1d983e97b503093bb14e23ccc5152aa026a65b11b91d94470ad"
+        },
+        "stdout": {
+          "bytes": 0,
+          "file": "sparsified_stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "command": [
+        "/opt/homebrew/Cellar/msolve/0.11.0/bin/msolve",
+        "-g",
+        "2",
+        "-t",
+        "1",
+        "-v",
+        "2",
+        "-m",
+        "256",
+        "-f",
+        "/Volumes/SSD990-2/crypto-worktrees/exotic-ecdlp-recovery-20261119/research/exotic_ecdlp_20261021/g2_sparse_equation_basis_20261120/sparsified.ms",
+        "-o",
+        "/Volumes/SSD990/cryptanalysis/.sage-build-tmp/g2-sparse-sparsified-umqcjsgl/msolve.out"
+      ],
+      "dyld_library_path": "/opt/homebrew/Cellar/flint/3.6.0/lib",
+      "exit_code": 0,
+      "input_sha256": "5c6869a73d93edac2f5e60434ae0a1934a1f2e61a8d5265c0ded0b3b4e3a1034",
+      "name": "sparsified",
+      "peak_process_tree_rss_bytes": 668778496,
+      "rss_samples": 761,
+      "status": "COMPLETED",
+      "wall_ns_exploratory": 90632594125
+    }
+  ],
+  "msolve_sha256": "ebeecabcd328d313e49ec11515f23ad1dfa4b81c497ae1bfef8f60f84e951819",
+  "protocol_sha256": "08b4d867d1804d2ecbc5036c33a3d655b2107f39712888eaa4416a07d04a6f97",
+  "status": "COMPLETED"
+}

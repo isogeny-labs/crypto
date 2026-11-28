@@ -1,0 +1,17 @@
+CryptoLean/Combinatorics/PortMass.lean:30:27: error(lean.unknownIdentifier): Unknown identifier `two_mul`
+CryptoLean/Combinatorics/PortMass.lean:48:39: error(lean.unknownIdentifier): Unknown identifier `two_mul`
+CryptoLean/Combinatorics/PortMass.lean:48:30: error: unsolved goals
+G : Type u_1
+inst✝¹ : Fintype G
+inst✝ : DecidableEq G
+edges : Multiset (G × G)
+p : ℕ
+⊢ (edges.card + edges.card) * p = 2 * edges.card * p
+CryptoLean/Combinatorics/PortMass.lean:55:23: error(lean.unknownIdentifier): Unknown constant `Fintype.card`
+CryptoLean/Combinatorics/PortMass.lean:55:51: error: unsolved goals
+G : Type u_1
+inst✝¹ : Fintype G
+inst✝ : DecidableEq G
+oldLabels : Multiset G
+packets : ℕ
+⊢ Finset.univ.card * packets = sorry () * packets

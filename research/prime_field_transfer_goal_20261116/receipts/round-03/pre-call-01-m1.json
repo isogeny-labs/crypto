@@ -1,0 +1,35 @@
+{
+  "schema": "development.provenance/v1",
+  "timestamp": "2026-11-16T04:23:21.560Z",
+  "head": "730e036d50adc86c77d0a826564aa828bae02deb",
+  "pins": [
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp",
+      "sha256": "29e0f81074ed5664b57a7795bf2776ce47e154870283a7e4a9b58b7c42098405",
+      "qualifier_path": "/tmp/prime-transfer-round03-qualifier-01/round-03/wild_target.cpp",
+      "qualifier_sha256": "29e0f81074ed5664b57a7795bf2776ce47e154870283a7e4a9b58b7c42098405"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-02/local_torsion.cpp",
+      "sha256": "10943c5719179f30cf939854c5f07894ef33e7cf24f2091b2331665bd0a78a4b",
+      "qualifier_path": "/tmp/prime-transfer-round03-qualifier-01/round-02/local_torsion.cpp",
+      "qualifier_sha256": "10943c5719179f30cf939854c5f07894ef33e7cf24f2091b2331665bd0a78a4b"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-03/PROTOCOL.md",
+      "sha256": "c0be75dbeb03dbc5b40eb3adaf2348e97d94cc464cf92493fa7df88ec7577646",
+      "qualifier_path": "/tmp/prime-transfer-round03-qualifier-01/round-03/PROTOCOL.md",
+      "qualifier_sha256": "c0be75dbeb03dbc5b40eb3adaf2348e97d94cc464cf92493fa7df88ec7577646"
+    },
+    {
+      "path": "/tmp/prime-transfer-round03-qualifier-01/wild-target",
+      "sha256": "3ee89dec92ef7fa5839b6667cca5fbc2f9b54513470bcb6565c19728344ea40e"
+    }
+  ],
+  "qualifier": "/tmp/prime-transfer-round03-qualifier-01",
+  "scope": "Local development correctness only; no performance experiment or independent execution proof",
+  "independent_preregistration": false,
+  "phase": "pre-call",
+  "command": "timeout 60s /tmp/prime-transfer-round03-qualifier-01/wild-target 1",
+  "timeout_seconds": 60
+}

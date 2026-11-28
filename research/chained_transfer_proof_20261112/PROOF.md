@@ -389,7 +389,13 @@ the reachable-set census is in `atlas.rs` and
   "closed by data" rule is not met: the lower 95% bound of the ratio's slope in
   `p` is −0.07 (full) and −0.65 (double large prime), because the instance
   selection did not bind `r` to `p`, and rho costs about `√r`. O3 stays open.
-  A decisive rerun freezes `r ≈ p`.
+  An independent validation (2026-11-14, `research/validation_20261114/`)
+  admitted this run with caveats: replay, recompute and certificates all agree,
+  and eight reporting errors were corrected in `ERRATA.md` without changing any
+  cell or the verdict. The decisive rerun, with `r ≥ 0.4p` (`#E1 = 2r` at every prime), is
+  frozen in `research/full_jacobian_ic_rp_20261114/PROTOCOL.md` (sha256
+  `565d57fa…50cc`). It has not run: the S3 checkpoint gate has no credentials
+  in this session. O3 stays open `[pcc:unverified]`.
 * **Measured results are toy-size.** Every experiment cited has `p` at most
   12,841 (degree 2) or 251 (degree 3), a handful of covers per prime, and no
   signed pcc claim: they are `[pcc:unverified]`, and none is a row in the

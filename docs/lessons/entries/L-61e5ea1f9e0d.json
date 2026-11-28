@@ -1,0 +1,14 @@
+{
+  "action": "compute the overflow threshold of every unreduced product chain against the new largest prime, and check the release profile for overflow-checks; demand a u128 reference test at the largest prime, since a small-p positive control cannot see it",
+  "created": "2026-11-15T17:01:14Z",
+  "evidence": [
+    "src/cryptanalysis/bielliptic_quartic.rs"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "red-team"
+  ],
+  "trigger": "a protocol lifts a field-size gate on copied small-field arithmetic (u64 products like 6*m*m*t*t % p)",
+  "why": "bielliptic_quartic.rs section() overflows u64 for p >= 41,874 and release wraps silently, so stage-2 primes 51203 and 102407 would abort collection"
+}

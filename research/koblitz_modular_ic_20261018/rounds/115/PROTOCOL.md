@@ -1,0 +1,5 @@
+# R115: direct uniformizer for the x=0 wild base branch
+
+Bind R51 donor, R105 parser and R113 exact support by SHA-256. Substitute `v=x*t` in the R113 quotient F(x,v), divide by x^2, and verify the resulting polynomial E(x,t) has special fiber `t^2` and x-derivative 1 at `(0,0)`. Hensel-lift the unique root x(t) with x(0)=0 modulo t^128. Check E residual, leading order x=t^2+..., the original R51 f residual after `y=1+x+x^2+x^3*t`, and the identity v=x*t. Export exact supports and bounds. Fresh byte-identical replay, changed-input rejection, an independent source evaluator and Lean residual arithmetic are acceptance checks. Commit source and protocol before data. The slope denominator/edge-length criterion and degree accounting are separate proof obligations for normalized-place certification. Exact local F2 arithmetic; no cloud or timed claim.
+
+Sources: R51 donor, R105 parser, R113 wild edge, [Stacks Henselian lifting](https://stacks.math.columbia.edu/tag/04GE), [Newton polygon theorem](https://www.math.columbia.edu/~gyujinoh/ANT_revised.pdf).

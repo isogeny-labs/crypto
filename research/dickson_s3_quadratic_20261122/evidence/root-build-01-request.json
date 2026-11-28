@@ -1,0 +1,12 @@
+{
+  "schema": "dickson-s3-root-build-request/v1",
+  "created_at_utc": "2026-11-23T03:07:59Z",
+  "base_commit": "e95645aede904b21421683d917b29b622140da1e",
+  "working_tree_changes": true,
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "input_inventory_sha256": "1d4fd02cf04e3f09afb2cb7f3896e8a04f3b8384d602cf267c749d48f95d03a1",
+  "command": "timeout --signal=TERM --kill-after=20s 600s env CARGO_BUILD_JOBS=1 CARGO_INCREMENTAL=0 cargo test --release --lib --no-run --locked --offline --message-format=json --target-dir /workspace/scratch/108b275c78dd/dickson-root-release-build",
+  "purpose": "required root library gate, build stage only",
+  "default_features": true,
+  "tests_executed": false
+}

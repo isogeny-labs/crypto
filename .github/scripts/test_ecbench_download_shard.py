@@ -46,6 +46,10 @@ class DownloadPlanTests(unittest.TestCase):
         self.assertNotIn('git ls-tree',job)
         self.assertIn('AUDIT_SHARD: 0/1',job)
         self.assertIn('audit-shards/${SHARD}.txt',job)
-        self.assertLess(job.index('audit-shards/${SHARD}.txt'),job.index('artifacts.py pull'))
+        # The session-specific pull (not a job-wide soft-fail / canonical pull)
+        # must follow the shard list. Wire may insert an earlier soft-fail pull.
+        session_pull='artifacts.py pull --jobs 16 "${artifact_sessions[@]}"'
+        self.assertIn(session_pull,job)
+        self.assertLess(job.index('audit-shards/${SHARD}.txt'),job.index(session_pull))
 
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,38 @@
+{
+ "note": "Wide target batching (64/256/1024 synchronized walks) for prime-field IC against the incumbent walk, same binary, sessions, targets and rounds. A wall-time study: counted S cannot fall with width. The schema's `ic` band slot carries the 16-lane arm, the best width; the matched rho reference is the session's own rho.negation arm.",
+ "replay_certificate": {
+  "path": "../../research/ic_wide_batching_20261028/replay-certificate.json",
+  "sha256": "ca2cab672a4754313a7cdcb05deb3a9a54e6acca12792a8df0791c7371f5ac4b"
+ },
+ "rho_reference": {
+  "band_source": "../../research/ic_wide_batching_20261028/band/wide-32.json (ic.pipeline mitm-prime-batch:m=2, targets=walk-prime-batch-16, 32-bit prime-order curve, 3 sessions)",
+  "binary_or_process": "ecbench release build of this branch; every arm of a session runs in that session's binary",
+  "gae_band": {
+   "0": {
+    "ic": 31.083015176561155,
+    "rho": 1.0189098859866688
+   },
+   "0.1": {
+    "ic": 33.73206821786103,
+    "rho": 1.12013169469697
+   },
+   "1": {
+    "ic": 57.573545589559835,
+    "rho": 2.0311279730896845
+   }
+  },
+  "kind": "negation",
+  "matches_protocol": true,
+  "order_holds_across_band": true,
+  "protocol": "each spec's rho.negation reference arm (role reference), run in every session on the same curve, targets and rounds as the candidate arms; prime-order curves (A = 2), so negation is the strongest symmetry available",
+  "same_binary_or_process": true,
+  "same_unit": true,
+  "strongest_available": true,
+  "unit": "ecbench.gae (counted group operations, S = GAE/sqrt(r))"
+ },
+ "schema": "validation-gate/v1",
+ "validator_report": {
+  "path": "../../research/ic_wide_batching_20261028/validator-report.json",
+  "sha256": "d0c77ee74554ce436836b0b3633ede5d4d6cdd7970a0447771461b5cee27ef45"
+ }
+}

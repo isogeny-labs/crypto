@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T00:28:31Z",
+ "id": "PCC-20261116-025524",
+ "kind": "execution",
+ "producer": {
+  "commit": "fc85acc268c349189fccb091188b214938b745d8",
+  "model": "GPT-6",
+  "session": "selected-root-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/selected-root-development/selected-core-fc85acc26-02-post-call.json",
+    "sha256": "ef2f922198d3dac513aac6e4b548570849a4e52a9c6aeae7beaf6a0e40e396d7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/selected-root-development/core-tests-02.log",
+    "sha256": "39c8e7b4e3ae403c3cc99ab9b8128a7b6ce8175cf14cce92d5b9007f264cf0bb"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/relation_degree_trace_20261115",
+ "statement": "Copied immutable selected-root core release qualifier at source fc85acc26 completed 32 fixed correctness tests including exact all-vertices root/full-certificate comparisons, both-field cycle bases and fallback cache behavior. Structural six-cycle counts are 2 edge resultants/1 vertex GCD fold versus 6/6; no timing result."
+}

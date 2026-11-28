@@ -1,0 +1,3 @@
+# Sign-independent solver comparison
+
+Use the original v5 B8 examples, both polynomial presentations, and the same public positive and negatives. Compare liftstd (control), std followed by lift, and slimgb followed by lift. Time the basis/unit decision, lift, and full runtime independently. We will track shape and replay validity of each identity, observe wall time with three repetitions per fixture, and compare each exact solution to prior independent replay. Prefer a smaller exact identity and report whether its generator closes the large cost gap to the same-fixture generic group method. All runs use a 30 s timeout and a 768 MiB process address-space cap; preserve errors and censored runs. No extrapolation to B31 if the sign-free methods retain a large gap.

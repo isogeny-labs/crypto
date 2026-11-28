@@ -1,0 +1,17 @@
+digraph incidence {
+graph [rankdir=LR,bgcolor="white",fontname="Helvetica",label="Actual private columns: first two added rows shown",labelloc=t];
+node [shape=box,style="rounded,filled",fillcolor="#EDF2F7",fontname="Helvetica"];
+r6 [label="Added row 6"];
+c225 [label="New column 225",fillcolor="#DDEFE5"];
+r6 -> c225 [label="+1"];
+r6 [label="Added row 6"];
+c226 [label="New column 226",fillcolor="#DDEFE5"];
+r6 -> c226 [label="-1"];
+r7 [label="Added row 7"];
+c227 [label="New column 227",fillcolor="#DDEFE5"];
+r7 -> c227 [label="+1"];
+r7 [label="Added row 7"];
+c228 [label="New column 228",fillcolor="#DDEFE5"];
+r7 -> c228 [label="-1"];
+note [label="Complete certificate: every new column has one owner",fillcolor="#FFF0CD"];
+}

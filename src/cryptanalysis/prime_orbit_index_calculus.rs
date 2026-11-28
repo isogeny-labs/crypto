@@ -1413,6 +1413,11 @@ pub struct OrbitIcOptions {
     /// Skip the rho baseline.
     pub skip_rho: bool,
     pub seed: u64,
+    /// Keep a copy of the relation rows handed to [`solve_two_term_system`]
+    /// in [`LogsReport::captured_relations`], so graph tools
+    /// (`large_prime_graph::eval`) can be run on the real stream.  Off by
+    /// default; it changes no counted work.
+    pub capture_relations: bool,
 }
 
 impl Default for OrbitIcOptions {
@@ -1430,6 +1435,7 @@ impl Default for OrbitIcOptions {
             rho_max_steps: 0,
             skip_rho: false,
             seed: 1,
+            capture_relations: false,
         }
     }
 }
@@ -1536,6 +1542,8 @@ pub struct LogsReport {
     /// End-to-end logarithm-precomputation wall time, including
     /// [`Self::collection_ns`] and all excluded stages named above.
     pub seconds: f64,
+    /// Only with [`OrbitIcOptions::capture_relations`]: the rows solved.
+    pub captured_relations: Option<Vec<Relation>>,
 }
 
 /// One target's descent.
@@ -2168,6 +2176,9 @@ pub fn solve_logs(
         (rows, FxMap::default(), solved)
     };
     rep.relations = rows.len();
+    if opts.capture_relations {
+        rep.captured_relations = Some(rows.clone());
+    }
     rep.system = stats;
     rep.uncertified_columns = uncertified;
     let (keep, logs): (Vec<usize>, Vec<u64>) = certified

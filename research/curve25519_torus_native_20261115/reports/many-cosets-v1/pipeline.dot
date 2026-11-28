@@ -1,0 +1,15 @@
+digraph Cosets {
+  graph [rankdir=TB, bgcolor="white", fontname="Helvetica", ranksep=0.30];
+  node [shape=box,style="rounded,filled",fillcolor="#EDF4FF",fontname="Helvetica",fontsize=11];
+  edge [color="#4D607D"];
+  input [label="CONTRACT: field, order(h)=60824497 x 213156431\nCharacteristic != 2 for sign exclusions"];
+  family [label="h^(j+60824497 t)\n1 <= j <= 20633; 0 <= t < 213156431\nRaw size 4,398,056,640,823"];
+  proof [label="Conditional Lean algebra\nDistinct; excludes 1, inverse/sign pairs"];
+  lookup [label="Membership: z^q in {(h^q)^j}\n20,633 labels; 27 squarings + 13 multiplications\nper q-power, then BTreeMap lookup"];
+  dense [label="Nonzero univariate vanishing on raw base\nDegree >= 4,398,056,640,823\nDoes not bound compact-circuit solving cost"];
+  controls [label="Native development evidence\n43 fixed controls: 9 members, 34 exclusions\nNo full-base enumeration or timing study"];
+  next [fillcolor="#FFF3D9",label="OPEN APPLICATION\nPoint normalization/indexing; actual field bridge\nTarget-conditioned decomposition + full cost/yield\nGrowing admissible family"];
+  input -> family; family -> proof; family -> lookup;
+  proof -> dense; lookup -> controls;
+  dense -> next; controls -> next;
+}

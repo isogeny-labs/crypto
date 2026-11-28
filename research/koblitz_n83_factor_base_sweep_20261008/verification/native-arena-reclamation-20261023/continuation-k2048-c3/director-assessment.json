@@ -1,0 +1,32 @@
+{
+  "card_id": "CARD-native-arena-reclamation-continuation-k2048-c3",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "outcome": "executed_as_specified",
+  "execution_conforms_to_frozen_argv": true,
+  "stopped_at_step": null,
+  "recommendation": "proceed_to_analysis",
+  "recommendation_authorizes_retry": false,
+  "interpretation": "not_assessed",
+  "whole_command_seconds": 5325.486226592,
+  "attempts": 1,
+  "exit_code": 0,
+  "command_timed_out": false,
+  "card_sha256": "d0aadf52705a122f41c5f2adb7c2662c4aa237fcc7e7278eebd024f0daa9a4d2",
+  "prompt_sha256": "7a7b8c9741520d02f7e4c3c5b6f6a8af4d51b42f278c2b068c4da7aea6a70639",
+  "relay_sha256": "08712cac0da4f04831640d6e8b5e0a8df9e7cbd2e03615c818e4c2c4fce81e55",
+  "commit": "c13e33dccd9563f6c1a5d17ed88bd1783db7501b",
+  "worker_sha256": "8ab6f9cf7abe886f33e497bc052089f32fdbe5270b8eee2218242040fa2cc6b4",
+  "guard_sha256": "efa7c80519a547cb13843ae84d777a269419cd668851af2d87fa0558ae6815a5",
+  "native_audit_observed_status": "PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY",
+  "reasons": [
+    "Native card-check exited 0 with relay_verbatim=true, record_digests_verified=true and status=completed; see card-check.stdout and card-check.exit. All frozen binds and every nonnull receipt stream/output digest were verified.",
+    "Receipt and relay are byte-identical; receipt-relay-cmp.exit is 0. Fresh card, prompt, relay, guard and worker SHA-256 values match the parent-supplied identities.",
+    "Regenerated native prompt under the frozen PATH is byte-identical to the authoritative prompt; prompt-v2.exit and prompt-v2-cmp.exit are 0. The initial prompt regeneration used sudo's default PATH and refused before producing a prompt; its empty stdout, stderr and exit are preserved, with no worker execution.",
+    "Receipt records exactly one frozen command, one attempt, exit 0, succeeded=true, no timeout, and whole command elapsed 5325.486226592 seconds; no retry is recorded.",
+    "All declared outputs exist and match receipt hashes; audit.json reports PASS_NATIVE_BOUNDED_ZERO_RELATION_REPLAY. This assessment records that status without interpreting research results.",
+    "outer.json records cleanup_verified=true, systemd_runtime_cleanup_verified=true, exit_code=0 and wall_censored=false.",
+    "Receipt card_changed=false and dirty_before/dirty_after are empty. Fresh HEAD matches the frozen commit; fresh git status --porcelain was empty. The assessment writes only this new scratch assessment directory."
+  ],
+  "assessment_scope": "Execution conformance and custody only. No worker, retry, new card, dispatch, build, tracked-source edit or Python execution was performed. Research interpretation and any subsequent separately authorized card remain with the root agent. The existing 30000-worker-second accounting is unchanged."
+}

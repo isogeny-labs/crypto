@@ -1,0 +1,24 @@
+   Compiling orientation-yx-validation v0.1.0 (/workspace/crypto/research/orientation_yx_validation_20261115)
+    Finished `release` profile [optimized] target(s) in 0.64s
+     Running unittests validation.rs (research/orientation_yx_validation_20261115/target/release/build/orientation-yx-validation/d1f3665c6cf113ad/out/orientation_yx_validation-d1f3665c6cf113ad)
+
+running 6 tests
+determinant-only counterexample: GF(8), a=0, b=1, P=Q=R=(1, 0)
+test tests::anchor_slope_redundancy_is_an_exact_polynomial_identity ... ok
+test tests::collinearity_alone_is_not_a_multiplicity_test ... ok
+test tests::fields_and_chart_are_valid_in_odd_and_even_degrees ... ok
+unguarded-anchor counterexample: GF(8), a=0, b=1, P=(1, 1), Q=(1, 0), R=(0, 1)
+test tests::zero_target_denominator_needs_an_explicit_branch ... ok
+negative controls: wrong-sign S3 roots=1560, S3 roots without rational lifts=1112
+test tests::rational_lifts_require_trace_and_s3_does_not_fix_signs ... ok
+18 curves: triples=24782, hybrid=19664, repeated_x=9518, containing_x_zero=5118
+test tests::oriented_and_hybrid_systems_equal_the_full_group_relation ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+   Doc-tests orientation_yx_validation
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

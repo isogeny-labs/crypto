@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T01:47:50Z",
+ "id": "PCC-20261123-2689b1",
+ "kind": "statement",
+ "producer": {
+  "commit": "45742543a57f50ae8a53d9882ba786826b3d5463",
+  "model": "gpt-6-astra-pro",
+  "session": "prime31-isogeny-choices-20261122"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_aux_matched_20261122/isogeny-choice/DEVELOPMENT_RECEIPT.json",
+    "sha256": "6d29154864321dab93f001e45951930c02f53e692fd2ab707e611563f6d592fb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_aux_matched_20261122/isogeny-choice/fixtures/kernel_correctness_fixtures.json",
+    "sha256": "0de066383113198aff48da2beb6604d56b4bf328af55aa61eae20f07c7d96c33"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime31_aux_matched_20261122/isogeny-choice",
+ "statement": "The Prime31 isogeny-choice development receipt records 54 passing optimized native contract tests, 230 structurally valid prepared comparison inputs, and zero attempted campaign cells. Fixed degree1024 fixtures and target degree3 transport assertions are included; these producer records establish no signed execution verdict or performance ranking."
+}

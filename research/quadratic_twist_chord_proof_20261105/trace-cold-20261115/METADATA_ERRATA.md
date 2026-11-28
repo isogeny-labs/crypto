@@ -1,0 +1,7 @@
+# Post-data metadata errata — 2026-11-15
+
+The successful17-stage copied qualifier reused its start timestamp variable name inside the missing-failed-query corruption builder. Consequently run.json and postcall.json record start=17 (a line index), not the UTC start time. Those original files stay IMMUTABLE. No start time, elapsed-time ratio or speedup is inferred from them. Build/precall file timestamps are post-call custody metadata, not silently substituted as an original timing receipt. Finish20:55:12.920846UTC is retained as recorded. [pcc:unverified]
+
+This occurs after both full producer/audit executions; native transcript hashes, complete9-workload coverage, actual curve scalars, witness/cap checks, all11 changed control rejections, source hashes and A/A equality are unaffected. The intact immutable build/precall manifests and copied qualifier bytes are retained. A future qualifier must use separate names started_utc and missing_call_start; no scientific rerun merely to cosmetically replace this successful record. [pcc:unverified]
+
+The first local copy of official profile.sh also had one extra terminal newline. That copy is retained; the exact official2c53af0c blob was then byte-bound and the exact probe again exits2 for missinggawk. No official tool was weakened. GNUgprof fallback remains a separately named diagnostic, not a claimed profile/v1 success or speed benchmark. [pcc:unverified]

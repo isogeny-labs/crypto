@@ -50,9 +50,12 @@ enum Fx {
     Genus2,
     Ghs,
     Hyper,
+    Hec,
+    Hashed7,
     Gls,
     Subfield,
     Fp4,
+    Fp3,
     /// `PrimeExplicit` p = 4999, order 5006 = 2 · 2503: cofactor two, so the
     /// cofactor multiplication of a hashed public point is a real doubling.
     Cofactor2,
@@ -140,6 +143,16 @@ fn spec(fx: Fx) -> CurveSpec {
         },
         Fx::Ghs => CurveSpec::GhsFp6Search { p: 13, seed: 1 },
         Fx::Hyper => CurveSpec::HyperellipticThread { p: 23, genus: 3 },
+        Fx::Hec => CurveSpec::HecThread { p: 41, genus: 2 },
+        Fx::Hashed7 => CurveSpec::PrimeExplicit {
+            p: 5,
+            a: 2,
+            b: 1,
+            group_order: 7,
+            r: 7,
+            gx: 0,
+            gy: 1,
+        },
         Fx::Gls => CurveSpec::GlsFp2 {
             p_bits: 14,
             seed: 1,
@@ -151,6 +164,7 @@ fn spec(fx: Fx) -> CurveSpec {
             max_cofactor_ratio: 64,
         },
         Fx::Fp4 => CurveSpec::Fp4Translation { p: 29, seed: 1 },
+        Fx::Fp3 => CurveSpec::Fp3Random { p: 67, seed: 1 },
     }
 }
 
@@ -215,6 +229,28 @@ const APS: P = &[
     ("lambda", "0"),
     ("prune", "false"),
 ];
+const APS_V3: P = &[
+    ("encoding", "line_chart3"),
+    ("roots", "exact"),
+    ("stop", "first_informative"),
+    ("labels", "guaranteed"),
+    ("subset_size", "0"),
+    ("subset_profile", "2,2,2"),
+    ("attempts", "8"),
+    ("degree", "24"),
+    ("budget_ms", "10000"),
+    ("sampling_draws", "1000"),
+    ("orbit", "none"),
+    ("beta", "0"),
+    ("lambda", "0"),
+    ("prune", "false"),
+    ("guess", "none"),
+    ("trace", "certified"),
+    ("trace_entries", "8"),
+    ("trace_words", "100000"),
+    ("growth", "none"),
+    ("growth_ceiling", "4"),
+];
 const LARGE_PRIME: P = &[
     ("small_dimension", "3"),
     ("envelope_dimension", "4"),
@@ -227,6 +263,49 @@ const LARGE_PRIME: P = &[
 /// Every (id, fixture, parameters) that is run.  An id may be listed on
 /// several fixtures.
 const CASES: &[(&str, Fx, P)] = &[
+    (
+        "hec.ic_fb_walk",
+        Fx::Hec,
+        &[
+            ("branches", "64"),
+            ("d_step_in", "4"),
+            ("extra_relations", "8"),
+            ("max_trials", "50000"),
+        ],
+    ),
+    ("hec.rho_full_width", Fx::Hec, &[("max_steps", "200000")]),
+    (
+        "ic.orbit_rank_v1",
+        Fx::K0n7,
+        &[
+            ("columns", "2"),
+            ("raw_x_cap", "127"),
+            ("max_trials", "1000"),
+            ("max_pair_visits", "20000"),
+            ("table_mode", "orbit"),
+        ],
+    ),
+    (
+        "ic.hashed_native_v1",
+        Fx::Hashed7,
+        &[
+            ("backend", "selectors"),
+            ("m", "2"),
+            ("trials", "16"),
+            ("columns", "128"),
+            ("steps", "10000000"),
+            ("vector", "2000000"),
+            ("bits", "1000000"),
+            ("threshold", "11"),
+            ("derive_last", "1"),
+            ("smallest_first", "1"),
+            ("cache_entries", "4096"),
+            ("rank", "16"),
+            ("slices", "16"),
+            ("outer_multiplier", "1"),
+            ("attempts", "128"),
+        ],
+    ),
     ("rho.three_leads_negation_v1", Fx::Scholten, TL_RHO),
     ("rho.three_leads_plain_v1", Fx::Scholten, TL_RHO),
     ("rho.three_leads_jacobian_v1", Fx::Scholten, TL_RHO),
@@ -269,6 +348,7 @@ const CASES: &[(&str, Fx, P)] = &[
     ("bsgs.interleaved", Fx::Prime18, &[]),
     ("bsgs.negation", Fx::Prime18, &[]),
     ("bsgs.negation_table", Fx::Prime18, &[]),
+    ("bsgs.negation_table_v2", Fx::Prime18, &[]),
     ("bsgs.textbook_v2", Fx::Prime18, &[]),
     ("bsgs.interleaved_v2", Fx::Prime18, &[]),
     ("bsgs.negation_v2", Fx::Prime18, &[]),
@@ -320,6 +400,7 @@ const CASES: &[(&str, Fx, P)] = &[
     ),
     ("ic.aps_v1", Fx::Aps101, APS),
     ("ic.aps_v2", Fx::Aps101, APS),
+    ("ic.aps_v3", Fx::Aps101, APS_V3),
     ("transfer.isogeny", Fx::Prime14, &[("ell", "3")]),
     ("transfer.quartic_cover", Fx::Prime14, &[]),
     ("transfer.quartic_cover_v2", Fx::Prime14, &[]),
@@ -332,6 +413,7 @@ const CASES: &[(&str, Fx, P)] = &[
     ("rho.signed_frobenius_v3", Fx::K0n19, &[]),
     ("rho.signed_frobenius_v4", Fx::K0n19, &[]),
     ("rho.signed_frobenius_v5", Fx::K0n19, &[]),
+    ("rho.signed_frobenius_v6", Fx::K0n19, &[]),
     ("rho.signed_frobenius_strong", Fx::K0n19, &[]),
     ("rho.signed_frobenius_strong_legacy", Fx::K0n19, &[]),
     ("rho.signed_frobenius_strong_escape", Fx::K0n19, &[]),
@@ -392,6 +474,20 @@ const CASES: &[(&str, Fx, P)] = &[
     ("jacobian_image.bsgs", Fx::K0n7, &[]),
     ("jacobian_image.rho3_field_tally", Fx::K0n7, &[]),
     ("jacobian_image.bsgs_field_tally", Fx::K0n7, &[]),
+    ("jacobian_image.rho3_v2", Fx::K0n7, &[]),
+    ("jacobian_image.bsgs_v2", Fx::K0n7, &[]),
+    (
+        "jacobian_image.genus3_projected_ic_v1",
+        Fx::K0n7,
+        &[
+            ("fb_size", "32"),
+            ("extra_relations", "8"),
+            ("branches", "32"),
+            ("d_step_in", "4"),
+            ("max_trials", "200000"),
+            ("threads", "1"),
+        ],
+    ),
     ("jacobian_image.rho3", Fx::Binary11, &[]),
     ("jacobian_image.bsgs", Fx::Binary11, &[]),
     ("jacobian_image.rho3_field_tally", Fx::Binary11, &[]),
@@ -434,11 +530,27 @@ const CASES: &[(&str, Fx, P)] = &[
         Fx::Fp4,
         &[("base", "xline"), ("large_primes", "0"), ("c4", "97")],
     ),
+    (
+        "ic.k3_gaudry",
+        Fx::Fp3,
+        &[("harvester", "eliminator"), ("oracle", "groebner")],
+    ),
+    (
+        "ic.k3_gaudry",
+        Fx::Fp3,
+        &[("harvester", "cycles"), ("oracle", "groebner")],
+    ),
 ];
 
-/// Ids that are not run, each with why.  Only an external backend or the
-/// lack of any instance small enough for a unit test belongs here.
+/// Ids that are not run here. Each entry identifies the missing fixture,
+/// an incompatible workload contract, or the dedicated coverage.
 const SKIPS: &[(&str, &str)] = &[
+    ("bsgs.prime_mont4_v1", "four-limb explicit fixture and exact replay covered by prime_mont4_dispatch_and_refusals"),
+    ("ic.diem_kgrow", "generates its own extension-field cell and planted logarithm independently of the supplied workload"),
+    ("ic.growing_arity", "generates its own field-size study cell and planted logarithm independently of the supplied workload"),
+    ("ic.aux_tower_solver", "generates its own auxiliary-tower study cell and planted logarithm independently of the supplied workload"),
+    ("rho.curve25519_bounded", "fixed 253-bit subgroup: bounded arbitrary-target runs are censoring controls, independently covered by curve25519_bounded_tests"),
+    ("ic.curve25519_pair_v1", "fixed full-width curve: the generic planted target is not guaranteed to decompose in a bounded pair base; independent high-scalar positive and refusal controls run in curve25519_pair_dispatch_tests"),
     ("ic.cm_folded_native_v1", "needs the external native backend binary"),
     ("ic.cm_folded_recurrence_v1", "needs the external native backend binary"),
     ("ic.cm_folded_native_d43_v1", "needs the external native backend binary"),
@@ -467,6 +579,7 @@ const EXEMPT: &[(&str, &str)] = &[];
 /// the descent's modular combination, the host-dependent vector decline
 /// count): honest declarations, not counters.
 const UNCOUNTED_NAMES: &[&str] = &[
+    crate::cryptanalysis::ecbench::hec::GAE_GAP, // Legacy group-operation GAE explicitly omits native ring/field work.
     "field_arithmetic_uncharged",
     "hash_and_allocation_uncharged",
     "modular_combination_uncharged",
@@ -498,8 +611,8 @@ const UNPRICED_EXEMPT: &[(&str, &str)] = &[
 
 /// Rule 2: the phase that holds the final `[d]G = Q` check, which must
 /// charge something inside the total (a recovered run performed the check).
-/// `jacobian_image.*` is absent: it converts no operation to GAE at all
-/// (its check is counted in `jacobian_group_operations_uncharged`).
+/// Historical `jacobian_image.*` is absent: it converts no operation to GAE at
+/// all. The v2 adapters charge their source replay in `verification`.
 const CHECK_PHASE: &[(&str, &str)] = &[
     ("ic.known_log_ksum_v1", "target_recovery_check"),
     ("ic.known_log_mitm2_v1", "target_recovery_check"),
@@ -512,6 +625,9 @@ const CHECK_PHASE: &[(&str, &str)] = &[
     ("rho.negation_strong", "check"),
     ("ic.koblitz_batched", "verify"),
     ("ic.koblitz_batched_v2", "verify"),
+    ("jacobian_image.rho3_v2", "verification"),
+    ("jacobian_image.bsgs_v2", "verification"),
+    ("jacobian_image.genus3_projected_ic_v1", "verification"),
 ];
 
 fn phase_gap(rep: &SolveReport) -> f64 {
@@ -590,7 +706,7 @@ fn every_registered_method_is_run_skipped_or_exempt_and_its_phases_sum() {
             problems.push(format!("{tag}: refused at plan time: {e}"));
             continue;
         }
-        let k = 1 + 4242 % (facts.r - 1);
+        let k = 1 + 4242 % (facts.r.checked_u128().unwrap() - 1);
         let Some(target) = inst.mul_generator_hex(k) else {
             problems.push(format!("{tag}: no target for k = {k}"));
             continue;
@@ -709,6 +825,8 @@ fn what_the_planner_accepts_the_new_methods_run_without_error() {
         ("jacobian_image.bsgs", &[], &koblitz),
         ("jacobian_image.rho3_field_tally", &[], &koblitz),
         ("jacobian_image.bsgs_field_tally", &[], &koblitz),
+        ("jacobian_image.rho3_v2", &[], &koblitz),
+        ("jacobian_image.bsgs_v2", &[], &koblitz),
         ("ic.koblitz_batched", batched, &koblitz),
         (
             "rho.negation_strong",
@@ -784,8 +902,13 @@ fn what_the_planner_accepts_the_new_methods_run_without_error() {
             if applicable(&m, &inst, &facts).is_err() {
                 continue;
             }
-            for k in [1u128, 2, facts.r / 2, facts.r - 1] {
-                if k == 0 || k >= facts.r {
+            for k in [
+                1u128,
+                2,
+                facts.r.checked_u128().unwrap() / 2,
+                facts.r.checked_u128().unwrap() - 1,
+            ] {
+                if k == 0 || k >= facts.r.checked_u128().unwrap() {
                     continue;
                 }
                 let Some(target) = inst.mul_generator_hex(k) else {
@@ -841,7 +964,7 @@ fn run_report(id: &str, fx: Fx, params: P) -> SolveReport {
     })
     .unwrap();
     applicable(&m, &inst, &facts).unwrap();
-    let k = 1 + 4242 % (facts.r - 1);
+    let k = 1 + 4242 % (facts.r.checked_u128().unwrap() - 1);
     let target = inst.mul_generator_hex(k).unwrap();
     let mut rep = solve(&m, &inst, &facts, &target, 6).unwrap();
     rep.solve_wall_ns = 0;

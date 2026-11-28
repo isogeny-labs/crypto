@@ -1,0 +1,44 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-23T02:13:33Z",
+ "id": "PCC-20261123-2d6d3e",
+ "kind": "theorem",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "gpt-6-astra",
+  "session": "prime31-family-density-iteration7"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration7/FIXED_CURVE_FIBRE_DENSITY.md",
+    "sha256": "c1725df2f00f61a972edbb5cfee803fe97bd2c27d8f761fbb08b73385c70b7a1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration7/FIXED_CURVE_INDEPENDENT_REVIEW.md",
+    "sha256": "347de94743d57531ef492798537902c2906165de9f972bd5a814cddd4b2a24c2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration7/INDEPENDENT_REVIEW.md",
+    "sha256": "dd54122c5b9703b948d2ab590cecfc8a27e26ba34e7105531b02d9bb2900087c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration7/INTEGRATION_REVIEW.md",
+    "sha256": "99e7cdcbfa770b82056c3fdfc241ae3c93cd3f448c52739b6a5042d0f0d7014f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Written mathematical deduction and independent prose review only; unsigned PCC standing; no native run or asymptotic relation-solving claim.",
+ "statement": "For a supplied nonsingular odd-order E/Fp, prime p>=4096 and power-of-two4<=q<=sqrt(p)/16 with4q dividingp+1, the written genus-one/genus-two count proves at least one sixth of regular split q-point Dickson fibres have B>=q/4. The exact uniform-torus sampler takes fewer than7 expected seeds and O(q log p) ordinary field-operation setup plus inversions and O(q) storage. Capping the reviewed Linnik family retains q=Omega(p^(1/L)). This constructs a base on the same supplied curve; it does not construct a prime-order family or solve a target."
+}

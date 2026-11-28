@@ -1129,7 +1129,7 @@ mod tests {
                 family: "koblitz".into(),
                 field_degree: Some(13),
                 field_bits: None,
-                r: 2003,
+                r: crate::evidence::Order(2003),
                 rest: BTreeMap::new(),
             },
             target: ["1".into(), "2".into()],

@@ -1,0 +1,300 @@
+{
+  "created": "2026-11-19T07:33:20Z",
+  "round": 2,
+  "rules": {
+    "exploration_slots": 3,
+    "families_enabled": [
+      "mitm2",
+      "ksum3f",
+      "ksum4f",
+      "wsum-b5",
+      "wsum-b8",
+      "wsum-b12",
+      "wsum-b20",
+      "mitmblocked",
+      "mitmbatch",
+      "ksum5f"
+    ],
+    "max_candidates": 5,
+    "n_grid": [
+      0.5,
+      0.7,
+      0.85,
+      1.2,
+      1.4,
+      2.0
+    ]
+  },
+  "schema": "ic_autolab.panel/v1",
+  "sizes": {
+    "20": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=4",
+            "family": "wsum-b5",
+            "n": 4,
+            "name": "wsum-b5-n4",
+            "oracle": "wsum:coef=5,free=1"
+          },
+          "reason": "incumbent neighbourhood: N = 1.2 x 3"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=56",
+            "family": "mitm2",
+            "n": 56,
+            "name": "mitm2-n56",
+            "oracle": "mitm:negation_folded=1"
+          },
+          "reason": "cross-size transfer: mitm2 is incumbent at 3 sizes; ln N fitted on log2 r (slope 0.210) and extrapolated"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b8",
+            "n": 3,
+            "name": "wsum-b8-n3",
+            "oracle": "wsum:coef=8,free=1"
+          },
+          "reason": "exploration: family wsum-b8 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b12",
+            "n": 3,
+            "name": "wsum-b12-n3",
+            "oracle": "wsum:coef=12,free=1"
+          },
+          "reason": "exploration: family wsum-b12 untried at k = 20, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b20",
+            "n": 3,
+            "name": "wsum-b20-n3",
+            "oracle": "wsum:coef=20,free=1"
+          },
+          "reason": "exploration: family wsum-b20 untried at k = 20, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-abscissa:size=3",
+        "family": "wsum-b5",
+        "n": 3,
+        "name": "wsum-b5-n3",
+        "oracle": "wsum:coef=5,free=1"
+      },
+      "incumbent_s": [
+        4.4793740043663615,
+        5.010152891580556,
+        9.787162876508305
+      ],
+      "tried_before": 5
+    },
+    "24": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=224",
+            "family": "mitm2",
+            "n": 224,
+            "name": "mitm2-n224",
+            "oracle": "mitm:negation_folded=1"
+          },
+          "reason": "incumbent neighbourhood: N = 1.4 x 160"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=112",
+            "family": "mitm2",
+            "n": 112,
+            "name": "mitm2-n112",
+            "oracle": "mitm:negation_folded=1"
+          },
+          "reason": "incumbent neighbourhood: N = 0.7 x 160"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b8",
+            "n": 3,
+            "name": "wsum-b8-n3",
+            "oracle": "wsum:coef=8,free=1"
+          },
+          "reason": "exploration: family wsum-b8 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b12",
+            "n": 3,
+            "name": "wsum-b12-n3",
+            "oracle": "wsum:coef=12,free=1"
+          },
+          "reason": "exploration: family wsum-b12 untried at k = 24, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b20",
+            "n": 3,
+            "name": "wsum-b20-n3",
+            "oracle": "wsum:coef=20,free=1"
+          },
+          "reason": "exploration: family wsum-b20 untried at k = 24, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-abscissa:size=160",
+        "family": "mitm2",
+        "n": 160,
+        "name": "mitm2-n160",
+        "oracle": "mitm:negation_folded=1"
+      },
+      "incumbent_s": [
+        13.300198,
+        15.250145,
+        32.799672
+      ],
+      "tried_before": 6
+    },
+    "28": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=291",
+            "family": "mitm2",
+            "n": 291,
+            "name": "mitm2-n291",
+            "oracle": "mitm:negation_folded=1"
+          },
+          "reason": "incumbent neighbourhood: N = 0.85 x 342"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=410",
+            "family": "mitm2",
+            "n": 410,
+            "name": "mitm2-n410",
+            "oracle": "mitm:negation_folded=1"
+          },
+          "reason": "incumbent neighbourhood: N = 1.2 x 342"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b8",
+            "n": 3,
+            "name": "wsum-b8-n3",
+            "oracle": "wsum:coef=8,free=1"
+          },
+          "reason": "exploration: family wsum-b8 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b12",
+            "n": 3,
+            "name": "wsum-b12-n3",
+            "oracle": "wsum:coef=12,free=1"
+          },
+          "reason": "exploration: family wsum-b12 untried at k = 28, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b20",
+            "n": 3,
+            "name": "wsum-b20-n3",
+            "oracle": "wsum:coef=20,free=1"
+          },
+          "reason": "exploration: family wsum-b20 untried at k = 28, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-abscissa:size=342",
+        "family": "mitm2",
+        "n": 342,
+        "name": "mitm2-n342",
+        "oracle": "mitm:negation_folded=1"
+      },
+      "incumbent_s": [
+        19.309196595567933,
+        22.425800050990574,
+        50.475231149794325
+      ],
+      "tried_before": 5
+    },
+    "32": {
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=689",
+            "family": "mitm2",
+            "n": 689,
+            "name": "mitm2-n689",
+            "oracle": "mitm:negation_folded=1"
+          },
+          "reason": "incumbent neighbourhood: N = 0.85 x 810"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=972",
+            "family": "mitm2",
+            "n": 972,
+            "name": "mitm2-n972",
+            "oracle": "mitm:negation_folded=1"
+          },
+          "reason": "incumbent neighbourhood: N = 1.2 x 810"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b8",
+            "n": 3,
+            "name": "wsum-b8-n3",
+            "oracle": "wsum:coef=8,free=1"
+          },
+          "reason": "exploration: family wsum-b8 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b12",
+            "n": 3,
+            "name": "wsum-b12-n3",
+            "oracle": "wsum:coef=12,free=1"
+          },
+          "reason": "exploration: family wsum-b12 untried at k = 32, N = 0.0001 x N_a"
+        },
+        {
+          "arm": {
+            "factor_base": "prime-abscissa:size=3",
+            "family": "wsum-b20",
+            "n": 3,
+            "name": "wsum-b20-n3",
+            "oracle": "wsum:coef=20,free=1"
+          },
+          "reason": "exploration: family wsum-b20 untried at k = 32, N = 0.0001 x N_a"
+        }
+      ],
+      "incumbent": {
+        "factor_base": "prime-abscissa:size=810",
+        "family": "mitm2",
+        "n": 810,
+        "name": "mitm2-n810",
+        "oracle": "mitm:negation_folded=1"
+      },
+      "incumbent_s": [
+        29.238800058679672,
+        33.96969919057273,
+        76.54779137761024
+      ],
+      "tried_before": 5
+    }
+  },
+  "track": "multibase"
+}

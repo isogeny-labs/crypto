@@ -1,0 +1,7 @@
+map_sub.{u_7, u_8, u_9} {G : Type u_7} {H : Type u_8} {F : Type u_9} [FunLike F G H] [AddGroup G] [SubtractionMonoid H]
+  [AddMonoidHomClass F G H] (f : F) (a b : G) : f (a - b) = f a - f b
+map_add.{u_4, u_5, u_9} {M : Type u_4} {N : Type u_5} {F : Type u_9} [Add M] [Add N] [FunLike F M N] [AddHomClass F M N]
+  (f : F) (x y : M) : f (x + y) = f x + f y
+sub_eq_zero.{u_3} {G : Type u_3} [AddGroup G] {a b : G} : a - b = 0 ↔ a = b
+'map_sub' depends on axioms: [propext, Classical.choice, Quot.sound]
+'map_add' does not depend on any axioms

@@ -1,0 +1,13 @@
+digraph History {
+  graph [rankdir=LR, bgcolor="white", nodesep=0.24, ranksep=0.35];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, fillcolor="#edf2f6"];
+  edge [fontname="Helvetica", fontsize=8];
+  actual [label="Actual Rust call histories\npath extraction still open", fillcolor="#fff0d6"];
+  supplied [label="Supplied finite numeric history\nexact recurrence + shrink\ninitial bounds + exponent cap"];
+  inherited [label="Inherited precision\np(d) <= 81 s 2^A\nchecked finite-history proof", fillcolor="#e0f0e4"];
+  dimensions [label="Current dimensions\nactive valuation + comparison\ntwo absorption conditions", fillcolor="#fff0d6"];
+  sharp [label="Composed sharp bound\nu p(d+1) <= 34 M D\nchecked; 8 instance controls", fillcolor="#e0f0e4"];
+  cost [label="Full counter/solver cost\nsource guards, allocation,\nmode and bit-work still open", fillcolor="#fff0d6"];
+  actual -> supplied [style=dashed]; supplied -> inherited; inherited -> sharp; dimensions -> sharp;
+  sharp -> cost [label="remaining bridges"];
+}

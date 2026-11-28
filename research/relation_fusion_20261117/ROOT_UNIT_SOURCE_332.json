@@ -1,0 +1,23 @@
+{
+  "schema": "actual-root-unit-build-source/v1",
+  "runtime_source_context": "FLAT_ROOT_SOURCE_322.json",
+  "runtime_source_pins_unchanged": true,
+  "command": "cargo test --release --locked --manifest-path Cargo.toml --lib --no-run",
+  "environment": {
+    "CARGO_PROFILE_RELEASE_OPT_LEVEL": "0",
+    "CARGO_PROFILE_RELEASE_LTO": "off",
+    "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "16",
+    "CARGO_BUILD_JOBS": "1",
+    "CARGO_TARGET_DIR": "/workspace/crypto-root-unoptimized-181",
+    "RAYON_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "RUST_TEST_THREADS": "1"
+  },
+  "affinity": "CPU0",
+  "features": "root default features, including redis-native-tls and jemalloc; distinct from default-features=false native matrix322",
+  "scope": "Actual root unit-test compiler target, preserving crate-private relationships and every original test; no runtime outcome yet. Resource-controlled opt0/no-LTO correctness build, never performance.",
+  "old_partial_unit165_unchanged": true,
+  "recorded_before_build": true,
+  "performance_claim": false
+}

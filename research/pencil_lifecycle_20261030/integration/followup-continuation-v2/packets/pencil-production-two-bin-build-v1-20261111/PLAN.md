@@ -1,0 +1,9 @@
+# Bounded production build: ecbench and retained exporter
+
+Build only ecbench and ecbench_retained_attempt_export_v4 from the exact 4500-file source image in exporter-v4-qualification-v3-20261111. Sourcearchive3f1c7e0647242589507e6afa82d2125ba66325891157f1ee4230143842a76464 and sourceinventory4210f7425d1042296f17a635a523f3bd3cd11ade343f6af46700ab813b4ceb0a are unchanged. No algorithm, target, control, test, enrollment or scientific protocol changes. [pcc:unverified]
+
+Reuse the existing durable launcher, cache-mode-preserving materializer and containment. Fresh workspace, unit and durable-output names prevent reuse of earlier attempts. The cache inventory remains2165regular files including82executables; exactfrozen modes are preserved beforefsync. Allcopy/hash/offlinelockgeneration/build work remains within1800seconds. The inherited600second post-build allowance is used only for binary/source custody and receipts; neither executable is invoked. Total2400seconds,2CPU16GiB,zero swap,oneattempt,noautoretry,oneactivepayload,absolute deadline2026-11-11T12:00:00Z. [pcc:unverified]
+
+Actualadmission requires exactpassed combinedqualification and exporter11control workerreceipts, plus exporter materialization receipt binding the same4500-file source digest. The worker writes production-build-info.json with bothactualELF paths,hashes,bytes,modes,sourcepaths,generatedlock and sourceidentity, then rechecks inputs. Binaries remain in the privatecache for the coordinator to retain/publish; this step creates no runtimeimage and submits no scientificjob. [pcc:unverified]
+
+Currentledger,livelease,publication and receiptpins remain null. This is a prospective source draft, not launch authority. Rootpublishes source and independentreview before binding actualterminal accounting and releasing one bounded attempt. [pcc:unverified]

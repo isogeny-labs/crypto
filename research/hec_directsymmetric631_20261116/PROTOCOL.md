@@ -1,0 +1,7 @@
+# Direct symmetric inverse construction
+
+Build the section polynomials directly in the six graph coefficients u0,u1,u2,v0,v1,v2, not from a solved ordered parametrization. In the universal cubic algebra x³+u2x²+u1x+u0=0, reduce each section numerator at y=v0+v1x+v2x². Compute symmetric threefold tensors with trace polarization tr(a)tr(b)tr(c)-tr(ab)tr(c)-tr(ac)tr(b)-tr(bc)tr(a)+2tr(abc). Combine with the fresh target section coefficients.
+
+Emit three curve remainder equations, seven projective section equations, saturation w*h0=1 and t=u0. This generic chart excludes raw-section base zeros. It does not claim full repeated-support/base-cancellation coverage. Target vectors only; no old eliminant, divisor representatives or quadratic certificates are generation inputs. The initial gate is symbolic production, not solution/equivalence. Subsequent independent substitution at known positive graph divisors and existing full inverse algebra must check the formula before accepting any solver output.
+
+Bound each polynomial multiplication to20million input term pairs; retain cap failure without raising it. Freeze source/dependencies/inputs/binary and checkpoint/gate before once-only production on D1. Do not execute B until D1production and subsequent controls are assessed. No timing, novelty, generic degree or10xclaim. Shared corpus search found no directly applicable construction certificate; trace polarization already exists in the repository numerical evaluator, so this is a proposed symbolic formulation rather than a novelty assertion.

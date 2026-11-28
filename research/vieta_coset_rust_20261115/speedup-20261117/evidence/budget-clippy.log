@@ -1,0 +1,22 @@
+    Checking typenum v1.20.1
+    Checking num-traits v0.2.19
+    Checking serde_core v1.0.229
+    Checking zmij v1.0.23
+   Compiling vieta-fiber-budget-lab v0.1.0 (/workspace/crypto-vieta-speedup/research/vieta_coset_rust_20261115/speedup-20261117/fiber-budget)
+error: module has the same name as its containing module
+ --> ../fiber-scale/build.rs:1:1
+  |
+1 | / mod original {
+2 | |     include!("../fiber/build.rs");
+3 | |     pub fn generate() {
+4 | |         main();
+5 | |     }
+6 | | }
+  | |_^
+  |
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#module_inception
+  = note: `-D clippy::module-inception` implied by `-D warnings`
+  = help: to override `-D warnings` add `#[allow(clippy::module_inception)]`
+
+error: could not compile `vieta-fiber-budget-lab` (build script) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

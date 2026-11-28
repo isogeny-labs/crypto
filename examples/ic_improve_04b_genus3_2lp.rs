@@ -787,15 +787,37 @@ fn kdivrem(k: &Fk, a: &KP, b: &KP) -> (KP, KP) {
     }
     (ktrim(qt), ktrim(r))
 }
-fn kgcd(k: &Fk, a: &KP, b: &KP) -> KP {
-    let (mut x, mut y) = (a.clone(), b.clone());
-    while !y.is_empty() {
-        let r = kdivrem(k, &x, &y).1;
-        x = y;
-        y = r;
+/// `F_{q^3}` as a coefficient field of the shared polynomial GCD.
+struct KField3<'a, 'b>(&'b Fk<'a>);
+
+impl crypto_lib::gcd::poly::PolyField for KField3<'_, '_> {
+    type E = K3;
+    fn zero(&self) -> K3 {
+        K3([0, 0, 0])
     }
-    let li = k.inv(*x.last().unwrap());
-    kscale(k, &x, li)
+    fn one(&self) -> K3 {
+        K3([1, 0, 0])
+    }
+    fn add(&self, a: K3, b: K3) -> K3 {
+        self.0.add(a, b)
+    }
+    fn sub(&self, a: K3, b: K3) -> K3 {
+        self.0.sub(a, b)
+    }
+    fn mul(&self, a: K3, b: K3) -> K3 {
+        self.0.mul(a, b)
+    }
+    fn inv(&self, a: K3) -> K3 {
+        self.0.inv(a)
+    }
+}
+
+fn kgcd(k: &Fk, a: &KP, b: &KP) -> KP {
+    // Monic gcd through the shared module (construction only, not in a
+    // counted window); panics like the old body when both inputs are zero.
+    let g = crypto_lib::gcd::poly::gcd(&KField3(k), a, b);
+    assert!(!g.is_empty(), "kgcd of two zero polynomials");
+    g
 }
 
 // ------------------------------------------------------------------ the GHS m = 3, r = 5 hyperelliptic cover (T-2463 construction)

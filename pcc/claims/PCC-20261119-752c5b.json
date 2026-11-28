@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T05:43:18Z",
+ "id": "PCC-20261119-752c5b",
+ "kind": "theorem",
+ "producer": {
+  "commit": "f7c592e225884de304b42dae0f5ea80f3c91f0d3",
+  "model": "Codex",
+  "session": "semaev-algebraic-contradiction-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "5f402d52e312945b80298b223dafbb0cc790c37831c495f80c73dfd39eec01aa",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.algebraic_ne_const_mul_transcendental"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This checks the corrected final contradiction in Lemma N'. It does not prove that a torsion point's coordinates are algebraic over the constant field.",
+ "statement": "An element algebraic over a constant field cannot equal a nonzero constant multiple of an element transcendental over that field."
+}

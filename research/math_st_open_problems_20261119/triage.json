@@ -1,0 +1,289 @@
+{
+ "schema": "math-st-triage/v1",
+ "source": "isogeny-labs/knowledge imports/math-st/index.json (upstream math-street/math-st f631bccdb19945a90e92bab6fc11c00c4ec841f5)",
+ "date": "2026-11-19",
+ "scale": {
+  "tractability": "1 low, 2 med, 3 high (hours-to-days attack exists)",
+  "relevance": "0 none, 1 low, 2 med, 3 high, to IC speedups or non-generic ECDLP"
+ },
+ "items": [
+  {
+   "id": "P1.2/Q004",
+   "tract": 2,
+   "rel": 2,
+   "verdict": "ATTACK-NOW",
+   "attack": "Coppersmith/Howgrave-Graham small roots of S3,S4 mod p; max alpha with |x_i|<=p^alpha vs counting threshold 1/(m-1)",
+   "kill": "alpha_max < 0.6 x threshold as lattice dimension grows"
+  },
+  {
+   "id": "P2.3",
+   "tract": 3,
+   "rel": 2,
+   "verdict": "ATTACK-NOW",
+   "attack": "exact max trinomial root count R(n,d)=max #roots of a+bX+cX^d in F_n, all d, toy n<=2^20; compare with gcd(d,n-1), gcd(d,n+1)",
+   "kill": "R(n,d)=O(gcd(d,n-1)) off the known divisor cases"
+  },
+  {
+   "id": "P5.2/Q025",
+   "tract": 3,
+   "rel": 2,
+   "verdict": "ATTACK-NOW",
+   "attack": "reduce orbit-collision detection to the power-residue character of log(P); GGM lower bound for that character",
+   "kill": "GGM bound Omega(sqrt(eps r)) holds -> close Q025"
+  },
+  {
+   "id": "P1.6/Q018",
+   "tract": 3,
+   "rel": 1,
+   "verdict": "ATTACK-LATER",
+   "attack": "p=17 Experiment A under 2-3 explicit samplers, certified regulator test",
+   "kill": "rates spread >3x across samplers -> published count is sampler-specific"
+  },
+  {
+   "id": "P3.3/Q099",
+   "tract": 2,
+   "rel": 1,
+   "verdict": "ATTACK-LATER",
+   "attack": "min l^e/p vs bits (counting baseline), then KLPT vs exact optimum",
+   "kill": "min l^e/p ~ constant -> gap is counting"
+  },
+  {
+   "id": "P3.3",
+   "tract": 2,
+   "rel": 1,
+   "verdict": "ATTACK-LATER",
+   "note": "mis-posed: unconstrained sqrt(p) is a 4-dim SVP (trivial); l-power norm sqrt(p) is impossible by counting (~p/12 classes); real gap is p vs KLPT p^3-p^3.5"
+  },
+  {
+   "id": "P1.4",
+   "tract": 2,
+   "rel": 1,
+   "verdict": "RECORD-ONLY",
+   "note": "GHS useless on ECC2K-130: ord_131(2)=130 (checked), b=1 gives m=1"
+  },
+  {
+   "id": "P1.4/Q002",
+   "tract": 3,
+   "rel": 1,
+   "verdict": "RECORD-ONLY",
+   "note": "teaching fixture only; explicit m=2,3 models are in the literature"
+  },
+  {
+   "id": "P1.4/Q003",
+   "tract": 1,
+   "rel": 1,
+   "verdict": "RECORD-ONLY",
+   "note": "answered by known Gaudry/Enge-Gaudry/Diem complexities; 2^8-size groups cannot show asymptotics"
+  },
+  {
+   "id": "P1.1",
+   "tract": 3,
+   "rel": 1,
+   "verdict": "RECORD-ONLY",
+   "note": "free-coordinate model is vacuous on prime fields; GHS row is outside the problem"
+  },
+  {
+   "id": "P1.5",
+   "tract": 1,
+   "rel": 3,
+   "verdict": "RECORD-ONLY",
+   "note": "SG-39 is a breakthrough-level transfer; read A033-A049 as a dead-route list"
+  },
+  {
+   "id": "P1.5/Q004",
+   "tract": 1,
+   "rel": 3,
+   "verdict": "RECORD-ONLY",
+   "note": "duplicate of SG-39"
+  },
+  {
+   "id": "P1.6",
+   "tract": 2,
+   "rel": 1,
+   "verdict": "RECORD-ONLY",
+   "note": "literal bound trivially false (choose a6 through the point); xedni failure known since JKSST 2000"
+  },
+  {
+   "id": "P1.6/Q008",
+   "tract": 3,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "bibliographic"
+  },
+  {
+   "id": "P1.2/Q002",
+   "tract": 3,
+   "rel": 1,
+   "verdict": "RECORD-ONLY",
+   "note": "circular: decomposition over reduced lifts is a multi-dimensional ECDLP in E(F_p)"
+  },
+  {
+   "id": "P1.2/Q003",
+   "tract": 3,
+   "rel": 1,
+   "verdict": "RECORD-ONLY",
+   "note": "specification choice; Variant S linear algebra ~p, worse than rho"
+  },
+  {
+   "id": "P2.1",
+   "tract": 1,
+   "rel": 1,
+   "verdict": "RECORD-ONLY",
+   "note": "SCM condition heuristically false: polylog discriminants vs smoothness probability r^(-1/C)"
+  },
+  {
+   "id": "P2.1/Q005",
+   "tract": 1,
+   "rel": 1,
+   "verdict": "RECORD-ONLY",
+   "note": "same as P2.1"
+  },
+  {
+   "id": "P2.2",
+   "tract": 2,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "q-type assumption separations; not ECDLP"
+  },
+  {
+   "id": "P2.2/Q003",
+   "tract": 2,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "same"
+  },
+  {
+   "id": "P3.1",
+   "tract": 2,
+   "rel": 1,
+   "verdict": "RECORD-ONLY",
+   "note": "check Herledan Le Merdy-Wesolowski 2025 (unconditional foundations) first; may be solved"
+  },
+  {
+   "id": "P3.2",
+   "tract": 1,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "quantum CSIDH constant; query complexity ~Theta(log N) already"
+  },
+  {
+   "id": "P3.2/Q012",
+   "tract": 1,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "mis-posed in the query model"
+  },
+  {
+   "id": "P3.2/Q013",
+   "tract": 2,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "reproduce published simulator table"
+  },
+  {
+   "id": "P3.4",
+   "tract": 1,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "no attack model fixed"
+  },
+  {
+   "id": "P3.4/Q011",
+   "tract": 1,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "ill-posed"
+  },
+  {
+   "id": "P4.2",
+   "tract": 2,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "SNARK cycles; Magma-dependent closures"
+  },
+  {
+   "id": "P4.2/Q010",
+   "tract": 3,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "rho<2 automatic by Hasse for prime-order cycles"
+  },
+  {
+   "id": "P4.3",
+   "tract": 1,
+   "rel": 1,
+   "verdict": "RECORD-ONLY",
+   "note": "rigorous L(1/3) unknown even for prime fields"
+  },
+  {
+   "id": "P4.3/Q016",
+   "tract": 1,
+   "rel": 1,
+   "verdict": "RECORD-ONLY",
+   "note": "same"
+  },
+  {
+   "id": "P4.3/Q017",
+   "tract": 1,
+   "rel": 1,
+   "verdict": "RECORD-ONLY",
+   "note": "same"
+  },
+  {
+   "id": "P4.1/Q027",
+   "tract": 1,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "ask the authors"
+  },
+  {
+   "id": "P5.1",
+   "tract": 1,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "Koblitz conjecture (curves over Q, not Koblitz binary curves); parity barrier"
+  },
+  {
+   "id": "P5.1/Q026",
+   "tract": 1,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "same"
+  },
+  {
+   "id": "P5.2",
+   "tract": 1,
+   "rel": 2,
+   "verdict": "RECORD-ONLY",
+   "note": "famous open; validated speedups are Duursma-Gaudry-Morain 1999"
+  },
+  {
+   "id": "P5.3/Q014",
+   "tract": 1,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "archival"
+  },
+  {
+   "id": "P5.4",
+   "tract": 2,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "hash-to-curve engineering"
+  },
+  {
+   "id": "P5.4/Q012",
+   "tract": 3,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "sqrt_ratio zero-numerator fault needs rational 2-torsion; check RFC errata; filing is the owner's call"
+  },
+  {
+   "id": "P5.4/Q021",
+   "tract": 1,
+   "rel": 0,
+   "verdict": "RECORD-ONLY",
+   "note": "no arithmetic model fixed"
+  }
+ ]
+}

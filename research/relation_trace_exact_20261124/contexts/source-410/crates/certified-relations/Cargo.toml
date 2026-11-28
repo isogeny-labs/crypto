@@ -1,0 +1,17 @@
+[package]
+name = "certified-relations"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.87"
+publish = false
+description = "Exact certified polynomial relations, bounded degree traces and quotient bases"
+
+[workspace]
+
+[features]
+count-field-ops = []
+scale-screen = []
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

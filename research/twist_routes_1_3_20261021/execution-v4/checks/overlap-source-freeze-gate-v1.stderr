@@ -1,0 +1,10 @@
+checkpoint gate: a resume checkpoint must be in S3 before an experiment runs.
+  - .resume/RESUME.md section '## Goal' is missing or empty
+  - .resume/RESUME.md section '## Lead / hypothesis' is missing or empty
+  - .resume/RESUME.md section '## Spec' is missing or empty
+  - .resume/RESUME.md section '## State' is missing or empty
+  - .resume/RESUME.md section '## Next steps' is missing or empty
+  - .resume/RESUME.md section '## Runs in flight' is missing or empty
+  - .resume/RESUME.md section '## Stop and success conditions' is missing or empty
+Fill in .resume/RESUME.md (scripts/checkpoint.sh init writes the template) so a fresh
+session could resume from it alone, then re-run. The checkpoint is pushed automatically.

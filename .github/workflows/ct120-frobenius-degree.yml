@@ -1,0 +1,36 @@
+name: CT120 Frobenius extension-degree and sparsity gate
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct120/**'
+      - '.github/workflows/ct120-frobenius-degree.yml'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct120/**'
+      - '.github/workflows/ct120-frobenius-degree.yml'
+  workflow_dispatch:
+jobs:
+  ct120:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          sparse-checkout: |
+            research/cross_characteristic_global_torsion_20261112/ct120
+      - name: Independent matrix-order and field-degree tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct120
+          python3 -B "$D/ct120_frob_degree.py" >/tmp/ct120-py.json
+          python3 -O -B "$D/ct120_frob_degree.py" >/tmp/ct120-pyo.json
+          node "$D/ct120_frob_degree_independent.js" >/tmp/ct120-js.json
+          node --no-opt "$D/ct120_frob_degree_independent.js" >/tmp/ct120-jso.json
+          cmp /tmp/ct120-py.json /tmp/ct120-pyo.json
+          cmp /tmp/ct120-py.json /tmp/ct120-js.json
+          cmp /tmp/ct120-py.json /tmp/ct120-jso.json
+          printf '%s  %s\n' b795557375a74fc2aa090e1c92f72484573c67a30df6e466957efadfd76e7d5b /tmp/ct120-py.json | sha256sum -c

@@ -1,0 +1,167 @@
+{
+  "schema": "native-precision-qualification/v1",
+  "scope": "Std scalar model and mathematical controls; no solver/performance experiment",
+  "shared_commit": "3e47fb776a4eb5231de4c8aad2bb6e756c2f89a1",
+  "shared_git_blob": "42ed02cde305b5df5c8145cff3e83df653580831",
+  "core_source_sha256": "92e4300c71c4b1570ab193df4de22fe31b04a9d7ca0f0212191169555951989a",
+  "declaration_sha256": "72b48b96db59bc71d059360987abec830ef5c8019625d01758dbd3ba1e7034c1",
+  "lean_version": "4.35.0",
+  "kernel_commit": "eb6cafb7290e8bd5f2937522d8d804f58f02bafc",
+  "kernel_sha256": "bf8d54e4714cc4b03d3f6bb34c83b7202b87e49c8bfcbff6895c085bb90ceb38",
+  "native_gate_sha256": "2fe88bb302db587bbb6ede217fc646cf8fa35f9b9a2980e4a15dae273b8df6eb",
+  "native_auditor_sha256": "cae6856e24a91aeb7b123eb189cd40e3bd2672fb9b75f7d0b213b46b9cdbfe6d",
+  "phases": [
+    {
+      "label": "01-gate-probe",
+      "exit_code": 1,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14494154752,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "5aca61df453aa19169e8331fe1d11bb1273bf9fa8852e966c378e0d3a2bba8c8"
+    },
+    {
+      "label": "01b-gate-probe-root",
+      "exit_code": 134,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14589358080,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "48bc2200174632932b9ea98fd0a0c30e6dc353ce535531045f1c7efc7b79940a"
+    },
+    {
+      "label": "01c-rational-gate-probe",
+      "exit_code": 134,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14531309568,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "48bc2200174632932b9ea98fd0a0c30e6dc353ce535531045f1c7efc7b79940a"
+    },
+    {
+      "label": "01d-rational-probe-physical-guard",
+      "exit_code": 1,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14586040320,
+      "stdout_sha256": "a8c790ab259eda0c14e7b7f39f4777258723e5cd5809e21ef559b5c90e48a383",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "01e-explicit-assembly-probe",
+      "exit_code": 1,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14588346368,
+      "stdout_sha256": "7df01d08c24968adb12f65b27410b0e8274d03669e9b296d6928394370da9389",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "01f-complete-assembly-imports",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14589771776,
+      "stdout_sha256": "079f415b9cad84e4a167364356110519263f0b4d791d6d897f5f57b78085e4d0",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "02-std-floor-probe",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14486810624,
+      "stdout_sha256": "c3c2b118940ccb6924a68fd011ff39a322e684efcc29aab8631875a5aa4a7b11",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "03-shared-scalar-law",
+      "exit_code": 1,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14498615296,
+      "stdout_sha256": "97c86d74083e7d4b899d3722c1abea1ce1271079915b0a3c86b1ed657d3f808f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "03b-canonical-scalar-law",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14502764544,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "03c-core-increment-and-scalar",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14497193984,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "04-scalar-premise-controls",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14482640896,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "05-theorem-axioms",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14469644288,
+      "stdout_sha256": "f4609f23f8940f2ce2fa81d960cc54637b7f79bdee79090fa37a11a53f213efa",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "06-pcc-lean-verifier",
+      "exit_code": 143,
+      "physical_stop": 1,
+      "peak_whole_cgroup_bytes": 15044296704,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "07-pcc-verifier-after-cache-compaction",
+      "exit_code": 143,
+      "physical_stop": 1,
+      "peak_whole_cgroup_bytes": 15032705024,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "08-bounded-external-cache-compaction",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14767620096,
+      "stdout_sha256": "22d969a1b3b393a260e4fc950835f0c80fb3bf43bead4dc65205fbb7d4bc02ae",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "09-pcc-verifier-after-bounded-cache-compaction",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14011281408,
+      "stdout_sha256": "2d73121ed73a4fecec0abafde08649e08985a82c06b563933985317fb6156863",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "10-native-controls-gate",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13992992768,
+      "stdout_sha256": "4104f346dd1184a7fbcd4472028568ae10de6ced8dee3f65682669b774c8877f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "flow": {
+    "shared_statements": 3,
+    "controls_planned": 7,
+    "controls_compiled": 7,
+    "controls_gate_passed": 7,
+    "controls_excluded": 0,
+    "axiom_queries": 10,
+    "solver_executions": 0
+  },
+  "local_theorem_verifier": "pass",
+  "local_controls_gate": "pass",
+  "signed_pcc_standing": "unverified",
+  "full_history_formalization": "open",
+  "S3_used": false,
+  "extra_external_spend_usd": 0,
+  "scientific_experiment": false
+}

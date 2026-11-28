@@ -1,0 +1,32 @@
+{
+  "schema": "shared-s3-full-library-dispatch-plan/v1",
+  "status": "prepared_not_launched",
+  "repository": "isogeny-labs/crypto",
+  "workflow": ".github/workflows/rust-all-targets.yml",
+  "workflow_ref": "main",
+  "reviewed_workflow_blob_sha": "8e30574f3f14a006c3500ea86f74d1e24984bdef",
+  "latest_main_workflow_matches_reviewed_definition": true,
+  "inputs": {
+    "full_library": true,
+    "source_revision": "2b1a5722dbad5ff881f6695d0cd934bc8c1fa85a"
+  },
+  "job": "full-library / Native full library (manual)",
+  "runner": "ubuntu-24.04",
+  "rust_toolchain": "1.99.1",
+  "job_timeout_minutes": 130,
+  "build_timeout_minutes": 40,
+  "test_timeout_minutes": 70,
+  "automatic_retries": 0,
+  "required_evidence": [
+    "exact source identity and unchanged-source postcheck",
+    "full release library build exit and test executable hash",
+    "unfiltered library test log with no new ignored tests",
+    "cargo parent exit, log writer exit and completion record",
+    "native-library-RUN_ID-ATTEMPT artifact"
+  ],
+  "access_gap": "Connector lacks dispatch; gh is unauthenticated; browser requires sign-in",
+  "run_id": null,
+  "full_library_gate_passed": false,
+  "performance_run": false,
+  "runner_caps_changed": false
+}

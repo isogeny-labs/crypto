@@ -1,0 +1,75 @@
+{
+  "schema": "rho-twochoice-verification/v1",
+  "source_commit": "ab295a2af6eafaf5bb878293ce43773f727df423",
+  "claim_id": "PCC-20261115-db512a",
+  "declaration_sha256": "ce864beb518e06e523e89e965cc96ef0d00e05836cae76e1e4d229659cb0d339",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 32,
+  "gate_declarations": 70,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 245,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-db512a",
+    "claim_sha256": "f87987f17f534f9f914797618f1f15ef97f183260569419ce82bf67ffe642ce6",
+    "commit": "ab295a2af6eafaf5bb878293ce43773f727df423",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/rho_twochoice_collision_audit_20261115/lean (TwoChoiceCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T16:05:42Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-db512a",
+    "claim_sha256": "f87987f17f534f9f914797618f1f15ef97f183260569419ce82bf67ffe642ce6",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 48131,
+    "sha256": "a4c536192bfe552e77a42a4be112910beb620ae22ba49c63a8f13991467b0750",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 70,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_uniform_distinct_support_ensemble": true,
+    "actual_static_hash_first_repeat": true,
+    "nonasymptotic_ensemble_lower_bound": true,
+    "no_uniform_twochoice_sqrt_bound": true,
+    "qualified_large_partition_source_conjecture_refuted": false,
+    "limiting_large_partition_collision_constant": false,
+    "practical_hash_refinement": false,
+    "new_solver_or_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

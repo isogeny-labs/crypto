@@ -1,0 +1,22 @@
+--- a/src/cryptanalysis/ic_framework/mod.rs
++++ b/src/cryptanalysis/ic_framework/mod.rs
+@@ -598,8 +598,11 @@
+             .point_index
+             .values()
+             .any(|&index| index >= fb.points.len())
++        || fb
+             .x_index
++            .values()
+             .flatten()
++            .any(|&index| index >= fb.points.len())
+     {
+         return Err("factor-base plug-in returned inconsistent point/column indexes".into());
+     }
+@@ -610,6 +613,7 @@
+             "a base without its index (lean_layout) needs mitm-frobenius-layout-counted, not {}",
+             oracle.name()
+         ));
++    }
+     let archive_import = base_builder.name() == "archive";
+     if archive_import
+         && matches!(oracle.name(), "mitm-frobenius" | "mitm-frobenius-counted")

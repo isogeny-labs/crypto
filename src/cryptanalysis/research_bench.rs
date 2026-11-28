@@ -588,6 +588,50 @@ pub fn bench_curves_a_minus_3() -> Vec<(u32, CurveParams)> {
             6_655_615,
             16_784_527,
         ),
+        // 28-bit P-256-class rung (p = 268435399 ≡ 3 mod 4).
+        a3(
+            28,
+            "a3-bench-28bit-p256class",
+            268_435_399,
+            3,
+            1,
+            1,
+            268_407_199,
+        ),
+        // 28-bit CryptoPro-B-class rung (p = 268435361 ≡ 1 mod 4).
+        a3(
+            28,
+            "a3-bench-28bit-cryptoproclass",
+            268_435_361,
+            10,
+            1,
+            27_786_607,
+            268_448_867,
+        ),
+        // 32-bit P-256-class rung (p = 2^32 - 5 ≡ 3 mod 4), prime order.
+        // Generator and order verified in the 2026-11-22 pursuit tranche:
+        // [n]G = O with n = 4295072597 prime.
+        a3(
+            32,
+            "a3-bench-32bit-p256class",
+            4_294_967_291,
+            267,
+            1,
+            2_811_385_579,
+            4_295_072_597,
+        ),
+        // 36-bit P-256-class rung (p = 2^36 - 5 ≡ 3 mod 4), prime order.
+        // Found by `examples/find_a3_bench_curves 36` via Hasse-interval
+        // (Mestre) counting; [n]G = O with n = 68719022539 prime.
+        a3(
+            36,
+            "a3-bench-36bit-p256class",
+            68_719_476_731,
+            33,
+            19,
+            72_892_532,
+            68_719_022_539,
+        ),
     ]
 }
 

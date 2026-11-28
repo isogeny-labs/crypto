@@ -1,0 +1,8 @@
+Finset.card_image_of_injective.{u_1, u_2} {α : Type u_1} {β : Type u_2} {f : α → β} [DecidableEq β] (s : Finset α)
+  (H : Function.Injective f) : (Finset.image f s).card = s.card
+Finset.card_image_iff.{u_1, u_2} {α : Type u_1} {β : Type u_2} {s : Finset α} {f : α → β} [DecidableEq β] :
+  (Finset.image f s).card = s.card ↔ Set.InjOn f ↑s
+Fintype.card_fun.{u_1, u_2} {α : Type u_1} {β : Type u_2} [DecidableEq α] [Fintype α] [Fintype β] :
+  Fintype.card (α → β) = Fintype.card β ^ Fintype.card α
+'Lagrange.natDegree_nodal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Lagrange.eval_nodal_not_at_node' depends on axioms: [propext, Classical.choice, Quot.sound]

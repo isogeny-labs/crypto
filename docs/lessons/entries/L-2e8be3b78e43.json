@@ -1,0 +1,14 @@
+{
+  "action": "De-duplicate rows by (instance, arm, seed) before the bootstrap; check 'runs' per cell equals curves x seeds",
+  "created": "2026-11-21T21:01:15Z",
+  "evidence": [
+    "research/genus_ladder_sge_scale_20261115/VALIDATION_REPORT.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "genus-ladder-analysis"
+  ],
+  "trigger": "An arm's rows appear in two input files of genus_ladder_analyze (reused reference rows)",
+  "why": "joined_analysis.json counted the unmerged arm twice; intervals too narrow"
+}

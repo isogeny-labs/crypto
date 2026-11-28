@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T03:39:28Z",
+ "id": "PCC-20261124-f5a76c",
+ "kind": "execution",
+ "producer": {
+  "commit": "655cbc9cb9a68b6a499fe75dabf2804bc3326075",
+  "model": "GPT-6-Astra-Pro",
+  "session": "rr5-coprime-sectors-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_rr5_coprime_sectors_20261123/ROOT_VALIDATION.json",
+    "sha256": "134b67275463d1a3fb6cf81c0c709df70b22d923a1705b2d761c1428be7cff33"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_rr5_coprime_sectors_20261123/evidence/root-library-02/OBSERVATION.json",
+    "sha256": "5bf14092de72b40192ef79d9acc145ad758135f5d9de1a157cadcc25172b00da"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_rr5_coprime_sectors_20261123/evidence/root-library-03/exit-status.txt",
+    "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_rr5_coprime_sectors_20261123/evidence/root-library-03/stderr.txt",
+    "sha256": "b225c41f0388807e265f6dee921f21ecf14c21071c8349bd83fc15d3737f0ec1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_rr5_coprime_sectors_20261123/evidence/root-library-03/source-check-exit.txt",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "M31 RR5 coprime constructor full-root validation custody; no scientific extraction or benchmark",
+ "statement": "Unsigned local full-root validation observations: attempt 01 failed before compilation on an omitted tracked path dependency; attempt 02 lost its session without a terminal receipt and remains censored; after restoring exact tracked inputs, final attempt 03 timed out with exit 124 under its 300-second cap, source integrity check zero, and no root tests executed. Root src and Cargo inputs are unchanged. The standalone 35/8 constructor qualification is separate."
+}

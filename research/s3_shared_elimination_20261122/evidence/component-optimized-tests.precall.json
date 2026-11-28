@@ -1,0 +1,139 @@
+{
+  "schema": "shared-s3-development-precall/v1",
+  "purpose": "optimized arithmetic correctness only",
+  "binary": {
+    "path": "/workspace/scratch/012d3e641737/immutable-qualifiers/component-optimized-tests",
+    "sha256": "1bee27c7625c7b5af59b35d4909982e923ac081c5defe8177de67c1e48cbcea3",
+    "copied_and_read_only": true
+  },
+  "argv": [
+    "component-optimized-tests",
+    "--test-threads=1"
+  ],
+  "cargo_config_override": "profile.release.package.shared-s3-component-qualifier.opt-level=3",
+  "source_head": "38f1467ebee77b6fc507d5539760ff7589880114",
+  "worktree_modified": true,
+  "sources": {
+    "benchmark_executed": false,
+    "cargo_profile": "release",
+    "complete_hermetic_build_manifest": false,
+    "development_profile_only": true,
+    "evidence_status": "build provenance only; test results require a separate receipt; PCC-unverified",
+    "extracted_production_ranges": [
+      {
+        "byte_end_exclusive": 37163,
+        "byte_start_inclusive": 8445,
+        "generated_name": "fp32_backend.rs",
+        "path": "src/cryptanalysis/fp_backend.rs",
+        "pinned_whole_source_sha256": "2722bbf0c1e58a079772af71680aabc514f7354e8b51bb3ed10ca5729a0da0e1",
+        "rewritten": false,
+        "scope": "production imports, PrimeField, generic helpers, and complete Fp32 implementation; no Fp64/wide backends or legacy tests",
+        "selected_bytes": 28718,
+        "selected_sha256": "ede1f0c089ef6d38559c09d4a454cd8a239016ad7fc138bd51fe15b52b2fab49",
+        "selection": "verbatim_byte_range",
+        "whole_source_bytes": 109960,
+        "whole_source_sha256": "2722bbf0c1e58a079772af71680aabc514f7354e8b51bb3ed10ca5729a0da0e1"
+      },
+      {
+        "byte_end_exclusive": 2500,
+        "byte_start_inclusive": 1401,
+        "generated_name": "challenge_prime.rs",
+        "path": "src/cryptanalysis/challenge_ladder.rs",
+        "pinned_whole_source_sha256": "5dd3022fc9fe214b3d8775c55e5b04e5fa306b9442604f99ddd643d2fef7ccf2",
+        "rewritten": false,
+        "scope": "production mulm, powm, and deterministic is_prime_u64 only",
+        "selected_bytes": 1099,
+        "selected_sha256": "3637225cf7a90d3b44a070a1f16fb5efdef7274eb5d2ee2d1778fcd4db7efc98",
+        "selection": "verbatim_byte_range",
+        "whole_source_bytes": 13529,
+        "whole_source_sha256": "5dd3022fc9fe214b3d8775c55e5b04e5fa306b9442604f99ddd643d2fef7ccf2"
+      },
+      {
+        "byte_end_exclusive": 3709,
+        "byte_start_inclusive": 3534,
+        "generated_name": "poly_type.rs",
+        "path": "src/cryptanalysis/f4_fp.rs",
+        "pinned_whole_source_sha256": "3dc5148e0faf82f340480bbde732fb36c37e5abbbfceb56e03e728b9828713c6",
+        "rewritten": false,
+        "scope": "production Poly alias and its documentation only; no F4 solver",
+        "selected_bytes": 175,
+        "selected_sha256": "ff546de567fc3d54c71a428a5b6ecf5e78ba10412e9f2170056cf92bea60b129",
+        "selection": "verbatim_byte_range",
+        "whole_source_bytes": 365261,
+        "whole_source_sha256": "3dc5148e0faf82f340480bbde732fb36c37e5abbbfceb56e03e728b9828713c6"
+      }
+    ],
+    "f4_solver_included": false,
+    "full_root_library_compiled": false,
+    "full_root_library_tests_included": false,
+    "integration_example_included": false,
+    "omitted_from_manifest": [
+      "registry package bodies (their resolved checksums are in Cargo.lock)",
+      "rustc, linker, system libraries, CPU state, and environment flags"
+    ],
+    "opt_level": "3",
+    "schema": "shared-s3-source-component-manifest/v1",
+    "scope": "two new modules and their selected production arithmetic/type dependency closure",
+    "target": "x86_64-unknown-linux-gnu",
+    "whole_files": [
+      {
+        "bytes": 32464,
+        "path": "src/cryptanalysis/exact_modular_matrix.rs",
+        "role": "actual source included in full, including its unit tests",
+        "selection": "whole_file",
+        "sha256": "20a809c6b072bec647b12f3a347c0c8bfb2ddc4f641acaf2e7fb6bc9df7c3b33"
+      },
+      {
+        "bytes": 57393,
+        "path": "src/cryptanalysis/shared_macaulay.rs",
+        "role": "actual source included in full, including its unit tests",
+        "selection": "whole_file",
+        "sha256": "850d424798d33d50d162e437c85a8467aa4b7a69792f973dd176cf1e59063996"
+      },
+      {
+        "bytes": 970,
+        "path": "research/s3_shared_elimination_20261122/qualifier/Cargo.toml",
+        "role": "qualifier dependency and profile configuration",
+        "selection": "whole_file",
+        "sha256": "f8c7cd87b91f4112982092fa74a740436676b92dc95197236e41109fff5ab16a"
+      },
+      {
+        "bytes": 5827,
+        "path": "research/s3_shared_elimination_20261122/qualifier/Cargo.lock",
+        "role": "resolved registry versions and checksums",
+        "selection": "whole_file",
+        "sha256": "998f136fe39d03be5dee3ef8eabd2330131080b8a2e6dc83dda0228fae2a57e5"
+      },
+      {
+        "bytes": 7071,
+        "path": "research/s3_shared_elimination_20261122/qualifier/build.rs",
+        "role": "verbatim source selector and manifest producer",
+        "selection": "whole_file",
+        "sha256": "37503f916d0bb405252ed18d3dba50b63ccfe432533d0784e8cff828c1c140cb"
+      },
+      {
+        "bytes": 670,
+        "path": "research/s3_shared_elimination_20261122/qualifier/src/lib.rs",
+        "role": "qualifier module and manifest entry point",
+        "selection": "whole_file",
+        "sha256": "c399b8337305a7ca893ace3f66d069f25d60d0b304adfec450604f36317fc422"
+      },
+      {
+        "bytes": 668,
+        "path": "research/s3_shared_elimination_20261122/qualifier/src/cryptanalysis.rs",
+        "role": "production module namespace and source include paths",
+        "selection": "whole_file",
+        "sha256": "ca3c1df55c80e635bbb5c9947a602a3db4d11b4ca7010be1f95ea54e2649e5bc"
+      },
+      {
+        "bytes": 82,
+        "path": "research/s3_shared_elimination_20261122/qualifier/src/source_manifest.rs",
+        "role": "manifest output binary; no experiment or timing",
+        "selection": "whole_file",
+        "sha256": "14482cc83e4643f2f740179c9dd473270a4fcc40b5ad5ee51792861d12347bbe"
+      }
+    ]
+  },
+  "performance_measurement": false,
+  "pcc_standing": "unverified"
+}

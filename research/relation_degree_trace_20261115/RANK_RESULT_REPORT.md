@@ -1,0 +1,23 @@
+# Two cheap cubics lower the observed F4 degree
+
+The fixed early-rank study lowers actual Rust F4 degree from5to4 on all three known development dimensions n3/4/6 over F2147483647,seed7. The selector retains two directly certified syzygy cubics; equal-count difference controls add no rank and remain at degree5. All18 complete Rust bases match fresh Singular std/slimgb/msolve bases, and all affine ideals match their dimension-specific star. PCCedfc6c. Producer evidence remains unsigned. [pcc:unverified]
+
+| n | Star F4 degree | Selected F4 degree | Star max rows/columns | Selected max rows/columns | Exported degree4 rank gain |
+|---|---:|---:|---|---|---:|
+|3|5|4|34/37|26/30|8|
+|4|5|4|71/71|26/31|10|
+|6|5|4|136/175|78/73|14|
+
+Each retained cubic has10 polynomial terms,8 original-input proof terms and certificate product degree6. Both selected rows total16 proof terms. The equally counted difference control is not equally sparse:it has16 total polynomial terms and4 proof terms versus selected20/16; exact support/certificate sizes are reported rather than assumed equal. The previously tested quartic route had80-term degree14 certificates and kept F4 degree5 on this grid. This observation supports studying early independent contribution, not sparsity alone. No reduction in discovery-inclusive maximum algebraic degree follows from degree4 F4 matrices:the original-input identities still have product degree6. [pcc:unverified]
+
+All syzygies and both-family arms also reach F4 degree4. The budgeted two-row arm is smaller at n6 (78/73 versus all-syzygies134/95). Affine closure thresholds separately drop5to4. Top-form first vanishing differs:some full syzygy/both systems have finite values within the fixed caps, while the selected n4/n6 systems retain null. Thus the actual solver improvement does not establish an intrinsic regularity decrease or require a finite observed top-form threshold. [pcc:unverified]
+
+Timing remains descriptive. The run contains one full checked F4 call per fixed cell, and prices generation, the bounded build/selection child, candidate construction/verification, exact rank scouting, preparation, fresh Singular identity checking, all3 reference routes and complete solver consumption. The selected n6 checked F4 call is5.616800ms versus star9.576815ms, but build/selection is10.582751ms versus star7.617232ms; all individual full-paid clocks remain in the raw report. Different external-check timings and single calls prevent a confirmed timing gain or15x admission. Earlier cubic-only timing limits in FINAL_REPORT.md remain applicable; this is a degree/matrix component result. [pcc:unverified]
+
+The next hypothesis is to avoid per-input rank scouting with a fixed structural rule. Every selected development result uses candidate ids1and3, the first two pair syzygies. A prospectively frozen first-two rule can construct these identities directly and preserve ideal equality without running the rank selector; exact final checks and a paid fallback policy would still apply. It must be tested against the dynamic selector and stronger existing constructors with matched repeated timing before any speed claim. This is an unmeasured successor, not a fresh-family conclusion. [pcc:unverified]
+
+Method: RANK_BUDGET_PROTOCOL_02.md (PCCd8ef6a) was frozen before data; the original tag-correction subject1d2f7b is retained. Source/config/47test/lint/build and oldn3/matrix/corrupt-rank qualification (PCCe54197/e63246) were published as commit9534b33b before the registered development run. Production algebra and actual-root F4 executable are unchanged. The reporter recomputes every rank decision and identity from raw bytes; no completed basis or witness enters selection.
+
+Sources checked (KB unavailable): original c1/c0 trace and direct construction in README/FOLLOWUP; FINAL_REPORT earlier cubic timing results; cheap.rs and degree4 closure implementation; primary Caminata–Gorla arXiv2112.05579v2 Preliminaries71–83 for the distinction between bounded closure and actual algorithm observations. Known constructions are reused, with no novelty claim.
+
+Flow:18 planned/attempted/completed development cells,0 failed/excluded/replaced,0 contention,unchanged pins. Six oldn3 correctness cells and4 tiny field-rank matrices are separately retained and excluded from development timings. Complete rawarchives, exact sourcebundles, certificate/rank/cost tables and SVG/PNG/PDF accompany PR4349. LocalCPU0/L0/checkpoint waiver/zero cloud spend. Fresh41011/43013/47017 and original conditional reserved19001/23003/29009 remain untouched by this study. Canonical export tooling remains inaccessible/encrypted; no canonical-schema or signed independent validation is asserted.

@@ -1,0 +1,36 @@
+{
+  "namespace": "TheriaultCollisionAudit",
+  "proofs": [
+    {
+      "file": "FiniteUrn.lean",
+      "claim": "Actual source-model counterexample and controls",
+      "main": [
+        "negate_involutive",
+        "negate_fixed_point_free",
+        "same_orbit_iff",
+        "actual_intersection_sum",
+        "actual_expectation",
+        "source_lower_bound_fails"
+      ]
+    },
+    {
+      "file": "RecurrenceBounds.lean",
+      "claim": "Source closedform algebra and repaired bounds with explicit recurrence premise",
+      "main": [
+        "closed_form_lower_fails",
+        "repaired_bounds",
+        "repaired_quadratic_bounds"
+      ]
+    },
+    {
+      "file": "CollisionCertificate.lean",
+      "claim": "Complete closed source-model certificate",
+      "main": [
+        "actual_collision_bound_certificate"
+      ]
+    }
+  ],
+  "local_gate": "18/0failures/0trusted",
+  "signed_standing": "not established",
+  "open": "Generic actual iid recurrence bridge/full paper runtime/Jacobian/subgroup/walk/linear algebra conditions."
+}

@@ -1,0 +1,24 @@
+Second bounded m=3 development correctness verification; failed validation retained.
+No performance measurement or comparison panel.
+
+Command:
+cargo test --offline --manifest-path summation_split/m31_native/Cargo.toml f4::tests::m31_one_preclosed_geometric_system_bounded_development_probe -- --nocapture
+
+Producer source/presentation unchanged, with the same frozen caps recorded in
+f4-verifier-step-limit-initial.txt. Recomputed producer outcome unchanged:
+Complete; nonfixed_basis=30; all561 pairs; ten matrices;
+maximum raw degree6; maximum post-NF matrix-column degree6.
+
+Verifier max_steps was separately corrected from32 F4 matrix batches to2000
+ordinary Buchberger pair steps, per parent instruction. Every other cap stayed
+unchanged, including max_pairs=2000 and max_reductions=20000.
+
+Observed verification: Incomplete(reason="ordinary verification reductions").
+candidate_pairs_checked=561; original_generators_checked=11;
+oracle_pairs_processed=93; candidate_generators_checked=0;
+oracle_basis_len=0 (oracle did not finish).
+
+The assertion requiring Verified failed; cargo exit101. This is retained as a
+second incomplete verification, not a successful independent ideal-equality
+certificate. The producer's ordinary candidate S-pair tests and original-input
+containment passed, but independent reverse containment remains open here.

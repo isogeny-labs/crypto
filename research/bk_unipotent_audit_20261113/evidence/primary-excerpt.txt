@@ -1,0 +1,45 @@
+Theorem 1. Let E be an elliptic curve defined over Fq , and suppose that l is a prime
+that divides N = #E(Fq ) but does not divide q − 1. Then E(Fq k ) contains l 2 points of
+order l if and only if l|(q k − 1).
+
+
+Proof. Necessity is well known, and it does not require the hypotheses l|N , l6 |(q − 1).
+We prove sufficiency. By assumption, E(Fq ) contains a nontrivial point P of order l. If
+l|(q k − 1), then l6 |q, and so E(Fq r ) contains l 2 points of order l for some r . Let Q be an
+Fq r -point such that P, Q form a basis for the Fl -vector space of points of order l. Let 8
+denote the q-Frobenius map on points of E(Fq r ); it is defined by 8(x, y) = (x q , y q ).
+Since 8 acts as an Fl -linear map on the points of order l, and    µ since ¶it fixes P, it follows
+                                                                     1 a
+that in the basis P, Q it is given by a matrix of the form                     (we are using the
+                                                                     0 q
+fact that its determinant is q; of course, q here is regarded as an integer modulo l). By
+Improbability of a Discrete Log Problem under the MOV Algorithm                               143
+
+
+assumption, q 6≡ 1 (mod l). So this Fl -matrix has two distinct eigenvalues, and hence is
+semisimple. Then the matrix of 8k , which has 1’s along the diagonal, is also semisimple,
+and hence it is the identity. That is, Q is defined over Fq k . To put this more explicitly, if we
+replace the basis P, Q by the basis P, Q 0 , where Q 0 = Q µ    +b P with              −1
+                                                                        ¶ b ≡ (q −1) a (mod
+                                                                  1 0
+l), then the matrix of 8 in the basis P, Q 0 is diagonal:                 , and so 8k obviously
+                                                                  0 q
+fixes Q 0 , as well as P. So all the points of order l are defined over Fq k .
+
+
+Remarks. 1. Theorem 1 is false without the condition that l6 |(q − 1), even if we assume
+that l 2 |N . Here is an example when l = 3. The group of F19 -points of the curve Y 2 =
+X 3 + X + 6 is cyclic of order 18. One has to go to F193 to get all nine points of order 3.
+   2. More generally, suppose that l|(q − 1) and one looks at the set of all isomorphism
+classes of elliptic curves E over Fq for which l 2 |#E(Fq ). Using the formulas in [12]
+and standard estimates for the Kronecker class number, one can show that only a small
+proportion of these isomorphism classes (approximately 1 out of l) have l 2 Fq -points of
+order l. (To look at it another way, there is about a 1 out ofµl probability
+                                                                        ¶        that the matrix
+                                                                   1 b
+of 8 in the proof of Theorem 1, which now has the form                    , is semisimple, i.e.,
+                                                                   0 1
+that b = 0.) Most of the elliptic curve groups have cyclic l-part, in which case one has
+to go to Fq l to get all l 2 points of order l. This is in notable contrast with what happens
+when l|N and the smallest k for which l|(q k − 1) is greater than 1; Theorem 1 tells us
+that in that case the l-part of the group of Fq k -points can never be cyclic.

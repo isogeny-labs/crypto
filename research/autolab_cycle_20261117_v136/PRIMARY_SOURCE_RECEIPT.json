@@ -1,0 +1,8 @@
+{
+  "url": "https://github.com/berkeley-abc/abc/blob/5c246cfbdba5590aa252ea598bb9b4294227ce8f/src/aig/gia/giaHash.c",
+  "last_file_commit": "5c246cfbdba5590aa252ea598bb9b4294227ce8f",
+  "excerpt": "int Gia_ManHashXorReal( Gia_Man_t * p, int iLit0, int iLit1 )  \n{ \n    int fCompl = 0;\n    assert( p->fAddStrash == 0 );\n    if ( iLit0 < 2 )\n        return iLit0 ? Abc_LitNot(iLit1) : iLit1;\n    if ( iLit1 < 2 )\n        return iLit1 ? Abc_LitNot(iLit0) : iLit0;\n    if ( iLit0 == iLit1 )\n        return 0;\n    if ( iLit0 == Abc_LitNot(iLit1) )\n        return 1;\n    if ( (p->nObjs & 0xFF) == 0 && 2 * Vec_IntSize(&p->vHTable) < Gia_ManAndNum(p) )\n        Gia_ManHashResize( p );\n    if ( iLit0 < iLit1 )\n        iLit0 ^= iLit1, iLit1 ^= iLit0, iLit0 ^= iLit1;\n    if ( Abc_LitIsCompl(iLit0) )\n        iLit0 = Abc_LitNot(iLit0), fCompl ^= 1;\n    if ( Abc_LitIsCompl(iLit1) )\n        iLit1 = Abc_LitNot(iLit1), fCompl ^= 1;\n    {\n        int *pPlace = Gia_ManHashFind( p, iLit0, iLit1, -1 );\n        if ( *pPlace )\n        {\n            p->nHashHit++;\n            return Abc_Var2Lit( *pPlace, fCompl );\n        }\n        p->nHashMiss++;\n        if ( Vec_IntSize(&p->vHash) < Vec_IntCap(&p->vHash) )\n            *pPlace = Abc_Lit2Var( Gia_ManAppendXorR",
+  "excerpt_sha256": "ab9afd41f60cb17b4d8a6403f0eb791dca9ace92aa3221ad69e792d3dc60b033",
+  "observed": "Gia_ManHashXorReal simplifies XOR constants,equal and complementary literals and uses structural hashing. These are established compiler mechanisms.",
+  "boundary": "This evidence does not establish novelty of affine coefficient normalization or performance of the rootfinding adaptation. The fresh experiment measures the exact substitution on the frozen guarded family."
+}

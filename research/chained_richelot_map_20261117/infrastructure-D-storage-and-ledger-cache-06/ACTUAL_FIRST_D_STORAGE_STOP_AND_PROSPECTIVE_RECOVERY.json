@@ -1,0 +1,13 @@
+{
+  "time": "2026-11-17T08:06:22.886152+00:00",
+  "source": "c0a2f94debb9bd26763ebabb0dda746936fdbdd1",
+  "source_public_exact_readback": true,
+  "first_D_attempt": "scratch preflight fails3039232 < unchanged3145728 bytes",
+  "first_D_compiler_and_arithmetic_calls": 0,
+  "archive_bytes": 1272,
+  "archive_sha256": "1e3832ae7c48cf2103900650cee5c03620ca4b043f969cc9f3360c924f51619c",
+  "whole10_member_byte_mode_equality": true,
+  "cause_observation": "each append-only ledger version stored as a separate compressed loose Git object; preserve bytes and compact duplicate representations",
+  "next": "Git pack only explicitly enumerated historical ledger blobs, verify each full byte from isolated pack, normal prune-packed of owned duplicates; same D source/guards on fresh hold after storage reclaimed",
+  "first_pack_metadata_failure": "pack-objects attempted temporary pack in RAM then rename to runlock: EXDEV; no ledger row/cache prefix changed. Retry via stdout pack stream into owned runlock cache."
+}

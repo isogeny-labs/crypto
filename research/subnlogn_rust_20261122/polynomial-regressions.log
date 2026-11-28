@@ -1,0 +1,39 @@
+Command: cargo test --release --manifest-path isogeny_algos/Cargo.toml --features experimental-subnlogn --test polyfast --test powmod --test ntt --example subnlogn
+Exit status: 0
+Scope: existing polynomial correctness regressions; compiler/test harness durations are not benchmark results.
+
+    Finished `release` profile [optimized] target(s) in 2m 48s
+     Running tests/ntt.rs (isogeny_algos/target/release/build/isogeny_algos/0374b944b126ee87/out/ntt-0374b944b126ee87)
+
+running 4 tests
+test ntt_equals_karatsuba_one_limb ... ok
+test ntt_equals_karatsuba_four_limbs ... ok
+test ntt_equals_karatsuba_two_limbs ... ok
+test ntt_equals_karatsuba_eight_limbs ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.57s
+
+     Running tests/polyfast.rs (isogeny_algos/target/release/build/isogeny_algos/78854bd492845dfd/out/polyfast-78854bd492845dfd)
+
+running 4 tests
+test eval_tree_matches_horner ... ok
+test composer_matches_naive_and_frobenius_powers ... ok
+test fast_poly_and_series_match_reference ... ok
+test ddf_matches_exponentiation_ddf ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.81s
+
+     Running tests/powmod.rs (isogeny_algos/target/release/build/isogeny_algos/7548b6c0d4a4b430/out/powmod-7548b6c0d4a4b430)
+
+running 2 tests
+test barrett_matches_division_eight_limbs ... ok
+test powmod_matches_naive ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 25.89s
+
+     Running unittests examples/subnlogn.rs (isogeny_algos/target/release/build/isogeny_algos/eec9176daad820f5/out/subnlogn-eec9176daad820f5)
+
+running 1 test
+test tests::example_checks_candidate_products_and_auxiliary_restoration ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

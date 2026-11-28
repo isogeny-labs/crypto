@@ -1,0 +1,1 @@
+env PRIME31_ADMISSION_CONTROL_DIR=/home/runner/work/_temp/prime31-group-admission-qualification/controls timeout --signal=TERM --kill-after=5s 60s /home/runner/work/_temp/prime31-group-admission-qualification/executables/prime31_lp_group_admission-tests --nocapture --test-threads=1 

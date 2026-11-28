@@ -1,0 +1,163 @@
+{
+  "schema": "quotient-query-renderer-qa/v1",
+  "scope": "document_layout_and_plotting_of_retained_records_only",
+  "research_computation": false,
+  "performance_measurement": false,
+  "source_report": {
+    "path": "REPORT.md",
+    "sha256": "da88d33def821f66db54eeb0f4cf53a613c572585867c0f47418a14b1eff2916"
+  },
+  "graph_input": {
+    "path": "evidence/producer/attempt1/qualifier.stdout.jsonl",
+    "sha256": "f19a4806299fa117bb24fda0a2da4bf599fe22337ea5732e4dba7763f4d23ef3",
+    "filter": {
+      "kind": "case",
+      "ids": [
+        "prime31-d63-x0-all",
+        "prime31-d63-x0-liftable",
+        "prime31-d63-x1-all",
+        "prime31-d63-x1-liftable",
+        "prime31-d63-x2-all",
+        "prime31-d63-x2-liftable"
+      ]
+    }
+  },
+  "plotted_values": [
+    {
+      "id": "prime31-d63-x0-all",
+      "B": 63,
+      "e": 68,
+      "degree_mass": [
+        [
+          0,
+          68
+        ]
+      ],
+      "support": 0
+    },
+    {
+      "id": "prime31-d63-x0-liftable",
+      "B": 34,
+      "e": 68,
+      "degree_mass": [
+        [
+          0,
+          68
+        ]
+      ],
+      "support": 0
+    },
+    {
+      "id": "prime31-d63-x1-all",
+      "B": 63,
+      "e": 67,
+      "degree_mass": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          66
+        ]
+      ],
+      "support": 133
+    },
+    {
+      "id": "prime31-d63-x1-liftable",
+      "B": 34,
+      "e": 67,
+      "degree_mass": [
+        [
+          1,
+          1
+        ],
+        [
+          2,
+          66
+        ]
+      ],
+      "support": 133
+    },
+    {
+      "id": "prime31-d63-x2-all",
+      "B": 63,
+      "e": 68,
+      "degree_mass": [
+        [
+          0,
+          68
+        ]
+      ],
+      "support": 0
+    },
+    {
+      "id": "prime31-d63-x2-liftable",
+      "B": 34,
+      "e": 68,
+      "degree_mass": [
+        [
+          0,
+          68
+        ]
+      ],
+      "support": 0
+    }
+  ],
+  "renderer_source_sha256": "843e7f7059e97d8b1c7e91e46a6852893eba22a7877af3938e656e08232e7c0d",
+  "page_count": 6,
+  "display_equations": 7,
+  "all_report_markdown_blocks_consumed": true,
+  "artifacts": [
+    {
+      "path": "REPORT.pdf",
+      "sha256": "1aba456ccb0a5b4d59f3d84d5413b54b21046474cb4dca952a9cb6be5433e472",
+      "size_bytes": 268909
+    },
+    {
+      "path": "figures/blocks.svg",
+      "sha256": "78f77a603798b79c0b628c7809f02005d89f1a3a3553793ebfd2c8e15da688b9",
+      "size_bytes": 25258
+    },
+    {
+      "path": "figures/structure.svg",
+      "sha256": "f3e817a48f17a4622c2b42bd1d0272ee27db93ebcd2488e4f2489bf22ca84f15",
+      "size_bytes": 19964
+    },
+    {
+      "path": "figures/blocks.png",
+      "sha256": "62b8e2c80208c22fa451a3f52d124138bf1e285ca532d22520563feaff1d0e16",
+      "size_bytes": 25618
+    },
+    {
+      "path": "figures/structure.png",
+      "sha256": "17477b18da4f0b36b8f3e8f3494eaf970bb12a983d29c6c758ebc7513e9146c3",
+      "size_bytes": 34262
+    }
+  ],
+  "visual_qa": {
+    "status": "inspected_with_layout_issue",
+    "rendered_with": "pdftoppm -png -r 120",
+    "pages_inspected": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "display_equations_inspected": 7,
+    "figures_inspected": [
+      "figures/structure.png",
+      "figures/blocks.png"
+    ],
+    "issue": {
+      "page": 1,
+      "artifact": "figures/structure.png",
+      "description": "The ideal-intersection formula is too close to the all-blocks heading; increase vertical separation in the next presentation revision."
+    },
+    "other_pages": "No clipped text, broken equations, missing glyphs or table overflow observed on pages 2-6.",
+    "scientific_claim_status": "Unverified; layout review is not arithmetic or theorem verification.",
+    "first_qualification_report_preserved": true
+  }
+}

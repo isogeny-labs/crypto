@@ -1,0 +1,24 @@
+short=0;string parameterQText34=string(paddingBaseMinimal34);
+ring qResidue34=(2,u),(n,l,v),dp;execute("minpoly="+parameterQText34+";");
+map specializeColon34=paddingPolynomial34,n,l,v,u;matrix residueSColon34=specializeColon34(primitiveS34);
+print("QCOLON34_BEGIN_RESIDUE_SYZYGY");module relationsColon34=syz(module(residueSColon34));matrix relationsMatrix34=matrix(relationsColon34);int newColumnsColon34=ncols(relationsMatrix34);int totalColumnsColon34=17+newColumnsColon34;
+if(nrows(relationsMatrix34)!=17 || newColumnsColon34==0){ERROR("QCOLON34_RELATION_DIMENSIONS");}
+matrix residueZeroColon34[4][newColumnsColon34];if(residueSColon34*relationsMatrix34!=residueZeroColon34){ERROR("QCOLON34_RESIDUE_IDENTITY");}
+matrix badRelationsColon34=relationsMatrix34;badRelationsColon34[1,1]=badRelationsColon34[1,1]+1;
+if(residueSColon34*badRelationsColon34==residueZeroColon34){ERROR("QCOLON34_CORRUPT_RELATION_ACCEPTED");}
+short=0;link relationOutColon34="ASCII:w lifted-relations.sing";open(relationOutColon34);write(relationOutColon34,"ring liftedRelations34=2,(n,l,v,u),dp;matrix liftedH34[17]["+string(newColumnsColon34)+"];");int rowColon34;int colColon34;
+for(rowColon34=1;rowColon34<=17;rowColon34++){for(colColon34=1;colColon34<=newColumnsColon34;colColon34++){write(relationOutColon34,"liftedH34["+string(rowColon34)+","+string(colColon34)+"]="+string(relationsMatrix34[rowColon34,colColon34])+";");}}close(relationOutColon34);
+execute(read("lifted-relations.sing"));setring qResidue34;map reduceLiftColon34=liftedRelations34,n,l,v,u;matrix returnedHColon34=reduceLiftColon34(liftedH34);if(returnedHColon34!=relationsMatrix34){ERROR("QCOLON34_COEFFICIENT_LIFT_ROUNDTRIP");}
+setring liftedRelations34;map integralParentColon34=paddingPolynomial34,n,l,v,u;matrix parentSColon34=integralParentColon34(primitiveS34);poly parameterQColon34=integralParentColon34(paddingBaseMinimal34);matrix numeratorColon34=parentSColon34*liftedH34;matrix newSColon34[4][newColumnsColon34];
+for(rowColon34=1;rowColon34<=4;rowColon34++){for(colColon34=1;colColon34<=newColumnsColon34;colColon34++){
+ newSColon34[rowColon34,colColon34]=numeratorColon34[rowColon34,colColon34]/parameterQColon34;
+ if(parameterQColon34*newSColon34[rowColon34,colColon34]!=numeratorColon34[rowColon34,colColon34]){ERROR("QCOLON34_INEXACT_DIVISION");}
+}}
+matrix corruptedQuotientColon34=newSColon34;corruptedQuotientColon34[1,1]=corruptedQuotientColon34[1,1]+1;if(parameterQColon34*corruptedQuotientColon34==numeratorColon34){ERROR("QCOLON34_CORRUPT_QUOTIENT_ACCEPTED");}
+setring primitiveFamily34;map genericColon34=liftedRelations34,n,l,v,u;matrix genericNewSColon34=genericColon34(newSColon34);matrix genericZeroColon34[1][newColumnsColon34];if(matrix(rationalSource33)*genericNewSColon34!=genericZeroColon34){ERROR("QCOLON34_SOURCE_SYZYGY");}
+setring liftedRelations34;short=0;link outColon34="ASCII:w qcolon-family.sing";open(outColon34);write(outColon34,"ring qColonPolynomial34=2,(n,l,v,u),dp;int colonAddedColumns34="+string(newColumnsColon34)+";int colonTotalColumns34="+string(totalColumnsColon34)+";matrix saturatedS34[4]["+string(totalColumnsColon34)+"];");
+for(rowColon34=1;rowColon34<=4;rowColon34++){
+ for(colColon34=1;colColon34<=17;colColon34++){write(outColon34,"saturatedS34["+string(rowColon34)+","+string(colColon34)+"]="+string(parentSColon34[rowColon34,colColon34])+";");}
+ for(colColon34=1;colColon34<=newColumnsColon34;colColon34++){write(outColon34,"saturatedS34["+string(rowColon34)+","+string(colColon34+17)+"]="+string(newSColon34[rowColon34,colColon34])+";");}
+}
+close(outColon34);print("QCOLON34_RESULT old_columns=17 new_columns="+string(newColumnsColon34)+" exact_q_division=all source_identities=all");print("QCOLON34_ALL_CHECKS_PASS");quit;

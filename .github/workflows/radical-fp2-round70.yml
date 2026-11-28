@@ -1,0 +1,36 @@
+name: Radical Fp2 Frobenius power optimization
+
+on:
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_radical_root.rs'
+      - 'research/amm_digit_perf_20261118/round70_fp2_frobenius_isolated.py'
+      - '.github/workflows/radical-fp2-round70.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-rust-ab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src/cryptanalysis/prime_radical_root.rs
+            research/amm_digit_perf_20261118/round70_fp2_frobenius_isolated.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Exact before/after Rust with independent binary-power checks
+        run: |
+          set -euo pipefail
+          rustc --version
+          python3 research/amm_digit_perf_20261118/round70_fp2_frobenius_isolated.py | tee "$RUNNER_TEMP/round70-native.txt"
+          cat "$RUNNER_TEMP/round70-native.txt" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round70-native-rust-ab
+          path: ${{ runner.temp }}/round70-native.txt
+          if-no-files-found: ignore

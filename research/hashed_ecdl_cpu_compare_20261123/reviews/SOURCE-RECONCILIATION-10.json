@@ -1,0 +1,265 @@
+{
+  "schema": "native-cpu-source-reconciliation-review/v1",
+  "review_id": "SOURCE-RECONCILIATION-10",
+  "created_utc": "2026-11-23T13:19:38.628Z",
+  "repository": "isogeny-labs/crypto",
+  "pr": 4996,
+  "source_commit": "310d7fb0d908e9ca32c7d9282e31810b700d52cd",
+  "source_tree": "635c47fa7a185042b8c20718f937313fdd444518",
+  "reviewer_scope": "Same-root-team, read-only source and historical artifact consistency review. Separate source readback and administrative recalculation; no authenticated independent execution, official independent-session experiment.review acceptance, signed PCC verdict, novel mechanism or new performance result.",
+  "disposition": {
+    "historical_status": "Supported within the inspected committed paths: round24 executed records supersede stale preparation prose; round25 has preparation only at the reviewed head.",
+    "source_comparison": "Supported in principle: current no-numerator Scratch versus historical staged-numerator Scratch with all other current sources fixed.",
+    "new_panel_readiness": "Not determined. Proposed builds, controls, driver and future frozen protocol are not executed or qualified by this review.",
+    "execution_standing": "Unestablished. Historical producer execution/certificate assertions and any unsigned claims remain unsigned."
+  },
+  "evidence_manifest": {
+    "path": "source-reconciliation-evidence-10.json",
+    "bytes": 13805,
+    "sha256": "dffe60256a01a95d86d7b0dc500e86d0c0d3dd1c92830324cb8fe4282ed82a00",
+    "entries": 40
+  },
+  "sources_and_retrieval": {
+    "kb": "No relevant loaded KB tool found in reviewer ALL_TOOLS inspection. Parent reports repository wrapper exit127; no KB clearance or novelty conclusion.",
+    "fallback": "Direct exact Git records listed in manifest; source-level affine expressions and retained prior implementation are the primary references for this bounded reconciliation. No fresh paper/frontier survey is claimed.",
+    "remote_historical_source_readback": [
+      {
+        "url": "https://github.com/isogeny-labs/crypto/blob/c47886258a0e2b3d00a0734f059aaaa3373ca322/crates/hashed-ecdl-cpu/src/lib.rs",
+        "result": "GitHub connector returned text exactly equal to fetched pinned Git blob49221e50b514e2c672c1c657496418c280b1ddf5"
+      },
+      {
+        "url": "https://github.com/isogeny-labs/crypto/blob/4939261c9fcc48bf86f17ac36fa458f52a155b2e/crates/hashed-ecdl-cpu/src/lib.rs",
+        "result": "GitHub connector returned text exactly equal to fetched pinned Git blob5d36193ca097b942c4b0c6bf6fb4524e8beef314"
+      }
+    ],
+    "partial_clone": "Initial no-lazy-fetch reads correctly failed for missing local objects; parent then materialized exact sources and fetched both historical commits. Missing-on-disk was never treated as absent-from-tree."
+  },
+  "findings": [
+    {
+      "id": "S10-1",
+      "priority": "P1",
+      "location": "research/hashed_ecdl_cpu_20261030/round24/README.md, Open threads and Frozen validation",
+      "finding": "Retained preparation prose says no study timing rows; later EXECUTION.md and committed results/rows.csv prove that this is stale status prose.",
+      "required_action": "Preserve original README and records; publish a sibling source/status erratum linking EXECUTION.md, rows.csv, summary.csv and residual-filter-revert/README.md."
+    },
+    {
+      "id": "S10-2",
+      "priority": "P1",
+      "location": "research/hashed_ecdl_cpu_scale_20261123/README.md:12 and docs/session-logs/2026-11-23.md, 11:52 entry",
+      "finding": "Combined absence claim for CPU24/25 is false for round24. It does not affect the completed scale cohort outcomes or exact metadata reviews05..09.",
+      "required_action": "Keep frozen bytes and journal prefix. Add sibling scale erratum and append a dated journal correction. Native baseline README only says CPU reconciliation remained needed; no literal false round24 absence statement was found there."
+    },
+    {
+      "id": "S10-3",
+      "priority": "P2",
+      "location": "Prospective source/build and metadata controls",
+      "finding": "Unchanged scale.rs only accepts u/x and emits native replicate0,warmup=false. New logical arms/repeats require explicit external mapping; raw seed101/202 are distinct public targets. Source-only comparison is not a qualified build or frozen launch approval.",
+      "required_action": "Bind exact source variants and raw/logical fields before data. Parent proposes logical a(parent),b(current),c(parent A/A), all worker argv arm=u; unique case/seed/round/arm directories, instance_id including seed, round0..9 replicate and round0 warmup classification with original native fields preserved. This plan is responsive but its new driver/protocol source has not been inspected here."
+    }
+  ],
+  "historical_round24": {
+    "recorded_rows": 180,
+    "unique_arm_instance_round_keys": 180,
+    "warmups": 18,
+    "measured": 162,
+    "measured_cells": 18,
+    "repetitions_per_cell": 9,
+    "summary_rows": 108,
+    "all_summary_min_median_max_recomputed": true,
+    "all_csv_verifications": "verified",
+    "recorded_tier": "L0",
+    "fixture_scalar_attempt_relation_digest_fields": "Constant within each fixture across all60 rows; this checks CSV consistency only.",
+    "comparisons": [
+      {
+        "instance": 0,
+        "batch": 64,
+        "candidate_arm": "v",
+        "parent_arm": "y",
+        "candidate_median_ms": 0.145871,
+        "parent_median_ms": 0.14443,
+        "candidate_increase_percent": 0.9977151561310071,
+        "observed_ranges_overlap": true
+      },
+      {
+        "instance": 0,
+        "batch": 1,
+        "candidate_arm": "w",
+        "parent_arm": "z",
+        "candidate_median_ms": 0.14404,
+        "parent_median_ms": 0.142611,
+        "candidate_increase_percent": 1.0020264916451138,
+        "observed_ranges_overlap": true
+      },
+      {
+        "instance": 1,
+        "batch": 64,
+        "candidate_arm": "v",
+        "parent_arm": "y",
+        "candidate_median_ms": 0.903933,
+        "parent_median_ms": 0.819213,
+        "candidate_increase_percent": 10.341632762175411,
+        "observed_ranges_overlap": false
+      },
+      {
+        "instance": 1,
+        "batch": 1,
+        "candidate_arm": "w",
+        "parent_arm": "z",
+        "candidate_median_ms": 1.034953,
+        "parent_median_ms": 1.001373,
+        "candidate_increase_percent": 3.353395787583646,
+        "observed_ranges_overlap": true
+      },
+      {
+        "instance": 2,
+        "batch": 64,
+        "candidate_arm": "v",
+        "parent_arm": "y",
+        "candidate_median_ms": 1.142073,
+        "parent_median_ms": 1.031493,
+        "candidate_increase_percent": 10.720382978847166,
+        "observed_ranges_overlap": false
+      },
+      {
+        "instance": 2,
+        "batch": 1,
+        "candidate_arm": "w",
+        "parent_arm": "z",
+        "candidate_median_ms": 1.372484,
+        "parent_median_ms": 1.319604,
+        "candidate_increase_percent": 4.007262784896071,
+        "observed_ranges_overlap": false
+      }
+    ],
+    "aa_ranges": "u/x complete-cost ranges overlap in each of three fixtures.",
+    "conclusion": "All six early-residual candidate medians are higher than the suffix-only parent. Range overlap is retained; this does not establish an isolated or general performance law or a causal overhead decomposition.",
+    "revert": "residual-filter-revert/README.md records restoring the measured suffix-only parent byte-for-byte and removing early x-rejection/flags; current source also has no such early rejection path.",
+    "limits": "No worker/job query, original379-entry manifest verification, certificate arithmetic replay, certificate byte readback or execution-authentication check was run by this reviewer."
+  },
+  "historical_round25": {
+    "protocol_id": "HASHED-ECDL-CPU-NUMERATOR-SCRATCH-20261105",
+    "declared_frozen_protocol_hash": "df2d4e9d7415845dfb13d3ca6fe41489b1d43e0e8ec0a18578900a77206fd058",
+    "raw_protocol_sha256": "d7714eafdfb0a2dda78df888bcba0661493324da39ad9ed181354f3a190039ae",
+    "freeze_status": "Frozen preparation record; native canonical checker was not rerun.",
+    "tracked_preparation_paths": 31,
+    "tracked_results_or_reports_at_reviewed_head": 0,
+    "scope": "Three old known-answer fixtures with m3/m4, batch64/batch1; no timing observations are imported into a new m8 public-target panel."
+  },
+  "source_identities": {
+    "current_and_c478": {
+      "git_blob_sha": "49221e50b514e2c672c1c657496418c280b1ddf5",
+      "bytes": 26849,
+      "sha256": "414cb7709bd7c2b985d00e2813b13d10829e709a0bbe5e7a6dfe1bfb8b4e66b0"
+    },
+    "parent_493": {
+      "git_blob_sha": "5d36193ca097b942c4b0c6bf6fb4524e8beef314",
+      "bytes": 26649,
+      "sha256": "6113e603e3437815507ee6f92b789a516dd4cfa09874a8023427b18d555ec139"
+    },
+    "delta": "Only Scratch numerator Vec removal and computation scheduling differ. Original staged (num,den) becomes den-only in forward pass; same ordinary/doubling num is derived from original point in reverse pass. Denominator/prefix/inversion recurrence, exceptional outputs, suffix exact-lookup filter, witness order and tests are unchanged. All @@ hunks equal the retained round25 patch; patch header bytes differ.",
+    "nonvacuity": "Scratch::subtract is called from both cold sum-table construction and target-query residual batches. It affects reachable production paths, not only an unused optional flag. Identity/inverse entries retain den0 outputs; reverse unwrap occurs only for den!=0 entries.",
+    "not_an_early_filter_rerun": true
+  },
+  "prefreeze_control_requirements": [
+    {
+      "id": "D1",
+      "requirement": "Use identical complete current source/lock/compiler/flags snapshot in both standalone variants, replacing only baseline CPUlib with exact493 bytes. The 108-input source plan is not independently inventoried here. Hash each variant, record the one-file delta and keep explicit relative paper-module dependencies."
+    },
+    {
+      "id": "D2",
+      "requirement": "Build source-separated output trees; qualify both variants before solver calls, copy immutable binaries, and keep distinct build/pre-call/post-call manifests. A/A must invoke the same exact parent binary and workload as parent arm. Old binary timing is not pooled with new builds."
+    },
+    {
+      "id": "D3",
+      "requirement": "Keep all12 public targets, m8/batch64/limits and target derivation identical. Two seeds per curve are distinct targets; schedule rounds are repeat executions. If the proposed3x12x10 schedule is used, preregister360 calls,36 excluded warmups and324 measured observations with no adaptive repeats or target changes."
+    },
+    {
+      "id": "D4",
+      "requirement": "Freeze arm order/counterbalancing, warmup role, matched pairing and decision rules before outcomes; retain every failure, timeout and partial attempt. Fresh-process complete intervals include setup, all discarded trials, solving, both charged replays and serialization according to scale.rs; artifact I/O and corruption control remain outside that interval."
+    },
+    {
+      "id": "D5",
+      "requirement": "Retain full certificate equality and target-bound native/independent checks plus corruption controls for each source arm. Same certificate bytes and old recorded passes do not substitute for fresh source-variant qualification. Describe implementation independence separately from actor/session execution provenance."
+    },
+    {
+      "id": "D6",
+      "requirement": "Preserve every raw native row/certificate and numeric token. Logical a/b/c, seed-inclusive instance identity, schedule replicate/warmup and original native fields need an explicit exact-delta whitelist; do not repeat v1 duplicate keys or v2 float round-trip changes."
+    },
+    {
+      "id": "D7",
+      "requirement": "query_inversions is not total arithmetic/work; built/probed rows do not account for moved multiplies, y loads, branches or allocation. peak_table_bytes deliberately omits numerator and other scratch, so it cannot demonstrate total memory savings. No latency, asymptotic or global strongest-baseline conclusion follows from this source delta."
+    }
+  ],
+  "suggested_sibling_erratum": "Source/status correction at310d7fb0: round24 README is a retained preparation snapshot. Later EXECUTION.md and raw rows record180 calls (162 measured,18 warmups); early residual-rejection complete medians exceed the suffix-only parent in all six matched cells (batch64:1.00/10.34/10.72%; batch1:1.00/3.35/4.01%), with the recorded overlaps and L0 limits retained. The path was reverted. Round25 has frozen numerator-scratch preparation and no result tree at this head. Current CPUlib equals c4788625 no-numerator code; a fresh one-factor panel can compare it with exact4939261 staged-numerator code using otherwise identical current sources. Earlier cohort outcomes and immutable records are unchanged. [pcc:unverified]",
+  "preservation": {
+    "prior_review_files": [
+      {
+        "kind": "preserved_prior_review",
+        "path": "/tmp/ecdlp-baseline-cohort-20261123/review/COHORT-REVIEW-05.json",
+        "bytes": 21558,
+        "sha256": "841fae26a3c2f44350baeb084b28f1a469ee1d17e7a848c6e96259f0a8a2831d"
+      },
+      {
+        "kind": "preserved_prior_review",
+        "path": "/tmp/ecdlp-baseline-cohort-20261123/review/cohort-evidence-05.sha256",
+        "bytes": 41488,
+        "sha256": "1f90ef79635f5e2e709814976975cabd1b3a5bfd58a87fbeedbdaf7f1843a491"
+      },
+      {
+        "kind": "preserved_prior_review",
+        "path": "/tmp/ecdlp-baseline-cohort-20261123/review/COHORT-EXPORT-REVIEW-06.json",
+        "bytes": 9201,
+        "sha256": "aae6a4de44e6b4fd550ced3c8bd92e6e8b2c84df6bd904f930d1a96a225af495"
+      },
+      {
+        "kind": "preserved_prior_review",
+        "path": "/tmp/ecdlp-baseline-cohort-20261123/review/cohort-export-evidence-06.sha256",
+        "bytes": 5697,
+        "sha256": "ba2ba0ef0aa08891891cad522c92c102a2babcfde26d5214362d2dfdd724de7c"
+      },
+      {
+        "kind": "preserved_prior_review",
+        "path": "/tmp/ecdlp-baseline-cohort-20261123/review/COHORT-LOSSLESS-REVIEW-07.json",
+        "bytes": 11996,
+        "sha256": "e45f1c8906f5d6d32577395a87778b20894994b73283ae3fae9e38b4905ab1b3"
+      },
+      {
+        "kind": "preserved_prior_review",
+        "path": "/tmp/ecdlp-baseline-cohort-20261123/review/cohort-lossless-evidence-07.sha256",
+        "bytes": 9933,
+        "sha256": "4f109a2508b31c0366fc6f7172c4606b2f30731efee9bed30cc518b1f66ea2c5"
+      },
+      {
+        "kind": "preserved_prior_review",
+        "path": "/tmp/ecdlp-baseline-cohort-20261123/review/COHORT-PUBLICATION-REVIEW-08.json",
+        "bytes": 9907,
+        "sha256": "465ad61c683a10bcbd208161cd09cda12b7229f3d53fc51d3551efc1908b2992"
+      },
+      {
+        "kind": "preserved_prior_review",
+        "path": "/tmp/ecdlp-baseline-cohort-20261123/review/cohort-publication-evidence-08.sha256",
+        "bytes": 58733,
+        "sha256": "14af545ddad770fc275c92e3986bc0dc57ad678dee986e83975245d5e669e01f"
+      },
+      {
+        "kind": "preserved_prior_review",
+        "path": "/tmp/ecdlp-baseline-cohort-20261123/review/COHORT-PUBLICATION-REVIEW-09.json",
+        "bytes": 6270,
+        "sha256": "7549db99e517793891651fc6ef17621e00ccebb2777e3de5815bcbbaeca44d96"
+      },
+      {
+        "kind": "preserved_prior_review",
+        "path": "/tmp/ecdlp-baseline-cohort-20261123/review/cohort-publication-correction-evidence-09.sha256",
+        "bytes": 62145,
+        "sha256": "1b19d216a76fe47a5c3d79490785c2916ad5d1747e0de4b6cd3edaccf8968c80"
+      }
+    ],
+    "repository_edits_by_reviewer": [],
+    "review_outputs": "Only new exclusive files in the requested review directory. Parent worktree changes, future protocol, source-separated builds and capsule contents are outside this source snapshot."
+  },
+  "not_performed": [
+    "No builds, tests, solver run, EC replay, cloud/S3 access or secrets",
+    "No new canonical protocol/export checker run",
+    "No performance acceptance, mathematical novelty, general algorithm improvement, 84-case comparison or authenticated execution attestation"
+  ]
+}

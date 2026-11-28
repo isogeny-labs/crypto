@@ -1,0 +1,15 @@
+digraph Proof {
+ graph [rankdir=TB, bgcolor="white", nodesep=.35, ranksep=.3];
+ node [shape=box,style="rounded,filled",fillcolor="#edf3f8",fontname="DejaVu Sans",fontsize=11];
+ edge [color="#526777",arrowsize=.7];
+ variables [label="Actual new variables\nz = C(X), t = X"];
+ exchange [label="Bivariate algebra automorphism\nz <-> t; old coefficients fixed"];
+ lifted [label="Old lifted polynomial fixed\nS3 quadratic coefficients fixed"];
+ resultant [label="Map commutes with actual\nfixed-size Sylvester determinant"];
+ family [label="Canonical recursive polynomial\ninvariant under newest-pair exchange"];
+ degrees [label="Both newest input degrees\n2^(m-2), every recursive m >= 4",fillcolor="#e8f4eb"];
+ {rank=same; variables; exchange;}
+ {rank=same; lifted; resultant;}
+ {rank=same; family; degrees;}
+ variables -> exchange -> lifted -> resultant -> family -> degrees;
+}

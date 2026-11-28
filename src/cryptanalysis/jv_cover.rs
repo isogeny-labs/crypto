@@ -21,7 +21,7 @@
 
 use std::cell::Cell;
 use std::collections::{BTreeSet, HashMap};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use num_bigint::BigUint;
 use num_traits::{One, Zero};
@@ -132,8 +132,10 @@ impl Fq {
         *a == E2::ZERO || self.pow(a, self.order() / 2) == E2::ONE
     }
     pub fn random(&self, rng: &mut StdRng) -> E2 {
-        super::jv_bitops::rng_words(2);
-        E2([rng.gen_range(0..self.p), rng.gen_range(0..self.p)])
+        E2([
+            super::jv_bitops::uniform_mod_u64(rng, 0, self.p),
+            super::jv_bitops::uniform_mod_u64(rng, 0, self.p),
+        ])
     }
     /// Tonelli–Shanks in `F_{p²}^×`.
     pub fn sqrt(&self, a: &E2, rng: &mut StdRng) -> Option<E2> {
@@ -1290,6 +1292,15 @@ impl WeilForms {
 pub struct ZeroDimStats {
     pub degree_reached: u32,
     pub solving_degree: u32,
+    /// Final-basis Hilbert observations from explicitly instrumented F4 runs.
+    /// These are not formal fall-degree or regularity invariants and never
+    /// change counted work or the stopping rule.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_hilbert_deviation_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_hilbert_deviation_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub staircase_extinction_degree: Option<u32>,
     pub max_rows: usize,
     pub max_cols: usize,
     pub f4_muls: u64,
@@ -1422,7 +1433,7 @@ pub fn solve_zero_dim_mode(
                 // a diverging replay finishes as a full run inside the engine
                 let r = f4_fp::f4_replay(input, n, p, opts, &t);
                 let mut cache = trace_cache().lock().unwrap();
-                if let Some(e) = cache.get_mut(&key) {
+                if let Some(e) = cache.get_mut(&key).filter(|_| f4_fp::trace_growth()) {
                     if Arc::ptr_eq(&e.trace, &t) {
                         if r.trace_mismatch {
                             e.diverged += 1;
@@ -1441,6 +1452,9 @@ pub fn solve_zero_dim_mode(
                 }
                 r
             }
+            // no trace, and none may be recorded now (the parallel phase
+            // after a warm-up): a plain run
+            None if !f4_fp::trace_growth() => f4_fp::f4(input, n, p, opts),
             None => {
                 let (r, t) = f4_fp::f4_record(input, n, p, opts);
                 if !r.timed_out && !r.inconsistent && r.pairs_above_bound == 0 {
@@ -1462,6 +1476,9 @@ pub fn solve_zero_dim_mode(
     st.f4_muls = r.field_ops;
     st.degree_reached = r.degree_reached;
     st.solving_degree = r.solving_degree;
+    st.first_hilbert_deviation_degree = r.first_hilbert_deviation_degree;
+    st.last_hilbert_deviation_degree = r.last_hilbert_deviation_degree;
+    st.staircase_extinction_degree = r.staircase_extinction_degree;
     st.max_rows = r.max_rows;
     st.max_cols = r.max_cols;
     st.f4_ms = r.ms;
@@ -2668,6 +2685,14 @@ pub struct NagaoCost {
     pub post_muls: u64,
     pub delta: usize,
     pub degree_reached: u32,
+    /// Optional final-basis Hilbert observations carried from the F4 solve.
+    /// These are not formal fall-degree or regularity invariants.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_hilbert_deviation_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_hilbert_deviation_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub staircase_extinction_degree: Option<u32>,
     pub max_rows: usize,
     pub max_cols: usize,
     pub f4_ms: f64,
@@ -2723,6 +2748,38 @@ pub enum StopMode {
     Hilbert(usize),
 }
 
+/// Whether a traced run may replay F4 under `mode`.  A replay never
+/// consumes the pairs it skips, so without a stop rule (`StopMode::Full`)
+/// every replay ends with a full run over all of them: the 2026-11-21 pilot
+/// measured `--trace` with `Full` at +25 % counted operations and slower
+/// than no trace (research/f4_round4_leads_20261121).  Tracing is therefore
+/// refused there, with a warning; with a stop rule it is kept.
+/// Residuals of a traced DLP run processed on one thread before the
+/// parallel phase (`JV_TRACE_WARMUP`, default 256).
+fn trace_warmup() -> u64 {
+    static W: std::sync::OnceLock<u64> = std::sync::OnceLock::new();
+    *W.get_or_init(|| {
+        std::env::var("JV_TRACE_WARMUP")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(256)
+    })
+}
+
+pub fn trace_for_mode(trace: bool, mode: StopMode) -> bool {
+    if trace && matches!(mode, StopMode::Full) {
+        static WARNED: std::sync::Once = std::sync::Once::new();
+        WARNED.call_once(|| {
+            eprintln!(
+                "jv_cover: --trace needs a stop rule (--stop K or --stop hilbert:C); \
+                 tracing is off for this full-F4 run"
+            )
+        });
+        return false;
+    }
+    trace
+}
+
 pub fn opts_for_mode(max_degree: u32, budget_secs: f64, mode: StopMode) -> F4Options {
     match mode {
         StopMode::Full => jv_options(max_degree, budget_secs),
@@ -2768,6 +2825,9 @@ pub fn nagao_decompose(
     cost.lin_muls = st.lin_muls;
     cost.delta = st.delta;
     cost.degree_reached = st.degree_reached;
+    cost.first_hilbert_deviation_degree = st.first_hilbert_deviation_degree;
+    cost.last_hilbert_deviation_degree = st.last_hilbert_deviation_degree;
+    cost.staircase_extinction_degree = st.staircase_extinction_degree;
     cost.max_rows = st.max_rows;
     cost.max_cols = st.max_cols;
     cost.f4_ms = st.f4_ms;
@@ -3446,6 +3506,7 @@ pub fn run_cover_ccov_mode(
     };
     let start = Instant::now();
     let spec = generate_spec(p, seed);
+    let trace = trace_for_mode(trace, mode);
     let ctx = Ctx::with_trace(&spec, trace);
     let mut rng = StdRng::seed_from_u64(seed ^ 0xC0C0);
     let base = factor_base(&ctx, &mut rng);
@@ -3612,6 +3673,10 @@ pub struct CoverDlpReport {
     pub trace: bool,
     pub replayed: u64,
     pub trace_mismatches: u64,
+    /// Replays that diverged and continued on a recorded branch, and the
+    /// branches recorded, during this run ([`f4_fp::branch_totals`]).
+    pub branch_follows: u64,
+    pub branch_records: u64,
     pub residuals: u64,
     pub decompositions: u64,
     pub decomposition_rate: f64,
@@ -3724,6 +3789,7 @@ pub fn run_cover_dlp_mode(
         (spec, None)
     };
     let line_muls = fb_line.as_ref().map_or(0, |r| r.muls);
+    let trace = trace_for_mode(trace, mode);
     let ctx = Ctx::with_trace(&spec, trace);
     let jac = ctx.jac();
     assert!(
@@ -3784,6 +3850,7 @@ pub fn run_cover_dlp_mode(
     // (its six factor-base indices and abscissae).  Used by the large-prime
     // feasibility study; nothing below depends on it.
     let lp_log = std::env::var("JV_LP_LOG").is_ok();
+    let branches_before = f4_fp::branch_totals();
     'collect: while rep.residuals < cap {
         let mut batch: Vec<(u64, u64, Div<E2>, u64)> = Vec::with_capacity(64);
         for _ in 0..64 {
@@ -3798,35 +3865,42 @@ pub fn run_cover_dlp_mode(
         let f4_before = f4_fp::field_ops_total();
         let native_before = f4_fp::native_ops_total();
         let stair_before = f4_fp::native_stair_ops_total();
-        let found: Vec<(u64, u64, Div<E2>, Vec<Dec6>, NagaoCost, u64, bool, bool)> = batch
-            .par_iter()
-            .map_init(
-                || Ctx::with_trace(&spec, trace),
-                |c, (a, b, r, idx)| {
-                    // the deadline is absolute: one budget per test, not per run
-                    let opts = opts_for_mode(24, 600.0, mode);
-                    let mut lrng =
-                        StdRng::seed_from_u64(seed ^ idx.wrapping_mul(0x9E37_79B9_7F4A_7C15));
-                    let (decs, cost) = nagao_decompose(c, &base, &by_x, r, &opts, &mut lrng);
-                    let jc = c.jac();
-                    let v0 = c.f.muls();
-                    let ok: Vec<Dec6> = decs
-                        .into_iter()
-                        .filter(|d| verify_dec(&jc, &base, r, d))
-                        .collect();
-                    let vm = c.f.muls() - v0;
-                    let (checked, was_checked) =
-                        match (&table, check_every > 0 && idx % check_every == 0) {
-                            (Some(t), true) => {
-                                let o = mitm6(&jc, t, r);
-                                (cost.incomplete || cost.timed_out || o == ok, true)
-                            }
-                            _ => (true, false),
-                        };
-                    (*a, *b, r.clone(), ok, cost, vm, checked, was_checked)
-                },
-            )
-            .collect();
+        // With a trace, the first residuals run on one thread and alone grow
+        // the trace tree (root and branches); afterwards it is read-only, so
+        // the replays, and every counted operation, do not depend on thread
+        // scheduling.  `JV_TRACE_WARMUP` sets how many (default 256).
+        let warm = trace && rep.residuals < trace_warmup();
+        f4_fp::set_trace_growth(!trace || warm);
+        let run = |c: &mut Ctx, (a, b, r, idx): &(u64, u64, Div<E2>, u64)| {
+            // the deadline is absolute: one budget per test, not per run
+            let opts = opts_for_mode(24, 600.0, mode);
+            let mut lrng = StdRng::seed_from_u64(seed ^ idx.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            let (decs, cost) = nagao_decompose(c, &base, &by_x, r, &opts, &mut lrng);
+            let jc = c.jac();
+            let v0 = c.f.muls();
+            let ok: Vec<Dec6> = decs
+                .into_iter()
+                .filter(|d| verify_dec(&jc, &base, r, d))
+                .collect();
+            let vm = c.f.muls() - v0;
+            let (checked, was_checked) = match (&table, check_every > 0 && idx % check_every == 0) {
+                (Some(t), true) => {
+                    let o = mitm6(&jc, t, r);
+                    (cost.incomplete || cost.timed_out || o == ok, true)
+                }
+                _ => (true, false),
+            };
+            (*a, *b, r.clone(), ok, cost, vm, checked, was_checked)
+        };
+        let found: Vec<(u64, u64, Div<E2>, Vec<Dec6>, NagaoCost, u64, bool, bool)> = if warm {
+            let mut c = Ctx::with_trace(&spec, trace);
+            batch.iter().map(|it| run(&mut c, it)).collect()
+        } else {
+            batch
+                .par_iter()
+                .map_init(|| Ctx::with_trace(&spec, trace), |c, it| run(c, it))
+                .collect()
+        };
         // the F4 work is counted once, globally, by the batch's difference
         rep.f4_muls += f4_fp::field_ops_total() - f4_before;
         rep.f4_native_ops += f4_fp::native_ops_total() - native_before;
@@ -3941,6 +4015,10 @@ pub fn run_cover_dlp_mode(
             }
         }
     }
+    f4_fp::set_trace_growth(true);
+    let branches_after = f4_fp::branch_totals();
+    rep.branch_follows = branches_after.0 - branches_before.0;
+    rep.branch_records = branches_after.1 - branches_before.1;
     rep.stream_muls += ctx.f.muls();
     rep.oracle_muls = rep.weil_muls + rep.f4_muls + rep.lin_muls + rep.post_muls;
     rep.c_cov = rep.oracle_muls as f64 / rep.residuals.max(1) as f64;
@@ -4012,7 +4090,9 @@ pub fn run_cover_dlp_mode(
 pub struct StudyMode {
     pub name: String,
     pub f4_muls: u64,
+    /// The run and the full baseline completed with equal decompositions.
     pub same_found: bool,
+    /// The run and the full baseline completed with equal solution counts.
     pub same_fp_solutions: bool,
     pub stopped: bool,
     pub hilbert_applied: bool,
@@ -4100,26 +4180,26 @@ pub fn run_stop_study(
     for _ in 0..constructed {
         jobs.push((planted(&jac, &base, &mut rng).0, true));
     }
-    let mut modes: Vec<(String, F4Options)> = Vec::new();
-    modes.push(("full".into(), jv_options(24, 300.0)));
-    modes.push(("stop64".into(), jv_options_stopped(24, 300.0, 64)));
+    let full = F4Options::new(F4Ordering::Grevlex, 24).capturing_run_log();
+    let stopped = full.clone().stopping_below(64);
+    let mut modes = vec![
+        ("full".to_owned(), full.clone()),
+        ("stop64".to_owned(), stopped.clone()),
+    ];
     for &c in chunks {
-        let mut o = jv_options_stopped(24, 300.0, 64);
+        let mut o = stopped.clone();
         o.max_pairs_per_step = Some(c);
         modes.push((format!("stop64_chunk{c}"), o));
     }
     modes.push((
         "hilbert".into(),
-        jv_options(24, 300.0).stopping_by_hilbert(usize::MAX),
+        full.clone().stopping_by_hilbert(usize::MAX),
     ));
     for &c in chunks {
         modes.push((
             format!("hilbert_chunk{c}"),
-            jv_options(24, 300.0).stopping_by_hilbert(c),
+            full.clone().stopping_by_hilbert(c),
         ));
-    }
-    for (_, opts) in &mut modes {
-        *opts = opts.clone().capturing_run_log();
     }
     let mut out = Vec::new();
     for (k, (r, pl)) in jobs.iter().enumerate() {
@@ -4156,23 +4236,24 @@ pub fn run_stop_study(
             top_staircase: rep.staircase_at_stop,
             modes: Vec::new(),
         };
-        let mut ref_found = None;
-        let mut ref_fp = 0usize;
-        for (name, opts) in &modes {
+        let mut reference = None;
+        for (index, (name, opts)) in modes.iter().enumerate() {
             let _ = f4_fp::take_run_log();
             let mut lrng =
                 StdRng::seed_from_u64(seed ^ (k as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15));
-            let (found, cost) = nagao_decompose(&ctx, &base, &by_x, r, opts, &mut lrng);
+            let opts = opts.clone().with_budget(Duration::from_secs(300));
+            let (found, cost) = nagao_decompose(&ctx, &base, &by_x, r, &opts, &mut lrng);
             let log = f4_fp::take_run_log();
-            if ref_found.is_none() {
-                ref_found = Some(found.clone());
-                ref_fp = cost.fp_solutions;
+            let completed = !cost.timed_out && !cost.incomplete;
+            if index == 0 && completed {
+                reference = Some((found.clone(), cost.fp_solutions));
             }
+            let baseline = reference.as_ref().filter(|_| completed);
             sys.modes.push(StudyMode {
                 name: name.clone(),
                 f4_muls: cost.f4_muls,
-                same_found: Some(&found) == ref_found.as_ref(),
-                same_fp_solutions: cost.fp_solutions == ref_fp,
+                same_found: baseline.is_some_and(|(decompositions, _)| &found == decompositions),
+                same_fp_solutions: baseline.is_some_and(|(_, count)| cost.fp_solutions == *count),
                 stopped: cost.stopped_at.is_some(),
                 hilbert_applied: cost.hilbert_applied,
                 hilbert_fallback: cost.hilbert_fallback,
@@ -4480,7 +4561,6 @@ mod tests {
         let (_, ctx, base, by_x, mut rng) = small_ctx(53, 2);
         let jac = ctx.jac();
         let t = table3(&jac, &base);
-        let opts = jv_options(24, 120.0);
         let mut found_planted = 0;
         for trial in 0..6 {
             let mut idx: Vec<usize> = Vec::new();
@@ -4506,6 +4586,7 @@ mod tests {
             let want = Dec6 {
                 terms: core::array::from_fn(|k| terms[k]),
             };
+            let opts = jv_options(24, 120.0);
             let (found, cost) = nagao_decompose(&ctx, &base, &by_x, &r, &opts, &mut rng);
             let oracle = mitm6(&jac, &t, &r);
             assert!(oracle.contains(&want));
@@ -4525,7 +4606,6 @@ mod tests {
     #[test]
     fn sparse_linear_stage_agrees_with_dense() {
         let mut rng = StdRng::seed_from_u64(77);
-        let opts = jv_options(24, 120.0);
         let (mut used_fast, mut total) = (0usize, 0usize);
         for &p in &[53u64, 101] {
             for &n in &[4usize, 5, 6] {
@@ -4564,6 +4644,7 @@ mod tests {
                     let mut outs = Vec::new();
                     for mode in [LinMode::Dense, LinMode::Sparse, LinMode::L1a, LinMode::Fast] {
                         let mut r = StdRng::seed_from_u64(5 + trial as u64);
+                        let opts = jv_options(24, 120.0);
                         let (sols, st) =
                             solve_zero_dim_mode(&sys, n, p, &opts, &mut r, false, mode);
                         assert!(!st.incomplete, "p={p} n={n} trial={trial} {mode:?}");
@@ -4658,9 +4739,9 @@ mod tests {
         // probability 1/p, a non-separating form likewise.  Plant many sums.
         let (_, ctx, base, by_x, mut rng) = small_ctx(53, 6);
         let jac = ctx.jac();
-        let opts = jv_options(24, 120.0);
         for trial in 0..120 {
             let (r, want) = planted(&jac, &base, &mut rng);
+            let opts = jv_options(24, 120.0);
             let (found, cost) = nagao_decompose(&ctx, &base, &by_x, &r, &opts, &mut rng);
             assert!(
                 !cost.incomplete && !cost.timed_out,
@@ -4685,10 +4766,10 @@ mod tests {
     fn solver_is_exact_on_1500_planted_sums_at_p61() {
         let (_, ctx, base, by_x, mut rng) = small_ctx(61, 1);
         let jac = ctx.jac();
-        let opts = jv_options(24, 120.0);
         let (mut flagged, mut missed) = (0, 0);
         for _ in 0..1500 {
             let (r, want) = planted(&jac, &base, &mut rng);
+            let opts = jv_options(24, 120.0);
             let (found, cost) = nagao_decompose(&ctx, &base, &by_x, &r, &opts, &mut rng);
             if found.contains(&want) {
                 continue;
@@ -4711,8 +4792,6 @@ mod tests {
         let (spec, ctx, base, by_x, mut rng) = small_ctx(53, 7);
         let jac = ctx.jac();
         let t = table3(&jac, &base);
-        let full = jv_options(24, 120.0);
-        let stop = jv_options_stopped(24, 120.0, 64);
         let (mut stopped, mut cheaper, mut n) = (0, 0, 0);
         for k in 0..30 {
             let r = if k % 2 == 0 {
@@ -4721,7 +4800,9 @@ mod tests {
                 let a = rng.gen_range(0..spec.l);
                 jac.add(&jac.mul(&spec.gj, a as u128), &spec.qj)
             };
+            let full = jv_options(24, 120.0);
             let (fa, ca) = nagao_decompose(&ctx, &base, &by_x, &r, &full, &mut rng);
+            let stop = jv_options_stopped(24, 120.0, 64);
             let (fb, cb) = nagao_decompose(&ctx, &base, &by_x, &r, &stop, &mut rng);
             if ca.degenerate || ca.incomplete || cb.incomplete || ca.timed_out || cb.timed_out {
                 continue;
@@ -4763,8 +4844,6 @@ mod tests {
         let (spec, ctx, base, by_x, mut rng) = small_ctx(53, 7);
         let jac = ctx.jac();
         let t = table3(&jac, &base);
-        let full = jv_options(24, 120.0);
-        let hil = jv_options(24, 120.0).stopping_by_hilbert(1);
         let (mut applied, mut fallbacks, mut n) = (0, 0, 0);
         // Some residuals are degenerate or exhaust a solver budget. Keep
         // sampling until the comparison includes 30 completed residuals.
@@ -4778,7 +4857,9 @@ mod tests {
                 let a = rng.gen_range(0..spec.l);
                 jac.add(&jac.mul(&spec.gj, a as u128), &spec.qj)
             };
+            let full = jv_options(24, 120.0);
             let (fa, ca) = nagao_decompose(&ctx, &base, &by_x, &r, &full, &mut rng);
+            let hil = jv_options(24, 120.0).stopping_by_hilbert(1);
             let (fb, cb) = nagao_decompose(&ctx, &base, &by_x, &r, &hil, &mut rng);
             if ca.degenerate || ca.incomplete || cb.incomplete || ca.timed_out || cb.timed_out {
                 continue;
@@ -4804,6 +4885,104 @@ mod tests {
             applied >= n - 3,
             "applied {applied} fallbacks {fallbacks} of {n}"
         );
+    }
+
+    /// Explicit Hilbert observations preserve solutions and counted work. A
+    /// regular sequence's computed staircase expires at n+1; an extra relation
+    /// can reduce that staircase. Neither observation is a formal degree fall.
+    #[test]
+    fn solve_zero_dim_records_opt_in_hilbert_observations() {
+        // Count this case without contributions from other library tests.
+        if crate::test_process::parent_runs_isolated_case(
+            "cryptanalysis::jv_cover::tests::solve_zero_dim_records_opt_in_hilbert_observations",
+        ) {
+            return;
+        }
+        let p = 101u64;
+        // x_i^2 - 1 in n variables.
+        let quad = |i: usize, n: usize| -> f4_fp::Poly {
+            let mut e = vec![0u32; n];
+            e[i] = 2;
+            vec![(e, 1u64), (vec![0u32; n], p - 1)]
+        };
+        let opts = jv_options(6, 120.0).recording_hilbert_diagnostics();
+        let mut rng = StdRng::seed_from_u64(0x0D_FA11);
+
+        // Regular sequence {x^2 - 1, y^2 - 1}: realized Hilbert == semi-regular
+        // prediction at every degree; staircase extinction is n + 1 = 3.
+        let reg: Vec<f4_fp::Poly> = (0..2).map(|i| quad(i, 2)).collect();
+        let (sols, st) = solve_zero_dim(&reg, 2, p, &opts, &mut rng);
+        let mut baseline_rng = StdRng::seed_from_u64(0x0D_FA11);
+        let (mut baseline_solutions, baseline) =
+            solve_zero_dim(&reg, 2, p, &jv_options(6, 120.0), &mut baseline_rng);
+        let mut observed_solutions = sols.clone();
+        baseline_solutions.sort();
+        observed_solutions.sort();
+        assert_eq!(baseline_solutions, observed_solutions);
+        assert_eq!(baseline.f4_muls, st.f4_muls);
+        assert_eq!(baseline.lin_muls, st.lin_muls);
+        assert!(baseline.first_hilbert_deviation_degree.is_none());
+        assert!(baseline.last_hilbert_deviation_degree.is_none());
+        assert!(baseline.staircase_extinction_degree.is_none());
+        let default_json = serde_json::to_value(&baseline).unwrap();
+        for field in [
+            "first_hilbert_deviation_degree",
+            "last_hilbert_deviation_degree",
+            "staircase_extinction_degree",
+        ] {
+            assert!(default_json.get(field).is_none());
+        }
+        assert_eq!(
+            st.staircase_extinction_degree,
+            Some(3),
+            "regular sequence: staircase extinction is n+1"
+        );
+        assert_eq!(
+            st.first_hilbert_deviation_degree, None,
+            "regular sequence has no Hilbert deviation"
+        );
+        // All four rational roots (±1, ±1) are found and every returned point
+        // satisfies the system (recording did not perturb the solve).
+        for w in [[1u64, 1], [1, 100], [100, 1], [100, 100]] {
+            assert!(
+                sols.iter().any(|s| s[0] == w[0] && s[1] == w[1]),
+                "missing root {w:?} among {sols:?}"
+            );
+        }
+        for s in &sols {
+            assert_eq!((s[0] * s[0]) % p, 1);
+            assert_eq!((s[1] * s[1]) % p, 1);
+        }
+
+        // Over-determined consistent system {x^2-1, y^2-1, xy-1}: the third
+        // relation cuts the four points to {(1,1), (-1,-1)}, reducing the final staircase.
+        let xy: f4_fp::Poly = vec![(vec![1u32, 1u32], 1u64), (vec![0u32, 0u32], p - 1)];
+        let over: Vec<f4_fp::Poly> = vec![quad(0, 2), quad(1, 2), xy];
+        let (sols2, st2) = solve_zero_dim(&over, 2, p, &opts, &mut rng);
+        assert!(
+            st2.staircase_extinction_degree.is_some(),
+            "staircase extinction recorded on the over-determined system"
+        );
+        if let (Some(f), Some(l)) = (
+            st2.first_hilbert_deviation_degree,
+            st2.last_hilbert_deviation_degree,
+        ) {
+            assert!(
+                f <= l,
+                "first deviation {f} must not exceed last deviation {l}"
+            );
+        }
+        for w in [[1u64, 1], [100, 100]] {
+            assert!(
+                sols2.iter().any(|s| s[0] == w[0] && s[1] == w[1]),
+                "missing root {w:?} among {sols2:?}"
+            );
+        }
+        for s in &sols2 {
+            assert_eq!((s[0] * s[0]) % p, 1);
+            assert_eq!((s[1] * s[1]) % p, 1);
+            assert_eq!((s[0] * s[1]) % p, 1, "xy = 1");
+        }
     }
 
     #[test]
@@ -4844,7 +5023,6 @@ mod tests {
         clear_traces();
         let jac = ctx.jac();
         let t = table3(&jac, &base);
-        let stop = jv_options_stopped(24, 120.0, 64);
         let (mut replayed, mut cheaper, mut n, mut mismatches) = (0, 0, 0, 0);
         for k in 0..40 {
             let r = if k % 2 == 0 {
@@ -4853,7 +5031,9 @@ mod tests {
                 let a = rng.gen_range(0..spec.l);
                 jac.add(&jac.mul(&spec.gj, a as u128), &spec.qj)
             };
+            let stop = jv_options_stopped(24, 120.0, 64);
             let (fa, ca) = nagao_decompose(&ctx, &base, &by_x, &r, &stop, &mut rng);
+            let stop = jv_options_stopped(24, 120.0, 64);
             let (fb, cb) = nagao_decompose(&traced, &base, &by_x, &r, &stop, &mut rng);
             if ca.degenerate || ca.incomplete || cb.incomplete || ca.timed_out || cb.timed_out {
                 continue;

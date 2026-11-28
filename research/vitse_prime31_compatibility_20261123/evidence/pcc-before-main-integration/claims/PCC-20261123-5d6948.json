@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T15:54:05Z",
+ "id": "PCC-20261123-5d6948",
+ "kind": "statement",
+ "producer": {
+  "commit": "50a9820906698926868f7c97a6f7ed23755ee29d",
+  "model": "GPT-6 Astra Pro",
+  "session": "vitse-prime31-compatibility-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/qualification-receipt.json",
+    "sha256": "349324afcda82ca6748eda9b152385f6fbc91cb4996cd3e12b76baa306df65c8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/qualification-01/contract-tests/stdout.txt",
+    "sha256": "a03ad7ab4ca0e4a2ad19e4e6e46eaef9bad46cc4d4e4fddf30167db3fbdd6d36"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/qualification-01/prime31-audit/stdout.txt",
+    "sha256": "7a4466eeed7ea66d72729571713066c35f410eff3e35a0e10ec4307d959f8713"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact Prime31 d1302 finite selector/support audit and public fixed-target/chart controls; same-team unsigned development evidence, no scalar recovery or speed claim",
+ "statement": "Frozen native qualification-01 completed: 17 contract tests passed; the 1302-root X^1302-1 selector yielded 653 rational subgroup abscissae. Identity preserves both supplied sets. Coordinate negation, reciprocal and negative reciprocal preserve all raw roots but escape retained support on 321, 344 and 335 coordinates respectively. On the separate public R=G, P=2G, Q=-G control, their transformed S3 residuals are nonzero. The public four-point permutation control retains total2G but introduces an infinity prefix. These are producer observations, not signed independently verified results."
+}

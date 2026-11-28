@@ -144,7 +144,7 @@ pub const PROFILES: [Profile; 5] = [
 
 /// A profile in force; the previous state returns when it drops.
 pub struct Guard {
-    _private: (),
+    _f4_full_width: crate::cryptanalysis::pq_f4_f2::LegacyFullWidth,
 }
 
 impl Profile {
@@ -160,7 +160,12 @@ impl Profile {
         if self.no_gate_first {
             set_gate_first(Some(false));
         }
-        Guard { _private: () }
+        // Every admitted profile predates the full-width-to-FL schedule
+        // change. Preserve its counted elimination without changing the
+        // current solver's process-wide environment policy.
+        Guard {
+            _f4_full_width: crate::cryptanalysis::pq_f4_f2::legacy_full_width(),
+        }
     }
 }
 
@@ -432,6 +437,14 @@ pub fn admits(profile: &Profile, r: &crate::cryptanalysis::ecbench::record::Reco
 /// it names a binary on [`SETUP_DESCRIPTOR_BINARIES`].
 pub fn admits_setup_descriptors(r: &crate::cryptanalysis::ecbench::record::Record) -> bool {
     listed(&SETUP_DESCRIPTOR_BINARIES, r)
+}
+
+/// The frozen prime20 producer predates the diagnostic count of
+/// materialised jumps. Their group operations are already in the ledger.
+pub fn admits_pre_walk_jump_descriptor(r: &crate::cryptanalysis::ecbench::record::Record) -> bool {
+    r.method.id == "ic.pipeline"
+        && r.binary_sha256.as_deref()
+            == Some("fa6778a792c06162b0c63ff1f3e63c7ae43a383bb8fd3f27d388f3401e3026b9")
 }
 
 /// Whether `r` may be replayed under [`pre_endomorphism_a1`]: it names a

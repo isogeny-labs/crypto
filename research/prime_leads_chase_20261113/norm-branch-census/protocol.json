@@ -1,0 +1,255 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXP-NORM-BRANCH-CENSUS-20261113-v1",
+  "version": 1,
+  "created": "2026-11-13",
+  "repository": "crypto",
+  "study_dir": "research/prime_leads_chase_20261113/norm-branch-census",
+  "authors": [
+    "Codex continuation; frozen by the main research session"
+  ],
+  "links": {
+    "narrative_protocol": "research/prime_leads_chase_20261113/norm-branch-census/PROTOCOL.md",
+    "counterexample": "research/prime_leads_chase_20261113/NORM_BRANCH_COUNTEREXAMPLE.md",
+    "continuation": "research/prime_leads_chase_20261113/CONTINUATION_PROTOCOL.md",
+    "norm_derivation": "research/prime_norm_rank_20261112/DERIVATION.md",
+    "native_source": "research/prime_leads_chase_20261113/norm-branch-census/src/lib.rs",
+    "formal_source": "research/prime_leads_chase_20261113/norm-branch-census/formal/NormBranchKernel.lean",
+    "literature_receipt": "research/prime_leads_chase_20261113/norm-branch-census/LITERATURE.md",
+    "launch_request": "research/prime_leads_chase_20261113/norm-branch-census/launch/dispatch.json",
+    "launch_payload": "research/prime_leads_chase_20261113/norm-branch-census/launch/run.sh",
+    "launch_workflow": ".github/workflows/isolab-experiment.yml"
+  },
+  "question": "Does the source-bound signed norm-branch coefficient tensor exhibit a growing held-out flattening-rank defect large enough to admit the preregistered SAT/proof-size stage?",
+  "claims": [
+    {
+      "id": "C-semantic",
+      "text": "Direct signed group sums, direct evaluation-matrix singularity, Laplace coefficients, product-kernel block ranks, and reconstructed bounded norm witnesses agree at the declared finite scope.",
+      "class": "exact_computation",
+      "decided_by": ["semantic-gate", "independent-checker"]
+    },
+    {
+      "id": "C-rank",
+      "text": "Global and fixed-cardinality flattening ranks are exact over each named field and split; a full-rank pivot modulo p also certifies full rank of the canonical integer lift over Q.",
+      "class": "exact_computation",
+      "decided_by": ["heldout-ranks", "independent-checker"]
+    },
+    {
+      "id": "C-scope",
+      "text": "The experiment does not establish a branch finder, SAT speedup, ECDLP speedup, security claim, universal hardness result, or novelty claim.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H-linear-message",
+      "statement": "Natural curve-derived tensors have a growing low-rank balanced separator absent from support-matched independent coefficients.",
+      "mechanism": "Fixed-cardinality blocks are compound-Vandermonde product kernels; a growing defect could reduce exact separator-message state before any SAT encoding.",
+      "predictions": [
+        {
+          "id": "P-heldout-gap",
+          "metric": "minimum_global_rank",
+          "direction": "lower",
+          "minimum_effect": "on the split minimizing natural rank (ties by smallest left mask), natural rank at most one half of the null rank on that same split at k=12 and k=14 for every prime/seed pair; matched-null minus natural log2-rank slope at least 0.125 per added Boolean variable",
+          "provenance": {
+            "written_at": "2026-11-13",
+            "first_recorded_in": "research/prime_leads_chase_20261113/norm-branch-census/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/prime_leads_chase_20261113/NORM_BRANCH_COUNTEREXAMPLE.md",
+                "measured": "fixed d=5 rank-one block only; no growing or natural census"
+              }
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "frozen k=12,14 natural cells"
+          }
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "natural",
+      "role": "candidate",
+      "description": "Prime-order curve-derived target/support points with exact Laplace coefficients.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [["cargo", "build", "--release", "--locked", "--manifest-path", "research/prime_leads_chase_20261113/norm-branch-census/Cargo.toml"]],
+        "binary_sha256": null,
+        "flags": {"binary": "produce", "write_policy": "create_new"},
+        "env": {"RUST_BACKTRACE": "1"},
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "primes": [8191, 131071],
+        "k": [6, 8, 10, 12, 14],
+        "curve_seed_rule": "0x4e42433100000000 xor p",
+        "support_seeds_hex": ["4e42435300000001", "4e42435300000002", "4e42435300000003", "4e42435300000004"],
+        "target_sign": -1
+      }
+    },
+    {
+      "id": "random-coefficients",
+      "role": "reference",
+      "description": "Independent nonzero field coefficients on the byte-identical two-level support.",
+      "instrument": {"repo": "same", "commit": null, "build": [], "binary_sha256": null, "flags": {"domain": "0x4e42434e554c4c00"}, "env": {}, "threads": 1, "image_digest": null},
+      "parameters": {"same_support": true, "same_splits": true, "nonzero_entries": true}
+    },
+    {
+      "id": "random-ordinates",
+      "role": "control",
+      "description": "Independent nonzero ordinate multipliers; exact fixed-cardinality rank-invariance control, not a null.",
+      "instrument": {"repo": "same", "commit": null, "build": [], "binary_sha256": null, "flags": {"domain": "0x4e42434f52440000"}, "env": {}, "threads": 1, "image_digest": null},
+      "parameters": {"same_abscissae": true}
+    },
+    {
+      "id": "second-vandermonde",
+      "role": "control",
+      "description": "A second distinct arithmetic-progression abscissa family with identical dimensions.",
+      "instrument": {"repo": "same", "commit": null, "build": [], "binary_sha256": null, "flags": {}, "env": {}, "threads": 1, "image_digest": null},
+      "parameters": {"ordinate": 1}
+    },
+    {
+      "id": "separable",
+      "role": "positive_control",
+      "description": "Synthetic nonzero outer product whose exact rank is one.",
+      "instrument": {"repo": "same", "commit": null, "build": [], "binary_sha256": null, "flags": {}, "env": {}, "threads": 1, "image_digest": null},
+      "parameters": {"expected_rank": 1}
+    }
+  ],
+  "controls": {
+    "comparisons": [
+      {
+        "id": "heldout-ranks",
+        "arms": ["natural", "random-coefficients"],
+        "differs_in": ["coefficient_generation"],
+        "design": "paired_exact",
+        "threshold": "rank ratio <= 1/2 and slope gap >= 0.125 for advance; exact full-rank equality for strict measured-family kill"
+      },
+      {
+        "id": "semantic-gate",
+        "arms": ["natural"],
+        "differs_in": ["representation_only"],
+        "design": "exact_equivalence",
+        "threshold": "identical ordered model sets and complete norm/group replay"
+      },
+      {
+        "id": "independent-checker",
+        "arms": ["natural", "random-coefficients", "random-ordinates"],
+        "differs_in": ["minor determinant and rank algorithms"],
+        "design": "independent_replay",
+        "threshold": "zero disagreements, with every producer pivot minor independently extracted from its recorded row/column indices and its determinant recomputed"
+      }
+    ],
+    "aa_not_applicable": "No timing endpoint. Deterministic regeneration is the A/A analogue and must be byte-stable.",
+    "crosses_map": true
+  },
+  "variable_ledger": {
+    "independent": ["prime", "support_seed", "k", "balanced_split", "arm"],
+    "dependent": ["global_rank", "block_rank", "model_count", "pivot_minor", "exact_operation_counts"],
+    "held_constant": ["target_sign", "curve_search_rule", "support rejection rule", "coefficient support", "split search per k"],
+    "confounders": ["field-specific modular rank defect", "partition search multiplicity", "model-count stratum", "target ordinate coupling between adjacent levels"]
+  },
+  "randomization": {
+    "arm_order": "fixed within a single deterministic producer invocation",
+    "arm_order_reason": "No timing comparison; natural source generation precedes derived controls.",
+    "seed_derivation": {"method": "explicit_list_and_domain_separation", "seeds": ["4e42435300000001", "4e42435300000002", "4e42435300000003", "4e42435300000004"], "nonce": null, "note": "All null/control streams are domain separated in source."},
+    "instance_sampling": {"rule": "One maximum k=14 target/support draw per prime/seed, with frozen prefixes for smaller k.", "independent_of_arm": true},
+    "blinding": {"analysis_labels_masked": false, "how": "Exact structural arms are identifiable; thresholds and held-out sizes are frozen before invocation.", "unmasked_at": null}
+  },
+  "sample_size": {
+    "instances": 40,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {"method": "exact_family_gate", "alpha": null, "tests_in_family": 1, "correction": "none", "rank_test_n": null, "min_attainable_two_sided_p": null, "passes": true, "note": "No population p-value; every frozen held-out cell must satisfy the directional gate."},
+    "preflight_runtime": {"fixed_seconds": 180, "per_sample_seconds": 20, "threads": 1, "estimated_total_seconds": 980, "measured_on": "static operation-count estimate only; no scientific timing claim"}
+  },
+  "metrics": {
+    "primary": [
+      {"id": "global_rank", "name": "Exact global coefficient-flattening rank", "unit": "field dimension", "kind": "counted", "definition": "Rank over the named prime field for one balanced split.", "source": "artifact cells[].splits[]", "aggregation": "minimum over preregistered split search", "resolution": "1", "uncertainty": "none_exact"},
+      {"id": "block_rank", "name": "Exact fixed-cardinality product-kernel block rank", "unit": "field dimension", "kind": "counted", "definition": "Rank from both raw Laplace coefficients and the scaled product kernel.", "source": "artifact cells[].block_sweep", "aggregation": "all blocks", "resolution": "1", "uncertainty": "none_exact"}
+    ],
+    "secondary": [
+      {"id": "model_count", "name": "Signed target decompositions", "unit": "models", "kind": "counted", "definition": "Exact number among all 2^k branch assignments.", "source": "artifact cells[].model_count", "aggregation": "per cell", "resolution": "1", "uncertainty": "none_exact"},
+      {"id": "operation_counts", "name": "Native exact arithmetic counters", "unit": "operations", "kind": "counted", "definition": "Field additions, multiplications, inversions and comparisons in producer coefficient/rank paths.", "source": "artifact cells[].ops", "aggregation": "per cell", "resolution": "1", "uncertainty": "implementation exact"}
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0 exact computation; clocks invalid",
+    "warmups": 0,
+    "order": "deterministic",
+    "clock": "descriptive_only",
+    "counters": ["global_rank", "block_rank", "model_count", "field_operations", "matrix_bytes", "coefficient_bit_growth_bound"],
+    "record": ["source_revision", "protocol_sha256", "binary_sha256", "image_digest", "job_uid", "pod_uid", "exit_status", "payload_sha256"],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-eks",
+    "queue": "cpu-spot",
+    "placement": {"cpus": 2, "memory_mb": 4096, "disk_gb": 10, "spot": true, "paid": true},
+    "measurement_class": "search",
+    "timeout_seconds": 1800,
+    "checkpoint": {"policy": "none", "interval_seconds": null, "grace_seconds": null, "restore_validation": "fresh identical retry only after definite infrastructure failure", "after_restore": {"wall_time": "invalid", "counted_units": "invalid_for_ordinary_v1"}},
+    "retries": {"infrastructure_only": true, "max_attempts": 2},
+    "budget_usd": 2.0
+  },
+  "stopping_rules": [
+    {"rule": "One producer and one checker invocation, then stop.", "kind": "fixed_n", "preregistered": true},
+    {"rule": "Stop on budget uncertainty/exhaustion, source or protocol mismatch, capacity refusal, output cap, deadline, nonzero producer/checker exit, or mutation/control failure.", "kind": "invalidation", "preregistered": true},
+    {"rule": "Do not run SAT B2 unless ADVANCE_B2 fires.", "kind": "scientific_gate", "preregistered": true}
+  ],
+  "invalidation_rules": [
+    "Any semantic, rewrite, mutation, independent-checker, or rank-one positive-control failure makes the scientific verdict inconclusive.",
+    "A modular defect cannot be called a Q defect without fraction-free replay or an explicit integer null vector.",
+    "An infrastructure failure is not a mathematical negative and does not authorize changed seeds, thresholds, resources, or backend.",
+    "A successful pod without matching source/image/job/payload receipts is incomplete."
+  ],
+  "decision_rule": {
+    "text": "ADVANCE_B2 only on the universal held-out half-rank and 0.125 slope-gap gate plus a checked product-kernel defect whose target inclusion is unchanged, exactly one side cardinality grows by one, available rank does not shrink, and deficiency does not decrease. KILL_MEASURED_FAMILY only when every held-out global and fixed-cardinality rank is full and each global rank matches its null. Otherwise INCONCLUSIVE.",
+    "comparison_ids": ["heldout-ranks", "semantic-gate", "independent-checker"],
+    "threshold": "See PROTOCOL.md Frozen decision rule.",
+    "statistic": "Exact paired ranks and log2 rank slopes.",
+    "interval": "none; all frozen held-out cells required",
+    "multiple_comparison_correction": "universal conjunction over the frozen split search; no selected partition inference",
+    "effect_size_measure": "natural/null rank ratio and paired log2-rank slope difference",
+    "verdict_vocabulary": ["ADVANCE_B2", "KILL_MEASURED_FAMILY", "INCONCLUSIVE", "INCOMPLETE_EXECUTION"]
+  },
+  "analysis_plan": {
+    "script": {"path": "research/prime_leads_chase_20261113/norm-branch-census/src/lib.rs::analyze_decision", "sha256": null},
+    "inputs": ["artifact.json", "checker.json", "source/protocol/binary/image manifests"],
+    "outputs": ["RESULT.md", "rank-census.svg", "report.pdf"],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "norm.branch-census/v1 plus experiment.export/v1 execution receipt",
+    "review_schema": "experiment.review/v1 when canonical checker becomes available",
+    "graphs": ["Natural and matched-null minimum global rank by k; block-defect and semantic-control flow diagram."],
+    "report_dir": "research/prime_leads_chase_20261113/norm-branch-census/report"
+  },
+  "inadmissible": [
+    "Calling one singular minor a tensor or SAT breakthrough.",
+    "Treating randomized ordinates as an independent null for fixed-cardinality ranks.",
+    "SAT tuning before ADVANCE_B2.",
+    "A speed, ECDLP, security, novelty, exhaustive-search, or universal-hardness claim.",
+    "Changing held-out sizes, seeds, split count, thresholds, or controls after artifact generation."
+  ],
+  "literature": [
+    {"ref": "https://people.maths.ox.ac.uk/petit/files/16PKC_primeECDLP.pdf", "provenance": "primary_author_hosted", "claim": "Prime-field composed-map factor bases and open relation-system complexity.", "verified_by": "Codex, 2026-11-13"},
+    {"ref": "https://eprint.iacr.org/2017/609.pdf", "provenance": "primary_eprint", "claim": "Prime-field summation-polynomial relation collection and one-basis variant.", "verified_by": "Codex, 2026-11-13"},
+    {"ref": "https://www.kurims.kyoto-u.ac.jp/EMIS/journals/EJC/Volume_11/PDF/v11i1r48.pdf", "provenance": "primary_journal", "claim": "Borchardt determinant-permanent identity for inverse-square Cauchy matrices.", "verified_by": "Codex, 2026-11-13"}
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen_before_artifact_invocation",
+    "protocol_sha256": null,
+    "protocol_digest_file": "research/prime_leads_chase_20261113/norm-branch-census/PROTOCOL.sha256",
+    "commit": null,
+    "frozen_at": "2026-11-13T22:34:59Z",
+    "filed_before_affected_data": true,
+    "note": "Exact protocol bytes are bound by the companion digest and pushed source revision supplied to the producer and EKS request. Canonical external schema checker unavailable; existing repository v1 examples were used without inventing a successful validation receipt."
+  }
+}

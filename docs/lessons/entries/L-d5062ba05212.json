@@ -1,0 +1,15 @@
+{
+  "action": "Use git add --sparse for that journal and verify its staged diff and committed contents before pushing;a tracked path can still require --sparse on later edits.",
+  "created": "2026-11-24T00:06:09Z",
+  "evidence": [
+    "docs/session-logs/2026-11-24.md",
+    "research/nist_cover_three_tests_20261116/split_tangent_20261123/evidence/publication-v1.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "*"
+  ],
+  "trigger": "A UTC rollover creates or edits a dated journal outside a custom sparse-checkout definition",
+  "why": "Ordinary git add excluded the Nov24 journal even after its initial explicit staging;checked effects and preserved it in a follow-up commit."
+}

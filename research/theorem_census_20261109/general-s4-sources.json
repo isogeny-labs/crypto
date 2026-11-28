@@ -1,0 +1,55 @@
+{
+  "schema": "theorem-source-audit/v1",
+  "created": "2026-11-09T16:19:07.625Z",
+  "scope": "First fixed-degree Sylvester resultant recursion step (m=4) and a faithful degree-drop negative control; original item1 only.",
+  "sources": [
+    {
+      "id": "Kosters-Yeo2015",
+      "url": "https://arxiv.org/pdf/1503.08001",
+      "version": "arXiv1503.08001v3",
+      "pdf_sha256": "b5ea5e4c5de7dcacf579e283168d9463b2b6977b031002ddee134a3a0d7868eb",
+      "text_sha256": "49a35941e7f8b2a7d33c7d4a387a967354c48a16b172f66d443e72ee57e85345",
+      "read_scope": "Section2 p3 recursive definition with resultant and Proposition2.1. PDF p3 visually inspected previously; retained primary text re-read for this step."
+    },
+    {
+      "id": "Mathlib",
+      "revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+      "paths": [
+        "Mathlib/RingTheory/Polynomial/Resultant/Basic.lean",
+        "Mathlib/LinearAlgebra/Matrix/Determinant/Basic.lean",
+        "Mathlib/AlgebraicGeometry/EllipticCurve/Affine/Point.lean"
+      ],
+      "read_scope": "Actual fixed-degree resultant and Sylvester definitions; determinant cofactor expansion; actual point xRep equality/negation. Scalar-resultant code is used directly, not replaced by a coefficient formula assumption."
+    },
+    {
+      "id": "Semaev2004",
+      "url": "https://eprint.iacr.org/2004/031.pdf",
+      "status": "still_unread",
+      "observed": "Original ePrint403; separate CiteSeer copy403; cited RHUL institutional copy404 on2026-11-09. Search snippets and the classic ePrint listing do not count as reading the original."
+    }
+  ],
+  "kb": "Unavailable: no kb_status/search_knowledge tools; scripts/research-kb status reports no executable. Narrow repository and primary-source fallback; no novelty claim.",
+  "formal": {
+    "lean": "leanprover/lean4:v4.35.0",
+    "source": "research/theorem_census_20261109/lean/GeneralS4.lean",
+    "source_sha256": "1d73c0555b406b7c54796796f11f4ca720708060b2d5dba4de95c9d455bc378b",
+    "universal": "GeneralS4Audit.generalS4_zero_iff_exists_points",
+    "control": "GeneralS4Audit.fixed_degree_resultant_common_root_counterexample",
+    "scope": "All characteristics and repeated-pair/vertical cases on actual Mathlib point groups. No proof of all m, irreducibility or general symbolic degrees."
+  },
+  "identity_plan": {
+    "status": "Source committed before issue; actual result will be retained separately.",
+    "source": "research/theorem_census_20261109/identity/src/bin/general_s4.rs",
+    "source_sha256": "9ce7623ab15583da4a7c85a1a2782bf72b1f115398b0f73d46d1d22ba2aa1abf",
+    "variables": 6,
+    "degree_bound": 4,
+    "seed_hex": "0x202611091614",
+    "points": 32,
+    "extra_seed_hex": "0x5e4ae004",
+    "extra_points": 11,
+    "checker": "Unchanged repository identity_certificate.rs and SHA256. One-host supplement, not universal or independent-host inference."
+  },
+  "new_native_curve_population": false,
+  "frozen_prior_data_changed": false,
+  "paid_spend": 0
+}

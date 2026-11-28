@@ -1,0 +1,111 @@
+{
+  "schema": "root-precision-formal-and-native-source-review/v1",
+  "review_id": "ROOT-MATH-SOURCE-REVIEW-02",
+  "created_utc": "2026-11-23T16:17:46.625Z",
+  "reviewer_scope": "Same-root-team written source/math review. This is not independent execution,compiler/PCC attestation or a signed proof-gate verdict.",
+  "prior_review": "ROOT-MATH-SOURCE-REVIEW-01 remains immutable; its written35proof,normalized34counterexample and scope limits are retained.",
+  "disposition": {
+    "shared_statement_hypothesis_fidelity": "Supported. root_precision_mul_le has exactly p<=M,32u<=M,i<u androotshapea2u; root_precision_of_array correctly derivesmarginfromtheactualrootarrayexpression.",
+    "formal_controls": "Supported by source/math review. Normalizedroot,exact546E+2identity,margin-domain34failure,positiveexample andthree weakened-premise counterexamples match reviewed01.",
+    "revised_prospective_native_translation": "Supported within plannedfixedwitness/sweep/controlscope. Two earliernative source fidelity notes are corrected in this snapshot.",
+    "native_outcomes": "No native run,output or qualification result inspected/attested. Source/plan review is prospective regardless of anylaterparent execution.",
+    "formal_execution": "Only retained02b/03bcompilationrecords were read. They are unsignedproducerrecords,not newcompiler executions byreviewer.05/04c/officialleanchecker results were not inspected or accepted."
+  },
+  "evidence_manifest": {
+    "path": "root-math-source-evidence-02.json",
+    "bytes": 6728,
+    "sha256": "e9e607d326f3b6c055371b581654f807d9289df6e791cdd4e20b3771a4a64f1c",
+    "entries": 19
+  },
+  "source_identities": {
+    "shared_original_sha256": "92e4300c71c4b1570ab193df4de22fe31b04a9d7ca0f0212191169555951989a",
+    "shared_root_sha256": "03368ae977387da1f83f529fc4fcb6053d2ece32bf3e5449fb1407ad54ded0df",
+    "study_controls_sha256": "571b3589332e9d954e29ce26f49592cf3d7a84d36c8ac88b2a620810cc1f4d77",
+    "revised_native_sha256": "f58da26c64174b3f89f30d16e36ab5b99ec7a7250b7244e9dea10371d800f385",
+    "native_plan_sha256": "7ce8246c9e15d83a89d64b939bc562be38db58a9250c215256e572fdeda44a2c",
+    "native_lock_sha256": "0ce46ec0008639104cd4bad4a29392dde58b23400f9ab2ba7e63750d72f1bcaf",
+    "snapshot_directory": "/tmp/ecdlp-root-precision-20261123/review/root-math-source-inputs-02",
+    "note": "Exact reviewed snapshot bytes only; formatting or subsequent corrections require their own identity binding. No claim about changinglivefiles or futuretestedbodies."
+  },
+  "shared_theorem_review": [
+    {
+      "name": "root_evaluation_envelope",
+      "statement": "0<u ->16u(2u+1)<=21*2^(u+1)",
+      "reason": "u1,u2handled directly; u3is equality336=336. Tail induction uses(u+1)(2u+3)<=2u(2u+1) foru>=3,which followsfromu^2>=3uandpositiveu. Constants/exponents match01."
+    },
+    {
+      "name": "root_four_scale",
+      "statement": "0<u ->4u<=2^(u+1)",
+      "reason": "Usesu<=2^(u-1),valid foru>=1,then exactpower multiplication. Nat subtraction is controlledbypositiveu."
+    },
+    {
+      "name": "root_array_margin",
+      "statement": "2^(2u)*64^(4u)<=M ->32u<=M",
+      "reason": "u0handledseparately; exact26uexponentandpositiveu+5<=26ugive margin. No actualusizeadmission conclusion."
+    },
+    {
+      "name": "root_precision_mul_le",
+      "statement": "p<=M,32u<=M,i<u ->childPrecision p M u(2u)i*u<=35M2^(2u-i)",
+      "reason": "hD,initial,node,evaluationcomponents match4-scaled1+97+42=140proof. Uses exactsharedfloor/ceiling expression; noadditionalabsorption/history hypothesis is smuggled into the conclusion."
+    },
+    {
+      "name": "root_precision_of_array",
+      "statement": "p<=M,i<u,arrayguard ->same35rootbound",
+      "reason": "Directcompositionwithroot_array_margin; consumersstillneedactualsourcevalues,checkedarithmetic andcallbinding."
+    }
+  ],
+  "controls_review": {
+    "normalized_root": "E>0impliesE+1<=2E; strongarrayguardwithM2Eandactivevaluationentails35. This hasmathematicalinstances butdoesnotadmitproductionusizegraphs.",
+    "normalized_two_identity": "ForallNatE,(childPrecision(E+1)(2E)2 4 1)*2=546E+2,includingE0. Ceiling simplifiesexactlyto3E.",
+    "constant34_family": "E>=32givesbothp<=Mand32*2<=2E,andstrict34failure. Fixedi1<u2is true; fullarrayguardisnotasserted.",
+    "scalar_positive": "Exact33,64,2,4,1margin-domain instance iscoveredbysharedtheorem,not by aclaimedarrayguard.",
+    "premise_deletions": "Statements explicitly retain theother twopremises and fail35; numeric values agreewith01. Missingmargin control also drops thestrongerarrayguard. NoneisaSetup-admitted witness."
+  },
+  "recorded_formal_readback": {
+    "core": "02b-root-core16:00:42..16:00:43UTC,exit0,empty stderr.",
+    "controls": "03b-controls16:05:23..16:05:24UTC,exit0,empty stderr.",
+    "axiom_queries": 12,
+    "foundations": {
+      "propext_Quot_sound_only": 8,
+      "also_Classical_choice": 1,
+      "no_axioms": 3
+    },
+    "classical_choice_declaration": "NativeRootPrecision.constant34_family",
+    "no_axiom_declarations": [
+      "NativeRootPrecision.missing_initial_precision",
+      "NativeRootPrecision.missing_margin",
+      "NativeRootPrecision.missing_active_valuation"
+    ],
+    "scope": "All12printed names match thesourcequerylist andshowonlystandardfoundation axioms,withno customclaimaxiom orsorryAx in inspectedoutputs. This doesnot substitute for independent replay,signedstanding or uninspected officialcheckerresults."
+  },
+  "native_source_review": {
+    "formula": "precision computes p+8*floor((3M+u-1)/u)*2^(a-i)+8M(a+1) usingBigUint fornonnegativearithmetic. Itsused inputs ensureu>0andi<=a; inactive-premise deletion deliberatelyevaluates thescalarformula ratherthancallingproductionchild_precision(whichwouldrejectinactivei).",
+    "fixed_witness": "M=s=2^262150,p=M/2+1,degree2,lambda262150,sqrt512,delta2^235935,u2,a4,L16,array2^48,t2match01. Root source-size/edge andprecisionnormalization,exact-powerdelta certificate,leaf/degree/array guards,activevaluation andshift/power checks arepresent.",
+    "ceiling_check": "Remainder-basedceil(3M/2) iscomparedto(3M+1)/2for thepositivewitness. This is a separately expressed same-inputintegercheck,not independentexecution or a generalnth-root algorithm.",
+    "seven_corruptions": "lambda+1,u+1,delta+1,sqrt+1,degree=delta+1,t4andarray64^7eachmodifyonefield andrequireatleastone source-bindingpredicatefailure. Codepreservesfailedpredicate names; no claim eachcorruptionmustbreakthefinal35inequality.",
+    "sweep": "u1..12,M32u..32u+127,p0/floor(M/2)+1/M,i0..u-1 give128*3*(1+...+12)=29,952rows,allintheweakerroot35domain. Nativecodechecks35andretainsdimensionless maxima byexactintegercrossmultiplication. Denominatorsarepositive;float/timinginferenceabsent.",
+    "deletions": "Revisedloopchecksremainingpremisesandnegationofomittedone,thenleft>rightfor eachthreefixedtuple. E32small34checkalsohasexact17474value. FullSetupadmissionisnotasserted.",
+    "scope": "Fixedfamily sourcecertificates andboundedscalar sweep only. Thevalidator isnot claimedtotalforallarbitrarymalformedWitnessvalues orgeneralrootfinding. M/precisionaredeliberatelyoutsidecurrentusize; currentpublicroot_u0andgeneralhistory/graph/costgapsremain."
+  },
+  "resolved_native_notes": [
+    {
+      "id": "N02-1",
+      "prior_issue": "abs(t)<Lexcludedactualleftgridendpoint-L.",
+      "resolution": "Revisedpredicateusesnegativeabs<=Landnonnegativeabs<L,exactly[-L,L). Nonzero/activevaluationisnowseparate. Currentt2witnessunchanged;leftendpointisinactiveinrootshapeanyway."
+    },
+    {
+      "id": "N02-2",
+      "prior_issue": "Initialdeletionloopcheckedonlyconclusionfailuredespiteplanrequiringremainingpremises.",
+      "resolution": "Revisedmatchassertsp> Mormissingmarginorini>=uwiththeotherpremisesretainedbeforeinequalitycheck. Fixedtuplemathematicswasalreadycorrect;newruntimeassertionsmatchplan."
+    }
+  ],
+  "remaining_source_math_errors": [],
+  "limits": [
+    "No Rust/Lean/BigUint/program/checker/test/solver/replay execution byreviewer; no gateterminalstatus beyond02b/03bwasread orattested.",
+    "Source/math review doesnotestablish source-to-builtbinarycustodyforanylaternativejob,officialLeancheckerresult,PCCsignedstandingor independentexecution.",
+    "35isrootshapeonly;existingconditional34andfinitehistory81areunchanged. PaperD.11isBigOandnotcontradictedbyfinite34counterexamples.",
+    "No graphconstruction,nativemachineadmission,fullrecursivepathrefinement,totalbitcostoralgorithm/runtimeimprovementisderived.",
+    "KB/prior-sourcefallbackunchanged;no novelty or broadabsenceclaim."
+  ],
+  "preservation": "Only newexclusive review02source/evidence files writtenunderrequested/tmpreviewdirectory. Repository files,oldreview01andallolderrecords remain untouched."
+}

@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T15:17:27Z",
+ "id": "PCC-20261116-02d8f1",
+ "kind": "theorem",
+ "producer": {
+  "commit": "575b3cf41082596ebf8757a4974d1a27bdcd0301",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "ea5d02493097ca46a09f313f797375146b2969665f688d758645b56ef2cb6d5d",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/cubic-basis-injectivity-final-03/CubicBasisInjectivity22303.lean",
+   "theorem": "CubicBasisInjectivity22303.coefficient_embedding_fixed"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact generic CommRing characteristic223 coefficient transport/separation and cubic basis injectivity under z^3=3, fixed-expression equivalence without assumed injectivity. Six typed corollaries fully bind old embedding statements with unchanged original extractor; original limited records preserved. Zero-generator counterexample documents cubic-relation dependency. Both original gates37 audited0 trusted, standard foundations only, no field construction/native refinement/Jacobian/cost or signed standing.",
+ "statement": "theorem coefficient_embedding_fixed {R : Type} [CommRing R] [IsCharP R 223] (a : Fin 223) : (embed a : R)^223=embed a"
+}

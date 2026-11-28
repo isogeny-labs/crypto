@@ -1,0 +1,206 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h10810f17e0f6c8f6",
+  "statement": {
+    "name": "Cubic evaluated at a peeled factor",
+    "source": "RepeatedFactor.cubic_identity; collision_certificate/proof/RepeatedFactor.lean",
+    "variables": [
+      "a",
+      "x",
+      "y",
+      "z"
+    ],
+    "degree_bound": 3,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "a"
+            },
+            {
+              "op": "var",
+              "args": "a"
+            },
+            {
+              "op": "var",
+              "args": "a"
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "a"
+              },
+              {
+                "op": "var",
+                "args": "a"
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "x"
+                  },
+                  {
+                    "op": "var",
+                    "args": "y"
+                  },
+                  {
+                    "op": "var",
+                    "args": "z"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "a"
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "y"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "z"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "y"
+                    },
+                    {
+                      "op": "var",
+                      "args": "z"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "x"
+              },
+              {
+                "op": "var",
+                "args": "y"
+              },
+              {
+                "op": "var",
+                "args": "z"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "a"
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "var",
+                "args": "x"
+              }
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "a"
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "var",
+                "args": "y"
+              }
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "a"
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "var",
+                "args": "z"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 64,
+  "seed": 20261025,
+  "value_digest": "67bb9c14fc4416c01bc8b5a25d94746745258b913aafef25f7196240d274b472",
+  "independence": "Native issue/check in one process; checker uses a separate extra-point domain. Universal Lean identity independently kernel-checked by the retained gate; no distinct-model attestation claimed.",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/twist_index_calculus_20261020/zero_fiber_collector/collision_certificate/proof/RepeatedFactor.lean",
+    "sha256": "fe7fbef221b2d391f3793976fd3babbe14673ef08b0ddaa3b5ae74664764773c"
+  }
+}

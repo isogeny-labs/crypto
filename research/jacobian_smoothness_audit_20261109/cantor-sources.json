@@ -1,0 +1,93 @@
+{
+  "schema": "theorem-audit-source-plan/v1",
+  "status": "Source/plan freeze; supplement not yet issued.",
+  "lean": "leanprover/lean4:v4.35.0",
+  "mathlib_revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+  "formal": {
+    "binding": "MumfordCantorGroupAudit.cantor_subgroup_audit_certificate",
+    "decl_sha256": "d679c6228528c41e37c2afa3267f6d36b9ab9631fdfbcd0f3ac54baff380d6ee",
+    "sources": [
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordSmoothness.lean",
+        "sha256": "1ebb9df7ecd8c67df17b2a58e44afd95576ccf8f1c218e284260f8773d817bd7"
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordCantor.lean",
+        "sha256": "898cbea8d29b6089b584b41093a50c8c874b40870324cd96a286cf228052e7b4"
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordCantorGroup.lean",
+        "sha256": "87c9bf6250568be433375ad432667bd41af281844019ced0de12b2a49a8452e7"
+      }
+    ],
+    "scope": "Complete finite reduced-pair arithmetic model and actual specialized Cantor relation. Geometric Picard identification and scaling/large-prime asymptotics remain separate."
+  },
+  "sources": [
+    {
+      "id": "Gaudry2000",
+      "record": "sources.json",
+      "read_scope": "Definitions2-4, Section2.3, Proposition4 at recorded scope; fixed-g q-to-infinity is not exact finite equality."
+    },
+    {
+      "id": "MMT2002",
+      "record": "sources.json",
+      "read_scope": "Sections4.2-4.3printedpp133-134/PDF7-8, prime-r/binary setting and explicit heuristic beforeeq13; eq12omits identity."
+    },
+    {
+      "id": "Stoll2014",
+      "title": "Arithmetic of Hyperelliptic Curves, screen version August1,2014",
+      "url": "https://www.mathe2.uni-bayreuth.de/stoll/teaching/ArithHypKurven-SS2014/Skript-ArithHypCurves-pub-screen.pdf",
+      "pdf_sha256": "619150b20644d44b3fee4aeda6ece57d4e5a2d5b1343d0dc2dcbafd1bb9cb321",
+      "text_sha256": "2337ce2864d2ed126a6b7c3bc6de4cf976cc394da4294afe7aefa061af99c3d3",
+      "read_scope": "Definition2.2p5(characteristicnot2/squarefree), Lemmas4.16-4.17andTheorem4.18pp23-25including proof, Lemma5.2p30including2torsion factorization proof; PDFp24visually inspected."
+    },
+    {
+      "id": "Cantor1987",
+      "doi": "10.1090/S0025-5718-1987-0866101-0",
+      "url": "https://www.ams.org/mcom/1987-48-177/S0025-5718-1987-0866101-0/S0025-5718-1987-0866101-0.pdf",
+      "status": "Unread: publisher PDF403 in curl and web retrieval. Citation verified against actual Gaudry reference4. Stoll/pinned source are separate read sources."
+    },
+    {
+      "id": "Pinned native arithmetic",
+      "repository": "isogeny-labs/cryptanalysis",
+      "revision": "fe751b09b08bc274d60cb22cfba25b13983b2b6e",
+      "path": "suite/src/prime_hyperelliptic/curve.rs",
+      "git_blob": "048e2265aa4066241b10be3538806ad6c3a22484",
+      "read_scope": "Constructor/validation/Cantor compose/reduce/enumeration at recorded scope; not a full implementation refinement or new population run."
+    }
+  ],
+  "identity_plan": {
+    "status": "Planned; commit this source and plan before issue.",
+    "source": "research/jacobian_smoothness_audit_20261109/identity/src/bin/mumford_cantor.rs",
+    "source_sha256": "c6f47a10ab686990922e44fa519b5d857f238de9a60d708e751a9d791c365978",
+    "cargo_lock_sha256": "8f6ee1f1edd91391f7468c6b46f0b7536c05752132fe0cd3f18de92f341c3b61",
+    "variables": 5,
+    "total_degree": 6,
+    "seed_hex": "0x202611092040",
+    "points": 32,
+    "extra_seed_hex": "0x5e4ae096",
+    "extra_points": 11,
+    "scope": "Only scalar cancellation d^2ab=(da)(db) and quintic factorization, combined with independent t. Not gcd selection, full64step theorem, group structure, subgroup counts or geometry.",
+    "checker_sources": [
+      {
+        "path": "src/cryptanalysis/identity_certificate.rs",
+        "sha256": "d81ee915ad769a87d7aac5d9664631239607f4a0deb27850cdb52cea84e34270"
+      },
+      {
+        "path": "src/hash/sha256.rs",
+        "sha256": "2bafe271f1b2f6e6eb1a100f672f81e2b16bbe30b6db29ac579c0740dfe9eddf"
+      }
+    ]
+  },
+  "kb": "No connected research-kb tools; scripts/research-kb status unavailable (no executable). Narrow primary/pinned-source fallback, no novelty claim.",
+  "new_native_curve_population": false,
+  "paid_spend": 0,
+  "prior_frozen_data_changed": false,
+  "retained_raw_log": {
+    "archive": "research/jacobian_smoothness_audit_20261109/evidence/mumford-cantor-build-04.log.gz",
+    "raw_bytes": 15426,
+    "raw_sha256": "2d329231c742de615b3255b19e98bc020faa40c8d00df478649d3da3750383a0",
+    "archive_sha256": "af2bd54dda03296aa86db582f84582996ecd9b53e9ef7428ab6bd107a03aac83",
+    "reason": "Original trailing whitespace in raw Lean diagnostics; deterministic lossless compression, no trimming."
+  }
+}

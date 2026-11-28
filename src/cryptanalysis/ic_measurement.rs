@@ -456,6 +456,17 @@ pub(crate) fn callgrind_dump(label: &'static [u8]) {
     dump(label);
 }
 
+/// Fixed, safe labels for a separately profiled native scalar verifier.
+/// Requests are inert outside Valgrind; this does not qualify an execution.
+pub fn callgrind_solve_frame_begin() {
+    dump(b"ecbench_before_solve\0");
+}
+
+/// Close the same complete-verifier frame, including an ordinary error return.
+pub fn callgrind_solve_frame_end() {
+    dump(b"ecbench_solve\0");
+}
+
 #[cfg(test)]
 thread_local! { static DUMPS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) }; }
 

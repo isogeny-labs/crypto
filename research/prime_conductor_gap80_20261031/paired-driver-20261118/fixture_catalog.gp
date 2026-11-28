@@ -1,0 +1,4 @@
+\ Approved finite development-fixture enumeration; no timing or large search.
+ps=[191,193,197,199,211,223,227,229,233,239,241,251];
+for(i=1,#ps,p=ps[i];a=lift(Mod(-1/3,p));b=lift(Mod(19/108,p));K=[Mod(-1/3,p),Mod(-1/2,p)];E=ellinit([0,0,0,a,b],p);N=ellcard(E);r=N/5;ok=isprime(r)&&r>=5&&((p+1-N)%p!=0);if(ok,G=[];for(x=0,p-1,ys=ellordinate(E,x);if(#ys,P=[Mod(x,p),ys[1]];T=ellmul(E,P,5);if(T!=[0]&&ellmul(E,T,r)==[0],G=lift(T);break))));print("{\"p\":\"",p,"\",\"a\":\"",a,"\",\"b\":\"",b,"\",\"N\":\"",N,"\",\"candidate_r\":\"",r,"\",\"kernel_order\":\"",ellorder(E,K),"\",\"accepted\":",if(ok,"true","false"),",\"G\":",if(ok,Str("[\"",G[1],"\",\"",G[2],"\"]"),"null"),",\"scope\":\"tiny public correctness fixture only\"}"));
+quit;

@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# Thin orchestration only. No base construction, field arithmetic or solver is
+# implemented here. The caller enforces the frozen 180-second outer deadline.
+set -euo pipefail
+[[ $# == 2 ]] || { echo 'usage: sequence SOURCE_REVISION PROTOCOL_SHA256' >&2; exit 2; }
+here=$(cd "$(dirname "$0")" && pwd)
+revision=$1 protocol=$2 output=${ISOLAB_OUTPUT_DIR:?}
+export RAYON_NUM_THREADS=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export RUST_TEST_THREADS=1
+# The command contract reserves two CPUs; only one scientific worker is used.
+ulimit -v 2097152
+any_failed=0
+run_call() {
+  local name=$1 case_name=$2 presentation=$3 call_dir status check_status
+  call_dir="$output/$name"
+  mkdir "$call_dir" # A previous call is never overwritten or retried.
+  jq -n --arg revision "$revision" --arg protocol "$protocol" \
+    --arg case_name "$case_name" --arg presentation "$presentation" \
+    --arg start "$(date -u +%FT%TZ)" \
+    --arg binary "$(sha256sum "$here/rr5-b677-gate" | cut -d' ' -f1)" \
+    --arg checker "$(sha256sum "$here/rr5-b677-receipt-check" | cut -d' ' -f1)" \
+    '{schema:"rr5.b677.pre-call/v1",source_revision:$revision,protocol_sha256:$protocol,
+      started_at:$start,case:$case_name,presentation:$presentation,
+      producer_sha256:$binary,checker_sha256:$checker,workers:1,address_space_bytes:2147483648,
+      argv:["rr5-b677-gate","--case",$case_name,"--presentation",$presentation]}' \
+    > "$call_dir/pre-call.json"
+  set +e
+  "$here/rr5-b677-gate" --case "$case_name" --presentation "$presentation" \
+    > "$call_dir/producer.stdout" 2> "$call_dir/producer.stderr"
+  status=$?
+  set -e
+  printf '%s\n' "$status" > "$call_dir/producer.exit"
+  set +e
+  "$here/verify-call" "$call_dir" "$case_name" "$presentation" \
+    > "$call_dir/verification.stdout" 2> "$call_dir/verification.stderr"
+  check_status=$?
+  set -e
+  printf '%s\n' "$check_status" > "$call_dir/verification.exit"
+  jq -e --arg binary "$(sha256sum "$here/rr5-b677-gate" | cut -d' ' -f1)" \
+    --arg checker "$(sha256sum "$here/rr5-b677-receipt-check" | cut -d' ' -f1)" \
+    '.producer_sha256==$binary and .checker_sha256==$checker' "$call_dir/pre-call.json" >/dev/null
+  jq -n --arg end "$(date -u +%FT%TZ)" --argjson producer "$status" --argjson checker "$check_status" \
+    '{schema:"rr5.b677.post-call/v1",ended_at:$end,producer_exit:$producer,
+      verification_exit:$checker,accepted:($producer==0 and $checker==0),
+      scope:"row replay plus source-bound completion metadata; not an independent completeness proof"}' \
+    > "$call_dir/post-call.json"
+  if [[ "$status" != 0 || "$check_status" != 0 ]]; then any_failed=1; fi
+}
+run_call positive-structured positive structured
+# The cofactor reference is compulsory even after a stopped structured call.
+run_call positive-cofactor positive cofactor
+if jq -e '.accepted==true' "$output/positive-structured/post-call.json" >/dev/null; then
+  run_call h0-structured h0 structured
+  run_call w0-structured w0 structured
+else
+  jq -n '{schema:"rr5.b677.not-run/v1",cases:["h0","w0"],
+    reason:"structured positive did not complete with independent row replay"}' > "$output/followups-not-run.json"
+fi
+jq -n --argjson failed "$any_failed" \
+  '{schema:"rr5.b677.sequence/v1",all_requested_calls_accepted:($failed==0),
+    retries:0,scientific_worker_count:1,outer_wall_seconds:180,complete_cold_cost:null}' \
+  > "$output/sequence.json"
+exit "$any_failed"

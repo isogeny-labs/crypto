@@ -41,6 +41,8 @@ jobs:
             .github/scripts/frozen-lock-source.sh
             .github/scripts/frozen-lock-source.files
             research/notes/ecc2k130/compact_orbit_point_panel_20260929/test_point_mode.py
+            /tools/artifacts/
+            /.artifacts/
       - uses: Swatinem/rust-cache@v2
       - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock && bash .github/scripts/frozen-lock-source.sh
       - run: cargo build --release --locked --example koblitz_rho_batch_ks_v2_n61
@@ -79,6 +81,8 @@ jobs:
             research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924/independent_replay.py
             research/notes/ecc2k130/compact_orbit_point_panel_20260929
             .github/workflows/compact-orbit-point-panel.yml
+            /tools/artifacts/
+            /.artifacts/
       - uses: Swatinem/rust-cache@v2
       - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock && bash .github/scripts/frozen-lock-source.sh
       - run: cargo build --release --locked --example koblitz_rho_batch_ks_v2_n61 --example koblitz_orbit_dlp_fast
@@ -139,6 +143,8 @@ jobs:
             research/sat_factor_base_review_20260908/autolab_orbit_extract_20260924/independent_replay.py
             research/notes/ecc2k130/compact_orbit_point_panel_20260929
             .github/workflows/compact-orbit-point-panel.yml
+            /tools/artifacts/
+            /.artifacts/
       - uses: Swatinem/rust-cache@v2
       - run: cp research/notes/ecc2k130/compact_shared_log_20260925/Cargo.lock Cargo.lock && bash .github/scripts/frozen-lock-source.sh
       - run: cp research/notes/ecc2k130/compact_orbit_point_panel_20260929/rho_baseline_0839.rs examples/koblitz_rho_backend_baseline.rs

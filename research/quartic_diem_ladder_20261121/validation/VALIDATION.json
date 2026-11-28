@@ -1,0 +1,37 @@
+{
+ "schema": "validation-gate/v1",
+ "note": "Draft by the validator; the study has no leaderboard or benchmarks row. Paths are relative to this directory (validation/); if the manifest is moved to the study root (the evidence directory of a row whose source is RESULTS.md), prefix them with validation/ and change ../raw/ to raw/ in validator-report.json.",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "d69199dc3e3d9c3e3ec70ea02672aff80c6fd39e79825880dbc5cc2bdec426c2"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "bdcae09299f231bbe20f67d14cd9548f2bbda0f0a289b7dab05c5c6811756b38"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "PROTOCOL.md (sha256 96311c59...2ec2) section 4: the ideal negation rho R = sqrt(pi r / 4) Pic^0 additions with nothing unpriced charged to rho, the primary reference at every prime; the executed Q_rho_neg is calibration only (p <= 16411, 50 runs, mean steps / R = 1.007)",
+  "unit": "GAE per solve, p = 131101, 2lp-sfb: geometric mean over the 5 curves of the per-curve geometric mean over solver seeds 1, 2; one counted Pic^0 operation = 1; each counted native operation (rel_mul, rel_add, la_mul, la_add, idx_lookups, idx_inserts) = w; the ideal negation rho charges no native work at any w",
+  "binary_or_process": "IC arms: genus_ladder.qsfb sha256 f0243cf85a90ddb630f7ad868a4375fffae1189aff959a71da3c901a49c9e38b (replayed by the validator, rows identical). The negation floor is a closed form of each instance's r as emitted by that binary and certified by the validator's own arithmetic (r prime, h = 1, #J = r by Hasse-Weil, [r]G = 0); the calibration walk Q_rho_neg ran in the same binary at p <= 16411",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 8086.594778902975,
+    "rho": 42080116.41636846
+   },
+   "0.1": {
+    "ic": 32608350.538097497,
+    "rho": 42080116.41636846
+   },
+   "1": {
+    "ic": 326003607.14749795,
+    "rho": 42080116.41636846
+   }
+  },
+  "order_holds_across_band": false
+ }
+}

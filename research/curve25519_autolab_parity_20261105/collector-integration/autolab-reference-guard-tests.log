@@ -1,0 +1,30 @@
+   Compiling crypto v0.1.0 (/home/ec2-user/crypto-curve25519-collector-20261105)
+    Finished `release` profile [optimized] target(s) in 9.04s
+     Running unittests src/bin/ic_autolab.rs (/tmp/curve25519-collector-target/release/deps/ic_autolab-de9aac9a86f11ab3)
+
+running 22 tests
+test complete_reference_tests::complete_cohorts_keep_the_original_ratios ... ok
+test complete_reference_tests::empty_incomplete_and_nonfinite_cohorts_are_not_eligible ... ok
+test complete_reference_tests::invalid_denominators_and_ratio_overflow_are_not_distances ... ok
+test complete_reference_tests::optional_reference_keeps_legacy_array_encoding ... ok
+test complete_reference_tests::partial_reference_does_not_supply_a_distance ... ok
+test tests::a_family_incumbent_at_two_sizes_extrapolates_n_by_its_own_fit ... ok
+test tests::an_exhausted_exploration_does_not_close_the_family ... ok
+test tests::a_variant_family_starts_at_its_parents_best_n ... ok
+test tests::another_sizes_incumbent_family_transfers_at_the_same_relative_n ... ok
+test tests::arm_strings_follow_the_family_template ... ok
+test tests::civil_dates_are_right ... ok
+test tests::classification_follows_the_frozen_rule ... ok
+test tests::exploration_slots_survive_the_budget_cut ... ok
+test tests::family_params_reach_the_method_and_the_identity ... ok
+test tests::propose_neighbourhood_then_exploration_never_repeats_a_trial ... ok
+test tests::propose_refines_alternatives_within_one_and_a_half_of_the_incumbent ... ok
+test tests::ratchet_keeps_verified_improvement_when_reference_is_unavailable ... ok
+test tests::seeds_skip_exposed_values_and_differ_between_stages ... ok
+test tests::selection_takes_the_lowest_verified_candidate_below_the_incumbent ... ok
+test tests::size_orders_preserve_legacy_numbers_and_full_curve25519_values ... ok
+test tests::train_spec_names_every_arm_and_holdout_adds_the_controls ... ok
+test tests::explicit_full_width_routes_preserve_reference_and_parameter_caps ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

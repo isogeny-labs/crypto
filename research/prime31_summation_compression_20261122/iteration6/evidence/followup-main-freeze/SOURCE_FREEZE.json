@@ -1,0 +1,117 @@
+{
+  "schema": "prime31-source-freeze/v1",
+  "frozen_before_run": true,
+  "date_utc": "2026-11-23",
+  "base_commit": "f0ca664eca0081a30adfcc79dcf62a32de40d2af",
+  "tracking_commit": "1650b344b9bd72237d9bafd26b3401da1385eafa",
+  "pr": 4962,
+  "branch": "lane/prime31-rational-chain-correctness",
+  "compiled_changes": [
+    {
+      "path": "src/cryptanalysis/ic_framework/mod.rs",
+      "insertions": 4,
+      "deletions": 0,
+      "purpose": "Restore exact missing parent guard lines"
+    }
+  ],
+  "source_inputs": [
+    {
+      "path": "src/cryptanalysis/ext_curve.rs",
+      "git_blob": "5ba07735ae238e6ebf4b414692a717d47081513e"
+    },
+    {
+      "path": "src/cryptanalysis/semaev_prime_poly.rs",
+      "git_blob": "123ccac36794ed3ce043e01b3a9c27ed3e2ca096"
+    },
+    {
+      "path": "src/cryptanalysis/identity_certificate.rs",
+      "git_blob": "114f1f4a3f2a1be027a9b046ef166259df49dd45"
+    },
+    {
+      "path": "research/prime31_ic_20261115/native/lib.rs",
+      "git_blob": "42e1e7c1912be43190959c5be8f84cf59c867786"
+    },
+    {
+      "path": "examples/prime31_rational_chain_guard.rs",
+      "git_blob": "7f991783bd99d4f95ec4df1a94b50e79be693b51",
+      "sha256": "5cfcb6611552f16ea8a13fc1f6bd2dc441c4e32636812a647585f8f93c7438a0"
+    },
+    {
+      "path": "examples/identity_certificate_rational_chain.rs",
+      "git_blob": "a71898f453975cf1f77881d2a0779fc99622e712",
+      "sha256": "b803aa70037cd95467cc0865f99fd8af5848912eb490542d8ad327b3dfa490fc"
+    },
+    {
+      "path": "src/cryptanalysis/f4_fp_tower.rs",
+      "git_blob": "9d898fd2625c63bc0c90072f847db1c9f33bec2a"
+    },
+    {
+      "path": "src/cryptanalysis/sig_fp_tower.rs",
+      "git_blob": "d4abc9493a4b8f2692625aa9032f43c716d22e5e"
+    },
+    {
+      "path": "tests/rust_extension_security.rs",
+      "git_blob": "e4624c681aa9bae7573d381206b8056fe6974b35"
+    },
+    {
+      "path": "Cargo.toml",
+      "git_blob": "8d6da017040e8edbb2cd8b016a94cb2e62c7d1ca"
+    },
+    {
+      "path": "Cargo.lock",
+      "git_blob": "afc9511377b3549c26a44d8e285e865e2d2041b4"
+    },
+    {
+      "path": "src/cryptanalysis/ic_framework/mod.rs",
+      "git_blob": "f4f2cce4118d1510fd961cc6d6e0fc0354c257e1",
+      "base_git_blob": "8c6fbde25df09ad504877f780f4bdbf6acbbd002",
+      "sha256": "4c8ae812e9f9233797e0131d132f13189cd7157f21318798556d0b57e96b06d0"
+    },
+    {
+      "path": "src/cryptanalysis/ic_boundary.rs",
+      "git_blob": "0b0d7fb149307d484075529bfb9852621aaa4ff0"
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/spec.rs",
+      "git_blob": "6878f0b872ef6349324e7ba43c8a6d61d7ffcedf"
+    },
+    {
+      "path": ".github/workflows/prime31-rational-chain-guard.yml",
+      "sha256": "0ad84c62586d87103aeda021bf1a408208fdd1ac46f28ce73a9acf925d4428c9",
+      "git_blob": "2131bcd33f73c0ec6fe11f0a41bcf7d84e1d8635"
+    }
+  ],
+  "cargo_lock_policy": "Original root Cargo.lock; --locked on every command; no dependency or arithmetic substitution",
+  "commands": [
+    "cargo test --locked --release --lib cryptanalysis::ecbench::spec::tests",
+    "cargo test --locked --release --test rust_extension_security malformed_plugin_maps_and_invalid_subgroup_bounds_return_errors",
+    "cargo test --locked --release --example prime31_rational_chain_guard",
+    "cargo run --locked --release --example prime31_rational_chain_guard",
+    "cargo run --locked --release --example identity_certificate_rational_chain -- correctness-receipts/identities",
+    "cargo run --locked --release --example identity_certificate_rational_chain -- --check correctness-receipts/identities 6677026024"
+  ],
+  "workflow_policy": "After source-identity capture, independent checks run unless cancelled; no continue-on-error; any failed step fails the job; logs/artifact retained always",
+  "expected_scope": "Fixed supplied-certificate correctness, inherited regression and evaluated identity; no relation finder, performance run or formal proof",
+  "prior_failures": [
+    {
+      "source": "bf56de345c02ef6f1c55bfa047087b0e880cb09e",
+      "run": 45096187034,
+      "job": 137436389923,
+      "cause": "inherited spec delimiter"
+    },
+    {
+      "source": "a4ddc035c0c7519d6bab7a438d8a168f74ae40db",
+      "run": 45097885135,
+      "job": 137441679059,
+      "cause": "inherited framework delimiter"
+    }
+  ],
+  "inherited_repairs_already_present": [
+    "Cargo.toml three array-table headers",
+    "ic_boundary.rs eleven historical restoration lines",
+    "ecbench/spec.rs original restoration plus current PairedCurvesV1 additions"
+  ],
+  "candidate_tests_executed_before_freeze": false,
+  "new_identity_issued_before_freeze": false,
+  "standing": "unverified"
+}

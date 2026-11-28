@@ -40,6 +40,25 @@ Same-agent exact checks and a separate parser share declared primitives;
 no external audit is claimed. See PROOF_MAP.md for the boundary between
 Lean proofs, native calculations and written global geometry. Run the
 pinned project with tools/lean/proof-gate.sh from the repository root.
-Install report-requirements.txt in a scratch environment and run
-python build_report.py to render frozen evidence only. All PDF pages are
+For current rendering use the patched isolated command below instead of
+executing the builder in this archived directory. The historical build used
+`build_report.py` to render frozen evidence only. All PDF pages are
 visually inspected. No background experiment is scheduled.
+
+
+### Patched, isolated report reproduction (2026-11-15)
+
+The environment and output hashes above describe the frozen historical build.
+For current reproduction, install `report-requirements.txt` in a scratch environment
+and run the following from the repository root, choosing a new directory outside
+the checkout. This copies the pinned builder and inputs; it never renders over
+the archived outputs.
+
+```sh
+python tools/reproduce_archived_reports_v1.py --round 09 --output /absolute/new/reproduction-directory
+```
+
+The original `PyMuPDF==1.26.5` requirements bytes, their SHA-256, and the
+source revision are retained in `tools/report_reproduction_v1.json`. The active
+requirements use `PyMuPDF==1.26.7`; Typst remains at 0.15.0. Do not invoke
+`build_report.py` in the frozen round directory. See `docs/archived-report-reproduction-v1.md`.

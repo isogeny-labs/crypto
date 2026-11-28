@@ -1,0 +1,25 @@
+Baseline build (unmodified library revision 232925556a6e39d4589932c60e75a1bf24f9e049):
+  source /home/agent/.cargo/env
+  cargo build --offline --release --lib --locked
+
+Native measurement build (source tree of e4af92fbc62ac21b6ae53d45d961de50ed60275f):
+  research/extension_ic_graph_20261115/rho-parity/build-native.sh /workspace/crypto /tmp/rho-parity-native-1
+  /tmp/rho-parity-native-1/tests --test-threads=1
+
+Single frozen development comparison; exit 0, no retry:
+  IC_SOURCE_REVISION=e4af92fbc62ac21b6ae53d45d961de50ed60275f RAYON_NUM_THREADS=1 timeout 600 /tmp/rho-parity-native-1/qualify research/extension_ic_graph_20261115/rho-parity/validation/paired-1.jsonl
+  stdout and stderr go to distinct paired-1.stdout / paired-1.stderr.
+  Native worker owns its create-new JSONL; each completed case is flushed.
+
+Rust recomputation:
+  /tmp/rho-parity-native-1/analyze research/extension_ic_graph_20261115/rho-parity/validation/paired-1.jsonl research/extension_ic_graph_20261115/rho-parity/validation/summary-1.json
+
+Final development coverage (new tests and analyzer only; no replacement comparison):
+  research/extension_ic_graph_20261115/rho-parity/build-native.sh /workspace/crypto /tmp/rho-parity-native-3
+  /tmp/rho-parity-native-3/tests --test-threads=1 --nocapture
+  clippy-driver [rustc-args.txt] --test qualify.rs --emit=metadata -D warnings
+    -A clippy::needless_range_loop -A clippy::manual_memcpy
+    -A clippy::unusual_byte_groupings -A clippy::result_unit_err
+  clippy-driver [rustc-args.txt] analyze.rs --emit=metadata -D warnings
+
+No admitted wall-clock comparison, paid allocation or global-main build.

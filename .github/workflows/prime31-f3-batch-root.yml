@@ -1,0 +1,70 @@
+name: Prime31 Semaev F3 batch-root gate (source-specific)
+on:
+  push:
+    branches:
+      - automation/prime31-f3-batch-root-gate-20261119
+    paths:
+      - ".github/workflows/prime31-f3-batch-root.yml"
+      - "research/prime31_ic_20261115/native/examples/prime31_f3_batch_roots.rs"
+      - "research/prime31_ic_20261115/native/verify_prime31_f3_batch_roots.py"
+      - "research/prime31_ic_20261115/rr9/F3_BATCH_ROOT_PROTOCOL_20261119.md"
+  pull_request:
+    paths:
+      - ".github/workflows/prime31-f3-batch-root.yml"
+      - "research/prime31_ic_20261115/native/examples/prime31_f3_batch_roots.rs"
+      - "research/prime31_ic_20261115/native/verify_prime31_f3_batch_roots.py"
+      - "research/prime31_ic_20261115/rr9/F3_BATCH_ROOT_PROTOCOL_20261119.md"
+permissions:
+  contents: read
+jobs:
+  original-prime31:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout study exact head
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout pinned original Prime31 arithmetic
+        uses: actions/checkout@v4
+        with:
+          repository: isogeny-labs/crypto
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Rust version
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only new example onto pinned original Rust crate
+        run: |
+          mkdir -p pinned/research/prime31_ic_20261115/native/examples
+          cp research/prime31_ic_20261115/native/examples/prime31_f3_batch_roots.rs pinned/research/prime31_ic_20261115/native/examples/
+          mkdir -p results
+          git rev-parse HEAD > results/study_commit.txt
+          git -C pinned rev-parse HEAD > results/pinned_original_commit.txt
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_f3_batch_roots.rs research/prime31_ic_20261115/rr9/F3_BATCH_ROOT_PROTOCOL_20261119.md > results/source_sha256.txt
+      - name: Run original library tests
+        run: cargo +1.100.0 test --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib --quiet
+      - name: Run focused source-bound Rust identity and full-fibre tests
+        run: cargo +1.100.0 test --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --example prime31_f3_batch_roots --quiet
+      - name: Run full original Prime31 benchmark
+        run: cargo +1.100.0 run --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --release --example prime31_f3_batch_roots --quiet > results/prime31-f3-batch-roots-raw.json
+      - name: Independent Python bigint reproduction and arithmetic checks
+        run: python3 research/prime31_ic_20261115/native/verify_prime31_f3_batch_roots.py results/prime31-f3-batch-roots-raw.json | tee results/prime31-f3-independent.json
+      - name: Raw SHA256 and machine-checkable summary
+        run: |
+          sha256sum results/prime31-f3-batch-roots-raw.json results/prime31-f3-independent.json > results/results_sha256.txt
+          python3 - <<'PY'
+          import json
+          x=json.load(open('results/prime31-f3-batch-roots-raw.json'))
+          assert x['all_full_fibre_comparisons_match'] and x['cohorts']['planted']['hits']==64
+          assert x['forbidden_group_sum_tables']==0 and not x['complete_ecdlp_solved']
+          assert x['field_ops_f3']['inversions']==351
+          print('F3 batch root original source source-specific gate PASS')
+          PY
+      - name: Upload complete source-bound evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-f3-batch-root-original-rust
+          path: results/
+          if-no-files-found: error

@@ -1,0 +1,127 @@
+{
+  "schema": "m31-component-wrapper/v1",
+  "recorded_at": "2026-11-24T04:07:43.872Z",
+  "standing": "unsigned producer development evidence; pcc:unverified",
+  "source_base_commit": "42cbbf529176ef49767575e7415520647dd41959",
+  "algorithm_source_commit": "709a68ad6367751e0d2b7362de22bca35cb3d631",
+  "working_tree_source_changes": [
+    {
+      "path": "research/m31_integrated_build_20261123/check.sh",
+      "original_sha256": "7e694eea833c80ea4c3f38cc9a1174442c5cac40fe2a787d6a187967d343008a",
+      "current_sha256": "904b9646cb2b824dfaf934ada9c67b7f0b0981dbd17dbc94172d0be57c706924"
+    }
+  ],
+  "original_source_manifest_scope": "The immutable original verification.json and SOURCE_SHA256SUMS describe source commit 709a68ad, including the earlier syntax-only wrapper. This separate receipt pins the corrected wrapper; all other original source entries remain equal.",
+  "wrapper_source": {
+    "path": "research/m31_integrated_build_20261123/check.sh",
+    "sha256": "904b9646cb2b824dfaf934ada9c67b7f0b0981dbd17dbc94172d0be57c706924"
+  },
+  "gates": [
+    {
+      "name": "graph",
+      "exit": 0,
+      "passed": 7,
+      "target": "--test graph_suite"
+    },
+    {
+      "name": "structured",
+      "exit": 0,
+      "passed": 13,
+      "target": "--all-targets"
+    },
+    {
+      "name": "rr5",
+      "exit": 0,
+      "passed": 50,
+      "target": "--all-targets"
+    }
+  ],
+  "total_distinct_tests": 70,
+  "overall_exit": 0,
+  "earlier_failure": {
+    "exit": 101,
+    "reason": "Unqualified inherited graph unit tests require the full root telemetry API; corrected wrapper selects the qualified graph integration target."
+  },
+  "artifacts": [
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/wrapper-final-v1/environment.txt",
+      "sha256": "cc5cc735297a3fbe3392c674e0fb354cec4580fb219b475f1259b992cf97d503",
+      "bytes": 558
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/wrapper-final-v1/graph.command",
+      "sha256": "838accf41e6e33011f12f22bb5928e059a3660236bcdfeb6325b72e97052974c",
+      "bytes": 265
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/wrapper-final-v1/graph.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/wrapper-final-v1/graph.log",
+      "sha256": "d0f10405faf3dc4973483e0b421e2d2c6a9e38f1cc6ffe19960c0d5b51942a4d",
+      "bytes": 856
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/wrapper-final-v1/invocation.txt",
+      "sha256": "e473048cbf800a3d8e630777add0eca1b3197ae9a37525bb7ca4f5e387b64f0b",
+      "bytes": 800
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/wrapper-final-v1/overall.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/wrapper-final-v1/rr5.command",
+      "sha256": "3bcdf3dd215e22df0d6d57239c7096bf43be4629a3f63b31ced13379bed97978",
+      "bytes": 261
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/wrapper-final-v1/rr5.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/wrapper-final-v1/rr5.log",
+      "sha256": "7720da45603f4b634dc7dab508fe4dd96e62849b05a766d535aa2e13df8d1174",
+      "bytes": 12656
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/wrapper-final-v1/structured.command",
+      "sha256": "17396fbcdc21e6c079026ba511a11ba5e8e7bded6a63b87f011af1d02fc9c2a1",
+      "bytes": 265
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/wrapper-final-v1/structured.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/wrapper-final-v1/structured.log",
+      "sha256": "6fb2e8e9fb38c0e580fc6464d7c4d1f8b64a18993172878aed50bbd8a7052d03",
+      "bytes": 10097
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/wrapper-compatibility-v1/graph-all-targets.command",
+      "sha256": "202fb7d4acf04383d854813703828ef4ea5ca914db6eb0b7794b9b136748f796",
+      "bytes": 499
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/wrapper-compatibility-v1/graph-all-targets.exit",
+      "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c",
+      "bytes": 4
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/wrapper-compatibility-v1/graph-all-targets.log",
+      "sha256": "a699f9857fd398ffe7ac3990184bdb65ee1ba9f6002d08722f91e200d81e1ee9",
+      "bytes": 2540
+    },
+    {
+      "path": "research/m31_integrated_build_20261123/evidence/ci-preconditions-v1.json",
+      "sha256": "888be3e1109056f446d9d4ef942375a6d96e79950ed11a2530279bd36efa2819",
+      "bytes": 2507
+    }
+  ]
+}

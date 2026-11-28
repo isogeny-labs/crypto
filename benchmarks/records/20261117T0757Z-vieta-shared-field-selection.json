@@ -1,0 +1,1052 @@
+{
+  "branch": "lane/vieta-speedup-20261117",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/isolated_bench.py",
+        "run",
+        "--cpus",
+        "4",
+        "--out",
+        "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/isolation.jsonl",
+        "--label",
+        "vieta-selection",
+        "--",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=3s",
+        "900",
+        "bash",
+        "research/vieta_coset_rust_20261115/speedup-20261117/selection-native.sh",
+        "/workspace/scratch/vieta-speedup-binaries/629a8d5c5311041d8833574c6bd9166e83577db380bb63e100a5203ce9d753cf"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-17T07:58:05+00:00",
+      "wall_s": 385.215
+    }
+  ],
+  "commit": "6a1540d0d80227cfea558aab0f3a5dcbaffff394",
+  "commit_dirty": false,
+  "created_utc": "2026-11-17T07:57:57+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "2b48a61969ab",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261117T0757Z-vieta-shared-field-selection",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "failed_calls",
+      "note": "Stored Rust summary; includes warmups; producer unverified.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 1,
+      "name": "cold_ratio_coset_p224_m2048_conditioned_sum_finite",
+      "note": "Copied frozen Rust paired median/conditional bootstrap; belowL2,unverified; full native field setup timed but primitive constructor counts unpriced. No S3 availability assertion.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        10.742445881198673,
+        10.742445881198673
+      ],
+      "unit": "ratio",
+      "value": 10.742445881198673
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 1,
+      "name": "cold_ratio_coset_p224_m2048_seeded_random_abscissa_finite",
+      "note": "Copied frozen Rust paired median/conditional bootstrap; belowL2,unverified; full native field setup timed but primitive constructor counts unpriced. No S3 availability assertion.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        10.784457167438228,
+        10.784457167438228
+      ],
+      "unit": "ratio",
+      "value": 10.784457167438228
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 1,
+      "name": "cold_ratio_coset_word62_m16384_conditioned_sum_finite",
+      "note": "Copied frozen Rust paired median/conditional bootstrap; belowL2,unverified; full native field setup timed but primitive constructor counts unpriced. No S3 availability assertion.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1495533435469294,
+        1.1495533435469294
+      ],
+      "unit": "ratio",
+      "value": 1.1495533435469294
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 1,
+      "name": "cold_ratio_coset_word62_m16384_seeded_random_abscissa_finite",
+      "note": "Copied frozen Rust paired median/conditional bootstrap; belowL2,unverified; full native field setup timed but primitive constructor counts unpriced. No S3 availability assertion.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.2541011420512354,
+        1.2541011420512354
+      ],
+      "unit": "ratio",
+      "value": 1.2541011420512354
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 1,
+      "name": "cold_ratio_rational_p224_m512_conditioned_sum_finite",
+      "note": "Copied frozen Rust paired median/conditional bootstrap; belowL2,unverified; full native field setup timed but primitive constructor counts unpriced. No S3 availability assertion.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.5263354908513411,
+        1.5263354908513411
+      ],
+      "unit": "ratio",
+      "value": 1.5263354908513411
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 1,
+      "name": "cold_ratio_rational_p224_m512_seeded_random_abscissa_finite",
+      "note": "Copied frozen Rust paired median/conditional bootstrap; belowL2,unverified; full native field setup timed but primitive constructor counts unpriced. No S3 availability assertion.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.4623369406909614,
+        1.4623369406909614
+      ],
+      "unit": "ratio",
+      "value": 1.4623369406909614
+    }
+  ],
+  "problem": "vieta-component-speedup",
+  "raw": [
+    {
+      "bytes": 6880,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/RESULTS.md",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/da/dac6fbf20e78554464c0b285d155282b60d476b355a3abb8b3b6403aa3eed07e",
+      "sha256": "dac6fbf20e78554464c0b285d155282b60d476b355a3abb8b3b6403aa3eed07e",
+      "uploaded": false
+    },
+    {
+      "bytes": 83087,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/cold-ratios.svg",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/00/001c964127adb5ea3a7550d310f9b92cbcf3feb710c453743b589791b4b08b00",
+      "sha256": "001c964127adb5ea3a7550d310f9b92cbcf3feb710c453743b589791b4b08b00",
+      "uploaded": false
+    },
+    {
+      "bytes": 184,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/evidence/selection-export-check.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/59/59d8df0400e430c8be2101af51d7e0cd872cc161bf3559b65c9779a7abba49dd",
+      "sha256": "59d8df0400e430c8be2101af51d7e0cd872cc161bf3559b65c9779a7abba49dd",
+      "uploaded": false
+    },
+    {
+      "bytes": 212,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/evidence/selection-replay.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e7/e77e329d6e90d378a3d35ecc8c2fecd741d352f02d785e8d3b49f6a5ef559a29",
+      "sha256": "e77e329d6e90d378a3d35ecc8c2fecd741d352f02d785e8d3b49f6a5ef559a29",
+      "uploaded": false
+    },
+    {
+      "bytes": 171086,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/evidence/selection-summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/60/609e7a3d447847093d7145d3c95b7d76665884bac3ade0590eea7e005131f6ec",
+      "sha256": "609e7a3d447847093d7145d3c95b7d76665884bac3ade0590eea7e005131f6ec",
+      "uploaded": false
+    },
+    {
+      "bytes": 2274,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/evidence/selection-supervisor.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/86/8676ad6ee42658263e49c540ab4a6c1573600bdcea91fd893c48f4868d5ea231",
+      "sha256": "8676ad6ee42658263e49c540ab4a6c1573600bdcea91fd893c48f4868d5ea231",
+      "uploaded": false
+    },
+    {
+      "bytes": 75220,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/export-selection.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/27/27ecc674343ba36e52a068e75888f19fbd3bad7189b47b3b53c71518e85de917",
+      "sha256": "27ecc674343ba36e52a068e75888f19fbd3bad7189b47b3b53c71518e85de917",
+      "uploaded": false
+    },
+    {
+      "bytes": 21136,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/protocol-selection.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/34/343c638562732e1918800719e6ab108b19a6557a120c12bdd7cb8c014d74f790",
+      "sha256": "343c638562732e1918800719e6ab108b19a6557a120c12bdd7cb8c014d74f790",
+      "uploaded": false
+    },
+    {
+      "bytes": 96543,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/report.pdf",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/34/347e11123ce9164b3717dae6f04cf179b825729c135f55bdfc6c9b7b5aa18804",
+      "sha256": "347e11123ce9164b3717dae6f04cf179b825729c135f55bdfc6c9b7b5aa18804",
+      "uploaded": false
+    },
+    {
+      "bytes": 2048,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-fast-aa.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/47/4774a23a63132c89c8aaed492c22e6b86a6a615f00d36cd219840da84a26edbc",
+      "sha256": "4774a23a63132c89c8aaed492c22e6b86a6a615f00d36cd219840da84a26edbc",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-fast-aa.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2053,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-fast-double.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/05/051980eb4547214dcad3e74a473a813cfaa09d202eff3a1540d1e04f42f08cac",
+      "sha256": "051980eb4547214dcad3e74a473a813cfaa09d202eff3a1540d1e04f42f08cac",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-fast-double.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2060,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-fast-half.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/87/875c083d94b5d903ac9cb03a1fbaa9c4003b35d1758bbecd320c05904929a6c5",
+      "sha256": "875c083d94b5d903ac9cb03a1fbaa9c4003b35d1758bbecd320c05904929a6c5",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-fast-half.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2045,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-fast.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a0/a02eb701d5fb2735398abf68a0f48ec718d88fd53b0832f2451202fe3da13f9b",
+      "sha256": "a02eb701d5fb2735398abf68a0f48ec718d88fd53b0832f2451202fe3da13f9b",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-fast.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2052,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-half.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/03/0345a4fd72f421a14b92c293f888bcadd8c1a1bcc1be1ec57129462ec334afd3",
+      "sha256": "0345a4fd72f421a14b92c293f888bcadd8c1a1bcc1be1ec57129462ec334afd3",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-half.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2017,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-lookup-fast.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e1/e1dc8d5189c0acd22edfa8a2bfe730eadad737e6ee2cf18894edebe1865f92ae",
+      "sha256": "e1dc8d5189c0acd22edfa8a2bfe730eadad737e6ee2cf18894edebe1865f92ae",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-lookup-fast.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2009,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-lookup.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fd/fd277dd9c3c963af51d1efaf6f93bee658c975e97ed64aaede2897930fa90cd8",
+      "sha256": "fd277dd9c3c963af51d1efaf6f93bee658c975e97ed64aaede2897930fa90cd8",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-lookup.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2044,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-newton.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/73/7379bdc8615daf1ebaa39c5f1f1dee8e76909d5ec52f16e789578bb7bf1c3e6b",
+      "sha256": "7379bdc8615daf1ebaa39c5f1f1dee8e76909d5ec52f16e789578bb7bf1c3e6b",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-newton.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2037,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-school.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/12/1266d927ac087e57371496e9b6ff2bf65f0ee5d881f8bed526e66791487d6224",
+      "sha256": "1266d927ac087e57371496e9b6ff2bf65f0ee5d881f8bed526e66791487d6224",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-000-school.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2186,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-fast-aa.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/07/079aa12b414885af04d8dca523d7f834f5677297ef7d12699891c63bc5ff1fbf",
+      "sha256": "079aa12b414885af04d8dca523d7f834f5677297ef7d12699891c63bc5ff1fbf",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-fast-aa.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2190,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-fast-double.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4c/4c141fb21e3e27ef12aaf9f1e2f641e1846ce3591997b0fc6a829e7ff82acb17",
+      "sha256": "4c141fb21e3e27ef12aaf9f1e2f641e1846ce3591997b0fc6a829e7ff82acb17",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-fast-double.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2198,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-fast-half.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/bd/bdc7cf4c5a1a5a1393c3681aa7188bc5538fb541fc8e3a9d635ea8643d0d41b1",
+      "sha256": "bdc7cf4c5a1a5a1393c3681aa7188bc5538fb541fc8e3a9d635ea8643d0d41b1",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-fast-half.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2183,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-fast.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d6/d6fbd0c02c4b02025c0b5f6fd6dedb5040d8e98a231b0b5cd3ca911193a909a1",
+      "sha256": "d6fbd0c02c4b02025c0b5f6fd6dedb5040d8e98a231b0b5cd3ca911193a909a1",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-fast.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2190,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-half.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/00/009196b155a5828a4b26c92273ce3c11745b62cc7d2a7a52aa1a4f40d55423b3",
+      "sha256": "009196b155a5828a4b26c92273ce3c11745b62cc7d2a7a52aa1a4f40d55423b3",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-half.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2155,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-lookup-fast.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a1/a18719bea26aab34f2b8103a8051f39065f73548ff886ba09c1c58e874785242",
+      "sha256": "a18719bea26aab34f2b8103a8051f39065f73548ff886ba09c1c58e874785242",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-lookup-fast.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2147,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-lookup.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/86/86ac80f9eb6e56be699c7df46e14362c95c2f03ed8ecd81afef2415e10c9f1b0",
+      "sha256": "86ac80f9eb6e56be699c7df46e14362c95c2f03ed8ecd81afef2415e10c9f1b0",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-lookup.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2182,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-newton.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/76/762afb8e9dc94fa91998436451e831a588a41b7226458a1e28d7ff6f2ceb0ace",
+      "sha256": "762afb8e9dc94fa91998436451e831a588a41b7226458a1e28d7ff6f2ceb0ace",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-newton.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2175,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-school.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b6/b6588f1abb45bc4ba6e798ae95f93474606e746175d5b2a05fdb63578f26c1d3",
+      "sha256": "b6588f1abb45bc4ba6e798ae95f93474606e746175d5b2a05fdb63578f26c1d3",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/cell-001-school.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 645,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/fixture.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0f/0f290d970c3f065478829c61952ea312c43d70f61b7e2f4c48e72d7c65b510ee",
+      "sha256": "0f290d970c3f065478829c61952ea312c43d70f61b7e2f4c48e72d7c65b510ee",
+      "uploaded": false
+    },
+    {
+      "bytes": 754,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/input-000.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f1/f1deb101c64f9970235f5c3be897f8b68bbad574f06290bf1f6bf89c3065ddef",
+      "sha256": "f1deb101c64f9970235f5c3be897f8b68bbad574f06290bf1f6bf89c3065ddef",
+      "uploaded": false
+    },
+    {
+      "bytes": 892,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/0-word62-coset-m16384/input-001.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ba/baf5ada4dbe1d3fef09432c08a41c80e68e8b9f966e41a889de141d1178c2a1b",
+      "sha256": "baf5ada4dbe1d3fef09432c08a41c80e68e8b9f966e41a889de141d1178c2a1b",
+      "uploaded": false
+    },
+    {
+      "bytes": 2102,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-fast-aa.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b2/b2462c2166afc3a708b80c58e889971b1f1757e8d42603d0964a26a4201e8e1b",
+      "sha256": "b2462c2166afc3a708b80c58e889971b1f1757e8d42603d0964a26a4201e8e1b",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-fast-aa.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2113,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-fast-double.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2c/2c342f66e50d9486de6bc2ee1c320f39d39807e56c7c3f5ecfc402bc39895e70",
+      "sha256": "2c342f66e50d9486de6bc2ee1c320f39d39807e56c7c3f5ecfc402bc39895e70",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-fast-double.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2117,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-fast-half.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/66/66c72a2eb9a430af7001a9229642d39798ad649c6813cbc940f961b4e2e08a4a",
+      "sha256": "66c72a2eb9a430af7001a9229642d39798ad649c6813cbc940f961b4e2e08a4a",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-fast-half.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2099,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-fast.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/31/31412692ae724230e1789e151d66034a23a6854f5b8c235fd0dd6374c69cc695",
+      "sha256": "31412692ae724230e1789e151d66034a23a6854f5b8c235fd0dd6374c69cc695",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-fast.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2113,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-half.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/81/81a77f34244840a8c3fb377dc61501872a5edeedab615e5b88b99330816f3464",
+      "sha256": "81a77f34244840a8c3fb377dc61501872a5edeedab615e5b88b99330816f3464",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-half.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2085,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-lookup-fast.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f0/f0e4fe42f5b434606f6d6bf3678bd3c326031013d232e140a1c7ffcf4c965772",
+      "sha256": "f0e4fe42f5b434606f6d6bf3678bd3c326031013d232e140a1c7ffcf4c965772",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-lookup-fast.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2082,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-lookup.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/83/833844da4348d86d7c3ab4112e13a441f76eedc73d43bd747a64a4323c23ebe9",
+      "sha256": "833844da4348d86d7c3ab4112e13a441f76eedc73d43bd747a64a4323c23ebe9",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-lookup.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2102,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-newton.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b2/b2f4cefb7704957287b4ec8c2da87604a35ead7299ec5ec6550e3c77f1d6d587",
+      "sha256": "b2f4cefb7704957287b4ec8c2da87604a35ead7299ec5ec6550e3c77f1d6d587",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-newton.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2099,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-school.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/89/8977cb999c3033a354f0e6ac36109b308f9958f9b67cd37996717b8ee1f2163c",
+      "sha256": "8977cb999c3033a354f0e6ac36109b308f9958f9b67cd37996717b8ee1f2163c",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-000-school.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2568,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-fast-aa.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8c/8c5fb8bec2a91f31e3a04fbf8c6e22caa3eef339af6dbf8d92b0bce5651213e6",
+      "sha256": "8c5fb8bec2a91f31e3a04fbf8c6e22caa3eef339af6dbf8d92b0bce5651213e6",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-fast-aa.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2577,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-fast-double.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/45/45e1c954dfad5aff01a24614cc7c3f4413ce63acd9ef0b88950d91a549d621b7",
+      "sha256": "45e1c954dfad5aff01a24614cc7c3f4413ce63acd9ef0b88950d91a549d621b7",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-fast-double.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2581,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-fast-half.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a3/a3321e3d74c6d382db0f26dc15e25319076937e2234f8fca5a3ce44585099161",
+      "sha256": "a3321e3d74c6d382db0f26dc15e25319076937e2234f8fca5a3ce44585099161",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-fast-half.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2565,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-fast.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/78/78d9b8d00bf6e1ead456444ce28e90236b9360e4c825f45feda568ce80ef3026",
+      "sha256": "78d9b8d00bf6e1ead456444ce28e90236b9360e4c825f45feda568ce80ef3026",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-fast.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2577,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-half.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/cf/cf9cdd1f270b992f26d698ddef7298bb9de80d92da0f85946e2f08323f90b4f2",
+      "sha256": "cf9cdd1f270b992f26d698ddef7298bb9de80d92da0f85946e2f08323f90b4f2",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-half.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2549,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-lookup-fast.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fb/fbff5a7a28b7e364efdbbc6eecd63d4c7c7e020b4e991aa1d478d86b11f191c5",
+      "sha256": "fbff5a7a28b7e364efdbbc6eecd63d4c7c7e020b4e991aa1d478d86b11f191c5",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-lookup-fast.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2546,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-lookup.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8b/8b03cdb0f6f7ff19a95b638f35e10976c0d131a3ec7b4f767fdadf7aa179a088",
+      "sha256": "8b03cdb0f6f7ff19a95b638f35e10976c0d131a3ec7b4f767fdadf7aa179a088",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-lookup.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2568,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-newton.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/84/8452777f394ac43db8821297528082c824da8c2ee97cf2e7ae4a6fadf3387ae5",
+      "sha256": "8452777f394ac43db8821297528082c824da8c2ee97cf2e7ae4a6fadf3387ae5",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-newton.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2566,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-school.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ce/ce2e9fa1862d5c1156c934d64655251db93af9208b6b3734dbe100985b0cd5a4",
+      "sha256": "ce2e9fa1862d5c1156c934d64655251db93af9208b6b3734dbe100985b0cd5a4",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/cell-001-school.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 681,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/fixture.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ca/cad9a5e0d206042b7026d9117fb91adffb4968284fb3a6d2c21852c6d2833a85",
+      "sha256": "cad9a5e0d206042b7026d9117fb91adffb4968284fb3a6d2c21852c6d2833a85",
+      "uploaded": false
+    },
+    {
+      "bytes": 827,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/input-000.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c0/c0681fd40e3bd466f7ea979c42a5628e9b2e0647140a0e323746945a9283ec71",
+      "sha256": "c0681fd40e3bd466f7ea979c42a5628e9b2e0647140a0e323746945a9283ec71",
+      "uploaded": false
+    },
+    {
+      "bytes": 1291,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/1-p224-coset-m2048/input-001.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d7/d73219281b7f3a1ef3edaedec1c385b4794ec3b9c27f0b2c9c1f6d7b1ea65a6a",
+      "sha256": "d73219281b7f3a1ef3edaedec1c385b4794ec3b9c27f0b2c9c1f6d7b1ea65a6a",
+      "uploaded": false
+    },
+    {
+      "bytes": 2139,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-fast-aa.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9f/9f5148968721adad9fb4ad3d830762c7a3d4f9da325f42e095e616584dba3c14",
+      "sha256": "9f5148968721adad9fb4ad3d830762c7a3d4f9da325f42e095e616584dba3c14",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-fast-aa.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2145,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-fast-double.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8b/8bcf3aa1c8f44aed6ade4919b80e681021c789501da32a50abf7c90ff3f3de63",
+      "sha256": "8bcf3aa1c8f44aed6ade4919b80e681021c789501da32a50abf7c90ff3f3de63",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-fast-double.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2144,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-fast-half.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/34/34421125426c17a92962b75b955301ba06a970416aca3591f7a192b8180f25a0",
+      "sha256": "34421125426c17a92962b75b955301ba06a970416aca3591f7a192b8180f25a0",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-fast-half.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2136,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-fast.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/65/653935ebc5bd275044c7521ca94e7a9fd11587b88deef371d597df83ea37f754",
+      "sha256": "653935ebc5bd275044c7521ca94e7a9fd11587b88deef371d597df83ea37f754",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-fast.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2142,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-half.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/63/63ec832e9147453e70d6dd7c57c10a63c2c9600a73e99a45fc9dce7886f756cc",
+      "sha256": "63ec832e9147453e70d6dd7c57c10a63c2c9600a73e99a45fc9dce7886f756cc",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-half.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2128,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-lookup-fast.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/40/4094bf1d2ebc0d771e512f38b555ee99768412d6e685e07dd519b4356de37829",
+      "sha256": "4094bf1d2ebc0d771e512f38b555ee99768412d6e685e07dd519b4356de37829",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-lookup-fast.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2127,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-lookup.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/41/411535969e7fe2dfada205afd537afb0a672d759a350e62a3678c2bae12816fd",
+      "sha256": "411535969e7fe2dfada205afd537afb0a672d759a350e62a3678c2bae12816fd",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-lookup.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2140,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-newton.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/08/080e4a9bc71b6ca50b7f4f0212f269651820d69c900b550e7b2ec5fa8dd269f0",
+      "sha256": "080e4a9bc71b6ca50b7f4f0212f269651820d69c900b550e7b2ec5fa8dd269f0",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-newton.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2136,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-school.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ca/ca0af614d70669941e97b96a6af86f34b86552e164108e0a843535ea9cc125bb",
+      "sha256": "ca0af614d70669941e97b96a6af86f34b86552e164108e0a843535ea9cc125bb",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-000-school.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2603,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-fast-aa.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5b/5bd3a2a4cb6272de5dc44507f809b8f1e1b167c2c0f31656c8b592dff2e7059f",
+      "sha256": "5bd3a2a4cb6272de5dc44507f809b8f1e1b167c2c0f31656c8b592dff2e7059f",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-fast-aa.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2608,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-fast-double.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fe/fe393e47de72a6f3a900a94f7038c6f5963740acc406f04cfb26e20b79413136",
+      "sha256": "fe393e47de72a6f3a900a94f7038c6f5963740acc406f04cfb26e20b79413136",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-fast-double.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2608,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-fast-half.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8d/8d22c5f1eb75f15bba626786a35abe00d33e5b012ee1a15f874f1e5be3f14e3d",
+      "sha256": "8d22c5f1eb75f15bba626786a35abe00d33e5b012ee1a15f874f1e5be3f14e3d",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-fast-half.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2599,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-fast.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0c/0c1bda5ded87129d0c0972d8cde43b6ae71f34f4b0e0ce4144433534026aacb0",
+      "sha256": "0c1bda5ded87129d0c0972d8cde43b6ae71f34f4b0e0ce4144433534026aacb0",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-fast.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2606,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-half.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/59/5993e199f2a04b0cb702e1da17dbb54bf609b3eda6e911442c555f80a0b76ce7",
+      "sha256": "5993e199f2a04b0cb702e1da17dbb54bf609b3eda6e911442c555f80a0b76ce7",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-half.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2590,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-lookup-fast.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b4/b4c2137eae4de00aee8a29090b4ead1d38327d4e0be7c32e89d2b91b643f51c8",
+      "sha256": "b4c2137eae4de00aee8a29090b4ead1d38327d4e0be7c32e89d2b91b643f51c8",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-lookup-fast.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2588,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-lookup.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3f/3f7371d7c8673181bacbb28d816de95574fd6fb922c9c0dd0bc904195ca13672",
+      "sha256": "3f7371d7c8673181bacbb28d816de95574fd6fb922c9c0dd0bc904195ca13672",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-lookup.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2605,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-newton.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/92/9231da56effa630cc26fa987f1c0551c241370858df8d4051f37f631bd626755",
+      "sha256": "9231da56effa630cc26fa987f1c0551c241370858df8d4051f37f631bd626755",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-newton.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 2599,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-school.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/73/737039d8bf897c2b31422035cba3f84510b4da3abed1c5f4cb4c6ddf991d69f4",
+      "sha256": "737039d8bf897c2b31422035cba3f84510b4da3abed1c5f4cb4c6ddf991d69f4",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/cell-001-school.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 706,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/fixture.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/79/79ef0c4b71631986d62e3d31eb1ef9e9997134bab55e1bc4dd718bccc1c23523",
+      "sha256": "79ef0c4b71631986d62e3d31eb1ef9e9997134bab55e1bc4dd718bccc1c23523",
+      "uploaded": false
+    },
+    {
+      "bytes": 824,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/input-000.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7e/7e8fbf57d7e0d8e765fca787cafc41d7ad270cd961e1ecdbd9d825087e745d70",
+      "sha256": "7e8fbf57d7e0d8e765fca787cafc41d7ad270cd961e1ecdbd9d825087e745d70",
+      "uploaded": false
+    },
+    {
+      "bytes": 1286,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/2-p224-rational-m512/input-001.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a5/a5e57cc2a266502b8420fbd22f3dc0276ee0511cac0259d390507da5b1aee654",
+      "sha256": "a5e57cc2a266502b8420fbd22f3dc0276ee0511cac0259d390507da5b1aee654",
+      "uploaded": false
+    },
+    {
+      "bytes": 2400,
+      "path": "research/vieta_coset_rust_20261115/speedup-20261117/runs/selection/isolation.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e1/e1d9fb78079d8c7a0783651f8c8a4f4ce752fa8f230129343caa6abf5677b4f6",
+      "sha256": "e1d9fb78079d8c7a0783651f8c8a4f4ce752fa8f230129343caa6abf5677b4f6",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "vieta-shared-field-selection",
+  "status": "open",
+  "summary": "",
+  "validation": null
+}

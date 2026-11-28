@@ -1,0 +1,1360 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "msolve-crash-diagnostic-20261110-v1",
+  "created": "2026-11-10T17:25:43.375074+00:00",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "7bf6fb556462fe34ecea980d3872ba9ce278be9fabdb4f2d3e49c67bc6d1e734",
+    "protocol_id": "msolve-crash-diagnostic-20261110",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "f79068d307a34332433e912a7133187f17a373da",
+    "dirty": true
+  },
+  "backend": "local",
+  "host": {
+    "path": "provenance.json",
+    "sha256": "49390d7400dde4fb249beb741dedc6f48d6e3289b35d6fd03cb60d703ada2708",
+    "class_id": "local-shared-msolve-diagnostic",
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": "6.18.57",
+      "hypervisor": null,
+      "isolation_tier_max": "none"
+    }
+  },
+  "arms": [
+    {
+      "id": "original-l2-ordinary",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "original-l2-saturation",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "sanitized-l2-ordinary",
+      "role": "candidate",
+      "binary_sha256": "40a3ae1cfc2de0d742f33cc84ab710515c3558f400d8c0c4c7aae7d263ad5100",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "sanitized-l2-saturation",
+      "role": "candidate",
+      "binary_sha256": "40a3ae1cfc2de0d742f33cc84ab710515c3558f400d8c0c4c7aae7d263ad5100",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "original-l1-ordinary",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "original-l1-saturation",
+      "role": "reference",
+      "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "sanitized-l1-ordinary",
+      "role": "candidate",
+      "binary_sha256": "40a3ae1cfc2de0d742f33cc84ab710515c3558f400d8c0c4c7aae7d263ad5100",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    },
+    {
+      "id": "sanitized-l1-saturation",
+      "role": "candidate",
+      "binary_sha256": "40a3ae1cfc2de0d742f33cc84ab710515c3558f400d8c0c4c7aae7d263ad5100",
+      "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "original-l2-ordinary",
+      "arm": "original-l2-ordinary",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/original-l2-ordinary.argv",
+          "sha256": "ce32b10b20bc188684471d0354abd14845b9df3e77e1464670d6cd8685b839d7",
+          "bytes": 125,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-ordinary.end",
+          "sha256": "a94708ac6dcdd921613cfb3fc88bc60d4a764cff0d0c2cb497c4e1b5097b7d97",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-ordinary.exit",
+          "sha256": "690e07064753123c967bbac0180f32da6a753a5bd8b79a47644cef58e776d9f0",
+          "bytes": 4,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-ordinary.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-ordinary.start",
+          "sha256": "a94708ac6dcdd921613cfb3fc88bc60d4a764cff0d0c2cb497c4e1b5097b7d97",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-ordinary.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-ordinary.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:24:59Z",
+      "finished_at": "2026-11-10T17:24:59Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "original-l2-saturation",
+      "arm": "original-l2-saturation",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "timeout",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/original-l2-saturation.argv",
+          "sha256": "0b87ca4aba63dba8665ed222d6b67e76e203051297c7212109e63c2068b6433f",
+          "bytes": 132,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-saturation.end",
+          "sha256": "d24056e619e300e6a6b07ddec80ad6e0cd472fe74d11929d70f23b2b21ac72cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-saturation.exit",
+          "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+          "bytes": 4,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-saturation.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-saturation.start",
+          "sha256": "a94708ac6dcdd921613cfb3fc88bc60d4a764cff0d0c2cb497c4e1b5097b7d97",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-saturation.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l2-saturation.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:24:59Z",
+      "finished_at": "2026-11-10T17:25:04Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "sanitized-l2-ordinary",
+      "arm": "sanitized-l2-ordinary",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/sanitized-l2-ordinary.argv",
+          "sha256": "1cc83798553f79bdc5d2c8cca76c8949dc6ab97589aaa7c3444d66a12c4b8d97",
+          "bytes": 140,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-ordinary.end",
+          "sha256": "d24056e619e300e6a6b07ddec80ad6e0cd472fe74d11929d70f23b2b21ac72cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-ordinary.exit",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-ordinary.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-ordinary.start",
+          "sha256": "d24056e619e300e6a6b07ddec80ad6e0cd472fe74d11929d70f23b2b21ac72cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-ordinary.stderr",
+          "sha256": "951f7b756d01e313093ffb4645140e8078593d2348ef42912738230b4bc6cfcd",
+          "bytes": 948,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-ordinary.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:25:04Z",
+      "finished_at": "2026-11-10T17:25:04Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "sanitized-l2-saturation",
+      "arm": "sanitized-l2-saturation",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/sanitized-l2-saturation.argv",
+          "sha256": "9721da5d647d6605d24ed81a524c917e22a278e22ef2bef46119b101526d7da5",
+          "bytes": 147,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-saturation.end",
+          "sha256": "92a69b6a79d8f829b353ec142768934122f769fbd0b229d57a6a82cccfcd0e92",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-saturation.exit",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-saturation.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-saturation.start",
+          "sha256": "d24056e619e300e6a6b07ddec80ad6e0cd472fe74d11929d70f23b2b21ac72cd",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-saturation.stderr",
+          "sha256": "9765e4b2c53ae34124f0d7c1887bd4eda0846b9713fc3459840720ab97f99e1f",
+          "bytes": 890,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l2-saturation.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:25:04Z",
+      "finished_at": "2026-11-10T17:25:05Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "original-l1-ordinary",
+      "arm": "original-l1-ordinary",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 1,
+          "dimension": 3
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/original-l1-ordinary.argv",
+          "sha256": "c7cad9138d59d5d3a397ca7583060b51fb1f16af8faa051699cb9728f8bf2534",
+          "bytes": 125,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-ordinary.end",
+          "sha256": "92a69b6a79d8f829b353ec142768934122f769fbd0b229d57a6a82cccfcd0e92",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-ordinary.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-ordinary.out",
+          "sha256": "1ac5710f628f5ec9478d4de8c196e05624bf42bd6d09f4372022f24f6794541e",
+          "bytes": 270,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-ordinary.start",
+          "sha256": "92a69b6a79d8f829b353ec142768934122f769fbd0b229d57a6a82cccfcd0e92",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-ordinary.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-ordinary.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:25:05Z",
+      "finished_at": "2026-11-10T17:25:05Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "original-l1-saturation",
+      "arm": "original-l1-saturation",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "timeout",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/original-l1-saturation.argv",
+          "sha256": "5d93b4beef49115cbf9bad9a3703ec13e3cda931f72c3ae576aab236034ec5d0",
+          "bytes": 132,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-saturation.end",
+          "sha256": "68f7632baa56449b5f3e85c1761a929c347b013ec7f9a1bea43f0a841e490ead",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-saturation.exit",
+          "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+          "bytes": 4,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-saturation.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-saturation.start",
+          "sha256": "92a69b6a79d8f829b353ec142768934122f769fbd0b229d57a6a82cccfcd0e92",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-saturation.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/original-l1-saturation.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:25:05Z",
+      "finished_at": "2026-11-10T17:25:10Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "sanitized-l1-ordinary",
+      "arm": "sanitized-l1-ordinary",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/sanitized-l1-ordinary.argv",
+          "sha256": "9fea45ef6e60f9a4564d59e033cb76f744f06da7704bada84e60ebdc740e8830",
+          "bytes": 140,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-ordinary.end",
+          "sha256": "68f7632baa56449b5f3e85c1761a929c347b013ec7f9a1bea43f0a841e490ead",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-ordinary.exit",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-ordinary.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-ordinary.start",
+          "sha256": "68f7632baa56449b5f3e85c1761a929c347b013ec7f9a1bea43f0a841e490ead",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-ordinary.stderr",
+          "sha256": "d506319131bc68bbfadc04b1bcf86dd481428d408860686ffe8a75bf4d3cb05e",
+          "bytes": 948,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-ordinary.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:25:10Z",
+      "finished_at": "2026-11-10T17:25:10Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    },
+    {
+      "run_id": "sanitized-l1-saturation",
+      "arm": "sanitized-l1-saturation",
+      "instance_id": "boolean-F65537",
+      "seed": "No sampled seed; genericity disabled",
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "basis_ok": 0
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no accepted timing metric."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Frozen C++ exact known-answer checker; source/binary provenance retained. Native diagnostics do not establish C refinement."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/runs/sanitized-l1-saturation.argv",
+          "sha256": "8fce2270a1949c9153019dd0d591e9f3a6062d71e955bbdbf840103c8dfb55fd",
+          "bytes": 147,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-saturation.end",
+          "sha256": "68f7632baa56449b5f3e85c1761a929c347b013ec7f9a1bea43f0a841e490ead",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-saturation.exit",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-saturation.out",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-saturation.start",
+          "sha256": "68f7632baa56449b5f3e85c1761a929c347b013ec7f9a1bea43f0a841e490ead",
+          "bytes": 21,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-saturation.stderr",
+          "sha256": "05e5a5e0d9a7a9e69de0ff76004670129ef4b28cde7cd63673fca5a5d09cca19",
+          "bytes": 890,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/runs/sanitized-l1-saturation.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-10T17:25:10Z",
+      "finished_at": "2026-11-10T17:25:10Z",
+      "worker": "single local host",
+      "backend_ref": "evidence/runs/ordinary"
+    }
+  ],
+  "flow": {
+    "planned": 8,
+    "attempted": 8,
+    "completed": 6,
+    "not_completed": 2,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "build-sanitized.sh",
+      "sha256": "2bd071a5f7f337765cfd52f88fa10e5f460852a1a9f526435374ae1f298a82f3",
+      "bytes": 1179,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analysis.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analysis.jsonl",
+      "sha256": "76a63f77f7e6bddd842d42826635f1996e96a1958adf81cadcc12afebe5a7375",
+      "bytes": 653,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analysis.stderr",
+      "sha256": "abd6ea9c26845f16f2702c4684562d6a2a3b1798266cf1f2f31df662cbe4da18",
+      "bytes": 446,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-build.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-calibration.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-calibration.jsonl",
+      "sha256": "66354c704bba13f25a49e544741278300aa90c81320629e92cd11a08dfe914be",
+      "bytes": 61,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/analyzer-calibration.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/build-recipe-01.sh.gz",
+      "sha256": "1753ccec5f12ec723794ebfe9990af3c0f7394088c27da054e9f1194a9b0ac48",
+      "bytes": 536,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/compiler.txt.gz",
+      "sha256": "9011c0f9477ecb1e607d3c68154f2550c204024a2ea986f6e03cf26843b1e0f4",
+      "bytes": 205,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/diagnostic-summary.json",
+      "sha256": "326bbf0f6eae7df038a43d0dbd9ead667fa374a3fd0a9b7a556539bbfeb53334",
+      "bytes": 345,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-draft-01.json",
+      "sha256": "c6fd0786fdf1f849ff91e2708be99c6c824fb05e381e5d86bc83c654709e7e53",
+      "bytes": 23642,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-freeze.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-freeze.json",
+      "sha256": "dfffa77511475d7cdf174a99cf87ac23bb671cc29b067c5eccfd8672fa05a55a",
+      "bytes": 247,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-validation-01.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-validation-01.log",
+      "sha256": "d3986b92f59a72fae5cf0686ecd48ff3a342c7d6b27a311cac2c76571a01e035",
+      "bytes": 178,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-validation-02.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-validation-02.log",
+      "sha256": "7d2be96076fe0997b33c778146534985b59f0c4e47bd8010539f85e74367a5ce",
+      "bytes": 98,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/run.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/run.log",
+      "sha256": "573af28db111c22c29909d5271fbcdd307d480e822262f5d9c00c8a58371b027",
+      "bytes": 525,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l1-ordinary.argv",
+      "sha256": "c7cad9138d59d5d3a397ca7583060b51fb1f16af8faa051699cb9728f8bf2534",
+      "bytes": 125,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l1-ordinary.end",
+      "sha256": "92a69b6a79d8f829b353ec142768934122f769fbd0b229d57a6a82cccfcd0e92",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l1-ordinary.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l1-ordinary.out",
+      "sha256": "1ac5710f628f5ec9478d4de8c196e05624bf42bd6d09f4372022f24f6794541e",
+      "bytes": 270,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l1-ordinary.start",
+      "sha256": "92a69b6a79d8f829b353ec142768934122f769fbd0b229d57a6a82cccfcd0e92",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l1-ordinary.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l1-ordinary.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l1-saturation.argv",
+      "sha256": "5d93b4beef49115cbf9bad9a3703ec13e3cda931f72c3ae576aab236034ec5d0",
+      "bytes": 132,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l1-saturation.end",
+      "sha256": "68f7632baa56449b5f3e85c1761a929c347b013ec7f9a1bea43f0a841e490ead",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l1-saturation.exit",
+      "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+      "bytes": 4,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l1-saturation.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l1-saturation.start",
+      "sha256": "92a69b6a79d8f829b353ec142768934122f769fbd0b229d57a6a82cccfcd0e92",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l1-saturation.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l1-saturation.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l2-ordinary.argv",
+      "sha256": "ce32b10b20bc188684471d0354abd14845b9df3e77e1464670d6cd8685b839d7",
+      "bytes": 125,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l2-ordinary.end",
+      "sha256": "a94708ac6dcdd921613cfb3fc88bc60d4a764cff0d0c2cb497c4e1b5097b7d97",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l2-ordinary.exit",
+      "sha256": "690e07064753123c967bbac0180f32da6a753a5bd8b79a47644cef58e776d9f0",
+      "bytes": 4,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l2-ordinary.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l2-ordinary.start",
+      "sha256": "a94708ac6dcdd921613cfb3fc88bc60d4a764cff0d0c2cb497c4e1b5097b7d97",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l2-ordinary.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l2-ordinary.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l2-saturation.argv",
+      "sha256": "0b87ca4aba63dba8665ed222d6b67e76e203051297c7212109e63c2068b6433f",
+      "bytes": 132,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l2-saturation.end",
+      "sha256": "d24056e619e300e6a6b07ddec80ad6e0cd472fe74d11929d70f23b2b21ac72cd",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l2-saturation.exit",
+      "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+      "bytes": 4,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l2-saturation.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l2-saturation.start",
+      "sha256": "a94708ac6dcdd921613cfb3fc88bc60d4a764cff0d0c2cb497c4e1b5097b7d97",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l2-saturation.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/original-l2-saturation.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l1-ordinary.argv",
+      "sha256": "9fea45ef6e60f9a4564d59e033cb76f744f06da7704bada84e60ebdc740e8830",
+      "bytes": 140,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l1-ordinary.end",
+      "sha256": "68f7632baa56449b5f3e85c1761a929c347b013ec7f9a1bea43f0a841e490ead",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l1-ordinary.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l1-ordinary.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l1-ordinary.start",
+      "sha256": "68f7632baa56449b5f3e85c1761a929c347b013ec7f9a1bea43f0a841e490ead",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l1-ordinary.stderr",
+      "sha256": "d506319131bc68bbfadc04b1bcf86dd481428d408860686ffe8a75bf4d3cb05e",
+      "bytes": 948,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l1-ordinary.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l1-saturation.argv",
+      "sha256": "8fce2270a1949c9153019dd0d591e9f3a6062d71e955bbdbf840103c8dfb55fd",
+      "bytes": 147,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l1-saturation.end",
+      "sha256": "68f7632baa56449b5f3e85c1761a929c347b013ec7f9a1bea43f0a841e490ead",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l1-saturation.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l1-saturation.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l1-saturation.start",
+      "sha256": "68f7632baa56449b5f3e85c1761a929c347b013ec7f9a1bea43f0a841e490ead",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l1-saturation.stderr",
+      "sha256": "05e5a5e0d9a7a9e69de0ff76004670129ef4b28cde7cd63673fca5a5d09cca19",
+      "bytes": 890,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l1-saturation.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l2-ordinary.argv",
+      "sha256": "1cc83798553f79bdc5d2c8cca76c8949dc6ab97589aaa7c3444d66a12c4b8d97",
+      "bytes": 140,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l2-ordinary.end",
+      "sha256": "d24056e619e300e6a6b07ddec80ad6e0cd472fe74d11929d70f23b2b21ac72cd",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l2-ordinary.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l2-ordinary.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l2-ordinary.start",
+      "sha256": "d24056e619e300e6a6b07ddec80ad6e0cd472fe74d11929d70f23b2b21ac72cd",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l2-ordinary.stderr",
+      "sha256": "951f7b756d01e313093ffb4645140e8078593d2348ef42912738230b4bc6cfcd",
+      "bytes": 948,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l2-ordinary.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l2-saturation.argv",
+      "sha256": "9721da5d647d6605d24ed81a524c917e22a278e22ef2bef46119b101526d7da5",
+      "bytes": 147,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l2-saturation.end",
+      "sha256": "92a69b6a79d8f829b353ec142768934122f769fbd0b229d57a6a82cccfcd0e92",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l2-saturation.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l2-saturation.out",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l2-saturation.start",
+      "sha256": "d24056e619e300e6a6b07ddec80ad6e0cd472fe74d11929d70f23b2b21ac72cd",
+      "bytes": 21,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l2-saturation.stderr",
+      "sha256": "9765e4b2c53ae34124f0d7c1887bd4eda0846b9713fc3459840720ab97f99e1f",
+      "bytes": 890,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/runs/sanitized-l2-saturation.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/sanitized-build-01.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/sanitized-build-01.log",
+      "sha256": "d2b35cacadc66b7fad8dedd1be5244e17150a6625978c9330f831bd7a9cd6b1e",
+      "bytes": 69,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/sanitized-build-02.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/sanitized-build-02.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "frozen-files.sha256",
+      "sha256": "209a0ed766ff587e0d1e2da6dd0c6f02ec7ebb6d594fe45fc94194c493651fab",
+      "bytes": 665,
+      "kind": "raw"
+    },
+    {
+      "path": "inputs/ordinary.ms",
+      "sha256": "940be6ee58679144408ba008d350282f4b68a0ba7477bbdc1bec0d64068e131a",
+      "bytes": 28,
+      "kind": "raw"
+    },
+    {
+      "path": "inputs/saturation.ms",
+      "sha256": "5ecba116ff9e4bbd08cd59cba53fe4c7a346f0468476fd29f00f3b383e5647d0",
+      "bytes": 31,
+      "kind": "raw"
+    },
+    {
+      "path": "native/analyze.cpp",
+      "sha256": "8fd28ef5b7e52b35112a36bf6174ed5a2e18b77b6639c95f045402f8331dd31b",
+      "bytes": 3277,
+      "kind": "raw"
+    },
+    {
+      "path": "native/polynomial.hpp",
+      "sha256": "6e299d2f8f1032d1bdb1f4459a46ec3e32cc1f88a30fa105f08b082607b9b59b",
+      "bytes": 5491,
+      "kind": "raw"
+    },
+    {
+      "path": "protocol.json",
+      "sha256": "0011c216305863153cb4b046e3d2ba304e0351c0677f1ad254218970b6f4e2ae",
+      "bytes": 24184,
+      "kind": "raw"
+    },
+    {
+      "path": "provenance.json",
+      "sha256": "49390d7400dde4fb249beb741dedc6f48d6e3289b35d6fd03cb60d703ada2708",
+      "bytes": 1136,
+      "kind": "raw"
+    },
+    {
+      "path": "run.sh",
+      "sha256": "a397e4017297a32d23d065259665f25f9f94dc6a53f6e62121a78bc0f493004c",
+      "bytes": 2075,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "native/analyze.cpp",
+      "sha256": "8fd28ef5b7e52b35112a36bf6174ed5a2e18b77b6639c95f045402f8331dd31b",
+      "bytes": 3277
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "evidence/analysis.jsonl",
+        "sha256": "76a63f77f7e6bddd842d42826635f1996e96a1958adf81cadcc12afebe5a7375",
+        "bytes": 653
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Eight descriptive in-sample diagnostic cells. Historical v2ordinary139/saturation60stimeout retained. New original-l1ordinary exact checker pass; native execution and C refinement remain independently unsigned.",
+      "by": "producer"
+    },
+    {
+      "kind": "observation",
+      "text": "Allfour combined sanitizer calls stop at earlier signed1<<31, which does not identify original crash/timeout cause.",
+      "by": "producer"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

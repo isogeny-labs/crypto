@@ -1,0 +1,176 @@
+{
+  "required": "L2",
+  "executions": 1344,
+  "invalid_outcomes": [],
+  "below_l2": [
+    {
+      "seq": 1144,
+      "arm": "dgb-edge",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: solve too short to admit wall time: solve 903.9 µs is under the 1.0 ms minimum",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 2031
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1793279538188,
+          "loadavg": [
+            0.64990234375,
+            0.24609375,
+            0.09130859375
+          ],
+          "psi_cpu_some_avg10": 0.04,
+          "psi_cpu_some_total_us": 25416051,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 3448,
+              "idle": 9245,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1793279538216,
+          "loadavg": [
+            0.64990234375,
+            0.24609375,
+            0.09130859375
+          ],
+          "psi_cpu_some_avg10": 0.04,
+          "psi_cpu_some_total_us": 25416052,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 3451,
+              "idle": 9245,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    },
+    {
+      "seq": 1145,
+      "arm": "dgb",
+      "isolation": {
+        "level": "L1",
+        "blockers": [
+          "L2: solve too short to admit wall time: solve 913.0 µs is under the 1.0 ms minimum",
+          "L3: governor is None, not performance",
+          "L3: turbo/boost is not known to be off",
+          "L3: not known to be bare metal"
+        ],
+        "run_cpu": 4,
+        "reserved": [
+          4
+        ],
+        "node": 0,
+        "placement": {
+          "affinity": [
+            4
+          ],
+          "cpu_at_start": 4,
+          "cpu_at_end": 4,
+          "mems_allowed": "0",
+          "mempolicy": null,
+          "anon_pages_by_node": {
+            "0": 2031
+          }
+        },
+        "foreign_busy_ticks": 0,
+        "steal_ticks": 0,
+        "idle_sibling_busy_ticks": 0,
+        "before": {
+          "unix_ms": 1793279538221,
+          "loadavg": [
+            0.64990234375,
+            0.24609375,
+            0.09130859375
+          ],
+          "psi_cpu_some_avg10": 0.04,
+          "psi_cpu_some_total_us": 25416052,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 3451,
+              "idle": 9245,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        },
+        "after": {
+          "unix_ms": 1793279538249,
+          "loadavg": [
+            0.64990234375,
+            0.24609375,
+            0.09130859375
+          ],
+          "psi_cpu_some_avg10": 0.04,
+          "psi_cpu_some_total_us": 25416053,
+          "psi_memory_some_avg10": 0.0,
+          "psi_memory_some_total_us": 0,
+          "reserved_ticks": {
+            "4": {
+              "busy": 3454,
+              "idle": 9245,
+              "steal": 0
+            }
+          },
+          "intruders": {
+            "user_threads": 0,
+            "kernel_threads": 0
+          }
+        }
+      }
+    }
+  ],
+  "grades": [
+    {
+      "level": "L1",
+      "count": 2
+    },
+    {
+      "level": "L2",
+      "count": 1342
+    }
+  ],
+  "accepted": false
+}

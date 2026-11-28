@@ -178,15 +178,36 @@ enum ImportWhat {
     Ecbench,
     /// Curve records, dataset curves and measurements of the sibling checkouts (src/import/siblings.rs).
     Siblings,
+    /// Complete rational ℓ-isogeny graphs for ℓ = 7, 11, 13 over F_p, p < 2^10 (src/import/ell_isogenies.rs).
+    EllIsogenies,
     /// ℓ-volcano levels, isogeny directions and End(E) derived from the stored census isogeny graphs.
     Volcanoes,
     /// End(E) of every ordinary curve over F_p, p < 2^10 (Kohel's l^k-torsion criterion, src/import/end_ring.rs).
     EndRings,
+    /// Frobenius on E[l], l <= 13, of every curve over F_p, p < 2^10: action, isogeny count, torsion and
+    /// isogeny field degrees, psi_l factor degrees (src/import/ell_torsion.rs).
+    EllTorsion,
+    /// Certified ℓ = 5, 7 volcano levels of the census-fp curves from computed rational isogenies
+    /// (src/import/levels57.rs).
+    Levels57,
+    /// Genus-2 curves glued from census-fp pairs along their 2-torsion, with the two degree-2 maps
+    /// and L(Jac C) (Howe–Leprévost–Poonen Prop. 4, src/import/gluing.rs).
+    Gluings,
+    /// End(E) of every supersingular curve over F_p, p < 2^10 (Delfs-Galbraith, src/import/supersingular.rs).
+    SupersingularEndRings,
     /// Factor bases of the IC work: FB1/FBM1 from ecbench records, the catalog and dumps,
     /// large-prime and SECG small-x results, the cryptanalysis archive (src/import/factor_bases.rs).
     FactorBases,
+    /// Cl(End(E)) of every census-fp curve with End(E) known and the order of the class above l = 2, 3, 5, 7
+    /// (src/import/class_group.rs).
+    ClassGroups,
+    /// Ciani plane quartics over F_p, 5 <= p < 64 (seeded sample), verified L(Jac C) = L(E_x) L(E_y) L(E_z),
+    /// with their quotient maps (src/import/ciani.rs).
+    CianiQuartics,
     /// Curves written by ecdb/sage/generate.sage (JSONL files or directories of them), re-verified.
     Generated { paths: Vec<String> },
+    /// Versioned curve sweeps, feature definitions and model-ready dataset recipes.
+    Research,
     /// An LMFDB av_fq_isog JSON export (rows of isogeny classes over finite fields).
     LmfdbAvFq {
         path: PathBuf,
@@ -282,9 +303,17 @@ async fn main() -> Result<()> {
                 ImportWhat::Results => import::run(&ctx, Selection::Results, None).await?,
                 ImportWhat::Ecbench => import::run(&ctx, Selection::Ecbench, None).await?,
                 ImportWhat::Siblings => import::run(&ctx, Selection::Siblings, None).await?,
+                ImportWhat::EllIsogenies => import::run(&ctx, Selection::EllIsogenies, None).await?,
                 ImportWhat::Volcanoes => import::run(&ctx, Selection::Volcanoes, None).await?,
                 ImportWhat::EndRings => import::run(&ctx, Selection::EndRings, None).await?,
+                ImportWhat::EllTorsion => import::run(&ctx, Selection::EllTorsion, None).await?,
+                ImportWhat::Levels57 => import::run(&ctx, Selection::Levels57, None).await?,
+                ImportWhat::Gluings => import::run(&ctx, Selection::Gluings, None).await?,
+                ImportWhat::SupersingularEndRings => import::run(&ctx, Selection::SupersingularEndRings, None).await?,
                 ImportWhat::FactorBases => import::run(&ctx, Selection::FactorBases, None).await?,
+                ImportWhat::ClassGroups => import::run(&ctx, Selection::ClassGroups, None).await?,
+                ImportWhat::CianiQuartics => import::run(&ctx, Selection::CianiQuartics, None).await?,
+                ImportWhat::Research => import::run(&ctx, Selection::Research, None).await?,
                 ImportWhat::Generated { paths } => vec![import::generated::import_paths(&ctx, &paths).await?],
                 ImportWhat::LmfdbAvFq { path, title } => vec![import::lmfdb::import(&client, &path, &title).await?],
             };

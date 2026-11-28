@@ -1,0 +1,48 @@
+# cubic_check.py: exact O(M) integer-cubic solver vs stored roots [pcc:unverified]
+# p = 4294967291; p^(1/3) = 1625.5; M^3 < p holds for M <= 1625
+
+## (a) Panel B, M=128: cubic vs stored panel roots (= brute-force oracle)
+  s1 M=128 cubics=385 roots=6 match=True
+  s2 M=128 cubics=385 roots=6 match=True
+  s3 M=128 cubics=385 roots=6 match=True
+  s4 M=128 cubics=385 roots=6 match=True
+  s5 M=128 cubics=385 roots=6 match=True
+  s6 M=128 cubics=385 roots=6 match=True
+  s7 M=128 cubics=385 roots=6 match=True
+  s8 M=128 cubics=385 roots=6 match=True
+  s9 M=128 cubics=385 roots=6 match=True
+ s10 M=128 cubics=385 roots=6 match=True
+ s11 M=128 cubics=385 roots=0 match=True
+ s12 M=128 cubics=385 roots=0 match=True
+ s13 M=128 cubics=385 roots=0 match=True
+ s14 M=128 cubics=385 roots=0 match=True
+ s15 M=128 cubics=385 roots=0 match=True
+ s16 M=128 cubics=385 roots=0 match=True
+ s17 M=128 cubics=385 roots=0 match=True
+ s18 M=128 cubics=385 roots=0 match=True
+ s19 M=128 cubics=385 roots=0 match=True
+ s20 M=128 cubics=385 roots=0 match=True
+
+## (b) fresh brute force over [0,M]^3
+  s1 M=64 cubics=193 roots=6 brute=6 match=True
+ s11 M=64 cubics=193 roots=0 brute=0 match=True
+  s2 M=128 cubics=385 roots=6 brute=6 match=True
+
+## (c) post-hoc ladder: cubic vs F4-visit stored root count and hash
+  s1 M=128 cubics=385 roots=6 F4_roots=6 sha_match=True
+  s2 M=128 cubics=385 roots=6 F4_roots=6 sha_match=True
+ s11 M=128 cubics=385 roots=0 F4_roots=0 sha_match=True
+  s1 M=384 cubics=1153 roots=6 F4_roots=6 sha_match=True
+  s2 M=384 cubics=1153 roots=6 F4_roots=6 sha_match=True
+ s11 M=384 cubics=1153 roots=0 F4_roots=0 sha_match=True
+  s1 M=768 cubics=2305 roots=6 F4_roots=6 sha_match=True
+  s2 M=768 cubics=2305 roots=6 F4_roots=6 sha_match=True
+ s11 M=768 cubics=2305 roots=0 F4_roots=0 sha_match=True
+  s1 M=1024 cubics=3073 roots=6 F4_roots=6 sha_match=True
+  s2 M=1024 cubics=3073 roots=6 F4_roots=6 sha_match=True
+ s11 M=1024 cubics=3073 roots=0 F4_roots=0 sha_match=True
+  s1 M=1365 cubics=4096 roots=6 F4_roots=6 sha_match=True
+  s2 M=1365 cubics=4096 roots=6 F4_roots=6 sha_match=True
+ s11 M=1365 cubics=4096 roots=0 F4_roots=0 sha_match=True
+
+ALL MATCH

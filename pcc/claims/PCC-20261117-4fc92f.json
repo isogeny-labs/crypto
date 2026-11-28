@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T00:03:05Z",
+ "id": "PCC-20261117-4fc92f",
+ "kind": "statement",
+ "producer": {
+  "commit": "345652eb3e563cea1c7add4c877802ec9d9b3fc5",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/transfer/RECEIPT.json",
+    "sha256": "c1ebfb16cc1ca0471b9933a86df629f576d57ecaac41646d6a03919408956cd4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/transfer/UPSTREAM_RETENTION.json",
+    "sha256": "39089aef3647732d547632efe9b937209bc680364a146b9ea79f325bd1d19d89"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/transfer/SUFFIX_PROVENANCE.json",
+    "sha256": "f2f144ec0535040abfbb4983ba6c9f77e2eb41a45c69fee2e981a3f1632e76e5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/branch-affine-v1/transfer/UNPUBLISHED_LEDGER_SUFFIX.jsonl",
+    "sha256": "c91e1b6665e41105c076b97d36e8172395a4e878fffe67baee75ff6816d983f6"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Branch-affine canonical transfer and bounded upstream history audit",
+ "statement": "Unsigned metadata transfer from checkpoint28ead4be to actual child345652eb preserves94copied paths,all98qualified source inputs and40new attestation subjects. Only genuinely unpublished0c76bf,10062c,49751a bodies were registered using maintained append tooling on canonical1222rowprefix,retained byte-identically as prefix of1225rows,chain0errors. Existing upstream old1224prefix is absent after1215common rows and14oldnormalized journal blocks are not identically present; no semantic deletion inference from normalization alone. Old nine published registrations are not replayed or rechained. No native source/output change or rerun. Fresh sparse empty-index diagnostics were corrected by exact HEAD restoration/materialization before helpers; no deletion or policy change."
+}

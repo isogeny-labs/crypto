@@ -1,0 +1,21 @@
+   Compiling crypto v0.1.0 (/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-resume-20261019)
+error[E0599]: no method named `cancel_until` found for struct `sat::Solver` in the current scope
+    --> src/cryptanalysis/sat.rs:2684:11
+     |
+ 451 | pub struct Solver {
+     | ----------------- method `cancel_until` not found for this struct
+...
+2684 |         s.cancel_until(0);
+     |           ^^^^^^^^^^^^ method not found in `sat::Solver`
+
+error[E0599]: no method named `cancel_until` found for struct `sat::Solver` in the current scope
+    --> src/cryptanalysis/sat.rs:2702:11
+     |
+ 451 | pub struct Solver {
+     | ----------------- method `cancel_until` not found for this struct
+...
+2702 |         s.cancel_until(0);
+     |           ^^^^^^^^^^^^ method not found in `sat::Solver`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `crypto` (lib test) due to 2 previous errors

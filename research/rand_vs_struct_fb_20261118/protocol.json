@@ -1,0 +1,57 @@
+{
+  "schema": "experiment.protocol/v1(by-hand)",
+  "study": "rand_vs_struct_fb_20261118",
+  "date": "2026-11-18",
+  "status": "[pcc:unverified] pilot",
+  "commit": "2d918fed3b5520efb5b44b49148a6365ca856c54",
+  "binary_sha256": "37d5ce4fda3b27f2c095aee3e4f448c1bb360464da269ca20e918a67c50d245f",
+  "prime": 2013265921,
+  "m": 2,
+  "kind": "kummer",
+  "claims": [
+    {
+      "id": "C1",
+      "class": "comparative",
+      "text": "structured subgroup-chain base has d_F bounded well below |F|; random base of same size has d_F floored by |F| (grows)."
+    },
+    {
+      "id": "C2",
+      "class": "comparative",
+      "text": "randbase d_F = |F|+2 (floor); excess over floor is a size-independent constant (no structural signal)."
+    },
+    {
+      "id": "C3",
+      "class": "comparative",
+      "text": "crossover: |F| (random membership degree) exceeds tower full d_F."
+    }
+  ],
+  "arms": {
+    "tower": "--controls tower",
+    "randbase": "--controls randbase (f4 only)",
+    "null": "--controls null"
+  },
+  "metrics": [
+    "F4 solving_degree_max D (uniform, all arms)",
+    "HKY last_fall true d_F (tower/null, random targets)",
+    "excess = d_F - |F|"
+  ],
+  "aa": {
+    "randbase_seeds": [
+      11,
+      22,
+      33
+    ],
+    "predicted_spread": 0
+  },
+  "positive_control": {
+    "arm": "tower",
+    "expect": "d_F=4 (t=2..5), 5 (t=6)"
+  },
+  "ceiling": {
+    "randbase_aa_to_t": 10,
+    "randbase_single_to_t": 11,
+    "tower_null_hky_to_t": 8,
+    "tower_f4_to_t": 10
+  },
+  "engines_note": "HKY cannot express randbase (HkyRing n-m*t underflow); f4 is the one cross-arm instrument; D=d_F for tower per prior study and §6 cross-check."
+}

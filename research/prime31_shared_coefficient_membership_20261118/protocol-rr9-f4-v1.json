@@ -1,0 +1,48 @@
+{
+  "schema": "prime31.rr9-f4.protocol/v1",
+  "status": "prospective",
+  "frozen_at_utc": "2026-11-20T02:02:54Z",
+  "registered_rows_completed_before_freeze": 0,
+  "pull_request": 4692,
+  "predicate": "M_(A,V,R)(X) divides H_B(X)^8",
+  "shared_support_only": true,
+  "weighted_selector_equivalent": false,
+  "rungs": {
+    "smoke": [4, 8],
+    "holdout": [12, 16],
+    "shape_only": [24],
+    "whole_solve_gate": [31]
+  },
+  "smoke_cases": [
+    "prime31-rr9-b8-known-chart",
+    "prime31-rr9-b4-natural-00",
+    "prime31-rr9-b8-natural-00"
+  ],
+  "degree_policy": {
+    "initial": 4,
+    "predeclared_escalation": 6,
+    "escalation_condition": "cap-4 incomplete/timeout, plus the B8 known-positive control"
+  },
+  "truth_multisets": {
+    "B4": 6435,
+    "B8": 490314
+  },
+  "generic_half_words": {
+    "B4": 4096,
+    "B8": 65536
+  },
+  "per_case_caps": {
+    "wall_seconds": 900,
+    "internal_deadline_margin_seconds": 5,
+    "memory_gib": 16,
+    "threads": 1
+  },
+  "forbidden_counters": [
+    "secret_scalars_consumed",
+    "supplied_chart_or_auxiliaries_consumed",
+    "signed_multiset_table_entries_consumed",
+    "complete_signed_multisets_enumerated",
+    "grader_records_consumed_after_case_extraction"
+  ],
+  "pcc": "unverified"
+}

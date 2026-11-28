@@ -1,0 +1,83 @@
+{
+  "time": "2026-11-17T08:55:27.504332+00:00",
+  "PR": 4514,
+  "merged_at": "2026-11-17T06:00:38Z",
+  "merge_commit": "017ad45fbc6dc3475e00d63d8e098bb72cfba912",
+  "actual_final_head": "bc6931688fab092518ca66c231b0949f2356b163",
+  "base": "470e60fc2cef7557ec7021b5b08e20b6ba89bdfb",
+  "first_elapsed_PR_only_metadata": "approximately07:40Z; connector16 PR-only workflows per head preserved",
+  "complementary_full_API_custody": "single first observation completion;19 all-event workflows/30 checks each; no CI rerun or busy poll",
+  "heads": {
+    "submitted233": {
+      "head": "233c0cab0e2facffa22769d063450e1bccba00d8",
+      "workflow_runs": 19,
+      "events": {
+        "pull_request": 16,
+        "pull_request_target": 2,
+        "push": 1
+      },
+      "check_runs": 30,
+      "conclusions": {
+        "skipped": 10,
+        "success": 11,
+        "failure": 9
+      },
+      "complete_workflow_and_check_payloads_in_archive": true
+    },
+    "finalbc": {
+      "head": "bc6931688fab092518ca66c231b0949f2356b163",
+      "workflow_runs": 19,
+      "events": {
+        "pull_request": 16,
+        "pull_request_target": 2,
+        "push": 1
+      },
+      "check_runs": 30,
+      "conclusions": {
+        "skipped": 10,
+        "success": 11,
+        "failure": 9
+      },
+      "complete_workflow_and_check_payloads_in_archive": true
+    }
+  },
+  "validation": "86 tests/1 failure; committed-tree diagnostic abbreviated by unittest; InvalidAccessKeyId on one S3 GetObject line; full provided decoded stream retained",
+  "artifact_gate": "9 files belong in store; exact listed paths in full log",
+  "learning_and_large_file_gates": "success",
+  "full_selected_decoded_logs": [
+    {
+      "job_id": 133853027136,
+      "full_decoded_log_bytes": 37292,
+      "sha256": "c84f716e8861a9012d1e4ff2447a1c08f2a0386182ab3e04f8d240eb13cb170d",
+      "logs_have_not_been_tail_or_excerpt_replaced": true
+    },
+    {
+      "job_id": 133853026594,
+      "full_decoded_log_bytes": 26376,
+      "sha256": "8cc1116d5099f81fa0485d043570fa37fb115d6f733417ff3c51395755dc314f",
+      "logs_have_not_been_tail_or_excerpt_replaced": true
+    },
+    {
+      "job_id": 133853027438,
+      "full_decoded_log_bytes": 415373,
+      "sha256": "1588fbd59bdef8a9cb07189ecdbe0e7c5ba3e6a3a4cd148087bf688e591c1ced",
+      "logs_have_not_been_tail_or_excerpt_replaced": true
+    },
+    {
+      "job_id": 133853027273,
+      "full_decoded_log_bytes": 21040,
+      "sha256": "b19dcb2349e19bd9fe23b44cbe51d10c7ca5f2f91c897da640f877b894f7da11",
+      "logs_have_not_been_tail_or_excerpt_replaced": true
+    }
+  ],
+  "whole_archive": {
+    "path": "research/chained_richelot_map_20261117/parent-PR4514-final-CI-12/whole-first-PR4514-all-APIs-and-four-full-decoded-logs.tar.xz",
+    "bytes": 82472,
+    "sha256": "4567932d617082795f68a351dfb662b73be34729db01d1391e08ebead273bf3c",
+    "members": 22,
+    "all_full_member_bytes_and_modes_compared": true
+  },
+  "no_green_CI_inference_from_merge": true,
+  "revert_check_due": "2026-12-01T06:00:38Z",
+  "next_result_PR": "fresh canonical main intake; no closed branch pushes; avoid new inline binary data under current artifact policy, retain immutable full checkpoints with exact materialization references"
+}

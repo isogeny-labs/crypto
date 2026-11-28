@@ -1,0 +1,87 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-progression-v2",
+  "version": 2,
+  "created": "2026-10-27",
+  "repository": "crypto",
+  "study_dir": "research/twist_routes_1_3_20261021/execution-v4",
+  "question": "Can target-blind twist-orbit proposals produce useful source-rational bases, and can redundant companion equations lower same-base cold finite-decomposition instruction counts?",
+  "claims": [
+    {"id":"finite-bases","text":"The fixed constructors produce the recorded finite sets and every admitted coordinate lifts to the source curve.","class":"exact_computation","decided_by":["finite-verification"]},
+    {"id":"finite-yields","text":"The fixed public queries have the recorded complete first-pair-canonical signed tuple counts.","class":"exact_computation","decided_by":["finite-verification"]},
+    {"id":"same-base-cost","text":"Same-base worker instruction counts differ by the recorded ratios on completed, independently verified and A/A-admitted cells.","class":"comparative","decided_by":["helpers-direct","companion-direct","polynomials-group"]},
+    {"id":"general-speedup","text":"Novelty, population-level twist advantage, NIST-scale benefit and calibrated full IC/rho speedups remain outside this finite diagnostic.","class":"out_of_scope","decided_by":[]}
+  ],
+  "arms": [
+    {"id":"direct-chain","role":"baseline","description":"Product-membership Semaev-chain F4, complete finite roots/signs/exceptions, under each fixed public base.","instrument":{"repo":"crypto","commit":null,"build":null,"binary_sha256":null,"threads":1}},
+    {"id":"direct-aa","role":"control_aa","description":"Fresh-process repeat of the direct task; samples process layout, not independent targets.","instrument":{"repo":"crypto","commit":null,"build":null,"binary_sha256":null,"threads":1},"same_instrument_as":"direct-chain"},
+    {"id":"hybrid-eight","role":"candidate","description":"Eight charged membership branches on exactly the same base and target.","instrument":{"repo":"crypto","commit":null,"build":null,"binary_sha256":null,"threads":1},"same_instrument_as":"direct-chain"},
+    {"id":"companion-curve","role":"candidate","description":"Direct equations plus redundant delta*v_i^2=f(x_i-shift) constraints on orbit-derived bases.","instrument":{"repo":"crypto","commit":null,"build":null,"binary_sha256":null,"threads":1},"same_instrument_as":"direct-chain"},
+    {"id":"group-mitm","role":"reference","description":"Ordinary source-group meet-in-the-middle returning the same complete signed tuple set.","instrument":{"repo":"crypto","commit":null,"build":null,"binary_sha256":null,"threads":1},"same_instrument_as":"direct-chain"},
+    {"id":"group-aa","role":"control_aa","description":"Fresh-process repeat of ordinary group MITM.","instrument":{"repo":"crypto","commit":null,"build":null,"binary_sha256":null,"threads":1},"same_instrument_as":"direct-chain"},
+    {"id":"planted-positive","role":"control_positive","description":"Development correctness test plants source sums and recovers the known rows through the same complete worker paths.","instrument":{"repo":"crypto","commit":null,"build":null,"binary_sha256":null,"threads":1}},
+    {"id":"unshifted-twist","role":"control_negative","description":"Unshifted twist orbit must supply no nonzero source lifts; uniform and ordinary bases are additional matched descriptive controls.","instrument":{"repo":"crypto","commit":null,"build":null,"binary_sha256":null,"threads":1}}
+  ],
+  "controls": {
+    "aa":{"present":true,"comparison":"direct-determinism","not_applicable_reason":null},
+    "positive":{"present":true,"arm":"planted-positive","expected_detection":"Recover the planted sign-zero source relation under every applicable constructor/arity/worker path; any miss invalidates the detector.","not_applicable_reason":null},
+    "negative":{"present":true,"arm":"unshifted-twist","null_population":{"description":"The same ten registered toy curves with zero shift; complementary ordinary/random bases retain field, size and target.","generator":"Exact rules in PROTOCOL_V1.md; no post-outcome seed or fixture selection.","n":10,"why_n":"Complete fixed original fixture panel; descriptive finite results only, with no population-equivalence inference.","matched_on":["field","source curve","source subgroup","requested B","constructor rule","query labels"]},"not_applicable_reason":null}
+  },
+  "variable_ledger": {
+    "independent":[{"name":"base constructor","levels":["twist-orbit","curve-orbit","field-ap","uniform"]},{"name":"shift","levels":[0,1,3]},{"name":"B","levels":[8,16]},{"name":"arity","levels":[2,3]},{"name":"same-base solver","levels":["direct-chain","hybrid-eight","companion-curve","group-mitm"]}],
+    "factors":[
+      {"name":"instrument","treatment":"fixed","value":"One pinned native binary, F4 baseline bytes from 26efb57a3, GM=1, linear roots=1, one thread.","how":"Source/binary hashes must be filled before freeze; every worker receipt reopens them."},
+      {"name":"field, base, target and arity","treatment":"crossed","value":"The explicit plan fixes every same-base task; geometry uses labels 0..15 and costs use label zero.","how":"Full factorial finite grids; final labels 32..63 stay unopened."},
+      {"name":"host and co-tenants","treatment":"measured","value":"CPU/kernel/hypervisor/memory and execution tier recorded; native clock excluded.","how":"Only simulated guest instructions Ir are ranked."},
+      {"name":"layout and environment","treatment":"measured","value":"Fresh processes, recorded argv and non-secret overrides; direct/group A/A.","how":"Five-percent per-task gate; no failed gate is discarded silently."},
+      {"name":"order and warmup","treatment":"fixed","value":"Arms grouped within each configuration; fresh cold processes; no warmup subtraction.","how":"No cache-dependent clock claim; budget/cap selection effects remain explicit."},
+      {"name":"seeds","treatment":"fixed","value":"Existing fixture target rule and the written SplitMix64 constructor seed.","how":"The constructor reads no target."},
+      {"name":"analyst labels","treatment":"fixed","value":"Blinding workflow pending before data.","how":"Protocol remains draft; no comparative conclusion can be promoted from this record."},
+      {"name":"interruption","treatment":"measured","value":"No automatic measurement retry or row resume.","how":"Retain failures, incomplete rows and global-cap omissions."}
+    ],
+    "comparisons":[
+      {"id":"finite-verification","arms":["direct-chain","group-mitm"],"differs_in":["same-base solver"],"design":"absolute","reason":"Independent exhaustive affine arithmetic certifies finite answers.","threshold":"Exact finite tuple equality."},
+      {"id":"direct-determinism","arms":["direct-chain","direct-aa"],"differs_in":["layout and environment"],"design":"aa"},
+      {"id":"helpers-direct","arms":["hybrid-eight","direct-chain"],"differs_in":["same-base solver"],"design":"one_factor"},
+      {"id":"companion-direct","arms":["companion-curve","direct-chain"],"differs_in":["same-base solver"],"design":"one_factor"},
+      {"id":"polynomials-group","arms":["direct-chain","group-mitm"],"differs_in":["same-base solver"],"design":"one_factor"}
+    ],
+    "crosses_map":false
+  },
+  "randomization": {
+    "arm_order":"fixed",
+    "arm_order_reason":"The metric is cold-process simulated instructions, with within-configuration A/A. Budget-dependent completion and order are disclosed; no native-time inference.",
+    "seed_derivation":{"method":"harness_drawn","note":"Uniform: SplitMix64 seed 202610260001 xor p xor (b<<16) xor shift. Existing target: 202610210000+label+p*65537, first nonzero source lift."},
+    "instance_sampling":{"rule":"All ten original odd-prime-order toy fixtures; no measured-outcome filtering.","independent_of_arm":true},
+    "blinding":{"analysis_labels_masked":false,"how":"Not yet implemented. Resolve before freezing the comparative protocol; no data collected.","unmasked_at":null}
+  },
+  "sample_size": {
+    "instances":10,"replicates":1,"warmups":0,
+    "power":{"method":"exact","alpha":0.05,"tests_in_family":1,"correction":"none","passes":true,"note":"Only exact finite answers and descriptive paired counts are planned. No significance, population-equivalence or scaling test; configurations and labels are correlated."},
+    "preflight_runtime":{"fixed_seconds":null,"per_sample_seconds":null,"threads":1,"estimated_total_seconds":null,"measured_on":"Preflight pending authorized backend. The fixed operational caps are not measured runtime estimates."}
+  },
+  "metrics": {
+    "primary":[{"id":"Ir","name":"Cold worker simulated instructions","unit":"simulated guest instructions Ir","kind":"counted","definition":"Process startup through construction, solving, all finite roots/signs/exceptions, source verification and serialization; excludes parent, kernel, independent audit, relation algebra and full DLP.","source":"Single-event raw Callgrind totals/summary, independently reopened","aggregation":"paired_ratio","resolution":"one simulated guest instruction","uncertainty":"range"}],
+    "secondary":[{"id":"finite-tuples","name":"Complete first-pair-canonical source tuples","unit":"tuples per public query","kind":"exact","definition":"All valid source signed tuples for the fixed base/target; not relation-matrix rank or independent logs.","source":"Independent finite affine census and exact output equality","aggregation":"per_row","uncertainty":"none_exact"}]
+  },
+  "measurement":{"isolation_required":"none","warmups":0,"order":"sequential","clock":"counted","counters":["Ir"],"record":["source commit","binary SHA256","CPU/kernel/hypervisor","argv","non-secret environment overrides","input/output/trace hashes","actual exit/signal","resource caps","A/A gate"],"timed_primary_justification":null},
+  "execution":{"backend":"mixed","queue":"EKS default blocked; explicit local-backend choice pending","placement":{"cpus":1,"memory_GiB":4,"paid_resources_created":false},"measurement_class":"measurement","timeout_seconds":2400,"checkpoint":{"policy":"none","interval_seconds":null,"grace_seconds":1,"restore_validation":"none","after_restore":{"wall_time":"invalid","counted_units":"valid"}},"retries":{"infrastructure_only":true,"max_attempts":1}},
+  "stopping_rules":[
+    {"rule":"Attempt the fixed 880 cells or stop at the 2400-second/1-GiB global cap; retain every omission.","kind":"budget","preregistered":true},
+    {"rule":"Per-cell 2000-ms cooperative solver budget, 4-second hard limit plus one-second grace, 4-GiB memory and 32-MiB file cap.","kind":"budget","preregistered":true},
+    {"rule":"Do not launch until backend, complete S3 checkpoint, instrument hashes and protocol freeze are ready.","kind":"invalidation","preregistered":true}
+  ],
+  "decision_rule":{"text":"Require exact independent finite answers, clean PARI replay and same-input A/A before interpreting cost ratios; different-base costs/yields remain descriptive.","comparison_ids":["finite-verification","helpers-direct","companion-direct","polynomials-group"],"threshold":"A/A maximum/minimum <=1.05; candidate/control Ir <1 describes only that admitted paired task.","statistic":"Per-case ratios and descriptive median/min/max; all incomplete pairs retained.","interval":"Observed ranges only; no confidence interval or independent-host inference.","multiple_comparison_correction":"none","effect_size_measure":"Candidate/control cold-worker Ir on identical output tasks.","verdict_vocabulary":["verified finite answer","lower paired Ir on this task","higher paired Ir on this task","incomplete","unsupported base","A/A not admitted","not attempted"]},
+  "analysis_plan":{"script":{"path":"research/twist_routes_1_3_20261021/runner/src/bin/twist-progression.rs","sha256":null},"inputs":["PLAN.json","census/ROWS.json","cost/RECORDS.json","raw worker files","PARI exit/hash receipt"],"outputs":["independent finite checks","paired raw-Ir audit","PARI script","admission","unified export"],"blinded":false,"frozen_before_data":false},
+  "reporting":{"export_schema":"experiment.export/v1","review_schema":"experiment.review/v1","graphs":["Planned construction/verification diagram; future graphs use recorded data only."],"report_dir":"research/twist_routes_1_3_20261021/reports/progression-20261027"},
+  "inadmissible":["Treating a different factor-base answer set as a same-output speedup","Dropping timeouts or zero yields","Claiming a source-to-rational-twist scalar map","Calling this full IC/rho or NIST evidence","Changing source/plan after data without an amendment","Treating pending backend approval as granted"],
+  "literature":[
+    {"ref":"research/twist_routes_1_3_20261021/EXPERIMENTS.md","provenance":"internal","claim":"Existing separation, same-projection controls and original full-campaign obligations.","verified_by":"Read in this session."},
+    {"ref":"research/twist_routes_1_3_20261021/reports/continue-20261026/RESULTS.md","provenance":"internal","claim":"Earlier finite polynomial costs must be compared to ordinary group MITM.","verified_by":"Prior audited report and source inspected."},
+    {"ref":"https://eprint.iacr.org/2004/031","provenance":"recalled","claim":"Semaev summation-polynomial construction is prior art; current primary PDF fetch returned HTTP 403.","verified_by":null},
+    {"ref":"https://www.iacr.org/archive/eurocrypt2014/84410158/84410158.pdf","provenance":"recalled","claim":"Known symmetry/decomposition reference; current primary fetch returned HTTP 403. Novelty review is incomplete.","verified_by":null}
+  ],
+  "amendments":[{"id":"pre-data-v2","filed":"2026-10-27","filed_before_affected_data":true,"reason":"Incoming main adds EKS/checkpoint/artifact requirements and shared-solver hooks.","changes":["Retain exact baseline solver/hash-helper bytes.","Resolve backend, blinding and structured freeze before scientific data.","Use maintained Setec artifact/checkpoint transport."]}],
+  "freeze":{"status":"draft","protocol_sha256":null,"commit":null,"frozen_at":null,"filed_before_affected_data":true},
+  "extensions":{"original_narrative_protocol":"PROTOCOL_V1.md","pre_data_amendment":"AMENDMENT_V2.md","scientific_runs_started":false,"metadata_and_blinding_gaps_remain":true,"original_full_campaign_discharged":false}
+}

@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-09T23:31:57Z",
+ "id": "PCC-20261109-f48acd",
+ "kind": "theorem",
+ "producer": {
+  "commit": "3dd8d410e688515805aa27216aee5372359da62a",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "2ee5cb96672a164abe1937a0c8023cdb4986b286e32b23db0775f82bbca4491b",
+   "kind": "lean",
+   "project": "research/jacobian_smoothness_audit_20261109/lean",
+   "theorem": "MumfordStollGeneralAudit.run_output_unique"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Actual fixed finite-curve polynomial-run determinism conditional on run certificates. Does not assert their existence for all100pairs, a full ambient/Picard group, subgroup heuristics or native execution.",
+ "statement": "For fixed Bezout coefficient choices a,b,cand actual reduced Mumford pairs on y^2=X^5+1overF3, a GeneralCantorRun has a unique output. The relation verifies normalized full gcd, exact composition/numerator remainders, a possibly nontrivial nonzero reduction unit and the final bounded remainder. The proof uses actual polynomial cancellation, monic normalization and remainder uniqueness, before any full ambient group transfer."
+}

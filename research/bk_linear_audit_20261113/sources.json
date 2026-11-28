@@ -1,0 +1,148 @@
+{
+  "schema": "qualified-bk-linear-source-plan/v1",
+  "created": "2026-11-13T21:19:29.690780+00:00",
+  "formal": {
+    "project": "research/bk_linear_audit_20261113/lean",
+    "theorem": "BKLinearAudit.qualified_BK_linear_certificate",
+    "statement": "theorem qualified_BK_linear_certificate : (∀ (K : Type) [Field K] [Finite K] [DecidableEq K] (W : WeierstrassCurve.Affine K) (r : ℕ),r.Prime → r∣Nat.card W.Point → ∃ P : W.Point,P≠0 ∧ addOrderOf P=r ∧ r • P=0) ∧ (∀ (K : Type) [Field K] (A : M2 K) (q : K), q≠1 → A.det=q → ∀ v : Fin 2 → K, v≠0 → A*ᵥv=v → A.trace=1+q ∧ A.charpoly=(X-C 1)*(X-C q) ∧ ∀ k : ℕ,A^k=1 ↔ q^k=1) ∧ (∀ r : ℕ,r.Prime → (∀ k : ℕ,(1:ZMod r)^k=1 ∧ (jordan (1:ZMod r)^k=1 ↔ r∣k)) ∧ (jordan (1:ZMod r)).det=1 ∧ ((![1,0] : Fin 2 → ZMod r)≠0 ∧ jordan (1:ZMod r)*ᵥ ![1,0]= ![1,0]) ∧ ¬ (∀ k : ℕ,jordan (1:ZMod r)^k=1 ↔ (1:ZMod r)^k=1)) ∧ ¬ (∀ (K : Type) [Field K] (A : M2 K) (q : K), A.det=q → ∀ v : Fin 2 → K, v≠0 → A*ᵥv=v → ∀ k : ℕ,A^k=1 ↔ q^k=1)",
+    "decl_sha256": "90b14f0e36dddcf0c5bd7a05fa8b905ec64cfb580f3c4490c875b884d1ce0712",
+    "scope": "Actual finitefield Mathlib affinepointgroup finite via injective Option-coordinate encoding; every prime divisor of actual pointcardinality gives actual nonzero point of exact primeorder killedbyr via Cauchy. Independent generic arbitrary-field2x2matrix with actual nonzero fixedvector/detq/q!=1 has derived trace1+q/charpoly(X-1)(X-q) and A^k=I iffq^k=1forallk, by provedcoprime factors/CayleyHamilton. ActualJordanpowers overeverycommring/J(1)^k=J(k), allmoduliZModn identityiffn|k, everyprime nonzero fixedvector/det1/but1^k=1always anddirectnegation of deletingq!=1while retainingothermatrixhypotheses. No trace/diagonalization premise. Actual genericE[r]rank2/representation/Frobeniusdeterminant/descent and characteristic-rank bridge remainopen; actualpoint input and matrix theorem are explicit separate conjuncts. No identification of abstractJordan withactualF7Frobenius. OriginalqualifiedBKconfirmed atthese steps, notrefuted. No nativeexperiment/novelty.",
+    "sources": [
+      {
+        "path": "research/bk_linear_audit_20261113/lean/GenericFrobenius.lean",
+        "bytes": 2580,
+        "sha256": "15975255d4f4ac1d84be82f104c4f339c5e752923a1881b446766a883c1d464e"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/JordanException.lean",
+        "bytes": 2337,
+        "sha256": "d7a75edfe396e8bddf2785b6d8d10aae5d0cb39c544d08818644ed4180dd60a3"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/LinearCertificate.lean",
+        "bytes": 2185,
+        "sha256": "8b08c43890e067ef7529f6ae90bc78b51c5bcf65f71f48e6db790eedf14605e9"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/RationalTorsion.lean",
+        "bytes": 1492,
+        "sha256": "0c146876e71121a4716165bce9e3125e65cce4e9de466ab72aa9bc129835aaa4"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/lake-manifest.json",
+        "bytes": 3810,
+        "sha256": "eb1cf595e6547efb084a2f16644bdbd3d6a9ddd5752f9d1639396e94217bc2ea"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/lakefile.toml",
+        "bytes": 282,
+        "sha256": "a8b213339113a23409463c0085eeb018856674ecb04338455d072c3d22a242d1"
+      },
+      {
+        "path": "research/bk_linear_audit_20261113/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lake-manifest.json",
+        "bytes": 3164,
+        "sha256": "78d571cee87e7b66d595330ab2c22b28a84d5aa1e40c7101472e053fb3b84953"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lakefile.toml",
+        "bytes": 380,
+        "sha256": "bc5664e40eb442c0924007125c2c3fdfdf3ff93ae9314998c0ba7b42ecaecc86"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ]
+  },
+  "custom_import_modules": [
+    "GenericFrobenius",
+    "JordanException",
+    "LinearCertificate",
+    "RationalTorsion"
+  ],
+  "artifacts": [
+    {
+      "path": "research/bk_linear_audit_20261113/evidence/attempts.tar.gz",
+      "bytes": 9270,
+      "sha256": "f9a26828744e7dd0c226df5d9943f76e7423de9ad66cb60d6dc7f73e22a030e2"
+    },
+    {
+      "path": "research/bk_linear_audit_20261113/evidence/attempts.json",
+      "bytes": 5237,
+      "sha256": "77f22a7044b0afa0d7fb74330cc1c37f132cb3839806ff47d2e987dc00a5abb4"
+    },
+    {
+      "path": "research/bk_linear_audit_20261113/evidence/gate.tar.gz",
+      "bytes": 1320,
+      "sha256": "6ec229e9f488f778ebc001982177cf9d3d8b3a4c708606e02da459dd667a3d9b"
+    },
+    {
+      "path": "research/bk_linear_audit_20261113/evidence/gate.json",
+      "bytes": 1122,
+      "sha256": "0ae38cd366efd335c752f9b7207034499d831be4029e8725899d0ada8225e981"
+    },
+    {
+      "path": "research/bk_linear_audit_20261113/evidence/source-review.json",
+      "bytes": 1917,
+      "sha256": "67487223cac3958d1b9d8216e325d0bb082ebff7b28e6072ea23f8dc7b627132"
+    },
+    {
+      "path": "research/bk_linear_audit_20261113/proof-map.json",
+      "bytes": 1475,
+      "sha256": "3232f0115cae6fd0292c96a660735ffde9fd181fbdabc6a6a44468e00045b277"
+    },
+    {
+      "path": "research/bk_linear_audit_20261113/render_report.py",
+      "bytes": 6850,
+      "sha256": "6cda5155c585b1b3fc6cb6d8673239d5e4d907c466efff16f154f81070068f61"
+    },
+    {
+      "path": "research/bk_linear_audit_20261113/reports/layout.json",
+      "bytes": 268,
+      "sha256": "d10a2395749bea0f10e3f89d355c5cd2761288b9af87e72f27b0fea409051220"
+    },
+    {
+      "path": "research/bk_linear_audit_20261113/reports/proof-boundary.svg",
+      "bytes": 1800,
+      "sha256": "1d8daaaab3efc197c2940a6f413dfc816989ccbc7422b164801f7f43f7bf082d"
+    },
+    {
+      "path": "research/bk_linear_audit_20261113/reports/report.pdf",
+      "bytes": 47658,
+      "sha256": "8bdf8d30e8473c9adef05b846cefe2de364def336eef943c597be6f429429931"
+    }
+  ],
+  "assurance": {
+    "gate_declarations": 22,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "global_elaboration_flags": false,
+    "waivers": false,
+    "actual_rational_prime_order_points": true,
+    "actual_generic_two_by_two_matrices": true,
+    "derived_trace_and_charpoly": true,
+    "every_prime_Jordan_boundary": true,
+    "direct_deleted_hypothesis_negation": true,
+    "generic_geometric_rank_two_proved": false,
+    "actual_Frobenius_determinant_proved": false,
+    "actual_generic_torsion_field_descent_proved": false,
+    "qualified_source_refuted": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

@@ -1,0 +1,482 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "msolve-degree-word-20261116",
+  "version": 1,
+  "created": "2026-11-16",
+  "repository": "crypto",
+  "study_dir": "research/msolve_degree_word_audit_20261116",
+  "authors": [
+    "Codex theorem audit"
+  ],
+  "links": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/4389",
+    "formal_source": "lean/F4Boundary.lean"
+  },
+  "question": "Can stored uint16 LCM degrees certify the actual original F4Run bound? Two fixed known-answer cases; no whole-C or timing claim.",
+  "claims": [
+    {
+      "id": "D1",
+      "class": "exact_computation",
+      "text": "Two fixed native output and bounded degree-log observations checked by preregistered Rust analyzer. Native degree exposure requires successful control, normal boundary completion, exact basis and uncapped required events.",
+      "decided_by": [
+        "fixed-diagnostics"
+      ]
+    },
+    {
+      "id": "D2",
+      "class": "theorem",
+      "text": "Actual UInt16 and all-field polynomial/F4Run mathematical claims are decided by Lean; not by native observations.",
+      "decided_by": []
+    },
+    {
+      "id": "D3",
+      "class": "out_of_scope",
+      "text": "Whole C/compiler/parser refinement, independent-host/signing, generic solver correctness, timing/statistical inference and upstream novelty.",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "control",
+      "role": "control_positive",
+      "description": "Fixed degree2 healthy known-answer case; must pass before boundary call",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "native/build.sh"
+          ]
+        ],
+        "binary_sha256": "07c1a4d6b3e679b1aa8da8d4a3846f6df5e88c526b5c040a6833218c1171e4ea",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "2",
+          "genericity": "0",
+          "print_gb": "2",
+          "verbosity": "0",
+          "hash_table_size_power": "8",
+          "SIMD": "disabled",
+          "sanitizers": "AddressSanitizer; leaks disabled; unsigned-mask repair",
+          "patch_sha256": "0004e252ba059e1f7c54404049118f96fe91c479a37961966855d1f65d707686",
+          "degree_representation": "unchanged uint16_t exp_t; read-only logs capped1024 per logger"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=1"
+        }
+      },
+      "parameters": {
+        "input": "inputs/control.ms",
+        "input_sha256": "f110d0d7eaa4e65caab0760b64563e0147d71906f3a601448cd761895bb8f07f"
+      }
+    },
+    {
+      "id": "boundary",
+      "role": "candidate",
+      "description": "Fixed degree65535 input; candidate uint16 LCM degree overflow",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "native/build.sh"
+          ]
+        ],
+        "binary_sha256": "07c1a4d6b3e679b1aa8da8d4a3846f6df5e88c526b5c040a6833218c1171e4ea",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "2",
+          "genericity": "0",
+          "print_gb": "2",
+          "verbosity": "0",
+          "hash_table_size_power": "8",
+          "SIMD": "disabled",
+          "sanitizers": "AddressSanitizer; leaks disabled; unsigned-mask repair",
+          "patch_sha256": "0004e252ba059e1f7c54404049118f96fe91c479a37961966855d1f65d707686",
+          "degree_representation": "unchanged uint16_t exp_t; read-only logs capped1024 per logger"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=1"
+        }
+      },
+      "parameters": {
+        "input": "inputs/boundary.ms",
+        "input_sha256": "8d775c7c17bce47b94c9a00d2b3174f77e666220dfa3464b27fe4672f311d931"
+      },
+      "same_instrument_as": "control"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact registered known-answer computation, no sampled population/noise/causal or statistical inference. Mathematical range guards supply negative controls in Lean; no extra native calls."
+    },
+    "positive": {
+      "present": true,
+      "arm": "control",
+      "expected_detection": "Exit0, exact known basis and required correct unwrapped degree events",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Exact registered known-answer computation, no sampled population/noise/causal or statistical inference. Mathematical range guards supply negative controls in Lean; no extra native calls."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "input_degree",
+        "levels": [
+          "2",
+          "65535"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "input_degree",
+        "treatment": "fixed",
+        "value": "Two fixed source-led cases, not a population sample",
+        "how": "Separate absolute known-answer checks; no cross-case causal/performance effect"
+      },
+      {
+        "name": "instrument_environment",
+        "treatment": "fixed",
+        "value": "Same binary, one thread, exactLA2, g2,c0,v0,s8 and library path",
+        "how": "Hash source/patch/build/analyzer/binary/input/runner before data"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "how": "Shared authorized local host; timestamps provenance only, no clock evidence"
+      },
+      {
+        "name": "order_analyst",
+        "treatment": "fixed",
+        "value": "Unblinded control first; boundary only if control passes; no retry/warmup",
+        "how": "One attempt per registered input; preserve all outcomes and skipped row"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "fixed-diagnostics",
+        "arms": [
+          "control",
+          "boundary"
+        ],
+        "differs_in": [
+          "input_degree"
+        ],
+        "design": "absolute",
+        "threshold": "Per-case exact answer, exit0, required uncapped degree events; otherwise discrepancy/not_validated"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "No sampled inputs or random forms. Fixed exactLA2 sparse solver, genericity0; no internal random choices used for distribution inference."
+    },
+    "instance_sampling": {
+      "rule": "Two fixed explicitly hashed inputs, no sampled instance.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Literal expected answers and source-led arithmetic; no subjective fit/exclusion."
+    },
+    "arm_order_reason": "Positive known-answer control gates boundary, which must be skipped if control fails. No timing/noise comparison."
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "N/A statistical power: two exact cases, one attempt each; no inferential population."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 30,
+      "threads": 1,
+      "estimated_total_seconds": 60,
+      "measured_on": "Admission bound only, not a runtime estimate:30s watchdog/case. No pilot call on affected inputs; total native budget60s."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "accepted",
+        "name": "Registered exact checks",
+        "unit": "Boolean or exact integer",
+        "kind": "exact",
+        "definition": "Native exit0, exact unordered basis, required LCM/row/selection events and no cap/sanitizer diagnostics.",
+        "source": "evidence/native/*-analysis.json:accepted",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "stored_bound",
+        "name": "Observed stored bound",
+        "unit": "Boolean or exact integer",
+        "kind": "exact",
+        "definition": "Maximum input degree and logged selection/row stored degrees. Bounded instrument paths only; not all execution internals.",
+        "source": "evidence/native/*-analysis.json:observed_stored_bound",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "lcm_records",
+        "name": "LCM record count",
+        "unit": "Boolean or exact integer",
+        "kind": "exact",
+        "definition": "Number of actual WORD_LCM lines, capped logger invalidates coverage.",
+        "source": "evidence/native/*-analysis.json:lcm_records",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [],
+    "record": [
+      "Source/patch/build/binary/input/analyzer/runner hashes",
+      "Full argv/stdout/stderr/output/exit",
+      "UTC timestamps provenance only",
+      "Host/compiler provenance; no independent-host claim"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 60,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Control first; boundary only if control passes all registered checks. One attempt per case, no post-data repairs/retries.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "30s watchdog each, at most60s total native solver calls; preserve timeout/crash/cap/wrong-answer/skipped rows.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Missing/malformed output, nonzero exit, timeout, sanitizer diagnostics, missing required events or log cap: not_validated; preserve all raw bytes.",
+    "No source/parser/expected-answer change after affected data under this version; retain earlier data and label amendment if needed.",
+    "No full-degree trace claim: only instrumented LCM/selection/generated-row paths."
+  ],
+  "decision_rule": {
+    "text": "fixture_pass only for all exact per-case checks; otherwise discrepancy/not_validated. Boundary exposure requires both registered cases passing.",
+    "comparison_ids": [
+      "fixed-diagnostics"
+    ],
+    "threshold": "Zero exact discrepancies",
+    "statistic": "Exact polynomial equality and finite integer checks",
+    "interval": "None; exact known answers",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact degree word/coordinate mismatch, no performance effect",
+    "verdict_vocabulary": [
+      "fixture_pass",
+      "discrepancy",
+      "not_validated",
+      "skipped_control_failure"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/analyze.rs",
+      "sha256": "61549e81f039698dfca0ce38498ccd49fdcf0a7c9c07bcd5aa750c2630b4d582"
+    },
+    "inputs": [
+      "inputs/*.ms",
+      "evidence/native/*.out",
+      "evidence/native/*.stderr",
+      "evidence/native/*.exit"
+    ],
+    "outputs": [
+      "evidence/native/*-analysis.json",
+      "evidence/native/*-constants.lean.txt",
+      "export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Whole C/compiler/parser/host refinement from native constants",
+    "Unmodified-binary claim: known matrix-table repair and unsigned mask plus logging are present",
+    "Performance/noise/statistical/novelty/independence claim",
+    "Hiding failed control, skipped boundary, cap, crash, timeout or wrong basis",
+    "Treating generic Lean word counterexample as observed native exposure without both accepted rows"
+  ],
+  "literature": [
+    {
+      "ref": "PROTOCOL.md and canonical census F4Containment/F4ExpectedOutputs/SolvingDegreeBound",
+      "provenance": "internal",
+      "claim": "Actual original operational model; full inherited statement rebinding and separate old-prefix negative control"
+    },
+    {
+      "ref": "msolve@5e72b9d99eaea55fe87eb8ac945ec9e914a69327 data.h/io.c/hash.c/symbol.c/f4.c and la_ff_32.c",
+      "provenance": "retrieved",
+      "claim": "Actual uint16 degree storage/LCM/selection; known prior coefficient-table repair; bounded paths listed in source review"
+    },
+    {
+      "ref": "Faugere1999 DOI10.1016/s0022-4049(99)00005-5 Crossref metadata",
+      "provenance": "retrieved",
+      "claim": "Full original paper inaccessible503/403; metadata only, no primary fulltext theorem attribution"
+    },
+    {
+      "ref": "Lean core UInt16 lemmas and official Mathlib MvPolynomial degrees",
+      "provenance": "internal",
+      "claim": "Actual word-modulo and polynomial coefficient/degree interfaces"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "e36c897190211f1824a1c3baebfb766660a0d82be55d5f6cb6f007daaaf95796",
+    "commit": "3cdbecbdd3c2456c41515ce642f0c2dae4cb110e",
+    "frozen_at": "2026-11-16T15:59:32Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "original_items": [
+      12,
+      13,
+      14
+    ],
+    "checkpoint_exception": "Authorized zero-paid bounded local exact known-answer computation",
+    "native_budget_seconds": 60,
+    "per_call_timeout_seconds": 30,
+    "analyzer_binary_sha256": "a177e6d1b09ec53ddac31ab2c830ee1c8dc8e949ea84bbd997cc276d1bbd64f7",
+    "instrument_files": [
+      {
+        "path": "/workspace/crypto-audit/research/msolve_degree_word_audit_20261116/PROTOCOL.md",
+        "bytes": 9759,
+        "sha256": "29a16b2645ae1d885e1ab198675b76991e4473fdcc7856a01e278e6f18e01a02"
+      },
+      {
+        "path": "/workspace/crypto-audit/research/msolve_degree_word_audit_20261116/native/analyze.rs",
+        "bytes": 7402,
+        "sha256": "61549e81f039698dfca0ce38498ccd49fdcf0a7c9c07bcd5aa750c2630b4d582"
+      },
+      {
+        "path": "/workspace/crypto-audit/research/msolve_degree_word_audit_20261116/native/build.sh",
+        "bytes": 1324,
+        "sha256": "92a956ab50f86a9eecafb308c2de2bd37b5c0ced968d68792a68137c7be83361"
+      },
+      {
+        "path": "/workspace/crypto-audit/research/msolve_degree_word_audit_20261116/native/prepare_source.py",
+        "bytes": 4792,
+        "sha256": "0aa9b20bdf3b8397af181384bebea1628f5f21a160a1d9f8f9b96f94b42883e9"
+      },
+      {
+        "path": "/workspace/crypto-audit/research/msolve_degree_word_audit_20261116/native/run_one.sh",
+        "bytes": 1415,
+        "sha256": "f279f94ab98480f0e56a8a373754b199330ed062d31dfd765197908a9a472f58"
+      },
+      {
+        "path": "/workspace/crypto-audit/research/msolve_degree_word_audit_20261116/native/degree-audit.patch",
+        "bytes": 3229,
+        "sha256": "0004e252ba059e1f7c54404049118f96fe91c479a37961966855d1f65d707686"
+      },
+      {
+        "path": "/workspace/crypto-audit/research/msolve_degree_word_audit_20261116/inputs/control.ms",
+        "bytes": 19,
+        "sha256": "f110d0d7eaa4e65caab0760b64563e0147d71906f3a601448cd761895bb8f07f"
+      },
+      {
+        "path": "/workspace/crypto-audit/research/msolve_degree_word_audit_20261116/inputs/boundary.ms",
+        "bytes": 29,
+        "sha256": "8d775c7c17bce47b94c9a00d2b3174f77e666220dfa3464b27fe4672f311d931"
+      },
+      {
+        "path": "/workspace/scratch/msolve-degree-native-build/msolve",
+        "bytes": 3632816,
+        "sha256": "07c1a4d6b3e679b1aa8da8d4a3846f6df5e88c526b5c040a6833218c1171e4ea"
+      },
+      {
+        "path": "/workspace/scratch/msolve-degree-native-build/analyze",
+        "bytes": 4652672,
+        "sha256": "a177e6d1b09ec53ddac31ab2c830ee1c8dc8e949ea84bbd997cc276d1bbd64f7"
+      },
+      {
+        "path": "/workspace/scratch/msolve-degree-native-build/source-provenance.json",
+        "bytes": 1432,
+        "sha256": "83a66ac51e7327b6871a18fe9a21e7b0add99a71eaf182959be89f06e7c30674"
+      },
+      {
+        "path": "/workspace/scratch/msolve-degree-native-build/config.h",
+        "bytes": 51,
+        "sha256": "95f24fc5f54eaea2c5f6f58bfea15e7ced00a7f280551ce44a4e65f50e51984d"
+      },
+      {
+        "path": "/workspace/scratch/msolve-degree-native-build/gcc-version.txt",
+        "bytes": 232,
+        "sha256": "4dc9a4e32fd9e06d42fb307688c59d6d889f0ff90ce034cbefed21b0d451fd81"
+      },
+      {
+        "path": "/workspace/scratch/msolve-degree-native-build/rustc-version.txt",
+        "bytes": 196,
+        "sha256": "f22d5e4e9ced367e774ce5bc140d9e6b1235c1882fec80d011044851f3ae6369"
+      },
+      {
+        "path": "/workspace/crypto-autoresearcher-current/tools/experiment_protocol.py",
+        "bytes": 64811,
+        "sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4"
+      }
+    ],
+    "canonical_protocol_tool_commit": "005a7d7758844f97980b90c7ccd41b5cdcf9e048",
+    "canonical_version_limit": "Fresh origin/main5d7c27e protocol paths are opaque VLT1; use existing unmodified readable canonical005a tool, not latest-source claim",
+    "in_sample": false
+  }
+}

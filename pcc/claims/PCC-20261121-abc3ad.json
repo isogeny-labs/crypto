@@ -1,0 +1,15 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-21T19:54:48Z",
+ "id": "PCC-20261121-abc3ad",
+ "kind": "statement",
+ "producer": {
+  "commit": "70a603ed1852a52bd904ec56f8ae0bd28ed78f98",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [],
+ "schema": "pcc.claim/v1",
+ "scope": "Curve25519-family miniatures k = 20, 24, 28, 32, the five c1 confirmation curves per size with new target and measurement seeds, 12 targets x 8 rounds, arms rho-neg, ledger incumbent, tw2cj-lazy, tw2cj-lazy sib=8 pool=64, c1-lazy, c1-lazy sib=8 pool=64; ecbench counted GAE with the 2026-11-08 band and bitop/v1 per sqrt(r) from the records; local route L1; independent in-session recomputation but no signed replay; protocol frozen before data",
+ "statement": "Sibling-points panel (research/curve25519_autolab_20261104/sibling-panel): 3240 records per size, every record with audit status verified, 8 replays reproduced per size, 0 problems. Paired ratios in bitop/v1 per sqrt(r), ratio of sums with workload-block bootstrap: tw2cj-lazy-sib8 / tw2cj-lazy 0.805 / 0.689 / 0.624 / 0.627 and c1-lazy-sib8 / c1-lazy 0.838 / 0.699 / 0.669 / 0.646 at k = 20 / 24 / 28 / 32; tw2cj-lazy-sib8 / rho-neg 1.272 / 1.074 / 1.054 / 1.142; c1-lazy-sib8 / rho-neg 1.043 / 0.876 [0.833, 0.920] / 0.902 [0.862, 0.941] / 0.912 [0.859, 0.971]. Stored points per sqrt(r) of a sib8 arm within 1.09x of its control. In the GAE band the sibling pairs are below their controls at w = 0 and 0.1 and above at w = 1, verdict unresolved at every size. Twelve of sixteen pre-registered bit-op cells inside their intervals, four missed in the cheaper direction; no falsification line of the protocol fires. A second lane recomputed every ratio from the records within 6e-5. The curves are not new to the programme (c1 confirmation curves); the 0.75x goal is not approached."
+}

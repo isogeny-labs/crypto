@@ -1,0 +1,9 @@
+# Target-scoped exponent-one support
+
+For a monic quintic H, let R=L_V mod H, where L_V is the squarefree subspace polynomial with roots V. For every quintic, support with multiplicities is equivalent to R^8=0 mod H, since 8 exceeds every possible root multiplicity. The generic predicate preserves this contract.
+
+For the exact GF(2^83), low-18-bit domain, A=0, B=1, target (z,Qy+z), k=0 family, the common-X reduction and audited complete empty cubic certificate exclude all supported H with zero as a root. The complete reciprocal-triple certificate excludes all supported H with repeated nonzero roots. Thus supported H in this family is squarefree, and support is equivalent to R=0. The converse is unconditional: H divides the squarefree split polynomial L_V. Since H(0)=z v^2 and z is nonzero, v=0 is an immediately rejected whole cell under these same certificates.
+
+The API accepts h,u,v and reconstructs H from the normalized norm; it does not accept a caller-supplied polynomial with an unverified provenance tag. Certificate use requires exact field/domain/curve/ordinate matching plus pinned mathematical receipts. Other contexts retain the repeated-root-safe predicate. This implementation intentionally exposes only the k=0 chart. It does not prune any nonzero-k chart or establish original-chain completeness.
+
+Both arms pay field/context construction, receipt checking where enabled, basis compilation, norm construction, support and serialization. A shared compiled remainder kernel is the strong baseline; avoiding three final squarings alone may yield little total gain. Each polynomial has degree five, storage O(d+5), and work O(d*5^2) field operations; no reduction of the dominant distinct-five search dimension is claimed. Correctness comparisons include literal small-domain root-product dictionaries and repeated-root examples that refute an unguarded squarefree shortcut.

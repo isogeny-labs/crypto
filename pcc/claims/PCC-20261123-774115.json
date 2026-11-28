@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T04:24:52Z",
+ "id": "PCC-20261123-774115",
+ "kind": "execution",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "gpt-6-astra",
+  "session": "prime31-rational-chain-iteration6"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/evidence/ci-restored-spec-failure/receipt.json",
+    "sha256": "e9fa228a251a43badecfd05078a858cd6fef5e29431f148866608f8a7360313a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/evidence/ci-restored-spec-failure/spec-tests.txt",
+    "sha256": "7d544b79f476d103ae88d8f2692dc07418e9c81aadbe15cf16c21049b2b986d4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/evidence/ci-restored-spec-failure/source-sha256.txt",
+    "sha256": "19c5cf71dbc223bb51177bcf712c601ffc9847ff53ae7cd3b91232dbb6046069"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/evidence/ci-restored-spec-failure/job.log.gz",
+    "sha256": "5976049b187842ca0934d6ac72fd49c95453f65c98fcb527d3ba36d3ec82958a"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Unsigned source-bound producer CI failure, not a failed mathematical test or successful compilation.",
+ "statement": "Original-lock run45097885135/job137441679059 ata4ddc035c0c7519d6bab7a438d8a168f74ae40db failed before any tests at inherited ic_framework/mod.rs unclosed delimiter after the prior spec.rs restoration. All candidate and native identity steps were skipped. Artifact14784865238 was downloaded and ZIP SHA256915598d695abeb8f35368527093cd1be101db1c0f457a9aeda2c44707aaf1693 verified. Retained source hashes, compiler output and full compressed job log support this failure boundary only."
+}

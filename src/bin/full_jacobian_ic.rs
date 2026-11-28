@@ -7,9 +7,21 @@
 //! ```text
 //! full_jacobian_ic [--primes 211,...] [--stage2 25601,51203,102407]
 //!                  [--out-dir DIR] [--threads 4] [--budget-s 3600]
+//!                  [--min-r-frac F] [--max-prime-hops 20] [--protocol PATH]
+//!                  [--inv-weight W] [--select-only] [--field-microbench]
 //! ```
 //!
-//! Protocol (frozen by hash): `research/full_jacobian_ic_20261113/PROTOCOL.md`.
+//! Amendment 1 of `research/full_jacobian_ic_rp_20261114/PROTOCOL.md`
+//! (2026-11-15): every arm row also carries `field_mul_sqr` and `field_inv`
+//! (the `F_p` products, squarings and inversions behind its group operations:
+//! `full_jacobian_ic::{CantorTally, ec_add_tally}`) and a `field_unit`
+//! report in which one unit is one `F_p` multiplication or squaring and an
+//! inversion weighs `--inv-weight`; the primary `verdict` is computed in that
+//! unit and the group-operation verdict is kept as `verdict_group_ops`.
+//!
+//! Protocol (frozen by hash): `research/full_jacobian_ic_20261113/PROTOCOL.md`;
+//! with `--min-r-frac`, `research/full_jacobian_ic_rp_20261114/PROTOCOL.md`
+//! (covers with `r >= ceil(F p)`, next prime when a prime has none).
 //! Writes `full_jacobian.json`; the table, the SVG and the verdict text are
 //! `render.py`.  Exit status 0 only when every log of every arm was certified
 //! by the independent `[k]G == T` on `E1` and `[k]phi^*G == phi^*T` on `J_C`.
@@ -22,16 +34,27 @@ use clap::Parser;
 use rayon::prelude::*;
 use serde_json::{json, Value};
 
+use crypto_lib::cryptanalysis::chained_transfer::field::Fp as FieldFp;
 use crypto_lib::cryptanalysis::chained_transfer::full_jacobian_ic::{
-    certify_both, cover_instance, fit_loglog, run_full_ic, selection_skips, CoverInstance, Source,
+    certify_both, cover_instance, cover_select_rp, fit_loglog, inv_extgcd, min_r_for,
+    rho_full_ec_tallied, run_full_ic, selection_skips_min_r, CoverInstance, Source, TalliedJac,
 };
 use crypto_lib::cryptanalysis::chained_transfer::hyper64::{H64Curve, H64Div};
 use crypto_lib::cryptanalysis::chained_transfer::ic_control::{Arm as IcArm, IcParams, IcResult};
 use crypto_lib::cryptanalysis::chained_transfer::instrument::{fb_size_g, ic_on_rung};
 use crypto_lib::cryptanalysis::chained_transfer::negation_remeasure::{
-    best_of, cover_select, mean_rho, measure_class_times, report_arm, rho_full, rho_full_ec, Arm,
-    Class, ClassTimes, RefSet, RhoFull, BAND, CAL_FACTORS, TIMING_BATCHES, TIMING_BATCH_LEN,
+    best_of, mean_rho, measure_class_times, report_arm, rho_full, Arm, Class, ClassTimes, RefSet,
+    RhoFull, BAND, CAL_FACTORS, TIMING_BATCHES, TIMING_BATCH_LEN,
 };
+use crypto_lib::cryptanalysis::ic_boundary::FieldOps;
+
+/// Frozen inversion weight of Amendment 1 (one `F_p` inversion = this many
+/// multiplications); see `research/full_jacobian_ic_rp_20261114/PROTOCOL.md`.
+const INV_WEIGHT_FROZEN: f64 = 10.0;
+
+/// What the IC arms do not count (Amendment 1; validator finding 7).
+const IC_LOWER_BOUND_NOTE: &str = "lower bound: not counted are the partition (jump) hash of every walk step (key_of + mix64), the large-prime map (HashMap) and union-find, the RNG draws (StdRng), the one-time [h]Z and ord(Z) of the instance (uncounted Cantor), polynomial additions/subtractions in Cantor and the relation phase, and linear-algebra additions (off the band)";
+const CTL_LOWER_BOUND_NOTE: &str = "lower bound: as the whole-J arms, and the Cantor steps of ic_on_rung are not field-tallied (instrument.rs is outside the tallied code): the field_unit base holds only rel_mul + la_mul";
 
 #[derive(Parser, Debug)]
 #[command(about = "O3: index calculus with relations from all of J_C(F_p) against matched rho")]
@@ -69,6 +92,33 @@ struct Args {
     /// Smoke run: unit class times, no calibration (the part says so).
     #[arg(long, default_value_t = false)]
     no_calibration: bool,
+    /// Accept only covers with `r >= ceil(F p)` (`r` the largest prime with
+    /// `r || #E1`).  0 (default) is the 2026-11-13 selection, unchanged.
+    #[arg(long, default_value_t = 0.0)]
+    min_r_frac: f64,
+    /// With `--min-r-frac > 0`: when a prime has no such cover, try the next
+    /// prime above it, at most this many times (frozen fallback of
+    /// `research/full_jacobian_ic_rp_20261114/PROTOCOL.md`).
+    #[arg(long, default_value_t = 20)]
+    max_prime_hops: u32,
+    /// Print the selected cover of every prime (p used, r, #E1 / r, h,
+    /// candidate, skips) as JSON lines and exit: no arm is run, no file is
+    /// written.
+    #[arg(long, default_value_t = false)]
+    select_only: bool,
+    /// Protocol path written into the output (provenance only).
+    #[arg(long, default_value = "research/full_jacobian_ic_20261113/PROTOCOL.md")]
+    protocol: String,
+    /// Weight of one F_p inversion in F_p multiplications (field unit of
+    /// Amendment 1).  The default is the frozen value.
+    #[arg(long, default_value_t = INV_WEIGHT_FROZEN)]
+    inv_weight: f64,
+    /// Time one F_p multiplication, one extended-gcd inversion (the Cantor
+    /// code's) and one Fermat inversion (ec.rs's) at every listed prime, best
+    /// of the calibration batches, print JSON lines and exit: no cover, no
+    /// arm, no file.
+    #[arg(long, default_value_t = false)]
+    field_microbench: bool,
 }
 
 fn host() -> Value {
@@ -89,6 +139,16 @@ struct Sample {
     res: IcResult,
     good: bool,
     smooth_rate: f64,
+    /// Whether `res.group.field_ops` holds a tally (the whole-J arms).
+    tallied: bool,
+}
+
+/// Field-operation means of a set of tallies.
+fn field_means(f: &[FieldOps]) -> Value {
+    let n = f.len().max(1) as f64;
+    let m = |g: &dyn Fn(&FieldOps) -> u64| f.iter().map(|x| g(x) as f64).sum::<f64>() / n;
+    let (mu, sq, iv) = (m(&|x| x.muls), m(&|x| x.sqrs), m(&|x| x.invs));
+    json!({"field_mul": mu, "field_sqr": sq, "field_mul_sqr": mu + sq, "field_inv": iv})
 }
 
 fn ic_mean(rs: &[Sample]) -> (Arm, Value) {
@@ -108,12 +168,23 @@ fn ic_mean(rs: &[Sample]) -> (Arm, Value) {
         let g = s.res.group_ops() as f64;
         (a.min(g), b.max(g))
     });
+    let tallied = rs.iter().all(|s| s.tallied);
+    let fm = field_means(&rs.iter().map(|s| s.res.group.field_ops).collect::<Vec<_>>());
     let arm = Arm {
         group_ops: go,
         native: vec![(Class::MulP, rm), (Class::MulR, lm)],
-        lower_bound: false,
+        lower_bound: true,
+    };
+    let (fms, finv) = if tallied {
+        (fm["field_mul_sqr"].clone(), fm["field_inv"].clone())
+    } else {
+        (Value::Null, Value::Null)
     };
     let j = json!({
+        "field_mul_sqr": fms, "field_inv": finv,
+        "field_mul": if tallied { fm["field_mul"].clone() } else { Value::Null },
+        "field_sqr": if tallied { fm["field_sqr"].clone() } else { Value::Null },
+        "lower_bound_note": if tallied { IC_LOWER_BOUND_NOTE } else { CTL_LOWER_BOUND_NOTE },
         "runs": rs.len(), "certified": certified, "exhausted": exhausted,
         "group_ops": go, "group_ops_min": mn, "group_ops_max": mx,
         "setup_ops": m(&|r| r.setup_ops as f64),
@@ -168,18 +239,31 @@ fn unit_times() -> ClassTimes {
 }
 
 /// One prime: all arms, references, calibration.  `None` if no admissible cover.
-fn run_prime(a: &Args, i: usize, p: u64, stage: u8) -> (Option<Value>, bool) {
+fn run_prime(a: &Args, i: usize, p_req: u64, stage: u8) -> (Option<Value>, bool) {
     let t0 = Instant::now();
-    let Some(ci) = cover_select(p, i) else {
-        println!("p={p}: no admissible cover");
+    let hops = if a.min_r_frac > 0.0 {
+        a.max_prime_hops
+    } else {
+        0
+    };
+    let Some((p, passed_over, ci)) = cover_select_rp(p_req, i, a.min_r_frac, hops) else {
+        println!("p={p_req}: no admissible cover");
         return (
             Some(
-                json!({"p": p, "stage": stage, "skipped": "no admissible cover candidate in 4000"}),
+                json!({"p": p_req, "stage": stage, "min_r_frac": a.min_r_frac,
+                        "skipped": format!("no admissible cover candidate in 4000 at p and {hops} next primes")}),
             ),
             false,
         );
     };
-    let skips = selection_skips(p, i, ci.candidate);
+    let min_r = min_r_for(p, a.min_r_frac);
+    if p != p_req {
+        println!(
+            "p={p_req}: no cover with r >= {:.4} p; next prime used: {p}",
+            a.min_r_frac
+        );
+    }
+    let skips = selection_skips_min_r(p, i, ci.candidate, min_r);
     let (ninst, nseeds) = if stage == 1 {
         (a.instances, a.ic_seeds)
     } else {
@@ -242,18 +326,27 @@ fn run_prime(a: &Args, i: usize, p: u64, stage: u8) -> (Option<Value>, bool) {
     let mut ok = true;
 
     // matched rho on E1 (negation = primary, plain = context)
+    // (the same runs as `rho_full_ec`, with the field tally of Amendment 1)
     let mut rneg: Vec<RhoFull> = vec![];
     let mut rplain: Vec<RhoFull> = vec![];
+    let mut fneg: Vec<FieldOps> = vec![];
+    let mut fplain: Vec<FieldOps> = vec![];
     for c in &insts {
         let te = e1.mul(&ge, c.x as u128);
-        let run = |neg: bool| -> Vec<RhoFull> {
+        let run = |neg: bool| -> Vec<(RhoFull, FieldOps)> {
             (0..a.rho_seeds)
                 .into_par_iter()
-                .map(|s| rho_full_ec(&e1, ge, te, r, 1000 + s + c.seed % 997, neg))
+                .map(|s| rho_full_ec_tallied(&e1, ge, te, r, 1000 + s + c.seed % 997, neg))
                 .collect()
         };
-        rneg.extend(run(true));
-        rplain.extend(run(false));
+        for (out, f) in run(true) {
+            rneg.push(out);
+            fneg.push(f);
+        }
+        for (out, f) in run(false) {
+            rplain.push(out);
+            fplain.push(f);
+        }
     }
     ok &= rneg.iter().chain(&rplain).all(|x| x.certified);
     let refs = RefSet {
@@ -264,12 +357,14 @@ fn run_prime(a: &Args, i: usize, p: u64, stage: u8) -> (Option<Value>, bool) {
     };
     // rho on the order-r subgroup of J_C (context)
     let mut rj: Vec<RhoFull> = vec![];
+    let mut fj: Vec<FieldOps> = vec![];
     for c in &insts {
-        let rs: Vec<RhoFull> = (0..a.rho_j_seeds)
+        let rs: Vec<(RhoFull, FieldOps)> = (0..a.rho_j_seeds)
             .into_par_iter()
             .map(|s| {
                 let (g, t, x) = (c.inst.g, c.inst.target, c.x);
-                let mut v = rho_full(&c.inst.curve, g, t, r, 2000 + s, true, &|k| {
+                let tj = TalliedJac::new(&c.inst.curve);
+                let mut v = rho_full(&tj, g, t, r, 2000 + s, true, &|k| {
                     c.inst.curve.mul_rtl(g, k) == t && k % r == x
                 });
                 // independent certificate on the library Jacobian
@@ -277,10 +372,13 @@ fn run_prime(a: &Args, i: usize, p: u64, stage: u8) -> (Option<Value>, bool) {
                     let (_, on_j) = certify_both(&ci, x, k);
                     v.certified &= on_j;
                 }
-                v
+                (v, tj.tally())
             })
             .collect();
-        rj.extend(rs);
+        for (v, f) in rs {
+            rj.push(v);
+            fj.push(f);
+        }
     }
     ok &= rj.iter().all(|x| x.certified);
     let rj_mean = mean_rho(&rj);
@@ -348,9 +446,35 @@ fn run_prime(a: &Args, i: usize, p: u64, stage: u8) -> (Option<Value>, bool) {
                     res,
                     good,
                     smooth_rate: rate,
+                    tallied: label == "A" || label == "B",
                 }
             })
             .collect()
+    };
+    // ── field unit (Amendment 1): 1 = one F_p multiplication or squaring ──
+    let w_inv = a.inv_weight;
+    let fbase = |fm: &Value| {
+        fm["field_mul_sqr"].as_f64().unwrap() + w_inv * fm["field_inv"].as_f64().unwrap()
+    };
+    let (neg_f, plain_f, rj_f) = (field_means(&fneg), field_means(&fplain), field_means(&fj));
+    let refs_f = RefSet {
+        neg: Arm {
+            group_ops: fbase(&neg_f),
+            ..refs.neg.clone()
+        },
+        plain: Arm {
+            group_ops: fbase(&plain_f),
+            ..refs.plain.clone()
+        },
+        t_add_ns: times.mul_p,
+        times,
+    };
+    let field_entry = |name: &str, arm: &Arm, parts: Value| -> Value {
+        let mut v =
+            serde_json::to_value(report_arm(name, arm, times.mul_p, &times, &refs_f)).unwrap();
+        v["base_parts"] = parts;
+        v["unit"] = json!("one F_p multiplication or squaring; inversion at inv_weight");
+        v
     };
     let mut arms = serde_json::Map::new();
     for label in ["A", "B", "A_S", "B_S"] {
@@ -360,6 +484,26 @@ fn run_prime(a: &Args, i: usize, p: u64, stage: u8) -> (Option<Value>, bool) {
         ok &= rs.iter().all(|s| s.good) && rs.iter().all(|s| !s.res.exhausted);
         let mut e = entry(label, &arm, t_add_h, &times, &refs, j);
         e["arm_wall_s"] = json!(tt.elapsed().as_secs_f64());
+        // field unit: Cantor products (+ w_inv inversions) + relation-phase
+        // and linear-algebra multiplications, every one an F_p (or mod-r,
+        // r < p) product; no native class is left for the band
+        let g = |k: &str| e[k].as_f64().unwrap_or(0.0);
+        let cantor = if e["field_mul_sqr"].is_null() {
+            0.0
+        } else {
+            g("field_mul_sqr") + w_inv * g("field_inv")
+        };
+        let farm = Arm {
+            group_ops: cantor + g("rel_mul") + g("la_mul"),
+            native: vec![],
+            lower_bound: true,
+        };
+        e["field_unit"] = field_entry(
+            label,
+            &farm,
+            json!({"cantor_mul_sqr_plus_w_inv_inv": if e["field_mul_sqr"].is_null() { Value::Null } else { json!(cantor) },
+                   "rel_mul": g("rel_mul"), "la_mul": g("la_mul")}),
+        );
         println!(
             "p={p} arm {label}: runs {} group_ops {:.0} class {} ratio_band {:?} wall {:.1}s",
             rs.len(),
@@ -380,8 +524,19 @@ fn run_prime(a: &Args, i: usize, p: u64, stage: u8) -> (Option<Value>, bool) {
             &refs,
             json!({"note": "context: rho on the order-r subgroup of J_C; canon/hash/lookup classes timed on E1",
                    "runs": rj.len(), "certified": rj.iter().filter(|x| x.certified).count(),
-                   "mean": serde_json::to_value(&rj_mean).unwrap()}),
+                   "mean": serde_json::to_value(&rj_mean).unwrap(),
+                   "field_mul_sqr": rj_f["field_mul_sqr"], "field_inv": rj_f["field_inv"],
+                   "field_mul": rj_f["field_mul"], "field_sqr": rj_f["field_sqr"]}),
         ),
+    );
+    let rj_farm = Arm {
+        group_ops: fbase(&rj_f),
+        ..rho_j_arm.clone()
+    };
+    arms["rho_J_negation"]["field_unit"] = field_entry(
+        "rho_J_negation",
+        &rj_farm,
+        json!({"cantor_mul_sqr_plus_w_inv_inv": fbase(&rj_f)}),
     );
     let neg_m = mean_rho(&rneg);
     let plain_m = mean_rho(&rplain);
@@ -391,6 +546,9 @@ fn run_prime(a: &Args, i: usize, p: u64, stage: u8) -> (Option<Value>, bool) {
         .collect();
     let row = json!({
         "p": p, "stage": stage, "r": r, "x": insts.iter().map(|c| c.x).collect::<Vec<_>>(),
+        "p_requested": p_req, "primes_passed_over": passed_over,
+        "min_r_frac": a.min_r_frac, "min_r": min_r, "r_over_p": r as f64 / p as f64,
+        "e1_cofactor": e1.order() / r,
         "candidate": ci.candidate, "seed0": ci.seed0,
         "skipped_candidates": serde_json::to_value(&skips).unwrap(),
         "e1_order": e1.order(), "e2_order": b.e2.order(), "jac_order": jac_order, "h": h,
@@ -404,7 +562,12 @@ fn run_prime(a: &Args, i: usize, p: u64, stage: u8) -> (Option<Value>, bool) {
         "t_add_ns": {"E1": t_add_e, "J_word": t_add_h},
         "rho_E": {"negation": serde_json::to_value(&neg_m).unwrap(),
                   "plain": serde_json::to_value(&plain_m).unwrap(),
-                  "band_negation": refs.neg.band(), "cal_negation": refs.neg.cal(&times, t_add_e)},
+                  "band_negation": refs.neg.band(), "cal_negation": refs.neg.cal(&times, t_add_e),
+                  "field": {"negation": neg_f, "plain": plain_f,
+                            "band_negation": refs_f.neg.band(),
+                            "cal_negation": refs_f.neg.cal(&times, times.mul_p),
+                            "band_plain": refs_f.plain.band()}},
+        "inv_weight": w_inv,
         "arms": arms,
         "wall_s": t0.elapsed().as_secs_f64(),
     });
@@ -457,6 +620,55 @@ fn fits(rows: &[Value], label: &str) -> Value {
             .map(|r| r["rho_E"]["band_negation"][1].as_f64().unwrap())
             .collect(),
     );
+    // Amendment 1: the same fits in the field unit (primary)
+    for arm in ["A", "B", "A_S", "B_S"] {
+        if arm == "A" || arm == "B" {
+            put(
+                &format!("{arm}_field_mul_sqr"),
+                rows.iter()
+                    .map(|r| get(r, arm, &|e| e["field_mul_sqr"].as_f64().unwrap()))
+                    .collect(),
+            );
+        }
+        for (i, w) in ["w0", "w0.1", "w1"].iter().enumerate() {
+            put(
+                &format!("{arm}_field_ratio_to_rho_E_{w}"),
+                rows.iter()
+                    .map(|r| {
+                        get(r, arm, &|e| {
+                            e["field_unit"]["ratio_neg_band"][i].as_f64().unwrap()
+                        })
+                    })
+                    .collect(),
+            );
+            put(
+                &format!("{arm}_field_total_{w}"),
+                rows.iter()
+                    .map(|r| {
+                        get(r, arm, &|e| {
+                            e["field_unit"]["total_band"][i].as_f64().unwrap()
+                        })
+                    })
+                    .collect(),
+            );
+        }
+    }
+    put(
+        "rho_E_negation_field_mul_sqr",
+        rows.iter()
+            .map(|r| {
+                r["rho_E"]["field"]["negation"]["field_mul_sqr"]
+                    .as_f64()
+                    .unwrap()
+            })
+            .collect(),
+    );
+    put(
+        "rho_E_negation_field_total_w0.1",
+        rows.iter()
+            .map(|r| r["rho_E"]["field"]["band_negation"][1].as_f64().unwrap())
+            .collect(),
+    );
     put(
         "rho_J_negation_group_ops",
         rows.iter()
@@ -468,8 +680,24 @@ fn fits(rows: &[Value], label: &str) -> Value {
     v
 }
 
-/// The frozen decision rule over the rows of stage 1.
-fn verdict(rows: &[Value], fit: &Value) -> Value {
+/// The frozen decision rule over the rows of stage 1, read in one unit:
+/// `field = true` (Amendment 1, primary) uses each arm's `field_unit` report
+/// and the `*_field_ratio_*` fits; `false` the group-operation reading.
+fn verdict(rows: &[Value], fit: &Value, field: bool) -> Value {
+    let rep = |e: &Value| -> Value {
+        if field {
+            e["field_unit"].clone()
+        } else {
+            e.clone()
+        }
+    };
+    let fit_key = |arm: &str| {
+        if field {
+            format!("{arm}_field_ratio_to_rho_E_w0.1")
+        } else {
+            format!("{arm}_ratio_to_rho_E_w0.1")
+        }
+    };
     let mut cells_blocking: Vec<String> = vec![];
     let mut per_arm = serde_json::Map::new();
     let mut all_closed = true;
@@ -478,7 +706,7 @@ fn verdict(rows: &[Value], fit: &Value) -> Value {
         let mut above_band = 0;
         let mut above_cal = 0;
         for r in rows {
-            let e = &r["arms"][arm];
+            let e = &rep(&r["arms"][arm]);
             if e["class_neg_band"] == "above" {
                 above_band += 1;
             } else {
@@ -493,8 +721,8 @@ fn verdict(rows: &[Value], fit: &Value) -> Value {
                 any_below = true;
             }
         }
-        let lo = fit[format!("{arm}_ratio_to_rho_E_w0.1")]["ci95"][0].as_f64();
-        let slope = fit[format!("{arm}_ratio_to_rho_E_w0.1")]["slope"].as_f64();
+        let lo = fit[fit_key(arm)]["ci95"][0].as_f64();
+        let slope = fit[fit_key(arm)]["slope"].as_f64();
         let closed =
             above_band == rows.len() && above_cal == rows.len() && lo.is_some_and(|v| v > 0.2);
         all_closed &= closed;
@@ -511,7 +739,12 @@ fn verdict(rows: &[Value], fit: &Value) -> Value {
     } else {
         "unresolved: the frozen rule is not met by both arms; blocking cells listed"
     };
-    json!({"verdict": v, "per_arm": per_arm, "blocking_cells": cells_blocking})
+    let unit = if field {
+        "field: one F_p multiplication or squaring, inversion at inv_weight (Amendment 1, primary)"
+    } else {
+        "group operations of each arm's own group (secondary since Amendment 1)"
+    };
+    json!({"verdict": v, "unit": unit, "per_arm": per_arm, "blocking_cells": cells_blocking})
 }
 
 fn main() -> ExitCode {
@@ -525,6 +758,72 @@ fn main() -> ExitCode {
         |s: &str| -> Vec<u64> { s.split(',').filter_map(|x| x.trim().parse().ok()).collect() };
     let s1 = parse(&a.primes);
     let s2 = parse(&a.stage2);
+    if a.field_microbench {
+        for &p in s1.iter().chain(&s2) {
+            let Some(k) = FieldFp::new(p) else {
+                println!(
+                    "{}",
+                    json!({"p": p, "error": "not an odd prime below 2^31"})
+                );
+                continue;
+            };
+            let xs: Vec<u64> = (1..=64u64).map(|i| (i * 7919 + 13) % (p - 1) + 1).collect();
+            // every operand through black_box, no chain between calls: the
+            // three are timed the same way (throughput, best batch)
+            let mut i = 0usize;
+            let t_mul = best_of(TIMING_BATCHES, TIMING_BATCH_LEN, &mut || {
+                let x = std::hint::black_box(xs[i & 63]);
+                let y = std::hint::black_box(xs[(i + 1) & 63]);
+                std::hint::black_box(x * y % p);
+                i += 1;
+            });
+            let mut i = 0usize;
+            let t_inv_ext = best_of(TIMING_BATCHES, TIMING_BATCH_LEN, &mut || {
+                let x = std::hint::black_box(xs[i & 63]);
+                std::hint::black_box(inv_extgcd(p, x));
+                i += 1;
+            });
+            let mut i = 0usize;
+            let t_inv_fermat = best_of(TIMING_BATCHES, TIMING_BATCH_LEN, &mut || {
+                let x = std::hint::black_box(xs[i & 63]);
+                std::hint::black_box(k.inv(x));
+                i += 1;
+            });
+            println!(
+                "{}",
+                json!({"p": p, "ns_mul": t_mul, "ns_inv_extgcd": t_inv_ext,
+                       "ns_inv_fermat": t_inv_fermat,
+                       "inv_extgcd_over_mul": t_inv_ext / t_mul,
+                       "inv_fermat_over_mul": t_inv_fermat / t_mul,
+                       "batches": TIMING_BATCHES, "batch_len": TIMING_BATCH_LEN,
+                       "host": host()})
+            );
+        }
+        return ExitCode::SUCCESS;
+    }
+    if a.select_only {
+        for (i, &p) in s1.iter().chain(&s2).enumerate() {
+            let hops = if a.min_r_frac > 0.0 {
+                a.max_prime_hops
+            } else {
+                0
+            };
+            let row = cover_select_rp(p, i, a.min_r_frac, hops).map_or_else(
+                || json!({"p_requested": p, "selected": null}),
+                |(q, passed, ci)| {
+                    let (n1, n2) = (ci.b.e1.order(), ci.b.e2.order());
+                    let min_r = min_r_for(q, a.min_r_frac);
+                    json!({"p_requested": p, "p": q, "primes_passed_over": passed,
+                           "r": ci.r, "min_r": min_r, "r_over_p": ci.r as f64 / q as f64,
+                           "e1_order": n1, "e1_cofactor": n1 / ci.r, "e2_order": n2,
+                           "h": n1 * n2 / ci.r, "candidate": ci.candidate, "seed0": ci.seed0,
+                           "skipped_candidates": selection_skips_min_r(q, i, ci.candidate, min_r)})
+                },
+            );
+            println!("{row}");
+        }
+        return ExitCode::SUCCESS;
+    }
     let mut rows: Vec<Value> = vec![];
     let mut all_ok = true;
     for (i, &p) in s1.iter().enumerate() {
@@ -557,9 +856,10 @@ fn main() -> ExitCode {
     let mut both: Vec<Value> = stage1_rows.clone();
     both.extend(stage2_rows.iter().cloned());
     let f_all = fits(&both, "stage 1 and 2 primes");
-    let v = verdict(&stage1_rows, &f1);
+    let v = verdict(&stage1_rows, &f1, true);
+    let v_group = verdict(&stage1_rows, &f1, false);
     let out = json!({
-        "protocol": "research/full_jacobian_ic_20261113/PROTOCOL.md",
+        "protocol": a.protocol,
         "args": format!("{a:?}"),
         "host": host(),
         "calibration": {
@@ -575,6 +875,14 @@ fn main() -> ExitCode {
         "fits_stage1": f1,
         "fits_all": f_all,
         "verdict": v,
+        "verdict_group_ops": v_group,
+        "inv_weight": a.inv_weight,
+        "field_unit": {
+            "definition": "1 unit = one F_p multiplication or squaring; one F_p inversion = inv_weight units; IC: Cantor tally + rel_mul + la_mul; rho: E1 affine-formula tally, native classes on the band and at w_cal = time(class) / time(mul_p)",
+            "cantor": "full_jacobian_ic::CantorTally (H64Curve::cantor step for step, generic Cantor, not explicit formulae)",
+            "e1": "full_jacobian_ic::ec_add_tally (affine: add 2M+1S+1I, double 4M+2S+1I; F_{p^2} container work not charged)",
+            "ic_lower_bound": IC_LOWER_BOUND_NOTE,
+        },
         "wall_s": t_all.elapsed().as_secs_f64(),
     });
     let path = format!("{}/full_jacobian.json", a.out_dir);

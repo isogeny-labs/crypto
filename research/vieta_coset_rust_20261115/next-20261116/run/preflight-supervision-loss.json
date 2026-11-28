@@ -1,0 +1,66 @@
+{
+  "schema": "vieta-preflight-supervision-loss/v1",
+  "recorded_utc": "2026-11-16T19:47:34.424429+00:00",
+  "source_revision": "9d2106eb2a9f65ffe94020b237301ce910a799e1",
+  "event": "Execution environment reconnect lost benchrec/isolation supervisors; native timeout/driver survived without restart",
+  "observed_controller": {
+    "pid": 9620,
+    "state": "zombie",
+    "parent": 1
+  },
+  "observed_bounded_driver": {
+    "timeout_pid": 9621,
+    "outer_cap_seconds": 900,
+    "final_state": "zombie",
+    "configuration_receipts": [
+      {
+        "panel": "preflight",
+        "representation": "coset",
+        "field": "word62",
+        "m": 8192,
+        "exit": 0
+      },
+      {
+        "panel": "preflight",
+        "representation": "coset",
+        "field": "word62",
+        "m": 16384,
+        "exit": 0
+      },
+      {
+        "panel": "preflight",
+        "representation": "coset",
+        "field": "p224",
+        "m": 2048,
+        "exit": 0
+      },
+      {
+        "panel": "preflight",
+        "representation": "rational",
+        "field": "word62",
+        "m": 2048,
+        "exit": 0
+      },
+      {
+        "panel": "preflight",
+        "representation": "rational",
+        "field": "p224",
+        "m": 128,
+        "exit": 0
+      },
+      {
+        "panel": "preflight",
+        "representation": "rational",
+        "field": "p224",
+        "m": 512,
+        "exit": 0
+      }
+    ]
+  },
+  "aggregate_launcher_exit": null,
+  "isolation_receipt_available": false,
+  "native_process_restart": false,
+  "clock_scope": "all wall values remain invalid for admitted timing; native durations are planning diagnostics only",
+  "counted_evidence_scope": "Retained per-input records, no retry; scalar replay and source/hash checks still required",
+  "no_primary_data_yet": true
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "local-main-host-receipt/v1",
+  "created_utc": "2026-11-23T14:14:08.870Z",
+  "isolation": "L0 shared local host",
+  "controller_affinity": "Captured process status/current cgroup;worker+external NativefixedCPU4",
+  "worker_virtual_limit_bytes": 4294967296,
+  "virtual_limit_scope": "Worker wrapper/timeout/taskset/worker only; driver,external verifier and point auditor not subject to thisulimit",
+  "whole_cgroup_guard_bytes": 15032385536,
+  "retained_other_research_included": true,
+  "per_process_RSS_and_CPU_time": "not measured",
+  "runtime_libraries": [
+    {
+      "path": "/lib/x86_64-linux-gnu/libcrypto.so.3",
+      "bytes": 6517312,
+      "sha256": "8bb5f3fdffe280d4453eb79a4663c2c47af70b7c247fe2e94e2da703cee1fd3d"
+    },
+    {
+      "path": "/lib/x86_64-linux-gnu/libc.so.6",
+      "bytes": 1995216,
+      "sha256": "9792e3cbb541c8f44c7acf5f14f4022ea62998ecc787d326bed4d8b6547dfd92"
+    },
+    {
+      "path": "/lib/x86_64-linux-gnu/libz.so.1",
+      "bytes": 125376,
+      "sha256": "85590dd58edf5445e18bc7193e5ebc01ac5841f1ae187e97705a662e90c6421e"
+    },
+    {
+      "path": "/lib/x86_64-linux-gnu/libzstd.so.1",
+      "bytes": 825336,
+      "sha256": "27f07c9a49c2c956bcfb64cd4712976586a66facbf15fc7f09bc37413b5f2b21"
+    },
+    {
+      "path": "/lib64/ld-linux-x86-64.so.2",
+      "bytes": 225672,
+      "sha256": "c8438e4fde1934e61c88311633f00949ff645d5c04cdb8671fa3d78164d2f307"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+# Prospective optimized-negation rho vs complete APS — prime31 (2026-11-16)
+
+**Standing:** preregistration only; no result, benchmark, independent PCC or claim of rho superiority yet. The purpose is to replace an **insufficient BSGS control** in the prior APS cold-solver experiment with an actually executed, same-instance optimized generic rho baseline.
+
+## Scope and frozen incumbent
+
+- Exact ordinary cofactor-one curve: `p=2147483647`, `E: y²=x³+847514846x+2087444724`, prime `n=2147446831`, `PRIME31.g` from the shared Rust native library.
+- Current complete APS implementation: `examples/prime31_aps_one_relation.rs`, `execute_factorized_unequal_index_variant_joint(q,[384,384,16384],6,false,true,true)`: joint-Jacobian/batch-normalized labelled public walk; packed x-index, factorized S3 roots, independently checked signed relation. Frozen matched 24-target development result: 87.218164 ms vs 106.240928 ms cold BSGS in [APS_JOINT_SHAMIR_BATCH_RESULT_20261116.md](APS_JOINT_SHAMIR_BATCH_RESULT_20261116.md), exact-source [run 43897531857](https://github.com/isogeny-labs/crypto/actions/runs/43897531857). This does not imply rho advantage.
+- Use **only existing Rust** native library and source (`Arithmetic`, `joint_public_jac`, `jac_mixed`, `normalize_jac_batch`, finite field and scalar verifier); no Python replacement, no hidden answer fed into either solver.
+
+## Proposed optimized rho comparator
+
+A truly complete, bounded single-target prime-order discrete-log computation. Use (i) x/y negation-folded equivalence classes, (ii) at least 16 pseudorandom labelled r-adding jumps from public G and Q, (iii) multiple concurrent independent lanes with batch-normalized mixed-Jacobian group additions, (iv) distinguished point table keyed by the canonical x coordinate, (v) exact modular collision-to-scalar recovery and caller-side [k]G==Q, (vi) explicit restart on exact/futile collisions, short cycles and infinity. Verify the walk invariant after folding: `P=[a]G+[b]Q`. Avoid declaring *global* optimality from this one tuning: the existing `src/cryptanalysis/ic_boundary.rs` `rho.negation` is a separate tuned implementation; `research/ecbench_rho_optimized_20261014/METHODS.txt` documents its Wiener–Zuccherato look-ahead/cycle-escape controls.
+
+Panel: 24 fresh distinct caller-seeded scalars, verifier-only `k`, no overlap with the earlier joint APS Q panel; record source seed in JSON. Four arms per Q, alternated/cycled chronological order: (A) incumbent cold APS, (B) cold batched negation rho with 32 lanes and 4 DP bits, (C) 64 lanes and 5 DP bits, (D) repeated 32-lane rho A/A. Seed all runs from Q-specific public arm seeds; do not tune on these outcomes. Every arm must return an actual scalar and independent `[k]G=Q`; no omitted failures or median-only substitutions. The cap for each rho arm is 2,000,000 *total walk additions* including restarts. Record incomplete/censored arms and all cold costs rather than replacing them.
+
+**Runtime and attribution:** GitHub Actions ubuntu-24.04, pinned Rust 1.100.0 release, one worker, single process per panel, all setup/jump generation, field group operations, folding and cycle handling, DP memory/lookup, collision and log verification charged. Capture precise execution source SHA, all 24 x 4 outputs and aggregate totals. Include `steps`, `restarts`, `DP_records`, useful/unusable collisions, memory/table size. A step count or single-target warm result alone is not a cold solver performance claim. Verify q uniqueness and scalar privacy at solver boundary.
+
+**Acceptance:** 24/24 solved in each arm, independent verifier scalar and point replays, zero erroneous collision answers, at least one full paired panel. A >=10% APS cold-cost improvement over the fastest **measured** optimized rho arm is a *development signal* only; it does not prove an asymptotic/non-generic advance or superiority to external implementations. If the matched rho wins, register an honest negative and keep the previous engineering APS improvement separately. Independently signed PCC and isolated-host reproduction required for external ranking.
+
+## Prior work reviewed before coding
+
+- `AGENTS.md`, `docs/session-logs/2026-11-16.md`, `research/prime31_ic_20261115/native/APS_JOINT_SHAMIR_BATCH_RESULT_20261116.md`, `research/ecbench_rho_optimized_20261014/METHODS.txt`, `src/cryptanalysis/ic_boundary.rs`, `research/rho_walk_leads_20261014/` and prior APS partition & S3 factorization data. In particular #4391's previous matched comparison was **BSGS**, not optimized rho.
+- Van Oorschot–Wiener, *Parallel collision search*, CCS 1994, https://doi.org/10.1145/191177.191231 ; Wiener–Zuccherato, *Faster Attacks on Elliptic Curve Cryptosystems*, SAC 1998, https://doi.org/10.1007/3-540-48892-8_15 . Negation folds give generic square-root saving but introduce fruitless short cycles, so test cycle escape explicitly.
+- PKM, *Index Calculus in the Kummer Line*, PKC 2016 https://doi.org/10.1007/978-3-662-49387-8_1 and APS, *On the Complexity of the ECDLP for Non-Supersingular Curves*, FFA 2018 https://doi.org/10.1016/j.ffa.2018.01.009 . This finite S3 enumeration remains generic meet-in-the-middle equivalent.
+- Previous non-generic dead ends to **not** repeat without changed mechanisms: anchored m6 F4 natural-support ceiling 3.7407%, two-summand S3 generic root index, post-Jac unequal partition losses, B8 symmetric eight-summand given-f validation (not yet f extraction). The next *scientific* task remains target-conditioned original-ideal-certified m8/S9 rational-root extraction from public Q, not another pure arithmetic rho tweak.
+- Research-KB MCP and CLI wrapper are **not available in this runtime**; bounded repo evidence and primary literature above are the fallback, not evidence of a comprehensive negative search.
+
+**No paid compute, merge, project policy bypass, leaderboards, or PCC ledger changes.**

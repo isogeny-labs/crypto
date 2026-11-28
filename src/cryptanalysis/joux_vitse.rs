@@ -1125,17 +1125,7 @@ pub fn trial_options() -> F4Options {
 // ── A complete toy DLP: dense linear algebra modulo ℓ ────────────────────
 
 fn inv_mod_u128(a: u128, m: u128) -> Option<u128> {
-    let (mut t, mut nt) = (0i128, 1i128);
-    let (mut r, mut nr) = (m as i128, (a % m) as i128);
-    while nr != 0 {
-        let q = r / nr;
-        (t, nt) = (nt, t - q * nt);
-        (r, nr) = (nr, r - q * nr);
-    }
-    if r != 1 {
-        return None;
-    }
-    Some(t.rem_euclid(m as i128) as u128)
+    crate::gcd::int::inv_mod_u128(a, m)
 }
 fn mulm(a: u128, b: u128, m: u128) -> u128 {
     // m < 2^64 in every use here

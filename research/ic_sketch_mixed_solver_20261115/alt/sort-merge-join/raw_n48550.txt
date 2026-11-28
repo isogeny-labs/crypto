@@ -1,0 +1,19 @@
+N_trials=48550 reps=21 |F|=128 table_raw_entries=16384 unique_keys=16360 build_group_ops=16384 (|F|^2=16384) hash_slots=32768
+arm           walk_ops setup_ops       hits     key_cmps     word_ops  line_touch  ratio_w  ident
+hash             48550      2218         93        70882       167889       57546    1.000   base
+hash arm: trial-hits=93 table-entry relations=93 verified_by_scalar_mult=93
+merge256         48550      2218         93      3144586      7163342      254289   42.667   true
+merge4096        48550      2218         93       244821      1227108       72965    7.309   true
+merge65536       48550      2218         93        64907       858832       61713    5.115   true
+gallop256        48550      2218         93       600957      1523677      289663    9.076   true
+gallop4096       48550      2218         93       257957      1043973       85441    6.218   true
+gallop65536      48550      2218         93       115911       893479       62119    5.322   true
+ALL_IDENTICAL_HITS_AND_GROUP_OPS=true
+wall L0 (uncertified), median of 21 reps, ns/trial: total (walk+lookup) | lookup-only
+hash         total     138.0  lookup       0.0
+merge256     total     175.3  lookup      76.5
+merge4096    total     118.8  lookup      21.6
+merge65536   total     137.8  lookup      18.9
+gallop256    total     178.1  lookup      59.8
+gallop4096   total     123.1  lookup      26.4
+gallop65536  total     116.9  lookup      14.9

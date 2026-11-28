@@ -1,0 +1,65 @@
+{
+  "schema": "profile/v1",
+  "kind": "manifest",
+  "subcommand": "cpu",
+  "label": "Unmodified landed ECC2K index-calculus baseline",
+  "status": "ok",
+  "reason": null,
+  "started_utc": "2026-11-23T18:53:08Z",
+  "wall_seconds": 0.710,
+  "cwd": "/workspace/crypto",
+  "command": [
+    "research/trace_zero_projection_setup_20261123/native/target/release/trace-zero-projection-setup",
+    "one",
+    "research/trace_zero_projected_20261115/inputs/scale-n131-d12-uniform.json",
+    "adjoint"
+  ],
+  "isolation": "none",
+  "binary": {
+    "path": "/workspace/crypto/research/trace_zero_projection_setup_20261123/native/target/release/trace-zero-projection-setup",
+    "sha256": "7a1ffd3115e52049472f432a88be40e7815d1cb0bfc54dec925cb68644624825",
+    "bytes": 13633064
+  },
+  "git": {
+    "commit": "065176db5621a0cfc5d94a1be0551e158e6e0fa1",
+    "dirty_tracked_files": 0
+  },
+  "tools": {
+    "valgrind": {
+      "path": "/workspace/scratch/profile-tools/root/usr/bin/valgrind",
+      "version": "valgrind-3.24.0"
+    }
+  },
+  "host": {
+    "hostname": "49d6f53fbd3b",
+    "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpu_features": [
+      "adx",
+      "aes",
+      "avx2",
+      "avx512f",
+      "avx512ifma",
+      "bmi2",
+      "gfni",
+      "pclmulqdq",
+      "popcnt",
+      "sha_ni",
+      "vpclmulqdq"
+    ],
+    "kernel": "6.18.57",
+    "arch": "x86_64",
+    "logical_cpus": 1,
+    "mem_kib": 18440100,
+    "event_sources": [
+      "breakpoint",
+      "msr",
+      "software"
+    ],
+    "hardware_pmu": false,
+    "perf_event_paranoid": "2",
+    "kptr_restrict": "0",
+    "gpus": []
+  },
+  "hotspots_method": "callgrind",
+  "event": "Ir (instructions executed, simulated)"
+}

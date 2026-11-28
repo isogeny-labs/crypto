@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T15:01:54Z",
+ "id": "PCC-20261123-7fa78f",
+ "kind": "statement",
+ "producer": {
+  "commit": "3803ebac2902c094dadda6a9b885757461c0ebc4",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_realcurve_torsion_20261123/model_isomorphism/ACTUAL_FIRST_B_COMPILE_FAILURE.json",
+    "sha256": "cb02aa2c3dc334b087752ddb4dcf6e75b7316d7da1a028ba0ae7093c4adef3a5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_realcurve_torsion_20261123/model_isomorphism/first-B-compile-negative/compile.stderr",
+    "sha256": "a93f8735ebb1c963e30955a581f18ecca7e97d66b8213c6f22b683d59895c45c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "model-isomorphism-first-B-strict-compile-negative",
+ "statement": "First model-change B3803ebac passes versions/format then strict -Dwarnings compile1: inherited Chart.roots field is unread by new driver. Complete500B diagnostic and empty guards preserved. Clippy/new arithmetic/isomorphism/cross-chain/twist phases not reached; no geometric result or suppression."
+}

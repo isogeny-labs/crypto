@@ -1,0 +1,36 @@
+218937Z   AWS_DEFAULT_REGION: us-west-2
+2026-11-16T04:55:37.2219156Z   AWS_REGION: us-west-2
+2026-11-16T04:55:37.2219385Z   AWS_ACCESS_KEY_ID: ***
+2026-11-16T04:55:37.2219695Z   AWS_SECRET_ACCESS_KEY: ***
+2026-11-16T04:55:37.2219908Z ##[endgroup]
+2026-11-16T04:55:37.2577630Z ##[group]Run if [ "pull_request" = pull_request ]; then
+2026-11-16T04:55:37.2577997Z [36;1mif [ "pull_request" = pull_request ]; then[0m
+2026-11-16T04:55:37.2578349Z [36;1m  python3 tools/benchrec.py check --base "origin/main" --verify-s3[0m
+2026-11-16T04:55:37.2578672Z [36;1melse[0m
+2026-11-16T04:55:37.2578909Z [36;1m  python3 tools/benchrec.py check --verify-s3[0m
+2026-11-16T04:55:37.2579345Z [36;1mfi[0m
+2026-11-16T04:55:37.2597459Z shell: /usr/bin/bash -e {0}
+2026-11-16T04:55:37.2597689Z env:
+2026-11-16T04:55:37.2597997Z   KEY_ID: ***
+2026-11-16T04:55:37.2598191Z   AWS_DEFAULT_REGION: us-west-2
+2026-11-16T04:55:37.2598411Z   AWS_REGION: us-west-2
+2026-11-16T04:55:37.2598645Z   AWS_ACCESS_KEY_ID: ***
+2026-11-16T04:55:37.2598933Z   AWS_SECRET_ACCESS_KEY: ***
+2026-11-16T04:55:37.2599143Z ##[endgroup]
+2026-11-16T04:55:51.6180078Z benchrec: S3 inventory for 2559 raw object(s): 1 prefix listing(s) (24056 objects), 2 HEAD(s), 5.1s
+2026-11-16T04:55:51.6181912Z benchrec: benchmarks/records/20261105T1826Z-ic-aimed-gather-registry-binding-20261105.json: original raw bytes verified from S3 archive for docs/curves/registry.json; differing checkout bytes are not validated here
+2026-11-16T04:55:51.6183354Z FAIL: benchmarks/records/20261115T0609Z-genus-ladder-sge-scale.json: still open; close it with benchrec.py close
+2026-11-16T04:55:51.6184296Z FAIL: progress report is stale: benchmarks/progress/progress.json, benchmarks/progress/PROGRESS.md, benchmarks/progress/progress.svg, benchmarks/progress/progress.pdf (run python3 tools/benchrec.py report)
+2026-11-16T04:55:51.6185030Z benchrec: 2 problem(s) across 220 record(s)
+2026-11-16T04:55:51.6305522Z ##[error]Process completed with exit code 1.
+2026-11-16T04:55:51.6432044Z Post job cleanup.
+2026-11-16T04:55:51.7541265Z Post job cleanup.
+2026-11-16T04:55:51.8341736Z [command]/usr/bin/git version
+2026-11-16T04:55:51.8392550Z git version 2.56.1
+2026-11-16T04:55:51.8425977Z Temporarily overriding HOME='/home/runner/work/_temp/cc625795-2223-4740-995f-53519665b50d' before making global git config changes
+2026-11-16T04:55:51.8427107Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-16T04:55:51.8430529Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-16T04:55:51.8482934Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-16T04:55:51.8520483Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-16T04:55:51.9337127Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-16T04:55:51.9375453Z http.https://github.com/.extrah

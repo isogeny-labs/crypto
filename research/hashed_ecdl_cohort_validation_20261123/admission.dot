@@ -1,0 +1,16 @@
+digraph admission {
+  graph [rankdir=LR, bgcolor="white", fontname="Helvetica", nodesep=0.28, ranksep=0.35];
+  node [shape=box, style="rounded,filled", fillcolor="#edf4fb", color="#365b7d", fontname="Helvetica", fontsize=12, margin="0.14,0.1"];
+  edge [color="#365b7d", fontname="Helvetica", fontsize=10];
+  headers [label="12 public headers\nNo scalar or timing input"];
+  check [label="Exact primality + curve checks\nRaw point add / double\nNo configured group order"];
+  hasse [label="Prime r-torsion + Hasse\nUpper bound < 2r"];
+  certified [label="12 target certificates\n6 full prime-order domains"];
+  controls [label="199 prescribed control rows\n144 small parameter cells", fillcolor="#f0f5eb"];
+  unknown [label="Insufficient bound / resource\nremains unknown", fillcolor="#fff5df"];
+  next [label="Next: qualify new-target\nworker + harness identities", style="rounded,dashed", fillcolor="white"];
+  headers -> check -> hasse -> certified;
+  controls -> check [label="exact outcomes"];
+  hasse -> unknown [label="insufficient"];
+  certified -> next [style=dashed];
+}

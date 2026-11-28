@@ -1,0 +1,63 @@
+name: Prime31 RR9 low-power original-curve Rust controls
+
+on:
+  push:
+    branches:
+      - automation/prime31-rr9-low-power-strata-20261118
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_low_power_strata.rs
+      - research/prime31_ic_20261115/rr9/RR9_LOW_POWER_STRATA_PROTOCOL_20261118.md
+      - .github/workflows/prime31-rr9-low-power-strata.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_rr9_low_power_strata.rs
+      - research/prime31_ic_20261115/rr9/RR9_LOW_POWER_STRATA_PROTOCOL_20261118.md
+      - .github/workflows/prime31-rr9-low-power-strata.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-original-curve:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout candidate source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout immutable existing prime31-algebraic-ic Rust code
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only new example on pinned original source
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_low_power_strata.rs \
+             pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_low_power_strata.rs
+          test -f pinned/research/prime31_ic_20261115/native/Cargo.toml
+      - name: Run reused Rust library and focused exact controls
+        run: |
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_low_power_strata
+      - name: Emit source-bound original curve record
+        run: |
+          cargo +1.100.0 run --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_low_power_strata > prime31-rr9-low-power-result.json
+          test -s prime31-rr9-low-power-result.json
+      - name: Retain exact source-bound output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-low-power-exact-original-curve
+          path: prime31-rr9-low-power-result.json
+          if-no-files-found: warn
+          retention-days: 30

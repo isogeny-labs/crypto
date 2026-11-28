@@ -1,0 +1,119 @@
+{
+  "branch": "codex/vieta-local-run-20261115",
+  "closed_utc": "2026-11-15T22:09:45+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/isolated_bench.py",
+        "run",
+        "--cpus",
+        "4",
+        "--out",
+        "research/vieta_coset_rust_20261115/scale-20261115T2053Z/repair/isolation.jsonl",
+        "--",
+        "env",
+        "VIETA_ISOLATED_RUN=1",
+        "VIETA_PANEL=three-repair",
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "600",
+        "research/vieta_coset_rust_20261115/scale-20261115T2053Z/bin/qualifier-fixture-fix",
+        "bench",
+        "p224",
+        "128",
+        "10",
+        "120",
+        "three"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T21:48:06+00:00",
+      "wall_s": 162.632
+    }
+  ],
+  "commit": "af75747d0b79bb4542c7d30fafbd44c9ce931774",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T21:47:45+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-vieta-coset-local-scale"
+  ],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "d08f873f2af5",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261115T2147Z-vieta-three-fixture-repair",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "p224_m128_stream_mitm_fmul_ratio",
+      "note": "Ratio candidate stream-Vieta / MITM (not default reference/candidate); median paired warm conditioned queries, generic reference; pending independent standing [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 637.887663
+    }
+  ],
+  "problem": "kernel:vieta_coset_three_sum",
+  "raw": [
+    {
+      "bytes": 2250,
+      "path": "research/vieta_coset_rust_20261115/scale-20261115T2053Z/repair/isolation.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/48/48a0d25c0a69668cef1c02c4b1d656480db225ec3cb873a6c7920b1d0bead0f7",
+      "sha256": "48a0d25c0a69668cef1c02c4b1d656480db225ec3cb873a6c7920b1d0bead0f7",
+      "uploaded": false
+    },
+    {
+      "bytes": 100179,
+      "path": "research/vieta_coset_rust_20261115/scale-20261115T2053Z/repair/three-p224-m128.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/51/510c1454e2c8e57359b33fb3f466e3e017af9265e8db262a994ad245119b9bf9",
+      "sha256": "510c1454e2c8e57359b33fb3f466e3e017af9265e8db262a994ad245119b9bf9",
+      "uploaded": false
+    },
+    {
+      "bytes": 0,
+      "path": "research/vieta_coset_rust_20261115/scale-20261115T2053Z/repair/three-p224-m128.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "uploaded": false
+    },
+    {
+      "bytes": 35791,
+      "path": "research/vieta_coset_rust_20261115/scale-20261115T2053Z/repair-summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/45/45a6a411803f6426ceccf3cc3b705e489c7bd1f428b26a0e0856717e6f06f90e",
+      "sha256": "45a6a411803f6426ceccf3cc3b705e489c7bd1f428b26a0e0856717e6f06f90e",
+      "uploaded": false
+    },
+    {
+      "bytes": 234,
+      "path": "research/vieta_coset_rust_20261115/scale-20261115T2053Z/replay-repair.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1d/1dfb8de896361f5b3846fb93b09ef33128d3a57df95e87e14a62126fc1594f20",
+      "sha256": "1dfb8de896361f5b3846fb93b09ef33128d3a57df95e87e14a62126fc1594f20",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261115-vieta-coset-local-scale/report.pdf",
+    "png": [
+      "benchmarks/20261115-vieta-coset-local-scale/three-counts.png"
+    ],
+    "svg": [
+      "benchmarks/20261115-vieta-coset-local-scale/three-counts.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "vieta-three-fixture-repair",
+  "status": "censored",
+  "summary": "Separate fixture-clock repair completed/replayed all 96 calls, but frozen protocol has stale instrument commit metadata; retain checker mismatches. Counts generic reference, clocks below L2. Git-only custody authorized, prospective s3_uri addresses are not uploaded/available claims. No canonical promotion; producer observations pending independent signed standing [pcc:unverified].",
+  "validation": null
+}

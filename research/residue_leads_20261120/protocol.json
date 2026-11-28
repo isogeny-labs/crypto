@@ -1,0 +1,31 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "RESIDUE-LEADS-20261120",
+  "version": 1,
+  "created": "2026-11-20",
+  "repository": "crypto",
+  "study_dir": "research/residue_leads_20261120",
+  "links": {"source_pr": "https://github.com/isogeny-labs/crypto/pull/4850", "narrative": "research/residue_leads_20261120/PROTOCOL.md"},
+  "question": "Can a residue or character invariant of points help solve Q = kG (R1 homomorphic, R2 non-homomorphic bias, R3 Semaev pre-filter, R4 rho classes)?",
+  "claims": [
+    {"id": "R1-thm", "class": "theorem"},
+    {"id": "R1-bin", "class": "exact_computation"},
+    {"id": "R1-2desc", "class": "exact_computation"},
+    {"id": "R2-spec", "class": "comparative", "decided_by": ["R2"]},
+    {"id": "R2-res", "class": "comparative", "decided_by": ["R2"]},
+    {"id": "R3-prime", "class": "comparative", "decided_by": ["R3"]},
+    {"id": "R3-bin", "class": "comparative", "decided_by": ["R3"]},
+    {"id": "R4-thm", "class": "theorem"},
+    {"id": "R4-exact", "class": "exact_computation"},
+    {"id": "R4-cost", "class": "heuristic_estimate"}
+  ],
+  "controls": {
+    "positive": "planted spectral and residue predicates (R2), planted decomposability predicate and planted subspace set (R3), full group E (R1), j=0 and j=1728 (R4)",
+    "negative": "analytic random-function / hypergeometric / Gaussian-max nulls",
+    "aa": "K=64 simulated random functions and sets per instance through the same code; KS > 0.25 invalidates the analytic null for that instance"
+  },
+  "decision": {"alpha": 0.01, "correction": "Bonferroni within each lead", "R3_min_lift": 1.10},
+  "seeds": "SplitMix64 seeded by the first 8 bytes of SHA-256 of this file as committed at freeze",
+  "metrics": "exact counts; no clocks",
+  "execution": {"backend": "local container, 4 vCPU", "reason": "no AWS identity in session; exact counts are host-independent"}
+}

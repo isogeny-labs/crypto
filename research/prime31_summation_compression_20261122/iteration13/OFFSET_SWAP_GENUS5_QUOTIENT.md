@@ -1,0 +1,15 @@
+# Swap quotient of the fixed-offset signed cover: genus 5, degree 4
+
+2026-11-23 UTC, PR #5064. [pcc:unverified] Addendum to the frozen OFFSET_GENUS11_GEOMETRIC_GATE.md, commit 4c185fd67ac6ed892354576f16d282d214ddcbd9, blob 3708ac43781d5faafba4a32ebf9a785692eacd04. Same odd full rational group and nonendpoint 2-power offset hypotheses.
+
+The ordered genus-eleven pair cover X_delta has the swap involution iota:(P_1,P_2)->(P_2,P_1), extending uniquely to the normalization. Its fixed points are exactly the finite diagonal points P_1=P_2. Indeed x_1=x_2 gives x_1^2=delta+2, two distinct roots, neither a zero of f (private-zero argument in the parent note). For each root there are two equal-sign lifts, hence four fixed points. The two conic points at infinity are interchanged since their distinct slopes rho and rho^{-1} are exchanged by swap (rho != +-1); therefore no point over infinity is fixed. Opposite-sign diagonal points are not fixed. The involution is nontrivial, order two, tame. Its smooth quotient Y_delta has genus computed by
+
+    2*11-2 = 2*(2*g(Y_delta)-2)+4,
+
+so g(Y_delta)=5. The oriented sum is invariant under swap and descends to Y_delta -> E with degree 8/2=4 and is separable, by the parent degree-eight theorem and multiplicativity. This is a quotient of the signed pair cover, not a hyperelliptic model claim and not an isogeny of Jacobians of degree four.
+
+For any two such offsets and target R, the unordered signed pair fibre product over the intermediate elliptic point is finite flat of degree 16 and dimension one; all R over the algebraic closure are possible before imposing both midpoint selectors. The same finite-exclusion argument applies. This improves the geometric sheet count 64 -> 16 (not a measured speedup), and gives a compact degree-four per-offset cover with a genus-five source. No finite field DLP reduction, rational cover parametrization or new relation index follows from this alone. The fixed-offset cover is still positive genus; quotienting does not remove the free intermediate variable. Preserve both endpoint guards and the actual eligible subgroup/point signs.
+
+For future validation the unordered signed chart must agree exactly with ordered replay modulo swap (including repeated leaves, two sign branches, identity, and diagonal points). For any given subtotal the quotient has at most four geometric points, counted with multiplicity, including points outside the full Dickson fibre. A rational quotient point need not descend from an individually rational ordered pair, so explicit rational leaf recovery is mandatory. The full-fibre chart gives rational leaf abscissae, not automatic rational y lifts. Retain the established actual-M and group replay filter.
+
+Literature and parent evidence are bound in the frozen note. Same-coordinator exact symbolic arithmetic checked seven residuals after that parent was frozen (see receipt); this checks the equations and integer arithmetic, not the geometric proof independently. No native Rust, signed proof, or performance run.

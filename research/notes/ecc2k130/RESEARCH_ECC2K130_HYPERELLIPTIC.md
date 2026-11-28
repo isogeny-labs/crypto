@@ -1,5 +1,18 @@
 # Hyperelliptic covers of ECC2K-130
 
+> **Theory update, 2026-11-23:** The hyperelliptic genus130 realization in
+> §6 is excluded by an elementary written fiber argument: its Weil
+> polynomial gives2 points over F4, while every degree2 cover of P1/F2
+> has at least3. This applies to the whole isogeny class without a
+> maximal-endomorphism-order assumption. Hyperelliptic genus131 carriers
+> reduce to the single A*E0 class and an ordinary branch131+1 normal
+> form; existence and subgroup maps remain unresolved. A fixed member of
+> that family fails in degree6 after matching five counts. See the
+> [new report](../../ecc2k130_jacobian_theory_20261123/round05/REPORT.md)
+> and draft PR5079. PCC-7c96d0/a0ff27/55a9e6 are unverified. The general
+> nonhyperelliptic genus130 and genus132–300 existence question stays
+> open; the2^37.17 estimate remains conditional. [pcc:unverified]
+
 **Experiment:** `scripts/ecc2k130_hyperelliptic_cover_boundary.py` (legacy Python, written before the
 repository's no-Python rule; its numbers are replayed natively by `ecc2k130_curve_construction`,
 which agrees to 0.0048 on every value this note cites)

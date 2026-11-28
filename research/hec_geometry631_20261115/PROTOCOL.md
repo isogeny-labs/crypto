@@ -1,0 +1,9 @@
+# F631 quotient geometry from both fresh normalized kernels
+
+Inputs are committed freshF631kernel/publicdata and all54freshnormalizationweights from normalize631once-onlygate. No F127HC/QF/alpha/images/logs supplied. Bothkernelindices0,1inserializationorder are fixedcohort; runseparateprocesseseachonce, stopfirstunexpectedfailureandretain. No after-outcome kernel selection/deletion.
+
+Reconstruct freshprincipalfunctions, use freshprimitive3root, same three-character/order13tracebasis, degree4localjetconstruction, rank7Gamma00relation and smoothplanequartic extraction as originalcoldgeometry. The localpremise is independentlyadmitted by normalize631LOCAL: complete2primarygrouporder4hasone rationaldegree3order2point. Correct sourceprojectionell*Pmayhaveorder4by doublinguntilorder2(maxdepth2), explicitlyrecorddepth. Do not silently assume allnonzeroellprojectionsare2torsion.
+
+Requirejet-ringcontrols, exactcurvejetresidual, basefielddescent/odd-coefficientvanishing, uniqueGamma00nullvector, nonzeroquarticnormalizer, smoothness, and rank36globalquadricexclusion fromfirst64D1multiples. CounttargetFp pointsindependently. Record SOURCE sign if597, OPPOSITE sign if667, elseunexpectedfailure. Oppositesign is a retained constructionoutcome, NOT source-transferadmission. Sourcepointtraceisnonzerohere, distinguishingthetwo signs; pointcountaloneisnot an independentfullLpolynomial or mapverification.
+
+All source/lock/copiedinputhashes/binaries committed, freshS3checkpoint/gate before execution. Aggregate600s cap percase retained. Once-onlyrun/HC/QF/rawstdout/stderr/statusandCOHORT.*,stopfailure/noscientificrerun withoutamendment. Noquotientmap, originalinputimage, DLP, endtoendspeedup ornoveltyclaim. A derivedquarticrequiresactualtransferidentityverificationlater. Fullmath10x/genus2/4open.

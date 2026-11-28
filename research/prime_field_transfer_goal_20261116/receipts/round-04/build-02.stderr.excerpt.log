@@ -1,0 +1,21 @@
+research/prime_field_transfer_goal_20261116/round-04/recognizer.cpp:75:8: error: redefinition of ‘struct Model’
+   75 | struct Model {
+      |        ^~~~~
+In file included from research/prime_field_transfer_goal_20261116/round-04/native_base.hpp:6,
+                 from research/prime_field_transfer_goal_20261116/round-04/recognizer.cpp:3:
+research/prime_field_transfer_goal_20261116/round-04/../round-02/local_torsion.cpp:52:8: note: previous definition of ‘struct Model’
+   52 | struct Model {
+      |        ^~~~~
+research/prime_field_transfer_goal_20261116/round-04/recognizer.cpp: In function ‘void save_model(const Model&, const std::string&)’:
+research/prime_field_transfer_goal_20261116/round-04/recognizer.cpp:81:26: error: ‘const struct Model’ has no member named ‘u’
+   81 |     f<<"WEBER-CM-1\n"<<m.u<<' '<<m.c0<<' '<<m.aux<<'\n'
+      |                          ^
+research/prime_field_transfer_goal_20261116/round-04/recognizer.cpp:81:36: error: ‘const struct Model’ has no member named ‘c0’
+   81 |     f<<"WEBER-CM-1\n"<<m.u<<' '<<m.c0<<' '<<m.aux<<'\n'
+      |                                    ^~
+research/prime_field_transfer_goal_20261116/round-04/recognizer.cpp:81:47: error: ‘const struct Model’ has no member named ‘aux’
+   81 |     f<<"WEBER-CM-1\n"<<m.u<<' '<<m.c0<<' '<<m.aux<<'\n'
+      |                                               ^~~
+research/prime_field_transfer_goal_20261116/round-04/recognizer.cpp:82:30: error: ‘const struct Model’ has no member named ‘B’
+   82 |      <<m.p<<' '<<m.r<<' '<<m.B<<' '<<m.Bp<<' '<<m.Br<<'\n'
+[Full raw log retained at pinned local path; excerpt ends here.]

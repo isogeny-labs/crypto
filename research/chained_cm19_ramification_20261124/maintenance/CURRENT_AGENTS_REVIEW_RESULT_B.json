@@ -1,0 +1,10 @@
+{
+  "schema": "exact-current-instruction-review/v1",
+  "main": "81f0308c75204f3a1c0ec52fdf78396eee0898ed",
+  "frozen_local_AGENTS": "bc5217fe9f49242c46ab25c6b84f149bda4a02a2",
+  "current_main_AGENTS": "042f9fe35e94665b11307c5d04decccf1e9b95fd",
+  "complete_diff": "--- frozen-bc5217fe\n+++ reviewed-main-042f9fe3\n@@ -36,6 +36,10 @@\n Keep entries about this project; do not copy private global logs or chat transcripts.\n \n <!-- END SHARED SESSION LOG -->\n+\n+In a custom sparse checkout, a dated journal may need `git add --sparse` even\n+after it is tracked. Stage that file explicitly and inspect its staged diff\n+before committing or pushing (adopted lesson `L-d5062ba05212`).\n \n ## Goal: what to work on next\n \n",
+  "review": "Fresh main81f0308c retains exact same reviewed042f9fe3 AGENTS; full current file fetched, no further instruction changes. Preserve all frozen bc5217 inputs; explicit sparse-journal staging/diff applies.",
+  "initial_stop": "First delivery metadata call correctly stopped at AGENTS changed before snapshot/reconciliation/journal mutation. No scientific rerun or source change.",
+  "not_a_policy_change": "Apply current requirements; do not alter repository policy, canonical gates, verifier, keyring or frozen subjects."
+}

@@ -1,0 +1,33 @@
+{
+  "schema": "engineering.pcc-workflow-restoration/v1",
+  "parent_commit": "f6b4a5a69829d09edb09468da893c257de01c902",
+  "path": ".github/workflows/pcc-gate.yml",
+  "loss_merge": "64f2445a7bf9ce7f9edbd43268d7aa4aaf676cbf",
+  "loss_merge_parents": [
+    "4207b14622adf9462edef301417b00886dd9a96f",
+    "c48ff675df6e88ef8e3affef53a26efa0bb683ee"
+  ],
+  "both_parent_blobs": "bad81d16debadbfa211b2dc52725d330decc9859",
+  "merge_and_current_path_absent": true,
+  "restored_blob": "bad81d16debadbfa211b2dc52725d330decc9859",
+  "restored_bytes": 5546,
+  "restoration_is_byte_exact": true,
+  "checks_retained": [
+    "sabotage canaries",
+    "base-ledger prefix and keyring pin",
+    "every-claim verification with original exit-code contract",
+    "strict PR prose lint",
+    "PCC unit tests",
+    "main-push-only signing condition"
+  ],
+  "validation": [
+    "YAML parsed",
+    "Bash syntax for all run steps",
+    "Original trigger set and signing guard checked",
+    "Restored bytes hash to the identical blob in both merge parents"
+  ],
+  "frozen_claims_ledger_keyring_changed": false,
+  "no_failure_disposition_added": true,
+  "scientific_measurement": false,
+  "full_pcc_gate_result": "pending; any existing claim failures must remain visible"
+}

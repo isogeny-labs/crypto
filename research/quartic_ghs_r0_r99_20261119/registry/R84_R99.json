@@ -1,0 +1,306 @@
+{
+  "schema": "ghs-r0-r99-range/v1",
+  "range": [
+    84,
+    99
+  ],
+  "claim_scope": "producer-side deterministic screens only",
+  "lanes": [
+    {
+      "id": "R84",
+      "title": "Freeze the live ECBench inventory",
+      "mechanism": "Use the native optimization inventory and require-all audit so every registered method, system solver, PDP3 engine, and prime-tower engine comes from source rather than a stale hand list.",
+      "target": "src/cryptanalysis/ecbench/optimization.rs; ecbench optimize inventory --json; ecbench optimize audit --require-all",
+      "prerequisites": [
+        "clean source-bound ecbench executable",
+        "development specifications"
+      ],
+      "deterministic_falsifier": "Any registered method or nested algorithm missing from the policy inventory or require-all development coverage makes the audit fail.",
+      "measurement_gate": "Inventory is descriptive only; promotion still needs fresh holdout, symmetric pricing, replay, and validation.",
+      "status": "screened_existing",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "screened"
+    },
+    {
+      "id": "R85",
+      "title": "Integrate GHS strong rho as an ECBench method",
+      "mechanism": "Add a versioned restricted-family strong-rho method with counted and counter-free implementations, exclusive phases, authority fields, and source-bound identity.",
+      "target": "src/cryptanalysis/ecbench/methods.rs; src/cryptanalysis/ecbench/runner.rs; docs/ecbench/specs/ghs-strong-rho-development.json",
+      "prerequisites": [
+        "composed strong_rho.rs baseline",
+        "canonical ICV1 identities",
+        "counter-authority contract"
+      ],
+      "deterministic_falsifier": "Plan, run, or replay accepts false count authority, loses a phase, changes the planted scalar, or permits a non-GHS curve.",
+      "measurement_gate": "Cold one-target records, counted/native parity, full replay, and L2 admission.",
+      "status": "specified_unimplemented",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R86",
+      "title": "Freeze matched GHS IC and rho controls",
+      "mechanism": "Bind the same restricted E0 over Fq3 instances and targets to optimized strong rho, plain rho, negation rho, and B0 S L0 L1 L D DL1 DL IC arms.",
+      "target": "docs/ecbench/specs/ghs-weak-matched-frontier.json; research/quartic_ghs_strong_rho_parallel_20261118/IMPLEMENTATION_SPEC.md",
+      "prerequisites": [
+        "R85",
+        "admitted host",
+        "immutable curve and target manifests"
+      ],
+      "deterministic_falsifier": "An arm changes curve, subgroup, target, seed, cache policy, unit, or omits a failed attempt.",
+      "measurement_gate": "All eleven q sizes, seeds 1-3, frozen repetitions, cold records, and full pricing band.",
+      "status": "blocked_admission",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "blocked"
+    },
+    {
+      "id": "R87",
+      "title": "Run F4 and Faugere-Lachartre F4 arms",
+      "mechanism": "Hold factor base and query stream fixed while comparing full F4 and its reducer/free-column split with preprocessing, matrix construction, elimination, extraction, and witness work retained.",
+      "target": "src/cryptanalysis/ic_framework/solvers.rs; src/cryptanalysis/pq_f4_f2.rs; ecbench system-solver arms",
+      "prerequisites": [
+        "supported system cell",
+        "exact exported systems",
+        "full solver ledger",
+        "matched reference"
+      ],
+      "deterministic_falsifier": "Different systems, missing preprocessing, unequal solution sets, failed witness replay, or solver-local counts presented as pipeline cost.",
+      "measurement_gate": "Complete cold pipeline, identical inputs, five matched L2 rounds, A/A admission, and fastest external equal-output reference.",
+      "status": "specified_unimplemented",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R88",
+      "title": "Run signature F5 arms",
+      "mechanism": "Compare matrix F5 signature suppression with matched F4 while retaining matrix build, signatures, reduction, extraction, and witness costs.",
+      "target": "src/cryptanalysis/ic_framework/solvers.rs matrix-f5; PDP3 matrix-f5; PKM sig-f5",
+      "prerequisites": [
+        "R87 corpus",
+        "pinned F5 configuration"
+      ],
+      "deterministic_falsifier": "Smaller word-XOR count without complete construction, changed input tree, or a solution-set mismatch.",
+      "measurement_gate": "Same-system external equality, complete cold pipeline, paired holdout, and qualified pricing.",
+      "status": "specified_unimplemented",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R89",
+      "title": "Run F6 and F6-IC arms",
+      "mechanism": "Measure F6-IC, F6-IC pair, and prime-tower F6 with support closure, residual arithmetic, sign lifts, witness replay, and solver work visible.",
+      "target": "src/bin/ecbench/pdp3_koblitz.rs; optimization.rs PDP3_ENGINES and PKM_TOWER_ENGINES",
+      "prerequisites": [
+        "matched F4 and F5 cell",
+        "bounded node budgets",
+        "complete group-operation accounting"
+      ],
+      "deterministic_falsifier": "Omitted geometric additions, exhaustion treated as UNSAT, different queries, or partial native counts cross-ranked as total cost.",
+      "measurement_gate": "Verified attempts, matched cold holdout, external equality where available, replay, and validation.",
+      "status": "specified_unimplemented",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R90",
+      "title": "Run SAT CDCL and sound WD-SAT controls",
+      "mechanism": "Run SAT-CDCL with pinned CNF or native-XOR settings and admit WD-SAT only behind an exhaustive truth-set soundness gate rejecting false UNSAT.",
+      "target": "src/cryptanalysis/ic_framework/solvers.rs sat-cdcl; src/cryptanalysis/wdsat_oracle.rs; ecbench solver specs",
+      "prerequisites": [
+        "exact ANF export",
+        "fixed budgets and seeds",
+        "small-system truth oracle",
+        "independent model check"
+      ],
+      "deterministic_falsifier": "One false UNSAT, unchecked model, timeout mapped to no-solution, hidden encoding change, or missing solver settings.",
+      "measurement_gate": "Soundness passes first; then full cold recovery pipeline, holdout, replay, and priced/unpriced separation.",
+      "status": "blocked_soundness",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "blocked"
+    },
+    {
+      "id": "R91",
+      "title": "Run FES Gray-code and guess-and-determine arms",
+      "mechanism": "Compare scalar, GPU, and wide FES plus bounded Gray enumeration and fixed guesses on identical systems while preserving order and CPU re-verification.",
+      "target": "src/cryptanalysis/ic_framework/solvers.rs fes-f2 fes-f2-gpu fes-f2-wide exhaustive; method guess parameter",
+      "prerequisites": [
+        "supported Boolean shapes",
+        "pinned lane capabilities",
+        "small-cell solution oracle",
+        "fixed guess schedule"
+      ],
+      "deterministic_falsifier": "Missing solution, incomplete worker output called UNSAT, changed first-solution order, hidden fallback, or omitted setup.",
+      "measurement_gate": "Answer parity, complete cold pipeline, host capsule, matched holdout, and applicable external equality.",
+      "status": "screened_existing",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "screened"
+    },
+    {
+      "id": "R92",
+      "title": "Run all root-finding engines",
+      "mechanism": "Cover MITM, pairs, subtract, full-window, negation-folded, and prime-tower roots against identical pair-table and algebraic controls.",
+      "target": "src/cryptanalysis/ic_framework/rootfind.rs; PDP3 rootfind engines; ecbench rootfind specs",
+      "prerequisites": [
+        "identical factor base and targets",
+        "complete table/probe accounting",
+        "bounded memory",
+        "original-root verification"
+      ],
+      "deterministic_falsifier": "Different query streams called direct, unchecked root, uncharged table, or complete count divided by an algebraic lower bound and called speedup.",
+      "measurement_gate": "Cold recovery, root replay, memory and native counters, paired holdout, and FLINT NTL or Magma reference for fastest claims.",
+      "status": "screened_existing",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "screened"
+    },
+    {
+      "id": "R93",
+      "title": "Bind fastest external equal-output references",
+      "mechanism": "Export identical systems or roots and bind versions and hashes for Magma, msolve, FGb, M4GB, FLINT, NTL, and other applicable tools.",
+      "target": "gb_cas_export; M4GB_BINARY; external command cards and logs",
+      "prerequisites": [
+        "tool availability or missing-reference record",
+        "identical inputs",
+        "fixed randomness",
+        "independent output equality"
+      ],
+      "deterministic_falsifier": "Different order or field equations, unpinned executable, unequal outputs, warm-vs-cold mismatch, or inferred external performance.",
+      "measurement_gate": "Same host and inputs, cold boundary, checked equality, retained logs and hashes, and five matched rounds for timing.",
+      "status": "blocked_external",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "blocked"
+    },
+    {
+      "id": "R94",
+      "title": "Enforce complete cold one-target accounting",
+      "mechanism": "Require exclusive setup, relation/search, linear algebra, recovery, internal verification, and process windows; report online separately and name every unpriced counter.",
+      "target": "src/cryptanalysis/ecbench/runner.rs; docs/ecbench/README.md sections 3 and 7; plans and records",
+      "prerequisites": [
+        "R85 phases",
+        "accounting schema per arm"
+      ],
+      "deterministic_falsifier": "Phase sums differ, missing work becomes zero, reusable setup leaks into online claims, verification disappears, or unlike units are cross-ranked.",
+      "measurement_gate": "Audit and replay reproduce every charged and unpriced field; cold_end_to_end is the promotion denominator.",
+      "status": "specified_unimplemented",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R95",
+      "title": "Admit host calibration and A-A controls",
+      "mechanism": "Require L2 isolation, source-bound host capsule, calibration ratio in the frozen interval, same-target A/A pairs, positive controls, placement, and checkpoint admission.",
+      "target": "ecbench host calibrate compare; problems/ghs-strong-rho-measurement-admission.md",
+      "prerequisites": [
+        "checkpoint transport",
+        "budget and pool receipts",
+        "source-bound image",
+        "raw-result access"
+      ],
+      "deterministic_falsifier": "Unknown identity or budget, ratio outside 0.75-1.15, noisy A/A, placement failure, source mismatch, or missing raw data.",
+      "measurement_gate": "Every admission field passes before candidate timing; failure admits no wall ranking.",
+      "status": "blocked_admission",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "blocked"
+    },
+    {
+      "id": "R96",
+      "title": "Separate adaptive development from frozen holdout",
+      "mechanism": "Use require-all development coverage, freeze the candidate, then evaluate disjoint targets and seeds once on confirmatory holdout specs.",
+      "target": "src/cryptanalysis/ecbench/optimization.rs; ghs-strong-rho-development.json; ghs-strong-rho-holdout.json",
+      "prerequisites": [
+        "R84",
+        "R85",
+        "frozen knob domains",
+        "disjoint seed manifests"
+      ],
+      "deterministic_falsifier": "Holdout appears in development, cap is tuned as speed knob, override changes identity, or holdout triggers retuning and reuse.",
+      "measurement_gate": "Optimize audit exits zero, development covers required live entries, and holdout passes unchanged.",
+      "status": "specified_unimplemented",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R97",
+      "title": "Compute matched uncertainty and multiplicity",
+      "mechanism": "Use paired targets, frozen repetitions, clustered bootstrap with ten thousand resamples, censoring rules, and Holm correction over attempts.",
+      "target": "ecbench compare calibrate band; immutable analysis receipt",
+      "prerequisites": [
+        "complete admitted records",
+        "all failures retained",
+        "stable workload clusters"
+      ],
+      "deterministic_falsifier": "Unpaired ratios, dropped timeout, missing-to-zero conversion, wrong resampling unit, post-hoc seeds, or uncorrected multiple claims.",
+      "measurement_gate": "Predeclared cold interval excludes parity and A/A noise; independent recompute agrees.",
+      "status": "specified_unimplemented",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R98",
+      "title": "Produce replay validation and PCC chain",
+      "mechanism": "Replay all records, independently recompute headlines, bind strongest matched rho and pricing band, then create hash-pinned PCC claims eligible for CI verdict.",
+      "target": "ecbench verify --replay-all; VALIDATION.json; replay certificate; validator report; pcc claims",
+      "prerequisites": [
+        "immutable raw data",
+        "independent validator",
+        "current rho",
+        "keyring-covered artifacts",
+        "complete failures"
+      ],
+      "deterministic_falsifier": "Subset replay, producer independence flag, hash mismatch, scalar failure, stale rho, incomplete band, or unsigned claim standing.",
+      "measurement_gate": "Validation reports valid and PCC standing comes from the trusted verifier; otherwise evidence remains unverified.",
+      "status": "specified_unimplemented",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "queued-after-dependency"
+    },
+    {
+      "id": "R99",
+      "title": "Publish benchmark report and frontier rows",
+      "mechanism": "Close bench records, generate source-linked visual and PDF reports, update progress, then regenerate leaderboard twins only for R98-admitted rows with restricted scope.",
+      "target": "benchmarks records and progress; IC leaderboard twins; backend leaderboard views",
+      "prerequisites": [
+        "R98",
+        "closed raw-data record",
+        "visual and PDF report",
+        "current references",
+        "clean regeneration"
+      ],
+      "deterministic_falsifier": "Planned result enters board, twins diverge, raw object absent, record open or edited, scope generalized, or failed arm hidden.",
+      "measurement_gate": "Bench-record, recompute, validation, replay, artifact, PCC, and publication checks pass from reviewed commit.",
+      "status": "blocked_evidence",
+      "evidence": [
+        "research/quartic_ghs_r0_r99_20261119/ranges/R84_R99.md"
+      ],
+      "state": "blocked"
+    }
+  ]
+}

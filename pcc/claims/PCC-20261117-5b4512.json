@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T03:50:31Z",
+ "id": "PCC-20261117-5b4512",
+ "kind": "statement",
+ "producer": {
+  "commit": "2043bee6aee1cef2444c48e8fd3a1b2368c6db38",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_rowmap_20261117/checks/validation-tests.txt",
+    "sha256": "7b24f6379621f323d09efdefa0a0cf933c2d77dfa310cf874d12ec46a29d2cb5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_rowmap_20261117/checks/validation-tests-initial.txt",
+    "sha256": "dd6b4a40e409d7fe3d0dd9bdbf18276487b88af94360cf0b8e9fd4ffef512e98"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Actual current solver, field and trace kernel with pinned nonexecuted SAT support; full current-root compilation is not established.",
+ "statement": "Focused current-arithmetic numeric S3 build passes the recorded release tests, including exact65-case baseline/lookup parity, all input basis bits and independent random packed-row comparisons, widths beyond16 fallback, and deliberately delayed scalar-tail row checks. The qualified backend pins previously compiled SAT/chain support because current main SAT source has unclosed delimiters. This is unsigned pre-primary implementation validation, not a speed result."
+}

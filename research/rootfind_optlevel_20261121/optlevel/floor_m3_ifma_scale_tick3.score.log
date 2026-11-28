@@ -1,0 +1,9 @@
+floor_m3_ifma_scale_tick3  [T-timing]  class modmuladd_p62
+  attainment single 0.925 [0.839, 0.933]  of 9.448e+08 ops/s (compute roof, 1 thread(s))
+  attainment full   0.921 [0.690, 0.928]  of 3.779e+09 ops/s (compute roof, 4 thread(s))
+  parallel   raw 0.996, roofline-normalised 0.996 at 4 threads
+  grade      A (score 0.923, scope single+parallel)
+  limiting   none above threshold: near the roofline; what remains is the algorithmic axis  [roofline]
+  noise      A/A 0.099 over 5 pairs
+  flags      CALIBRATION_VIRTUALIZED, OPS_VARY, VIRTUALIZED
+  This is not a speed claim or a benchmark row (docs/OPTIMIZATION_LEVEL.md).

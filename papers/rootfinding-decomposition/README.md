@@ -81,25 +81,53 @@ nonzero, which these lemmas do not assume or use. `pointX` (a helper defined
 here) returns `none` at infinity. **`S_m` for `m ≥ 4` is not formalized**;
 only `S₃` and its link to the group law are.
 
+### Finite point-decomposition SAT schema
+
+`lean/PointDecompositionSAT.lean` formalizes the semantic one-hot CNF schema
+for a finite-domain decomposition problem. There is one positive clause per
+slot, pairwise negative clauses for uniqueness, and one blocking clause for
+every invalid tuple. It contains these kernel-checked declarations,
+`[pcc:unverified]`:
+
+- `PointDecompositionSAT.sound`: every satisfying assignment decodes to one
+  valid tuple and selects exactly that tuple's candidate in each slot;
+- `PointDecompositionSAT.complete`: every valid tuple gives a satisfying
+  canonical one-hot assignment;
+- `PointDecompositionSAT.satisfiable_iff_valid`: the schema is satisfiable
+  exactly when a valid tuple exists; and
+- `PointDecompositionSAT.decomposition_satisfiable_iff`: for candidates in an
+  abstract additive commutative monoid, satisfiability is equivalent to the
+  existence of a tuple whose sum is the target.
+
+Signed factor-base points can be candidates themselves. The theorem is about
+the finite semantic clause families; it does not verify the production
+XOR/Tseitin compiler, a CDCL solver, witness lifting, or a real-curve attack
+path. The instance and inheritance record is
+[`lean/POINT_DECOMPOSITION_SAT_PROOF_MAP.md`](lean/POINT_DECOMPOSITION_SAT_PROOF_MAP.md).
+
 **Axiom audit.** `lean/AxiomAudit.lean` runs `#print axioms` on
 `SemaevS3.S3_factor`, `SemaevS3.S3_root_iff`, the helper
-`SemaevS3.d2_mul_addX` and the four bridge lemmas above. It fails if any of them depends on an axiom other
+`SemaevS3.d2_mul_addX`, the four bridge lemmas above and the four finite-SAT
+declarations. It fails if any of them depends on an axiom other
 than `propext`, `Classical.choice` or `Quot.sound`, including `sorryAx`.
 The audit log comes from CI job `lean-proof` in
 `.github/workflows/rootfinding-s3roots-lean.yml`, kept as the run artifact
 `rootfinding-s3roots-axiom-audit`. That job builds against the Mathlib
-cache, replays `S3Roots` with `leanchecker --fresh`, and refuses `sorry`,
+cache, replays both modules with `leanchecker --fresh`, and refuses `sorry`,
 `admit`, `native_decide` and custom axioms. Read the CI log for the actual
-axiom set. Earlier text here stated the result without any kept output
+axiom set. Earlier text here stated the Semaev result without any kept output
 (sheriff case SHF-20261016-3caa6f, finding L6). The output of a green run
 is now committed as [`lean/axiom-audit.txt`](lean/axiom-audit.txt) (`.txt` because `papers/.gitignore` ignores `*.log`)
 (run 41010358498, job 123914606537, main at 77f0eddecd, 2026-10-30, whose
-`lean/` sources are identical to this commit's): all seven declarations,
+`S3Roots.lean` source is identical to this commit's): all seven original declarations,
 the four bridge lemmas included, depend on exactly `propext`,
 `Classical.choice` and `Quot.sound`, and `leanchecker --fresh` passed.
 The first committed log (run 38984047507, 2026-10-17; sheriff case
 SHF-20261017-e4d7f6, L-N7) covered only the first three; it was replaced
-2026-11-06 (sheriff case SHF-20261106-a114e7, LNX-4). To check locally:
+2026-11-06 (sheriff case SHF-20261106-a114e7, LNX-4). The four new
+point-decomposition declarations passed the same local axiom audit and a
+`leanchecker --fresh` replay; the first green post-change workflow will retain
+their CI audit log. To check locally:
 
 ```
 cd lean && lake exe cache get && lake build && lake env lean AxiomAudit.lean
@@ -155,7 +183,8 @@ packages); it has no overfull boxes and all references resolve. ≈10 pages.
   `research/semaev_rootfind_scaling_20261012/`,
   `research/semaev_rootfind_nist_20261012/` (console transcripts + JSON).
 - `cargo test --release --lib`: 2247 passed at the measured commit.
-- Lean: `lean/S3Roots.lean` and `lean/AxiomAudit.lean` (see above).
+- Lean: `lean/S3Roots.lean`, `lean/PointDecompositionSAT.lean` and
+  `lean/AxiomAudit.lean` (see above).
 
 ## Before submission
 

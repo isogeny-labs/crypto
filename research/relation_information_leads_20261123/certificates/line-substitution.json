@@ -1,0 +1,270 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h41de375d1f91decb",
+  "statement": {
+    "name": "Affine line substitution into short Weierstrass equation",
+    "source": "RESEARCH_402.md section3; direct substitution y=m*x+c, not a subgroup or splitting claim",
+    "variables": [
+      "x",
+      "m",
+      "c",
+      "A",
+      "B"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "m"
+                    },
+                    {
+                      "op": "var",
+                      "args": "x"
+                    }
+                  ]
+                },
+                {
+                  "op": "var",
+                  "args": "c"
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "m"
+                    },
+                    {
+                      "op": "var",
+                      "args": "x"
+                    }
+                  ]
+                },
+                {
+                  "op": "var",
+                  "args": "c"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "add",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "x"
+                          },
+                          {
+                            "op": "var",
+                            "args": "x"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "var",
+                        "args": "x"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "A"
+                      },
+                      {
+                        "op": "var",
+                        "args": "x"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "op": "var",
+                "args": "B"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "neg",
+      "args": {
+        "op": "add",
+        "args": [
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "x"
+                          },
+                          {
+                            "op": "var",
+                            "args": "x"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "var",
+                        "args": "x"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "neg",
+                    "args": {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "mul",
+                          "args": [
+                            {
+                              "op": "var",
+                              "args": "m"
+                            },
+                            {
+                              "op": "var",
+                              "args": "m"
+                            }
+                          ]
+                        },
+                        {
+                          "op": "mul",
+                          "args": [
+                            {
+                              "op": "var",
+                              "args": "x"
+                            },
+                            {
+                              "op": "var",
+                              "args": "x"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "add",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "A"
+                      },
+                      {
+                        "op": "neg",
+                        "args": {
+                          "op": "mul",
+                          "args": [
+                            {
+                              "op": "const",
+                              "args": 2
+                            },
+                            {
+                              "op": "mul",
+                              "args": [
+                                {
+                                  "op": "var",
+                                  "args": "m"
+                                },
+                                {
+                                  "op": "var",
+                                  "args": "c"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "op": "var",
+                    "args": "x"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "var",
+                "args": "B"
+              },
+              {
+                "op": "neg",
+                "args": {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "c"
+                    },
+                    {
+                      "op": "var",
+                      "args": "c"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 0,
+  "value_digest": "020ddf82b702fb526012591fa219da0084ef43a088ba57168809a71379bc28b0",
+  "independence": "Same local issuer/checker implementation; extra stream domain-separated. No independent-host or signed verification. Fixed correctness statements, not performance input selection.",
+  "proof": null
+}

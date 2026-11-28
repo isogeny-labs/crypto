@@ -1,0 +1,38 @@
+{
+ "note": "Validation of research/ic_tableb_sib_20261119 (counted-cost L0 measurements, three Table B prime curves). Headline arm for the descriptor: sib8-p256 at P24. Per-arm and per-curve bands: rho-references.json. Named gaps (same binary and host, no keyring signature, wall time and bitop widths not re-derived) are listed in both pinned files. [pcc:unverified]",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "3f4d93af9c64f23d781c5c6e226290a632cb9ed3d2cebda9f5fccf1f5930b47f"
+ },
+ "rho_reference": {
+  "band_source": "rho-references.json key sib8-p256@P24 (P24 = largest Table B curve)",
+  "binary_or_process": "one ecbench binary, sha256 b4fcf0ecdb3d0a0f42842856fe1e258258d52414c3ea54155292ae5431a592a0; every arm of a session, rho-neg included, runs in it",
+  "gae_band": {
+   "0": {
+    "ic": 1.0102295676389637,
+    "rho": 1.0853156237899748
+   },
+   "0.1": {
+    "ic": 1.2684389690995055,
+    "rho": 1.1826682317381991
+   },
+   "1": {
+    "ic": 3.5923235822443806,
+    "rho": 2.058841703272218
+   }
+  },
+  "kind": "negation",
+  "matches_protocol": true,
+  "order_holds_across_band": false,
+  "protocol": "as fewcol: matched rho.negation arm rho-neg, same curve, targets and seeds",
+  "same_binary_or_process": true,
+  "same_unit": true,
+  "strongest_available": true,
+  "unit": "ecbench.gae (counted group operations, S = GAE/sqrt(r)); native work priced at w in {0, 0.1, 1} GAE per operation (AGENTS.md section 5a), counted table work priced as in ecbench band (default since 2026-11-08)"
+ },
+ "schema": "validation-gate/v1",
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "bc7f78f8aad62111f64b7220e09458510379188481144d8edd00174c4aaa63f5"
+ }
+}

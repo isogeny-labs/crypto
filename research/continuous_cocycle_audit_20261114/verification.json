@@ -1,0 +1,76 @@
+{
+  "schema": "continuous-cocycle-verification/v1",
+  "source_commit": "17d11c65cd73961ab21100f9eb6fe464edba0214",
+  "claim_id": "PCC-20261114-2fd770",
+  "declaration_sha256": "ecb78f4c0b1bb831db95371328cc33938e5871d2651b142dc93eb38442a257a7",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 117,
+  "gate_declarations": 16,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 73,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-2fd770",
+    "claim_sha256": "eef2b888ce4994736a5acbecb049e34265fadb38a18cd354e475867a578c9cbe",
+    "commit": "17d11c65cd73961ab21100f9eb6fe464edba0214",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/continuous_cocycle_audit_20261114/lean (CocycleEvaluationCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T09:15:14Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-2fd770",
+    "claim_sha256": "eef2b888ce4994736a5acbecb049e34265fadb38a18cd354e475867a578c9cbe",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47103,
+    "sha256": "08cf3977fc0d92df1dad4478d1a2bf06dcfa12707ff6c391118f93769561a7d0",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 16,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "actual_Krull_Galois_F2_and_q_power_Frobenius": true,
+    "actual_trivial_discrete_integer_action_and_all_continuous_cocycles": true,
+    "actual_missing_coinvariant_and_class_quotient_evaluation_obstruction_proved": true,
+    "literal_broad_source_evaluation_assertion_refuted": true,
+    "qualified_finite_pairing_source_refuted": false,
+    "canonical_continuous_H1_object_constructed": false,
+    "finite_torsion_H1_identification_proved": false,
+    "noncompact_and_nontorsion_controls_proved": true,
+    "prior_full_published_Bruin_read_credited": true,
+    "full_author_preprint_read": false,
+    "original_FR_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

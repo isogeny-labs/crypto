@@ -1,0 +1,49 @@
+name: Rootfind round112 high-degree Mersenne chain native Rust A/B
+on:
+  push:
+    branches:
+      - automation/rootfind-column-accumulator-round89-20261121
+    paths:
+      - src/cryptanalysis/prime_root_trace.rs
+      - research/amm_digit_perf_20261118/round112_ab.py
+      - .github/workflows/rootfind-round112-ab.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - src/cryptanalysis/prime_root_trace.rs
+      - research/amm_digit_perf_20261118/round112_ab.py
+      - .github/workflows/rootfind-round112-ab.yml
+  workflow_dispatch:
+jobs:
+  round112-source-exact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round112_ab.py
+          sparse-checkout-cone-mode: false
+      - name: Fetch frozen round111 source
+        env:
+          ROOTFIND_BASELINE_REF: 35559c0c6eaff1526f21ae592d6717873f17a757
+        run: |
+          git cat-file -e "${ROOTFIND_BASELINE_REF}^{commit}" ||
+            git fetch --no-tags --depth=1 origin "$ROOTFIND_BASELINE_REF"
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compile, test and compare production Rust
+        env:
+          ROOTFIND_AB_TRIALS: "13"
+          ROOTFIND_BASELINE_REF: 35559c0c6eaff1526f21ae592d6717873f17a757
+        run: python3 research/amm_digit_perf_20261118/round112_ab.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rootfind-round112-rust-ab
+          path: research/amm_digit_perf_20261118/round112_rust_ab.csv
+          if-no-files-found: warn

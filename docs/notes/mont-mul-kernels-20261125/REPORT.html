@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Fixed-width multiplication for ECC scalar
+multiplication</title>
+  <style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+  <style type="text/css">body{font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;font-size:10.5pt;line-height:1.45;color:#1d1d1f;max-width:900px;margin:0 auto}
+h1{font-size:17pt;margin:0 0 6px}h2{font-size:13pt;margin-top:18px;border-bottom:1px solid #ddd;padding-bottom:3px}
+table{border-collapse:collapse;font-size:9pt;margin:8px 0}th,td{border:1px solid #ccc;padding:3px 6px}th{background:#f3f3f3}
+td{text-align:right}td:first-child{text-align:left}code{font-size:9pt;background:#f5f5f5;padding:0 2px}
+img{max-width:100%;border:1px solid #eee;margin:6px 0}pre{background:#f5f5f5;padding:6px;font-size:8.5pt;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h1 id="faster-fixed-width-multiplication-for-generic-prime-ecc-scalar-multiplication-2026-11-25">Faster
+fixed-width multiplication for generic-prime ECC scalar multiplication
+(2026-11-25)</h1>
+<p>Branch <code>feat/lucid-cray-tckh5e</code>, PR
+isogeny-labs/crypto#5173. Benchmark record
+<code>benchmarks/records/20261125T1820Z-mont-mul-kernels.json</code>.
+Status of every number below: <strong>unverified assertion</strong>
+(local single-host measurement, no pcc claim, no independent
+replay).</p>
+<h2 id="boundary">Boundary</h2>
+<p>What is measured: wall time of one scalar multiplication
+<code>k·P</code> (random <code>k &lt; 2^bits(p)</code>, random affine
+<code>P</code>, random curve coefficient <code>a</code>) through the
+fixed-width Montgomery path <code>src/ecc/mont_vt.rs</code> behind
+<code>Point::scalar_mul</code> and
+<code>Point::scalar_mul_vartime</code>, including entry to Montgomery
+form, the ladder, the final inversion and the conversion back to
+<code>BigUint</code>. Also the latency of one dependent modular
+multiplication / squaring / inversion per width.</p>
+<p>Not measured, not changed: the P-256 and secp256k1 paths (they have
+their own specialised ladders and are dispatched before
+<code>mont_vt</code>), single-word primes (the <code>Word</code> path),
+the constant-time <code>scalar_mul_ct</code>, binary fields, and any
+ECDLP solver. This is a component speed-up of public-input scalar
+multiplication (set-up multiplications of walks and searches, signature
+verification on curves other than P-256/secp256k1); it says nothing
+about the cost of ECDLP and is not an index-calculus row.</p>
+<p>Fields (one per limb width): 2^127−1 (2 limbs), P-192 (3), 2^255−19
+(4), the largest prime below 2^320 (5), P-384 (6), Goldilocks
+2^448−2^224−1 (7), the largest prime below 2^512 (8), 2^521−1 (9).</p>
+<h2 id="what-changed">What changed</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">change</th>
+<th style="text-align: left;">where</th>
+<th style="text-align: left;">applies to</th>
+<th style="text-align: left;">result semantics</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">exact limb widths 5..8 (were padded to 9
+limbs: 81 word products per CIOS pass instead of 25–64)</td>
+<td style="text-align: left;"><code>Point::scalar_mul</code>
+dispatch</td>
+<td style="text-align: left;">every 5..8-limb modulus</td>
+<td style="text-align: left;">bit-identical for every odd modulus</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">dedicated Montgomery squaring: cross
+products once, doubled by a shift, diagonal added, SOS reduction
+(<code>N(N+1)/2 + N²</code> word products vs <code>2N²</code>)</td>
+<td style="text-align: left;"><code>Mont::sqr</code>,
+<code>TunedKernel</code> for N ≥ 4</td>
+<td style="text-align: left;"><code>scalar_mul</code>,
+<code>scalar_mul_vartime</code></td>
+<td style="text-align: left;">bit-identical</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">separated schoolbook + SOS reduction
+product</td>
+<td style="text-align: left;"><code>TunedKernel</code> at N = 5
+only</td>
+<td style="text-align: left;">both</td>
+<td style="text-align: left;">bit-identical</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fixed-width binary extended-GCD inverse
+(<code>Mont::inv_bingcd</code>), 4–16× faster than the Fermat power</td>
+<td style="text-align: left;">final <code>Z⁻¹</code> of
+<code>scalar_mul_vartime</code></td>
+<td style="text-align: left;">multi-word primes</td>
+<td style="text-align: left;">equal over a prime; Fermat fallback where
+it finds no inverse, as <code>FieldElement::inv_vartime</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">width-4 (≤ 3 limbs) / width-5 NAF; odd
+multiples built on the isomorphic curve scaled by <code>Z(2P)</code> (so
+<code>2P</code> is affine without an inversion) and normalised by one
+batch inversion</td>
+<td style="text-align: left;"><code>Mont::ladder_wnaf</code></td>
+<td style="text-align: left;"><code>scalar_mul_vartime</code>,
+multi-word primes</td>
+<td style="text-align: left;">equal over a prime; declines to the binary
+ladder on a small-order base or non-unit <code>Z</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">one-level subtractive Karatsuba
+product</td>
+<td style="text-align: left;"><code>Mont::mul_wide_karatsuba</code></td>
+<td style="text-align: left;">measured only, <strong>not
+used</strong></td>
+<td style="text-align: left;">—</td>
+</tr>
+</tbody>
+</table>
+<p><code>Point::scalar_mul</code>’s contract (“the same point the
+<code>BigUint</code> ladder returns, for every odd modulus”) is
+unchanged, so only the bit-identical changes go there.
+<code>Point::scalar_mul_vartime</code> documents “exactly
+<code>scalar_mul</code> over a prime <code>p</code>”, which the wNAF and
+binary-GCD changes keep. The fast vartime path runs only on moduli that
+pass Miller–Rabin (40 fixed bases, cached per thread for the last eight
+moduli); a composite multi-word modulus runs <code>scalar_mul</code>
+itself, so the existing test
+<code>composite_modulus_non_units_match_constant_time</code> (strict
+equality on (2^31−1)(2^89−1), where the final <code>Z</code> is a unit)
+keeps holding. It failed on the first version of this change, which is
+how the gap was found.</p>
+<h2 id="method">Method</h2>
+<p><code>src/bin/mont_mul_bench.rs</code>, <code>taskset -c 3</code> on
+a 4-vCPU Intel Xeon @ 2.10 GHz cloud VM (no hardware PMU, isolation:
+local container). Per field: 41 rounds; each round draws 30 fresh
+scalars and runs every arm on the same scalars, arm order shuffled per
+round from a derived seed; an A/A copy of the baseline arm
+(<code>pad9_cios#aa</code>) measures the noise floor. Speedup = baseline
+ns / arm ns per round, summarised by the median and a 2000-resample
+percentile bootstrap 95% interval. Before timing, every arm and both
+production entry points are checked equal to the <code>num-bigint</code>
+ladder on 38 scalars per field (edge values 0..256, p−1, 2^bits−1,
+2^(bits−1), 24 random); the run aborts on any mismatch. Kernel latency:
+7 repetitions of 2·10^6 dependent operations (10^5 for
+<code>num-bigint</code>, 2·10^3 for inversions), median.</p>
+<p>Four runs, all under the one benchmark record:</p>
+<ul>
+<li>run 1 at f0271142f: kernels and arms;</li>
+<li>run 2 at 8427dc0c1: the first tuned kernel;</li>
+<li>run 3 at 8fc62fdc3: the final tuned kernel;</li>
+<li>run 4 at 17c530427: the final code, including the Miller–Rabin gate
+of the vartime path.</li>
+</ul>
+<p>Run 2 showed that the first tuned kernel regressed
+<code>scalar_mul</code> by 1–3% at 2–3 limbs end to end. That kernel
+used the SOS product and dedicated squaring at N ≤ 3, chosen from the
+isolated kernel loop. Run 3’s kernel keeps plain CIOS there. The runs
+agree to within about 1–2% on every common paired ratio. Absolute times
+move between runs (shared VM, baseline 24–31 µs at 2 limbs), which is
+why every comparison is paired within a round.</p>
+<h2 id="results-run-4-final-code">Results (run 4, final code)</h2>
+<p>Baseline <code>pad9_cios</code> = the pre-change production path. A/A
+on every field: 0.996–1.002×, all intervals containing 1. Run 3 (before
+the Miller–Rabin gate) agrees with every number here to within 1%.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">field</th>
+<th style="text-align: right;">limbs</th>
+<th style="text-align: right;">baseline µs</th>
+<th style="text-align: right;"><code>scalar_mul</code> (tuned)</th>
+<th style="text-align: right;"><code>scalar_mul_vartime</code></th>
+<th style="text-align: right;"><code>num-bigint</code> ladder →
+<code>scalar_mul_vartime</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2^127−1</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">24.0</td>
+<td style="text-align: right;">1.005× [0.987, 1.008] ¹</td>
+<td style="text-align: right;">1.142× [1.129, 1.154]</td>
+<td style="text-align: right;">28.6×</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P-192</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">57.9</td>
+<td style="text-align: right;">1.002× [0.986, 1.010] ¹</td>
+<td style="text-align: right;">1.216× [1.206, 1.228]</td>
+<td style="text-align: right;">17.9×</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2^255−19</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">100.0</td>
+<td style="text-align: right;">1.006× [1.001, 1.011]</td>
+<td style="text-align: right;">1.278× [1.272, 1.283]</td>
+<td style="text-align: right;">18.5×</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">prime &lt; 2^320</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">640.8</td>
+<td style="text-align: right;">2.849× [2.832, 2.860]</td>
+<td style="text-align: right;">3.704× [3.683, 3.721]</td>
+<td style="text-align: right;">12.5×</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">P-384</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">782.3</td>
+<td style="text-align: right;">1.961× [1.948, 1.970]</td>
+<td style="text-align: right;">2.596× [2.589, 2.620]</td>
+<td style="text-align: right;">9.7×</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Goldilocks</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">914.3</td>
+<td style="text-align: right;">1.568× [1.560, 1.574]</td>
+<td style="text-align: right;">2.140× [2.136, 2.156]</td>
+<td style="text-align: right;">9.3×</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">prime &lt; 2^512</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">1035.3</td>
+<td style="text-align: right;">1.265× [1.245, 1.271]</td>
+<td style="text-align: right;">1.746× [1.723, 1.765]</td>
+<td style="text-align: right;">8.8×</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2^521−1</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">1041.3</td>
+<td style="text-align: right;">1.096× [1.088, 1.101]</td>
+<td style="text-align: right;">1.531× [1.526, 1.543]</td>
+<td style="text-align: right;">11.8×</td>
+</tr>
+</tbody>
+</table>
+<p>¹ At N ≤ 3 the tuned kernel is the same CIOS code as the baseline
+(expected 1.000×; run 3 read 1.000× and 0.992× there). The last column
+is a derived ratio of medians (<code>prod_vartime</code> speedup /
+<code>biguint</code> speedup), not a paired interval.
+<code>scalar_mul_vartime</code> timings are cache hits of the
+per-modulus Miller–Rabin test; the first call on a new modulus pays one
+test (not measured separately).</p>
+<figure>
+<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc5ODAnIGhlaWdodD0nNDgwJyBmb250LWZhbWlseT0nc2Fucy1zZXJpZicgZm9udC1zaXplPScxMic+PHJlY3Qgd2lkdGg9JzEwMCUnIGhlaWdodD0nMTAwJScgZmlsbD0nd2hpdGUnLz48dGV4dCB4PSc2MCcgeT0nMjInIGZvbnQtc2l6ZT0nMTQnIGZvbnQtd2VpZ2h0PSdib2xkJz5TY2FsYXIgbXVsdGlwbGljYXRpb24gc3BlZWR1cCB2cyBwcmUtY2hhbmdlIG1vbnRfdnQgKHBhZDlfY2lvcyk7IG1lZGlhbiwgOTUlIGJvb3RzdHJhcCBDSTwvdGV4dD48bGluZSB4MT0nNjAnIHgyPSc5NjAnIHkxPSczNzAuMCcgeTI9JzM3MC4wJyBzdHJva2U9JyNlMGUwZTAnLz48dGV4dCB4PSc1NCcgeT0nMzc0LjAnIHRleHQtYW5jaG9yPSdlbmQnPjAuMMOXPC90ZXh0PjxsaW5lIHgxPSc2MCcgeDI9Jzk2MCcgeTE9JzMyOS4zJyB5Mj0nMzI5LjMnIHN0cm9rZT0nI2UwZTBlMCcvPjx0ZXh0IHg9JzU0JyB5PSczMzMuMycgdGV4dC1hbmNob3I9J2VuZCc+MC41w5c8L3RleHQ+PGxpbmUgeDE9JzYwJyB4Mj0nOTYwJyB5MT0nMjg4LjYnIHkyPScyODguNicgc3Ryb2tlPScjZTBlMGUwJy8+PHRleHQgeD0nNTQnIHk9JzI5Mi42JyB0ZXh0LWFuY2hvcj0nZW5kJz4xLjDDlzwvdGV4dD48bGluZSB4MT0nNjAnIHgyPSc5NjAnIHkxPScyNDcuOCcgeTI9JzI0Ny44JyBzdHJva2U9JyNlMGUwZTAnLz48dGV4dCB4PSc1NCcgeT0nMjUxLjgnIHRleHQtYW5jaG9yPSdlbmQnPjEuNcOXPC90ZXh0PjxsaW5lIHgxPSc2MCcgeDI9Jzk2MCcgeTE9JzIwNy4xJyB5Mj0nMjA3LjEnIHN0cm9rZT0nI2UwZTBlMCcvPjx0ZXh0IHg9JzU0JyB5PScyMTEuMScgdGV4dC1hbmNob3I9J2VuZCc+Mi4ww5c8L3RleHQ+PGxpbmUgeDE9JzYwJyB4Mj0nOTYwJyB5MT0nMTY2LjQnIHkyPScxNjYuNCcgc3Ryb2tlPScjZTBlMGUwJy8+PHRleHQgeD0nNTQnIHk9JzE3MC40JyB0ZXh0LWFuY2hvcj0nZW5kJz4yLjXDlzwvdGV4dD48bGluZSB4MT0nNjAnIHgyPSc5NjAnIHkxPScxMjUuNycgeTI9JzEyNS43JyBzdHJva2U9JyNlMGUwZTAnLz48dGV4dCB4PSc1NCcgeT0nMTI5LjcnIHRleHQtYW5jaG9yPSdlbmQnPjMuMMOXPC90ZXh0PjxsaW5lIHgxPSc2MCcgeDI9Jzk2MCcgeTE9Jzg0LjknIHkyPSc4NC45JyBzdHJva2U9JyNlMGUwZTAnLz48dGV4dCB4PSc1NCcgeT0nODguOScgdGV4dC1hbmNob3I9J2VuZCc+My41w5c8L3RleHQ+PGxpbmUgeDE9JzYwJyB4Mj0nOTYwJyB5MT0nNDQuMicgeTI9JzQ0LjInIHN0cm9rZT0nI2UwZTBlMCcvPjx0ZXh0IHg9JzU0JyB5PSc0OC4yJyB0ZXh0LWFuY2hvcj0nZW5kJz40LjDDlzwvdGV4dD48bGluZSB4MT0nNjAnIHgyPSc5NjAnIHkxPScyODguNicgeTI9JzI4OC42JyBzdHJva2U9JyMzMzMnIHN0cm9rZS1kYXNoYXJyYXk9JzQgMycvPjxyZWN0IHg9JzcxLjInIHk9JzI4OC45JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzgxLjEnIGZpbGw9JyM5YWEwYTYnPjx0aXRsZT5wYWQ5X2Npb3MjYWEgcDEyN19tZXJzZW5uZTogMC45OTbDlyBbMC45ODQsIDEuMDE0XTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPSc3NS4zJyB4Mj0nNzUuMycgeTE9JzI4OS45JyB5Mj0nMjg3LjQnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzgwLjInIHk9JzI4OC40JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzgxLjYnIGZpbGw9JyM0ZTc5YTcnPjx0aXRsZT5jaW9zIHAxMjdfbWVyc2VubmU6IDEuMDAyw5cgWzAuOTkyLCAxLjAxNV08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nODQuMycgeDI9Jzg0LjMnIHkxPScyODkuMicgeTI9JzI4Ny40JyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc4OS4yJyB5PScyOTEuMScgd2lkdGg9JzguMScgaGVpZ2h0PSc3OC45JyBmaWxsPScjZjI4ZTJiJz48dGl0bGU+c3FyIHAxMjdfbWVyc2VubmU6IDAuOTY5w5cgWzAuOTU3LCAwLjk3Nl08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nOTMuMycgeDI9JzkzLjMnIHkxPScyOTIuMCcgeTI9JzI5MC41JyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc5OC4yJyB5PScyOTAuOCcgd2lkdGg9JzguMScgaGVpZ2h0PSc3OS4yJyBmaWxsPScjZTE1NzU5Jz48dGl0bGU+a2FyYXRzdWJhIHAxMjdfbWVyc2VubmU6IDAuOTczw5cgWzAuOTU0LCAwLjk3OF08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nMTAyLjMnIHgyPScxMDIuMycgeTE9JzI5Mi4zJyB5Mj0nMjkwLjMnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzEwNy4yJyB5PScyODkuOScgd2lkdGg9JzguMScgaGVpZ2h0PSc4MC4xJyBmaWxsPScjNzZiN2IyJz48dGl0bGU+c3FyX2JpbmdjZCBwMTI3X21lcnNlbm5lOiAwLjk4M8OXIFswLjk3OCwgMC45OTJdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzExMS4zJyB4Mj0nMTExLjMnIHkxPScyOTAuNCcgeTI9JzI4OS4yJyBzdHJva2U9JyMyMjInLz48cmVjdCB4PScxMTYuMicgeT0nMjc3LjMnIHdpZHRoPSc4LjEnIGhlaWdodD0nOTIuNycgZmlsbD0nIzU5YTE0Zic+PHRpdGxlPnNxcl93bmFmNCBwMTI3X21lcnNlbm5lOiAxLjEzOMOXIFsxLjEzMCwgMS4xNDldPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzEyMC4zJyB4Mj0nMTIwLjMnIHkxPScyNzcuOScgeTI9JzI3Ni41JyBzdHJva2U9JyMyMjInLz48cmVjdCB4PScxMjUuMicgeT0nMjc2LjInIHdpZHRoPSc4LjEnIGhlaWdodD0nOTMuOCcgZmlsbD0nI2VkYzk0OCc+PHRpdGxlPnNxcl93bmFmNSBwMTI3X21lcnNlbm5lOiAxLjE1MsOXIFsxLjE0NCwgMS4xNjBdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzEyOS4zJyB4Mj0nMTI5LjMnIHkxPScyNzYuOCcgeTI9JzI3NS42JyBzdHJva2U9JyMyMjInLz48cmVjdCB4PScxMzQuMicgeT0nMjg4LjInIHdpZHRoPSc4LjEnIGhlaWdodD0nODEuOCcgZmlsbD0nI2IwN2FhMSc+PHRpdGxlPnR1bmVkIHAxMjdfbWVyc2VubmU6IDEuMDA1w5cgWzAuOTg3LCAxLjAwOF08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nMTM4LjMnIHgyPScxMzguMycgeTE9JzI4OS42JyB5Mj0nMjg3LjknIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzE0My4yJyB5PScyNzYuMScgd2lkdGg9JzguMScgaGVpZ2h0PSc5My45JyBmaWxsPScjZmY5ZGE3Jz48dGl0bGU+dHVuZWRfd25hZiBwMTI3X21lcnNlbm5lOiAxLjE1M8OXIFsxLjE0MSwgMS4xNjNdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzE0Ny4zJyB4Mj0nMTQ3LjMnIHkxPScyNzcuMScgeTI9JzI3NS4zJyBzdHJva2U9JyMyMjInLz48cmVjdCB4PScxNTIuMicgeT0nMjc3LjAnIHdpZHRoPSc4LjEnIGhlaWdodD0nOTMuMCcgZmlsbD0nIzljNzU1Zic+PHRpdGxlPnByb2RfdmFydGltZSBwMTI3X21lcnNlbm5lOiAxLjE0MsOXIFsxLjEyOSwgMS4xNTRdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzE1Ni4zJyB4Mj0nMTU2LjMnIHkxPScyNzguMScgeTI9JzI3Ni4wJyBzdHJva2U9JyMyMjInLz48dGV4dCB4PScxMTYuMicgeT0nMzg4LjAnIHRleHQtYW5jaG9yPSdtaWRkbGUnPnAxMjdfbWVyc2VubmU8L3RleHQ+PHRleHQgeD0nMTE2LjInIHk9JzQwMy4wJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmaWxsPScjNTU1Jz4yIGxpbWJzPC90ZXh0PjxyZWN0IHg9JzE4My44JyB5PScyODguOScgd2lkdGg9JzguMScgaGVpZ2h0PSc4MS4xJyBmaWxsPScjOWFhMGE2Jz48dGl0bGU+cGFkOV9jaW9zI2FhIHAxOTJfbmlzdDogMC45OTbDlyBbMC45OTEsIDEuMDA2XTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPScxODcuOCcgeDI9JzE4Ny44JyB5MT0nMjg5LjMnIHkyPScyODguMScgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nMTkyLjgnIHk9JzI4OC43JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzgxLjMnIGZpbGw9JyM0ZTc5YTcnPjx0aXRsZT5jaW9zIHAxOTJfbmlzdDogMC45OTnDlyBbMC45ODgsIDEuMDA0XTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPScxOTYuOCcgeDI9JzE5Ni44JyB5MT0nMjg5LjUnIHkyPScyODguMicgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nMjAxLjgnIHk9JzI4OS43JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzgwLjMnIGZpbGw9JyNmMjhlMmInPjx0aXRsZT5zcXIgcDE5Ml9uaXN0OiAwLjk4NsOXIFswLjk4MCwgMC45OTFdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzIwNS44JyB4Mj0nMjA1LjgnIHkxPScyOTAuMicgeTI9JzI4OS4zJyBzdHJva2U9JyMyMjInLz48cmVjdCB4PScyMTAuOCcgeT0nMjg5LjcnIHdpZHRoPSc4LjEnIGhlaWdodD0nODAuMycgZmlsbD0nI2UxNTc1OSc+PHRpdGxlPmthcmF0c3ViYSBwMTkyX25pc3Q6IDAuOTg2w5cgWzAuOTc1LCAwLjk5MF08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nMjE0LjgnIHgyPScyMTQuOCcgeTE9JzI5MC42JyB5Mj0nMjg5LjQnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzIxOS44JyB5PScyODYuMCcgd2lkdGg9JzguMScgaGVpZ2h0PSc4NC4wJyBmaWxsPScjNzZiN2IyJz48dGl0bGU+c3FyX2JpbmdjZCBwMTkyX25pc3Q6IDEuMDMxw5cgWzEuMDIzLCAxLjA0MF08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nMjIzLjgnIHgyPScyMjMuOCcgeTE9JzI4Ni43JyB5Mj0nMjg1LjMnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzIyOC44JyB5PScyNzEuMScgd2lkdGg9JzguMScgaGVpZ2h0PSc5OC45JyBmaWxsPScjNTlhMTRmJz48dGl0bGU+c3FyX3duYWY0IHAxOTJfbmlzdDogMS4yMTTDlyBbMS4yMDAsIDEuMjMwXTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPScyMzIuOCcgeDI9JzIzMi44JyB5MT0nMjcyLjMnIHkyPScyNjkuOScgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nMjM3LjgnIHk9JzI3MC4yJyB3aWR0aD0nOC4xJyBoZWlnaHQ9Jzk5LjgnIGZpbGw9JyNlZGM5NDgnPjx0aXRsZT5zcXJfd25hZjUgcDE5Ml9uaXN0OiAxLjIyNcOXIFsxLjIwOCwgMS4yNDFdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzI0MS44JyB4Mj0nMjQxLjgnIHkxPScyNzEuNicgeTI9JzI2OC45JyBzdHJva2U9JyMyMjInLz48cmVjdCB4PScyNDYuOCcgeT0nMjg4LjQnIHdpZHRoPSc4LjEnIGhlaWdodD0nODEuNicgZmlsbD0nI2IwN2FhMSc+PHRpdGxlPnR1bmVkIHAxOTJfbmlzdDogMS4wMDLDlyBbMC45ODYsIDEuMDEwXTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPScyNTAuOCcgeDI9JzI1MC44JyB5MT0nMjg5LjcnIHkyPScyODcuNycgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nMjU1LjgnIHk9JzI3MC4zJyB3aWR0aD0nOC4xJyBoZWlnaHQ9Jzk5LjcnIGZpbGw9JyNmZjlkYTcnPjx0aXRsZT50dW5lZF93bmFmIHAxOTJfbmlzdDogMS4yMjTDlyBbMS4yMTAsIDEuMjM2XTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPScyNTkuOCcgeDI9JzI1OS44JyB5MT0nMjcxLjUnIHkyPScyNjkuMycgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nMjY0LjgnIHk9JzI3MS4wJyB3aWR0aD0nOC4xJyBoZWlnaHQ9Jzk5LjAnIGZpbGw9JyM5Yzc1NWYnPjx0aXRsZT5wcm9kX3ZhcnRpbWUgcDE5Ml9uaXN0OiAxLjIxNsOXIFsxLjIwNiwgMS4yMjhdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzI2OC44JyB4Mj0nMjY4LjgnIHkxPScyNzEuOCcgeTI9JzI2OS45JyBzdHJva2U9JyMyMjInLz48dGV4dCB4PScyMjguOCcgeT0nMzg4LjAnIHRleHQtYW5jaG9yPSdtaWRkbGUnPnAxOTJfbmlzdDwvdGV4dD48dGV4dCB4PScyMjguOCcgeT0nNDAzLjAnIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9JyM1NTUnPjMgbGltYnM8L3RleHQ+PHJlY3QgeD0nMjk2LjInIHk9JzI4OC43JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzgxLjMnIGZpbGw9JyM5YWEwYTYnPjx0aXRsZT5wYWQ5X2Npb3MjYWEgcDI1NV8yNTUxOTogMC45OTjDlyBbMC45OTUsIDEuMDAyXTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPSczMDAuMycgeDI9JzMwMC4zJyB5MT0nMjg5LjAnIHkyPScyODguNCcgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nMzA1LjInIHk9JzI4OC41JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzgxLjUnIGZpbGw9JyM0ZTc5YTcnPjx0aXRsZT5jaW9zIHAyNTVfMjU1MTk6IDEuMDAww5cgWzAuOTk3LCAxLjAwNV08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nMzA5LjMnIHgyPSczMDkuMycgeTE9JzI4OC44JyB5Mj0nMjg4LjEnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzMxNC4yJyB5PScyODcuOScgd2lkdGg9JzguMScgaGVpZ2h0PSc4Mi4xJyBmaWxsPScjZjI4ZTJiJz48dGl0bGU+c3FyIHAyNTVfMjU1MTk6IDEuMDA4w5cgWzEuMDA0LCAxLjAxM108L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nMzE4LjMnIHgyPSczMTguMycgeTE9JzI4OC4yJyB5Mj0nMjg3LjUnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzMyMy4yJyB5PScyOTQuMCcgd2lkdGg9JzguMScgaGVpZ2h0PSc3Ni4wJyBmaWxsPScjZTE1NzU5Jz48dGl0bGU+a2FyYXRzdWJhIHAyNTVfMjU1MTk6IDAuOTMzw5cgWzAuOTI5LCAwLjkzNF08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nMzI3LjMnIHgyPSczMjcuMycgeTE9JzI5NC4zJyB5Mj0nMjkzLjknIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzMzMi4yJyB5PScyODQuNycgd2lkdGg9JzguMScgaGVpZ2h0PSc4NS4zJyBmaWxsPScjNzZiN2IyJz48dGl0bGU+c3FyX2JpbmdjZCBwMjU1XzI1NTE5OiAxLjA0OMOXIFsxLjA0NSwgMS4wNTFdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzMzNi4zJyB4Mj0nMzM2LjMnIHkxPScyODQuOScgeTI9JzI4NC40JyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSczNDEuMicgeT0nMjY3LjcnIHdpZHRoPSc4LjEnIGhlaWdodD0nMTAyLjMnIGZpbGw9JyM1OWExNGYnPjx0aXRsZT5zcXJfd25hZjQgcDI1NV8yNTUxOTogMS4yNTbDlyBbMS4yNTEsIDEuMjU4XTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPSczNDUuMycgeDI9JzM0NS4zJyB5MT0nMjY4LjEnIHkyPScyNjcuNicgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nMzUwLjInIHk9JzI2Ni4yJyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzEwMy44JyBmaWxsPScjZWRjOTQ4Jz48dGl0bGU+c3FyX3duYWY1IHAyNTVfMjU1MTk6IDEuMjc1w5cgWzEuMjY5LCAxLjI4NF08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nMzU0LjMnIHgyPSczNTQuMycgeTE9JzI2Ni42JyB5Mj0nMjY1LjQnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzM1OS4yJyB5PScyODguMCcgd2lkdGg9JzguMScgaGVpZ2h0PSc4Mi4wJyBmaWxsPScjYjA3YWExJz48dGl0bGU+dHVuZWQgcDI1NV8yNTUxOTogMS4wMDbDlyBbMS4wMDEsIDEuMDExXTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPSczNjMuMycgeDI9JzM2My4zJyB5MT0nMjg4LjUnIHkyPScyODcuNycgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nMzY4LjInIHk9JzI2NS4zJyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzEwNC43JyBmaWxsPScjZmY5ZGE3Jz48dGl0bGU+dHVuZWRfd25hZiBwMjU1XzI1NTE5OiAxLjI4NcOXIFsxLjI3NCwgMS4yOTBdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzM3Mi4zJyB4Mj0nMzcyLjMnIHkxPScyNjYuMycgeTI9JzI2NS4wJyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSczNzcuMicgeT0nMjY1LjknIHdpZHRoPSc4LjEnIGhlaWdodD0nMTA0LjEnIGZpbGw9JyM5Yzc1NWYnPjx0aXRsZT5wcm9kX3ZhcnRpbWUgcDI1NV8yNTUxOTogMS4yNzjDlyBbMS4yNzIsIDEuMjgzXTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPSczODEuMycgeDI9JzM4MS4zJyB5MT0nMjY2LjQnIHkyPScyNjUuNScgc3Ryb2tlPScjMjIyJy8+PHRleHQgeD0nMzQxLjInIHk9JzM4OC4wJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJz5wMjU1XzI1NTE5PC90ZXh0Pjx0ZXh0IHg9JzM0MS4yJyB5PSc0MDMuMCcgdGV4dC1hbmNob3I9J21pZGRsZScgZmlsbD0nIzU1NSc+NCBsaW1iczwvdGV4dD48cmVjdCB4PSc0MDguOCcgeT0nMjg4LjYnIHdpZHRoPSc4LjEnIGhlaWdodD0nODEuNCcgZmlsbD0nIzlhYTBhNic+PHRpdGxlPnBhZDlfY2lvcyNhYSBwMzIwX3BtYXg6IDAuOTk5w5cgWzAuOTk2LCAxLjAwM108L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nNDEyLjgnIHgyPSc0MTIuOCcgeTE9JzI4OC45JyB5Mj0nMjg4LjMnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzQxNy44JyB5PScxNTkuMicgd2lkdGg9JzguMScgaGVpZ2h0PScyMTAuOCcgZmlsbD0nIzRlNzlhNyc+PHRpdGxlPmNpb3MgcDMyMF9wbWF4OiAyLjU4OMOXIFsyLjU3NywgMi42MDFdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzQyMS44JyB4Mj0nNDIxLjgnIHkxPScxNjAuMScgeTI9JzE1OC4xJyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc0MjYuOCcgeT0nMTQ1LjEnIHdpZHRoPSc4LjEnIGhlaWdodD0nMjI0LjknIGZpbGw9JyNmMjhlMmInPjx0aXRsZT5zcXIgcDMyMF9wbWF4OiAyLjc2McOXIFsyLjczOCwgMi43NjVdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzQzMC44JyB4Mj0nNDMwLjgnIHkxPScxNDcuMCcgeTI9JzE0NC44JyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc0MzUuOCcgeT0nMTM3LjQnIHdpZHRoPSc4LjEnIGhlaWdodD0nMjMyLjYnIGZpbGw9JyNlMTU3NTknPjx0aXRsZT5rYXJhdHN1YmEgcDMyMF9wbWF4OiAyLjg1NsOXIFsyLjg0MiwgMi44NjZdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzQzOS44JyB4Mj0nNDM5LjgnIHkxPScxMzguNScgeTI9JzEzNi42JyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc0NDQuOCcgeT0nMTMxLjYnIHdpZHRoPSc4LjEnIGhlaWdodD0nMjM4LjQnIGZpbGw9JyM3NmI3YjInPjx0aXRsZT5zcXJfYmluZ2NkIHAzMjBfcG1heDogMi45MjfDlyBbMi45MTcsIDIuOTM3XTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPSc0NDguOCcgeDI9JzQ0OC44JyB5MT0nMTMyLjQnIHkyPScxMzAuOCcgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nNDUzLjgnIHk9Jzc3LjEnIHdpZHRoPSc4LjEnIGhlaWdodD0nMjkyLjknIGZpbGw9JyM1OWExNGYnPjx0aXRsZT5zcXJfd25hZjQgcDMyMF9wbWF4OiAzLjU5N8OXIFszLjU3NiwgMy42MDhdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzQ1Ny44JyB4Mj0nNDU3LjgnIHkxPSc3OC43JyB5Mj0nNzYuMicgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nNDYyLjgnIHk9JzcwLjEnIHdpZHRoPSc4LjEnIGhlaWdodD0nMjk5LjknIGZpbGw9JyNlZGM5NDgnPjx0aXRsZT5zcXJfd25hZjUgcDMyMF9wbWF4OiAzLjY4MsOXIFszLjY1NywgMy42OTddPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzQ2Ni44JyB4Mj0nNDY2LjgnIHkxPSc3Mi4yJyB5Mj0nNjguOScgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nNDcxLjgnIHk9JzEzNy45JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzIzMi4xJyBmaWxsPScjYjA3YWExJz48dGl0bGU+dHVuZWQgcDMyMF9wbWF4OiAyLjg0OcOXIFsyLjgzMiwgMi44NjBdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzQ3NS44JyB4Mj0nNDc1LjgnIHkxPScxMzkuMycgeTI9JzEzNy4xJyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc0ODAuOCcgeT0nNjYuNicgd2lkdGg9JzguMScgaGVpZ2h0PSczMDMuNCcgZmlsbD0nI2ZmOWRhNyc+PHRpdGxlPnR1bmVkX3duYWYgcDMyMF9wbWF4OiAzLjcyNcOXIFszLjcwOCwgMy43NTJdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzQ4NC44JyB4Mj0nNDg0LjgnIHkxPSc2OC4wJyB5Mj0nNjQuNCcgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nNDg5LjgnIHk9JzY4LjQnIHdpZHRoPSc4LjEnIGhlaWdodD0nMzAxLjYnIGZpbGw9JyM5Yzc1NWYnPjx0aXRsZT5wcm9kX3ZhcnRpbWUgcDMyMF9wbWF4OiAzLjcwNMOXIFszLjY4MywgMy43MjFdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzQ5My44JyB4Mj0nNDkzLjgnIHkxPSc3MC4xJyB5Mj0nNjYuOScgc3Ryb2tlPScjMjIyJy8+PHRleHQgeD0nNDUzLjgnIHk9JzM4OC4wJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJz5wMzIwX3BtYXg8L3RleHQ+PHRleHQgeD0nNDUzLjgnIHk9JzQwMy4wJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJyBmaWxsPScjNTU1Jz41IGxpbWJzPC90ZXh0PjxyZWN0IHg9JzUyMS4yJyB5PScyODguNicgd2lkdGg9JzguMScgaGVpZ2h0PSc4MS40JyBmaWxsPScjOWFhMGE2Jz48dGl0bGU+cGFkOV9jaW9zI2FhIHAzODRfbmlzdDogMC45OTnDlyBbMC45OTQsIDEuMDExXTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPSc1MjUuMycgeDI9JzUyNS4zJyB5MT0nMjg5LjEnIHkyPScyODcuNicgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nNTMwLjInIHk9JzIxMC43JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzE1OS4zJyBmaWxsPScjNGU3OWE3Jz48dGl0bGU+Y2lvcyBwMzg0X25pc3Q6IDEuOTU2w5cgWzEuOTQ3LCAxLjk2NF08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nNTM0LjMnIHgyPSc1MzQuMycgeTE9JzIxMS40JyB5Mj0nMjEwLjAnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzUzOS4yJyB5PScyMTAuMycgd2lkdGg9JzguMScgaGVpZ2h0PScxNTkuNycgZmlsbD0nI2YyOGUyYic+PHRpdGxlPnNxciBwMzg0X25pc3Q6IDEuOTYxw5cgWzEuOTU1LCAxLjk2OF08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nNTQzLjMnIHgyPSc1NDMuMycgeTE9JzIxMC44JyB5Mj0nMjA5LjgnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzU0OC4yJyB5PScyMTguNycgd2lkdGg9JzguMScgaGVpZ2h0PScxNTEuMycgZmlsbD0nI2UxNTc1OSc+PHRpdGxlPmthcmF0c3ViYSBwMzg0X25pc3Q6IDEuODU4w5cgWzEuODUyLCAxLjg3N108L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nNTUyLjMnIHgyPSc1NTIuMycgeTE9JzIxOS4yJyB5Mj0nMjE3LjEnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzU1Ny4yJyB5PScyMDAuMCcgd2lkdGg9JzguMScgaGVpZ2h0PScxNzAuMCcgZmlsbD0nIzc2YjdiMic+PHRpdGxlPnNxcl9iaW5nY2QgcDM4NF9uaXN0OiAyLjA4N8OXIFsyLjA3OSwgMi4wOTRdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzU2MS4zJyB4Mj0nNTYxLjMnIHkxPScyMDAuNycgeTI9JzE5OS40JyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc1NjYuMicgeT0nMTYxLjknIHdpZHRoPSc4LjEnIGhlaWdodD0nMjA4LjEnIGZpbGw9JyM1OWExNGYnPjx0aXRsZT5zcXJfd25hZjQgcDM4NF9uaXN0OiAyLjU1NcOXIFsyLjU0NiwgMi41NjZdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzU3MC4zJyB4Mj0nNTcwLjMnIHkxPScxNjIuNicgeTI9JzE2MS4wJyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc1NzUuMicgeT0nMTU4LjEnIHdpZHRoPSc4LjEnIGhlaWdodD0nMjExLjknIGZpbGw9JyNlZGM5NDgnPjx0aXRsZT5zcXJfd25hZjUgcDM4NF9uaXN0OiAyLjYwMcOXIFsyLjU4NywgMi42MjJdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzU3OS4zJyB4Mj0nNTc5LjMnIHkxPScxNTkuMycgeTI9JzE1Ni40JyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc1ODQuMicgeT0nMjEwLjMnIHdpZHRoPSc4LjEnIGhlaWdodD0nMTU5LjcnIGZpbGw9JyNiMDdhYTEnPjx0aXRsZT50dW5lZCBwMzg0X25pc3Q6IDEuOTYxw5cgWzEuOTQ4LCAxLjk3MF08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nNTg4LjMnIHgyPSc1ODguMycgeTE9JzIxMS40JyB5Mj0nMjA5LjYnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzU5My4yJyB5PScxNTguMScgd2lkdGg9JzguMScgaGVpZ2h0PScyMTEuOScgZmlsbD0nI2ZmOWRhNyc+PHRpdGxlPnR1bmVkX3duYWYgcDM4NF9uaXN0OiAyLjYwMsOXIFsyLjU5NSwgMi42MjJdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzU5Ny4zJyB4Mj0nNTk3LjMnIHkxPScxNTguNicgeTI9JzE1Ni40JyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc2MDIuMicgeT0nMTU4LjYnIHdpZHRoPSc4LjEnIGhlaWdodD0nMjExLjQnIGZpbGw9JyM5Yzc1NWYnPjx0aXRsZT5wcm9kX3ZhcnRpbWUgcDM4NF9uaXN0OiAyLjU5NsOXIFsyLjU4OSwgMi42MjBdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzYwNi4zJyB4Mj0nNjA2LjMnIHkxPScxNTkuMScgeTI9JzE1Ni42JyBzdHJva2U9JyMyMjInLz48dGV4dCB4PSc1NjYuMicgeT0nMzg4LjAnIHRleHQtYW5jaG9yPSdtaWRkbGUnPnAzODRfbmlzdDwvdGV4dD48dGV4dCB4PSc1NjYuMicgeT0nNDAzLjAnIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9JyM1NTUnPjYgbGltYnM8L3RleHQ+PHJlY3QgeD0nNjMzLjgnIHk9JzI4OC41JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzgxLjUnIGZpbGw9JyM5YWEwYTYnPjx0aXRsZT5wYWQ5X2Npb3MjYWEgcDQ0OF9nb2xkaWxvY2tzOiAxLjAwMcOXIFswLjk5OSwgMS4wMDVdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzYzNy44JyB4Mj0nNjM3LjgnIHkxPScyODguNycgeTI9JzI4OC4xJyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc2NDIuOCcgeT0nMjQ3LjAnIHdpZHRoPSc4LjEnIGhlaWdodD0nMTIzLjAnIGZpbGw9JyM0ZTc5YTcnPjx0aXRsZT5jaW9zIHA0NDhfZ29sZGlsb2NrczogMS41MTHDlyBbMS41MDUsIDEuNTIyXTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPSc2NDYuOCcgeDI9JzY0Ni44JyB5MT0nMjQ3LjQnIHkyPScyNDYuMCcgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nNjUxLjgnIHk9JzI0Mi40JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzEyNy42JyBmaWxsPScjZjI4ZTJiJz48dGl0bGU+c3FyIHA0NDhfZ29sZGlsb2NrczogMS41NjbDlyBbMS41NTEsIDEuNTcwXTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPSc2NTUuOCcgeDI9JzY1NS44JyB5MT0nMjQzLjcnIHkyPScyNDIuMScgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nNjYwLjgnIHk9JzI0Ny41JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzEyMi41JyBmaWxsPScjZTE1NzU5Jz48dGl0bGU+a2FyYXRzdWJhIHA0NDhfZ29sZGlsb2NrczogMS41MDTDlyBbMS40OTksIDEuNTA4XTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPSc2NjQuOCcgeDI9JzY2NC44JyB5MT0nMjQ4LjAnIHkyPScyNDcuMScgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nNjY5LjgnIHk9JzIzMS45JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzEzOC4xJyBmaWxsPScjNzZiN2IyJz48dGl0bGU+c3FyX2JpbmdjZCBwNDQ4X2dvbGRpbG9ja3M6IDEuNjk1w5cgWzEuNjg4LCAxLjcxMV08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nNjczLjgnIHgyPSc2NzMuOCcgeTE9JzIzMi41JyB5Mj0nMjMwLjYnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzY3OC44JyB5PScxOTkuNCcgd2lkdGg9JzguMScgaGVpZ2h0PScxNzAuNicgZmlsbD0nIzU5YTE0Zic+PHRpdGxlPnNxcl93bmFmNCBwNDQ4X2dvbGRpbG9ja3M6IDIuMDk0w5cgWzIuMDg1LCAyLjEwMV08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nNjgyLjgnIHgyPSc2ODIuOCcgeTE9JzIwMC4yJyB5Mj0nMTk4LjknIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzY4Ny44JyB5PScxOTYuMCcgd2lkdGg9JzguMScgaGVpZ2h0PScxNzQuMCcgZmlsbD0nI2VkYzk0OCc+PHRpdGxlPnNxcl93bmFmNSBwNDQ4X2dvbGRpbG9ja3M6IDIuMTM3w5cgWzIuMTI4LCAyLjE0OV08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nNjkxLjgnIHgyPSc2OTEuOCcgeTE9JzE5Ni43JyB5Mj0nMTk1LjAnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzY5Ni44JyB5PScyNDIuMycgd2lkdGg9JzguMScgaGVpZ2h0PScxMjcuNycgZmlsbD0nI2IwN2FhMSc+PHRpdGxlPnR1bmVkIHA0NDhfZ29sZGlsb2NrczogMS41NjjDlyBbMS41NjAsIDEuNTc0XTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPSc3MDAuOCcgeDI9JzcwMC44JyB5MT0nMjQyLjknIHkyPScyNDEuOCcgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nNzA1LjgnIHk9JzE5NS42JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzE3NC40JyBmaWxsPScjZmY5ZGE3Jz48dGl0bGU+dHVuZWRfd25hZiBwNDQ4X2dvbGRpbG9ja3M6IDIuMTQxw5cgWzIuMTM3LCAyLjE2NV08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nNzA5LjgnIHgyPSc3MDkuOCcgeTE9JzE5Ni4wJyB5Mj0nMTkzLjcnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzcxNC44JyB5PScxOTUuNycgd2lkdGg9JzguMScgaGVpZ2h0PScxNzQuMycgZmlsbD0nIzljNzU1Zic+PHRpdGxlPnByb2RfdmFydGltZSBwNDQ4X2dvbGRpbG9ja3M6IDIuMTQww5cgWzIuMTM2LCAyLjE1Nl08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nNzE4LjgnIHgyPSc3MTguOCcgeTE9JzE5Ni4wJyB5Mj0nMTk0LjQnIHN0cm9rZT0nIzIyMicvPjx0ZXh0IHg9JzY3OC44JyB5PSczODguMCcgdGV4dC1hbmNob3I9J21pZGRsZSc+cDQ0OF9nb2xkaWxvY2tzPC90ZXh0Pjx0ZXh0IHg9JzY3OC44JyB5PSc0MDMuMCcgdGV4dC1hbmNob3I9J21pZGRsZScgZmlsbD0nIzU1NSc+NyBsaW1iczwvdGV4dD48cmVjdCB4PSc3NDYuMicgeT0nMjg4LjUnIHdpZHRoPSc4LjEnIGhlaWdodD0nODEuNScgZmlsbD0nIzlhYTBhNic+PHRpdGxlPnBhZDlfY2lvcyNhYSBwNTEyX3BtYXg6IDEuMDAxw5cgWzAuOTkxLCAxLjAxMV08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nNzUwLjMnIHgyPSc3NTAuMycgeTE9JzI4OS4zJyB5Mj0nMjg3LjYnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9Jzc1NS4yJyB5PScyNzMuNicgd2lkdGg9JzguMScgaGVpZ2h0PSc5Ni40JyBmaWxsPScjNGU3OWE3Jz48dGl0bGU+Y2lvcyBwNTEyX3BtYXg6IDEuMTgzw5cgWzEuMTc1LCAxLjE4Nl08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nNzU5LjMnIHgyPSc3NTkuMycgeTE9JzI3NC4zJyB5Mj0nMjczLjQnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9Jzc2NC4yJyB5PScyNjcuMScgd2lkdGg9JzguMScgaGVpZ2h0PScxMDIuOScgZmlsbD0nI2YyOGUyYic+PHRpdGxlPnNxciBwNTEyX3BtYXg6IDEuMjYzw5cgWzEuMjUzLCAxLjI3OF08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nNzY4LjMnIHgyPSc3NjguMycgeTE9JzI2OC4wJyB5Mj0nMjY1LjknIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9Jzc3My4yJyB5PScyNjcuMCcgd2lkdGg9JzguMScgaGVpZ2h0PScxMDMuMCcgZmlsbD0nI2UxNTc1OSc+PHRpdGxlPmthcmF0c3ViYSBwNTEyX3BtYXg6IDEuMjY1w5cgWzEuMjQ4LCAxLjI2OF08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nNzc3LjMnIHgyPSc3NzcuMycgeTE9JzI2OC40JyB5Mj0nMjY2LjcnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9Jzc4Mi4yJyB5PScyNTguOCcgd2lkdGg9JzguMScgaGVpZ2h0PScxMTEuMicgZmlsbD0nIzc2YjdiMic+PHRpdGxlPnNxcl9iaW5nY2QgcDUxMl9wbWF4OiAxLjM2NcOXIFsxLjM1OCwgMS4zNzJdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9Jzc4Ni4zJyB4Mj0nNzg2LjMnIHkxPScyNTkuNCcgeTI9JzI1OC4zJyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc3OTEuMicgeT0nMjMwLjknIHdpZHRoPSc4LjEnIGhlaWdodD0nMTM5LjEnIGZpbGw9JyM1OWExNGYnPjx0aXRsZT5zcXJfd25hZjQgcDUxMl9wbWF4OiAxLjcwN8OXIFsxLjY4NywgMS43MjJdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9Jzc5NS4zJyB4Mj0nNzk1LjMnIHkxPScyMzIuNicgeTI9JzIyOS43JyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc4MDAuMicgeT0nMjI3LjYnIHdpZHRoPSc4LjEnIGhlaWdodD0nMTQyLjQnIGZpbGw9JyNlZGM5NDgnPjx0aXRsZT5zcXJfd25hZjUgcDUxMl9wbWF4OiAxLjc0OcOXIFsxLjcyOSwgMS43NjNdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzgwNC4zJyB4Mj0nODA0LjMnIHkxPScyMjkuMicgeTI9JzIyNi40JyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc4MDkuMicgeT0nMjY3LjAnIHdpZHRoPSc4LjEnIGhlaWdodD0nMTAzLjAnIGZpbGw9JyNiMDdhYTEnPjx0aXRsZT50dW5lZCBwNTEyX3BtYXg6IDEuMjY1w5cgWzEuMjQ1LCAxLjI3MV08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nODEzLjMnIHgyPSc4MTMuMycgeTE9JzI2OC42JyB5Mj0nMjY2LjUnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzgxOC4yJyB5PScyMjcuOScgd2lkdGg9JzguMScgaGVpZ2h0PScxNDIuMScgZmlsbD0nI2ZmOWRhNyc+PHRpdGxlPnR1bmVkX3duYWYgcDUxMl9wbWF4OiAxLjc0NcOXIFsxLjcyOCwgMS43NTVdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzgyMi4zJyB4Mj0nODIyLjMnIHkxPScyMjkuMycgeTI9JzIyNy4xJyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc4MjcuMicgeT0nMjI3LjgnIHdpZHRoPSc4LjEnIGhlaWdodD0nMTQyLjInIGZpbGw9JyM5Yzc1NWYnPjx0aXRsZT5wcm9kX3ZhcnRpbWUgcDUxMl9wbWF4OiAxLjc0NsOXIFsxLjcyMywgMS43NjVdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzgzMS4zJyB4Mj0nODMxLjMnIHkxPScyMjkuNycgeTI9JzIyNi4yJyBzdHJva2U9JyMyMjInLz48dGV4dCB4PSc3OTEuMicgeT0nMzg4LjAnIHRleHQtYW5jaG9yPSdtaWRkbGUnPnA1MTJfcG1heDwvdGV4dD48dGV4dCB4PSc3OTEuMicgeT0nNDAzLjAnIHRleHQtYW5jaG9yPSdtaWRkbGUnIGZpbGw9JyM1NTUnPjggbGltYnM8L3RleHQ+PHJlY3QgeD0nODU4LjgnIHk9JzI4OC40JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzgxLjYnIGZpbGw9JyM5YWEwYTYnPjx0aXRsZT5wYWQ5X2Npb3MjYWEgcDUyMV9tZXJzZW5uZTogMS4wMDLDlyBbMC45OTcsIDEuMDEzXTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPSc4NjIuOCcgeDI9Jzg2Mi44JyB5MT0nMjg4LjgnIHkyPScyODcuNScgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nODY3LjgnIHk9JzI4OC43JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzgxLjMnIGZpbGw9JyM0ZTc5YTcnPjx0aXRsZT5jaW9zIHA1MjFfbWVyc2VubmU6IDAuOTk4w5cgWzAuOTg5LCAxLjAwNF08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nODcxLjgnIHgyPSc4NzEuOCcgeTE9JzI4OS41JyB5Mj0nMjg4LjInIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9Jzg3Ni44JyB5PScyODAuOScgd2lkdGg9JzguMScgaGVpZ2h0PSc4OS4xJyBmaWxsPScjZjI4ZTJiJz48dGl0bGU+c3FyIHA1MjFfbWVyc2VubmU6IDEuMDk0w5cgWzEuMDg3LCAxLjEwMl08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nODgwLjgnIHgyPSc4ODAuOCcgeTE9JzI4MS41JyB5Mj0nMjgwLjMnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9Jzg4NS44JyB5PScyODMuNScgd2lkdGg9JzguMScgaGVpZ2h0PSc4Ni41JyBmaWxsPScjZTE1NzU5Jz48dGl0bGU+a2FyYXRzdWJhIHA1MjFfbWVyc2VubmU6IDEuMDYxw5cgWzEuMDUzLCAxLjA3M108L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nODg5LjgnIHgyPSc4ODkuOCcgeTE9JzI4NC4yJyB5Mj0nMjgyLjYnIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9Jzg5NC44JyB5PScyNzMuMycgd2lkdGg9JzguMScgaGVpZ2h0PSc5Ni43JyBmaWxsPScjNzZiN2IyJz48dGl0bGU+c3FyX2JpbmdjZCBwNTIxX21lcnNlbm5lOiAxLjE4N8OXIFsxLjE3MSwgMS4xOTNdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9Jzg5OC44JyB4Mj0nODk4LjgnIHkxPScyNzQuNicgeTI9JzI3Mi44JyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc5MDMuOCcgeT0nMjQ5LjAnIHdpZHRoPSc4LjEnIGhlaWdodD0nMTIxLjAnIGZpbGw9JyM1OWExNGYnPjx0aXRsZT5zcXJfd25hZjQgcDUyMV9tZXJzZW5uZTogMS40ODXDlyBbMS40NzQsIDEuNTAzXTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPSc5MDcuOCcgeDI9JzkwNy44JyB5MT0nMjQ5LjknIHkyPScyNDcuNicgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nOTEyLjgnIHk9JzI0NC44JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzEyNS4yJyBmaWxsPScjZWRjOTQ4Jz48dGl0bGU+c3FyX3duYWY1IHA1MjFfbWVyc2VubmU6IDEuNTM3w5cgWzEuNTMwLCAxLjU0OV08L3RpdGxlPjwvcmVjdD48bGluZSB4MT0nOTE2LjgnIHgyPSc5MTYuOCcgeTE9JzI0NS40JyB5Mj0nMjQzLjknIHN0cm9rZT0nIzIyMicvPjxyZWN0IHg9JzkyMS44JyB5PScyODAuNycgd2lkdGg9JzguMScgaGVpZ2h0PSc4OS4zJyBmaWxsPScjYjA3YWExJz48dGl0bGU+dHVuZWQgcDUyMV9tZXJzZW5uZTogMS4wOTbDlyBbMS4wODgsIDEuMTAxXTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPSc5MjUuOCcgeDI9JzkyNS44JyB5MT0nMjgxLjQnIHkyPScyODAuMycgc3Ryb2tlPScjMjIyJy8+PHJlY3QgeD0nOTMwLjgnIHk9JzI0NS43JyB3aWR0aD0nOC4xJyBoZWlnaHQ9JzEyNC4zJyBmaWxsPScjZmY5ZGE3Jz48dGl0bGU+dHVuZWRfd25hZiBwNTIxX21lcnNlbm5lOiAxLjUyNsOXIFsxLjUxMywgMS41NDNdPC90aXRsZT48L3JlY3Q+PGxpbmUgeDE9JzkzNC44JyB4Mj0nOTM0LjgnIHkxPScyNDYuOCcgeTI9JzI0NC40JyBzdHJva2U9JyMyMjInLz48cmVjdCB4PSc5MzkuOCcgeT0nMjQ1LjMnIHdpZHRoPSc4LjEnIGhlaWdodD0nMTI0LjcnIGZpbGw9JyM5Yzc1NWYnPjx0aXRsZT5wcm9kX3ZhcnRpbWUgcDUyMV9tZXJzZW5uZTogMS41MzHDlyBbMS41MjYsIDEuNTQzXTwvdGl0bGU+PC9yZWN0PjxsaW5lIHgxPSc5NDMuOCcgeDI9Jzk0My44JyB5MT0nMjQ1LjcnIHkyPScyNDQuMycgc3Ryb2tlPScjMjIyJy8+PHRleHQgeD0nOTAzLjgnIHk9JzM4OC4wJyB0ZXh0LWFuY2hvcj0nbWlkZGxlJz5wNTIxX21lcnNlbm5lPC90ZXh0Pjx0ZXh0IHg9JzkwMy44JyB5PSc0MDMuMCcgdGV4dC1hbmNob3I9J21pZGRsZScgZmlsbD0nIzU1NSc+OSBsaW1iczwvdGV4dD48cmVjdCB4PSc2MCcgeT0nNDM2JyB3aWR0aD0nMTInIGhlaWdodD0nMTInIGZpbGw9JyM5YWEwYTYnLz48dGV4dCB4PSc3NicgeT0nNDQ2Jz5wYWQ5X2Npb3MjYWE8L3RleHQ+PHJlY3QgeD0nMjEwJyB5PSc0MzYnIHdpZHRoPScxMicgaGVpZ2h0PScxMicgZmlsbD0nIzRlNzlhNycvPjx0ZXh0IHg9JzIyNicgeT0nNDQ2Jz5jaW9zPC90ZXh0PjxyZWN0IHg9JzM2MCcgeT0nNDM2JyB3aWR0aD0nMTInIGhlaWdodD0nMTInIGZpbGw9JyNmMjhlMmInLz48dGV4dCB4PSczNzYnIHk9JzQ0Nic+c3FyPC90ZXh0PjxyZWN0IHg9JzUxMCcgeT0nNDM2JyB3aWR0aD0nMTInIGhlaWdodD0nMTInIGZpbGw9JyNlMTU3NTknLz48dGV4dCB4PSc1MjYnIHk9JzQ0Nic+a2FyYXRzdWJhPC90ZXh0PjxyZWN0IHg9JzY2MCcgeT0nNDM2JyB3aWR0aD0nMTInIGhlaWdodD0nMTInIGZpbGw9JyM3NmI3YjInLz48dGV4dCB4PSc2NzYnIHk9JzQ0Nic+c3FyX2JpbmdjZDwvdGV4dD48cmVjdCB4PSc4MTAnIHk9JzQzNicgd2lkdGg9JzEyJyBoZWlnaHQ9JzEyJyBmaWxsPScjNTlhMTRmJy8+PHRleHQgeD0nODI2JyB5PSc0NDYnPnNxcl93bmFmNDwvdGV4dD48cmVjdCB4PSc2MCcgeT0nNDU2JyB3aWR0aD0nMTInIGhlaWdodD0nMTInIGZpbGw9JyNlZGM5NDgnLz48dGV4dCB4PSc3NicgeT0nNDY2Jz5zcXJfd25hZjU8L3RleHQ+PHJlY3QgeD0nMjEwJyB5PSc0NTYnIHdpZHRoPScxMicgaGVpZ2h0PScxMicgZmlsbD0nI2IwN2FhMScvPjx0ZXh0IHg9JzIyNicgeT0nNDY2Jz50dW5lZDwvdGV4dD48cmVjdCB4PSczNjAnIHk9JzQ1Nicgd2lkdGg9JzEyJyBoZWlnaHQ9JzEyJyBmaWxsPScjZmY5ZGE3Jy8+PHRleHQgeD0nMzc2JyB5PSc0NjYnPnR1bmVkX3duYWY8L3RleHQ+PHJlY3QgeD0nNTEwJyB5PSc0NTYnIHdpZHRoPScxMicgaGVpZ2h0PScxMicgZmlsbD0nIzljNzU1ZicvPjx0ZXh0IHg9JzUyNicgeT0nNDY2Jz5wcm9kX3ZhcnRpbWU8L3RleHQ+PC9zdmc+Cg==" alt="Scalar multiplication speedup per arm and field" />
+<figcaption aria-hidden="true">Scalar multiplication speedup per arm and
+field</figcaption>
+</figure>
+<p>Where the gain comes from (run 4, paired medians against the
+baseline):</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">limbs</th>
+<th style="text-align: right;">exact width (<code>cios</code>)</th>
+<th style="text-align: right;">+ squaring (<code>sqr</code>)</th>
+<th style="text-align: right;">+ bingcd inverse</th>
+<th style="text-align: right;">+ wNAF-5 (<code>sqr_wnaf5</code>)</th>
+<th style="text-align: right;">Karatsuba instead of CIOS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1.002×</td>
+<td style="text-align: right;">0.969×</td>
+<td style="text-align: right;">0.983×</td>
+<td style="text-align: right;">1.152×</td>
+<td style="text-align: right;">0.973×</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0.999×</td>
+<td style="text-align: right;">0.986×</td>
+<td style="text-align: right;">1.031×</td>
+<td style="text-align: right;">1.225×</td>
+<td style="text-align: right;">0.986×</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">1.000×</td>
+<td style="text-align: right;">1.008×</td>
+<td style="text-align: right;">1.048×</td>
+<td style="text-align: right;">1.275×</td>
+<td style="text-align: right;">0.933×</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">2.588×</td>
+<td style="text-align: right;">2.761×</td>
+<td style="text-align: right;">2.927×</td>
+<td style="text-align: right;">3.682×</td>
+<td style="text-align: right;">2.856× ²</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">1.956×</td>
+<td style="text-align: right;">1.961×</td>
+<td style="text-align: right;">2.087×</td>
+<td style="text-align: right;">2.601×</td>
+<td style="text-align: right;">1.858×</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">1.511×</td>
+<td style="text-align: right;">1.566×</td>
+<td style="text-align: right;">1.695×</td>
+<td style="text-align: right;">2.137×</td>
+<td style="text-align: right;">1.504×</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">1.183×</td>
+<td style="text-align: right;">1.263×</td>
+<td style="text-align: right;">1.365×</td>
+<td style="text-align: right;">1.749×</td>
+<td style="text-align: right;">1.265×</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">0.998×</td>
+<td style="text-align: right;">1.094×</td>
+<td style="text-align: right;">1.187×</td>
+<td style="text-align: right;">1.537×</td>
+<td style="text-align: right;">1.061×</td>
+</tr>
+</tbody>
+</table>
+<p>² N = 5 is odd, so the Karatsuba arm falls back to the schoolbook +
+SOS product there; that number measures SOS, not Karatsuba.</p>
+<p>Kernel latency (ns per dependent operation; full tables in
+<code>run{1..4}/summary.md</code>). Dedicated squaring vs CIOS
+<code>a·a</code>: 0.88–0.96× at N ≥ 4 in run 4. One-level Karatsuba vs
+the CIOS product: <strong>slower</strong> at every even width in both
+final runs, by 3–30% (run 4: 1.03×, 1.12×, 1.30× at N = 4, 6, 8; run 3:
+1.09×, 1.15×, 1.05×). Binary-GCD inverse vs Fermat power: 0.24× at 2
+limbs down to 0.066× at 9 limbs.</p>
+<figure>
+<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc3NjAnIGhlaWdodD0nNDIwJyBmb250LWZhbWlseT0nc2Fucy1zZXJpZicgZm9udC1zaXplPScxMic+PHJlY3Qgd2lkdGg9JzEwMCUnIGhlaWdodD0nMTAwJScgZmlsbD0nd2hpdGUnLz48dGV4dCB4PSc3MCcgeT0nMjInIGZvbnQtc2l6ZT0nMTQnIGZvbnQtd2VpZ2h0PSdib2xkJz5Nb2R1bGFyIG11bHRpcGx5IC8gc3F1YXJlIGxhdGVuY3kgKG5zLCBsb2cgc2NhbGUpIHZzIGxpbWJzPC90ZXh0PjxsaW5lIHgxPSc3MCcgeDI9JzczMCcgeTE9JzM1MC4wJyB5Mj0nMzUwLjAnIHN0cm9rZT0nI2UwZTBlMCcvPjx0ZXh0IHg9JzY0JyB5PSczNTQuMCcgdGV4dC1hbmNob3I9J2VuZCc+MTwvdGV4dD48bGluZSB4MT0nNzAnIHgyPSc3MzAnIHkxPScyNDYuNycgeTI9JzI0Ni43JyBzdHJva2U9JyNlMGUwZTAnLz48dGV4dCB4PSc2NCcgeT0nMjUwLjcnIHRleHQtYW5jaG9yPSdlbmQnPjEwPC90ZXh0PjxsaW5lIHgxPSc3MCcgeDI9JzczMCcgeTE9JzE0My4zJyB5Mj0nMTQzLjMnIHN0cm9rZT0nI2UwZTBlMCcvPjx0ZXh0IHg9JzY0JyB5PScxNDcuMycgdGV4dC1hbmNob3I9J2VuZCc+MTAwPC90ZXh0PjxsaW5lIHgxPSc3MCcgeDI9JzczMCcgeTE9JzQwLjAnIHkyPSc0MC4wJyBzdHJva2U9JyNlMGUwZTAnLz48dGV4dCB4PSc2NCcgeT0nNDQuMCcgdGV4dC1hbmNob3I9J2VuZCc+MTAwMDwvdGV4dD48dGV4dCB4PSc3MC4wJyB5PSczNjgnIHRleHQtYW5jaG9yPSdtaWRkbGUnPjI8L3RleHQ+PHRleHQgeD0nMTY0LjMnIHk9JzM2OCcgdGV4dC1hbmNob3I9J21pZGRsZSc+MzwvdGV4dD48dGV4dCB4PScyNTguNicgeT0nMzY4JyB0ZXh0LWFuY2hvcj0nbWlkZGxlJz40PC90ZXh0Pjx0ZXh0IHg9JzM1Mi45JyB5PSczNjgnIHRleHQtYW5jaG9yPSdtaWRkbGUnPjU8L3RleHQ+PHRleHQgeD0nNDQ3LjEnIHk9JzM2OCcgdGV4dC1hbmNob3I9J21pZGRsZSc+NjwvdGV4dD48dGV4dCB4PSc1NDEuNCcgeT0nMzY4JyB0ZXh0LWFuY2hvcj0nbWlkZGxlJz43PC90ZXh0Pjx0ZXh0IHg9JzYzNS43JyB5PSczNjgnIHRleHQtYW5jaG9yPSdtaWRkbGUnPjg8L3RleHQ+PHRleHQgeD0nNzMwLjAnIHk9JzM2OCcgdGV4dC1hbmNob3I9J21pZGRsZSc+OTwvdGV4dD48dGV4dCB4PSc0MDAuMCcgeT0nMzg2JyB0ZXh0LWFuY2hvcj0nbWlkZGxlJz42NC1iaXQgbGltYnM8L3RleHQ+PHBvbHlsaW5lIHBvaW50cz0nNzAuMCwxMjYuOCAxNjQuMywxNDEuMyAyNTguNiwxMjIuMyAzNTIuOSwxMTIuNyA0NDcuMSwxMDQuNCA1NDEuNCw5NS43IDYzNS43LDk3LjkgNzMwLjAsNjcuMCcgZmlsbD0nbm9uZScgc3Ryb2tlPScjNGU3OWE3JyBzdHJva2Utd2lkdGg9JzInLz48Y2lyY2xlIGN4PSc3MC4wJyBjeT0nMTI2LjgnIHI9JzMnIGZpbGw9JyM0ZTc5YTcnPjx0aXRsZT5iaWd1aW50X211bCAyIGxpbWJzOiAxNDQuNDMgbnM8L3RpdGxlPjwvY2lyY2xlPjxjaXJjbGUgY3g9JzE2NC4zJyBjeT0nMTQxLjMnIHI9JzMnIGZpbGw9JyM0ZTc5YTcnPjx0aXRsZT5iaWd1aW50X211bCAzIGxpbWJzOiAxMDQuNTYgbnM8L3RpdGxlPjwvY2lyY2xlPjxjaXJjbGUgY3g9JzI1OC42JyBjeT0nMTIyLjMnIHI9JzMnIGZpbGw9JyM0ZTc5YTcnPjx0aXRsZT5iaWd1aW50X211bCA0IGxpbWJzOiAxNTkuNzUgbnM8L3RpdGxlPjwvY2lyY2xlPjxjaXJjbGUgY3g9JzM1Mi45JyBjeT0nMTEyLjcnIHI9JzMnIGZpbGw9JyM0ZTc5YTcnPjx0aXRsZT5iaWd1aW50X211bCA1IGxpbWJzOiAxOTcuODMgbnM8L3RpdGxlPjwvY2lyY2xlPjxjaXJjbGUgY3g9JzQ0Ny4xJyBjeT0nMTA0LjQnIHI9JzMnIGZpbGw9JyM0ZTc5YTcnPjx0aXRsZT5iaWd1aW50X211bCA2IGxpbWJzOiAyMzcuOTAgbnM8L3RpdGxlPjwvY2lyY2xlPjxjaXJjbGUgY3g9JzU0MS40JyBjeT0nOTUuNycgcj0nMycgZmlsbD0nIzRlNzlhNyc+PHRpdGxlPmJpZ3VpbnRfbXVsIDcgbGltYnM6IDI4OS4xNyBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nNjM1LjcnIGN5PSc5Ny45JyByPSczJyBmaWxsPScjNGU3OWE3Jz48dGl0bGU+YmlndWludF9tdWwgOCBsaW1iczogMjc1LjA4IG5zPC90aXRsZT48L2NpcmNsZT48Y2lyY2xlIGN4PSc3MzAuMCcgY3k9JzY3LjAnIHI9JzMnIGZpbGw9JyM0ZTc5YTcnPjx0aXRsZT5iaWd1aW50X211bCA5IGxpbWJzOiA1NDcuOTUgbnM8L3RpdGxlPjwvY2lyY2xlPjxyZWN0IHg9JzcwJyB5PSczOTYnIHdpZHRoPScxMicgaGVpZ2h0PScxMicgZmlsbD0nIzRlNzlhNycvPjx0ZXh0IHg9Jzg2JyB5PSc0MDYnPmJpZ3VpbnRfbXVsPC90ZXh0Pjxwb2x5bGluZSBwb2ludHM9JzcwLjAsMjUzLjUgMTY0LjMsMjQxLjggMjU4LjYsMjIwLjggMzUyLjksMTg5LjggNDQ3LjEsMTc3LjIgNTQxLjQsMTYzLjggNjM1LjcsMTY0LjcgNzMwLjAsMTQ2LjYnIGZpbGw9J25vbmUnIHN0cm9rZT0nI2YyOGUyYicgc3Ryb2tlLXdpZHRoPScyJy8+PGNpcmNsZSBjeD0nNzAuMCcgY3k9JzI1My41JyByPSczJyBmaWxsPScjZjI4ZTJiJz48dGl0bGU+Y2lvc19tdWwgMiBsaW1iczogOC41OCBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nMTY0LjMnIGN5PScyNDEuOCcgcj0nMycgZmlsbD0nI2YyOGUyYic+PHRpdGxlPmNpb3NfbXVsIDMgbGltYnM6IDExLjE1IG5zPC90aXRsZT48L2NpcmNsZT48Y2lyY2xlIGN4PScyNTguNicgY3k9JzIyMC44JyByPSczJyBmaWxsPScjZjI4ZTJiJz48dGl0bGU+Y2lvc19tdWwgNCBsaW1iczogMTcuODAgbnM8L3RpdGxlPjwvY2lyY2xlPjxjaXJjbGUgY3g9JzM1Mi45JyBjeT0nMTg5LjgnIHI9JzMnIGZpbGw9JyNmMjhlMmInPjx0aXRsZT5jaW9zX211bCA1IGxpbWJzOiAzNS41MCBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nNDQ3LjEnIGN5PScxNzcuMicgcj0nMycgZmlsbD0nI2YyOGUyYic+PHRpdGxlPmNpb3NfbXVsIDYgbGltYnM6IDQ2Ljk5IG5zPC90aXRsZT48L2NpcmNsZT48Y2lyY2xlIGN4PSc1NDEuNCcgY3k9JzE2My44JyByPSczJyBmaWxsPScjZjI4ZTJiJz48dGl0bGU+Y2lvc19tdWwgNyBsaW1iczogNjMuNDEgbnM8L3RpdGxlPjwvY2lyY2xlPjxjaXJjbGUgY3g9JzYzNS43JyBjeT0nMTY0LjcnIHI9JzMnIGZpbGw9JyNmMjhlMmInPjx0aXRsZT5jaW9zX211bCA4IGxpbWJzOiA2Mi4xOCBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nNzMwLjAnIGN5PScxNDYuNicgcj0nMycgZmlsbD0nI2YyOGUyYic+PHRpdGxlPmNpb3NfbXVsIDkgbGltYnM6IDkyLjk5IG5zPC90aXRsZT48L2NpcmNsZT48cmVjdCB4PScxODInIHk9JzM5Nicgd2lkdGg9JzEyJyBoZWlnaHQ9JzEyJyBmaWxsPScjZjI4ZTJiJy8+PHRleHQgeD0nMTk4JyB5PSc0MDYnPmNpb3NfbXVsPC90ZXh0Pjxwb2x5bGluZSBwb2ludHM9JzcwLjAsMjU5LjcgMTY0LjMsMjM0LjUgMjU4LjYsMjE5LjcgMzUyLjksMTg2LjggNDQ3LjEsMTcxLjYgNTQxLjQsMTYyLjcgNjM1LjcsMTUzLjIgNzMwLjAsMTQ3LjgnIGZpbGw9J25vbmUnIHN0cm9rZT0nI2UxNTc1OScgc3Ryb2tlLXdpZHRoPScyJy8+PGNpcmNsZSBjeD0nNzAuMCcgY3k9JzI1OS43JyByPSczJyBmaWxsPScjZTE1NzU5Jz48dGl0bGU+Y2lvc19zcXIgMiBsaW1iczogNy40OSBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nMTY0LjMnIGN5PScyMzQuNScgcj0nMycgZmlsbD0nI2UxNTc1OSc+PHRpdGxlPmNpb3Nfc3FyIDMgbGltYnM6IDEzLjEwIG5zPC90aXRsZT48L2NpcmNsZT48Y2lyY2xlIGN4PScyNTguNicgY3k9JzIxOS43JyByPSczJyBmaWxsPScjZTE1NzU5Jz48dGl0bGU+Y2lvc19zcXIgNCBsaW1iczogMTguMjUgbnM8L3RpdGxlPjwvY2lyY2xlPjxjaXJjbGUgY3g9JzM1Mi45JyBjeT0nMTg2LjgnIHI9JzMnIGZpbGw9JyNlMTU3NTknPjx0aXRsZT5jaW9zX3NxciA1IGxpbWJzOiAzNy45OSBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nNDQ3LjEnIGN5PScxNzEuNicgcj0nMycgZmlsbD0nI2UxNTc1OSc+PHRpdGxlPmNpb3Nfc3FyIDYgbGltYnM6IDUzLjIzIG5zPC90aXRsZT48L2NpcmNsZT48Y2lyY2xlIGN4PSc1NDEuNCcgY3k9JzE2Mi43JyByPSczJyBmaWxsPScjZTE1NzU5Jz48dGl0bGU+Y2lvc19zcXIgNyBsaW1iczogNjQuOTEgbnM8L3RpdGxlPjwvY2lyY2xlPjxjaXJjbGUgY3g9JzYzNS43JyBjeT0nMTUzLjInIHI9JzMnIGZpbGw9JyNlMTU3NTknPjx0aXRsZT5jaW9zX3NxciA4IGxpbWJzOiA4MC4yNSBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nNzMwLjAnIGN5PScxNDcuOCcgcj0nMycgZmlsbD0nI2UxNTc1OSc+PHRpdGxlPmNpb3Nfc3FyIDkgbGltYnM6IDkwLjYwIG5zPC90aXRsZT48L2NpcmNsZT48cmVjdCB4PScyOTQnIHk9JzM5Nicgd2lkdGg9JzEyJyBoZWlnaHQ9JzEyJyBmaWxsPScjZTE1NzU5Jy8+PHRleHQgeD0nMzEwJyB5PSc0MDYnPmNpb3Nfc3FyPC90ZXh0Pjxwb2x5bGluZSBwb2ludHM9JzcwLjAsMjU0LjggMTY0LjMsMjQyLjIgMjU4LjYsMjE5LjYgMzUyLjksMTkzLjQgNDQ3LjEsMTcyLjEgNTQxLjQsMTU2LjkgNjM1LjcsMTUyLjggNzMwLjAsMTQyLjEnIGZpbGw9J25vbmUnIHN0cm9rZT0nIzc2YjdiMicgc3Ryb2tlLXdpZHRoPScyJy8+PGNpcmNsZSBjeD0nNzAuMCcgY3k9JzI1NC44JyByPSczJyBmaWxsPScjNzZiN2IyJz48dGl0bGU+a2FyYXRzdWJhX211bCAyIGxpbWJzOiA4LjM0IG5zPC90aXRsZT48L2NpcmNsZT48Y2lyY2xlIGN4PScxNjQuMycgY3k9JzI0Mi4yJyByPSczJyBmaWxsPScjNzZiN2IyJz48dGl0bGU+a2FyYXRzdWJhX211bCAzIGxpbWJzOiAxMS4wNSBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nMjU4LjYnIGN5PScyMTkuNicgcj0nMycgZmlsbD0nIzc2YjdiMic+PHRpdGxlPmthcmF0c3ViYV9tdWwgNCBsaW1iczogMTguMzAgbnM8L3RpdGxlPjwvY2lyY2xlPjxjaXJjbGUgY3g9JzM1Mi45JyBjeT0nMTkzLjQnIHI9JzMnIGZpbGw9JyM3NmI3YjInPjx0aXRsZT5rYXJhdHN1YmFfbXVsIDUgbGltYnM6IDMyLjc3IG5zPC90aXRsZT48L2NpcmNsZT48Y2lyY2xlIGN4PSc0NDcuMScgY3k9JzE3Mi4xJyByPSczJyBmaWxsPScjNzZiN2IyJz48dGl0bGU+a2FyYXRzdWJhX211bCA2IGxpbWJzOiA1Mi42NSBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nNTQxLjQnIGN5PScxNTYuOScgcj0nMycgZmlsbD0nIzc2YjdiMic+PHRpdGxlPmthcmF0c3ViYV9tdWwgNyBsaW1iczogNzMuODQgbnM8L3RpdGxlPjwvY2lyY2xlPjxjaXJjbGUgY3g9JzYzNS43JyBjeT0nMTUyLjgnIHI9JzMnIGZpbGw9JyM3NmI3YjInPjx0aXRsZT5rYXJhdHN1YmFfbXVsIDggbGltYnM6IDgwLjkwIG5zPC90aXRsZT48L2NpcmNsZT48Y2lyY2xlIGN4PSc3MzAuMCcgY3k9JzE0Mi4xJyByPSczJyBmaWxsPScjNzZiN2IyJz48dGl0bGU+a2FyYXRzdWJhX211bCA5IGxpbWJzOiAxMDIuODkgbnM8L3RpdGxlPjwvY2lyY2xlPjxyZWN0IHg9JzQwNicgeT0nMzk2JyB3aWR0aD0nMTInIGhlaWdodD0nMTInIGZpbGw9JyM3NmI3YjInLz48dGV4dCB4PSc0MjInIHk9JzQwNic+a2FyYXRzdWJhX211bDwvdGV4dD48cG9seWxpbmUgcG9pbnRzPSc3MC4wLDI1NC44IDE2NC4zLDI0Mi41IDI1OC42LDIyMi4xIDM1Mi45LDE5My40IDQ0Ny4xLDE2OS41IDU0MS40LDE1Ni43IDYzNS43LDE1OC4wIDczMC4wLDE0MS43JyBmaWxsPSdub25lJyBzdHJva2U9JyM1OWExNGYnIHN0cm9rZS13aWR0aD0nMicvPjxjaXJjbGUgY3g9JzcwLjAnIGN5PScyNTQuOCcgcj0nMycgZmlsbD0nIzU5YTE0Zic+PHRpdGxlPnNvc19tdWwgMiBsaW1iczogOC4zNCBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nMTY0LjMnIGN5PScyNDIuNScgcj0nMycgZmlsbD0nIzU5YTE0Zic+PHRpdGxlPnNvc19tdWwgMyBsaW1iczogMTAuOTcgbnM8L3RpdGxlPjwvY2lyY2xlPjxjaXJjbGUgY3g9JzI1OC42JyBjeT0nMjIyLjEnIHI9JzMnIGZpbGw9JyM1OWExNGYnPjx0aXRsZT5zb3NfbXVsIDQgbGltYnM6IDE3LjI5IG5zPC90aXRsZT48L2NpcmNsZT48Y2lyY2xlIGN4PSczNTIuOScgY3k9JzE5My40JyByPSczJyBmaWxsPScjNTlhMTRmJz48dGl0bGU+c29zX211bCA1IGxpbWJzOiAzMi44MCBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nNDQ3LjEnIGN5PScxNjkuNScgcj0nMycgZmlsbD0nIzU5YTE0Zic+PHRpdGxlPnNvc19tdWwgNiBsaW1iczogNTUuNzYgbnM8L3RpdGxlPjwvY2lyY2xlPjxjaXJjbGUgY3g9JzU0MS40JyBjeT0nMTU2LjcnIHI9JzMnIGZpbGw9JyM1OWExNGYnPjx0aXRsZT5zb3NfbXVsIDcgbGltYnM6IDc0LjMxIG5zPC90aXRsZT48L2NpcmNsZT48Y2lyY2xlIGN4PSc2MzUuNycgY3k9JzE1OC4wJyByPSczJyBmaWxsPScjNTlhMTRmJz48dGl0bGU+c29zX211bCA4IGxpbWJzOiA3Mi4wNSBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nNzMwLjAnIGN5PScxNDEuNycgcj0nMycgZmlsbD0nIzU5YTE0Zic+PHRpdGxlPnNvc19tdWwgOSBsaW1iczogMTAzLjY0IG5zPC90aXRsZT48L2NpcmNsZT48cmVjdCB4PSc1MTgnIHk9JzM5Nicgd2lkdGg9JzEyJyBoZWlnaHQ9JzEyJyBmaWxsPScjNTlhMTRmJy8+PHRleHQgeD0nNTM0JyB5PSc0MDYnPnNvc19tdWw8L3RleHQ+PHBvbHlsaW5lIHBvaW50cz0nNzAuMCwyNTkuNiAxNjQuMywyMzUuNyAyNTguNiwyMjUuNCAzNTIuOSwxOTIuMCA0NDcuMSwxNzYuMCA1NDEuNCwxNjguMSA2MzUuNywxNTcuNiA3MzAuMCwxNDkuNycgZmlsbD0nbm9uZScgc3Ryb2tlPScjZWRjOTQ4JyBzdHJva2Utd2lkdGg9JzInLz48Y2lyY2xlIGN4PSc3MC4wJyBjeT0nMjU5LjYnIHI9JzMnIGZpbGw9JyNlZGM5NDgnPjx0aXRsZT5zcXIgMiBsaW1iczogNy40OSBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nMTY0LjMnIGN5PScyMzUuNycgcj0nMycgZmlsbD0nI2VkYzk0OCc+PHRpdGxlPnNxciAzIGxpbWJzOiAxMi43NiBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nMjU4LjYnIGN5PScyMjUuNCcgcj0nMycgZmlsbD0nI2VkYzk0OCc+PHRpdGxlPnNxciA0IGxpbWJzOiAxNi4wNyBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nMzUyLjknIGN5PScxOTIuMCcgcj0nMycgZmlsbD0nI2VkYzk0OCc+PHRpdGxlPnNxciA1IGxpbWJzOiAzMy44NSBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nNDQ3LjEnIGN5PScxNzYuMCcgcj0nMycgZmlsbD0nI2VkYzk0OCc+PHRpdGxlPnNxciA2IGxpbWJzOiA0OC4zMSBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nNTQxLjQnIGN5PScxNjguMScgcj0nMycgZmlsbD0nI2VkYzk0OCc+PHRpdGxlPnNxciA3IGxpbWJzOiA1Ny42MiBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nNjM1LjcnIGN5PScxNTcuNicgcj0nMycgZmlsbD0nI2VkYzk0OCc+PHRpdGxlPnNxciA4IGxpbWJzOiA3Mi43NyBuczwvdGl0bGU+PC9jaXJjbGU+PGNpcmNsZSBjeD0nNzMwLjAnIGN5PScxNDkuNycgcj0nMycgZmlsbD0nI2VkYzk0OCc+PHRpdGxlPnNxciA5IGxpbWJzOiA4Ni43NCBuczwvdGl0bGU+PC9jaXJjbGU+PHJlY3QgeD0nNjMwJyB5PSczOTYnIHdpZHRoPScxMicgaGVpZ2h0PScxMicgZmlsbD0nI2VkYzk0OCcvPjx0ZXh0IHg9JzY0NicgeT0nNDA2Jz5zcXI8L3RleHQ+PC9zdmc+Cg==" alt="Modular multiply and square latency" />
+<figcaption aria-hidden="true">Modular multiply and square
+latency</figcaption>
+</figure>
+<h2 id="reading">Reading</h2>
+<ul>
+<li>Most of the <code>scalar_mul</code> gain at 5–8 limbs is the
+dispatch fix, not a new multiplication algorithm: those moduli were
+paying for 9-limb arithmetic.</li>
+<li>Asymptotically fast multiplication does not pay at these sizes. One
+Karatsuba level saves <code>N²/4</code> word products but adds carries,
+two absolute differences and a recombination, and on this host it lost
+3–30% per product at N = 4, 6, 8 (and 7% per <code>k·P</code> at 4
+limbs). Toom-Cook, Schönhage–Strassen and Harvey–van der Hoeven have
+crossovers in the thousands to millions of bits; ECC fields are 2–9
+words. The levers here are fewer word products (squaring), the right
+width, fewer inversions, and fewer point additions.</li>
+<li>For variable-time public scalars the larger lever is the scalar side
+(wNAF: ~bits/6 additions instead of bits/2) together with an inversion
+that is cheap enough to normalise a precomputed table.</li>
+</ul>
+<h2 id="tests">Tests</h2>
+<ul>
+<li>New:
+<code>ecc::mont_vt::tests::{squaring_and_karatsuba_match_cios,   bingcd_inverse_matches_fermat, wnaf_digits_reconstruct}</code>
+(every width 1..=9, edge and random residues, all-ones carry chains, a
+composite modulus) and
+<code>ecc::point::mont_kernel_arms::{arms_match_biguint_ladder,   arms_handle_two_torsion}</code>
+(all arms and both production entry points against the
+<code>num-bigint</code> ladder on 2..9-limb primes; a 2-torsion
+base).</li>
+<li><code>cargo test --lib -- ecc::mont_vt ecc::point</code>: 26 passed.
+Whole <code>ecc::</code> module: 345 passed, 2 ignored.</li>
+<li>The 40 modules outside <code>ecc</code> that call
+<code>scalar_mul</code> / <code>scalar_mul_vartime</code>: 1093 passed,
+49 failed. All 49 are pre-existing in this sparse checkout: 36 panic on
+data files under <code>research/</code> that are not checked out, and
+the other 13 fail identically on the pre-change <code>point.rs</code> /
+<code>mont_vt.rs</code> (rebuilt and rerun one by one).</li>
+<li>The benchmark’s correctness gate (every arm, <code>scalar_mul</code>
+and <code>scalar_mul_vartime</code> equal to the <code>num-bigint</code>
+ladder on 38 scalars per field) passed in all four runs.</li>
+<li>Build note: the library test target needs more than this container’s
+~15 GB with debuginfo; it was built with
+<code>CARGO_PROFILE_DEV_DEBUG=0   CARGO_PROFILE_TEST_DEBUG=0 CARGO_PROFILE_DEV_CODEGEN_UNITS=64 -j 1</code>.</li>
+</ul>
+<h2 id="not-done-open">Not done / open</h2>
+<ul>
+<li>No ADX/MULX (<code>adcx</code>/<code>adox</code> dual carry chains)
+assembly kernel; the host has <code>adx</code> and <code>bmi2</code>.
+That is the next measurable lever for the product itself (it is how the
+fastest libraries reach ~2× over portable CIOS at 4 limbs).</li>
+<li>No “no-carry” CIOS variant for moduli with spare top bits (applies
+to 2^521−1 here, and to BN254/BLS12-381-style primes).</li>
+<li><code>scalar_mul_ct</code> (secret scalars) still runs
+<code>FieldElement</code> on <code>num-bigint</code> for generic primes;
+it was not touched.</li>
+<li>Single host, no PMU (cycles/IPC unavailable), not run on Iso Lab
+EKS; no independent replay. An EKS rerun of <code>mont_mul_bench</code>
+would make the numbers lab-grade.</li>
+</ul>
+<h2 id="files">Files</h2>
+<ul>
+<li><code>raw.jsonl.gz</code>, <code>raw_run2.jsonl.gz</code>,
+<code>raw_run3.jsonl.gz</code>, <code>raw_run4.jsonl.gz</code> — every
+timing row (gzip; kept in Git under the 64 KiB data limit because this
+session’s AWS identity could not write the artifact store, HeadObject
+403).</li>
+<li><code>run{1,2,3,4}/summary.md|json</code> — analysis output
+(<code>mont_mul_bench --analyze</code>), <code>run{3,4}/*.svg|png</code>
+— graphs.</li>
+<li><code>REPORT.html</code> / <code>REPORT.pdf</code> — this study as a
+report.</li>
+</ul>
+<p>Reproduce:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">cargo</span> build <span class="at">--release</span> <span class="at">--bin</span> mont_mul_bench</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">taskset</span> <span class="at">-c</span> 3 ./target/release/mont_mul_bench <span class="at">--rounds</span> 41 <span class="at">--batch</span> 30 <span class="at">--kernel-iters</span> 2000000 <span class="at">--seed</span> 7885634870099997748 <span class="at">--out</span> raw_run4.jsonl</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">./target/release/mont_mul_bench</span> <span class="at">--analyze</span> raw_run4.jsonl <span class="at">--report-dir</span> run4</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># or, from the committed data: gunzip -k raw_run4.jsonl.gz first</span></span></code></pre></div>
+</body>
+</html>

@@ -1,0 +1,180 @@
+{
+  "amendment_commit": "ccb82776e7bfc32b8929aba445a29d84ee237d8c",
+  "cells": [
+    {
+      "all_final_rank": 18,
+      "all_full_rank": {
+        "queries": 16,
+        "scan": {
+          "lookups": 528,
+          "pair_readds": 44,
+          "subtractions": 528
+        }
+      },
+      "all_independent_rows": 13,
+      "base_points": 33,
+      "base_sha256": "d9f69121c63a04c3f744c5be0e4ea488a030db0315794a4e05c7a9d3cd341807",
+      "collision_candidates": 11,
+      "columns_with_target": 18,
+      "curve_id": "ICV1:f2m-13-752c6463:181:8012:0x1:-7:unk:r:515ee5696294",
+      "extra_hits": 3106,
+      "extra_independent_rows": 3,
+      "field_degree": 13,
+      "first_final_rank": 18,
+      "first_full_rank": {
+        "queries": 26,
+        "scan": {
+          "lookups": 418,
+          "pair_readds": 17,
+          "subtractions": 418
+        }
+      },
+      "first_independent_rows": 13,
+      "hit_targets": 998,
+      "max_hits_per_target": 32,
+      "multihit_targets": 998,
+      "nonidentity_queries": 2002,
+      "nonzero_collision_rows": 11,
+      "pair_keys": 261,
+      "sample_targets": 2003,
+      "schema": "rootfind-multihit-screen/v1",
+      "seed_rank": 5,
+      "status": "passed",
+      "subgroup_order": 2003,
+      "total_hits": 4104
+    },
+    {
+      "all_final_rank": 71,
+      "all_full_rank": {
+        "queries": 92,
+        "scan": {
+          "lookups": 12788,
+          "pair_readds": 234,
+          "subtractions": 12788
+        }
+      },
+      "all_independent_rows": 60,
+      "base_points": 139,
+      "base_sha256": "013a0d4223494500cd06b48bf41b51dda2dd5add0009d1b89cdb0b7bd49c0a5a",
+      "collision_candidates": 30,
+      "columns_with_target": 71,
+      "curve_id": "ICV1:f2m-19-87f45376:797:523492:0x1:-7:unk:r:b6cf2467887c",
+      "extra_hits": 2065,
+      "extra_independent_rows": 18,
+      "field_degree": 19,
+      "first_final_rank": 71,
+      "first_full_rank": {
+        "queries": 115,
+        "scan": {
+          "lookups": 8741,
+          "pair_readds": 69,
+          "subtractions": 8741
+        }
+      },
+      "first_independent_rows": 60,
+      "hit_targets": 611,
+      "max_hits_per_target": 14,
+      "multihit_targets": 611,
+      "nonidentity_queries": 1024,
+      "nonzero_collision_rows": 30,
+      "pair_keys": 4800,
+      "sample_targets": 1024,
+      "schema": "rootfind-multihit-screen/v1",
+      "seed_rank": 11,
+      "status": "passed",
+      "subgroup_order": 130873,
+      "total_hits": 2676
+    },
+    {
+      "all_final_rank": 139,
+      "all_full_rank": {
+        "queries": 599,
+        "scan": {
+          "lookups": 164725,
+          "pair_readds": 696,
+          "subtractions": 164725
+        }
+      },
+      "all_independent_rows": 116,
+      "base_points": 275,
+      "base_sha256": "686cba2fafe973e49139c2722df47bf728340e25a4df5faad8b51dfa91df3877",
+      "collision_candidates": 64,
+      "columns_with_target": 139,
+      "curve_id": "ICV1:f2m-23-c07a6b8c:5197:8383412:0x1:-7:unk:r:69e76b739aa7",
+      "extra_hits": 912,
+      "extra_independent_rows": 19,
+      "field_degree": 23,
+      "first_final_rank": 139,
+      "first_full_rank": {
+        "queries": 740,
+        "scan": {
+          "lookups": 152582,
+          "pair_readds": 238,
+          "subtractions": 152582
+        }
+      },
+      "first_independent_rows": 116,
+      "hit_targets": 337,
+      "max_hits_per_target": 12,
+      "multihit_targets": 337,
+      "nonidentity_queries": 1024,
+      "nonzero_collision_rows": 64,
+      "pair_keys": 18842,
+      "sample_targets": 1024,
+      "schema": "rootfind-multihit-screen/v1",
+      "seed_rank": 23,
+      "status": "passed",
+      "subgroup_order": 2095853,
+      "total_hits": 1249
+    }
+  ],
+  "claim_boundary": "Deterministic target stream and scan-operation counts only; no complete-call timing or attack-cost ordering.",
+  "derived": [
+    {
+      "extra_pair_lookups": 110,
+      "extra_pair_readds": 27,
+      "extra_scan_subtractions": 110,
+      "field_degree": 13,
+      "saved_target_queries": 10
+    },
+    {
+      "extra_pair_lookups": 4047,
+      "extra_pair_readds": 165,
+      "extra_scan_subtractions": 4047,
+      "field_degree": 19,
+      "saved_target_queries": 23
+    },
+    {
+      "extra_pair_lookups": 12143,
+      "extra_pair_readds": 458,
+      "extra_scan_subtractions": 12143,
+      "field_degree": 23,
+      "saved_target_queries": 141
+    }
+  ],
+  "execution": {
+    "binary_path": "/Volumes/SSD990-2/crypto/wt/codex-rootfind-k13-local-f456-screen-20261116/target/release/deps/rootfind_multihit_relations-b6c17bf1553eba29",
+    "binary_sha256": "fcb39e4c600aad3b340efd05dd659fec6eda8fd1727237c70d055f12ba01b8c5",
+    "command": "cargo test --manifest-path research/rootfind_multihit_relations_20261116/harness/Cargo.toml --release --locked --test rootfind_multihit_relations -- --nocapture",
+    "end_utc": "2026-11-16T12:19:21Z",
+    "exit_code": 0,
+    "meta_sha256": "c73493e7fe5fc8c2307b7457588c896a9cfec7bc23d7431ad94734f74723d626",
+    "start_utc": "2026-11-16T12:14:45Z",
+    "stderr_sha256": "8558158f93091d747af0d57a5ecc9699cc1526b2ff77566ca3860e79b2c6874c",
+    "stdout_sha256": "422101b3a3415796734365302dd749c67b0c58080132cb89767edb306b1ad5b8",
+    "toolchain": "rustc 1.99.1 aarch64-apple-darwin"
+  },
+  "protocol_commit": "15a7782ef37832e0a93eb796de94de6a3687da40",
+  "schema": "rootfind-multihit-result/v1",
+  "source_commit": "aa129e0ab04af355e1be547defce08c28b5694a1",
+  "source_sha256": {
+    "amendment": "c664104cfa4be021c514d60dd68275ccc52b6e128a88d826a352b06e4b52138c",
+    "frozen_protocol": "ac04d731f2f5af3beb93fbf7afa38659bdb3cd027da212e9bd6cc4a6a01bc18c",
+    "lock": "1c96f5dd6f0acbaf91148521078ac12a4d4e0a80f82d34a3c55d961e11928482",
+    "manifest": "1ad0913b8e2425f7c3d0e9a704a0f634218108fb78cea9c7a791946e81b4b815",
+    "post_run_annotation": "cd11ef56c51b7e4b775a103f3bfb52727d41bebca6fdd087f39a794fd2a6df42",
+    "protocol": "8796de6d1f542186c6d85ef78e60f787d495cbb94f053f7c6ef87cff04877d43",
+    "test": "e254ed4204130046a54f6274adc4ea3e8e76ae583e3769da73026bec69fa2b8b"
+  },
+  "status": "bounded_screen_passed"
+}

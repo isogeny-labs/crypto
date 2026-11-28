@@ -1,0 +1,43 @@
+import RationalCounterexample
+import DescentCounterexample
+import TorsionBoundaries
+import SourceFSTBoundary
+import BivariateMultiplicity
+import SolverCoefficientBoundary
+
+#print axioms SkepticalAudit.rational_only_s3_converse_false
+#print axioms SkepticalAudit.extensionPolynomial_irreducible
+#print axioms SkepticalAudit.coordinate_constant
+#print axioms SkepticalAudit.actual_descended_equations
+#print axioms SkepticalAudit.actual_descent_not_regular
+#print axioms SkepticalAudit.actual_descent_top_parts_not_regular
+#print axioms SkepticalAudit.extension_finrank
+#print axioms SkepticalAudit.extension_cardinality
+#print axioms SkepticalAudit.target_three_torsion
+#print axioms SkepticalAudit.symmetrization_over_extension
+#print axioms SkepticalAudit.universal_descent_regularity_counterexample
+#print axioms SkepticalAudit.symmetrization_universal
+#print axioms TorsionBoundaryAudit.small_curve_cardinality
+#print axioms TorsionBoundaryAudit.small_curve_source_supersingular
+#print axioms TorsionBoundaryAudit.twoPoint_order
+#print axioms TorsionBoundaryAudit.literal_supersingular_k_two_false
+#print axioms TorsionBoundaryAudit.hasse_trace_zero
+#print axioms TorsionBoundaryAudit.corrected_prime_embedding_degree
+#print axioms TorsionBoundaryAudit.bkCurve_cardinality
+#print axioms TorsionBoundaryAudit.geometric_root_exists
+#print axioms TorsionBoundaryAudit.bk_geometric_nonrational_three_torsion
+#print axioms TorsionBoundaryAudit.bk_excluded_boundary_counterexample
+#print axioms FSTBoundaryAudit.curve_cardinality
+#print axioms FSTBoundaryAudit.curve_source_supersingular
+#print axioms FSTBoundaryAudit.twoPoint_order
+#print axioms FSTBoundaryAudit.roots2_adjoin_eq_bot
+#print axioms FSTBoundaryAudit.roots2_extension_degree
+#print axioms FSTBoundaryAudit.two_torsion_not_all_rational
+#print axioms FSTBoundaryAudit.fst_algorithm3_3_r_two_counterexample
+#print axioms BivariateMultiplicityAudit.quotientEquiv
+#print axioms BivariateMultiplicityAudit.quotient_dimension_two
+#print axioms BivariateMultiplicityAudit.triangular_generators_same_ideal
+#print axioms BivariateMultiplicityAudit.support_is_not_multiplicity
+#print axioms SolverCoefficientAudit.advertised_power_outside_int32
+#print axioms SolverCoefficientAudit.observed_coefficient_wrong_in_five
+#print axioms SolverCoefficientAudit.observed_coefficient_wrong_in_five_at_first_overflow

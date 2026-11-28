@@ -1,0 +1,353 @@
+﻿2026-11-17T15:10:37.1624299Z Current runner version: '2.338.2'
+2026-11-17T15:10:37.1660002Z ##[group]Runner Image Provisioner
+2026-11-17T15:10:37.1661390Z Hosted Compute Agent
+2026-11-17T15:10:37.1662429Z Version: 20261103.629
+2026-11-17T15:10:37.1664125Z Commit: 15dbd9ccb5dbf34fae002b6ed1a2670f52df37bc
+2026-11-17T15:10:37.1665490Z Build Date: 2026-11-03T17:26:59Z
+2026-11-17T15:10:37.1666861Z Worker ID: {27f9cac1-f35e-4815-b236-555775ce00b8}
+2026-11-17T15:10:37.1668178Z Region: eastus
+2026-11-17T15:10:37.1669286Z Cloud: Azure
+2026-11-17T15:10:37.1670328Z ##[endgroup]
+2026-11-17T15:10:37.1673338Z ##[group]Operating System
+2026-11-17T15:10:37.1674590Z Ubuntu
+2026-11-17T15:10:37.1675586Z 24.04.5
+2026-11-17T15:10:37.1676652Z LTS
+2026-11-17T15:10:37.1677607Z ##[endgroup]
+2026-11-17T15:10:37.1678750Z ##[group]Runner Image
+2026-11-17T15:10:37.1679865Z Image: ubuntu-24.04
+2026-11-17T15:10:37.1681072Z Version: 20261111.370.1
+2026-11-17T15:10:37.1683731Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261111.370/images/ubuntu/Ubuntu2404-Readme.md
+2026-11-17T15:10:37.1686739Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261111.370
+2026-11-17T15:10:37.1688427Z ##[endgroup]
+2026-11-17T15:10:37.1690547Z ##[group]GITHUB_TOKEN Permissions
+2026-11-17T15:10:37.1693832Z Contents: read
+2026-11-17T15:10:37.1695011Z Metadata: read
+2026-11-17T15:10:37.1696000Z ##[endgroup]
+2026-11-17T15:10:37.1699337Z Secret source: Actions
+2026-11-17T15:10:37.1701091Z Cache mode: write
+2026-11-17T15:10:37.1703176Z Prepare workflow directory
+2026-11-17T15:10:37.2296676Z Prepare all required actions
+2026-11-17T15:10:37.2369952Z Getting action download info
+2026-11-17T15:10:37.4092088Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-17T15:10:37.7225103Z Complete job name: artifacts
+2026-11-17T15:10:37.8012206Z ##[group]Run sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
+2026-11-17T15:10:37.8013459Z [36;1msudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \[0m
+2026-11-17T15:10:37.8014312Z [36;1m  /usr/local/.ghcup /opt/hostedtoolcache/CodeQL[0m
+2026-11-17T15:10:37.8038288Z shell: /usr/bin/bash -e {0}
+2026-11-17T15:10:37.8039099Z env:
+2026-11-17T15:10:37.8039540Z   GIT_AUTHOR_NAME: ci
+2026-11-17T15:10:37.8040060Z   GIT_AUTHOR_EMAIL: ci@example.invalid
+2026-11-17T15:10:37.8040622Z   GIT_COMMITTER_NAME: ci
+2026-11-17T15:10:37.8041132Z   GIT_COMMITTER_EMAIL: ci@example.invalid
+2026-11-17T15:10:37.8041680Z ##[endgroup]
+2026-11-17T15:11:35.2000947Z ##[group]Run actions/checkout@v4
+2026-11-17T15:11:35.2001336Z with:
+2026-11-17T15:11:35.2001613Z   fetch-depth: 2
+2026-11-17T15:11:35.2001887Z   filter: blob:none
+2026-11-17T15:11:35.2002167Z   repository: isogeny-labs/crypto
+2026-11-17T15:11:35.2004955Z   token: ***
+2026-11-17T15:11:35.2005229Z   ssh-strict: true
+2026-11-17T15:11:35.2005488Z   ssh-user: git
+2026-11-17T15:11:35.2005757Z   persist-credentials: true
+2026-11-17T15:11:35.2006057Z   clean: true
+2026-11-17T15:11:35.2006326Z   sparse-checkout-cone-mode: true
+2026-11-17T15:11:35.2006664Z   fetch-tags: false
+2026-11-17T15:11:35.2006937Z   show-progress: true
+2026-11-17T15:11:35.2007204Z   lfs: false
+2026-11-17T15:11:35.2007458Z   submodules: false
+2026-11-17T15:11:35.2007733Z   set-safe-directory: true
+2026-11-17T15:11:35.2008032Z   allow-unsafe-pr-checkout: false
+2026-11-17T15:11:35.2008359Z env:
+2026-11-17T15:11:35.2008597Z   GIT_AUTHOR_NAME: ci
+2026-11-17T15:11:35.2008883Z   GIT_AUTHOR_EMAIL: ci@example.invalid
+2026-11-17T15:11:35.2009243Z   GIT_COMMITTER_NAME: ci
+2026-11-17T15:11:35.2009539Z   GIT_COMMITTER_EMAIL: ci@example.invalid
+2026-11-17T15:11:35.2009857Z ##[endgroup]
+2026-11-17T15:11:35.5211772Z Syncing repository: isogeny-labs/crypto
+2026-11-17T15:11:35.5213543Z ##[group]Getting Git version info
+2026-11-17T15:11:35.5213981Z Working directory is '/home/runner/work/crypto/crypto'
+2026-11-17T15:11:35.5214699Z [command]/usr/bin/git version
+2026-11-17T15:11:35.5323711Z git version 2.56.1
+2026-11-17T15:11:35.5354096Z ##[endgroup]
+2026-11-17T15:11:35.5371161Z Temporarily overriding HOME='/home/runner/work/_temp/82f27572-ca2b-4832-b74d-27dc7ba06253' before making global git config changes
+2026-11-17T15:11:35.5372553Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-17T15:11:35.5378542Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-17T15:11:35.5443720Z Deleting the contents of '/home/runner/work/crypto/crypto'
+2026-11-17T15:11:35.5448713Z ##[group]Initializing the repository
+2026-11-17T15:11:35.5453542Z [command]/usr/bin/git init /home/runner/work/crypto/crypto
+2026-11-17T15:11:35.5601709Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-17T15:11:35.5603211Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-17T15:11:35.5604431Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-17T15:11:35.5605234Z hint: call:
+2026-11-17T15:11:35.5605597Z hint:
+2026-11-17T15:11:35.5606151Z hint: 	git config --global init.defaultBranch <name>
+2026-11-17T15:11:35.5606733Z hint:
+2026-11-17T15:11:35.5607307Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-17T15:11:35.5608381Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-17T15:11:35.5609073Z hint:
+2026-11-17T15:11:35.5609419Z hint: 	git branch -m <name>
+2026-11-17T15:11:35.5609833Z hint:
+2026-11-17T15:11:35.5610424Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-17T15:11:35.5615118Z Initialized empty Git repository in /home/runner/work/crypto/crypto/.git/
+2026-11-17T15:11:35.5627492Z [command]/usr/bin/git remote add origin https://github.com/isogeny-labs/crypto
+2026-11-17T15:11:35.5691688Z ##[endgroup]
+2026-11-17T15:11:35.5692535Z ##[group]Disabling automatic garbage collection
+2026-11-17T15:11:35.5696354Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-17T15:11:35.5737007Z ##[endgroup]
+2026-11-17T15:11:35.5738422Z ##[group]Setting up auth
+2026-11-17T15:11:35.5746790Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-17T15:11:35.5791517Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-17T15:11:35.6255811Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-17T15:11:35.6302546Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-17T15:11:35.6549596Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-17T15:11:35.6595183Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-17T15:11:35.6843562Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-17T15:11:35.6893476Z ##[endgroup]
+2026-11-17T15:11:35.6894283Z ##[group]Fetching the repository
+2026-11-17T15:11:35.6908319Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --filter=blob:none --depth=2 origin +b6470091c995bb3b6908dda96e43f4cec7ee784c:refs/remotes/pull/4525/merge
+2026-11-17T15:11:36.7265955Z From https://github.com/isogeny-labs/crypto
+2026-11-17T15:11:36.7268281Z  * [new ref]           b6470091c995bb3b6908dda96e43f4cec7ee784c -> pull/4525/merge
+2026-11-17T15:11:36.7273956Z ##[endgroup]
+2026-11-17T15:11:36.7275938Z ##[group]Determining the checkout info
+2026-11-17T15:11:36.7288186Z ##[endgroup]
+2026-11-17T15:11:36.7289552Z [command]/usr/bin/git sparse-checkout disable
+2026-11-17T15:11:36.7372374Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-17T15:11:36.7416536Z ##[group]Checking out the ref
+2026-11-17T15:11:36.7424667Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/4525/merge
+2026-11-17T15:14:58.0748664Z Updating files:   0% (1/444201)
+2026-11-17T15:14:59.0842582Z Updating files:   0% (619/444201)
+2026-11-17T15:14:59.2114061Z Updating files:   0% (3909/444201)
+2026-11-17T15:15:00.0118088Z Updating files:   1% (4443/444201)
+2026-11-17T15:15:00.2436172Z Updating files:   2% (8885/444201)
+2026-11-17T15:15:01.3606668Z Updating files:   2% (9147/444201)
+2026-11-17T15:15:01.5909693Z Updating files:   2% (11471/444201)
+2026-11-17T15:15:02.0102729Z Updating files:   3% (13327/444201)
+2026-11-17T15:15:02.0747810Z Updating files:   4% (17769/444201)
+2026-11-17T15:15:02.3283791Z Updating files:   4% (18613/444201)
+2026-11-17T15:15:02.6897504Z Updating files:   5% (22211/444201)
+2026-11-17T15:15:02.9417408Z Updating files:   6% (26653/444201)
+2026-11-17T15:15:03.0755719Z Updating files:   7% (31095/444201)
+2026-11-17T15:15:03.2354947Z Updating files:   7% (32899/444201)
+2026-11-17T15:15:03.5360238Z Updating files:   8% (35537/444201)
+2026-11-17T15:15:03.8300042Z Updating files:   9% (39979/444201)
+2026-11-17T15:15:04.0684945Z Updating files:  10% (44421/444201)
+2026-11-17T15:15:04.0746972Z Updating files:  11% (48863/444201)
+2026-11-17T15:15:04.3689455Z Updating files:  11% (48925/444201)
+2026-11-17T15:15:04.7099371Z Updating files:  12% (53305/444201)
+2026-11-17T15:15:05.0658847Z Updating files:  13% (57747/444201)
+2026-11-17T15:15:05.0745421Z Updating files:  14% (62189/444201)
+2026-11-17T15:15:05.3857881Z Updating files:  14% (62293/444201)
+2026-11-17T15:15:05.6658361Z Updating files:  15% (66631/444201)
+2026-11-17T15:15:05.9658961Z Updating files:  16% (71073/444201)
+2026-11-17T15:15:06.0747874Z Updating files:  17% (75515/444201)
+2026-11-17T15:15:06.2548290Z Updating files:  17% (77589/444201)
+2026-11-17T15:15:06.5950100Z Updating files:  18% (79957/444201)
+2026-11-17T15:15:06.9598955Z Updating files:  19% (84399/444201)
+2026-11-17T15:15:07.0747241Z Updating files:  20% (88841/444201)
+2026-11-17T15:15:07.3346031Z Updating files:  20% (90552/444201)
+2026-11-17T15:15:07.6672407Z Updating files:  21% (93283/444201)
+2026-11-17T15:15:07.9693660Z Updating files:  22% (97725/444201)
+2026-11-17T15:15:08.0747772Z Updating files:  23% (102167/444201)
+2026-11-17T15:15:08.1943971Z Updating files:  23% (104022/444201)
+2026-11-17T15:15:08.5811418Z Updating files:  24% (106609/444201)
+2026-11-17T15:15:08.9103848Z Updating files:  25% (111051/444201)
+2026-11-17T15:15:09.0748822Z Updating files:  26% (115493/444201)
+2026-11-17T15:15:09.2669249Z Updating files:  26% (117480/444201)
+2026-11-17T15:15:09.5719398Z Updating files:  27% (119935/444201)
+2026-11-17T15:15:09.9454148Z Updating files:  28% (124377/444201)
+2026-11-17T15:15:10.0747241Z Updating files:  29% (128819/444201)
+2026-11-17T15:15:10.2062856Z Updating files:  29% (130967/444201)
+2026-11-17T15:15:10.5462245Z Updating files:  30% (133261/444201)
+2026-11-17T15:15:10.9181100Z Updating files:  31% (137703/444201)
+2026-11-17T15:15:11.0748460Z Updating files:  32% (142145/444201)
+2026-11-17T15:15:11.1763864Z Updating files:  32% (144523/444201)
+2026-11-17T15:15:11.4788076Z Updating files:  33% (146587/444201)
+2026-11-17T15:15:11.7905413Z Updating files:  34% (151029/444201)
+2026-11-17T15:15:12.0508382Z Updating files:  35% (155471/444201)
+2026-11-17T15:15:12.0746879Z Updating files:  36% (159913/444201)
+2026-11-17T15:15:12.3301031Z Updating files:  36% (160288/444201)
+2026-11-17T15:15:12.6703918Z Updating files:  37% (164355/444201)
+2026-11-17T15:15:13.0442298Z Updating files:  38% (168797/444201)
+2026-11-17T15:15:13.0747418Z Updating files:  39% (173239/444201)
+2026-11-17T15:15:13.3094319Z Updating files:  39% (173718/444201)
+2026-11-17T15:15:13.5680518Z Updating files:  40% (177681/444201)
+2026-11-17T15:15:13.8272547Z Updating files:  41% (182123/444201)
+2026-11-17T15:15:14.0747527Z Updating files:  42% (186565/444201)
+2026-11-17T15:15:14.1011353Z Updating files:  42% (190484/444201)
+2026-11-17T15:15:14.3596203Z Updating files:  43% (191007/444201)
+2026-11-17T15:15:14.6093701Z Updating files:  44% (195449/444201)
+2026-11-17T15:15:14.9724486Z Updating files:  45% (199891/444201)
+2026-11-17T15:15:15.0747475Z Updating files:  46% (204333/444201)
+2026-11-17T15:15:15.2000749Z Updating files:  46% (205749/444201)
+2026-11-17T15:15:15.6192744Z Updating files:  47% (208775/444201)
+2026-11-17T15:15:15.9501221Z Updating files:  48% (213217/444201)
+2026-11-17T15:15:16.0747399Z Updating files:  49% (217659/444201)
+2026-11-17T15:15:16.1633229Z Updating files:  49% (220200/444201)
+2026-11-17T15:15:16.3736477Z Updating files:  50% (222101/444201)
+2026-11-17T15:15:16.6278193Z Updating files:  51% (226543/444201)
+2026-11-17T15:15:16.8830556Z Updating files:  52% (230985/444201)
+2026-11-17T15:15:17.0748035Z Updating files:  53% (235427/444201)
+2026-11-17T15:15:17.1597374Z Updating files:  53% (238830/444201)
+2026-11-17T15:15:17.4525411Z Updating files:  54% (239869/444201)
+2026-11-17T15:15:17.8025739Z Updating files:  55% (244311/444201)
+2026-11-17T15:15:18.0747227Z Updating files:  56% (248753/444201)
+2026-11-17T15:15:18.0780838Z Updating files:  56% (253118/444201)
+2026-11-17T15:15:18.3579371Z Updating files:  57% (253195/444201)
+2026-11-17T15:15:18.6185439Z Updating files:  58% (257637/444201)
+2026-11-17T15:15:19.0751888Z Updating files:  59% (262079/444201)
+2026-11-17T15:15:19.2125589Z Updating files:  59% (265216/444201)
+2026-11-17T15:15:19.8234969Z Updating files:  60% (266521/444201)
+2026-11-17T15:15:20.0747402Z Updating files:  61% (270963/444201)
+2026-11-17T15:15:20.1072725Z Updating files:  61% (274869/444201)
+2026-11-17T15:15:20.3783275Z Updating files:  62% (275405/444201)
+2026-11-17T15:15:20.6424465Z Updating files:  63% (279847/444201)
+2026-11-17T15:15:20.8706195Z Updating files:  64% (284289/444201)
+2026-11-17T15:15:21.0753278Z Updating files:  65% (288731/444201)
+2026-11-17T15:15:21.1344273Z Updating files:  65% (292456/444201)
+2026-11-17T15:15:21.4828507Z Updating files:  66% (293173/444201)
+2026-11-17T15:15:21.8304131Z Updating files:  67% (297615/444201)
+2026-11-17T15:15:22.0747787Z Updating files:  68% (302057/444201)
+2026-11-17T15:15:22.4020073Z Updating files:  68% (303729/444201)
+2026-11-17T15:15:22.7540550Z Updating files:  69% (306499/444201)
+2026-11-17T15:15:23.0017389Z Updating files:  70% (310941/444201)
+2026-11-17T15:15:23.0757447Z Updating files:  71% (315383/444201)
+2026-11-17T15:15:23.2560922Z Updating files:  71% (316670/444201)
+2026-11-17T15:15:23.5342369Z Updating files:  72% (319825/444201)
+2026-11-17T15:15:23.7962035Z Updating files:  73% (324267/444201)
+2026-11-17T15:15:24.0208693Z Updating files:  74% (328709/444201)
+2026-11-17T15:15:24.0746912Z Updating files:  75% (333151/444201)
+2026-11-17T15:15:24.2739956Z Updating files:  75% (334209/444201)
+2026-11-17T15:15:24.6655730Z Updating files:  76% (337593/444201)
+2026-11-17T15:15:24.8953460Z Updating files:  77% (342035/444201)
+2026-11-17T15:15:25.0747674Z Updating files:  78% (346477/444201)
+2026-11-17T15:15:25.1656922Z Updating files:  78% (349656/444201)
+2026-11-17T15:15:25.4415857Z Updating files:  79% (350919/444201)
+2026-11-17T15:15:25.7378653Z Updating files:  80% (355361/444201)
+2026-11-17T15:15:26.0701324Z Updating files:  81% (359803/444201)
+2026-11-17T15:15:26.0746582Z Updating files:  82% (364245/444201)
+2026-11-17T15:15:26.2886840Z Updating files:  82% (364315/444201)
+2026-11-17T15:15:26.5499539Z Updating files:  83% (368687/444201)
+2026-11-17T15:15:26.8369738Z Updating files:  84% (373129/444201)
+2026-11-17T15:15:27.0758967Z Updating files:  85% (377571/444201)
+2026-11-17T15:15:27.2231475Z Updating files:  85% (380383/444201)
+2026-11-17T15:15:27.5145727Z Updating files:  86% (382013/444201)
+2026-11-17T15:15:28.0233139Z Updating files:  87% (386455/444201)
+2026-11-17T15:15:28.0745384Z Updating files:  88% (390897/444201)
+2026-11-17T15:15:28.2567705Z Updating files:  88% (391544/444201)
+2026-11-17T15:15:28.5075617Z Updating files:  89% (395339/444201)
+2026-11-17T15:15:28.9270987Z Updating files:  90% (399781/444201)
+2026-11-17T15:15:29.0750449Z Updating files:  91% (404223/444201)
+2026-11-17T15:15:29.3321862Z Updating files:  91% (405736/444201)
+2026-11-17T15:15:29.5334461Z Updating files:  92% (408665/444201)
+2026-11-17T15:15:29.8623897Z Updating files:  93% (413107/444201)
+2026-11-17T15:15:30.0772700Z Updating files:  94% (417549/444201)
+2026-11-17T15:15:30.2061709Z Updating files:  94% (420558/444201)
+2026-11-17T15:15:30.6121811Z Updating files:  95% (421991/444201)
+2026-11-17T15:15:30.9460701Z Updating files:  96% (426433/444201)
+2026-11-17T15:15:31.0747173Z Updating files:  97% (430875/444201)
+2026-11-17T15:15:31.2347352Z Updating files:  97% (432650/444201)
+2026-11-17T15:15:31.5843580Z Updating files:  98% (435317/444201)
+2026-11-17T15:15:32.0549004Z Updating files:  99% (439759/444201)
+2026-11-17T15:15:32.0549552Z Updating files: 100% (444201/444201)
+2026-11-17T15:15:32.0549981Z Updating files: 100% (444201/444201), done.
+2026-11-17T15:15:32.6429497Z Note: switching to 'refs/remotes/pull/4525/merge'.
+2026-11-17T15:15:32.6430126Z 
+2026-11-17T15:15:32.6430815Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-17T15:15:32.6431695Z changes and commit them, and you can discard any commits you make in this
+2026-11-17T15:15:32.6432545Z state without impacting any branches by switching back to a branch.
+2026-11-17T15:15:32.6433370Z 
+2026-11-17T15:15:32.6433862Z If you want to create a new branch to retain commits you create, you may
+2026-11-17T15:15:32.6434613Z do so (now or later) by using -c with the switch command. Example:
+2026-11-17T15:15:32.6435071Z 
+2026-11-17T15:15:32.6435254Z   git switch -c <new-branch-name>
+2026-11-17T15:15:32.6435541Z 
+2026-11-17T15:15:32.6435709Z Or undo this operation with:
+2026-11-17T15:15:32.6436633Z 
+2026-11-17T15:15:32.6436892Z   git switch -
+2026-11-17T15:15:32.6437187Z 
+2026-11-17T15:15:32.6437675Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-17T15:15:32.6438142Z 
+2026-11-17T15:15:32.6438672Z HEAD is now at b6470091c9 Merge 9c66263eb62f1e91685f2ac60eef92ba8c1ef4c0 into c5cbb67b19fe39864da7f8c9b29726696ba01580
+2026-11-17T15:15:32.6818434Z ##[endgroup]
+2026-11-17T15:15:32.6875102Z [command]/usr/bin/git log -1 --format=%H
+2026-11-17T15:15:32.6910575Z b6470091c995bb3b6908dda96e43f4cec7ee784c
+2026-11-17T15:15:32.7070990Z ##[group]Run python3 -m unittest tools/artifacts/test_artifacts.py
+2026-11-17T15:15:32.7071522Z [36;1mpython3 -m unittest tools/artifacts/test_artifacts.py[0m
+2026-11-17T15:15:32.7091162Z shell: /usr/bin/bash -e {0}
+2026-11-17T15:15:32.7091442Z env:
+2026-11-17T15:15:32.7091660Z   GIT_AUTHOR_NAME: ci
+2026-11-17T15:15:32.7091929Z   GIT_AUTHOR_EMAIL: ci@example.invalid
+2026-11-17T15:15:32.7092230Z   GIT_COMMITTER_NAME: ci
+2026-11-17T15:15:32.7092496Z   GIT_COMMITTER_EMAIL: ci@example.invalid
+2026-11-17T15:15:32.7093053Z ##[endgroup]
+2026-11-17T15:15:44.0816544Z .........................................artifacts: not a sha256 digest: '../../etc/passwd'
+2026-11-17T15:15:55.2581488Z ................
+2026-11-17T15:15:55.2581895Z ----------------------------------------------------------------------
+2026-11-17T15:15:55.2582403Z Ran 57 tests in 22.416s
+2026-11-17T15:15:55.2582568Z 
+2026-11-17T15:15:55.2582658Z OK
+2026-11-17T15:15:55.2785939Z ##[group]Run python3 -B .github/scripts/test_artifact_prefetch.py -v
+2026-11-17T15:15:55.2786934Z [36;1mpython3 -B .github/scripts/test_artifact_prefetch.py -v[0m
+2026-11-17T15:15:55.2811212Z shell: /usr/bin/bash -e {0}
+2026-11-17T15:15:55.2811470Z env:
+2026-11-17T15:15:55.2811665Z   GIT_AUTHOR_NAME: ci
+2026-11-17T15:15:55.2811910Z   GIT_AUTHOR_EMAIL: ci@example.invalid
+2026-11-17T15:15:55.2812203Z   GIT_COMMITTER_NAME: ci
+2026-11-17T15:15:55.2812465Z   GIT_COMMITTER_EMAIL: ci@example.invalid
+2026-11-17T15:15:55.2812743Z ##[endgroup]
+2026-11-17T15:15:55.4203506Z test_cached_objects_need_no_further_fetch (__main__.BloblessPrefetch.test_cached_objects_need_no_further_fetch) ... ok
+2026-11-17T15:15:55.4755682Z test_empty_diff_needs_no_fetch (__main__.BloblessPrefetch.test_empty_diff_needs_no_fetch) ... ok
+2026-11-17T15:15:55.5353137Z test_fetch_failure_is_not_reported_as_a_pass (__main__.BloblessPrefetch.test_fetch_failure_is_not_reported_as_a_pass) ... ok
+2026-11-17T15:15:55.5847419Z test_invalid_revisions_and_batch_limits_fail (__main__.BloblessPrefetch.test_invalid_revisions_and_batch_limits_fail) ... ok
+2026-11-17T15:15:55.6820473Z test_real_missing_blobs_are_fetched_in_batches_without_checkout (__main__.BloblessPrefetch.test_real_missing_blobs_are_fetched_in_batches_without_checkout) ... ok
+2026-11-17T15:15:55.6821931Z 
+2026-11-17T15:15:55.6822318Z ----------------------------------------------------------------------
+2026-11-17T15:15:55.6823175Z Ran 5 tests in 0.346s
+2026-11-17T15:15:55.6823431Z 
+2026-11-17T15:15:55.6823550Z OK
+2026-11-17T15:15:55.7003288Z ##[group]Run if [ "pull_request" != pull_request ]; then exit 0; fi
+2026-11-17T15:15:55.7003821Z [36;1mif [ "pull_request" != pull_request ]; then exit 0; fi[0m
+2026-11-17T15:15:55.7004318Z [36;1mif python3 tools/artifacts/artifacts.py check HEAD^1 HEAD; then exit 0; fi[0m
+2026-11-17T15:15:55.7004804Z [36;1mif [ "$LARGE_FILE_OK" = true ]; then[0m
+2026-11-17T15:15:55.7005224Z [36;1m  echo "::warning::data files committed under the large-file-ok label"[0m
+2026-11-17T15:15:55.7005619Z [36;1m  exit 0[0m
+2026-11-17T15:15:55.7005837Z [36;1mfi[0m
+2026-11-17T15:15:55.7006047Z [36;1mexit 1[0m
+2026-11-17T15:15:55.7024766Z shell: /usr/bin/bash -e {0}
+2026-11-17T15:15:55.7025034Z env:
+2026-11-17T15:15:55.7025263Z   GIT_AUTHOR_NAME: ci
+2026-11-17T15:15:55.7025526Z   GIT_AUTHOR_EMAIL: ci@example.invalid
+2026-11-17T15:15:55.7025820Z   GIT_COMMITTER_NAME: ci
+2026-11-17T15:15:55.7026094Z   GIT_COMMITTER_EMAIL: ci@example.invalid
+2026-11-17T15:15:55.7026390Z   LARGE_FILE_OK: false
+2026-11-17T15:15:55.7026654Z ##[endgroup]
+2026-11-17T15:15:55.8430689Z 
+2026-11-17T15:15:55.8431121Z 9 data file(s) belong in the store, not Git. Move them with
+2026-11-17T15:15:55.8432145Z   python3 tools/artifacts/artifacts.py push <file-or-dir>...
+2026-11-17T15:15:55.8433472Z and commit the .artifacts.json / .gitignore it writes (docs/artifacts.md).
+2026-11-17T15:15:55.8434405Z        136,063  benchmarks/20261117-vieta-half-gcd-cold-speed/calibration-counts.png
+2026-11-17T15:15:55.8435232Z        137,849  benchmarks/20261117-vieta-half-gcd-cold-speed/calibration-timing.png
+2026-11-17T15:15:55.8435964Z        135,770  benchmarks/20261117-vieta-half-gcd-cold-speed/counts.png
+2026-11-17T15:15:55.8436616Z        138,981  benchmarks/20261117-vieta-half-gcd-cold-speed/timing.png
+2026-11-17T15:15:55.8437350Z        136,063  research/vieta_coset_rust_20261115/speed-20261117/calibration-counts.png
+2026-11-17T15:15:55.8438262Z        137,849  research/vieta_coset_rust_20261115/speed-20261117/calibration-timing.png
+2026-11-17T15:15:55.8438970Z        135,770  research/vieta_coset_rust_20261115/speed-20261117/counts.png
+2026-11-17T15:15:55.8439739Z         85,764  research/vieta_coset_rust_20261115/speed-20261117/evidence/control-audit-command.log
+2026-11-17T15:15:55.8440514Z        138,981  research/vieta_coset_rust_20261115/speed-20261117/timing.png
+2026-11-17T15:15:55.8577987Z ##[error]Process completed with exit code 1.
+2026-11-17T15:15:55.8725713Z Post job cleanup.
+2026-11-17T15:15:55.9733885Z [command]/usr/bin/git version
+2026-11-17T15:15:55.9791270Z git version 2.56.1
+2026-11-17T15:15:55.9833285Z Temporarily overriding HOME='/home/runner/work/_temp/e6b921b8-7da4-4dfe-9c71-04e5609f4cda' before making global git config changes
+2026-11-17T15:15:55.9834921Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-17T15:15:55.9840007Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-17T15:15:55.9894841Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-17T15:15:55.9937188Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-17T15:15:56.1174808Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-17T15:15:56.1207113Z http.https://github.com/.extraheader
+2026-11-17T15:15:56.1219902Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-17T15:15:56.1269260Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-17T15:15:56.2281282Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-17T15:15:56.2336646Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-17T15:15:56.3553746Z Cleaning up orphan processes
+2026-11-17T15:15:56.4017771Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

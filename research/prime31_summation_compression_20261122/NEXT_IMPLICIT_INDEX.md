@@ -1,0 +1,147 @@
+# Fourth iteration — exact emptiness representations and the two-summand rank barrier
+
+Checkpoint: 2026-11-22 (America/Los_Angeles). [pcc:unverified] This is a written mathematical analysis, not a new Rust execution, a signed PCC proof, an admitted timing experiment, or a claim of novelty. It follows [NEXT_ROOT_INTERSECTION.md](NEXT_ROOT_INTERSECTION.md). No complete ECDLP or asymptotic relation-solving improvement has been established.
+
+## Fixed setting
+
+Use the same ordinary Prime31 curve and signed-liftable Dickson fibre as REPORT.md: p=2147483647, group order n=2147446831 (inherited source record, not independently recounted), fully split squarefree F(X)=D_N(X)-c with N=2^k<p, and B distinct liftable x-coordinates W. Let R be a nonzero point with s != 0; S3(X,Y,x(R)) is as in REPORT.md. An exact relation is a signed identity P+Q=R on the *original* curve, with x(P),x(Q) in W. The number of projected x solutions z is not the same as the number of signed ordered pairs.
+
+The previous note supplied an output-sensitive binary-tree **number of tests**, not the cost of an emptiness test. The experiments had already rejected dense norm and explicit dimension-charged block descent. We now examine a different exact algebraic zero-test, show where it fails, and pivot to an exact *group-sum index* that does achieve fast **online** emptiness at a charged, prohibitive preprocessing cost.
+
+## A. Rejected auxiliary representation: Fermat idempotent in the split fibre algebra
+
+For a tree node (j,a), put M=2^j and F_(j,a)(X)=D_M(X)-a. Assume all its M roots belong to the split squarefree full fibre. Define the etale algebra
+
+    A_(j,a) = F_p[X] / (F_(j,a)(X)) ~= F_p^M.
+
+Let G_R(X)=Res_Y(F_k(Y),S3(X,Y,x(R))) and g=G_R mod F_(j,a). Define the *Fermat zero projector* e=1-g^(p-1) in A_(j,a).
+
+**Exact lemma.** e^2=e, and for the algebra trace of multiplication,
+
+    z_(j,a) = M - Tr_A(g^(p-1)) = Tr_A(e) in F_p.
+
+Since 0<=z_(j,a)<=M<p, the canonical field representative is the *integer* count of roots x in that node with G_R(x)=0. Hence E(j,a) is true if and only if this integer is positive. There are no probabilistic false negatives, provided splitness, squarefreeness and M<p are checked. Proof: Chinese remaindering identifies A with a product of M copies of F_p; at each root, a^(p-1) equals 0 for a=0 and 1 otherwise. The trace is the sum of the diagonal evaluations. Non-split roots or inseparable fibres are not covered by this formula.
+
+**Complete explicit-vector recurrence.** Compute q=dY^2-tY+u with d,t,u as in REPORT.md, *inside A*. Set (Q_0,T_0,U_0)=(d,t,u) mod F_(j,a). For ell=0,...,k-1:
+
+    Q_(ell+1) = Q_ell^2
+    T_(ell+1) = T_ell^2 - 2 U_ell Q_ell - 4 Q_ell^2
+    U_(ell+1) = U_ell^2 - 2 T_ell^2 + 4 U_ell Q_ell + 4 Q_ell^2
+
+with each right side reduced modulo F_(j,a). Then g=U_k-c T_k+c^2 Q_k. Compute u_0=1,v_0=g and, for binary digits b_i of p-1,
+
+    u_(i+1) = u_i * (b_i ? v_i : 1) mod F_(j,a)
+    v_(i+1) = v_i^2 mod F_(j,a).
+
+The final u is g^(p-1). Precompute power sums s_t=sum_(F_(j,a)(alpha)=0) alpha^t for 0<=t<M using Newton identities from F_(j,a), or any exact equivalent. If u=sum_(t=0)^(M-1) u_t X^t, then Tr_A(u)=sum_t u_t s_t. This is the complete zero decision, not just an equation-circuit construction.
+
+With dense normal-form arrays and cost C(M) for one modular product, this specific implementation uses O((k+log p) C(M)+M) target arithmetic after the node modulus and trace-weight setup, which costs at most O(j C(M)+M^2) under straightforward squaring/Newton-sum algorithms. Its live state is O(M) coefficient slots plus multiplication scratch and output, with O(M) coefficient writes to instantiate dense state. For the empty root node M=N the setup/target state is already Omega(N); visiting many nodes is worse. Reusing trace weights across targets does not eliminate the target-dependent g and idempotent. This representation therefore **fails** the requested o(N) cold empty-root criterion. This is a bound on an explicitly materialized quotient-state algorithm, *not* on every possible symbolic compression of the projector.
+
+## B. Different auxiliary representation: exact signed group-sum index
+
+Instead of representing G_R, let A={P_x,-P_x:x in W}, where P_x is one rational point over x. In the present odd prime-order source group these are 2B distinct signed points, so L=|A|=2B. The point signs are part of the relation and every entry is in E(F_p). Use a collision-checked dictionary keyed by a *complete encoded group point*, not by x alone.
+
+Define the full tuple index I_1={(P,(P)):P in A}; recursively,
+
+    I_(h+1) = { (S+P, (P_1,...,P_h,P)):
+                 (S,(P_1,...,P_h)) in I_h, P in A }.
+
+Store all entries by their first coordinate S (an elliptic-curve point, including O). For an exact public target R the dictionary bucket I_m[R] contains **all** ordered signed m-summand decompositions, including repeated indices and exceptional identities. Nothing is inferred from merely sharing an x-coordinate. Hash collisions are settled by exact point equality; alternatively use deterministic sorted point keys. Every output is rechecked by original-curve addition before being treated as a relation.
+
+An exact online empty-root test for m=2 is simply “is I_2[R] empty?”. To answer *every* Dickson-subtree predicate for that target, take returned tuples, project their first x coordinates, and insert their sequences D_(2^j)(x) into a target-local trie (or deduplicated level map). E(j,a) then tests existence of the node label in the trie. This is logically equivalent to the S3/full-fibre predicate under the earlier rational lifting theorem and its R-domain exceptions. It needs no G_R coefficients, no dense quotient vectors and no traversal of an empty fibre. The trie is only for a queried target; it cannot be credited as free universal precomputation.
+
+Let r_R=|I_m[R]| count *ordered signed tuples*, distinct from z_R projected first coordinates. Complete cost accounting for this particular representation:
+
+- Fibre generation, liftability, point signs and original-curve checks: C_base(N,B,p) >= Omega(B), and reusable only after charging.
+- Tuple enumeration: exactly L^h records at level h, requiring sum_(h=2)^m L^h original-curve additions, plus O(m L^m) tuple bookkeeping and encodings for fixed m; hash insertion is expected O(L^m), a deterministic balanced index has O(L^m log(L^m)) comparison overhead.
+- Stored index: Theta(m L^m) point/identifier words with full tuple storage; peak memory and temporary sorting buffers must be charged. A different compressed representation needs its own proof.
+- Per-target exact lookup: expected O(1+r_R) indexed accesses with collision-checked hashing, or O(log(L^m)+r_R) comparisons via ordered keys; complete signed row verification O(m r_R) group additions. Optional trie build costs O(k r_R) Dickson evaluations and O(k r_R) words. No-root queries have O(1) expected online lookup but **not** zero preprocessing cost.
+- For T uniform independently generated group targets, *exactly* E[sum_R r_R]=T L^m/n, by linearity of expectation: each of L^m fixed tuple sums equals a uniform target with probability 1/n. This expectation does not assert independence among tuple sums, full relation rank, or low memory.
+- Total work over T targets is Omega(L^m+T+sum_R r_R) for the full table, before linear algebra; group-operation and bit costs are additional. Per-query amortized setup is Omega(L^m/T), so the advertised constant-time emptiness is a **batch-indexing tradeoff**, not a cold gain.
+
+In the Prime31 depth-six component cell, B=31 gives L=62 and 3,844 ordered signed pair entries for I_2, before deduplication or index overhead. This is an exact size calculation, **not** an executed benchmark. A PR #4829/group-complement scan is still a mandatory incumbent. Full pair-sum indexing is classical meet-in-the-middle preprocessing, not a claimed novel ECDLP method.
+
+## C. Conditional rank/work barrier: why a perfect two-summand online oracle is insufficient
+
+Assume the conventional full-rank index-calculus architecture with B unknown factor-base logs, requiring at least B independent relation rows; assume each attempt uses a fresh uniform random R in a source group of size n; assume at most L^m signed ordered tuples can be reported for a target, and count all attempts and factor-base setup. (One-dependency methods, correlated target selection, reused challenge-specific knowledge and more structured relation constructions fall outside this model.)
+
+The expected number of **candidate tuple rows** from T attempts is exactly T L^m/n. Requiring expected candidate output at least B (already weaker than independent rank) implies
+
+    T >= B n / L^m = n / (2^m B^(m-1))   when L=2B.
+
+For m=2 even an ideal O(1) exact query, with only Omega(B) factor-base setup and Omega(T) target handling, costs
+
+    Omega(B+n/B) = Omega(sqrt(n))
+
+in the stated model. This is a **conditional full-rank collection barrier**, not a black-box ECDLP lower bound. Dependencies, repeated tuples and rank loss only make the necessary collection harder. It explains why accelerating only the two-summand emptiness predicate cannot, under these assumptions, yield a strictly better cold exponent than optimized Pollard rho.
+
+For the *explicit complete m-tuple index*, preprocessing alone is Omega(B^m). Combining with the necessary attempts yields
+
+    Omega(B^m + n/B^(m-1))
+      >= Omega(n^(m/(2m-1)))   for fixed m>=2,
+
+with the minimum near B=n^(1/(2m-1)). The exponents are 2/3 for m=2, 3/5 for m=3, 4/7 for m=4, all **above** 1/2. This conclusion is confined to fully materialized m-sum dictionaries, uniform target attempts and a B-row rank objective. It does not exclude a genuinely subquadratic *implicit* m-sum index, higher-arity Semaev chains with cheap online extraction, or one-dependency index calculus. It also excludes all linear-algebra and sign-validation overhead from the displayed optimistic lower bounds; adding them cannot improve the bounds.
+
+## D. What to pursue next, without recycling the failed mechanism
+
+The most useful successor question is now an **implicit signed m-sum index** or higher-arity S3 chain for m>=3, with a proved preprocessing/query/storage tradeoff and exact signed extraction, not merely a small polynomial or conditional branch count.
+
+For a claimed growing prime-field family define:
+
+    P_m(B,p) = charged setup and index work,
+    Q_m(B,p) = expected exact cost per fresh natural target including misses,
+    W_m(B,p) = verified output and group work,
+    L_m(B,p) = independent rank and sparse linear algebra.
+
+The optimistic full-rank collection model gives the *necessary* scale T=Omega(n/B^(m-1)), so the total is P_m+T Q_m+W_m+L_m, with duplicate rows and rank defects explicitly measured. A candidate must specify how it outperforms both O(B) group-complement scanning and maintained quotient/GCD/product-tree controls. One-dependency methods require a separate end-to-end accounting; the B-row assumption must not be imported into that architecture.
+
+For k increasing, one can define primes p_k congruent to -1 mod 2^k (Dirichlet guarantees an individual prime for each k), but **no bound here** proves 2^k >= p_k^delta for any fixed delta>0, or supplies ordinary prime-order curves with sufficiently many liftable fibre points. Those are explicit *additional* asymptotic family obligations, not facts inferred from the fixed Mersenne prime 2^31-1. No assumption of infinitely many Mersenne primes is used.
+
+## E. 2026 static-indexing prior-art gate (discovered after the explicit-table derivation)
+
+The signed m=2 group-sum query is an instance of the *abstract* 3SUM-Indexing task (given an additive list A, preprocess it to answer whether a pair sums to a target), so claiming novelty for the table or for generic preprocessed 2SUM would be incorrect.
+
+- Dinur and Golovnev, **Improved Time-Space Tradeoffs for 3SUM-Indexing**, ICALP 2026 (primary full HTML: https://drops.dagstuhl.de/storage/00lipics/lipics-vol374-icalp2026/html/LIPIcs.ICALP.2026.78/LIPIcs.ICALP.2026.78.html) report `T*S=~O(B^(5/2))` in a range of static **space S** and **query time T**, and state that their **preprocessing computation is ~O(B^2)**. Their inversion algorithm returns one index pair or absence with high-probability preprocessing correctness, not the complete list of signed tuples needed for independent rank. The stated T/S tradeoff does **not** imply subquadratic preprocessing cost or exact no-false-negative enumeration.
+- Chung and Larsen, **Stronger 3SUM-Indexing Lower Bounds**, SODA 2023: https://doi.org/10.1137/1.9781611977554.ch19. Its lower bounds are for specified static-data-structure models; they are not unconditional algebraic lower bounds on ECDLP.
+- The ICALP 2026 construction uses modular integer hashing and function substructures. An elliptic-curve group point has a readily computable group law and encoding but, on a prime-order group, **does not have a known efficiently computed additive scalar coordinate without a DLP**. Consequently it is not justified to transfer the integer modular-bucketing construction to E(F_p) by simply identifying it abstractly with Z/nZ. A rigorous adaptation must construct the required compatible bucket/sub-function maps *directly from encodings and group operations* without secretly solving DLP. Even if such an adaptation existed, the cited quadratic preprocessing and one-witness output leave the cold/full-rank gate open.
+
+Therefore the genuinely open adaptation is narrower: an algebraically exploitable **original-curve** implicit signed relation index with (i) efficiently computable compatible bucketing, (ii) exact empty certificates or a proved, correctly priced Las Vegas verification step, (iii) all useful independent rows rather than only one witness, and (iv) preprocessing that survives cold complete-solver accounting. This is a prior-art-informed research direction, not a newly implemented method.
+
+## Provenance, controls and standing
+
+- Semaev, *Summation polynomials and the discrete logarithm problem on elliptic curves* (2004): https://eprint.iacr.org/2004/031
+- Faugere–Huot–Joux–Renault–Vitse, *Symmetrized Summation Polynomials*, EUROCRYPT 2014, DOI 10.1007/978-3-642-55220-5_3: existing symmetry prior art.
+- Repository: research/prime31_ic_20261115/native/examples/prime31_s3_quotient_gcd.rs, PR #4829 group-complement/point-origin roots, PR #4924 monic symmetric pair work, PRs #4692/#4812/#4822/#4901 active solver/rank controls. The shared research-KB interface and wrapper were not available; the repository and public primary sources were checked directly. This is not an exhaustive novelty audit.
+- Companion **new source-bound CI receipt found during this iteration**: [run 45089472283](https://github.com/isogeny-labs/crypto/actions/runs/45089472283), job 137415511884, checked out 96c9101315d9f0c7ca5fee2af18cdb10d16c645d and passed its original-Rust tests, including 2 monic-oracle tests. The monic oracle blob ec949fa765aee1686ba01a74f420f8f2f0a77df3 at that commit is identical to PR #4924 current head 70e04851fae933675dbc4476f22dcea25090551e; the intervening commit changes only B677_MONIC_SCALING_PROTOCOL_20261123.md. This **supersedes the stale-source concern for those exact monic bytes**, but does not imply signed independent validation, a complete solver result or an admitted benchmark. The log prints B=677 online 28.9–32.0 ms and reference scan 4.8–5.5 ms in the inspected cases, not a speedup over that printed control; protocol/admission were not established for these timings. [pcc:unverified]
+- All mathematical statements above are written derivations only, [pcc:unverified]. No new Rust run, natural-target corpus, EKS job, Lean proof, signed PCC certificate, or performance leaderboard entry was produced in this iteration.
+
+**Next obligation:** derive and source-audit a non-enumerative, exact higher-arity/implicit sumset representation with a full P/Q/memory recurrence that is sublinear per cold emptiness query after setup; otherwise retain the explicit barriers. Then implement the already preregistered byte-exact natural-target generator before any new matched performance run, obtain original-source correctness CI, repository checkpoint and EKS admission, and measure genuine signed rank and complete recovery.
+
+
+## F. Fifth iteration (2026-11-22 Pacific): exact-bucket obstruction and m-sum exponent budget
+
+**Standing:** written mathematical derivation only; not a native-Rust test, signed PCC/Lean proof, timing benchmark, complete DLP solver, or novelty claim. [pcc:unverified] Starting state was PR #4928 head \`65f413e2ca1014a28e5ba6bb456d599f020b8f29\`, PR #4924 head \`70e04851fae933675dbc4476f22dcea25090551e\`. The earlier successful original-lock source-bound CI remains at source \`109fc024e33f122fd678d2c93a18b2c0438a8668\`, not at this subsequent documentary commit.
+
+**Obstruction 1 — exact compatible small buckets.** Let G be cyclic of order n, H finite and gcd(n,|H|)=1. For a group homomorphism h:G→H, ord(h(P)) divides both n and |H| for any generator P of G; therefore ord(h(P))=1, hence h=0. In the maintained Prime31 fixture n=2147446831 is odd, so any *exact homomorphic* bucket into a 2-power group is trivial, even if n were composite. If n is prime, any finite bucket group smaller than n is similarly ruled out. This does **not** rule out nonhomomorphic coordinate fingerprints with exact checking, randomized data structures, nonlinear elimination or representations with nontrivial collision lists. Abstractly identifying <G> with Z/nZ is not a computational route to integer modular 3SUM bucketing: the additive coordinate k of [k]G is a DLP.
+
+**Obstruction 2 — why signs cannot disappear.** In odd-order subgroups, x(Q)=x(-Q). A single-valued f(x(P),x(Q))=x(P+Q) for *all orientations* would imply x(P+Q)=x(P-Q). Since x(A)=x(B) implies A=±B, this forces 2P=O or 2Q=O. Contradiction for nonzero P,Q in an odd-order subgroup. The exact S3 pair operation is intrinsically multivalued in x, or it must carry point signs. As a concrete DLP-free fallback, for P=(x,y), Q=(u,v), x≠u, compute d=(u-x)^(-1), z_+=(d(v-y))²-x-u and z_-=(d(-v-y))²-x-u modulo p. Retain both branches and full signed witnesses; handle tangent/point-at-infinity separately. A nonhomomorphic interval label floor(K*z/p) can organize candidates with collision checking but computing all B² pairs costs Ω(B²) emissions. Batch inversion does not change the exponent. **No subquadratic index follows from this fallback.**
+
+**Optimistic full-rank exponent budget.** Specify a *growing family* of ordinary prime-field elliptic-curve groups with order n, a factor base with B unknown logs, m fixed signed summands, uniformly sampled independent public targets and at least B independent relation rows required. Expected candidate tuple count from T targets is T(2B)^m/n; it is not independent rank. Thus T=Ω(n/B^(m-1)). Suppose cold setup is Ω(B^σ), empty-inclusive query Ω(B^τ), with σ>0, 0≤τ<m-1 and with any p-dependence suppressed **only within this explicit polynomial model**. For B=n^β, an optimistic lower bound on the cold exponent is
+
+    α(β) ≥ max(σβ, 1−(m−1−τ)β).
+
+For α<1/2 to be feasible, one needs
+
+    1/[2(m−1−τ)] < β < 1/(2σ),
+
+which is possible iff **σ+τ<m−1**. For m=3, σ+τ<2; in particular σ=τ=1 fails the criterion. Balancing these two simplified terms yields β*=1/(σ+m−1−τ) and α*=σ/(σ+m−1−τ). These are conditional necessary budgets, not measured runtimes or sufficient algorithms.
+
+If this *particular full-rank architecture* also incurs Ω(B²) matrix work, include 2β. For m=3 and τ≥0:
+
+    α(β) ≥ max(1−(2−τ)β, 2β) ≥ 1/2.
+
+Hence no sub-√n **cold complete** exponent is possible in this model with quadratic matrix cost, even with a constant-time exact-empty oracle. This conditional statement does not cover subquadratic rank extraction, one-dependency methods, altered relation distributions, structured families, non-generic curves, or component-only gains. It is not an unconditional ECDLP lower bound.
+
+**Next discriminating obligation:** find a DLP-free, exact, genuinely implicit m≥3 representation that supports target-dependent empty certification and all signed original-curve independent relations. Derive complete P_m(B,p), Q_m(B,p), verification, memory, failures and rank/LA costs; m=3 under the above full-rank model needs σ+τ<2 even to be a candidate for cold sub-√n. Compare to the maintained #4829 point-complement and product-tree controls; neither dense Dickson norms nor a complete m-tuple index qualifies. Implement the precommitted exact native Rust natural-target generator from PROTOCOL.md *before* any new admitted timing corpus. No new performance corpus, benchmark or Space save was made here.
+
+**Prior art/audit:** Semaev 2004 (https://eprint.iacr.org/2004/031); Faugère et al., Symmetrized Summation Polynomials 2014 (DOI 10.1007/978-3-642-55220-5_3); Dinur–Golovnev, ICALP 2026 3SUM-Indexing (https://drops.dagstuhl.de/storage/00lipics/lipics-vol374-icalp2026/html/LIPIcs.ICALP.2026.78/LIPIcs.ICALP.2026.78.html, near-quadratic preprocessing, one witness). Existing repo notes NEXT_IMPLICIT_INDEX, NEXT_ROOT_INTERSECTION, #4924 monic, #4829, #4901 checked. Research-KB server unavailable in this tool context; no exhaustive novelty assertion. All PCC standing unverified.

@@ -69,7 +69,14 @@ def merge(catalog, imported):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--check', action='store_true')
+    ap.add_argument(
+        '--registry-only',
+        action='store_true',
+        help='with --check, verify only the standards-to-curve registry join',
+    )
     args = ap.parse_args()
+    if args.registry_only and not args.check:
+        ap.error('--registry-only requires --check')
     before = REGISTRY.read_text()
     result = merge(json.loads(before), json.loads(STANDARDS.read_text()))
     text = json.dumps(result, indent=1, ensure_ascii=False) + '\n'
@@ -81,6 +88,9 @@ def main():
         # Alias index formatting only; no identity arithmetic is invoked.
         import curve_id
         curve_id.ALIAS_MAP.write_text(curve_id.alias_map_text(result))
+    if args.registry_only:
+        print(f"standard catalog join: {len(result['curves'])} models (registry only)")
+        return
     for path, rendered in catalog_displays().items():
         if args.check:
             if path.read_text() != rendered:

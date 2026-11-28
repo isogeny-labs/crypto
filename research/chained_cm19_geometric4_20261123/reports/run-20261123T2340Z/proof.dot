@@ -1,0 +1,20 @@
+digraph proof {
+ graph [rankdir=TB,bgcolor="transparent",fontname="DejaVu Sans",nodesep=0.18,ranksep=0.23,pad=0.05];
+ node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=10,color="#384957",fillcolor="#edf4f7",margin="0.12,0.07"];
+ edge [color="#536976",arrowsize=0.65];
+ frob [label="Actual F7 beta + nonzero b_n\nall geometric group Homs descend"];
+ aut [label="Canonical action + full F7 census\nAut(Cbar) = S3"];
+ prim [label="Any 2 x 2 factor -> rational 2-isogeny\n#E(F7)=11 excludes it: primitive"];
+ parity [label="T has one rational fixed point\n#C(F7) odd excludes A/G = C2",fillcolor="#f7f1e6"];
+ a4 [label="Assume remaining A=G=A4\nRH: two branch values; quotient by V4"];
+ zero [label="0 three-cycle values\netale 3-isogeny impossible",fillcolor="#fbecec"];
+ one [label="1 three-cycle value\nKummer divisor impossible",fillcolor="#fbecec"];
+ two [label="2 three-cycle values\nunique theta ramifies at etale points",fillcolor="#fbecec"];
+ result [label="Geometric and arithmetic monodromy S4\nWritten geometry; partial quantified Lean dependency",fillcolor="#e6f3e9"];
+ frob -> aut -> prim -> a4;
+ parity -> a4;
+ a4 -> zero; a4 -> one; a4 -> two;
+ zero -> result; one -> result; two -> result;
+ {rank=same;prim;parity}
+ {rank=same;zero;one;two}
+}

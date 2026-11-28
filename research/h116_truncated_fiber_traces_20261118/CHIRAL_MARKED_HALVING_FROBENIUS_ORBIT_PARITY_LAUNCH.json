@@ -1,0 +1,20 @@
+{
+  "schema": "h116-chiral-marked-halving-frobenius-orbit-parity-launch/v1",
+  "protocol_id": "H116-CHIRAL-MARKED-HALVING-FROBENIUS-ORBIT-PARITY-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and exact hashes in CHIRAL_MARKED_HALVING_FROBENIUS_ORBIT_PARITY_SOURCE_GATE.md",
+  "quartic_pairs": [[0, 2], [1, 3], [4, 6], [5, 7]],
+  "marked_fiber_order": ["model0_source", "model0_dual", "model1_source", "model1_dual", "model2_source", "model2_dual", "model3_source", "model3_dual"],
+  "orbit_type_order": ["1^4", "1^2 2", "2^2", "4"],
+  "predicate_order_per_fiber": ["has_fixed_point", "all_rational", "has_four_cycle"],
+  "singular_quartic": "abstain",
+  "rules": 600,
+  "target": "canonical_scalar_mod_2",
+  "replicates": 4096,
+  "commands": {
+    "build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_chiral_branch_residual_parity.rs", "-o", "/tmp/h116_chiral_marked_halving_frobenius_orbit_parity"],
+    "selftest": ["/tmp/h116_chiral_marked_halving_frobenius_orbit_parity", "--selftest"],
+    "run": ["/tmp/h116_chiral_marked_halving_frobenius_orbit_parity", "--run-orbits", "CHIRAL_MARKED_HALVING_FROBENIUS_ORBIT_PARITY_RESULT.json"]
+  },
+  "outputs": ["CHIRAL_MARKED_HALVING_FROBENIUS_ORBIT_PARITY_RESULT.json", "CHIRAL_MARKED_HALVING_FROBENIUS_ORBIT_PARITY_RUN.txt", "CHIRAL_MARKED_HALVING_FROBENIUS_ORBIT_PARITY_SHA256SUMS"],
+  "measurement_scope": "all 600 single/pair-xor Boolean rules on fixed-point, all-rational and four-cycle predicates of eight marked source/dual halving fibers, with independent degree-four Frobenius-permutation and base-character classifications, inherited marked-isogeny controls, and family-wise shuffle calibration"
+}

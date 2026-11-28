@@ -1,0 +1,68 @@
+name: Prime31 S9 orientation fibres and exceptional branches (Rust)
+on:
+  push:
+    branches:
+      - research/prime31-aps-walk-source-20261116
+      - research/prime31-s9-zero-fibre-theorem-20261116
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_s9_orientation_fibres.rs
+      - .github/workflows/prime31-s9-orientation-fibres.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  orientation-fibres:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Existing native lib tests
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: S9 orientation combinatorics and original-group-point tests
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_orientation_fibres
+      - name: Source-specific generated finite-field diagnostic
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s9_orientation_fibres > prime31-s9-orientation-fibres.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path("prime31-s9-orientation-fibres.json").read_text())
+          assert p["schema"] == "prime31.s9.orientation_fibres.v1"
+          assert p["curve"]["p"] == 2147483647
+          expected = [
+              (4, 2241, 165, 6435),
+              (8, 187137, 6435, 490314),
+              (31, 5654193417, 48903492, 8361453672),
+          ]
+          for row, (b, sig, polys, words) in zip(p["combinatorics"], expected):
+              assert row["base_size"] == b
+              assert row["net_integer_signatures"] == sig
+              assert row["x_only_degree_eight_polynomials"] == polys
+              assert row["oriented_signed_token_multisets"] == words
+              assert row["orientation_count_two_independent_generating_functions_agree"]
+          q = p["prime31_curve_controls"]
+          assert q["base"] == "actual_dickson_depth6_31_rational_points"
+          assert len(q["selected_eight_x"]) == 8
+          assert q["oriented_masks_evaluated"] == 256
+          assert q["squarefree_identity_sign_orientations"] == 0
+          assert q["first_two_sign_orientations_have_distinct_Q"]
+          assert q["repeated_x_identity_cases"] == 1
+          assert q["repeated_x_orientation_net_choices"] == 9
+          assert q["distinct_group_targets_for_repeated_x"] == 9
+          assert q["all_public_targets_checked_on_original_prime31_curve"]
+          assert p["complete_unknown_target_ecdlp_recoveries"] == 0
+          assert p["measured_speedup"] is False
+          print("S9 orientation exact-combinatorics + source-curve sign/infinity controls PASS")
+          PY
+      - name: Retain complete source-specific diagnostic (not signed PCC)
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-s9-orientation-fibres
+          path: prime31-s9-orientation-fibres.json
+          retention-days: 30

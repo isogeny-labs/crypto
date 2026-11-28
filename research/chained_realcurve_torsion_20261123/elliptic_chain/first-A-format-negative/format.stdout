@@ -1,0 +1,606 @@
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/main_a.rs:1:
+-mod inherited;
+ mod base27;
+-#[path = "field_a.rs"]
+-mod field;
+ #[path = "chart_a.rs"]
+ mod chart;
+ #[path = "ec_a.rs"]
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/main_a.rs:8:
+ mod ec;
++#[path = "field_a.rs"]
++mod field;
++mod inherited;
+ #[path = "maps_a.rs"]
+ mod maps;
+ 
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/main_a.rs:12:
+-use std::collections::BTreeSet;
+ use chart::{key, Chart, Divisor};
+ use ec::Point;
+ use field::{Field, Q};
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/main_a.rs:16:
+ use inherited::{pmod, pscale, Div};
+ use maps::{Kernel, G0, G1, G2, ORIGINAL};
++use std::collections::BTreeSet;
+ 
+ fn qualify(label: &str, chart: &Chart<'_>, points: &[Point], images: &[Divisor]) {
+     assert_eq!(points.len(), 7);
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/main_a.rs:40:
+     for scalar in 0..7 {
+         let q = ec::mul(points[generator], scalar);
+         let index = points.iter().position(|&r| r == q).unwrap();
+-        assert_eq!(chart.h.mul(&images[generator], u128::from(scalar)), images[index]);
++        assert_eq!(
++            chart.h.mul(&images[generator], u128::from(scalar)),
++            images[index]
++        );
+     }
+     println!("MAP_RESULT map={label} distinct=7 addition_pairs=49 scalar_controls=7 F3_fixed=7 injective_on_source_order7=pass");
+ }
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/main_a.rs:49:
+     let f = Field::new();
+     println!("FIELD q={Q} tower=F27[b]/(b2-2) F27_modulus=2,2,0,1 generator={} all_pair_addition_and_multiplication_checks={} inverse_and_Fq_checks={Q} square_root_checks={Q}", f.generator, Q * Q);
+     let points = ec::points();
+-    assert!(!ec::on_curve(Point { x: 0, y: 0, infinity: false }));
+-    assert!(!ec::on_curve(Point { x: 3, y: 1, infinity: false }));
++    assert!(!ec::on_curve(Point {
++        x: 0,
++        y: 0,
++        infinity: false
++    }));
++    assert!(!ec::on_curve(Point {
++        x: 3,
++        y: 1,
++        infinity: false
++    }));
+     for &p in &points {
+         assert_eq!(ec::add(p, ec::IDENTITY), p);
+         assert_eq!(ec::mul(p, 7), ec::IDENTITY);
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/main_a.rs:57:
+         for &q in &points {
+             assert!(points.contains(&ec::add(p, q)));
+             assert_eq!(ec::add(p, q), ec::add(q, p));
+-            for &r in &points { assert_eq!(ec::add(ec::add(p, q), r), ec::add(p, ec::add(q, r))); }
++            for &r in &points {
++                assert_eq!(ec::add(ec::add(p, q), r), ec::add(p, ec::add(q, r)));
++            }
+         }
+     }
+     let generator = *points.iter().find(|p| !p.infinity).unwrap();
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/main_a.rs:64:
+-    assert_eq!((0..7).map(|n| ec::mul(generator, n)).collect::<BTreeSet<_>>().len(), 7);
++    assert_eq!(
++        (0..7)
++            .map(|n| ec::mul(generator, n))
++            .collect::<BTreeSet<_>>()
++            .len(),
++        7
++    );
+     println!("ELLIPTIC curve=Y2-X3-2X-1 points={points:?} generator={generator:?} order=7 addition_pairs=49 associativity_triples=343 invalid_point_controls=pass");
+     maps::cover_identity(&f);
+     let source = Chart::new(&f, &ORIGINAL);
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/main_a.rs:73:
+     for (&p, image) in points.iter().zip(&source_images) {
+         assert_eq!(maps::source_fibre_reference(&source, p), *image);
+         if !p.infinity {
+-            let mutated = Div { u: image.u.clone(), v: pscale(&f, &image.v, &source.scale) };
++            let mutated = Div {
++                u: image.u.clone(),
++                v: pscale(&f, &image.v, &source.scale),
++            };
+             assert!(!source.h.is_valid(&mutated));
+             assert!(source.h.is_valid(&maps::pullback(&source, p)));
+             scale_mutants_rejected += 1;
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/main_a.rs:87:
+     assert_eq!(scale_mutants_rejected, 6);
+     qualify("elliptic_pullback", &source, &points, &source_images);
+     assert!(Kernel::new(&f, 1, G1).is_err());
+-    let kernels = [Kernel::new(&f, 0, G0).unwrap(), Kernel::new(&f, 2, G2).unwrap()];
++    let kernels = [
++        Kernel::new(&f, 0, G0).unwrap(),
++        Kernel::new(&f, 2, G2).unwrap(),
++    ];
+     let mut degree_drop_controls = 0;
+     let mut affine_remainder_positive_controls = 0;
+     let mut total_chain_maps = 0;
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/main_a.rs:94:
+     for kernel in &kernels {
+         let target = Chart::new(&f, &kernel.codomain);
+         target.controls();
+-        println!("KERNEL id={} G={:?} H={:?} delta={} codomain={:?}", kernel.id, kernel.g, kernel.h, kernel.delta, kernel.codomain);
++        println!(
++            "KERNEL id={} G={:?} H={:?} delta={} codomain={:?}",
++            kernel.id, kernel.g, kernel.h, kernel.delta, kernel.codomain
++        );
+         println!("CHART label=Ric{} roots={:?} r={} scale={} leading={} monic={:?} inverse_cube_exponent=243 basepoint_control=pass", kernel.id, target.roots, target.r, target.scale, target.leading, target.h.h);
+         assert!(target.h.is_identity(&maps::identity_fibre(&target, kernel)));
+-        let images: Vec<_> = points.iter().map(|&p| maps::chain(&target, kernel, p)).collect();
++        let images: Vec<_> = points
++            .iter()
++            .map(|&p| maps::chain(&target, kernel, p))
++            .collect();
+         let label = format!("elliptic_then_Ric{}", kernel.id);
+         qualify(&label, &target, &points, &images);
+         total_chain_maps += 1;
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/field_a.rs:22:
+     fn raw_pow(mut a: u32, mut n: u32) -> u32 {
+         let mut result = 1;
+         while n != 0 {
+-            if n & 1 == 1 { result = Self::raw_mul(result, a); }
++            if n & 1 == 1 {
++                result = Self::raw_mul(result, a);
++            }
+             n >>= 1;
+-            if n != 0 { a = Self::raw_mul(a, a); }
++            if n != 0 {
++                a = Self::raw_mul(a, a);
++            }
+         }
+         result
+     }
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/field_a.rs:31:
+ 
+     pub fn new() -> Self {
+         let base = F27;
+-        assert_eq!(base.pow(2, 13), 2, "quadratic extension requires nonsquare2");
+-        let generator = (2..Q).find(|&g| [2, 7, 13].iter()
+-            .all(|p| Self::raw_pow(g, (Q - 1) / p) != 1)).unwrap();
++        assert_eq!(
++            base.pow(2, 13),
++            2,
++            "quadratic extension requires nonsquare2"
++        );
++        let generator = (2..Q)
++            .find(|&g| {
++                [2, 7, 13]
++                    .iter()
++                    .all(|p| Self::raw_pow(g, (Q - 1) / p) != 1)
++            })
++            .unwrap();
+         let mut logarithm = vec![u32::MAX; Q as usize];
+         let mut exponential = Vec::new();
+         let mut value = 1;
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/field_a.rs:49:
+         let mut addition = vec![0; (Q * Q) as usize];
+         for a in 0..Q {
+             for b in 0..Q {
+-                let sum = base.add(&(a % 27), &(b % 27))
+-                    + 27 * base.add(&(a / 27), &(b / 27));
++                let sum = base.add(&(a % 27), &(b % 27)) + 27 * base.add(&(a / 27), &(b / 27));
+                 let (mut aa, mut bb, mut weight, mut reference) = (a, b, 1, 0);
+                 for _ in 0..6 {
+                     reference += ((aa % 3 + bb % 3) % 3) * weight;
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/field_a.rs:62:
+                 addition[(a * Q + b) as usize] = sum as u16;
+             }
+         }
+-        let field = Self { generator, logarithm, exponential, addition };
++        let field = Self {
++            generator,
++            logarithm,
++            exponential,
++            addition,
++        };
+         for a in 0..Q {
+             for b in 0..Q {
+                 assert_eq!(field.mul(&a, &b), Self::raw_mul(a, b));
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/field_a.rs:73:
+                 let norm = base.sub(&base.mul(&a0, &a0), &base.mul(&2, &base.mul(&a1, &a1)));
+                 assert_ne!(norm, 0);
+                 let inverse_norm = base.inv(&norm);
+-                let reference = base.mul(&a0, &inverse_norm)
+-                    + 27 * base.neg(&base.mul(&a1, &inverse_norm));
++                let reference =
++                    base.mul(&a0, &inverse_norm) + 27 * base.neg(&base.mul(&a1, &inverse_norm));
+                 assert_eq!(field.inv(&a), reference);
+                 assert_eq!(field.mul(&a, &field.inv(&a)), 1);
+             }
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/field_a.rs:87:
+         for a in [1, 3, 9, 27, 81, 243] {
+             for b in [1, 3, 9, 27, 81, 243] {
+                 for c in [1, 3, 9, 27, 81, 243] {
+-                    assert_eq!(field.mul(&a, &field.add(&b, &c)), field.add(&field.mul(&a, &b), &field.mul(&a, &c)));
++                    assert_eq!(
++                        field.mul(&a, &field.add(&b, &c)),
++                        field.add(&field.mul(&a, &b), &field.mul(&a, &c))
++                    );
+                 }
+             }
+         }
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/field_a.rs:97:
+     pub fn pow(&self, mut a: u32, mut n: u32) -> u32 {
+         let mut result = 1;
+         while n != 0 {
+-            if n & 1 == 1 { result = self.mul(&result, &a); }
++            if n & 1 == 1 {
++                result = self.mul(&result, &a);
++            }
+             n >>= 1;
+-            if n != 0 { a = self.mul(&a, &a); }
++            if n != 0 {
++                a = self.mul(&a, &a);
++            }
+         }
+         result
+     }
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/field_a.rs:106:
+ 
+     pub fn sqrt(&self, a: u32) -> Option<u32> {
+-        if a == 0 { return Some(0); }
++        if a == 0 {
++            return Some(0);
++        }
+         let exponent = self.logarithm[a as usize];
+-        if exponent & 1 == 1 { return None; }
++        if exponent & 1 == 1 {
++            return None;
++        }
+         let root = self.exponential[(exponent / 2) as usize];
+         Some(root.min(self.neg(&root)))
+     }
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/field_a.rs:115:
+ 
+ impl Fld for Field {
+     type E = u32;
+-    fn zero(&self) -> u32 { 0 }
+-    fn one(&self) -> u32 { 1 }
++    fn zero(&self) -> u32 {
++        0
++    }
++    fn one(&self) -> u32 {
++        1
++    }
+     fn add(&self, a: &u32, b: &u32) -> u32 {
+         u32::from(self.addition[(a * Q + b) as usize])
+     }
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/field_a.rs:123:
+-    fn sub(&self, a: &u32, b: &u32) -> u32 { self.add(a, &self.neg(b)) }
+-    fn neg(&self, a: &u32) -> u32 { self.add(a, a) }
++    fn sub(&self, a: &u32, b: &u32) -> u32 {
++        self.add(a, &self.neg(b))
++    }
++    fn neg(&self, a: &u32) -> u32 {
++        self.add(a, a)
++    }
+     fn mul(&self, a: &u32, b: &u32) -> u32 {
+-        if *a == 0 || *b == 0 { return 0; }
++        if *a == 0 || *b == 0 {
++            return 0;
++        }
+         self.exponential[(self.logarithm[*a as usize] + self.logarithm[*b as usize]) as usize]
+     }
+     fn inv(&self, a: &u32) -> u32 {
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/chart_a.rs:19:
+         for j in 0..=i {
+             let coefficient = f.mul(c, &f.mul(&(choose % 3), &f.pow(r, (i - j) as u32)));
+             result[weight - j] = f.add(&result[weight - j], &coefficient);
+-            if j < i { choose = choose * (i - j) as u32 / (j + 1) as u32; }
++            if j < i {
++                choose = choose * (i - j) as u32 / (j + 1) as u32;
++            }
+         }
+     }
+     ptrim(f, &mut result);
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/chart_a.rs:50:
+         let g = homogeneous(f, model, 6, r);
+         assert_eq!(g.len(), 6);
+         let leading = g[5];
+-        let scale = f.sqrt(leading).expect("frozen F3^6 monic-chart square root absent");
++        let scale = f
++            .sqrt(leading)
++            .expect("frozen F3^6 monic-chart square root absent");
+         assert_eq!(f.mul(&scale, &scale), leading);
+         let monic = pscale(f, &g, &f.inv(&leading));
+         assert_eq!(monic[5], 1);
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/chart_a.rs:57:
+-        let mut derivative: Vec<_> = monic.iter().enumerate().skip(1)
+-            .map(|(i, c)| f.mul(c, &(i as u32 % 3))).collect();
++        let mut derivative: Vec<_> = monic
++            .iter()
++            .enumerate()
++            .skip(1)
++            .map(|(i, c)| f.mul(c, &(i as u32 % 3)))
++            .collect();
+         ptrim(f, &mut derivative);
+         assert_eq!(pxgcd(f, &monic, &derivative).0.len(), 1);
+         let h = Hyp { f, h: monic, g: 2 };
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/chart_a.rs:65:
+         let post = Self::point_chart(&h, f.inv(&delta), 0);
+         assert_eq!(h.add(&pre, &pre), h.identity());
+         assert_eq!(h.add(&post, &post), h.identity());
+-        Self { h, model: model.to_vec(), roots, r, scale, leading, delta, pole, pre, post }
++        Self {
++            h,
++            model: model.to_vec(),
++            roots,
++            r,
++            scale,
++            leading,
++            delta,
++            pole,
++            pre,
++            post,
++        }
+     }
+ 
+     pub fn point_homogeneous(&self, a: u32, b: u32, ordinate: u32) -> Divisor {
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/chart_a.rs:83:
+             return self.h.identity();
+         }
+         let t = f.mul(&b, &f.inv(&denominator));
+-        let z = f.mul(&ordinate, &f.inv(&f.mul(&f.pow(denominator, 3), &self.scale)));
++        let z = f.mul(
++            &ordinate,
++            &f.inv(&f.mul(&f.pow(denominator, 3), &self.scale)),
++        );
+         Self::point_chart(&self.h, t, z)
+     }
+ 
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/ec_a.rs:5:
+     pub infinity: bool,
+ }
+ 
+-pub const IDENTITY: Point = Point { x: 0, y: 0, infinity: true };
++pub const IDENTITY: Point = Point {
++    x: 0,
++    y: 0,
++    infinity: true,
++};
+ 
+ pub fn on_curve(p: Point) -> bool {
+-    if p.infinity { return p == IDENTITY; }
++    if p.infinity {
++        return p == IDENTITY;
++    }
+     p.x < 3 && p.y < 3 && p.y * p.y % 3 == (p.x * p.x * p.x + 2 * p.x + 1) % 3
+ }
+ 
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/ec_a.rs:16:
+     let mut result = vec![IDENTITY];
+     for x in 0..3 {
+         for y in 0..3 {
+-            let p = Point { x, y, infinity: false };
+-            if on_curve(p) { result.push(p); }
++            let p = Point {
++                x,
++                y,
++                infinity: false,
++            };
++            if on_curve(p) {
++                result.push(p);
++            }
+         }
+     }
+     assert_eq!(result.len(), 7);
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/ec_a.rs:26:
+ 
+ pub fn add(p: Point, q: Point) -> Point {
+     assert!(on_curve(p) && on_curve(q));
+-    if p.infinity { return q; }
+-    if q.infinity { return p; }
+-    if p.x == q.x && (p.y + q.y).is_multiple_of(3) { return IDENTITY; }
++    if p.infinity {
++        return q;
++    }
++    if q.infinity {
++        return p;
++    }
++    if p.x == q.x && (p.y + q.y).is_multiple_of(3) {
++        return IDENTITY;
++    }
+     let (numerator, denominator) = if p == q {
+         ((3 * p.x * p.x + 2) % 3, 2 * p.y % 3)
+     } else {
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/ec_a.rs:38:
+     let slope = numerator * denominator % 3;
+     let x = (slope * slope + 6 - p.x - q.x) % 3;
+     let y = (slope * ((p.x + 3 - x) % 3) + 3 - p.y) % 3;
+-    let result = Point { x, y, infinity: false };
++    let result = Point {
++        x,
++        y,
++        infinity: false,
++    };
+     assert!(on_curve(result));
+     result
+ }
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/ec_a.rs:47:
+     let mut result = IDENTITY;
+     let mut base = p;
+     while n != 0 {
+-        if n & 1 == 1 { result = add(result, base); }
++        if n & 1 == 1 {
++            result = add(result, base);
++        }
+         n >>= 1;
+-        if n != 0 { base = add(base, base); }
++        if n != 0 {
++            base = add(base, base);
++        }
+     }
+     result
+ }
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/maps_a.rs:19:
+ }
+ 
+ fn derivative(f: &Field, p: &[u32]) -> Vec<u32> {
+-    let mut result: Vec<_> = p.iter().enumerate().skip(1)
+-        .map(|(i, c)| f.mul(c, &(i as u32 % 3))).collect();
++    let mut result: Vec<_> = p
++        .iter()
++        .enumerate()
++        .skip(1)
++        .map(|(i, c)| f.mul(c, &(i as u32 % 3)))
++        .collect();
+     ptrim(f, &mut result);
+     result
+ }
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/maps_a.rs:30:
+         let g = coefficients.map(|p| p.to_vec());
+         assert_eq!(pmul(f, &pmul(f, &g[0], &g[1]), &g[2]), ORIGINAL);
+         let rows = g.each_ref().map(|p| [p[2], p[1], p[0]]);
+-        let minor = |j: usize, k: usize| f.sub(&f.mul(&rows[1][j], &rows[2][k]), &f.mul(&rows[1][k], &rows[2][j]));
+-        let delta = f.add(&f.sub(&f.mul(&rows[0][0], &minor(1, 2)), &f.mul(&rows[0][1], &minor(0, 2))), &f.mul(&rows[0][2], &minor(0, 1)));
+-        if delta == 0 { return Err("actual product endpoint: no genus-two target chart"); }
++        let minor = |j: usize, k: usize| {
++            f.sub(
++                &f.mul(&rows[1][j], &rows[2][k]),
++                &f.mul(&rows[1][k], &rows[2][j]),
++            )
++        };
++        let delta = f.add(
++            &f.sub(
++                &f.mul(&rows[0][0], &minor(1, 2)),
++                &f.mul(&rows[0][1], &minor(0, 2)),
++            ),
++            &f.mul(&rows[0][2], &minor(0, 1)),
++        );
++        if delta == 0 {
++            return Err("actual product endpoint: no genus-two target chart");
++        }
+         let h = [(1, 2), (2, 0), (0, 1)].map(|(j, k)| {
+-            psub(f, &pmul(f, &g[j], &derivative(f, &g[k])), &pmul(f, &derivative(f, &g[j]), &g[k]))
++            psub(
++                f,
++                &pmul(f, &g[j], &derivative(f, &g[k])),
++                &pmul(f, &derivative(f, &g[j]), &g[k]),
++            )
+         });
+         let codomain = pscale(f, &pmul(f, &pmul(f, &h[0], &h[1]), &h[2]), &f.inv(&delta));
+-        let expected = if id == 0 { TARGET0 } else { assert_eq!(id, 2); TARGET2 };
++        let expected = if id == 0 {
++            TARGET0
++        } else {
++            assert_eq!(id, 2);
++            TARGET2
++        };
+         assert_eq!(codomain, expected);
+-        Ok(Self { id, g, h, delta, codomain })
++        Ok(Self {
++            id,
++            g,
++            h,
++            delta,
++            codomain,
++        })
+     }
+ }
+ 
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/maps_a.rs:52:
+     }
+     let mut transformed = Vec::new();
+     for (i, c) in ORIGINAL.iter().enumerate() {
+-        transformed = padd(f, &transformed, &pscale(f, &pmul(f, &a_powers[i], &b_powers[6 - i]), c));
++        transformed = padd(
++            f,
++            &transformed,
++            &pscale(f, &pmul(f, &a_powers[i], &b_powers[6 - i]), c),
++        );
+     }
+     let even = vec![1, 0, 1, 0, 0, 0, 2];
+     assert_eq!(transformed, even);
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/maps_a.rs:59:
+     let x = vec![0, 0, 2];
+-    let elliptic = padd(f, &padd(f, &pmul(f, &pmul(f, &x, &x), &x), &pscale(f, &x, &2)), &[1]);
++    let elliptic = padd(
++        f,
++        &padd(f, &pmul(f, &pmul(f, &x, &x), &x), &pscale(f, &x, &2)),
++        &[1],
++    );
+     assert_eq!(elliptic, even);
+ }
+ 
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/maps_a.rs:64:
+ pub fn pullback(source: &Chart<'_>, p: Point) -> Divisor {
+     assert!(on_curve(p));
+-    if p.infinity { return source.h.identity(); }
++    if p.infinity {
++        return source.h.identity();
++    }
+     let f = source.h.f;
+     let a = vec![1, source.r];
+     let b = vec![1, f.add(&source.r, &1)];
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/maps_a.rs:70:
+-    let u = pmonic(f, &psub(f, &pmul(f, &a, &a), &pscale(f, &pmul(f, &b, &b), &f.mul(&2, &p.x))));
++    let u = pmonic(
++        f,
++        &psub(
++            f,
++            &pmul(f, &a, &a),
++            &pscale(f, &pmul(f, &b, &b), &f.mul(&2, &p.x)),
++        ),
++    );
+     assert_eq!(u.len(), 3);
+     let numerator = pscale(f, &pmul(f, &pmul(f, &b, &b), &b), &f.mul(&2, &p.y));
+     let v = pmod(f, &pscale(f, &numerator, &f.inv(&source.scale)), &u);
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/maps_a.rs:97:
+ fn binary_quadratic(f: &Field, g: &[u32], a: u32, b: u32) -> u32 {
+     let mut value = 0;
+     for (i, c) in g.iter().enumerate() {
+-        value = f.add(&value, &f.mul(c, &f.mul(&f.pow(a, i as u32), &f.pow(b, (2 - i) as u32))));
++        value = f.add(
++            &value,
++            &f.mul(c, &f.mul(&f.pow(a, i as u32), &f.pow(b, (2 - i) as u32))),
++        );
+     }
+     value
+ }
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/maps_a.rs:107:
+     assert_ne!(ordinate, 0);
+     let mut source_equation = 0;
+     for (i, c) in ORIGINAL.iter().enumerate() {
+-        source_equation = f.add(&source_equation, &f.mul(c, &f.mul(&f.pow(a, i as u32), &f.pow(b, (6 - i) as u32))));
++        source_equation = f.add(
++            &source_equation,
++            &f.mul(c, &f.mul(&f.pow(a, i as u32), &f.pow(b, (6 - i) as u32))),
++        );
+     }
+     assert_eq!(f.mul(&ordinate, &ordinate), source_equation);
+     let g0 = binary_quadratic(f, &kernel.g[0], a, b);
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/maps_a.rs:114:
+     let g1 = binary_quadratic(f, &kernel.g[1], a, b);
+-    let u = padd(f, &pscale(f, &kernel.h[0], &g0), &pscale(f, &kernel.h[1], &g1));
++    let u = padd(
++        f,
++        &pscale(f, &kernel.h[0], &g0),
++        &pscale(f, &kernel.h[1], &g1),
++    );
+     assert!(!u.is_empty());
+-    let v = pscale(f, &pmul(f, &kernel.h[0], &[a, f.neg(&b)]), &f.mul(&g0, &f.inv(&ordinate)));
++    let v = pscale(
++        f,
++        &pmul(f, &kernel.h[0], &[a, f.neg(&b)]),
++        &f.mul(&g0, &f.inv(&ordinate)),
++    );
+     (u, v)
+ }
+ 
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/maps_a.rs:122:
+     let f = target.h.f;
+     let u = pmonic(f, &homogeneous(f, u, 2, target.r));
+     assert!(!u.is_empty() && u.len() <= 3);
+-    let v = pmod(f, &pscale(f, &homogeneous(f, numerator, 3, target.r), &f.inv(&target.scale)), &u);
++    let v = pmod(
++        f,
++        &pscale(
++            f,
++            &homogeneous(f, numerator, 3, target.r),
++            &f.inv(&target.scale),
++        ),
++        &u,
++    );
+     Div { u, v }
+ }
+ 
+Diff in /dev/shm/ct23-elliptic-chain-first-A/source/research/chained_realcurve_torsion_20261123/elliptic_chain/maps_a.rs:135:
+ 
+ pub fn chain(target: &Chart<'_>, kernel: &Kernel, p: Point) -> Divisor {
+     assert!(on_curve(p));
+-    if p.infinity { return target.h.identity(); }
++    if p.infinity {
++        return target.h.identity();
++    }
+     let images = preimages(target.h.f, p).map(|(a, b, y)| image_point(target, kernel, a, b, y));
+     target.h.add(&images[0], &images[1])
+ }

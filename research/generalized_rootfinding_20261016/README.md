@@ -5,6 +5,18 @@ research cycle. **Historical Python development calibration; no qualified
 native, end-to-end index-calculus, or F4/F5/F6 performance claim.** The requested
 5x target and the unchanged 2x release gate remain open.
 
+**Native continuation, 2026-10-19:** the bounded solver is now implemented in
+[Rust](../../tools/generalized-rootfinder/README.md), including certified
+prime/extension fields, exact domains, complete enumeration/component MITM,
+Boolean solving and the complete original eight-coordinate S3 separator.
+Thirteen standalone tests and the two/eight-root CLI fixtures pass. The
+[native runtime study](../f4_f5_boolean_runtime_20261019/REPORT.md) compares
+matching 16/22-variable Boolean roots and first-witness decompositions against
+F4/F5, F6 and the Semaev backend. These measurements do not qualify the original
+hard GF(2^83) search, this checkpoint's 2x/5x gate, or the later 8x hard-family
+gate. The status/next-work section below records the original checkpoint;
+`historical/` and every transport hash remain unchanged.
+
 The 112 original payloads are preserved under `historical/`. Files larger than
 1 MB use deterministic gzip transport; decoding restores the exact original
 bytes. `TRANSPORT.json` records both transport and original SHA-256 digests,
@@ -72,7 +84,7 @@ included. Older attempts and native runtime dependencies are not all bundled.
 This checkpoint is therefore not a complete resumable checkout of the original
 lab. Every current-cycle raw record and pinned source/input payload is included.
 
-## Requirement status and next work
+## Requirement status and next work (2026-10-16 checkpoint)
 
 | Requirement | Status and remaining condition |
 | --- | --- |

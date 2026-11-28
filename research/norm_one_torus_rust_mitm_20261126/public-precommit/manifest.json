@@ -1,0 +1,59 @@
+{
+  "schema": "isogeny-labs/experiment-seeds/v1",
+  "study_id": "norm-one-torus-rust-mitm-public-precommit-20261126",
+  "frozen_before_execution_utc": "2026-11-26T06:17:22Z",
+  "precommit_intent": "This manifest must be committed and pushed to the open pull-request branch before its target stream is constructed or its benchmark is run.",
+  "master_seed_hex": "aebd88a483c46b219e0856f6152145f58133dd8005ace62f90302b53cc53fa52",
+  "stream_derivation": {
+    "domain": "isogeny-labs/norm-one-torus-mitm/public-precommit/2026-11-26/v1",
+    "construction": "SHA-256(domain || 0x00 || master_seed || 0x00 || stream_name || 0x00 || u64be(index)); reduce big-endian digest modulo the requested range"
+  },
+  "configuration": {
+    "curve": "icv1-fp31-tm3989-ae9db972",
+    "dickson_height": 6,
+    "dickson_lo": 0,
+    "dickson_c_top": 0,
+    "random_targets": 32,
+    "planted_targets": 8,
+    "arity": 5,
+    "rounds": 9,
+    "query_block_size": 512
+  },
+  "comparison": {
+    "control": "individual affine normalization of the complete signed 2+3 MITM tables",
+    "candidate": "Montgomery batch normalization plus canonical negation quotient of the signed three-sum table",
+    "warmups_per_arm": 1,
+    "round_order": "individual,batch-quotient on even rounds; reversed on odd rounds",
+    "candidate_aa_repeats_per_round": 2,
+    "primary_evidence": "deterministic operation counts",
+    "wall_clock_status": "local non-isolated producer diagnostic"
+  },
+  "tuning_disclosure": {
+    "development_master_seeds": [
+      "8fd1de7e3b856433fd0335bfd4685baae0167aca90448729a9a1a97a7bdfaa47",
+      "f56ad68b7188c6f0f806458becfee34fe81da3789a1595e7df9081e0aae7f19c"
+    ],
+    "block_sizes_tested": [128, 256, 512, 1024, 2048, 4096],
+    "selected_block_size": 512,
+    "public_precommit_seed_used_during_tuning": false
+  },
+  "source": {
+    "commit": "970114502704a9506e3207c54991a577feceda19",
+    "sha256": {
+      "examples/norm_one_torus_mitm.rs": "efb1e483b1bcdb38f212c508e58bb047bcd35d3786943cd6647b163e0aa5d6bd",
+      "examples/norm_one_torus_mitm_verify.rs": "d8c7b153354a3b649403f1605e9c2590074c77c23c704c01ea9c211245311b91",
+      "examples/support/norm_one_torus_mitm.rs": "e4228fde00253700da64ad6dabd7fba958b6349797733867dda013a1707c62f3",
+      "src/cryptanalysis/ic_framework/pkm_semaev.rs": "4c506981d6449f2688fe07222ae9b6b21e6d58d5a363e372e0425014167c9c4a",
+      "Cargo.lock": "192c1d7e8bf2c3bbfb084721d192a6ab08d86d67adbb452cc3f79cff70ccfec0"
+    }
+  },
+  "environment": {
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "llvm": "23.1.5",
+    "target": "x86_64-unknown-linux-gnu",
+    "kernel": "Linux 6.18.57 x86_64",
+    "cpu": "Intel Xeon Platinum 8573C",
+    "visible_cpus": 5,
+    "isolation": "none; use counts as primary and wall time only as producer diagnostic"
+  }
+}

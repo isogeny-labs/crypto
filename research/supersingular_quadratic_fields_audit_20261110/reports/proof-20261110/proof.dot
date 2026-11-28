@@ -1,0 +1,16 @@
+digraph QuadraticFields {
+  graph [rankdir=TB, bgcolor="white", fontname="DejaVu Sans", nodesep=0.25, ranksep=0.3];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, fillcolor="#eef3fa", color="#2d4262", margin="0.15,0.10"];
+  edge [color="#53657e", arrowsize=0.7];
+  fields [label="Actual computable quadratic fields F4 / F9\nField axioms, characteristic and cardinalities proved\n1,024 / 59,049 general coefficient tuples"];
+  f4 [label="F4: generic monic quadratic fibre bound\nAt most 2 y-values for every x\nPositive count ≤ 2q+1 = 9", fillcolor="#e6f3e9"];
+  f9 [label="F9: generic characteristic-3 square completion\nExplicit equation bijection and inverse\nAll general models reduce to 729 normalized models"];
+  cases [label="Nine independent 81-model kernel proofs\nExplicit exhaustion of all nine a2 values\nNo native_decide / classification premise", fillcolor="#e6f3e9"];
+  counts [label="Actual nonsingular point-group count bridge\nSource criterion gcd(q+1−#E,q) ≠ 1\nF4 counts {1,3,5,7,9}; F9 counts {4,7,10,13,16}", fillcolor="#e6f3e9"];
+  bound [label="Every prime divisor: modular order ≤ 6\nCoprime with q and actual prime-order point\nExplicit equality-instance Cauchy application"];
+  controls [label="Actual nonsingular controls: F4 / order 7, F9 / order 13\nBoth satisfy source trace criterion and exact modular degree 3", fillcolor="#e6f3e9"];
+  scope [label="42 declarations pass, 0 failing / 0 trusted-native\nHigher extensions and geometric / torsion-field bridges open\n57 attempt/source/resource files retained losslessly\nLocal checking; signed standing unverified", fillcolor="#fce7e7"];
+  fields -> f4; fields -> f9; f9 -> cases;
+  f4 -> counts; cases -> counts; counts -> bound;
+  fields -> controls; bound -> scope; controls -> scope;
+}

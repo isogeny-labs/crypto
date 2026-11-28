@@ -1,0 +1,13 @@
+digraph admission_v3 {
+  graph [rankdir=TB, bgcolor="white", pad="0.15", nodesep="0.38", ranksep="0.48"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=13,
+        color="#243b53", fillcolor="#f4f8fc", margin="0.17,0.11"];
+  edge [color="#526b80", penwidth=1.35, arrowsize=0.7];
+  panel [label="Frozen K13 panel: 10 arms\nall records need L2", fillcolor="#e9f0fb"];
+  v2 [label="v2 screened batch m3 + A/A + F6\nomitted rho and three other non-Gröbner arms", fillcolor="#fff0e8"];
+  v3 [label="v3 screens all 6 non-Gröbner arms\nrho reference + scalar m3/m2\nbatch m3/m2 + batch A/A", fillcolor="#e8f6f1"];
+  full [label="Full panel tests four Gröbner arms too\nF4, F5, inherited F4, F6-IC", fillcolor="#e8f6f1"];
+  panel -> v2 [label="incomplete preflight"];
+  v2 -> v3 [label="before-data correction"];
+  v3 -> full [label="if admitted; separate run"];
+}

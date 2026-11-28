@@ -1,0 +1,25 @@
+# Genuine original equations through a durable native checkpoint
+
+A deterministic supplied n=2,m=2 Original is constructed and independently checked by the actual production provenance functions, then serialized/imported through the actual independent map checker. The genuine private CheckedMap is expanded by the production Boolean wrapper/kernel. Its26ordered generators are normalized and passed into the actual continuation/search/scheduler callback path. No native basis, search node or continuation partition is manually constructed.
+
+The first committed batch in the first node invokes the actual checkpoint_native encoder and actual publication bridge against the actual Budget and filesystem CaptureEmitter. After that successful capture, the fixture callback deliberately returns Err to stop further search; nested child attempts remain retained. The local callback stop does not stop the original Budget, allowing the remaining fixture verification to consume its existing allowance. This is a controlled fixture observer stop, not production recovery or resume.
+
+The emitter is dropped. Fresh committed-prefix verification rereads events and payload hashes. The actual decoder reads the complete acknowledged snapshot. Actual original descent reconstructs the imported CheckedMap equations and compares raw/normalized ordered generators; actual native semantic/BQI replay verifies12committed row identities. All these stages share the same real Budget and absolute30second deadline, through small adapters to reserve_checking. No new ledger or reset is introduced. Charges:8464835modeled checking work,23047139adapter allocation bytes,198772trace bytes. Original ceilings remain16777216work,64MiBmemory,16MiBtrace. A2Mwork/2Mbyte fixture materialization reservation covers fixture copies/serialization overhead; these are modeled reservations, not instruction or resident-memory measurements.
+
+Evidence is in fixtures/1256420, including RESULT.json and untouched live event/head/payload files. The successful runnable source is durable_tests.rs (invoked as a small standalone main, despite the inherited filename), with COMMAND.json and compile.log/run.log. Runtime used40second timeout,35second CPU limit and1GiB virtual-memory cap. The focused rustc command used cached libraries and a single-thread linker; no full crate/Cargo build was performed.
+
+Source bindings verify byte identity of the actual provenance donor, checked expansion, callback kernels, Budget, capture, storage and publication sources. Encoder differs only in the fixture-module cfg/visibility, not any production method body. The donor extraction boundaries remain those documented in the two source packets. Unused checked-model/signed-lift record types retain their original structural fixture shim; no such verification is executed.
+
+Identity remains explicitly a software fixture: supplied Original binding and public/factor/launch hashes are synthetic; map publication uses a fixture full-JSON-map role, and capture attempt binding is separate synthetic fixture data. This is not a dataset original-cell token/launch/factor-domain admission or central caller acceptance. The proof is original descent relative to the supplied Original joined to actual captured arithmetic state. No pseudo complete report, signed lift, full-search or degree claim is made.
+
+No active source, frozen policy, scientific corpus or cloud state changed.
+
+## V2 readback accounting correction
+
+V1 remains preserved and its raw-file readback was not prepaid with an exact retained-size quote. V2 reserves2380736modeled work and1578600allocation bytes BEFORE fresh prefix verification, payload reading and concatenation. Inputs are retained final acknowledgement byte_end4258, known map+snapshot payload bytes30893 and known8records; no filesystem metadata discovery is used to obtain this quote. Fresh readback limits are tightened to those exact stream/payload/count ceilings. The concatenated length is checked against retained snapshot bytes, then the original Budget deadline is checked before decoder entry. All reservations use the same original Budget; there is no renewed grant.
+
+The final fixture is1256420. Earlier v2 fixture1255627 passed with prepayment but before tightening readback limits; its source/log remain preserved. The final bounded rerun adds those ceilings so fresh verification cannot simply admit a larger stream under its earlier broad fixture caps.
+
+Normalization uses fixture stdsort by degree then lexicographic order; its cursor is fixture supplied. Native batch_rows=128 is a software-fixture limit, whereas the current production policy uses1. This test exercises actual kernels and publication methods, not the complete production owner-policy factory or owner normalization loop. Synthetic identity/original-cell limitations above remain unchanged.
+
+Both v2 focused compilations used a50second wall timeout,45second CPU limit,1.5GiB virtual-memory cap and single-thread linker. Runtime used40second wall timeout,35second CPU limit and1GiB virtual-memory cap. No cloud or full Cargo build.

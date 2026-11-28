@@ -1,0 +1,182 @@
+{
+  "branch": "aburan28/laughing-darwin-3qdnk2",
+  "closed_utc": "2026-11-15T10:24:19+00:00",
+  "commands": [
+    {
+      "argv": [
+        "env",
+        "BIN=/dev/shm/fv/ic",
+        "ISO=/tmp/claude-0/rulev9/bin/isolated_bench",
+        "bash",
+        "research/ic_tool_program/explorations/fast-verify-20261115/ab/run.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T09:47:14+00:00",
+      "wall_s": 2169.884
+    }
+  ],
+  "commit": "d1290ca4053b07fe2cae06ecb726183082042778",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T09:47:06+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-ic-fast-verify"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T0947Z-ic-fast-verify-ab",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "verify_generic_over_fast_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.0472090771182962,
+        2.177246542472667
+      ],
+      "unit": "ratio",
+      "value": 2.0988447957077296
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "verify_aa_k0n53",
+      "note": "A/A generic/generic; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9454740959768334,
+        1.030848611028784
+      ],
+      "unit": "ratio",
+      "value": 1.0061915322424906
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "setup_generic_over_fast_k0n53",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9522491599746913,
+        0.9988902154555943
+      ],
+      "unit": "ratio",
+      "value": 0.979895283457205
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "setup_aa_k0n53",
+      "note": "A/A generic/generic; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9471262090668178,
+        1.015578565191985
+      ],
+      "unit": "ratio",
+      "value": 0.9893389421171053
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "verify_generic_over_fast_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.2060185240135626,
+        2.308714039186569
+      ],
+      "unit": "ratio",
+      "value": 2.2684197260732395
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "verify_aa_k0n61",
+      "note": "A/A generic/generic; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9812001828168794,
+        1.0155561043581394
+      ],
+      "unit": "ratio",
+      "value": 0.9976828415923339
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 24,
+      "name": "setup_generic_over_fast_k0n61",
+      "note": "median of per-round ratios, 95% bootstrap over rounds; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9780631227958366,
+        1.0230564234275799
+      ],
+      "unit": "ratio",
+      "value": 1.00839738470753
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 24,
+      "name": "setup_aa_k0n61",
+      "note": "A/A generic/generic; PROTOCOL.md",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9680435549897459,
+        1.025189548828425
+      ],
+      "unit": "ratio",
+      "value": 1.0029183117812122
+    }
+  ],
+  "problem": "ic:koblitz_setup_phase",
+  "raw": [
+    {
+      "bytes": 171012,
+      "path": "/tmp/claude-0/-home-user/7f658e4a-7634-5acc-b973-cdb225b38f41/scratchpad/fv-runs.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/60/60ddfb440c9babc9ca356205bcd647c76ba3387fed557b7203433efaee0fec54",
+      "sha256": "60ddfb440c9babc9ca356205bcd647c76ba3387fed557b7203433efaee0fec54",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261115-ic-fast-verify/report.pdf",
+    "png": [
+      "benchmarks/20261115-ic-fast-verify/ab.png"
+    ],
+    "svg": [
+      "benchmarks/20261115-ic-fast-verify/ab.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-fast-verify-ab",
+  "status": "measured",
+  "summary": "Single-word relation check: verify generic/fast 2.10 [2.05,2.18] (k0n53), 2.27 [2.21,2.31] (k0n61); both established; whole set-up not established, no regression. Kept as default.",
+  "validation": null
+}

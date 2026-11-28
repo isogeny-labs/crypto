@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-22T23:30:30Z",
+ "id": "PCC-20261122-9e6381",
+ "kind": "statement",
+ "producer": {
+  "commit": "db270b54ac9cf05bcd9e39e024e855ff65808229",
+  "model": "GPT-6-Astra-Pro",
+  "session": "subnlogn-full-construction-20261122"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/subnlogn_rust_20261122/construction-correctness.json",
+    "sha256": "3ce161c9a6972de00b0888b964e26b64324293e286540db2dcd3eccf5340675b"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "isogeny_algos experimental-subnlogn reconstruction, finite public known-answer fixtures; no speed or full-network claim",
+ "statement": "Producer-recorded native Rust checks of the experimental multiplication reconstruction at source tree 91ca547dda751394e959b7ae7f3fe4ddcb6613f8: 117 feature-enabled library tests, 10 integration tests, 3 example tests and 10 polynomial regressions passed; one pre-existing library test remained ignored. The explicit diagnostic numerical flow matched its integer known answer and reported zero recursive network nodes. This does not establish a native sub-nlogn runtime bound."
+}

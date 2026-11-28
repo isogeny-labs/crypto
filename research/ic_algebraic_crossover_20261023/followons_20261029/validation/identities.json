@@ -1,0 +1,744 @@
+{
+  "formal_proofs_checked_separately": true,
+  "records": [
+    {
+      "added_one_negative_control_rejected": true,
+      "certificate": {
+        "id": "IDC1h02c42d4a878d05d0",
+        "independence": "native issuer and separately seeded checker in same development session; no external-runner claim",
+        "modulus": 2305843009213693951,
+        "points": 32,
+        "proof": {
+          "kind": "lean4",
+          "path": "research/ic_algebraic_crossover_20261023/followons_20261029/ThreeLeads.lean",
+          "sha256": "9b736c71806fbddeaded513f2a9bf5726a0815faf93776c97914393032a771f8"
+        },
+        "schema": "identity.certificate/v1",
+        "seed": 539365417,
+        "statement": {
+          "degree_bound": 7,
+          "lhs": {
+            "args": [
+              {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": "a",
+                            "op": "var"
+                          },
+                          {
+                            "args": "f",
+                            "op": "var"
+                          }
+                        ],
+                        "op": "mul"
+                      },
+                      {
+                        "args": {
+                          "args": [
+                            {
+                              "args": "c",
+                              "op": "var"
+                            },
+                            {
+                              "args": "d",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        "op": "neg"
+                      }
+                    ],
+                    "op": "add"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": "a",
+                            "op": "var"
+                          },
+                          {
+                            "args": "f",
+                            "op": "var"
+                          }
+                        ],
+                        "op": "mul"
+                      },
+                      {
+                        "args": {
+                          "args": [
+                            {
+                              "args": "c",
+                              "op": "var"
+                            },
+                            {
+                              "args": "d",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        "op": "neg"
+                      }
+                    ],
+                    "op": "add"
+                  }
+                ],
+                "op": "mul"
+              },
+              {
+                "args": {
+                  "args": [
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": "a",
+                              "op": "var"
+                            },
+                            {
+                              "args": "e",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        {
+                          "args": {
+                            "args": [
+                              {
+                                "args": "b",
+                                "op": "var"
+                              },
+                              {
+                                "args": "d",
+                                "op": "var"
+                              }
+                            ],
+                            "op": "mul"
+                          },
+                          "op": "neg"
+                        }
+                      ],
+                      "op": "add"
+                    },
+                    {
+                      "args": [
+                        {
+                          "args": [
+                            {
+                              "args": "b",
+                              "op": "var"
+                            },
+                            {
+                              "args": "f",
+                              "op": "var"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        {
+                          "args": {
+                            "args": [
+                              {
+                                "args": "c",
+                                "op": "var"
+                              },
+                              {
+                                "args": "e",
+                                "op": "var"
+                              }
+                            ],
+                            "op": "mul"
+                          },
+                          "op": "neg"
+                        }
+                      ],
+                      "op": "add"
+                    }
+                  ],
+                  "op": "mul"
+                },
+                "op": "neg"
+              }
+            ],
+            "op": "add"
+          },
+          "name": "Quadratic resultant Bezout witness used by the chain pullback",
+          "rhs": {
+            "args": [
+              {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": [
+                              {
+                                "args": [
+                                  {
+                                    "args": "d",
+                                    "op": "var"
+                                  },
+                                  {
+                                    "args": [
+                                      {
+                                        "args": [
+                                          {
+                                            "args": "a",
+                                            "op": "var"
+                                          },
+                                          {
+                                            "args": "e",
+                                            "op": "var"
+                                          }
+                                        ],
+                                        "op": "mul"
+                                      },
+                                      {
+                                        "args": {
+                                          "args": [
+                                            {
+                                              "args": "b",
+                                              "op": "var"
+                                            },
+                                            {
+                                              "args": "d",
+                                              "op": "var"
+                                            }
+                                          ],
+                                          "op": "mul"
+                                        },
+                                        "op": "neg"
+                                      }
+                                    ],
+                                    "op": "add"
+                                  }
+                                ],
+                                "op": "mul"
+                              },
+                              {
+                                "args": "z",
+                                "op": "var"
+                              }
+                            ],
+                            "op": "mul"
+                          },
+                          {
+                            "args": [
+                              {
+                                "args": "e",
+                                "op": "var"
+                              },
+                              {
+                                "args": [
+                                  {
+                                    "args": [
+                                      {
+                                        "args": "a",
+                                        "op": "var"
+                                      },
+                                      {
+                                        "args": "e",
+                                        "op": "var"
+                                      }
+                                    ],
+                                    "op": "mul"
+                                  },
+                                  {
+                                    "args": {
+                                      "args": [
+                                        {
+                                          "args": "b",
+                                          "op": "var"
+                                        },
+                                        {
+                                          "args": "d",
+                                          "op": "var"
+                                        }
+                                      ],
+                                      "op": "mul"
+                                    },
+                                    "op": "neg"
+                                  }
+                                ],
+                                "op": "add"
+                              }
+                            ],
+                            "op": "mul"
+                          }
+                        ],
+                        "op": "add"
+                      },
+                      {
+                        "args": {
+                          "args": [
+                            {
+                              "args": "d",
+                              "op": "var"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "args": [
+                                    {
+                                      "args": "a",
+                                      "op": "var"
+                                    },
+                                    {
+                                      "args": "f",
+                                      "op": "var"
+                                    }
+                                  ],
+                                  "op": "mul"
+                                },
+                                {
+                                  "args": {
+                                    "args": [
+                                      {
+                                        "args": "c",
+                                        "op": "var"
+                                      },
+                                      {
+                                        "args": "d",
+                                        "op": "var"
+                                      }
+                                    ],
+                                    "op": "mul"
+                                  },
+                                  "op": "neg"
+                                }
+                              ],
+                              "op": "add"
+                            }
+                          ],
+                          "op": "mul"
+                        },
+                        "op": "neg"
+                      }
+                    ],
+                    "op": "add"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": [
+                              {
+                                "args": "a",
+                                "op": "var"
+                              },
+                              {
+                                "args": [
+                                  {
+                                    "args": "z",
+                                    "op": "var"
+                                  },
+                                  {
+                                    "args": "z",
+                                    "op": "var"
+                                  }
+                                ],
+                                "op": "mul"
+                              }
+                            ],
+                            "op": "mul"
+                          },
+                          {
+                            "args": [
+                              {
+                                "args": "b",
+                                "op": "var"
+                              },
+                              {
+                                "args": "z",
+                                "op": "var"
+                              }
+                            ],
+                            "op": "mul"
+                          }
+                        ],
+                        "op": "add"
+                      },
+                      {
+                        "args": "c",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "add"
+                  }
+                ],
+                "op": "mul"
+              },
+              {
+                "args": [
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": "a",
+                            "op": "var"
+                          },
+                          {
+                            "args": [
+                              {
+                                "args": [
+                                  {
+                                    "args": "a",
+                                    "op": "var"
+                                  },
+                                  {
+                                    "args": "f",
+                                    "op": "var"
+                                  }
+                                ],
+                                "op": "mul"
+                              },
+                              {
+                                "args": {
+                                  "args": [
+                                    {
+                                      "args": "c",
+                                      "op": "var"
+                                    },
+                                    {
+                                      "args": "d",
+                                      "op": "var"
+                                    }
+                                  ],
+                                  "op": "mul"
+                                },
+                                "op": "neg"
+                              }
+                            ],
+                            "op": "add"
+                          }
+                        ],
+                        "op": "mul"
+                      },
+                      {
+                        "args": {
+                          "args": [
+                            {
+                              "args": [
+                                {
+                                  "args": [
+                                    {
+                                      "args": "a",
+                                      "op": "var"
+                                    },
+                                    {
+                                      "args": [
+                                        {
+                                          "args": [
+                                            {
+                                              "args": "a",
+                                              "op": "var"
+                                            },
+                                            {
+                                              "args": "e",
+                                              "op": "var"
+                                            }
+                                          ],
+                                          "op": "mul"
+                                        },
+                                        {
+                                          "args": {
+                                            "args": [
+                                              {
+                                                "args": "b",
+                                                "op": "var"
+                                              },
+                                              {
+                                                "args": "d",
+                                                "op": "var"
+                                              }
+                                            ],
+                                            "op": "mul"
+                                          },
+                                          "op": "neg"
+                                        }
+                                      ],
+                                      "op": "add"
+                                    }
+                                  ],
+                                  "op": "mul"
+                                },
+                                {
+                                  "args": "z",
+                                  "op": "var"
+                                }
+                              ],
+                              "op": "mul"
+                            },
+                            {
+                              "args": [
+                                {
+                                  "args": "b",
+                                  "op": "var"
+                                },
+                                {
+                                  "args": [
+                                    {
+                                      "args": [
+                                        {
+                                          "args": "a",
+                                          "op": "var"
+                                        },
+                                        {
+                                          "args": "e",
+                                          "op": "var"
+                                        }
+                                      ],
+                                      "op": "mul"
+                                    },
+                                    {
+                                      "args": {
+                                        "args": [
+                                          {
+                                            "args": "b",
+                                            "op": "var"
+                                          },
+                                          {
+                                            "args": "d",
+                                            "op": "var"
+                                          }
+                                        ],
+                                        "op": "mul"
+                                      },
+                                      "op": "neg"
+                                    }
+                                  ],
+                                  "op": "add"
+                                }
+                              ],
+                              "op": "mul"
+                            }
+                          ],
+                          "op": "add"
+                        },
+                        "op": "neg"
+                      }
+                    ],
+                    "op": "add"
+                  },
+                  {
+                    "args": [
+                      {
+                        "args": [
+                          {
+                            "args": [
+                              {
+                                "args": "d",
+                                "op": "var"
+                              },
+                              {
+                                "args": [
+                                  {
+                                    "args": "z",
+                                    "op": "var"
+                                  },
+                                  {
+                                    "args": "z",
+                                    "op": "var"
+                                  }
+                                ],
+                                "op": "mul"
+                              }
+                            ],
+                            "op": "mul"
+                          },
+                          {
+                            "args": [
+                              {
+                                "args": "e",
+                                "op": "var"
+                              },
+                              {
+                                "args": "z",
+                                "op": "var"
+                              }
+                            ],
+                            "op": "mul"
+                          }
+                        ],
+                        "op": "add"
+                      },
+                      {
+                        "args": "f",
+                        "op": "var"
+                      }
+                    ],
+                    "op": "add"
+                  }
+                ],
+                "op": "mul"
+              }
+            ],
+            "op": "add"
+          },
+          "source": "followons_20261029/src/lib.rs::chain_bridge; resultant identity over Z reduces to characteristic2",
+          "variables": [
+            "a",
+            "b",
+            "c",
+            "d",
+            "e",
+            "f",
+            "z"
+          ]
+        },
+        "value_digest": "6be3449a2db0a92ebd8094bfb5a5a00a28da6ea2a009464c630820b779425850"
+      },
+      "checker": {
+        "extra_points": 64,
+        "false_accept_log2": -5586.49392748247,
+        "points": 32,
+        "verdict": "Accept"
+      }
+    },
+    {
+      "added_one_negative_control_rejected": true,
+      "certificate": {
+        "id": "IDC1hf913cc1220ef209b",
+        "independence": "native issuer and separately seeded checker in same development session; no external-runner claim",
+        "modulus": 2305843009213693951,
+        "points": 32,
+        "proof": {
+          "kind": "lean4",
+          "path": "research/ic_algebraic_crossover_20261023/followons_20261029/ThreeLeads.lean",
+          "sha256": "9b736c71806fbddeaded513f2a9bf5726a0815faf93776c97914393032a771f8"
+        },
+        "schema": "identity.certificate/v1",
+        "seed": 539365417,
+        "statement": {
+          "degree_bound": 8,
+          "lhs": {
+            "args": [
+              {
+                "args": [
+                  {
+                    "args": "s",
+                    "op": "var"
+                  },
+                  {
+                    "args": "f",
+                    "op": "var"
+                  },
+                  {
+                    "args": "f",
+                    "op": "var"
+                  },
+                  {
+                    "args": "f",
+                    "op": "var"
+                  }
+                ],
+                "op": "mul"
+              },
+              {
+                "args": [
+                  {
+                    "args": "s",
+                    "op": "var"
+                  },
+                  {
+                    "args": "v",
+                    "op": "var"
+                  },
+                  {
+                    "args": "v",
+                    "op": "var"
+                  },
+                  {
+                    "args": "v",
+                    "op": "var"
+                  }
+                ],
+                "op": "mul"
+              }
+            ],
+            "op": "mul"
+          },
+          "name": "Complementary Koblitz quotient endomorphism identity",
+          "rhs": {
+            "args": [
+              {
+                "args": "s",
+                "op": "var"
+              },
+              {
+                "args": "s",
+                "op": "var"
+              },
+              {
+                "args": [
+                  {
+                    "args": "f",
+                    "op": "var"
+                  },
+                  {
+                    "args": "v",
+                    "op": "var"
+                  }
+                ],
+                "op": "mul"
+              },
+              {
+                "args": [
+                  {
+                    "args": "f",
+                    "op": "var"
+                  },
+                  {
+                    "args": "v",
+                    "op": "var"
+                  }
+                ],
+                "op": "mul"
+              },
+              {
+                "args": [
+                  {
+                    "args": "f",
+                    "op": "var"
+                  },
+                  {
+                    "args": "v",
+                    "op": "var"
+                  }
+                ],
+                "op": "mul"
+              }
+            ],
+            "op": "mul"
+          },
+          "source": "phi=s V^3; psi=s F^3; commuting F,V and F V=2 give psi phi=s^2*8; s=23 gives4232",
+          "variables": [
+            "s",
+            "f",
+            "v"
+          ]
+        },
+        "value_digest": "a1f077c09e4bee5353bcefefe92fa3e7ee239caee897024d086f3ac980512aff"
+      },
+      "checker": {
+        "extra_points": 64,
+        "false_accept_log2": -5568.0,
+        "points": 32,
+        "verdict": "Accept"
+      }
+    }
+  ],
+  "schema": "ic-three-lead-identity-checks/v1"
+}

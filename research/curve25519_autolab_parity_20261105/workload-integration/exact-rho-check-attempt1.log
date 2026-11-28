@@ -1,0 +1,33 @@
+    Checking crypto v0.1.0 (/home/ec2-user/crypto-curve25519-workload-20261105)
+error[E0599]: no method named `to_u128` found for type parameter `S` in the current scope
+   --> src/cryptanalysis/ic_framework/linalg.rs:559:22
+    |
+419 | impl<S: RhoScalar> Wiedemann<S> {
+    |      - method `to_u128` not found for this type parameter
+...
+559 |         let m128 = m.to_u128();
+    |                      ^^^^^^^ method not found in `S`
+    |
+    = help: items from traits can only be used if the type parameter is bounded by the trait
+help: the following traits define an item `to_u128`, perhaps you need to restrict type parameter `S` with one of them:
+    |
+419 | impl<S: RhoScalar + NarrowRhoScalar> Wiedemann<S> {
+    |                   +++++++++++++++++
+419 | impl<S: RhoScalar + num_traits::ToPrimitive> Wiedemann<S> {
+    |                   +++++++++++++++++++++++++
+
+error[E0308]: mismatched types
+   --> src/cryptanalysis/ic_framework/linalg.rs:562:36
+    |
+419 | impl<S: RhoScalar> Wiedemann<S> {
+    |      - expected this type parameter
+...
+562 |                 let w = if m128 <= u64::MAX as u128 {
+    |                                    ^^^^^^^^^^^^^^^^ expected type parameter `S`, found `u128`
+    |
+    = note: expected type parameter `S`
+                         found type `u128`
+
+Some errors have detailed explanations: E0308, E0599.
+For more information about an error, try `rustc --explain E0308`.
+error: could not compile `crypto` (lib) due to 2 previous errors

@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-19T19:20:32Z",
+ "id": "PCC-20261119-3731f3",
+ "kind": "statement",
+ "producer": {
+  "commit": "7314ee267f930db7e4af85bc0ae466a2fb0f8267",
+  "model": "codex",
+  "session": "conductor-twist-20261119"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/results/scalar-l0/manifest.json",
+    "sha256": "e3c2addd6ee5ee6b013cd6d6caa353f2c215f4cd891e75e3f4c671ff51c87651"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/scalar-audit.stdout",
+    "sha256": "b6d74fdb13daaa170e3117d0b639a5ab8652e029178f1f605506630a479582dd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/negative-controls.json",
+    "sha256": "d7d68047d47702b4dc02abd3af4c6dfbb51d3b5cd478aacc56e6d328ad671a74"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "retained33555419-scalar-panel",
+ "statement": "The evaluated33555419 crossing scalar panel covers32 bases per source/image/u2 model,6 measured rounds plus1 warmup and672 independently PARI-verified batch outputs. Four map/scalar wrong-output/truncated-coverage controls reject. Timings are L0 batched throughput with construction and verification excluded; no ECDLP, speedup or80bit completion claim follows from scalar timing."
+}

@@ -1,0 +1,25 @@
+# EXP-R31-APS-BUFFER — reusable factorized S3 oracle scratch (frozen before code, 2026-11-17)
+
+## Question and classification
+On the **actual** cofactor-one curve over `p=2147483647`, `E:y²=x³+847514846x+2087444724`, prime order `n=2147446831`, can we reduce complete cold Rust APS one-relation ECDLP time by removing allocation/free churn in the **existing** factorized S3 oracle's per-left-point loop? This is **implementation engineering of published Amadori–Pintore–Sala 2018 one-relation prime-field index calculus**, still enumerating S3 pair support; it is not a novel nongeneric attack or an exponent gain. [pcc:unverified].
+
+### Prior work and competing work checked
+- Existing complete prime31 Rust APS: merged #4391, #4454 (24-Q composed win4+public-y, 144/144 correct, 74.434 ms APS versus 79.833 ms unfolded rho32; paired 95% ratio CI overlaps parity).
+- RR9/S9 certificates: merged #4451 and #4466; Hermite and signed degree-nine norm require supplied leaves and do not extract `F` from unknown `Q`. Existing #4228/#4349 quotient, censored #4373 F4, #4410 Vieta, #1536 auxiliary, and crypto-autoresearcher negative leads remain separate.
+- Stronger WZ reference: merged #4460/#4462/#4468; latest exact-source Actions #43994897230 fails **before the solver** on malformed *unrelated pinned root* `src/cryptanalysis/sat.rs`. Do not advertise a strongest-rho win from this experiment.
+- Primary literature: Petit–Kosters–Messeng, PKC 2016, DOI 10.1007/978-3-662-49387-8_1; Amadori–Pintore–Sala, *On the discrete logarithm problem for prime-field elliptic curves*, FFA 51 (2018), DOI 10.1016/j.ffa.2018.01.009. These precede and delimit novelty.
+- Shared research KB MCP and repository CLI wrapper cannot be executed in this connector-only runtime; scoped GitHub PR/source search and primary publication records were checked instead. No absence-of-prior-art claim.
+
+## Proposed source edit and proof obligations
+Edit only `research/prime31_ic_20261115/native/examples/prime31_aps_one_relation.rs`, in `algebraic_mode_factorized_index_variant_y`. Allocate `denoms`, `prefix`, and `inverses` **once** before the `for (i,left)` loop; use clear/resize each iteration instead of three new heap buffers per left x. Preserve original `sqrt`, Mersenne multiplication, prefix-product order, Montgomery batch inversion semantics, lookup, source labels, target seed in production source, signed candidate checks, and early return. No oracle arithmetic, group arithmetic or private-label use changes. Rust existing 40 library tests and the complete APS example tests must pass; exact per-round signed `solution` and S3 transcript must match old source at every target and arm.
+
+### Measurement pre-registration (source-specific GH Actions, no paid compute)
+- Base pin: immutable merged #4454 `1df714645aa683cf975bc76fcacb9842cb4780fd`. Prepare separate `old` and `candidate` workspaces from *the same pin*, copy only the candidate Rust example into candidate. Hash and archive both source files. Do not compile damaged current root.
+- Existing `--aps-composed-win4-publicy-24q` complete cold Rust six-arm panel, but **in both temporary test workspaces only** replace its exact frozen target seed `0x434F_4D50_4150_5331` with a fresh preregistered seed `0x4255_4646_5245_5553`. Assert exactly one replacement; do not mutate any other source. The seed is caller/verifier-only and never passed as a scalar to the oracle.
+- Fixed order: baseline / candidate / candidate / baseline (ABBA), 24 identical public targets, 144 complete cold solver calls in each output. Track all 576 complete calls; aborted, incomplete or mismatched cases are FAIL, not discarded.
+- Primary: candidate/comparator sum of `APS_window4_public_y.cold_wall_ns` across 24 paired targets, each of the two AB/BA matched blocks. Gate: **both** block aggregate ratios ≤0.95, ≥18/24 paired candidate wins in *each block*, variant/composed A/A within 5%. Reject on any arithmetic or transcript mismatch. Failure is a valid measured null, not a reason to reroll.
+- Sanity: compare exact `p,n,cofactor,profile,public_Q,caller_known_scalar_verifier_only`, complete 144/144 flags, all six arm recovered values, and each APS round's `round,seed,s3_pair_quadratics,s3_batch_inversions,signed_candidates,solution,rejected_duplicate_x,rejected_identity`. Keep 4 raw complete JSON outputs and manifest with source pins in the artifact.
+- Secondary report total source setup vs oracle time and time per candidate pair; do not subtract setup or warm anything for the headline. CI producer development, not signed PCC and not an isolated external-fastest comparison.
+
+## Next decision
+If 5% gate passes with unchanged transcripts, independently reproduce the paired comparison, isolate timing, and test the source on 96 new targets against the verified WZ comparator and fastest external prime-field IC. If gate fails, retain exact negative result and pursue **target-conditioned RR9 (F) extraction** (factor-base divisibility of the signed x-norm) rather than further blind allocations. Never promote a faster-complete-solver claim without full cold matched evidence.

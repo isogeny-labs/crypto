@@ -140,6 +140,9 @@ struct Ctx<'a> {
     next: Vec<u32>,
     slots: Vec<(u32, u32)>,
     lp: bool,
+    pf: bool,
+    bits: Vec<u64>,
+    bmask: usize,
     hmask: usize,
     beta: u64,
     beta2: u64,
@@ -201,10 +204,14 @@ impl<'a> Ctx<'a> {
             next: vec![],
             slots: vec![],
             lp: std::env::var_os("LINPROBE").is_some(),
+            pf: !rot && std::env::var_os("NOPREFILTER").is_none(),
+            bits: vec![],
+            bmask: 0,
             hmask: 0,
             beta,
             beta2,
         };
+        let norow = std::env::var_os("NOROWBATCH").is_some();
         let mut ents = Vec::new();
         let mut dd = Vec::new();
         let mut sc = Vec::new();
@@ -222,21 +229,31 @@ impl<'a> Ctx<'a> {
                     ents.push((kk, i as u32, i as u32, 0, 0, se as u8));
                 }
             }
+            // One batched inversion per i (all j, m) instead of one per (i, j).
+            dd.clear();
             for j in i..b_size {
-                dd.clear();
                 let ms: &[usize] = if j == i { &[1, 2] } else { &[0, 1, 2] };
                 for &m in ms {
                     let dx = f.sub(me.cand[3 * j + m].x, fi.x);
                     dd.push(if dx == 0 { f.one } else { dx });
                 }
+            }
+            if !norow {
                 f.batch_inv(&mut dd, &mut sc);
+            }
+            let mut pos = 0usize;
+            for j in i..b_size {
+                let ms: &[usize] = if j == i { &[1, 2] } else { &[0, 1, 2] };
+                if norow {
+                    f.batch_inv(&mut dd[pos..pos + ms.len()], &mut sc);
+                }
                 for (t, &m) in ms.iter().enumerate() {
                     let qj = me.cand[3 * j + m];
                     if f.sub(qj.x, fi.x) == 0 {
                         continue;
                     }
-                    let sx = c.add_x_with_inv(fi, qj, dd[t]);
-                    let dx2 = c.add_x_with_inv(fi, c.neg(qj), dd[t]);
+                    let sx = c.add_x_with_inv(fi, qj, dd[pos + t]);
+                    let dx2 = c.add_x_with_inv(fi, c.neg(qj), dd[pos + t]);
                     if rot {
                         let mut a1 = sx;
                         let mut a2 = dx2;
@@ -253,6 +270,7 @@ impl<'a> Ctx<'a> {
                         ents.push((k2, i as u32, j as u32, m as u8, 1, s2 as u8));
                     }
                 }
+                pos += ms.len();
             }
         }
         let hs = (ents.len() * 2).next_power_of_two().max(16);
@@ -273,6 +291,18 @@ impl<'a> Ctx<'a> {
                 let h = (ent.0.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & me.hmask;
                 me.next[e] = me.heads[h];
                 me.heads[h] = e as u32;
+            }
+        }
+        if me.pf {
+            let nb = (ents.len() * 3 * 16).next_power_of_two().max(64);
+            me.bmask = nb - 1;
+            me.bits = vec![0u64; nb / 64];
+            for ent in ents.iter() {
+                let k0 = ent.0;
+                for kx in [k0, f.mul(beta, k0), f.mul(beta2, k0)] {
+                    let h = (kx.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 24) as usize & me.bmask;
+                    me.bits[h >> 6] |= 1u64 << (h & 63);
+                }
             }
         }
         me.ents = ents;
@@ -299,11 +329,22 @@ impl<'a> Ctx<'a> {
             let lp = f.mul(f.sub(r.y, fi.y), inv);
             for (eps, l) in [(1i8, lm), (-1i8, lp)] {
                 let x3 = f.sub(f.sub(f.sqr(l), r.x), fi.x);
-                let (key, sft0) = if self.rot { (x3, 0) } else { self.canon(x3) };
+                let pass = !self.pf || {
+                    let hb = (x3.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 24) as usize & self.bmask;
+                    self.bits[hb >> 6] >> (hb & 63) & 1 == 1
+                };
+                let (key, sft0) = if !pass {
+                    (0, 0)
+                } else if self.rot {
+                    (x3, 0)
+                } else {
+                    self.canon(x3)
+                };
                 let h = (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 20) as usize & self.hmask;
                 let mut hits = [0u32; 16];
                 let mut nh = 0usize;
-                if self.lp {
+                if !pass {
+                } else if self.lp {
                     let fp = (key >> 17) as u32;
                     let mut i = h;
                     loop {
@@ -393,6 +434,7 @@ struct MultiOut {
     total_ms: f64,
     determined: usize,
     solved: usize,
+    recs: Vec<Option<u64>>,
     ok: usize,
 }
 
@@ -509,6 +551,7 @@ fn sym_multi(
     let t1 = Instant::now();
     let mut solved = 0;
     let mut ok = 0;
+    let mut recs: Vec<Option<u64>> = vec![None; qs.len()];
     for (qi, q) in qs.iter().enumerate() {
         let mut tries = 0u64;
         'target: loop {
@@ -536,6 +579,7 @@ fn sym_multi(
                         let num = fnum.sub(s, fnum.to_mont(a_eff % n));
                         let x = fnum.from_mont(fnum.mul(num, fnum.inv(fnum.to_mont(bb % n))));
                         solved += 1;
+                        recs[qi] = Some(x);
                         if c.mul(Some(g), x) == Some(*q) && x == ks[qi] {
                             ok += 1;
                         }
@@ -561,6 +605,7 @@ fn sym_multi(
         determined,
         solved,
         ok,
+        recs,
     }
 }
 
@@ -601,7 +646,8 @@ fn main() {
             let row = json!({"bits": bits, "curve": c.name, "T": t_count, "inst": ins, "B": bsz, "base_fb": fb,
                 "sym_total_ms": s.total_ms, "sym_setup_ms": s.setup_ms, "sym_pair_ms": s.pair_ms, "sym_collect_ms": s.collect_ms, "sym_per_target_ms": s.per_target_ms,
                 "sym_determined": s.determined, "sym_solved": s.solved, "sym_ok": s.ok,
-                "base_total_ms": base_ms, "base_setup_ms": bsetup, "base_ok": bok});
+                "base_total_ms": base_ms, "base_setup_ms": bsetup, "base_ok": bok,
+                "cert": {"g": [c.canonical(g).0, c.canonical(g).1], "k": ks, "q": qs.iter().map(|q| { let z = c.canonical(*q); [z.0, z.1] }).collect::<Vec<_>>(), "p": c.f.p, "n": c.n, "sym_rec": s.recs, "base_rec": base.as_ref().map(|b| b.0.clone())}});
             writeln!(out, "{row}").unwrap();
             println!("{row}");
         }

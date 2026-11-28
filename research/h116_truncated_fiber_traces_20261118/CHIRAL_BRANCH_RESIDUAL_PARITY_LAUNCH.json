@@ -1,0 +1,19 @@
+{
+  "schema": "h116-chiral-branch-residual-parity-launch/v1",
+  "protocol_id": "H116-CHIRAL-BRANCH-RESIDUAL-PARITY-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and exact hashes in CHIRAL_BRANCH_RESIDUAL_PARITY_SOURCE_GATE.md",
+  "multipliers": [1, 2, 3, 4],
+  "chiralities": [1, -1],
+  "feature_order": ["m1_cplus", "m1_cminus", "m2_cplus", "m2_cminus", "m3_cplus", "m3_cminus", "m4_cplus", "m4_cminus"],
+  "bit_convention": {"smooth_split_residual": 1, "smooth_inert_residual": 0, "singular_branch_cubic": "abstain"},
+  "rules": 512,
+  "target": "canonical_scalar_mod_2",
+  "replicates": 4096,
+  "commands": {
+    "build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_chiral_branch_residual_parity.rs", "-o", "/tmp/h116_chiral_branch_residual_parity"],
+    "selftest": ["/tmp/h116_chiral_branch_residual_parity", "--selftest"],
+    "run": ["/tmp/h116_chiral_branch_residual_parity", "--run", "CHIRAL_BRANCH_RESIDUAL_PARITY_RESULT.json"]
+  },
+  "outputs": ["CHIRAL_BRANCH_RESIDUAL_PARITY_RESULT.json", "CHIRAL_BRANCH_RESIDUAL_PARITY_RUN.txt", "CHIRAL_BRANCH_RESIDUAL_PARITY_SHA256SUMS"],
+  "measurement_scope": "all 512 affine Boolean rules on eight ordered split characters of target-tethered residual ramification quadratics, with cubic reconstruction, discriminant factorization, root-count, chord-sum, chiral-swap, and shuffle controls"
+}

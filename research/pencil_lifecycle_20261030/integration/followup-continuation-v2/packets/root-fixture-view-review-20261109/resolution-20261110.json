@@ -1,0 +1,90 @@
+{
+  "schema": "fixture-view-source-review-resolution/v1",
+  "reviewed_utc": "2026-11-10T23:43:23Z",
+  "status": "source_corrections_accepted_execution_not_admitted",
+  "execution": false,
+  "runtime_checked": false,
+  "payload_invoked": false,
+  "tests_invoked": false,
+  "compiler_invoked": false,
+  "materialization_invoked": false,
+  "pcc_standing": "unverified_no_signed_verdict",
+  "producer_packet": {
+    "path": "../root-fixture-view-20261109",
+    "manifest_sha256": "2226e43890d3a8710f54c9f2fc1cf704236d01cb0845da601d5d6f7c58cb9377",
+    "manifest_entries_checked": 15,
+    "manifest_hash_or_size_mismatches": 0,
+    "materialize_worker_sha256": "757f210418974d61fa876791c52cce25b953ae193c158e18ee22b38f0cc1403a",
+    "suite_worker_sha256": "757f210418974d61fa876791c52cce25b953ae193c158e18ee22b38f0cc1403a",
+    "workers_byte_identical": true,
+    "expected_test_inventory_sha256": "31bbf3894564c2dbe9cd7c79dca0b3b6d9e35496c0faf129acefa8e187be8016",
+    "expected_test_inventory_count": 6179,
+    "expected_test_inventory_unique_count": 6179
+  },
+  "inventory_provenance": {
+    "prior_receipt_path": "/home/ec2-user/pencil-validation-receipts/root-library-v4-20261109/worker/worker-receipt.json",
+    "prior_receipt_sha256": "d4c192bf03c964630ebd29989c5ad0b2a8ef9570f3681ebb71a7a7d4e1b05726",
+    "prior_receipt_bytes": 527101,
+    "ordered_inventory_equal": true
+  },
+  "historical_review": {
+    "plan_sha256": "c49731b33f9dee0eec1660e4170ff8a3d6deeb5317af99a227e8b8a3663d3278",
+    "input_source_check_sha256": "cb2e88e91f7104ad7faf9c0f103e30b24a532726e5c10ec846ff16220c4c36e9",
+    "pending_findings_sha256": "f405dbf2db5be8e72e363fd1be0d75b74de1eca81d4b73da8941900120d50fb8",
+    "preserved_without_overwrite": true
+  },
+  "resolutions": [
+    {
+      "scope": "toolchain custody",
+      "historical_finding": "Rehashing listed files does not detect added header-tree members.",
+      "disposition": "resolved_in_source",
+      "source_evidence": [
+        "materialize/durable-worker.py:131-140 exact membership over four roots followed by hash verification",
+        "materialize/durable-worker.py:199 materialization verification",
+        "materialize/durable-worker.py:210 suite pre-verification",
+        "materialize/durable-worker.py:223 suite post-verification"
+      ],
+      "checked_behavior": "Any added, removed, or renamed file member under /usr/include, /usr/lib/gcc/x86_64-amazon-linux/11, /usr/libexec/gcc/x86_64-amazon-linux/11, or /usr/lib64/ldscripts makes exact set equality fail at the recorded pre/post checks."
+    },
+    {
+      "scope": "full-suite acceptance",
+      "historical_finding": "Current regex permits zero passing tests and does not bind 6179 inventory.",
+      "disposition": "resolved_in_source",
+      "source_evidence": [
+        "materialize/durable-worker.py:183-184 hash-bound 6179-name unique inventory",
+        "materialize/durable-worker.py:216-219 exactly one summary, passed plus ignored equals 6179, and failed/measured/filtered equal zero",
+        "materialize/durable-worker.py:220-221 ignored count and exact ignored-name equality"
+      ],
+      "checked_behavior": "Acceptance requires one successful full-suite summary covering exactly 6179 passed-or-ignored tests, with no failed, measured, or filtered tests and no ignored-name drift."
+    }
+  ],
+  "admission_boundary": {
+    "materialize_admitted": false,
+    "suite_admitted": false,
+    "recorded_absolute_deadline": "2026-11-10T05:11:39Z",
+    "deadline_state_at_review": "expired",
+    "renewed_campaign_ceiling_seconds": 43200,
+    "replacement_absolute_deadline_confirmed": false,
+    "next_gate": "Confirm a replacement absolute deadline, revise and publish the exact admission bindings, then independently review the published bindings before either attempt."
+  },
+  "limitations": [
+    "This is source-only review; it does not establish runtime behavior.",
+    "No materialized view, systemd unit, read-only bind, toolchain snapshot, compiler process, test process, or terminal receipt was observed in this review.",
+    "The historical pending-findings record is retained as the prior review state and is not rewritten."
+  ],
+  "conductor": {
+    "check_result": "clear",
+    "scope": [
+      "root-fixture-view-review-20261109/resolution-20261110.json",
+      "root-fixture-view-review-20261109/supplement-manifest-20261110.json"
+    ]
+  },
+  "sources_checked": {
+    "knowledge_base": "unavailable_in_this_checkout",
+    "fallback": [
+      "exact producer packet source and manifest",
+      "historical independent review files",
+      "prior root-library-v4 native worker receipt inventory"
+    ]
+  }
+}

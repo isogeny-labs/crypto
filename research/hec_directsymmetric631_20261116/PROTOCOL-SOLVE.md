@@ -1,0 +1,5 @@
+# Direct symmetric D1 solve
+
+Prior independent full-algebra control passes after a retained parser-header failure/correction. Solve only the unchanged generated-D1/target.ms with official private msolve0.11, two threads, c0, verbosity1 and300spercase cap, once. Existing solver wrapper/binary/libraries must match the manifest. Require dimension0anddegree2, squarefree eliminant, invertible denominator, unique numerator convention, and independent exact substitution into all twelve direct equations. Retain timeout, extra component, failed separation or solver failure; no fallback authorized here.
+
+The direct-system verifier adapts variable names and expected degree only from the original exact verifier. No old quadratic/representative is a solver input. Freeze code, lock, generated equations, binary and dependencies; commit/checkpoint/gate before execution. Even degree2success is a component result, not a total timing or10xclaim. Later target class/adjacency replay and charged comparison remain required.

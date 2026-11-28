@@ -17,7 +17,7 @@ RAYON_NUM_THREADS=1 timeout --kill-after=5 CAP ./target/release/examples/n83_msw
   cell M FB ENGINE TRIALS 8609517 10000 public|planted CURVE
 ```
 
-`FB = union:S` (Frobenius-union base on `span(1, z, ..., z^(S-1))`), `ENGINE` in {`chain-s3-orbit`, `chain-s3`}, `TRIALS` = 4 in Part A and 1 in Part B, `CURVE` = `k<a>n<degree>` or `n83k1`. Chained SAT has `(m-1)(3n^2+4n)+n(2m-1)` variables: 6,923 at (5, 23), 26,486 at (6, 41), 105,908 at (6, 83). Curves: `k0n23`, `k1n29`, `k0n31`, `k0n37`, `k0n41` (aliases in `src/cryptanalysis/curve_aliases.json`; no `k0n29`, so n = 29 is a = 1); Part B uses the pinned `n83k1` (`KoblitzCurve::known_n83_k1`, a = 1), the argument the n83 sweep used. A generic `k1n83` would take the `KoblitzCurve::new` path instead of that fixture.
+`FB = union:S` (Frobenius-union base on `span(1, z, ..., z^(S-1))`), `ENGINE` in {`chain-s3-orbit`, `chain-s3`}, `TRIALS` = 4 in Part A and 1 in Part B, `CURVE` = `k<a>n<degree>` or `n83k1`. Chained SAT has `(m-1)(3n^2+4n)+n(2m-1)` variables: 6,923 at (5, 23), 26,486 at (6, 41), 105,908 at (6, 83). Curves: `icv1-f2m23-t5197-69e76b73`, `icv1-f2m29-tm40309-30c52b96`, `icv1-f2m31-tm90707-c95f16f5`, `icv1-f2m37-tm534059-32aad96b`, `icv1-f2m41-tm2308219-7f48b14a` (aliases in `src/cryptanalysis/curve_aliases.json`; no `icv1-f2m29-t40309-09c51dbd`, so n = 29 is a = 1); Part B uses the pinned `n83k1` (`KoblitzCurve::known_n83_k1`, a = 1), the argument the n83 sweep used. A generic `k1n83` would take the `KoblitzCurve::new` path instead of that fixture.
 
 ## Cells (grid.tsv, 148 cells, seed 8609517, per_query_ms 10000 which the chain engines ignore)
 
@@ -37,13 +37,13 @@ Caps. 188 s is the parity threshold: one query above the largest m = 4 root-tabl
 
 ## Preflight (development smoke, not evidence)
 
-To be filled by the preflight: one development smoke of the (m = 5, n = 23 = k0n23, S = 2) public cell, engine chain-s3-orbit with the frozen command, output discarded, labelled not evidence, used only to confirm the command runs and to record preflight_runtime. Worst-case total if every cell hit its cap: 110400 CPU-seconds (Part A 78000, Part B 32400); the stopping rule can only lower it.
+To be filled by the preflight: one development smoke of the (m = 5, n = 23 = icv1-f2m23-t5197-69e76b73, S = 2) public cell, engine chain-s3-orbit with the frozen command, output discarded, labelled not evidence, used only to confirm the command runs and to record preflight_runtime. Worst-case total if every cell hit its cap: 110400 CPU-seconds (Part A 78000, Part B 32400); the stopping rule can only lower it.
 
 ## Claims and falsifiers
 
-- **K1** (exact_computation). For each engine (chain-s3-orbit and chain-s3), at n = 23 (k0n23) the m = 5 and m = 6 public union:2 cells decide (all four queries SAT or proved UNSAT) inside the 600 s process cap.
+- **K1** (exact_computation). For each engine (chain-s3-orbit and chain-s3), at n = 23 (icv1-f2m23-t5197-69e76b73) the m = 5 and m = 6 public union:2 cells decide (all four queries SAT or proved UNSAT) inside the 600 s process cap.
   - If supported: The chained-S3 union-base line produces its first measured m >= 5 decided cells; their seconds per query are the first price of the line, to be compared with the m = 4 root-table figure.
-  - If not supported: Falsified for an engine if either of its two k0n23 cells caps or is undecided: at the smallest registered curve that engine does not decide m >= 5 inside 600 s single-threaded, and K2/K4 are read accordingly. The two engines are reported separately; the claim holds only if it holds for both.
+  - If not supported: Falsified for an engine if either of its two icv1-f2m23-t5197-69e76b73 cells caps or is undecided: at the smallest registered curve that engine does not decide m >= 5 inside 600 s single-threaded, and K2/K4 are read accordingly. The two engines are reported separately; the claim holds only if it holds for both.
   - Decided by: C-cells-A, C-positive, C-engine
 - **K2** (comparative). For each engine, decided-query seconds grow at least geometrically with n at fixed (m, S), such that every m = 6 public cell at n = 37 and n = 41 (S = 2, 3) hits the 600 s cap.
   - If supported: Cost per query rises past the Part A cap by n = 37; the curve gives the n at which each (m, S) leaves reach.
@@ -69,7 +69,7 @@ To be filled by the preflight: one development smoke of the (m = 5, n = 23 = k0n
 
 ## Arms
 
-- `A-public` (candidate): Part A measurement: public probes R = [a]G (4 per cell), engines chain-s3-orbit and chain-s3, m in {5, 6} x union:S for S in {2, 3} x curves k0n23, k1n29, k0n31, k0n37, k0n41 (a = 0 except n = 29, a = 1), 40 cells, 600 s process cap each (4 trials per process, so a decided cell is at most 150 s per query), family koblitzA.
+- `A-public` (candidate): Part A measurement: public probes R = [a]G (4 per cell), engines chain-s3-orbit and chain-s3, m in {5, 6} x union:S for S in {2, 3} x curves icv1-f2m23-t5197-69e76b73, icv1-f2m29-tm40309-30c52b96, icv1-f2m31-tm90707-c95f16f5, icv1-f2m37-tm534059-32aad96b, icv1-f2m41-tm2308219-7f48b14a (a = 0 except n = 29, a = 1), 40 cells, 600 s process cap each (4 trials per process, so a decided cell is at most 150 s per query), family koblitzA.
 - `A-planted` (control_positive): Positive control for Part A: the same 40 cells (both engines) with planted targets (sum of m random base points), 4 per cell; the planted relation must be recovered.
 - `A-aa` (control_aa): A/A for Part A: the 40 public cells (both engines) run a second time with identical arguments (same binary, seed, host class) as separate records of family aa; outcomes must agree exactly, seconds are compared as a noise floor.
 - `A-neg-m2` (control_negative): Known-decidable baseline for Part A: m = 2, union:2, public, engines chain-s3-orbit and chain-s3, at each of the five Part A curves (10 cells, 600 s cap).
@@ -86,7 +86,7 @@ To be filled by the preflight: one development smoke of the (m = 5, n = 23 = k0n
 
 ## Variable ledger
 
-Independent: m [5, 6]; engine ['chain-s3-orbit', 'chain-s3']; n (curve) ['k0n23', 'k1n29', 'k0n31', 'k0n37', 'k0n41', 'n83k1']; S (union base span(1, ..., z^(S-1))) [2, 3]; mode ['public', 'planted']; part (cell_timeout_s) ['A: 600 s per process, 4 trials', 'B: 1800 s per process, 1 trial'].
+Independent: m [5, 6]; engine ['chain-s3-orbit', 'chain-s3']; n (curve) ['icv1-f2m23-t5197-69e76b73', 'icv1-f2m29-tm40309-30c52b96', 'icv1-f2m31-tm90707-c95f16f5', 'icv1-f2m37-tm534059-32aad96b', 'icv1-f2m41-tm2308219-7f48b14a', 'n83k1']; S (union base span(1, ..., z^(S-1))) [2, 3]; mode ['public', 'planted']; part (cell_timeout_s) ['A: 600 s per process, 4 trials', 'B: 1800 s per process, 1 trial'].
 
 - Fixed/measured, **engine family and its domain**: chain-s3 is the explicit-domain encoding the n83 record decided at m = 2; chain-s3-orbit is the signed-Frobenius orbit-domain encoding that capped there. Both read the same limits.
 - Fixed/measured, **trials**: TRIALS is the grid trials column. Part B uses 1 so the 1800 s process cap is a per-query cap; Part A keeps 4 under a 600 s process cap, so a decided Part A cell is at most 150 s per query (factor-base time excluded). The n83 planted rows used 2 trials and the public rows 4, so Part B is not like-for-like with the record on trial count.
@@ -95,7 +95,7 @@ Independent: m [5, 6]; engine ['chain-s3-orbit', 'chain-s3']; n (curve) ['k0n23'
 - Fixed/measured, **ChainS3Limits**: Compiled into the binary (examples/n83_msweep_cell.rs); the binary sha256 pins them.
 - Fixed/measured, **binary and commit**: One release binary of examples/n83_msweep_cell built once at the frozen commit; sha256 recorded at freeze and in every shard receipt.
 - Fixed/measured, **host class and threads**: isolab-eks native-L2 worker class; shards run concurrently on separate cores; host facts recorded per row.
-- Fixed/measured, **curve parameter a**: Fixed by the repository's curve aliases (src/cryptanalysis/curve_aliases.json has k0n23, k1n29, k0n31, k0n37, k0n41; no k0n29) and by the n83 record (known_n83_k1). a is confounded with n at n = 29 and n = 83, so C-n-scaling reads n across a mix of a values.
+- Fixed/measured, **curve parameter a**: Fixed by the repository's curve aliases (src/cryptanalysis/curve_aliases.json has icv1-f2m23-t5197-69e76b73, icv1-f2m29-tm40309-30c52b96, icv1-f2m31-tm90707-c95f16f5, icv1-f2m37-tm534059-32aad96b, icv1-f2m41-tm2308219-7f48b14a; no icv1-f2m29-t40309-09c51dbd) and by the n83 record (known_n83_k1). a is confounded with n at n = 29 and n = 83, so C-n-scaling reads n across a mix of a values.
 - Fixed/measured, **cell_timeout_s**: Per cell process (timeout --kill-after=5). Part A: four trials share 600 s, so a decided cell has mean seconds per query at most 150 s. Part B: one trial per process, so 1800 s bounds one query.
 - Fixed/measured, **instance parity between modes**: public probes are [a]G for a drawn from the stream; planted probes are sums of m stream-chosen base points; the two modes are not matched targets.
 - Fixed/measured, **spot preemption and worker**: Worker, node and any interruption are recorded per row; an interrupted cell is discarded and re-run whole on an admitted worker.
@@ -138,7 +138,7 @@ Worst case if every cell caps: 110400 CPU-seconds (Part A 78,000: 120 main-arm c
 
 1. (fixed_n) Fixed grid: 148 cells in grid.tsv (Part A, both engines: 40 public + 40 planted + 40 A/A + 10 negative; Part B, both engines: 8 public + 8 planted + 2 negative), one fresh single-threaded process each, seed 8609517; 4 trials in Part A and 1 trial in Part B; cell caps 600 s (Part A, negatives at n <= 41) and 1800 s (Part B).
 2. (budget) Per-cell cap: timeout --kill-after=5 at the cell cap; a killed cell is recorded as capped with its wall time and is never re-run with a longer cap.
-3. (preregistered_sequential) Part A stopping rule, per m and per engine: curves run in the order k0n23, k1n29, k0n31, k0n37, k0n41; once all four public cells (S = 2, 3 at the two previous curves, same engine) are capped or skipped, every Part A cell of that m and engine (public, planted, A/A) at the next curve is recorded as skipped_stopping_rule and not run. Part B and the negatives are never skipped.
+3. (preregistered_sequential) Part A stopping rule, per m and per engine: curves run in the order icv1-f2m23-t5197-69e76b73, icv1-f2m29-tm40309-30c52b96, icv1-f2m31-tm90707-c95f16f5, icv1-f2m37-tm534059-32aad96b, icv1-f2m41-tm2308219-7f48b14a; once all four public cells (S = 2, 3 at the two previous curves, same engine) are capped or skipped, every Part A cell of that m and engine (public, planted, A/A) at the next curve is recorded as skipped_stopping_rule and not run. Part B and the negatives are never skipped.
 4. (invalidation) Invalidation stop: a failed positive control, a process_error, a binary sha256 different from the frozen one, or a negative control undecided at its cap stops the affected shard for the director's assessment; no cap is changed.
 
 ## Invalidation
@@ -153,7 +153,7 @@ Worst case if every cell caps: 110400 CPU-seconds (Part A 78,000: 120 main-arm c
 
 ## Decision rule
 
-Each cell receives one exact class (decided_sat, decided_unsat, decided_mixed, undecided, capped, skipped_stopping_rule, invalid_control, process_error). K1 to K5 are read per engine from those classes against the thresholds in the claims (K1: the two k0n23 union:2 public cells decide; K2: all m = 6 public cells at n = 37 and 41 capped and a positive log-slope between decided n; K3: every completed planted cell has only verified witnesses; K4: all four n83k1 public cells undecided or capped; K5: no decided public cell at n >= 31 under 188 s). Plainly on K5: Part A keeps TRIALS = 4 under a 600 s process cap, so a decided Part A cell proves at most 150 s per query and any decided Part A cell at n >= 31 falsifies K5 by construction; otherwise K5 stays untested on capped cells, because a cap is a censored observation and says nothing against 188 s. Only Part B (one query per process, 1800 s) can observe a per-query cost above 188 s. The kill criterion fires when, for both engines, K4 and K5 are supported and K3 is not falsified. A capped cell is never a cost.
+Each cell receives one exact class (decided_sat, decided_unsat, decided_mixed, undecided, capped, skipped_stopping_rule, invalid_control, process_error). K1 to K5 are read per engine from those classes against the thresholds in the claims (K1: the two icv1-f2m23-t5197-69e76b73 union:2 public cells decide; K2: all m = 6 public cells at n = 37 and 41 capped and a positive log-slope between decided n; K3: every completed planted cell has only verified witnesses; K4: all four n83k1 public cells undecided or capped; K5: no decided public cell at n >= 31 under 188 s). Plainly on K5: Part A keeps TRIALS = 4 under a 600 s process cap, so a decided Part A cell proves at most 150 s per query and any decided Part A cell at n >= 31 falsifies K5 by construction; otherwise K5 stays untested on capped cells, because a cap is a censored observation and says nothing against 188 s. Only Part B (one query per process, 1800 s) can observe a per-query cost above 188 s. The kill criterion fires when, for both engines, K4 and K5 are supported and K3 is not falsified. A capped cell is never a cost.
 
 Threshold: Per cell: decided = every query of the cell decided inside the cap. Parity threshold 188 s per query (largest m = 4 root-table DLP of the n83 record). Observation caps: 600 s per Part A process (4 queries, so at most 150 s per query) and 1800 s per Part B process (1 query).
 

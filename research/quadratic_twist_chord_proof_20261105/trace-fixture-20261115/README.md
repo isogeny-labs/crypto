@@ -1,0 +1,13 @@
+# Proper-extension auxiliary twist: executed fixture screen
+
+At pre-data source checkpoint4f7af6d7, both native instruments completed. All2401 models(A,B) were screened under the fixed criterion;192 qualify. First qualifying model: F49=F7[i]/(i²−3), E:y²=x³+x+(1+i), source order47. Nonsquare delta=1+i; monic twist T:y²=x³+(4+2i)x+2i has order53. Codes are a+7b; raw A1/B8/twistA18/twistB14. Both independent arithmetic implementations reproduce the selection and counts. [pcc:unverified]
+
+Over K=F49[w]/(w²−delta), psi(x,y)=(x/delta,y*w/delta²). All47×53=2491 pairs(B,T), identities included, satisfy trace(psi(T))=O and trace([24]B+psi(T))=B. Rust additionally enumerates the extension curve:2491 points. Two fresh auditor receipts agree exactly. Six genuinely changed inputs delta,A,twist_A,source_order,half,trace_pairs reject101 and emit no receipt. [pcc:unverified]
+
+This is an actual auxiliary-trace source-preserving route. The two rational groups have different orders; no rational main-to-twist subgroup injection is assumed. Input B is an actual point, not a known scalar fed into recovery. The full2491 pair census repeats47 source points; it is not2491 distinct DLP challenges. The mechanism itself is standard trace geometry, not a novelty claim. [pcc:unverified]
+
+Executed local stages: two compiler version queries, two builds, one producer, two auditors, six rejection controls;13 process exits match the predeclared contract. Stage caps600s, no paid resources. Fixed-source C++ warnings concern compact misleading indentation and are retained; no algorithm correction or selective rerun. A static JSON-field-count correction13 before any build/data is preserved separately. [pcc:unverified]
+
+The source/protocol hashes were published before compilation. This labelled deterministic engineering screen has its own pre-data protocol; it is not presented as a frozen canonical solver experiment or independent signed PCC verdict. Raw command/log/payload/archive and diagram/PDF assets remain local at /workspace/twist-trace-fixture-evidence-20261115; no result-asset upload occurred. [pcc:unverified]
+
+Next: offer the SAME trace-lifted algebraic membership formulation to source controls, deduplicate projected coefficient rows and compare the complete source-policy frontier. Prime source relation field isF47, curve fieldF49, extensionF2401. Public-log setup, actual unknown-source scalar recovery, relevant expanded certificate degree and total priced cost have not been measured here. Plain witness multiplicity cannot count as useful rank. A new native solver/auditor and canonical full experiment freeze are required before that data. [pcc:unverified]

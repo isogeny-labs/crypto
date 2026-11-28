@@ -54,6 +54,7 @@ match an independent rational eliminator. See
 [lead reconciliation](SEARCH_20261101.md).
 
 The census now emits independently recomputable nonzero-minor certificates.
+[pcc:unverified]
 A Lean-checked theorem proves that an order-`k` certificate forces every exact
 linear separator factorization to use at least `k` coordinates. A second
 theorem makes the asymptotic gap precise: exponential rank on a linear-width
@@ -65,9 +66,54 @@ This is instrument verification, not an E1 row. Stable production semantic
 cuts, matched rewired nulls, a fresh-process A/A runner, disjoint preflight and
 the final frozen identities remain open. No affected rank data has been taken.
 
+## Fixed-arity recovery update — 2026-11-19
+
+The separate fixed-arity route now has a kernel-checked planted-dense fallback.
+Mathlib's verified Bird determinant is lifted to adjugates, and the resulting
+executable `ZMod` formula is proved equal to the nonsingular matrix inverse
+under a unit-determinant hypothesis. Exact natural arithmetic also shows that
+a prospective `rows^6` implementation has fixed numerator six and is therefore
+absorbed by the already checked fixed-arity diagonal. This does not yet prove
+the full bit runtime, but the scalar-ring bound is now checked: array-backed
+eager states compute the same determinant, an instrumented entry count yields
+`4(n+1)^4` operations per determinant, and all `n²` cofactors cost at most
+`4(n+1)^6`. Counting the extra determinant and final scaling gives the checked
+whole-inverse ring bound `4(n+1)^6 + 4(n+1)^4 + n^2`; a conditional bit-work
+theorem multiplies it by an explicit polynomial modular-operation cost and
+adds one explicit polynomial extended-GCD inversion cost. The latter two
+polynomial bounds remain hypotheses because the pinned Mathlib contains no
+machine-time proof for `Nat.gcdA`. The generic planted-block binding is checked
+too: the executable Bird kernel satisfies
+the annihilation and identity-right-block laws used by the upstream uniformity
+proof. The remaining tasks are the cross-project specialization,
+array/indexing cost and proofs of the two stated modular bit-cost hypotheses.
+The rectangular `R * B^-1` work is no longer open: an exact counted dot-product
+implementation yields `2sf^2` charged operations and `sf` output negations.
+The sampler side now has an exact finite rejection theorem as well: equal
+accepted fibres imply uniform outputs and pair events, with expected retry
+count `total/accepted`. The concrete signed-x elliptic-curve decoder is now
+bound to those hypotheses over Mathlib affine points, including the double-root
+half-acceptance rule and an explicit identity seed. Its full output is exactly
+uniform with expectation `(2|K|+1)/|E(K)|`. The arithmetic after Hasse is now
+checked: for `|K| >= 16`, the standard trace premises `t^2 <= 4|K|` and
+`|K|+1 <= |E(K)|+t` imply the sampler's four-trial inequality. Executable
+square-root cost is also checked for the common `|K| = 3 mod 4` case:
+repeated squaring uses at most twice the binary length of `|K|` field
+multiplications, and on elliptic short-form curves (`a1=a3=0`) the resulting
+root satisfies the sampler's nonsingular-root interface. A pinned Hasse theorem
+is now imported from Meta's Atlas development at commit
+`a4557099d45c620a038e90a9c4b4d9ab08294b81`; its Manin proof closes the
+four-trial sampler bound for every elliptic finite-field curve with at least 16
+field elements. General prime-field square roots remain open outside the
+three-mod-four case.
+The exact upstream-shaped `Ttop`/`Rint`/`nu`/`q` specialization is
+now checked locally; only integration into the external pinned tree remains.
+[pcc:unverified] See
+[`FIXED_ARITY_DIAGONAL.md`](FIXED_ARITY_DIAGONAL.md).
+
 ## Claim boundary
 
-No result in the proposed rank census proves a subexponential ECDLP algorithm. E1 can identify or reject a finite-size compression mechanism. E4 can establish an exact-engine improvement on a frozen ladder. E5 can establish complete relation-oracle progress. A complexity claim still needs a proved family invariant and complete end-to-end cost theorem.
+No result in the proposed rank census proves a subexponential ECDLP algorithm. E1 can identify or reject a finite-size compression mechanism. E4 can establish an exact-engine improvement on a frozen ladder. E5 can establish complete relation-oracle progress. A complexity claim still needs a proved family invariant and complete end-to-end cost theorem. [pcc:unverified]
 
 ## State of evidence
 

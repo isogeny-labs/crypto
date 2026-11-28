@@ -1,0 +1,21 @@
+digraph transfers {
+  graph [rankdir=LR, bgcolor="transparent", nodesep=0.35, ranksep=0.6];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4fa", color="#315574", fontname="DejaVu Sans", fontsize=11, margin="0.14,0.1"];
+  edge [color="#315574", fontname="DejaVu Sans", fontsize=10];
+  e [label="E / F7\ngenus 1"];
+  jc [label="J(C) / F7\ndimension 3"];
+  p [label="Prym(Y6/Y3) / F7\ndimension 2, principal Xi"];
+  jd [label="J(D) / F7\ngenus 2"];
+  e -> jc [label="beta3: homomorphism\nL beta3 = 0"];
+  jc -> p [label="pair incidence Psi\non ker L"];
+  p -> jd [label="iota inverse\nactual polarized isomorphism"];
+  jd -> e [label="p1 pushforward\np1_* Gamma = I", color="#23845a", fontcolor="#17603e", constraint=false];
+  subgraph cluster_models {
+    label="Actual normalization covers over the same prime field";
+    color="#c6d3df"; fontname="DejaVu Sans"; fontsize=11;
+    y6 [label="Y6, genus 5"];
+    y3 [label="Y3, genus 3"];
+    y6 -> y3 [label="etale degree 2"];
+  }
+  y6 -> p [style=dotted, arrowhead=none, label="kernel of norm, identity component"];
+}

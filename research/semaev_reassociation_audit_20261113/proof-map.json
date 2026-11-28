@@ -1,0 +1,82 @@
+{
+  "namespace": "SemaevReassociationAudit",
+  "proofs": [
+    {
+      "file": "ActualS3.lean",
+      "claim": "Actual S3 bivariate source/degree/swap and canonical step specialization",
+      "declarations": [
+        "s3Bi_source",
+        "s3Bi_bidegrees",
+        "s3Bi_swap",
+        "step_specialization"
+      ]
+    },
+    {
+      "file": "Reassociation.lean",
+      "claim": "Actual S4 inner resultant, distinct-coordinate identity and declared-size coefficient naturality",
+      "declarations": [
+        "innerX_actual_S4",
+        "reassociation_distinct",
+        "leftAssoc_map",
+        "rightAssoc_map"
+      ]
+    },
+    {
+      "file": "GenericSpecialization.lean",
+      "claim": "Repeated-coordinate specialization preserves formal sizes",
+      "declarations": [
+        "reassociation_all_parameters"
+      ]
+    },
+    {
+      "file": "PrescribedDegree.lean",
+      "claim": "All declaredD>=degP via actual independent leading coefficient and specialization",
+      "declarations": [
+        "genericLeading_degree",
+        "genericLeading_specialize",
+        "reassociation_prescribed"
+      ]
+    },
+    {
+      "file": "CanonicalBridge.lean",
+      "claim": "Actual double resultantStep and existing canonical recursion bridge",
+      "declarations": [
+        "doubleStep_eval",
+        "doubleStep_reassociation",
+        "canonical_doubleStep",
+        "canonical_reassociation"
+      ]
+    },
+    {
+      "file": "LiteralPolynomial.lean",
+      "claim": "Generic evaluation is identity; equality of actual formal/canonical polynomials",
+      "declarations": [
+        "generic_tripleEval_identity",
+        "doubleStep_polynomial_reassociation",
+        "canonical_polynomial_reassociation"
+      ]
+    },
+    {
+      "file": "S4Cross.lean",
+      "claim": "Actual-curve S4 middle transposition, all commutative rings",
+      "declarations": [
+        "actual_S4_middle_swap"
+      ]
+    },
+    {
+      "file": "SourceOrder.lean",
+      "claim": "Exact source order, actual canonical split and independent-b negative control",
+      "declarations": [
+        "actual_lastPolynomial_rotate",
+        "unrestricted_b_S4_counterexample",
+        "control_b_not_a_curve",
+        "source_order_polynomial_reassociation",
+        "canonical_source_order_reassociation",
+        "actual_source_order_reassociation_with_control"
+      ]
+    }
+  ],
+  "hypotheses": "Domain for reassociation;D>=natDegreeP; actual Weierstrass coefficients for source order; no nonsingularity/characteristic/nonzero/repeated-coordinate exclusion. The arbitrary-b negative control is not a source curve.",
+  "local_gate": 60,
+  "signed_standing": "not established"
+}

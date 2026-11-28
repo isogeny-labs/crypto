@@ -1,0 +1,14 @@
+spec ECS1hbbd42592ba69 (native K_0 halftrace cache: matched one-target pipeline comparison): 280 executions
+  arm rho-strong       reference  ECM1hb6123afffc07 rho.signed_frobenius_strong {"dp_bits": "4", "lanes": "32", "step_cap_factor": "2000"}
+  arm rho-aa           control    ECM1hb6123afffc07 rho.signed_frobenius_strong {"dp_bits": "4", "lanes": "32", "step_cap_factor": "2000"}
+  arm ic-baseline      baseline   ECM1hcf1599deb841 ic.pipeline {"factor_base": "koblitz-orbit:divisor=1;2", "linalg": "incremental-gauss-full-rank-checked", "max_trials": "100000000", "oracle": "mitm-frobenius-counted:m=3", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ic-aa            control    ECM1hcf1599deb841 ic.pipeline {"factor_base": "koblitz-orbit:divisor=1;2", "linalg": "incremental-gauss-full-rank-checked", "max_trials": "100000000", "oracle": "mitm-frobenius-counted:m=3", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ic-halftrace-tables candidate  ECM1h4d8308fb0a64 ic.pipeline {"factor_base": "koblitz-orbit:divisor=1;2,halftrace_tables=1", "linalg": "incremental-gauss-full-rank-checked", "max_trials": "100000000", "oracle": "mitm-frobenius-counted:m=3", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  workload W8dad8f406218 icv1-f2m31-tm90707-c95f16f5 r=2^20.46 A=62 registered=true ec1=EC1N31Ce0h3e9d0f84f702
+  workload W557e699c824e icv1-f2m31-tm90707-c95f16f5 r=2^20.46 A=62 registered=true ec1=EC1N31Ce0h3e9d0f84f702
+  workload W34adfef56c96 icv1-f2m31-tm90707-c95f16f5 r=2^20.46 A=62 registered=true ec1=EC1N31Ce0h3e9d0f84f702
+  workload Wf35530fec0d0 icv1-f2m31-tm90707-c95f16f5 r=2^20.46 A=62 registered=true ec1=EC1N31Ce0h3e9d0f84f702
+  workload W0ab7aaca8a74 icv1-f2m31-tm90707-c95f16f5 r=2^20.46 A=62 registered=true ec1=EC1N31Ce0h3e9d0f84f702
+  workload W30c41dc35215 icv1-f2m31-tm90707-c95f16f5 r=2^20.46 A=62 registered=true ec1=EC1N31Ce0h3e9d0f84f702
+  workload W9ee60a5c74e8 icv1-f2m31-tm90707-c95f16f5 r=2^20.46 A=62 registered=true ec1=EC1N31Ce0h3e9d0f84f702
+  workload We9a4970bbbad icv1-f2m31-tm90707-c95f16f5 r=2^20.46 A=62 registered=true ec1=EC1N31Ce0h3e9d0f84f702

@@ -1,0 +1,42 @@
+{
+  "review_completed_at": "2026-11-23T10:06:56.581548+00:00",
+  "head": "8475b8a2a6cc88a738f09f8b4d0ca15ff505d8fa",
+  "first_read_after_50min": true,
+  "next_unchanged_head_read_not_before": "2026-11-23T14:06:56.581548+00:00",
+  "check_endpoint": "check-runs?filter=all&per_page=100",
+  "all_attempts_count": 13,
+  "workflow_runs_all_events_count": 12,
+  "pagination_complete": true,
+  "failures": [
+    {
+      "job_id": 137587799893,
+      "finding": "artifact hydration: full-history/store recovery gaps; no S3 contact reported"
+    },
+    {
+      "job_id": 137587794802,
+      "finding": "three PCC test NameErrors for q/reasons; 49 tests, errors3, skipped1"
+    }
+  ],
+  "logs": [
+    {
+      "job_id": 137587799893,
+      "provider_url": "https://github.com/isogeny-labs/crypto/actions/runs/45143739614/job/137587799893",
+      "complete_decoded_log_bytes": 41211,
+      "sha256": "e8e5d9817c0f160eff5e78381938c112aa92623eba61f7c5fc816c8553804acf",
+      "private_path": "/dev/shm/ct23-ci4992-failed-0.log",
+      "whole_log_remote_custody_pending": true
+    },
+    {
+      "job_id": 137587794802,
+      "provider_url": "https://github.com/isogeny-labs/crypto/actions/runs/45143738664/job/137587794802",
+      "complete_decoded_log_bytes": 2540390,
+      "sha256": "cb22a2a4bcef0cfdce3407d01073a1976cf6453e0fb37e21dbadbc3a17edee7b",
+      "private_path": "/dev/shm/ct23-ci4992-failed-1.log",
+      "whole_log_remote_custody_pending": true
+    }
+  ],
+  "existing_tools_scripts_workflows_equal_base_except_new_study_workflow": true,
+  "base_comparison_not_a_baseline_CI_rerun_or_waiver": true,
+  "draft_remains_for_formal_instance_gap": true,
+  "all_claims_unsigned": true
+}

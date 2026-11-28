@@ -1,0 +1,7 @@
+{
+  "command": "timeout 60 cargo test --release --lib --offline",
+  "exit": 124,
+  "result": "not passed; missing compile-time fixture observed before 60-second deadline",
+  "missing": "research/curve25519_algebraic_ecbench_20261102/fixtures/pkm_iso_t6_g4_target3.record.json",
+  "scope": "repository-wide release library check, separate from passing focused validation"
+}

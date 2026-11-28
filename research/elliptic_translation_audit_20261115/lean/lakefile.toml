@@ -1,0 +1,11 @@
+name = "elliptic_translation_audit"
+version = "0.1.0"
+defaultTargets = ["EllipticTranslationAudit"]
+
+[[require]]
+name = "elliptic_picard_bridge_audit"
+path = "../../elliptic_picard_bridge_audit_20261115/lean"
+
+[[lean_lib]]
+name = "EllipticTranslationAudit"
+roots = ["TranslationGeneric", "TranslationTranscendence", "TranslationCoordinate", "TranslationGeneration", "TranslationNaturality", "TranslationAction", "TranslationDivisors", "TranslationPicard", "TranslationExample", "TranslationReciprocal", "TranslationExampleField", "TranslationCertificate"]

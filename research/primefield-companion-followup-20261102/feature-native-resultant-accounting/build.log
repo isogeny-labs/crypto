@@ -1,0 +1,27 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> research/primefield-companion-followup-20261102/feature-native-resultant-accounting/meter.rs:11:13
+   |
+11 |  let _=cell.fetch_update(Relaxed,Relaxed,|v|Some(match v.checked_add(n){Some(x)=>x,None=>{HEAP[9].store(1,Relaxed);u64::MAX}}));
+   |             ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+11 -  let _=cell.fetch_update(Relaxed,Relaxed,|v|Some(match v.checked_add(n){Some(x)=>x,None=>{HEAP[9].store(1,Relaxed);u64::MAX}}));
+11 +  let _=cell.try_update(Relaxed,Relaxed,|v|Some(match v.checked_add(n){Some(x)=>x,None=>{HEAP[9].store(1,Relaxed);u64::MAX}}));
+   |
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> research/primefield-companion-followup-20261102/feature-native-resultant-accounting/meter.rs:15:34
+   |
+15 | fn shrink(n:usize){let _=HEAP[5].fetch_update(Relaxed,Relaxed,|v|Some(match v.checked_sub(n as u64){Some(x)=>x,None=>{HEAP[8].store(...
+   |                                  ^^^^^^^^^^^^
+   |
+help: replace the use of the deprecated method
+   |
+15 - fn shrink(n:usize){let _=HEAP[5].fetch_update(Relaxed,Relaxed,|v|Some(match v.checked_sub(n as u64){Some(x)=>x,None=>{HEAP[8].store(1,Relaxed);0}}));}
+15 + fn shrink(n:usize){let _=HEAP[5].try_update(Relaxed,Relaxed,|v|Some(match v.checked_sub(n as u64){Some(x)=>x,None=>{HEAP[8].store(1,Relaxed);0}}));}
+   |
+
+warning: 2 warnings emitted
+

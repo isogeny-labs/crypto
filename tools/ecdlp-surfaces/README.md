@@ -4,7 +4,7 @@ A dependency-free Rust project with three command-line tools for the finite-fiel
 quadric-pencil search and subgroup-transfer checks. Requires Rust 1.70 or newer.
 
 Agents can invoke `$ecdlp-surfaces` or read the
-[ecdlp-surfaces skill](../../.agents/skills/ecdlp-surfaces/SKILL.md) for when to
+[ecdlp-surfaces skill](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/ecdlp-surfaces/SKILL.md) for when to
 use each command, input requirements, reproducible examples, and output limits.
 
 ## Build and run

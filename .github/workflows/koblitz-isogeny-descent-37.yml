@@ -32,6 +32,8 @@ jobs:
             research/koblitz_isogeny_descent_37_20260925
             research/koblitz_isogeny_descent_37_results_20260925
             research/toy_f5_neighbors_20260924
+            tools/artifacts
+            .artifacts
       - name: Verify frozen archive and source hashes on pull requests
         if: github.event_name == 'pull_request'
         env:

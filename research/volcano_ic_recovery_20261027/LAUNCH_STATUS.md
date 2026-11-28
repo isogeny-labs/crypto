@@ -1,4 +1,40 @@
-# Launch status — 2026-10-28
+# Launch status — 2026-11-24
+
+The collector now has an exact-input command wrapper, committed-source exporter
+and a locally built static image. The original radius-12 plan was checked in
+that image without allocating its production table. A small known-answer image
+control ran as UID 1000 with networking disabled; the separately compiled
+affine/Euclidean checker checked its twelve base logs and target equation.
+Producer evidence is in [the command component](command/README.md),
+[report PDF](command/REPORT.pdf) and [receipt](command/validation/component.json).
+[pcc:unverified]
+
+The previous controller's 8Gi maximum was below the unchanged 9,566,497,092-byte
+payload. This source change adds explicit 14Gi admission with tests for legacy
+identity preservation and both computation/fresh manifest resources. No
+controller/runtime was deployed. The local image configuration ID is not a
+registry manifest digest. Both candidate and original-base controller suites
+have the same unchanged process-owner test failure; all 15 contract and 3
+top-level cloud tests pass. [pcc:unverified]
+
+The current one-shot `sts:GetCallerIdentity` check returns
+`InvalidClientTokenId`. This supersedes the older authentication observation
+below; no new CodeBuild or EKS request was attempted. The next live step needs
+working authorized execution access, current source-checkpoint and budget
+admission, published tested payload/runtime image digests and collector-specific
+CRIU/EBS worker-loss continuation qualification. The prepared recovery PVC
+requirement is 64Gi, not the old 20GB development estimate; it is unallocated.
+
+The replacement filesystem does not contain the old private working directories
+or original local-only archives. Their recovery remains an explicit task;
+published source/results are available, and no permanent-loss conclusion is
+drawn. New private control journals and build attempts are retained locally
+outside Git. No original-width production table or research job was started.
+
+## Observations recorded on 2026-10-28
+
+The following is the preserved October access snapshot, not a current identity
+or command-support assertion.
 
 **No original-size experiment has started.** Implementation and development
 controls in [PR #2707](https://github.com/isogeny-labs/crypto/pull/2707) are merged.

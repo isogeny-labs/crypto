@@ -1,0 +1,149 @@
+{
+  "schema": "ecbench.comparison/v1",
+  "comparison_id": "ECC1h325bf46d1f0d",
+  "resample_seed": 20261002,
+  "a": {
+    "session_id": "ECBS1h08dbafdea64f",
+    "arm": "rho-negation",
+    "method_id": "ECM1hefea4e0ebe79",
+    "method": "rho.negation",
+    "measured": 20,
+    "verified": 20,
+    "statuses": {
+      "verified": 20
+    },
+    "mean_s": 0.8247289854155749,
+    "mean_ratio_to_floor": 0.9306070056427533,
+    "lower_bound": true,
+    "deterministic": true
+  },
+  "b": {
+    "session_id": "ECBS1h08dbafdea64f",
+    "arm": "mitm",
+    "method_id": "ECM1h134e3c4c712c",
+    "method": "ic.pipeline",
+    "measured": 20,
+    "verified": 20,
+    "statuses": {
+      "verified": 20
+    },
+    "mean_s": 189.7412038029832,
+    "mean_ratio_to_floor": 214.10002151091012,
+    "lower_bound": false,
+    "deterministic": true
+  },
+  "workloads": [
+    {
+      "workload_id": "W0490fa4e6d3e",
+      "slug": "icv1-f2m27-t12543-569dca8b",
+      "r": 22367531,
+      "floor_s": 0.8862269254527579,
+      "pairs": 5,
+      "a_mean_s": 0.4375577906470941,
+      "b_mean_s": 190.4881754746097,
+      "ratio_b_over_a": 435.34403808214944
+    },
+    {
+      "workload_id": "W20922f9b1b7d",
+      "slug": "icv1-f2m27-t12543-569dca8b",
+      "r": 22367531,
+      "floor_s": 0.8862269254527579,
+      "pairs": 5,
+      "a_mean_s": 1.050443173835297,
+      "b_mean_s": 175.53015048021314,
+      "ratio_b_over_a": 167.10104349512883
+    },
+    {
+      "workload_id": "W388bc3b96b0d",
+      "slug": "icv1-f2m27-t12543-569dca8b",
+      "r": 22367531,
+      "floor_s": 0.8862269254527579,
+      "pairs": 5,
+      "a_mean_s": 0.7059620911435769,
+      "b_mean_s": 193.93323612097575,
+      "ratio_b_over_a": 274.707719513418
+    },
+    {
+      "workload_id": "W6f58322d8834",
+      "slug": "icv1-f2m27-t12543-569dca8b",
+      "r": 22367531,
+      "floor_s": 0.8862269254527579,
+      "pairs": 5,
+      "a_mean_s": 1.1049528860363316,
+      "b_mean_s": 199.01325313613424,
+      "ratio_b_over_a": 180.11017089609246
+    }
+  ],
+  "curves": [
+    {
+      "slug": "icv1-f2m27-t12543-569dca8b",
+      "log2_r": 24.414902680079198,
+      "workloads": 4,
+      "pairs": 20,
+      "ratio_b_over_a": 230.0649148488143,
+      "ci95": [
+        167.38107583972842,
+        363.1190730233057
+      ],
+      "ci_method": "cluster"
+    }
+  ],
+  "ops": {
+    "status": "ok",
+    "unit": "ecbench.gae",
+    "ratio_b_over_a": 230.0649148488143,
+    "ci95": [
+      167.38107583972842,
+      363.1190730233057
+    ],
+    "ci_method": "cluster",
+    "pairs": 20,
+    "unpaired_runs": 0,
+    "same_seeds": true,
+    "same_session": true,
+    "pooled_curves": 1,
+    "bounded": true,
+    "resamples": 4000
+  },
+  "wall": {
+    "status": "admitted",
+    "reasons": [
+      "7 of 20 pairs did not reach L2",
+      "the A/A arms have 0 admitted pairs; at least 5 are needed for a noise floor"
+    ],
+    "required_level": "L2",
+    "pairs": 20,
+    "pairs_below_level": 7,
+    "median_ratio": 3.198803282284059,
+    "ci95": [
+      3.055057162503439,
+      3.24460910112015
+    ],
+    "aa_arms": [
+      "s4-baseline",
+      "s4-baseline-control"
+    ],
+    "aa_pairs": 0,
+    "aa_median_ratio": null,
+    "aa_ci95": null,
+    "outside_noise": null
+  },
+  "quality": {
+    "score": 62,
+    "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+    "paired_attempts": 20,
+    "verified_pairs": 20,
+    "admitted_pairs": 13,
+    "levels": {
+      "L1": 7,
+      "L2": 13
+    },
+    "p95_foreign_busy_percent": 6.117370403019928,
+    "p95_run_queue_percent": 0.02341751576669743,
+    "contention_observed_runs": 40,
+    "notes": [
+      "no admitted A/A interval; calibration bonus unavailable"
+    ]
+  },
+  "verdict": "ops (ok): mitm / rho-negation = 230.0649 [167.381, 363.119] (cluster) over 20 pairs on 4 workloads, 1 curve(s), diagnostic only (unpriced work; ratio does not bound full cost); wall: admitted median 3.1988 [3.055, 3.245]"
+}

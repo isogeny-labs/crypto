@@ -1,0 +1,1469 @@
+warning: function `work` is never used
+   --> crates/hashed-ecdl-tensor/src/metrics.rs:170:15
+    |
+170 | pub(crate) fn work(n: u64) -> Result<()> {
+    |               ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `hashed-ecdl-tensor` (lib) generated 1 warning
+    Checking crypto v0.1.0 (/workspace/relation-root-recovery)
+error[E0428]: the name `touch` is defined multiple times
+   --> src/cryptanalysis/ic_framework/stages.rs:325:5
+    |
+295 |     fn touch(&self, _ctx: &InstanceCtx<G>, _point: &G::Elt) {}
+    |     ------------------------------------------------------- previous definition of the value `touch` here
+...
+325 |     fn touch(&self, _ctx: &InstanceCtx<G>, _point: &G::Elt) {}
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `touch` redefined here
+    |
+    = note: `touch` must be defined only once in the value namespace of this trait
+
+error[E0432]: unresolved import `crate::cryptanalysis::ecbench::claw::pair_claw_big`
+  --> src/cryptanalysis/ecbench/methods.rs:34:16
+   |
+34 |     pair_claw, pair_claw_big, pair_claw_v2, pair_claw_wide, pair_claw_wide_v2, ClawOutcome,
+   |                ^^^^^^^^^^^^^ no `pair_claw_big` in `cryptanalysis::ecbench::claw`
+   |
+help: a similar name exists in the module
+   |
+34 -     pair_claw, pair_claw_big, pair_claw_v2, pair_claw_wide, pair_claw_wide_v2, ClawOutcome,
+34 +     pair_claw, pair_claw_wide, pair_claw_v2, pair_claw_wide, pair_claw_wide_v2, ClawOutcome,
+   |
+
+error[E0432]: unresolved import `crate::cryptanalysis::ecbench::workload::BigInstance`
+  --> src/cryptanalysis/ecbench/methods.rs:54:5
+   |
+54 |     BigInstance, CurveFacts, HashWork, Instance, WideInstance,
+   |     ^^^^^^^^^^^ no `BigInstance` in `cryptanalysis::ecbench::workload`
+   |
+help: a similar name exists in the module
+   |
+54 -     BigInstance, CurveFacts, HashWork, Instance, WideInstance,
+54 +     ExtInstance, CurveFacts, HashWork, Instance, WideInstance,
+   |
+
+error[E0432]: unresolved import `super::chained_transfer::ic_control::wiedemann_coord`
+  --> src/cryptanalysis/genus_ladder_sieve.rs:71:72
+   |
+71 |     addm, build_rows, mulmod, pa, peel, pm, ppow, ps, subm, wiedemann, wiedemann_coord, Dsu, Nat,
+   |                                                                        ^^^^^^^^^^^^^^^ no `wiedemann_coord` in `cryptanalysis::chained_transfer::ic_control`
+
+error[E0433]: cannot find `hashed_native` in `super`
+    --> src/cryptanalysis/ecbench/methods.rs:1198:28
+     |
+1198 |             params: super::hashed_native::PARAMS,
+     |                            ^^^^^^^^^^^^^ could not find `hashed_native` in `super`
+
+error[E0433]: cannot find `hashed_native` in `super`
+    --> src/cryptanalysis/ecbench/methods.rs:3879:20
+     |
+3879 |             super::hashed_native::solve(m, i, PrimePoint::affine(tx, ty), seed)
+     |                    ^^^^^^^^^^^^^ could not find `hashed_native` in `super`
+
+error[E0416]: identifier `p` is bound more than once in the same pattern
+   --> src/cryptanalysis/ecbench/workload.rs:307:17
+    |
+307 |                 p,
+    |                 ^ used in a pattern more than once
+
+error[E0416]: identifier `n` is bound more than once in the same pattern
+   --> src/cryptanalysis/ecbench/workload.rs:308:17
+    |
+308 |                 n,
+    |                 ^ used in a pattern more than once
+
+error[E0416]: identifier `modulus` is bound more than once in the same pattern
+   --> src/cryptanalysis/ecbench/workload.rs:309:17
+    |
+309 |                 modulus,
+    |                 ^^^^^^^ used in a pattern more than once
+
+error[E0416]: identifier `a` is bound more than once in the same pattern
+   --> src/cryptanalysis/ecbench/workload.rs:310:17
+    |
+310 |                 a,
+    |                 ^ used in a pattern more than once
+
+error[E0416]: identifier `b` is bound more than once in the same pattern
+   --> src/cryptanalysis/ecbench/workload.rs:311:17
+    |
+311 |                 b,
+    |                 ^ used in a pattern more than once
+
+error[E0416]: identifier `group_order` is bound more than once in the same pattern
+   --> src/cryptanalysis/ecbench/workload.rs:312:17
+    |
+312 |                 group_order,
+    |                 ^^^^^^^^^^^ used in a pattern more than once
+
+error[E0416]: identifier `r` is bound more than once in the same pattern
+   --> src/cryptanalysis/ecbench/workload.rs:313:17
+    |
+313 |                 r,
+    |                 ^ used in a pattern more than once
+
+error[E0416]: identifier `gx` is bound more than once in the same pattern
+   --> src/cryptanalysis/ecbench/workload.rs:314:17
+    |
+314 |                 gx,
+    |                 ^^ used in a pattern more than once
+
+error[E0416]: identifier `gy` is bound more than once in the same pattern
+   --> src/cryptanalysis/ecbench/workload.rs:315:17
+    |
+315 |                 gy,
+    |                 ^^ used in a pattern more than once
+
+error[E0416]: identifier `family` is bound more than once in the same pattern
+   --> src/cryptanalysis/ecbench/workload.rs:316:21
+    |
+316 |                 ref family,
+    |                     ^^^^^^ used in a pattern more than once
+
+error[E0416]: identifier `parameter` is bound more than once in the same pattern
+   --> src/cryptanalysis/ecbench/workload.rs:317:17
+    |
+317 |                 parameter,
+    |                 ^^^^^^^^^ used in a pattern more than once
+
+error[E0407]: method `to_u128` is not a member of trait `RhoScalar`
+   --> src/cryptanalysis/koblitz_big.rs:468:5
+    |
+468 | /     fn to_u128(self) -> u128 {
+469 | |         self.checked_u128()
+470 | |             .expect("a U192 scalar above 2^128 has no u128 form")
+471 | |     }
+    | |_____^ not a member of trait `RhoScalar`
+
+error[E0425]: cannot find type `AdmittedKoblitzNative` in module `super::solvers`
+    --> src/ml_dataset/capture.rs:1671:35
+     |
+1671 |         payload: &super::solvers::AdmittedKoblitzNative<'_>,
+     |                                   ^^^^^^^^^^^^^^^^^^^^^ not found in `super::solvers`
+
+error[E0425]: cannot find function `verify_factor_base_config` in module `curves`
+    --> src/ml_dataset/relations_generic.rs:1303:13
+     |
+1303 |     curves::verify_factor_base_config(config, &case.public_instance, &case.factor_base)?;
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^ not found in `curves`
+     |
+note: similarly named function `verify_factor_base` defined here
+    --> src/ml_dataset/curves.rs:1613:1
+     |
+1613 | pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: a function with a similar name exists
+     |
+1303 -     curves::verify_factor_base_config(config, &case.public_instance, &case.factor_base)?;
+1303 +     curves::verify_factor_base(config, &case.public_instance, &case.factor_base)?;
+     |
+
+error[E0425]: cannot find function `verify_factor_base_config` in module `curves`
+    --> src/ml_dataset/relations_generic.rs:1509:13
+     |
+1509 |     curves::verify_factor_base_config(&t.config, public, base)?;
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^ not found in `curves`
+     |
+note: similarly named function `verify_factor_base` defined here
+    --> src/ml_dataset/curves.rs:1613:1
+     |
+1613 | pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: a function with a similar name exists
+     |
+1509 -     curves::verify_factor_base_config(&t.config, public, base)?;
+1509 +     curves::verify_factor_base(&t.config, public, base)?;
+     |
+
+error[E0425]: cannot find function `verify_factor_base_config` in module `curves`
+    --> src/ml_dataset/prime_f4_wide.rs:1082:13
+     |
+1082 |     curves::verify_factor_base_config(config, &case.public_instance, &case.factor_base)?;
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^ not found in `curves`
+     |
+note: similarly named function `verify_factor_base` defined here
+    --> src/ml_dataset/curves.rs:1613:1
+     |
+1613 | pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: a function with a similar name exists
+     |
+1082 -     curves::verify_factor_base_config(config, &case.public_instance, &case.factor_base)?;
+1082 +     curves::verify_factor_base(config, &case.public_instance, &case.factor_base)?;
+     |
+
+error[E0425]: cannot find function `verify_factor_base_config` in module `curves`
+    --> src/ml_dataset/prime_f4_wide_m3.rs:901:13
+     |
+ 901 |     curves::verify_factor_base_config(config, public, &case.factor_base)?;
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^ not found in `curves`
+     |
+note: similarly named function `verify_factor_base` defined here
+    --> src/ml_dataset/curves.rs:1613:1
+     |
+1613 | pub fn verify_factor_base(public: &Value, base: &Value) -> Result<(), String> {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: a function with a similar name exists
+     |
+ 901 -     curves::verify_factor_base_config(config, public, &case.factor_base)?;
+ 901 +     curves::verify_factor_base(config, public, &case.factor_base)?;
+     |
+
+error[E0603]: function `add_coordinate_domain` is private
+    --> src/cryptanalysis/trace_zero_point_chain.rs:13:9
+     |
+  13 |         add_coordinate_domain, finite_domain_clause_count, ChainBuildError, Circuit,
+     |         ^^^^^^^^^^^^^^^^^^^^^ private function
+     |
+note: the function `add_coordinate_domain` is defined here
+    --> src/cryptanalysis/binary_semaev_chain_sat.rs:1135:1
+     |
+1135 | fn add_coordinate_domain(solver: &mut Solver, block: &[u32], codes: &[BigUint], bit: usize) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0603]: struct `Circuit` is private
+   --> src/cryptanalysis/trace_zero_point_chain.rs:13:77
+    |
+ 13 |         add_coordinate_domain, finite_domain_clause_count, ChainBuildError, Circuit,
+    |                                                                             ^^^^^^^ private struct
+    |
+note: the struct `Circuit` is defined here
+   --> src/cryptanalysis/binary_semaev_chain_sat.rs:185:1
+    |
+185 | struct Circuit {
+    | ^^^^^^^^^^^^^^
+
+error[E0603]: function `ps` is private
+  --> src/cryptanalysis/genus_ladder_sieve.rs:71:51
+   |
+71 |     addm, build_rows, mulmod, pa, peel, pm, ppow, ps, subm, wiedemann, wiedemann_coord, Dsu, Nat,
+   |                                                   ^^ private function
+   |
+note: the function `ps` is defined here
+  --> src/cryptanalysis/chained_transfer/ic_control.rs:82:1
+   |
+82 | fn ps(p: u64, a: u64, b: u64, n: &mut Nat) -> u64 {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0046]: not all trait items implemented, missing: `checked_u128`
+   --> src/cryptanalysis/koblitz_big.rs:450:1
+    |
+450 | impl RhoScalar for U192 {
+    | ^^^^^^^^^^^^^^^^^^^^^^^ missing `checked_u128` in implementation
+    |
+   ::: src/cryptanalysis/koblitz_strong_rho.rs:199:5
+    |
+199 |     fn checked_u128(self) -> Option<u128>;
+    |     -------------------------------------- `checked_u128` from trait
+
+error[E0592]: duplicate definitions with name `to_f64`
+  --> src/cryptanalysis/ecbench/exact_scalar.rs:54:5
+   |
+36 |     pub fn to_f64(self) -> f64 {
+   |     -------------------------- other definition for `to_f64`
+...
+54 |     pub fn to_f64(self) -> f64 {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^ duplicate definitions for `to_f64`
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+    --> src/cryptanalysis/ecbench/audit.rs:1680:33
+     |
+1680 |         let sqrt_r = (w.curve.r.to_f64()).sqrt();
+     |                                 ^^^^^^
+     |
+    ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+     |
+ 197 |     fn to_f64(self) -> f64;
+     |        ------ the method is available for `u128` here
+     |
+     = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+     |
+  47 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+     |
+help: there is a method `to_i64` with a similar name
+     |
+1680 -         let sqrt_r = (w.curve.r.to_f64()).sqrt();
+1680 +         let sqrt_r = (w.curve.r.to_i64()).sqrt();
+     |
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/audit.rs:1715:66
+     |
+1715 |         let planted_ok = w.planted.and_then(|p| rec.map(|k| k == p));
+     |                                                             -    ^ expected `ExactScalar`, found `u128`
+     |                                                             |
+     |                                                             expected because this is `ExactScalar`
+     |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+     |
+1715 |         let planted_ok = w.planted.and_then(|p| rec.map(|k| k == p.into()));
+     |                                                                   +++++++
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+   --> src/cryptanalysis/ecbench/band.rs:442:34
+    |
+442 |     let sq = (r.workload.curve.r.to_f64()).sqrt();
+    |                                  ^^^^^^
+    |
+   ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+    |
+197 |     fn to_f64(self) -> f64;
+    |        ------ the method is available for `u128` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+    |
+ 47 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+    |
+help: there is a method `to_i64` with a similar name
+    |
+442 -     let sq = (r.workload.curve.r.to_f64()).sqrt();
+442 +     let sq = (r.workload.curve.r.to_i64()).sqrt();
+    |
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+   --> src/cryptanalysis/ecbench/band.rs:590:29
+    |
+590 |         (r.workload.curve.r.to_f64()).sqrt(),
+    |                             ^^^^^^
+    |
+   ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+    |
+197 |     fn to_f64(self) -> f64;
+    |        ------ the method is available for `u128` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+    |
+ 47 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+    |
+help: there is a method `to_i64` with a similar name
+    |
+590 -         (r.workload.curve.r.to_f64()).sqrt(),
+590 +         (r.workload.curve.r.to_i64()).sqrt(),
+    |
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+   --> src/cryptanalysis/ecbench/band.rs:862:45
+    |
+862 |             log2_r: (rs[0].workload.curve.r.to_f64()).log2(),
+    |                                             ^^^^^^
+    |
+   ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+    |
+197 |     fn to_f64(self) -> f64;
+    |        ------ the method is available for `u128` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+    |
+ 47 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+    |
+help: there is a method `to_i64` with a similar name
+    |
+862 -             log2_r: (rs[0].workload.curve.r.to_f64()).log2(),
+862 +             log2_r: (rs[0].workload.curve.r.to_i64()).log2(),
+    |
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+   --> src/cryptanalysis/ecbench/band.rs:917:22
+    |
+913 |                 let sqrt_r = (by[&(a.curve.clone(), a.arm.clone())][0]
+914 |                     .workload
+915 |                     .curve
+916 |                     .r
+917 |                     .to_f64())
+    |                      ^^^^^^
+    |
+   ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+    |
+197 |     fn to_f64(self) -> f64;
+    |        ------ the method is available for `u128` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+    |
+ 47 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+    |
+help: there is a method `to_i64` with a similar name
+    |
+917 -                     .to_f64())
+917 +                     .to_i64())
+    |
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+   --> src/cryptanalysis/ecbench/bounds.rs:931:47
+    |
+931 |     Some(entries as f64 / (r.workload.curve.r.to_f64()).sqrt())
+    |                                               ^^^^^^
+    |
+   ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+    |
+197 |     fn to_f64(self) -> f64;
+    |        ------ the method is available for `u128` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+    |
+ 23 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+    |
+help: there is a method `to_i64` with a similar name
+    |
+931 -     Some(entries as f64 / (r.workload.curve.r.to_f64()).sqrt())
+931 +     Some(entries as f64 / (r.workload.curve.r.to_i64()).sqrt())
+    |
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+   --> src/cryptanalysis/ecbench/bounds.rs:947:40
+    |
+947 |     total as f64 / (r.workload.curve.r.to_f64()).sqrt()
+    |                                        ^^^^^^
+    |
+   ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+    |
+197 |     fn to_f64(self) -> f64;
+    |        ------ the method is available for `u128` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+    |
+ 23 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+    |
+help: there is a method `to_i64` with a similar name
+    |
+947 -     total as f64 / (r.workload.curve.r.to_f64()).sqrt()
+947 +     total as f64 / (r.workload.curve.r.to_i64()).sqrt()
+    |
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+   --> src/cryptanalysis/ecbench/bounds.rs:979:45
+    |
+979 |     Some(count as f64 / (r.workload.curve.r.to_f64()).sqrt())
+    |                                             ^^^^^^
+    |
+   ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+    |
+197 |     fn to_f64(self) -> f64;
+    |        ------ the method is available for `u128` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+    |
+ 23 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+    |
+help: there is a method `to_i64` with a similar name
+    |
+979 -     Some(count as f64 / (r.workload.curve.r.to_f64()).sqrt())
+979 +     Some(count as f64 / (r.workload.curve.r.to_i64()).sqrt())
+    |
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+    --> src/cryptanalysis/ecbench/bounds.rs:1346:43
+     |
+1346 |             log2_r: (any.workload.curve.r.to_f64()).log2(),
+     |                                           ^^^^^^
+     |
+    ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+     |
+ 197 |     fn to_f64(self) -> f64;
+     |        ------ the method is available for `u128` here
+     |
+     = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+     |
+  23 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+     |
+help: there is a method `to_i64` with a similar name
+     |
+1346 -             log2_r: (any.workload.curve.r.to_f64()).log2(),
+1346 +             log2_r: (any.workload.curve.r.to_i64()).log2(),
+     |
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/bounds.rs:1347:16
+     |
+1347 |             r: any.workload.curve.r,
+     |                ^^^^^^^^^^^^^^^^^^^^ expected `ExactScalar`, found `u128`
+     |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+     |
+1347 |             r: any.workload.curve.r.into(),
+     |                                    +++++++
+
+error[E0605]: non-primitive cast: `ExactScalar` as `f64`
+    --> src/cryptanalysis/ecbench/bounds.rs:1662:24
+     |
+1662 |             let ln_r = (row.r as f64).ln();
+     |                        ^^^^^^^^^^^^^^ an `as` expression can only be used to convert between primitive types or to coerce to a specific trait object
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+   --> src/cryptanalysis/ecbench/compare/pooled.rs:327:41
+    |
+327 |                     (r.workload.curve.r.to_f64()).sqrt(),
+    |                                         ^^^^^^
+    |
+   ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+    |
+197 |     fn to_f64(self) -> f64;
+    |        ------ the method is available for `u128` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+    |
+ 42 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+    |
+help: there is a method `to_i64` with a similar name
+    |
+327 -                     (r.workload.curve.r.to_f64()).sqrt(),
+327 +                     (r.workload.curve.r.to_i64()).sqrt(),
+    |
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+   --> src/cryptanalysis/ecbench/compare/pooled.rs:488:25
+    |
+488 |     (r.workload.curve.r.to_f64()).sqrt()
+    |                         ^^^^^^
+    |
+   ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+    |
+197 |     fn to_f64(self) -> f64;
+    |        ------ the method is available for `u128` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+    |
+ 42 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+    |
+help: there is a method `to_i64` with a similar name
+    |
+488 -     (r.workload.curve.r.to_f64()).sqrt()
+488 +     (r.workload.curve.r.to_i64()).sqrt()
+    |
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+   --> src/cryptanalysis/ecbench/compare.rs:692:46
+    |
+692 |             let sqrt_r = (r.workload.curve.r.to_f64()).sqrt();
+    |                                              ^^^^^^
+    |
+   ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+    |
+197 |     fn to_f64(self) -> f64;
+    |        ------ the method is available for `u128` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+    |
+ 77 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+    |
+help: there is a method `to_i64` with a similar name
+    |
+692 -             let sqrt_r = (r.workload.curve.r.to_f64()).sqrt();
+692 +             let sqrt_r = (r.workload.curve.r.to_i64()).sqrt();
+    |
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/compare.rs:1186:20
+     |
+1186 |                 r: any.workload.curve.r,
+     |                    ^^^^^^^^^^^^^^^^^^^^ expected `ExactScalar`, found `u128`
+     |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+     |
+1186 |                 r: any.workload.curve.r.into(),
+     |                                        +++++++
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+   --> src/cryptanalysis/ecbench/db.rs:95:21
+    |
+ 95 |         f(Some((c.r.to_f64()).log2())),
+    |                     ^^^^^^
+    |
+   ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+    |
+197 |     fn to_f64(self) -> f64;
+    |        ------ the method is available for `u128` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+    |
+ 30 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+    |
+help: there is a method `to_i64` with a similar name
+    |
+ 95 -         f(Some((c.r.to_f64()).log2())),
+ 95 +         f(Some((c.r.to_i64()).log2())),
+    |
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+   --> src/cryptanalysis/ecbench/db.rs:483:21
+    |
+483 |         f(Some((c.r.to_f64()).log2())),
+    |                     ^^^^^^
+    |
+   ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+    |
+197 |     fn to_f64(self) -> f64;
+    |        ------ the method is available for `u128` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+    |
+ 30 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+    |
+help: there is a method `to_i64` with a similar name
+    |
+483 -         f(Some((c.r.to_f64()).log2())),
+483 +         f(Some((c.r.to_i64()).log2())),
+    |
+
+error[E0308]: mismatched types
+   --> src/cryptanalysis/ecbench/gpu.rs:972:57
+    |
+972 |             super::exact_scalar::ExactScalar::from(k) < workload.curve.r
+    |             -----------------------------------------   ^^^^^^^^^^^^^^^^ expected `ExactScalar`, found `u128`
+    |             |
+    |             expected because this is `ExactScalar`
+    |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+    |
+972 |             super::exact_scalar::ExactScalar::from(k) < workload.curve.r.into()
+    |                                                                         +++++++
+
+error[E0308]: mismatched types
+   --> src/cryptanalysis/ecbench/hec.rs:285:9
+    |
+285 |         recovered,
+    |         ^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+    |
+    = note: expected enum `Option<ExactScalar>`
+               found enum `Option<u128>`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:2989:28
+     |
+2989 |     let base = shape.seeds(r, n).saturating_mul(2 * u64::from(n));
+     |                      ----- ^ expected `u128`, found `f64`
+     |                      |
+     |                      arguments to this method are incorrect
+     |
+note: method defined here
+    --> src/cryptanalysis/ecbench/claw.rs:65:12
+     |
+  65 |     pub fn seeds(&self, r: u128, n: u32) -> u64 {
+     |            ^^^^^        -------
+
+error[E0599]: no variant, associated function, or constant named `Big` found for enum `ecbench::workload::Instance` in the current scope
+    --> src/cryptanalysis/ecbench/methods.rs:3118:19
+     |
+3118 |         Instance::Big(bi) => {
+     |                   ^^^ variant, associated function, or constant not found in `ecbench::workload::Instance`
+     |
+    ::: src/cryptanalysis/ecbench/workload.rs:861:1
+     |
+ 861 | pub enum Instance {
+     | ----------------- variant, associated function, or constant `Big` not found for this enum
+
+error[E0599]: no method named `checked_u64` found for type `u128` in the current scope
+    --> src/cryptanalysis/ecbench/methods.rs:3237:10
+     |
+3235 |     let r = curve
+3236 |         .r
+3237 |         .checked_u64()
+     |          ^^^^^^^^^^^
+     |
+help: there is a method `checked_add` with a similar name, but with different arguments
+    --> /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/uint_macros.rs:960:8
+    --> /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/mod.rs:1359:4
+    ::: /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/mod.rs:1385:5
+     |
+     = note: in this macro invocation
+     = note: this error originates in the macro `uint_impl` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0599]: no variant, associated function, or constant named `Big` found for enum `ecbench::workload::Instance` in the current scope
+    --> src/cryptanalysis/ecbench/methods.rs:3588:36
+     |
+3588 |     let mut rep = if let Instance::Big(bi) = inst {
+     |                                    ^^^ variant, associated function, or constant not found in `ecbench::workload::Instance`
+     |
+    ::: src/cryptanalysis/ecbench/workload.rs:861:1
+     |
+ 861 | pub enum Instance {
+     | ----------------- variant, associated function, or constant `Big` not found for this enum
+
+error[E0599]: no variant, associated function, or constant named `Big` found for enum `ecbench::workload::Instance` in the current scope
+    --> src/cryptanalysis/ecbench/methods.rs:3829:22
+     |
+3829 |     if let Instance::Big(_) = inst {
+     |                      ^^^ variant, associated function, or constant not found in `ecbench::workload::Instance`
+     |
+    ::: src/cryptanalysis/ecbench/workload.rs:861:1
+     |
+ 861 | pub enum Instance {
+     | ----------------- variant, associated function, or constant `Big` not found for this enum
+
+error[E0599]: no variant, associated function, or constant named `Big` found for enum `ecbench::workload::Instance` in the current scope
+    --> src/cryptanalysis/ecbench/methods.rs:4244:22
+     |
+4244 |         | (Instance::Big(_), _)
+     |                      ^^^ variant, associated function, or constant not found in `ecbench::workload::Instance`
+     |
+    ::: src/cryptanalysis/ecbench/workload.rs:861:1
+     |
+ 861 | pub enum Instance {
+     | ----------------- variant, associated function, or constant `Big` not found for this enum
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:5278:9
+     |
+5263 |     match inst {
+     |           ---- this expression has type `&ExtInstance`
+...
+5278 |         (Instance::Wide(_), _) | (Instance::Fp4(_), _) | (Instance::ThreeLeads(_), _) => {
+     |         ^^^^^^^^^^^^^^^^^^^^^^ expected `ExtInstance`, found `(_, _)`
+     |
+     = note: expected enum `ExtInstance`
+               found tuple `(_, _)`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:5278:34
+     |
+5263 |     match inst {
+     |           ---- this expression has type `&ExtInstance`
+...
+5278 |         (Instance::Wide(_), _) | (Instance::Fp4(_), _) | (Instance::ThreeLeads(_), _) => {
+     |                                  ^^^^^^^^^^^^^^^^^^^^^ expected `ExtInstance`, found `(_, _)`
+     |
+     = note: expected enum `ExtInstance`
+               found tuple `(_, _)`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:5278:58
+     |
+5263 |     match inst {
+     |           ---- this expression has type `&ExtInstance`
+...
+5278 |         (Instance::Wide(_), _) | (Instance::Fp4(_), _) | (Instance::ThreeLeads(_), _) => {
+     |                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `ExtInstance`, found `(_, _)`
+     |
+     = note: expected enum `ExtInstance`
+               found tuple `(_, _)`
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:5810:36
+     |
+5810 |         "seed_orbits": shape.seeds(r, n),
+     |                              ----- ^ expected `u128`, found `f64`
+     |                              |
+     |                              arguments to this method are incorrect
+     |
+note: method defined here
+    --> src/cryptanalysis/ecbench/claw.rs:65:12
+     |
+  65 |     pub fn seeds(&self, r: u128, n: u32) -> u64 {
+     |            ^^^^^        -------
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:5811:45
+     |
+5811 |         "table_classes_target": shape.table(r, n),
+     |                                       ----- ^ expected `u128`, found `f64`
+     |                                       |
+     |                                       arguments to this method are incorrect
+     |
+note: method defined here
+    --> src/cryptanalysis/ecbench/claw.rs:69:12
+     |
+  69 |     pub fn table(&self, r: u128, n: u32) -> u64 {
+     |            ^^^^^        -------
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/methods.rs:5819:20
+     |
+5819 |         recovered: o.recovered,
+     |                    ^^^^^^^^^^^ expected `Option<ExactScalar>`, found `Option<u128>`
+     |
+     = note: expected enum `Option<ExactScalar>`
+                found enum `Option<u128>`
+
+error[E0599]: no variant, associated function, or constant named `Big` found for enum `ecbench::workload::Instance` in the current scope
+    --> src/cryptanalysis/ecbench/methods.rs:8666:42
+     |
+8666 |     if let Instance::Wide(_) | Instance::Big(_) = &inst {
+     |                                          ^^^ variant, associated function, or constant not found in `ecbench::workload::Instance`
+     |
+    ::: src/cryptanalysis/ecbench/workload.rs:861:1
+     |
+ 861 | pub enum Instance {
+     | ----------------- variant, associated function, or constant `Big` not found for this enum
+
+error[E0599]: no variant, associated function, or constant named `Big` found for enum `ecbench::workload::Instance` in the current scope
+    --> src/cryptanalysis/ecbench/methods.rs:8808:21
+     |
+8808 |         | Instance::Big(_)
+     |                     ^^^ variant, associated function, or constant not found in `ecbench::workload::Instance`
+     |
+    ::: src/cryptanalysis/ecbench/workload.rs:861:1
+     |
+ 861 | pub enum Instance {
+     | ----------------- variant, associated function, or constant `Big` not found for this enum
+
+error[E0599]: no method named `to_u128` found for associated type `<G as ClawGroup>::S` in the current scope
+   --> src/cryptanalysis/ecbench/orbit_ic.rs:462:40
+    |
+462 |                     recovered = Some(d.to_u128());
+    |                                        ^^^^^^^ method not found in `<G as ClawGroup>::S`
+    |
+   ::: src/cryptanalysis/koblitz_strong_rho.rs:220:8
+    |
+220 |     fn to_u128(self) -> u128;
+    |        ------- the method is available for `<G as ClawGroup>::S` here
+    |
+    = help: items from traits can only be used if the trait is in scope
+help: trait `NarrowRhoScalar` which provides `to_u128` is implemented but not in scope; perhaps you want to import it
+    |
+  3 + use crate::cryptanalysis::koblitz_strong_rho::NarrowRhoScalar;
+    |
+
+error[E0308]: mismatched types
+    --> src/cryptanalysis/ecbench/runner.rs:1737:73
+     |
+1737 |     let matches_planted = w.planted.and_then(|p| recovered.map(|k| k == p));
+     |                                                                    -    ^ expected `ExactScalar`, found `u128`
+     |                                                                    |
+     |                                                                    expected because this is `ExactScalar`
+     |
+help: call `Into::into` on this expression to convert `u128` into `ExactScalar`
+     |
+1737 |     let matches_planted = w.planted.and_then(|p| recovered.map(|k| k == p.into()));
+     |                                                                          +++++++
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+    --> src/cryptanalysis/ecbench/runner.rs:1755:29
+     |
+1755 |     let sqrt_r = (w.curve.r.to_f64()).sqrt();
+     |                             ^^^^^^
+     |
+    ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+     |
+ 197 |     fn to_f64(self) -> f64;
+     |        ------ the method is available for `u128` here
+     |
+     = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+     |
+  28 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+     |
+help: there is a method `to_i64` with a similar name
+     |
+1755 -     let sqrt_r = (w.curve.r.to_f64()).sqrt();
+1755 +     let sqrt_r = (w.curve.r.to_i64()).sqrt();
+     |
+
+error[E0599]: no method named `bits` found for type `u128` in the current scope
+   --> src/cryptanalysis/ecbench/wordram_price.rs:209:43
+    |
+209 |     Ok(describe(field_of(curve)?, curve.r.bits()))
+    |                                           ^^^^ method not found in `u128`
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+note: `fp_backend::PrimeField` defines an item `bits`, perhaps you need to implement it
+   --> src/cryptanalysis/fp_backend.rs:162:1
+    |
+162 | pub trait PrimeField: Clone + Debug + Send + Sync {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `bits` found for type `u128` in the current scope
+   --> src/cryptanalysis/ecbench/wordram_price.rs:216:26
+    |
+216 |     let r_bits = curve.r.bits();
+    |                          ^^^^ method not found in `u128`
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+note: `fp_backend::PrimeField` defines an item `bits`, perhaps you need to implement it
+   --> src/cryptanalysis/fp_backend.rs:162:1
+    |
+162 | pub trait PrimeField: Clone + Debug + Send + Sync {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `bits` found for type `u128` in the current scope
+   --> src/cryptanalysis/ecbench/work.rs:972:26
+    |
+972 |     let r_bits = curve.r.bits();
+    |                          ^^^^ method not found in `u128`
+    |
+    = help: items from traits can only be used if the trait is implemented and in scope
+note: `fp_backend::PrimeField` defines an item `bits`, perhaps you need to implement it
+   --> src/cryptanalysis/fp_backend.rs:162:1
+    |
+162 | pub trait PrimeField: Clone + Debug + Send + Sync {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+    --> src/cryptanalysis/ecbench/work.rs:1333:23
+     |
+1333 |     let r = x.curve.r.to_f64();
+     |                       ^^^^^^
+     |
+    ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+     |
+ 197 |     fn to_f64(self) -> f64;
+     |        ------ the method is available for `u128` here
+     |
+     = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+     |
+  28 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+     |
+help: there is a method `to_i64` with a similar name
+     |
+1333 -     let r = x.curve.r.to_f64();
+1333 +     let r = x.curve.r.to_i64();
+     |
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+    --> src/cryptanalysis/ecbench/work.rs:1392:38
+     |
+1392 |     let sqrt_r = (r.workload.curve.r.to_f64()).sqrt();
+     |                                      ^^^^^^
+     |
+    ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+     |
+ 197 |     fn to_f64(self) -> f64;
+     |        ------ the method is available for `u128` here
+     |
+     = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+     |
+  28 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+     |
+help: there is a method `to_i64` with a similar name
+     |
+1392 -     let sqrt_r = (r.workload.curve.r.to_f64()).sqrt();
+1392 +     let sqrt_r = (r.workload.curve.r.to_i64()).sqrt();
+     |
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+    --> src/cryptanalysis/ecbench/work.rs:1490:37
+     |
+1490 |         log2_r: (r.workload.curve.r.to_f64()).log2(),
+     |                                     ^^^^^^
+     |
+    ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+     |
+ 197 |     fn to_f64(self) -> f64;
+     |        ------ the method is available for `u128` here
+     |
+     = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+     |
+  28 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+     |
+help: there is a method `to_i64` with a similar name
+     |
+1490 -         log2_r: (r.workload.curve.r.to_f64()).log2(),
+1490 +         log2_r: (r.workload.curve.r.to_i64()).log2(),
+     |
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+    --> src/cryptanalysis/ecbench/work.rs:1541:37
+     |
+1541 |                 (r.workload.curve.r.to_f64()).log2(),
+     |                                     ^^^^^^
+     |
+    ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+     |
+ 197 |     fn to_f64(self) -> f64;
+     |        ------ the method is available for `u128` here
+     |
+     = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+     |
+  28 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+     |
+help: there is a method `to_i64` with a similar name
+     |
+1541 -                 (r.workload.curve.r.to_f64()).log2(),
+1541 +                 (r.workload.curve.r.to_i64()).log2(),
+     |
+
+error[E0599]: no method named `to_f64` found for type `u128` in the current scope
+    --> src/cryptanalysis/ecbench/work.rs:1929:37
+     |
+1929 |         log2_r: (r.workload.curve.r.to_f64()).log2(),
+     |                                     ^^^^^^
+     |
+    ::: src/cryptanalysis/koblitz_strong_rho.rs:197:8
+     |
+ 197 |     fn to_f64(self) -> f64;
+     |        ------ the method is available for `u128` here
+     |
+     = help: items from traits can only be used if the trait is in scope
+help: trait `RhoScalar` which provides `to_f64` is implemented but not in scope; perhaps you want to import it
+     |
+  28 + use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+     |
+help: there is a method `to_i64` with a similar name
+     |
+1929 -         log2_r: (r.workload.curve.r.to_f64()).log2(),
+1929 +         log2_r: (r.workload.curve.r.to_i64()).log2(),
+     |
+
+error[E0025]: field `p` bound multiple times in the pattern
+   --> src/cryptanalysis/ecbench/workload.rs:307:17
+    |
+306 |                 p, n, modulus, a, b, group_order, r, gx, gy, ref family, parameter,
+    |                 - first use of `p`
+307 |                 p,
+    |                 ^ multiple uses of `p` in pattern
+
+error[E0025]: field `n` bound multiple times in the pattern
+   --> src/cryptanalysis/ecbench/workload.rs:308:17
+    |
+306 |                 p, n, modulus, a, b, group_order, r, gx, gy, ref family, parameter,
+    |                    - first use of `n`
+307 |                 p,
+308 |                 n,
+    |                 ^ multiple uses of `n` in pattern
+
+error[E0025]: field `modulus` bound multiple times in the pattern
+   --> src/cryptanalysis/ecbench/workload.rs:309:17
+    |
+306 |                 p, n, modulus, a, b, group_order, r, gx, gy, ref family, parameter,
+    |                       ------- first use of `modulus`
+...
+309 |                 modulus,
+    |                 ^^^^^^^ multiple uses of `modulus` in pattern
+
+error[E0025]: field `a` bound multiple times in the pattern
+   --> src/cryptanalysis/ecbench/workload.rs:310:17
+    |
+306 |                 p, n, modulus, a, b, group_order, r, gx, gy, ref family, parameter,
+    |                                - first use of `a`
+...
+310 |                 a,
+    |                 ^ multiple uses of `a` in pattern
+
+error[E0025]: field `b` bound multiple times in the pattern
+   --> src/cryptanalysis/ecbench/workload.rs:311:17
+    |
+306 |                 p, n, modulus, a, b, group_order, r, gx, gy, ref family, parameter,
+    |                                   - first use of `b`
+...
+311 |                 b,
+    |                 ^ multiple uses of `b` in pattern
+
+error[E0025]: field `group_order` bound multiple times in the pattern
+   --> src/cryptanalysis/ecbench/workload.rs:312:17
+    |
+306 |                 p, n, modulus, a, b, group_order, r, gx, gy, ref family, parameter,
+    |                                      ----------- first use of `group_order`
+...
+312 |                 group_order,
+    |                 ^^^^^^^^^^^ multiple uses of `group_order` in pattern
+
+error[E0025]: field `r` bound multiple times in the pattern
+   --> src/cryptanalysis/ecbench/workload.rs:313:17
+    |
+306 |                 p, n, modulus, a, b, group_order, r, gx, gy, ref family, parameter,
+    |                                                   - first use of `r`
+...
+313 |                 r,
+    |                 ^ multiple uses of `r` in pattern
+
+error[E0025]: field `gx` bound multiple times in the pattern
+   --> src/cryptanalysis/ecbench/workload.rs:314:17
+    |
+306 |                 p, n, modulus, a, b, group_order, r, gx, gy, ref family, parameter,
+    |                                                      -- first use of `gx`
+...
+314 |                 gx,
+    |                 ^^ multiple uses of `gx` in pattern
+
+error[E0025]: field `gy` bound multiple times in the pattern
+   --> src/cryptanalysis/ecbench/workload.rs:315:17
+    |
+306 |                 p, n, modulus, a, b, group_order, r, gx, gy, ref family, parameter,
+    |                                                          -- first use of `gy`
+...
+315 |                 gy,
+    |                 ^^ multiple uses of `gy` in pattern
+
+error[E0025]: field `family` bound multiple times in the pattern
+   --> src/cryptanalysis/ecbench/workload.rs:316:17
+    |
+306 |                 p, n, modulus, a, b, group_order, r, gx, gy, ref family, parameter,
+    |                                                              ---------- first use of `family`
+...
+316 |                 ref family,
+    |                 ^^^^^^^^^^ multiple uses of `family` in pattern
+
+error[E0025]: field `parameter` bound multiple times in the pattern
+   --> src/cryptanalysis/ecbench/workload.rs:317:17
+    |
+306 |                 p, n, modulus, a, b, group_order, r, gx, gy, ref family, parameter,
+    |                                                                          --------- first use of `parameter`
+...
+317 |                 parameter,
+    |                 ^^^^^^^^^ multiple uses of `parameter` in pattern
+
+error[E0062]: field `curve` specified more than once
+   --> src/cryptanalysis/ecbench/workload.rs:326:21
+    |
+325 |                     curve: crate::cryptanalysis::three_leads::Elliptic { f, c, binary: p == 2 },
+    |                     --------------------------------------------------------------------------- first use of `curve`
+326 |                     curve: crate::cryptanalysis::three_leads::Elliptic {
+    |                     ^^^^^ used more than once
+
+error[E0599]: no associated function or constant named `build_for_domain` found for struct `ChainedS3Encoding` in the current scope
+   --> src/cryptanalysis/trace_zero_relations.rs:263:32
+    |
+263 |             ChainedS3Encoding::build_for_domain(
+    |                                ^^^^^^^^^^^^^^^^ associated function or constant not found in `ChainedS3Encoding`
+    |
+   ::: src/cryptanalysis/binary_semaev_chain_sat.rs:450:1
+    |
+450 | pub struct ChainedS3Encoding {
+    | ---------------------------- associated function or constant `build_for_domain` not found for this struct
+    |
+note: if you're trying to build a new `ChainedS3Encoding` consider using one of the following associated functions:
+      ChainedS3Encoding::build
+      ChainedS3Encoding::build_with_kernel
+   --> src/cryptanalysis/binary_semaev_chain_sat.rs:470:5
+    |
+470 | /     pub fn build(
+471 | |         m: usize,
+472 | |         irr: &IrreduciblePoly,
+473 | |         b: &F2mElement,
+...   |
+476 | |         max_variables: u32,
+477 | |     ) -> Result<Self, ChainBuildError> {
+    | |______________________________________^
+...
+491 | /     pub fn build_with_kernel(
+492 | |         m: usize,
+493 | |         irr: &IrreduciblePoly,
+494 | |         b: &F2mElement,
+...   |
+498 | |         kernel: ChainProductKernel,
+499 | |     ) -> Result<Self, ChainBuildError> {
+    | |______________________________________^
+
+warning: method call on a diverging inference variable
+   --> src/cryptanalysis/trace_zero_relations.rs:292:18
+    |
+292 |                 .constrain_summands(&codes, limits.max_domain_clauses)
+    |                  ^^^^^^^^^^^^^^^^^^
+    |
+    = help: consider providing a type annotation
+    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+    = note: for more information, see issue #156047 <https://github.com/rust-lang/rust/issues/156047>
+    = note: `#[warn(method_call_on_diverging_infer_var)]` (part of `#[warn(future_incompatible)]`) on by default
+
+error[E0599]: no method named `constrain_summands` found for type `!` in the current scope
+   --> src/cryptanalysis/trace_zero_relations.rs:292:18
+    |
+291 |             && enc
+292 |                 .constrain_summands(&codes, limits.max_domain_clauses)
+    |                  ^^^^^^^^^^^^^^^^^^ method not found in `!`
+
+error[E0599]: no method named `constrain_terminal_pair_domain` found for type `!` in the current scope
+   --> src/cryptanalysis/trace_zero_relations.rs:316:21
+    |
+316 |                 enc.constrain_terminal_pair_domain(&pairs, remaining_clauses)
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method not found in `!`
+
+warning: unreachable expression
+   --> src/cryptanalysis/trace_zero_relations.rs:316:52
+    |
+316 |                 enc.constrain_terminal_pair_domain(&pairs, remaining_clauses)
+    |                 ---                                ^^^^^^ unreachable expression
+    |                 |
+    |                 any code following this expression is unreachable
+    |
+    = note: `#[warn(unreachable_code)]` (part of `#[warn(unused)]`) on by default
+
+error[E0599]: no method named `constrain_intermediate` found for type `!` in the current scope
+   --> src/cryptanalysis/trace_zero_relations.rs:325:21
+    |
+325 |                 enc.constrain_intermediate(1, &xs, remaining_clauses)
+    |                     ^^^^^^^^^^^^^^^^^^^^^^ method not found in `!`
+
+warning: unreachable expression
+   --> src/cryptanalysis/trace_zero_relations.rs:325:44
+    |
+325 |                 enc.constrain_intermediate(1, &xs, remaining_clauses)
+    |                 ---                        ^ unreachable expression
+    |                 |
+    |                 any code following this expression is unreachable
+
+error[E0599]: no method named `constrain_full_trace_zero_summands` found for type `!` in the current scope
+   --> src/cryptanalysis/trace_zero_relations.rs:333:23
+    |
+333 |             match enc.constrain_full_trace_zero_summands(
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method not found in `!`
+
+warning: unreachable expression
+   --> src/cryptanalysis/trace_zero_relations.rs:334:17
+    |
+333 |             match enc.constrain_full_trace_zero_summands(
+    |                   --- any code following this expression is unreachable
+334 |                 variety,
+    |                 ^^^^^^^ unreachable expression
+
+error[E0599]: no method named `constrain_kummer_trace_zero_summands` found for type `!` in the current scope
+   --> src/cryptanalysis/trace_zero_relations.rs:346:23
+    |
+346 |             match enc.constrain_kummer_trace_zero_summands(
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method not found in `!`
+
+warning: unreachable expression
+   --> src/cryptanalysis/trace_zero_relations.rs:347:17
+    |
+346 |             match enc.constrain_kummer_trace_zero_summands(
+    |                   --- any code following this expression is unreachable
+347 |                 variety,
+    |                 ^^^^^^^ unreachable expression
+
+error[E0599]: no method named `constrain_trace_zero_intermediates` found for type `!` in the current scope
+   --> src/cryptanalysis/trace_zero_relations.rs:359:23
+    |
+359 |             match enc.constrain_trace_zero_intermediates(variety) {
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method not found in `!`
+
+warning: unreachable expression
+   --> src/cryptanalysis/trace_zero_relations.rs:359:58
+    |
+359 |             match enc.constrain_trace_zero_intermediates(variety) {
+    |                   ---                                    ^^^^^^^ unreachable expression
+    |                   |
+    |                   any code following this expression is unreachable
+
+error[E0609]: no field `solver` on type `!`
+   --> src/cryptanalysis/trace_zero_relations.rs:367:63
+    |
+367 |         report.peak_variables = report.peak_variables.max(enc.solver.n_vars());
+    |                                                               ^^^^^^ unknown field
+
+error[E0609]: no field `solver` on type `!`
+   --> src/cryptanalysis/trace_zero_relations.rs:374:13
+    |
+374 |         enc.solver.conflict_budget = limits.conflict_budget - prior;
+    |             ^^^^^^ unknown field
+
+error[E0609]: no field `solver` on type `!`
+   --> src/cryptanalysis/trace_zero_relations.rs:375:13
+    |
+375 |         enc.solver.deadline = deadline;
+    |             ^^^^^^ unknown field
+
+error[E0609]: no field `solver` on type `!`
+   --> src/cryptanalysis/trace_zero_relations.rs:377:30
+    |
+377 |             let result = enc.solver.solve();
+    |                              ^^^^^^ unknown field
+
+error[E0609]: no field `solver` on type `!`
+   --> src/cryptanalysis/trace_zero_relations.rs:378:57
+    |
+378 |             report.conflicts = prior.saturating_add(enc.solver.conflicts());
+    |                                                         ^^^^^^ unknown field
+
+error[E0599]: no method named `decode_summands` found for type `!` in the current scope
+   --> src/cryptanalysis/trace_zero_relations.rs:390:34
+    |
+390 |                     let xs = enc.decode_summands();
+    |                                  ^^^^^^^^^^^^^^^ method not found in `!`
+
+warning: unreachable call
+   --> src/cryptanalysis/trace_zero_relations.rs:390:34
+    |
+390 |                     let xs = enc.decode_summands();
+    |                              --- ^^^^^^^^^^^^^^^ unreachable call
+    |                              |
+    |                              any code following this expression is unreachable
+
+error[E0599]: no method named `verify_model` found for type `!` in the current scope
+   --> src/cryptanalysis/trace_zero_relations.rs:391:29
+    |
+391 |                     if !enc.verify_model()
+    |                             ^^^^^^^^^^^^ method not found in `!`
+
+warning: unreachable call
+   --> src/cryptanalysis/trace_zero_relations.rs:391:29
+    |
+391 |                     if !enc.verify_model()
+    |                         --- ^^^^^^^^^^^^ unreachable call
+    |                         |
+    |                         any code following this expression is unreachable
+
+error[E0609]: no field `solver` on type `!`
+   --> src/cryptanalysis/trace_zero_relations.rs:415:36
+    |
+415 |                     let bits = enc.solver.model();
+    |                                    ^^^^^^ unknown field
+
+error[E0609]: no field `solver` on type `!`
+   --> src/cryptanalysis/trace_zero_relations.rs:416:25
+    |
+416 |                     enc.solver.reset_search();
+    |                         ^^^^^^ unknown field
+
+error[E0609]: no field `solver` on type `!`
+   --> src/cryptanalysis/trace_zero_relations.rs:417:25
+    |
+417 |                     enc.solver.add_clause(
+    |                         ^^^^^^ unknown field
+
+error[E0599]: no associated function or constant named `build_for_trace_zero_subspace` found for struct `ChainedS3Encoding` in the current scope
+   --> src/cryptanalysis/trace_zero_subspace_relations.rs:109:48
+    |
+109 |         let mut enc = match ChainedS3Encoding::build_for_trace_zero_subspace(
+    |                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ associated function or constant not found in `ChainedS3Encoding`
+    |
+   ::: src/cryptanalysis/binary_semaev_chain_sat.rs:450:1
+    |
+450 | pub struct ChainedS3Encoding {
+    | ---------------------------- associated function or constant `build_for_trace_zero_subspace` not found for this struct
+    |
+note: if you're trying to build a new `ChainedS3Encoding` consider using one of the following associated functions:
+      ChainedS3Encoding::build
+      ChainedS3Encoding::build_with_kernel
+   --> src/cryptanalysis/binary_semaev_chain_sat.rs:470:5
+    |
+470 | /     pub fn build(
+471 | |         m: usize,
+472 | |         irr: &IrreduciblePoly,
+473 | |         b: &F2mElement,
+...   |
+476 | |         max_variables: u32,
+477 | |     ) -> Result<Self, ChainBuildError> {
+    | |______________________________________^
+...
+491 | /     pub fn build_with_kernel(
+492 | |         m: usize,
+493 | |         irr: &IrreduciblePoly,
+494 | |         b: &F2mElement,
+...   |
+498 | |         kernel: ChainProductKernel,
+499 | |     ) -> Result<Self, ChainBuildError> {
+    | |______________________________________^
+
+error[E0599]: no method named `to_u128` found for type parameter `S` in the current scope
+   --> src/cryptanalysis/ic_framework/linalg.rs:610:22
+    |
+470 | impl<S: RhoScalar> Wiedemann<S> {
+    |      - method `to_u128` not found for this type parameter
+...
+610 |         let m128 = m.to_u128();
+    |                      ^^^^^^^ method not found in `S`
+    |
+    = help: items from traits can only be used if the type parameter is bounded by the trait
+help: the following traits define an item `to_u128`, perhaps you need to restrict type parameter `S` with one of them:
+    |
+470 | impl<S: RhoScalar + NarrowRhoScalar> Wiedemann<S> {
+    |                   +++++++++++++++++
+470 | impl<S: RhoScalar + num_traits::ToPrimitive> Wiedemann<S> {
+    |                   +++++++++++++++++++++++++
+
+error[E0308]: mismatched types
+   --> src/cryptanalysis/ic_framework/linalg.rs:613:36
+    |
+470 | impl<S: RhoScalar> Wiedemann<S> {
+    |      - expected this type parameter
+...
+613 |                 let w = if m128 <= u64::MAX as u128 {
+    |                                    ^^^^^^^^^^^^^^^^ expected type parameter `S`, found `u128`
+    |
+    = note: expected type parameter `S`
+                         found type `u128`
+
+error[E0599]: no method named `order_equal_adjacent_summands` found for struct `ChainedS3Encoding` in the current scope
+   --> src/cryptanalysis/koblitz_large_prime.rs:417:21
+    |
+417 |                 enc.order_equal_adjacent_summands(limits.max_variables)?;
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/cryptanalysis/binary_semaev_chain_sat.rs:450:1
+    |
+450 | pub struct ChainedS3Encoding {
+    | ---------------------------- method `order_equal_adjacent_summands` not found for this struct
+    |
+help: there is a method `order_all_summands` with a similar name
+    |
+417 -                 enc.order_equal_adjacent_summands(limits.max_variables)?;
+417 +                 enc.order_all_summands(limits.max_variables)?;
+    |
+
+error[E0560]: struct `GenerateArgs` has no field named `snapshot_seconds`
+   --> src/ml_dataset/startup_gate.rs:439:13
+    |
+439 |             snapshot_seconds: 30,
+    |             ^^^^^^^^^^^^^^^^ `GenerateArgs` does not have this field
+    |
+    = note: all struct fields are already assigned
+
+error[E0560]: struct `GenerateArgs` has no field named `snapshot_timeout_seconds`
+   --> src/ml_dataset/startup_gate.rs:440:13
+    |
+440 |             snapshot_timeout_seconds: 120,
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^ `GenerateArgs` does not have this field
+    |
+    = note: all struct fields are already assigned
+
+error[E0063]: missing field `factor_base_policy` in initializer of `ml_dataset::types::CaseConfig`
+   --> src/ml_dataset/mod.rs:472:12
+    |
+472 |         Ok(CaseConfig {
+    |            ^^^^^^^^^^ missing `factor_base_policy`
+
+warning: unreachable pattern
+   --> src/cryptanalysis/ecbench/workload.rs:732:13
+    |
+725 | /             Instance::Binary(_)
+726 | |             | Instance::Wide(_)
+727 | |             | Instance::Fp4(_)
+728 | |             | Instance::Fp4Torsion(_)
+729 | |             | Instance::F2m4(_)
+730 | |             | Instance::Ext(_)
+731 | |             | Instance::ThreeLeads(_) => None,
+    | |_____________________________________- matches all the relevant values
+732 | /             | Instance::ThreeLeads(_)
+733 | |             | Instance::Ext(_) => None,
+    | |______________________________^ no value can reach this
+    |
+    = note: `#[warn(unreachable_patterns)]` (part of `#[warn(unused)]`) on by default
+
+warning: unreachable pattern
+   --> src/cryptanalysis/ecbench/workload.rs:815:13
+    |
+754 | ...   CurveSpec::ThreeLeads {p,n,a,b,ref family,parameter,..}=>format!("three_leads_explicit(p={p},n={n},a={a},b={b},family={family...
+    |       ------------------------------------------------------- matches all the relevant values
+...
+815 | ...   CurveSpec::ThreeLeads { p, n, a, b, ref family, parameter, .. } => format!(
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no value can reach this
+
+warning: unreachable pattern
+    --> src/cryptanalysis/ecbench/workload.rs:1356:15
+     |
+1350 |             | Instance::ThreeLeads(_)
+     |               ----------------------- matches all the relevant values
+...
+1356 |             | Instance::ThreeLeads(_) => {
+     |               ^^^^^^^^^^^^^^^^^^^^^^^ no value can reach this
+
+warning: unreachable pattern
+    --> src/cryptanalysis/ecbench/workload.rs:1543:15
+     |
+1537 |             | Instance::ThreeLeads(_)
+     |               ----------------------- matches all the relevant values
+...
+1543 |             | Instance::ThreeLeads(_) => {
+     |               ^^^^^^^^^^^^^^^^^^^^^^^ no value can reach this
+
+Some errors have detailed explanations: E0025, E0046, E0062, E0063, E0308, E0407, E0416, E0425, E0428...
+For more information about an error, try `rustc --explain E0025`.
+warning: `crypto` (lib) generated 12 warnings
+error: could not compile `crypto` (lib) due to 109 previous errors; 13 warnings emitted

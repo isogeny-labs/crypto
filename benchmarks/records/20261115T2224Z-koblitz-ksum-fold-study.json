@@ -1,0 +1,164 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-15T22:34:41+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/koblitz_ksum_fold_study_20261115/run.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T22:25:30+00:00",
+      "wall_s": 257.098
+    }
+  ],
+  "commit": "9fa38942e40f8583fe24acf15f830dbf1b77ea6f",
+  "commit_dirty": true,
+  "created_utc": "2026-11-15T22:24:43+00:00",
+  "curve_uid": "icv1-f2m23-tm5197-1f85e9e1",
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T2224Z-koblitz-ksum-fold-study",
+  "metrics": [
+    {
+      "baseline": 1.314,
+      "better": "lower",
+      "n": 432,
+      "name": "s_kf3_n23_w0p1",
+      "note": "pooled mean S, kf3-c1g-sr, K1 n23, w=0.1 band-priced; baseline lazy-c4; ratio 0.799 [0.762,0.837]; pcc:unverified",
+      "reference": 0.95,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 1.05
+    },
+    {
+      "baseline": 2.063,
+      "better": "lower",
+      "n": 432,
+      "name": "s_kf3_n29_w0p1",
+      "note": "pooled mean S, kf3-c1g-sr, K1 n29, w=0.1 band-priced; baseline lazy-c1; ratio 5.622 [5.540,5.704] (regression); pcc:unverified",
+      "reference": 4.685,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 11.597
+    }
+  ],
+  "problem": "ic:koblitz-ksum-fold-n23-n29",
+  "raw": [
+    {
+      "bytes": 1592085,
+      "path": "research/koblitz_ksum_fold_study_20261115/sessions/n23-r1/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d6/d62028234634316a599ac24a2983e8d8e3bbca2488cea1d7ae496d3f36b05aa2",
+      "sha256": "d62028234634316a599ac24a2983e8d8e3bbca2488cea1d7ae496d3f36b05aa2",
+      "uploaded": false
+    },
+    {
+      "bytes": 1592750,
+      "path": "research/koblitz_ksum_fold_study_20261115/sessions/n23-r2/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/50/50e7ffddd9d11d326374d6c047024e734c77801c08850151e7393ab45a026433",
+      "sha256": "50e7ffddd9d11d326374d6c047024e734c77801c08850151e7393ab45a026433",
+      "uploaded": false
+    },
+    {
+      "bytes": 1590718,
+      "path": "research/koblitz_ksum_fold_study_20261115/sessions/n23-r3/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/66/666e19190b552bba60c60d0fe4cebb3dc9a94a39a7b0cf7ec5f9c58480dea4e6",
+      "sha256": "666e19190b552bba60c60d0fe4cebb3dc9a94a39a7b0cf7ec5f9c58480dea4e6",
+      "uploaded": false
+    },
+    {
+      "bytes": 1684770,
+      "path": "research/koblitz_ksum_fold_study_20261115/sessions/n29-r1/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b5/b571b9bb1b358798b72536fec6bafc49eb81a2a0098e53c5d9fb2ebd41a71904",
+      "sha256": "b571b9bb1b358798b72536fec6bafc49eb81a2a0098e53c5d9fb2ebd41a71904",
+      "uploaded": false
+    },
+    {
+      "bytes": 1687898,
+      "path": "research/koblitz_ksum_fold_study_20261115/sessions/n29-r2/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/37/3796071ad245e23a81d293ea1273bf810232c5af7263a37a7b3130dde37fbe4e",
+      "sha256": "3796071ad245e23a81d293ea1273bf810232c5af7263a37a7b3130dde37fbe4e",
+      "uploaded": false
+    },
+    {
+      "bytes": 1682903,
+      "path": "research/koblitz_ksum_fold_study_20261115/sessions/n29-r3/records.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/12/122725fa35ab882576e282c0282390d6fa7f083e9b423e9f8b818d777f3f2ef0",
+      "sha256": "122725fa35ab882576e282c0282390d6fa7f083e9b423e9f8b818d777f3f2ef0",
+      "uploaded": false
+    },
+    {
+      "bytes": 39172,
+      "path": "research/koblitz_ksum_fold_study_20261115/results.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4d/4d9d7d75a1c2d37f2ea57d1bee33155212fbdc6337a9f075fff73826980edc5c",
+      "sha256": "4d9d7d75a1c2d37f2ea57d1bee33155212fbdc6337a9f075fff73826980edc5c",
+      "uploaded": false
+    },
+    {
+      "bytes": 206199,
+      "path": "research/koblitz_ksum_fold_study_20261115/audits/audit-n23-r1.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f7/f7fb11cfac848c29d7231c6dd0f936bfc272254efbab7f15d8268a11b0e9cdba",
+      "sha256": "f7fb11cfac848c29d7231c6dd0f936bfc272254efbab7f15d8268a11b0e9cdba",
+      "uploaded": false
+    },
+    {
+      "bytes": 206199,
+      "path": "research/koblitz_ksum_fold_study_20261115/audits/audit-n23-r2.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/cc/cc2ed09de6827bda03a26a5ff0dc738c6ddc334c5127757f85a0eebab810f4e7",
+      "sha256": "cc2ed09de6827bda03a26a5ff0dc738c6ddc334c5127757f85a0eebab810f4e7",
+      "uploaded": false
+    },
+    {
+      "bytes": 206199,
+      "path": "research/koblitz_ksum_fold_study_20261115/audits/audit-n23-r3.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/70/7020be1993a5db30209caefec6e6eaf0070e4de65e8c65ecf366936b392f42cb",
+      "sha256": "7020be1993a5db30209caefec6e6eaf0070e4de65e8c65ecf366936b392f42cb",
+      "uploaded": false
+    },
+    {
+      "bytes": 200583,
+      "path": "research/koblitz_ksum_fold_study_20261115/audits/audit-n29-r1.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/30/30a478bf69e9ff485171b48ae830e645fd1a34796412cf1bbb9bafb60f36a7ad",
+      "sha256": "30a478bf69e9ff485171b48ae830e645fd1a34796412cf1bbb9bafb60f36a7ad",
+      "uploaded": false
+    },
+    {
+      "bytes": 200583,
+      "path": "research/koblitz_ksum_fold_study_20261115/audits/audit-n29-r2.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fa/faa97b80370e583a3f332234c280d66742ceeef2ca46e1216db4f87ab19c43cc",
+      "sha256": "faa97b80370e583a3f332234c280d66742ceeef2ca46e1216db4f87ab19c43cc",
+      "uploaded": false
+    },
+    {
+      "bytes": 200583,
+      "path": "research/koblitz_ksum_fold_study_20261115/audits/audit-n29-r3.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/26/2680f7ea0288cf9d1faeb2386e5539fb00233b9e9a4a33173ffffbd92f5e2996",
+      "sha256": "2680f7ea0288cf9d1faeb2386e5539fb00233b9e9a4a33173ffffbd92f5e2996",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/koblitz_ksum_fold_study_20261115/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/koblitz_ksum_fold_study_20261115/figures/fig1-ratio.svg",
+      "research/koblitz_ksum_fold_study_20261115/figures/fig2-S.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "koblitz-ksum-fold-study",
+  "status": "measured",
+  "summary": "kf3-c1g-sr vs lazy orbit-member incumbent, band-priced pooled R: K1 n23 0.784/0.799/0.832 at w=0/0.1/1 (improves), K1 n29 5.30/5.62/6.31 (regresses); local L0; pcc:unverified",
+  "validation": null
+}

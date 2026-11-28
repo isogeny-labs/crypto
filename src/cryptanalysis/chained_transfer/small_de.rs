@@ -63,7 +63,8 @@ fn pw(mut a: u64, mut e: u64, m: u64) -> u64 {
     r
 }
 fn inv_mod(a: u64, m: u64) -> u64 {
-    pw(a, m - 2, m)
+    // Prime m >= 3: Fermat's a^(m-2) is the inverse of a unit and 0 for a = 0 mod m.
+    crate::gcd::int::inv_mod_u64(a, m).unwrap_or(0)
 }
 fn sub_mod(a: u64, b: u64, m: u64) -> u64 {
     if a >= b {

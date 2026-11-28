@@ -1,0 +1,36 @@
+{
+  "scope": "Fresh Std-only requalification of same scalar statements/controls; not additional instances",
+  "phase": "11-fresh-std-only-reproduction",
+  "exit_code": 0,
+  "physical_stop": 0,
+  "peak_whole_cgroup_bytes": 14009532416,
+  "unique_controls": 7,
+  "shared_statements": 3,
+  "solver_executions": 0,
+  "lean_version": "Lean (version 4.35.0, x86_64-unknown-linux-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)",
+  "pcc_local_verdict": {
+    "claim_id": "PCC-20261123-75fa8c",
+    "claim_sha256": "a67483a0cd024abcd5454982323c3d6300e71b61f79cc6c71d1312563e26007a",
+    "commit": "e33eb5511d84ea8ae596601ca53c99185d5453ae",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/hashed_ecdl_precision_20261123/formal/CryptoLeanCore/TaperedPrecision.lean (TaperedPrecision.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-23T10:31:29Z",
+    "verifier_host": "fa9ba08aa8bc"
+  },
+  "controls_gate": "PASS                      7 thm   0 trusted  research/hashed_ecdl_precision_20261123/formal/PrecisionControls.lean",
+  "source_check_sha256": "a7932c481dc895cada16c19d7b32c3d0741de8b4960b8d39d4ea895f7ef5b598",
+  "axioms_stdout_sha256": "f4609f23f8940f2ce2fa81d960cc54637b7f79bdee79090fa37a11a53f213efa",
+  "Mathlib_cache_used": false,
+  "S3_used": false
+}

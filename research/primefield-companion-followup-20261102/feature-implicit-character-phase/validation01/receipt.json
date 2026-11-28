@@ -1,0 +1,20 @@
+{
+  "scope": "Standalone exact quotient-phase and compressed-observation controls; no end-to-end recovery or timing claim",
+  "build_exit": 1,
+  "check_exit": null,
+  "limits_seconds": {
+    "build": 90,
+    "check": 60
+  },
+  "commands": [
+    "rustc --edition=2021 -O -C overflow-checks=yes --emit=link,dep-info driver.rs -o /tmp/t1925-v1-check",
+    "not executed"
+  ],
+  "source_hashes": {},
+  "logs": {
+    "build.stderr": "64c99e3d350007b1190b6919fd7c13caa5461071401d6f59f313cceb48eed379",
+    "build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "driver.rs.snapshot": "6c390cdaa869177f08e51bd6671977f8c2a1dce525c698bf79d6f570e03767dc"
+  },
+  "copied_sources": 2
+}

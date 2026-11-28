@@ -260,11 +260,7 @@ fn fe_to_u64(lf: &LField, x: &crypto_lib::cryptanalysis::isogeny_walk::field::Fe
 }
 
 fn gcd_u(a: u64, b: u64) -> u64 {
-    if b == 0 {
-        a
-    } else {
-        gcd_u(b, a % b)
-    }
+    crypto_lib::gcd::int::gcd_u64(a, b)
 }
 
 fn mulm(a: u64, b: u64, m: u64) -> u64 {

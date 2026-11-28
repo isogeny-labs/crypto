@@ -31,6 +31,9 @@
 //! - **TEA** (`tea`) and **XTEA** (`xtea`) — Wheeler/Needham
 //!
 //! ### Wide-block
+//! - **Rijndael-256** (`rijndael::Rijndael256`) — 256-bit block/key, 14 rounds,
+//!   proposed for NIST SP 800-197; `rijndael::Rijndael` covers every
+//!   Rijndael block/key length
 //! - **Threefish** (`threefish`) — 256/512/1024-bit blocks, Skein family
 //!
 //! ## Stream ciphers
@@ -72,6 +75,7 @@ pub mod cmac;
 pub mod des;
 pub mod des3;
 pub mod feal;
+pub mod gf128;
 pub mod gift;
 pub mod gost_magma;
 pub mod grain;
@@ -88,6 +92,7 @@ pub mod present;
 pub mod rc4;
 pub mod rc5;
 pub mod rc6;
+pub mod rijndael;
 pub mod safer;
 pub mod salsa20;
 pub mod seed;

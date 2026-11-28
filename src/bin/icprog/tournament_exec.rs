@@ -45,6 +45,7 @@ pub fn child_env() -> Vec<(String, String)> {
     env
 }
 
+#[cfg(target_os = "linux")]
 pub fn affinity() -> Result<Vec<usize>, String> {
     unsafe {
         let mut set: libc::cpu_set_t = std::mem::zeroed();
@@ -60,6 +61,7 @@ pub fn affinity() -> Result<Vec<usize>, String> {
     }
 }
 
+#[cfg(target_os = "linux")]
 fn set_affinity(cpus: &[usize]) -> Result<(), String> {
     unsafe {
         let mut set: libc::cpu_set_t = std::mem::zeroed();
@@ -77,6 +79,7 @@ fn set_affinity(cpus: &[usize]) -> Result<(), String> {
     Ok(())
 }
 
+#[cfg(target_os = "linux")]
 fn prlimit(pid: i32, resource: libc::__rlimit_resource_t, value: u64) -> Result<(), String> {
     let lim = libc::rlimit64 {
         rlim_cur: value,
@@ -86,6 +89,19 @@ fn prlimit(pid: i32, resource: libc::__rlimit_resource_t, value: u64) -> Result<
         return Err(format!("prlimit: {}", std::io::Error::last_os_error()));
     }
     Ok(())
+}
+
+#[cfg(not(target_os = "linux"))]
+pub fn affinity() -> Result<Vec<usize>, String> {
+    Err("measured tournament execution requires Linux CPU affinity".into())
+}
+#[cfg(not(target_os = "linux"))]
+fn set_affinity(_cpus: &[usize]) -> Result<(), String> {
+    Err("measured tournament execution requires Linux CPU affinity".into())
+}
+#[cfg(not(target_os = "linux"))]
+fn prlimit(_pid: i32, _resource: libc::c_int, _value: u64) -> Result<(), String> {
+    Err("measured tournament execution requires Linux prlimit".into())
 }
 
 struct Watch {
@@ -274,4 +290,18 @@ pub fn run_capture(binary: &Path, job: &J, timeout: f64) -> Result<J, String> {
         ));
     }
     json::parse(&String::from_utf8_lossy(&output.stdout))
+}
+
+#[cfg(all(test, not(target_os = "linux")))]
+mod platform_controls {
+    #[test]
+    fn native_measurement_interfaces_fail_closed_off_linux() {
+        assert!(super::affinity().unwrap_err().contains("requires Linux"));
+        assert!(super::set_affinity(&[0])
+            .unwrap_err()
+            .contains("requires Linux"));
+        assert!(super::prlimit(0, libc::RLIMIT_AS, 1)
+            .unwrap_err()
+            .contains("requires Linux"));
+    }
 }

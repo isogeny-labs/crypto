@@ -1,0 +1,71 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1ha123de2704e5560c",
+  "statement": {
+    "name": "cleared 2-point Lagrange partition of unity",
+    "source": "E30 finite-grid interpolation; integer identity, denominators invertible on all frozen fields",
+    "variables": [
+      "x"
+    ],
+    "degree_bound": 1,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": -1
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x"
+                },
+                {
+                  "op": "const",
+                  "args": -1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": 1
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "x"
+                },
+                {
+                  "op": "const",
+                  "args": 0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "const",
+      "args": 1
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261023,
+  "value_digest": "6ba64591dc5d5fa6ab9e575602829ad02f0fe517616bda69e4fe87b55b9d9836",
+  "independence": "native issuer plus extra domain-separated checker points; this is same-host replay",
+  "proof": null
+}

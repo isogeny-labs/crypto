@@ -1,0 +1,10 @@
+$ candidate setup.reciprocal_div check
+candidate_setup_reciprocal_div_check_exit=0
+$ diff -u q223-baseline-counter-identity.jsonl q223-candidate-counter-identity.jsonl
+counter_identity_diff_exit=0
+$ diff -u q223-baseline-normalized.jsonl q223-candidate-normalized.jsonl
+normalized_expected_setup_diff_exit=1
+$ jq width summary from q223-candidate.jsonl
+strong-b4	1	2481	155	0	92	1	5	175852	2867	703	4814	9707
+strong-b8	1	1487	76	0	53	2	10	149558	2619	231	4011	5049
+strong-b16	1	1008	57	0	34	0	0	151572	2954	89	4005	3189

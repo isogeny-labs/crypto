@@ -1,0 +1,290 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h7769f46ded30a517",
+  "statement": {
+    "name": "cleared long-to-short Weierstrass coordinate identity",
+    "source": "E19 short() coordinate conversion; generic integer polynomial, not a gluing-model certificate",
+    "variables": [
+      "X",
+      "a2",
+      "a4",
+      "a6"
+    ],
+    "degree_bound": 3,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": 3
+                    },
+                    {
+                      "op": "var",
+                      "args": "X"
+                    }
+                  ]
+                },
+                {
+                  "op": "var",
+                  "args": "a2"
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": 3
+                    },
+                    {
+                      "op": "var",
+                      "args": "X"
+                    }
+                  ]
+                },
+                {
+                  "op": "var",
+                  "args": "a2"
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": 3
+                    },
+                    {
+                      "op": "var",
+                      "args": "X"
+                    }
+                  ]
+                },
+                {
+                  "op": "var",
+                  "args": "a2"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": 9
+                    },
+                    {
+                      "op": "var",
+                      "args": "a4"
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": -3
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "a2"
+                        },
+                        {
+                          "op": "var",
+                          "args": "a2"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": 3
+                    },
+                    {
+                      "op": "var",
+                      "args": "X"
+                    }
+                  ]
+                },
+                {
+                  "op": "var",
+                  "args": "a2"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": 27
+            },
+            {
+              "op": "var",
+              "args": "a6"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": -9
+            },
+            {
+              "op": "var",
+              "args": "a2"
+            },
+            {
+              "op": "var",
+              "args": "a4"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": 2
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "a2"
+                },
+                {
+                  "op": "var",
+                  "args": "a2"
+                },
+                {
+                  "op": "var",
+                  "args": "a2"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "const",
+          "args": 27
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "X"
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "a2"
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "X"
+                    },
+                    {
+                      "op": "var",
+                      "args": "X"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "a4"
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                }
+              ]
+            },
+            {
+              "op": "var",
+              "args": "a6"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261023,
+  "value_digest": "4c5ca1a8eab170ac5345641628471cce3b6131679d1b44cf619227e4db1a011c",
+  "independence": "native issuer plus extra domain-separated checker points; this is same-host replay",
+  "proof": null
+}

@@ -1,0 +1,74 @@
+{
+  "schema": "support-gaussian-verification/v1",
+  "source_commit": "edfa82c6996cd7763f4e78008fd943fb959d7ea9",
+  "claim_id": "PCC-20261114-ee1e7f",
+  "declaration_sha256": "ea36a9f58e9ab88db16a3ee051fda3460c55e793deb152b798b0543c30c18f61",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 47,
+  "gate_declarations": 46,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 78,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-ee1e7f",
+    "claim_sha256": "63023225be75c7d34eaffff2571a8312b23d39e155e78c4e038218b222cfe6b8",
+    "commit": "edfa82c6996cd7763f4e78008fd943fb959d7ea9",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/support_gaussian_audit_20261114/lean (GaussianCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T13:04:59Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-ee1e7f",
+    "claim_sha256": "63023225be75c7d34eaffff2571a8312b23d39e155e78c4e038218b222cfe6b8",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 46294,
+    "sha256": "14aaceebb261632e4663a495224af6d67ec4e99d5d0a9a73f28ea5f3a36baec3",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 46,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "literal_printed_k3_equality_refuted": true,
+    "valid_upper_inequality_repair": true,
+    "actual_gaussian_summability_and_integer_integral_bound": true,
+    "actual_injective_uniform_product_bound": true,
+    "actual_centered_walk_decay": true,
+    "fixed_weight_constant_chosen_before_modulus": true,
+    "stronger_expected_random_support_mixing_closed": false,
+    "qualified_theorem_one_or_two_refuted": false,
+    "full_preprint_read": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

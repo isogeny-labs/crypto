@@ -1,0 +1,18 @@
+int omitQuot33;int rowQuot33;int colQuot33;int nextQuot33;ideal remainingQuot33;ideal omittedQuot33;ideal quotientQuot33;ideal productsQuot33;matrix liftQuot33;matrix checkQuot33;
+short=0;link outQuot33="ASCII:w direct-quotients.sing";open(outQuot33);
+write(outQuot33,"ring directQuotient33=(2,u),(n,l,v),dp;");
+for(omitQuot33=1;omitQuot33<=4;omitQuot33++){
+ remainingQuot33=0;nextQuot33=0;
+ for(rowQuot33=1;rowQuot33<=4;rowQuot33++){if(rowQuot33!=omitQuot33){nextQuot33++;remainingQuot33[nextQuot33]=rationalSource33[rowQuot33];}}
+ omittedQuot33=rationalSource33[omitQuot33];quotientQuot33=quotient(remainingQuot33,omittedQuot33);
+ productsQuot33=rationalSource33[omitQuot33]*quotientQuot33;
+ liftQuot33=lift(remainingQuot33,productsQuot33);checkQuot33=matrix(remainingQuot33)*liftQuot33;
+ if(checkQuot33!=matrix(productsQuot33)){ERROR("LOCAL33_QUOTIENT_LIFT_IDENTITY");}
+ write(outQuot33,"ideal quotientGenerators"+string(omitQuot33)+"33;matrix quotientLift"+string(omitQuot33)+"33[3]["+string(ncols(matrix(quotientQuot33)))+"];");
+ for(colQuot33=1;colQuot33<=ncols(matrix(quotientQuot33));colQuot33++){
+  write(outQuot33,"quotientGenerators"+string(omitQuot33)+"33["+string(colQuot33)+"]="+string(quotientQuot33[colQuot33])+";");
+  for(rowQuot33=1;rowQuot33<=3;rowQuot33++){write(outQuot33,"quotientLift"+string(omitQuot33)+"33["+string(rowQuot33)+","+string(colQuot33)+"]="+string(liftQuot33[rowQuot33,colQuot33])+";");}
+ }
+ print("LOCAL33_DIRECT_QUOTIENT omit="+string(omitQuot33)+" generators="+string(ncols(matrix(quotientQuot33)))+" exact_lift=pass");
+}
+close(outQuot33);print("LOCAL33_QUOTIENT_ALL_CHECKS_PASS");quit;

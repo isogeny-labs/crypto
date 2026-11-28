@@ -1,0 +1,7 @@
+dump rows 12: replay==committed 12, dump==replay 11, independent checks ok 8
+frozen replay rows 400: identical to committed 400, missing in committed 0
+FAIL ('R_rho_negation', 131, 0, 1000) ['[t]G != T', 't != t_secret mod r']
+FAIL ('R_rho_negation', 131, 0, 2000) ['G or T not a reduced divisor on the curve']
+FAIL ('R_rho_negation', 131, 0, 3000) ["f is not the generator's output for any seed <= 4000", 'G or T not a reduced divisor on the curve', '[order]D != 0 for a random D']
+FAIL ('R_rho_negation', 131, 0, 4000) ['G is the identity', '[t]G != T']
+FAIL ('R_rho_negation', 131, 1, 1001) ["dump != replay: ['group_ops: 655 != 654']"]

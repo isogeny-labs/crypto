@@ -100,7 +100,9 @@ fn sqrt_mod(x: &BigUint, p: &BigUint) -> Option<BigUint> {
 }
 
 fn mod_inverse(x: &BigUint, p: &BigUint) -> BigUint {
-    x.modpow(&(p - BigUint::from(2u32)), p)
+    // Was Fermat x^(p-2) for the prime field p (> 2): equal to the shared
+    // inverse, and 0 for x ≡ 0.
+    crypto_lib::gcd::int::modinv_big(x, p).unwrap_or_else(BigUint::zero)
 }
 
 /// Multiplicative order of `p` modulo `n` if it is at most `max_k`.

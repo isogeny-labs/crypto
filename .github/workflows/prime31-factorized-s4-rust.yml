@@ -1,0 +1,50 @@
+name: Prime31 factorized S4 Rust-only gate
+
+on:
+  push:
+    branches: [research/norm-branch-rank-pilot-20261115]
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_s3_quotient_gcd.rs
+      - research/prime31_ic_20261115/native/M4_FACTORIZED_S4_RESULTANT_PROTOCOL_20261115.md
+      - .github/workflows/prime31-factorized-s4-rust.yml
+      - research/prime31_ic_20261115/native/M4_FACTORIZED_NATURAL_4096_PROTOCOL_20261115.md
+      - research/prime31_ic_20261115/native/examples/prime31_s3_root_index.rs
+      - research/prime31_ic_20261115/native/S3_ROOT_INDEX_CONTROL_AND_NATURAL_16384_20261115.md
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  factorized-resultant:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    env:
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install recorded minimal Rust toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Reused Rust finite-field/curve and F4 unit tests
+        run: cargo +1.100.0 test --locked --release --lib --manifest-path research/prime31_ic_20261115/native/Cargo.toml
+      - name: Rust exact elimination equivalence including diagonal and U=r
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_quotient_gcd -- --nocapture
+      - name: Matched Rust B4/B8/B16 and factorized B31 stage measurements
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_quotient_gcd -- --m4-factorized
+      - name: Rust natural 4096 public-target S4 witness/rank calibration
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_quotient_gcd -- --m4-natural-4096
+      - name: Rust S3 pair-root index correctness and B4 exhaustive signed support
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_root_index
+      - name: Rust-only 16384 public natural-target coordinate control
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_root_index -- --natural-16384
+      - name: Rust-only 32-unknown cold prime31 factor-base relation solver trial
+        timeout-minutes: 5
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_root_index -- --solve-one
+      - name: Rust-only BSGS full-cold prime31 generic reference on identical public Q
+        timeout-minutes: 2
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_s3_root_index -- --bsgs-one

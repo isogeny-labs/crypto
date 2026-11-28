@@ -29,6 +29,7 @@
 //! explicitly requested local route (counted units only, no wall-time claim).
 
 use clap::{Parser, Subcommand};
+use crypto_lib::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
@@ -129,6 +130,8 @@ enum Cmd {
         cpus: String,
         #[arg(long)]
         allow_busy: bool,
+        #[arg(long)]
+        lock: Option<String>,
         #[arg(long, default_value_t = 8)]
         replay: usize,
     },
@@ -145,6 +148,8 @@ enum Cmd {
         cpus: String,
         #[arg(long)]
         allow_busy: bool,
+        #[arg(long)]
+        lock: Option<String>,
         #[arg(long, default_value_t = 8)]
         replay: usize,
         /// The card's ordinal in `CARD-<experiment>-<date>-<n>`.
@@ -211,6 +216,8 @@ enum Cmd {
         cpus: String,
         #[arg(long)]
         allow_busy: bool,
+        #[arg(long)]
+        lock: Option<String>,
         #[arg(long, default_value_t = 8)]
         replay: usize,
     },
@@ -222,6 +229,8 @@ enum Cmd {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 struct ArmConfig {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    method_id: Option<String>,
     name: String,
     family: String,
     n: u64,
@@ -238,6 +247,9 @@ impl ArmConfig {
     /// with any further pipeline parameters.
     fn key(&self) -> (String, String) {
         let mut o = self.oracle.clone();
+        if let Some(id) = self.method_id.as_deref().filter(|id| *id != "ic.pipeline") {
+            o += &format!("|method_id={id}");
+        }
         for (k, v) in &self.params {
             o += &format!("|{k}={v}");
         }
@@ -245,12 +257,15 @@ impl ArmConfig {
     }
     fn method(&self) -> Value {
         let mut params = serde_json::Map::new();
-        params.insert("factor_base".into(), json!(self.factor_base));
-        params.insert("oracle".into(), json!(self.oracle));
+        let id = self.method_id.as_deref().unwrap_or("ic.pipeline");
+        if id == "ic.pipeline" {
+            params.insert("factor_base".into(), json!(self.factor_base));
+            params.insert("oracle".into(), json!(self.oracle));
+        }
         for (k, v) in &self.params {
             params.insert(k.clone(), json!(v));
         }
-        json!({"id": "ic.pipeline", "params": params})
+        json!({"id": id, "params": params})
     }
 }
 
@@ -259,18 +274,87 @@ struct Incumbent {
     arm: ArmConfig,
     /// Mean S at w = 0, 0.1, 1 GAE per unpriced native operation.
     s: [f64; 3],
-    rho_s: [f64; 3],
+    #[serde(default)]
+    rho_s: Option<[f64; 3]>,
     evidence: Value,
     since_round: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct SizeInfo {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    reference: Option<Value>,
     k: u32,
-    r: u64,
+    r: ExactScalar,
     log2_r: f64,
     n_a: u64,
     curve: Value,
+}
+
+impl SizeInfo {
+    fn reference_method(&self) -> Value {
+        self.reference
+            .clone()
+            .unwrap_or_else(|| json!({"id":"rho.negation"}))
+    }
+}
+
+fn validate_explicit_routes(size: &SizeInfo, arms: &[&ArmConfig]) -> Result<(), String> {
+    use crypto_lib::cryptanalysis::ecbench::{
+        methods::{self, MethodSpec},
+        workload::CurveSpec,
+    };
+    let full = size.curve["kind"] == "curve25519";
+    if full && size.reference.is_none() {
+        return Err("Curve25519 requires an explicit bounded rho reference".into());
+    }
+    if !full && size.reference.is_none() && arms.iter().all(|a| a.method_id.is_none()) {
+        return Ok(());
+    }
+    let spec: CurveSpec = serde_json::from_value(size.curve.clone()).map_err(|e| e.to_string())?;
+    let instance = spec.build()?;
+    let facts = instance.facts(&spec);
+    if size.r != instance.r() {
+        return Err("size order differs from the actual curve subgroup".into());
+    }
+    let resolve = |value: Value| -> Result<methods::ResolvedMethod, String> {
+        let m: MethodSpec = serde_json::from_value(value).map_err(|e| e.to_string())?;
+        let m = methods::resolve(&m)?;
+        methods::applicable(&m, &instance, &facts)?;
+        Ok(m)
+    };
+    if resolve(size.reference_method())?.family != "rho" {
+        return Err("Autolab reference must be a rho method".into());
+    }
+    for arm in arms {
+        if resolve(arm.method())?.family != "ic" {
+            return Err("Autolab index-calculus candidates must resolve to an ic method".into());
+        }
+    }
+    Ok(())
+}
+
+fn validate_frozen_routes(
+    size: &SizeInfo,
+    incumbent: &ArmConfig,
+    frozen: &Value,
+) -> Result<(), String> {
+    let arms = frozen["arms"].as_array().ok_or("frozen spec lacks arms")?;
+    let method = |name| {
+        arms.iter()
+            .find(|a| a["name"] == name)
+            .map(|a| &a["method"])
+    };
+    if method("rho-neg") != Some(&size.reference_method()) {
+        return Err("rho reference differs from the frozen train specification".into());
+    }
+    if method("inc") != Some(&incumbent.method()) {
+        return Err("incumbent method differs from the frozen train specification".into());
+    }
+    if frozen["workloads"]["curves"] != json!([size.curve]) {
+        return Err("curve differs from the frozen train specification".into());
+    }
+    Ok(())
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -367,6 +451,8 @@ impl Ledger {
 
 #[derive(Deserialize, Clone, Debug)]
 struct Family {
+    #[serde(default)]
+    method_id: Option<String>,
     id: String,
     oracle: String,
     default_f: f64,
@@ -414,6 +500,7 @@ impl TrackFamilies {
             fam.n_max.unwrap_or(self.n_max),
         );
         ArmConfig {
+            method_id: fam.method_id.clone(),
             name: format!("{}-n{n}", fam.id),
             family: fam.id.clone(),
             n,
@@ -422,7 +509,20 @@ impl TrackFamilies {
                 .replace("{n}", &n.to_string())
                 .replace("{scan}", &(self.scan_factor * n).to_string()),
             oracle: fam.oracle.clone(),
-            params: fam.params.clone(),
+            params: if fam.method_id.is_some() {
+                fam.params
+                    .iter()
+                    .map(|(k, v)| {
+                        (
+                            k.clone(),
+                            v.replace("{n}", &n.to_string())
+                                .replace("{scan}", &(self.scan_factor * n).to_string()),
+                        )
+                    })
+                    .collect()
+            } else {
+                fam.params.clone()
+            },
         }
     }
     fn family(&self, id: &str) -> Option<&Family> {
@@ -607,8 +707,27 @@ fn fmt_s(s: &[f64; 3]) -> String {
     format!("{:.3} / {:.3} / {:.3}", s[0], s[1], s[2])
 }
 
-fn distance(s: &[f64; 3], rho: &[f64; 3]) -> [f64; 3] {
-    [s[0] / rho[0], s[1] / rho[1], s[2] / rho[2]]
+/// Return a cost mean only for a nonempty, completely verified cohort.
+fn complete_means(rows: &BTreeMap<String, ([f64; 3], u64, u64)>, arm: &str) -> Option<[f64; 3]> {
+    let (s, runs, verified) = rows.get(arm)?;
+    (*runs > 0 && runs == verified && s.iter().all(|v| v.is_finite() && *v >= 0.0)).then_some(*s)
+}
+
+/// Missing/zero/corrupt reference costs cannot define a finite ratio.
+fn checked_distance(s: &[f64; 3], rho: &[f64; 3]) -> Option<[f64; 3]> {
+    if s.iter().any(|v| !v.is_finite() || *v < 0.0)
+        || rho.iter().any(|v| !v.is_finite() || *v <= 0.0)
+    {
+        return None;
+    }
+    let ratio = [s[0] / rho[0], s[1] / rho[1], s[2] / rho[2]];
+    ratio.iter().all(|v| v.is_finite()).then_some(ratio)
+}
+
+fn fmt_distance(s: &[f64; 3], rho: Option<&[f64; 3]>) -> String {
+    rho.and_then(|r| checked_distance(s, r))
+        .map(|d| format!("{:.1}x / {:.1}x / {:.1}x", d[0], d[1], d[2]))
+        .unwrap_or_else(|| "unavailable".into())
 }
 
 // ---------------------------------------------------------------------------
@@ -941,6 +1060,15 @@ fn round_seeds(round: u64, k: u32, exposed: &BTreeSet<u64>) -> (u64, u64) {
     }
 }
 
+fn curve_scope(curve: &Value) -> &'static str {
+    match curve["kind"].as_str() {
+        Some("curve25519") => "actual Curve25519 subgroup",
+        Some("prime_search") | Some("prime_roster") => "generic prime-order E(F_p) curve",
+        Some("prime_orbit_shape") => "prime-order E(F_p) curve",
+        _ => "Curve25519-family miniature",
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 fn train_spec(
     home: &Path,
@@ -954,17 +1082,19 @@ fn train_spec(
     rounds: u64,
     timeout: u64,
 ) -> Value {
+    let scope = curve_scope(&size.curve);
     let mut arms = vec![
-        json!({"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}}),
+        json!({"name": "rho-neg", "role": "reference", "method": size.reference_method()}),
         json!({"name": "inc", "role": "baseline", "method": inc.method()}),
     ];
     for c in cands {
         arms.push(json!({"name": c.name, "role": "candidate", "method": c.method()}));
     }
     json!({
-        "schema": "ecbench.spec/v1",
+        "schema": "ecbench.spec/v2",
+        "curve_policy": {"mode": "diagnostic", "off_panel_reason": "adaptive training uses Curve25519-family miniatures chosen by the autolab round"},
         "label": format!("ic_autolab round {round} train, {track} track, k = {}", size.k),
-        "description": format!("{}/round-{round:03}/PROTOCOL.md (frozen before data), train screen. Public synthetic Curve25519-family miniature and targets; no security claim. In-sample selection; promotion_eligible=false.", home.display()),
+        "description": format!("{}/round-{round:03}/PROTOCOL.md (frozen before data), train screen. Public synthetic {scope} and targets; no security claim. In-sample selection; promotion_eligible=false.", home.display()),
         "workloads": {"curves": [size.curve], "targets_per_curve": targets, "target_seed": target_seed, "target_kind": "public"},
         "arms": arms,
         "measurement": {"rounds": rounds, "warmup": 1, "order": if rounds % 2 == 1 { "alternate_measured" } else { "alternate" }, "seed": target_seed + 7, "isolation_required": "L0", "timeout_seconds": timeout}
@@ -984,17 +1114,19 @@ fn holdout_spec(
     rounds: u64,
     timeout: u64,
 ) -> Value {
+    let scope = curve_scope(&size.curve);
     json!({
-        "schema": "ecbench.spec/v1",
+        "schema": "ecbench.spec/v2",
+        "curve_policy": {"mode": "diagnostic", "off_panel_reason": "fresh holdout uses the same Curve25519-family miniature as its training round"},
         "label": format!("ic_autolab round {round} holdout, {track} track, k = {}", size.k),
-        "description": format!("{}/round-{round:03}/PROTOCOL.md (frozen before data), fresh holdout: sel = {} ({} + {}). Public synthetic Curve25519-family miniature and targets; no security claim.", home.display(), sel.name, sel.factor_base, sel.oracle),
+        "description": format!("{}/round-{round:03}/PROTOCOL.md (frozen before data), fresh holdout: sel = {} ({} + {}). Public synthetic {scope} and targets; no security claim.", home.display(), sel.name, sel.factor_base, sel.oracle),
         "workloads": {"curves": [size.curve], "targets_per_curve": targets, "target_seed": target_seed, "target_kind": "public"},
         "arms": [
-            {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+            {"name": "rho-neg", "role": "reference", "method": size.reference_method()},
             {"name": "inc", "role": "baseline", "method": inc.method()},
             {"name": "sel", "role": "candidate", "method": sel.method()},
             {"name": "inc-aa", "role": "control", "method": inc.method()},
-            {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.negation"}}
+            {"name": "rho-neg-aa", "role": "control", "method": size.reference_method()}
         ],
         "measurement": {"rounds": rounds, "warmup": 1, "order": if rounds % 2 == 1 { "alternate_measured" } else { "alternate" }, "seed": target_seed + 7, "isolation_required": "L0", "timeout_seconds": timeout}
     })
@@ -1048,7 +1180,24 @@ fn protocol_text(
         let size = ledger.size(*k).expect("checked");
         t += &format!(
             "### k = {k} (p = {}, r = {}, log2 r = {:.2}, N_a = {})\n\n",
-            size.curve["p"], size.r, size.log2_r, size.n_a
+            size.curve
+                .get("p")
+                .map(Value::to_string)
+                .unwrap_or_else(|| {
+                    if size.curve["kind"] == "curve25519" {
+                        "2^255 - 19".into()
+                    } else if let Some(bits) = size.curve.get("bits") {
+                        format!(
+                            "prime_search({bits}-bit, seed {})",
+                            size.curve.get("seed").unwrap_or(&Value::Null)
+                        )
+                    } else {
+                        "unspecified".into()
+                    }
+                }),
+            size.r,
+            size.log2_r,
+            size.n_a
         );
         t += &format!(
             "- `inc` (baseline): `{}` + `{}` (family `{}`, N = {}); S = {} since round {}.\n",
@@ -1059,7 +1208,10 @@ fn protocol_text(
             fmt_s(&inc.s),
             inc.since_round
         );
-        t += "- `rho-neg` (reference): `rho.negation`, the matched rho.\n";
+        t += &format!(
+            "- `rho-neg` (reference): `{}`, the matched rho.\n",
+            size.reference_method()["id"].as_str().unwrap_or("invalid")
+        );
         let cands = panel["sizes"][k.to_string()]["candidates"]
             .as_array()
             .cloned()
@@ -1135,6 +1287,20 @@ fn protocol_text(
          seeds above are new.\n",
         ledger.exposures.len()
     );
+    if seeds.keys().any(|k| {
+        ledger
+            .size(*k)
+            .is_ok_and(|s| s.curve["kind"] == "curve25519")
+    }) {
+        t = t.replace("Curve25519-family miniature", "declared Curve25519 workload")
+            .replace("Factor base and oracle strings are ecbench `ic.pipeline` parameters.",
+                "Each arm uses its explicit ecbench method when supplied; otherwise factor base and oracle strings are ic.pipeline parameters.");
+    } else if ledger.family != "curve25519" {
+        t = t.replace(
+            "Curve25519-family miniature",
+            &format!("registered `{}` curve", ledger.family),
+        );
+    }
     t
 }
 
@@ -1183,6 +1349,9 @@ fn cmd_freeze(home: &Path, round: u64, panel_path: &Path, opts: FreezeOpts) -> R
             ));
         }
         let size = ledger.size(k)?;
+        let mut routes = vec![&inc];
+        routes.extend(cands.iter());
+        validate_explicit_routes(size, &routes)?;
         specs.insert(
             k,
             train_spec(
@@ -1281,6 +1450,7 @@ struct RunOpts {
     ecbench: PathBuf,
     cpus: String,
     allow_busy: bool,
+    lock: Option<String>,
     replay: usize,
 }
 
@@ -1323,6 +1493,10 @@ fn run_argv(opts: &RunOpts, spec: &Path, out: &Path) -> Vec<String> {
     ];
     if opts.allow_busy {
         a.push("--allow-busy".into());
+    }
+    if let Some(lock) = &opts.lock {
+        a.push("--lock".into());
+        a.push(lock.clone());
     }
     a
 }
@@ -1621,7 +1795,7 @@ fn select_from_band(
     Option<[f64; 3]>,
 ) {
     let rows = band_rows(band);
-    let inc_s = rows.get("inc").map(|r| r.0);
+    let inc_s = complete_means(&rows, "inc");
     let mut table = Vec::new();
     let mut best0: Option<(f64, ArmConfig)> = None;
     let mut best2: Option<(f64, ArmConfig)> = None;
@@ -1697,7 +1871,7 @@ fn cmd_select(home: &Path, round: u64, ecbench: Option<PathBuf>) -> Result<Value
         }
         let band = read_json(Path::new(row["band"].as_str().ok_or("band")?))?;
         let (sel, alt_w1, table, inc_s) = select_from_band(&band, &cands);
-        let rho_s = band_rows(&band).get("rho-neg").map(|r| r.0);
+        let rho_s = complete_means(&band_rows(&band), "rho-neg");
         match &sel {
             Some(arm) => {
                 let inc = ledger.incumbent(&track, k)?;
@@ -1709,6 +1883,14 @@ fn cmd_select(home: &Path, round: u64, ecbench: Option<PathBuf>) -> Result<Value
                     )
                 };
                 let size = ledger.size(k)?;
+                if size.reference.is_some()
+                    || inc.arm.method_id.is_some()
+                    || arm.method_id.is_some()
+                {
+                    validate_explicit_routes(size, &[&inc.arm, arm])?;
+                    let frozen = read_json(&dir.join("specs").join(format!("train-k{k}.json")))?;
+                    validate_frozen_routes(size, &inc.arm, &frozen)?;
+                }
                 let spec = holdout_spec(
                     home,
                     round,
@@ -1963,9 +2145,9 @@ fn cmd_assess(home: &Path, round: u64, ecbench: &Path) -> Result<Value, String> 
         let band = read_json(Path::new(run["band"].as_str().ok_or("band")?))?;
         let (class, why) = classify(&c0, &band, Some(&aa));
         let rows = band_rows(&band);
-        let s_sel = rows.get("sel").map(|r| r.0);
-        let s_inc = rows.get("inc").map(|r| r.0);
-        let s_rho = rows.get("rho-neg").map(|r| r.0);
+        let s_sel = complete_means(&rows, "sel");
+        let s_inc = complete_means(&rows, "inc");
+        let s_rho = complete_means(&rows, "rho-neg");
         let session = read_json(&sdir.join("session.json"))?;
         sizes.insert(
             k_s.clone(),
@@ -1982,10 +2164,11 @@ fn cmd_assess(home: &Path, round: u64, ecbench: &Path) -> Result<Value, String> 
                 },
                 "band_verdict": band_verdict(&band, "inc", "sel"),
                 "band_rho": band_verdict(&band, "rho-neg", "sel"),
+                "rho_reference": band["rows"].as_array().and_then(|rows| rows.iter().find(|row| row["arm"] == "rho-neg")).cloned(),
                 "s": {"sel": s_sel, "inc": s_inc, "rho_neg": s_rho},
                 "distance_to_rho": {
-                    "sel": s_sel.zip(s_rho).map(|(a, b)| distance(&a, &b)),
-                    "inc": s_inc.zip(s_rho).map(|(a, b)| distance(&a, &b)),
+                    "sel": s_sel.zip(s_rho).and_then(|(a, b)| checked_distance(&a, &b)),
+                    "inc": s_inc.zip(s_rho).and_then(|(a, b)| checked_distance(&a, &b)),
                 },
                 "evidence": {
                     "session_id": session["session_id"],
@@ -2115,7 +2298,7 @@ fn cmd_ratchet(home: &Path, round: u64) -> Result<(), String> {
             let sel: ArmConfig =
                 serde_json::from_value(r["sel"].clone()).map_err(|e| e.to_string())?;
             let s_to = s3(&r["s"]["sel"]).ok_or("sel S")?;
-            let rho = s3(&r["s"]["rho_neg"]).ok_or("rho S")?;
+            let rho = s3(&r["s"]["rho_neg"]);
             let ratio = r["ratio"]["w0"]["ratio"].as_f64().ok_or("ratio")?;
             let ci = r["ratio"]["w0"]["ci95"]
                 .as_array()
@@ -2150,6 +2333,8 @@ fn cmd_ratchet(home: &Path, round: u64) -> Result<(), String> {
                 "band_verdict": r["band_verdict"],
                 "route": manifest["route"],
                 "validation_gate": "none (development loop)",
+                "rho_reference_complete": rho.is_some(),
+                "rho_reference": r["rho_reference"],
             });
             ledger.tracks.get_mut(&track).unwrap().insert(
                 k_s.clone(),
@@ -2285,7 +2470,12 @@ fn ratchet_svg(ledger: &Ledger, track: &str) -> String {
         .unwrap_or(1)
         .max(1) as f64;
     let max_s = series.values().flatten().map(|p| p.1).fold(1.0, f64::max) * 1.1;
-    let mut s = format!("<svg xmlns='http://www.w3.org/2000/svg' width='{w}' height='{h}' viewBox='0 0 {w} {h}' font-family='Helvetica,Arial,sans-serif' font-size='11'>\n<rect width='100%' height='100%' fill='white'/>\n<text x='{ml}' y='20' font-size='14' font-weight='bold'>Ratchet: incumbent mean S at w = 0 by round ({track} track, Curve25519 miniatures)</text>\n");
+    let family_label = if ledger.family == "curve25519" {
+        "Curve25519 miniatures".to_string()
+    } else {
+        svg_escape(&ledger.family)
+    };
+    let mut s = format!("<svg xmlns='http://www.w3.org/2000/svg' width='{w}' height='{h}' viewBox='0 0 {w} {h}' font-family='Helvetica,Arial,sans-serif' font-size='11'>\n<rect width='100%' height='100%' fill='white'/>\n<text x='{ml}' y='20' font-size='14' font-weight='bold'>Ratchet: incumbent mean S at w = 0 by round ({track} track, {family_label})</text>\n");
     let colours = ["#36c", "#c63", "#393", "#939", "#099"];
     for t in 0..=4 {
         let v = max_s * t as f64 / 4.0;
@@ -2332,19 +2522,35 @@ fn ratchet_svg(ledger: &Ledger, track: &str) -> String {
     s
 }
 
-/// The newest pcc claim whose statement names this round
+fn claim_matches_home(v: &Value, home: &Path, round: u64) -> bool {
+    let prefix = format!("ic_autolab round {round} ");
+    let Some(statement) = v["statement"].as_str() else {
+        return false;
+    };
+    if !statement.starts_with(&prefix) {
+        return false;
+    }
+    let Some(home_name) = home.file_name().and_then(|s| s.to_str()) else {
+        return false;
+    };
+    let scope = v["scope"].as_str().unwrap_or("");
+    if scope.contains(home_name) || statement.contains(home_name) {
+        return true;
+    }
+    home_name == "curve25519_autolab_20261104" && scope.is_empty()
+}
+
+/// The newest pcc claim whose statement names this round and loop home
 /// (`ic_autolab round N ...`), read from `pcc/claims/` under the working
 /// directory (the repository root).
-fn find_claim(round: u64) -> Option<String> {
-    let prefix = format!("ic_autolab round {round} ");
+fn find_claim(home: &Path, round: u64) -> Option<String> {
     let mut found: Vec<(String, String)> = std::fs::read_dir("pcc/claims")
         .ok()?
         .filter_map(|e| e.ok())
         .filter_map(|e| {
             let v = read_json(&e.path()).ok()?;
-            let statement = v["statement"].as_str()?;
             let id = v["id"].as_str().or_else(|| v["claim_id"].as_str())?;
-            statement.starts_with(&prefix).then(|| {
+            claim_matches_home(&v, home, round).then(|| {
                 (
                     v["created_at"].as_str().unwrap_or("").to_string(),
                     id.to_string(),
@@ -2381,7 +2587,7 @@ fn cmd_report(home: &Path, round: u64) -> Result<(), String> {
     // The round's claim record (AGENTS.md "Sabotage is assumed"): cited by id
     // with an explicit unverified tag; `pcc standing` is the only source for
     // a stronger word.
-    match find_claim(round) {
+    match find_claim(home, round) {
         Some(id) => {
             md += &format!(
                 "Claim record: `{id}` (`python3 tools/pcc/pcc.py standing {id}`). Until a signed replay and recompute exist, this round's outcome is an unverified assertion [pcc:unverified].\n\n"
@@ -2423,7 +2629,7 @@ fn cmd_report(home: &Path, round: u64) -> Result<(), String> {
                     best.as_ref().map(|b| fmt_s(&b.0)).unwrap_or("-".into()),
                     inc_s.map(|s| fmt_s(&s)).unwrap_or("-".into()),
                     rho_s.map(|s| fmt_s(&s)).unwrap_or("-".into()),
-                    inc_s.zip(rho_s).map(|(a, b)| { let d = distance(&a, &b); format!("{:.1}x / {:.1}x / {:.1}x", d[0], d[1], d[2]) }).unwrap_or("-".into()),
+                    inc_s.zip(rho_s).map(|(a, b)| fmt_distance(&a, Some(&b))).unwrap_or("unavailable".into()),
                 );
                 continue;
             }
@@ -2596,21 +2802,19 @@ fn cmd_report(home: &Path, round: u64) -> Result<(), String> {
     md += "## Ledger after this round\n\n| k | incumbent | since round | S (w = 0 / 0.1 / 1) | distance to rho |\n|--:|:--|--:|:--|:--|\n";
     if let Some(t) = ledger.tracks.get(&track) {
         for (k, inc) in t {
-            let d = distance(&inc.s, &inc.rho_s);
+            let d = fmt_distance(&inc.s, inc.rho_s.as_ref());
             md += &format!(
-                "| {k} | `{}` (`{}` + `{}`) | {} | {} | {:.1}x / {:.1}x / {:.1}x |\n",
+                "| {k} | `{}` (`{}` + `{}`) | {} | {} | {} |\n",
                 inc.arm.name,
                 inc.arm.factor_base,
                 inc.arm.oracle,
                 inc.since_round,
                 fmt_s(&inc.s),
-                d[0],
-                d[1],
-                d[2]
+                d
             );
         }
     }
-    md += "\n![ratchet](../ratchet.svg)\n\n";
+    md += &format!("\n![ratchet](../ratchet-{track}.svg)\n\n");
     md += "## Evidence and deviations\n\n";
     md += &format!(
         "- ecbench binary sha256: `{}`; `--cpus {}`, allow_busy = {}; `verify --replay {}` per session; audit receipts in `analysis/`; sessions in `sessions/` (records in the artifact store when large).\n",
@@ -2622,8 +2826,9 @@ fn cmd_report(home: &Path, round: u64) -> Result<(), String> {
     md += "- Route: the local route is an explicitly requested development screen, not the Iso Lab EKS default; counts are deterministic and replayed, wall time is not claimed. No row of this round enters the IC leaderboard or `benchmarks/README.md` (validation gate).\n";
     md += "- Train selection is in sample (disclosed); the holdout is fresh (new `target_seed`, excluded exposures). Failed, timed-out and regressing arms are retained above.\n";
     std::fs::write(dir.join("README.md"), md).map_err(|e| e.to_string())?;
-    std::fs::write(home.join("ratchet.svg"), ratchet_svg(&ledger, &track))
-        .map_err(|e| e.to_string())?;
+    let rsvg = ratchet_svg(&ledger, &track);
+    std::fs::write(home.join(format!("ratchet-{track}.svg")), &rsvg).map_err(|e| e.to_string())?;
+    std::fs::write(home.join("ratchet.svg"), rsvg).map_err(|e| e.to_string())?;
     println!("report written: {}", dir.join("README.md").display());
     Ok(())
 }
@@ -2645,15 +2850,13 @@ fn cmd_status(home: &Path) -> Result<(), String> {
             "k", "incumbent", "round", "S (w=0 / 0.1 / 1)", "to rho"
         );
         for (k, inc) in sizes {
-            let d = distance(&inc.s, &inc.rho_s);
+            let d = fmt_distance(&inc.s, inc.rho_s.as_ref());
             println!(
-                "  {k:>3} | {:<14} | {:<5} | {:<28} | {:.1}x / {:.1}x / {:.1}x",
+                "  {k:>3} | {:<14} | {:<5} | {:<28} | {}",
                 inc.arm.name,
                 inc.since_round,
                 fmt_s(&inc.s),
-                d[0],
-                d[1],
-                d[2]
+                d
             );
         }
     }
@@ -2815,6 +3018,7 @@ fn main() {
             ecbench,
             cpus,
             allow_busy,
+            lock,
             replay,
         } => cmd_run(
             &home,
@@ -2824,6 +3028,7 @@ fn main() {
                 ecbench,
                 cpus,
                 allow_busy,
+                lock,
                 replay,
             },
         )
@@ -2834,6 +3039,7 @@ fn main() {
             ecbench,
             cpus,
             allow_busy,
+            lock,
             replay,
             n,
         } => cmd_card(
@@ -2844,6 +3050,7 @@ fn main() {
                 ecbench,
                 cpus,
                 allow_busy,
+                lock,
                 replay,
             },
             n,
@@ -2867,6 +3074,7 @@ fn main() {
             ecbench,
             cpus,
             allow_busy,
+            lock,
             replay,
         } => parse_sizes(&sizes).and_then(|s| {
             cmd_loop(
@@ -2889,6 +3097,7 @@ fn main() {
                     ecbench,
                     cpus,
                     allow_busy,
+                    lock,
                     replay,
                 },
             )
@@ -2932,7 +3141,7 @@ mod tests {
             Incumbent {
                 arm: inc,
                 s: [8.987, 9.71, 16.217],
-                rho_s: [1.578, 1.693, 2.724],
+                rho_s: Some([1.578, 1.693, 2.724]),
                 evidence: json!({}),
                 since_round: 0,
             },
@@ -2942,8 +3151,9 @@ mod tests {
         sizes.insert(
             "20".to_string(),
             SizeInfo {
+                reference: None,
                 k: 20,
-                r: 131203,
+                r: 131203u64.into(),
                 log2_r: 17.0,
                 n_a: 32,
                 curve: json!({"kind": "prime_explicit", "p": 1048573}),
@@ -3112,8 +3322,9 @@ mod tests {
         l.sizes.insert(
             "24".into(),
             SizeInfo {
+                reference: None,
                 k: 24,
-                r: 2097349,
+                r: 2097349u64.into(),
                 log2_r: 21.0,
                 n_a: 81,
                 curve: json!({}),
@@ -3125,7 +3336,7 @@ mod tests {
             Incumbent {
                 arm: win,
                 s: [7.0, 7.5, 12.3],
-                rho_s: [1.2, 1.3, 2.2],
+                rho_s: Some([1.2, 1.3, 2.2]),
                 evidence: json!({}),
                 since_round: 2,
             },
@@ -3168,8 +3379,9 @@ mod tests {
             l.sizes.insert(
                 k.to_string(),
                 SizeInfo {
+                    reference: None,
                     k,
-                    r,
+                    r: r.into(),
                     log2_r: l2,
                     n_a: na,
                     curve: json!({}),
@@ -3180,7 +3392,7 @@ mod tests {
                 Incumbent {
                     arm: tf.arm(tf.family("ksum4").unwrap(), n),
                     s: [1.0; 3],
-                    rho_s: [1.0; 3],
+                    rho_s: Some([1.0; 3]),
                     evidence: json!({}),
                     since_round: 2,
                 },
@@ -3189,8 +3401,9 @@ mod tests {
         l.sizes.insert(
             "32".into(),
             SizeInfo {
+                reference: None,
                 k: 32,
-                r: 536884639,
+                r: 536884639u64.into(),
                 log2_r: 29.0,
                 n_a: 512,
                 curve: json!({}),
@@ -3201,7 +3414,7 @@ mod tests {
             Incumbent {
                 arm: tf.arm(tf.family("mitm2").unwrap(), 512),
                 s: [24.0; 3],
-                rho_s: [1.0; 3],
+                rho_s: Some([1.0; 3]),
                 evidence: json!({}),
                 since_round: 0,
             },
@@ -3352,6 +3565,78 @@ mod tests {
     }
 
     #[test]
+    fn ratchet_keeps_verified_improvement_when_reference_is_unavailable() {
+        let unique = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let home = std::env::temp_dir().join(format!(
+            "ic-autolab-reference-{}-{unique}",
+            std::process::id()
+        ));
+        struct Cleanup(std::path::PathBuf);
+        impl Drop for Cleanup {
+            fn drop(&mut self) {
+                let _ = std::fs::remove_dir_all(&self.0);
+            }
+        }
+        let _cleanup = Cleanup(home.clone());
+        let mut l = ledger();
+        l.rounds.push(RoundEntry {
+            round: 1,
+            dir: "round-001".into(),
+            track: "generic".into(),
+            sizes: vec![20],
+            status: "assessed".into(),
+        });
+        save_ledger(&home, &mut l).unwrap();
+        let tf = families();
+        let challenger = tf.arm(tf.family("mitm2").unwrap(), 8);
+        let dir = round_dir(&home, 1);
+        write_json(
+            &dir.join("MANIFEST.json"),
+            &json!({"track":"generic", "route":"test-fixture",
+            "seeds":{"20":{"holdout":123}}, "holdout":{"targets":4}}),
+        )
+        .unwrap();
+        write_json(
+            &dir.join("selection.json"),
+            &json!({"sizes":{"20":{"status":"challenger"}}}),
+        )
+        .unwrap();
+        write_json(&dir.join("panel.json"), &json!({"sizes":{}})).unwrap();
+        write_json(
+            &dir.join("analysis/run-train.json"),
+            &json!({"sessions":[]}),
+        )
+        .unwrap();
+        let reference = json!({"arm":"rho-neg", "runs":4, "verified":1});
+        write_json(
+            &dir.join("RESULT.json"),
+            &json!({"sizes":{"20":{
+            "class":"improvement", "sel":challenger, "s":{"sel":[7.0,8.0,12.0],"rho_neg":null},
+            "ratio":{"w0":{"ratio":0.78,"ci95":[0.72,0.84]}},
+            "rho_reference":reference, "band_verdict":"sel < inc",
+            "evidence":{"session_id":"fixture"}}}}),
+        )
+        .unwrap();
+        cmd_ratchet(&home, 1).unwrap();
+        let updated = load_ledger(&home).unwrap();
+        let inc = updated.incumbent("generic", 20).unwrap();
+        assert_eq!(inc.arm.name, challenger.name);
+        assert_eq!(inc.s, [7.0, 8.0, 12.0]);
+        assert_eq!(inc.rho_s, None);
+        assert_eq!(inc.evidence["rho_reference_complete"], false);
+        assert_eq!(inc.evidence["rho_reference"], reference);
+        assert_eq!(updated.history.len(), 1);
+        assert_eq!(updated.rounds[0].status, "ratcheted");
+        assert!(cmd_ratchet(&home, 1)
+            .unwrap_err()
+            .contains("already ratcheted"));
+        assert_eq!(load_ledger(&home).unwrap().history.len(), 1);
+    }
+
+    #[test]
     fn selection_takes_the_lowest_verified_candidate_below_the_incumbent() {
         let tf = families();
         let a = tf.arm(tf.family("ksum3").unwrap(), 8);
@@ -3450,8 +3735,237 @@ mod tests {
     }
 
     #[test]
+    fn size_orders_preserve_legacy_numbers_and_full_curve25519_values() {
+        let legacy = json!({"k":20,"r":131203,"log2_r":17.0,"n_a":32,
+            "curve":{"kind":"prime_explicit","p":1048573}});
+        let size: SizeInfo = serde_json::from_value(legacy.clone()).unwrap();
+        assert_eq!(serde_json::to_value(&size).unwrap(), legacy);
+        let order = crypto_lib::cryptanalysis::curve25519_wide::L25519;
+        let wide = json!({"k":255,"r":order,"log2_r":252.0,"n_a":32,
+            "curve":{"kind":"curve25519"}});
+        let size: SizeInfo = serde_json::from_value(wide.clone()).unwrap();
+        assert_eq!(size.r.bits(), 253);
+        assert_eq!(serde_json::to_value(size).unwrap(), wide);
+    }
+
+    #[test]
+    fn explicit_full_width_routes_preserve_reference_and_parameter_caps() {
+        let order = crypto_lib::cryptanalysis::curve25519_wide::L25519;
+        let mut size: SizeInfo = serde_json::from_value(json!({"k":255,"r":order,
+            "log2_r":252.0,"n_a":32,"curve":{"kind":"curve25519"},
+            "reference":{"id":"rho.curve25519_bounded","params":{"max_steps":"32"}}}))
+        .unwrap();
+        let families: TrackFamilies = serde_json::from_value(json!({
+            "factor_base":"public-lifts:size={n}","scan_factor":4,"n_grid":[1.0],"n_min":1,"n_max":128,
+            "families":[{"id":"full-pair","method_id":"ic.curve25519_pair_v1","oracle":"signed-pair",
+                "default_f":1.0,"params":{"base_size":"{n}","max_scan":"{scan}","max_trials":"4"}}]
+        })).unwrap();
+        let arm = families.arm(&families.families[0], 8);
+        assert_eq!(
+            arm.method(),
+            json!({"id":"ic.curve25519_pair_v1",
+            "params":{"base_size":"8","max_scan":"32","max_trials":"4"}})
+        );
+        validate_explicit_routes(&size, &[&arm]).unwrap();
+        let spec = train_spec(
+            Path::new("fixture"),
+            1,
+            "generic",
+            &size,
+            &arm,
+            &[],
+            7,
+            2,
+            2,
+            60,
+        );
+        let holdout = holdout_spec(
+            Path::new("fixture"),
+            1,
+            "generic",
+            &size,
+            &arm,
+            &arm,
+            9,
+            2,
+            2,
+            60,
+        );
+        assert_eq!(spec["arms"][0]["method"], size.reference_method());
+        assert_eq!(holdout["arms"][0]["method"], holdout["arms"][4]["method"]);
+        assert!(spec["description"]
+            .as_str()
+            .unwrap()
+            .contains("actual Curve25519 subgroup"));
+        validate_frozen_routes(&size, &arm, &spec).unwrap();
+        let mut changed_reference = size.clone();
+        changed_reference.reference.as_mut().unwrap()["params"]["max_steps"] = json!("64");
+        assert!(validate_frozen_routes(&changed_reference, &arm, &spec)
+            .unwrap_err()
+            .contains("reference"));
+        let mut another = arm.clone();
+        another.method_id = Some("ic.pipeline".into());
+        assert_ne!(arm.key(), another.key());
+        size.reference = None;
+        assert!(validate_explicit_routes(&size, &[&arm])
+            .unwrap_err()
+            .contains("explicit"));
+        size.reference = Some(json!({"id":"rho.curve25519_bounded","params":{"max_steps":"32"}}));
+        size.r = 131203u64.into();
+        assert!(validate_explicit_routes(&size, &[&arm])
+            .unwrap_err()
+            .contains("order"));
+        size.r = order.parse().unwrap();
+        let mut false_ic = arm;
+        false_ic.method_id = Some("rho.curve25519_bounded".into());
+        false_ic.params = BTreeMap::from([("max_steps".into(), "32".into())]);
+        assert!(validate_explicit_routes(&size, &[&false_ic])
+            .unwrap_err()
+            .contains("ic method"));
+    }
+
+    #[test]
     fn civil_dates_are_right() {
         assert_eq!(civil_from_days(0), (1970, 1, 1));
         assert_eq!(civil_from_days(20761), (2026, 11, 4));
+    }
+
+    #[test]
+    fn generic_prime_family_describes_prime_search_curves_cleanly() {
+        let mut l = ledger();
+        l.family = "prime-generic".into();
+        let size = l.sizes.get_mut("20").unwrap();
+        size.curve = json!({"kind": "prime_search", "bits": 20, "seed": 59297});
+        let inc = l.incumbent("generic", 20).unwrap().arm.clone();
+        let spec = train_spec(
+            Path::new("research/prime_generic_autolab_20261118"),
+            1,
+            "generic",
+            l.size(20).unwrap(),
+            &inc,
+            &[],
+            42,
+            12,
+            1,
+            300,
+        );
+        assert!(spec["description"]
+            .as_str()
+            .unwrap()
+            .contains("generic prime-order E(F_p) curve"));
+        let svg = ratchet_svg(&l, "generic");
+        assert!(svg.contains("(generic track, prime-generic)"));
+        let opts_default = RunOpts {
+            ecbench: PathBuf::from("target/release/ecbench"),
+            cpus: "none".into(),
+            allow_busy: true,
+            lock: None,
+            replay: 8,
+        };
+        assert!(
+            !run_argv(&opts_default, Path::new("s.json"), Path::new("out"))
+                .iter()
+                .any(|a| a == "--lock")
+        );
+        let opts_locked = RunOpts {
+            lock: Some("/tmp/custom.lock".into()),
+            ..opts_default
+        };
+        let argv = run_argv(&opts_locked, Path::new("s.json"), Path::new("out"));
+        assert!(argv.windows(2).any(|w| w == ["--lock", "/tmp/custom.lock"]));
+        let legacy_c25519 = json!({
+            "statement": "ic_autolab round 1 train sessions ECBS1h87338492e26d",
+        });
+        assert!(!claim_matches_home(
+            &legacy_c25519,
+            Path::new("research/prime_generic_autolab_20261118"),
+            1
+        ));
+        assert!(claim_matches_home(
+            &legacy_c25519,
+            Path::new("research/curve25519_autolab_20261104"),
+            1
+        ));
+        let prime_claim = json!({
+            "scope": "research/prime_generic_autolab_20261118/round-001",
+            "statement": "ic_autolab round 1 holdout sessions on prime-generic",
+        });
+        assert!(claim_matches_home(
+            &prime_claim,
+            Path::new("research/prime_generic_autolab_20261118"),
+            1
+        ));
+    }
+}
+
+#[cfg(test)]
+mod complete_reference_tests {
+    use super::*;
+    #[test]
+    fn partial_reference_does_not_supply_a_distance() {
+        let rows = BTreeMap::from([
+            ("sel".into(), ([1.0, 2.0, 3.0], 4, 4)),
+            ("rho-neg".into(), ([2.0, 3.0, 4.0], 4, 1)),
+        ]);
+        assert!(complete_means(&rows, "sel").is_some());
+        let ratio = complete_means(&rows, "sel")
+            .zip(complete_means(&rows, "rho-neg"))
+            .and_then(|(s, rho)| checked_distance(&s, &rho));
+        assert_eq!(ratio, None);
+    }
+
+    #[test]
+    fn complete_cohorts_keep_the_original_ratios() {
+        let rows = BTreeMap::from([
+            ("sel".into(), ([1.0, 2.0, 3.0], 4, 4)),
+            ("rho-neg".into(), ([2.0, 4.0, 6.0], 4, 4)),
+        ]);
+        assert_eq!(
+            complete_means(&rows, "sel")
+                .zip(complete_means(&rows, "rho-neg"))
+                .and_then(|(s, rho)| checked_distance(&s, &rho)),
+            Some([0.5; 3])
+        );
+    }
+
+    #[test]
+    fn empty_incomplete_and_nonfinite_cohorts_are_not_eligible() {
+        for (means, runs, verified) in [
+            ([1.0; 3], 0, 0),
+            ([1.0; 3], 4, 0),
+            ([1.0; 3], 4, 3),
+            ([f64::NAN; 3], 4, 4),
+            ([-1.0; 3], 4, 4),
+            ([f64::INFINITY; 3], 4, 4),
+        ] {
+            let rows = BTreeMap::from([("inc".into(), (means, runs, verified))]);
+            assert!(complete_means(&rows, "inc").is_none());
+        }
+    }
+
+    #[test]
+    fn invalid_denominators_and_ratio_overflow_are_not_distances() {
+        assert_eq!(checked_distance(&[1.0; 3], &[0.0; 3]), None);
+        assert_eq!(checked_distance(&[1.0; 3], &[-1.0; 3]), None);
+        assert_eq!(checked_distance(&[1.0; 3], &[f64::NAN; 3]), None);
+        assert_eq!(
+            checked_distance(&[f64::MAX; 3], &[f64::MIN_POSITIVE; 3]),
+            None
+        );
+        assert_eq!(checked_distance(&[0.0; 3], &[1.0; 3]), Some([0.0; 3]));
+    }
+
+    #[test]
+    fn optional_reference_keeps_legacy_array_encoding() {
+        let mut value = serde_json::json!({"arm":{"name":"fixture","family":"fixture","n":1,
+        "factor_base":"fixture","oracle":"fixture"},"s":[1.0,2.0,3.0],
+        "rho_s":[2.0,3.0,4.0],"evidence":{},"since_round":0});
+        let mut inc: Incumbent = serde_json::from_value(value.clone()).unwrap();
+        assert_eq!(inc.rho_s, Some([2.0, 3.0, 4.0]));
+        assert_eq!(serde_json::to_value(&inc).unwrap(), value);
+        inc.rho_s = None;
+        value["rho_s"] = Value::Null;
+        assert_eq!(serde_json::to_value(&inc).unwrap(), value);
+        assert_eq!(fmt_distance(&inc.s, inc.rho_s.as_ref()), "unavailable");
     }
 }

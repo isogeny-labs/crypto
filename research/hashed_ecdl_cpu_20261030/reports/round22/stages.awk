@@ -1,0 +1,3 @@
+BEGIN { FS=","; print "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"900\" height=\"580\" viewBox=\"0 0 900 580\"><rect width=\"900\" height=\"580\" fill=\"white\"/><g font-family=\"sans-serif\" font-size=\"14\" fill=\"#182535\"><text x=\"20\" y=\"24\">Round22 profiled batch64 stages: median and min–max (ms), n=9</text>"; y=55 }
+$1=="y" && $3!="solve" && $3!="complete" { printf "<text x=\"20\" y=\"%g\">case %s / %s</text><rect x=\"230\" y=\"%g\" width=\"%g\" height=\"14\" fill=\"#327da8\"/><path d=\"M %g %g H %g\" stroke=\"#182535\"/><text x=\"790\" y=\"%g\">%s</text>\n",y+11,$2,$3,y,$6*1000,230+$5*1000,y+7,230+$7*1000,y+11,$6; y+=27 }
+END { print "<text x=\"20\" y=\"565\">Source: stage-summary.csv; separate stage clocks are not additive.</text></g></svg>" }

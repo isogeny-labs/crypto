@@ -1,0 +1,8 @@
+$ jq -e -s -f check_q223.jq q223.jsonl
+true
+
+The validator checks the exact q=223 source binding, all 12 rho records,
+count-authority flags, counted/counter-free trajectory and native-count
+identity at widths 1/4/8/16/32, zero field counts in every fast arm, the
+combined b8 counted oracle, the legacy-setup b8 oracle, and the explicit
+reciprocal setup-division diagnostic.

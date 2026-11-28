@@ -1,0 +1,55 @@
+ring compact49=2,(n,l,b,c),dp;ideal compactSource49;
+compactSource49[1]=bc7+b2c5+bc6+b2c4+c6+b5+b4c+b3c2+b2c3;
+compactSource49[2]=b2c10+b3c8+b2c9+b6c3+b5c4+b2c7+bc8+b4c4+c8+b7+b6c+b3c4+b2c5;
+compactSource49[3]=n2l6+nl6b+l6b2+n2l5c+nl5bc+l5b2c+n2l3c3+nl3bc3+l3b2c3+n2lc5+nlbc5+lb2c5+n2c6+nbc6+b2c6+n2l5+n2l4b+nl5b+nl4b2+l5b2+l4b3+n2l3c2+n2l2bc2+nl3bc2+nl2b2c2+l3b2c2+l2b3c2+n2lc4+n2bc4+nlbc4+nb2c4+lb2c4+b3c4+n2l3b+n2l2b2+nl3b2+nl2b3+l3b3+l2b4+n3l2c+n2l3c+nl3bc+n2lb2c+l3b2c+nlb3c+l2b3c+lb4c+n3lc2+n2lbc2+n2b2c2+nlb2c2+nb3c2+b4c2+n2c4+nbc4+b2c4+n3l2+n2l3+n2l2b+nl3b+nl2b2+l3b2+n2b3+nb4+lb4+b5+n3bc+n2b2c+b4c+n4+n3l+n3b+n2lb+nlb2+b4+n2lc+nlbc+lb2c+n2c2+nbc2+b2c2+n2l+n2b+nlb+nb2+lb2+b3+n2+nb+b2;
+compactSource49[4]=l7b+nl6c+l6bc+nl5c2+l4bc3+nl3c4+l2bc5+nlc6+lbc6+nc7+nl6+l6b+l5b2+nl4bc+l4bc2+l3b2c2+nl2bc3+l2bc4+lb2c4+nbc5+nc6+n2l4+nl5+l3b3+l4bc+nl2b2c+l3b2c+l2b3c+nlb2c2+l2b2c2+lb3c2+n2lc3+nb2c3+n2c4+nlc4+lbc4+b2c4+nc5+l4b+nl2b2+lb4+nl2bc+nb3c+n2lc2+n2bc2+nb2c2+b3c2+nc4+nl3+n2lb+n2b2+l2b2+b4+n3c+n2lc+n2bc+l2bc+b3c+nlc2+lbc2+nc3+n3+n2l+l2b+lb2+nbc+nc2+n2+nl+lb+b2+nc+n;
+compactSource49[5]=l8+l4c4+c8+l3bc2+nl2c3+l2bc3+nlc4+lbc4+nc5+nl2c2+l2bc2+lb2c2+nbc3+nc4+l4+l3b+l2b2+b4+nl2c+l2bc+b2c2+nl2+l2b+lb2+nbc+nl+lb+b2+nc+n+1;
+LIB "normal.lib";
+LIB "primdec.lib";
+option(redSB);short=0;
+print("COMPACT_NORMAL49_STAGE minimal_primes_begin=true");
+list primes49=minAssGTZ(compactSource49);
+print("COMPACT_NORMAL49_COMPONENT_COUNT "+string(size(primes49)));
+link primeOut49="ASCII:w prime-components49.sing";open(primeOut49);
+write(primeOut49,"ring components49=2,(n,l,b,c),dp;list primes49;");
+int idx49;int gen49;ideal candidate49;int selected49=0;int matches49=0;
+for(idx49=1;idx49<=size(primes49);idx49++){
+ candidate49=primes49[idx49];
+ write(primeOut49,"ideal component49_"+string(idx49)+";");
+ for(gen49=1;gen49<=size(candidate49);gen49++){write(primeOut49,"component49_"+string(idx49)+"["+string(gen49)+"]="+string(candidate49[gen49])+";");}
+ ring probe49=(2,u),(n,l,v),dp;
+ poly rnProbe49=(u+1)*v+1;poly cnProbe49=rnProbe49+u^3;
+ map compactProbe49=compact49,n,l,rnProbe49*cnProbe49/u^7,cnProbe49/u^4;
+ ideal probeIdeal49=compactProbe49(candidate49),v^2+v+u^3+u;
+ int degree49=vdim(std(probeIdeal49));
+ print("COMPACT_NORMAL49_COMPONENT index="+string(idx49)+" generic_degree="+string(degree49));
+ if(degree49==32){setring compact49;matches49++;selected49=idx49;}else{setring compact49;}
+ kill probe49;
+}
+close(primeOut49);
+if(matches49!=1){ERROR("COMPACT_NORMAL49_UNIQUE_DEGREE32_COMPONENT");quit;}
+ideal selectedPrime49=primes49[selected49];ideal selectedStd49=std(selectedPrime49);
+if(size(reduce(compactSource49,selectedStd49))!=0){ERROR("COMPACT_NORMAL49_SOURCE_CONTAINMENT");quit;}
+link selectedOut49="ASCII:w selected-prime49.sing";open(selectedOut49);
+write(selectedOut49,"ring selected49=2,(n,l,b,c),dp;ideal selectedPrime49;ideal originalIdeal49;");
+for(gen49=1;gen49<=size(selectedPrime49);gen49++){write(selectedOut49,"selectedPrime49["+string(gen49)+"]="+string(selectedPrime49[gen49])+";");}
+for(gen49=1;gen49<=size(compactSource49);gen49++){write(selectedOut49,"originalIdeal49["+string(gen49)+"]="+string(compactSource49[gen49])+";");}
+close(selectedOut49);
+print("COMPACT_NORMAL49_STAGE selected_prime_exported=true normalization_begin=true");
+list normalizedOutput49=normalP(selectedPrime49,"withRing");
+if(size(normalizedOutput49[1])!=1){ERROR("COMPACT_NORMAL49_COMPONENT_NOT_ONE");quit;}
+ideal module49=normalizedOutput49[2][1];
+if(reduce(module49[size(module49)],selectedStd49)==0){ERROR("COMPACT_NORMAL49_ZERO_DENOMINATOR");quit;}
+link moduleOut49="ASCII:w fractional-module49.sing";open(moduleOut49);
+write(moduleOut49,"ideal module49;");
+for(gen49=1;gen49<=size(module49);gen49++){write(moduleOut49,"module49["+string(gen49)+"]="+string(module49[gen49])+";");}
+write(moduleOut49,"int delta49="+string(normalizedOutput49[3][2])+";");close(moduleOut49);
+def normalRing49=normalizedOutput49[1][1];setring normalRing49;
+link normalOut49="ASCII:w normalization49.sing";open(normalOut49);
+write(normalOut49,"ring normalized49=2,("+varstr(basering)+"),dp;ideal norid;ideal normap;");
+int entry49;
+for(entry49=1;entry49<=size(norid);entry49++){write(normalOut49,"norid["+string(entry49)+"]="+string(norid[entry49])+";");}
+for(entry49=1;entry49<=size(normap);entry49++){write(normalOut49,"normap["+string(entry49)+"]="+string(normap[entry49])+";");}
+close(normalOut49);
+print("COMPACT_NORMAL49_RESULT normalization_output_computed=true independent_verification_required=true");
+print("COMPACT_NORMAL49_PRODUCER_PASS");quit;

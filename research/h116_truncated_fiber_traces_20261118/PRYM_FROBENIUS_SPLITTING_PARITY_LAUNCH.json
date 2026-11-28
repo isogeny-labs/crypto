@@ -1,0 +1,21 @@
+{
+  "schema": "h116-prym-frobenius-splitting-parity-launch/v1",
+  "protocol_id": "H116-PRYM-FROBENIUS-SPLITTING-PARITY-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and exact hashes in PRYM_FROBENIUS_SPLITTING_PARITY_SOURCE_GATE.md",
+  "auxiliary_primes": [5, 7],
+  "feature_order": [
+    "m1_cplus_l5", "m1_cplus_l7", "m1_cminus_l5", "m1_cminus_l7",
+    "m2_cplus_l5", "m2_cplus_l7", "m2_cminus_l5", "m2_cminus_l7"
+  ],
+  "bit_convention": {"split_nonzero": 1, "irreducible": 0, "repeated_root": "abstain"},
+  "rules": 512,
+  "target": "canonical_scalar_mod_2",
+  "replicates": 4096,
+  "commands": {
+    "build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_chiral_genus3_zeta2_digit.rs", "-o", "/tmp/h116_chiral_genus3_prym_splitting"],
+    "selftest": ["/tmp/h116_chiral_genus3_prym_splitting", "--selftest"],
+    "run": ["/tmp/h116_chiral_genus3_prym_splitting", "--run-prym-splitting", "PRYM_FROBENIUS_SPLITTING_PARITY_RESULT.json"]
+  },
+  "outputs": ["PRYM_FROBENIUS_SPLITTING_PARITY_RESULT.json", "PRYM_FROBENIUS_SPLITTING_PARITY_RUN.txt", "PRYM_FROBENIUS_SPLITTING_PARITY_SHA256SUMS"],
+  "measurement_scope": "all 512 affine Boolean rules on eight ordered auxiliary-prime splitting bits of chiral Prym real-Weil polynomials, with exact root-count and inherited oracle controls"
+}

@@ -1,0 +1,293 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "pilot Frobenius-folded ksum on K1 n23",
+ "description": "sizing pilot, not data",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 1,
+    "n": 23
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 31337023,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-strong",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "k1-l8",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "koblitz-standard-subspace:dimension=8",
+     "oracle": "pdp3-koblitz:m=3,engine=rootfind-negfold",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "k1-l9",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "koblitz-standard-subspace:dimension=9",
+     "oracle": "pdp3-koblitz:m=3,engine=rootfind-negfold",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "k1-l10",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "koblitz-standard-subspace:dimension=10",
+     "oracle": "pdp3-koblitz:m=3,engine=rootfind-negfold",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum4-n10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=10,mult=1",
+     "oracle": "ksum:m=4",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum4-n12",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=12,mult=1",
+     "oracle": "ksum:m=4",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum4-n14",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=14,mult=1",
+     "oracle": "ksum:m=4",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum5-n9",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=9,mult=1",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum5-n10",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=10,mult=1",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "ksum5-n12",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=12,mult=1",
+     "oracle": "ksum:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "kf3-c1",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=1000000",
+     "oracle": "ksum-frobenius:m=3",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "kf4-c1",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=1000000",
+     "oracle": "ksum-frobenius:m=4",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "kf5-c1",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=1000000",
+     "oracle": "ksum-frobenius:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "kf3-c1g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=1000000,generator_orbit=1",
+     "oracle": "ksum-frobenius:m=3",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "kf4-c1g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=1000000,generator_orbit=1",
+     "oracle": "ksum-frobenius:m=4",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "kf5-c1g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=1000000,generator_orbit=1",
+     "oracle": "ksum-frobenius:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "kf3-c2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=1000000",
+     "oracle": "ksum-frobenius:m=3",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "kf4-c2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=1000000",
+     "oracle": "ksum-frobenius:m=4",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "kf5-c2",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=1000000",
+     "oracle": "ksum-frobenius:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "kf3-c2g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=1000000,generator_orbit=1",
+     "oracle": "ksum-frobenius:m=3",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "kf4-c2g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=1000000,generator_orbit=1",
+     "oracle": "ksum-frobenius:m=4",
+     "max_trials": "13528399621"
+    }
+   }
+  },
+  {
+   "name": "kf5-c2g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=1000000,generator_orbit=1",
+     "oracle": "ksum-frobenius:m=5",
+     "max_trials": "13528399621"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 31337024,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

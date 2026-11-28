@@ -1,0 +1,38 @@
+{
+  "schema": "point-hash-development-qualification/v1",
+  "repository": "crypto",
+  "source_identity": {
+    "kind": "post-test-observed-sha256-manifest",
+    "manifest": "native-source.sha256",
+    "sha256": "d8fc37bab17aee8b8a6696cf2b74c6bdfd355c8c1c79db95d5a116dac7637d21",
+    "no_native_edits_after_tests": true
+  },
+  "base_commit": "88112c5a930009c883059c1c2e3c6c92c4b23f18",
+  "standing": "producer development controls; unsigned, no performance or execution attestation",
+  "full_suite": {
+    "command": "cargo test --manifest-path crates/hashed-ecdl-tensor/Cargo.toml -p hashed-ecdl-tensor --locked --release --all-targets",
+    "exit_code": 0,
+    "passed": 236,
+    "failed": 0,
+    "ignored": 0,
+    "raw": "point-five-integration-controls/full-final.txt"
+  },
+  "format": {
+    "exit_code": 0,
+    "raw": "point-five-integration-controls/fmt-final.txt"
+  },
+  "clippy": {
+    "arguments": "--locked --all-targets -- -D warnings",
+    "exit_code": 0,
+    "raw": "point-five-integration-controls/clippy-final.txt"
+  },
+  "compiler_check": {
+    "rust": "1.78.0",
+    "all_targets": true,
+    "locked": true,
+    "exit_code": 0,
+    "raw": "point-five-integration-controls/msrv-final.txt"
+  },
+  "benchmarks_launched": false,
+  "scientific_conclusions": null
+}

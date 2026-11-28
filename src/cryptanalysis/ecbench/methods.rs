@@ -24,22 +24,28 @@ use serde_json::{json, Value};
 
 use crate::binary_ecc::{
     hcdlp_bsgs_counted, hcdlp_pollard_rho_counted, operation_tally::OperationTally, F2mElement,
-    HcdlpGroupOps, OrdinaryBinaryCover,
+    HcdlpGroupOps, OrdinaryBinaryCover, SubgroupTransferStatus,
+};
+use crate::cryptanalysis::binary_hyperelliptic_index_calculus::{
+    binary_hec_projected_index_calculus_dlp, BhecIndexCalculusParams, BhecIndexCalculusStage,
 };
 use crate::cryptanalysis::cheon_counted::{
     cheon_pminus1, cheon_pplus1, shape_divisor, Outcome as CheonOutcome, Side,
 };
 use crate::cryptanalysis::ecbench::canonical::{derive_u64, sha256_hex, short_id};
 use crate::cryptanalysis::ecbench::claw::{
-    pair_claw, pair_claw_v2, pair_claw_wide, pair_claw_wide_v2, ClawOutcome, ClawShape,
+    pair_claw, pair_claw_big, pair_claw_v2, pair_claw_wide, pair_claw_wide_v2, ClawOutcome,
+    ClawShape,
 };
 use crate::cryptanalysis::ecbench::ext::ExtInstance;
+use crate::cryptanalysis::ecbench::fp3::{self as fp3, Fp3Group, Fp3Instance, K3Params};
 use crate::cryptanalysis::ecbench::fp4::{self as fp4, Fp4Group, Fp4Instance, K4Base, K4Params};
 use crate::cryptanalysis::ecbench::full_price;
 use crate::cryptanalysis::ecbench::generic::{
-    bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook, kangaroo, kangaroo_with,
-    verify_candidate, GenericOutcome,
+    bsgs_interleaved, bsgs_negation, bsgs_negation_table, bsgs_textbook, build_negation_table,
+    kangaroo, kangaroo_with, verify_candidate, GenericOutcome,
 };
+use crate::cryptanalysis::ecbench::hec;
 use crate::cryptanalysis::ecbench::hyper::HyperInstance;
 use crate::cryptanalysis::ecbench::hyper_ic::{self, HyperIcParams};
 use crate::cryptanalysis::ecbench::koblitz_batched::{self, BatchedParams as KoblitzBatchedParams};
@@ -49,7 +55,9 @@ use crate::cryptanalysis::ecbench::koblitz_descent::{
 use crate::cryptanalysis::ecbench::negation_strong::NegStrongParams;
 use crate::cryptanalysis::ecbench::oracle::StaticDhOracle;
 use crate::cryptanalysis::ecbench::wordram_price;
-use crate::cryptanalysis::ecbench::workload::{CurveFacts, HashWork, Instance, WideInstance};
+use crate::cryptanalysis::ecbench::workload::{
+    BigInstance, CurveFacts, HashWork, Instance, WideInstance,
+};
 use crate::cryptanalysis::ecbench_large_prime::{
     self as large_prime, SolveConfig as LargePrimeConfig,
 };
@@ -66,9 +74,10 @@ use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
     ic_residual_batch_with, native_is_pinned, price_phase, rho_batch_with, rho_cap, rho_reference,
     rho_walk_lanes, rho_walk_v3, rho_walk_with, rho_walk_with_policy, signed_frobenius_rho_tuned,
-    signed_frobenius_rho_tuned_policy, signed_frobenius_rho_v3, BinaryGroup, BinaryInstance,
-    Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost,
-    PointClasses, PreprocessingRho, PrimeInstance, PrimePoint, PrimeRepresentation, QuarticClasses,
+    signed_frobenius_rho_tuned_policy, signed_frobenius_rho_v3,
+    signed_frobenius_rho_v3_partition_counted, BinaryGroup, BinaryInstance, Calibration,
+    CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost, PointClasses,
+    PreprocessingRho, PrimeInstance, PrimePoint, PrimeRepresentation, QuarticClasses,
     RhoBatchResult, RhoResult, RhoV3, RhoWalk, WalkPolicy,
 };
 use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
@@ -79,10 +88,14 @@ use crate::cryptanalysis::ic_framework::plugins::{
     BinaryMultiplierBase, BinarySubspaceBase, CmMultiplierBase, CompactOrbitScanBase,
     CyclotomicBase, DescentAlgebraicOracle, FrobeniusMitmOracle, GlvOrbitBase, KSumOracle,
     KoblitzOrbitBase, MitmOracle, OnbWeightBase, PrimeAbscissaBase, PrimeBatchMitmOracle,
-    PrimeProjectedAbscissaBase, RootfindSubtractOracle, SubtractOracle, WSumOracle, WWalkOracle,
+    PrimeProjectedAbscissaBase, ResidualSweepOracle, RootfindSubtractOracle, SubtractOracle,
+    WSumOracle, WWalkOracle,
 };
 use crate::cryptanalysis::ic_framework::prime_tower::{PrimeIsogenyBase, PrimeKummerBase};
 use crate::cryptanalysis::ic_framework::rootfind::{RootfindMitmOracle, RootfindPairsOracle};
+use crate::cryptanalysis::ic_framework::rootfind_floor::RootfindFloorOracle;
+use crate::cryptanalysis::ic_framework::rootfind_kmitm::RootfindKMitmOracle;
+use crate::cryptanalysis::ic_framework::semaev_projection_oracle::SemaevProjectionOracle;
 use crate::cryptanalysis::ic_framework::shared_rank::{
     run_shared_rank_targets, SharedRankSpec, SharedTargetSpec,
 };
@@ -97,7 +110,7 @@ use crate::cryptanalysis::koblitz_strong_rho::{
     RawPoint as StrongPoint, RawPointG, RhoField, RhoScalar, StrongRho, StrongRhoCharges,
     StrongRhoExtras, StrongRhoG, StrongRhoParams,
 };
-use num_traits::ToPrimitive;
+use num_traits::{ToPrimitive, Zero};
 use rand::{rngs::StdRng, SeedableRng};
 
 /// A parameter a method reads.  `default: None` means required: a value
@@ -135,6 +148,58 @@ pub struct MethodDecl {
     pub params: &'static [ParamDecl],
 }
 
+const GROWING_ARITY_PARAMS: &[ParamDecl] = &[ParamDecl {
+    name: "bits",
+    default: Some("16"),
+    help: "prime-order curve bit size for prime_instance_for (12..=40)",
+}];
+
+const AUX_TOWER_SOLVER_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "bits",
+        default: Some("16"),
+        help: "prime-order curve bit size for prime_instance_for (14..=36); AUX prime-isogeny + rootfind-mitm",
+    },
+];
+
+const DIEM_KGROW_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "p",
+        default: Some("5"),
+        help: "base-field prime for the self-hosted E(F_{p^k}) cell",
+    },
+    ParamDecl {
+        name: "k",
+        default: Some("2"),
+        help: "extension degree, or `schedule` to use k_of_p(p,k_min,k_max)",
+    },
+    ParamDecl {
+        name: "k_min",
+        default: Some("2"),
+        help: "lower clamp for schedule mode",
+    },
+    ParamDecl {
+        name: "k_max",
+        default: Some("8"),
+        help: "upper clamp for schedule mode",
+    },
+    ParamDecl {
+        name: "trial_budget",
+        default: Some("2000000"),
+        help: "charged k-decomp trial budget",
+    },
+    ParamDecl {
+        name: "planted",
+        default: Some("2"),
+        help: "number of planted k-summand targets per cell",
+    },
+    ParamDecl {
+        name: "oracle",
+        default: Some("semaev"),
+        help: "`semaev` = LineOracle/LineS4Oracle; `brute` = exhaustive k-summand control",
+    },
+];
+
 const K4_PARAMS: &[ParamDecl] = &[
     ParamDecl {
         name: "base",
@@ -160,6 +225,34 @@ const K4_PARAMS: &[ParamDecl] = &[
         name: "trial_cap",
         default: Some("2000"),
         help: "trials per column before the run counts as exhausted",
+    },
+];
+
+const K3_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "harvester",
+        default: None,
+        help: "`eliminator` (pivot elimination of the large primes, target column protected) or `cycles` (the gain-forest cycle harvester); changes the search, so no default",
+    },
+    ParamDecl {
+        name: "max_lp",
+        default: Some("auto"),
+        help: "large primes accepted per relation; `auto` is 2 for the eliminator and 3 for the harvester (the pre-registered pairing)",
+    },
+    ParamDecl {
+        name: "lp_exponent",
+        default: Some("0.6666666666666666"),
+        help: "|F'| = ⌈|F|^lp_exponent⌉ (Gaudry's |F|^{1−1/k}, k = 3)",
+    },
+    ParamDecl {
+        name: "oracle",
+        default: None,
+        help: "`groebner` (the O(1) symmetrised-S₄ solve) or `mitm` (2|F| pair tests per residual); no default, since it changes the search",
+    },
+    ParamDecl {
+        name: "trial_cap",
+        default: Some("400"),
+        help: "residuals per base column before the run counts as exhausted",
     },
 ];
 
@@ -218,17 +311,17 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-mitm-prime-batch:m=2|3 (prime curves: rootfind-mitm with one batched inversion a block of row additions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); rootfind-mitm-prime-batch:m=2|3 (prime curves: rootfind-mitm with one batched inversion a block of row additions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); rootfind-floor:m=2|3 (scalar target schedule, same search with x-only Montgomery candidates and a Bloom filter); rootfind-floor-batch-v1:m=2|3 (versioned 8-target production kernel; requires walk-prime-serial/batch targets); rootfind-kmitm:m=3..12 (scalar target schedule, meet-in-the-middle half-sum table + complementary probe); rootfind-kmitm-batch-v1:m=3..12 (versioned 8-target production kernel; requires walk-prime-serial/batch targets); ksum:m=3..9 (one probe a target into a negation-folded table of every signed m-sum of the base; m = 6..9 limit the base to 1023, 511, 255, 127 points); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), pdp3-koblitz:m=2|3,engine=rootfind-negfold-batch (same table with batched binary additions), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
         },
         ParamDecl {
             name: "solver",
             default: Some(""),
-            help: "descent-algebraic and descent-algebraic-fiber only: f4-f2, buchberger-f2, sat-cdcl, exhaustive (with :k=v options)",
+            help: "descent-algebraic and descent-algebraic-fiber only: f4-f2, f4-f2-full-width, buchberger-f2, sat-cdcl, exhaustive (with :k=v options)",
         },
         ParamDecl {
             name: "linalg",
             default: Some("incremental-gauss"),
-            help: "incremental-gauss (stop at target pin), incremental-gauss-full-rank (all columns independent), incremental-gauss-full-rank-checked (also point-check each base column), incremental-gauss-echelon (sparse forward-only elimination, same pins and answer as incremental-gauss), structured-gauss, sparse-cado = filter+wiedemann (CADO-style filter + block Wiedemann, full-rank rule), filter+lanczos, wiedemann or lanczos (no filter, block Wiedemann / block Lanczos, full-rank rule)",
+            help: "incremental-gauss (stop at target pin), incremental-gauss-full-rank (all columns independent), incremental-gauss-full-rank-checked (also point-check each base column), incremental-gauss-echelon (sparse forward-only elimination, same pins and answer as incremental-gauss), structured-gauss, sparse-cado = filter+wiedemann (CADO-style filter + block Wiedemann, full-rank rule), filter+lanczos, wiedemann or lanczos (no filter, block Wiedemann / block Lanczos, full-rank rule), filter+wiedemann+match / filter+lanczos+match (the same behind the structural-rank matching gate), mixed-peel (gate + matched square system: two-sided peeling, Markowitz core, one certified solve; full-rank rule), mixed-peel+bloom (mixed-peel with a Bloom duplicate screen)",
         },
         ParamDecl {
             name: "targets",
@@ -289,6 +382,46 @@ const NEG_STRONG_PARAMS: &[ParamDecl] = &[
         default: Some("64"),
         help: "give up after this multiple of √(πr/4) walk steps (at least 10⁶)",
     },
+];
+
+/// The arm's solver seed: the harness's algorithm seed unless pinned.
+const HEC_FIXED_SEED: ParamDecl = ParamDecl {
+    name: "fixed_seed",
+    default: Some("none"),
+    help: "a decimal seed the solver uses instead of the harness's algorithm seed, to reproduce a study's seed list one arm per seed; `none` uses the algorithm seed",
+};
+
+const HEC_IC_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "branches",
+        default: None,
+        help: "factor-base walk steps (the thread's fb-walk: 64)",
+    },
+    ParamDecl {
+        name: "d_step_in",
+        default: None,
+        help: "one step in d_step_in is by D₁ or D₂ rather than a place (the thread's fb-walk: 4)",
+    },
+    ParamDecl {
+        name: "extra_relations",
+        default: None,
+        help: "rows collected beyond the m + 1 unknowns (the thread: 8)",
+    },
+    ParamDecl {
+        name: "max_trials",
+        default: Some("5000000"),
+        help: "candidate divisors before the run counts as exhausted",
+    },
+    HEC_FIXED_SEED,
+];
+
+const HEC_RHO_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "max_steps",
+        default: Some("200000000"),
+        help: "walk steps before the run counts as exhausted",
+    },
+    HEC_FIXED_SEED,
 ];
 
 const RHO_PARAMS: &[ParamDecl] = &[ParamDecl {
@@ -485,6 +618,39 @@ const HYPER_IC_PARAMS: &[ParamDecl] = &[
     },
 ];
 
+const GENUS3_PROJECTED_IC_PARAMS: &[ParamDecl] = &[
+    ParamDecl {
+        name: "fb_size",
+        default: Some("0"),
+        help: "degree-one factor-base cap; 0 selects q^(2/(g+1)) for the genus-3 cover",
+    },
+    ParamDecl {
+        name: "extra_relations",
+        default: Some("8"),
+        help: "rows beyond the factor-base columns plus the target column before the first solve",
+    },
+    ParamDecl {
+        name: "branches",
+        default: Some("64"),
+        help: "seeded factor-base walk branches, capped at the built base size",
+    },
+    ParamDecl {
+        name: "d_step_in",
+        default: Some("4"),
+        help: "one step in this many adds the image generator, one adds the image target, and the rest add factor-base classes",
+    },
+    ParamDecl {
+        name: "max_trials",
+        default: Some("200000"),
+        help: "hard relation-trial cap; exhaustion is retained",
+    },
+    ParamDecl {
+        name: "threads",
+        default: Some("1"),
+        help: "deterministic independent relation walks; canonical comparisons pin this value",
+    },
+];
+
 /// Every method `ecbench` knows.  Adding one is an entry here and an arm
 /// in [`solve`]; nothing else changes.
 const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
@@ -513,12 +679,59 @@ const BEST2_MODEL_PARAMS: &[ParamDecl] = &[
 pub fn registry() -> &'static [MethodDecl] {
     &[
         MethodDecl {
+            id: "ic.curve25519_pair_v1", family: "ic",
+            summary: "bounded actual Curve25519 signed pair decomposition, verified exact relations and target-coordinate elimination",
+            entry: "ecbench::curve25519_pair::collect_observed", applies: Applies::Any,
+            params: &[
+                ParamDecl { name: "base_size", default: None, help: "public factor-base columns, 1 through128" },
+                ParamDecl { name: "max_scan", default: None, help: "maximum lifted x coordinates, at most1000000" },
+                ParamDecl { name: "max_trials", default: None, help: "maximum full-width relation probes, at most1000000" },
+            ],
+        },
+        MethodDecl {
+            id: "rho.curve25519_bounded",
+            family: "rho",
+            summary: "explicitly capped Curve25519 negation-map reference with exact scalars and native field counters",
+            entry: "ic_wide::rho_negation<Curve25519Wide, ExactScalar>",
+            applies: Applies::Any,
+            params: &[ParamDecl { name: "max_steps", default: None, help: "walk-operation stop threshold, 0 through 1000000; one iteration can overshoot by at most 17 operations; setup and verification are counted separately" }],
+        },
+        MethodDecl {
+            id: "ic.orbit_rank_v1",
+            family: "ic",
+            summary: "bounded width-generic IC with unknown orbit logs, exact direct/quotient pair witnesses, modular rank and target pinning; native work remains unpriced",
+            entry: "ecbench::orbit_ic::solve_narrow/solve_wide",
+            applies: Applies::KoblitzOnly,
+            params: &[
+                ParamDecl { name: "columns", default: None, help: "distinct projected signed-Frobenius orbit columns, 1..64" },
+                ParamDecl { name: "raw_x_cap", default: None, help: "raw x values scanned from1, at most1000000" },
+                ParamDecl { name: "max_trials", default: None, help: "ordinary random aG+bQ query cap, at most1000000" },
+                ParamDecl { name: "max_pair_visits", default: None, help: "pair descriptor cap, at most2000000; unfinished setup exhausts with counts" },
+                ParamDecl { name: "table_mode", default: None, help: "direct full-point table or orbit signed-Frobenius quotient table" },
+            ],
+        },
+        MethodDecl{id:"rho.three_leads_plain_v1",family:"rho",summary:"Fully counted memoized r-adding rho on frozen finite-extension study inputs; collision-table memory reported",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_negation_v1",family:"rho",summary:"Fully counted memoized negation rho with fruitless-two-cycle look-ahead and charged escape/restarts",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"rho.three_leads_jacobian_v1",family:"rho",summary:"Explicit Scholten transfer followed by the matched generic Jacobian negation rho, every primitive counted",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_v2",family:"ic",summary:"Signed double-large-prime IC with charged restart on every repeated walk divisor, including unsplit states",entry:"three_leads::solve_genus2_v2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
+        MethodDecl{id:"ic.three_leads_genus2_v1",family:"ic",summary:"Complete Scholten transfer and signed double-large-prime elimination; independent and duplicate-relation controls are explicit parameters",entry:"three_leads::solve_genus2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
+        MethodDecl{id:"ic.three_leads_decomposition_v2",family:"ic",summary:"Complete subfield or PKM IC including initial and restarted relation targets, charged cofactor offsets, actual roots and elimination",entry:"three_leads::solve_subfield_or_pkm_v2",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
+        MethodDecl{id:"ic.three_leads_decomposition_v1",family:"ic",summary:"Complete subfield or PKM IC with actual S3 roots, unknown projected base logarithms and incremental elimination",entry:"three_leads::solve_subfield_or_pkm",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
+        MethodDecl {
             id: super::prime_orbit::ID,
             family: "ic",
             summary: "prime-field orbit IC relation collector inside a verified one-target solve; affine is one lane, Jacobian is 32 lanes with batch normalization, and relation wall time is a native phase",
             entry: "ecbench::prime_orbit::solve",
             applies: Applies::PrimeOnly,
             params: super::prime_orbit::PARAMS,
+        },
+        MethodDecl {
+            id: super::aps::ID_V3,
+            family: "ic",
+            summary: "APS explicit profiles, hybrid variable, two-parameter line chart, certified trace reuse and new-tuple growth; complete pricing is unestablished",
+            entry: "ecbench::aps::solve",
+            applies: Applies::PrimeOnly,
+            params: super::aps::PARAMS_V3,
         },
         MethodDecl {
             id: super::aps::ID_V2,
@@ -541,13 +754,6 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl{id:"ic.three_leads_genus2_choice2_v1",family:"ic",summary:"Two-choice component-directed genus2 relation walk; both candidate additions, roots and valid relation insertions charged",entry:"three_leads_followup::solve_genus2_choice2",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_projective_chart_v1",family:"ic",summary:"Two-choice genus2 collector with charged projective CRT numerator chart, one normalization and complete exceptional Cantor fallback",entry:"three_leads_followup::solve_genus2_projective",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_target_rank_v1",family:"ic",summary:"Projective two-choice genus2 collector choosing continuation by charged signed target-coefficient rank preview; both valid relations inserted",entry:"three_leads_followup::solve_genus2_target_rank",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
-        MethodDecl{id:"rho.three_leads_plain_v1",family:"rho",summary:"Fully counted memoized r-adding rho on frozen finite-extension study inputs; collision-table memory reported",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
-        MethodDecl{id:"rho.three_leads_negation_v1",family:"rho",summary:"Fully counted memoized negation rho with fruitless-two-cycle look-ahead and charged escape/restarts",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
-        MethodDecl{id:"rho.three_leads_jacobian_v1",family:"rho",summary:"Explicit Scholten transfer followed by the matched generic Jacobian negation rho, every primitive counted",entry:"three_leads::solve_rho",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
-        MethodDecl{id:"ic.three_leads_genus2_v2",family:"ic",summary:"Signed double-large-prime IC with charged restart on every repeated walk divisor, including unsplit states",entry:"three_leads::solve_genus2_v2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
-        MethodDecl{id:"ic.three_leads_genus2_v1",family:"ic",summary:"Complete Scholten transfer and signed double-large-prime elimination; independent and duplicate-relation controls are explicit parameters",entry:"three_leads::solve_genus2",applies:Applies::Any,params:THREE_LEADS_GENUS2_PARAMS},
-        MethodDecl{id:"ic.three_leads_decomposition_v2",family:"ic",summary:"Complete subfield or PKM IC including initial and restarted relation targets, charged cofactor offsets, actual roots and elimination",entry:"three_leads::solve_subfield_or_pkm_v2",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
-        MethodDecl{id:"ic.three_leads_decomposition_v1",family:"ic",summary:"Complete subfield or PKM IC with actual S3 roots, unknown projected base logarithms and incremental elimination",entry:"three_leads::solve_subfield_or_pkm",applies:Applies::Any,params:THREE_LEADS_DECOMPOSITION_PARAMS},
         MethodDecl {
             id: "rho.plus_model_v1",
             family: "rho",
@@ -643,6 +849,38 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "ecbench::fp4::solve_k4",
             applies: Applies::Any,
             params: K4_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.k3_gaudry",
+            family: "ic",
+            summary: "Gaudry's k = 3 index calculus on E(F_{p³}) (fp3_random curves only): subspace base {P : x(P) ∈ F_p}, double large primes (|F'| = ⌈|F|^lp_exponent⌉) handled by `harvester=eliminator` (pivots) or `harvester=cycles` (gain-forest cycle harvester, up to 3 large primes), filtering + Wiedemann; the oracle runs for real and everything is charged in GAE (group additions + F_p multiplications ÷ the curve's measured F_p mults per addition + 9 F_p mults per multiplication mod r); only the relation-digest hashing is uncharged",
+            entry: "ecbench::fp3::solve_k3",
+            applies: Applies::Any,
+            params: K3_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.diem_kgrow",
+            family: "ic",
+            summary: "Selectable-k Diem extension-IC lab cell: Semaev-line decomp (LineOracle S3 / LineS4Oracle Macaulay) on self-hosted E(F_{p^k}) from params (p,k), matched Pollard-ρ with [d]G=Q check; for growing (p,k(p)) ladders / α-vs-√r — not absolute F_p same-target",
+            entry: "ecbench::diem_kgrow::solve",
+            applies: Applies::Any,
+            params: DIEM_KGROW_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.growing_arity",
+            family: "ic",
+            summary: "Growing-arity prime-field ksum: m=m(L) from GROWING_ARITY_ORACLE_TARGET, B≤C m exp(L/m) capped for KSumOracle, prime_instance_for(bits)+prime-abscissa; matched S_ρ=√(π/2), [d]G=Q via pipeline verify — not extension-IC",
+            entry: "ecbench::growing_arity::solve",
+            applies: Applies::Any,
+            params: GROWING_ARITY_PARAMS,
+        },
+        MethodDecl {
+            id: "ic.aux_tower_solver",
+            family: "ic",
+            summary: "AUX prime-isogeny tower FB + algebraic rootfind-mitm:m=3 on prime_instance_for(bits); t from schedule capped at T_MAX; matched S_ρ=√(π/2), [d]G=Q — not ksum, not absolute-F_p extension-IC",
+            entry: "ecbench::aux_tower_solver::solve",
+            applies: Applies::Any,
+            params: AUX_TOWER_SOLVER_PARAMS,
         },
         MethodDecl {
             id: "rho.cubic",
@@ -795,10 +1033,53 @@ pub fn registry() -> &'static [MethodDecl] {
             params: &[],
         },
         MethodDecl {
+            id: "jacobian_image.rho3_v2",
+            family: "rho",
+            summary: "jacobian_image.rho3 with the exact cover certificate and prime-subgroup injectivity condition checked at run time, source scalar replay charged, and complete cold wall split across the transfer methodology's nine exclusive phases; destination Jacobian operations remain unpriced in source GAE",
+            entry: "binary_ecc::hcdlp_pollard_rho_counted + binary_cubic_pullback_nine_phase_v2",
+            applies: Applies::BinaryOnly,
+            params: &[
+                ParamDecl {
+                    name: "cap_multiple",
+                    default: Some("64"),
+                    help: "walk-step budget per restart as a multiple of sqrt(r)",
+                },
+                ParamDecl {
+                    name: "max_restarts",
+                    default: Some("64"),
+                    help: "deterministic restart cap for degenerate rho collisions",
+                },
+            ],
+        },
+        MethodDecl {
+            id: "jacobian_image.bsgs_v2",
+            family: "bsgs",
+            summary: "jacobian_image.bsgs with the exact cover certificate and prime-subgroup injectivity condition checked at run time, source scalar replay charged, and complete cold wall split across the transfer methodology's nine exclusive phases; destination Jacobian operations remain unpriced in source GAE",
+            entry: "binary_ecc::hcdlp_bsgs_counted + binary_cubic_pullback_nine_phase_v2",
+            applies: Applies::BinaryOnly,
+            params: &[],
+        },
+        MethodDecl {
+            id: "jacobian_image.genus3_projected_ic_v1",
+            family: "ic",
+            summary: "transfer-aware characteristic-two genus-3 hyperelliptic index calculus on the exact degree-three cover image: actual degree-one relations and sparse elimination, with factor-base columns made valid modulo r by arbitrary-class pushforward and source-cofactor clearing; complete nine-phase cold wall and charged source replay, while destination native work remains unpriced in source GAE",
+            entry: "binary_hyperelliptic_index_calculus::binary_hec_projected_index_calculus_dlp + binary_cubic_pullback_nine_phase_v2",
+            applies: Applies::BinaryOnly,
+            params: GENUS3_PROJECTED_IC_PARAMS,
+        },
+        MethodDecl {
             id: "bsgs.textbook",
             family: "bsgs",
             summary: "baby table of m = ⌈√r⌉ steps first, then giant steps; worst 2√r, mean 1.5√r",
             entry: "ecbench::generic::bsgs_textbook",
+            applies: Applies::Any,
+            params: &[],
+        },
+        MethodDecl {
+            id: "bsgs.prime_mont4_v1",
+            family: "bsgs",
+            summary: "four-limb prime curves with u64-order subgroup: textbook BSGS with exact full-point B-tree keys; field/group operations counted, tree allocation/comparisons unpriced",
+            entry: "ecbench::prime_mont4::bsgs",
             applies: Applies::Any,
             params: &[],
         },
@@ -823,6 +1104,18 @@ pub fn registry() -> &'static [MethodDecl] {
             family: "bsgs",
             summary: "bsgs.negation with the baby table's half-width m given (m + 1 classes, giant stride 2m + 1): the equal-memory comparator for a known-log base",
             entry: "ecbench::generic::bsgs_negation_table",
+            applies: Applies::Any,
+            params: &[ParamDecl {
+                name: "baby",
+                default: Some("0"),
+                help: "baby table half-width m (table entries m + 1); 0 means ceil(sqrt(r)/2), which is bsgs.negation",
+            }],
+        },
+        MethodDecl {
+            id: "bsgs.negation_table_v2",
+            family: "bsgs",
+            summary: "versioned cached-table BSGS: target-independent negation baby table, inserts and stride negation charged once in the cold total; online lookups, hit recovery arithmetic and final [d]G = Q verification charged in their phases",
+            entry: "ecbench::generic::build_negation_table + NegationBabyTable::solve + verify_candidate",
             applies: Applies::Any,
             params: &[ParamDecl {
                 name: "baby",
@@ -1100,6 +1393,22 @@ pub fn registry() -> &'static [MethodDecl] {
             params: HYPER_IC_PARAMS,
         },
         MethodDecl {
+            id: "hec.ic_fb_walk",
+            family: "ic",
+            summary: "index calculus on a hyperelliptic Jacobian (hec_thread curves): the full degree-1 factor base, the factor-base walk, the gcd smoothness test, sparse elimination mod r and the solver's own [k]D₁ = D₂ checks, every F_p, mod-r, word and hash-probe operation counted in bitop/v1 primitives by phase (ecbench::hec); group operations in gae are a lower bound",
+            entry: "hyperelliptic_index_calculus::hec_index_calculus_dlp",
+            applies: Applies::Any,
+            params: HEC_IC_PARAMS,
+        },
+        MethodDecl {
+            id: "hec.rho_full_width",
+            family: "rho",
+            summary: "Pollard rho on a hyperelliptic Jacobian (hec_thread curves): 16 full-width branches a_jD₁ + b_jD₂, distinguished points, about 1.25·√r steps, counted in bitop/v1 primitives by phase like hec.ic_fb_walk",
+            entry: "hyperelliptic_ic_bench::pollard_rho_jacobian_with(DistinguishedPointsFullWidth)",
+            applies: Applies::Any,
+            params: HEC_RHO_PARAMS,
+        },
+        MethodDecl {
             id: "ic.pipeline",
             family: "ic",
             summary: "index calculus through ic_framework::run_pipeline: factor base, oracle set-up, relations, linear algebra, verification, all charged",
@@ -1172,6 +1481,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: IC_COUNTED_PARAMS,
         },
         MethodDecl {
+            id: "ic.hashed_native_v1",
+            family: "ic",
+            summary: "native BigUint hashed-base IC with explicit source/selector/width/partial backend; group calls charged, all meter/native work unpriced; cold and exclusive online phases; bounded failures retained",
+            entry: "hashed_ecdl_tensor::{reduction,finite,width,partial} through ecbench::hashed_native",
+            applies: Applies::PrimeOnly,
+            params: super::hashed_native::PARAMS,
+        },
+        MethodDecl {
             id: "ic.tensor_contraction_v1",
             family: "ic",
             summary: "toy index calculus with m keyed SHA-256 hashed factor bases (|F_i| ≈ (2r)^(1/m)), each relation found by exact sparse tensor contraction of the whole-point network (crates/ecdl-tensor-ic); exponential, about r point additions per relation; contraction rows, factor-base listing and elimination counted unpriced",
@@ -1207,12 +1524,12 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl {
             id: "ic.known_log_ksum_v1",
             family: "ic",
-            summary: "ic.known_log_mitm2_v1 with a negation-folded table of every signed k-sum (k = 3, 4, 5) of the seeded known-log base in place of the pair table; a hit's log is the sum of k known logs",
+            summary: "ic.known_log_mitm2_v1 with a negation-folded table of every signed k-sum (k = 3 to 9) of the seeded known-log base in place of the pair table; a hit's log is the sum of k known logs",
             entry: "ecbench::known_log::{prepare_ksum,recover}",
             applies: Applies::PrimeOnly,
             params: &[
                 ParamDecl { name: "size", default: None, help: "unsigned base points; signed point count is twice this (at most 2047)" },
-                ParamDecl { name: "k", default: None, help: "summands, 3, 4 or 5" },
+                ParamDecl { name: "k", default: None, help: "summands, 3 to 9" },
                 ParamDecl { name: "base_seed", default: None, help: "target-independent base seed" },
                 ParamDecl { name: "base_multiplier", default: Some("1"), help: "H=[u]G; use c^-1 when transporting a base to generator [c]G" },
                 ParamDecl { name: "max_sums", default: None, help: "hard bound on the table's 2^(k-1)·C(size,k) sums, checked before any work" },
@@ -1385,6 +1702,14 @@ pub fn registry() -> &'static [MethodDecl] {
             family: "rho",
             summary: "rho.signed_frobenius_v4 with jumps in G only; Koblitz curves only (RhoV3::v6(true) on signed-Frobenius classes)",
             entry: "ic_boundary::signed_frobenius_rho_v3(RhoV3::v6(true))",
+            applies: Applies::KoblitzOnly,
+            params: RHO_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.signed_frobenius_v6",
+            family: "rho",
+            summary: "rho.signed_frobenius_v5 with a direct count of every partition-mix call in place of the per-step tally; the trajectory and charged group operations are identical; Koblitz curves only",
+            entry: "ic_boundary::signed_frobenius_rho_v3_partition_counted(RhoV3::v6(true))",
             applies: Applies::KoblitzOnly,
             params: RHO_PARAMS,
         },
@@ -1664,6 +1989,7 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
         | "rho.signed_frobenius_v3"
         | "rho.signed_frobenius_v4"
         | "rho.signed_frobenius_v5"
+        | "rho.signed_frobenius_v6"
         | "rho.signed_frobenius_full"
         | "rho.signed_frobenius_v2_full"
         | "rho.signed_frobenius_strong"
@@ -1780,6 +2106,17 @@ fn normalise_param(name: &str, default: Option<&str>, value: &str) -> String {
     }
 }
 
+/// Parameters a method accepts without declaring them: absent from the
+/// registry (so no default is written and the identity of a spec without
+/// them is unchanged), hashed into the identity only when given.  Today
+/// only the factor-base log store of the Koblitz descent pipelines
+/// ([`koblitz_descent::LOG_STORE_PARAM`]), whose runs with a store hit
+/// are amortized rows, never cold ones.
+pub fn optional_param(method: &str, name: &str) -> bool {
+    name == koblitz_descent::LOG_STORE_PARAM
+        && matches!(method, "ic.koblitz_descent" | "ic.koblitz_descent_v2")
+}
+
 /// Fill defaults, normalise integer-valued parameters to canonical
 /// decimal, refuse unknown and missing parameters, hash.
 pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
@@ -1802,11 +2139,18 @@ pub fn resolve(spec: &MethodSpec) -> Result<ResolvedMethod, String> {
         format!("unknown method `{}`; known: {}", spec.id, ids.join(", "))
     })?;
     for k in spec.params.keys() {
-        if !d.params.iter().any(|p| p.name == k) {
+        if !d.params.iter().any(|p| p.name == k) && !optional_param(d.id, k) {
             return Err(format!("method `{}` has no parameter `{k}`", d.id));
         }
     }
     let mut params = BTreeMap::new();
+    // An optional parameter is hashed only when given, so a spec without
+    // it keeps the method identity it always had.
+    for (k, v) in &spec.params {
+        if optional_param(d.id, k) && !d.params.iter().any(|p| p.name == k) {
+            params.insert(k.clone(), v.clone());
+        }
+    }
     for p in d.params {
         match (spec.params.get(p.name), p.default) {
             (Some(v), def) => {
@@ -1959,9 +2303,73 @@ pub struct SolverStats {
     pub degree_of_regularity_forecast: Option<crate::cryptanalysis::dreg_forecast::Forecast>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub forecast_unavailable: Option<String>,
+    /// Optional invariant values supplied by an engine with the corresponding
+    /// closure-space or top-form analysis. A final-basis Hilbert deviation or
+    /// a productive F4 step alone does not establish these invariants. Existing
+    /// stored fields remain readable; unmeasured values are absent. Diagnostic
+    /// only, outside pricing and replay comparisons.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_fall_degree: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_fall_degree: Option<u32>,
+    /// The total (sum over solver calls) solving degree.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub solving_degree_sum: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub degree_of_regularity_observed: Option<u32>,
+    /// Per-working-degree history of the richest solver call, for the trace
+    /// drawing (relations/steps against degree, coloured by fall intensity).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub degree_trace: Vec<crate::cryptanalysis::ic_framework::stages::DegreeStep>,
+    /// Which cost story this block carries, so a reader never mistakes an
+    /// absent degree for a measured one: `polynomial-system` (Gröbner /
+    /// Macaulay / Semaev — the degree fields are measured), `sat`, `sparse-la`
+    /// (block-Wiedemann / Markowitz mod r), `generic-transfer`, or
+    /// `table-enumeration`. The degree fields are populated only for
+    /// `polynomial-system`; elsewhere they are absent by construction, not
+    /// missing data.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub degree_story: Option<String>,
+    /// Relation-phase figures for the sparse-linear-algebra and table families
+    /// that have no polynomial-system degree (`degree_story` says which): the
+    /// relations collected and the shape and rank of the relation matrix, which
+    /// is solved modulo the group order (block Wiedemann / Markowitz), not by a
+    /// Gröbner basis. The degree fields above are absent for these families by
+    /// construction, not missing data.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub relations: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub relation_matrix_rows: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub relation_matrix_columns: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub relation_matrix_rank: Option<u64>,
 }
 
 impl SolverStats {
+    /// A solver block for a sparse-linear-algebra or table family: no
+    /// polynomial-system degree (the degree fields stay `None`), only the
+    /// relation-phase figures, tagged with its `degree_story`.
+    pub fn relation_block(
+        name: &str,
+        story: &str,
+        relations: Option<u64>,
+        rows: Option<u64>,
+        columns: Option<u64>,
+        rank: Option<u64>,
+    ) -> Self {
+        SolverStats {
+            name: name.to_string(),
+            op_unit: "relations".to_string(),
+            degree_story: Some(story.to_string()),
+            relations,
+            relation_matrix_rows: rows,
+            relation_matrix_columns: columns,
+            relation_matrix_rank: rank,
+            ..Default::default()
+        }
+    }
+
     /// Attach the run's degree-of-regularity forecast, pricing its hope
     /// band against the generic floor `√(π r / 2A)` of this curve.
     pub fn with_forecast(
@@ -2023,6 +2431,17 @@ impl SolverStats {
             sat_restarts: if sat { get(&["restarts"]) } else { None },
             sat_learnt_clauses: if sat { get(&["learnt_clauses"]) } else { None },
             extra: x.clone(),
+            first_fall_degree: solver.first_fall_degree,
+            last_fall_degree: solver.last_fall_degree,
+            solving_degree_sum: (solver.solving_degree_sum > 0)
+                .then_some(solver.solving_degree_sum),
+            degree_of_regularity_observed: solver.degree_of_regularity_observed,
+            degree_trace: solver.degree_trace.clone(),
+            degree_story: Some(if sat { "sat" } else { "polynomial-system" }.to_string()),
+            relations: None,
+            relation_matrix_rows: None,
+            relation_matrix_columns: None,
+            relation_matrix_rank: None,
             degree_of_regularity_forecast: None,
             forecast_unavailable: None,
         }
@@ -2095,6 +2514,19 @@ pub(super) fn ops_phase(name: &str, ops: GroupOps) -> PhaseRecord {
         native: BTreeMap::new(),
         work_native: BTreeMap::new(),
     }
+}
+
+/// The counter `rho.signed_frobenius_v5` tallies its per-step jump-index
+/// selection under since 2026-11-19: the name the strong reference uses
+/// for its per-step partition hash, so `ecbench::work` and the §5a band
+/// price the two alike.  Records written before then lack it; their
+/// replay is matched with it removed ([`v5_pre_tally_record`]).
+pub const V5_JUMP_INDEX_COUNTER: &str = "partition_hashes_uncharged";
+
+/// A `rho.signed_frobenius_v5` record written before the per-step
+/// jump-index tally existed: it carries no [`V5_JUMP_INDEX_COUNTER`].
+pub(super) fn v5_pre_tally_record(method: &str, counters: &BTreeMap<String, u64>) -> bool {
+    method == "rho.signed_frobenius_v5" && !counters.contains_key(V5_JUMP_INDEX_COUNTER)
 }
 
 pub(super) fn unpriced_of(counters: &BTreeMap<String, u64>) -> Vec<String> {
@@ -2188,6 +2620,239 @@ fn attach_work_native(phases: &mut [PhaseRecord], work: &BTreeMap<String, u64>) 
             *search.work_native.entry(k.clone()).or_default() += v;
         }
     }
+}
+
+fn curve25519_pair_caps(m: &ResolvedMethod) -> Result<(usize, u64, u64), String> {
+    let number = |name: &str| -> Result<u64, String> {
+        m.params
+            .get(name)
+            .ok_or_else(|| format!("missing {name}"))?
+            .parse()
+            .map_err(|_| format!("{name} must be a nonnegative integer"))
+    };
+    let (base, scan, trials) = (
+        number("base_size")?,
+        number("max_scan")?,
+        number("max_trials")?,
+    );
+    if !(1..=128).contains(&base) || scan > 1_000_000 || trials > 1_000_000 {
+        return Err(
+            "Curve25519 pair collector requires base_size=1..=128 and max_scan/max_trials<=1000000"
+                .into(),
+        );
+    }
+    Ok((base as usize, scan, trials))
+}
+
+fn solve_curve25519_pair(
+    m: &ResolvedMethod,
+    group: &crate::cryptanalysis::curve25519_wide::Curve25519Wide,
+    facts: &CurveFacts,
+    target: &[String; 2],
+    seed: u64,
+) -> Result<SolveReport, String> {
+    use super::curve25519_pair::{build_factor_base, collect_observed, Outcome, Stage};
+    let (size, scan, trials) = curve25519_pair_caps(m)?;
+    let started = Instant::now();
+    let base = {
+        let _phase = measurement::scope(Phase::FactorBase);
+        build_factor_base(group, size, scan)?
+    };
+    measurement::begin_online(Phase::TargetQuery);
+    let mut validation = GroupOps::default();
+    let target = super::curve25519_workload::decode_counted(group, target, &mut validation)?;
+    let out = if base.complete {
+        collect_observed(group, &base.points, target, seed, trials, |stage| {
+            measurement::mark(match stage {
+                Stage::Setup | Stage::Query | Stage::Finished => Phase::TargetQuery,
+                Stage::Decomposition => Phase::TargetPdp,
+                Stage::AdmitAndEliminate => Phase::TargetDescent,
+                Stage::Recovery => Phase::RecoveryCheck,
+            });
+        })?
+    } else {
+        Outcome {
+            recovered: None,
+            rank: 0,
+            trials: 0,
+            relations: 0,
+            lookups: 0,
+            scalar_hash_draws: 0,
+            setup: GroupOps::default(),
+            search: GroupOps::default(),
+            admission: GroupOps::default(),
+            recovery: GroupOps::default(),
+            matrix: Default::default(),
+        }
+    };
+    measurement::end_online();
+    let solve_wall_ns = started.elapsed().as_nanos() as u64;
+    let phases = vec![
+        ops_phase("factor_base", base.ops),
+        ops_phase("input_validation", validation),
+        ops_phase("setup_validation", out.setup),
+        ops_phase("relation_search", out.search),
+        ops_phase("relation_admission", out.admission),
+        ops_phase("recovery_check", out.recovery),
+    ];
+    let mut counters = BTreeMap::new();
+    for (name, value) in [
+        ("input_validation_field_additions_uncharged", 2),
+        ("input_validation_coordinate_decodes_uncharged", 2),
+        ("input_validation_canonical_curve_checks_uncharged", 1),
+        ("factor_base_columns", base.points.len() as u64),
+        ("factor_base_coordinates_tried", base.coordinates_tried),
+        ("factor_base_sqrt_calls_uncharged", base.sqrt_calls),
+        (
+            "factor_base_rhs_additions_uncharged",
+            2 * base.coordinates_tried,
+        ),
+        (
+            "factor_base_coordinate_conversions_uncharged",
+            base.coordinates_tried,
+        ),
+        ("relation_trials", out.trials),
+        ("relations_verified", out.relations),
+        ("matrix_rank", out.rank as u64),
+        ("relation_point_lookups_uncharged", out.lookups),
+        ("scalar_sha256_draws_uncharged", out.scalar_hash_draws),
+        ("linalg_muls_uncharged", out.matrix.multiplications),
+        ("linalg_adds_uncharged", out.matrix.additions),
+        ("linalg_subs_uncharged", out.matrix.subtractions),
+        ("linalg_inverses_uncharged", out.matrix.inversions),
+        ("linalg_conversions_uncharged", out.matrix.conversions),
+    ] {
+        counters.insert(name.into(), value);
+    }
+    // Full coordinates, not truncated group hashes, define this inventory.
+    let mut coordinates: Vec<[String; 2]> = base
+        .points
+        .iter()
+        .map(|&point| {
+            super::curve25519_workload::encode(group, point).expect("base points are nonidentity")
+        })
+        .collect();
+    coordinates.sort();
+    let points_sha256 = sha256_hex(super::canonical::canonical(&json!(coordinates))?.as_bytes());
+    let family = "curve25519-cofactor-cleared-lifts-v1";
+    let base_params = BTreeMap::from([
+        ("base_size".to_string(), size.to_string()),
+        ("max_scan".to_string(), scan.to_string()),
+    ]);
+    let (fb_id, fb_sha256) = short_id(
+        "FB1",
+        &json!({"schema":"ecbench.factor_base/v1",
+        "curve":facts.slug,"family":family,"params":base_params,
+        "points_sha256":points_sha256,"columns":base.points.len()}),
+    )?;
+    let factor_base = FactorBaseFacts {
+        fb_id, fb_sha256, family: family.into(), params: base_params,
+        description: "G, then distinct signed classes of cofactor-cleared lifts of x=0,1,...; only log_G(G)=1 pre-admitted".into(),
+        signed_points: 2 * base.points.len() as u64, abscissae: base.points.len() as u64,
+        columns: base.points.len() as u64, dimension: None, points_sha256,
+    };
+    let recovered = out
+        .recovered
+        .as_ref()
+        .map(|value| ExactScalar::from_biguint(value).ok_or("recovered scalar exceeds256bits"))
+        .transpose()?;
+    Ok(SolveReport {
+        recovered,
+        exhausted: recovered.is_none(),
+        total_gae: phases.iter().map(|p| p.gae).sum(),
+        phases,
+        automorphisms_used: 2,
+        unpriced: unpriced_of(&counters),
+        counters,
+        deterministic: true,
+        nondeterminism: vec![],
+        solve_wall_ns,
+        factor_base: Some(factor_base),
+        detail: json!({
+            "algorithm":"bounded signed two-summand decomposition with exact verified relations",
+            "track":"generic", "factor_base_complete":base.complete,
+            "matrix":"WideGauss target-coordinate recovery modulo the exact subgroup order",
+            "accounting":"group operations plus separately retained native API counters; allocations, hash-map internals and internal square-root work are not priced",
+            "inventory":"canonical full coordinates; inventory serialization follows the solver interval",
+            "admission_timing":"group relation verification and matrix insertion share target_descent timing"
+        }),
+        online: None,
+        online_error: None,
+        solver: None,
+        field_ops: field_ops_of(
+            group,
+            &[
+                base.ops,
+                validation,
+                out.setup,
+                out.search,
+                out.admission,
+                out.recovery,
+            ],
+        ),
+    })
+}
+
+fn curve25519_cap(m: &ResolvedMethod) -> Result<u64, String> {
+    let cap: u64 = m
+        .params
+        .get("max_steps")
+        .ok_or("Curve25519 requires explicit max_steps")?
+        .parse()
+        .map_err(|_| "Curve25519 max_steps must be a nonnegative integer")?;
+    if cap > 1_000_000 {
+        return Err("Curve25519 max_steps must be at most 1000000".into());
+    }
+    Ok(cap)
+}
+
+fn solve_curve25519_bounded(
+    m: &ResolvedMethod,
+    curve: &crate::cryptanalysis::curve25519_wide::Curve25519Wide,
+    target: &[String; 2],
+    seed: u64,
+) -> Result<SolveReport, String> {
+    let cap = curve25519_cap(m)?;
+    let r = ExactScalar::from_biguint(&curve.r).ok_or("subgroup order exceeds 256 bits")?;
+    super::exact_rho_scalar::take_work();
+    let start = Instant::now();
+    measurement::begin_online(Phase::RhoSolve);
+    let mut validation = GroupOps::default();
+    let target = super::curve25519_workload::decode_counted(curve, target, &mut validation)?;
+    let (result, recovered) =
+        crate::cryptanalysis::ic_wide::rho_negation(curve, curve.generator, target, r, seed, cap);
+    measurement::end_online();
+    let wall = start.elapsed().as_nanos() as u64;
+    let scalar = super::exact_rho_scalar::take_work();
+    let field_ops = field_ops_of(curve, &[validation, result.group_ops]);
+    let mut report = rho_report(result, wall, field_ops);
+    report.total_gae += validation.gae();
+    report
+        .phases
+        .insert(0, ops_phase("input_validation", validation));
+    report.recovered = recovered;
+    report.exhausted = recovered.is_none();
+    for (name, count) in [
+        ("input_validation_field_additions_uncharged", 2),
+        ("input_validation_coordinate_decodes_uncharged", 2),
+        ("input_validation_canonical_curve_checks_uncharged", 1),
+        ("scalar_modular_adds_uncharged", scalar.modular_adds),
+        ("scalar_modular_subs_uncharged", scalar.modular_subs),
+        ("scalar_modular_muls_uncharged", scalar.modular_muls),
+        ("scalar_modular_inverses_uncharged", scalar.modular_inverses),
+        ("scalar_sampling_draws_uncharged", scalar.wide_sample_draws),
+    ] {
+        report.counters.insert(name.into(), count);
+    }
+    report.unpriced = unpriced_of(&report.counters);
+    report.detail["scalar_backend"] = json!("ExactScalar with BigUint modular arithmetic");
+    report.detail["walk_operation_stop_threshold"] = json!(cap);
+    report.detail["maximum_iteration_overshoot"] = json!(17);
+    report.detail["scalar_count_scope"] =
+        json!("API calls; allocation and internal BigUint word work are not priced");
+    report.detail["target_validation"] =
+        json!("canonical coordinates, on-curve and subgroup checks inside the solver window");
+    Ok(report)
 }
 
 fn rho_report(res: RhoResult, wall: u64, field_ops: Option<FieldOps>) -> SolveReport {
@@ -2649,9 +3314,14 @@ fn solve_generic<G: CountedGroup>(
 ) -> Result<SolveReport, String> {
     let cap = || -> Result<u64, String> { Ok(rho_cap(r, param_u64(m, "cap_multiple")? as f64)) };
     let t = Instant::now();
-    // Everything these methods do depends on the target (rho's jump table
-    // is [a]G + [b]Q), so the whole solve is the online window.
-    measurement::begin_online(Phase::RhoSolve);
+    // The versioned cached BSGS builds its reusable `G`-only table before
+    // opening the online window.  Frozen generic ids retain their original
+    // whole-call boundary; in particular this does not reinterpret any
+    // committed record.
+    let split_cached_bsgs = m.id == "bsgs.negation_table_v2";
+    if !split_cached_bsgs {
+        measurement::begin_online(Phase::RhoSolve);
+    }
     // The rho walks keep one ledger for the whole solve; the tables and
     // the kangaroo keep set-up and search apart.  Either way the field
     // operations reported are the solve's total, known only when the
@@ -2736,6 +3406,53 @@ fn solve_generic<G: CountedGroup>(
                 bsgs_negation_table(g, gen, target, r, baby)
             };
             generic(o, t.elapsed().as_nanos() as u64, 2)
+        }
+        "bsgs.negation_table_v2" => {
+            let baby = param_u64(m, "baby")?;
+            let baby = if baby == 0 {
+                crate::cryptanalysis::ecbench::generic::ceil_sqrt(r)
+                    .div_ceil(2)
+                    .max(1)
+            } else {
+                baby
+            };
+            let table = build_negation_table(g, gen, r, baby);
+            measurement::begin_online(Phase::RhoSolve);
+            let mut o = table.solve(g, target);
+            verify_candidate(g, gen, target, &mut o);
+            measurement::end_online();
+            let wall = t.elapsed().as_nanos() as u64;
+            let f = field_ops_of(g, &[o.setup, o.search, o.verification]);
+            let mut rep = generic_report_v2(o, wall, 2, f, "bsgs");
+
+            // Keep the top-level counters for the stable band/report schema,
+            // and also bind each native count to the phase that performed it
+            // so reusable/per-target work splits are honest.
+            for (phase_name, counter) in [
+                ("setup", "inserts_uncharged"),
+                ("setup", "point_negations_uncharged"),
+                ("search", "lookups_uncharged"),
+                ("search", "recovery_key_comparisons_uncharged"),
+                ("search", "recovery_modr_muls_uncharged"),
+                ("search", "recovery_modr_adds_uncharged"),
+            ] {
+                let Some(count) = rep.counters.get(counter).copied() else {
+                    continue;
+                };
+                rep.phases
+                    .iter_mut()
+                    .find(|p| p.name == phase_name)
+                    .expect("generic v2 report has setup and search phases")
+                    .native
+                    .insert(counter.into(), count);
+            }
+            rep.detail["cache_contract"] = json!({
+                "cold_total_charges_setup_once": true,
+                "online_excludes_setup": true,
+                "reusable_phase": "setup",
+                "per_target_phases": ["search", "verification"],
+            });
+            rep
         }
         "kangaroo.vow" => {
             let o = kangaroo(g, gen, target, r, seed, cap()?);
@@ -2882,7 +3599,9 @@ fn solve_generic<G: CountedGroup>(
         }
         other => return Err(format!("`{other}` is not a generic method")),
     };
-    measurement::end_online();
+    if !split_cached_bsgs {
+        measurement::end_online();
+    }
     Ok(rep)
 }
 
@@ -2901,11 +3620,13 @@ fn parse_hex_wide(s: &str) -> Result<u128, String> {
 fn solve_wide(
     m: &ResolvedMethod,
     wi: &WideInstance,
+    curve: &CurveFacts,
     tx: u128,
     ty: u128,
     seed: u64,
 ) -> Result<SolveReport, String> {
     match m.id.as_str() {
+        "ic.orbit_rank_v1" => super::orbit_ic::solve_wide(m, wi, curve, RawPointG::Affine { x: tx, y: ty }, seed),
         "rho.signed_frobenius_strong"
         | "rho.signed_frobenius_strong_legacy"
         | "rho.signed_frobenius_strong_escape" => {
@@ -2917,6 +3638,91 @@ fn solve_wide(
             "`{other}` has no wide-field implementation; on a curve past one word (n = {}) only the strong rho (with or without the escape, or its _v2) and claw.pair_table (or its _v2) run",
             wi.kc.n
         )),
+    }
+}
+
+/// The methods that have a three-word (`128 ≤ n ≤ 191`, subgroup order
+/// past `2^128`) implementation: the strong rho in all four registered
+/// forms (each is generic over the field word and scalar) and the pair
+/// claw in both accountings.  Any other method refuses a big curve rather
+/// than run on a truncation; [`applicable`] refuses it at plan time.
+pub const BIG_METHODS: [&str; 6] = [
+    "rho.signed_frobenius_strong",
+    "rho.signed_frobenius_strong_legacy",
+    "rho.signed_frobenius_strong_escape",
+    "rho.signed_frobenius_strong_v2",
+    "claw.pair_table",
+    "claw.pair_table_v2",
+];
+
+fn big_refusal(id: &str, n: u32) -> String {
+    format!(
+        "`{id}` has no three-word implementation; on a Koblitz curve with 128 ≤ n ≤ 191 (here n = {n}, a subgroup order past 2^128) only {} run",
+        BIG_METHODS.join(", ")
+    )
+}
+
+/// The most base points a claw on a big curve may build: `2^24` points (a
+/// few hundred megabytes with the table).  The cost-minimising base at
+/// `n = 131` is about `4·10^10` points, which no host holds; a run asks for
+/// a scaled-down base instead of aborting on the allocation.
+pub const BIG_CLAW_MAX_BASE: u64 = 1 << 24;
+
+/// The claw's shape on a big curve: [`ClawShape`] from the parameters,
+/// the step budget by the wide rule saturated at `u64::MAX` (the floor of a
+/// `2^129` subgroup times the cap multiple is past `2^64`), and a refusal
+/// when the base would exceed [`BIG_CLAW_MAX_BASE`] points.
+fn big_claw_shape(m: &ResolvedMethod, r: f64, n: u32) -> Result<ClawShape, String> {
+    let multiple = param_u64(m, "cap_multiple")? as f64;
+    let shape = ClawShape {
+        base_scale: param_f64(m, "base_scale")?,
+        table_scale: param_f64(m, "table_scale")?,
+        max_adds: ((crate::cryptanalysis::ic_boundary::generic_floor_ops(r, 1.0) * multiple)
+            as u64)
+            .saturating_add(4096),
+    };
+    let base = shape.seeds(r, n).saturating_mul(2 * u64::from(n));
+    if base > BIG_CLAW_MAX_BASE {
+        return Err(format!(
+            "`{}` with base_scale = {} builds {base} base points on n = {n}, past the {BIG_CLAW_MAX_BASE} a big-curve claw may hold; lower base_scale",
+            m.id, shape.base_scale
+        ));
+    }
+    Ok(shape)
+}
+
+/// The methods of [`BIG_METHODS`] on a big Koblitz curve.
+fn solve_big(
+    m: &ResolvedMethod,
+    bi: &BigInstance,
+    target: &[String; 2],
+    seed: u64,
+) -> Result<SolveReport, String> {
+    use crate::cryptanalysis::koblitz_big::W192;
+    let parse = |s: &String| W192::parse_hex(s).ok_or_else(|| format!("bad hex `{s}`"));
+    let q = RawPointG::Affine {
+        x: parse(&target[0])?,
+        y: parse(&target[1])?,
+    };
+    let r = bi.kc.r192().to_f64();
+    match m.id.as_str() {
+        "rho.signed_frobenius_strong"
+        | "rho.signed_frobenius_strong_legacy"
+        | "rho.signed_frobenius_strong_escape"
+        | "rho.signed_frobenius_strong_v2" => {
+            let t = Instant::now();
+            let rho = bi.kc.strong_rho();
+            strong_run(m, &rho, q, r, bi.kc.n, seed, t)
+        }
+        "claw.pair_table" | "claw.pair_table_v2" => {
+            let shape = big_claw_shape(m, r, bi.kc.n)?;
+            let v2 = m.id == "claw.pair_table_v2";
+            let t = Instant::now();
+            let o = pair_claw_big(bi, q, seed, shape, v2);
+            let wall = t.elapsed().as_nanos() as u64;
+            Ok(claw_report(o, shape, r, bi.kc.n, wall, v2))
+        }
+        other => Err(big_refusal(other, bi.kc.n)),
     }
 }
 
@@ -2934,6 +3740,37 @@ fn parse_hex(s: &str) -> Result<u64, String> {
 /// non-prime instance. An arm that cannot run is a spec error, not a session of `error`
 /// records that `compare` then reports as incomplete.
 pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Result<(), String> {
+    if matches!(inst, Instance::PrimeMont4(_)) {
+        return if matches!(m.id.as_str(), "rho.negation" | "bsgs.prime_mont4_v1") {
+            Ok(())
+        } else {
+            Err(format!("{} has no prime_mont4 adapter; supported methods are rho.negation and bsgs.prime_mont4_v1", m.id))
+        };
+    }
+    if m.id == "bsgs.prime_mont4_v1" {
+        return Err("bsgs.prime_mont4_v1 requires prime_mont4_explicit".into());
+    }
+    if matches!(inst, Instance::Curve25519(_)) {
+        if m.id == "rho.curve25519_bounded" {
+            curve25519_cap(m)?;
+            return Ok(());
+        }
+        if m.id == "ic.curve25519_pair_v1" {
+            curve25519_pair_caps(m)?;
+            return Ok(());
+        }
+        return Err(format!(
+            "`{}` has no registered full-width Curve25519 solver adapter yet",
+            m.id
+        ));
+    }
+    if matches!(
+        m.id.as_str(),
+        "rho.curve25519_bounded" | "ic.curve25519_pair_v1"
+    ) {
+        return Err(format!("{} requires Curve25519", m.id));
+    }
+
     let id = full_price::base_of(&m.id)
         .or(wordram_price::base_of(&m.id))
         .unwrap_or(m.id.as_str());
@@ -2970,11 +3807,33 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
     {
         return Err(prime_only_refusal(id, curve));
     }
+    if id == "ic.k3_gaudry" && !matches!(inst, Instance::Fp3(_)) {
+        return Err(format!(
+            "`ic.k3_gaudry` runs on fp3_random curves only; {} is {}",
+            curve.slug, curve.family
+        ));
+    }
+    if id == "ic.k3_gaudry" {
+        k3_params(m)?;
+    }
     if id == "ic.k4_gaudry" && !matches!(inst, Instance::Fp4(_)) {
         return Err(format!(
             "`ic.k4_gaudry` runs on fp4_translation curves only; {} is {}",
             curve.slug, curve.family
         ));
+    }
+    if id == "ic.diem_kgrow" {
+        // Self-hosted (p,k) cell; any workload is accepted as a carrier.
+        let _ = (m, inst, curve);
+        return Ok(());
+    }
+    if id == "ic.growing_arity" {
+        let _ = (m, inst, curve);
+        return Ok(());
+    }
+    if id == "ic.aux_tower_solver" {
+        let _ = (m, inst, curve);
+        return Ok(());
     }
     if id == NEG_STRONG {
         if !matches!(inst, Instance::F2m4(_)) {
@@ -3004,6 +3863,15 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
             "`{id}` runs on subfield_fp3 / gls_fp2 curves only; {} is {}",
             curve.slug, curve.family
         )),
+        Instance::Big(bi) => {
+            if !BIG_METHODS.contains(&m.id.as_str()) {
+                return Err(big_refusal(&m.id, bi.kc.n));
+            }
+            if m.id.starts_with("claw.") {
+                big_claw_shape(m, bi.kc.r192().to_f64(), bi.kc.n)?;
+            }
+            Ok(())
+        }
         Instance::Wide(wi) => match id {
             "rho.signed_frobenius_strong"
             | "rho.signed_frobenius_strong_legacy"
@@ -3112,7 +3980,10 @@ fn known_log_applicable(
     if param_u64(m, "max_trials")? == 0 {
         return Err("known-log max_trials must be positive".into());
     }
-    let r = u64::try_from(curve.r).map_err(|_| "known-log needs an order below 2^64")?;
+    let r = curve
+        .r
+        .checked_u64()
+        .ok_or("known-log needs an order below 2^64")?;
     let params = super::known_log::Parameters {
         size: usize::try_from(param_u64(m, "size")?).map_err(|_| "base size exceeds usize")?,
         base_seed: param_u64(m, "base_seed")?,
@@ -3169,13 +4040,25 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
     if !prime_only {
         return Ok(());
     }
-    let Instance::Prime(i) = inst else {
-        return Err(format!(
-            "`{}` with factor base `{fb_name}` and oracle `{or_name}` runs on single-word prime curves only",
-            m.id
-        ));
+    // `wwalk` (without `sib`/`aut`, which need x-only siblings and the
+    // order-3 automorphism of a prime curve) also runs on a single-word
+    // binary curve: the walk is generic over `CountedGroup`.
+    let bin_walk = matches!(inst, Instance::Binary(_)) && or_name == "wwalk";
+    let (r, prime) = match inst {
+        Instance::Prime(i) => (i.r, Some(i)),
+        Instance::Binary(b)
+            if bin_walk && !matches!(fb_name.as_str(), "prime-abscissa" | "prime-interval") =>
+        {
+            (b.r, None)
+        }
+        _ => {
+            return Err(format!(
+                "`{}` with factor base `{fb_name}` and oracle `{or_name}` runs on single-word prime curves only",
+                m.id
+            ));
+        }
     };
-    if fb_name == "prime-interval" {
+    if let (Some(i), "prime-interval") = (prime, fb_name.as_str()) {
         PrimeIntervalBase::interval(&fb, i.curve.p)?;
     }
     match or_name.as_str() {
@@ -3219,7 +4102,7 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
             // The target walk packs coefficients in a u128 word (62 bits a
             // seed); the plain walk table in 32 bits.
             let coef_bits = if tw > 0 { TW_COEF_BITS } else { 32 };
-            wwalk_plan_check_bits(i.r, x, jumps, opts, coef_bits)?;
+            wwalk_plan_check_bits(r, x, jumps, opts, coef_bits)?;
             let (cj, lazy) = (or.flag("cj"), or.flag("lazy"));
             if cj && tw == 0 {
                 return Err("wwalk: cj=1 needs tw=1 or tw=2".into());
@@ -3243,6 +4126,9 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
                     if tw == 0 {
                         return Err("wwalk: aut=3 needs tw=1 or tw=2".into());
                     }
+                    let Some(i) = prime else {
+                        return Err("wwalk: aut=3 runs on prime curves only".into());
+                    };
                     use crate::cryptanalysis::ic_boundary::CountedGroup;
                     let mut ops = crate::cryptanalysis::ic_boundary::GroupOps::default();
                     if i.curve
@@ -3423,9 +4309,25 @@ pub fn solve_measured(
     seed: u64,
     oracle: Option<&dyn StaticDhOracle>,
 ) -> Result<SolveReport, String> {
+    if matches!(inst, Instance::PrimeMont4(_)) || m.id == "bsgs.prime_mont4_v1" {
+        applicable(m, inst, curve)?;
+    }
     hyper_ic_variant_guard(m, inst, curve)?;
     let d = decl(&m.id).ok_or("unregistered method")?;
     three_leads_applicable(m, inst, curve)?;
+    // Self-hosted extension geometry from params; workload curve unused.
+    if m.id == "ic.diem_kgrow" {
+        let _ = (inst, curve, target, oracle);
+        return super::diem_kgrow::solve(m, seed);
+    }
+    if m.id == "ic.growing_arity" {
+        let _ = (inst, curve, target, oracle);
+        return super::growing_arity::solve(m, seed);
+    }
+    if m.id == "ic.aux_tower_solver" {
+        let _ = (inst, curve, target, oracle);
+        return super::aux_tower_solver::solve(m, seed);
+    }
     if m.id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
     }
@@ -3462,9 +4364,28 @@ pub fn solve_measured(
     // The phase clock: the methods open and close the online window, the
     // session turns it into exclusive phase times.
     let session = measurement::Session::begin().ok();
-    let mut rep = if let Instance::Wide(wi) = inst {
+    let mut rep = if let Instance::PrimeMont4(wi) = inst {
+        let target = wi.decode(target)?;
+        if m.id == "rho.negation" {
+            solve_generic(m, wi.as_ref(), wi.generator, target, wi.r, seed)?
+        } else {
+            let start = Instant::now();
+            measurement::begin_online(Phase::RhoSolve);
+            let outcome = super::prime_mont4::bsgs(wi, target);
+            let field_ops = field_ops_of(wi.as_ref(), &[outcome.setup, outcome.search]);
+            generic_report(outcome, start.elapsed().as_nanos() as u64, 1, field_ops)
+        }
+    } else if let Instance::Curve25519(wi) = inst {
+        match m.id.as_str() {
+            "ic.curve25519_pair_v1" => solve_curve25519_pair(m, wi, curve, target, seed)?,
+            "rho.curve25519_bounded" => solve_curve25519_bounded(m, wi, target, seed)?,
+            _ => return Err(format!("{} has no full-width Curve25519 adapter", m.id)),
+        }
+    } else if let Instance::Big(bi) = inst {
+        solve_big(m, bi, target, seed)?
+    } else if let Instance::Wide(wi) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
-        solve_wide(m, wi, tx, ty, seed)?
+        solve_wide(m, wi, curve, tx, ty, seed)?
     } else if let Instance::F2m4(i) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
         if m.id == NEG_STRONG {
@@ -3701,6 +4622,9 @@ fn solve_inner(
     if let Instance::Wide(_) = inst {
         return Err("a wide instance goes through solve_wide".into());
     }
+    if let Instance::Big(_) = inst {
+        return Err("a big instance goes through solve_big".into());
+    }
     if d.family == "cheon" {
         let Instance::Prime(i) = inst else {
             return Err(format!(
@@ -3712,6 +4636,18 @@ fn solve_inner(
     }
     if let Instance::Fp4(i) = inst {
         return solve_fp4(m, i, tx, ty, seed);
+    }
+    if let Instance::Fp3(i) = inst {
+        return solve_fp3(m, i, tx, ty, seed);
+    }
+    if let Instance::Hec(i) = inst {
+        return hec::solve(m, i, tx, ty, seed);
+    }
+    if m.id.starts_with("hec.") {
+        return Err(format!(
+            "`{}` runs on hec_thread curves only; {} is {}",
+            m.id, curve.slug, curve.family
+        ));
     }
     if let Instance::Ext(i) = inst {
         return solve_ext(m, i, tx, ty, seed);
@@ -3728,9 +4664,24 @@ fn solve_inner(
             m.id, curve.slug, curve.family
         ));
     }
+    if let Instance::Hec(i) = inst {
+        return hec::solve(m, i, tx, ty, seed);
+    }
+    if m.id.starts_with("hec.") {
+        return Err(format!(
+            "`{}` runs on hec_thread curves only; {} is {}",
+            m.id, curve.slug, curve.family
+        ));
+    }
     if m.id == "ic.k4_gaudry" {
         return Err(format!(
             "`ic.k4_gaudry` runs on fp4_translation curves only; {} is {}",
+            curve.slug, curve.family
+        ));
+    }
+    if m.id == "ic.k3_gaudry" {
+        return Err(format!(
+            "`ic.k3_gaudry` runs on fp3_random curves only; {} is {}",
             curve.slug, curve.family
         ));
     }
@@ -3747,6 +4698,12 @@ fn solve_inner(
         return solve_neg_strong(m, i, target, seed);
     }
     match (inst, d.family) {
+        (Instance::Binary(i), _) if m.id == "ic.orbit_rank_v1" => {
+            super::orbit_ic::solve_narrow(m, i, curve, FastPoint::affine(tx, ty), seed)
+        }
+        (Instance::Prime(i), _) if m.id == "ic.hashed_native_v1" => {
+            super::hashed_native::solve(m, i, PrimePoint::affine(tx, ty), seed)
+        }
         (Instance::Binary(i), _) if m.id.starts_with("jacobian_image.") => {
             solve_jacobian_image(m, i, FastPoint::affine(tx, ty), seed)
         }
@@ -3873,6 +4830,25 @@ fn solve_inner(
             solve_strong(m, i, FastPoint::affine(tx, ty), seed)
         }
         (Instance::Binary(i), "claw") => solve_claw(m, i, FastPoint::affine(tx, ty), seed),
+        (Instance::Binary(i), _) if m.id == "rho.signed_frobenius_v6" => {
+            let t = Instant::now();
+            measurement::begin_online(Phase::RhoSolve);
+            let res = signed_frobenius_rho_v3_partition_counted(
+                i,
+                FastPoint::affine(tx, ty),
+                seed,
+                rho_cap(i.r, param_u64(m, "cap_multiple")? as f64),
+                RhoV3::v6(true),
+            )
+            .ok_or("not a Koblitz instance")?;
+            measurement::end_online();
+            Ok(rho_report_v2(
+                res,
+                t.elapsed().as_nanos() as u64,
+                None,
+                GroupOps::default(),
+            ))
+        }
         (Instance::Binary(i), _) if m.id == "rho.signed_frobenius_v5" => {
             let t = Instant::now();
             measurement::begin_online(Phase::RhoSolve);
@@ -3885,6 +4861,15 @@ fn solve_inner(
             )
             .ok_or("not a Koblitz instance")?;
             measurement::end_online();
+            let mut res = res;
+            // The per-step jump-index selection, tallied as the strong
+            // reference tallies its partition hash (one per step), so the
+            // §5a band prices it alike (owner decision 2026-11-19,
+            // research/koblitz_rho_reference_20261115/DECISION.md).  A
+            // native counter only: the walk, the outcome and every group
+            // operation are unchanged.
+            res.counters
+                .insert(V5_JUMP_INDEX_COUNTER.into(), res.jump_index_selections);
             Ok(rho_report_v2(
                 res,
                 t.elapsed().as_nanos() as u64,
@@ -4109,14 +5094,19 @@ fn solve_inner(
             };
             solve_generic(m, &i.curve, i.generator, target, one_word(i.r)?, seed)
         }
-        (Instance::Wide(_), _)
+        (Instance::Curve25519(_), _)
+        | (Instance::PrimeMont4(_), _)
+        | (Instance::Wide(_), _)
+        | (Instance::Big(_), _)
         | (Instance::Fp4(_), _)
+        | (Instance::Fp3(_), _)
         | (Instance::ThreeLeads(_), _)
         | (Instance::Ext(_), _)
         | (Instance::Genus2(_), _)
         | (Instance::Quartic(_), _)
         | (Instance::Ghs(_), _)
-        | (Instance::Hyper(_), _) => {
+        | (Instance::Hyper(_), _)
+        | (Instance::Hec(_), _) => {
             unreachable!("returned above")
         }
     }
@@ -4143,6 +5133,21 @@ fn jacobian_phase(name: &str, ops: HcdlpGroupOps) -> PhaseRecord {
     }
 }
 
+fn jacobian_phase_timed(name: &str, ops: HcdlpGroupOps, wall_ns: u64) -> PhaseRecord {
+    PhaseRecord {
+        wall_ns: Some(wall_ns),
+        ..jacobian_phase(name, ops)
+    }
+}
+
+fn empty_timed_phase(name: &str, wall_ns: u64) -> PhaseRecord {
+    PhaseRecord {
+        name: name.into(),
+        wall_ns: Some(wall_ns),
+        ..Default::default()
+    }
+}
+
 /// Execute a named solver on the exact image of the certified same-field
 /// degree-three pullback. The planted logarithm is not an input. The solver
 /// verifies its candidate in the destination group and ecbench independently
@@ -4157,8 +5162,15 @@ fn solve_jacobian_image(
         return Err("jacobian-image adapter requires an affine target".into());
     }
     let started = Instant::now();
+    let nine_phase = matches!(
+        method.id.as_str(),
+        "jacobian_image.rho3_v2"
+            | "jacobian_image.bsgs_v2"
+            | "jacobian_image.genus3_projected_ic_v1"
+    );
     let field_tally_enabled = method.id.ends_with("_field_tally");
     let field_tally = field_tally_enabled.then(OperationTally::begin);
+    let construction_started = Instant::now();
     let cover = OrdinaryBinaryCover::new(
         inst.n,
         inst.irreducible.clone(),
@@ -4166,39 +5178,93 @@ fn solve_jacobian_image(
         F2mElement::from_biguint(&BigUint::from(inst.b), inst.n),
     )
     .map_err(|e| format!("constructing the certified genus-three cover: {e}"))?;
+    if nine_phase {
+        cover
+            .verify_certificate()
+            .map_err(|e| format!("verifying the genus-three cover certificate: {e}"))?;
+    }
+    let construction_wall_ns = construction_started.elapsed().as_nanos() as u64;
+
+    let forward_started = Instant::now();
     let source_generator = crate::binary_ecc::BinaryPoint::Affine {
         x: F2mElement::from_biguint(&BigUint::from(inst.generator.x), inst.n),
         y: F2mElement::from_biguint(&BigUint::from(inst.generator.y), inst.n),
     };
-    let image_generator = cover
-        .pullback_point_class(&source_generator)
-        .map_err(|e| format!("pulling the generator into the Jacobian: {e}"))?;
-
-    measurement::begin_online(Phase::RhoSolve);
     let source_target = crate::binary_ecc::BinaryPoint::Affine {
         x: F2mElement::from_biguint(&BigUint::from(target.x), inst.n),
         y: F2mElement::from_biguint(&BigUint::from(target.y), inst.n),
     };
-    let image_target = cover
-        .pullback_point_class(&source_target)
-        .map_err(|e| format!("pulling the target into the Jacobian: {e}"))?;
     let order = BigUint::from(inst.r);
-    let outcome = match method.id.as_str() {
-        "jacobian_image.bsgs" | "jacobian_image.bsgs_field_tally" => hcdlp_bsgs_counted(
-            &image_generator,
-            &image_target,
-            &order,
-            cover.source_curve(),
-        ),
-        "jacobian_image.rho3" | "jacobian_image.rho3_field_tally" => hcdlp_pollard_rho_counted(
-            &image_generator,
-            &image_target,
-            &order,
-            cover.source_curve(),
+    if nine_phase {
+        match cover
+            .subgroup_transfer_status(&order)
+            .map_err(|e| format!("checking the order-r pullback condition: {e}"))?
+        {
+            SubgroupTransferStatus::InjectiveIfExactSubgroupOrder { .. } => {}
+            SubgroupTransferStatus::KernelIntersectionUnresolved { common_factor, .. } => {
+                return Err(format!(
+                    "degree-three pullback does not certify injectivity: gcd(3,r)={common_factor}"
+                ))
+            }
+        }
+    }
+    let (image_generator, image_target) = if nine_phase {
+        let generator = cover
+            .pull_push_composition_certificate(&source_generator)
+            .map_err(|e| format!("certifying the generator pullback: {e}"))?;
+        let target = cover
+            .pull_push_composition_certificate(&source_target)
+            .map_err(|e| format!("certifying the target pullback: {e}"))?;
+        (generator.pullback, target.pullback)
+    } else {
+        (
+            cover
+                .pullback_point_class(&source_generator)
+                .map_err(|e| format!("pulling the generator into the Jacobian: {e}"))?,
+            cover
+                .pullback_point_class(&source_target)
+                .map_err(|e| format!("pulling the target into the Jacobian: {e}"))?,
+        )
+    };
+    let forward_wall_ns = forward_started.elapsed().as_nanos() as u64;
+
+    if method.id == "jacobian_image.genus3_projected_ic_v1" {
+        return solve_genus3_projected_ic(
+            method,
+            inst,
+            target,
             seed,
-            rho_cap(inst.r, param_u64(method, "cap_multiple")? as f64),
-            param_u64(method, "max_restarts")?,
-        ),
+            started,
+            cover,
+            image_generator,
+            image_target,
+            order,
+            construction_wall_ns,
+            forward_wall_ns,
+        );
+    }
+
+    measurement::begin_online(Phase::RhoSolve);
+    let outcome = match method.id.as_str() {
+        "jacobian_image.bsgs" | "jacobian_image.bsgs_field_tally" | "jacobian_image.bsgs_v2" => {
+            hcdlp_bsgs_counted(
+                &image_generator,
+                &image_target,
+                &order,
+                cover.source_curve(),
+            )
+        }
+        "jacobian_image.rho3" | "jacobian_image.rho3_field_tally" | "jacobian_image.rho3_v2" => {
+            hcdlp_pollard_rho_counted(
+                &image_generator,
+                &image_target,
+                &order,
+                cover.source_curve(),
+                seed,
+                rho_cap(inst.r, param_u64(method, "cap_multiple")? as f64),
+                param_u64(method, "max_restarts")?,
+            )
+        }
         other => return Err(format!("unknown Jacobian-image solver `{other}`")),
     }
     .map_err(|e| format!("destination Jacobian solver failed: {e}"))?;
@@ -4215,6 +5281,7 @@ fn solve_jacobian_image(
             .unwrap_or(0),
     });
 
+    let recovery_started = Instant::now();
     let recovered = outcome
         .recovered
         .as_ref()
@@ -4224,6 +5291,28 @@ fn solve_jacobian_image(
             })
         })
         .transpose()?;
+    let recovery_wall_ns = recovery_started.elapsed().as_nanos() as u64;
+
+    let source_verification_started = Instant::now();
+    let mut source_verification = GroupOps::default();
+    if nine_phase {
+        if let Some(value) = outcome.recovered.as_ref() {
+            let scalar = value
+                .to_u64()
+                .ok_or("destination solver returned a scalar wider than the source subgroup")?;
+            let replay = CountedGroup::mul(
+                &BinaryGroup(&inst.fast),
+                &mut source_verification,
+                inst.generator,
+                scalar,
+            );
+            if replay != target {
+                return Err("destination scalar failed charged source replay".into());
+            }
+        }
+    }
+    let source_verification_wall_ns = source_verification_started.elapsed().as_nanos() as u64;
+    let solve_wall_ns = started.elapsed().as_nanos() as u64;
     let native_operations = outcome
         .setup
         .operations()
@@ -4252,28 +5341,74 @@ fn solve_jacobian_image(
         counters.insert(format!("complete_route_{name}_uncharged"), count);
     }
     counters.retain(|_, value| *value > 0);
-    let phases = vec![
-        jacobian_phase("setup", outcome.setup),
-        jacobian_phase("search", outcome.search),
-        jacobian_phase("internal_verification", outcome.verification),
-    ];
+    let phases = if nine_phase {
+        let individually_clocked = construction_wall_ns
+            .saturating_add(forward_wall_ns)
+            .saturating_add(outcome.setup_wall_ns)
+            .saturating_add(outcome.search_wall_ns)
+            .saturating_add(outcome.verification_wall_ns)
+            .saturating_add(recovery_wall_ns)
+            .saturating_add(source_verification_wall_ns);
+        let setup_wall_ns = outcome
+            .setup_wall_ns
+            .saturating_add(solve_wall_ns.saturating_sub(individually_clocked));
+        let mut verification = jacobian_phase_timed(
+            "verification",
+            outcome.verification,
+            outcome
+                .verification_wall_ns
+                .saturating_add(source_verification_wall_ns),
+        );
+        verification.adds = source_verification.adds;
+        verification.doubles = source_verification.doubles;
+        verification.scalar_mults = source_verification.scalar_mults;
+        verification.gae = source_verification.gae();
+        verification.native.insert(
+            "source_verification_additions".into(),
+            source_verification.adds,
+        );
+        verification.native.insert(
+            "source_verification_doublings".into(),
+            source_verification.doubles,
+        );
+        vec![
+            empty_timed_phase("route_search", 0),
+            empty_timed_phase("construction", construction_wall_ns),
+            empty_timed_phase("forward_map", forward_wall_ns),
+            jacobian_phase_timed("solver_setup", outcome.setup, setup_wall_ns),
+            jacobian_phase_timed("relation_or_walk", outcome.search, outcome.search_wall_ns),
+            empty_timed_phase("linear_algebra", 0),
+            empty_timed_phase("individual_log_or_descent", 0),
+            empty_timed_phase("source_recovery", recovery_wall_ns),
+            verification,
+        ]
+    } else {
+        vec![
+            jacobian_phase("setup", outcome.setup),
+            jacobian_phase("search", outcome.search),
+            jacobian_phase("internal_verification", outcome.verification),
+        ]
+    };
+    let phase_wall_sum_ns = phases.iter().filter_map(|phase| phase.wall_ns).sum::<u64>();
+    let total_gae = phases.iter().map(|phase| phase.gae).sum();
     let unpriced = unpriced_of(&counters);
     Ok(SolveReport {
         recovered,
         exhausted: outcome.exhausted,
         phases,
-        // Deliberately zero until a versioned source-GAE conversion is
-        // supplied. `unpriced` makes the resulting record a lower bound.
-        total_gae: 0.0,
+        // The v2 adapters charge only the source replay. Destination work
+        // remains unpriced until a versioned source-GAE conversion exists,
+        // so `unpriced` keeps the record visibly a lower bound.
+        total_gae,
         automorphisms_used: 1,
         counters,
         unpriced,
         deterministic: true,
         nondeterminism: Vec::new(),
-        solve_wall_ns: started.elapsed().as_nanos() as u64,
+        solve_wall_ns,
         factor_base: None,
         detail: json!({
-            "adapter": "binary_cubic_pullback_v1",
+            "adapter": if nine_phase { "binary_cubic_pullback_nine_phase_v2" } else { "binary_cubic_pullback_v1" },
             "destination": "genus_3_jacobian_image",
             "destination_solver": method.id,
             "map_degree": 3,
@@ -4286,14 +5421,303 @@ fn solve_jacobian_image(
             },
             "inversion_count_includes_its_mul_and_square_cost": true,
             "complete_machine_instruction_count": false,
+            "nine_phase_cold_wall_complete": nine_phase,
+            "phase_wall_sum_ns": phase_wall_sum_ns,
             "source_gae_conversion": "unavailable",
             "destination_candidate_verified": recovered.is_some(),
-            "source_reverification": "performed independently by the ecbench runner"
+            "source_reverification": if nine_phase {
+                "performed and charged inside the adapter, then performed independently by the ecbench runner"
+            } else {
+                "performed independently by the ecbench runner"
+            }
         }),
         online: None,
         online_error: None,
         solver: None,
         field_ops,
+    })
+}
+
+#[allow(clippy::too_many_arguments)]
+fn solve_genus3_projected_ic(
+    method: &ResolvedMethod,
+    inst: &BinaryInstance,
+    target: FastPoint,
+    seed: u64,
+    route_started: Instant,
+    cover: OrdinaryBinaryCover,
+    image_generator: crate::binary_ecc::MumfordDivisor,
+    image_target: crate::binary_ecc::MumfordDivisor,
+    order: BigUint,
+    construction_wall_ns: u64,
+    forward_wall_ns: u64,
+) -> Result<SolveReport, String> {
+    let destination_started = Instant::now();
+    let number = |name: &str| -> Result<usize, String> {
+        usize::try_from(param_u64(method, name)?)
+            .map_err(|_| format!("parameter `{name}` does not fit usize"))
+    };
+    let fb_size = number("fb_size")?;
+    let extra_relations = number("extra_relations")?;
+    let branches = number("branches")?;
+    let d_step_in = param_u64(method, "d_step_in")?;
+    let max_trials = number("max_trials")?;
+    let threads = number("threads")?;
+    if fb_size > (1 << 24)
+        || extra_relations > (1 << 20)
+        || branches == 0
+        || branches > (1 << 20)
+        || d_step_in < 2
+        || max_trials == 0
+        || max_trials > 1_000_000_000
+        || !(1..=256).contains(&threads)
+    {
+        return Err(
+            "genus-3 projected IC parameters exceed their checked resource envelope".into(),
+        );
+    }
+
+    let params = BhecIndexCalculusParams {
+        fb_size,
+        extra_relations,
+        max_trials,
+        seed,
+        search:
+            crate::cryptanalysis::hyperelliptic_index_calculus::RelationSearch::FactorBaseWalk {
+                branches,
+                d_step_in,
+            },
+        linear_algebra: crate::cryptanalysis::hyperelliptic_index_calculus::LinearAlgebra::Sparse,
+        smoothness:
+            crate::cryptanalysis::binary_hyperelliptic_index_calculus::BhecSmoothnessTest::Trace,
+        threads,
+    };
+
+    // For every destination relation, phi_* maps the two image labels to
+    // [3]G and [3]Q.  Multiplication by the exact source cofactor maps every
+    // factor-base pushforward into the unique order-r subgroup because
+    // #E = h*r and r does not divide h.  Thus both known labels are scaled by
+    // 3h and every unknown column has a well-defined logarithm modulo r.
+    let exact_group_order = inst
+        .cofactor
+        .checked_mul(inst.r)
+        .ok_or("source cofactor times subgroup order overflows")?;
+    if exact_group_order != inst.group_order || inst.cofactor.is_multiple_of(inst.r) {
+        return Err(
+            "projected genus-3 IC requires exact #E=h*r with r occurring to the first power".into(),
+        );
+    }
+    let label_scale = BigUint::from(3u64) * BigUint::from(inst.cofactor);
+    if (&label_scale % &order).is_zero() {
+        return Err("cover degree times source cofactor vanishes modulo r".into());
+    }
+
+    let source_generator = crate::binary_ecc::BinaryPoint::Affine {
+        x: F2mElement::from_biguint(&BigUint::from(inst.generator.x), inst.n),
+        y: F2mElement::from_biguint(&BigUint::from(inst.generator.y), inst.n),
+    };
+    let source_target = crate::binary_ecc::BinaryPoint::Affine {
+        x: F2mElement::from_biguint(&BigUint::from(target.x), inst.n),
+        y: F2mElement::from_biguint(&BigUint::from(target.y), inst.n),
+    };
+    for (source, image, label) in [
+        (&source_generator, &image_generator, "generator"),
+        (&source_target, &image_target, "target"),
+    ] {
+        let typed = cover
+            .pull_push_composition_certificate(source)
+            .map_err(|e| format!("certifying projected-IC {label} composition: {e}"))?;
+        let general = cover
+            .jacobian_pushforward_certificate(image)
+            .map_err(|e| format!("certifying projected-IC {label} arbitrary pushforward: {e}"))?;
+        if general.general_pushforward != typed.formal_pushforward {
+            return Err(format!(
+                "projected-IC {label} arbitrary pushforward differs from the typed composition"
+            ));
+        }
+    }
+
+    measurement::begin_online(Phase::TargetQuery);
+    let (scalar, ic) = binary_hec_projected_index_calculus_dlp(
+        cover.source_curve(),
+        &image_generator,
+        &image_target,
+        &order,
+        &label_scale,
+        &params,
+        |stage| {
+            measurement::mark(match stage {
+                BhecIndexCalculusStage::FactorBase => Phase::TargetQuery,
+                BhecIndexCalculusStage::RelationCollection => Phase::TargetPdp,
+                BhecIndexCalculusStage::LinearAlgebra => Phase::TargetDescent,
+                BhecIndexCalculusStage::Verification => Phase::RecoveryCheck,
+            });
+        },
+    );
+    let destination_wall_ns = destination_started.elapsed().as_nanos() as u64;
+
+    let recovery_started = Instant::now();
+    let recovered = scalar
+        .as_ref()
+        .map(|value| {
+            ExactScalar::from_biguint(value).ok_or_else(|| {
+                "recovered scalar exceeds ecbench's 256-bit record width".to_string()
+            })
+        })
+        .transpose()?;
+    let recovery_wall_ns = recovery_started.elapsed().as_nanos() as u64;
+
+    measurement::mark(Phase::RecoveryCheck);
+    let source_verification_started = Instant::now();
+    let mut source_verification = GroupOps::default();
+    if let Some(value) = scalar.as_ref() {
+        let value = value
+            .to_u64()
+            .ok_or("genus-3 solver returned a scalar wider than the source subgroup")?;
+        let replay = CountedGroup::mul(
+            &BinaryGroup(&inst.fast),
+            &mut source_verification,
+            inst.generator,
+            value,
+        );
+        if replay != target {
+            return Err("genus-3 projected IC scalar failed charged source replay".into());
+        }
+    }
+    let source_verification_wall_ns = source_verification_started.elapsed().as_nanos() as u64;
+    measurement::end_online();
+
+    let relation_wall_ns = ic.relation_collection_wall_ns;
+    let linear_algebra_wall_ns = ic.solve_wall_ns;
+    let destination_verification_wall_ns = ic.verification_wall_ns;
+    let named_destination_wall_ns = relation_wall_ns
+        .saturating_add(linear_algebra_wall_ns)
+        .saturating_add(destination_verification_wall_ns);
+    let mut solver_setup_wall_ns = destination_wall_ns.saturating_sub(named_destination_wall_ns);
+    let solve_wall_ns = route_started.elapsed().as_nanos() as u64;
+    let named_route_wall_ns = construction_wall_ns
+        .saturating_add(forward_wall_ns)
+        .saturating_add(destination_wall_ns)
+        .saturating_add(recovery_wall_ns)
+        .saturating_add(source_verification_wall_ns);
+    solver_setup_wall_ns =
+        solver_setup_wall_ns.saturating_add(solve_wall_ns.saturating_sub(named_route_wall_ns));
+
+    let setup_ops = HcdlpGroupOps {
+        additions: ic.precompute_ops as u64,
+        ..Default::default()
+    };
+    let relation_ops = HcdlpGroupOps {
+        additions: ic.jacobian_ops.saturating_sub(ic.precompute_ops) as u64,
+        ..Default::default()
+    };
+    let destination_verification_ops = HcdlpGroupOps {
+        additions: ic.verification_adds as u64,
+        doublings: ic.verification_doubles as u64,
+        scalar_multiplications: u64::from(recovered.is_some()),
+    };
+    let mut verification = jacobian_phase_timed(
+        "verification",
+        destination_verification_ops,
+        destination_verification_wall_ns.saturating_add(source_verification_wall_ns),
+    );
+    verification.adds = source_verification.adds;
+    verification.doubles = source_verification.doubles;
+    verification.scalar_mults = source_verification.scalar_mults;
+    verification.gae = source_verification.gae();
+    verification.native.insert(
+        "source_verification_additions".into(),
+        source_verification.adds,
+    );
+    verification.native.insert(
+        "source_verification_doublings".into(),
+        source_verification.doubles,
+    );
+    let mut linear_algebra = empty_timed_phase("linear_algebra", linear_algebra_wall_ns);
+    linear_algebra
+        .native
+        .insert("modular_row_operations".into(), ic.solve_row_ops as u64);
+    let mut solver_setup = jacobian_phase_timed("solver_setup", setup_ops, solver_setup_wall_ns);
+    solver_setup
+        .native
+        .insert("factor_base_columns".into(), ic.factor_base_size as u64);
+    solver_setup
+        .native
+        .insert("factor_base_wall_ns".into(), ic.factor_base_wall_ns);
+    let phases = vec![
+        empty_timed_phase("route_search", 0),
+        empty_timed_phase("construction", construction_wall_ns),
+        empty_timed_phase("forward_map", forward_wall_ns),
+        solver_setup,
+        jacobian_phase_timed("relation_or_walk", relation_ops, relation_wall_ns),
+        linear_algebra,
+        empty_timed_phase("individual_log_or_descent", 0),
+        empty_timed_phase("source_recovery", recovery_wall_ns),
+        verification,
+    ];
+    let phase_wall_sum_ns = phases.iter().filter_map(|phase| phase.wall_ns).sum::<u64>();
+    let total_gae = phases.iter().map(|phase| phase.gae).sum();
+    let mut counters = BTreeMap::from([
+        ("cover_constructions_uncharged".into(), 1),
+        ("cover_pullbacks_uncharged".into(), 2),
+        ("arbitrary_pushforward_certificates_uncharged".into(), 2),
+        ("factor_base_columns".into(), ic.factor_base_size as u64),
+        ("relation_trials_uncharged".into(), ic.trials as u64),
+        ("smooth_relations".into(), ic.smooth_trials as u64),
+        ("retained_relations".into(), ic.relations as u64),
+        (
+            "jacobian_group_operations_uncharged".into(),
+            (ic.jacobian_ops + ic.verification_adds + ic.verification_doubles) as u64,
+        ),
+        ("smoothness_oracle_calls_uncharged".into(), ic.trials as u64),
+        (
+            "linear_algebra_row_ops_uncharged".into(),
+            ic.solve_row_ops as u64,
+        ),
+    ]);
+    counters.retain(|_, count| *count > 0);
+    let unpriced = unpriced_of(&counters);
+    Ok(SolveReport {
+        recovered,
+        exhausted: !ic.solved,
+        phases,
+        total_gae,
+        automorphisms_used: 1,
+        counters,
+        unpriced,
+        deterministic: true,
+        nondeterminism: Vec::new(),
+        solve_wall_ns,
+        factor_base: None,
+        detail: json!({
+            "adapter": "binary_cubic_pullback_projected_ic_nine_phase_v1",
+            "destination": "genus_3_jacobian_image",
+            "destination_solver": method.id,
+            "solver_family": "characteristic_two_hyperelliptic_index_calculus",
+            "map_degree": 3,
+            "source_cofactor": inst.cofactor,
+            "relation_label_scale": label_scale.to_string(),
+            "projection_contract": "apply phi_* to every destination relation and clear the exact source cofactor; factor-base images then lie in the unique order-r source subgroup, while pulled-back G and Q acquire the common label scale 3h",
+            "projection_runtime_check": "the arbitrary-class pushforward certificate matched the typed phi_*phi^*=[3] composition for both generator and target",
+            "factor_base_kind": "seeded degree-one places on the exact genus-3 cover",
+            "factor_base_size": ic.factor_base_size,
+            "relation_trials": ic.trials,
+            "smooth_relations": ic.smooth_trials,
+            "retained_relations": ic.relations,
+            "linear_algebra": "sparse Markowitz-lite elimination modulo r",
+            "linear_algebra_row_ops": ic.solve_row_ops,
+            "destination_candidate_verified": ic.solved,
+            "native_operation_unit": "Cantor additions/doublings in Jac(H)(F_2^m), modular row operations, and characteristic-two smoothness calls",
+            "source_gae_conversion": "unavailable",
+            "nine_phase_cold_wall_complete": true,
+            "phase_wall_sum_ns": phase_wall_sum_ns,
+            "source_reverification": "performed and charged inside the adapter when a candidate exists, then performed independently by the ecbench runner",
+            "exhaustion_is_evidence": true,
+        }),
+        online: None,
+        online_error: None,
+        solver: None,
+        field_ops: None,
     })
 }
 
@@ -5096,7 +6520,16 @@ fn solve_hyper_ic(
         detail,
         online: None,
         online_error: None,
-        solver: None,
+        // Markowitz sparse elimination mod r, not a polynomial-system solve:
+        // no degree story, only the relation matrix's column count.
+        solver: Some(SolverStats::relation_block(
+            "markowitz-sparse",
+            "sparse-la",
+            None,
+            None,
+            Some(columns),
+            None,
+        )),
         // HCurve does not tally the field work inside a Cantor step.
         field_ops: None,
     })
@@ -5191,6 +6624,106 @@ fn solve_endo_orbit<G: CountedGroup, E: Endomorphism<G>>(
         d.extend(c);
     }
     Ok(rep)
+}
+
+/// The checked parameters of `ic.k3_gaudry`.
+fn k3_params(m: &ResolvedMethod) -> Result<K3Params, String> {
+    use crate::cryptanalysis::gaudry_cubic::{Harvester, Solver};
+    let harvester = match m.params["harvester"].as_str() {
+        "eliminator" => Harvester::Eliminator,
+        "cycles" => Harvester::Cycles,
+        other => return Err(format!("harvester `{other}`: eliminator or cycles")),
+    };
+    let max_lp = match (m.params["max_lp"].as_str(), harvester) {
+        ("auto", Harvester::Eliminator) => 2,
+        ("auto", Harvester::Cycles) => 3,
+        (v, _) => v
+            .parse::<u8>()
+            .ok()
+            .filter(|&k| (1..=3).contains(&k))
+            .ok_or_else(|| format!("max_lp `{v}`: auto, 1, 2 or 3"))?,
+    };
+    if harvester == Harvester::Eliminator && max_lp > 2 {
+        return Err("the eliminator takes at most two large primes per relation".into());
+    }
+    let lp_exponent = param_f64(m, "lp_exponent")?;
+    if lp_exponent >= 1.0 {
+        return Err("lp_exponent must be below 1".into());
+    }
+    let solver = match m.params["oracle"].as_str() {
+        "groebner" => Solver::Groebner,
+        "mitm" => Solver::MeetInTheMiddle,
+        other => return Err(format!("oracle `{other}`: groebner or mitm")),
+    };
+    let trial_cap_per_column = param_u64(m, "trial_cap")?;
+    if trial_cap_per_column == 0 {
+        return Err("trial_cap must be positive".into());
+    }
+    Ok(K3Params {
+        harvester,
+        max_lp,
+        lp_exponent,
+        solver,
+        trial_cap_per_column,
+    })
+}
+
+/// `E(F_{p³})`: `ic.k3_gaudry`, or a generic method on [`Fp3Group`].
+fn solve_fp3(
+    m: &ResolvedMethod,
+    i: &Fp3Instance,
+    tx: u64,
+    ty: u64,
+    seed: u64,
+) -> Result<SolveReport, String> {
+    let target = i.decode(tx, ty)?;
+    if m.id != "ic.k3_gaudry" {
+        if !(m.id.starts_with("rho.plain")
+            || m.id == "rho.negation"
+            || m.id == "rho.negation_v2"
+            || m.id.starts_with("bsgs.")
+            || m.id == "kangaroo.vow"
+            || m.id == "kangaroo.vow_v2")
+        {
+            return Err(format!("`{}` has no E(F_p³) implementation", m.id));
+        }
+        let g = Fp3Group(i.curve());
+        return solve_generic(m, &g, i.g, target, i.r, seed);
+    }
+    let prm = k3_params(m)?;
+    let t = Instant::now();
+    measurement::begin_online(Phase::RhoSolve);
+    let out = fp3::solve_k3(i, target, seed, &prm);
+    measurement::end_online();
+    let phases: Vec<PhaseRecord> = out
+        .phases
+        .iter()
+        .map(|&(name, adds, gae)| PhaseRecord {
+            name: name.into(),
+            adds,
+            gae,
+            ..Default::default()
+        })
+        .collect();
+    let total = phases.iter().map(|p| p.gae).sum();
+    Ok(SolveReport {
+        recovered: out.recovered.map(ExactScalar::from),
+        exhausted: out.exhausted,
+        phases,
+        total_gae: total,
+        automorphisms_used: 2,
+        unpriced: unpriced_of(&out.counters),
+        counters: out.counters,
+        deterministic: true,
+        nondeterminism: vec![],
+        solve_wall_ns: t.elapsed().as_nanos() as u64,
+        factor_base: None,
+        detail: out.detail,
+        online: None,
+        online_error: None,
+        solver: None,
+        field_ops: None,
+    })
 }
 
 /// `E(F_{p⁴})`: `ic.k4_gaudry`, or a generic method on [`Fp4Group`].
@@ -5583,6 +7116,12 @@ fn online_window(family: &str, id: &str, snap: &Snapshot) -> Option<OnlineWindow
         w.start_event = "first target-dependent operation (G + Q and the online stride) after the target-blind jump table and distinguished-point table are complete".into();
         w.mapping = "preprocessing rho: the online walks on the precomputation's map, table lookups at distinguished points, and final [d]G=Q verification".into();
     }
+    if id == "bsgs.negation_table_v2" {
+        w.start_event = "first target-dependent giant-step lookup after the G-only negation baby table and giant stride are complete".into();
+        w.stop_event = "[d]G = Q verified inside the method".into();
+        w.included_stages = vec!["giant_steps".into(), "recovery_check".into()];
+        w.mapping = "cached BSGS: setup and table inserts are reusable and excluded from the online clock; giant steps, table lookups, collision recovery, and final scalar replay are per-target and inside it".into();
+    }
     Some(w)
 }
 
@@ -5620,7 +7159,7 @@ fn solve_claw(
     }
     .ok_or("not a Koblitz instance")?;
     let wall = t.elapsed().as_nanos() as u64;
-    Ok(claw_report(o, shape, u128::from(inst.r), inst.n, wall, v2))
+    Ok(claw_report(o, shape, inst.r as f64, inst.n, wall, v2))
 }
 
 /// The claw on a wide Koblitz curve; the step budget is [`rho_cap`]'s rule
@@ -5649,13 +7188,13 @@ fn solve_claw_wide(
         pair_claw_wide(wi, target, seed, shape)
     };
     let wall = t.elapsed().as_nanos() as u64;
-    Ok(claw_report(o, shape, wi.kc.r, wi.kc.n, wall, v2))
+    Ok(claw_report(o, shape, wi.kc.r as f64, wi.kc.n, wall, v2))
 }
 
 fn claw_report(
     o: ClawOutcome,
     shape: ClawShape,
-    r: u128,
+    r: f64,
     n: u32,
     wall: u64,
     v2: bool,
@@ -5681,7 +7220,7 @@ fn claw_report(
         detail["accounting"] = json!("v2");
     }
     SolveReport {
-        recovered: o.recovered.map(ExactScalar::from),
+        recovered: o.recovered,
         exhausted: o.exhausted,
         phases,
         total_gae: total,
@@ -5852,7 +7391,7 @@ fn strong_run_v2<F: RhoField, S: RhoScalar>(
     let (recovered, c, walk_steps, walks, fruitless, capped, wasted, entries, automorphisms, lost) =
         match &outcome {
             Ok(o) => (
-                Some(o.scalar.to_u128()),
+                ExactScalar::from_biguint(&o.scalar.to_biguint()),
                 o.charges,
                 o.walk_steps,
                 o.walks,
@@ -5945,7 +7484,7 @@ fn strong_run_v2<F: RhoField, S: RhoScalar>(
         "scalar_multiplication_charge": "1.5·log2(r) additions each for the two start multiplications and every candidate check (ic_boundary::signed_frobenius_rho's convention); the start multiples j·stride are charged as additions",
     });
     Ok(SolveReport {
-        recovered: recovered.map(ExactScalar::from),
+        recovered,
         exhausted: recovered.is_none(),
         phases,
         total_gae,
@@ -6072,7 +7611,7 @@ fn strong_run<F: RhoField, S: RhoScalar>(
         counters.insert("fruitless_escapes".to_string(), o.escapes);
     }
     Ok(SolveReport {
-        recovered: Some(ExactScalar::from(o.scalar.to_u128())),
+        recovered: ExactScalar::from_biguint(&o.scalar.to_biguint()),
         exhausted: false,
         total_gae: setup.gae + search.gae,
         phases: vec![setup, search],
@@ -6122,7 +7661,7 @@ pub const PRICED_NATIVE: &[(&str, &str)] = &[
     ("target_guard_probes", "ns_per_lookup"),
 ];
 
-fn phase_of(name: &str, p: &PhaseCost) -> PhaseRecord {
+pub(crate) fn phase_of(name: &str, p: &PhaseCost) -> PhaseRecord {
     PhaseRecord {
         name: name.into(),
         adds: p.group_ops.adds,
@@ -6160,6 +7699,17 @@ fn ic_report(
     // (`audit::legacy_solver_rounding` reproduces those records).
     let mut total = rep.total_gae;
     if let Some(s) = &rep.decomposition.solver {
+        // New opt-in Boolean variants retain their exact Gray search work
+        // separately from calibrated Macaulay word XORs. A reduction in the
+        // latter must not silently price the tail enumeration at zero.
+        for name in [
+            "quadratic_tail_assignments_uncharged",
+            "generalized_assignments_uncharged",
+        ] {
+            if let Some(&count) = s.extra.get(name).filter(|&&count| count > 0) {
+                phases[2].native.insert(name.into(), count);
+            }
+        }
         // `counted` (field multiplications priced at the curve's own
         // multiplications per addition, `gaudry-d4`) is a count, like
         // `pinned`, and stays in the total.
@@ -6230,7 +7780,26 @@ fn ic_report(
             automorphisms,
         )
     });
-    let detail = json!({
+    // GroupOps already tallies prime field arithmetic in the group law and
+    // in instrumented oracles such as rootfind-subtract.  Keep that partial
+    // tally visible by phase without promoting it to SolveReport::field_ops:
+    // factor-base lifts, native tests, and elimination still have separate
+    // accounting, and some of their field work is not in GroupOps.
+    let phase_field_ops = [
+        ("factor_base", rep.factor_base.cost.group_ops.field_ops),
+        ("oracle_setup", rep.decomposition.setup.group_ops.field_ops),
+        ("relations", rep.decomposition.cost.group_ops.field_ops),
+        (
+            "linear_algebra",
+            rep.linear_algebra.cost.group_ops.field_ops,
+        ),
+        ("verify", rep.verify.group_ops.field_ops),
+    ];
+    let mut counted_field_ops = FieldOps::default();
+    for (_, ops) in phase_field_ops {
+        counted_field_ops.merge(ops);
+    }
+    let mut detail = json!({
         "label": rep.label,
         "decomposition": {
             "name": rep.decomposition.name,
@@ -6243,6 +7812,18 @@ fn ic_report(
         "calibration_pinned_units": calib.pinned_units,
         "framework_total_gae_before_solver_removal": rep.total_gae,
     });
+    if counted_field_ops != FieldOps::default() {
+        detail["counted_field_ops"] = json!({
+            "schema": "ecbench.counted-field-ops/v1",
+            "scope": "instrumented GroupOps arithmetic only; incomplete pipeline field cost",
+            "complete": false,
+            "phases": phase_field_ops.iter().map(|(name, ops)| json!({
+                "name": name,
+                "field_ops": ops,
+            })).collect::<Vec<_>>(),
+            "total": counted_field_ops,
+        });
+    }
     SolveReport {
         recovered: rep.recovered.map(ExactScalar::from),
         exhausted: rep.exhausted,
@@ -6734,7 +8315,21 @@ fn solve_ic_prime(
     let mut rootfind_mitm = RootfindMitmOracle::new(ms);
     let mut rootfind_mitm_batch = RootfindMitmOracle::new_prime_batch(ms);
     let mut rootfind_pairs = RootfindPairsOracle::new(ms);
+    let mut semaev_projection = SemaevProjectionOracle::new(ms);
+    let mut residual_sweep = ResidualSweepOracle::new();
     let mut rootfind = RootfindSubtractOracle::new(ms, inst);
+    let mut rootfind_floor = if or_name == "rootfind-floor-batch-v1" {
+        RootfindFloorOracle::new_batch_v1(ms, inst)
+    } else {
+        RootfindFloorOracle::new(ms, inst)
+    };
+    let mut rootfind_kmitm = if or_name == "rootfind-kmitm-batch-v1" {
+        RootfindKMitmOracle::new_prime_batch_v1(ms, inst)
+    } else {
+        RootfindKMitmOracle::new_prime(ms, inst)
+    };
+    let mut rootfind_gpu =
+        crate::cryptanalysis::ic_framework::rootfind_gpu::RootfindSubtractGpuOracle::new(ms, inst);
     let mut plugin_oracle = prime_plugins().and_then(|p| (p.oracle)(or_name.as_str(), ms, inst));
     // `pkm-semaev` writes its system on the base's own tower; the shared
     // constructor rebuilds it from the base's spec (`ic bench` uses the same).
@@ -6759,7 +8354,12 @@ fn solve_ic_prime(
         "rootfind-mitm" => &mut rootfind_mitm,
         "rootfind-mitm-prime-batch" => &mut rootfind_mitm_batch,
         "rootfind-pairs" => &mut rootfind_pairs,
+        "semaev-projection" => &mut semaev_projection,
+        "residual-sweep" => &mut residual_sweep,
         "rootfind-subtract" => &mut rootfind,
+        "rootfind-floor" | "rootfind-floor-batch-v1" => &mut rootfind_floor,
+        "rootfind-kmitm" | "rootfind-kmitm-batch-v1" => &mut rootfind_kmitm,
+        "rootfind-subtract-gpu" => &mut rootfind_gpu,
         other => match plugin_oracle.as_deref_mut() {
             Some(o) => o,
             None => return Err(format!("oracle `{other}` does not run on a prime curve")),
@@ -7532,6 +9132,19 @@ fn solve_ic_binary(
     let mut oracle_box: Box<dyn DecompositionOracle<BinaryGroup> + '_> = match or_name.as_str() {
         "subtract" => Box::new(SubtractOracle),
         "mitm" => Box::new(MitmOracle::new(ms)),
+        "mitm-coset" => Box::new(FiberMitmOracle::new(ms)),
+        // Generic over the group: one probe a target into the negation-folded
+        // table of every signed m-sum of the base (as on prime curves).
+        // Restored from d87eb39548 (lost in the 2026-11-16 merges).
+        "ksum" => Box::new(KSumOracle::new(ms)),
+        // Restored: present in 2476332d22 (the binary k-sum study's build) and
+        // lost from main since, which made `ksum` refuse binary curves.
+        "wwalk" => Box::new(WWalkOracle::<FastPoint>::new()),
+        // Koblitz: the same probe into a table folded by the signed
+        // Frobenius as well, over a Frobenius-closed base.
+        "ksum-frobenius" => Box::new(
+            crate::cryptanalysis::ic_framework::plugins::FrobeniusKSumOracle::new(ms, inst),
+        ),
         "mitm-frobenius" => Box::new(FrobeniusMitmOracle::new(ms, inst)),
         "mitm-frobenius-counted" => Box::new(FrobeniusMitmOracle::new_counted(ms, inst)),
         "mitm-frobenius-lazy-counted" => Box::new(FrobeniusMitmOracle::new_lazy_counted(ms, inst)),
@@ -7827,10 +9440,15 @@ fn solve_koblitz_descent(
     let q = inst.fast.lower(target);
     let started = Instant::now();
     let top_layout = m.id == "ic.koblitz_descent_v2";
-    let out = if top_layout {
-        koblitz_descent::run_top(kc, &q, &p)?
-    } else {
-        koblitz_descent::run(kc, &q, &p)?
+    let store = koblitz_descent::log_store_dir(&m.params)?;
+    let (out, log_table) = match &store {
+        // Opt-in only: a factor-base log store (`log_store=<dir|env>`).
+        Some(dir) => {
+            let (out, prov) = koblitz_descent::run_stored(kc, &q, &p, top_layout, dir)?;
+            (out, Some(prov))
+        }
+        None if top_layout => (koblitz_descent::run_top(kc, &q, &p)?, None),
+        None => (koblitz_descent::run(kc, &q, &p)?, None),
     };
     let wall = started.elapsed().as_nanos() as u64;
     if !out.single_thread {
@@ -7939,10 +9557,28 @@ fn solve_koblitz_descent(
         nondeterminism: Vec::new(),
         solve_wall_ns: wall,
         factor_base: Some(facts),
-        detail: koblitz_filter_detail(koblitz_descent::detail_of(&out, &p), top_layout),
+        detail: {
+            let mut d = koblitz_filter_detail(koblitz_descent::detail_of(&out, &p), top_layout);
+            // Only with a store: where the log table came from.  A
+            // `log_table_source: "store"` run is amortized, and the runner
+            // moves its cost off the cold fields (`Cost::s_store`).
+            if let Some(prov) = log_table {
+                d["log_table"] = prov;
+            }
+            d
+        },
         online,
         online_error,
-        solver: None,
+        // Sparse logs mod r (block Wiedemann), not a polynomial-system solve:
+        // no degree story, only the relation-phase figures.
+        solver: Some(SolverStats::relation_block(
+            "block-wiedemann",
+            "sparse-la",
+            Some(c.relations_accepted as u64),
+            None,
+            Some(c.columns as u64),
+            c.sparse.as_ref().map(|r| r.core_dimension as u64),
+        )),
         field_ops: None,
     })
 }
@@ -8483,7 +10119,13 @@ pub fn dump_factor_base(
         _ => None,
     };
     let (name, params) = Params::parse_spec(fb_spec)?;
-    if let Instance::Wide(_) = &inst {
+    if let Instance::Curve25519(_) = &inst {
+        return Err("no full-width Curve25519 factor-base plug-in is registered".into());
+    }
+    if let Instance::PrimeMont4(_) = &inst {
+        return Err("no prime_mont4 factor-base or index-calculus adapter is registered".into());
+    }
+    if let Instance::Wide(_) | Instance::Big(_) = &inst {
         return Err("no factor-base plug-in runs on a wide (n > 62) curve yet".into());
     }
     if matches!(
@@ -8491,6 +10133,9 @@ pub fn dump_factor_base(
         Instance::Fp4(_) | Instance::Fp4Torsion(_) | Instance::F2m4(_)
     ) {
         return Err("no factor-base plug-in runs on E(F_p⁴); ic.k4_gaudry builds its own".into());
+    }
+    if let Instance::Fp3(_) = &inst {
+        return Err("no factor-base plug-in runs on E(F_p³); ic.k3_gaudry builds its own".into());
     }
     if let Instance::Ghs(_) = &inst {
         return Err("no factor-base plug-in runs on a ghs_fp6 curve".into());
@@ -8503,10 +10148,10 @@ pub fn dump_factor_base(
     if let Instance::Ext(_) = &inst {
         return Err("no factor-base plug-in runs on a gls_fp2 or subfield_fp3 curve".into());
     }
-    if let Instance::Hyper(_) = &inst {
+    if let Instance::Hec(_) | Instance::Hyper(_) = &inst {
         return Err("no factor-base plug-in runs on a hyperelliptic Jacobian".into());
     }
-    if let Instance::Fp4Torsion(_) | Instance::F2m4(_) = &inst {
+    if let Instance::Fp4Torsion(_) | Instance::F2m4(_) | Instance::Hec(_) = &inst {
         return Err("factor-base dumps cover prime and binary curves".into());
     }
     match &inst {
@@ -8624,8 +10269,12 @@ pub fn dump_factor_base(
                 build_doubles: total.doubles,
             })
         }
-        Instance::Wide(_)
+        Instance::Curve25519(_)
+        | Instance::PrimeMont4(_)
+        | Instance::Wide(_)
+        | Instance::Big(_)
         | Instance::Fp4(_)
+        | Instance::Fp3(_)
         | Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
         | Instance::ThreeLeads(_)
@@ -8633,13 +10282,76 @@ pub fn dump_factor_base(
         | Instance::Genus2(_)
         | Instance::Quartic(_)
         | Instance::Ghs(_)
-        | Instance::Hyper(_) => unreachable!("returned above"),
+        | Instance::Hyper(_)
+        | Instance::Hec(_) => unreachable!("returned above"),
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn prime_mont4_dispatch_and_refusals() {
+        use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
+        let spec = CurveSpec::PrimeMont4Explicit {
+            p: "223".into(),
+            a: "74".into(),
+            b: "122".into(),
+            group_order: "205".into(),
+            r: 41,
+            gx: "119".into(),
+            gy: "198".into(),
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        for id in ["rho.negation", "bsgs.prime_mont4_v1"] {
+            let method = resolve(&MethodSpec {
+                id: id.into(),
+                params: BTreeMap::new(),
+            })
+            .unwrap();
+            applicable(&method, &inst, &facts).unwrap();
+            for index in 0..8 {
+                let workload =
+                    Workload::on(&spec, &inst, 20261118, index, TargetKind::PlantedShared).unwrap();
+                let first = solve(&method, &inst, &facts, &workload.target, 17).unwrap();
+                let replay = solve(&method, &inst, &facts, &workload.target, 17).unwrap();
+                assert_eq!(first.recovered, workload.planted);
+                assert_eq!(first.recovered, replay.recovered);
+                assert_eq!(first.counters, replay.counters);
+                assert_eq!(first.total_gae, replay.total_gae);
+                assert!(first.field_ops.is_some());
+            }
+        }
+        let method = resolve(&MethodSpec {
+            id: "bsgs.textbook".into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        assert!(applicable(&method, &inst, &facts)
+            .unwrap_err()
+            .contains("no prime_mont4 adapter"));
+        assert!(dump_factor_base(&spec, "prime-abscissa:size=8")
+            .unwrap_err()
+            .contains("no prime_mont4"));
+        let narrow = CurveSpec::PrimeExplicit {
+            p: 223,
+            a: 74,
+            b: 122,
+            group_order: 205,
+            r: 41,
+            gx: 119,
+            gy: 198,
+        };
+        let narrow_inst = narrow.build().unwrap();
+        let exact = resolve(&MethodSpec {
+            id: "bsgs.prime_mont4_v1".into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        assert!(applicable(&exact, &narrow_inst, &narrow_inst.facts(&narrow)).is_err());
+    }
 
     #[test]
     fn solve_report_preserves_full_width_recovery_and_legacy_encoding() {
@@ -8750,6 +10462,135 @@ mod tests {
     }
 
     #[test]
+    fn v2_jacobian_image_adapters_emit_complete_nine_phase_wall_and_source_replay() {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+        let spec = CurveSpec::Koblitz { a: 0, n: 7 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Binary(binary) = &inst else {
+            unreachable!()
+        };
+        let scalar = 13u64;
+        let target = binary.fast.mul_u64(binary.generator, scalar);
+        let coordinates = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
+        for id in ["jacobian_image.rho3_v2", "jacobian_image.bsgs_v2"] {
+            let method = resolve(&MethodSpec {
+                id: id.into(),
+                params: BTreeMap::new(),
+            })
+            .unwrap();
+            let report = solve(&method, &inst, &facts, &coordinates, 0x83_03).unwrap();
+            assert_eq!(
+                report.recovered,
+                Some(ExactScalar::from(u128::from(scalar)))
+            );
+            assert!(!report.exhausted);
+            assert_eq!(
+                report
+                    .phases
+                    .iter()
+                    .map(|phase| phase.name.as_str())
+                    .collect::<Vec<_>>(),
+                vec![
+                    "route_search",
+                    "construction",
+                    "forward_map",
+                    "solver_setup",
+                    "relation_or_walk",
+                    "linear_algebra",
+                    "individual_log_or_descent",
+                    "source_recovery",
+                    "verification"
+                ]
+            );
+            assert!(report.phases.iter().all(|phase| phase.wall_ns.is_some()));
+            assert_eq!(
+                report
+                    .phases
+                    .iter()
+                    .filter_map(|phase| phase.wall_ns)
+                    .sum::<u64>(),
+                report.solve_wall_ns
+            );
+            assert!(report.total_gae > 0.0);
+            assert!(report
+                .unpriced
+                .contains(&"jacobian_group_operations_uncharged".into()));
+            assert_eq!(report.detail["nine_phase_cold_wall_complete"], true);
+            assert_eq!(
+                report.detail["source_reverification"],
+                "performed and charged inside the adapter, then performed independently by the ecbench runner"
+            );
+        }
+    }
+
+    #[test]
+    fn projected_genus3_ic_recovers_through_the_exact_cover_image() {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+        let spec = CurveSpec::Koblitz { a: 0, n: 7 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Binary(binary) = &inst else {
+            unreachable!()
+        };
+        let scalar = 13u64;
+        let target = binary.fast.mul_u64(binary.generator, scalar);
+        let coordinates = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
+        let method = resolve(&MethodSpec {
+            id: "jacobian_image.genus3_projected_ic_v1".into(),
+            params: [
+                ("fb_size", "32"),
+                ("extra_relations", "8"),
+                ("branches", "32"),
+                ("d_step_in", "4"),
+                ("max_trials", "200000"),
+                ("threads", "1"),
+            ]
+            .into_iter()
+            .map(|(name, value)| (name.into(), value.into()))
+            .collect(),
+        })
+        .unwrap();
+        let report = solve(&method, &inst, &facts, &coordinates, 0x83_03).unwrap();
+        assert_eq!(report.recovered, Some(ExactScalar::from(scalar as u128)));
+        assert!(!report.exhausted);
+        assert_eq!(report.detail["relation_label_scale"], "12");
+        assert_eq!(report.detail["destination_candidate_verified"], true);
+        assert_eq!(
+            report
+                .phases
+                .iter()
+                .map(|phase| phase.name.as_str())
+                .collect::<Vec<_>>(),
+            vec![
+                "route_search",
+                "construction",
+                "forward_map",
+                "solver_setup",
+                "relation_or_walk",
+                "linear_algebra",
+                "individual_log_or_descent",
+                "source_recovery",
+                "verification"
+            ]
+        );
+        assert_eq!(
+            report
+                .phases
+                .iter()
+                .filter_map(|phase| phase.wall_ns)
+                .sum::<u64>(),
+            report.solve_wall_ns
+        );
+        assert!(report.total_gae > 0.0);
+        assert!(report
+            .unpriced
+            .contains(&"linear_algebra_row_ops_uncharged".into()));
+    }
+
+    #[test]
     fn best2_model_registry_prime_recovery_and_replay() {
         use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
         let spec = CurveSpec::PrimeSearch {
@@ -8776,7 +10617,7 @@ mod tests {
                     Workload::build(&spec, 20261027, index, TargetKind::Planted).unwrap();
                 let a = solve(&m, &inst, &w.curve, &w.target, index + 1).unwrap();
                 let b = solve(&m, &inst, &w.curve, &w.target, index + 1).unwrap();
-                assert_eq!(a.recovered, w.planted.map(ExactScalar::from));
+                assert_eq!(a.recovered, w.planted);
                 assert_eq!(a.recovered, b.recovered);
                 assert_eq!(a.counters, b.counters);
                 assert_eq!(a.total_gae, b.total_gae);
@@ -8801,6 +10642,30 @@ mod tests {
         .unwrap();
         assert_eq!(a.method_id, b.method_id);
         assert!(a.method_id.starts_with("ECM1h"));
+    }
+
+    #[test]
+    fn frozen_negation_table_identity_stays_on_its_original_entry() {
+        let historical = resolve(&MethodSpec {
+            id: "bsgs.negation_table".into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        assert_eq!(historical.params["baby"], "0");
+        assert_eq!(historical.entry, "ecbench::generic::bsgs_negation_table");
+        assert_eq!(historical.method_id, "ECM1hae967a248ea2");
+        assert_eq!(
+            historical.method_sha256,
+            "ae967a248ea21c4a34ec79a0130ebaa412891a6ea97e61532b0ce51199a08d97"
+        );
+
+        let versioned = resolve(&MethodSpec {
+            id: "bsgs.negation_table_v2".into(),
+            params: BTreeMap::new(),
+        })
+        .unwrap();
+        assert_ne!(versioned.method_id, historical.method_id);
+        assert_ne!(versioned.entry, historical.entry);
     }
 
     #[test]
@@ -8905,11 +10770,7 @@ mod tests {
             for index in 0..3 {
                 let (w, inst) = Workload::build(&spec, 11, index, TargetKind::Planted).unwrap();
                 let rep = solve(&m, &inst, &w.curve, &w.target, 40 + index).unwrap();
-                assert_eq!(
-                    rep.recovered,
-                    w.planted.map(ExactScalar::from),
-                    "record target"
-                );
+                assert_eq!(rep.recovered, w.planted, "record target");
                 assert_eq!(rep.automorphisms_used, 2);
                 let per = rep.detail["per_target"].as_array().unwrap();
                 assert_eq!(per.len(), batch.parse::<usize>().unwrap());
@@ -9365,6 +11226,24 @@ mod tests {
         let inversions = r.native["inversions"];
         assert!(inversions > 0 && inversions <= root.counters["targets_tried"]);
         assert_eq!(s.native.get("inversions").copied().unwrap_or(0), 0);
+        let counted = &root.detail["counted_field_ops"];
+        assert_eq!(counted["schema"], "ecbench.counted-field-ops/v1");
+        assert_eq!(counted["complete"], false);
+        let phase_tallies = counted["phases"].as_array().unwrap();
+        assert_eq!(phase_tallies.len(), root.phases.len());
+        let relation_tally = phase_tallies
+            .iter()
+            .find(|phase| phase["name"] == "relations")
+            .unwrap();
+        assert!(relation_tally["field_ops"]["invs"].as_u64().unwrap() > 0);
+        for op in ["muls", "sqrs", "invs"] {
+            let sum: u64 = phase_tallies
+                .iter()
+                .map(|phase| phase["field_ops"][op].as_u64().unwrap())
+                .sum();
+            assert_eq!(counted["total"][op].as_u64(), Some(sum), "{op}");
+        }
+        assert!(root.field_ops.is_none(), "partial work is not a full tally");
         assert_eq!(r.native.get("frobfold_mismatches").copied().unwrap_or(0), 0);
         assert!(root.solver.is_none(), "a table oracle solves no system");
         assert!(root.deterministic);
@@ -9676,7 +11555,10 @@ mod accounting_rules_tests {
             ],
         );
         let rep = run(&f4, &inst, &facts, 4242, 6);
-        assert_eq!(rep.recovered, Some(ExactScalar::from(4242 % facts.r)));
+        assert_eq!(
+            rep.recovered,
+            Some(ExactScalar::from(4242 % facts.r.checked_u128().unwrap()))
+        );
         let solver = rep.solver.as_ref().expect("solver block");
         let fc = solver
             .degree_of_regularity_forecast
@@ -9688,7 +11570,7 @@ mod accounting_rules_tests {
         assert!(fc.cost.columns > 0);
         assert_eq!(fc.cost.hope_ratio_band.len(), 3);
         let floor = fc.cost.rho_floor_group_additions.unwrap();
-        let expected = (std::f64::consts::PI * facts.r as f64 / (2.0 * 34.0)).sqrt();
+        let expected = (std::f64::consts::PI * facts.r.to_f64() / (2.0 * 34.0)).sqrt();
         assert!((floor - expected).abs() < 1e-6, "{floor} vs {expected}");
         assert_eq!(fc.semi_regular_degree, solver.semi_regular_degree);
         assert!(fc.certified_degree_of_regularity.is_none());
@@ -9930,9 +11812,12 @@ mod accounting_rules_tests {
         for i in 0..runs {
             let k = 12_345 + 40_503 * u128::from(i);
             let rep = run(&m, &inst, &facts, k, 100 + i);
-            assert_eq!(rep.recovered, Some(ExactScalar::from(k % facts.r)));
+            assert_eq!(
+                rep.recovered,
+                Some(ExactScalar::from(k % facts.r.checked_u128().unwrap()))
+            );
             assert!(rep.automorphisms_used <= facts.automorphisms_available);
-            s += rep.total_gae / (facts.r as f64).sqrt();
+            s += rep.total_gae / (facts.r.to_f64()).sqrt();
         }
         let ratio = s / runs as f64 / floor;
         assert!(ratio > 1.0, "mean S over the A = 6 floor is {ratio}");
@@ -9951,7 +11836,7 @@ mod accounting_rules_tests {
             (j1728(), "rho.quartic", "rho.quartic_v2"),
         ] {
             let (inst, facts) = built(&spec);
-            let k = 4321u128 % facts.r;
+            let k = 4321u128 % facts.r.checked_u128().unwrap();
             let frozen = run(&method(old, &[]), &inst, &facts, k, 7);
             let v2 = run(&method(new, &[]), &inst, &facts, k, 7);
             assert_eq!(frozen.recovered, Some(ExactScalar::from(k)));
@@ -10046,12 +11931,14 @@ mod accounting_rules_tests {
             ("rho.negation_v6", &[], true),
             ("rho.plain_v6", &[], true),
             ("rho.signed_frobenius_v5", &[], false),
+            ("rho.signed_frobenius_v6", &[], false),
             ("rho.signed_frobenius_v2", &[], false),
             ("rho.signed_frobenius_v3", &[], false),
             ("rho.signed_frobenius_strong_v2", &[], false),
             ("bsgs.textbook_v2", &[], true),
             ("bsgs.interleaved_v2", &[], true),
             ("bsgs.negation_v2", &[], true),
+            ("bsgs.negation_table_v2", &[], true),
             ("kangaroo.vow_v2", &[], true),
             ("claw.pair_table_v2", claw, false),
         ];
@@ -10062,7 +11949,7 @@ mod accounting_rules_tests {
                 curves.push(&prime);
             }
             for (inst, facts) in curves {
-                let r = facts.r;
+                let r = facts.r.checked_u128().unwrap();
                 for (j, k) in [3u128, r - 2, r / 3 + 5, r / 2 + 11]
                     .into_iter()
                     .enumerate()
@@ -10091,6 +11978,40 @@ mod accounting_rules_tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn signed_frobenius_v6_only_changes_partition_accounting() {
+        let (inst, facts) = built(&CurveSpec::Koblitz { a: 0, n: 19 });
+        let old = run(
+            &method("rho.signed_frobenius_v5", &[]),
+            &inst,
+            &facts,
+            100_003,
+            71,
+        );
+        let counted = run(
+            &method("rho.signed_frobenius_v6", &[]),
+            &inst,
+            &facts,
+            100_003,
+            71,
+        );
+
+        assert_eq!(counted.recovered, old.recovered);
+        assert_eq!(counted.exhausted, old.exhausted);
+        assert_eq!(counted.total_gae, old.total_gae);
+        assert_eq!(counted.phases, old.phases);
+        assert_eq!(old.counters[V5_JUMP_INDEX_COUNTER], old.counters["steps"]);
+        let hashes = counted.counters[V5_JUMP_INDEX_COUNTER];
+        assert!(hashes >= counted.counters["walk_operations"]);
+        assert!(counted.unpriced.contains(&V5_JUMP_INDEX_COUNTER.to_string()));
+        assert_eq!(counted.unpriced, old.unpriced);
+        let mut counted_counters = counted.counters.clone();
+        counted_counters.remove(V5_JUMP_INDEX_COUNTER);
+        let mut old_counters = old.counters;
+        old_counters.remove(V5_JUMP_INDEX_COUNTER);
+        assert_eq!(counted_counters, old_counters);
     }
 
     /// The verification a BSGS, kangaroo or claw run pays is the one
@@ -10131,6 +12052,58 @@ mod accounting_rules_tests {
         }
     }
 
+    #[test]
+    fn cached_bsgs_v2_separates_reusable_setup_from_verified_online_query() {
+        let (inst, facts) = built(&CurveSpec::PrimeSearch {
+            bits: 18,
+            seed: 59297,
+        });
+        let rep = run(
+            &method("bsgs.negation_table_v2", &[("baby", "128")]),
+            &inst,
+            &facts,
+            100_003,
+            9,
+        );
+        assert_eq!(rep.recovered, Some(ExactScalar::from(100_003u64)));
+        let setup = rep.phases.iter().find(|p| p.name == "setup").unwrap();
+        let search = rep.phases.iter().find(|p| p.name == "search").unwrap();
+        let verification = rep
+            .phases
+            .iter()
+            .find(|p| p.name == "verification")
+            .unwrap();
+        assert_eq!(
+            setup.native["inserts_uncharged"],
+            rep.counters["inserts_uncharged"]
+        );
+        assert_eq!(
+            search.native["lookups_uncharged"],
+            rep.counters["lookups_uncharged"]
+        );
+        assert_eq!(setup.native["point_negations_uncharged"], 1);
+        assert_eq!(search.native["recovery_key_comparisons_uncharged"], 1);
+        assert_eq!(search.native["recovery_modr_muls_uncharged"], 1);
+        assert_eq!(search.native["recovery_modr_adds_uncharged"], 1);
+        assert_eq!(verification.scalar_mults, 1);
+        assert_phases_sum("bsgs.negation_table_v2", &rep);
+
+        let online = rep.online.expect("cached query has an online window");
+        assert!(online.wall_ns > 0 && online.wall_ns < rep.solve_wall_ns);
+        assert!(online
+            .start_event
+            .contains("after the G-only negation baby table"));
+        assert_eq!(
+            online.phases_ns.values().sum::<u64>(),
+            online.wall_ns,
+            "exclusive online phases sum to the online interval"
+        );
+        assert_eq!(
+            rep.detail["cache_contract"]["cold_total_charges_setup_once"],
+            json!(true)
+        );
+    }
+
     /// A kangaroo restart is neither set-up nor a jump: v2 charges it to
     /// `restarts`.  Frozen `kangaroo.vow` charges it to `search` (since
     /// 2026-10-18; before, to `setup`) and reports it only in `detail`.
@@ -10146,7 +12119,7 @@ mod accounting_rules_tests {
                 unreachable!()
             };
             let (g, gen) = (&p.curve, p.generator_point());
-            for k in 1..facts.r as u64 {
+            for k in 1..facts.r.checked_u64().unwrap() {
                 let mut scratch = GroupOps::default();
                 let q = g.mul(&mut scratch, gen, k);
                 for seed in 0..4u64 {
@@ -10291,7 +12264,9 @@ mod accounting_rules_tests {
     #[test]
     fn tuned_rho_window_compares_are_priced_through_work_native() {
         use crate::cryptanalysis::ecbench::work::{price, Priceable};
-        use crate::cryptanalysis::ic_boundary::{BRENT_WORD_OPS, WINDOW_WORD_OPS};
+        use crate::cryptanalysis::ic_boundary::{
+            BRENT_WORD_OPS, JUMP_SELECTIONS, JUMP_SELECT_WORD_OPS, WINDOW_WORD_OPS,
+        };
         for (spec, id) in [
             (
                 CurveSpec::PrimeSearch {
@@ -10315,11 +12290,20 @@ mod accounting_rules_tests {
                 "rho.negation_v2",
             ),
             (CurveSpec::Koblitz { a: 0, n: 19 }, "rho.signed_frobenius"),
+            (
+                CurveSpec::Koblitz { a: 0, n: 19 },
+                "rho.signed_frobenius_v5",
+            ),
         ] {
             let (inst, facts) = built(&spec);
             let rep = run(&method(id, &[]), &inst, &facts, 5555, 8);
             assert!(rep.recovered.is_some(), "{id}");
-            for name in [WINDOW_WORD_OPS, BRENT_WORD_OPS] {
+            for name in [
+                WINDOW_WORD_OPS,
+                BRENT_WORD_OPS,
+                JUMP_SELECT_WORD_OPS,
+                JUMP_SELECTIONS,
+            ] {
                 assert!(
                     !rep.counters.contains_key(name),
                     "{id}: {name} is a counter"
@@ -10338,7 +12322,30 @@ mod accounting_rules_tests {
             // Every step scans the ring and pushes into it.
             assert!(window >= 2 * rep.counters["steps"], "{id}: {window}");
             let brent = search.work_native.get(BRENT_WORD_OPS).copied().unwrap_or(0);
-            assert_eq!(brent > 0, id.ends_with("_v2"), "{id}: brent {brent}");
+            // v2 and v5 (a tuned v3 walk) run Brent's checks; the others do not.
+            let has_brent = id.ends_with("_v2") || id.ends_with("_v5");
+            assert_eq!(brent > 0, has_brent, "{id}: brent {brent}");
+            // Every step selects a jump: two word operations each, at least.
+            let select = search
+                .work_native
+                .get(JUMP_SELECT_WORD_OPS)
+                .copied()
+                .unwrap_or(0);
+            assert!(select >= 2 * rep.counters["steps"], "{id}: select {select}");
+            // The band's count: one per selection, behind its marker.
+            assert_eq!(
+                search.work_native.get(JUMP_SELECTIONS).copied(),
+                Some(select / 2),
+                "{id}"
+            );
+            assert_eq!(
+                search
+                    .work_native
+                    .get(&format!("counted:{JUMP_SELECTIONS}"))
+                    .copied(),
+                Some(1),
+                "{id}"
+            );
             let priced = |phases: &[PhaseRecord]| {
                 price(&Priceable {
                     method_id: id,
@@ -10353,7 +12360,7 @@ mod accounting_rules_tests {
             let with = priced(&rep.phases);
             // The window counters are priced (v2 keeps its own table counters
             // unpriced, as before).
-            for name in [WINDOW_WORD_OPS, BRENT_WORD_OPS] {
+            for name in [WINDOW_WORD_OPS, BRENT_WORD_OPS, JUMP_SELECT_WORD_OPS] {
                 assert!(
                     !with.unpriced.iter().any(|u| u == name),
                     "{id}: {name} unpriced"
@@ -10370,7 +12377,7 @@ mod accounting_rules_tests {
             let gates = with.widths.gates(word).expect("word_op priced");
             let diff: u128 =
                 with.bitops.parse::<u128>().unwrap() - without.bitops.parse::<u128>().unwrap();
-            assert_eq!(diff, gates * u128::from(window + brent), "{id}");
+            assert_eq!(diff, gates * u128::from(window + brent + select), "{id}");
         }
     }
 
@@ -10409,6 +12416,88 @@ mod accounting_rules_tests {
         }
     }
 
+    /// `rho.signed_frobenius_v5` tallies its per-step jump-index selection
+    /// as `partition_hashes_uncharged` (owner decision 2026-11-19): the
+    /// report is the pre-tally report (the same walk, recovered scalar,
+    /// phases, group operations, GAE and every other counter) plus that one
+    /// counter, which equals the walk steps (strong's definition: one
+    /// partition hash per step) and is listed as unpriced, so the band
+    /// prices it at `w` per step.
+    #[test]
+    fn v5_jump_index_tally_adds_one_counter_equal_to_steps_and_changes_nothing_else() {
+        let m = method("rho.signed_frobenius_v5", &[]);
+        let cap = param_u64(&m, "cap_multiple").unwrap() as f64;
+        for (a, n) in [(0u8, 13u32), (1, 17), (0, 23), (1, 29)] {
+            let (inst, facts) = built(&CurveSpec::Koblitz { a, n });
+            let Instance::Binary(bi) = &inst else {
+                unreachable!()
+            };
+            for i in 0..6u64 {
+                let k = (1_009 + 7_919 * i) % bi.r;
+                let tgt = bi.fast.mul_u64(bi.generator, k);
+                let hex = [format!("0x{:x}", tgt.x), format!("0x{:x}", tgt.y)];
+                let seed = 40 + i;
+                let tallied = solve(&m, &inst, &facts, &hex, seed).unwrap();
+                let res = signed_frobenius_rho_v3(
+                    bi,
+                    FastPoint::affine(tgt.x, tgt.y),
+                    seed,
+                    rho_cap(bi.r, cap),
+                    RhoV3::v6(true),
+                )
+                .unwrap();
+                let steps = res.steps;
+                assert_eq!(res.jump_index_selections, steps, "a={a} n={n} i={i}");
+                let before = rho_report_v2(res, 0, None, GroupOps::default());
+                assert_eq!(tallied.recovered, before.recovered);
+                assert_eq!(tallied.recovered, Some(ExactScalar::from(k)));
+                assert_eq!(tallied.exhausted, before.exhausted);
+                assert_eq!(tallied.total_gae.to_bits(), before.total_gae.to_bits());
+                assert_eq!(tallied.phases.len(), before.phases.len());
+                for (p, q) in tallied.phases.iter().zip(&before.phases) {
+                    assert_eq!(
+                        (&p.name, p.adds, p.doubles, p.scalar_mults, p.gae.to_bits()),
+                        (&q.name, q.adds, q.doubles, q.scalar_mults, q.gae.to_bits())
+                    );
+                    assert_eq!(p.native, q.native);
+                    assert_eq!(p.work_native, q.work_native);
+                }
+                assert_eq!(tallied.field_ops, before.field_ops);
+                assert_eq!(tallied.automorphisms_used, before.automorphisms_used);
+                let mut extra = tallied.counters.clone();
+                assert_eq!(extra.remove(V5_JUMP_INDEX_COUNTER), Some(steps));
+                assert_eq!(extra, before.counters, "a={a} n={n} i={i}");
+                assert_eq!(tallied.counters["steps"], steps);
+                assert!(steps > 0);
+                let mut unpriced = tallied.unpriced.clone();
+                assert!(unpriced.contains(&V5_JUMP_INDEX_COUNTER.to_string()));
+                unpriced.retain(|u| u != V5_JUMP_INDEX_COUNTER);
+                assert_eq!(unpriced, before.unpriced);
+                assert!(v5_pre_tally_record(
+                    "rho.signed_frobenius_v5",
+                    &before.counters
+                ));
+                assert!(!v5_pre_tally_record(
+                    "rho.signed_frobenius_v5",
+                    &tallied.counters
+                ));
+            }
+        }
+        // Strong's definition, for the record: one partition hash per step.
+        let (inst, facts) = built(&CurveSpec::Koblitz { a: 1, n: 17 });
+        let s = run(
+            &method("rho.signed_frobenius_strong", &[]),
+            &inst,
+            &facts,
+            4_321,
+            3,
+        );
+        assert_eq!(
+            s.counters["partition_hashes_uncharged"],
+            s.counters["walk_steps"]
+        );
+    }
+
     /// The v2 strong reference's fixed set-up against the frozen one at the
     /// sizes of the review: n = 13 and n = 19, where the frozen S is 58× and
     /// 15.5× theory.  Both walk the same group; v2 is the cheaper reference
@@ -10435,13 +12524,16 @@ mod accounting_rules_tests {
                     k,
                     i,
                 );
-                assert_eq!(v.recovered, Some(ExactScalar::from(k % facts.r)));
+                assert_eq!(
+                    v.recovered,
+                    Some(ExactScalar::from(k % facts.r.checked_u128().unwrap()))
+                );
                 assert_phases_sum("strong_v2", &v);
                 old += o.total_gae;
                 new += v.total_gae;
             }
             assert!(new * 2.0 < old, "n={n}: v1 {old}, v2 {new}");
-            let floor_ops = ((facts.r as f64).sqrt()
+            let floor_ops = ((facts.r.to_f64()).sqrt()
                 * crate::cryptanalysis::ecbench::record::floor_s(facts.automorphisms_available))
                 * runs as f64;
             assert!(old / floor_ops > 2.0, "n={n}: frozen set-up dominates");
@@ -10455,42 +12547,33 @@ mod accounting_rules_tests {
     fn exhausted_strong_v2_records_the_spent_work() {
         let spec = CurveSpec::Koblitz { a: 0, n: 13 };
         let (inst, facts) = built(&spec);
-        let Instance::Binary(b) = &inst else {
-            unreachable!()
-        };
-        // A point of the curve outside the order-r subgroup (h = 4).
-        let out_of_subgroup = (1u64..)
-            .flat_map(|x| b.points_with_x(x))
-            .find(|q| !b.fast.mul_u64(*q, b.r).infinity)
-            .expect("the cofactor is 4");
-        let target = [
-            format!("0x{:x}", out_of_subgroup.x),
-            format!("0x{:x}", out_of_subgroup.y),
+        // Keep the target in the subgroup and bound both walks tightly.
+        let parameters = [
+            ("lanes", "1"),
+            ("dp_bits", "31"),
+            ("step_cap_factor", "1"),
         ];
-        let frozen = solve(
-            &method("rho.signed_frobenius_strong", &[]),
+        let frozen = run(
+            &method("rho.signed_frobenius_strong", &parameters),
             &inst,
             &facts,
-            &target,
+            37,
             3,
-        )
-        .unwrap();
+        );
         assert!(frozen.exhausted);
         assert_eq!(frozen.total_gae, 0.0);
         assert!(frozen.phases.is_empty());
-        let v2 = solve(
-            &method("rho.signed_frobenius_strong_v2", &[]),
+        let v2 = run(
+            &method("rho.signed_frobenius_strong_v2", &parameters),
             &inst,
             &facts,
-            &target,
+            37,
             3,
-        )
-        .unwrap();
+        );
         assert!(v2.exhausted && v2.recovered.is_none());
         assert!(v2.total_gae > 0.0);
         assert_phases_sum("strong_v2 exhausted", &v2);
         assert!(v2.counters["walk_steps"] > 0);
-        assert!(v2.counters["failed_collisions"] > 0 || v2.counters["table_inserts_uncharged"] > 0);
         // The failed candidate checks are charged to verification.
         let checks = v2.phases.iter().find(|p| p.name == "verification").unwrap();
         assert_eq!(checks.scalar_mults, v2.counters["failed_collisions"]);
@@ -10774,6 +12857,7 @@ mod accounting_rules_tests {
             ("bsgs.textbook_v2", &[], &prime),
             ("bsgs.interleaved_v2", &[], &prime),
             ("bsgs.negation_v2", &[], &prime),
+            ("bsgs.negation_table_v2", &[], &prime),
             ("kangaroo.vow_v2", &[], &prime),
             ("claw.pair_table_v2", claw, &koblitz),
         ];
@@ -10782,7 +12866,7 @@ mod accounting_rules_tests {
             let rep = run(&method(id, params), inst, facts, 4242, 6);
             assert_eq!(
                 rep.recovered,
-                Some(ExactScalar::from(4242 % facts.r)),
+                Some(ExactScalar::from(4242 % facts.r.checked_u128().unwrap())),
                 "{id}"
             );
             assert_phases_sum(id, &rep);
@@ -10796,7 +12880,7 @@ mod accounting_rules_tests {
             (j1728(), "rho.quartic", "rho.quartic_v2"),
         ] {
             let (inst, facts) = built(&spec);
-            let k = 4242 % facts.r;
+            let k = 4242 % facts.r.checked_u128().unwrap();
             let rep = run(&method(id, &[]), &inst, &facts, k, 6);
             assert_eq!(rep.recovered, Some(ExactScalar::from(k)), "{id}");
             assert_phases_sum(id, &rep);
@@ -10808,6 +12892,10 @@ mod accounting_rules_tests {
         // Covered elsewhere (own tests, native backends, other curve shapes).
         covered.extend([
             "ic.k4_gaudry",           // curves over F_{p^4}: ecbench::fp4 tests
+            "ic.k3_gaudry",           // curves over F_{p^3}: ecbench::fp3 tests
+            "ic.diem_kgrow",          // self-hosted E(F_{p^k}) charged cell + ladder example
+            "ic.growing_arity",       // growing-m ksum on prime_instance_for
+            "ic.aux_tower_solver",    // AUX prime-isogeny + rootfind-mitm ladder
             "ic.cm_folded_native_v1", // native backend binary
             "ic.cm_folded_recurrence_v1",
             "ic.cm_folded_native_d43_v1",
@@ -10884,6 +12972,7 @@ mod accounting_tests {
             &json!({
                 "schema": SPEC_SCHEMA,
                 "label": "accounting",
+                "curve_policy": {"mode": "diagnostic", "off_panel_reason": "method accounting applicability fixture"},
                 "workloads": {"curves": [curve], "targets_per_curve": 1, "target_seed": 1},
                 "arms": [{"name": "a", "role": "candidate", "method": {"id": id, "params": params}}],
                 "measurement": {"rounds": 1, "seed": 9},
@@ -10948,7 +13037,7 @@ mod accounting_tests {
             applicable(&v2, &inst, &w.curve).unwrap();
             let a = strip_wall(solve(&frozen, &inst, &w.curve, &w.target, 5).unwrap());
             let b = strip_wall(solve(&v2, &inst, &w.curve, &w.target, 5).unwrap());
-            assert_eq!(a.recovered, w.planted.map(ExactScalar::from));
+            assert_eq!(a.recovered, w.planted);
             assert_eq!(b.recovered, a.recovered);
             // The frozen record keeps its three phases, its counters and its
             // `unpriced`, with no verification and no factor-base tally.
@@ -11025,7 +13114,7 @@ mod accounting_tests {
         applicable(&v2, &inst, &w.curve).unwrap();
         let a = strip_wall(solve(&frozen, &inst, &w.curve, &w.target, 7).unwrap());
         let b = strip_wall(solve(&v2, &inst, &w.curve, &w.target, 7).unwrap());
-        assert_eq!(a.recovered, w.planted.map(ExactScalar::from));
+        assert_eq!(a.recovered, w.planted);
         assert_eq!(b.recovered, a.recovered);
         assert!(a.unpriced.is_empty(), "frozen: {:?}", a.unpriced);
         assert!(!a.counters.contains_key("root_search_field_muls_uncharged"));
@@ -11215,8 +13304,8 @@ mod accounting_tests {
         )
         .unwrap();
         for (params, needle) in [
-            (ksum("12", "2", "1", "100000"), "k = 3, 4 or 5"),
-            (ksum("12", "6", "1", "100000"), "k = 3, 4 or 5"),
+            (ksum("12", "2", "1", "100000"), "k = 3 to 9"),
+            (ksum("12", "10", "1", "100000"), "k = 3 to 9"),
             (ksum("12", "3", "1", "10"), "above max_sums"),
             (ksum("0", "3", "1", "100000"), "size must lie in"),
             (ksum("999999999", "3", "1", "100000"), "size must lie in"),
@@ -11384,7 +13473,8 @@ mod accounting_tests {
                 "unknown parameter",
             ),
         ] {
-            let err = plan_arm(curve.clone(), "ic.pipeline", pipe(fb, oracle)).unwrap_err();
+            let err = plan_arm(curve.clone(), "ic.pipeline", pipe(fb, oracle))
+                .expect_err(&format!("{fb} / {oracle} was admitted"));
             assert!(err.contains(needle), "{fb} / {oracle}: {err}");
         }
     }
@@ -11402,6 +13492,7 @@ mod accounting_tests {
     }
 }
 
+/// `rho.negation_strong` end to end through `solve`, on curves over F_(2^m)^4.
 #[cfg(test)]
 mod neg_strong_tests {
     use super::*;
@@ -11437,7 +13528,8 @@ mod neg_strong_tests {
             let (inst, facts) = f2m4(m, 1);
             applicable(&strong, &inst, &facts).unwrap();
             for seed in 0..4u64 {
-                let k = (17 + 1009 * u128::from(seed) + u128::from(m)) % facts.r;
+                let k = (17 + 1009 * u128::from(seed) + u128::from(m))
+                    % facts.r.checked_u128().unwrap();
                 let target = inst.mul_generator_hex(k).unwrap();
                 let a = solve(&strong, &inst, &facts, &target, seed).unwrap();
                 let b = solve(&plain, &inst, &facts, &target, seed).unwrap();
@@ -11480,9 +13572,9 @@ mod neg_strong_tests {
             &[("lanes", "8"), ("dp_bits", "6"), ("step_cap_factor", "0")],
         );
         let (inst, facts) = f2m4(17, 1);
-        assert!(u64::try_from(facts.r).is_err());
+        assert!(facts.r.checked_u64().is_none());
         applicable(&strong, &inst, &facts).unwrap();
-        let k = (u128::MAX / 5) % facts.r;
+        let k = (u128::MAX / 5) % facts.r.checked_u128().unwrap();
         let target = inst.mul_generator_hex(k).unwrap();
         let rep = solve(&strong, &inst, &facts, &target, 3).unwrap();
         assert!(rep.counters["walk_steps"] >= 1_000_000);
@@ -11692,7 +13784,7 @@ mod engine_items_tests {
         assert_ne!(base.method_id, cv0.method_id);
         let mut saved_total = 0.0;
         for seed in 0..12u64 {
-            let k = 1 + (seed as u128 * 104729 + 7) % (facts.r - 1);
+            let k = 1 + (seed as u128 * 104729 + 7) % (facts.r.checked_u128().unwrap() - 1);
             let d = run(&base, &inst, &facts, k, seed);
             let e = run(&explicit, &inst, &facts, k, seed);
             let n = run(&cv0, &inst, &facts, k, seed);
@@ -11772,7 +13864,7 @@ mod engine_items_tests {
                 .expect("setup phase")
         };
         for seed in 0..16u64 {
-            let k = 1 + (seed as u128 * 7919 + 3) % (facts.r - 1);
+            let k = 1 + (seed as u128 * 7919 + 3) % (facts.r.checked_u128().unwrap() - 1);
             let a = run(&plain, &inst, &facts, k, seed);
             let b = run(&chained, &inst, &facts, k, seed);
             assert_eq!(a.recovered, Some(ExactScalar::from(k)), "seed {seed}");
@@ -11916,7 +14008,7 @@ mod rho_lanes_tests {
         assert_ne!(one.method_id, many.method_id);
         let own = ["lanes", "lane_rounds", "montgomery_conversions_uncharged"];
         for seed in 0..8u64 {
-            let k = 1 + (seed as u128 * 104_729 + 11) % (facts.r - 1);
+            let k = 1 + (seed as u128 * 104_729 + 11) % (facts.r.checked_u128().unwrap() - 1);
             let target = inst.mul_generator_hex(k).expect("a nonzero target");
             let a = solve(&serial, &inst, &facts, &target, seed).unwrap();
             let b = solve(&one, &inst, &facts, &target, seed).unwrap();
@@ -11952,6 +14044,416 @@ mod rho_lanes_tests {
         for bad in ["0", "4097"] {
             let m = method("rho.negation_lanes_v1", &[("lanes", bad)]);
             assert!(solve(&m, &inst, &facts, &target, 1).is_err(), "lanes={bad}");
+        }
+    }
+}
+
+#[cfg(test)]
+mod big_koblitz_tests {
+    //! The three-word Koblitz class (`Instance::Big`, `128 ≤ n ≤ 191`) on
+    //! the method layer: plan-time refusals, the dispatch through
+    //! `solve_big` on a curve small enough to solve (built by the same
+    //! constructor at `n = 41`), and capped runs on ECC2K-130's field.
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
+    use crate::cryptanalysis::koblitz_big::{BigKoblitz, W192};
+    use crate::cryptanalysis::koblitz_index_calculus::KoblitzCurve;
+    use crate::cryptanalysis::koblitz_wide::WideKoblitz;
+
+    fn method(id: &str, params: &[(&str, &str)]) -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: id.into(),
+            params: params
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect(),
+        })
+        .unwrap()
+    }
+
+    fn strip_wall(mut r: SolveReport) -> SolveReport {
+        r.solve_wall_ns = 0;
+        for p in &mut r.phases {
+            p.wall_ns = None;
+        }
+        r
+    }
+
+    /// The three-word constructor's curve at `n = 41` as a big instance,
+    /// and the same curve, generator and λ as a wide instance.
+    fn toy(a: u8, n: u32) -> (BigInstance, WideInstance) {
+        let irr = KoblitzCurve::new(a, n).unwrap().curve.irreducible.clone();
+        let kc = BigKoblitz::for_any_degree(a, &irr).unwrap();
+        let rho = kc.strong_rho();
+        let narrow = |v: &num_bigint::BigUint| num_traits::ToPrimitive::to_u128(v).unwrap();
+        let wk = WideKoblitz {
+            a,
+            n,
+            irreducible: irr,
+            trace: kc.trace,
+            group_order: narrow(&kc.group_order),
+            r: narrow(&kc.r),
+            cofactor: u128::from(kc.cofactor),
+            lambda: narrow(&kc.lambda),
+            generator: (
+                kc.generator.0.checked_u128().unwrap(),
+                kc.generator.1.checked_u128().unwrap(),
+            ),
+            generator_seed_x: u128::from(kc.generator_seed_x),
+        };
+        let wrho = wk.strong_rho();
+        (BigInstance { kc, rho }, WideInstance { kc: wk, rho: wrho })
+    }
+
+    fn big131() -> (Instance, CurveFacts, CurveSpec) {
+        let spec = CurveSpec::Koblitz { a: 0, n: 131 };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        (inst, facts, spec)
+    }
+
+    #[test]
+    fn plan_refuses_every_method_without_a_three_word_path() {
+        let (inst, facts, _) = big131();
+        for id in BIG_METHODS {
+            let params: &[(&str, &str)] = if id.starts_with("claw") {
+                &[("base_scale", "1"), ("table_scale", "1")]
+            } else if id.ends_with("_v2") {
+                &[("lanes", "auto"), ("dp_bits", "auto"), ("jumps", "auto")]
+            } else {
+                &[]
+            };
+            let m = method(id, params);
+            if id.starts_with("claw") {
+                // base_scale = 1 is about 4·10^10 base points on n = 131.
+                let err = applicable(&m, &inst, &facts).expect_err(id);
+                assert!(err.contains("lower base_scale"), "{err}");
+                let small = method(id, &[("base_scale", "0.000000001"), ("table_scale", "1")]);
+                assert!(applicable(&small, &inst, &facts).is_ok(), "{id}");
+            } else {
+                assert!(applicable(&m, &inst, &facts).is_ok(), "{id}");
+            }
+        }
+        for (id, params) in [
+            ("bsgs.textbook", &[][..]),
+            ("rho.plain", &[][..]),
+            ("rho.negation", &[][..]),
+            ("rho.signed_frobenius", &[][..]),
+            ("rho.signed_frobenius_strong_wordram", &[][..]),
+        ] {
+            let Ok(m) = resolve(&MethodSpec {
+                id: id.into(),
+                params: params
+                    .iter()
+                    .map(|(k, v): &(&str, &str)| (k.to_string(), v.to_string()))
+                    .collect(),
+            }) else {
+                continue;
+            };
+            let err = applicable(&m, &inst, &facts).expect_err(id);
+            assert!(err.contains("no three-word implementation"), "{id}: {err}");
+            assert!(err.contains("n = 131"), "{err}");
+        }
+    }
+
+    /// `solve_big` (the dispatch every big run takes) on a 39-bit subgroup:
+    /// the strong rho in all four ids reports exactly what `solve_wide`
+    /// reports on the same curve, seed and target — the recovered
+    /// logarithm, every phase, counter and the total — and the claw in both
+    /// ids recovers the planted logarithm with its own seed rule.
+    #[test]
+    fn solve_big_is_solve_wide_on_a_solvable_curve() {
+        let (bi, wi) = toy(0, 41);
+        let spec = CurveSpec::Koblitz { a: 0, n: 41 };
+        let facts = spec.build().unwrap().facts(&spec);
+        let r = wi.kc.r;
+        for (k, seed) in [(12_345u128, 1u64), (r - 7, 2), (r / 3 + 1, 3)] {
+            let RawPointG::Affine { x, y } = wi.rho.scalar_mul(wi.rho.generator(), k) else {
+                unreachable!()
+            };
+            let target = [W192::from_u128(x).hex(), W192::from_u128(y).hex()];
+            assert_eq!(target, [format!("0x{x:x}"), format!("0x{y:x}")]);
+            for (id, params) in [
+                ("rho.signed_frobenius_strong", &[][..]),
+                ("rho.signed_frobenius_strong_legacy", &[][..]),
+                (
+                    "rho.signed_frobenius_strong_escape",
+                    &[("dp_bits", "6")][..],
+                ),
+                (
+                    "rho.signed_frobenius_strong_v2",
+                    &[("lanes", "auto"), ("dp_bits", "auto"), ("jumps", "auto")][..],
+                ),
+            ] {
+                let m = method(id, params);
+                let big = strip_wall(solve_big(&m, &bi, &target, seed).unwrap());
+                let wide = strip_wall(solve_wide(&m, &wi, &facts, x, y, seed).unwrap());
+                assert_eq!(big.recovered, Some(ExactScalar::from(k)), "{id}");
+                assert_eq!(
+                    serde_json::to_value(&big).unwrap(),
+                    serde_json::to_value(&wide).unwrap(),
+                    "{id} k={k}"
+                );
+            }
+            for id in ["claw.pair_table", "claw.pair_table_v2"] {
+                let m = method(id, &[("base_scale", "4"), ("table_scale", "1")]);
+                let rep = solve_big(&m, &bi, &target, seed).unwrap();
+                assert_eq!(rep.recovered, Some(ExactScalar::from(k)), "{id}");
+                assert!(!rep.exhausted);
+                if id.ends_with("_v2") {
+                    assert_eq!(rep.counters.get("verification_checks"), Some(&1));
+                    assert_eq!(rep.counters.get("failed_candidates"), None);
+                }
+                let total: f64 = rep.phases.iter().map(|p| p.gae).sum();
+                assert_eq!(total, rep.total_gae);
+            }
+        }
+    }
+
+    /// On ECC2K-130's field (a 2^129 subgroup) a capped run is an
+    /// instrument check: the `_v2` strong rho stops at its first million
+    /// steps and records the work it spent; the claw with a two-seed base
+    /// exhausts its query domain.  Both report `exhausted`, no candidate,
+    /// and phases that sum to the total.
+    #[test]
+    fn capped_runs_on_ecc2k130s_field_end_exhausted_with_their_work() {
+        let (inst, facts, spec) = big131();
+        let (w, _) = Workload::build(&spec, 1, 0, TargetKind::Planted).unwrap();
+        assert_eq!(w.curve, facts);
+        let m = method(
+            "rho.signed_frobenius_strong_v2",
+            &[
+                ("lanes", "auto"),
+                ("dp_bits", "auto"),
+                ("jumps", "auto"),
+                ("step_cap_factor", "0"),
+            ],
+        );
+        applicable(&m, &inst, &facts).unwrap();
+        let rep = solve(&m, &inst, &facts, &w.target, 5).unwrap();
+        assert!(rep.exhausted && rep.recovered.is_none());
+        assert!(rep.counters["walk_steps"] >= 1_000_000);
+        assert_eq!(rep.automorphisms_used, 262);
+        let total: f64 = rep.phases.iter().map(|p| p.gae).sum();
+        assert_eq!(total, rep.total_gae);
+        let m = method(
+            "claw.pair_table_v2",
+            &[
+                ("base_scale", "0.000000001"),
+                ("table_scale", "0.00000000000000000001"),
+            ],
+        );
+        applicable(&m, &inst, &facts).unwrap();
+        let rep = solve(&m, &inst, &facts, &w.target, 5).unwrap();
+        assert!(rep.exhausted && rep.recovered.is_none());
+        assert_eq!(rep.counters["seed_orbits"], 2, "{:?}", rep.counters);
+        assert_eq!(
+            rep.counters.get("query_domain_exhausted"),
+            Some(&1),
+            "{:?}",
+            rep.counters
+        );
+        let total: f64 = rep.phases.iter().map(|p| p.gae).sum();
+        assert_eq!(total, rep.total_gae);
+    }
+}
+
+#[cfg(test)]
+mod curve25519_bounded_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    fn method(cap: u64) -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: "rho.curve25519_bounded".into(),
+            params: BTreeMap::from([("max_steps".into(), cap.to_string())]),
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn bounded_curve25519_reference_replays_and_counts_setup_when_exhausted() {
+        let spec = CurveSpec::Curve25519;
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Curve25519(curve) = &inst else {
+            unreachable!()
+        };
+        let target = super::super::curve25519_workload::encode(curve, curve.generator).unwrap();
+        for cap in [0, 32] {
+            let m = method(cap);
+            applicable(&m, &inst, &facts).unwrap();
+            let a = solve(&m, &inst, &facts, &target, 7).unwrap();
+            let b = solve(&m, &inst, &facts, &target, 7).unwrap();
+            assert_eq!(a.counters, b.counters);
+            assert_eq!(a.recovered, b.recovered);
+            assert_eq!(a.total_gae, b.total_gae);
+            assert_eq!(a.total_gae, a.phases.iter().map(|p| p.gae).sum::<f64>());
+            assert!(a.field_ops.is_some());
+            assert!(a
+                .phases
+                .iter()
+                .any(|p| p.name == "input_validation" && p.gae > 0.0));
+            assert!(a.phases.iter().any(|p| p.name == "setup" && p.gae > 0.0));
+            assert!(a.counters["scalar_sampling_draws_uncharged"] > 0);
+            assert!(a
+                .unpriced
+                .iter()
+                .any(|v| v == "scalar_modular_adds_uncharged"));
+            // The existing walk stops at iteration boundaries: up to 16
+            // look-ahead additions and one escape can cross the threshold.
+            assert!(a.counters["walk_operations"] <= cap + 17);
+            if cap == 0 {
+                assert_eq!(a.counters["walk_operations"], 0);
+                assert!(a.exhausted);
+                assert!(a.recovered.is_none());
+            }
+            if let Some(k) = a.recovered {
+                assert_eq!(inst.mul_generator_exact(k), Some(target.clone()));
+            }
+        }
+        assert!(applicable(&method(1_000_001), &inst, &facts).is_err());
+        assert!(resolve(&MethodSpec {
+            id: "rho.curve25519_bounded".into(),
+            params: BTreeMap::new()
+        })
+        .is_err());
+        let bad = ["0x0".into(), "0x0".into()];
+        assert!(solve(&method(0), &inst, &facts, &bad, 7).is_err());
+        let narrow_spec = CurveSpec::PrimeSearch { bits: 10, seed: 1 };
+        let narrow = narrow_spec.build().unwrap();
+        assert!(applicable(&method(0), &narrow, &narrow.facts(&narrow_spec)).is_err());
+    }
+}
+
+#[cfg(test)]
+mod curve25519_pair_dispatch_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    fn method(size: u64, scan: u64, trials: u64) -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: "ic.curve25519_pair_v1".into(),
+            params: BTreeMap::from([
+                ("base_size".into(), size.to_string()),
+                ("max_scan".into(), scan.to_string()),
+                ("max_trials".into(), trials.to_string()),
+            ]),
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn actual_curve25519_pair_dispatch_recovers_high_scalar_and_accounts_for_every_stage() {
+        let spec = CurveSpec::Curve25519;
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Curve25519(curve) = &inst else {
+            unreachable!()
+        };
+        let target = curve.neg(curve.double(&mut GroupOps::default(), curve.generator));
+        let coordinates = super::super::curve25519_workload::encode(curve, target).unwrap();
+        let m = method(1, 0, 1);
+        applicable(&m, &inst, &facts).unwrap();
+        let a = solve(&m, &inst, &facts, &coordinates, 7).unwrap();
+        assert_eq!(a.recovered, ExactScalar::from_biguint(&(&curve.r - 2u8)));
+        assert!(!a.exhausted);
+        assert_eq!(a.counters["relations_verified"], 1);
+        assert_eq!(a.counters["matrix_rank"], 2);
+        assert_eq!(a.total_gae, a.phases.iter().map(|p| p.gae).sum::<f64>());
+        assert!(a.field_ops.is_some());
+        assert!(a
+            .phases
+            .iter()
+            .any(|p| p.name == "input_validation" && p.gae > 0.0));
+        assert!(a.unpriced.iter().any(|s| s == "linalg_inverses_uncharged"));
+        let online = a.online.as_ref().unwrap();
+        assert_eq!(online.phases_ns.values().sum::<u64>(), online.wall_ns);
+        let b = solve(&method(1, 0, 2), &inst, &facts, &coordinates, 7).unwrap();
+        assert_eq!(a.recovered, b.recovered);
+        assert_eq!(a.counters, b.counters);
+        assert_eq!(
+            a.factor_base.as_ref().unwrap().fb_id,
+            b.factor_base.as_ref().unwrap().fb_id
+        );
+    }
+
+    #[test]
+    fn actual_curve25519_pair_dispatch_preserves_factor_base_exhaustion_and_caps() {
+        let spec = CurveSpec::Curve25519;
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let target = inst.mul_generator_exact(3u64.into()).unwrap();
+        let report = solve(&method(2, 0, 1), &inst, &facts, &target, 9).unwrap();
+        assert!(report.exhausted);
+        assert!(report.recovered.is_none());
+        assert_eq!(report.detail["factor_base_complete"], false);
+        assert_eq!(report.counters["relation_trials"], 0);
+        assert_eq!(report.factor_base.unwrap().columns, 1);
+        assert!(applicable(&method(129, 128, 1), &inst, &facts).is_err());
+        assert!(applicable(&method(1, 1_000_001, 1), &inst, &facts).is_err());
+        assert!(applicable(&method(1, 0, 1_000_001), &inst, &facts).is_err());
+        let narrow_spec = CurveSpec::PrimeSearch { bits: 10, seed: 1 };
+        let narrow = narrow_spec.build().unwrap();
+        assert!(applicable(&method(1, 0, 1), &narrow, &narrow.facts(&narrow_spec)).is_err());
+    }
+
+    /// Unrestricted ordinary prime-field ECDLP: PKM isogeny FB vs negation rho (no MOV/k_emb).
+    #[test]
+    fn pkm_isogeny_vs_rho_ladder_20_24_28() {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+        for bits in [20u32, 24] {
+            let spec = CurveSpec::PrimeSearch {
+                bits,
+                seed: 0xA11CE ^ bits as u64,
+            };
+            let inst = spec.build().unwrap();
+            let facts = inst.facts(&spec);
+            let Instance::Prime(prime) = &inst else {
+                unreachable!()
+            };
+            let mut scratch = GroupOps::default();
+            let d = 12_345u128 % u128::from(prime.r);
+            let target = prime
+                .curve
+                .mul(&mut scratch, prime.generator_point(), d as u64);
+            let coords = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
+            let t = match bits {
+                20 => 7,
+                24 => 8,
+                _ => 9,
+            };
+            let fb_spec = format!("prime-isogeny:t={t},seed=1");
+            let ic = resolve(&MethodSpec {
+                id: "ic.pipeline".into(),
+                params: [
+                    ("factor_base".to_string(), fb_spec),
+                    ("oracle".to_string(), "rootfind-mitm:m=3".to_string()),
+                ]
+                .into_iter()
+                .collect(),
+            })
+            .unwrap();
+            let rho = resolve(&MethodSpec {
+                id: "rho.negation".into(),
+                params: Default::default(),
+            })
+            .unwrap();
+            let ic_rep = solve(&ic, &inst, &facts, &coords, 3).unwrap();
+            let rho_rep = solve(&rho, &inst, &facts, &coords, 3).unwrap();
+            let d_exact = crate::cryptanalysis::ecbench::exact_scalar::ExactScalar::from(d);
+            eprintln!(
+                "PKM bits={} t={} ic_ok={} ic_gae={:.3e} rho_ok={} rho_gae={:.3e} speedup={:.3}",
+                bits,
+                t,
+                ic_rep.recovered == Some(d_exact),
+                ic_rep.total_gae,
+                rho_rep.recovered == Some(d_exact),
+                rho_rep.total_gae,
+                rho_rep.total_gae / ic_rep.total_gae.max(1.0),
+            );
+            assert_eq!(ic_rep.recovered, Some(d_exact));
+            assert_eq!(rho_rep.recovered, Some(d_exact));
         }
     }
 }

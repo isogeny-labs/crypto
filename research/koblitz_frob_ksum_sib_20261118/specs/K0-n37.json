@@ -1,0 +1,106 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Cohort K (K0-n37): cold single-target Koblitz IC speedup",
+  "description": "Preregistered paired comparison of cand-kf4-c2-free (and cand-kf5-c1) against gen-layout, kf3, and rho.signed_frobenius_strong.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 37
+      }
+    ],
+    "targets_per_curve": 32,
+    "target_seed": 2026111804,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-strong",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    },
+    {
+      "name": "rho-strong-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    },
+    {
+      "name": "inc-gen-layout-c13",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=13,raw_x_cap=100000000,generator_orbit=1",
+          "oracle": "mitm-frobenius-layout-counted:m=2",
+          "max_trials": "2000000000",
+          "targets": "stride-generator"
+        }
+      }
+    },
+    {
+      "name": "inc-gen-layout-c16",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=16,raw_x_cap=100000000,generator_orbit=1",
+          "oracle": "mitm-frobenius-layout-counted:m=2",
+          "max_trials": "2000000000",
+          "targets": "stride-generator"
+        }
+      }
+    },
+    {
+      "name": "inc-kf3",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000,generator_orbit=1",
+          "oracle": "ksum-frobenius:m=3",
+          "max_trials": "2000000000",
+          "targets": "stride-generator"
+        }
+      }
+    },
+    {
+      "name": "cand-kf4-c2-free",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=2,raw_x_cap=100000000,generator_orbit=1",
+          "oracle": "ksum-frobenius:m=4,layout=1,prune=1,sib=1,free=1,scale=1.35",
+          "max_trials": "2000000000",
+          "targets": "stride-generator"
+        }
+      }
+    },
+    {
+      "name": "cand-kf5-c1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=1,raw_x_cap=100000000,generator_orbit=1",
+          "oracle": "ksum-frobenius:m=5,layout=1,prune=1,sib=1,scale=1.0",
+          "max_trials": "2000000000",
+          "targets": "stride-generator"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 8104,
+    "isolation_required": "L0",
+    "timeout_seconds": 120
+  }
+}

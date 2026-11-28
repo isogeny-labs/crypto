@@ -1,0 +1,114 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-15T22:43:51Z",
+ "id": "PCC-20261115-81f437",
+ "kind": "statement",
+ "producer": {
+  "commit": "b8cd452f3f52d8ad32aa77813f44a6b385567033",
+  "model": "claude-opus-5-5",
+  "session": "session_01TCbLH6jxWA7Yo11oJpoLxe"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/notes/index-calculus/PRIME_FIELD_IC_CLOSURE_20261112.md",
+    "sha256": "a77cbf9dd226845f1b8eed591ddd6fe0136f2d03b41cbd2f62247d376dfb55a6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/pkm-msolve/PRESET.txt",
+    "sha256": "cc630314f1c3263a4cd5cc3d3d37d78a1e79f698d5733110275b21523deaa651"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/pkm-msolve/PRESET.sha256",
+    "sha256": "dfd1315225400275a9ed9f7eeb607cae6f58ab00fd7e867e5c20984ea16e0098"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/pkm-msolve/MANIFEST.sha256",
+    "sha256": "778de80b71cf52897fa9b9b727a7573596f17894e7dea4fb0b814b3d8e1e8d75"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/pkm-msolve/tables_final.txt",
+    "sha256": "7775f95b54c713f2fcc0ba9037757767d8d2f3f501bde829872af098e6ac8e26"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/pkm-msolve/analysis.json",
+    "sha256": "4016c6a606665cba95edb6198ecce9e613271bed66a6a186442d61cbd6b374bd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/pkm-msolve/breakeven.json",
+    "sha256": "ad994113ebdd94edc5f556f1e567cbff6794032276942304d49644daee95b5dd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/pkm-msolve/checks.jsonl",
+    "sha256": "8e511f0bc0c8541f12a6c813b9da58b586ab7884be90cf286a5367348df28af7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/pkm-msolve/closure/certs.jsonl",
+    "sha256": "f6cab6735f7e2012b27833c98e4d17546a906ce50a118bdd268346f4eedead7c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/pkm-msolve/index.jsonl",
+    "sha256": "85e0f2c7b649d2c60af74b511f08a51ae6f12d843ffa11f7cd345a0bd60ea223"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/pkm-msolve/progress.txt",
+    "sha256": "5b35288259fe38929d6d4b2128c4ca8a6245c889d2b37549909f9513bb6b8754"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/pkm-msolve-check/indep_m4t3_c6.txt",
+    "sha256": "9372df8bd5d180f2b6e722b48d88f79f862e5b30d83ecdeec33fcfd186ef52e9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/pkm-msolve-check/indep_m5t2_c5.txt",
+    "sha256": "4ee2c0c24510a228392e4d081fc868cfd80b63adcbaa38a80ad872e4ae8e74c3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/pkm-msolve-check/scripts/indep_closure.py",
+    "sha256": "aa078133d8865e29a9fbad814584d088cdecee6062e22457d2bbd9113d69865f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Toy scale and fragile, per the adversarial checker: the m = 6 and m = 7 KILLs each rest on one censored or small-base step; under a slope-halving scenario m = 6 reads exponent 0.443 and m = 7 reads 0.370 (INCONCLUSIVE); the preset's only SURVIVE cell (m = 4, t = 4) was not run. A censored F4 run (D >= 8) does not certify that the degree-7 closure lacks 1. Open for m >= 8 (sigma = 1/m with w = 1 gives exponent 0.43 < 0.5) and asymptotically; no F4 or polynomial-calculus degree lower bound is proved. The owner's decisive cells (m = 4 at N = 20; m = 2 at t = 13/14) were not run. MANIFEST.sha256 re-checked 25/25 in the repo copy on 2026-11-15. No bench.record/v1.",
+ "statement": "PKM Kummer chain (base V = g*mu_{2^t}, raw presentation, Semaev S3 chain, N = m*t variables) at toy scale: under the kill rule frozen before data (research/prime_field_ic_closure_20261112/finish/pkm-msolve/PRESET.txt, sha256 cc630314...: sigma = dD/dN from t = 2 to 3 on the lower of two draws, KILL if sigma >= alpha*(m,1) = H^-1(1-3/m)), msolve 0.6.5 F4 solving degrees on the 16-bit prime-order curve over p = 40961 read KILL for m = 4, 5, 6 and 7: m=4 D 6->7 (certified), sigma 0.250 vs 0.0417; m=5 D 6->>=8, sigma >= 0.400 vs 0.0794; m=6 D 7->>=8, sigma >= 0.167 vs 0.110; m=7 (fallback t = 1->2) D 6->>=8, sigma >= 0.286 vs 0.135. The KILL cells use N <= 18."
+}

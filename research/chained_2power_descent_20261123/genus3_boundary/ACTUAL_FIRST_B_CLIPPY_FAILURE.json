@@ -1,0 +1,211 @@
+{
+  "recorded": "2026-11-23T11:02:17.344940+00:00",
+  "source_B": "3d78cc42eba48abb476b594bd57adc6295c7efbe",
+  "actual_phase_exits": {
+    "rustc-version": 0,
+    "clippy-version": 0,
+    "rustfmt-version": 0,
+    "format": 0,
+    "compile": 0,
+    "clippy": 1
+  },
+  "verification_process_not_reached": true,
+  "full_clippy_stderr": "error: manual implementation of `.is_multiple_of()`\n   --> /dev/shm/ct23-genus3-verify-B/source/research/chained_2power_descent_20261123/genus3_boundary/verification/verify.rs:205:13\n    |\n205 |             v[0] % 2 == 0\n    |             ^^^^^^^^^^^^^ help: replace with: `v[0].is_multiple_of(2)`\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of\n    = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`\n    = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`\n\nerror: manual implementation of `.is_multiple_of()`\n   --> /dev/shm/ct23-genus3-verify-B/source/research/chained_2power_descent_20261123/genus3_boundary/verification/verify.rs:206:20\n    |\n206 |                 && v[1] % 2 == 0\n    |                    ^^^^^^^^^^^^^ help: replace with: `v[1].is_multiple_of(2)`\n    |\n    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of\n\nerror: aborting due to 2 previous errors\n\n",
+  "source_runtime_guards_unchanged": true,
+  "complete_private_packet": "/dev/shm/ct23-genus3-verify-B",
+  "whole_compiled_ELF_remote_custody_pending": true,
+  "files": [
+    {
+      "path": "BUILD_MANIFEST.json",
+      "bytes": 19403,
+      "sha256": "4bbe7fce2d13daafbe5a27ab9b72657db9041c545c1cea94c56ab26f86cc3d74",
+      "whole_file_public": true
+    },
+    {
+      "path": "CONTEXT.json",
+      "bytes": 5195,
+      "sha256": "0754d6eaf5931e526e87b34ad4f6d35d044feedc0f0f041e0d1feba2eb606b80",
+      "whole_file_public": true
+    },
+    {
+      "path": "POST_CALL_MANIFEST.json",
+      "bytes": 19512,
+      "sha256": "9242b4291b913f2599b7e112fb03f4e0fc0414e263d7b63048f67ef78037b90c",
+      "whole_file_public": true
+    },
+    {
+      "path": "clippy-version.argv",
+      "bytes": 43,
+      "sha256": "76845bb28fc4cca7a47668988a31ba3a650a88808014e5dac29b8f2812391548",
+      "whole_file_public": true
+    },
+    {
+      "path": "clippy-version.phase.json",
+      "bytes": 401,
+      "sha256": "b7bc013435fa1ded94ceb6684572e4009c50732f6f19c5dab0862d2e378d6215",
+      "whole_file_public": true
+    },
+    {
+      "path": "clippy-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "whole_file_public": true
+    },
+    {
+      "path": "clippy-version.stdout",
+      "bytes": 38,
+      "sha256": "514f4171a1bed07e7d27a872fc29ebb3e32360eb297e28acf00ab796f80e1038",
+      "whole_file_public": true
+    },
+    {
+      "path": "clippy.argv",
+      "bytes": 275,
+      "sha256": "f4d47c6e51c8007247680a3f994c2c06f2d20a7dd9b1f6f994cf99ab2ccfec9d",
+      "whole_file_public": true
+    },
+    {
+      "path": "clippy.phase.json",
+      "bytes": 395,
+      "sha256": "9688ff39facd8d66fb5012a31f1be9fd14ed603c23aef5ba6dbc70ad09ec6e54",
+      "whole_file_public": true
+    },
+    {
+      "path": "clippy.stderr",
+      "bytes": 1076,
+      "sha256": "637ebe4259bb47191724c70de618ff700fe2a9cca12477949103f40f46a15464",
+      "whole_file_public": true
+    },
+    {
+      "path": "clippy.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "whole_file_public": true
+    },
+    {
+      "path": "compile.argv",
+      "bytes": 297,
+      "sha256": "a730d3ec7b896e4f3b1ed6793c052ecf34785f849570ea543a1808757400343c",
+      "whole_file_public": true
+    },
+    {
+      "path": "compile.phase.json",
+      "bytes": 393,
+      "sha256": "e422c41e34a62f37ee1039d5407df7dcbcf83135ae16c83be593688bac575654",
+      "whole_file_public": true
+    },
+    {
+      "path": "compile.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "whole_file_public": true
+    },
+    {
+      "path": "compile.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "whole_file_public": true
+    },
+    {
+      "path": "final-guards.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "whole_file_public": true
+    },
+    {
+      "path": "final-guards.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "whole_file_public": true
+    },
+    {
+      "path": "format.argv",
+      "bytes": 167,
+      "sha256": "42459ba936066625ebd1cd67cd6b323697bd367d3b765da25e7edef1e0ff6216",
+      "whole_file_public": true
+    },
+    {
+      "path": "format.phase.json",
+      "bytes": 392,
+      "sha256": "8531fb3274350ee16b91202708086cb07ab4652e41732898407d4d09153c5d9b",
+      "whole_file_public": true
+    },
+    {
+      "path": "format.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "whole_file_public": true
+    },
+    {
+      "path": "format.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "whole_file_public": true
+    },
+    {
+      "path": "init.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "whole_file_public": true
+    },
+    {
+      "path": "init.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "whole_file_public": true
+    },
+    {
+      "path": "native-built",
+      "bytes": 4635240,
+      "sha256": "7dc4d755f9c501c5a5034f61b14e5eac7cccd8790fda5040826cde75c73d9a84",
+      "whole_file_public": false
+    },
+    {
+      "path": "rustc-version.argv",
+      "bytes": 35,
+      "sha256": "0c84f2e54be6a2a8da3f7574fbb69a9de26a77188e5b56a10aef6e49ded0004f",
+      "whole_file_public": true
+    },
+    {
+      "path": "rustc-version.phase.json",
+      "bytes": 400,
+      "sha256": "3d6e64e388e01d2dce63d9f0e55706181bed7dc43e3f0f2a8e6f6dbccb00dff9",
+      "whole_file_public": true
+    },
+    {
+      "path": "rustc-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "whole_file_public": true
+    },
+    {
+      "path": "rustc-version.stdout",
+      "bytes": 36,
+      "sha256": "55cd0529c005d3f62869ea6e2271bfa9d5196f56dc65a8be00a371af114a4a98",
+      "whole_file_public": true
+    },
+    {
+      "path": "rustfmt-version.argv",
+      "bytes": 37,
+      "sha256": "29d02920eed6ed38c5977a39ed0de2ff173f7555bacd2b97b0e8f7ac242bb168",
+      "whole_file_public": true
+    },
+    {
+      "path": "rustfmt-version.phase.json",
+      "bytes": 402,
+      "sha256": "00349e087d616a50a173760816e1549fe4a1b888886612584990c1b15a741d7b",
+      "whole_file_public": true
+    },
+    {
+      "path": "rustfmt-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "whole_file_public": true
+    },
+    {
+      "path": "rustfmt-version.stdout",
+      "bytes": 46,
+      "sha256": "5599925a145edaa750ffdd40d2dc1adb031362d0932dd5935e20440a5f51d2be",
+      "whole_file_public": true
+    }
+  ]
+}

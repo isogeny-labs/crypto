@@ -1,0 +1,93 @@
+{
+  "schema": "prime31-run70-authentic-multi-certificate-v1",
+  "date_utc": "2026-11-22",
+  "classification": "GENERIC pair/triple table negative control; actual RHS and 32/32 verified target logs; NOT non-generic IC advantage",
+  "source": "research/prime31_ic_20261115/native/examples/prime31_run70_multi_witness.rs",
+  "source_blob_sha": "6534dec885c76aad9684c43b3bd39b00da22dccb",
+  "included_run69_source_blob_sha": "80a335ca98f3f7345b091a9f792c788f2a2659bc",
+  "tested_commit": "9af5d90c8cf9f295ca37d2e3945275a3da037377",
+  "original_run69_source_change": "only four leading //! inner-doc lines normalized to // for Rust include!; no executable code changed",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "h": 1,
+    "G": [
+      625037715,
+      2100627251
+    ]
+  },
+  "base_size": 677,
+  "generic_pair_table_keys": 916469,
+  "homogeneous_verified_rank": 88,
+  "target_count": 32,
+  "corpus": "run69 deterministic 0x68B677A1D1 source cohort; exact group equality and post-solve BSGS verified",
+  "witness_widths": [
+    1,
+    4,
+    16
+  ],
+  "distinct_valid_public_certificates_per_target": 16,
+  "public_leaf_probes_to_collect_all_16": 3661605,
+  "arms": [
+    {
+      "width": 1,
+      "actual_public_relation_shifts": 5378231,
+      "real_rhs_pair_hits": 2272,
+      "independent_pair_rows": 651,
+      "verified_logs": 32
+    },
+    {
+      "width": 4,
+      "actual_public_relation_shifts": 2528933,
+      "real_rhs_pair_hits": 1088,
+      "independent_pair_rows": 546,
+      "verified_logs": 32
+    },
+    {
+      "width": 16,
+      "actual_public_relation_shifts": 2528933,
+      "real_rhs_pair_hits": 1088,
+      "independent_pair_rows": 546,
+      "verified_logs": 32
+    }
+  ],
+  "k4_vs_k1_query_reduction_fraction": 0.5297834920069443,
+  "k16_extra_query_reduction_over_k4": 0,
+  "runs": [
+    {
+      "id": 45066573115,
+      "job_id": 137343963258,
+      "conclusion": "success",
+      "library_tests": "41/41 pass",
+      "setup_ms": 223.84,
+      "certificate_scan_16_ms": 792.156,
+      "whole_relation_walk_1_4_16_ms": 1215.847,
+      "whole_joint_experiment_ms": 2382.204,
+      "same_process_bsgs_setup_ms": 10.668,
+      "same_process_bsgs_32_online_ms": 139.188
+    },
+    {
+      "id": 45066578357,
+      "job_id": 137343972253,
+      "conclusion": "success",
+      "library_tests": "41/41 pass",
+      "setup_ms": 202.384,
+      "certificate_scan_16_ms": 652.955,
+      "whole_relation_walk_1_4_16_ms": 1104.987,
+      "whole_joint_experiment_ms": 2115.936,
+      "same_process_bsgs_setup_ms": 10.449,
+      "same_process_bsgs_32_online_ms": 144.746
+    }
+  ],
+  "limitations": [
+    "Both runs replay one deterministic target cohort and one relation walk, not independent samples",
+    "The whole joint experiment performs 16-certificate enumeration plus the full K=1 relation walk; it is NOT a K=4-only cold solver benchmark",
+    "Candidate still uses generic 916,469-key pair dictionary and generic target-triple scan, disqualifying novel non-generic IC claim",
+    "Comparison BSGS not optimized rho or strongest existing index-calculus frontier",
+    "Adding target-certificate difference rows (Run71 proposal) is not measured",
+    "Research-KB MCP and local Rust unavailable; published sources and direct GitHub exact-source review used"
+  ],
+  "pcc": "unverified"
+}

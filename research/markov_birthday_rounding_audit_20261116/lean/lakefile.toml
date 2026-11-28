@@ -1,0 +1,11 @@
+name = "markov_birthday_rounding_audit"
+version = "0.1.0"
+defaultTargets = ["MarkovBirthdayRoundingAudit"]
+
+[[require]]
+name = "static_hash_collision_audit"
+path = "../../static_hash_collision_audit_20261114/lean"
+
+[[lean_lib]]
+name = "MarkovBirthdayRoundingAudit"
+roots = ["BirthdayImports", "UniformChain", "GreenMoment", "MarkovCollision", "KMPTCounter", "BirthdayWords", "BirthdayLaw", "BirthdayBound", "BirthdayCertificate"]

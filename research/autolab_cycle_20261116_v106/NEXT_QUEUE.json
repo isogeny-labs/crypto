@@ -1,0 +1,18 @@
+{
+  "id": "C107-zero-polynomial-normalization-regression",
+  "variant": "research/discriminant_roots_20261116_v106d",
+  "hypothesis": "Canonical zero normalization at GCD entry repairs random odd-splitter zero-polynomial inputs without changing mathematical root sets.",
+  "next_command": [
+    "python",
+    "-m",
+    "research.discriminant_roots_20261116_v106d.oracles"
+  ],
+  "preconditions": "Preregister fresh source/input hashes and explicit regression. Never rerun the frozen failed C106 implementation.",
+  "then": "Freeze successful panel bytes and run bounded binary/odd cold comparisons with full root multiplicities; preserve every field/branch.",
+  "budgets": {
+    "initial_seconds": 90,
+    "memory_mb": 4096,
+    "cpu": 0
+  },
+  "qualified_speedup": null
+}

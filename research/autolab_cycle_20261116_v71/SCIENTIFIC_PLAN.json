@@ -1,0 +1,61 @@
+[
+  {
+    "experiment_id": "prime-orbit-calibration-20261116-v71",
+    "preregistered_at": "2026-11-16T00:46:33.248963+00:00",
+    "original_preregistration_sha256": "cc8928b5837063383b25047c954627abf5cdf5b5e32a2f32264d129332fa86f9",
+    "original_fingerprint": "1c84d0566848ee8ab8f949fc8eaca456aca7fce527334dc2c2208ecff032344f",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.prime_orbit_roots_20261116_v71.worker",
+      "prime-orbit-calibration-20261116-v71"
+    ],
+    "timeout_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cpu_affinity": 0,
+    "hypothesis": "Prime-field factorization and exact interval filtering recover every conditional orbit root,including characteristic3andhigh2-adic square roots",
+    "selected_frozen_dependencies_sha256": {
+      "research/image_cells_20261115_v67/algebra.py": "409e0348040c9f8f6cf24440785abd9c4d85a8852ebf750c70b1d12db3473dea",
+      "research/prime_orbit_review_20261116_v71/REVIEW.md": "06704d1739e4956543904a0b7e216891bff44ceeddead73353e94ef129d31460",
+      "research/prime_orbit_roots_20261116_v71/DATA.json": "a73166e3bedaeef3c8def5f25ee9fb09c89e27838bad0a3fd20cc4c49fd0d078",
+      "research/prime_orbit_roots_20261116_v71/PROOF.md": "64252ca17912d0f986791bed63950f4ce9b419822d4c22e73c7d07529916564c",
+      "research/prime_orbit_roots_20261116_v71/field.py": "bb2ef46e57e207f27b7e0d8fac9213fa8a60fc5d225d99346c593138fd41ac1e",
+      "research/prime_orbit_roots_20261116_v71/solver.py": "556279e145c78b2114d17ec8f35c7a10bd94e3df6bcf2bd8dbd4add0b18eaccf",
+      "research/prime_orbit_roots_20261116_v71/worker.py": "71a0fe83e34a3c9000750d5a975d8efeb84fb9b1a6b115cc699a58671acf8403",
+      "research/translation_orbits_20261115_v69/algebra.py": "599b9ebe8c0810c7555923e59e503334b47755b81b06dd3392bfe65912149119"
+    },
+    "scope": "Public scientific excerpt; full original preregistration retained in private append-only ledger. No ELF binary bundled."
+  },
+  {
+    "experiment_id": "nist-orbit-correctness-20261116-v71",
+    "preregistered_at": "2026-11-16T00:49:39.321029+00:00",
+    "original_preregistration_sha256": "70e2962cdc986445259d7e0b1df59b1cffc0ebc8f63d54525df3e619c5a3f691",
+    "original_fingerprint": "aee90174b2ededf37bcb2bb554ee64b92f2dbd8a3468a218c4df4d98e1c3dce0",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.nist_orbit_correctness_20261116_v71.worker",
+      "nist-orbit-correctness-20261116-v71"
+    ],
+    "timeout_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cpu_affinity": 0,
+    "hypothesis": "The exact odd-prime conditional orbit backend retains all interval roots on allfive standardNISTfields,with proved primes and literal auxiliary verification",
+    "selected_frozen_dependencies_sha256": {
+      "lab/research/nist_fields.py": "f79b9a60cb69e8d11f7dcb9fd9675b4f613f72c5048151c24b588676d2e86987",
+      "lab/research/nist_presets.json": "a614dac35438fce60fb05d822d0e90f0149bdfde616986f32255f10722ea2a7c",
+      "research/image_cells_20261115_v67/algebra.py": "409e0348040c9f8f6cf24440785abd9c4d85a8852ebf750c70b1d12db3473dea",
+      "research/local_baseline_deps_20261115_v62/vendor/msolve-local/usr/lib/x86_64-linux-gnu/libflint.so.24.0.0": "d4d65f1045ba48bba16dd796c1b2003c4b599b5c8741f42f61fed47db55d8e2d",
+      "research/nist_orbit_correctness_20261116_v71/DATA.json": "dc25a90c2bcf3a70287c6f1839487983f395448bd23d4d9900c04aa80a6f5b32",
+      "research/nist_orbit_correctness_20261116_v71/PROOF.md": "e6246157184dc47733e2f6e280a2c44ae5c3179fd42526984f09e5625751b3e5",
+      "research/nist_orbit_correctness_20261116_v71/worker.py": "94cfffb43b024a6a689bac0d3511a1b917e409f9effdb214d5fc7b41a2cf8b2d",
+      "research/prime_orbit_review_20261116_v71/REVIEW.md": "06704d1739e4956543904a0b7e216891bff44ceeddead73353e94ef129d31460",
+      "research/prime_orbit_roots_20261116_v71/PROOF.md": "64252ca17912d0f986791bed63950f4ce9b419822d4c22e73c7d07529916564c",
+      "research/prime_orbit_roots_20261116_v71/field.py": "bb2ef46e57e207f27b7e0d8fac9213fa8a60fc5d225d99346c593138fd41ac1e",
+      "research/prime_orbit_roots_20261116_v71/solver.py": "556279e145c78b2114d17ec8f35c7a10bd94e3df6bcf2bd8dbd4add0b18eaccf",
+      "research/prime_orbit_roots_20261116_v71/worker.py": "71a0fe83e34a3c9000750d5a975d8efeb84fb9b1a6b115cc699a58671acf8403",
+      "research/translation_orbits_20261115_v69/algebra.py": "599b9ebe8c0810c7555923e59e503334b47755b81b06dd3392bfe65912149119"
+    },
+    "scope": "Public scientific excerpt; full original preregistration retained in private append-only ledger. No ELF binary bundled."
+  }
+]

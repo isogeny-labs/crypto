@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T11:00:02Z",
+ "id": "PCC-20261116-b94249",
+ "kind": "measurement",
+ "producer": {
+  "commit": "ab40ad935295f185c1b533f9fae03a082f5b5a44",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/update-screen-01/summary.json",
+    "sha256": "a8c1919925236f08b92b7631e9816018567735b0e7cba5c13db2926eb353d13e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/update-screen-01/isolation.jsonl",
+    "sha256": "397977157146419d3afb6d0766f8cf25aa2b3283b98a457b63ed4c2f43e214cb"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Correction of PCC-20261116-c231a8 selection wording: its pinned raw screen selects star-last-n16-s7/index24/both_updates (in-place with old addition), not first-star/guarded-sum. All156 answers match/four paid recoveries/unchanged identities/zero monitor contention. Earlier selection wording was assumed before reading the actual result and is false; preserve it and use this corrective claim. Single-call selection only, no fifteen-fold confirmation."
+}

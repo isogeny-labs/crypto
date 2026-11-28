@@ -1,0 +1,77 @@
+{
+  "schema": "vieta-coset-producer-checks/v1",
+  "standing": "unverified; producer observations only",
+  "source": {
+    "path": "src/cryptanalysis/vieta_coset.rs",
+    "sha256": "1d3dbff14f638e39ee94f3f189bcb5aa051029f4b364618e374053f72ee6bbc1"
+  },
+  "cli_sha256": "0f078826cfb71af11fae281e8cd666b85246fadbf15bb998b148783951abf65d",
+  "cargo_lock_sha256": "9da0f2328ff9068a6ece1244c8c63e86af78022a01e2cdfb151fd73cf17c9d1d",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "checks": [
+    {
+      "argv": [
+        "cargo",
+        "test",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "research/vieta_coset_rust_20261115/native/Cargo.toml"
+      ],
+      "exit_code": 0,
+      "unit_tests": 5,
+      "cli_tests": 3,
+      "log": "evidence/native-tests.log"
+    },
+    {
+      "argv": [
+        "cargo",
+        "clippy",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "research/vieta_coset_rust_20261115/native/Cargo.toml",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "log": "evidence/clippy.log"
+    },
+    {
+      "check": "cargo fmt --check",
+      "exit_code": 0
+    },
+    {
+      "check": "draft protocol schema validation",
+      "exit_code": 0,
+      "log": "evidence/protocol-validation.log"
+    }
+  ],
+  "replay": {
+    "algorithm": "wide-scalar-subtraction",
+    "checked": 16,
+    "preserved_failed_rows": 0,
+    "schema": "vieta-coset-replay/v1",
+    "standing": "producer check; independent signed PCC verdict required"
+  },
+  "larger_correctness_cases": [
+    {
+      "field_bits": 62,
+      "m": 4096
+    },
+    {
+      "field_bits": 224,
+      "m": 1024
+    }
+  ],
+  "performance_measurements": "not launched",
+  "root_release_library_tests": "building; not claimed passed",
+  "missing": [
+    "EKS checkpoint upload credentials",
+    "live budget and capacity readback",
+    "component image and admitted runner"
+  ],
+  "canonical_views": "No admitted performance result: no frontier, leaderboard, benchmark row or canonical graph promoted."
+}

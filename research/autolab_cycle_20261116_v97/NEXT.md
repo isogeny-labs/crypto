@@ -1,0 +1,5 @@
+# Next falsifiable experiments
+
+1. Outer-image alignment: freeze tiny complete original-chain endpoint/source triples,enumeratebothfinitewroots,andmeasure structuredcellcoverage onthatSAMEimage with explicitzero/infinityroutes. Compare complete original8-coordinate rootswitholdseparatorjoin/exhaustiveoracles. Then freeze128source-generatedactualGF83outerstates under a fixedseed; count everyendpoint branch and measurecost/pruning only.90s4GiBonecore. Uniform-field coverbarrier doesnotdetermine this distribution. No discarded positivebranch orsampled rateasglobalbound.
+2. Stronger product consistency: rejectsinsidetheM(w)image requireexactX^2+sX=t support,notlinearcoefficientduals. Design a certificate on a bounded affine cell of the SAMEglobal variables; independenttinywholecelloracle beforeactualprofile. Avoid enumerating2^73relaxations or2^51dualcells.
+3. Rebracketing original-chainintegration andlargeequal-endpointfibers;primecachedchord/tangent/sharedoptimizedrootcontext remain queued. FullmatchinggenuineF4/F5/F6andhard-panelengineeringindependentstreams. No stop/goalsuccessuntilfullgate.

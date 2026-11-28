@@ -1,0 +1,34 @@
+name: CT241 independent F103 two-LP native cost record audit
+
+on:
+  push:
+    branches:
+      - research/ct204-odd-cover-toy-dlp-20261118
+    paths:
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct241_f103_native_cost_audit.py"
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct241_f103_native_15_pairs.jsonl"
+      - ".github/workflows/ct241-f103-native-cost-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  strict-record-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct241_f103_native_cost_audit.py
+            research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct241_f103_native_15_pairs.jsonl
+      - name: Both Python variants must reject corrupt cost records
+        shell: bash
+        run: |
+          set -euo pipefail
+          git log -1 --format='CT241_AUDIT_SOURCE_SHA %H'
+          cd research/chained_jacobian_transfers_20261110/toy_dlp_ct204
+          python3 ct241_f103_native_cost_audit.py
+          python3 -O ct241_f103_native_cost_audit.py

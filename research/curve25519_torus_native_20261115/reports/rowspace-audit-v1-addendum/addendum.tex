@@ -1,0 +1,62 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.65in]{geometry}
+\usepackage{graphicx,hyperref,amsmath}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\begin{document}
+{\Large\bfseries Row-space audit: quota scope and next plan}\par
+\textbf{Producer unsigned/unverified. Original algebraic cases not rerun.}
+
+\textbf{Quota correction.} Frozen v1 checks one million represented entries
+separately for each rank certificate, not globally across the complete Audit
+or live containers. Work and coefficient-write meters are shared per call.
+The 32 MiB output guard is producer-side; the in-memory reader is not a JSON
+transport admission API. Read frozen quota wording with this clarification.
+
+A separately qualified Rust metadata reader counted all existing records:
+4963 for raw12 and 6119 for input204, including three rank certificates and
+image terms. The five small cases have 7, 8, 9, 5, 5 records. All fit the global
+reading of the allowance. These are term/origin records, not bytes, RSS or field
+work. The largest JSON is 1111242 bytes: the initial byte-bound assumption was
+rejected before publication and replaced by native record counts.
+
+New reader source, compiled bindings and seven old input hashes were sealed
+before its one metadata dispatch. No polynomial, field, rank or solver call
+was repeated. Original source, rank evidence and report bytes stay unchanged.
+A future global admission guard needs a new version and qualification.
+
+\textbf{Proposed next discriminating check.}\par
+\includegraphics[width=\linewidth]{plan.pdf}\par
+Protect raw12 or input204. Solve auxiliary pivots in original affine equations,
+then substitute their affine forms into every original quadratic. Bound fill
+before allocation and lift each rewrite using explicit linear polynomial
+multipliers of original affine constraints. Keep every guard and the original
+system. Check extension/projection, then full transformed row-space ranks.
+This partial quotient is not the complete degree-two ideal or a root solver.
+
+The reason to test it is concrete: $x=1,xy=2$ give $y=2$ after substitution,
+although constant combinations of the original rows yield no $y$ relation.
+Retain all seven v1 cases and add this control over both fields. Review old
+affine-closure fill/reservation failures before freezing new source and a
+global quota contract. No successor is implemented, running or scheduled.
+No family, useful-yield or exponent conclusion follows.
+
+\textbf{PR4502 closeout.} Created 04:27:24Z and merged 04:27:58Z on
+2026-11-17. Required gate/size/artifacts began after merge; outcomes remained
+pending at the 04:31 snapshot. The authoring command used guarded
+\texttt{gh pr merge --auto --merge}; the timeline contains a merged event and
+no auto-merge-enabled event. It cannot be called proven queued-only or no
+merge action. Follow-up merge handling must wait for explicit applicable head
+gates and reviews, with no immediate merge fallback.
+
+Owned claim subjects remain unchanged. The initial published ledger prefix
+was not retained: common prefix 1290 rows, final ledger 1352; all three claim
+IDs remain registered with different event hashes. Exact old published suffix
+is archived, never replayed here. Canonical owners must resolve this history.
+Episode coverage is publication only; original-session intervention, recovery
+and cost coverage are unavailable. Revert review is not yet due.
+
+\textbf{Sources.} Native f9b20c/report ad6a8b; new quota-reader-v1 packet;
+\texttt{ERRATA.md}, \texttt{AFFINE\_QUOTIENT\_PLAN.md}; closure4502 facts and
+full decoded logs. No new scientific result plot: original dimensions remain
+unchanged; the diagram labels proposed work only.
+\end{document}

@@ -1,0 +1,59 @@
+   Compiling zmij v1.0.23
+   Compiling proc-macro2 v1.0.107
+   Compiling version_check v0.9.5
+   Compiling serde_json v1.0.151
+   Compiling unicode-ident v1.0.26
+   Compiling quote v1.0.47
+   Compiling crossbeam-utils v0.8.23
+   Compiling serde_core v1.0.229
+   Compiling typenum v1.20.1
+   Compiling libc v0.2.190
+   Compiling zerocopy v0.8.60
+   Compiling crossbeam-epoch v0.9.21
+   Compiling syn v3.0.6
+   Compiling generic-array v0.14.7
+   Compiling serde v1.0.229
+   Compiling autocfg v1.5.1
+   Compiling cfg-if v1.0.5
+   Compiling crossbeam-deque v0.8.8
+   Compiling serde_derive v1.0.229
+   Compiling getrandom v0.2.17
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling num-traits v0.2.19
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling rayon-core v1.13.0
+   Compiling digest v0.10.7
+   Compiling rand_core v0.6.4
+   Compiling cpufeatures v0.2.17
+   Compiling sha2 v0.10.9
+   Compiling ppv-lite86 v0.2.21
+   Compiling either v1.18.0
+   Compiling rr5-original-f4-closure v0.1.0 (/workspace/scratch/isogeny-labs-crypto/research/prime31_four_summand_20261122/native/f4-source)
+   Compiling rayon v1.12.0
+   Compiling rand_chacha v0.3.1
+   Compiling rand v0.8.8
+   Compiling num-integer v0.1.47
+error: failed to run custom build command for `rr5-original-f4-closure v0.1.0 (/workspace/scratch/isogeny-labs-crypto/research/prime31_four_summand_20261122/native/f4-source)`
+
+Caused by:
+  process didn't exit successfully: `/workspace/scratch/rr5-production-target/release/build/rr5-original-f4-closure-3018bf981ea905d6/build-script-build` (exit status: 101)
+  --- stdout
+  cargo:rerun-if-changed=/workspace/scratch/isogeny-labs-crypto/src/cryptanalysis/f4_fp.rs
+  cargo:rerun-if-changed=/workspace/scratch/isogeny-labs-crypto/src/cryptanalysis/f4_fp/reuse.rs
+  cargo:rerun-if-changed=/workspace/scratch/isogeny-labs-crypto/src/cryptanalysis/f4_fp/pair_certificate.rs
+  cargo:rerun-if-changed=/workspace/scratch/isogeny-labs-crypto/src/cryptanalysis/f4_fp/certified.rs
+  cargo:rerun-if-changed=/workspace/scratch/isogeny-labs-crypto/src/cryptanalysis/challenge_ladder.rs
+  cargo:rerun-if-changed=/workspace/scratch/isogeny-labs-crypto/src/cryptanalysis/glv_invariant_base.rs
+  cargo:rerun-if-changed=/workspace/scratch/isogeny-labs-crypto/src/cryptanalysis/groebner_f4.rs
+  cargo:rerun-if-changed=/workspace/scratch/isogeny-labs-crypto/src/cryptanalysis/ic_boundary.rs
+
+  --- stderr
+
+  thread 'main' (27562) panicked at f4-source/build.rs:52:5:
+  assertion `left == right` failed: production source changed: src/cryptanalysis/ic_boundary.rs; review the dependency closure before deliberately updating its pinned hash
+    left: "2ff113f98afb6aae1d2ccd247f5872dbed33396922f4c87f0151a6819354c56d"
+   right: "ee70c40d611bea2a86e782e8513d6e18be49ca575e1159a42512afb18dc346ce"
+  note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+warning: build failed, waiting for other jobs to finish...

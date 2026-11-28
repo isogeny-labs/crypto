@@ -1,0 +1,78 @@
+{
+  "schema": "development.provenance/v1",
+  "phase": "pre-call",
+  "timestamp": "2026-11-16T06:24:16.320Z",
+  "qualifier": "/tmp/prime-transfer-round04-qualifier-02",
+  "pins": [
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-04/v2/recognizer.cpp",
+      "sha256": "089fc69ca39509cccc8c0d0717b86f3b14a9de4b43f719e1680c69d9ee459576",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-02/round-04/v2/recognizer.cpp",
+      "qualifier_sha256": "089fc69ca39509cccc8c0d0717b86f3b14a9de4b43f719e1680c69d9ee459576"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-04/v2/exact.hpp",
+      "sha256": "d52df5722fbde3fa4c2491d4ad15f3061cf04308d617997b33665af7e4ec7cb9",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-02/round-04/v2/exact.hpp",
+      "qualifier_sha256": "d52df5722fbde3fa4c2491d4ad15f3061cf04308d617997b33665af7e4ec7cb9"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-04/v2/lattice.hpp",
+      "sha256": "3925e7078c5a4171084bdda582f697c5715d1ea7e2a8c0f15f90dad1b91762a5",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-02/round-04/v2/lattice.hpp",
+      "qualifier_sha256": "3925e7078c5a4171084bdda582f697c5715d1ea7e2a8c0f15f90dad1b91762a5"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-04/native_base.hpp",
+      "sha256": "54fb1e9c5e2f76c0c2afe982b406a81f87b2aea164ab234588327159d9b474a6",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-02/round-04/native_base.hpp",
+      "qualifier_sha256": "54fb1e9c5e2f76c0c2afe982b406a81f87b2aea164ab234588327159d9b474a6"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-04/PROTOCOL.md",
+      "sha256": "6ac739e360d70d0564b19dd8ce3b6aba4362ce5239b9301cd4c8d36e64eeb693",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-02/round-04/PROTOCOL.md",
+      "qualifier_sha256": "6ac739e360d70d0564b19dd8ce3b6aba4362ce5239b9301cd4c8d36e64eeb693"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-04/AMENDMENT-01.md",
+      "sha256": "660653c3e7a9a14355c0ff146e0ffbc0512dd5b0460608b9e735105b465b8c4c",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-02/round-04/AMENDMENT-01.md",
+      "qualifier_sha256": "660653c3e7a9a14355c0ff146e0ffbc0512dd5b0460608b9e735105b465b8c4c"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-04/provenance.cjs",
+      "sha256": "ccf99c6ba0ab90d695a7092caece3c63d41842a579e4a9042dbccf239e251ae9",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-02/round-04/provenance.cjs",
+      "qualifier_sha256": "ccf99c6ba0ab90d695a7092caece3c63d41842a579e4a9042dbccf239e251ae9"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/round-02/local_torsion.cpp",
+      "sha256": "10943c5719179f30cf939854c5f07894ef33e7cf24f2091b2331665bd0a78a4b",
+      "qualifier_path": "/tmp/prime-transfer-round04-qualifier-02/round-02/local_torsion.cpp",
+      "qualifier_sha256": "10943c5719179f30cf939854c5f07894ef33e7cf24f2091b2331665bd0a78a4b"
+    },
+    {
+      "path": "/tmp/prime-transfer-round04-qualifier-02/recognizer",
+      "sha256": "f5d7c2836e8691a4c3b222d158dbe2ae421dc39a63ee2f930bf7f45481279dfb"
+    },
+    {
+      "path": "research/prime_field_transfer_goal_20261116/receipts/round-04/models/u5-v2.model",
+      "sha256": "0ff61d4aa0d0cfaf9fd8f676b11df161b59def1ab1e2fdc18de80be02e694afc"
+    }
+  ],
+  "exit": 0,
+  "build_log": "build-v2-01.stderr",
+  "scope": "Local development correctness only; no performance experiment or independent execution proof",
+  "independent_preregistration": false,
+  "recorder_sha256": "ccf99c6ba0ab90d695a7092caece3c63d41842a579e4a9042dbccf239e251ae9",
+  "command": [
+    "timeout",
+    "60s",
+    "/tmp/prime-transfer-round04-qualifier-02/recognizer",
+    "qualify",
+    "research/prime_field_transfer_goal_20261116/receipts/round-04/models/u5-v2.model",
+    "2"
+  ],
+  "timeout_seconds": 60
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "pencil.independent-source-review/v1",
+  "recorded_utc": "2026-11-11T02:04:43.245819+00:00",
+  "status": "source_correction_supported_pending_runtime",
+  "reviewer": "branch_specialization",
+  "producer": "ci_audit",
+  "source_manifest": {
+    "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v5-20261111/manifest.json",
+    "sha256": "c5f902f357d4b08eee69319dc0895c20b66aa7a5d2de730836909e4ab049c0be"
+  },
+  "worker_sha256": "064beefe07ad549f49af488d977b3ab360d64ddb61179c4313079858a0d75e1f",
+  "published_source_revision": "ce963ce8d3b7fe83591448824e8a6e7d8bf5211b",
+  "publication_scope": "Worker bytes checked against local Git object; coordinator supplied remote publication readback.",
+  "checks": {
+    "semantic_manifest_20_files_match": true,
+    "admission_packet_pins_match": true,
+    "only_FileNotFoundError_tolerated_for_target_stat": true,
+    "absent_target_allowed_only_materialize": true,
+    "present_target_requires_S_ISDIR": true,
+    "other_stat_errors_propagate": true,
+    "six_panel_source_inputs_unchanged": true,
+    "total_build_execution_seconds": [
+      2400,
+      1800,
+      600
+    ],
+    "cpu": 2,
+    "memory_bytes": 17179869184,
+    "sampled_filesystem_thresholds_unchanged": true,
+    "fresh_v5_runtime_identities_consistent": true,
+    "v4_packaging_original_metadata_custody_hashes_match": true
+  },
+  "limitations": [
+    "Source review only; no runtime or compiler result.",
+    "Existing disappearing regular-file tolerance within traversal remains inherited.",
+    "Source manifest excludes mutable artifact packaging metadata explicitly.",
+    "Final ledger, lease and released admission require separate coordinator binding."
+  ],
+  "reviewer_executed_payload": false,
+  "reviewer_compiled": false,
+  "reviewer_ran_tests": false,
+  "blockers": []
+}

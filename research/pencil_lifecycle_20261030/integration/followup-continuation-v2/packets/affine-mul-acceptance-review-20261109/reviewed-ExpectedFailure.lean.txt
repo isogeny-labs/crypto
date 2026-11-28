@@ -1,0 +1,4 @@
+import Controls
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy StoredInput
+example : WellFormed 17 (wordsPoly 17 []) ⟨0,#[1,17,0],#[0,0]⟩ := by
+ norm_num [WellFormed, Stored.canonical, Canon]

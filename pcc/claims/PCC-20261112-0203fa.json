@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T22:57:07Z",
+ "id": "PCC-20261112-0203fa",
+ "kind": "theorem",
+ "producer": {
+  "commit": "5bec81e36ac9b6f7b91ddc5437766248bf7aacfe",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "ec58fd3845968d6bd8b14979c1f6db4483ecb03f168e3e74c41e69ee20efd6d2",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/T20DirectNorms.lean",
+   "theorem": "T20DirectNorms.two_torsion_translation_x"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Faithful cleared ring identities/conditional IntModule norm4/recovery/explicit scalar and raw monic normalization constants;actual curves/jets/Picard/polarization/descent remain explicit written/native bridges. Local Lean pass is not scientific signature.",
+ "statement": "theorem two_torsion_translation_x {K : Type} [CommRing K] (x e A B : K) (he : e^3+A*e+B=0) : x^3+A*x+B-(x+e)*(x-e)^2 = (e*(x-e)+(3*e^2+A))*(x-e)"
+}

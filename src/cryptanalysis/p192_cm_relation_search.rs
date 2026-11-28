@@ -176,13 +176,8 @@ fn factor_product(factors: &[(&str, u32)]) -> BigUint {
     })
 }
 
-fn gcd_biguint(mut a: BigUint, mut b: BigUint) -> BigUint {
-    while !b.is_zero() {
-        let r = &a % &b;
-        a = b;
-        b = r;
-    }
-    a
+fn gcd_biguint(a: BigUint, b: BigUint) -> BigUint {
+    crate::gcd::int::gcd_big(&a, &b)
 }
 
 fn trial_prime_u64(n: u64) -> bool {
@@ -710,16 +705,16 @@ impl Hnf {
 }
 
 fn extended_gcd(a: &BigInt, b: &BigInt) -> (BigInt, BigInt, BigInt) {
-    if b.is_zero() {
-        let sign = if a.is_negative() {
-            -BigInt::one()
-        } else {
-            BigInt::one()
-        };
-        return (a.abs(), sign, BigInt::zero());
-    }
-    let (g, x1, y1) = extended_gcd(b, &a.mod_floor(b));
-    (g, y1.clone(), x1 - a.div_floor(b) * y1)
+    // (|g|, x, y) with a·x + b·y = |g|, by the shared extended gcd on |a|, |b|
+    // with the signs folded into the cofactors.  The only caller
+    // (`hnf_from_vectors`) uses the Bézout identity and reduces the
+    // accumulated x-coordinate mod the HNF `a`, which is unique, so the HNF is
+    // unchanged; with one side zero the cofactors equal the old ones (for
+    // both zero only the still-zero x-combo is multiplied, so nothing changes).
+    let (g, s, t) = crate::gcd::int::xgcd_big(a.magnitude(), b.magnitude());
+    let x = if a.is_negative() { -s } else { s };
+    let y = if b.is_negative() { -t } else { t };
+    (BigInt::from(g), x, y)
 }
 
 fn hnf_from_vectors(vectors: &[(BigInt, BigInt)]) -> Result<Hnf, String> {

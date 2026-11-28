@@ -1,0 +1,158 @@
+{
+  "schema": "crypto.ml-dataset.native-f4-validation-references/v1",
+  "runtime_test_source": "29973950752cd0e2389a07608eee63781841afc2",
+  "base_commit": "c14d4552e513f6e28bda0e0e045f5e64beb492db",
+  "binary_sha256": "e368482f8f8d56070d19e50c51aad1948d3238d1d579776f6c54e7f1243d4501",
+  "receipts": {
+    "source_and_native_fixtures": {
+      "schema": "crypto.ml-dataset.software-source-checkpoint/v1",
+      "completed_utc": "2026-10-28T17:46:23.934673+00:00",
+      "uri": "s3://setec-astronomy-artifacts/ml-dataset/20261028/software/boolean-f4-suffix-trace/53f2f9891e03acfb6eeaf37dac25ade84bd007fb1fbeb1266ded8e0b05e0ac5e/source.tar.gz",
+      "sha256": "53f2f9891e03acfb6eeaf37dac25ade84bd007fb1fbeb1266ded8e0b05e0ac5e",
+      "bytes": 37533614,
+      "etag": "\"a5c89cb1f6363ae904ef7bf07736a2ae\"",
+      "source_commit": "29973950752cd0e2389a07608eee63781841afc2",
+      "base_commit": "c14d4552e513f6e28bda0e0e045f5e64beb492db",
+      "status": "native-focused-tests-and-lint-passed",
+      "finite_completed_file_allowlist": true,
+      "live_full_library_log_excluded_before_compression_and_after_fresh_get": true,
+      "conditional_put": true,
+      "etag_bound_head": true,
+      "etag_bound_fresh_get": true,
+      "byte_compare": true,
+      "contained_hashes_verified": true,
+      "file_count_including_manifest": 62,
+      "fresh_bundle_verified": true,
+      "bundle_mode": "incremental; requires pinned base commit in restoration repository",
+      "bundle_prerequisite": "c14d4552e513f6e28bda0e0e045f5e64beb492db",
+      "native_tests_executed": true,
+      "focused_tests_passed": 14,
+      "focused_tests_failed": 0,
+      "strict_clippy_passed": true,
+      "cargo_or_compile_executed": true,
+      "native_fixtures_generated": true,
+      "fixture_streams": 6,
+      "independent_native_replay_included_in_archive": false,
+      "separate_parent_report": {
+        "independent_replay_passed": true,
+        "reported_utc": "2026-10-28T17:39:38Z",
+        "checker_cli_sha256": "3e294a77fcef48ad39462a90c67a7da5bc55996fd70282363823a70183603f3d",
+        "evidence_directory": "/home/ec2-user/ml-dataset-resume-20261028/algebra-checker-native-interop-final"
+      },
+      "parent_owned_full_library_gate": "pending; live log excluded",
+      "scientific_dataset_generated": false,
+      "requests": [
+        {
+          "operation": "put-object",
+          "exit_code": 0
+        },
+        {
+          "operation": "head-object",
+          "exit_code": 0
+        },
+        {
+          "operation": "get-object",
+          "exit_code": 0
+        }
+      ],
+      "verified_billing_claim": false
+    },
+    "completed_native_full_gate": {
+      "schema": "crypto.ml-dataset.software-validation-archive/v1",
+      "uri": "s3://setec-astronomy-artifacts/ml-dataset/20261028/software/boolean-f4-suffix-full-gate/e5dbfcf4a2569ece526bf29d3f4cf28b8e3326837ebc13f06684c5e00cb4f8c2/validation.tar.gz",
+      "sha256": "e5dbfcf4a2569ece526bf29d3f4cf28b8e3326837ebc13f06684c5e00cb4f8c2",
+      "bytes": 122441,
+      "etag": "\"51b14b0afef58f6bcea577b98bd5c9a8\"",
+      "verified_at": "2026-10-28T18:06:38.625004+00:00",
+      "source_commit": "29973950752cd0e2389a07608eee63781841afc2",
+      "base_commit": "c14d4552e513f6e28bda0e0e045f5e64beb492db",
+      "conditional_put": true,
+      "etag_bound_head": true,
+      "etag_bound_fresh_get": true,
+      "byte_comparison": true,
+      "contained_hashes_verified": true,
+      "fresh_source_bundle_verified": true,
+      "finite_completed_file_allowlist": true,
+      "full_library": {
+        "passed": 5197,
+        "failed": 0,
+        "ignored": 125,
+        "exit_code": 0,
+        "duration_seconds_diagnostic": 1375.67
+      },
+      "prior_archives_immutable": true,
+      "scientific_dataset_generated": false,
+      "requests": [
+        {
+          "operation": "put-object",
+          "exit_code": 0
+        },
+        {
+          "operation": "head-object",
+          "exit_code": 0
+        },
+        {
+          "operation": "get-object",
+          "exit_code": 0
+        }
+      ],
+      "verified_billing_claim": false
+    },
+    "independent_checker_and_interop": {
+      "schema": "crypto.ml-dataset.software-validation-archive/v1",
+      "uri": "s3://setec-astronomy-artifacts/ml-dataset/20261028/software/boolean-matrix-checker-final/45f0743e02a7a01920e553cc389761685bd838a6d6b96f10ddc47bd8e7628c0e/validation.tar.gz",
+      "sha256": "45f0743e02a7a01920e553cc389761685bd838a6d6b96f10ddc47bd8e7628c0e",
+      "bytes": 1493694,
+      "verified_at": "2026-10-28T17:44:18Z",
+      "conditional_put": true,
+      "etag_bound_fresh_get": true,
+      "byte_comparison": true,
+      "content_length_checked": true,
+      "contained_hashes_verified": true,
+      "restored_source_bundle_verified": true,
+      "runtime_source": "2ca93f74a00a5ff133aeaf5cab772f616a110791",
+      "native_interoperability_verified": true,
+      "independent_completed_ranks_checked": 5,
+      "native_censored_prefix_checked": true,
+      "historical_review_gap_preserved": true,
+      "scientific_dataset_generated": false,
+      "new_cloud_job": false
+    },
+    "parent_source_review_packet": {
+      "schema": "crypto.ml-dataset.delivery-status-archive/v1",
+      "uri": "s3://setec-astronomy-artifacts/ml-dataset/20261028/software/delivery-status/0826091163bf872f2bf146a3e51ca86b47cfe566aa159a1ded1a57892324827a/delivery.tar.gz",
+      "sha256": "0826091163bf872f2bf146a3e51ca86b47cfe566aa159a1ded1a57892324827a",
+      "bytes": 15411,
+      "verified_at": "2026-10-28T17:54:33Z",
+      "conditional_put": true,
+      "etag_bound_fresh_get": true,
+      "byte_comparison": true,
+      "contained_hashes_verified": true,
+      "pr2794_six_observed_checks_passed": true,
+      "pr2790_one_checkout_retry_pending_at_recorded_snapshot": true,
+      "main_delivery_claim": false,
+      "scientific_dataset_generated": false,
+      "new_cloud_job": false
+    }
+  },
+  "independent_replay": {
+    "schema": "crypto.boolean-matrix-cli-software-validation/v1",
+    "native_source": "29973950752cd0e2389a07608eee63781841afc2",
+    "native_binary_sha256": "e368482f8f8d56070d19e50c51aad1948d3238d1d579776f6c54e7f1243d4501",
+    "checker_runtime_source": "2ca93f74a00a5ff133aeaf5cab772f616a110791",
+    "checker_test_source": "2ca93f74a00a5ff133aeaf5cab772f616a110791",
+    "checker_binary_sha256": "3e294a77fcef48ad39462a90c67a7da5bc55996fd70282363823a70183603f3d",
+    "test_binary_sha256": "0adf3cc01b50615af9279b1e13c18cf443dc2699ba4cf71ee8fd76790ee8582e",
+    "completed_at": "2026-10-28T17:39:38Z",
+    "completed_native_traces": 5,
+    "censored_native_traces": 1,
+    "cli_reports_equal_test_reports": true,
+    "rehashed_tampered_traces_rejected": 4,
+    "scientific_dataset_generated": false,
+    "total_instruction_count_verified": false,
+    "first_or_last_fall_degree_claim": false
+  },
+  "scientific_dataset_generated": false,
+  "first_fall_degree": null,
+  "last_fall_degree": null
+}

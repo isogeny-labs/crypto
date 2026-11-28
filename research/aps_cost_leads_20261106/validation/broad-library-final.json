@@ -1,0 +1,109 @@
+{
+  "schema": "aps.broad-library-outcome/v1",
+  "standing": "unverified producer assertion",
+  "compiled_source_commit": "ffd0bd0dd33f53e53bd8f5526ffa1c2ad20cce30",
+  "compiled_source_tree": "685a58c6e2216005cd5a6f4e7fa3deb39c768a74",
+  "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --lib -- --test-threads=2",
+  "exit": 101,
+  "summary": {
+    "status": "FAILED",
+    "passed": 6098,
+    "failed": 11,
+    "ignored": 133
+  },
+  "private_log_sha256": "d550421308f9bba016e0c8911a5bdd58656ed0b3af3a228ddb944b75f8a1d0ac",
+  "failure_groups": [
+    {
+      "category": "missing tracked inputs at the broad run boundary",
+      "count": 6,
+      "tests": [
+        "cryptanalysis::certicom_dlp::device_tests::device_published_targets_stop_with_real_work_and_no_scalar",
+        "cryptanalysis::certicom_dlp::device_tests::device_rho_bsgs_and_complete_ic_recover_exact_curve_fixtures",
+        "cryptanalysis::certicom_dlp::device_tests::device_source_matches_independent_rust_full_width_arithmetic",
+        "cryptanalysis::certicom_dlp::device_tests::expired_sessions_reject_no_io_results_for_every_solver",
+        "cryptanalysis::certicom_dlp::device_tests::worker_backend_binding_encoding_and_candidate_checks_fail_closed",
+        "cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version"
+      ]
+    },
+    {
+      "category": "introduced APS registry/optimization inventory omissions at compiled sourceFFD",
+      "count": 3,
+      "tests": [
+        "cryptanalysis::ecbench::methods::registry_audit_tests::every_registered_method_is_run_skipped_or_exempt_and_its_phases_sum",
+        "cryptanalysis::ecbench::optimization::tests::every_live_method_and_parameter_has_an_optimization_policy",
+        "cryptanalysis::ecbench::optimization::tests::koblitz_batch_tuning_keeps_seed_and_resource_cap_out_of_the_grid"
+      ]
+    },
+    {
+      "category": "unavailable Linux diagnostic-clock procfs input",
+      "count": 2,
+      "tests": [
+        "cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::ok_without_observed_reap_cannot_mark_or_read_sidecars",
+        "cryptanalysis::ecbench::runner::diagnostic_reap_publication_regression_tests::publication_collision_preserves_previous_bytes_and_pending_failure"
+      ]
+    }
+  ],
+  "subsequent_evidence": [
+    {
+      "scope": "exact tracked-input restoration targeted reruns",
+      "receipt": "completed-components.json",
+      "native_statement": "PCC-20261106-34db73",
+      "standing": "unverified",
+      "effect_on_broad_outcome": "none"
+    },
+    {
+      "scope": "registry and optimization repairs, assertions/exemptions preserved",
+      "receipt": "final-components.json",
+      "native_statement": "PCC-20261106-5e324a",
+      "standing": "unverified",
+      "effect_on_broad_outcome": "none"
+    }
+  ],
+  "hosted_observation": {
+    "head": "f33f6dda9e4fdae869b2401572b1717454d99e84",
+    "required_jobs": [
+      {
+        "name": "gate",
+        "job": 128178135710,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/isogeny-labs/crypto/actions/runs/42300908429/job/128178135710"
+      },
+      {
+        "name": "size",
+        "job": 128177039197,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/isogeny-labs/crypto/actions/runs/42300594022/job/128177039197"
+      },
+      {
+        "name": "gate",
+        "job": 128177037352,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/isogeny-labs/crypto/actions/runs/42300593411/job/128177037352"
+      },
+      {
+        "name": "artifacts",
+        "job": 128177035732,
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/isogeny-labs/crypto/actions/runs/42300593131/job/128177035732"
+      }
+    ],
+    "submitted_reviews": 0,
+    "review_threads": 0,
+    "auto_merge": null,
+    "not_a_full_library_result": true
+  },
+  "boundary_notes": [
+    "The broad run driver initially began on an older source; library-source.txt pins the actual later FFD compilation after the transitive main dependency rebuild.",
+    "Later targeted input-restoration and inventory-repair passes do not replace this failed broad outcome.",
+    "The current PR head has later repaired inventory/metadata. This is not a final-source or later-head full-library pass.",
+    "Validation elapsed time is excluded from performance evidence. No profiler, benchmark or EKS experiment was launched.",
+    "Older frozen receipts remain unchanged and retain their pending/source-specific boundaries."
+  ],
+  "performance_evidence": false,
+  "raw_logs_published": false,
+  "full_native_ledger_published": false
+}

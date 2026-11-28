@@ -1,0 +1,109 @@
+..............FE......EFFE.........................EEF..........
+======================================================================
+ERROR: test_build_and_run_preserve_pinned_stage_commands (test_k600_mixed_orbit_supervisor.MixedOrbitSupervisorTests.test_build_and_run_preserve_pinned_stage_commands)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/test_k600_mixed_orbit_supervisor.py", line 253, in test_build_and_run_preserve_pinned_stage_commands
+    built = gate.build(auth, build_dir, output)
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/k600_mixed_orbit_supervisor.py", line 204, in build
+    _, auth_hash = load_authorization(authorization, build_dir, output_dir)
+                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/k600_mixed_orbit_supervisor.py", line 118, in load_authorization
+    raise ValueError(error)
+ValueError: additional-budget build_dir mismatch
+
+======================================================================
+ERROR: test_build_and_import_receipts_are_source_bound (test_mixed_orbit_import_900_supervisor.ImportGateTests.test_build_and_import_receipts_are_source_bound)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/test_mixed_orbit_import_900_supervisor.py", line 96, in test_build_and_import_receipts_are_source_bound
+    result = gate.gate(auth, output, small, envelope)
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/mixed_orbit_import_900_supervisor.py", line 76, in gate
+    raise ValueError(error)
+ValueError: authorization output_dir mismatch
+
+======================================================================
+ERROR: test_build_and_run_preserve_pinned_stage_commands (test_mixed_orbit_supervisor.MixedOrbitSupervisorTests.test_build_and_run_preserve_pinned_stage_commands)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/test_mixed_orbit_supervisor.py", line 209, in test_build_and_run_preserve_pinned_stage_commands
+    built = gate.build(auth, build_dir, output)
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/mixed_orbit_supervisor.py", line 167, in build
+    _, auth_hash = load_authorization(authorization, build_dir, output_dir)
+                   ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/mixed_orbit_supervisor.py", line 109, in load_authorization
+    raise ValueError(error)
+ValueError: additional-budget build_dir mismatch
+
+======================================================================
+ERROR: test_import_failure_prevents_search_and_success_charges_both_caps (test_structured_orbit_search_supervisor.StructuredOrbitGateTests.test_import_failure_prevents_search_and_success_charges_both_caps) (valid_import=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/test_structured_orbit_search_supervisor.py", line 241, in test_import_failure_prevents_search_and_success_charges_both_caps
+    outer = gate.run(obj, binary, auth, output)
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/structured_orbit_search_supervisor.py", line 277, in run
+    raise ValueError(error)
+ValueError: additional-budget output_dir mismatch
+
+======================================================================
+ERROR: test_import_failure_prevents_search_and_success_charges_both_caps (test_structured_orbit_search_supervisor.StructuredOrbitGateTests.test_import_failure_prevents_search_and_success_charges_both_caps) (valid_import=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/test_structured_orbit_search_supervisor.py", line 241, in test_import_failure_prevents_search_and_success_charges_both_caps
+    outer = gate.run(obj, binary, auth, output)
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/structured_orbit_search_supervisor.py", line 277, in run
+    raise ValueError(error)
+ValueError: additional-budget output_dir mismatch
+
+======================================================================
+FAIL: test_additional_budget_is_required_before_build (test_k600_mixed_orbit_supervisor.MixedOrbitSupervisorTests.test_additional_budget_is_required_before_build)
+----------------------------------------------------------------------
+ValueError: additional-budget build_dir mismatch
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/test_k600_mixed_orbit_supervisor.py", line 76, in test_additional_budget_is_required_before_build
+    with self.assertRaisesRegex(ValueError, "below full conservative charge"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "below full conservative charge" does not match "additional-budget build_dir mismatch"
+
+======================================================================
+FAIL: test_exact_budget_and_output_binding_precede_docker (test_mixed_orbit_import_900_supervisor.ImportGateTests.test_exact_budget_and_output_binding_precede_docker)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/test_mixed_orbit_import_900_supervisor.py", line 42, in test_exact_budget_and_output_binding_precede_docker
+    self.assertIsNone(gate.authorization_error(record, output))
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'authorization output_dir mismatch' is not None
+
+======================================================================
+FAIL: test_additional_budget_is_required_before_build (test_mixed_orbit_supervisor.MixedOrbitSupervisorTests.test_additional_budget_is_required_before_build)
+----------------------------------------------------------------------
+ValueError: additional-budget build_dir mismatch
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/test_mixed_orbit_supervisor.py", line 75, in test_additional_budget_is_required_before_build
+    with self.assertRaisesRegex(ValueError, "below full conservative charge"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "below full conservative charge" does not match "additional-budget build_dir mismatch"
+
+======================================================================
+FAIL: test_missing_additional_budget_cannot_launch (test_structured_orbit_search_supervisor.StructuredOrbitGateTests.test_missing_additional_budget_cannot_launch)
+----------------------------------------------------------------------
+ValueError: additional-budget output_dir mismatch
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Volumes/SSD990-2/.codex/worktrees/ec70/crypto/target/n83-d18-census-worktree/research/koblitz_n83_factor_base_sweep_20261008/test_structured_orbit_search_supervisor.py", line 112, in test_missing_additional_budget_cannot_launch
+    with self.assertRaisesRegex(ValueError, "below the full conservative charge"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "below the full conservative charge" does not match "additional-budget output_dir mismatch"
+
+----------------------------------------------------------------------
+Ran 63 tests in 6.000s
+
+FAILED (failures=4, errors=5)

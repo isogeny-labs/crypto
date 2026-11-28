@@ -1,5 +1,16 @@
 # N83 signed-orbit size frontier: exact design extension
 
+The [native free-selector follow-up](verification/native-selector-export-20261019/RESULT.md)
+passes the original witness at 787 conflicts /167.34 s, actual selectors
+replayed. This does not change the size frontier, natural yield or unknown
+full-cold winner.
+
+The [19 October native diagnostic](verification/native-phase-20261019-v3/RESULT.md)
+now supplies independently replayed 1,000-conflict terminals for both retained
+K2048 and K4096, with zero models, relations and rank. This resolves bounded
+observability, without selecting a size by full cold runtime or changing
+the frozen design and support bounds below.
+
 The frozen v1 design stops at 900 public-x orbit columns. The primary
 `a=0` subgroup has order `2417851639230796216685689`. For a successfully
 constructed signed-Frobenius base with `K` full, distinct orbit columns,
@@ -68,10 +79,40 @@ hash-policy K=1,182 object at seed 2026100801, replayed all 196,212 signed
 points and uploaded/downloaded its 5,956,114-byte compressed object with a
 matching BLAKE3 digest. Its exact receipt and resource limits are in
 `verification/two-hour-extension-20261010/REPORT.md`. No single-target cold
-timing claim follows. Other larger K choices, source-pinned relation
-production, natural rank and fully charged cold comparison remain required.
-The versioned S3 destination is
+timing claim follows. Later runs constructed the remaining primary sizes,
+as recorded below. Source-pinned relation production, natural rank and a
+fully charged cold comparison remain required.
+The original versioned S3 destination is
 `s3://crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/v2-size-frontier/`.
+Exact K2048 and K4096 mirrors now have verified fresh round trips in the
+user-selected `setec-astronomy-artifacts` bucket under the same versioned
+prefix. Historical sidecars retain their original destination; current
+transfer receipts are separate. Other panel objects are not claimed migrated.
+
+The later [K4096 primary result](verification/k4096-primary-20261018/RESULT.md)
+adds a third constructed and hash-verified S3 object to this size frontier.
+Its full generic replay and independent fresh-object sign/Frobenius scan
+passed. The [guarded K4096 follow-on](verification/k4096-orbit-model-20261018/RESULT.md)
+constructed the predicted 131,958-variable, 2,021,197-clause five-summand
+orbit model after retaining and correcting a missing-corpus producer failure.
+One public search ended `UNKNOWN_solver_cap` at 5,000 conflicts with zero
+models, relations and rank inside the cap on an emulated host. The separate
+[native-worker continuation](verification/cloud-matched-k2048-k4096-20261018/RESULT.md)
+confirmed the same installed model counts. Its 600-second natural attempt
+and 180-second short control were wall-censored with unknown final counters.
+Those host/source observations remain separate; natural yield, useful rank
+and a complete cold comparison remain open. The [K16627 primary reconstruction](verification/k16627-primary-20261027/RESULT.md)
+reconciles the fourth object with the prior [K16627 prebuild study](../n83_k16627_prebuild_20261017/RESULT.md);
+its freshly reconstructed bytes match the 17 October S3 object. The
+[K8192 primary run](verification/k8192-primary-20261027/RESULT.md)
+constructed, generically replayed and published the fifth added-size object.
+All five added primary sizes now have objects under the declared policy and
+seed. Natural yield, useful rank and a complete cold comparison remain open.
+The [bounded K8192 five-summand diagnostic](verification/k8192-m5-natural-20261027/RESULT.md)
+built a 172,918-variable orbit-chain model and returned
+`UNKNOWN_solver_cap` after one natural trial and 1,000 conflicts, with zero
+models, relations and rank. It supplies a completed zero-yield cell at that
+cap, not a yield-rate estimate or size ranking.
 
 The exporter now has a one-object path for the five added sizes. It accepts
 only the two pinned curve arms, the three public-x policies, the three frozen

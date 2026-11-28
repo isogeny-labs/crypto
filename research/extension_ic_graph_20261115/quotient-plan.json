@@ -1,0 +1,25 @@
+{
+  "schema":"cover.homogeneous-quotient.runpod-validation/v1",
+  "driver_kind":"recorded-homogeneous-quotient-reuse-validation",
+  "backend":"runpod_user_authorized","runpod_compute_type":"CPU",
+  "cpu_affinity_rule":"first_allowed_cpu_bound_before_call",
+  "runpod_max_hourly_usd":0.40,"runpod_lifetime_seconds":900,
+  "source_revision":null,"original_source_revision":"f3e76f16a85c30cc4018183b864083fe030e6307",
+  "mode_order":["s75-r32","s75-r128","s85-r32","s85-r128","s95-r32","s95-r128"],
+  "input_sha256":{
+    "s75-r32":"3aff7136bd8596382b739709b69c511b8603eaf8768de9dd7d782659744444f4",
+    "s75-r128":"2a8e196b1d8217894896d5b32a3103db0905039dc3fba19d05788a80a18e0d91",
+    "s85-r32":"8f0473a700564c9110fa4779282583e34354909c45e7bce2f28c26e2709f1a0c",
+    "s85-r128":"cae5d43b7aa662e47c7d05f53c824ff63f14d89a24f7747795cb1e6f63a16df3",
+    "s95-r32":"e7739541af719d04642ebe12209e91e628f13e5daab5b25d65d6d97f19f91386",
+    "s95-r128":"e1ccc64655fb6e46780c50dbe4c1743f1929b5c6a1880c5c6eddae24f3ded2cd"
+  },
+  "p":1009,"seed":359,"l":263807419874170961,"expected_scalar":10013957165807875,
+  "rounds":1,"paired_replays":6,"warmup_rounds":0,"automatic_retries":0,
+  "worker_timeout_seconds":60,"timeout_seconds":180,"memory_gib":8,
+  "allow_comparative_claims":false,"new_dlp_sample":false,"reprices_prior_pipeline":false,
+  "component_hashes":"validation/quotient-source.sha256",
+  "recorded_timing":"cold_process_wall_practicality_only_including_diagnostic_hashes",
+  "pricing_scope":"checkpoint plus affine component; observed algebra and known new state events; other native work incomplete",
+  "complete_total":null,"rho_parity":false
+}

@@ -1,0 +1,14 @@
+{
+  "action": "Measure the no-Bloom ablation on matched targets before removing it; retain all full-cost and scan-count controls.",
+  "created": "2026-11-23T10:05:06Z",
+  "evidence": [
+    "research/trace_incidence_20261116/setup_20261123/results/summary-field-a1.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "report-evidence"
+  ],
+  "trigger": "Replacing pointer-based membership with an exact flat table and considering removal of its Bloom filter",
+  "why": "The fresh field-arithmetic panel measured a regression when the prefilter was removed; flat storage alone did not make direct lookup cheaper."
+}

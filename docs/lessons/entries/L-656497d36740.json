@@ -1,0 +1,14 @@
+{
+  "action": "Use its returned blob SHA with the connected blob reader before treating the file as empty; preserve the full canonical bytes before appending.",
+  "created": "2026-11-23T18:07:14Z",
+  "evidence": [
+    "https://github.com/isogeny-labs/crypto/blob/bd20b95dce44a91d7f74a1367853e724f280a3b6/docs/session-logs/2026-11-23.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "report-evidence"
+  ],
+  "trigger": "A GitHub contents response has an empty content string for a known large tracked file",
+  "why": "The canonical2MB session journal returned empty contents, while its blob read retained the full existing history."
+}

@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T05:32:28Z",
+ "id": "PCC-20261123-df2e5e",
+ "kind": "statement",
+ "producer": {
+  "commit": "240f04abc38fcea95930971376331c1ac5082069",
+  "model": "gpt-6-astra",
+  "session": "fass-quotient-query-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/producer/attempt2/qualifier.stdout.jsonl",
+    "sha256": "92d1d2d715da2cc51410f119237dbb75307a67180c9970187c407ab5e26f01c5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/producer/attempt2/pre-call-manifest.json",
+    "sha256": "ca56ba4a18562dd1c01f6831c4af49a15c9d75201fb39352aeac8e74342ca57c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/producer/attempt2/post-call-manifest.json",
+    "sha256": "9134dc8b4cfec64dd639a8dfd014146962de63b57b14a0d43a301ace3898af67"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/producer/attempt2/first-to-corrected-comparison.json",
+    "sha256": "cd5daad57ace1323923601f9a1edae837e5a9d6bf8b8eb16cad2fbf6ca256e9d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/producer/attempt2/build-post-call-manifest.json",
+    "sha256": "1b5bc17c367542bc8d3f296a91174af8b3d7a0adc86b42442c84be0e11ba11af"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Fixed finite development observations for CORRECTION_PROTOCOL.md; no performance, signed-relation or formal/signed verification claim.",
+ "statement": "The single corrected immutable build and unchanged95-case qualifier both returned exit0. The corrected run reports83 tensor norms,618 identity checks,24454 grid cells,318 rejected certificate mutations,13 refused inputs and27 persisted proof objects; all15 prehashed source files and the executable retained their hashes. Scientific records and all54 saved certificate/sidecar files match attempt1 after excluding only the declared sidecar-binding metadata additions. Reader rejection controls and independent replay are separate pending checks at this registration."
+}

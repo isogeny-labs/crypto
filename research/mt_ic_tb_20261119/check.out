@@ -1,0 +1,20 @@
+# Pre-run checks, 2026-11-19T03:21:31Z
+THP mode: always [madvise] never; CPU:  Intel(R) Xeon(R) Processor @ 2.10GHz
+new binary (examples/mt_fieldops.rs at fdf1ae109a) sha256 198a6e49e740e53d; huge-page round binary c049a3233c674818
+build: rustc --edition 2021 -C opt-level=3 -C codegen-units=16 --crate-type bin examples/mt_fieldops.rs -L dependency=target/release/deps --extern rand=librand-995139fa871833e1.rlib --extern serde_json=libserde_json-15598c5810c24e49.rlib
+## 1. new vs huge-page round binary (MTF_HP=1, MTF_Z=0); ## 2. new MTF_Z=1 vs MTF_Z=0 (all fields but times)
+ic5b mt_fieldops_v5_20261112/instances/W28-0.json 1024 43 0.85 4 1.2 flatf 128 bi pf,rel : 1 PASS  2 PASS
+ic5b mt_ic_scale_20261115/instances/W36-0.json 1024 43 0.85 4 1.2 flatf 128 bi pf,rel : 1 PASS  2 PASS
+rhodpb mt_fieldops_v5_20261112/instances/W32-4.json 1024 43 0.0 0 64 : 1 PASS  2 PASS
+rhodpb mt_ic_scale_20261115/instances/W36-0.json 1024 43 0.0 0 64 : 1 PASS  2 PASS
+## 3. rel,ib keeps pf,rel's counts (T = 1024)
+  W32-4.json pf,rel   {'table': 1085717, 'trials': 1904484, 'relations': 49, 'p1_trials': 94732, 'I': 145732, 'M': 7761294, 'S': 3235271} ok 1024 / 1024
+  W32-4.json rel,ib   {'table': 1085717, 'trials': 1904484, 'relations': 49, 'p1_trials': 94732, 'I': 145732, 'M': 7761294, 'S': 3235271} ok 1024 / 1024
+  W32-4.json pf,rel   {'table': 1085717, 'trials': 1904484, 'relations': 49, 'p1_trials': 94732, 'I': 145732, 'M': 7761294, 'S': 3235271} ok 1024 / 1024
+  W32-4.json rel,ib   {'table': 1085717, 'trials': 1904484, 'relations': 49, 'p1_trials': 94732, 'I': 145732, 'M': 7761294, 'S': 3235271} ok 1024 / 1024
+  PASS
+  W36-0.json pf,rel   {'table': 4462447, 'trials': 8092020, 'relations': 84, 'p1_trials': 711182, 'I': 360904, 'M': 33085632, 'S': 13555474} ok 1024 / 1024
+  W36-0.json rel,ib   {'table': 4462447, 'trials': 8092020, 'relations': 84, 'p1_trials': 711182, 'I': 360904, 'M': 33085632, 'S': 13555474} ok 1024 / 1024
+  W36-0.json pf,rel   {'table': 4462447, 'trials': 8092020, 'relations': 84, 'p1_trials': 711182, 'I': 360904, 'M': 33085632, 'S': 13555474} ok 1024 / 1024
+  W36-0.json rel,ib   {'table': 4462447, 'trials': 8092020, 'relations': 84, 'p1_trials': 711182, 'I': 360904, 'M': 33085632, 'S': 13555474} ok 1024 / 1024
+  PASS

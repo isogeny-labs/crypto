@@ -1,0 +1,47 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "F3 rate probe: wide strong rho at n=83, capped",
+ "description": "research/ecc2k130_followups_20261116/F3-m83-counted/PROTOCOL.md section 4 (frozen). Step rate only; every run is expected to exhaust its cap. Not a measurement of solve cost.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 0,
+    "n": 83
+   }
+  ],
+  "targets_per_curve": 2,
+  "target_seed": 20261116303,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-strong",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong",
+    "params": {
+     "step_cap_factor": "0"
+    }
+   }
+  },
+  {
+   "name": "rho-strong-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.signed_frobenius_strong",
+    "params": {
+     "step_cap_factor": "0"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261116304,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

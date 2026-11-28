@@ -1,0 +1,67 @@
+{
+  "schema": "profile/v1",
+  "kind": "manifest",
+  "subcommand": "cpu",
+  "label": "round-039 inc, 160 jobs x 10, ecbench exec",
+  "status": "ok",
+  "reason": null,
+  "started_utc": "2026-11-19T15:36:00Z",
+  "wall_seconds": 12.141,
+  "cwd": "/home/user/crypto",
+  "command": [
+    "/tmp/claude-0/-home-user/e375a883-d595-5f04-8ef9-a57bb8288ce5/scratchpad/jobs/run_arm.sh",
+    "inc",
+    "10"
+  ],
+  "isolation": "none",
+  "binary": {
+    "path": "/tmp/claude-0/-home-user/e375a883-d595-5f04-8ef9-a57bb8288ce5/scratchpad/jobs/run_arm.sh",
+    "sha256": "7688250cdf0577baa263888d9e37e2a48129978b646f34730ed54ab013bb1412",
+    "bytes": 290
+  },
+  "git": {
+    "commit": "f187cad6a2609d65e03d565c01cbfbd73732dc4a",
+    "dirty_tracked_files": 0
+  },
+  "tools": {
+    "perf": {
+      "path": "/usr/lib/linux-tools/6.8.0-151-generic/perf",
+      "version": "perf version 6.8.12"
+    }
+  },
+  "host": {
+    "hostname": "vm",
+    "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpu_features": [
+      "adx",
+      "aes",
+      "avx2",
+      "avx512f",
+      "avx512ifma",
+      "bmi2",
+      "gfni",
+      "pclmulqdq",
+      "popcnt",
+      "sha_ni",
+      "vpclmulqdq"
+    ],
+    "kernel": "6.18.44-fc-v653",
+    "arch": "x86_64",
+    "logical_cpus": 4,
+    "mem_kib": 16473756,
+    "event_sources": [
+      "breakpoint",
+      "msr",
+      "power",
+      "software",
+      "tracepoint",
+      "uprobe"
+    ],
+    "hardware_pmu": false,
+    "perf_event_paranoid": "2",
+    "kptr_restrict": "0",
+    "gpus": []
+  },
+  "hotspots_method": "perf record",
+  "event": "cpu-clock"
+}

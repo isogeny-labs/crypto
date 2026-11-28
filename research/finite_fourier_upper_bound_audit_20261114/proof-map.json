@@ -1,0 +1,44 @@
+{
+  "main": "FiniteFourierUpperBoundAudit.finite_fourier_upper_bound_certificate",
+  "binding": "8e1b8c3254622300cf9d726f5eff360ee88e895237fc9e27aedcf53dc96b175b",
+  "custom_imports": {
+    "CharacterCertificate": "research/walk_character_audit_20261114/lean/CharacterCertificate.lean",
+    "CharacterWalk": "research/walk_character_audit_20261114/lean/CharacterWalk.lean",
+    "ComplexExpectation": "research/walk_character_audit_20261114/lean/ComplexExpectation.lean",
+    "FairKernel": "research/cycle_coupling_audit_20261114/lean/FairKernel.lean",
+    "FourierAlgebra": "research/finite_fourier_upper_bound_audit_20261114/lean/FourierAlgebra.lean",
+    "NormalizationControl": "research/finite_fourier_upper_bound_audit_20261114/lean/NormalizationControl.lean",
+    "PhaseVariance": "research/walk_character_audit_20261114/lean/PhaseVariance.lean",
+    "SpectralContraction": "research/walk_character_audit_20261114/lean/SpectralContraction.lean",
+    "TVDistance": "research/finite_fourier_upper_bound_audit_20261114/lean/TVDistance.lean",
+    "UniformChoices": "research/hildebrand_cell_audit_20261114/lean/UniformChoices.lean",
+    "UpperBoundCertificate": "research/finite_fourier_upper_bound_audit_20261114/lean/UpperBoundCertificate.lean",
+    "WalkUpperBound": "research/finite_fourier_upper_bound_audit_20261114/lean/WalkUpperBound.lean",
+    "WeightedKernel": "research/weighted_cycle_coupling_audit_20261114/lean/WeightedKernel.lean"
+  },
+  "modules": [
+    {
+      "file": "FourierAlgebra.lean",
+      "role": "Derive finite complex Plancherel from actual character orthogonality; uniform coefficients and actual PMF-difference transform."
+    },
+    {
+      "file": "TVDistance.lean",
+      "role": "Actual finite event/fullL1/halfL1 definitions, probability bounds, signed-complement event bound, attaining event and squared Cauchy-Schwarz."
+    },
+    {
+      "file": "WalkUpperBound.lean",
+      "role": "Actual PMF Parseval, nontrivial-mode/quarter-factor bound, exact uniform event cardinality and actual iid walk spectral/event upper bounds."
+    },
+    {
+      "file": "NormalizationControl.lean",
+      "role": "Actual ZMod2 pointmass/uniform distances/energy, direct mixed-normalization negation, correct equality and sharp-quarter necessity."
+    },
+    {
+      "file": "UpperBoundCertificate.lean",
+      "role": "Complete actual finite-abelian Upper Bound Lemma binding derived Plancherel/probability normalization/event attainment/actual iid application and sharp control."
+    }
+  ],
+  "gate_declarations": 38,
+  "signed_standing": "not established",
+  "open": "Finite-abelian Parseval/TV upper bound now proved. Expected random-support spectral averaging, full nonabelian matrix case, canonical measure-tvDist bridge and original fourteen-item gaps remain open. Qualified source retained."
+}

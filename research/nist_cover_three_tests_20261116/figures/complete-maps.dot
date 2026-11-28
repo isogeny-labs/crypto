@@ -1,0 +1,17 @@
+digraph maps {
+  graph [rankdir=TB, bgcolor="white", label="P-192 map interfaces: producer-unverified", labelloc=t, fontsize=16, nodesep=0.35, ranksep=0.4];
+  node [shape=box, style="rounded,filled", fillcolor="#e8f0fe", fontname="Helvetica", fontsize=11];
+  source [label="J(H): reduced Fp Mumford class\nzero, branch and repeated support"];
+  cycle [label="Explicit target cycle\nz=x+lambda*y\nmultiplicities retained"];
+  target [label="J(C): KM class space\nlocal jets add reference padding"];
+  reverse [label="Transpose correspondence\nfinite factor fields + Frobenius trace"];
+  output [label="J(H): reduced reverse output"];
+  boundary [label="Closed/projective point\nline complement of degree 3"];
+  source -> cycle [label="phi: degree-3 correspondence"];
+  cycle -> target [label="RR encoding"];
+  cycle -> reverse [label="psi on closed support"];
+  boundary -> reverse [label="norm residual divisor"];
+  reverse -> output [label="Cantor reduction"];
+  note [shape=note, fillcolor="#fff3cd", label="Checked: phi psi=[3], psi phi=[3]\nInfinity hyperplane equality\nUniversal search certification / opaque KM decoding open"];
+  output -> note [style=dashed, arrowhead=none];
+}

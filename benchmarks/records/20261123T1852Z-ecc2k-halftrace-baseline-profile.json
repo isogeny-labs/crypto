@@ -1,0 +1,95 @@
+{
+  "branch": "lane/ecc2k-ic-half-trace-setup",
+  "closed_utc": "2026-11-23T19:07:09+00:00",
+  "commands": [
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "0",
+        "bash",
+        "-c",
+        "ulimit -v 2097152; exec timeout 600 bash -c 'set -e; b=research/trace_zero_projection_setup_20261123/native/target/release/trace-zero-projection-setup; p=research/trace_zero_halftrace_elimination_20261123; i=research/trace_zero_projected_20261115/inputs/scale-n131-d12-uniform.json; \"$b\" one \"$i\" adjoint > \"$p/checks/profile-native.json\"; tools/profile.sh cpu --out \"$p/profiles/baseline-cold\" --mode callgrind --label \"Unmodified landed ECC2K index-calculus baseline\" -- \"$b\" one \"$i\" adjoint; tools/profile.sh cpu --out \"$p/profiles/baseline-aa-cold\" --mode callgrind --label \"Identical baseline A/A\" -- \"$b\" one \"$i\" adjoint'"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-23T18:53:08+00:00",
+      "wall_s": 2.788
+    }
+  ],
+  "commit": "065176db5621a0cfc5d94a1be0551e158e6e0fa1",
+  "commit_dirty": false,
+  "created_utc": "2026-11-23T18:52:20+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpus_online": 5,
+    "hostname": "49d6f53fbd3b",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261123T1852Z-ecc2k-halftrace-baseline-profile",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 2,
+      "name": "baseline_profile_complete_ir",
+      "note": "Absolute identical-baseline A/A diagnostic; no candidate gain comparison or native clock.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        44038405.0,
+        44038405.0
+      ],
+      "unit": "ir",
+      "value": 44038405.0
+    }
+  ],
+  "problem": "kernel:ecc2k130-ic-halftrace-setup",
+  "raw": [
+    {
+      "bytes": 65468,
+      "path": "research/trace_zero_halftrace_elimination_20261123/PROFILE-RAW.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/90/90350cb04abf7fb2c350637f02c1c01392a758c6618df50574cbe3c80645609f",
+      "sha256": "90350cb04abf7fb2c350637f02c1c01392a758c6618df50574cbe3c80645609f",
+      "uploaded": false
+    },
+    {
+      "bytes": 389,
+      "path": "research/trace_zero_halftrace_elimination_20261123/profile-rows.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a6/a69c4e79cc381a47e263ec91f971b193759c9518db3c45da1992eccf2ce061a4",
+      "sha256": "a69c4e79cc381a47e263ec91f971b193759c9518db3c45da1992eccf2ce061a4",
+      "uploaded": false
+    },
+    {
+      "bytes": 435,
+      "path": "research/trace_zero_halftrace_elimination_20261123/checks/profile-receipt.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/31/31da287d37c5f63cc7342f1df0d38a4d17bd5c1340ed70690cd4f72dcc6139a9",
+      "sha256": "31da287d37c5f63cc7342f1df0d38a4d17bd5c1340ed70690cd4f72dcc6139a9",
+      "uploaded": false
+    },
+    {
+      "bytes": 4898,
+      "path": "research/trace_zero_halftrace_elimination_20261123/profile-export-final.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/83/83e59968cfda698393ded8d1aef3384186ffc25b42d30c7368c87bba43b9ba19",
+      "sha256": "83e59968cfda698393ded8d1aef3384186ffc25b42d30c7368c87bba43b9ba19",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/trace_zero_halftrace_elimination_20261123/profile.pdf",
+    "png": [],
+    "svg": [
+      "research/trace_zero_halftrace_elimination_20261123/profile.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ecc2k-halftrace-baseline-profile",
+  "status": "measured",
+  "summary": "Two identical-source baseline A/A cold profiles; known query output matches native; hotspot diagnosis only, unsigned producer evidence.",
+  "validation": null
+}

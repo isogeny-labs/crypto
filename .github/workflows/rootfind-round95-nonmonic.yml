@@ -1,0 +1,39 @@
+name: Rootfind round95 nonmonic verifier A/B
+on:
+  push:
+    branches:
+      - 'automation/rootfind-column-accumulator-round89-20261121'
+    paths:
+      - 'src/cryptanalysis/prime_root_trace.rs'
+      - 'research/amm_digit_perf_20261118/round95_nonmonic_ab.py'
+      - '.github/workflows/rootfind-round95-nonmonic.yml'
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_root_trace.rs'
+      - 'research/amm_digit_perf_20261118/round95_nonmonic_ab.py'
+      - '.github/workflows/rootfind-round95-nonmonic.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-exact-round95:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round95_nonmonic_ab.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Run source-exact native Rust verifier power A/B and regression tests
+        env:
+          ROOTFIND_BASELINE_REF: 11c7c28e9314525a9fc310ef6ce73eca2dbff0e5
+          ROOTFIND_AB_OUTPUT: research/amm_digit_perf_20261118/round95_native_ab.csv
+        run: python3 research/amm_digit_perf_20261118/round95_nonmonic_ab.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rootfind-round95-native-ab
+          path: research/amm_digit_perf_20261118/round95_native_ab.csv

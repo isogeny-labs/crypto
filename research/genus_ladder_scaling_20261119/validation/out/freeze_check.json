@@ -1,0 +1,237 @@
+{
+ "head": "f0ac380b21c9ea8c9dbb111d1fc717d7e181a8c6",
+ "branch": "claude/hyperelliptic-index-calculus-td1fdn",
+ "tracked_dirty": "",
+ "tracked_files": [
+  "research/genus_ladder_scaling_20261119/.gitignore",
+  "research/genus_ladder_scaling_20261119/DEVIATIONS.md",
+  "research/genus_ladder_scaling_20261119/PROTOCOL.md",
+  "research/genus_ladder_scaling_20261119/RESULTS.md",
+  "research/genus_ladder_scaling_20261119/analysis.json",
+  "research/genus_ladder_scaling_20261119/analyze.py",
+  "research/genus_ladder_scaling_20261119/binary.sha256",
+  "research/genus_ladder_scaling_20261119/curves.json",
+  "research/genus_ladder_scaling_20261119/curves.py",
+  "research/genus_ladder_scaling_20261119/fig_scaling.png",
+  "research/genus_ladder_scaling_20261119/fig_scaling.svg",
+  "research/genus_ladder_scaling_20261119/frozen.sha256",
+  "research/genus_ladder_scaling_20261119/report.py",
+  "research/genus_ladder_scaling_20261119/run.sh",
+  "research/genus_ladder_scaling_20261119/search.sh",
+  "research/genus_ladder_scaling_20261119/tables.md",
+  "research/genus_ladder_scaling_20261119/tune.json",
+  "research/genus_ladder_scaling_20261119/tune.py"
+ ],
+ "producer_files_changed_since_validated_commit": "",
+ "validation_dir_commits": [
+  "f0ac380b21c 2026-11-23T01:50:18+00:00 WIP snapshot: lead C validation in progress",
+  "3b2b980d617 2026-11-23T01:42:52+00:00 WIP snapshot: quartic ladder analysis and lead C validation in progress (after #4847 merge)"
+ ],
+ "commits": {
+  "b5971d86dd": {
+   "sha": "b5971d86ddcdd3fb00fddedb506e7f806d12b104",
+   "committed": "2026-11-19T06:40:49+00:00",
+   "subject": "genus-ladder scaling (lead C): frozen protocol, search, tuning, run and analysis scripts (before data)"
+  },
+  "d0ac2cd27b": {
+   "sha": "d0ac2cd27b2376397ebd6b79d44971e690084c52",
+   "committed": "2026-11-20T19:08:35+00:00",
+   "subject": "Lead C D1: genus-4 third prime 60013 -> 54293 (binary range guard), driver stop rule"
+  },
+  "2a3fde9e0f": {
+   "sha": "2a3fde9e0ffcf65cb6a7807595c634c8bf1cf39d",
+   "committed": "2026-11-21T05:01:41+00:00",
+   "subject": "Lead C: curve selection (g4 p54293 confirm 381/1206/1375; g5 p2357 confirm 466/1215/1520, tune 1973/2254; g5 p4099 confirm 330/538/574)"
+  },
+  "469f5bf731": {
+   "sha": "469f5bf73199cfb69e01426df46170bd976bdb88",
+   "committed": "2026-11-21T06:37:35+00:00",
+   "subject": "Lead C results: genus-4 x* exponent 1.568 (3 primes); genus 5 x5* 0.419/0.201 of ideal negation rho, ahead of genus 4 at matched size"
+  }
+ },
+ "frozen": {
+  "PROTOCOL.md": {
+   "frozen": "c5eec67b43ca0637f9b4a123a6145238f036494b1d5a5e0f674465d5c97f0606",
+   "now": "c5eec67b43ca0637f9b4a123a6145238f036494b1d5a5e0f674465d5c97f0606",
+   "freeze_blob": "c5eec67b43ca0637f9b4a123a6145238f036494b1d5a5e0f674465d5c97f0606",
+   "now_eq_frozen": true,
+   "freeze_blob_eq_frozen": true
+  },
+  "search.sh": {
+   "frozen": "54568c21ed920abe3e0c3a1bacd304b8abdc31fbc4416d02357d3d1c6ab9a1a6",
+   "now": "54568c21ed920abe3e0c3a1bacd304b8abdc31fbc4416d02357d3d1c6ab9a1a6",
+   "freeze_blob": "54568c21ed920abe3e0c3a1bacd304b8abdc31fbc4416d02357d3d1c6ab9a1a6",
+   "now_eq_frozen": true,
+   "freeze_blob_eq_frozen": true
+  },
+  "curves.py": {
+   "frozen": "36ede4a0b7f3187f6f344d5769e308c8f3abdf6cfb896944efd023e07efbc97d",
+   "now": "d0a8243a32ac8b6f03ef604653f203419d598698947583a746460b36e57e825d",
+   "freeze_blob": "36ede4a0b7f3187f6f344d5769e308c8f3abdf6cfb896944efd023e07efbc97d",
+   "now_eq_frozen": false,
+   "freeze_blob_eq_frozen": true,
+   "reversed_54293_to_60013": "36ede4a0b7f3187f6f344d5769e308c8f3abdf6cfb896944efd023e07efbc97d",
+   "reversed_eq_frozen": true,
+   "forward_freeze_blob_eq_now": true,
+   "count_54293_now": 1,
+   "count_60013_freeze": 1,
+   "count_54293_freeze": 0
+  },
+  "tune.py": {
+   "frozen": "c62b988f0cb4591a533f530a4d7fb17d5aa307db728222ed74f5cebc68f5d22a",
+   "now": "c62b988f0cb4591a533f530a4d7fb17d5aa307db728222ed74f5cebc68f5d22a",
+   "freeze_blob": "c62b988f0cb4591a533f530a4d7fb17d5aa307db728222ed74f5cebc68f5d22a",
+   "now_eq_frozen": true,
+   "freeze_blob_eq_frozen": true
+  },
+  "run.sh": {
+   "frozen": "ef73da593951ab356416bec92fb39b0e4b396a8dc809e0f2b081f4380eee6a2e",
+   "now": "d2f7e71320b0f13e164368a43a0ddb96f123ee37e200911779d59fd79aaa20ce",
+   "freeze_blob": "ef73da593951ab356416bec92fb39b0e4b396a8dc809e0f2b081f4380eee6a2e",
+   "now_eq_frozen": false,
+   "freeze_blob_eq_frozen": true,
+   "reversed_54293_to_60013": "ef73da593951ab356416bec92fb39b0e4b396a8dc809e0f2b081f4380eee6a2e",
+   "reversed_eq_frozen": true,
+   "forward_freeze_blob_eq_now": true,
+   "count_54293_now": 5,
+   "count_60013_freeze": 5,
+   "count_54293_freeze": 0
+  },
+  "analyze.py": {
+   "frozen": "152dfdeebb674cbd318e1f4232d208eb0c04743e60e2d2c7bd67a01ede319590",
+   "now": "f66d6fd3639920be8236024e318b55f8ce6c6ceab5fa99c62f82e2b51a3b128f",
+   "freeze_blob": "152dfdeebb674cbd318e1f4232d208eb0c04743e60e2d2c7bd67a01ede319590",
+   "now_eq_frozen": false,
+   "freeze_blob_eq_frozen": true,
+   "reversed_54293_to_60013": "152dfdeebb674cbd318e1f4232d208eb0c04743e60e2d2c7bd67a01ede319590",
+   "reversed_eq_frozen": true,
+   "forward_freeze_blob_eq_now": true,
+   "count_54293_now": 6,
+   "count_60013_freeze": 6,
+   "count_54293_freeze": 0
+  }
+ },
+ "changed_since_freeze": [
+  ".../genus_ladder_scaling_20261119/DEVIATIONS.md    |   25 +",
+  " research/genus_ladder_scaling_20261119/RESULTS.md  |   86 ++",
+  " .../genus_ladder_scaling_20261119/analysis.json    |  450 ++++++",
+  " research/genus_ladder_scaling_20261119/analyze.py  |    8 +-",
+  " research/genus_ladder_scaling_20261119/curves.json |   61 +",
+  " research/genus_ladder_scaling_20261119/curves.py   |    2 +-",
+  " .../genus_ladder_scaling_20261119/fig_scaling.png  |  Bin 0 -> 37669 bytes",
+  " .../genus_ladder_scaling_20261119/fig_scaling.svg  | 1624 ++++++++++++++++++++",
+  " research/genus_ladder_scaling_20261119/report.py   |   22 +",
+  " research/genus_ladder_scaling_20261119/run.sh      |    4 +-",
+  " research/genus_ladder_scaling_20261119/tables.md   |   30 +",
+  " research/genus_ladder_scaling_20261119/tune.json   |   76 +",
+  " 12 files changed, 2381 insertions(+), 7 deletions(-)"
+ ],
+ "d1_commit_files": [
+  ".../genus_ladder_scaling_20261119/DEVIATIONS.md    | 25 ++++++++++++++++++++++",
+  " research/genus_ladder_scaling_20261119/analyze.py  |  8 +++----",
+  " research/genus_ladder_scaling_20261119/curves.py   |  2 +-",
+  " research/genus_ladder_scaling_20261119/run.sh      |  4 ++--",
+  " 4 files changed, 32 insertions(+), 7 deletions(-)"
+ ],
+ "deviations_first_commit": "d0ac2cd27b2 2026-11-20T19:08:35+00:00",
+ "deviations_changed_after_d1": "",
+ "curves_json_commits": [
+  "2a3fde9e0ff 2026-11-21T05:01:41+00:00"
+ ],
+ "tune_json_commits": [
+  "469f5bf7319 2026-11-21T06:37:35+00:00"
+ ],
+ "binary": {
+  "path": "/tmp/claude-0/-home-user/c9b2fe43-c085-5dfa-9cde-b0311430c5d1/scratchpad/bin/genus_ladder.po",
+  "sha256": "493ee2942473b8708a0b52f40ab10095c4da83ab0f0755ed3e5dbc02771b6921",
+  "binary_sha256_file": "493ee2942473b8708a0b52f40ab10095c4da83ab0f0755ed3e5dbc02771b6921",
+  "mtime": "2026-11-18T16:45:27.652856+00:00",
+  "match": true
+ },
+ "raw_manifest_count": 550,
+ "raw_tracked": 0,
+ "raw_bytes": 457528,
+ "raw_manifest_sha256": "02e18928061ba966380ac6728d447f786179cb35fa50b3f8647668c5acefb4db",
+ "timeline": {
+  "failed_p60013": {
+   "files": 112,
+   "first": "2026-11-20T07:43:22.533259+00:00",
+   "last": "2026-11-20T07:43:22.645259+00:00"
+  },
+  "search_g4_p54293": {
+   "files": 112,
+   "first": "2026-11-20T19:08:36.001979+00:00",
+   "last": "2026-11-21T05:01:11.441399+00:00"
+  },
+  "search_g5_p2357": {
+   "files": 192,
+   "first": "2026-11-19T09:27:18.265648+00:00",
+   "last": "2026-11-20T07:43:22.497259+00:00"
+  },
+  "search_g5_p4099": {
+   "files": 112,
+   "first": "2026-11-19T10:21:37.669842+00:00",
+   "last": "2026-11-19T13:01:58.014414+00:00"
+  },
+  "tune5": {
+   "files": 8,
+   "first": "2026-11-21T05:01:45.257401+00:00",
+   "last": "2026-11-21T05:12:57.297441+00:00"
+  },
+  "b4_p54293": {
+   "files": 4,
+   "first": "2026-11-21T05:12:57.413441+00:00",
+   "last": "2026-11-21T05:45:13.909556+00:00"
+  },
+  "b5": {
+   "files": 8,
+   "first": "2026-11-21T05:45:14.001556+00:00",
+   "last": "2026-11-21T06:15:33.857664+00:00"
+  },
+  "rho5": {
+   "files": 2,
+   "first": "2026-11-21T06:15:33.897664+00:00",
+   "last": "2026-11-21T06:36:00.105737+00:00"
+  },
+  "fig": {
+   "files": 2,
+   "first": "2026-11-21T06:37:05.785741+00:00",
+   "last": "2026-11-21T06:37:05.901741+00:00"
+  }
+ },
+ "order_checks": {
+  "freeze_before_any_search": true,
+  "d1_commit_before_first_p54293_file": true,
+  "d1_seconds_before_first_p54293_file": 1.001979,
+  "searches_done_before_selection_commit": true,
+  "selection_commit_before_tune_and_blocks": true,
+  "tune_done_before_b5": true,
+  "results_commit_after_all_data": true
+ },
+ "reused_prime_order_rows": {
+  "b_p16411_x.jsonl.gz": {
+   "sha256": "96b186020b8c809d241b36ae5671cf0356cd04e5924a0554bab9d85a507c5a9e",
+   "pinned": "96b186020b8c809d241b36ae5671cf0356cd04e5924a0554bab9d85a507c5a9e",
+   "match": true,
+   "tracked": true
+  },
+  "b_p16411_xstar.jsonl.gz": {
+   "sha256": "bdec1befb18af007b07caa929b02e74e8c4d783d7bdc8988c3f8e50d12a26924",
+   "pinned": "bdec1befb18af007b07caa929b02e74e8c4d783d7bdc8988c3f8e50d12a26924",
+   "match": true,
+   "tracked": true
+  },
+  "b_p32771_x.jsonl.gz": {
+   "sha256": "499637a37583867c1c49254c8f1913016521c16d7c6f0eb15ced5cff499b47bf",
+   "pinned": "499637a37583867c1c49254c8f1913016521c16d7c6f0eb15ced5cff499b47bf",
+   "match": true,
+   "tracked": true
+  },
+  "b_p32771_xstar.jsonl.gz": {
+   "sha256": "dd87a5345a12aabcd2722328cf186e8eaa5eaf15f3e48ef5c289765d7430ea4a",
+   "pinned": "dd87a5345a12aabcd2722328cf186e8eaa5eaf15f3e48ef5c289765d7430ea4a",
+   "match": true,
+   "tracked": true
+  }
+ }
+}

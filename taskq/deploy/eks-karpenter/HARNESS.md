@@ -61,7 +61,7 @@ rounds, a warmup, a reference and matching A/A control. The native parser and
 audit enforce the workload semantics; the envelope schema alone is not proof of
 valid cryptography or L2. `job` has the same fields as `isolab_k8s_benchmark`.
 The portable wrapper defaults to C8a without SMT, 4 GiB and 900 seconds, with a
-maximum deadline of 3,600 seconds. CPU count is four and measurement retries are
+maximum deadline of 4,800 seconds. CPU count is four and measurement retries are
 zero. Requests are bounded to 64 KiB.
 
 An optional `job.build` selects a per-run image:
@@ -122,7 +122,7 @@ taskq/deploy/eks-karpenter/remote/launch-remote request.json
 The script validates and normalizes the request, uploads it under its SHA-256,
 uploads and hash-pins the current reviewed `remote/run-request`, starts the
 configured CodeBuild project with the repository's fixed buildspec and a
-100-minute terminal override, and returns a
+130-minute terminal override, and returns a
 [result receipt](contracts/result.schema.json). An SDK can perform the same
 `S3 PutObject → CodeBuild StartBuild → BatchGetBuilds → S3 GetObject` sequence.
 Use the normalized request hash as the StartBuild token; AWS's short-lived token
@@ -228,9 +228,10 @@ cancellation; its Kubernetes deadline still applies. For immediate cancellation,
 use the native cancel tool or an authorized Kubernetes Job deletion. Cancellation
 can lose artifacts that were not uploaded yet.
 
-CodeBuild allows two concurrent launchers, with a ten-minute queue timeout and
-100-minute build timeout. The portable client waits the requested EKS duration
-plus one hour for provisioning, verification and a terminal launcher state.
+CodeBuild allows two concurrent launchers, with a ten-minute queue timeout. The
+portable launch requests a 130-minute build timeout, and its client waits the
+requested EKS duration plus one hour for provisioning, verification and a
+terminal launcher state.
 The EKS Spot pool retains its separate aggregate
 combined 24-vCPU / 160-GiB ceiling (ordinary 16/128, L2 8/32). Native Job objects expire after a day; empty workers and their pod
 logs can disappear after two minutes. S3 is the durable experiment record.

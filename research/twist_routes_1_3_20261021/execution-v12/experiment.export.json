@@ -1,0 +1,262 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "twist-quotient-cycle-20261028-v1",
+  "created": "2026-10-28T16:17:46.277Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "14c12589c69bb260a9736a8fc332f251c1e18a85c7bba88d981dabb9e54af812",
+    "protocol_id": "twist-quotient-cycle-v1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": "GPT-6",
+    "session": "twist-quotient-cycle-20261028",
+    "role": "research-and-implementation"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "9e612b707a85ed291f470386126b5b7143628c02",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "HOST.json",
+    "sha256": "28405029535171720e00c78294be9762dbc1b48392ec2824f445e1bb1fcc6883",
+    "class_id": null,
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "kernel": "Linux fad1b5a2d1f5 6.18.55 #1 SMP Wed Oct 14 19:45:18 UTC 2026 x86_64 GNU/Linux",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0",
+      "memory_bytes": 18882674688
+    }
+  },
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "binary_sha256": "1d03b0b79f51441c550fe2c31218bff6db267057e1a52d642f98eb5e01248ccb",
+      "commit": "9e612b707a85ed291f470386126b5b7143628c02"
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "commit": "9e612b707a85ed291f470386126b5b7143628c02"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "quotient-native-000",
+      "arm": "native",
+      "instance_id": "p827-eight-fixed-quotient-squares",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "generic_squares": 8
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "maps": 8,
+          "generic_squares": 8,
+          "rational_checks": 6584,
+          "kernel_checks": 136,
+          "wrong_sign_rejections": 6576,
+          "corrupt_maps_rejected": 8
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact correctness experiment; no performance comparison."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Native exact generic/finite checks; independent reference failed separately"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "c1d62b826606698abb30fd7bc8210a30e4ff0c83ca26bebaa9dea357a1448f08",
+          "bytes": 75692,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "ede992edbd3213b20fe4984f431ec5f86ca4b9ea4cdf0da86ebb61cb4a73d8f7",
+          "bytes": 1540,
+          "kind": "receipt"
+        },
+        {
+          "path": "runs/pari-v1/RECEIPT.json",
+          "sha256": "e231ad28c282225363477212c40aaafe37e68c809bd60fd0c88adaddeba2737a",
+          "bytes": 1047,
+          "kind": "receipt"
+        },
+        {
+          "path": "runs/quotient-v1/RESULTS.json",
+          "sha256": "ed2a5b849834a3b2c372db11278c146ac9359a9fdbed37b74ec4e2abc86e539e",
+          "bytes": 67497,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-28T16:17:46.194Z",
+      "finished_at": "2026-10-28T16:17:46.277Z",
+      "worker": "1d03b0b79f51441c550fe2c31218bff6db267057e1a52d642f98eb5e01248ccb",
+      "backend_ref": "runs/quotient-v1"
+    },
+    {
+      "run_id": "quotient-pari-000",
+      "arm": "pari",
+      "instance_id": "p827-eight-fixed-quotient-squares",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "failed",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "generic_squares": 8
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "maps": 8,
+          "generic_squares": 8,
+          "rational_checks": 6584,
+          "kernel_checks": 136,
+          "wrong_sign_rejections": 6576,
+          "corrupt_maps_rejected": 8
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact correctness experiment; no performance comparison."
+        ]
+      },
+      "verification": {
+        "status": "error",
+        "verifier": "Strict stderr gate rejects reserved Pi assignment despite process0/sentinel"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "c1d62b826606698abb30fd7bc8210a30e4ff0c83ca26bebaa9dea357a1448f08",
+          "bytes": 75692,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "ede992edbd3213b20fe4984f431ec5f86ca4b9ea4cdf0da86ebb61cb4a73d8f7",
+          "bytes": 1540,
+          "kind": "receipt"
+        },
+        {
+          "path": "runs/pari-v1/RECEIPT.json",
+          "sha256": "e231ad28c282225363477212c40aaafe37e68c809bd60fd0c88adaddeba2737a",
+          "bytes": 1047,
+          "kind": "receipt"
+        },
+        {
+          "path": "runs/quotient-v1/RESULTS.json",
+          "sha256": "ed2a5b849834a3b2c372db11278c146ac9359a9fdbed37b74ec4e2abc86e539e",
+          "bytes": 67497,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "backend_ref": "runs/pari-v1"
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "FROZEN.json",
+      "sha256": "f3084a8b2f89b905cd610e6d52c4c0ebdc3a6da3e63ba466da7f764bafbcae62",
+      "bytes": 2323,
+      "kind": "receipt"
+    },
+    {
+      "path": "protocol.json",
+      "sha256": "aada8cde06a567bebf31675be3cebf3ce2ada2055aca18be7bbf22dff83a2c2f",
+      "bytes": 10412,
+      "kind": "protocol"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../runner/src/quotient_cycle_20261028.rs",
+      "sha256": "dfc4cd7374b31e31fe6fae11d8b4ccf7801f167147c9bc63cc85d4777be07066",
+      "bytes": 10602,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "runs/quotient-v1/RESULTS.json",
+        "sha256": "ed2a5b849834a3b2c372db11278c146ac9359a9fdbed37b74ec4e2abc86e539e",
+        "bytes": 67497,
+        "kind": "analysis"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Native all8 generic squares pass; first GP strict verification fails on reserved Pi name despite exit0/sentinel. Original records retained; not independently certified.",
+      "by": "native publication tool"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

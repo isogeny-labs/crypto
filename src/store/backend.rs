@@ -18,11 +18,55 @@ use std::fs;
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output, Stdio};
+use std::sync::Arc;
+use std::time::{Duration, Instant};
 
 use base64::Engine;
 
 use super::index::validate_sha256;
 use crate::hash::sha256::Sha256;
+
+/// Explicit command attempts and object body bytes, not an AWS billing meter.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Operation {
+    Head,
+    Put,
+    Get,
+    List,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Phase {
+    Snapshot,
+    Finalize,
+    Restore,
+    Control,
+}
+
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RequestSpec {
+    pub operation: Operation,
+    pub phase: Phase,
+    pub bucket: String,
+    pub key: String,
+    pub upload_bytes: u64,
+    pub download_bytes: u64,
+}
+
+pub trait S3Admission: Send + Sync {
+    /// Must durably charge this attempt before returning. No refund on failure.
+    fn reserve(&self, request: &RequestSpec) -> Result<(), String>;
+}
+
+#[derive(Clone)]
+pub struct S3Guard {
+    pub admission: Arc<dyn S3Admission>,
+    pub phase: Phase,
+    pub timeout_secs: u64,
+}
 
 /// What the remote reports about an object without downloading it.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -288,6 +332,7 @@ pub struct S3Backend {
     pub endpoint: Option<String>,
     /// The `aws` executable (`CRYPTO_STORE_AWS` overrides the name).
     pub aws: String,
+    pub guard: Option<S3Guard>,
 }
 
 /// The argument vectors are pure functions, so they are tested without a
@@ -641,6 +686,54 @@ impl S3Backend {
     }
 
     fn run(&self, args: &[String]) -> Result<Output, String> {
+        self.run_with_download(args, 0)
+    }
+
+    fn run_with_download(&self, args: &[String], download_bytes: u64) -> Result<Output, String> {
+        if let Some(guard) = &self.guard {
+            if self.endpoint.is_some() || self.bucket.ends_with("--x-s3") {
+                return Err("budgeted transport requires an ordinary AWS S3 bucket without endpoint override".into());
+            }
+            let value = |name: &str| -> Result<&str, String> {
+                args.windows(2)
+                    .find(|a| a[0] == name)
+                    .map(|a| a[1].as_str())
+                    .ok_or_else(|| format!("budgeted command missing {name}"))
+            };
+            if args.first().map(String::as_str) != Some("s3api") {
+                return Err("budgeted transport forbids high-level/multipart commands".into());
+            }
+            let operation = match args.get(1).map(String::as_str) {
+                Some("head-object") => Operation::Head,
+                Some("put-object") => Operation::Put,
+                Some("get-object") => Operation::Get,
+                Some("list-objects-v2") => Operation::List,
+                _ => return Err("unsupported budgeted S3 command".into()),
+            };
+            let key = value(if operation == Operation::List {
+                "--prefix"
+            } else {
+                "--key"
+            })?;
+            let upload_bytes = if operation == Operation::Put {
+                let metadata = fs::symlink_metadata(value("--body")?).map_err(|e| e.to_string())?;
+                if !metadata.is_file() || metadata.len() > SINGLE_PUT_MAX {
+                    return Err("budgeted PUT requires a regular single-PUT source".into());
+                }
+                metadata.len()
+            } else {
+                0
+            };
+            guard.admission.reserve(&RequestSpec {
+                operation,
+                phase: guard.phase,
+                bucket: self.bucket.clone(),
+                key: key.into(),
+                upload_bytes,
+                download_bytes,
+            })?;
+            return bounded_command(&self.aws, args, guard.timeout_secs);
+        }
         Command::new(&self.aws)
             .args(args)
             .stdin(Stdio::null())
@@ -658,9 +751,274 @@ impl S3Backend {
             })
     }
 
+    /// Pin the remote representation before reserving its complete body. The
+    /// preliminary HEAD is independently admitted. A Range limits nonempty
+    /// bodies even if an object is replaced; response metadata must still name
+    /// the complete expected representation, not just a matching prefix.
+    fn guarded_get(&self, key: &str, dest: &Path) -> Result<(), String> {
+        let head = self.run(&self.head_args(key))?;
+        if !head.status.success() {
+            return Err(self.failure("head-object before bounded GET", &head));
+        }
+        let meta = parse_head(&head.stdout)?;
+        let value: serde_json::Value =
+            serde_json::from_slice(&head.stdout).map_err(|e| e.to_string())?;
+        let etag = value
+            .get("ETag")
+            .and_then(|v| v.as_str())
+            .filter(|s| !s.is_empty() && s.len() <= 256 && !s.chars().any(char::is_control))
+            .ok_or("bounded GET requires an ETag")?;
+        let mut args = vec![
+            "s3api".into(),
+            "get-object".into(),
+            "--bucket".into(),
+            self.bucket.clone(),
+            "--key".into(),
+            self.full_key(key),
+            "--if-match".into(),
+            etag.into(),
+            "--output".into(),
+            "json".into(),
+        ];
+        if meta.bytes > 0 {
+            args.extend(["--range".into(), format!("bytes=0-{}", meta.bytes - 1)]);
+        }
+        // Destination is a caller-owned scratch file, never a committed object.
+        args.push(dest.display().to_string());
+        let out = self.run_with_download(&args, meta.bytes)?;
+        if !out.status.success() {
+            return Err(self.failure("bounded get-object", &out));
+        }
+        let reply: serde_json::Value =
+            serde_json::from_slice(&out.stdout).map_err(|e| e.to_string())?;
+        let full_range = if meta.bytes == 0 {
+            None
+        } else {
+            Some(format!("bytes 0-{}/{}", meta.bytes - 1, meta.bytes))
+        };
+        if reply.get("ContentLength").and_then(|v| v.as_u64()) != Some(meta.bytes)
+            || reply.get("ETag").and_then(|v| v.as_str()) != Some(etag)
+            || (meta.bytes > 0
+                && reply.get("ContentRange").and_then(|v| v.as_str()) != full_range.as_deref())
+            || fs::metadata(dest).map_err(|e| e.to_string())?.len() != meta.bytes
+        {
+            return Err("bounded GET returned a different size, range, or ETag".into());
+        }
+        Ok(())
+    }
+
+    fn guarded_list(&self, prefix: &str) -> Result<Vec<(String, u64)>, String> {
+        #[derive(serde::Deserialize)]
+        #[serde(rename_all = "PascalCase")]
+        struct Item {
+            key: String,
+            size: u64,
+        }
+        #[derive(serde::Deserialize)]
+        #[serde(rename_all = "PascalCase")]
+        struct Page {
+            name: String,
+            prefix: String,
+            key_count: u64,
+            is_truncated: bool,
+            #[serde(default)]
+            contents: Vec<Item>,
+            #[serde(default)]
+            common_prefixes: Vec<serde_json::Value>,
+            next_continuation_token: Option<String>,
+        }
+        let mut result = Vec::new();
+        let mut token: Option<String> = None;
+        let mut seen = std::collections::BTreeSet::new();
+        let mut seen_keys = std::collections::BTreeSet::new();
+        loop {
+            let mut args = self.list_args(prefix);
+            args.extend(["--no-paginate".into(), "--max-keys".into(), "1000".into()]);
+            if let Some(t) = &token {
+                args.extend(["--continuation-token".into(), t.clone()]);
+            }
+            let out = self.run(&args)?;
+            if !out.status.success() {
+                return Err(self.failure("list-objects-v2", &out));
+            }
+            let v: Page = serde_json::from_slice(&out.stdout).map_err(|e| e.to_string())?;
+            if v.name != self.bucket || v.prefix != self.full_key(prefix) {
+                return Err("budgeted listing changed bucket or prefix".into());
+            }
+            let strip = if self.prefix.is_empty() {
+                String::new()
+            } else {
+                format!("{}/", self.prefix)
+            };
+            if v.contents.len() > 1000
+                || v.key_count != v.contents.len() as u64
+                || !v.common_prefixes.is_empty()
+                || v.contents
+                    .iter()
+                    .any(|item| !item.key.starts_with(&self.full_key(prefix)))
+            {
+                return Err("budgeted listing has invalid members/count".into());
+            }
+            for item in v.contents {
+                if !seen_keys.insert(item.key.clone()) {
+                    return Err("listing repeated an object across pages".into());
+                }
+                let relative = item
+                    .key
+                    .strip_prefix(&strip)
+                    .ok_or("listing key outside store prefix")?;
+                result.push((relative.to_owned(), item.size));
+                if result.len() > 1_000_000 {
+                    return Err("budgeted listing exceeds local member cap".into());
+                }
+            }
+            match v.is_truncated {
+                false => {
+                    if v.next_continuation_token.is_some() {
+                        return Err("complete listing unexpectedly has next token".into());
+                    }
+                    break;
+                }
+                true => {
+                    let next = v
+                        .next_continuation_token
+                        .filter(|s| !s.is_empty() && s.len() <= 8192)
+                        .ok_or("truncated listing lacks bounded continuation token")?;
+                    if !seen.insert(next.clone()) {
+                        return Err("listing continuation token repeated".into());
+                    }
+                    token = Some(next);
+                }
+            }
+        }
+        result.sort();
+        Ok(result)
+    }
+
     fn failure(&self, what: &str, out: &Output) -> String {
         let err = String::from_utf8_lossy(&out.stderr);
         format!("aws {what} failed ({}): {}", out.status, err.trim())
+    }
+}
+
+/// Drain bounded pipes concurrently and kill the entire command process group
+/// on timeout/overflow, including grandchildren holding inherited pipes open.
+fn bounded_command(aws: &str, args: &[String], timeout_secs: u64) -> Result<Output, String> {
+    #[cfg(not(unix))]
+    {
+        let _ = (aws, args, timeout_secs);
+        Err("budgeted S3 subprocess isolation requires Unix".into())
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::process::CommandExt;
+        use std::sync::atomic::{AtomicBool, Ordering};
+        if !(1..=3600).contains(&timeout_secs) {
+            return Err("invalid budgeted command timeout".into());
+        }
+        let mut command = Command::new(aws);
+        command
+            .args(args)
+            .args(["--no-cli-pager", "--no-cli-auto-prompt"])
+            .env("AWS_MAX_ATTEMPTS", "1")
+            .env("AWS_RETRY_MODE", "standard")
+            .env("AWS_PAGER", "")
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
+        #[cfg(target_os = "linux")]
+        let parent = std::process::id();
+        unsafe {
+            command.pre_exec(move || {
+                if libc::setpgid(0, 0) != 0 {
+                    return Err(std::io::Error::last_os_error());
+                }
+                #[cfg(target_os = "linux")]
+                if libc::prctl(libc::PR_SET_PDEATHSIG, libc::SIGKILL) != 0
+                    || libc::getppid() as u32 != parent
+                {
+                    return Err(std::io::Error::other("budgeted command parent unavailable"));
+                }
+                Ok(())
+            });
+        }
+        let mut child = command
+            .spawn()
+            .map_err(|e| format!("budgeted AWS command spawn failed: {e}"))?;
+        let pid = child.id() as i32;
+        let overflow = Arc::new(AtomicBool::new(false));
+        let reader = |mut stream: Box<dyn Read + Send>, limit: usize, flag: Arc<AtomicBool>| {
+            std::thread::spawn(move || -> Result<Vec<u8>, String> {
+                let mut bytes = Vec::new();
+                let mut buf = [0u8; 8192];
+                loop {
+                    let n = stream.read(&mut buf).map_err(|e| e.to_string())?;
+                    if n == 0 {
+                        break;
+                    }
+                    if bytes.len().saturating_add(n) > limit {
+                        flag.store(true, Ordering::SeqCst);
+                    } else {
+                        bytes.extend_from_slice(&buf[..n]);
+                    }
+                }
+                Ok(bytes)
+            })
+        };
+        let stdout = reader(
+            Box::new(child.stdout.take().expect("piped stdout")),
+            2 * 1024 * 1024,
+            overflow.clone(),
+        );
+        let stderr = reader(
+            Box::new(child.stderr.take().expect("piped stderr")),
+            64 * 1024,
+            overflow.clone(),
+        );
+        let start = Instant::now();
+        let mut reason = None;
+        let status = loop {
+            if overflow.load(Ordering::SeqCst)
+                || start.elapsed() >= Duration::from_secs(timeout_secs)
+            {
+                reason = Some("budgeted AWS command exceeded output or time limit".to_string());
+                unsafe {
+                    libc::kill(-pid, libc::SIGKILL);
+                }
+                break child.wait().map_err(|e| e.to_string());
+            }
+            match child.try_wait() {
+                Ok(Some(s)) => break Ok(s),
+                Ok(None) => std::thread::sleep(Duration::from_millis(20)),
+                Err(e) => {
+                    unsafe {
+                        libc::kill(-pid, libc::SIGKILL);
+                    }
+                    let _ = child.wait();
+                    break Err(e.to_string());
+                }
+            }
+        };
+        unsafe {
+            libc::kill(-pid, libc::SIGKILL);
+        }
+        let stdout = stdout
+            .join()
+            .map_err(|_| "AWS stdout reader panicked".to_string())??;
+        let stderr = stderr
+            .join()
+            .map_err(|_| "AWS stderr reader panicked".to_string())??;
+        if overflow.load(Ordering::SeqCst) {
+            reason = Some("budgeted AWS command exceeded output limit".into());
+        }
+        if let Some(reason) = reason {
+            return Err(reason);
+        }
+        Ok(Output {
+            status: status?,
+            stdout,
+            stderr,
+        })
     }
 }
 
@@ -827,6 +1185,9 @@ impl Backend for S3Backend {
             Err(e) => return Err(format!("CRYPTO_STORE_MULTIPART_THRESHOLD_BYTES: {e}")),
         };
         if len > threshold {
+            if self.guard.is_some() {
+                return Err("budgeted publication forbids multipart upload".into());
+            }
             let minimum_part_size = DEFAULT_MULTIPART_PART.max(len.div_ceil(MAX_MULTIPART_PARTS));
             let part_size = match std::env::var("CRYPTO_STORE_MULTIPART_PART_BYTES") {
                 Ok(v) => {
@@ -877,6 +1238,9 @@ impl Backend for S3Backend {
         if let Some(dir) = dest.parent() {
             fs::create_dir_all(dir).map_err(|e| format!("{}: {e}", dir.display()))?;
         }
+        if self.guard.is_some() {
+            return self.guarded_get(key, dest);
+        }
         let out = self.run(&self.get_args(key, dest))?;
         if out.status.success() {
             Ok(())
@@ -887,6 +1251,9 @@ impl Backend for S3Backend {
     }
 
     fn list(&self, prefix: &str) -> Result<Vec<(String, u64)>, String> {
+        if self.guard.is_some() {
+            return self.guarded_list(prefix);
+        }
         let out = self.run(&self.list_args(prefix))?;
         if !out.status.success() {
             return Err(self.failure("list-objects-v2", &out));
@@ -912,6 +1279,7 @@ mod tests {
             prefix: prefix.into(),
             endpoint: endpoint.map(str::to_string),
             aws: "aws".into(),
+            guard: None,
         }
     }
 
@@ -1156,5 +1524,260 @@ mod tests {
         }
         assert!(b.get("sha256/zz/none", &root.join("nope")).is_err());
         let _ = fs::remove_dir_all(&root);
+    }
+}
+
+#[cfg(all(test, unix))]
+mod guarded_transport_tests {
+    use super::*;
+    use std::os::unix::fs::PermissionsExt;
+    use std::sync::Mutex;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    #[derive(Default)]
+    struct Meter {
+        calls: Mutex<Vec<RequestSpec>>,
+        max_calls: usize,
+        max_download: u64,
+    }
+    impl S3Admission for Meter {
+        fn reserve(&self, r: &RequestSpec) -> Result<(), String> {
+            let mut calls = self.calls.lock().unwrap();
+            if calls.len() >= self.max_calls || r.download_bytes > self.max_download {
+                return Err("test budget exhausted".into());
+            }
+            calls.push(r.clone());
+            Ok(())
+        }
+    }
+    struct Fixture {
+        root: PathBuf,
+        backend: S3Backend,
+        meter: Arc<Meter>,
+    }
+    impl Fixture {
+        fn new(body: &str, max_calls: usize, max_download: u64) -> Self {
+            let root = std::env::temp_dir().join(format!(
+                "guarded-s3-{}-{}",
+                std::process::id(),
+                SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos()
+            ));
+            fs::create_dir(&root).unwrap();
+            let aws = root.join("aws");
+            fs::write(&aws,format!("#!/bin/sh\nset -eu\n[ \"$AWS_MAX_ATTEMPTS\" = 1 ]\n[ \"$AWS_RETRY_MODE\" = standard ]\n{body}\n")).unwrap();
+            fs::set_permissions(&aws, fs::Permissions::from_mode(0o700)).unwrap();
+            let meter = Arc::new(Meter {
+                calls: Mutex::new(Vec::new()),
+                max_calls,
+                max_download,
+            });
+            let backend = S3Backend {
+                bucket: "setec-astronomy-artifacts".into(),
+                prefix: "research/fixture".into(),
+                endpoint: None,
+                aws: aws.display().to_string(),
+                guard: Some(S3Guard {
+                    admission: meter.clone(),
+                    phase: Phase::Snapshot,
+                    timeout_secs: 5,
+                }),
+            };
+            Self {
+                root,
+                backend,
+                meter,
+            }
+        }
+        fn ops(&self) -> Vec<Operation> {
+            self.meter
+                .calls
+                .lock()
+                .unwrap()
+                .iter()
+                .map(|r| r.operation)
+                .collect()
+        }
+    }
+    impl Drop for Fixture {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.root);
+        }
+    }
+
+    const DOWNLOAD: &str = r#"
+case "$2" in
+head-object) printf '%s\n' '{"ContentLength":3,"ETag":"\"fixed\""}' ;;
+get-object)
+  have_range=no
+  previous=''
+  destination=''
+  for arg in "$@"; do
+    [ "$previous" != --range ] || { [ "$arg" = bytes=0-2 ]; have_range=yes; }
+    case "$arg" in */download) destination="$arg";; esac
+    previous="$arg"
+  done
+  [ "$have_range" = yes ]
+  [ -n "$destination" ]
+  printf abc > "$destination"
+  printf '%s\n' '{"ContentLength":3,"ETag":"\"fixed\"","ContentRange":"bytes 0-2/3"}' ;;
+*) exit 8 ;;
+esac
+"#;
+    #[test]
+    fn guarded_get_is_pinned_bounded_and_individually_admitted() {
+        let f = Fixture::new(DOWNLOAD, 2, 3);
+        let dest = f.root.join("download");
+        f.backend.get("object", &dest).unwrap();
+        assert_eq!(fs::read(dest).unwrap(), b"abc");
+        assert_eq!(f.ops(), [Operation::Head, Operation::Get]);
+        let calls = f.meter.calls.lock().unwrap();
+        assert_eq!(calls[1].download_bytes, 3);
+        assert_eq!(calls[0].key, "research/fixture/object");
+    }
+    #[test]
+    fn head_advertised_length_is_admitted_before_get() {
+        let f = Fixture::new(DOWNLOAD, 2, 2);
+        let dest = f.root.join("download");
+        assert!(f
+            .backend
+            .get("object", &dest)
+            .unwrap_err()
+            .contains("exhausted"));
+        assert!(!dest.exists());
+        assert_eq!(f.ops(), [Operation::Head]);
+    }
+    #[test]
+    fn zero_budget_does_not_execute_aws() {
+        let f = Fixture::new("exit 77", 0, 0);
+        let message = f.backend.head("object").unwrap_err();
+        assert!(message.contains("budget"));
+        assert!(f.ops().is_empty());
+    }
+    #[test]
+    fn put_collision_charges_internal_head() {
+        let f = Fixture::new(
+            r#"case "$2" in
+put-object) echo 'An error occurred (PreconditionFailed)' >&2; exit 1 ;;
+head-object) printf '%s\n' '{"ContentLength":3,"Metadata":{"sha256":"ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"}}' ;;
+*) exit 8;; esac"#,
+            2,
+            0,
+        );
+        let source = f.root.join("source");
+        fs::write(&source, b"abc").unwrap();
+        let digest = crate::store::hash_file(&source).unwrap().0;
+        assert!(!f.backend.put("object", &source, &digest).unwrap());
+        assert_eq!(f.ops(), [Operation::Put, Operation::Head]);
+        assert_eq!(f.meter.calls.lock().unwrap()[0].upload_bytes, 3);
+    }
+    #[test]
+    fn denied_head_probe_is_admitted_and_strict() {
+        let f = Fixture::new(
+            r#"case "$2" in
+head-object) echo 'An error occurred (403) when calling HeadObject: Forbidden' >&2; exit 1 ;;
+list-objects-v2) printf '%s\n' '{"Name":"setec-astronomy-artifacts","Prefix":"research/fixture/object","MaxKeys":1,"KeyCount":0,"IsTruncated":false}' ;;
+*) exit 8;; esac"#,
+            2,
+            0,
+        );
+        assert_eq!(f.backend.head("object").unwrap(), None);
+        assert_eq!(f.ops(), [Operation::Head, Operation::List]);
+    }
+    #[test]
+    fn denied_probe_cannot_spend_unreserved_list_credit() {
+        let f = Fixture::new(
+            "echo 'An error occurred (403) when calling HeadObject: Forbidden' >&2; exit 1",
+            1,
+            0,
+        );
+        assert!(f.backend.head("object").is_err());
+        assert_eq!(f.ops(), [Operation::Head]);
+    }
+    #[test]
+    fn non403_forbidden_never_runs_absence_probe() {
+        let f = Fixture::new("echo 'proxy Forbidden' >&2; exit 1", 2, 0);
+        assert!(f.backend.head("object").is_err());
+        assert_eq!(f.ops(), [Operation::Head]);
+    }
+    #[test]
+    fn altered_range_is_not_a_complete_object() {
+        let script = DOWNLOAD.replace("bytes 0-2/3", "bytes 0-2/4");
+        let f = Fixture::new(&script, 2, 3);
+        assert!(f
+            .backend
+            .get("object", &f.root.join("download"))
+            .unwrap_err()
+            .contains("different"));
+        assert_eq!(f.ops(), [Operation::Head, Operation::Get]);
+    }
+    #[test]
+    fn empty_object_uses_pinned_zero_byte_get() {
+        let f = Fixture::new(
+            r#"case "$2" in
+head-object) printf '%s\n' '{"ContentLength":0,"ETag":"\"empty\""}';;
+get-object)
+ for arg in "$@"; do [ "$arg" != --range ]; case "$arg" in */download) : > "$arg";; esac; done
+ printf '%s\n' '{"ContentLength":0,"ETag":"\"empty\""}';;
+*) exit 8;; esac"#,
+            2,
+            0,
+        );
+        f.backend.get("object", &f.root.join("download")).unwrap();
+        assert_eq!(f.ops(), [Operation::Head, Operation::Get]);
+    }
+    #[test]
+    fn explicit_list_pages_each_consume_credit() {
+        let f = Fixture::new(
+            r#"
+next=no
+for arg in "$@"; do [ "$arg" != second ] || next=yes; done
+if [ "$next" = no ]; then
+printf '%s\n' '{"Name":"setec-astronomy-artifacts","Prefix":"research/fixture/objects/","KeyCount":1,"IsTruncated":true,"Contents":[{"Key":"research/fixture/objects/a","Size":3}],"NextContinuationToken":"second"}'
+else
+printf '%s\n' '{"Name":"setec-astronomy-artifacts","Prefix":"research/fixture/objects/","KeyCount":1,"IsTruncated":false,"Contents":[{"Key":"research/fixture/objects/b","Size":4}]}'
+fi"#,
+            2,
+            0,
+        );
+        assert_eq!(
+            f.backend.list("objects/").unwrap(),
+            vec![("objects/a".into(), 3), ("objects/b".into(), 4)]
+        );
+        assert_eq!(f.ops(), [Operation::List, Operation::List]);
+    }
+    #[test]
+    fn spawned_command_timeout_remains_charged() {
+        let mut f = Fixture::new("sleep 20", 1, 0);
+        f.backend.guard.as_mut().unwrap().timeout_secs = 1;
+        let begin = Instant::now();
+        assert!(f.backend.head("object").unwrap_err().contains("limit"));
+        assert!(begin.elapsed() < Duration::from_secs(8));
+        assert_eq!(f.ops(), [Operation::Head]);
+    }
+    #[test]
+    fn output_overflow_is_bounded_and_charged() {
+        let f = Fixture::new("head -c 2200000 /dev/zero", 1, 0);
+        assert!(f.backend.head("object").unwrap_err().contains("output"));
+        assert_eq!(f.ops(), [Operation::Head]);
+    }
+    #[test]
+    fn scope_rejects_custom_endpoint_and_multipart_before_spawn() {
+        let mut f = Fixture::new("exit 77", 10, 100);
+        f.backend.endpoint = Some("https://example.invalid".into());
+        assert!(f.backend.head("object").unwrap_err().contains("endpoint"));
+        assert!(f.ops().is_empty());
+        f.backend.endpoint = None;
+        let source = f.root.join("large");
+        let file = fs::File::create(&source).unwrap();
+        file.set_len(SINGLE_PUT_MAX + 1).unwrap();
+        assert!(f
+            .backend
+            .put("object", &source, &"a".repeat(64))
+            .unwrap_err()
+            .contains("multipart"));
+        assert!(f.ops().is_empty());
     }
 }

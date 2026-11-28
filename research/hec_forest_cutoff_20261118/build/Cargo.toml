@@ -1,0 +1,10 @@
+[package]
+name="hec-forest-cutoff"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../hec_residual_span_20261116/holdout/native"}
+[[bin]]
+name="forest-cutoff"
+path="../main.rs"

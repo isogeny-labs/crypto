@@ -190,13 +190,10 @@ fn polynomial_remainder(mut dividend: BigUint, divisor: &BigUint) -> BigUint {
     dividend
 }
 
-fn polynomial_gcd(mut left: BigUint, mut right: BigUint) -> BigUint {
-    while !right.is_zero() {
-        let remainder = polynomial_remainder(left, &right);
-        left = right;
-        right = remainder;
-    }
-    left
+fn polynomial_gcd(left: BigUint, right: BigUint) -> BigUint {
+    // GF(2)[x] gcd by the shared bit-packed gcd (BigUint bit i = coeff of x^i).
+    let g = crate::gcd::gf2::gcd(&left.to_u64_digits(), &right.to_u64_digits());
+    BigUint::from_bytes_le(&g.iter().flat_map(|w| w.to_le_bytes()).collect::<Vec<u8>>())
 }
 
 fn prime_division_checkpoints(degree: u32) -> HashSet<u32> {

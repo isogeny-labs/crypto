@@ -1,0 +1,28 @@
+{
+  "schema": "relation-diagnostic-unit-plan/v1",
+  "source": "SOURCE_410.json",
+  "recorded_before_calls": true,
+  "recorded_utc": "2026-11-24T03:25:15.300831+00:00",
+  "executable": "/workspace/relation-diagnostic-tests-410",
+  "executable_sha256": "1ded68a0e9369ba200085790fa7b8f295fbd61ea8f3cbf959dd7b03819121cb1",
+  "exact_roster_sha256": "28ad5a3bffc83f41ccaed73959e6983a424b1471fb3d3ec49a135c6621411840",
+  "tests": 83,
+  "new_tests": [
+    "degree_space::tests::degree_derivation_and_membership_tampering_is_rejected",
+    "degree_space::tests::empty_constant_and_validation_edges",
+    "degree_space::tests::genuinely_earlier_consequence_retains_original_generator_witnesses",
+    "degree_space::tests::producer_censoring_never_becomes_an_exact_rank_or_gain",
+    "degree_space::tests::raw_gain_can_be_zero_gain_after_closure",
+    "relation_labels::tests::detects_inconsistent_scalar_systems_even_when_rank_gain_is_only_one",
+    "relation_labels::tests::empty_zero_and_malformed_inputs_are_explicit",
+    "relation_labels::tests::formal_labels_never_extract_and_augmented_span_is_preserved",
+    "relation_labels::tests::homogeneous_connector_is_needed_for_target_dependency"
+  ],
+  "selection": "Entire maintaineddefaultproducerlibtarget, nofilters, noignoredforced",
+  "cpu": 0,
+  "threads": 1,
+  "wall_limit_seconds": 300,
+  "address_space_bytes": 12884901888,
+  "output_limit_bytes": 16777216,
+  "performance_experiment": false
+}

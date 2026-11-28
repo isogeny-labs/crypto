@@ -1,0 +1,5 @@
+Build: rustc --edition=2024 --crate-name pplus_selector_qualifier -C opt-level=2 qualifier.rs -o build/pplus-selector-build
+Normal: evidence/attempt-02/pplus-selector-qualifier
+Expected rejection: evidence/attempt-02/pplus-selector-qualifier --mutate-first-root
+Expected rejection: evidence/attempt-02/pplus-selector-qualifier --mutate-norm-one-lift
+Build timeout: 60 seconds. Each native invocation timeout: 30 seconds.

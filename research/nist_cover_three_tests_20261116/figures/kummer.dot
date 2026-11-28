@@ -1,0 +1,14 @@
+digraph kummer {
+  graph [rankdir=LR,bgcolor="white",pad=0.15,nodesep=0.35,ranksep=0.35];
+  node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=11,fillcolor="#e6f2ff",color="#27679a"];
+  edge [color="#4b6175"];
+  source [label="Actual source divisors\n5 public fixtures\n2 representatives each"];
+  coordinates [label="Quotient Kummer K\n384 normalization checks\nnegation / kernel checks"];
+  target [label="Quartic good functions\n8 functions / rank8\n16 unused triple checks"];
+  match [label="Basis identification\nH = A K"];
+  inverse [label="Finite divisor inverse\nconsistent sign\nREMAINING",fillcolor="#fff0d7",color="#a47425"];
+  classes [label="Class map / Frobenius\npublic transfer / relations\nREMAINING",fillcolor="#fff0d7",color="#a47425"];
+  source -> coordinates -> match;
+  target -> match;
+  match -> inverse -> classes;
+}

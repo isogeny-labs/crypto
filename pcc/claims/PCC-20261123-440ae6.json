@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T08:22:36Z",
+ "id": "PCC-20261123-440ae6",
+ "kind": "statement",
+ "producer": {
+  "commit": "1d51fef4f3396948d7ea3a4fad681c906702c478",
+  "model": "",
+  "session": "chained-transfers-resume-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_twohop_descent_20261123/maintenance-PR4990-first-CI/SCHEDULED_ALL_EVENT_ALL_ATTEMPT_CI.json",
+    "sha256": "e20b036b6651ef82c5a2f240853b4925b174fc173f9a52072e85c170a77e8514"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_twohop_descent_20261123/maintenance-PR4990-first-CI/ALL_SELECTED_FAILED_LOG_CUSTODY.json",
+    "sha256": "3c70635e673b593f7d906b27f669ba579e6edac78c527242c9a4bdb2b75d9809"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_twohop_descent_20261123/maintenance-PR4990-first-CI/BASE_TREE_COMPARISON_NOT_BASELINE_CI_RERUN.json",
+    "sha256": "b2537bdcf1636a751db9b2b525d66f9c3d096df6b8aeddadacbb4c76168a4c5f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Unsigned CI observation; failures/budget excess remain visible, no manual merge or gate/trigger change. Next unchanged read at least4hours later.",
+ "statement": "Scheduled first CI review of PR4990 f48f41b8 occurs after the50-minute cadence and finds36 workflow runs and49 explicit filter=all checks, exceeding30. Required gate/artifacts checks fail; size succeeds. All seven selected failed-job logs are retained complete with decoded-text hashes and provider URLs. Entire .github/.artifacts/tools/scripts/shared-code lock/keyring objects equal base816; this is input comparison, not a baseline CI rerun or merge waiver. Earlier4544 default-latest check counts do not establish all-attempt budget compliance."
+}

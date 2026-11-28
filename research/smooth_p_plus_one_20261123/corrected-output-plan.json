@@ -1,0 +1,150 @@
+{
+  "schema": "dickson.corrected_output_plan/v1",
+  "status": "planned_unadmitted",
+  "canonical_protocol_validated": false,
+  "execution_count": 0,
+  "source_commit": "55f8d14f3b5fb1c997740ce8952360c2a31535e6",
+  "source_identity": "evidence/semantic_guard_v1/build_identity.json",
+  "driver_sha256": "5d25b56793ff93865eeb130fd30466d651911e95bdbb8b0f49aff42faa5a9ffe",
+  "solver_sha256": "74088d6775c82845faedcbdc24a82d3709e39ee7ebf3e3e4aabde080f9ab3c28",
+  "oci_digest": null,
+  "registered_launcher": null,
+  "methods": [
+    "liftable-cutoff",
+    "cofactor-msolve"
+  ],
+  "fixed_form_policy": "canonical_semantic_v1",
+  "panels": [
+    {
+      "id": "f127_d4",
+      "prime": 127,
+      "depth": 4,
+      "targets": [
+        [
+          20,
+          91
+        ],
+        [
+          116,
+          69
+        ],
+        [
+          41,
+          95
+        ],
+        [
+          41,
+          32
+        ]
+      ],
+      "planted": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "planned_answers": 8
+    },
+    {
+      "id": "f8191_d4",
+      "prime": 8191,
+      "depth": 4,
+      "targets": [
+        [
+          792,
+          883
+        ],
+        [
+          1806,
+          2202
+        ],
+        [
+          2071,
+          2384
+        ],
+        [
+          2228,
+          5734
+        ]
+      ],
+      "planted": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "planned_answers": 8
+    },
+    {
+      "id": "f8191_d5",
+      "prime": 8191,
+      "depth": 5,
+      "targets": [
+        [
+          792,
+          883
+        ],
+        [
+          1806,
+          2202
+        ],
+        [
+          2071,
+          2384
+        ],
+        [
+          2228,
+          5734
+        ],
+        [
+          4375,
+          6159
+        ]
+      ],
+      "planted": [
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "planned_answers": 10
+    }
+  ],
+  "resources": {
+    "backend": "isolab ordinary Spot command job",
+    "cpu": 1,
+    "memory_bytes": 2147483648,
+    "virtual_memory_kib": 2097152,
+    "concurrency": 1,
+    "panel_seconds": 60,
+    "termination_grace_seconds": 5,
+    "job_seconds_including_provisioning": 900,
+    "query_milliseconds": 3000,
+    "form_limit": 16,
+    "automatic_retries": 0,
+    "proposed_component_usd_ceiling": 5,
+    "cost_reserved": false,
+    "budget_headroom": null
+  },
+  "acceptance": {
+    "expected_answer_count": 26,
+    "require_all_complete": true,
+    "reference": "Direct full signed relation set at pinned driver source",
+    "whole_set_equality": true,
+    "mismatch": "stop that panel and retain unattempted suffix; other admitted panels still attempted once",
+    "incomplete": "retain; no accepted prefix",
+    "empty_marker": "solver_empty_unchecked, independently compared to Direct for this finite cohort",
+    "time_comparison": false,
+    "recovery_comparison": false
+  },
+  "gates": [
+    "readable and validated canonical protocol",
+    "exact source/image/driver/solver/dependency binding",
+    "registered supported launcher and authorized identity",
+    "live budget and capacity plus USD5 reservation",
+    "Git custody receipt",
+    "current S3 resume checkpoint",
+    "private output location and durable payload replay"
+  ]
+}

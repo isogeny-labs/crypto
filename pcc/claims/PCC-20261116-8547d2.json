@@ -1,0 +1,50 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T02:46:13Z",
+ "id": "PCC-20261116-8547d2",
+ "kind": "theorem",
+ "producer": {
+  "commit": "4c59c865bcf8e3a49f9650e951c7549c33a656d4",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "89e0f0718f2380967e8334ad132fd84971a4bf06c436cbf1fb1cf8b382d1a597",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-kernel",
+   "theorem": "Curve25519SharedQuery.shared_query_counterexample"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-kernel/SharedQueryCounterexample.lean",
+    "sha256": "4b6c2afe7f7887c0c90eca90b0f3ac9082e4733a69c5cdea77fb5958462666c3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-kernel/lakefile.toml",
+    "sha256": "829f7abf457d21f8c4b3fd32274b8c8a61b359f6e0ccba81577d31782f8f2efc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-kernel/lake-manifest.json",
+    "sha256": "434f6ca2bd398320b66eff450c062ba4cff89d1392760b9139125dc5695b64aa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-kernel/gate-v2/audit.log",
+    "sha256": "de17aea731421a0fbcb6113af41126955289c892a7d3935d0f564d2f9e18e9c0"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "curve25519-query-row-contract",
+ "statement": "Concrete finite-field witness only: over ZMod5, the fixed nonzero vector(1,-1) is in the left kernel of the two-by-one all-ones matrix, and its dot product with(b,b) is zero for every field element b. Kernel-checked decide and existing Mathlib structures establish this instance. The maintained complete project gate passes four named declarations with no trusted-native exception; the new claim covers only the shared-query witness. This demonstrates a row-tag dependence counterexample, not actual curve decompositions, arbitrary batch correctness or a generic probability/cost theorem. Frozen older source/manifest contexts remain unchanged."
+}

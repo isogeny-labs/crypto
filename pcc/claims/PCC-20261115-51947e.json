@@ -1,0 +1,29 @@
+{
+ "created_at": "2026-11-15T21:04:36Z",
+ "id": "PCC-20261115-51947e",
+ "kind": "statement",
+ "producer": {
+  "commit": "a6505f782c40b9850adf231bc508b751fcd83625",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_fast_20261115/checks/independent-old650.json",
+    "sha256": "314e3143c26789f43c05aa89e57973d0f98a71e3e487e06cb872d370ecddac41"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_fast_20261115/checks/equivalence-tests.txt",
+    "sha256": "6c8097dffd6277e3c8cf05d3b43d1f771f07155ca884ecc8b1a11ade3684f8ce"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Producer-written arithmetic cross-check and scoped development checks, unsigned; not independently signed verification.",
+ "statement": "Separate schoolbook polynomial arithmetic and Euclidean inversion checks all65 saved scale inputs,46 known witnesses and every19 negative truth. Large negatives are checked by inconsistent necessary symmetric systems for every residual, small negatives by complete pair tables. The checker replays416 saved relations in650 earlier rows without importing production field/group/solver modules. Four focused checks also pass, including exact65-case old/new witness-order equivalence."
+}

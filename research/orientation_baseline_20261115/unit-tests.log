@@ -1,0 +1,32 @@
+   Compiling orientation-baseline v0.1.0 (/workspace/crypto/research/orientation_baseline_20261115)
+    Finished `release` profile [optimized] target(s) in 0.78s
+     Running unittests baseline.rs (research/orientation_baseline_20261115/target/release/build/orientation-baseline/bf0f1c372ee0dcc7/out/orientation_baseline-bf0f1c372ee0dcc7)
+
+running 9 tests
+determinant-only counterexample: GF(8), a=0, b=1, P=Q=R=(1, 0)
+test prior_controls::tests::anchor_slope_redundancy_is_an_exact_polynomial_identity ... ok
+test prior_controls::tests::collinearity_alone_is_not_a_multiplicity_test ... ok
+test prior_controls::tests::fields_and_chart_are_valid_in_odd_and_even_degrees ... ok
+unguarded-anchor counterexample: GF(8), a=0, b=1, P=(1, 1), Q=(1, 0), R=(0, 1)
+test prior_controls::tests::zero_target_denominator_needs_an_explicit_branch ... ok
+negative controls: wrong-sign S3 roots=1560, S3 roots without rational lifts=1112
+test prior_controls::tests::rational_lifts_require_trace_and_s3_does_not_fix_signs ... ok
+test tests::field_and_batch_inverse_controls ... ok
+exact complete-output cases across 18 small curves: 528
+test tests::complete_relations_and_exceptional_branches ... ok
+B=8 targets=8 pair_scan=Counts { mul: 3213, square: 2814, inverse: 336, additions: 512, inserts: 0, lookups: 0, rows: 16 } scalar=Counts { mul: 612, square: 502, inverse: 47, additions: 64, inserts: 64, lookups: 64, rows: 16 } batch=Counts { mul: 473, square: 222, inverse: 7, additions: 64, inserts: 64, lookups: 64, rows: 16 }
+B=16 targets=8 pair_scan=Counts { mul: 15501, square: 13694, inverse: 1680, additions: 2048, inserts: 0, lookups: 0, rows: 28 } scalar=Counts { mul: 1308, square: 1078, inverse: 103, additions: 128, inserts: 128, lookups: 128, rows: 28 } batch=Counts { mul: 945, square: 406, inverse: 7, additions: 128, inserts: 128, lookups: 128, rows: 28 }
+B=32 targets=8 pair_scan=Counts { mul: 67725, square: 60030, inverse: 7440, additions: 8192, inserts: 0, lookups: 0, rows: 55 } scalar=Counts { mul: 2700, square: 2230, inverse: 215, additions: 256, inserts: 256, lookups: 256, rows: 55 } batch=Counts { mul: 1889, square: 774, inverse: 7, additions: 256, inserts: 256, lookups: 256, rows: 55 }
+18 curves: triples=24782, hybrid=19664, repeated_x=9518, containing_x_zero=5118
+test prior_controls::tests::oriented_and_hybrid_systems_equal_the_full_group_relation ... ok
+B=64 targets=8 pair_scan=Counts { mul: 282765, square: 251006, inverse: 31248, additions: 32768, inserts: 0, lookups: 0, rows: 165 } scalar=Counts { mul: 5475, square: 4526, inverse: 438, additions: 512, inserts: 512, lookups: 512, rows: 165 } batch=Counts { mul: 3772, square: 1509, inverse: 7, additions: 512, inserts: 512, lookups: 512, rows: 165 }
+test tests::counted_cold_scaling_controls ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+   Doc-tests orientation_baseline
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

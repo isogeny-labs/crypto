@@ -1,0 +1,11 @@
+name = "pairing_geometric_torsion_audit"
+version = "0.1.0"
+defaultTargets = ["GeometricTorsionAudit"]
+
+[[require]]
+name = "pairing_miller_audit"
+path = "../../pairing_miller_audit_20261110/lean"
+
+[[lean_lib]]
+name = "GeometricTorsionAudit"
+roots = ["CoordinateDescent", "GeometricTorsion", "AlgebraicClosure", "GeometricFrobenius"]

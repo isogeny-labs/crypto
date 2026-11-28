@@ -1,0 +1,10 @@
+digraph cut {
+  graph [bgcolor="white",rankdir=LR,pad=0.16,nodesep=0.36,ranksep=0.48];
+  node [shape=box,fontname="Helvetica",fontsize=13,style="rounded,filled",fillcolor="#f2f6fb",color="#65829c",margin="0.18,0.12"];
+  edge [fontname="Helvetica",fontsize=10,color="#587189"];
+  roots [label="RR5 quartic\nFour factor-base abscissae"];
+  boundary [label="Distinct intermediate images\nQuartic divides the suffix selector\nJacobian rank 3",fillcolor="#e8f6eb",color="#457a52"];
+  terminal [label="Four coincident images\nQuartic = (X − c)⁴\nJacobian rank at most 1",fillcolor="#f9ece7",color="#a8725f"];
+  roots -> boundary [label="Dickson prefix"];
+  boundary -> terminal [label="Dickson suffix"];
+}

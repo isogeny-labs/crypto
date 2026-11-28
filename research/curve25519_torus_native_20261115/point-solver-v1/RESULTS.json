@@ -1,0 +1,60 @@
+{
+  "schema": "point-solver-fixed-results/v1",
+  "synthetic_complete_models": 12,
+  "synthetic_scope": "supplied complete original assignments, not discovery",
+  "asserted_smt_export_controls": [
+    "toy-signed-support-1",
+    "original-actual-k20633"
+  ],
+  "small_sat_unsat_controls": 2,
+  "output_cap_control": true,
+  "public_problem": {
+    "Q": [
+      "70",
+      "41"
+    ],
+    "R": [
+      "89",
+      "27"
+    ],
+    "k": 8,
+    "order_factor": 17,
+    "p": "101",
+    "q": 3
+  },
+  "public_stats": {
+    "arity": 6,
+    "complete_addition": "RFC8032 section5.1.4",
+    "distinct_raw_indices": true,
+    "equations": 357,
+    "max_degree": 2,
+    "member": {
+      "equations": 39,
+      "fp2_power_gates": 2,
+      "fp2_selector_gates": 3,
+      "has_nonidentity_cofactor_image": true,
+      "max_degree": 2,
+      "selector_bits": 3,
+      "slack_bits": 3,
+      "solver_cost_established": false,
+      "total_terms": 119,
+      "variables": 37
+    },
+    "target_discovery_solver": false,
+    "terms": 1139,
+    "variables": 327
+  },
+  "public_outcome": "resource_or_backend_refusal",
+  "public_status": null,
+  "public_refusal": "backend reported timeout",
+  "public_exit_code": null,
+  "public_exit_signal": 6,
+  "public_stderr": "cvc5 interrupted by timeout.\n",
+  "public_transport_error": "model transport: Broken pipe (os error 32)",
+  "public_get_value_sent": false,
+  "public_query_sha256": "38a32927fe11e46a8cfb073c0428965039c952f334618ca4f7a9646fea035063",
+  "public_query_retries": 0,
+  "old_spectrum_query_rerun": false,
+  "curve_root_discovered": false,
+  "scope": "same Q as old section attempt, distinct raw-sector conditions; no rate, hardness, absence or exponent inference"
+}

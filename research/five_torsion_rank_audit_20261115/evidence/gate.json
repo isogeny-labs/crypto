@@ -1,0 +1,73 @@
+{
+  "archive": "research/five_torsion_rank_audit_20261115/evidence/gate.tar.gz",
+  "files": 5,
+  "unique_objects": 5,
+  "losslessly_deduplicated": false,
+  "roundtrip_equal": true,
+  "inventory": [
+    {
+      "member": "research_five_torsion_rank_audit_20261115_lean/audit.log",
+      "bytes": 4709,
+      "sha256": "20c8515e8909bba5a69db051d450f880e1db4bc28d20de5c7abb5d1975d75131"
+    },
+    {
+      "member": "research_five_torsion_rank_audit_20261115_lean/build.log",
+      "bytes": 4540,
+      "sha256": "f7b2d269105cc5c2b9d366787d37d6c02bb178bd0bc47d8bea15e842ac429fc6"
+    },
+    {
+      "member": "research_five_torsion_rank_audit_20261115_lean/cache.log",
+      "bytes": 138,
+      "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+    },
+    {
+      "member": "research_five_torsion_rank_audit_20261115_lean/source-build.log",
+      "bytes": 4540,
+      "sha256": "866a6083a204d68f9f240dcaf6bcf11344bce4fa3bf9d444e1c0fd8c39c98310"
+    },
+    {
+      "member": "research_five_torsion_rank_audit_20261115_lean/status",
+      "bytes": 5,
+      "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+    }
+  ],
+  "declarations": 50,
+  "failing": 0,
+  "trusted_native": 0,
+  "new_concrete_modules": 10,
+  "credited_dependency_modules": 12,
+  "credited_prior_gate": 77,
+  "new_source_warnings": 0,
+  "inherited_advisories": {
+    "final-build": [
+      "warning: DivisionQuartic.lean: imports `Mathlib.AlgebraicGeometry.EllipticCurve.DivisionPolynomial.Degree` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: DivisionQuartic.lean: imports `Mathlib.FieldTheory.IsAlgClosed.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: DivisionQuartic.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: QuarticRoots.lean: imports `Mathlib.SetTheory.Cardinal.NatCard` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: TernaryBasis.lean: imports `Mathlib.Algebra.Module.ZMod` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: TernaryBasis.lean: imports `Mathlib.FieldTheory.Finiteness` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: CharacteristicThree.lean: imports `Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+    ],
+    "build.log": [
+      "warning: DivisionQuartic.lean: imports `Mathlib.AlgebraicGeometry.EllipticCurve.DivisionPolynomial.Degree` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: DivisionQuartic.lean: imports `Mathlib.FieldTheory.IsAlgClosed.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: DivisionQuartic.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: QuarticRoots.lean: imports `Mathlib.SetTheory.Cardinal.NatCard` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: TernaryBasis.lean: imports `Mathlib.Algebra.Module.ZMod` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: TernaryBasis.lean: imports `Mathlib.FieldTheory.Finiteness` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: CharacteristicThree.lean: imports `Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+    ],
+    "source-build.log": [
+      "warning: DivisionQuartic.lean: imports `Mathlib.AlgebraicGeometry.EllipticCurve.DivisionPolynomial.Degree` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: DivisionQuartic.lean: imports `Mathlib.FieldTheory.IsAlgClosed.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: DivisionQuartic.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: QuarticRoots.lean: imports `Mathlib.SetTheory.Cardinal.NatCard` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: TernaryBasis.lean: imports `Mathlib.Algebra.Module.ZMod` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: TernaryBasis.lean: imports `Mathlib.FieldTheory.Finiteness` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+      "warning: CharacteristicThree.lean: imports `Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+    ],
+    "audit.log": [
+      "/workspace/crypto-audit/tools/lean/AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead"
+    ]
+  }
+}

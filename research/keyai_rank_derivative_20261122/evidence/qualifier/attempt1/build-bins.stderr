@@ -1,0 +1,58 @@
+   Compiling keyai-rank-derivative-qualifier v0.1.0 (/workspace/scratch/8fc860ec28a4/crypto-keyai/research/keyai_rank_derivative_20261122/qualifier)
+error[E0433]: cannot find type `Fp64` in this scope
+    --> /workspace/scratch/99b214ce852d/build/release/build/keyai-rank-derivative-qualifier/ae78db2f61898e72/out/ic_boundary.rs:1529:17
+     |
+1529 |         let f = Fp64::new(p);
+     |                 ^^^^ use of undeclared type `Fp64`
+     |
+help: consider importing this struct
+    -->  src/cryptanalysis.rs:19:5
+     |
+  19 +     use crate::cryptanalysis::prime_fast::Fp64;
+     |
+
+error[E0433]: cannot find type `Fp64` in this scope
+    --> /workspace/scratch/99b214ce852d/build/release/build/keyai-rank-derivative-qualifier/ae78db2f61898e72/out/ic_boundary.rs:1638:21
+     |
+1638 |             let f = Fp64::new(self.p);
+     |                     ^^^^ use of undeclared type `Fp64`
+     |
+help: consider importing this struct
+    -->  src/cryptanalysis.rs:19:5
+     |
+  19 +     use crate::cryptanalysis::prime_fast::Fp64;
+     |
+
+error[E0425]: cannot find type `Fp64` in this scope
+    --> /workspace/scratch/99b214ce852d/build/release/build/keyai-rank-derivative-qualifier/ae78db2f61898e72/out/ic_boundary.rs:1830:27
+     |
+1830 |             field: Option<Fp64>,
+     |                           ^^^^ not found in this scope
+     |
+help: consider importing this struct
+    -->  src/cryptanalysis.rs:19:5
+     |
+  19 +     use crate::cryptanalysis::prime_fast::Fp64;
+     |
+
+error[E0433]: cannot find type `Fp64` in this scope
+    --> /workspace/scratch/99b214ce852d/build/release/build/keyai-rank-derivative-qualifier/ae78db2f61898e72/out/ic_boundary.rs:1843:25
+     |
+1843 |                 let f = Fp64::new(self.p);
+     |                         ^^^^ use of undeclared type `Fp64`
+     |
+help: consider importing this struct
+    -->  src/cryptanalysis.rs:19:5
+     |
+  19 +     use crate::cryptanalysis::prime_fast::Fp64;
+     |
+
+error[E0425]: cannot find function `prefetch_cache_line` in this scope
+   --> /workspace/scratch/99b214ce852d/build/release/build/keyai-rank-derivative-qualifier/ae78db2f61898e72/out/ic_boundary.rs:204:9
+    |
+204 |         prefetch_cache_line(&self.keys, self.home(key));
+    |         ^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+Some errors have detailed explanations: E0425, E0433.
+For more information about an error, try `rustc --explain E0425`.
+error: could not compile `keyai-rank-derivative-qualifier` (lib) due to 5 previous errors

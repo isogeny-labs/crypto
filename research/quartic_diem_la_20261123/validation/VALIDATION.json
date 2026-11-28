@@ -1,0 +1,37 @@
+{
+ "schema": "validation-gate/v1",
+ "note": "Written by the validator. The study's claim is a paired component comparison (2lp-sfb-sge vs 2lp-sfb, frozen rule IMPROVEMENT); the band below is the sge arm against the ideal negation rho at p = 131101 and does not order across the band (UNRESOLVED, no rho claim). The sge-vs-sfb order is also not a strict section-5a ranking: it reverses at w = 0 (validator-report.md, E2). Paths are relative to this directory (validation/); if the manifest is moved to the study root, prefix them with validation/ and change ../raw/ to raw/ in validator-report.json.",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "7ef1ca287002961b0da31c59ad887ff2a1de40a210af82e0a84ce363d9a0ca79"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "8572f5d1761b71f07d71fb2af4a7ff83f448c1d38d3f9b1ab81aa7ce1a400d1b"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "PROTOCOL.md (sha256 6d07d316...ac25) section 6: the ideal negation rho R = sqrt(pi r / 4) group additions, nothing unpriced charged to rho; no measured rho is run",
+  "unit": "GAE_w per solve, p = 131101, 2lp-sfb-sge: geometric mean over the 5 curves of the per-curve geometric mean over solver seeds 1, 2; one counted Pic^0 operation = 1; each counted native operation (rel_mul, rel_add, la_mul, la_add, idx_lookups, idx_inserts) = w; the ideal negation rho charges no native work at any w",
+  "binary_or_process": "IC arms: genus_ladder.qla sha256 adddfbfa0bf2cdfd115a1fff510fa29753411c60c940dc0b5ca916b0e5d6d1f6 (replayed by the validator, all 80 runs byte-identical). The negation reference is a closed form of each instance's r as emitted by that binary and certified by the validator's own arithmetic (r prime, h = 1, Hasse-Weil, [r]G = 0)",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 8098.263382562886,
+    "rho": 42080116.41636846
+   },
+   "0.1": {
+    "ic": 11704950.892386947,
+    "rho": 42080116.41636846
+   },
+   "1": {
+    "ic": 116969425.52120331,
+    "rho": 42080116.41636846
+   }
+  },
+  "order_holds_across_band": false
+ }
+}

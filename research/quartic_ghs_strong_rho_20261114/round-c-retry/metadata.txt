@@ -1,0 +1,27 @@
+round_id=ghs-strong-rho-r3-retry-slab2
+started_utc=2026-11-18T17:48:48Z
+baseline_revision=ad2a014c0022cf000845014499a9649b6c2cef2d
+protocol_commit=d04ca66499
+baseline_strong_rho_sha256=0bb8da07393873aa2b935403b86f5b7a0c24a52fff2d598a145a9fcca103229c
+candidate_strong_rho_sha256=b788534182d3286f5f88d48bd51eda5309d30ceb468b42cbee9e61246b87444d
+candidate_main_sha256=27a643bc680d3db5cebf578e06f248e4e10f50aa0f5ab90cf498a147da7ec3cd
+binary_sha256=0cd185940bd826c1d7431a395dc3ed1433cf3abcc6dad9ea204e0969ad025b62
+binary_bytes=4801016
+rustc=rustc 1.100.0 (0ef1bc386 2026-11-09)
+llvm=23.1.5
+host=Linux 6.18.57 x86_64
+cpu=Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+visible_cpus=5
+isolation=development
+build_command=rustc --edition 2021 -O main.rs -o round-c-retry/ghs-strong-rho-r3
+build_exit=0
+selftest_command=./round-c-retry/ghs-strong-rho-r3 selftest
+selftest_exit=0
+control_command=GHS_CALIB_TRIPLES=1 ./round-c-retry/ghs-strong-rho-r3 run 223 1 0 1 ic-repeat strong-b8,strong-b8-retry2
+control_exit=0
+research_kb_status_exit=127
+research_kb_search_1_exit=127
+research_kb_search_2_exit=127
+research_kb_error=research-kb: no executable found; set RESEARCH_KB_BIN or put research-kb on PATH
+conductor_check_exit=127
+conductor_error=/bin/bash: conductor: command not found

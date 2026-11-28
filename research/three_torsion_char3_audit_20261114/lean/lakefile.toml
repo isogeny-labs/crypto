@@ -1,0 +1,11 @@
+name = "three_torsion_char3_audit"
+version = "0.1.0"
+defaultTargets = ["ThreeTorsionCharThreeAudit"]
+
+[[require]]
+name = "bk_three_normalization_audit"
+path = "../../bk_three_normalization_audit_20261114/lean"
+
+[[lean_lib]]
+name = "ThreeTorsionCharThreeAudit"
+roots = ["NormalFormCharThree", "GeneralCharThree", "SourceThreeCriterion"]

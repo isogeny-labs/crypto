@@ -1,0 +1,37 @@
+
+## 2026-11-23T16:49Z — P192 follow-up: deployed telemetry reaches a real auth failure
+
+### What was done
+
+Merged PR4983 is now on main;created continuation branch
+lane/p192-admission-and-pencil-audit-20261123 and draft PR5025 with ACTIVE-only
+tracking first. Refreshed main and preserved its incoming journal/claim
+registrations before new claims. Dispatched changed main read-only telemetry
+once:run45219644370,source5ca465dd7b,job137850127626. Checkout and role
+configuration succeed;actual credential outcome fails with Not authorized
+to perform sts:AssumeRoleWithWebIdentity. Budget read is skipped and final
+gate fails. Receipt retains no credential or private budget amount.
+[pcc:unverified]
+
+### Decisions made
+
+The earlier archive-hydration blocker is resolved by deployed code. Treat the
+new auth denial as the current lab-access observation;do not count a
+continue-on-error step's success conclusion as credential success. No paid
+launch or IAM change. Separately audit the necessary row-overlap condition
+for the proposed pencil using only synthetic matrices and existing rows.
+
+### Open threads
+
+Qualify the frozen closure protocol/source before interpreting matrix output.
+No new P192 point search or collector run. Keep signed independent checking
+and admitted complete-cost requirements open. Main PCC runs currently queue;
+no fresh configured-secret evidence has been observed. KB unavailable:wrapper
+has no executable;use the already reviewed study/native rank contracts.
+
+### Errors
+
+One read-only inspection command stopped with SIGPIPE because head closed a
+long Git stream under pipefail;no mutation was interrupted. Subsequent reads
+consume the complete stream. Auth-step conclusion is success only because
+continue-on-error masks it;actual outcome/final gate retain failure.

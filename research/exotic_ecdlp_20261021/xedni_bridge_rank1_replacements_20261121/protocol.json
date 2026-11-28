@@ -1,0 +1,13 @@
+{
+  "schema": "xedni-bridge-rank1-replacements-protocol-v1",
+  "source_result_sha256": "b73c86494fb382740747590cf838e73ef402f731ebef5a40221c539b84280ca1",
+  "source_indices": [85, 353],
+  "offset_order": [-1, 0, 1],
+  "grid_law": "For each index, enumerate (u,v) lexicographically with a1=47*u and a3=47*v; derive a2,a4,a6 by the fixed tangent formula",
+  "formula": "lambda=(yP-yQ)/(xP-xQ); a2=lambda^2+a1*lambda-2*xQ-xP; a4=lambda*(2*yQ+a1*xQ+a3)-3*xQ^2-2*a2*xQ+a1*yQ; a6=yQ^2+a1*xQ*yQ+a3*yQ-xQ^3-a2*xQ^2-a4*xQ",
+  "point_and_reduction_checks": ["P_and_Q_on_curve", "P_plus_2Q_identity", "good_reduction_at_47", "a_invariants_reduce_to_0_0_0_minus1_minus2"],
+  "rank_method": "For every valid curve, simon_two_descent with known Q and limbigprime=0; if and only if completed upper bound <=1, run proof-enabled Sage PARI rank with use_database=False, only_use_mwrank=True",
+  "per_method_wall_cap_seconds": 25,
+  "status_law": "Retain all 18 grid cells, including invalid, complete, error, and timeout; exact rank-one replacements require completed Simon upper bound <=1 and proof-enabled exact PARI rank 1",
+  "selection": "first rank-one certified cell in lexicographic (u,v) order for each source index, without stopping the full grid"
+}

@@ -1,0 +1,191 @@
+{
+  "schema": "coupled-renderer-qa/v1",
+  "scope": "document_layout_and_plotting_of_retained_records_only",
+  "research_computation": false,
+  "performance_measurement": false,
+  "source_report": {
+    "path": "REPORT.md",
+    "sha256": "caad5711bb0c4094c2f6f2de9460779816d911281fe8558957eaaa82ebdb0735"
+  },
+  "graph_input": {
+    "path": "evidence/attempt2/qualifier.stdout.jsonl",
+    "sha256": "861dd0b6fa43c38f57cc8269eee85b17fba7bfd8fb95847c35ed33506fde4a33",
+    "filter": {
+      "kind": "coefficient_rank",
+      "fixture": "prime31_project"
+    }
+  },
+  "plotted_values": [
+    {
+      "p": 2147483647,
+      "a": 847514846,
+      "b": 2087444724,
+      "d": 1,
+      "rank": 1
+    },
+    {
+      "p": 2147483647,
+      "a": 847514846,
+      "b": 2087444724,
+      "d": 2,
+      "rank": 2
+    },
+    {
+      "p": 2147483647,
+      "a": 847514846,
+      "b": 2087444724,
+      "d": 3,
+      "rank": 3
+    },
+    {
+      "p": 2147483647,
+      "a": 847514846,
+      "b": 2087444724,
+      "d": 6,
+      "rank": 6
+    },
+    {
+      "p": 2147483647,
+      "a": 847514846,
+      "b": 2087444724,
+      "d": 7,
+      "rank": 7
+    },
+    {
+      "p": 2147483647,
+      "a": 847514846,
+      "b": 2087444724,
+      "d": 9,
+      "rank": 9
+    },
+    {
+      "p": 2147483647,
+      "a": 847514846,
+      "b": 2087444724,
+      "d": 14,
+      "rank": 14
+    },
+    {
+      "p": 2147483647,
+      "a": 847514846,
+      "b": 2087444724,
+      "d": 18,
+      "rank": 18
+    },
+    {
+      "p": 2147483647,
+      "a": 847514846,
+      "b": 2087444724,
+      "d": 21,
+      "rank": 21
+    },
+    {
+      "p": 2147483647,
+      "a": 847514846,
+      "b": 2087444724,
+      "d": 31,
+      "rank": 31
+    },
+    {
+      "p": 2147483647,
+      "a": 847514846,
+      "b": 2087444724,
+      "d": 42,
+      "rank": 42
+    },
+    {
+      "p": 2147483647,
+      "a": 847514846,
+      "b": 2087444724,
+      "d": 63,
+      "rank": 63
+    }
+  ],
+  "renderer_source_sha256": "4ccd5ed02debe3af398acf5d67ff0b01de2c8cd5dd2f8a89151e7080d2ef56c5",
+  "page_count": 8,
+  "display_equations": 20,
+  "all_report_markdown_blocks_consumed": true,
+  "artifacts": [
+    {
+      "path": "REPORT.pdf",
+      "sha256": "7e8bb2e06b3fe168cf3fdf5d01aab30661292b50b582642346d7fac258520e03",
+      "size_bytes": 224761
+    },
+    {
+      "path": "figures/rank.svg",
+      "sha256": "76e4fd4a7647e944548fe88577dd6234de4d4835b0dad498c6e4b8298f441e2b",
+      "size_bytes": 18472
+    },
+    {
+      "path": "figures/structure.svg",
+      "sha256": "e88e6083ca7142f52d1a07b615c185609fa6b5c08956129911071de28bd8331d",
+      "size_bytes": 19548
+    },
+    {
+      "path": "figures/rank.png",
+      "sha256": "1d10976705e4f8091d4273446cc864f19c37e5e551df183f5123a36f3f477179",
+      "size_bytes": 19417
+    },
+    {
+      "path": "figures/structure.png",
+      "sha256": "eb6411469b0383fc793831c0fff2de7b16bf8e56e6ab49fa0e2b41db158e7a86",
+      "size_bytes": 24141
+    }
+  ],
+  "visual_qa": {
+    "status": "all_pages_rendered_and_visually_inspected",
+    "inspected_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "renderer": "pdftoppm",
+    "command": "pdftoppm -scale-to 1300 -png REPORT.pdf <scratch>/page",
+    "findings": "No clipped text, missing glyphs, overlapping labels, or broken tables observed. All twenty displayed equations and both figures were inspected.",
+    "text_coverage": {
+      "paragraphs_and_table_cells_checked": 95,
+      "missing": 0
+    },
+    "pngs": [
+      {
+        "page": 1,
+        "sha256": "76e70d63c47f8d2cc5b6a753c831f2d167f09300554d436a36e72706a4939463"
+      },
+      {
+        "page": 2,
+        "sha256": "f389e451f971062382870ff2fbc978198d8dbd04e4911a5ddecd8edd41843f84"
+      },
+      {
+        "page": 3,
+        "sha256": "318fd0c364600932a0a3b9054a310a751900eee74874bf6f24f08d52ee5475a8"
+      },
+      {
+        "page": 4,
+        "sha256": "f0b3199fcfa9a33a2bc5af508c9fd33b62fc35ea2664fa5dca822d1b0573001f"
+      },
+      {
+        "page": 5,
+        "sha256": "d826ae91ebf3b96478f0a66e617b419dc649e206c5dbd538157cbf4a82654c7f"
+      },
+      {
+        "page": 6,
+        "sha256": "10a7c7f9bfb857650327cc1a61136f83cf753b9eaee499ba871b243198cdaf78"
+      },
+      {
+        "page": 7,
+        "sha256": "5b59bdd6dca16a70915b14a2d2b7098d7fe023055f752806c1f4bca1963e4765"
+      },
+      {
+        "page": 8,
+        "sha256": "f3e772596096fd01190f393ac4a818a3f349c1b521280307276a1823bd889083"
+      }
+    ],
+    "checked_at_utc": "2026-11-23T01:57:49.598064+00:00",
+    "execution_class": "document_rendering_only; not an independent research or PCC verification"
+  }
+}

@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T08:14:56Z",
+ "id": "PCC-20261117-75697f",
+ "kind": "statement",
+ "producer": {
+  "commit": "c0a2f94debb9bd26763ebabb0dda746936fdbdd1",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_map_20261117/infrastructure-D-storage-and-ledger-cache-06/ACTUAL_OWNED_GIT_LEDGER_STORAGE_COMPACTION.json",
+    "sha256": "224c2b38b980a6e204f409d141c98dab8d8ca1fb65d5a9989ae40d3afb181ad4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_map_20261117/infrastructure-D-storage-and-ledger-cache-06/PROSPECTIVE_IDENTICAL_D2_AFTER_LEDGER_CACHE_COMPACTION.json",
+    "sha256": "e6c3266f66dad43fcfb7a264d0114916f43de107e5bbd0d59b823e4d78a8de9e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Only Git storage representations of nine unchanged historical PCC ledgers were compacted into a205106B standard pack. Every original full ledger byte was read equal from the isolated new pack before registering an owned alternate; old alternate content remains an exact prefix. Normal prune-packed removes10 duplicate owned loose objects, leaving4870144B scratch available. No ledger row, claim, keyring, verifier, policy, original/shared objects or frozen index was changed. First EXDEV metadata failure is retained. Prospective D2 uses identical publicc0a source/caller/scientific criteria/8MiB/3MiB/120s on fresh paths; first D storage stop0852fe remains."
+}

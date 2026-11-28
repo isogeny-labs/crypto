@@ -1,0 +1,1 @@
+T-2052: source-only runner preparation. Verified132original source hashes before staging381179bytes of136sources; only proposed NatClassifier import correction changes an archived prerequisite. AST parsing of runner source only; no fixture, compiler, proof or payload execution. Current ledger and release intentionally unset.

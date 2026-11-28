@@ -1,0 +1,28 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m37-tm534059-32aad96b | 27.78 | ls | 432/432 | 0.185 | 0.251 | 0.840 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | rho-strong | 432/432 | 0.278 | 0.315 | 0.651 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | rho-v5 | 432/432 | 0.150 | 0.165 | 0.303 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | sp-c8-d5 | 432/432 | 0.264 | 0.343 | 1.054 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | sp-c8-d5-aa | 432/432 | 0.264 | 0.343 | 1.054 | — |
+| icv1-f2m37-tm534059-32aad96b | 27.78 | sp-c8-d5-off | 432/432 | 0.264 | 0.343 | 1.054 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m37-tm534059-32aad96b | ls vs rho-strong | unresolved inside the band |
+| icv1-f2m37-tm534059-32aad96b | ls vs rho-v5 | rho-v5 < ls |
+| icv1-f2m37-tm534059-32aad96b | ls vs sp-c8-d5 | ls < sp-c8-d5 |
+| icv1-f2m37-tm534059-32aad96b | ls vs sp-c8-d5-aa | ls < sp-c8-d5-aa |
+| icv1-f2m37-tm534059-32aad96b | ls vs sp-c8-d5-off | ls < sp-c8-d5-off |
+| icv1-f2m37-tm534059-32aad96b | rho-strong vs rho-v5 | rho-v5 < rho-strong |
+| icv1-f2m37-tm534059-32aad96b | rho-strong vs sp-c8-d5 | unresolved inside the band |
+| icv1-f2m37-tm534059-32aad96b | rho-strong vs sp-c8-d5-aa | unresolved inside the band |
+| icv1-f2m37-tm534059-32aad96b | rho-strong vs sp-c8-d5-off | unresolved inside the band |
+| icv1-f2m37-tm534059-32aad96b | rho-v5 vs sp-c8-d5 | rho-v5 < sp-c8-d5 |
+| icv1-f2m37-tm534059-32aad96b | rho-v5 vs sp-c8-d5-aa | rho-v5 < sp-c8-d5-aa |
+| icv1-f2m37-tm534059-32aad96b | rho-v5 vs sp-c8-d5-off | rho-v5 < sp-c8-d5-off |
+| icv1-f2m37-tm534059-32aad96b | sp-c8-d5 vs sp-c8-d5-aa | unresolved inside the band |
+| icv1-f2m37-tm534059-32aad96b | sp-c8-d5 vs sp-c8-d5-off | unresolved inside the band |
+| icv1-f2m37-tm534059-32aad96b | sp-c8-d5-aa vs sp-c8-d5-off | unresolved inside the band |

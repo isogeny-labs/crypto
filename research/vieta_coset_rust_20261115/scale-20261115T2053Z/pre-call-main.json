@@ -1,0 +1,40 @@
+{
+  "schema": "vieta-pre-call/v1",
+  "phase": "main",
+  "source_revision": "5f818b153e8e4475cd3fae5d90cda843bcae814c",
+  "protocol_sha256": "42f7647fdf59bab94aabfd70644e34484117f0c10dd2c07b803342d693679928",
+  "qualifier_sha256": "1b527b222b82f2c862c48cc36ffbae8470c136abbf1ad180c7a06064459da782",
+  "driver_sha256": "1e4e2b6a49d9052ce9629f01b81612870849b123262517f188673ed309628015",
+  "analyzer_sha256": "854ab1b4f47c7ffa16cf80d39b5fd9a0c763165fa1c57213a5c21a5ca20c8912",
+  "planned_configurations": 32,
+  "planned_query_rows": 2112,
+  "cpus": [
+    4
+  ],
+  "timeout_seconds": 3600,
+  "clock_standing": "diagnostic only; missing PSI and unmovable host threads; no L2 claim",
+  "checkpoint": "Git-only, explicitly authorized by user",
+  "command": [
+    "python3",
+    "tools/benchrec.py",
+    "run",
+    "benchmarks/records/20261115T2104Z-vieta-coset-local-scale.json",
+    "python3",
+    "tools/isolated_bench.py",
+    "run",
+    "--cpus",
+    "4",
+    "--out",
+    "research/vieta_coset_rust_20261115/scale-20261115T2053Z/main/isolation.jsonl",
+    "--",
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "3600",
+    "bash",
+    "research/vieta_coset_rust_20261115/scale-20261115T2053Z/bin/run-panel.sh",
+    "all",
+    "research/vieta_coset_rust_20261115/scale-20261115T2053Z/main",
+    "research/vieta_coset_rust_20261115/scale-20261115T2053Z/bin/qualifier"
+  ]
+}

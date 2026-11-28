@@ -1,0 +1,38 @@
+{
+ "note": "Counted-cost measurement (L0) of the k = 5 sum table against the strictest tuned pair-table incumbent on Table B's random-binary curves (study research/ic_tableb_binary_ksum_20261115; ecbench runs the generic ksum oracle on binary curves since d87eb39548). The rho reference is the matched negation-map rho arm every session runs beside every other arm. gae_band is the n27 row (ic = ksum5); every row's band is in research/ic_tableb_binary_ksum_20261115/band/. [pcc:unverified]",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "418c9dc06b8d3ca6f3058020d62939dd241d614ca366389f6770ead0b1df3552"
+ },
+ "rho_reference": {
+  "band_source": "../../../research/ic_tableb_binary_ksum_20261115/band/B27.json (ecbench band --ranks, 3 replicate sessions, n27)",
+  "binary_or_process": "one ecbench binary, sha256 bc96a44a3342d24569e7f2bbe7e24e55400eda47d955960e766ae66df3e08f8d (built from 2476332d22); every arm of a session runs in it; the validator's rebuild is the same program (sections identical, build-id and symbol-suffix differences only)",
+  "gae_band": {
+   "0": {
+    "ic": 6.414344886348004,
+    "rho": 1.0687426839329563
+   },
+   "0.1": {
+    "ic": 7.167742882598426,
+    "rho": 1.1677372189100692
+   },
+   "1": {
+    "ic": 13.948324848852257,
+    "rho": 2.0586880337040863
+   }
+  },
+  "kind": "negation",
+  "matches_protocol": true,
+  "order_holds_across_band": true,
+  "protocol": "matched rho.negation reference arm (role reference), run in every session on the same curve, targets and algorithm seeds as every IC arm; random binary curves with A = 2 usable automorphisms, so negation is the strongest symmetry available",
+  "same_binary_or_process": true,
+  "same_unit": true,
+  "strongest_available": true,
+  "unit": "ecbench.gae (counted group operations, S = GAE/sqrt(r)); native work priced at w in {0, 0.1, 1} GAE per operation (AGENTS.md section 5a)"
+ },
+ "schema": "validation-gate/v1",
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "a98ad03b934346de38ce1e500646a353a3977dd25918528ef1d25ebd3d1e4ee3"
+ }
+}

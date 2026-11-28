@@ -1,0 +1,11 @@
+{
+ "frozen_before_run": "2026-11-15",
+ "method": "4-summand relation collection: R = eps*phi^k F_h + (F_i + s1 phi^m F_j + s2 phi^n F_l), matched through an orbit-canonical triple-sum x-table (examples/prime_fast_j0_sym.rs, summands=4, commit 'sym example: 4-summand relation collection')",
+ "tuning": "CSKIP=150, 2 curves x 6 instances, extra=40, sym4 B grid per size; rows in sym4_tune/. Mean ms: 28b B=20/24/28 = 8.4/6.5/6.7; 30b B=20/24/28/36 = 22.8/19.0/13.5/17.3; 32b B=36/44/56/72 = 41.1/38.0/64.8/175.8. 3-summand and ic_solve parameters are the earlier frozen ones (sym3 B=116/184/292, ic_solve c=0.7/0.8/0.5).",
+ "frozen_parameters": {"28": {"B4": 24, "B3": 116, "baseline_c": 0.7}, "30": {"B4": 28, "B3": 184, "baseline_c": 0.8}, "32": {"B4": 44, "B3": 292, "baseline_c": 0.5}},
+ "holdout_command": "CSKIP=1000 NOPLAIN2=1 C3=<baseline_c> prime_fast_j0_sym out.jsonl <bits> <B> 8 40 <4 or 3>",
+ "holdout": "CSKIP=1000 (fresh curves, not used in any tuning or debugging), two curves per size, 8 instances per curve, 16 rows per size per arm; wall clock, one host, no isolation; each row also times tuned ic_solve (3 summands) as the in-row baseline",
+ "prediction": "pooled sum(plain3_ms)/sum(sym4_ms) >= 6.0 (28 bits), 7.0 (30 bits), 8.0 (32 bits); and pooled sum(sym3_ms)/sum(sym4_ms) >= 1.8 at every size",
+ "abandon_rule": "any pooled plain3/sym4 ratio < 4.0, or sym3/sym4 < 1.3 at any size, or any failed verification => the claim that 4-summand collection beats the 3-summand symmetric solver and tuned ic_solve is withdrawn",
+ "known_limits": "one twist group per size; no isolation, no A/A interval, no 5a priced rho band; memory/time of the triple table grows as B^3; sym4 uses triples i<j<l only; rho and BSGS comparators still faster"
+}

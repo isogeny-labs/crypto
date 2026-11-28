@@ -226,15 +226,8 @@ fn mm(a: u64, b: u64, m: u64) -> u64 {
 }
 
 fn inv_mod(a: u64, m: u64) -> u64 {
-    let (mut t, mut nt) = (0i128, 1i128);
-    let (mut r, mut nr) = (m as i128, (a % m) as i128);
-    while nr != 0 {
-        let q = r / nr;
-        (t, nt) = (nt, t - q * nt);
-        (r, nr) = (nr, r - q * nr);
-    }
-    assert_eq!(r, 1, "not invertible");
-    t.rem_euclid(m as i128) as u64
+    // `a % m` keeps the old panic on m = 0; a non-unit panics as before.
+    crypto_lib::gcd::int::inv_mod_u64(a % m, m).expect("not invertible")
 }
 
 // ---------------------------------------------------------------------------
@@ -1024,11 +1017,7 @@ fn ec_order(e: &Ell, p: u64, rng: &mut u64) -> Option<u64> {
 }
 
 fn gcd(a: u64, b: u64) -> u64 {
-    if b == 0 {
-        a
-    } else {
-        gcd(b, a % b)
-    }
+    crypto_lib::gcd::int::gcd_u64(a, b)
 }
 
 impl Instance {

@@ -1,0 +1,10 @@
+[package]
+name="hec-eigen-cover-verifier"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../holdout/native"}
+[[bin]]
+name="eigen-cover-verifier"
+path="../main.rs"

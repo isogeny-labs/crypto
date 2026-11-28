@@ -1,0 +1,14 @@
+{
+  "action": "read the allocation site before building on the hypothesis: fast_map(t_max + 1) already pre-sized the table, so the cost was first-touch page faults on a 48-byte-entry power-of-two array, not growth; and test the memory hypothesis with GLIBC_TUNABLES=glibc.malloc.hugetlb=1 before writing code",
+  "created": "2026-11-19T16:15:20Z",
+  "evidence": [
+    "ic_boundary.rs fast_map(t_max as usize + 1); A/B hugetlb sel B/A 0.851 vs A/A 1.020"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "profile"
+  ],
+  "trigger": "a hypothesis about a data structure's cost (here: the table grows from empty)",
+  "why": ""
+}

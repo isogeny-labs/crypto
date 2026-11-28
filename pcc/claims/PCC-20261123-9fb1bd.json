@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T23:29:40Z",
+ "id": "PCC-20261123-9fb1bd",
+ "kind": "statement",
+ "producer": {
+  "commit": "e64469e6aea1b9c558c8f6c79bb69cfc697369bf",
+  "model": "",
+  "session": "codex-ecc2k-cold50-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50_20261123/checks/candidate1-residual-profile.json",
+    "sha256": "17770c297394a489fad47718cf85844c44075703576622a9821caf8628263c45"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50_20261123/profiles/candidate1-cold/annotate-inclusive.txt",
+    "sha256": "da46beb3d4891cfaf3855045f30ba5f6f6f2e6f98346e98495a1f321306742e3"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Two fresh source-bound candidate1 residual-cost profiles agree. WordField reduction costs1651088 selfIr, the hardware multiply stack1308024 inclusiveIr and the word wrapper459576 selfIr. These descriptive views motivate testing a fused131-bit multiplication/reduction path and qualified cache lookup; they are not a speed result or summed ancestor costs."
+}

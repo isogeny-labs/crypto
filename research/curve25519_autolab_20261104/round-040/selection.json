@@ -1,0 +1,55 @@
+{
+  "holdout_spec_sha256": {},
+  "round": 40,
+  "rule": "lowest mean S at w = 0 among candidates whose every run verified; a challenger only if below inc at w = 0",
+  "schema": "ic_autolab.selection/v1",
+  "selected": "2026-11-17T15:18:25Z",
+  "sizes": {
+    "20": {
+      "alt_w1": {
+        "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+        "family": "tw2l-x20-j16",
+        "n": 2,
+        "name": "tw2l-x20-j16-n2",
+        "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+        "params": {
+          "targets": "stride-generator"
+        }
+      },
+      "candidates": [
+        {
+          "arm": {
+            "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+            "family": "tw2l-x20-j16",
+            "n": 2,
+            "name": "tw2l-x20-j16-n2",
+            "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+            "params": {
+              "targets": "stride-generator"
+            }
+          },
+          "s": [
+            2.6445028540536653,
+            2.8414914640091586,
+            4.614388953608592
+          ],
+          "status": "verified"
+        }
+      ],
+      "inc_s": [
+        2.5232452482671093,
+        2.767183974956179,
+        4.962632515157817
+      ],
+      "rho_s": [
+        1.6438580011789756,
+        1.7649171775857324,
+        2.854449765246541
+      ],
+      "sel": null,
+      "session_id": "ECBS1haad6fa3361bf",
+      "status": "no_challenger"
+    }
+  },
+  "track": "generic"
+}

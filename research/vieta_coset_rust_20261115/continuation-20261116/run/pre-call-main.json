@@ -1,0 +1,36 @@
+{
+  "schema": "vieta-poly-pre-call/v1",
+  "phase": "main+supplemental",
+  "created": "2026-11-16T16:00:52.039938+00:00",
+  "source_revision": "9814b4bb5ca5949685be0f99bc992f6e1d0cc8bd",
+  "protocol_sha256": [
+    "1abbbad626f0fd1a7714eb833f61ed5cd1bbd55a9a2d84a7e922c63eb9527c1d",
+    "b9d6705ccee48dc3b77132f050239bf7cf02e12c5c9273220489cc1eed57c477"
+  ],
+  "qualifier_sha256": "82584bfb5f086fa768259960804066bf2f23faf0262512e0a0ba8d433f64f96a",
+  "build_manifest_sha256": "f0a01d2d5d3940b7b83a2a01295690e3630ece93da9955e0700a343eaefabbd9",
+  "command": [
+    "python3",
+    "tools/isolated_bench.py",
+    "run",
+    "--cpus",
+    "4",
+    "--out",
+    "research/vieta_coset_rust_20261115/continuation-20261116/run/main/isolation.jsonl",
+    "--",
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "3600",
+    "bash",
+    "research/vieta_coset_rust_20261115/continuation-20261116/run/bin/run-panel.sh",
+    "all",
+    "research/vieta_coset_rust_20261115/continuation-20261116/run/main",
+    "research/vieta_coset_rust_20261115/continuation-20261116/run/bin/qualifier"
+  ],
+  "local_clock_level": "below L2; PSI unavailable",
+  "git_only_authorized": true,
+  "cloud_spend_usd": 0,
+  "planned_primary_query_rows": 192,
+  "planned_supplemental_query_rows": 12
+}

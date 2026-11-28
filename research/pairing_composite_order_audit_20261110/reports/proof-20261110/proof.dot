@@ -1,0 +1,17 @@
+digraph TateBoundary {
+  graph [rankdir=TB, bgcolor="white", fontname="DejaVu Sans", nodesep=0.3, ranksep=0.35];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, fillcolor="#eef3fa", color="#2d4262", margin="0.15,0.10"];
+  edge [color="#53657e", arrowsize=0.7];
+  source [label="Literal source conditions\nn coprime to q; n divides actual #E\na nonidentity nth root exists", fillcolor="#fff2d9"];
+  three [label="F3, n = 4\ny² = x³ + x + 1\n#E = 4; P = (0,1), order 4\n2P = (1,0) is nonzero"];
+  five [label="F5, n = 6\ny² = x³ + 1\n#E = 6; P = (0,1), order 3\n2P = −P is nonzero"];
+  domains [label="Actual domains\nleft: ker[n] on E(Fq)\nright: E(Fq) / nE(Fq)"];
+  target [label="Actual target: Fq* / (Fq*)^n\nnontrivial; every z satisfies z² = 1\nno primitive nth root in either field"];
+  obstruction [label="Any left-bilinear e satisfies\ne(2P,Q) = e(P,Q)² = 1 for all Q", fillcolor="#e6f3e9"];
+  negation [label="Lean: no left-nondegenerate bilinear map\nDirect negation of literal composite-n implication\nLocal checking only; signed standing unverified", fillcolor="#fce7e7"];
+  source -> three; source -> five;
+  three -> domains; five -> domains;
+  three -> target; five -> target;
+  domains -> obstruction; target -> obstruction;
+  obstruction -> negation;
+}

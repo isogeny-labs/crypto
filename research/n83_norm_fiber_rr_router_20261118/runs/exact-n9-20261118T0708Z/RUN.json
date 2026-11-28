@@ -1,0 +1,21 @@
+{
+  "schema": "crypto.n83-norm-fiber-rr-router-run/v1",
+  "backend": "local_structural_fallback",
+  "timing_claim": false,
+  "source_revision": "c198788190a8596101ea278564f0197bbbddb8fc",
+  "binary": "target/release/n83_norm_fiber_rr_router_audit",
+  "binary_sha256": "1c68e04f84e1f4d477693f6bff5a0ca0ca3a445840d6768ef5dca4896ff68b87",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "host_architecture": "x86_64",
+  "command": "cargo run --release --bin n83_norm_fiber_rr_router_audit -- --output research/n83_norm_fiber_rr_router_20261118/runs/exact-n9-20261118T0708Z/certificate.json",
+  "normalization": "jq -c lossless JSON normalization was applied before validation and hashing to keep the raw certificate below the artifact-store threshold",
+  "certificate_sha256": "06d35ba1234579889966faa34ae8e3abfbaae823dce74799cdbd91ccb52471ce",
+  "validator_command": "python3 research/n83_norm_fiber_rr_router_20261118/validate.py research/n83_norm_fiber_rr_router_20261118/runs/exact-n9-20261118T0708Z/certificate.json --output research/n83_norm_fiber_rr_router_20261118/runs/exact-n9-20261118T0708Z/validator.json",
+  "validator_sha256": "4e5b0c3a7f194f344b6a051febe14ba6fc12cfd117a84358457fb8fdf9061bf0",
+  "eks_preflight": {
+    "submitted": false,
+    "reason": "no attached IsoLab MCP, AWS CLI/identity, kubectl pool readback, or main-workflow arbitrary-command payload for this binary"
+  },
+  "status": "pass",
+  "pcc": "unverified"
+}

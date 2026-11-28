@@ -1,0 +1,15 @@
+[package]
+name = "twist-degree-closure-probe"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+serde_json = { version = "=1.0.154", features = ["arbitrary_precision"] }
+sha2 = "=0.10.9"
+hex = "=0.4.3"
+
+[profile.release]
+opt-level = 3

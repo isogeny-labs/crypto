@@ -1,0 +1,81 @@
+--- a/src/ml_dataset/original_boolean_search_policy.rs
++++ b/src/ml_dataset/original_boolean_search_policy.rs
+@@ -8,6 +8,18 @@
+ #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+ pub(in crate::ml_dataset::solvers) enum ProposedPolicy {
+     ConservativeAffineEnvelopeV1,
++    ConservativeAffineEnvelopeCheckpointV1,
++}
++
++/// Additional committed-batch hook attempts only. Existing initial,
++/// post-exclusion and final snapshots remain under global capture limits.
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub(super) struct CheckpointCadence {pub every_batches:u64,pub max_snapshots:u64}
++fn checkpoint_for(policy:ProposedPolicy)->Option<CheckpointCadence>{
++    match policy {
++        ProposedPolicy::ConservativeAffineEnvelopeV1=>None,
++        ProposedPolicy::ConservativeAffineEnvelopeCheckpointV1=>Some(CheckpointCadence{every_batches:1,max_snapshots:16}),
++    }
+ }
+ 
+ // Exact envelope from affine_boolean_row_worker.rs::caps. New scheduler count
+@@ -36,7 +48,9 @@
+         || super::super::owned_search_worker::selection(owner.original.config).map(|(pattern,_)|pattern)!=owner.pattern {
+         return Err(Stop::InvalidLimits);
+     }
+-    from_budget(&owner.budget, owner.original.config.degree_bound)
++    let mut caps=from_budget(&owner.budget, owner.original.config.degree_bound)?;
++    caps.checkpoint=checkpoint_for(policy);
++    Ok(caps)
+ }
+ 
+ fn from_budget(budget: &Budget, requested_degree: u32) -> Result<Caps, Stop> {
+@@ -98,6 +112,7 @@
+         caps: checker_caps,
+     };
+     Ok(Caps {
++        checkpoint:None,
+         expansion: equations::Limits {
+             variables: COUNT_MAX as u32,
+             generators: count,
+@@ -224,4 +239,17 @@
+         assert!(matches!(from_budget(&b, 0), Err(Stop::InvalidLimits)));
+     }
+ 
+-}
++    #[test]
++    fn legacy_has_no_batch_hook_and_new_policy_is_finite(){
++        assert_eq!(checkpoint_for(ProposedPolicy::ConservativeAffineEnvelopeV1),None);
++        assert_eq!(checkpoint_for(ProposedPolicy::ConservativeAffineEnvelopeCheckpointV1),Some(CheckpointCadence{every_batches:1,max_snapshots:16}));
++    }
++    #[test]
++    fn cadence_selection_cannot_mutate_arithmetic_or_owner_allowance(){
++        let b=budget();let mut c=from_budget(&b,3).unwrap();
++        let before=(c.expansion.work,c.expansion.bytes,c.continuation.work,c.continuation.bytes,b.native,b.checking_work,b.deadline);
++        c.checkpoint=checkpoint_for(ProposedPolicy::ConservativeAffineEnvelopeCheckpointV1);
++        assert_eq!(before,(c.expansion.work,c.expansion.bytes,c.continuation.work,c.continuation.bytes,b.native,b.checking_work,b.deadline));
++    }
++
++}
+--- a/src/ml_dataset/types.rs
++++ b/src/ml_dataset/types.rs
+@@ -123,7 +123,7 @@
+ fn present_search<'de,D:serde::Deserializer<'de>>(d:D)->Result<Option<SatSearchRequest>,D::Error>{SatSearchRequest::deserialize(d).map(Some)}
+ #[derive(Clone,Copy,Debug,Serialize,Deserialize,PartialEq,Eq)]
+ #[serde(rename_all="snake_case")]
+-pub enum OwnedBooleanSearchPolicy { ConservativeAffineEnvelopeV1 }
++pub enum OwnedBooleanSearchPolicy { ConservativeAffineEnvelopeV1, ConservativeAffineEnvelopeCheckpointV1 }
+ #[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
+ #[serde(tag="mode",rename_all="snake_case",deny_unknown_fields)]
+ pub enum OwnedBooleanSearchRequest { MatrixContinuation { pattern:u32, policy:OwnedBooleanSearchPolicy } }
+--- a/src/ml_dataset/owned_boolean_search_worker.rs
++++ b/src/ml_dataset/owned_boolean_search_worker.rs
+@@ -12,7 +12,7 @@
+     if !profile(&c.family,c.n,c.m)||c.solver!="f4"||c.factor_base_size==0||c.work_limit==0||c.degree_bound==0{return None}
+     let total=c.m.checked_sub(2).and_then(|n|u32::try_from(n).ok()).and_then(|n|1u32.checked_shl(n))?;
+     if *pattern>=total{return None}
+-    let chosen=match policy{OwnedBooleanSearchPolicy::ConservativeAffineEnvelopeV1=>boolean_search::ProposedPolicy::ConservativeAffineEnvelopeV1};
++    let chosen=match policy{OwnedBooleanSearchPolicy::ConservativeAffineEnvelopeV1=>boolean_search::ProposedPolicy::ConservativeAffineEnvelopeV1,OwnedBooleanSearchPolicy::ConservativeAffineEnvelopeCheckpointV1=>boolean_search::ProposedPolicy::ConservativeAffineEnvelopeCheckpointV1};
+     Some((*pattern,chosen))
+ }
+ pub(in crate::ml_dataset::solvers) fn supported(c:&CaseConfig)->bool{selection(c).is_some()}

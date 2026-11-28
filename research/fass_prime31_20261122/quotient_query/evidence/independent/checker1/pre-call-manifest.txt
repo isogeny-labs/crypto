@@ -1,0 +1,12 @@
+2026-11-23T05:16:08Z
+role: separate-role persisted certificate reader; no producer solver or norm call
+command: timeout 180s bash -c 'ulimit -v 2097152; export RAYON_NUM_THREADS=1; exec "$1" --check "$2" "$3"' -- <binary> <producer proofs> <producer raw JSONL>
+binary=/workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/native/target/immutable-attempt1
+proofs=/workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/evidence/producer/attempt1/proofs
+raw=/workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/evidence/producer/attempt1/qualifier.stdout.jsonl
+limits: 180 seconds; 2097152 KiB virtual memory; one process, RAYON_NUM_THREADS=1; no timing claim
+b78202639890aedf2b1afb971ec6d6d0186d5f0182be3e6eedfb9b514b94c75c  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/native/target/immutable-attempt1
+6b7732995c5f6f2864d90ff0ae64d3f459c67d82bfef0ba9f69534d7fdf2211f  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/PROTOCOL.md
+ee30e8b00e41709eb6e0a6d270e2ba2f6be75da57e23310e29ef105bf7559213  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/evidence/independent/checker1/source-allfiles-pre-call-sha256.txt
+f19a4806299fa117bb24fda0a2da4bf599fe22337ea5732e4dba7763f4d23ef3  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/evidence/producer/attempt1/qualifier.stdout.jsonl
+30b8233a10ebbeb43c3ee3c4d4e854bd0020b5d87792d0ea1965e3b14456d5ef  /workspace/scratch/457a488177fc/crypto-quotient/research/fass_prime31_20261122/quotient_query/evidence/independent/replay1/producer-proof-files-sha256.txt

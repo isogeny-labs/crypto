@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="580" viewBox="0 0 1120 580" role="img" aria-labelledby="title desc">
+  <title id="title">Selector resultant: algebraic extraction followed by signed point validation</title>
+  <desc id="desc">A public S3 equation and two subgroup selectors enter a division-free quotient-ring norm. Its gcd gives coordinate support. Rational lifting and signed group replay turn eligible coordinate pairs into relations. Generic point scanning is a separate comparison.</desc>
+  <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#456078"/></marker></defs>
+  <rect width="1120" height="580" rx="18" fill="#f5f8fb"/>
+  <text x="36" y="44" font-family="DejaVu Sans,sans-serif" font-size="25" font-weight="700" fill="#17324c">Solve the selector equations, then validate the points</text>
+  <text x="36" y="73" font-family="DejaVu Sans,sans-serif" font-size="16" fill="#516779">Construction diagram • no measured performance values • PR #4921</text>
+  <g font-family="DejaVu Sans,sans-serif">
+    <rect x="36" y="105" width="300" height="145" rx="12" fill="#e7eff8" stroke="#aac2dc"/>
+    <text x="54" y="136" font-size="18" font-weight="700" fill="#17324c">Public equations</text>
+    <text x="54" y="168" font-size="18" fill="#203c56">q(Y) = A(X)Y² + B(X)Y + C(X)</text>
+    <text x="54" y="198" font-size="18" fill="#203c56">Xᵈ = 1, Yᵈ = 1</text>
+    <text x="54" y="228" font-size="15" fill="#516779">Prime p, positive d dividing p − 1</text>
+    <rect x="390" y="105" width="340" height="145" rx="12" fill="#e7eff8" stroke="#aac2dc"/>
+    <text x="408" y="136" font-size="18" font-weight="700" fill="#17324c">Norm in Fp[X] / (Xᵈ − 1)</text>
+    <text x="408" y="168" font-size="18" fill="#203c56">N = Aᵈ + Cᵈ − T_d</text>
+    <text x="408" y="198" font-size="17" fill="#203c56">Binary even and odd recurrence</text>
+    <text x="408" y="228" font-size="15" fill="#516779">No inverse of A; zero divisors allowed</text>
+    <rect x="784" y="105" width="300" height="145" rx="12" fill="#e7eff8" stroke="#aac2dc"/>
+    <text x="802" y="136" font-size="18" font-weight="700" fill="#17324c">Coordinate candidates</text>
+    <text x="802" y="168" font-size="18" fill="#203c56">G = gcd(Xᵈ − 1, N)</text>
+    <text x="802" y="198" font-size="17" fill="#203c56">Extract x, solve qₓ(Y)</text>
+    <text x="802" y="228" font-size="15" fill="#516779">Recheck both selectors and S3</text>
+    <path d="M336 176 H382" stroke="#456078" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+    <path d="M730 176 H776" stroke="#456078" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+    <path d="M934 250 V310" stroke="#456078" stroke-width="2.5" marker-end="url(#arrow)" fill="none"/>
+    <rect x="480" y="320" width="604" height="123" rx="12" fill="#e2f1ed" stroke="#93bdad"/>
+    <text x="500" y="350" font-size="19" font-weight="700" fill="#145248">Point validation boundary</text>
+    <text x="500" y="382" font-size="17" fill="#234f47">Rational ordinates → all signs → actual sum P + Q = T</text>
+    <text x="500" y="414" font-size="16" fill="#234f47">Optional order annihilator; retain failures and reject nonlifts</text>
+    <rect x="36" y="320" width="390" height="123" rx="12" fill="#fff0d7" stroke="#d2b272"/>
+    <text x="55" y="350" font-size="18" font-weight="700" fill="#6d501d">Separate generic comparator</text>
+    <text x="55" y="382" font-size="17" fill="#6d501d">Scan P in the base; test T − P</text>
+    <text x="55" y="414" font-size="16" fill="#6d501d">O(d) group operations + setup</text>
+    <rect x="36" y="474" width="1048" height="71" rx="10" fill="#ffffff" stroke="#cedae4"/>
+    <text x="54" y="502" font-size="17" fill="#17324c">Norm-stage upper bound: schoolbook O(d² log d) field work, O(d) live coefficients.</text>
+    <text x="54" y="529" font-size="16" fill="#516779">Gcd, roots, signed replay, useful rank and complete scalar recovery are additional charged work.</text>
+  </g>
+</svg>

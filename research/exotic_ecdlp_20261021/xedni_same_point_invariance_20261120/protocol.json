@@ -1,0 +1,12 @@
+{
+  "schema": "xedni-same-point-invariance-protocol-v1",
+  "source": "../xedni_coefficient_choice_20261120/source-rows-v2.jsonl.gz",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "input_law": "all ordered source pairs with distinct rational x, first auxiliary x collision at 7 or 11, and identical point reduction at that collision prime",
+  "gate": "enumerate the frozen local nonsingular order-4/order-6 coefficient witnesses at 7 and 11; pair them in source and local witness order",
+  "arithmetic_test": "write x1-x2=p*u and y1-y2=p*v; require u nonzero modulo p; compute the unique tangent-compatible a4 residue from a1,a2,a3 and integer x,y,u,v; classify every local gate witness by exact residue equality",
+  "null": "some one-digit failures may be fixed by changing higher CRT digits while a1,a2,a3 retain their prescribed local residues",
+  "decision": "if all source pairs have u a unit modulo p, each mismatched collision-prime a4 is impossible under every higher-digit coefficient lift preserving a1,a2,a3 mod p; otherwise retain the unmatched source pairs as open",
+  "record": "valuation class, local gate counts, all weighted local witness comparisons, compatible and incompatible totals, source and code digests",
+  "claim_boundary": "local residue compatibility for this source law and relation construction; no assertion about changing the local a1,a2,a3 residues or the input law"
+}

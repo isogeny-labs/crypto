@@ -1,0 +1,89 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "inc",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2.4753633761849048,
+        2.7144966609370766,
+        4.866696223706622
+      ],
+      "charged_sum": 14346.0,
+      "native_sum": 13859,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 480.0
+      }
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "rho-neg",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        1.7147749360466733,
+        1.8430810984983044,
+        2.997836560562981
+      ],
+      "charged_sum": 9938.0,
+      "native_sum": 7436,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "log2_r": 17.00144118246934,
+      "arm": "wwalkGg-x09-sr-n2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        3.0815219946526,
+        3.2867152280946113,
+        5.13345432907271
+      ],
+      "charged_sum": 17859.0,
+      "native_sum": 11892,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 526.75
+      }
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc",
+      "b": "rho-neg",
+      "verdict": "rho-neg < inc"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "inc",
+      "b": "wwalkGg-x09-sr-n2",
+      "verdict": "inc < wwalkGg-x09-sr-n2"
+    },
+    {
+      "curve": "icv1-fp20-tm1050-4295f05e",
+      "a": "rho-neg",
+      "b": "wwalkGg-x09-sr-n2",
+      "verdict": "rho-neg < wwalkGg-x09-sr-n2"
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_ksum_retune_20261118 pilot B18",
+ "description": "Sizing pilot (not data) for the k-sum (k, N) rule: prune=1, split=1, stride-renew. Generic decomposition track (bounded by sqrt(r); cannot beat rho). Public synthetic curve and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "binary_explicit",
+    "n": 18,
+    "modulus": 262153,
+    "a": 0,
+    "b": 25863,
+    "group_order": 261752,
+    "r": 32719,
+    "gx": 215757,
+    "gy": 240931
+   }
+  ],
+  "targets_per_curve": 64,
+  "target_seed": 20261118204,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "k4n6",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=6,mult=1",
+     "oracle": "ksum:m=4,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k4n7",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=7,mult=1",
+     "oracle": "ksum:m=4,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k4n8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=8,mult=1",
+     "oracle": "ksum:m=4,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k5n6",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=6,mult=1",
+     "oracle": "ksum:m=5,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k5n7",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=7,mult=1",
+     "oracle": "ksum:m=5,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k5n8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=8,mult=1",
+     "oracle": "ksum:m=5,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k6n7",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=7,mult=1",
+     "oracle": "ksum:m=6,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k6n8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=8,mult=1",
+     "oracle": "ksum:m=6,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k7n8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=8,mult=1",
+     "oracle": "ksum:m=7,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "k7n9",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=9,mult=1",
+     "oracle": "ksum:m=7,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261118304,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

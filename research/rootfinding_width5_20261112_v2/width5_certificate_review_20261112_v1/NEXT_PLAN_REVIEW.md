@@ -1,0 +1,15 @@
+# Review of unexecuted source-coupled range intersection
+
+The Bernstein coefficient formula in source_coupled_bernstein_plan_20261112_v1 is correct for tensor degree(2,2,2). A linear coordinate has Bernstein coefficient i/2, its square is the indicator i=2, pair products have coefficient ij/4, and the triple product ijk/8. Multiplying by8 gives the stated integral formula. Symmetry reduces27coefficients to ten sorted index multisets without changing extrema.
+
+Nonnegative basis weights sum to one on the real cube, so min/max coefficients bound every integer source tuple as well. Ceiling the minimum over8 and flooring the maximum is sound. Intersecting with the older valid interval cannot discard a genuine source and need not assume the Bernstein bound is always stronger. For M=0 the formula reduces to the integer constant. Phase shifts by p preserve the exclusion test after the corresponding interval translation.
+
+The p7,M1 example has J=1+x²+y²+z² in[1,4], while treating S,T independently gives[-5,10]. T=4S²+4 supplies an abstract coefficient chart satisfying the required modular relation, and all eight source tuples fail it. An actual guarded elliptic-curve realization of that particular coefficient chart has not been proved; it must not be represented as an actual NIST input.
+
+The proposed later coordinate change c=2lambda0-gamma is integral unimodular with determinant-1, so it preserves indexp³. Keeping exact gamma=2lambda0-c is required to retain the intended cancellation; recentering can change c by p multiples and worsen an integer bound. That discovery change is a separate future variant, not a measured improvement of the fixed-pool range experiment.
+
+These are sound mathematical next mechanisms, not executed algorithms. The first fixed-pool test must retain full conditional unions, all five fields and every cost. No global h compression, original root completeness, novelty or qualified speed result follows.
+
+Recorded-result headroom matters: on the current shifted five-positive width8panel, the measured5D masks already exclude every one of the35empty u fibers and retain only five root-containing fibers. A sound intersection on the SAME fixed pool and panel cannot add exclusions, so that panel can measure overhead but cannot establish a pruning-based cost benefit. A separate frozen comparison family must contain old-5D-unknown but independently empty fibers before additional pruning is a meaningful performance hypothesis.
+
+The unexecuted width5_wider_panel_plan_20261112_v1 keeps exposed source-independent target/anchor geometry but freezes new hash-selected width16placements without expected roots. The h0 reduction modulo p-15 avoids wrap. It correctly accounts for80fixed-u fibers per arm and the existing40-row native front end, requiring two deterministic complete batches and explicit second-batch incompleteness. Three repetitions have17760total5D/7Dmask checks and at most720recovered fibers across all nine arms. Every failed guard/arm remains visible; wider32/64costs require separate registration. This next panel tests generalization and cost, not hardness or a global p-wide search.

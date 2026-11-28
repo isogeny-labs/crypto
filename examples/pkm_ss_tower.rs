@@ -54,7 +54,7 @@ use std::time::{Duration, Instant};
 use crypto_lib::cryptanalysis::f4_fp_tower::{self, SquareRule, TowerF4Options, TowerRing};
 use crypto_lib::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
 use crypto_lib::cryptanalysis::ic_framework::prime_tower::{
-    isogeny_tower, supersingular_aux, supersingular_tower, AuxKind, IsogenyTower,
+    isogeny_tower, supersingular_aux, supersingular_tower, AuxFamily, AuxKind, IsogenyTower,
 };
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -498,8 +498,19 @@ fn build_arm(arm: &str, p: u64, t: usize, seed: u64, rng: &mut StdRng) -> Tower 
         "torus" => dickson_torus(p, t, rng),
         "split" => dickson_split(p, t, rng),
         "ordinary" => {
-            let tw = isogeny_tower(p, t as u32, seed, &mut GroupOps::default())
-                .expect("ordinary isogeny tower");
+            // The seeded search can land on a supersingular curve (#E' =
+            // p + 1, probability about 1/√p per accepted curve); the
+            // comparison needs a genuinely ordinary E', so walk the seed
+            // until one is found.
+            let mut seed = seed;
+            let tw = loop {
+                let tw = isogeny_tower(p, t as u32, seed, AuxFamily::Any, &mut GroupOps::default())
+                    .expect("ordinary isogeny tower");
+                if tw.aux_order != p + 1 {
+                    break tw;
+                }
+                seed = seed.wrapping_add(0x1000);
+            };
             assert_ne!(tw.aux_order, p + 1, "the searched E' is supersingular");
             from_isogeny(&tw, "ordinary")
         }

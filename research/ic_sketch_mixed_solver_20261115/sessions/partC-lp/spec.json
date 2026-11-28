@@ -1,0 +1,20 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "accounting v2 study: frozen ic.large_prime, run on the branch binary and on the main binary",
+  "description": "Only frozen ids, with the curve, parameters, arm names and seeds of pairs-large-prime.json, so the same file runs on the main binary. Used to compare recorded counts of the frozen ic.large_prime across binaries.",
+  "workloads": {
+    "curves": [{
+      "kind": "binary_explicit", "n": 11, "modulus": 2323, "a": 1, "b": 1,
+      "group_order": 1982, "r": 991, "gx": 1193, "gy": 1007
+    }],
+    "targets_per_curve": 4,
+    "target_seed": 20261023
+  },
+  "arms": [
+    {"name": "rho-frob", "role": "reference", "method": {"id": "rho.signed_frobenius"}},
+    {"name": "lp", "role": "baseline", "method": {"id": "ic.large_prime", "params": {
+      "small_dimension": "3", "envelope_dimension": "4", "summands": "n-1", "large_primes": "2",
+      "max_trials": "20000", "max_states": "100000"}}}
+  ],
+  "measurement": {"rounds": 4, "warmup": 0, "order": "alternate", "seed": 20261023, "isolation_required": "L0", "timeout_seconds": 120}
+}

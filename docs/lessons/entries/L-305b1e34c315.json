@@ -1,0 +1,14 @@
+{
+  "action": "Preserve original export, use lossless numeric tokens, and check the full recursive difference whitelist before and after serialization; schema acceptance alone does not check measurement preservation",
+  "created": "2026-11-23T12:45:53Z",
+  "evidence": [
+    "research/hashed_ecdl_cpu_scale_20261123/reviews/COHORT-EXPORT-REVIEW-06.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "experiment-protocol"
+  ],
+  "trigger": "A metadata-only JSON export adapter must preserve fractional measurements exactly",
+  "why": "Default serde_json Value conversion rounded5 measurements while canonical schema checker returned0findings"
+}

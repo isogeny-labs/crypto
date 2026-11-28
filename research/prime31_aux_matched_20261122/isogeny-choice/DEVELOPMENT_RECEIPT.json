@@ -1,0 +1,203 @@
+{
+  "schema": "prime31-isogeny-choice.development-receipt/v1",
+  "status": "development_checks_passed_campaign_blocked",
+  "pcc_standing": "unverified",
+  "scope": "fixed arithmetic, parser and small-field relation/rho contracts; structural panel preparation; no p31 natural-query campaign, census, timing comparison or p31 DLP solve",
+  "tests_passed": 54,
+  "tests_failed": 0,
+  "tests_ignored": 0,
+  "test_executables": 12,
+  "tests": {
+    "schema": "prime31-isogeny-choice.development-tests/v1",
+    "scope": "fixed arithmetic and parser contracts; no benchmark or campaign",
+    "tests_passed": 54,
+    "tests_failed": 0,
+    "tests_ignored": 0,
+    "test_executables": 12,
+    "exit_code": 0,
+    "pre_post_binary_hashes_match": true,
+    "results": [
+      {
+        "test": "adversarial_contracts",
+        "command": "/workspace/scratch/caf932c2ca37/crypto-isogeny/tmp/isogeny_comparison/combined/qualified-v1/bin/adversarial_contracts --test-threads=1",
+        "log": "logs/adversarial_contracts.txt",
+        "summary": "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "exit_code": 0,
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "audit_contracts",
+        "command": "/workspace/scratch/caf932c2ca37/crypto-isogeny/tmp/isogeny_comparison/combined/qualified-v1/bin/audit_contracts --test-threads=1",
+        "log": "logs/audit_contracts.txt",
+        "summary": "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
+        "exit_code": 0,
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "base_certificates",
+        "command": "/workspace/scratch/caf932c2ca37/crypto-isogeny/tmp/isogeny_comparison/combined/qualified-v1/bin/base_certificates --test-threads=1",
+        "log": "logs/base_certificates.txt",
+        "summary": "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "exit_code": 0,
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "choice_audit_contract",
+        "command": "/workspace/scratch/caf932c2ca37/crypto-isogeny/tmp/isogeny_comparison/combined/qualified-v1/bin/choice_audit_contract --test-threads=1",
+        "log": "logs/choice_audit_contract.txt",
+        "summary": "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.38s",
+        "exit_code": 0,
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "collector_contracts",
+        "command": "/workspace/scratch/caf932c2ca37/crypto-isogeny/tmp/isogeny_comparison/combined/qualified-v1/bin/collector_contracts --test-threads=1",
+        "log": "logs/collector_contracts.txt",
+        "summary": "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "exit_code": 0,
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "domain_modes_contract",
+        "command": "/workspace/scratch/caf932c2ca37/crypto-isogeny/tmp/isogeny_comparison/combined/qualified-v1/bin/domain_modes_contract --test-threads=1",
+        "log": "logs/domain_modes_contract.txt",
+        "summary": "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "exit_code": 0,
+        "passed": 1,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "kernel_fiber_contract",
+        "command": "/workspace/scratch/caf932c2ca37/crypto-isogeny/tmp/isogeny_comparison/combined/qualified-v1/bin/kernel_fiber_contract --test-threads=1",
+        "log": "logs/kernel_fiber_contract.txt",
+        "summary": "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s",
+        "exit_code": 0,
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "oracle_contracts",
+        "command": "/workspace/scratch/caf932c2ca37/crypto-isogeny/tmp/isogeny_comparison/combined/qualified-v1/bin/oracle_contracts --test-threads=1",
+        "log": "logs/oracle_contracts.txt",
+        "summary": "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+        "exit_code": 0,
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "provenance_contracts",
+        "command": "/workspace/scratch/caf932c2ca37/crypto-isogeny/tmp/isogeny_comparison/combined/qualified-v1/bin/provenance_contracts --test-threads=1",
+        "log": "logs/provenance_contracts.txt",
+        "summary": "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "exit_code": 0,
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "rho_v6_contract",
+        "command": "/workspace/scratch/caf932c2ca37/crypto-isogeny/tmp/isogeny_comparison/combined/qualified-v1/bin/rho_v6_contract --test-threads=1",
+        "log": "logs/rho_v6_contract.txt",
+        "summary": "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "exit_code": 0,
+        "passed": 5,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "target_transport_contract",
+        "command": "/workspace/scratch/caf932c2ca37/crypto-isogeny/tmp/isogeny_comparison/combined/qualified-v1/bin/target_transport_contract --test-threads=1",
+        "log": "logs/target_transport_contract.txt",
+        "summary": "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s",
+        "exit_code": 0,
+        "passed": 3,
+        "failed": 0,
+        "ignored": 0
+      },
+      {
+        "test": "tower4_contract",
+        "command": "/workspace/scratch/caf932c2ca37/crypto-isogeny/tmp/isogeny_comparison/combined/qualified-v1/bin/tower4_contract --test-threads=1",
+        "log": "logs/tower4_contract.txt",
+        "summary": "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
+        "exit_code": 0,
+        "passed": 6,
+        "failed": 0,
+        "ignored": 0
+      }
+    ]
+  },
+  "build": {
+    "command": "CARGO_BUILD_JOBS=2 cargo test --release --offline --locked --manifest-path research/prime31_aux_matched_20261122/native/Cargo.toml --tests --no-run --message-format=json",
+    "final_exit_code": 0,
+    "log": "evidence/build3.jsonl.gz",
+    "stderr": "evidence/build3.stderr.gz",
+    "development_failures_retained": [
+      "evidence/target-build.jsonl.gz",
+      "evidence/target-build2.jsonl.gz",
+      "evidence/build.jsonl.gz",
+      "evidence/build2.jsonl.gz"
+    ],
+    "full_root_library_qualified": false
+  },
+  "source": {
+    "checkout_parent_revision": "45742543a57f50ae8a53d9882ba786826b3d5463",
+    "upstream_revision": "33b3bc3c7485df0fe80aae41e2093cf940d87ff3",
+    "upstream_production_dependency_files": 43,
+    "upstream_manifest_sha256": "1496e51b27dc390ec9dde6714dd7edd2292fb15e6370a1c9cb878b1ecb4eb789",
+    "source_manifest": "evidence/source-manifest.json",
+    "source_manifest_sha256": "745e790f4bbc3785d312f3c83767dd621820d12e3915d565831beba92bd64abf",
+    "binary_sha256": "2e3fdaac355ef27b5c7437b2213e96607b6c57ce78bab90cee824a50eaa1a827",
+    "qualification_script_sha256": "f690fbeef069dbb48a1a1e292d8cf316e7db37d62b1368e91da4b9ac4659c1d0",
+    "compilation_used_uncommitted_study_sources_bound_by_manifest": true,
+    "post_publication_source_check": "recorded separately after publication"
+  },
+  "panel": {
+    "planned": 230,
+    "auxiliary_ic": 140,
+    "plain_ic": 60,
+    "rho": 30,
+    "rounds": 5,
+    "structurally_valid_inputs": 230,
+    "attempted": 0,
+    "completed": 0,
+    "blocked": 230,
+    "canonical_status": "draft_unadmitted",
+    "same_workload_replicates": true
+  },
+  "checkpoint": {
+    "command": "scripts/checkpoint.sh gate",
+    "exit_code": 1,
+    "captured_utc": "2026-11-23T01:44:41Z",
+    "experiment_submitted": false
+  },
+  "execution_access": {
+    "isolab_tool_available": false,
+    "aws_cli_available": false,
+    "authenticated_workflow_dispatch_available": false,
+    "live_shared_budget_receipt_available": false,
+    "canonical_protocol_freeze": false,
+    "absolute_campaign_deadline_frozen": false,
+    "timing_AA_admission": false
+  },
+  "limitations": [
+    "Producer receipts are not signed PCC execution proofs.",
+    "Three unused malformed upstream sibling-pair members are omitted by declared exact byte ranges; no replacement bodies are inserted.",
+    "Full-root library qualification remains open.",
+    "Pre-existing benchmark-record gate fails on unchanged 20261117T0334Z-hec-multi-production-cold.json.",
+    "All timing and native counter fields are diagnostic or partial; no performance ranking is supported.",
+    "The inherited USD5 ceiling includes prior lane spending and live remaining headroom is unknown."
+  ]
+}

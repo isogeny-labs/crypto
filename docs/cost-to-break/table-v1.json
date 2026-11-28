@@ -1,0 +1,496 @@
+{
+  "schema": "cost-to-break/v1",
+  "table_version": "1",
+  "as_of": "2026-11-22",
+  "generated_by": "docs/cost-to-break/gen_table.rs from docs/cost-to-break/inputs-v1.json",
+  "label": "Derived table. Elliptic-curve times use rho rates measured in this repository on one GPU type (Curve25519 uses the P-256 rate as a labelled proxy); RSA figures are extrapolated from a cited record; ML-KEM figures are cited and not converted. Not a benchmark or leaderboard row; no number here is pcc-verified.",
+  "display_header": [
+    "Target",
+    "Best known classical method",
+    "Expected work",
+    "Throughput used",
+    "$/GPU-hour",
+    "GPU-years",
+    "Cost, USD",
+    "Quantum-vulnerable"
+  ],
+  "rows": [
+    {
+      "id": "ecc2k130",
+      "name": "ECC2K-130 (calibration)",
+      "basis": "measured",
+      "formula": "E = 1.069*sqrt(pi*n/(2*262)); time = E / rate",
+      "log2_group_order": 129.000,
+      "log2_expected_work": 60.905,
+      "work_unit": "group operations (rho steps)",
+      "expected_work": 2.1593e18,
+      "rate_used": "ecc2k130_rho_rtx6000",
+      "rate_steps_per_second": 1.4107e10,
+      "gpu_seconds": 1.5307e8,
+      "gpu_hours": 4.2520e4,
+      "gpu_years": 4.8506e0,
+      "price_used": "rtx6000_aws_g7e",
+      "usd_low": 5.5701e4,
+      "usd_high": 1.4287e5,
+      "check_published_log2_work": 60.900,
+      "check_log2_difference": 0.005,
+      "display_cells": [
+        "ECC2K-130 (calibration)",
+        "parallel Pollard rho with distinguished points on classes under negation and Frobenius",
+        "`1.069*sqrt(pi*n/(2*262))` = 2^60.91 group operations (n ≈ 2^129.00)",
+        "14.1 G/s, measured here (RTX PRO 6000, on Modal)",
+        "1.31–3.36 (AWS g7e, spot–on-demand)",
+        "4.85",
+        "55,700–143,000",
+        "yes"
+      ]
+    },
+    {
+      "id": "p256",
+      "name": "P-256 (secp256r1)",
+      "basis": "measured",
+      "formula": "E = sqrt(pi*n/(2*2)); time = E / rate",
+      "log2_group_order": 256.000,
+      "log2_expected_work": 127.826,
+      "work_unit": "group operations (rho steps)",
+      "expected_work": 3.0157e38,
+      "rate_used": "p256_rho_rtx6000",
+      "rate_steps_per_second": 1.8830e9,
+      "gpu_seconds": 1.6015e29,
+      "gpu_hours": 4.4487e25,
+      "gpu_years": 5.0749e21,
+      "price_used": "rtx6000_aws_g7e",
+      "usd_low": 5.8278e25,
+      "usd_high": 1.4948e26,
+      "display_cells": [
+        "P-256 (secp256r1)",
+        "parallel Pollard rho with distinguished points and the negation map",
+        "`sqrt(pi*n/(2*2))` = 2^127.83 group operations (n ≈ 2^256.00)",
+        "1.88 G/s, measured here (RTX PRO 6000, on Modal)",
+        "1.31–3.36 (AWS g7e, spot–on-demand)",
+        "5.07e21",
+        "5.83e25–1.49e26",
+        "yes"
+      ]
+    },
+    {
+      "id": "secp256k1",
+      "name": "secp256k1",
+      "basis": "measured",
+      "formula": "E = sqrt(pi*n/(2*6)); time = E / rate",
+      "log2_group_order": 256.000,
+      "log2_expected_work": 127.033,
+      "work_unit": "group operations (rho steps)",
+      "expected_work": 1.7411e38,
+      "rate_used": "secp256k1_rho_rtx6000",
+      "rate_steps_per_second": 1.3770e9,
+      "gpu_seconds": 1.2644e29,
+      "gpu_hours": 3.5123e25,
+      "gpu_years": 4.0067e21,
+      "price_used": "rtx6000_aws_g7e",
+      "usd_low": 4.6011e25,
+      "usd_high": 1.1801e26,
+      "display_cells": [
+        "secp256k1",
+        "parallel Pollard rho with distinguished points, walk on classes under Aut(E) = Z/6 (negation and the GLV endomorphism)",
+        "`sqrt(pi*n/(2*6))` = 2^127.03 group operations (n ≈ 2^256.00)",
+        "1.38 G/s, measured here (RTX PRO 6000, on Modal)",
+        "1.31–3.36 (AWS g7e, spot–on-demand)",
+        "4.01e21",
+        "4.60e25–1.18e26",
+        "yes"
+      ]
+    },
+    {
+      "id": "curve25519",
+      "name": "Curve25519 / Ed25519",
+      "basis": "proxy",
+      "formula": "E = sqrt(pi*n/(2*2)); time = E / rate",
+      "log2_group_order": 252.000,
+      "log2_expected_work": 125.826,
+      "work_unit": "group operations (rho steps)",
+      "expected_work": 7.5392e37,
+      "rate_used": "p256_rho_rtx6000",
+      "rate_steps_per_second": 1.8830e9,
+      "gpu_seconds": 4.0038e28,
+      "gpu_hours": 1.1122e25,
+      "gpu_years": 1.2687e21,
+      "price_used": "rtx6000_aws_g7e",
+      "usd_low": 1.4569e25,
+      "usd_high": 3.7369e25,
+      "display_cells": [
+        "Curve25519 / Ed25519",
+        "parallel Pollard rho with distinguished points and the negation map, in the prime-order subgroup",
+        "`sqrt(pi*n/(2*2))` = 2^125.83 group operations (n ≈ 2^252.00)",
+        "1.88 G/s, proxy: P-256 rate (RTX PRO 6000, on Modal)",
+        "1.31–3.36 (AWS g7e, spot–on-demand)",
+        "1.27e21 (proxy rate)",
+        "1.46e25–3.74e25",
+        "yes"
+      ]
+    },
+    {
+      "id": "rsa2048",
+      "name": "RSA-2048",
+      "basis": "extrapolated",
+      "formula": "GPU-years = anchor GPU-years x L(N)/L(anchor), L = L_N[1/3,(64/9)^(1/3)], o(1) = 0",
+      "nist_security_strength_bits": 112.000,
+      "anchor": "rsa260",
+      "log2_l_ratio": 36.397,
+      "gpu_years": 1.2219e12,
+      "gpu_hours": 1.0711e16,
+      "price_used": "rsa260_anchor",
+      "usd_low": 3.7489e16,
+      "usd_high": 3.7489e16,
+      "cpu_cross_check_core_years": 6.2912e14,
+      "caveat": "order of magnitude only: the o(1) term, memory, the linear-algebra share and hardware change are ignored",
+      "display_cells": [
+        "RSA-2048",
+        "general number field sieve (GNFS)",
+        "NIST strength 112 bits; GNFS L-ratio to the 862-bit RSA-260 record = 2^36.4",
+        "RSA-260 record: 13.5 GPU-years on B200-class GPUs (cited)",
+        "3.50 (the record's own assumption)",
+        "1.22e12 (extrapolated)",
+        "3.75e16",
+        "yes"
+      ]
+    },
+    {
+      "id": "rsa3072",
+      "name": "RSA-3072",
+      "basis": "extrapolated",
+      "formula": "GPU-years = anchor GPU-years x L(N)/L(anchor), L = L_N[1/3,(64/9)^(1/3)], o(1) = 0",
+      "nist_security_strength_bits": 128.000,
+      "anchor": "rsa260",
+      "log2_l_ratio": 58.250,
+      "gpu_years": 4.6268e18,
+      "gpu_hours": 4.0559e22,
+      "price_used": "rsa260_anchor",
+      "usd_low": 1.4196e23,
+      "usd_high": 1.4196e23,
+      "cpu_cross_check_core_years": 2.3822e21,
+      "caveat": "order of magnitude only: the o(1) term, memory, the linear-algebra share and hardware change are ignored",
+      "display_cells": [
+        "RSA-3072",
+        "general number field sieve (GNFS)",
+        "NIST strength 128 bits; GNFS L-ratio to the 862-bit RSA-260 record = 2^58.2",
+        "RSA-260 record: 13.5 GPU-years on B200-class GPUs (cited)",
+        "3.50 (the record's own assumption)",
+        "4.63e18 (extrapolated)",
+        "1.42e23",
+        "yes"
+      ]
+    },
+    {
+      "id": "mlkem512",
+      "name": "ML-KEM-512",
+      "basis": "not converted",
+      "core_svp_classical_bits": 118.000,
+      "core_svp_quantum_bits": 107.000,
+      "refined_log2_gates": 151.500,
+      "gpu_years": null,
+      "usd_low": null,
+      "usd_high": null,
+      "why_not_converted": "the cited figures count operations or gates in a cost model; turning them into GPU time needs a measured lattice-sieving rate, which this repository does not have",
+      "display_cells": [
+        "ML-KEM-512",
+        "primal lattice attack with BKZ and sieving (core-SVP model and the specification's refined gate count)",
+        "core-SVP 2^118 classical, 2^107 quantum; refined 2^151.5 gates (±16 bits) (cited)",
+        "not converted (no GPU rate for lattice sieving here)",
+        "—",
+        "—",
+        "—",
+        "not known"
+      ]
+    },
+    {
+      "id": "mlkem768",
+      "name": "ML-KEM-768",
+      "basis": "not converted",
+      "core_svp_classical_bits": 183.000,
+      "core_svp_quantum_bits": 166.000,
+      "refined_log2_gates": 215.100,
+      "gpu_years": null,
+      "usd_low": null,
+      "usd_high": null,
+      "why_not_converted": "the cited figures count operations or gates in a cost model; turning them into GPU time needs a measured lattice-sieving rate, which this repository does not have",
+      "display_cells": [
+        "ML-KEM-768",
+        "primal lattice attack with BKZ and sieving (core-SVP model and the specification's refined gate count)",
+        "core-SVP 2^183 classical, 2^166 quantum; refined 2^215.1 gates (cited)",
+        "not converted (no GPU rate for lattice sieving here)",
+        "—",
+        "—",
+        "—",
+        "not known"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "ecc2k130-published-work",
+      "what": "formula work against the published planning budget",
+      "derived_log2": 60.905,
+      "published_log2": 60.900,
+      "difference_bits": 0.005,
+      "source": "D. V. Bailey et al., 'Breaking ECC2K-130', IACR ePrint 2009/541 (the planning budget quoted across crypto:ecc2k130/)"
+    },
+    {
+      "id": "ecc2k130-repository-cost",
+      "what": "derived GPU-hours and dollars against the figures already in the repository",
+      "derived_gpu_hours": 4.2520e4,
+      "repository_gpu_hours": 4.2400e4,
+      "ratio_gpu_hours": 1.003,
+      "derived_usd_spot": 5.5701e4,
+      "repository_usd_spot": 5.6000e4,
+      "ratio_usd_spot": 0.995,
+      "derived_usd_on_demand": 1.4287e5,
+      "repository_usd_on_demand": 1.4200e5,
+      "ratio_usd_on_demand": 1.006,
+      "source": "crypto:ecc2k130/aws/README.md cost table and crypto:ecc2k130/FPGA-CEILING.md section 5 (RTX PRO 6000 at 14.11 B/s: 42,400 GPU-hours, $56k spot, $142k on-demand g7e.2xlarge)"
+    },
+    {
+      "id": "gnfs-rsa260-to-rsa896",
+      "what": "the L-ratio extrapolation from RSA-260 against the reported RSA-896 cost",
+      "predicted_gpu_years": 3.4971e1,
+      "reported_gpu_years": 3.0000e1,
+      "ratio_predicted_to_reported": 1.166,
+      "caveat": "different software and unnamed GPUs; the reported compute is not independently confirmed",
+      "source": "M. Ivezic, 'RSA-896 Factored With Claude, 16 Days After RSA-260', PostQuantum.com, 2026-09-19, reporting S. A. Weis: about 10 days and roughly 30 GPU-years on up to 2,048 GPUs; GPU model not named; compute not independently confirmed. https://postquantum.com/security-pqc/rsa-896-factored-claude-gpus/"
+    }
+  ],
+  "inputs": {
+    "schema": "cost-to-break.inputs/v1",
+    "table_version": "1",
+    "as_of": "2026-11-22",
+    "status": "Derived table, version 1, drafted 2026-11-22 for review by the Principal Cryptographer (action plan 2026-11-21, row R2). It is not a benchmark, not a leaderboard row and not a validated result. Elliptic-curve rows combine a textbook work formula with a throughput measured and committed in this repository; RSA and ML-KEM rows are cited published estimates. Every input below carries its source; gen_table.rs derives everything else.",
+    "constants": {
+      "seconds_per_year": 31557600,
+      "hours_per_year": 8766,
+      "basis": "Julian year, 365.25 days"
+    },
+    "prices": {
+      "rtx6000_aws_g7e": {
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "low_usd_per_gpu_hour": 1.31,
+        "low_basis": "AWS spot, g7e.2xlarge (one GPU), us-west-2, observed 2026-09-11",
+        "high_usd_per_gpu_hour": 3.36,
+        "high_basis": "AWS on-demand, g7e.2xlarge (one GPU), us-west-2, observed 2026-09-11",
+        "source": "crypto:ecc2k130/aws/README.md, paragraph 'Wall-clock and cost at the expected work' (spot g7e.2xlarge $1.31/h, on-demand $3.36/h; g7e.48xlarge on-demand $33.14/h = $4.14 per GPU-hour)",
+        "cross_checks": [
+          "crypto:gpu/certicom131/RESULT.md, 'CUDA validation gate': AWS Pricing API, g7e.2xlarge on-demand $3.36312/hour",
+          "crypto:gpu/explicit-relations/VALIDATION.md: RunPod Secure Cloud, RTX PRO 6000 Blackwell Server Edition, provider rate $2.49/hour (2026-10-29)"
+        ],
+        "kind": "observed provider price, not a billing receipt"
+      },
+      "rsa260_anchor": {
+        "gpu": "NVIDIA B200, GB200 and GB300 (the RSA-260 run)",
+        "low_usd_per_gpu_hour": 3.5,
+        "low_basis": "the anchor's own stated assumption",
+        "high_usd_per_gpu_hour": 3.5,
+        "high_basis": "the anchor's own stated assumption",
+        "source": "E. Lu (Cognition), 'Factoring RSA-260', 2026-09-09, Appendix 1: 'Costs assume $0.08/CPU core-hour, $3.50/GPU-hour'. https://cognition.com/blog/factoring-rsa-260",
+        "kind": "cited assumption"
+      }
+    },
+    "rates": {
+      "ecc2k130_rho_rtx6000": {
+        "value": 14106673000,
+        "unit": "ECC2K-130 walk iterations per second per GPU (Frobenius and negation classes), with DP34 distinguished-point collection",
+        "kind": "lab measurement",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition, on Modal",
+        "price": "rtx6000_aws_g7e",
+        "where": "crypto:ecc2k130/RTX-PRO6000.md ('14.106673 B/s collection median (14.073041-14.159239)'); crypto:ecc2k130/README.md, platform table ('14.637530 B/s benchmark; 14.106673 B/s DP34 collection')",
+        "conditions": "collection rate, lower than the 14.637530 B/s --bench rate because it includes distinguished-point handling; no ecbench session; no pcc claim"
+      },
+      "p256_rho_rtx6000": {
+        "value": 1883000000,
+        "unit": "P-256 rho steps per second per GPU (negation-map walk)",
+        "kind": "lab measurement",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition, on Modal",
+        "price": "rtx6000_aws_g7e",
+        "where": "crypto:gpu/nist/RESULTS.md, 'Round 3: W=64 and a shared-memory jump table' (global table, 256 threads, W = 64: 1.883 Gstep/s); raw log crypto:gpu/nist/sweep3.log; Modal run ap-UfeieuzyETwurk5q75ZnHC",
+        "conditions": "8192 iterations per cell, one sweep; distinguished points matched the expected rate (24,115 observed, 24,140 expected); rented GPU, no isolation level recorded; not an ecbench session, no replay certificate, no pcc claim"
+      },
+      "secp256k1_rho_rtx6000": {
+        "value": 1377000000,
+        "unit": "secp256k1 rho steps per second per GPU (walk folded by Aut(E) = Z/6)",
+        "kind": "lab measurement",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition, on Modal",
+        "price": "rtx6000_aws_g7e",
+        "where": "crypto:gpu/ecc/validation/20261017-modal-rtx-pro-6000/README.md (FP_PTX=1, min-blocks 2: 1,377 Mstep/s) and tune.log ('385024 walks ... fold=6 ... 1.377 Gstep/s (99 M steps in 0.072 s)'); Modal run ap-ELJJSCBc7W12zY6d6NlRdk",
+        "conditions": "one sample per configuration, 99 M steps in 0.072 s; rented GPU, no isolation level recorded; not an ecbench session, no replay certificate, no pcc claim. gpu/ecc/README.md still says no kernel has been run on a GPU; the validation directory postdates it"
+      }
+    },
+    "rows": [
+      {
+        "id": "ecc2k130",
+        "name": "ECC2K-130 (calibration)",
+        "family": "elliptic curve",
+        "field_type": "binary, GF(2^131), Koblitz",
+        "method": "parallel Pollard rho with distinguished points on classes under negation and Frobenius",
+        "group_order": "680564733841876926932320129493409985129",
+        "group_order_source": "crypto:ecc2k130/README.md, 'The problems' (|E| = 4l, l a 129-bit prime)",
+        "automorphisms": 262,
+        "automorphisms_basis": "negation times the 131 powers of Frobenius (2 x 131)",
+        "walk_constant": 1.069,
+        "walk_constant_source": "crypto:ecc2k130/WALK-CONSTANT.md section 6: Bailey et al.'s planning budget 2^60.9 is 2^60.809 x 1.069; measured for this walk 1.070-1.082 on completed trails",
+        "rate": "ecc2k130_rho_rtx6000",
+        "rate_basis": "measured",
+        "published_check": {
+          "log2_work": 60.9,
+          "source": "D. V. Bailey et al., 'Breaking ECC2K-130', IACR ePrint 2009/541 (the planning budget quoted across crypto:ecc2k130/)"
+        },
+        "repo_cost_check": {
+          "gpu_hours": 42400,
+          "usd_spot": 56000,
+          "usd_on_demand": 142000,
+          "source": "crypto:ecc2k130/aws/README.md cost table and crypto:ecc2k130/FPGA-CEILING.md section 5 (RTX PRO 6000 at 14.11 B/s: 42,400 GPU-hours, $56k spot, $142k on-demand g7e.2xlarge)"
+        },
+        "quantum_vulnerable": "yes: Shor's algorithm solves the ECDLP in polynomial time on a large fault-tolerant quantum computer; none exists today",
+        "quantum_source": "Roetteler, Naehrig, Svore, Lauter, 'Quantum Resource Estimates for Computing Elliptic Curve Discrete Logarithms', ASIACRYPT 2017, IACR ePrint 2017/598"
+      },
+      {
+        "id": "p256",
+        "name": "P-256 (secp256r1)",
+        "family": "elliptic curve",
+        "field_type": "prime, 256-bit",
+        "method": "parallel Pollard rho with distinguished points and the negation map",
+        "group_order": "0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551",
+        "group_order_source": "crypto:docs/curves/standards/parameters.json, 'P-256' (cofactor 1)",
+        "automorphisms": 2,
+        "automorphisms_basis": "Aut(E) = {+1, -1}: j is not 0 or 1728 (crypto:gpu/nist/README.md)",
+        "walk_constant": 1.0,
+        "walk_constant_source": "assumption: idealised random walk; real r-adding walks cost a few percent more (ECC2K-130 measures 1.07-1.08)",
+        "rate": "p256_rho_rtx6000",
+        "rate_basis": "measured",
+        "quantum_vulnerable": "yes: Shor's algorithm; at most 2,330 logical qubits and about 1.29e11 Toffoli gates for a 256-bit prime field by the bounds of the cited paper; no such machine exists today",
+        "quantum_source": "Roetteler, Naehrig, Svore, Lauter, ASIACRYPT 2017, IACR ePrint 2017/598 (bounds 9n + 2ceil(log2 n) + 10 qubits and 448 n^3 log2 n + 4090 n^3 Toffoli gates, evaluated at n = 256)"
+      },
+      {
+        "id": "secp256k1",
+        "name": "secp256k1",
+        "family": "elliptic curve",
+        "field_type": "prime, 256-bit",
+        "method": "parallel Pollard rho with distinguished points, walk on classes under Aut(E) = Z/6 (negation and the GLV endomorphism)",
+        "group_order": "0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141",
+        "group_order_source": "crypto:docs/curves/standards/parameters.json, 'secp256k1' (cofactor 1)",
+        "automorphisms": 6,
+        "automorphisms_basis": "j = 0, Aut(E) = Z/6 (crypto:gpu/ecc/README.md)",
+        "walk_constant": 1.0,
+        "walk_constant_source": "assumption: idealised random walk (as for P-256)",
+        "rate": "secp256k1_rho_rtx6000",
+        "rate_basis": "measured",
+        "quantum_vulnerable": "yes: Shor's algorithm (same resource class as P-256); no such machine exists today",
+        "quantum_source": "Roetteler, Naehrig, Svore, Lauter, ASIACRYPT 2017, IACR ePrint 2017/598"
+      },
+      {
+        "id": "curve25519",
+        "name": "Curve25519 / Ed25519",
+        "family": "elliptic curve",
+        "field_type": "prime, 255-bit (2^255 - 19)",
+        "method": "parallel Pollard rho with distinguished points and the negation map, in the prime-order subgroup",
+        "group_order": "0x1000000000000000000000000000000014def9dea2f79cd65812631a5cf5d3ed",
+        "group_order_source": "crypto:docs/curves/standards/parameters.json, 'Curve25519' and 'Ed25519' (subgroup order l, cofactor 8)",
+        "automorphisms": 2,
+        "automorphisms_basis": "Aut(E) = {+1, -1}: the j-invariant of y^2 = x^3 + 486662x^2 + x over GF(2^255 - 19) is not 0 or 1728 (checked)",
+        "walk_constant": 1.0,
+        "walk_constant_source": "assumption: idealised random walk (as for P-256)",
+        "rate": "p256_rho_rtx6000",
+        "rate_basis": "proxy",
+        "rate_note": "No rho throughput on the 2^255 - 19 field has been measured in this repository (gpu/ecc compiles Curve25519 vectors for its CPU tests only). The P-256 rate, same field type and size, is used as a labelled proxy; a dedicated 2^255 - 19 reduction could be faster or slower.",
+        "quantum_vulnerable": "yes: Shor's algorithm; no such machine exists today",
+        "quantum_source": "Roetteler, Naehrig, Svore, Lauter, ASIACRYPT 2017, IACR ePrint 2017/598"
+      },
+      {
+        "id": "rsa2048",
+        "name": "RSA-2048",
+        "family": "integer factorisation",
+        "field_type": "n/a",
+        "method": "general number field sieve (GNFS)",
+        "modulus_bits": 2048,
+        "nist_security_strength_bits": 112,
+        "nist_source": "NIST SP 800-57 Part 1 Rev. 5 (2020), Table 2: RSA k = 2048 has a 112-bit security strength",
+        "anchor": "rsa260",
+        "quantum_vulnerable": "yes: Shor's algorithm; the cited estimate is under a million noisy qubits for less than a week; no such machine exists today",
+        "quantum_source": "C. Gidney, 'How to factor 2048 bit RSA integers with less than a million noisy qubits', arXiv:2505.15917 (2025)"
+      },
+      {
+        "id": "rsa3072",
+        "name": "RSA-3072",
+        "family": "integer factorisation",
+        "field_type": "n/a",
+        "method": "general number field sieve (GNFS)",
+        "modulus_bits": 3072,
+        "nist_security_strength_bits": 128,
+        "nist_source": "NIST SP 800-57 Part 1 Rev. 5 (2020), Table 2: RSA k = 3072 has a 128-bit security strength",
+        "anchor": "rsa260",
+        "quantum_vulnerable": "yes: Shor's algorithm; no such machine exists today",
+        "quantum_source": "C. Gidney, arXiv:2505.15917 (2025), for the RSA-2048 case; RSA-3072 needs somewhat more"
+      },
+      {
+        "id": "mlkem512",
+        "name": "ML-KEM-512",
+        "family": "module lattice (Module-LWE)",
+        "field_type": "n/a",
+        "method": "primal lattice attack with BKZ and sieving (core-SVP model and the specification's refined gate count)",
+        "nist_category": 1,
+        "core_svp_classical_bits": 118,
+        "core_svp_quantum_bits": 107,
+        "bkz_blocksize": 406,
+        "refined_log2_gates": 151.5,
+        "refined_log2_gates_uncertainty_bits": 16,
+        "refined_log2_memory_bits": 93.8,
+        "lattice_source": "Avanzi et al., CRYSTALS-Kyber Algorithm Specifications and Supporting Documentation v3.02 (2021-08-04), Table 4 and section 5.2 ('this number could be affected by a factor of up to 2^16 in either direction'); ML-KEM (FIPS 203, 2024) uses these parameter sets",
+        "not_used": "the lab's own 'mlwe margins' estimator is excluded until its outside review (action plan R5)",
+        "quantum_vulnerable": "not known: no quantum algorithm is known that breaks Module-LWE at these parameters beyond the quantum core-SVP figure",
+        "quantum_source": "Kyber specification v3.02, Table 4 (quantum core-SVP 107)"
+      },
+      {
+        "id": "mlkem768",
+        "name": "ML-KEM-768",
+        "family": "module lattice (Module-LWE)",
+        "field_type": "n/a",
+        "method": "primal lattice attack with BKZ and sieving (core-SVP model and the specification's refined gate count)",
+        "nist_category": 3,
+        "core_svp_classical_bits": 183,
+        "core_svp_quantum_bits": 166,
+        "bkz_blocksize": 626,
+        "refined_log2_gates": 215.1,
+        "refined_log2_memory_bits": 138.5,
+        "lattice_source": "Avanzi et al., CRYSTALS-Kyber Algorithm Specifications and Supporting Documentation v3.02 (2021-08-04), Table 4; ML-KEM (FIPS 203, 2024) uses these parameter sets",
+        "not_used": "the lab's own 'mlwe margins' estimator is excluded until its outside review (action plan R5)",
+        "quantum_vulnerable": "not known: no quantum algorithm is known that breaks Module-LWE at these parameters beyond the quantum core-SVP figure",
+        "quantum_source": "Kyber specification v3.02, Table 4 (quantum core-SVP 166)"
+      }
+    ],
+    "gnfs": {
+      "heuristic": "L_N[1/3, (64/9)^(1/3)] = exp((64/9)^(1/3) (ln N)^(1/3) (ln ln N)^(2/3)), with the o(1) term set to 0",
+      "heuristic_source": "the number field sieve's heuristic running time (Buhler, Lenstra, Pomerance, in A. K. Lenstra and H. W. Lenstra (eds.), The Development of the Number Field Sieve, LNM 1554, Springer 1993)",
+      "anchors": {
+        "rsa260": {
+          "bits": 862,
+          "gpu_years": 13.5,
+          "price": "rsa260_anchor",
+          "date": "2026-09-03 (factors), 2026-09-09 (report)",
+          "source": "E. Lu (Cognition), 'Factoring RSA-260': 'about 4,900 GPU-days, or 13.5 GPU-years, which is about $400k at current market prices' (Appendix 1: $414k); modified CADO-NFS with a GPU lattice siever on B200/GB200/GB300. https://cognition.com/blog/factoring-rsa-260",
+          "kind": "published record (self-reported cost)"
+        }
+      },
+      "checks": {
+        "rsa896": {
+          "bits": 896,
+          "reported_gpu_years": 30,
+          "source": "M. Ivezic, 'RSA-896 Factored With Claude, 16 Days After RSA-260', PostQuantum.com, 2026-09-19, reporting S. A. Weis: about 10 days and roughly 30 GPU-years on up to 2,048 GPUs; GPU model not named; compute not independently confirmed. https://postquantum.com/security-pqc/rsa-896-factored-claude-gpus/",
+          "kind": "secondary report"
+        },
+        "rsa250_cpu": {
+          "bits": 829,
+          "core_years": 2700,
+          "source": "Boudot, Gaudry, Guillevic, Heninger, Thomé, Zimmermann, RSA-250 announcement, 2020-02-28: 'roughly 2700 core-years, using Intel Xeon Gold 6130 CPUs as a reference (2.1GHz)'. https://caramba.loria.fr/rsa250.txt",
+          "kind": "published record"
+        }
+      }
+    }
+  }
+}

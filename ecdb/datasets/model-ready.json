@@ -1,0 +1,85 @@
+{
+  "schema": "ecdb.ml_datasets/v1",
+  "description": "Saved, versioned dataset recipes. Materialization is separate and must retain the query, feature versions, split policy, source commit and artifact digest.",
+  "datasets": [
+    {
+      "name": "curve-structure-ic-outcomes",
+      "version": 1,
+      "subject_scope": "curve",
+      "description": "Curve-level structural predictors for the best recorded solved factor-base cost on each curve.",
+      "selection_query": "SELECT * FROM v_curve_ml_features WHERE best_s_solved IS NOT NULL ORDER BY curve_id",
+      "split_policy": {"kind":"group_hash","groups":["isogeny_class_id","field_kind","field_bits"],"basis_points":{"train":7000,"validation":1500,"test":1500},"rule":"All stored models in one finite-field isogeny class remain in one split; null classes group by curve_id."},
+      "seed": "2026111741",
+      "status": "not_evaluated",
+      "features": [
+        {"feature_key":"field.kind","version":1,"role":"input","ordinal":0},
+        {"feature_key":"field.degree","version":1,"role":"input","ordinal":1},
+        {"feature_key":"field.order_bits","version":1,"role":"input","ordinal":2},
+        {"feature_key":"curve.family","version":1,"role":"input","ordinal":3},
+        {"feature_key":"curve.model","version":1,"role":"input","ordinal":4},
+        {"feature_key":"frobenius.trace_ratio","version":1,"role":"input","ordinal":5},
+        {"feature_key":"cm.fundamental_discriminant","version":1,"role":"input","ordinal":6},
+        {"feature_key":"cm.frobenius_conductor_fraction","version":1,"role":"input","ordinal":7},
+        {"feature_key":"endomorphism.discriminant_bits","version":1,"role":"input","ordinal":8},
+        {"feature_key":"endomorphism.class_number","version":1,"role":"input","ordinal":9},
+        {"feature_key":"automorphism.base_field_order","version":1,"role":"input","ordinal":10},
+        {"feature_key":"graph.isogeny_count","version":1,"role":"input","ordinal":11},
+        {"feature_key":"graph.isomorphism_relation_count","version":1,"role":"input","ordinal":12},
+        {"feature_key":"curve.best_s_solved","version":1,"role":"target","ordinal":0},
+        {"feature_key":"isogeny_class.label","version":1,"role":"metadata","ordinal":0}
+      ]
+    },
+    {
+      "name": "factor-base-outcomes",
+      "version": 1,
+      "subject_scope": "factor_base",
+      "description": "FB1/FBS1 construction and curve-structure predictors for solved cost, yield, rank and relation coverage.",
+      "selection_query": "SELECT fb.*, cv.trace_ratio, cv.cm_discriminant, cv.endomorphism_discriminant, cv.automorphism_group_order, cv.isogeny_count FROM v_factor_base_ml_features fb LEFT JOIN v_curve_ml_features cv ON cv.curve_id = fb.curve_id WHERE fb.result_count > 0 ORDER BY fb.factor_base_id",
+      "split_policy": {"kind":"group_hash","groups":["curve_id","factor_base_key"],"basis_points":{"train":7000,"validation":1500,"test":1500},"rule":"Every result and configuration of one factor-base identity remains in one split; curves may optionally be grouped more strictly by isogeny_class_id during materialization."},
+      "seed": "2026111742",
+      "status": "not_evaluated",
+      "features": [
+        {"feature_key":"field.kind","version":1,"role":"input","ordinal":0},
+        {"feature_key":"field.order_bits","version":1,"role":"input","ordinal":1},
+        {"feature_key":"frobenius.trace_ratio","version":1,"role":"input","ordinal":2},
+        {"feature_key":"endomorphism.discriminant_bits","version":1,"role":"input","ordinal":3},
+        {"feature_key":"factor_base.scheme","version":1,"role":"input","ordinal":4},
+        {"feature_key":"factor_base.family","version":1,"role":"input","ordinal":5},
+        {"feature_key":"factor_base.signed_points","version":1,"role":"input","ordinal":6},
+        {"feature_key":"factor_base.abscissae","version":1,"role":"input","ordinal":7},
+        {"feature_key":"factor_base.columns","version":1,"role":"input","ordinal":8},
+        {"feature_key":"factor_base.dimension","version":1,"role":"input","ordinal":9},
+        {"feature_key":"factor_base.has_object_store_artifact","version":1,"role":"metadata","ordinal":0},
+        {"feature_key":"factor_base.best_s_solved","version":1,"role":"target","ordinal":0},
+        {"feature_key":"factor_base.best_yield_log2","version":1,"role":"target","ordinal":1},
+        {"feature_key":"factor_base.max_rank","version":1,"role":"target","ordinal":2}
+      ]
+    },
+    {
+      "name": "fbm1-solver-outcomes",
+      "version": 1,
+      "subject_scope": "factor_base_measurement",
+      "description": "Exact FBM1 oracle, solver, linear-algebra and instrument configurations with relation, solving-degree, matrix and complete-cost outcomes.",
+      "selection_query": "SELECT * FROM v_factor_base_measurement_ml_features WHERE result_count > 0 ORDER BY factor_base_measurement_id",
+      "split_policy": {"kind":"group_hash","groups":["curve_id","factor_base_id"],"basis_points":{"train":7000,"validation":1500,"test":1500},"rule":"All FBM1 configurations sharing one curve and FB1 remain in one split to prevent point-set and curve leakage."},
+      "seed": "2026111743",
+      "status": "not_evaluated",
+      "features": [
+        {"feature_key":"field.kind","version":1,"role":"input","ordinal":0},
+        {"feature_key":"field.order_bits","version":1,"role":"input","ordinal":1},
+        {"feature_key":"factor_base.family","version":1,"role":"input","ordinal":2},
+        {"feature_key":"factor_base.columns","version":1,"role":"input","ordinal":3},
+        {"feature_key":"factor_base.dimension","version":1,"role":"input","ordinal":4},
+        {"feature_key":"fbm.oracle","version":1,"role":"input","ordinal":5},
+        {"feature_key":"fbm.solver","version":1,"role":"input","ordinal":6},
+        {"feature_key":"fbm.linalg","version":1,"role":"input","ordinal":7},
+        {"feature_key":"fbm.instrument","version":1,"role":"metadata","ordinal":0},
+        {"feature_key":"ic.best_yield_log2","version":1,"role":"target","ordinal":0},
+        {"feature_key":"ic.solving_degree_max","version":1,"role":"target","ordinal":1},
+        {"feature_key":"ic.macaulay_rows_max","version":1,"role":"target","ordinal":2},
+        {"feature_key":"ic.best_total_gae_solved","version":1,"role":"target","ordinal":3},
+        {"feature_key":"ic.validation_status","version":1,"role":"metadata","ordinal":1}
+      ]
+    }
+  ]
+}

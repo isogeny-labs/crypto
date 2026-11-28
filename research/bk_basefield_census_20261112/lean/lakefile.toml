@@ -1,0 +1,11 @@
+name = "bk_basefield_census_audit"
+version = "0.1.0"
+defaultTargets = ["BKBasefieldCensusAudit"]
+
+[[require]]
+name = "three_torsion_rank_audit"
+path = "../../three_torsion_rank_audit_20261112/lean"
+
+[[lean_lib]]
+name = "BKBasefieldCensusAudit"
+roots = ["Scaling", "ScalingGroup", "TorsionTransport", "RationalTwo", "CensusBridge"]

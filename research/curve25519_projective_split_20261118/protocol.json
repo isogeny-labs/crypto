@@ -1,0 +1,20 @@
+{
+  "schema": "curve25519.projective-split-protocol/v1",
+  "frozen_date": "2026-11-18",
+  "status": "frozen_before_implementation_or_measurement",
+  "curve": {"family": "curve25519", "k": 20, "p": 1048573, "r": 131203},
+  "cells": {"t": [3, 4, 5, 6], "random_targets": 32, "planted_targets": 8, "seed": 20261118, "cap_s": 900},
+  "baseline": {"m": 3, "mode": "chain", "form": "bits"},
+  "candidate": {"m": 3, "mode": "projective", "form": "bits"},
+  "primary_unit": "F_p multiply-adds in f4_fp_tower elimination",
+  "qualification": {
+    "paired_ratio_upper_95_lt": 0.8,
+    "invalid_rows": 0,
+    "planted_exact_fraction": 1.0,
+    "native_work_ratio_max": 2.0,
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 20261118
+  },
+  "m3_exponent_rule": "upper_95_slope_ln_cost_on_ln_base_size < 0",
+  "m4_gate": "freeze addendum before data; upper_95 solver-cost slope < 0.5; component result is not total subexponential ECDLP"
+}

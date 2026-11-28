@@ -1,0 +1,15 @@
+{
+  "action": "Run prose lint and attach the required producer-evidence labels before hashing the protocol; retain the exact pre-call text and do not silently rewrite it after execution.",
+  "created": "2026-11-19T20:55:35Z",
+  "evidence": [
+    "research/prime_conductor_gap80_20261031/twist-transport-20261119/post-call-protocol-annotations.json",
+    "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/protocol-annotation.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "ecbench-measure"
+  ],
+  "trigger": "Freezing an experiment protocol that will be cited as immutable evidence",
+  "why": "Native and Rust protocol paragraphs with negated speedup claims triggered lint after runs, requiring explicit archived-original mappings even though no parameters changed."
+}

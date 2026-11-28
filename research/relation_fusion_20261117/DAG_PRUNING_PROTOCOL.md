@@ -1,0 +1,7 @@
+# Prospective DAG sparsification
+
+Before new data, freeze this generic policy: remove definition nodes unreachable from final basis proofs; then process remaining nodes in reverse topological order, inlining a node only when its proof is a single term or its current global cofactor-use count is one. Inline by exact polynomial multiplication of coefficient monomials and modular accumulation of duplicate generator/monomial terms. Refuse an individual inlining when it exceeds existing degree64,50000localterms,1millionlocalproduct bounds. Keep that node rather than relax a cap. Reindex retained nodes in original topological order.
+
+All original inputs are retained. Verify every transformed local identity against earlier generators, all final membership/original containment and product/standard S-pair obligations. Final v2 packed consumer and fresh CAS replay remain mandatory; p31 expanded-v1 legacy shadow must also agree. The unchanged unpruned DAG constructor remains an explicit control. No timing or15x inference from smaller proof counts. Goal active. Use same fixed six existing field/dimension/seed7 correctness fixtures; no new seeds or dimensions. [pcc:unverified]
+
+Trace nodes,proof terms and referenced polynomial products before/after; retain cap-refusal counts. This measures certificate work,not F4 solving degree or intrinsic degree of regularity. Sources: DAG74 qualification,original v1/v2consumercontracts and exact generator-linear proof semantics. KBunavailable,no noveltyclaim.

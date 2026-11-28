@@ -1,0 +1,185 @@
+name: Original ledger artifact transport02 through a new tag
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/chained-transfer-ledger-artifact-transport-02.yml'
+      - 'research/chained_jacobian_transfers_20261110/LEDGER_ARTIFACT_TRANSPORT_02.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: chained-ledger-metadata02-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  original-transport:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SOURCE_REVISION: c019950bd36d74bbfa379d346c3943dec591a4df
+      BASE_REVISION: 1487e3a55efaacf899ab2553af7ff8fbccae22f6
+      TRUSTED_REVISION: 2d46258afc20188b8593b3a0693183d1282e0aaf
+      PAYLOAD: research/chained_jacobian_transfers_20261110/evidence/public-n4-concurrent-main-merge-ledger-divergence-01/entire-original-publication-and-remote-divergence-evidence.tar.xz
+      PAYLOAD_SHA256: a7072da26d05a0e27ba2f43f26584887979484e1faee0e2e08594fb108e73fe1
+    steps:
+      - name: Initialize complete and partial custody output
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/chained-ledger-transport02"
+          mkdir "$out"
+          date -u +%FT%TZ > "$out/start.txt"
+          printf '%s\n' "$SOURCE_REVISION" > "$out/source-head.txt"
+          printf '%s\n' "$TRUSTED_REVISION" > "$out/trusted-head.txt"
+          printf '%s\n' '${{ github.workflow_sha }}' > "$out/workflow-revision.txt"
+      - name: Checkout immutable original artifact tool and policy
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          repository: isogeny-labs/crypto
+          ref: 2d46258afc20188b8593b3a0693183d1282e0aaf
+          path: trusted
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/artifacts/
+            /.artifacts/
+            /.github/scripts/artifact_prefetch.py
+      - name: Checkout exact original source as data
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          repository: isogeny-labs/crypto
+          ref: c019950bd36d74bbfa379d346c3943dec591a4df
+          path: candidate
+          token: ${{ secrets.ARTIFACT_AUTOFIX_PUSH_TOKEN }}
+          fetch-depth: 0
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/artifacts/
+            /.artifacts/
+            /research/chained_jacobian_transfers_20261110/evidence/public-n4-concurrent-main-merge-ledger-divergence-01/
+      - name: Retain the exact executing workflow source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: executed-workflow
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/workflows/chained-transfer-ledger-artifact-transport-02.yml
+      - name: Verify original tool, policy, source and full regular payload
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/chained-ledger-transport02"
+          test "$(git -C candidate rev-parse HEAD)" = "$SOURCE_REVISION"
+          test "$(git -C trusted rev-parse HEAD)" = "$TRUSTED_REVISION"
+          cmp trusted/tools/artifacts/artifacts.py candidate/tools/artifacts/artifacts.py
+          cmp trusted/.artifacts/config.json candidate/.artifacts/config.json
+          echo 'ebca27d94ae3c94099688621823105c7e8e624b14210ea1d62eb0917620762e9  trusted/tools/artifacts/artifacts.py' | sha256sum --check
+          echo 'fdbebcc590e8b71ccd4335f36fc1036992b85184984a8e5583eeaf5bd36af172  trusted/.artifacts/config.json' | sha256sum --check
+          echo '26f004f2db51bc5a24217610c2a082d055380a1b1b428d7a3665adc959f29a9e  trusted/.github/scripts/artifact_prefetch.py' | sha256sum --check
+          test -f "candidate/$PAYLOAD" && test ! -L "candidate/$PAYLOAD"
+          test "$(wc -c < "candidate/$PAYLOAD")" -eq 726536
+          printf '%s  %s\n' "$PAYLOAD_SHA256" "candidate/$PAYLOAD" | sha256sum --check
+          git -C candidate status --porcelain --untracked-files=all > "$out/original-source-status.txt"
+          test ! -s "$out/original-source-status.txt"
+          git -C candidate cat-file commit HEAD > "$out/original-source-commit.txt"
+          git -C candidate show HEAD:pcc/ledger.jsonl > "$out/entire-original-source-ledger.jsonl"
+          cp "candidate/$PAYLOAD" "$out/entire-original-payload.tar.xz"
+          cp trusted/tools/artifacts/artifacts.py "$out/immutable-original-artifacts.py"
+          cp trusted/.artifacts/config.json "$out/immutable-original-policy.json"
+          cp trusted/.github/scripts/artifact_prefetch.py "$out/immutable-original-prefetch.py"
+          cp executed-workflow/.github/workflows/chained-transfer-ledger-artifact-transport-02.yml "$out/actual-workflow.yml"
+      - name: Prepare pinned AWS CLI before credentialed original migration
+        run: |
+          set -euo pipefail
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/ledger-artifact-awscli"
+            "$RUNNER_TEMP/ledger-artifact-awscli/bin/python" -m pip install --disable-pip-version-check awscli==1.46.2
+            echo "$RUNNER_TEMP/ledger-artifact-awscli/bin" >> "$GITHUB_PATH"
+          fi
+      - name: Prefetch original changed blobs with the immutable helper
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/chained-ledger-transport02"
+          set +e
+          python3 ../trusted/.github/scripts/artifact_prefetch.py "$BASE_REVISION" "$SOURCE_REVISION" > "$out/original-prefetch.log" 2>&1
+          code=$?
+          set -e
+          printf '%s\n' "$code" > "$out/original-prefetch.exit"
+          cat "$out/original-prefetch.log"
+          exit "$code"
+      - name: Execute only original whole upload and remote replay
+        working-directory: candidate
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/chained-ledger-transport02"
+          cmp ../trusted/tools/artifacts/artifacts.py tools/artifacts/artifacts.py
+          cmp ../trusted/.artifacts/config.json .artifacts/config.json
+          set +e
+          python3 ../trusted/tools/artifacts/artifacts.py migrate "$BASE_REVISION" "$SOURCE_REVISION" > "$out/original-migrate.log" 2>&1
+          code=$?
+          set -e
+          printf '%s\n' "$code" > "$out/original-migrate.exit"
+          cat "$out/original-migrate.log"
+          test "$code" -eq 0 || exit "$code"
+          cmp "$PAYLOAD" "$out/entire-original-payload.tar.xz"
+          git diff --cached --check
+          dir=${PAYLOAD%/*}
+          file=${PAYLOAD##*/}
+          jq --exit-status --arg file "$file" --arg sha "$PAYLOAD_SHA256" '.files|keys==[$file] and .[$file]=={"bytes":726536,"sha256":$sha}' "$dir/.artifacts.json"
+          cp "$dir/.artifacts.json" "$out/actual-original-generated-artifacts.json"
+          cp "$dir/.gitignore" "$out/actual-original-generated-gitignore.txt"
+          printf '%s\0' "$PAYLOAD" "$dir/.artifacts.json" "$dir/.gitignore" | sort -z > "$out/expected-three-paths.paths0"
+          git diff --cached --no-renames --name-only -z | sort -z > "$out/actual-three-paths.paths0"
+          cmp "$out/expected-three-paths.paths0" "$out/actual-three-paths.paths0"
+      - name: Preserve actual direct-parent bot and create a genuinely new tag
+        working-directory: candidate
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/chained-ledger-transport02"
+          git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'Move PR data files to the artifact store'
+          bot=$(git rev-parse HEAD)
+          test "$(git rev-parse HEAD^)" = "$SOURCE_REVISION"
+          git diff --no-renames --name-only -z "$SOURCE_REVISION" HEAD | sort -z > "$out/actual-bot-three-paths.paths0"
+          cmp "$out/expected-three-paths.paths0" "$out/actual-bot-three-paths.paths0"
+          git show HEAD:pcc/ledger.jsonl > "$out/entire-actual-bot-ledger.jsonl"
+          cmp "$out/entire-original-source-ledger.jsonl" "$out/entire-actual-bot-ledger.jsonl"
+          printf '%s\n' "$bot" > "$out/actual-bot-head.txt"
+          git cat-file commit HEAD > "$out/entire-actual-bot-commit.txt"
+          git bundle create "$out/actual-bot-with-original-source-prerequisite.bundle" HEAD "^$SOURCE_REVISION"
+          git bundle verify "$out/actual-bot-with-original-source-prerequisite.bundle" > "$out/actual-bot-bundle-verification.log" 2>&1
+          [[ "$GITHUB_RUN_ID" =~ ^[0-9]+$ && "$GITHUB_RUN_ATTEMPT" =~ ^[0-9]+$ ]]
+          ref="refs/tags/chained-transfer-ledger-metadata02-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          printf '%s\n' "$ref" > "$out/actual-new-tag-ref.txt"
+          git ls-remote --tags origin "$ref" > "$out/tag-before.txt"
+          test ! -s "$out/tag-before.txt"
+          set +e
+          timeout 180 git push --no-force origin "HEAD:$ref" > "$out/actual-new-tag-push.log" 2>&1
+          code=$?
+          set -e
+          printf '%s\n' "$code" > "$out/actual-new-tag-push.exit"
+          cat "$out/actual-new-tag-push.log"
+          test "$code" -eq 0 || exit "$code"
+          git ls-remote --tags origin "$ref" > "$out/tag-after.txt"
+          read -r actual_sha actual_ref < "$out/tag-after.txt"
+          test "$actual_sha" = "$bot" && test "$actual_ref" = "$ref"
+          git status --porcelain --untracked-files=all > "$out/actual-bot-final-status.txt"
+          test ! -s "$out/actual-bot-final-status.txt"
+          printf '0\n' > "$out/original.exit"
+          date -u +%FT%TZ > "$out/finish.txt"
+      - name: Retain complete generated source, payload, bot and partial evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: chained-ledger-metadata02-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/chained-ledger-transport02
+          if-no-files-found: error

@@ -1,0 +1,152 @@
+{
+  "oracle": {
+    "out": {
+      "monic_polynomials": 668,
+      "factor_product_pairs": 160,
+      "reduction_checks": 192,
+      "counterexample_fields": [
+        {
+          "degree": 1,
+          "accepted": false
+        },
+        {
+          "degree": 2,
+          "accepted": true
+        },
+        {
+          "degree": 3,
+          "accepted": false
+        }
+      ],
+      "original_complete": false
+    },
+    "error": null
+  },
+  "profile": {
+    "out": {
+      "actual_controls": 48,
+      "local_factor_checks": 1344,
+      "factor_valid_controls": 0,
+      "original_complete": false,
+      "formulations": {
+        "candidate": {
+          "inputs": 63,
+          "variables": 58024,
+          "clauses": 210289,
+          "gate_kinds": {
+            "false": 1,
+            "true": 1,
+            "input": 63,
+            "xor": 35961,
+            "not": 53,
+            "and": 21947
+          },
+          "graph_sha256": "764e379ad846e2279e7667cc3130a9c0ec1e18beec4e2701af6d91ab155054d1"
+        },
+        "control": {
+          "inputs": 63,
+          "variables": 81218,
+          "clauses": 296189,
+          "gate_kinds": {
+            "false": 1,
+            "true": 1,
+            "input": 63,
+            "xor": 52316,
+            "not": 74,
+            "and": 28765
+          },
+          "graph_sha256": "383c6f0b28995d02d0105ab6aa1f8778c3f2fd64f04f71803f8461162790d698"
+        }
+      },
+      "synthesis": {
+        "synthesis_rounds": 256,
+        "pair_events": 662327,
+        "stop_reason": "round_cap",
+        "target_forms": 403,
+        "pair_index_entries": 25811,
+        "fallback_forms": 0
+      },
+      "total_seconds": 2.1846787779941224,
+      "same_conditional_parameter_contract": true,
+      "scope": "k3only;factorization+14residuefieldlocalconditions;notfullprefixsupport/originalsource/U/alloutercases"
+    },
+    "error": null
+  },
+  "search": {
+    "out": {
+      "models": [],
+      "original_complete": false,
+      "original_exact_root_count": null,
+      "independent_unsat_certificate": false,
+      "scope": "conditional k3only,fixednecessarynormfamily;otherstrata/outerfamilies/source/Uunresolved",
+      "inputs": 63,
+      "variables": 58024,
+      "cold_compile_seconds": 1.0550180659920443,
+      "soft_total_target_seconds": 40,
+      "backend_configuration_readback": {
+        "threads": "1",
+        "cut": "true",
+        "cut.xor": "true",
+        "cut.aig": "true",
+        "cut.delay": "0",
+        "anf": "false"
+      },
+      "formulation_seconds": 4.077599180978723,
+      "version": "4.15.4",
+      "cpu_affinity": [
+        0
+      ],
+      "last_answer": "unknown",
+      "termination": "unknown",
+      "reason_unknown": "timeout",
+      "statistics": {
+        "sat mk clause 2ary": "194892",
+        "sat mk clause 3ary": "52080",
+        "sat mk clause nary": "559894",
+        "sat mk var": "115934",
+        "sat gc clause": "261691",
+        "sat del clause": "451075",
+        "sat conflicts": "303752",
+        "sat decisions": "333795",
+        "sat propagations 2ary": "4398218",
+        "sat propagations nary": "146190649",
+        "sat restarts": "42706",
+        "sat minimized lits": "1088036",
+        "sat subs resolution dyn": "1153",
+        "sat units": "29827",
+        "sat elim bool vars res": "20137",
+        "sat backjumps": "303749",
+        "sat backtracks": "3",
+        "sat elim clauses": "42114",
+        "sat elim literals": "12971",
+        "sat subsumed": "10557",
+        "sat subs resolution": "11947",
+        "sat ate": "123",
+        "sat scc elim vars": "46765",
+        "sat scc elim binary": "12",
+        "sat tr": "12",
+        "sat probing assigned": "6",
+        "sat-cut.eqs": "112",
+        "sat-cut.cuts": "243884",
+        "sat-cut.ands": "21947",
+        "sat-cut.xors": "35961",
+        "sat-cut.xands": "4337",
+        "sat-cut.xites": "15206",
+        "sat-cut.xxors": "55725",
+        "sat-cut.dc-reduce": "844",
+        "rlimit count": "147740385",
+        "max memory": "336.49",
+        "memory": "174.47",
+        "num allocs": "39200981318.0",
+        "time": "36.501"
+      },
+      "engine_seconds": 40.58239345898619,
+      "soft_target_overshoot_seconds": 0.5823934589861892,
+      "complete": false,
+      "exact_root_count": null
+    },
+    "error": "nativeunknown"
+  },
+  "qualified_speedup": null,
+  "original_complete": false
+}

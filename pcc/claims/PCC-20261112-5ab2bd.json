@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T05:01:36Z",
+ "id": "PCC-20261112-5ab2bd",
+ "kind": "statement",
+ "producer": {
+  "commit": "00cba85497f927a0f41a4436b2ae09c72aa885f7",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/quartic-independent-source-04.rs",
+    "sha256": "fede4a6454313cacf774e83536a24297f4bf7724b6d1be35080f9074a749d2db"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/quartic-independent-native-04.txt",
+    "sha256": "91fbe5c54bf36171a1d825b14774c24375922b0c7a2fd5a63aa54d97f26da6c5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/quartic-independent-clippy-04.txt",
+    "sha256": "802d199796357018a4256e536e83f596fd0615bb961eb20233010bab3235cc63"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/quartic-independent-source-04.sha256",
+    "sha256": "0b700961faf4b7e861d6ff25df6684f4cb7c84f31a0ed638ef240274f2474a42"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/successor-preflight/fixtures/quartic/t0-e109-points.tsv",
+    "sha256": "587e0d8ee66edc5444f3163d765252395b8cac93a6d570e1ac5edb130ab35ff9"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned CT28 independent flat-Fp6 checker04 passes2tests/strictClippy:exact quartic curve identity/gcd/smoothness/separablexdegree4,all118 distinct complete rational source/certificate coordinates,finite infinity limits and four simple geometric pole branches. Actual source sextic irreducibility checked by existing Rabin constructor. Mutated numerator/codomain reject;negated ordinate still satisfies curve equation but disagrees at118points,confirming identity alone is insufficient. No producer interpolation/Balanced/Richelot import;old expected-value provenance/global geometry are explicit written6afa9c dependencies. No independent Richelot evaluation or timing claim."
+}

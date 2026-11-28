@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T06:42:50Z",
+ "id": "PCC-20261117-051d64",
+ "kind": "measurement",
+ "producer": {
+  "commit": "c5cbb67b19fe39864da7f8c9b29726696ba01580",
+  "model": "Codex",
+  "session": "root-recurrence-20261117"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/recurrence_20261117/results/a3-final.json",
+    "sha256": "0074d64ec83e1e138897319a29feabd379c09f4ebfe131688eee87c9c188958a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/recurrence_20261117/blocks.cpp",
+    "sha256": "8e566e87ff9e4c9b87aa01c781ed3b86de3cabd6cd014d9f63c1c70314ea6f72"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/recurrence_20261117/analyze.cpp",
+    "sha256": "eee6bf66e0f805e18ab1ed53d6e8d9e32421d9b973936443cfee6ab9aff28965"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/recurrence_20261117",
+ "statement": "Third local recurrence run completes1512 checked rows. Degree256 complete wall medians: dense49.887ms, old trace5.000ms, block32 trace3.929ms, block64 trace4.266ms, block128 trace5.944ms. Median paired improvement block32 versus old trace1.2629 and dense12.7415 across40 units. Block64/128 have worse median time and RSS than block32; observed finite-panel frontier includes old trace and block32. Complete F83 root example does not improve with these trace changes; existing pullback gives4.6654 median paired improvement versus dense. Root-finding ratios are not ECDLP or rho ratios; no global optimality or signed-validation claim."
+}

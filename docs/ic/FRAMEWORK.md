@@ -24,6 +24,11 @@ is visible where it lands, not only in the total.
 
 ## 1. Quick start
 
+For library consumers, see [Rust extension and hardening](../rust-extension-hardening.md)
+and the runnable [`ic_custom_pipeline` example](../../examples/ic_custom_pipeline.rs).
+Application-owned registries and matrix factories allow downstream composition
+without editing the CLI's built-in lists.
+
 For one-command structured-base search with live CADO-style progress, exact
 inventories, verified decomposition probes and resumable attempts, see
 [the native factor-base sweeper](factor-base-sweep/README.md). Its live rates
@@ -139,8 +144,13 @@ operations.
   in counted `S`.
 
 A weighted plan is cheaper only at its weight; it is never a ranking across
-the band. The rule set is versioned (`ic-planner/4` since the weight rules were withdrawn);
-change a rule and the version changes with it.
+the band. The rule set is versioned (`ic-planner/5`: fiber-closed Frobenius
+oracle when cofactor `h > 1`; `ic-planner/4` withdrew the weight rules);
+change a rule and the version changes with it. The `h > 1` fiber default is
+`Support::Measured` on the matched K0-13 capsule (not an S win over counted);
+see [`FIBER_H_GT1_VALIDATION.md`](FIBER_H_GT1_VALIDATION.md).
+
+Pair-table DRAM/layout knobs for the m=3 host path are listed in [`PAIR_TABLE_LAYOUT.md`](PAIR_TABLE_LAYOUT.md).
 
 ---
 

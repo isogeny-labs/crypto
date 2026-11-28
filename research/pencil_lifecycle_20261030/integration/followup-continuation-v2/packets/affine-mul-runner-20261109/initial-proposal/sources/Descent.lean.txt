@@ -1,0 +1,70 @@
+import Admit
+set_option autoImplicit false
+namespace MonicTermination
+open Polynomial ScaleTrim MonicRemainder RemainderPolynomial CoefficientTraversal
+
+theorem top_coefficient (p : UInt64) (xs : List UInt64) :
+ (wordsPoly p xs).coeff (xs.length-1)=(((xs.getLast?).getD 0).toNat : ZMod p.toNat) := by
+ rw [wordsPoly_coefficient, List.getLast?_eq_getElem?]
+
+theorem last_coefficient (p : UInt64) (xs : List UInt64) (h : xs≠[]) :
+ (wordsPoly p xs).coeff (xs.length-1)=((xs.getLast h).toNat : ZMod p.toNat) := by
+ rw [top_coefficient]
+ simp [List.getLast?_eq_some_getLast h]
+
+def raw (p : UInt64) (b r : List UInt64) (hr : r≠[]) (hl : b.length≤r.length) : List UInt64 :=
+ (RemainderWord.run p (r.getLast hr) (events (r.length-b.length) b (by omega)) (state r)).val.toList
+
+theorem raw_length (p : UInt64) (b r : List UInt64) (hr : r≠[]) (hl : b.length≤r.length) :
+ (raw p b r hr hl).length=r.length := by
+ simp only [raw,Array.length_toList]
+ exact (RemainderWord.run p (r.getLast hr) (events (r.length-b.length) b (by omega)) (state r)).property
+
+theorem raw_top_zero (p : UInt64) [Fact p.toNat.Prime] (b r : List UInt64)
+ (hr : r≠[]) (hl : b.length≤r.length) (hp : 0<p.toNat) (hb : p.toNat<2^31)
+ (hbs : Canon p b) (hrs : Canon p r) (hm : b.getLast?=some 1) :
+ (wordsPoly p (raw p b r hr hl)).coeff (r.length-1)=0 := by
+ have hbn:=monic_nonempty b hm
+ have hbl : 0<b.length := List.length_pos_iff.mpr hbn
+ have hshift : r.length-b.length≤r.length-1 := by omega
+ have hindex : r.length-1-(r.length-b.length)=b.length-1 := by omega
+ have hs:=generated_polynomial_step p (r.getLast hr) (r.length-b.length) b (by omega)
+   (state r) hp hb (hrs _ (List.getLast_mem hr)) (state_good p r hrs) hbs
+ have hh : wordsPoly p (raw p b r hr hl)=wordsPoly p r-
+   C ((r.getLast hr).toNat : ZMod p.toNat)*X^(r.length-b.length)*wordsPoly p b := by
+   simpa only [raw,wordsPoly_array,state_polynomial] using hs
+ rw [hh,coeff_sub,last_coefficient p r hr,mul_assoc,coeff_C_mul,coeff_X_pow_mul',if_pos hshift,hindex,top_coefficient,hm]
+ simp
+
+theorem raw_last_zero (p : UInt64) [Fact p.toNat.Prime] (b r : List UInt64)
+ (hr : r≠[]) (hl : b.length≤r.length) (hp : 0<p.toNat) (hb : p.toNat<2^31)
+ (hbs : Canon p b) (hrs : Canon p r) (hm : b.getLast?=some 1) :
+ (raw p b r hr hl).getLast?=some 0 := by
+ let out:=raw p b r hr hl
+ have hlen : out.length=r.length := raw_length p b r hr hl
+ have hn : out≠[] := by intro h; simp [h] at hlen; exact hr (List.length_eq_zero_iff.mp hlen.symm)
+ have hg : Canon p out := list_good p _ (RemainderWord.run_correct p _ _ _ hp hb
+   (hrs _ (List.getLast_mem hr)) (state_good p r hrs) (events_good p _ b _ hbs)).1
+ have hz:=raw_top_zero p b r hr hl hp hb hbs hrs hm
+ rw [← hlen,last_coefficient p out hn] at hz
+ have hv:=congrArg ZMod.val hz
+ rw [ZMod.val_natCast_of_lt (hg _ (List.getLast_mem hn))] at hv
+ have hw : out.getLast hn=0 := UInt64.toNat_inj.mp (by simpa using hv)
+ change out.getLast?=some 0
+ simp [List.getLast?_eq_some_getLast hn,hw]
+
+theorem selected_shorter (p : UInt64) [Fact p.toNat.Prime] (b r : List UInt64)
+ (hr : r≠[]) (hl : b.length≤r.length) (hp : 0<p.toNat) (hb : p.toNat<2^31)
+ (hbs : Canon p b) (hrs : Canon p r) (hm : b.getLast?=some 1) :
+ (selected p b r hr hl).length<r.length := by
+ have hz:=raw_last_zero p b r hr hl hp hb hbs hrs hm
+ have hlen:=raw_length p b r hr hl
+ have hn : 0<r.length := List.length_pos_iff.mpr hr
+ change (trimFuel (raw p b r hr hl).length (raw p b r hr hl)).length<r.length
+ generalize he : raw p b r hr hl=out at *
+ have hk : out.length=(out.length-1)+1 := by omega
+ rw [hk,trimFuel,if_pos hz]
+ have ht:=trim_length (out.length-1) out.dropLast
+ simp only [List.length_dropLast] at ht
+ omega
+end MonicTermination

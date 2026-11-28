@@ -1,0 +1,5 @@
+# Exact tmux Ctrl-C control for validation receipt wrapper
+
+At 2026-11-15 21:22 UTC, the [committed signal-aware wrapper](../k600-m6-validation-wrapper-20261115/run-with-receipt.sh) at SHA-256 `090a3020c0ec2862735af0b1c0ab10258199fd4bcefc11c1b55daa0113c48bb3` ran a 30-second sleep child through [this launcher](launch.sh) in a dedicated tmux session. After one second, `tmux send-keys C-c` reproduced the operator interaction that had lost the earlier validation receipt. This control contains no cryptographic work or performance measurement.
+
+The wrapper wrote [a terminal receipt](control.receipt), SHA-256 `edd661e34bad9cd4657619658c18c9d3401da55dea8f832c5ccaa431362cfb43`, with `wrapper_exit_code=130`, `stop_signal=INT`, `child_exit_code=unknown`, and the SHA-256 of the zero-byte [raw child log](control.log). The tmux session was absent after the control. The result demonstrates terminal capture for this exact Ctrl-C route; it does not cover SIGKILL, a host crash, full storage exhaustion, or the actual checkpoint test. No IC graph changes.

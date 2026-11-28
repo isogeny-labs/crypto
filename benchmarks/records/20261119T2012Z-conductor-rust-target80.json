@@ -1,0 +1,91 @@
+{
+  "branch": "research/conductor-widefield-harness-20261118",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/run-case.sh",
+        "target80",
+        "research/prime_conductor_gap80_20261031/local-20261119/target80-33points.txt",
+        "1",
+        "500000000000",
+        "64",
+        "60"
+      ],
+      "cwd": ".",
+      "exit": 2,
+      "started_utc": "2026-11-19T20:13:08+00:00",
+      "wall_s": 0.037
+    },
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/run-case-v2.sh",
+        "target80-signed-v2",
+        "research/prime_conductor_gap80_20261031/local-20261119/target80-33points.txt",
+        "1",
+        "500000000000",
+        "64",
+        "60"
+      ],
+      "cwd": ".",
+      "exit": 124,
+      "started_utc": "2026-11-19T20:21:24+00:00",
+      "wall_s": 60.017
+    }
+  ],
+  "commit": "8c71d21370fd541c74e5d48f9b429d1615df6c62",
+  "commit_dirty": true,
+  "created_utc": "2026-11-19T20:12:58+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/prime_conductor_gap80_20261031/rust-evaluator-20261119"
+  ],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "fd3f496179cc",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261119T2012Z-conductor-rust-target80",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "rust_original80_censored_attempt_elapsed",
+      "note": "Actual final Rust attempt reaches60second cap, exit124, no quotient/images; censored elapsed only, not successful solve time or lower bound.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 60.008
+    }
+  ],
+  "problem": "kernel:rust-conductor80",
+  "raw": [
+    {
+      "bytes": 12164,
+      "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/raw-results.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/75/7591f3dfad2e846a0a3e5edb1fc1770f41a7e4229cff92340ba122f75679210e",
+      "sha256": "7591f3dfad2e846a0a3e5edb1fc1770f41a7e4229cff92340ba122f75679210e",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/reports/report.pdf",
+    "png": [],
+    "svg": [
+      "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/reports/architecture.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "conductor-rust-target80",
+  "status": "open",
+  "summary": "Initial Rust unsigned-codec refusal is retained separately; final signed-codec original80bit attempt hits60second watchdog without quotient/images. Raw bundle included in Git; S3 upload not verified, record remains open.",
+  "validation": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/summary.json"
+}

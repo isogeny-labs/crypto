@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T04:58:38Z",
+ "id": "PCC-20261124-862d78",
+ "kind": "statement",
+ "producer": {
+  "commit": "98d5ada1527e64ba56946a3e44a67561347215bc",
+  "model": "",
+  "session": "codex-ecc2k-cold10m-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold10m_20261124/candidate2/summary.json",
+    "sha256": "7b23337b25c58c8418dac89c80ca73efe998f74d04e6124d8b6d7dbc46525cb4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold10m_20261124/candidate2/grid-audit.json",
+    "sha256": "68d68ed188b45edfa730cd5cd7deb0787769f0979e92c01b6ff617ea38dd0c69"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold10m_20261124/candidate2/polynomial-replay.json",
+    "sha256": "5fc7c2381969b680b699fdb109b0e2561304558d60ad50b155da69aabd68c7e3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold10m_20261124/candidate2/checks/source-final.json",
+    "sha256": "91e5e3cbb938e731748fd770b6207f41771abd5982a5e2bd8940063cceee953d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Second strict-sub10M full panel completes120/120 rows and80 schoolbook tuple replays with unchanged sources at completion. Uniform n131 median12,304,900Ir misses10M; four of six non-regression controls fail, including oracle against12.286M incumbent. Retain rejected bundle and all data; no admission or target success."
+}

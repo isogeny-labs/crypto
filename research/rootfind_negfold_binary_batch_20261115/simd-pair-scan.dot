@@ -1,0 +1,17 @@
+digraph PairedSimdScan {
+  graph [rankdir=TB, bgcolor="white", pad="0.12", nodesep="0.55", ranksep="0.36", fontname="Helvetica"];
+  node [shape=box, style="rounded,filled", fillcolor="#edf3fa", color="#5b779a", fontname="Helvetica", fontsize=14, margin="0.16,0.12"];
+  edge [color="#68798c", arrowsize=0.7];
+  base [label="K13 signed base\n1 self-negative + 16 pairs"];
+  layout [label="Check layout once\nreciprocal signs, equal x, finite"];
+  blocks [label="Ordered scan\n1 singleton, then 4 paired blocks"];
+  simd [label="x86 paired SIMD kernel\ncompile checked, runtime pending", fillcolor="#fff1d6", color="#aa7935"];
+  fallback [label="Portable or exceptional fallback\nARM parity checked", fillcolor="#dff4e8", color="#478365"];
+  probe [label="Ordered lazy table probes\nfirst witness preserved"];
+  {rank=same; simd; fallback;}
+  base -> layout -> blocks;
+  blocks -> simd [label="CPU, field and inputs admit"];
+  blocks -> fallback [label="otherwise"];
+  simd -> probe;
+  fallback -> probe;
+}

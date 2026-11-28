@@ -1,0 +1,18 @@
+[package]
+name = "crypto-lib"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+path = "lib.rs"
+
+[[bin]]
+name = "identity_certificate_dickson_s3"
+path = "../repo-audit/examples/identity_certificate_dickson_s3.rs"
+
+[dependencies]
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+hex = "=0.4.3"
+sha2 = "=0.10.9"

@@ -1,0 +1,260 @@
+# PKM §3.4 run as the paper defines it: `|V| = p^(1/m)` at five field sizes
+
+Date: 2026-11-24. Branch `codex/pkm-map-sweep-20261123` (draft PR #5067).
+Status: measured end-to-end runs plus an independent construction check. All
+empirical statements are `[pcc:unverified]` until an independent replay.
+
+This closes the "full relation/LA/descent" item that was left open for this
+lane. It does **not** replace the degree-32 component sweeps; it asks the
+narrower question those sweeps did not: does the paper's Algorithm 1, with the
+§3.4 auxiliary-isogeny factor base at the paper's own density condition,
+actually collect relations, reach a rank, and recover a scalar?
+
+The earlier NIST-curve pilot (`research/pkm_nist_pm1_20261122`) ran the Kummer
+and Dickson-torus towers at composed degree ≤ 4. Neither is the §3.4
+construction: no `E'`, no smooth `H`, no Vélu chain, no `χ`. The runs below
+are the construction the paper defines.
+
+## 1. What the paper defines
+
+[Petit–Kosters–Messeng, PKC 2016](https://people.maths.ox.ac.uk/petit/files/16PKC_primeECDLP.pdf)
+
+**Algorithm 1** (§3.1):
+
+1. fix `m`;
+2. find a map `L` and a decomposition `L = L_n0 ∘ … ∘ L_1`;
+3. `F = {(x, y) ∈ E(K) : L(x) = 0}`, `|F| ≈ deg L ≈ p^(1/m)`;
+4. collect `deg L + Δ` relations:
+   a. draw `a, b ∈ F_p`, compute `(X, Y) = aP + bQ`;
+   b. solve
+      `S_{m+1}(x_{1,1}, …, x_{m,1}, X) = 0`,
+      `x_{i,j+1} = L_j(x_{i,j})`,
+      `0 = L_{n0}(x_{i,n0})`   (system (4); rational `L_j` cleared of denominators);
+   c. store the relation `Σ P_i = aP + bQ`;
+5. linear algebra to recover `k`.
+
+**§3.4 construction.** An auxiliary `E'/F_p` whose order has a divisor
+`|H| = ∏ p_i ≈ p^(1/m)` with every `p_i` small; `H ⊂ E'(F_p)`; `V` is the set
+of `x`-coordinates of a *coset* of `H`; `φ: E' → E'` is the isogeny with kernel
+`H`, written as a chain `φ = φ_n0 ∘ … ∘ φ_1` of Vélu maps
+`φ_j = (ξ_j/ψ_j², y·ω_j/ψ_j³)`; `L_j = ξ_j/ψ_j²` and
+`L_n0 = ξ_n0/ψ_n0² − χ`, with `χ` the abscissa of a non-2-torsion image point.
+Lemma 1 then gives `|{x : L(x) = 0}| = |H|`.
+
+**§3.2 density.** Expected solutions per target `(deg L)^m/(m!·p)`; at
+`(deg L)^m ≈ m!·p` that is `Θ(1)` and the relation search needs a constant
+number of systems per relation.
+
+**§3.5 precomputation.** Random-curve search: on average about `p^(1/m)`
+curves are tried before one has a large enough smooth divisor.
+
+The paper's own §4 experiment (Table 5) stops at the relation search: it
+reports `nbsols`, the degree of regularity `D`, time and memory for `n1 ≤ 11`
+(`p ≤ 3 173 683`), with `V = x(coset)` of an order-`2^n1` subgroup. It does not
+run step 5.
+
+## 2. What these runs do
+
+Binary: `ic` SHA-256 `06439ae5119b5ed69c413df90e7a65dc67541dd1dfb9f6ac8d77cf2bd4441c59`
+(the hash the earlier PKM protocols pin).
+
+```
+ic bench --bits B --family generic \
+  --factor-base "prime-isogeny:t=T,seed=0,aux=ordinary" \
+  --oracle "pkm-semaev:m=M,engine=f4,degree=8,mode=chain" \
+  --targets walk --linalg incremental-gauss-full-rank-checked \
+  --max-trials N --solver-budget-seconds 30 --json
+```
+
+`--targets walk` is an `r`-adding walk whose jumps are `[a_j]G + [b_j]Q` with
+the coefficients tracked mod `r`: every target is `aP + bQ` for known `a, b`,
+i.e. Algorithm 1 step 4a, with the guard that no target is decomposed twice.
+The `--targets random` run below is step 4a literally (fresh `a, b` each trial).
+
+The factor base is the paper's §3.4 object (`src/cryptanalysis/ic_framework/prime_tower.rs`,
+`isogeny_tower`): search `E'/F_p` with `2^t | #E'`, take `Q` of exact order
+`2^t`, `V = x(R' + ⟨Q⟩)` with `2R' ∉ ⟨Q⟩` (so a coset and its negative are
+disjoint), build the `t` Vélu steps
+`y_{j+1} = y_j + τ_j/(y_j − ξ_j) = (y_j² − ξ_j y_j + τ_j)/(y_j − ξ_j)`,
+i.e. `ξ_j/ψ_j²` with `deg ξ_j = 2`, `ψ_j = y − ξ_j`, and the terminal
+`χ = x(φ(R'))`. The base is every point of the *target* curve `E` whose
+abscissa lies in `V`, one column per abscissa.
+
+The roster curves were built with `p ≈ 2^(2t)`; `√p` is 28.8, 62.5, 127.2,
+255.6, 511.7 at `t = 5, 6, 7, 8, 9` against `2^t = 32, 64, 128, 256, 512`.
+So the paper's condition `|F| ≈ deg L ≈ p^(1/2)` holds by construction, not by
+tuning after the fact.
+
+## 3. Results
+
+`pred = (2^t)^m/(m!·p)` is the paper's §3.2 formula; `predF = |F|^m/(m!·p)`
+uses the measured base size. `obs` is `relations_found / targets_tried`.
+`D` is the F4 solving degree; `aux` is the number of auxiliary curves tried.
+
+| p | t | m | \|V\|=2^t | √p | \|F\| | cols | pred | predF | obs | targets | rows | rank | D | aux | wall |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 827 | 5 | 2 | 32 | 28.8 | 36 | 18 | 0.62 | 0.78 | 0.554 | 74 | 41 | 19 | 5 | 58 | 5 s |
+| 3907 | 6 | 2 | 64 | 62.5 | 50 | 25 | 0.52 | 0.32 | 0.271 | 140 | 38 | 26 | 5 | 132 | 43 s |
+| 16187 | 7 | 2 | 128 | 127.2 | 142 | 71 | 0.51 | 0.62 | 0.485 | 270 | 131 | 72 | 5 | 175 | 122 s |
+| 16187 | 7 | 2 | 128 | 127.2 | 142 | 71 | 0.51 | 0.62 | 0.402 | 127 | 51 | 51 | 5 | 175 | 14 s |
+| 65353 | 8 | 2 | 256 | 255.6 | 268 | 134 | 0.50 | 0.55 | 0.391 | 128 | 50 | 50 | 5 | 641 | 59 s |
+| 261847 | 9 | 2 | 512 | 511.7 | 524 | 262 | 0.50 | 0.52 | 0.412 | 279 | 115 | 115 | 5 | 108 | 986 s |
+| 3907 | 4 | 3 | 16 | 15.7 | 18 | 9 | 0.175 | 0.249 | 0.270 | 37 | 10 | 10 | 6 | 7 | 142 s |
+
+Every row recovered the planted scalar and passed the harness's full-point
+check. Rows 3 and 4 are the same instance solved twice — walk targets and
+literal random `aP + bQ` — and both return `k = 9331`. Row 5 is the
+`incremental-gauss` (target-pinned) completion at 16 bits; see §5.
+
+Reading the table:
+
+* **Density.** The paper's `(deg L)^m/(m!·p)` predicts 0.50–0.62 and the runs
+  observe 0.27–0.55. Against the measured base size, `obs/predF` is 0.71, 0.85,
+  0.78, 0.64, 0.71, 0.76, 0.79, 1.09 — one constant factor, `≈0.77 ± 0.13`, across
+  sixteen-fold range in `p` and both `m`. The relation search is in the regime
+  the paper's analysis describes, and the analytic constant is right to within
+  the 1/4-to-4× that the heuristic claims.
+* **Precomputation.** §3.5 predicts about `p^(1/m) = 2^t` curves tried.
+  Measured 58, 132, 175, 641, 108 against 32, 64, 128, 256, 512 — same order,
+  and the two outliers are in opposite directions.
+* **Solving degree.** The paper's Magma runs report `D_av` (largest step
+  degree) rising from 5.00 at `n1 ≤ 5` to 5.42, 5.47, 5.42, 5.92 at
+  `n1 = 6..9` and 6.44, 6.45 at 10, 11, with `D_av^corr` at 5.00 through
+  `n1 = 9` and 6.00 at 10, 11. Our `solving_degree_max` — the same "largest
+  step degree" notion — is 5 at every `m = 2` rung through `t = 9`, and 6 at
+  `m = 3, t = 4`. Read that as a difference in the ring we hand the engine
+  (the tower quotient with its rewriting, not a raw polynomial list in Magma),
+  not as evidence about the algorithm's asymptotic degree; one run per rung,
+  four different primes, and a different engine.
+* **Cost.** `s/ρ` is `2·10^4` to `4·10^7` — no speedup, and none is possible
+  here. At `|V| = p^(1/2)` and `m = 2` the algorithm needs
+  `m!·p/(deg L)^(m-1) = 2√p` targets, so its cost is `≈ 2√p · T` against rho's
+  `≈ √p`; it loses by the per-system cost `T` (measured here as `10^4`–`10^6`
+  group-operation equivalents). §3.2's own criterion says the same: the win
+  needs larger `m` (targets `m!·p^(1/m)`) or a cheaper `T`.
+
+## 4. Independent verification
+
+`verify.py` re-derives the three things a reader should not take on trust.
+
+1. **The construction (§3.4), from its definition.** For the pilot cell
+   `p = 100003`, `t = 5`, the emitted `E': y² = x³ + 67190x + 45464`,
+   `#E' = 100352`, `V` of 32 values: all 32 are distinct and lift to `E'`; the
+   64 signed points are exactly `C ∪ (−C)` for `C = P0 + E'[2^5]` with `P0 =
+   (60340, 62458)`, `C ∩ (−C) = ∅`, and `2P0 ∉ H`; so `V` is the `x`-image of a
+   coset of the order-`2^5` subgroup and `χ` is not 2-torsion, as Lemma 1
+   requires. It then brute-forces the target `x_R = 90553` over `V` and finds
+   exactly 2 ordered / 1 unordered decomposition — the `m = 2` sign/swap pair,
+   which is also why the "two ordered decompositions per planted target" in the
+   earlier NIST pilot is a symmetry count, not a density measurement.
+2. **The answer.** The harness plants `k = 1 + seed mod (r − 1)`. `verify.py`
+   recomputes that formula outside the harness and compares it with `recovered`
+   for every run that recovered a scalar — seven of the eight result files; the
+   eighth is the strict-certificate run of §5. Values
+   `139, 2683, 2683, 9331, 9331, 60091, 203179` all match.
+3. Each run's own final check is a group-law test `[d]G == target` with counted
+   scalar multiplications, not a comparison of two copies of the same number.
+
+Together: the map is the paper's map, the relations are the paper's relations,
+and the answer is checked against something the harness did not produce.
+
+## 5. Where it stops
+
+* **Strict full-rank certificate.** `incremental-gauss-full-rank-checked` wants
+  rank `cols + 1 = 135` at 16 bits. Over 1 000 targets it reached 134 with 420
+  rows, 286 of them dependent, and stopped. The target itself was pinned much
+  earlier — rank 50 at target 128 — and the `incremental-gauss` run verifies
+  `k = 60091` there. Report the two separately: the strict certificate is a
+  stronger claim than Algorithm 1 step 5, and it is the one that fails.
+* **Size.** The factor base materialises all `2^t` abscissae, so `p` is bounded
+  by memory along this path; 18 bits (`|V| = 512`) is the largest rung run here.
+  Nothing above is a statement about 59-bit primes, P-192, or any deployed
+  curve.
+* **One map per rung.** `seed=0` fixes one auxiliary curve per rung; the search
+  cost is counted but its variance is not measured.
+* **No large-prime variation, no descent, no shared precomputation.** These are
+  single-target solves per rung.
+
+## 6. The `m`-ladder, m = 2..6
+
+`m` is the only parameter in §3.2's cost formula that changes the exponent, so
+the natural next question is the `m`-axis. One prime, `p = 3907`, with `t` the
+power of two nearest `p^{1/m}` (`predicted` is `|F|^m/(m!·p)`, as in §3):
+
+| m | t | \|V\| | p^(1/m) | \|F\| | cols | predicted | observed | targets | rank | D | wall | k |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 2 | 6 | 64 | 62.5 | 50 | 25 | 0.320 | 0.271 | 140 | 26 | 5 | 43 s | 2683 |
+| 3 | 4 | 16 | 15.7 | 18 | 9 | 0.249 | 0.270 | 37 | 10 | 6 | 142 s | 2683 |
+| 4 | 3 | 8 | 7.9 | 6 | 3 | 0.014 | 0.023 | 171 | 4 | 7 | 488 s | 2683 |
+| 5 | 3 | 8 | 5.2 | 6 | 3 | 0.017 | 0.031 | 129 | 4 | — | 17 s | 2683 |
+| 6 | 3 | 8 | 4.0 | 6 | 3 | 0.017 | 0.118 | 34 | 4 | — | 40 s | 2683 |
+
+**m = 1 is refused, and is degenerate.** Both modes reject `m < 2`
+(`pkm-semaev: mode Chain takes m in 2..=6, not 1`). That is the right answer:
+`S_2(x_1, X) = x_1 − X`, so a "relation" is just `x_1 = X`, and the paper's
+condition `|V| ≈ p^{1/1} = p` would make the factor base all of `E`. Every
+target then decomposes into one base element trivially, the columns' logarithms
+are the object being computed, and there is nothing left for step 5 to do.
+
+**Where the solver stops.** The density holds through `m = 4` (observed within
+1.9× of `|F|^m/(m!·p)` at every `m`; the `m = 6` point is 4 relations out of 34
+targets and is not worth reading). What changes is the algebraic engine: the
+F4 solving degree climbs 5 → 6 → 7, and at `m = 5` and `m = 6` the F4 exceeds
+its degree bound on **every** system (`budget_exceeded == calls`, `D = 0`) and
+the oracle decides on the exact grid instead. So the `m = 5, 6` costs in the
+table are `|V|^m` enumeration — the brute force the paper's Gröbner-basis step
+exists to replace — and are cheap only because `|V| = 8` here. At a real size
+`|V| = p^{1/m}`, that enumeration is `p`.
+
+That is the answer to "can the `m`-axis carry us": not with this solver. The
+`s`-chain system stops being tractable at `m = 5` on a 12-bit field, long
+before the factor base is the limit. Raising `m` needs a cheaper `S_{m+1}`
+chain first.
+
+Binary note: `m = 2..5` ran on the pinned `06439ae5…` build. `m = 6` needed the
+chain cap raised from `2..=5` to `2..=6` in
+`src/cryptanalysis/ic_framework/pkm_semaev.rs` (the ring's `MAX_FREE = 4` is
+exactly `m − 2 = 4`) and a rebuild, `ic` SHA-256 `3c22886c…`; the only source
+change is that cap, and the `m = 5` rerun on the new binary is identical
+(129 targets, 0.031, `k = 2683`).
+
+## 7. The solver boundary (see `CHAIN_DIAGNOSTIC.md`)
+
+A single-system probe at `p = 3907` puts the F4 ceiling between 14 and 18
+variables: `m = 5, t = 2` (13 vars) and `m = 4, t = 3` (14 vars) are refuted
+at degree 7 in under 4 s; `m = 5, t = 3` (18 vars) never decides at degree
+bound 8, 10 or 12, and `m = 6, t = 3` (22 vars) does not finish one system in
+30 min. Since the density condition forces `m·t ≈ log2 p`, the tower height is
+the field size no matter how `m` is chosen: 192 variables for P-192 against a
+measured ceiling of ~14. `m` is therefore not the lever; the smoothness bound
+`B` is, because `m·n0 ≈ log2 p / log2 B`. That relationship, and the fact that
+no `B > 2` run exists anywhere (the paper included), is the remaining gap
+between this record and any statement about 2^32 or 2^96 degrees.
+
+## 8. The smoothness bound moves the other way (`B_LADDER.md`)
+
+At a fixed composed degree (`p = 1000003`, `S ≈ 1000 ≈ p^{1/2}`, `m = 2`), the
+generic F4 does not finish one `B = 2` system in 300 s, while the same degree
+built from `3·3·11·11` is decided in ~1.3 s and one from `7·11·13` in 8.2 s —
+a U-shape with its optimum around `B = 7–11`. The variable count falls exactly
+as `log_B` predicts (20 → 14 → 12 → 8 → 8 → 6), and the auxiliary-curve search
+gets cheaper at the same time (2 561 curves at `B = 2`, 57 at `7·11·13`).
+Extrapolated to P-192 at `m = 2`, `B = 11` still needs `n0 ≈ 28` levels and
+56 tower variables against a measured ceiling of ~14, so this narrows the gap
+by a factor of ~3.5 and roughly two orders of magnitude in solver time; it
+does not close it.
+
+## 9. Files
+* `run.sh` — the exact commands, in order.
+* `results/*.json` — the raw `ic bench` output, one file per row above
+  (`r16t8_fullrank.json` is the strict-certificate run of §5).
+* `verify.py` — §4, all three checks, plus the density table.
+* `m_sweep.py` — the §6 table from `results/m*_p12t*.json`.
+* `CHAIN_DIAGNOSTIC.md` — §7, the solver-boundary probe and its raw rows
+  (`chain_diag.jsonl`, `results/diag_*.json`).
+* `B_LADDER.md` — §8, the smoothness-bound ladder (`b_ladder.jsonl`).
+* `examples/pkm_mixed_chain_f4.rs` — the driver for §8 (builds the
+  `pkm_smooth_tower` mixed-degree chain and its relation system, hands it to
+  `f4_fp`).
+* `pilot_iso.json` — the `pkm_tower_pilot` row that emitted `E'`, `#E'` and
+  `V` for the §4 construction check.

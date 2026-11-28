@@ -1,0 +1,34 @@
+   Compiling torus-coset-circuit v0.1.0 (/workspace/isogeny-labs/crypto-energy/tools/torus-coset-circuit)
+error[E0277]: the trait bound `Curve: Clone` is not satisfied
+  --> src/aggregation.rs:31:5
+   |
+26 | #[derive(Clone)]
+   |          ----- in this derive macro expansion
+...
+31 |     curve: Curve,
+   |     ^^^^^^^^^^^^ the trait `Clone` is not implemented for `Curve`
+
+error[E0308]: mismatched types
+  --> src/aggregation.rs:93:39
+   |
+93 |     let c = b.alloc("add_c", Op::Expr(&(d * &(&l.t * &r.t)).scale(2)));
+   |                              -------- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Poly`, found `&Poly`
+   |                              |
+   |                              arguments to this enum variant are incorrect
+   |
+note: tuple variant defined here
+  --> src/lib.rs:36:5
+   |
+36 |     Expr(Poly),
+   |     ^^^^
+help: consider removing the borrow
+   |
+93 -     let c = b.alloc("add_c", Op::Expr(&(d * &(&l.t * &r.t)).scale(2)));
+93 +     let c = b.alloc("add_c", Op::Expr((d * &(&l.t * &r.t)).scale(2)));
+   |
+
+Some errors have detailed explanations: E0277, E0308.
+For more information about an error, try `rustc --explain E0277`.
+error: could not compile `torus-coset-circuit` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `torus-coset-circuit` (lib test) due to 2 previous errors

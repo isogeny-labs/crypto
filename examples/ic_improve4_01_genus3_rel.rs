@@ -1798,17 +1798,8 @@ struct C1 {
 }
 
 fn inv_mod_int(a: u64, m: u64) -> Option<u64> {
-    let (mut r0, mut r1) = (m as i128, (a % m) as i128);
-    let (mut t0, mut t1) = (0i128, 1i128);
-    while r1 != 0 {
-        let qq = r0 / r1;
-        (r0, r1) = (r1, r0 - qq * r1);
-        (t0, t1) = (t1, t0 - qq * t1);
-    }
-    if r0 != 1 {
-        return None;
-    }
-    Some(t0.rem_euclid(m as i128) as u64)
+    // `a % m` keeps the old panic on m = 0; the inverse is unique.
+    crypto_lib::gcd::int::inv_mod_u64(a % m, m)
 }
 
 impl C1 {

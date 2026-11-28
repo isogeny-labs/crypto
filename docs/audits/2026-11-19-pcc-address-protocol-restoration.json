@@ -1,0 +1,94 @@
+{
+  "schema": "engineering.pcc-address-protocol-restoration/v1",
+  "at": "2026-11-20T02:45:41.278178+00:00",
+  "baseline_head": "36058bb606f286fb03e466d3df8556c5218c1458",
+  "protocol_sources": [
+    "research/chained_jacobian_transfers_20261110/PCC_EVIDENCE_ADDRESS_PROTOCOL_01.md",
+    "research/chained_jacobian_transfers_20261110/PCC_LEGACY_EVIDENCE_ADDRESSES_01.json",
+    "research/chained_jacobian_transfers_20261110/PCC_HISTORICAL_WORKFLOW_ADDRESS_02.json",
+    "problems/chained-transfer-pcc-evidence-addresses.md"
+  ],
+  "metadata_controls": {
+    "legacy_alias_tests": 8,
+    "historical_source_tests": 12,
+    "failures": 0
+  },
+  "actual_frozen_b55_control": {
+    "rows": [
+      {
+        "stage": "before",
+        "exit": 1,
+        "verdict": "fail"
+      },
+      {
+        "stage": "historical-view",
+        "exit": 2,
+        "verdict": "not_covered"
+      },
+      {
+        "stage": "restored-current",
+        "exit": 1,
+        "verdict": "fail"
+      }
+    ],
+    "all18_other_frozen_proof_subjects_sha256_matched": true,
+    "current_workflow_bytes_preserved": true,
+    "current_workflow_sha256": "691acabe7f5487758c9b3a90392b4239d80c8b0bb0bc22a87804740e2a6b6eeb",
+    "current_mode_preserved": true,
+    "git_current_source_diff_empty": true,
+    "frozen_claim_raw_sha256": "0ed9c3bf49ed8f01c5ab24c558f47f924381758b37be5a53721ba01272352bd6",
+    "frozen_claim_changed": false,
+    "verifier_or_keyring_changed": false,
+    "signed_verdict_created": false
+  },
+  "actual_frozen_3e6_binding": {
+    "claim_sha256_matches": true,
+    "canonical_bytes": 244,
+    "canonical_sha256": "fa9e1f54cdd2141101c8a21b64f84f081c46a18db5dcad49c2e732699dc52d92",
+    "local_exact_absolute_namespace_not_created": true,
+    "fresh_CI_actual_claim_validation_pending": true
+  },
+  "workflow_preservation": {
+    "triggers_permissions_concurrency_timeouts_unchanged": true,
+    "strict_verify_all_command_unchanged": true,
+    "ledger_and_keyring_checks_unchanged": true,
+    "signing_commands_rejoined_byte_identical": true,
+    "signing_publication_after_source_restoration": true,
+    "source_tests_run_only_after_current_source_restoration": true,
+    "source_and_alias_cleanup_always": true,
+    "whole_current_and_historical_source_custody_retained": true,
+    "original_pcc_tests_still_required": true,
+    "original_metadata_controls_added": true
+  },
+  "canonical_wiring": {
+    "referenced_current_manifests": [
+      ".artifacts.json",
+      "pcc/.artifacts.json",
+      "research/rootfind_dense_binary_pilot_20261116/sessions/local-custody-rerun-202611160401/.artifacts.json",
+      "research/rootfind_k13_local_f456_screen_20261116/sessions/local-custody-repeat-202611160511/.artifacts.json"
+    ],
+    "exact_paths": [
+      "research/rootfind_dense_binary_pilot_20261116/sessions/local-custody-rerun-202611160401/records.jsonl",
+      "research/rootfind_k13_local_f456_screen_20261116/sessions/local-custody-repeat-202611160511/records.jsonl"
+    ],
+    "canonical_generated_steps": 2,
+    "generator_idempotent": true,
+    "git_source_pinned": true,
+    "full_hosted_artifact_contract_still_required": true
+  },
+  "yaml_valid_unique_keys": true,
+  "all_shell_steps_parse": true,
+  "actionlint": "pass",
+  "verifier_keyring_frozen_claims_reports_and_canonical_receipts_modified": false,
+  "s3_access": false,
+  "retained_failure_disposition_activated": false,
+  "expected_two_additional_data_address_repairs": "Derived from original protocol/local controls; full current corpus outcome remains unobserved until CI.",
+  "performance_claim": null,
+  "actionlint_provenance": {
+    "version": "1.7.12",
+    "platform": "darwin_arm64",
+    "official_release_archive_sha256": "aba9ced2dee8d27fecca3dc7feb1a7f9a52caefa1eb46f3271ea66b6e0e6953f",
+    "archive_bytes": 2164202,
+    "binary_sha256": "8db11704dc296f096216db4db65d86cd7f0ebfdf4c38453a1da276b137b88388"
+  }
+}

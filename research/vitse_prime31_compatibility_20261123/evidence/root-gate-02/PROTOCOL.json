@@ -1,0 +1,48 @@
+{
+  "frozen_at_utc": "2026-11-23T16:06:16.707506+00:00",
+  "purpose": "one local root-library correctness qualification continuation",
+  "rationale": "The unchanged cold attempt timed out while compiling the isogeny_algos path dependency after populating locked registry downloads and compiled dependency artifacts. This continuation reuses those caches instead of repeating the cold dependency setup. No source, dependency, feature, or test selection changes are allowed.",
+  "prior_result_sha256": "75e473157e7760848176f971391a86591c9ce6d0c9768acbdaf70df355bebd5a",
+  "root_sha": "7d61e3b45de6e93d235345a0061dae08db1f8b44",
+  "tracked_status_before": "",
+  "manifest_sha256": "097c73742907c4d710cb0daff8cd0eaca763e260420675d2cc29a6c8f0cbf692",
+  "lock_sha256": "192c1d7e8bf2c3bbfb084721d192a6ab08d86d67adbb452cc3f79cff70ccfec0",
+  "cargo_home": "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate/cargo-home",
+  "target_dir": "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate/target",
+  "timeout_seconds": 1200,
+  "build_jobs": 1,
+  "command": [
+    "/workspace/scratch/857f9e575d1c/tmp/vitse-rust-toolchain/installed/bin/cargo",
+    "test",
+    "--release",
+    "--lib",
+    "--locked"
+  ],
+  "cache_preflight": {
+    "rlib_files": 201,
+    "rmeta_files": 201,
+    "rlib_bytes": 290908372,
+    "locks": [
+      {
+        "path": "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate/target/release/.cargo-lock",
+        "available": true
+      },
+      {
+        "path": "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate/target/release/.cargo-artifact-lock",
+        "available": true
+      },
+      {
+        "path": "/workspace/scratch/857f9e575d1c/tmp/vitse-root-gate/target/release/.cargo-build-lock",
+        "available": true
+      }
+    ]
+  },
+  "memory_preflight": "MemAvailable 9449544kB, no swap; no visible cargo/rustc process; prior process-group cleanup completed",
+  "stopping_rules": [
+    "stop on completion",
+    "stop on compiler failure",
+    "stop on resource limit",
+    "terminate cargo process group at1200seconds",
+    "one continuation only; no feature pruning or ignored tests"
+  ]
+}

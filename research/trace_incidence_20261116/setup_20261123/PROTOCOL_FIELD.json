@@ -1,0 +1,51 @@
+{
+  "schema": "trace-field-confirmation/v1",
+  "parents": [
+    "PROTOCOL_FLAT.json"
+  ],
+  "holdout": "480 further fresh public targets on the same15 curves,96 perB and32 percurve, constructor fixed seed0x484f4c444f555433. Private validation never passed to solvers.",
+  "construction": "make-field-confirmation.cpp, given public-input target construction excluded identically.",
+  "candidate_modes": [
+    "ap4",
+    "ap8"
+  ],
+  "pair_kernels": [
+    "barrett"
+  ],
+  "current_rho_policies": [
+    "tuned8",
+    "tuned16",
+    "tuned"
+  ],
+  "current_reference_scope": "intact current prime_fast module compiled with sealed older crate for compatible ECC adapter types and primality. No rho/group code stubbed. Not a whole current root crate build. Full mixed-version test suite20pass/1root-oracle mismatch/1ignored; all rho/group tests pass, failing source/log retained.",
+  "qualification": "All5760 nmod/Barrett generator cases compare every point/label/order/count, independent affine labels, exceptional-point arithmetic and malformed context/pool checks. Fresh target/mode/direct-vs-Bloom witness controls use frozen pair oracle.",
+  "matrix": {
+    "arms": 10,
+    "targets": 480,
+    "warmups": 1,
+    "measured_rounds": 5,
+    "rows": 28800
+  },
+  "execution": "rotate arm order by round, one allowed CPU, one process at a time, max4 pool attempts, max10million rho steps,45second row timeout, no automatic retry",
+  "timing": "complete per-target cold adapter incl given-input parsing, public checks, charged labels/steps/conversions/rejects, all misses, index construction, witness/scalar recovery and group check; process startup excluded, process RSS/time retained. No canonical online admission.",
+  "postcheck": "native independent affine replay plus private known-answer equality, strict trial/generation accounting, exact equal trial lists across kernels on each target/mode",
+  "report": "all arms and censors; completed-pair ratios conditional; strongest current whole-system rho and global Pareto optimality remain separate; no paper-root-kernel attribution",
+  "custody": "continued authorized temporary local checkpoint/raw, no paid allocations/S3 success claim",
+  "arms": [
+    "baseline-ap4",
+    "baseline-ap8",
+    "field-ap4",
+    "field-ap8",
+    "direct-ap4",
+    "direct-ap8",
+    "direct-ap8-aa",
+    "current-tuned8",
+    "current-tuned16",
+    "current-tuned"
+  ],
+  "statistical_criterion": "Primary descriptive complete-cost ratio is ratio of target-cluster means. Each target averages five rounds. Stratified bootstrap resamples32 targets with replacement independently in each of3 curves perB,10000 replicates, fixed seed0x464c41544349. Strict scoped wall-time parity requires no censors in either arm and one-sided95% upper candidate/reference mean-cost ratio<=1. Both AP scales and rho policies reported; no per-target winning-arm selection. No global Pareto/cryptographic-scale claim.",
+  "aa": "direct-ap8-aa repeats the identical direct/AP8 binary/mode/seed; exact trial lists required.",
+  "mechanism": "Baseline is full-flat/nmod AP arithmetic and old on-curve validator. Field arm uses standard already tested Barrett32 in AP formulas and canonical on-curve checks. Direct arm additionally removes Bloom filtering before exact flat lookup. All controls/checks and point/label streams remain equal.",
+  "primary_candidate": "direct-ap8; all other candidate variants are reported engineering ablations",
+  "primary_parity": "For eachB require the predeclared direct-ap8 to pass the strict no-censor one-sided95% upper mean-cost-ratio<=1 test against EACH of current-tuned8,current-tuned16,current-tuned. No per-target or outcome-selected algorithm. This is only a scoped local-wall criterion, not canonical counted-operation or global-rho parity."
+}

@@ -54,7 +54,8 @@ use crate::cryptanalysis::ecbench::canonical::{sha256_hex, short_id, splitmix64}
 use crate::cryptanalysis::ecbench::host::{self, recompute_class, HostCapsule};
 use crate::cryptanalysis::ecbench::legacy;
 use crate::cryptanalysis::ecbench::methods::{
-    MethodSpec, PhaseRecord, ResolvedMethod, SolveReport,
+    v5_pre_tally_record, MethodSpec, PhaseRecord, ResolvedMethod, SolveReport,
+    V5_JUMP_INDEX_COUNTER,
 };
 use crate::cryptanalysis::ecbench::record::{
     check_line_seal, child_main, expected_automorphisms, f4_accounting_note, f6_tree_note,
@@ -696,6 +697,15 @@ fn replay_with_accounting_inner(
     (false, detail)
 }
 
+fn counted_field_ops_match(
+    replay_detail: &serde_json::Value,
+    recorded_detail: &serde_json::Value,
+) -> bool {
+    recorded_detail
+        .get("counted_field_ops")
+        .is_none_or(|recorded| replay_detail.get("counted_field_ops") == Some(recorded))
+}
+
 /// What a replay must reproduce of `r`: `(reproduced, detail)`.
 fn compare_replay(
     rep: &SolveReport,
@@ -711,11 +721,27 @@ fn compare_replay(
                 .retain(|k, _| !legacy::is_setup_descriptor(k) || rec.native.contains_key(k));
         }
     }
+    if legacy::admits_pre_walk_jump_descriptor(r) {
+        for (ph, recorded) in rep.phases.iter_mut().zip(&r.phases) {
+            if ph.name == "relations" && !recorded.native.contains_key("walk_jumps_materialised") {
+                ph.native.remove("walk_jumps_materialised");
+            }
+        }
+    }
     // The three-lead adapters' cost-accounting counters are compared only
     // where the record has them (`legacy::admits_pre_cost_accounting`).
     if legacy::admits_pre_cost_accounting(r) {
         rep.counters
             .retain(|k, _| !legacy::is_cost_accounting_counter(k) || r.counters.contains_key(k));
+    }
+    // A `rho.signed_frobenius_v5` record written before its per-step
+    // jump-index tally (2026-11-19) is compared without it: the tally is a
+    // native counter only, equal to the recorded `steps`, and the walk,
+    // outcome and group operations it replays are unchanged.  Readers that
+    // price such a record derive the tally from `steps`.
+    if v5_pre_tally_record(&r.method.id, &r.counters) {
+        rep.counters.remove(V5_JUMP_INDEX_COUNTER);
+        rep.unpriced.retain(|k| k != V5_JUMP_INDEX_COUNTER);
     }
     let rep = &rep;
     let mut diffs = Vec::new();
@@ -729,7 +755,11 @@ fn compare_replay(
     // the same serialise-parse round trip the record's took.
     let same_gae = |phases: &[f64], total: f64| {
         (
-            Some(json_roundtrip(total).to_bits()) == r.cost.total_gae.map(f64::to_bits),
+            Some(json_roundtrip(total).to_bits())
+                == r.cost
+                    .total_gae
+                    .or(r.cost.total_gae_store)
+                    .map(f64::to_bits),
             phases
                 .iter()
                 .map(|g| json_roundtrip(*g).to_bits())
@@ -810,6 +840,11 @@ fn compare_replay(
         if a != b {
             diffs.push("field_ops");
         }
+    }
+    // Historical records have no partial IC tally.  Once a record carries
+    // one, its replay must reproduce the exact phase split and total.
+    if !counted_field_ops_match(&rep.detail, &r.detail) {
+        diffs.push("counted_field_ops");
     }
     if rep.unpriced != r.cost.unpriced
         || rep.deterministic != r.cost.deterministic
@@ -1312,8 +1347,8 @@ fn consistency_problems(
             ));
         }
     }
-    // Phases sum to the total.
-    if let Some(total) = r.cost.total_gae {
+    // Phases sum to the total (an amortized run's, under `*_store`).
+    if let Some(total) = r.cost.total_gae.or(r.cost.total_gae_store) {
         // A named pre-fix producer's class-set-up record is short of its
         // phase sum by exactly the set-up, which its replay checks
         // (`legacy_class_setup`); every other record sums to its total.
@@ -1365,7 +1400,29 @@ fn consistency_problems(
             r.outcome.status
         ));
     }
-    if !failed && r.cost.total_gae.is_none() {
+    // An amortized run (factor-base logs from a store) carries its total
+    // under `total_gae_store` with the cold fields null, never both.
+    let amortized = r.log_table_amortized();
+    if amortized
+        && (r.cost.total_gae.is_some()
+            || r.cost.s.is_some()
+            || r.boundaries.ratio_to_floor.is_some()
+            || r.cost.cost_basis.as_deref() != Some("amortized"))
+    {
+        out.push(format!(
+            "{tag}: its factor-base logs came from a store, so its cost is amortized and must not sit under the cold `total_gae`, `s` or `ratio_to_floor`"
+        ));
+    }
+    if !amortized
+        && (r.cost.total_gae_store.is_some()
+            || r.cost.s_store.is_some()
+            || r.cost.cost_basis.is_some())
+    {
+        out.push(format!(
+            "{tag}: carries an amortized cost but its log table was computed in the run"
+        ));
+    }
+    if !failed && r.cost.total_gae.or(r.cost.total_gae_store).is_none() {
         out.push(format!(
             "{tag}: status `{}` has no total, so no solve finished",
             r.outcome.status
@@ -1663,7 +1720,7 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
         // Every derived figure must follow from the record's own counts:
         // a hand-edited S, ratio or flag fails here even if resealed.
         let floor = floor_s(r.boundaries.automorphisms_available);
-        let sqrt_r = (w.curve.r as f64).sqrt();
+        let sqrt_r = (w.curve.r.to_f64()).sqrt();
         // The floor's `A` follows the rule the record names (none: the first
         // rule), so a record written before `j = 0` and `j = 1728` curves got
         // their own count still recomputes to the floor it was written with.
@@ -1673,6 +1730,11 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
             && match (r.cost.total_gae, r.cost.s, r.boundaries.ratio_to_floor) {
                 (Some(t), Some(sv), Some(q)) => close(sv, t / sqrt_r) && close(q, sv / floor),
                 (None, None, None) => true,
+                _ => false,
+            }
+            && match (r.cost.total_gae_store, r.cost.s_store) {
+                (Some(t), Some(sv)) => close(sv, t / sqrt_r),
+                (None, None) => true,
                 _ => false,
             }
             && r.cost.lower_bound != r.cost.unpriced.is_empty()
@@ -1698,7 +1760,7 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
         let rec: Option<super::exact_scalar::ExactScalar> =
             r.outcome.recovered.as_deref().and_then(|s| s.parse().ok());
         let target_ok = rec.map(|k| inst.mul_generator_exact(k).as_ref() == Some(&w.target));
-        let planted_ok = w.planted.and_then(|p| rec.map(|k| k == p.into()));
+        let planted_ok = w.planted.and_then(|p| rec.map(|k| k == p));
         if target_ok != r.outcome.matches_target || planted_ok != r.outcome.matches_planted {
             record_problems.push(format!("{tag}: verification does not reproduce"));
         }
@@ -1836,23 +1898,22 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
     // neither.
     if let Some(last) = session.last_seq {
         let n = records.len() as u64;
-        let ok = if killed {
-            n == last + 1 || n == last + 2
-        } else {
-            n == last + 1
-        };
+        let ok = last.checked_add(1) == Some(n) || (killed && last.checked_add(2) == Some(n));
         led.check("last_seq", ok, || {
-            format!("session.json says the last record is seq {last}, the records end at {n}")
+            format!("session.json says the last record is seq {last}, the records contain {n} rows")
         });
     }
     if let Some(stop) = &session.stop {
         let n = records.len() as u64;
         led.check(
             "stop",
-            !complete && stop.seq.is_none_or(|s| n == s || n == s + 1),
+            !complete
+                && stop
+                    .seq
+                    .is_none_or(|s| n == s || s.checked_add(1) == Some(n)),
             || {
                 format!(
-                    "session.json says it stopped ({}) at seq {:?}, the records end at {n}",
+                    "session.json says it stopped ({}) at seq {:?}, the records contain {n} rows",
                     stop.kind, stop.seq
                 )
             },
@@ -1974,6 +2035,49 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
 pub(crate) mod tests {
     use crate::cryptanalysis::ecbench::methods::{PhaseRecord, SolveReport};
 
+    #[test]
+    fn sequence_counter_overflow_is_rejected_without_panicking() {
+        let dir = fresh("sequence-overflow");
+        let allow = AuditOptions {
+            allow_interrupted: true,
+            ..Default::default()
+        };
+        tamper(&dir, |_, s| {
+            s["last_seq"] = json!(u64::MAX);
+        });
+        let report = audit_opts(&dir, &allow).unwrap();
+        assert_eq!(report.checks.get("last_seq"), Some(&false));
+        assert!(report
+            .problems
+            .iter()
+            .any(|p| p.contains("records contain")));
+        tamper(&dir, |_, s| {
+            s["status"] = json!("interrupted");
+            s["last_seq"] = json!(u64::MAX - 1);
+            s["stop"] = json!({"kind":"interrupt", "seq":u64::MAX, "message":"synthetic validation control"});
+        });
+        let report = audit_opts(&dir, &allow).unwrap();
+        assert_eq!(report.checks.get("last_seq"), Some(&false));
+        assert_eq!(report.checks.get("stop"), Some(&false));
+        tamper(&dir, |records, s| {
+            records.clear();
+            s["records_written"] = json!(0);
+            s["status_counts"] = json!({});
+            s["last_seq"] = json!(u64::MAX);
+        });
+        let report = audit_opts(&dir, &allow).unwrap();
+        assert!(!report.ok);
+        assert_eq!(report.checks.get("last_seq"), Some(&false));
+        assert_eq!(report.checks.get("stop"), Some(&false));
+        tamper(&dir, |_, s| {
+            s["last_seq"] = serde_json::Value::Null;
+            s["stop"]["seq"] = json!(0);
+        });
+        let report = audit_opts(&dir, &allow).unwrap();
+        assert!(report.ok, "{:?}", report.problems);
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+
     fn phase(name: &str, adds: u64, doubles: u64, sm: u64) -> PhaseRecord {
         PhaseRecord {
             name: name.into(),
@@ -2074,6 +2178,22 @@ pub(crate) mod tests {
     }
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn partial_ic_field_tally_is_replay_bound_without_rewriting_old_records() {
+        let counted = json!({"counted_field_ops": {
+            "schema": "ecbench.counted-field-ops/v1",
+            "phases": [{"name": "relations", "field_ops": {"muls": 8, "sqrs": 3, "invs": 1}}],
+            "total": {"muls": 8, "sqrs": 3, "invs": 1},
+            "complete": false,
+        }});
+        let mut altered = counted.clone();
+        altered["counted_field_ops"]["phases"][0]["field_ops"]["invs"] = json!(2);
+        assert!(counted_field_ops_match(&counted, &json!({})));
+        assert!(counted_field_ops_match(&counted, &counted));
+        assert!(!counted_field_ops_match(&altered, &counted));
+        assert!(!counted_field_ops_match(&json!({}), &counted));
+    }
 
     fn detail(w: f64, before: f64, priced_by: &str) -> serde_json::Value {
         json!({

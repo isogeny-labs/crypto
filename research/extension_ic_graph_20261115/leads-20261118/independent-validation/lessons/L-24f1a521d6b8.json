@@ -1,0 +1,16 @@
+{
+  "action": "grep pcc/ledger.jsonl at the validated commit for each claim id, and trace it with git log --full-history -S; a 'Merge branch main into the pull request branch' that resolves pcc/ledger.jsonl to main's side drops the branch's appended entries while ledger verify still passes",
+  "created": "2026-11-18T17:59:38Z",
+  "evidence": [
+    "research/extension_ic_graph_20261115/leads-20261118/independent-validation/results/ledger.txt",
+    "research/extension_ic_graph_20261115/leads-20261118/independent-validation/ledger_trace.sh"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "research"
+  ],
+  "trigger": "validating a result whose PCC claim files exist (pcc standing says unverified and pcc ledger verify passes)",
+  "why": "PCC-20261117-e9f39d/7defbb/6224b9/853115 were appended on their branches and dropped by merges bdd757487a and 96e50a56d3; 2588 of 3584 claim files at 6016f362 have no ledger entry"
+}

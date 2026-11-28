@@ -13,6 +13,7 @@
 //! | name | engine | native unit |
 //! |:--|:--|:--|
 //! | `f4-f2` | Faugère's F4: batched pairs, symbolic preprocessing, bit-packed elimination, field pairs; a full reduced basis | word XORs (elimination only) |
+//! | `f4-f2-full-width` | same F4 implementation and binary as `f4-f2`, with only the Faugère–Lachartre split disabled | word XORs (elimination only) |
 //! | `buchberger-f2` | boolean-ring Buchberger with the coprime and chain criteria and the field-equation pairs, one pair at a time | monomial operations |
 //! | `matrix-f4` | the Koblitz oracle's hybrid: Macaulay matrices to a fixed degree, then splitting | word XORs (elimination only) |
 //! | `matrix-f5` | the same hybrid, rows the Boolean F5 criterion predicts to vanish left out | word XORs (elimination only) |
@@ -26,6 +27,7 @@
 //! | `xl-f2` | XL: multiply out to a degree, then linearise | monomial operations (modelled) |
 //! | `sat-cdcl` | CDCL with Tseitin monomials; parity encoded as CNF by default, native XOR opt-in | conflicts |
 //! | `primo-smt` | Primo 0.2.0 through SMT-LIB `QF_UF`; one checked Boolean model per call | solver-reported SAT conflicts |
+//! | `primo-smt-file` | matched legacy control for `primo-smt`: temporary-file input and 5 ms completion polling | solver-reported SAT conflicts |
 //! | `fes-f2` | fast exhaustive search, libfes-lite Gray code, quadratic systems only | word XORs (Gray-code steps) |
 //! | `fes-f2-gpu` | `fes-f2` with the search on the `gpu/fes` CUDA serve worker, every point re-verified on the CPU; same count as `fes-f2` | word XORs (Gray-code steps) |
 //! | `fes-f2-wide` | the same over 8 or 16 sub-cubes per step in the lanes of an AVX2 or AVX-512 register, ≤ 32 equations | vector XORs (Gray-code steps) |
@@ -98,7 +100,12 @@ use crate::cryptanalysis::koblitz_groebner::{
 use crate::cryptanalysis::m4gb_oracle::{
     run_m4gb, run_m4gb_persistent, select_binary, M4gbError, M4gbOptions, M4gbRun,
 };
-use crate::cryptanalysis::pq_f4_f2::{groebner_basis_f4, solutions_from_reduced_basis};
+use crate::cryptanalysis::pq_f4_f2::{
+    groebner_basis_f4, groebner_basis_f4_full_width, groebner_basis_f4_skeleton,
+    groebner_basis_f4_skeleton_full_width, groebner_basis_f4_traced,
+    groebner_basis_f4_traced_full_width, solutions_from_reduced_basis, F4PairTrace, F4Skeleton,
+    SKELETON_DEFAULT_CAP_BYTES, TRACE_DEFAULT_CAP_BYTES,
+};
 use crate::cryptanalysis::pq_groebner_f2::{
     bit, groebner_basis_f2_within, mask_from64, solve_system_f2_counted, F2BoolPoly, Mask,
     MASK_BITS,
@@ -185,7 +192,41 @@ fn verified(points: Vec<Mask>, system: &BooleanSystem, tests: &mut u64) -> Vec<M
 /// ([`crate::cryptanalysis::pq_f4_f2`]), with the field pairs a boolean
 /// basis needs and solutions read off the linear elements rather than
 /// enumerated.
-pub struct F4F2;
+///
+/// Holds an [`F4Skeleton`]: the symbolic preprocessing (divisor candidates
+/// and column maps) of the systems this instance has solved, reused on the
+/// later systems of the run (one oracle, one target).  The bases are those
+/// of the plain path.  Opt-in (`skeleton=1`): on 16 `S_3` descents over
+/// `F_{2^13}` it saved 7% of the divisor tests but added hash probes and
+/// matched a stored column map once in 11 replayed steps, a small net
+/// loss in `bitop/v1`, so the default stays the plain path (`skeleton=0`).
+/// `skeleton_mb` (default 256) caps the stored bytes.
+///
+/// Also holds an [`F4PairTrace`] (opt-in, `trace=1`): Traverso's Gröbner
+/// trace — the useful pairs of the first system of each shape, replayed on
+/// the later ones, verified by one charged F4 pass over the replayed
+/// basis's pairs and the inputs, with a fall-back to the plain path.  On
+/// 32 `S_3` descents over `F_{2^13}` (one support, but 21 distinct plain
+/// run outcomes) every one of the 31 replays mismatched at its first
+/// step, so every system paid a failed replay plus a re-recording plain
+/// run: 382,248 word XORs against 133,813 plain (×2.86, of which 247,230
+/// the provenance passes), 4.83M against 3.55M `bitop` word operations —
+/// a net loss, so the default stays off (`trace=0`).  Random same-shape
+/// systems varying only their affine part replay with hits.  `trace_mb`
+/// (default 64) caps the stored bytes.  The two options are exclusive.
+#[derive(Default)]
+pub struct F4F2 {
+    skeleton: std::sync::Mutex<Option<F4Skeleton>>,
+    trace: std::sync::Mutex<Option<F4PairTrace>>,
+}
+
+// Preserve the former unit-value constructor API while each owned solver
+// retains its actual per-run skeleton/trace state.
+#[allow(non_upper_case_globals, clippy::declare_interior_mutable_const)]
+pub const F4F2: F4F2 = F4F2 {
+    skeleton: std::sync::Mutex::new(None),
+    trace: std::sync::Mutex::new(None),
+};
 
 impl SystemSolver for F4F2 {
     fn name(&self) -> &str {
@@ -193,8 +234,29 @@ impl SystemSolver for F4F2 {
     }
 
     fn describe(&self) -> String {
-        "F4 over F_2[v]/(v²−v): normal strategy, dense exact-LCM Gebauer–Möller selection on bounded domains, field pairs, bitmap/hash symbolic sets, adaptive leading-block tables, tiled bit-packed elimination, reduced basis"
+        "F4 over F_2[v]/(v²−v): normal strategy, dense exact-LCM Gebauer–Möller selection on bounded domains, field pairs, bitmap/hash symbolic sets shared across the run's systems (skeleton), Faugère–Lachartre reducer/free-column split with full-width fallback, tiled bit-packed elimination, reduced basis"
             .into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        &[
+            (
+                "skeleton",
+                "0 (default): the plain path; 1: reuse the symbolic preprocessing of earlier systems of the run (identical bases; a net loss on the F_2^13 descent test, see the test below)",
+            ),
+            (
+                "skeleton_mb",
+                "byte cap of the stored skeleton in MiB (default 256); past it new steps are not stored",
+            ),
+            (
+                "trace",
+                "0 (default): the plain path; 1: Gröbner trace — replay the useful pairs recorded on the first system of each shape (unknowns, degree, monomial support), verify with one charged F4 pass, fall back to the plain path on failure (identical bases)",
+            ),
+            (
+                "trace_mb",
+                "byte cap of the stored traces in MiB (default 64); past it new shapes are not stored",
+            ),
+        ]
     }
 
     fn accepts(&self, shape: &SystemShape) -> bool {
@@ -204,12 +266,76 @@ impl SystemSolver for F4F2 {
     fn solve(
         &self,
         system: &BooleanSystem,
-        _params: &Params,
+        params: &Params,
         budget: Option<Duration>,
     ) -> (SolverVerdict, SolverCost) {
         let started = Instant::now();
         let tally_before = bitop_tally::snapshot();
-        let (gb, st) = groebner_basis_f4(system.equations.clone(), system.n_vars, budget);
+        let full_width = params.get("_f4_full_width_control") == Some("1");
+        let use_skeleton = params.u64_or("skeleton", 0).unwrap_or(0) != 0;
+        let cap_bytes = params
+            .u64_or("skeleton_mb", SKELETON_DEFAULT_CAP_BYTES >> 20)
+            .unwrap_or(SKELETON_DEFAULT_CAP_BYTES >> 20)
+            .saturating_mul(1 << 20);
+        let use_trace = params.u64_or("trace", 0).unwrap_or(0) != 0;
+        let trace_cap = params
+            .u64_or("trace_mb", TRACE_DEFAULT_CAP_BYTES >> 20)
+            .unwrap_or(TRACE_DEFAULT_CAP_BYTES >> 20)
+            .saturating_mul(1 << 20);
+        // A solve that finds the skeleton (or the trace) in use by another
+        // thread runs the plain path: same basis, its own (plain) count.
+        let mut guard = if use_skeleton {
+            self.skeleton.try_lock().ok()
+        } else {
+            None
+        };
+        let mut trace_guard = if use_trace && !use_skeleton {
+            self.trace.try_lock().ok()
+        } else {
+            None
+        };
+        let (gb, st) = match (guard.as_deref_mut(), trace_guard.as_deref_mut()) {
+            (None, Some(slot)) => {
+                let store = slot.get_or_insert_with(|| F4PairTrace::with_cap(trace_cap));
+                if full_width {
+                    groebner_basis_f4_traced_full_width(
+                        system.equations.clone(),
+                        system.n_vars,
+                        budget,
+                        store,
+                    )
+                } else {
+                    groebner_basis_f4_traced(system.equations.clone(), system.n_vars, budget, store)
+                }
+            }
+            (Some(slot), _) => {
+                let skeleton = slot.get_or_insert_with(|| F4Skeleton::with_cap(cap_bytes));
+                if full_width {
+                    groebner_basis_f4_skeleton_full_width(
+                        system.equations.clone(),
+                        system.n_vars,
+                        budget,
+                        skeleton,
+                    )
+                } else {
+                    groebner_basis_f4_skeleton(
+                        system.equations.clone(),
+                        system.n_vars,
+                        budget,
+                        skeleton,
+                    )
+                }
+            }
+            (None, None) => {
+                if full_width {
+                    groebner_basis_f4_full_width(system.equations.clone(), system.n_vars, budget)
+                } else {
+                    groebner_basis_f4(system.equations.clone(), system.n_vars, budget)
+                }
+            }
+        };
+        drop(guard);
+        drop(trace_guard);
         let mut tests = 0u64;
         let mut extra = BTreeMap::new();
         for (k, v) in [
@@ -248,11 +374,39 @@ impl SystemSolver for F4F2 {
             ("full_m4ri_matrices", st.full_m4ri_matrices),
             ("full_m4ri_blocks", st.full_m4ri_blocks),
             ("full_m4ri_table_word_xors", st.full_m4ri_table_word_xors),
+            ("fl_matrices", st.fl_matrices),
+            ("fl_reducer_rows", st.fl_reducer_rows),
+            ("fl_pair_rows", st.fl_pair_rows),
+            ("fl_free_cols", st.fl_free_cols),
             ("build_ns", st.build_ns),
             ("eliminate_ns", st.eliminate_ns),
             ("f4_wall_ns", st.wall_ns),
             ("pairs_left", st.pairs_left),
             ("oversize", st.oversize as u64),
+            ("skeleton_shape_rebuilds", st.skeleton_shape_rebuilds),
+            ("skeleton_steps_built", st.skeleton_steps_built),
+            ("skeleton_steps_replayed", st.skeleton_steps_replayed),
+            ("skeleton_candidate_hits", st.skeleton_candidate_hits),
+            ("skeleton_candidate_misses", st.skeleton_candidate_misses),
+            ("skeleton_candidate_tests", st.skeleton_candidate_tests),
+            ("skeleton_columns_reused", st.skeleton_columns_reused),
+            ("skeleton_columns_rebuilt", st.skeleton_columns_rebuilt),
+            ("skeleton_store_refused", st.skeleton_store_refused),
+            ("skeleton_bytes", st.skeleton_bytes),
+            ("trace_records", st.trace_records),
+            ("trace_replays", st.trace_replays),
+            ("trace_hits", st.trace_hits),
+            ("trace_fallbacks", st.trace_fallbacks),
+            ("trace_mismatches", st.trace_mismatches),
+            ("trace_steps_matched", st.trace_steps_matched),
+            ("trace_verifications", st.trace_verifications),
+            ("trace_verify_failures", st.trace_verify_failures),
+            ("trace_verify_word_xors", st.trace_verify_word_xors),
+            ("trace_verify_divisor_tests", st.trace_verify_divisor_tests),
+            ("trace_verify_pairs", st.trace_verify_pairs),
+            ("trace_record_xors", st.trace_record_xors),
+            ("trace_pairs_dropped", st.trace_pairs_dropped),
+            ("trace_bytes", st.trace_bytes),
         ] {
             extra.insert(k.to_string(), v);
         }
@@ -297,11 +451,14 @@ impl SystemSolver for F4F2 {
             peak_bytes: st
                 .peak_matrix_bytes
                 .saturating_add(st.peak_table_bytes)
-                .saturating_add(st.pair_dense_scratch_bytes_max),
+                .saturating_add(st.pair_dense_scratch_bytes_max)
+                .saturating_add(st.skeleton_bytes)
+                .saturating_add(st.trace_bytes),
             degree_reached: Some(st.degree_reached),
             solving_degree: Some(st.solving_degree),
             timed_out: st.timed_out,
             extra,
+            ..Default::default()
         };
         let verdict = if st.timed_out || st.oversize {
             SolverVerdict::BudgetExceeded
@@ -337,6 +494,46 @@ impl SystemSolver for F4F2 {
 }
 
 // ── M4GB, an external process ──────────────────────────────────────
+
+/// Same-binary control for [`F4F2`] with only the Faugère–Lachartre
+/// reducer/free-column split disabled.
+#[derive(Default)]
+pub struct F4F2FullWidth {
+    #[allow(dead_code)]
+    inner: F4F2,
+}
+#[allow(non_upper_case_globals, clippy::declare_interior_mutable_const)]
+pub const F4F2FullWidth: F4F2FullWidth = F4F2FullWidth { inner: F4F2 };
+
+impl SystemSolver for F4F2FullWidth {
+    fn name(&self) -> &str {
+        "f4-f2-full-width"
+    }
+
+    fn describe(&self) -> String {
+        "F4 over F_2[v]/(v²−v): exact same-binary control for f4-f2 with the Faugère–Lachartre split disabled and the full-width reducer cascade retained"
+            .into()
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        F4F2::default().accepts(shape)
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        let mut control = params.clone();
+        control
+            .0
+            .insert("_f4_full_width_control".into(), "1".into());
+        let (verdict, mut cost) = F4F2::default().solve(system, &control, budget);
+        cost.extra.insert("fl_forced_full_width".into(), 1);
+        (verdict, cost)
+    }
+}
 
 /// M4GB (Makarim–Stevens, ISSAC 2017) run as a separate process behind
 /// `M4GB_BINARY` ([`crate::cryptanalysis::m4gb_oracle`]).  It is priced by
@@ -660,6 +857,7 @@ impl SystemSolver for HybridF4 {
             solving_degree: None,
             timed_out: st.exhausted,
             extra,
+            ..Default::default()
         };
         let verdict = if st.exhausted {
             SolverVerdict::BudgetExceeded
@@ -780,6 +978,7 @@ impl SystemSolver for CrossbredF2 {
             solving_degree: None,
             timed_out: matches!(verdict, SolverVerdict::BudgetExceeded),
             extra,
+            ..Default::default()
         };
         (verdict, cost)
     }
@@ -1103,6 +1302,7 @@ fn fes_finish(
         solving_degree: None,
         timed_out: false,
         extra,
+        ..Default::default()
     };
     (verdict, cost)
 }
@@ -1509,6 +1709,7 @@ impl SystemSolver for FesWide {
             solving_degree: None,
             timed_out: false,
             extra,
+            ..Default::default()
         };
         if points.is_empty() {
             (SolverVerdict::Unsatisfiable, cost)
@@ -1565,6 +1766,7 @@ impl SystemSolver for BuchbergerF2 {
             solving_degree: Some(st.solving_degree),
             timed_out: st.timed_out,
             extra,
+            ..Default::default()
         };
         let done = |mut cost: SolverCost, word_ops: u64| {
             cost.extra.insert("bitop_word_ops".into(), word_ops);
@@ -1649,6 +1851,7 @@ impl SystemSolver for XlF2 {
                 ("bitop_word_ops".to_string(), word_ops),
                 ("bitop_complete".to_string(), 1),
             ]),
+            ..Default::default()
         };
         if solutions.is_empty() {
             (SolverVerdict::Unsatisfiable, cost)
@@ -1665,10 +1868,24 @@ impl SystemSolver for XlF2 {
 /// a fail-fast invariant.
 pub fn validate_solver_params(name: &str, params: &Params) -> Result<(), String> {
     match name {
+        "f4-f2" => {
+            if params.u64_or("skeleton", 0)? > 1 {
+                return Err("skeleton must be 0 or 1".into());
+            }
+            params.u64_or("skeleton_mb", SKELETON_DEFAULT_CAP_BYTES >> 20)?;
+            let trace = params.u64_or("trace", 0)?;
+            if trace > 1 {
+                return Err("trace must be 0 or 1".into());
+            }
+            if trace == 1 && params.u64_or("skeleton", 0)? == 1 {
+                return Err("skeleton and trace are exclusive".into());
+            }
+            params.u64_or("trace_mb", TRACE_DEFAULT_CAP_BYTES >> 20)?;
+        }
         "sat-cdcl" => {
             sat_xor_encoding(params)?;
         }
-        "primo-smt" => {
+        "primo-smt" | "primo-smt-file" => {
             let timeout_ms = params.u64_or("primo_timeout_ms", 600_000)?;
             if timeout_ms == 0 {
                 return Err("primo_timeout_ms must be positive".into());
@@ -1806,6 +2023,7 @@ impl SystemSolver for SatCdcl {
             solving_degree: None,
             timed_out: matches!(verdict, SolveResult::Unknown),
             extra,
+            ..Default::default()
         };
         match verdict {
             SolveResult::Sat => (SolverVerdict::Solved(vec![enc.model_assignment()]), cost),
@@ -1825,26 +2043,167 @@ impl SystemSolver for SatCdcl {
 /// converted to the framework's mask representation.
 pub struct PrimoSmt;
 
+/// The pre-optimization Primo adapter, retained as a matched benchmark arm.
+/// It has the same input, solver and model checks as [`PrimoSmt`]; only the
+/// script transport and child-completion polling interval differ.
+pub struct PrimoSmtFile;
+
+const PRIMO_PARAMETERS: &[(&str, &str)] = &[
+    (
+        "primo_binary",
+        "path to Primo; otherwise SMT_PRIMO_BIN or PATH is used",
+    ),
+    (
+        "primo_timeout_ms",
+        "external wall timeout per call (default 600000; intersected with the pipeline budget)",
+    ),
+];
+
+#[derive(Clone, Copy)]
+enum PrimoTransport {
+    Stdin,
+    LegacyFile,
+}
+
+fn solve_primo(
+    solver_name: &str,
+    transport: PrimoTransport,
+    system: &BooleanSystem,
+    params: &Params,
+    budget: Option<Duration>,
+) -> (SolverVerdict, SolverCost) {
+    validate_solver_params(solver_name, params)
+        .expect("primo-smt configuration must be validated before a timed solve");
+    let binary = primo_binary(params)
+        .expect("primo-smt configuration must be validated before a timed solve");
+    let started = Instant::now();
+    let rows: Vec<AnfRow> = system.equations.iter().map(AnfRow::from_poly).collect();
+    let script = format_smtlib_for_solver(
+        system.n_vars as u32,
+        &rows,
+        &[],
+        SmtEncoding::Bool,
+        SmtSolverKind::Primo,
+    );
+    let configured = Duration::from_millis(
+        params
+            .u64_or("primo_timeout_ms", 600_000)
+            .expect("validated Primo timeout"),
+    );
+    let timeout = budget.map_or(configured, |limit| limit.min(configured));
+    let mut options = SmtSolveOptions::new(SmtSolverKind::Primo, binary);
+    options.encoding = SmtEncoding::Bool;
+    options.timeout = timeout;
+    options.use_stdin = matches!(transport, PrimoTransport::Stdin);
+    options.poll_interval = match transport {
+        PrimoTransport::Stdin => Duration::from_micros(250),
+        PrimoTransport::LegacyFile => Duration::from_millis(5),
+    };
+
+    let mut extra = BTreeMap::from([
+        ("input_bytes".into(), script.len() as u64),
+        ("rows".into(), rows.len() as u64),
+        ("variables".into(), system.n_vars as u64),
+        ("solver_calls".into(), 1),
+        ("solver_conflicts_available".into(), 0),
+        ("solver_decisions_available".into(), 0),
+        ("decisions".into(), 0),
+        ("invocation_error".into(), 0),
+        ("external_timeout".into(), 0),
+        ("unknown".into(), 0),
+        ("invalid_model".into(), 0),
+        ("model_checked".into(), 0),
+        ("stdin_transport".into(), u64::from(options.use_stdin)),
+        (
+            "poll_interval_us".into(),
+            options.poll_interval.as_micros() as u64,
+        ),
+        ("solver_process_wall_ns".into(), 0),
+    ]);
+    let run = match run_smt(&script, 0, &options) {
+        Ok(run) => run,
+        Err(error) => {
+            let timed_out = error.contains(" timed out after ");
+            extra.insert("external_timeout".into(), u64::from(timed_out));
+            extra.insert("invocation_error".into(), u64::from(!timed_out));
+            return (
+                SolverVerdict::BudgetExceeded,
+                SolverCost {
+                    ops: 0,
+                    op_unit: "Primo SAT conflicts (solver-reported)".into(),
+                    wall_ns: started.elapsed().as_nanos() as u64,
+                    peak_bytes: 0,
+                    degree_reached: None,
+                    solving_degree: None,
+                    timed_out,
+                    extra,
+                    ..Default::default()
+                },
+            );
+        }
+    };
+    let conflicts = run.conflicts.unwrap_or(0);
+    extra.insert(
+        "solver_conflicts_available".into(),
+        u64::from(run.conflicts.is_some()),
+    );
+    extra.insert(
+        "solver_decisions_available".into(),
+        u64::from(run.decisions.is_some()),
+    );
+    extra.insert("decisions".into(), run.decisions.unwrap_or(0));
+    extra.insert(
+        "solver_process_wall_ns".into(),
+        run.elapsed.as_nanos() as u64,
+    );
+    let verdict = match parse_smt_stdout(&run.stdout, system.n_vars) {
+        SmtVerdict::Unsat => SolverVerdict::Unsatisfiable,
+        SmtVerdict::Unknown => {
+            extra.insert("unknown".into(), 1);
+            SolverVerdict::BudgetExceeded
+        }
+        SmtVerdict::Sat(model) if rows_satisfied(&rows, &model) => {
+            extra.insert("model_checked".into(), 1);
+            let root = model
+                .iter()
+                .enumerate()
+                .filter(|(_, value)| **value)
+                .fold(0 as Mask, |mask, (i, _)| mask | bit(i as u32));
+            SolverVerdict::Solved(vec![root])
+        }
+        SmtVerdict::Sat(_) => {
+            extra.insert("invalid_model".into(), 1);
+            SolverVerdict::BudgetExceeded
+        }
+    };
+    (
+        verdict,
+        SolverCost {
+            ops: conflicts,
+            op_unit: "Primo SAT conflicts (solver-reported)".into(),
+            wall_ns: started.elapsed().as_nanos() as u64,
+            peak_bytes: 0,
+            degree_reached: None,
+            solving_degree: None,
+            timed_out: false,
+            extra,
+            ..Default::default()
+        },
+    )
+}
+
 impl SystemSolver for PrimoSmt {
     fn name(&self) -> &str {
         "primo-smt"
     }
 
     fn describe(&self) -> String {
-        "Primo SMT over exact Boolean QF_UF rows; returns one independently checked model".into()
+        "Primo SMT over stdin on exact Boolean QF_UF rows; returns one independently checked model"
+            .into()
     }
 
     fn parameters(&self) -> &[(&str, &str)] {
-        &[
-            (
-                "primo_binary",
-                "path to Primo; otherwise SMT_PRIMO_BIN or PATH is used",
-            ),
-            (
-                "primo_timeout_ms",
-                "external wall timeout per call (default 600000; intersected with the pipeline budget)",
-            ),
-        ]
+        PRIMO_PARAMETERS
     }
 
     fn accepts(&self, shape: &SystemShape) -> bool {
@@ -1861,106 +2220,43 @@ impl SystemSolver for PrimoSmt {
         params: &Params,
         budget: Option<Duration>,
     ) -> (SolverVerdict, SolverCost) {
-        validate_solver_params(self.name(), params)
-            .expect("primo-smt configuration must be validated before a timed solve");
-        let binary = primo_binary(params)
-            .expect("primo-smt configuration must be validated before a timed solve");
-        let rows: Vec<AnfRow> = system.equations.iter().map(AnfRow::from_poly).collect();
-        let script = format_smtlib_for_solver(
-            system.n_vars as u32,
-            &rows,
-            &[],
-            SmtEncoding::Bool,
-            SmtSolverKind::Primo,
-        );
-        let configured = Duration::from_millis(
-            params
-                .u64_or("primo_timeout_ms", 600_000)
-                .expect("validated Primo timeout"),
-        );
-        let timeout = budget.map_or(configured, |limit| limit.min(configured));
-        let mut options = SmtSolveOptions::new(SmtSolverKind::Primo, binary);
-        options.encoding = SmtEncoding::Bool;
-        options.timeout = timeout;
+        solve_primo(self.name(), PrimoTransport::Stdin, system, params, budget)
+    }
+}
 
-        let started = Instant::now();
-        let mut extra = BTreeMap::from([
-            ("input_bytes".into(), script.len() as u64),
-            ("rows".into(), rows.len() as u64),
-            ("variables".into(), system.n_vars as u64),
-            ("solver_calls".into(), 1),
-            ("solver_conflicts_available".into(), 0),
-            ("solver_decisions_available".into(), 0),
-            ("decisions".into(), 0),
-            ("invocation_error".into(), 0),
-            ("external_timeout".into(), 0),
-            ("unknown".into(), 0),
-            ("invalid_model".into(), 0),
-            ("model_checked".into(), 0),
-        ]);
-        let run = match run_smt(&script, 0, &options) {
-            Ok(run) => run,
-            Err(error) => {
-                let timed_out = error.contains(" timed out after ");
-                extra.insert("external_timeout".into(), u64::from(timed_out));
-                extra.insert("invocation_error".into(), u64::from(!timed_out));
-                return (
-                    SolverVerdict::BudgetExceeded,
-                    SolverCost {
-                        ops: 0,
-                        op_unit: "Primo SAT conflicts (solver-reported)".into(),
-                        wall_ns: started.elapsed().as_nanos() as u64,
-                        peak_bytes: 0,
-                        degree_reached: None,
-                        solving_degree: None,
-                        timed_out,
-                        extra,
-                    },
-                );
-            }
-        };
-        let conflicts = run.conflicts.unwrap_or(0);
-        extra.insert(
-            "solver_conflicts_available".into(),
-            u64::from(run.conflicts.is_some()),
-        );
-        extra.insert(
-            "solver_decisions_available".into(),
-            u64::from(run.decisions.is_some()),
-        );
-        extra.insert("decisions".into(), run.decisions.unwrap_or(0));
-        let verdict = match parse_smt_stdout(&run.stdout, system.n_vars) {
-            SmtVerdict::Unsat => SolverVerdict::Unsatisfiable,
-            SmtVerdict::Unknown => {
-                extra.insert("unknown".into(), 1);
-                SolverVerdict::BudgetExceeded
-            }
-            SmtVerdict::Sat(model) if rows_satisfied(&rows, &model) => {
-                extra.insert("model_checked".into(), 1);
-                let root = model
-                    .iter()
-                    .enumerate()
-                    .filter(|(_, value)| **value)
-                    .fold(0 as Mask, |mask, (i, _)| mask | bit(i as u32));
-                SolverVerdict::Solved(vec![root])
-            }
-            SmtVerdict::Sat(_) => {
-                extra.insert("invalid_model".into(), 1);
-                SolverVerdict::BudgetExceeded
-            }
-        };
-        (
-            verdict,
-            SolverCost {
-                ops: conflicts,
-                op_unit: "Primo SAT conflicts (solver-reported)".into(),
-                wall_ns: run.elapsed.as_nanos() as u64,
-                peak_bytes: 0,
-                degree_reached: None,
-                solving_degree: None,
-                timed_out: false,
-                extra,
-            },
+impl SystemSolver for PrimoSmtFile {
+    fn name(&self) -> &str {
+        "primo-smt-file"
+    }
+
+    fn describe(&self) -> String {
+        "legacy Primo SMT file transport and 5 ms polling; matched performance control only".into()
+    }
+
+    fn parameters(&self) -> &[(&str, &str)] {
+        PRIMO_PARAMETERS
+    }
+
+    fn accepts(&self, shape: &SystemShape) -> bool {
+        shape.n_vars <= MASK_BITS
+    }
+
+    fn finds_every_solution(&self) -> bool {
+        false
+    }
+
+    fn solve(
+        &self,
+        system: &BooleanSystem,
+        params: &Params,
+        budget: Option<Duration>,
+    ) -> (SolverVerdict, SolverCost) {
+        solve_primo(
+            self.name(),
+            PrimoTransport::LegacyFile,
+            system,
+            params,
+            budget,
         )
     }
 }
@@ -2013,6 +2309,7 @@ impl SystemSolver for Exhaustive {
                 ("bitop_word_ops".to_string(), word_ops),
                 ("bitop_complete".to_string(), 1),
             ]),
+            ..Default::default()
         };
         if solutions.is_empty() {
             (SolverVerdict::Unsatisfiable, cost)
@@ -2025,7 +2322,8 @@ impl SystemSolver for Exhaustive {
 /// Every solver the framework knows, by name.
 pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
     vec![
-        Box::new(F4F2),
+        Box::new(F4F2::default()),
+        Box::new(F4F2FullWidth),
         Box::new(BuchbergerF2),
         Box::new(M4gbF2),
         Box::new(M4gbF2Server),
@@ -2053,6 +2351,7 @@ pub fn solver_registry() -> Vec<Box<dyn SystemSolver>> {
         Box::new(XlF2),
         Box::new(SatCdcl),
         Box::new(PrimoSmt),
+        Box::new(PrimoSmtFile),
         Box::new(FesF2),
         Box::new(FesF2Gpu),
         Box::new(FesWide),
@@ -2269,8 +2568,24 @@ mod tests {
         assert_eq!(cost.extra["invalid_model"], 0);
         assert_eq!(cost.extra["solver_calls"], 1);
         assert_eq!(cost.extra["solver_conflicts_available"], 1);
+        assert_eq!(cost.extra["stdin_transport"], 1);
+        assert_eq!(cost.extra["poll_interval_us"], 250);
+        assert!(cost.extra["solver_process_wall_ns"] > 0);
         assert!(!cost.timed_out);
         assert!(!PrimoSmt.finds_every_solution());
+
+        let (legacy_verdict, legacy_cost) =
+            PrimoSmtFile.solve(&sys, &params, Some(Duration::from_secs(60)));
+        let SolverVerdict::Solved(legacy_found) = legacy_verdict else {
+            panic!("legacy Primo control did not solve the fixture: {legacy_verdict:?}");
+        };
+        assert_eq!(legacy_found, found);
+        assert_eq!(legacy_cost.ops, cost.ops);
+        assert_eq!(legacy_cost.extra["decisions"], cost.extra["decisions"]);
+        assert_eq!(legacy_cost.extra["stdin_transport"], 0);
+        assert_eq!(legacy_cost.extra["poll_interval_us"], 5_000);
+        assert!(legacy_cost.extra["solver_process_wall_ns"] > 0);
+        assert!(!PrimoSmtFile.finds_every_solution());
 
         let m = F2BoolMono::from_mask;
         let inconsistent = BooleanSystem {
@@ -2284,6 +2599,12 @@ mod tests {
         assert!(matches!(verdict, SolverVerdict::Unsatisfiable));
         assert_eq!(cost.extra["unknown"], 0);
         assert!(!cost.timed_out);
+        let (legacy_verdict, legacy_cost) = PrimoSmtFile.solve(&inconsistent, &params, None);
+        assert!(matches!(legacy_verdict, SolverVerdict::Unsatisfiable));
+        assert_eq!(legacy_cost.ops, cost.ops);
+        assert_eq!(legacy_cost.extra["decisions"], cost.extra["decisions"]);
+        assert_eq!(legacy_cost.extra["unknown"], 0);
+        assert!(!legacy_cost.timed_out);
     }
 
     #[test]
@@ -2557,7 +2878,13 @@ mod tests {
         use rand::SeedableRng;
         let mut rng = rand::rngs::StdRng::seed_from_u64(20261016);
         let sys = random_quadratic(10, 9, &mut rng);
-        for name in ["f4-f2", "matrix-f4", "matrix-f5", "inherited-f4"] {
+        for name in [
+            "f4-f2",
+            "f4-f2-full-width",
+            "matrix-f4",
+            "matrix-f5",
+            "inherited-f4",
+        ] {
             let run = || {
                 let sys = sys.clone();
                 std::thread::spawn(move || {
@@ -2854,6 +3181,182 @@ mod tests {
         assert!(
             cost.ops >= sys.equations[0].terms.len() as u64 * (1 << 12),
             "every point tests the first equation"
+        );
+    }
+
+    /// **`f4-f2` with its skeleton decides real descent systems exactly as
+    /// the plain path does.**  One solver instance solves a batch of
+    /// `S_3` descents of one cell (Koblitz curve over `F_{2^13}`, a
+    /// 6-dimensional subspace, 12 unknowns, random targets), as one
+    /// oracle does in one run; every verdict, solution set and structural
+    /// count equals that of `skeleton=0` on a fresh instance, the skeleton
+    /// is replayed, and its counters are reported.
+    #[test]
+    fn f4_f2_skeleton_matches_plain_on_descent_systems() {
+        use crate::cryptanalysis::ic_boundary::koblitz_instance;
+        use crate::cryptanalysis::pq_descent_symbolic::descend;
+        use rand::{Rng, SeedableRng};
+        let inst = koblitz_instance(0, 13).expect("Koblitz curve over F_2^13");
+        let basis: Vec<u64> = (0..6).map(|k| 1u64 << k).collect();
+        let mut rng = rand::rngs::StdRng::seed_from_u64(0x5ce1_17);
+        let with = F4F2::default();
+        let plain = F4F2::default();
+        let mut on = Params::default();
+        on.set("skeleton", "1");
+        let off = Params::default();
+        let keys = [
+            "steps",
+            "new_elements",
+            "reducer_rows",
+            "matrix_rows_sum",
+            "word_xors_performed",
+        ];
+        let mut sums: BTreeMap<String, (u64, u64)> = BTreeMap::new();
+        for k in 0..16 {
+            let x_r = rng.gen::<u64>() & inst.gf.mask;
+            let sys = descend(&inst.gf, inst.b, x_r, &basis, 2).unwrap();
+            let system = BooleanSystem {
+                equations: sys.equations.clone(),
+                n_vars: sys.n_vars,
+            };
+            let (va, ca) = with.solve(&system, &on, None);
+            let (vb, cb) = plain.solve(&system, &off, None);
+            assert_eq!(
+                format!("{va:?}"),
+                format!("{vb:?}"),
+                "system {k}: verdicts differ"
+            );
+            for key in keys {
+                assert_eq!(ca.extra[key], cb.extra[key], "system {k}: {key} differs");
+            }
+            assert_eq!(cb.extra["skeleton_steps_replayed"], 0);
+            for key in [
+                "divisor_tests",
+                "bitop_word_ops",
+                "bitop_hash_probes",
+                "skeleton_steps_built",
+                "skeleton_steps_replayed",
+                "skeleton_candidate_hits",
+                "skeleton_candidate_misses",
+                "skeleton_columns_reused",
+                "skeleton_columns_rebuilt",
+            ] {
+                let e = sums.entry(key.to_string()).or_default();
+                e.0 += ca.extra.get(key).copied().unwrap_or(0);
+                e.1 += cb.extra.get(key).copied().unwrap_or(0);
+            }
+        }
+        eprintln!("skeleton vs plain over 16 descent systems: {sums:?}");
+        assert!(sums["skeleton_steps_replayed"].0 > 0);
+        assert!(sums["divisor_tests"].0 < sums["divisor_tests"].1);
+    }
+
+    /// **`f4-f2` with its trace decides real descent systems exactly as
+    /// the plain path does.**  One solver instance with `trace=1` solves a
+    /// batch of `S_3` descents of one cell (Koblitz curve over `F_{2^13}`,
+    /// a 6-dimensional subspace, 12 unknowns, random targets), as one
+    /// oracle does in one run; every verdict and solution set equals that
+    /// of `trace=0`, and the charged work of both (replays, verifications,
+    /// fallbacks and recordings included) is reported side by side.
+    #[test]
+    fn f4_f2_trace_matches_plain_on_descent_systems() {
+        use crate::cryptanalysis::ic_boundary::koblitz_instance;
+        use crate::cryptanalysis::pq_descent_symbolic::descend;
+        use rand::{Rng, SeedableRng};
+        let inst = koblitz_instance(0, 13).expect("Koblitz curve over F_2^13");
+        let basis: Vec<u64> = (0..6).map(|k| 1u64 << k).collect();
+        let mut rng = rand::rngs::StdRng::seed_from_u64(0x5ce1_17);
+        let with = F4F2::default();
+        let plain = F4F2::default();
+        let mut on = Params::default();
+        on.set("trace", "1");
+        assert!(validate_solver_params("f4-f2", &on).is_ok());
+        let mut both = on.clone();
+        both.set("skeleton", "1");
+        assert!(validate_solver_params("f4-f2", &both).is_err());
+        let mut two = Params::default();
+        two.set("trace", "2");
+        assert!(validate_solver_params("f4-f2", &two).is_err());
+        let off = Params::default();
+        let mut sums: BTreeMap<String, (u64, u64)> = BTreeMap::new();
+        let mut supports = std::collections::BTreeSet::new();
+        let mut plain_shapes = std::collections::BTreeMap::new();
+        let n_systems = 32;
+        for k in 0..n_systems {
+            let x_r = rng.gen::<u64>() & inst.gf.mask;
+            let sys = descend(&inst.gf, inst.b, x_r, &basis, 2).unwrap();
+            let system = BooleanSystem {
+                equations: sys.equations.clone(),
+                n_vars: sys.n_vars,
+            };
+            let mut support: Vec<Mask> = system
+                .equations
+                .iter()
+                .flat_map(|p| p.terms.iter().map(|t| t.mask))
+                .collect();
+            support.sort_unstable();
+            support.dedup();
+            supports.insert(support);
+            let (va, ca) = with.solve(&system, &on, None);
+            let (vb, cb) = plain.solve(&system, &off, None);
+            assert_eq!(
+                format!("{va:?}"),
+                format!("{vb:?}"),
+                "system {k}: verdicts differ"
+            );
+            assert_eq!(ca.extra["basis_len"], cb.extra["basis_len"], "system {k}");
+            assert_eq!(cb.extra["trace_replays"], 0);
+            *plain_shapes
+                .entry((
+                    cb.extra["steps"],
+                    cb.extra["new_elements"],
+                    cb.extra["basis_len"],
+                    cb.solving_degree,
+                ))
+                .or_insert(0) += 1;
+            let e = sums.entry("word_xors".into()).or_default();
+            e.0 += ca.ops;
+            e.1 += cb.ops;
+            for key in [
+                "divisor_tests",
+                "pairs_reduced",
+                "field_pairs_reduced",
+                "matrix_rows_sum",
+                "bitop_word_ops",
+                "bitop_hash_probes",
+                "trace_records",
+                "trace_replays",
+                "trace_hits",
+                "trace_fallbacks",
+                "trace_mismatches",
+                "trace_steps_matched",
+                "steps",
+                "new_elements",
+                "trace_verifications",
+                "trace_verify_failures",
+                "trace_verify_word_xors",
+                "trace_verify_divisor_tests",
+                "trace_verify_pairs",
+                "trace_record_xors",
+                "trace_pairs_dropped",
+            ] {
+                let e = sums.entry(key.to_string()).or_default();
+                e.0 += ca.extra.get(key).copied().unwrap_or(0);
+                e.1 += cb.extra.get(key).copied().unwrap_or(0);
+            }
+        }
+        eprintln!(
+            "trace vs plain over {n_systems} descent systems ({} distinct supports):",
+            supports.len()
+        );
+        eprintln!("  plain (steps, new elements, basis, solving degree): {plain_shapes:?}");
+        for (k, (a, b)) in &sums {
+            eprintln!("  {k:28} trace {a:>12} plain {b:>12}");
+        }
+        assert!(sums["trace_records"].0 > 0);
+        assert_eq!(
+            sums["trace_hits"].0 + sums["trace_fallbacks"].0,
+            sums["trace_replays"].0
         );
     }
 }

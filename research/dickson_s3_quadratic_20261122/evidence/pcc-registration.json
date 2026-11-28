@@ -1,0 +1,52 @@
+{
+  "schema": "dickson-s3.pcc-registration/v1",
+  "mode": "append",
+  "claim_path": "pcc/claims/PCC-20261123-d1c503.json",
+  "claim_sha256": "ace47be167eff067821af1f4be12a8afa335b58cb31cbbeb54233f377f7d2136",
+  "entry_sha256": "6a23155dbfc9e3c219b1f9b84deea70624388aa9901743f22eb88221de50ab9b",
+  "receipt_sha256": "0451a0c5f09d7e76c6ddf951e805f07c8b9794b56936e0ed792c661afd339f3e",
+  "contract_source_sha256": "85d787ed7cec0c02a0e2cb81cf435691d448221c1d46e3a4cecb54e64d674fcb",
+  "base_entries_hash_checked": 1545,
+  "appended_entries": 1,
+  "standing": "unverified",
+  "standing_source": "unsigned metadata only; no standing verifier executed",
+  "verifier_run": false,
+  "signature_created": false,
+  "python_executed": false,
+  "claim": {
+    "schema": "pcc.claim/v1",
+    "id": "PCC-20261123-d1c503",
+    "kind": "statement",
+    "claim_type": "data",
+    "statement": "Frozen Rust development records report five corrected constructor/extraction tests and seven identity-record tests passing; the bounded F31 solve yields the same accepted ordered leaf tuples across quartic, invariant-Q and line-L arms; M31 checks cover selector roots and planted assignments only. This is unsigned producer evidence, with no M31 extraction, speedup, full-library, subgroup, or complete-DLP claim.",
+    "scope": "Unsigned producer development records for Dickson selectors with quartic and quadratic S3 coupling. Source review is within the same assistant team. No signed scientific verification, performance result, or complete-cost comparison is asserted. [pcc:unverified]",
+    "proofs": [
+      {
+        "kind": "attestation",
+        "subject": {
+          "path": "research/dickson_s3_quadratic_20261122/evidence/qualification-receipt.json",
+          "sha256": "0451a0c5f09d7e76c6ddf951e805f07c8b9794b56936e0ed792c661afd339f3e"
+        }
+      }
+    ],
+    "producer": {
+      "commit": "69fad1271054225a95d5682f5fdcd11fd2a692d7",
+      "session": "108b275c78dd",
+      "model": "ChatGPT GPT-6 Astra Pro"
+    },
+    "created_at": "2026-11-23T03:24:48Z"
+  },
+  "ledger_entry": {
+    "at": "2026-11-23T03:24:48Z",
+    "body": {
+      "claim_id": "PCC-20261123-d1c503",
+      "claim_sha256": "ace47be167eff067821af1f4be12a8afa335b58cb31cbbeb54233f377f7d2136",
+      "path": "pcc/claims/PCC-20261123-d1c503.json"
+    },
+    "hash": "6a23155dbfc9e3c219b1f9b84deea70624388aa9901743f22eb88221de50ab9b",
+    "prev": "90f7799fb5d77170d64e019939cb9c293dfcbd7829e36e6d39682e4a4cbe7c96",
+    "schema": "pcc.ledger-entry/v1",
+    "seq": 1545,
+    "type": "claim"
+  }
+}

@@ -1,0 +1,12 @@
+digraph R {
+  graph [rankdir=LR, bgcolor="white", fontname="Helvetica"];
+  node [shape=box, style="rounded,filled", fillcolor="#eaf3ef", fontname="Helvetica", fontsize=11];
+  dense [label="Retained target points (x,y)\nd4 D=8 / d5 D=16\nSame BM preprocessing"];
+  common [label="Same finite point algebra\nFp^18 or Fp^42\nNo extension points / no sign cover"];
+  chain [label="(x,y,chain coordinates)\nd4 D=4 / d5 D=5\nExtra coordinates uniquely recoverable"];
+  full [label="48 complete input cells\nm=2–7; 12 planted replays\nFull relation D UNKNOWN", fillcolor="#eeeeee"];
+  dense -> common [dir=both, label="evaluation isomorphism"];
+  common -> chain [dir=both, label="exact coordinate lift"];
+  dense -> full [label="same group equations"];
+  chain -> full [label="same group equations"];
+}

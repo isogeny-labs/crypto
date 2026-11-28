@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="970" viewBox="0 0 1200 970" role="img" aria-labelledby="title desc">
+  <title id="title">Two factorizations of the same H2 quotient</title>
+  <desc id="desc">The standard route merges a 1024-point coset by a size-512 cyclic kernel, leaving two images, and then merges those two. The sparse route first quotients by the full four-point two-torsion, leaving 256 images, then quotients by the residual cyclic kernel of size 256. Both yield the same normalized degree-1024 quotient and the same set V. This is an unsigned algebraic derivation, not a timing result.</desc>
+  <defs>
+    <marker id="blue-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0L10 5L0 10Z" fill="#345d98"/></marker>
+    <marker id="teal-arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0L10 5L0 10Z" fill="#087f82"/></marker>
+    <style>
+      text { font-family: "DejaVu Sans", Arial, sans-serif; fill: #192c42; }
+      .title { font-size: 32px; font-weight: 700; }
+      .sub { font-size: 19px; fill: #53647a; }
+      .heading { font-size: 23px; font-weight: 700; }
+      .body { font-size: 20px; }
+      .small { font-size: 17px; fill: #53647a; }
+      .number { font-size: 44px; font-weight: 700; }
+      .math { font-size: 24px; font-family: "DejaVu Serif", Georgia, serif; }
+      .white { fill: white; }
+      .blue { fill: #345d98; }
+      .teal { fill: #087f82; }
+    </style>
+  </defs>
+  <rect width="1200" height="970" fill="#f7f9fc"/>
+  <text x="600" y="50" text-anchor="middle" class="title">The same 1,024 points, grouped in two orders</text>
+  <text x="600" y="82" text-anchor="middle" class="sub">An isogeny merges points that differ by a kernel element.</text>
+
+  <rect x="310" y="112" width="580" height="128" rx="18" fill="#192c42"/>
+  <text x="600" y="147" text-anchor="middle" class="heading white">One starting coset: S + H₂</text>
+  <text x="600" y="182" text-anchor="middle" class="body white">1,024 rational points on A₋: y² = x³ − x</text>
+  <text x="600" y="213" text-anchor="middle" class="body white">H₂ = ⟨2K, U⟩, with orders 512 and 2</text>
+
+  <path d="M450 241C450 270 305 267 305 307" stroke="#345d98" stroke-width="3.5" fill="none" marker-end="url(#blue-arrow)"/>
+  <path d="M750 241C750 270 895 267 895 307" stroke="#087f82" stroke-width="3.5" fill="none" marker-end="url(#teal-arrow)"/>
+
+  <rect x="40" y="315" width="530" height="338" rx="18" fill="#eaf0f9" stroke="#b7c9e2" stroke-width="2"/>
+  <rect x="630" y="315" width="530" height="338" rx="18" fill="#e8f5f3" stroke="#a6d6d0" stroke-width="2"/>
+
+  <text x="305" y="355" text-anchor="middle" class="heading blue">STANDARD ROUTE</text>
+  <text x="305" y="393" text-anchor="middle" class="body">First nine degree-2 maps</text>
+  <text x="305" y="425" text-anchor="middle" class="body">Kernel ⟨2K⟩ has 512 points</text>
+  <rect x="100" y="449" width="410" height="93" rx="12" fill="white"/>
+  <text x="305" y="491" text-anchor="middle" class="number blue">2</text>
+  <text x="305" y="521" text-anchor="middle" class="body">coset images remain</text>
+  <text x="305" y="579" text-anchor="middle" class="body">One final degree-2 map</text>
+  <text x="305" y="612" text-anchor="middle" class="small">merges those two images.</text>
+
+  <text x="895" y="355" text-anchor="middle" class="heading teal">FULL TWO-TORSION FIRST</text>
+  <text x="895" y="393" text-anchor="middle" class="body">First two degree-2 maps form δ</text>
+  <text x="895" y="425" text-anchor="middle" class="body">Kernel A₋[2] has 4 points</text>
+  <rect x="690" y="449" width="410" height="93" rx="12" fill="white"/>
+  <text x="895" y="491" text-anchor="middle" class="number teal">256</text>
+  <text x="895" y="521" text-anchor="middle" class="body">coset images remain</text>
+  <text x="895" y="579" text-anchor="middle" class="body">Eight more degree-2 maps</text>
+  <text x="895" y="612" text-anchor="middle" class="small">quotient by ⟨δ(2K)⟩, of order 256.</text>
+
+  <path d="M305 654C305 693 450 685 450 726" stroke="#345d98" stroke-width="3.5" fill="none" marker-end="url(#blue-arrow)"/>
+  <path d="M895 654C895 693 750 685 750 726" stroke="#087f82" stroke-width="3.5" fill="none" marker-end="url(#teal-arrow)"/>
+  <text x="248" y="694" text-anchor="middle" class="small blue">512 × 2</text>
+  <text x="950" y="694" text-anchor="middle" class="small teal">4 × 256</text>
+
+  <rect x="310" y="735" width="580" height="110" rx="18" fill="#192c42"/>
+  <text x="600" y="772" text-anchor="middle" class="heading white">One final image T</text>
+  <text x="600" y="807" text-anchor="middle" class="body white">Same normalized map of degree 1,024</text>
+  <text x="600" y="833" text-anchor="middle" class="small white">Same original coset and same 1,024 x-values in V</text>
+
+  <text x="600" y="884" text-anchor="middle" class="math">z = δₓ(x) = (x² + 1)² / [x(x² − 1)]</text>
+  <text x="600" y="920" text-anchor="middle" class="math">First quartic constraint: x⁴ − zx³ + 2x² + zx + 1 = 0</text>
+  <text x="600" y="954" text-anchor="middle" class="small">Unsigned algebraic derivation · Five terms in this constraint · Speed remains unmeasured</text>
+</svg>

@@ -1,0 +1,9 @@
+# Pre-data amendment 1: repair K13 curve registration
+
+Status: written before any timed execution. The frozen 48-execution spec, both seeds, all eight method parameters, stopping rules and analysis boundaries remain byte-for-byte unchanged.
+
+The source-bound `ecbench` build from `88112c5a930009c883059c1c2e3c6c92c4b23f18` expanded the spec as two **unregistered** K13 workloads. The earlier admission binary expanded the identical spec as registered. `scripts/check_curve_names.py` reported that `src/cryptanalysis/ecbench/registry_index.txt` and `src/cryptanalysis/curve_aliases.json` disagreed with `docs/curves/registry.json`. The workload parser uses the index's byte offsets; the index is therefore load-bearing for exact registered identity. Running the first binary would violate the protocol's curve control.
+
+Before data, regenerate only the two derived files from the existing committed registry with `scripts/curve_id.py`'s `registry_index_text` and `alias_map_text`, using temp-file-plus-rename. The registry bytes (SHA-256 `33a16da0548b7b0c3482b3ba7198500a0285271794f63e9c46e10f9a02186e4f`) are unchanged. The new index SHA-256 is `f082729fc1486075f7c0c16d5235535aabbdb704a534456b6e1b2e82b3331779`; the new alias map SHA-256 is `45352b7c109436e6a2f3eca3accadf86b9bff6943508fd3f71ed7284f92128fd`. No IC, rootfinding, F4, F5, F6, rho, or ecbench timing code changes.
+
+Acceptance before measurement: generator check confirms the derived bytes, a newly built release `ecbench` reports both workloads registered and the same spec ID/target identities, and a focused registry test passes. Record the new binary hash and commit. If the generator check rejects the catalog itself, stop and record that obstruction rather than using the unregistered workload. The interrupted broad test log stays as an earlier failed validation attempt; it is not rewritten.

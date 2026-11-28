@@ -1,0 +1,19 @@
+{
+  "schema": "h116-chiral-branch-resultant-parity-launch/v1",
+  "protocol_id": "H116-CHIRAL-BRANCH-RESULTANT-PARITY-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and exact hashes in CHIRAL_BRANCH_RESULTANT_PARITY_SOURCE_GATE.md",
+  "base_feature_order": ["m1_cplus", "m1_cminus", "m2_cplus", "m2_cminus", "m3_cplus", "m3_cminus", "m4_cplus", "m4_cminus"],
+  "resultant_feature_order": "lexicographic unordered pairs (i,j), 0<=i<j<8",
+  "bit_convention": {"smooth_nonzero_square_resultant": 1, "smooth_nonsquare_resultant": 0, "singular_or_zero_resultant": "abstain"},
+  "rule_family": "all one- and two-feature xors, optionally complemented",
+  "rules": 812,
+  "target": "canonical_scalar_mod_2",
+  "replicates": 4096,
+  "commands": {
+    "build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_chiral_branch_residual_parity.rs", "-o", "/tmp/h116_chiral_branch_resultant_parity"],
+    "selftest": ["/tmp/h116_chiral_branch_resultant_parity", "--selftest"],
+    "run": ["/tmp/h116_chiral_branch_resultant_parity", "--run-resultants", "CHIRAL_BRANCH_RESULTANT_PARITY_RESULT.json"]
+  },
+  "outputs": ["CHIRAL_BRANCH_RESULTANT_PARITY_RESULT.json", "CHIRAL_BRANCH_RESULTANT_PARITY_RUN.txt", "CHIRAL_BRANCH_RESULTANT_PARITY_SHA256SUMS"],
+  "measurement_scope": "all 812 one-/two-feature affine Boolean rules on 28 ordered pairwise residual-quadratic resultant characters, with independent Sylvester determinant, common-root, symmetry, inherited branch-geometry, and family-wise shuffle controls"
+}

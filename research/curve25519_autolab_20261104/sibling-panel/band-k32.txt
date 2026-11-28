@@ -1,0 +1,112 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp32-tm5202-633eb5e4 | 29.00 | c1-lazy | 96/96 | 1.325 | 1.456 | 2.637 | — |
+| icv1-fp32-tm5202-633eb5e4 | 29.00 | c1-lazy-sib8 | 96/96 | 0.732 | 0.952 | 2.931 | — |
+| icv1-fp32-tm5202-633eb5e4 | 29.00 | inc | 96/96 | 1.755 | 1.929 | 3.493 | — |
+| icv1-fp32-tm5202-633eb5e4 | 29.00 | rho-neg | 96/96 | 0.946 | 1.039 | 1.876 | — |
+| icv1-fp32-tm5202-633eb5e4 | 29.00 | tw2cj-lazy | 96/96 | 1.755 | 1.929 | 3.493 | — |
+| icv1-fp32-tm5202-633eb5e4 | 29.00 | tw2cj-lazy-sib8 | 96/96 | 0.925 | 1.203 | 3.708 | — |
+| icv1-fp32-tm35946-001a66f4 | 29.00 | c1-lazy | 96/96 | 1.423 | 1.564 | 2.832 | — |
+| icv1-fp32-tm35946-001a66f4 | 29.00 | c1-lazy-sib8 | 96/96 | 0.736 | 0.956 | 2.939 | — |
+| icv1-fp32-tm35946-001a66f4 | 29.00 | inc | 96/96 | 1.784 | 1.960 | 3.549 | — |
+| icv1-fp32-tm35946-001a66f4 | 29.00 | rho-neg | 96/96 | 0.963 | 1.058 | 1.909 | — |
+| icv1-fp32-tm35946-001a66f4 | 29.00 | tw2cj-lazy | 96/96 | 1.784 | 1.960 | 3.549 | — |
+| icv1-fp32-tm35946-001a66f4 | 29.00 | tw2cj-lazy-sib8 | 96/96 | 0.912 | 1.187 | 3.657 | — |
+| icv1-fp32-tm44530-ae524bdb | 29.00 | c1-lazy | 96/96 | 1.320 | 1.451 | 2.627 | — |
+| icv1-fp32-tm44530-ae524bdb | 29.00 | c1-lazy-sib8 | 96/96 | 0.721 | 0.937 | 2.882 | — |
+| icv1-fp32-tm44530-ae524bdb | 29.00 | inc | 96/96 | 1.781 | 1.957 | 3.543 | — |
+| icv1-fp32-tm44530-ae524bdb | 29.00 | rho-neg | 96/96 | 0.951 | 1.045 | 1.886 | — |
+| icv1-fp32-tm44530-ae524bdb | 29.00 | tw2cj-lazy | 96/96 | 1.781 | 1.957 | 3.543 | — |
+| icv1-fp32-tm44530-ae524bdb | 29.00 | tw2cj-lazy-sib8 | 96/96 | 0.902 | 1.174 | 3.616 | — |
+| icv1-fp32-tm78226-faf1c6ae | 29.00 | c1-lazy | 96/96 | 1.362 | 1.497 | 2.711 | — |
+| icv1-fp32-tm78226-faf1c6ae | 29.00 | c1-lazy-sib8 | 96/96 | 0.700 | 0.911 | 2.804 | — |
+| icv1-fp32-tm78226-faf1c6ae | 29.00 | inc | 96/96 | 1.793 | 1.970 | 3.567 | — |
+| icv1-fp32-tm78226-faf1c6ae | 29.00 | rho-neg | 96/96 | 0.964 | 1.059 | 1.911 | — |
+| icv1-fp32-tm78226-faf1c6ae | 29.00 | tw2cj-lazy | 96/96 | 1.793 | 1.970 | 3.567 | — |
+| icv1-fp32-tm78226-faf1c6ae | 29.00 | tw2cj-lazy-sib8 | 96/96 | 0.890 | 1.157 | 3.565 | — |
+| icv1-fp32-tm100554-bc281c80 | 29.00 | c1-lazy | 96/96 | 1.448 | 1.592 | 2.883 | — |
+| icv1-fp32-tm100554-bc281c80 | 29.00 | c1-lazy-sib8 | 96/96 | 0.763 | 0.993 | 3.056 | — |
+| icv1-fp32-tm100554-bc281c80 | 29.00 | inc | 96/96 | 1.760 | 1.935 | 3.502 | — |
+| icv1-fp32-tm100554-bc281c80 | 29.00 | rho-neg | 96/96 | 0.926 | 1.017 | 1.836 | — |
+| icv1-fp32-tm100554-bc281c80 | 29.00 | tw2cj-lazy | 96/96 | 1.760 | 1.935 | 3.502 | — |
+| icv1-fp32-tm100554-bc281c80 | 29.00 | tw2cj-lazy-sib8 | 96/96 | 0.942 | 1.226 | 3.779 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp32-tm5202-633eb5e4 | c1-lazy vs c1-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm5202-633eb5e4 | c1-lazy vs inc | c1-lazy < inc |
+| icv1-fp32-tm5202-633eb5e4 | c1-lazy vs rho-neg | rho-neg < c1-lazy |
+| icv1-fp32-tm5202-633eb5e4 | c1-lazy vs tw2cj-lazy | c1-lazy < tw2cj-lazy |
+| icv1-fp32-tm5202-633eb5e4 | c1-lazy vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm5202-633eb5e4 | c1-lazy-sib8 vs inc | c1-lazy-sib8 < inc |
+| icv1-fp32-tm5202-633eb5e4 | c1-lazy-sib8 vs rho-neg | unresolved inside the band |
+| icv1-fp32-tm5202-633eb5e4 | c1-lazy-sib8 vs tw2cj-lazy | c1-lazy-sib8 < tw2cj-lazy |
+| icv1-fp32-tm5202-633eb5e4 | c1-lazy-sib8 vs tw2cj-lazy-sib8 | c1-lazy-sib8 < tw2cj-lazy-sib8 |
+| icv1-fp32-tm5202-633eb5e4 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-tm5202-633eb5e4 | inc vs tw2cj-lazy | unresolved inside the band |
+| icv1-fp32-tm5202-633eb5e4 | inc vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm5202-633eb5e4 | rho-neg vs tw2cj-lazy | rho-neg < tw2cj-lazy |
+| icv1-fp32-tm5202-633eb5e4 | rho-neg vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm5202-633eb5e4 | tw2cj-lazy vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm35946-001a66f4 | c1-lazy vs c1-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm35946-001a66f4 | c1-lazy vs inc | c1-lazy < inc |
+| icv1-fp32-tm35946-001a66f4 | c1-lazy vs rho-neg | rho-neg < c1-lazy |
+| icv1-fp32-tm35946-001a66f4 | c1-lazy vs tw2cj-lazy | c1-lazy < tw2cj-lazy |
+| icv1-fp32-tm35946-001a66f4 | c1-lazy vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm35946-001a66f4 | c1-lazy-sib8 vs inc | c1-lazy-sib8 < inc |
+| icv1-fp32-tm35946-001a66f4 | c1-lazy-sib8 vs rho-neg | unresolved inside the band |
+| icv1-fp32-tm35946-001a66f4 | c1-lazy-sib8 vs tw2cj-lazy | c1-lazy-sib8 < tw2cj-lazy |
+| icv1-fp32-tm35946-001a66f4 | c1-lazy-sib8 vs tw2cj-lazy-sib8 | c1-lazy-sib8 < tw2cj-lazy-sib8 |
+| icv1-fp32-tm35946-001a66f4 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-tm35946-001a66f4 | inc vs tw2cj-lazy | unresolved inside the band |
+| icv1-fp32-tm35946-001a66f4 | inc vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm35946-001a66f4 | rho-neg vs tw2cj-lazy | rho-neg < tw2cj-lazy |
+| icv1-fp32-tm35946-001a66f4 | rho-neg vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm35946-001a66f4 | tw2cj-lazy vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm44530-ae524bdb | c1-lazy vs c1-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm44530-ae524bdb | c1-lazy vs inc | c1-lazy < inc |
+| icv1-fp32-tm44530-ae524bdb | c1-lazy vs rho-neg | rho-neg < c1-lazy |
+| icv1-fp32-tm44530-ae524bdb | c1-lazy vs tw2cj-lazy | c1-lazy < tw2cj-lazy |
+| icv1-fp32-tm44530-ae524bdb | c1-lazy vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm44530-ae524bdb | c1-lazy-sib8 vs inc | c1-lazy-sib8 < inc |
+| icv1-fp32-tm44530-ae524bdb | c1-lazy-sib8 vs rho-neg | unresolved inside the band |
+| icv1-fp32-tm44530-ae524bdb | c1-lazy-sib8 vs tw2cj-lazy | c1-lazy-sib8 < tw2cj-lazy |
+| icv1-fp32-tm44530-ae524bdb | c1-lazy-sib8 vs tw2cj-lazy-sib8 | c1-lazy-sib8 < tw2cj-lazy-sib8 |
+| icv1-fp32-tm44530-ae524bdb | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-tm44530-ae524bdb | inc vs tw2cj-lazy | unresolved inside the band |
+| icv1-fp32-tm44530-ae524bdb | inc vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm44530-ae524bdb | rho-neg vs tw2cj-lazy | rho-neg < tw2cj-lazy |
+| icv1-fp32-tm44530-ae524bdb | rho-neg vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm44530-ae524bdb | tw2cj-lazy vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm78226-faf1c6ae | c1-lazy vs c1-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm78226-faf1c6ae | c1-lazy vs inc | c1-lazy < inc |
+| icv1-fp32-tm78226-faf1c6ae | c1-lazy vs rho-neg | rho-neg < c1-lazy |
+| icv1-fp32-tm78226-faf1c6ae | c1-lazy vs tw2cj-lazy | c1-lazy < tw2cj-lazy |
+| icv1-fp32-tm78226-faf1c6ae | c1-lazy vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm78226-faf1c6ae | c1-lazy-sib8 vs inc | c1-lazy-sib8 < inc |
+| icv1-fp32-tm78226-faf1c6ae | c1-lazy-sib8 vs rho-neg | unresolved inside the band |
+| icv1-fp32-tm78226-faf1c6ae | c1-lazy-sib8 vs tw2cj-lazy | c1-lazy-sib8 < tw2cj-lazy |
+| icv1-fp32-tm78226-faf1c6ae | c1-lazy-sib8 vs tw2cj-lazy-sib8 | c1-lazy-sib8 < tw2cj-lazy-sib8 |
+| icv1-fp32-tm78226-faf1c6ae | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-tm78226-faf1c6ae | inc vs tw2cj-lazy | unresolved inside the band |
+| icv1-fp32-tm78226-faf1c6ae | inc vs tw2cj-lazy-sib8 | tw2cj-lazy-sib8 < inc |
+| icv1-fp32-tm78226-faf1c6ae | rho-neg vs tw2cj-lazy | rho-neg < tw2cj-lazy |
+| icv1-fp32-tm78226-faf1c6ae | rho-neg vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm78226-faf1c6ae | tw2cj-lazy vs tw2cj-lazy-sib8 | tw2cj-lazy-sib8 < tw2cj-lazy |
+| icv1-fp32-tm100554-bc281c80 | c1-lazy vs c1-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm100554-bc281c80 | c1-lazy vs inc | c1-lazy < inc |
+| icv1-fp32-tm100554-bc281c80 | c1-lazy vs rho-neg | rho-neg < c1-lazy |
+| icv1-fp32-tm100554-bc281c80 | c1-lazy vs tw2cj-lazy | c1-lazy < tw2cj-lazy |
+| icv1-fp32-tm100554-bc281c80 | c1-lazy vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm100554-bc281c80 | c1-lazy-sib8 vs inc | c1-lazy-sib8 < inc |
+| icv1-fp32-tm100554-bc281c80 | c1-lazy-sib8 vs rho-neg | unresolved inside the band |
+| icv1-fp32-tm100554-bc281c80 | c1-lazy-sib8 vs tw2cj-lazy | c1-lazy-sib8 < tw2cj-lazy |
+| icv1-fp32-tm100554-bc281c80 | c1-lazy-sib8 vs tw2cj-lazy-sib8 | c1-lazy-sib8 < tw2cj-lazy-sib8 |
+| icv1-fp32-tm100554-bc281c80 | inc vs rho-neg | rho-neg < inc |
+| icv1-fp32-tm100554-bc281c80 | inc vs tw2cj-lazy | unresolved inside the band |
+| icv1-fp32-tm100554-bc281c80 | inc vs tw2cj-lazy-sib8 | unresolved inside the band |
+| icv1-fp32-tm100554-bc281c80 | rho-neg vs tw2cj-lazy | rho-neg < tw2cj-lazy |
+| icv1-fp32-tm100554-bc281c80 | rho-neg vs tw2cj-lazy-sib8 | rho-neg < tw2cj-lazy-sib8 |
+| icv1-fp32-tm100554-bc281c80 | tw2cj-lazy vs tw2cj-lazy-sib8 | unresolved inside the band |

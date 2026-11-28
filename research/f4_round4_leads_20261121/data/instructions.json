@@ -1,0 +1,10 @@
+{"workload": "jv_cover --exp ccov --sizes 53 --seeds 1 --residuals 100 --constructed 4 --oracle-base 0, RAYON_NUM_THREADS=1, callgrind --toggle-collect=*f4_with_arithmetic*",
+ "rows": [
+  {"label": "full F4, before round 4 (step 1 binary)", "f4_ir": 1137807395, "color": "#555555", "source": "data/step3/full1"},
+  {"label": "full F4, + step 3 (u32 acc, byte pack, u64 scan)", "f4_ir": 997615103, "color": "#3b6ea8", "source": "data/step3/full3"},
+  {"label": "Hilbert, before round 4", "f4_ir": 1096195667, "color": "#555555", "source": "data/step1/A"},
+  {"label": "Hilbert + trace (step 1 fix)", "f4_ir": 979078770, "color": "#c8553d", "source": "data/step1/C"},
+  {"label": "Hilbert + trace + step 3", "f4_ir": 858570556, "color": "#c8553d", "source": "data/step2/s2/s3tr"},
+  {"label": "Hilbert + trace + step 3, frozen steps off", "f4_ir": 858508825, "color": "#bbbbbb", "source": "data/step2/s2c/nofrz"},
+  {"label": "Hilbert + trace + step 3 + frozen steps (union)", "f4_ir": 774222391, "color": "#c8553d", "source": "data/step2/s2c/frz"}
+ ]}

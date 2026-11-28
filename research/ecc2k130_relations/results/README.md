@@ -9,13 +9,27 @@ files and do not recompute anything from them.
   (`target.log2_rho_reference` = 2^60.809, S = 0.07743), not recomputed here.
 * `summary.json`, `<name>.json` — the three-point sweeps, one file per support.
 * `run.log.live`, `four_point.log` — progress logs.
+* `four_point_summary.json`, `four_weight_two.json`,
+  `four_weight_two_frobenius_stable.json`, `four_random_matched.json` — the
+  completed four-point collision sweep.
 
-The four-point collision sweep of #404 is represented here by `four_point.log`
-alone. It has **no** JSON evidence: the run was cut off at 93% of its 18.16M
-signed pairs, and `run_four_point.py` writes `four_point_summary.json` and
-`four_<name>.json` only after a support completes, so nothing was ever
-written. An earlier version of this file listed those two names as though
-they were present. They were not, and the note cites no number from them.
+The restored four-point evidence contains three complete supports totalling
+37,507,774 signed pairs and 2,365 checked digest-collision candidates, with
+zero four-point relations. The apparent 93% endpoint in the first support is
+only its last 30-second progress heartbeat; its following JSON record says
+18,160,382 of 18,160,382 pairs were consumed. The summary, each standalone
+record and all three JSON records embedded in `four_point.log` agree exactly
+after omitting the standalone-only empty `relations` list.
+
+An older copy of this README incorrectly said the run had stopped at that
+heartbeat and that the JSON files did not exist. Commit `1e85fdf181` restored
+the files after sparse-branch merges had deleted main-tree content, but also
+restored that stale explanation. Check custody and three-way parity without
+rerunning the sweep with:
+
+```sh
+python3 research/ecc2k130_relations/verify_four_point_evidence.py
+```
 
 The orbit-grouped four-point sweep that replaces it is in
 

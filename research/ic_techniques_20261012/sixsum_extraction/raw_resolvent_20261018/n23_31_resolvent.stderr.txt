@@ -1,0 +1,17 @@
+# kernel B quartic root finder: resolvent
+# icv1-f2m23-t5197-69e76b73 r = 2095853 (21.0 bits), cofactor 4
+# n=23 solver cost: S3 395 ns (table 234), s4_in_x4 43 ns, roots split 8789 ns (22.3 S3), resolvent 723 ns (1.83 S3); ops/solve split FieldOps { mul: 970, sqr: 220, inv: 7, half_trace: 0, trace: 0, sqrt: 0 } resolvent FieldOps { mul: 52, sqr: 31, inv: 2, half_trace: 3, trace: 4, sqrt: 1 }; disagree 0
+# n = 23, K = 10: 460 points, 2223 table states (51129 abscissa states), build 0.00 s
+# n=23 K=10 4sum                   rel= 32 targets=   32 S3=        341 S4=         0 S3/rel=     1.066e1 S4/rel=   0.000e0 outer/rel=   1.066e1 tgt/rel=   1.000 wall/rel= 2.275e-5 (0.0s, relations)
+# n=23 K=10 6sum_b2_s4_strided     rel= 32 targets=   32 S3=          0 S4=       175 S3/rel=     0.000e0 S4/rel=   5.469e0 outer/rel=   5.469e0 tgt/rel=   1.000 wall/rel= 6.173e-5 (0.0s, relations)
+# n = 23, K = 20: 920 points, 8241 table states (189543 abscissa states), build 0.01 s
+# n=23 K=20 4sum                   rel= 32 targets=   32 S3=         95 S4=         0 S3/rel=     2.969e0 S4/rel=   0.000e0 outer/rel=   2.969e0 tgt/rel=   1.000 wall/rel= 1.795e-5 (0.0s, relations)
+# n=23 K=20 6sum_b2_s4_strided     rel= 32 targets=   32 S3=          0 S4=        57 S3/rel=     0.000e0 S4/rel=   1.781e0 outer/rel=   1.781e0 tgt/rel=   1.000 wall/rel= 1.242e-4 (0.0s, relations)
+# icv1-f2m31-tm90707-c95f16f5 r = 1439393 (20.5 bits), cofactor 1492
+# n=31 solver cost: S3 517 ns (table 291), s4_in_x4 43 ns, roots split 11320 ns (21.9 S3), resolvent 926 ns (1.79 S3); ops/solve split FieldOps { mul: 1292, sqr: 299, inv: 7, half_trace: 0, trace: 0, sqrt: 0 } resolvent FieldOps { mul: 61, sqr: 40, inv: 2, half_trace: 3, trace: 4, sqrt: 1 }; disagree 0
+# n = 31, K = 10: 620 points, 2888 table states (89528 abscissa states), build 0.01 s
+# n=31 K=10 4sum                   rel= 32 targets=   32 S3=        119 S4=         0 S3/rel=     3.719e0 S4/rel=   0.000e0 outer/rel=   3.719e0 tgt/rel=   1.000 wall/rel= 2.663e-5 (0.0s, relations)
+# n=31 K=10 6sum_b2_s4_strided     rel= 32 targets=   32 S3=          0 S4=        68 S3/rel=     0.000e0 S4/rel=   2.125e0 outer/rel=   2.125e0 tgt/rel=   1.000 wall/rel= 1.485e-4 (0.0s, relations)
+# n = 31, K = 20: 1240 points, 9548 table states (295988 abscissa states), build 0.02 s
+# n=31 K=20 4sum                   rel= 32 targets=   32 S3=         43 S4=         0 S3/rel=     1.344e0 S4/rel=   0.000e0 outer/rel=   1.344e0 tgt/rel=   1.000 wall/rel= 2.599e-5 (0.0s, relations)
+# n=31 K=20 6sum_b2_s4_strided     rel= 32 targets=   32 S3=          0 S4=        37 S3/rel=     0.000e0 S4/rel=   1.156e0 outer/rel=   1.156e0 tgt/rel=   1.000 wall/rel= 4.017e-4 (0.0s, relations)

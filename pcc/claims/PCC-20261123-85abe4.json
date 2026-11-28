@@ -1,0 +1,28 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-23T18:27:50Z",
+ "id": "PCC-20261123-85abe4",
+ "kind": "theorem",
+ "producer": {
+  "commit": "769693473039856325d83d6d9d8797d6edaced7f",
+  "model": "Codex",
+  "session": "leaf-guard-20261123"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "16ab5094cb447431ebf3e01dc435e4d4cc1d3f12d358ad079e668d6f25b3defe",
+   "kind": "lean",
+   "project": "research/hashed_ecdl_leaf_guard_20261123/formal/LeafGuard.lean",
+   "theorem": "NativeLeafGuard.active_size_lt"
+  },
+  {
+   "decl_sha256": "9f528bec75352b796fbfa0643bd630ba2ac07ff5f5ecbbc74ae53089b1b0688c",
+   "kind": "lean",
+   "project": "research/hashed_ecdl_leaf_guard_20261123/formal/LeafGuard.lean",
+   "theorem": "NativeLeafGuard.precision_from_source_guard"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/hashed_ecdl_leaf_guard_20261123",
+ "statement": "For natural s,M and positive q, the active size guard s/q<M implies s<M*q by the existing Std division equivalence. With the source divisor q=max(k,1), failing the early size return supplies s<=M*q. Substituting that derived comparison into the unchanged shared conditional34 precision law preserves every other inherited and dimension premise explicitly. This is a Nat/source-guard application, not a full Rust refinement, production admission, complete history or bit-cost result. Kernel-decided activity/divisor/boundary controls and a nonempty scalar application illustrate scope; no native run is added."
+}

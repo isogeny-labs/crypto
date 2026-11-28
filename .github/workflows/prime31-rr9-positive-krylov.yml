@@ -1,0 +1,78 @@
+name: Prime31 RR9 public-positive Krylov replay
+
+on:
+  push:
+    branches: [codex/prime31-b8-positive-extractor-20261122]
+    paths:
+      - '.github/workflows/prime31-rr9-positive-krylov.yml'
+      - 'research/prime31_ic_20261115/native/**'
+      - 'research/prime31_ic_20261115/rr9/verify_d9_positive_krylov.py'
+  pull_request:
+    paths:
+      - '.github/workflows/prime31-rr9-positive-krylov.yml'
+      - 'research/prime31_ic_20261115/native/**'
+      - 'research/prime31_ic_20261115/rr9/verify_d9_positive_krylov.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  exact-head-replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CARGO_BUILD_JOBS: '2'
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/prime31_ic_20261115/native/
+            /research/prime31_ic_20261115/rr9/verify_d9_positive_krylov.py
+            /src/cryptanalysis/f4_fp_tower.rs
+            /src/cryptanalysis/sig_fp_tower.rs
+      - name: Pin Rust and identify source
+        run: |
+          rustup toolchain install 1.100.0 --profile minimal
+          git rev-parse HEAD
+      - name: Native regressions and public-input extraction
+        shell: bash
+        run: |
+          set -euo pipefail
+          manifest=research/prime31_ic_20261115/native/Cargo.toml
+          cargo +1.100.0 test --locked --release --manifest-path "$manifest" --lib
+          cargo +1.100.0 build --locked --release --manifest-path "$manifest" --example prime31_rr9_d9_positive_krylov
+          timeout -k 10 300 research/prime31_ic_20261115/native/target/release/examples/prime31_rr9_d9_positive_krylov > positive.json
+          jq -e '.schema == "prime31.rr9.d9-positive-krylov.v1" and
+            .p == 2147483647 and .n == 2147446831 and
+            .rows == 27456 and .columns == 11440 and .nnz == 240240 and
+            .krylov_moments == 22880 and .scalar_bm_linear_complexity == 11440 and
+            .scalar_bm_last_coefficient == 0 and .macaulay_null_checked == true and
+            .constant_monomial_nonzero == true and .original_equations_checked == true and
+            .original_full_point_checked == true and .no_sign_mask_or_secret_scalar_passed == true and
+            .recovered_coefficients == [455835358,518652820,754716693,932383545,62510441,1884059825,1142049404] and
+            .complete_unknown_ecdlp_solves == 0' positive.json
+      - name: Independent original-curve replay
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/prime31_ic_20261115/rr9/verify_d9_positive_krylov.py positive.json > independent_replay.json
+          jq -e '.schema == "prime31.rr9.d9-positive-independent-replay.v1" and
+            .all_eight_original_equations_zero == true and
+            .all_eight_original_points_verified == true and
+            .signed_point_sum_matches_residual == true and
+            .independent_implementation == true' independent_replay.json
+      - name: Preserve exact-head output
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: prime31-rr9-positive-krylov-replay
+          path: |
+            positive.json
+            independent_replay.json
+          retention-days: 30
+          if-no-files-found: warn

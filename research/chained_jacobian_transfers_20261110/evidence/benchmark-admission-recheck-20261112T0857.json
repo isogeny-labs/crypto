@@ -1,0 +1,39 @@
+{
+  "checked_at": "2026-11-12T08:59:34.954103+00:00",
+  "decision": "no new cloud build/job submitted",
+  "policy_sources": [
+    {
+      "path": ".agents/skills/isolab-eks/SKILL.md",
+      "sha256": "61d599f8b300f5097e7bb1ab642eed30d2ee65df21f3e0d2258d91831e8b4e65"
+    },
+    {
+      "path": "taskq/deploy/eks-karpenter/COST_CONTROLS.md",
+      "sha256": "e57d6eb9378caebf9071f5eb306870f8fbc1149288d74ec65a78cc8108384f3d"
+    },
+    {
+      "path": ".agents/skills/isolab-eks/references/submission.md",
+      "sha256": "c85a1da8779edbf7c77d17afca4d195a484785ac4a708fb8abddd9fb868a4735"
+    }
+  ],
+  "configured_allowance_from_dated_repository_policy": {
+    "daily_usd": 200,
+    "monthly_usd": 1000,
+    "live_balance": null
+  },
+  "live_lane_charged_reserved_cost": null,
+  "live_pool_quota_readback": null,
+  "checkpoint_store_admission": "unresolved from prior failed checks",
+  "aws_cli_available": false,
+  "eks_or_budget_mcp_tools_available": false,
+  "github_commit_build_route": "documented candidate;current main commit-image/OIDC support not audited and no experiment dispatched",
+  "fresh_runtime_metadata": {
+    "observed_at": "2026-11-12T08:37:07Z",
+    "phase": "running",
+    "observations_current": true,
+    "configured_secrets": 0,
+    "runtime_variables": 0,
+    "outbound_identities": 0
+  },
+  "scope": "readiness metadata and policy review only;not proof that every possible external identity lacks access",
+  "next": "preserve admission gap;continue authorized native/Lean unit work and reconcile existing CI;freeze executable/protocol/publication before any future admitted benchmark"
+}

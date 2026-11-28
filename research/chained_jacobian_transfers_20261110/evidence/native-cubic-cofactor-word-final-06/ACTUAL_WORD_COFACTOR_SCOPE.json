@@ -1,0 +1,19 @@
+{
+  "time": "2026-11-16T19:20:28.857852+00:00",
+  "source_sha256": "22bd90207f04182513291a40a25a52a951c975502d4eaf35c3985f8fdb2f0c16",
+  "exact_frozen_prefix_sha256": "5743a021f3767e94d5e37617958596a75ec603a09088184e3218d3e40430febe",
+  "both_original_gates": "42 audited/0 failing/0 trusted each",
+  "new_named": 11,
+  "new_generated": [
+    "CubicCofactorWordBridge22307.decodeTriple.eq_1",
+    "CubicCofactorWordBridge22307.decodeWord.eq_1",
+    "CubicCofactorWordBridge22307.wordMul.eq_1",
+    "CubicCofactorWordBridge22307.wordSub.eq_1"
+  ],
+  "resources": "one worker/120s/original memory defaults each",
+  "warnings": "four deprecated if_pos/if_neg uses in each original build, retained and nonfatal, no source/gate changes",
+  "hypotheses": "input unsigned words canonical<223; native mul/sub expressions and constant3",
+  "result": "no-overflow multiplication/subtraction, canonical raw cofactor values equal the stated Fin223 polynomial P, not merely decoded residues",
+  "controls": "cofactor111/011 and noncanonical2^63 times2 wrap invalidates unconditional decode homomorphism",
+  "limits": "compiler/base inversion/nonzero-norm/actual field/Jacobian/counter/runtime/full original population/admission remain separate"
+}

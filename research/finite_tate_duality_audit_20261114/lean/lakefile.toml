@@ -1,0 +1,11 @@
+name = "finite_tate_duality_audit"
+version = "0.1.0"
+defaultTargets = ["FiniteTateDualityAudit"]
+
+[[require]]
+name = "char_p_pairing_domain_audit"
+path = "../../char_p_pairing_domain_audit_20261114/lean"
+
+[[lean_lib]]
+name = "FiniteTateDualityAudit"
+roots = ["FieldCharacterRoots", "CoinvariantCharacters", "PerfectEvaluation", "ActualDualityControls", "FiniteTateDualityCertificate"]

@@ -1,0 +1,20 @@
+digraph compatibility {
+graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.35", ranksep="0.32", fontname="DejaVu Sans"];
+node [shape=box, style="rounded,filled", color="#b9cad3", fillcolor="#f4f7f9", fontname="DejaVu Sans", fontsize=12, margin="0.18,0.12"];
+edge [color="#728a98", arrowsize=0.7, fontname="DejaVu Sans", fontsize=10];
+raw [label="1  Raw selector\n1,302 roots of X^1302 = 1", fillcolor="#eaf5ee",color="#4d8d66"];
+rawpass [label="-x, 1/x, -1/x\nall preserve these roots",fillcolor="#eaf5ee",color="#4d8d66"];
+support [label="2  Actual point support\n653 retained coordinates"];
+reject [label="All three maps rejected\n321 / 344 / 335 escaped coordinates",fillcolor="#fff0e8",color="#be7750"];
+geometry [label="3  Curve action + fixed target\nMust preserve the original signed relation"];
+chart [label="4  Solver chart\nInfinity prefixes need explicit coverage"];
+replay [label="5  Signed recovery and row accounting\nCoordinate closure alone cannot certify these"];
+raw -> support [label="lift and filter"];
+raw -> rawpass;
+support -> reject;
+support -> geometry [style=dashed,label="additional obligations"];
+geometry -> chart [style=dashed];
+chart -> replay [style=dashed];
+{rank=same; raw;rawpass;}
+{rank=same; support;reject;}
+}

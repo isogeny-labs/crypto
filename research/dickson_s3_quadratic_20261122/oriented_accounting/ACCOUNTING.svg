@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="1200" viewBox="0 0 920 1200" role="img" aria-labelledby="title description">
+  <title id="title">Cold candidate flow and independent check</title>
+  <desc id="description">Shared public inputs and cold setup feed four matched equation arms, a production traced visitor, and signed reconstruction with exact replay. Ordered signed tuples, signed multisets, and full augmented rows are parallel projections of accepted witnesses. Only the augmented rows feed row deduplication, native rank, and scalar replay. An independent exhaustive oracle remains outside the candidate cost boundary. This is a construction diagram with no measured results.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 1 1 L 9 5 L 1 9 Z" fill="#263e50"/>
+    </marker>
+    <marker id="comparison-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 1 1 L 9 5 L 1 9 Z" fill="#74828c"/>
+    </marker>
+    <style>
+      text { font-family: "DejaVu Sans", sans-serif; fill: #173043; font-size: 22px; }
+      .heading { font-size: 28px; font-weight: 700; }
+      .label { font-size: 24px; font-weight: 700; }
+      .scope-label { font-size: 22px; font-weight: 700; fill: #1d7b73; }
+      .muted { fill: #566875; }
+      .node { fill: #ffffff; stroke: #a7bac4; stroke-width: 1.6; }
+      .teal-node { fill: #eaf4f2; stroke: #1d7b73; stroke-width: 1.8; }
+      .flow { fill: none; stroke: #263e50; stroke-width: 2; stroke-linejoin: round; }
+      .comparison { fill: none; stroke: #74828c; stroke-width: 1.8; stroke-dasharray: 7 6; stroke-linejoin: round; }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="920" height="1200" fill="#ffffff"/>
+  <text x="460" y="40" text-anchor="middle" class="heading">Cold candidate flow and independent check</text>
+  <text x="460" y="73" text-anchor="middle" class="muted">Matched inputs · exact signed witnesses · useful rows</text>
+
+  <g id="candidate-boundary">
+    <rect x="24" y="92" width="872" height="930" rx="16" fill="#fbfcfd" stroke="#b5c6ce" stroke-width="1.6"/>
+    <text x="46" y="124" class="scope-label">CANDIDATE COST BOUNDARY</text>
+  </g>
+
+  <g id="public-inputs">
+    <rect x="48" y="142" width="824" height="94" rx="12" class="teal-node"/>
+    <text x="460" y="171" text-anchor="middle" class="label">Shared public inputs</text>
+    <text x="460" y="200" text-anchor="middle">Curve, subgroup, G, Q · public R = aG + bQ</text>
+    <text x="460" y="226" text-anchor="middle">Same Dickson fibre · full-field auxiliaries · fixed limits</text>
+  </g>
+
+  <g id="arm-input-branches" class="flow">
+    <path d="M 460 236 V 250 M 145 250 H 775"/>
+    <path d="M 145 250 V 268" marker-end="url(#arrow)"/>
+    <path d="M 355 250 V 268" marker-end="url(#arrow)"/>
+    <path d="M 565 250 V 268" marker-end="url(#arrow)"/>
+    <path d="M 775 250 V 268" marker-end="url(#arrow)"/>
+  </g>
+
+  <g id="quartic-arm">
+    <rect x="48" y="268" width="194" height="76" rx="12" class="node"/>
+    <text x="145" y="299" text-anchor="middle" class="label">Quartic S₃</text>
+    <text x="145" y="329" text-anchor="middle" class="muted">reference A</text>
+  </g>
+  <g id="invariant-arm">
+    <rect x="258" y="268" width="194" height="76" rx="12" class="teal-node"/>
+    <text x="355" y="299" text-anchor="middle" class="label">Invariant Q</text>
+    <text x="355" y="329" text-anchor="middle" class="muted">quadratic lift</text>
+  </g>
+  <g id="line-arm">
+    <rect x="468" y="268" width="194" height="76" rx="12" class="teal-node"/>
+    <text x="565" y="299" text-anchor="middle" class="label">Line L</text>
+    <text x="565" y="329" text-anchor="middle" class="muted">quadratic lift</text>
+  </g>
+  <g id="oriented-arm">
+    <rect x="678" y="268" width="194" height="76" rx="12" class="teal-node"/>
+    <text x="775" y="299" text-anchor="middle" class="label">Oriented O</text>
+    <text x="775" y="329" text-anchor="middle" class="muted">signed root</text>
+  </g>
+
+  <g id="arm-output-branches" class="flow">
+    <path d="M 145 344 V 366 H 775 V 344 M 355 344 V 366 M 565 344 V 366"/>
+    <path d="M 460 366 V 392" marker-end="url(#arrow)"/>
+  </g>
+
+  <g id="production-visitor">
+    <rect x="48" y="392" width="824" height="120" rx="12" class="teal-node"/>
+    <text x="460" y="425" text-anchor="middle" class="label">Production traced visitor</text>
+    <text x="460" y="458" text-anchor="middle">Native F4 · finite-field root recovery</text>
+    <text x="460" y="491" text-anchor="middle" class="muted">Caps / full_field refusal → incomplete</text>
+  </g>
+  <path d="M 460 512 V 548" class="flow" marker-end="url(#arrow)"/>
+
+  <g id="signed-reconstruction">
+    <rect x="100" y="548" width="720" height="88" rx="12" class="node"/>
+    <text x="460" y="581" text-anchor="middle" class="label">Signed reconstruction + literal replay</text>
+    <text x="460" y="615" text-anchor="middle">Base membership · every prefix · exact signed target</text>
+  </g>
+
+  <text x="48" y="670" class="scope-label">PARALLEL PROJECTIONS</text>
+  <g id="projection-branches" class="flow">
+    <path d="M 460 636 V 687 M 177 687 H 743"/>
+    <path d="M 177 687 V 698" marker-end="url(#arrow)"/>
+    <path d="M 460 687 V 698" marker-end="url(#arrow)"/>
+    <path d="M 743 687 V 698" marker-end="url(#arrow)"/>
+  </g>
+
+  <g id="ordered-signed-projection">
+    <rect x="48" y="698" width="258" height="80" rx="12" class="node"/>
+    <text x="177" y="730" text-anchor="middle" class="label">Ordered signed</text>
+    <text x="177" y="760" text-anchor="middle" class="muted">tuples</text>
+  </g>
+  <g id="multiset-projection">
+    <rect x="331" y="698" width="258" height="80" rx="12" class="node"/>
+    <text x="460" y="730" text-anchor="middle" class="label">Signed multisets</text>
+    <text x="460" y="760" text-anchor="middle" class="muted">retain repetitions</text>
+  </g>
+  <g id="augmented-row-projection">
+    <rect x="614" y="698" width="258" height="80" rx="12" class="teal-node"/>
+    <text x="743" y="730" text-anchor="middle" class="label">Augmented rows</text>
+    <text x="743" y="760" text-anchor="middle" class="muted">coefficients + RHS</text>
+  </g>
+  <text x="410" y="812" text-anchor="middle" class="muted">Parallel views; their counts are not added.</text>
+
+  <!-- Only the augmented-row projection enters the row/rank pipeline. -->
+  <path d="M 743 778 V 835 H 177 V 858" class="flow" marker-end="url(#arrow)"/>
+  <g id="row-deduplication">
+    <rect x="48" y="858" width="258" height="110" rx="12" class="teal-node"/>
+    <text x="177" y="888" text-anchor="middle" class="label">Deduplicate rows</text>
+    <text x="177" y="919" text-anchor="middle">Full key incl. RHS</text>
+    <text x="177" y="949" text-anchor="middle" class="muted">within / across cells</text>
+  </g>
+  <path d="M 306 913 H 331" class="flow" marker-end="url(#arrow)"/>
+  <g id="native-rank">
+    <rect x="331" y="858" width="258" height="110" rx="12" class="teal-node"/>
+    <text x="460" y="888" text-anchor="middle" class="label">Native rank</text>
+    <text x="460" y="919" text-anchor="middle">independent /</text>
+    <text x="460" y="949" text-anchor="middle" class="muted">dependent rows</text>
+  </g>
+  <path d="M 589 913 H 614" class="flow" marker-end="url(#arrow)"/>
+  <g id="scalar-replay">
+    <rect x="614" y="858" width="258" height="110" rx="12" class="teal-node"/>
+    <text x="743" y="888" text-anchor="middle" class="label">Scalar replay</text>
+    <text x="743" y="919" text-anchor="middle">original curve</text>
+    <text x="743" y="949" text-anchor="middle" class="muted">if determined</text>
+  </g>
+
+  <text x="460" y="1001" text-anchor="middle" class="muted">Includes admission, base setup, public targets and equations</text>
+
+  <!-- The oracle is outside the candidate boundary and never supplies roots. -->
+  <path d="M 820 592 H 908 V 1116 H 896" class="comparison" marker-end="url(#comparison-arrow)"/>
+  <g id="independent-oracle">
+    <rect x="24" y="1056" width="872" height="120" rx="14" fill="#f2f4f5" stroke="#74828c" stroke-width="1.6" stroke-dasharray="7 6"/>
+    <text x="460" y="1087" text-anchor="middle" class="label">Independent exhaustive oracle</text>
+    <text x="460" y="1119" text-anchor="middle">Outside candidate cost · tiny signed-base controls only</text>
+    <text x="460" y="1151" text-anchor="middle" class="muted">Compare complete signed witnesses and chart exclusions</text>
+  </g>
+</svg>

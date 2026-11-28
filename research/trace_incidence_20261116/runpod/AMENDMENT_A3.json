@@ -1,0 +1,11 @@
+{
+ "schema":"trace-runpod-protocol-amendment/v1",
+ "amends":["PROTOCOL.json","AMENDMENT_A2.json"],
+ "reason":"The agent-added admission formula reserved 30 minutes of unrelated pods' projected spending and incorrectly treated that forecast as insufficient funding for this USD1 task. Actual prepaid credit exceeds this task's full remaining allowance; unrelated job lifetimes/reservations are unknown.",
+ "previous_admission":"clientBalance > currentSpendPerHr*0.5 + 1",
+ "corrected_admission":"clientBalance >= 1, plus unchanged price/resource/deadline checks and inclusion of the first failed attempt in the combined USD1 ceiling",
+ "controls_unchanged":{"cost_ceiling_all_attempts_usd":1,"maximum_pods_total":2,"maximum_active_own_pods":1,"maximum_seconds_per_pod":1800,"maximum_pod_price_usd_per_hour":0.5,"maximum_vcpus":8,"maximum_memory_gib":16},
+ "resilience":"Supervisor-v2 mirrors public row/status/build outputs about once per minute in addition to its independent original-deadline deletion watchdog. No account key or signing credential is sent to the worker.",
+ "measurement_scope":"The native algorithm and fixed scientific matrix are unchanged; mirror traffic is a recorded shared-host nuisance. No measured data existed before this correction.",
+ "spending":"No automatic top-up, limit increase, unrelated-pod action or provider change is authorized or performed. Additional account credit is optional, not a prerequisite imposed by this agent."
+}

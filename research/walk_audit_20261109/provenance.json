@@ -1,0 +1,63 @@
+{
+  "schema": "walk-audit-provenance/v1",
+  "source_commit": "8c376a41754c03c8baa045e316ea2514f3363491",
+  "source": "native/census.cpp",
+  "source_sha256": "d9057ad43ea91aff1b13511901b8d0e4ff3b78e49e6aba01568fd3dcbed3d776",
+  "binary_sha256": "35de6f81723fb12ea2f9756634ec7b7bbbcf32da10aa4bc6636d4256ceb90080",
+  "build": [
+    "g++",
+    "-O2",
+    "-std=c++20",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "research/walk_audit_20261109/native/census.cpp",
+    "-o",
+    "/workspace/scratch/walk-census",
+    "-lgmpxx",
+    "-lgmp"
+  ],
+  "compiler": "g++ (Debian 14.2.0-19) 14.2.0",
+  "libraries": [
+    "linux-vdso.so.1 (0x00007ffa93702000)",
+    "\tlibgmpxx.so.4 => /lib/x86_64-linux-gnu/libgmpxx.so.4 (0x00007ffa936c3000)",
+    "\tlibgmp.so.10 => /lib/x86_64-linux-gnu/libgmp.so.10 (0x00007ffa93639000)",
+    "\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007ffa933d3000)",
+    "\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007ffa933a6000)",
+    "\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007ffa931b0000)",
+    "\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007ffa930c0000)",
+    "\t/lib64/ld-linux-x86-64.so.2 (0x00007ffa93704000)"
+  ],
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "kernel": "6.18.57",
+    "arch": "x64",
+    "isolation": "none; local shared host; no timing metric"
+  },
+  "preflight": {
+    "data_seen": [
+      "evidence/preflight/*",
+      "evidence/preflight-final/*",
+      "evidence/preflight-frozen-binary/*"
+    ],
+    "final_mix_seconds": 0.006,
+    "final_rho_seconds": 0.038,
+    "scope": "Mix p3,r2 plus p17,r2 support0,1; rho p2,r2 plus p11,r3 support0,1,2. In-sample calibration only, not confirmatory populations.",
+    "confirmatory_data_seen": false
+  },
+  "sources": [
+    {
+      "id": "Hildebrand1994",
+      "url": "https://link.springer.com/content/pdf/10.1007/BF01199265.pdf",
+      "sha256": "4629e178e68096fa5b37193de34e3e55dfb3f12021721dea06080737b5901458",
+      "read": "Theorems1–2, definitions/averaging, arc-support example; previous full proof setup."
+    },
+    {
+      "id": "Galbraith-ch14-v2",
+      "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch14.pdf",
+      "sha256": "ab59d8013db88ca145a101ddf9a9e28876fc4d10c76aac115d11da7bbbe1fada",
+      "read": "§14.2.5; PDFpage13/bookp297 visually inspected."
+    }
+  ],
+  "paid_spend": 0
+}

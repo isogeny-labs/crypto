@@ -1,0 +1,83 @@
+{
+  "schema": "twist.proposal-validation/v1",
+  "recorded_utc": "2026-10-22T06:45:44.975Z",
+  "source_commit": "9dff98b15fd91887d41a73419a03abe17f9e24ca",
+  "scientific_experiments_run": 0,
+  "proposals": {
+    "count": 12,
+    "status": "proposed_not_started",
+    "funding_units": 0,
+    "scheduled": false
+  },
+  "native_backlog_validation": {
+    "command": "target/release/backlog validate --all --merged-into origin/main",
+    "exit_code": 0,
+    "materialized_cards": 15
+  },
+  "library_initial": {
+    "command": "cargo +1.90.0 test --release --lib --locked",
+    "exit_code": 101,
+    "passed": 4470,
+    "failed": 9,
+    "ignored": 119,
+    "reason": "All nine failures returned PermissionDenied at local socket setup in the restricted sandbox; no source patch was made."
+  },
+  "library_socket_replay": {
+    "command": "cargo +1.90.0 test --release --lib --locked cryptanalysis::pollard_collab:: -- --test-threads=2",
+    "network_access_enabled": true,
+    "exit_code": 0,
+    "passed": 44,
+    "failed": 0,
+    "filtered_out": 4554,
+    "original_failures_all_passed": true,
+    "originally_failed_tests": [
+      "cryptanalysis::pollard_collab::cairn::tests::a_key_submitter_signs_what_cairn_verifies",
+      "cryptanalysis::pollard_collab::cairn::tests::an_older_node_without_progress_turns_heartbeats_off_quietly",
+      "cryptanalysis::pollard_collab::cairn::tests::generic_artifacts_use_the_persisted_commit_reveal_outbox",
+      "cryptanalysis::pollard_collab::cairn::tests::heartbeats_carry_the_sessions_own_counters_at_the_cadence",
+      "cryptanalysis::pollard_collab::cairn::tests::pending_commitments_survive_a_restart",
+      "cryptanalysis::pollard_collab::cairn::tests::points_travel_through_cairn_as_commit_reveal_claims_and_solve",
+      "cryptanalysis::pollard_collab::cairn::tests::the_client_speaks_enough_http",
+      "cryptanalysis::pollard_collab::net::tests::foreign_job_is_refused",
+      "cryptanalysis::pollard_collab::net::tests::three_nodes_in_a_chain_converge"
+    ]
+  },
+  "unique_passing_library_tests_across_invocations": 4479,
+  "full_suite_single_invocation_pass": false,
+  "pdf_visual_inspection": {
+    "file": "REPORT.pdf",
+    "pages": 12,
+    "inspected_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "method": "Rendered every page to PNG and read all three four-page contact sheets with view_image; final dependency diagram included."
+  },
+  "syntax_and_diff_checks": [
+    "bash -n render.sh",
+    "node --check write-proposals.cjs",
+    "node --check validate.cjs",
+    "git diff --cached --check (source/docs; raw stdout excluded)",
+    "git -c core.whitespace=-blank-at-eof diff --cached --check (raw stdout; original trailing empty lines preserved)"
+  ],
+  "previous_pr_head_validation": {
+    "head": "9dff98b15fd91887d41a73419a03abe17f9e24ca",
+    "mergeable_state": "dirty",
+    "failed_check_ids": [
+      119620671324,
+      119606683289
+    ],
+    "copilot_request": "https://github.com/aburan28/crypto/pull/2380#issuecomment-6334433856",
+    "note": "Remote hold remains; local proposal checks do not discharge prior CI failures or merge conflicts. Direct job-log downloads were unavailable through the environment network policy; API metadata/annotations and the existing PR hold were inspected."
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "schema": "h116.dual-pair-composition-protocol/v1",
+  "protocol_id": "H116-DUAL-PAIR-COMPOSITION-001",
+  "status": "frozen-before-producer-or-verifier-implementation-and-before-execution",
+  "question": "Does pointwise reconstruction of pi-1 produce an extension-stable degree-(N,N-1) rational x-map paired with the recovered V-1 map, and does their pointwise composition equal [N] on the complete frozen panel?",
+  "parent_v_minus_one_result_sha256": "d1c26c6f0a29a933fb82b64fafbc5c20531fe59122c924613de4bc46f00cb9bc",
+  "parent_pointwise_result_sha256": "5c8f506a81280c650470dac6d2b32deca78c9e63a45282b1a579a6ace66368eb",
+  "cells": [
+    {"slug":"fp5-a2-b1-d2","p":5,"a":2,"b":1,"degree":2,"dual_pole_roots":3,"dual_simple_roots":0,"dual_double_roots":3,"dual_regular_x":14},
+    {"slug":"fp5-a2-b1-d3","p":5,"a":2,"b":1,"degree":3,"dual_pole_roots":3,"dual_simple_roots":0,"dual_double_roots":3,"dual_regular_x":54},
+    {"slug":"fp5-a2-b1-d4","p":5,"a":2,"b":1,"degree":4,"dual_pole_roots":3,"dual_simple_roots":0,"dual_double_roots":3,"dual_regular_x":294},
+    {"slug":"fp7-a1-b1-d2","p":7,"a":1,"b":1,"degree":2,"dual_pole_roots":2,"dual_simple_roots":0,"dual_double_roots":2,"dual_regular_x":25},
+    {"slug":"fp7-a1-b1-d3","p":7,"a":1,"b":1,"degree":3,"dual_pole_roots":2,"dual_simple_roots":0,"dual_double_roots":2,"dual_regular_x":189},
+    {"slug":"fp7-a1-b1-d4","p":7,"a":1,"b":1,"degree":4,"dual_pole_roots":2,"dual_simple_roots":0,"dual_double_roots":2,"dual_regular_x":1235},
+    {"slug":"fp11-a1-b1-d2","p":11,"a":1,"b":1,"degree":2,"dual_pole_roots":7,"dual_simple_roots":1,"dual_double_roots":6,"dual_regular_x":64},
+    {"slug":"fp11-a1-b1-d3","p":11,"a":1,"b":1,"degree":3,"dual_pole_roots":7,"dual_simple_roots":1,"dual_double_roots":6,"dual_regular_x":630}
+  ],
+  "degree_model": {
+    "N": "base-field point count p+1-t",
+    "left_factor": "V-1=[t-1]-pi, using the stable parent rational map",
+    "right_factor": "pi-1, reconstructed from pointwise extension-field evaluations",
+    "right_numerator_degree": "N",
+    "right_denominator_degree": "N-1, monic",
+    "right_unknown_count": "2N",
+    "separation_requirement": "strictly more than 2N-1 regular x-values",
+    "scalar_factor": "[N] checked by direct scalar multiplication, not reconstructed"
+  },
+  "dual_kernel_model": {
+    "kernel": "ker(pi-1)=E(F_p), of frozen order N",
+    "distinct_x_roots": "floor(N/2)",
+    "simple_roots": "one when N is even, from the unique nonzero order-two point in the frozen cyclic groups; zero otherwise",
+    "double_roots": "distinct_x_roots-simple_roots",
+    "extension_stability": "all denominator roots and coefficients are already defined over F_p"
+  },
+  "composition_model": {
+    "identity": "([t-1]-pi) o (pi-1) = [p+1-t] = [N]",
+    "domain": "every point of every frozen extension-field curve, including infinity",
+    "point_evaluation": "use group operations and coordinate Frobenius independently of the reconstructed x-map coefficients"
+  },
+  "producer": {
+    "path": "h116_dual_pair_composition.rs",
+    "build": "rustc --edition=2021 -O -D warnings",
+    "source_hash": "4221e3f6ea1fe7fe5ad559b050d6bf8a76e8e5493f0f88421ae0ea6deae1b0ec"
+  },
+  "independent_verifier": {
+    "path": "h116_dual_pair_composition_verify.py",
+    "method": "separate Python extension-field/group implementation, Gaussian reconstruction, derivative multiplicity census and complete pointwise composition replay",
+    "source_hash": "b89f26b549eec491f29812129885b7ce57d2ddda5ad380bec21da5d1aeaab9d4"
+  },
+  "positive_checks": [
+    "both first and last canonical 2N windows have full rank and recover identical pi-1 maps",
+    "the pi-1 maps have exact degrees (N,N-1), base-field coefficients, and are stable across extensions of each base curve",
+    "the recovered denominator roots, simple/double multiplicities and regular counts equal the locked values",
+    "the recovered map matches every regular x-value, vanishes at every observed pi-1 pole, and has no numerator cancellation",
+    "the parent V-1 and new pi-1 x-maps have equal numerator and denominator degrees",
+    "the direct pointwise composition equals [N] on every point in every cell"
+  ],
+  "controls": [
+    "adding one to the reconstructed numerator constant rejects every regular dual-map sample",
+    "adding one to the denominator constant destroys every dual-map pole",
+    "using pi instead of pi-1 as the right factor must produce at least one composition failure in every cell",
+    "using [N+1] instead of [N] as the scalar result must produce at least one failure in every cell",
+    "exactly 2N-1 regular samples fail the strict finite-separation premise"
+  ],
+  "measurements": [
+    "solver ranks, exact degrees, coefficient encodings and family stability",
+    "regular/pole counts, exact root multiplicities, full-sample mismatches and cancellations",
+    "complete point count, correct composition failures and both mutation-failure counts",
+    "field/group operation counters and elapsed nanoseconds"
+  ],
+  "acceptance": {
+    "primary": "all positive checks pass in all eight cells, both mutation compositions reject in every cell, the three coefficient families are stable, and every exact producer field matches independent replay",
+    "failure_policy": "retain every row and report failures without changing cells, windows, degree model, locked root counts or controls"
+  },
+  "claim_boundary": "This experiment can provide finite pointwise evidence for the norm-factor pair and equal rational x-map degrees on three toy curves. It does not prove that pi-1 is the dual isogeny of V-1, instantiate scheme-theoretic degree, prove generic cyclicity or separability, solve ECDLP, or establish an asymptotic speedup.",
+  "filed_before_code": true,
+  "filed_before_data": true
+}

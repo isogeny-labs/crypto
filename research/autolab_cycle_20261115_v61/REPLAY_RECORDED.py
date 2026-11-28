@@ -1,0 +1,4 @@
+import pathlib,json,hashlib,base64,gzip
+R=pathlib.Path(__file__).resolve().parents[2];P=R/'research/autolab_cycle_20261115_v61'
+for name,h in json.loads((P/'EVIDENCE_SHA256.json').read_text()).items():assert hashlib.sha256((R/name).read_bytes()).hexdigest()==h,name
+raw=json.loads((R/'research/ordinary_boolean_encoding_20261115_v61/raw.json').read_text());assert raw['error']is None;o=raw['out'];payload=gzip.decompress(base64.b64decode((R/'research/ordinary_boolean_encoding_20261115_v61/neutral.json.gz.b64').read_bytes()));assert hashlib.sha256(payload).hexdigest()==o['input_sha256'];v=json.loads(payload);assert v['n_vars']==137 and len(v['equations'])==166 and sum(map(len,v['equations']))==124560;assert o['tiny_states']==3136 and o['mutation_rejected'];print('Lossless original ANF archive, hashes and encoding receipts verified. Baseline pilot was not executed.')

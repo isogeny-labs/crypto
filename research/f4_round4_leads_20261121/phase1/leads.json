@@ -1,0 +1,556 @@
+[
+ {
+  "lead": "L1-template: per-shape fixed elimination templates (Joux–Vitse F4 with precomputation) for jv_cover's Nagao systems",
+  "verdict": "pursue",
+  "measured": [
+   {
+    "what": "Why --trace is slower in the pilot (Full stop mode, the dlp default): counted cost",
+    "value": "C_cov 9.397e5 without trace, 1.173e6 with trace (+24.8%). 15,870 replays held and 3,142 mismatched, which reproduces the pilot's counts.",
+    "source": "jv_cover --exp dlp --sizes 53 --seeds 1 --rho-runs 0 --threads 1 [--trace], RAYON_NUM_THREADS=1, F4_DEBUG=1; round4/L1-template/dlp_nt.out, dlp_tr.out"
+   },
+   {
+    "what": "Why --trace is slower in Full mode: mechanism",
+    "value": "17,631 of 19,065 traced F4 runs replay the recorded steps up to degree 8, then start again at degree 2 and process every pair they accumulated as a full run. Pair rows summed over all steps go from 19,384,584 to 32,226,433 (+66%); rows*cols from 4.40e9 to 7.19e9 (+63%). Cause: a replay never consumes pairs (f4_fp.rs ~5228). In Full mode the trace has stopped=false, so at the end of the recorded steps (f4_fp.rs:5074-5101) the run turns tracing off and continues over all pending pairs. Every held replay is therefore a full run plus a redundant prefix.",
+    "source": "census2.py on dlp_nt.err / dlp_tr.err (restart = degree drops within a run); code read at f4_fp.rs:5074-5101, 5222-5251, 5888-5922"
+   },
+   {
+    "what": "Existing trace in staircase stop mode (where its design applies)",
+    "value": "dlp: C_cov 9.024e5 to 5.689e5 (-37%), 1,403 restarts. ccov400 F4 cost per test: 6.921e5 to 3.609e5. Callgrind over ccov100: F4 instructions 1.050G to 0.856G (-18.5%). Packed::symbolic inclusive drops only 345M to 315M; rref32_deferred inclusive drops 223M to 138M. The replay removes elimination work but not symbolic preprocessing.",
+    "source": "dlp_64_nt.out, dlp_64_tr.out, ccov_modes.txt, cg_s64_nt.cg, cg_s64_tr.cg (callgrind_annotate --inclusive=yes)"
+   },
+   {
+    "what": "The current best counted baseline is --stop hilbert, not trace",
+    "value": "ccov400 F4 cost per test: hilbert 1.506e5, stop64+trace 3.609e5, full 7.279e5. dlp C_cov: hilbert 3.621e5.",
+    "source": "ccov_modes.txt; dlp_hilbert_nt.out"
+   },
+   {
+    "what": "--trace together with --stop hilbert silently runs Full mode",
+    "value": "The dlp hilbert+trace output is identical to full+trace (C_cov 1.173e6, 15,870/3,142, same step census). f4_record and f4_replay call f4_with_arithmetic directly and skip the dispatch to f4_hilbert_guarded at f4_fp.rs:4425-4429.",
+    "source": "dlp_hilbert_tr.out vs dlp_tr.out; f4_fp.rs:1378-1408, 4425-4429"
+   },
+   {
+    "what": "Hilbert-mode F4 instruction breakdown (the lever)",
+    "value": "1.933G F4 instructions over 104 tests (about 18.6M per test). Packed::symbolic inclusive 1.195G (61.8%), of which Interned::id self 389.6M (20.2%) and symbolic self 387.7M (20.1%). (u128,u32) collect and sort about 10% (likely inside symbolic). rref32_deferred inclusive 122.5M (6.3%). staircase_at_most inclusive about 73M (3.8%). memset 69M (3.6%). The step loop runs one pair per step: 36.5 steps per main run and 38.7 per lead-form check run.",
+    "source": "valgrind --tool=callgrind --toggle-collect='*f4_with_arithmetic*' jv_cover --exp ccov --sizes 53 --seeds 1 --residuals 100 --constructed 4 --oracle-base 0 --stop hilbert; cg_hil.cg; census3.py dlp_hilbert_nt.err"
+   },
+   {
+    "what": "Shape census, Full mode (19,065 F4 runs)",
+    "value": "Basis-growth key (degree and basis size per step; a necessary condition for an equal LM shape): 11 distinct, top key 95.5%, 3 keys cover 99.6%. Dims key (rows/cols/pivots per step): 249 distinct, top key 64.2%, 10 keys cover 90%, 96 cover 99%, 118 singletons. True LM-shape agreement with one recorded trace: 15,870/19,012 = 83.5% held. LM shape is coarser than the dims key and finer than the growth key.",
+    "source": "census.py and census2.py on dlp_nt.err; dlp_tr.out"
+   },
+   {
+    "what": "Shape census, Hilbert mode, main runs",
+    "value": "Growth key: 61 distinct, top key 85.0%, 8 keys cover 97.1%, 17 singletons. Dims key: 14,817 distinct, top key 1.7%. Lead-form check runs: 65 growth keys, top 85.0%. The exact LM-shape count needs instrumentation (not measurable without a code change).",
+    "source": "census3.py and inline python on dlp_hilbert_nt.err (runs split by alternation; parity drifts on Hilbert fallbacks, so these are estimates)"
+   },
+   {
+    "what": "Support spread inside the top growth-key group (matrix size of a generic-support template)",
+    "value": "Per-step p95/mean of rows*cols: Hilbert main 1.006, lead 1.012, full 1.004, stop64 1.004. Max/mean: 1.597, 1.287, 1.332, 1.365. Rows max/mean: 1.15 to 1.35.",
+    "source": "union.py on dlp_hilbert_nt.err, dlp_nt.err, dlp_64_nt.err"
+   },
+   {
+    "what": "Output identity",
+    "value": "In every dlp mode: 31 relations, solved true, correct true. ccov: planted 4/4 and decomposable 1 in every mode.",
+    "source": "dlp_*.out, ccov_modes.txt"
+   }
+  ],
+  "estimated_gain": "All figures are estimates.\n\n- **Against the Hilbert baseline (best counted cost):** a frozen template removes symbolic preprocessing (61.8% of F4 instructions inclusive), most per-step bookkeeping and staircase walks (about 5%) and part of the allocation and memset churn (about 3 to 5%). It adds a gather-based fill, estimated at about 0.5M instructions per test: about 1,829 main rows plus 916 lead rows per test, about 40 terms each, about 5 instructions per term. That is against 18.6M F4 instructions per test today.\n- **Projected instruction cut:** about 65 to 70% of F4 instructions on systems that match a template (about 1.93G to about 0.6 to 0.7G over 104 tests).\n- **Weighted by coverage:** the top shape is at most 85% (growth-key bound); about 8 templates reach about 95%. Mismatches pay a wasted prefix plus a full run. Overall estimate: a 50 to 60% cut in Hilbert-mode F4 instructions.\n- **Counted F4 ops:** roughly unchanged against Hilbert (Hilbert already skips most zero reductions), at most about 10% lower if recorded useful-row pruning carries over.\n- **Against staircase+trace:** the existing replay leaves 315M of 856M (36.8%) in symbolic; the template removes most of it.\n- **Full mode:** do not compare against the current --trace there; it is a regression by construction.\n- **Falsification risk:** the lead could fail if true LM-shape coverage under Hilbert is well below 85%, for example if pair order with chunk=1 varies with supports. That would need about 20 or more templates and push the mismatch overhead above 15%.",
+  "accounting_impact": "- **Counted F4 ops (f4_muls / field_ops):** a template run charges exactly the elimination it performs.\n  - Rows are filled sparsely, with zero coefficients skipped.\n  - Unused reducer rows cost nothing in rref32_deferred, which charges per reduction of a pair row.\n  - Against the Hilbert baseline, counted F4 ops should be about equal, possibly a few percent lower from pruned zero-reducing rows (estimate).\n- **Mismatches:** must charge the template prefix plus the full fallback run. The current code already does this (it continues inside the engine), so oracle_muls cannot fall artificially.\n- **Hilbert lead-form check ops:** stay charged (hilbert_check_ops). If templated, they are charged at what is computed.\n- **Unpriced native work:** symbolic, hashing and pair bookkeeping disappear in place of a gather. Any native-ops counter (f4_native_ops) must drop, because that work is actually removed. This is not a relabelling: what is removed is real instructions, measured by callgrind.\n- **Record runs:** the one-time record per template (tracked_rref_contributors plus the generic-support symbolic pass) must be charged to the run, amortised over the systems that use it.",
+  "design": "**0. Fix the two defects found first; they are independently useful.**\n- (a) Trace or template mode must go through f4_hilbert_guarded (f4_fp.rs:4425-4429). Today f4_record and f4_replay (f4_fp.rs:1378-1408) bypass it, so `--trace --stop hilbert` is silently Full mode.\n- (b) In Full mode a replay must not end in a full run over all accumulated pairs (f4_fp.rs:5074-5101 with stopped=false).\n  - Either refuse replay when no stop rule is set,\n  - or record the pair set consumed per step and drop the pairs the recorded run proved useless (needs the Hilbert or staircase certificate to be sound).\n\n**1. Template = FrozenShape, recorded once per shape** (a new module, src/cryptanalysis/f4_fp/template.rs). It holds:\n- the input LMs;\n- per step:\n  - `cols`: a column list of packed u128 monomials in the frozen order;\n  - `pivot_cols`: a bitset;\n  - the row list, each row `(src: BasisRef, mult: packed monomial, colmap: Vec<u16>)` where `colmap[k]` is the target column of `mult * t_k` for the k-th generic-support term of src. `src` is an input poly or \"new poly j of step s\".\n  - `new_lm_cols`: the expected new pivots.\n- the final staircase count.\n\n**Generic support.** At record time each new polynomial's support is taken as all non-pivot columns of its step's echelon form, not just its nonzero terms. A zero coefficient at p=53 cannot then change the layout. Measured spread: p95/mean of rows*cols is 1.004 to 1.012; max/mean is 1.29 to 1.6. Build the union over the first K systems of a shape, or simply use the generic support.\n\n**2. Template run.**\n- New polynomials stay in column coordinates of their step (a dense or sparse vector over the step's non-pivot columns). There is no MonoTable/Interned::id, no Packed::symbolic and no pair queue.\n- Each row is filled by a gather: `for k in nz(src) { row[colmap[k]] = coef }`.\n- Then the unchanged rref32_deferred/add_lazy_avx2 kernel runs, with the pivot order taken from `cols`.\n- Unpack to monomials only for the final basis.\n\n**3. Matching and divergence.**\n- Key: hash the input LMs. They are already compared at f4_fp.rs:4928-4935, so the lookup is a HashMap from input_lms to candidate templates ordered by hit count.\n- Per step: the pivots found must equal `new_lm_cols` (a bitset compare).\n- If a src coefficient falls outside the generic support (impossible by construction) or the pivots differ: abort and run the plain engine from the input, charging both.\n- Cap the cache at N=8 to 16 templates per p. Record a new template after a full run whose growth key is unseen and is seen again (two hits). Evict on held<diverged as now (jv_cover.rs:1432-1446).\n\n**4. Correctness argument.**\n- Every template row is mult*f with f in I, so every output lies in I.\n- Matching pivots give LM(G) equal to the recorded set, whose staircase count is 64.\n- With the Hilbert lead-form certificate (finite staircase of the leading forms, so a regular sequence and no solutions at infinity), dim R/I = 64. Hence staircase(LT(G)) ⊇ staircase(LT(I)) with equal sizes, so G is a Gröbner basis.\n- The lead-form check can itself be templated: any finite staircase of a subset of (h) certifies, however it was computed.\n- Without a stop certificate (Full mode), template output must be re-certified or the template must be refused.\n\n**5. Tests.**\n- Template output equals the plain-engine reduced basis exactly (the reduced GB is unique) on: 1,000 Nagao systems at p=53, 101 and 251; adversarial systems with forced zero coefficients; a shape-changing system (must diverge and fall back with an identical basis).\n- jv_cover dlp: relation digest, decompositions and solved/correct identical; counted ops reported per arm.\n- Callgrind A/B on `ccov --residuals 100 --stop hilbert`.\n\n**6. Toggle.** F4_TEMPLATE=0/1 (default 0), with F4_TEMPLATE_MAX=N for the cache size. Keep --trace as the legacy path; F4_DEBUG prints template hit/miss per run.",
+  "risks": "- **LM-shape coverage under Hilbert is not yet measured.** Only the growth-key bound (top 85%, 8 keys 97%) and the Full-mode held rate (83.5%) are known. chunk=1 pair selection could make the pair order depend on support, which would fragment shapes (the dims key fragments to 14,817 distinct). Needs a small instrumentation run that hashes the recorded new_lms and step pair lcms per run.\n- **Generic-support templates** carry 15 to 35% more reducer rows than a typical system (rows max/mean 1.15 to 1.35). The extra fill instructions are cheap, but memory grows.\n- **Correctness depends on the stop certificate.** In Full mode without a certificate a template cannot claim a Gröbner basis.\n- **Fallback cost:** at 15% mismatches the wasted prefix could cost about 5 to 10% of the gain (estimate).\n- **Counted-op parity** with Hilbert must be demonstrated, not assumed: replay rows are recorded \"useful\" rows of the record system, and their counted reductions may differ.\n- **Interaction with other leads:** L-symbolic or MonoTable optimisations shrink the same 62% share this lead claims. The gains are not additive.\n- **Scope of the evidence:** all numbers are at p=53, seed 1. Larger p means fewer zero coefficients and probably more stable shapes (unmeasured).",
+  "artifacts": [
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/results.tsv",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/ccov_modes.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/census.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/census2.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/census3.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/union.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/cg_hil.cg",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/cg_s64_nt.cg",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/cg_s64_tr.cg",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/dlp_nt.out",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/dlp_tr.out",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/dlp_64_nt.out",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/dlp_64_tr.out",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/dlp_hilbert_nt.out",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/dlp_hilbert_tr.out",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/dlp_nt.err",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L1-template/dlp_hilbert_nt.err"
+  ]
+ },
+ {
+  "lead": "L2-divisor-index: a cheaper reducer search in Packed::symbolic and symbolic_par, returning the same first-alive divisor",
+  "verdict": "pursue-small",
+  "measured": [
+   {
+    "what": "Self Ir of Packed::symbolic on ccov (104 Nagao tests). Same value as cg/new3.cg, so the run is deterministic",
+    "value": "129,575,760 Ir (11.39% of F4's 1,137,381,291)",
+    "source": "callgrind --dump-instr=yes --collect-jumps=yes --toggle-collect='<crypto_lib::cryptanalysis::f4_fp::Packed>::symbolic' on new3/jv_cover --exp ccov --sizes 53 --seeds 1 --residuals 100 --constructed 4 --oracle-base 0, RAYON_NUM_THREADS=1 -> round4/L2-divisor-index/sym.cg, parsed by parse_cg.py (per-instruction sum = 129,575,760)"
+   },
+   {
+    "what": "Instructions in the reducer-scan loop on ccov (0x507080-0x5070c1, 18 instructions per probe: alive_idx load, bounds check, shl, u128 sub/sbb, not/and x2, or, branch, loop counter)",
+    "value": "37,603,443 Ir = 29.0% of symbolic self = 3.31% of F4 Ir",
+    "source": "sym_instr.txt summed over 0x507080..0x5070c1; disassembly sym.dis (objdump of new3/jv_cover)"
+   },
+   {
+    "what": "Queue pops on ccov",
+    "value": "142,681 pops, of which 15,704 were already done; 126,977 searched (77,489 found a reducer, 49,488 scanned the whole alive list without one)",
+    "source": "sym.cg jcnd 0x507038 15704/142681, exec count 0x50703a = 126,977, jcnd 0x5070b4 77489 taken, exec 0x5070c3 = 49,488"
+   },
+   {
+    "what": "Probes (divisibility tests) on ccov and mean probes per searched pop",
+    "value": "2,101,995 probes, 16.55 per pop",
+    "source": "exec count of 0x507080 (loop head) = 2,101,995; 2,101,995 / 126,977"
+   },
+   {
+    "what": "Calls to symbolic on ccov (728 F4 steps plus 104 final interreductions with count=false)",
+    "value": "832 calls, 7.0 steps per test",
+    "source": "exec count of the function entry 0x506980 = 832; F4_DEBUG=1 run dbg.err: 728 'f4 step' lines over 104 tests"
+   },
+   {
+    "what": "Basis size per F4 step on ccov",
+    "value": "mean 19.3 at step entry, mean 25.3 after the step, max 43; mean 181 columns and 145 rows",
+    "source": "F4_DEBUG=1 RAYON_NUM_THREADS=1 new3/jv_cover ccov run, dbg.err parsed"
+   },
+   {
+    "what": "Large-system workload (base/jv_quintic weierstrass p=271, 1 residual and 1 constructed, max-degree 24): total F4 Ir",
+    "value": "43,973,428,920 Ir (add_lazy_avx2 is 54.4% of it)",
+    "source": "callgrind --toggle-collect=crypto_lib::cryptanalysis::f4_fp::f4_with_arithmetic -> q.cg"
+   },
+   {
+    "what": "Reducer-scan loop on jv_quintic (symbolic is inlined into f4_with_arithmetic there; the loop is 0x3f04d0-0x3f050d, same 18 instructions)",
+    "value": "303,747,600 Ir = 0.69% of F4 Ir; 16,880,985 probes over 111,350 searched pops = 151.6 per pop; 36,710 found a reducer, 74,640 were full scans without one",
+    "source": "q_instr.txt; jcnd 0x3f0504 36710/16880985, jump 0x3f050f 74640, exec 0x3f04c6 = 111,350"
+   },
+   {
+    "what": "Peak basis on jv_quintic",
+    "value": "basis 2792 by step 35 (68 steps)",
+    "source": "F4_DEBUG=1 native run, q.err"
+   },
+   {
+    "what": "Equivalence check: u128 guarded test vs u64 test vs exponent-wise divisibility for n<=8 and exponents <=127, plus first match by 4-lane chunks vs linear scan",
+    "value": "0 mismatches in 200,000 pairs; 0 mismatches in 20,000 random lists (n=6, up to 45 LMs)",
+    "source": "python3 -I equiv_check.py"
+   },
+   {
+    "what": "Output identity of the instrumented run",
+    "value": "sym.json equals cg/new3.json except for timing fields (f4_muls and the other counted values are identical)",
+    "source": "diff of the two JSONs with _ms/elapsed lines removed: only f4_ms mean/min/max differ"
+   }
+  ],
+  "estimated_gain": "The ceiling is set by the scan's measured share: 3.31% of F4 instructions on ccov (37.6 M of 1,137 M Ir) and 0.69% on the large jv_quintic system (304 M of 43.97 G Ir). Nothing outside the scan loop gets cheaper. Estimates from instruction counting (not measured):\n(a) Scalar loop over a contiguous alive_lms array, with no alive_idx indirection or bounds check and a u64 test when n<=8: about 6 Ir per probe instead of 18. Saves about 25 M Ir on ccov (about 2.2% of F4) and about 200 M on quintic (about 0.46%).\n(b) AVX2 test of 4 LMs per vector (vpor, vpsubq, vpand, vpcmpeqq, vmovmskpd, tzcnt): about 1.75 Ir per probe plus about 10 Ir per pop. Saves about 32 M Ir on ccov (about 2.9% of F4 Ir, about 25% of symbolic self) and about 270 M on quintic (about 0.6%).\nSeveral alternatives do not pay:\n- Divisibility masks or per-variable signature bits: the existing probe is already one guarded word subtraction, so a mask test is not cheaper.\n- Most searched pops find no reducer: 39% on ccov (49,488 of 126,977) and 67% on quintic (74,640 of 111,350). For those a mask filter still has to reject every alive element.\n- A reducer cache kept across steps is exact (proof below), but it costs a u128 hash lookup of about 25-40 Ir against about 298 Ir of scan per pop on ccov. Pops are only about 153 per call, and each of the 19,020 systems is new. Its hit rate is unmeasured and the gain over (b) is at most about 0.3% of F4. Dropped.\n- Per-degree buckets need a merge back into index order and add complexity for at most the same 3.3%.\nWall time on 4 vCPU: not claimed. The host is shared, and branch mispredicts on the exit probe may dominate the cycles.",
+  "accounting_impact": "None, if done as proposed. Both search sites charge `count_native(found.map_or(alive_idx.len(), |k| k + 1))` (f4_fp.rs, line 2082 in symbolic and line 1974 in symbolic_par). An index that returns the same first-alive position k still knows k exactly, so it can charge exactly k+1, or len when nothing divides. f4_native_ops, oracle_muls and f4_muls stay bit-identical, and that equality should be the CI gate.\nThis means f4_native_ops keeps charging the linear-scan model cost: the probes the reference algorithm would make, now above the probes the machine actually runs (about 4x lower with AVX2). Report it that way, as an unchanged counted model with fewer engine instructions. It is not an improvement of the index-calculus baseline under the success criterion.\nCharging actual probes instead (ceil(k+1)/4 vector tests) would cut f4_native_ops by at most the probe share. That would be an accounting change, so it must not be reported as a speedup and needs its own flag and note. I do not recommend it.\nOne accounting nit: the per-pop `lock add` to the NATIVE_OPS atomic (about 120 k per ccov run) could be summed in a local and added once per call, with the same total.",
+  "design": "1. In Packed::symbolic (src/cryptanalysis/f4_fp.rs:2019; scan at lines 2078-2082), after `alive_idx` (line 2075), build `alive_lm64: Vec<u64> = alive_idx.iter().map(|&i| self.lms[i] as u64).collect()` and a u64 guard `g64 = self.guard as u64`, but only when `self.n <= 8`. Keep the u128 path for 9 <= n <= 15: the packed gate at line 4766 allows n_vars <= 15. Building the array costs O(alive) per call, about 25 entries times 832 calls on ccov, which is negligible.\n2. Add `fn first_divisor(lms: &[u64], g: u64, m: u64) -> Option<usize>`. Scalar version: `lms.iter().position(|&a| ((m|g).wrapping_sub(a)) & g == g)`. AVX2 version behind is_x86_feature_detected, like add_lazy_avx2: broadcast m|g and g, and for each chunk of 4 compute `vpsubq`, `vpand g`, `vpcmpeqq g` and `movemask_pd`. When the mask is nonzero, return chunk*4 + tzcnt(mask). The scalar version handles the tail.\n3. Replace the scan with `let found = first_divisor(...)` and keep `count_native(found.map_or(alive_idx.len(), |k| k+1) as u64)` unchanged. Apply the same change to the `reducer_of` closure in symbolic_par (lines 1966-1975), which has the identical scan. symbolic_par runs only with more than one thread and at least 1024 seed rows (sym_par_min_seeds, line 2293), so it never runs on ccov at RAYON_NUM_THREADS=1 but does run on large systems. The final interreduction (line 6101, count=false) gets the change for free.\n4. Env toggle for A/B: `F4_FP_DIVSCAN=linear|scalar|avx2`, default avx2 once validated, read once through OnceLock like symbolic_parallel (line 1659).\n\nEquivalence proof:\n(i) Exponents are below 128. The packed path requires max_degree < 128 and every input term of total degree below 128 (lines 4767-4768). Each byte of `b|G` is therefore at least 0x80, and each byte of `a` is at most 0x7f, so no byte subtraction borrows. The guard bit of field i survives exactly when b_i >= a_i, which is the existing u128 test. With n <= 8 every field and guard bit lies in the low 64 bits and the high half is 0 - 0 = 0, so the u64 test equals the u128 test bit for bit. equiv_check.py found 0 mismatches in 200 k random pairs.\n(ii) alive_lm64[k] = lms[alive_idx[k]], in the same order. The movemask lowest set bit in the lowest-indexed matching chunk is the minimal k with the predicate true, which is what `Iterator::position` returns. The divisor (alive_idx[k]), the multiplier and the count k+1 are therefore identical, so the rows, the `seen` set, the queue order and the matrices are identical.\n(iii) For the rejected cross-step cache: alive only goes from true to false (line 2223), and new elements are appended at the end (line 4902). A cached first divisor is still first while it is alive. Otherwise, resuming from cached index + 1 is exact, because the earlier indices were either non-divisors (LMs are fixed) or already dead.\n\nTest plan:\n- Unit test: random packed LMs and monomials, first_divisor equals the linear position, for every n from 1 to 15 and for lengths 0-9 and around 4k+-1.\n- Integration: run ccov 104 tests and the jv_quintic command in linear mode and in avx2 mode, and require identical JSON apart from timing fields, plus an identical native_ops_total() and identical F4_DEBUG step lines.\n- callgrind with the same toggle: show symbolic self Ir falling from 129.58 M (target about 97 M) and F4 total from 1,137 M (target about 1,105 M).\n- Optional: F4_FP_SYMBOLIC_PAR=1 with RAYON_NUM_THREADS=4 on quintic to cover symbolic_par.",
+  "risks": "The payoff is small and bounded: 3.3% of F4 instructions at most on the main consumer and 0.7% on large systems. Interned::id, at 16.9% of F4, is the far bigger symbolic cost. The instruction saving may not show up as wall time: the scan is short (16.5 probes), the exit branch mispredicts, and AVX2 setup per pop adds a few instructions. A tiny alive list (about 6-43 here) blunts the 4-lane win. A wall-time claim needs a quiet-host A/A and A/B, which was not done. The u64 path is valid only for n <= 8, so a wrong guard choice for n > 8 would silently break divisibility; keep the u128 fallback and a unit test at n = 9 to 15. The quintic numbers come from the base binary (glibc, older build) with symbolic inlined into f4_with_arithmetic. Its scan loop is the same 18-instruction code, but the F4 total is not directly comparable with new3. The found/not-found probe split per pop was not measured; only totals were. Claims are [pcc:unverified].",
+  "artifacts": [
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L2-divisor-index/numbers.tsv",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L2-divisor-index/sym.cg",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L2-divisor-index/sym_instr.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L2-divisor-index/sym.dis",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L2-divisor-index/q.cg",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L2-divisor-index/q_instr.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L2-divisor-index/q_f4.dis",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L2-divisor-index/parse_cg.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L2-divisor-index/equiv_check.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L2-divisor-index/dbg.err",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L2-divisor-index/q.err"
+  ]
+ },
+ {
+  "lead": "L3-narrow-arith: narrower arithmetic for small primes (p=53) in the F4 elimination on jv_cover's Nagao systems",
+  "verdict": "pursue-small",
+  "measured": [
+   {
+    "what": "Which path jv_cover's ccov systems take: F4 steps with n_cols >= FL_MIN_COLS (256), i.e. eligible for Faugere-Lachartre",
+    "value": "8 of 728 steps (2.2% of rows x cols); the other 720 use the per-pair-row cascade (deferred mode 2). The modal step 5 has 254.6 mean cols, and 96 of 104 tests sit at exactly 255 cols, one below the threshold",
+    "source": "F4_DEBUG=1 RAYON_NUM_THREADS=1 new3/jv_cover --exp ccov --sizes 53 --seeds 1 --residuals 100 --constructed 4 --oracle-base 0; parsed by round4/L3-narrow-arith/steps.py -> steps.txt; threshold at f4_fp.rs:2921, dispatch at f4_fp.rs:5543"
+   },
+   {
+    "what": "Step shapes (means over 104 tests)",
+    "value": "steps 3-7: 153x190, 205x232, 231x255, 204x245, 176x235 (rows x cols); pivots 133-191; 7 steps per test, degree up to 8",
+    "source": "round4/L3-narrow-arith/steps.txt"
+   },
+   {
+    "what": "Matrix density in the cascade",
+    "value": "10,784,279 sparse updates over 396,020 eliminations = 27.2 entries per reducer row out of about 240 columns (about 11% dense); 10,273 pair rows, 38.5 eliminations per pair row",
+    "source": "per-instruction callgrind (l3.cg, --dump-instr=yes): inner loop 0x586e40 = 5,503,021 and 0x5740e0 = 5,281,258 iterations; elimination entry 0x586de5 = 250,535 and 0x574085 = 145,485; pair-row entry 7,822 + 2,451"
+   },
+   {
+    "what": "Elimination share of F4 Ir",
+    "value": "about 415.6M of 1,136,909,960 (36.5%): cascade closure#41, both copies, 188.6M inclusive; rref32_deferred 227.0M inclusive. This is higher than the 25-30% in the brief",
+    "source": "callgrind_annotate --inclusive=yes round4/L3-narrow-arith/l3.cg"
+   },
+   {
+    "what": "Cascade sparse scatter acc[cc]+=neg*v (u64 acc, (u32,u64) entries)",
+    "value": "108.1M Ir at 9-11 instr per update; scalar scatter that includes a bounds check",
+    "source": "l3.cg blocks 0x586e40-0x586e69 (11 instr x 5.50M) and 0x5740e0-0x5740fe (9 x 5.28M); objdump of new3/jv_cover"
+   },
+   {
+    "what": "u64 to u32 narrowing passes using the 64-bit (u128) Barrett",
+    "value": "store narrowing 34.2M Ir (2.98M elements, 11.5/elt, scalar mul); back-substitution narrowing 45.8M Ir (2.23M elements, 20.5/elt, SSE2-emulated 64-bit mul); cascade gather of free columns 30.4M Ir (1.65M elements, 18/elt). Total 110.4M Ir",
+    "source": "l3.cg blocks 0x52afb0 (23 instr x 1,487,701, unrolled x2), 0x487160 (41 x 1,117,198, x2), 0x487690 (18 x 1,646,637); tools/cgaddr.py + tools/blocks.py"
+   },
+   {
+    "what": "Other element-wise passes in rref32_deferred",
+    "value": "widen u32 to u64 about 10.4M Ir (about 4.6M elements, SSE2 2.25/elt); pivot-column tests via u64 Barrett about 21M Ir (about 1.04M tests at 17-19 instr); first-nonzero scan about 11M plus Barrett32 pivot scaling 12.9M (SSE2, 37 instr per 4 elements)",
+    "source": "l3.cg blocks 0x588c50, 0x584300, 0x52aba0, 0x59094c, 0x52b030, 0x52b2f0"
+   },
+   {
+    "what": "add_lazy_avx2 (u32 pivot x u64 acc, 4 lanes)",
+    "value": "62.0M Ir plus 3.0M in the add_lazy wrapper; 314,976 calls, 5,303,907 vector iterations, so 67 elements per call; body 47.7M, fixed cost about 45 instr per call",
+    "source": "l3.cg addresses 0x521d40-0x521d64 (9 instr x 5,303,907)"
+   },
+   {
+    "what": "Lane-count sensitivity measured with the same binary: F4_FP_LAZY_SIMD=0 (scalar) vs default AVX2",
+    "value": "F4 Ir 1,211,092,167 vs 1,136,909,960, so 4 lanes save 74.2M (6.5%); output identical; f4_muls identical at 75,685,287",
+    "source": "round4/L3-narrow-arith/SIMD0.err, l3.err; tools/cmpjson.py"
+   },
+   {
+    "what": "Existing narrow mode F4_FP_NARROW=1 (u32, Barrett32 on every update, no lazy accumulation)",
+    "value": "F4 Ir 1,592,679,777 (+40.1%); f4_muls 79,900,962, which differs from the default",
+    "source": "round4/L3-narrow-arith/NARROW1.err/json"
+   },
+   {
+    "what": "F4_FP_NARROW=0 (u64 wide)",
+    "value": "F4 Ir 1,713,272,470 (+50.7%); f4_muls 76,795,646",
+    "source": "NARROW0.err/json"
+   },
+   {
+    "what": "Forced Faugere-Lachartre F4_FP_FL_MIN_COLS=0 (dense B' path)",
+    "value": "F4 Ir 1,720,593,129 (+51.3%); counted f4_muls 93,872,901 (+24%); add_lazy_avx2 alone 273M",
+    "source": "FL0.err/json; callgrind_annotate FL0.cg"
+   },
+   {
+    "what": "Reproduction of the baseline callgrind",
+    "value": "1,136,909,960 vs 1,137,381,291 in the brief's new3.cg; JSON identical to the native F4_DEBUG run apart from timings",
+    "source": "l3.err; tools/cmpjson.py l3.json dbg.json"
+   },
+   {
+    "what": "F4 share of the whole program (ccov)",
+    "value": "1.139G of 3.331G Ir = 34.2%",
+    "source": "callgrind_annotate --inclusive=yes cg/prog_new3.cg"
+   },
+   {
+    "what": "Host SIMD vs measured path",
+    "value": "The host has avx512f/bw/vl/ifma, so the native run takes the 8-lane AVX-512 add_lazy, but valgrind hides AVX-512 and callgrind measured AVX2. The crate builds for baseline x86-64 (no target-cpu in .cargo/Cargo.toml), so auto-vectorised loops are SSE2 only",
+    "source": "/proc/cpuinfo; Cargo.toml [profile.lab] lines 414-417; SSE2 code seen in objdump"
+   },
+   {
+    "what": "Delayed-reduction headroom at p=53",
+    "value": "(p-1)^2 = 2704. A u16 acc holds floor((65535-52)/2704) = 24 products; a u32 acc holds floor((2^32-1-52)/2704) = 1,588,330, so a row (at most 302 columns or updates) never needs normalising. For p<2^8 in general a u16 acc holds 1 product (useless) and a u32 acc holds 66,572; a u16 acc is useful only for p <= about 91 (k >= 8)",
+    "source": "arithmetic from Barrett32 bound at f4_fp.rs:458-460"
+   }
+  ],
+  "estimated_gain": "Estimate, in Ir rather than time. A u32-accumulator (or u16-storage) deferred kernel for p <= about 2^12 removes most of the 110.4M Ir spent narrowing u64 to u32 through the u128 Barrett (scalar or SSE2-emulated). Done as AVX2 8-lane u32 Barrett or 16-lane u16 mulhi, those passes should fall to about 10-20M, saving about 90-100M. Moving add_lazy from 4 to 8 (u32) or 16 (u16) lanes saves about 24-36M; the fixed cost of about 45 instr per call over 315k calls of 67 elements stays and limits it, and the lane data supports that limit (scalar to 4 lanes saved only 74M). Dropping the widen pass and using cheaper u32 tests of acc[c] saves about 15-20M. Total about 130-155M Ir, about 11-14% of F4 Ir (1.137G), or about 4-4.5% of whole-program ccov Ir. On the native AVX-512 host the lane part is smaller, because add_lazy already runs 8 lanes there. The largest single elimination kernel, the cascade sparse scatter at 108M (about 26% of elimination Ir), gains nothing from narrower lanes. It is a scalar scatter at about 11% density, so SIMD reaches it only by densifying reducer rows. An unmeasured estimate of densifying them as u32 rows plus an 8-lane dense axpy over each reducer's span of about 95 columns is about 108M down to about 40M. That is a separate, riskier sub-lead. The scalar u128 loops probably run at high IPC, so the cycle gain is likely below the Ir gain; no wall-time claim is made (shared host).",
+  "accounting_impact": "None if done as designed. count_ops is called at the same sites with the same n: row_ops = reducer.len() in the cascade, acc.len()-from in add_lazy, row.len()-c on store. counted f4_muls must stay at 75,685,287 for this workload, and oracle ops must not change. Warning: switching arithmetic modes does change the count (NARROW=1 gives 79.9M, NARROW=0 76.8M, FL forced 93.9M), so the kernel must keep mode 2's deferred chunk structure and pivot order exactly and change only element width. A densified cascade (sub-lead) would do extra zero-products that are not counted. That is unpriced native work, so a 0/0.1/1 GAE band (AGENTS §5a) would be needed before claiming it.",
+  "design": "1) Pick the width with a pure function of p. k32 = floor((2^32-1-(p-1))/(p-1)^2) and k16 = floor((2^16-1-(p-1))/(p-1)^2). Use u32 lazy when k32 >= 256 (p <= about 4097); when k32 >= max row updates (n_cols), skip normalisation. Optionally use u16 storage plus u16 acc when k16 >= 8 (p <= 91), normalising every k16 (24 at p=53). Add an env toggle F4_FP_LAZY_WIDTH=64|32|16 (default auto), next to arithmetic_mode() at f4_fp.rs:1411 and lazy_simd_kind() at 2709, as a same-binary A/B.\n2) Make rref32_deferred generic over the accumulator type (f4_fp.rs:2813-2905). known: Vec<(usize, Vec<u32>)> stays u32, or becomes u16 for the 16 path. The acc Vec<u64> becomes Vec<u32>, which removes the widen pass (closure#1, closure#7 outer). reduce_lazy_by (2785) takes Acc32 with NORMALIZE_AFTER = min(k32, 256) or none, and its pivot test becomes Barrett32::reduce. The store narrowing (row = acc.map(fp.reduce)) and the back-substitution narrowing (closure#7) become one explicit SIMD u32 Barrett: AVX2 _mm256_mul_epu32 on even and odd lanes, recombine, mullo, sub, min_epu32 correction. That is about 10 instr per 8 elements, and twice as wide on AVX-512. In u16 mode use _mm256_mulhi_epu16 (16 or 32 lanes).\n3) Add add_lazy32_avx2/avx512 for u32 acc and u32 or u16 pivot: _mm256_mullo_epi32 (or vpmaddwd for u16) plus add, 8 or 16 lanes instead of 4 or 8 today. Keep count_ops(acc.len()-from) in the add_lazy wrapper (2722).\n4) In the cascade reduce_pair_row (closure#41, 5463-5502), use acc Vec<u32>. The scatter stays scalar, but the per-column zero test becomes a u32 Barrett, the pending==256 normalise drops when k32 >= n_cols, and the free-column gather uses the SIMD u32 Barrett. Keep count_ops(row_ops) unchanged.\n5) Equivalence: every value stays exact over Z within the type, and the bound acc <= (p-1) + k(p-1)^2 < 2^w is proven by the choice of k (state it as a debug_assert and a unit test at p = 2, 53, 91, 4093). The reduced echelon form is unique, so output is bit-identical.\nTest plan, contention-insensitive:\n(a) The existing f4_fp tests, including the deferred-vs-rref32 cross-check at f4_fp.rs:8817.\n(b) jv_cover --exp ccov with the brief's parameters: JSON identical apart from timings (tools/cmpjson.py) and f4_muls sum = 75,685,287.\n(c) Callgrind with --toggle-collect=*f4_with_arithmetic*: F4 Ir vs 1,136,909,960, with per-kernel rows from tools/cgaddr.py and tools/blocks.py.\n(d) The same on jv_quintic p=271 (k32 = 58,736, still no normalise), which checks a larger p and the large-system FL path.\n(e) A wall-time A/B only on isolab-eks (the host is shared now), noting that valgrind cannot see AVX-512, so the native AVX-512 variant needs perf or isolab timing.",
+  "risks": "- The gain is mostly from replacing u128-Barrett narrowing loops, not from more lanes. On cycles those scalar mul loops likely have IPC above 2, so the time gain may be well below the 11-14% Ir estimate. Callgrind cannot measure the AVX-512 path the host actually runs.\n- At about 67 elements per add_lazy call and 4-8 vector iterations, call overhead (count_ops atomic plus TLS, the tail, allocating a 2KB acc per row) is the same order as the arithmetic. Wider lanes hit diminishing returns quickly: scalar to 4 lanes saved only 6.5% of F4 Ir.\n- The working set is in L2 (pivots about 190x256x4 B = 195KB; chunk acc 64x2KB = 128KB). Narrowing halves or quarters it but does not hit a DRAM bound, so memory is not the limiter either way.\n- The largest elimination kernel (sparse scatter, 108M Ir) is untouched unless rows are densified, and densifying adds uncounted zero-products, a §5a accounting issue.\n- Any change to the deferred chunk order or pivot sequence changes counted f4_muls (seen: 75.7M vs 76.8M/79.9M/93.9M across existing modes), so the kernel must be a pure width change.\n- A u16 path only suits p <= 91; a u32 lazy path only suits p <= about 4097; larger p must keep today's u64 path.\n- Allocation and jemalloc (about 8% of F4 Ir) and symbolic interning (about 37% inclusive) are bigger, separate levers.",
+  "artifacts": [
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/split.tsv",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/variants.tsv",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/steps.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/steps.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/dbg.err",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/l3.cg",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/SIMD0.cg",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/NARROW1.cg",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/NARROW0.cg",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/FL0.cg",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/tools/cgaddr.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/tools/blocks.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/tools/cmpjson.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/runs.sh",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/hot41full.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L3-narrow-arith/rref_self.txt"
+  ]
+ },
+ {
+  "lead": "L5-term-alloc: remaining per-term heap allocations (f4_fp::Poly = Vec<(Vec<u32>, u64)>)",
+  "verdict": "pursue-small",
+  "measured": [
+   {
+    "what": "Caveat for every lead: the F4-only profile (new3.cg, toggle-collect) counts only the main thread. Rayon par_iter jobs run on the pool worker even with RAYON_NUM_THREADS=1, and that work is missing from it",
+    "value": "worker thread 664.7M Ir, all of it F4 jobs (closure#41 row reduction 603.7M, to_sparse closure#30 53.7M, rref32_deferred closure#1 4.7M). Main-thread F4 = 1,139.1M. True F4 is about 1.80G (frac-weighted estimate 1.769G). Separately, closure#41 call_mut self is 555.6M in the whole-program profile and 64.2M in the F4-only one",
+    "source": "prog_new3.cg edges start_thread -> rayon WorkerThread::wait_until_cold (scripts/cgcalls.py, full_f4.py); f4 -> f4_with_arithmetic incl 1,139,131,297"
+   },
+   {
+    "what": "F4 calls in the run",
+    "value": "104",
+    "source": "prog_new3.cg: f4_fp::f4 -> f4_with_arithmetic calls=104"
+   },
+   {
+    "what": "Heap allocation events inside F4 (main + worker), per F4 call",
+    "value": "alloc 941,500 (9,053/call), alloc_zeroed 36,223 (348/call), realloc 71,348 (686/call), dealloc 771,182 (7,415/call)",
+    "source": "round4/L5-term-alloc/full_f4.txt (callers of __rust_alloc/_zeroed/_realloc/_dealloc in prog_new3.cg, frac-weighted to F4)"
+   },
+   {
+    "what": "Allocator plus memcpy/memset share of F4 instructions with jemalloc",
+    "value": "171.0M Ir = 9.7% of full F4 (jemalloc 134.1M 7.6%, Rust shims 14.7M, RawVec grow 6.1M, memcpy 8.6M, memset 7.6M). Main-thread-only view: 147M = 12.9% of 1.137G",
+    "source": "full_f4.txt; new3.pkl self-cost category sum"
+   },
+   {
+    "what": "Top allocation site: emitted terms via Cols::get (unpack -> Vec<u32>)",
+    "value": "408,630 allocations (3,929 per call, about 40% of all F4 allocations). Step emission is 201,328 terms in 3,746 polys; interreduction output is 207,302 terms in 4,159 polys. Cols::get self is 60.48M Ir, which is 148 Ir per call excluding the allocation",
+    "source": "prog.pkl callers of Cols::get (closure#48 and interreduce_linear_with closure#14); selfc"
+   },
+   {
+    "what": "Total cost of emitting the polynomials (rows -> Poly)",
+    "value": "130.5M Ir, 7.4% of full F4 (step 62.4M + interreduction 68.1M), about 320 Ir per emitted term",
+    "source": "inclusive cost of the SpecFromIter for closure#48 and closure#14 in prog_new3.cg"
+   },
+   {
+    "what": "Outer Poly Vec regrowth when emitting (filter-collect has no size hint)",
+    "value": "25,583 reallocs (246 per call): step 12,419, interreduction 13,164",
+    "source": "do_reserve_and_handle callers (f4_alloc_sites.txt / attrib.txt)"
+   },
+   {
+    "what": "Symbolic and matrix row buffers (not the Poly type)",
+    "value": "Packed::symbolic row Vec<u32>: 115,911. to_sparse Vec<(u32,u64)>: 94,306 + about 15.6k on the parallel path (incl 57.3M Ir). Elimination buffers about 176k (rref32_deferred 33.8k, closure#1 31.3k, closure#7 24.0k+19.5k, closure#41 acc and free_cols 48.4k, u32->u64 widening 15.3k)",
+    "source": "attrib.txt"
+   },
+   {
+    "what": "Pair lcm, rows_poly multiplier m and seen clones",
+    "value": "add::{closure#5} unpacks one Pair.lcm per new pair: 16,757 (161 per call). The f4_with_arithmetic body allocates 78.4k directly (m and m.clone per seed row). FxSet<(usize,Vec<u32>)>::insert: 33,486 calls, 12.6M Ir incl, plus 33,486 memcpy",
+    "source": "attrib.txt; new3.pkl callees of f4_with_arithmetic"
+   },
+   {
+    "what": "report() copies",
+    "value": "0 on the normal return path: the basis is moved into F4Report. Only the early-return paths clone",
+    "source": "src/cryptanalysis/f4_fp.rs:5986-6003, 4776-4785"
+   },
+   {
+    "what": "Input normalise",
+    "value": "about 10.7k allocations (about 103 per call)",
+    "source": "attrib.txt normalise::{closure#0}"
+   },
+   {
+    "what": "Freeing the output basis in the consumer (outside F4)",
+    "value": "drop_glue<F4Report>: 211,565 deallocs, 26.33M Ir incl, in jv_cover::solve_zero_dim_mode",
+    "source": "prog.pkl"
+   },
+   {
+    "what": "Microbenchmark of unpack/pack codegen (rustc -O, n=6, callgrind self Ir per call)",
+    "value": "unpack_old 144 Ir (production binary: 148), unpack_new via to_le_bytes 63 Ir. pack_old (u128 variable-shift fold) 108 Ir, pack_new via from_le_bytes 45 Ir. Outputs asserted identical on 1024 values",
+    "source": "round4/L5-term-alloc/micro/m.rs, cg.3/cg.4 callgrind_annotate"
+   },
+   {
+    "what": "Number of caller files for a full Poly representation change",
+    "value": "56 files mention f4_fp:: and 48 name Poly",
+    "source": "grep -rln 'f4_fp::' src examples | wc -l; grep for f4_fp::Poly"
+   }
+  ],
+  "estimated_gain": "All figures below are estimates against full F4 of about 1.80G Ir per 104 calls (main + worker).\n(1) Byte-wise pack/unpack: about 33M Ir from unpack, which is 81 Ir saved per call × 408,630 measured calls. About 25M from pack: the call count is my estimate of about 400k (pk.extend, interreduction pk.push, seeds), at 63 Ir each. Together about 58M, roughly 3.2%.\n(2) Pre-size the emitted Poly Vec: 25.6k reallocs removed, about 8–23M (0.5–1.3%).\n(3) Pair keeps only lcm_p in packed mode, and rows_poly/seen become (usize, u128): about 84k allocations and Vec-key hashing removed, about 20M (about 1.1%).\nCheap set (1+2+3): about 86–101M Ir, roughly 5% of F4. In the main-thread-only view it is about 7.5–9% of 1.137G.\n(4) An internal packed basis mirror, where step polys stay packed and Poly is built only for the final output: about 40–55M more (2–3%).\n(5) Full public Poly change: about 60M more, including the 26M consumer-side drop. That is too little for 56 files of churn.\nNo wall-time claim: the host is shared.",
+  "accounting_impact": "None. These changes touch only memory layout, allocation and bit-packing codegen. oracle_muls, f4_native_ops (the probe and row counts are unchanged) and f4_muls are all unchanged, and so is the output basis. Only Ir changes. It is an implementation speed-up, not an algorithmic one.",
+  "design": "Order: cheapest first; each step has an env toggle for A/B in the same binary.\n\n1. pack/unpack codegen (src/cryptanalysis/f4_fp.rs:1622-1630):\n   unpack(x, n) = x.to_le_bytes()[..n].iter().map(|&b| b as u32).collect()\n   pack(e): write each e[i] as u8 into a [u8; 16] and return u128::from_le_bytes.\n   Equivalence: the packed path guarantees every exponent < 128 (f4_fp.rs:4765-4770, 6086-6091), so the byte truncation is exact. Already checked in micro/m.rs against 1024 values; the existing test packed_monomials_behave_like_exponent_vectors (f4_fp.rs:9102) covers it too.\n   No toggle needed (bit-identical), but F4_FP_PACK_OLD=1 can keep the old fold for one A/B.\n\n2. Emission pre-size, at two sites:\n   - step: f4_fp.rs:5856-5862\n   - interreduction: f4_fp.rs:6205-6213\n   Count the nonzeros first, call Vec::with_capacity(nz), then push. The terms and their order are unchanged.\n\n3. Packed-only pair data (packed mode only):\n   - add() at f4_fp.rs:4846: stop unpack(l, n); leave Pair.lcm empty.\n   - Selection loop at f4_fp.rs:5262-5275: build m_p = pr.lcm_p - lm_packed[idx]. Keep seen as PkSet<(usize, u128)>, and keep rows_poly as Vec<(usize, u128)> passed straight to symbolic. Symbolic needs a variant that takes packed seeds (it currently packs them at f4_fp.rs:2043).\n   - Unpack only where Vec<u32> is truly needed: TraceMode::Record/Replay rows (f4_fp.rs:5231-5253, 5313), the max_pairs_per_step sort (f4_fp.rs:5260, use the grevlex_key order instead), and checkpoints (ckpt).\n   - Toggle F4_FP_PACKED_PAIRS=0 keeps the current path.\n\n4. (Optional, larger) Packed basis mirror: store new step polys as (Vec<u128>, Vec<u64>) in Packed and keep basis: Vec<Poly> lazily materialised. Materialise only for interreduce fallback, hilbert_diagnostic, ckpt, stop_staircase/RUN_LOG lms (these need only lms) and early report() returns. interreduce_linear_with should then take Packed directly, so pk.push repacking (f4_fp.rs:6095-6098) disappears. Toggle F4_FP_PACKED_BASIS=0.\n\nTest plan:\n- cargo test f4_fp (packed-vs-vector tests at f4_fp.rs:9102, 9285, 9339).\n- Byte-identical F4Report.basis on jv_cover --exp ccov --sizes 53 --seeds 1 --residuals 100 --constructed 4 --oracle-base 0 (compare the --json output against cg/new3.json; the counted ops must be identical).\n- jv_quintic weierstrass p=271 as the large-system control.\n- Measure with callgrind on the whole program (not toggle-collect, which drops the rayon worker). Report Ir and the __rust_alloc/_dealloc/_realloc call counts before and after, frac-weighted with scripts/full_f4.py.",
+  "risks": "- I wrote the code changes in my design but have not built or measured them: the no-cargo rule applies. The pack call count (about 400k) is an estimate, because pack is inlined and the binary has no line info.\n- The frac-weighting that splits shared generic functions (jemalloc internals, RawVec grow_one) between F4 and jv_cover is approximate.\n- Contrarian reading: with jemalloc, allocation is only about 9.7% of full F4, and the largest part of it (one allocation per output term, 207k) is forced by the public Poly type. The best cheap item, roughly 3% of F4, is pack/unpack codegen, which is not an allocation fix at all. The allocation-only fixes (2+3) are about 1.5–2.5% of F4. The full type change would add only about 3% more across 56 files, so drop it.\n- Item 3 touches trace record/replay and checkpoint formats, which must keep their Vec<u32> serialisation.\n- Every F4 percentage quoted to the leads (for example \"elimination closures ~13%\") comes from the main-thread-only profile, which misses about 0.66G Ir of worker-thread F4 work. The shares should be recomputed on prog_new3.cg.",
+  "artifacts": [
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L5-term-alloc/sites_table.tsv",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L5-term-alloc/full_f4.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L5-term-alloc/attrib.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L5-term-alloc/f4_alloc_sites.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L5-term-alloc/prog_callers_l1.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L5-term-alloc/caller.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L5-term-alloc/cols_get.asm",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L5-term-alloc/scripts/cgcalls.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L5-term-alloc/scripts/attrib.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L5-term-alloc/scripts/full_f4.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L5-term-alloc/micro/m.rs"
+  ]
+ },
+ {
+  "lead": "L4-large-alloc: large-system allocation / page-fault cost on jv_quintic (glibc vs jemalloc), and whether F4 buffer reuse would cut system time",
+  "verdict": "drop",
+  "measured": [
+   {
+    "what": "glibc default, RAYON=1: minor faults / maxrss / sys",
+    "value": "753,335 minflt, 380 MB, sys 1.38 s (user 23.0 s)",
+    "source": "ru.py glibc_t1 (os.wait4 rusage); fault_table.tsv"
+   },
+   {
+    "what": "jemalloc LD_PRELOAD default, RAYON=1",
+    "value": "1,315,031 minflt, 526 MB, sys 2.11 s",
+    "source": "ru.py je_t1"
+   },
+   {
+    "what": "glibc MALLOC_TRIM_THRESHOLD_=16G + MALLOC_TOP_PAD_=256M, RAYON=1",
+    "value": "96,490 minflt (7.8x fewer), sys 0.28 s",
+    "source": "ru.py g_trim"
+   },
+   {
+    "what": "glibc MALLOC_ARENA_MAX=1 alone, RAYON=1",
+    "value": "109,676 minflt, 337 MB, sys 0.22 s",
+    "source": "ru.py g_arena1"
+   },
+   {
+    "what": "glibc trim+toppad+mmap32M+arena1 (floor)",
+    "value": "85,580 minflt, 337 MB = 86k pages, i.e. faults equal first touch of peak RSS",
+    "source": "ru.py g_all"
+   },
+   {
+    "what": "glibc MALLOC_MMAP_THRESHOLD_=32M alone",
+    "value": "936,894 minflt (worse than default): mmap threshold does not explain glibc's lower cost; fixing it also freezes the trim threshold at 128 KiB",
+    "source": "ru.py g_mmap"
+   },
+   {
+    "what": "strace -f -c -e trace=memory, glibc RAYON=1",
+    "value": "24 mmap, 8 munmap, 3,092 brk, 2,858 mprotect, 138 madvise",
+    "source": "round4/L4-large-alloc/strace_c_glibc.txt"
+   },
+   {
+    "what": "strace -f -c -e trace=memory, jemalloc RAYON=1",
+    "value": "30,162 madvise, 75 mmap, 4 munmap",
+    "source": "round4/L4-large-alloc/strace_c_je.txt"
+   },
+   {
+    "what": "jemalloc stats_print merged arenas (default decay 10 s / muzzy 0)",
+    "value": "dirty purged 1,120,741 pages in 579 sweeps; large nmalloc 226,245, of which ~210k are 16-40 KiB size classes",
+    "source": "round4/L4-large-alloc/je_stats.err lines 101-200"
+   },
+   {
+    "what": "jemalloc dirty_decay_ms:-1,muzzy_decay_ms:-1 (round-3 'nodecay')",
+    "value": "1,547,961 minflt, maxrss 5,132 MB, mapped 5.80 GB: freed extents are not reused (fragmentation guard), so no-decay makes faults worse",
+    "source": "ru.py je_nodecay; je_nodecay_stats.err 'mapped: 5795938304'"
+   },
+   {
+    "what": "jemalloc lg_extent_max_active_fit:10 + no decay, RAYON=1",
+    "value": "373,807 minflt, 518 MB, sys 0.68 s",
+    "source": "ru.py je_fit10_nodecay"
+   },
+   {
+    "what": "jemalloc narenas:1,lg_extent_max_active_fit:16 + no decay, RAYON=1",
+    "value": "325,287 minflt, 333 MB, sys 0.59 s",
+    "source": "ru.py je_fit16_nodecay_n1"
+   },
+   {
+    "what": "jemalloc thp:always,metadata_thp:always, RAYON=1",
+    "value": "144,740 minflt, 555 MB, sys 0.96 s",
+    "source": "ru.py je_thp"
+   },
+   {
+    "what": "RAYON=4 (production setting) glibc default / glibc trim / je default / je thp / je fit10+nodecay",
+    "value": "234,417 / 110,280 / 1,366,941 / 108,710 / 238,412 minflt; sys 0.83 / 0.67 / 2.83 / 1.42 / 0.82 s",
+    "source": "ru.py g_t4, g_t4_trim, je_t4, je_t4_thp, je_t4_fit10_nodecay"
+   },
+   {
+    "what": "Allocation size histogram, glibc RAYON=1 (LD_PRELOAD shim, allocations >=16 KiB)",
+    "value": "240,902 allocations totalling 7.00 GB: 2^14 bucket 187,789 (3.82 GB), 2^15 37,854 (1.36 GB), 2^16 9,685, 2^17 3,796, 2^18 1,060, 2^19 691, >=1 MiB only 27 allocations (29 MB). All allocations: 19.24 M calls, 11.7 GB",
+    "source": "round4/L4-large-alloc/bigalloc_g.txt header"
+   },
+   {
+    "what": "Top allocation sites by bytes (symbolised from nm)",
+    "value": "f4_with_arithmetic Vec growth via realloc 1388 MB (n=33,160, max 128 KiB); reduce_pairs_blocked realloc 902 MB (n=6,065, max 1 MiB, the `hits` Vec); reduce_pairs_fl calloc 694 MB (n=35,538, 21,096 B = n_free*8, the per-reducer `acc`); rayon collect of Vec<(u32,u64)> sparse rows ~1,960 MB over 4 sites (max 39,344 B); reduce_pairs_blocked malloc 469 MB (n=24,985, 21,096 B, clones in vec![vec![0u64;n_free];rows])",
+    "source": "round4/L4-large-alloc/sites_g.txt (sym2.py)"
+   },
+   {
+    "what": "F4 step shapes (F4_DEBUG)",
+    "value": "5 F4 calls x 29 steps; largest step 2019 rows x 2369 cols, max rows x cols 1853 x 2999; sum rows*cols*8 over steps 2.23 GB",
+    "source": "round4/L4-large-alloc/f4_steps.txt from shim_g.err"
+   },
+   {
+    "what": "Main consumer jv_cover ccov 104 tests, RAYON=1",
+    "value": "833 minflt (new3, jemalloc), 856 (base glibc), 855 (glibc arena1); maxrss 13 MB: page faults are irrelevant on the small Nagao systems",
+    "source": "ru.py cov_new3, cov_base_glibc, cov_base_glibc_trim"
+   },
+   {
+    "what": "Output identity",
+    "value": "all 21 jv_quintic arms give the same output modulo timing tokens (one md5 b527425e81ae); planted 2/2, C'' 1.104e10 in every arm",
+    "source": "md5 of sed-stripped *.out"
+   }
+  ],
+  "estimated_gain": "The lead's premise does not hold, and buffer reuse in F4 code adds about nothing on top of allocator settings. (1) The faults do not come from freshly mapped large buffers. glibc made only 24 mmaps in the whole run, and only 27 allocations were 1 MiB or larger. About 99% of the large-allocation bytes are 16 to 128 KiB row and accumulator Vecs. The repeated faults come from the allocators returning memory to the OS and touching it again. glibc shrinks its non-main thread arena (2,858 mprotect and 138 madvise calls). jemalloc purges by decay (1.12 M pages purged), and its extent-fit limit stops it reusing freed extents. (2) Settings alone already bring the faults down to the floor (measured). On glibc at 1 thread, MALLOC_ARENA_MAX=1 or a large trim threshold gives 753k -> 86k to 110k faults, against a floor of 86k pages, which is peak RSS. Code-level reuse could only lower that floor by shrinking peak RSS: at most about 10k to 25k faults (estimate). (3) At RAYON=4, the setting that matters, glibc default already makes only 234k faults with 0.83 s sys. The trim setting saves 124k faults and 0.16 s sys out of about 29 CPU-s, roughly 0.5% (estimate; sys time is from rusage on a shared host). (4) For jemalloc builds, lg_extent_max_active_fit:10 with dirty and muzzy decay off brings RAYON=4 faults from 1.367M to 238k and sys from 2.83 s to 0.82 s, the same as glibc. That accounts for the fault/sys part of round 3's 0.94x jemalloc gap. thp:always gives 109k faults but 1.42 s sys. These are fault counts only; I make no wall-time claim. (5) On jv_cover, the real consumer, the whole run has about 830 faults, so the lead does not reach it at all.",
+  "accounting_impact": "None. oracle_muls, f4_native_ops and f4_muls do not change: C'' = 1.104e10 and the output is identical in all 21 arms. Allocator settings and buffer reuse change only allocator calls, page faults and system time, never the counted operations.",
+  "design": "No F4 code change is recommended for faults. If anyone wants to act on this, the only change that pays is an allocator setting in the large-system binaries. Nothing was edited for this report.\n(A) glibc binaries such as jv_quintic: at the start of main, call libc::mallopt(M_ARENA_MAX, 1), or set M_TRIM_THRESHOLD to a large value with M_TOP_PAD around 256 MiB. Same-binary A/B: the env vars MALLOC_ARENA_MAX=1 and MALLOC_TRIM_THRESHOLD_ give the same effect with no rebuild. Do not set M_MMAP_THRESHOLD: it makes faults worse (937k).\n(B) jemalloc builds: set malloc_conf through the tikv-jemalloc-sys prefixed symbol (`_rjem_malloc_conf`) to \"lg_extent_max_active_fit:10,dirty_decay_ms:-1,muzzy_decay_ms:-1\". For A/B, override at runtime with `_RJEM_MALLOC_CONF`. Gate it to the large-system binaries; jv_cover shows no fault effect (833 vs 828 faults).\n(C) Optional code-level cleanup, aimed at allocator call count rather than faults (another lead should check it with callgrind):\n- Keep the reduce_pairs_blocked `hits` Vec (f4_fp.rs:3675, grown by realloc to 1 MiB, 902 MB in total) in a thread_local scratch and clear it per block.\n- Replace `vec![vec![0u64; n_free]; rows.len()]` (f4_fp.rs:3673) with one flat rows*n_free scratch slab. That removes 24,985 malloc+memcpy clones (469 MB).\n- Reuse the per-reducer acc in against_finished (f4_fp.rs:3037; 35,538 callocs, 694 MB).\n- Pre-size the f4_with_arithmetic Vec that grows by realloc (33,160 reallocs, 1.39 GB; I did not pin which Vec it is because the binary has no line info).\nEquivalence: the arithmetic order is unchanged, so check with output identity and counted-ops identity.\nTest plan:\n- Faults: the rusage wrapper round4/L4-large-alloc/ru.py.\n- Allocation counts: the shim round4/L4-large-alloc/shim/bigalloc.so with sym2.py.\n- Correctness: md5 of the timing-stripped output.",
+  "risks": "- The jemalloc no-decay plus fit settings raise peak RSS: 518 to 556 MB against 380 to 430 MB for glibc. The fit:16 with narenas:1 variant held 333 MB, but I measured it at 1 thread only.\n- The sys_s values come from rusage on a shared 4-vCPU host. They show direction only; the fault counts are the contention-insensitive result.\n- Function-level site attribution comes from the symbol table: the binary has no DWARF, so I could not resolve line numbers, and inlined callers fold into f4_with_arithmetic.\n- The shim's backtrace skips 3 frames, so some rayon collect sites cannot be tied to their F4 caller.\n- I measured only the base glibc jv_quintic binary (with jemalloc injected by LD_PRELOAD). The new3 tikv-jemallocator build could behave a little differently: different jemalloc version and prefix.",
+  "artifacts": [
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/fault_table.tsv",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/rusage.jsonl",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/strace_c_glibc.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/strace_c_je.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/je_stats.err",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/je_nodecay_stats.err",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/bigalloc_g.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/sites_g.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/f4_steps.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/ru.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/shim/bigalloc.c",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/sym2.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/matrix.sh",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/matrix2.sh",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L4-large-alloc/matrix3.sh"
+  ]
+ },
+ {
+  "lead": "L6-zero-reductions: cut zero reductions with a signature (F5-style) criterion, and stop F4 early when a system has no F_p-rational roots",
+  "verdict": "pursue-small",
+  "measured": [
+   {
+    "what": "Full mode (jv_cover ccov default, no stop), 104 systems: matrix rows, pivots, zero reductions (rows minus pivots), new polynomials",
+    "value": "rows 105,777; pivots 92,780; zero 12,997 (12.3% of all rows); new 3,746 (36 per system); reducer rows 89,034; non-reducer (reduced) rows 16,743, of which 77.6% reduce to zero (82% weighted by cols, 84% by cols^2)",
+    "source": "RAYON_NUM_THREADS=1 F4_DEBUG=1 new3/jv_cover --exp ccov --sizes 53 --seeds 1 --residuals 100 --constructed 4 --oracle-base 0; parsed by round4/L6-zero-reductions/parse.py over ccov.err. The pivots count printed at f4_fp.rs:5827 is reducers.len() plus the pair-block rank. Reducer columns are fully eliminated by reduce_pair_row, so every pair-block pivot is a new polynomial, and reducers = pivots - new. new = basis growth taken from the next 'pairs pending' line. The last step's new count is taken as 0 (inferred: about 5 pairs pending, about 5.5 reduced rows, all zero)."
+   },
+   {
+    "what": "Full mode, reduced rows by step (average per system)",
+    "value": "step 3: 30 reduced rows, 20 zero; step 4: 45/36; step 5: 45/40; step 6: 24.4/23.4; step 7: 5.5/5.5. Reduced rows are about one per selected pair, so this equals pairs reducing to zero: 125 of 161 pairs per system",
+    "source": "round4/L6-zero-reductions/summary_tables.txt (ccov.err)"
+   },
+   {
+    "what": "Existing criteria: Gebauer-Moeller on against off (F4_FP_GM=0)",
+    "value": "F4 counted muls per system 7.277e5 (GM on) vs 5.637e6 (GM off), 7.7x. With GM off, 92.6% of reduced rows reduce to zero. Outputs are identical (sha of fp_solutions, decompositions and delta per test: c760a25f25c0019d in all four runs)",
+    "source": "ccov.out, ccov_gm0_none.out; f4_fp.rs:2260 gebauer_moeller()"
+   },
+   {
+    "what": "Existing Hilbert-driven rule (--stop hilbert:16), counted cost per system",
+    "value": "F4 3.003e5 (including 3.20e4 for the regularity check on the leading forms) vs 7.277e5 in Full mode, 2.42x; C_cov 5.215e5 vs 9.490e5, 1.82x; same solutions and decompositions. Applied on 101 of 104 systems, 3 fallbacks",
+    "source": "ccov_hilbert_16.out and .json; agrees with benchmarks/README.md:89 (20261029-jv-cover-hilbert-stop: paired S ratio 1.848 at p=53, emitted native-ops ratio 0.988)"
+   },
+   {
+    "what": "Zero reductions left under hilbert:16, main run only (odd runs; even runs are the leading-form check)",
+    "value": "reduced rows 7,997, zero 4,356 (54.5%; 67% weighted by cols^2), new 3,641. Per system: 77 reduced rows, of which 42 are zero and 35 useful. Zero rows by step: 6.5, 8.0, 11.7, 14.5 at steps 3 to 6. Check run: 7,834 reduced rows, 4,202 zero (53.6%)",
+    "source": "inline split of ccov_hilbert_16.err (208 F4 runs = 104 checks + 104 main runs, f4_fp.rs:4633 f4_hilbert_guarded)"
+   },
+   {
+    "what": "Staircase stop 64 (--stop 64)",
+    "value": "F4 6.906e5 (only 5% below Full); zero/reduced 77.3%",
+    "source": "ccov_64.out, ccov_64.err"
+   },
+   {
+    "what": "--trace (record/replay) in each mode",
+    "value": "Full+trace: F4 9.638e5 (+32% vs 7.277e5), C_cov 1.185e6 (+24.9%), 86 replayed, 17 mismatches. stop64+trace: F4 3.707e5. hilbert:16+trace: identical to Full+trace (hilbert 0 applied) because f4_record/f4_replay (f4_fp.rs:1378/1394) call f4_with_arithmetic directly and bypass f4_hilbert_guarded (f4_fp.rs:4425). This reproduces the pilot's +25% (17.87 G to 22.30 G) and its 16.5% divergence rate (17/103 here, 3,142/19,020 in the pilot)",
+    "source": "ccov_trace_none.out, ccov_trace_64.out, ccov_trace_hilbert_16.out; f4_fp.rs:1378-1405, 4413-4426"
+   },
+   {
+    "what": "Early abort: unit ideal, degree and rational roots over 104 systems",
+    "value": "inconsistent (1 in the ideal) 0/104; delta 64 on 101, 62 on 3; F_p solutions in the symmetric coordinates: 0 roots 32, 1 root 43, 2 roots 21, 3 roots 6, 4 roots 2; decompositions 4/104, all planted (0/100 random, expected 1/720)",
+    "source": "ccov.json per_test (fields inconsistent, delta, fp_solutions, decompositions)"
+   },
+   {
+    "what": "F4 cost of systems with no rational root vs all random systems",
+    "value": "no-root systems (32): F4 728,869, lin 177,558. All 100 random: F4 728,491, lin 205,529",
+    "source": "ccov.json per_test"
+   },
+   {
+    "what": "Share of counted per-system cost (Full mode)",
+    "value": "weil 2,730 + F4 7.277e5 (76.7%) + lin 2.173e5 + post 1,167 = C_cov 9.490e5. Under hilbert:16, F4 is 57.6% of 5.215e5",
+    "source": "ccov.out, ccov_hilbert_16.out"
+   }
+  ],
+  "estimated_gain": "Estimates only; none of these were measured as an implemented change.\n\n(a) Early abort when a system has no F_p-rational root: about 0 on F4. No system has 1 in its ideal (0/104), and 101/104 have the full Bezout degree 64. Whether the variety has an F_p point does not show in the leading terms. It needs the complete basis plus the minimal polynomial and its gcd with x^p - x. No-root systems already cost the same F4 (728,869 vs 728,491). The 32% of no-root systems already save about 28k lin muls each (no eigenvectors). A no-root abort inside lin would save at most about 0.32 x (lin - Krylov), under 2% of C_cov. Drop this part.\n\n(b) The cheap test that already exists, \"stop once the ideal is known zero-dimensional\": stop64 is only 1.05x on F4. The Hilbert rule is 2.42x on F4 and 1.82x on C_cov (measured here; 1.85x S in benchmark 20261029). It is NOT the default for --exp dlp or ccov (examples/jv_cover.rs:238-241 and 263-266 map no flag to StopMode::Full). Every pilot that uses the default leaves about 1.8x of counted ops unused. This is an existing measured option, not a new improvement.\n\n(c) A signature (F5-type) criterion on top of hilbert:16, perfect and with no overhead (upper bound): it removes 54.5% of the main run's reduced rows (67% weighted by cols^2) and about 54% of the check run's. If counted F4 muls scale with reduced-row work (assumption: every counted op of a step is spent reducing non-reducer rows or in their RREF), F4 falls from 3.0e5 to about 1.7e5-1.9e5 and C_cov from 5.2e5 to about 3.9e5-4.1e5, 1.27x-1.33x as an upper bound. A real F5 pays signature bookkeeping and non-minimal reducers; plausible net is 1.1x-1.2x on C_cov. A cheaper route is a tighter Hilbert rule: the zero rows left over are the extra pairs of 16-pair chunks at steps 5 and 6, after the degree's Hilbert function is already met. Benchmark 20261029 shows that hilbert:1 cuts S further but raises native ops 8.3-8.5x, and it was ruled a relabelling. Any gain here must be shown in native ops as well.\n\n(d) Combining trace with Hilbert: today --trace silently disables the Hilbert rule. That is the measured cause of the pilot slowdown, not a defect of replay: in Full mode, replay processes every accumulated pair to zero after the trace ends. stop64+trace gives F4 3.707e5, still worse than hilbert:16 alone (3.003e5).",
+  "accounting_impact": "The measurements here change no counter. A signature criterion or tighter pair skipping would lower f4_muls (the counted F_p multiplications of row reduction and RREF, f4_fp.rs count_ops) and therefore oracle_muls and C_cov. f4_native_ops (symbolic preprocessing, interning, reducer search) scales with all matrix rows, and 89% of those rows are reducer rows. Removing zero pair rows also drops the reducers only they pull in, so native ops should fall too, but less than in proportion.\n\nA signature criterion adds unpriced native work (signature comparisons, rewritable checks). It must be reported in f4_native_ops and priced across the 0/0.1/1 GAE band per AGENTS.md §5a, or it repeats the hilbert:1 relabelling.\n\nSwitching the dlp default to hilbert:16 changes counted ops by about 1.8x (measured), with native ops about flat (0.988 per benchmark 20261029). That is a configuration choice that is already benchmarked, not a new improvement. The leaderboard row must say which mode it ran.\n\nEarly abort: no counted impact.",
+  "design": "1. Baseline first (no new code). Run the dlp p=53 pilots and any L1-L5 A/B against `--stop hilbert:16`, not Full. On ccov, hilbert:16 is already 1.82x on C_cov, with the same fp_solutions and decompositions (hash c760a25f25c0019d). Measuring zero-row or trace leads against Full overstates them.\n\n2. Fix the composition bug behind the pilot slowdown. In src/cryptanalysis/jv_cover.rs:1412 solve_zero_dim_mode, trace mode calls f4_fp::f4_record and f4_replay (f4_fp.rs:1378/1394), and both go straight to f4_with_arithmetic. So opts.stop_hilbert is dropped (f4_fp.rs:4425 is never reached), and an unstopped replay runs every accumulated pair to zero (Full+trace F4 is +32%). Either refuse --trace together with Hilbert, or record and replay inside f4_hilbert_guarded's main run, passing o.hilbert_expect and max_pairs_per_step to the traced call. Also make jv_cover warn when trace runs with StopMode::Full.\n\n3. Cheap zero-row cut on top of Hilbert (try before F5). Under hilbert:16, 42 of 77 reduced rows per system are zero, mostly at steps 5 and 6, where the 16-pair chunk overshoots the expected Hilbert value. Variant A: inside a degree, order the selected pairs so that likely-useful ones come first. Two candidates for that order are recorded new_lms per step from the trace, and pairs whose lcm is a known-standard monomial of the expected staircase. Then take a chunk sized to the remaining Hilbert deficit, min(16, expected_new_at_d - learned_so_far + slack), instead of a fixed 16. Variant B: a pair-level trace. Record which (i, j, lcm) pairs produced new pivots and, on replay, select only those pairs inside the Hilbert-guarded run; on divergence fall back to the remaining pairs. Divergence is 16.5% today with row-level traces.\n\n4. Signature criterion (F5/Gao-Volny-Wang style) only if 3 stalls. Attach signatures (index, monomial) to rows. Use the syzygy criterion (lm of earlier input times e_j, the Koszul syzygies, which suffice for a regular sequence) and the rewritable criterion. Build it as a new mode in f4_fp.rs beside TraceMode, not inside the hot path. The regular-sequence certificate f4_hilbert_guarded already computes (staircase finite on the leading forms) is the precondition for zero zero-reductions.\n\n5. Equivalence argument: any pair skipped by these rules lies in the span of rows already present (Hilbert count or signature theory), so the reduced Groebner basis is unchanged. Test that by an identical reduced basis per system, identical fp_solutions, decompositions and relation digest on ccov (104 systems) and on dlp p=53 seed 1.\n\n6. Measurements: counted f4_muls, f4_native_ops, rows and zero rows from F4_DEBUG with parse.py, and callgrind instruction counts. Use RAYON_NUM_THREADS=1 throughout. Do not claim wall time.\n\n7. Env toggles for A/B: a new F4_FP_HILBERT_CHUNK=adaptive|N and F4_FP_SIG=1, each defaulting to the current behaviour. Same binary for both arms.\n\nEarly-abort part: do not implement. There are no unit ideals (0/104). Rationality of the roots is not visible before the complete basis, and the lin stage already skips eigenvectors when there is no root.",
+  "risks": "The zero-row shares come from F4_DEBUG structure and assume the last step learns nothing (inferred). Mapping row share to counted muls assumes cost scales with reduced-row work weighted by columns; this was not measured per step, because the capture_run_log per-step ops are not exposed by the jv_cover binary and no rebuild was allowed.\n\nThe F5 upper bound ignores signature overhead and F5's non-minimal reducer choice. On systems this small (about 230x256), bookkeeping can eat the gain.\n\nNative ops: 89% of matrix rows are reducers. Shrinking the pair rows leaves most of the symbolic cost (about 28% of F4 instructions in callgrind) in place, so the instruction-level gain will be well below the counted-mul gain. The adaptive-chunk variant may raise the step count, and so native ops, as hilbert:1 did (8.3-8.5x native ops, ruled a relabelling in 20261029).\n\nAll data is from one prime (p=53) and one seed, 104 systems. The rare non-generic shapes (3/104 with delta 62 or Hilbert fallback) can behave differently.\n\nHilbert mode being off by default looks deliberate. Before treating hilbert:16 as the baseline, check why it is not the default (for example the validation status of 20261029).",
+  "artifacts": [
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L6-zero-reductions/parse.py",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L6-zero-reductions/summary_tables.txt",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L6-zero-reductions/ccov.err",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L6-zero-reductions/ccov.json",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L6-zero-reductions/ccov_hilbert_16.err",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L6-zero-reductions/ccov_hilbert_16.json",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L6-zero-reductions/ccov_64.json",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L6-zero-reductions/ccov_gm0_none.json",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L6-zero-reductions/ccov_gm0_hilbert_16.json",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L6-zero-reductions/ccov_trace_none.json",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L6-zero-reductions/ccov_trace_64.json",
+   "/tmp/claude-0/-home-user/557dc6d7-a322-5dce-a371-122a5cef1780/scratchpad/round4/L6-zero-reductions/ccov_trace_hilbert_16.json"
+  ]
+ }
+]

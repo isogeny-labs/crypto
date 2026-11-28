@@ -1,0 +1,57 @@
+import PegcdWordScale
+set_option autoImplicit false
+namespace PegcdWord
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest PencilWordRefinement WideModPow
+
+def finish (p : UInt64) (z : Registers) : Option (List UInt64 × List UInt64 × List UInt64) :=
+ match z.r0.getLast? with
+ | none => none
+ | some last =>
+   let v := inverseGenerator p last
+   some (scale p v z.r0,scale p v z.s0,scale p v z.t0)
+
+def Result (p : UInt64) [Fact p.toNat.Prime] (a b : (ZMod p.toNat)[X]) (d s t : List UInt64) : Prop :=
+ Canon p d ∧ Canon p s ∧ Canon p t ∧ Normal d ∧ Normal s ∧ Normal t ∧
+ wordsPoly p d=wordsPoly p s*a+wordsPoly p t*b ∧
+ wordsPoly p d∣a ∧ wordsPoly p d∣b ∧ ∀ h, (h∣a ∧ h∣b) ↔ h∣wordsPoly p d
+
+theorem finish_correct (p : UInt64) [Fact p.toNat.Prime] (a b : (ZMod p.toNat)[X]) (z : Registers)
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31) (hg : Good p z) (hn : Normal z.r0)
+ (hv : Pegcd.Valid a b (decode p z)) (hend : (decode p z).r1=0) (ha : a ≠ 0) :
+ ∃ d s t, finish p z=some (d,s,t) ∧ Result p a b d s t := by
+ have hnz := Pegcd.endpoint_nonzero a b (decode p z) hv hend ha
+ have hz : z.r0 ≠ [] := by
+   intro he
+   apply hnz
+   simp [decode,he,wordsPoly,listPoly]
+ have hl : (z.r0.getLast hz).toNat < p.toNat := hg.1 _ (List.getLast_mem hz)
+ have hln : z.r0.getLast hz ≠ 0 := by
+   intro he
+   apply hn
+   simp [List.getLast?_eq_some_getLast hz,he]
+ let v := inverseGenerator p (z.r0.getLast hz)
+ have hvc : v.toNat < p.toNat := (generator_product p _ hp hl hln).1
+ have hvn : (v.toNat : ZMod p.toNat) ≠ 0 := by
+   rw [show (v.toNat : ZMod p.toNat)=((z.r0.getLast hz).toNat : ZMod p.toNat)⁻¹ from generator_decode p _ hp hl hln]
+   exact inv_ne_zero (canonical_word_nonzero p _ (by omega) hl hln)
+ have hd := scale_correct p v z.r0 (by omega) hb hvc hg.1
+ have hs := scale_correct p v z.s0 (by omega) hb hvc hg.2.2.1
+ have ht := scale_correct p v z.t0 (by omega) hb hvc hg.2.2.2.2.1
+ have hnorm := Pegcd.normalized_endpoint a b (decode p z) hv hend (v.toNat : ZMod p.toNat) hvn
+ have hf : finish p z=some (scale p v z.r0,scale p v z.s0,scale p v z.t0) := by
+   simp [finish,List.getLast?_eq_some_getLast hz,v]
+ refine ⟨_,_,_,hf,hd.1,hs.1,ht.1,hd.2.1,hs.2.1,ht.2.1,?_⟩
+ simpa only [hd.2.2,hs.2.2,ht.2.2,decode] using hnorm
+
+theorem full_word_endpoint (p : UInt64) [Fact p.toNat.Prime] (a b : List UInt64)
+ (hp : 1 < p.toNat) (hb : p.toNat < 2^31)
+ (ha : Canon p a) (hna : Normal a) (hc : Canon p b) (hn : Normal b)
+ (han : wordsPoly p a ≠ 0) :
+ ∃ z d s t, Run p (initial a b) z ∧ z.r1=[] ∧ finish p z=some (d,s,t) ∧
+ Result p (wordsPoly p a) (wordsPoly p b) d s t := by
+ obtain ⟨z,hr,hg,h0,h1,he,ht⟩ := run_total p hp hb a b ha hna hc hn
+ have hv := Pegcd.trace_valid (wordsPoly p a) (wordsPoly p b) _ _ ht (Pegcd.initial_valid _ _)
+ have hend : (decode p z).r1=0 := by simp [decode,he,wordsPoly,listPoly]
+ obtain ⟨d,s,t,hf,ho⟩ := finish_correct p _ _ z hp hb hg h0 hv hend han
+ exact ⟨z,d,s,t,hr,he,hf,ho⟩
+end PegcdWord

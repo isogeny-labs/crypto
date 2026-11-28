@@ -1,0 +1,15 @@
+{
+  "action": "replay the binary's uncounted diagnostic on a sample of grid rows and count the predicted outcome per prime before accepting the mechanism",
+  "created": "2026-11-21T04:08:10Z",
+  "evidence": [
+    "research/quartic_diem_precheck2_20261121/validation/validator-report.md (F12); research/quartic_diem_precheck2_20261121/validation/out/diag_check.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "research"
+  ],
+  "trigger": "a protocol states that a failure is structural ('by construction') from a diagnosis on development curves only",
+  "why": "quartic pre-check 2: development curves showed 0/36 first-attempt successes for the frozen order, but grid OLD rows succeed on the first attempt in 20/56 runs (18/32 full-rank at p <= 8209 in the validator's --quartic-diag replay)"
+}

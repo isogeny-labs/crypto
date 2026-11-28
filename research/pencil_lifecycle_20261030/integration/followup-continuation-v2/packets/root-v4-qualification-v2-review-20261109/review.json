@@ -1,0 +1,31 @@
+{
+  "schema": "source-protocol-review/v1",
+  "verdict": "source_review_passed_scoped",
+  "reviewer": "renew_materializer",
+  "familiarity": "Reviewed v4 source/fixture before first attempt; original review missed this class-local shadow. Did not author successor correction.",
+  "candidate_sha256": "3c60a3453ac39cafe69483c1c7eb1aa6b0c80f3ade8dbfc96fe66fff4edc8a44",
+  "actual_payload_sources_unchanged": true,
+  "qualification_pins_unchanged": true,
+  "fixed_case_count": 24,
+  "exact_delta": "Within class DT, resolve datetime.timezone before binding class-local datetime=DateTime. All other source bytes unchanged.",
+  "reasoning": "Class-body name lookup previously found the new DateTime class on the second assignment, which has no timezone attribute. Reversing assignments resolves imported datetime module first and then stores the same DateTime fake-clock class. DateTime.now itself resolves global datetime module; extracted functions receive the same two intended attributes.",
+  "remaining_startup_review": "Inspected imports, Python3.9 guard, actual source pin verification/extraction, Clock/Reader construction, DateTime/DT bindings, supervisor globals and final output path. No further source defect identified. No execution performed.",
+  "failed_attempt": {
+    "terminal_path": "/var/tmp/pencil-root-v4-permit-qualification-20261109-control/terminal.json",
+    "exit_code": 1,
+    "elapsed_seconds": 0.06454660795861855,
+    "charged_seconds": 60,
+    "durable_result": null,
+    "partial_scope": "14 worker test calls precede the class failure; their return is inferred from traceback location and source order, not retained per-case rows. Complete24-case qualification did not finish."
+  },
+  "limits": {
+    "reservation_seconds": 60,
+    "internal_alarm_seconds": 50,
+    "outer_term_seconds": 55,
+    "kill_seconds": 5,
+    "address_space_bytes": 536870912,
+    "file_ceiling_bytes": 1048576
+  },
+  "release_readiness": "Source correction is ready for exact publication and separately charged coordinator-released qualification; no launch or reservation by reviewer.",
+  "execution_performed": false
+}

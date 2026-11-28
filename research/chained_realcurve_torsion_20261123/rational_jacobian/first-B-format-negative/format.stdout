@@ -1,0 +1,12 @@
+Diff in /dev/shm/ct23-rational-Jacobian-first-B/source/research/chained_realcurve_torsion_20261123/rational_jacobian/main_b.rs:281:
+ 
+ fn main() {
+     let f = Field::new();
+-    println!("INHERITED_FIELD q={Q} generator={} setup_controls=pass", f.generator);
++    println!(
++        "INHERITED_FIELD q={Q} generator={} setup_controls=pass",
++        f.generator
++    );
+     let source = Chart::new(&f, &ORIGINAL);
+     source.controls();
+     let a = build_cohort("C", &source);

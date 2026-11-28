@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T17:49:20Z",
+ "id": "PCC-20261118-5de5c2",
+ "kind": "statement",
+ "producer": {
+  "commit": "5158b9db0ae9410209056f94a309641dc3c8770f",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-20261118/attempt-a/arithmetic.json",
+    "sha256": "bdef2f03910e657876e30e66a4f5b7cb0b4c11bdaceacf0ec866acc56731cff1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-20261118/attempt-a/ring.jsonl",
+    "sha256": "7ef7c28e79716560bcdb85e129c91a441107c8929fb64a6443df56c3237a4432"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/published-lucas-20261118/pre-check.sha256",
+    "sha256": "2f44f99c82fb9f406dbc1752ff601dcb955fafdb3e15b2f3b45d395ed09d7097"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/published-lucas-20261118",
+ "statement": "For the fixed published index 7351, native PARI recurrence/matrix and separate C++ GMP quadratic-ring powering agree on the exact trace and Frobenius conductor, whose recorded size is 3673 bits. The discriminant identity is checked. Primality certification is still pending; this statement does not establish a prime or an evaluated isogeny crossing."
+}

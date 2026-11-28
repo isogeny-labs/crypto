@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T02:12:33Z",
+ "id": "PCC-20261117-9add58",
+ "kind": "statement",
+ "producer": {
+  "commit": "0fabe3fe753d09de1d6b499df639574b848ca195",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/leased-affine-v1/SOURCE_PUBLICATION.json",
+    "sha256": "303ad67d1668c678ea89dda638a9a2492282f8090d8f97be9c48149cd9717d15"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/leased-affine-v1/PUBLISHED_COMMIT.txt",
+    "sha256": "ba626ee27ddafd4607e6cd34281d807dc6c0553aa2769ce06ba070a02135159b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/leased-affine-v1/PUBLICATION_PR.json",
+    "sha256": "65f32990aab23004733b28ed19074519adada5a3ed63e22e078dbcc3d4aff4ec"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "initial source publication identity only",
+ "statement": "Initial maintained lane publication489ce2a1 has the exact local0fabe3fe tree and133source context; regular main-based PR4482 contains the bounded component/report/closure. This is Git metadata readback, not scientific execution, hosted gate or signed validation."
+}

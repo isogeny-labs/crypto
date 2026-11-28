@@ -1,0 +1,14 @@
+digraph G {
+ graph [rankdir=LR,bgcolor="white",pad="0.12",nodesep="0.22",ranksep="0.34"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf3fa",color="#54708d",fontname="Helvetica",fontsize=11,margin="0.13,0.12"];
+ edge [color="#54708d",arrowsize=.65,fontname="Helvetica",fontsize=10];
+ queue [label="Public original equations\nqueue quiescence"];
+ specialize [label="Specialize under exact\nassignment premises"];
+ check [label="Affine lineage / coefficient check\nseparate BigUint specialization",fillcolor="#e9f4ed"];
+ active [label="Original prefix + conditional rows\nactivation bound to LIFO trail",fillcolor="#e9f4ed"];
+ drop [label="Drop generation\nBEFORE Undo",fillcolor="#fff0dc"];
+ queue->specialize->check->active;
+ active->queue [label="propagate / branch"];
+ active->drop [label="backtrack"];
+ drop->queue [label="reset cache / dependencies"];
+}

@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+REQUEST=${1:?usage: validate-ghs-l2-request REQUEST.json}
+SCHEMA="$ROOT/contracts/ghs-l2-request.schema.json"
+
+[[ -f "$REQUEST" ]] || { echo "missing request: $REQUEST" >&2; exit 2; }
+[[ -f "$SCHEMA" ]] || { echo "missing schema: $SCHEMA" >&2; exit 2; }
+[[ $(wc -c <"$REQUEST") -le 65536 ]] || { echo "request exceeds 64 KiB" >&2; exit 2; }
+
+# jq performs the cross-field checks that JSON Schema cannot express.  This
+# command validates only; there is deliberately no submission side effect.
+jq -e '
+  def hex($n): type == "string" and test("^[0-9a-f]{" + ($n|tostring) + "}$");
+  def exactkeys($want): (keys | sort) == ($want | sort);
+  def argv_ok($build; $work):
+    type == "array" and length == 8 and
+    .[0] == $build.binary_path and .[1] == "run" and
+    .[2] == ($work.q | tostring) and
+    .[3] == ($work.instance_seed | tostring) and
+    .[4] == ($work.target_index | tostring) and
+    .[5] == (($work.target_index + 1) | tostring) and .[6] == $work.target_policy and
+    (.[7] | test("^[a-z][a-z0-9-]{0,31}$"));
+
+  . as $root |
+  exactkeys(["schema", "job", "provenance"]) and
+  .schema == "isolab.eks.ghs-l2-request/v1" and
+  (.job | exactkeys(["job_name", "instance_type", "cpu", "memory", "seconds",
+                     "retries", "isolation_required", "build", "runner", "spec"])) and
+  (.job.job_name | type == "string" and test("^ghs-l2-[a-z0-9-]{1,48}$")) and
+  (.job.instance_type == "c8a.2xlarge" or .job.instance_type == "m8a.2xlarge") and
+  .job.cpu == 4 and (.job.memory == "4Gi" or .job.memory == "8Gi") and
+  (.job.seconds | type == "number" and floor == . and . >= 1 and . <= 4800) and
+  .job.retries == 0 and .job.isolation_required == "L2" and
+
+  (.job.build | exactkeys(["image_uri", "source_revision", "binary_path", "binary_sha256",
+                           "validator_path", "validator_sha256"])) and
+  (.job.build.image_uri | type == "string" and
+    test("^104186811093\\.dkr\\.ecr\\.us-east-2\\.amazonaws\\.com/isolab/tasks@sha256:[0-9a-f]{64}$")) and
+  (.job.build.source_revision | hex(40)) and
+  .job.build.binary_path == "/usr/local/bin/ghs-strong-rho" and
+  (.job.build.binary_sha256 | hex(64)) and
+  .job.build.validator_path == "/usr/local/bin/ghs-l2-validate" and
+  (.job.build.validator_sha256 | hex(64)) and
+
+  (.job.runner | exactkeys(["path", "sha256", "argv"])) and
+  .job.runner.path == "/usr/local/bin/ghs-l2-runner" and
+  (.job.runner.sha256 | hex(64)) and
+  .job.runner.argv == ["/usr/local/bin/ghs-l2-runner", "--spec",
+                       "/opt/isolab/ghs-l2-spec.json", "--out", "/work/results"] and
+
+  (.provenance | exactkeys(["harness", "source_revision", "protocol_sha256"])) and
+  .provenance.harness == "isolab-eks/ghs-l2-bridge-v1" and
+  (.provenance.source_revision | hex(40)) and
+  (.provenance.protocol_sha256 | hex(64)) and
+
+  (.job.spec | exactkeys(["schema", "suite_id", "source_revision", "protocol_sha256",
+                          "workload", "measurement", "arms", "replay", "required_artifacts"])) and
+  .job.spec.schema == "ghs.l2.spec/v1" and
+  (.job.spec.suite_id | type == "string" and test("^[a-z0-9][a-z0-9._-]{0,63}$")) and
+  .job.spec.source_revision == .job.build.source_revision and
+  .job.spec.source_revision == .provenance.source_revision and
+  .job.spec.protocol_sha256 == .provenance.protocol_sha256 and
+
+  (.job.spec.workload | exactkeys(["q", "instance_seed", "target_index", "target_policy"])) and
+  (.job.spec.workload.q | type == "number" and floor == . and . >= 3 and . <= 2147483647) and
+  (.job.spec.workload.instance_seed | type == "number" and floor == . and . >= 0 and . <= 4294967295) and
+  (.job.spec.workload.target_index | type == "number" and floor == . and . >= 0 and . <= 4294967295) and
+  (.job.spec.workload.target_policy == "sequence" or .job.spec.workload.target_policy == "ic-repeat") and
+
+  (.job.spec.measurement | exactkeys(["warmup", "rounds", "warmup_order", "order"])) and
+  (.job.spec.measurement.warmup | type == "number" and floor == . and . >= 1 and . <= 20) and
+  (.job.spec.measurement.rounds | type == "number" and floor == . and . >= 5 and . <= 50) and
+  (.job.spec.arms | type == "array" and length >= 3 and length <= 8) and
+  ([.job.spec.arms[].name] | length == (unique | length)) and
+  ([.job.spec.arms[] | select(.role == "reference")] | length == 1) and
+  ([.job.spec.arms[] | select(.role == "control")] | length == 1) and
+  ([.job.spec.arms[] | select(.role == "candidate")] | length >= 1) and
+  (all(.job.spec.arms[];
+    exactkeys(["name", "role", "driver_argv"]) and
+    (.name | type == "string" and test("^[a-z][a-z0-9-]{0,31}$")) and
+    (.role == "reference" or .role == "control" or .role == "candidate") and
+    (.driver_argv | argv_ok($root.job.build; $root.job.spec.workload)))) and
+  ([.job.spec.arms[] | select(.role == "reference") | .driver_argv][0] ==
+   [.job.spec.arms[] | select(.role == "control") | .driver_argv][0]) and
+
+  ([.job.spec.arms[].name] | sort) as $names |
+  (.job.spec.measurement.warmup_order | type == "array" and
+    length == $root.job.spec.measurement.warmup and all(.[]; (sort == $names))) and
+  (.job.spec.measurement.order | type == "array" and
+    length == $root.job.spec.measurement.rounds and all(.[]; (sort == $names))) and
+
+  (.job.spec.replay | exactkeys(["all", "validator_path", "validator_sha256", "canonical_excluded_fields"])) and
+  .job.spec.replay.all == true and
+  .job.spec.replay.validator_path == .job.build.validator_path and
+  .job.spec.replay.validator_sha256 == .job.build.validator_sha256 and
+  .job.spec.replay.canonical_excluded_fields ==
+    ["timestamps", "wall_intervals", "cpu_intervals", "scheduler_counters", "host_load"] and
+  .job.spec.required_artifacts ==
+    ["build-info.json", "control-comparison.json", "input-request.json",
+     "job-exit.json", "l2-gate.json", "replay.json", "session.jsonl",
+     "validation.json", "warmup.json", "SHA256SUMS"]
+' "$REQUEST" >/dev/null || {
+  echo "invalid standalone GHS L2 request: $REQUEST" >&2
+  exit 2
+}
+
+echo "validated standalone GHS L2 request (validation only; no runnable submission route)"

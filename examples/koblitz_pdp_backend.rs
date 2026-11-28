@@ -827,7 +827,7 @@ fn native_f4(instance: VerifiedInstance, budget_seconds: u64) -> (Value, bool) {
         BinaryPoint::Affine { x, .. } => x,
         BinaryPoint::Infinity => unreachable!(),
     };
-    let solver = F4F2;
+    let solver = F4F2::default();
     let x2 = SymElement::from_subspace_vars(&instance.basis, 0, instance.n, n_vars);
     let x3 = SymElement::from_subspace_vars(&instance.basis, instance.ell, instance.n, n_vars);
     let parallel_construction =

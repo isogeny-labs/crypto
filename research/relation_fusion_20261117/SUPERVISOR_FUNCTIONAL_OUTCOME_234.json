@@ -1,0 +1,56 @@
+{
+  "schema": "native-supervisor-functional-outcome/v1",
+  "source_commit": "ff7bfe55360d1ee78f6a6c697afae4d569f87365",
+  "exit_code": 0,
+  "planned_proof_cases": 216,
+  "attempted": 216,
+  "complete": 216,
+  "excluded": 0,
+  "native_cases": 108,
+  "wrapped_cases": 108,
+  "launcher_pairs_with_equal_complete_proof_metadata_basis_stats": 108,
+  "transport_controls": [
+    {
+      "expected_success": false,
+      "id": "transport-wrapped-invalid-mode",
+      "later_arms_still_planned": true,
+      "observed_success": false
+    },
+    {
+      "expected_success": true,
+      "id": "transport-wrapped-limits",
+      "later_arms_still_planned": true,
+      "observed_success": true
+    },
+    {
+      "expected_collision_rejected": true,
+      "native": false,
+      "sentinel_preserved": true
+    },
+    {
+      "expected_success": false,
+      "id": "transport-native-invalid-mode",
+      "later_arms_still_planned": true,
+      "observed_success": false
+    },
+    {
+      "expected_success": true,
+      "id": "transport-native-limits",
+      "later_arms_still_planned": true,
+      "observed_success": true
+    },
+    {
+      "expected_collision_rejected": true,
+      "native": true,
+      "sentinel_preserved": true
+    }
+  ],
+  "raw_summary_sha256": "eb27c160278ae7e961c11c2022581a92818dc175d188a07051c48e4358461b36",
+  "all_declared_source_tool_pins_unchanged": true,
+  "performance_statistics_computed": false,
+  "primary_15x_admitted": false,
+  "logs": {
+    "research/relation_fusion_20261117/development-01/supervised-qualification-234.stdout": "50a127ec5ab0e36d9c253048ea0ddaed4d4285aa06273be8d670adb0222018a9",
+    "research/relation_fusion_20261117/development-01/supervised-qualification-234.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

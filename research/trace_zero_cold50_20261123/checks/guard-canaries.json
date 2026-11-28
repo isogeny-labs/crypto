@@ -1,0 +1,24 @@
+{
+  "schema": "executable-arm-binding-canaries/v1",
+  "cases": [
+    {
+      "variant": "baseline",
+      "wrong_arm": "incumbent",
+      "exit": 101,
+      "refused": true
+    },
+    {
+      "variant": "incumbent",
+      "wrong_arm": "elimination",
+      "exit": 101,
+      "refused": true
+    },
+    {
+      "variant": "elimination",
+      "wrong_arm": "baseline",
+      "exit": 101,
+      "refused": true
+    }
+  ],
+  "standing": "producer negative instrumentation controls"
+}

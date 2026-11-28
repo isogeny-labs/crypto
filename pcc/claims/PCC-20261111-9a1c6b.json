@@ -1,0 +1,30 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-11T20:18:25Z",
+ "id": "PCC-20261111-9a1c6b",
+ "kind": "statement",
+ "producer": {
+  "commit": "6905c86363f5ba499214c5488149ae46a3ba9bec",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/chain-automorphisms-02.txt",
+    "sha256": "a0eb6b6b457c87a6a42d266b275ad01f30a2887e42eadd9ccfe17096815d0d94"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/chain-automorphisms-source-02.rs",
+    "sha256": "e2e2915a5a8a977b810ed06387302416ff8d1f41ef209ccc8d8cb7fdfa693970"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Both actual fixed Richelot targets T0=[31,75,74,54,71,55,1] and T1=[95,26,19,27,94,91,1] have trivial geometric PGL2 stabilizers of their six branch roots. Existing FpR/polynomial engine splits each sextic in declared F1016,checks exact six-root product,and enumerates all120 unique fractional-linear maps from one fixed ordered root triple to every ordered target triple;only identity preserves the full root set. Any geometric branch automorphism is determined by three roots,so this includes transformations over the algebraic closure. The hyperelliptic/Torelli implication Aut(J,lambda)={plus/minus1} and any global isogeny descent are separate written bridges,not established by finite testing alone. Producer-run bounded certificate,unsigned."
+}

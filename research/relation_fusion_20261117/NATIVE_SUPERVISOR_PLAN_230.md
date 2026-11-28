@@ -1,0 +1,9 @@
+# Native supervisor functional qualification230
+
+Scope: deterministic transport/resource/full-proof checks only. No parent performance statistic or speedup admission. The six existing seed7 LAST-star inputs and three frozen85/96/200workers remain unchanged. Pair every18fixed control/candidate arm under wrapped and native launchers:216proof cases, requiring byte-identical complete proof, constructor metadata, independently replayed basis and replay statistics for each launcher pair. Preserve full worker/internal checks and both whole-proof replay paths. [pcc:unverified]
+
+Before proof cases, actual transport controls send an invalid probe mode and then a valid OS-envelope probe through each launcher; expected failure must not suppress the later arm. Existing proof-directory collisions must reject and preserve a sentinel. Raw stdout/stderr use distinct parent-owned capture files; the worker owns its fresh proof directory. All planned proof outcomes, including failures, remain; no retries or exclusions.
+
+LocalCPU0/one-thread, hard childAS2GiB/file16MiB/deadline30seconds, global600seconds. Native timeout sends SIGKILL to the private process group at the original absolute deadline; the old wrapper uses its unchanged TERM30/KILL31behavior. The native cap is no weaker. OS qualifications229 cover real hard limits, allocation/file refusal, short deadline/descendant cleanup and nondefaultSIGCHLDrefusal. All new evidence is unsigned data. User checkpoint/S3 waiver and zero-cloud policy persist. [pcc:unverified]
+
+Any later comparative run needs its own published protocol, immutable pins and strongest matched controls upgraded with the same launcher. Original cross-case15xcriteria stay unchanged; this qualification cannot satisfy them. Canonical protocol tools are presently encrypted and their validation remains an explicit dependency, not a reason to weaken a gate.

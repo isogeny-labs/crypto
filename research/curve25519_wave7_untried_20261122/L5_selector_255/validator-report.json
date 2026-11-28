@@ -1,0 +1,1829 @@
+{
+ "schema": "validator-report (wave 7 L5)",
+ "role": "validator (independent; Claude Opus 5.5, core tier)",
+ "date": "2026-11-22",
+ "target": "research/curve25519_wave7_untried_20261122/L5_selector_255",
+ "validated_commit": "5e7db008a97a237b4c3b8cd9c6b6bd2623b818b4",
+ "branch": "claude/curve25519-index-calculus-i674j4",
+ "frozen_protocol_code_commit": "7be4f368e597dddaf7b594f3392ded0118b06ce4",
+ "run_and_analysis_commit": "2985e0f8e6",
+ "branch_head_at_report": "77b1e5ed91f5e46b1ab24d1dd7a83499a9eeb034 (L5 directory unchanged since 5e7db008a9)",
+ "dirty_tree": false,
+ "verdict": "pass_with_errata",
+ "disposition": "validated (component measurement and derived extrapolation; every preregistered verdict reproduces from raw data, including on non-overlapping rows; errata are prose and disclosure corrections, E1 moderate). Not a leaderboard validation: no replay certificate and no matched rho arm, as the study states.",
+ "summary": "All 20 recorded verdicts reproduce from the raw per-frame data with independent code. The validator independently reproduced: the curve facts; the PC1 cells; all 1431 gain rows and 479 intervals; f = 3.045 from 80 regenerated pools; the M1/M2/M3 decisions; the real-curve labels; every derived 255-bit number. Twelve errata. E1 (moderate): the 2.8e21 x rho break-even belongs to full-label selection; the Legendre-only selector breaks even at 1.7e18 / 1.7e19 x rho (0.1 / 1 GAE). E2-E9 (low): prose numbers and disclosures. E10-E12: informational.",
+ "checks": [
+  {
+   "name": "artifact set frozen and committed",
+   "result": "pass",
+   "detail": "Validated the L5 directory at 5e7db008a97a237b4c3b8cd9c6b6bd2623b818b4 (write-up HEAD named by the dispatch); branch HEAD later moved to 77b1e5ed91 but `git diff 5e7db008a9 HEAD -- L5_selector_255 BRIEF.md` is empty and the L5 tree is clean. Data files are git-ignored and exist on this host only; they were validated against data/SHA256SUMS committed in 2985e0f8e6."
+  },
+  {
+   "name": "frozen protocol and code byte-identical to what produced the data",
+   "result": "pass",
+   "detail": "git diff 7be4f368e5..HEAD over scripts/, PROTOCOL.md, smoke/ is empty (only .gitignore changed). Script mtimes 03:05-03:17 precede the freeze commit (03:20:23) and the logged launch (2026-11-22T03:20:33Z, run.log). frame_census_orig.py sha256 afcf2cc3... equals research/curve25519_frame_search_20261103/scripts/frame_census.py. Engine binary sha256 5abc70ba... equals data/iso/binary.sha256. analysis/{results.json,verdicts.json,gains.csv,fig_gain_vs_t.png} and data/SHA256SUMS at 2985e0f8e6 are byte-identical to the working tree. Data file timestamps follow run_all.sh order (03:20 verify_curves ... 04:15 analysis)."
+  },
+  {
+   "name": "data hashes",
+   "result": "pass",
+   "detail": "sha256sum -c data/SHA256SUMS: 57/57 OK (49 git-ignored npz/jsonl + 3 tracked jsonl/json files + 5 analysis outputs); sha256sum -c data_json/SHA256SUMS: 49/49 OK."
+  },
+  {
+   "name": "lossless JSON mirrors",
+   "result": "pass",
+   "detail": "Validator reload: 49/49 data_json mirrors equal their source arrays/records (dtype, shape, values) and source_sha256; analysis/gains.json rebuilds gains.csv byte-exactly (sha256 99d3856915bc0195... = gains.csv.sha256), 1431 rows."
+  },
+  {
+   "name": "(1) curve facts",
+   "result": "pass",
+   "detail": "Own code (v_curves.py): #E by counting squares over all x, deterministic Miller-Rabin, affine Montgomery arithmetic. k20 #E 1049624 = 8*131203 (r prime), twist 4*261881 (prime), cyclic (point of order 8r found); k24f p 16777141 A 7842: #E 16784072 = 8*2098009 (prime), twist 4*4192553 (prime), cyclic; k24r p 16777213 A 318: #E 16778792 = 8*2097349 (prime), twist 4*4193909 (prime), cyclic; all p = 5 mod 8, A^2-4 non-square. Curve25519: p, r probable primes (MR, 40 own-seed bases + 13 small), point of exact order 8r ([8r]P = O, [4r]P != O, [8]P != O) so #E = 8r (8r > 4 sqrt p), twist 4r' with r' probable prime; r has 253 bits, popcount 73. All equal data/verify_curves.json."
+  },
+  {
+   "name": "(2) gain estimator recomputed from raw per-frame data",
+   "result": "pass",
+   "detail": "Own U-statistic with exact big-integer weights C(i-1,K-1)/C(N,K) and stable multi-key sort, cross-checked with a pure-Python tuple sort (k20 t=6: 1.9352070232538918 both). All 1431 gains.csv rows recomputed (arms F, I, R; K = 10..2000): max relative difference 5.0e-6 (6-significant-digit CSV rounding); 0 missing, 0 extra. Row consistency: c = sum m, J and S1 from class counts, surrogate J: 0 issues."
+  },
+  {
+   "name": "(2) bootstrap intervals and calibration factor f",
+   "result": "pass",
+   "detail": "Own bootstrap with the PROTOCOL seed rule reproduces all 479 recorded intervals (max relative difference 4.9e-6). f = mean over t = 5, 6 of SD(U-statistic over 40 independent N = 4000 pairs) / SD(raw bootstrap): 2.319 and 3.772 -> f = 3.0455 (README 3.05). The 80 pools at t = 5 and 6 were regenerated with the validator's own k20 log table: realised gains identical (max |diff| 0), pair U-statistics within 1.6e-11. Applied as preregistered: replicates re-centred on the point estimate, spread x f, 2.5-97.5% percentiles, for every arm."
+  },
+  {
+   "name": "(2) M1/M2/M3 fits, held-out scores, decision rule",
+   "result": "pass",
+   "detail": "Own closed-form WLS (weights from bootstrap SE of the transformed response). Frames held-out scores: k20 M2 0.110 M3 0.089; k24f M2 0.157 M3 0.174; k24r M2 0.421 M3 0.062; M1 infinite on all; worst M2 0.4207 M3 0.1737 -> M3 wins, adequate (<= ln 2). Seeds: k20 M1 1.427 M2 0.183 M3 0.140; k24r M1 inf M2 0.157 M3 0.106; worst M2 0.1831 M3 0.1402 -> M3. All equal README. alpha (M2, all t) frames 0.5651/0.5550/0.5527, 95% [0.501,0.618]/[0.530,0.579]/[0.514,0.588]; seeds 0.5900/0.5615, [0.506,0.682]/[0.452,0.678]; 0 bootstrap replicates censored by the G<=1 skip."
+  },
+  {
+   "name": "(2) robustness of the decision (not preregistered; informational)",
+   "result": "pass",
+   "detail": "Unweighted LS: frames still M3 (worst 0.311), alpha 0.588-0.593; seeds flip to M2 (worst M2 0.092 vs M3 0.223), alpha 0.573-0.596. With f = 1 and f = 3.772 (the t = 6 ratio) every verdict holds; alpha ranges 0.556-0.570 and 0.546-0.561."
+  },
+  {
+   "name": "(3) independent reduced frame census at k20 (PC1)",
+   "result": "pass",
+   "detail": "Own log table (own generator; logs differ by a unit, J/covered invariant), own J/covered from the frame-search definition, replaying random.Random(20261103+20) over t = 4,5,6 (translate and mobius draws consumed; mobius coverage not computed). t = 5: L 976503, covered 198, gain vs mean 2.8376519147, vs bits lo=0 4.714286 (42); t = 6: L 908172, covered 536, 1.9775095186, 3.308642 (162). Equal to the published 2.8377 / 1.9775 and 4.714 / 3.309."
+  },
+  {
+   "name": "data rows re-derived with independent instrument",
+   "result": "pass",
+   "detail": "Own full log tables for k20, k24f, k24r: sampled rows plus every 2-torsion row of every frame cell re-derived (c, folded classes up to the 1<->3 unit swap, J, covered where recorded): k20 1387 rows 0 mismatches, k24f 679 rows 0, k24r 678 rows 0. Frame L values and iid-surrogate counts of all 31 cells regenerated from the PROTOCOL seed rule: identical. Arm I rows t = 4-7 equal the isogeny-seed study's rows 8000/8000 (full-record equality, same keys)."
+  },
+  {
+   "name": "(4) P3a / P3b",
+   "result": "pass",
+   "detail": "alpha_Phi k20 1.055, k24f 1.029, k24r 1.040 (>= 0.8); c-only share of the J excess at t >= 8: min 0.959 (>= 0.7)."
+  },
+  {
+   "name": "(4) P4 / P8 / P9",
+   "result": "pass",
+   "detail": "P4 geomeans k20 0.968, k24f 0.959, k24r 1.026; P8 max |z| 2.727; P9 geomeans k20 1.406, k24f 1.320, k24r 1.386, Gaussian ratio z2000/z100 = 1.370 (own numerical integration)."
+  },
+  {
+   "name": "(4) P5 cost per label",
+   "result": "pass",
+   "detail": "Counted double-and-add [r]P (preregistered instrument): (bits-1)+(popcount-1) = 20, 27, 25 ops = 1.176, 1.286, 1.190 log2 r; 200/200 labels per cell in all 31 cells; validator: label = log mod 8 on 300/300 random points per curve. Validator x-only ladder count (2 ops per bit of r): 36, 44, 44 ops = 2.12, 2.10, 2.10 log2 r (outside 1.0-1.6; see E10). Curve25519 ladder 506 = 2*253 ops per label; double-and-add 252 doublings + 72 additions = 324."
+  },
+  {
+   "name": "(4) P6 real vs k24f",
+   "result": "pass",
+   "detail": "Recomputed: t=6 1.776 [1.651,1.896] vs k24f 1.847; t=8 1.388 [1.242,1.514] vs 1.345; t=10 1.139 [1.109,1.163] vs 1.178; each interval meets [e/1.5, 1.5e]; also passes with the uncalibrated intervals."
+  },
+  {
+   "name": "(4) R1 dispersion",
+   "result": "pass",
+   "detail": "D t=12 0.961, t=14 0.884, t=16 0.945 (in [0.7,1.4]); R1 enumerated D 1.032/0.994/0.941; pooled class proportions within 0.0022 of (1,2,2,2,1)/8."
+  },
+  {
+   "name": "(4) R2 homogeneity (own chi-square tails, closed forms)",
+   "result": "pass",
+   "detail": "classes chi2 259.1 df 252 p 0.366; on-curve chi2 68.5 df 63 p 0.297; pooled chi2 13.49 df 4 p 0.0091; on-curve fraction 0.49995. All >= 0.001 as preregistered (pooled p < 0.01, disclosed)."
+  },
+  {
+   "name": "(4) R3 split-half / R3b parity",
+   "result": "pass",
+   "detail": "Selected frame 54 on half A, half-B excess -0.0038 inside [-0.0666, 0.0765]; swapping halves also inside (0.0208); plug-in J_rel gives the same frame. Parity: 0 mismatches recorded over 659,525 labels; validator relabelled 12627 points with its own affine (u,v) arithmetic and own E[8] reference: 0 parity mismatches."
+  },
+  {
+   "name": "real-curve data re-derived independently",
+   "result": "pass",
+   "detail": "Own arithmetic regenerating frames from the PROTOCOL seed rule: R1 t=6 first 100 frames and t=8 first 10 frames rows identical; R1c t=12 30/30 and t=16 3/3 column counts identical; R2 frames 0 and 1 counts and trials per half identical."
+  },
+  {
+   "name": "(5) derived 255-bit numbers",
+   "result": "pass_with_errata",
+   "detail": "t* = ceil((252.000 - (-3.9545))/2) = ceil(127.977) = 128; m=3 86, m=4 65; rho = sqrt(pi r/4) = 2^125.826; M3 excess at t*: 4.086e-19 / 3.732e-19 / 3.814e-19, max upper 95% 4.371e-19 (<= 1e-15); M2 1.8-5.3e-21; mechanism prediction 3.73e-19; K = 2^64: 1.087e-18; full-label frame 2^135.983 = 1141.9 / 1142.4 / 1146.4 x rho; Legendre-only 0 / 0.677 / 6.77 x rho; samples 2^126.77 (s1 1.430), sampled cost 974 x rho; break-even full-label 2.794e+21, Legendre-only 1.657e+18 (w=0.1) and 1.657e+19 (w=1); isogeny traces 4 sqrt(p)/2^128 = 2^1.5 (exact count 3). All labelled DERIVED. Errata E1, E2."
+  },
+  {
+   "name": "(6) smoke/data overlaps",
+   "result": "pass_with_errata",
+   "detail": "Verified from files: frames k20 t=4-12 first 121 rows identical, surrogate rows equal 1 (t=4) else 0; arm I k20 t=4-7 seeds 0-39 40/40; PC3 first 4 pools equal; R1 first 40 (t=6) and 12 (t=8) frames and R1c first 6 (t=12) equal; PC1/PC2 identical by design; verify_curves identical. R2: smoke frame 0's 64 labelled samples and trials equal the first 64 of data frame 0 (validator regenerated both), not only its start point (E5)."
+  },
+  {
+   "name": "(6) verdicts on held-out (non-overlapping) rows",
+   "result": "pass",
+   "detail": "Dropping k20 rows 1-121, arm I k20 t<=7 seeds 0-39, R1 first 40/12 frames, R1c first 6, PC3 pools 0-3 and R2 frame 0 (K kept at 2000): every verdict holds. Frames M3 worst 0.174 (M2 0.421); seeds M3 0.131 (M2 0.241); alpha frames 0.553-0.564, seeds 0.562-0.579; alpha_Phi >= 1.029; P3b min 0.959; P4 0.959-1.026; P8 2.725; P9 1.320-1.406; f 3.085; PC3 [2.442,3.452] and [1.869,2.491] contain 2.838 and 1.978; R1 D 0.960/0.884/0.945; R2 p 0.450/0.269/0.0109; R3 inside; M3 excess at t* upper 95% 4.34e-19."
+  },
+  {
+   "name": "(7) .gitignore incident and gains.csv mirror disclosed",
+   "result": "pass_with_errata",
+   "detail": "History: 969a857783 (npz rules), 2224082c48 (+analysis/gains.csv, untracked), 7c3c954db2 (lead rewrite dropped the gains.csv rule; gains.csv re-committed), 8304e6fefa (rule restored, untracked again), 335229c927 (original lines + gains.csv + appended jsonl lines). README discloses the rewrite and the mirror; it does not say the rewrite re-committed gains.csv (E8). gains.csv blobs at 2985e0f8e6 and 7c3c954db2 hash to 99d38569... = gains.csv.sha256."
+  },
+  {
+   "name": "(8) README and tables.md numbers vs data",
+   "result": "pass_with_errata",
+   "detail": "316 table cells in each file (gain points, intervals, mean c, mean cols, frames) checked against the recomputation at 3-decimal rounding: 0 mismatches; tables.md equals the README tables. Text numbers checked one by one; errata E1-E4, E7, E9 are prose errors. Model-comparison table, prediction table, alpha intervals, R1/R2/R3 figures, selection costs at t = 10 and 14 (10,254 / 13,825 / 12,794 and 221,300 / 204,790) all reproduce."
+  },
+  {
+   "name": "(8) [pcc:unverified] coverage, measured vs derived, no relabelling",
+   "result": "pass_with_errata",
+   "detail": "pcc lint-prose: 0 findings. Measured and derived are separated (Answer 4 and the DERIVED section are labelled; figure right panel DERIVED). Distance to rho is imported only, and the figures match the cited READMEs (18.3x / 6.9e5x / 4.4e6x, curve25519_isogeny_seed_20261103 \"Distance remaining\"; 7.8x, curve25519_frame_search_20261103). No rho or BSGS arm is relabelled and no improvement over the IC baseline is claimed. Answer 4 bullets and most DERIVED bullets lack [pcc:unverified] (E6)."
+  },
+  {
+   "name": "controls present and priced",
+   "result": "pass",
+   "detail": "Positive controls PC1 (exact replay), PC2 (instrument equivalence, 3 x 2001 frames, 0 mismatches recorded), PC3 (80 pools); negative controls decoy (P8) and iid surrogate (P4); arm I identity (P0-iso). Legendre symbols, the unpriced native work, are priced at 0, 0.1 and 1 GAE in the 255-bit costs. No rho arm was measured (disclosed); the study is a component measurement, not a vs-rho claim, so no matched rho arm is required for these verdicts. ecbench band / band.rs (L-546d37ca7750) does not apply: no ecbench session."
+  },
+  {
+   "name": "reporting contract and infrastructure deviations",
+   "result": "pass",
+   "detail": "Disclosed: no Conductor task, no isolab-eks route, no benchrec record, no pcc claim, S3 resume checkpoint unavailable (run.log). Not a leaderboard row; the validation gate was not attempted. m=83 / ECC2K-130 disclosure rules not applicable (prime-field Curve25519 family)."
+  },
+  {
+   "name": "identity scripts read real keys (L-99ee952350b2)",
+   "result": "pass",
+   "detail": "iso_pc.py compares whole records (==). analyse.py reads parity_mismatches with .get(...,0): every r1/r2 event carries the key (value 0), r1c events have no labels; P6 uses G.get but the validator recomputed all three t. Validator scripts index records with [] ."
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "moderate",
+   "text": "Break-even is attributed to the wrong selector. README \"DERIVED EXTRAPOLATION\" (Break-even bullet) says \"a selection costing even one Legendre-only frame enumeration (the 0.1 GAE column) pays only if the index-calculus attack itself costs at least 2.8·10²¹ × rho\", and Answer 4 says \"Selection could only pay for an index-calculus attack that is already more than about 2.8·10²¹ × rho\". 2.79·10²¹ is C_sel·(1 + 1/e) with C_sel = the FULL-LABEL enumeration (1,141.9 × rho, analyse.py takes the minimum of full_label_over_rho over w), e = 4.086·10⁻¹⁹. For the Legendre-only (one-bit / c-only) selector, which captures 96–100% of the excess, the break-even is 1.66·10¹⁸ × rho at 0.1 GAE and 1.66·10¹⁹ × rho at 1 GAE, and at w = 0 it costs no group operations. The same text is in REPORT.typ/PDF.",
+   "suggested_fix": "Break-even: full-label selection (1,142 × rho per frame) pays only if the IC attack costs at least 2.8·10²¹ × rho; a Legendre-only selection pays only above 1.7·10¹⁸ × rho (0.1 GAE) or 1.7·10¹⁹ × rho (1 GAE), and at w = 0 it costs no group operations but its gain is 1 + 4·10⁻¹⁹. Answer 4: replace the single 2.8·10²¹ bound by these three figures. Record in the README Errata section; leave analysis/results.json byte-equal."
+  },
+  {
+   "id": "E2",
+   "severity": "low",
+   "text": "README \"Sampling instead of enumerating\": \"about 2^126.8 samples per frame ... That is more than the frame's 2^127 columns\". 2^126.77 is 0.85 × 2^127, fewer than the columns, not more; the 974 × rho sampled cost against 1,142 × rho enumerated is that 0.85 ratio.",
+   "suggested_fix": "\"about 2^126.8 samples per frame, 0.85 × the frame's 2^127 columns, so sampling saves at most about 15% (974 vs 1,142 × rho per frame with full labels).\""
+  },
+  {
+   "id": "E3",
+   "severity": "low",
+   "text": "README \"Selection cost\": \"Arm R used about 9.9·10⁶ Legendre symbols for on-curve tests, plus one more per label for the parity check\". On-curve tests total 9,509,937 (R1 793,600; R1c 8,192,000; R2 524,337 trials). 9,907,318 is the sum of the R1 \"legendre\" fields, which already include 397,381 parity symbols, plus R1c and the R2 trials; it omits R2's 262,144 parity symbols.",
+   "suggested_fix": "\"about 9.51·10⁶ Legendre symbols for on-curve tests plus 659,525 for the parity check (1.017·10⁷ in total).\""
+  },
+  {
+   "id": "E4",
+   "severity": "low",
+   "text": "README \"Selection cost\": \"A double-and-add count for r would be 324 ops (251 doublings, 73 additions)\". r has 253 bits and popcount 73, so double-and-add is 252 doublings and 72 additions; the total 324 is right.",
+   "suggested_fix": "\"324 ops (252 doublings, 72 additions).\""
+  },
+  {
+   "id": "E5",
+   "severity": "low",
+   "text": "Disclosures, smoke vs data seeds: \"Curve25519 R2: the data frames differ from the smoke frames; only frame 0's start point coincides.\" The smoke R2 (K = 8, n = 64, same derived seed) frame 0 shares more than its start point: its 64 labelled samples and their trials are the first 64 samples of data frame 0. The validator regenerated both and they are equal. This is 64 of 262,144 samples. Without frame 0 the R2/R3 verdicts still hold (p = 0.450, 0.269, 0.0109; R3 inside).",
+   "suggested_fix": "\"R2: data frame 0 starts at the smoke frame 0 point and its first 64 labelled samples are the smoke samples; the other 63 data frames differ. R2/R3 recomputed without frame 0 still hold.\""
+  },
+  {
+   "id": "E6",
+   "severity": "low",
+   "text": "Result sentences without [pcc:unverified]: Answer item 4 (all five bullets, README lines 31–36) and the DERIVED EXTRAPOLATION bullets (t*, excess at t*, rho, the cost table, sampling, isogeny-tower note) carry no tag. Only the break-even bullet does. The brief requires every result sentence to carry it. \"At 255 bits the selector is worthless\" is also an interpretive dismissal (AGENTS.md \"Preserve scope and report evidence\").",
+   "suggested_fix": "Tag each derived bullet [pcc:unverified] (as well as DERIVED) and replace \"worthless\" with the quantitative statement, e.g. \"At 255 bits the derived selector excess is about 4·10⁻¹⁹ (DERIVED EXTRAPOLATION) [pcc:unverified]\"."
+  },
+  {
+   "id": "E7",
+   "severity": "low",
+   "text": "Answer 1, \"The gain dies like 2^(−t/2)\", is stated without its caveat. M3 wins the held-out test because the preregistered rule prefers the simpler model. But the free-α (M2) 95% intervals exclude 0.5 on k24f [0.530, 0.579] and k24r [0.514, 0.588]; k20 is [0.501, 0.618]. Unweighted fits give α 0.59, and under unweighted LS the seed arm's winner becomes M2 (worst 0.092 vs 0.223). Separately, \"M1 ... predicts gain < 1 on the held-out t\" holds for frames and k24r seeds but not for k20 seeds, where M1 scores a finite 1.427 (still inadequate).",
+   "suggested_fix": "\"Under the preregistered rule the one-parameter 2^(−t/2) form (M3) wins on every curve; the free exponent fits 0.55–0.59 and its intervals exclude 0.5 on k24f and k24r. M3 is the conservative (larger-excess) extrapolation; M2 gives 2–5·10⁻²¹ at t*.\" Qualify the M1 sentence for k20 seeds."
+  },
+  {
+   "id": "E8",
+   "severity": "low",
+   "text": "Disclosure gaps on Git state. (a) analysis/gains.csv (89 KB, above the 64 KB data-file threshold) was committed in 2985e0f8e6. The lead's .gitignore rewrite (7c3c954db2) dropped the ignore rule and re-committed it, and it was untracked again in 8304e6fefa. The README discloses the rewrite but not the re-commit; the blob stays in history. (b) The README says data/**/*.jsonl are git-ignored and that SHA256SUMS lists \"all 49 of them\". Four of those 49 (data/frames_k20.jsonl, frames_k24f.jsonl, frames_k24r.jsonl, iso.jsonl, each under 5 KB) are tracked in Git. (c) The restored .gitignore comment names data/json/, but the mirrors are in data_json/.",
+   "suggested_fix": "Add a sentence: gains.csv was committed in 2985e0f8e6 and again in 7c3c954db2 (identical blob 99d38569...) before being untracked. Say \"45 of the 49 are git-ignored; the three frames_*.jsonl logs and iso.jsonl are tracked\". Correct the comment to data_json/ in an append-only line."
+  },
+  {
+   "id": "E9",
+   "severity": "low",
+   "text": "README \"Selection cost, Seeds\": \"the tower build costs 1,529–19,643 group ops per seed (k20, t = 4–9) and 2,317–25,614 (k24r)\". These are the per-t means over 1000 seeds. Per seed the build cost ranges 278–125,667 (k20) and 456–152,809 (k24r).",
+   "suggested_fix": "\"the mean tower build cost per seed rises from 1,529 (t = 4) to 19,643 (t = 9) at k20 and from 2,317 to 25,614 at k24r (single seeds range 278–125,667 and 456–152,809).\""
+  },
+  {
+   "id": "E10",
+   "severity": "info",
+   "text": "The P5 band only applies to one counting rule. The preregistered rule is the counted double-and-add (20/27/25 ops = 1.18/1.29/1.19 log2 r, fixed by r's bit length and popcount). Under that rule P5 holds as worded. An x-only ladder count (two ops per bit of r) gives 36/44/44 = 2.12/2.10/2.10 log2 r, outside 1.0–1.6. Yet the 255-bit per-label cost uses the ladder count (506 = 2.01 log2 r). With the double-and-add count (324), full-label enumeration at t* would cost 731 × rho, not 1,142 × rho. The README P5 row reads \"[r]P costs 1.0–1.6·log₂ r\" without naming the counting rule.",
+   "suggested_fix": "Name the counting rule in the P5 row (\"counted double-and-add\"). Give both 255-bit full-label figures (ladder 1,142 × rho; double-and-add 731 × rho), labelled derived."
+  },
+  {
+   "id": "E11",
+   "severity": "info",
+   "text": "Calibration factor: f = 3.045 is the mean of the two per-t ratios, 2.319 (t = 5) and 3.772 (t = 6). PROTOCOL states one factor \"measured at k20, t = 5, 6\" without saying the ratios are averaged. The factor is also applied to selectors, N and K it was not measured on (arm I N = 1000, K = 500; R1 N = 400–2000, K = 200; covered values). The validator reran with f = 1 and f = 3.772: no verdict changes, and the M3 upper 95% excess at t* is 4.21e-19 and 4.42e-19.",
+   "suggested_fix": "One sentence in Disclosures: f averages the t = 5 and t = 6 ratios, it is transferred unvalidated to other N/K, and the verdicts are unchanged for f in [1, 3.77]."
+  },
+  {
+   "id": "E12",
+   "severity": "info",
+   "text": "README \"Class\" says \"there is no ... validator report\". Once this validator-report.json is committed, that sentence is stale (the leaderboard gate still fails: no replay certificate, no matched rho arm).",
+   "suggested_fix": "Cite validator-report.json and keep the statement that the validation gate is not met."
+  }
+ ],
+ "recomputed": {
+  "curve_facts": {
+   "k20": {
+    "curve": "k20",
+    "p": 1048573,
+    "A": 926,
+    "p_prime": true,
+    "p_mod_8": 5,
+    "count_E": 1049624,
+    "div8": true,
+    "r": 131203,
+    "r_prime": true,
+    "twist": 1047524,
+    "twist_div4": true,
+    "twist_cof": 261881,
+    "twist_cof_prime": true,
+    "A2m4_nonsquare": true,
+    "hasse": true,
+    "generator_found": true,
+    "cyclic_Z_8r": true
+   },
+   "k24f": {
+    "curve": "k24f",
+    "p": 16777141,
+    "A": 7842,
+    "p_prime": true,
+    "p_mod_8": 5,
+    "count_E": 16784072,
+    "div8": true,
+    "r": 2098009,
+    "r_prime": true,
+    "twist": 16770212,
+    "twist_div4": true,
+    "twist_cof": 4192553,
+    "twist_cof_prime": true,
+    "A2m4_nonsquare": true,
+    "hasse": true,
+    "generator_found": true,
+    "cyclic_Z_8r": true
+   },
+   "k24r": {
+    "curve": "k24r",
+    "p": 16777213,
+    "A": 318,
+    "p_prime": true,
+    "p_mod_8": 5,
+    "count_E": 16778792,
+    "div8": true,
+    "r": 2097349,
+    "r_prime": true,
+    "twist": 16775636,
+    "twist_div4": true,
+    "twist_cof": 4193909,
+    "twist_cof_prime": true,
+    "A2m4_nonsquare": true,
+    "hasse": true,
+    "generator_found": true,
+    "cyclic_Z_8r": true
+   },
+   "curve25519": {
+    "curve": "curve25519",
+    "p_prime": true,
+    "r_prime": true,
+    "p_mod_8": 5,
+    "r_bits": 253,
+    "r_popcount": 73,
+    "A2m4_nonsquare": true,
+    "NP_is_O": true,
+    "half_not_O": true,
+    "eightP_not_O": true,
+    "order_is_8r": true,
+    "hasse": true,
+    "unique_multiple_in_hasse": true,
+    "twist_div4": true,
+    "twist_cof_prime": true,
+    "twist_cof": "14474011154664524427946373126085988481603263447650325797860494125407373907997",
+    "log2_r": 252.0,
+    "log2_rho_sqrt_pi_r_over_4": 125.82574806473616
+   }
+  },
+  "PC1_replay": {
+   "5": {
+    "selected_L": 976503,
+    "selected_cols": 24,
+    "selected_J": 198,
+    "selected_covered": 198,
+    "trans_mean": 69.776,
+    "gain_vs_mean": 2.837651914698464,
+    "bits_lo0_covered": 42,
+    "bits_lo0_cols": 11,
+    "gain_vs_bits_lo0": 4.714285714285714,
+    "oracle_best_covered": 198
+   },
+   "6": {
+    "selected_L": 908172,
+    "selected_cols": 42,
+    "selected_J": 536,
+    "selected_covered": 536,
+    "trans_mean": 271.048,
+    "gain_vs_mean": 1.97750951860925,
+    "bits_lo0_covered": 162,
+    "bits_lo0_cols": 25,
+    "gain_vs_bits_lo0": 3.308641975308642,
+    "oracle_best_covered": 536
+   }
+  },
+  "calibration": {
+   "ratio_t5": 2.3190314717474156,
+   "ratio_t6": 3.7718777815560807,
+   "f": 3.045454626651748,
+   "PC3_t5": [
+    2.4418239585909327,
+    3.4514524268160445
+   ],
+   "PC3_t6": [
+    1.8699138528820394,
+    2.479531901131951
+   ]
+  },
+  "decision_frames": {
+   "winner": "M3",
+   "worst": {
+    "M1": Infinity,
+    "M2": 0.42071247353124036,
+    "M3": 0.17371927710275137
+   },
+   "adequate": true,
+   "scores": {
+    "k20": {
+     "M1": Infinity,
+     "M2": 0.10994608750645657,
+     "M3": 0.08919252471443528
+    },
+    "k24f": {
+     "M1": Infinity,
+     "M2": 0.1568799964579563,
+     "M3": 0.17371927710275137
+    },
+    "k24r": {
+     "M1": Infinity,
+     "M2": 0.42071247353124036,
+     "M3": 0.06181257272494254
+    }
+   },
+   "alpha_M2": {
+    "k20": 0.5651410495608602,
+    "k24f": 0.5550055600437914,
+    "k24r": 0.5527222481864349
+   },
+   "alpha_M2_ci": {
+    "k20": [
+     0.5009148789183194,
+     0.6184467094860504
+    ],
+    "k24f": [
+     0.529637439115512,
+     0.5788010032154822
+    ],
+    "k24r": [
+     0.5142485228463282,
+     0.5878528991309242
+    ]
+   },
+   "boot_skipped": {
+    "k20": {
+     "M2": 0,
+     "M3": 0
+    },
+    "k24f": {
+     "M2": 0,
+     "M3": 0
+    },
+    "k24r": {
+     "M2": 0,
+     "M3": 0
+    }
+   },
+   "M3_a": {
+    "k20": 2.0199659586943564,
+    "k24f": 1.929126311416589,
+    "k24r": 1.951102869011964
+   }
+  },
+  "decision_seeds": {
+   "winner": "M3",
+   "worst": {
+    "M1": Infinity,
+    "M2": 0.18307909301033498,
+    "M3": 0.14018704876477195
+   },
+   "adequate": true,
+   "scores": {
+    "k20": {
+     "M1": 1.4266133025802539,
+     "M2": 0.18307909301033498,
+     "M3": 0.14018704876477195
+    },
+    "k24r": {
+     "M1": Infinity,
+     "M2": 0.15660915039941908,
+     "M3": 0.10603702106117066
+    }
+   },
+   "alpha_M2": {
+    "k20": 0.5900247442759181,
+    "k24r": 0.5614764724659412
+   },
+   "alpha_M2_ci": {
+    "k20": [
+     0.50588254957918,
+     0.6821947528464541
+    ],
+    "k24r": [
+     0.4516409588256887,
+     0.677812716083241
+    ]
+   },
+   "boot_skipped": {
+    "k20": {
+     "M2": 0,
+     "M3": 0
+    },
+    "k24r": {
+     "M2": 0,
+     "M3": 0
+    }
+   },
+   "M3_a": {
+    "k20": 1.8683894755940742,
+    "k24r": 1.9681381009507237
+   }
+  },
+  "decision_frames_unweighted": {
+   "winner": "M3",
+   "worst": {
+    "M1": Infinity,
+    "M2": 0.40229795071015007,
+    "M3": 0.31123241054447254
+   },
+   "alpha": {
+    "k20": 0.5928419488496562,
+    "k24f": 0.5925308832760741,
+    "k24r": 0.5877314504139035
+   }
+  },
+  "decision_seeds_unweighted": {
+   "winner": "M2",
+   "worst": {
+    "M1": 2.432403612081733,
+    "M2": 0.09249919208013938,
+    "M3": 0.2232868399700664
+   },
+   "alpha": {
+    "k20": 0.5963789589106654,
+    "k24r": 0.5725230080070789
+   }
+  },
+  "alpha_Phi": {
+   "k20": 1.0546001068936224,
+   "k24f": 1.0294819694394142,
+   "k24r": 1.0401209132117915
+  },
+  "alpha_covered_unsaturated": {
+   "k20": 0.6149677743444031,
+   "k24f": 0.5988427362703607,
+   "k24r": 0.6684642654684018
+  },
+  "P3b_min": 0.9591192073813222,
+  "P3b_share": {
+   "k20_t8": 0.9961798152851177,
+   "k20_t9": 0.9991739609079074,
+   "k20_t10": 0.9670797099023138,
+   "k20_t11": 0.9997836937036104,
+   "k20_t12": 0.9999788691129269,
+   "k24f_t8": 0.9918527472167337,
+   "k24f_t9": 0.9874168120635648,
+   "k24f_t10": 0.9984196280868785,
+   "k24f_t11": 0.9994147490783895,
+   "k24f_t12": 0.998901645456823,
+   "k24f_t13": 0.99841840861803,
+   "k24f_t14": 0.9996062403980792,
+   "k24r_t8": 0.9591192073813222,
+   "k24r_t9": 0.985073808167266,
+   "k24r_t10": 0.9887742363422316,
+   "k24r_t11": 0.9994584049475229,
+   "k24r_t12": 0.9974778042921828,
+   "k24r_t13": 0.9999998763900738,
+   "k24r_t14": 0.9999185264877843
+  },
+  "P4_geomean": {
+   "k20": 0.9682395461583151,
+   "k24f": 0.959239776109101,
+   "k24r": 1.0256990041942322
+  },
+  "P8_max_abs_z": 2.7266842962556646,
+  "P9_geomean": {
+   "k20": 1.405565440042291,
+   "k24f": 1.3203963235946312,
+   "k24r": 1.386299162873926
+  },
+  "P6": {
+   "6": {
+    "gain": 1.7759146481250458,
+    "lo": 1.6509077911203918,
+    "hi": 1.89558357651137,
+    "k24f": 1.8465909301928798,
+    "k20": 1.7856747826733876,
+    "band": [
+     0.5643939534619199,
+     1.2698863952893196
+    ],
+    "pass_calibrated": true,
+    "raw_interval": [
+     1.7310826015786267,
+     1.81142390210228
+    ],
+    "pass_uncalibrated": true
+   },
+   "8": {
+    "gain": 1.3879885441366397,
+    "lo": 1.2423199525433888,
+    "hi": 1.5141393845770805,
+    "k24f": 1.3452732023153129,
+    "k20": 1.385699736066531,
+    "band": [
+     0.23018213487687525,
+     0.5179098034729693
+    ],
+    "pass_calibrated": true,
+    "raw_interval": [
+     1.3336411057286814,
+     1.4228952452108174
+    ],
+    "pass_uncalibrated": true
+   },
+   "10": {
+    "gain": 1.1394644709565933,
+    "lo": 1.1087771877515178,
+    "hi": 1.162718733526857,
+    "k24f": 1.1776202705779328,
+    "k20": 1.1766259345208485,
+    "band": [
+     0.1184135137186219,
+     0.26643040586689926
+    ],
+    "pass_calibrated": true,
+    "raw_interval": [
+     1.127504806653113,
+     1.1452169555399423
+    ],
+    "pass_uncalibrated": true
+   }
+  },
+  "cv_ratio_measured_over_mechanism_t_ge_7_range": [
+   0.9979085977668448,
+   1.0193128891633734
+  ],
+  "R1": {
+   "r1_t6": {
+    "N": 2000,
+    "mean_c": 31.9585,
+    "D": 1.0316911892877452,
+    "props": [
+     0.12492764053381729,
+     0.2516701347059468,
+     0.2513259383262669,
+     0.2488539825085658,
+     0.12322230392540326
+    ],
+    "max_abs_dev_props": 0.0017776960745967407,
+    "labels": 63917
+   },
+   "r1_t8": {
+    "N": 1000,
+    "mean_c": 128.106,
+    "D": 0.9936938120969195,
+    "props": [
+     0.12350709568638471,
+     0.24782601907795107,
+     0.25030053237162975,
+     0.25130751096748005,
+     0.12705884189655442
+    ],
+    "max_abs_dev_props": 0.0021739809220489292,
+    "labels": 128106
+   },
+   "r1_t10": {
+    "N": 400,
+    "mean_c": 513.395,
+    "D": 0.9405574795620119,
+    "props": [
+     0.12489895694348406,
+     0.24906748215311797,
+     0.2501290429396469,
+     0.2504066069985099,
+     0.12549791096524118
+    ],
+    "max_abs_dev_props": 0.0009325178468820305,
+    "labels": 205358
+   },
+   "r1c_t12": {
+    "N": 400,
+    "mean_c": 2046.315,
+    "var_c": 983.5847368421054,
+    "D": 0.9605326197799422
+   },
+   "r1c_t14": {
+    "N": 200,
+    "mean_c": 8193.445,
+    "var_c": 3621.9969597989943,
+    "D": 0.8842766290268069
+   },
+   "r1c_t16": {
+    "N": 50,
+    "mean_c": 32754.08,
+    "var_c": 15482.115918367348,
+    "D": 0.9449535346835545
+   }
+  },
+  "R2": {
+   "frames": 64,
+   "chi2_classes": 259.1123241341867,
+   "df_classes": 252,
+   "p_classes": 0.3656081941807693,
+   "chi2_oncurve": 68.45578485617128,
+   "df_oncurve": 63,
+   "p_oncurve": 0.29746746097749793,
+   "chi2_pooled": 13.485519409179688,
+   "p_pooled": 0.009131717101942091,
+   "pooled_props": [
+    0.12495040893554688,
+    0.2505836486816406,
+    0.25135040283203125,
+    0.24707794189453125,
+    0.12603759765625
+   ],
+   "oncurve_fraction": 0.49995327432548153,
+   "trials": 524337,
+   "labels": 262144,
+   "R3_selected": 54,
+   "R3_excess": -0.0038491731712446686,
+   "R3_null": [
+    -0.06655462704876793,
+    0.07649165507768275
+   ],
+   "R3_inside": true,
+   "R3_plugin": {
+    "selected": 54,
+    "excess": -0.0038613018802629018,
+    "null": [
+     -0.06654508910078605,
+     0.07649065631505197
+    ]
+   },
+   "R3_swapped": {
+    "selected": 21,
+    "excess": 0.020792959223605356,
+    "null": [
+     -0.07362471430892088,
+     0.0717267272026067
+    ],
+    "inside": true
+   },
+   "rel_sd_per_frame": 0.031608716981379535,
+   "between_var_rel": 3.089267781522462e-05,
+   "between_var_rel_se_rough": 9.451215822070992e-05
+  },
+  "R2_without_frame0": {
+   "frames": 63,
+   "chi2_classes": 250.15393845799645,
+   "df_classes": 248,
+   "p_classes": 0.449725649191831,
+   "chi2_oncurve": 68.38904547047055,
+   "df_oncurve": 62,
+   "p_oncurve": 0.2694198633372787,
+   "chi2_pooled": 13.07593936011905,
+   "p_pooled": 0.010910640126319628,
+   "pooled_props": [
+    0.12503100198412698,
+    0.25048828125,
+    0.25155784970238093,
+    0.24707418774801587,
+    0.1258486793154762
+   ],
+   "oncurve_fraction": 0.49997578087308986,
+   "trials": 516121,
+   "labels": 258048,
+   "R3_selected": 53,
+   "R3_excess": -0.003176100260117831,
+   "R3_null": [
+    -0.06593579774861934,
+    0.07722115086508434
+   ],
+   "R3_inside": true,
+   "R3_plugin": {
+    "selected": 53,
+    "excess": -0.0031881091042160747,
+    "null": [
+     -0.06592604939118078,
+     0.07722008669247617
+    ]
+   },
+   "R3_swapped": {
+    "selected": 20,
+    "excess": 0.01998796079207188,
+    "null": [
+     -0.07437838039440828,
+     0.07097826966300796
+    ],
+    "inside": true
+   },
+   "rel_sd_per_frame": 0.030605693281273206,
+   "between_var_rel": 6.96031641523218e-05,
+   "between_var_rel_se_rough": 9.662000036448579e-05
+  },
+  "P5": {
+   "double_and_add_ops": {
+    "k20": 20,
+    "k24f": 27,
+    "k24r": 25
+   },
+   "double_and_add_over_log2r": {
+    "k20": 1.1763708608786976,
+    "k24f": 1.285678198802759,
+    "k24r": 1.1904685082148807
+   },
+   "xonly_ladder_ops": {
+    "k20": 36,
+    "k24f": 44,
+    "k24r": 44
+   },
+   "xonly_ladder_over_log2r": {
+    "k20": 2.1174675495816557,
+    "k24f": 2.0951792869378294,
+    "k24r": 2.09522457445819
+   },
+   "curve25519_ladder_ops": 506,
+   "curve25519_double_and_add": {
+    "doublings": 252,
+    "additions": 72,
+    "total": 324
+   },
+   "label_equals_log_mod8": {
+    "k20": [
+     300,
+     300
+    ],
+    "k24f": [
+     300,
+     300
+    ],
+    "k24r": [
+     300,
+     300
+    ]
+   }
+  },
+  "legendre_arm_R": {
+   "oncurve_tests": 9509937,
+   "parity": 659525,
+   "total": 10169462,
+   "readme_figure_9_9e6_equals": 9907318
+  },
+  "derived_255": {
+   "log2_r": 252.0,
+   "log2_rho": 125.82574806473616,
+   "b_intercept": -3.954484803344238,
+   "tstar_unrounded": 127.97724240167211,
+   "tstar": 128,
+   "t_m3": 86,
+   "t_m4": 65,
+   "excess": {
+    "k20": {
+     "M3_C": 7.53806832360651,
+     "M3_128": 4.086395026399179e-19,
+     "M3_86": 8.569791502403092e-13,
+     "M3_65": 1.2410383738273929e-09,
+     "M3_128_hi95": 4.370897725921771e-19,
+     "M3_128_lo95": 3.7177521464677658e-19,
+     "M2_128": 1.82705450338099e-21,
+     "M2_128_hi95": 3.7129099662803535e-19
+    },
+    "k24f": {
+     "M3_C": 6.883493583863236,
+     "M3_128": 3.7315493489572793e-19,
+     "M3_86": 7.825626180264457e-13,
+     "M3_65": 1.133271723846854e-09,
+     "M3_128_hi95": 3.873232257568206e-19,
+     "M3_128_lo95": 3.542497337426453e-19,
+     "M2_128": 4.124082836839675e-21,
+     "M2_128_hi95": 3.213258781853296e-20
+    },
+    "k24r": {
+     "M3_C": 7.036443578455406,
+     "M3_128": 3.81446370716651e-19,
+     "M3_86": 7.99951019241169e-13,
+     "M3_65": 1.1584528185805209e-09,
+     "M3_128_hi95": 4.01786589811292e-19,
+     "M3_128_lo95": 3.5135608408163333e-19,
+     "M2_128": 5.287772827374491e-21,
+     "M2_128_hi95": 1.216981596656181e-19
+    }
+   },
+   "e_max_M3": 4.086395026399179e-19,
+   "e_hi95_max_M3": 4.370897725921771e-19,
+   "mechanism_point_prediction": 3.729655473350135e-19,
+   "z_2000": 3.4353371625143003,
+   "z_100": 2.5075936364416833,
+   "z_2_64": 9.141756733030073,
+   "gaussian_P9_ratio": 1.3699736323262888,
+   "excess_K_2_64": 1.0874283215643406e-18,
+   "cost_per_frame": {
+    "0": {
+     "full_log2": 135.98299357469432,
+     "full_over_rho": 1141.9197171006651,
+     "onebit_log2": null,
+     "onebit_over_rho": 0.0,
+     "full_dadd_over_rho": 731.1897002778878
+    },
+    "0.1": {
+     "full_log2": 135.98356369722333,
+     "full_over_rho": 1142.371068767504,
+     "onebit_log2": 125.26303440583379,
+     "onebit_over_rho": 0.6770275002573065,
+     "full_dadd_over_rho": 731.6410519447261
+    },
+    "1": {
+     "full_log2": 135.98868468677216,
+     "full_over_rho": 1146.4332337690355,
+     "onebit_log2": 128.58496250072116,
+     "onebit_over_rho": 6.770275002573095,
+     "full_dadd_over_rho": 735.7032169462763
+    }
+   },
+   "breakeven": {
+    "full_label_w0": 2.7944428028214735e+21,
+    "legendre_only_w0.1": 1.656784270447502e+18,
+    "legendre_only_w1": 1.6567842704475095e+19
+   },
+   "s1": 1.4304472398169503,
+   "samples_log2": 126.76544623041121,
+   "sampled_cost_over_rho": 974.4084624453224,
+   "iso_trace_count_exact": 3,
+   "iso_trace_count_rough_log2": 1.5
+  },
+  "heldout_rows": {
+   "decision_frames": {
+    "winner": "M3",
+    "worst": {
+     "M1": Infinity,
+     "M2": 0.4206223996837562,
+     "M3": 0.17365856425565104
+    },
+    "adequate": true,
+    "scores": {
+     "k20": {
+      "M1": Infinity,
+      "M2": 0.1103320712342857,
+      "M3": 0.08333931021901458
+     },
+     "k24f": {
+      "M1": Infinity,
+      "M2": 0.1570495797809702,
+      "M3": 0.17365856425565104
+     },
+     "k24r": {
+      "M1": Infinity,
+      "M2": 0.4206223996837562,
+      "M3": 0.061662879064446424
+     }
+    },
+    "alpha_M2": {
+     "k20": 0.564365615926873,
+     "k24f": 0.5549758743771249,
+     "k24r": 0.552561587199802
+    },
+    "alpha_M2_ci": {
+     "k20": [
+      0.507445334068759,
+      0.6255878441647785
+     ],
+     "k24f": [
+      0.5292457197362618,
+      0.5791066920728104
+     ],
+     "k24r": [
+      0.5134194204359744,
+      0.5881419140991608
+     ]
+    },
+    "boot_skipped": {
+     "k20": {
+      "M2": 0,
+      "M3": 0
+     },
+     "k24f": {
+      "M2": 0,
+      "M3": 0
+     },
+     "k24r": {
+      "M2": 0,
+      "M3": 0
+     }
+    },
+    "M3_a": {
+     "k20": 2.017711229462469,
+     "k24f": 1.9290264953223604,
+     "k24r": 1.9508004504237684
+    }
+   },
+   "decision_seeds": {
+    "winner": "M3",
+    "worst": {
+     "M1": Infinity,
+     "M2": 0.24052332328648998,
+     "M3": 0.13083320258748282
+    },
+    "adequate": true,
+    "scores": {
+     "k20": {
+      "M1": 1.696316256922264,
+      "M2": 0.24052332328648998,
+      "M3": 0.13083320258748282
+     },
+     "k24r": {
+      "M1": Infinity,
+      "M2": 0.15737873512584508,
+      "M3": 0.10588501907666148
+     }
+    },
+    "alpha_M2": {
+     "k20": 0.5792895089371413,
+     "k24r": 0.5615185941121135
+    },
+    "alpha_M2_ci": {
+     "k20": [
+      0.47442003618827255,
+      0.6752163730835133
+     ],
+     "k24r": [
+      0.45000527570600063,
+      0.6798995475581657
+     ]
+    },
+    "boot_skipped": {
+     "k20": {
+      "M2": 3,
+      "M3": 3
+     },
+     "k24r": {
+      "M2": 0,
+      "M3": 0
+     }
+    },
+    "M3_a": {
+     "k20": 1.8400372718086662,
+     "k24r": 1.9680192754027668
+    }
+   },
+   "alpha_Phi": {
+    "k20": 1.0548028590199734,
+    "k24f": 1.0294484749501556,
+    "k24r": 1.0399886776802008
+   },
+   "P3b_min": 0.9591192073813222,
+   "P4_geomean": {
+    "k20": 0.9673425551216295,
+    "k24f": 0.959239776109101,
+    "k24r": 1.0256990041942322
+   },
+   "P8_max_abs_z": 2.7249893534009852,
+   "P9_geomean": {
+    "k20": 1.4060502957348953,
+    "k24f": 1.3203963235946312,
+    "k24r": 1.386299162873926
+   },
+   "P6": {
+    "6": {
+     "gain": 1.7753802667090777,
+     "lo": 1.6493584677454636,
+     "hi": 1.895241712667036,
+     "k24f": 1.8465909301928798,
+     "k20": 1.7825549937780847,
+     "band": [
+      0.5643939534619199,
+      1.2698863952893196
+     ],
+     "pass_calibrated": true,
+     "raw_interval": [
+      1.7298438327317358,
+      1.8095404267846817
+     ],
+     "pass_uncalibrated": true
+    },
+    "8": {
+     "gain": 1.3891284758722562,
+     "lo": 1.255433549823181,
+     "hi": 1.5047198743911505,
+     "k24f": 1.3452732023153129,
+     "k20": 1.386574476568442,
+     "band": [
+      0.23018213487687525,
+      0.5179098034729693
+     ],
+     "pass_calibrated": true,
+     "raw_interval": [
+      1.3396460189331343,
+      1.4204456318485295
+     ],
+     "pass_uncalibrated": true
+    },
+    "10": {
+     "gain": 1.1394644709565933,
+     "lo": 1.1083762777615678,
+     "hi": 1.1630225357928,
+     "k24f": 1.1776202705779328,
+     "k20": 1.177217525219926,
+     "band": [
+      0.1184135137186219,
+      0.26643040586689926
+     ],
+     "pass_calibrated": true,
+     "raw_interval": [
+      1.127504806653113,
+      1.1452169555399423
+     ],
+     "pass_uncalibrated": true
+    }
+   },
+   "R1": {
+    "r1_t6": {
+     "N": 1960,
+     "mean_c": 31.972448979591835,
+     "D": 1.0328144538550417,
+     "props": [
+      0.12520345961127247,
+      0.2514601219161906,
+      0.25147607953276097,
+      0.24874732709922445,
+      0.1231130118405515
+     ],
+     "max_abs_dev_props": 0.0018869881594485022,
+     "labels": 62666
+    },
+    "r1_t8": {
+     "N": 988,
+     "mean_c": 128.085020242915,
+     "D": 0.9931117967429508,
+     "props": [
+      0.12344722950975125,
+      0.24796124790593294,
+      0.2501659449378892,
+      0.2512959509435155,
+      0.12712962670291114
+     ],
+     "max_abs_dev_props": 0.0021296267029111415,
+     "labels": 126548
+    },
+    "r1_t10": {
+     "N": 400,
+     "mean_c": 513.395,
+     "D": 0.9405574795620119,
+     "props": [
+      0.12489895694348406,
+      0.24906748215311797,
+      0.2501290429396469,
+      0.2504066069985099,
+      0.12549791096524118
+     ],
+     "max_abs_dev_props": 0.0009325178468820305,
+     "labels": 205358
+    },
+    "r1c_t12": {
+     "N": 394,
+     "mean_c": 2046.1218274111675,
+     "var_c": 982.7637462703917,
+     "D": 0.9597310281290293
+    },
+    "r1c_t14": {
+     "N": 200,
+     "mean_c": 8193.445,
+     "var_c": 3621.9969597989943,
+     "D": 0.8842766290268069
+    },
+    "r1c_t16": {
+     "N": 50,
+     "mean_c": 32754.08,
+     "var_c": 15482.115918367348,
+     "D": 0.9449535346835545
+    }
+   },
+   "calibration_f": 3.0852415695233084,
+   "PC3": {
+    "5": {
+     "lo": 2.4415260567080885,
+     "hi": 3.4516622376222212,
+     "published": 2.837651914698464,
+     "inside": true
+    },
+    "6": {
+     "lo": 1.86921454598945,
+     "hi": 2.4911264585481137,
+     "published": 1.97750951860925,
+     "inside": true
+    }
+   },
+   "verdicts": {
+    "P1_form_not_M1": true,
+    "P1_alpha": true,
+    "P2_adequate": true,
+    "P3a": true,
+    "P3b": true,
+    "P4": true,
+    "P7": true,
+    "P8": true,
+    "P9": true,
+    "P6": true,
+    "R1": true
+   }
+  },
+  "sensitivity_f": {
+   "f_1": {
+    "verdicts": {
+     "P1_form_not_M1": true,
+     "P1_alpha": true,
+     "P2_adequate": true,
+     "P3a": true,
+     "P3b": true,
+     "P4": true,
+     "P7": true,
+     "P8": true,
+     "P9": true,
+     "P6": true,
+     "R1": true
+    },
+    "alpha_frames": {
+     "k20": 0.5695412056614841,
+     "k24f": 0.5560039079229955,
+     "k24r": 0.5573787346940868
+    },
+    "alpha_seeds": {
+     "k20": 0.5979873441838359,
+     "k24r": 0.560595316407772
+    }
+   },
+   "f_3_772": {
+    "verdicts": {
+     "P1_form_not_M1": true,
+     "P1_alpha": true,
+     "P2_adequate": true,
+     "P3a": true,
+     "P3b": true,
+     "P4": true,
+     "P7": true,
+     "P8": true,
+     "P9": true,
+     "P6": true,
+     "R1": true
+    },
+    "alpha_frames": {
+     "k20": 0.5611105740964792,
+     "k24f": 0.5540522805581111,
+     "k24r": 0.546287346935639
+    },
+    "alpha_seeds": {
+     "k20": 0.5783663771569714,
+     "k24r": 0.562284228720822
+    }
+   }
+  },
+  "independent_rederivation": {
+   "census_k20": {
+    "4": {
+     "rows_checked": 151,
+     "torsion_rows": 0,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "5": {
+     "rows_checked": 151,
+     "torsion_rows": 0,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "6": {
+     "rows_checked": 152,
+     "torsion_rows": 1,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "7": {
+     "rows_checked": 151,
+     "torsion_rows": 0,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "8": {
+     "rows_checked": 151,
+     "torsion_rows": 0,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "9": {
+     "rows_checked": 152,
+     "torsion_rows": 1,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "10": {
+     "rows_checked": 152,
+     "torsion_rows": 1,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "11": {
+     "rows_checked": 160,
+     "torsion_rows": 9,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "12": {
+     "rows_checked": 167,
+     "torsion_rows": 16,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    }
+   },
+   "census_k24f": {
+    "4": {
+     "rows_checked": 61,
+     "torsion_rows": 0,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "5": {
+     "rows_checked": 61,
+     "torsion_rows": 0,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "6": {
+     "rows_checked": 61,
+     "torsion_rows": 0,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "7": {
+     "rows_checked": 61,
+     "torsion_rows": 0,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "8": {
+     "rows_checked": 61,
+     "torsion_rows": 0,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "9": {
+     "rows_checked": 61,
+     "torsion_rows": 0,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "10": {
+     "rows_checked": 62,
+     "torsion_rows": 1,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "11": {
+     "rows_checked": 62,
+     "torsion_rows": 1,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "12": {
+     "rows_checked": 62,
+     "torsion_rows": 2,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "13": {
+     "rows_checked": 64,
+     "torsion_rows": 4,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    },
+    "14": {
+     "rows_checked": 63,
+     "torsion_rows": 3,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      false
+     ]
+    }
+   },
+   "census_k24r": {
+    "4": {
+     "rows_checked": 61,
+     "torsion_rows": 0,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      true
+     ]
+    },
+    "5": {
+     "rows_checked": 62,
+     "torsion_rows": 1,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      true
+     ]
+    },
+    "6": {
+     "rows_checked": 61,
+     "torsion_rows": 0,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      true
+     ]
+    },
+    "7": {
+     "rows_checked": 61,
+     "torsion_rows": 1,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      true
+     ]
+    },
+    "8": {
+     "rows_checked": 61,
+     "torsion_rows": 1,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      true
+     ]
+    },
+    "9": {
+     "rows_checked": 61,
+     "torsion_rows": 1,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      true
+     ]
+    },
+    "10": {
+     "rows_checked": 61,
+     "torsion_rows": 1,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      true
+     ]
+    },
+    "11": {
+     "rows_checked": 62,
+     "torsion_rows": 2,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      true
+     ]
+    },
+    "12": {
+     "rows_checked": 63,
+     "torsion_rows": 3,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      true
+     ]
+    },
+    "13": {
+     "rows_checked": 61,
+     "torsion_rows": 1,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      true
+     ]
+    },
+    "14": {
+     "rows_checked": 64,
+     "torsion_rows": 4,
+     "mismatches": 0,
+     "first": [],
+     "class13_swapped": [
+      true
+     ]
+    }
+   },
+   "real_curve": {
+    "r1_t6": {
+     "frames": 100,
+     "c_equal": 100,
+     "rows_equal": 100,
+     "rows_equal_with_class13_swap": 0,
+     "mismatches": 0,
+     "first": []
+    },
+    "r1_t8": {
+     "frames": 10,
+     "c_equal": 10,
+     "rows_equal": 10,
+     "rows_equal_with_class13_swap": 0,
+     "mismatches": 0,
+     "first": []
+    },
+    "r1c_t12": {
+     "frames": 30,
+     "equal": 30
+    },
+    "r1c_t16": {
+     "frames": 3,
+     "equal": 3
+    },
+    "r2": [
+     {
+      "frame": 0,
+      "trials_equal": true,
+      "counts_equal": true,
+      "counts_equal_with_swap": false,
+      "smoke_frame0_counts_equal": true,
+      "smoke_frame0_trials_equal": true
+     },
+     {
+      "frame": 1,
+      "trials_equal": true,
+      "counts_equal": true,
+      "counts_equal_with_swap": false
+     }
+    ],
+    "labels_computed": 12627,
+    "parity_mismatches": 0,
+    "seconds": 102.1
+   },
+   "seed_rule_and_pools": {
+    "5": {
+     "pools": 80,
+     "realised_max_abs_diff": 0.0,
+     "ustat_max_abs_diff": 1.6058709917388114e-11
+    },
+    "6": {
+     "pools": 80,
+     "realised_max_abs_diff": 0.0,
+     "ustat_max_abs_diff": 1.1647127706737592e-11
+    }
+   },
+   "smoke_overlap": {
+    "frames": {
+     "k20_t10.npz": {
+      "smoke_rows": 121,
+      "rows_equal_first": true,
+      "surrogate_rows_equal": 0,
+      "smoke_rho": 0.5010335286458333,
+      "data_rho": 0.500697021484375
+     },
+     "k20_t11.npz": {
+      "smoke_rows": 121,
+      "rows_equal_first": true,
+      "surrogate_rows_equal": 0,
+      "smoke_rho": 0.49954020182291664,
+      "data_rho": 0.5002813720703125
+     },
+     "k20_t12.npz": {
+      "smoke_rows": 121,
+      "rows_equal_first": true,
+      "surrogate_rows_equal": 0,
+      "smoke_rho": 0.501275634765625,
+      "data_rho": 0.5003755493164063
+     },
+     "k20_t4.npz": {
+      "smoke_rows": 121,
+      "rows_equal_first": true,
+      "surrogate_rows_equal": 1,
+      "smoke_rho": 0.5151041666666667,
+      "data_rho": 0.5000625
+     },
+     "k20_t5.npz": {
+      "smoke_rows": 121,
+      "rows_equal_first": true,
+      "surrogate_rows_equal": 0,
+      "smoke_rho": 0.4947916666666667,
+      "data_rho": 0.5014296875
+     },
+     "k20_t6.npz": {
+      "smoke_rows": 121,
+      "rows_equal_first": true,
+      "surrogate_rows_equal": 0,
+      "smoke_rho": 0.50234375,
+      "data_rho": 0.500390625
+     },
+     "k20_t7.npz": {
+      "smoke_rows": 121,
+      "rows_equal_first": true,
+      "surrogate_rows_equal": 0,
+      "smoke_rho": 0.49140625,
+      "data_rho": 0.502142578125
+     },
+     "k20_t8.npz": {
+      "smoke_rows": 121,
+      "rows_equal_first": true,
+      "surrogate_rows_equal": 0,
+      "smoke_rho": 0.500390625,
+      "data_rho": 0.500283203125
+     },
+     "k20_t9.npz": {
+      "smoke_rows": 121,
+      "rows_equal_first": true,
+      "surrogate_rows_equal": 0,
+      "smoke_rho": 0.501904296875,
+      "data_rho": 0.50088330078125
+     }
+    },
+    "iso": {
+     "iso_k20_t4.jsonl": {
+      "smoke_rows": 40,
+      "seeds": [
+       0,
+       39
+      ],
+      "equal": 40
+     },
+     "iso_k20_t5.jsonl": {
+      "smoke_rows": 40,
+      "seeds": [
+       0,
+       39
+      ],
+      "equal": 40
+     },
+     "iso_k20_t6.jsonl": {
+      "smoke_rows": 40,
+      "seeds": [
+       0,
+       39
+      ],
+      "equal": 40
+     },
+     "iso_k20_t7.jsonl": {
+      "smoke_rows": 40,
+      "seeds": [
+       0,
+       39
+      ],
+      "equal": 40
+     }
+    },
+    "pc3": {
+     "5": {
+      "smoke_pools": 4,
+      "realised_equal_first": true,
+      "ustat_equal_first": true
+     },
+     "6": {
+      "smoke_pools": 4,
+      "realised_equal_first": true,
+      "ustat_equal_first": true
+     }
+    },
+    "real": {
+     "r1_t6": {
+      "smoke_n": 40,
+      "equal_first": true
+     },
+     "r1_t8": {
+      "smoke_n": 12,
+      "equal_first": true
+     },
+     "r1c_t12": {
+      "smoke_n": 6,
+      "equal_first": true
+     },
+     "r2_smoke_shape": [
+      8,
+      2,
+      5
+     ],
+     "r2_data_shape": [
+      64,
+      2,
+      5
+     ]
+    },
+    "verify_curves_smoke_all_equals_data": true,
+    "pc_replay_equal_except_seconds": {
+     "pc1": true,
+     "pc2": true,
+     "PC1_pass": true,
+     "PC2_pass": true
+    }
+   },
+   "mirrors": {
+    "mirrors": 49,
+    "ok": 49,
+    "bad": [],
+    "gains_json_rebuild_sha256": "99d3856915bc0195d596ff646be84b4ea37870aadb2591e96b62543b96dbb043",
+    "gains_csv_sha256": "99d3856915bc0195d596ff646be84b4ea37870aadb2591e96b62543b96dbb043",
+    "gains_csv_sha256_recorded": "99d3856915bc0195d596ff646be84b4ea37870aadb2591e96b62543b96dbb043",
+    "gains_json_rows": 1431
+   },
+   "iso_identity": {
+    "k20_t4": {
+     "rows": 1000,
+     "in_ref": 1000,
+     "equal": 1000,
+     "same_keys": true,
+     "J_cov_cols_equal": 1000
+    },
+    "k20_t5": {
+     "rows": 1000,
+     "in_ref": 1000,
+     "equal": 1000,
+     "same_keys": true,
+     "J_cov_cols_equal": 1000
+    },
+    "k20_t6": {
+     "rows": 1000,
+     "in_ref": 1000,
+     "equal": 1000,
+     "same_keys": true,
+     "J_cov_cols_equal": 1000
+    },
+    "k20_t7": {
+     "rows": 1000,
+     "in_ref": 1000,
+     "equal": 1000,
+     "same_keys": true,
+     "J_cov_cols_equal": 1000
+    },
+    "k20_t8": {
+     "rows": 1000,
+     "in_ref": 0,
+     "equal": 0,
+     "same_keys": null,
+     "J_cov_cols_equal": 0
+    },
+    "k20_t9": {
+     "rows": 1000,
+     "in_ref": 0,
+     "equal": 0,
+     "same_keys": null,
+     "J_cov_cols_equal": 0
+    },
+    "k24_t4": {
+     "rows": 1000,
+     "in_ref": 1000,
+     "equal": 1000,
+     "same_keys": true,
+     "J_cov_cols_equal": 1000
+    },
+    "k24_t5": {
+     "rows": 1000,
+     "in_ref": 1000,
+     "equal": 1000,
+     "same_keys": true,
+     "J_cov_cols_equal": 1000
+    },
+    "k24_t6": {
+     "rows": 1000,
+     "in_ref": 1000,
+     "equal": 1000,
+     "same_keys": true,
+     "J_cov_cols_equal": 1000
+    },
+    "k24_t7": {
+     "rows": 1000,
+     "in_ref": 1000,
+     "equal": 1000,
+     "same_keys": true,
+     "J_cov_cols_equal": 1000
+    },
+    "k24_t8": {
+     "rows": 1000,
+     "in_ref": 0,
+     "equal": 0,
+     "same_keys": null,
+     "J_cov_cols_equal": 0
+    },
+    "k24_t9": {
+     "rows": 1000,
+     "in_ref": 0,
+     "equal": 0,
+     "same_keys": null,
+     "J_cov_cols_equal": 0
+    }
+   }
+  }
+ },
+ "commands": [
+  "cd /home/user/crypto && git rev-parse HEAD; git status; git diff --stat 7be4f368e5 HEAD -- <L5>/scripts <L5>/PROTOCOL.md <L5>/smoke <L5>/.gitignore",
+  "cd <L5> && sha256sum -c data/SHA256SUMS && sha256sum -c data_json/SHA256SUMS",
+  "git show 2985e0f8e6:<L5>/<file> | sha256sum   (results.json, verdicts.json, gains.csv, fig png, SHA256SUMS, run.log)",
+  "python3 tools/pcc/pcc.py lint-prose <L5>/README.md",
+  "python3 -I v_curves.py > curves_out.json",
+  "taskset -c 0 python3 -I v_gains.py gains_full.json",
+  "taskset -c 0 python3 -I v_gains.py gains_drop.json --drop-smoke",
+  "F_OVERRIDE=1.0 python3 -I v_gains.py gains_f1.json; F_OVERRIDE=3.7718777815560807 python3 -I v_gains.py gains_f377.json",
+  "python3 -I v_tables.py gains_full.json",
+  "taskset -c 1 python3 -I v_census.py k20 census_k20.json 150; ... k24f census_k24f.json 60; ... k24r census_k24r.json 60",
+  "taskset -c 0 python3 -I v_real.py real_check.json 100 10 30 3 2",
+  "taskset -c 0 python3 -I v_derived.py gains_full.json derived.json",
+  "taskset -c 0 python3 -I v_seeds.py seeds_check80.json 80",
+  "python3 -I v_smoke.py; python3 -I v_mirrors.py"
+ ],
+ "validator_scripts": {
+  "location": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/val/ (session scratchpad, not committed; nothing imported from <L5>/scripts, export_json.py or make_tables.py)",
+  "sha256": {
+   "v_census.py": "784664d0fcd836898065f7072e6cbb58dd45ad79c980e664ffc548bdd33cbaa4",
+   "v_common.py": "11c831baa5efc13ca26effd7b0f317f50bbcc582a52908f50afee1bd3f0aba48",
+   "v_curves.py": "870895da698406e9c6cb1b02013dd1c5c1f7642e303d93171019c0cea4c82fe9",
+   "v_derived.py": "18490408a7376363a08799f01ff905aad1424b4b5821b8a9b3db225e2c6c9a06",
+   "v_gains.py": "81af80cfea161e7bdd911e10ac2362cc9753ef23d37e1723ab606b7f003e993f",
+   "v_mirrors.py": "748fe34e105ec5e1570dea8ef07836123344ea57cf307bcaf19ae4fa8023e395",
+   "v_real.py": "9e5359c30467171f8d78a6d16ce0ec3751c9899723d59e71de4230a3a174fdfd",
+   "v_seeds.py": "be1ac3f0eff9eaba2cd41cf1f9c556451cbfae7739d4965e694f950f859fa8dc",
+   "v_smoke.py": "4887db1ca7ac7184c7b326044801bbc270dac96937e740f403ee9fa200debec2",
+   "v_tables.py": "dbf22fe2571dfcfd37b8c12a4bd8b1fe2005ed9aae2abd65591b78efe6ebe64f"
+  }
+ },
+ "environment": {
+  "python": "3.13.18",
+  "numpy": "2.5.3",
+  "host": "shared 4-core Linux container; validator used one core at a time (taskset), OMP/OPENBLAS threads 1",
+  "engine_binary": "/home/user/bin-archive/curve25519_family-5abc70ba sha256 5abc70ba47b1192df71a5e93d697f095e59a0e5f0132cf47db1d0d34d34e3746 (not rerun)"
+ },
+ "lessons_applied": [
+  "L-99ee952350b2 (identity scripts read real keys): pass",
+  "L-26895912385b (ratios vs preregistered thresholds recomputed from unrounded data): pass",
+  "L-1a5a6b64022c (report written once, every cell filled): applied",
+  "L-8d86e8fc352c (errata go to the README Errata section; pinned files stay byte-equal): advised",
+  "L-546d37ca7750 (canonical band rule): not applicable, no ecbench session"
+ ]
+}

@@ -1,0 +1,27 @@
+proc require100(int ok,string tag){if(!ok){print("FACTOR100_FATAL "+tag);exit;}}
+ring factorRing100=2,x,dp;short=0;
+execute(read("root.sing"));
+intvec degreeWeight100=1;
+require100(deg(root100,degreeWeight100)==123,"ROOT_DEGREE123");
+require100(root100^16==numerator100,"EXACT_FROBENIUS_POWER");
+list factorization100=factorize(root100,2);
+ideal factors100=factorization100[1];intvec exponents100=factorization100[2];
+require100(size(factors100)==size(exponents100),"FACTOR_SHAPE");
+poly product100=1;int i100;int degreeSum100=0;
+link output100="ASCII:w factors100.sing";open(output100);
+write(output100,"// Factors of the exact degree-123 Frobenius root of R99 norm numerator.");
+write(output100,"poly root100="+string(root100)+";");
+write(output100,"ideal factors100;intvec exponents100;");
+for(i100=1;i100<=size(factors100);i100++){
+ require100(exponents100[i100]>0,"FACTOR_EXPONENT");
+ product100=product100*factors100[i100]^exponents100[i100];
+ degreeSum100=degreeSum100+deg(factors100[i100],degreeWeight100)*exponents100[i100];
+ print("FACTOR100_FACTOR index="+string(i100)+" degree="+string(deg(factors100[i100],degreeWeight100))+" exponent="+string(exponents100[i100])+" polynomial="+string(factors100[i100]));
+ write(output100,"factors100["+string(i100)+"]="+string(factors100[i100])+";exponents100["+string(i100)+"]="+string(exponents100[i100])+";");
+}
+close(output100);
+require100(product100==root100 && degreeSum100==123,"COMPLETE_FACTOR_PRODUCT");
+require100(product100+1!=root100,"CHANGED_PRODUCT_REJECTED");
+print("FACTOR100_RESULT factors="+string(size(factors100))+" degree=123 complete=1");
+print("FACTOR100_ALL_CHECKS_PASS");
+quit;

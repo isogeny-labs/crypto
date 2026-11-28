@@ -1,0 +1,28 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-17T21:22:50Z",
+ "id": "PCC-20261117-2dca91",
+ "kind": "theorem",
+ "producer": {
+  "commit": "4ce098bdb050a46ca425fe75b0db87edcf0ac059",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "c4515cddb130823b367bdfeb81ca90a647967490331e53c456bcc66ee4bbf5f3",
+   "kind": "lean",
+   "project": "research/ecdlp_weakness_lean_20261104/lean",
+   "theorem": "SurvivalTailExpectation.harmonic_survival_tail"
+  },
+  {
+   "decl_sha256": "fcca97fe0a4e65e811f11d0e396ee7d2e4c93eee9acf10555803525cddeaac92",
+   "kind": "lean",
+   "project": "research/ecdlp_weakness_lean_20261104/lean",
+   "theorem": "SurvivalTailExpectation.truncated_survival_sum_le_inv"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Lean v4.34.1 / Mathlib v4.34.1; analytic sequence statements only; identifying a sequence with a waiting-time tail needs the separate probabilistic tail-sum bridge.",
+ "statement": "The real sequence 1/(n+1) tends to zero while its finite partial sums tend to infinity; a normalized nonnegative survival sequence with a strictly positive uniform lower stopping hazard delta has every truncated sum bounded by 1/delta."
+}

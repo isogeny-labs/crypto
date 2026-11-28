@@ -1,0 +1,9 @@
+digraph factorwise {
+  graph [rankdir=LR, bgcolor="transparent", nodesep=0.32, ranksep=0.45];
+  node [shape=box, style="rounded,filled", fillcolor="#e6f0ec", fontname="DejaVu Sans", fontsize=11];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#44645c"];
+  fiber [label="Monic Q_b divides separable H_b\nremainders force delta q = 0"];
+  norm [label="Q_theta = product Q_b\nRR5 chart forces delta theta = 0"];
+  local [label="8 equations / 7 variables\nrank 7 at the admissible relation",fillcolor="#f7eade"];
+  fiber -> norm -> local;
+}

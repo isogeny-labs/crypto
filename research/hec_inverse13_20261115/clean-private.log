@@ -1,0 +1,38 @@
+Making clean in src/usolve
+rm -rf .libs _libs
+rm -f  libusolve.la
+rm -f ./so_locations
+rm -f *.o
+rm -f *.lo
+Making clean in src/fglm
+rm -rf .libs _libs
+rm -f  libfglm.la
+rm -f ./so_locations
+rm -f *.o
+rm -f *.lo
+Making clean in src/neogb
+rm -f  libneogb.la
+rm -f ./so_locations
+rm -rf .libs _libs
+rm -f *.o
+rm -f *.lo
+Making clean in src/msolve
+rm -f  libmsolve.la
+rm -f ./so_locations
+rm -rf .libs _libs
+rm -f *.o
+rm -f *.lo
+rm -f  msolve
+test -z "" || rm -f  msolve
+rm -f  neogb_io fglm_build_matrixn_radical-shape-31 fglm_build_matrixn_nonradical-shape-31 fglm_build_matrixn_nonradical-radicalshape-31 line_endings_support
+test -z "" || rm -f  neogb_io fglm_build_matrixn_radical-shape-31 fglm_build_matrixn_nonradical-shape-31 fglm_build_matrixn_nonradical-radicalshape-31 line_endings_support
+rm -rf .libs _libs
+rm -f *.o
+rm -f src/msolve/*.o
+rm -f test/fglm/*.o
+rm -f test/msolve/*.o
+rm -f test/neogb/io/*.o
+rm -f  neogb_io.log fglm_build_matrixn_radical-shape-31.log fglm_build_matrixn_nonradical-shape-31.log fglm_build_matrixn_nonradical-radicalshape-31.log line_endings_support.log test/diff/diff_bug-2nd-prime-bad.sh.log test/diff/diff_bug-68.sh.log test/diff/diff_bug-empty-tracer.sh.log test/diff/diff_bug-prob-sparse-dense-la.sh.log test/diff/diff_cp-d3-n4-p2.sh.log test/diff/diff_cyclic5-16.sh.log test/diff/diff_cyclic5-31.sh.log test/diff/diff_cyclic5-qq.sh.log test/diff/diff_eco10-31.sh.log test/diff/diff_eco6-16.sh.log test/diff/diff_eco6-31.sh.log test/diff/diff_eco6-qq.sh.log test/diff/diff_elim-31.sh.log test/diff/diff_elim-qq.sh.log test/diff/diff_empty-elim-qq.sh.log test/diff/diff_f4sat-31.sh.log test/diff/diff_f4sat-byone-31.sh.log test/diff/diff_f4sat-field-char.sh.log test/diff/diff_f4sat-is-saturated-check.sh.log test/diff/diff_f4sat-zero-input.sh.log test/diff/diff_groebner-g2.sh.log test/diff/diff_hankel-degenerate-16.sh.log test/diff/diff_sum-squares-system.sh.log test/diff/diff_henrion5-qq.sh.log test/diff/diff_input-overflow-a-16.sh.log test/diff/diff_input-overflow-b-16.sh.log test/diff/diff_issue-230.sh.log test/diff/diff_issue-230-squared.sh.log test/diff/diff_issue-310-bivariate.sh.log test/diff/diff_kat6-31.sh.log test/diff/diff_kat7-qq.sh.log test/diff/diff_kat8-qq-truncate.sh.log test/diff/diff_line-endings.sh.log test/diff/diff_linear0-qq.sh.log test/diff/diff_linear1-qq.sh.log test/diff/diff_linear2-qq.sh.log test/diff/diff_maxbitsize-bug.sh.log test/diff/diff_mq-2-1.sh.log test/diff/diff_multy-16.sh.log test/diff/diff_multy-31.sh.log test/diff/diff_multy-qq.sh.log test/diff/diff_nf-16.sh.log test/diff/diff_nf-31.sh.log test/diff/diff_nf-8.sh.log test/diff/diff_nf-lm-bug.sh.log test/diff/diff_nonradical-radicalshape-no-square-31.sh.log test/diff/diff_nonradical-radicalshape-no-square-qq.sh.log test/diff/diff_nonradical-radicalshape-qq.sh.log test/diff/diff_nonradical-shape-31.sh.log test/diff/diff_nonradical-shape-qq.sh.log test/diff/diff_one-16.sh.log test/diff/diff_one-31.sh.log test/diff/diff_one-qq.sh.log test/diff/diff_quadratic-nonradical-qq.sh.log test/diff/diff_radical-shape-31.sh.log test/diff/diff_radical-shape-qq.sh.log test/diff/diff_realroot1.sh.log test/diff/diff_realroot-extraction-exact-root.sh.log test/diff/diff_reals-dim0-chgvar.sh.log test/diff/diff_reals-dim0-extract.sh.log test/diff/diff_reals-dim0.sh.log test/diff/diff_reals-dim0-swapvar.sh.log test/diff/diff_test-lifting2.sh.log test/diff/diff_univariate-assign-left.sh.log test/diff/diff_univariate-cubic-close-roots.sh.log test/diff/diff_univariate-sgn.sh.log
+rm -f  neogb_io.trs fglm_build_matrixn_radical-shape-31.trs fglm_build_matrixn_nonradical-shape-31.trs fglm_build_matrixn_nonradical-radicalshape-31.trs line_endings_support.trs test/diff/diff_bug-2nd-prime-bad.sh.trs test/diff/diff_bug-68.sh.trs test/diff/diff_bug-empty-tracer.sh.trs test/diff/diff_bug-prob-sparse-dense-la.sh.trs test/diff/diff_cp-d3-n4-p2.sh.trs test/diff/diff_cyclic5-16.sh.trs test/diff/diff_cyclic5-31.sh.trs test/diff/diff_cyclic5-qq.sh.trs test/diff/diff_eco10-31.sh.trs test/diff/diff_eco6-16.sh.trs test/diff/diff_eco6-31.sh.trs test/diff/diff_eco6-qq.sh.trs test/diff/diff_elim-31.sh.trs test/diff/diff_elim-qq.sh.trs test/diff/diff_empty-elim-qq.sh.trs test/diff/diff_f4sat-31.sh.trs test/diff/diff_f4sat-byone-31.sh.trs test/diff/diff_f4sat-field-char.sh.trs test/diff/diff_f4sat-is-saturated-check.sh.trs test/diff/diff_f4sat-zero-input.sh.trs test/diff/diff_groebner-g2.sh.trs test/diff/diff_hankel-degenerate-16.sh.trs test/diff/diff_sum-squares-system.sh.trs test/diff/diff_henrion5-qq.sh.trs test/diff/diff_input-overflow-a-16.sh.trs test/diff/diff_input-overflow-b-16.sh.trs test/diff/diff_issue-230.sh.trs test/diff/diff_issue-230-squared.sh.trs test/diff/diff_issue-310-bivariate.sh.trs test/diff/diff_kat6-31.sh.trs test/diff/diff_kat7-qq.sh.trs test/diff/diff_kat8-qq-truncate.sh.trs test/diff/diff_line-endings.sh.trs test/diff/diff_linear0-qq.sh.trs test/diff/diff_linear1-qq.sh.trs test/diff/diff_linear2-qq.sh.trs test/diff/diff_maxbitsize-bug.sh.trs test/diff/diff_mq-2-1.sh.trs test/diff/diff_multy-16.sh.trs test/diff/diff_multy-31.sh.trs test/diff/diff_multy-qq.sh.trs test/diff/diff_nf-16.sh.trs test/diff/diff_nf-31.sh.trs test/diff/diff_nf-8.sh.trs test/diff/diff_nf-lm-bug.sh.trs test/diff/diff_nonradical-radicalshape-no-square-31.sh.trs test/diff/diff_nonradical-radicalshape-no-square-qq.sh.trs test/diff/diff_nonradical-radicalshape-qq.sh.trs test/diff/diff_nonradical-shape-31.sh.trs test/diff/diff_nonradical-shape-qq.sh.trs test/diff/diff_one-16.sh.trs test/diff/diff_one-31.sh.trs test/diff/diff_one-qq.sh.trs test/diff/diff_quadratic-nonradical-qq.sh.trs test/diff/diff_radical-shape-31.sh.trs test/diff/diff_radical-shape-qq.sh.trs test/diff/diff_realroot1.sh.trs test/diff/diff_realroot-extraction-exact-root.sh.trs test/diff/diff_reals-dim0-chgvar.sh.trs test/diff/diff_reals-dim0-extract.sh.trs test/diff/diff_reals-dim0.sh.trs test/diff/diff_reals-dim0-swapvar.sh.trs test/diff/diff_test-lifting2.sh.trs test/diff/diff_univariate-assign-left.sh.trs test/diff/diff_univariate-cubic-close-roots.sh.trs test/diff/diff_univariate-sgn.sh.trs
+rm -f  test-suite.log
+rm -f *.lo

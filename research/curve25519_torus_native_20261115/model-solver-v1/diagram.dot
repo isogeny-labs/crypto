@@ -1,0 +1,13 @@
+digraph Model {
+ graph [rankdir=LR,bgcolor="white",fontname="Helvetica",ranksep=0.35];
+ node [shape=box,style="rounded,filled",fillcolor="#e8f1f5",color="#29465b",fontname="Helvetica",fontsize=11];
+ edge [color="#526978",arrowsize=0.6];
+ input [label="Public Spec / R / Q\nComplete frozen equations"];
+ backend [label="Pinned native backend\nBounded check-sat"];
+ parse [label="SAT only: all inputs\nExact grammar + field"];
+ check [label="Rebuild every gate\nOriginal index/group replay",fillcolor="#def0df"];
+ refuse [label="Timeout / unknown / invalid\nRetain scoped observation",fillcolor="#fff0cf"];
+ input -> backend -> parse -> check;
+ backend -> refuse [label="no model",fontsize=9];
+ parse -> refuse [label="reject",fontsize=9];
+}

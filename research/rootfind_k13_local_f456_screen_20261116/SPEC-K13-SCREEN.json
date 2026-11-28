@@ -1,0 +1,123 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Separate local K13 rootfinding versus F4 F5 F6 engineering screen on fresh public targets",
+  "description": "Bounded same-source L0 complete-cold diagnostic, separate from the frozen EKS confirmatory panel; all failures and timeouts retained.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 13
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 202611160511,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-strong",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong",
+        "params": {
+          "lanes": "32",
+          "dp_bits": "4",
+          "step_cap_factor": "2000"
+        }
+      }
+    },
+    {
+      "name": "matrix-f4",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=5",
+          "oracle": "pdp3-binary:m=3,engine=matrix-f4,degree=3,node_budget=8192",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "matrix-f5",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=5",
+          "oracle": "pdp3-binary:m=3,engine=matrix-f5,degree=3,node_budget=8192",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "inherited-f4",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=5",
+          "oracle": "pdp3-binary:m=3,engine=inherited-f4,degree=3,node_budget=8192",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "f6-ic",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=5",
+          "oracle": "pdp3-binary:m=3,engine=f6-ic,degree=3,node_budget=8192",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "rootfind-m3",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=5",
+          "oracle": "pdp3-binary:m=3,engine=rootfind-negfold",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "batch-m3",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=5",
+          "oracle": "pdp3-binary:m=3,engine=rootfind-negfold-batch",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "batch-m3-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-standard-subspace:dimension=5",
+          "oracle": "pdp3-binary:m=3,engine=rootfind-negfold-batch",
+          "max_trials": "200000"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 202611160512,
+    "isolation_required": "L0",
+    "timeout_seconds": 120
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "branch": "claude/f4-f5-algorithm-speed-bvp7qd",
+  "closed_utc": "2026-11-18T08:10:53+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/ic_ksum_retune_20261118/run_pilot.sh",
+        "/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/ecbench-split2",
+        "/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/fbretune/pilot"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-18T08:00:03+00:00",
+      "wall_s": 90.391
+    }
+  ],
+  "commit": "c3a74728459f3903a7a1062efbb9f09f297da736",
+  "commit_dirty": false,
+  "created_utc": "2026-11-18T07:59:59+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v595-x86_64-with-glibc2.39"
+  },
+  "id": "20261118T0759Z-ksum-retune-pilot",
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 64,
+      "name": "pilot_rule_r0_b24_k6n9_over_k5n9_w0",
+      "note": "[pcc:unverified] pilot (not data), 64 targets, 1 round; B24 icv1-f2m24-tm3047-2d0c0e8c; w=1: 0.874 [0.811, 0.942]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.8743,
+        0.9946
+      ],
+      "unit": "ratio",
+      "value": 0.9325
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 64,
+      "name": "pilot_rule_r0_p24_k6n10_over_k5n11_w0",
+      "note": "[pcc:unverified] pilot; P24",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.968,
+        1.066
+      ],
+      "unit": "ratio",
+      "value": 1.016
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 64,
+      "name": "pilot_rule_r0_b27_k7n10_over_k5n12_w1",
+      "note": "[pcc:unverified] pilot; B27 w=1 (w=0: 1.001 [0.952, 1.053]); led to rule revision R1 (w=0.1 objective)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0,
+        1.126
+      ],
+      "unit": "ratio",
+      "value": 1.061
+    }
+  ],
+  "problem": "ic:ksum_retune_tableb",
+  "raw": [
+    {
+      "bytes": 5231853,
+      "path": "/tmp/claude-0/-home-user/cba6917f-779a-544b-9ecf-84e512b45b33/scratchpad/fbretune/pilot-sessions.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a2/a2ba7a4a3c976256dfa8180ba5c0a476189eea05234ef04f75192755da270ba1",
+      "sha256": "a2ba7a4a3c976256dfa8180ba5c0a476189eea05234ef04f75192755da270ba1",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_ksum_retune_20261118/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/ic_ksum_retune_20261118/model.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ksum-retune-pilot",
+  "status": "measured",
+  "summary": "[pcc:unverified] Sizing pilot (not data) for the k-sum (k, N) rule on Table B (8 rows, 92 arms, 64 targets, 1 round, fresh seeds): model optimum = empirical best on 6/8 rows; R0 helps B24 only (0.932 [0.874, 0.995] w=0), P24 1.016, B27 1.061 at w=1 -> revision R1 (w=0.1 objective). Raw pilot-sessions.tar.gz (scratchpad, sha256 a2ba7a4a...). No S3.",
+  "validation": null
+}

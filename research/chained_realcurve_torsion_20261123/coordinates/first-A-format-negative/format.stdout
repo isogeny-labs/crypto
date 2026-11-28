@@ -1,0 +1,597 @@
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:1:
+-mod inherited;
+-#[path = "field_a.rs"]
+-mod field;
+ #[path = "curve_a.rs"]
+ mod curve;
++#[path = "field_a.rs"]
++mod field;
++mod inherited;
+ 
+-use std::collections::{BTreeMap, BTreeSet};
+-use std::fs::OpenOptions;
+-use std::io::{BufWriter, Write};
+ use curve::{key, Chart, Divisor, ORIGINAL};
+ use field::{Field, Q};
+ use inherited::{peval, Fld};
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:13:
++use std::collections::{BTreeMap, BTreeSet};
++use std::fs::OpenOptions;
++use std::io::{BufWriter, Write};
+ 
+ fn apply(matrix: &[[u8; 4]; 4], id: usize) -> usize {
+     let mut result = 0;
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:16:
+     for (i, row) in matrix.iter().enumerate() {
+-        let value: usize = row.iter().enumerate()
+-            .map(|(j, &entry)| usize::from(entry) * ((id >> (3 * j)) & 7)).sum();
++        let value: usize = row
++            .iter()
++            .enumerate()
++            .map(|(j, &entry)| usize::from(entry) * ((id >> (3 * j)) & 7))
++            .sum();
+         result |= (value & 7) << (3 * i);
+     }
+     result
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:27:
+         if let Some(pivot) = (rank..4).find(|&i| rows[i] & (1 << bit) != 0) {
+             rows.swap(rank, pivot);
+             for i in 0..4 {
+-                if i != rank && rows[i] & (1 << bit) != 0 { rows[i] ^= rows[rank]; }
++                if i != rank && rows[i] & (1 << bit) != 0 {
++                    rows[i] ^= rows[rank];
++                }
+             }
+             rank += 1;
+         }
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:36:
+ }
+ 
+ fn main() {
+-    let table_path = std::env::args().nth(1).expect("fresh full-coordinate TSV path");
+-    let output = OpenOptions::new().write(true).create_new(true).open(table_path).unwrap();
++    let table_path = std::env::args()
++        .nth(1)
++        .expect("fresh full-coordinate TSV path");
++    let output = OpenOptions::new()
++        .write(true)
++        .create_new(true)
++        .open(table_path)
++        .unwrap();
+     let mut output = BufWriter::new(output);
+     let f = Field::new();
+-    println!("FIELD q={Q} modulus_low12={:?} generator={} all_nonzero_inverse_and_Fq=pass", f.modulus, f.generator);
++    println!(
++        "FIELD q={Q} modulus_low12={:?} generator={} all_nonzero_inverse_and_Fq=pass",
++        f.modulus, f.generator
++    );
+     let chart = Chart::new(&f);
+     let h = &chart.h;
+     println!("CURVE original={ORIGINAL:?} roots={:?} r={} scale={} leading={} monic={:?} delta={} pole={}", chart.roots, chart.r, chart.scale, chart.leading, h.h, chart.delta, chart.pole);
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:51:
+     let next_root = f.pow(f.pow(chart.r, 3), 3);
+     let direct = h.sub(&chart.point(next_root, 0), &chart.post);
+     assert_eq!(correct, direct);
+-    println!("BASEPOINT_CONTROL naive={:?} corrected={:?} direct={:?} restored=pass", key(&naive), key(&correct), key(&direct));
++    println!(
++        "BASEPOINT_CONTROL naive={:?} corrected={:?} direct={:?} restored=pass",
++        key(&naive),
++        key(&correct),
++        key(&direct)
++    );
+ 
+     let mut pair_masks = BTreeMap::new();
+     for i in 0..6 {
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:58:
+         for j in i + 1..6 {
+             let d = chart.pair(i, j);
+             assert!(!h.is_identity(&d) && h.is_identity(&h.add(&d, &d)));
+-            assert!(pair_masks.insert(key(&d), (1_u8 << i) | (1_u8 << j)).is_none());
+-            let ii = chart.roots.iter().position(|&x| x == f.pow(chart.roots[i], 3)).unwrap();
+-            let jj = chart.roots.iter().position(|&x| x == f.pow(chart.roots[j], 3)).unwrap();
++            assert!(pair_masks
++                .insert(key(&d), (1_u8 << i) | (1_u8 << j))
++                .is_none());
++            let ii = chart
++                .roots
++                .iter()
++                .position(|&x| x == f.pow(chart.roots[i], 3))
++                .unwrap();
++            let jj = chart
++                .roots
++                .iter()
++                .position(|&x| x == f.pow(chart.roots[j], 3))
++                .unwrap();
+             assert_eq!(chart.frobenius(&d), chart.pair(ii, jj));
+-            println!("PAIR mask={} d={:?} Fmask={}", (1_u8 << i) | (1_u8 << j), key(&d), (1_u8 << ii) | (1_u8 << jj));
++            println!(
++                "PAIR mask={} d={:?} Fmask={}",
++                (1_u8 << i) | (1_u8 << j),
++                key(&d),
++                (1_u8 << ii) | (1_u8 << jj)
++            );
+         }
+     }
+     assert_eq!(pair_masks.len(), 15);
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:91:
+         assert!(h.is_identity(&h.mul(&d, 8)));
+         let top = h.mul(&d, 4);
+         let independent = !span.contains(&top);
+-        println!("DRAW id={draw} x={x} y={y} D={:?} top={:?} independent={}", key(&d), key(&top), u8::from(independent));
++        println!(
++            "DRAW id={draw} x={x} y={y} D={:?} top={:?} independent={}",
++            key(&d),
++            key(&top),
++            u8::from(independent)
++        );
+         if independent {
+             let extra: Vec<_> = span.iter().map(|a| h.add(a, &top)).collect();
+             span.extend(extra);
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:98:
+             basis.push(d);
+-            if basis.len() == 4 { break; }
++            if basis.len() == 4 {
++                break;
++            }
+         }
+     }
+     assert_eq!(basis.len(), 4, "fixed256-draw basis budget exhausted");
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:103:
+     assert_eq!(span.len(), 16);
+-    assert_eq!(span.iter().filter(|d| !h.is_identity(d)).map(key).collect::<BTreeSet<_>>(), pair_masks.keys().cloned().collect());
++    assert_eq!(
++        span.iter()
++            .filter(|d| !h.is_identity(d))
++            .map(key)
++            .collect::<BTreeSet<_>>(),
++        pair_masks.keys().cloned().collect()
++    );
+     for a in &basis {
+         assert!(h.is_valid(a));
+         assert_eq!(h.add(a, &h.neg(a)), h.identity());
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:112:
+             }
+         }
+     }
+-    let multiples: Vec<Vec<_>> = basis.iter().map(|b| (0..8).map(|n| h.mul(b, n)).collect()).collect();
++    let multiples: Vec<Vec<_>> = basis
++        .iter()
++        .map(|b| (0..8).map(|n| h.mul(b, n)).collect())
++        .collect();
+     let mut table = Vec::new();
+     let mut lookup = BTreeMap::new();
+     for id in 0..4096 {
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:119:
+         let mut d = h.identity();
+-        for (j, values) in multiples.iter().enumerate() { d = h.add(&d, &values[(id >> (3 * j)) & 7]); }
++        for (j, values) in multiples.iter().enumerate() {
++            d = h.add(&d, &values[(id >> (3 * j)) & 7]);
++        }
+         assert!(h.is_valid(&d) && d.u.len() <= 3);
+         assert!(h.is_identity(&h.mul(&d, 8)));
+         assert_eq!(h.add(&d, &h.neg(&d)), h.identity());
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:129:
+     for (j, b) in basis.iter().enumerate() {
+         let image = chart.frobenius(b);
+         let code = *lookup.get(&key(&image)).unwrap();
+-        for (i, row) in matrix.iter_mut().enumerate() { row[j] = ((code >> (3 * i)) & 7) as u8; }
+-        println!("BASIS j={j} D={:?} F={:?} Fcode={code}", key(b), key(&image));
++        for (i, row) in matrix.iter_mut().enumerate() {
++            row[j] = ((code >> (3 * i)) & 7) as u8;
++        }
++        println!(
++            "BASIS j={j} D={:?} F={:?} Fcode={code}",
++            key(b),
++            key(&image)
++        );
+         let mut p = h.identity();
+         let mut iterate = b.clone();
+         for coefficient in [9, 6, 3, 2, 1] {
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:137:
+             p = h.add(&p, &h.mul(&iterate, coefficient));
+             iterate = chart.frobenius(&iterate);
+         }
+-        assert!(h.is_identity(&p), "actual Weil polynomial annihilation failed");
++        assert!(
++            h.is_identity(&p),
++            "actual Weil polynomial annihilation failed"
++        );
+         let mut iterate = b.clone();
+-        for _ in 0..12 { iterate = chart.frobenius(&iterate); }
++        for _ in 0..12 {
++            iterate = chart.frobenius(&iterate);
++        }
+         assert_eq!(&iterate, b);
+     }
+     println!("FROBENIUS_Z8 rows={matrix:?}");
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:146:
+-    let masks: Vec<_> = basis.iter().map(|b| pair_masks[&key(&h.mul(b, 4))]).collect();
++    let masks: Vec<_> = basis
++        .iter()
++        .map(|b| pair_masks[&key(&h.mul(b, 4))])
++        .collect();
+     let mut omega = [[0_u8; 4]; 4];
+     for (i, row) in omega.iter_mut().enumerate() {
+-        for (j, value) in row.iter_mut().enumerate() { *value = ((masks[i] & masks[j]).count_ones() & 1) as u8; }
++        for (j, value) in row.iter_mut().enumerate() {
++            *value = ((masks[i] & masks[j]).count_ones() & 1) as u8;
++        }
+     }
+     let row_bits = omega.map(|row| row.iter().enumerate().fold(0, |r, (j, v)| r | (v << j)));
+     assert_eq!(binary_rank(row_bits), 4);
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:154:
+         for j in 0..4 {
+             let mut pairing = 0;
+             for a in 0..4 {
+-                for b in 0..4 { pairing ^= (matrix[a][i] & 1) & omega[a][b] & (matrix[b][j] & 1); }
++                for b in 0..4 {
++                    pairing ^= (matrix[a][i] & 1) & omega[a][b] & (matrix[b][j] & 1);
++                }
+             }
+             assert_eq!(pairing, omega[i][j]);
+         }
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:167:
+         let image = chart.frobenius(d);
+         assert!(h.is_valid(&image));
+         let image_id = *lookup.get(&key(&image)).unwrap();
+-        assert_eq!(image_id, apply(&matrix, id), "full actual coordinate/Frobenius mismatch");
++        assert_eq!(
++            image_id,
++            apply(&matrix, id),
++            "full actual coordinate/Frobenius mismatch"
++        );
+         unique_images.insert(image_id);
+         images.push(image_id);
+         writeln!(output, "{id}\t{:?}\t{:?}\t{image_id}", d.u, d.v).unwrap();
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:180:
+             let digit = (id >> shift) & 7;
+             let target = (id & !(7 << shift)) | (((digit + 1) & 7) << shift);
+             assert_eq!(h.add(d, b), table[target]);
+-            assert_eq!(h.add(&table[images[id]], &table[images[1 << shift]]), table[images[target]]);
++            assert_eq!(
++                h.add(&table[images[id]], &table[images[1 << shift]]),
++                table[images[target]]
++            );
+         }
+     }
+     let mut fixed_counts = Vec::new();
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/main_a.rs:187:
+     for (n, expected) in [(1, 1), (3, 16), (6, 256), (12, 4096)] {
+-        let fixed = (0..4096).filter(|&id| {
+-            let mut image = id;
+-            for _ in 0..n { image = apply(&matrix, image); }
+-            image == id
+-        }).count();
++        let fixed = (0..4096)
++            .filter(|&id| {
++                let mut image = id;
++                for _ in 0..n {
++                    image = apply(&matrix, image);
++                }
++                image == id
++            })
++            .count();
+         assert_eq!(fixed, expected);
+         fixed_counts.push((n, fixed));
+     }
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/field_a.rs:17:
+ 
+ impl Fld for Prime3 {
+     type E = u32;
+-    fn zero(&self) -> u32 { 0 }
+-    fn one(&self) -> u32 { 1 }
+-    fn add(&self, a: &u32, b: &u32) -> u32 { (a + b) % 3 }
+-    fn sub(&self, a: &u32, b: &u32) -> u32 { (a + 3 - b) % 3 }
+-    fn neg(&self, a: &u32) -> u32 { (3 - a) % 3 }
+-    fn mul(&self, a: &u32, b: &u32) -> u32 { a * b % 3 }
++    fn zero(&self) -> u32 {
++        0
++    }
++    fn one(&self) -> u32 {
++        1
++    }
++    fn add(&self, a: &u32, b: &u32) -> u32 {
++        (a + b) % 3
++    }
++    fn sub(&self, a: &u32, b: &u32) -> u32 {
++        (a + 3 - b) % 3
++    }
++    fn neg(&self, a: &u32) -> u32 {
++        (3 - a) % 3
++    }
++    fn mul(&self, a: &u32, b: &u32) -> u32 {
++        a * b % 3
++    }
+     fn inv(&self, a: &u32) -> u32 {
+         assert!(*a == 1 || *a == 2);
+         *a
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/field_a.rs:56:
+     fn pow(&self, mut a: u32, mut n: u32) -> u32 {
+         let mut result = 1;
+         while n != 0 {
+-            if n & 1 == 1 { result = self.mul(result, a); }
++            if n & 1 == 1 {
++                result = self.mul(result, a);
++            }
+             n >>= 1;
+-            if n != 0 { a = self.mul(a, a); }
++            if n != 0 {
++                a = self.mul(a, a);
++            }
+         }
+         result
+     }
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/field_a.rs:71:
+             power = self.pow(power, 3);
+             if i == 4 || i == 6 {
+                 let difference = psub(&Prime3, &digits(power, 12), &[0, 1]);
+-                if pxgcd(&Prime3, &full, &difference).0.len() != 1 { return false; }
++                if pxgcd(&Prime3, &full, &difference).0.len() != 1 {
++                    return false;
++                }
+             }
+         }
+         power == 3
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/field_a.rs:90:
+     pub fn new() -> Self {
+         let slow = (1..Q)
+             .filter(|code| !code.is_multiple_of(3))
+-            .map(|code| Slow { modulus: digits(code, 12) })
++            .map(|code| Slow {
++                modulus: digits(code, 12),
++            })
+             .find(Slow::irreducible)
+             .expect("no irreducible degree12 polynomial in complete coefficient-code order");
+         let generator = (2..Q)
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/field_a.rs:97:
+-            .find(|&g| [2, 5, 7, 13, 73].iter().all(|p| slow.pow(g, (Q - 1) / p) != 1))
++            .find(|&g| {
++                [2, 5, 7, 13, 73]
++                    .iter()
++                    .all(|p| slow.pow(g, (Q - 1) / p) != 1)
++            })
+             .unwrap();
+         let mut logarithm = vec![u32::MAX; Q as usize];
+         let mut exponential = Vec::with_capacity(2 * (Q - 1) as usize);
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/field_a.rs:121:
+                 addition[a * HALF + b] = sum as u16;
+             }
+         }
+-        let field = Self { modulus: slow.modulus.clone(), generator, logarithm, exponential, addition };
++        let field = Self {
++            modulus: slow.modulus.clone(),
++            generator,
++            logarithm,
++            exponential,
++            addition,
++        };
+         for a in 1..Q {
+             assert_eq!(field.mul(&a, &field.inv(&a)), 1);
+             assert_eq!(field.pow(a, Q), a);
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/field_a.rs:137:
+     pub fn pow(&self, mut a: u32, mut n: u32) -> u32 {
+         let mut result = 1;
+         while n != 0 {
+-            if n & 1 == 1 { result = self.mul(&result, &a); }
++            if n & 1 == 1 {
++                result = self.mul(&result, &a);
++            }
+             n >>= 1;
+-            if n != 0 { a = self.mul(&a, &a); }
++            if n != 0 {
++                a = self.mul(&a, &a);
++            }
+         }
+         result
+     }
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/field_a.rs:146:
+ 
+     pub fn sqrt(&self, a: u32) -> Option<u32> {
+-        if a == 0 { return Some(0); }
++        if a == 0 {
++            return Some(0);
++        }
+         let exponent = self.logarithm[a as usize];
+-        if exponent & 1 == 1 { return None; }
++        if exponent & 1 == 1 {
++            return None;
++        }
+         let root = self.exponential[(exponent / 2) as usize];
+         assert_eq!(self.mul(&root, &root), a);
+         Some(root.min(self.neg(&root)))
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/field_a.rs:161:
+         for a in 0..3 {
+             for b in 0..3 {
+                 for c in 0..3 {
+-                    result.push(self.add(&a, &self.add(&self.mul(&b, &alpha), &self.mul(&c, &alpha2))));
++                    result.push(
++                        self.add(&a, &self.add(&self.mul(&b, &alpha), &self.mul(&c, &alpha2))),
++                    );
+                 }
+             }
+         }
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/field_a.rs:172:
+         for a in &result {
+             for b in &result {
+                 for c in &result {
+-                    assert_eq!(self.mul(a, &self.add(b, c)), self.add(&self.mul(a, b), &self.mul(a, c)));
++                    assert_eq!(
++                        self.mul(a, &self.add(b, c)),
++                        self.add(&self.mul(a, b), &self.mul(a, c))
++                    );
+                     assert_eq!(self.mul(a, &self.mul(b, c)), self.mul(&self.mul(a, b), c));
+                 }
+             }
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/field_a.rs:183:
+ 
+ impl Fld for Field {
+     type E = u32;
+-    fn zero(&self) -> u32 { 0 }
+-    fn one(&self) -> u32 { 1 }
++    fn zero(&self) -> u32 {
++        0
++    }
++    fn one(&self) -> u32 {
++        1
++    }
+     fn add(&self, a: &u32, b: &u32) -> u32 {
+         u32::from(self.addition[(a % 729) as usize * HALF + (b % 729) as usize])
+             + 729 * u32::from(self.addition[(a / 729) as usize * HALF + (b / 729) as usize])
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/field_a.rs:191:
+     }
+-    fn sub(&self, a: &u32, b: &u32) -> u32 { self.add(a, &self.neg(b)) }
+-    fn neg(&self, a: &u32) -> u32 { self.add(a, a) }
++    fn sub(&self, a: &u32, b: &u32) -> u32 {
++        self.add(a, &self.neg(b))
++    }
++    fn neg(&self, a: &u32) -> u32 {
++        self.add(a, a)
++    }
+     fn mul(&self, a: &u32, b: &u32) -> u32 {
+-        if *a == 0 || *b == 0 { return 0; }
++        if *a == 0 || *b == 0 {
++            return 0;
++        }
+         self.exponential[(self.logarithm[*a as usize] + self.logarithm[*b as usize]) as usize]
+     }
+     fn inv(&self, a: &u32) -> u32 {
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/curve_a.rs:1:
+ use crate::field::Field;
+-use crate::inherited::{padd, pmod, pmonic, pmul, pscale, ptrim, peval, pxgcd, Div, Fld, Hyp};
++use crate::inherited::{padd, peval, pmod, pmonic, pmul, pscale, ptrim, pxgcd, Div, Fld, Hyp};
+ 
+ pub const ORIGINAL: [u32; 7] = [1, 0, 1, 0, 0, 1, 1];
+ pub type Divisor = Div<u32>;
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/curve_a.rs:26:
+ 
+ impl<'a> Chart<'a> {
+     pub fn new(field: &'a Field) -> Self {
+-        let roots: Vec<_> = field.subfield27().into_iter()
+-            .filter(|x| peval(field, &ORIGINAL, x) == 0).collect();
++        let roots: Vec<_> = field
++            .subfield27()
++            .into_iter()
++            .filter(|x| peval(field, &ORIGINAL, x) == 0)
++            .collect();
+         assert_eq!(roots.len(), 6);
+         assert!(roots.iter().all(|&x| field.pow(x, 3) != x));
+         let r = roots[0];
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/curve_a.rs:37:
+             for j in 0..=i {
+                 let term = field.mul(c, &field.mul(&(choose % 3), &field.pow(r, (i - j) as u32)));
+                 g[6 - j] = field.add(&g[6 - j], &term);
+-                if j < i { choose = choose * (i - j) as u32 / (j + 1) as u32; }
++                if j < i {
++                    choose = choose * (i - j) as u32 / (j + 1) as u32;
++                }
+             }
+         }
+         ptrim(field, &mut g);
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/curve_a.rs:46:
+         let scale = field.sqrt(leading).unwrap();
+         let monic = pscale(field, &g, &field.inv(&leading));
+         assert_eq!(monic[5], 1);
+-        let derivative: Vec<_> = monic.iter().enumerate().skip(1)
+-            .map(|(i, c)| field.mul(c, &(i as u32 % 3))).collect();
++        let derivative: Vec<_> = monic
++            .iter()
++            .enumerate()
++            .skip(1)
++            .map(|(i, c)| field.mul(c, &(i as u32 % 3)))
++            .collect();
+         assert_eq!(pxgcd(field, &monic, &derivative).0.len(), 1);
+-        let h = Hyp { f: field, h: monic, g: 2 };
++        let h = Hyp {
++            f: field,
++            h: monic,
++            g: 2,
++        };
+         let delta = field.sub(&field.pow(r, 3), &r);
+         let pole = field.inv(&field.sub(&field.pow(r, 9), &r));
+         let pre = Self::point_chart(&h, pole, 0);
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/curve_a.rs:58:
+         assert_eq!(h.add(&pre, &pre), h.identity());
+         assert_eq!(h.add(&post, &post), h.identity());
+         assert_ne!(pre, post);
+-        Self { h, roots, r, scale, leading, delta, pole, pre, post }
++        Self {
++            h,
++            roots,
++            r,
++            scale,
++            leading,
++            delta,
++            pole,
++            pre,
++            post,
++        }
+     }
+ 
+     fn point_chart(h: &Hyp<'a, Field>, x: u32, y: u32) -> Divisor {
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/curve_a.rs:65:
+         let mut v = vec![y];
+         ptrim(h.f, &mut v);
+-        let d = Div { u: vec![h.f.neg(&x), 1], v };
++        let d = Div {
++            u: vec![h.f.neg(&x), 1],
++            v,
++        };
+         assert!(h.is_valid(&d));
+         d
+     }
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/curve_a.rs:72:
+     pub fn point(&self, x: u32, y: u32) -> Divisor {
+         let f = self.h.f;
+         assert_eq!(f.mul(&y, &y), peval(f, &ORIGINAL, &x));
+-        if x == self.r { return self.h.identity(); }
++        if x == self.r {
++            return self.h.identity();
++        }
+         let t = f.inv(&f.sub(&x, &self.r));
+         let z = f.mul(&f.mul(&y, &f.pow(t, 3)), &f.inv(&self.scale));
+         Self::point_chart(&self.h, t, z)
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/curve_a.rs:80:
+ 
+     pub fn pair(&self, i: usize, j: usize) -> Divisor {
+         assert_ne!(i, j);
+-        self.h.add(&self.point(self.roots[i], 0), &self.point(self.roots[j], 0))
++        self.h
++            .add(&self.point(self.roots[i], 0), &self.point(self.roots[j], 0))
+     }
+ 
+     pub fn push_regular(&self, d: &Divisor) -> Divisor {
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/curve_a.rs:89:
+         let degree = d.u.len() - 1;
+         let denominator = vec![1, f.neg(&self.delta)];
+         let mut powers = vec![vec![1]];
+-        for _ in 0..3 { powers.push(pmul(f, powers.last().unwrap(), &denominator)); }
++        for _ in 0..3 {
++            powers.push(pmul(f, powers.last().unwrap(), &denominator));
++        }
+         let substitute = |coefficients: &[u32], weight: usize| {
+             let mut result = Vec::new();
+             for (i, &c) in coefficients.iter().enumerate() {
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/curve_a.rs:110:
+ 
+     pub fn frobenius(&self, d: &Divisor) -> Divisor {
+         assert!(self.h.is_valid(d));
+-        if self.h.is_identity(d) { return self.h.identity(); }
++        if self.h.is_identity(d) {
++            return self.h.identity();
++        }
+         if peval(self.h.f, &d.u, &self.pole) == 0 {
+             let reduced = self.h.add(d, &self.pre);
+             assert!(reduced.u.len() < d.u.len());
+Diff in /dev/shm/ct23-jacobian8-first-A/source/research/chained_realcurve_torsion_20261123/coordinates/curve_a.rs:117:
+             return self.h.add(&self.frobenius(&reduced), &self.post);
+         }
+         let image = self.push_regular(d);
+-        if (d.u.len() - 1) & 1 == 1 { self.h.sub(&image, &self.post) } else { image }
++        if (d.u.len() - 1) & 1 == 1 {
++            self.h.sub(&image, &self.post)
++        } else {
++            image
++        }
+     }
+ }
+ 

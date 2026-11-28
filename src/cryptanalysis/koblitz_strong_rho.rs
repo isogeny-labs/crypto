@@ -185,8 +185,7 @@ impl RhoField for WideGf2 {
     }
 }
 
-/// A scalar modulo the subgroup order: `u64`, or `u128` for an order past
-/// `2^64` (below `2^127`).
+/// A scalar modulo the subgroup order, with lossless export and checked narrowing.
 pub trait RhoScalar:
     Copy + Eq + Ord + Hash + Debug + Send + Sync + SampleUniform + std::fmt::Display
 {
@@ -196,7 +195,8 @@ pub trait RhoScalar:
     fn one() -> Self;
     fn from_biguint(v: &BigUint) -> Option<Self>;
     fn to_f64(self) -> f64;
-    fn to_u128(self) -> u128;
+    fn to_biguint(self) -> BigUint;
+    fn checked_u128(self) -> Option<u128>;
     /// Bits in the binary expansion (`0` for zero).
     fn bit_len(self) -> u32;
     fn bit(self, i: u32) -> bool;
@@ -213,6 +213,21 @@ pub trait RhoScalar:
     fn add_mod(a: Self, b: Self, m: Self) -> Self;
     fn sub_mod(a: Self, b: Self, m: Self) -> Self;
     fn inverse_mod(v: Self, m: Self) -> Option<Self>;
+}
+
+/// Scalars accepted by legacy algorithms whose matrices and records use u128.
+pub trait NarrowRhoScalar: RhoScalar {
+    fn to_u128(self) -> u128;
+}
+impl NarrowRhoScalar for u64 {
+    fn to_u128(self) -> u128 {
+        u128::from(self)
+    }
+}
+impl NarrowRhoScalar for u128 {
+    fn to_u128(self) -> u128 {
+        self
+    }
 }
 
 impl RhoScalar for u64 {
@@ -234,8 +249,11 @@ impl RhoScalar for u64 {
     fn to_f64(self) -> f64 {
         self as f64
     }
-    fn to_u128(self) -> u128 {
-        u128::from(self)
+    fn to_biguint(self) -> BigUint {
+        BigUint::from(self)
+    }
+    fn checked_u128(self) -> Option<u128> {
+        Some(u128::from(self))
     }
     fn bit_len(self) -> u32 {
         64 - self.leading_zeros()
@@ -359,8 +377,11 @@ impl RhoScalar for u128 {
     fn to_f64(self) -> f64 {
         self as f64
     }
-    fn to_u128(self) -> u128 {
-        self
+    fn to_biguint(self) -> BigUint {
+        BigUint::from(self)
+    }
+    fn checked_u128(self) -> Option<u128> {
+        Some(self)
     }
     fn bit_len(self) -> u32 {
         128 - self.leading_zeros()

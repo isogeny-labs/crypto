@@ -1,0 +1,22 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T08:09:11Z",
+ "id": "PCC-20261116-a9570b",
+ "kind": "theorem",
+ "producer": {
+  "commit": "4b48fb4de6e4bc642f529ebd2811aa2010459396",
+  "model": "",
+  "session": "prime-field-transfer-goal-round-05"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "5f0f274486a6f42e4ea6299a3993bf902d6acfff27fa5735724a93ab5e70af32",
+   "kind": "lean",
+   "project": "research/prime_field_transfer_goal_20261116/lean",
+   "theorem": "EisensteinMetricV4.upper_psd"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Literal real2x2 metric instance only; native LLL/vector encoding/CM/transfer/coverage not formalized",
+ "statement": "theorem upper_psd : ((3 : \u211d) \u2022 (1 : Matrix (Fin 2) (Fin 2) \u211d) - gram).PosSemidef"
+}

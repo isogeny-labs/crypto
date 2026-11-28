@@ -1,0 +1,47 @@
+{
+  "schema": "keyai-qualifier-build-plan/v1",
+  "status": "pre-build",
+  "created_utc": "2026-11-23T06:38:27.274Z",
+  "cwd": "/workspace/scratch/8fc860ec28a4/crypto-keyai",
+  "base_commit": "06e4e7d94f6cc5e15acce5d3e5fcd3e3bacde8e6",
+  "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "production_and_example": {
+    "src/cryptanalysis/bitops.rs": "f4c15d1d79fe4752c32c9b46bb4fdecaebad7d41ffcaed1832dec3dc06fb28f0",
+    "src/cryptanalysis/challenge_ladder.rs": "5dd3022fc9fe214b3d8775c55e5b04e5fa306b9442604f99ddd643d2fef7ccf2",
+    "src/cryptanalysis/ic_boundary.rs": "ee70c40d611bea2a86e782e8513d6e18be49ca575e1159a42512afb18dc346ce",
+    "src/cryptanalysis/ic_framework/stages.rs": "5fd68aafe8bc17468c11359552dd98ba3ddaedce31e5bdef7cac00fa8d2e8eae",
+    "src/cryptanalysis/ic_framework/useful_rank.rs": "38037290feb8974626e7de8632bfcd8c1b16500c296149f820b782058ba33e9e",
+    "src/cryptanalysis/ic_measurement.rs": "b2bc883f7a7cfc194ebcba78991b9aca901285acebf01187f56bd3e6fe57f980",
+    "src/cryptanalysis/jv_bitops.rs": "03b8215cd9f6bfed125a7d32e5b2ab765a2315c49097546b65d1da9f133a41f7",
+    "src/cryptanalysis/jv_bitops_uniform.rs": "3f15f1145e24378dd90f19d5aef5cd08db3a0ddfb4ee526dccba02d4c6eb22bc",
+    "src/cryptanalysis/prime_fast.rs": "03397cbcd5146df5341eea15febe34912bfed346d25759343a33a7b123712731",
+    "src/cryptanalysis/residual_walk.rs": "4e54e030cebfc873f9288e25c83153841724d1cc0d8c79417288aa9e74f507c9",
+    "src/cryptanalysis/semaev_prime_poly.rs": "e77ebb1576469b24e399cf2cd62059b80607eb65eeaa486847782e6f11714f9b",
+    "src/prime_hyperelliptic/ops.rs": "668c2ea7804578fe09b8b3dc2dd905b1564be5ebbf0f5e6571d785fa7ad842f4",
+    "examples/keyai_rank_derivative_controls.rs": "64299e12deeb21bc74ed9a57bd93a1ac1be6125dcae5acc0fd6f7a91d383bef3"
+  },
+  "qualifier_sources": {
+    "research/keyai_rank_derivative_20261122/qualifier/Cargo.toml": "b1d0e67b669703edf21ed262b1686f6d3df7d3994657e49213f52f92319bfa32",
+    "research/keyai_rank_derivative_20261122/qualifier/Cargo.lock": "c5039ac663d45e4aa0101964e353428e21ddb699827724977ed8a6c81073c520",
+    "research/keyai_rank_derivative_20261122/qualifier/build.rs": "ab22619d005318648047454ed11b9c8073c07fde6e46918d6244bb31466d5be5",
+    "research/keyai_rank_derivative_20261122/qualifier/source-pins.json": "445250d3a6a44cd2d9d14dd3fe6c7c873f15dd5944d93388631f1a3b5e07a4c1",
+    "research/keyai_rank_derivative_20261122/qualifier/README.md": "dbd0ada36ed3587e4cef9b660841010643b9f868215256e37154b084a097ec5e",
+    "research/keyai_rank_derivative_20261122/qualifier/src/lib.rs": "9fca4377dfd368a726b51be61b6c0ba0916fd782b7c61fa2b1aa5933bccf3d4c",
+    "research/keyai_rank_derivative_20261122/qualifier/src/cryptanalysis.rs": "f11baaa6dc069421410c9043a67b09351d0f7fa68d8d8f07064cd6cb73a3145f",
+    "research/keyai_rank_derivative_20261122/qualifier/src/ic_framework.rs": "5991cfd3cf8181f5237d94d6cbc34ec7f53f72e7d1656d351f05d1436ec76b3b",
+    "research/keyai_rank_derivative_20261122/qualifier/src/source_manifest.rs": "cd029f6e657a7cffda9814319b48a7ef46f4b433e3509f2ca23499844d81d69a",
+    "research/keyai_rank_derivative_20261122/qualifier/src/adversarial.rs": "af528e135640a5c63063e3d6ef389d336f350d8dd77a595204e9722f4bdc42b7"
+  },
+  "build_environment": {
+    "CARGO_BUILD_JOBS": "1",
+    "offline": true
+  },
+  "commands": [
+    "timeout 300 cargo build --offline --release --locked --manifest-path research/keyai_rank_derivative_20261122/qualifier/Cargo.toml --target-dir /workspace/scratch/99b214ce852d/build --bins --message-format=json-render-diagnostics",
+    "timeout 300 cargo test --offline --release --locked --manifest-path research/keyai_rank_derivative_20261122/qualifier/Cargo.toml --target-dir /workspace/scratch/99b214ce852d/build --bin keyai-rank-derivative-controls --test adversarial --no-run --message-format=json-render-diagnostics"
+  ],
+  "tests_executed": false,
+  "correctness_only": true,
+  "full_root_library_gate": false
+}

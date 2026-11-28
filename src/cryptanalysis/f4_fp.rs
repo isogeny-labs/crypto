@@ -35,6 +35,12 @@
 //! system resolved — the number to compare across coordinate systems —
 //! and stops cooperatively at a deadline, so a budget never leaves a
 //! thread behind.
+//! Root extraction uses closed forms through degree two and a scan-versus-
+//! Frobenius cost estimate for higher degrees. [`solve_with_root_mode`]
+//! retains explicit scan and algebraic controls for matched comparisons.
+//! An opt-in diagnostic policy (`F4_FP_LINEAR_ROOTS=1`, default off) first
+//! substitutes a pure univariate linear equation analytically. Other root
+//! finding and the final exact input check are unchanged.
 //!
 //! [`interreduce`] and [`autoreduce`] reduce every element of a set by the
 //! others over and over; with at most 16 unknowns and every exponent at most
@@ -52,7 +58,11 @@
 //! the descent systems of the coordinate thread can be timed at `m = 3`.
 
 use std::collections::HashSet;
-use std::sync::atomic::{AtomicU64, Ordering as AtomicOrdering};
+use std::marker::PhantomData;
+use std::num::NonZeroU64;
+use std::rc::Rc;
+use std::sync::atomic::{AtomicU64, AtomicU8, AtomicUsize, Ordering as AtomicOrdering};
+use std::thread::ThreadId;
 use std::time::{Duration, Instant};
 
 use rayon::prelude::*;
@@ -64,6 +74,15 @@ pub use super::groebner_f4::Ordering;
 /// A polynomial over `F_p`: `(exponent vector, coefficient)` terms with
 /// non-zero coefficients, sorted with the leading term first.
 pub type Poly = Vec<(Vec<u32>, u64)>;
+
+/// Opt-in, bounded trace storage with independent Buchberger checks on replay.
+pub mod reuse;
+pub use reuse::{TracePool, TraceStats};
+
+/// Opt-in certified relation/quotient basis construction using this module's
+/// polynomial representation. It has its own typed result; it does not invent
+/// F4 solving-degree or regularity observations or change the default engine.
+pub mod certified;
 
 /// Optional, read-only observations of the regular F4/solve path. Degrees
 /// describe this run, never a certified degree of regularity.
@@ -111,6 +130,10 @@ fn notify_progress(progress: F4Progress) {
     });
 }
 
+fn progress_observer_active() -> bool {
+    OBSERVER.with(|slot| slot.borrow().is_some())
+}
+
 // ── Field arithmetic ───────────────────────────────────────────────
 
 /// Process-wide count of `F_p` multiplications spent in row reduction
@@ -142,11 +165,13 @@ pub fn native_stair_ops_total() -> u64 {
 #[inline]
 fn count_native(n: u64) {
     NATIVE_OPS.fetch_add(n, AtomicOrdering::Relaxed);
+    visit_account_charge(VisitAccountingCounter::Comparisons, n);
 }
 
 #[inline]
 fn count_stair(n: u64) {
     NATIVE_STAIR.fetch_add(n, AtomicOrdering::Relaxed);
+    visit_account_charge(VisitAccountingCounter::DivisibilityTests, n);
 }
 
 thread_local! {
@@ -329,6 +354,11 @@ fn stair_scan() -> bool {
 }
 
 fn field_ops_now() -> u64 {
+    // Drain every Rayon pool thread's buffer (and this thread's) before
+    // reading the process total — otherwise a worker's unflushed share is
+    // missing from the report.
+    let _ = rayon::broadcast(|_| flush_field_ops_buf());
+    flush_field_ops_buf();
     if thread_ops_mode() {
         FIELD_OPS_THREAD.with(|c| c.get())
     } else {
@@ -360,24 +390,147 @@ fn count_norm(n: usize) {
     if super::jv_bitops::enabled() {
         NORM_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
     }
+    if let Ok(n) = u64::try_from(n) {
+        // `count_ops` conservatively records a multiply-subtract.  Pivot
+        // normalization is multiplication-only and reads one rather than two
+        // field elements, so correct those two leaves in the same phase.
+        visit_account_uncharge(VisitAccountingCounter::FieldAdditions, n);
+        visit_account_uncharge(VisitAccountingCounter::RowReads, n);
+    } else {
+        visit_account_block(
+            "counter_overflow",
+            Some("row_operations"),
+            "normalization length does not fit u64",
+        );
+    }
+}
+
+#[inline]
+fn visit_account_row_operations(n: usize) {
+    let Ok(n) = u64::try_from(n) else {
+        visit_account_block(
+            "counter_overflow",
+            Some("row_operations"),
+            "row-operation count does not fit u64",
+        );
+        return;
+    };
+    let Some(reads) = n.checked_mul(2) else {
+        visit_account_block(
+            "counter_overflow",
+            Some("row_reads"),
+            "row-operation read count overflowed",
+        );
+        return;
+    };
+    visit_account_with(|accounting| {
+        accounting.charge(VisitAccountingCounter::RowOperations, n);
+        accounting.charge(VisitAccountingCounter::FieldMultiplications, n);
+        accounting.charge(VisitAccountingCounter::FieldAdditions, n);
+        accounting.charge(VisitAccountingCounter::RowReads, reads);
+        accounting.charge(VisitAccountingCounter::RowWrites, n);
+    });
+}
+
+#[inline]
+fn visit_account_row_structure(n: usize) {
+    let Ok(n) = u64::try_from(n) else {
+        visit_account_block(
+            "counter_overflow",
+            Some("row_operations"),
+            "row-operation count does not fit u64",
+        );
+        return;
+    };
+    let Some(reads) = n.checked_mul(2) else {
+        visit_account_block(
+            "counter_overflow",
+            Some("row_reads"),
+            "row-operation read count overflowed",
+        );
+        return;
+    };
+    visit_account_with(|accounting| {
+        accounting.charge(VisitAccountingCounter::RowOperations, n);
+        accounting.charge(VisitAccountingCounter::FieldAdditions, n);
+        accounting.charge(VisitAccountingCounter::RowReads, reads);
+        accounting.charge(VisitAccountingCounter::RowWrites, n);
+    });
+}
+
+#[inline]
+fn count_words(n: u64) {
+    super::jv_bitops::words(n);
+    visit_account_charge(VisitAccountingCounter::WordOperations, n);
+}
+
+#[inline]
+fn count_probes(n: u64, key_words: u64) {
+    super::jv_bitops::probes(n, key_words);
+    match n.checked_mul(key_words) {
+        Some(words) => visit_account_with(|accounting| {
+            accounting.charge(VisitAccountingCounter::HashProbes, n);
+            accounting.charge(VisitAccountingCounter::WordOperations, words);
+        }),
+        None => visit_account_block(
+            "counter_overflow",
+            Some("word_operations"),
+            format!("checked probe word product {n} * {key_words} failed"),
+        ),
+    }
+}
+
+thread_local! {
+    /// Buffered share of [`FIELD_OPS`] not yet flushed.  Flushing every
+    /// `add_lazy` contended the same cache line under multi-thread FL /
+    /// deferred; batching keeps the process total exact at report time.
+    static FIELD_OPS_BUF: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+const FIELD_OPS_BUF_FLUSH: u64 = 1 << 20;
+
+#[inline]
+fn flush_field_ops_buf() {
+    FIELD_OPS_BUF.with(|b| {
+        let v = b.replace(0);
+        if v != 0 {
+            FIELD_OPS.fetch_add(v, AtomicOrdering::Relaxed);
+        }
+    });
 }
 
 #[inline]
 fn count_ops(n: usize) {
-    FIELD_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
-    FIELD_OPS_THREAD.with(|c| c.set(c.get() + n as u64));
+    let n = n as u64;
+    FIELD_OPS_THREAD.with(|c| c.set(c.get() + n));
+    if thread_ops_mode() {
+        // Reports read the thread-local only; skip the process atomic.
+    } else {
+        FIELD_OPS_BUF.with(|b| {
+            let v = b.get() + n;
+            if v >= FIELD_OPS_BUF_FLUSH {
+                FIELD_OPS.fetch_add(v, AtomicOrdering::Relaxed);
+                b.set(0);
+            } else {
+                b.set(v);
+            }
+        });
+    }
     // bitop/v1 (`jv_bitops`, off unless a study turns it on): one row
     // operation is a multiply-subtract
-    super::jv_bitops::row_ops(n as u64);
+    super::jv_bitops::row_ops(n);
+    visit_account_row_operations(n as usize);
 }
 
 #[inline]
 fn mulmod(a: u64, b: u64, p: u64) -> u64 {
+    visit_account_charge(VisitAccountingCounter::FieldMultiplications, 1);
     ((a as u128 * b as u128) % p as u128) as u64
 }
 
 fn invmod(a: u64, p: u64) -> u64 {
     super::jv_bitops::charge(super::jv_bitops::Kind::FieldInv, 1);
+    visit_account_charge(VisitAccountingCounter::FieldInversions, 1);
     // p prime, a != 0
     if (2..1 << 32).contains(&p) {
         // the same powers, each product reduced by Barrett's method
@@ -483,6 +636,7 @@ fn total_degree(m: &[u32]) -> u32 {
 fn scale_monic(f: &mut Poly, p: u64) {
     let inv = invmod(f[0].1, p);
     super::jv_bitops::charge(super::jv_bitops::Kind::FieldMul, f.len() as u64);
+    visit_account_charge_usize(VisitAccountingCounter::FieldMultiplications, f.len());
     if (2..1 << 32).contains(&p) {
         let fp = Barrett::new(p);
         for (_, c) in f.iter_mut() {
@@ -527,8 +681,18 @@ fn normalise_owned(mut out: Poly, p: u64, ord: Ordering) -> Poly {
         }
         same
     });
-    super::jv_bitops::words(super::jv_bitops::sort_cost(scanned as usize) + scanned);
+    let sort = super::jv_bitops::sort_cost(scanned as usize);
+    match sort.checked_add(scanned) {
+        Some(words) => count_words(words),
+        None => visit_account_block(
+            "counter_overflow",
+            Some("word_operations"),
+            "normalization sort plus scan cost overflowed",
+        ),
+    }
+    visit_account_charge(VisitAccountingCounter::SortComparisons, sort);
     super::jv_bitops::charge(super::jv_bitops::Kind::FieldAdd, merges);
+    visit_account_charge(VisitAccountingCounter::FieldAdditions, merges);
     // drop the sums that cancelled
     out.retain(|(_, c)| *c != 0);
     if !out.is_empty() {
@@ -586,6 +750,10 @@ pub struct F4Options {
     pub max_degree: u32,
     /// Cooperative stop: the run returns `timed_out` once past it.
     pub deadline: Option<Instant>,
+    /// Opt-in allocation admission. `None` preserves the existing paths.
+    /// Bounded runs use exponent-vector symbolic preprocessing and guarded
+    /// polynomial interreduction; see [`F4ResourceLimits`].
+    pub resource_limits: Option<F4ResourceLimits>,
     /// Stop once the leading monomials of the basis so far leave at most
     /// this many standard monomials.
     ///
@@ -621,6 +789,10 @@ pub struct F4Options {
     pub max_pairs_per_step: Option<usize>,
     /// Collect per-step diagnostics for explicit research runs. Disabled by default.
     pub capture_run_log: bool,
+    /// Compare the final leading-monomial staircase with the semi-regular
+    /// Hilbert expectation. Off by default and never priced into solver work.
+    /// This does not establish first/last fall degree or degree of regularity.
+    pub record_hilbert_diagnostics: bool,
     /// Write the run's state to this file (and resume from it if it already
     /// holds a checkpoint of this very run), at the top of a step once the
     /// given time has passed since the last write.  `None` (the default)
@@ -637,6 +809,215 @@ pub struct F4Options {
     /// Test hook for [`F4Options::checkpointing_in_step`]: stop (reported as
     /// `timed_out`) right after this many in-step snapshots.
     pub checkpoint_stop_in_rref: Option<usize>,
+    /// How the recursive visitor ([`solve_visit`] and its variants) finds the
+    /// roots of a univariate in a variable with a finite domain (a factor-base
+    /// coordinate).  Every mode returns the same roots in the same (domain)
+    /// order, so the traversal and the visitor's call sequence do not depend
+    /// on it; only the work does.  The default is the domain scan, kept as the
+    /// control.  See [`DomainRootMode`].
+    pub domain_roots: DomainRootMode,
+    /// Batched sibling extraction in the recursive visitor: at a node that
+    /// branches over a finite domain, the children are the specialisations
+    /// of one parent generating set at each domain value.  With this set,
+    /// the parent generators are rewritten once with coefficients that are
+    /// univariates in the branch variable, each sibling is specialised by
+    /// Horner evaluation, and its system is solved without F4 by triangular
+    /// back-substitution (univariate gcd, closed-form roots for degree at
+    /// most two, the counted Frobenius root finder otherwise, the shared
+    /// domain index); a child with no univariate falls back to the F4 path.
+    /// Every candidate is still checked against the original input, so the
+    /// solution set is the scan's; the order can differ where a child needs
+    /// more than one substitution.  Off by default, and never used with a
+    /// trace sink or a trace-reuse pool.
+    pub sibling_batch: bool,
+    /// Measure exclusive wall-time phases of the recursive visitor. Off by
+    /// default; no timing field is then serialized in [`VisitReport`]. This
+    /// observes the selected plain, traced, or trace-reuse path without
+    /// changing its arithmetic, domains, or stopping policy. Clock reads can
+    /// consume a small part of an existing cooperative deadline.
+    pub visit_timing: bool,
+}
+
+/// Conservative, per-native-call allocation admission, not a process-memory
+/// limit. Keep an external address-space limit for allocator overhead, input
+/// storage, exponent-vector width and caller-owned traces.
+///
+/// These limits also apply to recorded/replayed calls. Checkpoint, Hilbert,
+/// staircase and run-log modes are refused while limits are enabled: those
+/// paths do not yet have allocation admission. The recursive visitor refuses
+/// trace pools and sibling batching for the same reason.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct F4ResourceLimits {
+    /// Pending and above-degree pairs plus the temporary GM candidates,
+    /// before product/chain criteria can discard those candidates.
+    pub max_pairs: usize,
+    /// Each symbolic support, retained basis term population, reduction
+    /// work/output population and cumulative trace monomial population.
+    /// Repeated terms in different basis polynomials are counted separately.
+    pub max_symbolic_monomials: usize,
+    /// Conservative numeric workspace entries. Admission reserves eight
+    /// rows-by-columns arrays plus row/column scratch. Recording additionally
+    /// reserves two arrays, contributor bitsets and contributor index lists.
+    /// This deliberately exceeds the size of the eventual pair-row matrix.
+    pub max_matrix_entries: usize,
+}
+
+/// The first allocation admission that refused a native call. Such a report
+/// is incomplete, even when its returned basis is empty. `observed` saturates
+/// at `usize::MAX` on arithmetic overflow, which always refuses admission.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct F4ResourceLimit {
+    pub stage: &'static str,
+    pub resource: &'static str,
+    pub observed: usize,
+    pub limit: usize,
+    pub overflowed: bool,
+}
+
+impl std::fmt::Display for F4ResourceLimit {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}: {} admission {} exceeds {}{}",
+            self.stage,
+            self.resource,
+            self.observed,
+            self.limit,
+            if self.overflowed {
+                " (count overflow)"
+            } else {
+                ""
+            }
+        )
+    }
+}
+
+impl F4ResourceLimits {
+    fn check(
+        &self,
+        stage: &'static str,
+        resource: &'static str,
+        observed: Option<usize>,
+        limit: usize,
+    ) -> Result<(), F4ResourceLimit> {
+        if observed.is_some_and(|n| n <= limit) {
+            Ok(())
+        } else {
+            Err(F4ResourceLimit {
+                stage,
+                resource,
+                observed: observed.unwrap_or(usize::MAX),
+                limit,
+                overflowed: observed.is_none(),
+            })
+        }
+    }
+
+    fn symbolic(&self, stage: &'static str, n: usize) -> Result<(), F4ResourceLimit> {
+        self.check(
+            stage,
+            "symbolic_monomials",
+            Some(n),
+            self.max_symbolic_monomials,
+        )
+    }
+
+    fn matrix(
+        &self,
+        stage: &'static str,
+        rows: usize,
+        cols: usize,
+        recording: bool,
+    ) -> Result<(), F4ResourceLimit> {
+        let entries = (|| {
+            let rectangle = rows.checked_mul(cols)?;
+            let mut n = rectangle.checked_mul(8)?;
+            n = n.checked_add(cols.checked_mul(4)?)?;
+            n = n.checked_add(rows.checked_mul(4)?)?;
+            if recording {
+                let words = rows / 64 + usize::from(!rows.is_multiple_of(64));
+                n = n.checked_add(rectangle.checked_mul(2)?)?;
+                n = n.checked_add(rows.checked_mul(words)?)?;
+                n = n.checked_add(rows.checked_mul(rows.min(cols))?)?;
+                n = n.checked_add(words)?;
+            }
+            Some(n)
+        })();
+        self.check(stage, "matrix_entries", entries, self.max_matrix_entries)
+    }
+
+    fn symbolic_step(
+        &self,
+        rows: usize,
+        cols: usize,
+        recording: bool,
+    ) -> Result<(), F4ResourceLimit> {
+        self.symbolic("symbolic_rows", rows)?;
+        self.symbolic("symbolic_support", cols)?;
+        self.matrix("symbolic_workspace", rows, cols.max(1), recording)
+    }
+}
+
+fn unsupported_resource_option(option: &'static str) -> F4ResourceLimit {
+    F4ResourceLimit {
+        stage: "options",
+        resource: option,
+        observed: 1,
+        limit: 0,
+        overflowed: false,
+    }
+}
+
+/// Root extraction for a univariate whose variable has a finite domain `D`.
+///
+/// The roots of `g` in `D` are exactly the `F_p`-roots of `g` that lie in
+/// `D`, because the visitor requires `D ⊂ F_p`.  The scan evaluates `g` at
+/// every element of `D`: about `|D| · terms · log deg` multiplications for
+/// each univariate at each node.  [`DomainRootMode::Frobenius`] instead finds
+/// the few rational roots with the counted `gcd(g, x^p − x)` / Cantor–Zassenhaus
+/// root finder that unrestricted univariates already use (`O(log p · deg²)`
+/// multiplications, independent of `|D|`), then keeps those in `D` through a
+/// value → position index built once per traversal and shared by every node,
+/// and returns them in domain order.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum DomainRootMode {
+    /// Evaluate the univariate at every domain element (the legacy control).
+    #[default]
+    Scan,
+    /// Frobenius root extraction filtered through the domain index.
+    Frobenius,
+    /// Per univariate, whichever of the two has the smaller estimated
+    /// multiplication count ([`domain_scan_cost`] against
+    /// [`domain_frobenius_cost`]).
+    Auto,
+}
+
+/// Multiplications the domain scan spends on one univariate: for each domain
+/// element and each term, square-and-multiply `x^e` and one coefficient
+/// product.  Exact for the scan below.
+pub fn domain_scan_cost(exponents: &[u32], domain_len: usize) -> u64 {
+    let per_point: u64 = exponents
+        .iter()
+        .map(|&e| powmod_muls(u64::from(e)) + 1)
+        .sum();
+    per_point.saturating_mul(domain_len as u64)
+}
+
+/// An estimate of the Frobenius root finder's multiplications for a
+/// univariate of degree `degree`: square-and-multiply for `x^p mod g`, each
+/// step a schoolbook product and a reduction, plus the gcd.  Used only to
+/// choose between the modes in [`DomainRootMode::Auto`]; never reported.
+pub fn domain_frobenius_cost(degree: u32, p: u64) -> u64 {
+    let n = u64::from(degree) + 1;
+    let square = n.saturating_mul(n);
+    let step = square.saturating_mul(2);
+    powmod_muls(p).saturating_mul(step).saturating_add(square)
+}
+
+/// Multiplications of the square-and-multiply loop of [`powmod`] for exponent
+/// `e`: one squaring a bit and one product a set bit.
+fn powmod_muls(e: u64) -> u64 {
+    u64::from(64 - e.leading_zeros()) + u64::from(e.count_ones())
 }
 
 impl F4Options {
@@ -645,17 +1026,41 @@ impl F4Options {
             order,
             max_degree,
             deadline: None,
+            resource_limits: None,
             stop_staircase: None,
             weights: None,
             stop_hilbert: None,
             hilbert_expect: None,
             max_pairs_per_step: None,
             capture_run_log: false,
+            record_hilbert_diagnostics: false,
             checkpoint: None,
             checkpoint_stop_after: None,
             checkpoint_in_step: None,
             checkpoint_stop_in_rref: None,
+            domain_roots: DomainRootMode::Scan,
+            sibling_batch: false,
+            visit_timing: false,
         }
+    }
+
+    /// Enable or disable recursive-visitor wall phases ([`VisitTimings`]).
+    /// Native F4 calls outside a visitor are unaffected.
+    pub fn with_visit_timing(mut self, on: bool) -> Self {
+        self.visit_timing = on;
+        self
+    }
+
+    /// Turn batched sibling extraction on or off ([`F4Options::sibling_batch`]).
+    pub fn with_sibling_batch(mut self, on: bool) -> Self {
+        self.sibling_batch = on;
+        self
+    }
+
+    /// Select the visitor's root extraction for finite-domain variables.
+    pub fn with_domain_roots(mut self, mode: DomainRootMode) -> Self {
+        self.domain_roots = mode;
+        self
     }
     /// Checkpoint the run to `path` and resume from it.
     ///
@@ -699,6 +1104,12 @@ impl F4Options {
     }
     pub fn with_budget(mut self, budget: Duration) -> Self {
         self.deadline = Some(Instant::now() + budget);
+        self
+    }
+    /// Record the post-hoc degree-fall diagnostic. See
+    /// [`F4Options::record_hilbert_diagnostics`].
+    pub fn recording_hilbert_diagnostics(mut self) -> Self {
+        self.record_hilbert_diagnostics = true;
         self
     }
     /// See [`F4Options::stop_staircase`].
@@ -1253,6 +1664,275 @@ pub struct TraceStep {
     pub degree: u32,
     pub rows: Vec<(usize, Vec<u32>)>,
     pub new_lms: Vec<Vec<u32>>,
+    /// The step's symbolic preprocessing, frozen by a replay
+    /// ([`FrozenStep`]); never serialized.
+    #[serde(skip)]
+    frozen: FrozenSlot,
+    /// Continuations recorded by replays that diverged at this step, keyed
+    /// by the leading monomials they found ([`TraceMode::RecordBranch`]);
+    /// never serialized.
+    #[serde(skip)]
+    branches: BranchSlot,
+}
+
+/// The branches recorded under one trace step: (the step's new leading
+/// monomials as a diverging replay found them, the continuation from the
+/// next step).  At most [`MAX_BRANCHES`] per step.
+#[derive(Default, Debug)]
+struct BranchSlot(std::sync::RwLock<Vec<(Vec<Vec<u32>>, std::sync::Arc<F4Trace>)>>);
+
+impl Clone for BranchSlot {
+    fn clone(&self) -> Self {
+        BranchSlot(std::sync::RwLock::new(self.0.read().unwrap().clone()))
+    }
+}
+
+const MAX_BRANCHES: usize = 8;
+
+/// `F4_FP_BRANCH=0` makes a diverged replay finish as a full run without
+/// following or recording a branch (the path before 2026-11-24).
+fn branch_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_BRANCH").as_deref() != Ok("0"))
+}
+
+static TRACE_GROWTH: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(true);
+
+/// Whether replays may record new branches (default on).  A caller that
+/// replays one trace on many threads turns it off after a sequential
+/// warm-up, so the trace tree, and with it every run's counted cost, no
+/// longer depends on thread scheduling.
+pub fn set_trace_growth(on: bool) {
+    TRACE_GROWTH.store(on, AtomicOrdering::Relaxed);
+}
+
+/// See [`set_trace_growth`].
+pub fn trace_growth() -> bool {
+    TRACE_GROWTH.load(AtomicOrdering::Relaxed)
+}
+
+static BRANCH_FOLLOWS: AtomicU64 = AtomicU64::new(0);
+static BRANCH_RECORDS: AtomicU64 = AtomicU64::new(0);
+
+/// Diverged replays that continued on a recorded branch, and branches
+/// recorded, process-wide.
+pub fn branch_totals() -> (u64, u64) {
+    (
+        BRANCH_FOLLOWS.load(AtomicOrdering::Relaxed),
+        BRANCH_RECORDS.load(AtomicOrdering::Relaxed),
+    )
+}
+
+/// A step's frozen symbolic preprocessing, shared by the replays of one
+/// trace (they run on several threads).
+#[derive(Default, Debug)]
+struct FrozenSlot(std::sync::RwLock<Option<std::sync::Arc<FrozenStep>>>);
+
+impl Clone for FrozenSlot {
+    fn clone(&self) -> Self {
+        FrozenSlot(std::sync::RwLock::new(self.0.read().unwrap().clone()))
+    }
+}
+
+/// One replayed step's symbolic preprocessing, kept to rebuild the step's
+/// matrix on later systems without hashing a monomial.
+///
+/// Symbolic preprocessing on a replayed step depends only on the seed rows
+/// (the recorded rows, the same on every replay), the alive leading
+/// monomials (the same on every replay that reached the step: each earlier
+/// step's new leading monomials were checked) and the terms of the basis
+/// elements it reaches.  The frozen copy is taken on a system whose
+/// supports contain the current system's (term by term, a subsequence), so
+/// every monomial and reducer the current system reaches is in it, with the
+/// same column order and the same reducer (the first alive divisor of the
+/// monomial, a function of the leading monomials alone).  Walking the frozen
+/// columns from the current seed rows' terms through the frozen reducers of
+/// the columns reached gives exactly the monomials and reducer rows
+/// symbolic preprocessing would find; the columns not reached are dropped.
+/// Only the reducer rows' order can differ, and the reductions key reducers
+/// by their leading column.
+#[derive(Debug)]
+struct FrozenStep {
+    /// Every basis element the rows use, with its packed terms when frozen.
+    support: Vec<(usize, Vec<u128>)>,
+    /// The seed rows: basis element and, per frozen term, its column.
+    seeds: Vec<(usize, Vec<u32>)>,
+    /// The reducer rows: basis element, packed multiplier, column per term.
+    reducers: Vec<(usize, u128, Vec<u32>)>,
+    /// The columns, packed, in decreasing order.
+    cols: Vec<u128>,
+    /// Per column, the reducer row with that leading column (`u32::MAX`: none).
+    reducer_of: Vec<u32>,
+}
+
+/// The positions of `actual` within `frozen` when it is a subsequence of
+/// it (both in the polynomial's term order), else `None`.
+fn subsequence_positions(frozen: &[u128], actual: &[u128]) -> Option<Vec<u32>> {
+    let mut out = Vec::with_capacity(actual.len());
+    let mut j = 0;
+    for &t in actual {
+        while j < frozen.len() && frozen[j] != t {
+            j += 1;
+        }
+        if j == frozen.len() {
+            return None;
+        }
+        out.push(j as u32);
+        j += 1;
+    }
+    Some(out)
+}
+
+/// The union of two term lists of one polynomial, both in decreasing term
+/// order under `key`.
+fn merge_terms(a: &[u128], b: &[u128], key: impl Fn(u128) -> u128) -> Vec<u128> {
+    let mut out = Vec::with_capacity(a.len().max(b.len()));
+    let (mut i, mut j) = (0, 0);
+    while i < a.len() && j < b.len() {
+        let (ka, kb) = (key(a[i]), key(b[j]));
+        if ka == kb {
+            out.push(a[i]);
+            i += 1;
+            j += 1;
+        } else if ka > kb {
+            out.push(a[i]);
+            i += 1;
+        } else {
+            out.push(b[j]);
+            j += 1;
+        }
+    }
+    out.extend_from_slice(&a[i..]);
+    out.extend_from_slice(&b[j..]);
+    out
+}
+
+/// One step's symbolic preprocessing: reducer rows, packed columns, and
+/// every row as column indices (as [`Packed::symbolic`] returns it).
+type Symbolic = (Vec<(usize, u128)>, Vec<u128>, Vec<Vec<u32>>);
+
+impl FrozenStep {
+    fn from_symbolic(
+        terms: &[Vec<u128>],
+        seeds: &[(usize, Vec<u32>)],
+        extra: &[(usize, u128)],
+        cols: &[u128],
+        row_cols: &[Vec<u32>],
+    ) -> Self {
+        let n = seeds.len();
+        let mut reducer_of = vec![u32::MAX; cols.len()];
+        for (r, rc) in row_cols[n..].iter().enumerate() {
+            reducer_of[rc[0] as usize] = r as u32;
+        }
+        let mut used: Vec<usize> = seeds
+            .iter()
+            .map(|(i, _)| *i)
+            .chain(extra.iter().map(|&(i, _)| i))
+            .collect();
+        used.sort_unstable();
+        used.dedup();
+        FrozenStep {
+            support: used.iter().map(|&i| (i, terms[i].clone())).collect(),
+            seeds: seeds
+                .iter()
+                .zip(row_cols)
+                .map(|((i, _), rc)| (*i, rc.clone()))
+                .collect(),
+            reducers: extra
+                .iter()
+                .zip(&row_cols[n..])
+                .map(|(&(i, m), rc)| (i, m, rc.clone()))
+                .collect(),
+            cols: cols.to_vec(),
+            reducer_of,
+        }
+    }
+
+    /// The step's symbolic preprocessing for the current terms, or `None`
+    /// when some element has a term the frozen copy lacks.
+    fn rebuild(&self, terms: &[Vec<u128>]) -> Option<Symbolic> {
+        let top = self.support.last().map_or(0, |(i, _)| i + 1);
+        let mut pos: Vec<Vec<u32>> = vec![Vec::new(); top];
+        for (i, frozen) in &self.support {
+            pos[*i] = subsequence_positions(frozen, terms.get(*i)?)?;
+        }
+        let map = |i: usize, fcols: &[u32]| -> Vec<u32> {
+            pos[i].iter().map(|&k| fcols[k as usize]).collect()
+        };
+        let nc = self.cols.len();
+        let mut reached = vec![false; nc];
+        let mut done = vec![false; nc];
+        let mut stack: Vec<u32> = Vec::new();
+        let mut rows: Vec<Vec<u32>> = Vec::with_capacity(self.seeds.len() + self.reducers.len());
+        for (i, fc) in &self.seeds {
+            let rc = map(*i, fc);
+            done[rc[0] as usize] = true;
+            for &c in &rc {
+                if !reached[c as usize] {
+                    reached[c as usize] = true;
+                    stack.push(c);
+                }
+            }
+            rows.push(rc);
+        }
+        let mut used: Vec<u32> = Vec::new();
+        while let Some(c) = stack.pop() {
+            let c = c as usize;
+            if done[c] {
+                continue;
+            }
+            done[c] = true;
+            let r = self.reducer_of[c];
+            if r == u32::MAX {
+                continue;
+            }
+            let (i, _, fc) = &self.reducers[r as usize];
+            let rc = map(*i, fc);
+            for &x in &rc {
+                if !reached[x as usize] {
+                    reached[x as usize] = true;
+                    stack.push(x);
+                }
+            }
+            used.push(r);
+            rows.push(rc);
+        }
+        let mut new_index = vec![u32::MAX; nc];
+        let mut cols = Vec::new();
+        for c in 0..nc {
+            if reached[c] {
+                new_index[c] = cols.len() as u32;
+                cols.push(self.cols[c]);
+            }
+        }
+        for row in &mut rows {
+            for x in row.iter_mut() {
+                *x = new_index[*x as usize];
+            }
+        }
+        let extra = used
+            .iter()
+            .map(|&r| {
+                let (i, m, _) = &self.reducers[r as usize];
+                (*i, *m)
+            })
+            .collect();
+        Some((extra, cols, rows))
+    }
+}
+
+static FROZEN_HITS: AtomicU64 = AtomicU64::new(0);
+
+/// Replayed steps that rebuilt their matrix from frozen preprocessing.
+pub fn frozen_steps_total() -> u64 {
+    FROZEN_HITS.load(AtomicOrdering::Relaxed)
+}
+
+/// `F4_FP_FREEZE=0` makes every replay run its steps' symbolic
+/// preprocessing (the path before 2026-11-21), a same-binary control.
+fn freeze_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_FREEZE").as_deref() != Ok("0"))
 }
 
 /// The trace of one run (Joux–Vitse's "F4 remake": the useful rows of
@@ -1273,10 +1953,14 @@ pub struct F4Trace {
 /// for every pivot row which input rows it is a combination of.  Returns
 /// `(pivot column, contributing input rows)` per pivot.  Used once per `p`
 /// when a trace is recorded; its cost is not part of the replays.
-fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize>)> {
+fn tracked_rref_contributors(
+    rows: &[Vec<u64>],
+    p: u64,
+    deadline: Option<Instant>,
+) -> Option<Vec<(usize, Vec<usize>)>> {
     let n = rows.len();
     if n == 0 {
-        return Vec::new();
+        return Some(Vec::new());
     }
     let ncols = rows[0].len();
     let words = n.div_ceil(64);
@@ -1291,6 +1975,9 @@ fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize
     let mut piv: Vec<(usize, usize)> = Vec::new(); // (row, col)
     let mut r = 0usize;
     for c in 0..ncols {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
         if r >= n {
             break;
         }
@@ -1303,15 +1990,23 @@ fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize
         for v in m[r].iter_mut() {
             *v = ((*v as u128 * inv as u128) % p as u128) as u64;
         }
+        // Charged to the recording run like any other row operation (since
+        // 2026-11-21; before, the tracked elimination a recording adds was
+        // not counted at all).
+        count_ops(ncols);
         let pivot_row = m[r].clone();
         let pivot_who = who[r].clone();
         for i in 0..n {
+            if deadline.is_some_and(|d| Instant::now() > d) {
+                return None;
+            }
             if i != r && m[i][c] != 0 {
                 let f = m[i][c];
                 let neg = p - f;
                 for (x, &y) in m[i].iter_mut().zip(&pivot_row) {
                     *x = ((*x as u128 + neg as u128 * y as u128) % p as u128) as u64;
                 }
+                count_ops(ncols);
                 for (a, &b) in who[i].iter_mut().zip(&pivot_who) {
                     *a |= b;
                 }
@@ -1320,14 +2015,16 @@ fn tracked_rref_contributors(rows: &[Vec<u64>], p: u64) -> Vec<(usize, Vec<usize
         piv.push((r, c));
         r += 1;
     }
-    piv.into_iter()
-        .map(|(row, col)| {
-            let contributors: Vec<usize> = (0..n)
-                .filter(|&i| who[row][i / 64] >> (i % 64) & 1 == 1)
-                .collect();
-            (col, contributors)
-        })
-        .collect()
+    Some(
+        piv.into_iter()
+            .map(|(row, col)| {
+                let contributors: Vec<usize> = (0..n)
+                    .filter(|&i| who[row][i / 64] >> (i % 64) & 1 == 1)
+                    .collect();
+                (col, contributors)
+            })
+            .collect(),
+    )
 }
 
 fn inv_mod_u64(a: u64, p: u64) -> u64 {
@@ -1348,18 +2045,127 @@ fn inv_mod_u64(a: u64, p: u64) -> u64 {
 enum TraceMode<'a> {
     Off,
     Record(&'a mut F4Trace),
-    Replay(&'a F4Trace),
+    Replay(Cursor<'a>),
+    /// A replay that diverged at a step with no branch for what it found,
+    /// recording its continuation as one ([`BranchRec`]).
+    RecordBranch(Box<BranchRec<'a>>),
+}
+
+/// A trace node: the trace a replay started from, or a branch of it.
+#[derive(Clone)]
+enum Node<'a> {
+    Root(&'a F4Trace),
+    Branch(std::sync::Arc<F4Trace>),
+}
+
+impl Node<'_> {
+    fn get(&self) -> &F4Trace {
+        match self {
+            Node::Root(t) => t,
+            Node::Branch(t) => t,
+        }
+    }
+}
+
+/// Where a replay is: the node it follows, whose step `i` is the run's
+/// step `base + i`.
+#[derive(Clone)]
+struct Cursor<'a> {
+    node: Node<'a>,
+    base: usize,
+}
+
+/// A branch being recorded: the continuation from the run's step `base`,
+/// to be stored under step `at` of `parent` with the key `key` when the run
+/// ends cleanly.
+struct BranchRec<'a> {
+    trace: F4Trace,
+    parent: Node<'a>,
+    at: usize,
+    key: Vec<Vec<u32>>,
+}
+
+impl BranchRec<'_> {
+    fn commit(self) {
+        let mut w = self.parent.get().steps[self.at].branches.0.write().unwrap();
+        if w.len() < MAX_BRANCHES && !w.iter().any(|(k, _)| *k == self.key) {
+            w.push((self.key, std::sync::Arc::new(self.trace)));
+            BRANCH_RECORDS.fetch_add(1, AtomicOrdering::Relaxed);
+        }
+    }
+}
+
+impl TraceMode<'_> {
+    /// The same mode for one more run, borrowing the trace again.
+    fn reborrow(&mut self) -> TraceMode<'_> {
+        match self {
+            TraceMode::Off | TraceMode::RecordBranch(_) => TraceMode::Off,
+            TraceMode::Record(t) => TraceMode::Record(t),
+            TraceMode::Replay(c) => TraceMode::Replay(c.clone()),
+        }
+    }
+
+    /// The trace being recorded (a whole run or a branch).
+    fn rec_mut(&mut self) -> Option<&mut F4Trace> {
+        match self {
+            TraceMode::Record(t) => Some(t),
+            TraceMode::RecordBranch(b) => Some(&mut b.trace),
+            _ => None,
+        }
+    }
+
+    fn recording(&self) -> bool {
+        matches!(self, TraceMode::Record(_) | TraceMode::RecordBranch(_))
+    }
+}
+
+/// One F4 run with the run's stop rule: through [`f4_hilbert_guarded`] when
+/// `opts.stop_hilbert` is set, else [`f4_with_arithmetic`].  Recording and
+/// replaying go through here, so a traced run keeps the Hilbert rule (before
+/// 2026-11-21 they called the engine directly and silently ran without it).
+fn f4_dispatch(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    account: VisitAccount<'_>,
+    trace: TraceMode,
+) -> F4Report {
+    if matches!(account, VisitAccount::Off) && visit_accounting_unsuspended_active() {
+        visit_account_block(
+            "accounting_token_missing",
+            None,
+            "native F4 dispatch entered an active solver ledger without its borrowed token",
+        );
+        return f4_accounting_stopped_report();
+    }
+    if account.control().stopped() {
+        return f4_accounting_stopped_report();
+    }
+    let report = if opts.resource_limits.is_some() {
+        f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), account, trace)
+    } else {
+        match opts.stop_hilbert {
+            Some(chunk) => f4_hilbert_guarded(input, n_vars, p, opts, chunk, account, trace),
+            None => f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), account, trace),
+        }
+    };
+    if account.control().stopped() {
+        f4_accounting_stopped_report()
+    } else {
+        report
+    }
 }
 
 /// [`f4`] recording the trace of the run.
 pub fn f4_record(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> (F4Report, F4Trace) {
     let mut trace = F4Trace::default();
-    let r = f4_with_arithmetic(
+    let r = f4_dispatch(
         input,
         n_vars,
         p,
         opts,
-        arithmetic_mode(),
+        VisitAccount::Off,
         TraceMode::Record(&mut trace),
     );
     (r, trace)
@@ -1375,13 +2181,16 @@ pub fn f4_replay(
     opts: &F4Options,
     trace: &F4Trace,
 ) -> F4Report {
-    f4_with_arithmetic(
+    f4_dispatch(
         input,
         n_vars,
         p,
         opts,
-        arithmetic_mode(),
-        TraceMode::Replay(trace),
+        VisitAccount::Off,
+        TraceMode::Replay(Cursor {
+            node: Node::Root(trace),
+            base: 0,
+        }),
     )
 }
 
@@ -1486,6 +2295,10 @@ pub struct F4Report {
     pub max_cols: usize,
     pub ms: f64,
     pub timed_out: bool,
+    /// Allocation admission stopped this call. The basis is intentionally
+    /// empty on this path; it is not an emptiness or consistency certificate.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub resource_limit: Option<F4ResourceLimit>,
     /// Pairs dropped because their lcm degree exceeded the bound: `> 0`
     /// means the basis may be a strict truncation.
     pub pairs_above_bound: usize,
@@ -1506,6 +2319,28 @@ pub struct F4Report {
     /// Milliseconds of the run (inside `ms`) that a resumed checkpoint had
     /// already spent; 0 when the run did not resume.
     pub resumed_ms: f64,
+    /// Post-hoc Hilbert diagnostics, present only when requested. These scan
+    /// the final computed leading ideal, including a degree-truncated basis.
+    /// Deviations and staircase extinction are not formal fall-degree or
+    /// regularity measurements. Empty/None when not requested or interrupted.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first_hilbert_deviation_degree: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_hilbert_deviation_degree: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub staircase_extinction_degree: Option<u32>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub hilbert_deviations: Vec<HilbertDeviation>,
+}
+
+/// One degree of the final leading-monomial staircase against the semi-regular
+/// expectation. A deviation does not certify a degree fall in the input system.
+#[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize)]
+pub struct HilbertDeviation {
+    pub degree: u32,
+    pub hilbert_expected: usize,
+    pub hilbert_realized: usize,
+    pub is_below_expectation: bool,
 }
 
 /// What [`F4Options::stopping_by_hilbert`] did.
@@ -1575,13 +2410,58 @@ fn rref_blocked<T: Copy + Default + PartialEq + Send>(
 /// monomials whose degree stays below 128 is the sum of their packings,
 /// and the top bit of every field is free to guard divisibility tests.
 fn pack(e: &[u32]) -> u128 {
-    e.iter()
-        .enumerate()
-        .fold(0u128, |acc, (i, &x)| acc | (x as u128) << (8 * i))
+    // byte per field (exponents are below 128 on the packed path, so the
+    // truncation is exact); one load instead of a shift-or per field
+    let mut b = [0u8; 16];
+    for (d, &x) in b.iter_mut().zip(e) {
+        *d = x as u8;
+    }
+    u128::from_le_bytes(b)
 }
 
 fn unpack(x: u128, n: usize) -> Vec<u32> {
-    (0..n).map(|i| ((x >> (8 * i)) & 0xff) as u32).collect()
+    x.to_le_bytes()[..n].iter().map(|&b| b as u32).collect()
+}
+
+/// The position of the first of `lms` (packed leading monomials, in basis
+/// order) that divides `m`, as `lms.iter().position(|&a| divides(a, m))`
+/// under the guard `guard`.  With at most 8 variables every field lies in
+/// the low word, so the test runs on `u64`: exponents below 128 cannot
+/// borrow across fields, and the high words are zero.  Same position, so the
+/// same reducer, rows and probe count.
+#[inline]
+fn first_alive_divisor(lms: &[u128], guard: u128, m: u128) -> Option<usize> {
+    if guard >> 64 == 0 {
+        let (g, mg) = (guard as u64, (m | guard) as u64);
+        lms.iter().position(|&a| mg.wrapping_sub(a as u64) & g == g)
+    } else {
+        lms.iter().position(|&a| ((m | guard) - a) & guard == guard)
+    }
+}
+
+/// The columns of one F4 matrix, in decreasing monomial order: packed when
+/// the run packs its monomials (unpacked only for the terms a step emits),
+/// else one exponent vector each.
+enum Cols {
+    Packed(Vec<u128>, usize),
+    Plain(Vec<Vec<u32>>),
+}
+
+impl Cols {
+    fn len(&self) -> usize {
+        match self {
+            Cols::Packed(c, _) => c.len(),
+            Cols::Plain(c) => c.len(),
+        }
+    }
+
+    /// Column `j`'s monomial as an exponent vector.
+    fn get(&self, j: usize) -> Vec<u32> {
+        match self {
+            Cols::Packed(c, n) => unpack(c[j], *n),
+            Cols::Plain(c) => c[j].clone(),
+        }
+    }
 }
 
 /// Whether large steps run symbolic preprocessing on several threads
@@ -1646,6 +2526,75 @@ type PkBuild = std::hash::BuildHasherDefault<PackedHasher>;
 type PkMap<K, V> = std::collections::HashMap<K, V, PkBuild>;
 type PkSet<K> = std::collections::HashSet<K, PkBuild>;
 
+/// Packed monomial -> id, open addressing with linear probing, for the
+/// interning of [`Packed::symbolic`]: the tables are small (a step's
+/// columns) and probed once per row term, so one multiply-shift hash and an
+/// inline probe replace a general map's entry API.  `u128::MAX` marks an
+/// empty slot: it has every guard bit set, which no packed monomial has.
+/// Ids are whatever the caller assigns, so the table does not change them.
+struct MonoTable {
+    keys: Vec<u128>,
+    vals: Vec<u32>,
+    len: usize,
+    shift: u32,
+}
+
+impl MonoTable {
+    const EMPTY: u128 = u128::MAX;
+
+    fn with_capacity(n: usize) -> Self {
+        // at most half full
+        let cap = (2 * n.max(8)).next_power_of_two();
+        Self {
+            keys: vec![Self::EMPTY; cap],
+            vals: vec![0; cap],
+            len: 0,
+            shift: 64 - cap.trailing_zeros(),
+        }
+    }
+
+    #[inline]
+    fn slot(&self, x: u128) -> usize {
+        let h = (x as u64) ^ ((x >> 64) as u64).rotate_left(29);
+        (h.wrapping_mul(0x9e37_79b9_7f4a_7c15) >> self.shift) as usize
+    }
+
+    /// The id stored for `x`, or `next` after storing it.
+    #[inline]
+    fn get_or_insert(&mut self, x: u128, next: u32) -> u32 {
+        let mask = self.keys.len() - 1;
+        let mut i = self.slot(x);
+        loop {
+            let k = self.keys[i];
+            if k == x {
+                return self.vals[i];
+            }
+            if k == Self::EMPTY {
+                break;
+            }
+            i = (i + 1) & mask;
+        }
+        if 2 * (self.len + 1) > self.keys.len() {
+            self.grow();
+            return self.get_or_insert(x, next);
+        }
+        self.keys[i] = x;
+        self.vals[i] = next;
+        self.len += 1;
+        next
+    }
+
+    fn grow(&mut self) {
+        let mut t = Self::with_capacity(self.keys.len());
+        for (&k, &v) in self.keys.iter().zip(&self.vals) {
+            if k != Self::EMPTY {
+                t.get_or_insert(k, v);
+            }
+        }
+        *self = t;
+    }
+}
+
 /// Packed monomials of the basis for grevlex runs with at most 15
 /// variables and every degree below 128: products are additions, a
 /// divisibility test is one guarded subtraction, and hashing and sorting
@@ -1670,6 +2619,13 @@ impl Packed {
         }
     }
 
+    /// Pack one more basis element.
+    fn push(&mut self, f: &Poly) {
+        let t: Vec<u128> = f.iter().map(|(e, _)| pack(e)).collect();
+        self.lms.push(t[0]);
+        self.terms.push(t);
+    }
+
     /// Pack the basis elements added since the last call.
     fn extend(&mut self, basis: &[Poly]) {
         while self.terms.len() < basis.len() {
@@ -1680,13 +2636,6 @@ impl Packed {
             self.lms.push(t[0]);
             self.terms.push(t);
         }
-    }
-
-    /// Does `a` divide `b`?  Each field of `b | guard` minus `a`'s keeps
-    /// its guard bit exactly when it does not borrow.
-    #[inline]
-    fn divides(&self, a: u128, b: u128) -> bool {
-        ((b | self.guard) - a) & self.guard == self.guard
     }
 
     /// A key ordered as `cmp_monomial(·, ·, Grevlex)`: the degree above
@@ -1720,6 +2669,7 @@ impl Packed {
     ) -> (Vec<(usize, u128)>, Vec<u128>, Vec<Vec<u32>>) {
         const UNKNOWN: u32 = u32::MAX;
         let alive_idx: Vec<usize> = (0..self.lms.len()).filter(|&i| alive[i]).collect();
+        let alive_lms: Vec<u128> = alive_idx.iter().map(|&i| self.lms[i]).collect();
         let mut ids: PkMap<u128, u32> = PkMap::default();
         let mut monos: Vec<u128> = Vec::new();
         let mut is_lead: Vec<bool> = Vec::new();
@@ -1734,41 +2684,63 @@ impl Packed {
                     .map(|&(i, _)| self.terms[i].len() as u64)
                     .sum(),
             );
+            // a small round runs on this thread (unless `F4_FP_PAR_OLD=1`):
+            // the same lookups, the same new monomials, the same order
+            let spread = par_old() || frontier.len() >= sym_par_min_frontier();
+            pp_add(PP_SYM_ROUNDS, 1);
+            pp_add(PP_SYM_FRONTIER, frontier.len() as u64);
+            if !spread {
+                pp_add(PP_SYM_ROUNDS_SEQ, 1);
+            }
             let known = &ids;
-            let mut frows: Vec<Vec<u32>> = frontier
-                .par_iter()
-                .map(|&(idx, m)| {
-                    self.terms[idx]
-                        .iter()
-                        .map(|&e| known.get(&(e + m)).copied().unwrap_or(UNKNOWN))
-                        .collect()
-                })
-                .collect();
+            let lookup = |&(idx, m): &(usize, u128)| -> Vec<u32> {
+                self.terms[idx]
+                    .iter()
+                    .map(|&e| known.get(&(e + m)).copied().unwrap_or(UNKNOWN))
+                    .collect()
+            };
+            let mut frows: Vec<Vec<u32>> = if spread {
+                frontier.par_iter().map(lookup).collect()
+            } else {
+                frontier.iter().map(lookup).collect()
+            };
             // the monomials not met before, deduplicated per thread first
             // (in the first round every term is new)
-            let mut new: Vec<u128> = frontier
-                .par_iter()
-                .zip(&frows)
-                .fold(PkSet::<u128>::default, |mut set, (&(idx, m), row)| {
+            let mut new: Vec<u128> = if !spread {
+                let mut set = PkSet::<u128>::default();
+                for (&(idx, m), row) in frontier.iter().zip(&frows) {
                     for (&e, &id) in self.terms[idx].iter().zip(row) {
                         if id == UNKNOWN {
                             set.insert(e + m);
                         }
                     }
-                    set
-                })
-                .reduce(PkSet::<u128>::default, |mut a, b| {
-                    if a.len() < b.len() {
-                        return b.into_iter().fold(a, |mut b2, x| {
-                            b2.insert(x);
-                            b2
-                        });
-                    }
-                    a.extend(b);
-                    a
-                })
-                .into_iter()
-                .collect();
+                }
+                set.into_iter().collect()
+            } else {
+                frontier
+                    .par_iter()
+                    .zip(&frows)
+                    .fold(PkSet::<u128>::default, |mut set, (&(idx, m), row)| {
+                        for (&e, &id) in self.terms[idx].iter().zip(row) {
+                            if id == UNKNOWN {
+                                set.insert(e + m);
+                            }
+                        }
+                        set
+                    })
+                    .reduce(PkSet::<u128>::default, |mut a, b| {
+                        if a.len() < b.len() {
+                            return b.into_iter().fold(a, |mut b2, x| {
+                                b2.insert(x);
+                                b2
+                            });
+                        }
+                        a.extend(b);
+                        a
+                    })
+                    .into_iter()
+                    .collect()
+            };
             new.sort_unstable();
             let first_new = monos.len();
             for &x in &new {
@@ -1777,34 +2749,43 @@ impl Packed {
                 is_lead.push(false);
             }
             let known = &ids;
-            frows
-                .par_iter_mut()
-                .zip(&frontier)
-                .for_each(|(row, &(idx, m))| {
-                    for (id, &e) in row.iter_mut().zip(&self.terms[idx]) {
-                        if *id == UNKNOWN {
-                            *id = known[&(e + m)];
-                        }
+            let fix = |(row, &(idx, m)): (&mut Vec<u32>, &(usize, u128))| {
+                for (id, &e) in row.iter_mut().zip(&self.terms[idx]) {
+                    if *id == UNKNOWN {
+                        *id = known[&(e + m)];
                     }
-                });
+                }
+            };
+            if spread {
+                frows.par_iter_mut().zip(&frontier).for_each(fix);
+            } else {
+                frows.iter_mut().zip(&frontier).for_each(fix);
+            }
             for row in &frows {
                 is_lead[row[0] as usize] = true;
             }
             rows.extend(frows);
             // the reducers of this round's new monomials: the next round
             let lead = &is_lead;
-            let next: Vec<(usize, u128)> = (first_new..monos.len())
-                .into_par_iter()
-                .filter(|&id| !lead[id])
-                .filter_map(|id| {
-                    let mono = monos[id];
-                    let k = alive_idx
-                        .iter()
-                        .position(|&i| self.divides(self.lms[i], mono));
-                    count_native(k.map_or(alive_idx.len(), |k| k + 1) as u64);
-                    k.map(|k| (alive_idx[k], mono - self.lms[alive_idx[k]]))
-                })
-                .collect();
+            let reducer_of = |id: usize| -> Option<(usize, u128)> {
+                if lead[id] {
+                    return None;
+                }
+                let mono = monos[id];
+                let k = first_alive_divisor(&alive_lms, self.guard, mono);
+                count_native(k.map_or(alive_idx.len(), |k| k + 1) as u64);
+                k.map(|k| (alive_idx[k], mono - self.lms[alive_idx[k]]))
+            };
+            let spread_next =
+                par_old() || (monos.len() - first_new) * alive_idx.len().max(1) >= PAR_WORK;
+            let next: Vec<(usize, u128)> = if spread_next {
+                (first_new..monos.len())
+                    .into_par_iter()
+                    .filter_map(reducer_of)
+                    .collect()
+            } else {
+                (first_new..monos.len()).filter_map(reducer_of).collect()
+            };
             extra.extend(next.iter().copied());
             frontier = next;
         }
@@ -1841,35 +2822,46 @@ impl Packed {
         &self,
         seeds: &[(usize, Vec<u32>)],
         alive: &[bool],
+        count: bool,
     ) -> (Vec<(usize, u128)>, Vec<u128>, Vec<Vec<u32>>) {
         struct Interned {
-            ids: PkMap<u128, u32>,
+            ids: MonoTable,
             monos: Vec<u128>,
             done: Vec<bool>,
             queue: Vec<u32>,
         }
         impl Interned {
+            #[inline]
             fn id(&mut self, x: u128) -> u32 {
-                match self.ids.entry(x) {
-                    std::collections::hash_map::Entry::Occupied(o) => *o.get(),
-                    std::collections::hash_map::Entry::Vacant(v) => {
-                        let id = self.monos.len() as u32;
-                        v.insert(id);
-                        self.monos.push(x);
-                        self.done.push(false);
-                        self.queue.push(id);
-                        id
-                    }
+                let next = self.monos.len() as u32;
+                let id = self.ids.get_or_insert(x, next);
+                if id == next {
+                    self.monos.push(x);
+                    self.done.push(false);
+                    self.queue.push(id);
                 }
+                id
             }
         }
         let seeds: Vec<(usize, u128)> = seeds.iter().map(|(i, m)| (*i, pack(m))).collect();
         let mut seen: PkSet<(usize, u128)> = seeds.iter().copied().collect();
+        // The table starts at a typical step's column count and doubles as
+        // it fills.  (Sizing it from the seed rows' total terms, an upper
+        // bound, cost more in clearing than the probes saved: the rows share
+        // most of their monomials.)  The columns and rows are the same.
+        let hint = 256;
         let mut t = Interned {
-            ids: PkMap::default(),
-            monos: Vec::new(),
-            done: Vec::new(),
-            queue: Vec::new(),
+            ids: MonoTable::with_capacity(hint),
+            monos: Vec::with_capacity(hint),
+            done: Vec::with_capacity(hint),
+            queue: Vec::with_capacity(hint),
+        };
+        // `count`: charge the probes to the native-operation counter (the F4
+        // steps do; the final interreduction never did and still does not)
+        let count_native = |n: u64| {
+            if count {
+                count_native(n)
+            }
         };
         let mut rows: Vec<Vec<u32>> = Vec::with_capacity(seeds.len());
         for &(idx, m) in &seeds {
@@ -1879,6 +2871,8 @@ impl Packed {
             rows.push(row);
         }
         let alive_idx: Vec<usize> = (0..self.lms.len()).filter(|&i| alive[i]).collect();
+        // the alive leading monomials contiguous, for the reducer scan
+        let alive_lms: Vec<u128> = alive_idx.iter().map(|&i| self.lms[i]).collect();
         let mut extra: Vec<(usize, u128)> = Vec::new();
         while let Some(id) = t.queue.pop() {
             if t.done[id as usize] {
@@ -1886,9 +2880,7 @@ impl Packed {
             }
             t.done[id as usize] = true;
             let mono = t.monos[id as usize];
-            let found = alive_idx
-                .iter()
-                .position(|&i| self.divides(self.lms[i], mono));
+            let found = first_alive_divisor(&alive_lms, self.guard, mono);
             count_native(found.map_or(alive_idx.len(), |k| k + 1) as u64);
             if let Some(idx) = found.map(|k| alive_idx[k]) {
                 let m = mono - self.lms[idx];
@@ -1994,19 +2986,34 @@ fn gm_update<K: PartialEq>(
     div: impl Fn(&K, &K) -> bool,
     lcmf: impl Fn(&K, &K) -> K,
     coprime: impl Fn(&K, &K) -> bool,
-) -> Vec<(usize, K)> {
+    limits: Option<&F4ResourceLimits>,
+    deadline: Option<Instant>,
+) -> Result<Vec<(usize, K)>, F4Stop> {
     // bitop/v1: criterion B tests every held pair (a divisibility and two
     // lcm compares, a packed monomial being two words each), every alive
     // element gets a divisibility, coprimality and lcm, and criteria M/F
     // compare candidate pairs (charged at the quadratic bound)
-    super::jv_bitops::words(
-        if gm {
-            6 * (pairs.len() + above.len()) as u64
-        } else {
-            0
-        } + 6 * k as u64,
-    );
+    let held = pairs.len().checked_add(above.len());
+    let legacy_words = if gm {
+        held.unwrap_or(usize::MAX).saturating_mul(6)
+    } else {
+        0
+    }
+    .saturating_add(k.saturating_mul(6));
+    visit_account_charge_usize(VisitAccountingCounter::WordOperations, legacy_words);
+    super::jv_bitops::words(u64::try_from(legacy_words).unwrap_or(u64::MAX));
+    if held.is_none() {
+        visit_account_block(
+            "counter_overflow",
+            Some("word_operations"),
+            "held-pair population overflowed usize",
+        );
+    }
     if gm {
+        if let Some(held) = held {
+            visit_account_charge_usize(VisitAccountingCounter::DivisibilityTests, held);
+            visit_account_charge_product(VisitAccountingCounter::Comparisons, held, 2);
+        }
         // Criterion B: an old pair (g1, g2) whose lcm `h` divides is covered
         // by (g1, h) and (h, g2) unless one of those has the same lcm.  Pairs
         // held above the degree bound are tested too: a pair the criterion
@@ -2018,12 +3025,28 @@ fn gm_update<K: PartialEq>(
         pairs.retain(|pr| keep(pr));
         above.retain(|pr| keep(pr));
     }
+    if let Some(limits) = limits {
+        limits.check(
+            "critical_pairs",
+            "pairs",
+            pairs
+                .len()
+                .checked_add(above.len())
+                .and_then(|n| n.checked_add(alive.iter().take(k).filter(|&&a| a).count())),
+            limits.max_pairs,
+        )?;
+    }
     // the new pairs (h, g) with every alive g
     let mut cand: Vec<(usize, K, bool)> = Vec::new();
     for i in 0..k {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return Err(F4Stop::Deadline);
+        }
         if !alive[i] {
             continue;
         }
+        visit_account_charge(VisitAccountingCounter::CriticalPairCandidates, 1);
+        visit_account_charge(VisitAccountingCounter::DivisibilityTests, 1);
         let lmi = lm(i);
         if div(h, &lmi) {
             // `basis[i]` is redundant in the final basis, but its pair with
@@ -2037,25 +3060,48 @@ fn gm_update<K: PartialEq>(
     }
     let mut kept = vec![true; cand.len()];
     if gm {
-        super::jv_bitops::words(2 * (cand.len() * cand.len()) as u64);
+        match cand
+            .len()
+            .checked_mul(cand.len())
+            .and_then(|n| n.checked_mul(2))
+            .and_then(|n| u64::try_from(n).ok())
+        {
+            Some(words) => count_words(words),
+            None => visit_account_block(
+                "counter_overflow",
+                Some("word_operations"),
+                "quadratic critical-pair comparison bound overflowed",
+            ),
+        }
         // Criteria M and F: drop (h, g1) when another pair (h, g2) still
         // standing has an lcm dividing its own; of several with equal lcms
         // the last one stays.  A coprime pair is never dropped here (it may
         // drop others) and never kept below.
         for a in 0..cand.len() {
+            if deadline.is_some_and(|d| Instant::now() > d) {
+                return Err(F4Stop::Deadline);
+            }
             if cand[a].2 {
                 continue;
             }
-            if (0..cand.len()).any(|b| b != a && kept[b] && div(&cand[b].1, &cand[a].1)) {
+            if (0..cand.len()).any(|b| {
+                if b == a || !kept[b] {
+                    return false;
+                }
+                visit_account_charge(VisitAccountingCounter::DivisibilityTests, 1);
+                div(&cand[b].1, &cand[a].1)
+            }) {
                 kept[a] = false;
             }
         }
     }
-    cand.into_iter()
+    let selected: Vec<_> = cand
+        .into_iter()
         .zip(kept)
         .filter(|((_, _, cp), keep)| !cp && *keep)
         .map(|((i, l, _), _)| (i, l))
-        .collect()
+        .collect();
+    Ok(selected)
 }
 
 fn lcm(a: &[u32], b: &[u32]) -> Vec<u32> {
@@ -2076,6 +3122,224 @@ fn gebauer_moeller() -> bool {
 /// elimination runs on one thread: under it, rayon's dispatch costs more
 /// than the arithmetic it spreads.
 const PAR_WORK: usize = 1 << 15;
+
+/// `F4_FP_PAR_OLD=1` restores the thread dispatch as it was before the
+/// f4-parallel lead: `B'` in 64-row blocks gated by their width, with the
+/// in-block finish on one thread; 64-row pair blocks behind the rows ×
+/// columns gate; round-parallel symbolic preprocessing from 64 seed rows
+/// with every round spread.  A same-binary control; results and counted
+/// row operations are the same either way.
+fn par_old() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_PAR_OLD").as_deref() == Ok("1"))
+}
+
+/// A tunable threshold read once from the environment.
+fn par_env(cell: &'static std::sync::OnceLock<usize>, name: &str, default: usize) -> usize {
+    *cell.get_or_init(|| {
+        std::env::var(name)
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(default)
+    })
+}
+
+/// Seed rows a step needs before symbolic preprocessing is spread over
+/// threads (`F4_FP_PAR_SYM_SEEDS`).
+fn sym_par_min_seeds() -> usize {
+    static C: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    par_env(&C, "F4_FP_PAR_SYM_SEEDS", 1024)
+}
+
+/// Frontier rows a round of [`Packed::symbolic_par`] needs before it is
+/// spread over threads (`F4_FP_PAR_SYM_FRONTIER`); a smaller round runs
+/// the same computation on the calling thread.
+fn sym_par_min_frontier() -> usize {
+    static C: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    par_env(&C, "F4_FP_PAR_SYM_FRONTIER", 256)
+}
+
+/// Multiply-adds the `B'` build needs before it is split into column
+/// tiles over threads (`F4_FP_PAR_FL_WORK`).
+fn fl_par_min_work() -> usize {
+    static C: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    par_env(&C, "F4_FP_PAR_FL_WORK", 1 << 17)
+}
+
+/// Column tiles per thread of the `B'` build (`F4_FP_PAR_FL_TILES`).
+fn fl_tiles_per_thread() -> usize {
+    static C: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    par_env(&C, "F4_FP_PAR_FL_TILES", 3).max(1)
+}
+
+/// How `B'` is built: by column tiles ([`bprime_tiled`]) or by row blocks
+/// with a column-tiled in-block finish.  `F4_FP_PAR_FL_MODE=tiles` or
+/// `=rows` forces one; by default the tiles are used with more than one
+/// thread while `B'` has at most [`FL_TILES_MAX_ENTRIES`] entries (they hold
+/// a second copy of `B'` until it is assembled into rows).  On one thread
+/// the row blocks run: the old serial build, without per-tile overhead.
+fn fl_mode_tiles(entries: usize) -> bool {
+    static MODE: std::sync::OnceLock<u8> = std::sync::OnceLock::new();
+    match *MODE.get_or_init(|| match std::env::var("F4_FP_PAR_FL_MODE").as_deref() {
+        Ok("tiles") => 1,
+        Ok("rows") => 2,
+        _ => 0,
+    }) {
+        1 => true,
+        2 => false,
+        _ => rayon::current_num_threads() > 1 && entries <= FL_TILES_MAX_ENTRIES,
+    }
+}
+
+/// Most entries of `B'` (4 bytes each) built by column tiles by default.
+const FL_TILES_MAX_ENTRIES: usize = 1 << 26;
+
+/// In-block multiply-adds a `B'` row block needs before its finish is
+/// split into column tiles over threads (`F4_FP_PAR_FL_INBLOCK`).
+fn fl_inblock_par_work() -> usize {
+    static C: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    par_env(&C, "F4_FP_PAR_FL_INBLOCK", 1 << 16)
+}
+
+/// `F4_FP_PAR_PROF=1`: count the row operations of every reduction section
+/// by how it ran (spread over threads or on one thread) and print the
+/// tallies of each F4 run to stderr.  A diagnostic: it changes no result.
+fn par_prof() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_PAR_PROF").as_deref() == Ok("1"))
+}
+
+const PP_N: usize = 40;
+static PAR_PROF: [AtomicU64; PP_N] = [const { AtomicU64::new(0) }; PP_N];
+const PP_NAMES: [&str; PP_N] = [
+    "sym_seq_steps",     // 0
+    "sym_par_steps",     // 1
+    "sym_rounds",        // 2
+    "sym_rounds_seq",    // 3
+    "sym_frontier_sum",  // 4
+    "sym_seeds_sum",     // 5
+    "flb_old_par_ops",   // 6  against_finished, spread
+    "flb_old_ser_ops",   // 7  against_finished, one thread (small block)
+    "flb_old_inblock",   // 8  in-block finish, one thread
+    "flb_tile_par_ops",  // 9
+    "flb_tile_ser_ops",  // 10
+    "pairs_par_ops",     // 11
+    "pairs_ser_ops",     // 12
+    "casc_par_ops",      // 13
+    "casc_ser_ops",      // 14
+    "def_chunk_par_ops", // 15
+    "def_chunk_ser_ops", // 16
+    "def_store_ops",     // 17 one thread
+    "def_back_par_ops",  // 18
+    "def_back_ser_ops",  // 19
+    "def_chunks",        // 20
+    "fl_steps",          // 21
+    "casc_steps",        // 22
+    "flb_tiles",         // 23
+    "flb_ns",            // 24
+    "pairs_ns",          // 25
+    "casc_ns",           // 26
+    "def_ns",            // 27
+    "def_store_ns",      // 28
+    "sym_ns",            // 29
+    "ir_sym_ns",         // 30
+    "ir_red_ns",         // 31
+    "def_store_checks",  // 32 coefficient reductions in the store pass
+    "flb_par_dispatch",  // 33
+    "def_rows",          // 34
+    "def_rank",          // 35
+    "fl_reducers",       // 36
+    "fl_free_cols_sum",  // 37
+    "pair_rows_sum",     // 38
+    "flb_inblock_par",   // 39 in-block finish, column tiles
+];
+const PP_SYM_SEQ: usize = 0;
+const PP_SYM_PAR: usize = 1;
+const PP_SYM_ROUNDS: usize = 2;
+const PP_SYM_ROUNDS_SEQ: usize = 3;
+const PP_SYM_FRONTIER: usize = 4;
+const PP_SYM_SEEDS: usize = 5;
+const PP_FLB_OLD_PAR: usize = 6;
+const PP_FLB_OLD_SER: usize = 7;
+const PP_FLB_OLD_INBLOCK: usize = 8;
+const PP_FLB_TILE_PAR: usize = 9;
+const PP_FLB_TILE_SER: usize = 10;
+const PP_PAIRS_PAR: usize = 11;
+const PP_PAIRS_SER: usize = 12;
+const PP_CASC_PAR: usize = 13;
+const PP_CASC_SER: usize = 14;
+const PP_DEF_CHUNK_PAR: usize = 15;
+const PP_DEF_CHUNK_SER: usize = 16;
+const PP_DEF_STORE: usize = 17;
+const PP_DEF_BACK_PAR: usize = 18;
+const PP_DEF_BACK_SER: usize = 19;
+const PP_DEF_CHUNKS: usize = 20;
+const PP_FL_STEPS: usize = 21;
+const PP_CASC_STEPS: usize = 22;
+const PP_FLB_TILES: usize = 23;
+const PP_FLB_NS: usize = 24;
+const PP_PAIRS_NS: usize = 25;
+const PP_CASC_NS: usize = 26;
+const PP_DEF_NS: usize = 27;
+const PP_DEF_STORE_NS: usize = 28;
+const PP_SYM_NS: usize = 29;
+const PP_IR_SYM_NS: usize = 30;
+const PP_IR_RED_NS: usize = 31;
+const PP_DEF_STORE_CHECKS: usize = 32;
+const PP_FLB_DISPATCH: usize = 33;
+const PP_DEF_ROWS: usize = 34;
+const PP_DEF_RANK: usize = 35;
+const PP_FL_REDUCERS: usize = 36;
+const PP_FL_FREE: usize = 37;
+const PP_PAIR_ROWS: usize = 38;
+const PP_FLB_INBLOCK_PAR: usize = 39;
+
+#[inline]
+fn pp_add(i: usize, n: u64) {
+    if par_prof() {
+        PAR_PROF[i].fetch_add(n, AtomicOrdering::Relaxed);
+    }
+}
+
+/// The process-wide row-operation counter, for the profile's deltas.
+#[inline]
+fn pp_ops() -> u64 {
+    // Profile deltas call this often; only flush this thread.  Full-pool
+    // drain happens in [`field_ops_now`] for the report total.
+    flush_field_ops_buf();
+    FIELD_OPS.load(AtomicOrdering::Relaxed)
+}
+
+#[inline]
+fn pp_ns(t: Instant) -> u64 {
+    if !par_prof() {
+        return 0;
+    }
+    t.elapsed().as_nanos() as u64
+}
+
+/// Print and clear the profile tallies (only under `F4_FP_PAR_PROF=1`).
+fn pp_dump(label: &str) {
+    if !par_prof() {
+        return;
+    }
+    let mut s = format!("f4par {label} threads={}", rayon::current_num_threads());
+    for (i, name) in PP_NAMES.iter().enumerate() {
+        let v = PAR_PROF[i].swap(0, AtomicOrdering::Relaxed);
+        if v != 0 {
+            s.push_str(&format!(" {name}={v}"));
+        }
+    }
+    eprintln!("{s}");
+}
+
+/// Prints the profile of an F4 run however it returns.
+struct PpGuard;
+impl Drop for PpGuard {
+    fn drop(&mut self) {
+        pp_dump("final");
+    }
+}
 
 /// Subtract `f · pivot` from `row` over the columns `from..`, with
 /// `f = row[col]`.  `p < 2³²`, so `x + (p − f)·y < 2⁶⁴` fits a `u64`
@@ -2189,7 +3453,7 @@ fn rref32(
             return None;
         }
         let found = (pr..rows.len()).find(|&r| rows[r][c] != 0);
-        super::jv_bitops::words(found.map_or(rows.len(), |r| r + 1) as u64 - pr as u64);
+        count_words(found.map_or(rows.len(), |r| r + 1) as u64 - pr as u64);
         let Some(r) = found else {
             continue;
         };
@@ -2351,13 +3615,184 @@ fn normalize_lazy(acc: &mut [u64], fp: Barrett) {
 /// chunk's rows are independent of each other until they are stored, so
 /// their reductions run in parallel; a smaller chunk finds pivots sooner
 /// for the rows after it, a larger one spreads better.
-const DEFERRED_CHUNK: usize = 64;
+/// Rows reduced together against the pivots known before the chunk.
+/// Larger than 64 amortises the deferred schedule on wide NTT free-column
+/// matrices (m=3 t=5 is ~28k rows); override with `F4_FP_DEFERRED_CHUNK`.
+fn deferred_chunk_rows() -> usize {
+    static C: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    *C.get_or_init(|| {
+        std::env::var("F4_FP_DEFERRED_CHUNK")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .filter(|&n| (1..=4096).contains(&n))
+            .unwrap_or(64)
+    })
+}
 
 /// `F4_FP_DEFERRED_PAR=0` runs the deferred elimination row by row on one
 /// thread, as it did before the chunks; a same-binary control.
 fn deferred_parallel() -> bool {
     static PAR: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
     *PAR.get_or_init(|| std::env::var("F4_FP_DEFERRED_PAR").as_deref() != Ok("0"))
+}
+
+/// Exact `f64` SpMM/GEMM trailing updates in deferred RREF
+/// (`p` with [`fp_gemm::supports_f64_gemm`]).  Opt-in (`F4_FP_GEMM=1`):
+/// on NTT free-column cells packing still loses to parallel AVX `add_lazy`
+/// even without strip-splitting; default off.  Same-binary control: `=1`.
+fn f4_fp_gemm_env_on() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_GEMM").as_deref() == Ok("1"))
+}
+
+/// Wide-prime deferred RREF (default on when the prime admits exact `f64`
+/// arithmetic).  `F4_FP_WIDE_DEFERRED=0` forces classical [`rref`].
+fn wide_deferred_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_WIDE_DEFERRED").as_deref() != Ok("0"))
+}
+
+/// Whether a deferred chunk should use blocked exact-`f64` GEMM against
+/// `known`: enough pivots and trailing width that packing beats rank-1
+/// `add_lazy`, and the prime admits exact `f64` accumulation.
+fn deferred_gemm_worthwhile(p: u64, n_rows: usize, n_cols: usize, n_pivots: usize) -> bool {
+    // Prefer SpMM/GEMM only when the panel is large enough that packing
+    // beats parallel AVX `add_lazy` (smaller panels regress on NTT cells).
+    f4_fp_gemm_env_on()
+        && super::fp_gemm::supports_f64_gemm(p)
+        && n_pivots >= 32
+        && n_cols >= 256
+        && n_rows >= 16
+        && n_rows.saturating_mul(n_pivots).saturating_mul(n_cols) >= (1 << 20)
+}
+
+/// Reduce every row of `sources` by the pivots `known` with blocked exact
+/// `f64` SpMM/GEMM trailing updates.  Panels of at most `min(64, k_safe_f64(p))`
+/// pivots: multipliers are formed by the same left-looking triangular rule
+/// as [`reduce_lazy_by`], then adaptive [`fp_gemm::spmm_or_gemm_f64`] writes
+/// the trailing submatrix (sparse `A` avoids zero-factor flops).  Returns
+/// fully-reduced accumulators (`pending = 0`); counted ops match the
+/// nonzero-factor `add_lazy` total (`n − c` per factor).
+fn reduce_chunk_by_known_gemm(
+    sources: &[Vec<u32>],
+    known: &[(usize, Vec<u32>)],
+    fp: Barrett,
+) -> Vec<(Vec<u64>, usize)> {
+    use super::fp_gemm::{
+        detect_gemm_simd, k_safe_f64, reduce_f64_slice_mod_p, spmm_or_gemm_f64,
+    };
+    let m = sources.len();
+    let n = sources[0].len();
+    let p = fp.p;
+    let bm = ((1u128 << 64) / u128::from(p)) as u64;
+    let simd = detect_gemm_simd();
+    let k_cap = k_safe_f64(p).min(64).max(1);
+    let mut accs: Vec<Vec<u64>> = sources
+        .iter()
+        .map(|s| s.iter().copied().map(u64::from).collect())
+        .collect();
+    let mut a_dense_buf = Vec::new();
+    let mut b_pack_buf = Vec::new();
+    let mut panel_start = 0usize;
+    while panel_start < known.len() {
+        let k = (known.len() - panel_start).min(k_cap);
+        let panel = &known[panel_start..panel_start + k];
+        let c_min = panel[0].0;
+        let w = n - c_min;
+        if w == 0 {
+            panel_start += k;
+            continue;
+        }
+        let mut a_rows: Vec<Vec<(u32, f64)>> = vec![Vec::new(); m];
+        let mut ops = 0usize;
+        for (i, acc) in accs.iter().enumerate() {
+            let mut ell = vec![0u64; k];
+            for j in 0..k {
+                let cj = panel[j].0;
+                let mut v = u128::from(acc[cj]);
+                for jprev in 0..j {
+                    let f = ell[jprev];
+                    if f != 0 {
+                        v += u128::from(p - f) * u128::from(panel[jprev].1[cj]);
+                    }
+                }
+                let f = (v % u128::from(p)) as u64;
+                ell[j] = f;
+                if f != 0 {
+                    a_rows[i].push((j as u32, (p - f) as f64));
+                    ops += n - cj;
+                }
+            }
+        }
+        count_ops(ops);
+        let mut b = vec![0f64; k * w];
+        for j in 0..k {
+            let prow = &panel[j].1;
+            for t in 0..w {
+                b[j * w + t] = f64::from(prow[c_min + t]);
+            }
+        }
+        let mut c = vec![0f64; m * w];
+        for (i, acc) in accs.iter().enumerate() {
+            for t in 0..w {
+                c[i * w + t] = acc[c_min + t] as f64;
+            }
+        }
+        spmm_or_gemm_f64(
+            simd,
+            m,
+            w,
+            k,
+            &a_rows,
+            &b,
+            w,
+            &mut c,
+            w,
+            &mut a_dense_buf,
+            &mut b_pack_buf,
+        );
+        for i in 0..m {
+            reduce_f64_slice_mod_p(&mut c[i * w..(i + 1) * w], p, bm);
+        }
+        for (i, acc) in accs.iter_mut().enumerate() {
+            for t in 0..w {
+                acc[c_min + t] = c[i * w + t] as u64;
+            }
+        }
+        panel_start += k;
+    }
+    accs.into_iter().map(|a| (a, 0usize)).collect()
+}
+
+/// GEMM on the full chunk (do not strip-parallelize): B-panel packing is the
+/// dominant cost, so one pack over `m = chunk` rows beats many small packs.
+fn reduce_chunk_by_known_gemm_par(
+    sources: &[Vec<u32>],
+    known: &[(usize, Vec<u32>)],
+    fp: Barrett,
+    _spread: bool,
+) -> Vec<(Vec<u64>, usize)> {
+    reduce_chunk_by_known_gemm(sources, known, fp)
+}
+
+/// How many unnormalised `add_lazy` updates may land on one accumulator
+/// before a full [`normalize_lazy`].  Bounded by the exact `u64` product
+/// limit for `p`, clamped to `[256, 4096]` (NTT primes have ~3×10⁷
+/// headroom; a higher cap was measured and did not beat 4096 on
+/// m=3 t=5).  Override with `F4_FP_NORMALIZE_AFTER`.
+#[inline]
+fn normalize_after_for(p: u64) -> usize {
+    static OVERRIDE: std::sync::OnceLock<Option<usize>> = std::sync::OnceLock::new();
+    if let Some(n) = *OVERRIDE.get_or_init(|| {
+        std::env::var("F4_FP_NORMALIZE_AFTER")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .filter(|&n| (1..=(1 << 24)).contains(&n))
+    }) {
+        return n;
+    }
+    let lim = ((u64::MAX - p) / (p - 1).saturating_mul(p - 1).max(1)) as usize;
+    lim.clamp(256, 4096)
 }
 
 /// Reduce `acc` (64-bit lazy accumulators of one row) by `known`, in
@@ -2372,16 +3807,136 @@ fn reduce_lazy_by(
     simd: u8,
     pending: &mut usize,
 ) {
-    const NORMALIZE_AFTER: usize = 256;
+    if mem_site(0) {
+        return reduce_lazy_by_fused(acc, known, fp, simd, pending);
+    }
+    let normalize_after = normalize_after_for(fp.p);
     for (c, pivot) in known {
         let f = fp.reduce(acc[*c]);
         if f != 0 {
             add_lazy(acc, pivot, *c, fp.p - f, simd);
             *pending += 1;
-            if *pending == NORMALIZE_AFTER {
+            if *pending == normalize_after {
                 normalize_lazy(acc, fp);
                 *pending = 0;
             }
+        }
+    }
+}
+
+/// Rows per pivot-outer panel in deferred chunk reduce.  Default **off**
+/// (`0`): on NTT m=3 t=5 with MEM fused, per-row rayon + fused beats
+/// panels.  Opt in with `F4_FP_DEFERRED_PANEL=8` (or 2..64) for hosts
+/// where pivot reuse wins without MEM.
+fn deferred_panel_rows() -> usize {
+    static C: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    *C.get_or_init(|| {
+        std::env::var("F4_FP_DEFERRED_PANEL")
+            .ok()
+            .and_then(|v| {
+                if v == "0" {
+                    Some(0)
+                } else {
+                    v.parse().ok()
+                }
+            })
+            .filter(|&n| n == 0 || (2..=64).contains(&n))
+            .unwrap_or(0)
+    })
+}
+
+/// Pivot-outer reduction of a small panel of source rows by `known`: each
+/// pivot stays hot while every residual in the panel is updated (exact
+/// same products and counted ops as per-row [`reduce_lazy_by`]).
+fn reduce_panel_by_known(
+    sources: &[Vec<u32>],
+    known: &[(usize, Vec<u32>)],
+    fp: Barrett,
+    simd: u8,
+) -> Vec<(Vec<u64>, usize)> {
+    let normalize_after = normalize_after_for(fp.p);
+    let mut accs: Vec<Vec<u64>> = sources
+        .iter()
+        .map(|s| s.iter().copied().map(u64::from).collect())
+        .collect();
+    let mut pendings = vec![0usize; sources.len()];
+    // Prefer fused multi-pivot when MEM site A is on: each row keeps its
+    // own MemGroup, flushed when full — pivots are still re-read per row
+    // inside a flush, but the outer walk shares the pivot pointer.
+    if mem_site(0) {
+        for (acc, pending) in accs.iter_mut().zip(pendings.iter_mut()) {
+            reduce_lazy_by_fused(acc, known, fp, simd, pending);
+        }
+        return accs.into_iter().zip(pendings).collect();
+    }
+    for (c, pivot) in known {
+        let c = *c;
+        for (acc, pending) in accs.iter_mut().zip(pendings.iter_mut()) {
+            let v = acc[c];
+            let f = if v == 0 {
+                0
+            } else if v < fp.p {
+                v
+            } else {
+                fp.reduce(v)
+            };
+            if f != 0 {
+                add_lazy(acc, pivot, c, fp.p - f, simd);
+                *pending += 1;
+                if *pending >= normalize_after {
+                    normalize_lazy(acc, fp);
+                    *pending = 0;
+                }
+            }
+        }
+    }
+    accs.into_iter().zip(pendings).collect()
+}
+
+/// Reduce every row of `chunk` by `known`, optionally as pivot-outer panels
+/// in parallel (`deferred_panel_rows`), else per-row fused/lazy.
+fn reduce_chunk_by_known(
+    chunk: &[Vec<u32>],
+    known: &[(usize, Vec<u32>)],
+    fp: Barrett,
+    simd: u8,
+    spread: bool,
+) -> Vec<(Vec<u64>, usize)> {
+    let panel = deferred_panel_rows();
+    if panel >= 2 && chunk.len() >= panel && !mem_site(0) {
+        // Pivot-outer panels (MEM off): better pivot reuse than per-row.
+        let reduce_panel = |rows: &[Vec<u32>]| reduce_panel_by_known(rows, known, fp, simd);
+        if spread {
+            chunk
+                .par_chunks(panel)
+                .flat_map_iter(reduce_panel)
+                .collect()
+        } else {
+            chunk.chunks(panel).flat_map(reduce_panel).collect()
+        }
+    } else if panel >= 2 && chunk.len() >= 2 && mem_site(0) {
+        // MEM on: still shard into panels so rayon tasks are larger than
+        // one row (less scheduling overhead) while each row uses fused.
+        let reduce_panel = |rows: &[Vec<u32>]| reduce_panel_by_known(rows, known, fp, simd);
+        if spread {
+            chunk
+                .par_chunks(panel)
+                .flat_map_iter(reduce_panel)
+                .collect()
+        } else {
+            chunk.chunks(panel).flat_map(reduce_panel).collect()
+        }
+    } else {
+        let reduce_one = |source: &Vec<u32>| -> (Vec<u64>, usize) {
+            let mut acc: Vec<u64> = source.iter().copied().map(u64::from).collect();
+            let mut pending = 0usize;
+            reduce_lazy_by(&mut acc, &known, fp, simd, &mut pending);
+            (acc, pending)
+        };
+        if spread {
+            chunk.par_iter().map(reduce_one).collect()
+        } else {
+            chunk.iter().map(reduce_one).collect()
         }
     }
 }
@@ -2391,7 +3946,7 @@ fn reduce_lazy_by(
 /// coefficient and the row when it is stored.  A bounded normalization
 /// keeps even the largest supported prime far below `u64` overflow.
 ///
-/// Rows are taken in chunks of [`DEFERRED_CHUNK`]: every row of a chunk is
+/// Rows are taken in chunks of [`deferred_chunk_rows`]: every row of a chunk is
 /// reduced in parallel against the pivots known before the chunk, then the
 /// rows are stored one at a time, each first reduced again against the
 /// whole pivot list so the pivots its chunk-mates contributed (and any
@@ -2408,36 +3963,464 @@ fn rref32_deferred(
     fp: Barrett,
     deadline: Option<Instant>,
 ) -> Option<Vec<usize>> {
+    if let Some(every) = narrow_acc_interval(fp.p) {
+        return rref32_deferred_n32(rows, fp32, fp, deadline, every);
+    }
+    let _timer = MemTimer::new(1);
     let simd = lazy_simd_kind();
     let parallel = deferred_parallel();
     let mut known: Vec<(usize, Vec<u32>)> = Vec::new();
     let sources = std::mem::take(rows);
-    let chunk_rows = if parallel { DEFERRED_CHUNK } else { 1 };
+    let chunk_rows = if parallel { deferred_chunk_rows() } else { 1 };
+    let _def_ns = PpNs(PP_DEF_NS, Instant::now());
+    pp_add(PP_DEF_ROWS, sources.len() as u64);
     for chunk in sources.chunks(chunk_rows) {
+        pp_add(PP_DEF_CHUNKS, 1);
         if deadline.is_some_and(|d| Instant::now() > d) {
             return None;
         }
         let n_cols = chunk[0].len();
-        let reduce_one = |source: &Vec<u32>| -> (Vec<u64>, usize) {
-            let mut acc: Vec<u64> = source.iter().copied().map(u64::from).collect();
+        let o0 = pp_ops();
+        let spread = chunk.len() > 1 && chunk.len() * known.len().max(1) * n_cols > PAR_WORK;
+        let mut reduced: Vec<(Vec<u64>, usize)> = if deferred_gemm_worthwhile(
+            fp.p,
+            chunk.len(),
+            n_cols,
+            known.len(),
+        ) {
+            reduce_chunk_by_known_gemm_par(chunk, &known, fp, spread)
+        } else {
+            reduce_chunk_by_known(chunk, &known, fp, simd, spread)
+        };
+        let o1 = pp_ops();
+        pp_add(
+            if spread {
+                PP_DEF_CHUNK_PAR
+            } else {
+                PP_DEF_CHUNK_SER
+            },
+            o1 - o0,
+        );
+        let t_store = Instant::now();
+        // Same as `rref_u32_barrett_deferred`: only re-reduce by this
+        // chunk's new pivots (pre-chunk columns are already clear).
+        let mut chunk_pivots: Vec<(usize, Vec<u32>)> = Vec::new();
+        for (acc, pending) in reduced.iter_mut() {
+            if !chunk_pivots.is_empty() {
+                pp_add(PP_DEF_STORE_CHECKS, chunk_pivots.len() as u64);
+                reduce_lazy_by(acc, &chunk_pivots, fp, simd, pending);
+            }
+            let mut row: Vec<u32> = acc.iter().map(|&v| fp.reduce(v) as u32).collect();
+            let Some(c) = row.iter().position(|&v| v != 0) else {
+                continue;
+            };
+            let inv = invmod(u64::from(row[c]), fp.p) as u32;
+            for x in &mut row[c..] {
+                *x = fp32.reduce(*x * inv);
+            }
+            count_ops(row.len() - c);
+            count_norm(row.len() - c);
+            let at_chunk = chunk_pivots.partition_point(|(pc, _)| *pc < c);
+            chunk_pivots.insert(at_chunk, (c, row));
+        }
+        if !chunk_pivots.is_empty() {
+            let cap = known.len() + chunk_pivots.len();
+            let mut old = std::mem::take(&mut known).into_iter().peekable();
+            let mut add = chunk_pivots.into_iter().peekable();
+            let mut merged = Vec::with_capacity(cap);
+            loop {
+                match (old.peek(), add.peek()) {
+                    (Some(a), Some(b)) if a.0 <= b.0 => {
+                        merged.push(old.next().unwrap());
+                    }
+                    (Some(_), Some(_)) => merged.push(add.next().unwrap()),
+                    (Some(_), None) => {
+                        merged.extend(old);
+                        break;
+                    }
+                    (None, Some(_)) => {
+                        merged.extend(add);
+                        break;
+                    }
+                    (None, None) => break,
+                }
+            }
+            known = merged;
+        }
+        pp_add(PP_DEF_STORE, pp_ops() - o1);
+        pp_add(PP_DEF_STORE_NS, pp_ns(t_store));
+    }
+    pp_add(PP_DEF_RANK, known.len() as u64);
+    if deadline.is_some_and(|d| Instant::now() > d) {
+        return None;
+    }
+    let n_cols = known.first().map_or(0, |(_, r)| r.len());
+    let back = |i: usize| -> Vec<u32> {
+        let (_, row) = &known[i];
+        let mut acc: Vec<u64> = row.iter().copied().map(u64::from).collect();
+        let mut pending = 0usize;
+        reduce_lazy_by(&mut acc, &known[i + 1..], fp, simd, &mut pending);
+        acc.into_iter().map(|v| fp.reduce(v) as u32).collect()
+    };
+    let o0 = pp_ops();
+    let spread = parallel && known.len() * n_cols > PAR_WORK;
+    let reduced: Vec<Vec<u32>> = if spread {
+        (0..known.len()).into_par_iter().map(back).collect()
+    } else {
+        (0..known.len()).map(back).collect()
+    };
+    pp_add(
+        if spread {
+            PP_DEF_BACK_PAR
+        } else {
+            PP_DEF_BACK_SER
+        },
+        pp_ops() - o0,
+    );
+    let pivots = known.iter().map(|(c, _)| *c).collect();
+    *rows = reduced;
+    Some(pivots)
+}
+
+/// Deferred RREF for residues stored as `u32` with a general [`Barrett`]
+/// prime (`p < 2^32`, including NTT primes above `2^16` where
+/// [`Barrett32`] refuses).  Same schedule as [`rref32_deferred`]'s 64-bit
+/// accumulator path, including exact-`f64` GEMM trailing updates.
+fn rref_u32_barrett_deferred(
+    rows: &mut Vec<Vec<u32>>,
+    fp: Barrett,
+    deadline: Option<Instant>,
+) -> Option<Vec<usize>> {
+    debug_assert!(fp.p < (1 << 32));
+    let _timer = MemTimer::new(1);
+    let simd = lazy_simd_kind();
+    let parallel = deferred_parallel();
+    let mut known: Vec<(usize, Vec<u32>)> = Vec::new();
+    let sources = std::mem::take(rows);
+    let chunk_rows = if parallel { deferred_chunk_rows() } else { 1 };
+    let _def_ns = PpNs(PP_DEF_NS, Instant::now());
+    pp_add(PP_DEF_ROWS, sources.len() as u64);
+    for chunk in sources.chunks(chunk_rows) {
+        pp_add(PP_DEF_CHUNKS, 1);
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
+        let n_cols = chunk[0].len();
+        let o0 = pp_ops();
+        let spread = chunk.len() > 1 && chunk.len() * known.len().max(1) * n_cols > PAR_WORK;
+        let mut reduced: Vec<(Vec<u64>, usize)> = if deferred_gemm_worthwhile(
+            fp.p,
+            chunk.len(),
+            n_cols,
+            known.len(),
+        ) {
+            reduce_chunk_by_known_gemm_par(chunk, &known, fp, spread)
+        } else {
+            reduce_chunk_by_known(chunk, &known, fp, simd, spread)
+        };
+        let o1 = pp_ops();
+        pp_add(
+            if spread {
+                PP_DEF_CHUNK_PAR
+            } else {
+                PP_DEF_CHUNK_SER
+            },
+            o1 - o0,
+        );
+        let t_store = Instant::now();
+        // Residuals are already cleared against pre-chunk `known`, and each
+        // new pivot inherits that (zeros on those columns).  Re-walking the
+        // whole pivot list on every store only re-checks zeros — keep a
+        // column-ordered list of *this chunk's* new pivots and reduce by
+        // those alone, then merge into `known` once.
+        let mut chunk_pivots: Vec<(usize, Vec<u32>)> = Vec::new();
+        for (acc, pending) in reduced.iter_mut() {
+            if !chunk_pivots.is_empty() {
+                pp_add(PP_DEF_STORE_CHECKS, chunk_pivots.len() as u64);
+                reduce_lazy_by(acc, &chunk_pivots, fp, simd, pending);
+            }
+            let mut row: Vec<u32> = acc.iter().map(|&v| fp.reduce(v) as u32).collect();
+            let Some(c) = row.iter().position(|&v| v != 0) else {
+                continue;
+            };
+            let inv = invmod(u64::from(row[c]), fp.p);
+            for x in &mut row[c..] {
+                *x = fp.reduce(u64::from(*x) * inv) as u32;
+            }
+            count_ops(row.len() - c);
+            count_norm(row.len() - c);
+            let at_chunk = chunk_pivots.partition_point(|(pc, _)| *pc < c);
+            chunk_pivots.insert(at_chunk, (c, row));
+        }
+        if !chunk_pivots.is_empty() {
+            // Both sides column-ordered: linear merge beats k·n inserts.
+            let cap = known.len() + chunk_pivots.len();
+            let mut old = std::mem::take(&mut known).into_iter().peekable();
+            let mut add = chunk_pivots.into_iter().peekable();
+            let mut merged = Vec::with_capacity(cap);
+            loop {
+                match (old.peek(), add.peek()) {
+                    (Some(a), Some(b)) if a.0 <= b.0 => {
+                        merged.push(old.next().unwrap());
+                    }
+                    (Some(_), Some(_)) => merged.push(add.next().unwrap()),
+                    (Some(_), None) => {
+                        merged.extend(old);
+                        break;
+                    }
+                    (None, Some(_)) => {
+                        merged.extend(add);
+                        break;
+                    }
+                    (None, None) => break,
+                }
+            }
+            known = merged;
+        }
+        pp_add(PP_DEF_STORE, pp_ops() - o1);
+        pp_add(PP_DEF_STORE_NS, pp_ns(t_store));
+    }
+    pp_add(PP_DEF_RANK, known.len() as u64);
+    if deadline.is_some_and(|d| Instant::now() > d) {
+        return None;
+    }
+    let n_cols = known.first().map_or(0, |(_, r)| r.len());
+    let back = |i: usize| -> Vec<u32> {
+        let (_, row) = &known[i];
+        let mut acc: Vec<u64> = row.iter().copied().map(u64::from).collect();
+        let mut pending = 0usize;
+        reduce_lazy_by(&mut acc, &known[i + 1..], fp, simd, &mut pending);
+        acc.into_iter().map(|v| fp.reduce(v) as u32).collect()
+    };
+    // Prefer GEMM panels for back-substitution when the trailing width and
+    // pivot count amortise packing; otherwise the parallel lazy path.
+    let o0 = pp_ops();
+    let reduced: Vec<Vec<u32>> = if deferred_gemm_worthwhile(fp.p, known.len(), n_cols, known.len())
+        && known.len() >= 2
+    {
+        // One GEMM-style reduce of each pivot row by the later pivots:
+        // build sources = known rows, then for i reduce by known[i+1..].
+        // Fall back to per-row lazy when the triangular structure makes a
+        // single packed call awkward — still use GEMM per row panel via
+        // reduce_chunk against the suffix.
+        (0..known.len())
+            .into_par_iter()
+            .map(|i| {
+                let src = known[i].1.clone();
+                let suffix = &known[i + 1..];
+                if deferred_gemm_worthwhile(fp.p, 1, n_cols, suffix.len()) {
+                    let mut out = reduce_chunk_by_known_gemm(&[src], suffix, fp);
+                    let (acc, _) = out.pop().unwrap();
+                    acc.into_iter().map(|v| fp.reduce(v) as u32).collect()
+                } else {
+                    back(i)
+                }
+            })
+            .collect()
+    } else {
+        let spread = parallel && known.len() * n_cols > PAR_WORK;
+        if spread {
+            (0..known.len()).into_par_iter().map(back).collect()
+        } else {
+            (0..known.len()).map(back).collect()
+        }
+    };
+    pp_add(PP_DEF_BACK_PAR, pp_ops() - o0);
+    let pivots = known.iter().map(|(c, _)| *c).collect();
+    *rows = reduced;
+    Some(pivots)
+}
+
+/// For small primes the deferred elimination keeps its accumulators in
+/// 32-bit lanes: `Some(k)` when `(p - 1) + k (p - 1)^2 < 2^32` with
+/// `k >= 256`, i.e. `p <= 4097`, normalising every `k` updates (none at all
+/// on rows shorter than that).  Each value stays exact over the integers,
+/// so the reduced echelon form, and every counted operation, is the one the
+/// 64-bit accumulators give.  `F4_FP_NARROW_ACC=0` keeps the 64-bit path
+/// (also kept under `F4_FP_MEM=1`, whose fused kernel is 64-bit).
+fn narrow_acc_enabled() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_NARROW_ACC").as_deref() != Ok("0"))
+}
+
+fn narrow_acc_interval(p: u64) -> Option<usize> {
+    if !narrow_acc_enabled() || mem_site(0) {
+        return None;
+    }
+    narrow_acc_interval_for(p)
+}
+
+/// The interval of [`narrow_acc_interval`] for `p`, ignoring the toggles.
+fn narrow_acc_interval_for(p: u64) -> Option<usize> {
+    if !(2..=1 << 16).contains(&p) {
+        return None;
+    }
+    let q = (p - 1) * (p - 1);
+    let k = (u64::from(u32::MAX) - (p - 1)) / q.max(1);
+    (k >= 256).then_some(k as usize)
+}
+
+#[inline(always)]
+fn add_lazy32_scalar(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32) {
+    for (x, &y) in acc[from..].iter_mut().zip(&pivot[from..]) {
+        *x += factor * y;
+    }
+}
+
+/// Eight 32-bit products accumulated in 32-bit lanes; the caller's
+/// normalisation interval keeps every lane below 2^32.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn add_lazy32_avx2(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32) {
+    use std::arch::x86_64::{
+        __m256i, _mm256_add_epi32, _mm256_loadu_si256, _mm256_mullo_epi32, _mm256_set1_epi32,
+        _mm256_storeu_si256,
+    };
+    let (acc, pivot) = (&mut acc[from..], &pivot[from..]);
+    let multiplier = _mm256_set1_epi32(factor as i32);
+    let mut i = 0;
+    while i + 8 <= acc.len() {
+        // SAFETY: the bounds cover eight entries of both slices; the loads
+        // and the store accept unaligned pointers.
+        let values = unsafe { _mm256_loadu_si256(pivot.as_ptr().add(i) as *const __m256i) };
+        let current = unsafe { _mm256_loadu_si256(acc.as_ptr().add(i) as *const __m256i) };
+        let updated = _mm256_add_epi32(current, _mm256_mullo_epi32(values, multiplier));
+        unsafe { _mm256_storeu_si256(acc.as_mut_ptr().add(i) as *mut __m256i, updated) };
+        i += 8;
+    }
+    for (x, &y) in acc[i..].iter_mut().zip(&pivot[i..]) {
+        *x += factor * y;
+    }
+}
+
+/// Sixteen 32-bit products accumulated in 32-bit lanes.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx512f")]
+unsafe fn add_lazy32_avx512(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32) {
+    use std::arch::x86_64::{
+        __m512i, _mm512_add_epi32, _mm512_loadu_si512, _mm512_mullo_epi32, _mm512_set1_epi32,
+        _mm512_storeu_si512,
+    };
+    let (acc, pivot) = (&mut acc[from..], &pivot[from..]);
+    let multiplier = _mm512_set1_epi32(factor as i32);
+    let mut i = 0;
+    while i + 16 <= acc.len() {
+        // SAFETY: as in `add_lazy32_avx2`, for sixteen entries.
+        let values = unsafe { _mm512_loadu_si512(pivot.as_ptr().add(i) as *const __m512i) };
+        let current = unsafe { _mm512_loadu_si512(acc.as_ptr().add(i) as *const __m512i) };
+        let updated = _mm512_add_epi32(current, _mm512_mullo_epi32(values, multiplier));
+        unsafe { _mm512_storeu_si512(acc.as_mut_ptr().add(i) as *mut __m512i, updated) };
+        i += 16;
+    }
+    for (x, &y) in acc[i..].iter_mut().zip(&pivot[i..]) {
+        *x += factor * y;
+    }
+}
+
+/// [`add_lazy`] in 32-bit lanes, counted the same way.
+#[inline]
+fn add_lazy32(acc: &mut [u32], pivot: &[u32], from: usize, factor: u32, simd: u8) {
+    debug_assert_eq!(acc.len(), pivot.len());
+    #[cfg(target_arch = "x86_64")]
+    if simd == 0 {
+        add_lazy32_scalar(acc, pivot, from, factor);
+    } else if simd == 2 {
+        // SAFETY: `lazy_simd_kind` verified AVX-512F and AVX2.
+        unsafe { add_lazy32_avx512(acc, pivot, from, factor) };
+    } else {
+        // SAFETY: `lazy_simd_kind` verified AVX2 before this call.
+        unsafe { add_lazy32_avx2(acc, pivot, from, factor) };
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        let _ = simd;
+        add_lazy32_scalar(acc, pivot, from, factor);
+    }
+    count_ops(acc.len() - from);
+}
+
+/// [`reduce_lazy_by`] in 32-bit lanes, normalising every `every` updates.
+#[inline]
+fn reduce_lazy_by32(
+    acc: &mut [u32],
+    known: &[(usize, Vec<u32>)],
+    fp32: Barrett32,
+    simd: u8,
+    pending: &mut usize,
+    every: usize,
+) {
+    for (c, pivot) in known {
+        let f = fp32.reduce(acc[*c]);
+        if f != 0 {
+            add_lazy32(acc, pivot, *c, fp32.p - f, simd);
+            *pending += 1;
+            if *pending == every {
+                for x in acc.iter_mut() {
+                    *x = fp32.reduce(*x);
+                }
+                *pending = 0;
+            }
+        }
+    }
+}
+
+/// [`rref32_deferred`] with 32-bit accumulators ([`narrow_acc_interval`]):
+/// the same chunks, order, pivots and counted operations; no widening of
+/// the rows and no 64-bit reduction when they are stored.
+fn rref32_deferred_n32(
+    rows: &mut Vec<Vec<u32>>,
+    fp32: Barrett32,
+    fp: Barrett,
+    deadline: Option<Instant>,
+    every: usize,
+) -> Option<Vec<usize>> {
+    let _timer = MemTimer::new(1);
+    let simd = lazy_simd_kind();
+    let parallel = deferred_parallel();
+    let mut known: Vec<(usize, Vec<u32>)> = Vec::new();
+    let sources = std::mem::take(rows);
+    let chunk_rows = if parallel { deferred_chunk_rows() } else { 1 };
+    let _def_ns = PpNs(PP_DEF_NS, Instant::now());
+    pp_add(PP_DEF_ROWS, sources.len() as u64);
+    for chunk in sources.chunks(chunk_rows) {
+        pp_add(PP_DEF_CHUNKS, 1);
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
+        let n_cols = chunk[0].len();
+        let reduce_one = |source: &Vec<u32>| -> (Vec<u32>, usize) {
+            let mut acc = source.clone();
             let mut pending = 0usize;
-            reduce_lazy_by(&mut acc, &known, fp, simd, &mut pending);
+            reduce_lazy_by32(&mut acc, &known, fp32, simd, &mut pending, every);
             (acc, pending)
         };
-        let mut reduced: Vec<(Vec<u64>, usize)> =
-            if chunk.len() > 1 && chunk.len() * known.len().max(1) * n_cols > PAR_WORK {
-                chunk.par_iter().map(reduce_one).collect()
+        let o0 = pp_ops();
+        let spread = chunk.len() > 1 && chunk.len() * known.len().max(1) * n_cols > PAR_WORK;
+        let mut reduced: Vec<(Vec<u32>, usize)> = if spread {
+            chunk.par_iter().map(reduce_one).collect()
+        } else {
+            chunk.iter().map(reduce_one).collect()
+        };
+        let o1 = pp_ops();
+        pp_add(
+            if spread {
+                PP_DEF_CHUNK_PAR
             } else {
-                chunk.iter().map(reduce_one).collect()
-            };
+                PP_DEF_CHUNK_SER
+            },
+            o1 - o0,
+        );
+        let t_store = Instant::now();
         let known_before = known.len();
         for (acc, pending) in reduced.iter_mut() {
             if known.len() > known_before {
-                // chunk-mates became pivots: clear them, and whatever
-                // earlier pivot columns they re-dirtied
-                reduce_lazy_by(acc, &known, fp, simd, pending);
+                pp_add(PP_DEF_STORE_CHECKS, known.len() as u64);
+                reduce_lazy_by32(acc, &known, fp32, simd, pending, every);
             }
-            let mut row: Vec<u32> = acc.iter().map(|&v| fp.reduce(v) as u32).collect();
+            let mut row = std::mem::take(acc);
+            for x in row.iter_mut() {
+                *x = fp32.reduce(*x);
+            }
             let Some(c) = row.iter().position(|&v| v != 0) else {
                 continue;
             };
@@ -2450,23 +4433,39 @@ fn rref32_deferred(
             let at = known.partition_point(|(pc, _)| *pc < c);
             known.insert(at, (c, row));
         }
+        pp_add(PP_DEF_STORE, pp_ops() - o1);
+        pp_add(PP_DEF_STORE_NS, pp_ns(t_store));
     }
+    pp_add(PP_DEF_RANK, known.len() as u64);
     if deadline.is_some_and(|d| Instant::now() > d) {
         return None;
     }
     let n_cols = known.first().map_or(0, |(_, r)| r.len());
     let back = |i: usize| -> Vec<u32> {
         let (_, row) = &known[i];
-        let mut acc: Vec<u64> = row.iter().copied().map(u64::from).collect();
+        let mut acc = row.clone();
         let mut pending = 0usize;
-        reduce_lazy_by(&mut acc, &known[i + 1..], fp, simd, &mut pending);
-        acc.into_iter().map(|v| fp.reduce(v) as u32).collect()
+        reduce_lazy_by32(&mut acc, &known[i + 1..], fp32, simd, &mut pending, every);
+        for x in acc.iter_mut() {
+            *x = fp32.reduce(*x);
+        }
+        acc
     };
-    let reduced: Vec<Vec<u32>> = if parallel && known.len() * n_cols > PAR_WORK {
+    let o0 = pp_ops();
+    let spread = parallel && known.len() * n_cols > PAR_WORK;
+    let reduced: Vec<Vec<u32>> = if spread {
         (0..known.len()).into_par_iter().map(back).collect()
     } else {
         (0..known.len()).map(back).collect()
     };
+    pp_add(
+        if spread {
+            PP_DEF_BACK_PAR
+        } else {
+            PP_DEF_BACK_SER
+        },
+        pp_ops() - o0,
+    );
     let pivots = known.iter().map(|(c, _)| *c).collect();
     *rows = reduced;
     Some(pivots)
@@ -2482,6 +4481,18 @@ const FL_BLOCK: usize = 64;
 
 /// Columns a step needs before the Faugère–Lachartre form is used.
 const FL_MIN_COLS: usize = 256;
+
+/// [`FL_MIN_COLS`], or `F4_FP_FL_MIN_COLS` when set: a measurement knob for
+/// the size at which the Faugère–Lachartre form replaces the cascade.
+fn fl_min_cols() -> usize {
+    static C: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    *C.get_or_init(|| {
+        std::env::var("F4_FP_FL_MIN_COLS")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(FL_MIN_COLS)
+    })
+}
 
 /// `F4_FP_FL=0` keeps the per-pair-row reducer cascade; a same-binary
 /// control for the Faugère–Lachartre form.
@@ -2504,10 +4515,27 @@ fn reduce_pairs_fl(
     fp: Barrett,
     deadline: Option<Instant>,
 ) -> Option<Vec<Vec<u32>>> {
+    let _timer = MemTimer::new(0);
+    // Integration of the f4-memory and f4-parallel leads: under
+    // `F4_FP_PAR_OLD=1` the fused `B'` build runs with the old thread
+    // dispatch exactly as the f4-memory lead wrote it; otherwise the new
+    // dispatch below applies the fused updates (`fuse`) at the same places.
+    // The fused updates are opt-in (`F4_FP_MEM=1`, see [`mem_site`]).
+    if mem_site(1) && par_old() {
+        return reduce_pairs_fl_mem(
+            pair_rows, reducers, reducer_at, free_cols, n_cols, fp, deadline,
+        );
+    }
+    let fuse = mem_site(1);
     const NONE: u32 = u32::MAX;
-    const NORMALIZE_AFTER: usize = 256;
+    let normalize_after = normalize_after_for(fp.p);
     let simd = lazy_simd_kind();
     let n_free = free_cols.len();
+    if fuse && mem_stats() {
+        MEM_STATS[9].fetch_max(n_free as u64, AtomicOrdering::Relaxed);
+        MEM_STATS[10].fetch_max(reducers.len() as u64, AtomicOrdering::Relaxed);
+        MEM_STATS[11].fetch_max(pair_rows.len() as u64, AtomicOrdering::Relaxed);
+    }
     let mut free_index = vec![NONE; n_cols];
     for (i, &c) in free_cols.iter().enumerate() {
         free_index[c] = i as u32;
@@ -2529,13 +4557,75 @@ fn reduce_pairs_fl(
     for (pos, &k) in order.iter().enumerate() {
         position[k] = pos;
     }
-    let mut bprime: Vec<Vec<u32>> = vec![Vec::new(); reducers.len()];
+    pp_add(PP_FL_STEPS, 1);
+    pp_add(PP_FL_REDUCERS, reducers.len() as u64);
+    pp_add(PP_FL_FREE, n_free as u64);
+    pp_add(PP_PAIR_ROWS, pair_rows.len() as u64);
+    let t_flb = Instant::now();
+    // `B'` by column tiles, or (large `B'`, `F4_FP_PAR_FL_MODE=rows`) by
+    // the row blocks with the new gates and a column-tiled in-block finish
+    let tiles_mode = !par_old() && fl_mode_tiles(reducers.len().saturating_mul(n_free));
+    let mut bprime: Vec<Vec<u32>> = if !tiles_mode {
+        vec![Vec::new(); reducers.len()]
+    } else {
+        bprime_tiled(
+            reducers,
+            reducer_at,
+            &free_index,
+            &bstart,
+            &order,
+            &position,
+            n_free,
+            fp,
+            deadline,
+            0,
+        )?
+    };
+    // fused path (f4-memory site B): flush a group into `acc`, normalising
+    // first when the group would take the unnormalised updates past the
+    // bound
+    let flush = |g: &mut MemGroup, acc: &mut [u64], pending: &mut usize, st: &mut (u64, u64)| {
+        if *pending + g.n > normalize_after {
+            normalize_lazy(acc, fp);
+            *pending = 0;
+        }
+        *pending += g.n;
+        st.0 += g.flush(acc, 0, n_free, simd);
+        st.1 += 1;
+    };
     // `(acc, pending, in-block dependencies)` of one reducer against the
     // finished blocks
     let against_finished = |k: usize, block_start: usize, bprime: &Vec<Vec<u32>>| {
         let mut acc = vec![0u64; n_free];
         let mut pending = 0usize;
         let mut later: Vec<(usize, u64)> = Vec::new();
+        if fuse {
+            let mut g = MemGroup::new();
+            let (mut ops, mut st) = (0usize, (0u64, 0u64));
+            for &(c, v) in &reducers[k][1..] {
+                let fi = free_index[c as usize];
+                if fi != NONE {
+                    acc[fi as usize] += v;
+                } else {
+                    let j = reducer_at[c as usize] as usize;
+                    if position[j] < block_start {
+                        g.push(&bprime[j], bstart[j], fp.p - v);
+                        ops += n_free - bstart[j];
+                        if g.n == MEM_K {
+                            flush(&mut g, &mut acc, &mut pending, &mut st);
+                        }
+                    } else {
+                        later.push((j, v));
+                    }
+                }
+            }
+            if g.n > 0 {
+                flush(&mut g, &mut acc, &mut pending, &mut st);
+            }
+            count_ops(ops);
+            mem_stat(1, ops as u64, st.0, st.1);
+            return (acc, pending, later);
+        }
         for &(c, v) in &reducers[k][1..] {
             let fi = free_index[c as usize];
             if fi != NONE {
@@ -2545,7 +4635,7 @@ fn reduce_pairs_fl(
                 if position[j] < block_start {
                     add_lazy(&mut acc, &bprime[j], bstart[j], fp.p - v, simd);
                     pending += 1;
-                    if pending == NORMALIZE_AFTER {
+                    if pending == normalize_after {
                         normalize_lazy(&mut acc, fp);
                         pending = 0;
                     }
@@ -2556,40 +4646,145 @@ fn reduce_pairs_fl(
         }
         (acc, pending, later)
     };
-    for block in order.chunks(FL_BLOCK) {
+    let row_blocks: &[usize] = if tiles_mode { &[] } else { &order };
+    let threads = rayon::current_num_threads();
+    for block in row_blocks.chunks(FL_BLOCK) {
         if deadline.is_some_and(|d| Instant::now() > d) {
             return None;
         }
         let block_start = position[block[0]];
         let bp = &bprime;
-        let mut partial: Vec<(Vec<u64>, usize, Vec<(usize, u64)>)> =
-            if block.len() * n_free > PAR_WORK {
-                block
-                    .par_iter()
-                    .map(|&k| against_finished(k, block_start, bp))
-                    .collect()
+        let o0 = pp_ops();
+        // unless `F4_FP_PAR_OLD=1`: spread by the block's update work
+        // (about half a row of `B'` per reducer entry), not its width
+        let spread = if par_old() {
+            block.len() * n_free > PAR_WORK
+        } else {
+            threads > 1
+                && block.len() > 1
+                && block.iter().map(|&k| reducers[k].len()).sum::<usize>() * n_free / 2 > PAR_WORK
+        };
+        let mut partial: Vec<(Vec<u64>, usize, Vec<(usize, u64)>)> = if spread {
+            block
+                .par_iter()
+                .map(|&k| against_finished(k, block_start, bp))
+                .collect()
+        } else {
+            block
+                .iter()
+                .map(|&k| against_finished(k, block_start, bp))
+                .collect()
+        };
+        let o1 = pp_ops();
+        pp_add(
+            if spread {
+                PP_FLB_OLD_PAR
             } else {
-                block
-                    .iter()
-                    .map(|&k| against_finished(k, block_start, bp))
-                    .collect()
-            };
+                PP_FLB_OLD_SER
+            },
+            o1 - o0,
+        );
+        if spread {
+            pp_add(PP_FLB_DISPATCH, 1);
+        }
+        // The in-block finish ran on one thread.  Unless `F4_FP_PAR_OLD=1`,
+        // a block with enough of it finishes by column tiles in parallel
+        // instead: the factors are the reducers' own coefficients, so a
+        // tile of the block's rows needs only the same tile of the rows
+        // before it (see [`bprime_tiled`]).
+        let inblock_work: usize = if par_old() || threads == 1 {
+            0
+        } else {
+            partial
+                .iter()
+                .map(|(_, _, later)| {
+                    later
+                        .iter()
+                        .map(|&(j, _)| n_free - bstart[j])
+                        .sum::<usize>()
+                })
+                .sum()
+        };
+        if inblock_work > fl_inblock_par_work() {
+            let segs = finish_block_tiled(
+                &partial,
+                &bstart,
+                &position,
+                block_start,
+                n_free,
+                fp,
+                simd,
+                threads,
+            );
+            for (bi, &k) in block.iter().enumerate() {
+                let mut row = Vec::with_capacity(n_free);
+                for ((a, b), seg) in &segs {
+                    let w = *b - *a;
+                    row.extend_from_slice(&seg[bi * w..(bi + 1) * w]);
+                }
+                bprime[k] = row;
+            }
+            pp_add(PP_FLB_INBLOCK_PAR, pp_ops() - o1);
+            continue;
+        }
         for (&k, (acc, pending, later)) in block.iter().zip(partial.iter_mut()) {
+            if fuse {
+                let mut g = MemGroup::new();
+                let (mut ops, mut st) = (0usize, (0u64, 0u64));
+                for &(j, v) in later.iter() {
+                    debug_assert!(position[j] < position[k]);
+                    g.push(&bprime[j], bstart[j], fp.p - v);
+                    ops += n_free - bstart[j];
+                    if g.n == MEM_K {
+                        flush(&mut g, acc, pending, &mut st);
+                    }
+                }
+                if g.n > 0 {
+                    flush(&mut g, acc, pending, &mut st);
+                }
+                count_ops(ops);
+                mem_stat(1, ops as u64, st.0, st.1);
+                bprime[k] = acc.iter().map(|&x| fp.reduce(x) as u32).collect();
+                continue;
+            }
             // in-block dependencies are earlier in the block, so finished
             for &(j, v) in later.iter() {
                 debug_assert!(position[j] < position[k]);
                 add_lazy(acc, &bprime[j], bstart[j], fp.p - v, simd);
                 *pending += 1;
-                if *pending == NORMALIZE_AFTER {
+                if *pending == normalize_after {
                     normalize_lazy(acc, fp);
                     *pending = 0;
                 }
             }
             bprime[k] = acc.iter().map(|&x| fp.reduce(x) as u32).collect();
         }
+        pp_add(PP_FLB_OLD_INBLOCK, pp_ops() - o1);
     }
-    if fl_blocked_pairs() {
+    pp_add(PP_FLB_NS, pp_ns(t_flb));
+    let t_pairs = Instant::now();
+    let _pairs_ns = PpNs(PP_PAIRS_NS, t_pairs);
+    // `reduce_pairs_blocked` asserts `p ≤ 2¹⁶` (u64 accumulators without
+    // mid-tile normalisation).  Larger primes that still fit in `u32`
+    // coefficients (`supports_f64_gemm`, including the NTT prime 786433)
+    // take the per-row lazy path below, or the exact-f64 blocked form.
+    if fl_blocked_pairs() && fp.p <= 1 << 16 {
         return reduce_pairs_blocked(
+            pair_rows,
+            &bprime,
+            &bstart,
+            reducer_at,
+            &free_index,
+            n_free,
+            fp,
+            deadline,
+        );
+    }
+    // Wide primes: exact-f64 blocked D−C·B' (default on when the prime
+    // admits it).  Independent of F4_FP_GEMM (that flag is for deferred
+    // RREF panels, which still need packing-cost tuning).
+    if fl_blocked_pairs() && super::fp_gemm::supports_f64_gemm(fp.p) && fp.p > 1 << 16 {
+        return reduce_pairs_blocked_f64(
             pair_rows,
             &bprime,
             &bstart,
@@ -2614,7 +4809,7 @@ fn reduce_pairs_fl(
                 let j = reducer_at[c as usize] as usize;
                 add_lazy(&mut acc, &bprime[j], bstart[j], fp.p - v, simd);
                 pending += 1;
-                if pending == NORMALIZE_AFTER {
+                if pending == normalize_after {
                     normalize_lazy(&mut acc, fp);
                     pending = 0;
                 }
@@ -2622,10 +4817,358 @@ fn reduce_pairs_fl(
         }
         Some(acc.iter().map(|&x| fp.reduce(x) as u32).collect())
     };
-    if pair_rows.len() * n_free > PAR_WORK {
+    let o0 = pp_ops();
+    let spread = pair_rows.len() * n_free > PAR_WORK;
+    let out: Option<Vec<Vec<u32>>> = if spread {
         pair_rows.par_iter().map(reduce_pair).collect()
     } else {
         pair_rows.iter().map(reduce_pair).collect()
+    };
+    pp_add(
+        if spread { PP_PAIRS_PAR } else { PP_PAIRS_SER },
+        pp_ops() - o0,
+    );
+    out
+}
+
+/// Cuts of the columns `0..n` into at most `want` ranges of about equal
+/// update work, on 16-column boundaries, where `starts_at[c]` updates start
+/// at column `c` and run to `n` (so a column's work is the number of
+/// updates started at or left of it).
+fn equal_work_cuts(starts_at: &[u64], n: usize, want: usize) -> Vec<(usize, usize)> {
+    let mut col_work = vec![0u64; n];
+    let mut live = 0u64;
+    for (c, w) in col_work.iter_mut().enumerate() {
+        live += starts_at[c];
+        *w = live;
+    }
+    let total: u64 = col_work.iter().sum();
+    let mut cuts: Vec<usize> = vec![0];
+    if want > 1 && total > 0 {
+        let mut acc = 0u64;
+        let mut next = 1usize;
+        for (c, &w) in col_work.iter().enumerate() {
+            acc += w;
+            if next < want && acc * want as u64 >= total * next as u64 {
+                let cut = ((c + 1).div_ceil(16) * 16).min(n);
+                if cut > *cuts.last().unwrap() && cut < n {
+                    cuts.push(cut);
+                }
+                next += 1;
+            }
+        }
+    }
+    cuts.push(n);
+    cuts.dedup();
+    cuts.windows(2).map(|w| (w[0], w[1])).collect()
+}
+
+/// The in-block finish of one `B'` row block ([`reduce_pairs_fl`]) by
+/// column tiles in parallel: each tile applies the block's in-block
+/// updates to its columns of the block's rows, in block order, reading the
+/// same tile of the rows it has finished.  Returns every tile's range and
+/// its reduced entries (`block rows × width`, row-major).  The updates,
+/// their sums and the counted row operations are those of the row-wise
+/// finish.
+#[allow(clippy::too_many_arguments, clippy::type_complexity)]
+fn finish_block_tiled(
+    partial: &[(Vec<u64>, usize, Vec<(usize, u64)>)],
+    bstart: &[usize],
+    position: &[usize],
+    block_start: usize,
+    n_free: usize,
+    fp: Barrett,
+    simd: u8,
+    threads: usize,
+) -> Vec<((usize, usize), Vec<u32>)> {
+    const NORMALIZE_AFTER: usize = 256;
+    let mut starts_at = vec![0u64; n_free + 1];
+    for (_, _, later) in partial {
+        for &(j, _) in later {
+            starts_at[bstart[j].min(n_free)] += 1;
+        }
+    }
+    let tiles = equal_work_cuts(&starts_at, n_free, threads.min(n_free / 32).max(1));
+    let rows = partial.len();
+    let fuse = mem_site(1);
+    let run = |&(a, b): &(usize, usize)| -> ((usize, usize), Vec<u32>) {
+        let w = b - a;
+        let mut seg = vec![0u32; rows * w];
+        let mut ops = 0usize;
+        let mut acc = vec![0u64; w];
+        for (bi, (row, pending0, later)) in partial.iter().enumerate() {
+            acc.copy_from_slice(&row[a..b]);
+            let mut pending = *pending0;
+            let (done, rest) = seg.split_at_mut(bi * w);
+            if fuse {
+                // f4-memory site B, fused over this tile
+                let mut g = MemGroup::new();
+                let (mut touched, mut flushes) = (0u64, 0u64);
+                let mut tops = 0usize;
+                for &(j, v) in later {
+                    let start = bstart[j].max(a);
+                    if start >= b {
+                        continue;
+                    }
+                    let jb = position[j] - block_start;
+                    debug_assert!(jb < bi);
+                    g.push(&done[jb * w..jb * w + w], start - a, fp.p - v);
+                    tops += b - start;
+                    if g.n == MEM_K {
+                        if pending + g.n > NORMALIZE_AFTER {
+                            normalize_lazy(&mut acc, fp);
+                            pending = 0;
+                        }
+                        pending += g.n;
+                        touched += g.flush(&mut acc, 0, w, simd);
+                        flushes += 1;
+                    }
+                }
+                if g.n > 0 {
+                    if pending + g.n > NORMALIZE_AFTER {
+                        normalize_lazy(&mut acc, fp);
+                    }
+                    touched += g.flush(&mut acc, 0, w, simd);
+                    flushes += 1;
+                }
+                ops += tops;
+                mem_stat(1, tops as u64, touched, flushes);
+                for (d, &x) in rest[..w].iter_mut().zip(&acc) {
+                    *d = fp.reduce(x) as u32;
+                }
+                continue;
+            }
+            for &(j, v) in later {
+                let start = bstart[j].max(a);
+                if start >= b {
+                    continue;
+                }
+                let jb = position[j] - block_start;
+                debug_assert!(jb < bi);
+                add_lazy_range(
+                    &mut acc,
+                    &done[jb * w..jb * w + w],
+                    start - a,
+                    w,
+                    fp.p - v,
+                    simd,
+                );
+                ops += b - start;
+                pending += 1;
+                if pending == NORMALIZE_AFTER {
+                    normalize_lazy(&mut acc, fp);
+                    pending = 0;
+                }
+            }
+            for (d, &x) in rest[..w].iter_mut().zip(&acc) {
+                *d = fp.reduce(x) as u32;
+            }
+        }
+        count_ops(ops);
+        ((a, b), seg)
+    };
+    pp_add(PP_FLB_DISPATCH, 1);
+    tiles.par_iter().map(run).collect()
+}
+
+/// `B' = A⁻¹B` of the Faugère–Lachartre form (see [`reduce_pairs_fl`]),
+/// split by free *columns* instead of by reducer rows.
+///
+/// Row `k` of `B'` is `B_k − Σ_j A_kj · B'_j` over the reducers `j` led
+/// right of `k`'s lead.  The factors `A_kj` are the reducers' own
+/// coefficients, never computed values, so every column of `B'` depends
+/// only on the same column of earlier rows: a tile of free columns is
+/// built for every reducer, rightmost lead first, without reading any
+/// other tile.  The tiles run in parallel with no serial finish (the row
+/// blocks needed one for their in-block dependencies), and a tile's rows
+/// sit contiguously, `w` entries each.  Each tile sees every update that
+/// meets its columns, in the same order as the row build; the sums are
+/// exact (bounded lazy accumulation, reduced at the end), so every entry
+/// of `B'` is the same, and the row operations counted (the tiles' parts
+/// of each update) add up to the same totals.  Tiles are cut where the
+/// update work is equal: an update by `B'_j` covers the free columns from
+/// `bstart[j]` on, so columns further right carry more of it.
+#[allow(clippy::too_many_arguments)]
+fn bprime_tiled(
+    reducers: &[Vec<(u32, u64)>],
+    reducer_at: &[u32],
+    free_index: &[u32],
+    bstart: &[usize],
+    order: &[usize],
+    position: &[usize],
+    n_free: usize,
+    fp: Barrett,
+    deadline: Option<Instant>,
+    force_tiles: usize,
+) -> Option<Vec<Vec<u32>>> {
+    const NONE: u32 = u32::MAX;
+    const NORMALIZE_AFTER: usize = 256;
+    let simd = lazy_simd_kind();
+    let n_red = reducers.len();
+    // per reducer, in build order: its entries on free columns and its
+    // dependencies (position of the reducer, factor)
+    let mut free_off: Vec<usize> = Vec::with_capacity(n_red + 1);
+    let mut free_ent: Vec<(u32, u64)> = Vec::new();
+    let mut dep_off: Vec<usize> = Vec::with_capacity(n_red + 1);
+    let mut dep_ent: Vec<(u32, u64)> = Vec::new();
+    let mut starts_at = vec![0u64; n_free + 1];
+    free_off.push(0);
+    dep_off.push(0);
+    for &k in order {
+        for &(c, v) in &reducers[k][1..] {
+            let fi = free_index[c as usize];
+            if fi != NONE {
+                free_ent.push((fi, v));
+            } else {
+                let j = reducer_at[c as usize] as usize;
+                debug_assert!(position[j] < position[k]);
+                dep_ent.push((position[j] as u32, fp.p - v));
+                starts_at[bstart[j].min(n_free)] += 1;
+            }
+        }
+        free_off.push(free_ent.len());
+        dep_off.push(dep_ent.len());
+    }
+    let bstart_pos: Vec<usize> = order.iter().map(|&k| bstart[k]).collect();
+    // update work in all: an update by `B'_j` covers `bstart[j]..n_free`
+    let total: u64 = (0..n_free)
+        .map(|c| starts_at[c] * (n_free - c) as u64)
+        .sum();
+    let threads = rayon::current_num_threads();
+    let parallel = threads > 1 && total as usize > fl_par_min_work();
+    let want = if force_tiles > 0 {
+        force_tiles
+    } else if parallel {
+        (threads * fl_tiles_per_thread()).min(n_free / 64).max(1)
+    } else {
+        1
+    };
+    let tiles = equal_work_cuts(&starts_at, n_free, want);
+    pp_add(PP_FLB_TILES, tiles.len() as u64);
+    let fuse = mem_site(1);
+    let run_tile = |&(a, b): &(usize, usize)| -> Option<Vec<u32>> {
+        let w = b - a;
+        let mut store = vec![0u32; n_red * w];
+        let mut acc = vec![0u64; w];
+        let mut ops = 0usize;
+        for pos in 0..n_red {
+            if pos % 64 == 0 && deadline.is_some_and(|d| Instant::now() > d) {
+                return None;
+            }
+            acc.fill(0);
+            for &(fi, v) in &free_ent[free_off[pos]..free_off[pos + 1]] {
+                let fi = fi as usize;
+                if (a..b).contains(&fi) {
+                    acc[fi - a] += v;
+                }
+            }
+            let (done, rest) = store.split_at_mut(pos * w);
+            let mut pending = 0usize;
+            if fuse {
+                // f4-memory site B, fused over this tile
+                let mut g = MemGroup::new();
+                let (mut touched, mut flushes) = (0u64, 0u64);
+                let mut tops = 0usize;
+                for &(pj, factor) in &dep_ent[dep_off[pos]..dep_off[pos + 1]] {
+                    let pj = pj as usize;
+                    let start = bstart_pos[pj].max(a);
+                    if start >= b {
+                        continue;
+                    }
+                    g.push(&done[pj * w..pj * w + w], start - a, factor);
+                    tops += b - start;
+                    if g.n == MEM_K {
+                        if pending + g.n > NORMALIZE_AFTER {
+                            normalize_lazy(&mut acc, fp);
+                            pending = 0;
+                        }
+                        pending += g.n;
+                        touched += g.flush(&mut acc, 0, w, simd);
+                        flushes += 1;
+                    }
+                }
+                if g.n > 0 {
+                    if pending + g.n > NORMALIZE_AFTER {
+                        normalize_lazy(&mut acc, fp);
+                    }
+                    touched += g.flush(&mut acc, 0, w, simd);
+                    flushes += 1;
+                }
+                ops += tops;
+                mem_stat(1, tops as u64, touched, flushes);
+                for (d, &x) in rest[..w].iter_mut().zip(&acc) {
+                    *d = fp.reduce(x) as u32;
+                }
+                continue;
+            }
+            for &(pj, factor) in &dep_ent[dep_off[pos]..dep_off[pos + 1]] {
+                let pj = pj as usize;
+                let start = bstart_pos[pj].max(a);
+                if start >= b {
+                    continue;
+                }
+                add_lazy_range(
+                    &mut acc,
+                    &done[pj * w..pj * w + w],
+                    start - a,
+                    w,
+                    factor,
+                    simd,
+                );
+                ops += b - start;
+                pending += 1;
+                if pending == NORMALIZE_AFTER {
+                    normalize_lazy(&mut acc, fp);
+                    pending = 0;
+                }
+            }
+            for (d, &x) in rest[..w].iter_mut().zip(&acc) {
+                *d = fp.reduce(x) as u32;
+            }
+        }
+        count_ops(ops);
+        Some(store)
+    };
+    let o0 = pp_ops();
+    let stores: Vec<Option<Vec<u32>>> = if tiles.len() > 1 {
+        pp_add(PP_FLB_DISPATCH, 1);
+        tiles.par_iter().map(run_tile).collect()
+    } else {
+        tiles.iter().map(run_tile).collect()
+    };
+    pp_add(
+        if tiles.len() > 1 {
+            PP_FLB_TILE_PAR
+        } else {
+            PP_FLB_TILE_SER
+        },
+        pp_ops() - o0,
+    );
+    let mut bprime: Vec<Vec<u32>> = vec![Vec::new(); n_red];
+    if tiles.len() == 1 {
+        let store = stores.into_iter().next()??;
+        for (pos, &k) in order.iter().enumerate() {
+            bprime[k] = store[pos * n_free..(pos + 1) * n_free].to_vec();
+        }
+        return Some(bprime);
+    }
+    let stores: Vec<Vec<u32>> = stores.into_iter().collect::<Option<_>>()?;
+    for (pos, &k) in order.iter().enumerate() {
+        let mut row = Vec::with_capacity(n_free);
+        for (&(a, b), store) in tiles.iter().zip(&stores) {
+            let w = b - a;
+            row.extend_from_slice(&store[pos * w..(pos + 1) * w]);
+        }
+        bprime[k] = row;
+    }
+    Some(bprime)
+}
+
+/// Adds the time since `.1` to profile slot `.0` when dropped.
+struct PpNs(usize, Instant);
+impl Drop for PpNs {
+    fn drop(&mut self) {
+        pp_add(self.0, pp_ns(self.1));
     }
 }
 
@@ -2642,6 +5185,30 @@ const FL_PAIR_BLOCK: usize = 64;
 /// Free columns per tile in [`reduce_pairs_blocked`]: a block's
 /// accumulators over one tile (64 × 256 × 8 bytes) stay in L2.
 const FL_PAIR_TILE: usize = 256;
+
+/// Whether [`reduce_pairs_blocked`] (and its fused form) runs its row
+/// blocks in parallel, and how many pair rows a block holds.  Shared by
+/// both forms so the f4-parallel dispatch applies to either kernel.
+fn pairs_blocked_dispatch(pair_rows: &[Vec<(u32, u64)>], n_free: usize) -> (bool, usize) {
+    if par_old() {
+        (pair_rows.len() * n_free > PAR_WORK, FL_PAIR_BLOCK)
+    } else {
+        // the update work (about half a row of `B'` per entry), and
+        // blocks small enough to give every thread a few of them
+        let entries: usize = pair_rows.iter().map(|r| r.len()).sum();
+        let threads = rayon::current_num_threads();
+        let spread = threads > 1 && pair_rows.len() > 1 && entries * n_free / 2 > PAR_WORK;
+        let per = if spread {
+            pair_rows
+                .len()
+                .div_ceil(2 * threads)
+                .clamp(8, FL_PAIR_BLOCK)
+        } else {
+            FL_PAIR_BLOCK
+        };
+        (spread, per)
+    }
+}
 
 /// `D − C·B'` for the pair rows `C | D`, a block of rows and a tile of
 /// free columns at a time.
@@ -2669,6 +5236,11 @@ fn reduce_pairs_blocked(
     fp: Barrett,
     deadline: Option<Instant>,
 ) -> Option<Vec<Vec<u32>>> {
+    if mem_site(2) {
+        return reduce_pairs_blocked_mem(
+            pair_rows, bprime, bstart, reducer_at, free_index, n_free, fp, deadline,
+        );
+    }
     const NONE: u32 = u32::MAX;
     assert!(
         fp.p <= 1 << 16 && bprime.len() < 1 << 31,
@@ -2717,11 +5289,132 @@ fn reduce_pairs_blocked(
                 .collect(),
         )
     };
-    let blocks: Vec<Option<Vec<Vec<u32>>>> = if pair_rows.len() * n_free > PAR_WORK {
-        pair_rows.par_chunks(FL_PAIR_BLOCK).map(block).collect()
+    let o0 = pp_ops();
+    let (spread, rows_per_block) = pairs_blocked_dispatch(pair_rows, n_free);
+    let blocks: Vec<Option<Vec<Vec<u32>>>> = if spread {
+        pair_rows.par_chunks(rows_per_block).map(block).collect()
     } else {
-        pair_rows.chunks(FL_PAIR_BLOCK).map(block).collect()
+        pair_rows.chunks(rows_per_block).map(block).collect()
     };
+    pp_add(
+        if spread { PP_PAIRS_PAR } else { PP_PAIRS_SER },
+        pp_ops() - o0,
+    );
+    let mut out = Vec::with_capacity(pair_rows.len());
+    for b in blocks {
+        out.extend(b?);
+    }
+    Some(out)
+}
+
+/// [`reduce_pairs_blocked`] for primes with exact `f64` GEMM (`p` up to the
+/// `supports_f64_gemm` bound, including 786433): same hit grouping and
+/// column tiles, with `f64` accumulators reduced every `k_safe_f64(p)`
+/// updates so every partial sum stays strictly ≤ 2⁵³.
+#[allow(clippy::too_many_arguments)]
+fn reduce_pairs_blocked_f64(
+    pair_rows: &[Vec<(u32, u64)>],
+    bprime: &[Vec<u32>],
+    bstart: &[usize],
+    reducer_at: &[u32],
+    free_index: &[u32],
+    n_free: usize,
+    fp: Barrett,
+    deadline: Option<Instant>,
+) -> Option<Vec<Vec<u32>>> {
+    use super::fp_gemm::{
+        axpy_f64, cvt_u32_to_f64, detect_gemm_simd, k_safe_f64, reduce_f64_slice_mod_p,
+    };
+    const NONE: u32 = u32::MAX;
+    assert!(bprime.len() < 1 << 31, "reducer index fits u32");
+    let simd = detect_gemm_simd();
+    let k_safe = k_safe_f64(fp.p).max(1);
+    let bm = ((1u128 << 64) / u128::from(fp.p)) as u64;
+    // B' as f64 once: every block reuses the same panels.
+    let bprime_f64: Vec<Vec<f64>> = bprime
+        .iter()
+        .map(|row| {
+            let mut out = vec![0f64; row.len()];
+            cvt_u32_to_f64(simd, row, &mut out);
+            out
+        })
+        .collect();
+    let block = |rows: &[Vec<(u32, u64)>]| -> Option<Vec<Vec<u32>>> {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
+        let mut acc: Vec<Vec<f64>> = vec![vec![0f64; n_free]; rows.len()];
+        let mut hits: Vec<(u32, u32, f64)> = Vec::new();
+        for (i, r) in rows.iter().enumerate() {
+            for &(c, v) in r {
+                let fi = free_index[c as usize];
+                if fi != NONE {
+                    acc[i][fi as usize] += v as f64;
+                } else {
+                    hits.push((reducer_at[c as usize], i as u32, (fp.p - v) as f64));
+                }
+            }
+        }
+        hits.sort_unstable_by_key(|&(j, i, _)| (j, i));
+        let mut pending = vec![0usize; rows.len()];
+        let mut from = 0usize;
+        while from < n_free {
+            let to = (from + FL_PAIR_TILE).min(n_free);
+            for &(j, i, factor) in &hits {
+                let j = j as usize;
+                let i = i as usize;
+                let start = bstart[j].max(from);
+                if start >= to {
+                    continue;
+                }
+                axpy_f64(
+                    simd,
+                    &mut acc[i][start..to],
+                    &bprime_f64[j][start..to],
+                    factor,
+                );
+                pending[i] += 1;
+                if pending[i] >= k_safe {
+                    reduce_f64_slice_mod_p(&mut acc[i], fp.p, bm);
+                    pending[i] = 0;
+                }
+            }
+            from = to;
+        }
+        for (i, a) in acc.iter_mut().enumerate() {
+            if pending[i] > 0 {
+                reduce_f64_slice_mod_p(a, fp.p, bm);
+            }
+        }
+        count_ops(
+            hits.iter()
+                .map(|&(j, _, _)| n_free - bstart[j as usize])
+                .sum(),
+        );
+        Some(
+            acc.into_iter()
+                .map(|a| {
+                    a.into_iter()
+                        .map(|x| {
+                            debug_assert!(x >= 0.0 && x < fp.p as f64);
+                            x as u32
+                        })
+                        .collect()
+                })
+                .collect(),
+        )
+    };
+    let o0 = pp_ops();
+    let (spread, rows_per_block) = pairs_blocked_dispatch(pair_rows, n_free);
+    let blocks: Vec<Option<Vec<Vec<u32>>>> = if spread {
+        pair_rows.par_chunks(rows_per_block).map(block).collect()
+    } else {
+        pair_rows.chunks(rows_per_block).map(block).collect()
+    };
+    pp_add(
+        if spread { PP_PAIRS_PAR } else { PP_PAIRS_SER },
+        pp_ops() - o0,
+    );
     let mut out = Vec::with_capacity(pair_rows.len());
     for b in blocks {
         out.extend(b?);
@@ -2749,6 +5442,621 @@ fn add_lazy_range(acc: &mut [u64], pivot: &[u32], from: usize, to: usize, factor
         let _ = simd;
         add_lazy_scalar(acc, pivot, from, factor);
     }
+}
+
+// ── Fused lazy updates (lead f4-memory) ─────────────────────────────
+//
+// Every dense update of the deferred path is `acc[from..] += f·pivot[from..]`
+// with 64-bit accumulators and 32-bit pivot entries: 20 bytes moved per
+// field operation (accumulator load and store, pivot load), the
+// accumulator row re-streamed once per pivot.  The fused form gathers up
+// to [`MEM_K`] updates of one accumulator and applies them in one pass,
+// the partial sum held in a register: the same products and the same
+// exact integer sums, one accumulator pass per group instead of one per
+// update.
+//
+// Default on: fused multi-pivot updates for deferred reduction, `B'` build,
+// and blocked pair rows.  On NTT `pkm_symmetric_tower` m=3 t=5 the fused
+// path cut wall another ~1.2× on top of wide FL + deferred lazy (three
+// matched repeats).  `F4_FP_MEM=0` or `F4_FP_MEM_OLD=1` restores the
+// one-update path; `F4_FP_MEM_A=0` / `B=0` / `C=0` turn off one site each.
+
+/// Updates of one accumulator applied together.  Capped at 8: the AVX-512
+/// fused kernel is instantiated only for `n ≤ 8` ([`fused_apply`]).
+const MEM_K: usize = 8;
+
+/// Whether fused site `site` (0 deferred reduction, 1 `B'` build, 2
+/// blocked pair rows) is on.  Default on; `F4_FP_MEM=0` disables.
+fn mem_site(site: usize) -> bool {
+    static ON: std::sync::OnceLock<[bool; 3]> = std::sync::OnceLock::new();
+    ON.get_or_init(|| {
+        let on = std::env::var("F4_FP_MEM").as_deref() != Ok("0")
+            && std::env::var("F4_FP_MEM_OLD").as_deref() != Ok("1");
+        let off = |v: &str| std::env::var(v).as_deref() == Ok("0");
+        [
+            on && !off("F4_FP_MEM_A"),
+            on && !off("F4_FP_MEM_B"),
+            on && !off("F4_FP_MEM_C"),
+        ]
+    })[site]
+}
+
+/// `F4_FP_MEM_STATS=1`: per site, field operations, accumulator words
+/// loaded and stored by the fused passes, and flushes; printed to stderr
+/// after every [`f4`] call and reset.  The one-update path touches one
+/// accumulator word per field operation, so its traffic is the ops.
+fn mem_stats() -> bool {
+    static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *ON.get_or_init(|| std::env::var("F4_FP_MEM_STATS").as_deref() == Ok("1"))
+}
+
+/// `[site * 3 + {0 ops, 1 acc words, 2 flushes}]`, then the largest
+/// free-column count, reducer count and pair-row count seen, then the
+/// wall-clock nanoseconds and calls of [`reduce_pairs_fl`] (12, 14) and
+/// [`rref32_deferred`] (13, 15), old path or new (indicative only).
+static MEM_STATS: [AtomicU64; 16] = [const { AtomicU64::new(0) }; 16];
+
+/// Under `F4_FP_MEM_STATS=1`, adds the wall-clock time from its creation
+/// to its drop to `MEM_STATS[12 + slot]` and one call to `[14 + slot]`.
+struct MemTimer(usize, Option<Instant>);
+
+impl MemTimer {
+    fn new(slot: usize) -> Self {
+        MemTimer(slot, mem_stats().then(Instant::now))
+    }
+}
+
+impl Drop for MemTimer {
+    fn drop(&mut self) {
+        if let Some(t) = self.1 {
+            MEM_STATS[12 + self.0]
+                .fetch_add(t.elapsed().as_nanos() as u64, AtomicOrdering::Relaxed);
+            MEM_STATS[14 + self.0].fetch_add(1, AtomicOrdering::Relaxed);
+        }
+    }
+}
+
+fn mem_stat(site: usize, ops: u64, acc: u64, flushes: u64) {
+    if mem_stats() {
+        MEM_STATS[site * 3].fetch_add(ops, AtomicOrdering::Relaxed);
+        MEM_STATS[site * 3 + 1].fetch_add(acc, AtomicOrdering::Relaxed);
+        MEM_STATS[site * 3 + 2].fetch_add(flushes, AtomicOrdering::Relaxed);
+    }
+}
+
+fn mem_stats_report(ms: f64) {
+    if !mem_stats() {
+        return;
+    }
+    let v: Vec<u64> = MEM_STATS
+        .iter()
+        .map(|a| a.swap(0, AtomicOrdering::Relaxed))
+        .collect();
+    eprintln!(
+        "{{\"mem_stats\":1,\"deferred\":[{},{},{}],\"bprime\":[{},{},{}],\"pairs\":[{},{},{}],\"max_free\":{},\"max_reducers\":{},\"max_pair_rows\":{},\"fl_ns\":{},\"deferred_ns\":{},\"fl_calls\":{},\"deferred_calls\":{},\"f4_ms\":{}}}",
+        v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11],
+        v[12], v[13], v[14], v[15], ms
+    );
+}
+
+/// Pending updates of one accumulator: pivot rows, start columns and
+/// factors, at most [`MEM_K`].
+struct MemGroup<'a> {
+    n: usize,
+    piv: [&'a [u32]; MEM_K],
+    from: [usize; MEM_K],
+    f: [u64; MEM_K],
+}
+
+impl<'a> MemGroup<'a> {
+    fn new() -> Self {
+        MemGroup {
+            n: 0,
+            piv: [&[]; MEM_K],
+            from: [0; MEM_K],
+            f: [0; MEM_K],
+        }
+    }
+
+    #[inline]
+    fn push(&mut self, piv: &'a [u32], from: usize, f: u64) {
+        self.piv[self.n] = piv;
+        self.from[self.n] = from;
+        self.f[self.n] = f;
+        self.n += 1;
+    }
+
+    /// Apply the group to `acc[lo..hi]` (every start clipped to `lo`) and
+    /// empty it; returns the accumulator words touched.  Starts are put in
+    /// ascending order, then the columns between consecutive starts take
+    /// the updates begun so far, so no pivot is read left of its start.
+    fn flush(&mut self, acc: &mut [u64], lo: usize, hi: usize, simd: u8) -> u64 {
+        let n = self.n;
+        self.n = 0;
+        if n == 0 {
+            return 0;
+        }
+        // insertion sort by start (n <= 8)
+        for a in 1..n {
+            let mut b = a;
+            while b > 0 && self.from[b - 1] > self.from[b] {
+                self.from.swap(b - 1, b);
+                self.piv.swap(b - 1, b);
+                self.f.swap(b - 1, b);
+                b -= 1;
+            }
+        }
+        let first = self.from[0].max(lo);
+        if first >= hi {
+            return 0;
+        }
+        for s in 0..n {
+            let a = self.from[s].max(lo);
+            let b = if s + 1 < n {
+                self.from[s + 1].max(lo).min(hi)
+            } else {
+                hi
+            };
+            if a < b {
+                fused_apply(acc, &self.piv[..=s], &self.f[..=s], a, b, simd);
+            }
+        }
+        (hi - first) as u64
+    }
+}
+
+/// `acc[lo..hi] += Σ f[t]·piv[t][lo..hi]`, one accumulator pass.
+#[inline]
+fn fused_apply(acc: &mut [u64], piv: &[&[u32]], f: &[u64], lo: usize, hi: usize, simd: u8) {
+    assert!(hi <= acc.len() && piv.iter().all(|p| p.len() >= hi) && f.len() == piv.len());
+    #[cfg(target_arch = "x86_64")]
+    if simd == 2 {
+        macro_rules! go {
+            ($($n:literal),*) => {
+                match piv.len() {
+                    // SAFETY: `lazy_simd_kind` verified AVX-512F; bounds asserted above.
+                    $($n => unsafe { fused_avx512::<$n>(acc, piv, f, lo, hi) },)*
+                    _ => unreachable!(),
+                }
+            };
+        }
+        go!(1, 2, 3, 4, 5, 6, 7, 8);
+        return;
+    }
+    #[cfg(target_arch = "x86_64")]
+    if simd == 1 {
+        macro_rules! go {
+            ($($n:literal),*) => {
+                match piv.len() {
+                    // SAFETY: `lazy_simd_kind` verified AVX2; bounds asserted above.
+                    $($n => unsafe { fused_avx2::<$n>(acc, piv, f, lo, hi) },)*
+                    _ => unreachable!(),
+                }
+            };
+        }
+        go!(1, 2, 3, 4, 5, 6, 7, 8);
+        return;
+    }
+    let _ = simd;
+    fused_scalar(acc, piv, f, lo, hi);
+}
+
+#[inline]
+fn fused_scalar(acc: &mut [u64], piv: &[&[u32]], f: &[u64], lo: usize, hi: usize) {
+    for i in lo..hi {
+        let mut x = acc[i];
+        for t in 0..piv.len() {
+            x += f[t] * u64::from(piv[t][i]);
+        }
+        acc[i] = x;
+    }
+}
+
+/// [`fused_apply`] with `N` updates in AVX2: per four columns one
+/// accumulator load and store and `N` pivot loads.  Same schedule as
+/// [`fused_avx512`]; used when AVX-512F is unavailable (the previous
+/// fallback was scalar and left a large gap on AVX2-only hosts).
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn fused_avx2<const N: usize>(
+    acc: &mut [u64],
+    piv: &[&[u32]],
+    f: &[u64],
+    lo: usize,
+    hi: usize,
+) {
+    use std::arch::x86_64::{
+        __m128i, __m256i, _mm256_add_epi64, _mm256_cvtepu32_epi64, _mm256_loadu_si256,
+        _mm256_mul_epu32, _mm256_set1_epi64x, _mm256_storeu_si256, _mm_loadu_si128,
+    };
+    let mut m = [_mm256_set1_epi64x(0); N];
+    let mut ptr = [std::ptr::null::<u32>(); N];
+    for t in 0..N {
+        m[t] = _mm256_set1_epi64x(f[t] as i64);
+        ptr[t] = piv[t].as_ptr();
+    }
+    let a = acc.as_mut_ptr();
+    let mut i = lo;
+    while i + 4 <= hi {
+        // SAFETY: caller asserted `hi` within the accumulator and every
+        // pivot row; loads and stores accept unaligned pointers.
+        let mut cur = unsafe { _mm256_loadu_si256(a.add(i) as *const __m256i) };
+        for t in 0..N {
+            let v = unsafe { _mm_loadu_si128(ptr[t].add(i) as *const __m128i) };
+            cur = _mm256_add_epi64(cur, _mm256_mul_epu32(_mm256_cvtepu32_epi64(v), m[t]));
+        }
+        unsafe { _mm256_storeu_si256(a.add(i) as *mut __m256i, cur) };
+        i += 4;
+    }
+    while i < hi {
+        let mut x = acc[i];
+        for t in 0..N {
+            x += f[t] * u64::from(piv[t][i]);
+        }
+        acc[i] = x;
+        i += 1;
+    }
+}
+
+/// [`fused_apply`] with `N` updates in AVX-512F: per eight columns one
+/// accumulator load and store and `N` pivot loads.
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx512f")]
+unsafe fn fused_avx512<const N: usize>(
+    acc: &mut [u64],
+    piv: &[&[u32]],
+    f: &[u64],
+    lo: usize,
+    hi: usize,
+) {
+    use std::arch::x86_64::{
+        __m256i, __m512i, _mm256_loadu_si256, _mm512_add_epi64, _mm512_cvtepu32_epi64,
+        _mm512_loadu_si512, _mm512_mul_epu32, _mm512_set1_epi64, _mm512_storeu_si512,
+    };
+    let mut m = [_mm512_set1_epi64(0); N];
+    let mut ptr = [std::ptr::null::<u32>(); N];
+    for t in 0..N {
+        m[t] = _mm512_set1_epi64(f[t] as i64);
+        ptr[t] = piv[t].as_ptr();
+    }
+    let a = acc.as_mut_ptr();
+    let mut i = lo;
+    while i + 8 <= hi {
+        // SAFETY: the caller asserted `hi` within the accumulator and every
+        // pivot row; loads and stores accept unaligned pointers.
+        let mut cur = unsafe { _mm512_loadu_si512(a.add(i) as *const __m512i) };
+        for t in 0..N {
+            let v = unsafe { _mm256_loadu_si256(ptr[t].add(i) as *const __m256i) };
+            cur = _mm512_add_epi64(cur, _mm512_mul_epu32(_mm512_cvtepu32_epi64(v), m[t]));
+        }
+        unsafe { _mm512_storeu_si512(a.add(i) as *mut __m512i, cur) };
+        i += 8;
+    }
+    while i < hi {
+        let mut x = acc[i];
+        for t in 0..N {
+            x += f[t] * u64::from(piv[t][i]);
+        }
+        acc[i] = x;
+        i += 1;
+    }
+}
+
+/// Site A: [`reduce_lazy_by`] with up to [`MEM_K`] nonzero updates
+/// applied per accumulator pass.  The factor of each pivot is taken from
+/// `acc[c]` plus the group's pending contributions at `c`, which is the
+/// value the one-update path sees there (exactly, as integers, up to its
+/// normalisations, so the same residue).  The count of unnormalised
+/// updates stays at most 256, as before.
+fn reduce_lazy_by_fused(
+    acc: &mut [u64],
+    known: &[(usize, Vec<u32>)],
+    fp: Barrett,
+    simd: u8,
+    pending: &mut usize,
+) {
+    let normalize_after = normalize_after_for(fp.p);
+    let len = acc.len();
+    let mut g = MemGroup::new();
+    let (mut ops, mut touched, mut flushes) = (0usize, 0u64, 0u64);
+    let mut flush = |g: &mut MemGroup, acc: &mut [u64], pending: &mut usize| {
+        if *pending + g.n > normalize_after {
+            normalize_lazy(acc, fp);
+            *pending = 0;
+        }
+        *pending += g.n;
+        touched += g.flush(acc, 0, len, simd);
+        flushes += 1;
+    };
+    for (c, pivot) in known {
+        let c = *c;
+        let f = if g.n == 0 {
+            // Hot miss path: no pending group — skip Barrett when the
+            // coefficient is already a reduced residue (common after a
+            // flush/normalise).
+            let v = acc[c];
+            if v == 0 {
+                continue;
+            }
+            if v < fp.p {
+                v
+            } else {
+                fp.reduce(v)
+            }
+        } else {
+            let mut v = acc[c];
+            for t in 0..g.n {
+                v += g.f[t] * u64::from(g.piv[t][c]);
+            }
+            fp.reduce(v)
+        };
+        if f != 0 {
+            g.push(pivot, c, fp.p - f);
+            ops += len - c;
+            if g.n == MEM_K {
+                flush(&mut g, acc, pending);
+            }
+        }
+    }
+    if g.n > 0 {
+        flush(&mut g, acc, pending);
+    }
+    count_ops(ops);
+    mem_stat(0, ops as u64, touched, flushes);
+}
+
+/// Site B: [`reduce_pairs_fl`] with the `B'` build fused (the factors
+/// are the reducers' own coefficients, so any [`MEM_K`] updates of one
+/// row go together).  The pair stage is the same call.
+fn reduce_pairs_fl_mem(
+    pair_rows: &[Vec<(u32, u64)>],
+    reducers: &[Vec<(u32, u64)>],
+    reducer_at: &[u32],
+    free_cols: &[usize],
+    n_cols: usize,
+    fp: Barrett,
+    deadline: Option<Instant>,
+) -> Option<Vec<Vec<u32>>> {
+    const NONE: u32 = u32::MAX;
+    const NORMALIZE_AFTER: usize = 256;
+    let simd = lazy_simd_kind();
+    let n_free = free_cols.len();
+    if mem_stats() {
+        MEM_STATS[9].fetch_max(n_free as u64, AtomicOrdering::Relaxed);
+        MEM_STATS[10].fetch_max(reducers.len() as u64, AtomicOrdering::Relaxed);
+        MEM_STATS[11].fetch_max(pair_rows.len() as u64, AtomicOrdering::Relaxed);
+    }
+    let mut free_index = vec![NONE; n_cols];
+    for (i, &c) in free_cols.iter().enumerate() {
+        free_index[c] = i as u32;
+    }
+    let bstart: Vec<usize> = reducers
+        .iter()
+        .map(|r| free_cols.partition_point(|&c| c <= r[0].0 as usize))
+        .collect();
+    let mut order: Vec<usize> = (0..reducers.len()).collect();
+    order.sort_unstable_by_key(|&k| std::cmp::Reverse(reducers[k][0].0));
+    let mut position = vec![0usize; reducers.len()];
+    for (pos, &k) in order.iter().enumerate() {
+        position[k] = pos;
+    }
+    let mut bprime: Vec<Vec<u32>> = vec![Vec::new(); reducers.len()];
+    // flush a group into `acc`, normalising first when the group would
+    // take the unnormalised updates past the bound
+    let flush = |g: &mut MemGroup, acc: &mut [u64], pending: &mut usize, st: &mut (u64, u64)| {
+        if *pending + g.n > NORMALIZE_AFTER {
+            normalize_lazy(acc, fp);
+            *pending = 0;
+        }
+        *pending += g.n;
+        st.0 += g.flush(acc, 0, n_free, simd);
+        st.1 += 1;
+    };
+    let against_finished = |k: usize, block_start: usize, bprime: &Vec<Vec<u32>>| {
+        let mut acc = vec![0u64; n_free];
+        let mut pending = 0usize;
+        let mut later: Vec<(usize, u64)> = Vec::new();
+        let mut g = MemGroup::new();
+        let (mut ops, mut st) = (0usize, (0u64, 0u64));
+        for &(c, v) in &reducers[k][1..] {
+            let fi = free_index[c as usize];
+            if fi != NONE {
+                acc[fi as usize] += v;
+            } else {
+                let j = reducer_at[c as usize] as usize;
+                if position[j] < block_start {
+                    g.push(&bprime[j], bstart[j], fp.p - v);
+                    ops += n_free - bstart[j];
+                    if g.n == MEM_K {
+                        flush(&mut g, &mut acc, &mut pending, &mut st);
+                    }
+                } else {
+                    later.push((j, v));
+                }
+            }
+        }
+        if g.n > 0 {
+            flush(&mut g, &mut acc, &mut pending, &mut st);
+        }
+        count_ops(ops);
+        mem_stat(1, ops as u64, st.0, st.1);
+        (acc, pending, later)
+    };
+    for block in order.chunks(FL_BLOCK) {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
+        let block_start = position[block[0]];
+        let bp = &bprime;
+        let mut partial: Vec<(Vec<u64>, usize, Vec<(usize, u64)>)> =
+            if block.len() * n_free > PAR_WORK {
+                block
+                    .par_iter()
+                    .map(|&k| against_finished(k, block_start, bp))
+                    .collect()
+            } else {
+                block
+                    .iter()
+                    .map(|&k| against_finished(k, block_start, bp))
+                    .collect()
+            };
+        for (&k, (acc, pending, later)) in block.iter().zip(partial.iter_mut()) {
+            let mut g = MemGroup::new();
+            let (mut ops, mut st) = (0usize, (0u64, 0u64));
+            for &(j, v) in later.iter() {
+                debug_assert!(position[j] < position[k]);
+                g.push(&bprime[j], bstart[j], fp.p - v);
+                ops += n_free - bstart[j];
+                if g.n == MEM_K {
+                    flush(&mut g, acc, pending, &mut st);
+                }
+            }
+            if g.n > 0 {
+                flush(&mut g, acc, pending, &mut st);
+            }
+            count_ops(ops);
+            mem_stat(1, ops as u64, st.0, st.1);
+            bprime[k] = acc.iter().map(|&x| fp.reduce(x) as u32).collect();
+        }
+    }
+    if fl_blocked_pairs() {
+        return reduce_pairs_blocked(
+            pair_rows,
+            &bprime,
+            &bstart,
+            reducer_at,
+            &free_index,
+            n_free,
+            fp,
+            deadline,
+        );
+    }
+    let reduce_pair = |r: &Vec<(u32, u64)>| -> Option<Vec<u32>> {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
+        let mut acc = vec![0u64; n_free];
+        let mut pending = 0usize;
+        for &(c, v) in r {
+            let fi = free_index[c as usize];
+            if fi != NONE {
+                acc[fi as usize] += v;
+            } else {
+                let j = reducer_at[c as usize] as usize;
+                add_lazy(&mut acc, &bprime[j], bstart[j], fp.p - v, simd);
+                pending += 1;
+                if pending == NORMALIZE_AFTER {
+                    normalize_lazy(&mut acc, fp);
+                    pending = 0;
+                }
+            }
+        }
+        Some(acc.iter().map(|&x| fp.reduce(x) as u32).collect())
+    };
+    if pair_rows.len() * n_free > PAR_WORK {
+        pair_rows.par_iter().map(reduce_pair).collect()
+    } else {
+        pair_rows.iter().map(reduce_pair).collect()
+    }
+}
+
+/// Site C: [`reduce_pairs_blocked`] with each row's updates over a column
+/// tile fused [`MEM_K`] at a time: the hits are taken row by row (by
+/// reducer within a row), so a row's tile of accumulators stays in L1
+/// across its updates and the block's `B'` tiles are read from L2.  The
+/// sum is the same exact integer sum, in another order.
+fn reduce_pairs_blocked_mem(
+    pair_rows: &[Vec<(u32, u64)>],
+    bprime: &[Vec<u32>],
+    bstart: &[usize],
+    reducer_at: &[u32],
+    free_index: &[u32],
+    n_free: usize,
+    fp: Barrett,
+    deadline: Option<Instant>,
+) -> Option<Vec<Vec<u32>>> {
+    const NONE: u32 = u32::MAX;
+    assert!(
+        fp.p <= 1 << 16 && bprime.len() < 1 << 31,
+        "accumulator bound"
+    );
+    let simd = lazy_simd_kind();
+    let block = |rows: &[Vec<(u32, u64)>]| -> Option<Vec<Vec<u32>>> {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return None;
+        }
+        let mut acc: Vec<Vec<u64>> = vec![vec![0u64; n_free]; rows.len()];
+        // (row of the block, reducer, factor), grouped by row
+        let mut hits: Vec<(u32, u32, u64)> = Vec::new();
+        for (i, r) in rows.iter().enumerate() {
+            for &(c, v) in r {
+                let fi = free_index[c as usize];
+                if fi != NONE {
+                    acc[i][fi as usize] += v;
+                } else {
+                    hits.push((i as u32, reducer_at[c as usize], fp.p - v));
+                }
+            }
+        }
+        hits.sort_unstable_by_key(|&(i, j, _)| (i, j));
+        let (mut touched, mut flushes) = (0u64, 0u64);
+        let mut from = 0;
+        while from < n_free {
+            let to = (from + FL_PAIR_TILE).min(n_free);
+            let mut h = 0;
+            while h < hits.len() {
+                let i = hits[h].0;
+                let row = &mut acc[i as usize];
+                let mut g = MemGroup::new();
+                while h < hits.len() && hits[h].0 == i {
+                    let (_, j, factor) = hits[h];
+                    let j = j as usize;
+                    h += 1;
+                    if bstart[j].max(from) >= to {
+                        continue;
+                    }
+                    g.push(&bprime[j], bstart[j], factor);
+                    if g.n == MEM_K {
+                        touched += g.flush(row, from, to, simd);
+                        flushes += 1;
+                    }
+                }
+                if g.n > 0 {
+                    touched += g.flush(row, from, to, simd);
+                    flushes += 1;
+                }
+            }
+            from = to;
+        }
+        let ops: usize = hits
+            .iter()
+            .map(|&(_, j, _)| n_free - bstart[j as usize])
+            .sum();
+        count_ops(ops);
+        mem_stat(2, ops as u64, touched, flushes);
+        Some(
+            acc.into_iter()
+                .map(|a| a.into_iter().map(|x| fp.reduce(x) as u32).collect())
+                .collect(),
+        )
+    };
+    // the f4-parallel dispatch (or, under `F4_FP_PAR_OLD=1`, the old one)
+    let o0 = pp_ops();
+    let (spread, rows_per_block) = pairs_blocked_dispatch(pair_rows, n_free);
+    let blocks: Vec<Option<Vec<Vec<u32>>>> = if spread {
+        pair_rows.par_chunks(rows_per_block).map(block).collect()
+    } else {
+        pair_rows.chunks(rows_per_block).map(block).collect()
+    };
+    pp_add(
+        if spread { PP_PAIRS_PAR } else { PP_PAIRS_SER },
+        pp_ops() - o0,
+    );
+    let mut out = Vec::with_capacity(pair_rows.len());
+    for b in blocks {
+        out.extend(b?);
+    }
+    Some(out)
 }
 
 /// Where a dense reduction stands, shown to the in-step snapshot hook at a
@@ -2811,7 +6119,7 @@ fn rref_ckpt(
                 }
             }
             let found = (pr..rows.len()).find(|&r| rows[r][c] != 0);
-            super::jv_bitops::words(found.map_or(rows.len(), |r| r + 1) as u64 - pr as u64);
+            count_words(found.map_or(rows.len(), |r| r + 1) as u64 - pr as u64);
             let Some(r) = found else {
                 continue;
             };
@@ -2871,6 +6179,57 @@ fn rref_ckpt(
 
 /// Degree-bounded F4.
 pub fn f4(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> F4Report {
+    f4_with_visit_account(input, n_vars, p, opts, VisitAccount::Off)
+}
+
+fn f4_accounting_stopped_report() -> F4Report {
+    F4Report {
+        basis: Vec::new(),
+        inconsistent: false,
+        degree_reached: 0,
+        solving_degree: 0,
+        solving_degree_max: 0,
+        max_cols_to_solution: 0,
+        steps_to_solution: 0,
+        steps: 0,
+        max_rows: 0,
+        max_cols: 0,
+        ms: 0.0,
+        timed_out: false,
+        resource_limit: None,
+        pairs_above_bound: 0,
+        staircase_at_stop: None,
+        field_ops: 0,
+        blocked_steps: 0,
+        trace_mismatch: false,
+        hilbert: HilbertStop::Off,
+        hilbert_check_ops: 0,
+        resumed_ms: 0.0,
+        first_hilbert_deviation_degree: None,
+        last_hilbert_deviation_degree: None,
+        staircase_extinction_degree: None,
+        hilbert_deviations: Vec::new(),
+    }
+}
+
+fn f4_with_visit_account(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    account: VisitAccount<'_>,
+) -> F4Report {
+    if matches!(account, VisitAccount::Off) && visit_accounting_unsuspended_active() {
+        visit_account_block(
+            "accounting_token_missing",
+            None,
+            "native F4 entered an active solver ledger without its borrowed token",
+        );
+        return f4_accounting_stopped_report();
+    }
+    if account.control().stopped() {
+        return f4_accounting_stopped_report();
+    }
     notify_progress(F4Progress {
         event: "begin",
         variables: n_vars,
@@ -2882,11 +6241,11 @@ pub fn f4(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> F4Report {
         field_multiplications: 0,
         elapsed_ms: 0.0,
     });
-    let report = if let Some(chunk) = opts.stop_hilbert {
-        f4_hilbert_guarded(input, n_vars, p, opts, chunk)
-    } else {
-        f4_with_arithmetic(input, n_vars, p, opts, arithmetic_mode(), TraceMode::Off)
-    };
+    let report = f4_dispatch(input, n_vars, p, opts, account, TraceMode::Off);
+    if account.control().stopped() {
+        return f4_accounting_stopped_report();
+    }
+    mem_stats_report(report.ms);
     notify_progress(F4Progress {
         event: "complete",
         variables: n_vars,
@@ -2917,6 +6276,175 @@ pub fn complete_intersection_hilbert(degrees: &[u32]) -> Vec<usize> {
     h
 }
 
+/// The semi-regular (Bardet) Hilbert function of `m` forms of the given
+/// `degrees` in `n_vars` variables: the coefficients of
+/// `prod_i (1 - t^{d_i}) / (1 - t)^{n_vars}` up to the first non-positive one,
+/// which is the degree of regularity. This is the generic expectation a
+/// first-fall degree is measured against; for a square system (`m == n_vars`)
+/// it agrees with [`complete_intersection_hilbert`], and for an over-determined
+/// one it uses the right `(1 - t)^{n_vars}` denominator and truncates, where
+/// the complete-intersection form would not.
+pub fn semi_regular_hilbert(degrees: &[u32], n_vars: usize) -> Option<Vec<usize>> {
+    semi_regular_hilbert_before(degrees, n_vars, None)
+}
+
+fn semi_regular_hilbert_before(
+    degrees: &[u32],
+    n_vars: usize,
+    deadline: Option<Instant>,
+) -> Option<Vec<usize>> {
+    let sum_d = degrees
+        .iter()
+        .try_fold(0usize, |sum, &d| sum.checked_add(d as usize))?;
+    let max_deg = sum_d.checked_add(n_vars)?.checked_add(2)?;
+    // 1 / (1 - t)^{n_vars} up to max_deg: n_vars prefix-sum passes from [1,0,0,…].
+    let count = max_deg.checked_add(1)?;
+    let mut s = Vec::<i128>::new();
+    s.try_reserve_exact(count).ok()?;
+    s.resize(count, 0);
+    s[0] = 1;
+    for _ in 0..n_vars {
+        if deadline.is_some_and(|d| Instant::now() >= d) {
+            return None;
+        }
+        for k in 1..=max_deg {
+            s[k] = s[k].checked_add(s[k - 1])?;
+        }
+    }
+    // multiply by prod_i (1 - t^{d_i}).
+    for &d in degrees {
+        if deadline.is_some_and(|d| Instant::now() >= d) {
+            return None;
+        }
+        let d = d as usize;
+        if d == 0 || d > max_deg {
+            continue;
+        }
+        for k in (d..=max_deg).rev() {
+            s[k] = s[k].checked_sub(s[k - d])?;
+        }
+    }
+    // Coefficients up to (not including) the first non-positive one.
+    let mut out = Vec::new();
+    for &c in &s {
+        if c <= 0 {
+            break;
+        }
+        out.push(usize::try_from(c).ok()?);
+    }
+    Some(out)
+}
+
+/// Compare the computed basis's leading-monomial staircase with the generic
+/// semi-regular expectation. This is not a closure-space computation or a
+/// top-form syzygy calculation, so it cannot establish first/last fall degree.
+/// Extinction refers only to this computed leading ideal, not regularity of
+/// the homogeneous top-form system. A degree bound may leave a partial basis.
+/// The scan is diagnostic only and does not affect solving or charged work.
+// Diagnostic-only counting must not mutate the native staircase counter.
+// Return no value if the caller's original deadline or integer range is exhausted.
+fn diagnostic_staircase_count(
+    lms: &[&[u32]],
+    n_vars: usize,
+    degree: u32,
+    deadline: Option<Instant>,
+) -> Option<usize> {
+    fn count(
+        k: usize,
+        left: u32,
+        mono: &mut [u32],
+        lms: &[&[u32]],
+        deadline: Option<Instant>,
+    ) -> Option<usize> {
+        if deadline.is_some_and(|d| Instant::now() >= d) {
+            return None;
+        }
+        if k + 1 == mono.len() {
+            mono[k] = left;
+            for lm in lms {
+                if deadline.is_some_and(|d| Instant::now() >= d) {
+                    return None;
+                }
+                if divides(lm, mono) {
+                    return Some(0);
+                }
+            }
+            return Some(1);
+        }
+        let mut result = 0usize;
+        for exponent in 0..=left {
+            mono[k] = exponent;
+            result = result.checked_add(count(k + 1, left - exponent, mono, lms, deadline)?)?;
+        }
+        Some(result)
+    }
+    if deadline.is_some_and(|d| Instant::now() >= d) {
+        return None;
+    }
+    if n_vars == 0 {
+        return Some(usize::from(degree == 0 && lms.is_empty()));
+    }
+    let mut mono = vec![0; n_vars];
+    count(0, degree, &mut mono, lms, deadline)
+}
+
+fn hilbert_diagnostic(
+    input: &[Poly],
+    basis: &[Poly],
+    n_vars: usize,
+    deadline: Option<Instant>,
+) -> (Option<u32>, Option<u32>, Option<u32>, Vec<HilbertDeviation>) {
+    let degs: Vec<u32> = input
+        .iter()
+        .filter_map(|f| f.iter().map(|(e, _)| total_degree(e)).max())
+        .filter(|&d| d > 0)
+        .collect();
+    if degs.is_empty() {
+        return (None, None, None, Vec::new());
+    }
+    let Some(expected) = semi_regular_hilbert_before(&degs, n_vars, deadline) else {
+        return (None, None, None, Vec::new());
+    };
+    let lms: Vec<&[u32]> = basis
+        .iter()
+        .filter(|f| !f.is_empty())
+        .map(|f| f[0].0.as_slice())
+        .collect();
+    // Scan the degrees the expectation covers, then on until the quotient
+    // vanishes (the computed staircase extinction), with a hard
+    // cap so a positive-dimensional ideal still terminates.
+    let scan_max = expected.len() as u32 + n_vars as u32 + 1;
+    let mut first_fall = None;
+    let mut last_fall = None;
+    let mut dreg = None;
+    let mut falls = Vec::with_capacity(expected.len() + 1);
+    for d in 0..=scan_max {
+        let exp = expected.get(d as usize).copied().unwrap_or(0);
+        let Some(real) = diagnostic_staircase_count(&lms, n_vars, d, deadline) else {
+            return (None, None, None, Vec::new());
+        };
+        let is_below_expectation = real < exp;
+        if is_below_expectation {
+            if first_fall.is_none() {
+                first_fall = Some(d);
+            }
+            last_fall = Some(d);
+        }
+        falls.push(HilbertDeviation {
+            degree: d,
+            hilbert_expected: exp,
+            hilbert_realized: real,
+            is_below_expectation,
+        });
+        // No standard monomial remains in this degree of the computed staircase.
+        if d > 0 && real == 0 {
+            dreg = Some(d);
+            break;
+        }
+    }
+    (first_fall, last_fall, dreg, falls)
+}
+
 /// [`F4Options::stopping_by_hilbert`]: certify that the leading forms are a
 /// regular sequence, run the Hilbert rule, and fall back to the plain run
 /// when the certificate fails.
@@ -2926,6 +6454,8 @@ fn f4_hilbert_guarded(
     p: u64,
     opts: &F4Options,
     chunk: usize,
+    account: VisitAccount<'_>,
+    mut trace: TraceMode,
 ) -> F4Report {
     let ops0 = field_ops_now();
     let t0 = Instant::now();
@@ -2945,18 +6475,18 @@ fn f4_hilbert_guarded(
         // ideal `(h)` makes `R/(h)` finite-dimensional, so the `n` forms in
         // `n` variables are a regular sequence (Lemma 1); the Macaulay
         // degree `sum(d_i - 1) + 1` bounds the degrees that matter.
-        let lead: Vec<Poly> = input
-            .iter()
-            .zip(&degs)
-            .map(|(f, &d)| {
-                let t: Vec<(Vec<u32>, u64)> = f
-                    .iter()
-                    .filter(|(e, _)| total_degree(e) == d)
-                    .cloned()
-                    .collect();
-                normalise(&t, p, opts.order)
-            })
-            .collect();
+        let mut lead = Vec::with_capacity(input.len());
+        for (f, &d) in input.iter().zip(&degs) {
+            let t: Vec<(Vec<u32>, u64)> = f
+                .iter()
+                .filter(|(e, _)| total_degree(e) == d)
+                .cloned()
+                .collect();
+            lead.push(normalise(&t, p, opts.order));
+            if account.control().stopped() {
+                return f4_accounting_stopped_report();
+            }
+        }
         let bound: usize = degs.iter().map(|&d| d as usize).product();
         let dreg: u32 = degs.iter().map(|d| d - 1).sum::<u32>() + 1;
         let mut co = F4Options::new(opts.order, dreg.min(opts.max_degree));
@@ -2967,22 +6497,48 @@ fn f4_hilbert_guarded(
         // function is a heuristic here that makes the check cheap.
         co.hilbert_expect = Some(complete_intersection_hilbert(&degs));
         co.max_pairs_per_step = Some(chunk);
-        let r = f4_with_arithmetic(&lead, n_vars, p, &co, arithmetic_mode(), TraceMode::Off);
+        let r = f4_with_arithmetic(
+            &lead,
+            n_vars,
+            p,
+            &co,
+            arithmetic_mode(),
+            account,
+            TraceMode::Off,
+        );
+        if account.control().stopped() {
+            return f4_accounting_stopped_report();
+        }
         check_ops = r.field_ops;
         let lms: Vec<&[u32]> = r.basis.iter().map(|g| g[0].0.as_slice()).collect();
-        if !r.timed_out
-            && !r.inconsistent
-            && lead.iter().all(|f| !f.is_empty())
-            && staircase_at_most(&lms, n_vars, bound).is_some()
-        {
-            status = HilbertStop::Applied;
+        if !r.timed_out && !r.inconsistent && lead.iter().all(|f| !f.is_empty()) {
+            let finite_staircase = staircase_at_most(&lms, n_vars, bound).is_some();
+            if account.control().stopped() {
+                return f4_accounting_stopped_report();
+            }
+            if finite_staircase {
+                status = HilbertStop::Applied;
+            }
         }
     }
     if status == HilbertStop::Applied {
         let mut o = plain.clone();
         o.hilbert_expect = Some(complete_intersection_hilbert(&degs));
         o.max_pairs_per_step = Some(chunk);
-        let r = f4_with_arithmetic(input, n_vars, p, &o, arithmetic_mode(), TraceMode::Off);
+        // the main run is the one a trace records or replays (the check
+        // on the leading forms is never traced)
+        let r = f4_with_arithmetic(
+            input,
+            n_vars,
+            p,
+            &o,
+            arithmetic_mode(),
+            account,
+            trace.reborrow(),
+        );
+        if account.control().stopped() {
+            return f4_accounting_stopped_report();
+        }
         if r.hilbert == HilbertStop::Applied {
             return F4Report {
                 field_ops: field_ops_now() - ops0,
@@ -2993,12 +6549,35 @@ fn f4_hilbert_guarded(
         }
         status = HilbertStop::Violated;
     }
-    let r = f4_with_arithmetic(input, n_vars, p, &plain, arithmetic_mode(), TraceMode::Off);
+    // The fallback full run.  A recording keeps only this run's steps; a
+    // replay does not apply to it (the recorded run stopped by the Hilbert
+    // rule) and reports the divergence.
+    let replayed = matches!(trace, TraceMode::Replay(_));
+    let fallback = match &mut trace {
+        TraceMode::Record(t) => {
+            **t = F4Trace::default();
+            TraceMode::Record(t)
+        }
+        _ => TraceMode::Off,
+    };
+    let r = f4_with_arithmetic(
+        input,
+        n_vars,
+        p,
+        &plain,
+        arithmetic_mode(),
+        account,
+        fallback,
+    );
+    if account.control().stopped() {
+        return f4_accounting_stopped_report();
+    }
     F4Report {
         field_ops: field_ops_now() - ops0,
         ms: t0.elapsed().as_secs_f64() * 1e3,
         hilbert: status,
         hilbert_check_ops: check_ops,
+        trace_mismatch: r.trace_mismatch || replayed,
         ..r
     }
 }
@@ -3009,6 +6588,7 @@ fn f4_with_arithmetic(
     p: u64,
     opts: &F4Options,
     mode: u8,
+    account: VisitAccount<'_>,
     mut trace: TraceMode<'_>,
 ) -> F4Report {
     let t0 = Instant::now();
@@ -3017,17 +6597,8 @@ fn f4_with_arithmetic(
     let carried = std::cell::Cell::new(Duration::ZERO);
     let ops_carry = std::cell::Cell::new(0u64);
     let mut blocked_steps = 0usize;
-    if opts.checkpoint.is_some() {
-        assert!(
-            matches!(trace, TraceMode::Off)
-                && opts.hilbert_expect.is_none()
-                && opts.stop_hilbert.is_none()
-                && opts.stop_staircase.is_none()
-                && !opts.capture_run_log,
-            "checkpointing is not combined with traces, the Hilbert or staircase stops, or the run log"
-        );
-    }
     let debug = std::env::var("F4_DEBUG").is_ok();
+    let _pp_guard = par_prof().then_some(PpGuard);
     if debug {
         eprintln!(
             "f4: {} polys in {n_vars} vars over F_{p}, degrees {:?}",
@@ -3050,8 +6621,17 @@ fn f4_with_arithmetic(
     // Pairs over the degree bound, kept so Gebauer–Möller can retire them:
     // `pairs_above_bound` counts the ones still standing.
     let mut above: Vec<Pair> = Vec::new();
+    let mut basis_terms = 0usize;
+    let mut trace_monomials = 0usize;
+    let mut steps = 0usize;
+    let mut max_rows = 0usize;
+    let mut max_cols = 0usize;
+    let mut degree_reached = 0u32;
+    let mut solving_degree = 0u32;
+    let mut learned = (0u32, 0usize, 0usize);
     let gm = gebauer_moeller();
     let mut packed = (matches!(ord, Ordering::Grevlex)
+        && opts.resource_limits.is_none()
         && n_vars <= 15
         && opts.max_degree < 128
         && input.iter().flatten().all(|(e, _)| total_degree(e) < 128)
@@ -3067,7 +6647,7 @@ fn f4_with_arithmetic(
                   steps,
                   mr,
                   mc,
-                  to,
+                  to: bool,
                   pab,
                   learned: (u32, usize, usize),
                   bs: usize| {
@@ -3080,6 +6660,15 @@ fn f4_with_arithmetic(
                 .filter(|(_, &a)| a)
                 .map(|(f, _)| f.clone())
                 .collect()
+        };
+        let (dff, dlf, ddreg, dfalls) = if opts.record_hilbert_diagnostics
+            && opts.resource_limits.is_none()
+            && !inconsistent
+            && !to
+        {
+            hilbert_diagnostic(input, &b, n_vars, opts.deadline)
+        } else {
+            (None, None, None, Vec::new())
         };
         F4Report {
             basis: b,
@@ -3094,6 +6683,7 @@ fn f4_with_arithmetic(
             max_cols: mc,
             ms: (t0.elapsed() + carried.get()).as_secs_f64() * 1e3,
             timed_out: to,
+            resource_limit: None,
             pairs_above_bound: pab,
             staircase_at_stop: None,
             field_ops: ops_carry.get() + (field_ops_now() - ops0),
@@ -3102,8 +6692,99 @@ fn f4_with_arithmetic(
             hilbert: HilbertStop::Off,
             hilbert_check_ops: 0,
             resumed_ms: carried.get().as_secs_f64() * 1e3,
+            first_hilbert_deviation_degree: dff,
+            last_hilbert_deviation_degree: dlf,
+            staircase_extinction_degree: ddreg,
+            hilbert_deviations: dfalls,
         }
     };
+
+    // A refused operation returns diagnostics, but no partial basis which a
+    // caller could accidentally interpret as a certificate of an empty ideal.
+    macro_rules! abort_call {
+        ($stop:expr) => {{
+            let stop: F4Stop = $stop.into();
+            let mut r = report(
+                &[],
+                &[],
+                false,
+                degree_reached,
+                solving_degree,
+                steps,
+                max_rows,
+                max_cols,
+                matches!(&stop, F4Stop::Deadline),
+                pairs_above_bound,
+                learned,
+                blocked_steps,
+            );
+            if let F4Stop::Resource(limit) = stop {
+                r.resource_limit = Some(limit);
+            }
+            return r;
+        }};
+    }
+    macro_rules! admit {
+        ($check:expr) => {
+            if let Err(stop) = $check {
+                abort_call!(stop);
+            }
+        };
+    }
+    macro_rules! account_or_abort {
+        ($control:expr) => {
+            if $control.stopped() {
+                abort_call!(F4Stop::Accounting);
+            }
+        };
+    }
+    macro_rules! bounded_deadline {
+        () => {
+            if opts.resource_limits.is_some() && opts.deadline.is_some_and(|d| Instant::now() > d) {
+                abort_call!(F4Stop::Deadline);
+            }
+        };
+    }
+    account_or_abort!(account.control());
+    if let Some(limits) = &opts.resource_limits {
+        let incompatible = if opts.checkpoint.is_some()
+            || opts.checkpoint_stop_after.is_some()
+            || opts.checkpoint_in_step.is_some()
+            || opts.checkpoint_stop_in_rref.is_some()
+        {
+            Some("checkpoint")
+        } else if opts.stop_hilbert.is_some()
+            || opts.hilbert_expect.is_some()
+            || opts.record_hilbert_diagnostics
+        {
+            Some("hilbert")
+        } else if opts.stop_staircase.is_some() {
+            Some("staircase")
+        } else if opts.capture_run_log {
+            Some("run_log")
+        } else {
+            None
+        };
+        if let Some(option) = incompatible {
+            admit!(Err::<(), _>(unsupported_resource_option(option)));
+        }
+        admit!(limits.check(
+            "input",
+            "symbolic_monomials",
+            input.iter().try_fold(0usize, |n, f| n.checked_add(f.len())),
+            limits.max_symbolic_monomials,
+        ));
+    }
+    if opts.checkpoint.is_some() {
+        assert!(
+            matches!(trace, TraceMode::Off)
+                && opts.hilbert_expect.is_none()
+                && opts.stop_hilbert.is_none()
+                && opts.stop_staircase.is_none()
+                && !opts.capture_run_log,
+            "checkpointing is not combined with traces, the Hilbert or staircase stops, or the run log"
+        );
+    }
 
     // add a polynomial to the basis: pairs under the Gebauer–Möller
     // criteria (or the product criterion alone, `F4_FP_GM=0`) and the
@@ -3121,7 +6802,14 @@ fn f4_with_arithmetic(
         pairs_above_bound: &mut usize,
         gm: bool,
         lmp: Option<&mut Vec<u128>>,
-    ) {
+        limits: Option<&F4ResourceLimits>,
+        deadline: Option<Instant>,
+        account: VisitAccount<'_>,
+    ) -> Result<(), F4Stop> {
+        let (account_phase, control) = account.phase_scope(VisitAccountingPhaseV1::CriticalPairs);
+        if control.stopped() {
+            return Err(F4Stop::Accounting);
+        }
         let k = basis.len();
         let n = f[0].0.len();
         let new: Vec<(usize, Vec<u32>, u128)> = match lmp {
@@ -3140,7 +6828,9 @@ fn f4_with_arithmetic(
                     |a, b| packed_divides(*a, *b),
                     |a, b| packed_lcm(*a, *b),
                     |a, b| packed_coprime(*a, *b),
-                );
+                    limits,
+                    deadline,
+                )?;
                 lmp.push(h);
                 new.into_iter().map(|(i, l)| (i, unpack(l, n), l)).collect()
             }
@@ -3158,10 +6848,15 @@ fn f4_with_arithmetic(
                     |a, b| divides(a, b),
                     |a, b| lcm(a, b),
                     |a, b| a.iter().zip(b).all(|(x, y)| *x == 0 || *y == 0),
-                );
+                    limits,
+                    deadline,
+                )?;
                 new.into_iter().map(|(i, l)| (i, l, 0)).collect()
             }
         };
+        if account.control().stopped() {
+            return Err(F4Stop::Accounting);
+        }
         for (i, l, lp) in new {
             let d = total_degree(&l);
             let pair = Pair {
@@ -3180,39 +6875,61 @@ fn f4_with_arithmetic(
         *pairs_above_bound = above.len();
         basis.push(f);
         alive.push(true);
+        drop(account_phase);
+        if account.control().stopped() {
+            return Err(F4Stop::Accounting);
+        }
+        Ok(())
     }
 
-    for f in input {
-        let f = normalise(f, p, ord);
-        if f.is_empty() {
-            continue;
+    {
+        let (account_phase, control) =
+            account.phase_scope(VisitAccountingPhaseV1::InputNormalization);
+        account_or_abort!(control);
+        for f in input {
+            bounded_deadline!();
+            let f = normalise(f, p, ord);
+            account_or_abort!(account.control());
+            if f.is_empty() {
+                continue;
+            }
+            if total_degree(&f[0].0) == 0 {
+                return report(&basis, &alive, true, 0, 0, 0, 0, 0, false, 0, (0, 0, 0), 0);
+            }
+            basis_terms += f.len();
+            account_or_abort!(account.charge_usize(VisitAccountingCounter::BasisTerms, f.len()));
+            admit!(add(
+                f,
+                &mut basis,
+                &mut alive,
+                &mut pairs,
+                &mut above,
+                opts.max_degree,
+                &mut pairs_above_bound,
+                gm,
+                lm_packed.as_mut(),
+                opts.resource_limits.as_ref(),
+                opts.resource_limits.and(opts.deadline),
+                account,
+            ));
         }
-        if total_degree(&f[0].0) == 0 {
-            return report(&basis, &alive, true, 0, 0, 0, 0, 0, false, 0, (0, 0, 0), 0);
-        }
-        add(
-            f,
-            &mut basis,
-            &mut alive,
-            &mut pairs,
-            &mut above,
-            opts.max_degree,
-            &mut pairs_above_bound,
-            gm,
-            lm_packed.as_mut(),
-        );
+        drop(account_phase);
+        account_or_abort!(account.control());
     }
     let input_lms_now: Vec<Vec<u32>> = basis.iter().map(|f| f[0].0.clone()).collect();
     let mut input_mismatch = false;
     match &mut trace {
-        TraceMode::Record(t) => t.input_lms = input_lms_now,
-        TraceMode::Replay(t) => {
+        TraceMode::Record(t) => {
+            trace_monomials = input_lms_now.len();
+            t.input_lms = input_lms_now;
+        }
+        TraceMode::Replay(c) => {
             // other input leading monomials: not this trace's shape, a full run
-            if t.input_lms != input_lms_now {
+            if c.node.get().input_lms != input_lms_now {
                 input_mismatch = true;
             }
         }
-        TraceMode::Off => {}
+        TraceMode::Off | TraceMode::RecordBranch(_) => {}
     }
     let mut replay_step = 0usize;
     let mut mismatch = false;
@@ -3221,13 +6938,6 @@ fn f4_with_arithmetic(
         trace = TraceMode::Off;
     }
     // interreduce the input (tails included) so the first matrix is small
-    let mut steps = 0usize;
-    let mut max_rows = 0usize;
-    let mut max_cols = 0usize;
-    let mut degree_reached = 0u32;
-    let mut solving_degree = 0u32;
-    // (solving_degree_max, max_cols_to_solution, steps_to_solution)
-    let mut learned = (0u32, 0usize, 0usize);
     let mut staircase_at_stop: Option<usize> = None;
     let mut hilbert_violated = false;
     let mut stair = StairTracker::new(n_vars);
@@ -3239,16 +6949,23 @@ fn f4_with_arithmetic(
         .map(|_| ckpt::fingerprint(input, n_vars, p, opts, mode, gm, packed.is_some()));
     let mut resumed_opts: Option<F4Options> = None;
     let mut resume_rref: Option<ckpt::RrefLoaded> = None;
+    // (elapsed, field operations) of the loop-top checkpoint just read: the first
+    // step of a resumed run starts from exactly what is on disk, so it needs no
+    // rewrite of that file, and an in-step snapshot of it binds to these values.
+    let mut disk_top: Option<(Duration, u64)> = None;
     if let (Some((path, _)), Some(fp)) = (&opts.checkpoint, ck_fp) {
+        let t_read = Instant::now();
         if let Some(l) = ckpt::load_best(path, Some(fp)) {
             eprintln!(
-                "f4: resumed {} at step {}, {:.1} s of the budget already spent, {} basis elements, {} pairs",
+                "f4: resumed {} at step {}, {:.1} s of the budget already spent, {} basis elements, {} pairs (read in {:.1} s)",
                 path.display(),
                 l.steps,
                 l.elapsed.as_secs_f64(),
                 l.basis.len(),
-                l.pairs.len()
+                l.pairs.len(),
+                t_read.elapsed().as_secs_f64()
             );
+            disk_top = Some((l.elapsed, l.field_ops));
             basis = l.basis;
             alive = l.alive;
             pairs = l.pairs;
@@ -3273,14 +6990,16 @@ fn f4_with_arithmetic(
             // finished part of the reduction, so its counts continue from the
             // snapshot's.
             if !deferred && opts.weights.is_none() {
+                let t_rref = Instant::now();
                 if let Some(r) = ckpt::load_rref(&ckpt::rref_path(path), fp, l.steps, l.elapsed) {
                     eprintln!(
-                        "f4: in-step snapshot found: phase {}, column {}, {} pivots, {:.1} s spent, {} rows",
+                        "f4: in-step snapshot found: phase {}, column {}, {} pivots, {:.1} s spent, {} rows (read in {:.1} s)",
                         r.phase,
                         r.c,
                         r.pivots.len(),
                         r.elapsed.as_secs_f64(),
-                        r.rows.len()
+                        r.rows.len(),
+                        t_rref.elapsed().as_secs_f64()
                     );
                     carried.set(r.elapsed);
                     ops_carry.set(r.ops);
@@ -3342,8 +7061,9 @@ fn f4_with_arithmetic(
                 RUN_LOG.with(|l| l.borrow_mut().dropped_pairs += before - pairs.len());
             }
         }
-        if let TraceMode::Replay(t) = &trace {
-            if replay_step >= t.steps.len() {
+        if let TraceMode::Replay(c) = &trace {
+            let t = c.node.get();
+            if replay_step - c.base >= t.steps.len() {
                 // the recorded run's end: the recorded staircase, or the
                 // pairs still pending are processed as a full run
                 let lms: Vec<&[u32]> = basis
@@ -3377,13 +7097,23 @@ fn f4_with_arithmetic(
             eprintln!("f4: {} pairs pending, basis {}", pairs.len(), basis.len());
         }
         // the loop-top values a checkpoint of this step's top records
-        let top_el = t0.elapsed() + carried.get();
-        let top_ops = ops_carry.get() + (field_ops_now() - ops0);
-        let mut wrote_top = false;
+        let (mut top_el, mut top_ops, mut wrote_top) = match disk_top.take() {
+            Some((e, o)) => (e, o, true),
+            None => (
+                t0.elapsed() + carried.get(),
+                ops_carry.get() + (field_ops_now() - ops0),
+                false,
+            ),
+        };
         if let (Some((path, every)), Some(fp)) = (&opts.checkpoint, ck_fp) {
             let stop = opts.checkpoint_stop_after.is_some_and(|k| steps >= k);
             if stop || last_ckpt.elapsed() >= *every {
                 let tw = Instant::now();
+                if wrote_top {
+                    // rewriting the file this step started from: record the values of now
+                    top_el = t0.elapsed() + carried.get();
+                    top_ops = ops_carry.get() + (field_ops_now() - ops0);
+                }
                 let snap = ckpt::Snap {
                     fingerprint: fp,
                     n_vars,
@@ -3476,13 +7206,17 @@ fn f4_with_arithmetic(
         let mut last_snap = Instant::now();
         let mut snaps = 0usize;
         // symbolic preprocessing
+        let (account_symbolic, control) =
+            account.phase_scope(VisitAccountingPhaseV1::SymbolicPreprocessing);
+        account_or_abort!(control);
+        let recording = trace.recording();
         let mut rows_poly: Vec<(usize, Vec<u32>)> = Vec::new(); // (basis index, multiplier)
         let mut seen: FxSet<(usize, Vec<u32>)> = FxSet::default();
         let d;
         let mut selected_len = 0usize;
-        if let TraceMode::Replay(t) = &trace {
+        if let TraceMode::Replay(c) = &trace {
             // the recorded useful rows of this step stand in for the pairs
-            let step = &t.steps[replay_step];
+            let step = &c.node.get().steps[replay_step - c.base];
             replay_step += 1;
             d = step.degree;
             degree_reached = degree_reached.max(d);
@@ -3490,6 +7224,7 @@ fn f4_with_arithmetic(
             // (or ends off the recorded staircase) finishes as a full run
             // over all of them
             for (idx, m) in &step.rows {
+                bounded_deadline!();
                 if *idx >= basis.len() {
                     let mut r = report(
                         &basis,
@@ -3508,25 +7243,41 @@ fn f4_with_arithmetic(
                     r.trace_mismatch = true;
                     return r;
                 }
+                if let Some(limits) = &opts.resource_limits {
+                    admit!(limits.symbolic_step(rows_poly.len().saturating_add(1), 0, recording));
+                }
                 if seen.insert((*idx, m.clone())) {
                     rows_poly.push((*idx, m.clone()));
                 }
             }
         } else {
-            d = pairs.iter().map(|pr| pr.degree).min().unwrap();
-            degree_reached = degree_reached.max(d);
-            let (selected, rest): (Vec<Pair>, Vec<Pair>) =
-                pairs.drain(..).partition(|pr| pr.degree == d);
-            pairs = rest;
-            let mut selected = selected;
-            if let Some(c) = opts.max_pairs_per_step {
-                if selected.len() > c {
-                    selected.sort_by(|a, b| cmp_monomial(&a.lcm, &b.lcm, ord));
-                    pairs.extend(selected.split_off(c));
+            let selected = {
+                let (account_pairs, control) =
+                    account.phase_scope(VisitAccountingPhaseV1::CriticalPairs);
+                account_or_abort!(control);
+                d = pairs.iter().map(|pr| pr.degree).min().unwrap();
+                degree_reached = degree_reached.max(d);
+                let (selected, rest): (Vec<Pair>, Vec<Pair>) =
+                    pairs.drain(..).partition(|pr| pr.degree == d);
+                pairs = rest;
+                let mut selected = selected;
+                if let Some(c) = opts.max_pairs_per_step {
+                    if selected.len() > c {
+                        selected.sort_by(|a, b| cmp_monomial(&a.lcm, &b.lcm, ord));
+                        pairs.extend(selected.split_off(c));
+                    }
                 }
-            }
+                account_or_abort!(account.charge_usize(
+                    VisitAccountingCounter::CriticalPairsSelected,
+                    selected.len(),
+                ));
+                drop(account_pairs);
+                account_or_abort!(account.control());
+                selected
+            };
             selected_len = selected.len();
             for pr in &selected {
+                bounded_deadline!();
                 for &idx in &[pr.i, pr.j] {
                     let m: Vec<u32> = pr
                         .lcm
@@ -3534,6 +7285,13 @@ fn f4_with_arithmetic(
                         .zip(&basis[idx][0].0)
                         .map(|(a, b)| a - b)
                         .collect();
+                    if let Some(limits) = &opts.resource_limits {
+                        admit!(limits.symbolic_step(
+                            rows_poly.len().saturating_add(1),
+                            0,
+                            recording
+                        ));
+                    }
                     if seen.insert((idx, m.clone())) {
                         rows_poly.push((idx, m));
                     }
@@ -3541,25 +7299,99 @@ fn f4_with_arithmetic(
             }
         }
         let n_pair_rows = rows_poly.len();
-        let (cols, sparse, tp1): (Vec<Vec<u32>>, Vec<Vec<(u32, u64)>>, Instant) = if let Some(pk) =
+        let (cols, sparse, tp1): (Cols, Vec<Vec<(u32, u64)>>, Instant) = if let Some(pk) =
             packed.as_mut()
         {
+            if account.enabled() {
+                account_or_abort!(account.block(
+                    "uninstrumented_branch",
+                    None,
+                    "packed symbolic preprocessing is not yet allocation-complete",
+                ));
+            }
             pk.extend(&basis);
             let pk = &*pk;
-            let (extra, cols_packed, row_cols) =
-                if symbolic_parallel() && rayon::current_num_threads() > 1 && rows_poly.len() >= 64
-                {
+            // Spread over threads only from `F4_FP_PAR_SYM_SEEDS` seed rows
+            // (unless `F4_FP_PAR_OLD=1`): below it the rounds are too small
+            // to pay for their dispatches.  Both give the same matrix.
+            let min_seeds = if par_old() { 64 } else { sym_par_min_seeds() };
+            let t_sym = Instant::now();
+            let sym_par = symbolic_parallel()
+                && rayon::current_num_threads() > 1
+                && rows_poly.len() >= min_seeds;
+            pp_add(if sym_par { PP_SYM_PAR } else { PP_SYM_SEQ }, 1);
+            pp_add(PP_SYM_SEEDS, rows_poly.len() as u64);
+            // A replayed step rebuilds its matrix from frozen preprocessing
+            // when the current terms fit the frozen ones ([`FrozenStep`]).
+            let slot = match &trace {
+                TraceMode::Replay(c) if freeze_enabled() => {
+                    Some(&c.node.get().steps[replay_step - 1 - c.base].frozen)
+                }
+                _ => None,
+            };
+            let frozen = slot.and_then(|f| f.0.read().unwrap().clone());
+            let rebuilt = frozen.as_ref().and_then(|fz| fz.rebuild(&pk.terms));
+            let (extra, cols_packed, row_cols) = if let Some(r) = rebuilt {
+                FROZEN_HITS.fetch_add(1, AtomicOrdering::Relaxed);
+                r
+            } else if let (Some(f), Some(old)) = (slot, frozen.as_ref()) {
+                // Widen the frozen copy to the union of its supports and the
+                // current ones (each element's terms merged in term order),
+                // preprocess that once, and rebuild the current step from it.
+                // The supports converge to the generic ones in a few systems.
+                let mut terms = pk.terms.clone();
+                for (i, ft) in &old.support {
+                    terms[*i] = merge_terms(ft, &pk.terms[*i], |x| pk.grevlex_key(x));
+                }
+                let wide = Packed {
+                    n: pk.n,
+                    guard: pk.guard,
+                    terms,
+                    lms: pk.lms.clone(),
+                };
+                let union = wide.symbolic(&rows_poly, &alive, true);
+                let new = FrozenStep::from_symbolic(
+                    &wide.terms,
+                    &rows_poly,
+                    &union.0,
+                    &union.1,
+                    &union.2,
+                );
+                let r = new
+                    .rebuild(&pk.terms)
+                    .expect("the union contains the current supports");
+                *f.0.write().unwrap() = Some(std::sync::Arc::new(new));
+                r
+            } else {
+                let computed = if sym_par {
                     pk.symbolic_par(&rows_poly, &alive)
                 } else {
-                    pk.symbolic(&rows_poly, &alive)
+                    pk.symbolic(&rows_poly, &alive, true)
                 };
+                if let Some(f) = slot {
+                    let new = FrozenStep::from_symbolic(
+                        &pk.terms,
+                        &rows_poly,
+                        &computed.0,
+                        &computed.1,
+                        &computed.2,
+                    );
+                    *f.0.write().unwrap() = Some(std::sync::Arc::new(new));
+                }
+                computed
+            };
+            pp_add(PP_SYM_NS, pp_ns(t_sym));
             let tp1 = Instant::now();
             let idxs: Vec<usize> = rows_poly
                 .iter()
                 .map(|(i, _)| *i)
                 .chain(extra.iter().map(|&(i, _)| i))
                 .collect();
-            rows_poly.extend(extra.iter().map(|&(i, m)| (i, unpack(m, n_vars))));
+            // the reducer rows' multipliers are read back only by a recording
+            // run (its trace); elsewhere they stay packed
+            if trace.recording() {
+                rows_poly.extend(extra.iter().map(|&(i, m)| (i, unpack(m, n_vars))));
+            }
             // Small steps (most of them, and all of `solve`'s specialised
             // runs) are cheaper on one thread than handed to the pool: the
             // hand-off wakes a worker and waits for it, which costs more than
@@ -3575,8 +7407,8 @@ fn f4_with_arithmetic(
             } else {
                 row_cols.into_iter().zip(&idxs).map(to_sparse).collect()
             };
-            let cols = cols_packed.iter().map(|&m| unpack(m, n_vars)).collect();
-            (cols, sparse, tp1)
+            // columns stay packed: only the terms of new polynomials are unpacked
+            (Cols::Packed(cols_packed, n_vars), sparse, tp1)
         } else {
             let mut monomials: FxSet<Vec<u32>> = FxSet::default();
             let mut done: FxSet<Vec<u32>> = FxSet::default();
@@ -3584,11 +7416,19 @@ fn f4_with_arithmetic(
             // One scratch monomial; a heap copy only for a monomial not seen.
             let mut em: Vec<u32> = vec![0; n_vars];
             for (idx, m) in &rows_poly {
+                bounded_deadline!();
                 for (e, _) in &basis[*idx] {
                     for (k, x) in em.iter_mut().enumerate() {
                         *x = e[k] + m[k];
                     }
                     if !monomials.contains(em.as_slice()) {
+                        if let Some(limits) = &opts.resource_limits {
+                            admit!(limits.symbolic_step(
+                                rows_poly.len(),
+                                monomials.len().saturating_add(1),
+                                recording,
+                            ));
+                        }
                         monomials.insert(em.clone());
                         queue.push(em.clone());
                     }
@@ -3597,6 +7437,7 @@ fn f4_with_arithmetic(
                 done.insert(lm);
             }
             while let Some(mono) = queue.pop() {
+                bounded_deadline!();
                 if done.contains(&mono) {
                     continue;
                 }
@@ -3611,12 +7452,26 @@ fn f4_with_arithmetic(
                         .zip(&basis[idx][0].0)
                         .map(|(a, b)| a - b)
                         .collect();
+                    if let Some(limits) = &opts.resource_limits {
+                        admit!(limits.symbolic_step(
+                            rows_poly.len().saturating_add(1),
+                            monomials.len(),
+                            recording,
+                        ));
+                    }
                     if seen.insert((idx, m.clone())) {
                         for (e, _) in &basis[idx] {
                             for (k, x) in em.iter_mut().enumerate() {
                                 *x = e[k] + m[k];
                             }
                             if !monomials.contains(em.as_slice()) {
+                                if let Some(limits) = &opts.resource_limits {
+                                    admit!(limits.symbolic_step(
+                                        rows_poly.len().saturating_add(1),
+                                        monomials.len().saturating_add(1),
+                                        recording,
+                                    ));
+                                }
                                 monomials.insert(em.clone());
                                 queue.push(em.clone());
                             }
@@ -3625,8 +7480,14 @@ fn f4_with_arithmetic(
                     }
                 }
             }
+            if let Some(limits) = &opts.resource_limits {
+                admit!(limits.matrix("matrix", rows_poly.len(), monomials.len(), recording));
+            }
             let tp1 = Instant::now();
             // matrix: columns in decreasing monomial order, rows sparse
+            let (account_columns, control) =
+                account.phase_scope(VisitAccountingPhaseV1::ColumnOrdering);
+            account_or_abort!(control);
             let mut cols: Vec<Vec<u32>> = monomials.into_iter().collect();
             cols.sort_unstable_by(|a, b| cmp_monomial(b, a, ord));
             let col_of: FxMap<&[u32], u32> = cols
@@ -3635,8 +7496,13 @@ fn f4_with_arithmetic(
                 .map(|(i, m)| (m.as_slice(), i as u32))
                 .collect();
             let n_cols = cols.len();
+            drop(account_columns);
+            account_or_abort!(account.control());
             // `(column, coefficient)` in increasing column order, so the
             // leading term first; every row is monic
+            let (account_matrix, control) =
+                account.phase_scope(VisitAccountingPhaseV1::MatrixConstruction);
+            account_or_abort!(control);
             let to_sparse = |(idx, m): &(usize, Vec<u32>)| -> Vec<(u32, u64)> {
                 let mut em = vec![0u32; n_vars];
                 basis[*idx]
@@ -3657,10 +7523,27 @@ fn f4_with_arithmetic(
             } else {
                 rows_poly.iter().map(to_sparse).collect()
             };
-            (cols, sparse, tp1)
+            drop(account_matrix);
+            account_or_abort!(account.control());
+            (Cols::Plain(cols), sparse, tp1)
         };
+        drop(account_symbolic);
+        account_or_abort!(account.control());
         let n_cols = cols.len();
-        let parallel = rows_poly.len() * n_cols > PAR_WORK;
+        let (account_matrix, control) =
+            account.phase_scope(VisitAccountingPhaseV1::MatrixConstruction);
+        account_or_abort!(control);
+        account_or_abort!(
+            account.charge_usize(VisitAccountingCounter::SymbolicRows, rows_poly.len())
+        );
+        account_or_abort!(account.charge_usize(VisitAccountingCounter::MatrixRows, sparse.len()));
+        account_or_abort!(account.charge_usize(VisitAccountingCounter::MatrixColumns, n_cols));
+        account_or_abort!(account.charge_product(
+            VisitAccountingCounter::MatrixEntries,
+            sparse.len(),
+            n_cols,
+        ));
+        let parallel = sparse.len() * n_cols > PAR_WORK;
         let tp2 = Instant::now();
         let mut input_lm = vec![false; n_cols];
         for r in &sparse {
@@ -3686,19 +7569,75 @@ fn f4_with_arithmetic(
         // probe and the column-index probe), per column (the done-set probe,
         // the reducer search over the basis at its bound, the column sort),
         // and the pair rows' scans over the reducer columns
-        if super::jv_bitops::enabled() {
-            let entries: u64 = sparse.iter().map(|r| r.len() as u64).sum();
-            let nc = n_cols as u64;
-            super::jv_bitops::probes(2 * entries + nc, 2);
-            super::jv_bitops::words(
-                2 * entries + super::jv_bitops::sort_cost(n_cols) + nc * basis.len() as u64,
-            );
-            let scans: u64 = sparse[..n_pair_rows]
-                .iter()
-                .map(|r| r.first().map_or(0, |e| nc - e.0 as u64))
-                .sum();
-            super::jv_bitops::words(scans);
+        if super::jv_bitops::enabled() || account.enabled() {
+            let entries = sparse.iter().try_fold(0u64, |sum, row| {
+                sum.checked_add(u64::try_from(row.len()).ok()?)
+            });
+            let nc = u64::try_from(n_cols).ok();
+            if let (Some(entries), Some(nc)) = (entries, nc) {
+                if let Some(probes) = entries.checked_mul(2).and_then(|n| n.checked_add(nc)) {
+                    super::jv_bitops::probes(probes, 2);
+                    if let Some(words) = probes.checked_mul(2) {
+                        account_or_abort!(
+                            account.charge(VisitAccountingCounter::HashProbes, probes)
+                        );
+                        account_or_abort!(
+                            account.charge(VisitAccountingCounter::WordOperations, words)
+                        );
+                    } else {
+                        account_or_abort!(account.block(
+                            "counter_overflow",
+                            Some("word_operations"),
+                            format!("checked probe word product {probes} * 2 failed"),
+                        ));
+                    }
+                } else {
+                    account_or_abort!(account.block(
+                        "counter_overflow",
+                        Some("hash_probes"),
+                        "symbolic probe count overflowed",
+                    ));
+                }
+                let sort = super::jv_bitops::sort_cost(n_cols);
+                account_or_abort!(account.charge(VisitAccountingCounter::SortComparisons, sort));
+                let basis_words = nc.checked_mul(u64::try_from(basis.len()).unwrap_or(u64::MAX));
+                let words = entries
+                    .checked_mul(2)
+                    .and_then(|n| n.checked_add(sort))
+                    .and_then(|n| n.checked_add(basis_words?));
+                if let Some(words) = words {
+                    super::jv_bitops::words(words);
+                    account_or_abort!(account.charge(VisitAccountingCounter::WordOperations, words));
+                } else {
+                    account_or_abort!(account.block(
+                        "counter_overflow",
+                        Some("word_operations"),
+                        "symbolic matrix-build word count overflowed",
+                    ));
+                }
+                let scans = sparse[..n_pair_rows].iter().try_fold(0u64, |sum, row| {
+                    sum.checked_add(row.first().map_or(0, |entry| nc - u64::from(entry.0)))
+                });
+                if let Some(scans) = scans {
+                    super::jv_bitops::words(scans);
+                    account_or_abort!(account.charge(VisitAccountingCounter::WordOperations, scans));
+                } else {
+                    account_or_abort!(account.block(
+                        "counter_overflow",
+                        Some("word_operations"),
+                        "pair-row scan count overflowed",
+                    ));
+                }
+            } else {
+                account_or_abort!(account.block(
+                    "counter_overflow",
+                    Some("matrix_entries"),
+                    "matrix shape does not fit u64",
+                ));
+            }
         }
+        drop(account_matrix);
+        account_or_abort!(account.control());
         // The reducer rows of symbolic preprocessing have distinct leading
         // columns, none of them an lcm: they are already an echelon form.
         // Reduce each pair row by them alone, column by column, then take
@@ -3706,6 +7645,8 @@ fn f4_with_arithmetic(
         // other columns only.  Its rows are exactly the rows of the whole
         // matrix's reduced echelon form whose pivot is not a reducer's
         // leading monomial — the only ones that can be new.
+        let (account_rows, control) = account.phase_scope(VisitAccountingPhaseV1::RowReduction);
+        account_or_abort!(control);
         let (pair_rows, reducers) = sparse.split_at(n_pair_rows);
         const NONE: u32 = u32::MAX;
         let mut reducer_at = vec![NONE; n_cols];
@@ -3717,7 +7658,7 @@ fn f4_with_arithmetic(
         // Block-aware reduction: with every row in one weight class the
         // reduced pair rows split by class over the free columns.
         let block_classes: Option<Vec<u8>> = opts.weights.as_ref().and_then(|w| {
-            let col_w: Vec<u8> = cols.iter().map(|m| z3_weight(m, w)).collect();
+            let col_w: Vec<u8> = (0..n_cols).map(|j| z3_weight(&cols.get(j), w)).collect();
             let homogeneous = sparse.iter().all(|r| {
                 let cw = col_w[r[0].0 as usize];
                 r.iter().all(|&(c, _)| col_w[c as usize] == cw)
@@ -3731,7 +7672,7 @@ fn f4_with_arithmetic(
         // reduced rows before the echelon form, to find the contributors of
         // every new pivot
         let mut useful: Vec<bool> = Vec::new();
-        let recording = matches!(trace, TraceMode::Record(_));
+        let recording = trace.recording();
         let mut rec_rows: Vec<Vec<u64>> = Vec::new();
         let pivots: Option<(Vec<Vec<u64>>, Vec<usize>)> = if deferred {
             let fp32 = fp32.expect("deferred mode has narrow arithmetic");
@@ -3788,8 +7729,9 @@ fn f4_with_arithmetic(
             // blocks before it, then finished in order against each other.
             // Tiny steps (most of `solve`'s specialised runs) keep the
             // cascade: building `B'` there costs more than it saves.
-            let fl = fl_enabled()
-                && n_cols >= FL_MIN_COLS
+            let fl = opts.resource_limits.is_none()
+                && fl_enabled()
+                && n_cols >= fl_min_cols()
                 && reducers.len().saturating_mul(free_cols.len()) <= FL_MAX_ENTRIES;
             let reduced: Option<Vec<Vec<u32>>> = if fl {
                 reduce_pairs_fl(
@@ -3801,10 +7743,21 @@ fn f4_with_arithmetic(
                     fp,
                     deadline,
                 )
-            } else if parallel {
-                pair_rows.par_iter().map(reduce_pair_row).collect()
             } else {
-                pair_rows.iter().map(reduce_pair_row).collect()
+                let o0 = pp_ops();
+                let t_c = Instant::now();
+                let out: Option<Vec<Vec<u32>>> = if parallel {
+                    pair_rows.par_iter().map(reduce_pair_row).collect()
+                } else {
+                    pair_rows.iter().map(reduce_pair_row).collect()
+                };
+                pp_add(
+                    if parallel { PP_CASC_PAR } else { PP_CASC_SER },
+                    pp_ops() - o0,
+                );
+                pp_add(PP_CASC_STEPS, 1);
+                pp_add(PP_CASC_NS, pp_ns(t_c));
+                out
             };
             reduced.and_then(|mut rows| {
                 useful = rows.iter().map(|r| r.iter().any(|&v| v != 0)).collect();
@@ -3888,6 +7841,16 @@ fn f4_with_arithmetic(
             // Products an entry below `p` can take without reaching `2⁶⁴`
             // (`p < 2³²`, so `(p - 1)²` fits a `u64`).
             let lazy_limit = ((u64::MAX - p) / ((p - 1) * (p - 1))) as usize;
+            // Wide primes (above the narrow/deferred gate at 2¹⁶) still admit
+            // Faugère–Lachartre when coefficients fit in `u32` and exact `f64`
+            // panels are safe — the NTT prime 786433 is the motivating case.
+            // `F4_FP_FL=0` keeps the cascade below as a same-binary control.
+            let fl_wide = resume_here.is_none()
+                && opts.resource_limits.is_none()
+                && fl_enabled()
+                && n_cols >= fl_min_cols()
+                && reducers.len().saturating_mul(free_cols.len()) <= FL_MAX_ENTRIES
+                && super::fp_gemm::supports_f64_gemm(p);
             let reduce_pair_row = |r: &Vec<(u32, u64)>| -> Option<Vec<u64>> {
                 if deadline.is_some_and(|d| Instant::now() > d) {
                     return None;
@@ -3952,6 +7915,21 @@ fn f4_with_arithmetic(
             // part of the reduction
             let reduced: Option<Vec<Vec<u64>>> = if resume_here.is_some() {
                 Some(Vec::new())
+            } else if fl_wide {
+                reduce_pairs_fl(
+                    pair_rows,
+                    reducers,
+                    &reducer_at,
+                    &free_cols,
+                    n_cols,
+                    fp,
+                    deadline,
+                )
+                .map(|rows| {
+                    rows.into_iter()
+                        .map(|r| r.into_iter().map(u64::from).collect())
+                        .collect()
+                })
             } else if parallel {
                 pair_rows.par_iter().map(reduce_pair_row).collect()
             } else {
@@ -4047,18 +8025,53 @@ fn f4_with_arithmetic(
                 let piv = match &block_classes {
                     Some(cls) => rref_blocked(&mut rows, cls, |b| rref(b, fp, deadline)),
                     None => {
-                        let hook: Option<&mut dyn FnMut(&RrefView) -> bool> =
-                            if top.is_some() && opts.checkpoint.is_some() {
-                                Some(&mut snapshot_hook)
-                            } else {
-                                None
-                            };
-                        rref_ckpt(&mut rows, fp, deadline, resume_arg, hook)
+                        let want_hook = top.is_some() && opts.checkpoint.is_some();
+                        // Deferred lazy/SpMM RREF for free-column matrices on
+                        // exact-f64 primes (NTT 786433): classical `rref` uses
+                        // per-entry Barrett reduces; deferred keeps AVX lazy
+                        // accumulators (GEMM panels optional via F4_FP_GEMM).
+                        // `F4_FP_WIDE_DEFERRED=0` restores classical `rref`.
+                        let use_wide_deferred = resume_arg.is_none()
+                            && !want_hook
+                            && wide_deferred_enabled()
+                            && super::fp_gemm::supports_f64_gemm(p)
+                            && rows.len() >= 8
+                            && rows.first().map(|r| r.len()).unwrap_or(0) >= 64;
+                        if use_wide_deferred {
+                            let mut rows32: Vec<Vec<u32>> = rows
+                                .iter()
+                                .map(|r| {
+                                    r.iter()
+                                        .map(|&v| {
+                                            debug_assert!(v < p);
+                                            v as u32
+                                        })
+                                        .collect()
+                                })
+                                .collect();
+                            let piv =
+                                rref_u32_barrett_deferred(&mut rows32, fp, deadline)?;
+                            rows = rows32
+                                .into_iter()
+                                .map(|r| r.into_iter().map(u64::from).collect())
+                                .collect();
+                            Some(piv)
+                        } else {
+                            let hook: Option<&mut dyn FnMut(&RrefView) -> bool> =
+                                if want_hook {
+                                    Some(&mut snapshot_hook)
+                                } else {
+                                    None
+                                };
+                            rref_ckpt(&mut rows, fp, deadline, resume_arg, hook)
+                        }
                     }
                 };
                 piv.map(|piv| (rows, piv))
             })
         };
+        drop(account_rows);
+        account_or_abort!(account.control());
         if debug {
             eprintln!(
                 "f4 step {steps}: degree {d}, {} pairs, {} rows × {n_cols} cols, {} pivots, basis {}",
@@ -4086,17 +8099,34 @@ fn f4_with_arithmetic(
         };
         let tp3 = Instant::now();
         // new polynomials: rows whose pivot column is not an input leading monomial
+        let (account_basis, control) = account.phase_scope(VisitAccountingPhaseV1::BasisCleanup);
+        account_or_abort!(control);
         let mut new_polys: Vec<Poly> = Vec::new();
+        let mut new_terms = 0usize;
         for (row, &c) in rows.iter().zip(&pivots) {
             if input_lm[free_cols[c]] {
                 continue;
             }
-            let poly: Poly = row
-                .iter()
-                .enumerate()
-                .filter(|(_, &v)| v != 0)
-                .map(|(j, &v)| (cols[free_cols[j]].clone(), v))
-                .collect();
+            // sized up front: a filtered collect grows by reallocation
+            let terms = row.iter().filter(|&&v| v != 0).count();
+            if let Some(limits) = &opts.resource_limits {
+                admit!(limits.check(
+                    "basis_update",
+                    "symbolic_monomials",
+                    basis_terms
+                        .checked_add(new_terms)
+                        .and_then(|n| n.checked_add(terms)),
+                    limits.max_symbolic_monomials,
+                ));
+            }
+            new_terms += terms;
+            let mut poly: Poly = Vec::with_capacity(terms);
+            poly.extend(
+                row.iter()
+                    .enumerate()
+                    .filter(|(_, &v)| v != 0)
+                    .map(|(j, &v)| (cols.get(free_cols[j]), v)),
+            );
             if total_degree(&poly[0].0) == 0 {
                 return report(
                     &basis,
@@ -4121,12 +8151,33 @@ fn f4_with_arithmetic(
         }
         let learned_now = !new_polys.is_empty();
         let learned_new = new_polys.len();
-        match &mut trace {
-            TraceMode::Record(t) => {
+        if let Some(t) = trace.rec_mut() {
+            {
+                if let Some(limits) = &opts.resource_limits {
+                    // Count a step record even when it has no retained rows.
+                    // This check precedes both contributor recovery and copies.
+                    admit!(limits.check(
+                        "trace",
+                        "symbolic_monomials",
+                        trace_monomials
+                            .checked_add(1)
+                            .and_then(|n| n.checked_add(n_pair_rows))
+                            .and_then(|n| n.checked_add(new_polys.len())),
+                        limits.max_symbolic_monomials,
+                    ));
+                }
                 // the pair rows that the new pivots are combinations of
                 let retained: Vec<usize> = (0..n_pair_rows).filter(|&i| useful[i]).collect();
                 let mut needed = vec![false; retained.len()];
-                for (col, contributors) in tracked_rref_contributors(&rec_rows, p) {
+                let contributors = match tracked_rref_contributors(
+                    &rec_rows,
+                    p,
+                    opts.resource_limits.and(opts.deadline),
+                ) {
+                    Some(c) => c,
+                    None => abort_call!(F4Stop::Deadline),
+                };
+                for (col, contributors) in contributors {
                     if !input_lm[free_cols[col]] {
                         for i in contributors {
                             needed[i] = true;
@@ -4134,6 +8185,8 @@ fn f4_with_arithmetic(
                     }
                 }
                 t.steps.push(TraceStep {
+                    frozen: Default::default(),
+                    branches: Default::default(),
                     degree: d,
                     rows: retained
                         .iter()
@@ -4143,23 +8196,55 @@ fn f4_with_arithmetic(
                         .collect(),
                     new_lms: new_polys.iter().map(|f| f[0].0.clone()).collect(),
                 });
+                let step = t.steps.last().unwrap();
+                trace_monomials += 1 + step.rows.len() + step.new_lms.len();
             }
-            TraceMode::Replay(t) => {
-                let expected = &t.steps[replay_step - 1].new_lms;
-                let found: Vec<&Vec<u32>> = new_polys.iter().map(|f| &f[0].0).collect();
-                if found.len() != expected.len() || found.iter().zip(expected).any(|(a, b)| *a != b)
-                {
-                    // the shapes diverged: keep what this step found (it is
-                    // in the ideal) and finish as a full run over the pairs
-                    // the basis has accumulated
+        } else if let TraceMode::Replay(c) = &trace {
+            let at = replay_step - 1 - c.base;
+            let expected = &c.node.get().steps[at].new_lms;
+            let found: Vec<&Vec<u32>> = new_polys.iter().map(|f| &f[0].0).collect();
+            if found.len() != expected.len() || found.iter().zip(expected).any(|(a, b)| *a != b) {
+                // The shapes diverged.  What this step found is in the ideal
+                // either way.  A branch recorded for these leading monomials
+                // is followed from the next step; without one, the run
+                // continues over the pairs the basis has accumulated and
+                // records that continuation as a new branch.
+                let key: Vec<Vec<u32>> = found.iter().map(|m| (*m).clone()).collect();
+                let next = if branch_enabled() {
+                    let slot = c.node.get().steps[at].branches.0.read().unwrap();
+                    match slot.iter().find(|(k, _)| *k == key) {
+                        Some((_, b)) => {
+                            BRANCH_FOLLOWS.fetch_add(1, AtomicOrdering::Relaxed);
+                            TraceMode::Replay(Cursor {
+                                node: Node::Branch(b.clone()),
+                                base: replay_step,
+                            })
+                        }
+                        None if slot.len() < MAX_BRANCHES && trace_growth() => {
+                            mismatch = true;
+                            TraceMode::RecordBranch(Box::new(BranchRec {
+                                trace: F4Trace::default(),
+                                parent: c.node.clone(),
+                                at,
+                                key,
+                            }))
+                        }
+                        None => {
+                            mismatch = true;
+                            TraceMode::Off
+                        }
+                    }
+                } else {
                     mismatch = true;
-                    trace = TraceMode::Off;
-                }
+                    TraceMode::Off
+                };
+                trace = next;
             }
-            TraceMode::Off => {}
         }
         for f in new_polys {
-            add(
+            basis_terms += f.len();
+            account_or_abort!(account.charge_usize(VisitAccountingCounter::BasisTerms, f.len()));
+            admit!(add(
                 f,
                 &mut basis,
                 &mut alive,
@@ -4169,8 +8254,13 @@ fn f4_with_arithmetic(
                 &mut pairs_above_bound,
                 gm,
                 lm_packed.as_mut(),
-            );
+                opts.resource_limits.as_ref(),
+                opts.resource_limits.and(opts.deadline),
+                account,
+            ));
         }
+        drop(account_basis);
+        account_or_abort!(account.control());
         if let Some(ops_step0) = ops_step0 {
             let lms: Vec<&[u32]> = basis
                 .iter()
@@ -4209,26 +8299,56 @@ fn f4_with_arithmetic(
                 .collect();
             if let Some(count) = staircase_at_most(&lms, n_vars, bound) {
                 staircase_at_stop = Some(count);
-                if let TraceMode::Record(t) = &mut trace {
+                if let Some(t) = trace.rec_mut() {
                     t.stopped = true;
                 }
                 break;
             }
         }
     }
-    // final interreduction of the alive basis (tails)
-    let mut reduced: Vec<Poly> = basis
-        .iter()
+    // final interreduction of the alive basis (tails); the basis is not used
+    // again, so its polynomials are moved rather than copied term by term
+    let (account_basis, control) = account.phase_scope(VisitAccountingPhaseV1::BasisCleanup);
+    account_or_abort!(control);
+    let mut reduced: Vec<Poly> = std::mem::take(&mut basis)
+        .into_iter()
         .zip(&alive)
         .filter(|(_, &a)| a)
-        .map(|(f, _)| f.clone())
+        .map(|(f, _)| f)
         .collect();
     let ti = Instant::now();
-    reduced = interreduce_linear(&reduced, n_vars, p, ord)
-        .unwrap_or_else(|| interreduce(&reduced, p, ord));
+    pp_dump("steps");
+    reduced = if let Some(limits) = &opts.resource_limits {
+        match interreduce_bounded(reduced, p, ord, limits, opts.deadline) {
+            Ok(reduced) => reduced,
+            Err(stop) => abort_call!(stop),
+        }
+    } else {
+        interreduce_linear(&reduced, n_vars, p, ord)
+            .unwrap_or_else(|| interreduce(&reduced, p, ord))
+    };
+    account_or_abort!(account.control());
     if debug {
         eprintln!("f4 interreduce ms: {:.2}", ti.elapsed().as_secs_f64() * 1e3);
     }
+    for polynomial in &reduced {
+        account_or_abort!(
+            account.charge_usize(VisitAccountingCounter::BasisTerms, polynomial.len())
+        );
+    }
+    let (dff, dlf, ddreg, dfalls) = if opts.record_hilbert_diagnostics {
+        hilbert_diagnostic(input, &reduced, n_vars, opts.deadline)
+    } else {
+        (None, None, None, Vec::new())
+    };
+    // a branch is kept only from a run that ended cleanly under its rule
+    if let TraceMode::RecordBranch(b) = trace {
+        if pairs_above_bound == 0 && !(opts.hilbert_expect.is_some() && hilbert_violated) {
+            b.commit();
+        }
+    }
+    drop(account_basis);
+    account_or_abort!(account.control());
     F4Report {
         basis: reduced,
         inconsistent: false,
@@ -4242,6 +8362,7 @@ fn f4_with_arithmetic(
         max_cols,
         ms: (t0.elapsed() + carried.get()).as_secs_f64() * 1e3,
         timed_out: false,
+        resource_limit: None,
         pairs_above_bound,
         staircase_at_stop,
         field_ops: ops_carry.get() + (field_ops_now() - ops0),
@@ -4258,6 +8379,10 @@ fn f4_with_arithmetic(
         },
         hilbert_check_ops: 0,
         resumed_ms: carried.get().as_secs_f64() * 1e3,
+        first_hilbert_deviation_degree: dff,
+        last_hilbert_deviation_degree: dlf,
+        staircase_extinction_degree: ddreg,
+        hilbert_deviations: dfalls,
     }
 }
 
@@ -4278,9 +8403,23 @@ fn linear_interreduce_enabled() -> bool {
 /// interreduction was 43 % of the whole run.  `None` outside the narrow
 /// deferred arithmetic (`p ≤ 2¹⁶`), where the caller interreduces as before.
 fn interreduce_linear(basis: &[Poly], n_vars: usize, p: u64, ord: Ordering) -> Option<Vec<Poly>> {
+    interreduce_linear_with(basis, n_vars, p, ord, packed_enabled())
+}
+
+/// [`interreduce_linear`] with the monomial representation chosen by the
+/// caller (`packed` is only a request: it needs grevlex, n <= 15 and every
+/// degree below 128).
+fn interreduce_linear_with(
+    basis: &[Poly],
+    n_vars: usize,
+    p: u64,
+    ord: Ordering,
+    packed: bool,
+) -> Option<Vec<Poly>> {
     if !linear_interreduce_enabled() || p > 1 << 16 || arithmetic_mode() != 2 || basis.is_empty() {
         return None;
     }
+    let t_ir = Instant::now();
     // the same minimal subset as `interreduce`
     let keep: Vec<&Poly> = basis
         .iter()
@@ -4293,67 +8432,100 @@ fn interreduce_linear(basis: &[Poly], n_vars: usize, p: u64, ord: Ordering) -> O
         })
         .map(|(_, f)| f)
         .collect();
-    let mut rows_poly: Vec<(usize, Vec<u32>)> =
-        (0..keep.len()).map(|i| (i, vec![0u32; n_vars])).collect();
-    let mut seen: FxSet<(usize, Vec<u32>)> = rows_poly.iter().cloned().collect();
-    let mut monomials: FxSet<Vec<u32>> = FxSet::default();
-    let mut done: FxSet<Vec<u32>> = keep.iter().map(|f| f[0].0.clone()).collect();
-    let mut queue: Vec<Vec<u32>> = Vec::new();
-    for f in &keep {
-        for (e, _) in f.iter() {
-            if monomials.insert(e.clone()) {
-                queue.push(e.clone());
-            }
+    // Packed monomials (as the F4 steps use them) when the ordering is
+    // grevlex, n <= 15 and every degree is below 128: the same rows, columns
+    // and column order as the exponent-vector path below, without a heap
+    // vector per monomial.  `F4_FP_PACKED=0` keeps the vector path.
+    let packed_ok = matches!(ord, Ordering::Grevlex)
+        && n_vars <= 15
+        && packed
+        && keep
+            .iter()
+            .all(|f| f.iter().all(|(e, _)| total_degree(e) < 128));
+    let (cols, sparse): (Cols, Vec<Vec<(u32, u64)>>) = if packed_ok {
+        let mut pk = Packed::new(n_vars);
+        for f in &keep {
+            pk.push(f);
         }
-    }
-    let mut em: Vec<u32> = vec![0; n_vars];
-    while let Some(mono) = queue.pop() {
-        if !done.insert(mono.clone()) {
-            continue;
-        }
-        if let Some(idx) = (0..keep.len()).find(|&i| divides(&keep[i][0].0, &mono)) {
-            let m: Vec<u32> = mono
-                .iter()
-                .zip(&keep[idx][0].0)
-                .map(|(a, b)| a - b)
-                .collect();
-            if seen.insert((idx, m.clone())) {
-                for (e, _) in keep[idx].iter() {
-                    for (k, x) in em.iter_mut().enumerate() {
-                        *x = e[k] + m[k];
-                    }
-                    if !monomials.contains(em.as_slice()) {
-                        monomials.insert(em.clone());
-                        queue.push(em.clone());
-                    }
+        let seeds: Vec<(usize, Vec<u32>)> =
+            (0..keep.len()).map(|i| (i, vec![0u32; n_vars])).collect();
+        let (extra, cols_packed, row_cols) = pk.symbolic(&seeds, &vec![true; keep.len()], false);
+        let idxs = (0..keep.len()).chain(extra.iter().map(|&(i, _)| i));
+        let sparse = row_cols
+            .into_iter()
+            .zip(idxs)
+            .map(|(rc, idx)| {
+                rc.into_iter()
+                    .zip(keep[idx].iter())
+                    .map(|(c, (_, v))| (c, *v))
+                    .collect()
+            })
+            .collect();
+        (Cols::Packed(cols_packed, n_vars), sparse)
+    } else {
+        let mut rows_poly: Vec<(usize, Vec<u32>)> =
+            (0..keep.len()).map(|i| (i, vec![0u32; n_vars])).collect();
+        let mut seen: FxSet<(usize, Vec<u32>)> = rows_poly.iter().cloned().collect();
+        let mut monomials: FxSet<Vec<u32>> = FxSet::default();
+        let mut done: FxSet<Vec<u32>> = keep.iter().map(|f| f[0].0.clone()).collect();
+        let mut queue: Vec<Vec<u32>> = Vec::new();
+        for f in &keep {
+            for (e, _) in f.iter() {
+                if monomials.insert(e.clone()) {
+                    queue.push(e.clone());
                 }
-                rows_poly.push((idx, m));
             }
         }
-    }
-    let mut cols: Vec<Vec<u32>> = monomials.into_iter().collect();
-    cols.sort_unstable_by(|a, b| cmp_monomial(b, a, ord));
-    let col_of: FxMap<&[u32], u32> = cols
-        .iter()
-        .enumerate()
-        .map(|(i, m)| (m.as_slice(), i as u32))
-        .collect();
-    let n_cols = cols.len();
-    let sparse: Vec<Vec<(u32, u64)>> = rows_poly
-        .iter()
-        .map(|(idx, m)| {
-            let mut em = vec![0u32; n_vars];
-            keep[*idx]
-                .iter()
-                .map(|(e, c)| {
-                    for (k, x) in em.iter_mut().enumerate() {
-                        *x = e[k] + m[k];
+        let mut em: Vec<u32> = vec![0; n_vars];
+        while let Some(mono) = queue.pop() {
+            if !done.insert(mono.clone()) {
+                continue;
+            }
+            if let Some(idx) = (0..keep.len()).find(|&i| divides(&keep[i][0].0, &mono)) {
+                let m: Vec<u32> = mono
+                    .iter()
+                    .zip(&keep[idx][0].0)
+                    .map(|(a, b)| a - b)
+                    .collect();
+                if seen.insert((idx, m.clone())) {
+                    for (e, _) in keep[idx].iter() {
+                        for (k, x) in em.iter_mut().enumerate() {
+                            *x = e[k] + m[k];
+                        }
+                        if !monomials.contains(em.as_slice()) {
+                            monomials.insert(em.clone());
+                            queue.push(em.clone());
+                        }
                     }
-                    (col_of[em.as_slice()], *c)
-                })
-                .collect()
-        })
-        .collect();
+                    rows_poly.push((idx, m));
+                }
+            }
+        }
+        let mut cols: Vec<Vec<u32>> = monomials.into_iter().collect();
+        cols.sort_unstable_by(|a, b| cmp_monomial(b, a, ord));
+        let col_of: FxMap<&[u32], u32> = cols
+            .iter()
+            .enumerate()
+            .map(|(i, m)| (m.as_slice(), i as u32))
+            .collect();
+        let sparse: Vec<Vec<(u32, u64)>> = rows_poly
+            .iter()
+            .map(|(idx, m)| {
+                let mut em = vec![0u32; n_vars];
+                keep[*idx]
+                    .iter()
+                    .map(|(e, c)| {
+                        for (k, x) in em.iter_mut().enumerate() {
+                            *x = e[k] + m[k];
+                        }
+                        (col_of[em.as_slice()], *c)
+                    })
+                    .collect()
+            })
+            .collect();
+        (Cols::Plain(cols), sparse)
+    };
+    let n_cols = cols.len();
     let (pair_rows, reducers) = sparse.split_at(keep.len());
     const NONE: u32 = u32::MAX;
     let mut reducer_at = vec![NONE; n_cols];
@@ -4365,6 +8537,8 @@ fn interreduce_linear(basis: &[Poly], n_vars: usize, p: u64, ord: Ordering) -> O
         return None;
     }
     let fp = Barrett::new(p);
+    pp_add(PP_IR_SYM_NS, pp_ns(t_ir));
+    let t_red = Instant::now();
     let mut rows = reduce_pairs_fl(
         pair_rows,
         reducers,
@@ -4375,17 +8549,21 @@ fn interreduce_linear(basis: &[Poly], n_vars: usize, p: u64, ord: Ordering) -> O
         None,
     )?;
     let pivots = rref32_deferred(&mut rows, Barrett32::new(p), fp, None)?;
+    pp_add(PP_IR_RED_NS, pp_ns(t_red));
     if pivots.len() != keep.len() {
         return None; // not full rank: cannot happen for a minimal basis
     }
     let mut out: Vec<Poly> = rows
         .iter()
         .map(|row| {
-            row.iter()
-                .enumerate()
-                .filter(|(_, &v)| v != 0)
-                .map(|(j, &v)| (cols[free_cols[j]].clone(), v as u64))
-                .collect()
+            let mut f: Poly = Vec::with_capacity(row.iter().filter(|&&v| v != 0).count());
+            f.extend(
+                row.iter()
+                    .enumerate()
+                    .filter(|(_, &v)| v != 0)
+                    .map(|(j, &v)| (cols.get(free_cols[j]), v as u64)),
+            );
+            f
         })
         .collect();
     out.sort_by(|a, b| cmp_monomial(&a[0].0, &b[0].0, ord));
@@ -4462,7 +8640,10 @@ fn reduce_skipping_vecs(f: &Poly, basis: &[Poly], skip: usize, p: u64, ord: Orde
                 });
                 *v = (*v + mulmod(neg, *gc, p)) % p;
                 super::jv_bitops::row_ops(1);
-                super::jv_bitops::probes(1, 2);
+                // `mulmod` charges the multiplication; this hook records the
+                // remaining multiply-add structure without charging it twice.
+                visit_account_row_structure(1);
+                count_probes(1, 2);
             }
         } else {
             out.push((mono, c));
@@ -4712,11 +8893,17 @@ fn reduce_skipping_packed(
                 0
             });
             *v = match fp {
-                Some(fp) if gc < p => fp.reduce(*v + neg * gc),
-                _ => (*v + mulmod(neg, gc, p)) % p,
+                Some(fp) if gc < p => {
+                    visit_account_row_operations(1);
+                    fp.reduce(*v + neg * gc)
+                }
+                _ => {
+                    visit_account_row_structure(1);
+                    (*v + mulmod(neg, gc, p)) % p
+                }
             };
             super::jv_bitops::row_ops(1);
-            super::jv_bitops::probes(1, 2);
+            count_probes(1, 2);
         }
     }
     // popped in decreasing order: already leading-first
@@ -4736,6 +8923,132 @@ fn reduce_skipping(set: &[Poly], ps: Option<&PackedSet>, i: usize, p: u64, ord: 
 fn make_monic(mut f: Poly, p: u64) -> Poly {
     scale_monic(&mut f, p);
     f
+}
+
+enum F4Stop {
+    Resource(F4ResourceLimit),
+    Deadline,
+    Accounting,
+}
+
+impl From<F4ResourceLimit> for F4Stop {
+    fn from(limit: F4ResourceLimit) -> Self {
+        Self::Resource(limit)
+    }
+}
+
+/// The exponent-vector reduction above, with admission before a new pending
+/// monomial is copied into the map/heap. The default reduction is untouched.
+fn reduce_skipping_bounded(
+    f: &Poly,
+    basis: &[Poly],
+    skip: usize,
+    p: u64,
+    ord: Ordering,
+    limits: &F4ResourceLimits,
+    deadline: Option<Instant>,
+) -> Result<Poly, F4Stop> {
+    limits.symbolic("interreduce", f.len())?;
+    let mut work: FxMap<Vec<u32>, u64> = FxMap::default();
+    let mut heap: std::collections::BinaryHeap<Keyed> = std::collections::BinaryHeap::new();
+    for (e, c) in f {
+        let v = work.entry(e.clone()).or_insert_with(|| {
+            heap.push(Keyed(e.clone(), &ord));
+            0
+        });
+        *v = (*v + c % p) % p;
+    }
+    let mut out = Vec::new();
+    let mut scratch = vec![0; f.first().map_or(0, |(e, _)| e.len())];
+    while let Some(Keyed(mono, _)) = heap.pop() {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return Err(F4Stop::Deadline);
+        }
+        let Some(c) = work.remove(&mono) else {
+            continue;
+        };
+        if c == 0 {
+            continue;
+        }
+        let g = basis
+            .iter()
+            .enumerate()
+            .find(|&(j, g)| j != skip && divides(&g[0].0, &mono));
+        if let Some((_, g)) = g {
+            let neg = p - c;
+            for (e, gc) in &g[1..] {
+                if deadline.is_some_and(|d| Instant::now() > d) {
+                    return Err(F4Stop::Deadline);
+                }
+                for (k, x) in scratch.iter_mut().enumerate() {
+                    *x = e[k] + mono[k] - g[0].0[k];
+                }
+                if !work.contains_key(scratch.as_slice()) {
+                    limits.check(
+                        "interreduce",
+                        "symbolic_monomials",
+                        work.len()
+                            .checked_add(out.len())
+                            .and_then(|n| n.checked_add(1)),
+                        limits.max_symbolic_monomials,
+                    )?;
+                    heap.push(Keyed(scratch.clone(), &ord));
+                    work.insert(scratch.clone(), 0);
+                }
+                let v = work.get_mut(scratch.as_slice()).unwrap();
+                *v = (*v + mulmod(neg, *gc, p)) % p;
+                super::jv_bitops::row_ops(1);
+                visit_account_row_structure(1);
+                count_probes(1, 2);
+            }
+        } else {
+            out.push((mono, c));
+        }
+    }
+    Ok(out)
+}
+
+fn interreduce_bounded(
+    basis: Vec<Poly>,
+    p: u64,
+    ord: Ordering,
+    limits: &F4ResourceLimits,
+    deadline: Option<Instant>,
+) -> Result<Vec<Poly>, F4Stop> {
+    let mut keep = Vec::new();
+    for (i, f) in basis.iter().enumerate() {
+        if deadline.is_some_and(|d| Instant::now() > d) {
+            return Err(F4Stop::Deadline);
+        }
+        keep.push(
+            !basis
+                .iter()
+                .enumerate()
+                .any(|(j, g)| j != i && divides(&g[0].0, &f[0].0) && (g[0].0 != f[0].0 || j < i)),
+        );
+    }
+    let mut out: Vec<Poly> = basis
+        .into_iter()
+        .zip(keep)
+        .filter_map(|(f, keep)| keep.then_some(f))
+        .collect();
+    let mut terms: usize = out.iter().map(Vec::len).sum();
+    limits.symbolic("interreduce_basis", terms)?;
+    for i in 0..out.len() {
+        let r = reduce_skipping_bounded(&out[i], &out, i, p, ord, limits, deadline)?;
+        if !r.is_empty() {
+            limits.check(
+                "interreduce_basis",
+                "symbolic_monomials",
+                (terms - out[i].len()).checked_add(r.len()),
+                limits.max_symbolic_monomials,
+            )?;
+            terms = terms - out[i].len() + r.len();
+            out[i] = make_monic(r, p);
+        }
+    }
+    out.sort_by(|a, b| cmp_monomial(&a[0].0, &b[0].0, ord));
+    Ok(out)
 }
 
 /// Interreduce a basis: drop elements whose leading monomial another
@@ -4822,6 +9135,1560 @@ fn autoreduce_with(polys: &[Poly], p: u64, ord: Ordering, packed: bool) -> Vec<P
 
 // ── Solving ────────────────────────────────────────────────────────
 
+/// Caller-supplied provenance for one accounted visitor invocation.
+///
+/// The generic solver cannot derive these bindings reliably: in particular,
+/// it cannot know the protocol case, the public-system serialization or the
+/// executable that embedded this module.  A source-bound outer record must
+/// independently recompute every digest before it admits this ledger.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingBindingV1 {
+    pub attempt_id: String,
+    pub protocol_id: String,
+    pub case_id: String,
+    pub arm_id: String,
+    pub case_sha256: String,
+    pub system_sha256: String,
+    pub f4_source_sha256: String,
+    pub executable_sha256: String,
+}
+
+/// Request the fail-closed, call-owned accounting path.
+///
+/// Legacy [`solve_visit`] remains unchanged.  Accounted callers use
+/// [`solve_visit_accounted_v1`] (or its traced counterpart) and must execute
+/// it from inside a dedicated one-thread Rayon pool.  That makes nested Rayon
+/// work stay on the call's owning worker instead of escaping a thread-local
+/// meter merely because the global pool happens to contain one worker.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingRequestV1 {
+    pub binding: VisitAccountingBindingV1,
+}
+
+const VISIT_ACCOUNTING_CONTEXT_FAULT_NONE: u8 = 0;
+const VISIT_ACCOUNTING_CONTEXT_FAULT_FOREIGN_THREAD: u8 = 1;
+static VISIT_ACCOUNTING_CONTEXT_IDS: AtomicU64 = AtomicU64::new(1);
+
+/// Per-call ownership identity for the explicit-token migration.
+///
+/// The authoritative ledger is still worker TLS.  The borrowed token gates
+/// traversal and native-driver mutations and cannot enter detached `'static`
+/// work; shared arithmetic, reducers, roots and allocation helpers remain a
+/// non-authoritative TLS shadow until later migration.
+struct VisitAccountingContext {
+    id: NonZeroU64,
+    owner_thread: ThreadId,
+    fault: AtomicU8,
+}
+
+impl VisitAccountingContext {
+    fn new() -> Option<Self> {
+        let mut observed = VISIT_ACCOUNTING_CONTEXT_IDS.load(AtomicOrdering::Relaxed);
+        let id = loop {
+            let id = NonZeroU64::new(observed)?;
+            let next = observed.checked_add(1)?;
+            match VISIT_ACCOUNTING_CONTEXT_IDS.compare_exchange_weak(
+                observed,
+                next,
+                AtomicOrdering::Relaxed,
+                AtomicOrdering::Relaxed,
+            ) {
+                Ok(_) => break id,
+                Err(current) => observed = current,
+            }
+        };
+        Some(Self {
+            id,
+            owner_thread: std::thread::current().id(),
+            fault: AtomicU8::new(VISIT_ACCOUNTING_CONTEXT_FAULT_NONE),
+        })
+    }
+
+    #[cfg(test)]
+    fn unbound_test_token(&self) -> VisitAccountingToken<'_> {
+        VisitAccountingToken(self)
+    }
+
+    fn record_foreign_thread(&self) {
+        let _ = self.fault.compare_exchange(
+            VISIT_ACCOUNTING_CONTEXT_FAULT_NONE,
+            VISIT_ACCOUNTING_CONTEXT_FAULT_FOREIGN_THREAD,
+            AtomicOrdering::Release,
+            AtomicOrdering::Relaxed,
+        );
+    }
+}
+
+#[derive(Clone, Copy)]
+struct VisitAccountingToken<'a>(&'a VisitAccountingContext);
+
+impl VisitAccountingToken<'_> {
+    fn id(self) -> NonZeroU64 {
+        self.0.id
+    }
+}
+
+#[derive(Clone, Copy)]
+enum VisitAccount<'a> {
+    Off,
+    On(VisitAccountingToken<'a>),
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum VisitAccountingControl {
+    Continue,
+    Stop,
+}
+
+impl VisitAccountingControl {
+    fn stopped(self) -> bool {
+        self == Self::Stop
+    }
+}
+
+#[derive(Clone, Copy)]
+enum VisitAccountingEntryMode {
+    CallerPool,
+    PrivateFirstExecutor,
+}
+
+impl VisitAccountingEntryMode {
+    fn ownership_mode(self) -> &'static str {
+        match self {
+            Self::CallerPool => "caller_one_thread_rayon_tls_unproven",
+            Self::PrivateFirstExecutor => "private_one_thread_first_result_tls_shadow",
+        }
+    }
+
+    fn callback_stop_disposition(self) -> VisitDispositionV1 {
+        match self {
+            Self::CallerPool => VisitDispositionV1::CallbackStopped,
+            Self::PrivateFirstExecutor => VisitDispositionV1::WitnessFound,
+        }
+    }
+}
+
+/// The solver outcome.  This is deliberately independent of whether its work
+/// ledger is complete: a fully counted timeout is still not a complete solve,
+/// and a reconciliation failure does not rewrite a completed solver outcome.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum VisitDispositionV1 {
+    CompleteNonempty,
+    CompleteEmpty,
+    EmptyDomain,
+    WitnessFound,
+    CallbackStopped,
+    TimedOut,
+    ResourceStopped,
+    TraceError,
+    Incomplete,
+    InvalidInput,
+    Unsupported,
+}
+
+/// One sticky reason an accounted invocation cannot be promoted.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingBlockerV1 {
+    pub code: &'static str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub phase: Option<VisitAccountingPhaseV1>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub counter: Option<&'static str>,
+    pub detail: String,
+}
+
+/// Exclusive phase buckets of the admitted visitor call.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum VisitAccountingPhaseV1 {
+    Validation,
+    InputNormalization,
+    CriticalPairs,
+    SymbolicPreprocessing,
+    ColumnOrdering,
+    MatrixConstruction,
+    RowReduction,
+    BasisCleanup,
+    Traversal,
+    Specialization,
+    RootExtraction,
+    CandidateVerification,
+    CallbackDelivery,
+    TraceDelivery,
+    AccountingOverhead,
+}
+
+impl VisitAccountingPhaseV1 {
+    const ALL: [Self; 15] = [
+        Self::Validation,
+        Self::InputNormalization,
+        Self::CriticalPairs,
+        Self::SymbolicPreprocessing,
+        Self::ColumnOrdering,
+        Self::MatrixConstruction,
+        Self::RowReduction,
+        Self::BasisCleanup,
+        Self::Traversal,
+        Self::Specialization,
+        Self::RootExtraction,
+        Self::CandidateVerification,
+        Self::CallbackDelivery,
+        Self::TraceDelivery,
+        Self::AccountingOverhead,
+    ];
+
+    fn index(self) -> usize {
+        self as usize
+    }
+}
+
+/// Additive leaves of one phase.  Unlike units are never converted or added
+/// together.  `wall_ns` and `thread_cpu_ns` are observations, not operation
+/// prices; their presence here only lets the fixed phase partition reconcile.
+#[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingWorkV1 {
+    pub field_multiplications: u64,
+    pub field_additions: u64,
+    pub field_inversions: u64,
+    pub row_operations: u64,
+    pub row_reads: u64,
+    pub row_writes: u64,
+    pub word_operations: u64,
+    pub hash_probes: u64,
+    pub comparisons: u64,
+    pub divisibility_tests: u64,
+    pub sort_comparisons: u64,
+    pub critical_pair_candidates: u64,
+    pub critical_pairs_selected: u64,
+    pub symbolic_rows: u64,
+    pub symbolic_monomials: u64,
+    pub matrix_rows: u64,
+    pub matrix_columns: u64,
+    pub matrix_entries: u64,
+    pub pivot_candidates: u64,
+    pub basis_terms: u64,
+    pub specialization_terms: u64,
+    pub root_candidates: u64,
+    pub candidate_terms_checked: u64,
+    pub traversal_nodes: u64,
+    pub branch_deliveries: u64,
+    pub callback_deliveries: u64,
+    pub trace_deliveries: u64,
+    pub allocation_requests: u64,
+    pub payload_bytes_requested: u64,
+    pub payload_bytes_released: u64,
+    pub wall_ns: u64,
+    pub thread_cpu_ns: u64,
+}
+
+impl VisitAccountingWorkV1 {
+    fn checked_add_assign(&mut self, other: &Self) -> Option<()> {
+        macro_rules! add {
+            ($($field:ident),+ $(,)?) => {{
+                $(self.$field = self.$field.checked_add(other.$field)?;)+
+            }};
+        }
+        add!(
+            field_multiplications,
+            field_additions,
+            field_inversions,
+            row_operations,
+            row_reads,
+            row_writes,
+            word_operations,
+            hash_probes,
+            comparisons,
+            divisibility_tests,
+            sort_comparisons,
+            critical_pair_candidates,
+            critical_pairs_selected,
+            symbolic_rows,
+            symbolic_monomials,
+            matrix_rows,
+            matrix_columns,
+            matrix_entries,
+            pivot_candidates,
+            basis_terms,
+            specialization_terms,
+            root_candidates,
+            candidate_terms_checked,
+            traversal_nodes,
+            branch_deliveries,
+            callback_deliveries,
+            trace_deliveries,
+            allocation_requests,
+            payload_bytes_requested,
+            payload_bytes_released,
+            wall_ns,
+            thread_cpu_ns,
+        );
+        Some(())
+    }
+}
+
+/// One named phase and its additive leaves.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingPhaseRecordV1 {
+    pub phase: VisitAccountingPhaseV1,
+    pub work: VisitAccountingWorkV1,
+}
+
+/// Call-owned logical-payload observations.  These do not purport to include
+/// allocator metadata or process RSS; the separate whole-job record must keep
+/// those units distinct.
+#[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingMemoryV1 {
+    pub live_payload_bytes_at_finish: u64,
+    pub peak_live_payload_bytes: u64,
+    pub peak_scratch_payload_bytes: u64,
+    pub allocator_overhead_included: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingArmV1 {
+    pub ordering: &'static str,
+    pub selection_strategy: &'static str,
+    pub ownership_mode: &'static str,
+    pub accounting_token_mode: &'static str,
+    pub rayon_threads: usize,
+    pub inside_rayon_worker: bool,
+    pub max_degree: u32,
+    pub deadline_present: bool,
+    pub deadline_remaining_ns_at_entry: Option<u64>,
+    pub deadline_remaining_ns_overflowed: bool,
+    pub domain_root_mode: &'static str,
+    pub trace_sink: bool,
+    pub resource_max_pairs: Option<usize>,
+    pub resource_max_symbolic_monomials: Option<usize>,
+    pub resource_max_matrix_entries: Option<usize>,
+    pub visit_timing_enabled: bool,
+    pub legacy_bitops_enabled: bool,
+    pub implementation_environment: &'static str,
+    pub arithmetic_mode: u8,
+    pub packed_monomials_enabled: bool,
+    pub symbolic_parallel_enabled: bool,
+    pub gebauer_moeller_enabled: bool,
+    pub faugere_lachartre_enabled: bool,
+    pub faugere_lachartre_build_mode: &'static str,
+    pub faugere_lachartre_min_columns: usize,
+    pub blocked_pair_reduction_enabled: bool,
+    pub narrow_accumulators_enabled: bool,
+    pub linear_interreduce_enabled: bool,
+    pub lazy_simd: &'static str,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingReconciliationV1 {
+    pub phase_sum_equals_total: bool,
+    pub memory_balanced: bool,
+    pub operation_tracking_complete: bool,
+    pub memory_tracking_complete: bool,
+    pub work_ownership_complete: bool,
+    pub checked_arithmetic: bool,
+}
+
+/// Versioned accounting for one admitted `f4_fp::solve_visit` call only.
+///
+/// This is not a whole-collector record and never authorizes a
+/// `fully_charged` RR9, B31 or ECDLP label by itself.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountingV1 {
+    pub schema: &'static str,
+    pub scope: &'static str,
+    pub binding: VisitAccountingBindingV1,
+    pub arm: VisitAccountingArmV1,
+    pub solver_disposition: VisitDispositionV1,
+    pub accounting_complete: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub blocker: Option<VisitAccountingBlockerV1>,
+    pub total: VisitAccountingWorkV1,
+    pub phases: Vec<VisitAccountingPhaseRecordV1>,
+    pub memory: VisitAccountingMemoryV1,
+    pub reconciliation: VisitAccountingReconciliationV1,
+    pub whole_collector_accounting_required: bool,
+}
+
+/// Validation/unsupported failures from the accounted entry point retain the
+/// sealed ledger rather than dropping preflight work behind `Err(String)`.
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct VisitAccountedErrorV1 {
+    pub message: String,
+    pub accounting: VisitAccountingV1,
+}
+
+impl std::fmt::Display for VisitAccountedErrorV1 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.message)
+    }
+}
+
+impl std::error::Error for VisitAccountedErrorV1 {}
+
+#[derive(Clone, Copy)]
+#[allow(dead_code)] // Reserved leaves remain unreachable while promotion gates are false.
+enum VisitAccountingCounter {
+    FieldMultiplications,
+    FieldAdditions,
+    FieldInversions,
+    RowOperations,
+    RowReads,
+    RowWrites,
+    WordOperations,
+    HashProbes,
+    Comparisons,
+    DivisibilityTests,
+    SortComparisons,
+    CriticalPairCandidates,
+    CriticalPairsSelected,
+    SymbolicRows,
+    SymbolicMonomials,
+    MatrixRows,
+    MatrixColumns,
+    MatrixEntries,
+    PivotCandidates,
+    BasisTerms,
+    SpecializationTerms,
+    RootCandidates,
+    CandidateTermsChecked,
+    TraversalNodes,
+    BranchDeliveries,
+    CallbackDeliveries,
+    TraceDeliveries,
+    AllocationRequests,
+    PayloadBytesRequested,
+    PayloadBytesReleased,
+    WallNs,
+    ThreadCpuNs,
+}
+
+impl VisitAccountingCounter {
+    fn name(self) -> &'static str {
+        match self {
+            Self::FieldMultiplications => "field_multiplications",
+            Self::FieldAdditions => "field_additions",
+            Self::FieldInversions => "field_inversions",
+            Self::RowOperations => "row_operations",
+            Self::RowReads => "row_reads",
+            Self::RowWrites => "row_writes",
+            Self::WordOperations => "word_operations",
+            Self::HashProbes => "hash_probes",
+            Self::Comparisons => "comparisons",
+            Self::DivisibilityTests => "divisibility_tests",
+            Self::SortComparisons => "sort_comparisons",
+            Self::CriticalPairCandidates => "critical_pair_candidates",
+            Self::CriticalPairsSelected => "critical_pairs_selected",
+            Self::SymbolicRows => "symbolic_rows",
+            Self::SymbolicMonomials => "symbolic_monomials",
+            Self::MatrixRows => "matrix_rows",
+            Self::MatrixColumns => "matrix_columns",
+            Self::MatrixEntries => "matrix_entries",
+            Self::PivotCandidates => "pivot_candidates",
+            Self::BasisTerms => "basis_terms",
+            Self::SpecializationTerms => "specialization_terms",
+            Self::RootCandidates => "root_candidates",
+            Self::CandidateTermsChecked => "candidate_terms_checked",
+            Self::TraversalNodes => "traversal_nodes",
+            Self::BranchDeliveries => "branch_deliveries",
+            Self::CallbackDeliveries => "callback_deliveries",
+            Self::TraceDeliveries => "trace_deliveries",
+            Self::AllocationRequests => "allocation_requests",
+            Self::PayloadBytesRequested => "payload_bytes_requested",
+            Self::PayloadBytesReleased => "payload_bytes_released",
+            Self::WallNs => "wall_ns",
+            Self::ThreadCpuNs => "thread_cpu_ns",
+        }
+    }
+
+    fn field(self, work: &mut VisitAccountingWorkV1) -> &mut u64 {
+        match self {
+            Self::FieldMultiplications => &mut work.field_multiplications,
+            Self::FieldAdditions => &mut work.field_additions,
+            Self::FieldInversions => &mut work.field_inversions,
+            Self::RowOperations => &mut work.row_operations,
+            Self::RowReads => &mut work.row_reads,
+            Self::RowWrites => &mut work.row_writes,
+            Self::WordOperations => &mut work.word_operations,
+            Self::HashProbes => &mut work.hash_probes,
+            Self::Comparisons => &mut work.comparisons,
+            Self::DivisibilityTests => &mut work.divisibility_tests,
+            Self::SortComparisons => &mut work.sort_comparisons,
+            Self::CriticalPairCandidates => &mut work.critical_pair_candidates,
+            Self::CriticalPairsSelected => &mut work.critical_pairs_selected,
+            Self::SymbolicRows => &mut work.symbolic_rows,
+            Self::SymbolicMonomials => &mut work.symbolic_monomials,
+            Self::MatrixRows => &mut work.matrix_rows,
+            Self::MatrixColumns => &mut work.matrix_columns,
+            Self::MatrixEntries => &mut work.matrix_entries,
+            Self::PivotCandidates => &mut work.pivot_candidates,
+            Self::BasisTerms => &mut work.basis_terms,
+            Self::SpecializationTerms => &mut work.specialization_terms,
+            Self::RootCandidates => &mut work.root_candidates,
+            Self::CandidateTermsChecked => &mut work.candidate_terms_checked,
+            Self::TraversalNodes => &mut work.traversal_nodes,
+            Self::BranchDeliveries => &mut work.branch_deliveries,
+            Self::CallbackDeliveries => &mut work.callback_deliveries,
+            Self::TraceDeliveries => &mut work.trace_deliveries,
+            Self::AllocationRequests => &mut work.allocation_requests,
+            Self::PayloadBytesRequested => &mut work.payload_bytes_requested,
+            Self::PayloadBytesReleased => &mut work.payload_bytes_released,
+            Self::WallNs => &mut work.wall_ns,
+            Self::ThreadCpuNs => &mut work.thread_cpu_ns,
+        }
+    }
+}
+
+struct VisitAccountingBuilder {
+    request: VisitAccountingRequestV1,
+    arm: VisitAccountingArmV1,
+    token_identity: Option<NonZeroU64>,
+    phases: [VisitAccountingWorkV1; 15],
+    total: VisitAccountingWorkV1,
+    current_phase: VisitAccountingPhaseV1,
+    last_wall: Instant,
+    last_cpu_ns: Option<u64>,
+    blocker: Option<VisitAccountingBlockerV1>,
+    checked_arithmetic: bool,
+    suspended_depth: usize,
+    live_payload_bytes: u64,
+    peak_live_payload_bytes: u64,
+    peak_scratch_payload_bytes: u64,
+    operation_tracking_complete: bool,
+    memory_tracking_complete: bool,
+    work_ownership_complete: bool,
+}
+
+impl VisitAccountingBuilder {
+    #[cfg(test)]
+    fn new(request: VisitAccountingRequestV1, opts: &F4Options, trace_sink: bool) -> Self {
+        Self::new_for_entry(
+            request,
+            opts,
+            trace_sink,
+            VisitAccountingEntryMode::CallerPool,
+            true,
+        )
+    }
+
+    fn new_for_entry(
+        request: VisitAccountingRequestV1,
+        opts: &F4Options,
+        trace_sink: bool,
+        entry_mode: VisitAccountingEntryMode,
+        resolve_profile: bool,
+    ) -> Self {
+        let last_wall = Instant::now();
+        let last_cpu_ns = visit_thread_cpu_ns();
+        let forbidden_environment = VISIT_ACCOUNTING_FORBIDDEN_ENV
+            .iter()
+            .any(|name| std::env::var_os(name).is_some());
+        // Do not resolve environment-backed OnceLocks for a call that will
+        // be rejected.  Otherwise a forbidden environment could permanently
+        // alter later legacy calls even though this invocation did no work.
+        let (
+            implementation_environment,
+            arithmetic,
+            packed,
+            symbolic,
+            gm,
+            fl,
+            fl_build_mode,
+            fl_min_columns,
+            fl_blocked,
+            narrow_accumulators,
+            linear_interreduce,
+            legacy_bitops,
+            simd,
+        ) = if forbidden_environment || !resolve_profile {
+            (
+                if forbidden_environment {
+                    "f4_environment_present_unresolved"
+                } else {
+                    "f4_profile_not_resolved_during_rejected_preflight"
+                },
+                0,
+                false,
+                false,
+                false,
+                false,
+                "unresolved",
+                0,
+                false,
+                false,
+                false,
+                false,
+                "unresolved",
+            )
+        } else {
+            let simd = match lazy_simd_kind() {
+                0 => "scalar",
+                1 => "avx2",
+                2 => "avx512f",
+                _ => "invalid",
+            };
+            (
+                "f4_environment_absent",
+                arithmetic_mode(),
+                packed_enabled(),
+                symbolic_parallel(),
+                gebauer_moeller(),
+                fl_enabled(),
+                if fl_mode_tiles(0) {
+                    "column_tiles"
+                } else {
+                    "row_blocks"
+                },
+                fl_min_cols(),
+                fl_blocked_pairs(),
+                narrow_acc_enabled(),
+                linear_interreduce_enabled(),
+                super::jv_bitops::enabled(),
+                simd,
+            )
+        };
+        let (deadline_remaining_ns_at_entry, deadline_remaining_ns_overflowed) = match opts.deadline
+        {
+            None => (None, false),
+            Some(deadline) => {
+                let nanos = deadline.saturating_duration_since(last_wall).as_nanos();
+                match u64::try_from(nanos) {
+                    Ok(nanos) => (Some(nanos), false),
+                    Err(_) => (None, true),
+                }
+            }
+        };
+        let resource = opts.resource_limits;
+        Self {
+            request,
+            arm: VisitAccountingArmV1 {
+                ordering: match opts.order {
+                    Ordering::Lex => "lex",
+                    Ordering::Grlex => "grlex",
+                    Ordering::Grevlex => "grevlex",
+                },
+                selection_strategy: "normal_degree_by_degree",
+                ownership_mode: entry_mode.ownership_mode(),
+                accounting_token_mode: "not_started_preflight_rejected",
+                rayon_threads: rayon::current_num_threads(),
+                inside_rayon_worker: rayon::current_thread_index().is_some(),
+                max_degree: opts.max_degree,
+                deadline_present: opts.deadline.is_some(),
+                deadline_remaining_ns_at_entry,
+                deadline_remaining_ns_overflowed,
+                domain_root_mode: match opts.domain_roots {
+                    DomainRootMode::Scan => "scan",
+                    DomainRootMode::Frobenius => "frobenius",
+                    DomainRootMode::Auto => "auto",
+                },
+                trace_sink,
+                resource_max_pairs: resource.map(|limits| limits.max_pairs),
+                resource_max_symbolic_monomials: resource
+                    .map(|limits| limits.max_symbolic_monomials),
+                resource_max_matrix_entries: resource.map(|limits| limits.max_matrix_entries),
+                visit_timing_enabled: opts.visit_timing,
+                legacy_bitops_enabled: legacy_bitops,
+                implementation_environment,
+                arithmetic_mode: arithmetic,
+                packed_monomials_enabled: packed,
+                symbolic_parallel_enabled: symbolic,
+                gebauer_moeller_enabled: gm,
+                faugere_lachartre_enabled: fl,
+                faugere_lachartre_build_mode: fl_build_mode,
+                faugere_lachartre_min_columns: fl_min_columns,
+                blocked_pair_reduction_enabled: fl_blocked,
+                narrow_accumulators_enabled: narrow_accumulators,
+                linear_interreduce_enabled: linear_interreduce,
+                lazy_simd: simd,
+            },
+            token_identity: None,
+            phases: std::array::from_fn(|_| VisitAccountingWorkV1::default()),
+            total: VisitAccountingWorkV1::default(),
+            current_phase: VisitAccountingPhaseV1::Validation,
+            last_wall,
+            last_cpu_ns,
+            blocker: None,
+            checked_arithmetic: true,
+            suspended_depth: 0,
+            live_payload_bytes: 0,
+            peak_live_payload_bytes: 0,
+            peak_scratch_payload_bytes: 0,
+            // Operation, memory and work ownership are independent promotion
+            // gates.  The current slice deliberately leaves all three false
+            // until every admitted path is source-complete, explicitly
+            // token-owned and independently reviewed.
+            operation_tracking_complete: false,
+            memory_tracking_complete: false,
+            work_ownership_complete: false,
+        }
+    }
+
+    fn bind_token(&mut self, token: VisitAccountingToken<'_>) {
+        self.token_identity = Some(token.id());
+        self.arm.accounting_token_mode = "borrowed_traversal_native_driver_tls_helper_shadow_v1";
+    }
+
+    fn block(
+        &mut self,
+        code: &'static str,
+        counter: Option<&'static str>,
+        detail: impl Into<String>,
+    ) {
+        if self.blocker.is_none() {
+            self.blocker = Some(VisitAccountingBlockerV1 {
+                code,
+                phase: Some(self.current_phase),
+                counter,
+                detail: detail.into(),
+            });
+        }
+    }
+
+    fn charge(&mut self, counter: VisitAccountingCounter, amount: u64) {
+        if amount == 0 {
+            return;
+        }
+        let phase = self.current_phase;
+        let phase_slot = counter.field(&mut self.phases[phase.index()]);
+        let phase_next = phase_slot.checked_add(amount);
+        let total_slot = counter.field(&mut self.total);
+        let total_next = total_slot.checked_add(amount);
+        match (phase_next, total_next) {
+            (Some(p), Some(t)) => {
+                *phase_slot = p;
+                *total_slot = t;
+            }
+            _ => {
+                self.checked_arithmetic = false;
+                self.block(
+                    "counter_overflow",
+                    Some(counter.name()),
+                    format!("checked addition of {amount} failed"),
+                );
+            }
+        }
+    }
+
+    fn uncharge(&mut self, counter: VisitAccountingCounter, amount: u64) {
+        if amount == 0 {
+            return;
+        }
+        let phase = self.current_phase;
+        let phase_slot = counter.field(&mut self.phases[phase.index()]);
+        let phase_next = phase_slot.checked_sub(amount);
+        let total_slot = counter.field(&mut self.total);
+        let total_next = total_slot.checked_sub(amount);
+        match (phase_next, total_next) {
+            (Some(p), Some(t)) => {
+                *phase_slot = p;
+                *total_slot = t;
+            }
+            _ => {
+                self.checked_arithmetic = false;
+                self.block(
+                    "counter_underflow",
+                    Some(counter.name()),
+                    format!("checked subtraction of {amount} failed"),
+                );
+            }
+        }
+    }
+
+    fn close_current_interval(&mut self) {
+        let now = Instant::now();
+        let cpu_now = visit_thread_cpu_ns();
+        match u64::try_from(now.duration_since(self.last_wall).as_nanos()) {
+            Ok(ns) => self.charge(VisitAccountingCounter::WallNs, ns),
+            Err(_) => {
+                self.checked_arithmetic = false;
+                self.block(
+                    "timer_overflow",
+                    Some("wall_ns"),
+                    "wall-clock interval exceeds u64 nanoseconds",
+                );
+            }
+        }
+        self.last_wall = now;
+        match (self.last_cpu_ns, cpu_now) {
+            (Some(before), Some(after)) => match after.checked_sub(before) {
+                Some(ns) => self.charge(VisitAccountingCounter::ThreadCpuNs, ns),
+                None => {
+                    self.checked_arithmetic = false;
+                    self.block(
+                        "timer_regression",
+                        Some("thread_cpu_ns"),
+                        "thread CPU clock moved backwards",
+                    );
+                }
+            },
+            _ => self.block(
+                "thread_cpu_clock_unavailable",
+                Some("thread_cpu_ns"),
+                "a call-owned thread CPU observation is required",
+            ),
+        }
+        self.last_cpu_ns = cpu_now;
+    }
+
+    fn transition(&mut self, next: VisitAccountingPhaseV1) {
+        self.close_current_interval();
+        self.current_phase = next;
+    }
+
+    fn pause_external_work(&mut self) {
+        if self.suspended_depth == 0 {
+            self.close_current_interval();
+            VISIT_ACCOUNTING_CHARGING_CALLS.fetch_sub(1, AtomicOrdering::Relaxed);
+        }
+        match self.suspended_depth.checked_add(1) {
+            Some(depth) => self.suspended_depth = depth,
+            None => {
+                self.checked_arithmetic = false;
+                self.block(
+                    "suspension_overflow",
+                    None,
+                    "external-work suspension depth overflowed",
+                );
+            }
+        }
+    }
+
+    fn resume_external_work(&mut self) {
+        match self.suspended_depth.checked_sub(1) {
+            Some(depth) => {
+                self.suspended_depth = depth;
+                if depth == 0 {
+                    // Exclude arbitrary callback/sink body time and work from
+                    // this solver-owned ledger.
+                    self.last_wall = Instant::now();
+                    self.last_cpu_ns = visit_thread_cpu_ns();
+                    VISIT_ACCOUNTING_CHARGING_CALLS.fetch_add(1, AtomicOrdering::Relaxed);
+                    let environment_changed = VISIT_ACCOUNTING_FORBIDDEN_ENV
+                        .iter()
+                        .any(|name| std::env::var_os(name).is_some());
+                    if environment_changed
+                        || progress_observer_active()
+                        || super::jv_bitops::enabled() != self.arm.legacy_bitops_enabled
+                    {
+                        self.block(
+                            "configuration_changed_during_external_work",
+                            None,
+                            "callback or trace-sink work changed a frozen solver mode",
+                        );
+                    }
+                }
+            }
+            None => {
+                self.checked_arithmetic = false;
+                self.block(
+                    "suspension_underflow",
+                    None,
+                    "external-work suspension depth underflowed",
+                );
+            }
+        }
+    }
+
+    fn seal(mut self, disposition: VisitDispositionV1) -> VisitAccountingV1 {
+        self.transition(VisitAccountingPhaseV1::AccountingOverhead);
+        let final_environment_changed = VISIT_ACCOUNTING_FORBIDDEN_ENV
+            .iter()
+            .any(|name| std::env::var_os(name).is_some());
+        if final_environment_changed
+            || super::jv_bitops::enabled() != self.arm.legacy_bitops_enabled
+        {
+            self.block(
+                "configuration_changed_during_call",
+                None,
+                "a frozen process-global solver mode changed before seal",
+            );
+        }
+        let memory_balanced = self.live_payload_bytes == 0;
+        // Charge gate and preliminary reconciliation work to the explicit
+        // accounting-overhead phase.  The final clock read is necessarily
+        // the boundary of the observable interval.
+        self.close_current_interval();
+        let mut phase_sum = VisitAccountingWorkV1::default();
+        let mut sum_ok = true;
+        for work in &self.phases {
+            if phase_sum.checked_add_assign(work).is_none() {
+                sum_ok = false;
+                break;
+            }
+        }
+        let phase_sum_equals_total = sum_ok && phase_sum == self.total;
+        if !phase_sum_equals_total {
+            self.block(
+                "reconciliation_mismatch",
+                None,
+                "componentwise phase sum differs from the independently accumulated total",
+            );
+        }
+        if !memory_balanced {
+            self.block(
+                "memory_reconciliation_mismatch",
+                Some("payload_bytes_released"),
+                format!(
+                    "{} logical payload bytes remain live at seal",
+                    self.live_payload_bytes
+                ),
+            );
+        }
+        if !self.memory_tracking_complete {
+            self.block(
+                "memory_tracking_gap",
+                Some("payload_bytes_requested"),
+                "logical allocation and scratch coverage is not yet source-complete",
+            );
+        }
+        if !self.operation_tracking_complete {
+            self.block(
+                "operation_tracking_gap",
+                None,
+                "operation and branch coverage is not yet source-complete",
+            );
+        }
+        if !self.work_ownership_complete {
+            let ownership_mode = self.arm.ownership_mode;
+            self.block(
+                "work_ownership_gap",
+                None,
+                format!(
+                    "ownership mode {} does not prove exclusive solver work ownership",
+                    ownership_mode
+                ),
+            );
+        }
+        let phases = VisitAccountingPhaseV1::ALL
+            .iter()
+            .copied()
+            .map(|phase| VisitAccountingPhaseRecordV1 {
+                phase,
+                work: self.phases[phase.index()].clone(),
+            })
+            .collect();
+        VisitAccountingV1 {
+            schema: "crypto.f4-fp.visit-accounting/v1",
+            scope: "solve_visit_call_only",
+            binding: self.request.binding,
+            arm: self.arm,
+            solver_disposition: disposition,
+            accounting_complete: self.blocker.is_none()
+                && phase_sum_equals_total
+                && memory_balanced
+                && self.operation_tracking_complete
+                && self.memory_tracking_complete
+                && self.work_ownership_complete
+                && self.checked_arithmetic,
+            blocker: self.blocker,
+            total: self.total,
+            phases,
+            memory: VisitAccountingMemoryV1 {
+                live_payload_bytes_at_finish: self.live_payload_bytes,
+                peak_live_payload_bytes: self.peak_live_payload_bytes,
+                peak_scratch_payload_bytes: self.peak_scratch_payload_bytes,
+                allocator_overhead_included: false,
+            },
+            reconciliation: VisitAccountingReconciliationV1 {
+                phase_sum_equals_total,
+                memory_balanced,
+                operation_tracking_complete: self.operation_tracking_complete,
+                memory_tracking_complete: self.memory_tracking_complete,
+                work_ownership_complete: self.work_ownership_complete,
+                checked_arithmetic: self.checked_arithmetic,
+            },
+            whole_collector_accounting_required: true,
+        }
+    }
+}
+
+thread_local! {
+    static VISIT_ACCOUNTING_ACTIVE: std::cell::RefCell<Option<VisitAccountingBuilder>> = const { std::cell::RefCell::new(None) };
+}
+static VISIT_ACCOUNTING_CHARGING_CALLS: AtomicUsize = AtomicUsize::new(0);
+
+#[cfg(unix)]
+fn visit_thread_cpu_ns() -> Option<u64> {
+    let mut ts = libc::timespec {
+        tv_sec: 0,
+        tv_nsec: 0,
+    };
+    // SAFETY: `ts` points to writable storage and CLOCK_THREAD_CPUTIME_ID
+    // does not retain the pointer.
+    if unsafe { libc::clock_gettime(libc::CLOCK_THREAD_CPUTIME_ID, &mut ts) } != 0 {
+        return None;
+    }
+    let seconds = u64::try_from(ts.tv_sec).ok()?;
+    let nanos = u64::try_from(ts.tv_nsec).ok()?;
+    seconds.checked_mul(1_000_000_000)?.checked_add(nanos)
+}
+
+#[cfg(not(unix))]
+fn visit_thread_cpu_ns() -> Option<u64> {
+    None
+}
+
+fn visit_accounting_active() -> bool {
+    VISIT_ACCOUNTING_ACTIVE.with(|slot| slot.borrow().is_some())
+}
+
+fn visit_accounting_unsuspended_active() -> bool {
+    VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+        slot.borrow()
+            .as_ref()
+            .is_some_and(|accounting| accounting.suspended_depth == 0)
+    })
+}
+
+fn visit_accounting_merge_context_fault(
+    token: VisitAccountingToken<'_>,
+    accounting: &mut VisitAccountingBuilder,
+) {
+    if token.0.fault.load(AtomicOrdering::Acquire) == VISIT_ACCOUNTING_CONTEXT_FAULT_FOREIGN_THREAD
+    {
+        accounting.block(
+            "foreign_thread_work",
+            None,
+            "borrowed accounting token was used outside its owning thread",
+        );
+    }
+}
+
+fn visit_account_with_token(
+    token: VisitAccountingToken<'_>,
+    run_when_blocked: bool,
+    allow_suspended: bool,
+    f: impl FnOnce(&mut VisitAccountingBuilder),
+) -> VisitAccountingControl {
+    if std::thread::current().id() != token.0.owner_thread {
+        token.0.record_foreign_thread();
+        return VisitAccountingControl::Stop;
+    }
+    VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+        let mut slot = slot.borrow_mut();
+        let Some(accounting) = slot.as_mut() else {
+            return VisitAccountingControl::Stop;
+        };
+        if accounting.token_identity != Some(token.id()) {
+            accounting.block(
+                "accounting_token_mismatch",
+                None,
+                "borrowed accounting token does not own the active ledger",
+            );
+            return VisitAccountingControl::Stop;
+        }
+        visit_accounting_merge_context_fault(token, accounting);
+        if accounting.suspended_depth != 0 && !allow_suspended {
+            accounting.block(
+                "accounting_token_suspended",
+                None,
+                "solver-owned token was used while external work was suspended",
+            );
+            return VisitAccountingControl::Stop;
+        }
+        if accounting.blocker.is_some() && !run_when_blocked {
+            return VisitAccountingControl::Stop;
+        }
+        f(accounting);
+        if accounting.blocker.is_some() {
+            VisitAccountingControl::Stop
+        } else {
+            VisitAccountingControl::Continue
+        }
+    })
+}
+
+impl<'a> VisitAccount<'a> {
+    fn enabled(self) -> bool {
+        matches!(self, Self::On(_))
+    }
+
+    fn control(self) -> VisitAccountingControl {
+        match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |_| {}),
+        }
+    }
+
+    fn charge(self, counter: VisitAccountingCounter, amount: u64) -> VisitAccountingControl {
+        match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |accounting| {
+                accounting.charge(counter, amount);
+            }),
+        }
+    }
+
+    fn charge_usize(self, counter: VisitAccountingCounter, value: usize) -> VisitAccountingControl {
+        match u64::try_from(value) {
+            Ok(value) => self.charge(counter, value),
+            Err(_) => self.block(
+                "counter_overflow",
+                Some(counter.name()),
+                "usize observation does not fit u64",
+            ),
+        }
+    }
+
+    fn charge_product(
+        self,
+        counter: VisitAccountingCounter,
+        left: usize,
+        right: usize,
+    ) -> VisitAccountingControl {
+        match left.checked_mul(right).and_then(|n| u64::try_from(n).ok()) {
+            Some(value) => self.charge(counter, value),
+            None => self.block(
+                "counter_overflow",
+                Some(counter.name()),
+                format!("checked product {left} * {right} failed"),
+            ),
+        }
+    }
+
+    fn block(
+        self,
+        code: &'static str,
+        counter: Option<&'static str>,
+        detail: impl Into<String>,
+    ) -> VisitAccountingControl {
+        match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |accounting| {
+                accounting.block(code, counter, detail);
+            }),
+        }
+    }
+
+    fn phase_scope(
+        self,
+        phase: VisitAccountingPhaseV1,
+    ) -> (VisitAccountingTokenPhaseScope<'a>, VisitAccountingControl) {
+        let mut previous = None;
+        let control = match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |accounting| {
+                previous = Some(accounting.current_phase);
+                accounting.transition(phase);
+            }),
+        };
+        (
+            VisitAccountingTokenPhaseScope {
+                token: match self {
+                    Self::Off => None,
+                    Self::On(token) => Some(token),
+                },
+                previous,
+                _not_send: PhantomData,
+            },
+            control,
+        )
+    }
+
+    fn pause_external(
+        self,
+    ) -> Result<VisitAccountingTokenExternalPause<'a>, VisitAccountingControl> {
+        let mut active = false;
+        let control = match self {
+            Self::Off => VisitAccountingControl::Continue,
+            Self::On(token) => visit_account_with_token(token, false, false, |accounting| {
+                accounting.pause_external_work();
+                active = true;
+            }),
+        };
+        let guard = VisitAccountingTokenExternalPause {
+            token: match self {
+                Self::Off => None,
+                Self::On(token) => Some(token),
+            },
+            active,
+            _not_send: PhantomData,
+        };
+        if control.stopped() {
+            drop(guard);
+            Err(VisitAccountingControl::Stop)
+        } else {
+            Ok(guard)
+        }
+    }
+}
+
+struct VisitAccountingTokenPhaseScope<'a> {
+    token: Option<VisitAccountingToken<'a>>,
+    previous: Option<VisitAccountingPhaseV1>,
+    _not_send: PhantomData<Rc<()>>,
+}
+
+impl Drop for VisitAccountingTokenPhaseScope<'_> {
+    fn drop(&mut self) {
+        if let (Some(token), Some(previous)) = (self.token, self.previous.take()) {
+            let _ = visit_account_with_token(token, true, false, |accounting| {
+                accounting.transition(previous);
+            });
+        }
+    }
+}
+
+struct VisitAccountingTokenExternalPause<'a> {
+    token: Option<VisitAccountingToken<'a>>,
+    active: bool,
+    _not_send: PhantomData<Rc<()>>,
+}
+
+impl Drop for VisitAccountingTokenExternalPause<'_> {
+    fn drop(&mut self) {
+        if self.active {
+            if let Some(token) = self.token {
+                let _ = visit_account_with_token(token, true, true, |accounting| {
+                    accounting.resume_external_work();
+                });
+            }
+        }
+    }
+}
+
+#[inline]
+fn visit_account_with(f: impl FnOnce(&mut VisitAccountingBuilder)) {
+    if VISIT_ACCOUNTING_CHARGING_CALLS.load(AtomicOrdering::Relaxed) == 0 {
+        return;
+    }
+    VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+        if let Some(accounting) = slot.borrow_mut().as_mut() {
+            if accounting.suspended_depth == 0 {
+                f(accounting);
+            }
+        }
+    });
+}
+
+#[inline]
+fn visit_account_charge(counter: VisitAccountingCounter, amount: u64) {
+    visit_account_with(|accounting| accounting.charge(counter, amount));
+}
+
+#[inline]
+fn visit_account_uncharge(counter: VisitAccountingCounter, amount: u64) {
+    visit_account_with(|accounting| accounting.uncharge(counter, amount));
+}
+
+fn visit_account_block(
+    code: &'static str,
+    counter: Option<&'static str>,
+    detail: impl Into<String>,
+) {
+    visit_account_with(|accounting| accounting.block(code, counter, detail));
+}
+
+struct VisitAccountingSession<'a> {
+    active: bool,
+    context: &'a VisitAccountingContext,
+    _not_send: PhantomData<Rc<()>>,
+}
+
+impl<'a> VisitAccountingSession<'a> {
+    #[allow(clippy::result_large_err)]
+    fn begin(
+        mut builder: VisitAccountingBuilder,
+        context: &'a VisitAccountingContext,
+    ) -> Result<Self, VisitAccountingBuilder> {
+        let token = VisitAccountingToken(context);
+        builder.bind_token(token);
+        if std::thread::current().id() != token.0.owner_thread {
+            token.0.record_foreign_thread();
+            visit_accounting_merge_context_fault(token, &mut builder);
+            return Err(builder);
+        }
+        VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+            let mut slot = slot.borrow_mut();
+            if slot.is_some() {
+                Err(builder)
+            } else {
+                *slot = Some(builder);
+                VISIT_ACCOUNTING_CHARGING_CALLS.fetch_add(1, AtomicOrdering::Relaxed);
+                Ok(Self {
+                    active: true,
+                    context,
+                    _not_send: PhantomData,
+                })
+            }
+        })
+    }
+
+    /// Borrow the per-call token from the live session.  This brands every
+    /// production token use with the session lease: Rust will not allow the
+    /// session to be sealed while a token-derived account or guard is live.
+    fn token<'session>(&'session self) -> VisitAccountingToken<'session> {
+        VisitAccountingToken(self.context)
+    }
+
+    fn finish(mut self, disposition: VisitDispositionV1) -> VisitAccountingV1 {
+        self.active = false;
+        let mut builder = VISIT_ACCOUNTING_ACTIVE.with(|slot| {
+            slot.borrow_mut()
+                .take()
+                .expect("accounted visitor session must still own its meter")
+        });
+        visit_accounting_merge_context_fault(VisitAccountingToken(self.context), &mut builder);
+        let unbalanced_suspension = builder.suspended_depth != 0;
+        if unbalanced_suspension {
+            builder.block(
+                "unbalanced_external_work_suspension",
+                None,
+                "accounting session reached seal while external work remained suspended",
+            );
+            // The excluded interval has no valid endpoint.  Resume only the
+            // local clock state so sealing does not charge arbitrary external
+            // work; the global charging count was already decremented by the
+            // first pause and therefore must not be decremented again below.
+            builder.suspended_depth = 0;
+            builder.last_wall = Instant::now();
+            builder.last_cpu_ns = visit_thread_cpu_ns();
+        } else {
+            VISIT_ACCOUNTING_CHARGING_CALLS.fetch_sub(1, AtomicOrdering::Relaxed);
+        }
+        builder.seal(disposition)
+    }
+}
+
+impl Drop for VisitAccountingSession<'_> {
+    fn drop(&mut self) {
+        if self.active {
+            let builder = VISIT_ACCOUNTING_ACTIVE.with(|slot| slot.borrow_mut().take());
+            if builder.is_some_and(|accounting| accounting.suspended_depth == 0) {
+                VISIT_ACCOUNTING_CHARGING_CALLS.fetch_sub(1, AtomicOrdering::Relaxed);
+            }
+        }
+    }
+}
+
+const VISIT_ACCOUNTING_FORBIDDEN_ENV: [&str; 36] = [
+    "F4_DEBUG",
+    "F4_FP_BRANCH",
+    "F4_FP_DEFERRED_CHUNK",
+    "F4_FP_DEFERRED_PAR",
+    "F4_FP_FL",
+    "F4_FP_FL_BLOCKED",
+    "F4_FP_FL_MIN_COLS",
+    "F4_FP_FREEZE",
+    "F4_FP_GEMM",
+    "F4_FP_GM",
+    "F4_FP_WIDE_DEFERRED",
+    "F4_FP_LAZY_AVX2",
+    "F4_FP_LAZY_AVX512",
+    "F4_FP_LAZY_SIMD",
+    "F4_FP_LINEAR_INTERREDUCE",
+    "F4_FP_LINEAR_ROOTS",
+    "F4_FP_MEM",
+    "F4_FP_MEM_A",
+    "F4_FP_MEM_B",
+    "F4_FP_MEM_C",
+    "F4_FP_MEM_OLD",
+    "F4_FP_MEM_STATS",
+    "F4_FP_NARROW",
+    "F4_FP_NARROW_ACC",
+    "F4_FP_PACKED",
+    "F4_FP_PAR_FL_INBLOCK",
+    "F4_FP_PAR_FL_MODE",
+    "F4_FP_PAR_FL_TILES",
+    "F4_FP_PAR_FL_WORK",
+    "F4_FP_PAR_OLD",
+    "F4_FP_PAR_PROF",
+    "F4_FP_PAR_SYM_FRONTIER",
+    "F4_FP_PAR_SYM_SEEDS",
+    "F4_FP_SYMBOLIC_PAR",
+    "F4_FP_THREAD_OPS",
+    "F4_STAIR",
+];
+
+fn visit_accounting_binding_error(binding: &VisitAccountingBindingV1) -> Option<String> {
+    for (name, value) in [
+        ("attempt_id", binding.attempt_id.as_str()),
+        ("protocol_id", binding.protocol_id.as_str()),
+        ("case_id", binding.case_id.as_str()),
+        ("arm_id", binding.arm_id.as_str()),
+    ] {
+        if value.is_empty() || value.len() > 256 || value.chars().any(char::is_control) {
+            return Some(format!(
+                "{name} must contain 1..=256 non-control characters"
+            ));
+        }
+    }
+    for (name, value) in [
+        ("case_sha256", binding.case_sha256.as_str()),
+        ("system_sha256", binding.system_sha256.as_str()),
+        ("f4_source_sha256", binding.f4_source_sha256.as_str()),
+        ("executable_sha256", binding.executable_sha256.as_str()),
+    ] {
+        if value.len() != 64
+            || !value
+                .bytes()
+                .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+        {
+            return Some(format!("{name} must be 64 lowercase hexadecimal bytes"));
+        }
+    }
+    None
+}
+
+fn visit_accounting_basic_configuration_error(
+    opts: &F4Options,
+    trace_pool: bool,
+) -> Option<String> {
+    if progress_observer_active() {
+        return Some("progress observation is outside VisitAccountingV1".into());
+    }
+    if rayon::current_num_threads() != 1 {
+        return Some("accounted visitor requires a one-thread Rayon pool".into());
+    }
+    if rayon::current_thread_index().is_none() {
+        return Some("accounted visitor must run inside the owning one-thread Rayon worker".into());
+    }
+    if opts.order != Ordering::Grevlex {
+        return Some("accounted visitor supports only grevlex ordering".into());
+    }
+    if trace_pool {
+        return Some("trace reuse is outside VisitAccountingV1".into());
+    }
+    if opts.sibling_batch {
+        return Some("sibling batching is outside VisitAccountingV1".into());
+    }
+    if opts.checkpoint.is_some()
+        || opts.checkpoint_stop_after.is_some()
+        || opts.checkpoint_in_step.is_some()
+        || opts.checkpoint_stop_in_rref.is_some()
+    {
+        return Some("checkpoint paths are outside VisitAccountingV1".into());
+    }
+    if opts.weights.is_some() {
+        return Some("weighted block reduction is outside VisitAccountingV1".into());
+    }
+    if opts.stop_hilbert.is_some() || opts.hilbert_expect.is_some() {
+        return Some("Hilbert stopping is outside VisitAccountingV1".into());
+    }
+    if opts.stop_staircase.is_some() {
+        return Some("staircase stopping is outside VisitAccountingV1".into());
+    }
+    if opts.max_pairs_per_step.is_some() {
+        return Some("pair batching is outside the normal VisitAccountingV1 strategy".into());
+    }
+    if opts.capture_run_log {
+        return Some("run-log diagnostics are outside VisitAccountingV1".into());
+    }
+    if opts.record_hilbert_diagnostics {
+        return Some("post-hoc Hilbert diagnostics are outside VisitAccountingV1".into());
+    }
+    let present: Vec<&str> = VISIT_ACCOUNTING_FORBIDDEN_ENV
+        .iter()
+        .copied()
+        .filter(|name| std::env::var_os(name).is_some())
+        .collect();
+    if !present.is_empty() {
+        return Some(format!(
+            "accounted visitor requires the frozen F4 environment to be absent; present: {}",
+            present.join(",")
+        ));
+    }
+    if opts.deadline.is_some_and(|deadline| {
+        u64::try_from(
+            deadline
+                .saturating_duration_since(Instant::now())
+                .as_nanos(),
+        )
+        .is_err()
+    }) {
+        return Some("deadline remainder does not fit VisitAccountingV1 nanoseconds".into());
+    }
+    None
+}
+
+fn visit_accounting_resolved_configuration_error() -> Option<String> {
+    // Bind the effective values too: an earlier call in this process may have
+    // initialized a OnceLock while an environment override was present.
+    if arithmetic_mode() != 2
+        || !packed_enabled()
+        || !symbolic_parallel()
+        || !gebauer_moeller()
+        || !fl_enabled()
+        || !fl_blocked_pairs()
+        || !linear_interreduce_enabled()
+        || !branch_enabled()
+        || !freeze_enabled()
+        || par_old()
+        || par_prof()
+        || mem_stats()
+        || (0..3).any(mem_site)
+        || !deferred_parallel()
+        || stair_scan()
+        || thread_ops_mode()
+        || !visit_accounting_cached_profile_is_default(
+            fl_mode_tiles(0),
+            fl_min_cols(),
+            narrow_acc_enabled(),
+        )
+    {
+        return Some("resolved F4 implementation profile is not the frozen default".into());
+    }
+    None
+}
+
+fn visit_accounting_cached_profile_is_default(
+    fl_tiles: bool,
+    fl_min_columns: usize,
+    narrow_accumulators: bool,
+) -> bool {
+    !fl_tiles && fl_min_columns == FL_MIN_COLS && narrow_accumulators
+}
+
+fn visit_account_charge_usize(counter: VisitAccountingCounter, value: usize) {
+    match u64::try_from(value) {
+        Ok(value) => visit_account_charge(counter, value),
+        Err(_) => visit_account_block(
+            "counter_overflow",
+            Some(counter.name()),
+            "usize observation does not fit u64",
+        ),
+    }
+}
+
+fn visit_account_charge_product(counter: VisitAccountingCounter, left: usize, right: usize) {
+    match left.checked_mul(right).and_then(|n| u64::try_from(n).ok()) {
+        Some(value) => visit_account_charge(counter, value),
+        None => visit_account_block(
+            "counter_overflow",
+            Some(counter.name()),
+            format!("checked product {left} * {right} failed"),
+        ),
+    }
+}
+
+/// Opt-in, exclusive wall-time phases of one recursive visitor call.
+///
+/// The four phase buckets partition `total_ns`. They measure elapsed time,
+/// not CPU time or a complete arithmetic-operation count. In particular,
+/// [`VisitReport::field_ops`] and the root multiplication counters remain
+/// their existing partial diagnostics. A trace sink runs in
+/// `traversal_other_ns`; `callback_ns` is only the solution visitor.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize)]
+pub struct VisitTimings {
+    /// Elapsed time from entry into the shared visitor implementation through
+    /// traversal and stop classification. Caller setup, final state destruction,
+    /// and serialization of the returned report are outside this interval.
+    pub total_ns: u64,
+    /// The selected native-call path: plain F4, recorded F4, or trace-pool
+    /// dispatch including profile/statistics bookkeeping and its
+    /// learning/replay/certification work. This is not just row elimination.
+    pub native_f4_ns: u64,
+    /// Recognized-univariate processing: coefficient preparation, finite-domain
+    /// scanning or root factoring/filtering, and the batched path's univariate
+    /// gcd/root recovery. General specialization remains traversal work.
+    pub root_recovery_ns: u64,
+    /// Time inside solution-visitor callbacks, including a callback that asks
+    /// to stop. The caller can separately subdivide this bucket.
+    pub callback_ns: u64,
+    /// Remaining elapsed work: validation, traversal, specialization, candidate
+    /// checks, trace-sink callbacks, and timing/dispatch overhead.
+    pub traversal_other_ns: u64,
+}
+
 /// Observations from the opt-in streaming/domain solver. These are stage
 /// diagnostics, not complete operation accounting or a performance claim.
 #[derive(Clone, Debug, Default, serde::Serialize)]
@@ -4831,6 +10698,10 @@ pub struct VisitReport {
     /// The visitor requested termination after an equation-checked witness.
     pub stopped_early: bool,
     pub timed_out: bool,
+    /// Native allocation admission stopped traversal before another branch or
+    /// callback. Such a traversal is incomplete even with zero visited roots.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub resource_limit: Option<F4ResourceLimit>,
     /// The fallible trace sink rejected an event; no later callback ran.
     pub trace_stopped: bool,
     /// At most 512 UTF-8 bytes of the first sink error.
@@ -4838,6 +10709,23 @@ pub struct VisitReport {
     pub solutions_visited: usize,
     pub candidates_rejected: usize,
     pub solving_degree: u32,
+    /// Measured degree-fall observables, folded over the F4 runs of the
+    /// traversal (first fall = min, last fall = max, observed degree of
+    /// regularity = max). Diagnostic; `None` unless a run recorded them
+    /// (`F4Options::record_degree_falls`). Omitted from serialised reports when
+    /// `None`, so transcripts written without the opt-in are unchanged.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_fall_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_fall_degree: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub degree_of_regularity_observed: Option<u32>,
+    /// Post-hoc Hilbert diagnostics folded over recorded F4 calls: min first
+    /// deviation, max last deviation and max staircase extinction degree.
+    /// These describe computed leading ideals, not formal system invariants.
+    pub first_hilbert_deviation_degree: Option<u32>,
+    pub last_hilbert_deviation_degree: Option<u32>,
+    pub staircase_extinction_degree: Option<u32>,
     pub max_rows: usize,
     pub max_cols: usize,
     pub f4_runs: usize,
@@ -4847,6 +10735,131 @@ pub struct VisitReport {
     /// Counted coefficient multiplications in the reused root finder only.
     pub root_field_multiplications: u64,
     pub full_field_branches: u64,
+    /// Finite-domain univariates whose roots came from the Frobenius root
+    /// finder and the domain index ([`DomainRootMode`]); zero, and omitted
+    /// from serialised reports, under the default scan.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub domain_frobenius_univariates: usize,
+    /// Counted multiplications of those extractions.
+    #[serde(skip_serializing_if = "is_zero_u64")]
+    pub domain_root_field_multiplications: u64,
+    /// Entries inserted into the per-traversal domain indexes.
+    #[serde(skip_serializing_if = "is_zero_u64")]
+    pub domain_index_entries: u64,
+    /// Multiplications of the domain scan (exact: [`domain_scan_cost`] for
+    /// each element evaluated), so that the two [`DomainRootMode`]s can be
+    /// compared in one unit.  In-process only: never serialised, so existing
+    /// transcripts are unchanged.
+    #[serde(skip_serializing)]
+    pub domain_scan_field_multiplications: u64,
+    /// Branching nodes whose children were extracted in one batch
+    /// ([`F4Options::sibling_batch`]); zero and omitted by default.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub batched_nodes: usize,
+    /// Children specialised and solved by the batched path.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub batched_children: usize,
+    /// Child systems with no univariate, handed back to the F4 path.
+    #[serde(skip_serializing_if = "is_zero_usize")]
+    pub batched_fallbacks: usize,
+    /// Counted multiplications of the batched path: Horner specialisation,
+    /// univariate gcds, square roots, root finding and substitution.
+    #[serde(skip_serializing_if = "is_zero_u64")]
+    pub batched_field_multiplications: u64,
+    /// Wall-time accounting, only when [`F4Options::with_visit_timing`] enabled
+    /// it. Omitted when disabled, preserving existing serialized reports.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub timings: Option<VisitTimings>,
+    /// Fail-closed, call-owned accounting emitted only by the explicit v1
+    /// accounted entry points.  Legacy callers keep their serialized shape.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub accounting_v1: Option<Box<VisitAccountingV1>>,
+}
+
+// Interior-mutability keeps the clock independent of VisitState's mutable
+// traversal borrow. Scope guards close phases even on early return; none
+// spans recursive traversal or another measured phase.
+struct VisitClock {
+    started: Instant,
+    native_f4_ns: std::cell::Cell<u64>,
+    root_recovery_ns: std::cell::Cell<u64>,
+    callback_ns: std::cell::Cell<u64>,
+}
+
+impl VisitClock {
+    fn new() -> Self {
+        Self {
+            started: Instant::now(),
+            native_f4_ns: std::cell::Cell::new(0),
+            root_recovery_ns: std::cell::Cell::new(0),
+            callback_ns: std::cell::Cell::new(0),
+        }
+    }
+
+    fn finish(&self) -> VisitTimings {
+        let total_ns = visit_elapsed_ns(self.started);
+        let native_f4_ns = self.native_f4_ns.get();
+        let root_recovery_ns = self.root_recovery_ns.get();
+        let callback_ns = self.callback_ns.get();
+        let accounted = native_f4_ns
+            .saturating_add(root_recovery_ns)
+            .saturating_add(callback_ns);
+        debug_assert!(
+            accounted <= total_ns,
+            "visitor wall phases must not overlap"
+        );
+        VisitTimings {
+            total_ns,
+            native_f4_ns,
+            root_recovery_ns,
+            callback_ns,
+            traversal_other_ns: total_ns.saturating_sub(accounted),
+        }
+    }
+}
+
+fn visit_elapsed_ns(started: Instant) -> u64 {
+    u64::try_from(started.elapsed().as_nanos()).unwrap_or(u64::MAX)
+}
+
+enum VisitPhase {
+    NativeF4,
+    RootRecovery,
+    Callback,
+}
+
+struct VisitPhaseScope<'a> {
+    started: Instant,
+    elapsed: &'a std::cell::Cell<u64>,
+}
+
+impl Drop for VisitPhaseScope<'_> {
+    fn drop(&mut self) {
+        self.elapsed.set(
+            self.elapsed
+                .get()
+                .saturating_add(visit_elapsed_ns(self.started)),
+        );
+    }
+}
+
+fn visit_phase_scope(clock: Option<&VisitClock>, phase: VisitPhase) -> Option<VisitPhaseScope<'_>> {
+    clock.map(|clock| VisitPhaseScope {
+        started: Instant::now(),
+        elapsed: match phase {
+            VisitPhase::NativeF4 => &clock.native_f4_ns,
+            VisitPhase::RootRecovery => &clock.root_recovery_ns,
+            VisitPhase::Callback => &clock.callback_ns,
+        },
+    })
+}
+
+fn is_zero_u64(v: &u64) -> bool {
+    *v == 0
+}
+
+fn is_zero_usize(v: &usize) -> bool {
+    *v == 0
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -4855,6 +10868,8 @@ enum VisitEnd {
     Stopped,
     TimedOut,
     TraceStopped,
+    ResourceLimited,
+    AccountingStopped,
 }
 
 /// Borrowed events for one depth-first traversal. `assignments` contains only
@@ -4876,6 +10891,10 @@ pub enum VisitEvent<'a> {
         node_id: usize,
         report: &'a F4Report,
         trace: &'a F4Trace,
+        /// Actual generating set used for branch selection and specialization.
+        /// Includes missing incoming generators; the raw native report above
+        /// remains unchanged and may describe a truncated relaxed system.
+        generating_set: &'a [Poly],
     },
     Branch {
         node_id: usize,
@@ -4891,29 +10910,56 @@ pub enum VisitEvent<'a> {
     },
 }
 
-struct VisitState<'a, F, S> {
+struct VisitState<'a, 'account, F, S> {
     original: &'a [Poly],
     domains: &'a [Option<Vec<u64>>],
     p: u64,
     opts: &'a F4Options,
+    account: VisitAccount<'account>,
     assignment: Vec<u64>,
     visitor: F,
     sink: Option<S>,
+    pool: Option<&'a mut TracePool>,
     next_node: usize,
     report: VisitReport,
+    timing: Option<&'a VisitClock>,
+    /// Lazily built value → position index of each original variable's
+    /// finite domain, shared by every node of the traversal.
+    domain_index: Vec<Option<FxMap<u64, usize>>>,
 }
 
-impl<F, S> VisitState<'_, F, S>
+impl<F, S> VisitState<'_, '_, F, S>
 where
     F: FnMut(&[u64]) -> bool,
     S: FnMut(VisitEvent<'_>) -> Result<(), String>,
 {
-    fn emit(&mut self, event: VisitEvent<'_>) -> bool {
+    fn emit(&mut self, event: VisitEvent<'_>) -> Result<(), VisitEnd> {
         if self.report.trace_stopped {
-            return false;
+            return Err(VisitEnd::TraceStopped);
         }
         if let Some(sink) = &mut self.sink {
-            if let Err(mut error) = sink(event) {
+            let (account_phase, control) = self
+                .account
+                .phase_scope(VisitAccountingPhaseV1::TraceDelivery);
+            if control.stopped()
+                || self
+                    .account
+                    .charge(VisitAccountingCounter::TraceDeliveries, 1)
+                    .stopped()
+            {
+                return Err(VisitEnd::AccountingStopped);
+            }
+            let delivered = {
+                let _external = self
+                    .account
+                    .pause_external()
+                    .map_err(|_| VisitEnd::AccountingStopped)?;
+                sink(event)
+            };
+            if self.account.control().stopped() {
+                return Err(VisitEnd::AccountingStopped);
+            }
+            if let Err(mut error) = delivered {
                 let mut end = error.len().min(512);
                 while !error.is_char_boundary(end) {
                     end -= 1;
@@ -4921,16 +10967,28 @@ where
                 error.truncate(end);
                 self.report.trace_stopped = true;
                 self.report.trace_error = Some(error);
-                return false;
+                drop(account_phase);
+                if self.account.control().stopped() {
+                    return Err(VisitEnd::AccountingStopped);
+                }
+                return Err(VisitEnd::TraceStopped);
+            }
+            drop(account_phase);
+            if self.account.control().stopped() {
+                return Err(VisitEnd::AccountingStopped);
             }
         }
-        true
+        Ok(())
     }
     fn expired(&self) -> bool {
         self.opts.deadline.is_some_and(|d| Instant::now() >= d)
     }
 
     fn walk(&mut self, input: &[Poly], active: &[usize], parent_id: Option<usize>) -> VisitEnd {
+        let (_account_phase, control) = self.account.phase_scope(VisitAccountingPhaseV1::Traversal);
+        if control.stopped() {
+            return VisitEnd::AccountingStopped;
+        }
         if self.report.trace_stopped {
             return VisitEnd::TraceStopped;
         }
@@ -4939,6 +10997,13 @@ where
         }
         let node_id = self.next_node;
         self.next_node += 1;
+        if self
+            .account
+            .charge(VisitAccountingCounter::TraversalNodes, 1)
+            .stopped()
+        {
+            return VisitEnd::AccountingStopped;
+        }
         if self.sink.is_some() {
             let assignments: Vec<_> = self
                 .assignment
@@ -4947,14 +11012,14 @@ where
                 .enumerate()
                 .filter(|(i, _)| !active.contains(i))
                 .collect();
-            if !self.emit(VisitEvent::System {
+            if let Err(end) = self.emit(VisitEvent::System {
                 node_id,
                 parent_id,
                 active_variables: active,
                 assignments: &assignments,
                 polynomials: input,
             }) {
-                return VisitEnd::TraceStopped;
+                return end;
             }
         }
         // Sink persistence may itself consume the remaining deadline. It is
@@ -4965,21 +11030,51 @@ where
         if active.is_empty() {
             // A degree-truncated basis can describe a strict superset of
             // the original variety. Never expose those spurious roots.
-            let residual_satisfied = input.iter().all(|g| eval(g, &[], self.p) == 0);
-            let original_satisfied = residual_satisfied.then(|| {
-                self.original
-                    .iter()
-                    .all(|g| eval(g, &self.assignment, self.p) == 0)
-            });
+            let (residual_satisfied, original_satisfied) = {
+                let (_phase, control) = self
+                    .account
+                    .phase_scope(VisitAccountingPhaseV1::CandidateVerification);
+                if control.stopped() {
+                    return VisitEnd::AccountingStopped;
+                }
+                for g in input {
+                    if self
+                        .account
+                        .charge_usize(VisitAccountingCounter::CandidateTermsChecked, g.len())
+                        .stopped()
+                    {
+                        return VisitEnd::AccountingStopped;
+                    }
+                }
+                let residual_satisfied = input.iter().all(|g| eval(g, &[], self.p) == 0);
+                let original_satisfied = residual_satisfied.then(|| {
+                    for g in self.original {
+                        if self
+                            .account
+                            .charge_usize(VisitAccountingCounter::CandidateTermsChecked, g.len())
+                            .stopped()
+                        {
+                            return false;
+                        }
+                    }
+                    self.original
+                        .iter()
+                        .all(|g| eval(g, &self.assignment, self.p) == 0)
+                });
+                (residual_satisfied, original_satisfied)
+            };
+            if self.account.control().stopped() {
+                return VisitEnd::AccountingStopped;
+            }
             if self.sink.is_some() {
                 let assignment = self.assignment.clone();
-                if !self.emit(VisitEvent::Candidate {
+                if let Err(end) = self.emit(VisitEvent::Candidate {
                     node_id,
                     assignment: &assignment,
                     residual_satisfied,
                     original_satisfied,
                 }) {
-                    return VisitEnd::TraceStopped;
+                    return end;
                 }
             }
             if self.sink.is_some() && self.expired() {
@@ -4992,8 +11087,30 @@ where
                 self.report.candidates_rejected += 1;
                 return VisitEnd::Complete;
             }
+            let stop = {
+                let _phase = visit_phase_scope(self.timing, VisitPhase::Callback);
+                let (_account_phase, control) = self
+                    .account
+                    .phase_scope(VisitAccountingPhaseV1::CallbackDelivery);
+                if control.stopped()
+                    || self
+                        .account
+                        .charge(VisitAccountingCounter::CallbackDeliveries, 1)
+                        .stopped()
+                {
+                    return VisitEnd::AccountingStopped;
+                }
+                let _external = match self.account.pause_external() {
+                    Ok(external) => external,
+                    Err(_) => return VisitEnd::AccountingStopped,
+                };
+                (self.visitor)(&self.assignment)
+            };
             self.report.solutions_visited += 1;
-            return if (self.visitor)(&self.assignment) {
+            if self.account.control().stopped() {
+                return VisitEnd::AccountingStopped;
+            }
+            return if stop {
                 VisitEnd::Stopped
             } else {
                 VisitEnd::Complete
@@ -5005,26 +11122,107 @@ where
         {
             return VisitEnd::Complete;
         }
-        let (r, trace) = if self.sink.is_some() {
-            let (r, trace) = f4_record(input, active.len(), self.p, self.opts);
-            (r, Some(trace))
-        } else {
-            (f4(input, active.len(), self.p, self.opts), None)
+        let mut native_calls = 1;
+        let (r, trace) = {
+            let _phase = visit_phase_scope(self.timing, VisitPhase::NativeF4);
+            if let Some(pool) = &mut self.pool {
+                let profile: Vec<_> = active
+                    .iter()
+                    .map(|&i| self.domains[i].as_ref().map(Vec::len))
+                    .collect();
+                let before = pool.stats();
+                let r = pool.run(input, active.len(), self.p, self.opts, &profile);
+                let after = pool.stats();
+                native_calls = (after.learned - before.learned + after.replay_attempts
+                    - before.replay_attempts) as usize;
+                (r, None)
+            } else if self.sink.is_some() {
+                if matches!(self.account, VisitAccount::On(_)) {
+                    self.account.block(
+                        "uninstrumented_branch",
+                        None,
+                        "recording-specific contributor recovery is not operation-complete",
+                    );
+                    return VisitEnd::AccountingStopped;
+                }
+                let (r, trace) = f4_record(input, active.len(), self.p, self.opts);
+                (r, Some(trace))
+            } else {
+                (
+                    f4_with_visit_account(input, active.len(), self.p, self.opts, self.account),
+                    None,
+                )
+            }
         };
+        if self.account.control().stopped() {
+            return VisitEnd::AccountingStopped;
+        }
         if self.report.f4_runs == 0 {
             self.report.solving_degree = r.solving_degree;
         }
-        self.report.f4_runs += 1;
+        self.report.f4_runs += native_calls;
         self.report.max_rows = self.report.max_rows.max(r.max_rows);
         self.report.max_cols = self.report.max_cols.max(r.max_cols);
         self.report.field_ops += r.field_ops;
+        if let Some(d) = r.first_hilbert_deviation_degree {
+            self.report.first_hilbert_deviation_degree = Some(
+                self.report
+                    .first_hilbert_deviation_degree
+                    .map_or(d, |c| c.min(d)),
+            );
+        }
+        if let Some(d) = r.last_hilbert_deviation_degree {
+            self.report.last_hilbert_deviation_degree = Some(
+                self.report
+                    .last_hilbert_deviation_degree
+                    .map_or(d, |c| c.max(d)),
+            );
+        }
+        if let Some(d) = r.staircase_extinction_degree {
+            self.report.staircase_extinction_degree = Some(
+                self.report
+                    .staircase_extinction_degree
+                    .map_or(d, |c| c.max(d)),
+            );
+        }
+        if let Some(limit) = &r.resource_limit {
+            self.report.resource_limit = Some(limit.clone());
+            // Preserve the diagnostic event without cloning the incoming
+            // generators or admitting root recovery from an incomplete call.
+            if let Some(trace) = &trace {
+                if let Err(end) = self.emit(VisitEvent::NativeResult {
+                    node_id,
+                    report: &r,
+                    trace,
+                    generating_set: input,
+                }) {
+                    return end;
+                }
+            }
+            return VisitEnd::ResourceLimited;
+        }
+        // An alive-only native basis can retire an input before its deferred
+        // pair is processed. Preserve the exact incoming generators in the
+        // opt-in traced traversal instead of claiming equality for that subset.
+        // This adds no pair processing and does not change any solver limit.
+        let preserved = trace.as_ref().map(|_| {
+            let mut generators = r.basis.clone();
+            for f in input {
+                if !f.is_empty() && !generators.contains(f) {
+                    generators.push(f.clone());
+                }
+            }
+            generators
+        });
+        let generating_set = preserved.as_deref().unwrap_or(&r.basis);
         if let Some(trace) = &trace {
-            if !self.emit(VisitEvent::NativeResult {
+            if let Err(end) = self.emit(VisitEvent::NativeResult {
                 node_id,
                 report: &r,
                 trace,
+                generating_set,
             }) {
-                return VisitEnd::TraceStopped;
+                return end;
             }
         }
         if r.timed_out || self.expired() {
@@ -5034,7 +11232,7 @@ where
             return VisitEnd::Complete;
         }
         let mut best: Option<(usize, Vec<u64>)> = None;
-        for g in &r.basis {
+        for g in generating_set {
             let vars: HashSet<_> = g
                 .iter()
                 .flat_map(|(e, _)| {
@@ -5048,13 +11246,93 @@ where
                 continue;
             }
             let var = *vars.iter().next().unwrap();
-            let roots = if let Some(domain) = &self.domains[active[var]] {
+            let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
+            let (account_phase, control) = self
+                .account
+                .phase_scope(VisitAccountingPhaseV1::RootExtraction);
+            if control.stopped() {
+                return VisitEnd::AccountingStopped;
+            }
+            let frobenius = self.domains[active[var]].as_ref().is_some_and(|domain| {
+                match self.opts.domain_roots {
+                    DomainRootMode::Scan => false,
+                    DomainRootMode::Frobenius => true,
+                    DomainRootMode::Auto => {
+                        let exponents: Vec<u32> = g.iter().map(|(e, _)| e[var]).collect();
+                        let degree = exponents.iter().copied().max().unwrap_or(0);
+                        domain_frobenius_cost(degree, self.p)
+                            < domain_scan_cost(&exponents, domain.len())
+                    }
+                }
+            });
+            let roots = if frobenius {
+                let original = active[var];
+                let domain = self.domains[original]
+                    .as_ref()
+                    .expect("selected only for a finite domain");
+                if self.domain_index[original].is_none() {
+                    self.report.domain_index_entries += domain.len() as u64;
+                    self.domain_index[original] = Some(domain_position_index(domain));
+                }
+                let degree = g.iter().map(|(e, _)| e[var]).max().unwrap_or(0) as usize;
+                let mut coefficients = vec![0; degree + 1];
+                for (e, c) in g {
+                    coefficients[e[var] as usize] = *c;
+                }
+                self.report.domain_frobenius_univariates += 1;
+                let before = self.report.domain_root_field_multiplications;
+                let roots = domain_roots_frobenius(
+                    &coefficients,
+                    self.domain_index[original].as_ref().expect("built above"),
+                    self.p,
+                    &mut self.report.domain_root_field_multiplications,
+                    self.opts.deadline,
+                );
+                match self
+                    .report
+                    .domain_root_field_multiplications
+                    .checked_sub(before)
+                {
+                    Some(muls) => {
+                        if self
+                            .account
+                            .charge(VisitAccountingCounter::FieldMultiplications, muls)
+                            .stopped()
+                        {
+                            return VisitEnd::AccountingStopped;
+                        }
+                    }
+                    None => {
+                        if self
+                            .account
+                            .block(
+                                "counter_underflow",
+                                Some("field_multiplications"),
+                                "finite-domain root counter regressed",
+                            )
+                            .stopped()
+                        {
+                            return VisitEnd::AccountingStopped;
+                        }
+                    }
+                }
+                if self.account.control().stopped() {
+                    return VisitEnd::AccountingStopped;
+                }
+                let Some(roots) = roots else {
+                    return VisitEnd::TimedOut;
+                };
+                roots
+            } else if let Some(domain) = &self.domains[active[var]] {
                 let mut roots = Vec::new();
+                let exponents: Vec<u32> = g.iter().map(|(e, _)| e[var]).collect();
+                let per_point = domain_scan_cost(&exponents, 1);
                 for &x in domain {
                     if self.expired() {
                         return VisitEnd::TimedOut;
                     }
                     self.report.domain_evaluations += 1;
+                    self.report.domain_scan_field_multiplications += per_point;
                     let value = g.iter().fold(0, |v, (e, c)| {
                         (v + mulmod(*c, powmod(x, u64::from(e[var]), self.p), self.p)) % self.p
                     });
@@ -5070,21 +11348,62 @@ where
                     coefficients[e[var] as usize] = *c;
                 }
                 self.report.factored_univariates += 1;
-                let Some(roots) = super::glv_invariant_base::poly_roots_fp_counted_until(
+                let before = self.report.root_field_multiplications;
+                let roots = super::glv_invariant_base::poly_roots_fp_counted_until(
                     &coefficients,
                     self.p,
                     0x4634_524f_4f54,
                     &mut self.report.root_field_multiplications,
                     self.opts.deadline,
-                ) else {
+                );
+                match self.report.root_field_multiplications.checked_sub(before) {
+                    Some(muls) => {
+                        if self
+                            .account
+                            .charge(VisitAccountingCounter::FieldMultiplications, muls)
+                            .stopped()
+                        {
+                            return VisitEnd::AccountingStopped;
+                        }
+                    }
+                    None => {
+                        if self
+                            .account
+                            .block(
+                                "counter_underflow",
+                                Some("field_multiplications"),
+                                "unrestricted root counter regressed",
+                            )
+                            .stopped()
+                        {
+                            return VisitEnd::AccountingStopped;
+                        }
+                    }
+                }
+                if self.account.control().stopped() {
+                    return VisitEnd::AccountingStopped;
+                }
+                let Some(roots) = roots else {
                     return VisitEnd::TimedOut;
                 };
                 roots
             };
+            if self
+                .account
+                .charge_usize(VisitAccountingCounter::RootCandidates, roots.len())
+                .stopped()
+            {
+                return VisitEnd::AccountingStopped;
+            }
             if best.as_ref().is_none_or(|(_, old)| roots.len() < old.len()) {
                 best = Some((var, roots));
             }
-            if best.as_ref().is_some_and(|(_, roots)| roots.is_empty()) {
+            let empty_roots = best.as_ref().is_some_and(|(_, roots)| roots.is_empty());
+            drop(account_phase);
+            if self.account.control().stopped() {
+                return VisitEnd::AccountingStopped;
+            }
+            if empty_roots {
                 return VisitEnd::Complete;
             }
         }
@@ -5106,6 +11425,14 @@ where
         let full_field = !has_univariate && self.domains[active[var]].is_none();
         let mut remaining = active.to_vec();
         let original = remaining.remove(var);
+        if self.opts.sibling_batch
+            && !has_univariate
+            && !full_field
+            && self.sink.is_none()
+            && self.pool.is_none()
+        {
+            return self.batched_siblings(generating_set, var, original, &remaining, node_id);
+        }
         for value in values {
             if self.expired() {
                 return VisitEnd::TimedOut;
@@ -5113,7 +11440,14 @@ where
             if full_field {
                 self.report.full_field_branches += 1;
             }
-            if !self.emit(VisitEvent::Branch {
+            if self
+                .account
+                .charge(VisitAccountingCounter::BranchDeliveries, 1)
+                .stopped()
+            {
+                return VisitEnd::AccountingStopped;
+            }
+            if let Err(end) = self.emit(VisitEvent::Branch {
                 node_id,
                 original_variable: original,
                 value,
@@ -5125,20 +11459,39 @@ where
                     "finite_domain"
                 },
             }) {
-                return VisitEnd::TraceStopped;
+                return end;
             }
             if self.sink.is_some() && self.expired() {
                 return VisitEnd::TimedOut;
             }
             self.assignment[original] = value;
-            let sub: Vec<_> = r
-                .basis
-                .iter()
-                .map(|g| {
-                    normalise_owned(specialise(g, var, value, self.p), self.p, self.opts.order)
-                })
-                .filter(|g| !g.is_empty())
-                .collect();
+            let sub: Vec<_> = {
+                let (_phase, control) = self
+                    .account
+                    .phase_scope(VisitAccountingPhaseV1::Specialization);
+                if control.stopped() {
+                    return VisitEnd::AccountingStopped;
+                }
+                for g in generating_set {
+                    if self
+                        .account
+                        .charge_usize(VisitAccountingCounter::SpecializationTerms, g.len())
+                        .stopped()
+                    {
+                        return VisitEnd::AccountingStopped;
+                    }
+                }
+                generating_set
+                    .iter()
+                    .map(|g| {
+                        normalise_owned(specialise(g, var, value, self.p), self.p, self.opts.order)
+                    })
+                    .filter(|g| !g.is_empty())
+                    .collect()
+            };
+            if self.account.control().stopped() {
+                return VisitEnd::AccountingStopped;
+            }
             let end = self.walk(&sub, &remaining, Some(node_id));
             if end != VisitEnd::Complete {
                 return end;
@@ -5146,6 +11499,489 @@ where
         }
         VisitEnd::Complete
     }
+
+    /// Build the value → position index of an original variable's domain
+    /// once per traversal.
+    fn ensure_domain_index(&mut self, original: usize) {
+        if self.domain_index[original].is_none() {
+            if let Some(domain) = &self.domains[original] {
+                self.report.domain_index_entries += domain.len() as u64;
+                self.domain_index[original] = Some(domain_position_index(domain));
+            }
+        }
+    }
+
+    /// [`F4Options::sibling_batch`]: every child of a finite-domain branching
+    /// node, from one sibling family, in domain order.
+    fn batched_siblings(
+        &mut self,
+        generating_set: &[Poly],
+        var: usize,
+        original: usize,
+        remaining: &[usize],
+        node_id: usize,
+    ) -> VisitEnd {
+        let family = sibling_family(generating_set, var);
+        let domain = self.domains[original]
+            .clone()
+            .expect("batched only over a finite domain");
+        self.report.batched_nodes += 1;
+        for value in domain {
+            if self.expired() {
+                return VisitEnd::TimedOut;
+            }
+            self.assignment[original] = value;
+            let mut muls = 0u64;
+            let polys = specialise_family(&family, value, self.p, &mut muls);
+            self.report.batched_field_multiplications += muls;
+            self.report.batched_children += 1;
+            let end = self.tri_solve(polys, remaining, node_id);
+            if end != VisitEnd::Complete {
+                return end;
+            }
+        }
+        VisitEnd::Complete
+    }
+
+    /// Solve one child system without F4: repeatedly take a variable with a
+    /// univariate polynomial, extract the roots of the gcd of all its
+    /// univariates (restricted to its domain), substitute each and recurse.
+    /// A system with no univariate goes to the F4 path ([`Self::walk`]).
+    /// Leaves are checked against the original input as the walk's are.
+    fn tri_solve(&mut self, polys: Vec<SparsePoly>, vars: &[usize], node_id: usize) -> VisitEnd {
+        if self.expired() {
+            return VisitEnd::TimedOut;
+        }
+        // Constants: a nonzero one is inconsistent, a zero one says nothing.
+        let mut live: Vec<SparsePoly> = Vec::with_capacity(polys.len());
+        for g in polys {
+            if g.iter().all(|(e, _)| e.iter().all(|&k| k == 0)) {
+                if g.iter().fold(0u64, |s, (_, c)| (s + c) % self.p) != 0 {
+                    return VisitEnd::Complete;
+                }
+            } else {
+                live.push(g);
+            }
+        }
+        if vars.is_empty() {
+            let ok = self
+                .original
+                .iter()
+                .all(|g| eval(g, &self.assignment, self.p) == 0);
+            if !ok {
+                self.report.candidates_rejected += 1;
+                return VisitEnd::Complete;
+            }
+            self.report.solutions_visited += 1;
+            let stop = {
+                let _phase = visit_phase_scope(self.timing, VisitPhase::Callback);
+                (self.visitor)(&self.assignment)
+            };
+            return if stop {
+                VisitEnd::Stopped
+            } else {
+                VisitEnd::Complete
+            };
+        }
+        if vars
+            .iter()
+            .any(|&i| self.domains[i].as_ref().is_some_and(Vec::is_empty))
+        {
+            return VisitEnd::Complete;
+        }
+        // Univariates by local variable, as dense coefficient vectors.
+        let p = self.p;
+        let mut univariates: Vec<Vec<Vec<u64>>> = vec![Vec::new(); vars.len()];
+        for g in &live {
+            let mut support = None;
+            let mut single = true;
+            for (e, _) in g {
+                for (j, &k) in e.iter().enumerate() {
+                    if k > 0 {
+                        match support {
+                            None => support = Some(j),
+                            Some(s) if s != j => single = false,
+                            _ => {}
+                        }
+                    }
+                }
+            }
+            if let (true, Some(j)) = (single, support) {
+                let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
+                let degree = g.iter().map(|(e, _)| e[j]).max().unwrap_or(0) as usize;
+                let mut dense = vec![0u64; degree + 1];
+                for (e, c) in g {
+                    let k = e[j] as usize;
+                    dense[k] = (dense[k] + c) % p;
+                }
+                univariates[j].push(dense_trim(dense));
+            }
+        }
+        let mut muls = 0u64;
+        let mut best: Option<(usize, Vec<u64>)> = None;
+        for (j, us) in univariates.iter().enumerate() {
+            if us.is_empty() {
+                continue;
+            }
+            let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
+            let h = us
+                .iter()
+                .skip(1)
+                .fold(us[0].clone(), |h, u| dense_gcd(&h, u, p, &mut muls));
+            let h = dense_gcd(&h, &[], p, &mut muls);
+            if h.len() <= 1 {
+                // No common root of this variable's univariates.
+                self.report.batched_field_multiplications += muls;
+                return VisitEnd::Complete;
+            }
+            if best.as_ref().is_none_or(|(_, b)| h.len() < b.len()) {
+                best = Some((j, h));
+            }
+        }
+        let Some((z, h)) = best else {
+            self.report.batched_field_multiplications += muls;
+            self.report.batched_fallbacks += 1;
+            let normalised: Vec<Poly> = live
+                .into_iter()
+                .map(|g| normalise_owned(g, self.p, self.opts.order))
+                .filter(|g| !g.is_empty())
+                .collect();
+            return self.walk(&normalised, vars, Some(node_id));
+        };
+        let z_original = vars[z];
+        let roots = {
+            let _phase = visit_phase_scope(self.timing, VisitPhase::RootRecovery);
+            let Some(mut roots) = dense_roots_fp(&h, p, &mut muls, self.opts.deadline) else {
+                self.report.batched_field_multiplications += muls;
+                return VisitEnd::TimedOut;
+            };
+            if self.domains[z_original].is_some() {
+                self.ensure_domain_index(z_original);
+                let index = self.domain_index[z_original].as_ref().expect("built above");
+                let mut hits: Vec<(usize, u64)> = roots
+                    .iter()
+                    .filter_map(|r| index.get(r).map(|&pos| (pos, *r)))
+                    .collect();
+                hits.sort_unstable_by_key(|&(pos, _)| pos);
+                roots = hits.into_iter().map(|(_, r)| r).collect();
+            }
+            self.report.batched_field_multiplications += muls;
+            roots
+        };
+        let mut rest = vars.to_vec();
+        rest.remove(z);
+        for r in roots {
+            let mut muls = 0u64;
+            let next = substitute_var(&live, z, r, p, &mut muls);
+            self.report.batched_field_multiplications += muls;
+            self.assignment[z_original] = r;
+            let end = self.tri_solve(next, &rest, node_id);
+            if end != VisitEnd::Complete {
+                return end;
+            }
+        }
+        VisitEnd::Complete
+    }
+}
+
+fn visit_disposition(
+    report: &VisitReport,
+    empty_domain: bool,
+    callback_stop_disposition: VisitDispositionV1,
+) -> VisitDispositionV1 {
+    if report.trace_stopped {
+        VisitDispositionV1::TraceError
+    } else if report.stopped_early {
+        callback_stop_disposition
+    } else if report.timed_out {
+        VisitDispositionV1::TimedOut
+    } else if report.resource_limit.is_some() {
+        VisitDispositionV1::ResourceStopped
+    } else if !report.complete {
+        VisitDispositionV1::Incomplete
+    } else if report.complete && empty_domain {
+        VisitDispositionV1::EmptyDomain
+    } else if report.complete && report.solutions_visited == 0 {
+        VisitDispositionV1::CompleteEmpty
+    } else {
+        VisitDispositionV1::CompleteNonempty
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+#[allow(clippy::result_large_err)]
+fn solve_visit_accounted_impl<F, S>(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    domains: &[Option<Vec<u64>>],
+    request: VisitAccountingRequestV1,
+    entry_mode: VisitAccountingEntryMode,
+    visitor: F,
+    sink: Option<S>,
+) -> Result<VisitReport, VisitAccountedErrorV1>
+where
+    F: FnMut(&[u64]) -> bool,
+    S: FnMut(VisitEvent<'_>) -> Result<(), String>,
+{
+    let trace_sink = sink.is_some();
+    let nested = visit_accounting_active();
+    let binding_error = (!nested)
+        .then(|| visit_accounting_binding_error(&request.binding))
+        .flatten();
+    let basic_configuration_error = (!nested && binding_error.is_none())
+        .then(|| visit_accounting_basic_configuration_error(opts, false))
+        .flatten();
+    let resolve_profile = !nested && binding_error.is_none() && basic_configuration_error.is_none();
+    let mut builder = VisitAccountingBuilder::new_for_entry(
+        request,
+        opts,
+        trace_sink,
+        entry_mode,
+        resolve_profile,
+    );
+    if nested {
+        builder.block(
+            "nested_accounted_call",
+            None,
+            "an accounted visitor is already active on this worker",
+        );
+        return Err(VisitAccountedErrorV1 {
+            message: "nested accounted visitor calls are unsupported".into(),
+            accounting: builder.seal(VisitDispositionV1::Unsupported),
+        });
+    }
+    if let Some(error) = binding_error {
+        builder.block("invalid_binding", None, error.clone());
+        return Err(VisitAccountedErrorV1 {
+            message: error,
+            accounting: builder.seal(VisitDispositionV1::InvalidInput),
+        });
+    }
+    if let Some(error) = basic_configuration_error {
+        builder.block("unsupported_configuration", None, error.clone());
+        return Err(VisitAccountedErrorV1 {
+            message: error,
+            accounting: builder.seal(VisitDispositionV1::Unsupported),
+        });
+    }
+    if builder.arm.implementation_environment != "f4_environment_absent" {
+        let error = "F4 environment changed during accounted preflight".to_string();
+        builder.block("unsupported_configuration", None, error.clone());
+        return Err(VisitAccountedErrorV1 {
+            message: error,
+            accounting: builder.seal(VisitDispositionV1::Unsupported),
+        });
+    }
+    if let Some(error) = visit_accounting_basic_configuration_error(opts, false) {
+        builder.block("unsupported_configuration", None, error.clone());
+        return Err(VisitAccountedErrorV1 {
+            message: error,
+            accounting: builder.seal(VisitDispositionV1::Unsupported),
+        });
+    }
+    if let Some(error) = visit_accounting_resolved_configuration_error() {
+        builder.block("unsupported_configuration", None, error.clone());
+        return Err(VisitAccountedErrorV1 {
+            message: error,
+            accounting: builder.seal(VisitDispositionV1::Unsupported),
+        });
+    }
+    let Some(context) = VisitAccountingContext::new() else {
+        let error = "accounting context identifier space is exhausted".to_string();
+        builder.block("accounting_context_exhausted", None, error.clone());
+        return Err(VisitAccountedErrorV1 {
+            message: error,
+            accounting: builder.seal(VisitDispositionV1::Unsupported),
+        });
+    };
+    let session = VisitAccountingSession::begin(builder, &context).map_err(|mut builder| {
+        builder.block(
+            "nested_accounted_call",
+            None,
+            "accounted meter ownership changed during preflight",
+        );
+        VisitAccountedErrorV1 {
+            message: "accounted visitor meter is already active".into(),
+            accounting: builder.seal(VisitDispositionV1::Unsupported),
+        }
+    })?;
+    let account = VisitAccount::On(session.token());
+    let initial_accounting_stopped = account
+        .charge_usize(VisitAccountingCounter::SymbolicRows, input.len())
+        .stopped()
+        || input.iter().any(|polynomial| {
+            account
+                .charge_usize(VisitAccountingCounter::SymbolicMonomials, polynomial.len())
+                .stopped()
+        })
+        || account
+            .charge_usize(VisitAccountingCounter::Comparisons, domains.len())
+            .stopped()
+        || domains.iter().flatten().any(|domain| {
+            account
+                .charge_usize(VisitAccountingCounter::Comparisons, domain.len())
+                .stopped()
+        });
+    if initial_accounting_stopped || account.control().stopped() {
+        let report = VisitReport {
+            accounting_v1: Some(Box::new(session.finish(VisitDispositionV1::Incomplete))),
+            ..VisitReport::default()
+        };
+        return Ok(report);
+    }
+    let empty_domain = domains.iter().flatten().any(Vec::is_empty);
+    match solve_visit_impl(
+        input, n_vars, p, opts, domains, account, visitor, sink, None,
+    ) {
+        Ok(mut report) => {
+            let disposition = visit_disposition(
+                &report,
+                empty_domain,
+                entry_mode.callback_stop_disposition(),
+            );
+            report.accounting_v1 = Some(Box::new(session.finish(disposition)));
+            Ok(report)
+        }
+        Err(message) => Err(VisitAccountedErrorV1 {
+            accounting: session.finish(VisitDispositionV1::InvalidInput),
+            message,
+        }),
+    }
+}
+
+/// One equation-checked witness and the accounted report that produced it.
+///
+/// `first_solution` is `None` when traversal completes without a witness or
+/// stops for another reason.  A present witness is also reflected by
+/// [`VisitDispositionV1::WitnessFound`] in `report.accounting_v1`.
+#[derive(Clone, Debug, serde::Serialize)]
+pub struct VisitFirstReportV1 {
+    pub report: VisitReport,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub first_solution: Option<Vec<u64>>,
+}
+
+/// Private, sequential entry point for the first equation-checked witness.
+///
+/// The executor owns a one-thread Rayon pool and exposes no caller callback or
+/// trace sink, preventing those extension points from submitting unrelated
+/// work to that pool. Traversal, delivery and native-driver orchestration now
+/// borrow a session-branded token, but shared arithmetic, reducers, roots and
+/// allocation helpers still use the worker-local meter as a shadow.
+/// `work_ownership_complete` therefore remains false until every admitted
+/// charged path carries explicit call ownership.
+pub struct VisitAccountingExecutorV1 {
+    pool: rayon::ThreadPool,
+}
+
+impl VisitAccountingExecutorV1 {
+    /// Build a fresh executor with its own single worker.
+    pub fn try_new() -> Result<Self, rayon::ThreadPoolBuildError> {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(1)
+            .build()
+            .map(|pool| Self { pool })
+    }
+
+    /// Return the first equation-checked solution, if one is reached.
+    ///
+    /// Calls require `&mut self`, so one executor cannot admit overlapping
+    /// solves through this API.  The report remains call-scoped; construction,
+    /// replay, persistence, and whole-collector work need outer accounting.
+    #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::result_large_err)]
+    pub fn solve_first(
+        &mut self,
+        input: &[Poly],
+        n_vars: usize,
+        p: u64,
+        opts: &F4Options,
+        domains: &[Option<Vec<u64>>],
+        request: VisitAccountingRequestV1,
+    ) -> Result<VisitFirstReportV1, VisitAccountedErrorV1> {
+        let (report, first_solution) = self.pool.install(move || {
+            let mut first_solution = None;
+            let report = solve_visit_accounted_impl(
+                input,
+                n_vars,
+                p,
+                opts,
+                domains,
+                request,
+                VisitAccountingEntryMode::PrivateFirstExecutor,
+                |solution| {
+                    first_solution = Some(solution.to_vec());
+                    true
+                },
+                None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+            )?;
+            Ok((report, first_solution))
+        })?;
+        Ok(VisitFirstReportV1 {
+            report,
+            first_solution,
+        })
+    }
+}
+
+/// Accounted plain visitor for the frozen single-thread, normal-grevlex path.
+///
+/// This entry point preserves its ledger on validation failure through
+/// [`VisitAccountedErrorV1`].  It must be invoked inside a dedicated
+/// one-thread Rayon pool.  The returned record covers only this solver call;
+/// public-system construction, arbitrary callback work, replay, storage and
+/// the enclosing relation collector require their own ledger.
+#[allow(clippy::result_large_err)]
+pub fn solve_visit_accounted_v1(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    domains: &[Option<Vec<u64>>],
+    request: VisitAccountingRequestV1,
+    visitor: impl FnMut(&[u64]) -> bool,
+) -> Result<VisitReport, VisitAccountedErrorV1> {
+    solve_visit_accounted_impl(
+        input,
+        n_vars,
+        p,
+        opts,
+        domains,
+        request,
+        VisitAccountingEntryMode::CallerPool,
+        visitor,
+        None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+    )
+}
+
+/// Traced accounted visitor.  Trace delivery belongs to this call, but the
+/// sink's own persistence/storage implementation remains outer work.  Trace
+/// reuse is intentionally unsupported by v1.
+#[allow(clippy::too_many_arguments)]
+#[allow(clippy::result_large_err)]
+pub fn solve_visit_traced_accounted_v1(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    domains: &[Option<Vec<u64>>],
+    request: VisitAccountingRequestV1,
+    visitor: impl FnMut(&[u64]) -> bool,
+    sink: impl FnMut(VisitEvent<'_>) -> Result<(), String>,
+) -> Result<VisitReport, VisitAccountedErrorV1> {
+    solve_visit_accounted_impl(
+        input,
+        n_vars,
+        p,
+        opts,
+        domains,
+        request,
+        VisitAccountingEntryMode::CallerPool,
+        visitor,
+        Some(sink),
+    )
 }
 
 /// Visit exact solutions in the Cartesian product of `domains` (`None`
@@ -5177,8 +12013,10 @@ pub fn solve_visit(
         p,
         opts,
         domains,
+        VisitAccount::Off,
         visitor,
         None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+        None,
     )
 }
 
@@ -5203,22 +12041,79 @@ pub fn solve_visit_traced(
     if opts.stop_hilbert.is_some() {
         return Err("traced visitor does not support Hilbert stopping".into());
     }
-    solve_visit_impl(input, n_vars, p, opts, domains, visitor, Some(sink))
+    solve_visit_impl(
+        input,
+        n_vars,
+        p,
+        opts,
+        domains,
+        VisitAccount::Off,
+        visitor,
+        Some(sink),
+        None,
+    )
 }
 
-fn solve_visit_impl<F, S>(
+/// Reuse certified native traces across attempts in one explicitly scoped
+/// family. Learning, rejected replay, certification and fallback remain inside
+/// the same deadline; the original visitor and traced APIs are unchanged.
+#[allow(clippy::too_many_arguments)]
+pub fn solve_visit_reusing(
     input: &[Poly],
     n_vars: usize,
     p: u64,
     opts: &F4Options,
     domains: &[Option<Vec<u64>>],
+    pool: &mut TracePool,
+    visitor: impl FnMut(&[u64]) -> bool,
+) -> Result<VisitReport, String> {
+    if opts.stop_hilbert.is_some() {
+        return Err("trace reuse does not support Hilbert stopping".into());
+    }
+    solve_visit_impl(
+        input,
+        n_vars,
+        p,
+        opts,
+        domains,
+        VisitAccount::Off,
+        visitor,
+        None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+        Some(pool),
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn solve_visit_impl<'account, F, S>(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    domains: &[Option<Vec<u64>>],
+    account: VisitAccount<'account>,
     visitor: F,
     sink: Option<S>,
+    pool: Option<&mut TracePool>,
 ) -> Result<VisitReport, String>
 where
     F: FnMut(&[u64]) -> bool,
     S: FnMut(VisitEvent<'_>) -> Result<(), String>,
 {
+    if account.control().stopped() {
+        return Ok(VisitReport::default());
+    }
+    let timing = opts.visit_timing.then(VisitClock::new);
+    if opts.resource_limits.is_some() && (pool.is_some() || opts.sibling_batch) {
+        return Ok(VisitReport {
+            resource_limit: Some(unsupported_resource_option(if pool.is_some() {
+                "trace_pool"
+            } else {
+                "sibling_batch"
+            })),
+            timings: timing.as_ref().map(VisitClock::finish),
+            ..VisitReport::default()
+        });
+    }
     if opts.checkpoint.is_some()
         || opts.checkpoint_stop_after.is_some()
         || opts.checkpoint_in_step.is_some()
@@ -5245,17 +12140,1719 @@ where
         domains,
         p,
         opts,
+        account,
         assignment: vec![0; n_vars],
         visitor,
         sink,
+        pool,
         next_node: 0,
         report: VisitReport::default(),
+        timing: timing.as_ref(),
+        domain_index: vec![None; n_vars],
     };
-    let end = state.walk(input, &(0..n_vars).collect::<Vec<_>>(), None);
+    let mut end = state.walk(input, &(0..n_vars).collect::<Vec<_>>(), None);
+    if account.control().stopped() {
+        end = VisitEnd::AccountingStopped;
+    }
     state.report.complete = end == VisitEnd::Complete;
     state.report.stopped_early = end == VisitEnd::Stopped;
     state.report.timed_out = end == VisitEnd::TimedOut;
+    state.report.timings = timing.as_ref().map(VisitClock::finish);
     Ok(state.report)
+}
+
+// BEGIN PUBLIC F4 RESOURCE LIMIT CONTROLS
+// This public-API-only module can be selected verbatim by an exact-source
+// qualifier whose outer module re-exports `cryptanalysis::f4_fp::*`.
+#[cfg(test)]
+mod resource_limit_tests {
+    use super::*;
+    use std::time::{Duration, Instant};
+
+    fn options(order: Ordering) -> F4Options {
+        let mut opts = F4Options::new(order, 10);
+        opts.resource_limits = Some(F4ResourceLimits {
+            max_pairs: 128,
+            max_symbolic_monomials: 1024,
+            max_matrix_entries: 100_000,
+        });
+        opts
+    }
+
+    fn two_roots() -> Vec<Poly> {
+        // Independently: x²=1 forces x=±1; xy=1 then forces y=x in F7.
+        vec![
+            vec![(vec![2, 0], 1), (vec![0, 0], 6)],
+            vec![(vec![1, 1], 1), (vec![0, 0], 6)],
+        ]
+    }
+
+    #[test]
+    fn bounded_native_and_traced_positive_control() {
+        let input = two_roots();
+        let bounded = options(Ordering::Grevlex);
+        let plain = F4Options::new(Ordering::Grevlex, 10);
+        let reference = f4(&input, 2, 7, &plain);
+        let actual = f4(&input, 2, 7, &bounded);
+        assert!(actual.resource_limit.is_none() && !actual.timed_out && !actual.inconsistent);
+        assert_eq!(actual.basis, reference.basis);
+        let mut roots = Vec::new();
+        let report = solve_visit_traced(
+            &input,
+            2,
+            7,
+            &bounded,
+            &[None, None],
+            |s| {
+                roots.push(s.to_vec());
+                false
+            },
+            |_| Ok(()),
+        )
+        .unwrap();
+        roots.sort();
+        assert!(report.complete && report.resource_limit.is_none() && !report.timed_out);
+        assert_eq!(roots, vec![vec![1, 1], vec![6, 6]]);
+    }
+
+    #[test]
+    fn pair_limit_includes_above_degree_pairs_and_stops_traversal() {
+        let input = two_roots();
+        let mut opts = options(Ordering::Grevlex);
+        opts.max_degree = 1;
+        opts.resource_limits.as_mut().unwrap().max_pairs = 0;
+        let r = f4(&input, 2, 7, &opts);
+        let limit = r.resource_limit.unwrap();
+        assert_eq!(
+            (limit.stage, limit.resource, limit.observed, limit.limit),
+            ("critical_pairs", "pairs", 1, 0)
+        );
+        assert!(!r.inconsistent && !r.timed_out && r.basis.is_empty());
+        assert_eq!(r.steps, 0);
+        assert_eq!(solve(&input, 2, 7, &opts).verdict, Verdict::Undetermined);
+        let mut refused_native = 0;
+        let report = solve_visit_traced(
+            &input,
+            2,
+            7,
+            &opts,
+            &[None, None],
+            |_| panic!("a resource stop must not call the solution visitor"),
+            |event| {
+                match event {
+                    VisitEvent::NativeResult {
+                        report,
+                        generating_set,
+                        ..
+                    } => {
+                        assert!(report.resource_limit.is_some());
+                        assert_eq!(generating_set, input.as_slice());
+                        refused_native += 1;
+                    }
+                    VisitEvent::Branch { .. } | VisitEvent::Candidate { .. } => {
+                        panic!("a resource stop must not branch or produce a candidate");
+                    }
+                    _ => {}
+                }
+                Ok(())
+            },
+        )
+        .unwrap();
+        assert_eq!(refused_native, 1);
+        assert!(!report.complete && !report.stopped_early && !report.timed_out);
+        assert!(report.resource_limit.is_some());
+        assert_eq!(report.solutions_visited, 0);
+        assert_eq!(report.full_field_branches, 0);
+    }
+
+    #[test]
+    fn symbolic_closure_refuses_new_support_before_matrix_allocation() {
+        // The first two pair rows have five distinct monomials. Reducing
+        // xy^6 by the second generator adds y^11 and y^5 z^6: seven total,
+        // although the input itself contains only six terms.
+        let input = vec![
+            vec![(vec![2, 0, 0], 1), (vec![0, 7, 0], 1), (vec![0, 0, 7], 1)],
+            vec![(vec![1, 1, 0], 1), (vec![0, 6, 0], 1), (vec![0, 0, 6], 1)],
+        ];
+        let mut opts = options(Ordering::Lex);
+        opts.resource_limits
+            .as_mut()
+            .unwrap()
+            .max_symbolic_monomials = 6;
+        let r = f4(&input, 3, 7, &opts);
+        let limit = r.resource_limit.unwrap();
+        assert_eq!(
+            (limit.stage, limit.resource, limit.observed, limit.limit),
+            ("symbolic_support", "symbolic_monomials", 7, 6)
+        );
+        assert_eq!((r.steps, r.max_rows, r.max_cols), (0, 0, 0));
+        assert!(!r.inconsistent && !r.timed_out);
+    }
+
+    #[test]
+    fn recording_reserves_dense_copies_and_contributor_storage() {
+        // x²=0 and x²+1=0 contradict each other. The first matrix has two
+        // rows and two columns; this budget admits the ordinary workspace
+        // while refusing the additional recording workspace in advance.
+        let input = vec![vec![(vec![2], 1)], vec![(vec![2], 1), (vec![0], 1)]];
+        let mut opts = options(Ordering::Grevlex);
+        opts.resource_limits.as_mut().unwrap().max_matrix_entries = 48;
+        let plain = f4(&input, 1, 7, &opts);
+        assert!(plain.inconsistent && plain.resource_limit.is_none());
+        let (recorded, trace) = f4_record(&input, 1, 7, &opts);
+        let limit = recorded.resource_limit.unwrap();
+        assert_eq!(limit.resource, "matrix_entries");
+        assert!(limit.observed > limit.limit);
+        assert!(!recorded.inconsistent && !recorded.timed_out);
+        assert_eq!(recorded.steps, 0);
+        assert!(trace.steps.is_empty());
+    }
+
+    #[test]
+    fn replay_obeys_the_current_call_limits() {
+        let input = two_roots();
+        let mut opts = options(Ordering::Grevlex);
+        let (recorded, trace) = f4_record(&input, 2, 7, &opts);
+        assert!(recorded.resource_limit.is_none() && !recorded.timed_out);
+        let replayed = f4_replay(&input, 2, 7, &opts, &trace);
+        assert!(replayed.resource_limit.is_none() && !replayed.trace_mismatch);
+        assert_eq!(replayed.basis, recorded.basis);
+        opts.resource_limits.as_mut().unwrap().max_matrix_entries = 0;
+        let refused = f4_replay(&input, 2, 7, &opts, &trace);
+        assert_eq!(refused.resource_limit.unwrap().resource, "matrix_entries");
+        assert!(!refused.inconsistent && !refused.timed_out && refused.basis.is_empty());
+    }
+
+    #[test]
+    fn final_interreduce_cannot_expand_past_the_term_budget() {
+        // The leading terms x and y are coprime, hence there is no F4 step.
+        // Substitution in x-y^4 produces x-(z+w)^4, with six nonzero terms
+        // over F7, already more than the entire five-term input budget.
+        let input = vec![
+            vec![(vec![1, 0, 0, 0], 1), (vec![0, 4, 0, 0], 6)],
+            vec![
+                (vec![0, 1, 0, 0], 1),
+                (vec![0, 0, 1, 0], 6),
+                (vec![0, 0, 0, 1], 6),
+            ],
+        ];
+        let mut opts = options(Ordering::Lex);
+        opts.resource_limits
+            .as_mut()
+            .unwrap()
+            .max_symbolic_monomials = 5;
+        let r = f4(&input, 4, 7, &opts);
+        let limit = r.resource_limit.unwrap();
+        assert!(limit.stage.starts_with("interreduce"));
+        assert_eq!(limit.resource, "symbolic_monomials");
+        assert_eq!(r.steps, 0);
+        assert!(!r.inconsistent && !r.timed_out);
+    }
+
+    #[test]
+    fn bounded_calls_refuse_unguarded_optional_modes() {
+        let input = two_roots();
+        for mode in ["checkpoint", "hilbert", "staircase", "run_log"] {
+            let mut opts = options(Ordering::Grevlex);
+            match mode {
+                "checkpoint" => {
+                    opts.checkpoint = Some(("must-not-be-written".into(), Duration::ZERO))
+                }
+                "hilbert" => opts.stop_hilbert = Some(1),
+                "staircase" => opts.stop_staircase = Some(8),
+                "run_log" => opts.capture_run_log = true,
+                _ => unreachable!(),
+            }
+            let r = f4(&input, 2, 7, &opts);
+            let limit = r.resource_limit.unwrap();
+            assert_eq!((limit.stage, limit.resource), ("options", mode));
+            assert_eq!(r.steps, 0);
+            assert!(!r.inconsistent && !r.timed_out);
+        }
+        let mut opts = options(Ordering::Grevlex);
+        opts.sibling_batch = true;
+        let r = solve_visit_traced(
+            &input,
+            2,
+            7,
+            &opts,
+            &[None, None],
+            |_| panic!("unsupported mode reached callback"),
+            |_| Ok(()),
+        )
+        .unwrap();
+        assert!(!r.complete && r.resource_limit.is_some());
+        opts.sibling_batch = false;
+        let mut pool = TracePool::new("resource-cap-refusal", 2, 1024).unwrap();
+        let r = solve_visit_reusing(&input, 2, 7, &opts, &[None, None], &mut pool, |_| {
+            panic!("unsupported reuse reached callback")
+        })
+        .unwrap();
+        assert!(!r.complete && r.resource_limit.is_some());
+        assert_eq!(r.f4_runs, 0);
+    }
+
+    #[test]
+    fn bounded_deadline_is_incomplete_and_distinct_from_resource_admission() {
+        let mut opts = options(Ordering::Grevlex);
+        opts.deadline = Some(Instant::now() - Duration::from_millis(1));
+        let r = f4(&two_roots(), 2, 7, &opts);
+        assert!(r.timed_out && r.resource_limit.is_none() && !r.inconsistent);
+        let r = solve_visit_traced(
+            &two_roots(),
+            2,
+            7,
+            &opts,
+            &[None, None],
+            |_| panic!("expired deadline reached callback"),
+            |_| Ok(()),
+        )
+        .unwrap();
+        assert!(r.timed_out && !r.complete && r.resource_limit.is_none());
+    }
+}
+
+// END PUBLIC F4 RESOURCE LIMIT CONTROLS
+
+#[cfg(test)]
+mod visit_timing_tests {
+    use super::*;
+
+    fn partition(report: &VisitReport) -> VisitTimings {
+        let timing = report.timings.expect("opt-in wall accounting is present");
+        assert_eq!(
+            timing.total_ns,
+            timing.native_f4_ns
+                + timing.root_recovery_ns
+                + timing.callback_ns
+                + timing.traversal_other_ns,
+            "exclusive wall buckets must partition the total"
+        );
+        timing
+    }
+
+    fn diagnostics(report: &VisitReport) -> serde_json::Value {
+        let mut value = serde_json::to_value(report).unwrap();
+        let fields = value.as_object_mut().unwrap();
+        fields.remove("timings");
+        // Native row-operation counts are process-wide unless explicitly
+        // configured otherwise. Parallel tests can affect this one field.
+        fields.remove("field_ops");
+        value
+    }
+
+    type Branches = Vec<(usize, usize, u64, &'static str)>;
+
+    fn coupled_fixture(
+        timing: bool,
+        traced: bool,
+        mode: DomainRootMode,
+    ) -> (Vec<Vec<u64>>, Branches, VisitReport) {
+        // x^2=1, y=x over F7: an unrestricted root followed by a
+        // finite-domain variable exercises both kinds of root recovery.
+        let input = vec![
+            vec![(vec![2, 0], 1), (vec![0, 0], 6)],
+            vec![(vec![1, 0], 1), (vec![0, 1], 6)],
+        ];
+        let opts = F4Options::new(Ordering::Grevlex, 4)
+            .with_domain_roots(mode)
+            .with_visit_timing(timing);
+        let domains = [Some(vec![1, 2, 3, 6]), None];
+        let mut solutions = Vec::new();
+        let mut branches = Vec::new();
+        let visitor = |s: &[u64]| {
+            solutions.push(s.to_vec());
+            false
+        };
+        let report = if traced {
+            solve_visit_traced(&input, 2, 7, &opts, &domains, visitor, |event| {
+                if let VisitEvent::Branch {
+                    node_id,
+                    original_variable,
+                    value,
+                    source,
+                } = event
+                {
+                    branches.push((node_id, original_variable, value, source));
+                }
+                Ok(())
+            })
+        } else {
+            solve_visit(&input, 2, 7, &opts, &domains, visitor)
+        }
+        .unwrap();
+        (solutions, branches, report)
+    }
+
+    #[test]
+    fn default_off_preserves_serialized_report_shape() {
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        assert!(!opts.visit_timing);
+        assert!(
+            !opts
+                .clone()
+                .with_visit_timing(true)
+                .with_visit_timing(false)
+                .visit_timing
+        );
+        for traced in [false, true] {
+            let (_, _, report) = coupled_fixture(false, traced, DomainRootMode::Scan);
+            assert!(report.timings.is_none());
+            assert!(serde_json::to_value(&report)
+                .unwrap()
+                .get("timings")
+                .is_none());
+        }
+        assert!(serde_json::to_value(VisitReport::default())
+            .unwrap()
+            .get("timings")
+            .is_none());
+    }
+
+    #[test]
+    fn opt_in_preserves_each_visitors_solutions_branches_and_diagnostics() {
+        for traced in [false, true] {
+            for mode in [
+                DomainRootMode::Scan,
+                DomainRootMode::Frobenius,
+                DomainRootMode::Auto,
+            ] {
+                let (before, before_branches, old) = coupled_fixture(false, traced, mode);
+                let (after, after_branches, timed) = coupled_fixture(true, traced, mode);
+                assert_eq!(after, before);
+                assert_eq!(after_branches, before_branches);
+                assert_eq!(diagnostics(&timed), diagnostics(&old));
+                let mut expected = after;
+                expected.sort();
+                assert_eq!(expected, vec![vec![1, 1], vec![6, 6]]);
+                assert!(timed.complete && !timed.stopped_early && !timed.timed_out);
+                partition(&timed);
+            }
+        }
+    }
+
+    #[test]
+    fn callback_stop_retains_callback_time_without_native_work() {
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        let mut callbacks = 0;
+        let report = solve_visit(&[], 0, 7, &opts, &[], |_| {
+            callbacks += 1;
+            // Deliberate callback work distinguishes this bucket from
+            // residual traversal without assuming the solver's speed.
+            std::thread::sleep(Duration::from_millis(2));
+            true
+        })
+        .unwrap();
+        let timing = partition(&report);
+        assert_eq!(callbacks, 1);
+        assert!(report.stopped_early && !report.complete && !report.timed_out);
+        assert_eq!(timing.native_f4_ns, 0);
+        assert_eq!(timing.root_recovery_ns, 0);
+        assert!(timing.callback_ns >= 1_000_000);
+    }
+
+    #[test]
+    fn empty_domain_and_expired_deadline_retain_zero_work_partitions() {
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        let empty = solve_visit(&[], 1, 7, &opts, &[Some(vec![])], |_| {
+            panic!("empty domain must not visit a solution")
+        })
+        .unwrap();
+        assert!(empty.complete);
+        let expired = opts.with_budget(Duration::ZERO);
+        let timeout = solve_visit(&[], 0, 7, &expired, &[], |_| {
+            panic!("expired deadline must not visit a solution")
+        })
+        .unwrap();
+        assert!(timeout.timed_out && !timeout.complete);
+        for report in [&empty, &timeout] {
+            let timing = partition(report);
+            assert_eq!(timing.native_f4_ns, 0);
+            assert_eq!(timing.root_recovery_ns, 0);
+            assert_eq!(timing.callback_ns, 0);
+            assert_eq!(timing.total_ns, timing.traversal_other_ns);
+        }
+    }
+
+    #[test]
+    fn empty_univariate_root_set_retains_recovery_time() {
+        // -1 is not a square in F7. Native F4 leaves a univariate, whose
+        // empty field-root set returns directly from the recovery loop.
+        let input = vec![vec![(vec![2], 1), (vec![0], 1)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        let report = solve_visit(&input, 1, 7, &opts, &[None], |_| {
+            panic!("x^2+1 has no F7 root")
+        })
+        .unwrap();
+        let timing = partition(&report);
+        assert!(report.complete && !report.timed_out);
+        assert_eq!(report.factored_univariates, 1);
+        assert_eq!(report.solutions_visited, 0);
+        assert!(timing.native_f4_ns > 0 && timing.root_recovery_ns > 0);
+        assert_eq!(timing.callback_ns, 0);
+    }
+
+    #[test]
+    fn trace_stop_retains_prior_work_and_charges_sink_time_to_other() {
+        let input = vec![vec![(vec![2], 1), (vec![0], 6)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4).with_visit_timing(true);
+        for after_roots in [false, true] {
+            let report = solve_visit_traced(
+                &input,
+                1,
+                7,
+                &opts,
+                &[None],
+                |_| panic!("trace sink stops before the first solution"),
+                |event| {
+                    if !after_roots || matches!(event, VisitEvent::Branch { .. }) {
+                        std::thread::sleep(Duration::from_millis(2));
+                        Err("timing test sink stop".into())
+                    } else {
+                        Ok(())
+                    }
+                },
+            )
+            .unwrap();
+            let timing = partition(&report);
+            assert!(report.trace_stopped && !report.complete && !report.timed_out);
+            assert_eq!(timing.callback_ns, 0);
+            assert!(timing.traversal_other_ns >= 1_000_000);
+            if after_roots {
+                assert!(timing.native_f4_ns > 0 && timing.root_recovery_ns > 0);
+            } else {
+                assert_eq!(timing.native_f4_ns, 0);
+                assert_eq!(timing.root_recovery_ns, 0);
+            }
+        }
+    }
+
+    #[test]
+    fn batched_back_substitution_preserves_results_and_phase_partition() {
+        let input = vec![vec![(vec![0, 2], 1), (vec![1, 0], 6)]];
+        let domains = [Some(vec![4]), None];
+        let mut results = Vec::new();
+        for enabled in [false, true] {
+            let opts = F4Options::new(Ordering::Grevlex, 4)
+                .with_sibling_batch(true)
+                .with_visit_timing(enabled);
+            let mut solutions = Vec::new();
+            let report = solve_visit(&input, 2, 7, &opts, &domains, |s| {
+                solutions.push(s.to_vec());
+                false
+            })
+            .unwrap();
+            assert!(report.complete && report.batched_nodes > 0);
+            if enabled {
+                let timing = partition(&report);
+                assert!(timing.root_recovery_ns > 0);
+            } else {
+                assert!(report.timings.is_none());
+            }
+            results.push((solutions, diagnostics(&report)));
+        }
+        assert_eq!(results[0], results[1]);
+        let mut solutions = results.remove(0).0;
+        solutions.sort();
+        assert_eq!(solutions, vec![vec![4, 2], vec![4, 5]]);
+    }
+
+    #[test]
+    fn cold_and_warm_trace_reuse_preserve_results_with_timing_enabled() {
+        // The native reuse module's xy=1, x^2=1 fixture exercises both
+        // learning and certified replay, with separately initialized pools.
+        let input = vec![
+            vec![(vec![1, 1], 1), (vec![0, 0], 4)],
+            vec![(vec![2, 0], 1), (vec![0, 0], 4)],
+        ];
+        let domains = [Some((0..5).collect()), Some((0..5).collect())];
+        let mut results = Vec::new();
+        for enabled in [false, true] {
+            let opts = F4Options::new(Ordering::Grevlex, 8).with_visit_timing(enabled);
+            let mut pool = TracePool::new("visit-timing-control", 4, 10_000).unwrap();
+            let mut runs = Vec::new();
+            for _ in 0..2 {
+                let mut solutions = Vec::new();
+                let report = solve_visit_reusing(&input, 2, 5, &opts, &domains, &mut pool, |s| {
+                    solutions.push(s.to_vec());
+                    false
+                })
+                .unwrap();
+                assert!(report.complete);
+                if enabled {
+                    let timing = partition(&report);
+                    assert!(timing.native_f4_ns > 0 && timing.root_recovery_ns > 0);
+                } else {
+                    assert!(report.timings.is_none());
+                }
+                let mut sorted = solutions.clone();
+                sorted.sort();
+                assert_eq!(sorted, vec![vec![1, 1], vec![4, 4]]);
+                let stats = pool.stats();
+                runs.push((
+                    solutions,
+                    diagnostics(&report),
+                    stats.learned,
+                    stats.replay_attempts,
+                    stats.accepted,
+                    stats.certification_reductions,
+                ));
+            }
+            assert!(pool.stats().accepted > 0);
+            assert!(pool.stats().certification_reductions > 0);
+            results.push(runs);
+        }
+        assert_eq!(results[0], results[1]);
+    }
+}
+
+#[cfg(test)]
+mod visit_accounting_tests {
+    use super::*;
+
+    fn request(id: &str) -> VisitAccountingRequestV1 {
+        VisitAccountingRequestV1 {
+            binding: VisitAccountingBindingV1 {
+                attempt_id: id.into(),
+                protocol_id: "test.visit-accounting/v1".into(),
+                case_id: format!("case-{id}"),
+                arm_id: "normal-grevlex".into(),
+                case_sha256: "11".repeat(32),
+                system_sha256: "22".repeat(32),
+                f4_source_sha256: "33".repeat(32),
+                executable_sha256: "44".repeat(32),
+            },
+        }
+    }
+
+    fn in_owner_pool<T: Send>(f: impl FnOnce() -> T + Send) -> T {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(1)
+            .build()
+            .unwrap()
+            .install(f)
+    }
+
+    fn accounting(report: &VisitReport) -> &VisitAccountingV1 {
+        report
+            .accounting_v1
+            .as_ref()
+            .expect("accounted entry point returns its ledger")
+    }
+
+    fn assert_reconciles_in_modes(
+        record: &VisitAccountingV1,
+        ownership_mode: &str,
+        accounting_token_mode: &str,
+    ) {
+        let mut sum = VisitAccountingWorkV1::default();
+        for phase in &record.phases {
+            sum.checked_add_assign(&phase.work).unwrap();
+        }
+        assert_eq!(sum, record.total);
+        assert!(record.reconciliation.phase_sum_equals_total);
+        assert!(record.reconciliation.checked_arithmetic);
+        assert!(!record.reconciliation.operation_tracking_complete);
+        assert!(!record.reconciliation.memory_tracking_complete);
+        assert!(!record.reconciliation.work_ownership_complete);
+        assert_eq!(record.arm.ownership_mode, ownership_mode);
+        assert_eq!(record.arm.accounting_token_mode, accounting_token_mode);
+        assert_eq!(record.scope, "solve_visit_call_only");
+        assert!(record.whole_collector_accounting_required);
+    }
+
+    fn assert_reconciles_in_mode(record: &VisitAccountingV1, ownership_mode: &str) {
+        assert_reconciles_in_modes(
+            record,
+            ownership_mode,
+            "borrowed_traversal_native_driver_tls_helper_shadow_v1",
+        );
+    }
+
+    fn assert_reconciles(record: &VisitAccountingV1) {
+        assert_reconciles_in_mode(record, "caller_one_thread_rayon_tls_unproven");
+    }
+
+    fn assert_reconciles_rejected(record: &VisitAccountingV1) {
+        assert_reconciles_in_modes(
+            record,
+            "caller_one_thread_rayon_tls_unproven",
+            "not_started_preflight_rejected",
+        );
+    }
+
+    fn begin_counter_overflow_session<'a>(
+        context: &'a VisitAccountingContext,
+        id: &str,
+        opts: &F4Options,
+        trace_sink: bool,
+        counter: VisitAccountingCounter,
+    ) -> VisitAccountingSession<'a> {
+        let mut builder = VisitAccountingBuilder::new(request(id), opts, trace_sink);
+        *counter.field(&mut builder.total) = u64::MAX;
+        *counter.field(&mut builder.phases[VisitAccountingPhaseV1::Validation.index()]) = u64::MAX;
+        VisitAccountingSession::begin(builder, context)
+            .ok()
+            .expect("test owns the accounted session")
+    }
+
+    fn assert_empty_accounting_stop(report: &F4Report) {
+        assert!(report.basis.is_empty());
+        assert!(!report.inconsistent && !report.timed_out);
+        assert_eq!(report.degree_reached, 0);
+        assert_eq!(report.solving_degree, 0);
+        assert_eq!(report.steps, 0);
+        assert_eq!(report.max_rows, 0);
+        assert_eq!(report.max_cols, 0);
+        assert_eq!(report.field_ops, 0);
+        assert!(report.resource_limit.is_none());
+    }
+
+    fn assert_no_non_time_work(record: &VisitAccountingV1) {
+        let mut work = record.total.clone();
+        work.wall_ns = 0;
+        work.thread_cpu_ns = 0;
+        assert_eq!(work, VisitAccountingWorkV1::default());
+    }
+
+    #[test]
+    fn native_preblocked_token_stops_before_engine_entry() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let mut builder =
+                VisitAccountingBuilder::new(request("native-preblocked-token"), &opts, false);
+            builder.block(
+                "seeded_native_block",
+                None,
+                "test blocker must stop before the native engine",
+            );
+            let session = VisitAccountingSession::begin(builder, &context)
+                .ok()
+                .expect("test owns the accounted session");
+
+            // `p = 1` is an engine-entry tripwire: Barrett construction would
+            // panic if the blocked token admitted any native setup.
+            let report = f4_with_visit_account(&[], 0, 1, &opts, VisitAccount::On(session.token()));
+            assert_empty_accounting_stop(&report);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.blocker.as_ref().unwrap().code, "seeded_native_block");
+            assert_eq!(
+                record.blocker.as_ref().unwrap().phase,
+                Some(VisitAccountingPhaseV1::Validation)
+            );
+            assert_no_non_time_work(&record);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn native_tokenless_entry_stops_before_engine_entry() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            for entry in ["plain", "record", "replay"] {
+                let context = VisitAccountingContext::new().unwrap();
+                let session = VisitAccountingSession::begin(
+                    VisitAccountingBuilder::new(
+                        request(&format!("native-token-missing-{entry}")),
+                        &opts,
+                        false,
+                    ),
+                    &context,
+                )
+                .ok()
+                .expect("test owns the accounted session");
+
+                // Every public F4 entry deliberately uses `Off`. While an
+                // unsuspended ledger is active, that is a missing authority
+                // rather than a legacy call. `p = 1` proves dispatch remains
+                // untouched for plain, recording and replay entry points.
+                let report = match entry {
+                    "plain" => f4(&[], 0, 1, &opts),
+                    "record" => f4_record(&[], 0, 1, &opts).0,
+                    "replay" => f4_replay(&[], 0, 1, &opts, &F4Trace::default()),
+                    _ => unreachable!(),
+                };
+                assert_empty_accounting_stop(&report);
+
+                let record = session.finish(VisitDispositionV1::Incomplete);
+                assert_eq!(
+                    record.blocker.as_ref().unwrap().code,
+                    "accounting_token_missing"
+                );
+                assert_eq!(
+                    record.blocker.as_ref().unwrap().phase,
+                    Some(VisitAccountingPhaseV1::Validation)
+                );
+                assert_no_non_time_work(&record);
+                assert_reconciles(&record);
+            }
+        });
+    }
+
+    #[test]
+    fn native_same_thread_token_mismatch_stops_before_engine_entry() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let owning_context = VisitAccountingContext::new().unwrap();
+            let wrong_context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("native-token-mismatch"), &opts, false),
+                &owning_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+
+            let report = f4_with_visit_account(
+                &[],
+                0,
+                1,
+                &opts,
+                VisitAccount::On(wrong_context.unbound_test_token()),
+            );
+            assert_empty_accounting_stop(&report);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                record.blocker.as_ref().unwrap().code,
+                "accounting_token_mismatch"
+            );
+            assert_eq!(
+                record.blocker.as_ref().unwrap().phase,
+                Some(VisitAccountingPhaseV1::Validation)
+            );
+            assert_no_non_time_work(&record);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn native_scoped_foreign_thread_stops_before_engine_entry() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("native-foreign-thread-token"), &opts, false),
+                &context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+
+            let token = session.token();
+            let report = std::thread::scope(|scope| {
+                scope
+                    .spawn(move || {
+                        let opts = F4Options::new(Ordering::Grevlex, 4);
+                        f4_with_visit_account(&[], 0, 1, &opts, VisitAccount::On(token))
+                    })
+                    .join()
+                    .unwrap()
+            });
+            assert_empty_accounting_stop(&report);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.blocker.as_ref().unwrap().code, "foreign_thread_work");
+            assert_eq!(
+                record.blocker.as_ref().unwrap().phase,
+                Some(VisitAccountingPhaseV1::Validation)
+            );
+            assert_no_non_time_work(&record);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn native_driver_counter_overflow_stops_before_later_phases() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = begin_counter_overflow_session(
+                &context,
+                "native-basis-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::BasisTerms,
+            );
+            let input = vec![vec![(vec![1], 1), (vec![0], 6)]];
+
+            let (sender, receiver) = std::sync::mpsc::channel();
+            let report = observe_progress(sender, || {
+                f4_with_visit_account(&input, 1, 7, &opts, VisitAccount::On(session.token()))
+            });
+            assert_empty_accounting_stop(&report);
+            let events: Vec<_> = receiver.try_iter().collect();
+            assert_eq!(
+                events.iter().map(|event| event.event).collect::<Vec<_>>(),
+                vec!["begin"]
+            );
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            let blocker = record.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "counter_overflow");
+            assert_eq!(
+                blocker.phase,
+                Some(VisitAccountingPhaseV1::InputNormalization)
+            );
+            assert_eq!(blocker.counter, Some("basis_terms"));
+            assert_eq!(record.total.field_multiplications, 2);
+            assert_eq!(record.total.field_inversions, 1);
+            assert_eq!(record.total.basis_terms, u64::MAX);
+            assert_eq!(record.total.critical_pair_candidates, 0);
+            assert_eq!(record.total.critical_pairs_selected, 0);
+            assert_eq!(record.total.matrix_entries, 0);
+            assert_eq!(record.total.row_operations, 0);
+            assert!(!record.reconciliation.checked_arithmetic);
+            assert!(record.reconciliation.phase_sum_equals_total);
+            assert!(!record.reconciliation.operation_tracking_complete);
+            assert!(!record.reconciliation.memory_tracking_complete);
+            assert!(!record.reconciliation.work_ownership_complete);
+            assert!(!record.accounting_complete);
+            assert_eq!(
+                record.arm.accounting_token_mode,
+                "borrowed_traversal_native_driver_tls_helper_shadow_v1"
+            );
+        });
+    }
+
+    #[test]
+    fn two_thread_accounted_native_entry_is_rejected_before_token_creation() {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(2)
+            .build()
+            .unwrap()
+            .install(|| {
+                let error = solve_visit_accounted_v1(
+                    &[],
+                    0,
+                    7,
+                    &F4Options::new(Ordering::Grevlex, 4),
+                    &[],
+                    request("two-thread-native-rejection"),
+                    |_| false,
+                )
+                .unwrap_err();
+                let record = &error.accounting;
+                assert_eq!(record.solver_disposition, VisitDispositionV1::Unsupported);
+                assert_eq!(
+                    record.blocker.as_ref().unwrap().code,
+                    "unsupported_configuration"
+                );
+                assert!(error.message.contains("one-thread Rayon pool"));
+                assert_eq!(record.arm.rayon_threads, 2);
+                assert!(record.arm.inside_rayon_worker);
+                assert_eq!(
+                    record.arm.accounting_token_mode,
+                    "not_started_preflight_rejected"
+                );
+                assert_no_non_time_work(record);
+                assert_reconciles_rejected(record);
+            });
+    }
+
+    #[test]
+    fn legacy_entry_point_preserves_serialized_shape() {
+        let report = solve_visit(
+            &[],
+            0,
+            7,
+            &F4Options::new(Ordering::Grevlex, 4),
+            &[],
+            |_| false,
+        )
+        .unwrap();
+        assert!(report.accounting_v1.is_none());
+        assert!(serde_json::to_value(report)
+            .unwrap()
+            .get("accounting_v1")
+            .is_none());
+    }
+
+    #[test]
+    fn cached_effective_profile_controls_are_bound_and_fail_closed() {
+        assert!(visit_accounting_cached_profile_is_default(
+            false,
+            FL_MIN_COLS,
+            true
+        ));
+        assert!(!visit_accounting_cached_profile_is_default(
+            true,
+            FL_MIN_COLS,
+            true
+        ));
+        assert!(!visit_accounting_cached_profile_is_default(
+            false,
+            FL_MIN_COLS + 1,
+            true
+        ));
+        assert!(!visit_accounting_cached_profile_is_default(
+            false,
+            FL_MIN_COLS,
+            false
+        ));
+
+        let report = in_owner_pool(|| {
+            solve_visit_accounted_v1(
+                &[],
+                0,
+                7,
+                &F4Options::new(Ordering::Grevlex, 4),
+                &[],
+                request("cached-profile"),
+                |_| false,
+            )
+            .unwrap()
+        });
+        let arm = &accounting(&report).arm;
+        assert_eq!(arm.faugere_lachartre_build_mode, "row_blocks");
+        assert_eq!(arm.faugere_lachartre_min_columns, FL_MIN_COLS);
+        assert!(arm.narrow_accumulators_enabled);
+    }
+
+    #[test]
+    fn zero_variable_complete_and_callback_stop_are_distinct_and_reconcile() {
+        for stop in [false, true] {
+            let report = in_owner_pool(|| {
+                solve_visit_accounted_v1(
+                    &[],
+                    0,
+                    7,
+                    &F4Options::new(Ordering::Grevlex, 4),
+                    &[],
+                    request(if stop { "stop" } else { "complete" }),
+                    |_| stop,
+                )
+                .unwrap()
+            });
+            let record = accounting(&report);
+            assert_eq!(
+                record.solver_disposition,
+                if stop {
+                    VisitDispositionV1::CallbackStopped
+                } else {
+                    VisitDispositionV1::CompleteNonempty
+                }
+            );
+            assert_eq!(record.total.traversal_nodes, 1);
+            assert_eq!(record.total.callback_deliveries, 1);
+            assert_eq!(record.total.matrix_entries, 0);
+            assert_reconciles(record);
+            // The first slice deliberately refuses promotion until the
+            // logical-allocation coverage gate is complete.
+            assert!(!record.accounting_complete);
+            assert_eq!(record.blocker.as_ref().unwrap().code, "memory_tracking_gap");
+        }
+    }
+
+    #[test]
+    fn private_first_executor_matches_legacy_and_is_sequentially_reusable() {
+        let input = vec![vec![(vec![2], 1), (vec![0], 6)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        let mut legacy_first = None;
+        let legacy = solve_visit(&input, 1, 7, &opts, &[None], |solution| {
+            legacy_first = Some(solution.to_vec());
+            true
+        })
+        .unwrap();
+        assert!(legacy.stopped_early);
+
+        let mut executor = VisitAccountingExecutorV1::try_new().unwrap();
+        let first = executor
+            .solve_first(&input, 1, 7, &opts, &[None], request("private-first"))
+            .unwrap();
+        assert_eq!(first.first_solution, legacy_first);
+        assert_eq!(first.first_solution, Some(vec![1]));
+        assert!(first.report.stopped_early);
+        let record = accounting(&first.report);
+        assert_eq!(record.solver_disposition, VisitDispositionV1::WitnessFound);
+        assert_reconciles_in_mode(record, "private_one_thread_first_result_tls_shadow");
+        assert!(!record.accounting_complete);
+
+        let empty = executor
+            .solve_first(
+                &[],
+                1,
+                7,
+                &opts,
+                &[Some(Vec::new())],
+                request("private-empty"),
+            )
+            .unwrap();
+        assert!(empty.first_solution.is_none());
+        assert!(!empty.report.stopped_early);
+        let record = accounting(&empty.report);
+        assert_eq!(record.solver_disposition, VisitDispositionV1::EmptyDomain);
+        assert_reconciles_in_mode(record, "private_one_thread_first_result_tls_shadow");
+    }
+
+    #[test]
+    fn empty_domain_and_expired_entry_have_distinct_dispositions() {
+        let empty = in_owner_pool(|| {
+            solve_visit_accounted_v1(
+                &[],
+                1,
+                7,
+                &F4Options::new(Ordering::Grevlex, 4),
+                &[Some(vec![])],
+                request("empty-domain"),
+                |_| panic!("empty domain reached callback"),
+            )
+            .unwrap()
+        });
+        assert_eq!(
+            accounting(&empty).solver_disposition,
+            VisitDispositionV1::EmptyDomain
+        );
+        assert_eq!(accounting(&empty).total.traversal_nodes, 1);
+        assert_eq!(accounting(&empty).total.callback_deliveries, 0);
+        assert_reconciles(accounting(&empty));
+
+        let timeout = in_owner_pool(|| {
+            let mut opts = F4Options::new(Ordering::Grevlex, 4);
+            opts.deadline = Some(Instant::now() - Duration::from_millis(1));
+            solve_visit_accounted_v1(&[], 0, 7, &opts, &[], request("timeout"), |_| {
+                panic!("expired deadline reached callback")
+            })
+            .unwrap()
+        });
+        assert_eq!(
+            accounting(&timeout).solver_disposition,
+            VisitDispositionV1::TimedOut
+        );
+        assert_eq!(accounting(&timeout).total.traversal_nodes, 0);
+        assert_reconciles(accounting(&timeout));
+    }
+
+    #[test]
+    fn resource_and_trace_stops_retain_their_solver_dispositions() {
+        let input = vec![
+            vec![(vec![2, 0], 1), (vec![0, 0], 6)],
+            vec![(vec![1, 1], 1), (vec![0, 0], 6)],
+        ];
+        let resource = in_owner_pool(|| {
+            let mut opts = F4Options::new(Ordering::Grevlex, 10);
+            opts.resource_limits = Some(F4ResourceLimits {
+                max_pairs: 0,
+                max_symbolic_monomials: 1024,
+                max_matrix_entries: 100_000,
+            });
+            solve_visit_accounted_v1(
+                &input,
+                2,
+                7,
+                &opts,
+                &[None, None],
+                request("resource"),
+                |_| panic!("resource stop reached callback"),
+            )
+            .unwrap()
+        });
+        assert_eq!(
+            accounting(&resource).solver_disposition,
+            VisitDispositionV1::ResourceStopped
+        );
+        assert!(!resource.complete && resource.resource_limit.is_some());
+        assert_reconciles(accounting(&resource));
+
+        let traced = in_owner_pool(|| {
+            solve_visit_traced_accounted_v1(
+                &[],
+                0,
+                7,
+                &F4Options::new(Ordering::Grevlex, 4),
+                &[],
+                request("trace"),
+                |_| panic!("trace error reached solution callback"),
+                |_| Err("accounted trace refusal".into()),
+            )
+            .unwrap()
+        });
+        assert_eq!(
+            accounting(&traced).solver_disposition,
+            VisitDispositionV1::TraceError
+        );
+        assert_eq!(accounting(&traced).total.trace_deliveries, 1);
+        assert_reconciles(accounting(&traced));
+    }
+
+    #[test]
+    fn known_uninstrumented_branches_stop_before_native_or_delivery_work() {
+        let input = vec![vec![(vec![2], 1)], vec![(vec![2], 1), (vec![0], 1)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+
+        let traced = in_owner_pool(|| {
+            let mut system_events = 0usize;
+            let mut other_events = 0usize;
+            let report = solve_visit_traced_accounted_v1(
+                &input,
+                1,
+                7,
+                &opts,
+                &[None],
+                request("recording-boundary"),
+                |_| panic!("recording blocker reached visitor"),
+                |event| {
+                    match event {
+                        VisitEvent::System { .. } => system_events += 1,
+                        _ => other_events += 1,
+                    }
+                    Ok(())
+                },
+            )
+            .unwrap();
+            (report, system_events, other_events)
+        });
+        assert_eq!((traced.1, traced.2), (1, 0));
+        assert!(!traced.0.complete && !traced.0.trace_stopped);
+        assert_eq!(traced.0.f4_runs, 0);
+        let record = accounting(&traced.0);
+        assert_eq!(record.solver_disposition, VisitDispositionV1::Incomplete);
+        assert_eq!(
+            record.blocker.as_ref().unwrap().code,
+            "uninstrumented_branch"
+        );
+        assert_eq!(
+            record.blocker.as_ref().unwrap().phase,
+            Some(VisitAccountingPhaseV1::Traversal)
+        );
+        assert_eq!(record.total.traversal_nodes, 1);
+        assert_eq!(record.total.trace_deliveries, 1);
+        assert_eq!(record.total.matrix_entries, 0);
+        assert_eq!(record.total.root_candidates, 0);
+        assert_eq!(record.total.branch_deliveries, 0);
+        assert_eq!(record.total.callback_deliveries, 0);
+        assert_reconciles(record);
+
+        let packed = in_owner_pool(|| {
+            solve_visit_accounted_v1(
+                &input,
+                1,
+                7,
+                &opts,
+                &[None],
+                request("packed-boundary"),
+                |_| panic!("packed blocker reached visitor"),
+            )
+            .unwrap()
+        });
+        assert!(!packed.complete && !packed.stopped_early && !packed.timed_out);
+        assert_eq!(packed.f4_runs, 0);
+        let record = accounting(&packed);
+        assert_eq!(record.solver_disposition, VisitDispositionV1::Incomplete);
+        assert_eq!(
+            record.blocker.as_ref().unwrap().code,
+            "uninstrumented_branch"
+        );
+        assert_eq!(
+            record.blocker.as_ref().unwrap().phase,
+            Some(VisitAccountingPhaseV1::SymbolicPreprocessing)
+        );
+        assert_eq!(record.total.matrix_entries, 0);
+        assert_eq!(record.total.root_candidates, 0);
+        assert_eq!(record.total.branch_deliveries, 0);
+        assert_eq!(record.total.callback_deliveries, 0);
+        assert_reconciles(record);
+    }
+
+    #[test]
+    fn delivery_counter_overflow_stops_before_external_bodies() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+
+            let callback_context = VisitAccountingContext::new().unwrap();
+            let callback_session = begin_counter_overflow_session(
+                &callback_context,
+                "callback-overflow",
+                &opts,
+                false,
+                VisitAccountingCounter::CallbackDeliveries,
+            );
+            let mut callback_entered = false;
+            let callback_report = solve_visit_impl(
+                &[],
+                0,
+                7,
+                &opts,
+                &[],
+                VisitAccount::On(callback_session.token()),
+                |_| {
+                    callback_entered = true;
+                    false
+                },
+                None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+                None,
+            )
+            .unwrap();
+            assert!(!callback_entered);
+            assert_eq!(callback_report.solutions_visited, 0);
+            let callback_record = callback_session.finish(visit_disposition(
+                &callback_report,
+                false,
+                VisitDispositionV1::CallbackStopped,
+            ));
+            assert_eq!(
+                callback_record.solver_disposition,
+                VisitDispositionV1::Incomplete
+            );
+            let blocker = callback_record.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "counter_overflow");
+            assert_eq!(
+                blocker.phase,
+                Some(VisitAccountingPhaseV1::CallbackDelivery)
+            );
+            assert_eq!(blocker.counter, Some("callback_deliveries"));
+            assert!(!callback_record.reconciliation.checked_arithmetic);
+            assert!(callback_record.reconciliation.phase_sum_equals_total);
+            assert_eq!(
+                callback_record.arm.accounting_token_mode,
+                "borrowed_traversal_native_driver_tls_helper_shadow_v1"
+            );
+
+            let trace_context = VisitAccountingContext::new().unwrap();
+            let trace_session = begin_counter_overflow_session(
+                &trace_context,
+                "trace-overflow",
+                &opts,
+                true,
+                VisitAccountingCounter::TraceDeliveries,
+            );
+            let mut visitor_entered = false;
+            let mut sink_entered = false;
+            let trace_report = solve_visit_impl(
+                &[],
+                0,
+                7,
+                &opts,
+                &[],
+                VisitAccount::On(trace_session.token()),
+                |_| {
+                    visitor_entered = true;
+                    false
+                },
+                Some(|_: VisitEvent<'_>| {
+                    sink_entered = true;
+                    Ok(())
+                }),
+                None,
+            )
+            .unwrap();
+            assert!(!visitor_entered && !sink_entered);
+            assert!(!trace_report.trace_stopped);
+            let trace_record = trace_session.finish(visit_disposition(
+                &trace_report,
+                false,
+                VisitDispositionV1::CallbackStopped,
+            ));
+            assert_eq!(
+                trace_record.solver_disposition,
+                VisitDispositionV1::Incomplete
+            );
+            let blocker = trace_record.blocker.as_ref().unwrap();
+            assert_eq!(blocker.code, "counter_overflow");
+            assert_eq!(blocker.phase, Some(VisitAccountingPhaseV1::TraceDelivery));
+            assert_eq!(blocker.counter, Some("trace_deliveries"));
+            assert!(!trace_record.reconciliation.checked_arithmetic);
+            assert!(trace_record.reconciliation.phase_sum_equals_total);
+            assert_eq!(
+                trace_record.arm.accounting_token_mode,
+                "borrowed_traversal_native_driver_tls_helper_shadow_v1"
+            );
+        });
+    }
+
+    #[test]
+    fn same_thread_token_mismatch_stops_before_callback_work() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let owning_context = VisitAccountingContext::new().unwrap();
+            let wrong_context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("token-mismatch"), &opts, false),
+                &owning_context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+
+            let mut callback_entered = false;
+            let report = solve_visit_impl(
+                &[],
+                0,
+                7,
+                &opts,
+                &[],
+                VisitAccount::On(wrong_context.unbound_test_token()),
+                |_| {
+                    callback_entered = true;
+                    false
+                },
+                None::<fn(VisitEvent<'_>) -> Result<(), String>>,
+                None,
+            )
+            .unwrap();
+            assert!(!callback_entered);
+            assert!(!report.complete && !report.stopped_early);
+            assert_eq!(report.solutions_visited, 0);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                record.blocker.as_ref().unwrap().code,
+                "accounting_token_mismatch"
+            );
+            assert_eq!(record.total.traversal_nodes, 0);
+            assert_eq!(record.total.callback_deliveries, 0);
+            assert!(!record.accounting_complete);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn scoped_foreign_thread_token_use_is_sticky_and_uncharged() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("foreign-thread-token"), &opts, false),
+                &context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+
+            let token = session.token();
+            let control = std::thread::scope(|scope| {
+                scope
+                    .spawn(move || {
+                        VisitAccount::On(token).charge(VisitAccountingCounter::TraversalNodes, 1)
+                    })
+                    .join()
+                    .unwrap()
+            });
+            assert_eq!(control, VisitAccountingControl::Stop);
+
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(record.blocker.as_ref().unwrap().code, "foreign_thread_work");
+            assert_eq!(record.total.traversal_nodes, 0);
+            assert_eq!(record.total.callback_deliveries, 0);
+            assert!(!record.accounting_complete);
+            assert_reconciles(&record);
+        });
+    }
+
+    #[test]
+    fn forgotten_external_pause_fails_closed_and_releases_session_slot() {
+        in_owner_pool(|| {
+            let opts = F4Options::new(Ordering::Grevlex, 4);
+            let context = VisitAccountingContext::new().unwrap();
+            let session = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("forgotten-pause"), &opts, false),
+                &context,
+            )
+            .ok()
+            .expect("test owns the accounted session");
+
+            let pause = VisitAccount::On(session.token()).pause_external().unwrap();
+            std::mem::forget(pause);
+            let record = session.finish(VisitDispositionV1::Incomplete);
+            assert_eq!(
+                record.blocker.as_ref().unwrap().code,
+                "unbalanced_external_work_suspension"
+            );
+            assert!(!record.accounting_complete);
+            assert_reconciles(&record);
+
+            let next_context = VisitAccountingContext::new().unwrap();
+            let next = VisitAccountingSession::begin(
+                VisitAccountingBuilder::new(request("after-forgotten-pause"), &opts, false),
+                &next_context,
+            )
+            .ok()
+            .expect("failed session releases the worker ledger slot");
+            let next_record = next.finish(VisitDispositionV1::Incomplete);
+            assert_ne!(
+                next_record.blocker.as_ref().unwrap().code,
+                "unbalanced_external_work_suspension"
+            );
+            assert_reconciles(&next_record);
+        });
+    }
+
+    #[test]
+    fn unsupported_configuration_and_invalid_binding_retain_ledgers() {
+        let outside = solve_visit_accounted_v1(
+            &[],
+            0,
+            7,
+            &F4Options::new(Ordering::Grevlex, 4),
+            &[],
+            request("outside-pool"),
+            |_| false,
+        )
+        .unwrap_err();
+        assert_eq!(
+            outside.accounting.solver_disposition,
+            VisitDispositionV1::Unsupported
+        );
+        assert_eq!(
+            outside.accounting.blocker.as_ref().unwrap().code,
+            "unsupported_configuration"
+        );
+        assert_reconciles_rejected(&outside.accounting);
+
+        let invalid = in_owner_pool(|| {
+            let mut bad = request("bad-binding");
+            bad.binding.case_sha256 = "not-a-digest".into();
+            solve_visit_accounted_v1(
+                &[],
+                0,
+                7,
+                &F4Options::new(Ordering::Grevlex, 4),
+                &[],
+                bad,
+                |_| false,
+            )
+            .unwrap_err()
+        });
+        assert_eq!(
+            invalid.accounting.solver_disposition,
+            VisitDispositionV1::InvalidInput
+        );
+        assert_eq!(
+            invalid.accounting.blocker.as_ref().unwrap().code,
+            "invalid_binding"
+        );
+        assert_reconciles_rejected(&invalid.accounting);
+
+        let observed = in_owner_pool(|| {
+            let (sender, _receiver) = std::sync::mpsc::channel();
+            observe_progress(sender, || {
+                solve_visit_accounted_v1(
+                    &[],
+                    0,
+                    7,
+                    &F4Options::new(Ordering::Grevlex, 4),
+                    &[],
+                    request("progress-observer"),
+                    |_| false,
+                )
+                .unwrap_err()
+            })
+        });
+        assert_eq!(
+            observed.accounting.solver_disposition,
+            VisitDispositionV1::Unsupported
+        );
+        assert!(observed.message.contains("progress observation"));
+        assert_reconciles_rejected(&observed.accounting);
+    }
+
+    #[test]
+    fn checked_overflow_and_reconciliation_faults_fail_closed() {
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        let mut overflow = VisitAccountingBuilder::new(request("overflow"), &opts, false);
+        overflow.total.callback_deliveries = u64::MAX;
+        overflow.phases[VisitAccountingPhaseV1::Validation.index()].callback_deliveries = u64::MAX;
+        overflow.charge(VisitAccountingCounter::CallbackDeliveries, 1);
+        overflow.operation_tracking_complete = true;
+        overflow.memory_tracking_complete = true;
+        overflow.work_ownership_complete = true;
+        let overflow = overflow.seal(VisitDispositionV1::CompleteEmpty);
+        assert_eq!(overflow.blocker.as_ref().unwrap().code, "counter_overflow");
+        assert!(!overflow.accounting_complete);
+        assert!(!overflow.reconciliation.checked_arithmetic);
+
+        let mut mismatch = VisitAccountingBuilder::new(request("mismatch"), &opts, false);
+        mismatch.phases[VisitAccountingPhaseV1::Validation.index()].traversal_nodes = 1;
+        mismatch.operation_tracking_complete = true;
+        mismatch.memory_tracking_complete = true;
+        mismatch.work_ownership_complete = true;
+        let mismatch = mismatch.seal(VisitDispositionV1::CompleteEmpty);
+        assert_eq!(
+            mismatch.blocker.as_ref().unwrap().code,
+            "reconciliation_mismatch"
+        );
+        assert!(!mismatch.accounting_complete);
+        assert!(!mismatch.reconciliation.phase_sum_equals_total);
+
+        let mut ownership = VisitAccountingBuilder::new(request("ownership"), &opts, false);
+        ownership.operation_tracking_complete = true;
+        ownership.memory_tracking_complete = true;
+        let ownership = ownership.seal(VisitDispositionV1::CompleteEmpty);
+        assert_eq!(
+            ownership.blocker.as_ref().unwrap().code,
+            "work_ownership_gap"
+        );
+        assert!(!ownership.accounting_complete);
+        assert!(!ownership.reconciliation.work_ownership_complete);
+    }
+
+    #[test]
+    fn concurrent_owned_workers_do_not_cross_contaminate() {
+        let handles: Vec<_> = [3usize, 7]
+            .into_iter()
+            .map(|callbacks| {
+                std::thread::spawn(move || {
+                    in_owner_pool(|| {
+                        let domains = [Some((0..callbacks as u64).collect())];
+                        let report = solve_visit_accounted_v1(
+                            &[],
+                            1,
+                            11,
+                            &F4Options::new(Ordering::Grevlex, 2),
+                            &domains,
+                            request(&format!("concurrent-{callbacks}")),
+                            |_| false,
+                        )
+                        .unwrap();
+                        let record = report.accounting_v1.unwrap();
+                        (callbacks, record)
+                    })
+                })
+            })
+            .collect();
+        for handle in handles {
+            let (callbacks, record) = handle.join().unwrap();
+            assert_eq!(record.total.callback_deliveries, callbacks as u64);
+            assert_eq!(record.total.branch_deliveries, callbacks as u64);
+            assert_eq!(record.total.traversal_nodes, callbacks as u64 + 1);
+            assert!(record.binding.attempt_id.ends_with(&callbacks.to_string()));
+            assert_reconciles(&record);
+        }
+    }
+
+    #[test]
+    fn callback_body_is_outside_the_solver_owned_meter() {
+        let report = in_owner_pool(|| {
+            solve_visit_accounted_v1(
+                &[],
+                0,
+                7,
+                &F4Options::new(Ordering::Grevlex, 4),
+                &[],
+                request("callback-boundary"),
+                |_| {
+                    assert_eq!(mulmod(3, 5, 7), 1);
+                    let _ = normalise_owned(vec![(vec![], 3), (vec![], 4)], 7, Ordering::Grevlex);
+                    let nested_input = vec![vec![(vec![1], 1), (vec![0], 6)]];
+                    let mut nested = Vec::new();
+                    solve_visit(
+                        &nested_input,
+                        1,
+                        7,
+                        &F4Options::new(Ordering::Grevlex, 2),
+                        &[None],
+                        |solution| {
+                            nested.push(solution.to_vec());
+                            false
+                        },
+                    )
+                    .unwrap();
+                    assert_eq!(nested, vec![vec![1]]);
+
+                    let nested_accounted = solve_visit_accounted_v1(
+                        &[],
+                        0,
+                        7,
+                        &F4Options::new(Ordering::Grevlex, 2),
+                        &[],
+                        request("callback-nested-accounted"),
+                        |_| panic!("rejected nested accounted call reached callback"),
+                    )
+                    .unwrap_err();
+                    assert_eq!(
+                        nested_accounted.accounting.solver_disposition,
+                        VisitDispositionV1::Unsupported
+                    );
+                    assert_eq!(
+                        nested_accounted.accounting.blocker.as_ref().unwrap().code,
+                        "nested_accounted_call"
+                    );
+                    assert_reconciles_rejected(&nested_accounted.accounting);
+
+                    let packed_input = vec![vec![(vec![2], 1)], vec![(vec![2], 1), (vec![0], 1)]];
+                    let packed_report = solve_visit(
+                        &packed_input,
+                        1,
+                        7,
+                        &F4Options::new(Ordering::Grevlex, 4),
+                        &[None],
+                        |_| panic!("inconsistent nested packed solve reached callback"),
+                    )
+                    .unwrap();
+                    assert!(packed_report.complete);
+                    assert_eq!(packed_report.solutions_visited, 0);
+                    false
+                },
+            )
+            .unwrap()
+        });
+        let record = accounting(&report);
+        assert_eq!(record.total.callback_deliveries, 1);
+        assert_eq!(record.total.field_multiplications, 0);
+        assert_eq!(record.total.field_additions, 0);
+        assert_reconciles(record);
+    }
+
+    #[test]
+    fn trace_sink_body_is_outside_the_solver_owned_meter() {
+        let report = in_owner_pool(|| {
+            solve_visit_traced_accounted_v1(
+                &[],
+                0,
+                7,
+                &F4Options::new(Ordering::Grevlex, 4),
+                &[],
+                request("trace-boundary"),
+                |_| false,
+                |_| {
+                    assert_eq!(mulmod(3, 5, 7), 1);
+                    Ok(())
+                },
+            )
+            .unwrap()
+        });
+        let record = accounting(&report);
+        assert_eq!(record.total.trace_deliveries, 2);
+        assert_eq!(record.total.callback_deliveries, 1);
+        assert_eq!(record.total.field_multiplications, 0);
+        assert_reconciles(record);
+    }
+
+    #[test]
+    fn accounted_real_f4_preserves_plain_solution_sequence() {
+        let input = vec![vec![(vec![2], 1), (vec![0], 6)]];
+        let opts = F4Options::new(Ordering::Grevlex, 4);
+        let mut plain = Vec::new();
+        solve_visit(&input, 1, 7, &opts, &[None], |solution| {
+            plain.push(solution.to_vec());
+            false
+        })
+        .unwrap();
+        let (accounted, record) = in_owner_pool(|| {
+            let mut solutions = Vec::new();
+            let report = solve_visit_accounted_v1(
+                &input,
+                1,
+                7,
+                &opts,
+                &[None],
+                request("real-f4-parity"),
+                |solution| {
+                    solutions.push(solution.to_vec());
+                    false
+                },
+            )
+            .unwrap();
+            (solutions, report.accounting_v1.unwrap())
+        });
+        assert_eq!(plain, vec![vec![1], vec![6]]);
+        assert_eq!(accounted, plain);
+        assert!(record.total.traversal_nodes > 0);
+        assert!(record.total.field_multiplications > 0);
+        assert_eq!(
+            record.arm.legacy_bitops_enabled,
+            super::super::jv_bitops::enabled()
+        );
+        assert_reconciles(&record);
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -5277,9 +13874,23 @@ pub struct SolveReport {
     pub max_cols: usize,
     pub f4_runs: usize,
     pub ms: f64,
+    /// Wall nanoseconds from entry to return of the substitution recursion.
+    pub recursion_total_ns: u64,
+    /// Wall nanoseconds inside all `f4` calls in the substitution tree.
+    pub f4_ns: u64,
+    /// Wall nanoseconds selecting a variable and its roots from each basis.
+    pub root_selection_ns: u64,
+    /// Wall nanoseconds specializing and normalizing each recursive system.
+    pub specialization_ns: u64,
+    /// Recursion wall nanoseconds outside the three measured spans: traversal,
+    /// candidate assembly, checks, and dispatch overhead.
+    pub recursion_traversal_ns: u64,
+    /// Wall nanoseconds in the final check against the original input.
+    pub final_filter_ns: u64,
     pub timed_out: bool,
     /// `F_p` multiplications spent in row reduction, summed over the F4
-    /// runs of the substitution tree.
+    /// runs of the substitution tree. This excludes root extraction, whose
+    /// elapsed time is included in `root_selection_ns`.
     pub field_ops: u64,
     /// Block-reduced steps of the top-level run.
     pub blocked_steps: usize,
@@ -5292,17 +13903,428 @@ pub struct SolveReport {
     pub candidates_rejected: usize,
 }
 
-/// Roots in `F_p` of a univariate polynomial given as `(degree, coeff)`.
-fn roots_univariate(coeffs: &[(u32, u64)], p: u64) -> Vec<u64> {
-    (0..p)
+/// Seed of the Cantor–Zassenhaus split stream shared with the unrestricted
+/// univariate path of the visitor.  The split stream changes only the work,
+/// never the root set.
+const VISIT_ROOT_SEED: u64 = 0x4634_524f_4f54;
+
+/// Value → position of a finite domain (the visitor validates that its
+/// values are distinct and below `p`).  Built once per traversal and
+/// variable, then shared by every node.
+pub(crate) fn domain_position_index(domain: &[u64]) -> FxMap<u64, usize> {
+    let mut index = FxMap::default();
+    index.reserve(domain.len());
+    for (position, &x) in domain.iter().enumerate() {
+        index.insert(x, position);
+    }
+    index
+}
+
+/// The roots in a finite domain of the univariate `coefficients` (low to
+/// high), in domain order: the counted `F_p`-root finder
+/// ([`super::glv_invariant_base::poly_roots_fp_counted_until`]), then the
+/// domain index.  Exact because the domain lies in `F_p`; `None` only when
+/// the deadline expires.  Multiplications are added to `muls`.
+pub(crate) fn domain_roots_frobenius(
+    coefficients: &[u64],
+    index: &FxMap<u64, usize>,
+    p: u64,
+    muls: &mut u64,
+    deadline: Option<Instant>,
+) -> Option<Vec<u64>> {
+    let rational = super::glv_invariant_base::poly_roots_fp_counted_until(
+        coefficients,
+        p,
+        VISIT_ROOT_SEED,
+        muls,
+        deadline,
+    )?;
+    let mut hits: Vec<(usize, u64)> = rational
+        .into_iter()
+        .filter_map(|r| index.get(&r).map(|&position| (position, r)))
+        .collect();
+    hits.sort_unstable_by_key(|&(position, _)| position);
+    Some(hits.into_iter().map(|(_, r)| r).collect())
+}
+
+/// The domain scan exactly as the visitor runs it (the control), with its
+/// multiplications counted: `terms` are `(exponent, coefficient)`.
+#[cfg(test)]
+pub(crate) fn domain_roots_scan(
+    terms: &[(u32, u64)],
+    domain: &[u64],
+    p: u64,
+    muls: &mut u64,
+) -> Vec<u64> {
+    let exponents: Vec<u32> = terms.iter().map(|&(e, _)| e).collect();
+    *muls += domain_scan_cost(&exponents, domain.len());
+    domain
+        .iter()
+        .copied()
         .filter(|&x| {
-            let mut v = 0u64;
-            for (k, c) in coeffs {
-                v = (v + mulmod(*c, powmod(x, *k as u64, p), p)) % p;
-            }
-            v == 0
+            terms.iter().fold(0, |v, &(e, c)| {
+                (v + mulmod(c, powmod(x, u64::from(e), p), p)) % p
+            }) == 0
         })
         .collect()
+}
+
+// ── Batched sibling extraction (`F4Options::sibling_batch`) ────────────────
+//
+// A sparse polynomial over the child's local variables, as the visitor's
+// `specialise` produces it (exponent vector, coefficient), without the
+// normalisation the F4 path needs.
+pub(crate) type SparsePoly = Vec<(Vec<u32>, u64)>;
+
+/// The generators of a branching node rewritten once for all its children:
+/// for each generator, its terms grouped by the exponent vector with the
+/// branch variable removed, each group's coefficient a univariate in the
+/// branch variable (low to high).  Specialising at `x = v` is one Horner
+/// evaluation per group.
+pub(crate) type SiblingFamily = Vec<Vec<(Vec<u32>, Vec<u64>)>>;
+
+pub(crate) fn sibling_family(generators: &[Poly], var: usize) -> SiblingFamily {
+    generators
+        .iter()
+        .map(|g| {
+            let mut groups: std::collections::BTreeMap<Vec<u32>, Vec<u64>> =
+                std::collections::BTreeMap::new();
+            for (e, c) in g {
+                let mut rest = e.clone();
+                let k = rest.remove(var) as usize;
+                let coeffs = groups.entry(rest).or_default();
+                if coeffs.len() <= k {
+                    coeffs.resize(k + 1, 0);
+                }
+                coeffs[k] = *c;
+            }
+            groups.into_iter().collect()
+        })
+        .collect()
+}
+
+/// The children's system at `x = v`: Horner on every coefficient group,
+/// zero terms and zero polynomials dropped.
+pub(crate) fn specialise_family(
+    family: &SiblingFamily,
+    v: u64,
+    p: u64,
+    muls: &mut u64,
+) -> Vec<SparsePoly> {
+    family
+        .iter()
+        .filter_map(|groups| {
+            let terms: SparsePoly = groups
+                .iter()
+                .filter_map(|(e, coeffs)| {
+                    let mut acc = 0u64;
+                    for &c in coeffs.iter().rev() {
+                        acc = (mulmod(acc, v, p) + c) % p;
+                    }
+                    *muls += coeffs.len().saturating_sub(1) as u64;
+                    (acc != 0).then(|| (e.clone(), acc))
+                })
+                .collect();
+            (!terms.is_empty()).then_some(terms)
+        })
+        .collect()
+}
+
+/// Substitute local variable `z = r` in every polynomial and drop it from
+/// the exponent vectors; equal monomials are merged and zero polynomials
+/// dropped.
+pub(crate) fn substitute_var(
+    polys: &[SparsePoly],
+    z: usize,
+    r: u64,
+    p: u64,
+    muls: &mut u64,
+) -> Vec<SparsePoly> {
+    polys
+        .iter()
+        .filter_map(|g| {
+            let mut merged: std::collections::BTreeMap<Vec<u32>, u64> =
+                std::collections::BTreeMap::new();
+            for (e, c) in g {
+                let mut rest = e.clone();
+                let k = u64::from(rest.remove(z));
+                let t = if k == 0 {
+                    *c
+                } else {
+                    *muls += powmod_muls(k) + 1;
+                    mulmod(*c, powmod(r, k, p), p)
+                };
+                let slot = merged.entry(rest).or_insert(0);
+                *slot = (*slot + t) % p;
+            }
+            let out: SparsePoly = merged.into_iter().filter(|(_, c)| *c != 0).collect();
+            (!out.is_empty()).then_some(out)
+        })
+        .collect()
+}
+
+fn dense_trim(mut v: Vec<u64>) -> Vec<u64> {
+    while v.last() == Some(&0) {
+        v.pop();
+    }
+    v
+}
+
+/// `a mod b` for dense polynomials (low to high), `b` trimmed and nonzero.
+fn dense_rem(a: &[u64], b: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
+    let mut r = dense_trim(a.to_vec());
+    let inv = inv_mod_u64(*b.last().expect("nonzero divisor"), p);
+    while r.len() >= b.len() {
+        let lead = mulmod(*r.last().expect("nonempty"), inv, p);
+        let shift = r.len() - b.len();
+        for (i, &bi) in b.iter().enumerate() {
+            r[shift + i] = (r[shift + i] + p - mulmod(lead, bi, p)) % p;
+        }
+        *muls += b.len() as u64 + 1;
+        r = dense_trim(r);
+    }
+    r
+}
+
+/// Monic gcd of two dense polynomials (either may be zero).
+pub(crate) fn dense_gcd(a: &[u64], b: &[u64], p: u64, muls: &mut u64) -> Vec<u64> {
+    let (mut x, mut y) = (dense_trim(a.to_vec()), dense_trim(b.to_vec()));
+    while !y.is_empty() {
+        let r = dense_rem(&x, &y, p, muls);
+        x = y;
+        y = r;
+    }
+    if let Some(&lead) = x.last() {
+        let inv = inv_mod_u64(lead, p);
+        *muls += x.len() as u64;
+        for c in &mut x {
+            *c = mulmod(*c, inv, p);
+        }
+    }
+    x
+}
+
+/// Square root modulo an odd prime (Tonelli–Shanks), multiplications
+/// counted; `None` for a non-residue.
+pub(crate) fn sqrt_mod_counted(n: u64, p: u64, muls: &mut u64) -> Option<u64> {
+    let n = n % p;
+    if n == 0 {
+        return Some(0);
+    }
+    let pw = |a: u64, e: u64, muls: &mut u64| {
+        *muls += powmod_muls(e);
+        powmod(a, e, p)
+    };
+    if p % 4 == 3 {
+        let root = pw(n, (p + 1) / 4, muls);
+        *muls += 1;
+        return (mulmod(root, root, p) == n).then_some(root);
+    }
+    if pw(n, (p - 1) / 2, muls) != 1 {
+        return None;
+    }
+    let (mut q, mut s) = (p - 1, 0u32);
+    while q % 2 == 0 {
+        q /= 2;
+        s += 1;
+    }
+    let mut z = 2u64;
+    while pw(z, (p - 1) / 2, muls) != p - 1 {
+        z += 1;
+    }
+    let (mut m, mut c, mut t, mut r) = (
+        s,
+        pw(z, q, muls),
+        pw(n, q, muls),
+        pw(n, q.div_ceil(2), muls),
+    );
+    while t != 1 {
+        let (mut i, mut tt) = (0u32, t);
+        while tt != 1 {
+            tt = mulmod(tt, tt, p);
+            *muls += 1;
+            i += 1;
+            if i == m {
+                return None;
+            }
+        }
+        let mut b = c;
+        for _ in 0..(m - i - 1) {
+            b = mulmod(b, b, p);
+            *muls += 1;
+        }
+        m = i;
+        c = mulmod(b, b, p);
+        t = mulmod(t, c, p);
+        r = mulmod(r, b, p);
+        *muls += 3;
+    }
+    Some(r)
+}
+
+/// All `F_p`-roots of the dense polynomial `h` (low to high, trimmed,
+/// degree at least one), ascending: closed form for degree one and, at an
+/// odd prime, two; the counted Frobenius root finder otherwise.  `None`
+/// only when the deadline expires.
+pub(crate) fn dense_roots_fp(
+    h: &[u64],
+    p: u64,
+    muls: &mut u64,
+    deadline: Option<Instant>,
+) -> Option<Vec<u64>> {
+    if deadline.is_some_and(|d| Instant::now() >= d) {
+        return None;
+    }
+    let mut roots = match h.len() {
+        0 | 1 => Vec::new(),
+        2 => {
+            *muls += 1;
+            vec![mulmod((p - h[0]) % p, inv_mod_u64(h[1], p), p)]
+        }
+        3 if p % 2 == 1 => {
+            let (c0, c1, c2) = (h[0], h[1], h[2]);
+            let disc = (mulmod(c1, c1, p) + p - mulmod(4 % p, mulmod(c2, c0, p), p)) % p;
+            *muls += 3;
+            match sqrt_mod_counted(disc, p, muls) {
+                None => Vec::new(),
+                Some(s) => {
+                    *muls += 2;
+                    let inv2a = inv_mod_u64(mulmod(2, c2, p), p);
+                    let neg_b = (p - c1) % p;
+                    let r1 = mulmod((neg_b + s) % p, inv2a, p);
+                    if s == 0 {
+                        vec![r1]
+                    } else {
+                        *muls += 1;
+                        let r2 = mulmod((neg_b + p - s) % p, inv2a, p);
+                        vec![r1, r2]
+                    }
+                }
+            }
+        }
+        _ => super::glv_invariant_base::poly_roots_fp_counted_until(
+            h,
+            p,
+            VISIT_ROOT_SEED,
+            muls,
+            deadline,
+        )?,
+    };
+    roots.sort_unstable();
+    roots.dedup();
+    if deadline.is_some_and(|d| Instant::now() >= d) {
+        None
+    } else {
+        Some(roots)
+    }
+}
+
+/// All roots of a sparse univariate polynomial over the prime field, in
+/// ascending order. A cancelled extraction is distinct from an empty root set.
+/// The automatic policy uses closed forms through degree two and the visitor's
+/// existing scan/Frobenius cost estimate for higher degrees.
+fn roots_univariate(
+    coeffs: &[(u32, u64)],
+    p: u64,
+    mode: DomainRootMode,
+    deadline: Option<Instant>,
+) -> Option<Vec<u64>> {
+    let expired = || deadline.is_some_and(|d| Instant::now() >= d);
+    if expired() {
+        return None;
+    }
+    let exponents: Vec<u32> = coeffs
+        .iter()
+        .filter(|(_, c)| !c.is_multiple_of(p))
+        .map(|&(k, _)| k)
+        .collect();
+    let degree = exponents.iter().copied().max().unwrap_or(0);
+    let scan = mode == DomainRootMode::Scan
+        || p == 2
+        || (mode == DomainRootMode::Auto
+            && degree > 2
+            && domain_scan_cost(&exponents, p as usize) <= domain_frobenius_cost(degree, p));
+    if scan {
+        return roots_univariate_exhaustive_until(coeffs, p, deadline);
+    }
+    let mut dense = vec![0; degree as usize + 1];
+    for &(k, c) in coeffs {
+        // Ignore zero terms before indexing, including a trailing term whose
+        // exponent exceeds the actual degree. Merge duplicate exponents.
+        if !c.is_multiple_of(p) {
+            dense[k as usize] =
+                ((u128::from(dense[k as usize]) + u128::from(c % p)) % u128::from(p)) as u64;
+        }
+    }
+    let dense = dense_trim(dense);
+    if dense.is_empty() {
+        return roots_univariate_exhaustive_until(coeffs, p, deadline);
+    }
+    let mut muls = 0;
+    let roots = dense_roots_fp(&dense, p, &mut muls, deadline)?;
+    if expired() {
+        None
+    } else {
+        Some(roots)
+    }
+}
+
+/// Original sparse evaluation control, with cooperative cancellation. Keep
+/// the arithmetic and root order so historical small-field runs can replay.
+fn roots_univariate_exhaustive_until(
+    coeffs: &[(u32, u64)],
+    p: u64,
+    deadline: Option<Instant>,
+) -> Option<Vec<u64>> {
+    let mut roots = Vec::new();
+    for x in 0..p {
+        if x % 256 == 0 && deadline.is_some_and(|d| Instant::now() >= d) {
+            return None;
+        }
+        let mut value = 0u64;
+        for &(k, c) in coeffs {
+            value = (value + mulmod(c, powmod(x, u64::from(k), p), p)) % p;
+        }
+        if value == 0 {
+            roots.push(x);
+        }
+    }
+    if deadline.is_some_and(|d| Instant::now() >= d) {
+        None
+    } else {
+        Some(roots)
+    }
+}
+
+#[cfg(test)]
+fn roots_univariate_exhaustive(coeffs: &[(u32, u64)], p: u64) -> Vec<u64> {
+    roots_univariate_exhaustive_until(coeffs, p, None).unwrap()
+}
+
+/// A forced assignment from a pure nonconstant linear univariate equation.
+/// Combine coefficients so duplicate or zero terms cannot invent a pivot.
+fn linear_assignment(g: &Poly, p: u64) -> Option<(usize, u64)> {
+    let mut variable = None;
+    let (mut a, mut b) = (0u64, 0u64);
+    for (powers, coefficient) in g {
+        let coefficient = coefficient % p;
+        if coefficient == 0 {
+            continue;
+        }
+        let mut support = powers.iter().enumerate().filter(|(_, power)| **power != 0);
+        match support.next() {
+            None => b = ((b as u128 + coefficient as u128) % p as u128) as u64,
+            Some((i, 1)) if support.next().is_none() => {
+                if variable.is_some_and(|previous| previous != i) {
+                    return None;
+                }
+                variable = Some(i);
+                a = ((a as u128 + coefficient as u128) % p as u128) as u64;
+            }
+            _ => return None,
+        }
+    }
+    (a != 0).then(|| (variable.unwrap(), mulmod((p - b) % p, inv_mod_u64(a, p), p)))
 }
 
 fn powmod(mut a: u64, mut e: u64, p: u64) -> u64 {
@@ -5332,6 +14354,32 @@ fn specialise(f: &Poly, i: usize, a: u64, p: u64) -> Vec<(Vec<u32>, u64)> {
 /// Solve a zero-dimensional system over `F_p` by degree-bounded F4 and
 /// substitution.  Solutions are full assignments `(x_0, …, x_{n−1})`.
 pub fn solve(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> SolveReport {
+    solve_with_root_mode(input, n_vars, p, opts, DomainRootMode::Auto)
+}
+
+/// Solve with an explicit univariate root policy. `Scan` retains the exhaustive
+/// control, `Frobenius` forces algebraic extraction, and `Auto` is the normal
+/// [`solve`] policy. This policy applies to the full field. Finite-domain
+/// visitor extraction remains controlled by [`F4Options::domain_roots`].
+pub fn solve_with_root_mode(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    root_mode: DomainRootMode,
+) -> SolveReport {
+    let linear_roots = std::env::var("F4_FP_LINEAR_ROOTS").is_ok_and(|v| v == "1");
+    solve_with_linear_roots(input, n_vars, p, opts, linear_roots, root_mode)
+}
+
+fn solve_with_linear_roots(
+    input: &[Poly],
+    n_vars: usize,
+    p: u64,
+    opts: &F4Options,
+    linear_roots: bool,
+    root_mode: DomainRootMode,
+) -> SolveReport {
     let t0 = Instant::now();
     let ops0 = field_ops_now();
     let mut runs = 0usize;
@@ -5340,18 +14388,30 @@ pub fn solve(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> SolveRe
     let mut top: Option<(u32, u32)> = None;
     let mut timed_out = false;
     let mut blocked = 0usize;
+    let mut f4_ns = 0u128;
+    let mut root_selection_ns = 0u128;
+    let mut specialization_ns = 0u128;
+    let recursion_start = Instant::now();
     let verdict = solve_rec(
         input,
         n_vars,
         p,
         opts,
+        linear_roots,
+        root_mode,
         &mut runs,
         &mut max_rows,
         &mut max_cols,
         &mut top,
         &mut timed_out,
         &mut blocked,
+        &mut f4_ns,
+        &mut root_selection_ns,
+        &mut specialization_ns,
     );
+    let recursion_ns = recursion_start.elapsed().as_nanos();
+    let measured_ns = f4_ns + root_selection_ns + specialization_ns;
+    assert!(measured_ns <= recursion_ns, "F4 stage timers overlap");
     let (solving_degree, degree_reached) = top.unwrap_or((0, 0));
     // Every run of the substitution tree may be a truncation (pairs above
     // the degree bound dropped, or a staircase stop), and a truncated basis
@@ -5362,6 +14422,7 @@ pub fn solve(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> SolveRe
     // A refutation needs no check: `1` in a truncated basis is `1` in the
     // ideal.
     let mut candidates_rejected = 0usize;
+    let filter_start = Instant::now();
     let verdict = match verdict {
         Verdict::Solutions(sols) => {
             let kept: Vec<Vec<u64>> = sols
@@ -5382,6 +14443,7 @@ pub fn solve(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> SolveRe
         }
         other => other,
     };
+    let final_filter_ns = filter_start.elapsed().as_nanos();
     SolveReport {
         verdict,
         solving_degree,
@@ -5390,6 +14452,12 @@ pub fn solve(input: &[Poly], n_vars: usize, p: u64, opts: &F4Options) -> SolveRe
         max_cols,
         f4_runs: runs,
         ms: t0.elapsed().as_secs_f64() * 1e3,
+        recursion_total_ns: recursion_ns.min(u64::MAX as u128) as u64,
+        f4_ns: f4_ns.min(u64::MAX as u128) as u64,
+        root_selection_ns: root_selection_ns.min(u64::MAX as u128) as u64,
+        specialization_ns: specialization_ns.min(u64::MAX as u128) as u64,
+        recursion_traversal_ns: (recursion_ns - measured_ns).min(u64::MAX as u128) as u64,
+        final_filter_ns: final_filter_ns.min(u64::MAX as u128) as u64,
         timed_out,
         field_ops: field_ops_now() - ops0,
         blocked_steps: blocked,
@@ -5403,12 +14471,17 @@ fn solve_rec(
     n_vars: usize,
     p: u64,
     opts: &F4Options,
+    linear_roots: bool,
+    root_mode: DomainRootMode,
     runs: &mut usize,
     max_rows: &mut usize,
     max_cols: &mut usize,
     top: &mut Option<(u32, u32)>,
     timed_out: &mut bool,
     blocked: &mut usize,
+    f4_ns: &mut u128,
+    root_selection_ns: &mut u128,
+    specialization_ns: &mut u128,
 ) -> Verdict {
     if n_vars == 0 {
         // constants only: consistent iff all zero
@@ -5419,7 +14492,9 @@ fn solve_rec(
             Verdict::Solutions(vec![vec![]])
         };
     }
+    let f4_start = Instant::now();
     let r = f4(input, n_vars, p, opts);
+    *f4_ns += f4_start.elapsed().as_nanos();
     *runs += 1;
     *max_rows = (*max_rows).max(r.max_rows);
     *max_cols = (*max_cols).max(r.max_cols);
@@ -5431,61 +14506,91 @@ fn solve_rec(
         *timed_out = true;
         return Verdict::Undetermined;
     }
+    if r.resource_limit.is_some() {
+        return Verdict::Undetermined;
+    }
     if r.inconsistent {
         return Verdict::Inconsistent;
     }
     // a univariate element?  prefer the variable with the fewest roots
-    let mut best: Option<(usize, Vec<u64>)> = None;
-    for g in &r.basis {
-        let vars: HashSet<usize> = g
+    // A forced linear value is valid even for a truncated basis: every
+    // basis polynomial lies in the input ideal. Other constraints are
+    // still checked by recursion and by solve's final exact input filter.
+    let root_selection_start = Instant::now();
+    let mut best = if linear_roots {
+        r.basis
             .iter()
-            .flat_map(|(e, _)| e.iter().enumerate().filter(|(_, &k)| k > 0).map(|(i, _)| i))
-            .collect();
-        if vars.len() == 1 {
-            let i = *vars.iter().next().unwrap();
-            let coeffs: Vec<(u32, u64)> = g.iter().map(|(e, c)| (e[i], *c)).collect();
-            let roots = roots_univariate(&coeffs, p);
-            if best.as_ref().is_none_or(|(_, rs)| roots.len() < rs.len()) {
-                best = Some((i, roots));
+            .find_map(|g| linear_assignment(g, p))
+            .map(|(i, x)| (i, vec![x]))
+    } else {
+        None
+    };
+    if best.is_none() {
+        for g in &r.basis {
+            let vars: HashSet<usize> = g
+                .iter()
+                .flat_map(|(e, _)| e.iter().enumerate().filter(|(_, &k)| k > 0).map(|(i, _)| i))
+                .collect();
+            if vars.len() == 1 {
+                let i = *vars.iter().next().unwrap();
+                let coeffs: Vec<(u32, u64)> = g.iter().map(|(e, c)| (e[i], *c)).collect();
+                let Some(roots) = roots_univariate(&coeffs, p, root_mode, opts.deadline) else {
+                    *root_selection_ns += root_selection_start.elapsed().as_nanos();
+                    *timed_out = true;
+                    return Verdict::Undetermined;
+                };
+                if best.as_ref().is_none_or(|(_, rs)| roots.len() < rs.len()) {
+                    best = Some((i, roots));
+                }
             }
         }
     }
-    let (var, values): (usize, Vec<u64>) = match best {
-        Some(b) => b,
+    let (var, roots, field_values) = match best {
+        Some((i, roots)) => (i, roots, 0..0),
         None => {
             // Without a univariate element every value of the first
             // variable is tried.  With a truncation (`pairs_above_bound`)
             // the basis is that of a sub-ideal, so this and the root
             // enumeration above return a superset of the solutions, which
             // `solve` filters against the input.
-            (0, (0..p).collect())
+            // Iterate lazily so a large field cannot allocate p entries
+            // before the recursion gets a chance to observe its deadline.
+            (0, Vec::new(), 0..p)
         }
     };
+    *root_selection_ns += root_selection_start.elapsed().as_nanos();
     let mut sols: Vec<Vec<u64>> = Vec::new();
-    for a in values {
+    for a in roots.into_iter().chain(field_values) {
         if let Some(d) = opts.deadline {
             if Instant::now() > d {
                 *timed_out = true;
                 return Verdict::Undetermined;
             }
         }
+        let specialization_start = Instant::now();
         let sub: Vec<Poly> = r
             .basis
             .iter()
             .map(|g| normalise_owned(specialise(g, var, a, p), p, opts.order))
             .filter(|g| !g.is_empty())
             .collect();
+        *specialization_ns += specialization_start.elapsed().as_nanos();
         match solve_rec(
             &sub,
             n_vars - 1,
             p,
             opts,
+            linear_roots,
+            root_mode,
             runs,
             max_rows,
             max_cols,
             top,
             timed_out,
             blocked,
+            f4_ns,
+            root_selection_ns,
+            specialization_ns,
         ) {
             Verdict::Inconsistent => {}
             Verdict::Undetermined => return Verdict::Undetermined,
@@ -5515,6 +14620,7 @@ pub fn eval(f: &Poly, x: &[u64], p: u64) -> u64 {
             }
         }
         v = (v + t) % p;
+        visit_account_charge(VisitAccountingCounter::FieldAdditions, 1);
     }
     v
 }
@@ -5523,6 +14629,374 @@ pub fn eval(f: &Poly, x: &[u64], p: u64) -> u64 {
 mod tests {
     use super::*;
     use std::collections::BTreeMap;
+
+    fn roots_test_rng(state: &mut u64) -> u64 {
+        *state = state
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
+        *state >> 11
+    }
+
+    #[test]
+    fn root_policies_match_every_small_cubic() {
+        for p in [2u64, 3, 5, 7] {
+            for encoded in 0..p.pow(4) {
+                let mut digits = encoded;
+                let coeffs: Vec<_> = (0..4)
+                    .map(|k| {
+                        let c = digits % p;
+                        digits /= p;
+                        (k, c)
+                    })
+                    .collect();
+                let want = roots_univariate_exhaustive(&coeffs, p);
+                for mode in [DomainRootMode::Auto, DomainRootMode::Frobenius] {
+                    assert_eq!(
+                        roots_univariate(&coeffs, p, mode, None),
+                        Some(want.clone()),
+                        "p={p} coeffs={coeffs:?} mode={mode:?}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn root_policies_match_13_bit_repeated_root_polynomials() {
+        for p in [4099u64, 6151, 8191] {
+            for degree in [1, 2, 4, 8, 16, 32, 64] {
+                let mut dense = vec![1];
+                let mut want = Vec::new();
+                for k in 0..degree {
+                    // Include zero and repeated roots without relying on
+                    // the extraction implementation to construct the oracle.
+                    let root = (k / 2 * 137) % p;
+                    want.push(root);
+                    let mut next = vec![0; dense.len() + 1];
+                    for (i, &c) in dense.iter().enumerate() {
+                        next[i] = (next[i] + p - mulmod(c, root, p)) % p;
+                        next[i + 1] = (next[i + 1] + c) % p;
+                    }
+                    dense = next;
+                }
+                want.sort_unstable();
+                want.dedup();
+                let coeffs: Vec<_> = dense
+                    .into_iter()
+                    .enumerate()
+                    .map(|(i, c)| (i as u32, c))
+                    .collect();
+                assert_eq!(roots_univariate_exhaustive(&coeffs, p), want);
+                for mode in [DomainRootMode::Auto, DomainRootMode::Frobenius] {
+                    assert_eq!(roots_univariate(&coeffs, p, mode, None), Some(want.clone()));
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn root_policies_preserve_zero_terms_and_cancellation() {
+        let cases = [
+            vec![],
+            vec![(0, 0)],
+            vec![(1, 1), (1, 4)],
+            vec![(1, 1), (0, 4), (u32::MAX, 0)],
+            vec![(2, 6), (2, 4), (1, 1), (0, 4)],
+        ];
+        for mode in [
+            DomainRootMode::Scan,
+            DomainRootMode::Frobenius,
+            DomainRootMode::Auto,
+        ] {
+            for coeffs in &cases {
+                assert_eq!(
+                    roots_univariate(coeffs, 5, mode, None),
+                    Some(roots_univariate_exhaustive(coeffs, 5))
+                );
+                assert_eq!(
+                    roots_univariate(coeffs, 5, mode, Some(Instant::now())),
+                    None
+                );
+            }
+            let mut opts = F4Options::new(Ordering::Grevlex, 4);
+            opts.deadline = Some(Instant::now());
+            let report =
+                solve_with_root_mode(&[vec![(vec![2], 1), (vec![0], 4)]], 1, 5, &opts, mode);
+            assert!(report.timed_out);
+            assert!(matches!(report.verdict, Verdict::Undetermined));
+        }
+        assert_eq!(domain_frobenius_cost(u32::MAX, 8191), u64::MAX);
+    }
+
+    #[test]
+    fn public_solver_root_modes_preserve_complete_solutions() {
+        let p = 101;
+        let input = vec![
+            vec![(vec![4, 0], 1), (vec![0, 0], p - 1)],
+            vec![(vec![0, 1], 1), (vec![1, 0], p - 1)],
+        ];
+        let want: Vec<_> = (0..p)
+            .filter(|&x| input.iter().all(|g| eval(g, &[x, x], p) == 0))
+            .map(|x| vec![x, x])
+            .collect();
+        let opts = F4Options::new(Ordering::Grevlex, 8);
+        for mode in [
+            DomainRootMode::Scan,
+            DomainRootMode::Frobenius,
+            DomainRootMode::Auto,
+        ] {
+            let report = solve_with_root_mode(&input, 2, p, &opts, mode);
+            assert!(!report.timed_out);
+            let Verdict::Solutions(mut got) = report.verdict else {
+                panic!("{mode:?}: no roots");
+            };
+            got.sort();
+            assert_eq!(got, want);
+        }
+        let Verdict::Solutions(mut got) = solve(&input, 2, p, &opts).verdict else {
+            panic!("default: no roots");
+        };
+        got.sort();
+        assert_eq!(got, want);
+    }
+
+    #[test]
+    fn split_roots_match_the_exhaustive_scan() {
+        let mut state = 7u64;
+        for p in [3u64, 5, 7, 101, 10_007, 65_537] {
+            for trial in 0..60 {
+                let deg = 1 + (roots_test_rng(&mut state) % 12) as u32;
+                let mut coeffs: Vec<(u32, u64)> = Vec::new();
+                for k in 0..=deg {
+                    if !roots_test_rng(&mut state).is_multiple_of(3) {
+                        coeffs.push((k, roots_test_rng(&mut state) % p));
+                    }
+                }
+                if trial % 4 == 0 {
+                    // Force several roots, a repeated one and zero.
+                    let mut f = vec![1u64];
+                    for r in [0, 1 % p, 1 % p, (p - 2) % p, 5 % p] {
+                        let mut g = vec![0u64; f.len() + 1];
+                        for (i, &c) in f.iter().enumerate() {
+                            g[i + 1] = (g[i + 1] + c) % p;
+                            g[i] = (g[i] + p - mulmod(c, r, p)) % p;
+                        }
+                        f = g;
+                    }
+                    coeffs = f.iter().enumerate().map(|(k, &c)| (k as u32, c)).collect();
+                }
+                let fast = roots_univariate(&coeffs, p, DomainRootMode::Frobenius, None);
+                let slow = roots_univariate_exhaustive(&coeffs, p);
+                assert_eq!(fast, Some(slow), "p={p} coeffs={coeffs:?}");
+            }
+        }
+    }
+
+    #[test]
+    fn large_field_roots_use_the_split_path() {
+        let p = 2_147_483_647u64;
+        let want: Vec<u64> = vec![0, 3, 77_777, 1_234_567_890, 2_147_483_646];
+        // prod (x - r) * (x^2 + 1); -1 is a non-residue mod p = 3 (mod 4).
+        let mut f = vec![1u64, 0, 1];
+        for &r in &want {
+            let mut g = vec![0u64; f.len() + 1];
+            for (i, &c) in f.iter().enumerate() {
+                g[i + 1] = (g[i + 1] + c) % p;
+                g[i] = (g[i] + p - mulmod(c, r, p)) % p;
+            }
+            f = g;
+        }
+        let coeffs: Vec<(u32, u64)> = f.iter().enumerate().map(|(k, &c)| (k as u32, c)).collect();
+        assert_eq!(
+            roots_univariate(&coeffs, p, DomainRootMode::Auto, None),
+            Some(want)
+        );
+        assert_eq!(
+            roots_univariate(&[(0, 5)], p, DomainRootMode::Auto, None),
+            Some(Vec::new())
+        );
+    }
+
+    #[test]
+    fn analytic_linear_roots_match_exhaustive_field_roots() {
+        for p in [2, 3, 5, 7, 59] {
+            for a in 1..p {
+                for b in 0..p {
+                    let g = vec![(vec![0, 1], a), (vec![0, 0], b)];
+                    let (var, root) = linear_assignment(&g, p).unwrap();
+                    assert_eq!(var, 1);
+                    assert_eq!(
+                        roots_univariate(&[(1, a), (0, b)], p, DomainRootMode::Auto, None),
+                        Some(vec![root])
+                    );
+                }
+            }
+        }
+        assert_eq!(
+            linear_assignment(&vec![(vec![1], 1), (vec![1], 4)], 5),
+            None
+        );
+        assert_eq!(
+            linear_assignment(&vec![(vec![1, 0], 1), (vec![0, 1], 1)], 5),
+            None
+        );
+        assert_eq!(linear_assignment(&vec![(vec![2], 1)], 5), None);
+        assert_eq!(linear_assignment(&vec![(vec![0], 1)], 5), None);
+    }
+
+    #[test]
+    fn linear_root_policy_preserves_recursive_and_inconsistent_answers() {
+        for p in [3, 5, 7] {
+            for c in 0..p {
+                let input = vec![
+                    vec![(vec![2, 0], 1), (vec![0, 0], c)],
+                    vec![(vec![0, 1], 1), (vec![1, 0], p - 1)],
+                ];
+                let opts = F4Options::new(Ordering::Grevlex, 8);
+                let baseline =
+                    solve_with_linear_roots(&input, 2, p, &opts, false, DomainRootMode::Auto);
+                let candidate =
+                    solve_with_linear_roots(&input, 2, p, &opts, true, DomainRootMode::Auto);
+                match (baseline.verdict, candidate.verdict) {
+                    (Verdict::Inconsistent, Verdict::Inconsistent) => {}
+                    (Verdict::Solutions(mut a), Verdict::Solutions(mut b)) => {
+                        a.sort();
+                        b.sort();
+                        assert_eq!(a, b);
+                    }
+                    (a, b) => panic!("linear policy changed verdict: {a:?} vs {b:?}"),
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn semi_regular_hilbert_matches_hand_computed_series() {
+        // Square complete intersection of two quadrics in two variables:
+        // (1 - t^2)^2 / (1 - t)^2 = (1 + t)^2 = 1 + 2t + t^2.
+        assert_eq!(semi_regular_hilbert(&[2, 2], 2), Some(vec![1, 2, 1]));
+        // Over-determined: three quadrics in two variables,
+        // (1 - t^2)^3 / (1 - t)^2, truncated at the first non-positive
+        // coefficient, is [1, 2].
+        assert_eq!(semi_regular_hilbert(&[2, 2, 2], 2), Some(vec![1, 2]));
+        // One linear form in one variable: 1 / (1 - t) * (1 - t) = 1.
+        assert_eq!(semi_regular_hilbert(&[1], 1), Some(vec![1]));
+    }
+
+    #[test]
+    fn diagnostic_staircase_matches_exact_counts_and_obeys_the_original_deadline() {
+        let leading = [vec![2, 0], vec![1, 1]];
+        let lms: Vec<&[u32]> = leading.iter().map(Vec::as_slice).collect();
+        for degree in 0..=8 {
+            assert_eq!(
+                diagnostic_staircase_count(&lms, 2, degree, None),
+                Some(uncovered_in_degree(&lms, 2, degree))
+            );
+        }
+        let expired = Some(Instant::now() - Duration::from_millis(1));
+        assert_eq!(diagnostic_staircase_count(&lms, 2, 8, expired), None);
+        assert_eq!(semi_regular_hilbert_before(&[2, 2], 2, expired), None);
+    }
+
+    #[test]
+    fn affine_staircase_extinction_is_not_top_form_regularity() {
+        // x^2-1 and xy-1 give the affine basis {x-y, y^2-1}, whose
+        // staircase is empty in degree 2. Their top forms generate (x^2,xy),
+        // which retains y^d at every degree and has no finite regularity degree.
+        let input = vec![
+            vec![(vec![2, 0], 1), (vec![0, 0], 6)],
+            vec![(vec![1, 1], 1), (vec![0, 0], 6)],
+        ];
+        let opts = F4Options::new(Ordering::Grevlex, 8).recording_hilbert_diagnostics();
+        let report = f4(&input, 2, 7, &opts);
+        assert!(!report.inconsistent && !report.timed_out);
+        assert_eq!(report.staircase_extinction_degree, Some(2));
+        let top = [vec![2, 0], vec![1, 1]];
+        let lms: Vec<&[u32]> = top.iter().map(Vec::as_slice).collect();
+        assert_eq!(diagnostic_staircase_count(&lms, 2, 8, None), Some(1));
+    }
+
+    #[test]
+    fn hilbert_expectation_overflow_is_unavailable_instead_of_wrapping() {
+        assert!(semi_regular_hilbert(&[2; 128], 128).is_none());
+    }
+
+    #[test]
+    fn hilbert_deviations_absent_for_a_regular_sequence() {
+        // x^2 - 1, y^2 - 1 over F_7: a regular sequence (square complete
+        // intersection), so the realized Hilbert function equals the
+        // semi-regular expectation at every degree — no degree fall — and the
+        // quotient {1, x, y, xy} vanishes at degree 3.
+        let input: Vec<Poly> = vec![
+            vec![(vec![2, 0], 1), (vec![0, 0], 6)], // x^2 - 1 (mod 7)
+            vec![(vec![0, 2], 1), (vec![0, 0], 6)], // y^2 - 1
+        ];
+        let mut opts = F4Options::new(Ordering::Grevlex, 8);
+        opts.record_hilbert_diagnostics = true;
+        let r = f4(&input, 2, 7, &opts);
+        assert!(!r.inconsistent && !r.timed_out);
+        assert!(!r.hilbert_deviations.is_empty(), "the diagnostic ran");
+        assert!(
+            r.hilbert_deviations.iter().all(|s| !s.is_below_expectation),
+            "a regular sequence has no degree fall: {:?}",
+            r.hilbert_deviations
+        );
+        assert_eq!(r.first_hilbert_deviation_degree, None);
+        assert_eq!(r.last_hilbert_deviation_degree, None);
+        assert_eq!(r.staircase_extinction_degree, Some(3));
+        let realized: Vec<usize> = r
+            .hilbert_deviations
+            .iter()
+            .take(3)
+            .map(|s| s.hilbert_realized)
+            .collect();
+        assert_eq!(realized, vec![1, 2, 1]);
+    }
+
+    #[test]
+    fn hilbert_deviation_does_not_claim_a_formal_first_fall_degree() {
+        // x^2 - 1, y^2 - 1, x*y - x over F_7. The extra form forces y = 1
+        // (reduced basis {x^2 - 1, y - 1}), so the realized Hilbert function
+        // {1, x} is [1, 1, 0] — below the semi-regular [1, 2] at degree 1.
+        // The staircase deviates at degree 1 and is empty at degree 2.
+        // Every input has degree 2, so V_{F,1} is zero: a formal degree
+        // fall at degree 1 is impossible. This prevents the old relabelling.
+        let input: Vec<Poly> = vec![
+            vec![(vec![2, 0], 1), (vec![0, 0], 6)], // x^2 - 1
+            vec![(vec![0, 2], 1), (vec![0, 0], 6)], // y^2 - 1
+            vec![(vec![1, 1], 1), (vec![1, 0], 6)], // x*y - x
+        ];
+        let mut opts = F4Options::new(Ordering::Grevlex, 8);
+        opts.record_hilbert_diagnostics = true;
+        let r = f4(&input, 2, 7, &opts);
+        assert!(!r.inconsistent && !r.timed_out);
+        assert_eq!(r.first_hilbert_deviation_degree, Some(1));
+        assert_eq!(r.last_hilbert_deviation_degree, Some(1));
+        assert_eq!(r.staircase_extinction_degree, Some(2));
+        let d1 = r.hilbert_deviations.iter().find(|s| s.degree == 1).unwrap();
+        assert_eq!(
+            (
+                d1.hilbert_realized,
+                d1.hilbert_expected,
+                d1.is_below_expectation
+            ),
+            (1, 2, true)
+        );
+    }
+
+    #[test]
+    fn hilbert_deviations_off_by_default() {
+        // Without record_hilbert_diagnostics the diagnostic does not run (zero cost).
+        let input: Vec<Poly> = vec![
+            vec![(vec![2, 0], 1), (vec![0, 0], 6)],
+            vec![(vec![0, 2], 1), (vec![0, 0], 6)],
+        ];
+        let opts = F4Options::new(Ordering::Grevlex, 8);
+        let r = f4(&input, 2, 7, &opts);
+        assert!(r.hilbert_deviations.is_empty());
+        assert_eq!(r.first_hilbert_deviation_degree, None);
+        assert_eq!(r.staircase_extinction_degree, None);
+    }
 
     #[test]
     fn recursive_visitors_reject_all_checkpoint_options_before_callbacks_or_file_effects() {
@@ -6453,6 +15927,230 @@ mod tests {
         }
     }
 
+    /// The column-tiled `B'` build gives the row build's `B'` for any
+    /// tiling, on random monic echelon reducer sets.
+    #[test]
+    fn bprime_tiled_matches_row_build() {
+        let mut s = 0x2545_f491_4f6c_dd1du64;
+        let mut rnd = move || {
+            s ^= s << 13;
+            s ^= s >> 7;
+            s ^= s << 17;
+            s
+        };
+        for &p in &[31u64, 65521] {
+            let fp = Barrett::new(p);
+            for &(n_cols, density) in &[(40usize, 3u64), (300, 5), (700, 9)] {
+                // reducers led by a random half of the columns, monic, with
+                // random entries to the right of the lead
+                let leads: Vec<usize> = (0..n_cols).filter(|_| rnd() % 2 == 0).collect();
+                let reducers: Vec<Vec<(u32, u64)>> = leads
+                    .iter()
+                    .map(|&l| {
+                        let mut r = vec![(l as u32, 1u64)];
+                        for c in l + 1..n_cols {
+                            if rnd() % density == 0 {
+                                r.push((c as u32, 1 + rnd() % (p - 1)));
+                            }
+                        }
+                        r
+                    })
+                    .collect();
+                const NONE: u32 = u32::MAX;
+                let mut reducer_at = vec![NONE; n_cols];
+                for (k, r) in reducers.iter().enumerate() {
+                    reducer_at[r[0].0 as usize] = k as u32;
+                }
+                let free_cols: Vec<usize> =
+                    (0..n_cols).filter(|&c| reducer_at[c] == NONE).collect();
+                let n_free = free_cols.len();
+                let mut free_index = vec![NONE; n_cols];
+                for (i, &c) in free_cols.iter().enumerate() {
+                    free_index[c] = i as u32;
+                }
+                let bstart: Vec<usize> = reducers
+                    .iter()
+                    .map(|r| free_cols.partition_point(|&c| c <= r[0].0 as usize))
+                    .collect();
+                let mut order: Vec<usize> = (0..reducers.len()).collect();
+                order.sort_unstable_by_key(|&k| std::cmp::Reverse(reducers[k][0].0));
+                let mut position = vec![0usize; reducers.len()];
+                for (pos, &k) in order.iter().enumerate() {
+                    position[k] = pos;
+                }
+                // the row build, one reducer at a time, exact mod p
+                let mut want: Vec<Vec<u32>> = vec![Vec::new(); reducers.len()];
+                for &k in &order {
+                    let mut acc = vec![0u64; n_free];
+                    for &(c, v) in &reducers[k][1..] {
+                        let fi = free_index[c as usize];
+                        if fi != NONE {
+                            acc[fi as usize] = (acc[fi as usize] + v) % p;
+                        } else {
+                            let j = reducer_at[c as usize] as usize;
+                            for (x, &y) in acc.iter_mut().zip(&want[j]) {
+                                *x = (*x + (p - v) * u64::from(y)) % p;
+                            }
+                        }
+                    }
+                    want[k] = acc.into_iter().map(|x| x as u32).collect();
+                }
+                for tiles in [1usize, 2, 3, 7] {
+                    let got = bprime_tiled(
+                        &reducers,
+                        &reducer_at,
+                        &free_index,
+                        &bstart,
+                        &order,
+                        &position,
+                        n_free,
+                        fp,
+                        None,
+                        tiles,
+                    )
+                    .unwrap();
+                    assert_eq!(got, want, "p={p} cols={n_cols} tiles={tiles}");
+                }
+                // the column-tiled finish of one row block, against the
+                // rows finished before it
+                let block_start = order.len().saturating_sub(64) / 2;
+                let block: Vec<usize> =
+                    order[block_start..(block_start + 64).min(order.len())].to_vec();
+                let partial: Vec<(Vec<u64>, usize, Vec<(usize, u64)>)> = block
+                    .iter()
+                    .map(|&k| {
+                        let mut acc = vec![0u64; n_free];
+                        let mut later = Vec::new();
+                        for &(c, v) in &reducers[k][1..] {
+                            let fi = free_index[c as usize];
+                            if fi != NONE {
+                                acc[fi as usize] = (acc[fi as usize] + v) % p;
+                            } else {
+                                let j = reducer_at[c as usize] as usize;
+                                if position[j] < block_start {
+                                    for (x, &y) in acc.iter_mut().zip(&want[j]) {
+                                        *x = (*x + (p - v) * u64::from(y)) % p;
+                                    }
+                                } else {
+                                    later.push((j, v));
+                                }
+                            }
+                        }
+                        (acc, 0, later)
+                    })
+                    .collect();
+                for threads in [1usize, 2, 3, 4] {
+                    let segs = finish_block_tiled(
+                        &partial,
+                        &bstart,
+                        &position,
+                        block_start,
+                        n_free,
+                        fp,
+                        lazy_simd_kind(),
+                        threads,
+                    );
+                    for (bi, &k) in block.iter().enumerate() {
+                        let mut row = Vec::new();
+                        for ((a, b), seg) in &segs {
+                            let w = *b - *a;
+                            row.extend_from_slice(&seg[bi * w..(bi + 1) * w]);
+                        }
+                        assert_eq!(row, want[k], "block p={p} cols={n_cols} threads={threads}");
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn mem_fused_apply_matches_sequential() {
+        let mut x = 0x5eed_f00d_1234_5678u64;
+        let mut next = || {
+            x ^= x << 13;
+            x ^= x >> 7;
+            x ^= x << 17;
+            x
+        };
+        let p = 65521u64;
+        for len in [1usize, 7, 8, 9, 31, 64, 257] {
+            for n in 1..=MEM_K {
+                let rows: Vec<Vec<u32>> = (0..n)
+                    .map(|_| (0..len).map(|_| (next() % p) as u32).collect())
+                    .collect();
+                let start: Vec<usize> = (0..n).map(|_| (next() as usize) % len).collect();
+                let f: Vec<u64> = (0..n).map(|_| next() % p).collect();
+                let base: Vec<u64> = (0..len).map(|_| next() % p).collect();
+                for lo in [0usize, len / 3] {
+                    let hi = len - len / 4;
+                    for simd in [0u8, lazy_simd_kind()] {
+                        let mut want = base.clone();
+                        for t in 0..n {
+                            let a = start[t].max(lo);
+                            if a < hi {
+                                add_lazy_range(&mut want, &rows[t], a, hi, f[t], 0);
+                            }
+                        }
+                        let mut got = base.clone();
+                        let mut g = MemGroup::new();
+                        for t in 0..n {
+                            g.push(&rows[t], start[t], f[t]);
+                        }
+                        g.flush(&mut got, lo, hi, simd);
+                        assert_eq!(got, want, "len {len} n {n} lo {lo} simd {simd}");
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn narrow_accumulators_match_wide_rref() {
+        let mut x = 0x0fed_cba9_8765_4321u64;
+        let mut next = || {
+            x ^= x << 13;
+            x ^= x >> 7;
+            x ^= x << 17;
+            x
+        };
+        for p in [2u64, 3, 29, 53, 101, 251, 4093] {
+            let fp = Barrett::new(p);
+            let narrow = Barrett32::new(p);
+            // the 32-bit reduction holds on every u32, not only on p(p-1)
+            for probe in [0u32, 1, u32::MAX, u32::MAX - 1, 1 << 31] {
+                assert_eq!(narrow.reduce(probe) as u64, probe as u64 % p, "p={p}");
+            }
+            for _ in 0..10_000 {
+                let probe = next() as u32;
+                assert_eq!(narrow.reduce(probe) as u64, probe as u64 % p, "p={p}");
+            }
+            let interval = narrow_acc_interval_for(p);
+            assert!(interval.is_some_and(|k| k >= 256), "p={p}");
+            for every in [1usize, 2, 7, interval.unwrap()] {
+                for (rows, cols) in [(1, 1), (7, 9), (20, 15), (40, 33), (64, 70)] {
+                    let mut wide: Vec<Vec<u64>> = (0..rows)
+                        .map(|_| (0..cols).map(|_| next() % p).collect())
+                        .collect();
+                    let mut narrow_rows: Vec<Vec<u32>> = wide
+                        .iter()
+                        .map(|row| row.iter().map(|&v| v as u32).collect())
+                        .collect();
+                    let want = rref(&mut wide, fp, None).unwrap();
+                    let got =
+                        rref32_deferred_n32(&mut narrow_rows, narrow, fp, None, every).unwrap();
+                    assert_eq!(got, want, "p={p} every={every} {rows}x{cols}");
+                    let widened: Vec<Vec<u64>> = narrow_rows
+                        .into_iter()
+                        .map(|row| row.into_iter().map(u64::from).collect())
+                        .collect();
+                    assert_eq!(widened, wide, "p={p} every={every} {rows}x{cols}");
+                }
+            }
+        }
+        assert_eq!(narrow_acc_interval_for(4099), None);
+        assert_eq!(narrow_acc_interval_for(65_521), None);
+    }
+
     #[test]
     fn narrow_arithmetic_matches_wide_rref() {
         let mut x = 0x0123_4567_89ab_cdefu64;
@@ -6505,6 +16203,58 @@ mod tests {
     }
 
     #[test]
+    fn reduce_chunk_gemm_matches_lazy_on_ntt_prime() {
+        // Direct A/B of the blocked GEMM helper against per-row `reduce_lazy_by`
+        // on p = 786433 (exact-f64 GEMM prime used by E2LOCMS45).
+        let p = 786_433u64;
+        assert!(super::super::fp_gemm::supports_f64_gemm(p));
+        let fp = Barrett::new(p);
+        let simd = lazy_simd_kind();
+        let mut x = 0xC0FF_EE00_D15C_AFE1u64;
+        let mut next = || {
+            x ^= x << 13;
+            x ^= x >> 7;
+            x ^= x << 17;
+            x
+        };
+        for (n_piv, n_rows, n_cols) in [(12usize, 16usize, 96usize), (24, 32, 128), (40, 48, 160)]
+        {
+            let mut known: Vec<(usize, Vec<u32>)> = Vec::with_capacity(n_piv);
+            for j in 0..n_piv {
+                let c = j * (n_cols / n_piv);
+                let mut row = vec![0u32; n_cols];
+                row[c] = 1;
+                for t in (c + 1)..n_cols {
+                    row[t] = (next() % p) as u32;
+                }
+                // Zero earlier pivot columns (forward-elim shape).
+                for &(pc, _) in &known {
+                    row[pc] = 0;
+                }
+                known.push((c, row));
+            }
+            let sources: Vec<Vec<u32>> = (0..n_rows)
+                .map(|_| (0..n_cols).map(|_| (next() % p) as u32).collect())
+                .collect();
+            let gemm = reduce_chunk_by_known_gemm(&sources, &known, fp);
+            let lazy: Vec<(Vec<u64>, usize)> = sources
+                .iter()
+                .map(|s| {
+                    let mut acc: Vec<u64> = s.iter().copied().map(u64::from).collect();
+                    let mut pending = 0usize;
+                    reduce_lazy_by(&mut acc, &known, fp, simd, &mut pending);
+                    normalize_lazy(&mut acc, fp);
+                    (acc, 0usize)
+                })
+                .collect();
+            assert_eq!(gemm.len(), lazy.len(), "row count {n_piv}/{n_rows}x{n_cols}");
+            for (i, ((ga, _), (la, _))) in gemm.iter().zip(lazy.iter()).enumerate() {
+                assert_eq!(ga, la, "row {i} piv={n_piv} {n_rows}x{n_cols}");
+            }
+        }
+    }
+
+    #[test]
     fn narrow_f4_matches_wide_basis() {
         let monomials = [
             vec![0, 0, 0],
@@ -6530,9 +16280,11 @@ mod tests {
                 .map(|_| monomials.iter().map(|m| (m.clone(), next() % p)).collect())
                 .collect();
             let opts = F4Options::new(Ordering::Grevlex, 6);
-            let wide = f4_with_arithmetic(&sys, 3, p, &opts, 0, TraceMode::Off);
-            let narrow = f4_with_arithmetic(&sys, 3, p, &opts, 1, TraceMode::Off);
-            let deferred = f4_with_arithmetic(&sys, 3, p, &opts, 2, TraceMode::Off);
+            let wide = f4_with_arithmetic(&sys, 3, p, &opts, 0, VisitAccount::Off, TraceMode::Off);
+            let narrow =
+                f4_with_arithmetic(&sys, 3, p, &opts, 1, VisitAccount::Off, TraceMode::Off);
+            let deferred =
+                f4_with_arithmetic(&sys, 3, p, &opts, 2, VisitAccount::Off, TraceMode::Off);
             assert_eq!(narrow.basis, wide.basis, "p={p}");
             assert_eq!(narrow.steps, wide.steps, "p={p}");
             assert_eq!(
@@ -6936,6 +16688,196 @@ mod packed_set_tests {
 
     /// Reduction by a set with its monomials packed against the vector one,
     /// for sets that reduce a good deal (multiples of one another).
+    #[test]
+    fn first_alive_divisor_matches_the_u128_scan() {
+        let mut rng = Xs(0x5eed_0fd1_d1d0_u64);
+        for n in 1usize..=15 {
+            let guard = (0..n).fold(0u128, |g, i| g | 0x80u128 << (8 * i));
+            let mono = |rng: &mut Xs, top: u64| {
+                (0..n).fold(0u128, |a, i| a | ((rng.below(top) as u128) << (8 * i)))
+            };
+            for len in [0usize, 1, 3, 4, 5, 9, 31] {
+                let lms: Vec<u128> = (0..len).map(|_| mono(&mut rng, 3)).collect();
+                for _ in 0..200 {
+                    let m = mono(&mut rng, 6);
+                    let want = lms.iter().position(|&a| ((m | guard) - a) & guard == guard);
+                    assert_eq!(first_alive_divisor(&lms, guard, m), want, "n={n} len={len}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn diverged_replays_record_and_follow_branches() {
+        let mut rng = Xs(0x0b5a_2c11_7e57_0001);
+        let (n, p) = (3usize, 31u64);
+        let monos = monomials_up_to(n, 2);
+        // dense quadrics, some with middle coefficients forced to zero:
+        // the input leading monomials stay, later steps can differ
+        let system = |rng: &mut Xs, zeros: &[usize]| -> Vec<Poly> {
+            (0..n)
+                .map(|k| {
+                    let f: Vec<_> = monos
+                        .iter()
+                        .enumerate()
+                        .map(|(i, m)| {
+                            let c = if k == 0 && i > 0 && zeros.contains(&i) {
+                                0
+                            } else {
+                                1 + rng.below(p - 1)
+                            };
+                            (m.clone(), c)
+                        })
+                        .filter(|(_, c)| *c != 0)
+                        .collect();
+                    normalise(&f, p, Ordering::Grevlex)
+                })
+                .collect()
+        };
+        let opts = F4Options::new(Ordering::Grevlex, 10);
+        let (_, trace) = f4_record(&system(&mut rng, &[]), n, p, &opts);
+        let mut followed = 0;
+        for t in 0..60 {
+            let zeros = [1 + t % 7, 2 + (t * 3) % 7];
+            let sys = system(&mut rng, &zeros);
+            let plain = f4(&sys, n, p, &opts);
+            let first = f4_replay(&sys, n, p, &opts, &trace);
+            if !first.trace_mismatch {
+                assert_eq!(first.basis, plain.basis, "system {t}");
+                continue;
+            }
+            if !trace_growth() {
+                continue; // another test turned recording off
+            }
+            // the same system again: the branch its first replay recorded
+            // (unless this step's branches are full) takes it to the end
+            let second = f4_replay(&sys, n, p, &opts, &trace);
+            if !second.trace_mismatch {
+                followed += 1;
+                assert_eq!(second.basis, plain.basis, "system {t}, on its branch");
+            }
+        }
+        if trace_growth() {
+            assert!(followed > 0, "no replay followed a branch");
+        }
+    }
+
+    #[test]
+    fn frozen_replay_steps_match_fresh_ones() {
+        let mut rng = Xs(0x7eed_f00d_1234_5678);
+        let (n, p) = (3usize, 53u64);
+        let monos = monomials_up_to(n, 2);
+        // dense quadrics: every system has the recorded shape, except those
+        // with one coefficient forced to zero (another support)
+        let system = |rng: &mut Xs, zero: Option<usize>| -> Vec<Poly> {
+            (0..n)
+                .map(|k| {
+                    let f: Vec<_> = monos
+                        .iter()
+                        .enumerate()
+                        .map(|(i, m)| {
+                            let c = if k == 0 && zero == Some(i) {
+                                0
+                            } else {
+                                1 + rng.below(p - 1)
+                            };
+                            (m.clone(), c)
+                        })
+                        .filter(|(_, c)| *c != 0)
+                        .collect();
+                    normalise(&f, p, Ordering::Grevlex)
+                })
+                .collect()
+        };
+        let opts = F4Options::new(Ordering::Grevlex, 10);
+        let (rec, trace) = f4_record(&system(&mut rng, None), n, p, &opts);
+        assert!(!rec.trace_mismatch);
+        let before = frozen_steps_total();
+        for t in 0..12 {
+            let zero = (t % 4 == 3).then_some(1 + t % 3);
+            let sys = system(&mut rng, zero);
+            let plain = f4(&sys, n, p, &opts);
+            // the first replay of a step freezes it, the second reuses it
+            let first = f4_replay(&sys, n, p, &opts, &trace);
+            let second = f4_replay(&sys, n, p, &opts, &trace);
+            assert_eq!(first.basis, second.basis, "system {t}");
+            assert_eq!(first.trace_mismatch, second.trace_mismatch, "system {t}");
+            if !first.trace_mismatch {
+                assert_eq!(first.basis, plain.basis, "system {t}");
+            }
+        }
+        assert!(frozen_steps_total() > before, "no step was reused");
+    }
+
+    #[test]
+    fn mono_table_interns_like_a_map() {
+        let mut rng = Xs(0x0bad_cafe_dead_beef);
+        let mut t = MonoTable::with_capacity(4);
+        let mut m: std::collections::HashMap<u128, u32> = Default::default();
+        for _ in 0..20_000 {
+            // small packed monomials in 6 fields, many repeats
+            let x = (0..6).fold(0u128, |a, i| a | ((rng.below(5) as u128) << (8 * i)));
+            let next = m.len() as u32;
+            let want = *m.entry(x).or_insert(next);
+            assert_eq!(t.get_or_insert(x, next), want);
+        }
+        assert_eq!(t.len, m.len());
+    }
+
+    #[test]
+    fn packed_linear_interreduction_matches_the_vector_path() {
+        let mut rng = Xs(0x2468_ace0_1357_9bdf);
+        for (n, p) in [(3usize, 31u64), (4, 53), (5, 65_521), (6, 251)] {
+            for _ in 0..6 {
+                let monos = monomials_up_to(n, 3);
+                let gens: Vec<Poly> = (0..n + 1)
+                    .map(|_| {
+                        let k = 3 + rng.below(6) as usize;
+                        let f: Vec<_> = (0..k)
+                            .map(|_| {
+                                (
+                                    monos[rng.below(monos.len() as u64) as usize].clone(),
+                                    1 + rng.below(p - 1),
+                                )
+                            })
+                            .collect();
+                        normalise(&f, p, Ordering::Grevlex)
+                    })
+                    .filter(|f| !f.is_empty())
+                    .collect();
+                // the reduced basis with tails left unreduced (F4's alive
+                // basis before its final interreduction): g_i = f_i + c f_j
+                // for an element f_j of smaller leading monomial keeps every
+                // leading monomial, so the interreduction must give back
+                // the reduced basis
+                let basis = f4(&gens, n, p, &F4Options::new(Ordering::Grevlex, 10)).basis;
+                let mut raw = basis.clone();
+                for i in 1..raw.len() {
+                    let j = rng.below(i as u64) as usize;
+                    let c = 1 + rng.below(p - 1);
+                    let mut g = basis[i].clone();
+                    g.extend(basis[j].iter().map(|(e, v)| (e.clone(), v * c % p)));
+                    raw[i] = normalise(&g, p, Ordering::Grevlex);
+                }
+                let what = format!("n={n} p={p}");
+                let packed = interreduce_linear_with(&raw, n, p, Ordering::Grevlex, true);
+                let plain = interreduce_linear_with(&raw, n, p, Ordering::Grevlex, false);
+                assert!(packed.is_some(), "linear interreduction declined {what}");
+                assert_eq!(packed, plain, "packed vs vector {what}");
+                let mut want = basis.clone();
+                want.sort_by(|a, b| cmp_monomial(&a[0].0, &b[0].0, Ordering::Grevlex));
+                assert_eq!(packed.unwrap(), want, "vs the reduced basis {what}");
+                // a generating set that is not a basis: the two paths still
+                // build the same matrix
+                assert_eq!(
+                    interreduce_linear_with(&gens, n, p, Ordering::Grevlex, true),
+                    interreduce_linear_with(&gens, n, p, Ordering::Grevlex, false),
+                    "generators {what}"
+                );
+            }
+        }
+    }
+
     #[test]
     fn packed_reduction_matches_the_vector_reduction() {
         let mut rng = Xs(0x1357_9bdf_2468_ace0);
@@ -7397,6 +17339,563 @@ mod packed_set_tests {
                 }
                 assert_eq!(mulmod(a % p, invmod(a, p), p), 1, "{a}^-1 mod {p}");
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod domain_root_tests {
+    //! [`DomainRootMode`]: the Frobenius extraction returns the scan's roots,
+    //! in the scan's order, so the visitor's traversal cannot tell them apart.
+    use super::*;
+    use rand::rngs::StdRng;
+    use rand::{Rng, SeedableRng};
+
+    fn mul_poly(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+        let mut out = vec![0u64; a.len() + b.len() - 1];
+        for (i, &x) in a.iter().enumerate() {
+            for (j, &y) in b.iter().enumerate() {
+                out[i + j] = (out[i + j] + mulmod(x, y, p)) % p;
+            }
+        }
+        out
+    }
+
+    /// Coefficients (low to high) with a nonzero leading coefficient and
+    /// degree at least one: planted roots (some repeated, some outside the
+    /// domain), an optional random cofactor that may carry irreducible
+    /// factors, and a random scale.
+    fn random_univariate(rng: &mut StdRng, p: u64, planted: &[u64]) -> Vec<u64> {
+        let mut f = vec![1u64];
+        for &r in planted {
+            f = mul_poly(&f, &[(p - r % p) % p, 1], p);
+        }
+        if planted.is_empty() || rng.gen_bool(0.5) {
+            let d = rng.gen_range(1..=4usize);
+            let mut cof: Vec<u64> = (0..d).map(|_| rng.gen_range(0..p)).collect();
+            cof.push(rng.gen_range(1..p.max(2)));
+            f = mul_poly(&f, &cof, p);
+        }
+        let scale = rng.gen_range(1..p.max(2));
+        f.iter().map(|&c| mulmod(c, scale, p)).collect()
+    }
+
+    fn terms_of(f: &[u64]) -> Vec<(u32, u64)> {
+        f.iter()
+            .enumerate()
+            .filter(|(_, &c)| c != 0)
+            .map(|(e, &c)| (e as u32, c))
+            .collect()
+    }
+
+    pub(super) fn random_domain(rng: &mut StdRng, p: u64, size: usize, must: &[u64]) -> Vec<u64> {
+        let mut seen = HashSet::new();
+        let mut d = Vec::new();
+        for &x in must {
+            if seen.insert(x % p) {
+                d.push(x % p);
+            }
+        }
+        let size = size.min(p as usize);
+        while d.len() < size {
+            let x = rng.gen_range(0..p);
+            if seen.insert(x) {
+                d.push(x);
+            }
+        }
+        // Domain order is arbitrary in the visitor; the extraction must keep it.
+        for i in (1..d.len()).rev() {
+            d.swap(i, rng.gen_range(0..=i));
+        }
+        d
+    }
+
+    fn check(f: &[u64], domain: &[u64], p: u64) {
+        let index = domain_position_index(domain);
+        let (mut scan_muls, mut frob_muls) = (0u64, 0u64);
+        let scan = domain_roots_scan(&terms_of(f), domain, p, &mut scan_muls);
+        let frob = domain_roots_frobenius(f, &index, p, &mut frob_muls, None).unwrap();
+        assert_eq!(frob, scan, "p = {p}, f = {f:?}, |D| = {}", domain.len());
+    }
+
+    #[test]
+    fn frobenius_extraction_returns_the_scans_roots_in_domain_order() {
+        let mut rng = StdRng::seed_from_u64(0x0F4D_0A1B);
+        let primes = [
+            2u64,
+            3,
+            5,
+            7,
+            13,
+            101,
+            1009,
+            65_521,
+            1_000_003,
+            2_147_483_647,
+            4_294_967_291,
+        ];
+        let mut cases = 0usize;
+        for &p in &primes {
+            for _ in 0..60 {
+                let k = rng.gen_range(0..=6usize);
+                let planted: Vec<u64> = (0..k).map(|_| rng.gen_range(0..p)).collect();
+                // Repeat a planted root now and then.
+                let mut planted = planted;
+                if !planted.is_empty() && rng.gen_bool(0.3) {
+                    planted.push(planted[0]);
+                }
+                let f = random_univariate(&mut rng, p, &planted);
+                let inside: Vec<u64> = planted
+                    .iter()
+                    .copied()
+                    .filter(|_| rng.gen_bool(0.6))
+                    .collect();
+                let size = if p <= 13 {
+                    rng.gen_range(0..=p as usize)
+                } else {
+                    rng.gen_range(0..=200usize)
+                };
+                let domain = random_domain(&mut rng, p, size, &inside);
+                check(&f, &domain, p);
+                cases += 1;
+            }
+            if p <= 13 {
+                // Degree at least p, vanishing on the whole field: x^p − x, and
+                // its product with a planted factor; full and partial domains.
+                let mut xp_x = vec![0u64; p as usize + 1];
+                xp_x[1] = p - 1;
+                xp_x[p as usize] = 1;
+                let full: Vec<u64> = (0..p).rev().collect();
+                check(&xp_x, &full, p);
+                check(&mul_poly(&xp_x, &[1, 1], p), &full[..full.len() / 2], p);
+                check(&[0, 1], &[], p);
+                cases += 3;
+            }
+        }
+        assert!(cases > 600);
+    }
+
+    #[test]
+    fn frobenius_needs_far_fewer_multiplications_on_a_large_domain() {
+        let p = 2_147_483_647u64;
+        let mut rng = StdRng::seed_from_u64(7);
+        let planted = [11u64, 23, 99_991];
+        let f = random_univariate(&mut rng, p, &planted);
+        let domain = random_domain(&mut rng, p, 1 << 14, &planted);
+        let index = domain_position_index(&domain);
+        let (mut s, mut fr) = (0u64, 0u64);
+        let a = domain_roots_scan(&terms_of(&f), &domain, p, &mut s);
+        let b = domain_roots_frobenius(&f, &index, p, &mut fr, None).unwrap();
+        assert_eq!(a, b);
+        assert_eq!(a.len(), 3);
+        assert!(fr * 10 < s, "frobenius {fr} vs scan {s}");
+    }
+
+    /// Dense random quadrics in three variables through planted points, with
+    /// finite domains on some variables: the generic F4 bases produce
+    /// univariates of degree up to eight with arbitrary roots.
+    pub(super) fn planted_system(rng: &mut StdRng, p: u64, n: usize) -> (Vec<Poly>, Vec<Vec<u64>>) {
+        let points: Vec<Vec<u64>> = (0..rng.gen_range(1..=3usize))
+            .map(|_| (0..n).map(|_| rng.gen_range(0..p)).collect())
+            .collect();
+        let mut monomials: Vec<Vec<u32>> = Vec::new();
+        for i in 0..n {
+            for j in i..n {
+                let mut e = vec![0u32; n];
+                e[i] += 1;
+                e[j] += 1;
+                monomials.push(e);
+            }
+            let mut e = vec![0u32; n];
+            e[i] = 1;
+            monomials.push(e);
+        }
+        let eval = |e: &[u32], x: &[u64]| {
+            e.iter().zip(x).fold(1u64, |v, (&k, &xi)| {
+                mulmod(v, powmod(xi, u64::from(k), p), p)
+            })
+        };
+        // Each equation is a random combination of monomials, with the constant
+        // chosen to vanish at the first planted point, times nothing else: the
+        // other planted points are kept only by the linear span (a degenerate
+        // system is still a valid traversal test).
+        let mut system = Vec::new();
+        for _ in 0..n {
+            let coeffs: Vec<u64> = monomials.iter().map(|_| rng.gen_range(0..p)).collect();
+            let mut terms: Vec<(Vec<u32>, u64)> = monomials
+                .iter()
+                .cloned()
+                .zip(coeffs.iter().copied())
+                .collect();
+            let at = |x: &[u64]| {
+                terms
+                    .iter()
+                    .fold(0u64, |v, (e, c)| (v + mulmod(*c, eval(e, x), p)) % p)
+            };
+            let c0 = (p - at(&points[0])) % p;
+            terms.push((vec![0u32; n], c0));
+            system.push(normalise(&terms, p, Ordering::Grevlex));
+        }
+        (system, points)
+    }
+
+    type Branches = Vec<(usize, usize, u64, &'static str)>;
+
+    fn traverse(
+        system: &[Poly],
+        n: usize,
+        p: u64,
+        domains: &[Option<Vec<u64>>],
+        mode: DomainRootMode,
+        stop_after: Option<usize>,
+    ) -> (Vec<Vec<u64>>, Branches, VisitReport) {
+        let opts = F4Options::new(Ordering::Grevlex, 12).with_domain_roots(mode);
+        let mut seen = Vec::new();
+        let mut branches = Vec::new();
+        let report = solve_visit_traced(
+            system,
+            n,
+            p,
+            &opts,
+            domains,
+            |s| {
+                seen.push(s.to_vec());
+                stop_after.is_some_and(|k| seen.len() >= k)
+            },
+            |event| {
+                if let VisitEvent::Branch {
+                    node_id,
+                    original_variable,
+                    value,
+                    source,
+                } = event
+                {
+                    branches.push((node_id, original_variable, value, source));
+                }
+                Ok(())
+            },
+        )
+        .unwrap();
+        (seen, branches, report)
+    }
+
+    #[test]
+    fn every_mode_gives_the_identical_traversal() {
+        let mut rng = StdRng::seed_from_u64(0xD0_4A1E);
+        let mut with_frobenius = 0usize;
+        for round in 0..40 {
+            let p = [101u64, 1009, 65_521, 1_000_003][round % 4];
+            let n = 2 + round % 2;
+            let (system, points) = planted_system(&mut rng, p, n);
+            let domains: Vec<Option<Vec<u64>>> = (0..n)
+                .map(|i| {
+                    rng.gen_bool(0.75).then(|| {
+                        let must: Vec<u64> = points.iter().map(|pt| pt[i]).collect();
+                        let size = rng.gen_range(must.len()..=must.len() + 300);
+                        random_domain(&mut rng, p, size, &must)
+                    })
+                })
+                .collect();
+            for stop in [None, Some(1)] {
+                let (s0, b0, r0) = traverse(&system, n, p, &domains, DomainRootMode::Scan, stop);
+                for mode in [DomainRootMode::Frobenius, DomainRootMode::Auto] {
+                    let (s1, b1, r1) = traverse(&system, n, p, &domains, mode, stop);
+                    assert_eq!(s1, s0, "solutions differ, round {round}, {mode:?}");
+                    assert_eq!(b1, b0, "branch sequence differs, round {round}, {mode:?}");
+                    assert_eq!(
+                        (
+                            r1.complete,
+                            r1.stopped_early,
+                            r1.timed_out,
+                            r1.solutions_visited
+                        ),
+                        (
+                            r0.complete,
+                            r0.stopped_early,
+                            r0.timed_out,
+                            r0.solutions_visited
+                        )
+                    );
+                    // `field_ops` is a delta of the process-wide counter (unless
+                    // `F4_FP_THREAD_OPS=1`), so tests running in parallel leak into
+                    // it; it is not compared here.  The identical branch sequence
+                    // above already fixes every F4 input, and the single-process
+                    // example `fb_domain_rootfind` asserts `field_ops` equality.
+                    assert_eq!(
+                        (r1.candidates_rejected, r1.f4_runs, r1.full_field_branches),
+                        (r0.candidates_rejected, r0.f4_runs, r0.full_field_branches)
+                    );
+                    if mode == DomainRootMode::Frobenius {
+                        assert_eq!(r1.domain_evaluations, 0);
+                        with_frobenius += r1.domain_frobenius_univariates;
+                    }
+                }
+                assert_eq!(r0.domain_frobenius_univariates, 0);
+            }
+        }
+        assert!(
+            with_frobenius > 20,
+            "only {with_frobenius} domain univariates exercised"
+        );
+    }
+
+    #[test]
+    fn default_reports_serialise_without_the_new_fields() {
+        let json = serde_json::to_value(VisitReport::default()).unwrap();
+        for key in [
+            "domain_frobenius_univariates",
+            "domain_root_field_multiplications",
+            "domain_index_entries",
+        ] {
+            assert!(
+                json.get(key).is_none(),
+                "{key} serialised under the default"
+            );
+        }
+        assert_eq!(
+            F4Options::new(Ordering::Grevlex, 4).domain_roots,
+            DomainRootMode::Scan
+        );
+    }
+}
+
+#[cfg(test)]
+mod sibling_batch_tests {
+    //! [`F4Options::sibling_batch`]: the batched, F4-free child solve finds
+    //! the scan's solution set (and, for one-level univariate children, the
+    //! scan's exact sequence), and its arithmetic helpers are exact.
+    use super::domain_root_tests::{planted_system, random_domain};
+    use super::*;
+    use rand::rngs::StdRng;
+    use rand::{Rng, SeedableRng};
+
+    #[test]
+    fn counted_sqrt_and_dense_roots_match_brute_force() {
+        let mut rng = StdRng::seed_from_u64(0x5157);
+        for p in [3u64, 5, 7, 11, 13, 17, 101, 1009, 65_537] {
+            for _ in 0..300 {
+                let n = rng.gen_range(0..p);
+                let mut muls = 0;
+                let euler = n == 0 || powmod(n, (p - 1) / 2, p) == 1;
+                match sqrt_mod_counted(n, p, &mut muls) {
+                    Some(r) => assert_eq!(mulmod(r, r, p), n, "sqrt({n}) mod {p}"),
+                    None => assert!(!euler, "missed square root of {n} mod {p}"),
+                }
+                assert_eq!(sqrt_mod_counted(n, p, &mut muls).is_some(), euler);
+            }
+            if p > 1009 {
+                continue;
+            }
+            for _ in 0..200 {
+                let degree = rng.gen_range(1..=6usize);
+                let mut h: Vec<u64> = (0..degree).map(|_| rng.gen_range(0..p)).collect();
+                h.push(rng.gen_range(1..p));
+                let mut muls = 0;
+                let got = dense_roots_fp(&h, p, &mut muls, None).unwrap();
+                let want: Vec<u64> = (0..p)
+                    .filter(|&x| h.iter().rev().fold(0, |v, &c| (mulmod(v, x, p) + c) % p) == 0)
+                    .collect();
+                assert_eq!(got, want, "p = {p}, h = {h:?}");
+            }
+        }
+    }
+
+    /// `S₃` in the symmetric odd-characteristic expansion (as the prime-chain
+    /// builder writes it); `None` puts the target abscissa in a slot.
+    fn s3(slots: [Option<usize>; 3], n: usize, x: u64, a: u64, b: u64, p: u64) -> Poly {
+        let neg = |v: u64| (p - v % p) % p;
+        let raw: [([u32; 3], u64); 13] = [
+            ([2, 2, 0], 1),
+            ([2, 0, 2], 1),
+            ([0, 2, 2], 1),
+            ([2, 1, 1], neg(2)),
+            ([1, 2, 1], neg(2)),
+            ([1, 1, 2], neg(2)),
+            ([1, 1, 0], neg(mulmod(2, a, p))),
+            ([1, 0, 1], neg(mulmod(2, a, p))),
+            ([0, 1, 1], neg(mulmod(2, a, p))),
+            ([1, 0, 0], neg(mulmod(4, b, p))),
+            ([0, 1, 0], neg(mulmod(4, b, p))),
+            ([0, 0, 1], neg(mulmod(4, b, p))),
+            ([0, 0, 0], mulmod(a, a, p)),
+        ];
+        let terms: Vec<(Vec<u32>, u64)> = raw
+            .iter()
+            .map(|(powers, c)| {
+                let mut e = vec![0u32; n];
+                let mut c = *c;
+                for (axis, &k) in powers.iter().enumerate() {
+                    match slots[axis] {
+                        Some(v) => e[v] += k,
+                        None => c = mulmod(c, powmod(x, u64::from(k), p), p),
+                    }
+                }
+                (e, c)
+            })
+            .collect();
+        normalise(&terms, p, Ordering::Grevlex)
+    }
+
+    fn visit(
+        system: &[Poly],
+        n: usize,
+        p: u64,
+        domains: &[Option<Vec<u64>>],
+        batch: bool,
+        mode: DomainRootMode,
+        stop_after: Option<usize>,
+    ) -> (Vec<Vec<u64>>, VisitReport) {
+        let opts = F4Options::new(Ordering::Grevlex, 12)
+            .with_domain_roots(mode)
+            .with_sibling_batch(batch);
+        let mut seen = Vec::new();
+        let report = solve_visit(system, n, p, &opts, domains, |s| {
+            seen.push(s.to_vec());
+            stop_after.is_some_and(|k| seen.len() >= k)
+        })
+        .unwrap();
+        (seen, report)
+    }
+
+    fn sorted(mut v: Vec<Vec<u64>>) -> Vec<Vec<u64>> {
+        v.sort();
+        v
+    }
+
+    #[test]
+    fn one_level_children_give_the_scans_exact_sequence() {
+        let mut rng = StdRng::seed_from_u64(0xB47C);
+        let mut solutions = 0usize;
+        for round in 0..24 {
+            let p = [101u64, 103, 1009][round % 3];
+            let (a, b, x) = (
+                rng.gen_range(0..p),
+                rng.gen_range(1..p),
+                rng.gen_range(0..p),
+            );
+            let system = vec![s3([Some(0), Some(1), None], 2, x, a, b, p)];
+            let size = rng.gen_range(p as usize / 3..=p as usize);
+            let domains = vec![
+                Some(random_domain(&mut rng, p, size, &[])),
+                Some(random_domain(&mut rng, p, size, &[])),
+            ];
+            let (s0, r0) = visit(&system, 2, p, &domains, false, DomainRootMode::Scan, None);
+            for mode in [DomainRootMode::Scan, DomainRootMode::Frobenius] {
+                let (s1, r1) = visit(&system, 2, p, &domains, true, mode, None);
+                assert_eq!(s1, s0, "round {round}: sequence differs");
+                assert_eq!(r1.solutions_visited, r0.solutions_visited);
+                assert!(r1.complete);
+                assert_eq!(r1.batched_nodes, 1);
+                assert_eq!(r1.batched_children, size);
+                assert_eq!(r1.batched_fallbacks, 0);
+                assert!(r1.f4_runs < r0.f4_runs, "batched children ran F4");
+            }
+            solutions += s0.len();
+        }
+        assert!(solutions > 100, "only {solutions} solutions exercised");
+    }
+
+    #[test]
+    fn chains_and_dense_systems_give_the_scans_solution_set() {
+        let mut rng = StdRng::seed_from_u64(0xC4A1);
+        let (mut batched, mut fallbacks, mut solutions) = (0usize, 0usize, 0usize);
+        for round in 0..30 {
+            let p = [101u64, 103, 211][round % 3];
+            let (system, n, domains): (Vec<Poly>, usize, Vec<Option<Vec<u64>>>) = if round % 2 == 0
+            {
+                // m = 3 chain: S3(x0, x1, u) = 0, S3(u, x2, X) = 0, x_i in D, u free.
+                let (a, b, x) = (
+                    rng.gen_range(0..p),
+                    rng.gen_range(1..p),
+                    rng.gen_range(0..p),
+                );
+                let size = rng.gen_range(8..=24);
+                let d = random_domain(&mut rng, p, size, &[]);
+                (
+                    vec![
+                        s3([Some(0), Some(1), Some(3)], 4, x, a, b, p),
+                        s3([Some(3), Some(2), None], 4, x, a, b, p),
+                    ],
+                    4,
+                    vec![Some(d.clone()), Some(d.clone()), Some(d), None],
+                )
+            } else {
+                let n = 3;
+                let (system, points) = planted_system(&mut rng, p, n);
+                let domains = (0..n)
+                    .map(|i| {
+                        let must: Vec<u64> = points.iter().map(|pt| pt[i]).collect();
+                        {
+                            let size = rng.gen_range(must.len()..=40);
+                            Some(random_domain(&mut rng, p, size, &must))
+                        }
+                    })
+                    .collect();
+                (system, n, domains)
+            };
+            let (s0, r0) = visit(&system, n, p, &domains, false, DomainRootMode::Scan, None);
+            let (s1, r1) = visit(
+                &system,
+                n,
+                p,
+                &domains,
+                true,
+                DomainRootMode::Frobenius,
+                None,
+            );
+            assert_eq!(
+                sorted(s1.clone()),
+                sorted(s0.clone()),
+                "round {round}: solution sets differ"
+            );
+            assert_eq!(
+                (r1.complete, r1.solutions_visited),
+                (r0.complete, r0.solutions_visited)
+            );
+            for s in &s1 {
+                assert!(
+                    system.iter().all(|g| eval(g, s, p) == 0),
+                    "not a solution: {s:?}"
+                );
+            }
+            batched += r1.batched_children;
+            fallbacks += r1.batched_fallbacks;
+            solutions += s0.len();
+        }
+        assert!(batched > 200, "batched path barely exercised ({batched})");
+        assert!(fallbacks > 0, "the F4 fallback was never exercised");
+        assert!(solutions > 20, "only {solutions} solutions");
+    }
+
+    #[test]
+    fn stopping_early_returns_a_genuine_solution_and_default_is_off() {
+        let p = 1009;
+        let system = vec![s3([Some(0), Some(1), None], 2, 77, 3, 11, p)];
+        let domains = vec![Some((0..p).collect()), Some((0..p).collect())];
+        let (s, r) = visit(
+            &system,
+            2,
+            p,
+            &domains,
+            true,
+            DomainRootMode::Frobenius,
+            Some(1),
+        );
+        assert_eq!(s.len(), 1);
+        assert!(r.stopped_early);
+        assert_eq!(eval(&system[0], &s[0], p), 0);
+        assert!(!F4Options::new(Ordering::Grevlex, 4).sibling_batch);
+        let json = serde_json::to_value(VisitReport::default()).unwrap();
+        for key in [
+            "batched_nodes",
+            "batched_children",
+            "batched_fallbacks",
+            "batched_field_multiplications",
+        ] {
+            assert!(
+                json.get(key).is_none(),
+                "{key} serialised under the default"
+            );
         }
     }
 }

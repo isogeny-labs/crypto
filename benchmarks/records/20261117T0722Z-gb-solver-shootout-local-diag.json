@@ -1,0 +1,156 @@
+{
+  "branch": "claude/fastest-grobner-base-algorithm-u74ipw",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "research/groebner_solver_shootout_20261116/run_local.py",
+        "run",
+        "--out",
+        "research/groebner_solver_shootout_20261116/run-local"
+      ],
+      "cwd": ".",
+      "exit": 1,
+      "started_utc": "2026-11-17T07:22:58+00:00",
+      "wall_s": 0.054
+    },
+    {
+      "argv": [
+        "python3",
+        "research/groebner_solver_shootout_20261116/run_local.py",
+        "run",
+        "--out",
+        "research/groebner_solver_shootout_20261116/run-local"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-17T07:23:34+00:00",
+      "wall_s": 3377.698
+    }
+  ],
+  "commit": "f8480787ec31523ec67885bfc1fc6d1a96027117",
+  "commit_dirty": false,
+  "created_utc": "2026-11-17T07:22:39+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v553-x86_64-with-glibc2.39"
+  },
+  "id": "20261117T0722Z-gb-solver-shootout-local-diag",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 160,
+      "name": "inherited_f4_cpu_s_per_relation",
+      "note": "local diagnostic, non-admitted, post-data; engine eb01341d3a; clock distance to matched rho 2^19.54",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.209,
+        1.329
+      ],
+      "unit": "cpu_s",
+      "value": 1.272
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 160,
+      "name": "msolve_f4_cpu_s_per_relation",
+      "note": "msolve 0.6.5 -g 2 -t 1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        163.5,
+        177.1
+      ],
+      "unit": "cpu_s",
+      "value": 170.9
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 160,
+      "name": "cms_xor_cpu_s_per_relation",
+      "note": "cryptominisat5 5.11.15 full enumeration",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        761.6,
+        834.0
+      ],
+      "unit": "cpu_s",
+      "value": 799.9
+    }
+  ],
+  "problem": "groebner:semaev-K17-m3-plain-l5-a1",
+  "raw": [
+    {
+      "bytes": 3183337,
+      "path": "research/groebner_solver_shootout_20261116/run-local/rows.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/7c/7c5c98f91cd6404f6308f06341731d60a23006d644f390eab06560877b2aedf1",
+      "sha256": "7c5c98f91cd6404f6308f06341731d60a23006d644f390eab06560877b2aedf1",
+      "uploaded": false
+    },
+    {
+      "bytes": 798481,
+      "path": "research/groebner_solver_shootout_20261116/run-local/cells.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/87/87d4b7a84b71c3f22167292f77f560d26c79419716e29c667b17af88f71b7f0f",
+      "sha256": "87d4b7a84b71c3f22167292f77f560d26c79419716e29c667b17af88f71b7f0f",
+      "uploaded": false
+    },
+    {
+      "bytes": 31398,
+      "path": "research/groebner_solver_shootout_20261116/run-local/driver.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6a/6afe59c732114920c13745b833339b1166d73bdd1de172bf6296efe3c203448e",
+      "sha256": "6afe59c732114920c13745b833339b1166d73bdd1de172bf6296efe3c203448e",
+      "uploaded": false
+    },
+    {
+      "bytes": 472,
+      "path": "research/groebner_solver_shootout_20261116/run-local/manifest.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/34/345aad7a747c991cfe2a8237fef83007e16ee569e24a0960123ce191b1d566c3",
+      "sha256": "345aad7a747c991cfe2a8237fef83007e16ee569e24a0960123ce191b1d566c3",
+      "uploaded": false
+    },
+    {
+      "bytes": 311,
+      "path": "research/groebner_solver_shootout_20261116/run-local/blinding_key.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/45/45f6ab97de60d181dbfc23227ac917379d5b86a97721f118cedcbc63a407e457",
+      "sha256": "45f6ab97de60d181dbfc23227ac917379d5b86a97721f118cedcbc63a407e457",
+      "uploaded": false
+    },
+    {
+      "bytes": 971,
+      "path": "research/groebner_solver_shootout_20261116/run-local.launch/driver_time.stderr",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/76/76862769c15a3c257b8ba9abfc6679f94c546fcabef48b773453f00604e72978",
+      "sha256": "76862769c15a3c257b8ba9abfc6679f94c546fcabef48b773453f00604e72978",
+      "uploaded": false
+    },
+    {
+      "bytes": 2115,
+      "path": "research/groebner_solver_shootout_20261116/run-local.launch/host.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0e/0e99c18b339f1f0e2712380d3b51e732310b503c7c17a6fe27a00eebb1cde1db",
+      "sha256": "0e99c18b339f1f0e2712380d3b51e732310b503c7c17a6fe27a00eebb1cde1db",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": null,
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "gb-solver-shootout-local-diag",
+  "status": "open",
+  "summary": "",
+  "validation": null
+}

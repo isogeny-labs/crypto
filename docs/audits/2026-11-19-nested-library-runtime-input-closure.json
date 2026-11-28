@@ -1,0 +1,70 @@
+{
+  "schema": "engineering.runtime-input-closure-repair/v1",
+  "claim_status": "pcc:unverified",
+  "baseline_commit": "c2c239ecdeb4b5f243ebc57e424d55d12b7aca51",
+  "censored_full_run": 44600638945,
+  "observed_failures": "Three completed cases stop on nested missing records; a separate replay-accounting mismatch remains unresolved",
+  "source_protocol": "Existing band compatibility and procedure-1 committed-verdict tests enumerate these original sessions; no protocol or expected answer changed",
+  "cold_cli_control": {
+    "schema": "engineering.exact-runtime-recovery-control/v1",
+    "original_index_entries_preserved": 630,
+    "new_git_blob_entries": 3,
+    "exact_bytes": 4999025,
+    "cold_actual_cli_result": "pass",
+    "empty_cache_at_start": true,
+    "aws_executable_absent": true,
+    "network_or_s3_reader_used": false,
+    "objects": [
+      {
+        "path": "research/ic_planner_validation_20261020/sessions/c24/records.jsonl",
+        "sha256": "75eb4c4f167d5fed1455e00e433897799adb3f246df590c2a1c34039c48c7993",
+        "bytes": 1628822,
+        "manifest_sha256": "3b3d0c43249f9db677d66482b631007fd8e733935c24bd3d9b2fc8112b5a8bb5",
+        "recovery_entry": null,
+        "cache_candidate_present": false,
+        "previous_cold_fixture_present": false,
+        "git_blob": "42ff8952706c8baa5756044e7d047a8f45686c91",
+        "original_commit": "3c13bc691a87fac0b42a81ccc8e5b547fcc3c144",
+        "exact_hash_and_length_verified": true,
+        "verified_original_copy": "/private/tmp/crypto-full-library-runtime-repair-20261119/nested-original-input-recovery/75eb4c4f167d5fed1455e00e433897799adb3f246df590c2a1c34039c48c7993"
+      },
+      {
+        "path": "research/ic_planner_validation_20261020/sessions/r26/records.jsonl",
+        "sha256": "c1bf99b615dbca981bc182f43a6600634466b39150c6fc899b8d753e91f4413a",
+        "bytes": 1690786,
+        "manifest_sha256": "37184e14245406dbe4aefcf1338092fcc487e61d8512f9f9a3a810773fd0e8c6",
+        "recovery_entry": null,
+        "cache_candidate_present": false,
+        "previous_cold_fixture_present": false,
+        "git_blob": "b90b2592381accc7b8e373d77094a03737feb20b",
+        "original_commit": "3c13bc691a87fac0b42a81ccc8e5b547fcc3c144",
+        "exact_hash_and_length_verified": true,
+        "verified_original_copy": "/private/tmp/crypto-full-library-runtime-repair-20261119/nested-original-input-recovery/c1bf99b615dbca981bc182f43a6600634466b39150c6fc899b8d753e91f4413a"
+      },
+      {
+        "path": "research/ecbench_bounds_challenges_20261006/sessions/koblitz-toy-reference-e1/records.jsonl",
+        "sha256": "e2c5f797f7d04fbe4cb74a662a2f6b54d77e0cb38ddb0b9bb149cfd7b7b0c080",
+        "bytes": 1679417,
+        "manifest_sha256": "1a82d12989f74b5ed3119417548213c3fc5153f9494a5bdd902e17de84bced74",
+        "recovery_entry": null,
+        "cache_candidate_present": false,
+        "previous_cold_fixture_present": false,
+        "git_blob": "ce3bbc2ccf47f48597a4a77ec9bdf9c970949c66",
+        "original_commit": "3c13bc691a87fac0b42a81ccc8e5b547fcc3c144",
+        "exact_hash_and_length_verified": true,
+        "verified_original_copy": "/private/tmp/crypto-full-library-runtime-repair-20261119/nested-original-input-recovery/e2c5f797f7d04fbe4cb74a662a2f6b54d77e0cb38ddb0b9bb149cfd7b7b0c080"
+      }
+    ],
+    "publication": "prepared only; workflow input closure still to update",
+    "frozen_manifests_changed": false
+  },
+  "runtime_original_paths_before": 12,
+  "runtime_original_paths_after": 15,
+  "existing_recovery_index_entries_preserved": 630,
+  "frozen_manifests_or_records_changed": false,
+  "step_deadline_minutes": 55,
+  "job_deadline_minutes": 90,
+  "full_test_command_and_ignored_policy_unchanged": true,
+  "full_suite_result": "not achieved; semantic replay mismatch and bounded runtime still need diagnosis",
+  "performance_measurement": "none"
+}

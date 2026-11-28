@@ -1,0 +1,14 @@
+digraph precision {
+  graph [rankdir=LR, bgcolor="white", pad="0.2", nodesep="0.35", ranksep="0.4"];
+  node [shape=box, style="rounded,filled", fillcolor="#edf2f7", fontname="Helvetica", fontsize=11];
+  edge [fontname="Helvetica", fontsize=10];
+  history [label="Actual call history\nP0, edges, shrink, scales\nformal binding open", fillcolor="#fff0d6"];
+  budget [label="Inherited budget\nP <= c s 2^A\nexplicit premise", fillcolor="#fff0d6"];
+  dimensions [label="Active dimensions\nroot + two absorption checks\nexplicit premises"];
+  scalar [label="Shared integer model\nu P_child <= 34 M D\nStd proof + 7 controls", fillcolor="#e0efe5"];
+  costs [label="Full counter cost\nallocation + entry + modes\naudit still open", fillcolor="#fff0d6"];
+  history -> budget;
+  budget -> scalar;
+  dimensions -> scalar;
+  scalar -> costs [label="one checked component"];
+}

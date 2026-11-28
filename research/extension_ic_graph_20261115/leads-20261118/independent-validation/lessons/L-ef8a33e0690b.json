@@ -1,0 +1,15 @@
+{
+  "action": "compute each rho walk's steps/sqrt(L) from the raw record against the generic expectation (sqrt(pi/2), or sqrt(pi/4) with negation) and compare configurations by per-step cost times expected steps; one walk is selection on noise",
+  "created": "2026-11-18T17:59:38Z",
+  "evidence": [
+    "research/extension_ic_graph_20261115/leads-20261118/independent-validation/results/run50.txt"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "research"
+  ],
+  "trigger": "a study names a rho configuration as its reference because it was the fastest observed",
+  "why": "Run50 and stage41 plain/b16 (seed 389) is the same 249,417,689-step walk at 0.387x expectation; per-step data favour negation/b16 in expectation (about 75.9 s against 95.2 s on the Run50 host, model-based)"
+}

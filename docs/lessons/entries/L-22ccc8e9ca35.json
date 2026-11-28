@@ -1,0 +1,14 @@
+{
+  "action": "space pushes so each migrate run finishes first (>=420 s here), or batch data into fewer pushes; a red migrate run with '! [rejected] ... (fetch first)' is a push race, superseded by the next head",
+  "created": "2026-11-16T02:19:35Z",
+  "evidence": [
+    "research/ecc2k130_followups_20261116/README.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "main-session"
+  ],
+  "trigger": "pushing checkpoints to a PR branch where the artifacts migrate bot rewrites data files",
+  "why": "four race failures on #4112 at <=60 s spacing; one on #4376 at 240 s spacing"
+}

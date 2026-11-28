@@ -1,0 +1,15 @@
+{
+  "action": "add a .gitignore in the validation directory with !*.jsonl and !*.log, re-ignore any data file over 64 KiB and commit a compact digest (flags plus sha256) instead; confirm with git add --dry-run",
+  "created": "2026-11-18T21:59:47Z",
+  "evidence": [
+    "research/genus4_prime_order_20261118/validation/.gitignore",
+    "research/genus4_prime_order_20261118/validation/out/prefilter_rust_flags.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "committing validator outputs under a study directory whose .gitignore ignores *.jsonl or *.log at every depth",
+  "why": "the study's *.jsonl rule would have silently dropped every replay row from the commit; h_irr.jsonl was 521 KB"
+}

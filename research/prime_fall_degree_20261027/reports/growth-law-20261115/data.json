@@ -1,0 +1,23 @@
+{
+  "schema": "pfd-growth-law-data/v1",
+  "note": "Recorded lower medians of the two random draws per cell; [pcc:unverified]. A string '>=k' is a one-sided bound (censored closure). Values exact where a closure lower bound meets the F4 upper bound (G2: d_F <= D).",
+  "prime": 2013265921,
+  "kummer_dF": {
+    "2": {"t": [1,2,3,4,5,6,7,8,9,10,11,12,13,14], "dF": [3,4,4,4,4,5,5,5,5,6,6,6,6,">=7"],
+          "source": "t1-11 RESULTS.md (pfd-a); t12 RESULTS_T12_BRACKET.md; t13 RESULTS_T13_BRACKET.md draw 1 + RESULTS_STAGE_B.md (Amendment 18 draw 0); t14 results/RPX cap-6 -m112 rows (cap 5 and cap 6 do not refute, both draws)"},
+    "3": {"t": [2,3,4,5,6], "dF": [5,6,6,7,">=7"], "source": "RESULTS_STAGE_B.md (pfd-b-rp)"},
+    "4": {"t": [2,3,4,5], "dF": [6,7,7,">=7"], "source": "RESULTS_STAGE_B.md; t4 exact from Amendment 19 M4-t4 closures; t5 from M4-t5 c=6 closures"},
+    "5": {"t": [2,3,4,5], "dF": [6,8,">=8",">=7"], "source": "RESULTS_STAGE_B.md (t3 exact: closure to c=7 without 1 and D=8)"},
+    "6": {"t": [2], "dF": [7], "source": "RESULTS_STAGE_B.md (closure >=7 and D=7)"}
+  },
+  "kummer_ffd": {"2": "3 at t=1, 4 for t>=2 (theorem D3)", "3": 4, "4": 4, "5": 4, "6": 4, "source": "RESULTS.md, RESULTS_STAGE_B.md: every Kummer cell"},
+  "null_dF": {
+    "3": {"t": [2,3,4,5,6], "dF": [5,6,6,7,">=7"]},
+    "4": {"t": [4,5], "dF": [7,">=7"]},
+    "source": "RESULTS_STAGE_B.md (B-m3-null; Amendment 19 M4N cells)"
+  },
+  "registered_laws": {
+    "C-step (Amendment 6, m=2)": "d_F = 4 + floor((t-2)/4) for t >= 2; predicts 6 at t=10..13 and 7 at t=14..17",
+    "Conjecture G (growth_law README, width W=2 = tower)": "d_F = ffd(W) + max(0, floor((t - s_W)/4)), s_2 = 2: identical to C-step for the tower"
+  }
+}

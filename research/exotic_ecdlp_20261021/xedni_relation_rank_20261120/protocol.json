@@ -1,0 +1,15 @@
+{
+  "schema": "xedni-relation-rank-protocol-v1",
+  "source": "../xedni_positive_shift_family_20261120/rows.jsonl.gz",
+  "source_sha256": "a51fcbfd8a7bd30e203527c84c4824de38f33dd1355fb79f34a04aaf7f3553b3",
+  "point_source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "curve": {"field_prime": 47, "a1": 0, "a2": 0, "a3": 0, "a4": 46, "a6": 45, "group_order": 43, "subgroup_order": 43},
+  "input_law": "all 264 verified rational relation rows, reduced at the fixed F47 model; no relation is selected by rank",
+  "factor_base": "all 42 nonidentity F47 points, folded into 21 sign orbits with lexicographically smaller affine coordinate pair as representative",
+  "relation_row": "P+2Q=0 over Z/43Z; sign-fold each point before accumulating coefficients",
+  "matrix": "264 ordered rows by 21 folded columns, modulus 43; retain duplicate, zero, and dependent rows in the audit",
+  "checks": "enumerate all F47 points, verify group order and every reduced P+2Q relation, hash raw and folded rows, compute modular rank and covered columns, independently replay in accepted Sage",
+  "expected_rows": 264,
+  "resource": "complete finite relation-rank diagnostic, no timing or speedup comparison",
+  "claim_boundary": "rank and column coverage for these 264 shifted rational curves only; new source point pairs or relation words define new rows"
+}

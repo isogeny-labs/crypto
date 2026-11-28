@@ -1,0 +1,14 @@
+s=vector(132);s[1]=2;s[2]=-1;
+for(j=2,131,s[j+1]=-s[j]-2*s[j-1]);
+P=divrem(x^262-s[132]*x^131+2^131,x^2+x+2);
+if(P[2]!=0,error("nonexact Weil quotient"));
+P=P[1];
+if(polcoef(P,130)%2!=1,error("A is not ordinary"));
+if(2^2+1+s[3]!=2,error("genus130 count"));
+print("A_N2=2; hyperelliptic_lower_bound=3; contradiction=pass");
+for(t=-2,2,b=vector(132); b[1]=2;b[2]=t;for(j=2,131,b[j+1]=t*b[j]-2*b[j-1]); print("t=",t,"; N2=",5+s[3]-b[3],"; N3=",9+s[4]-b[4],"; N131parity=",(2^131+1-130*s[132]-b[132])%2));
+Q=Mod(1,2)*(x^131+x^13+x^2+x+1);
+if(!polisirreducible(Q),error("fixture polynomial reducible"));
+print("fixture_Q_irreducible=pass");
+print("normalized_presentations=",2*(2^131-2)*(2^131-1)/131);
+quit;

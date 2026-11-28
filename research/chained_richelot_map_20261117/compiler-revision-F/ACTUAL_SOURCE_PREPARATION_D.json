@@ -1,0 +1,52 @@
+{
+  "time": "2026-11-17T07:48:56.916090+00:00",
+  "source_and_dependency_type_completion_only": true,
+  "full_original_method_prefix_checks": [
+    {
+      "compiled": "src/nonsplit.rs",
+      "literal_original_prefix_bytes": 13203,
+      "full_byte_equal": true
+    },
+    {
+      "compiled": "src/nonsplit_map.rs",
+      "literal_original_prefix_bytes": 21720,
+      "full_byte_equal": true
+    },
+    {
+      "compiled": "src/shifted.rs",
+      "literal_original_prefix_bytes": 20967,
+      "full_byte_equal": true
+    }
+  ],
+  "entire_Rust_difference": "--- immutable77d-Rust\n+++ isolated-D-Rust\n@@ -643,6 +643,8 @@\n const TARGET14: [u64; 7] = [16, 53, 24, 80, 73, 57, 1];\n const ROOTS14: [u64; 6] = [1008151, 720554, 352389, 357036, 975881, 738000];\n const PAIRING14: super::Pairing = [(0, 4), (1, 5), (2, 3)];\n+// Compile-time API binding: retain this import without constructing old fixtures.\n+const _: fn(u64, [u64; 3]) -> Result<Assessment> = construct_for;\n \n #[derive(Clone, Copy, Debug)]\n enum Mutation14 {\n@@ -710,7 +712,7 @@\n     }\n }\n \n-fn assert_model14(c: &Balanced, coefficients: &[u64]) {\n+fn assert_model14(c: &super::Balanced, coefficients: &[u64]) {\n     let expected = FpPoly::from_coeffs(\n         coefficients.iter().copied().map(BigUint::from).collect(),\n         BigUint::from(P14),\n",
+  "separately_awaited_static_checks": [
+    {
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustfmt",
+        "--check",
+        "--edition",
+        "2021",
+        "research/chained_richelot_map_20261117/compiler-revision-D/src/lib.rs"
+      ],
+      "exit": 0,
+      "complete_stdout": "",
+      "complete_stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "py_compile",
+        "research/chained_richelot_map_20261117/compiler-revision-D/run_first_unit_14_D.py"
+      ],
+      "exit": 0,
+      "complete_stdout": "",
+      "complete_stderr": ""
+    }
+  ],
+  "no_new_warning_suppression": true,
+  "no_scientific_arithmetic_has_run": true
+}

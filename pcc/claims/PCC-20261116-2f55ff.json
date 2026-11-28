@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T07:28:38Z",
+ "id": "PCC-20261116-2f55ff",
+ "kind": "statement",
+ "producer": {
+  "commit": "5ae1a82cc453102e63c828affda5b17faf65eabe",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/merged-empty-tree-runtime-branch-custody-01/actual-metadata-only-branch-custody.json",
+    "sha256": "1f738b42eaa2e3d8d30bc82bd5e63a66dba8c3df5545ba097955471d585cad3c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/merged-empty-tree-runtime-branch-custody-01/actual-switch.exit",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/merged-empty-tree-runtime-branch-custody-01/all-current-owned-working-files.json.xz",
+    "sha256": "260cf9f6dcbec9fa9787d40e38a8584634d13fd944f7d33d5a5a09ec58b186c8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/merged-empty-tree-runtime-branch-custody-01/entire-actual-Git-switch.log",
+    "sha256": "f62d6b262e104dea108f1a63d82186a76dfdb6b0950d99dd4b21596cab6c0603"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/merged-empty-tree-runtime-branch-custody-01/original-command.py",
+    "sha256": "84061dcd2c824758a088d775598267212b8c3779608fc028f8a6ce004acbcded"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Root genuine merged5ae1 has exactly the same entire Git tree as prior genuine3dff. Actual normal new-branch switch from3dff to5ae1 succeeds without modifying any staged/source tree or selected current owned working file; complete per-file working copies/index before/after and all selected SHA/size records retained. Uses new owned research/chained-transfer-runtime-progress-20261116; never resurrects deleted merged4401 head. Earlier8483-key scientific/raw guard270903 stays unchanged and is not rerun or replaced. No merge/rechain/force/data deletion or scientific execution. This metadata-only current source is the parent for the next ordinary checkpoint."
+}

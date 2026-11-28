@@ -1,0 +1,49 @@
+name: Prime31 APS vs batched negation rho cold baseline (Rust)
+
+on:
+  push:
+    branches: [research/prime31-aps-walk-source-20261116]
+    paths:
+      - research/prime31_ic_20261115/native/**
+      - .github/workflows/prime31-neg-rho-cold-20261116.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rho-prime31:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Compile and test existing Rust APS plus optimized negation rho
+        timeout-minutes: 4
+        run: cargo +1.100.0 test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation
+      - name: Full cold 24 Q APS vs optimized negation rho with repeat
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --rho-cold-match
+      - name: Prospective fresh 24 Q negation rho long-cycle escape and APS control
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --rho-watchdog-match
+
+      - name: Prospective fresh 24 Q APS versus unfolded rho (correct signed x-collisions)
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --rho-unfolded-match
+
+      - name: Preregistered 24 Q APS versus 16/32/64 jump unfolded rho
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --rho-jump-width-24q
+
+      - name: Prospective 48 Q same-host APS versus folded and unfolded rho
+        timeout-minutes: 6
+        run: cargo +1.100.0 run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_aps_one_relation -- --rho-fold-sensitivity-48q

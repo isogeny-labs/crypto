@@ -1,0 +1,34 @@
+digraph H116FormalScalarJet {
+  graph [rankdir=LR, bgcolor="white", pad="0.2", nodesep="0.35", ranksep="0.55",
+         label="H116 formal-scalar jet · excluded p=31, r=37 control · 2026-11-18",
+         labelloc=t, fontsize=18, fontname="DejaVu Sans"];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11,
+        color="#475569", fillcolor="#f8fafc", margin="0.12,0.08"];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#64748b"];
+
+  public [label="candidate input\n(p,A,B,t)=(31,1,19,-5)", fillcolor="#dbeafe"];
+  log [label="formal curve series\nq and logarithm L(z)"];
+  scalar [label="solve L([a](z))=aL(z)\na=t-1=25"];
+  scale [label="normalize target\n(A~,B~)=(a^4 A,a^6 B)"];
+  jet [label="re-expand x~([a](z)/a)/x(z)\nin w=1/x", fillcolor="#dcfce7"];
+  prefix [label="11-coefficient prefix\n[1,0,20,0,13,7,2,4,8,14,5]", fillcolor="#bbf7d0"];
+
+  public -> log -> scalar -> scale -> jet -> prefix;
+
+  full [label="full degree-37 Velu map\nloaded after candidate", fillcolor="#fef3c7"];
+  recurrence [label="Bostan recurrence\n9 coefficients", fillcolor="#fef3c7"];
+  identity [label="independent first-order\nidentity replay", fillcolor="#fef3c7"];
+  prefix -> full [label="equal 0..10", dir=both, color="#16a34a"];
+  prefix -> recurrence [label="equal 0..8", dir=both, color="#16a34a"];
+  prefix -> identity [label="zero residual 0..9", color="#16a34a"];
+
+  cutoff [label="Lean: X^(p-1)=0 below 22\nfor prime p>19\n64 theorems · 0 trusted", fillcolor="#ede9fe"];
+  boundary [label="synthetic boundary controls\np=23 first difference w^11\np=19 first difference w^9", fillcolor="#ede9fe"];
+  cutoff -> boundary [color="#7c3aed"];
+  boundary -> jet [style=dashed, label="precision prediction", color="#7c3aed"];
+
+  semantic [label="OPEN semantic bridge\nV+pi=[t], pi(z)=z^p,\nformal subtraction, x-pole transfer",
+            fillcolor="#fee2e2", color="#dc2626"];
+  semantic -> cutoff [style=dashed, label="must instantiate", color="#dc2626"];
+  semantic -> jet [style=dashed, label="must justify", color="#dc2626"];
+}

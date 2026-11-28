@@ -1,0 +1,13 @@
+{
+  "schema": "xedni-selected-c2-rank-effort-protocol-v1",
+  "reason": "C2 Simon two-descent returned (3,3), while default proof-enabled PARI returned (2,3) and proof-enabled mwrank_lib timed out at 90 seconds.",
+  "fixtures_sha256": "7df5e375792c2c9cd0368ffd878e47ef268078bc14b42b6d1384fddf9cf3f0b7",
+  "rank_proof_result_sha256": "9fa02ac56dc9a246ea4ce8e7558bbabc3c48ebfa94663814758eb4e90ffa4391",
+  "source_sha256": {
+    "rank_c2_pari_effort_sage.py": "63a6576fe7cfb89a1bd50bd9235cdd1854416cee303ed2509ade727686d2e823",
+    "run_c2_pari_effort.py": "f183dca28303935f74cce6c978844015bbf3778cc737a1de0113d789338af052"
+  },
+  "arm": "C2 only, Sage rank(use_database=False, proof=True, algorithm='pari', only_use_mwrank=True, pari_effort=3)",
+  "timeout_seconds": 90,
+  "status_rule": "Keep a complete rank or the timeout/error row; do not replace earlier intervals"
+}

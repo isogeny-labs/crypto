@@ -1,0 +1,64 @@
+import StoredLoop
+set_option autoImplicit false
+namespace QuotientStorage
+open Polynomial CoefficientTraversal TraversalPolynomial ScaleTrim MonicRemainder NativeDivision
+
+def finish {n:Nat} (xs:State n) : List UInt64 := trimFuel xs.val.toList.length xs.val.toList
+
+theorem finish_decode {n:Nat} (p:UInt64) [Fact p.toNat.Prime] (xs:State n) :
+ wordsPoly p (finish xs)=decodedPoly p xs := by rw [finish,trim_preserves,wordsPoly_array]
+
+theorem finish_good {n:Nat} (p:UInt64) (xs:State n) (hg:Good p xs) : Canon p (finish xs) :=
+ trim_good p _ _ (list_good p _ hg)
+
+def wordDiv (p:UInt64) (b a:List UInt64) (fuel:Nat) : Option (List UInt64×List UInt64) :=
+ if b.getLast?=some 1 then
+ (wloop p b fuel (ProductPolynomial.zeros (a.length-b.length+1)) (trimFuel a.length a)).map
+ (fun z=>(finish z.1,z.2))
+ else none
+
+theorem word_projection (p:UInt64) [Fact p.toNat.Prime] (b a:List UInt64)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b) (ha:Canon p a)
+ (fuel:Nat) : (wordDiv p b a fuel).map (fun z=>(wordsPoly p z.1,z.2))=checkedDiv p b a fuel := by
+ unfold wordDiv checkedDiv
+ split_ifs with hm
+ · rw [Option.map_map]
+   have h:=loop_refines p b hp hb hbs hm a.length fuel
+    (ProductPolynomial.zeros (a.length-b.length+1)) (trimFuel a.length a)
+    (trim_good p _ a ha) (trim_length _ _) (by omega)
+   simpa only [Function.comp_def,finish_decode,ProductPolynomial.zeros_polynomial] using h
+ · rfl
+
+theorem word_good (p:UInt64) [Fact p.toNat.Prime] (b a:List UInt64)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b) (ha:Canon p a)
+ (fuel:Nat) (q out:List UInt64) (ho:wordDiv p b a fuel=some (q,out)) : Canon p q ∧ Canon p out := by
+ unfold wordDiv at ho
+ split_ifs at ho with hm
+ cases he:wloop p b fuel (ProductPolynomial.zeros (a.length-b.length+1)) (trimFuel a.length a) with
+ | none => simp [he] at ho
+ | some z =>
+   rw [he] at ho
+   have hz:(finish z.1,z.2)=(q,out):=Option.some.inj ho
+   have hg:=loop_good p b hp hb hbs fuel _ z.1 _ z.2 (ProductPolynomial.zeros_good p _ hp) (trim_good p _ a ha) he
+   have hq:finish z.1=q:=congrArg Prod.fst hz
+   have hr:z.2=out:=congrArg Prod.snd hz
+   exact ⟨hq ▸ finish_good p z.1 hg.1,hr ▸ hg.2⟩
+
+theorem word_exact (p:UInt64) [Fact p.toNat.Prime] (b a:List UInt64)
+ (hp:0<p.toNat) (hb:p.toNat<2^31) (hbs:Canon p b) (ha:Canon p a)
+ (hm:b.getLast?=some 1) (fuel:Nat) (hf:a.length≤fuel) (wanted:(ZMod p.toNat)[X])
+ (hw:wordsPoly p a=wanted*wordsPoly p b) :
+ ∃q,wordDiv p b a fuel=some (q,[]) ∧ Canon p q ∧ wordsPoly p q=wanted := by
+ have hx:=returns_given_exact p b a hp hb hbs ha hm fuel hf wanted hw
+ have hproj:=word_projection p b a hp hb hbs ha fuel
+ rw [hx] at hproj
+ cases he:wordDiv p b a fuel with
+ | none => simp [he] at hproj
+ | some z =>
+   rw [he] at hproj
+   have hz:(wordsPoly p z.1,z.2)=(wanted,[]):=Option.some.inj hproj
+   have hq:=congrArg Prod.fst hz
+   have hr:z.2=[]:=congrArg Prod.snd hz
+   refine ⟨z.1,?_,(word_good p b a hp hb hbs ha fuel z.1 z.2 he).1,hq⟩
+   exact congrArg some (Prod.ext rfl hr)
+end QuotientStorage

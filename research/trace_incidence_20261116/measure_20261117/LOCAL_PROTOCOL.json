@@ -1,0 +1,25 @@
+{
+  "schema":"trace-local-measurement-amendment/v1",
+  "id":"trace-accelerated-local-20261117-a1",
+  "status":"prepared, not executed; explicit local-backend and S3-exception authorization pending",
+  "parent_protocol":"../accelerated/PROTOCOL.json",
+  "candidate_source_revision":"f1549fc821220641406b51a60324ef4ec81ab69b",
+  "changes":{
+    "host":"Current managed workspace CPU instead of inaccessible Runpod; shared host, one permitted CPU, one measured process at a time; no L2 claim",
+    "build":"Reuse exact previously qualified immutable native binaries; hash/record dependencies and recheck correctness before measurement. No fresh-build claim.",
+    "rho":"Reuse source-built sealed Runpod rho binary a22eea11abeb41aea88a60f99860a5f9d6ba2dd5f367e6b6e66001c0ef6d09e8 from c0176f942c03a549a98cb680b816e864b8820333; same adapter/prime_fast/residual source hashes as candidate source; record distinct binary provenance",
+    "custody":"If user explicitly authorizes exception, use a checked-in source/protocol plus local checkpoint and retain all raw files locally until approved S3 access returns; never claim successful S3 admission"
+  },
+  "unchanged":{
+    "B":[8,16,32,64,128],"public_targets":60,"relation_density":"r approximately 8 B^3",
+    "arms":"All eleven parent arms plus the registered rho reference; no arm selected using measurements",
+    "attempts_maximum":4,"attempt_seed":"public_seed + attempt*2654435761",
+    "stopping":"First informative relation, preceding misses charged, four misses censored, execution errors retained",
+    "warmup_rounds":1,"measured_rounds":5,
+    "complete_cost":"Public parsing/validation, per-target tables, actual labels and rejected draws, polynomial/index/Bloom preprocessing, norm/support computation, recovery and original-curve scalar check; peak RSS/process overhead separately retained",
+    "analysis":"Existing native descriptive analyzer; complete-support coefficient and generation-accounting equality; per-target paired ratios; no fitted exponent, fastest-tool claim, signed validation or leaderboard promotion"
+  },
+  "local_limits":{"wall_seconds":1200,"row_seconds":45,"threads":1,"new_paid_resources":0},
+  "expected_outputs":["source-and-binary hashes","host/dependency/cgroup metadata","raw rows including warmups/misses/failures","process RSS/time records","native summary","readable table and plots"],
+  "launch_gate":"Successful normal S3 checkpoint OR explicit user authorization recorded in AUTHORIZATION.json for both local execution and temporary local-only checkpoint/raw custody"
+}

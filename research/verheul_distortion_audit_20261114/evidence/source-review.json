@@ -1,0 +1,102 @@
+{
+  "schema": "verheul-distortion-source-review/v1",
+  "doi": "10.1007/s00145-004-0313-x",
+  "citation": "E.R.Verheul, Journal of Cryptology17(2004),277-296",
+  "primary": [
+    {
+      "version": "verheul2004-publisher.pdf",
+      "url": "https://link.springer.com/content/pdf/10.1007/s00145-004-0313-x.pdf",
+      "bytes": 444741,
+      "sha256": "83f55f4885fc31d8a2b05b1f0fbbf1be71b25ec23516feb59dbfc44224a14da0",
+      "pages": 20
+    },
+    {
+      "version": "verheul2004-author.pdf",
+      "url": "https://www.cs.ru.nl/E.Verheul/papers/Joc2004/joc2004.pdf",
+      "bytes": 244822,
+      "sha256": "28dffc313acf509d88d7f3220b1d590251633939e06a7c33a16aa49030f42afe",
+      "pages": 21
+    }
+  ],
+  "read_scope": "Published global p,l>3 onp277; selected point independence/Weil definitions/Theorem2 onp281; §4.1classespp287-288; §4.2Theorem5/full proof/adjacent6-7and remarkspp288-291. Author counterpart cross-checked. No full-paper/full-book dependency read claim.",
+  "visual_inspection": [
+    {
+      "printed_page": 288,
+      "pdf_page": 12,
+      "png_bytes": 317932,
+      "png_sha256": "dd4f7d908daf11665071248bb55f29350929577cbaf06eeebdc46c9879c74576",
+      "full_visual_inspection": true
+    },
+    {
+      "printed_page": 289,
+      "pdf_page": 13,
+      "png_bytes": 389926,
+      "png_sha256": "7d17bad0e5960cdbfde423af4ab2a2665ad8a6d3e2d52247fee64dd751998df2",
+      "full_visual_inspection": true
+    }
+  ],
+  "literal_formula": {
+    "page": 288,
+    "curve": "y^2=x^3+a",
+    "conditions": "p=2 mod3,a!=0inFp,w inFp2 outsideFp,w^3=1",
+    "printed": "(x,y) -> (x,w*y)",
+    "corrected": "(x,y) -> (w*x,y)",
+    "scope": "Explicit formula disproved; underlying existence theorem5 notrefuted. p29/l5example satisfies global prime bounds. XTR-specific CTP conditions are not silently imposed on the distinct §4.1 LUC family."
+  },
+  "source_theorem5": "End_Kprime(E[l]) isomorphic toM2(Z/lZ), with E supersingular, P rational primeorderl coprimep, Kprime minimal fulltorsion extension/MOVdegree, globalp,l>3. Its proof invokes Tate modules/endomorphism theorem; no full formalization claimed.",
+  "corpus": {
+    "path": "docs/ecdlp-hardness-corpus/lit-transfer.json",
+    "bytes": 123574,
+    "sha256": "99f4686b3ecb6f845fb98fc5c2db45696968e9c302b47b5873919202ddca8b9f",
+    "node": {
+      "id": "THM-XT-VERHEUL-DISTORTION-EXISTS",
+      "label": "Verheul: distortion maps exist on supersingular curves",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "curve_family_restricted",
+      "statement": "If E is supersingular then for any point P in E(F_{q^k}) - {O} a distortion map exists; in particular for P in E(F_q)[r] with k > 1 there is an endomorphism psi (not defined over F_q) with t_r(P, psi(P)) != 1.",
+      "scope": "Supersingular curves; the 'Type 1' symmetric-pairing setting.",
+      "assumptions": [
+        "E supersingular",
+        "k > 1"
+      ],
+      "source_refs": [
+        "S-XT-VERHEUL-2004",
+        "S-GALBRAITH-MPKC-2018"
+      ],
+      "tags": [
+        "pairing",
+        "distortion-map",
+        "supersingular"
+      ],
+      "source_locations": [
+        "Verheul 2004, Thm. 5 (as cited in Galbraith 2018 Section 26.6.1, p. 588)"
+      ],
+      "evidence_class": "theorem"
+    },
+    "effect": "Node uses a Tate-value paraphrase, wider any-point wording and fewer explicit qualifications. Original point-independence/existence theorem is not replaced with an unproved Tate statement; no canonical node status promotion or general node disproof."
+  },
+  "formal_primary_sources": {
+    "mathlib_commit": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "files": [
+      "Mathlib/AlgebraicGeometry/EllipticCurve/Affine/Basic.lean",
+      "Mathlib/AlgebraicGeometry/EllipticCurve/Affine/Formula.lean",
+      "Mathlib/AlgebraicGeometry/EllipticCurve/Affine/Point.lean",
+      "Mathlib/Algebra/QuadraticAlgebra/Basic.lean",
+      "Mathlib/GroupTheory/OrderOfElement.lean"
+    ],
+    "read_scope": "Actual equations/nonsingularity/group addition/negation/basechange, raw slopes/addX/addY, exact primitive-root/quadratic-field criterion, finite cyclic subgroup membership and prime point orders. Existing F25Miller field/check strategy reviewed; no frozen custom dependency imported."
+  },
+  "method": "Generic y-scaling fails every actual curve point with nonzero ordinate for nontrivial cube root. Actual corrected x-scaling has equation/nonsingularity and raw slope/addition proofs, group map/bijection/period3. Actual F29/F841 via nonsplit quadratic algebra; actual point/code count30 gives source trace0, actual base and extensionP(4,6)order5, nonbaseprimitivecube root. Wrong output notoncurve/no point map with those coordinates. RepairedQorder5outsideactualcyclicP and every nonzero member distorted. Actual order3point fixed as negative control.",
+  "boundary": "Point-group automorphism, not formal scheme/isogeny/endomorphism-ring representation or canonical pairing calculation. Source trace predicate is verified, not general geometric supersingularity classification. General theorem5/Tate-module/odd-prime rank and Weil/Tate bridges remainopen.",
+  "kb": "MCP absent; status/two initial FR-backlog searches/theorem and two specific Verheul positive/negative searches/theorem127. Explicit primary/repo/Mathlib fallback.",
+  "search_scope": "Public primary exact-title/author/publisher routes and bounded formula/correction search; no absence of errata or novelty claimed. FR94newpublicprovider403; Theriault primary onlypartialprovider text/direct403, not promoted.",
+  "conductor": "Scoped check attempted before edits; executable unavailable127.",
+  "literal_printed_formula_refuted": true,
+  "general_source_existence_theorem_refuted": false,
+  "full_paper_read": false,
+  "canonical_corpus_promoted": false,
+  "novelty_claim": false,
+  "new_native_experiment": false,
+  "paid_compute_and_agent_upload": 0
+}

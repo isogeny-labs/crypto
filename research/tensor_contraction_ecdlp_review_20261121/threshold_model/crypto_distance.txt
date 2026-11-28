@@ -1,0 +1,8 @@
+# Distance to cryptographic sizes: coarse grid (x0 in {6,8,10}, zeta 2^-j, front 40); fine-grid checks at density 1: 413/384/323/148, density 4.26: 1.09e4/9.81e3/7.71e3/780
+# have = log2 of the target's own network edge bits; all other columns are log2 m* (log2 of the instance size at which the route starts to beat the target's best conventional attack)
+check: #3-SAT density 1        bar= 1.32e-01 have=  -   | Majd       428 (2 lev) | reread       387 | LemmaQ       328 (2 lev) | Q+rho1/2       150 (1 lev) | AppD    2e+10 | AppD-opt  1.6e+05 | floor     15.1 | poly   7.8   [1s]
+check: #3-SAT density 4.26     bar= 3.02e-02 have=  -   | Majd  1.23e+04 (7 lev) | reread  1.06e+04 | LemmaQ  8.65e+03 (7 lev) | Q+rho1/2       855 (4 lev) | AppD  3.7e+11 | AppD-opt  3.1e+06 | floor     66.2 | poly  12.1   [1s]
+general 3-SAT (reference)      bar= 3.20e-04 have=  -   | Majd  1.02e+08 (20 lev) | reread  1.03e+08 | LemmaQ  7.57e+07 (20 lev) | Q+rho1/2  7.71e+04 (10 lev) | AppD  3.3e+15 | AppD-opt  2.8e+10 | floor 6.25e+03 | poly  25.2   [2s]
+Ring-LWE-1024 binary secret    bar= 1.13e-04 have= 20.1 | Majd  8.16e+08 (23 lev) | reread  8.26e+08 | LemmaQ  7.32e+08 (23 lev) | Q+rho1/2  2.52e+05 (12 lev) | AppD  2.7e+16 | AppD-opt  2.2e+11 | floor 1.77e+04 | poly  28.2   [2s]
+AES-128 key recovery (CNF)     bar= 2.13e-05 have= 22.5 | Majd   3.3e+10 (28 lev) | reread  4.36e+10 | LemmaQ  2.34e+10 (28 lev) | Q+rho1/2  1.18e+06 (14 lev) | AppD  7.5e+17 | AppD-opt  6.3e+12 | floor 9.38e+04 | poly  33.0   [2s]
+ECDLP-256 (Bochum IC, m=4)     bar= 9.41e-07 have= 26.0 | Majd  2.86e+13 (37 lev) | reread  3.75e+13 | LemmaQ   1.9e+13 (37 lev) | Q+rho1/2  3.23e+07 (19 lev) | AppD  3.9e+20 | AppD-opt  3.2e+15 | floor 2.12e+06 | poly  42.0   [2s]

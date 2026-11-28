@@ -1,0 +1,26 @@
+[ephemeral 02:02:22] phase: booting
+[ephemeral 02:02:23] phase: setup
+[ephemeral 02:02:24] toolchain preset: rust (baked into the image: 2026-10-16T22:38:40Z)
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+[ephemeral 02:02:37] phase: fetching (8f2a08c8718025c1df7f1034224afd24dfb6a75c)
+[ephemeral 02:02:49] git cache: restored base 50585a361a35 (2978 MiB, 12 s)
+[ephemeral 02:03:41] git: fetched 0 MiB from origin on top of base 50585a361a35
+[ephemeral 02:03:41] source at 8f2a08c8718025c1df7f1034224afd24dfb6a75c (64 s)
+[ephemeral 02:03:43] phase: cache
+[ephemeral 02:03:51] cache: restored root-45223ac12cb2f0d1, 818 MiB target, 9 of 115356 files changed, 8 s
+[ephemeral 02:03:54] phase: running (bash research/koblitz_n83_factor_base_sweep_20261008/verification/k4096-native-phases-20261018/run_ephemeral_native.sh)
+Traceback (most recent call last):
+  File "<stdin>", line 17, in <module>
+  File "<stdin>", line 11, in check
+  File "/usr/lib64/python3.9/pathlib.py", line 1187, in read_bytes
+    with self.open(mode='rb') as f:
+  File "/usr/lib64/python3.9/pathlib.py", line 1180, in open
+    return io.open(self, mode, buffering, encoding, errors, newline,
+  File "/usr/lib64/python3.9/pathlib.py", line 1038, in _opener
+    return self._accessor.open(self, flags, mode)
+FileNotFoundError: [Errno 2] No such file or directory: '/work/out/k4096-native-phases/panel/probe-corpus.json'
+[ephemeral 02:05:45] command exited 1
+[ephemeral 02:05:45] phase: uploading
+[ephemeral 02:05:45] phase: failed (exit 1)
+[ephemeral 02:05:45] terminating
+[ephemeral 02:05:47] cache: up to date

@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T19:54:22Z",
+ "id": "PCC-20261118-2521f3",
+ "kind": "statement",
+ "producer": {
+  "commit": "04b361ff2f5efd09bf77899ecbb8e1df99fe068a",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/summary-final.json",
+    "sha256": "ec346e04c917f5f5df88a07ee3f26c439cfbba8084b89005e3ba7e5365f07b33"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/summary.json",
+    "sha256": "9af452a440bb980941f297676c1e6c77f27f652b5a62a6e8f87a2ec62a62c626"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/proof/primitive.json",
+    "sha256": "4f5fb496f7ed05668f3824a44cb028ecb16dba9f9398b0fc36630ded8ac04afc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/results/attempt-b/qualification.stdout",
+    "sha256": "aec0b32648e5dfd45454f1a4ab243c1f46528c905d467564fe9ca2f715373d13"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/pre-call.sha256",
+    "sha256": "ee2d72e0e62b494b3732a69cd30739ab56328dc896645e6a4630b9acb6a1f8c6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/prepared-norm-20261118/reuse-pre-call.sha256",
+    "sha256": "684e4de40f079bb0337cdedb11e7a742f1e9aaab6c221e194c0b199db078fb73"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "pcc/claims/PCC-20261118-ef4b3c.json",
+    "sha256": "81676780b8a229b13cd734e2acfa061b6e5a4b977b237eceae1ef7a39768e50b"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/prepared-norm-20261118",
+ "statement": "Additive correction to PCC-20261118-ef4b3c: the post-timeout process was already defunct (Z), not active computation; the earlier summary cleanup wording overinterpreted a process listing without state. The unnecessary kill did not change that state. Native results remain 768 direct-root/reuse evaluations, 384 collision and six modulus rejections; 21 pipeline replays/483 input evaluations/four fields/18 CLI rejections, with the recorded PARI oracle-reuse policy and native affine/7/64 metadata. No performance, target80 crossing or timing is established. Use summary-final.json for the corrected process interpretation."
+}

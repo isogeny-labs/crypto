@@ -1,0 +1,12 @@
+{
+  "schema":"trace-accelerated-prelaunch-amendment/v1",
+  "status":"pre-data source review correction; no accelerated paid allocation",
+  "reason":"The first bootstrap omits a workflow file named by the source manifest. The nested Cargo.lock also needs an explicit manifest entry despite repository ignore rules.",
+  "changes":["New bootstrap-v2 adds both source-checkpoint workflow paths to its sparse checkout","New job-v2 and launch-v2 use SOURCES_v2","New source-checkpoint-v2 checks the corrected closure","Standalone Cargo.lock is committed and explicitly hashed in v2"],
+  "retained":"Original launch/bootstrap/job/workflow/manifest and all scientific implementation/check evidence remain unchanged",
+  "unchanged":"Protocol target/seed/arm matrix, hypotheses, stop rules, resources, deadlines, one-allocation/no-retry limit and existing combined spending cap",
+  "active_launch":"launch-v2.sh",
+  "active_worker":"job-v2.sh",
+  "active_manifest":"SOURCES_v2.sha256",
+  "active_checkpoint_workflow":"trace-incidence-accelerated-checkpoint-v2.yml"
+}

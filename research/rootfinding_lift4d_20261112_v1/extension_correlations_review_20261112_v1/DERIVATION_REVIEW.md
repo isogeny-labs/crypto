@@ -1,0 +1,9 @@
+# Independent derivation review
+
+Each polynomial-basis field multiplication matrix acts on canonical Fp coordinate vectors. A scalar coordinate functional transports using the TRANSPOSE matrix. For fixed target coordinates, J=lambda·F-gamma·t-delta·u vanishes modulo p on every genuine source pair. Any exact interval enclosing all allowed feature images may exclude the target only if it contains no multiple of p. Python floor and exact ceiling must handle negative endpoints.
+
+The full independent canonical-coordinate box interval has width (p-1)*sum|coefficients|. Every nonzero functional interval contains p consecutive integers, hence a multiple of p; the zero functional is vacuous as well. With outputs fixed, actual feature-coordinate marginal bounds are sound but may lose correlations. The min/max over all nine correlated feature tuples is contained in the marginal interval. Exact discrete residues preserve more information than their interval hull. Necessary filters from several functionals can accept different source pairs, so their intersection is NOT automatically a complete solution criterion. A survivor solver must recover every actual ordered pair and compare the entire set to an independent oracle.
+
+All q² targets and all eight declared functionals are retained, including empty targets, x=y, characteristic three and collisions in the feature/output map. Enumerating the tiny source image or using a complete lookup table is a calibration oracle whose setup and replay costs must be charged. It is not a compact representation for hard domains or a scalable generalized solver. No elliptic chart, GF(2^83), novelty or qualified GB timing claim follows from this toy correctness test.
+
+This review supplies the mathematical admission basis only. Source, closure, caps and full reporting lifetime require separate static code review before freezing.

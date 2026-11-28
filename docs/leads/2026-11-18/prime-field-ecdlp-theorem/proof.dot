@@ -1,0 +1,13 @@
+digraph graded_parity_ecdlp {
+    graph [bgcolor="transparent", rankdir=LR, nodesep=0.25, ranksep=0.31, pad=0.10]
+    node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, margin="0.13,0.09", color="#9CAEBA", fillcolor="#F0F6F9", fontcolor="#18313F"]
+    edge [color="#597684", arrowsize=0.64]
+    parity [label="Graded crossing factors\nDeterministic parity counter"]
+    seed [label="Half-density hashes\nSingleton relation yield"]
+    relations [label="Ambient relations\nSigned witnesses and public columns"]
+    recovery [label="Integer row dependence\nOrder-free scalar recovery", fillcolor="#DEEFF0", color="#7FA9AA"]
+    parity -> relations
+    seed -> relations
+    relations -> recovery
+    {rank=same; parity; seed}
+}

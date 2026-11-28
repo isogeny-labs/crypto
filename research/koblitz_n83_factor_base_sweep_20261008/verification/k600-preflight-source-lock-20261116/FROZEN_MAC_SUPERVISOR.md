@@ -1,0 +1,7 @@
+# Host-native supervisor identity, frozen before K600 prepare
+
+The [source-linked build report](../../reports/run-20261116-k600-preflight/attempt-3-mac-supervisor-build/REPORT.md) and its raw receipts establish terminal build exit 0 at Rust 1.99.1. The one macOS ARM64 Mach-O executable has **SHA-256 `3ea86decaf897e800aa3f78c5b028c1505b71fe1637cbb858ad717907f0284c0` and 1,284,960 bytes**. The source code paths were byte-identical to Linux worker build commit `ba620214684e41def8bc6caddf2e782f43920218`; the local PR head changed only documentation during this build.
+
+For this host attempt, execute the binary at `/Volumes/SSD990-2/tmp/n83-colima-output/k600-preflight-mac-supervisor-build-20261116-attempt-2/target/release/examples/n83_k600_m6_native_preflight`. Recheck its SHA-256 and Mach-O arm64 header immediately before `prepare` and `run`. The worker remains the distinct Linux ARM64 ELF SHA-256 `d6aad2f3737eff25e2d3759e204b6714e83c58212017b39a650414c7b6ac269b`, and the runtime image remains `sha256:b84bd73914a2c76a7c8635ee4d40564d974f0fc7188b9e71f315726050bae2b3` with source revision label `ba620214684e41def8bc6caddf2e782f43920218`.
+
+The next `prepare` must use the clean `C` worktree and create only `LOCK.json`, then commit that lock as direct-child evidence `H`. The previous Linux-ELF host attempt and Rust path failure remain separate stopped runs; this success does not overwrite them. No search arm is authorized by this build alone.

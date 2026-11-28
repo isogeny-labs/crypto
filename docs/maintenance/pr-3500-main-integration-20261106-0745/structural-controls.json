@@ -1,0 +1,126 @@
+{
+  "schema": "maintenance.integration-controls/v1",
+  "base": "a37d5a48447e7ba5100c792c05358a10f1b9a615",
+  "head": "2a010ea6912864d640a2ae22bf56e59ed360f2e5",
+  "main": "a2e8fbc1d08f3369ddcd647311a4a6faf408b986",
+  "three_way_merge_exit": 0,
+  "all_other_workflow_bytes_and_jobs_exact_main": true,
+  "five_lane_job_exact_published_head": true,
+  "job_set_exact_main": true,
+  "groups": [
+    {
+      "lane": 0,
+      "shards": "4 15"
+    },
+    {
+      "lane": 1,
+      "shards": "1 13 10"
+    },
+    {
+      "lane": 2,
+      "shards": "14 9 5 7"
+    },
+    {
+      "lane": 3,
+      "shards": "8 12 6 0"
+    },
+    {
+      "lane": 4,
+      "shards": "2 11 3"
+    }
+  ],
+  "original_run_block_exact": true,
+  "job_timeout_minutes": 40,
+  "step_timeout_minutes": 30,
+  "controls": [
+    {
+      "failed_shard": null,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 0,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 1,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 2,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 3,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 4,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 5,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 6,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 7,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 8,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 9,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 10,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 11,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 12,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 13,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 14,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    },
+    {
+      "failed_shard": 15,
+      "all16calls_retained": true,
+      "only_owning_lane_fails": true
+    }
+  ],
+  "bash_syntax": "PASS",
+  "actionlint1.7.12_exit": 0,
+  "external_shellcheck_pyflakes_absent": true,
+  "scope": "Synthetic infrastructure routing controls only, fake auditor, no real local AWS/native/scientific run."
+}

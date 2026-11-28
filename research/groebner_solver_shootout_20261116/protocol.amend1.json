@@ -1,0 +1,944 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "GB-SOLVER-SHOOTOUT-20261116",
+  "version": 2,
+  "created": "2026-11-17",
+  "repository": "crypto",
+  "study_dir": "research/groebner_solver_shootout_20261116",
+  "authors": [
+    "Claude (Opus 5.5), workflow subagent",
+    "Claude (Opus 5.5), workflow subagent, amendment-1"
+  ],
+  "question": "LOCAL DIAGNOSTIC (amendment-1, non-admitted, never a leaderboard row): on Weil-descended m=3 Semaev decomposition systems for the Koblitz curve K1: y^2+xy=x^3+x^2+1 over GF(2^17) (#E = 2*65587, r = 65587), factor base = nonzero abscissae in V=<1,z,...,z^4> (l=5), how do msolve F4 (-g 2 + in-house root extraction), CryptoMiniSat 5 with native XOR in full-enumeration mode, and the repository's incumbent inherited-f4 engine (on the same Boolean system) compare in verified relations per CPU-second, judged against an exhaustive factor-base oracle, and how far is each arm's cost per relation from the matched repository Pollard rho on the same curve, with every arm priced across the §5a band?",
+  "claims": [
+    {
+      "id": "C-certified",
+      "class": "exact_computation",
+      "text": "Every relation counted for any arm is an abscissa multiset {x1,x2,x3} of nonzero factor-base abscissae such that some sign choice gives P1+P2+P3 = ±R, established by group re-addition on the curve (semaev.readdition semantics, memoised per (target, multiset)); a Boolean root that does not project to such a multiset is a spurious root, counted per arm and never a relation. The arm's verified relation set per target must equal the fb-enum oracle's set for that target.",
+      "decided_by": []
+    },
+    {
+      "id": "C-telemetry",
+      "class": "exact_computation",
+      "text": "Per target and arm: native work units (msolve: sum over F4 rounds of rows x cols from the -v 2 'mat' column, plus max step degree and largest matrix; CMS: propagations and conflicts from --verb 1 final statistics, plus Gauss-Jordan matrix activation lines; inherited-f4: SolverCost.ops word XORs and degree_reached), solver CPU (wait4 rusage of the solver child), solver-internal timer (msolve 'overall(cpu)', CMS 'Total time'), wall and peak memory (cgroup memory.peak, else VmHWM). Recorded observations of this run, not properties of the systems.",
+      "decided_by": []
+    },
+    {
+      "id": "C-solver-order",
+      "class": "comparative",
+      "text": "In the one cell, which of two available solver arms (all on the same Boolean system) uses less charged CPU per natural target (stratified), at Bonferroni-corrected significance and outside the A/A noise floor of both arms. Diagnostic tier only (local shared VM, no PMU, no L2).",
+      "decided_by": [
+        "C-msolve-cms",
+        "C-inh-msolve",
+        "C-inh-cms"
+      ]
+    },
+    {
+      "id": "C-vs-rho",
+      "class": "comparative",
+      "text": "Per available arm, cost per verified relation and the projected relation phase ((fb_abscissae + 10) = 24 relations; linear algebra, target generation, encoding and projection uncharged, so an IC lower bound) relative to the matched rho, reported as distance remaining (log2) at w = 0, 0.1, 1 GAE per unpriced native op on BOTH sides and at the same-host clock. Verdict vocabulary excludes 'below matched rho' (not every IC phase is priced); only 'above matched rho at every reading' or 'unresolved in band'.",
+      "decided_by": [
+        "C-rho-msolve",
+        "C-rho-cms",
+        "C-rho-inh"
+      ]
+    },
+    {
+      "id": "C-dreg",
+      "class": "heuristic_estimate",
+      "text": "Observed max F4 step degree (msolve) and degree_reached (inherited-f4) are compared descriptively with the Boolean semi-regular degree from the series (1+t)^v / prod_i (1+t^{d_i}) (field equations included; replaces dreg_forecast::semi_regular_degree_field, which is the no-field-equation series; red-team M9). No law is claimed.",
+      "decided_by": []
+    },
+    {
+      "id": "C-out",
+      "class": "out_of_scope",
+      "text": "Not established: any improvement over the IC baseline or any leaderboard/benchmarks-README row (local, non-admitted, no replay certificate, no VALIDATION.json); any timing beyond this container; any scaling in n; any statement for the symmetrised or symmetrised-e encodings (dropped, see amendment); Magma (UNAVAILABLE: not available to the owner); trace-f4/julia-f4-warm (UNAVAILABLE: Julia absent, download host proxy-blocked); msolve 0.11 SIMD build (not provisioned in this container); repo-boolean-f4 (dropped, red-team H1).",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "msolve-f4",
+      "role": "candidate",
+      "description": "msolve 0.6.5 (/usr/bin/msolve, sha256 pinned) `-g 2 -v 2 -t 1` on the plain chained-S3 encoding with field equations; ALL roots of the reduced DRL basis extracted in-house (certificate.basis_roots; extraction CPU charged to this arm as extract_cpu_s and reported separately; extraction limit overflow = censored, not unknown). msolve's own GF(2) solving output is never used. Native unit: F4 matrix cells = sum over rounds of rows x cols ('mat' column of -v 2).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "python3",
+            "research/groebner_solver_shootout_20261116/run_amend1.py",
+            "--protocol",
+            "research/groebner_solver_shootout_20261116/protocol.amend1.json"
+          ]
+        ],
+        "binary_sha256": "c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa",
+        "threads": 1
+      },
+      "parameters": {
+        "pipeline": "msolve-f4",
+        "flags": [
+          "-g",
+          "2",
+          "-v",
+          "2",
+          "-t",
+          "1"
+        ],
+        "mode": "cold",
+        "task": "enumerate",
+        "native_unit": "F4 matrix cells (sum rows*cols over rounds)"
+      }
+    },
+    {
+      "id": "msolve-f4-aa",
+      "role": "control_aa",
+      "description": "A/A: the identical msolve-f4 call on the identical target, pass B (reversed within-target arm order, run immediately after pass A on the same worker).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "python3",
+            "research/groebner_solver_shootout_20261116/run_amend1.py",
+            "--protocol",
+            "research/groebner_solver_shootout_20261116/protocol.amend1.json"
+          ]
+        ],
+        "binary_sha256": "c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa",
+        "threads": 1
+      },
+      "same_instrument_as": "msolve-f4",
+      "parameters": {
+        "pipeline": "msolve-f4",
+        "aa_of": "msolve-f4",
+        "pass": "B"
+      }
+    },
+    {
+      "id": "cms-xor",
+      "role": "candidate",
+      "description": "CryptoMiniSat 5.11.15 (/usr/bin/cryptominisat5, sha256 pinned) on the extended-DIMACS encoding of the SAME Boolean system (Tseitin AND per nonlinear monomial, native XOR rows), `--threads 1 --random 0 --verb 1 --maxsol 1000000` = full enumeration until UNSAT (C1); default Gauss-Jordan options (--maxmatrixrows 2000 --maxmatrixcols 1000 --autodisablegauss 1) kept and every call's '[matrix] Good matrix' / 'Using N matrices' lines recorded (M5); a call with 0 matrices is flagged, not re-run. Every call charged. Native unit: propagations (conflicts recorded beside).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "python3",
+            "research/groebner_solver_shootout_20261116/run_amend1.py",
+            "--protocol",
+            "research/groebner_solver_shootout_20261116/protocol.amend1.json"
+          ]
+        ],
+        "binary_sha256": "00db7e59c634842acbfc6676bf0f5d30a3fdabbd0ec2fa17b20bb0bf683c7207",
+        "threads": 1
+      },
+      "parameters": {
+        "pipeline": "cms-xor",
+        "max_solutions": 1000000,
+        "random_seed": 0,
+        "mode": "cold",
+        "task": "enumerate",
+        "native_unit": "propagations"
+      }
+    },
+    {
+      "id": "cms-xor-aa",
+      "role": "control_aa",
+      "description": "A/A: the identical cms-xor call (same seed 0) on the identical target in pass B. Measures the clock noise floor of a deterministic enumeration, not seed sensitivity.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "python3",
+            "research/groebner_solver_shootout_20261116/run_amend1.py",
+            "--protocol",
+            "research/groebner_solver_shootout_20261116/protocol.amend1.json"
+          ]
+        ],
+        "binary_sha256": "00db7e59c634842acbfc6676bf0f5d30a3fdabbd0ec2fa17b20bb0bf683c7207",
+        "threads": 1
+      },
+      "same_instrument_as": "cms-xor",
+      "parameters": {
+        "pipeline": "cms-xor",
+        "aa_of": "cms-xor",
+        "pass": "B"
+      }
+    },
+    {
+      "id": "inherited-f4",
+      "role": "baseline",
+      "description": "Incumbent (red-team H1): the repository's inherited-f4 SystemSolver (ic_framework::solvers::HybridF4, kind InheritedF4; the Koblitz decomposition oracle's engine, incumbent of research/m4gb_descent_ladder_20261110) on the SAME plain chained-S3 Boolean system as the other arms, no re-encoding, through examples/gc_native_solve.rs (op 'solve', engine defaults max_degree 3, split auto, node_budget 4096) and groebner_compare/native_worker.py (prerequisite PA-3). Every returned root goes through the same re-addition projection. A run that hits the node budget is 'unknown' and is classified censored (charged at its CPU, flagged), never 'no root'. Native unit: word XORs (SolverCost.ops). AVAILABILITY-GATED on PA-1 (the crate builds) and PA-3; recorded UNAVAILABLE with its reason if either fails, never substituted.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "gc_native_solve"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "parameters": {
+        "pipeline": "inherited-f4",
+        "engine": "inherited-f4",
+        "params": {
+          "max_degree": 3,
+          "split": "auto",
+          "node_budget": 4096
+        },
+        "encoding": "same plain chained-S3 system",
+        "task": "enumerate",
+        "native_unit": "word XORs"
+      }
+    },
+    {
+      "id": "inherited-f4-aa",
+      "role": "control_aa",
+      "description": "A/A: the identical inherited-f4 call on the identical target in pass B.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "gc_native_solve"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "same_instrument_as": "inherited-f4",
+      "parameters": {
+        "pipeline": "inherited-f4",
+        "aa_of": "inherited-f4",
+        "pass": "B"
+      }
+    },
+    {
+      "id": "fb-enum-oracle",
+      "role": "reference",
+      "description": "Ground truth (C1): exhaustive enumeration of every 3-multiset (repetition allowed) of the 14 factor-base abscissae with every sign pattern by group addition, building the table x_R -> set of decomposing multisets for the whole cell once (prerequisite P2). Defines oracle_count and the oracle relation set of every target. Also reported as a descriptive row (H1: 'rank fb-enum as a row'): table-build CPU and group additions, amortised per relation found in the table; not part of the decisive family because it answers all targets at once.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "python3",
+            "research/groebner_solver_shootout_20261116/run_amend1.py",
+            "--protocol",
+            "research/groebner_solver_shootout_20261116/protocol.amend1.json"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "parameters": {
+        "unit": "group additions (counted)"
+      }
+    },
+    {
+      "id": "rho-matched",
+      "role": "reference",
+      "description": "Matched rho (C2): the repository's signed-Frobenius rho (koblitz_index_calculus::koblitz_signed_frobenius_rho_with_progress, step-identical to koblitz_signed_frobenius_rho_reference) on KoblitzCurve::new(1,17) (r = 65587), 1000 random subgroup DLPs from the protocol seed rule, run locally in this container; reports expected steps rho_expected_steps(65587,17) = sqrt(pi r/2)/sqrt(2n) = 55.05, measured mean walk group additions, every unpriced per-step counter (partition hashes, canonicalisations) and CPU per DLP; plus t_GA = same-process CPU seconds per FastCurve group addition (best of 7 batches of 10^6). Prerequisite PA-2. AVAILABILITY-GATED on PA-1.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--example",
+            "<PA-2 rho/t_GA adapter>"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "parameters": {
+        "dlps": 1000,
+        "r": 65587,
+        "n": 17,
+        "a": 1,
+        "expected_steps": 55.046
+      }
+    },
+    {
+      "id": "planted-positive",
+      "role": "control_positive",
+      "description": "5 planted targets (semaev.generate, m=3 FB points with distinct abscissae, x_R outside V) run first through every available arm in both passes. Every complete arm must return the planted multiset among its verified relations (5/5).",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "python3",
+            "research/groebner_solver_shootout_20261116/run_amend1.py",
+            "--protocol",
+            "research/groebner_solver_shootout_20261116/protocol.amend1.json"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "parameters": {
+        "population": "planted",
+        "per_cell": 5
+      }
+    },
+    {
+      "id": "oracle-empty-negative",
+      "role": "control_negative",
+      "description": "The UNSAT stratum (oracle_count = 0 natural targets, 80) plus 2 tampered witnesses per arm (one bit of a returned root flipped at a protocol-hash-derived index; the projection must reject it or map it to a different multiset that the oracle rejects). Any verified relation on an oracle-empty target or an accepted tampered witness invalidates the arm.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "python3",
+            "research/groebner_solver_shootout_20261116/run_amend1.py",
+            "--protocol",
+            "research/groebner_solver_shootout_20261116/protocol.amend1.json"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      },
+      "parameters": {
+        "population": "natural-unsat stratum + tamper"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-msolve-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "planted-positive",
+      "expected_detection": "Each available complete arm returns the planted abscissa multiset as a re-addition-verified relation on 5/5 planted targets in both passes. A miss that is not censored invalidates the arm (instrument fault), reported, never dropped.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "oracle-empty-negative",
+      "null_population": {
+        "description": "Natural targets (uniform liftable x_R outside V with random sign) for which the exhaustive fb-enum oracle finds no decomposition, plus tampered witnesses.",
+        "generator": "natural-target stream (randomization.instance_sampling) filtered by the oracle into the UNSAT stratum; tamper as in the arm description",
+        "n": 80,
+        "why_n": "80 UNSAT-stratum targets are both the negative control and the UNSAT stratum of the stratified estimator; specificity is zero-tolerance, so every one is used.",
+        "matched_on": [
+          "curve",
+          "field modulus",
+          "factor base",
+          "encoding",
+          "natural-target distribution",
+          "per-call caps"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "pipeline",
+        "levels": [
+          "msolve-f4",
+          "cms-xor",
+          "inherited-f4",
+          "rho-matched"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "cell",
+        "treatment": "fixed",
+        "value": "K17-m3-plain-l5-a1",
+        "how": "One cell only (fewer cells, more targets). cell K17-m3-plain-l5-a1: m=3, variant plain (chained S3: S3(X1,X2,U1), S3(U1,X3,x_R)), n=17, l=5, a=1, b=1, modulus z^17+z^3+1 (131081, semaev.irreducible(17)), nvars 32 (15 X + 17 U), fb_abscissae 14 (nonzero x in V that lift), #E 131174 = 2*65587 (semaev.Curve.order, exhaustive trace count), r 65587 (prime), h 2, KoblitzCurve::new(1,17) precondition r>h and r^2 !| #E holds; oracle stratum weights over the 65572 liftable abscissae outside V: 1757 with >=1 decomposition (p_sat = 0.026795), mean 1.04 decompositions given >=1 (fb-enum over all 3-multisets with repetition and every sign; dev computation 2026-11-17, recomputed by P2 at run time and must match)"
+      },
+      {
+        "name": "target",
+        "treatment": "randomized",
+        "value": "80 SAT-stratum + 80 UNSAT-stratum natural targets + 5 planted + 1 warm-up",
+        "how": "Same target bytes (x_R, sign) for every arm; seeds from the amendment seed rule, independent of arm."
+      },
+      {
+        "name": "stratum",
+        "treatment": "measured",
+        "value": [
+          "sat",
+          "unsat"
+        ],
+        "how": "Oracle label of each natural target; the estimator reweights by the exact oracle weight p_sat."
+      },
+      {
+        "name": "pass",
+        "treatment": "crossed",
+        "value": [
+          "A",
+          "B"
+        ],
+        "how": "Every target is run twice by every arm on the same worker: pass A in its Williams sequence, pass B immediately after in the reversed sequence. Pass B rows are the A/A arms."
+      },
+      {
+        "name": "order_position",
+        "treatment": "crossed",
+        "value": "Williams design for 3 pipelines (all 6 sequences, each used 26 or 27 times over the 160 natural targets by a hash-shuffled round robin)",
+        "how": "Order-effect check: mean log2 CPU by (arm, position) reported; red-team M2."
+      },
+      {
+        "name": "concurrency",
+        "treatment": "fixed",
+        "value": "3 single-threaded workers on 4 vCPU (one vCPU left for the driver/oracle)",
+        "how": "Each worker owns whole targets (pass A then B); co-tenancy and PSI recorded per call."
+      },
+      {
+        "name": "instrument_versions",
+        "treatment": "fixed",
+        "value": {
+          "msolve": "0.6.5 sha256 c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa",
+          "cryptominisat5": "5.11.15 sha256 00db7e59c634842acbfc6676bf0f5d30a3fdabbd0ec2fa17b20bb0bf683c7207",
+          "harness": {
+            "groebner_compare/semaev.py": "d71ab7c999ad5128635032a74ea85ce023ea2e56d78ffcf3e97582b4aae9756b",
+            "groebner_compare/external_worker.py": "556267555fcb075b8ab050672403700ba6ce653d35214c318b9671f4e2b83e75",
+            "groebner_compare/semaev_verifier.py": "e2d137a6af26a7df185fbc795e01e4958e31a36646e8261a3a457748ec795521",
+            "groebner_compare/runner.py": "9dd66b115830dfeca3cd23e1024c48d6e849f9096b469d7e148acbf6d89aa299",
+            "groebner_compare/certificate.py": "27a41eee36da407b596f9da0642dbe9e09e8ae87dbb7361280127eb62760c862"
+          },
+          "ldd_closure": "sha256 of every shared library in `ldd` of both binaries recorded at run start (red-team L1)"
+        },
+        "how": "Hashes re-checked at run start and end; mismatch invalidates."
+      },
+      {
+        "name": "host",
+        "treatment": "fixed",
+        "value": "this container: Intel Xeon @ 2.10GHz class, 4 vCPU shared VM, 15 GiB, no PMU",
+        "how": "cpu model, kernel, cgroup limits, load and PSI recorded; local diagnostic tier, never admitted."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-msolve-cms",
+        "arms": [
+          "msolve-f4",
+          "cms-xor"
+        ],
+        "differs_in": [
+          "pipeline"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-inh-msolve",
+        "arms": [
+          "inherited-f4",
+          "msolve-f4"
+        ],
+        "differs_in": [
+          "pipeline"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-inh-cms",
+        "arms": [
+          "inherited-f4",
+          "cms-xor"
+        ],
+        "differs_in": [
+          "pipeline"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-msolve-aa",
+        "arms": [
+          "msolve-f4",
+          "msolve-f4-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-cms-aa",
+        "arms": [
+          "cms-xor",
+          "cms-xor-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-inh-aa",
+        "arms": [
+          "inherited-f4",
+          "inherited-f4-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-rho-msolve",
+        "arms": [
+          "msolve-f4",
+          "rho-matched"
+        ],
+        "differs_in": [
+          "pipeline"
+        ],
+        "design": "absolute",
+        "threshold": "projected relation-phase cost / matched rho cost > 1 at every reading (w = 0, 0.1, 1 GAE per unpriced native op on both sides, and same-host clock) gives 'above matched rho at every reading'; anything else 'unresolved in band'. 'below' is not in the vocabulary of this amendment."
+      },
+      {
+        "id": "C-rho-cms",
+        "arms": [
+          "cms-xor",
+          "rho-matched"
+        ],
+        "differs_in": [
+          "pipeline"
+        ],
+        "design": "absolute",
+        "threshold": "projected relation-phase cost / matched rho cost > 1 at every reading (w = 0, 0.1, 1 GAE per unpriced native op on both sides, and same-host clock) gives 'above matched rho at every reading'; anything else 'unresolved in band'. 'below' is not in the vocabulary of this amendment."
+      },
+      {
+        "id": "C-rho-inh",
+        "arms": [
+          "inherited-f4",
+          "rho-matched"
+        ],
+        "differs_in": [
+          "pipeline"
+        ],
+        "design": "absolute",
+        "threshold": "projected relation-phase cost / matched rho cost > 1 at every reading (w = 0, 0.1, 1 GAE per unpriced native op on both sides, and same-host clock) gives 'above matched rho at every reading'; anything else 'unresolved in band'. 'below' is not in the vocabulary of this amendment."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "seed_derivation": {
+      "method": "protocol_hash_sha256",
+      "note": "Keyed on the LITERAL v1 hash (red-team M4), with an amendment domain so no v1/preflight/dev seed is reused: seed(q, i) = first 8 bytes big-endian of SHA-256('116b33f754becbd9d7e76cbd80bfff8e323cb79ab0ee0c57481c0616d3d9bfee:amend1:K17-m3-plain-l5-a1:' + q + ':' + i). Natural stream q='natural', i = 0,1,2,...: x = SHA-256 counter stream keyed by the seed reduced mod 2^17, rejected unless x >= 2^5 (outside V) and liftable; sign bit from the same stream; each accepted target is labelled by the oracle and appended to its stratum until both strata hold 80 (later draws of a full stratum are discarded and logged). Planted q='planted', i=0..4: semaev.generate(3,17,5,variant='plain',a=1,b=1,seed=seed,index=0). Warm-up q='warmup', i=0 (discarded). Target processing order and Williams-sequence assignment q='order'. Tamper bit index q='tamper:<arm>:<k>'. Rho DLPs q='rho', i=0..999. Bootstrap RNG seed q='bootstrap'. The checker's generic `seeds` table is not used."
+    },
+    "instance_sampling": {
+      "rule": "Natural targets: uniform random points R with x_R outside V (the population relation collection sees), stratified by the exact oracle label into 80 SAT + 80 UNSAT; 5 planted; 1 warm-up. Same bytes for every arm.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": true,
+      "how": "Arm labels in rows are masked (arm-NN, key file closed, SHA-256 recorded) for phase 1 of the analysis; pipelines are recognisable from telemetry fields (degree null for CMS), so blinding is partial (red-team L7) and declared as such.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 160,
+    "replicates": 2,
+    "warmups": 1,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 3,
+      "correction": "bonferroni",
+      "passes": true,
+      "note": "Decisive test per pipeline pair: exact (or normal-approximation with tie correction) two-sided Wilcoxon signed-rank on the paired per-target log2 of charged CPU (mean of passes A and B), over the 160 natural targets, stratum-pooled, with a stratified sign check reported beside it. Family = 3 pipeline pairs x 1 cell; threshold 0.05/3 = 0.0167. Pairs where both arms are censored drop out of the test AND the bootstrap (red-team H4). n_eff >= 6 needed for 2/2^n < 0.0167; fewer gives 'unresolved'. Effect size: median paired log2 ratio and the stratified rel_per_cpu_s ratio, each with a 20000-resample stratified paired bootstrap CI."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 900,
+      "per_sample_seconds": 66,
+      "threads": 1,
+      "estimated_total_seconds": 11500,
+      "measured_on": "2026-11-17 this container (4 vCPU shared, dev seeds 'dev-sizing'/90001, never main-run seeds; facts from commands, [pcc:unverified]): K17 plain l5 natural targets, msolve -g 2 -t 1 user 4.10-4.77 s (2 SAT, 2 UNSAT), RSS 189-226 MB; CMS --maxsol 100000 full enumeration user 19.4-24.5 s, rc 20 (UNSAT after enumeration), 3 and 6 models on the two oracle-SAT targets (oracle: 1 multiset each), 0 on UNSAT; runner msolve path on one planted l5 target: solve 5.07 s, basis_verification 0.003 s, verify_witnesses 10.85 s for 6 roots (=> re-addition memoised per multiset); empty-input startup msolve and CMS below /usr/bin/time resolution (0.00 s). symmetrised-e l5: msolve killed at 110 s; CMS enumeration killed at 90 s after 161 and 266 models (spurious e-roots; oracle 1 relation) => dropped. plain l6: CMS enumeration > 119 s => l6 dropped. Estimate per natural target, both passes, 3 pipelines: msolve 2x4.5, CMS 2x23, inherited-f4 unmeasured (build blocked, PA-1; bounded by the 60 s cap), projection ~2x3x2 s on SAT targets, generation/driver ~2 s => ~66 CPU-s; x 160 = 10.6k CPU-s; planted 5 x ~75 = 0.4k; fixed (oracle table, rho 1000 DLPs, t_GA, ldd/hash checks, startup baselines) ~0.9k (build excluded). Total ~11.5k CPU-s on 3 workers ~ 64 min + ~20% contention ~ 77 min; hard wall ceiling 105 min (stopping rule)."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "rel_per_cpu_s",
+        "name": "Verified relations per CPU-second (stratified)",
+        "unit": "relations / CPU-second",
+        "kind": "rate",
+        "definition": "Per arm: p_sat * mean_SAT(verified relations per target) / (p_sat * mean_SAT(charged CPU) + (1 - p_sat) * mean_UNSAT(charged CPU)), p_sat = exact oracle weight of the cell (1757/65572 at dev computation; P2 recomputes). Verified relations per target = size of the arm's re-addition-verified relation set (all distinct multisets, not 'at least one'; red-team H2). Charged CPU = solver child user+sys (wait4 rusage) + in-house root extraction CPU (msolve) + nothing else for any arm; a censored call is charged at the cap. Projection/re-addition CPU is recorded per arm and reported in a secondary reading, excluded here for every arm alike. Both passes averaged per target. A second reading uses the tool-internal timer (msolve overall(cpu), CMS Total time) with startup excluded (M6).",
+        "source": "rows.jsonl natural rows: stratum, verified_relations, status, solver_cpu_s, extract_cpu_s, internal_cpu_s",
+        "aggregation": "per_row",
+        "resolution": "1 ms (rusage)",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "cost_per_relation_vs_rho",
+        "name": "Projected relation phase vs matched rho across the §5a band",
+        "unit": "ratio (log2 as distance remaining)",
+        "kind": "derived",
+        "formula": "C_arm(w) = (24 / rel_rate_per_target) * w * N_arm  [native ops per target, stratified mean; no priced group additions in any solver arm], C_rho(w) = A_rho + w * U_rho [A_rho measured mean walk group additions per DLP, U_rho measured mean unpriced per-step ops per DLP]; ratio_w = C_arm(w)/C_rho(w) for w in {0, 0.1, 1}; ratio_clock = (24 * charged CPU per verified relation) / (measured rho CPU per DLP); expected-ops reading uses E_steps = 55.05 in place of A_rho.",
+        "definition": "C3: the band applies to every arm. Native unit per arm: msolve = F4 matrix cells; CMS = propagations; inherited-f4 = word XORs; fb-enum = group additions (priced 1 GAE); rho = walk group additions (priced 1 GAE) + partition hashes and canonicalisations (unpriced, w). Because solver arms perform no priced group additions, C_arm(0) = 0 and no solver arm can be 'above at every reading'; the band therefore resolves nothing for solvers by construction and this is reported as such. The clock ratio is reported as 'diagnostic, IC lower bound'. Missing fields fail closed (no default u = 0; red-team C3).",
+        "source": "rows.jsonl + cells.json (rho, t_ga_seconds)",
+        "aggregation": "per_row",
+        "resolution": "derived",
+        "uncertainty": "range"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "cpu_per_target",
+        "name": "Charged CPU per natural target",
+        "unit": "CPU-seconds",
+        "kind": "timed",
+        "definition": "As in rel_per_cpu_s, per target, mean of passes; decisive paired-test input. Also reported per stratum.",
+        "source": "rows.jsonl",
+        "aggregation": "paired_ratio",
+        "resolution": "1 ms",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "max_step_degree",
+        "name": "Degree reached",
+        "unit": "degree",
+        "kind": "exact",
+        "definition": "msolve: max 'deg' over F4 rounds of -v 2; inherited-f4: degree_reached; null for CMS. Killed calls: degree reached before the cap from the log parsed on every kill (H3), flagged lower bound.",
+        "source": "rows.jsonl",
+        "aggregation": "max",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "max_matrix",
+        "name": "Largest matrix",
+        "unit": "rows x cols",
+        "kind": "exact",
+        "definition": "msolve -v 2 largest 'mat' row; CMS largest Gauss matrix from '[matrix] Good matrix' lines; inherited-f4 if emitted, else null.",
+        "source": "rows.jsonl",
+        "aggregation": "max",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "peak_rss",
+        "name": "Solver peak memory",
+        "unit": "bytes",
+        "kind": "timed",
+        "definition": "cgroup v2 memory.peak of a per-call cgroup when writable; else max VmHWM sampled every 2 ms plus wait4 ru_maxrss of the solver child (not the forking worker). Which source was used is recorded per row.",
+        "source": "rows.jsonl",
+        "aggregation": "max",
+        "resolution": "1 page",
+        "uncertainty": "range"
+      },
+      {
+        "id": "native_ops",
+        "name": "Native work units per target",
+        "unit": "arm-specific (see cost_per_relation_vs_rho)",
+        "kind": "counted",
+        "definition": "Per arm per target, both passes (must be identical for deterministic arms; a difference is an instrument fault).",
+        "source": "rows.jsonl",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "range"
+      },
+      {
+        "id": "spurious_roots",
+        "name": "Boolean roots not projecting to a relation",
+        "unit": "count",
+        "kind": "counted",
+        "definition": "Per arm per target: roots returned minus roots projecting to a verified multiset; plus number of roots per verified multiset (ordering/U-intermediate multiplicity).",
+        "source": "rows.jsonl",
+        "aggregation": "sum",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "projection_cpu_s",
+        "name": "Projection and re-addition CPU",
+        "unit": "CPU-seconds",
+        "kind": "timed",
+        "definition": "Memoised re-addition per (target, multiset), per arm; secondary reading 'including projection'.",
+        "source": "rows.jsonl",
+        "aggregation": "mean",
+        "resolution": "1 ms",
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "startup_s",
+        "name": "Empty-input startup baseline",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "Per tool: 21 runs on a trivial input (msolve 1-var field equation; CMS 'p cnf 1 0'; adapter with zero targets), median and range, interleaved at start, middle and end (M6).",
+        "source": "cells.json",
+        "aggregation": "median",
+        "resolution": "1 ms",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 1,
+    "order": "randomized",
+    "clock": "cputime",
+    "counters": [
+      "fb-enum group additions",
+      "rho walk group additions and unpriced per-step counters",
+      "msolve F4 rounds (deg, rows x cols, density), overall(cpu)",
+      "CMS propagations, conflicts, decisions, Total time, Gauss matrix lines",
+      "inherited-f4 SolverCost.ops, degree_reached"
+    ],
+    "record": [
+      "source_revision (git HEAD + dirty flag)",
+      "binary_sha256 per tool and ldd closure sha256",
+      "harness_files_sha256",
+      "protocol.amend1.json file sha256 and canonical hash",
+      "python version",
+      "rustc/cargo version",
+      "cpu_model",
+      "kernel",
+      "nproc",
+      "cgroup cpu/memory limits",
+      "loadavg and PSI per call",
+      "co_tenants (process list snapshot per call)",
+      "isolation tier = local-diagnostic (non-admitted)",
+      "wall_valid",
+      "failures",
+      "projection_cpu_s",
+      "memory source (cgroup peak or VmHWM)"
+    ],
+    "timed_primary_justification": "Only fb-enum and rho emit priced operations; external solvers emit heterogeneous native counters, so solver-child CPU is the only common unit for the solver-vs-solver comparison. This run is a LOCAL DIAGNOSTIC on a shared 4-vCPU VM without PMU or L2 isolation (owner 2026-11-17: AWS does not work), so every clock-based verdict is labelled diagnostic tier, read only against the same-session A/A floor, and never reaches the IC leaderboard or benchmarks/README.md."
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "host": "this container",
+      "workers": 3,
+      "threads_per_call": 1,
+      "max_memory_gib_per_call": 4,
+      "harness_files_sha256_at_freeze": {
+        "groebner_compare/semaev.py": "d71ab7c999ad5128635032a74ea85ce023ea2e56d78ffcf3e97582b4aae9756b",
+        "groebner_compare/external_worker.py": "556267555fcb075b8ab050672403700ba6ce653d35214c318b9671f4e2b83e75",
+        "groebner_compare/semaev_verifier.py": "e2d137a6af26a7df185fbc795e01e4958e31a36646e8261a3a457748ec795521",
+        "groebner_compare/runner.py": "9dd66b115830dfeca3cd23e1024c48d6e849f9096b469d7e148acbf6d89aa299",
+        "groebner_compare/certificate.py": "27a41eee36da407b596f9da0642dbe9e09e8ae87dbb7361280127eb62760c862"
+      },
+      "aws_s3_isolab": "not used: owner decision 2026-11-17 (AWS does not work); raw data stays in the study directory with sha256 in a manifest; any repo hook that refuses an action is recorded verbatim and not bypassed",
+      "driver": "research/groebner_solver_shootout_20261116/run_amend1.py (prerequisite PA-4; pinned by amendment-2 before data)"
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 6300,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "1 cell x (1 warm-up + 5 planted + 80 SAT + 80 UNSAT natural targets) x passes A,B x every available pipeline, 2 tamper checks per arm, rho 1000 DLPs, t_GA, startup baselines. No extension or early stop on results."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Per call: RLIMIT_CPU 60 s on the solver child (SIGXCPU/SIGKILL = censored, rusage from wait4 kept, msolve log parsed for degree reached) and 4 GiB memory (per-call cgroup memory.max if writable, else RLIMIT_AS; OOM = censored, never 'infrastructure failure', never retried; red-team H3). Identical for every arm. Root-extraction overflow (certificate limits) = censored. Censored calls are charged at the 60 s cap and kept (lower bound). No arm-cell is stopped for censoring: all targets run (red-team H4); a pipeline with >= 50% censored calls is reported 'censored at cap' with directional verdicts ('A < cap; B censored') where applicable. Cost guard decided on control cost only, before any natural target: if the planted phase (all arms, both passes) projects a total wall above 100 min, the natural sample is reduced symmetrically to the largest N per stratum (minimum 40) whose projection fits, identically for every arm, and the reduction is logged. Whole-run wall ceiling 105 min: on reaching it no new target starts, running targets finish both passes, all rows kept, the run is reported truncated with the number of complete target pairs."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Invalidates the arm (rows kept, status invalid, reported): a verified relation on an oracle-empty target; an accepted tampered witness; for a complete arm on a non-censored call, a verified relation set different from the oracle set (missing or extra multiset); a 'no relation' answer (basis {1}, UNSAT, empty) on an oracle-SAT target whose oracle multiset is a root of the encoded system (M1, applied to every arm alike); a planted miss that is not censored; a binary/ldd/harness hash mismatch; differing native op counts between passes for a deterministic arm. Spurious roots (not projecting to a relation) never invalidate; they are counted (C1)."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Run blocked, not substituted: if PA-1..PA-5 are not met, the affected arm is UNAVAILABLE (inherited-f4, rho-matched) or the run does not start (oracle, driver, analysis). Without rho-matched, C-vs-rho is not reported at all."
+    }
+  ],
+  "decision_rule": {
+    "text": "Solver order: for each registered pipeline pair, two-sided Wilcoxon signed-rank on per-target paired log2 charged CPU (mean of passes A and B) over natural targets, both-censored pairs dropped; 'A uses less CPU per target' only if p < 0.05/3 AND |median paired log2 ratio| exceeds the larger |bound| of the 95% bootstrap intervals of BOTH arms' A/A (pass A vs pass B) log2 ratios; otherwise 'within A/A noise or not significant'; n_eff < 6 'unresolved'. A/A pairs and the registered comparisons are hard-coded, not supplied at unblinding (M3). Rho: per arm, 'above matched rho at every reading' only if ratio > 1 at w = 0, 0.1, 1 and at the clock; else 'unresolved in band'; log2 distance always reported, never pass/fail. Every verdict carries 'diagnostic tier (local, non-admitted)'. Unregistered pairs (e.g. aa vs other) get no verdict.",
+    "comparison_ids": [
+      "C-msolve-cms",
+      "C-inh-msolve",
+      "C-inh-cms",
+      "C-rho-msolve",
+      "C-rho-cms",
+      "C-rho-inh"
+    ],
+    "threshold": "Bonferroni 0.05/3 and outside the A/A floor of both arms",
+    "statistic": "Wilcoxon signed-rank on paired log2 charged CPU per target; stratified rate ratio for rel_per_cpu_s",
+    "interval": "stratified paired bootstrap (resample targets within stratum), 20000 resamples, 95% and Bonferroni-level intervals; implemented in the pinned analysis script (M3)",
+    "multiple_comparison_correction": "bonferroni",
+    "effect_size_measure": "median paired log2 CPU ratio; ratio of stratified rel_per_cpu_s",
+    "verdict_vocabulary": [
+      "A uses less CPU per target",
+      "within A/A noise or not significant",
+      "unresolved",
+      "A < cap; B censored",
+      "above matched rho at every reading",
+      "unresolved in band",
+      "censored at cap",
+      "UNAVAILABLE",
+      "invalid",
+      "diagnostic tier (local, non-admitted)"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/groebner_solver_shootout_20261116/analyze.py",
+      "sha256": "0b0eee393c01ee4b26d90013c0f007fcfecd533883d0fc7d62858be90e477929"
+    },
+    "inputs": [
+      "rows.jsonl",
+      "cells.json",
+      "blinding key (phase 2)"
+    ],
+    "outputs": [
+      "summary.json (blind)",
+      "summary.unblinded.json",
+      "arms.tsv",
+      "pairs.tsv",
+      "report.pdf + graphs (research-visuals)"
+    ],
+    "blinded": true,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "Using msolve's own GF(2) solving / sparse-FGLM / parametrisation output as roots",
+    "Counting a relation that has not passed group re-addition",
+    "Substituting any tool, published figure or estimate for an UNAVAILABLE arm (Magma, Julia trace)",
+    "Different budgets, thread counts, caps or encodings between arms",
+    "Changing N, cells, caps, metric, threshold or correction after any main-run data (an amendment must say whether it precedes the data it affects)",
+    "Choosing seeds by hand or after a look; reusing the preflight seed-1 instances as main-run data",
+    "Pooling across cells, fitting a scaling exponent across n, or comparing across variants as if the same system",
+    "Charging verification time to one arm only",
+    "Reading ru_maxrss of the forking worker as solver RSS",
+    "Reporting diagnostic-tier (command Job) clocks as admitted measurements or putting them on the IC leaderboard / benchmarks README without VALIDATION.json",
+    "Unmasking arm labels before phase-1 summary.json is written",
+    "Calling a rho gap a pass/fail, or ranking against rho when the band flips",
+    "Counting a Boolean root, rather than a re-addition-verified abscissa multiset, as a relation (amendment-1, C1)",
+    "Applying a completeness or invalidation rule to raw Boolean root sets instead of projected relation sets (C1)",
+    "Running CMS in decision mode (--maxsol 1) for any measured row of this amendment (C1)",
+    "Pricing any arm with a calibrated clock while another is band-priced, or defaulting a missing unpriced counter to 0 (C3)",
+    "Reporting 'below matched rho' from this amendment (not every IC phase is priced)",
+    "Using analyze.py v1 (sha 0b0eee39...) for amendment-1 verdicts: it implements v1's unstratified, rho-only-band rules; the amendment-1 analysis script must be written and pinned by amendment-2 before any data (PA-5)",
+    "Calling this local run admitted, isolab-equivalent, or eligible for any leaderboard / benchmarks README row"
+  ],
+  "literature": [
+    {
+      "ref": "crypto:RESEARCH_SEMAEV_ROOTFIND_VS_GROEBNER.md",
+      "provenance": "internal",
+      "claim": "Binary root-finding vs matrix-F4 measured at m=2 only; m=3/m=4 not measured end to end.",
+      "verified_by": "producer read; no pcc id"
+    },
+    {
+      "ref": "crypto:research/m4gb_descent_ladder_20261110/RESULTS.md",
+      "provenance": "internal",
+      "claim": "m=3 K/R n=11,13,15: f4-f2 Dmax 8, inherited-f4 Dmax 6, m4gb Dmax 7.",
+      "verified_by": "[pcc:unverified]"
+    },
+    {
+      "ref": "crypto:research/gb_cas_comparison_20261011/README.md",
+      "provenance": "internal",
+      "claim": "n=17 Boolean systems: msolve 42.7-46.5 s full basis; Magma never run.",
+      "verified_by": "producer read; no pcc id"
+    },
+    {
+      "ref": "crypto:research/sat_pdp_pricing_band_20261111/README.md",
+      "provenance": "internal",
+      "claim": "Native-XOR SAT vs rho order flips inside the §5a band at n=17.",
+      "verified_by": "[pcc:unverified]"
+    },
+    {
+      "ref": "crypto:research/curve25519_f4_trace_20261102/README.md; crypto:research/curve25519_scale_guess_trace_20261105/README.md",
+      "provenance": "internal",
+      "claim": "Trace F4 replay measured only on prime-field m=2 (0.29-0.485x multiply-adds).",
+      "verified_by": "[pcc:unverified]"
+    },
+    {
+      "ref": "cryptanalysis:groebner_compare/evidence/ (three ECC2K17 runs)",
+      "provenance": "internal",
+      "claim": "learn_apply never measured (trace_apply_attempts=0 everywhere).",
+      "verified_by": "producer read of receipts"
+    },
+    {
+      "ref": "pcc PCC-20261104-3d6b6c, -78dcbd, -f53ff4, -e899a0; PCC-20261106-6052e8, -607061; PCC-20261107-462bb0, -c12257; PCC-20261114-2bd98e, -39d251, -bea135",
+      "provenance": "internal",
+      "claim": "Prior msolve solving-degree, guess-then-degree and CMS claims.",
+      "verified_by": "pcc.py standing: all unverified"
+    },
+    {
+      "ref": "research-kb",
+      "provenance": "internal",
+      "claim": "NOT QUERIED: research-kb not installed in this container (scripts/research-kb exit 127); lead atlas checkout absent. No novelty claim is made.",
+      "verified_by": "none"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "amendment-1",
+      "filed": "2026-11-17",
+      "filed_before_affected_data": true,
+      "reason": "Red-team pre-data review REDTEAM_PREDATA.md (C1-C3, H1-H4, M1-M9) and owner decisions 2026-11-17 (AWS does not work; Magma not available). Amends frozen v1 GB-SOLVER-SHOOTOUT-20261116 (canonical sha256 116b33f754becbd9d7e76cbd80bfff8e323cb79ab0ee0c57481c0616d3d9bfee, file sha256 9ab6434739c01b7d5919d147c8a4dacf08256e7054f128057b183bed5ee9341a), which stays unedited. No main-run data exists for v1 or this amendment; dev sizing used only dev seeds.",
+      "changes": [
+        "EXECUTION: isolab-k8s/EKS/S3 replaced by a LOCAL DIAGNOSTIC run in this container (4 vCPU shared, 15 GiB, no PMU), 3 single-thread workers, isolation L0, explicitly non-admitted, never a leaderboard or benchmarks-README row; USD budget removed.",
+        "C1: every arm's Boolean roots are projected to abscissa multisets by group re-addition before any rule; completeness = verified relation set equals the exhaustive fb-enum oracle set per target; CMS runs in full-enumeration mode (--maxsol 1000000, until UNSAT), every call charged; spurious roots counted, never invalidating; x = 0 is not in the factor base (nonzero abscissae only, as the oracle and plant()), and a relation using x = 0 is projected out of both sides and counted separately.",
+        "C2: grid replaced by one cell on K1/GF(2^17) (a=1): #E = 131174 = 2*65587, r = 65587 (~2^16), h = 2, computed with groebner_compare.semaev.Curve.order and trial division (dev 2026-11-17); KoblitzCurve::new(1,17) preconditions hold. Old a=0 n=11/17 cells fail them (r^2 | #E or r <= h). Other candidates computed: (a=0,n=19) r=130873 but rate 0.0067 and larger systems; (a=1,n=11) r=991; (a=0,n=13) r=2003; (a=0,n=9) r=127, all below 2^12. Matched rho = repository signed-Frobenius rho on that curve, 1000 local DLPs, expected 55.05 steps and measured.",
+        "C3: the §5a band (0, 0.1, 1 GAE per unpriced native op) applies to every arm with defined native units (msolve F4 matrix cells, CMS propagations, inherited-f4 word XORs, rho partition hashes/canonicalisations); 'below matched rho' removed from the vocabulary; clock ratio labelled diagnostic IC lower bound; missing fields fail closed.",
+        "H1: incumbent inherited-f4 (ic_framework HybridF4/InheritedF4, the koblitz decomposition-oracle engine) added as baseline arm on the SAME Boolean system via examples/gc_native_solve.rs (no re-encoding, so solver is the only factor); the x-only S4 descent encoding of ic descent is not an arm here; fb-enum reported as a descriptive row; repo-boolean-f4 dropped; msolve 0.11 SIMD not provisioned here (C-out); trace-f4/julia-f4-warm/magma-f4 remain UNAVAILABLE and are removed from the arm list.",
+        "H2: both solver arms do the same task (enumerate all roots); every distinct verified relation counts; extraction CPU reported separately; extraction overflow = censored.",
+        "H3: per-call RLIMIT_CPU 60 s on the solver child and 4 GiB per-call memory cap; OOM/SIGXCPU = censored with rusage kept and logs parsed.",
+        "H4: no arm-cell stop on censoring; censored charged at cap; directional verdict allowed; both-censored pairs dropped from test and bootstrap.",
+        "GRID: symmetrised and symmetrised-e variants and l = 6 dropped (dev: symmetrised-e msolve > 110 s, CMS enumeration > 90 s with 161/266 spurious models; plain l6 CMS enumeration > 119 s); m = 4 dropped (r too small or rate ~0.004 at n = 17). Fewer cells, more targets: 160 natural targets stratified 80 SAT / 80 UNSAT by the oracle with exact stratum weights.",
+        "PRIMARY ENDPOINT: stratified verified relations per CPU-second per arm with stratified paired bootstrap CIs; secondary: degree reached, max matrix, peak memory, native ops, spurious roots, projection CPU, startup baselines.",
+        "A/A + ORDER: each target runs pass A (Williams sequence over 3 pipelines, all 6 sequences balanced) then pass B in reversed order on the same worker; pass B = A/A arms; order-position effect reported (M2).",
+        "M1: 'no relation' on an oracle-SAT target whose oracle multiset is a root of the encoding invalidates every arm alike. M3: A/A pairs and registered comparisons hard-coded; CI implemented; family = 3. M4: seed rule keyed on the literal v1 hash plus ':amend1:' domain; harness defaults (max_solutions, --random passthrough, separate extract/verify timers) asserted by tests in PA-4. M5: CMS Gauss options left at defaults and matrix activation logged per call. M6: tool-internal timers and empty-input startup baselines recorded; both readings reported. M7: UNAVAILABLE arms named with obstruction (problems/ record to be filed by the main session). M8: falsification/abandon target stated in AMENDMENT1.md. M9: Boolean semi-regular series with field equations.",
+        "PREREQUISITES PA-1..PA-5; first freeze of this amendment (canonical e57df6669dec9628cc5dc277a7298959444363bf27577e44e6c0be9fa0472ea8, never committed, no data) was superseded before commit because the inherited-f4 adapter under construction runs on the same encoding (AMENDMENT1.md) must exist and be pinned by amendment-2 (hashes only, no design change) before any data; analyze.py v1 is not used for amendment-1 verdicts."
+      ],
+      "supersedes_fields": [
+        "question",
+        "claims",
+        "arms",
+        "controls",
+        "variable_ledger",
+        "randomization",
+        "sample_size",
+        "metrics",
+        "measurement",
+        "execution",
+        "stopping_rules",
+        "decision_rule",
+        "inadmissible"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "c521e04c643ff8b3028426b1d9c8b85a3f92fabc5e6e91e124498c13524fe858",
+    "commit": "f8480787ec31523ec67885bfc1fc6d1a96027117",
+    "frozen_at": "2026-11-17T06:10:55Z",
+    "filed_before_affected_data": true
+  }
+}

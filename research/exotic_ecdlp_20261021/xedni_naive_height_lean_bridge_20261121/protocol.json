@@ -1,0 +1,12 @@
+{
+  "schema": "xedni-naive-height-lean-bridge-protocol-v1",
+  "source_fixed_curve_denominator_lean_sha256": "5c976a3b2f54b8239f93190c0489ea6104e753581da83c54171819f87f5df374",
+  "source_height_exclusion_lean_sha256": "3f00f0388783f74ae59cd74ded3dc59f798bcc4293ecfb9a50ac5aad353786b4",
+  "curve_a_invariants": ["0", "-47", "0", "751", "-3997"],
+  "height_definition": "Mathlib WeierstrassCurve.Affine.Point.naiveHeight on rational points",
+  "coordinate_law": "x=a/b^2 with a=x.num, b>0, x.den=b^2; H=max(abs(a),b)",
+  "theorem_goal": "For every nonidentity point on the fixed curve, if H<=2^130 then naiveHeight(P)<=260*log(2)",
+  "generic_goal": "Prove log(max(abs(a),b^2))<=2*log(H) for H=max(abs(a),b) and b>0",
+  "proof_policy": "Pinned Lean and Mathlib; build and print axioms; no sorry or custom research axiom",
+  "boundary": "This connects the coordinate cap to Mathlib naive height; canonical-height comparison and Mordell-Weil generator remain separate obligations"
+}

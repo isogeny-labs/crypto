@@ -1,0 +1,46 @@
+{
+  "schema": "rootfind-local-f456-build-status/v1",
+  "status": "source_bound_release_build_succeeded_no_scientific_run",
+  "source_commit": "e5d5e47189edb412711511b9e3dfcd1c44b4422f",
+  "source_tree_git_object": "be99a73806a4e78c5af3e0452c04e0f30014fbc5",
+  "cargo_lock_git_object": "426a5848aa26aecc9325b763b496c4761f413455",
+  "command": "gtimeout -s TERM -k 10s 900s env TMPDIR=/tmp CARGO_TARGET_DIR=/Volumes/SSD990-2/crypto/wt/codex-rootfind-k13-local-f456-screen-20261116/target CARGO_BUILD_JOBS=1 CARGO_INCREMENTAL=0 RUSTC=/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc /Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/cargo build --release --locked --bin ecbench",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "binary_path": "/Volumes/SSD990-2/crypto/wt/codex-rootfind-k13-local-f456-screen-20261116/target/release/ecbench",
+  "binary_sha256": "a9c9a5e17a70b826adce33a16ed1f6e502ace043f03c59686f5b4e8b6042866f",
+  "build_attempts": [
+    {
+      "prefix": "build1",
+      "exit_code": 101,
+      "reason": "Homebrew rustc 1.93.1 below dependency MSRV"
+    },
+    {
+      "prefix": "build2",
+      "exit_code": 124,
+      "reason": "300-second watchdog during active crate compilation"
+    },
+    {
+      "prefix": "build3",
+      "exit_code": 0,
+      "reason": "completed Rust 1.99.1 release build"
+    }
+  ],
+  "sha256": {
+    "build1.meta": "66c323f675aefab0145427cf747e91c547114023be3bf755b38b5ae1c9e91327",
+    "build1.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build1.stderr": "900305d663fa134519929c62975e1f958bfe80980da945eca92cc956908c9797",
+    "build2.meta": "85ec414f9811d028cec1611188d594f229a6e8b7af4aaed3823eef09ac4ffd98",
+    "build2.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build2.stderr": "2ee0e4b23c5a9a5942f5408f76ac0b8c16b543135de0b0e43ccf0785882c8f93",
+    "build3.meta": "4bf94b0ffab7bc07c97d2d8a7fcdf69c8294790b8ce73f9489fe8279b8536dbd",
+    "build3.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build3.stderr": "0b95601d0d178744b4506a07a0978440f274c7f43aa9a8b8e264c3727065f5d5",
+    "PLAN.json": "ce458e2b522d1582fbb5ba49cc54af3fc315d8c3d550c957959a3a8d3f45f359",
+    "PLAN-SOURCE-BOUND.json": "ce458e2b522d1582fbb5ba49cc54af3fc315d8c3d550c957959a3a8d3f45f359",
+    "SPEC-K13-L0.json": "2146eb248aaecb66b9f6c912078941aa642cdc084df147bc1f811d99b48c8584"
+  },
+  "plan_bytes_equal": true,
+  "scientific_executions": 0,
+  "checkpoint_gate": "not_passed_for_this_branch_due_reserved_resume_scope"
+}

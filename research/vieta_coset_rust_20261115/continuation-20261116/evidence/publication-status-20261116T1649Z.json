@@ -1,0 +1,103 @@
+{
+  "state": "OPEN",
+  "headRefOid": "1a2bd78c487f1bfec84351c9b13a51f9d2731a08",
+  "isDraft": false,
+  "mergeable": "UNKNOWN",
+  "mergeStateStatus": "UNKNOWN",
+  "reviewDecision": "",
+  "autoMergeRequest": {
+    "authorEmail": null,
+    "commitBody": null,
+    "commitHeadline": null,
+    "mergeMethod": "MERGE",
+    "enabledAt": "2026-11-16T07:34:21Z",
+    "enabledBy": {
+      "id": "MDQ6VXNlcjEwODY4NzQ=",
+      "is_bot": false,
+      "login": "aburan28",
+      "name": "Adam Buran"
+    }
+  },
+  "observed_utc": "2026-11-16T16:49:00Z",
+  "current_head_checks_observed": [],
+  "review_count": 0,
+  "required_checks": [
+    "gate",
+    "size",
+    "artifacts"
+  ],
+  "rules": [
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 0,
+        "dismiss_stale_reviews_on_push": false,
+        "required_reviewers": [],
+        "require_code_owner_review": false,
+        "dismissal_restriction": {
+          "enabled": false,
+          "allowed_actors": []
+        },
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": true,
+        "require_extra_approval_for_unattributed_changes": true,
+        "allowed_merge_methods": [
+          "merge"
+        ]
+      },
+      "ruleset_source_type": "Repository",
+      "ruleset_source": "isogeny-labs/crypto",
+      "ruleset_id": 25687816
+    },
+    {
+      "type": "non_fast_forward",
+      "ruleset_source_type": "Repository",
+      "ruleset_source": "isogeny-labs/crypto",
+      "ruleset_id": 25687816
+    },
+    {
+      "type": "deletion",
+      "ruleset_source_type": "Repository",
+      "ruleset_source": "isogeny-labs/crypto",
+      "ruleset_id": 25687816
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": false,
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          {
+            "context": "gate"
+          },
+          {
+            "context": "size"
+          },
+          {
+            "context": "artifacts"
+          }
+        ]
+      },
+      "ruleset_source_type": "Repository",
+      "ruleset_source": "isogeny-labs/crypto",
+      "ruleset_id": 25687816
+    }
+  ],
+  "legacy_branch_protection_endpoint": "403 Resource not accessible by integration; effective rules endpoint succeeded",
+  "local_artifact_policy": {
+    "exit": 1,
+    "pending_paths": [
+      "benchmarks/20261116-vieta-polynomial-backends/counts.png",
+      "research/vieta_coset_rust_20261115/continuation-20261116/counts.png"
+    ],
+    "official_same_repo_artifact_autofix_expected": true,
+    "local_s3_actions": false
+  },
+  "scientific_standing": "data80ec09 and hand argument480062 both unverified",
+  "progress_export_new_series": [
+    "vieta.component.word62_m16384_karatsuba_fmul",
+    "vieta.component.p224_m2048_karatsuba_fmul"
+  ],
+  "no_measurement_active": true,
+  "scope": "This records the observed head only, not future checks or merge."
+}

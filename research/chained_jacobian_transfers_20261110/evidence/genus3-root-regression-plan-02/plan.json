@@ -1,0 +1,20 @@
+{
+  "original_failed_attempt": "2d6fec root01 timeout124 after900s,colddependencies+cryptocratecompile,beforetests;2133guards0",
+  "command": [
+    "cargo",
+    "test",
+    "--release",
+    "--lib",
+    "--offline",
+    "--locked"
+  ],
+  "timeout_s": 1800,
+  "cache": "/workspace/scratch/ct55-g3-root-regression-01-build-cache",
+  "cache_scope": "REUSE exact original preceding correctness dependency compilation;Rust1.99.1/source/Cargo inputs byteunchanged,no coldcostclaim",
+  "guard_count": 2133,
+  "guard_scope": "all811 native accepted inputs plus every physical Rust/Cargo input in root src/crates/declared local dependencies androotmanifest;not claimed a complete compiler include closure",
+  "prediction": "completed preceding dependency objects permit rootlibrary tests to execute within newbound",
+  "acceptance": "original unfiltered rootlibrarynative0/zerochangedguards;no ignore/filter/criterion change",
+  "falsification": "any native error/newtimeout/changedguard;preserve wholeattempt",
+  "scope": "local correctness regression resource correction only,no benchmark/paidlaunch"
+}

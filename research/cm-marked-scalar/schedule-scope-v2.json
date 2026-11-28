@@ -1,0 +1,14 @@
+{
+ "id":"CM-COUNTED-SCHEDULE-V2",
+ "amends":"schedule-scope.json",
+ "primary_target":"P-192",
+ "targets":["P-192","P-224","P-256","P-384","P-521"],
+ "fixtures":"fixtures-v2, combining immutable historical P384/P521 inputs and native extension-v4 P192/P224/P256 certificates, preserving all numeric tokens exactly",
+ "arms":["window","maps","fused"],
+ "windows":[2,3,4,5,6,7],
+ "fixed_degree_window":2,
+ "selection":"Describe the minimum D+A count over the fixed widths for each arm and curve. This unweighted group-count minimum is not a runtime optimum. Keep all rows, negations and uncounted backend/setup/map costs explicit.",
+ "claims":"Exact group schedules and verified outputs only, clocks disabled; no end-to-end speed inference.",
+ "limits":{"processes":1,"threads":1,"memory_gib":2,"build_seconds":120,"correctness_seconds":120,"counted_seconds":120,"unchanged_retries":0,"cloud_submissions":0},
+ "timing_protocol":"The existing timing draft remains restricted to the initial two curves and is unfrozen. This amendment does not launch or extend a timing experiment."
+}

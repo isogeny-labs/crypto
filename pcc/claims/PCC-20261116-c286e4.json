@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T19:20:28Z",
+ "id": "PCC-20261116-c286e4",
+ "kind": "theorem",
+ "producer": {
+  "commit": "5f7c710d6d9b3f442107d9d97425b2b4d04ed283",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "4481b23286d612a4d6e311347125aaf94a19c8cd3784f0a3cc98ae48867494a2",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/evidence/native-cubic-cofactor-word-final-06/CubicCofactorWordBridge22307.lean",
+   "theorem": "CubicCofactorWordBridge22307.word_cofactor_canonical"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact normalized UInt64 multiply/subtract/cofactor model at223/3, decoded Fin223 polynomial plus raw canonical values, explicit normalization and overflow counterexample. Both unchanged original gates42/0 underj1/120/default memory. Not Rust compiler/base inverse/universal field/Jacobian/counter/runtime or signed standing.",
+ "statement": "theorem word_cofactor_canonical (a b c : UInt64) (ha : a.toNat<223) (hb : b.toNat<223) (hc : c.toNat<223) : (wordCofactor a b c).1.toNat<223 \u2227 (wordCofactor a b c).2.1.toNat<223 \u2227 (wordCofactor a b c).2.2.toNat<223"
+}

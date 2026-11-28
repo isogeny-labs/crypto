@@ -1,0 +1,34 @@
+{
+  "checks": {
+    "dedicated_structural_call": 0,
+    "fmt_both": 0,
+    "new_workflow_actionlint": 0,
+    "pinned_source_release_build": 0,
+    "rust198_release_package_tests": {
+      "boundary": "pre-source-publication, identical bridge Rust and locks; root b20 source unchanged",
+      "cli_passed": 2,
+      "failed": 0,
+      "library_passed": 6
+    },
+    "strict_clippy_rust198": 0,
+    "strict_clippy_rust199": 0
+  },
+  "not_run": [
+    "Rust1.99 runtime suite",
+    "root full library suite",
+    "whole ecbench pipeline",
+    "performance",
+    "EKS",
+    "private poisoned pool injection"
+  ],
+  "retained_failures": [
+    {
+      "attempt": "first bridge compile",
+      "error": "E0689 integer inference, corrected by explicit u64 loop bounds",
+      "exit": 101
+    }
+  ],
+  "schema": "aps.bridge-validation/v1",
+  "source": "2a9ae86cb2988b66a5598890dcb7630485e4c33a",
+  "standing": "unverified"
+}

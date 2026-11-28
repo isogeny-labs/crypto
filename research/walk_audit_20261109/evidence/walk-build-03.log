@@ -1,0 +1,30 @@
+WalkBoundary.lean:107:24: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  LE Type
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+WalkBoundary.lean:107:26: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat Type 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  Type
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+WalkBoundary.lean:108:45: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  LE Type
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+WalkBoundary.lean:108:47: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  OfNat Type 0
+numerals are polymorphic in Lean, but the numeral `0` cannot be used in a context where the expected type is
+  Type
+due to the absence of the instance above
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+WalkBoundary.lean:108:22: error: unsolved goals
+p t : ℕ
+inst✝ : NeZero p
+h : 6 * t + 2 ≤ p
+hmixed : ∀ (s : Set (ZMod p)), (walkLaw p t).toOuterMeasure s ≤ (uniformPMF (ZMod p)).toOuterMeasure s + 1 / 4
+he : 1 ≤ (uniformPMF (ZMod p)).toOuterMeasure ↑(arcEvent p t) + 1 / 4
+hu : (uniformPMF (ZMod p)).toOuterMeasure ↑(arcEvent p t) ≤ 1 / 2
+⊢ sorry ()

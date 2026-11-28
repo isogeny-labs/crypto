@@ -1,0 +1,84 @@
+/tmp/ecdlp-root-precision-20261123/02-root-core/CryptoLeanCore/TaperedPrecisionRoot.lean:49:8: error: Tactic `rfl` failed: equality lhs
+  2 * (2 * (21 * 2 ^ (k + 3)))
+is not definitionally equal to rhs
+  21 * 2 ^ (k + (1 + 4))
+
+k : Nat
+ih : 16 * (k + 3) * (2 * (k + 3) + 1) ≤ 21 * 2 ^ (k + 4)
+hstep : 16 * (k + 3 + 1) * (2 * (k + 3 + 1) + 1) ≤ 2 * (16 * (k + 3) * (2 * (k + 3) + 1))
+⊢ 2 * (2 * (21 * 2 ^ (k + 3))) = 21 * 2 ^ (k + (1 + 4))
+/tmp/ecdlp-root-precision-20261123/02-root-core/CryptoLeanCore/TaperedPrecisionRoot.lean:113:51: error(lean.invalidField): Invalid field `trans`: The environment does not contain `Nat.le.trans`, so it is not possible to project the field `trans` from an expression
+  root_four_scale u hu
+of type `(4 * u).le (2 ^ (u + 1))`
+/tmp/ecdlp-root-precision-20261123/02-root-core/CryptoLeanCore/TaperedPrecisionRoot.lean:115:30: error(lean.invalidField): Invalid field `trans`: The environment does not contain `Nat.le.trans`, so it is not possible to project the field `trans` from an expression
+  Nat.div_mul_le_self ?m.158 ?m.159
+of type
+  (?m.158 / ?m.159 * ?m.159).le ?m.158
+/tmp/ecdlp-root-precision-20261123/02-root-core/CryptoLeanCore/TaperedPrecisionRoot.lean:123:53: error: Tactic `rfl` failed: equality lhs
+  u * (D * (4 * (8 * ((u + M * 3 - 1) / u))))
+is not definitionally equal to rhs
+  u * (D * (32 * ((u + M * 3 - 1) / u)))
+
+p M u i : Nat
+hp : p ≤ M
+hmargin : 32 * u ≤ M
+hi : i < u
+D : Nat := 2 ^ (2 * u - i)
+hu : 0 < u
+hD : 2 ^ (u + 1) ≤ D
+hfour : 4 * u ≤ D
+hh : (3 * M + u - 1) / u * u ≤ 3 * M + u
+hpin : 4 * (p * u) ≤ M * D
+⊢ u * (D * (4 * (8 * ((u + M * 3 - 1) / u)))) = u * (D * (32 * ((u + M * 3 - 1) / u)))
+/tmp/ecdlp-root-precision-20261123/02-root-core/CryptoLeanCore/TaperedPrecisionRoot.lean:133:49: error: Tactic `rfl` failed: equality lhs
+  M * (u * (4 * (8 * (1 + u * 2))))
+is not definitionally equal to rhs
+  M * (u * (2 * (16 * (1 + u * 2))))
+
+p M u i : Nat
+hp : p ≤ M
+hmargin : 32 * u ≤ M
+hi : i < u
+D : Nat := 2 ^ (2 * u - i)
+hu : 0 < u
+hD : 2 ^ (u + 1) ≤ D
+hfour : 4 * u ≤ D
+hh : (3 * M + u - 1) / u * u ≤ 3 * M + u
+hpin : 4 * (p * u) ≤ M * D
+hnode : 4 * (8 * ((3 * M + u - 1) / u) * D * u) ≤ 97 * M * D
+⊢ M * (u * (4 * (8 * (1 + u * 2)))) = M * (u * (2 * (16 * (1 + u * 2))))
+/tmp/ecdlp-root-precision-20261123/02-root-core/CryptoLeanCore/TaperedPrecisionRoot.lean:142:2: error: omega could not prove the goal:
+a possible counterexample may satisfy the constraints
+  m ≥ 0
+  l ≥ 0
+  k ≥ 0
+  j ≥ 0
+  j + 8*k + 8*l - 35*m ≥ 1
+  h ≥ 0
+  h - 4*j ≥ 0
+  21*h - 16*l ≥ 0
+  97*h - 32*k ≥ 0
+  g ≥ 0
+  e - 2*f ≥ 0
+  d ≥ 0
+  c ≥ 1
+  c - d ≥ 1
+  4*c - e ≤ 0
+  b ≥ 0
+  a ≥ 0
+  a - b ≥ 0
+  a - 32*c ≥ 0
+  3*a + c - g ≥ 0
+where
+ a := ↑M
+ b := ↑p
+ c := ↑u
+ d := ↑i
+ e := ↑2 ^ (2 * u - i)
+ f := ↑2 ^ u
+ g := ↑((3 * M + u - 1) / u) * ↑u
+ h := ↑M * ↑D
+ j := ↑p * ↑u
+ k := ↑((3 * M + u - 1) / u) * ↑(D * u)
+ l := ↑M * ↑(2 * (u * u) + 1 * u)
+ m := ↑M * ↑(2 ^ (2 * u - i))

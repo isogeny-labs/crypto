@@ -1,0 +1,315 @@
+//! A six-*distinct-weight* 3+3 F2 group-algebra index-calculus control.
+//! Runs on the original cofactor-one Prime31 elliptic curve, not a weak curve.
+//! Reuses the native prime31_algebraic_ic Arithmetic/Point/PRIME31 implementation.
+//! This uses GENERIC three-sum point enumeration: NOT a nonenumerative extractor.
+//! All benchmark/PCC claims are development-only [pcc:unverified].
+//!
+//!    cargo +1.100.0 test --release --locked --example prime31_weighted_m6_complete \
+//!      --manifest-path research/prime31_ic_20261115/native/Cargo.toml
+//!    cargo +1.100.0 run --release --locked --example prime31_weighted_m6_complete \
+//!      --manifest-path research/prime31_ic_20261115/native/Cargo.toml
+use prime31_algebraic_ic::{check_curve, Arithmetic, Counts, Point, PRIME31};
+use serde_json::json;
+use std::collections::{hash_map::Entry, HashMap, HashSet};
+use std::time::Instant;
+
+const WEIGHTS: [u64; 6] = [1, 3, 5, 7, 11, 13];
+const TRAIN_SEED: u64 = 0x4d36_5452_4149_4e31;
+const TARGET_SEED: u64 = 0x4d36_5441_5247_4554;
+const TRAIN_CAP: usize = 512;
+const TARGETS: usize = 1024;
+const SHIFT_CAP: usize = 64;
+type Word3 = [u8; 3];
+type Word6 = [u8; 6];
+type Row = [u64; 32];
+
+fn splitmix64(s: &mut u64) -> u64 {
+    *s = s.wrapping_add(0x9e37_79b9_7f4a_7c15);
+    let mut z = *s;
+    z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
+    z ^ (z >> 31)
+}
+
+fn first_rational_points(ar: &mut Arithmetic, b: usize) -> Vec<Point> {
+    let mut out = Vec::with_capacity(b);
+    for x in 0..PRIME31.p {
+        let rhs = ar.rhs(PRIME31, x);
+        if let Some(y) = ar.sqrt(rhs, PRIME31.p) {
+            assert_ne!(y, 0);
+            out.push(Some((x, y.min(PRIME31.p - y))));
+            if out.len() == b { return out; }
+        }
+    }
+    panic!("insufficient rational points");
+}
+
+fn slot_points(ar: &mut Arithmetic, base: &[Point]) -> [Vec<Point>; 6] {
+    std::array::from_fn(|i| base.iter().map(|&p| ar.scalar(PRIME31, WEIGHTS[i], p)).collect())
+}
+
+fn eval(ar: &mut Arithmetic, slots: &[Vec<Point>; 6], word: &Word6) -> Point {
+    let mut acc = None;
+    for i in 0..6 {
+        acc = ar.add(PRIME31, acc, slots[i][word[i] as usize]);
+    }
+    acc
+}
+
+fn half(ar: &mut Arithmetic, slots: &[Vec<Point>; 6], from: usize) -> Vec<(Point, Word3)> {
+    let b = slots[0].len();
+    assert!(b > 0 && b < 256);
+    let mut pair = Vec::with_capacity(b * b);
+    for i in 0..b {
+        for j in 0..b {
+            pair.push((ar.add(PRIME31, slots[from][i], slots[from + 1][j]), i as u8, j as u8));
+        }
+    }
+    let mut odd: HashMap<Point, Word3> = HashMap::with_capacity(b * b * b);
+    for &(sum, i, j) in &pair {
+        for k in 0..b {
+            let pt = ar.add(PRIME31, sum, slots[from + 2][k]);
+            match odd.entry(pt) {
+                Entry::Vacant(e) => { e.insert([i, j, k as u8]); }
+                Entry::Occupied(e) => { e.remove(); }
+            }
+        }
+    }
+    let mut v: Vec<_> = odd.into_iter().collect();
+    v.sort_unstable_by_key(|(pt, _)| *pt); // fixed witness ordering, independent of hash randomization
+    v
+}
+
+fn query(ar: &mut Arithmetic, left: &[(Point, Word3)],
+         right: &HashMap<Point, Word3>, target: Point) -> Option<Word6> {
+    let mut parity = false;
+    let mut witness = None;
+    for &(lp, lw) in left {
+        let minus_lp = ar.neg(PRIME31, lp);
+        let complement = ar.add(PRIME31, target, minus_lp);
+        if let Some(&rw) = right.get(&complement) {
+            parity = !parity;
+            witness = Some([lw[0], lw[1], lw[2], rw[0], rw[1], rw[2]]);
+        }
+    }
+    if parity { witness } else { None }
+}
+fn mod_mul(x: u64, y: u64) -> u64 {
+    ((x as u128 * y as u128) % PRIME31.n as u128) as u64
+}
+fn mod_sub(x: u64, y: u64) -> u64 { (x + PRIME31.n - y) % PRIME31.n }
+fn mod_pow(mut x: u64, mut e: u64) -> u64 {
+    let mut z = 1u64;
+    while e > 0 {
+        if e & 1 != 0 { z = mod_mul(z, x); }
+        x = mod_mul(x, x);
+        e >>= 1;
+    }
+    z
+}
+fn coeffs(word: Word6) -> Row {
+    let mut r = [0u64; 32];
+    for i in 0..6 {
+        let j = word[i] as usize;
+        r[j] = (r[j] + WEIGHTS[i]) % PRIME31.n;
+    }
+    r
+}
+
+#[derive(Default)]
+struct Elimination { pivots: [Option<Row>; 31], rank: usize }
+impl Elimination {
+    fn add(&mut self, mut row: Row) -> bool {
+        for i in 0..31 {
+            if row[i] == 0 { continue; }
+            if let Some(p) = self.pivots[i] {
+                let t = row[i];
+                for j in i..32 { row[j] = mod_sub(row[j], mod_mul(t, p[j])); }
+            } else {
+                let inv = mod_pow(row[i], PRIME31.n - 2);
+                for v in &mut row[i..] { *v = mod_mul(*v, inv); }
+                self.pivots[i] = Some(row);
+                self.rank += 1;
+                return true;
+            }
+        }
+        assert_eq!(row[31], 0, "inconsistent relation rows");
+        false
+    }
+    fn recover(&self) -> Option<[u64; 31]> {
+        if self.rank != 31 { return None; }
+        let mut logs = [0u64; 31];
+        for i in (0..31).rev() {
+            let row = self.pivots[i]?;
+            let mut v = row[31];
+            for j in (i + 1)..31 { v = mod_sub(v, mod_mul(row[j], logs[j])); }
+            logs[i] = v;
+        }
+        Some(logs)
+    }
+}
+fn log_from_word(word: Word6, logs: &[u64; 31]) -> u64 {
+    let mut v = 0u64;
+    for i in 0..6 {
+        v = (v + mod_mul(WEIGHTS[i], logs[word[i] as usize])) % PRIME31.n;
+    }
+    v
+}
+fn delta(now: Counts, old: Counts) -> serde_json::Value {
+    json!({"group_additions":now.group_additions-old.group_additions,
+           "fp_multiplications":now.fp_multiplications-old.fp_multiplications,
+           "fp_inversions":now.fp_inversions-old.fp_inversions})
+}
+
+fn exact_b2_parity_control(ar: &mut Arithmetic, base: &[Point]) {
+    let slots = slot_points(ar, &base[..2]);
+    let left = half(ar, &slots, 0);
+    let right: HashMap<Point, Word3> = half(ar, &slots, 3).into_iter().collect();
+    let mut expected = HashSet::new();
+    for wordmask in 0..64 {
+        let mut word = [0u8; 6];
+        for (i, w) in word.iter_mut().enumerate() { *w = ((wordmask >> i) & 1) as u8; }
+        let pt = eval(ar, &slots, &word);
+        if !expected.insert(pt) { expected.remove(&pt); }
+    }
+    let mut got = HashSet::new();
+    for &lp in left.iter().map(|v| &v.0) {
+        for &rp in right.keys() {
+            let target = ar.add(PRIME31, lp, rp);
+            if !got.insert(target) { got.remove(&target); }
+        }
+    }
+    assert_eq!(got, expected);
+    // A repeated identical unsigned six-slot base is not the distinct-weight case.
+    for q in expected {
+        let w = query(ar, &left, &right, q).expect("odd case must return word");
+        assert_eq!(eval(ar, &slots, &w), q);
+    }
+}
+
+fn main() {
+    let total_t0 = Instant::now();
+    let mut ar = Arithmetic::default();
+    check_curve(PRIME31, &mut ar).expect("original ordinary cofactor-one curve");
+    let base = first_rational_points(&mut ar, 31);
+    exact_b2_parity_control(&mut ar, &base);
+    let setup_before = ar.counts;
+    let setup_t0 = Instant::now();
+    let slots = slot_points(&mut ar, &base);
+    let left = half(&mut ar, &slots, 0);
+    let right_map: HashMap<_, _> = half(&mut ar, &slots, 3).into_iter().collect();
+    let setup_ns = setup_t0.elapsed().as_nanos();
+    let setup_cost = delta(ar.counts, setup_before);
+
+    let mut train_rng = TRAIN_SEED;
+    let mut ranker = Elimination::default();
+    let mut train_rows = Vec::new();
+    let mut positive = 0usize;
+    let training_t0 = Instant::now();
+    let training_before = ar.counts;
+    let mut calls = 0usize;
+    for t in 0..TRAIN_CAP {
+        let known_a = 1 + splitmix64(&mut train_rng) % (PRIME31.n - 1);
+        let residual = ar.scalar(PRIME31, known_a, Some(PRIME31.g));
+        calls += 1;
+        if let Some(word) = query(&mut ar, &left, &right_map, residual) {
+            positive += 1;
+            assert_eq!(eval(&mut ar, &slots, &word), residual);
+            let mut row = coeffs(word);
+            row[31] = known_a;
+            let independent = ranker.add(row);
+            train_rows.push(json!({"public_residual":residual, "known_query_coefficient":known_a,
+                                   "word":word, "independent":independent}));
+            if ranker.rank == 31 { break; }
+        }
+        assert_eq!(t + 1, calls);
+    }
+    let training_ns = training_t0.elapsed().as_nanos();
+    let training_cost = delta(ar.counts, training_before);
+    let mut result = json!({
+        "protocol":"prime31-weighted-m6-complete-v1",
+        "source_p":PRIME31.p,"source_a":PRIME31.a,"source_b":PRIME31.b,
+        "source_n":PRIME31.n,"generator":PRIME31.g,
+        "weights":WEIGHTS,"base":base,"left_odd_keys":left.len(),"right_odd_keys":right_map.len(),
+        "theoretical_ordered_mean_b31": format!("{:.12}",(31f64).powi(6)/PRIME31.n as f64),
+        "train_seed":format!("{TRAIN_SEED:#018x}"),
+        "target_seed":format!("{TARGET_SEED:#018x}"),
+        "setup_ns":setup_ns,"setup_cost":setup_cost,
+        "train_calls":calls,"train_odd":positive,"train_rank":ranker.rank,
+        "train_ns":training_ns,"train_cost":training_cost,"training":train_rows,
+        "target_limit":TARGETS,"shift_cap":SHIFT_CAP,
+        "nonenumerative_algebraic_extractor":false,
+        "generic_three_plus_three_enumeration":true,
+        "pcc":"unverified"
+    });
+    if let Some(logs) = ranker.recover() {
+        for (p, &ell) in base.iter().zip(logs.iter()) {
+            assert_eq!(ar.scalar(PRIME31, ell, Some(PRIME31.g)), *p);
+        }
+        let query_before = ar.counts;
+        let query_t0 = Instant::now();
+        let mut rng = TARGET_SEED;
+        let mut completed = 0usize;
+        let mut targets = Vec::with_capacity(TARGETS);
+        let mut total_attempts = 0usize;
+        for idx in 0..TARGETS {
+            // The caller's expected scalar is NEVER passed to the query oracle.
+            let secret_for_verification_only = 1 + splitmix64(&mut rng) % (PRIME31.n - 1);
+            let q = ar.scalar(PRIME31, secret_for_verification_only, Some(PRIME31.g));
+            let mut r = q;
+            let mut solved = None;
+            for shift in 0..SHIFT_CAP {
+                total_attempts += 1;
+                if let Some(word) = query(&mut ar, &left, &right_map, r) {
+                    assert_eq!(eval(&mut ar, &slots, &word), r);
+                    let log = mod_sub(log_from_word(word, &logs), shift as u64);
+                    assert_eq!(ar.scalar(PRIME31, log, Some(PRIME31.g)), q);
+                    assert_eq!(log, secret_for_verification_only);
+                    solved = Some(json!({"index":idx,"public_point":q,"recovered":log,
+                        "known_scalar_verifier_only":secret_for_verification_only,
+                        "shift":shift,"word":word}));
+                    completed += 1;
+                    break;
+                }
+                r = ar.add(PRIME31, r, Some(PRIME31.g));
+            }
+            if let Some(row) = solved { targets.push(row); }
+            else { targets.push(json!({"index":idx,"public_point":q,"censored":true})); }
+        }
+        result["base_logs"] = json!(logs);
+        result["targets"] = json!(targets);
+        result["completed"] = json!(completed);
+        result["target_attempts"] = json!(total_attempts);
+        result["query_ns"] = json!(query_t0.elapsed().as_nanos());
+        result["query_cost"] = delta(ar.counts, query_before);
+    } else {
+        result["completed"] = json!(0);
+        result["target_attempts"] = json!(0);
+        result["censored_reason"] = json!("rank31 not reached within preregistered training cap");
+    }
+    result["total_ns_diagnostic"] = json!(total_t0.elapsed().as_nanos());
+    result["complete_nongeneric_speedup_claim"] = json!(false);
+    println!("{}",serde_json::to_string_pretty(&result).expect("json"));
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn exact_original_curve_b2_six_weight_parity() {
+        let mut ar = Arithmetic::default();
+        check_curve(PRIME31, &mut ar).unwrap();
+        let b = first_rational_points(&mut ar, 2);
+        exact_b2_parity_control(&mut ar, &b);
+    }
+    #[test]
+    fn modular_elimination_and_weighted_coefficients() {
+        let mut ranker = Elimination::default();
+        for i in 0..31 {
+            let mut row=[0u64;32];row[i]=7;row[31]=(7 * (i as u64 + 1))%PRIME31.n;
+            assert!(ranker.add(row));
+        }
+        assert_eq!(ranker.recover().unwrap(),std::array::from_fn(|i|i as u64+1));
+        let c=coeffs([0,0,0,0,0,0]);
+        assert_eq!(c[0], WEIGHTS.iter().sum::<u64>());
+    }
+}

@@ -1,0 +1,139 @@
+{
+  "main": "MillerFinitePointAudit.miller_finite_point_certificate",
+  "binding": "140ca58f39c177a432e21f1aee49ae26a9e3075c50cced761301751b1db04b09",
+  "custom_imports": {
+    "FieldValuation": "research/miller_finite_point_audit_20261115/lean/FieldValuation.lean",
+    "LineEvaluation": "research/miller_finite_point_audit_20261115/lean/LineEvaluation.lean",
+    "FiniteFractionField": "research/miller_finite_point_audit_20261115/lean/FiniteFractionField.lean",
+    "ChartAlgebra": "research/miller_finite_point_audit_20261115/lean/ChartAlgebra.lean",
+    "FiniteValuation": "research/miller_finite_point_audit_20261115/lean/FiniteValuation.lean",
+    "LocalComparison": "research/miller_finite_point_audit_20261115/lean/LocalComparison.lean",
+    "MillerFunctions": "research/miller_finite_point_audit_20261115/lean/MillerFunctions.lean",
+    "OriginEvaluation": "research/miller_finite_point_audit_20261115/lean/OriginEvaluation.lean",
+    "DVRIdentification": "research/miller_finite_point_audit_20261115/lean/DVRIdentification.lean",
+    "PointLocalization": "research/miller_finite_point_audit_20261115/lean/PointLocalization.lean",
+    "Normalization": "research/miller_finite_point_audit_20261115/lean/Normalization.lean",
+    "ValuationCertificate": "research/miller_finite_point_audit_20261115/lean/ValuationCertificate.lean",
+    "ChartCertificate": "research/miller_finite_point_audit_20261115/lean/ChartCertificate.lean",
+    "ChartFractionField": "research/miller_finite_point_audit_20261115/lean/ChartFractionField.lean",
+    "ChartAdicValuation": "research/miller_finite_point_audit_20261115/lean/ChartAdicValuation.lean",
+    "ChartLocalization": "research/miller_finite_point_audit_20261115/lean/ChartLocalization.lean",
+    "FinitePointCertificate": "research/miller_finite_point_audit_20261115/lean/FinitePointCertificate.lean",
+    "LineIdeals": "research/miller_finite_point_audit_20261115/lean/LineIdeals.lean",
+    "LocalOriginEvaluation": "research/miller_finite_point_audit_20261115/lean/LocalOriginEvaluation.lean",
+    "FiniteDVR": "research/miller_finite_point_audit_20261115/lean/FiniteDVR.lean",
+    "NormDegree": "research/miller_finite_point_audit_20261115/lean/NormDegree.lean",
+    "PointDivisor": "research/miller_finite_point_audit_20261115/lean/PointDivisor.lean",
+    "DiscreteValuation": "research/miller_finite_point_audit_20261115/lean/DiscreteValuation.lean",
+    "GuardControls": "research/miller_finite_point_audit_20261115/lean/GuardControls.lean",
+    "FiniteControls": "research/miller_finite_point_audit_20261115/lean/FiniteControls.lean",
+    "ResidueNormalization": "research/miller_finite_point_audit_20261115/lean/ResidueNormalization.lean",
+    "LineMultiplicity": "research/miller_finite_point_audit_20261115/lean/LineMultiplicity.lean"
+  },
+  "claims": [
+    {
+      "declaration": "MillerFinitePointAudit.evaluation_ideal_coordinates",
+      "conclusion": "Actual surjective evaluation kernel is the actual point coordinate ideal."
+    },
+    {
+      "declaration": "MillerFinitePointAudit.shifted_curve_relation",
+      "conclusion": "Exact shifted actual coordinate-ring equation in every characteristic."
+    },
+    {
+      "declaration": "MillerFinitePointAudit.pointLocalDVR",
+      "conclusion": "Nonsingular partials derive actual local DVR with no DVR premise."
+    },
+    {
+      "declaration": "MillerFinitePointAudit.pointFunctionFractionRing",
+      "conclusion": "Full actual curve FunctionField is the actual finite-point localization fraction field."
+    },
+    {
+      "declaration": "MillerFinitePointAudit.finite_adic_of_principal_power",
+      "conclusion": "Official normalized actual adic valuation from actual principal maximal-ideal powers."
+    },
+    {
+      "declaration": "MillerFinitePointAudit.localized_point_ideal",
+      "conclusion": "Equal point maps to actual maximal ideal, different point to unit ideal."
+    },
+    {
+      "declaration": "MillerFinitePointAudit.finite_chord_order",
+      "conclusion": "Every actual finite chord/tangent order counts repeated points."
+    },
+    {
+      "declaration": "MillerFinitePointAudit.finite_vertical_order",
+      "conclusion": "Every actual finite vertical order counts the negative pair, including two-torsion."
+    },
+    {
+      "declaration": "MillerFinitePointAudit.chord_principal_point_divisor",
+      "conclusion": "Actual Finsupp chord principal point divisor from actual local orders and proved finite support."
+    },
+    {
+      "declaration": "MillerFinitePointAudit.vertical_principal_point_divisor",
+      "conclusion": "Actual vertical principal point divisor, including repeated case."
+    },
+    {
+      "declaration": "MillerFinitePointAudit.three_tangent_principal_point_divisor",
+      "conclusion": "Actual three-torsion tangent principal point divisor 3(P)-3(O)."
+    },
+    {
+      "declaration": "MillerFinitePointAudit.control_two_x_not_uniformizer",
+      "conclusion": "Actual F5 two-torsion X-xP fails as local uniformizer."
+    },
+    {
+      "declaration": "MillerFinitePointAudit.control_negative_tangent_divisor",
+      "conclusion": "Actual F5 ordinary tangent divisor differs from 3(P)-3(O)."
+    }
+  ],
+  "prior_reused_claims": [
+    "PCC-20261115-6a306d",
+    "PCC-20261115-c0e6db",
+    "PCC-20261115-357b60"
+  ],
+  "native_written_binding": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "signed_standing": "unverified",
+  "assurance": {
+    "gate_declarations": 224,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "final_project_log_advisories": 0,
+    "inherited_audit_tool_deprecation_warnings": 1,
+    "complete_written_header": true,
+    "independent_native_full_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "exact_reused_credited_modules": 19,
+    "new_modules": 8,
+    "actual_finite_point_local_DVR_derived": true,
+    "actual_full_function_field_fraction_ring_proved": true,
+    "actual_official_normalized_adic_multiplicities": true,
+    "actual_chord_vertical_three_torsion_point_divisors": true,
+    "actual_two_torsion_uniformizer_guard_counterexample": true,
+    "actual_three_torsion_divisor_guard_counterexample": true,
+    "arbitrary_field_scope": "Actual nonsingular K-points; for elliptic model over algebraically closedK, all geometric points.",
+    "mathlib_projective_Scheme_localRing_Divisor_comparison": false,
+    "general_all_function_divisor_finiteness": false,
+    "full_pairing_or_original14_completion": false,
+    "independent_implementation_or_physicalhost_validation": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

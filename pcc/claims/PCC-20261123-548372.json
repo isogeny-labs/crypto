@@ -1,0 +1,57 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T16:14:41Z",
+ "id": "PCC-20261123-548372",
+ "kind": "theorem",
+ "producer": {
+  "commit": "112d7230223e9de495405f50f64d1f69c6b31c85",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "f22f43b44bb7502af45ca227ed51b287151c1eeaa90c3c16ad2c717ce8557db0",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/section-coeff-v1/SectionCoeffAssembly.lean",
+   "theorem": "SectionCoeffAssembly.actual_squarefree_of_divisibility"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-coeff-v1/lean-gate/audit.log",
+    "sha256": "11b5b3fdec04cd925e91283fe3558d828b0e18831c2b226f67b0bcfedac86b74"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-coeff-v1/lean-gate/build.log",
+    "sha256": "5b0a71754aa3e389262bcd37d501aa5acd1a8fee7594d0a8b2cf0ed6af795725"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-coeff-v1/lake-manifest.json",
+    "sha256": "7d0da41c43e339f608b0b326a979f030f983f7e36852e7edfcf6167a76c493f1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-coeff-v1/lakefile.toml",
+    "sha256": "1480186795fdca00de6abca4bd8bd7dec8ba61addac6a559c22e96bbdb06c94f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/section-coeff-v1/lean-toolchain",
+    "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Existing-law actual-modulus polynomial endpoint only; full curve/norm/degree bindings remain open",
+ "statement": "For all S,E over ZMod(2^255-19), squarefree E and S divides E imply squarefree S."
+}

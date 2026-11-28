@@ -1,0 +1,9 @@
+[selftest] orbit n=7 ell_eff=3 squaring_closed=true
+[selftest] orbit n=9 ell_eff=6 squaring_closed=true
+[selftest] orbit n=15 ell_eff=7 squaring_closed=true
+[selftest] arm=orbit n=15 ell_eff=6 sqclosed=true d_ff=Some(2) d_F=Some(3) d_res=Some(4)
+[selftest] arm=random n=15 ell_eff=6 sqclosed=false d_ff=Some(3) d_F=Some(3) d_res=Some(4)
+[selftest] arm=subspace n=15 ell_eff=6 sqclosed=false d_ff=Some(3) d_F=Some(2) d_res=Some(3)
+[selftest] note: proxy d_ff=3 > d_F=2 for arm=subspace (expected; d_ff is a rank proxy)
+[selftest] OK
+selftest_exit=0

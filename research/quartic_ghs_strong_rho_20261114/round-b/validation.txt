@@ -1,0 +1,5 @@
+command: jq -e . q223-round-{a,b}.jsonl; compare sorted rho records after deleting wall_s and the six expected fq_mul/fq_add fields; assert for setup/walk/verify that round_a.fq_mul-round_b.fq_mul=round_a.f3_sq and round_a.fq_add-round_b.fq_add=5*round_a.f3_sq
+exit: 0
+delta_assertion: true
+
+Scope: producer-side deterministic comparison only. This is not an independent replay or PCC admission.

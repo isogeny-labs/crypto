@@ -1,0 +1,61 @@
+{
+  "schema": "prime31-isogeny-choice.cell/v2",
+  "cell_id": "p31-sparse-recovery-candidates-s1-69",
+  "method": "ic",
+  "source_target": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "order": 2147446831,
+    "generator": {
+      "x": 625037715,
+      "y": 2100627251,
+      "infinity": false
+    },
+    "target": {
+      "x": 984837385,
+      "y": 1142774582,
+      "infinity": false
+    }
+  },
+  "kernel": "aplus_cyclic",
+  "coset_scalar": 1,
+  "target_arm": "isogenous_transported",
+  "arity": 3,
+  "presentation": "dense",
+  "stage": "complete_recovery",
+  "oracle_backend": "pair_table",
+  "plain_control": true,
+  "plain_reference": {
+    "schema": "prime31-isogeny-choice.plain-reference/v1",
+    "fixture_sha256": "0de066383113198aff48da2beb6604d56b4bf328af55aa61eae20f07c7d96c33",
+    "kernel": "aplus_cyclic",
+    "coset_scalar": 1,
+    "target_arm": "isogenous_transported",
+    "columns": 518
+  },
+  "plain_seed": 1,
+  "max_plain_x_trials": 1000000,
+  "query_seed": 104729,
+  "collection": {
+    "max_queries": 65536,
+    "max_seconds": 110,
+    "oracle": {
+      "max_degree": 1024,
+      "max_pairs_per_step": 32,
+      "timeout_ms": 2000,
+      "max_solutions": 4096,
+      "max_signed_lift_attempts": 1000000,
+      "stop_after_first": true,
+      "max_variables": 48,
+      "max_input_terms": 100000,
+      "domain_roots": "auto",
+      "sibling_batch": true
+    }
+  },
+  "execution_seconds": 120,
+  "memory_mib": 4096,
+  "round": 1,
+  "rho_max_steps": 2000000,
+  "rho_seed": 104729
+}

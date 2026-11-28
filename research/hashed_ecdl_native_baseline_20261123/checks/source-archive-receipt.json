@@ -1,0 +1,19 @@
+{
+  "scope": "Source payload archival and readback; no cryptographic experiment or solver retry",
+  "tested_source_head": "1f71987723a5c2d069e22abd4f99fc3303f51fee",
+  "manifest_source": "checks/native-source.sha256",
+  "local_tar": "/tmp/ecdlp-native-bootstrap-20261123/native-source.tar",
+  "tar_sha256": "6081d2959acf648b6abe67f26e398a397272d78b5a1804e1daf4502ae3ad7bac",
+  "tar_bytes": 1443840,
+  "source_files": 87,
+  "all_87_source_readback_hashes_matched": true,
+  "readback_log_sha256": "23e03a57c22c6bed729b4bf1fcbfc10c774661e359adae1c11c26e946059323e",
+  "creation": "native tar from existing hash-checked working source files",
+  "prior_git_archive_attempt": {
+    "command": "git archive --format=tar --prefix=source/ 1f71987723a5c2d069e22abd4f99fc3303f51fee crates/hashed-ecdl-tensor",
+    "outcome": "operator stopped metadata command with SIGTERM after 74 seconds; zero output bytes",
+    "local_empty_payload": "/tmp/ecdlp-native-bootstrap-20261123/native-source-git-archive-interrupted.tar",
+    "bytes": 0
+  },
+  "S3_used": false
+}

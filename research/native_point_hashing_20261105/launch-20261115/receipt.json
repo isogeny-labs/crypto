@@ -1,0 +1,153 @@
+{
+  "schema": "native-point-hash.launch-preflight/v1",
+  "recorded_at": "2026-11-15T16:45:48.265002+00:00",
+  "source_revision": "225cf2daa2ccef2808813dc32fff239416ce12f4",
+  "implementation_revision": "33ea7acf8af84b92209ade64af5a8b1015e838c2",
+  "user_request": "Run the point-table pilot",
+  "study_id": "XP-20261105-native-point-hashing",
+  "state": "blocked_before_submission",
+  "checks": [
+    {
+      "name": "aws-caller",
+      "argv": [
+        "aws",
+        "sts",
+        "get-caller-identity",
+        "--region",
+        "us-east-2",
+        "--no-cli-pager",
+        "--cli-connect-timeout",
+        "5",
+        "--cli-read-timeout",
+        "10"
+      ],
+      "exit_code": 253,
+      "nonsecret_env": {
+        "AWS_EC2_METADATA_DISABLED": "true",
+        "AWS_MAX_ATTEMPTS": "1"
+      },
+      "logs": [
+        {
+          "path": "aws-caller.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "aws-caller.stderr.log",
+          "sha256": "68ac2ac2a993375b76e6ff8109ae604592598965f05ee719b75635bb14275a72"
+        }
+      ]
+    },
+    {
+      "name": "github-checkpoint",
+      "argv": [
+        "gh",
+        "api",
+        "repos/isogeny-labs/crypto/actions/workflows/isolab-source-checkpoint.yml",
+        "--jq",
+        "{id,name,state,path}"
+      ],
+      "exit_code": 1,
+      "nonsecret_env": {},
+      "logs": [
+        {
+          "path": "github-checkpoint.stdout.log",
+          "sha256": "db5a14a8de2531e983a4c10fd1f1e4afd07450aa8e46bb4025b8ef403ab409f9"
+        },
+        {
+          "path": "github-checkpoint.stderr.log",
+          "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6"
+        }
+      ]
+    },
+    {
+      "name": "github-execution",
+      "argv": [
+        "gh",
+        "api",
+        "repos/isogeny-labs/crypto/actions/workflows/isolab-experiment.yml",
+        "--jq",
+        "{id,name,state,path}"
+      ],
+      "exit_code": 0,
+      "nonsecret_env": {},
+      "logs": [
+        {
+          "path": "github-execution.stdout.log",
+          "sha256": "aa771adfe303988bb542497b7ffa8dc9fa042025ebe2b52380a9457b3f1633a4"
+        },
+        {
+          "path": "github-execution.stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "name": "checkpoint-gate",
+      "argv": [
+        "scripts/checkpoint.sh",
+        "gate"
+      ],
+      "exit_code": 1,
+      "nonsecret_env": {
+        "AWS_EC2_METADATA_DISABLED": "true",
+        "AWS_MAX_ATTEMPTS": "1"
+      },
+      "logs": [
+        {
+          "path": "checkpoint-gate.stdout.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "checkpoint-gate.stderr.log",
+          "sha256": "2f1014b06fd1d5dbb602d7aef98a2e484b85b75101c52555f59d783097048012"
+        }
+      ]
+    }
+  ],
+  "runtime_observation": {
+    "connected": true,
+    "observations_current": true,
+    "bound_cloud_identities": 0,
+    "bound_secrets": 0,
+    "bound_runtime_variables": 0,
+    "network_mode": "unrestricted",
+    "network_policy_state": "enforced",
+    "oic_manifest_selector_present": false,
+    "kubeconfig_selector_present": false,
+    "documented_host_client_present": false
+  },
+  "budget_exception": {
+    "path": "../pilot-v1/budget-override-20261108.json",
+    "sha256": "6b38a7bada403660272dd03e97b27220ffaab2958978b717537075ea05537c22",
+    "active": true,
+    "total_usd_cap": 10,
+    "headroom_stop_overridden": true,
+    "renewed_budget_approval_requested": false
+  },
+  "checkpoint": {
+    "complete_current_request_note_prepared": true,
+    "current_request_note_sha256": "703f7e399f4791bf00764ae2371fe7e213860c8a990e617cada502947916a0b7",
+    "upload_attempt_reached_transport_selection": true,
+    "upload_succeeded": false,
+    "readback_succeeded": false,
+    "historical_tracked_note_restored": true
+  },
+  "launch": {
+    "workflow_dispatch_performed": false,
+    "cloud_builds_started": 0,
+    "cloud_jobs_submitted": 0,
+    "production_batches_started": 0,
+    "job_id": null,
+    "pod_id": null,
+    "build_id": null
+  },
+  "interpretation": [
+    "AWS client reports NoCredentials; no authenticated native caller is available here.",
+    "Checkpoint gate reports no upload transport; no current-source S3 upload/readback exists.",
+    "GitHub execution workflow is active; HTTP 404 for checkpoint workflow establishes no usable checkpoint route here, not its remote cause.",
+    "The stock ecbench image copies ecbench/fresh-owner, not the two point-table examples; no unrelated fixture was dispatched.",
+    "Protocol remains draft; image/L2/host/resource/export and remaining measurement qualifications still apply.",
+    "Account/lane headroom does not block this authorized bounded pilot."
+  ],
+  "standing": "Unregistered producer preflight observations; not a signed PCC execution verdict"
+}

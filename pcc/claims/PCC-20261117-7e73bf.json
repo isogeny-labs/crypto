@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T04:02:37Z",
+ "id": "PCC-20261117-7e73bf",
+ "kind": "statement",
+ "producer": {
+  "commit": "2043bee6aee1cef2444c48e8fd3a1b2368c6db38",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/complete-km-v2/source/complete_km.cpp",
+    "sha256": "76f076e646698aa49513eecc2ff44be33bf1642b6114e90247195676bcea4b34"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/complete-km-v2/stderr.txt",
+    "sha256": "addb9ff983407afa8e783f796fd78c782d41b8c601ee9c84528eecfe33baa0d2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/complete-km-v2/EXIT_CODE.txt",
+    "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "nist-cover-complete-maps",
+ "statement": "The complete-km-v2 producer qualifier passed its seven nonzero source encodings and reached its final vertical collision comparison, then rejected because the older rational-point-class helper caps support multiplicity at3 and the comparison needs4 at a pole-fiber point. This is a retained failed qualification, not a completed map claim."
+}

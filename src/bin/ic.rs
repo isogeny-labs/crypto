@@ -41,6 +41,8 @@ mod prime_orbit;
 mod progress;
 #[path = "ic/rho.rs"]
 mod rho;
+#[path = "ic/summation_roots.rs"]
+mod summation_roots;
 #[path = "ic/sweep/mod.rs"]
 mod sweep;
 #[path = "ic/tensor.rs"]
@@ -87,15 +89,24 @@ struct Cli {
     /// Print a machine-readable JSON report, without progress text.
     #[arg(long, global = true)]
     json: bool,
-    /// Trace index-calculus stages and individual trials as they finish (suppressed by --json).
-    #[arg(short, long, global = true)]
-    verbose: bool,
+    /// Live stages and relations; -vv adds point coordinates, -vvv includes unsuccessful attempts. Suppressed by --json.
+    #[arg(short, long, global = true, action = clap::ArgAction::Count)]
+    verbose: u8,
     /// Write the JSON report to a new file; existing files are never overwritten.
     #[arg(long, global = true)]
     out: Option<PathBuf>,
     /// Publish --out through the configured artifact store under a new logical name.
     #[arg(long, global = true, requires = "out")]
     store_name: Option<String>,
+    /// GPU offload: off (default), auto (discover workers) or a worker executable. Every offloaded
+    /// result is re-verified on the CPU and a worker failure falls back to the CPU path.
+    #[arg(
+        long,
+        global = true,
+        value_name = "off|auto|WORKER",
+        default_value = "off"
+    )]
+    gpu: String,
 }
 #[derive(Subcommand)]
 #[allow(clippy::large_enum_variant)]
@@ -151,6 +162,8 @@ enum Action {
     /// Run the scaled automorphism-orbit prime-field IC pipeline; relation
     /// walks support affine or batched Jacobian coordinates.
     PrimeOrbit(prime_orbit::PrimeArgs),
+    /// Find roots of point-origin prime-field Semaev specializations through signed curve sums.
+    SummationRoots(summation_roots::SummationRootsArgs),
     /// Run bounded EC index calculus on an explicit prime-field public target.
     SolvePrime(prime_external::PrimeArgs),
     /// Run bounded prime-field EC index calculus from a checked JSON target artifact.
@@ -243,6 +256,7 @@ fn execute(cli: &Cli) -> Result<Value, String> {
         Some(Action::LargePrime(args)) => large_prime::run(args.clone()),
         Some(Action::Prime(args)) => prime::run(args.clone()),
         Some(Action::PrimeOrbit(args)) => prime_orbit::run(args.clone(), cli.json),
+        Some(Action::SummationRoots(args)) => summation_roots::run(args.clone()),
         Some(Action::SolvePrime(args)) => prime_external::solve(args),
         Some(Action::SolvePrimeFile(args)) => prime_external::solve_file(args),
         Some(Action::PrimeRouteGenerate(args)) => prime_external::generate_route(args),
@@ -718,6 +732,34 @@ fn display(report: &Value) {
                 r["controls_detected"], r["controls"], r["controls_recovered"], r["controls"]
             );
         }
+        Some("summation-roots") => {
+            println!(
+                "Summation roots: {} ({})",
+                report["status"].as_str().unwrap_or("?"),
+                report["mode"].as_str().unwrap_or("?")
+            );
+            match report["mode"].as_str() {
+                Some("all") => println!(
+                    "  {} finite roots ({} distinct); infinity multiplicity {}",
+                    report["counts"]["finite_roots_with_multiplicity"],
+                    report["counts"]["distinct_finite_roots"],
+                    report["counts"]["infinity_multiplicity"]
+                ),
+                Some("one") => println!(
+                    "  sign mask {}; root {}",
+                    report["certificate"]["sign_mask"], report["root"]
+                ),
+                Some("target") => println!(
+                    "  found {}; left {} states; right {} stored of {} signed states; match {}",
+                    report["search"]["found"],
+                    report["search"]["left_states"],
+                    report["search"]["right_stored_states"],
+                    report["search"]["right_signed_states"],
+                    report["match"]
+                ),
+                _ => {}
+            }
+        }
         Some("large-prime") => {
             println!(
                 "Large-prime IC: {}; imported {} families",
@@ -746,8 +788,21 @@ fn display(report: &Value) {
 }
 fn main() -> ExitCode {
     let cli = Cli::parse();
+    match crypto_lib::cryptanalysis::gpu_offload::GpuMode::parse(&cli.gpu) {
+        Ok(mode) => crypto_lib::cryptanalysis::gpu_offload::set_mode(mode),
+        Err(message) => {
+            eprintln!("ic: {message}");
+            return ExitCode::FAILURE;
+        }
+    }
     // Generated parameters stay directly importable even with a global -v.
-    progress::init(cli.verbose && !cli.json && !matches!(cli.command, Some(Action::Generate(_))));
+    progress::init(
+        if cli.json || matches!(cli.command, Some(Action::Generate(_))) {
+            0
+        } else {
+            cli.verbose
+        },
+    );
     progress::line(format_args!(
         "startup: capturing executable and source provenance"
     ));
@@ -798,6 +853,9 @@ fn main() -> ExitCode {
             "arch":std::env::consts::ARCH,"binary_blake3":binary_hash(),"git_commit":git_commit(),
             "git_dirty":crypto_lib::build_provenance::git_dirty(),
             "git_commit_source":crypto_lib::build_provenance::source()});
+        if let Some(gpu) = crypto_lib::cryptanalysis::gpu_offload::report() {
+            report["gpu"] = gpu;
+        }
     }
     let success = matches!(
         report["status"].as_str(),
@@ -896,6 +954,35 @@ mod tests {
             prime_orbit::RelationCoordinatesArg::Jacobian
         );
         assert!(args.no_rho);
+    }
+
+    #[test]
+    fn summation_roots_parses_product_tree_all_mode() {
+        let cli = Cli::try_parse_from([
+            "ic",
+            "summation-roots",
+            "--p",
+            "1009",
+            "--a",
+            "2",
+            "--b",
+            "3",
+            "--x",
+            "0,1,2",
+            "--coefficients",
+            "--coefficient-method",
+            "product-tree",
+        ])
+        .unwrap();
+        let Some(Action::SummationRoots(args)) = cli.command else {
+            panic!("summation-roots did not select its action");
+        };
+        assert_eq!(args.xs, [0, 1, 2]);
+        assert!(args.coefficients);
+        assert_eq!(
+            args.coefficient_method,
+            summation_roots::Coefficients::ProductTree
+        );
     }
 
     #[test]

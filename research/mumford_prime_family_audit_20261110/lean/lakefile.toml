@@ -1,0 +1,11 @@
+name = "mumford_prime_family_audit"
+version = "0.1.0"
+defaultTargets = ["MumfordPrimeFamilyAudit"]
+
+[[require]]
+name = "mumford_family_group_audit"
+path = "../../mumford_family_group_audit_20261110/lean"
+
+[[lean_lib]]
+name = "MumfordPrimeFamilyAudit"
+roots = ["PrimeFamily"]

@@ -1,0 +1,3 @@
+# First-failure forensic diagnostic
+
+Preserve failed source/output at92bd5d0ea64 (exit101), no successful gate claim. New diagnostic prints first failing model counts,twistedtrace,Gaussian candidates and all norm-polynomials for norm-pGaussian integers before terminating on missing polynomial. No model/input/source correction, speed/result selection or replacement of original records. Freeze/push diagnostic/binary before one execution. It reconstructs same arithmetic only to expose intermediate values; it is not a retry qualifying the candidate. No future run without a new explicit amendment identifying the error. Git custody,noS3/cloud.

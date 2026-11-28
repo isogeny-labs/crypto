@@ -1,0 +1,21 @@
+MumfordSmoothness.lean:162:40: error: Function expected at
+  coeff_natDegree
+but this term has type
+  (coeff ?m.34) (natDegree ?m.34) = leadingCoeff ?m.34
+
+Note: Expected a function because this term is being applied to the argument
+  u
+MumfordSmoothness.lean:176:6: error: Type mismatch: After simplification, term
+  hv
+ has type
+  @LT.lt (WithBot ℕ) WithBot.instPreorder.toLT v.degree ↑1
+but is expected to have type
+  @LT.lt (WithBot ℕ) WithBot.instPreorder.toLT v.degree 1
+MumfordSmoothness.lean:187:6: error: Type mismatch: After simplification, term
+  hv
+ has type
+  @LT.lt (WithBot ℕ) WithBot.instPreorder.toLT v.degree ↑2
+but is expected to have type
+  @LT.lt (WithBot ℕ) WithBot.instPreorder.toLT v.degree 2
+'MumfordSmoothnessAudit.candidate_cardinality' depends on axioms: [propext, Classical.choice, Quot.sound]
+'MumfordSmoothnessAudit.valid_cardinality' depends on axioms: [propext, Classical.choice, Quot.sound]

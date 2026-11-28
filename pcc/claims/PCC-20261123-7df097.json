@@ -1,0 +1,34 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-23T18:02:54Z",
+ "id": "PCC-20261123-7df097",
+ "kind": "theorem",
+ "producer": {
+  "commit": "a404d19d67dcd6cd00f75150c4d875daad1b9d0c",
+  "model": "Codex",
+  "session": "port-mass-20261123-main-based-publication"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "15a04e6f6fa7c662dc308c10c7ede9bb0948f562aef90c006ab644c0c173125a",
+   "kind": "lean",
+   "project": "research/hashed_ecdl_port_mass_20261123/formal/PortControls.lean",
+   "theorem": "NativePortAccounting.source_tags"
+  },
+  {
+   "decl_sha256": "9ec7cb4ca9bfb1fc0035260c87ca64dadb6d90250b0841823119829d012fab58",
+   "kind": "lean",
+   "project": "research/hashed_ecdl_port_mass_20261123/formal/PortControls.lean",
+   "theorem": "NativePortAccounting.source_vertices"
+  },
+  {
+   "decl_sha256": "d17d82a1f409df1fe8ae16950fe32c799ff7d9bcaa9ee1cd46685df89b12c064",
+   "kind": "lean",
+   "project": "research/hashed_ecdl_port_mass_20261123/formal/PortControls.lean",
+   "theorem": "NativePortAccounting.parallel_example"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/hashed_ecdl_port_mass_20261123",
+ "statement": "For any natural radix, a multiset of endpoint tags in Fin radix squared has full-label incidence sum twice its edge cardinality; a separately labeled old-vertex multiset with P packet vertices per group has total vertex count card(old)+radix*P. Parallel incidences retain multiplicity. Three study declarations instantiate the existing shared multiset laws; no Rust refinement, bit-cost or production-admission theorem is asserted. Focused Lean4.35/Mathlib56 gates and fresh replay pass; default Mathlibcfc qualification and signed standing remain open."
+}

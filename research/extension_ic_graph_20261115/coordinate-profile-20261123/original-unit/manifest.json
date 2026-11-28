@@ -1,0 +1,65 @@
+{
+  "schema": "profile/v1",
+  "kind": "manifest",
+  "subcommand": "cpu",
+  "label": "First32 recorded Run51 coordinate systems; original unit reduction; not throughput",
+  "status": "ok",
+  "reason": null,
+  "started_utc": "2026-11-23T06:59:25Z",
+  "wall_seconds": 130.196,
+  "cwd": "/workspace/crypto-unit-descent-20261123",
+  "command": [
+    "/tmp/ic-descent51-native/recorded-coordinate-profile",
+    "/workspace/ic-runpod-runs/runpod-unit-deferred-20261117-51/returned/task/run/pair-unit-five.raw.json",
+    "unit",
+    "/tmp/ic-unit-coordinate-profile-20261123/profile-unit.coordinates.json"
+  ],
+  "isolation": "none",
+  "binary": {
+    "path": "/tmp/ic-descent51-native/recorded-coordinate-profile",
+    "sha256": "263a70fc2c2d20bf6ed2a25dd81c4d2cffdd1ef0082691899880f4c2c930ebf3",
+    "bytes": 14286296
+  },
+  "git": {
+    "commit": "92b9dae5db72775a0c4b2244253f082d37a0807a",
+    "dirty_tracked_files": 0
+  },
+  "tools": {
+    "valgrind": {
+      "path": "/tmp/ic-profile-tools-20261123/prefix/usr/bin/valgrind",
+      "version": "valgrind-3.24.0"
+    }
+  },
+  "host": {
+    "hostname": "b5556a226eac",
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "cpu_features": [
+      "adx",
+      "aes",
+      "avx2",
+      "avx512f",
+      "avx512ifma",
+      "bmi2",
+      "gfni",
+      "pclmulqdq",
+      "popcnt",
+      "sha_ni",
+      "vpclmulqdq"
+    ],
+    "kernel": "6.18.57",
+    "arch": "x86_64",
+    "logical_cpus": 1,
+    "mem_kib": 18440100,
+    "event_sources": [
+      "breakpoint",
+      "msr",
+      "software"
+    ],
+    "hardware_pmu": false,
+    "perf_event_paranoid": "2",
+    "kptr_restrict": "0",
+    "gpus": []
+  },
+  "hotspots_method": "callgrind",
+  "event": "Ir (instructions executed, simulated)"
+}

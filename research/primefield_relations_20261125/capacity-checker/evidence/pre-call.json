@@ -1,0 +1,47 @@
+{
+  "study_id": "m31-shared-chain-capacity-v1",
+  "created_utc": "2026-11-25T19:31:09Z",
+  "status": "frozen before any executable scientific or correctness call",
+  "mode": "deterministic exact-integer evaluation of explicitly stated probability bounds",
+  "immutable_qualifier": "frozen/exact_bounds.rs",
+  "immutable_qualifier_sha256": "e5ab263df42beedee1c350f9ffc853b0d0d738a9a9bc1a58c8aec5cb1705e83d",
+  "source_language": "Rust",
+  "dependencies": "Rust standard library only",
+  "compiler": "rustc 1.100.0 (0ef1bc386 2026-11-09), x86_64-unknown-linux-gnu",
+  "fixture_origin": {
+    "repository": "isogeny-labs/crypto",
+    "commit": "b60f801660eb423901ddea0c03c629089a1b5bfc",
+    "file": "research/prime31_ic_20261115/native/lib.rs",
+    "blob": "42e1e7c1912be43190959c5be8f84cf59c867786",
+    "file_sha256": "52b30e41478b0306603db7d09bcb17377cae64efcfd78d4c34db7bf91325a867"
+  },
+  "parameters": {
+    "p": 2147483647,
+    "r": 2147446831,
+    "universe_m": 1073723415,
+    "pool_n": 32768,
+    "capture_h": 128,
+    "chain_depth_s": 10,
+    "fiber_degree_cap_d": 1024,
+    "stirling_t": [1,2,4,8,10,12,13,14,15,16,32,64,128],
+    "anchor_t": [1,4,8,12,14,16,32,64,128],
+    "anchor_support_caps": ["h", "2*h", "4*h", "1024", "t*1024"],
+    "fixed_chain_complete_fiber_min_sizes": [2,3,4,8]
+  },
+  "randomness": {
+    "used": false,
+    "master_seed": null,
+    "replicates": null,
+    "reason": "No random generation, sampling, curve search, relation search, or timing comparison. Uniform sampling appears only as an explicit mathematical hypothesis in a probability bound."
+  },
+  "checks": [
+    "arbitrary-precision arithmetic against independent u128 edge cases",
+    "Stirling counting identity and Vandermonde identity",
+    "exact dyadic rounding against u128 rational comparisons",
+    "exhaustive abstract finite-set partition event versus upper bounds; no smaller finite field"
+  ],
+  "budgets": {"threads": 1, "seconds_per_executable": 30, "max_rss_mib": 512},
+  "outputs": ["build.txt", "tests.txt", "bounds.tsv", "certificates.json", "post-call.json"],
+  "failure_rule": "Stop on compile or assertion failure; retain this manifest and failure log. Any code correction needs a new frozen source and manifest version.",
+  "claim_boundary": "Checks exact arithmetic values of stated hand-proved formulas. Does not machine-prove the probability theorem, exhibit a relation extractor, or measure a speedup."
+}

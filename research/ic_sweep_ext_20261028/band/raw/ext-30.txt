@@ -1,0 +1,281 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | b8-dp2 | 36/36 | 5.032 | 5.179 | 6.501 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | b8-dp4 | 36/36 | 9.666 | 9.780 | 10.802 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | b8-dp6 | 36/36 | 22.899 | 23.067 | 24.582 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | b8-hybrid | 36/36 | 3.844 | 4.246 | 7.865 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | b8-klprog | 36/36 | 2.827 | 3.105 | 5.606 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | b8-klrand | 36/36 | 1.444 | 1.583 | 2.829 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | b8-nofold | 36/36 | 5.010 | 5.506 | 9.975 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | b8-null-strided | 36/36 | 4.256 | 4.678 | 8.469 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | bsgs-neg | 36/36 | 1.035 | 1.139 | 2.070 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | kangaroo | 36/36 | 1.757 | 1.762 | 1.812 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | pair-b16-b1536 | 36/36 | 81.817 | 82.895 | 92.602 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | pair-b16-b384 | 36/36 | 24.218 | 28.086 | 62.895 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | pair-b16-b768 | 36/36 | 29.054 | 31.030 | 48.816 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | pair-walk-b768 | 36/36 | 29.640 | 31.743 | 50.670 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | rho-lanes16 | 36/36 | 0.805 | 0.884 | 1.597 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | rho-neg | 36/36 | 0.729 | 0.801 | 1.446 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | sweep-b128 | 36/36 | 11.811 | 12.991 | 23.618 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | sweep-b16 | 36/36 | 4.933 | 5.423 | 9.826 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | sweep-b2 | 36/36 | 2.746 | 3.016 | 5.444 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | sweep-b32 | 36/36 | 6.753 | 7.425 | 13.472 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | sweep-b4 | 36/36 | 3.514 | 3.861 | 6.983 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | sweep-b64 | 36/36 | 9.391 | 10.329 | 18.765 | — |
+| icv1-fp30-tm6591-7c3fcd2f | 29.83 | sweep-b8 | 36/36 | 3.842 | 4.221 | 7.639 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs b8-dp4 | b8-dp2 < b8-dp4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs b8-dp6 | b8-dp2 < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs b8-hybrid | unresolved inside the band |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs b8-klprog | b8-klprog < b8-dp2 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs b8-klrand | b8-klrand < b8-dp2 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs b8-nofold | unresolved inside the band |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs b8-null-strided | unresolved inside the band |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs bsgs-neg | bsgs-neg < b8-dp2 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs kangaroo | kangaroo < b8-dp2 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs pair-b16-b1536 | b8-dp2 < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs pair-b16-b384 | b8-dp2 < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs pair-b16-b768 | b8-dp2 < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs pair-walk-b768 | b8-dp2 < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs rho-lanes16 | rho-lanes16 < b8-dp2 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs rho-neg | rho-neg < b8-dp2 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs sweep-b128 | b8-dp2 < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs sweep-b16 | unresolved inside the band |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs sweep-b2 | sweep-b2 < b8-dp2 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs sweep-b32 | b8-dp2 < sweep-b32 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs sweep-b4 | unresolved inside the band |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs sweep-b64 | b8-dp2 < sweep-b64 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp2 vs sweep-b8 | unresolved inside the band |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs b8-dp6 | b8-dp4 < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs b8-hybrid | b8-hybrid < b8-dp4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs b8-klprog | b8-klprog < b8-dp4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs b8-klrand | b8-klrand < b8-dp4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs b8-nofold | b8-nofold < b8-dp4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs b8-null-strided | b8-null-strided < b8-dp4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs bsgs-neg | bsgs-neg < b8-dp4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs kangaroo | kangaroo < b8-dp4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs pair-b16-b1536 | b8-dp4 < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs pair-b16-b384 | b8-dp4 < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs pair-b16-b768 | b8-dp4 < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs pair-walk-b768 | b8-dp4 < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs rho-lanes16 | rho-lanes16 < b8-dp4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs rho-neg | rho-neg < b8-dp4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs sweep-b128 | b8-dp4 < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs sweep-b16 | sweep-b16 < b8-dp4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs sweep-b2 | sweep-b2 < b8-dp4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs sweep-b32 | unresolved inside the band |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs sweep-b4 | sweep-b4 < b8-dp4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs sweep-b64 | unresolved inside the band |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp4 vs sweep-b8 | sweep-b8 < b8-dp4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs b8-hybrid | b8-hybrid < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs b8-klprog | b8-klprog < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs b8-klrand | b8-klrand < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs b8-nofold | b8-nofold < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs b8-null-strided | b8-null-strided < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs bsgs-neg | bsgs-neg < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs kangaroo | kangaroo < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs pair-b16-b1536 | b8-dp6 < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs pair-b16-b384 | b8-dp6 < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs pair-b16-b768 | b8-dp6 < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs pair-walk-b768 | b8-dp6 < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs rho-lanes16 | rho-lanes16 < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs rho-neg | rho-neg < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs sweep-b128 | sweep-b128 < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs sweep-b16 | sweep-b16 < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs sweep-b2 | sweep-b2 < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs sweep-b32 | sweep-b32 < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs sweep-b4 | sweep-b4 < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs sweep-b64 | sweep-b64 < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-dp6 vs sweep-b8 | sweep-b8 < b8-dp6 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs b8-klprog | b8-klprog < b8-hybrid |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs b8-klrand | b8-klrand < b8-hybrid |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs b8-nofold | b8-hybrid < b8-nofold |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs b8-null-strided | b8-hybrid < b8-null-strided |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs bsgs-neg | bsgs-neg < b8-hybrid |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs kangaroo | kangaroo < b8-hybrid |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs pair-b16-b1536 | b8-hybrid < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs pair-b16-b384 | b8-hybrid < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs pair-b16-b768 | b8-hybrid < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs pair-walk-b768 | b8-hybrid < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs rho-lanes16 | rho-lanes16 < b8-hybrid |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs rho-neg | rho-neg < b8-hybrid |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs sweep-b128 | b8-hybrid < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs sweep-b16 | b8-hybrid < sweep-b16 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs sweep-b2 | sweep-b2 < b8-hybrid |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs sweep-b32 | b8-hybrid < sweep-b32 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs sweep-b4 | sweep-b4 < b8-hybrid |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs sweep-b64 | b8-hybrid < sweep-b64 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-hybrid vs sweep-b8 | sweep-b8 < b8-hybrid |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs b8-klrand | b8-klrand < b8-klprog |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs b8-nofold | b8-klprog < b8-nofold |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs b8-null-strided | b8-klprog < b8-null-strided |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs bsgs-neg | bsgs-neg < b8-klprog |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs kangaroo | kangaroo < b8-klprog |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs pair-b16-b1536 | b8-klprog < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs pair-b16-b384 | b8-klprog < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs pair-b16-b768 | b8-klprog < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs pair-walk-b768 | b8-klprog < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs rho-lanes16 | rho-lanes16 < b8-klprog |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs rho-neg | rho-neg < b8-klprog |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs sweep-b128 | b8-klprog < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs sweep-b16 | b8-klprog < sweep-b16 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs sweep-b2 | sweep-b2 < b8-klprog |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs sweep-b32 | b8-klprog < sweep-b32 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs sweep-b4 | b8-klprog < sweep-b4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs sweep-b64 | b8-klprog < sweep-b64 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klprog vs sweep-b8 | b8-klprog < sweep-b8 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs b8-nofold | b8-klrand < b8-nofold |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs b8-null-strided | b8-klrand < b8-null-strided |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs bsgs-neg | bsgs-neg < b8-klrand |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs kangaroo | unresolved inside the band |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs pair-b16-b1536 | b8-klrand < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs pair-b16-b384 | b8-klrand < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs pair-b16-b768 | b8-klrand < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs pair-walk-b768 | b8-klrand < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs rho-lanes16 | rho-lanes16 < b8-klrand |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs rho-neg | rho-neg < b8-klrand |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs sweep-b128 | b8-klrand < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs sweep-b16 | b8-klrand < sweep-b16 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs sweep-b2 | b8-klrand < sweep-b2 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs sweep-b32 | b8-klrand < sweep-b32 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs sweep-b4 | b8-klrand < sweep-b4 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs sweep-b64 | b8-klrand < sweep-b64 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-klrand vs sweep-b8 | b8-klrand < sweep-b8 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs b8-null-strided | b8-null-strided < b8-nofold |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs bsgs-neg | bsgs-neg < b8-nofold |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs kangaroo | kangaroo < b8-nofold |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs pair-b16-b1536 | b8-nofold < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs pair-b16-b384 | b8-nofold < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs pair-b16-b768 | b8-nofold < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs pair-walk-b768 | b8-nofold < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs rho-lanes16 | rho-lanes16 < b8-nofold |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs rho-neg | rho-neg < b8-nofold |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs sweep-b128 | b8-nofold < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs sweep-b16 | sweep-b16 < b8-nofold |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs sweep-b2 | sweep-b2 < b8-nofold |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs sweep-b32 | b8-nofold < sweep-b32 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs sweep-b4 | sweep-b4 < b8-nofold |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs sweep-b64 | b8-nofold < sweep-b64 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-nofold vs sweep-b8 | sweep-b8 < b8-nofold |
+| icv1-fp30-tm6591-7c3fcd2f | b8-null-strided vs bsgs-neg | bsgs-neg < b8-null-strided |
+| icv1-fp30-tm6591-7c3fcd2f | b8-null-strided vs kangaroo | kangaroo < b8-null-strided |
+| icv1-fp30-tm6591-7c3fcd2f | b8-null-strided vs pair-b16-b1536 | b8-null-strided < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-null-strided vs pair-b16-b384 | b8-null-strided < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-null-strided vs pair-b16-b768 | b8-null-strided < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-null-strided vs pair-walk-b768 | b8-null-strided < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-null-strided vs rho-lanes16 | rho-lanes16 < b8-null-strided |
+| icv1-fp30-tm6591-7c3fcd2f | b8-null-strided vs rho-neg | rho-neg < b8-null-strided |
+| icv1-fp30-tm6591-7c3fcd2f | b8-null-strided vs sweep-b128 | b8-null-strided < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-null-strided vs sweep-b16 | b8-null-strided < sweep-b16 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-null-strided vs sweep-b2 | sweep-b2 < b8-null-strided |
+| icv1-fp30-tm6591-7c3fcd2f | b8-null-strided vs sweep-b32 | b8-null-strided < sweep-b32 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-null-strided vs sweep-b4 | sweep-b4 < b8-null-strided |
+| icv1-fp30-tm6591-7c3fcd2f | b8-null-strided vs sweep-b64 | b8-null-strided < sweep-b64 |
+| icv1-fp30-tm6591-7c3fcd2f | b8-null-strided vs sweep-b8 | sweep-b8 < b8-null-strided |
+| icv1-fp30-tm6591-7c3fcd2f | bsgs-neg vs kangaroo | unresolved inside the band |
+| icv1-fp30-tm6591-7c3fcd2f | bsgs-neg vs pair-b16-b1536 | bsgs-neg < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | bsgs-neg vs pair-b16-b384 | bsgs-neg < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | bsgs-neg vs pair-b16-b768 | bsgs-neg < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | bsgs-neg vs pair-walk-b768 | bsgs-neg < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | bsgs-neg vs rho-lanes16 | rho-lanes16 < bsgs-neg |
+| icv1-fp30-tm6591-7c3fcd2f | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp30-tm6591-7c3fcd2f | bsgs-neg vs sweep-b128 | bsgs-neg < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | bsgs-neg vs sweep-b16 | bsgs-neg < sweep-b16 |
+| icv1-fp30-tm6591-7c3fcd2f | bsgs-neg vs sweep-b2 | bsgs-neg < sweep-b2 |
+| icv1-fp30-tm6591-7c3fcd2f | bsgs-neg vs sweep-b32 | bsgs-neg < sweep-b32 |
+| icv1-fp30-tm6591-7c3fcd2f | bsgs-neg vs sweep-b4 | bsgs-neg < sweep-b4 |
+| icv1-fp30-tm6591-7c3fcd2f | bsgs-neg vs sweep-b64 | bsgs-neg < sweep-b64 |
+| icv1-fp30-tm6591-7c3fcd2f | bsgs-neg vs sweep-b8 | bsgs-neg < sweep-b8 |
+| icv1-fp30-tm6591-7c3fcd2f | kangaroo vs pair-b16-b1536 | kangaroo < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | kangaroo vs pair-b16-b384 | kangaroo < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | kangaroo vs pair-b16-b768 | kangaroo < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | kangaroo vs pair-walk-b768 | kangaroo < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | kangaroo vs rho-lanes16 | rho-lanes16 < kangaroo |
+| icv1-fp30-tm6591-7c3fcd2f | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp30-tm6591-7c3fcd2f | kangaroo vs sweep-b128 | kangaroo < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | kangaroo vs sweep-b16 | kangaroo < sweep-b16 |
+| icv1-fp30-tm6591-7c3fcd2f | kangaroo vs sweep-b2 | kangaroo < sweep-b2 |
+| icv1-fp30-tm6591-7c3fcd2f | kangaroo vs sweep-b32 | kangaroo < sweep-b32 |
+| icv1-fp30-tm6591-7c3fcd2f | kangaroo vs sweep-b4 | kangaroo < sweep-b4 |
+| icv1-fp30-tm6591-7c3fcd2f | kangaroo vs sweep-b64 | kangaroo < sweep-b64 |
+| icv1-fp30-tm6591-7c3fcd2f | kangaroo vs sweep-b8 | kangaroo < sweep-b8 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b1536 vs pair-b16-b384 | pair-b16-b384 < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b1536 vs pair-b16-b768 | pair-b16-b768 < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b1536 vs pair-walk-b768 | pair-walk-b768 < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b1536 vs rho-lanes16 | rho-lanes16 < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b1536 vs rho-neg | rho-neg < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b1536 vs sweep-b128 | sweep-b128 < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b1536 vs sweep-b16 | sweep-b16 < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b1536 vs sweep-b2 | sweep-b2 < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b1536 vs sweep-b32 | sweep-b32 < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b1536 vs sweep-b4 | sweep-b4 < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b1536 vs sweep-b64 | sweep-b64 < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b1536 vs sweep-b8 | sweep-b8 < pair-b16-b1536 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b384 vs pair-b16-b768 | unresolved inside the band |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b384 vs pair-walk-b768 | unresolved inside the band |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b384 vs rho-lanes16 | rho-lanes16 < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b384 vs rho-neg | rho-neg < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b384 vs sweep-b128 | sweep-b128 < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b384 vs sweep-b16 | sweep-b16 < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b384 vs sweep-b2 | sweep-b2 < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b384 vs sweep-b32 | sweep-b32 < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b384 vs sweep-b4 | sweep-b4 < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b384 vs sweep-b64 | sweep-b64 < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b384 vs sweep-b8 | sweep-b8 < pair-b16-b384 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b768 vs pair-walk-b768 | pair-b16-b768 < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b768 vs rho-lanes16 | rho-lanes16 < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b768 vs rho-neg | rho-neg < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b768 vs sweep-b128 | sweep-b128 < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b768 vs sweep-b16 | sweep-b16 < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b768 vs sweep-b2 | sweep-b2 < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b768 vs sweep-b32 | sweep-b32 < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b768 vs sweep-b4 | sweep-b4 < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b768 vs sweep-b64 | sweep-b64 < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-b16-b768 vs sweep-b8 | sweep-b8 < pair-b16-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-walk-b768 vs rho-lanes16 | rho-lanes16 < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-walk-b768 vs rho-neg | rho-neg < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-walk-b768 vs sweep-b128 | sweep-b128 < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-walk-b768 vs sweep-b16 | sweep-b16 < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-walk-b768 vs sweep-b2 | sweep-b2 < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-walk-b768 vs sweep-b32 | sweep-b32 < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-walk-b768 vs sweep-b4 | sweep-b4 < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-walk-b768 vs sweep-b64 | sweep-b64 < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | pair-walk-b768 vs sweep-b8 | sweep-b8 < pair-walk-b768 |
+| icv1-fp30-tm6591-7c3fcd2f | rho-lanes16 vs rho-neg | rho-neg < rho-lanes16 |
+| icv1-fp30-tm6591-7c3fcd2f | rho-lanes16 vs sweep-b128 | rho-lanes16 < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | rho-lanes16 vs sweep-b16 | rho-lanes16 < sweep-b16 |
+| icv1-fp30-tm6591-7c3fcd2f | rho-lanes16 vs sweep-b2 | rho-lanes16 < sweep-b2 |
+| icv1-fp30-tm6591-7c3fcd2f | rho-lanes16 vs sweep-b32 | rho-lanes16 < sweep-b32 |
+| icv1-fp30-tm6591-7c3fcd2f | rho-lanes16 vs sweep-b4 | rho-lanes16 < sweep-b4 |
+| icv1-fp30-tm6591-7c3fcd2f | rho-lanes16 vs sweep-b64 | rho-lanes16 < sweep-b64 |
+| icv1-fp30-tm6591-7c3fcd2f | rho-lanes16 vs sweep-b8 | rho-lanes16 < sweep-b8 |
+| icv1-fp30-tm6591-7c3fcd2f | rho-neg vs sweep-b128 | rho-neg < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | rho-neg vs sweep-b16 | rho-neg < sweep-b16 |
+| icv1-fp30-tm6591-7c3fcd2f | rho-neg vs sweep-b2 | rho-neg < sweep-b2 |
+| icv1-fp30-tm6591-7c3fcd2f | rho-neg vs sweep-b32 | rho-neg < sweep-b32 |
+| icv1-fp30-tm6591-7c3fcd2f | rho-neg vs sweep-b4 | rho-neg < sweep-b4 |
+| icv1-fp30-tm6591-7c3fcd2f | rho-neg vs sweep-b64 | rho-neg < sweep-b64 |
+| icv1-fp30-tm6591-7c3fcd2f | rho-neg vs sweep-b8 | rho-neg < sweep-b8 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b128 vs sweep-b16 | sweep-b16 < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b128 vs sweep-b2 | sweep-b2 < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b128 vs sweep-b32 | sweep-b32 < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b128 vs sweep-b4 | sweep-b4 < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b128 vs sweep-b64 | sweep-b64 < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b128 vs sweep-b8 | sweep-b8 < sweep-b128 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b16 vs sweep-b2 | sweep-b2 < sweep-b16 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b16 vs sweep-b32 | sweep-b16 < sweep-b32 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b16 vs sweep-b4 | sweep-b4 < sweep-b16 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b16 vs sweep-b64 | sweep-b16 < sweep-b64 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b16 vs sweep-b8 | sweep-b8 < sweep-b16 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b2 vs sweep-b32 | sweep-b2 < sweep-b32 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b2 vs sweep-b4 | sweep-b2 < sweep-b4 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b2 vs sweep-b64 | sweep-b2 < sweep-b64 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b2 vs sweep-b8 | sweep-b2 < sweep-b8 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b32 vs sweep-b4 | sweep-b4 < sweep-b32 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b32 vs sweep-b64 | sweep-b32 < sweep-b64 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b32 vs sweep-b8 | sweep-b8 < sweep-b32 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b4 vs sweep-b64 | sweep-b4 < sweep-b64 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b4 vs sweep-b8 | sweep-b4 < sweep-b8 |
+| icv1-fp30-tm6591-7c3fcd2f | sweep-b64 vs sweep-b8 | sweep-b8 < sweep-b64 |

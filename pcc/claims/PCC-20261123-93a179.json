@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T07:51:28Z",
+ "id": "PCC-20261123-93a179",
+ "kind": "statement",
+ "producer": {
+  "commit": "5036b1f5ef88a36ae1f86b836f3e58562df28ad1",
+  "model": "",
+  "session": "chained-twohop-descent-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_twohop_descent_20261123/first-A-version-negative/ACTUAL_FIRST_A_VERSION_NEGATIVE.json",
+    "sha256": "65bab847686bfbbfd795423eff8abc994d64b2ac1cbe479db7b6225d85f23340"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_twohop_descent_20261123/first-A-version-negative/lean-version.stderr",
+    "sha256": "8359249f494db5081050f585a4c9d589f4edb85f31252481b841f195761fd4f1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_twohop_descent_20261123/first-A-version-negative/POST_CALL_MANIFEST.json",
+    "sha256": "151c7a6d3bef3ad0412444a3f249892dbec03339323457eb0cabfd427b6f788f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "First setup negative under unchanged120s/2GiB/one-worker protocol. Exact thread-startup cause remains to inspect. Producer unsigned.",
+ "statement": "First two-hop sourceA5036b1f5 caller exits134 at Lean --version with complete failed-thread diagnostic. Rust/compiler-tool version queries succeed; scientific Rust compilation, Clippy source check, Lean proof and native enumeration are not reached. All source/copied/tool post guards match. Every available original stream and metadata file is retained whole, with the complete copied-source inventory and immutable public source reference; no mathematical outcome is asserted."
+}

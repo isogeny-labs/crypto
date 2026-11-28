@@ -1,0 +1,36 @@
+
+running 13 tests
+test principal_relation::tests::corrupted_norm_ordinate_support_and_tail_are_refused ... ok
+test principal_relation::tests::denominator_inverse_detects_non_coprimality ... ok
+test principal_relation::tests::exact_principal_remainder_agrees_with_cantor_group_law ... ok
+test quadratic_pair_graph::tests::caps_preserve_existing_anchors_and_consume_valid_source_ids ... ok
+test quadratic_pair_graph::tests::common_paths_retain_integer_coefficient_two ... ok
+test quadratic_pair_graph::tests::every_orientation_of_anchors_and_extensions_cancels_exactly ... ok
+test quadratic_pair_graph::tests::invalid_shapes_and_source_order_are_atomic ... ok
+test quadratic_pair_graph::tests::synthetic_signed_incidence_controls_replay_every_witness ... ok
+test quadratic_pair_graph::tests::ungrounded_odd_cycle_is_not_a_full_relation ... ok
+test tests::changed_norm_sign_class_or_factor_is_rejected ... FAILED
+test tests::five_small_two_irreducible_principal_classes_pass_direct_cantor ... FAILED
+test tests::old_single_remainder_admission_is_reused_exactly ... ok
+test tests::splitter_admits_only_exact_distinct_irreducible_quadratics ... ok
+
+failures:
+
+---- tests::changed_norm_sign_class_or_factor_is_rejected stdout ----
+
+thread 'tests::changed_norm_sign_class_or_factor_is_rejected' (127212) panicked at examples/jv_sieve_quadratic_pair_relation_controls.rs:30:51:
+called `Result::unwrap()` on an `Err` value: "monic positive-degree modulus required"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- tests::five_small_two_irreducible_principal_classes_pass_direct_cantor stdout ----
+
+thread 'tests::five_small_two_irreducible_principal_classes_pass_direct_cantor' (127213) panicked at examples/jv_sieve_quadratic_pair_relation_controls.rs:30:51:
+called `Result::unwrap()` on an `Err` value: "monic positive-degree modulus required"
+
+
+failures:
+    tests::changed_norm_sign_class_or_factor_is_rejected
+    tests::five_small_two_irreducible_principal_classes_pass_direct_cantor
+
+test result: FAILED. 11 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+

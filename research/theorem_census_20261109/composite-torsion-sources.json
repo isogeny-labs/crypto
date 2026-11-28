@@ -1,0 +1,41 @@
+{
+  "schema": "theorem-source-audit/v1",
+  "created": "2026-11-09T16:36:46.950Z",
+  "scope": "Composite integer subgroup orders in the conditional supersingular prime-field modular argument; actual order8positive control, item3.",
+  "sources": [
+    {
+      "id": "FST2010",
+      "url": "https://link.springer.com/content/pdf/10.1007/s00145-009-9048-z.pdf",
+      "pdf_sha256": "2acd937be8567abfb26bb3861e3aaf34312270c36df9a86f91cf9676c3caf785",
+      "text_sha256": "6a8fd50f8c67b351bfe54c136e60d9b8c5bb021dcd6fcf48c1d8a8ee914f1b19",
+      "read_scope": "Retained original p230 source trace definition, Definition2.1 and Remark2.2 re-read. Subgroup order is an integer, not assumed prime. General Hasse theorem cited there is not assumed proved in Lean."
+    },
+    {
+      "id": "Mathlib",
+      "revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+      "read_scope": "OrderOfElement orderOf_eq_prime and addOrderOf_eq_prime_pow; actual affine point group operations and ZMod.natCast_eq_zero_iff."
+    },
+    {
+      "id": "Prior formal components",
+      "paths": [
+        "research/theorem_audit_20261108/lean/StructuralAudit.lean",
+        "research/theorem_census_20261109/lean/TorsionBoundaries.lean",
+        "research/theorem_census_20261109/lean/SourceFSTBoundary.lean"
+      ],
+      "outcome": "Reused actual F7model/cardinality/source trace proofs and Hasse-premise arithmetic. Removed unnecessary primality assumption on subgroup r; did not remove Hasse."
+    }
+  ],
+  "kb": "No KB MCP tools; repository wrapper unavailable as already recorded. No novelty claim.",
+  "ecdb": "No ecdb MCP tool and sparse ecdb/docs/AGENTS.md path absent. Reused pinned Lean curve/cardinality instead of importing unverified database numbers; actual point order is a new kernel derivation.",
+  "formal": {
+    "lean": "leanprover/lean4:v4.35.0",
+    "source": "research/theorem_census_20261109/lean/CompositeTorsion.lean",
+    "sha256": "698df1ced84b01b56fb2fe9731c1587d45f3646b2496d279ead59dac6c5921e2",
+    "binding": "CompositeTorsionAudit.composite_order_audit_certificate",
+    "decl_sha256": "36a9c9d42459388be7737fb65fa60cdc8ad5f131330f3f8d14ef219541aaf53e",
+    "scope": "Universal conditional actual-cardinality statement and unconditional actual order8point/modular order2control. No full Hasse, geometric p-rank or cyclotomic-field equivalence."
+  },
+  "new_native_curve_population": false,
+  "frozen_prior_data_changed": false,
+  "paid_spend": 0
+}

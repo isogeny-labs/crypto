@@ -1,0 +1,97 @@
+[
+  {
+    "id": "semilinear-trace-oracles-20261116-v82",
+    "registered_at": "2026-11-16T04:47:44.409750+00:00",
+    "fingerprint": "2b6bc6f26c4a5df2d2be560ec0dd3c33441364d0bc185ae4e8f8570a1c5cad97",
+    "preregistration_sha256": "95b6cc28df115d497aa7d13d3edbb883f9b940c110c48ad2e08146594a1d586c",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.semilinear_trace_20261116_v82.oracles",
+      "semilinear-trace-oracles-20261116-v82",
+      "oracles_raw"
+    ],
+    "seconds": 90,
+    "memory_mb": 4096,
+    "cores": 1,
+    "depends_on": [],
+    "selected_frozen_files_sha256": {
+      "research/frobenius_split_20261116_v73/raw.json": "b1d3ef1b7e680ddd4da3691de4b3bce5ca89fda159a9313c2290ce3d330dfbe2",
+      "research/semilinear_trace_20261116_v82/DATA.json": "c9e3c8cd1049cc217a5e6443c346834b30548e030eacb8a5bfe92cba96a472d6",
+      "research/semilinear_trace_20261116_v82/PROOF.md": "82114e1616be75fe900da3c9bb120258bd4094bb29426490181246afc318deeb",
+      "research/semilinear_trace_20261116_v82/cases.py": "38846df64fa166a9bbe475012d731ebf097d601a05ad67f9bb9a70fae8b686a6",
+      "research/semilinear_trace_20261116_v82/common.py": "70a7c26e50af8c7b6360b8192c3a8c248204b4eba929b1e017d32ddcd4184d39",
+      "research/semilinear_trace_20261116_v82/kernel.py": "043b8d0a49211a97a0fdf1d93947bb4e5e7c4c6d88fd3a8a71023032b2b5b898",
+      "research/semilinear_trace_20261116_v82/oracles.py": "17e78db316ff8b0b2887cdba9f4ea6e132a71c82d4811156374e94173f5ba480",
+      "research/semilinear_trace_20261116_v82/profile.py": "a42564cc11a4f037646d91bacd9cd4ba1364121c2759c8d697bdbe6e5263e3fe",
+      "research/semilinear_trace_review_20261116_v82/REVIEW.md": "a927103454e9622518e5b486d197a73da17b1a915f35091c0c56a13d3f0e9f1b"
+    }
+  },
+  {
+    "id": "semilinear-trace-profile-20261116-v82",
+    "registered_at": "2026-11-16T04:47:44.418364+00:00",
+    "fingerprint": "6be5d8250b2422972bb0456837deebd8064ed7ab1717d86fa8e1c73e4838bd0e",
+    "preregistration_sha256": "78b4cbe9f01e61c05269afed0d3a7161a770d01ede331d3af98b8eea0402e368",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.semilinear_trace_20261116_v82.profile",
+      "semilinear-trace-profile-20261116-v82",
+      "profile_raw"
+    ],
+    "seconds": 90,
+    "memory_mb": 4096,
+    "cores": 1,
+    "depends_on": [
+      "semilinear-trace-oracles-20261116-v82"
+    ],
+    "selected_frozen_files_sha256": {
+      "research/frobenius_split_20261116_v73/raw.json": "b1d3ef1b7e680ddd4da3691de4b3bce5ca89fda159a9313c2290ce3d330dfbe2",
+      "research/semilinear_trace_20261116_v82/DATA.json": "c9e3c8cd1049cc217a5e6443c346834b30548e030eacb8a5bfe92cba96a472d6",
+      "research/semilinear_trace_20261116_v82/PROOF.md": "82114e1616be75fe900da3c9bb120258bd4094bb29426490181246afc318deeb",
+      "research/semilinear_trace_20261116_v82/cases.py": "38846df64fa166a9bbe475012d731ebf097d601a05ad67f9bb9a70fae8b686a6",
+      "research/semilinear_trace_20261116_v82/common.py": "70a7c26e50af8c7b6360b8192c3a8c248204b4eba929b1e017d32ddcd4184d39",
+      "research/semilinear_trace_20261116_v82/kernel.py": "043b8d0a49211a97a0fdf1d93947bb4e5e7c4c6d88fd3a8a71023032b2b5b898",
+      "research/semilinear_trace_20261116_v82/oracles.py": "17e78db316ff8b0b2887cdba9f4ea6e132a71c82d4811156374e94173f5ba480",
+      "research/semilinear_trace_20261116_v82/profile.py": "a42564cc11a4f037646d91bacd9cd4ba1364121c2759c8d697bdbe6e5263e3fe",
+      "research/semilinear_trace_review_20261116_v82/REVIEW.md": "a927103454e9622518e5b486d197a73da17b1a915f35091c0c56a13d3f0e9f1b"
+    }
+  },
+  {
+    "id": "shared-semilinear-trace-20261116-v82b",
+    "registered_at": "2026-11-16T04:52:02.807936+00:00",
+    "fingerprint": "048731b3dc960874f2edf5f2d0187298a90278739e73126e69d65599d50d03b1",
+    "preregistration_sha256": "5349d4196633e1eb3119e456e9d602440ebf12700fae0236df7bf896e95cdf7b",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.shared_semilinear_trace_20261116_v82b.worker",
+      "shared-semilinear-trace-20261116-v82b",
+      "raw"
+    ],
+    "seconds": 90,
+    "memory_mb": 4096,
+    "cores": 1,
+    "depends_on": [
+      "semilinear-trace-oracles-20261116-v82"
+    ],
+    "selected_frozen_files_sha256": {
+      "research/frobenius_split_20261116_v73/raw.json": "b1d3ef1b7e680ddd4da3691de4b3bce5ca89fda159a9313c2290ce3d330dfbe2",
+      "research/semilinear_trace_20261116_v82/PROOF.md": "82114e1616be75fe900da3c9bb120258bd4094bb29426490181246afc318deeb",
+      "research/semilinear_trace_20261116_v82/cases.py": "38846df64fa166a9bbe475012d731ebf097d601a05ad67f9bb9a70fae8b686a6",
+      "research/semilinear_trace_20261116_v82/common.py": "70a7c26e50af8c7b6360b8192c3a8c248204b4eba929b1e017d32ddcd4184d39",
+      "research/semilinear_trace_20261116_v82/kernel.py": "043b8d0a49211a97a0fdf1d93947bb4e5e7c4c6d88fd3a8a71023032b2b5b898",
+      "research/semilinear_trace_20261116_v82/oracles.py": "17e78db316ff8b0b2887cdba9f4ea6e132a71c82d4811156374e94173f5ba480",
+      "research/semilinear_trace_20261116_v82/profile.py": "a42564cc11a4f037646d91bacd9cd4ba1364121c2759c8d697bdbe6e5263e3fe",
+      "research/semilinear_trace_review_20261116_v82/REVIEW.md": "a927103454e9622518e5b486d197a73da17b1a915f35091c0c56a13d3f0e9f1b",
+      "research/shared_semilinear_trace_20261116_v82b/DATA.json": "c9e3c8cd1049cc217a5e6443c346834b30548e030eacb8a5bfe92cba96a472d6",
+      "research/shared_semilinear_trace_20261116_v82b/PROOF.md": "0d62192af9c7ef77d85900158acf278d558c7aa048da4c7cfc6566df825e879f",
+      "research/shared_semilinear_trace_20261116_v82b/common.py": "70a7c26e50af8c7b6360b8192c3a8c248204b4eba929b1e017d32ddcd4184d39",
+      "research/shared_semilinear_trace_20261116_v82b/kernel.py": "006e5a826a1a7bb6f94312641d390de5fdf5d4c92c096c68b1d2e11892f82087",
+      "research/shared_semilinear_trace_20261116_v82b/oracles_checks.py": "3f86c9ceddff1c8d9d65ee62a4a22f3cf7a6b5af0a524a5e01e2a44d54881bcd",
+      "research/shared_semilinear_trace_20261116_v82b/profile_checks.py": "e04e640d618016f738974360e7d06b7b8ef344d60ce68dcf5250316ddc870848",
+      "research/shared_semilinear_trace_20261116_v82b/worker.py": "a584895975f8ede9161d8afbb43c5f0c9825e92a849bf0972b885cbd5e11d90b",
+      "research/shared_semilinear_trace_review_20261116_v82b/REVIEW.md": "d728d822a4cdeef28eae56c589138d94c32e3e035135c861fce750c6ca8db28c"
+    }
+  }
+]

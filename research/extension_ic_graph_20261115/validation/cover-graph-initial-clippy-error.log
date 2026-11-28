@@ -1,0 +1,12 @@
+    Checking crypto v0.1.0 (/workspace/crypto)
+error: manual `!RangeInclusive::contains` implementation
+   --> examples/jv_sieve_graph_compare.rs:218:23
+    |
+218 |             .any(|&p| p < 5 || p > 1823 || !is_prime_u64(p))
+    |                       ^^^^^^^^^^^^^^^^^ help: use: `!(5..=1823).contains(&p)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#manual_range_contains
+    = note: `-D clippy::manual-range-contains` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_range_contains)]`
+
+error: could not compile `crypto` (example "jv_sieve_graph_compare") due to 1 previous error

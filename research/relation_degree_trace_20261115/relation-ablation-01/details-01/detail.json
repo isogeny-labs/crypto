@@ -1,0 +1,971 @@
+{
+  "cells": [
+    {
+      "class": "star",
+      "costs": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 238076137,
+        "checked_f4_ns": 9587289,
+        "class": "star",
+        "class_index": 0,
+        "construction_ns": 16515,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 21202,
+        "identities_ok": true,
+        "identity_check_ns": 115598078,
+        "input_equations": 4,
+        "input_sha256": "266701ed30601d20d48e83dcfcb0866ceccc8617ab0452e58daca1e2d9b173f8",
+        "n": 3,
+        "paid_ns": 196521594,
+        "point_scalar_identity": true,
+        "preparation_ns": 175683,
+        "reference_ns": 71122827,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 41385840
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 14894869
+      },
+      "n": 3,
+      "projection": null,
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 4,
+        "columns": 56,
+        "degree": 5,
+        "degree_falls": 20,
+        "max_new_certificate_product_degree": 10,
+        "new_pivot_degree_histogram": {
+          "2": 6,
+          "3": 8,
+          "4": 7,
+          "5": 21
+        },
+        "new_pivots": 42,
+        "new_row_nonzeros": 2975,
+        "new_rows_processed": 291,
+        "rank": 52,
+        "reference_gb_contained": true,
+        "row_reductions": 4647
+      }
+    },
+    {
+      "class": "root-projection",
+      "costs": {
+        "added_projection_rows": 1,
+        "case_wall_ns": 85082066,
+        "checked_f4_ns": 6006418,
+        "class": "root-projection",
+        "class_index": 1,
+        "construction_ns": 916065,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 35013,
+        "identities_ok": true,
+        "identity_check_ns": 14555313,
+        "input_equations": 5,
+        "input_sha256": "38c07675a547a17f45e0ee3747567dbf3020c12bd9460654724d0f92c9734e36",
+        "n": 3,
+        "paid_ns": 60462200,
+        "point_scalar_identity": true,
+        "preparation_ns": 353080,
+        "reference_ns": 38596311,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 23711662
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 11077903
+      },
+      "n": 3,
+      "projection": {
+        "certificate_product_degree": 14,
+        "certificate_terms": 80,
+        "degree": 4,
+        "incident_projections": 2,
+        "variable": 2
+      },
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 3,
+        "columns": 56,
+        "degree": 5,
+        "degree_falls": 20,
+        "max_new_certificate_product_degree": 8,
+        "new_pivot_degree_histogram": {
+          "2": 6,
+          "3": 8,
+          "4": 6,
+          "5": 21
+        },
+        "new_pivots": 41,
+        "new_row_nonzeros": 2646,
+        "new_rows_processed": 290,
+        "rank": 52,
+        "reference_gb_contained": true,
+        "row_reductions": 3912
+      }
+    },
+    {
+      "class": "nonroot-projections",
+      "costs": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 97385658,
+        "checked_f4_ns": 5960689,
+        "class": "nonroot-projections",
+        "class_index": 2,
+        "construction_ns": 1038529,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 30866,
+        "identities_ok": true,
+        "identity_check_ns": 13511006,
+        "input_equations": 4,
+        "input_sha256": "266701ed30601d20d48e83dcfcb0866ceccc8617ab0452e58daca1e2d9b173f8",
+        "n": 3,
+        "paid_ns": 56666605,
+        "point_scalar_identity": true,
+        "preparation_ns": 413411,
+        "reference_ns": 35712104,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 40601475
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 7725589
+      },
+      "n": 3,
+      "projection": null,
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 4,
+        "columns": 56,
+        "degree": 5,
+        "degree_falls": 20,
+        "max_new_certificate_product_degree": 10,
+        "new_pivot_degree_histogram": {
+          "2": 6,
+          "3": 8,
+          "4": 7,
+          "5": 21
+        },
+        "new_pivots": 42,
+        "new_row_nonzeros": 2975,
+        "new_rows_processed": 291,
+        "rank": 52,
+        "reference_gb_contained": true,
+        "row_reductions": 4647
+      }
+    },
+    {
+      "class": "all-projections",
+      "costs": {
+        "added_projection_rows": 1,
+        "case_wall_ns": 81262832,
+        "checked_f4_ns": 5592662,
+        "class": "all-projections",
+        "class_index": 3,
+        "construction_ns": 912730,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 32008,
+        "identities_ok": true,
+        "identity_check_ns": 15801756,
+        "input_equations": 5,
+        "input_sha256": "38c07675a547a17f45e0ee3747567dbf3020c12bd9460654724d0f92c9734e36",
+        "n": 3,
+        "paid_ns": 59721734,
+        "point_scalar_identity": true,
+        "preparation_ns": 978949,
+        "reference_ns": 36403629,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 21350191
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 9278442
+      },
+      "n": 3,
+      "projection": {
+        "certificate_product_degree": 14,
+        "certificate_terms": 80,
+        "degree": 4,
+        "incident_projections": 2,
+        "variable": 2
+      },
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 3,
+        "columns": 56,
+        "degree": 5,
+        "degree_falls": 20,
+        "max_new_certificate_product_degree": 8,
+        "new_pivot_degree_histogram": {
+          "2": 6,
+          "3": 8,
+          "4": 6,
+          "5": 21
+        },
+        "new_pivots": 41,
+        "new_row_nonzeros": 2646,
+        "new_rows_processed": 290,
+        "rank": 52,
+        "reference_gb_contained": true,
+        "row_reductions": 3912
+      }
+    },
+    {
+      "class": "leaf-closure",
+      "costs": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 86498953,
+        "checked_f4_ns": 6140680,
+        "class": "leaf-closure",
+        "class_index": 4,
+        "construction_ns": 136735,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 119890,
+        "identities_ok": true,
+        "identity_check_ns": 13718707,
+        "input_equations": 6,
+        "input_sha256": "095ce289b11b87f45964e4b4d16b5dd890640241adaf528ac85fdfe9c6a07dfa",
+        "n": 3,
+        "paid_ns": 57946463,
+        "point_scalar_identity": true,
+        "preparation_ns": 707553,
+        "reference_ns": 37122898,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 28416556
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 8154463
+      },
+      "n": 3,
+      "projection": null,
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 3,
+        "columns": 56,
+        "degree": 5,
+        "degree_falls": 16,
+        "max_new_certificate_product_degree": 8,
+        "new_pivot_degree_histogram": {
+          "2": 6,
+          "3": 7,
+          "4": 3,
+          "5": 21
+        },
+        "new_pivots": 37,
+        "new_row_nonzeros": 2737,
+        "new_rows_processed": 286,
+        "rank": 52,
+        "reference_gb_contained": true,
+        "row_reductions": 4455
+      }
+    },
+    {
+      "class": "clique",
+      "costs": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 104147176,
+        "checked_f4_ns": 7600041,
+        "class": "clique",
+        "class_index": 5,
+        "construction_ns": 17266,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 39610,
+        "identities_ok": true,
+        "identity_check_ns": 15907123,
+        "input_equations": 6,
+        "input_sha256": "095ce289b11b87f45964e4b4d16b5dd890640241adaf528ac85fdfe9c6a07dfa",
+        "n": 3,
+        "paid_ns": 69651513,
+        "point_scalar_identity": true,
+        "preparation_ns": 315123,
+        "reference_ns": 45772350,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 34371528
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 14953437
+      },
+      "n": 3,
+      "projection": null,
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 3,
+        "columns": 56,
+        "degree": 5,
+        "degree_falls": 16,
+        "max_new_certificate_product_degree": 8,
+        "new_pivot_degree_histogram": {
+          "2": 6,
+          "3": 7,
+          "4": 3,
+          "5": 21
+        },
+        "new_pivots": 37,
+        "new_row_nonzeros": 2737,
+        "new_rows_processed": 286,
+        "rank": 52,
+        "reference_gb_contained": true,
+        "row_reductions": 4455
+      }
+    },
+    {
+      "class": "star",
+      "costs": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 352010734,
+        "checked_f4_ns": 5252196,
+        "class": "star",
+        "class_index": 0,
+        "construction_ns": 20421,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 38508,
+        "identities_ok": true,
+        "identity_check_ns": 18781779,
+        "input_equations": 6,
+        "input_sha256": "658d994fb5da43c3e31db20ebb7da5e9dcdf071614ea750ee07b486985788a3c",
+        "n": 4,
+        "paid_ns": 59747252,
+        "point_scalar_identity": true,
+        "preparation_ns": 187271,
+        "reference_ns": 35467077,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 291808108
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 7595034
+      },
+      "n": 4,
+      "projection": null,
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 4,
+        "columns": 126,
+        "degree": 5,
+        "degree_falls": 47,
+        "max_new_certificate_product_degree": 10,
+        "new_pivot_degree_histogram": {
+          "1": 1,
+          "2": 10,
+          "3": 17,
+          "4": 20,
+          "5": 56
+        },
+        "new_pivots": 104,
+        "new_row_nonzeros": 10998,
+        "new_rows_processed": 933,
+        "rank": 122,
+        "reference_gb_contained": true,
+        "row_reductions": 27141
+      }
+    },
+    {
+      "class": "root-projection",
+      "costs": {
+        "added_projection_rows": 1,
+        "case_wall_ns": 226453843,
+        "checked_f4_ns": 5042932,
+        "class": "root-projection",
+        "class_index": 1,
+        "construction_ns": 1164829,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 42394,
+        "identities_ok": true,
+        "identity_check_ns": 25392501,
+        "input_equations": 7,
+        "input_sha256": "2f3f31880ca88744063aa50bb2237389d9d8b53dab3965c6fd155332be7067a4",
+        "n": 4,
+        "paid_ns": 82038833,
+        "point_scalar_identity": true,
+        "preparation_ns": 830387,
+        "reference_ns": 49565790,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 144221229
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 9953804
+      },
+      "n": 4,
+      "projection": {
+        "certificate_product_degree": 14,
+        "certificate_terms": 80,
+        "degree": 4,
+        "incident_projections": 3,
+        "variable": 3
+      },
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 4,
+        "columns": 126,
+        "degree": 5,
+        "degree_falls": 47,
+        "max_new_certificate_product_degree": 10,
+        "new_pivot_degree_histogram": {
+          "1": 1,
+          "2": 10,
+          "3": 17,
+          "4": 19,
+          "5": 56
+        },
+        "new_pivots": 103,
+        "new_row_nonzeros": 9600,
+        "new_rows_processed": 932,
+        "rank": 122,
+        "reference_gb_contained": true,
+        "row_reductions": 21900
+      }
+    },
+    {
+      "class": "nonroot-projections",
+      "costs": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 348280408,
+        "checked_f4_ns": 6712630,
+        "class": "nonroot-projections",
+        "class_index": 2,
+        "construction_ns": 1600223,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 41432,
+        "identities_ok": true,
+        "identity_check_ns": 22403262,
+        "input_equations": 6,
+        "input_sha256": "658d994fb5da43c3e31db20ebb7da5e9dcdf071614ea750ee07b486985788a3c",
+        "n": 4,
+        "paid_ns": 73226696,
+        "point_scalar_identity": true,
+        "preparation_ns": 209454,
+        "reference_ns": 42259695,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 274920181
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 8383196
+      },
+      "n": 4,
+      "projection": null,
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 4,
+        "columns": 126,
+        "degree": 5,
+        "degree_falls": 47,
+        "max_new_certificate_product_degree": 10,
+        "new_pivot_degree_histogram": {
+          "1": 1,
+          "2": 10,
+          "3": 17,
+          "4": 20,
+          "5": 56
+        },
+        "new_pivots": 104,
+        "new_row_nonzeros": 10998,
+        "new_rows_processed": 933,
+        "rank": 122,
+        "reference_gb_contained": true,
+        "row_reductions": 27141
+      }
+    },
+    {
+      "class": "all-projections",
+      "costs": {
+        "added_projection_rows": 1,
+        "case_wall_ns": 208234763,
+        "checked_f4_ns": 6532579,
+        "class": "all-projections",
+        "class_index": 3,
+        "construction_ns": 1079491,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 41823,
+        "identities_ok": true,
+        "identity_check_ns": 16325632,
+        "input_equations": 7,
+        "input_sha256": "2f3f31880ca88744063aa50bb2237389d9d8b53dab3965c6fd155332be7067a4",
+        "n": 4,
+        "paid_ns": 71429012,
+        "point_scalar_identity": true,
+        "preparation_ns": 285749,
+        "reference_ns": 47163738,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 136702395
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 12889658
+      },
+      "n": 4,
+      "projection": {
+        "certificate_product_degree": 14,
+        "certificate_terms": 80,
+        "degree": 4,
+        "incident_projections": 3,
+        "variable": 3
+      },
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 4,
+        "columns": 126,
+        "degree": 5,
+        "degree_falls": 47,
+        "max_new_certificate_product_degree": 10,
+        "new_pivot_degree_histogram": {
+          "1": 1,
+          "2": 10,
+          "3": 17,
+          "4": 19,
+          "5": 56
+        },
+        "new_pivots": 103,
+        "new_row_nonzeros": 9600,
+        "new_rows_processed": 932,
+        "rank": 122,
+        "reference_gb_contained": true,
+        "row_reductions": 21900
+      }
+    },
+    {
+      "class": "leaf-closure",
+      "costs": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 341316352,
+        "checked_f4_ns": 6000068,
+        "class": "leaf-closure",
+        "class_index": 4,
+        "construction_ns": 23716,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 46009,
+        "identities_ok": true,
+        "identity_check_ns": 15749677,
+        "input_equations": 8,
+        "input_sha256": "08eb0bc7f3d18708fd9de32a324cae56132f1df6cc4137078d21b9c5d3783fec",
+        "n": 4,
+        "paid_ns": 62705453,
+        "point_scalar_identity": true,
+        "preparation_ns": 210626,
+        "reference_ns": 40675357,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 278368064
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 9207064
+      },
+      "n": 4,
+      "projection": null,
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 3,
+        "columns": 126,
+        "degree": 5,
+        "degree_falls": 41,
+        "max_new_certificate_product_degree": 9,
+        "new_pivot_degree_histogram": {
+          "1": 1,
+          "2": 10,
+          "3": 16,
+          "4": 15,
+          "5": 56
+        },
+        "new_pivots": 98,
+        "new_row_nonzeros": 10407,
+        "new_rows_processed": 927,
+        "rank": 122,
+        "reference_gb_contained": true,
+        "row_reductions": 25502
+      }
+    },
+    {
+      "class": "clique",
+      "costs": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 318957697,
+        "checked_f4_ns": 10626356,
+        "class": "clique",
+        "class_index": 5,
+        "construction_ns": 348504,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 58798,
+        "identities_ok": true,
+        "identity_check_ns": 53509056,
+        "input_equations": 12,
+        "input_sha256": "b950c510f4d84c3628adf883bf60bf6a050659cfc1ef8e11026c86e2412b51cc",
+        "n": 4,
+        "paid_ns": 126574224,
+        "point_scalar_identity": true,
+        "preparation_ns": 187020,
+        "reference_ns": 61844490,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 191400917
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 13791757
+      },
+      "n": 4,
+      "projection": null,
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 3,
+        "columns": 126,
+        "degree": 5,
+        "degree_falls": 30,
+        "max_new_certificate_product_degree": 8,
+        "new_pivot_degree_histogram": {
+          "1": 1,
+          "2": 10,
+          "3": 14,
+          "4": 5,
+          "5": 56
+        },
+        "new_pivots": 86,
+        "new_row_nonzeros": 10441,
+        "new_rows_processed": 915,
+        "rank": 122,
+        "reference_gb_contained": true,
+        "row_reductions": 27531
+      }
+    },
+    {
+      "class": "star",
+      "costs": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 4827467948,
+        "checked_f4_ns": 7848384,
+        "class": "star",
+        "class_index": 0,
+        "construction_ns": 176996,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 54241,
+        "identities_ok": true,
+        "identity_check_ns": 14326610,
+        "input_equations": 10,
+        "input_sha256": "5697400235e3988cf7b310ee396a6c126e047d62adfa7fe32a65144b258da2ea",
+        "n": 6,
+        "paid_ns": 64318535,
+        "point_scalar_identity": true,
+        "preparation_ns": 303416,
+        "reference_ns": 41608888,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 4762740608
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 9403199
+      },
+      "n": 6,
+      "projection": null,
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 4,
+        "columns": 462,
+        "degree": 5,
+        "degree_falls": 165,
+        "max_new_certificate_product_degree": 11,
+        "new_pivot_degree_histogram": {
+          "1": 3,
+          "2": 21,
+          "3": 51,
+          "4": 91,
+          "5": 252
+        },
+        "new_pivots": 418,
+        "new_row_nonzeros": 71359,
+        "new_rows_processed": 5056,
+        "rank": 458,
+        "reference_gb_contained": true,
+        "row_reductions": 270221
+      }
+    },
+    {
+      "class": "root-projection",
+      "costs": {
+        "added_projection_rows": 1,
+        "case_wall_ns": 2151150847,
+        "checked_f4_ns": 7234503,
+        "class": "root-projection",
+        "class_index": 1,
+        "construction_ns": 2497069,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 60201,
+        "identities_ok": true,
+        "identity_check_ns": 33942058,
+        "input_equations": 11,
+        "input_sha256": "a211909a86eaee7aa66a0800c48a22910bd02b5c680de7a03e8969cb39e45a07",
+        "n": 6,
+        "paid_ns": 88607345,
+        "point_scalar_identity": true,
+        "preparation_ns": 758188,
+        "reference_ns": 44115326,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 2061423511
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 10543676
+      },
+      "n": 6,
+      "projection": {
+        "certificate_product_degree": 14,
+        "certificate_terms": 80,
+        "degree": 4,
+        "incident_projections": 5,
+        "variable": 5
+      },
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 4,
+        "columns": 462,
+        "degree": 5,
+        "degree_falls": 165,
+        "max_new_certificate_product_degree": 11,
+        "new_pivot_degree_histogram": {
+          "1": 3,
+          "2": 21,
+          "3": 51,
+          "4": 90,
+          "5": 252
+        },
+        "new_pivots": 417,
+        "new_row_nonzeros": 61241,
+        "new_rows_processed": 5055,
+        "rank": 458,
+        "reference_gb_contained": true,
+        "row_reductions": 214965
+      }
+    },
+    {
+      "class": "nonroot-projections",
+      "costs": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 4655184748,
+        "checked_f4_ns": 9391280,
+        "class": "nonroot-projections",
+        "class_index": 2,
+        "construction_ns": 1830839,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 145829,
+        "identities_ok": true,
+        "identity_check_ns": 30041666,
+        "input_equations": 10,
+        "input_sha256": "5697400235e3988cf7b310ee396a6c126e047d62adfa7fe32a65144b258da2ea",
+        "n": 6,
+        "paid_ns": 97455688,
+        "point_scalar_identity": true,
+        "preparation_ns": 561212,
+        "reference_ns": 55484862,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 4555716391
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 12815703
+      },
+      "n": 6,
+      "projection": null,
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 4,
+        "columns": 462,
+        "degree": 5,
+        "degree_falls": 165,
+        "max_new_certificate_product_degree": 11,
+        "new_pivot_degree_histogram": {
+          "1": 3,
+          "2": 21,
+          "3": 51,
+          "4": 91,
+          "5": 252
+        },
+        "new_pivots": 418,
+        "new_row_nonzeros": 71359,
+        "new_rows_processed": 5056,
+        "rank": 458,
+        "reference_gb_contained": true,
+        "row_reductions": 270221
+      }
+    },
+    {
+      "class": "all-projections",
+      "costs": {
+        "added_projection_rows": 1,
+        "case_wall_ns": 1991804706,
+        "checked_f4_ns": 6385407,
+        "class": "all-projections",
+        "class_index": 3,
+        "construction_ns": 1847814,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 61803,
+        "identities_ok": true,
+        "identity_check_ns": 27668732,
+        "input_equations": 11,
+        "input_sha256": "a211909a86eaee7aa66a0800c48a22910bd02b5c680de7a03e8969cb39e45a07",
+        "n": 6,
+        "paid_ns": 77013360,
+        "point_scalar_identity": true,
+        "preparation_ns": 514092,
+        "reference_ns": 40535512,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 1914422171
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 8777469
+      },
+      "n": 6,
+      "projection": {
+        "certificate_product_degree": 14,
+        "certificate_terms": 80,
+        "degree": 4,
+        "incident_projections": 5,
+        "variable": 5
+      },
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 4,
+        "columns": 462,
+        "degree": 5,
+        "degree_falls": 165,
+        "max_new_certificate_product_degree": 11,
+        "new_pivot_degree_histogram": {
+          "1": 3,
+          "2": 21,
+          "3": 51,
+          "4": 90,
+          "5": 252
+        },
+        "new_pivots": 417,
+        "new_row_nonzeros": 61241,
+        "new_rows_processed": 5055,
+        "rank": 458,
+        "reference_gb_contained": true,
+        "row_reductions": 214965
+      }
+    },
+    {
+      "class": "leaf-closure",
+      "costs": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 5430197453,
+        "checked_f4_ns": 11917508,
+        "class": "leaf-closure",
+        "class_index": 4,
+        "construction_ns": 19940,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 95773,
+        "identities_ok": true,
+        "identity_check_ns": 15110201,
+        "input_equations": 12,
+        "input_sha256": "351603c4e4b3f43828994e8112b8141e793524c0d00802b373fc7f52371869ee",
+        "n": 6,
+        "paid_ns": 69535430,
+        "point_scalar_identity": true,
+        "preparation_ns": 238248,
+        "reference_ns": 42153760,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 5360243476
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 8829240
+      },
+      "n": 6,
+      "projection": null,
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 4,
+        "columns": 462,
+        "degree": 5,
+        "degree_falls": 152,
+        "max_new_certificate_product_degree": 11,
+        "new_pivot_degree_histogram": {
+          "1": 3,
+          "2": 21,
+          "3": 50,
+          "4": 84,
+          "5": 252
+        },
+        "new_pivots": 410,
+        "new_row_nonzeros": 67326,
+        "new_rows_processed": 5048,
+        "rank": 458,
+        "reference_gb_contained": true,
+        "row_reductions": 243645
+      }
+    },
+    {
+      "class": "clique",
+      "costs": {
+        "added_projection_rows": 0,
+        "case_wall_ns": 4374922384,
+        "checked_f4_ns": 13167083,
+        "class": "clique",
+        "class_index": 5,
+        "construction_ns": 168943,
+        "diagnostics_ok": true,
+        "failures": [],
+        "generation_ns": 124967,
+        "identities_ok": true,
+        "identity_check_ns": 29993431,
+        "input_equations": 30,
+        "input_sha256": "9931b3d627b8628ec132a054000337ea877f569377e509eeeac4faff99398fda",
+        "n": 6,
+        "paid_ns": 116931021,
+        "point_scalar_identity": true,
+        "preparation_ns": 1015805,
+        "reference_ns": 72460792,
+        "same_affine_ideal_as_star": true,
+        "separate_diagnostic_ns": 4255594863
+      },
+      "fastest_external": {
+        "route": "msolve",
+        "whole_route_ns": 15467332
+      },
+      "n": 6,
+      "projection": null,
+      "terminal_affine_event": {
+        "closure_completed": true,
+        "closure_rounds": 3,
+        "columns": 462,
+        "degree": 5,
+        "degree_falls": 86,
+        "max_new_certificate_product_degree": 9,
+        "new_pivot_degree_histogram": {
+          "1": 3,
+          "2": 21,
+          "3": 41,
+          "4": 21,
+          "5": 252
+        },
+        "new_pivots": 338,
+        "new_row_nonzeros": 72754,
+        "new_rows_processed": 4976,
+        "rank": 458,
+        "reference_gb_contained": true,
+        "row_reductions": 334471
+      }
+    }
+  ],
+  "source_audit": "research/relation_degree_trace_20261115/relation-ablation-01/report-01/audit.json"
+}

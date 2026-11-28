@@ -1,0 +1,25 @@
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean:35:10: error(lean.unknownIdentifier): Unknown identifier `Function.Bijective`
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean:35:38: error(lean.unknownIdentifier): Unknown identifier `Function.Bijective`
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean:38:4: error(lean.unknownIdentifier): Unknown identifier `Function.Bijective`
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/QuarticGluing.lean:39:2: error: Tactic `constructor` failed: target is not an inductive datatype
+
+E F A E' F' A' : Type
+s : E → F → A
+t : E' → F' → A'
+z : A
+w : A'
+e : E → E'
+f : F → F'
+u : A → A'
+he : sorry
+hf : sorry
+hu : Function.Injective u
+uz : u z = w
+comm : ∀ (p : E) (q : F), u (s p q) = t (e p) (f q)
+⊢ sorry
+'QuarticGluing.duplication_ordinate_numerator' depends on axioms: [propext, Classical.choice, Quot.sound]
+'QuarticGluing.sum_kernel_projection_injective' depends on axioms: [propext, Classical.choice, Quot.sound]
+'QuarticGluing.kernel_transport_bijective' does not depend on any axioms
+'QuarticGluing.quotient_kernel_saturated' does not depend on any axioms
+'QuarticGluing.saturated_equal_rational_span' does not depend on any axioms
+toolchain pin: leanprover/lean4:v4.35.0

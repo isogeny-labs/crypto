@@ -1,0 +1,30 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-23T01:46:31Z",
+ "id": "PCC-20261123-36ec87",
+ "kind": "theorem",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "gpt-6-astra",
+  "session": "prime31-rational-chain-iteration6"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/LITERATURE_AUDIT.md",
+    "sha256": "0aade88768c143bedc00add9a233044d79b1a0b6e03f5cc8aa861d0ae0e49e03"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/iteration6/ROOT_REVIEW.md",
+    "sha256": "9e573ee3c0431a6e6364bb6b4ea7476717707b58dc3f5af9c0ceb9b227ddc067"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Explicit hypotheses in LITERATURE_AUDIT and ROOT_REVIEW; no signed or Lean proof and no new algorithmic speed claim.",
+ "statement": "Written scoped applicability arguments show that exact compositional buckets on a prime-order group are constant or injective; an even bucket with a fixed carry set over all affine noncancelling pairs has image size at most the squared carry-set size; a canonical scalar-residue oracle on all points recovers DLP digits; and the full proper-subset circulant indicator has full rational rank. In the declared conventional full-rank uniform-target model, setup B^sigma, empty-inclusive query B^tau and matrix B^2 yield the necessary exponent budget max(sigma,2)+tau<m-1 for a balanced sub-square-root total. These are scoped derivations, not universal lower bounds."
+}

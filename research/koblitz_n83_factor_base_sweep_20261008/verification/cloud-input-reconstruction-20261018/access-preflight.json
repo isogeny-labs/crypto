@@ -1,0 +1,55 @@
+{
+  "checkout": "/home/ec2-user/crypto-n83-resume",
+  "checks": {
+    "n83_python_tests": {
+      "failed": 0,
+      "passed": 63,
+      "wall_seconds": 5.353
+    },
+    "v4_design": {
+      "sha256": "8e512b8dbc6577093f8e31f4afb625894cbdedd9f9f3e87dc4f36a7df52344c2",
+      "status": "PASS"
+    }
+  },
+  "existing_pr": "https://github.com/aburan28/crypto/pull/2036",
+  "logs_sha256": {
+    "design-check.log": "6eafc24fd3ff5029e2cf1b22c38887b6f83fdabccfca9270620180ed5d72784d",
+    "python-tests.log": "ae520c93d9436563ea9e1f4ee79f36861236b1210ff114a7a9a1970db9aa6e81"
+  },
+  "new_n83_solver_runs": 0,
+  "next_required_actions": [
+    "Recover original K2048 protocol, frozen inputs, worker, supervisor receipts and independent audit; verify source hashes and forged-success negative control.",
+    "Restore authorized S3 read access and original hard resource envelope before retained-base solver work.",
+    "Reconcile capacity ledger before freezing next matched natural-yield experiment; keep a=1 53-bit results separate from primary a=0 81-bit subgroup.",
+    "Resume finite design cells and rank/complete cold measurements; do not select a winner from censored single queries."
+  ],
+  "observed_blockers": [
+    "Original /Volumes/SSD990 evidence not available on this executor; handoff K2048 100000-conflict result is not retained in PR head.",
+    "git fetch origin 3570932fcf returned could not find remote ref; full commit identity is unavailable.",
+    "HEAD on pinned K2048 S3 object returned HTTP 403; no OIC manifest or AWS profile selector was supplied.",
+    "Docker CLI/socket unavailable; required one-CPU 4-GiB zero-swap networkless envelope cannot be reproduced with the existing supervisor.",
+    "conductor check unavailable; .conductor/WORKFLOW.md unavailable."
+  ],
+  "reported_not_independently_replayed": {
+    "conflicts": 100000,
+    "k2048_disposition": "UNKNOWN_solver_cap",
+    "models": 0,
+    "relations": 0,
+    "source": "user supplied handoff",
+    "supervisor_wall_seconds_approx": 2846.7
+  },
+  "repository_changes": false,
+  "request": "Resume primary a=0 GF(2^83) factor-base sweep, minimizing complete cold one-target index-calculus runtime; retain finite combinations and S3 factor bases.",
+  "requirement_status": {
+    "all_combinations_executed": "partial_existing_design_mostly_unexecuted",
+    "finite_design_integrity": "verified",
+    "handoff_k2048_audit": "blocked_missing_evidence",
+    "minimum_complete_cold_runtime": "unresolved",
+    "new_retained_base_sweep": "blocked_access_and_runtime",
+    "python_regression_suite": "verified"
+  },
+  "schema": "n83.resume-preflight/v1",
+  "selected_best_total_runtime": null,
+  "source_commit": "8f971585692c702d2804668b322e2440177f80d2",
+  "status": "PARTIAL_EXECUTION_ACCESS_BLOCKED"
+}

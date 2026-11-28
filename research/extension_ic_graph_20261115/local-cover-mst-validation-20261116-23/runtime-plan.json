@@ -1,0 +1,37 @@
+{
+  "schema": "cover.sieve.local-validation/v1",
+  "backend": "local_user_authorized",
+  "source_revision": "a457ec75b8657c211da69b4dc658c4e698a5888a",
+  "binary_sha256": "06611689edfc98c99acf1618b8837aa4d9ee21163f620dde2793ac0325166457",
+  "driver_kind": "cover-sieve-validation",
+  "graph_strategy": "mst",
+  "primes": [
+    1009
+  ],
+  "seeds": [
+    263
+  ],
+  "retained_percent": 75,
+  "max_small_weight": 4096,
+  "max_sources": 4096,
+  "mst_max_rows": 4096,
+  "mst_max_column_degree": 64,
+  "mst_max_edge_evaluations": 1000000,
+  "mst_max_active_coefficients": 1000000,
+  "mst_cost_guard": "projected_dimension_times_nonzeros_no_greater_than_input",
+  "rounds": 1,
+  "warmup_rounds": 0,
+  "timeout_seconds": 1900,
+  "worker_timeout_seconds": 900,
+  "memory_gib": 8,
+  "automatic_retries": 0,
+  "record_start_events": true,
+  "allow_comparative_claims": false,
+  "sieve_recipe": "incidence_shared",
+  "purpose": "public_input_mst_and_proxy_guard_endpoint_validation_only",
+  "component_hashes": "validation/cover-mst-source.sha256",
+  "recorded_timing": "outer_cold_child_process_wall_diagnostic_only",
+  "legacy_arithmetic_counters": "incomplete_graph_and_wrapper_work_omitted",
+  "child_environment": "clear_JV_then_progress_incidence_shared_F4_defaults_RAYON_OMP_1",
+  "pinned_cpu": "0"
+}

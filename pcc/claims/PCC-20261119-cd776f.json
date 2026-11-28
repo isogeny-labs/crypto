@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T07:26:55Z",
+ "id": "PCC-20261119-cd776f",
+ "kind": "theorem",
+ "producer": {
+  "commit": "e0a4460da3d8234240f04679b31dd18f3d41ca25",
+  "model": "Codex",
+  "session": "semaev-square-product-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "75c94f58e9265c12638244ef0b2691b72e557bc2bd32815ad6e582928aa9ee77",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.shortCubicPolynomial_square_product_classification"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This discharges the polynomial square-product-to-scaling and forward classification step. It does not prove that a square in the rational function field is represented by a constant times a polynomial square, construct the multiquadratic Kummer characters, or prove their pairwise separation.",
+ "statement": "For a nonsingular short cubic over a field of characteristic not two, a nonzero constant-times-square factorization of the cubic times its nontrivially scaled copy forces exactly the exceptional scaling classes in Lemma 5.4: if A is nonzero then B is zero and r is minus one; if A is zero and B is nonzero then r cubed is one."
+}

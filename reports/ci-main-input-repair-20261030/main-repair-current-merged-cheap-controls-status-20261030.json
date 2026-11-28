@@ -1,0 +1,42 @@
+[
+  {
+    "command": [
+      "/workspace/actionlint/actionlint",
+      ".github/workflows/compact-orbit-n61-isolated.yml"
+    ],
+    "exit_code": 0,
+    "seconds": 0.01698486099485308,
+    "log": "/workspace/main-repair-current-merged-cheap-controls-0-20261030.log"
+  },
+  {
+    "command": [
+      "python",
+      "tools/artifacts/wire_workflows.py",
+      ".github/workflows/compact-orbit-n61-isolated.yml",
+      "--check"
+    ],
+    "exit_code": 0,
+    "seconds": 91.50478913498227,
+    "log": "/workspace/main-repair-current-merged-cheap-controls-1-20261030.log"
+  },
+  {
+    "command": [
+      "node",
+      "scripts/build_cover_transfer_assessments.mjs",
+      "--check"
+    ],
+    "exit_code": 1,
+    "seconds": 0.05106670700479299,
+    "log": "/workspace/main-repair-current-merged-cheap-controls-2-20261030.log"
+  },
+  {
+    "command": [
+      "node",
+      "tools/render_ic_dashboard.mjs",
+      "--check"
+    ],
+    "exit_code": 1,
+    "seconds": 0.020031748979818076,
+    "log": "/workspace/main-repair-current-merged-cheap-controls-3-20261030.log"
+  }
+]

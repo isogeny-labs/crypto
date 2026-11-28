@@ -28,7 +28,7 @@ use std::time::Instant;
 
 use crypto_lib::cryptanalysis::ecbench::methods::MethodSpec;
 use crypto_lib::cryptanalysis::ecbench::record::{ChildInput, CHILD_INPUT_SCHEMA};
-use crypto_lib::cryptanalysis::ecbench::spec::{plan, Spec};
+use crypto_lib::cryptanalysis::ecbench::spec::{plan_for_new_run, Spec};
 use serde_json::{json, Value};
 
 fn arg(args: &[String], name: &str) -> Option<String> {
@@ -54,7 +54,7 @@ fn inputs(args: &[String]) {
     let count: usize = need(args, "--count").parse().unwrap();
     let out = PathBuf::from(need(args, "--out"));
     std::fs::create_dir_all(&out).unwrap();
-    let p = plan(Spec::from_json(&spec).unwrap()).unwrap();
+    let p = plan_for_new_run(Spec::from_json(&spec).unwrap()).unwrap();
     for (i, ex) in p
         .executions
         .iter()

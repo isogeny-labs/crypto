@@ -1,0 +1,265 @@
+﻿2026-11-12T04:54:25.1531615Z Current runner version: '2.338.2'
+2026-11-12T04:54:25.1554831Z ##[group]Runner Image Provisioner
+2026-11-12T04:54:25.1555561Z Hosted Compute Agent
+2026-11-12T04:54:25.1556126Z Version: 20261028.624
+2026-11-12T04:54:25.1557726Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-12T04:54:25.1558658Z Build Date: 2026-10-28T21:51:42Z
+2026-11-12T04:54:25.1559620Z Worker ID: {3c2386df-7eb5-4bfa-9c13-42c5d7809ce9}
+2026-11-12T04:54:25.1560468Z Region: eastus2
+2026-11-12T04:54:25.1561149Z Cloud: Azure
+2026-11-12T04:54:25.1561639Z ##[endgroup]
+2026-11-12T04:54:25.1562881Z ##[group]Operating System
+2026-11-12T04:54:25.1563394Z Ubuntu
+2026-11-12T04:54:25.1563813Z 26.04.1
+2026-11-12T04:54:25.1564371Z LTS
+2026-11-12T04:54:25.1564790Z ##[endgroup]
+2026-11-12T04:54:25.1565271Z ##[group]Runner Image
+2026-11-12T04:54:25.1565790Z Image: ubuntu-26.04
+2026-11-12T04:54:25.1566638Z Version: 20261101.186.1
+2026-11-12T04:54:25.1567656Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261101.186/images/ubuntu/Ubuntu2604-Readme.md
+2026-11-12T04:54:25.1568922Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261101.186
+2026-11-12T04:54:25.1569914Z ##[endgroup]
+2026-11-12T04:54:25.1570931Z ##[group]GITHUB_TOKEN Permissions
+2026-11-12T04:54:25.1572718Z Contents: read
+2026-11-12T04:54:25.1573259Z Metadata: read
+2026-11-12T04:54:25.1573745Z ##[endgroup]
+2026-11-12T04:54:25.1575400Z Secret source: Actions
+2026-11-12T04:54:25.1576273Z Cache mode: write
+2026-11-12T04:54:25.1576867Z Prepare workflow directory
+2026-11-12T04:54:25.1847050Z Prepare all required actions
+2026-11-12T04:54:25.1885858Z Getting action download info
+2026-11-12T04:54:25.3774437Z Download action repository 'actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803' (SHA:d23441a48e516b6c34aea4fa41551a30e30af803)
+2026-11-12T04:54:25.4804867Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-11-12T04:54:25.7252630Z Complete job name: native
+2026-11-12T04:54:25.8189209Z ##[group]Run actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+2026-11-12T04:54:25.8190426Z with:
+2026-11-12T04:54:25.8190802Z   persist-credentials: false
+2026-11-12T04:54:25.8191478Z   sparse-checkout: research/chained_jacobian_transfers_20261110/native
+src/prime_hyperelliptic
+
+2026-11-12T04:54:25.8192207Z   repository: isogeny-labs/crypto
+2026-11-12T04:54:25.8195227Z   token: ***
+2026-11-12T04:54:25.8195582Z   ssh-strict: true
+2026-11-12T04:54:25.8195939Z   ssh-user: git
+2026-11-12T04:54:25.8196283Z   clean: true
+2026-11-12T04:54:25.8196647Z   sparse-checkout-cone-mode: true
+2026-11-12T04:54:25.8197073Z   fetch-depth: 1
+2026-11-12T04:54:25.8197428Z   fetch-tags: false
+2026-11-12T04:54:25.8197800Z   show-progress: true
+2026-11-12T04:54:25.8198170Z   lfs: false
+2026-11-12T04:54:25.8198513Z   submodules: false
+2026-11-12T04:54:25.8198880Z   set-safe-directory: true
+2026-11-12T04:54:25.8199292Z   allow-unsafe-pr-checkout: false
+2026-11-12T04:54:25.8200141Z ##[endgroup]
+2026-11-12T04:54:26.0641473Z Syncing repository: isogeny-labs/crypto
+2026-11-12T04:54:26.0643870Z ##[group]Getting Git version info
+2026-11-12T04:54:26.0644867Z Working directory is '/home/runner/work/crypto/crypto'
+2026-11-12T04:54:26.0646399Z [command]/usr/bin/git version
+2026-11-12T04:54:26.0654195Z git version 2.56.0
+2026-11-12T04:54:26.0672185Z ##[endgroup]
+2026-11-12T04:54:26.0687847Z Temporarily overriding HOME='/home/runner/work/_temp/bc8ff1a2-7e53-40a6-82fa-63ce874d2b72' before making global git config changes
+2026-11-12T04:54:26.0690697Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-12T04:54:26.0692699Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-12T04:54:26.0819169Z Deleting the contents of '/home/runner/work/crypto/crypto'
+2026-11-12T04:54:26.0824370Z ##[group]Determining repository object format
+2026-11-12T04:54:26.0829675Z ##[endgroup]
+2026-11-12T04:54:26.0830712Z ##[group]Initializing the repository
+2026-11-12T04:54:26.0831679Z [command]/usr/bin/git init /home/runner/work/crypto/crypto
+2026-11-12T04:54:26.0911024Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-12T04:54:26.0911950Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-12T04:54:26.0913003Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-12T04:54:26.0913635Z hint: call:
+2026-11-12T04:54:26.0913992Z hint:
+2026-11-12T04:54:26.0914574Z hint: 	git config --global init.defaultBranch <name>
+2026-11-12T04:54:26.0915130Z hint:
+2026-11-12T04:54:26.0915782Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-12T04:54:26.0916585Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-12T04:54:26.0917335Z hint:
+2026-11-12T04:54:26.0917704Z hint: 	git branch -m <name>
+2026-11-12T04:54:26.0918209Z hint:
+2026-11-12T04:54:26.0919145Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-12T04:54:26.0920835Z Initialized empty Git repository in /home/runner/work/crypto/crypto/.git/
+2026-11-12T04:54:26.0930077Z [command]/usr/bin/git remote add origin https://github.com/isogeny-labs/crypto
+2026-11-12T04:54:26.0972767Z ##[endgroup]
+2026-11-12T04:54:26.0973585Z ##[group]Disabling automatic garbage collection
+2026-11-12T04:54:26.0975391Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-12T04:54:26.1004325Z ##[endgroup]
+2026-11-12T04:54:26.1005442Z ##[group]Setting up auth
+2026-11-12T04:54:26.1005940Z Removing SSH command configuration
+2026-11-12T04:54:26.1010608Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-12T04:54:26.1040081Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-12T04:54:26.1417954Z Removing HTTP extra header
+2026-11-12T04:54:26.1419933Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-12T04:54:26.1463557Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-12T04:54:26.1710601Z Removing includeIf entries pointing to credentials config files
+2026-11-12T04:54:26.1712097Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-12T04:54:26.1738589Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-12T04:54:26.1981456Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-da0db849-4591-4686-94f5-8f00a8360f29.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-12T04:54:26.2021936Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/crypto/crypto/.git.path /home/runner/work/_temp/git-credentials-da0db849-4591-4686-94f5-8f00a8360f29.config
+2026-11-12T04:54:26.2056594Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/crypto/crypto/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-da0db849-4591-4686-94f5-8f00a8360f29.config
+2026-11-12T04:54:26.2090671Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-da0db849-4591-4686-94f5-8f00a8360f29.config
+2026-11-12T04:54:26.2120424Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-da0db849-4591-4686-94f5-8f00a8360f29.config
+2026-11-12T04:54:26.2145482Z ##[endgroup]
+2026-11-12T04:54:26.2146153Z ##[group]Fetching the repository
+2026-11-12T04:54:26.2152214Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --filter=blob:none --depth=1 origin +00cba85497f927a0f41a4436b2ae09c72aa885f7:refs/remotes/origin/research/chained-jacobian-transfer-20261110
+2026-11-12T04:54:27.0059931Z From https://github.com/isogeny-labs/crypto
+2026-11-12T04:54:27.0061690Z  * [new ref]           00cba85497f927a0f41a4436b2ae09c72aa885f7 -> origin/research/chained-jacobian-transfer-20261110
+2026-11-12T04:54:27.0068429Z [command]/usr/bin/git branch --list --remote origin/research/chained-jacobian-transfer-20261110
+2026-11-12T04:54:27.0094642Z   origin/research/chained-jacobian-transfer-20261110
+2026-11-12T04:54:27.0101540Z [command]/usr/bin/git rev-parse refs/remotes/origin/research/chained-jacobian-transfer-20261110
+2026-11-12T04:54:27.0122232Z 00cba85497f927a0f41a4436b2ae09c72aa885f7
+2026-11-12T04:54:27.0127220Z ##[endgroup]
+2026-11-12T04:54:27.0128352Z ##[group]Determining the checkout info
+2026-11-12T04:54:27.0129855Z ##[endgroup]
+2026-11-12T04:54:27.0131415Z ##[group]Setting up sparse checkout
+2026-11-12T04:54:27.0133054Z [command]/usr/bin/git sparse-checkout set research/chained_jacobian_transfers_20261110/native src/prime_hyperelliptic
+2026-11-12T04:54:27.0173223Z ##[endgroup]
+2026-11-12T04:54:27.0174688Z ##[group]Checking out the ref
+2026-11-12T04:54:27.0177335Z [command]/usr/bin/git checkout --progress --force -B research/chained-jacobian-transfer-20261110 refs/remotes/origin/research/chained-jacobian-transfer-20261110
+2026-11-12T04:54:27.9343835Z Switched to a new branch 'research/chained-jacobian-transfer-20261110'
+2026-11-12T04:54:27.9370506Z branch 'research/chained-jacobian-transfer-20261110' set up to track 'origin/research/chained-jacobian-transfer-20261110'.
+2026-11-12T04:54:27.9396055Z ##[endgroup]
+2026-11-12T04:54:27.9435063Z [command]/usr/bin/git log -1 --format=%H
+2026-11-12T04:54:27.9459039Z 00cba85497f927a0f41a4436b2ae09c72aa885f7
+2026-11-12T04:54:27.9466327Z ##[group]Removing auth
+2026-11-12T04:54:27.9466879Z Removing SSH command configuration
+2026-11-12T04:54:27.9469841Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-12T04:54:27.9498464Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-12T04:54:28.0141377Z Removing HTTP extra header
+2026-11-12T04:54:28.0145913Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-12T04:54:28.0179872Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-12T04:54:28.0796887Z Removing includeIf entries pointing to credentials config files
+2026-11-12T04:54:28.0800643Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-12T04:54:28.0825059Z includeif.gitdir:/home/runner/work/crypto/crypto/.git.path
+2026-11-12T04:54:28.0825726Z includeif.gitdir:/home/runner/work/crypto/crypto/.git/worktrees/*.path
+2026-11-12T04:54:28.0826266Z includeif.gitdir:/github/workspace/.git.path
+2026-11-12T04:54:28.0826565Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-12T04:54:28.0834687Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/crypto/crypto/.git.path
+2026-11-12T04:54:28.0857138Z /home/runner/work/_temp/git-credentials-da0db849-4591-4686-94f5-8f00a8360f29.config
+2026-11-12T04:54:28.0865676Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/crypto/crypto/.git.path /home/runner/work/_temp/git-credentials-da0db849-4591-4686-94f5-8f00a8360f29.config
+2026-11-12T04:54:28.0896629Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/crypto/crypto/.git/worktrees/*.path
+2026-11-12T04:54:28.0916108Z /home/runner/work/_temp/git-credentials-da0db849-4591-4686-94f5-8f00a8360f29.config
+2026-11-12T04:54:28.0924244Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/crypto/crypto/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-da0db849-4591-4686-94f5-8f00a8360f29.config
+2026-11-12T04:54:28.0953408Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-11-12T04:54:28.0976254Z /github/runner_temp/git-credentials-da0db849-4591-4686-94f5-8f00a8360f29.config
+2026-11-12T04:54:28.0984500Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-da0db849-4591-4686-94f5-8f00a8360f29.config
+2026-11-12T04:54:28.1015198Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-12T04:54:28.1033685Z /github/runner_temp/git-credentials-da0db849-4591-4686-94f5-8f00a8360f29.config
+2026-11-12T04:54:28.1039538Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-da0db849-4591-4686-94f5-8f00a8360f29.config
+2026-11-12T04:54:28.1067166Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-12T04:54:28.1699222Z Removing credentials config '/home/runner/work/_temp/git-credentials-da0db849-4591-4686-94f5-8f00a8360f29.config'
+2026-11-12T04:54:28.1710605Z ##[endgroup]
+2026-11-12T04:54:28.1907037Z ##[group]Run set -euo pipefail
+2026-11-12T04:54:28.1907358Z [36;1mset -euo pipefail[0m
+2026-11-12T04:54:28.1907760Z [36;1mrustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy[0m
+2026-11-12T04:54:28.1908253Z [36;1mmanifest=research/chained_jacobian_transfers_20261110/native/Cargo.toml[0m
+2026-11-12T04:54:28.1908624Z [36;1mcargo fmt --manifest-path "$manifest" -- --check[0m
+2026-11-12T04:54:28.1909088Z [36;1mcargo clippy --manifest-path "$manifest" --all-targets --features small-prime --offline --locked -- -D warnings[0m
+2026-11-12T04:54:28.1910094Z [36;1mcargo test --release --manifest-path "$manifest" --features small-prime --offline --locked -- --nocapture 2>&1 | tee "$RUNNER_TEMP/native-tests.txt"[0m
+2026-11-12T04:54:28.1958490Z shell: /usr/bin/bash -e {0}
+2026-11-12T04:54:28.1958713Z env:
+2026-11-12T04:54:28.1958886Z   RUSTUP_TOOLCHAIN: 1.99.1
+2026-11-12T04:54:28.1959081Z ##[endgroup]
+2026-11-12T04:54:28.2393503Z info: syncing channel updates for 1.99.1-x86_64-unknown-linux-gnu
+2026-11-12T04:54:28.3719582Z info: latest update on 2026-10-15 for version 1.99.1 (58cf8f9c3 2026-10-13)
+2026-11-12T04:54:28.3853651Z info: downloading 5 components
+2026-11-12T04:54:35.9362486Z 
+2026-11-12T04:54:35.9440446Z   1.99.1-x86_64-unknown-linux-gnu installed - rustc 1.99.1 (58cf8f9c3 2026-10-13)
+2026-11-12T04:54:35.9440936Z 
+2026-11-12T04:54:36.0785622Z     Checking chained-jacobian-transfer v0.1.0 (/home/runner/work/crypto/crypto/research/chained_jacobian_transfers_20261110/native)
+2026-11-12T04:54:36.3531590Z     Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.30s
+2026-11-12T04:54:36.3862284Z    Compiling chained-jacobian-transfer v0.1.0 (/home/runner/work/crypto/crypto/research/chained_jacobian_transfers_20261110/native)
+2026-11-12T04:54:39.2324231Z     Finished `release` profile [optimized] target(s) in 2.87s
+2026-11-12T04:54:39.2328330Z      Running unittests src/lib.rs (research/chained_jacobian_transfers_20261110/native/target/release/deps/chained_jacobian_transfer-0185ca336a44ea2a)
+2026-11-12T04:54:39.2338734Z 
+2026-11-12T04:54:39.2339016Z running 25 tests
+2026-11-12T04:54:39.2377770Z successor complete 96-point endpoint shortcuts tau(X,Y)=(sX+t,kY): [(100, 80, 91)]
+2026-11-12T04:54:39.2414805Z test richelot::model::tests::successor_complete_elliptic_route_deduplication ... ok
+2026-11-12T04:54:39.2415727Z test richelot::model::tests::original_fixture_agrees_and_curve_tags_reject_mixing ... ok
+2026-11-12T04:54:39.2461007Z test richelot::tests::complete_elliptic_domain_route_deduplication_control ... ok
+2026-11-12T04:54:39.5780933Z test richelot::model::tests::successor_both_norms_on_arbitrary_classes ... ok
+2026-11-12T04:54:39.5782014Z Richelot endpoint F=Some((F2(91, 0), F2(84, 0))), G=None
+2026-11-12T04:54:39.5980134Z test richelot::tests::entire_order_17_image_and_both_endpoint_projections ... ok
+2026-11-12T04:54:39.8710660Z test richelot::tests::dual_norm_and_order_17_point_recovery ... ok
+2026-11-12T04:54:39.8760172Z test richelot::tests::fixed_models_and_sign ... ok
+2026-11-12T04:54:40.5970788Z test richelot::tests::full_model_isomorphism_and_target_dual_norm ... ok
+2026-11-12T04:54:40.6010160Z test small_prime::field_reference::tests::checked_context_rejects_composites_and_forged_nonresidues ... ok
+2026-11-12T04:54:40.6030037Z test small_prime::field_reference::tests::fp2_basic_arithmetic ... ok
+2026-11-12T04:54:40.6060623Z test small_prime::field_reference::tests::fp2_inv_roundtrip ... ok
+2026-11-12T04:54:40.6089797Z test small_prime::field_reference::tests::fp2_qr_half_split ... ok
+2026-11-12T04:54:40.6090383Z test small_prime::field_reference::tests::fp2_qr_test_consistency ... ok
+2026-11-12T04:54:40.6091173Z test small_prime::field_reference::tests::public_element_fields_are_canonicalized_before_arithmetic ... ok
+2026-11-12T04:54:40.7521035Z successor: #J=9216, two-torsion source=4 target=16, #E=96, r=3, P=Some((F2(48, 0), F2(20, 0))), normF=Some((F2(2, 0), F2(72, 0))), normG=None
+2026-11-12T04:54:40.7580663Z test richelot::model::tests::successor_full_domain_and_nonisomorphic_rational_two_torsion ... ok
+2026-11-12T04:54:40.7609838Z test small_prime::tests::field_bounds_domains_and_bad_models_fail_closed ... ok
+2026-11-12T04:54:40.8021021Z p=13, selected odd subgroup r=5, P=Some((10, 6)), target class=([8, 6, 1], [7, 3])
+2026-11-12T04:54:40.8120062Z p=13, nonresidue=2, #J=180, rational2-torsion=4/4, #E=10
+2026-11-12T04:54:41.0770545Z p=29, selected odd subgroup r=5, P=Some((24, 15)), target class=([6, 24, 1], [17, 25])
+2026-11-12T04:54:41.1219922Z p=29, nonresidue=2, #J=960, rational2-torsion=4/16, #E=40
+2026-11-12T04:54:41.3970480Z p=31, selected odd subgroup r=7, P=Some((19, 2)), target class=([21, 22, 1], [20, 3])
+2026-11-12T04:54:41.4429963Z p=31, nonresidue=3, #J=1008, rational2-torsion=16/4, #E=28
+2026-11-12T04:54:41.5391183Z second hop: delta=67, source #J=9216, target #J=9216, target sextic=[38, 9, 29, 62, 86, 17, 8], target2-torsion=8, intersection(kerR2,kerDualR1)=1, rational composite kernel=8, r=3, image=([27, 86, 1], [7, 34])
+2026-11-12T04:54:41.5450096Z test richelot::model::tests::predeclared_second_hop_full_domain_and_nonbacktracking ... ok
+2026-11-12T04:54:41.5500245Z PASS p=13 successor rational shortcut: 12 affine curve points plus both infinities, actual base norm(1/125,0), all whole elliptic fibers
+2026-11-12T04:54:41.5510186Z PASS p=29 successor rational shortcut: 32 affine curve points plus both infinities, actual base norm(1/125,0), all whole elliptic fibers
+2026-11-12T04:54:41.5540075Z PASS p=31 successor rational shortcut: 30 affine curve points plus both infinities, actual base norm(1/125,0), all whole elliptic fibers
+2026-11-12T04:54:41.5570092Z PASS p=101 successor rational shortcut: 88 affine curve points plus both infinities, actual base norm(1/125,0), all whole elliptic fibers
+2026-11-12T04:54:41.5571066Z test small_prime::tests::successor_shortcut_on_all_curve_points_and_whole_fibers ... ok
+2026-11-12T04:54:41.6240274Z test tests::all_elliptic_inputs_including_exceptions ... ok
+2026-11-12T04:54:41.6610339Z test richelot::tests::every_rational_class_kernel_fibers_and_additivity ... ok
+2026-11-12T04:54:41.6611044Z test tests::field_and_model ... ok
+2026-11-12T04:54:41.6611527Z test tests::order_17_dlp_chain_and_rejections ... ok
+2026-11-12T04:54:41.9002988Z test tests::arbitrary_rational_classes_and_norm_homomorphisms ... ok
+2026-11-12T04:54:43.0672460Z test small_prime::tests::both_f101_hops_match_the_frozen_model_backend ... ok
+2026-11-12T04:54:43.6001900Z p=101, selected odd subgroup r=3, P=Some((48, 20)), target class=([65, 58, 1], [63, 82])
+2026-11-12T04:54:43.8788599Z p=101, nonresidue=2, #J=9216, rational2-torsion=4/16, #E=96
+2026-11-12T04:54:43.8809791Z test small_prime::tests::fixed_fields_complete_domains_and_source_norm ... ok
+2026-11-12T04:54:43.8810501Z 
+2026-11-12T04:54:43.8810909Z test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.65s
+2026-11-12T04:54:43.8811351Z 
+2026-11-12T04:54:43.8816934Z    Doc-tests chained_jacobian_transfer
+2026-11-12T04:54:43.9122807Z 
+2026-11-12T04:54:43.9123206Z running 0 tests
+2026-11-12T04:54:43.9123382Z 
+2026-11-12T04:54:43.9123673Z test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+2026-11-12T04:54:43.9124058Z 
+2026-11-12T04:54:43.9308004Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+2026-11-12T04:54:43.9308348Z with:
+2026-11-12T04:54:43.9308618Z   name: chained-jacobian-native-00cba85497f927a0f41a4436b2ae09c72aa885f7
+2026-11-12T04:54:43.9308964Z   path: /home/runner/work/_temp/native-tests.txt
+2026-11-12T04:54:43.9309218Z   if-no-files-found: ignore
+2026-11-12T04:54:43.9309537Z   compression-level: 6
+2026-11-12T04:54:43.9309720Z   overwrite: false
+2026-11-12T04:54:43.9309914Z   include-hidden-files: false
+2026-11-12T04:54:43.9310126Z ##[endgroup]
+2026-11-12T04:54:44.0658521Z (node:2472) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-12T04:54:44.0659234Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-12T04:54:44.0693921Z With the provided path, there will be 1 file uploaded
+2026-11-12T04:54:44.0698349Z Artifact name is valid!
+2026-11-12T04:54:44.0698986Z Root directory input is valid!
+2026-11-12T04:54:44.3206858Z Beginning upload of artifact content to blob storage
+2026-11-12T04:54:44.3368269Z (node:2472) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-12T04:54:44.3804823Z Uploaded bytes 1581
+2026-11-12T04:54:44.3972300Z Finished uploading artifact content to blob storage!
+2026-11-12T04:54:44.3972909Z SHA256 digest of uploaded artifact zip is b7c4264379404974d68ad0aff2408ad77603e7df3cc27c9aa3f114130f348d0b
+2026-11-12T04:54:44.3974683Z Finalizing artifact upload
+2026-11-12T04:54:44.7342969Z Artifact chained-jacobian-native-00cba85497f927a0f41a4436b2ae09c72aa885f7.zip successfully finalized. Artifact ID 13916940982
+2026-11-12T04:54:44.7344325Z Artifact chained-jacobian-native-00cba85497f927a0f41a4436b2ae09c72aa885f7 has been successfully uploaded! Final size is 1581 bytes. Artifact ID is 13916940982
+2026-11-12T04:54:44.7345518Z Artifact download URL: https://github.com/isogeny-labs/crypto/actions/runs/43157805224/artifacts/13916940982
+2026-11-12T04:54:44.8469188Z Post job cleanup.
+2026-11-12T04:54:44.9165372Z [command]/usr/bin/git version
+2026-11-12T04:54:44.9202527Z git version 2.56.0
+2026-11-12T04:54:44.9234918Z Temporarily overriding HOME='/home/runner/work/_temp/1d1b62f8-d7af-4108-ab69-4152e7e66d18' before making global git config changes
+2026-11-12T04:54:44.9235935Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-12T04:54:44.9239737Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/crypto/crypto
+2026-11-12T04:54:44.9268245Z Removing SSH command configuration
+2026-11-12T04:54:44.9274098Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-12T04:54:44.9306418Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-12T04:54:44.9955347Z Removing HTTP extra header
+2026-11-12T04:54:44.9959902Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-12T04:54:44.9993077Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-12T04:54:45.0640722Z Removing includeIf entries pointing to credentials config files
+2026-11-12T04:54:45.0648877Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-12T04:54:45.0686908Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-12T04:54:45.1477099Z Cleaning up orphan processes
+2026-11-12T04:54:45.1816061Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

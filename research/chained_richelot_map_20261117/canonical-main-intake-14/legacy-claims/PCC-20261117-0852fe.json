@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T08:06:23Z",
+ "id": "PCC-20261117-0852fe",
+ "kind": "statement",
+ "producer": {
+  "commit": "c0a2f94debb9bd26763ebabb0dda746936fdbdd1",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_map_20261117/infrastructure-D-storage-and-ledger-cache-06/ACTUAL_FIRST_D_STORAGE_STOP_AND_PROSPECTIVE_RECOVERY.json",
+    "sha256": "251c82d2a74b26bcca0bbd1bf5cfa7b513b3221e7b82a6067aa8e29ed9a88a2a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_richelot_map_20261117/infrastructure-D-storage-and-ledger-cache-06/whole-first-D-storage-stop-before-compiler.tar.xz",
+    "sha256": "1e3832ae7c48cf2103900650cee5c03620ca4b043f969cc9f3360c924f51619c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Public sourcec0a2f94d first D setup stops at unchanged scratch preflight3039232 <3145728B, before compiler/arithmetic; whole10-member raw stop archive byte/mode checked. Duplicate Git cache copies of append-only ledger versions are a storage target, not ledger-row changes. Proposed recovery packs only explicit historical ledger blobs, verifies every byte from isolated cache, then normal prune-packed removes owned duplicates. First metadata pack attempt hits cross-device temporary-file rename before cache registration; preserve it and retry stdout streaming. Same D source, scientific criteria,8MiB/3MiB and120s, no mathematical outcome."
+}

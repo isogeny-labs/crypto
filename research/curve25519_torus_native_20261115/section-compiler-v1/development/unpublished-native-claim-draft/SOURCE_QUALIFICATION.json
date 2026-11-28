@@ -1,0 +1,76 @@
+{
+  "schema": "section-compiler.source-qualification/v1",
+  "source_commit_local": "6f4987bd455e69e61c3449ef89a3a4025c6076dd",
+  "source_publication": "e1591a201d3957cd59b27b5f2b3545e34b8d194f",
+  "public_tree": "008d04f654a017d1fa54c32a15b7411fbb606571",
+  "composite_source_inputs": 54,
+  "composite_archives": [
+    {
+      "inputs": 30,
+      "path": "../section-query-v1/source-v1-post-checks.tar.xz",
+      "sha256": "80999002de541aa8c7505cc21fc5f501e6f3ca7fc636dfacf5e50620cbab1c4a"
+    },
+    {
+      "inputs": 11,
+      "path": "../section-coeff-v1/source-v1-delta.tar.xz",
+      "bytes": 13500,
+      "sha256": "ec9c5fe82540e1987be0a3b17ba53553c33ee0f1727a27f3dd1460f74be13a49"
+    },
+    {
+      "inputs": 13,
+      "path": "source-v1-delta.tar.xz",
+      "bytes": 21360,
+      "sha256": "09d12b0d4c0f6e3b80dbe71895c8d05b117200ecc2c0b44ccbdcad1b15f4662c"
+    }
+  ],
+  "compiled_new_inputs": [
+    {
+      "path": "tools/torus-section-compiler/Cargo.toml",
+      "sha256": "422894aa726c33b44696f801009b3b2df9f87575bcb571d3704d2521f5f6e3be"
+    },
+    {
+      "path": "tools/torus-section-compiler/Cargo.lock",
+      "sha256": "08c8bcbe8dcde25ca171502ba20614da6667009617f8b5444e6d5ad2f81c8cde"
+    },
+    {
+      "path": "tools/torus-section-compiler/.gitignore",
+      "sha256": "b0714d56cba1f7fee70756e26ad544405a926b320030f9a3f29d4ed2dab21315"
+    },
+    {
+      "path": "tools/torus-section-compiler/FIXTURES.json",
+      "sha256": "7b460f3d1e3051db298916ff7107414cfbac69013312882cb5e5af2890d7ab87"
+    },
+    {
+      "path": "tools/torus-section-compiler/src/main.rs",
+      "sha256": "2984dca34baf063312e015781331a950804209cf96c67dac74c627042b0338ce"
+    },
+    {
+      "path": "tools/torus-section-compiler/src/lib.rs",
+      "sha256": "f62b1a80123c0381c3dd2904bf9a8d223b48f4b2de9e00e362ffc061ca6f4d40"
+    },
+    {
+      "path": "tools/torus-section-compiler/src/gates.rs",
+      "sha256": "edfcf23f61a1c8cefb4a2fc2a35db35b01a8b1e9221d798dcf0770c76715b3b0"
+    },
+    {
+      "path": "tools/torus-section-compiler/src/arithmetic.rs",
+      "sha256": "85081f983ae275f13f95ff7a02f6464406299c0eff630be3241459583210e022"
+    },
+    {
+      "path": "tools/torus-section-compiler/src/controls.rs",
+      "sha256": "19a65bb81dff97bf8f4df98e51736f2dbdc8d2fda10c0f310ad6dfbfc2340ef0"
+    },
+    {
+      "path": "tools/torus-section-compiler/run-control.sh",
+      "sha256": "17c626bdfe03c4e9312e1802f9f4a9b1bd7a9c082916f7ec12d636cde07d8f8a"
+    }
+  ],
+  "binary": {
+    "path": "/workspace/curve25519-native-binaries/section-compiler-control-v1",
+    "sha256": "46e75f76f081edbed17b1bb0ec9500368d79bf60f2501c77cf3352f0b5b448d7",
+    "bytes": 1769168
+  },
+  "source_checks": "all54 hashes matched before and after; ten compiled-in hashes matched; binary pre/post matched",
+  "publication_note": "local6f source preceded the fixed call; remote source publication followed it after terminal5022 and HTTPS Git auth loss; source blobs byte-identical",
+  "standing": "unsigned/unverified"
+}

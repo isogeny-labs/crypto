@@ -1,0 +1,72 @@
+   Compiling zmij v1.0.23
+   Compiling version_check v0.9.5
+   Compiling generic-array v0.14.7
+   Compiling proc-macro2 v1.0.107
+   Compiling serde_json v1.0.151
+   Compiling libc v0.2.190
+   Compiling quote v1.0.47
+   Compiling typenum v1.20.1
+   Compiling unicode-ident v1.0.26
+   Compiling crossbeam-utils v0.8.23
+   Compiling zerocopy v0.8.60
+   Compiling serde_core v1.0.229
+   Compiling cfg-if v1.0.5
+   Compiling autocfg v1.5.1
+   Compiling crossbeam-epoch v0.9.21
+   Compiling num-traits v0.2.19
+   Compiling getrandom v0.2.17
+   Compiling syn v3.0.6
+   Compiling block-buffer v0.10.4
+   Compiling crypto-common v0.1.7
+   Compiling crossbeam-deque v0.8.8
+   Compiling serde v1.0.229
+   Compiling digest v0.10.7
+   Compiling ppv-lite86 v0.2.21
+   Compiling serde_derive v1.0.229
+   Compiling rand_core v0.6.4
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling rayon-core v1.13.0
+   Compiling cpufeatures v0.2.17
+   Compiling sha2 v0.10.9
+   Compiling rand_chacha v0.3.1
+   Compiling rand v0.8.8
+   Compiling num-integer v0.1.47
+   Compiling dickson-s3-qualifier v0.1.0 (/workspace/scratch/108b275c78dd/crypto-dickson/research/dickson_s3_quadratic_20261122/qualifier)
+   Compiling either v1.18.0
+   Compiling rayon v1.12.0
+   Compiling num-bigint v0.4.8
+   Compiling certified-relations v0.1.0 (/workspace/scratch/108b275c78dd/crypto-dickson/crates/certified-relations)
+   Compiling relation-replay-checker v0.1.0 (/workspace/scratch/108b275c78dd/crypto-dickson/crates/relation-replay-checker)
+   Compiling hex v0.4.3
+error: this file contains an unclosed delimiter
+    --> /workspace/scratch/108b275c78dd/dickson-qualifier-target/release/build/dickson-s3-qualifier/140e9aa747f8e4ad/out/ic_boundary.rs:2337:2
+     |
+ 833 | pub trait CountedGroup {
+     |                        - unclosed delimiter
+...
+ 863 |     fn coset_parity_squarings(&self) -> u64 {
+     |                                             - unclosed delimiter
+...
+ 868 |     fn abscissa_key_bound(&self) -> Option<u64> {
+     |                                                 - unclosed delimiter
+...
+1011 |     fn x_sibling_pair(&self, _p: Self::Elt, _j: Self::Elt) -> Option<(Self::Elt, u64)> {
+     |                                                                                        - unclosed delimiter
+...
+1548 | impl CountedGroup for PrimeCurve {
+     |                                  - unclosed delimiter
+...
+1782 |     ) -> Option<(PrimePoint, u64)> {
+     |                                    - this delimiter might not be properly closed...
+...
+2044 |                     _ => {}
+     |                          -- block is empty, you might have not meant to close it
+...
+2076 | }
+     | - ...as it matches this but it has different indentation
+...
+2337 |
+     | ^
+
+error: could not compile `dickson-s3-qualifier` (lib) due to 1 previous error

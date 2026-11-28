@@ -1,0 +1,105 @@
+     Locking 1 package to highest compatible version
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling hec-recover631 v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_recover631_20261116)
+error[E0433]: cannot find `target` in `super`
+  --> ../hec_calibration631_20261115/field_config.rs:28:12
+   |
+28 |     super::target::monomials(4)
+   |            ^^^^^^ unresolved import
+   |
+help: a similar path exists
+   |
+28 |     super::crate::target_program::target::monomials(4)
+   |            +++++++++++++++++++++++
+help: consider importing this module
+   |
+ 1 + use crate::target_program::target;
+   |
+help: if you import `target`, refer to it directly
+   |
+28 -     super::target::monomials(4)
+28 +     target::monomials(4)
+   |
+
+error[E0433]: cannot find `target` in `super`
+  --> ../hec_calibration631_20261115/field_config.rs:63:12
+   |
+63 |     super::target::monomials(4)
+   |            ^^^^^^ unresolved import
+   |
+help: a similar path exists
+   |
+63 |     super::crate::target_program::target::monomials(4)
+   |            +++++++++++++++++++++++
+help: consider importing this module
+   |
+ 1 + use crate::target_program::target;
+   |
+help: if you import `target`, refer to it directly
+   |
+63 -     super::target::monomials(4)
+63 +     target::monomials(4)
+   |
+
+error[E0433]: cannot find `target` in `super`
+  --> ../hec_calibration631_20261115/field_config.rs:74:12
+   |
+74 |     super::target::monomials(4)
+   |            ^^^^^^ unresolved import
+   |
+help: a similar path exists
+   |
+74 |     super::crate::target_program::target::monomials(4)
+   |            +++++++++++++++++++++++
+help: consider importing this module
+   |
+ 1 + use crate::target_program::target;
+   |
+help: if you import `target`, refer to it directly
+   |
+74 -     super::target::monomials(4)
+74 +     target::monomials(4)
+   |
+
+error[E0433]: cannot find `target` in `super`
+  --> ../hec_calibration631_20261115/field_config.rs:99:35
+   |
+99 |     for (&(a, _, c), v) in super::target::monomials(4).iter().zip(f) {
+   |                                   ^^^^^^ unresolved import
+   |
+help: a similar path exists
+   |
+99 |     for (&(a, _, c), v) in super::crate::target_program::target::monomials(4).iter().zip(f) {
+   |                                   +++++++++++++++++++++++
+help: consider importing this module
+   |
+ 1 + use crate::target_program::target;
+   |
+help: if you import `target`, refer to it directly
+   |
+99 -     for (&(a, _, c), v) in super::target::monomials(4).iter().zip(f) {
+99 +     for (&(a, _, c), v) in target::monomials(4).iter().zip(f) {
+   |
+
+error[E0433]: cannot find `target` in `super`
+   --> ../hec_calibration631_20261115/field_config.rs:164:16
+    |
+164 |         super::target::rational_points(&f, crate::field::p()),
+    |                ^^^^^^ unresolved import
+    |
+help: a similar path exists
+    |
+164 |         super::crate::target_program::target::rational_points(&f, crate::field::p()),
+    |                +++++++++++++++++++++++
+help: consider importing this module
+    |
+  1 + use crate::target_program::target;
+    |
+help: if you import `target`, refer to it directly
+    |
+164 -         super::target::rational_points(&f, crate::field::p()),
+164 +         target::rational_points(&f, crate::field::p()),
+    |
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `hec-recover631` (bin "recover631") due to 5 previous errors

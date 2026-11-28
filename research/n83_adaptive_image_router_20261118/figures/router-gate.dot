@@ -1,0 +1,33 @@
+digraph RouterGate {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.35", ranksep="0.55",
+         fontname="Helvetica", label="n=83 projector-only adaptive router gate",
+         labelloc="t", fontsize=18];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11,
+        color="#34495e", fillcolor="#eef5fb", margin="0.12,0.08"];
+  edge [fontname="Helvetica", fontsize=10, color="#4c6173"];
+
+  J [label="ambient class D in J(C)", fillcolor="#eef5fb"];
+  N [label="elliptic label\nphi_*(D)", fillcolor="#e8f7ee"];
+  K [label="kernel / Prym residue\nK in ker(phi_*)", fillcolor="#fff0dc"];
+  P [label="normalized image\np(D)=[3^-1]phi^*phi_*(D)", fillcolor="#e8f7ee"];
+
+  J -> N [label="general norm"];
+  J -> K [label="class-specific part"];
+  N -> P [label="pull back + normalize"];
+  K -> P [label="erased", style=dashed, color="#b14a4a"];
+
+  BEFORE [label="project before collection\nimage relation module = source module", fillcolor="#ffe7e7"];
+  AFTER [label="project exact ambient relation\nvalid, but collection cost unchanged", fillcolor="#ffe7e7"];
+  ONLY [label="accept projected relation only\nkernel cancellation missing", fillcolor="#ffe7e7"];
+  P -> BEFORE;
+  P -> AFTER;
+  P -> ONLY;
+
+  CONTROL [label="GF(8) exact control\n486 classes -> 6 labels\n81 classes per label\n1/81 projected-zero pairs lift", shape=note, fillcolor="#f5f0ff"];
+  ONLY -> CONTROL [label="exhaustive check"];
+
+  OPEN [label="still open only with a new oracle\nsource labels or controlled Prym cancellation\n+ non-reduced / Riemann--Roch representation", fillcolor="#fff7cf"];
+  BEFORE -> OPEN [style=dashed, label="projector alone stops"];
+  AFTER -> OPEN [style=dashed];
+  ONLY -> OPEN [style=dashed];
+}

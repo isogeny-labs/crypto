@@ -1,0 +1,19 @@
+{
+  "time": "2026-11-17T07:06:47.444003+00:00",
+  "original_caller_sha256": "bf48dd0690989ce26ad5e85c4a0fc45afa116f94da74c3419546160c31173886",
+  "isolated_C_sha256": "1643d095a4667e3a2e3b7a10cdd7fa81a6de3e7af885f666ad077734cbd918b9",
+  "entire_difference": "--- immutable-original-caller\n+++ isolated-caller-C\n@@ -53,7 +53,7 @@\n   assert free_temp>=3*1024*1024,('compiler scratch preflight',free_temp)\n   return {'RAM_available':free_ram,'scratch_available':free_temp,'minimum_RAM':8*1024*1024,'minimum_scratch':3*1024*1024}\n  local_phase('frozen-storage-preflight',storage)\n- lock=study/'SOURCE_LOCK_14.json'\n+ lock=study/'SOURCE_LOCK_14C.json'\n  git_env=dict(env,GIT_OPTIONAL_LOCKS='0',GIT_NO_LAZY_FETCH='1')\n  def exact_public_source():\n   subject=lock.relative_to(repo).as_posix()\n@@ -77,7 +77,7 @@\n   for row in manifest['files']:\n    src=study/row['path'];dst=hold/'source'/row['path'];dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)\n    assert sha(dst)==row['sha256']\n-  shutil.copy2(lock,hold/'source/SOURCE_LOCK_14.json')\n+  shutil.copy2(lock,hold/'source'/lock.name)\n   return {'copied_files':len(manifest['files'])+1,'no_history_tree_copy':True}\n  local_phase('copy-exact-declared-source',copy_source)\n  def copied_guard():\n@@ -112,7 +112,9 @@\n  for label,source in [('positive','fn main() { std::hint::black_box(1_u64); }\\n'),('negative','fn main() { let a = 1_u64; std::hint::black_box(a == a); }\\n')]:\n   fixture=hold/'source'/('clippy-sentinel-'+label+'.rs');fixture.write_text(source)\n   _,err=command('clippy-sentinel-'+label,['timeout','--signal=TERM','--kill-after=5s','120s','rustup','run','1.99.1','clippy-driver','--crate-name','clippy_sentinel_'+label,'--edition=2021','--emit=metadata','-D','clippy::eq_op',str(fixture),'-o',str(hold/('clippy-sentinel-'+label+'.rmeta'))],0 if label=='positive' else 1)\n-  if label=='negative':assert 'clippy::eq_op' in err.read_text()\n+  if label=='negative':\n+   diagnostic=err.read_text()\n+   assert 'clippy::eq-op' in diagnostic and 'equal expressions as operands' in diagnostic\n  deps=hold/'deps'\n  bigint=next(deps.glob('libnum_bigint-*.rlib'));traits=next(deps.glob('libnum_traits-*.rlib'))\n  common=['--crate-name','chained_richelot_operational_map_14','--test','--edition=2021','src/lib.rs','-L','dependency='+str(deps),'--extern','num_bigint='+str(bigint),'--extern','num_traits='+str(traits),'-C','opt-level=3','-C','codegen-units=1','-C','strip=symbols']\n",
+  "full_original_26_source_input_hashes_still_equal": true,
+  "new_source_lock_files": 28,
+  "no_main_scientific_compile_or_arithmetic": true,
+  "future_argv": [
+    "python3",
+    "research/chained_richelot_map_20261117/run_first_unit_14_C.py",
+    "--source-commit",
+    "<exact-public-C-checkpoint>",
+    "--custody-dir",
+    "/dev/shm/ct736-first-map14-C",
+    "--compiler-temp",
+    "/run/lock/ct736-map14-compiler-temp"
+  ]
+}

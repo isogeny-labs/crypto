@@ -395,6 +395,10 @@ pub struct HashedTensorOracle {
     setup_steps: u64,
     setup_square_roots: u64,
     relation_steps: u64,
+    /// Wall time of `decompose` contraction calls only (nanoseconds).
+    relation_contraction_wall_ns: u64,
+    /// `Meter::used` over those calls, minus curve additions and square roots.
+    relation_primitive_steps: u64,
     limit_hits: u64,
     integrity_failures: u64,
 }
@@ -504,8 +508,22 @@ impl DecompositionOracle<PrimeCurve> for HashedTensorOracle {
             y: big(point.y),
         };
         let mut meter = Meter::new(self.limits.clone()?);
+        let used_before = meter.used;
+        let adds_before = meter.curve_additions;
+        let sqrts_before = meter.square_roots;
+        let t0 = std::time::Instant::now();
         let mut counter = tensor::contraction::Counter::default();
         let witness = decompose(curve, &self.bases, &target, &mut counter, &mut meter);
+        self.relation_contraction_wall_ns = self
+            .relation_contraction_wall_ns
+            .saturating_add(t0.elapsed().as_nanos() as u64);
+        let delta_used = meter.used.saturating_sub(used_before);
+        let delta_adds = meter.curve_additions.saturating_sub(adds_before);
+        let delta_sqrts = meter.square_roots.saturating_sub(sqrts_before);
+        let primitive = delta_used
+            .saturating_sub(delta_adds)
+            .saturating_sub(delta_sqrts);
+        self.relation_primitive_steps = self.relation_primitive_steps.saturating_add(primitive);
         self.relation_steps = self.relation_steps.saturating_add(meter.used);
         ops.adds = ops.adds.saturating_add(meter.curve_additions);
         counters.sqrt_solves = counters.sqrt_solves.saturating_add(meter.square_roots);
@@ -554,6 +572,18 @@ impl DecompositionOracle<PrimeCurve> for HashedTensorOracle {
     fn relation_counters(&self) -> BTreeMap<String, u64> {
         let mut out = BTreeMap::new();
         out.insert("hashed_tensor_steps".to_string(), self.relation_steps);
+        if self.relation_contraction_wall_ns > 0 {
+            out.insert(
+                "hashed_tensor_contraction_wall_ns".to_string(),
+                self.relation_contraction_wall_ns,
+            );
+        }
+        if self.relation_primitive_steps > 0 {
+            out.insert(
+                "hashed_tensor_primitive_steps".to_string(),
+                self.relation_primitive_steps,
+            );
+        }
         out.insert("hashed_limit_hits".to_string(), self.limit_hits);
         out.insert(
             "hashed_integrity_failures".to_string(),

@@ -1,0 +1,13 @@
+## Exact half gate prepared
+
+What was done: translatedqualifiedextensionfieldarithmeticandnativeCantor, implementedZarhinWeierstrasshalves/principalidentity, complete9*256signcoverage andkernel0Z/4spanchecks; compiledwithoverflowchecks.
+Decisions made: retainlabelidentity, allsignchoices, exactsets/doublingandprincipalcontrols; no4Weil/isotropy/theta claim. T-7118scope, Gitprefreeze.
+Open threads: executefrozengateonce; thencompatible4Weil/symplecticliftingandtheta conversion, quotientSchottky/fullcost.
+Errors: exportedPaliasmissingfromsamelineasEinitially; fixedvisibilitybeforefreeze. Unusedfieldhelperwarningonly.No scientificexecutionyet.
+
+## All original Weierstrass halves and kernel lifts qualified
+
+What was done: freezeee3413caafc/inputhashpass/soleexit0.2304halves(9*256) allvalid/distinctperbranch/principal/double/order4;2304alteredVcontrolsrejected. Fourkernel0liftsgenerate256distinctclasses/doubleexactly16originalkernel. Fieldcopynumericidentitypass; structuredfullselectedcoordinatesretained.
+Decisions made: fullSIGNEDJ[4]pointfieldexactlyF31⁸; selecteddegree8plusallhalvesdiffbyFp4two-torsionimpliessameforallhalves. Kummerfieldcaveatretained(H0Ueven/Vodd). NoWeil/isotropy/thetasclaim.
+Open threads: exact4Weilpairingwithshared-infinitynormalizationandmoved-divisorcontrol, compatibleisotropic4lifts/symplecticbasis, coherenttheta/actualquotientSchottky/fullcost. Objectiveactive.
+Errors: noneinscientificrun; compilePaliasvisibilityfixpre-freeze. KBexactZarhinquerydidnotfindrelevanthit; primaryformulaused. NoS3/cloud/merge.

@@ -1,0 +1,387 @@
+{
+ "best_stop_by_cumulative_net": {
+  "A_as_written": {
+   "best_cumulative_net": -1219439380.496338,
+   "best_sources": 91515.0,
+   "best_sources_over_rank_stop": 1.0070204782288148,
+   "last_checkpoint_with_saving_ge_cost_sources": 112782.0,
+   "net_at_end": -1024942112819.7844
+  },
+  "B_match_rate_scaled_f": {
+   "best_cumulative_net": -1163986969.1865234,
+   "best_sources": 91515.0,
+   "best_sources_over_rank_stop": 1.0070204782288148,
+   "last_checkpoint_with_saving_ge_cost_sources": 112782.0,
+   "net_at_end": -996121691051.222
+  },
+  "C_c1_trace_replay": {
+   "best_cumulative_net": -6488984121.104858,
+   "best_sources": 91515.0,
+   "best_sources_over_rank_stop": 1.0070204782288148,
+   "last_checkpoint_with_saving_ge_cost_sources": null,
+   "net_at_end": -1434375283338.3
+  }
+ },
+ "checkpoints_past_rank_readiness": 151,
+ "checkpoints_with_saving_ge_cost": {
+  "A_as_written": 8,
+  "B_match_rate_scaled_f": 8,
+  "C_c1_trace_replay": 0
+ },
+ "constants": {
+  "b_scale": 0.9541619318325435,
+  "c": 1276500000.0,
+  "c1_factor": 1.68,
+  "d_universe": 254530.0,
+  "pi": 0.0009
+ },
+ "label": "MODEL-ONLY: measured trajectory combined with LEADS.md L2 descent model; not a measured descent saving",
+ "pcc": "unverified",
+ "rank_stop": {
+  "d_exact": 20510.0,
+  "e_desc_A": 1130715059471.9084,
+  "f": 0.080579892350607,
+  "relations_bitops": 2042699070612.0,
+  "sources": 90877.0
+ },
+ "recorded49_crosscheck": {
+  "mismatches": 0,
+  "points": 13
+ },
+ "rule_verdict": {
+  "A_as_written": "NOT KILLED (saving >= cost at some checkpoint)",
+  "B_match_rate_scaled_f": "NOT KILLED (saving >= cost at some checkpoint)",
+  "C_c1_trace_replay": "KILL (saving < cost at every checkpoint past rank readiness)"
+ },
+ "schema": "l2-anchor-trajectory.model/v1",
+ "windows_of_10": {
+  "count": 16,
+  "rows": [
+   {
+    "anchors_per_source": 0.6107088735477353,
+    "from_sources": 90877,
+    "measured_marginal_cost_per_source": 22675540.96952349,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 22201727.019813333,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 22346523.871987294,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 13215313.70226985,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 96816
+   },
+   {
+    "anchors_per_source": 0.6837723024638912,
+    "from_sources": 96816,
+    "measured_marginal_cost_per_source": 22618701.26049278,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 20533202.711380605,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 20770121.942065742,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 12222144.471059889,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 102701
+   },
+   {
+    "anchors_per_source": 0.8202416918429003,
+    "from_sources": 102701,
+    "measured_marginal_cost_per_source": 22161906.959382344,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 20033585.416982006,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 20367464.94682465,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 11924753.224394051,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 108659
+   },
+   {
+    "anchors_per_source": 0.9107202124128775,
+    "from_sources": 108659,
+    "measured_marginal_cost_per_source": 22328057.568204448,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 17795710.558451016,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 18185571.661091913,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 10592684.856220841,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 114685
+   },
+   {
+    "anchors_per_source": 1.0904350659931563,
+    "from_sources": 114685,
+    "measured_marginal_cost_per_source": 22220465.875509206,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 16748851.317315502,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 17204898.179431126,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 9969554.355544953,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 120822
+   },
+   {
+    "anchors_per_source": 1.2206699208887393,
+    "from_sources": 120822,
+    "measured_marginal_cost_per_source": 22574163.093081973,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 14548562.348840235,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 15021681.385143578,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 8659858.540976329,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 126763
+   },
+   {
+    "anchors_per_source": 1.4140786749482401,
+    "from_sources": 126763,
+    "measured_marginal_cost_per_source": 22710836.278812975,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 13032397.587386042,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 13521901.111121947,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 7757379.516301215,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 132559
+   },
+   {
+    "anchors_per_source": 1.468439602691445,
+    "from_sources": 132559,
+    "measured_marginal_cost_per_source": 22005246.193527717,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 10386457.738189522,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 10827319.000660073,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 6182415.320350904,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 138801
+   },
+   {
+    "anchors_per_source": 1.5711906744379684,
+    "from_sources": 138801,
+    "measured_marginal_cost_per_source": 22327547.687260617,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 8565452.583978795,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 8967910.886420302,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 5098483.680939763,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 144806
+   },
+   {
+    "anchors_per_source": 1.6151119703560497,
+    "from_sources": 144806,
+    "measured_marginal_cost_per_source": 22082674.194941197,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 6855710.715126472,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 7206092.878585031,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 4080780.187575279,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 151013
+   },
+   {
+    "anchors_per_source": 1.580264857881137,
+    "from_sources": 151013,
+    "measured_marginal_cost_per_source": 22187531.31879845,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 5298374.364037265,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 5588747.424253139,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 3153794.264307897,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 157205
+   },
+   {
+    "anchors_per_source": 1.5934679139996717,
+    "from_sources": 157205,
+    "measured_marginal_cost_per_source": 22372241.518463813,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 4306030.672675424,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 4555897.430486847,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 2563113.4956401335,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 163298
+   },
+   {
+    "anchors_per_source": 1.495383582340104,
+    "from_sources": 163298,
+    "measured_marginal_cost_per_source": 22419257.054893404,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 3330790.038096706,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 3533306.0381518905,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 1982613.1179147067,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 169255
+   },
+   {
+    "anchors_per_source": 1.3778118609406953,
+    "from_sources": 169255,
+    "measured_marginal_cost_per_source": 22873969.473074302,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 2597907.93990497,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 2761856.968393582,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 1546373.7737529576,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 175123
+   },
+   {
+    "anchors_per_source": 1.360411899313501,
+    "from_sources": 175123,
+    "measured_marginal_cost_per_source": 22371826.96044459,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 2201951.061840091,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 2345414.8187012863,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 1310685.1558571972,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 181241
+   },
+   {
+    "anchors_per_source": 1.2358003442340793,
+    "from_sources": 181241,
+    "measured_marginal_cost_per_source": 22639021.22891566,
+    "model_only": {
+     "A_as_written": {
+      "marginal_saving_per_source": 1842196.0712845454,
+      "saving_ge_cost": false
+     },
+     "B_match_rate_scaled_f": {
+      "marginal_saving_per_source": 1964233.6294246549,
+      "saving_ge_cost": false
+     },
+     "C_c1_trace_replay": {
+      "marginal_saving_per_source": 1096545.2805265337,
+      "saving_ge_cost": false
+     }
+    },
+    "to_sources": 181822
+   }
+  ],
+  "with_saving_ge_cost": {
+   "A_as_written": 0,
+   "B_match_rate_scaled_f": 0,
+   "C_c1_trace_replay": 0
+  }
+ }
+}

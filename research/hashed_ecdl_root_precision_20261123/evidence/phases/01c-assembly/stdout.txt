@@ -1,0 +1,11 @@
+Nat.rec.{u} {motive : Nat → Sort u} (zero : motive Nat.zero) (succ : (n : Nat) → motive n → motive n.succ) (t : Nat) :
+  motive t
+Nat.div_mul_le_self (m n : Nat) : m / n * n ≤ m
+Nat.pow_add (a m n : Nat) : a ^ (m + n) = a ^ m * a ^ n
+Nat.pow_mul (a m n : Nat) : a ^ (m * n) = (a ^ m) ^ n
+Nat.pow_succ (n m : Nat) : n ^ m.succ = n ^ m * n
+Nat.pow_le_pow_right {n : Nat} (hx : n > 0) {i j : Nat} : i ≤ j → n ^ i ≤ n ^ j
+Nat.mul_le_mul_left {n m : Nat} (k : Nat) (h : n ≤ m) : k * n ≤ k * m
+Nat.le_of_mul_le_mul_left {a b c : Nat} (h : c * a ≤ c * b) (hc : 0 < c) : a ≤ b
+Nat.log2_two_pow {n : Nat} : (2 ^ n).log2 = n
+Nat.lt_two_pow_self {n : Nat} : n < 2 ^ n

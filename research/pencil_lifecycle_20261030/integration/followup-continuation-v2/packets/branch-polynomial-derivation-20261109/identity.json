@@ -1,0 +1,87 @@
+{
+  "schema": "research.identity-derivation/v1",
+  "status": "source_derivation_pending_independent_review",
+  "new_execution": false,
+  "kernel_checked": false,
+  "ambient": "K a field; F,N,u1,u2,U in K[X]; a,b in K",
+  "premises": [
+    "Exact source identity S1",
+    "F(a)=0",
+    "F separable (used only to derive F prime(a)!=0)",
+    "b!=0",
+    "u1(a)*u2(a)*U(a)=0"
+  ],
+  "steps": [
+    {
+      "id": "S1",
+      "statement": "N^2 - (u1*u2)*U = C(b^2)*F",
+      "reason": "Exact ActualNonbranchNorm.source_norm_identity, not an assumed normalized norm."
+    },
+    {
+      "id": "S2",
+      "statement": "P := (u1*u2)*U = N^2 - C(b^2)*F",
+      "reason": "Rearrange S1 in the polynomial ring; no division by b or leading residual coefficient."
+    },
+    {
+      "id": "S3",
+      "statement": "N(a)^2 = 0, hence N(a)=0",
+      "reason": "Evaluate S1 with F(a)=0 and P(a)=0; K is a field, hence reduced."
+    },
+    {
+      "id": "S4",
+      "statement": "P'(a) = 2*N(a)*N'(a) - b^2*F'(a) = -b^2*F'(a) != 0",
+      "reason": "Formal derivative of S2, N(a)=0, b!=0 and F'(a)!=0. No cancellation by 2."
+    },
+    {
+      "id": "S5",
+      "statement": "P != 0; u1 != 0; u2 != 0; U != 0",
+      "reason": "A zero polynomial has zero derivative. P'(a)!=0 excludes P=0 and each zero factor."
+    },
+    {
+      "id": "S6",
+      "statement": "rootMultiplicity(P,a)=1",
+      "reason": "P(a)=0 gives multiplicity>=1. Multiplicity>1 would force P'(a)=0; contradiction."
+    },
+    {
+      "id": "S7",
+      "statement": "rootMultiplicity(u1,a)+rootMultiplicity(u2,a)+rootMultiplicity(U,a)=1",
+      "reason": "Apply product root multiplicity twice with the derived nonzero product."
+    }
+  ],
+  "characteristic": "No characteristic-zero or 2!=0 premise is needed for this base-polynomial derivation. In characteristic 2 the squared term derivative vanishes identically, and the surviving -b^2 F prime term remains nonzero under the stated premises. No geometric branch/DVR conclusion is inferred.",
+  "scales": "U is the actual unnormalized residual C(c^2)X^2+C(q)X+C(r). c may be zero; no normalization by c or c^2 occurs. b is coefficientData first component.",
+  "worked_instance": {
+    "field": "Q",
+    "a": 0,
+    "F": "X^5-X",
+    "N": "0",
+    "b": -4,
+    "u1": "X^2+1",
+    "u2": "X^2-1",
+    "U": "-16X",
+    "P": "-16(X^5-X)",
+    "P_prime_at_a": 16,
+    "multiplicities": [
+      0,
+      0,
+      1
+    ]
+  },
+  "premise_controls": [
+    {
+      "removed": "b!=0",
+      "example": "F=X, b=0, N=X, u1=X, u2=X, U=1, a=0",
+      "result": "Identity holds, F simple, support zero, product multiplicity2."
+    },
+    {
+      "removed": "F prime(a)!=0",
+      "example": "F=X^2, b=1, N=0, u1=X, u2=X, U=-1, a=0 over Q",
+      "result": "Identity holds but product multiplicity2."
+    },
+    {
+      "removed": "support zero",
+      "example": "F=X, b=1, N=1, u1=1-X, u2=1, U=1, a=0 over Q",
+      "result": "Identity holds and branch is simple, but product multiplicity0."
+    }
+  ]
+}

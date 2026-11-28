@@ -1,0 +1,32 @@
+{
+  "accepted": 20,
+  "audit_interval": {
+    "cpu_ns": 4186000,
+    "scope": "from main entry through input read, hashing, and verification; excludes interpreter startup and receipt writing",
+    "wall_ns": 5475000
+  },
+  "audit_source_sha256": "e3c0154aae786a35c01cd81f147786f1e83c087ecdd5745dd8de0e7e10055a73",
+  "candidates": 23,
+  "limitations": [
+    "No root-completeness proof or independent solver execution.",
+    "No timing validation, resource verification, record authentication, or general cross-version RNG guarantee.",
+    "Without a verified scalar, subgroup membership of Q in <P> is not independently certified.",
+    "Primality and curve arithmetic are checked only for primes below 2^32."
+  ],
+  "nonzero_b": 3,
+  "record_sha256": "d89a203542e81e099d19233ee246e90787133d031eee1557d767fe09387ae243",
+  "reported_roots": 3,
+  "seed_replay": {
+    "audit_python": "3.13.1",
+    "audit_python_implementation": "CPython",
+    "generator": "Python random.Random.randrange",
+    "record_python": "3.14.3",
+    "record_python_implementation": null,
+    "same_python_version": false,
+    "scope": "this recorded seed and stream; no general cross-version guarantee",
+    "status": "verified"
+  },
+  "signed_witnesses": 3,
+  "status": "verified",
+  "top_form_regularity_verified": 11
+}

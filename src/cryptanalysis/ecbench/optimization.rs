@@ -109,6 +109,49 @@ macro_rules! policy {
 // claim/accounting scope; the registry-exhaustiveness test fails otherwise.
 const POLICIES: &[PolicyDecl] = &[
     policy!(
+        "bsgs.prime_mont4_v1",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "ic.diem_kgrow",
+        ImplementationAb,
+        DiagnosticOnly,
+        DiagnosticModel
+    ),
+    policy!(
+        "ic.growing_arity",
+        ImplementationAb,
+        DiagnosticOnly,
+        DiagnosticModel
+    ),
+    policy!(
+        "ic.aux_tower_solver",
+        ImplementationAb,
+        DiagnosticOnly,
+        DiagnosticModel
+    ),
+    policy!("ic.orbit_rank_v1", NativeGrid, DiagnosticOnly, StandardBand),
+    policy!(
+        "ic.hashed_native_v1",
+        NativeGrid,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
+        "hec.ic_fb_walk",
+        NativeGrid,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "hec.rho_full_width",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
         "ic.prime_orbit_relations_v1",
         NativeGrid,
         SpecializedDomain,
@@ -116,6 +159,7 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!("ic.aps_v1", NativeAdaptive, SpecializedDomain, StandardBand),
     policy!("ic.aps_v2", NativeAdaptive, SpecializedDomain, StandardBand),
+    policy!("ic.aps_v3", NativeAdaptive, SpecializedDomain, StandardBand),
     policy!(
         "ic.three_leads_genus2_pencil_symbolic_v2",
         NativeGrid,
@@ -206,6 +250,18 @@ const POLICIES: &[PolicyDecl] = &[
         FrozenHistorical,
         StandardBand
     ),
+    policy!(
+        "rho.curve25519_bounded",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "ic.curve25519_pair_v1",
+        NativeGrid,
+        SpecializedDomain,
+        StandardBand
+    ),
     policy!("rho.plain", ReplayControl, FrozenHistorical, StandardBand),
     policy!(
         "rho.negation",
@@ -245,6 +301,12 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "ic.k4_gaudry",
+        NativeAdaptive,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "ic.k3_gaudry",
         NativeAdaptive,
         SpecializedDomain,
         StandardBand
@@ -307,6 +369,24 @@ const POLICIES: &[PolicyDecl] = &[
         JacobianImageNative
     ),
     policy!(
+        "jacobian_image.rho3_v2",
+        ImplementationAb,
+        SpecializedDomain,
+        JacobianImageNative
+    ),
+    policy!(
+        "jacobian_image.bsgs_v2",
+        ImplementationAb,
+        SpecializedDomain,
+        JacobianImageNative
+    ),
+    policy!(
+        "jacobian_image.genus3_projected_ic_v1",
+        NativeGrid,
+        SpecializedDomain,
+        JacobianImageNative
+    ),
+    policy!(
         "bsgs.textbook",
         ReplayControl,
         FrozenHistorical,
@@ -328,6 +408,12 @@ const POLICIES: &[PolicyDecl] = &[
         "bsgs.negation_table",
         NativeGrid,
         DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
+        "bsgs.negation_table_v2",
+        NativeGrid,
+        FrontierEligible,
         StandardBand
     ),
     policy!(
@@ -594,6 +680,12 @@ const POLICIES: &[PolicyDecl] = &[
         StandardBand
     ),
     policy!(
+        "rho.signed_frobenius_v6",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
         "rho.negation_v5",
         ImplementationAb,
         FrontierEligible,
@@ -709,22 +801,51 @@ const POLICIES: &[PolicyDecl] = &[
     ),
 ];
 
-fn parameter_role(name: &str) -> Option<ParameterRole> {
+fn parameter_role(method: &str, name: &str) -> Option<ParameterRole> {
     use ParameterRole::*;
+    if matches!(method, "ic.diem_kgrow" | "ic.growing_arity" | "ic.aux_tower_solver") {
+        return match name {
+            "bits" | "p" | "k" | "k_min" | "k_max" | "oracle" | "planted" => {
+                Some(WorkloadScope)
+            }
+            "trial_budget" => Some(ResourceEnvelope),
+            _ => None,
+        };
+    }
+    if method == "ic.hashed_native_v1" {
+        return Some(match name {
+            "backend" | "m" | "threshold" | "derive_last" | "smallest_first" | "cache_entries"
+            | "outer_multiplier" => Knob,
+            "trials" | "columns" | "steps" | "vector" | "bits" | "rank" | "slices" | "attempts" => {
+                ResourceEnvelope
+            }
+            _ => return None,
+        });
+    }
+    if method == "ic.orbit_rank_v1" {
+        return Some(match name {
+            "columns" | "table_mode" => Knob,
+            "raw_x_cap" | "max_trials" | "max_pair_visits" => ResourceEnvelope,
+            _ => return None,
+        });
+    }
     Some(match name {
-        "base_seed" | "fb_seed" | "rank_seed" | "seed" | "table_seed" => Seed,
+        "base_seed" | "fb_seed" | "rank_seed" | "seed" | "table_seed" | "fixed_seed" => Seed,
         "batch" => WorkloadScope,
         "backend" => ExternalBinding,
         "backend_sha256" | "c4" => IdentityOrPrice,
         "attempts"
         | "budget_ms"
         | "cap_multiple"
+        | "growth_ceiling"
         | "matrix_coefficient_cap"
         | "max_pair_work"
         | "max_descent_ops"
         | "max_ops"
         | "max_restarts"
         | "max_states"
+        | "max_steps"
+        | "max_scan"
         | "max_sums"
         | "max_trials"
         | "max_u"
@@ -737,13 +858,17 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "solver_budget_seconds"
         | "step_cap_factor"
         | "target_max_attempts"
+        | "threads"
         | "trial_cap"
+        | "trace_entries"
+        | "trace_words"
         | "unit_trials"
         | "units" => ResourceEnvelope,
         "baby"
         | "batch_trials"
         | "base"
         | "base_multiplier"
+        | "base_size"
         | "base_scale"
         | "beta"
         | "branches"
@@ -763,6 +888,9 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "factor_base"
         | "factor_base_points"
         | "fb_size"
+        | "growth"
+        | "guess"
+        | "harvester"
         | "independent"
         | "inner"
         | "jumps"
@@ -775,6 +903,7 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "line"
         | "lp_exponent"
         | "m"
+        | "max_lp"
         | "mode"
         | "oracle"
         | "orbit"
@@ -789,9 +918,11 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "solver"
         | "stop"
         | "subset_size"
+        | "subset_profile"
         | "summands"
         | "table_scale"
         | "targets"
+        | "trace"
         | "unique_relations"
         | "walks" => Knob,
         _ => return None,
@@ -835,7 +966,7 @@ fn profile(method: &'static MethodDecl) -> Result<MethodProfile<'static>, String
         .params
         .iter()
         .map(|p| {
-            let role = parameter_role(p.name).ok_or_else(|| {
+            let role = parameter_role(method.id, p.name).ok_or_else(|| {
                 format!(
                     "method `{}` parameter `{}` has no optimization role",
                     method.id, p.name
@@ -864,6 +995,9 @@ fn profile(method: &'static MethodDecl) -> Result<MethodProfile<'static>, String
 pub fn profiles() -> Result<Vec<MethodProfile<'static>>, String> {
     let registry_ids: BTreeSet<_> = methods::registry().iter().map(|m| m.id).collect();
     let policy_ids: BTreeSet<_> = POLICIES.iter().map(|p| p.id).collect();
+    if registry_ids.len() != methods::registry().len() || policy_ids.len() != POLICIES.len() {
+        return Err("duplicate method or optimization policy registry id".into());
+    }
     if registry_ids != policy_ids {
         let missing: Vec<_> = registry_ids.difference(&policy_ids).copied().collect();
         let stale: Vec<_> = policy_ids.difference(&registry_ids).copied().collect();
@@ -899,6 +1033,9 @@ const PDP3_ENGINES: &[&str] = &[
     "rootfind",
     "rootfind-window",
     "rootfind-negfold",
+    "rootfind-negfold-batch",
+    "rootfind-negfold-batch-harvest",
+    "rootfind-negfold-batch-harvest-torsion",
     "rootfind-window-negfold",
 ];
 
@@ -1104,7 +1241,7 @@ fn audit_spec(path: &Path, stage: Stage) -> Result<(Spec, SpecAudit), String> {
                 methods::resolve(&candidate.method),
             ) {
                 for key in baseline_method.params.keys() {
-                    if parameter_role(key) != Some(ParameterRole::Knob)
+                    if parameter_role(&candidate_method.id, key) != Some(ParameterRole::Knob)
                         && baseline_method.params.get(key) != candidate_method.params.get(key)
                     {
                         errors.push(format!(
@@ -1328,6 +1465,13 @@ mod tests {
         for name in PDP3_ENGINES {
             assert!(keys.contains(format!("pdp3_engine/{name}").as_str()));
         }
+        for name in [
+            "rootfind-negfold-batch",
+            "rootfind-negfold-batch-harvest",
+            "rootfind-negfold-batch-harvest-torsion",
+        ] {
+            assert!(keys.contains(format!("pdp3_engine/{name}").as_str()));
+        }
         for name in PKM_TOWER_ENGINES {
             assert!(keys.contains(format!("pkm_tower_engine/{name}").as_str()));
         }
@@ -1336,6 +1480,7 @@ mod tests {
     #[test]
     fn censoring_and_seeds_cannot_be_tuning_knobs() {
         for name in [
+            "max_steps",
             "max_trials",
             "trial_cap",
             "solver_budget_seconds",
@@ -1344,7 +1489,7 @@ mod tests {
             "base_seed",
             "rank_seed",
         ] {
-            assert_ne!(parameter_role(name), Some(ParameterRole::Knob));
+            assert_ne!(parameter_role("", name), Some(ParameterRole::Knob));
         }
     }
 }

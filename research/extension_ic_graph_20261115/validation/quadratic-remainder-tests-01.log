@@ -1,0 +1,22 @@
+    Blocking waiting for file lock on build directory
+   Compiling crypto v0.1.0 (/workspace/crypto)
+    Finished `release` profile [optimized] target(s) in 12m 08s
+     Running unittests src/lib.rs (target/release/build/crypto/1f3348487c0dcc6d/out/crypto_lib-1f3348487c0dcc6d)
+
+running 3 tests
+
+thread 'cryptanalysis::jv_sieve::two_large_prime::quadratic_remainder::tests::opposite_functions_keep_one_class_and_reverse_every_sign' (6533) panicked at src/cryptanalysis/jv_sieve_quadratic_remainder.rs:168:9:
+assertion failed: projected.projection.rows.is_empty()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cryptanalysis::jv_sieve::two_large_prime::quadratic_remainder::tests::opposite_functions_keep_one_class_and_reverse_every_sign ... FAILED
+test cryptanalysis::jv_sieve::two_large_prime::quadratic_remainder::tests::retains_seven_points_and_nonsplit_quadratic_with_jacobian_replay ... ok
+test cryptanalysis::jv_sieve::two_large_prime::quadratic_remainder::tests::refuses_split_repeated_forged_wrong_domain_and_excess_resources ... ok
+
+failures:
+
+failures:
+    cryptanalysis::jv_sieve::two_large_prime::quadratic_remainder::tests::opposite_functions_keep_one_class_and_reverse_every_sign
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 6715 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `--lib`

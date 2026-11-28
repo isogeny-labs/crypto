@@ -1,0 +1,32 @@
+name: CT234 two-large-prime frozen native-record audit
+
+on:
+  push:
+    branches:
+      - research/ct204-odd-cover-toy-dlp-20261118
+    paths:
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct234_*'
+      - '.github/workflows/ct234-two-lp-audit.yml'
+  pull_request:
+    paths:
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct234_*'
+      - '.github/workflows/ct234-two-lp-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct234_ct233_hosted_panel.jsonl
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct234_two_lp_cost_audit.py
+      - name: Independent frozen-record checks and eleven corruptions
+        run: |
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct234_two_lp_cost_audit.py --self-test
+          python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct234_two_lp_cost_audit.py --self-test

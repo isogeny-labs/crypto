@@ -1,0 +1,51 @@
+{
+  "schema": "curve25519.parent-diagnostics/v1",
+  "label": "Complete decoded connector logs and explicitly projected snapshots, not raw server-byte or signed execution receipts",
+  "parent_pr": 4447,
+  "head": "1d3a8879144aed8942132488e7609a28be33ca68",
+  "archive": {
+    "bytes": 56448,
+    "sha256": "d0fa123bac646935236cb9d49d79b82eb276399f36abb1cd36ef3608aa8cd9df"
+  },
+  "members": {
+    "parent-diagnostics/SNAPSHOT.json": {
+      "bytes": 166483,
+      "sha256": "1322c52a8603f6f52ca9eb0b2bfbdc340f8b2e06d0c82fa95ece7bd3c748ad00"
+    },
+    "parent-diagnostics/job-133618959181.log": {
+      "bytes": 53146,
+      "sha256": "a807bf7c1dd7c26820b8520d7bad5e983840a913bd2dba06d946f98553ad726e"
+    },
+    "parent-diagnostics/job-133618967326.log": {
+      "bytes": 411685,
+      "sha256": "b83da31881c87c67df2595b758f53dccfd7c67c5877a2e146de91f598b14f62e"
+    },
+    "parent-diagnostics/job-133618968061.log": {
+      "bytes": 26837,
+      "sha256": "a30927225b51d687d88f893c39bddc5eb8e7e0386acdf8d24c729f46237be99d"
+    },
+    "parent-diagnostics/job-133618968423.log": {
+      "bytes": 27929,
+      "sha256": "2d19f686b185df442f380f0a78c8a60221948fcc1b6eb99073b0f59e7f49f355"
+    }
+  },
+  "observations": {
+    "checks": 31,
+    "statuses": 0,
+    "conflicted_paths": [
+      "docs/session-logs/2026-11-16.md",
+      "pcc/ledger.jsonl"
+    ],
+    "copilot_comment": 6931501434,
+    "pcc_job": 133618959181,
+    "pcc_failure": "historical missing claim_type diagnostics, ledger1219 marked BROKEN; no signed verification inferred",
+    "validation_job": 133618968423,
+    "validation_failure": "artifact hydration HeadObject403",
+    "artifacts_job": 133618968061,
+    "artifacts_failure": "read_manifest JSONDecodeError Extra data, line10 column1; offending manifest path not named in traceback",
+    "learning_job": 133618967326,
+    "learning_failure": "five append-only episode/intervention entries absent against base",
+    "autofix_failure": "Require ANTHROPIC_API_KEY",
+    "causality": "Parent changes predate affine source publication. Diagnose/fix only introduced failures; preserve baseline history and policy."
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "build": "CARGO_TARGET_DIR=/Volumes/SSD990/pkm-native-roster-target CARGO_BUILD_JOBS=1 nice -n 15 cargo build --release --locked --manifest-path research/pkm_nonenum_decomp_20261125/roster/Cargo.toml",
+  "cargo": "cargo 1.93.1 (Homebrew)",
+  "cargo_lock_sha256": "37d7870c46666cd73bbcf2790f86fcecf9d52d7b26f7c5ea14b30e86b6985f7b",
+  "generate": "nice -n 15 /Volumes/SSD990/pkm-native-roster-target/release/pkm-native-f4-roster research/pkm_nonenum_decomp_20261125/roster.json",
+  "generated_at_utc": "2026-11-25T22:38:50.679821+00:00",
+  "independent_verifier_command": "python3 -B research/pkm_nonenum_decomp_20261125/verify_roster.py research/pkm_nonenum_decomp_20261125/roster.json",
+  "independent_verifier_result": {
+    "curves_checked": [
+      {
+        "base_abscissae": 8,
+        "base_points": 10,
+        "curve_index": 0,
+        "p": 89,
+        "r": 101,
+        "t": 3,
+        "targets_checked": 16
+      },
+      {
+        "base_abscissae": 8,
+        "base_points": 8,
+        "curve_index": 1,
+        "p": 97,
+        "r": 89,
+        "t": 3,
+        "targets_checked": 16
+      },
+      {
+        "base_abscissae": 8,
+        "base_points": 4,
+        "curve_index": 2,
+        "p": 113,
+        "r": 101,
+        "t": 3,
+        "targets_checked": 16
+      },
+      {
+        "base_abscissae": 16,
+        "base_points": 20,
+        "curve_index": 0,
+        "p": 769,
+        "r": 809,
+        "t": 4,
+        "targets_checked": 16
+      },
+      {
+        "base_abscissae": 16,
+        "base_points": 16,
+        "curve_index": 1,
+        "p": 881,
+        "r": 883,
+        "t": 4,
+        "targets_checked": 16
+      },
+      {
+        "base_abscissae": 16,
+        "base_points": 12,
+        "curve_index": 2,
+        "p": 929,
+        "r": 937,
+        "t": 4,
+        "targets_checked": 16
+      },
+      {
+        "base_abscissae": 32,
+        "base_points": 46,
+        "curve_index": 0,
+        "p": 5569,
+        "r": 5669,
+        "t": 5,
+        "targets_checked": 16
+      },
+      {
+        "base_abscissae": 32,
+        "base_points": 38,
+        "curve_index": 1,
+        "p": 5857,
+        "r": 5953,
+        "t": 5,
+        "targets_checked": 16
+      },
+      {
+        "base_abscissae": 32,
+        "base_points": 16,
+        "curve_index": 2,
+        "p": 5953,
+        "r": 5923,
+        "t": 5,
+        "targets_checked": 16
+      }
+    ],
+    "roster_sha256": "271fdaf1b23b87fb5b2b8a6ecb7ac1f6492e146d7e8b4deb2f6f251d618d9123",
+    "status": "pass",
+    "verifier_sha256": "5be34c6a7a082d6c90dbe9e99c20df4e3d04dded704d04a2eea0b89c53202b43"
+  },
+  "independent_verifier_sha256": "5be34c6a7a082d6c90dbe9e99c20df4e3d04dded704d04a2eea0b89c53202b43",
+  "platform": "macOS-27.2-arm64-arm-64bit-Mach-O",
+  "roster_sha256": "271fdaf1b23b87fb5b2b8a6ecb7ac1f6492e146d7e8b4deb2f6f251d618d9123",
+  "rustc": "rustc 1.93.1 (01f6ddf75 2026-02-11) (Homebrew)",
+  "schema": "pkm-native-f4-roster-provenance/v1",
+  "selection_protocol": "ROSTER_SELECTION_20261125.md",
+  "selector_binary_sha256": "6292e90038d1f9d1df739bc2deb05772b1cde166ebcb6ce3ba2b11379a47bd6b",
+  "selector_source_sha256": "a95d131a98664b2972cb00e734dbe20935622c8cf9f16d5c0a3bacb4d2a64e5f",
+  "source_commit": "c917450313d975ac48cc1cb1d6d34d1e5a0f9132"
+}

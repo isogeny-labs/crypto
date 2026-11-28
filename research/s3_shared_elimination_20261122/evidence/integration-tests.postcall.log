@@ -1,0 +1,22 @@
+
+running 5 tests
+test tests::committed_p31_nonexceptional_witness_matches_all_backends ... ok
+test tests::complete_toy_solution_sets_match_all_backends ... ok
+test tests::existing_f4_keeps_original_equations_and_domains ... FAILED
+test tests::signed_witnesses_and_infinite_prefix_control ... ok
+test tests::toy_public_target_recovers_through_existing_relation_matrix ... ok
+
+failures:
+
+---- tests::existing_f4_keeps_original_equations_and_domains stdout ----
+
+thread 'tests::existing_f4_keeps_original_equations_and_domains' (9) panicked at ../../../examples/shared_s3_matrix.rs:784:46:
+called `Result::unwrap()` on an `Err` value: "bounded F4 fixture was incomplete; no exhaustion conclusion is available"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tests::existing_f4_keeps_original_equations_and_domains
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+

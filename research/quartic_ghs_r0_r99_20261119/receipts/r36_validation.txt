@@ -1,0 +1,11 @@
+scope: producer-side deterministic correctness and counter validation; no timing claim
+selftest_exit_status: 0
+selftest_final_line: SELFTEST OK
+jsonl_parse_and_invariant_check_exit_status: 0
+jsonl_parse_and_invariant_check_stdout: true
+checked:
+- baseline and candidate recovery/trajectory fields equal
+- walk and verification field counters equal
+- setup and walk native counters equal
+- candidate setup deltas equal the preregistered recomputation in R36_PRODUCTION.md
+- counter-free candidate has count_authoritative=false and zero field counters

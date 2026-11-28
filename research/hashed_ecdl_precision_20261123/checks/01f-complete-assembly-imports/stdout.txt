@@ -1,0 +1,7 @@
+Monotone.seq_le_seq.{u_1} {α : Type u_1} [Preorder α] {f : α → α} {x y : ℕ → α} (hf : Monotone f) (n : ℕ)
+  (h₀ : x 0 ≤ y 0) (hx : ∀ k < n, x (k + 1) ≤ f (x k)) (hy : ∀ k < n, f (y k) ≤ y (k + 1)) : x n ≤ y n
+geom_sum_Ico_le_of_lt_one.{u_1} {K : Type u_1} [Field K] [LinearOrder K] [IsStrictOrderedRing K] {x : K} {m n : ℕ}
+  (hx : 0 ≤ x) (h'x : x < 1) : ∑ i ∈ Ico m n, x ^ i ≤ x ^ m / (1 - x)
+Nat.div_mul_le_self (m n : ℕ) : m / n * n ≤ m
+Nat.lt_two_pow_self {n : ℕ} : n < 2 ^ n
+Nat.pow_le_pow_right {n : ℕ} (hx : n > 0) {i j : ℕ} : i ≤ j → n ^ i ≤ n ^ j

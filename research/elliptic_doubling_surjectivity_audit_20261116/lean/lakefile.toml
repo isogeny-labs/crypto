@@ -1,0 +1,11 @@
+name = "elliptic_doubling_surjectivity_audit"
+version = "0.1.0"
+defaultTargets = ["EllipticDoublingSurjectivityAudit"]
+
+[[require]]
+name = "elliptic_doubling_degree_audit"
+path = "../../elliptic_doubling_degree_audit_20261116/lean"
+
+[[lean_lib]]
+name = "EllipticDoublingSurjectivityAudit"
+roots = ["SurjectiveImports", "DoublingFibers", "DoublingSurjective", "DyadicDivision", "SurjectiveControls", "SurjectiveCertificate"]

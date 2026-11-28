@@ -1,0 +1,77 @@
+{
+  "schema": "engineering.pcc-isolated-source-data-integration/v1",
+  "at": "2026-11-20T17:51:02.614447+00:00",
+  "parent": "14f946ff621b96abeb0f58ea423d7404d69718c6",
+  "canonical_verifier_sha256": "79f69ea92d5ce4225b295f44e5b8e7734259af2a3cc95effa4f9f929cfb54c69",
+  "source_checkout_unchanged_by_views": true,
+  "data_worktree": "separate non-nested detached worktree same common Git directory and HEAD",
+  "local_controls": 24,
+  "local_control_failures": 0,
+  "combined_complete_claims": 3,
+  "combined_proof_subjects": 51,
+  "valid_signed_suffix_control": "one not_covered entry; disposable key; unchanged original signature/prefix verification; dirty-source retry refused",
+  "cold_git_hydration": {
+    "schema": "engineering.pcc-cold-data-worktree-hydration/v1",
+    "reader_sha256": "93bec2944d358cc45c8fd3322095f1b5256dd73aa1888abab744b0a5aa5d4e37",
+    "workflow_script_sha256": "44ec65cfc08151633b1a10b7e5ef10532f439752fbe6320db115b36975ef3c8d",
+    "initial_cache_empty": true,
+    "initial_raw_records_absent": true,
+    "aws_executable_absent": true,
+    "source_git_clean_and_hashes_unchanged": true,
+    "source_raw_records_still_absent": true,
+    "data_tracked_files_unchanged": true,
+    "restored_objects": [
+      {
+        "path": "research/rootfind_dense_binary_pilot_20261116/sessions/local-custody-rerun-202611160401/records.jsonl",
+        "bytes": 1718893,
+        "sha256": "0be204a394b2ef7ef223cb30960f12747ea30f736a135f46c2c0d76ecf0dbbde"
+      },
+      {
+        "path": "research/rootfind_k13_local_f456_screen_20261116/sessions/local-custody-repeat-202611160511/records.jsonl",
+        "bytes": 453126,
+        "sha256": "dc16c97ae21a250cc1d47237231d9642960c100dc3fdb68f4dd210af171bff44"
+      }
+    ],
+    "restored_raw_bytes": 2172019,
+    "s3_access": false,
+    "frozen_records_rewritten": false
+  },
+  "original_commands_permissions_triggers_and_signing_restrictions_preserved": true,
+  "canonical_artifact_wiring_idempotent": true,
+  "actionlint": "1.7.12 pass",
+  "baseline_corpus": {
+    "fail": 298,
+    "not_covered": 3285,
+    "pass": 1
+  },
+  "full_candidate_corpus": "pending hosted original verify-all; no reduction inferred",
+  "frozen_claims_reports_ledger_keyring_or_verifier_changed": false,
+  "s3_access": false,
+  "performance_claim": null,
+  "evidence": {
+    "controls-prepublication.log": {
+      "sha256": "e330f83dae02d86700fbd7e3685fae65ac234e549def9aa5937bcbb647b591ec",
+      "bytes": 123
+    },
+    "workflow-execution-v4.json": {
+      "sha256": "69d4b03c0fd717eb2d96e866bfc738ea7731eb219cabc0c5ab8e4495fe4b1185",
+      "bytes": 2594
+    },
+    "signed-suffix-control-v1.json": {
+      "sha256": "69fc45725df8253e1a18aeb1a9318d86c9ee8234dcd0a9e90b888e640fa878fc",
+      "bytes": 1062
+    },
+    "cold-data-hydration-v1.json": {
+      "sha256": "c57799e136dc374aea2db9e71477b530e8373c94c6c902a0a8b18497b687e9b8",
+      "bytes": 1084
+    },
+    "workflow-ast-validation.json": {
+      "sha256": "f62efc95167cb3d2877be213c2c173b5c99c83be0460e7d7a81a63163e29257f",
+      "bytes": 620
+    },
+    "workflow-actionlint.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}

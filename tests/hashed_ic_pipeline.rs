@@ -67,6 +67,23 @@ fn hashed_base_and_tensor_oracle_share_their_slots() {
             let other = inst.curve.mul(&mut ops, generator, 1);
             oracle.decompose(&ctx, &fb, &mut ops, &mut counters, other)
         });
+    let counters = oracle.relation_counters();
+    if counters
+        .get("hashed_tensor_primitive_steps")
+        .copied()
+        .unwrap_or(0)
+        > 0
+    {
+        assert!(
+            counters
+                .get("hashed_tensor_contraction_wall_ns")
+                .copied()
+                .unwrap_or(0)
+                > 0,
+            "contraction timer records wall with primitive steps"
+        );
+    }
+
     if let Some(indices) = witness {
         assert_eq!(indices.len(), 2, "one point per slot");
         let sum = indices.iter().fold(PrimePoint::INFINITY, |acc, &i| {

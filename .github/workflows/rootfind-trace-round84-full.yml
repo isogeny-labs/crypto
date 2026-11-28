@@ -1,0 +1,40 @@
+name: Rootfind round84 indexed verifier A/B
+on:
+  push:
+    branches:
+      - 'automation/rootfind-verify-slots-round84-20261121'
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_root_trace.rs'
+      - 'research/amm_digit_perf_20261118/round84_full_ab.py'
+      - '.github/workflows/rootfind-trace-round84-full.yml'
+      - 'research/amm_digit_perf_20261118/round84_ablation.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full-solve-verify-ab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round84_full_ab.py
+            research/amm_digit_perf_20261118/round84_ablation.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Round84 source-exact complete root extraction and verifier replay
+        run: |
+          set -euo pipefail
+          rustc --version
+          python3 research/amm_digit_perf_20261118/round84_full_ab.py
+          python3 research/amm_digit_perf_20261118/round84_ablation.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: round84-rootfind-ab-raw
+          path: |
+            research/amm_digit_perf_20261118/round84_full_ab_results.csv
+            research/amm_digit_perf_20261118/round84_event_factor_ablation.csv

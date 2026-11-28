@@ -1,0 +1,93 @@
+{
+  "arms": [
+    {
+      "arm": "planted",
+      "artifacts": {
+        "basis": {
+          "bytes": 528,
+          "file": "planted_basis.txt",
+          "sha256": "689c4e99e275d1ec2a360ecf5dfaf27c8b32f2d0ef5edb3fbcec37b484eff0b2"
+        },
+        "stderr": {
+          "bytes": 8515,
+          "file": "planted_stderr.txt",
+          "sha256": "69586a4e7dc6f87856483ae490a09070332d34b73ca3a31ad6d718c2bfbbfb4e"
+        },
+        "stdout": {
+          "bytes": 0,
+          "file": "planted_stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "command": [
+        "/opt/homebrew/Cellar/msolve/0.11.0/bin/msolve",
+        "-g",
+        "2",
+        "-t",
+        "1",
+        "-v",
+        "2",
+        "-m",
+        "256",
+        "-f",
+        "/Volumes/SSD990-2/crypto-worktrees/exotic-ecdlp-recovery-20261119/research/exotic_ecdlp_20261021/H4_prime_descent/n13_msolve_20261120/planted.ms",
+        "-o",
+        "/Volumes/SSD990/cryptanalysis/.sage-build-tmp/g2-sparse-planted-c4htwg82/msolve.out"
+      ],
+      "dyld_library_path": "/opt/homebrew/Cellar/flint/3.6.0/lib",
+      "exit_code": 0,
+      "input_sha256": "9edcd821119624af8cb6233bd39f95c491caf09dc37d30a705833094c3928ecb",
+      "name": "planted",
+      "peak_process_tree_rss_bytes": 209272832,
+      "rss_samples": 227,
+      "status": "COMPLETED",
+      "wall_ns_exploratory": 29965560625
+    },
+    {
+      "arm": "random",
+      "artifacts": {
+        "basis": {
+          "bytes": 243,
+          "file": "random_basis.txt",
+          "sha256": "51e31c48e917984e71800ab1dd1fe996ecb410c2b38bf8ad77a36970d0a338bd"
+        },
+        "stderr": {
+          "bytes": 6811,
+          "file": "random_stderr.txt",
+          "sha256": "70d8e8b5a21782ee80d8bf7736387368174a942cde87230aa70373f0c175e1ff"
+        },
+        "stdout": {
+          "bytes": 0,
+          "file": "random_stdout.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "command": [
+        "/opt/homebrew/Cellar/msolve/0.11.0/bin/msolve",
+        "-g",
+        "2",
+        "-t",
+        "1",
+        "-v",
+        "2",
+        "-m",
+        "256",
+        "-f",
+        "/Volumes/SSD990-2/crypto-worktrees/exotic-ecdlp-recovery-20261119/research/exotic_ecdlp_20261021/H4_prime_descent/n13_msolve_20261120/random.ms",
+        "-o",
+        "/Volumes/SSD990/cryptanalysis/.sage-build-tmp/g2-sparse-random-wg7e6jhn/msolve.out"
+      ],
+      "dyld_library_path": "/opt/homebrew/Cellar/flint/3.6.0/lib",
+      "exit_code": 0,
+      "input_sha256": "64c9675e9031bffa2c481c85d3187b367b9046d9676e5d0f51aa22c0f6e4c231",
+      "name": "random",
+      "peak_process_tree_rss_bytes": 228900864,
+      "rss_samples": 219,
+      "status": "COMPLETED",
+      "wall_ns_exploratory": 28383913667
+    }
+  ],
+  "preparation_sha256": "14de03dad10d06aceb4e488de91a8df721162286dc939dd192c6abb522d43621",
+  "protocol_sha256": "175c9ebf5eed0b9f79f299d3a5deb446713401bf518ed24e47bc4ff3798aa85d",
+  "status": "COMPLETED"
+}

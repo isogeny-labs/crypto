@@ -1,0 +1,14 @@
+# L11 deviations and resolved ambiguities
+
+Frozen PROTOCOL.md and SPEC.md were not edited (frozen.sha256 verified OK before work). No threshold, arm, seed rule or decision rule was changed. No hook refusal occurred. No instance was reduced, skipped or split beyond the splits written in PROTOCOL section 10. Items below are places where SPEC.md was silent or ambiguous and the minimal executable choice was made:
+
+1. Smoothness (SPEC 4): an explicit reject was added when F(x,1,0) has all coefficients zero (a line at infinity inside the curve; reducible, hence singular). Without it `roots` would raise on the zero polynomial.
+2. Taylor setup (SPEC 7, 8): `taylor` is computed eagerly for all b base points at the start of every run, so `mul_setup = 82*b` for every run, including runs that stop early. Line counts start from zero after the setup.
+3. Rows (SPEC 8): `rows` counts cycle rows plus full-relation rows, zero rows included in `rows`, counted in `zero_rows`, and contributing 0 to `nnz`. `rank` is computed on all rows (zero rows are inert).
+4. `adm_seen`, `adm_admissible` are non-null only for AF2, AF4, AF8 (AF arms with alpha < 1), as SPEC 8 step 2 says; they are null for AS arms and AF1.
+5. G admission (SPEC 8 table and test 11) is implemented literally as "R1 in vid or R2 in vid" (vid lookup counted in `dict_lookups`).
+6. Analysis (SPEC 10): the paired-ratio bootstrap consumes draws for every cell listed in the TSV, including the U cell (ratios all 1); one set of resampled indices is used for the three metrics T, FPM, mem of a cell. The exponent bootstrap maps a drawn index j to the j-th curve id of that k. Elasticity bootstrap resamples curve ids with the same indices for all four arms. For the kill rule an exhausted cell must have both lower bound > 4.0 and point r_T (from the consumed supply) > 4.0.
+7. G6 is evaluated for AF2, AF4, AF8 only (SPEC 10), per k, pooled over curves. G4 exclusions apply per arm; the analysis script excluded U2, AF2, AF4, AF8, AS4, AS8, S from the verdict because G4 failed for them (G4 is a per-arm exclusion rule in PROTOCOL 7).
+8. `gate-pic` JSON carries two extra keys (`g1_checked`, `g1_failures`) beside the listed ones, plus `python_version` and `l11_sha256`.
+9. Helper files added in the lead directory: `runlog.sh` (writes raw/COMMANDS.log: command, exit code, sha256 of stdout file) and `make_results.py` (renders RESULTS.md and plot.svg from raw/analysis.json and raw/summary.tsv). `curves` and `run` print to stdout (not saved); their outputs are the files under raw/. The analyze output files (analysis.json, summary.tsv) are hashed in raw/SHA256SUMS.
+10. `raw/COMMANDS.log` lines for `curves` and `run` commands record stdout as `-` (not saved); the `python3 l11.py curves` commands were run once each (k=8,10,12 in a loop).

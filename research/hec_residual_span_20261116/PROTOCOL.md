@@ -1,0 +1,29 @@
+# Independent complete-residual span gate — frozen before execution
+
+Question: does the written restricted pole-(2g+2) span equivalence survive an independent finite implementation for g2/3/4, including complete Mumford labels, mixed-factor residuals and repeated zeros? This is algebraic correctness/coverage, not a performance experiment or proof of the general theorem.
+
+Source argument: ../hec_degree2_lp_20261116/GENERAL-SPAN.md and POLE6-BRIDGE.md. Existing rational.rs d=1 gives the distinct (g+2)-anchor direct schedule. Reviewed native polynomial/Jacobian APIs and the original pending quadratic gate; this implementation imports only native arithmetic/group operations. It does not import compact.rs, table_factor.rs, orbit.rs or the production sparse solver. Primary source checked: Gaudry–Thériault–Thomé, 16 February 2005, https://cacr.uwaterloo.ca/techreports/2004/corr2004-29.pdf , sections2–3; its degree-one LP graph supplies context, not this span theorem.
+
+Sources checked (KB): existing exact mechanism/negative-form queries and source receipts in GENERAL-SPAN.md (revision9141e386254340a9bdba3036f2bb706a, refresh2026-11-14T21:44:48Z). Snapshot predates the current derivation. No new novelty inference or Lean proof claim. Current code and written derivation are authoritative for this preparation.
+
+## Fixed panel and domain
+
+Twelve cells: g=2,3,4; p=19,31; membership mode0 prefix or mode1 half-catalogue rotation, then retain min(9,m) canonical nonbranch rational points, sort back to catalogue order. No rank or output selection. For each (g,p), scan c=1..p-1 in the existing thread_curve family and use the first smooth curve with irreducible f. Record selected c, or retain input failure if none exists. Irreducibility is checked using repeated Frobenius, gcd against x^(p^i)-x for all i<=deg(f)/2, and final Frobenius equality. Irreducible odd-degree f implies no rational Jacobian 2-torsion, hence odd rational Jacobian order; this structural implication is assumed classical algebra, not verified by an order computation here. No subgroup, known-log or target oracle is used. All identities are checked in the original Jacobian.
+
+Every (g+1)-subset and all 2^g signs modulo global negation are interpolated independently with elementary Lagrange polynomials. Form U,Q,v with exact division, verify valid reduced E, and verify input sum+E=0 in the original Jacobian. Exhaustive linear root division of Q classifies completely split versus nonsplit and records mixed rational/nonrational cases. Completely split rows retain all rational residual coordinates. Nonsplit keys use full Q,v with canonical orientation; every later match is differenced against its first occurrence. Construct a,c explicitly and check a²-c²f=U1U2, degree, multiplicity<=2, exact signed root row and original group sum. Zero-function differences must have zero rows.
+
+Independently enumerate every (g+2)-subset with 2^(g+1) signs. Ordinary interpolation gives a with y coefficient1. Reject degree<g+1, nonsplit norm, nonanchor zeros or multiplicities>2; count all scheduled candidates, not only admissions. For every admitted direct row, check original group zero, partition repeated zeros across two (g+1)-sets, interpolate again, and require exact equality of full reduced residuals. A full scalar-field dense elimination over F_1000003 compares ranks of S+cache, S+direct and their union, retaining all m rational-place coordinates. Equality of these three ranks proves both finite span inclusions. Split-only rank is reported separately. Raw row counts are not independent-rank claims.
+
+## Predictions, controls and falsifiers
+
+Written claim predicts the polynomial/divisor checks and equal augmented/union ranks in every eligible cell. Controls: independent direct construction, exhaustive root division instead of production tables, full-coordinate dense rank instead of production elimination, original-group identities, exact residual comparison in the converse partition. Shared native arithmetic remains a limitation.
+
+Any assertion failure falsifies the implementation/claim conjunction and is retained for diagnosis; do not label it automatically a theorem counterexample. Exit0 additionally requires nonzero cache and direct admissions for each genus, at least one admitted repeated-zero direct case across the panel, and at least one mixed-factor residual in g3/4 combined. Missing coverage exits2 with INCOMPLETE_COVERAGE: never silently pass a vacuous span equality. Per-genus mixed/repeated counters remain visible even if aggregate criteria pass. A timeout is incomplete, not a negative mathematical result. Do not enlarge/select fixtures after seeing outputs without a separate amendment.
+
+## Resources, custody and output
+
+One local correctness process, 180s wall watchdog; no timed speed result, no external worker spend. H<=9 and p<=31 bound all schedules and matrices. CONTROL.tsv stdout, CONTROL.stderr diagnostics/coverage, EXIT.txt status; create no scientific output until gates pass. Keep raw outputs and every failure. No Python scientific computation.
+
+Prerequisites: the original unchanged degree2-lp gate must already have EXIT.txt=0; this is a sequencing requirement, not an assertion it proves this theorem. Source/import/binary hashes in FREEZE.sha256 must verify. The standard checkpoint push AND gate must succeed after this separate freeze, before execution. No replacement destination is inferred, no secret/profile policy is altered, and an access error terminates before science. The first gate and this extension have distinct protocols. A restored approved destination enables the queued sequence; current access failure does not justify local bypass.
+
+No complete solver, source/target descent, timing campaign, novelty or tenfold speed result is accepted by this gate. Full-cost evaluation requires a useful finite-rank result first and its own protocol.

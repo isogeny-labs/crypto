@@ -1,0 +1,19 @@
+{
+  "schema": "h116.scalar-divpoly-coprimality-launch/v1",
+  "protocol_id": "H116-SCALAR-DIVPOLY-COPRIMALITY-001",
+  "source_revision_rule": "execute the first pushed commit containing this launch document and the exact source hashes in SCALAR_DIVPOLY_COPRIMALITY_SOURCE_GATE.md",
+  "backend": "isolab EKS Spot ordinary non-resumable command workload",
+  "resources": {"cpu":1,"memory_gib":2,"timeout_minutes":10},
+  "budget_usd_max": 0.25,
+  "retries": 0,
+  "compiler": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "commands": {
+    "producer_build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_scalar_divpoly_coprimality.rs", "-o", "/work/h116_scalar_divpoly_coprimality"],
+    "verifier_build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_scalar_divpoly_coprimality_verify.rs", "-o", "/work/h116_scalar_divpoly_coprimality_verify"],
+    "producer_run": ["/work/h116_scalar_divpoly_coprimality"],
+    "verifier_run": ["/work/h116_scalar_divpoly_coprimality_verify", "/work/result.tsv"]
+  },
+  "outputs": ["result.tsv", "verify.txt", "SHA256SUMS"],
+  "acceptance": "retain all rows; infrastructure success requires exact source/protocol hashes, both zero exits, thirteen producer rows, independent replay, and verified output hashes",
+  "measurement_scope": "exact polynomial identities and operation counts only; no timing or speedup claim"
+}

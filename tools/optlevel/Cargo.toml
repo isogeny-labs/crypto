@@ -1,0 +1,32 @@
+[package]
+name = "optlevel"
+version = "2.0.0"
+edition = "2021"
+rust-version = "1.89"
+publish = false
+license = "MIT"
+description = "How close does an implementation run to what its machine can do: roofline calibration, measurement and scoring (optlevel.record/v1)"
+
+# Standalone: not a member of the repository's root crate.
+[workspace]
+
+[[bin]]
+name = "optlevel"
+path = "src/main.rs"
+
+[dependencies]
+# JSON documents are the tool's whole interface; float_roundtrip makes parsing
+# correctly rounded, so re-scoring a committed measurement is bit-reproducible.
+serde = "1"
+serde_json = { version = "1", features = ["float_roundtrip"] }
+# SHA-256 of calibration files, kernel sources and the host fingerprint.
+sha2 = "0.10"
+# --ops-regex takes a user-supplied regular expression.
+regex = "1"
+# sched_setaffinity/getaffinity, getrusage, kill, sysconf: pinning and CPU accounting.
+libc = "0.2"
+
+[profile.release]
+codegen-units = 1
+opt-level = 3
+debug = false

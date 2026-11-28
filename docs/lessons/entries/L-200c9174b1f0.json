@@ -1,0 +1,16 @@
+{
+  "action": "Canonicalize field coefficients or preserve sign explicitly before strtoi, and check the exact PARI curve/input before accepting pairing or map evidence; retain invalid attempts separately.",
+  "created": "2026-11-18T18:14:09Z",
+  "evidence": [
+    "research/prime_conductor_gap80_20261031/construction-audit-20261118/attempt-a/positive.stderr",
+    "research/prime_conductor_gap80_20261031/construction-audit-20261118/parse-diagnostic.stdout",
+    "research/prime_conductor_gap80_20261031/construction-audit-20261118/attempt-b/positive.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "curve-algebra"
+  ],
+  "trigger": "A native PARI helper calls unsigned strtoi on signed curve coefficients or matrix entries.",
+  "why": ""
+}

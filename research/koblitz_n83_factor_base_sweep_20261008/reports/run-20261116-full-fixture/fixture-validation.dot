@@ -1,0 +1,12 @@
+digraph n83_full_fixture_validation {
+  graph [rankdir=LR, bgcolor="white", pad="0.20", nodesep="0.48", ranksep="0.65"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=16, penwidth=1.5, margin="0.25,0.20"];
+  edge [fontname="Helvetica", fontsize=12, penwidth=1.6, color="#6b7280"];
+
+  sparse [label="SPARSE CHECKOUT\n6,395 passed · 45 failed\n138 ignored", fillcolor="#fff1eb", color="#dc785c", fontcolor="#5e2b22"];
+  full [label="FULL CHECKOUT + VERIFIED ARCHIVE\n6,440 passed · 0 failed\n138 ignored", fillcolor="#eaf7ef", color="#398c62", fontcolor="#17472e"];
+  limit [shape=note, label="Same library/test code\nDifferent input materialization\nValidation only", fillcolor="#f3f5f8", color="#8b98a8", fontcolor="#394659", fontsize=13];
+
+  sparse -> full [label="45 exact prior failures now pass", fontcolor="#394659"];
+  full -> limit [style=dotted, arrowhead=none];
+}

@@ -47,6 +47,6 @@ jobs:
           export PATH="$HOME/.elan/bin:$PATH"
           lean StateId30Capacity.lean > /tmp/n83-id30-proof-check.log
           diff -u proof_check.log /tmp/n83-id30-proof-check.log
-          if rg -n '\b(sorry|admit|sorryAx)\b' StateId30Capacity.lean; then
+          if grep -nE '\b(sorry|admit|sorryAx)\b' StateId30Capacity.lean; then
             exit 1
           fi

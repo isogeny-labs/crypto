@@ -50,7 +50,26 @@ cargo test --release --offline --locked --manifest-path research/koblitz_modular
 tools/lean/proof-gate.sh research/koblitz_modular_ic_20261018/lean
 ```
 
-Install report-requirements.txt in a scratch environment and run
-python build_report.py. Python only renders frozen ledger/report content.
+For current rendering use the patched isolated command below instead of
+executing the builder in this archived directory. The historical build used
+`build_report.py`. Python only renders frozen ledger/report content.
 Every PDF page is inspected. Same-agent replay/parser checks share declared
 primitives;no external audit or scheduled background experiment is claimed.
+
+
+### Patched, isolated report reproduction (2026-11-15)
+
+The environment and output hashes above describe the frozen historical build.
+For current reproduction, install `report-requirements.txt` in a scratch environment
+and run the following from the repository root, choosing a new directory outside
+the checkout. This copies the pinned builder and inputs; it never renders over
+the archived outputs.
+
+```sh
+python tools/reproduce_archived_reports_v1.py --round 10 --output /absolute/new/reproduction-directory
+```
+
+The original `PyMuPDF==1.26.5` requirements bytes, their SHA-256, and the
+source revision are retained in `tools/report_reproduction_v1.json`. The active
+requirements use `PyMuPDF==1.26.7`; Typst remains at 0.15.0. Do not invoke
+`build_report.py` in the frozen round directory. See `docs/archived-report-reproduction-v1.md`.

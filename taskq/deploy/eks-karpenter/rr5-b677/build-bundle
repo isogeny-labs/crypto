@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# Unprivileged build/qualification only; no registered B677 extraction call.
+set -euo pipefail
+[[ $# == 3 ]] || { echo 'usage: build-bundle SOURCE_DIR REVISION OUTPUT_DIR' >&2; exit 2; }
+source_dir=$(realpath "$1") revision=$2
+[[ "$revision" =~ ^[a-f0-9]{40}$ ]]
+[[ $(git -C "$source_dir" rev-parse HEAD) == "$revision" ]]
+[[ -z $(git -C "$source_dir" status --porcelain --untracked-files=no) ]]
+[[ ! -e "$3" ]] || { echo 'refusing to replace a build bundle' >&2; exit 2; }
+mkdir -p "$3"
+output=$(realpath "$3")
+cd "$source_dir"
+study=research/prime31_four_summand_20261122
+payload=taskq/deploy/eks-karpenter/rr5-b677
+export CARGO_BUILD_JOBS=2 RAYON_NUM_THREADS=1 OMP_NUM_THREADS=1 RUST_TEST_THREADS=1
+export CARGO_TARGET_DIR="$source_dir/target/rr5-b677-payload"
+export RUSTFLAGS='-C target-cpu=x86-64'
+manifest="$study/native/Cargo.toml"
+target=x86_64-unknown-linux-musl
+toolchain=1.100.0
+git ls-files -z -- "$study/native" "$study/scaling-b677/PROTOCOL.md" \
+  research/prime31_ic_20261115/native \
+  research/cheap_ecdlp_cold_gate_20261123/src/bin/rr5_receipt_check.rs \
+  research/cheap_ecdlp_cold_gate_20261123/rr5_grevlex_b8_producer_row.json \
+  research/prime31_f4_admission_20261121/RUN66_Y7_EXTRA168.csv \
+  src crates/certified-relations crates/relation-replay-checker \
+  examples/prime31_rr5_quartic.rs "$payload" \
+  | sort -z | xargs -0 sha256sum > "$output/source.sha256"
+sha256sum -c "$output/source.sha256" > "$output/source-before.txt"
+cargo +"$toolchain" test --locked --release --target "$target" --manifest-path "$manifest" \
+  --lib --bin rr5-b677-receipt-check --example prime31_rr5_quartic --no-run \
+  > "$output/compile.stdout" 2> "$output/compile.stderr"
+# Compile outside the frozen test execution limits.
+(
+  ulimit -v 2097152
+  timeout --signal=KILL 180 cargo +"$toolchain" test --locked --release --target "$target" \
+    --manifest-path "$manifest" --lib --bin rr5-b677-receipt-check \
+    --example prime31_rr5_quartic -- --test-threads=1 --nocapture
+) > "$output/tests.stdout" 2> "$output/tests.stderr"
+cargo +"$toolchain" build --locked --release --target "$target" --manifest-path "$manifest" \
+  --bin rr5-b677-gate --bin rr5-b677-receipt-check \
+  > "$output/build.stdout" 2> "$output/build.stderr"
+for name in rr5-b677-gate rr5-b677-receipt-check; do
+  install -m555 "$CARGO_TARGET_DIR/$target/release/$name" "$output/$name"
+  readelf -h "$output/$name" | grep -q 'Advanced Micro Devices X86-64'
+  if readelf -l "$output/$name" | grep -q INTERP; then
+    echo "$name is not statically linked" >&2; exit 2
+  fi
+done
+for name in run sequence verify-call; do install -m555 "$payload/$name" "$output/$name"; done
+install -m444 "$study/scaling-b677/PROTOCOL.md" "$output/PROTOCOL.md"
+mapfile -t manifests < <(find "$CARGO_TARGET_DIR/$target/release/build" -type f \
+  \( -path '*/rr5-original-f4-closure-*/out/source-manifest.json' \
+     -o -path '*/rr5-original-f4-closure/*/out/source-manifest.json' \))
+[[ ${#manifests[@]} == 1 ]] || { echo 'expected one original-source manifest' >&2; exit 2; }
+install -m444 "${manifests[0]}" "$output/source-manifest.json"
+sha256sum -c "$output/source.sha256" > "$output/source-after.txt"
+[[ -z $(git status --porcelain --untracked-files=no) ]]
+payload_hashes='{}'
+for name in rr5-b677-gate rr5-b677-receipt-check run sequence verify-call; do
+  payload_hashes=$(jq -c --arg name "$name" --arg digest "$(sha256sum "$output/$name" | cut -d' ' -f1)" \
+    '.+{($name):$digest}' <<< "$payload_hashes")
+done
+metadata_hashes='{}'
+for name in source-manifest.json source.sha256; do
+  metadata_hashes=$(jq -c --arg name "$name" --arg digest "$(sha256sum "$output/$name" | cut -d' ' -f1)" \
+    '.+{($name):$digest}' <<< "$metadata_hashes")
+done
+jq -n --arg revision "$revision" --arg protocol "$(sha256sum "$output/PROTOCOL.md" | cut -d' ' -f1)" \
+  --arg lock "$(sha256sum "$study/native/Cargo.lock" | cut -d' ' -f1)" \
+  --arg compiler "$(rustc +"$toolchain" -vV)" --arg built "$(date -u +%FT%TZ)" \
+  --argjson payload "$payload_hashes" --argjson metadata "$metadata_hashes" \
+  '{schema:"rr5.b677.build/v1",source_repository:"https://github.com/isogeny-labs/crypto",
+    source_revision:$revision,protocol_sha256:$protocol,lock_sha256:$lock,
+    target:"x86_64-unknown-linux-musl",architecture:"linux/amd64",rustc:$compiler,
+    rustflags:"-C target-cpu=x86-64",built_at:$built,payload_sha256:$payload,metadata_sha256:$metadata,
+    registered_extraction_executed:false,full_root_library_gate:false,signed_pcc:false}' \
+  > "$output/build-info.json"

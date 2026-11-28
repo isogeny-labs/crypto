@@ -1,0 +1,558 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-torus-coordinate-proof-20261116",
+  "version": 1,
+  "created": "2026-11-15",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_field_cost_20261116/torus-proof",
+  "authors": [
+    "producer"
+  ],
+  "question": "Exact Lean norm-one reciprocal chart identities/coverage under explicit field and denominator assumptions, before any compressed solver experiment; no timing/yield/degree claim from source.",
+  "claims": [
+    {
+      "id": "chord-algebra",
+      "text": "Eight proposed public field-algebra declarations, checked only if full official scoped proof/axiom gate and false-source plan complete; no solver or DLP gain inferred",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-coverage"
+      ]
+    },
+    {
+      "id": "yield-degree-speed",
+      "text": "Eight proposed public field-algebra declarations, checked only if full official scoped proof/axiom gate and false-source plan complete; no solver or DLP gain inferred",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "gate-source-A",
+      "role": "candidate",
+      "description": "gate-source-A on exact new pre-filed torus coordinate source with unchanged current official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "source_bundle": "eight proposed coordinate declarations, single false conclusion on negative arms"
+      }
+    },
+    {
+      "id": "gate-source-B",
+      "role": "control_aa",
+      "description": "gate-source-B on exact new pre-filed torus coordinate source with unchanged current official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "source_bundle": "eight proposed coordinate declarations, single false conclusion on negative arms"
+      }
+    },
+    {
+      "id": "gate-positive",
+      "role": "control_positive",
+      "description": "gate-positive on exact new pre-filed torus coordinate source with unchanged current official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "source_bundle": "eight proposed coordinate declarations, single false conclusion on negative arms"
+      }
+    },
+    {
+      "id": "reject-product-real",
+      "role": "control_negative",
+      "description": "reject-product-real on exact new pre-filed torus coordinate source with unchanged current official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1,
+        "source_bundle": "eight proposed coordinate declarations, single false conclusion on negative arms"
+      }
+    },
+    {
+      "id": "reject-norm",
+      "role": "control_negative",
+      "description": "reject-norm on exact new pre-filed torus coordinate source with unchanged current official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1,
+        "source_bundle": "eight proposed coordinate declarations, single false conclusion on negative arms"
+      }
+    },
+    {
+      "id": "reject-decompress-compress",
+      "role": "control_negative",
+      "description": "reject-decompress-compress on exact new pre-filed torus coordinate source with unchanged current official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1,
+        "source_bundle": "eight proposed coordinate declarations, single false conclusion on negative arms"
+      }
+    },
+    {
+      "id": "reject-compress-decompress",
+      "role": "control_negative",
+      "description": "reject-compress-decompress on exact new pre-filed torus coordinate source with unchanged current official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1,
+        "source_bundle": "eight proposed coordinate declarations, single false conclusion on negative arms"
+      }
+    },
+    {
+      "id": "reject-membership",
+      "role": "control_negative",
+      "description": "reject-membership on exact new pre-filed torus coordinate source with unchanged current official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1,
+        "source_bundle": "eight proposed coordinate declarations, single false conclusion on negative arms"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "determinism",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "gate-positive",
+      "expected_detection": "Fresh true-source elaboration and scoped axiom audit accept all five exact declarations with0 failing/trusted axioms",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "reject-product-real",
+      "null_population": {
+        "description": "Five single-false-statement source mutations, not a statistical random null",
+        "generator": "Literal source text replacements and hashes in CONTROL_SOURCES.v1.json; generated copies strictly byte-equal",
+        "n": 5,
+        "why_n": "Exact public algebra proof detector coverage, no empirical population claim",
+        "matched_on": [
+          "source except one statement",
+          "compiler",
+          "Mathlib/dependencies",
+          "official gate/auditor",
+          "resource budget"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "source_truth",
+        "levels": [
+          "eight proposed coordinate statements",
+          "single false conclusion per negative source"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "Torus.lean SHA256 235cea5f44d2513bb824b96241be6f08377f4f0501b00d1d8168a29b92fd80d1",
+        "how": "Exact source hash and typed theorem statements, no pre-run tactic correction"
+      },
+      {
+        "name": "dependencies",
+        "treatment": "fixed",
+        "value": "Lean4.34.1,Mathlibd13f23,8 exact packages",
+        "how": "Public release SHA and full compiled-library inventory before launch"
+      },
+      {
+        "name": "process_repeat",
+        "treatment": "fixed",
+        "value": [
+          "A",
+          "B",
+          "positive"
+        ],
+        "how": "Fresh elaborations/audits, compare reports not wall times"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": [
+          "gate-source-A",
+          "gate-source-B",
+          "gate-positive",
+          "reject-product-real",
+          "reject-norm",
+          "reject-decompress-compress",
+          "reject-compress-decompress",
+          "reject-membership"
+        ],
+        "how": "Fixed gates; first unexpected failure stops full plan"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-coverage",
+        "arms": [
+          "gate-source-A",
+          "gate-source-B",
+          "gate-positive",
+          "reject-product-real",
+          "reject-norm",
+          "reject-decompress-compress",
+          "reject-compress-decompress",
+          "reject-membership"
+        ],
+        "differs_in": [
+          "source_truth"
+        ],
+        "design": "absolute",
+        "threshold": "All8public names accepted by official scoped axiom gate with0 failing/trusted;5single-false-statement sources reject1 by mathematical diagnostic"
+      },
+      {
+        "id": "determinism",
+        "arms": [
+          "gate-source-A",
+          "gate-source-B"
+        ],
+        "differs_in": [
+          "process_repeat"
+        ],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": false,
+    "transfer_obligations": [
+      {
+        "domain": "Field characteristic not2 and explicit chart/membership denominator assumptions",
+        "check": "Exact typed theorem statements; odd-subgroup/actual-point/source transport remains separate, no universal coverage inferred"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Dependency-ordered exact finite enumeration and adversarial controls; no clock statistic",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "Deterministic census; seed0 records no randomness"
+    },
+    "instance_sampling": {
+      "rule": "One full finite bundle; no sampling or independent-challenge interpretation",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit algorithms and semantic attacks; exact equality criteria frozen before full data"
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exact finite source/control bundle, no statistical confidence or timing inference; source never elaborated at freeze."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 30,
+      "per_sample_seconds": 30,
+      "threads": 2,
+      "estimated_total_seconds": 270,
+      "measured_on": "Prior actual scoped Mathlib gate on same pinned toolchain/cache informs conservative30s/gate; no new proof ran or performance comparison claimed"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "exit_code",
+        "name": "Native exit code",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Native exit code; no timing or pricing inference",
+        "source": "*.exit",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "audited_theorems",
+        "name": "audited_theorems",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "All in-scope theorem declarations reported by unmodified Lean axiom audit, including helpers",
+        "source": "official gate/audit logs",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "failing_axioms",
+        "name": "failing_axioms",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Non-foundational axioms in scope",
+        "source": "official gate/audit logs",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "trusted_native",
+        "name": "trusted_native",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Native-trust declarations, required0",
+        "source": "official gate/audit logs",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "audited_theorems",
+      "failing_axioms",
+      "trusted_native"
+    ],
+    "record": [
+      "actual published source head",
+      "exact true/false sources",
+      "compiler release/binary SHA",
+      "Mathlib/dependency identities and cache inventory",
+      "gate/auditor/trust-file SHA",
+      "all commands/exits/build/audit/status logs"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 2400,
+    "placement": {
+      "outer_seconds": 2400,
+      "per_stage_seconds": 600,
+      "max_local_workers": 2,
+      "paid_resources": false
+    },
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Full8stage proof/control plan or first unexpected failure,600s per stage and absolute04:15UTC; no weakened source/hypotheses or discarded failed attempt",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stage600seconds and outer3600seconds; any cap means incomplete, not a null",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Exactness gate: every named proposed statement accepted with only foundational axioms and every false source mathematically rejected. No speed/degree/actual group theorem inferred.",
+    "comparison_ids": [
+      "exact-coverage"
+    ],
+    "threshold": "All8public names accepted by official scoped axiom gate with0 failing/trusted;5single-false-statement sources reject1 by mathematical diagnostic",
+    "statistic": "Exact per-stage status/declaration/axiom/source audit, not statistical inference",
+    "interval": "none; finite deterministic enumeration",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "No numerical algorithm gain; source theorem/control completeness",
+    "verdict_vocabulary": [
+      "scoped_kernel_observation_unsigned",
+      "failed",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "/workspace/twist-torus-20261116/official/AuditAxioms.lean",
+      "sha256": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929"
+    },
+    "inputs": [
+      "Exact Torus.lean and all5false sources",
+      "PinnedENVIRONMENT/inventory and compiler/library bytes",
+      "Unmodified official gate/auditor/trust manifest"
+    ],
+    "outputs": [
+      "Every exact source/build/audit/status/exit and axiom declaration",
+      "All failures and rejection diagnostics"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Coordinate/exception-domain diagram only if proofs complete; no quantitative solver graph without data"
+    ],
+    "report_dir": "reports/kernel-20261115"
+  },
+  "inadmissible": [
+    "Skip/patch/fake official gate or its trust manifest",
+    "Weaken a theorem hypothesis/conclusion after failure",
+    "Use sorry/new axiom/native_decide/unsafe evaluation",
+    "Count rejected false source or failed build as proof",
+    "Publish false .lean fixtures as global claimed proofs",
+    "Claim kernel output is signed PCC standing or generic DLP/degree result",
+    "Upload denied result assets, credentials or paid resources"
+  ],
+  "literature": [
+    {
+      "ref": "https://www.math.uci.edu/~asilverb/bibliography/ceilidh.pdf",
+      "provenance": "retrieved",
+      "claim": "Indexed primary section5.2 equations inspected; fullPDF inaccessible403/502/503, reciprocal chart is established not novel"
+    },
+    {
+      "ref": "https://hackmd.io/@yelhousni/emulated-pairing",
+      "provenance": "retrieved",
+      "claim": "Primary author torus compression/operations and exceptional±1 section read; SNARK inverse cost not native CPU price"
+    },
+    {
+      "ref": "https://doi.org/10.1007/11535218_5",
+      "provenance": "retrieved",
+      "claim": "Primary institutional record confirms established rational-torus IC; no extension-field/prime-field security inference"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "f608d728005f2722599b26f7f3a9d0bb888abae3f6dee40c0000c8e7af92a28f",
+    "commit": "30a26ff2d46324796aeb3ea8b707a7469ca30020",
+    "frozen_at": "2026-11-16T03:40:11Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "checkpoint": "Existing authorized samebranch GitHub source/protocol transport; clean source plus fresh connected ref before proof, no S3/skip/raw upload",
+    "modes": [
+      "product-real",
+      "norm",
+      "decompress-compress",
+      "compress-decompress",
+      "membership"
+    ],
+    "source_sha256": "235cea5f44d2513bb824b96241be6f08377f4f0501b00d1d8168a29b92fd80d1",
+    "environment_inventory_sha256": "ea34f2a336b1ddbe7b2e1d2df3b1fdafb59b907a1cbf7be23cd31784ab5b3ba7",
+    "controls_manifest": "CONTROL_SOURCES.json",
+    "new_proof_execution_before_freeze": false,
+    "window": "03:15-04:15UTC,600s stage/max2LOCALworkers",
+    "canonical_skill_status": "Encrypted/unreadable, not claimed read; exact-proof-only scope, current available canonical validator pinned outside repository",
+    "canonical_tool_sha256": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+    "prior_result_export_denial_respected": true,
+    "no_performance_or_solver_claim": true
+  }
+}

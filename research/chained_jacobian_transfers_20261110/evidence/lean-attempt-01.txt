@@ -1,0 +1,62 @@
+ChainTransfer.lean:85:57: error: unsolved goals
+A B C : Type
+inst✝² : IntModule A
+inst✝¹ : IntModule B
+inst✝ : IntModule C
+f : Transfer A B
+sigma : Transfer B B
+g : Transfer B C
+hinv : ∀ (x : A), sigma.apply (f.apply x) = f.apply x
+hanti : ∀ (y : B), g.apply (sigma.apply y) = -g.apply y
+x : A
+⊢ -g.apply (f.apply x) = - -g.apply (f.apply x)
+ChainTransfer.lean:89:4: error: Type mismatch: After simplification, term
+  hh
+ has type
+  @Eq C ((1 + 1) • y) (y + y)
+but is expected to have type
+  @Eq C (2 • y) (y + y)
+ChainTransfer.lean:90:15: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  -?a + ?a
+in the target expression
+  -g.apply (f.apply x) + -g.apply (f.apply x) = 0
+
+A B C : Type
+inst✝² : IntModule A
+inst✝¹ : IntModule B
+inst✝ : IntModule C
+f : Transfer A B
+sigma : Transfer B B
+g : Transfer B C
+hinv : ∀ (x : A), sigma.apply (f.apply x) = f.apply x
+hanti : ∀ (y : B), g.apply (sigma.apply y) = -g.apply y
+x : A
+h : g.apply (f.apply x) = -g.apply (f.apply x)
+htwo : ∀ (y : C), 2 • y = y + y
+⊢ -g.apply (f.apply x) + -g.apply (f.apply x) = 0
+ChainTransfer.lean:122:61: error: Type mismatch
+  n
+has type
+  Nat
+but is expected to have type
+  K
+ChainTransfer.lean:122:71: error: Type mismatch
+  n
+has type
+  Nat
+but is expected to have type
+  L
+ChainTransfer.lean:135:12: error: Type mismatch
+  p
+has type
+  Nat
+but is expected to have type
+  K
+'ChainedTransfer.two_hop_norm' depends on axioms: [propext]
+'ChainedTransfer.injective_with_recovery' depends on axioms: [propext]
+'ChainedTransfer.two_hop_injective' depends on axioms: [propext]
+'ChainedTransfer.two_hop_scalar_relation' does not depend on any axioms
+'ChainedTransfer.anti_invariant_twice_zero' depends on axioms: [sorryAx]
+'ChainedTransfer.anti_invariant_odd_source_zero' depends on axioms: [propext, sorryAx]
+'CharacteristicBoundary.map_nat' depends on axioms: [sorryAx]
+'CharacteristicBoundary.no_unital_map_when_characteristic_not_divides' depends on axioms: [sorryAx]

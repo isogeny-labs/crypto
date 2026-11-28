@@ -1,0 +1,1 @@
+Exact native source/config copies recovered after execution from the preserved initial checkout. All recorded digests matched. Original absolute paths are retained in qualification-initial/pre-call-sources.sha256; this archive uses repository-relative paths. This is post-call preservation, not a new test or a contemporaneous snapshot.

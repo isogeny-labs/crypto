@@ -101,6 +101,37 @@ open for curves whose coefficients generate `F_{q^n}`.
 
 The axiom audit for all six theorems shows `propext`, `Classical.choice` and `Quot.sound` only.
 
+## Round 7: five adversarial assumption boundaries
+
+The final repository proof gate passed locally at source commit `4ce098bdb0`:
+158 theorems audited, zero failures, and zero trusted `native_decide` results.
+PCC verdicts remain unsigned [pcc:unverified]. The frozen instance map is
+[`NEXT_FIVE_PROOF_MAP.md`](NEXT_FIVE_PROOF_MAP.md), with the evidence narrative
+in [`REPORT.md`](reports/attack-corpus-five-20261117/REPORT.md) and its rendered
+[`report.pdf`](reports/attack-corpus-five-20261117/report.pdf).
+
+| module | key theorem endpoints | scoped result |
+|---|---|---|
+| `ZKSeparation` | `completeness_and_simulation_do_not_imply_soundness_or_global_extraction`, `globalAcceptedTranscriptWitness_implies_sound` | In a finite deterministic transcript model, completeness and exact honest-transcript/simulator equality coexist with failed soundness and failed global accepted-pair extraction; the stated extraction property implies soundness. This predicate is not full GMR zero knowledge or Bellare--Goldreich proof of knowledge. |
+| `SchnorrScalarBridge` | `composite_scalarMap_not_injective`, `prime_scalarMap_injective` | Multiplication by `2` on `ZMod 6` is noninjective, while a nonzero multiplier on prime `ZMod q` is injective. The pre-existing `JKSSTCyclicECDLP.orderScalarMap_injective` supplies the separate abstract exact-order group bridge. |
+| `FiatShamirEncoding` | `raw_encoding_alias`, `every_hash_sees_raw_alias`, `decode_encode`, `encode_injective` | Bare concatenation aliases two distinct typed inputs before hashing; one ordered tagged-length logical-token codec has a left inverse and is injective. |
+| `KZGToxicWaste` | `forgeProof_accepts`, `scalarVerify_at_trapdoor_iff`, `forgeGroupProof_accepts`, `groupVerify_at_trapdoor_iff` | Knowing `tau` constructs an accepting proof in the scalar-coordinate and additive-linear surrogates when `z != tau`; at `z = tau`, the exact scalar/group equality is independent of the proof. |
+| `SurvivalTailExpectation` | `harmonic_survival_tail`, `survival_upper_bound_and_scaled_partial_sum`, `truncated_survival_sum_le_inv` | A vanishing harmonic tail has divergent partial sums. A strictly positive uniform lower stopping hazard gives a geometric pointwise bound and the uniform truncated bound `sum S <= 1 / delta`. |
+
+These endpoints do not establish a computational/oracle proof-of-knowledge
+theorem, concrete Schnorr subgroup validation, a byte-level or prefix-free
+Fiat--Shamir codec, equivalence of the KZG surrogates to a pairing verifier,
+polynomial-degree or ceremony security, or the infinite/nontermination
+tail-sum bridge. They also do not supply the adaptive xedni trial law needed to
+turn JKSST's assumption-conditional one-run bound into a repeated-trial runtime
+theorem.
+
+Claim records: `PCC-20261117-a627cf` (ZK), `PCC-20261117-1ed703`
+(Schnorr), `PCC-20261117-a0edbe` (Fiat--Shamir),
+`PCC-20261117-d4d88d` (KZG), and `PCC-20261117-2dca91` (survival). The exact
+commands and receipt digests are in
+[`VERIFICATION.md`](reports/attack-corpus-five-20261117/VERIFICATION.md).
+
 ## What changes in the corpus
 
 - **`HEUR-RELATION-RANK` (W2).** The left-kernel method needs no rank

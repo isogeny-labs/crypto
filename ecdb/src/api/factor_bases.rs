@@ -96,7 +96,21 @@ pub async fn document(State(state): State<Shared>, Path(key): Path<String>) -> A
                                           FROM ec.v_factor_base_result r WHERE r.factor_base_id = fb.id GROUP BY source) x),
                   'leaderboard_rows', (SELECT jsonb_agg(jsonb_build_object('family', b.family, 'regime', b.regime,
                                           'curve_slug', b.curve_slug, 'best_ratio_rho', b.best_ratio_rho))
-                                         FROM ec.ic_board_row b WHERE b.factor_base_id = fb.id)))::text
+                                         FROM ec.ic_board_row b WHERE b.factor_base_id = fb.id),
+                  'artifacts', (SELECT jsonb_agg(jsonb_build_object(
+                                      'role', a.role, 'is_primary', a.is_primary, 'description', a.description,
+                                      'artifact', to_jsonb(x)) ORDER BY a.is_primary DESC, a.role, a.artifact_id)
+                                  FROM ec.factor_base_artifact a JOIN ec.artifact x ON x.id = a.artifact_id
+                                 WHERE a.factor_base_id = fb.id),
+                  'ml_features', (SELECT to_jsonb(v) - 'factor_base_id'
+                                    FROM ec.v_factor_base_ml_features v WHERE v.factor_base_id = fb.id),
+                  'observations', (SELECT jsonb_agg(jsonb_build_object(
+                                      'feature_key', d.feature_key, 'version', d.version, 'value', o.value,
+                                      'missing_reason', o.missing_reason, 'context', o.context,
+                                      'status', o.status, 'observed_at', o.observed_at)
+                                      ORDER BY d.feature_key, d.version, o.id)
+                                    FROM ec.feature_observation o JOIN ec.feature_definition d
+                                      ON d.id = o.feature_definition_id WHERE o.factor_base_id = fb.id)))::text
            FROM ec.factor_base fb JOIN ec.v_factor_base_summary s ON s.id = fb.id
           WHERE fb.id = $1::text::bigint",
         &[id.to_string()],

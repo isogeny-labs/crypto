@@ -1,0 +1,8 @@
+# Global progress-metric integration pending exclusive scope
+
+Conductorcheck2026-10-30 returnedblock_conflict: ec2-user/T-865holds
+path:tools/progress_metrics.pywrite_exclusive. Do notedit,joinorclaimthatpath.
+TheR37/R38exactcounters remaininresults.json; a scopedintegrationpatch is
+providedforlaterapplicationafterrelease. This is anownershipconstraint,
+notmathematicalfailure,anddoesnotblocknativework/report/artifactpublication.
+Do notclaimtheglobalexporterhasemittednewR37/R38metricsuntilappliedandtested.

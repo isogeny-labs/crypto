@@ -1,0 +1,132 @@
+{
+  "schema": "branch-helper-cast-machine-review/v1",
+  "reviewed_at_utc": "2026-11-11T00:05:38Z",
+  "reviewer_scope": "independent retained-output and custody audit; no compiler, proof replay, source repair, or semantic promotion",
+  "subject": {
+    "published_execution_commit": "f3c1b8cc7663ca7d15374ae5e9a16c86839c9d18",
+    "published_source_commit": "0f637dd630b3c68082b22c09f358ea1b2f79f722",
+    "independent_operational_review_commit": "be3c46ef6613a21df2245d311c4846c8dc151f2d",
+    "freeze_sha256": "c8ae601aa329fa54fed01560304615a2fa4824bfc266de8aa7e5d67907d384ba",
+    "release_sha256": "c0f2f57efc4e2316083b48e6b0f3319e9c65d5b9398af60e94b61862cda7b55c",
+    "workspace": "/home/ec2-user/pencil-native-branch-helper-cast-renewal-20261110",
+    "outer_workspace": "/home/ec2-user/pencil-native-branch-helper-cast-renewal-20261110.outer"
+  },
+  "run": {
+    "start_utc": "2026-11-10T23:59:01.963491000Z",
+    "end_utc": "2026-11-11T00:02:14.100759000Z",
+    "completion_status": "failed",
+    "elapsed_worker_wall_seconds": 192.1372683380032,
+    "charged_campaign_seconds": 600,
+    "attempts": 1,
+    "automatic_retries": 0,
+    "deadline_utc": "2026-11-11T12:00:00Z",
+    "campaign_ceiling_seconds": 129600
+  },
+  "machine_results": [
+    {
+      "module": "BranchRootMultiplicity",
+      "machine_status": "passed",
+      "exit": 0,
+      "elapsed_interval_seconds": 41.89551762898918,
+      "source_sha256": "4ef1d87d4ce5f46fd8d6f4a4217f83fb674d2976ec7a45b46488adaaba143aa7",
+      "olean_sha256": "e999a7c8e322b2c2fd4a0cb0182a04fed188458b41e1effa72df20cc373c786a",
+      "stdout_sha256": "261d2c5c8821ca9723e0113cadf71c9b5e5153642c2d35c05f6946874cb4cb91",
+      "axiom_output": "Seven named declarations reported only propext, Classical.choice, and Quot.sound; four style warnings were non-fatal."
+    },
+    {
+      "module": "BranchCoefficientMultiplicity",
+      "machine_status": "passed",
+      "exit": 0,
+      "elapsed_interval_seconds": 30.511097947019152,
+      "source_sha256": "4e8cfd2ff984359b4fbd92e8fd0432db04b82e08fd19223eb5dac9d718995b76",
+      "olean_sha256": "e770427600c120992331b2ecd77764643d3fb09211f097d960ef604a79e8fa84",
+      "stdout_sha256": "730733b730dfb91b19ad472e80d766a55eae5c05913f111b0f1fc9e8b274ebaa",
+      "axiom_output": "source_support_base_multiplicity_sum reported only propext, Classical.choice, and Quot.sound."
+    },
+    {
+      "module": "IndependentControls",
+      "machine_status": "failed",
+      "exit": 1,
+      "expected_exit": 0,
+      "elapsed_interval_seconds": 31.511452588019893,
+      "source_sha256": "2580a06556677187b197731712e78ffd0913712e0bc8cefdab4027e1d2224b9c",
+      "stdout_sha256": "83d553eb35a7030e8074a0fae2460b33683aa4b7b801837bca163ada4a8fdbeb",
+      "olean_present": false,
+      "failure": [
+        "IndependentControls.lean:22:2: simp made no progress",
+        "IndependentControls.lean:28:2: simp made no progress"
+      ]
+    },
+    {
+      "module": "Readback",
+      "machine_status": "not_verified",
+      "reason": "not attempted after IndependentControls failed",
+      "olean_present": false,
+      "consequence": "the separate thirteen-name readback was not executed"
+    },
+    {
+      "module": "ExpectedFailure",
+      "machine_status": "not_verified",
+      "reason": "not attempted after IndependentControls failed",
+      "olean_present": false,
+      "consequence": "the expected False rejection control was not executed"
+    }
+  ],
+  "custody": {
+    "pre_status": "passed",
+    "post_status": "passed",
+    "dependency_files_checked_each_phase": 16736,
+    "dependency_bytes_checked_each_phase": 3111892318,
+    "pre_post_hash_inventory_byte_identical": true,
+    "pre_post_retained_inventory_byte_identical": true,
+    "pre_post_runtime_inventory_byte_identical": true,
+    "retained_source_and_olean_bindings_checked": 26,
+    "retained_bindings_match": true,
+    "declared_trust_boundary": "Pinned shared caches; pre/post checks do not exclude transient concurrent changes."
+  },
+  "resource_and_terminal_checks": {
+    "phase_worker_wall_seconds": {
+      "pre": 54.44882508798037,
+      "compiler": 104.72157733800123,
+      "post": 32.84840777597856
+    },
+    "cpu_quota": "100%",
+    "memory_max": "8G",
+    "memory_swap_max": 0,
+    "tasks_max": 128,
+    "phase_runtime_max_seconds": {
+      "pre": 165,
+      "compiler": 225,
+      "post": 165
+    },
+    "all_recorded_phase_owners_terminal": true,
+    "compiler_invocation_id": "5958a22f6bc748c088bf175df6fb3881",
+    "compiler_unit_state": "loaded/failed with empty ControlGroup",
+    "compiler_child_pids_absent": true,
+    "compiler_cgroup_absent": true,
+    "pending_signals": []
+  },
+  "source_and_release_checks": {
+    "published_execution_commit_contains_source_and_release_commits": true,
+    "published_packet_bytes_match_local_source": true,
+    "five_workspace_sources_match_frozen_packet": true,
+    "all_release_receipt_hashes_match": true,
+    "freeze_hash_matches": true,
+    "source_manifest_hash_matches": true
+  },
+  "fidelity": {
+    "status": "not_reviewed",
+    "reason": "This review authenticated retained machine outputs and source identities. It did not perform a new independent semantic derivation or prove the bridge from the compiled declarations to a broader research claim.",
+    "binary_kernel_rechecker": false,
+    "scope_note": "The two successful compiler calls establish machine acceptance at the pinned Lean trust boundary only. The failed controls and unattempted readback and expected-failure modules prevent complete packet validation."
+  },
+  "review_outcome": "needs_revision",
+  "findings": [
+    "Two target modules compiled and emitted the expected standard axiom lists.",
+    "The independent controls source failed at lines 22 and 28 because simp only [Polynomial.C_ofNat] made no progress.",
+    "The thirteen-name readback and expected False rejection were not reached.",
+    "Pre/post dependency, retained-import and runtime custody inventories were byte-identical.",
+    "The one-attempt no-retry run ended terminally inside the 600-second envelope and before the absolute deadline."
+  ],
+  "next_action": "Treat this attempt as terminal failed evidence. Any controls correction is a new source revision requiring publication, independent affected-source review, and a separately authorized fresh attempt; do not reuse this attempt or promote its partial machine result."
+}

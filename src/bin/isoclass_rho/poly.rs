@@ -106,32 +106,48 @@ pub fn monic<F: Fq>(f: &F, a: &Poly) -> Poly {
     }
 }
 
-pub fn gcd<F: Fq>(f: &F, a: &Poly, b: &Poly) -> Poly {
-    let (mut a, mut b) = (trim(a.clone()), trim(b.clone()));
-    while !b.is_empty() {
-        let r = rem(f, &a, &b);
-        a = b;
-        b = r;
+/// [`Fq`] as a coefficient field for the shared `crypto_lib::gcd::poly`.
+struct Coeffs<'a, F: Fq>(&'a F);
+
+impl<F: Fq> crypto_lib::gcd::poly::PolyField for Coeffs<'_, F> {
+    type E = u64;
+    fn zero(&self) -> u64 {
+        0
     }
-    monic(f, &a)
+    fn one(&self) -> u64 {
+        1
+    }
+    fn add(&self, a: u64, b: u64) -> u64 {
+        self.0.fadd(a, b)
+    }
+    fn sub(&self, a: u64, b: u64) -> u64 {
+        self.0.fsub(a, b)
+    }
+    fn mul(&self, a: u64, b: u64) -> u64 {
+        self.0.fmul(a, b)
+    }
+    fn inv(&self, a: u64) -> u64 {
+        self.0.finv(a)
+    }
+    fn neg(&self, a: u64) -> u64 {
+        self.0.fneg(a)
+    }
+}
+
+/// Monic `gcd(a, b)` (empty when both are zero), by the shared module.
+pub fn gcd<F: Fq>(f: &F, a: &Poly, b: &Poly) -> Poly {
+    crypto_lib::gcd::poly::gcd(&Coeffs(f), a, b)
 }
 
 /// `a^{-1} mod m`, if `gcd(a, m) = 1`.
 pub fn invmod<F: Fq>(f: &F, a: &Poly, m: &Poly) -> Option<Poly> {
-    let (mut r0, mut r1) = (trim(m.clone()), rem(f, a, m));
-    let (mut t0, mut t1): (Poly, Poly) = (Vec::new(), vec![1]);
-    while !r1.is_empty() {
-        let (q, r) = divrem(f, &r0, &r1);
-        let t = sub(f, &t0, &mul(f, &q, &t1));
-        r0 = r1;
-        r1 = r;
-        t0 = t1;
-        t1 = t;
+    let m = trim(m.clone());
+    match degree(&m) {
+        None => panic!("division by the zero polynomial"),
+        // Everything is 0 modulo a unit; the old Euclid returned Some(0).
+        Some(0) => Some(Vec::new()),
+        Some(_) => crypto_lib::gcd::poly::inv_mod(&Coeffs(f), a, &m),
     }
-    if degree(&r0) != Some(0) {
-        return None;
-    }
-    Some(rem(f, &scale(f, &t0, f.finv(r0[0])), m))
 }
 
 /// `base^e mod m` with `e` given as bits, least significant first.
@@ -504,13 +520,7 @@ mod f2 {
         r
     }
     pub fn gcd(a: &P, b: &P) -> P {
-        let (mut a, mut b) = (a.clone(), b.clone());
-        while deg(&b).is_some() {
-            let r = rem(&a, &b);
-            a = b;
-            b = r;
-        }
-        a
+        crypto_lib::gcd::gf2::gcd(a, b)
     }
     pub fn is_one(a: &P) -> bool {
         deg(a) == Some(0)

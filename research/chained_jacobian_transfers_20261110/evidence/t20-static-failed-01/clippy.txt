@@ -1,0 +1,43 @@
+    Checking chained-successor-preflight v0.1.0 (/workspace/crypto/research/chained_jacobian_transfers_20261110/successor-preflight)
+error[E0603]: function `json_point` is private
+   --> src/primitive_four_t20.rs:259:54
+    |
+259 |                     super::even_kernel_certificates::json_point(p),
+    |                                                      ^^^^^^^^^^ private function
+    |
+note: the function `json_point` is defined here
+   --> src/even_kernel_certificates.rs:92:1
+    |
+ 92 | fn json_point(p: Pt<ER>) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0603]: function `json_point` is private
+   --> src/primitive_four_t20.rs:260:54
+    |
+260 |                     super::even_kernel_certificates::json_point(q)
+    |                                                      ^^^^^^^^^^ private function
+    |
+note: the function `json_point` is defined here
+   --> src/even_kernel_certificates.rs:92:1
+    |
+ 92 | fn json_point(p: Pt<ER>) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `clone` found for struct `independent_map_replay::quartic_gluing::isogeny_cycle_census::unbalanced_transfer::EvenModel` in the current scope
+  --> src/primitive_four_t20.rs:86:58
+   |
+86 |     let mut context = WholeContext::new(f, &flat, source.clone());
+   |                                                          ^^^^^ method not found in `independent_map_replay::quartic_gluing::isogeny_cycle_census::unbalanced_transfer::EvenModel`
+   |
+  ::: src/unbalanced_transfer.rs:48:1
+   |
+48 | struct EvenModel {
+   | ---------------- method `clone` not found for this struct
+   |
+   = help: items from traits can only be used if the trait is implemented and in scope
+   = note: the following trait defines an item `clone`, perhaps you need to implement it:
+           candidate #1: `std::clone::Clone`
+
+Some errors have detailed explanations: E0599, E0603.
+For more information about an error, try `rustc --explain E0599`.
+error: could not compile `chained-successor-preflight` (lib test) due to 3 previous errors

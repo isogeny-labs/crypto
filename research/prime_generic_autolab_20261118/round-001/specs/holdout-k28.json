@@ -1,0 +1,74 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=402",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "inc",
+      "role": "baseline"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=342",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "sel",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=402",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "inc-aa",
+      "role": "control"
+    },
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg-aa",
+      "role": "control"
+    }
+  ],
+  "description": "research/prime_generic_autolab_20261118/round-001/PROTOCOL.md (frozen before data), fresh holdout: sel = mitm2-n342 (prime-abscissa:size=342 + mitm:negation_folded=1). Public synthetic generic prime-order E(F_p) curve and targets; no security claim.",
+  "label": "ic_autolab round 1 holdout, multibase track, k = 28",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 2,
+    "seed": 2026111935,
+    "timeout_seconds": 300,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "bits": 28,
+        "kind": "prime_search",
+        "seed": 59297
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026111928,
+    "targets_per_curve": 24
+  }
+}

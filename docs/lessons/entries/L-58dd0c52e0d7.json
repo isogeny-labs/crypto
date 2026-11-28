@@ -1,0 +1,14 @@
+{
+  "action": "give each validator its own scratch subdirectory (scratchpad/val_<lead>/) in the dispatch, and copy its scripts into the lead's validation/ directory as soon as it finishes",
+  "created": "2026-11-22T05:02:11Z",
+  "evidence": [
+    "research/curve25519_wave7_untried_20261122/L2_highdeg_coords/validator-report.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "several validators run at once in one session",
+  "why": "wave 7: one validator overwrote another's replay.py in a shared scratchpad/val/"
+}

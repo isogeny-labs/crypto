@@ -1,0 +1,52 @@
+⚠ [3156/3188] Replayed S3Roots
+warning: S3Roots.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean: imports `Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean:137:63: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:137:63: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Roots.lean:161:55: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:161:55: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+⚠ [3157/3188] Replayed RationalCounterexample
+warning: RationalCounterexample.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [3186/3188] Built DescentCounterexample (3.8s)
+warning: DescentCounterexample.lean: imports `Mathlib.Algebra.Polynomial.SpecificDegree` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: DescentCounterexample.lean: imports `Mathlib.FieldTheory.Finiteness` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: DescentCounterexample.lean: imports `Mathlib.RingTheory.AdjoinRoot` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: DescentCounterexample.lean: imports `Mathlib.RingTheory.MvPolynomial.Homogeneous` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: DescentCounterexample.lean: imports `Mathlib.RingTheory.Regular.RegularSequence` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: DescentCounterexample.lean:44:2: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+warning: DescentCounterexample.lean:167:2: Try this: 
+  haveI̵
+
+The goal is a proposition, so `have` is preferred over `haveI`.
+The difference between `have` and `haveI` is that `haveI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+ℹ [3187/3188] Built Refutations (2.5s)
+info: Refutations.lean:4:0: 'SkepticalAudit.rational_only_s3_converse_false' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:5:0: 'SkepticalAudit.extensionPolynomial_irreducible' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:6:0: 'SkepticalAudit.coordinate_constant' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:7:0: 'SkepticalAudit.actual_descended_equations' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:8:0: 'SkepticalAudit.actual_descent_not_regular' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:9:0: 'SkepticalAudit.actual_descent_top_parts_not_regular' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:10:0: 'SkepticalAudit.extension_finrank' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:11:0: 'SkepticalAudit.extension_cardinality' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:12:0: 'SkepticalAudit.target_three_torsion' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:13:0: 'SkepticalAudit.symmetrization_over_extension' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:14:0: 'SkepticalAudit.universal_descent_regularity_counterexample' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (3188 jobs).

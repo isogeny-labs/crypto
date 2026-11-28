@@ -1,0 +1,37 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-16T01:56:37Z",
+ "id": "PCC-20261116-d45270",
+ "kind": "statement",
+ "producer": {
+  "commit": "187fc0ed13224cb29f704929bf4e08471f0be01e",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/reports/scaling-audit-v1/REPORT.md",
+    "sha256": "0e60c468a9c0d87d88f25ce351d7e2dddf8379a11f892dd521642c62b41f1b53"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/reports/scaling-audit-v1/report.pdf",
+    "sha256": "3c72fe2ef2cdf4bb7a467bb83be33d93aa456a65cb6caec49004703ab2ac2150"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/reports/scaling-audit-v1/pipeline.dot",
+    "sha256": "9cc28881ddc70e4eafa09090f130e106e9454965baca3c0258eb2be24a528570"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "curve25519-saturated-yield-plan",
+ "statement": "Revised research plan and conditional-model audit: success probability is capped at one before optimizing arity or batching. The rational numeric instances and current integer parameter checks are separately certified; they do not establish actual algorithm cost or an exponent improvement. The existing four-coset class lower bound exceeds the unit-constant sixth-root target, and the chosen gamma3/2 unit-budget model at that bound cannot certify the finite reference cost; this is not an asymptotic impossibility claim. Many-coset products are arithmetic proposals awaiting admissibility, transport, recognition-cost and growing-family checks. The plan prioritizes fixed-base batch algorithms, four/six arity comparisons, exact proof bridges and scoped rejection criteria. Novelty and a real decomposition advantage remain open."
+}

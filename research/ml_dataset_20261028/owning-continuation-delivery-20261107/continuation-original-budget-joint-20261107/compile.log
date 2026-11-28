@@ -1,0 +1,23 @@
+warning: unused import: `self`
+ --> /home/ec2-user/ml-dataset-resume-20261029/continuation-original-budget-joint-20261107/continuation.rs:3:59
+  |
+3 | use super::{sparse::{Owner,Charge,Polynomial},scheduler::{self,search},check};
+  |                                                           ^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /home/ec2-user/ml-dataset-resume-20261029/continuation-original-budget-joint-20261107/budget_core.rs:91:14
+   |
+91 |             .fetch_update(
+   |              ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+91 -             .fetch_update(
+91 +             .try_update(
+   |
+
+warning: 2 warnings emitted
+

@@ -1,0 +1,36 @@
+# reassembled tree vs BUILD_MANIFEST 'assembled build tree'
+MATCH src/cryptanalysis/bitops.rs
+MATCH src/cryptanalysis/f4_fp.rs
+MATCH src/cryptanalysis/f4_fp/pair_certificate.rs
+MATCH src/cryptanalysis/f4_fp/reuse.rs
+MATCH src/cryptanalysis/fx_hash.rs
+MATCH src/cryptanalysis/gaudry_cubic.rs
+MATCH src/cryptanalysis/glv_invariant_base.rs
+MATCH src/cryptanalysis/groebner_f4.rs
+MATCH src/cryptanalysis/ic_measurement.rs
+MATCH src/cryptanalysis/jv_bitops.rs
+MATCH src/cryptanalysis/jv_bitops_uniform.rs
+MATCH src/cryptanalysis/jv_cover.rs
+MATCH src/cryptanalysis/mod.rs
+MATCH src/cryptanalysis/residual_walk.rs
+MATCH src/cryptanalysis/zero_dim_la.rs
+MATCH src/lib.rs
+MATCH src/prime_hyperelliptic/mod.rs
+MATCH src/prime_hyperelliptic/ops.rs
+Cargo.toml with bin path /dev/shm/df-lane/traced_descent_check.rs: bd7d622a1569a95c6a11b11fb86c6bcdc697c37b2464fcfaef87da2dcd9f7408
+offline-resolved Cargo.lock: 3d1cb73380f8e43d9b67d90a90cf996a22f2c380d32f74a83bba78d0c50de13f
+manifest Cargo.lock/Cargo.toml: bd7d622a1569a95c6a11b11fb86c6bcdc697c37b2464fcfaef87da2dcd9f7408  Cargo.toml 3d1cb73380f8e43d9b67d90a90cf996a22f2c380d32f74a83bba78d0c50de13f  Cargo.lock 
+# rerun outputs vs committed (RAW.sha256)
+b719c682e659cb22ace7f7b739295303b24b719ccce441aa4d5edd980568f081 out389.json
+f79a67686e6aff391924a032b07201d925c5aa62b7529143255987d24291e9db out401.json
+578fa0faab24b409d376a7919039fe089f1e731e58f02414d1a4932daf9aa524 rows389.jsonl
+efa940f8a42379b001e6e0bee3d3b3f51aa6bbe8d43808e1e2712cfb01e7654e rows401.jsonl
+578fa0faab24b409d376a7919039fe089f1e731e58f02414d1a4932daf9aa524  run3415.jsonl
+efa940f8a42379b001e6e0bee3d3b3f51aa6bbe8d43808e1e2712cfb01e7654e  run401.jsonl
+b719c682e659cb22ace7f7b739295303b24b719ccce441aa4d5edd980568f081  run3415.out
+f79a67686e6aff391924a032b07201d925c5aa62b7529143255987d24291e9db  run401.out
+MATCH breakdown.json byte-equal on rerun
+# producer bootstrap replay (rand 0.8.8 StdRng seed 0xE2E_1009) vs recorded
+unit/baseline recorded 0.9672505907414171 1.0271663624414005 replay 0.9672505907414171 1.0271663624414005
+unit/rho recorded 0.1837160275278058 0.18928227976010126 replay 0.1837160275278058 0.18928227976010126
+baseline/rho recorded 0.1832472358045783 0.19369621581665877 replay 0.1832472358045783 0.19369621581665877

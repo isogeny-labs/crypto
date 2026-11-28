@@ -1,0 +1,28 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | gen-c1 | 144/144 | 0.425 | 0.689 | 3.065 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | gen-c1-aa | 144/144 | 0.425 | 0.689 | 3.065 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | gen-c1-m1 | 144/144 | 0.425 | 0.689 | 3.065 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | kl-c2 | 144/144 | 0.724 | 1.244 | 5.927 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | rho-strong | 144/144 | 4.525 | 4.634 | 5.614 | — |
+| icv1-f2m29-tm40309-30c52b96 | 15.37 | rho-v5 | 144/144 | 0.337 | 0.366 | 0.623 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs gen-c1-aa | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs gen-c1-m1 | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs kl-c2 | gen-c1 < kl-c2 |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs rho-strong | gen-c1 < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1 vs rho-v5 | rho-v5 < gen-c1 |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-aa vs gen-c1-m1 | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-aa vs kl-c2 | gen-c1-aa < kl-c2 |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-aa vs rho-strong | gen-c1-aa < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-aa vs rho-v5 | rho-v5 < gen-c1-aa |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-m1 vs kl-c2 | gen-c1-m1 < kl-c2 |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-m1 vs rho-strong | gen-c1-m1 < rho-strong |
+| icv1-f2m29-tm40309-30c52b96 | gen-c1-m1 vs rho-v5 | rho-v5 < gen-c1-m1 |
+| icv1-f2m29-tm40309-30c52b96 | kl-c2 vs rho-strong | unresolved inside the band |
+| icv1-f2m29-tm40309-30c52b96 | kl-c2 vs rho-v5 | rho-v5 < kl-c2 |
+| icv1-f2m29-tm40309-30c52b96 | rho-strong vs rho-v5 | rho-v5 < rho-strong |

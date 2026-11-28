@@ -1,0 +1,24 @@
+name = "VietaDegreeAudit"
+defaultTargets = ["BoundBridge", "ProjectorInstances"]
+
+[[require]]
+name = "CryptoLean"
+git = "https://github.com/aburan28/crypto-lean"
+rev = "23569e7f1da1abb865601f8f0dacc16fa11810e3"
+
+[[require]]
+name = "CryptoResearch"
+git = "https://github.com/aburan28/crypto-autoresearcher"
+rev = "0ca36c9d5b49f2fcba56f79a51456a715b7aae5e"
+subDir = "formal"
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "cfc55fc58714a59dc06e6e79edc6d1d95140d3c2"
+
+[[lean_lib]]
+name = "BoundBridge"
+
+[[lean_lib]]
+name = "ProjectorInstances"

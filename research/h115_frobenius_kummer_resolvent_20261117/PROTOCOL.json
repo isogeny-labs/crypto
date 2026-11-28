@@ -1,0 +1,19 @@
+{
+  "schema":"h115.protocol/v1",
+  "status":"frozen-before-implementation",
+  "mechanism":"Frobenius Kummer cocycle compressed to the (V-1) fiber",
+  "identity":"(V-1)(pi-1)=[p+1-t]=[r]",
+  "curves":"CURVES.json",
+  "moments":{"max_degree":8,"x":"sum x(C)^j","y":"sum y(C)*x(C)^(j-1)"},
+  "channels":{"raw_x":8,"raw_y":8,"ratio_x":8,"ratio_y":8,"cross_x":7,"cross_y":7,"mixed":8,"total":54},
+  "radix":6,
+  "predicate_ids":648,
+  "rows":15,
+  "row_targets":366,
+  "generator_multipliers":[1,2,3],
+  "controls":{"random_lines":{"curves":2,"replicates":8},"rational_line":true,"matched_labels":{"curves":2,"replicates":8},"coordinate_isomorphisms":{"lambda":2,"curves":5},"forbidden_oracle_positive":true,"ablations":["raw-only","normalized-only"],"tamper_classes":["extension-coefficient","frobenius-image","fiber-member","moment","scalar-label","predicate-id","raw-digest","summary-count"]},
+  "acceptance":{"same_id_exact_all_rows":true,"uniform_rows":15,"decoded_targets":366,"all_structural_checks":true,"all_tampers_reject":true,"fallback_search":false},
+  "cost_obligation":{"toy_fiber_enumeration":"Theta(r) per target","generic_full_division_degree":"Theta(r^2)","compressed_fiber_degree":"r","subex_claim_requires":"uniform r^o(1) moment construction plus complete decoder"},
+  "run_policy":{"backend":"isolab EKS Spot","checkpoint_required":true,"source_revision_must_be_pushed":true,"image_digest_required":true,"budget_usd":1,"deadline_seconds":1800,"scientific_retries":0},
+  "seed":"sha256(domain || 0x00 || curve_slug || 0x00 || generator_multiplier || 0x00 || replicate), first 8 bytes big-endian, SplitMix64"
+}

@@ -1,0 +1,39 @@
+[
+  {
+    "command": [
+      "python",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      ".github/scripts",
+      "-p",
+      "test_check_rust_syntax.py",
+      "-v"
+    ],
+    "exit_code": 0,
+    "seconds": 0.13234818700584583,
+    "log": "/workspace/ml2958-required-rust-parser-workflow-controls-0-20261030.log",
+    "sha256": "71a00fbfc5cb2f6f99fdc0794a6aebe90acc578d01e4c9eeb064a004939ef1a9"
+  },
+  {
+    "command": [
+      "python",
+      ".github/scripts/check_rust_syntax.py"
+    ],
+    "exit_code": 0,
+    "seconds": 17.127237876004074,
+    "log": "/workspace/ml2958-required-rust-parser-workflow-controls-1-20261030.log",
+    "sha256": "ff17103a0a15c336411aa253bb667af25718b1caf172a42ee22f3c3c78ad17c6"
+  },
+  {
+    "command": [
+      "/workspace/actionlint/actionlint",
+      ".github/workflows/validation-gate.yml"
+    ],
+    "exit_code": 0,
+    "seconds": 0.0067594649735838175,
+    "log": "/workspace/ml2958-required-rust-parser-workflow-controls-2-20261030.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

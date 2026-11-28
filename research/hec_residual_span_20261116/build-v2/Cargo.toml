@@ -1,0 +1,10 @@
+[package]
+name="hec-residual-span-v2"
+version="0.1.0"
+edition="2021"
+[workspace]
+[dependencies]
+hec-native-ic={path="../../../crates/hec-native-ic"}
+[[bin]]
+name="residual-span-gate-v2"
+path="../main_v2.rs"

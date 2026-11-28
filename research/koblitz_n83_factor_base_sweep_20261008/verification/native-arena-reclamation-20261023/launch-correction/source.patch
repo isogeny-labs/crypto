@@ -1,0 +1,237 @@
+diff --git a/research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs b/research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs
+index 1d60339b6..d1ca7de62 100644
+--- a/research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs
++++ b/research/koblitz_n83_factor_base_sweep_20261008/primary_adapter.rs
+@@ -1011,7 +1011,7 @@ fn supported_chain_wall_budget(
+             && !order_first_pair
+             && matches!(
+                 (columns, conflicts, seconds),
+-                (2048, 1_500_000, 8987) | (4096, 1_500_000, 9000)
++                (2048, 1_500_000, 8957) | (4096, 1_500_000, 9000)
+             ))
+ }
+ 
+@@ -1412,7 +1412,7 @@ mod tests {
+ 
+     #[test]
+     fn continuation_wall_admission_preserves_legacy_and_rejects_nearby_requests() {
+-        for (columns, seconds) in [(2048, 8987), (4096, 9000)] {
++        for (columns, seconds) in [(2048, 8957), (4096, 9000)] {
+             assert!(supported_chain_wall_budget(columns, 5, 1_500_000, seconds, true, false));
+             for (k, m, conflicts, wall, orbits, ordered) in [
+                 (columns, 5, 1_500_000, seconds - 1, true, false),
+@@ -1431,7 +1431,8 @@ mod tests {
+         }
+         assert!(!supported_chain_wall_budget(2048, 5, 1_500_000, 0, true, false));
+         assert!(!supported_chain_wall_budget(2048, 5, 1_500_000, 9000, true, false));
+-        assert!(!supported_chain_wall_budget(4096, 5, 1_500_000, 8987, true, false));
++        assert!(!supported_chain_wall_budget(2048, 5, 1_500_000, 8987, true, false));
++        assert!(!supported_chain_wall_budget(4096, 5, 1_500_000, 8957, true, false));
+     }
+ 
+     #[test]
+@@ -1443,7 +1444,7 @@ mod tests {
+         fs::create_dir_all(&fixtures).unwrap();
+         fs::write(fixtures.join("probe-corpus.json"), b"{}").unwrap();
+         fs::write(fixtures.join("probe-validation.json"), b"{}").unwrap();
+-        for (columns, seconds) in [(2048, 8987), (4096, 9000)] {
++        for (columns, seconds) in [(2048, 8957), (4096, 9000)] {
+             // The deliberately absent panel prevents any SAT execution even
+             // if the test happens to run inside a matching hard-memory cgroup.
+             let err = run_chain_cli(
+diff --git a/tools/n83-sweep-runner/src/admission_refusal.rs b/tools/n83-sweep-runner/src/admission_refusal.rs
+index c540502ea..35b98663d 100644
+--- a/tools/n83-sweep-runner/src/admission_refusal.rs
++++ b/tools/n83-sweep-runner/src/admission_refusal.rs
+@@ -91,6 +91,79 @@ pub fn account(dir: &Path, receipt_path: &Path, out: &Path) -> R<()> {
+     write(out, &budget)
+ }
+ 
++fn launch_budget(receipt: &Value, prior: &Value) -> R<Value> {
++    require(
++        prior["status"] == "PASS_CHARGE_REFUSAL_WITHIN_ORIGINAL_ARM"
++            && prior["original_arm_worker_allowance_seconds"] == 9000
++            && prior["charged_worker_seconds"] == 13
++            && prior["corrective_worker_ceiling_seconds"] == 8987
++            && prior["charged_plus_corrective_seconds"] == 9000
++            && prior["new_allowance_seconds"] == 0,
++        "original admission charge differs",
++    )?;
++    // Reuse the strict single-command custody and upward rounding checks.
++    let command = remaining_budget(receipt)?;
++    let charged = command["charged_worker_seconds"]
++        .as_u64()
++        .ok_or("charged seconds")?;
++    require(charged < 8987, "no original K2048 time remains")?;
++    Ok(json!({"schema":"n83.launch-refusal-budget/v1",
++        "status":"PASS_CHARGE_LAUNCH_REFUSAL_WITHIN_ORIGINAL_ARM",
++        "original_arm_worker_allowance_seconds":9000,
++        "prior_charged_worker_seconds":13,
++        "recorded_command_seconds":command["recorded_command_seconds"],
++        "additional_charged_worker_seconds":charged,
++        "cumulative_charged_worker_seconds":13+charged,
++        "corrective_worker_ceiling_seconds":8987-charged,
++        "charged_plus_corrective_seconds":9000,"new_allowance_seconds":0,
++        "worker_search_seconds":null,
++        "scope":"charge the whole launch-failed command upward in the same original slot; no new allowance, transfer or automatic retry; separately frozen correction required"}))
++}
++
++pub fn account_launch(dir: &Path, receipt_path: &Path, prior_path: &Path, out: &Path) -> R<()> {
++    let cfg = read(dir.join("config.json"))?;
++    let cleanup = read(dir.join("failure-cleanup.json"))?;
++    let launch = read(dir.join("launcher-error.json"))?;
++    let receipt = read(receipt_path)?;
++    require(
++        cfg["columns"] == 2048
++            && cfg["conflicts"] == 1500000
++            && cfg["wall_seconds"] == 8987
++            && cfg["source_commit"] == receipt["commit"],
++        "specific frozen K2048-c2 launch refusal required",
++    )?;
++    require(
++        cleanup["admitted_as_search_result"] == false
++            && cleanup["cleanup_verified"] == true
++            && cleanup["container_removed"] == true
++            && cleanup["systemd_runtime_cleanup_verified"] == true,
++        "launch cleanup is incomplete",
++    )?;
++    let error = launch["error"].as_str().ok_or("launcher error")?;
++    require(
++        error.starts_with("docker [\"run\",")
++            && error.contains("status exit status: 124")
++            && error.contains("RESOURCE_READY"),
++        "not the frozen bounded Docker launch refusal",
++    )?;
++    require(
++        !dir.join("RESOURCE_READY").exists()
++            && !dir.join("run").exists()
++            && !dir.join("outer.json").exists()
++            && !dir.join("memory-profile.jsonl").exists(),
++        "worker release/search evidence exists; do not classify as pre-search refusal",
++    )?;
++    let mut budget = launch_budget(&receipt, &read(prior_path)?)?;
++    budget["dir"] = json!(dir);
++    budget["receipt_blake3"] = json!(hash(receipt_path)?);
++    budget["prior_budget_blake3"] = json!(hash(prior_path)?);
++    budget["config_blake3"] = json!(hash(dir.join("config.json"))?);
++    budget["cleanup_blake3"] = json!(hash(dir.join("failure-cleanup.json"))?);
++    budget["launcher_error_blake3"] = json!(hash(dir.join("launcher-error.json"))?);
++    budget["original_source_commit"] = cfg["source_commit"].clone();
++    write(out, &budget)
++}
++
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+@@ -135,4 +208,30 @@ mod tests {
+         bad["card_changed"] = json!(true);
+         assert!(remaining_budget(&bad).is_err());
+     }
++    #[test]
++    fn charges_launch_failure_in_the_same_original_slot() {
++        let prior = remaining_budget(&receipt()).unwrap();
++        let mut launch = receipt();
++        launch["commands"][0]["seconds"] = json!(29.838953191);
++        launch["commands"][0]["attempt_log"][0]["seconds"] = json!(29.838953191);
++        let budget = launch_budget(&launch, &prior).unwrap();
++        assert_eq!(budget["additional_charged_worker_seconds"], 30);
++        assert_eq!(budget["cumulative_charged_worker_seconds"], 43);
++        assert_eq!(budget["corrective_worker_ceiling_seconds"], 8957);
++        assert_eq!(budget["charged_plus_corrective_seconds"], 9000);
++        assert_eq!(budget["new_allowance_seconds"], 0);
++        for field in [
++            "status",
++            "charged_worker_seconds",
++            "corrective_worker_ceiling_seconds",
++            "charged_plus_corrective_seconds",
++            "new_allowance_seconds",
++        ] {
++            let mut bad = prior.clone();
++            bad[field] = Value::Null;
++            assert!(launch_budget(&launch, &bad).is_err());
++        }
++        launch["commands"][0]["attempts"] = json!(2);
++        assert!(launch_budget(&launch, &prior).is_err());
++    }
+ }
+diff --git a/tools/n83-sweep-runner/src/main.rs b/tools/n83-sweep-runner/src/main.rs
+index a992abfab..c4d3ac03a 100644
+--- a/tools/n83-sweep-runner/src/main.rs
++++ b/tools/n83-sweep-runner/src/main.rs
+@@ -161,8 +161,9 @@ fn retained_panel(manifest: &Value, columns: u64) -> R<()> {
+ }
+ fn docker_rpc_timeout(args: &[&str]) -> &'static str {
+     // A slow daemon inspection must not discard a completed worker's evidence.
+-    // Mutating operations retain their original deadline and are never retried.
+-    if args.first() == Some(&"inspect") {
++    // Container launch may wait up to 60s inside the existing command envelope.
++    // No mutating request is retried; other mutations retain their 15s deadline.
++    if matches!(args.first(), Some(&"inspect") | Some(&"run")) {
+         "60s"
+     } else {
+         "15s"
+@@ -186,9 +187,10 @@ fn docker(args: &[&str]) -> R<Output> {
+ }
+ 
+ #[test]
+-fn longer_inspection_wait_does_not_extend_or_retry_mutations() {
++fn bounded_launch_and_inspection_wait_keep_other_mutation_deadlines() {
+     assert_eq!(docker_rpc_timeout(&["inspect", "container"]), "60s");
+-    for operation in ["run", "kill", "rm", "logs", "ps", "image", ""] {
++    assert_eq!(docker_rpc_timeout(&["run", "--detach"]), "60s");
++    for operation in ["kill", "rm", "logs", "ps", "image", ""] {
+         assert_eq!(docker_rpc_timeout(&[operation]), "15s");
+     }
+     assert_eq!(docker_rpc_timeout(&[]), "15s");
+@@ -305,7 +307,7 @@ fn memory_profile_refuses_escaping_or_nonunified_cgroups() {
+ fn continuation_budget(columns: u64, conflicts: u64, wall: u64) -> bool {
+     matches!(
+         (columns, conflicts, wall),
+-        (2048, 1_500_000, 8987) | (4096, 1_500_000, 9000)
++        (2048, 1_500_000, 8957) | (4096, 1_500_000, 9000)
+     )
+ }
+ fn memory_limit(v: &Value) -> R<u64> {
+@@ -341,7 +343,7 @@ fn explicit_memory_extension_keeps_legacy_and_control_limits() {
+         (4096, 800000, 4800),
+         (2048, 1000000, 6000),
+         (4096, 1000000, 6000),
+-        (2048, 1500000, 8987),
++        (2048, 1500000, 8957),
+         (4096, 1500000, 9000),
+     ] {
+         let base = json!({"columns":k,"conflicts":conflicts,"wall_seconds":wall,"memory_limit_bytes":8u64<<30});
+@@ -1039,7 +1041,7 @@ fn external_replay(dir: &Path) -> R<Vec<bool>> {
+ 
+ fn validate_run_budget(columns: u64, external: bool, conflicts: u64, wall: u64) -> R<()> {
+     // Exact preregistered natural-panel budgets: K2048 charges the refused
+-    // command inside its original slot, leaving 8987 seconds; K4096 keeps 9000.
++    // command inside its original slot, leaving 8957 seconds; K4096 keeps 9000.
+     // All other natural, witness and external limits retain their ceilings.
+     if !external && continuation_budget(columns, conflicts, wall) {
+         return Ok(());
+@@ -1394,6 +1396,12 @@ fn main() -> R<()> {
+         Some("account-admission-refusal") if a.len() == 5 => {
+             admission_refusal::account(Path::new(&a[2]), Path::new(&a[3]), Path::new(&a[4]))
+         }
++        Some("account-launch-refusal") if a.len() == 6 => admission_refusal::account_launch(
++            Path::new(&a[2]),
++            Path::new(&a[3]),
++            Path::new(&a[4]),
++            Path::new(&a[5]),
++        ),
+         Some("systemd-barrier-smoke") if a.len() == 3 => systemd_scope::smoke(Path::new(&a[2])),
+         Some("prepare-systemd-swap") if a.len() == 4 => {
+             let live = read(&a[2])?;
+@@ -1631,8 +1639,9 @@ fn natural_budget_admits_1m_but_stays_bounded() {
+ #[test]
+ fn continuation_budget_is_an_exact_natural_panel_pair() {
+     assert!(validate_run_budget(2048, false, 1_500_000, 9000).is_err());
+-    assert!(validate_run_budget(4096, false, 1_500_000, 8987).is_err());
+-    for (columns, wall) in [(2048, 8987), (4096, 9000)] {
++    assert!(validate_run_budget(2048, false, 1_500_000, 8987).is_err());
++    assert!(validate_run_budget(4096, false, 1_500_000, 8957).is_err());
++    for (columns, wall) in [(2048, 8957), (4096, 9000)] {
+         assert!(validate_run_budget(columns, false, 1_500_000, wall).is_ok());
+         for (conflicts, wall) in [
+             (1_500_001, wall),

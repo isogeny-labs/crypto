@@ -1,0 +1,102 @@
+{
+  "schema": "source-bound-producer-math-receipt/v1",
+  "date_utc": "2026-11-23",
+  "repo": "isogeny-labs/crypto",
+  "branch": "lane/prime31-s3-pencil-family",
+  "math_note_path": "research/prime31_summation_compression_20261122/iteration10/source_reconstruction_followup/HASSE_Q8_EXPLICIT_GENERATOR_REGRESSION.md",
+  "math_note_git_blob": "7a36dd405e362c0a9a84cdeebdbd060caad90b29",
+  "input_source_commit": "e9d788b0ea603db0fdcc1935b3f6858389ddcdd8",
+  "prior_math_note": "research/prime31_summation_compression_20261122/iteration10/source_reconstruction_followup/HASSE_Q8_CYCLIC_117_BSGS_FAILURE.md",
+  "standalone_reconstructed_candidate_git_blob": "616422524711c1dd0e54b6bb6c557348b999e262",
+  "field": {
+    "m": 3,
+    "modulus_bits": 11,
+    "modulus_polynomial": "z^3+z+1",
+    "coefficient_encoding": "3 bits, a0 + 2a1 + 4a2"
+  },
+  "curve": {
+    "f": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      1
+    ],
+    "h": [
+      1
+    ],
+    "genus": 2,
+    "jacobian_order_from_prior_note": 117
+  },
+  "generator": {
+    "u": [
+      2,
+      1
+    ],
+    "v": [
+      6
+    ],
+    "order": 117
+  },
+  "proof_witnesses": {
+    "9": {
+      "u": [
+        5,
+        1,
+        1
+      ],
+      "v": [
+        4,
+        5
+      ]
+    },
+    "39": {
+      "u": [
+        1,
+        1,
+        1
+      ],
+      "v": []
+    },
+    "78": {
+      "u": [
+        1,
+        1,
+        1
+      ],
+      "v": [
+        1
+      ]
+    },
+    "117": {
+      "u": [
+        1
+      ],
+      "v": []
+    }
+  },
+  "producer_checks": {
+    "distinct_powers": 117,
+    "sequential_vs_binary_scalar_matches": 117,
+    "sampled_pair_addition_grid": "i=7a, j=7b for integers 0<=a,b<=16",
+    "sampled_pair_additions_checked": 289,
+    "reduced_divisor_relation": "u divides v²+v+f checked for displayed multiples"
+  },
+  "actual_invocations": {
+    "native_workers": 0,
+    "rust_compilations": 0,
+    "original_root_tests": 0,
+    "timed_cryptographic_runs": 0,
+    "remote_validator_signatures": 0
+  },
+  "limitations": [
+    "Producer mathematical Cantor computation only",
+    "No independent reviewer or native Rust",
+    "No change to production source",
+    "CI at the new commit pending; earlier original-root all-targets failure retained",
+    "Not a Prime31 S3 speedup"
+  ],
+  "required_next": "Independently reconstruct the 9D and 39D Mumford pairs; frozen original-root old/fixed divisor_order_bsgs test after a both-parent-preserving repair, then resume actual Prime31 sublinear exact-query gate",
+  "claim_status": "unverified; no claim-ledger promotion"
+}

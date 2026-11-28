@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T03:03:33Z",
+ "id": "PCC-20261116-067d85",
+ "kind": "statement",
+ "producer": {
+  "commit": "d3bb7bdc00d3a48db275de159dfc3075384efa6a",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-historical-source-data-controls-01/actual-test.exit.xz",
+    "sha256": "f6ebd6f6f27ee66402036ad8c7d4cf1e86dfe3dcfd0125e9c1ecbefef91ece4d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-historical-source-data-controls-01/all11-entire-original-fixtures.tar.xz",
+    "sha256": "a680eb52116577fdb2127dba8fec0ec1aed0a945a9a7bc9c93ea44ba4a40968d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-historical-source-data-controls-01/prepare_historical_workflow_data_02.py",
+    "sha256": "fa8d2223616d32f557ee99bbab543f8b734a7d81dae87d07282ebbcd62d1cc71"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-historical-source-data-controls-01/scope.txt",
+    "sha256": "e230baf54f018b4bb4a72e216459df833acfbe04974bd4b5cf2d5b53c363b651"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-historical-source-data-controls-01/test_historical_workflow_data_02.py",
+    "sha256": "62fa6b95a630503164c54ab6ecfc094f14019e67714c32ecfc51e71c28d7513c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-historical-source-data-controls-01/whole-original-test.stderr.xz",
+    "sha256": "2f3ef3c79f696d22a111e64980d2448374ea18b341016703ee41ddf52c3e3c7c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/pcc-historical-source-data-controls-01/whole-original-test.stdout.xz",
+    "sha256": "0040f94d11d0039505328a90b2ff48968db873e9e7967307631bf40ef5679275"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Historical workflow unsigned data-address controls01: all11 metadata tests0 using the unchanged original verify_attestation. Positive flow preserves the entire actual current Git source, resolves only the one historical workflow data address to exact old canonical bytes, remains not_covered, then restores actual current source regular and exact. Authentic historical data fail against different current bytes before/after; they are not current execution evidence. Whole fixture tar/source/outputs retained. Changed canonical/claim/held bytes, non-data claims, conflicting/undeclared users, outside/missing data, modified/symlinked live source, unrelated cleanup and wrong address/in-repo hold reject. Main workspace workflow/verifier/keyring/claims/ledger unchanged by these controls. Archive hydration and actual required CI still pending."
+}

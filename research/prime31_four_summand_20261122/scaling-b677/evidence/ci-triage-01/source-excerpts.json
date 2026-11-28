@@ -1,0 +1,26 @@
+{
+  "path": "src/cryptanalysis/binary_hyperelliptic_index_calculus.rs",
+  "shared_git_blob": "f001a1b641abd48bb0130c1a9a246e37c28bcc3a",
+  "source_text_returned_for_core_equals_source_text_returned_for_base": true,
+  "tool_observed_urls": [
+    "https://api.github.com/repos/isogeny-labs/crypto/contents/src/cryptanalysis/binary_hyperelliptic_index_calculus.rs?ref=5e536ed93302def2122968aa880b22c4b675d516",
+    "https://api.github.com/repos/isogeny-labs/crypto/contents/src/cryptanalysis/binary_hyperelliptic_index_calculus.rs?ref=816f9c3a942efed569049618c056d12a0c56d693"
+  ],
+  "excerpts": [
+    {
+      "first_line": 73,
+      "last_line": 103,
+      "text": "/// The degree-one factor base, plus the `x ↦ index` map the decomposition\n/// needs.\npub struct BhecFactorBase {\n    pub entries: Vec<BhecFactorBaseEntry>,\n    by_x: HashMap<BigUint, usize>,\n\nimpl BhecFactorBase {\n    pub fn len(&self) -> usize {\n        self.entries.len()\n    }\n\n    pub fn is_empty(&self) -> bool {\n        self.entries.is_empty()\n\n    pub fn index_of_x(&self, x: &BigUint) -> Option<usize> {\n        self.by_x.get(x).copied()\n\n/// Solve `y^2 + h(x) y = f(x)` for the canonical representative of the\n/// `±` pair at abscissa `x`.\n///\n/// When `h(x) = 0` the equation is `y^2 = f(x)`, which has a unique root in\n/// `F_{2^m}`.  When `h(x) ≠ 0`, substitute `y = h(x)·z`; the equation\n/// becomes the Artin–Schreier equation\n/// ```text\n///   z^2 + z = f(x) / h(x)^2.\n/// ```\n/// It has two solutions when the absolute trace of the right-hand side is\n/// zero and none when the trace is one, so not every abscissa contributes a\n/// factor-base column.  The two roots are `y` and `y + h(x)`; the one with\n/// the smaller integer encoding is stored.\npub fn affine_point_for_x(curve: &HyperellipticCurve, x: &F2mElement) -> Option<F2mElement> {\n"
+    },
+    {
+      "first_line": 630,
+      "last_line": 658,
+      "text": "/// Split the trial budget across independent walks and merge the rows.\n/// The walks are independent, so this needs no locking on the group\n/// operations and no shared distinguished-point table: each worker returns\n/// a private relation list, and the linear algebra sees the concatenation.\nfn collect_relations_parallel(\n    let threads = params.threads.max(1).min(wanted.max(1));\n    if threads == 1 {\n        return collect_relations(curve, d1, d2, n, fb, wanted, params, report);\n    let per_thread = wanted / threads + 1;\n    let trial_budget = params.max_trials / threads + 1;\n    let chunks: Vec<(Vec<HecRelation>, HecIndexCalculusReport)> = std::thread::scope(|scope| {\n        let mut handles = Vec::with_capacity(threads);\n        for t in 0..threads {\n            let mut local = params.clone();\n            local.seed ^= (t as u64).wrapping_mul(0x9e37_79b9_7f4a_7c15);\n            local.max_trials = trial_budget;\n            handles.push(scope.spawn(move || {\n                let mut local_report = HecIndexCalculusReport::default();\n                let relations =\n                    collect_relations(curve, d1, d2, n, fb, per_thread, &local, &mut local_report);\n                (relations, local_report)\n            }));\n        handles\n            .into_iter()\n            .map(|handle| handle.join().expect(\"relation worker panicked\"))\n            .collect()\n    });\n\n    for (rows, local) in chunks {\n"
+    },
+    {
+      "first_line": 1214,
+      "last_line": 1233,
+      "text": "    let g = curve.genus;\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    }
+  ]
+}

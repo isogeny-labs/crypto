@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T05:14:21Z",
+ "id": "PCC-20261117-b9e8ca",
+ "kind": "statement",
+ "producer": {
+  "commit": "770f2ae7892699bcc2b478be8110cdb5cebaa6c0",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/opaque_km_boundary.cpp",
+    "sha256": "49e50d5e49fc69c09ed075997db948fe12c4b600679ae33ccf76122b62e8b699"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/OPAQUE_KM_BOUNDARY_PROTOCOL.md",
+    "sha256": "da5f7c11691d0ed44ce5814c2dbcb3f1a21ebf4ae107ed250d07ee0627301204"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/opaque-km-boundary-v1/result.json",
+    "sha256": "fee3507f6a2e6b6f1ece209ca6af4adac31d869a6f157619d9b4f64db01c6a74"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "pcc/claims/PCC-20261117-ef5e0c.json",
+    "sha256": "10baf53606db9494f8f319a3b276db8193d607b0bf2e781f2982c7d2c18b02ff"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "nist-cover-opaque-km",
+ "statement": "Producer opaque-KM boundary qualifier passes a canonical-minus-point case with RR dimension2, plus fixed nonflex triple-point and nontangent double-plus-single cases with dimension1. Reencoding and direct point-divisor dual answers agree in all three; repeated output supports retain exact multiplicities3 and2+1, with changed-y/result controls. Frozen opaque decoder source unchanged; not independent verification."
+}

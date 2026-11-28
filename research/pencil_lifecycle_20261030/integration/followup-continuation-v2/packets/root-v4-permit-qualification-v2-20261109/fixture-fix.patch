@@ -1,0 +1,11 @@
+--- v1/qualify-permit.py
++++ v2/qualify-permit.py
+@@ -61,7 +61,7 @@
+ class DateTime(datetime.datetime):
+  @classmethod
+  def now(cls,tz=None):return datetime.datetime.fromtimestamp(100,tz)
+-class DT:datetime=DateTime;timezone=datetime.timezone
++class DT:timezone=datetime.timezone;datetime=DateTime
+ def supervisor(cleaning=False,interrupt=False,state='active',owner='owner',cgroup='/same',attempted=True):
+  clock=Clock();writes=[];order=[]
+  class Dest:

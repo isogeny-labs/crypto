@@ -1,0 +1,11 @@
+name = "weil_mixed_level_audit"
+version = "0.1.0"
+defaultTargets = ["WeilMixedLevelAudit"]
+
+[[require]]
+name = "weil_dyadic_audit"
+path = "../../weil_dyadic_audit_20261116/lean"
+
+[[lean_lib]]
+name = "WeilMixedLevelAudit"
+roots = ["MixedImports", "MixedTransport", "MixedNondegenerate", "MixedRadical", "MixedControls", "MixedCertificate"]

@@ -1,0 +1,74 @@
+{
+  "schema": "gaudry.cubic.local-run/v1",
+  "backend": "local_user_authorized",
+  "source_revision": "73efa9eb54b7d6d329639fb704ae1aab240de0f1",
+  "binary_sha256": "30c80a7ea8784369f5ac4b02272b5f8afec07faf4d2109469c33397baa3512c1",
+  "primes": [
+    127,
+    523,
+    1039
+  ],
+  "seeds": [
+    157,
+    163,
+    167
+  ],
+  "oracles": [
+    "DelayedPseudoRemainderPairOnly",
+    "PreparedSymmetricPairOnly",
+    "PseudoRemainderPairOnly"
+  ],
+  "oracle_cli": "delayed-pseudo-pair,prepared-pair,pseudo-pair",
+  "rounds": 5,
+  "warmup_rounds": 1,
+  "max_residuals": 500000,
+  "timeout_seconds": 900,
+  "memory_gib": 8,
+  "automatic_retries": 0,
+  "aa_tolerance": 1.10,
+  "bootstrap_draws": 10000,
+  "bootstrap_seed": 20261115,
+  "parity_min_subgroup_order": 1073741824,
+  "reference_scope": "existing_cubic_radding_reference_not_fastest_external",
+  "purpose": "full_cold_IC_guarded_delayed_polynomial_ablation",
+  "sampler": "r-adding-long",
+  "component_hashes": "validation/delayed-poly-source.sha256",
+  "engine_environment": {
+    "F4_FP_THREAD_OPS": "0",
+    "F4_STAIR": "counter",
+    "F4_FP_NARROW": "2",
+    "F4_FP_SYMBOLIC_PAR": "1",
+    "F4_FP_PACKED": "1",
+    "F4_FP_GM": "1",
+    "F4_FP_DEFERRED_PAR": "1",
+    "F4_FP_FL": "1",
+    "F4_FP_FL_BLOCKED": "1",
+    "F4_FP_LINEAR_INTERREDUCE": "1",
+    "simd": "CPU automatic; all SIMD overrides cleared",
+    "debug_and_gaudry_environment": "cleared",
+    "RAYON_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1"
+  },
+  "paired_oracles": [
+    [
+      "PreparedSymmetricPairOnly",
+      "PseudoRemainderPairOnly"
+    ],
+    [
+      "PseudoRemainderPairOnly",
+      "DelayedPseudoRemainderPairOnly"
+    ],
+    [
+      "PreparedSymmetricPairOnly",
+      "DelayedPseudoRemainderPairOnly"
+    ]
+  ],
+  "record_start_events": true,
+  "paired_semantic_oracles": [
+    [
+      "PseudoRemainderPairOnly",
+      "DelayedPseudoRemainderPairOnly"
+    ]
+  ],
+  "pinned_cpu": "0"
+}

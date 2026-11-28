@@ -1,0 +1,260 @@
+name: pcc-gate
+
+# Contract: docs/SABOTAGE_RESISTANCE.md. The `gate` job runs on every pull
+# request and push: it runs the sabotage canaries, checks the hash-chained
+# ledger against the base branch, re-verifies every claim and lints prose.
+# The `sign` job runs only on main with the repository secret PCC_SIGNING_KEY,
+# which no producer session holds, and appends signed verdicts to the ledger.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    concurrency:
+      group: ${{ github.event_name == 'pull_request' && format('pcc-gate-{0}', github.ref) || format('pcc-gate-run-{0}', github.run_id) }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - name: Initialize historical data-address custody
+        run: |
+          mkdir "$RUNNER_TEMP/pcc-source-address-custody-02"
+          date -u +%FT%TZ > "$RUNNER_TEMP/pcc-source-address-custody-02/start.txt"
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/chained_jacobian_transfers_20261110/evidence/genus3-artifact-publication-01/whole-raw.tar.xz research/chained_jacobian_transfers_20261110/evidence/genus3-root-regression-01/members.json.xz research/chained_jacobian_transfers_20261110/evidence/public-n4-comparator-index-sidecar-01/complete-current-guard.json.xz research/chained_jacobian_transfers_20261110/evidence/public-n4-comparator-index-sidecar-01/whole-failed-staged-index.xz research/chained_jacobian_transfers_20261110/evidence/public-n4-concurrent-main-merge-ledger-divergence-01/entire-original-publication-and-remote-divergence-evidence.tar.xz research/chained_jacobian_transfers_20261110/evidence/PCC-current-source-CI-success-02/entire-original-artifact.zip research/chained_jacobian_transfers_20261110/evidence/research-queue-checkpoint-20261116-0400/whole-prior-local-QUEUE.md.xz research/chained_jacobian_transfers_20261110/evidence/complete-CI-current-bot-integration-03/entire-current-hold.json.xz research/chained_jacobian_transfers_20261110/evidence/complete-CI-current-bot-integration-03/entire-published-source-ledger.jsonl.xz research/chained_jacobian_transfers_20261110/evidence/complete-runtime-progress-bot-integration-04/entire-current-hold.json.xz research/chained_jacobian_transfers_20261110/evidence/complete-runtime-progress-bot-integration-04/entire-published-source-ledger.jsonl.xz research/chained_jacobian_transfers_20261110/evidence/cubic-norm-final-guarded-integration-08/entire-current-hold.json.xz research/chained_jacobian_transfers_20261110/evidence/cubic-norm-final-guarded-integration-08/entire-published-source-ledger.jsonl.xz research/chained_jacobian_transfers_20261110/evidence/cubic-word-prepublication-genuine-bot-integration-04/entire-current-hold.json.xz research/chained_jacobian_transfers_20261110/evidence/cubic-word-prepublication-genuine-bot-integration-04/entire-published-source-ledger.jsonl.xz
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Capture actual current source and authentic historical data separately
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/pcc-source-address-custody-02"
+          git rev-parse HEAD > "$out/actual-source-head.txt"
+          cp .github/workflows/pcc-gate.yml "$out/entire-actual-current-workflow.yml"
+          cp research/chained_jacobian_transfers_20261110/evidence/pcc-historical-workflow-source-02/pcc-gate-before-archive-preparation.yml "$out/entire-authentic-historical-workflow.yml"
+          cp research/chained_jacobian_transfers_20261110/PCC_HISTORICAL_WORKFLOW_ADDRESS_02.json "$out/exact-address-manifest.json"
+          cp pcc/ledger.jsonl "$out/whole-ledger-before.jsonl"
+          sha256sum tools/pcc/pcc.py pcc/keyring.json pcc/claims/PCC-20261116-b55dd4.json .github/workflows/pcc-gate.yml > "$out/actual-source-before.sha256"
+      - name: Restore the exact historical unsigned data address
+        run: |
+          set -euo pipefail
+          if [ ! -d /workspace/scratch ]; then
+            sudo install -d -m 0755 -o "$(id -u)" -g "$(id -g)" /workspace/scratch
+          fi
+          python3 tools/pcc/prepare_legacy_evidence_aliases.py \
+            --manifest research/chained_jacobian_transfers_20261110/PCC_LEGACY_EVIDENCE_ADDRESSES_01.json \
+            --receipt "$RUNNER_TEMP/pcc-legacy-addresses.json"
+      - name: Fetch the base tip
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
+        run: |
+          git fetch --no-tags --depth=1 --filter=blob:none origin \
+            "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
+          git rev-parse --verify "origin/$BASE_REF^{commit}"
+      - name: Sabotage canaries are all rejected
+        run: python3 tools/pcc/pcc.py canary
+      - name: Ledger chain holds, and the base ledger is a prefix (pull request)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
+        run: python3 tools/pcc/pcc.py ledger verify --base "origin/$BASE_REF"
+      - name: Ledger chain holds (push)
+        if: github.event_name != 'pull_request'
+        run: python3 tools/pcc/pcc.py ledger verify
+      - name: Prepare authentic historical workflow bytes for unsigned data replay
+        run: |
+          python3 tools/pcc/prepare_historical_workflow_data_02.py \
+            --manifest research/chained_jacobian_transfers_20261110/PCC_HISTORICAL_WORKFLOW_ADDRESS_02.json \
+            --receipt "$RUNNER_TEMP/pcc-historical-workflow-view-02/receipt.json"
+      - name: Every claim verifies (exit 2, not covered, is allowed; exit 1 fails)
+        run: python3 tools/pcc/pcc.py verify-all || [ $? -eq 2 ]
+      - name: Restore the exact actual current workflow source
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/pcc-historical-workflow-view-02/receipt.json" ]; then
+            python3 tools/pcc/prepare_historical_workflow_data_02.py --restore --receipt "$RUNNER_TEMP/pcc-historical-workflow-view-02/receipt.json"
+          fi
+          git diff --exit-code HEAD -- .github/workflows/pcc-gate.yml
+      - name: PR body is strict - a strong-claim word needs [pcc:ID] or [pcc:unverified]
+        if: github.event_name == 'pull_request'
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: printf '%s' "$PR_BODY" | python3 tools/pcc/pcc.py lint-prose --stdin
+      - name: Advisory prose lint of changed session logs and reports
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          BASE_REF: ${{ github.base_ref || 'main' }}
+        run: |
+          files=$(git diff --name-only "origin/$BASE_REF...HEAD" | grep -E '^docs/session-logs/.*\.md$|(^|/)(REPORT|README)\.md$' || true)
+          if [ -z "$files" ]; then echo "no session logs or reports changed"; exit 0; fi
+          # shellcheck disable=SC2086
+          python3 tools/pcc/pcc.py lint-prose $files
+      - name: pcc tests
+        run: |
+          python3 tools/pcc/test_pcc.py
+          python3 -m unittest tools/pcc/test_legacy_evidence_aliases.py -v
+          python3 -m unittest tools/pcc/test_historical_workflow_data_02.py -v
+      - name: Remove only the legacy address created by this job
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/pcc-legacy-addresses.json" ]; then
+            python3 tools/pcc/prepare_legacy_evidence_aliases.py --cleanup --receipt "$RUNNER_TEMP/pcc-legacy-addresses.json"
+          fi
+
+      - name: Retain complete current and historical data-address custody
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pcc-source-address-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/pcc-source-address-custody-02
+            ${{ runner.temp }}/pcc-historical-workflow-view-02
+            ${{ runner.temp }}/pcc-legacy-addresses.json
+          if-no-files-found: error
+
+  sign:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    concurrency:
+      group: pcc-sign
+      cancel-in-progress: false
+    steps:
+      - name: Initialize historical data-address custody
+        run: |
+          mkdir "$RUNNER_TEMP/pcc-source-address-custody-02"
+          date -u +%FT%TZ > "$RUNNER_TEMP/pcc-source-address-custody-02/start.txt"
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Pull store data this workflow reads (tools/artifacts)
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/chained_jacobian_transfers_20261110/evidence/genus3-artifact-publication-01/whole-raw.tar.xz research/chained_jacobian_transfers_20261110/evidence/genus3-root-regression-01/members.json.xz research/chained_jacobian_transfers_20261110/evidence/public-n4-comparator-index-sidecar-01/complete-current-guard.json.xz research/chained_jacobian_transfers_20261110/evidence/public-n4-comparator-index-sidecar-01/whole-failed-staged-index.xz research/chained_jacobian_transfers_20261110/evidence/public-n4-concurrent-main-merge-ledger-divergence-01/entire-original-publication-and-remote-divergence-evidence.tar.xz research/chained_jacobian_transfers_20261110/evidence/PCC-current-source-CI-success-02/entire-original-artifact.zip research/chained_jacobian_transfers_20261110/evidence/research-queue-checkpoint-20261116-0400/whole-prior-local-QUEUE.md.xz research/chained_jacobian_transfers_20261110/evidence/complete-CI-current-bot-integration-03/entire-current-hold.json.xz research/chained_jacobian_transfers_20261110/evidence/complete-CI-current-bot-integration-03/entire-published-source-ledger.jsonl.xz research/chained_jacobian_transfers_20261110/evidence/complete-runtime-progress-bot-integration-04/entire-current-hold.json.xz research/chained_jacobian_transfers_20261110/evidence/complete-runtime-progress-bot-integration-04/entire-published-source-ledger.jsonl.xz research/chained_jacobian_transfers_20261110/evidence/cubic-norm-final-guarded-integration-08/entire-current-hold.json.xz research/chained_jacobian_transfers_20261110/evidence/cubic-norm-final-guarded-integration-08/entire-published-source-ledger.jsonl.xz research/chained_jacobian_transfers_20261110/evidence/cubic-word-prepublication-genuine-bot-integration-04/entire-current-hold.json.xz research/chained_jacobian_transfers_20261110/evidence/cubic-word-prepublication-genuine-bot-integration-04/entire-published-source-ledger.jsonl.xz
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Capture actual current source and authentic historical data separately
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/pcc-source-address-custody-02"
+          git rev-parse HEAD > "$out/actual-source-head.txt"
+          cp .github/workflows/pcc-gate.yml "$out/entire-actual-current-workflow.yml"
+          cp research/chained_jacobian_transfers_20261110/evidence/pcc-historical-workflow-source-02/pcc-gate-before-archive-preparation.yml "$out/entire-authentic-historical-workflow.yml"
+          cp research/chained_jacobian_transfers_20261110/PCC_HISTORICAL_WORKFLOW_ADDRESS_02.json "$out/exact-address-manifest.json"
+          cp pcc/ledger.jsonl "$out/whole-ledger-before.jsonl"
+          sha256sum tools/pcc/pcc.py pcc/keyring.json pcc/claims/PCC-20261116-b55dd4.json .github/workflows/pcc-gate.yml > "$out/actual-source-before.sha256"
+      - name: Restore the exact historical unsigned data address
+        run: |
+          set -euo pipefail
+          if [ ! -d /workspace/scratch ]; then
+            sudo install -d -m 0755 -o "$(id -u)" -g "$(id -g)" /workspace/scratch
+          fi
+          python3 tools/pcc/prepare_legacy_evidence_aliases.py \
+            --manifest research/chained_jacobian_transfers_20261110/PCC_LEGACY_EVIDENCE_ADDRESSES_01.json \
+            --receipt "$RUNNER_TEMP/pcc-legacy-addresses.json"
+      - name: Prepare authentic historical workflow bytes for unsigned data replay
+        run: |
+          python3 tools/pcc/prepare_historical_workflow_data_02.py \
+            --manifest research/chained_jacobian_transfers_20261110/PCC_HISTORICAL_WORKFLOW_ADDRESS_02.json \
+            --receipt "$RUNNER_TEMP/pcc-historical-workflow-view-02/receipt.json"
+      - name: Sign verdicts for claims that do not stand
+        env:
+          PCC_SIGNING_KEY: ${{ secrets.PCC_SIGNING_KEY }}
+        run: |
+          if [ -z "$PCC_SIGNING_KEY" ]; then
+            echo "::notice::PCC_SIGNING_KEY is not set; no verdicts signed"
+            exit 0
+          fi
+          KEYFILE="$(mktemp)"
+          trap 'rm -f "$KEYFILE"' EXIT
+          chmod 600 "$KEYFILE"
+          printf '%s' "$PCC_SIGNING_KEY" > "$KEYFILE"
+          for f in pcc/claims/*.json; do
+            [ -e "$f" ] || continue
+            id="$(basename "$f" .json)"
+            if ! python3 tools/pcc/pcc.py standing "$id"; then
+              python3 tools/pcc/pcc.py verdict --sign-key "$KEYFILE" --key-id ci-main "$id" || true
+            fi
+          done
+          python3 tools/pcc/prepare_historical_workflow_data_02.py --restore --receipt "$RUNNER_TEMP/pcc-historical-workflow-view-02/receipt.json"
+          if [ -n "$(git status --porcelain pcc/ledger.jsonl)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add pcc/ledger.jsonl
+            git commit -m "pcc: signed verdicts for ${GITHUB_SHA}"
+            git push origin HEAD:main
+          fi
+
+      - name: Restore the exact actual current workflow source
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/pcc-historical-workflow-view-02/receipt.json" ]; then
+            python3 tools/pcc/prepare_historical_workflow_data_02.py --restore --receipt "$RUNNER_TEMP/pcc-historical-workflow-view-02/receipt.json"
+          fi
+          git diff --exit-code HEAD -- .github/workflows/pcc-gate.yml
+      - name: Remove only the legacy address created by this signing job
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/pcc-legacy-addresses.json" ]; then
+            python3 tools/pcc/prepare_legacy_evidence_aliases.py --cleanup --receipt "$RUNNER_TEMP/pcc-legacy-addresses.json"
+          fi
+
+      - name: Retain complete current and historical data-address custody
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pcc-source-address-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/pcc-source-address-custody-02
+            ${{ runner.temp }}/pcc-historical-workflow-view-02
+            ${{ runner.temp }}/pcc-legacy-addresses.json
+          if-no-files-found: error

@@ -1,0 +1,37 @@
+#!/bin/bash
+# Thin command-mode payload. External budget/freeze/checkpoint admission is required.
+set -euo pipefail
+refuse() { printf 'REFUSED: %s\n' "$1" >&2; exit 2; }
+[[ $# == 4 ]] || refuse 'run-field --pilot|--generate BITS NONCE ACK_FROZEN_CHECKPOINT'
+[[ ${ISOLAB_CRIU:-} == 1 ]] || refuse 'command recovery supervisor marker required'
+[[ $1 == --pilot || $1 == --generate ]] || refuse 'mode'
+case $2 in 192|224|239|256|384|521) ;; *) refuse 'one frozen field required';; esac
+[[ $3 =~ ^[0-9a-f]{64}$ ]] || refuse '32-byte lowercase nonce required'
+[[ $4 == ACK_FROZEN_CHECKPOINT ]] || refuse 'checkpoint acknowledgement required'
+for nist_env_name in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN \
+    AWS_PROFILE AWS_ROLE_ARN AWS_WEB_IDENTITY_TOKEN_FILE AWS_CONTAINER_CREDENTIALS_FULL_URI \
+    AWS_CONTAINER_CREDENTIALS_RELATIVE_URI; do
+    [[ ! -v $nist_env_name ]] || refuse 'AWS identity must not enter payload'
+done
+nist_output=${ISOLAB_OUTPUT_DIR:-}
+[[ $nist_output == /work/compute/* && -d $nist_output && ! -L $nist_output ]] ||
+    refuse 'existing controller output directory under /work/compute required'
+[[ $(realpath -e -- "$nist_output") == "$nist_output" ]] || refuse 'normalized output directory required'
+[[ $(stat -c %u -- "$nist_output") == "$(id -u)" ]] || refuse 'output owner differs from payload'
+nist_task=$nist_output/field-$2
+mkdir -m 700 -- "$nist_task" || refuse 'field output already exists; retain original'
+(
+    cd /
+    sha256sum -c /opt/nist/PAYLOAD.sha256
+) > "$nist_task/payload.stdout" 2> "$nist_task/payload.stderr"
+nist_cohort=/opt/nist/source/strict_elkies_20261029/inputs.tsv
+nist_target=10000
+[[ $1 != --pilot ]] || nist_target=10
+# CRIU restores this process tree. No process-level retry or new nonce is added.
+/opt/nist/bin/sampler_resume "$1" "$nist_cohort" "$2" "$3" \
+    "$nist_task/journal" NEW "$4" > "$nist_task/producer.stdout" 2> "$nist_task/producer.stderr"
+# This deliberately recounts every mapped rejected curve as well as accepted rows.
+/opt/nist/bin/journal_check verify "$nist_cohort" "$2" "$3" \
+    "$nist_task/journal/attempts.tsv" "$nist_task/journal/accepted.tsv" sampler-v1 "$nist_target" \
+    > "$nist_task/replay.json" 2> "$nist_task/replay.stderr"
+printf 'Native producer and separate full-journal reader exited zero; signed admission pending.\n'

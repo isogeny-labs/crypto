@@ -1,0 +1,12 @@
+{
+  "schema": "xedni-fixed-curve-lean-bridge-protocol-v1",
+  "source_square_denominator_lean_sha256": "f6f5a0024e739db4ecbdfbca26d51793bf8cf974cde171872ea064e2fb1ceb41",
+  "source_generator_sha256": "53fd653948c4376920c4d0ee2d53f2db275ebd7be5004d50f73d5d68986ade4e",
+  "source_minimum_height_sha256": "5b349e9a3609ccfd79711c23b44844b74b934bbd8bcf6256dafc72be8a131bbb",
+  "curve_a_invariants": ["0", "-47", "0", "751", "-3997"],
+  "theorem_goal": "Every nonidentity Mathlib rational point on the fixed curve has x=a/b^2 with b>0 and gcd(abs(a),b)=1",
+  "generalization_goal": "Prove the square-denominator representation for every integral short Weierstrass equation y^2=x^3+A*x^2+B*x+C",
+  "point_bridge_goal": "Connect the general affine result to Mathlib's WeierstrassCurve.Affine Point type for the exact fixed curve",
+  "proof_policy": "Pinned Lean toolchain and Mathlib manifest; build and print axioms; no sorry or custom research axiom",
+  "boundary": "This closes only the coordinate-representation input; Mordell-Weil generation, reduction and canonical-height comparison remain separate obligations"
+}

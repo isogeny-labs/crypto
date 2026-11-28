@@ -1,0 +1,85 @@
+import Mathlib.Order.Iterate
+import Mathlib.Algebra.Order.Field.Rat
+import Mathlib.Algebra.Order.Field.GeomSum
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Data.Nat.Basic
+import Mathlib.Tactic.Linarith
+import CryptoLeanCore.TaperedPrecision
+
+/-!
+Finite numeric history instance of the native D.11 precision expression.
+This does not extract histories from Rust or prove actual graph admission.
+-/
+
+open Finset
+open CryptoLeanCore.TaperedPrecision
+
+namespace NativePrecisionHistory
+
+theorem inherited_precision_le
+    (s A d : Nat) (M u a i p : Nat → Nat)
+    (hroot : M 0 ≤ s) (hpzero : p 0 ≤ s)
+    (hshrink : ∀ k < d, 8 * M (k + 1) ≤ M k)
+    (hscale : ∀ k < d, 0 < u k ∧ u k ≤ M k)
+    (hexponent : ∀ k < d, a k ≤ A)
+    (hprecision : ∀ k < d,
+      p (k + 1) = childPrecision (p k) (M k) (u k) (a k) (i k)) :
+    p d ≤ 81 * s * 2 ^ A := by
+  have hstep (k : Nat) (hk : k < d) :
+      (M (k + 1) : ℚ) ≤ (1 / 8 : ℚ) * (M k : ℚ) := by
+    have hs : (8 : ℚ) * (M (k + 1) : ℚ) ≤ (M k : ℚ) := by
+      exact_mod_cast hshrink k hk
+    linarith
+  have hgeo (j : Nat) (hj : j < d) :
+      (M j : ℚ) ≤ (1 / 8 : ℚ) ^ j * (s : ℚ) :=
+    (monotone_mul_left_of_nonneg (by norm_num : (0 : ℚ) ≤ 1 / 8)).seq_le_seq
+      (x := fun k => (M k : ℚ)) (y := fun k => (1 / 8 : ℚ) ^ k * (s : ℚ))
+      j (by simpa using (show (M 0 : ℚ) ≤ (s : ℚ) from by exact_mod_cast hroot))
+      (fun k hk => hstep k (Nat.lt_trans hk hj))
+      (fun k _ => by simp only [pow_succ', mul_assoc]; exact le_rfl)
+  have hgeom : ∑ j ∈ range d, (1 / 8 : ℚ) ^ j ≤ 8 / 7 := by
+    have g := geom_sum_Ico_le_of_lt_one (K := ℚ) (m := 0) (n := d)
+      (x := 1 / 8) (by norm_num) (by norm_num)
+    norm_num at g
+    exact g
+  have hmassQ : ∑ j ∈ range d, (M j : ℚ) ≤ 2 * (s : ℚ) := by
+    calc
+      _ ≤ ∑ j ∈ range d, (1 / 8 : ℚ) ^ j * (s : ℚ) :=
+        sum_le_sum (fun j hj => hgeo j (mem_range.mp hj))
+      _ = (∑ j ∈ range d, (1 / 8 : ℚ) ^ j) * (s : ℚ) := (sum_mul _ _ _).symm
+      _ ≤ (8 / 7 : ℚ) * (s : ℚ) :=
+        mul_le_mul_of_nonneg_right hgeom (Nat.cast_nonneg s)
+      _ ≤ 2 * (s : ℚ) := by nlinarith [Nat.cast_nonneg (R := ℚ) s]
+  have hmass : ∑ j ∈ range d, M j ≤ 2 * s := by exact_mod_cast hmassQ
+  have hsum : (∑ j ∈ range d, childPrecision 0 (M j) (u j) (a j) (i j)) ≤
+      80 * s * 2 ^ A := by
+    calc
+      _ ≤ ∑ j ∈ range d, (40 * 2 ^ A) * M j := by
+        apply sum_le_sum
+        intro j hj
+        have hjd := mem_range.mp hj
+        calc
+          _ ≤ 40 * M j * 2 ^ (a j) :=
+            increment_le _ _ _ _ (hscale j hjd).1 (hscale j hjd).2
+          _ ≤ 40 * M j * 2 ^ A :=
+            Nat.mul_le_mul_left _ (Nat.pow_le_pow_right (by decide) (hexponent j hjd))
+          _ = (40 * 2 ^ A) * M j := by ac_rfl
+      _ = (40 * 2 ^ A) * (∑ j ∈ range d, M j) := (mul_sum _ _ _).symm
+      _ ≤ (40 * 2 ^ A) * (2 * s) := Nat.mul_le_mul_left _ hmass
+      _ = 80 * s * 2 ^ A := by omega
+  have htel (n : Nat) (hn : n ≤ d) :
+      p n = p 0 + ∑ j ∈ range n, childPrecision 0 (M j) (u j) (a j) (i j) := by
+    induction n with
+    | zero => simp
+    | succ n ih =>
+      rw [hprecision n (by omega), childPrecision_formula,
+        ih (by omega), sum_range_succ, childPrecision_formula]
+      omega
+  have hpstart : p 0 ≤ s * 2 ^ A :=
+    Nat.le_trans hpzero (Nat.le_mul_of_pos_right _ (Nat.pow_pos (by decide)))
+  rw [htel d (by omega)]
+  calc
+    _ ≤ s * 2 ^ A + 80 * s * 2 ^ A := Nat.add_le_add hpstart hsum
+    _ = 81 * s * 2 ^ A := by simp only [Nat.mul_assoc]; omega
+
+end NativePrecisionHistory

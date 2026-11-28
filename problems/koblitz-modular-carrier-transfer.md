@@ -8,6 +8,74 @@
 
 ## Problem
 
+Round06(2026-11-23): [double-cover Prym analysis](../research/ecc2k130_jacobian_theory_20261123/round06/REPORT.md)
+reduces the entire-Prym-isogenous-to-A mechanism to ordinary genus260
+over genus130 with one rational invariant1 ramification point, or
+ordinary genus261 over genus131 etale. The etale base cannot be
+hyperelliptic. Two convenient formal base classes fail point-count
+constraints; no target cover is constructed. The mod2 Euler-factor
+and wild genus deductions are independent of the chosen isogeny
+representative. PCC-b29178/fb6a46/366dbf are unverified. This is not
+a classification of A as one factor in a larger Prym or of arbitrary
+genus130–300 carriers. The proposed ramified-base D4 check is next.
+[pcc:unverified]
+
+Round05(2026-11-23): [hyperelliptic fiber/branch report](../research/ecc2k130_jacobian_theory_20261123/round05/REPORT.md)
+gives a written exclusion of the entire genus130 hyperelliptic isogeny
+class:2 F4-points contradict the universal lower bound3. For genus131
+hyperelliptic carriers, all elliptic complements except E0 are excluded,
+including arbitrary isogenous representatives. The survivor must be
+ordinary with branch cycles131+1, hence has the displayed normalized
+Artin–Schreier family. One specified curve matches degrees1..5 then
+fails degree6 (53 versus65); this is not an exhaustive search.
+PCC-7c96d0/a0ff27/55a9e6 are unverified. Nonhyperelliptic genus130,
+larger-genus curves and executable subgroup maps remain open.
+[pcc:unverified]
+
+Round04(2026-11-23): [explicit-basis and subfield checks](../research/ecc2k130_jacobian_theory_20261123/round04/REPORT.md)
+give the written maximal-basis discriminant7^65*131^129, replayed by
+independent exact Gram and volume calculations. The specified norm263
+ideal now initializes. The degree130 class step and degree65 test time
+out without a result. In degrees2,5,10,13,26 explicit totally positive
+norm263 integral witnesses replay without class-group data, so these
+necessary norm tests do not exclude the candidate. They do not provide
+a degree130 lift. PCC-411bb5/0801cc are unverified. Curve realization,
+gluing and executable subgroup maps remain open. [pcc:unverified]
+
+Round03(2026-11-23): [elliptic-complement analysis](../research/ecc2k130_jacobian_theory_20261123/round03/REPORT.md)
+gives a written reduction of the genus131 natural-A, optimal elliptic
+degree<1213355897362451 case to E0 and degree34453, requiring a totally
+positive generator of ideal(263,u+1) in the degree130 real CM field.
+PCC-be4337/e8b7ce are unverified. A30-second native class initialization
+attempt timed out without a class vector or generator; this is not
+nonprincipality. The next discriminating implementation is an explicit
+real-cyclotomic integral basis, then exact ideal/sign checks. Other
+isogenous representatives, larger degrees and genus132–300 stay open.
+
+Continued2026-11-23: [round02](../research/ecc2k130_jacobian_theory_20261123/round02/REPORT.md)
+gives a written necessity result that every F2-isogeny from the natural A
+to a principally polarized representative has degree divisible by
+146505763881528721. It uses the retained Artin class of the canonical
+polarization and the universal order's conductor support; the local
+260-embedding residue census is retained separately. PCC-20261123-b7901e
+is unverified. No degree-to-time inference is made. The larger-genus
+complement/gluing cases require a separate argument and remain open.
+
+2026-11-23 theory update: [principal-polarization and integral-symmetry
+study](../research/ecc2k130_jacobian_theory_20261123/REPORT.md), draft PR #5079.
+A written application of Howe's finite-field criterion, with an exact native
+inert-prime witness, gives principal polarizability of the dimension130
+isogeny class. A separate written Torelli/tame-cover argument excludes a
+genus130 Jacobian retaining integral zeta131, hence excludes maximal
+F2-endomorphism order. The universal Frobenius order does not contain zeta,
+so this does not exclude every isogeny representative. All three deductions
+are unsigned [pcc:unverified]; full Lean geometric bridges are absent.
+The genus130 nonmaximal-order Jacobian, genus131–300 carrier and evaluated
+subgroup maps remain open. Next: classify Frobenius-stable nonmaximal
+Deligne lattices with principal forms, then test curve realization; for
+larger genus specify the complement and gluing kernel. No construction,
+destination-solver timing or improvement is claimed.
+
 The modular construction realizes the ECC2K-130 trace-zero isogeny factor,
 but no evaluated map preserving its prime subgroup or efficient IC relation
 algorithm on that factor has been constructed.

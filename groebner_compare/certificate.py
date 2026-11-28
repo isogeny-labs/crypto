@@ -100,3 +100,70 @@ class Rank:
                     self.pivots[col] = [x * inv % self.modulus for x in row]
                     break
         return len(self.pivots) - before
+
+
+def basis_roots(nvars, basis, *, limit=4096, node_budget=200000):
+    """All Boolean zeros of `basis` by propagation and branching, any nvars.
+
+    Used above the twelve-variable exhaustive bound. It proves nothing about
+    the ideal: callers must replay every returned root on the ORIGINAL
+    equations and must not treat the result as a complete zero set unless
+    `complete` is true AND the basis itself is independently certified.
+    Raises TimeoutError when the root limit or node budget is exceeded.
+    """
+    rows = [row for row in terms(basis, nvars) if row]
+    found, nodes = [], 0
+
+    def restrict(row, fixed, values):
+        out = set()
+        for mask in row:
+            if mask & fixed & ~values:
+                continue  # some factor fixed to 0
+            out ^= {mask & ~fixed}
+        return out
+
+    def visit(fixed, values):
+        nonlocal nodes
+        nodes += 1
+        if nodes > node_budget:
+            raise TimeoutError("basis root extraction node budget")
+        while True:
+            changed = False
+            live = []
+            for row in rows:
+                reduced = restrict(row, fixed, values)
+                if not reduced:
+                    continue
+                if reduced == {0}:
+                    return
+                variables = 0
+                for mask in reduced:
+                    variables |= mask
+                if variables.bit_count() == 1 and reduced <= {0, variables}:
+                    # x + c = 0 forces x = c.
+                    fixed |= variables
+                    if 0 in reduced:
+                        values |= variables
+                    changed = True
+                    break
+                live.append((reduced, variables))
+            if not changed:
+                break
+        free = ((1 << nvars) - 1) & ~fixed
+        if not live:
+            # Every remaining variable is unconstrained.
+            positions = [i for i in range(nvars) if free >> i & 1]
+            if len(found) + (1 << len(positions)) > limit:
+                raise TimeoutError("basis root extraction root limit")
+            for choice in range(1 << len(positions)):
+                extra = sum(1 << p for k, p in enumerate(positions) if choice >> k & 1)
+                found.append(values | extra)
+            return
+        # Branch on the lowest-index variable of the smallest live polynomial.
+        _, variables = min(live, key=lambda item: (len(item[0]), item[1].bit_count()))
+        bit = variables & -variables
+        for value in (0, bit):
+            visit(fixed | bit, values | value)
+
+    visit(0, 0)
+    return sorted(set(found)), {"nodes": nodes, "complete": True}

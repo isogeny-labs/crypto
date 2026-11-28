@@ -1,0 +1,167 @@
+{
+  "branch": "research/conductor-widefield-harness-20261118",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/run-case.sh",
+        "main",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/case0-main.txt",
+        "2",
+        "4096",
+        "4096",
+        "300"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T20:06:32+00:00",
+      "wall_s": 8.726
+    },
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/run-case.sh",
+        "probe",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/case0-probe.txt",
+        "1",
+        "4096",
+        "4096",
+        "300"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T20:08:22+00:00",
+      "wall_s": 0.6
+    },
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/run-case.sh",
+        "dual",
+        "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/case0-dual.txt",
+        "2",
+        "4096",
+        "4096",
+        "300"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T20:10:07+00:00",
+      "wall_s": 8.749
+    },
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/run-case-v2.sh",
+        "main-signed-v2",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/case0-main.txt",
+        "2",
+        "4096",
+        "4096",
+        "300"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T20:27:57+00:00",
+      "wall_s": 8.34
+    },
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/run-case-v2.sh",
+        "probe-signed-v2",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/case0-probe.txt",
+        "1",
+        "4096",
+        "4096",
+        "300"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T20:29:05+00:00",
+      "wall_s": 0.614
+    },
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/run-case-v2.sh",
+        "dual-signed-v2",
+        "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/audit-signed-v2/case0-dual.txt",
+        "2",
+        "4096",
+        "4096",
+        "300"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T20:30:17+00:00",
+      "wall_s": 8.78
+    }
+  ],
+  "commit": "8c71d21370fd541c74e5d48f9b429d1615df6c62",
+  "commit_dirty": true,
+  "created_utc": "2026-11-19T20:06:25+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/prime_conductor_gap80_20261031/rust-evaluator-20261119"
+  ],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "fd3f496179cc",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261119T2006Z-conductor-rust-fixed33555419",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "rust_signed_v2_constructor_33_images",
+      "note": "Raw Bash elapsed, final Rust whole process including load/hash/parse/construction/33 evaluations/output; L0, not isolated transfer or speedup.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 8.336
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "rust_signed_v2_dual_33_images",
+      "note": "Raw Bash elapsed, final Rust normalized dual constructor plus33 images; independent PARI compositions pass; L0.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 8.776
+    }
+  ],
+  "problem": "kernel:rust-twisted-sqrt-velu",
+  "raw": [
+    {
+      "bytes": 12164,
+      "path": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/raw-results.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/75/7591f3dfad2e846a0a3e5edb1fc1770f41a7e4229cff92340ba122f75679210e",
+      "sha256": "7591f3dfad2e846a0a3e5edb1fc1770f41a7e4229cff92340ba122f75679210e",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/reports/report.pdf",
+    "png": [],
+    "svg": [
+      "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/reports/architecture.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "conductor-rust-fixed33555419",
+  "status": "open",
+  "summary": "Rust evaluator and final signed codec complete fixed26bit33555419 crossing and33 normalized dual checks; full process L0 times, original subgroup preserved. Raw bundle included in Git; S3 upload not verified, record remains open.",
+  "validation": "research/prime_conductor_gap80_20261031/rust-evaluator-20261119/summary.json"
+}

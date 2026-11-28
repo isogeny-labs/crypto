@@ -1,0 +1,95 @@
+{
+  "schema": "native-cpu-cohort-publication-correction-review/v1",
+  "review_id": "COHORT-PUBLICATION-REVIEW-09",
+  "created_utc": "2026-11-23T13:03:09.206Z",
+  "scope": "Read-only administrative Git-object/content binding only. No builds,tests,solver,EC replay,canonical tool,CI check or prior audit was rerun. No earlier review,manifest,source,export or committed record was altered.",
+  "publication": {
+    "repository": "isogeny-labs/crypto",
+    "pr": 4996,
+    "commit": "89c42acb6ec5d3169351e4eab537576f2122732f",
+    "tree": "4228e5b675be2b6312cd2cb10bf7b701df46619b",
+    "parent": "f85fa363268175173df6b780afbad40686126b61",
+    "study": "research/hashed_ecdl_cpu_scale_20261123",
+    "observed_remote_tracking_ref": "89c42acb6ec5d3169351e4eab537576f2122732f"
+  },
+  "disposition": {
+    "corrective_publication": "supported_within_scope; exact missing lockfile is now committed",
+    "result_manifest_coverage": "All386unchanged result-manifest paths exist in the corrected commit and hash as pinned",
+    "review08_P1": "Resolved only at89c42acb; originalf85and08finding remain unchanged",
+    "source_artifact_binding": "All419scoped snapshot paths match actual fetched Git blobs,byte sizes,SHA256 and Git blob identities",
+    "independent_execution_provenance": "Still unestablished; no signed PCC execution/validator standing is created",
+    "new_discrepancies": []
+  },
+  "prior_review": {
+    "path": "/tmp/ecdlp-baseline-cohort-20261123/review/COHORT-PUBLICATION-REVIEW-08.json",
+    "sha256": "465ad61c683a10bcbd208161cd09cda12b7229f3d53fc51d3551efc1908b2992",
+    "manifest_sha256": "14af545ddad770fc275c92e3986bc0dc57ad678dee986e83975245d5e669e01f",
+    "scope": "08correctly retains the missingCargo.lock at originalf85.09does not rewrite or relabel that snapshot."
+  },
+  "correction": {
+    "only_added_paths": [
+      "research/hashed_ecdl_cpu_scale_20261123/LOCKFILE-PUBLICATION-ADDENDUM.md",
+      "research/hashed_ecdl_cpu_scale_20261123/independent/export-lossless/Cargo.lock"
+    ],
+    "modified_or_deleted_paths": [],
+    "lockfile": {
+      "bytes": 4872,
+      "sha256": "b1f245c1ec99c5d4395c47cdb2a234dfeeafb910ea4fbfae713a7d752c2d1c3c",
+      "matches_old_review07_and_original_result_manifest": true
+    },
+    "disclosure": "Committed lockfile addendum names the original omission and root ignore-rule cause,distinguishes working-tree consistency from committed coverage,and preserves the old manifest/reviews. No earlier source,measurement,export,claim,ledger,journal or report was changed by this two-file correction."
+  },
+  "checks": [
+    {
+      "id": "exact-parent-delta",
+      "result": "pass",
+      "detail": "Git diff fromf85to89c contains exactly two additions: disclosure note and exactCargo.lock. All prior committed bytes therefore remain unchanged."
+    },
+    {
+      "id": "manifest-git-coverage",
+      "result": "pass",
+      "detail": "Independently read every one of386paths named by unchangedSHA256SUMS-results-1 from exact corrected Git objects and recomputed SHA256. All exist and match. Checksum file SHA256 remains a14d4dd11547ee322514fd0a5453dfe9d991ff80ca8a6af65bed658628311a63."
+    },
+    {
+      "id": "scoped-snapshot-object-readback",
+      "result": "pass",
+      "detail": "Root committed-payload-readback.json names419paths. For each reviewer fetched the exactcommit:path bytes,checked declared byte length and SHA256,and recomputed Git blob SHA1 with canonical blob header. All419match. The new review manifest covers all419and all388actual corrected-study files."
+    },
+    {
+      "id": "earlier-frozen-records",
+      "result": "pass",
+      "detail": "Review08and its manifest remain465ad61c.../14af545d.... Corrective two-file delta leaves reviews05/06/07,the386entry manifest,all original reports/compact records and exporter sources unchanged. Earlier review scopes and retained v2 numeric drift/v3timestamp error remain distinct."
+    },
+    {
+      "id": "local-versus-remote-scope",
+      "result": "pass_with_explicit_limit",
+      "detail": "The missing dependency lock is now remote; deliberate DATA-RECEIPT gaps remain unchanged. Full24certificate payloads,all export JSON versions and qualified executable binaries remain local-only. Source-lock coverage does not supply full remote replay data or prove any recorded execution."
+    }
+  ],
+  "readback_record": {
+    "path": "/tmp/ecdlp-baseline-cohort-20261123/committed-payload-readback.json",
+    "sha256": "ddbedc3c32a9eac8b015abec1c2e2f189dc7420d83bb52a7dde94213e224adb6",
+    "commit_matches": true,
+    "paths": 419,
+    "reviewer_note": "The record also discloses an owned broad git-archive lazy-retrieval interruption and subsequent scoped snapshot. This review validates committed object bytes,not the process interruption/capsule sealing history."
+  },
+  "final_data_identity": {
+    "final_local_view": "export-v3b.json",
+    "bytes": 123081,
+    "sha256": "07a7f73eeecf1ed24cfb203233982135235e90b82822bc896ccefdabe1e5d208",
+    "interpretation": "Final lossless metadata view and exact39allowed-delta finding remain as07; no newsolver/point audit or metadata rewrite occurs in this publication correction."
+  },
+  "retained_limits": [
+    "PCC-20261123-e8d860 remains an unsigned/unverified statement; corrected commit adds no ledger verdict or signature.",
+    "The fixed24calls/12public targets,field-versus-order bit distinctions,no-candidate/no-timing-inference scope and original84-case/openproof obligations are unchanged.",
+    "Full remote replay payload and authenticated execution remain absent independently of resolved lockfile omission.",
+    "Capsule/handoff stage is outside09; no sealed capsule or extraction check is asserted by this review.",
+    "No new full-root,MSRV,CI,literature,novelty or performance result is supplied."
+  ],
+  "recommendation": {
+    "action": "use_corrected_commit_for_handoff",
+    "reason": "89c42acb closes08P1with exact source-lock bytes and preserves all frozen result records. Bind any later local capsule to this corrected commit and retain08/09together."
+  },
+  "publication_evidence_manifest": "cohort-publication-correction-evidence-09.sha256",
+  "publication_evidence_manifest_sha256": "1b19d216a76fe47a5c3d79490785c2916ad5d1747e0de4b6cd3edaccf8968c80"
+}

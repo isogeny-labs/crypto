@@ -1,0 +1,11 @@
+name = "weil_two_nondegeneracy_audit"
+version = "0.1.0"
+defaultTargets = ["WeilTwoNondegeneracyAudit"]
+
+[[require]]
+name = "weil_geometric_laws_audit"
+path = "../../weil_geometric_laws_audit_20261116/lean"
+
+[[lean_lib]]
+name = "WeilTwoNondegeneracyAudit"
+roots = ["TwoImports", "TwoRoots", "TwoVertical", "TwoPairing", "TwoControls", "TwoCertificate"]

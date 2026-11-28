@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-10T04:23:31Z",
+ "id": "PCC-20261110-2b8991",
+ "kind": "theorem",
+ "producer": {
+  "commit": "1029720bb5136fbda1afd1a37d3178647c3c1658",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "89b6c31db318750c276da79b52c9482851b438b76f0f5565dbc9d8e0ee6299f8",
+   "kind": "lean",
+   "project": "research/theorem_census_20261109/lean",
+   "theorem": "DeclaredResultantRootsAudit.declared_resultant_root_audit_certificate"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Over an algebraically closed field, positive declared sizesm,n and degree bounds imply resultant zero iff common finite root OR both declared leading coefficients vanish. Direct universal affine-only claim refuted by padded constant1/constant1over every field; closure removal refuted by actual full-degree X\u00b2+1overQ. Pure polynomial theorem; no projective-space construction or geometric Semaev recursion proof. All hypotheses are explicit. No monicity or separability assumption. No new native experiment, timing, source-status promotion or paid compute.",
+ "statement": "For every algebraically closed field and positive declared Sylvester sizesm,n, with actual polynomial degree bounds, the actual fixed-size resultant is zero iff the two polynomials have a common finite root OR both declared leading coefficients vanish. The same Lean binding directly refutes the universal affine-only criterion using constant1/constant1atdeclared2/2over every field, and proves the closure-removal control X\u00b2+1overQhas full degree/leading coefficient and zero self-resultant but no rational common root."
+}

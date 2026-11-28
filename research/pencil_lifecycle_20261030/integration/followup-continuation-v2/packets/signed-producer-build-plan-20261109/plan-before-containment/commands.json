@@ -1,0 +1,84 @@
+{
+  "status": "prospective_not_released",
+  "working_directory": "/var/tmp/pencil-signed-producer-20261109/source",
+  "build_env": {
+    "PATH": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin:/usr/bin:/bin",
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "CARGO_BUILD_JOBS": "1",
+    "RUST_TEST_THREADS": "1",
+    "CARGO_HOME": "/var/tmp/pencil-signed-producer-20261109/cache/cargo-home",
+    "CARGO_TARGET_DIR": "/var/tmp/pencil-signed-producer-20261109/cache/target",
+    "TMPDIR": "/var/tmp/pencil-signed-producer-20261109/cache/tmp",
+    "RUSTC": "/home/ec2-user/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rustc",
+    "QUAL_SOURCE_REVISION": "29861c9a55f9ae5a33e1e09b3866aa397fbde605",
+    "QUAL_SOURCE_SHA256": "7986123f9792c4ed05bdb17d0547fe7a377e29c2b900e98918837cd033bd27aa"
+  },
+  "build_argv": [
+    "cargo",
+    "test",
+    "--release",
+    "--lib",
+    "--locked",
+    "--offline",
+    "--no-run",
+    "--message-format=json"
+  ],
+  "exact_tests": [
+    "cryptanalysis::three_leads_followup::native_event_qualification::actual_signed_panel_identity_duplicate_terminal_and_faults",
+    "cryptanalysis::three_leads_followup::native_event_qualification::actual_kummer_labels_results_counters_and_early_returns"
+  ],
+  "test_argv_template": [
+    "EXACT_HASH_BOUND_ROOT_TEST_BINARY",
+    "EXACT_TEST_NAME",
+    "--exact",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "acceptance": "Nonzero exactly one test result per call, both tests pass, fixed coverage summary present; no entire-library invocation needed for this narrowly scoped draft unless coordinator broadens validation.",
+  "staging": [
+    "Apply only reviewed existing schema/consumer hunks from signed-event-adapter candidate to isolated materialized source. Do not apply historical Kummer packet hunk.",
+    "Stage exact new qualification packet including labels-root.rs and fixtures into its repository-relative path.",
+    "Apply native-tests.patch to exact bound native followup source; its cfg(test) integration changes no production code.",
+    "Bind full staged source/toolchain/cache and actual remaining ledger; publish/read back exact candidate+command before bounded native launch."
+  ],
+  "materialization_argv": [
+    "/usr/bin/python3",
+    "-B",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-producer-build-plan-20261109/materialize.py"
+  ],
+  "phase_clock_start": "build deadline starts before materialization and all input/hash/cache verification",
+  "build_artifact_selection": {
+    "reason": "compiler-artifact",
+    "target_name": "crypto",
+    "target_kind_contains": "lib",
+    "profile_test": true,
+    "target_src_path": "/var/tmp/pencil-signed-producer-20261109/source/src/lib.rs",
+    "unique_executable_under": "/var/tmp/pencil-signed-producer-20261109/cache/target/",
+    "require_build_finished_success": true,
+    "record_binary_sha256_before_execution": true
+  },
+  "execution_phase_seconds": 600,
+  "build_phase_seconds": 1800,
+  "pass_requirements": {
+    "signed_final_summary": {
+      "completed": 28,
+      "identity_cases_min": 1,
+      "duplicate_cases_min": 1
+    },
+    "signed_per_row_is_not_completion": true,
+    "kummer_exact_cases": [
+      "informative_same",
+      "informative_opposite",
+      "redundant_same",
+      "redundant_opposite",
+      "invalid_zero_target",
+      "invalid_wrong_candidate",
+      "noncanonical"
+    ],
+    "both_exit_codes": 0,
+    "each_test_summary": "test result ok with1passed0failed0ignored0measured",
+    "full_source_postcheck_required": true,
+    "immutable_vendor_toolchain_postcheck_required": true
+  }
+}

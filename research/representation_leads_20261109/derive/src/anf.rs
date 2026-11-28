@@ -173,6 +173,19 @@ impl Ctx {
     }
 }
 
+impl Ctx {
+    /// Tr(a) as one Boolean polynomial: Tr is F_2-linear, Tr(a) = sum_i a_i Tr(t^i).
+    pub fn trace(&self, a: &Fe) -> Anf {
+        let mut r = Anf::zero();
+        for i in 0..self.f.n as usize {
+            if self.f.trace(1u64 << i) == 1 {
+                r.add_assign(&a.0[i]);
+            }
+        }
+        r
+    }
+}
+
 /// Size statistics of a system of field equations (each Fe = 0 gives n Boolean equations).
 #[derive(Debug, Clone)]
 pub struct Stats {
@@ -184,12 +197,12 @@ pub struct Stats {
     pub terms_by_degree: BTreeMap<u32, usize>,
 }
 
-pub fn stats(nvars: usize, eqs: &[Fe]) -> Stats {
+pub fn stats(nvars: usize, eqs: &[Fe], extra: &[Anf]) -> Stats {
     let mut all: HashSet<Mono> = HashSet::new();
     let (mut neqs, mut terms, mut maxd) = (0, 0, 0);
     let mut by: BTreeMap<u32, usize> = BTreeMap::new();
-    for e in eqs {
-        for c in &e.0 {
+    for c in eqs.iter().flat_map(|e| e.0.iter()).chain(extra.iter()) {
+        {
             if c.is_zero() {
                 continue;
             }

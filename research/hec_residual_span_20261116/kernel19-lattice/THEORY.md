@@ -1,0 +1,9 @@
+# Exceptional19 quotient modules on the original genus-two instance
+
+[pcc:unverified]. The prior KERNEL-NEXT-GATES.md predicts20 rational maximal isotropic kernels because pi satisfies X²+4 modulo19. With A=pi/2, V is two-dimensional over F361 and its Weil form determines a Hermitian form; isotropic projective lines number19+1. Exhaust all362 lines rather than sample.
+
+The code constructs the cyclotomic source polarization and quotient modules using the same ordinary CM-module identification assumptions as kernel659-lattice/THEORY.md. The source CM field is Q(zeta5); its class number is1 (Minkowski bound below2), and the real unit zeta+zeta^-1 has norm-1, so totally positive units are squares. These facts motivate the source principal-polarization identification; the finite matrix checks do not independently verify that geometric identification.
+
+Four sigma-orbit representatives are four distinct symmetry orbits of kernels. Identifying them with four distinct rational polarized isomorphism classes requires the endomorphism and automorphism hypotheses; the enumeration alone does not prove geometric inequivalence. A degree361 quotient would preserve the order67931 target subgroup because these integers are coprime, once the actual curve and callable map exist. The matrices here are not point maps. Next construction must recover exact curve invariants and a finite-field quotient/map, then charge construction and collection costs.
+
+Sources: ../KERNEL-NEXT-GATES.md, its recorded KB receipt and Milne polarization background https://www.jmilne.org/math/CourseNotes/AV.pdf ; ../kernel659-lattice/THEORY.md for the conditional CM-module framework. These are established machinery and prior assumptions, not a novelty certificate. Genus-three algebraic recognition and reduction gaps remain separate open obligations.

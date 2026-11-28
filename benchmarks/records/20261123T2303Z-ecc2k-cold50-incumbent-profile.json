@@ -1,0 +1,84 @@
+{
+  "branch": "lane/ecc2k-ic-half-trace-setup",
+  "closed_utc": "2026-11-23T23:07:36+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/trace_zero_cold50_20261123/checks/run-profile.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-23T23:03:34+00:00",
+      "wall_s": 2.722
+    }
+  ],
+  "commit": "ad5f91c4b439eb758b63d2c7d0088d7e8f2d9915",
+  "commit_dirty": false,
+  "created_utc": "2026-11-23T23:03:12+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "cpus_online": 5,
+    "hostname": "49d6f53fbd3b",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261123T2303Z-ecc2k-cold50-incumbent-profile",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "whole_cold_ir",
+      "note": "Absolute incumbent profile; not a comparative gain result.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        34987635.0,
+        34987635.0
+      ],
+      "unit": "ir",
+      "value": 34987635.0
+    }
+  ],
+  "problem": "kernel:ecc2k130-ic-cold50",
+  "raw": [
+    {
+      "bytes": 364,
+      "path": "research/trace_zero_cold50_20261123/checks/profile-receipt.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/38/38e0d76f3efd33e7d481705aba52afa1f452f4d569815719506e2f8612dd3570",
+      "sha256": "38e0d76f3efd33e7d481705aba52afa1f452f4d569815719506e2f8612dd3570",
+      "uploaded": false
+    },
+    {
+      "bytes": 6409,
+      "path": "research/trace_zero_cold50_20261123/profiles/baseline-cold/hotspots.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/98/9845d43513b4d5ff1b5e97a04612d0ca00579c465bec3b1f5a7e3f9067fdd14a",
+      "sha256": "9845d43513b4d5ff1b5e97a04612d0ca00579c465bec3b1f5a7e3f9067fdd14a",
+      "uploaded": false
+    },
+    {
+      "bytes": 6409,
+      "path": "research/trace_zero_cold50_20261123/profiles/baseline-aa-cold/hotspots.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/98/9845d43513b4d5ff1b5e97a04612d0ca00579c465bec3b1f5a7e3f9067fdd14a",
+      "sha256": "9845d43513b4d5ff1b5e97a04612d0ca00579c465bec3b1f5a7e3f9067fdd14a",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/trace_zero_cold50_20261123/profile.pdf",
+    "png": [],
+    "svg": [
+      "research/trace_zero_cold50_20261123/profiles/baseline-cold/hotspots.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ecc2k-cold50-incumbent-profile",
+  "status": "measured",
+  "summary": "Two identical source-bound incumbent profiles identify exact input conversion and arithmetic hotspots; no gain or50% conclusion.",
+  "validation": null
+}

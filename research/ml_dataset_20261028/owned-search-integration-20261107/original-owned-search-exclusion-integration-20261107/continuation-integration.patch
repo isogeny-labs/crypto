@@ -1,0 +1,216 @@
+--- a/src/ml_dataset/original_boolean_search.rs
++++ b/src/ml_dataset/original_boolean_search.rs
+@@ -11,6 +11,8 @@
+ #[path="../cryptanalysis/boolean_identity_bqi.rs"] mod bqi;
+ #[path="dynamic_boolean_search_bqi.rs"] mod bridge;
+ #[path="dynamic_boolean_search_check.rs"] mod check;
++#[path="dynamic_boolean_continuation.rs"] pub(in crate::ml_dataset::solvers) mod continuation;
++pub(in crate::ml_dataset::solvers) use continuation::Limits as ContinuationLimits;
+ pub(in crate::ml_dataset::solvers) use scheduler::search::SearchLimits;
+ pub(in crate::ml_dataset::solvers) use check::Limits as AuditLimits;
+ // Charge incremental algorithm quotes against the ORIGINAL cumulative phase
+@@ -40,9 +42,17 @@
+     fn addition(&mut self)->Result<(),provenance::Error>{self.0.reserve_matrix_candidate_addition(Instant::now()).map_err(|_|provenance::Error::Admission)}
+ }
+ #[derive(Clone,Copy)]
+-pub(in crate::ml_dataset::solvers) struct Caps{pub expansion:equations::Limits,pub search:SearchLimits,pub audit:AuditLimits}
++pub(in crate::ml_dataset::solvers) struct Caps{pub expansion:equations::Limits,pub continuation:ContinuationLimits}
+ #[derive(Clone,Copy,Debug)]
+-pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check::Failure),LiftStopped(provenance::Error)}
++pub(in crate::ml_dataset::solvers) enum Failure{Admission(Stop),Expansion(equations::Failure),Search(scheduler::Failure),Audit(check::Failure),LiftStopped(provenance::Error),Continuation(continuation::Failure),Coverage(continuation::Failure)}
++/// Each record belongs to one exact retained partition and model. Returned
++/// callback values are diagnostics until callback_result is successful.
++pub(in crate::ml_dataset::solvers) struct LiftRecord {
++    pub partition:usize,pub record:u64,pub model:Vec<bool>,
++    pub progress:checked_model::Progress,
++    pub callback_result:Option<Result<(),continuation::Failure>>,
++    pub returned:Option<Result<signed_lift::Outcome,Stop>>,
++}
+ struct OriginalParts{
+     public_sha256:[u8;32],factor_sha256:[u8;32],budget:Budget,binding:[u8;32],launch_sha256:[u8;32],math:Math,
+     checked:Option<provenance::CheckedMap>,unchecked:Option<provenance::Map>,pattern:Option<u32>,
+@@ -55,18 +65,24 @@
+     original:OriginalParts,sink:capture::CaptureEmitter,diagnostic:Option<String>,
+     expansion:Option<equations::OwnedExpansion>,normalized:Vec<equations::Polynomial>,
+     normalization_generator:usize,normalization_term:usize,normalization_sort:usize,
+-    search:Option<scheduler::search::SearchAttempt>,audit:Option<check::Audit>,
++    continuation:Option<continuation::Attempt>,coverage:Option<continuation::CoverageAudit>,
+     original_deadline:Instant,failure:Option<Failure>,
+-    lift_progress:checked_model::Progress,lift_outcome:Option<signed_lift::Outcome>,lift_attempted:bool,
++    lift_records:Vec<LiftRecord>,accepted_record:Option<usize>,
+ }
+ impl OwnedAttempt{
+     pub(in crate::ml_dataset::solvers) fn failure(&self)->Option<Failure>{self.failure}
+     pub(in crate::ml_dataset::solvers) fn first_stop(&self)->Option<Stop>{self.original.budget.stopped}
+     pub(in crate::ml_dataset::solvers) fn charged(&self)->(u64,u64){(self.original.budget.native.work+self.original.budget.checking_work,self.original.budget.native.bytes+self.original.budget.adapter_bytes)}
+-    pub(in crate::ml_dataset::solvers) fn boolean_candidate(&self)->Option<&[bool]>{
+-        if self.failure.is_some() || self.audit.as_ref()?.result.is_err(){return None}
+-        let s=self.search.as_ref()?;if s.result.is_err()||s.verdict!=scheduler::search::Verdict::Witness{return None}
+-        let node=s.nodes.get(s.witness_node?)?;if node.candidate_valid!=Some(true){return None}Some(&node.candidate)
++    pub(in crate::ml_dataset::solvers) fn lift_records(&self)->&[LiftRecord]{&self.lift_records}
++    pub(in crate::ml_dataset::solvers) fn accepted_relation(&self)->Option<&LiftRecord>{
++        if self.failure.is_some(){return None}
++        let r=self.lift_records.get(self.accepted_record?)?;
++        if r.callback_result!=Some(Ok(()))||!matches!(r.returned,Some(Ok(signed_lift::Outcome::VerifiedSignedRelation))){return None}Some(r)
++    }
++    /// Conditional Boolean coverage only; exclusions still require independent
++    /// authentic classified replay before any pattern-negative conclusion.
++    pub(in crate::ml_dataset::solvers) fn conditional_coverage(&self)->Option<&continuation::CoverageAudit>{
++        if self.failure.is_some(){return None}self.coverage.as_ref().filter(|v|v.result.is_ok())
+     }
+     fn fail(&mut self,f:Failure,s:Stop){self.failure=Some(f);let _:Result<(),Stop>=self.original.budget.fail(s);}
+     fn pay(&mut self,w:u64,b:usize)->Result<(),Stop>{reserve_phase(&mut self.original.budget,w,u64::try_from(b).map_err(|_|Stop::Overflow)?)}
+@@ -109,51 +125,77 @@
+         }
+         self.original.budget.check(Instant::now())
+     }
+-    /// A first-candidate outcome only; never a whole-pattern no-lift verdict.
+-    pub(in crate::ml_dataset::solvers) fn lift_outcome(&self)->Option<signed_lift::Outcome>{
+-        if self.failure.is_some() && matches!(self.lift_outcome,Some(signed_lift::Outcome::VerifiedSignedRelation)){return None}
+-        self.lift_outcome
+-    }
+-    fn lift_candidate(&mut self){
+-        if self.failure.is_some(){return}
+-        let Some(search)=self.search.as_ref()else{self.fail(Failure::Admission(Stop::Phase),Stop::Phase);return};
+-        if search.verdict!=scheduler::search::Verdict::Witness{return}
+-        if self.lift_attempted{self.fail(Failure::Admission(Stop::Phase),Stop::Phase);return}
+-        self.lift_attempted=true;
+-        // Audit admission precedes native model consumption; source/model are
+-        // borrowed from this exact owned attempt, with no externally supplied map.
+-        if self.audit.as_ref().is_none_or(|a|a.result.is_err()){
+-            self.fail(Failure::Admission(Stop::Phase),Stop::Phase);return
+-        }
+-        let Some(index)=search.witness_node else{self.fail(Failure::Admission(Stop::Phase),Stop::Phase);return};
+-        let Some(node)=search.nodes.get(index)else{self.fail(Failure::Admission(Stop::Phase),Stop::Phase);return};
+-        if node.candidate_valid!=Some(true){self.fail(Failure::Admission(Stop::Phase),Stop::Phase);return}
++    fn continue_models(&mut self,limits:ContinuationLimits){
++        // Capacity is bounded and prepaid once before the session borrows the
++        // actual original ledger. Every growing record stays in this owner.
++        let bytes=match limits.partitions.checked_mul(size_of::<LiftRecord>()).and_then(|n|n.checked_add(64)){
++            Some(v)=>v,None=>{self.fail(Failure::Admission(Stop::Overflow),Stop::Overflow);return}
++        };
++        if let Err(e)=self.pay(1,bytes){self.fail(Failure::Admission(e),e);return}
++        if self.lift_records.try_reserve_exact(limits.partitions).is_err(){self.fail(Failure::Admission(Stop::Allocation),Stop::Allocation);return}
+         let Some(expansion)=self.expansion.as_ref()else{self.fail(Failure::Admission(Stop::Phase),Stop::Phase);return};
+-        let result=signed_lift::verify_candidate(
+-            expansion.source(),&node.candidate,&self.original.math.signed,self.original.math.signed_target,
+-            &mut self.lift_progress,self.original_deadline,&mut LiftAdmission(&mut self.original.budget));
+-        self.lift_outcome=Some(result);
+-        match result{
+-            signed_lift::Outcome::Deadline=>self.fail(Failure::Admission(Stop::Deadline),Stop::Deadline),
+-            signed_lift::Outcome::Stopped(e)=>self.fail(Failure::LiftStopped(e),Stop::NativeFailure),
+-            signed_lift::Outcome::ExhaustedForModel=>{
+-                // This exact Boolean model has exhausted its allowed sign masks.
+-                // Retain Matrix phase, candidate and progress for future continuation.
+-                // No continuation, blocking clause or pattern UNSAT claim here.
+-            },
+-            signed_lift::Outcome::RejectedUnclassified(_)=>{
+-                // Keep this exact candidate, remaining search nodes and lift
+-                // progress. Further model search is NOT implemented here.
+-                // No pattern refutation or global no-lift result is inferred.
+-            },
+-            signed_lift::Outcome::VerifiedSignedRelation=>{
+-                if let Err(s)=self.original.budget.finish_native(Instant::now()){self.fail(Failure::Admission(s),s);return}
+-                if let Err(s)=self.original.budget.begin_extraction(true,Instant::now()){self.fail(Failure::Admission(s),s);return}
+-                // Stay in Extraction for prepaid capture/publication. Completing
+-                // the budget here would prohibit later same-owner writes.
+-                if let Err(s)=self.original.budget.check(Instant::now()){self.fail(Failure::Admission(s),s)}
+-            },
+-        }
++        let variables=expansion.variables();let map=expansion.source();
++        let signed=&self.original.math.signed;let target=self.original.math.signed_target;
++        let records=&mut self.lift_records;
++        let mut owner=MatrixAdmission(&mut self.original.budget);
++        let mut session=continuation::Session::new(variables,&self.normalized,limits,self.original_deadline,&mut owner);
++        let mut terminal_error=None;let mut accepted=None;let mut unclassified=false;
++        loop {
++            match session.next(){
++                Err(e)=>{terminal_error=Some(Failure::Continuation(e));break},
++                Ok(continuation::Outcome::RemainingBooleanModelsExhaustedUnderRecordedExclusions)=>break,
++                Ok(continuation::Outcome::CandidateRetained)=>{},
++                _=>{terminal_error=Some(Failure::Admission(Stop::Phase));break},
++            }
++            let Some(partition)=session.attempt.active else{terminal_error=Some(Failure::Admission(Stop::Phase));break};
++            if records.len()>=limits.partitions{terminal_error=Some(Failure::Admission(Stop::Phase));break}
++            let index=records.len();let id=match u64::try_from(index){Ok(v)=>v,Err(_)=>{terminal_error=Some(Failure::Admission(Stop::Overflow));break}};
++            // Capacity above guarantees this push cannot allocate. The exact
++            // model buffer and verifier progress are retained before fallibility.
++            records.push(LiftRecord{partition,record:id,model:Vec::new(),progress:checked_model::Progress::default(),callback_result:None,returned:None});
++            let record=&mut records[index];
++            let call=session.with_candidate_owner(|model,deadline,owner|->Result<signed_lift::Outcome,Stop>{
++                let bytes=model.len().checked_mul(size_of::<bool>()).and_then(|n|n.checked_add(64)).ok_or(Stop::Overflow)?;
++                reserve_phase(owner.0,u64::try_from(model.len()).map_err(|_|Stop::Overflow)?.checked_add(1).ok_or(Stop::Overflow)?,u64::try_from(bytes).map_err(|_|Stop::Overflow)?)?;
++                record.model.try_reserve_exact(model.len()).map_err(|_|Stop::Allocation)?;
++                record.model.extend_from_slice(model);
++                Ok(signed_lift::verify_candidate(map,&record.model,signed,target,&mut record.progress,deadline,&mut LiftAdmission(&mut *owner.0)))
++            });
++            // No intervening fallible action: even a failed postcheck returns
++            // owned data that must survive in this authentic owning attempt.
++            record.returned=call.value;record.callback_result=Some(call.result);
++            if let Err(e)=call.result{terminal_error=Some(Failure::Continuation(e));break}
++            match record.returned{
++                Some(Ok(signed_lift::Outcome::VerifiedSignedRelation))=>{accepted=Some(index);break},
++                Some(Ok(signed_lift::Outcome::ExhaustedForModel))=>{
++                    // The model was copied from this exact callback, no next()
++                    // or other candidate mutation occurred before exclusion.
++                    if let Err(e)=session.exclude(id){terminal_error=Some(Failure::Continuation(e));break}
++                },
++                Some(Ok(signed_lift::Outcome::RejectedUnclassified(_)))=>{unclassified=true;break},
++                Some(Ok(signed_lift::Outcome::Deadline))=>{terminal_error=Some(Failure::Admission(Stop::Deadline));break},
++                Some(Ok(signed_lift::Outcome::Stopped(e)))=>{terminal_error=Some(Failure::LiftStopped(e));break},
++                Some(Err(e))=>{terminal_error=Some(Failure::Admission(e));break},
++                None=>{terminal_error=Some(Failure::Admission(Stop::Phase));break},
++            }
++        }
++        self.continuation=Some(session.into_attempt());
++        self.accepted_record=accepted;
++        if let Some(e)=terminal_error{
++            let stop=match e{Failure::Admission(s)=>s,Failure::Continuation(continuation::Failure::Deadline)=>Stop::Deadline,_=>Stop::NativeFailure};
++            self.fail(e,stop);return
++        }
++        if accepted.is_some(){
++            if let Err(e)=self.original.budget.finish_native(Instant::now()){self.fail(Failure::Admission(e),e);return}
++            if let Err(e)=self.original.budget.begin_extraction(true,Instant::now()){self.fail(Failure::Admission(e),e)}
++            return
++        }
++        if unclassified{return} // Retain Matrix and candidate; never exclude.
++        let audit=continuation::audit(variables,&self.normalized,self.continuation.as_ref().expect("retained continuation"),limits,self.original_deadline,&mut MatrixAdmission(&mut self.original.budget));
++        let result=audit.result;self.coverage=Some(audit);
++        if let Err(e)=result{let stop=if e==continuation::Failure::Deadline{Stop::Deadline}else{Stop::NativeFailure};self.fail(Failure::Coverage(e),stop);return}
++        // Stay Matrix for independently charged exclusion replay. Coverage alone
++        // is conditional and cannot yield a pattern-negative/public solve report.
+     }
+     fn run(&mut self,mut caps:Caps){
+         let phase=match self.original.budget.begin_native(false,Instant::now()){Ok(v)=>v,Err(s)=>{self.fail(Failure::Admission(s),s);return}};
+@@ -166,17 +208,9 @@
+         if let Err(s)=self.normalize(){self.fail(Failure::Admission(s),s);return}
+         if let Err(s)=self.original.budget.finish_native(Instant::now()){self.fail(Failure::Admission(s),s);return}
+         let phase=match self.original.budget.begin_native(true,Instant::now()){Ok(v)=>v,Err(s)=>{self.fail(Failure::Admission(s),s);return}};
+-        caps.search.native.work=caps.search.native.work.min(phase.work);caps.search.native.bytes=caps.search.native.bytes.min(phase.bytes);
+-        let variables=self.expansion.as_ref().expect("owned expansion").variables();
+-        let search=scheduler::search::solve(variables,&self.normalized,caps.search,self.original_deadline,&mut MatrixAdmission(&mut self.original.budget));
+-        let status=search.result;self.search=Some(search);
+-        if let Err(f)=status{let stop=if f==scheduler::Failure::Deadline{Stop::Deadline}else{Stop::NativeFailure};self.fail(Failure::Search(f),stop);return}
+-        let audit=check::verify(variables,&self.normalized,self.search.as_ref().expect("retained search"),caps.audit,self.original_deadline,&mut MatrixAdmission(&mut self.original.budget));
+-        let status=audit.result;self.audit=Some(audit);
+-        if let Err(f)=status{let stop=if f==check::Failure::Deadline{Stop::Deadline}else{Stop::NativeFailure};self.fail(Failure::Audit(f),stop);return}
+-        if self.search.as_ref().is_some_and(|s|s.verdict==scheduler::search::Verdict::Witness){
+-            self.lift_candidate();
+-        }else if let Err(s)=self.original.budget.finish_native(Instant::now()){self.fail(Failure::Admission(s),s)}
++        caps.continuation.work=caps.continuation.work.min(phase.work);caps.continuation.bytes=caps.continuation.bytes.min(phase.bytes);
++        caps.continuation.search.native.work=caps.continuation.search.native.work.min(phase.work);caps.continuation.search.native.bytes=caps.continuation.search.native.bytes.min(phase.bytes);
++        self.continue_models(caps.continuation);
+     }
+ }
+ impl OriginalOwner<'_>{
+@@ -197,8 +231,8 @@
+         let mut out=OwnedAttempt{
+             original:OriginalParts{public_sha256:original.public_sha256,factor_sha256:original.factor_base_sha256,budget,binding,launch_sha256,math,checked,unchecked:retained_unchecked,pattern,map_bytes:retained_bytes,map_ack,publication_attempted,map_published,capture_limits,boolean_attempted},
+             sink,diagnostic,expansion:None,normalized:Vec::new(),normalization_generator:0,normalization_term:0,normalization_sort:0,
+-            search:None,audit:None,original_deadline,failure:None,
+-            lift_progress:checked_model::Progress::default(),lift_outcome:None,lift_attempted:false,
++            continuation:None,coverage:None,original_deadline,failure:None,
++            lift_records:Vec::new(),accepted_record:None,
+         };
+         if let Err(s)=admission{out.fail(Failure::Admission(s),s);return out}
+         out.run(caps);out

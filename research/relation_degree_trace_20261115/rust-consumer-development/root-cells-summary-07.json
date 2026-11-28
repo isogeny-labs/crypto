@@ -1,0 +1,3186 @@
+{
+  "all_passed": true,
+  "embedded_corpus_cases": 0,
+  "fused_acceptance_cases": 60,
+  "records": [
+    {
+      "case": "cycle3-root-baseline-compact",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "cycle3-root-baseline-expanded",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "cycle3-root-baseline-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            2,
+            2,
+            null
+          ],
+          "definition_nodes": 3,
+          "derivation_depths": [
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 2,
+          "stored_basis_proof_terms": 37,
+          "stored_definition_proof_terms": 120,
+          "stored_proof_terms": 157
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "cycle3-root-consumer-only-compact",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 6,
+          "cofactor_terms": 260,
+          "definitions": 3,
+          "identities": 24,
+          "pairs": 15,
+          "product_pairs": 6,
+          "referenced_term_products": 1716
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "cycle3-root-consumer-only-expanded",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 6,
+          "cofactor_terms": 2025,
+          "definitions": 0,
+          "identities": 21,
+          "pairs": 15,
+          "product_pairs": 6,
+          "referenced_term_products": 17813
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "cycle3-root-consumer-only-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            2,
+            2,
+            null
+          ],
+          "definition_nodes": 3,
+          "derivation_depths": [
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 2,
+          "stored_basis_proof_terms": 37,
+          "stored_definition_proof_terms": 120,
+          "stored_proof_terms": 157
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 6,
+          "cofactor_terms": 260,
+          "definitions": 3,
+          "identities": 24,
+          "pairs": 15,
+          "product_pairs": 6,
+          "referenced_term_products": 1716
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "cycle3-root-native-only-compact",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            2,
+            2,
+            null
+          ],
+          "definition_nodes": 3,
+          "derivation_depths": [
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 2,
+          "stored_basis_proof_terms": 37,
+          "stored_definition_proof_terms": 120,
+          "stored_proof_terms": 157
+        }
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "cycle3-root-native-only-expanded",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_certificate_product_degree": 21,
+          "basis_polynomial_degree": 2,
+          "coordinate_certificates": [
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 0
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 1
+            }
+          ],
+          "coordinate_parents": [
+            2,
+            2,
+            null
+          ],
+          "coordinates_constructed": 2,
+          "derivation_depths": [
+            1,
+            1,
+            0
+          ],
+          "propagation_policy": "breadth-first",
+          "quotient_dimension": 4,
+          "root_variable": 2
+        }
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "cycle3-root-native-only-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            2,
+            2,
+            null
+          ],
+          "definition_nodes": 3,
+          "derivation_depths": [
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 2,
+          "stored_basis_proof_terms": 37,
+          "stored_definition_proof_terms": 120,
+          "stored_proof_terms": 157
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "cycle3-root-both-compact",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            2,
+            2,
+            null
+          ],
+          "definition_nodes": 3,
+          "derivation_depths": [
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 2,
+          "stored_basis_proof_terms": 37,
+          "stored_definition_proof_terms": 120,
+          "stored_proof_terms": 157
+        }
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 6,
+          "cofactor_terms": 260,
+          "definitions": 3,
+          "identities": 24,
+          "pairs": 15,
+          "product_pairs": 6,
+          "referenced_term_products": 1716
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "cycle3-root-both-expanded",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_certificate_product_degree": 21,
+          "basis_polynomial_degree": 2,
+          "coordinate_certificates": [
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 0
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 1
+            }
+          ],
+          "coordinate_parents": [
+            2,
+            2,
+            null
+          ],
+          "coordinates_constructed": 2,
+          "derivation_depths": [
+            1,
+            1,
+            0
+          ],
+          "propagation_policy": "breadth-first",
+          "quotient_dimension": 4,
+          "root_variable": 2
+        }
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 6,
+          "cofactor_terms": 2025,
+          "definitions": 0,
+          "identities": 21,
+          "pairs": 15,
+          "product_pairs": 6,
+          "referenced_term_products": 17813
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "cycle3-root-both-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            2,
+            2,
+            null
+          ],
+          "definition_nodes": 3,
+          "derivation_depths": [
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 2,
+          "stored_basis_proof_terms": 37,
+          "stored_definition_proof_terms": 120,
+          "stored_proof_terms": 157
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 6,
+          "cofactor_terms": 260,
+          "definitions": 3,
+          "identities": 24,
+          "pairs": 15,
+          "product_pairs": 6,
+          "referenced_term_products": 1716
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-0-root-baseline-compact",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-0-root-baseline-expanded",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-0-root-baseline-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "definition_nodes": 8,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 0,
+          "stored_basis_proof_terms": 79,
+          "stored_definition_proof_terms": 220,
+          "stored_proof_terms": 299
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-0-root-consumer-only-compact",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 11,
+          "cofactor_terms": 798,
+          "definitions": 8,
+          "identities": 42,
+          "pairs": 55,
+          "product_pairs": 46,
+          "referenced_term_products": 4646
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-0-root-consumer-only-expanded",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 11,
+          "cofactor_terms": 6879,
+          "definitions": 0,
+          "identities": 34,
+          "pairs": 55,
+          "product_pairs": 46,
+          "referenced_term_products": 59915
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-0-root-consumer-only-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "definition_nodes": 8,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 0,
+          "stored_basis_proof_terms": 79,
+          "stored_definition_proof_terms": 220,
+          "stored_proof_terms": 299
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 11,
+          "cofactor_terms": 798,
+          "definitions": 8,
+          "identities": 42,
+          "pairs": 55,
+          "product_pairs": 46,
+          "referenced_term_products": 4646
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-0-root-native-only-compact",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "definition_nodes": 8,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 7,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 0,
+          "stored_basis_proof_terms": 79,
+          "stored_definition_proof_terms": 220,
+          "stored_proof_terms": 299
+        }
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-0-root-native-only-expanded",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_certificate_product_degree": 21,
+          "basis_polynomial_degree": 2,
+          "coordinate_certificates": [
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 1
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 2
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 3
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 4
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 5
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 6
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 7
+            }
+          ],
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "coordinates_constructed": 7,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "propagation_policy": "breadth-first",
+          "quotient_dimension": 4,
+          "root_variable": 0
+        }
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-0-root-native-only-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "definition_nodes": 8,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 0,
+          "stored_basis_proof_terms": 79,
+          "stored_definition_proof_terms": 220,
+          "stored_proof_terms": 299
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-0-root-both-compact",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "definition_nodes": 8,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 7,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 0,
+          "stored_basis_proof_terms": 79,
+          "stored_definition_proof_terms": 220,
+          "stored_proof_terms": 299
+        }
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 11,
+          "cofactor_terms": 798,
+          "definitions": 8,
+          "identities": 42,
+          "pairs": 55,
+          "product_pairs": 46,
+          "referenced_term_products": 4646
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-0-root-both-expanded",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_certificate_product_degree": 21,
+          "basis_polynomial_degree": 2,
+          "coordinate_certificates": [
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 1
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 2
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 3
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 4
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 5
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 6
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 7
+            }
+          ],
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "coordinates_constructed": 7,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "propagation_policy": "breadth-first",
+          "quotient_dimension": 4,
+          "root_variable": 0
+        }
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 11,
+          "cofactor_terms": 6879,
+          "definitions": 0,
+          "identities": 34,
+          "pairs": 55,
+          "product_pairs": 46,
+          "referenced_term_products": 59915
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-0-root-both-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "definition_nodes": 8,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 0,
+          "stored_basis_proof_terms": 79,
+          "stored_definition_proof_terms": 220,
+          "stored_proof_terms": 299
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 11,
+          "cofactor_terms": 798,
+          "definitions": 8,
+          "identities": 42,
+          "pairs": 55,
+          "product_pairs": 46,
+          "referenced_term_products": 4646
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-7-root-baseline-compact",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-7-root-baseline-expanded",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-7-root-baseline-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            null
+          ],
+          "definition_nodes": 8,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 7,
+          "stored_basis_proof_terms": 52,
+          "stored_definition_proof_terms": 220,
+          "stored_proof_terms": 272
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-7-root-consumer-only-compact",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 11,
+          "cofactor_terms": 563,
+          "definitions": 8,
+          "identities": 42,
+          "pairs": 55,
+          "product_pairs": 46,
+          "referenced_term_products": 3471
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-7-root-consumer-only-expanded",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 11,
+          "cofactor_terms": 5037,
+          "definitions": 0,
+          "identities": 34,
+          "pairs": 55,
+          "product_pairs": 46,
+          "referenced_term_products": 44169
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-7-root-consumer-only-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            null
+          ],
+          "definition_nodes": 8,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 7,
+          "stored_basis_proof_terms": 52,
+          "stored_definition_proof_terms": 220,
+          "stored_proof_terms": 272
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 11,
+          "cofactor_terms": 563,
+          "definitions": 8,
+          "identities": 42,
+          "pairs": 55,
+          "product_pairs": 46,
+          "referenced_term_products": 3471
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-7-root-native-only-compact",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            null
+          ],
+          "definition_nodes": 8,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 7,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 7,
+          "stored_basis_proof_terms": 52,
+          "stored_definition_proof_terms": 220,
+          "stored_proof_terms": 272
+        }
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-7-root-native-only-expanded",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_certificate_product_degree": 21,
+          "basis_polynomial_degree": 2,
+          "coordinate_certificates": [
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 0
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 1
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 2
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 3
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 4
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 5
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 6
+            }
+          ],
+          "coordinate_parents": [
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            null
+          ],
+          "coordinates_constructed": 7,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "propagation_policy": "breadth-first",
+          "quotient_dimension": 4,
+          "root_variable": 7
+        }
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-7-root-native-only-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            null
+          ],
+          "definition_nodes": 8,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 7,
+          "stored_basis_proof_terms": 52,
+          "stored_definition_proof_terms": 220,
+          "stored_proof_terms": 272
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-7-root-both-compact",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            null
+          ],
+          "definition_nodes": 8,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 7,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 7,
+          "stored_basis_proof_terms": 52,
+          "stored_definition_proof_terms": 220,
+          "stored_proof_terms": 272
+        }
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 11,
+          "cofactor_terms": 563,
+          "definitions": 8,
+          "identities": 42,
+          "pairs": 55,
+          "product_pairs": 46,
+          "referenced_term_products": 3471
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-7-root-both-expanded",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_certificate_product_degree": 21,
+          "basis_polynomial_degree": 2,
+          "coordinate_certificates": [
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 0
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 1
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 2
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 3
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 4
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 5
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 6
+            }
+          ],
+          "coordinate_parents": [
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            null
+          ],
+          "coordinates_constructed": 7,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "propagation_policy": "breadth-first",
+          "quotient_dimension": 4,
+          "root_variable": 7
+        }
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 11,
+          "cofactor_terms": 5037,
+          "definitions": 0,
+          "identities": 34,
+          "pairs": 55,
+          "product_pairs": 46,
+          "referenced_term_products": 44169
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star8-7-root-both-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            7,
+            null
+          ],
+          "definition_nodes": 8,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 7,
+          "stored_basis_proof_terms": 52,
+          "stored_definition_proof_terms": 220,
+          "stored_proof_terms": 272
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 11,
+          "cofactor_terms": 563,
+          "definitions": 8,
+          "identities": 42,
+          "pairs": 55,
+          "product_pairs": 46,
+          "referenced_term_products": 3471
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-first-n16-s7-root-baseline-compact",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-first-n16-s7-root-baseline-expanded",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-first-n16-s7-root-baseline-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "definition_nodes": 16,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 0,
+          "stored_basis_proof_terms": 111,
+          "stored_definition_proof_terms": 380,
+          "stored_proof_terms": 491
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-first-n16-s7-root-consumer-only-compact",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 19,
+          "cofactor_terms": 1646,
+          "definitions": 16,
+          "identities": 74,
+          "pairs": 171,
+          "product_pairs": 162,
+          "referenced_term_products": 9270
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-first-n16-s7-root-consumer-only-expanded",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 19,
+          "cofactor_terms": 12079,
+          "definitions": 0,
+          "identities": 58,
+          "pairs": 171,
+          "product_pairs": 162,
+          "referenced_term_products": 104091
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-first-n16-s7-root-consumer-only-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "definition_nodes": 16,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 0,
+          "stored_basis_proof_terms": 111,
+          "stored_definition_proof_terms": 380,
+          "stored_proof_terms": 491
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 19,
+          "cofactor_terms": 1646,
+          "definitions": 16,
+          "identities": 74,
+          "pairs": 171,
+          "product_pairs": 162,
+          "referenced_term_products": 9270
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-first-n16-s7-root-native-only-compact",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "definition_nodes": 16,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 15,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 0,
+          "stored_basis_proof_terms": 111,
+          "stored_definition_proof_terms": 380,
+          "stored_proof_terms": 491
+        }
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-first-n16-s7-root-native-only-expanded",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_certificate_product_degree": 21,
+          "basis_polynomial_degree": 2,
+          "coordinate_certificates": [
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 1
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 2
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 3
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 4
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 5
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 6
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 7
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 8
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 9
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 10
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 11
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 12
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 13
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 14
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 15
+            }
+          ],
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "coordinates_constructed": 15,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "propagation_policy": "breadth-first",
+          "quotient_dimension": 4,
+          "root_variable": 0
+        }
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-first-n16-s7-root-native-only-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "definition_nodes": 16,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 0,
+          "stored_basis_proof_terms": 111,
+          "stored_definition_proof_terms": 380,
+          "stored_proof_terms": 491
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-first-n16-s7-root-both-compact",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "definition_nodes": 16,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 15,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 0,
+          "stored_basis_proof_terms": 111,
+          "stored_definition_proof_terms": 380,
+          "stored_proof_terms": 491
+        }
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 19,
+          "cofactor_terms": 1646,
+          "definitions": 16,
+          "identities": 74,
+          "pairs": 171,
+          "product_pairs": 162,
+          "referenced_term_products": 9270
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-first-n16-s7-root-both-expanded",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_certificate_product_degree": 21,
+          "basis_polynomial_degree": 2,
+          "coordinate_certificates": [
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 1
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 2
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 3
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 4
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 5
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 6
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 7
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 8
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 9
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 10
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 11
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 12
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 13
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 14
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 15
+            }
+          ],
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "coordinates_constructed": 15,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "propagation_policy": "breadth-first",
+          "quotient_dimension": 4,
+          "root_variable": 0
+        }
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 19,
+          "cofactor_terms": 12079,
+          "definitions": 0,
+          "identities": 58,
+          "pairs": 171,
+          "product_pairs": 162,
+          "referenced_term_products": 104091
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-first-n16-s7-root-both-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            null,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "definition_nodes": 16,
+          "derivation_depths": [
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 0,
+          "stored_basis_proof_terms": 111,
+          "stored_definition_proof_terms": 380,
+          "stored_proof_terms": 491
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 19,
+          "cofactor_terms": 1646,
+          "definitions": 16,
+          "identities": 74,
+          "pairs": 171,
+          "product_pairs": 162,
+          "referenced_term_products": 9270
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-last-n16-s7-root-baseline-compact",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-last-n16-s7-root-baseline-expanded",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-last-n16-s7-root-baseline-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            null
+          ],
+          "definition_nodes": 16,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 15,
+          "stored_basis_proof_terms": 76,
+          "stored_definition_proof_terms": 380,
+          "stored_proof_terms": 456
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-last-n16-s7-root-consumer-only-compact",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 19,
+          "cofactor_terms": 1083,
+          "definitions": 16,
+          "identities": 74,
+          "pairs": 171,
+          "product_pairs": 162,
+          "referenced_term_products": 6455
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-last-n16-s7-root-consumer-only-expanded",
+      "complete_basis_equal": true,
+      "constructor": null,
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 19,
+          "cofactor_terms": 8989,
+          "definitions": 0,
+          "identities": 58,
+          "pairs": 171,
+          "product_pairs": 162,
+          "referenced_term_products": 78393
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-last-n16-s7-root-consumer-only-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            null
+          ],
+          "definition_nodes": 16,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 15,
+          "stored_basis_proof_terms": 76,
+          "stored_definition_proof_terms": 380,
+          "stored_proof_terms": 456
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 19,
+          "cofactor_terms": 1083,
+          "definitions": 16,
+          "identities": 74,
+          "pairs": 171,
+          "product_pairs": 162,
+          "referenced_term_products": 6455
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-last-n16-s7-root-native-only-compact",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            null
+          ],
+          "definition_nodes": 16,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 15,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 15,
+          "stored_basis_proof_terms": 76,
+          "stored_definition_proof_terms": 380,
+          "stored_proof_terms": 456
+        }
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-last-n16-s7-root-native-only-expanded",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_certificate_product_degree": 21,
+          "basis_polynomial_degree": 2,
+          "coordinate_certificates": [
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 0
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 1
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 2
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 3
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 4
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 5
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 6
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 7
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 8
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 9
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 10
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 11
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 12
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 13
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 14
+            }
+          ],
+          "coordinate_parents": [
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            null
+          ],
+          "coordinates_constructed": 15,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "propagation_policy": "breadth-first",
+          "quotient_dimension": 4,
+          "root_variable": 15
+        }
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-last-n16-s7-root-native-only-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            null
+          ],
+          "definition_nodes": 16,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 15,
+          "stored_basis_proof_terms": 76,
+          "stored_definition_proof_terms": 380,
+          "stored_proof_terms": 456
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "singular-identity",
+        "stats": null
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-last-n16-s7-root-both-compact",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            null
+          ],
+          "definition_nodes": 16,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 15,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 15,
+          "stored_basis_proof_terms": 76,
+          "stored_definition_proof_terms": 380,
+          "stored_proof_terms": 456
+        }
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 19,
+          "cofactor_terms": 1083,
+          "definitions": 16,
+          "identities": 74,
+          "pairs": 171,
+          "product_pairs": 162,
+          "referenced_term_products": 6455
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-last-n16-s7-root-both-expanded",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_certificate_product_degree": 21,
+          "basis_polynomial_degree": 2,
+          "coordinate_certificates": [
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 0
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 182,
+              "polynomial_degree": 3,
+              "variable": 1
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 2
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 3
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 4
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 5
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 6
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 7
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 8
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 9
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 10
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 11
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 12
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 13
+            },
+            {
+              "certificate_product_degree": 18,
+              "certificate_terms": 220,
+              "polynomial_degree": 3,
+              "variable": 14
+            }
+          ],
+          "coordinate_parents": [
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            null
+          ],
+          "coordinates_constructed": 15,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "propagation_policy": "breadth-first",
+          "quotient_dimension": 4,
+          "root_variable": 15
+        }
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 19,
+          "cofactor_terms": 8989,
+          "definitions": 0,
+          "identities": 58,
+          "pairs": 171,
+          "product_pairs": 162,
+          "referenced_term_products": 78393
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    },
+    {
+      "case": "star-last-n16-s7-root-both-compact-sparse",
+      "complete_basis_equal": true,
+      "constructor": {
+        "info": {
+          "basis_polynomial_degree": 2,
+          "coordinate_parents": [
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            15,
+            null
+          ],
+          "definition_nodes": 16,
+          "derivation_depths": [
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0
+          ],
+          "expanded_original_product_degree_upper_bound": 21,
+          "max_local_certificate_product_degree": 14,
+          "projection_work": {
+            "edge_resultants": 2,
+            "vertex_gcd_folds": 1
+          },
+          "quotient_dimension": 4,
+          "root_variable": 15,
+          "stored_basis_proof_terms": 76,
+          "stored_definition_proof_terms": 380,
+          "stored_proof_terms": 456
+        },
+        "subset_error": null,
+        "subset_succeeded": true
+      },
+      "consumer": {
+        "kind": "separate-rust-arithmetic",
+        "stats": {
+          "basis_rows": 19,
+          "cofactor_terms": 1083,
+          "definitions": 16,
+          "identities": 74,
+          "pairs": 171,
+          "product_pairs": 162,
+          "referenced_term_products": 6455
+        }
+      },
+      "fresh_singular_accepts": true,
+      "kind": "fused",
+      "passed": true,
+      "variant_correct": true
+    }
+  ],
+  "scope": "correctness only; no timing ratios or independent signature"
+}

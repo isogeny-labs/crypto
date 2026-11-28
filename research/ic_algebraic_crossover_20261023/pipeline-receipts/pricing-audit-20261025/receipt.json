@@ -1,0 +1,1847 @@
+{
+  "correction": "Completed n13/n23 structured S uses pinned word rates, not solver wall time. The n7 measured solver term is removed. Quartic solver work is counted under its virtual field-operation convention.",
+  "quartic_virtual_calibrations": [
+    {
+      "curve": "icv1-f2m24-t1171-7fbf6d93",
+      "evidence": {
+        "curve_binding_checked": true,
+        "fq_operations_per_add": 179.0,
+        "fq_operations_per_successful_lift": 169.0625,
+        "m": 6,
+        "max_cofactor": 16,
+        "ratios_gae_per_native": {
+          "ns_per_double": 1.0,
+          "ns_per_lookup": 0.00558659217877095,
+          "ns_per_row_op": 0.00558659217877095,
+          "ns_per_sqrt": 0.9444832402234636
+        },
+        "seed": 1,
+        "unit": "deterministic native-count convention; not nanoseconds or hardware calibration"
+      }
+    },
+    {
+      "curve": "icv1-f2m32-tm45925-abb49a5a",
+      "evidence": {
+        "curve_binding_checked": true,
+        "fq_operations_per_add": 179.0,
+        "fq_operations_per_successful_lift": 177.84375,
+        "m": 8,
+        "max_cofactor": 16,
+        "ratios_gae_per_native": {
+          "ns_per_double": 1.0,
+          "ns_per_lookup": 0.00558659217877095,
+          "ns_per_row_op": 0.00558659217877095,
+          "ns_per_sqrt": 0.9935405027932961
+        },
+        "seed": 1,
+        "unit": "deterministic native-count convention; not nanoseconds or hardware calibration"
+      }
+    },
+    {
+      "curve": "icv1-f2m40-t573363-49958dc1",
+      "evidence": {
+        "curve_binding_checked": true,
+        "fq_operations_per_add": 179.0,
+        "fq_operations_per_successful_lift": 178.78125,
+        "m": 10,
+        "max_cofactor": 16,
+        "ratios_gae_per_native": {
+          "ns_per_double": 1.0,
+          "ns_per_lookup": 0.00558659217877095,
+          "ns_per_row_op": 0.00558659217877095,
+          "ns_per_sqrt": 0.9987779329608939
+        },
+        "seed": 1,
+        "unit": "deterministic native-count convention; not nanoseconds or hardware calibration"
+      }
+    },
+    {
+      "curve": "icv1-f2m48-tm17036033-cfcd9389",
+      "evidence": {
+        "curve_binding_checked": true,
+        "fq_operations_per_add": 179.0,
+        "fq_operations_per_successful_lift": 179.0,
+        "m": 12,
+        "max_cofactor": 16,
+        "ratios_gae_per_native": {
+          "ns_per_double": 1.0,
+          "ns_per_lookup": 0.00558659217877095,
+          "ns_per_row_op": 0.00558659217877095,
+          "ns_per_sqrt": 1.0
+        },
+        "seed": 1,
+        "unit": "deterministic native-count convention; not nanoseconds or hardware calibration"
+      }
+    }
+  ],
+  "records": [
+    {
+      "all_native_scenario_s": [
+        0.0,
+        null,
+        null
+      ],
+      "arm": "rho-strong",
+      "compatibility_s": [
+        0.0,
+        null,
+        null
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m7-t13-616700dd",
+      "outcome": "exhausted",
+      "raw_gae": 0.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h1ac299ee2960",
+      "session": "structured-n7-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        19291.14590186121,
+        21882.61719379106,
+        45205.85882115969
+      ],
+      "arm": "ic-direct",
+      "compatibility_s": [
+        19291.14590186121,
+        21882.61719379106,
+        45205.85882115969
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m7-t13-616700dd",
+      "outcome": "exhausted",
+      "raw_gae": 103886.0,
+      "rebuilt_gae": 103886.0,
+      "record_id": "ECR1hf1f90ab1966e",
+      "session": "structured-n7-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": 39552,
+      "solver_priced_by": "measured",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        19291.14590186121,
+        21351.67708287523,
+        39896.457712001415
+      ],
+      "arm": "ic-symmetric",
+      "compatibility_s": [
+        19291.14590186121,
+        21351.67708287523,
+        39896.457712001415
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m7-t13-616700dd",
+      "outcome": "exhausted",
+      "raw_gae": 103886.0,
+      "rebuilt_gae": 103886.0,
+      "record_id": "ECR1h34872f05c90f",
+      "session": "structured-n7-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": 10960,
+      "solver_priced_by": "measured",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        19313.057951766103,
+        21172.14682992566,
+        37903.94673336165
+      ],
+      "arm": "ic-pair-table",
+      "compatibility_s": [
+        19313.057951766103,
+        21172.14682992566,
+        37903.94673336165
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m7-t13-616700dd",
+      "outcome": "exhausted",
+      "raw_gae": 104004.0,
+      "rebuilt_gae": 104004.0,
+      "record_id": "ECR1h148572bd4581",
+      "session": "structured-n7-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        0.0,
+        null,
+        null
+      ],
+      "arm": "rho-strong-aa",
+      "compatibility_s": [
+        0.0,
+        null,
+        null
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m7-t13-616700dd",
+      "outcome": "exhausted",
+      "raw_gae": 0.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1hab579b3e1958",
+      "session": "structured-n7-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        0.0,
+        null,
+        null
+      ],
+      "arm": "rho-strong",
+      "compatibility_s": [
+        0.0,
+        null,
+        null
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m7-t13-616700dd",
+      "outcome": "exhausted",
+      "raw_gae": 0.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h9fb94066f76a",
+      "session": "structured-n7-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        19290.217425170325,
+        21881.688717100173,
+        45204.9303444688
+      ],
+      "arm": "ic-direct",
+      "compatibility_s": [
+        19290.217425170325,
+        21881.688717100173,
+        45204.9303444688
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m7-t13-616700dd",
+      "outcome": "exhausted",
+      "raw_gae": 103881.0,
+      "rebuilt_gae": 103881.0,
+      "record_id": "ECR1hd52a0e7dd259",
+      "session": "structured-n7-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": 39552,
+      "solver_priced_by": "measured",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        19290.217425170325,
+        21350.74860618435,
+        39895.52923531053
+      ],
+      "arm": "ic-symmetric",
+      "compatibility_s": [
+        19290.217425170325,
+        21350.74860618435,
+        39895.52923531053
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m7-t13-616700dd",
+      "outcome": "exhausted",
+      "raw_gae": 103881.0,
+      "rebuilt_gae": 103881.0,
+      "record_id": "ECR1hd4993b9626fe",
+      "session": "structured-n7-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": 10960,
+      "solver_priced_by": "measured",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        19312.129475075217,
+        21171.218353234774,
+        37903.018256670766
+      ],
+      "arm": "ic-pair-table",
+      "compatibility_s": [
+        19312.129475075217,
+        21171.218353234774,
+        37903.018256670766
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m7-t13-616700dd",
+      "outcome": "exhausted",
+      "raw_gae": 103999.0,
+      "rebuilt_gae": 103999.0,
+      "record_id": "ECR1hd17fad3faf09",
+      "session": "structured-n7-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        0.0,
+        null,
+        null
+      ],
+      "arm": "rho-strong-aa",
+      "compatibility_s": [
+        0.0,
+        null,
+        null
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m7-t13-616700dd",
+      "outcome": "exhausted",
+      "raw_gae": 0.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h0ce671ac6c59",
+      "session": "structured-n7-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        14.318373493370782,
+        14.53734398883347,
+        16.508078447997665
+      ],
+      "arm": "rho-strong",
+      "compatibility_s": [
+        14.318373493370782,
+        14.53734398883347,
+        16.508078447997665
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m13-t181-515ee569",
+      "outcome": "verified",
+      "raw_gae": 640.8172020551672,
+      "rebuilt_gae": null,
+      "record_id": "ECR1he208ab449125",
+      "session": "structured-n13-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        24.712384487931978,
+        11299.71993196441,
+        112774.78785925271
+      ],
+      "arm": "ic-direct",
+      "compatibility_s": [
+        24.712384487931978,
+        11299.71993196441,
+        112774.78785925271
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m13-t181-515ee569",
+      "outcome": "verified",
+      "raw_gae": 12736.128396,
+      "rebuilt_gae": 12736.128396,
+      "record_id": "ECR1hf227b0abc64d",
+      "session": "structured-n13-20261025-01",
+      "solver_charge_gae_recomputed": 11625.504768,
+      "solver_ops": 5045792,
+      "solver_priced_by": "pinned",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        24.77941627225729,
+        4539.921985606352,
+        45176.2051096132
+      ],
+      "arm": "ic-symmetric",
+      "compatibility_s": [
+        24.77941627225729,
+        4539.921985606352,
+        45176.2051096132
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m13-t181-515ee569",
+      "outcome": "verified",
+      "raw_gae": 5768.675916,
+      "rebuilt_gae": 5768.675916,
+      "record_id": "ECR1h58d0ba66c890",
+      "session": "structured-n13-20261025-01",
+      "solver_charge_gae_recomputed": 4655.052288,
+      "solver_ops": 2020422,
+      "solver_priced_by": "pinned",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        79.63375977847159,
+        85.89005964883411,
+        142.19675848209684
+      ],
+      "arm": "ic-pair-table",
+      "compatibility_s": [
+        79.63375977847159,
+        85.89005964883411,
+        142.19675848209684
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m13-t181-515ee569",
+      "outcome": "verified",
+      "raw_gae": 3598.140478,
+      "rebuilt_gae": 3598.140478,
+      "record_id": "ECR1h113dfd66adaf",
+      "session": "structured-n13-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        14.318373493370782,
+        14.53734398883347,
+        16.508078447997665
+      ],
+      "arm": "rho-strong-aa",
+      "compatibility_s": [
+        14.318373493370782,
+        14.53734398883347,
+        16.508078447997665
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m13-t181-515ee569",
+      "outcome": "verified",
+      "raw_gae": 640.8172020551672,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h3066a3d2b9f5",
+      "session": "structured-n13-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        14.34071742147922,
+        14.56639109537444,
+        16.597454160431415
+      ],
+      "arm": "rho-strong",
+      "compatibility_s": [
+        14.34071742147922,
+        14.56639109537444,
+        16.597454160431415
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m13-t181-515ee569",
+      "outcome": "verified",
+      "raw_gae": 641.8172020551672,
+      "rebuilt_gae": null,
+      "record_id": "ECR1hc84c02f7b72f",
+      "session": "structured-n13-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        14.434177558050685,
+        3281.9633018869363,
+        32689.72542084691
+      ],
+      "arm": "ic-direct",
+      "compatibility_s": [
+        14.434177558050685,
+        3281.9633018869363,
+        32689.72542084691
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m13-t181-515ee569",
+      "outcome": "verified",
+      "raw_gae": 4016.600945,
+      "rebuilt_gae": 4016.600945,
+      "record_id": "ECR1h824c49bbb90a",
+      "session": "structured-n13-20261025-01",
+      "solver_charge_gae_recomputed": 3369.1115520000003,
+      "solver_ops": 1462288,
+      "solver_priced_by": "pinned",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        14.166050420749428,
+        1227.6871299181034,
+        12149.37684539429
+      ],
+      "arm": "ic-symmetric",
+      "compatibility_s": [
+        14.166050420749428,
+        1227.6871299181034,
+        12149.37684539429
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m13-t181-515ee569",
+      "outcome": "verified",
+      "raw_gae": 1886.605169,
+      "rebuilt_gae": 1886.605169,
+      "record_id": "ECR1h7735eaf570c0",
+      "session": "structured-n13-20261025-01",
+      "solver_charge_gae_recomputed": 1251.115776,
+      "solver_ops": 543019,
+      "solver_priced_by": "pinned",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        28.935386900426682,
+        30.600009544505284,
+        45.58161334121269
+      ],
+      "arm": "ic-pair-table",
+      "compatibility_s": [
+        28.935386900426682,
+        30.600009544505284,
+        45.58161334121269
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m13-t181-515ee569",
+      "outcome": "verified",
+      "raw_gae": 1304.288997,
+      "rebuilt_gae": 1304.288997,
+      "record_id": "ECR1h5e5cd9ec6bfb",
+      "session": "structured-n13-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        14.34071742147922,
+        14.56639109537444,
+        16.597454160431415
+      ],
+      "arm": "rho-strong-aa",
+      "compatibility_s": [
+        14.34071742147922,
+        14.56639109537444,
+        16.597454160431415
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m13-t181-515ee569",
+      "outcome": "verified",
+      "raw_gae": 641.8172020551672,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h23da37d0c600",
+      "session": "structured-n13-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        1.0495590596109108,
+        1.1068911376128618,
+        1.6228798396304216
+      ],
+      "arm": "rho-strong",
+      "compatibility_s": [
+        1.0495590596109108,
+        1.1068911376128618,
+        1.6228798396304216
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m23-t5197-69e76b73",
+      "outcome": "verified",
+      "raw_gae": 1519.4530703167784,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h83f65e9d90f0",
+      "session": "structured-n23-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        31.02425242626061,
+        1789004.003041708,
+        17889760.81214524
+      ],
+      "arm": "ic-direct",
+      "compatibility_s": [
+        31.02425242626061,
+        1789004.003041708,
+        17889760.81214524
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m23-t5197-69e76b73",
+      "outcome": "verified",
+      "raw_gae": 30191386.339962,
+      "rebuilt_gae": 30191386.339962002,
+      "record_id": "ECR1h7422c92bc3d1",
+      "session": "structured-n23-20261025-01",
+      "solver_charge_gae_recomputed": 30146468.866704002,
+      "solver_ops": 25899028236,
+      "solver_priced_by": "pinned",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        31.028396913827017,
+        363655.6626849,
+        3636277.3712767754
+      ],
+      "arm": "ic-symmetric",
+      "compatibility_s": [
+        31.028396913827017,
+        363655.6626849,
+        3636277.3712767754
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m23-t5197-69e76b73",
+      "outcome": "verified",
+      "raw_gae": 6172420.926738001,
+      "rebuilt_gae": 6172420.9267380005,
+      "record_id": "ECR1hca859a599aa5",
+      "session": "structured-n23-20261025-01",
+      "solver_charge_gae_recomputed": 6127497.453480001,
+      "solver_ops": 5264173070,
+      "solver_priced_by": "pinned",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        675.1715619639407,
+        742.5540223144266,
+        1348.9961654687995
+      ],
+      "arm": "ic-pair-table",
+      "compatibility_s": [
+        675.1715619639407,
+        742.5540223144266,
+        1348.9961654687995
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m23-t5197-69e76b73",
+      "outcome": "verified",
+      "raw_gae": 977453.473258,
+      "rebuilt_gae": 977453.473258,
+      "record_id": "ECR1h1c457246aa0e",
+      "session": "structured-n23-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        1.0495590596109108,
+        1.1068911376128618,
+        1.6228798396304216
+      ],
+      "arm": "rho-strong-aa",
+      "compatibility_s": [
+        1.0495590596109108,
+        1.1068911376128618,
+        1.6228798396304216
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m23-t5197-69e76b73",
+      "outcome": "verified",
+      "raw_gae": 1519.4530703167784,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h36ed90b63d43",
+      "session": "structured-n23-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        1.2484944627984036,
+        1.3467188181222283,
+        2.23073801603665
+      ],
+      "arm": "rho-strong",
+      "compatibility_s": [
+        1.2484944627984036,
+        1.3467188181222283,
+        2.23073801603665
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m23-t5197-69e76b73",
+      "outcome": "verified",
+      "raw_gae": 1807.4530703167784,
+      "rebuilt_gae": null,
+      "record_id": "ECR1hf97fe51125c3",
+      "session": "structured-n23-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        46.05699957754328,
+        545971.127250635,
+        5459296.759510151
+      ],
+      "arm": "ic-symmetric",
+      "compatibility_s": [
+        46.05699957754328,
+        545971.127250635,
+        5459296.759510151
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m23-t5197-69e76b73",
+      "outcome": "verified",
+      "raw_gae": 9266151.893863002,
+      "rebuilt_gae": 9266151.893863,
+      "record_id": "ECR1h4e1949792874",
+      "session": "structured-n23-20261025-01",
+      "solver_charge_gae_recomputed": 9199471.27776,
+      "solver_ops": 7903325840,
+      "solver_priced_by": "pinned",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        1013.1897511486728,
+        1114.377069708514,
+        2025.062936747084
+      ],
+      "arm": "ic-pair-table",
+      "compatibility_s": [
+        1013.1897511486728,
+        1114.377069708514,
+        2025.062936747084
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m23-t5197-69e76b73",
+      "outcome": "verified",
+      "raw_gae": 1466804.616103,
+      "rebuilt_gae": 1466804.616103,
+      "record_id": "ECR1hbe262f193d39",
+      "session": "structured-n23-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        1.2484944627984036,
+        1.3467188181222283,
+        2.23073801603665
+      ],
+      "arm": "rho-strong-aa",
+      "compatibility_s": [
+        1.2484944627984036,
+        1.3467188181222283,
+        2.23073801603665
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m23-t5197-69e76b73",
+      "outcome": "verified",
+      "raw_gae": 1807.4530703167784,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h4a078f76aafb",
+      "session": "structured-n23-20261025-01",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        2.1449506582517146,
+        2.3451034219752884,
+        4.146478295487451
+      ],
+      "arm": "rho-neg",
+      "compatibility_s": [
+        2.1449506582517146,
+        2.3451034219752884,
+        4.146478295487451
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m24-t1171-7fbf6d93",
+      "outcome": "verified",
+      "raw_gae": 2348.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h8cae7c60fb15",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        8.329497488049036,
+        71293.40316901037,
+        712859.0662127113
+      ],
+      "arm": "ic-frobenius",
+      "compatibility_s": [
+        3990.7090954247064,
+        3991.187963880863,
+        3995.497779986272
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 780326708,
+      "curve": "icv1-f2m24-t1171-7fbf6d93",
+      "outcome": "verified",
+      "raw_gae": 4368543.474511174,
+      "rebuilt_gae": 4368543.474511173,
+      "record_id": "ECR1h1c9b7c099bed",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 4359367.083798883,
+      "solver_ops": 780326708,
+      "solver_priced_by": "counted",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        2.1449506582517146,
+        2.3451034219752884,
+        4.146478295487451
+      ],
+      "arm": "rho-neg-aa",
+      "compatibility_s": [
+        2.1449506582517146,
+        2.3451034219752884,
+        4.146478295487451
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m24-t1171-7fbf6d93",
+      "outcome": "verified",
+      "raw_gae": 2348.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h4a3f32d568d4",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        0.6065788914306383,
+        0.6514328425891388,
+        1.0551184030156433
+      ],
+      "arm": "rho-neg",
+      "compatibility_s": [
+        0.6065788914306383,
+        0.6514328425891388,
+        1.0551184030156433
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m24-t1171-7fbf6d93",
+      "outcome": "verified",
+      "raw_gae": 664.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h2fcad57b2ae1",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        8.404406327051012,
+        70839.88358991538,
+        708323.1962422103
+      ],
+      "arm": "ic-frobenius",
+      "compatibility_s": [
+        3965.443872010427,
+        3965.916619866324,
+        3970.1713505693933
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 775361440,
+      "curve": "icv1-f2m24-t1171-7fbf6d93",
+      "outcome": "verified",
+      "raw_gae": 4340886.172835195,
+      "rebuilt_gae": 4340886.172835195,
+      "record_id": "ECR1h9696b1ca640b",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 4331628.156424581,
+      "solver_ops": 775361440,
+      "solver_priced_by": "counted",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        0.6065788914306383,
+        0.6514328425891388,
+        1.0551184030156433
+      ],
+      "arm": "rho-neg-aa",
+      "compatibility_s": [
+        0.6065788914306383,
+        0.6514328425891388,
+        1.0551184030156433
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m24-t1171-7fbf6d93",
+      "outcome": "verified",
+      "raw_gae": 664.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h6f9dd508fd64",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        0.9841113297732884,
+        1.0810946977374254,
+        1.9539450094146589
+      ],
+      "arm": "rho-neg",
+      "compatibility_s": [
+        0.9841113297732884,
+        1.0810946977374254,
+        1.9539450094146589
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m32-tm45925-abb49a5a",
+      "outcome": "verified",
+      "raw_gae": 26330.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h26e9a9ec665b",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        1.2566200918460968,
+        10811.498195584676,
+        108103.67237502013
+      ],
+      "arm": "ic-frobenius",
+      "compatibility_s": [
+        605.1748594918556,
+        605.279949724515,
+        606.2257618184501
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 2892263152,
+      "curve": "icv1-f2m32-tm45925-abb49a5a",
+      "outcome": "verified",
+      "raw_gae": 16191798.252269551,
+      "rebuilt_gae": 16191798.252269553,
+      "record_id": "ECR1h789b486d6fb2",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 16157894.703910615,
+      "solver_ops": 2892263152,
+      "solver_priced_by": "counted",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        0.9841113297732884,
+        1.0810946977374254,
+        1.9539450094146589
+      ],
+      "arm": "rho-neg-aa",
+      "compatibility_s": [
+        0.9841113297732884,
+        1.0810946977374254,
+        1.9539450094146589
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m32-tm45925-abb49a5a",
+      "outcome": "verified",
+      "raw_gae": 26330.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h3b7e9c92cf74",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        0.8468291074315759,
+        0.9300693027425554,
+        1.6792310605413712
+      ],
+      "arm": "rho-neg",
+      "compatibility_s": [
+        0.8468291074315759,
+        0.9300693027425554,
+        1.6792310605413712
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m32-tm45925-abb49a5a",
+      "outcome": "verified",
+      "raw_gae": 22657.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h7acc6554dd28",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        1.1761868376997953,
+        10623.59540939892,
+        106225.3684124499
+      ],
+      "arm": "ic-frobenius",
+      "compatibility_s": [
+        594.6026372969351,
+        594.6883966378452,
+        595.4602307060368
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 2842016260,
+      "curve": "icv1-f2m32-tm45925-abb49a5a",
+      "outcome": "verified",
+      "raw_gae": 15908908.464560056,
+      "rebuilt_gae": 15908908.464560056,
+      "record_id": "ECR1h32e7133bea9f",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 15877185.810055867,
+      "solver_ops": 2842016260,
+      "solver_priced_by": "counted",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        0.8468291074315759,
+        0.9300693027425554,
+        1.6792310605413712
+      ],
+      "arm": "rho-neg-aa",
+      "compatibility_s": [
+        0.8468291074315759,
+        0.9300693027425554,
+        1.6792310605413712
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m32-tm45925-abb49a5a",
+      "outcome": "verified",
+      "raw_gae": 22657.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1he7e2a627388d",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        1.0246987247563017,
+        1.1271115472429125,
+        2.0488269496224105
+      ],
+      "arm": "rho-neg",
+      "compatibility_s": [
+        1.0246987247563017,
+        1.1271115472429125,
+        2.0488269496224105
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m40-t573363-49958dc1",
+      "outcome": "verified",
+      "raw_gae": 759768.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h0ee3a9916799",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        0.1555023554123786,
+        1262.1030497253525,
+        12619.630976054812
+      ],
+      "arm": "ic-frobenius",
+      "compatibility_s": [
+        70.65116325646612,
+        70.7263804975442,
+        71.40333566724684
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 9356215572,
+      "curve": "icv1-f2m40-t573363-49958dc1",
+      "outcome": "verified",
+      "raw_gae": 52388281.9118366,
+      "rebuilt_gae": 52388281.911836594,
+      "record_id": "ECR1h223d89a5ebf8",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 52269360.73743017,
+      "solver_ops": 9356215572,
+      "solver_priced_by": "counted",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        1.0246987247563017,
+        1.1271115472429125,
+        2.0488269496224105
+      ],
+      "arm": "rho-neg-aa",
+      "compatibility_s": [
+        1.0246987247563017,
+        1.1271115472429125,
+        2.0488269496224105
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m40-t573363-49958dc1",
+      "outcome": "verified",
+      "raw_gae": 759768.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h8c40c60de624",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        2.3214813900508817,
+        2.553572883676802,
+        4.642396326310083
+      ],
+      "arm": "rho-neg",
+      "compatibility_s": [
+        2.3214813900508817,
+        2.553572883676802,
+        4.642396326310083
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m40-t573363-49958dc1",
+      "outcome": "verified",
+      "raw_gae": 1721274.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h95c63cd32540",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        0.15681733742878018,
+        1234.8487702169996,
+        12347.076346133135
+      ],
+      "arm": "ic-frobenius",
+      "compatibility_s": [
+        69.12983700465762,
+        69.20473784083205,
+        69.87884536640195
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 9154129948,
+      "curve": "icv1-f2m40-t573363-49958dc1",
+      "outcome": "verified",
+      "raw_gae": 51260273.8392109,
+      "rebuilt_gae": 51260273.8392109,
+      "record_id": "ECR1h0245016fa9a4",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 51140390.77094972,
+      "solver_ops": 9154129948,
+      "solver_priced_by": "counted",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        2.3214813900508817,
+        2.553572883676802,
+        4.642396326310083
+      ],
+      "arm": "rho-neg-aa",
+      "compatibility_s": [
+        2.3214813900508817,
+        2.553572883676802,
+        4.642396326310083
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m40-t573363-49958dc1",
+      "outcome": "verified",
+      "raw_gae": 1721274.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h6bc3e3b78ac6",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        1.3571722310286622,
+        1.4928810099394236,
+        2.714260020136276
+      ],
+      "arm": "rho-neg",
+      "compatibility_s": [
+        1.3571722310286622,
+        1.4928810099394236,
+        2.714260020136276
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m48-tm17036033-cfcd9389",
+      "outcome": "verified",
+      "raw_gae": 7200371.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h722ffdcff88c",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        0.0870034516444389,
+        756.2725883151722,
+        7561.942852086922
+      ],
+      "arm": "ic-frobenius",
+      "compatibility_s": [
+        42.301023621124955,
+        42.85564745095157,
+        47.84726191939113
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 40089408950,
+      "curve": "icv1-f2m48-tm17036033-cfcd9389",
+      "outcome": "verified",
+      "raw_gae": 224591190.27374303,
+      "rebuilt_gae": 224591190.27374303,
+      "record_id": "ECR1ha5786cc30627",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 223963178.49162012,
+      "solver_ops": 40089408950,
+      "solver_priced_by": "counted",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        1.3571722310286622,
+        1.4928810099394236,
+        2.714260020136276
+      ],
+      "arm": "rho-neg-aa",
+      "compatibility_s": [
+        1.3571722310286622,
+        1.4928810099394236,
+        2.714260020136276
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m48-tm17036033-cfcd9389",
+      "outcome": "verified",
+      "raw_gae": 7200371.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h4d76f605843b",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        0.9282845515397097,
+        1.0211047321393636,
+        1.8564863575362491
+      ],
+      "arm": "rho-neg",
+      "compatibility_s": [
+        0.9282845515397097,
+        1.0211047321393636,
+        1.8564863575362491
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m48-tm17036033-cfcd9389",
+      "outcome": "verified",
+      "raw_gae": 4924941.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1hec2931a55dd6",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        0.08812532288122414,
+        771.3496943550308,
+        7712.703815644377
+      ],
+      "arm": "ic-frobenius",
+      "compatibility_s": [
+        43.1444787761642,
+        43.69732099454855,
+        48.67290096000775
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 40889348007,
+      "curve": "icv1-f2m48-tm17036033-cfcd9389",
+      "outcome": "verified",
+      "raw_gae": 229065547.4972067,
+      "rebuilt_gae": 229065547.49720672,
+      "record_id": "ECR1h8c213380a653",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 228432111.77094972,
+      "solver_ops": 40889348007,
+      "solver_priced_by": "counted",
+      "solver_wall_charge_in_reported_cost": false
+    },
+    {
+      "all_native_scenario_s": [
+        0.9282845515397097,
+        1.0211047321393636,
+        1.8564863575362491
+      ],
+      "arm": "rho-neg-aa",
+      "compatibility_s": [
+        0.9282845515397097,
+        1.0211047321393636,
+        1.8564863575362491
+      ],
+      "counted_fq_solver_ops_varied_only_in_additional_scenario": 0,
+      "curve": "icv1-f2m48-tm17036033-cfcd9389",
+      "outcome": "verified",
+      "raw_gae": 4924941.0,
+      "rebuilt_gae": null,
+      "record_id": "ECR1h89b74a75655c",
+      "session": "quartic-smoke-20261025-02",
+      "solver_charge_gae_recomputed": 0.0,
+      "solver_ops": null,
+      "solver_priced_by": "none",
+      "solver_wall_charge_in_reported_cost": false
+    }
+  ],
+  "rows": [
+    {
+      "all_native_scenario_s_mean": [
+        19.57328102299133,
+        7290.8416169256725,
+        72732.2566400498
+      ],
+      "arm": "ic-direct",
+      "compatibility_s_mean": [
+        19.57328102299133,
+        7290.8416169256725,
+        72732.2566400498
+      ],
+      "complete": true,
+      "curve": "icv1-f2m13-t181-515ee569",
+      "planned": 2,
+      "raw_s_mean": 187.16089000770853,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        54.28457333944913,
+        58.2450345966697,
+        93.88918591165476
+      ],
+      "arm": "ic-pair-table",
+      "compatibility_s_mean": [
+        54.28457333944913,
+        58.2450345966697,
+        93.88918591165476
+      ],
+      "complete": true,
+      "curve": "icv1-f2m13-t181-515ee569",
+      "planned": 2,
+      "raw_s_mean": 54.76976587304272,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        19.47273334650336,
+        2883.804557762228,
+        28662.790977503744
+      ],
+      "arm": "ic-symmetric",
+      "compatibility_s_mean": [
+        19.47273334650336,
+        2883.804557762228,
+        28662.790977503744
+      ],
+      "complete": true,
+      "curve": "icv1-f2m13-t181-515ee569",
+      "planned": 2,
+      "raw_s_mean": 85.52452510656107,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        14.329545457425,
+        14.551867542103956,
+        16.55276630421454
+      ],
+      "arm": "rho-strong",
+      "compatibility_s_mean": [
+        14.329545457425,
+        14.551867542103956,
+        16.55276630421454
+      ],
+      "complete": true,
+      "curve": "icv1-f2m13-t181-515ee569",
+      "planned": 2,
+      "raw_s_mean": 14.329545457425,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        14.329545457425,
+        14.551867542103956,
+        16.55276630421454
+      ],
+      "arm": "rho-strong-aa",
+      "compatibility_s_mean": [
+        14.329545457425,
+        14.551867542103956,
+        16.55276630421454
+      ],
+      "complete": true,
+      "curve": "icv1-f2m13-t181-515ee569",
+      "planned": 2,
+      "raw_s_mean": 14.329545457425,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        null,
+        null,
+        null
+      ],
+      "arm": "ic-direct",
+      "compatibility_s_mean": [
+        null,
+        null,
+        null
+      ],
+      "complete": false,
+      "curve": "icv1-f2m23-t5197-69e76b73",
+      "planned": 2,
+      "raw_s_mean": null,
+      "verified": 1
+    },
+    {
+      "all_native_scenario_s_mean": [
+        844.1806565563068,
+        928.4655460114702,
+        1687.0295511079416
+      ],
+      "arm": "ic-pair-table",
+      "compatibility_s_mean": [
+        844.1806565563068,
+        928.4655460114702,
+        1687.0295511079416
+      ],
+      "complete": true,
+      "curve": "icv1-f2m23-t5197-69e76b73",
+      "planned": 2,
+      "raw_s_mean": 844.1831050370166,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        38.542698245685145,
+        454813.39496776747,
+        4547787.065393463
+      ],
+      "arm": "ic-symmetric",
+      "compatibility_s_mean": [
+        38.542698245685145,
+        454813.39496776747,
+        4547787.065393463
+      ],
+      "complete": true,
+      "curve": "icv1-f2m23-t5197-69e76b73",
+      "planned": 2,
+      "raw_s_mean": 5332.081091503003,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        1.1490267612046572,
+        1.2268049778675452,
+        1.9268089278335356
+      ],
+      "arm": "rho-strong",
+      "compatibility_s_mean": [
+        1.1490267612046572,
+        1.2268049778675452,
+        1.9268089278335356
+      ],
+      "complete": true,
+      "curve": "icv1-f2m23-t5197-69e76b73",
+      "planned": 2,
+      "raw_s_mean": 1.1490267612046572,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        1.1490267612046572,
+        1.2268049778675452,
+        1.9268089278335356
+      ],
+      "arm": "rho-strong-aa",
+      "compatibility_s_mean": [
+        1.1490267612046572,
+        1.2268049778675452,
+        1.9268089278335356
+      ],
+      "complete": true,
+      "curve": "icv1-f2m23-t5197-69e76b73",
+      "planned": 2,
+      "raw_s_mean": 1.1490267612046572,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        8.366951907550025,
+        71066.64337946288,
+        710591.1312274608
+      ],
+      "arm": "ic-frobenius",
+      "compatibility_s_mean": [
+        3978.0764837175666,
+        3978.5522918735933,
+        3982.8345652778326
+      ],
+      "complete": true,
+      "curve": "icv1-f2m24-t1171-7fbf6d93",
+      "planned": 2,
+      "raw_s_mean": 3978.129653976276,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        1.3757647748411763,
+        1.4982681322822136,
+        2.600798349251547
+      ],
+      "arm": "rho-neg",
+      "compatibility_s_mean": [
+        1.3757647748411763,
+        1.4982681322822136,
+        2.600798349251547
+      ],
+      "complete": true,
+      "curve": "icv1-f2m24-t1171-7fbf6d93",
+      "planned": 2,
+      "raw_s_mean": 1.3757647748411763,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        1.3757647748411763,
+        1.4982681322822136,
+        2.600798349251547
+      ],
+      "arm": "rho-neg-aa",
+      "compatibility_s_mean": [
+        1.3757647748411763,
+        1.4982681322822136,
+        2.600798349251547
+      ],
+      "complete": true,
+      "curve": "icv1-f2m24-t1171-7fbf6d93",
+      "planned": 2,
+      "raw_s_mean": 1.3757647748411763,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        1.216403464772946,
+        10717.546802491797,
+        107164.52039373502
+      ],
+      "arm": "ic-frobenius",
+      "compatibility_s_mean": [
+        599.8887483943954,
+        599.98417318118,
+        600.8429962622434
+      ],
+      "complete": true,
+      "curve": "icv1-f2m32-tm45925-abb49a5a",
+      "planned": 2,
+      "raw_s_mean": 599.8987689662271,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        0.9154702186024322,
+        1.0055820002399904,
+        1.816588034978015
+      ],
+      "arm": "rho-neg",
+      "compatibility_s_mean": [
+        0.9154702186024322,
+        1.0055820002399904,
+        1.816588034978015
+      ],
+      "complete": true,
+      "curve": "icv1-f2m32-tm45925-abb49a5a",
+      "planned": 2,
+      "raw_s_mean": 0.9154702186024322,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        0.9154702186024322,
+        1.0055820002399904,
+        1.816588034978015
+      ],
+      "arm": "rho-neg-aa",
+      "compatibility_s_mean": [
+        0.9154702186024322,
+        1.0055820002399904,
+        1.816588034978015
+      ],
+      "complete": true,
+      "curve": "icv1-f2m32-tm45925-abb49a5a",
+      "planned": 2,
+      "raw_s_mean": 0.9154702186024322,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        0.1561598464205794,
+        1248.475909971176,
+        12483.353661093974
+      ],
+      "arm": "ic-frobenius",
+      "compatibility_s_mean": [
+        69.89050013056186,
+        69.96555916918813,
+        70.64109051682439
+      ],
+      "complete": true,
+      "curve": "icv1-f2m40-t573363-49958dc1",
+      "planned": 2,
+      "raw_s_mean": 69.89537786596094,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        1.6730900574035918,
+        1.8403422154598572,
+        3.345611637966247
+      ],
+      "arm": "rho-neg",
+      "compatibility_s_mean": [
+        1.6730900574035918,
+        1.8403422154598572,
+        3.345611637966247
+      ],
+      "complete": true,
+      "curve": "icv1-f2m40-t573363-49958dc1",
+      "planned": 2,
+      "raw_s_mean": 1.6730900574035918,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        1.6730900574035918,
+        1.8403422154598572,
+        3.345611637966247
+      ],
+      "arm": "rho-neg-aa",
+      "compatibility_s_mean": [
+        1.6730900574035918,
+        1.8403422154598572,
+        3.345611637966247
+      ],
+      "complete": true,
+      "curve": "icv1-f2m40-t573363-49958dc1",
+      "planned": 2,
+      "raw_s_mean": 1.6730900574035918,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        0.08756438726283153,
+        763.8111413351015,
+        7637.32333386565
+      ],
+      "arm": "ic-frobenius",
+      "compatibility_s_mean": [
+        42.72275119864457,
+        43.27648422275006,
+        48.26008143969944
+      ],
+      "complete": true,
+      "curve": "icv1-f2m48-tm17036033-cfcd9389",
+      "planned": 2,
+      "raw_s_mean": 42.75406968070011,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        1.142728391284186,
+        1.2569928710393936,
+        2.2853731888362625
+      ],
+      "arm": "rho-neg",
+      "compatibility_s_mean": [
+        1.142728391284186,
+        1.2569928710393936,
+        2.2853731888362625
+      ],
+      "complete": true,
+      "curve": "icv1-f2m48-tm17036033-cfcd9389",
+      "planned": 2,
+      "raw_s_mean": 1.142728391284186,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        1.142728391284186,
+        1.2569928710393936,
+        2.2853731888362625
+      ],
+      "arm": "rho-neg-aa",
+      "compatibility_s_mean": [
+        1.142728391284186,
+        1.2569928710393936,
+        2.2853731888362625
+      ],
+      "complete": true,
+      "curve": "icv1-f2m48-tm17036033-cfcd9389",
+      "planned": 2,
+      "raw_s_mean": 1.142728391284186,
+      "verified": 2
+    },
+    {
+      "all_native_scenario_s_mean": [
+        null,
+        null,
+        null
+      ],
+      "arm": "ic-direct",
+      "compatibility_s_mean": [
+        null,
+        null,
+        null
+      ],
+      "complete": false,
+      "curve": "icv1-f2m7-t13-616700dd",
+      "planned": 2,
+      "raw_s_mean": null,
+      "verified": 0
+    },
+    {
+      "all_native_scenario_s_mean": [
+        null,
+        null,
+        null
+      ],
+      "arm": "ic-pair-table",
+      "compatibility_s_mean": [
+        null,
+        null,
+        null
+      ],
+      "complete": false,
+      "curve": "icv1-f2m7-t13-616700dd",
+      "planned": 2,
+      "raw_s_mean": null,
+      "verified": 0
+    },
+    {
+      "all_native_scenario_s_mean": [
+        null,
+        null,
+        null
+      ],
+      "arm": "ic-symmetric",
+      "compatibility_s_mean": [
+        null,
+        null,
+        null
+      ],
+      "complete": false,
+      "curve": "icv1-f2m7-t13-616700dd",
+      "planned": 2,
+      "raw_s_mean": null,
+      "verified": 0
+    },
+    {
+      "all_native_scenario_s_mean": [
+        null,
+        null,
+        null
+      ],
+      "arm": "rho-strong",
+      "compatibility_s_mean": [
+        null,
+        null,
+        null
+      ],
+      "complete": false,
+      "curve": "icv1-f2m7-t13-616700dd",
+      "planned": 2,
+      "raw_s_mean": null,
+      "verified": 0
+    },
+    {
+      "all_native_scenario_s_mean": [
+        null,
+        null,
+        null
+      ],
+      "arm": "rho-strong-aa",
+      "compatibility_s_mean": [
+        null,
+        null,
+        null
+      ],
+      "complete": false,
+      "curve": "icv1-f2m7-t13-616700dd",
+      "planned": 2,
+      "raw_s_mean": null,
+      "verified": 0
+    }
+  ],
+  "schema": "ic-campaign-pricing-audit/v1",
+  "scope": "Accounting reconstruction and labeled sensitivity scenarios only; missing construction, splitting, word scans and physical calibration remain missing. No algorithmic improvement or full-price promotion.",
+  "status": "raw_ic_costs_rebuilt_from_native_counts",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ]
+}

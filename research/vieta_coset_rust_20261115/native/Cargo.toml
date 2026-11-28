@@ -1,0 +1,55 @@
+[package]
+name = "vieta-coset-lab"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+num-bigint = "0.4"
+num-traits = "0.2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+
+[lib]
+path = "lib.rs"
+
+[[bin]]
+name = "vieta-coset-lab"
+path = "main.rs"
+
+[[bin]]
+name = "vieta-coset-replay"
+path = "replay.rs"
+
+[[bin]]
+name = "vieta-coset-analyze"
+path = "analyze.rs"
+
+[lints.clippy]
+type_complexity = "allow"
+too_many_arguments = "allow"
+
+[[bin]]
+name = "vieta-coset-export"
+path = "export.rs"
+
+[[bin]]
+name = "vieta-poly-compare"
+path = "poly_compare.rs"
+
+[[bin]]
+name = "vieta-split-tower-check"
+path = "split_tower_certificate.rs"
+
+[[bin]]
+name = "vieta-tower-degree-audit"
+path = "tower_degree_audit.rs"
+
+[[bin]]
+name = "vieta-next-compare"
+path = "next_compare.rs"
+
+[[bin]]
+name = "vieta-next-export"
+path = "next_export.rs"

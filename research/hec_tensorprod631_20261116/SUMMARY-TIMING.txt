@@ -1,0 +1,33 @@
+ARM baseline_a median_ns=1478166542 min_ns=1448523250 max_ns=2065583333 spread_ratio=1.425992529288 spread_pass=false
+ARM baseline_b median_ns=1462773166 min_ns=1451185833 max_ns=1473323334 spread_ratio=1.015254766479 spread_pass=true
+ARM tensor_a median_ns=1290368459 min_ns=1275596250 max_ns=1407780416 spread_ratio=1.103625395575 spread_pass=true
+ARM tensor_b median_ns=1287459000 min_ns=1275094542 max_ns=1303754042 spread_ratio=1.022476372579 spread_pass=true
+AA baseline ratio=1.010523419733 pass=true
+AA tensor ratio=1.002259845945 pass=true
+GATE correctness=true stability=false numerical_10x=false ratio=1.145538339604 qualified_10x=false
+PHASE arm=baseline_a name=generate-B median_ns=274721208 n=5 inclusive_nested=true
+PHASE arm=baseline_a name=generate-D1 median_ns=268936625 n=5 inclusive_nested=true
+PHASE arm=baseline_a name=group_add_raw median_ns=499588417 n=5 inclusive_nested=true
+PHASE arm=baseline_a name=group_neg_raw median_ns=18681293 n=5 inclusive_nested=true
+PHASE arm=baseline_a name=input_B median_ns=243302166 n=5 inclusive_nested=true
+PHASE arm=baseline_a name=input_D1 median_ns=242676666 n=5 inclusive_nested=true
+PHASE arm=baseline_a name=model_construction median_ns=129893792 n=5 inclusive_nested=true
+PHASE arm=baseline_a name=reconstruct median_ns=628807042 n=5 inclusive_nested=true
+PHASE arm=baseline_a name=section_coords median_ns=4474374 n=5 inclusive_nested=true
+PHASE arm=baseline_a name=solver-B median_ns=124317209 n=5 inclusive_nested=true
+PHASE arm=baseline_a name=solver-D1 median_ns=126018833 n=5 inclusive_nested=true
+PHASE arm=baseline_a name=verify-B median_ns=24971833 n=5 inclusive_nested=true
+PHASE arm=baseline_a name=verify-D1 median_ns=26757417 n=5 inclusive_nested=true
+PHASE arm=tensor_a name=generate-B median_ns=267481125 n=5 inclusive_nested=true
+PHASE arm=tensor_a name=generate-D1 median_ns=272802125 n=5 inclusive_nested=true
+PHASE arm=tensor_a name=group_add_raw median_ns=331973289 n=5 inclusive_nested=true
+PHASE arm=tensor_a name=group_neg_raw median_ns=12729247 n=5 inclusive_nested=true
+PHASE arm=tensor_a name=input_B median_ns=166037250 n=5 inclusive_nested=true
+PHASE arm=tensor_a name=input_D1 median_ns=167495500 n=5 inclusive_nested=true
+PHASE arm=tensor_a name=model_construction median_ns=107776208 n=5 inclusive_nested=true
+PHASE arm=tensor_a name=reconstruct median_ns=448754834 n=5 inclusive_nested=true
+PHASE arm=tensor_a name=section_coords median_ns=4323505 n=5 inclusive_nested=true
+PHASE arm=tensor_a name=solver-B median_ns=118669750 n=5 inclusive_nested=true
+PHASE arm=tensor_a name=solver-D1 median_ns=118346667 n=5 inclusive_nested=true
+PHASE arm=tensor_a name=verify-B median_ns=23317458 n=5 inclusive_nested=true
+PHASE arm=tensor_a name=verify-D1 median_ns=24763791 n=5 inclusive_nested=true

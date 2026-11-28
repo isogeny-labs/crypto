@@ -1,0 +1,202 @@
+{
+  "schema": "aps.completed-component-checks/v1",
+  "standing": "unverified producer assertions",
+  "observations": [
+    {
+      "id": "nov6-public-integrated/leads",
+      "compiled_source_commit": "ffd0bd0dd33f53e53bd8f5526ffa1c2ad20cce30",
+      "exit": 0,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --test aps_cost_leads -- --test-threads=2",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "17edcc1c638e29f4f30f8b44f8831a3090a045e474ada4f593db499fa5fcd320",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-public-integrated/existing-bridge",
+      "compiled_source_commit": "ffd0bd0dd33f53e53bd8f5526ffa1c2ad20cce30",
+      "exit": 0,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --test aps_export_bridge --test aps_ecbench -- --test-threads=2",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "923db7971086660d4cd1871a73dffdf3fb630ad536ae3b56d7ce6e3f3b81d406",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-public-integrated/examples",
+      "compiled_source_commit": "ffd0bd0dd33f53e53bd8f5526ffa1c2ad20cce30",
+      "exit": 0,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --example aps_single_relation_check --example aps_scalar_check",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "3e06163510b5c9718ecb8b267996c82fafc5fe680a0eec840b4e6d662575860f",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-export-counter-final/stable",
+      "compiled_source_commit": "aac11676180d17c6b013bbcad67c82f61b546057",
+      "exit": 0,
+      "command": "cargo test --release --locked --manifest-path tools/aps-export/Cargo.toml",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 55,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "9c9fe5a6d8b0cb8d87ceac38e98fdd93e4199d6f55e92826c915af70a8819658",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-export-counter-final/rust198",
+      "compiled_source_commit": "aac11676180d17c6b013bbcad67c82f61b546057",
+      "exit": 0,
+      "command": "cargo +1.98.0 test --release --locked --manifest-path tools/aps-export/Cargo.toml",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 55,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "5134679e7caeca1f60fd5d9ec0284a8e36fc478030ef91e36062707c3aee114c",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-export-counter-final/lint-stable",
+      "compiled_source_commit": "aac11676180d17c6b013bbcad67c82f61b546057",
+      "exit": 0,
+      "command": "cargo clippy --locked --manifest-path tools/aps-export/Cargo.toml --all-targets -- -D warnings",
+      "test_summaries": [],
+      "private_log_sha256": "c2ab66ce5142913cef57ca7a4aacf6a3e08e961b4db9f097c1a9c0352cef8d1a",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-export-counter-final/lint-198",
+      "compiled_source_commit": "aac11676180d17c6b013bbcad67c82f61b546057",
+      "exit": 0,
+      "command": "cargo +1.98.0 clippy --locked --manifest-path tools/aps-export/Cargo.toml --all-targets -- -D warnings",
+      "test_summaries": [],
+      "private_log_sha256": "4e2d2bd6be9061e17b1394dbc1563b62cd8bbcc2ced06a745c06fe766d45c316",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-export-counter-final/format",
+      "compiled_source_commit": "aac11676180d17c6b013bbcad67c82f61b546057",
+      "exit": 0,
+      "command": "cargo fmt --check --manifest-path tools/aps-export/Cargo.toml",
+      "test_summaries": [],
+      "private_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-existing-input-reruns/emulator",
+      "compiled_source_commit": "ffd0bd0dd33f53e53bd8f5526ffa1c2ad20cce30",
+      "exit": 0,
+      "command": "/workspace/crypto-target/release/deps/crypto_lib-20ef3354171ae5f3 cryptanalysis::certicom_dlp::device_tests --test-threads=2",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "e983b14fc8952d8c8d312b09b8899463693eb6e023bf11041f06a1c52b99e595",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-existing-input-reruns/historical-bound",
+      "compiled_source_commit": "ffd0bd0dd33f53e53bd8f5526ffa1c2ad20cce30",
+      "exit": 0,
+      "command": "/workspace/crypto-target/release/deps/crypto_lib-20ef3354171ae5f3 cryptanalysis::ecbench::bounds::tests::committed_version_1_bounds_re_derive_under_their_recorded_version --exact --test-threads=1",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "3998b7e78f893b7d8e0e5a5bbb9d2141b124308f7aa24abe1f8253404e7e7c46",
+      "performance_evidence": false
+    }
+  ],
+  "boundary_notes": [
+    "The seven-test public boundary precedes the added native-session eighth test and the later registry/optimization repairs.",
+    "Standalone export/audit source is the finalAAC counter-checked version, unchanged by the later registry-only repairs.",
+    "Exact tracked GPU emulator and historical bound inputs were materialized before their targeted reruns; these do not replace the broad-suite outcome.",
+    "The actual full-library command onFFD is still in flight; its initial missing registry/optimization coverage is being repaired and independently rerun."
+  ],
+  "raw_logs_published": false,
+  "checkpoint_upload_completed": false,
+  "benchmark_launched": false
+}

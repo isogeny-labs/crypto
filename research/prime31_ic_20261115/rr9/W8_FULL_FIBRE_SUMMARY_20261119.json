@@ -1,0 +1,164 @@
+{
+  "schema": "prime31.w8.full-fibre-summary.v1",
+  "date": "2026-11-19",
+  "status": "component verified in source-specific CI; pcc unverified; no non-generic public-only extractor and no whole-solver advantage",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "cofactor": 1,
+    "generator": [
+      625037715,
+      2100627251
+    ]
+  },
+  "protocol_commit": "50028eda452cd198d48c268d2a35f44e96d39627",
+  "source_specific_commit": "c099bbb821472986805ebb427c2987a9284cfca1",
+  "source_specific_ci": "https://github.com/isogeny-labs/crypto/actions/runs/44533134056",
+  "raw_artifact": "https://github.com/isogeny-labs/crypto/actions/runs/44533134056/artifacts/14534683345",
+  "raw_zip_sha256": "e7288b76fa24754995b7dbf0bfdf9f6121beefd1c0e82af3d11a9002c9ff92fa",
+  "raw_json_sha256": "5725afe43a35d6150a61748329a11a790de59cbf655b92d773327ad4b0af43f0",
+  "independent_replay_sha256": "f69050798b8960c0b316c12c3d8dcd6ef48885d5b0bc00cf7fb81b84936e78e6",
+  "tests": {
+    "original_rust": 40,
+    "focused_rust": 3,
+    "independent_affine_witnesses": 16,
+    "target_points_per_arm": 1024,
+    "arms": 4
+  },
+  "seed": "5748385f48455432",
+  "arms": [
+    {
+      "name": "old",
+      "weights": [
+        1,
+        3,
+        5,
+        7,
+        11,
+        13,
+        17,
+        19
+      ],
+      "hits": 795,
+      "ordered_witnesses": 2116,
+      "mean": 2.06640625,
+      "variance": 4.8139495849609375,
+      "max": 28,
+      "window_hits": [
+        200,
+        196,
+        200,
+        199
+      ]
+    },
+    {
+      "name": "pow2",
+      "weights": [
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64,
+        128
+      ],
+      "hits": 877,
+      "ordered_witnesses": 2131,
+      "mean": 2.0810546875,
+      "variance": 2.2307348251342773,
+      "max": 8,
+      "window_hits": [
+        216,
+        225,
+        220,
+        216
+      ]
+    },
+    {
+      "name": "near127",
+      "weights": [
+        1,
+        2,
+        4,
+        8,
+        16,
+        32,
+        64,
+        127
+      ],
+      "hits": 873,
+      "ordered_witnesses": 2018,
+      "mean": 1.970703125,
+      "variance": 2.0362510681152344,
+      "max": 8,
+      "window_hits": [
+        216,
+        216,
+        222,
+        219
+      ]
+    },
+    {
+      "name": "ternary",
+      "weights": [
+        1,
+        3,
+        9,
+        27,
+        81,
+        243,
+        729,
+        2187
+      ],
+      "hits": 892,
+      "ordered_witnesses": 2056,
+      "mean": 2.0078125,
+      "variance": 1.95501708984375,
+      "max": 7,
+      "window_hits": [
+        224,
+        223,
+        223,
+        222
+      ]
+    }
+  ],
+  "pairwise_miss_a_hit_b": [
+    [
+      0,
+      194,
+      196,
+      202
+    ],
+    [
+      112,
+      0,
+      128,
+      125
+    ],
+    [
+      118,
+      132,
+      0,
+      128
+    ],
+    [
+      105,
+      110,
+      109,
+      0
+    ]
+  ],
+  "population_mean_ordered_witnesses": 2.0000342890910905,
+  "limits": [
+    "generic EC four-plus-four hash tables",
+    "not public-only nonenumerative index calculus",
+    "not complete ECDLP recovery",
+    "no same-runner BSGS or rho reference",
+    "statistical inference single fixed curve and deterministic target cohort",
+    "pending third-party signed PCC"
+  ]
+}

@@ -47,6 +47,10 @@ jobs:
           cargo clippy --manifest-path isogeny_algos/Cargo.toml --locked --all-targets -- -D warnings
       - name: Tests
         run: cargo test --manifest-path isogeny_algos/Cargo.toml --locked --release
+      - name: Experimental subnlogn lint
+        run: cargo clippy --manifest-path isogeny_algos/Cargo.toml --locked --features experimental-subnlogn --lib --test subnlogn --example subnlogn --example subnlogn_full_flow -- -D warnings
+      - name: Experimental subnlogn correctness
+        run: cargo test --manifest-path isogeny_algos/Cargo.toml --locked --release --features experimental-subnlogn --lib --test subnlogn --example subnlogn --example subnlogn_full_flow
       - name: Command-line smoke test
         shell: bash
         run: |

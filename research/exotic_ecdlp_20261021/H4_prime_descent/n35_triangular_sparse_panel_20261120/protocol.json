@@ -1,0 +1,32 @@
+{
+  "schema": "n35-triangular-sparse-local-panel-protocol-v1",
+  "status": "frozen before panel measurement",
+  "question": "Does the independently verified combined candidate recover five distinct new points under paired alternating-order local IC/rho execution?",
+  "claim_boundary": "secondary ordinary-local-host rehearsal after a complete one-target candidate run; each point is a separate one-target workload with shared setup recorded separately; no Tier 0 or Tier 1 speedup promotion",
+  "candidate_id": "IC1N35Ch4randfb4096PDP3mitmRCsampleLAgaussTDdescentISO0h21421ad7a3b3",
+  "curve_id": "EC1N35Ch4randha95af81414ea",
+  "full_runner": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_triangular_sparse_pipeline_20261120/run.py",
+  "full_result": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_triangular_sparse_pipeline_20261120/result.json",
+  "candidate": "research/exotic_ecdlp_20261021/H4_prime_descent/n35_triangular_sparse_pipeline_20261120/candidate.json",
+  "source_hashes": {
+    "research/exotic_ecdlp_20261021/H4_prime_descent/n35_triangular_sparse_pipeline_20261120/run.py": "6d86397e880475d2c426522dfb1abd534a4c10417c09361c4fe86b1b0d170a2d",
+    "research/exotic_ecdlp_20261021/H4_prime_descent/n35_triangular_sparse_pipeline_20261120/result.json": "cced48dffb06067584f27d11a21d744370565ce73aa5712db4c05285cd696ddf",
+    "research/exotic_ecdlp_20261021/H4_prime_descent/n35_triangular_sparse_pipeline_20261120/candidate.json": "c2b9c1829988e912b13794798fdfa56f98ebf6597795f26e66e8d0ded880764b",
+    "research/exotic_ecdlp_20261021/H4_prime_descent/n35_triangular_sparse_panel_20261120/make_fixtures.py": "a75d576c9fd97630d444e2baf6da9b34846cccfdd6094de08424d3e22330ea57"
+  },
+  "fixtures_sha256": "576a45ac1d65667a47bbac09a25985774e1c8873c83de523e3293530b1b5fc28",
+  "runner_sha256": "18f0dbe985f4529aa7bfc3b19b1252a105e3b6b1a2e80c9d630402ec4e9687b7",
+  "target_count": 5,
+  "target_law": "each fixed ASCII tag in fixtures.json is SHA-256 reduced to a nonzero scalar modulo r and multiplied by the exact frozen subgroup generator; fixture construction outside timing",
+  "arm_order": "IC,rho on even indices and rho,IC on odd indices; separate scalar replay for both arms",
+  "ic_cap_seconds": 20,
+  "rho_cap_seconds": 60,
+  "rss_cap_bytes": 8589934592,
+  "distinct_pair_sums": 8321091,
+  "calibration_additions": 5000,
+  "calibration_policy": "5000 deterministic group additions before and after each pair, with point replay; diagnostic only on ordinary local host, retain every value and do not drop a pair by timing",
+  "shared_setup_policy": "rebuild exact base and triangular pair index once; reuse and point-replay all 2048 factor logs from frozen complete run; record setup separately from all five one-target online intervals",
+  "statistics": ["all five per-point statuses", "candidate/workload/run IDs", "paired exact public points", "IC five online phases", "rho online intervals", "before/after calibration", "shared setup phases", "all scalar certificates", "peak RSS"],
+  "resource_envelope": "one checked Sage process on ordinary macOS local host, sequential one-worker arms, no pinned CPU, observed 8 GiB RSS cap",
+  "failure_policy": "retain timeout, error, invalid scalar and resource-cap rows; no replacement target after observing timing"
+}

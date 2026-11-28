@@ -1,0 +1,80 @@
+{
+ "arms": [
+  {
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+     "targets": "stride-generator"
+    }
+   },
+   "name": "inc",
+   "role": "baseline"
+  },
+  {
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+     "targets": "stride-generator"
+    }
+   },
+   "name": "sel",
+   "role": "candidate"
+  },
+  {
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+     "targets": "stride-generator"
+    }
+   },
+   "name": "inc-aa",
+   "role": "control"
+  },
+  {
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=2.0,jumps=16,g=1,grow=2,tw=2,cj=1,lazy=1,seed=run",
+     "targets": "stride-generator"
+    }
+   },
+   "name": "sel-aa",
+   "role": "control"
+  }
+ ],
+ "description": "research/curve25519_autolab_20261104/round-039/profiles/session/PROTOCOL.md (written before data). Same curve, targets and arms as the round-039 holdout without rho; sel-aa is a second copy of sel for the wall-time noise floor. Public synthetic miniature; no security claim.",
+ "label": "tw2l walk-table wall-time confirmation, k = 28 (development, local L0 session)",
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 4,
+  "seed": 2026112001,
+  "timeout_seconds": 1800,
+  "warmup": 1
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 169487139,
+    "b": 71222779,
+    "group_order": 268462472,
+    "gx": 178958571,
+    "gy": 19523146,
+    "kind": "prime_explicit",
+    "p": 268435157,
+    "r": 33557809
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 2026149928,
+  "targets_per_curve": 128
+ }
+}

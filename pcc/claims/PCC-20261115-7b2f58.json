@@ -1,0 +1,100 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-15T22:43:51Z",
+ "id": "PCC-20261115-7b2f58",
+ "kind": "statement",
+ "producer": {
+  "commit": "b8cd452f3f52d8ad32aa77813f44a6b385567033",
+  "model": "claude-opus-5-5",
+  "session": "session_01TCbLH6jxWA7Yo11oJpoLxe"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/notes/index-calculus/PRIME_FIELD_IC_CLOSURE_20261112.md",
+    "sha256": "a77cbf9dd226845f1b8eed591ddd6fe0136f2d03b41cbd2f62247d376dfb55a6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/lifting/PROOF.md",
+    "sha256": "76c67d15116c434ac95915272caedb696069c658ddf365f35e94ad70ded15e5f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/lifting/out/bounds.md",
+    "sha256": "cdd1557f8c400e24f07c1827b4ff75c0095fb70a7c9825897275868d0e9af925"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/lifting/out/tables.md",
+    "sha256": "f1633c07a1e167efbc8245354d9d8215e4452b82e5885df6f22bf5c36e31d99e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/lifting/out/rate_fits.md",
+    "sha256": "e9969f3abad7b8c3459cf389d20f8a5260f15c085e667210d397bd99a90f5c1f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/lifting/out/summary.json",
+    "sha256": "e2d2bc698f182914858f368f942faab0e0518f370a851be40c5b8f26cba23267"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/lifting/out/collinear_mc.json",
+    "sha256": "3162ade5c7efbf38cd7a3581851ce27e87d1da9cdfa5f34aaccd85d8aa879de5"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/lifting/out/rates.svg",
+    "sha256": "c853083ed4800df486ddc43b79e2676db8a077d2918f3b85ff5bcc5847d7fc6f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/lifting-check/copy/out/bounds.md",
+    "sha256": "cdd1557f8c400e24f07c1827b4ff75c0095fb70a7c9825897275868d0e9af925"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/lifting-check/copy/out/tables.md",
+    "sha256": "f1633c07a1e167efbc8245354d9d8215e4452b82e5885df6f22bf5c36e31d99e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/lifting-check/copy/out/rate_fits.md",
+    "sha256": "e9969f3abad7b8c3459cf389d20f8a5260f15c085e667210d397bd99a90f5c1f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_ic_closure_20261112/finish/lifting-check/rerun/validate.txt",
+    "sha256": "e77242a0aab5f7b0f0cb5349de202977d01fd33991cdb0b485f44c0290e2b37e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Paper proof only: research/prime_field_ic_closure_20261112/finish/lifting/PROOF.md, checked line by line by one adversarial checker ('sound with gaps'; reading in research/notes/index-calculus/PRIME_FIELD_IC_CLOSURE_20261112.md section 5). Petsche checked against arXiv math/0508160v2; Silverman 1990 Thm 1.1 recalled from memory (constants may change, the asymptotics not). Not covered: r growing with p; Silverman-Suzuki/Miller hybrids that use other rational points of E' (open); Q-curve and number-field lifts (Prop 3 is a sketch); non-homomorphic p-adic sections; concrete sizes (r >= 7 not excluded at 256 bits, r >= 6 under worst-case rho_G). The toy xedni (8-16 bits, 69,425 honest trials) illustrates and proves nothing. research-kb prior-art check not done.",
+ "statement": "Lifting attacks on prime-field ECDLP (xedni/JKSST type, A8), Theorem 2: any lifting procedure that draws fresh uniform masks per trial (every mask draw counted as a trial, rejected or aborted ones included), outputs lifts over Q of at most beta bits and uses relations only among the r sampled lifted points has per-trial success probability at most O_r(beta^{3r(r-1)} log^{r(r-1)} beta)/q. For fixed r, polynomial-size lifts and log log p = o(log q), the expected number of trials is at least q/(log p)^{O(r^2)} = q^{1-o(1)}, above Pollard rho's sqrt(q). The proof assumes no conjecture: Petsche 2006 Thm 2 with the Szpiro-ratio bound over Q replaces Lang's conjecture, with Silverman 1990 and Mazur's torsion bound. The per-mask bound does not depend on the lift."
+}

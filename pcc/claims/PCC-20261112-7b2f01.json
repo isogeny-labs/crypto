@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-12T03:39:48Z",
+ "id": "PCC-20261112-7b2f01",
+ "kind": "statement",
+ "producer": {
+  "commit": "952e1cb4bc44163a49c097d3d68d8f483f43d8f1",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/full-class-checker-source-01.rs",
+    "sha256": "ca15261191be47386be927bf3cfb7a8602a0708a8b13f5989624d88c4bda410e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/full-class-checker-source-01.sha256",
+    "sha256": "602b9fea9b84b80e4bedc91e636d771495f518fdc082becec9a231f52922b9c3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/full-class-clippy-failed-01.txt",
+    "sha256": "0a14cd62f94994c82c5dd5c2d836c842df4b72212aff71afed700a15e52b8411"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_jacobian_transfers_20261110/evidence/full-class-existing-guards-01.txt",
+    "sha256": "925cea9dbf90b4595495f8ef10808f3064d31b449cbfde92ce4aaf0024c6f6dc"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Unsigned CT27 first checker attempt01 compiles up to strictClippy but fails four parser/style lints;full native11 tests NOT RUN. Exact checker source01/hash manifest and full diagnostic retained,existing original/source-extraction digests pass. No arithmetic result or independent corpus acceptance inferred. Repair parser/style only without exemptions or weakened controls,then a distinct full attempt02."
+}

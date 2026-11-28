@@ -1,0 +1,9 @@
+# Next: nonlinear dual certificate for the saturated image cell
+
+The7parametercellhas128unsupportednormsandnozeroguardoutput,butitsnonconstantANFcoefficientspanfillsall68quotientdimensions. Thereforealinearoutputfunctional cannotcertifythecell. Do not repeat the identicallinear attempt or truncate observeddegree7terms.
+
+Letg(x)be theexactprojectedguard. Lift its outputtofeatures(g)=(g_i,g_i*g_j fori<j),withnoconstantfeature. Synthesizealinearfunctional onthese features whose compositionwithg isidentically1. It is a degree<=2polynomialQintheguardoutputs withQ(0)=0. ExactidentityQ(g(x))=1thereforecertifiesg(x)!=0for everypoint. This is a stronger sufficientcertificate,not a promise ofexistence ortractablesynthesis.
+
+Next90s/4GiB/core0experiment: freeze the recorded7cellANFvectors,reconstructtheirtruthtable andcompute thequadraticfeaturelift. Recover exactinputANFcoefficients bysubsetXOR,synthesizeanexplicitdualmask,andverify everycoefficientofQ(g)-1zero. Includezero-containingcells toexclude falsecertificates,andcompare againstindependentliteralguards. Coefficient/reconstructionwork is fullycharged;using128valuesfromtheoldcellis reuse ofevidence,not a fresh nonenumerative search. Ifsuccessful,onlythen attemptcircuit-levelcoefficientsynthesis withsoundnonlinearremainderbounds toavoid2^bpointconstruction. Do not call anenumeratedcertificate aspeedup.
+
+Reviewpriorart in finite-fieldNullstellensatz,polynomialcalculus andbounded-degreeinfeasibilitycertificates beforeclaimingnovelty. Global73parameterpreimageconstraints,imagecollisions,alloriginalauxiliaries,odd/prime domain algorithms andgenuinefullF6matchingremain unresolved. Furtherimagecell/Hensellifting designs mustretaincollidingrootprefixes andexplicitfield-wrapquotients;no generic nonsingular-root assumption is allowed.

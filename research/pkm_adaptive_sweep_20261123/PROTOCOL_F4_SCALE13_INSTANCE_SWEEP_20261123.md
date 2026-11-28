@@ -1,0 +1,7 @@
+# Independent 13-bit seed-10 instance sweep — 2026-11-23
+
+The fixed instance at CLI seed 20261124 stopped because the seed-10 degree-16 map had 11 lifting abscissae and the valid power-of-two interval bases had 2, 6 or 15. Preserve that store. Starting at CLI seed 20261125, inspect generic 13-bit instances in ascending seed order through 20261140 using exactly 32 repeats, `subtract`, one target trial and zero rho runs. On each instance, measure the ordinary t=4 auxiliary seed-10 map and interval bases below 8, 16 and 32. Select the **first** instance and interval whose actual lifting-abscissa counts agree. Selection uses only instance identity and base size. If none matches, stop.
+
+On the selected instance, run cold 32-repeat invocations in order interval, isogeny, isogeny, interval. Use m=2 Semaev F4 chain mode, degree bound 8, 1000 target trials, five-second solver-call budget, one rho context run and a 180-second outer cap. Require all four calls to share the selected instance and base size, exit successfully, and verify the same 32 planted scalars. Preserve all preflights and timed calls in one append-only store.
+
+A robust independent-instance component lead requires candidate/interval charged GAE <0.9, wall <1 and child CPU <1 in **both** mirrored pairs, and combined charged GAE <0.9. Report relation and trial totals. This gate remains separate from source-exact replay, cold same-target rho and s59/P-192/NIST transfer.

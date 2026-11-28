@@ -1,0 +1,47 @@
+{
+  "canonical_autonomy_records": false,
+  "created": "2026-11-23T06:05:56Z",
+  "drafts": [
+    {
+      "classification_status": "provisional_rule_based",
+      "classifier": "rule",
+      "episode": null,
+      "proposed_class": "nudge",
+      "reason": "Visible continuation request; missing surrounding pause and episode metadata prevents final attribution.",
+      "registered": false,
+      "separate_model_classifier_executed": false,
+      "text_sha256": "31fbef162594de01bab0cd525c51f74de7bcb15063029fa1a54b2cf5944c80d8",
+      "ts": null,
+      "visible_postinitial_short_message_ordinal": 1
+    },
+    {
+      "classification_status": "provisional_rule_based",
+      "classifier": "rule",
+      "episode": null,
+      "proposed_class": "nudge",
+      "reason": "Visible continuation request; missing surrounding pause and episode metadata prevents final attribution.",
+      "registered": false,
+      "separate_model_classifier_executed": false,
+      "text_sha256": "6cc8519b91584e8bd435d63341e0838a99721948718b1c9c1e9c358c64ba992a",
+      "ts": null,
+      "visible_postinitial_short_message_ordinal": 2
+    }
+  ],
+  "exhaustive_transcript_accounting": false,
+  "hashing": "SHA-256 over the exact visible message UTF-8 bytes, without an added newline.",
+  "requirements_before_registration": [
+    "Obtain authoritative timestamps and episode boundaries without substituting PR opening or receipt time.",
+    "Resolve full human-message boundaries and enumerate all applicable messages after the initial prompt.",
+    "Confirm classification from the surrounding agent pause and human request, retaining hash-only content.",
+    "Create valid episodes through the maintained tool before registering these interventions."
+  ],
+  "schema": "prime31.intervention-hash-drafts/v1",
+  "unaccounted_context_message": {
+    "class": null,
+    "description": "A later instruction/environment context block has uncertain human-message boundary and origin in this view.",
+    "reason": "No excerpt hash is substituted for an authoritative complete human-message hash.",
+    "registered": false,
+    "text_sha256": null,
+    "ts": null
+  }
+}

@@ -1,0 +1,80 @@
+[
+  {
+    "control": "positive",
+    "independent_witnesses": 1,
+    "replay_ok": true
+  },
+  {
+    "control": "smoke",
+    "independent_witnesses": 0,
+    "replay_ok": true
+  },
+  {
+    "control": "wide",
+    "independent_witnesses": 1,
+    "replay_ok": true
+  },
+  {
+    "control": "wide2",
+    "independent_witnesses": 1,
+    "replay_ok": true
+  },
+  {
+    "control": "wide_cycle",
+    "cancelled_lp_index": 7,
+    "factor_base_terms": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        -1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        3,
+        -1
+      ],
+      [
+        4,
+        1
+      ],
+      [
+        5,
+        -1
+      ]
+    ],
+    "point_replay_ok": true
+  },
+  {
+    "control": "public_aG_plus_bQ_panel",
+    "queries": 16,
+    "independent_one_lp_witnesses": 0,
+    "all_query_and_witness_replays_ok": true
+  },
+  {
+    "control": "nine_point_censored",
+    "same_target_and_selector": true,
+    "attempts": [
+      {
+        "matrix_entry_cap": 2000000,
+        "status": "ResourceLimit",
+        "independent_witnesses": 1
+      },
+      {
+        "matrix_entry_cap": 4000000,
+        "status": "ResourceLimit",
+        "independent_witnesses": 1
+      },
+      {
+        "matrix_entry_cap": 8000000,
+        "status": "ResourceLimit",
+        "independent_witnesses": 1
+      }
+    ]
+  }
+]

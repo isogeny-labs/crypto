@@ -1,0 +1,91 @@
+{
+  "schema": "experiment.review/v1",
+  "review_id": "REV-20261101T063628Z-531aad",
+  "created": "2026-11-01T06:36:28.371972+00:00",
+  "export": {
+    "path": "/home/ec2-user/ml-dataset-resume-20261029/cli46-v3-derived-export/experiment.export.derived.json",
+    "sha256": "4aee068ce1aa909ef96ca851cf2d8ba7e7ff90bd5a2c1115cd10c5e3d70d2822",
+    "export_id": "koblitz-m3-cli-functional-smoke"
+  },
+  "protocol_sha256": "c4d03a34ad36dd15cedd9926c761c658e9c2d59392bee1d442c3483e8ea60ec7",
+  "reviewer": {
+    "runtime": "Codex",
+    "model": null,
+    "session": "/root/bridge_resume",
+    "role": "reviewer",
+    "independence": {
+      "same_session_as_producer": false,
+      "same_host_class": true,
+      "shares_code_with_producer": true,
+      "declared_conflicts": [
+        "Same team and host; independent review subagent, not author of derived export. Pinned official checker shared; no producer solver executed."
+      ]
+    }
+  },
+  "checks": [
+    {
+      "id": "exact-observations",
+      "kind": "recompute",
+      "result": "pass",
+      "detail": "All92 run records identical to original except artifact references, with46 cases in each phase; source/host/flow/producer unchanged. Independent manifest tally agrees, including4unsupported and3partial solver outcomes."
+    },
+    {
+      "id": "file-custody",
+      "kind": "hashes",
+      "result": "pass",
+      "detail": "742 attached file references checked for exact SHA256 and size; original input before/after hashes agree. Arms and analysis script match frozen protocol and retained state."
+    },
+    {
+      "id": "official-export-check",
+      "kind": "protocol_adherence",
+      "result": "pass",
+      "detail": "Pinned37e193 checker schema and lint_export verify_files=True independently rerun using cached jsonschema4.26.0; zero findings."
+    },
+    {
+      "id": "failure-preserved",
+      "kind": "provenance",
+      "result": "pass",
+      "detail": "Original terminal no_retry failure remains unchanged; actual125 dataset commands contradict its no_dataset_commands flag. Derived artifact documents correction without replacing original verdict."
+    },
+    {
+      "id": "execution-replay",
+      "kind": "replay",
+      "result": "not_covered",
+      "detail": "Parent explicitly requested provenance-only review without data reruns; no solver or mathematical replay executed."
+    }
+  ],
+  "replay": {
+    "performed": false,
+    "method": "No execution authorized in this provenance-only review",
+    "units_sampled": 0,
+    "nonce": null,
+    "identical": 0,
+    "mismatched": 0,
+    "miss_probability": null
+  },
+  "observations": [
+    "46case identities and92functional phase observations preserved exactly.",
+    "Four policy cases remain unsupported and three domain cases remain partial; functional contract success does not relabel solver outcomes.",
+    "Original failed export metadata is separately reconciled; no additional solver runs."
+  ],
+  "judgments": [
+    {
+      "claim_id": "provenance-reconciliation",
+      "verdict": "supported_within_scope",
+      "basis": "Independent equality,742hash/size references, original manifest tally and pinned official lint all pass.",
+      "scope": "Derived metadata/custody only; original functional observations preserved."
+    }
+  ],
+  "open_questions": [
+    "Full semantic correctness of existing runs was not re-executed in this restricted review."
+  ],
+  "recommendation": {
+    "action": "no_action",
+    "reason": "Accept separate provenance-only reconciliation with original terminal failure and scoped outcomes retained."
+  },
+  "asserts_nothing_about": [
+    "official research status",
+    "fresh mathematical replay",
+    "new dataset runs"
+  ]
+}

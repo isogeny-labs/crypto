@@ -1,0 +1,17 @@
+✖ [1645/1646] Building AssemblyProbe (13s)
+trace: .> LEAN_PATH=/workspace/isogeny-labs/crypto-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/mathlib/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-exponent-ideas-20261117/research/curve25519_torus_native_20261115/section-operator-v1/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /workspace/isogeny-labs/crypto-exponent-ideas-20261117/research/curve25519_torus_native_20261115/section-operator-v1/AssemblyProbe.lean -o /workspace/isogeny-labs/crypto-exponent-ideas-20261117/research/curve25519_torus_native_20261115/section-operator-v1/.lake/build/lib/lean/AssemblyProbe.olean -i /workspace/isogeny-labs/crypto-exponent-ideas-20261117/research/curve25519_torus_native_20261115/section-operator-v1/.lake/build/lib/lean/AssemblyProbe.ilean -c /workspace/isogeny-labs/crypto-exponent-ideas-20261117/research/curve25519_torus_native_20261115/section-operator-v1/.lake/build/ir/AssemblyProbe.c --setup /workspace/isogeny-labs/crypto-exponent-ideas-20261117/research/curve25519_torus_native_20261115/section-operator-v1/.lake/build/ir/AssemblyProbe.setup.json --json
+info: AssemblyProbe.lean:14:0: 'Matrix.eq_zero_of_mulVec_eq_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+error: AssemblyProbe.lean:36:5: failed to synthesize instance of type class
+  NoZeroDivisors (ZMod 101)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+info: AssemblyProbe.lean:38:0: '_private.AssemblyProbe.0.SectionCertificate.toy_section_kernel' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: AssemblyProbe.lean:39:0: '_private.AssemblyProbe.0.SectionCertificate.toy_section_det_zero' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+Some required targets logged failures:
+- AssemblyProbe
+error: build failed

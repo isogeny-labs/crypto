@@ -1,0 +1,12 @@
+{
+  "schema": "xedni-target-first-height-scan-protocol-v1",
+  "source_packed_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "rational_curve_coefficients": [94, 0, 188, 1738, 3805],
+  "reduction_prime": 47,
+  "input_law": "uniform among the 42 nonidentity E(F47) source points; finite coverage census rather than sampled targets",
+  "enumeration": "canonical x=a/b^2 with gcd(abs(a),b)=1, b>=1, max(abs(a),b)<=H; test the integral quadratic discriminant for a rational y=c/b^3; include both rational y solutions",
+  "height_checkpoints": [16, 64, 256, 1024],
+  "reduction_rule": "retain rational points with b not divisible by 47; count b divisible by 47 separately as reduction-to-infinity cases",
+  "measurement": "exact candidate discriminant tests, rational points, distinct finite reductions, uniform target coverage at each H; no wall-time comparison",
+  "claim_boundary": "bounded search coverage for one fixed curve and enumeration; it is not a general lower bound for rational lifting"
+}

@@ -1,0 +1,30 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-26T05:48:13Z",
+ "id": "PCC-20261126-f633bb",
+ "kind": "statement",
+ "producer": {
+  "commit": "9d33062eec347fc8efd1f16f4a221c6237a212d9",
+  "model": "GPT-5",
+  "session": "blocked-bsgs-rho-wall-20261126"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/blocked_bsgs_rho_wall_20261126/PROTOCOL.md",
+    "sha256": "53548103cbf898dab3f39bf0de8bebb5ced07184855baa82556079395e58c773"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/blocked_bsgs_rho_wall_20261126/seed-manifest.json",
+    "sha256": "45fa0e04de6c91c567dea346849fc74c12d9537814124086649dc47ade8e6c5f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/blocked_bsgs_rho_wall_20261126/PROTOCOL.md; public synthetic 24, 28, 32, 36 and 40-bit prime-order curves; no production targets",
+ "statement": "Preregistered hypothesis: on each fixed public curve in protocol blocked-bsgs-rho-wall/v1, paired blocked BSGS has lower cold one-target elapsed time than tuned batched negation-map rho only when every retained target passes the evaluator check, no row is censored, both A/A intervals contain 1, and the paired ratio-of-sums bootstrap interval lies wholly above 1. This record asserts the test and decision rule, not an outcome. [pcc:unverified]"
+}

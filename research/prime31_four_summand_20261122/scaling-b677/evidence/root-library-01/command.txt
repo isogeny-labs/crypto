@@ -1,0 +1,1 @@
+bash -c ulimit\ -v\ 2097152\;\ exec\ env\ CARGO_BUILD_JOBS=2\ RAYON_NUM_THREADS=1\ CARGO_TARGET_DIR=/workspace/scratch/25ba7b3118bf/crypto-four-qualify/target\ timeout\ 180\ cargo\ test\ --offline\ --locked\ --release\ --lib\ --\ --test-threads=1 

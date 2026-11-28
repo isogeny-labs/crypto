@@ -1,0 +1,65 @@
+name: APS production partition bridge
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/aps-partition-bridge/**'
+      - 'tools/aps-partition-lab/**'
+      - 'src/cryptanalysis/aps_single_relation.rs'
+      - 'src/cryptanalysis/aps_single_relation/**'
+      - 'src/cryptanalysis/f4_fp.rs'
+      - 'src/cryptanalysis/f4_fp/**'
+      - 'src/cryptanalysis/prime_fast.rs'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - '.github/workflows/aps-partition-bridge.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aps-partition-bridge-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bridge:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        rust: ['1.98.0', '1.99.1']
+    env:
+      CARGO_BUILD_JOBS: 2
+      CARGO_PROFILE_RELEASE_CODEGEN_UNITS: 256
+      RUSTFLAGS: '-C target-cpu=x86-64'
+      RAYON_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            Cargo.toml
+            Cargo.lock
+            .cargo
+            .github/scripts/ci-scope.mjs
+            src
+            tools/aps-partition-bridge
+            tools/aps-partition-lab
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+          components: clippy,rustfmt
+      - name: Materialize maintained root build closure
+        run: node .github/scripts/ci-scope.mjs --materialize
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tools/aps-partition-bridge
+      - name: Format
+        run: cargo fmt --check --manifest-path tools/aps-partition-bridge/Cargo.toml
+      - name: Strict bridge lint
+        run: cargo clippy --release --locked --manifest-path tools/aps-partition-bridge/Cargo.toml --all-targets --no-deps -- -D warnings
+      - name: Bounded production-linked correctness cases
+        run: cargo test --release --locked --manifest-path tools/aps-partition-bridge/Cargo.toml -- --test-threads=1

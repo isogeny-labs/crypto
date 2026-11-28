@@ -110,6 +110,7 @@ use rand::{Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 
 use crate::binary_ecc::{BinaryCurve, BinaryPoint, IrreduciblePoly};
+use crate::cryptanalysis::binary_radical_root::FactoredSubspaceOracle;
 use crate::cryptanalysis::curve_id::{self, CurveId};
 use crate::cryptanalysis::efd_representations::EfdRepresentation;
 use crate::cryptanalysis::ic_measurement as measurement;
@@ -216,6 +217,12 @@ pub struct Calibration {
     pub ns_per_as_solve: Option<f64>,
     /// One pair of the `S₄` pairs-and-solve loop, binary regimes.
     pub ns_per_s4_pair: Option<f64>,
+    /// One pair of the factored `S₄ = S₃·S₃` oracle
+    /// ([`FactoredSubspaceOracle`]), binary regimes.  Measured on the host
+    /// like `ns_per_s4_pair`; absent (and left out of the record) where
+    /// that oracle did not run.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ns_per_s4f_pair: Option<f64>,
     /// One probe into the pair table (hash lookup), measured on the real
     /// table when one is built.
     pub ns_per_lookup: f64,
@@ -850,6 +857,17 @@ pub struct RhoResult {
     /// result.
     #[serde(skip)]
     pub work_native: BTreeMap<String, u64>,
+    /// Jump-index selections of the tuned walk ([`TunedWalker`]): one per
+    /// walk step, the mixed key reduced to a jump index (`index_of`), as
+    /// `koblitz_strong_rho` tallies one `partition_hashes` per lane step.
+    /// The look-ahead's rejected candidates are not selections (each is
+    /// charged a full addition in `look_ahead_additions`).  Zero for the
+    /// walks that do not tally it.  Kept out of `counters` and the
+    /// serialised result so that every report is unchanged; ecbench emits
+    /// it only for `rho.signed_frobenius_v5` (owner decision 2026-11-19,
+    /// research/koblitz_rho_reference_20261115/DECISION.md).
+    #[serde(skip)]
+    pub jump_index_selections: u64,
 }
 
 /// One instance of one regime: the curve, the boundaries, the reference
@@ -947,6 +965,224 @@ pub(crate) type FastMap<V> = HashMap<u64, V, BuildHasherDefault<MixHasher>>;
 
 pub(crate) fn fast_map<V>(capacity: usize) -> FastMap<V> {
     HashMap::with_capacity_and_hasher(capacity, BuildHasherDefault::default())
+}
+
+/// Open-addressing walk coefficient table `u64 → (u128, u64, u64)`.
+/// Multiplicative home, linear probe, `0` empty sentinel.  A full dense
+/// `p+2` array was tried on ledger fp20 and **regressed** cold-E2E wall
+/// ~10× (zeroing ~30 MB per solve); keep the compact open table.
+struct OpenCoefMap {
+    keys: Vec<u64>,
+    us: Vec<u128>,
+    zs: Vec<u64>,
+    bs: Vec<u64>,
+    mask: usize,
+    len: usize,
+}
+
+impl OpenCoefMap {
+    fn with_capacity(slots: usize) -> Self {
+        // 2× next_pow2; a 4× trial on fp20 raised cold-E2E wall (~2.7×
+        // vs ~2.3×) via cache pressure. Dense `p+2` arrays falsified.
+        let cap = (slots.max(8) * 2).next_power_of_two();
+        Self {
+            keys: vec![0; cap],
+            us: vec![0; cap],
+            zs: vec![0; cap],
+            bs: vec![0; cap],
+            mask: cap - 1,
+            len: 0,
+        }
+    }
+
+    fn with_capacity_bound(slots: usize, _key_bound: u64) -> Self {
+        // `_key_bound` retained so call sites can pass `abscissa_key_bound`
+        // without a second API; dense arrays are intentionally unused.
+        Self::with_capacity(slots)
+    }
+
+    // Complete occupied-entry views used by the original collision-ledger tests.
+    #[cfg(test)]
+    fn iter(&self) -> impl Iterator<Item = (u64, (u128, u64, u64))> + '_ {
+        self.keys
+            .iter()
+            .enumerate()
+            .filter(|&(_, &key)| key != 0)
+            .map(move |(i, &key)| (key, (self.us[i], self.zs[i], self.bs[i])))
+    }
+
+    #[cfg(test)]
+    fn values(&self) -> impl Iterator<Item = (u128, u64, u64)> + '_ {
+        self.iter().map(|(_, value)| value)
+    }
+
+    #[inline(always)]
+    fn home(&self, key: u64) -> usize {
+        (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) as usize) & self.mask
+    }
+
+    #[inline]
+    fn prefetch(&self, key: u64) {
+        prefetch_cache_line(&self.keys, self.home(key));
+    }
+
+    #[inline]
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    /// Insert if vacant; return `Err(existing)` on collision (occupied).
+    #[inline]
+    fn insert_vacant(&mut self, key: u64, val: (u128, u64, u64)) -> Result<(), (u128, u64, u64)> {
+        debug_assert!(key != 0);
+        let mut i = self.home(key);
+        loop {
+            let k = self.keys[i];
+            if k == 0 {
+                self.keys[i] = key;
+                self.us[i] = val.0;
+                self.zs[i] = val.1;
+                self.bs[i] = val.2;
+                self.len += 1;
+                if self.len * 4 > self.keys.len() * 3 {
+                    self.grow();
+                }
+                return Ok(());
+            }
+            if k == key {
+                return Err((self.us[i], self.zs[i], self.bs[i]));
+            }
+            i = (i + 1) & self.mask;
+        }
+    }
+
+    #[inline]
+    fn get(&self, key: u64) -> Option<(u128, u64, u64)> {
+        if key == 0 {
+            return None;
+        }
+        let mut i = self.home(key);
+        loop {
+            let k = self.keys[i];
+            if k == 0 {
+                return None;
+            }
+            if k == key {
+                return Some((self.us[i], self.zs[i], self.bs[i]));
+            }
+            i = (i + 1) & self.mask;
+        }
+    }
+
+    fn grow(&mut self) {
+        let cap = self.keys.len() * 2;
+        let old_keys = std::mem::replace(&mut self.keys, vec![0; cap]);
+        let old_us = std::mem::replace(&mut self.us, vec![0; cap]);
+        let old_zs = std::mem::replace(&mut self.zs, vec![0; cap]);
+        let old_bs = std::mem::replace(&mut self.bs, vec![0; cap]);
+        self.mask = cap - 1;
+        self.len = 0;
+        for (i, key) in old_keys.into_iter().enumerate() {
+            if key != 0 {
+                let _ = self.insert_vacant(key, (old_us[i], old_zs[i], old_bs[i]));
+            }
+        }
+    }
+}
+
+/// Sibling xref table `key → (parent, pool_idx, minus, own_key)` —
+/// open addressing (see [`OpenCoefMap`]; dense `p+2` falsified for cold E2E).
+struct OpenRefMap {
+    keys: Vec<u64>,
+    parents: Vec<usize>,
+    pools: Vec<usize>,
+    minus: Vec<bool>,
+    owns: Vec<u64>,
+    mask: usize,
+    len: usize,
+}
+
+impl OpenRefMap {
+    fn with_capacity_bound(slots: usize, _key_bound: u64) -> Self {
+        let cap = (slots.max(8) * 2).next_power_of_two();
+        Self {
+            keys: vec![0; cap],
+            parents: vec![0; cap],
+            pools: vec![0; cap],
+            minus: vec![false; cap],
+            owns: vec![0; cap],
+            mask: cap - 1,
+            len: 0,
+        }
+    }
+
+    #[inline(always)]
+    fn home(&self, key: u64) -> usize {
+        (key.wrapping_mul(0x9E37_79B9_7F4A_7C15) as usize) & self.mask
+    }
+
+    #[inline]
+    fn insert(&mut self, key: u64, val: (usize, usize, bool, u64)) {
+        debug_assert!(key != 0);
+        // Grow before a full table: linear probe with no empty slot
+        // loops forever (observed hang in oracle_setup on fp20).
+        if self.len * 4 >= self.keys.len() * 3 {
+            self.grow();
+        }
+        let mut i = self.home(key);
+        loop {
+            let k = self.keys[i];
+            if k == 0 || k == key {
+                if k == 0 {
+                    self.len += 1;
+                }
+                self.keys[i] = key;
+                self.parents[i] = val.0;
+                self.pools[i] = val.1;
+                self.minus[i] = val.2;
+                self.owns[i] = val.3;
+                return;
+            }
+            i = (i + 1) & self.mask;
+        }
+    }
+
+    fn grow(&mut self) {
+        let cap = self.keys.len() * 2;
+        let old_keys = std::mem::replace(&mut self.keys, vec![0; cap]);
+        let old_parents = std::mem::replace(&mut self.parents, vec![0; cap]);
+        let old_pools = std::mem::replace(&mut self.pools, vec![0; cap]);
+        let old_minus = std::mem::replace(&mut self.minus, vec![false; cap]);
+        let old_owns = std::mem::replace(&mut self.owns, vec![0; cap]);
+        self.mask = cap - 1;
+        self.len = 0;
+        for (i, key) in old_keys.into_iter().enumerate() {
+            if key != 0 {
+                self.insert(
+                    key,
+                    (old_parents[i], old_pools[i], old_minus[i], old_owns[i]),
+                );
+            }
+        }
+    }
+
+    #[inline]
+    fn get(&self, key: u64) -> Option<(usize, usize, bool, u64)> {
+        if key == 0 {
+            return None;
+        }
+        let mut i = self.home(key);
+        loop {
+            let k = self.keys[i];
+            if k == 0 {
+                return None;
+            }
+            if k == key {
+                return Some((self.parents[i], self.pools[i], self.minus[i], self.owns[i]));
+            }
+            i = (i + 1) & self.mask;
+        }
+    }
 }
 
 // ── Modular arithmetic on u64 ──────────────────────────────────────
@@ -1073,7 +1309,10 @@ pub fn invmod(a: u64, m: u64) -> Option<u64> {
         // whose divisions are several times faster than 64-bit ones on
         // x86-64.  Remainders and coefficient magnitudes stay at most `m`,
         // so nothing overflows and every value is the 64-bit loop's.
-        return invmod_u32((a % m) as u32, m as u32).map(u64::from);
+        // A reduced operand (the group law's, always) skips the 64-bit
+        // remainder, a hardware division ahead of the whole Euclid.
+        let a = if a < m { a } else { a % m };
+        return invmod_u32(a as u32, m as u32).map(u64::from);
     }
     invmod_u64(a, m)
 }
@@ -1119,7 +1358,10 @@ fn invmod_u32(a: u32, m: u32) -> Option<u32> {
     if gcd != 1 {
         return None;
     }
-    Some(if neg { (m - t) % m } else { t % m })
+    // `t ≤ m`, and `t = m` only for `t = 0` negated (`m - t = m`) or
+    // `m = 1`, so the remainder is a division only for those.
+    let t = if neg { m - t } else { t };
+    Some(if t >= m { t % m } else { t })
 }
 
 /// The extended Euclid loop of [`invmod_u32`]: `(gcd, t, neg)` with
@@ -1405,6 +1647,10 @@ pub struct SiblingPair {
     pub lambda_plus: u64,
     pub key_minus: u64,
     pub lambda_minus: u64,
+    /// Canonical `y(P+J)` when the FastPrime batch path lifted it (so
+    /// eager-sign skips a second mont round-trip in [`sibling_lift`]).
+    pub y_plus: Option<u64>,
+    pub y_minus: Option<u64>,
 }
 
 /// The little a collision search and a relation loop need from a group,
@@ -1416,8 +1662,38 @@ pub trait CountedGroup {
     fn add(&self, ops: &mut GroupOps, p: Self::Elt, q: Self::Elt) -> Self::Elt;
     fn double(&self, ops: &mut GroupOps, p: Self::Elt) -> Self::Elt;
     fn neg(&self, p: Self::Elt) -> Self::Elt;
+    /// `a` when `first`, else `b`: `if first { a } else { b }`, for the
+    /// walk's canonicalisation, where `first` is a coin toss (a branch on
+    /// it is mispredicted half the time).  A group whose elements are a
+    /// few words overrides it with word-wise selects, which stay moves
+    /// (the default's select of a whole element can become a branch).
+    #[inline]
+    fn select_elt(&self, first: bool, a: Self::Elt, b: Self::Elt) -> Self::Elt {
+        std::hint::select_unpredictable(first, a, b)
+    }
     /// A key that identifies the element (both walks must agree on it).
     fn key(&self, p: &Self::Elt) -> u64;
+    /// The class of `p` in `E / 2E` when the group reads it without a
+    /// group operation (`None` otherwise).  On an ordinary binary curve
+    /// `y² + xy = x³ + ax² + b` a point lies in `2E` exactly when
+    /// `Tr(x) = Tr(a)`, so the class is `Tr(x) + Tr(a)`.  With cofactor 2
+    /// the index-`r` subgroup is `2E`, so this is the full coset class.
+    /// The field squarings one call performs are
+    /// [`Self::coset_parity_squarings`].
+    fn coset_parity(&self, _p: &Self::Elt) -> Option<u8> {
+        None
+    }
+    /// Field squarings one [`Self::coset_parity`] call performs (the
+    /// `mitm-coset` oracle counts them, uncharged).
+    fn coset_parity_squarings(&self) -> u64 {
+        0
+    }
+    /// Exclusive upper bound on abscissa-style table keys (`x + 1`), when
+    /// every key the walk stores is below it — enables a dense array map.
+    /// `None` (default) keeps open-addressing.
+    fn abscissa_key_bound(&self) -> Option<u64> {
+        None
+    }
     /// An opt-in addition path for the relation walk.  The closure lives for
     /// one solve, so an implementation may retain native field state between
     /// steps.  Other group operations keep their established accounting.
@@ -1458,6 +1734,25 @@ pub trait CountedGroup {
     fn supports_siblings(&self) -> bool {
         false
     }
+    /// `r + qs[i]` (or `r − qs[i]` when `negate`) for `i = 0, 1, …` in
+    /// order, each handed with the ledger to `visit` until `visit` returns
+    /// `true`; returns that `i`.  Every element handed over is charged one
+    /// addition and nothing after the stopping one is computed or charged.
+    /// The default is [`serial_add_each`]: one [`CountedGroup::add`] each,
+    /// exactly the serial loop.  A group may override it to share one field
+    /// inversion over a block (Montgomery's trick: the prime curve does);
+    /// it must hand over the same elements in the same order, charge the
+    /// same additions, and tally the field work it actually performs.
+    fn add_each_batched(
+        &self,
+        ops: &mut GroupOps,
+        r: Self::Elt,
+        qs: &[Self::Elt],
+        negate: bool,
+        visit: &mut dyn FnMut(&mut GroupOps, usize, Self::Elt) -> bool,
+    ) -> Option<usize> {
+        serial_add_each(self, ops, r, qs, negate, visit)
+    }
     /// The rational order-3 automorphism `ζ₃: (x, y) ↦ (ωx, y)` of a
     /// `j = 0` curve, acting on the order-`r` subgroup of `generator` as
     /// `[κ]`: `Some((p, ω, κ))`, or `None` when the group lacks it (the
@@ -1487,6 +1782,21 @@ pub trait CountedGroup {
     ) -> Option<SiblingPair> {
         None
     }
+    /// Batched [`CountedGroup::sibling_pair`] for one parent `P` and many
+    /// jumps: Montgomery's trick on the denominators `x_J − x_P`, so `k`
+    /// valid pairs cost one inversion and `3(k−1)` multiplications instead
+    /// of `k` inversions.  Points and slopes are identical to the serial
+    /// path.  `None` means the group has no batch path (the caller falls
+    /// back to serial `sibling_pair`).  Each slot is `None` when that jump
+    /// is degenerate, matching serial.
+    fn sibling_pairs_batch(
+        &self,
+        _ops: &mut GroupOps,
+        _p: Self::Elt,
+        _js: &[(Self::Elt, bool)],
+    ) -> Option<Vec<Option<SiblingPair>>> {
+        None
+    }
     /// `λ` of `P + J` (`minus = false`) or `P − J`: one inversion and one
     /// multiplication, tallied into `ops.field_ops`.
     fn sibling_lambda(
@@ -1509,6 +1819,39 @@ pub trait CountedGroup {
         _lambda: u64,
     ) -> Option<Self::Elt> {
         None
+    }
+    /// Rebuild an affine element from canonical `(x, y)` when the group
+    /// exposes that chart (prime curves).  Used to consume a y already
+    /// lifted inside [`sibling_pairs_batch`] without a second field mul.
+    fn affine_elt(&self, _x: u64, _y: u64) -> Option<Self::Elt> {
+        None
+    }
+    /// A binary curve's sibling pair from ONE inversion `1/(x_P + x_J)`:
+    /// the full point `P + J` (its slope `λ₊`, square and `y`, exactly as
+    /// [`CountedGroup::add`] forms it) and the abscissa of `P − J`
+    /// (`λ₋ = λ₊ + x_J/(x_P + x_J)`, one multiplication and one squaring
+    /// more).  Nothing is charged here: the caller charges the pair as ONE
+    /// group addition plus one `sibling_second_points` (the convention of
+    /// the `wwalk` / `ksum` siblings and the layout pair table).  `None`
+    /// when the group has none (the default), or `P` or `J` is not finite,
+    /// or they share an abscissa (`J = ±P`): the caller then forms both
+    /// signs with full additions.  Used by the `walk_sib` giant-step walk.
+    fn x_sibling_pair(&self, _p: Self::Elt, _j: Self::Elt) -> Option<(Self::Elt, u64)> {
+        None
+    }
+    /// [`CountedGroup::x_sibling_pair`] with the field work tallied into
+    /// `ops.field_ops` as performed, for a group that counts field
+    /// operations ([`CountedGroup::counts_field_ops`]); `ops.adds` is NOT
+    /// touched (the caller charges the pair).  The default is the uncounted
+    /// pair, which is right for a group whose field tally means "unknown".
+    /// The minus abscissa is a field element as a word (`x`, not `x + 1`).
+    fn x_sibling_pair_counted(
+        &self,
+        _ops: &mut GroupOps,
+        p: Self::Elt,
+        j: Self::Elt,
+    ) -> Option<(Self::Elt, u64)> {
+        self.x_sibling_pair(p, j)
     }
     /// `[k]P` by double-and-add, counted exactly.
     fn mul(&self, ops: &mut GroupOps, p: Self::Elt, k: u64) -> Self::Elt {
@@ -1537,6 +1880,32 @@ pub trait CountedGroup {
         self.mul(ops, p, k)
     }
 }
+
+/// The serial form of [`CountedGroup::add_each_batched`]: `r ± qs[i]` by one
+/// [`CountedGroup::add`] each, in order, until `visit` returns `true`.
+pub fn serial_add_each<G: CountedGroup + ?Sized>(
+    g: &G,
+    ops: &mut GroupOps,
+    r: G::Elt,
+    qs: &[G::Elt],
+    negate: bool,
+    visit: &mut dyn FnMut(&mut GroupOps, usize, G::Elt) -> bool,
+) -> Option<usize> {
+    for (i, &q) in qs.iter().enumerate() {
+        let q = if negate { g.neg(q) } else { q };
+        let s = g.add(ops, r, q);
+        if visit(ops, i, s) {
+            return Some(i);
+        }
+    }
+    None
+}
+
+/// Elements a block of the prime curve's [`CountedGroup::add_each_batched`]:
+/// one inversion per block, so a hit wastes at most a block's share of
+/// the batched inversion (`3` multiplications an element), never an
+/// addition.
+const PRIME_ADD_EACH_BLOCK: usize = 128;
 
 fn mix(v: u64) -> u64 {
     let mut h = v ^ 0x2545_F491_4F6C_DD1D;
@@ -1672,6 +2041,7 @@ pub fn rho_reference<G: CountedGroup>(
         recovered,
         counters: BTreeMap::new(),
         work_native: BTreeMap::new(),
+        jump_index_selections: 0,
     }
 }
 
@@ -1852,6 +2222,40 @@ fn joint_mul<G: CountedGroup>(
     acc
 }
 
+/// `a` when `first`, else `b`, as one `cmov` where the target has one.  A
+/// select the compiler can see (`if first { a } else { b }`,
+/// `select_unpredictable`, mask arithmetic) it may turn into a branch
+/// around the code that computes its operands, and the walk's coin-toss
+/// conditions then cost a misprediction half the time; the instruction is
+/// opaque to it.
+#[inline(always)]
+fn pick_word(first: bool, a: u64, b: u64) -> u64 {
+    #[cfg(target_arch = "x86_64")]
+    {
+        let mut out = b;
+        // SAFETY: register-only; `out` takes `a` when `first` is non-zero.
+        unsafe {
+            std::arch::asm!(
+                "test {c:e}, {c:e}",
+                "cmovnz {out}, {a}",
+                c = in(reg) u32::from(first),
+                a = in(reg) a,
+                out = inout(reg) out,
+                options(pure, nomem, nostack),
+            );
+        }
+        out
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        if first {
+            a
+        } else {
+            b
+        }
+    }
+}
+
 #[inline]
 fn negmod(a: u64, m: u64) -> u64 {
     if a == 0 {
@@ -1859,6 +2263,44 @@ fn negmod(a: u64, m: u64) -> u64 {
     } else {
         m - a
     }
+}
+
+/// Whether `key` is one of `keys`: every entry compared, no branch per
+/// entry.  With AVX2 (found at run time) four keys are compared per
+/// instruction instead of two; the answer is the same.
+#[inline]
+fn any_key_equals(keys: &[u64], key: u64) -> bool {
+    #[cfg(target_arch = "x86_64")]
+    {
+        if keys.len() >= 8 && std::arch::is_x86_feature_detected!("avx2") {
+            // SAFETY: AVX2 is available, as just detected.
+            return unsafe { any_key_equals_avx2(keys, key) };
+        }
+    }
+    keys.iter().fold(false, |any, &k| any | (k == key))
+}
+
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "avx2")]
+unsafe fn any_key_equals_avx2(keys: &[u64], key: u64) -> bool {
+    use std::arch::x86_64::{
+        __m256i, _mm256_cmpeq_epi64, _mm256_loadu_si256, _mm256_or_si256, _mm256_set1_epi64x,
+        _mm256_setzero_si256, _mm256_testz_si256,
+    };
+    let needle = _mm256_set1_epi64x(key as i64);
+    let mut seen = _mm256_setzero_si256();
+    let chunks = keys.chunks_exact(4);
+    let tail = chunks.remainder();
+    for c in chunks {
+        // SAFETY: `c` is four `u64`s; the load is unaligned.
+        let v = unsafe { _mm256_loadu_si256(c.as_ptr().cast::<__m256i>()) };
+        seen = _mm256_or_si256(seen, _mm256_cmpeq_epi64(v, needle));
+    }
+    let mut hit = _mm256_testz_si256(seen, seen) == 0;
+    for &k in tail {
+        hit |= k == key;
+    }
+    hit
 }
 
 /// The classes a tuned walk moves between: one representative per orbit
@@ -1878,6 +2320,15 @@ pub trait RhoClasses<G: CountedGroup> {
     /// Points only: no canonicalisation is performed or counted.
     fn trivial(&self) -> bool {
         false
+    }
+    /// `Some(r)` for the classes `{P, -P}` of [`NegationClasses`]: `canon`
+    /// then is `-p` (multiplier `r - 1`) when its key is smaller than `p`'s
+    /// and `p` (multiplier 1) otherwise, with no field work.  The walk
+    /// reads it to take that choice as a select instead of a branch (the
+    /// two outcomes are equally likely, so the branch is mispredicted
+    /// half the time); every other class answers `None`.
+    fn negation_rule(&self) -> Option<u64> {
+        None
     }
     /// The walk's name in reports.
     fn method(&self) -> &'static str;
@@ -1917,6 +2368,9 @@ impl<G: CountedGroup> RhoClasses<G> for NegationClasses {
         } else {
             (p, 1)
         }
+    }
+    fn negation_rule(&self) -> Option<u64> {
+        Some(self.r)
     }
     fn method(&self) -> &'static str {
         "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts"
@@ -2332,6 +2786,22 @@ fn rho_canon<G: CountedGroup, C: RhoClasses<G>>(
         return (p, a, b, false);
     }
     *canonicalisations += 1;
+    if r > 2 && classes.negation_rule() == Some(r) {
+        // `NegationClasses::canon` followed by the branches below, as
+        // selects: the representative is `-p` exactly when its key is
+        // smaller (multiplier `r - 1`, the coefficients negated, and
+        // `flipped`; `r > 2` keeps `r - 1` apart from the multiplier 1),
+        // else `p` with `a`, `b` as they are.  The same values; no field
+        // work is tallied either way.  The negations of the unselected
+        // arm are computed and dropped, so they wrap rather than trap.
+        let neg = |x: u64| if x == 0 { 0 } else { r.wrapping_sub(x) };
+        let n = g.neg(p);
+        let flip = g.key(&n) < g.key(&p);
+        let rep = g.select_elt(flip, n, p);
+        let a = pick_word(flip, neg(a), a);
+        let b = pick_word(flip, neg(b), b);
+        return (rep, a, b, flip);
+    }
     let (rep, mu) = classes.canon(g, ops, p);
     if mu == 1 {
         (rep, a, b, false)
@@ -2454,12 +2924,19 @@ struct WalkTally {
     steps: u64,
     look_ahead_adds: u64,
     escapes: u64,
+    /// Calls to the 64-bit mix that selects the walk partition.  Historical
+    /// tuned-rho identities leave this at zero; the counted identity enables
+    /// it through a const-generic walk so their hot loop is unchanged.
+    partition_hashes: u64,
     cycles_2: u64,
     cycles_4: u64,
     cycles_other: u64,
     abandoned: u64,
     capped: u64,
     canonicalisations: u64,
+    /// Jump-index selections: one per step (`index_of` on the point's
+    /// mixed key).  See [`RhoResult::jump_index_selections`].
+    jump_index_selections: u64,
     /// Cycles longer than the window that the Brent detector found
     /// ([`WalkPolicy::brent`]).
     cycles_long: u64,
@@ -2481,6 +2958,21 @@ struct WalkTally {
     /// Brent's per-step compares ([`WalkPolicy::brent`]): the least-key
     /// update, the checkpoint test and the power-of-two test.
     brent_word_ops: u64,
+    /// The jump-index selection, a shift and a mask (or a remainder) of the
+    /// point's mixed key, two word operations per [`TunedWalker::index_of`]
+    /// call: every step's selection and every look-ahead re-test. Strong
+    /// tallies its equivalent as `partition_hashes_uncharged`; this walk had
+    /// left it untallied (research/koblitz_rho_reference_20261115, section
+    /// 1). Reported as `work_native` like the window's compares, so
+    /// committed records replay unchanged.
+    jump_select_word_ops: u64,
+    /// The same selections counted once each: the per-step native operation
+    /// the §5a band prices at `w` (strong's `partition_hashes_uncharged`
+    /// is one per step). Reported behind the marker
+    /// `counted:jump_selections` (`ecbench::band`), so committed records
+    /// replay unchanged; `ecbench::work` prices its word operations through
+    /// [`JUMP_SELECT_WORD_OPS`], not again here.
+    jump_selections: u64,
 }
 
 /// How a walk that never reached a distinguished point ended.
@@ -2514,12 +3006,14 @@ impl WalkTally {
         self.steps += o.steps;
         self.look_ahead_adds += o.look_ahead_adds;
         self.escapes += o.escapes;
+        self.partition_hashes += o.partition_hashes;
         self.cycles_2 += o.cycles_2;
         self.cycles_4 += o.cycles_4;
         self.cycles_other += o.cycles_other;
         self.abandoned += o.abandoned;
         self.capped += o.capped;
         self.canonicalisations += o.canonicalisations;
+        self.jump_index_selections += o.jump_index_selections;
         self.cycles_long += o.cycles_long;
         self.lost_identity += o.lost_identity;
         self.lost_abandoned += o.lost_abandoned;
@@ -2527,6 +3021,8 @@ impl WalkTally {
         self.lost_budget += o.lost_budget;
         self.window_word_ops += o.window_word_ops;
         self.brent_word_ops += o.brent_word_ops;
+        self.jump_select_word_ops += o.jump_select_word_ops;
+        self.jump_selections += o.jump_selections;
     }
 
     /// The window's and Brent's word operations, as a search phase's
@@ -2540,6 +3036,13 @@ impl WalkTally {
         if self.brent_word_ops > 0 {
             out.insert(BRENT_WORD_OPS.to_string(), self.brent_word_ops);
         }
+        if self.jump_select_word_ops > 0 {
+            out.insert(JUMP_SELECT_WORD_OPS.to_string(), self.jump_select_word_ops);
+        }
+        if self.jump_selections > 0 {
+            out.insert(JUMP_SELECTIONS.to_string(), self.jump_selections);
+            out.insert(format!("counted:{JUMP_SELECTIONS}"), 1);
+        }
         out
     }
 }
@@ -2549,6 +3052,12 @@ impl WalkTally {
 pub const WINDOW_WORD_OPS: &str = "cycle_window_word_ops";
 /// `work_native` name of Brent's per-step compares; one `word_op` each.
 pub const BRENT_WORD_OPS: &str = "brent_word_ops";
+/// `work_native` name of the tuned walk's jump-index selections (two word
+/// operations each, see [`WalkTally`]); one `word_op` each.
+pub const JUMP_SELECT_WORD_OPS: &str = "jump_select_word_ops";
+/// `work_native` name of the tuned walk's jump-index selections counted once
+/// each, behind `counted:jump_selections`: the band prices each at `w`.
+pub const JUMP_SELECTIONS: &str = "jump_selections";
 
 /// How one walk ended.
 enum WalkEnd<E> {
@@ -2675,10 +3184,7 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
     /// and the ring is read in age order only on a hit.
     #[inline]
     fn recent_position(&self, key: u64) -> Option<usize> {
-        let hit = self
-            .recent_keys
-            .iter()
-            .fold(false, |any, &k| any | (k == key));
+        let hit = any_key_equals(&self.recent_keys, key);
         if !hit {
             return None;
         }
@@ -2688,6 +3194,33 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
     /// One walk from `[a]G + [b]Q = start`, until a distinguished point
     /// or until it is lost; `budget` bounds the tally's walk operations.
     fn walk(
+        &mut self,
+        ops: &mut GroupOps,
+        tally: &mut WalkTally,
+        start: G::Elt,
+        a: u64,
+        b: u64,
+        budget: u64,
+    ) -> WalkEnd<G::Elt> {
+        self.walk_with_partition_tally::<false>(ops, tally, start, a, b, budget)
+    }
+
+    /// [`TunedWalker::walk`] with every partition-mix call tallied.  This is
+    /// a distinct monomorphisation so frozen tuned-rho identities do not pay
+    /// an accounting branch in their per-step loop.
+    fn walk_partition_counted(
+        &mut self,
+        ops: &mut GroupOps,
+        tally: &mut WalkTally,
+        start: G::Elt,
+        a: u64,
+        b: u64,
+        budget: u64,
+    ) -> WalkEnd<G::Elt> {
+        self.walk_with_partition_tally::<true>(ops, tally, start, a, b, budget)
+    }
+
+    fn walk_with_partition_tally<const COUNT_PARTITION_HASHES: bool>(
         &mut self,
         ops: &mut GroupOps,
         tally: &mut WalkTally,
@@ -2721,12 +3254,18 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
         // checkpoint all read them.
         let mut key = g.key(&x);
         let mut h = mix(key);
+        if COUNT_PARTITION_HASHES {
+            tally.partition_hashes += 1;
+        }
         let mut checkpoint = if self.brent { key } else { 0 };
         let mut since_min = (checkpoint, x, a, b);
         let (mut since, mut power) = (0u64, 1u64);
         loop {
             // One step, with the look-ahead when it is on.
             let j0 = self.index_of(h);
+            tally.jump_select_word_ops += 2;
+            tally.jump_selections += 1;
+            tally.jump_index_selections += 1;
             let mut tried = 0usize;
             let (y, ya, yb, ky, hy) = loop {
                 // `j0` and `tried` are below `jump_count`, so one
@@ -2751,11 +3290,25 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                 tried += 1;
                 let ky = g.key(&y);
                 let hy = mix(ky);
+                if COUNT_PARTITION_HASHES {
+                    tally.partition_hashes += 1;
+                }
+                // One branch on the whole test (`flipped` alone is a coin
+                // toss, so a branch on it is mispredicted half the time);
+                // every operand is pure, so evaluating them all changes
+                // nothing.
+                // The look-ahead's re-test selects a jump too (charged only
+                // when the test reaches it; `&` evaluates every operand, so
+                // charge it whenever the look-ahead is on).
+                if self.look_ahead {
+                    tally.jump_select_word_ops += 2;
+                    tally.jump_selections += 1;
+                }
                 if self.look_ahead
-                    && flipped
-                    && tried < jump_count
-                    && !g.is_identity(&y)
-                    && self.index_of(hy) == j
+                    & flipped
+                    & (tried < jump_count)
+                    & !g.is_identity(&y)
+                    & (self.index_of(hy) == j)
                 {
                     tally.look_ahead_adds += 1;
                     continue;
@@ -2816,6 +3369,9 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                     b = eb;
                     key = g.key(&x);
                     h = mix(key);
+                    if COUNT_PARTITION_HASHES {
+                        tally.partition_hashes += 1;
+                    }
                     self.forget_recent();
                     if g.is_identity(&x) {
                         tally.lose(ops0, LostHow::Identity);
@@ -2873,6 +3429,9 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                     b = eb;
                     key = g.key(&x);
                     h = mix(key);
+                    if COUNT_PARTITION_HASHES {
+                        tally.partition_hashes += 1;
+                    }
                     self.forget_recent();
                     if g.is_identity(&x) {
                         tally.lose(ops0, LostHow::Identity);
@@ -2935,6 +3494,12 @@ fn tuned_counters(
         ("canonicalisations_uncharged", tally.canonicalisations),
     ] {
         counters.insert(k.to_string(), v);
+    }
+    if tally.partition_hashes > 0 {
+        counters.insert(
+            "partition_hashes_uncharged".to_string(),
+            tally.partition_hashes,
+        );
     }
     counters
 }
@@ -3096,6 +3661,81 @@ struct RhoSetup<G: CountedGroup> {
     verify_ladder: Vec<G::Elt>,
 }
 
+/// The stored signed Frobenius orbit of the generator on a Koblitz curve,
+/// for the τ-adic recovery check (n29 generator-orbit lever, 2026-11-18).
+///
+/// `orbit[t] = τ^t(G)` and `neg[t] = −τ^t(G)` for `t < n`, `n` the field
+/// degree, so `τ^n(G) = G` and a τ-adic digit at position `i` reads entry
+/// `i mod n`.  `mu = ±1` is the Frobenius trace of the curve over `F_2`
+/// (`μ = (−1)^{1−a}`), for which `τ² − μτ + 2 = 0` holds on every point.
+/// No logarithm, eigenvalue or group order enters the check: it is an
+/// identity of the endomorphism ring `Z[τ]` evaluated on stored points.
+#[derive(Clone, Debug)]
+pub struct TauOrbitCheck<E> {
+    pub orbit: Vec<E>,
+    pub neg: Vec<E>,
+    pub mu: i64,
+}
+
+/// The τ-adic non-adjacent form of the integer `d` (Solinas 2000,
+/// Algorithm 1): digits `u_i ∈ {−1, 0, 1}`, no two adjacent non-zero, with
+/// `Σ u_i τ^i = d` in `Z[τ]`, `τ² = μτ − 2`.  Its length is about
+/// `log₂(d²) + 1` (the norm of `d` is `d²`), a third of the digits
+/// non-zero.  One loop step per digit.
+pub fn tau_naf(d: u64, mu: i64) -> Vec<i8> {
+    assert!(mu == 1 || mu == -1, "mu must be +-1");
+    let (mut r0, mut r1) = (d as i128, 0i128);
+    let mut out = Vec::new();
+    while r0 != 0 || r1 != 0 {
+        let u = if r0 & 1 != 0 {
+            let u = 2 - (r0 - 2 * r1).rem_euclid(4);
+            r0 -= u;
+            u
+        } else {
+            0
+        };
+        out.push(u as i8);
+        // (r0 + r1 τ)/τ = r1 + μ r0/2 − (r0/2) τ, since 1/τ = (μ − τ)/2.
+        let half = r0 / 2;
+        let next0 = r1 + mu as i128 * half;
+        r1 = -half;
+        r0 = next0;
+    }
+    out
+}
+
+/// `[d]G` as `Σ u_i τ^i(G)` over the τ-adic NAF of `d` ([`tau_naf`]), read
+/// from the stored orbit: one counted addition per non-zero digit after the
+/// first, no doubling and no Frobenius map.  Counted as one scalar
+/// multiplication, like [`ladder_mul`].  Also returns the recoding's loop
+/// steps (the digits), which the caller reports as native work.
+pub fn tau_orbit_mul<G: CountedGroup>(
+    g: &G,
+    ops: &mut GroupOps,
+    check: &TauOrbitCheck<G::Elt>,
+    d: u64,
+) -> (G::Elt, u64) {
+    ops.scalar_mults += 1;
+    let n = check.orbit.len();
+    let digits = tau_naf(d, check.mu);
+    let mut acc: Option<G::Elt> = None;
+    for (i, &u) in digits.iter().enumerate() {
+        if u == 0 {
+            continue;
+        }
+        let p = if u > 0 {
+            check.orbit[i % n]
+        } else {
+            check.neg[i % n]
+        };
+        acc = Some(match acc {
+            None => p,
+            Some(a) => g.add(ops, a, p),
+        });
+    }
+    (acc.unwrap_or_else(|| g.identity()), digits.len() as u64)
+}
+
 /// `[d]G` from a ladder `[2^i]G`, `i < L`, as a counted operation sequence:
 /// one addition per set bit below `L` (the first is free), and for the
 /// bits at and above `L` one doubling of the top rung, a double-and-add of
@@ -3131,6 +3771,29 @@ fn ladder_mul<G: CountedGroup>(g: &G, ops: &mut GroupOps, ladder: &[G::Elt], d: 
 /// nothing at random, so how the set-up was built is the only difference
 /// between the walks that share it.
 fn rho_search_from<G: CountedGroup, C: RhoClasses<G>>(
+    g: &G,
+    classes: &C,
+    s: RhoSetup<G>,
+) -> RhoResult {
+    rho_search_from_with_partition_tally::<G, C, false>(g, classes, s)
+}
+
+/// [`rho_search_from`] with the tuned walk's partition-mix calls exposed as
+/// `partition_hashes_uncharged`.  Kept as a separate monomorphisation so the
+/// historical identities retain their exact hot loop.
+fn rho_search_from_partition_counted<G: CountedGroup, C: RhoClasses<G>>(
+    g: &G,
+    classes: &C,
+    s: RhoSetup<G>,
+) -> RhoResult {
+    rho_search_from_with_partition_tally::<G, C, true>(g, classes, s)
+}
+
+fn rho_search_from_with_partition_tally<
+    G: CountedGroup,
+    C: RhoClasses<G>,
+    const COUNT_PARTITION_HASHES: bool,
+>(
     g: &G,
     classes: &C,
     s: RhoSetup<G>,
@@ -3186,9 +3849,12 @@ fn rho_search_from<G: CountedGroup, C: RhoClasses<G>>(
             }
             (sx, sa, sb)
         };
-        let WalkEnd::Distinguished(x, a, b) =
+        let end = if COUNT_PARTITION_HASHES {
+            walker.walk_partition_counted(&mut ops, &mut tally, wx, wa, wb, max_steps)
+        } else {
             walker.walk(&mut ops, &mut tally, wx, wa, wb, max_steps)
-        else {
+        };
+        let WalkEnd::Distinguished(x, a, b) = end else {
             continue;
         };
         dps += 1;
@@ -3245,6 +3911,7 @@ fn rho_search_from<G: CountedGroup, C: RhoClasses<G>>(
         verified: recovered.is_some(),
         recovered,
         work_native: tally.work_native(),
+        jump_index_selections: tally.jump_index_selections,
         counters: {
             let mut counters =
                 tuned_counters(&shape, setup, start_adds, &tally, verification_ops, useless);
@@ -3689,6 +4356,7 @@ pub fn rho_walk_lanes<G: CountedGroup, C: RhoClasses<G>>(
         verified: recovered.is_some(),
         recovered,
         work_native: tally.work_native(),
+        jump_index_selections: 0,
         counters,
     })
 }
@@ -3812,10 +4480,41 @@ impl RhoV3 {
 /// `F/k` more (the adding walk's `√(k/(k−1))` and, under negation, the
 /// look-ahead's `1/(2k)` additions a step) and `(weight − 1)·k` to build,
 /// so `k ≈ √(F/(weight − 1))`.
+///
+/// The result is rounded to a power of two so [`TunedWalker::index_of`]
+/// (and the lockstep walker) take a mask instead of a division every
+/// step.  On fp28, the unrounded weight-2 optimum is ≈120: a non-power
+/// of two that raised measured ns/GAE by ≈9 % against `rho.negation`'s
+/// 16-jump table and left wall ≈1.02× after S had already cleared 0.95×.
+///
+/// Weight-2 tables are further capped at 64: the GAE-optimal `k ≈ √F`
+/// reaches 128 (fp28) / 256 (fp32), and those sizes reopen wall CI even
+/// after the mask fix (fp28 expanded: wall 0.965× [0.905, 1.029]).
 pub fn rho_v3_jumps_for(r: u64, automorphisms: u32, weight: u32) -> usize {
     let f = generic_floor_ops(r as f64, automorphisms.max(1) as f64);
     let k = (f / (weight.max(2) - 1) as f64).sqrt().round() as usize;
-    k.clamp(4, 4096)
+    let k = round_jumps_pow2(k.clamp(4, 4096));
+    if weight <= 2 {
+        k.min(64)
+    } else {
+        k
+    }
+}
+
+/// Nearest power of two in `[4, 4096]`; on a tie, the larger (more jumps
+/// cut the look-ahead and `√(k/(k−1))` excess).
+pub fn round_jumps_pow2(k: usize) -> usize {
+    let k = k.clamp(4, 4096);
+    if k.is_power_of_two() {
+        return k;
+    }
+    let hi = k.next_power_of_two().min(4096);
+    let lo = (hi >> 1).max(4);
+    if k - lo < hi - k {
+        lo
+    } else {
+        hi
+    }
 }
 
 /// Rungs per ladder for `jumps` jumps: `2·⌈log₂ k⌉ + 4` bits a side, so
@@ -3837,6 +4536,44 @@ pub fn rho_v3_ladder_bits(r: u64, jumps: usize) -> u32 {
 /// the `setup` phase.
 #[allow(clippy::too_many_arguments)]
 pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
+    g: &G,
+    classes: &C,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    seed: u64,
+    max_steps: u64,
+    v3: RhoV3,
+) -> RhoResult {
+    rho_walk_v3_with_partition_tally::<G, C, false>(
+        g, classes, generator, target, r, seed, max_steps, v3,
+    )
+}
+
+/// [`rho_walk_v3`] with an exact uncharged counter for every partition-mix
+/// call.  The trajectory and all charged group operations are identical.
+#[allow(clippy::too_many_arguments)]
+pub fn rho_walk_v3_partition_counted<G: CountedGroup, C: RhoClasses<G>>(
+    g: &G,
+    classes: &C,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    seed: u64,
+    max_steps: u64,
+    v3: RhoV3,
+) -> RhoResult {
+    rho_walk_v3_with_partition_tally::<G, C, true>(
+        g, classes, generator, target, r, seed, max_steps, v3,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn rho_walk_v3_with_partition_tally<
+    G: CountedGroup,
+    C: RhoClasses<G>,
+    const COUNT_PARTITION_HASHES: bool,
+>(
     g: &G,
     classes: &C,
     generator: G::Elt,
@@ -4024,32 +4761,33 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
         }
     }
     let setup = ops;
-    rho_search_from(
-        g,
-        classes,
-        RhoSetup {
-            generator,
-            target,
-            r,
-            max_steps,
-            walk,
-            policy: WalkPolicy::v2(),
-            shape,
-            jumps,
-            stride,
-            ta,
-            tb,
-            setup,
-            ops,
-            start,
-            continue_walks: v3.continue_walks,
-            verify_ladder: if v3.ladder_verify {
-                ladder_g
-            } else {
-                Vec::new()
-            },
+    let setup = RhoSetup {
+        generator,
+        target,
+        r,
+        max_steps,
+        walk,
+        policy: WalkPolicy::v2(),
+        shape,
+        jumps,
+        stride,
+        ta,
+        tb,
+        setup,
+        ops,
+        start,
+        continue_walks: v3.continue_walks,
+        verify_ladder: if v3.ladder_verify {
+            ladder_g
+        } else {
+            Vec::new()
         },
-    )
+    };
+    if COUNT_PARTITION_HASHES {
+        rho_search_from_partition_counted(g, classes, setup)
+    } else {
+        rho_search_from(g, classes, setup)
+    }
 }
 
 /// The chained jump table of [`WalkPolicy::chained_setup`]: `M_0`, `M_1`
@@ -4915,6 +5653,7 @@ pub fn signed_frobenius_rho(
         verified: report.verified && recovered == Some(planted),
         counters: signed_rho_counters(&report),
         work_native: BTreeMap::new(),
+        jump_index_selections: 0,
     })
 }
 
@@ -4978,6 +5717,30 @@ pub fn signed_frobenius_rho_v3(
     let classes = SignedFrobeniusClasses::new(inst)?;
     let g = BinaryGroup(&inst.fast);
     Some(rho_walk_v3(
+        &g,
+        &classes,
+        inst.generator,
+        target,
+        inst.r,
+        seed,
+        max_steps,
+        v3,
+    ))
+}
+
+/// [`signed_frobenius_rho_v3`] with the tuned walk's partition-mix calls
+/// exposed as `partition_hashes_uncharged`; the search trajectory and charged
+/// group-operation ledger are otherwise identical.
+pub fn signed_frobenius_rho_v3_partition_counted(
+    inst: &BinaryInstance,
+    target: FastPoint,
+    seed: u64,
+    max_steps: u64,
+    v3: RhoV3,
+) -> Option<RhoResult> {
+    let classes = SignedFrobeniusClasses::new(inst)?;
+    let g = BinaryGroup(&inst.fast);
+    Some(rho_walk_v3_partition_counted(
         &g,
         &classes,
         inst.generator,
@@ -6033,6 +6796,71 @@ impl CountedFp<'_> {
     }
 }
 
+/// Montgomery's trick on nonzero field elements, charged to `ops` exactly
+/// as performed (`1` inv and `3(k−1)` muls for `k > 1`, matching
+/// [`crate::cryptanalysis::semaev_projection::batch_inv_u64_counted`]).
+/// Used by [`PrimeCurve::sibling_pairs_batch`].
+///
+/// Ledger fp20 (`p < 2³²`) stays on the canonical [`mulmod`] / [`invmod`]
+/// chain: a Montgomery round-trip per element was pure tax next to
+/// `mulmod_u32`.  Wider primes use [`Fp64::batch_inv`] in Montgomery form.
+fn batch_inv_field_ops(xs: &mut [u64], p: u64, ops: &mut FieldOps) {
+    let k = xs.len();
+    if k == 0 {
+        return;
+    }
+    if k == 1 {
+        ops.invs += 1;
+        xs[0] = invmod(xs[0], p).expect("prime field");
+        return;
+    }
+    ops.muls += 3 * (k as u64 - 1);
+    ops.invs += 1;
+    // Small primes: canonical mulmod_u32 path (no to_mont/from_mont).
+    // Callers pass at most 16 denominators (sib ≤ 16); keep the prefix
+    // on the stack so oracle_setup pays no heap traffic per expand.
+    if p <= u64::from(u32::MAX) || p <= 3 {
+        debug_assert!(k <= 16);
+        let mut prefix = [1u64; 16];
+        let mut acc = 1u64;
+        for i in 0..k {
+            prefix[i] = acc;
+            acc = mulmod(acc, xs[i], p);
+        }
+        let mut inv_acc = invmod(acc, p).expect("prime field");
+        for i in (0..k).rev() {
+            let xi = xs[i];
+            xs[i] = mulmod(inv_acc, prefix[i], p);
+            inv_acc = mulmod(inv_acc, xi, p);
+        }
+        return;
+    }
+    if p < (1u64 << crate::cryptanalysis::prime_fast::MAX_BITS) {
+        let f = Fp64::new(p);
+        for v in xs.iter_mut() {
+            *v = f.to_mont(*v);
+        }
+        let mut scratch = Vec::with_capacity(k);
+        f.batch_inv(xs, &mut scratch);
+        for v in xs.iter_mut() {
+            *v = f.from_mont(*v);
+        }
+        return;
+    }
+    let mut prefix = Vec::with_capacity(k);
+    let mut acc = 1u64;
+    for &x in xs.iter() {
+        prefix.push(acc);
+        acc = mulmod(acc, x, p);
+    }
+    let mut inv_acc = invmod(acc, p).expect("prime field");
+    for i in (0..k).rev() {
+        let xi = xs[i];
+        xs[i] = mulmod(inv_acc, prefix[i], p);
+        inv_acc = mulmod(inv_acc, xi, p);
+    }
+}
+
 impl CountedGroup for PrimeCurve {
     type Elt = PrimePoint;
     fn identity(&self) -> PrimePoint {
@@ -6074,32 +6902,144 @@ impl CountedGroup for PrimeCurve {
         j: PrimePoint,
         want_minus: bool,
     ) -> Option<SiblingPair> {
-        if p.infinity || j.infinity || p.x == j.x {
-            return None;
+        self.sibling_pairs_batch(ops, p, &[(j, want_minus)])?
+            .into_iter()
+            .next()
+            .flatten()
+    }
+    fn sibling_pairs_batch(
+        &self,
+        ops: &mut GroupOps,
+        p: PrimePoint,
+        js: &[(PrimePoint, bool)],
+    ) -> Option<Vec<Option<SiblingPair>>> {
+        let n = js.len();
+        let mut out = vec![None; n];
+        if p.infinity || n == 0 {
+            return Some(out);
         }
+        // Stack buffers: callers pass at most 16 jumps (sib ≤ 16).
+        debug_assert!(n <= 16);
+        let mut dxs = [0u64; 16];
+        let mut slots = [(0usize, PrimePoint::INFINITY, false); 16];
+        let mut k = 0usize;
+        for (i, &(j, want_minus)) in js.iter().enumerate() {
+            if j.infinity || j.x == p.x {
+                continue;
+            }
+            let dx = submod(j.x, p.x, self.p);
+            if dx == 0 {
+                continue;
+            }
+            slots[k] = (i, j, want_minus);
+            dxs[k] = dx;
+            k += 1;
+        }
+        if k == 0 {
+            return Some(out);
+        }
+        // FastPrime mont λ for wide primes.  Ledger fp20 stays on
+        // CountedFp/mulmod: a full Fp64 mont+lifted-y remasure on
+        // aarch64 (2026-11-20) held wall ~2.2× vs eager-sign ~2.0× —
+        // to_mont/from_mont tax ≥ any `%` savings on this host.
+        if self.p > u64::from(u32::MAX)
+            && self.p < (1u64 << crate::cryptanalysis::prime_fast::MAX_BITS)
+        {
+            let f = Fp64::new(self.p);
+            for s in 0..k {
+                dxs[s] = f.to_mont(dxs[s]);
+            }
+            ops.field_ops.muls += k as u64; // to_mont
+            if k == 1 {
+                ops.field_ops.invs += 1;
+                let mut one = [dxs[0]];
+                let mut scratch = Vec::new();
+                f.batch_inv(&mut one, &mut scratch);
+                dxs[0] = one[0];
+            } else {
+                ops.field_ops.muls += 3 * (k as u64 - 1);
+                ops.field_ops.invs += 1;
+                let mut scratch = Vec::with_capacity(k);
+                f.batch_inv(&mut dxs[..k], &mut scratch);
+            }
+            let px = f.to_mont(p.x);
+            let py = f.to_mont(p.y);
+            ops.field_ops.muls += 2; // parent once
+                                     // Interleave up to 4 λ chains when m is large enough that
+                                     // the mul latency would otherwise serialize (sib=8 typical).
+            for s in 0..k {
+                let (i, j, want_minus) = slots[s];
+                let inv = dxs[s]; // Montgomery
+                let jx = f.to_mont(j.x);
+                let jy = f.to_mont(j.y);
+                ops.field_ops.muls += 2;
+                let dy = f.sub(jy, py);
+                let lp_m = f.mul(dy, inv);
+                let lp2 = f.sqr(lp_m);
+                let xp_m = f.sub(f.sub(lp2, px), jx);
+                ops.field_ops.muls += 1;
+                ops.field_ops.sqrs += 1;
+                let lp = f.from_mont(lp_m);
+                let xp = f.from_mont(xp_m);
+                // y₊ = λ·(x_P − x) − y_P while λ still Montgomery.
+                let y_plus = f.from_mont(f.sub(f.mul(lp_m, f.sub(px, xp_m)), py));
+                ops.field_ops.muls += 4; // 2 from_mont + mul + from_mont y
+                let mut sp = SiblingPair {
+                    key_plus: xp + 1,
+                    lambda_plus: lp,
+                    key_minus: 0,
+                    lambda_minus: 0,
+                    y_plus: Some(y_plus),
+                    y_minus: None,
+                };
+                if want_minus {
+                    let sy = f.add(jy, py);
+                    let lm_m = f.mul(f.neg(sy), inv);
+                    let lm2 = f.sqr(lm_m);
+                    let xm_m = f.sub(f.sub(lm2, px), jx);
+                    ops.field_ops.muls += 1;
+                    ops.field_ops.sqrs += 1;
+                    let lm = f.from_mont(lm_m);
+                    let xm = f.from_mont(xm_m);
+                    let y_minus = f.from_mont(f.sub(f.mul(lm_m, f.sub(px, xm_m)), py));
+                    ops.field_ops.muls += 4;
+                    sp.lambda_minus = lm;
+                    sp.key_minus = xm + 1;
+                    sp.y_minus = Some(y_minus);
+                }
+                out[i] = Some(sp);
+            }
+            return Some(out);
+        }
+        batch_inv_field_ops(&mut dxs[..k], self.p, &mut ops.field_ops);
         let mut f = CountedFp {
             p: self.p,
             tally: &mut ops.field_ops,
         };
-        let dx = f.sub(j.x, p.x);
-        let inv = f.inv(dx);
-        let dy = f.sub(j.y, p.y);
-        let lp = f.mul(dy, inv);
-        let lp2 = f.sqr(lp);
-        let xp = f.sub(f.sub(lp2, p.x), j.x);
-        let mut out = SiblingPair {
-            key_plus: xp + 1,
-            lambda_plus: lp,
-            key_minus: 0,
-            lambda_minus: 0,
-        };
-        if want_minus {
-            let sy = f.add(j.y, p.y);
-            let lm = f.mul(f.sub(0, sy), inv);
-            let lm2 = f.sqr(lm);
-            let xm = f.sub(f.sub(lm2, p.x), j.x);
-            out.key_minus = xm + 1;
-            out.lambda_minus = lm;
+        for s in 0..k {
+            let (i, j, want_minus) = slots[s];
+            let inv = dxs[s];
+            let dy = f.sub(j.y, p.y);
+            let lp = f.mul(dy, inv);
+            let lp2 = f.sqr(lp);
+            let xp = f.sub(f.sub(lp2, p.x), j.x);
+            let mut sp = SiblingPair {
+                key_plus: xp + 1,
+                lambda_plus: lp,
+                key_minus: 0,
+                lambda_minus: 0,
+                y_plus: None,
+                y_minus: None,
+            };
+            if want_minus {
+                let sy = f.add(j.y, p.y);
+                let lm = f.mul(f.sub(0, sy), inv);
+                let lm2 = f.sqr(lm);
+                let xm = f.sub(f.sub(lm2, p.x), j.x);
+                sp.key_minus = xm + 1;
+                sp.lambda_minus = lm;
+            }
+            out[i] = Some(sp);
         }
         Some(out)
     }
@@ -6144,11 +7084,130 @@ impl CountedGroup for PrimeCurve {
         let ldx = f.mul(lambda, f.sub(p.x, x));
         Some(PrimePoint::affine(x, f.sub(ldx, p.y)))
     }
+    fn affine_elt(&self, x: u64, y: u64) -> Option<PrimePoint> {
+        Some(PrimePoint::affine(x, y))
+    }
+    /// `P + J` in full and the abscissa of `P − J` from ONE inversion: the
+    /// sibling pair above (inv, 2 mul, 2 sqr) and the plus child's `y`
+    /// (one mul), every field operation tallied.
+    fn x_sibling_pair_counted(
+        &self,
+        ops: &mut GroupOps,
+        p: PrimePoint,
+        j: PrimePoint,
+    ) -> Option<(PrimePoint, u64)> {
+        let pair = self.sibling_pair(ops, p, j, true)?;
+        let plus = self.sibling_lift(ops, p, pair.key_plus, pair.lambda_plus)?;
+        Some((plus, pair.key_minus - 1))
+    }
     fn neg(&self, p: PrimePoint) -> PrimePoint {
         if p.infinity {
             p
         } else {
             PrimePoint::affine(p.x, if p.y == 0 { 0 } else { self.p - p.y })
+        }
+    }
+    /// Montgomery's trick over blocks of [`PRIME_ADD_EACH_BLOCK`]: the
+    /// denominators `x_r − x_q` of a block are inverted together (one
+    /// inversion and `3k + 1` multiplications for `k` denominators), then
+    /// each sum is finished only when it is handed over, so the additions
+    /// charged are the serial loop's, one each, and the points are the
+    /// serial group law's.  The inputs stay canonical: the batch inverts
+    /// the plain `d` as a Montgomery value, giving `d⁻¹R²`, so one
+    /// Montgomery product with the plain numerator is `λR`; one reduction
+    /// gives `λ`, and `λR·λ`, `λR·(x_r − x₃)` are plain again.  A finished
+    /// sum is tallied `2M + 1S` and one Montgomery reduction.  An
+    /// exceptional element (`∞`, or `x_q = x_r`: a doubling or the
+    /// identity) is added serially on the ledger, as the default would.
+    /// `r = ∞` or a `p` outside `prime_fast`'s range takes the default.
+    fn add_each_batched(
+        &self,
+        ops: &mut GroupOps,
+        r: PrimePoint,
+        qs: &[PrimePoint],
+        negate: bool,
+        visit: &mut dyn FnMut(&mut GroupOps, usize, PrimePoint) -> bool,
+    ) -> Option<usize> {
+        if r.infinity
+            || self.p < 5
+            || self.p & 1 == 0
+            || self.p >= (1u64 << crate::cryptanalysis::prime_fast::MAX_BITS)
+        {
+            return serial_add_each(self, ops, r, qs, negate, visit);
+        }
+        #[derive(Default)]
+        struct Scratch {
+            field: Option<Fp64>,
+            dens: Vec<u64>,
+            inv: Vec<u64>,
+        }
+        thread_local! {
+            static SCRATCH: std::cell::RefCell<Scratch> =
+                std::cell::RefCell::new(Scratch::default());
+        }
+        // Taken, not borrowed, so that `visit` may itself batch.
+        let mut sc = SCRATCH.with(|c| std::mem::take(&mut *c.borrow_mut()));
+        let f = match sc.field {
+            Some(f) if f.p == self.p => f,
+            _ => {
+                let f = Fp64::new(self.p);
+                sc.field = Some(f);
+                f
+            }
+        };
+        let mut found = None;
+        let mut start = 0;
+        'blocks: while start < qs.len() {
+            let end = (start + PRIME_ADD_EACH_BLOCK).min(qs.len());
+            let block = &qs[start..end];
+            sc.dens.clear();
+            let mut ordinary = false;
+            for q in block {
+                if q.infinity || q.x == r.x {
+                    sc.dens.push(f.one);
+                } else {
+                    sc.dens.push(f.sub(r.x, q.x));
+                    ordinary = true;
+                }
+            }
+            if ordinary {
+                f.batch_inv(&mut sc.dens, &mut sc.inv);
+                ops.field_ops.invs += 1;
+                ops.field_ops.muls += 3 * block.len() as u64 + 1;
+            }
+            for (off, &q) in block.iter().enumerate() {
+                let s = if q.infinity || q.x == r.x {
+                    self.add(ops, r, if negate { self.neg(q) } else { q })
+                } else {
+                    // `r + q'` with `q' = (x_q, ±y_q)`:
+                    // `λ = (y_r − y_q')/(x_r − x_q)`.
+                    let yq = if negate { f.neg(q.y) } else { q.y };
+                    let lam_r = f.mul(f.sub(r.y, yq), sc.dens[off]);
+                    let lam = f.from_mont(lam_r);
+                    let x3 = f.sub(f.sub(f.mul(lam_r, lam), r.x), q.x);
+                    let y3 = f.sub(f.mul(lam_r, f.sub(r.x, x3)), r.y);
+                    ops.adds += 1;
+                    ops.field_ops.muls += 2;
+                    ops.field_ops.sqrs += 1;
+                    ops.montgomery_reductions += 1;
+                    PrimePoint::affine(x3, y3)
+                };
+                if visit(ops, start + off, s) {
+                    found = Some(start + off);
+                    break 'blocks;
+                }
+            }
+            start = end;
+        }
+        SCRATCH.with(|c| *c.borrow_mut() = sc);
+        found
+    }
+    #[inline]
+    fn select_elt(&self, first: bool, a: PrimePoint, b: PrimePoint) -> PrimePoint {
+        PrimePoint {
+            x: pick_word(first, a.x, b.x),
+            y: pick_word(first, a.y, b.y),
+            infinity: pick_word(first, u64::from(a.infinity), u64::from(b.infinity)) != 0,
         }
     }
     fn key(&self, p: &PrimePoint) -> u64 {
@@ -6157,6 +7216,11 @@ impl CountedGroup for PrimeCurve {
         } else {
             ((p.x + 1) << 1) | u64::from(p.y > self.p - p.y)
         }
+    }
+    fn abscissa_key_bound(&self) -> Option<u64> {
+        // Walk tables store `x + 1` (or orbit-min of that), so keys are
+        // in `1..=p + 1`.
+        Some(self.p.saturating_add(2))
     }
     fn native_walk_adder(
         &self,
@@ -6596,6 +7660,29 @@ pub fn curve25519_family_instance(k: u32) -> Option<PrimeInstance> {
 /// `p`, random `(a, b)`, `O(p)` point count, until `#E` is prime.
 /// Deterministic in the seed; the count of curves tried is not returned
 /// because it is not a cost of the attack.
+/// Ordinary cofactor-one Mersenne prime curve for the p31 exponent-lead gate.
+///
+/// Frozen in `docs/ic/research/fp_p31_subexp_calibration_20261121/` (sourced from
+/// the external `CURVE.json` workdir).  Select with `ic bench --bits 31
+/// --family p31-subexp`.
+pub fn fp_p31_subexp_mersenne_instance() -> PrimeInstance {
+    let curve = PrimeCurve {
+        p: 2_147_483_647,
+        a: 2_147_483_644,
+        b: 21,
+    };
+    let r = 2_147_487_637;
+    PrimeInstance {
+        name: prime_curve_id(&curve, r).slug,
+        curve,
+        group_order: r,
+        r,
+        cofactor: 1,
+        generator: (1_391_443_431, 177_979_044),
+        representation: None,
+    }
+}
+
 pub fn find_prime_order_curve(bits: u32, seed: u64) -> PrimeInstance {
     assert!((8..=32).contains(&bits));
     let mut rng = StdRng::seed_from_u64(seed ^ (bits as u64) << 40);
@@ -6836,11 +7923,111 @@ impl CountedGroup for BinaryGroup<'_> {
         ops.doubles += 1;
         self.0.double(p)
     }
+    fn supports_siblings(&self) -> bool {
+        true
+    }
+    fn sibling_pair(
+        &self,
+        _ops: &mut GroupOps,
+        p: FastPoint,
+        j: FastPoint,
+        want_minus: bool,
+    ) -> Option<SiblingPair> {
+        if p.infinity || j.infinity || p.x == j.x {
+            return None;
+        }
+        crate::cryptanalysis::group_op_count::count_adds(1);
+        let f = &self.0.field;
+        let dx = p.x ^ j.x;
+        let inv = f.inv(dx);
+        let lp = f.mul(p.y ^ j.y, inv);
+        let lp2 = f.sqr(lp);
+        let xp = lp2 ^ lp ^ dx ^ self.0.a;
+        let mut out = SiblingPair {
+            key_plus: xp + 1,
+            lambda_plus: lp,
+            key_minus: 0,
+            lambda_minus: 0,
+            y_plus: None,
+            y_minus: None,
+        };
+        if want_minus {
+            let lm = lp ^ f.mul(j.x, inv);
+            let lm2 = f.sqr(lm);
+            let xm = lm2 ^ lm ^ dx ^ self.0.a;
+            out.key_minus = xm + 1;
+            out.lambda_minus = lm;
+        }
+        Some(out)
+    }
+    fn sibling_lambda(
+        &self,
+        _ops: &mut GroupOps,
+        p: FastPoint,
+        j: FastPoint,
+        minus: bool,
+    ) -> Option<u64> {
+        if p.infinity || j.infinity || p.x == j.x {
+            return None;
+        }
+        let f = &self.0.field;
+        let dx = p.x ^ j.x;
+        let inv = f.inv(dx);
+        let num = if minus { p.y ^ j.x ^ j.y } else { p.y ^ j.y };
+        Some(f.mul(num, inv))
+    }
+    fn sibling_lift(
+        &self,
+        _ops: &mut GroupOps,
+        p: FastPoint,
+        key: u64,
+        lambda: u64,
+    ) -> Option<FastPoint> {
+        if p.infinity || key == 0 {
+            return None;
+        }
+        let x = key - 1;
+        let f = &self.0.field;
+        let y = f.mul(lambda, p.x ^ x) ^ x ^ p.y;
+        Some(FastPoint::affine(x, y))
+    }
     fn neg(&self, p: FastPoint) -> FastPoint {
         self.0.neg(p)
     }
     fn key(&self, p: &FastPoint) -> u64 {
         p.pack()
+    }
+    fn coset_parity(&self, p: &FastPoint) -> Option<u8> {
+        if p.infinity {
+            return Some(0);
+        }
+        let f = &self.0.field;
+        let tr = |v: u64| -> u64 {
+            let (mut acc, mut t) = (v, v);
+            for _ in 1..self.0.n {
+                t = f.sqr(t);
+                acc ^= t;
+            }
+            debug_assert!(acc == 0 || acc == 1);
+            acc
+        };
+        Some((tr(p.x) ^ tr(self.0.a)) as u8)
+    }
+    fn coset_parity_squarings(&self) -> u64 {
+        2 * u64::from(self.0.n.saturating_sub(1))
+    }
+    fn x_sibling_pair(&self, p: FastPoint, j: FastPoint) -> Option<(FastPoint, u64)> {
+        if p.infinity || j.infinity || p.x == j.x {
+            return None;
+        }
+        let f = &self.0.field;
+        let inv = f.inv(p.x ^ j.x);
+        let lp = f.mul(p.y ^ j.y, inv);
+        let lm = lp ^ f.mul(j.x, inv);
+        let base = p.x ^ j.x ^ self.0.a;
+        let x_plus = f.sqr(lp) ^ lp ^ base;
+        let y_plus = f.mul(lp, p.x ^ x_plus) ^ x_plus ^ p.y;
+        Some((FastPoint::affine(x_plus, y_plus), f.sqr(lm) ^ lm ^ base))
     }
 }
 
@@ -7084,6 +8271,11 @@ pub struct FactorBase<E> {
     pub cost: PhaseCost,
     /// Subspace basis (single words) when the base is a linear subspace.
     pub subspace_basis: Option<Vec<u64>>,
+    /// `(basis, offset)` when the abscissae form the affine subspace
+    /// `offset + span(basis)`, `offset` outside the span.  Such a base
+    /// has no `subspace_basis`, so only consumers that read this field
+    /// (the algebraic descent) accept it.
+    pub affine_subspace: Option<(Vec<u64>, u64)>,
     /// `Some(n)` when the builder laid the base out by signed Frobenius
     /// orbit: `points[2(o·n + t)] = σ^t(S_o)` and `points[2(o·n + t) + 1]
     /// = −σ^t(S_o)` for orbit seeds `S_o`, each orbit of size `2n`.  The
@@ -7096,6 +8288,19 @@ pub struct FactorBase<E> {
     /// `known-log` base.  Present, the pipeline skips linear algebra, since
     /// one verified relation names the target's logarithm directly.
     pub known_logs: Option<Vec<u64>>,
+    /// The doubling chain `[2^i]G`, `i = 0..=L`, that a builder formed
+    /// (and charged) on its way to its known seeds, kept rather than
+    /// dropped (`compact-orbit-scan` with `multiple_doublings`; empty for
+    /// every other base).  Memory only: no consumer reads it unless asked
+    /// (`mitm-frobenius-layout-counted` `ladder_verify=1`).
+    pub generator_ladder: Vec<E>,
+    /// `true` when a signed-layout base did not form its negatives
+    /// (`compact-orbit-scan` `lazy_neg=1`, Koblitz K1 set-up lever,
+    /// 2026-11-18): every odd slot `points[2i + 1]` holds the identity, and
+    /// a reader forms `−points[2i]` when it needs it and counts that
+    /// negation ([`FrobeniusPairTable`] is the only reader that accepts
+    /// such a base).  `false` for every other base.
+    pub negations_deferred: bool,
 }
 
 /// Charge the indexes a base builder derives (`ecbench::work`,
@@ -7135,8 +8340,11 @@ impl<E: Copy> FactorBase<E> {
             point_index: fast_map(0),
             cost: PhaseCost::default(),
             subspace_basis: None,
+            affine_subspace: None,
             frobenius_orbit_layout: None,
             known_logs: None,
+            generator_ladder: Vec::new(),
+            negations_deferred: false,
         }
     }
 
@@ -7204,6 +8412,54 @@ impl<E: Copy> FactorBase<E> {
         fb.columns = columns;
         Ok(fb)
     }
+
+    /// A base laid out in signed pairs, `points[2i + 1] = −points[2i]`,
+    /// with no derived hash index (`lean_layout` of `compact-orbit-scan`,
+    /// 2026-11-18): `neg_index[i] = i ^ 1` by the layout, and
+    /// `point_index`, `x_index` and `abscissa_list` stay empty, so the
+    /// build spends no hash insert, probe or negation on them.  Only a
+    /// consumer that names base points by index (the orbit-layout pair
+    /// table) may read such a base ([`FactorBase::index_elided`]).  The
+    /// caller vouches for the pairing; lengths and columns are checked.
+    pub fn from_signed_layout(
+        description: String,
+        points: Vec<E>,
+        col_of: Vec<usize>,
+        coef_of: Vec<u64>,
+        columns: usize,
+    ) -> Result<Self, String> {
+        if points.len() != col_of.len() || points.len() != coef_of.len() {
+            return Err(format!(
+                "column map lengths disagree: {} points, {} columns, {} coefficients",
+                points.len(),
+                col_of.len(),
+                coef_of.len()
+            ));
+        }
+        if points.is_empty() || !points.len().is_multiple_of(2) {
+            return Err("a signed layout needs a non-empty, even number of points".into());
+        }
+        if let Some(&c) = col_of.iter().find(|&&c| c >= columns) {
+            return Err(format!(
+                "column {c} is outside the {columns} declared columns"
+            ));
+        }
+        let mut fb = FactorBase::empty(description);
+        fb.neg_index = (0..points.len()).map(|i| i ^ 1).collect();
+        fb.abscissae = points.len() / 2;
+        fb.points = points;
+        fb.col_of = col_of;
+        fb.coef_of = coef_of;
+        fb.columns = columns;
+        Ok(fb)
+    }
+
+    /// `true` for a base built without its hash index
+    /// ([`FactorBase::from_signed_layout`]): `point_index` is empty while
+    /// the base holds points, so lookups by key would find nothing.
+    pub fn index_elided(&self) -> bool {
+        self.point_index.is_empty() && !self.points.is_empty()
+    }
 }
 
 /// The prime-field base: the `size` smallest abscissae that are on the
@@ -7259,6 +8515,83 @@ pub fn prime_factor_base(inst: &PrimeInstance, size: usize) -> FactorBase<PrimeP
     fb.cost.count("abscissae_scanned", scanned);
     fb.cost.count("legendre_symbols", scanned);
     fb.cost.count("sqrt_solves", sqrts);
+    fb
+}
+
+/// The cofactor-cleared base: `[h]P` for the points `P` above the
+/// smallest abscissae, until `size` distinct abscissae of `[h]P` are
+/// collected, each with its negative, one column per abscissa.
+///
+/// Every base point then lies in the order-`r` subgroup that the targets
+/// live in.  A pair sum of base points then always lands there, so a
+/// meet-in-the-middle table over this base hits a target `h` times as often
+/// as one over the raw small-abscissa base, at the same size
+/// (`research/isogeny_conductor_gap_round5_20261012/`, E7a).  The `[h]`
+/// multiplications are charged to `ops`.  With `h = 1` it is
+/// [`prime_factor_base`] with the same points.
+pub fn prime_factor_base_cleared(
+    inst: &PrimeInstance,
+    size: usize,
+    ops: &mut GroupOps,
+) -> FactorBase<PrimePoint> {
+    let start = Instant::now();
+    let curve = &inst.curve;
+    let h = inst.cofactor;
+    let mut fb = FactorBase::empty(format!("[{h}]·(smallest abscissae), {size} columns"));
+    let mut x = 1u64;
+    let mut scanned = 0u64;
+    let mut sqrts = 0u64;
+    let mut cleared = 0u64;
+    while fb.abscissae < size && x < curve.p {
+        scanned += 1;
+        let rhs = curve.rhs(x);
+        if curve.legendre(rhs) >= 0 {
+            sqrts += 1;
+            if let Some(y) = curve.sqrt(rhs) {
+                let raw = PrimePoint::affine(x, y);
+                let p = if h == 1 {
+                    raw
+                } else {
+                    cleared += 1;
+                    curve.mul(ops, raw, h)
+                };
+                if !p.infinity && !fb.x_index.contains_key(&p.x) {
+                    let y = if p.y == 0 { 0 } else { p.y.min(curve.p - p.y) };
+                    let p = PrimePoint::affine(p.x, y);
+                    let q = curve.neg(p);
+                    let col = fb.abscissae;
+                    let i = fb.points.len();
+                    fb.points.push(p);
+                    fb.col_of.push(col);
+                    fb.coef_of.push(1);
+                    if q != p {
+                        fb.points.push(q);
+                        fb.col_of.push(col);
+                        fb.coef_of.push(inst.r - 1);
+                        fb.neg_index.push(i + 1);
+                        fb.neg_index.push(i);
+                        fb.x_index.insert(p.x, vec![i, i + 1]);
+                    } else {
+                        fb.neg_index.push(i);
+                        fb.x_index.insert(p.x, vec![i]);
+                    }
+                    fb.abscissae += 1;
+                }
+            }
+        }
+        x += 1;
+    }
+    fb.columns = fb.abscissae;
+    for (i, p) in fb.points.iter().enumerate() {
+        fb.point_index.insert(curve.key(p), i);
+    }
+    fb.abscissa_list = fb.x_index.keys().copied().collect();
+    fb.abscissa_list.sort_unstable();
+    fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
+    fb.cost.count("abscissae_scanned", scanned);
+    fb.cost.count("legendre_symbols", scanned);
+    fb.cost.count("sqrt_solves", sqrts);
+    fb.cost.count("cofactor_clearings", cleared);
     fb
 }
 
@@ -7329,12 +8662,28 @@ pub fn prime_factor_base_strided(
 /// A binary base over the span of `basis` (single words), every point
 /// above every non-zero element, columns by abscissa.
 pub fn binary_subspace_factor_base(inst: &BinaryInstance, basis: &[u64]) -> FactorBase<FastPoint> {
+    binary_affine_subspace_factor_base(inst, basis, 0)
+}
+
+/// The points above `offset + span(basis)`; `offset = 0` is
+/// [`binary_subspace_factor_base`].  With `offset ≠ 0` (outside the span)
+/// the base records `affine_subspace` instead of `subspace_basis`.
+pub fn binary_affine_subspace_factor_base(
+    inst: &BinaryInstance,
+    basis: &[u64],
+    offset: u64,
+) -> FactorBase<FastPoint> {
     let start = Instant::now();
     let l = basis.len() as u32;
-    let mut fb = FactorBase::empty(format!("subspace of dimension {l}"));
+    let mut fb = FactorBase::empty(if offset == 0 {
+        format!("subspace of dimension {l}")
+    } else {
+        format!("affine subspace of dimension {l}")
+    });
     let mut solves = 0u64;
-    for idx in 1..(1u64 << l) {
-        let mut x = 0u64;
+    let first = if offset == 0 { 1 } else { 0 };
+    for idx in first..(1u64 << l) {
+        let mut x = offset;
         for (j, &e) in basis.iter().enumerate() {
             if (idx >> j) & 1 == 1 {
                 x ^= e;
@@ -7365,7 +8714,11 @@ pub fn binary_subspace_factor_base(inst: &BinaryInstance, basis: &[u64]) -> Fact
     }
     fb.columns = fb.abscissae;
     fb.dimension = Some(l);
-    fb.subspace_basis = Some(basis.to_vec());
+    if offset == 0 {
+        fb.subspace_basis = Some(basis.to_vec());
+    } else {
+        fb.affine_subspace = Some((basis.to_vec(), offset));
+    }
     for (i, p) in fb.points.iter().enumerate() {
         fb.point_index.insert(p.pack(), i);
     }
@@ -7375,7 +8728,7 @@ pub fn binary_subspace_factor_base(inst: &BinaryInstance, basis: &[u64]) -> Fact
     let (a, n) = (fb.abscissae as u64, fb.points.len() as u64);
     count_index_build(&mut fb, a + n, 0);
     fb.cost.wall_ns = start.elapsed().as_nanos() as u64;
-    fb.cost.count("abscissae_scanned", (1u64 << l) - 1);
+    fb.cost.count("abscissae_scanned", (1u64 << l) - first);
     fb.cost.count("as_solves", solves);
     fb
 }
@@ -8437,6 +9790,9 @@ pub struct PairTable {
     /// Opt-in cache-line representation.  All other representations are
     /// empty when this is present.
     lines: Option<PairLineIndex>,
+    /// Opt-in direct index for binary keys `x + 1`. A zero word is absent;
+    /// the high word stores `i + 1`, the low word `j`.
+    dense: Option<Vec<u64>>,
     /// `full` (every `i ≤ j`) or `negation_folded` (one pair per orbit
     /// under negation).
     pub kind: &'static str,
@@ -8453,6 +9809,16 @@ pub struct PairTable {
     pub filter_bit_sets: u64,
 }
 
+/// Native work omitted by the order-two first-row shortcut. The skipped
+/// witnesses are the negative twins of the retained first witnesses, not
+/// unexamined keys; the caller seeds their one homogeneous torsion row.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct BinaryTorsionBatchStats {
+    pub skipped_twin_collisions: u64,
+    pub inversion_lanes: u64,
+    pub inversion_batches: u64,
+}
+
 impl PairTable {
     /// The build's work beside its group operations, for `bitop/v1`
     /// (`ecbench::work`): one hash insert per attempt.
@@ -8467,10 +9833,26 @@ impl PairTable {
         if self.filter_bit_sets > 0 {
             out.insert("table_filter_bit_sets".to_string(), self.filter_bit_sets);
         }
+        if let Some(dense) = &self.dense {
+            out.insert("table_dense_zero_words".to_string(), dense.len() as u64);
+            out.insert("table_dense_witness_writes".to_string(), self.entries);
+        }
         out
     }
 
     pub fn build<G: CountedGroup>(g: &G, fb: &FactorBase<G::Elt>) -> Self {
+        Self::build_filtered(g, fb, None)
+    }
+
+    /// The full table restricted to the pairs `keep(i, j)` admits, in the
+    /// same order, so every key the filtered table holds carries the same
+    /// first witness as the full table's (`mitm-coset`).  `None` keeps
+    /// every pair and is exactly [`Self::build`].
+    pub fn build_filtered<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        keep: Option<&dyn Fn(usize, usize) -> bool>,
+    ) -> Self {
         let start = Instant::now();
         let n = fb.points.len();
         let mut ops = GroupOps::default();
@@ -8478,6 +9860,11 @@ impl PairTable {
         let mut attempts = 0u64;
         for i in 0..n {
             for j in i..n {
+                if let Some(keep) = keep {
+                    if !keep(i, j) {
+                        continue;
+                    }
+                }
                 let s = g.add(&mut ops, fb.points[i], fb.points[j]);
                 if g.is_identity(&s) {
                     continue;
@@ -8487,13 +9874,18 @@ impl PairTable {
             }
         }
         Self {
-            kind: "full",
+            kind: if keep.is_some() {
+                "full_coset_filtered"
+            } else {
+                "full"
+            },
             entries: map.len() as u64,
             map,
             parts: Vec::new(),
             part_shift: 0,
             packed: None,
             lines: None,
+            dense: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -8510,6 +9902,16 @@ impl PairTable {
     /// plus its own double.  About `|F|²/4` additions instead of
     /// `|F|²/2`; the probe is unchanged.
     pub fn build_negation_folded<G: CountedGroup>(g: &G, fb: &FactorBase<G::Elt>) -> Self {
+        Self::build_negation_folded_filtered(g, fb, None)
+    }
+
+    /// The negation-folded table restricted to the pairs `keep(i, j)`
+    /// admits (see [`Self::build_filtered`]); the probe is unchanged.
+    pub fn build_negation_folded_filtered<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        keep: Option<&dyn Fn(usize, usize) -> bool>,
+    ) -> Self {
         let start = Instant::now();
         let mut ops = GroupOps::default();
         let groups: Vec<&Vec<usize>> = fb
@@ -8524,6 +9926,11 @@ impl PairTable {
             let i = groups[ai][0];
             for group in groups.iter().skip(ai) {
                 for &j in group.iter() {
+                    if let Some(keep) = keep {
+                        if !keep(i, j) {
+                            continue;
+                        }
+                    }
                     let s = g.add(&mut ops, fb.points[i], fb.points[j]);
                     if g.is_identity(&s) {
                         continue;
@@ -8534,6 +9941,164 @@ impl PairTable {
             }
         }
         Self {
+            kind: if keep.is_some() {
+                "negation_folded_coset_filtered"
+            } else {
+                "negation_folded"
+            },
+            entries: map.len() as u64,
+            map,
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
+            lines: None,
+            dense: None,
+            filter_bit_sets: 0,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: a as u64,
+        }
+    }
+
+    /// [`Self::build`] with each row's sums through
+    /// [`CountedGroup::add_each_batched`]: on a prime curve one inversion a
+    /// block of the row (Montgomery's trick) instead of one a sum.  The same
+    /// sums in the same order, so the same keys, witnesses, entries, insert
+    /// attempts and charged additions; only the field tally differs, and it
+    /// books the batched work.  A group without a batched path builds
+    /// exactly [`Self::build`]'s table with the same tally.
+    pub fn build_batched<G: CountedGroup>(g: &G, fb: &FactorBase<G::Elt>) -> Self {
+        let start = Instant::now();
+        let n = fb.points.len();
+        let mut ops = GroupOps::default();
+        let mut map: FastMap<(u32, u32)> = fast_map(n * (n + 1) / 4 + 1);
+        let mut attempts = 0u64;
+        for i in 0..n {
+            g.add_each_batched(
+                &mut ops,
+                fb.points[i],
+                &fb.points[i..],
+                false,
+                &mut |_, off, s| {
+                    if !g.is_identity(&s) {
+                        map.entry(g.key(&s) >> 1)
+                            .or_insert((i as u32, (i + off) as u32));
+                        attempts += 1;
+                    }
+                    false
+                },
+            );
+        }
+        Self {
+            kind: "full",
+            entries: map.len() as u64,
+            map,
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
+            lines: None,
+            dense: None,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: 0,
+            filter_bit_sets: 0,
+        }
+    }
+
+    /// [`Self::build_negation_folded_lines`] with each row's sums through
+    /// [`CountedGroup::add_each_batched`]: the same entries, witnesses and
+    /// charged additions as the serial lines build, and the same field
+    /// tally as [`Self::build_negation_folded_batched`].
+    pub fn build_negation_folded_lines_batched<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+    ) -> Self {
+        let start = Instant::now();
+        let mut ops = GroupOps::default();
+        let groups: Vec<&Vec<usize>> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+            .collect();
+        let a = groups.len();
+        let mut lines = PairLineIndex::with_capacity(a * a + 1);
+        let mut attempts = 0u64;
+        let mut row_idx: Vec<usize> = Vec::new();
+        let mut row_pts: Vec<G::Elt> = Vec::new();
+        for ai in 0..a {
+            let i = groups[ai][0];
+            row_idx.clear();
+            row_pts.clear();
+            for group in groups.iter().skip(ai) {
+                for &j in group.iter() {
+                    row_idx.push(j);
+                    row_pts.push(fb.points[j]);
+                }
+            }
+            g.add_each_batched(&mut ops, fb.points[i], &row_pts, false, &mut |_, off, s| {
+                if !g.is_identity(&s) {
+                    lines.insert_if_absent(g.key(&s) >> 1, i as u32, row_idx[off] as u32);
+                    attempts += 1;
+                }
+                false
+            });
+        }
+        Self {
+            kind: "negation_folded",
+            entries: lines.len as u64,
+            map: fast_map(0),
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
+            lines: Some(lines),
+            dense: None,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: a as u64,
+            filter_bit_sets: 0,
+        }
+    }
+
+    /// [`Self::build_negation_folded`] with each row's sums through
+    /// [`CountedGroup::add_each_batched`], as [`Self::build_batched`] is to
+    /// [`Self::build`]: the same table and charged additions, the batched
+    /// field tally.
+    pub fn build_negation_folded_batched<G: CountedGroup>(g: &G, fb: &FactorBase<G::Elt>) -> Self {
+        let start = Instant::now();
+        let mut ops = GroupOps::default();
+        let groups: Vec<&Vec<usize>> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+            .collect();
+        let a = groups.len();
+        let mut map: FastMap<(u32, u32)> = fast_map(a * a + 1);
+        let mut attempts = 0u64;
+        let mut row_idx: Vec<usize> = Vec::new();
+        let mut row_pts: Vec<G::Elt> = Vec::new();
+        for ai in 0..a {
+            let i = groups[ai][0];
+            row_idx.clear();
+            row_pts.clear();
+            for group in groups.iter().skip(ai) {
+                for &j in group.iter() {
+                    row_idx.push(j);
+                    row_pts.push(fb.points[j]);
+                }
+            }
+            g.add_each_batched(&mut ops, fb.points[i], &row_pts, false, &mut |_, off, s| {
+                if !g.is_identity(&s) {
+                    map.entry(g.key(&s) >> 1)
+                        .or_insert((i as u32, row_idx[off] as u32));
+                    attempts += 1;
+                }
+                false
+            });
+        }
+        Self {
             kind: "negation_folded",
             entries: map.len() as u64,
             map,
@@ -8541,12 +10106,283 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: None,
+            dense: None,
             filter_bit_sets: 0,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
             index_lookups: a as u64,
         }
+    }
+
+    /// The binary negation-folded table in the scalar builder's exact pair
+    /// order. Each abscissa row shares one inversion across its ordinary
+    /// additions; exceptional doublings may need their own inversion.
+    /// The table needs only the final abscissa of each sum, so ordinates are
+    /// left unfinished. First-witness insertion and the abstract addition
+    /// charge are unchanged.
+    pub fn build_negation_folded_binary_batch(
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+    ) -> Self {
+        Self::build_negation_folded_binary_batch_inner(g, fb, false, false).0
+    }
+
+    /// Build the identical first-witness table while retaining every later
+    /// pair with the same sum abscissa. The four indices are current pair,
+    /// then first pair. A caller must resolve the sign and verify the full
+    /// group equation before using a collision as a relation.
+    pub fn build_negation_folded_binary_batch_with_collisions(
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+    ) -> (Self, Vec<[usize; 4]>) {
+        let (table, collisions, _) =
+            Self::build_negation_folded_binary_batch_inner(g, fb, true, false);
+        (table, collisions)
+    }
+
+    /// The batch table with its order-two row built from abscissa inverses.
+    /// On `b = 1`, `T = (0, 1)` and `x(T + P) = 1/x(P)`. The two signed points
+    /// above each later abscissa have the same sum key, so only the first is
+    /// inserted. Every later row retains the ordinary builder's order.
+    pub fn build_negation_folded_binary_batch_torsion_with_collisions(
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+    ) -> Result<(Self, Vec<[usize; 4]>, BinaryTorsionBatchStats), String> {
+        if g.0.b != 1 || fb.abscissa_list.first() != Some(&0) {
+            return Err("torsion batch requires b=1 and a zero first abscissa".into());
+        }
+        let groups: Vec<&Vec<usize>> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+            .collect();
+        if groups[0].as_slice() != [0]
+            || fb.points.first() != Some(&FastPoint::affine(0, 1))
+            || fb.neg_index.first() != Some(&0)
+        {
+            return Err("torsion batch requires the first point to be T=(0,1)".into());
+        }
+        for group in groups.iter().skip(1) {
+            if group.len() != 2 {
+                return Err("torsion batch requires complete signed pairs".into());
+            }
+            let (j, nj) = (group[0], group[1]);
+            if fb.points[j].infinity
+                || fb.points[j].x == 0
+                || fb.points[j].x != fb.points[nj].x
+                || fb.neg_index.get(j) != Some(&nj)
+                || fb.neg_index.get(nj) != Some(&j)
+                || g.neg(fb.points[j]) != fb.points[nj]
+            {
+                return Err("torsion batch has an invalid signed pair".into());
+            }
+        }
+        Ok(Self::build_negation_folded_binary_batch_inner(
+            g, fb, true, true,
+        ))
+    }
+
+    /// Convert the torsion-harvest binary table to direct abscissa lookup.
+    /// The builder has already fixed the first witness and collision stream;
+    /// this changes only storage and probe lookup. It deliberately keeps the
+    /// hash build cost and charges the conversion to `build_wall_ns`.
+    pub fn into_binary_dense(mut self, n: u32) -> Result<Self, String> {
+        if self.kind != "negation_folded_binary_batch_torsion" {
+            return Err("dense conversion requires the binary torsion-harvest table".into());
+        }
+        if !(1..=23).contains(&n) {
+            return Err(format!(
+                "dense binary pair table requires n=1..=23, got {n}"
+            ));
+        }
+        let len = (1usize << n) + 1;
+        let bytes = len * std::mem::size_of::<u64>();
+        if bytes > 128 * 1024 * 1024 {
+            return Err("dense binary pair table exceeds 128 MiB".into());
+        }
+        let started = Instant::now();
+        let mut dense = vec![0u64; len];
+        let map = std::mem::replace(&mut self.map, fast_map(0));
+        for (key, (i, j)) in map {
+            let at = usize::try_from(key).map_err(|_| "dense binary key is too wide")?;
+            if at == 0 || at >= len || i == u32::MAX {
+                return Err("dense binary table has an invalid key or witness".into());
+            }
+            let witness = ((u64::from(i) + 1) << 32) | u64::from(j);
+            if dense[at] != 0 {
+                return Err("dense binary table has a duplicate first key".into());
+            }
+            dense[at] = witness;
+        }
+        self.dense = Some(dense);
+        self.kind = "negation_folded_binary_batch_torsion_dense";
+        self.build_wall_ns = self
+            .build_wall_ns
+            .saturating_add(started.elapsed().as_nanos() as u64);
+        Ok(self)
+    }
+
+    pub fn dense_bytes(&self) -> Option<u64> {
+        self.dense
+            .as_ref()
+            .map(|dense| (dense.len() * std::mem::size_of::<u64>()) as u64)
+    }
+
+    fn build_negation_folded_binary_batch_inner(
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+        collect_collisions: bool,
+        torsion_row: bool,
+    ) -> (Self, Vec<[usize; 4]>, BinaryTorsionBatchStats) {
+        let start = Instant::now();
+        let groups: Vec<&Vec<usize>> = fb
+            .abscissa_list
+            .iter()
+            .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
+            .collect();
+        let a = groups.len();
+        let mut map: FastMap<(u32, u32)> = fast_map(a * a + 1);
+        let mut ops = GroupOps::default();
+        let mut attempts = 0u64;
+        let mut collisions = Vec::new();
+        let mut torsion_stats = BinaryTorsionBatchStats::default();
+        let mut scratch = BatchScratch::default();
+        let mut indices = Vec::new();
+        let mut addends = Vec::new();
+        let mut sums = Vec::new();
+        let mut lambdas = Vec::new();
+        #[cfg(target_arch = "x86_64")]
+        let (mut pair_x, mut pair_ya, mut pair_yb, mut x3) =
+            (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+        for ai in 0..a {
+            let i = groups[ai][0];
+            if torsion_row && ai == 0 {
+                let mut inverses: Vec<u64> = groups
+                    .iter()
+                    .skip(1)
+                    .map(|group| fb.points[group[0]].x)
+                    .collect();
+                let mut inverse_scratch = Vec::new();
+                g.0.field.batch_inv(&mut inverses, &mut inverse_scratch);
+                for (group, &inverse) in groups.iter().skip(1).zip(&inverses) {
+                    map.entry(inverse + 1)
+                        .or_insert((i as u32, group[0] as u32));
+                    attempts += 1;
+                }
+                torsion_stats.skipped_twin_collisions = inverses.len() as u64;
+                torsion_stats.inversion_lanes = inverses.len() as u64;
+                torsion_stats.inversion_batches = u64::from(!inverses.is_empty());
+                continue;
+            }
+            indices.clear();
+            addends.clear();
+            sums.clear();
+            lambdas.clear();
+            for group in groups.iter().skip(ai) {
+                for &j in group.iter() {
+                    indices.push(j);
+                    addends.push(fb.points[j]);
+                }
+            }
+            ops.adds += addends.len() as u64;
+            // The same-abscissa group is exceptional for every row. Leaving
+            // it in the batch makes the SIMD kernel decline the entire row.
+            // Keep its first-witness order, then batch the ordinary sums.
+            let diagonal_len = groups[ai].len();
+            for &q in &addends[..diagonal_len] {
+                sums.push(g.0.add(fb.points[i], q));
+                lambdas.push(FastCurve::LAZY_DONE);
+            }
+            let off_diagonal = &addends[diagonal_len..];
+            if !off_diagonal.is_empty() {
+                #[cfg(target_arch = "x86_64")]
+                let paired = {
+                    pair_x.clear();
+                    pair_ya.clear();
+                    pair_yb.clear();
+                    x3.clear();
+                    let complete_pairs = off_diagonal.len().is_multiple_of(2)
+                        && off_diagonal.chunks_exact(2).all(|pair| {
+                            !pair[0].infinity && !pair[1].infinity && pair[0].x == pair[1].x
+                        });
+                    if complete_pairs {
+                        for pair in off_diagonal.chunks_exact(2) {
+                            pair_x.push(pair[0].x);
+                            pair_ya.push(pair[0].y);
+                            pair_yb.push(pair[1].y);
+                        }
+                        if g.0.add_many_lazy_soa_paired(
+                            fb.points[i],
+                            &pair_x,
+                            &pair_ya,
+                            &pair_yb,
+                            &mut x3,
+                            &mut lambdas,
+                            &mut scratch,
+                            off_diagonal.len() as u64,
+                        ) {
+                            sums.extend(x3.iter().copied().map(|x| FastPoint::affine(x, 0)));
+                            true
+                        } else {
+                            false
+                        }
+                    } else {
+                        false
+                    }
+                };
+                #[cfg(not(target_arch = "x86_64"))]
+                let paired = false;
+                if !paired {
+                    g.0.add_many_lazy_paired_x(
+                        fb.points[i],
+                        off_diagonal,
+                        &mut sums,
+                        &mut lambdas,
+                        &mut scratch,
+                    );
+                }
+            }
+            debug_assert_eq!(sums.len(), indices.len());
+            debug_assert_eq!(lambdas.len(), indices.len());
+            for (&j, s) in indices.iter().zip(sums.iter()) {
+                if s.infinity {
+                    continue;
+                }
+                match map.entry(s.x + 1) {
+                    std::collections::hash_map::Entry::Vacant(slot) => {
+                        slot.insert((i as u32, j as u32));
+                    }
+                    std::collections::hash_map::Entry::Occupied(slot) => {
+                        if collect_collisions {
+                            let &(fi, fj) = slot.get();
+                            collisions.push([i, j, fi as usize, fj as usize]);
+                        }
+                    }
+                }
+                attempts += 1;
+            }
+        }
+        let table = Self {
+            kind: if torsion_row {
+                "negation_folded_binary_batch_torsion"
+            } else {
+                "negation_folded_binary_batch"
+            },
+            entries: map.len() as u64,
+            map,
+            parts: Vec::new(),
+            part_shift: 0,
+            packed: None,
+            lines: None,
+            dense: None,
+            build_ops: ops,
+            build_wall_ns: start.elapsed().as_nanos() as u64,
+            insert_attempts: attempts,
+            index_lookups: a as u64,
+            filter_bit_sets: 0,
+        };
+        (table, collisions, torsion_stats)
     }
 
     /// The same negation-folded table and emission order as
@@ -8584,6 +10420,7 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: Some(lines),
+            dense: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -8617,6 +10454,7 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: None,
+            dense: None,
             filter_bit_sets: 0,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
@@ -8649,6 +10487,7 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: Some(lines),
+            dense: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -8713,6 +10552,7 @@ impl PairTable {
                 part_shift: 0,
                 packed: Some(packed),
                 lines: None,
+                dense: None,
                 build_ops: ops,
                 build_wall_ns: start.elapsed().as_nanos() as u64,
                 insert_attempts,
@@ -8790,6 +10630,7 @@ impl PairTable {
             part_shift,
             packed: None,
             lines: None,
+            dense: None,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -8798,9 +10639,64 @@ impl PairTable {
         })
     }
 
+    /// Folded abscissa key (`x + 1`) → first witness pair, if present.
+    /// Used by x-only / sibling probes that already hold the folded key.
+    pub fn lookup_folded(&self, folded: u64) -> Option<(usize, usize)> {
+        let (i, j) = self.get(folded)?;
+        Some((i as usize, j as usize))
+    }
+
+    /// Visit every folded abscissa key the table stores (for Bloom / fuse
+    /// filters in front of [`Self::lookup_folded`]).
+    pub fn for_each_folded_key(&self, mut f: impl FnMut(u64)) {
+        if let Some(dense) = &self.dense {
+            for (key, &witness) in dense.iter().enumerate() {
+                if witness != 0 {
+                    f(key as u64);
+                }
+            }
+            return;
+        }
+        if let Some(lines) = &self.lines {
+            for (line_index, line) in lines.lines.iter().enumerate() {
+                let bits = lines.occupied[line_index];
+                for slot in 0..4 {
+                    if bits & (1 << slot) != 0 {
+                        f(line.keys[slot]);
+                    }
+                }
+            }
+            return;
+        }
+        if let Some(packed) = &self.packed {
+            for &word in packed.slots.iter().filter(|&&w| w != 0) {
+                f(word >> 32);
+            }
+            return;
+        }
+        if self.parts.is_empty() {
+            for &k in self.map.keys() {
+                f(k);
+            }
+        } else {
+            for part in &self.parts {
+                for &k in part.keys() {
+                    f(k);
+                }
+            }
+        }
+    }
+
     /// The witness stored under a key, in whichever layout the table has.
     fn get(&self, key: u64) -> Option<(u32, u32)> {
-        if let Some(lines) = &self.lines {
+        if let Some(dense) = &self.dense {
+            let witness = *dense.get(usize::try_from(key).ok()?)?;
+            if witness == 0 {
+                None
+            } else {
+                Some(((witness >> 32) as u32 - 1, witness as u32))
+            }
+        } else if let Some(lines) = &self.lines {
             lines.get(key)
         } else if let Some(packed) = &self.packed {
             packed.get(key)
@@ -8833,6 +10729,22 @@ impl PairTable {
 
     /// Indices `(i, j)` with `P_i + P_j = target`, if the table holds a
     /// pair summing to `±target`; one probe, at most one addition.
+    /// The abscissae of the stored sums, in the map's iteration order (`key >> 1
+    /// = x + 1` on a prime curve; unsorted: the device builds its own table),
+    /// for a table held in its plain map (`build`,
+    /// `build_negation_folded`); `None` for the blocked, packed and line
+    /// layouts.  `rootfind-subtract-gpu` (`m = 3`) probes this set on the device.
+    pub(crate) fn map_abscissae(&self) -> Option<Vec<u64>> {
+        if !self.parts.is_empty()
+            || self.packed.is_some()
+            || self.lines.is_some()
+            || self.dense.is_some()
+        {
+            return None;
+        }
+        Some(self.map.keys().map(|k| k - 1).collect())
+    }
+
     pub fn probe<G: CountedGroup>(
         &self,
         g: &G,
@@ -8843,6 +10755,33 @@ impl PairTable {
     ) -> Option<(usize, usize)> {
         *lookups += 1;
         let (i, j) = self.get(g.key(&target) >> 1)?;
+        let (i, j) = (i as usize, j as usize);
+        let s = g.add(ops, fb.points[i], fb.points[j]);
+        if s == target {
+            Some((i, j))
+        } else if s == g.neg(target) {
+            Some((fb.neg_index[i], fb.neg_index[j]))
+        } else {
+            None
+        }
+    }
+
+    /// Probe a binary sum returned by [`FastCurve::add_many_lazy`]. Its
+    /// abscissa is final; its ordinate is completed only after the key hits.
+    /// The lookup, re-addition and sign resolution are those of [`Self::probe`].
+    pub fn probe_binary_lazy(
+        &self,
+        g: &BinaryGroup<'_>,
+        fb: &FactorBase<FastPoint>,
+        ops: &mut GroupOps,
+        lookups: &mut u64,
+        minuend: FastPoint,
+        rest: FastPoint,
+        lambda: u64,
+    ) -> Option<(usize, usize)> {
+        *lookups += 1;
+        let (i, j) = self.get(rest.pack() >> 1)?;
+        let target = g.0.finish_lazy(minuend, rest, lambda);
         let (i, j) = (i as usize, j as usize);
         let s = g.add(ops, fb.points[i], fb.points[j]);
         if s == target {
@@ -8870,26 +10809,46 @@ impl PairTable {
     }
 }
 
-/// Largest arity a [`KSumTable`] builds, and the bits each packed summand
-/// index takes in an entry (`KSUM_MAX_K · KSUM_INDEX_BITS ≤ 64`).
-pub const KSUM_MAX_K: u32 = 5;
+/// Largest arity a [`KSumTable`] builds, and the most bits a packed summand
+/// index takes in an entry.  A `k`-sum entry packs `k` indices into one
+/// `u64`; [`ksum_index_bits`] gives the width per `k` (`k · bits ≤ 64`), so
+/// `KSUM_MAX_K · 7 ≤ 64` fixes the largest arity at 9.
+pub const KSUM_MAX_K: u32 = 9;
 pub const KSUM_INDEX_BITS: u32 = 12;
+/// Most entries a [`KSumTable`] agrees to reserve (a guard against a base
+/// whose `2^{k−1}·C(A, k)` table would not fit in memory).
+pub const KSUM_MAX_ENTRIES: u64 = 1 << 31;
 
-/// **A table of every signed `k`-sum of a base** (`k = 3`, `4` or `5`), keyed by
+/// Bits one packed summand index takes in a `k`-sum entry: [`KSUM_INDEX_BITS`]
+/// (12) for `k ≤ 5`, the layout every `k ≤ 5` table was recorded with, and
+/// `⌊64/k⌋` above it (10, 9, 8, 7 for `k = 6..9`).  The base then has at most
+/// `2^bits` points: 4096 for `k ≤ 5`, 1024, 512, 256, 128 for `k = 6..9`.
+pub const fn ksum_index_bits(k: u32) -> u32 {
+    if k == 0 || 64 / k > KSUM_INDEX_BITS {
+        KSUM_INDEX_BITS
+    } else {
+        64 / k
+    }
+}
+
+/// **A table of every signed `k`-sum of a base** (`k = 3` to `9`), keyed by
 /// the sum's abscissa as [`PairTable`] is, so one probe decides a
 /// `k`-summand decomposition.  The pair table's two-summand search costs a
 /// table of `|F|²` entries and needs about `0.4·|F|` relations; this one
 /// trades a smaller base for a table of about `2^{k−1}·C(|F|, k)` entries,
 /// so the generic cost `|F|^k + |F|·p/|F|^k` falls from `p^{2/3}` (pairs)
-/// to `p^{3/5}` (`k = 3`), `p^{4/7}` (`k = 4`) and `p^{5/9}` (`k = 5`).  Still generic: as `k`
+/// to `p^{3/5}` (`k = 3`), `p^{4/7}` (`k = 4`), `p^{5/9}` (`k = 5`) and
+/// `p^{k/(2k−1)}` beyond.  Still generic: as `k`
 /// grows it approaches baby-step giant-step, never below it.
 ///
 /// One sum per orbit under negation: summands above strictly increasing
 /// abscissae, the first with a fixed sign.  Each partial sum is one
 /// addition, reused by every completion below it.
 pub struct KSumTable {
-    /// The summands of each kept sum, [`KSUM_INDEX_BITS`] bits apiece.
+    /// The summands of each kept sum, [`ksum_index_bits`]`(k)` bits apiece.
     map: FastMap<u64>,
+    /// Bits per packed summand index, `ksum_index_bits(k)`.
+    bits: u32,
     pub k: u32,
     pub entries: u64,
     pub build_ops: GroupOps,
@@ -8903,7 +10862,30 @@ pub struct KSumTable {
     /// Each is a candidate relation among the base logs that the table
     /// found for free; [`KSumTable::free_rows`] verifies them.
     pub keep_collisions: bool,
+    /// Skip partial sums that cannot be completed to `k` summands
+    /// ([`KSumTable::build_negation_folded_opts`]).
+    pub prune: bool,
+    /// Form the last two summands as one precomputed pair sum
+    /// ([`KSumTable::build_negation_folded_split`]).
+    pub split: bool,
+    /// Group additions spent on that pair-sum table (inside `build_ops`).
+    pub split_pair_adds: u64,
     pub collisions: Vec<(u64, u64)>,
+    /// `sib`: the last level forms both signs `x(S ± P)` of a base pair
+    /// from ONE inversion ([`CountedGroup::sibling_pair`]) instead of two
+    /// additions.  Same keys, witnesses and insert order as without it.
+    pub sib: bool,
+    /// Pairs formed that way: each is charged ONE group addition plus one
+    /// unit of the native counter `sibling_second_points` (`work.rs`), the
+    /// walk's convention, so its `bitop/v1` price equals its field work.
+    pub sib_second_points: u64,
+    /// Also key the partial sums of fewer than `k` summands that the
+    /// build forms anyway ([`KSumTable::build_negation_folded_prefix`]).
+    pub prefix: bool,
+    /// Partial sums waiting for the prefix pass: `(key, packed)`.
+    prefix_pending: Vec<(u64, u64)>,
+    /// Prefix entries kept (keys no `k`-sum took); inside `entries`.
+    pub prefix_entries: u64,
 }
 
 impl KSumTable {
@@ -8925,13 +10907,128 @@ impl KSumTable {
         k: u32,
         keep_collisions: bool,
     ) -> Result<Self, String> {
-        if !(3..=KSUM_MAX_K).contains(&k) {
-            return Err(format!("a k-sum table needs k = 3, 4 or 5, not {k}"));
+        Self::build_negation_folded_opts(g, fb, k, keep_collisions, false)
+    }
+
+    /// The same table; with `prune`, a partial sum of `d + 1` summands is
+    /// formed only when at least `k - d - 1` abscissae remain after its
+    /// last one, so no add is spent on a partial that can never reach `k`
+    /// summands.  The kept sums, their keys and the inserts are identical
+    /// either way; only the dead-end adds of the lower levels go.
+    pub fn build_negation_folded_opts<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        k: u32,
+        keep_collisions: bool,
+        prune: bool,
+    ) -> Result<Self, String> {
+        Self::build_negation_folded_full(g, fb, k, keep_collisions, prune, false)
+    }
+
+    /// [`Self::build_negation_folded_opts`] with `sib`: the last level's
+    /// signed pairs share one inversion (x-only siblings), charged as one
+    /// group addition plus `sibling_second_points`.  Needs a group with
+    /// siblings (a prime curve); the kept sums and keys are identical.
+    pub fn build_negation_folded_full<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        k: u32,
+        keep_collisions: bool,
+        prune: bool,
+        sib: bool,
+    ) -> Result<Self, String> {
+        Self::build_negation_folded_all(g, fb, k, keep_collisions, prune, false, sib)
+    }
+
+    /// The same table; with `split`, the last two summands of every sum
+    /// come from a table of pair sums `P_j + P_l` (abscissa of `P_j`
+    /// below that of `P_l`, both at or above the `(k − 1)`-th smallest),
+    /// built once with two additions per abscissa pair (the other two
+    /// sign patterns are their negatives).  Each sum is then its
+    /// `(k − 2)`-summand prefix plus one pair sum: one addition, as
+    /// before, but the `(k − 1)`-summand partial sums, `2^{k−2}` of them
+    /// per `(k − 1)`-subset of abscissae, are never formed.  The sums are
+    /// visited in the same order and a `(k − 1)`-summand partial equal to
+    /// the identity (`prefix = −P_j`, an equality test, no group
+    /// operation) still skips its completions, so the kept sums, keys,
+    /// inserts and collisions are identical; only the build adds fall,
+    /// from `2^{k−2}·C(a′, k−1)` (level `k − 1`) to `2·C(a − k + 2, 2)`.
+    pub fn build_negation_folded_split<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        k: u32,
+        keep_collisions: bool,
+        prune: bool,
+        split: bool,
+    ) -> Result<Self, String> {
+        Self::build_negation_folded_all(g, fb, k, keep_collisions, prune, split, false)
+    }
+
+    /// Every build option at once: `prune`, `split` and `sib` (see the
+    /// three constructors above); all off is the plain build exactly.
+    ///
+    /// `split` and `sib` are mutually exclusive, an explicit error.  `sib`
+    /// shares one inversion between `S + P` and `S − P` for a formed
+    /// `(k − 1)`-summand partial `S` and the two signs `±P` of one
+    /// abscissa.  `split` never forms `S`: its last step adds a pair sum
+    /// `P_j + P_l` to the `(k − 2)`-summand prefix, and the only sibling of
+    /// `prefix + (P_j + P_l)` with a shared inversion is
+    /// `prefix − (P_j + P_l) = prefix + (−P_j − P_l)`, a sum the unsplit
+    /// order visits under the other sign of `j`, i.e. much later.  Pairing
+    /// them would reorder the inserts, so the first witness kept per key
+    /// and the collision list would no longer be those of the plain build
+    /// (the property both options promise); forming `S` to pair `±P_l`
+    /// instead gives back the adds `split` saves.  Hence the error.
+    #[allow(clippy::too_many_arguments)]
+    pub fn build_negation_folded_all<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        k: u32,
+        keep_collisions: bool,
+        prune: bool,
+        split: bool,
+        sib: bool,
+    ) -> Result<Self, String> {
+        Self::build_negation_folded_prefix(g, fb, k, keep_collisions, prune, split, sib, false)
+    }
+
+    /// [`Self::build_negation_folded_all`] with `prefix`: every partial
+    /// sum of `j < k` summands that the build forms anyway (a base point,
+    /// each lower level's partial sums, and with `split` each computed
+    /// pair sum) is also keyed, after the `k`-sums and only under a key no
+    /// `k`-sum took, so the `k`-sum entries, their keys and collisions are
+    /// those of the build without it.  No group operation is added; each
+    /// prefix insert is one more counted insert attempt.  A target equal
+    /// to `±` such a sum then decomposes into `j` summands (the unused
+    /// packed slots hold the index `2^bits − 1`, which no base point has).
+    #[allow(clippy::too_many_arguments)]
+    pub fn build_negation_folded_prefix<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        k: u32,
+        keep_collisions: bool,
+        prune: bool,
+        split: bool,
+        sib: bool,
+        prefix: bool,
+    ) -> Result<Self, String> {
+        if split && sib {
+            return Err("ksum split=1 and sib=1 cannot be combined: split never forms the (m-1)-summand partial sums that sib pairs".into());
         }
-        if fb.points.len() >= 1 << KSUM_INDEX_BITS {
+        if sib && !g.supports_siblings() {
+            return Err("ksum sib=1 needs a group with x-only siblings".into());
+        }
+        if !(3..=KSUM_MAX_K).contains(&k) {
             return Err(format!(
-                "a k-sum table packs base indices in {KSUM_INDEX_BITS} bits; the base has {} points",
-                fb.points.len()
+                "a k-sum table needs k = 3 to {KSUM_MAX_K}, not {k}"
+            ));
+        }
+        let bits = ksum_index_bits(k);
+        if fb.points.len() >= 1 << bits {
+            return Err(format!(
+                "a k-sum table with k = {k} packs base indices in {bits} bits; the base has {} points (fewer than {} are allowed)",
+                fb.points.len(),
+                1u64 << bits
             ));
         }
         let start = Instant::now();
@@ -8941,10 +11038,22 @@ impl KSumTable {
             .map(|x| fb.x_index.get(x).expect("every listed abscissa is indexed"))
             .collect();
         let a = groups.len() as u64;
-        let combinations = (0..u64::from(k)).fold(1u64, |c, i| c * (a - i) / (i + 1));
-        let estimate = (1u64 << (k - 1)) * combinations;
+        let combinations = (0..u64::from(k))
+            .try_fold(1u64, |c, i| {
+                c.checked_mul(a.saturating_sub(i)).map(|c| c / (i + 1))
+            })
+            .ok_or_else(|| {
+                format!("a {k}-sum table over {a} abscissae has too many sums to count")
+            })?;
+        let estimate = (1u64 << (k - 1)).saturating_mul(combinations);
+        if estimate > KSUM_MAX_ENTRIES {
+            return Err(format!(
+                "a {k}-sum table over {a} abscissae would hold about {estimate} sums, above the limit {KSUM_MAX_ENTRIES}"
+            ));
+        }
         let mut t = Self {
             map: fast_map(estimate as usize + 1),
+            bits,
             k,
             entries: 0,
             build_ops: GroupOps::default(),
@@ -8952,14 +11061,160 @@ impl KSumTable {
             insert_attempts: 0,
             index_lookups: a,
             keep_collisions: false,
+            prune,
+            split,
+            split_pair_adds: 0,
             collisions: Vec::new(),
+            sib,
+            sib_second_points: 0,
+            prefix,
+            prefix_pending: Vec::new(),
+            prefix_entries: 0,
         };
         t.keep_collisions = keep_collisions;
+        let pairs = if split {
+            Some(t.pair_sums(g, fb, &groups))
+        } else {
+            None
+        };
         let mut idx = [u32::MAX; KSUM_MAX_K as usize];
-        t.extend(g, fb, &groups, 0, 0, None, &mut idx);
+        t.extend(g, fb, &groups, 0, 0, None, pairs.as_deref(), &mut idx);
+        if prefix {
+            for (key, packed) in std::mem::take(&mut t.prefix_pending) {
+                if let std::collections::hash_map::Entry::Vacant(v) = t.map.entry(key) {
+                    v.insert(packed);
+                    t.prefix_entries += 1;
+                }
+                t.insert_attempts += 1;
+            }
+        }
         t.entries = t.map.len() as u64;
         t.build_wall_ns = start.elapsed().as_nanos() as u64;
         Ok(t)
+    }
+
+    /// `P_j + P_l` for every signed point `j` above an abscissa of index
+    /// at least `k − 2` and every signed `l` above a later abscissa, at
+    /// `j · n + l` (`n` the number of base points).  Two additions per
+    /// abscissa pair: the first point of the first abscissa against each
+    /// point of the second; the remaining sums are negatives of those
+    /// (`−P_j − P_l = −(P_j + P_l)`, no group operation).  Distinct
+    /// abscissae never sum to the identity.
+    fn pair_sums<G: CountedGroup>(
+        &mut self,
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        groups: &[&Vec<usize>],
+    ) -> Vec<Option<G::Elt>> {
+        let n = fb.points.len();
+        let mut pairs: Vec<Option<G::Elt>> = vec![None; n * n];
+        let first = self.k as usize - 2;
+        for (ai, ga) in groups.iter().enumerate().skip(first) {
+            for gb in groups.iter().skip(ai + 1) {
+                for &l in gb.iter() {
+                    let j = ga[0];
+                    let s = g.add(&mut self.build_ops, fb.points[j], fb.points[l]);
+                    self.split_pair_adds += 1;
+                    pairs[j * n + l] = Some(s);
+                    self.note_prefix(g, &s, &[j as u32, l as u32]);
+                    let (nj, nl) = (fb.neg_index[j], fb.neg_index[l]);
+                    if nj != j && ga.contains(&nj) && gb.contains(&nl) {
+                        pairs[nj * n + nl] = Some(g.neg(s));
+                    }
+                }
+                // Any sign pattern a missing negative left open (a base
+                // that lists only one point of an abscissa pair) is added.
+                for &j in ga.iter().skip(1) {
+                    for &l in gb.iter() {
+                        if pairs[j * n + l].is_none() {
+                            let s = g.add(&mut self.build_ops, fb.points[j], fb.points[l]);
+                            self.split_pair_adds += 1;
+                            pairs[j * n + l] = Some(s);
+                            self.note_prefix(g, &s, &[j as u32, l as u32]);
+                        }
+                    }
+                }
+            }
+        }
+        pairs
+    }
+
+    /// The last two levels of [`KSumTable::extend`] from one pair-sum
+    /// read: same visiting order, same identity skips, same inserts.
+    #[allow(clippy::too_many_arguments)]
+    fn extend_split<G: CountedGroup>(
+        &mut self,
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        groups: &[&Vec<usize>],
+        depth: usize,
+        from: usize,
+        prefix: G::Elt,
+        pairs: &[Option<G::Elt>],
+        idx: &mut [u32; KSUM_MAX_K as usize],
+    ) {
+        let n = fb.points.len();
+        let end = groups.len().saturating_sub(1);
+        for (ai, group) in groups.iter().enumerate().take(end).skip(from) {
+            for &j in group.iter() {
+                // `prefix + P_j` is the identity exactly when `prefix` is
+                // `−P_j`: the unsplit build skips that subtree, and so
+                // does this one.
+                if prefix == fb.points[fb.neg_index[j]] {
+                    continue;
+                }
+                idx[depth] = j as u32;
+                for gb in groups.iter().skip(ai + 1) {
+                    for &l in gb.iter() {
+                        let pair = pairs[j * n + l].expect("pair sum built");
+                        let s = g.add(&mut self.build_ops, prefix, pair);
+                        if g.is_identity(&s) {
+                            continue;
+                        }
+                        idx[depth + 1] = l as u32;
+                        self.insert_last(g.key(&s) >> 1, idx);
+                    }
+                }
+                idx[depth + 1] = u32::MAX;
+            }
+        }
+        idx[depth] = u32::MAX;
+    }
+
+    /// Insert one complete sum under its folded key (`x + 1`), first
+    /// witness kept, collisions recorded when asked.
+    fn insert_last(&mut self, key: u64, idx: &[u32; KSUM_MAX_K as usize]) {
+        let bits = self.bits;
+        let packed = idx[..self.k as usize]
+            .iter()
+            .rev()
+            .fold(0u64, |w, &i| (w << bits) | u64::from(i));
+        match self.map.entry(key) {
+            std::collections::hash_map::Entry::Vacant(v) => {
+                v.insert(packed);
+            }
+            std::collections::hash_map::Entry::Occupied(o) => {
+                if self.keep_collisions {
+                    self.collisions.push((*o.get(), packed));
+                }
+            }
+        }
+        self.insert_attempts += 1;
+    }
+
+    /// With `prefix`, keep a partial sum of `summands.len() < k` base
+    /// points for the prefix pass; the unused slots get the index
+    /// `2^bits − 1`.
+    fn note_prefix<G: CountedGroup>(&mut self, g: &G, s: &G::Elt, summands: &[u32]) {
+        if !self.prefix || g.is_identity(s) {
+            return;
+        }
+        let bits = self.bits;
+        let empty = (1u64 << bits) - 1;
+        let packed = (0..self.k as usize).rev().fold(0u64, |w, d| {
+            (w << bits) | summands.get(d).map_or(empty, |&i| u64::from(i))
+        });
+        self.prefix_pending.push((g.key(s) >> 1, packed));
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -8971,11 +11226,46 @@ impl KSumTable {
         depth: usize,
         from: usize,
         partial: Option<G::Elt>,
+        pairs: Option<&[Option<G::Elt>]>,
         idx: &mut [u32; KSUM_MAX_K as usize],
     ) {
+        if let (Some(pairs), Some(prefix)) = (pairs, partial) {
+            if depth + 2 == self.k as usize {
+                self.extend_split(g, fb, groups, depth, from, prefix, pairs, idx);
+                return;
+            }
+        }
         let last = depth + 1 == self.k as usize;
-        for (ai, group) in groups.iter().enumerate().skip(from) {
+        // With `prune`, stop where fewer than `k - depth - 1` abscissae
+        // would remain for the deeper levels.
+        let end = if self.prune {
+            groups.len().saturating_sub(self.k as usize - depth - 1)
+        } else {
+            groups.len()
+        };
+        for (ai, group) in groups.iter().enumerate().take(end).skip(from) {
             let signs: &[usize] = if depth == 0 { &group[..1] } else { group };
+            // `sib`: both signs of this abscissa from one inversion.  Falls
+            // back to the additions when the pair is degenerate (same x, so
+            // a sum would be the identity) or the group is not `{P, −P}`.
+            if last && self.sib && signs.len() == 2 {
+                if let Some(p) = partial {
+                    let (j0, j1) = (signs[0], signs[1]);
+                    if fb.points[j1] == g.neg(fb.points[j0]) {
+                        if let Some(sp) =
+                            g.sibling_pair(&mut self.build_ops, p, fb.points[j0], true)
+                        {
+                            self.build_ops.adds += 1;
+                            self.sib_second_points += 1;
+                            for (j, key) in [(j0, sp.key_plus), (j1, sp.key_minus)] {
+                                idx[depth] = j as u32;
+                                self.insert_last(key, idx);
+                            }
+                            continue;
+                        }
+                    }
+                }
+            }
             for &j in signs {
                 let s = match partial {
                     None => fb.points[j],
@@ -8986,23 +11276,13 @@ impl KSumTable {
                 }
                 idx[depth] = j as u32;
                 if last {
-                    let packed = idx[..self.k as usize]
-                        .iter()
-                        .rev()
-                        .fold(0u64, |w, &i| (w << KSUM_INDEX_BITS) | u64::from(i));
-                    match self.map.entry(g.key(&s) >> 1) {
-                        std::collections::hash_map::Entry::Vacant(v) => {
-                            v.insert(packed);
-                        }
-                        std::collections::hash_map::Entry::Occupied(o) => {
-                            if self.keep_collisions {
-                                self.collisions.push((*o.get(), packed));
-                            }
-                        }
-                    }
-                    self.insert_attempts += 1;
+                    self.insert_last(g.key(&s) >> 1, idx);
                 } else {
-                    self.extend(g, fb, groups, depth + 1, ai + 1, Some(s), idx);
+                    if self.prefix {
+                        let summands = idx[..=depth].to_vec();
+                        self.note_prefix(g, &s, &summands);
+                    }
+                    self.extend(g, fb, groups, depth + 1, ai + 1, Some(s), pairs, idx);
                 }
             }
         }
@@ -9018,14 +11298,37 @@ impl KSumTable {
         if self.index_lookups > 0 {
             out.insert("lookups".to_string(), self.index_lookups);
         }
+        if self.sib {
+            // The marker the band reads (`band::SIBLING_WORK_COUNTERS`).
+            out.insert("counted:sibling_second_points".to_string(), 1);
+            out.insert("sibling_second_points".to_string(), self.sib_second_points);
+        }
         out
     }
 
     fn unpack(&self, packed: u64) -> Vec<usize> {
-        let mask = (1u64 << KSUM_INDEX_BITS) - 1;
+        let mask = (1u64 << self.bits) - 1;
         (0..self.k)
-            .map(|d| ((packed >> (d * KSUM_INDEX_BITS)) & mask) as usize)
+            .map(|d| (packed >> (d * self.bits)) & mask)
+            // A prefix entry's unused slots (never a base index).
+            .take_while(|&i| i != mask)
+            .map(|i| i as usize)
             .collect()
+    }
+
+    /// Folded abscissa key (`x + 1`) → packed summand indices, if present.
+    /// Used by x-only / sibling probes that already hold the folded key.
+    pub fn lookup_folded(&self, folded: u64) -> Option<Vec<usize>> {
+        let packed = *self.map.get(&folded)?;
+        Some(self.unpack(packed))
+    }
+
+    /// Visit every folded abscissa key the table stores (for Bloom / fuse
+    /// filters in front of [`Self::lookup_folded`]).
+    pub fn for_each_folded_key(&self, mut f: impl FnMut(u64)) {
+        for &k in self.map.keys() {
+            f(k);
+        }
     }
 
     /// The relations among the base logs hidden in the build's key
@@ -9078,6 +11381,17 @@ impl KSumTable {
         (rows, self.collisions.len() as u64)
     }
 
+    /// Whether a sum equal to `±R` is stored, for a target `R` known by its
+    /// abscissa `x` only (a field element as a word): one counted lookup
+    /// of the key `x + 1` the table files every sum under (`key >> 1` of
+    /// the prime and binary point keys).  A `true` is a decomposition: the
+    /// caller forms `R` and probes it in full to name the summands and
+    /// their sign.
+    pub fn probe_x(&self, lookups: &mut u64, x: u64) -> bool {
+        *lookups += 1;
+        self.map.contains_key(&(x + 1))
+    }
+
     /// Signed indices of `k` base points summing to `target`, if the table
     /// holds a sum equal to `±target`; one probe, and `k − 1` additions to
     /// confirm a key match.
@@ -9091,10 +11405,7 @@ impl KSumTable {
     ) -> Option<Vec<usize>> {
         *lookups += 1;
         let packed = *self.map.get(&(g.key(&target) >> 1))?;
-        let mask = (1u64 << KSUM_INDEX_BITS) - 1;
-        let summands: Vec<usize> = (0..self.k)
-            .map(|d| ((packed >> (d * KSUM_INDEX_BITS)) & mask) as usize)
-            .collect();
+        let summands = self.unpack(packed);
         let mut s = fb.points[summands[0]];
         for &i in &summands[1..] {
             s = g.add(ops, s, fb.points[i]);
@@ -10139,6 +12450,212 @@ impl<E: Copy + PartialEq> WalkTable<E> {
     }
 }
 
+/// The table of a [`TargetWalk`]: key → `(u, z, b)`, insert-or-get only.
+///
+/// It replaces a `HashMap<u64, (u128, u64, u64)>`, whose 48-byte entries
+/// (`u128` forces 16-byte alignment) in a power-of-two bucket array
+/// touched about 190 fresh pages per solve; each first touch is a page
+/// fault, 17% of the walk's samples on the profiled host (round 039
+/// profiles).  This table stores 40-byte slots at load at most 3/4 in one
+/// zeroed allocation (`calloc`: untouched zero pages) and asks the kernel
+/// to fault a table of at least 256 KiB in with one call.  Neither the
+/// layout nor the prefault changes which keys collide or the order the
+/// walk inserts them, so the counted cost is unchanged.
+///
+/// A slot is `[key + 1, u_lo, u_hi, z, b]`, with 0 in the first word for
+/// an empty slot; the one key whose `+ 1` wraps (`u64::MAX`) has its own
+/// field.  Linear probing from a multiplicative hash; if the load would
+/// pass 7/8 (the caller's size hint was too small) the table doubles.
+#[allow(dead_code)]
+struct TwTable {
+    slots: Vec<[u64; 5]>,
+    special: Option<(u128, u64, u64)>,
+    len: usize,
+}
+
+/// What [`TwTable::entry`] found.
+#[allow(dead_code)]
+enum TwEntry<'a> {
+    Vacant(TwVacant<'a>),
+    Occupied((u128, u64, u64)),
+}
+
+/// An empty place in a [`TwTable`] for the key just looked up.
+#[allow(dead_code)]
+struct TwVacant<'a> {
+    table: &'a mut TwTable,
+    /// Slot index, or `usize::MAX` for the `u64::MAX` key's own field.
+    idx: usize,
+    key: u64,
+}
+
+#[allow(dead_code)]
+impl TwVacant<'_> {
+    fn insert(self, val: (u128, u64, u64)) {
+        if self.idx == usize::MAX {
+            self.table.special = Some(val);
+        } else {
+            self.table.slots[self.idx] = [
+                self.key.wrapping_add(1),
+                val.0 as u64,
+                (val.0 >> 64) as u64,
+                val.1,
+                val.2,
+            ];
+        }
+        self.table.len += 1;
+    }
+}
+
+#[allow(dead_code)]
+impl TwTable {
+    /// Room for `entries` keys at load at most 3/4.
+    fn with_capacity(entries: usize) -> Self {
+        let n = entries + entries / 3 + 8;
+        let mut slots = vec![[0u64; 5]; n];
+        Self::prefault(&mut slots);
+        Self {
+            slots,
+            special: None,
+            len: 0,
+        }
+    }
+
+    /// Fault a large table in with one `madvise` instead of one page
+    /// fault per first touch (Linux 5.14 and later; any failure is
+    /// ignored, the pages then fault in on first touch as before).
+    #[cfg(target_os = "linux")]
+    fn prefault(slots: &mut [[u64; 5]]) {
+        const MADV_POPULATE_WRITE: libc::c_int = 23;
+        const PAGE: usize = 4096;
+        let bytes = std::mem::size_of_val(slots);
+        if bytes < (256 << 10) {
+            return;
+        }
+        let start = slots.as_mut_ptr() as usize;
+        let first = (start + PAGE - 1) & !(PAGE - 1);
+        let end = (start + bytes) & !(PAGE - 1);
+        if end > first {
+            // SAFETY: [first, end) lies inside the `slots` allocation, whole
+            // pages of memory this table owns; populating them neither
+            // changes their contents (zero) nor is observable from Rust.
+            unsafe {
+                libc::madvise(first as *mut libc::c_void, end - first, MADV_POPULATE_WRITE);
+            }
+        }
+    }
+
+    #[cfg(not(target_os = "linux"))]
+    fn prefault(_slots: &mut [[u64; 5]]) {}
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    fn unpack(slot: &[u64; 5]) -> (u128, u64, u64) {
+        (
+            u128::from(slot[1]) | (u128::from(slot[2]) << 64),
+            slot[3],
+            slot[4],
+        )
+    }
+
+    /// The stored value of `key`, if any.
+    fn get(&self, key: u64) -> Option<(u128, u64, u64)> {
+        if key == u64::MAX {
+            return self.special;
+        }
+        let want = key + 1;
+        let mut i = self.home(key);
+        // Load stays below 7/8, so an empty slot ends the probe.
+        loop {
+            let slot = &self.slots[i];
+            if slot[0] == 0 {
+                return None;
+            }
+            if slot[0] == want {
+                return Some(Self::unpack(slot));
+            }
+            i += 1;
+            if i == self.slots.len() {
+                i = 0;
+            }
+        }
+    }
+
+    /// Every stored `(key, value)`, in no particular order.
+    #[cfg(test)]
+    fn iter(&self) -> impl Iterator<Item = (u64, (u128, u64, u64))> + '_ {
+        self.slots
+            .iter()
+            .filter(|s| s[0] != 0)
+            .map(|s| (s[0] - 1, Self::unpack(s)))
+            .chain(self.special.map(|v| (u64::MAX, v)))
+    }
+
+    #[cfg(test)]
+    fn values(&self) -> impl Iterator<Item = (u128, u64, u64)> + '_ {
+        self.iter().map(|(_, v)| v)
+    }
+
+    fn home(&self, key: u64) -> usize {
+        let h = key.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15);
+        ((u128::from(h) * self.slots.len() as u128) >> 64) as usize
+    }
+
+    fn grow(&mut self) {
+        let mut bigger = Self::with_capacity(self.slots.len() * 2);
+        bigger.special = self.special;
+        bigger.len = self.len;
+        for slot in self.slots.iter().filter(|s| s[0] != 0) {
+            let mut i = bigger.home(slot[0].wrapping_sub(1));
+            while bigger.slots[i][0] != 0 {
+                i += 1;
+                if i == bigger.slots.len() {
+                    i = 0;
+                }
+            }
+            bigger.slots[i] = *slot;
+        }
+        *self = bigger;
+    }
+
+    fn entry(&mut self, key: u64) -> TwEntry<'_> {
+        if key == u64::MAX {
+            return match self.special {
+                Some(v) => TwEntry::Occupied(v),
+                None => TwEntry::Vacant(TwVacant {
+                    table: self,
+                    idx: usize::MAX,
+                    key,
+                }),
+            };
+        }
+        if (self.len + 1) * 8 > self.slots.len() * 7 {
+            self.grow();
+        }
+        let want = key + 1;
+        let mut i = self.home(key);
+        loop {
+            let slot = &self.slots[i];
+            if slot[0] == 0 {
+                return TwEntry::Vacant(TwVacant {
+                    table: self,
+                    idx: i,
+                    key,
+                });
+            }
+            if slot[0] == want {
+                return TwEntry::Occupied(Self::unpack(slot));
+            }
+            i += 1;
+            if i == self.slots.len() {
+                i = 0;
+            }
+        }
+    }
+}
+
 /// One row of a [`TargetWalk`] in the relation loop's convention
 /// `Σ coef·x = h·(a + b·d)` (`Relation::Row { columns, a, b }`).
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -10282,8 +12799,9 @@ pub const TW_AUT_MASK: u128 = 3 << TW_AUT_SHIFT;
 pub struct TargetWalk<E> {
     /// Key (abscissa and sign bit, shifted) → `(u, z, b)`; with two seeds
     /// `u = u1 << 64 | u2` (a `u128`); with `cv=0` or `lazy` bit 127 of
-    /// `u` ([`TW_SIGN_BIT`]) is the key's low bit.
-    map: FastMap<(u128, u64, u64)>,
+    /// `u` ([`TW_SIGN_BIT`]) is the key's low bit.  Open-addressing
+    /// ([`OpenCoefMap`]) — denser than [`FastMap`] on the walk hot path.
+    map: OpenCoefMap,
     /// Table accesses made by the walk (one `entry` call per non-identity
     /// step, in every mode); not emitted as a counter.
     pub table_probes: u64,
@@ -10351,6 +12869,12 @@ pub struct TargetWalk<E> {
     pub lazy_checks: u64,
     pub lazy_failures: u64,
     pub lazy_dropped_rows: u64,
+    /// `lcheck=1`: the in-build final check (with `lazy`) computes `[d]G`
+    /// with [`ladder_mul`] over the set-up's `[2^i]G` chain
+    /// ([`TargetWalk::g_ladder`]) instead of `g.mul`, charged to the same
+    /// `lazy_check_ops`; the pipeline's recovery check reads the same
+    /// ladder.  Not emitted as a counter: only the check counts move.
+    pub lcheck: bool,
     /// `sib=m,pool=M` ([`TargetWalk`] sibling walk): `Some((m, M))`.
     pub sib: Option<(usize, usize)>,
     /// With `sib`: parents expanded, sibling pairs formed (each one group
@@ -10414,11 +12938,18 @@ struct SibWalk<E> {
     /// Table key of an x-only entry → `(parent index, pool index, minus,
     /// the entry's own abscissa key)` (the table key is canonical with
     /// `aut=3`; the sign resolution needs the point's own abscissa).
-    refs: FastMap<(usize, usize, bool, u64)>,
+    refs: OpenRefMap,
 }
 
 impl<E: Copy> SibWalk<E> {
-    fn new(_m: usize, pool: usize, p1: E, c: (u128, u64, u64)) -> Self {
+    fn new(
+        _m: usize,
+        pool: usize,
+        p1: E,
+        c: (u128, u64, u64),
+        key_bound: u64,
+        table_slots: usize,
+    ) -> Self {
         Self {
             started: false,
             parent: p1,
@@ -10435,7 +12966,9 @@ impl<E: Copy> SibWalk<E> {
             parents: Vec::new(),
             parents_n: 0,
             queue: std::collections::VecDeque::new(),
-            refs: fast_map(1024),
+            // Sibling xrefs can outnumber keyed walk entries (plus+minus
+            // per parent); size like the coef table (~t) not a fixed 1k.
+            refs: OpenRefMap::with_capacity_bound(table_slots.max(1024), key_bound),
         }
     }
 }
@@ -10593,6 +13126,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             None,
             None,
             false,
+            false,
         )
     }
 
@@ -10631,6 +13165,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             verify_collisions,
             None,
             sib,
+            false,
             false,
         )
     }
@@ -10673,7 +13208,61 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             None,
             sib,
             aut,
+            false,
         )
+    }
+
+    /// [`TargetWalk::build_ext_aut`] with `lcheck` (`wwalk:...,lcheck=1`):
+    /// the in-build final `[d]G = Q` check of a `lazy` walk computes `[d]G`
+    /// with [`ladder_mul`] over the set-up's stored `[2^i]G` chain
+    /// (`i < bits(r)`, already paid for), charged as `tw_lazy_check_*`
+    /// exactly as before.  The walk, its stream, its collisions, rows and
+    /// entries are unchanged; `lcheck = false` is `build_ext_aut` exactly.
+    #[allow(clippy::too_many_arguments)]
+    pub fn build_lcheck<G: CountedGroup<Elt = E>>(
+        g: &G,
+        generator: E,
+        target: E,
+        fb: &FactorBase<G::Elt>,
+        r: u64,
+        h: u64,
+        x: f64,
+        jumps: usize,
+        cheap: bool,
+        seed: u64,
+        lazy: bool,
+        seeds: usize,
+        verify_collisions: bool,
+        sib: Option<(usize, usize)>,
+        aut: bool,
+        lcheck: bool,
+    ) -> Result<Self, String> {
+        Self::build_inner(
+            g,
+            generator,
+            target,
+            fb,
+            r,
+            h,
+            x,
+            jumps,
+            cheap || sib.is_some(),
+            seed,
+            lazy,
+            seeds,
+            verify_collisions,
+            None,
+            sib,
+            aut,
+            lcheck,
+        )
+    }
+
+    /// `[2^i]G` for `i < bits(r)`: the generator chain the set-up doubled
+    /// (and charged) for the jumps, cut at the first identity.  Reading it
+    /// costs no group operation.
+    pub fn g_ladder(&self) -> Vec<E> {
+        self.pows[1].iter().map_while(|p| *p).collect()
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -10694,14 +13283,21 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         fault: Option<u64>,
         sib: Option<(usize, usize)>,
         aut: bool,
+        lcheck: bool,
     ) -> Result<Self, String> {
         let opts = WalkOpts {
             g_jumps: true,
             grow: 2,
         };
-        // With `sib` the jump pool has `pool` points (up to 512), outside
+        // With `sib` the jump *alphabet* has `pool` points (up to 512), outside
         // the plain walk's jump range; the range is checked on `pool` below.
-        let plan_jumps = if sib.is_some() { 16 } else { jumps };
+        // Table size T is planned from the caller's `jumps` (same as a plain
+        // tw2l walk): previously this was hard-coded to 16 whenever `sib` was
+        // set, so `jumps=` was ignored for planning and the walk overran a
+        // longer table than the non-sib arm with the same `x`/`jumps`. Keeping
+        // the product pool at `pool` preserves the sibling walk's jump
+        // identity; honouring `jumps` for T is the setup amortization.
+        let plan_jumps = jumps;
         let (t, t_max, w, bound) = wwalk_plan_check_bits(r, x, plan_jumps, opts, TW_COEF_BITS)?;
         let (jumps, cheap) = match sib {
             None => (jumps, cheap),
@@ -10820,7 +13416,10 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             }
         }
         let mut tw = Self {
-            map: fast_map(t_max as usize + 1),
+            map: OpenCoefMap::with_capacity_bound(
+                t_max as usize + 1,
+                g.abscissa_key_bound().unwrap_or(0),
+            ),
             table_probes: 0,
             verify_collisions,
             unverified_collisions: 0,
@@ -10865,6 +13464,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             lazy_checks: 0,
             lazy_failures: 0,
             lazy_dropped_rows: 0,
+            lcheck,
             sib,
             sib_parents: 0,
             sib_pairs: 0,
@@ -10906,11 +13506,15 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         let mut verify_ops = GroupOps::default();
         let mut check_ops = GroupOps::default();
         let mut lazy_active = lazy;
+        // `lcheck=1`: the final check reads the set-up's `[2^i]G` chain
+        // (copied, no group operation); empty otherwise.
+        let check_ladder: Vec<E> = if lcheck { tw.g_ladder() } else { Vec::new() };
         // `cv=0` and `lazy=1` store the key's sign bit in bit 127 of `u`.
         let store_sign = lazy || !verify_collisions;
         let _ = fault;
         // The sibling walk's state (only with `sib`): see "Sibling points".
-        let mut sw = sib.map(|(m, pool)| SibWalk::new(m, pool, p1, c));
+        let key_bound = g.abscissa_key_bound().unwrap_or(0);
+        let mut sw = sib.map(|(m, pool)| SibWalk::new(m, pool, p1, c, key_bound, tw.t as usize));
         loop {
             while tw.rank < need && tw.steps < t_max {
                 if let Some(sw) = sw.as_mut() {
@@ -10935,16 +13539,19 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                     } else {
                         0
                     };
-                    let mut kept = match tw.map.entry(key) {
-                        std::collections::hash_map::Entry::Vacant(slot) => {
+                    tw.map.prefetch(key);
+                    let mut kept = match tw
+                        .map
+                        .insert_vacant(key, (item.c.0 | low | rot, item.c.1, item.c.2))
+                    {
+                        Ok(()) => {
                             debug_assert!(item.c.0 & (TW_SIGN_BIT | TW_AUT_MASK) == 0);
-                            slot.insert((item.c.0 | low | rot, item.c.1, item.c.2));
                             if let Some((pi, h, minus, _)) = item.xref {
                                 sw.refs.insert(key, (pi, h, minus, own_key));
                             }
                             continue;
                         }
-                        std::collections::hash_map::Entry::Occupied(o) => *o.get(),
+                        Err(existing) => existing,
                     };
                     let kept_rot = kept.0 & TW_AUT_MASK;
                     kept.0 &= !TW_AUT_MASK;
@@ -10953,7 +13560,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                     // entry's from its parent, the new one from its slope.
                     let mut minus = false;
                     if store_sign {
-                        let kept_low = match sw.refs.get(&key).copied() {
+                        let kept_low = match sw.refs.get(key) {
                             Some((pi, h, mn, k0)) => {
                                 tw.sib_sign(g, sw, &jump_pts, pi, h, mn, k0, None)
                             }
@@ -11001,14 +13608,14 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 let (key, rot) = tw.canon_key(full_key >> 1, &mut walk_ops);
                 let low = u128::from(store_sign) * (u128::from(full_key & 1) << 127);
                 tw.table_probes += 1;
-                let mut kept = match tw.map.entry(key) {
-                    std::collections::hash_map::Entry::Vacant(slot) => {
+                tw.map.prefetch(key);
+                let mut kept = match tw.map.insert_vacant(key, (c.0 | low | rot, c.1, c.2)) {
+                    Ok(()) => {
                         // The bits are free: every coefficient is below 2^62.
                         debug_assert!(c.0 & (TW_SIGN_BIT | TW_AUT_MASK) == 0);
-                        slot.insert((c.0 | low | rot, c.1, c.2));
                         continue;
                     }
-                    std::collections::hash_map::Entry::Occupied(o) => *o.get(),
+                    Err(existing) => existing,
                 };
                 let kept_rot = kept.0 & TW_AUT_MASK;
                 kept.0 &= !TW_AUT_MASK;
@@ -11046,7 +13653,14 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             // and test [d]G = Q.
             tw.lazy_checks += 1;
             let d = tw.solve_log_q(r, h);
-            let ok = d.is_some_and(|d| g.mul(&mut check_ops, generator, d) == target);
+            let ok = d.is_some_and(|d| {
+                let check = if check_ladder.is_empty() {
+                    g.mul(&mut check_ops, generator, d)
+                } else {
+                    ladder_mul(g, &mut check_ops, &check_ladder, d)
+                };
+                check == target
+            });
             if ok {
                 break;
             }
@@ -11107,8 +13721,9 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             sw.c = sw.next_c;
             sw.prev2_h = sw.prev_h;
             sw.prev_h = Some(sw.h_t);
-            sw.s_tm2 = std::mem::take(&mut sw.s_tm1);
-            sw.s_tm1 = std::mem::take(&mut sw.cur);
+            // Rotate subset history without allocating.
+            std::mem::swap(&mut sw.s_tm2, &mut sw.s_tm1);
+            std::mem::swap(&mut sw.s_tm1, &mut sw.cur);
         }
         // A fresh uniform m-subset (partial Fisher-Yates) from the
         // point-independent stream.
@@ -11117,13 +13732,27 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             let j = rng.gen_range(i..n);
             sw.idx.swap(i, j);
         }
-        sw.cur = sw.idx[..m].to_vec();
+        sw.cur.clear();
+        sw.cur.extend_from_slice(&sw.idx[..m]);
         sw.h_t = sw.cur[0];
-        let parent_idx = sw.parents.len();
+        let _parent_idx = sw.parents.len();
         sw.parents.push(sw.parent);
         sw.parents_n += 1;
         self.sib_parents += 1;
         let c = sw.c;
+        // Plan each of the m jumps on the stack (m ≤ 16), then form every
+        // sibling pair from ONE batched inversion of the denominators.
+        debug_assert!(m <= 16);
+        let mut plans = [(
+            0usize,
+            g.identity(),
+            0u128,
+            0u64,
+            0u64,
+            false,
+            (0u128, 0u64, 0u64),
+        ); 16];
+        let mut js = [(g.identity(), false); 16];
         for pos in 0..m {
             let h = sw.cur[pos];
             let (jp, al, ga, be) = jump_pts[h];
@@ -11134,36 +13763,51 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 || (sw.prev2_h == Some(h) && sw.prev_h.is_some_and(|ph| sw.s_tm2.contains(&ph)));
             let want_minus = !skip_minus;
             let cp = (c.0 + al, addmod(c.1, ga, r), addmod(c.2, be, r));
-            match g.sibling_pair(ops, sw.parent, jp, want_minus) {
+            plans[pos] = (h, jp, al, ga, be, want_minus, cp);
+            js[pos] = (jp, want_minus);
+        }
+        let pairs = g
+            .sibling_pairs_batch(ops, sw.parent, &js[..m])
+            .unwrap_or_else(|| {
+                (0..m)
+                    .map(|i| {
+                        let (jp, want_minus) = js[i];
+                        g.sibling_pair(ops, sw.parent, jp, want_minus)
+                    })
+                    .collect()
+            });
+        for (pos, (&(_h, jp, al, ga, be, want_minus, cp), sp)) in
+            plans[..m].iter().zip(pairs).enumerate()
+        {
+            match sp {
                 Some(sp) => {
                     ops.adds += 1;
                     self.sib_pairs += 1;
                     if want_minus {
                         self.sib_second_points += 1;
                     }
-                    if pos == 0 {
-                        let pt = g
+                    // Eager sign bits: use batch-lifted y when present
+                    // (FastPrime path), else one sibling_lift mul.
+                    let pt_plus = match sp.y_plus.and_then(|y| g.affine_elt(sp.key_plus - 1, y)) {
+                        // Field mul already charged inside sibling_pairs_batch.
+                        Some(pt) => pt,
+                        None => g
                             .sibling_lift(ops, sw.parent, sp.key_plus, sp.lambda_plus)
-                            .expect("a finite parent");
-                        let k = g.key(&pt);
-                        debug_assert_eq!(k >> 1, sp.key_plus);
-                        self.sib_lifts += 1;
-                        sw.next_parent = pt;
+                            .expect("a finite parent"),
+                    };
+                    let k = g.key(&pt_plus);
+                    debug_assert_eq!(k >> 1, sp.key_plus);
+                    self.sib_lifts += 1;
+                    if pos == 0 {
+                        sw.next_parent = pt_plus;
                         sw.next_c = cp;
-                        sw.queue.push_back(SibItem {
-                            key: sp.key_plus,
-                            c: cp,
-                            sign: Some(u128::from(k & 1) << 127),
-                            xref: None,
-                        });
-                    } else {
-                        sw.queue.push_back(SibItem {
-                            key: sp.key_plus,
-                            c: cp,
-                            sign: None,
-                            xref: Some((parent_idx, h, false, sp.lambda_plus)),
-                        });
                     }
+                    sw.queue.push_back(SibItem {
+                        key: sp.key_plus,
+                        c: cp,
+                        sign: Some(u128::from(k & 1) << 127),
+                        xref: None,
+                    });
                     if want_minus {
                         let (u1, u2) = self.parts(c.0);
                         let (a1, a2) = self.parts(al);
@@ -11172,11 +13816,20 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                             submod(c.1, ga, r),
                             submod(c.2, be, r),
                         );
+                        let pt = match sp.y_minus.and_then(|y| g.affine_elt(sp.key_minus - 1, y)) {
+                            Some(pt) => pt,
+                            None => g
+                                .sibling_lift(ops, sw.parent, sp.key_minus, sp.lambda_minus)
+                                .expect("a finite parent"),
+                        };
+                        let k = g.key(&pt);
+                        debug_assert_eq!(k >> 1, sp.key_minus);
+                        self.sib_lifts += 1;
                         sw.queue.push_back(SibItem {
                             key: sp.key_minus,
                             c: cm,
-                            sign: None,
-                            xref: Some((parent_idx, h, true, sp.lambda_minus)),
+                            sign: Some(u128::from(k & 1) << 127),
+                            xref: None,
                         });
                     }
                 }
@@ -11724,7 +14377,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
                 point_rot = i << TW_AUT_SHIFT;
             }
         }
-        let (u, z, b) = *self.map.get(&key)?;
+        let (u, z, b) = self.map.get(key)?;
         // Clear the cv=0 / lazy sign bit and the aut rotation (never set
         // otherwise).
         let entry_rot = u & TW_AUT_MASK;
@@ -12012,6 +14665,25 @@ pub struct FrobeniusPairTable {
     pub insert_attempts: u64,
     /// The orbit-index pass's canonicalisations, one per base point.
     pub orbit_canonicalisations: u64,
+    /// `true` when the layout build formed the signed pairs `P ± X` as
+    /// x-only siblings from one inversion ([`Self::build_layout_with`]).
+    pub sib: bool,
+    /// Pairs whose second sign was formed that way: each pair is charged
+    /// one group addition plus one unit of `sibling_second_points` (the
+    /// convention of the `wwalk`/`ksum` siblings).
+    pub sib_second_points: u64,
+    /// Same-orbit pairs or halves the build did not form because a `Z[τ]`
+    /// identity names their key as one it inserts anyway (`orbit_ids`,
+    /// [`Self::build_layout_plan`]); each also skips its canonicalisation
+    /// and insert.  Zero without the plan.
+    pub identity_skips: u64,
+    /// `true` when the base left its negatives unformed
+    /// ([`FactorBase::negations_deferred`]): a hit reads `−P` as the
+    /// negation of its stored partner and counts it.
+    neg_deferred: bool,
+    /// Deferred negatives the build itself formed (its non-sibling
+    /// fallback); zero on every base that stores them.
+    pub build_point_negations: u64,
 }
 
 impl FrobeniusPairTable {
@@ -12049,7 +14721,58 @@ impl FrobeniusPairTable {
     /// in which the eager build first meets them.  `None` without the
     /// layout, at even `n`, or where [`build`](Self::build) gives `None`.
     pub fn build_layout(inst: &BinaryInstance, fb: &FactorBase<FastPoint>) -> Option<Self> {
+        Self::build_layout_with(inst, fb, false)
+    }
+
+    /// [`build_layout`](Self::build_layout); with `sib` (n29 generator-orbit
+    /// lever, 2026-11-18) the build forms each signed pair `P + X`, `P − X`
+    /// (`X` and `−X` sit side by side in the layout) from ONE inversion
+    /// `1/(x_P + x_X)`: the table only keys abscissae, and on a binary curve
+    /// `−X = (x_X, x_X + y_X)` changes the slope by `x_X/(x_P + x_X)`, so
+    /// the second abscissa costs one multiplication and one squaring more.
+    /// Each such pair is charged one group addition plus one
+    /// `sibling_second_points`; and the pair `P + (−P)`, the identity by
+    /// the layout, is not formed at all.  Keys, shifts, entries, their
+    /// insert order and every probe are those of `build_layout`; with
+    /// `sib = false` this is `build_layout` bit for bit.
+    pub fn build_layout_with(
+        inst: &BinaryInstance,
+        fb: &FactorBase<FastPoint>,
+        sib: bool,
+    ) -> Option<Self> {
+        Self::build_layout_plan(inst, fb, sib, None)
+    }
+
+    /// [`build_layout_with`](Self::build_layout_with); with `ids = Some(μ)`
+    /// (needs `sib`; `μ` the Frobenius trace, `τ² − μτ + 2 = 0`; Koblitz
+    /// K1 set-up lever, 2026-11-18) the build skips, in every orbit, the
+    /// same-orbit pairs whose key it inserts anyway, by three identities
+    /// of `Z[τ]` that hold for every point `P` (`μ² = 1`):
+    ///
+    /// * `2 = μτ(1 − μτ)`: `P + P` is a Frobenius image of `P − μσ(P)`
+    ///   (rotation 1), so the doubling `P + P` is not formed;
+    /// * `1 + τ² = −(1 − μτ)`: `P + σ²(P)` names the same key, so the
+    ///   plus half of rotation 2 is not formed;
+    /// * `1 + μτ³ = −(1 + μτ)`: `P + μσ³(P)` repeats `P + μσ(P)`, so that
+    ///   half of rotation 3 is not formed.
+    ///
+    /// A pair formed without one half costs its inversion and slope as
+    /// before and is charged one group addition, with no
+    /// `sibling_second_points`.  The table keeps every key (the map's key
+    /// set and size are those of the build without the plan); only the
+    /// first stored pair of the `2P` key changes, from `(P, P)` to
+    /// `(P, −μσ(P))`, which sums to the same point.  `None` with the plan
+    /// at `n < 7` (rotation 3 must lie in the formed half) or `μ ∉ {±1}`.
+    pub fn build_layout_plan(
+        inst: &BinaryInstance,
+        fb: &FactorBase<FastPoint>,
+        sib: bool,
+        ids: Option<i64>,
+    ) -> Option<Self> {
         let start = Instant::now();
+        if ids.is_some() && (!sib || inst.n < 7 || !matches!(ids, Some(1) | Some(-1))) {
+            return None;
+        }
         let n = inst.n as usize;
         let f = fb.points.len();
         if fb.frobenius_orbit_layout != Some(inst.n)
@@ -12065,19 +14788,90 @@ impl FrobeniusPairTable {
         let mut ops = GroupOps::default();
         let mut canons = 0u64;
         let mut map: FastMap<(u32, u32)> = fast_map(f * f / (4 * n) + 1);
+        let mut sib_second = 0u64;
+        let mut skips = 0u64;
+        let field = &inst.fast.field;
+        let deferred = fb.negations_deferred;
+        let mut point_negations = 0u64;
         for o in 0..orbits {
             let rep = 2 * o * n;
+            let p = fb.points[rep];
             // Rotations k = 0..=(n−1)/2 of the representative's own
             // orbit, both signs, then every later orbit.
-            for j in (rep..rep + n + 1).chain(rep + 2 * n..f) {
-                let u = g.add(&mut ops, fb.points[rep], fb.points[j]);
-                if g.is_identity(&u) {
+            let mut js = (rep..rep + n + 1).chain(rep + 2 * n..f).peekable();
+            while let Some(j) = js.next() {
+                if ids.is_some() && j == rep {
+                    // `P + P`: its key is that of `P − μσ(P)`, formed at
+                    // rotation 1 (`2 = μτ(1 − μτ)`).
+                    skips += 1;
                     continue;
                 }
-                canons += 1;
-                let (key, t_u) = canon.canon_with_shift(u.x);
-                map.entry(key)
-                    .or_insert((rep as u32, (j as u32) | (t_u << FROB_INDEX_BITS)));
+                if sib && j == rep + 1 {
+                    // P + (-P) is the identity, as known from the layout.
+                    continue;
+                }
+                // A deferred negative is formed from its partner here
+                // (only the non-sibling fallback reads an odd slot).
+                let x = if deferred && j % 2 == 1 {
+                    point_negations += 1;
+                    inst.fast.neg(fb.points[j - 1])
+                } else {
+                    fb.points[j]
+                };
+                // The sibling form: `x` at an even index (its negative
+                // next), a finite pair with distinct abscissae.
+                let sibling = sib
+                    && j % 2 == 0
+                    && js.peek() == Some(&(j + 1))
+                    && !p.infinity
+                    && !x.infinity
+                    && p.x != x.x;
+                let keys: [(Option<u64>, usize); 2] = if sibling {
+                    js.next();
+                    // The plan's skipped half (rotation 2: plus; rotation
+                    // 3: the sign μ); neither off the plan.
+                    let rot = (j - rep) / 2;
+                    let (skip_plus, skip_minus) = match ids {
+                        Some(mu) if j < rep + 2 * n => {
+                            (rot == 2 || (rot == 3 && mu == 1), rot == 3 && mu == -1)
+                        }
+                        _ => (false, false),
+                    };
+                    ops.adds += 1;
+                    let inv = field.inv(p.x ^ x.x);
+                    let lp = field.mul(p.y ^ x.y, inv);
+                    let base = p.x ^ x.x ^ inst.fast.a;
+                    if skip_plus {
+                        // One half: the inversion and slopes of an
+                        // addition, charged as the one addition above.
+                        skips += 1;
+                        let lm = lp ^ field.mul(x.x, inv);
+                        [(None, j), (Some(field.sqr(lm) ^ lm ^ base), j + 1)]
+                    } else if skip_minus {
+                        skips += 1;
+                        [(Some(field.sqr(lp) ^ lp ^ base), j), (None, j + 1)]
+                    } else {
+                        sib_second += 1;
+                        let lm = lp ^ field.mul(x.x, inv);
+                        [
+                            (Some(field.sqr(lp) ^ lp ^ base), j),
+                            (Some(field.sqr(lm) ^ lm ^ base), j + 1),
+                        ]
+                    }
+                } else {
+                    let u = g.add(&mut ops, p, x);
+                    [
+                        (if g.is_identity(&u) { None } else { Some(u.x) }, j),
+                        (None, j),
+                    ]
+                };
+                for (ux, jj) in keys {
+                    let Some(ux) = ux else { continue };
+                    canons += 1;
+                    let (key, t_u) = canon.canon_with_shift(ux);
+                    map.entry(key)
+                        .or_insert((rep as u32, (jj as u32) | (t_u << FROB_INDEX_BITS)));
+                }
             }
         }
         Some(Self {
@@ -12098,6 +14892,11 @@ impl FrobeniusPairTable {
             // pass: the inserts tried are the pair inserts alone.
             insert_attempts: canons,
             orbit_canonicalisations: 0,
+            sib,
+            sib_second_points: sib_second,
+            identity_skips: skips,
+            neg_deferred: deferred,
+            build_point_negations: point_negations,
         })
     }
 
@@ -12129,6 +14928,11 @@ impl FrobeniusPairTable {
         keep: impl Fn(usize, usize) -> bool,
         lazy: bool,
     ) -> Option<Self> {
+        if fb.negations_deferred {
+            // Reads every stored point; only the layout build forms a
+            // deferred negative.
+            return None;
+        }
         let start = Instant::now();
         let g = BinaryGroup(&inst.fast);
         let n = inst.n as usize;
@@ -12209,6 +15013,11 @@ impl FrobeniusPairTable {
             build_lookups: lookups,
             insert_attempts: attempts,
             orbit_canonicalisations: orbit_canons,
+            sib: false,
+            sib_second_points: 0,
+            identity_skips: 0,
+            neg_deferred: false,
+            build_point_negations: 0,
         })
     }
 
@@ -12227,6 +15036,12 @@ impl FrobeniusPairTable {
             if v > 0 {
                 out.insert(name.to_string(), v);
             }
+        }
+        if self.sib {
+            // Priced by the band where the marker is present (`band.rs`,
+            // `SIBLING_WORK_COUNTERS`), as for the `wwalk`/`ksum` siblings.
+            out.insert("counted:sibling_second_points".to_string(), 1);
+            out.insert("sibling_second_points".to_string(), self.sib_second_points);
         }
         out
     }
@@ -12282,7 +15097,11 @@ impl FrobeniusPairTable {
                 self.member_of[j * n as usize + t] as usize,
             )
         };
-        let s = g.add(ops, fb.points[i2], fb.points[j2]);
+        let s = g.add(
+            ops,
+            self.read_point(g, fb, ctr, i2),
+            self.read_point(g, fb, ctr, j2),
+        );
         if s == target {
             Some((i2, j2))
         } else if s == g.neg(target) {
@@ -12291,6 +15110,36 @@ impl FrobeniusPairTable {
             ctr.frobfold_mismatches += 1;
             None
         }
+    }
+
+    /// `fb.points[i]`, or, for an odd slot of a base that deferred its
+    /// negatives, the negation of its stored partner, counted in `ctr`.
+    fn read_point(
+        &self,
+        g: &BinaryGroup,
+        fb: &FactorBase<FastPoint>,
+        ctr: &mut OracleCounters,
+        i: usize,
+    ) -> FastPoint {
+        if self.neg_deferred && i % 2 == 1 {
+            ctr.point_negations += 1;
+            g.neg(fb.points[i - 1])
+        } else {
+            fb.points[i]
+        }
+    }
+
+    /// Whether an abscissa's signed Frobenius orbit is a key of the table:
+    /// the first half of [`probe`](Self::probe) (one canonicalisation, one
+    /// lookup, both counted), for a target known by its abscissa only (the
+    /// `walk_sib` giant-step walk).  A `true` says some `⟨σ, −1⟩`-image of
+    /// a stored pair has this abscissa; the caller forms the point and
+    /// probes it in full to name the pair and its sign.
+    pub fn probe_x(&self, ctr: &mut OracleCounters, x: u64) -> bool {
+        ctr.canonicalisations += 1;
+        let (key, _t_r) = self.canon.canon_with_shift(x);
+        ctr.lookups += 1;
+        self.map.contains_key(&key)
     }
 
     /// The base index of `σ^t(P_idx)` for a lazy table: `t` Frobenius
@@ -12386,6 +15235,9 @@ pub enum Oracle<'a> {
     },
     /// Semaev `S₄` pairs-and-solve over a subspace (`m = 3`, binary).
     SemaevS4 { oracle: &'a SubspaceOracle },
+    /// The same decision by `S₄ = S₃(u, x_R, X)·S₃(u', x_R, X)`, one
+    /// Artin–Schreier step a pair (`m = 3`, binary, odd `n`).
+    SemaevS4Factored { oracle: &'a FactoredSubspaceOracle },
 }
 
 impl Oracle<'_> {
@@ -12396,13 +15248,14 @@ impl Oracle<'_> {
             Oracle::Mitm { m, .. } => format!("meet_in_the_middle_m{m}"),
             Oracle::MitmFrobenius { m, .. } => format!("meet_in_the_middle_m{m}_frobenius_folded"),
             Oracle::SemaevS4 { .. } => "semaev_s4_pairs_and_solve".into(),
+            Oracle::SemaevS4Factored { .. } => "semaev_s4_factored".into(),
         }
     }
     pub fn summands(&self) -> u32 {
         match self {
             Oracle::SemaevS3Roots | Oracle::Subtract => 2,
             Oracle::Mitm { m, .. } | Oracle::MitmFrobenius { m, .. } => *m,
-            Oracle::SemaevS4 { .. } => 3,
+            Oracle::SemaevS4 { .. } | Oracle::SemaevS4Factored { .. } => 3,
         }
     }
     /// The table this oracle probes, as a cost to fold into the
@@ -12423,6 +15276,8 @@ pub struct OracleCounters {
     pub sqrt_solves: u64,
     pub inversions: u64,
     pub s4_pairs: u64,
+    /// Pairs of the factored oracle, priced by `ns_per_s4f_pair`.
+    pub s4f_pairs: u64,
     pub s4_hits: u64,
     pub lift_failures: u64,
     /// Algebraic systems the solver decided satisfiable none of whose
@@ -12437,6 +15292,11 @@ pub struct OracleCounters {
     /// Folded-table hits whose recovered pair summed to neither `±R`;
     /// a rotation-direction bug would show here, so it must stay zero.
     pub frobfold_mismatches: u64,
+    /// Negatives a reader formed from their partner because the base did
+    /// not store them ([`FactorBase::negations_deferred`]); reported as
+    /// `point_negations_uncharged` (priced like the base's own negations),
+    /// absent while zero.
+    pub point_negations: u64,
 }
 
 /// Resolve the signs of a witness of abscissae: which points above them
@@ -12551,7 +15411,9 @@ fn decompose_prime(
             None
         }
         Oracle::Mitm { table, m } => decompose_mitm(curve, fb, table, *m, ops, ctr, target),
-        Oracle::MitmFrobenius { .. } | Oracle::SemaevS4 { .. } => None,
+        Oracle::MitmFrobenius { .. }
+        | Oracle::SemaevS4 { .. }
+        | Oracle::SemaevS4Factored { .. } => None,
     }
 }
 
@@ -12640,6 +15502,19 @@ fn decompose_binary(
                 }
             }
             None
+        }
+        Oracle::SemaevS4Factored { oracle } => {
+            let (witness, pairs) = oracle.decompose(target.x, &inst.gf);
+            ctr.s4f_pairs += pairs;
+            let xs = witness?;
+            ctr.s4_hits += 1;
+            match lift_abscissae(&g, fb, ops, &xs, target) {
+                Some(w) => Some(w),
+                None => {
+                    ctr.lift_failures += 1;
+                    None
+                }
+            }
         }
         Oracle::SemaevS4 { oracle } => {
             let (witness, pairs) = oracle.decompose(target.x, &inst.gf);
@@ -12811,7 +15686,7 @@ pub enum TargetSource {
     WalkPrimeFast,
     /// Synchronized independent prime walks; `batched` controls only the
     /// field inversion schedule, not the generated lane requests.
-    WalkPrimeLanes { lanes: u8, batched: bool },
+    WalkPrimeLanes { lanes: u16, batched: bool },
     /// The walk as the Round-2 ladder first ran it: one jump table for
     /// every segment and no guard, so segments merge as rho's walks do.
     /// For the diagnostic of §10.2 only.
@@ -12839,6 +15714,21 @@ pub enum TargetSource {
     /// only after `r` steps, so the progression is unguarded and stops
     /// there instead: a guard probe a target could only ever miss.
     StrideGenerator,
+    /// `StrideGenerator`'s progression `R = Q + [k]G`, `k = 0, 1, …`, the
+    /// same targets in the same order, formed in blocks of `2m + 1` around
+    /// a centre `C = Q + [k_c]G` (`k_c = m + 1, 3m + 2, …`, one addition of
+    /// `[2m + 1]G` each): `C ± [i]G` for `i = 1..m` come as sibling pairs
+    /// from ONE inversion each (`CountedGroup::x_sibling_pair`), `C + [i]G`
+    /// full and `C − [i]G` as an abscissa only.  An abscissa is probed by
+    /// the oracle's x-only probe (`DecompositionOracle::probe_x`: one
+    /// canonicalisation and one lookup, counted); on a hit its point is
+    /// formed by one counted addition and decomposed as usual.  A pair is
+    /// charged one group addition plus one `sibling_second_points` (priced
+    /// at `w` by the band), the set-up `[2]G..[m]G, [m + 1]G, [2m + 1]G`
+    /// is `m + 1` counted operations, and a block's pairs are formed when
+    /// its first target is tried, so a hit early in a block has formed
+    /// (and paid for) the rest of the block.  Oracle `walk_sib=m`.
+    StrideGeneratorSib { m: u32 },
     /// `StrideRenew` with the guard moved after the decomposition: only
     /// a target that yields a relation is probed and remembered.  The
     /// guard exists so that no decomposed target is decomposed again
@@ -12849,6 +15739,38 @@ pub enum TargetSource {
     /// probe per trial, now one per decomposing trial, and one oracle
     /// lookup per non-decomposing repeat, which the eager guard skipped.
     StrideRenewDeferredGuard,
+    /// `StrideRenew` with each of its three `[a]G + [b]Q` (the stride, the
+    /// renewal step, the start) formed by one joint double-and-add
+    /// (Shamir's trick, `joint_mul`) over `G + Q`, which is added once at
+    /// set-up, instead of two double-and-adds and an addition.  The
+    /// coefficients are drawn from the same stream in the same order and
+    /// the points are equal, so the targets, rows and answer are those of
+    /// `StrideRenew`; only the set-up's additions and doublings fall
+    /// (about `log₂ r` doublings and a quarter of the additions a
+    /// multiplication pair), every one of them still counted.
+    StrideRenewJoint,
+    /// `StrideRenew` (or `StrideRenewJoint` with `joint`), the same targets
+    /// in the same order, formed in blocks of `2m + 1` around a centre:
+    /// from an anchor `A` (the start, or the target a relation came from)
+    /// the next block is `C − [m]S, …, C − [1]S, C, C + [1]S, …, C + [m]S`
+    /// with `C = A + [m + 1]S`, the progression's next `2m + 1` points.
+    /// `C ± [i]S` come as a sibling pair from ONE inversion
+    /// (`CountedGroup::x_sibling_pair_counted`), `C + [i]S` full and
+    /// `C − [i]S` as an abscissa only, probed by the oracle's x-only probe
+    /// (one counted lookup); on a hit the point is formed by one counted
+    /// addition and goes through the guard and the oracle as every target
+    /// does.  A pair is charged one group addition plus one
+    /// `sibling_second_points` (priced at `w` by the band); the multiples
+    /// `[2]S..[m + 1]S` are `m` counted operations each time `S` is drawn
+    /// or renewed, the centre one addition a block, and a block's pairs
+    /// are formed as its minus side is walked, so a relation on the minus
+    /// side has paid for plus points it never uses.  Points that never
+    /// decompose are not guarded when known by their abscissa only; a
+    /// decomposing target is guarded exactly as under `StrideRenew` (the
+    /// oracle is deterministic, so an earlier copy decomposed too and was
+    /// formed and guarded), so the rows and the answer are `StrideRenew`'s.
+    /// Oracle `walk_sib=m` with `targets=stride-renew(-joint)`.
+    StrideRenewSib { m: u32, joint: bool },
 }
 
 impl TargetSource {
@@ -12864,7 +15786,11 @@ impl TargetSource {
             TargetSource::Stride => "stride",
             TargetSource::StrideRenew => "stride_renew",
             TargetSource::StrideGenerator => "stride_generator",
+            TargetSource::StrideGeneratorSib { .. } => "stride_generator_sib",
             TargetSource::StrideRenewDeferredGuard => "stride_renew_deferred_guard",
+            TargetSource::StrideRenewJoint => "stride_renew_joint",
+            TargetSource::StrideRenewSib { joint: false, .. } => "stride_renew_sib",
+            TargetSource::StrideRenewSib { joint: true, .. } => "stride_renew_joint_sib",
         }
     }
     pub fn is_walk(&self) -> bool {
@@ -12880,7 +15806,10 @@ impl TargetSource {
     pub fn renews_stride(&self) -> bool {
         matches!(
             self,
-            TargetSource::StrideRenew | TargetSource::StrideRenewDeferredGuard
+            TargetSource::StrideRenew
+                | TargetSource::StrideRenewDeferredGuard
+                | TargetSource::StrideRenewJoint
+                | TargetSource::StrideRenewSib { .. }
         )
     }
     /// **Whether a target the run has already decomposed is skipped.**
@@ -12905,6 +15834,8 @@ impl TargetSource {
                 | TargetSource::Stride
                 | TargetSource::StrideRenew
                 | TargetSource::StrideRenewDeferredGuard
+                | TargetSource::StrideRenewJoint
+                | TargetSource::StrideRenewSib { .. }
         )
     }
 }
@@ -13109,6 +16040,13 @@ pub enum Relation {
     },
 }
 
+/// A native multi-target decomposition kernel used by the production
+/// relation loop.  The coefficient pairs correspond to `points` and let a
+/// future stateful collector return explicit [`Relation::Row`] values; the
+/// current prime root-finding kernels return ordered `Summands` rows.
+pub type BatchRelationsOracle<'a, E> =
+    dyn FnMut(&mut GroupOps, &mut OracleCounters, &[E], &[(u64, u64)], &mut [Vec<Relation>]) + 'a;
+
 /// The shared relation loop with an explicit completion rule. The
 /// `TargetPinned` wrapper above preserves historical run semantics.
 #[allow(clippy::too_many_arguments)]
@@ -13207,6 +16145,144 @@ pub fn collect_and_solve_relations_touching<G: CountedGroup, L: RelationSolver +
     touch: impl Fn(&G::Elt),
     line_guard: bool,
 ) -> PipelineOutcome {
+    collect_and_solve_relations_touching_ladder(
+        g, generator, target, r, h, fb, seed, max_trials, targets, pool_mode, matrix, completion,
+        oracle, touch, line_guard, None,
+    )
+}
+
+/// [`collect_and_solve_relations_touching`] whose recovery check `[d]G`
+/// reads a stored ladder `[2^i]G` ([`ladder_mul`]) when `verify_ladder` is
+/// a nonempty ladder, charged to the same verification ops; `None` (or an
+/// empty ladder) is `collect_and_solve_relations_touching` bit for bit.
+/// The `wwalk` oracle hands its target walk's ladder here with `lcheck=1`.
+#[allow(clippy::too_many_arguments)]
+pub fn collect_and_solve_relations_touching_ladder<G: CountedGroup, L: RelationSolver + ?Sized>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    targets: TargetSource,
+    pool_mode: RestartPool,
+    matrix: &mut L,
+    completion: CompletionRule,
+    oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+    touch: impl Fn(&G::Elt),
+    line_guard: bool,
+    verify_ladder: Option<&[G::Elt]>,
+) -> PipelineOutcome {
+    let check = match verify_ladder {
+        Some(ladder) if !ladder.is_empty() => RecoveryCheck::Ladder(ladder),
+        _ => RecoveryCheck::DoubleAndAdd,
+    };
+    collect_and_solve_relations_touching_check(
+        g, generator, target, r, h, fb, seed, max_trials, targets, pool_mode, matrix, completion,
+        oracle, touch, line_guard, check, None,
+    )
+}
+
+/// How the relation loop's recovery check forms `[d]G` before comparing it
+/// with the target.  Every variant is a counted group-operation sequence
+/// charged to the verify phase, and every one computes `[d]G` itself.
+#[derive(Clone, Copy, Debug)]
+pub enum RecoveryCheck<'a, E> {
+    /// Double-and-add from `G` (every recorded run before the ladder).
+    DoubleAndAdd,
+    /// A stored ladder `[2^i]G` ([`ladder_mul`]).
+    Ladder(&'a [E]),
+    /// The τ-adic expansion of `d` over the stored signed Frobenius orbit
+    /// of `G` ([`tau_orbit_mul`]); Koblitz curves only.
+    TauOrbit(&'a TauOrbitCheck<E>),
+}
+
+/// [`collect_and_solve_relations_touching_ladder`] with the recovery check
+/// named by [`RecoveryCheck`]; `DoubleAndAdd` and `Ladder` are that
+/// function's two cases, bit for bit.
+#[allow(clippy::too_many_arguments)]
+/// Plus points of a sibling block formed but never presented when the
+/// block is left with `slot` its next slot (`0..2m + 1`): the pairs formed
+/// so far are `min(slot, m)`, the plus points presented `slot - m - 1`
+/// past the centre.
+fn sr_plus_unused(slot: usize, m: usize) -> u64 {
+    let formed = slot.min(m);
+    let presented = slot.saturating_sub(m + 1);
+    (formed - presented) as u64
+}
+
+pub fn collect_and_solve_relations_touching_check<G: CountedGroup, L: RelationSolver + ?Sized>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    targets: TargetSource,
+    pool_mode: RestartPool,
+    matrix: &mut L,
+    completion: CompletionRule,
+    oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+    touch: impl Fn(&G::Elt),
+    line_guard: bool,
+    verify_ladder: RecoveryCheck<'_, G::Elt>,
+    xprobe: Option<&mut dyn FnMut(&mut OracleCounters, u64) -> bool>,
+) -> PipelineOutcome {
+    collect_and_solve_relations_touching_check_batched(
+        g,
+        generator,
+        target,
+        r,
+        h,
+        fb,
+        seed,
+        max_trials,
+        targets,
+        pool_mode,
+        matrix,
+        completion,
+        oracle,
+        touch,
+        line_guard,
+        verify_ladder,
+        xprobe,
+        1,
+        None,
+    )
+}
+
+/// Batch-capable form of [`collect_and_solve_relations_touching_check`].
+/// The historical public entry point remains a width-one wrapper so existing
+/// downstream callers retain both their source API and scalar semantics.
+#[allow(clippy::too_many_arguments)]
+pub fn collect_and_solve_relations_touching_check_batched<
+    G: CountedGroup,
+    L: RelationSolver + ?Sized,
+>(
+    g: &G,
+    generator: G::Elt,
+    target: G::Elt,
+    r: u64,
+    h: u64,
+    fb: &FactorBase<G::Elt>,
+    seed: u64,
+    max_trials: u64,
+    targets: TargetSource,
+    pool_mode: RestartPool,
+    matrix: &mut L,
+    completion: CompletionRule,
+    oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
+    touch: impl Fn(&G::Elt),
+    line_guard: bool,
+    verify_ladder: RecoveryCheck<'_, G::Elt>,
+    xprobe: Option<&mut dyn FnMut(&mut OracleCounters, u64) -> bool>,
+    batch_width: usize,
+    batch_oracle: Option<&mut BatchRelationsOracle<'_, G::Elt>>,
+) -> PipelineOutcome {
     let capacity = if targets.is_guarded() { 1 << 12 } else { 0 };
     if line_guard {
         collect_and_solve_relations_scaled_touching(
@@ -13226,6 +16302,10 @@ pub fn collect_and_solve_relations_touching<G: CountedGroup, L: RelationSolver +
             oracle,
             touch,
             GuardLineSet::with_capacity(capacity),
+            verify_ladder,
+            xprobe,
+            batch_width,
+            batch_oracle,
         )
     } else {
         collect_and_solve_relations_scaled_touching(
@@ -13245,6 +16325,10 @@ pub fn collect_and_solve_relations_touching<G: CountedGroup, L: RelationSolver +
             oracle,
             touch,
             fast_map(capacity),
+            verify_ladder,
+            xprobe,
+            batch_width,
+            batch_oracle,
         )
     }
 }
@@ -13287,6 +16371,10 @@ pub fn collect_and_solve_relations_scaled<G: CountedGroup, L: RelationSolver + ?
         oracle,
         |_| {},
         fast_map(if targets.is_guarded() { 1 << 12 } else { 0 }),
+        RecoveryCheck::DoubleAndAdd,
+        None,
+        1,
+        None,
     )
 }
 
@@ -13312,6 +16400,10 @@ fn collect_and_solve_relations_scaled_touching<
     mut oracle: impl FnMut(&mut GroupOps, &mut OracleCounters, G::Elt, u64, u64) -> Vec<Relation>,
     touch: impl Fn(&G::Elt),
     mut seen: R,
+    verify_ladder: RecoveryCheck<'_, G::Elt>,
+    mut xprobe: Option<&mut dyn FnMut(&mut OracleCounters, u64) -> bool>,
+    batch_width: usize,
+    mut batch_oracle: Option<&mut BatchRelationsOracle<'_, G::Elt>>,
 ) -> PipelineOutcome {
     let mut rng = StdRng::seed_from_u64(seed ^ 0x5245_4C41_5449_4F4E);
     let mut rel = PhaseCost::default();
@@ -13380,12 +16472,25 @@ fn collect_and_solve_relations_scaled_touching<
     // walk bit-identical trajectories and differ in exactly one thing:
     // the offsets they paid for.  `walk_pool_ops` reports that cost, so
     // the difference between the arms is checkable rather than argued.
+    //
+    // The sixteen walk jumps follow the same lazy-charge rule (§14): their
+    // `(a, b)` coefficients are drawn up front (so the RNG stream — and
+    // every later walk start — stays bit-identical), but the scalar
+    // multiplications that build the points run on first index into the
+    // jump table.  A TargetWalk / wwalk prepare that already emits full-
+    // rank free rows pins `d` on the first trial without ever taking a
+    // walk step, so those sixteen `[a]G+[b]Q` multiplications are never
+    // charged.  That is the cold-E2E setup amort that closes the ~0.9×
+    // relation-phase gap against `targets=stride-generator` while keeping
+    // `targets=walk` when a probe is still needed.
     let jump_count = 16usize;
     let pool_count = 16usize;
     let shared_jumps = targets == TargetSource::WalkSharedJumps;
     let guarded = targets.is_guarded();
     let defer_guard = targets == TargetSource::StrideRenewDeferredGuard;
     let mut jumps: Vec<(G::Elt, u64, u64)> = Vec::new();
+    let mut jump_coefs: Vec<(u64, u64)> = Vec::new();
+    let mut jumps_ready = false;
     let mut pool: Vec<(G::Elt, u64, u64)> = Vec::new();
     let mut pool_rng = StdRng::seed_from_u64(seed ^ 0x504F_4F4C_5F4F_4646);
     let mut pool_ops = GroupOps::default();
@@ -13404,6 +16509,7 @@ fn collect_and_solve_relations_scaled_touching<
     let mut segment_steps = 0u64;
     let (mut walk_steps, mut walk_restarts, mut repeats_skipped, mut guard_probes, mut walk_jumps) =
         (0u64, 0u64, 0u64, 0u64, 0u64);
+    let mut walk_jumps_materialised = 0u64;
     let lane_config = match targets {
         TargetSource::WalkPrimeLanes { lanes, batched } => Some((lanes as usize, batched)),
         _ => None,
@@ -13428,6 +16534,30 @@ fn collect_and_solve_relations_scaled_touching<
     let mut lane_requests = Vec::with_capacity(lanes.len());
     let mut lane_outputs = Vec::with_capacity(lanes.len());
     let (mut lane_rounds, mut lane_prepared) = (0u64, 0u64);
+    // Only the already-laned prime walk exposes several independent query
+    // points before the matrix consumes any of them. Batch their oracle
+    // probes in that same order; renewed strides keep scalar scheduling so
+    // that a hit can change the next point before it is drawn.
+    let batch_width = batch_width.max(1);
+    let batch_enabled = batch_width > 1
+        && batch_oracle.is_some()
+        && matches!(targets, TargetSource::WalkPrimeLanes { .. });
+    let mut batch_pending: std::collections::VecDeque<(
+        G::Elt,
+        u64,
+        u64,
+        Option<usize>,
+        Option<Vec<Relation>>,
+    )> = std::collections::VecDeque::new();
+    // Reuse the batch envelopes in the hot relation loop. Witness vectors
+    // still move into `batch_pending`, but scheduling a miss-only batch does
+    // not touch the allocator after these capacities have been established.
+    let mut batch_meta: Vec<(G::Elt, u64, u64, Option<usize>)> = Vec::with_capacity(batch_width);
+    let mut batch_points = Vec::with_capacity(batch_width);
+    let mut batch_coefficients = Vec::with_capacity(batch_width);
+    let mut batch_answers: Vec<Vec<Relation>> = Vec::with_capacity(batch_width);
+    let (mut oracle_batch_calls, mut oracle_batch_targets, mut oracle_batch_max_targets) =
+        (0u64, 0u64, 0u64);
     // `bitop/v1`-only bookkeeping (`PhaseCost::work`): the coefficient
     // updates modulo `r`, the step hashes, and the random draws of the
     // target stream, none of which the group-operation ledger sees.
@@ -13439,19 +16569,27 @@ fn collect_and_solve_relations_scaled_touching<
     let (mut stride, mut stride_steps, mut stride_restarts, mut stride_renewals) =
         ((g.identity(), 0u64, 0u64), 0u64, 0u64, 0u64);
     let mut renew_by = (g.identity(), 0u64, 0u64);
+    // `StrideRenewJoint`: `G + Q` once, then every `[a]G + [b]Q` of the
+    // set-up is one joint double-and-add over it (same draws, same points).
+    let joint_gq = matches!(
+        targets,
+        TargetSource::StrideRenewJoint | TargetSource::StrideRenewSib { joint: true, .. }
+    )
+    .then(|| g.add(&mut rel.group_ops, generator, target));
+    let draw_one = |rng: &mut StdRng, ops: &mut GroupOps, scale: &mut Option<&mut CoeffScale>| {
+        match joint_gq {
+            Some(gq) => {
+                let a = scale_coeff(scale, rng.gen_range(1..r), r);
+                let b = rng.gen_range(1..r);
+                (joint_mul(g, ops, generator, target, gq, a, b), a, b)
+            }
+            None => draw_jumps(g, generator, target, r, rng, ops, 1, scale)[0],
+        }
+    };
     if striding {
         // A stride at the identity would present one point forever.
         while g.is_identity(&stride.0) {
-            stride = draw_jumps(
-                g,
-                generator,
-                target,
-                r,
-                &mut rng,
-                &mut rel.group_ops,
-                1,
-                &mut scale,
-            )[0];
+            stride = draw_one(&mut rng, &mut rel.group_ops, &mut scale);
             rng_draws += 2;
         }
     }
@@ -13461,30 +16599,18 @@ fn collect_and_solve_relations_scaled_touching<
     }
     if targets.renews_stride() {
         while g.is_identity(&renew_by.0) {
-            renew_by = draw_jumps(
-                g,
-                generator,
-                target,
-                r,
-                &mut rng,
-                &mut rel.group_ops,
-                1,
-                &mut scale,
-            )[0];
+            renew_by = draw_one(&mut rng, &mut rel.group_ops, &mut scale);
             rng_draws += 2;
         }
     }
     if targets.is_walk() {
-        jumps = draw_jumps(
-            g,
-            generator,
-            target,
-            r,
-            &mut rng,
-            &mut rel.group_ops,
-            jump_count,
-            &mut scale,
-        );
+        // Coefficients now; points on first use (see §14 above).
+        jump_coefs.reserve(jump_count);
+        for _ in 0..jump_count {
+            let aj = scale_coeff(&mut scale, rng.gen_range(1..r), r);
+            let bj = rng.gen_range(1..r);
+            jump_coefs.push((aj, bj));
+        }
         walk_jumps += jump_count as u64;
         rng_draws += 2 * jump_count as u64;
         if !shared_jumps && pool_mode == RestartPool::Eager {
@@ -13503,9 +16629,56 @@ fn collect_and_solve_relations_scaled_touching<
             }
         }
     }
+    // `StrideGeneratorSib`: the multiples `[1]G..[m]G`, the step
+    // `[2m + 1]G`, the block centre `C = Q + [k_c]G` and the full points
+    // `C + [i]G` its pairs formed; `sw_next` is the next `k` to try.
+    let sw_m = match targets {
+        TargetSource::StrideGeneratorSib { m } => {
+            assert!(m >= 1, "walk_sib needs m >= 1");
+            assert!(
+                xprobe.is_some(),
+                "the sibling walk needs the oracle's x-only probe"
+            );
+            m as u64
+        }
+        _ => 0,
+    };
+    let mut sw_mults: Vec<G::Elt> = Vec::new();
+    let mut sw_step = g.identity();
+    let mut sw_centre = g.identity();
+    let mut sw_kc = 0u64;
+    let mut sw_plus: Vec<G::Elt> = vec![g.identity(); sw_m as usize + 1];
+    let mut sw_next = 0u64;
+    let (mut sw_second, mut sw_pairs, mut sw_lifts, mut sw_full_pairs, mut sw_xprobes) =
+        (0u64, 0u64, 0u64, 0u64, 0u64);
+    // `StrideRenewSib`: the multiples `[1]S..[m + 1]S` of the current
+    // stride with their coefficients (`sr_ready` false after a draw or a
+    // renewal), the anchor the next block starts from, the block's centre
+    // and coefficients, its kept plus points, and the next slot `0..2m + 1`
+    // (`None` between blocks).
+    let sr_m = match targets {
+        TargetSource::StrideRenewSib { m, .. } => {
+            assert!(m >= 1, "walk_sib needs m >= 1");
+            assert!(
+                xprobe.is_some(),
+                "the sibling walk needs the oracle's x-only probe"
+            );
+            m as usize
+        }
+        _ => 0,
+    };
+    let mut sr_mults: Vec<(G::Elt, u64, u64)> = Vec::with_capacity(sr_m + 1);
+    let mut sr_ready = false;
+    let mut sr_anchor = (g.identity(), 0u64, 0u64);
+    let mut sr_centre = (g.identity(), 0u64, 0u64);
+    let mut sr_plus: Vec<Option<G::Elt>> = vec![None; sr_m + 1];
+    let mut sr_slot: Option<usize> = None;
+    let (mut sr_multiple_ops, mut sr_centres, mut sr_unused_plus) = (0u64, 0u64, 0u64);
 
-    while trials < max_trials {
-        if lane_config.is_some() && lane_queue.is_empty() {
+    while trials < max_trials || !batch_pending.is_empty() {
+        let pending_query = batch_pending.pop_front();
+        let from_pending = pending_query.is_some();
+        if pending_query.is_none() && lane_config.is_some() && lane_queue.is_empty() {
             lane_requests.clear();
             for (index, lane) in lanes.iter_mut().enumerate() {
                 if lane.fresh || lane.segment_steps >= segment_cap {
@@ -13549,6 +16722,16 @@ fn collect_and_solve_relations_scaled_touching<
                 } else {
                     let j =
                         lane.permutation[((mix(g.key(&lane.point)) >> 24) as usize) % jump_count];
+                    if !jumps_ready {
+                        jumps.reserve(jump_coefs.len());
+                        for &(aj, bj) in &jump_coefs {
+                            let ag = g.mul(&mut rel.group_ops, generator, aj);
+                            let bq = g.mul(&mut rel.group_ops, target, bj);
+                            jumps.push((g.add(&mut rel.group_ops, ag, bq), aj, bj));
+                        }
+                        walk_jumps_materialised = jump_coefs.len() as u64;
+                        jumps_ready = true;
+                    }
                     let (jump, aj, bj) = jumps[j];
                     lane_requests.push((index, lane.point, jump, j));
                     lane.a = addmod(lane.a, aj, r);
@@ -13587,159 +16770,394 @@ fn collect_and_solve_relations_scaled_touching<
             }
             lane_rounds += 1;
         }
-        // Exclusive phase marks (no-ops without an `ic_measurement`
-        // session): drawing the target-dependent query point.
-        measurement::mark(measurement::Phase::TargetQuery);
-        let (point, a, b, lane_id) = match targets {
-            TargetSource::Random | TargetSource::RandomUnguarded => {
-                rng_draws += 2;
-                let a = scale_coeff(&mut scale, rng.gen_range(1..r), r);
-                let b = rng.gen_range(1..r);
-                let ag = g.mul(&mut rel.group_ops, generator, a);
-                let bq = g.mul(&mut rel.group_ops, target, b);
-                let point = g.add(&mut rel.group_ops, ag, bq);
-                if g.is_identity(&point) {
-                    direct_skipped += 1;
-                    continue;
+        let (point, a, b, lane_id, precomputed) = if let Some((point, a, b, lane_id, relations)) =
+            pending_query
+        {
+            (point, a, b, lane_id, relations)
+        } else {
+            // Exclusive phase marks (no-ops without an `ic_measurement`
+            // session): drawing the target-dependent query point.
+            measurement::mark(measurement::Phase::TargetQuery);
+            let (point, a, b, lane_id) = match targets {
+                TargetSource::Random | TargetSource::RandomUnguarded => {
+                    rng_draws += 2;
+                    let a = scale_coeff(&mut scale, rng.gen_range(1..r), r);
+                    let b = rng.gen_range(1..r);
+                    let ag = g.mul(&mut rel.group_ops, generator, a);
+                    let bq = g.mul(&mut rel.group_ops, target, b);
+                    let point = g.add(&mut rel.group_ops, ag, bq);
+                    if g.is_identity(&point) {
+                        direct_skipped += 1;
+                        continue;
+                    }
+                    (point, a, b, None)
                 }
-                (point, a, b, None)
-            }
-            TargetSource::Walk | TargetSource::WalkPrimeFast | TargetSource::WalkSharedJumps => {
-                if walk_fresh || segment_steps >= segment_cap {
-                    if walk_restarts == 0 || shared_jumps {
-                        // The first segment, and every segment of the
-                        // unguarded diagnostic, starts from a fresh
-                        // `[a]G + [b]Q`.
+                TargetSource::Walk
+                | TargetSource::WalkPrimeFast
+                | TargetSource::WalkSharedJumps => {
+                    if walk_fresh || segment_steps >= segment_cap {
+                        if walk_restarts == 0 || shared_jumps {
+                            // The first segment, and every segment of the
+                            // unguarded diagnostic, starts from a fresh
+                            // `[a]G + [b]Q`.
+                            rng_draws += 2;
+                            wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
+                            wb = rng.gen_range(1..r);
+                            let ag = g.mul(&mut rel.group_ops, generator, wa);
+                            let bq = g.mul(&mut rel.group_ops, target, wb);
+                            walk_point = g.add(&mut rel.group_ops, ag, bq);
+                        } else {
+                            // Offset `k mod 16` for the k-th restart, drawn
+                            // here if this is the first restart to reach it.
+                            let idx = (pool_taken as usize) % pool_count;
+                            pool_taken += 1;
+                            if idx == pool.len() {
+                                let off = draw_pool_offset(
+                                    g,
+                                    generator,
+                                    target,
+                                    r,
+                                    &mut pool_rng,
+                                    &mut rel.group_ops,
+                                    &mut pool_ops,
+                                    &mut scale,
+                                );
+                                pool.push(off);
+                            }
+                            let (op, oa, ob) = pool[idx];
+                            walk_point = if let Some(add) = native_walk.as_mut() {
+                                native_walk_calls += 1;
+                                add(&mut rel.group_ops, walk_point, op)
+                            } else {
+                                g.add(&mut rel.group_ops, walk_point, op)
+                            };
+                            wa = addmod(wa, oa, r);
+                            wb = addmod(wb, ob, r);
+                            walk_modr_adds += 2;
+                            // A fresh index map for the segment: Fisher–Yates
+                            // over the sixteen jumps, no group operation.
+                            for i in (1..jump_count).rev() {
+                                jump_perm.swap(i, rng.gen_range(0..i + 1));
+                            }
+                            rng_draws += jump_count as u64 - 1;
+                        }
+                        walk_fresh = false;
+                        walk_restarts += 1;
+                        segment_steps = 0;
+                    } else {
+                        let hsh = mix(g.key(&walk_point));
+                        let j = jump_perm[((hsh >> 24) as usize) % jump_count];
+                        if !jumps_ready {
+                            jumps.reserve(jump_coefs.len());
+                            for &(aj, bj) in &jump_coefs {
+                                let ag = g.mul(&mut rel.group_ops, generator, aj);
+                                let bq = g.mul(&mut rel.group_ops, target, bj);
+                                jumps.push((g.add(&mut rel.group_ops, ag, bq), aj, bj));
+                            }
+                            walk_jumps_materialised = jump_coefs.len() as u64;
+                            jumps_ready = true;
+                        }
+                        let (jp, aj, bj) = jumps[j];
+                        walk_point = if let Some(add) = native_walk.as_mut() {
+                            native_walk_calls += 1;
+                            add(&mut rel.group_ops, walk_point, jp)
+                        } else {
+                            g.add(&mut rel.group_ops, walk_point, jp)
+                        };
+                        wa = addmod(wa, aj, r);
+                        wb = addmod(wb, bj, r);
+                        walk_modr_adds += 2;
+                        walk_mix_hashes += 1;
+                        walk_steps += 1;
+                        segment_steps += 1;
+                    }
+                    if g.is_identity(&walk_point) {
+                        walk_fresh = true;
+                        direct_skipped += 1;
+                        continue;
+                    }
+                    (walk_point, wa, wb, None)
+                }
+                TargetSource::Stride
+                | TargetSource::StrideRenew
+                | TargetSource::StrideRenewDeferredGuard
+                | TargetSource::StrideRenewJoint => {
+                    if walk_fresh {
                         rng_draws += 2;
                         wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
                         wb = rng.gen_range(1..r);
-                        let ag = g.mul(&mut rel.group_ops, generator, wa);
-                        let bq = g.mul(&mut rel.group_ops, target, wb);
-                        walk_point = g.add(&mut rel.group_ops, ag, bq);
-                    } else {
-                        // Offset `k mod 16` for the k-th restart, drawn
-                        // here if this is the first restart to reach it.
-                        let idx = (pool_taken as usize) % pool_count;
-                        pool_taken += 1;
-                        if idx == pool.len() {
-                            let off = draw_pool_offset(
-                                g,
-                                generator,
-                                target,
-                                r,
-                                &mut pool_rng,
-                                &mut rel.group_ops,
-                                &mut pool_ops,
-                                &mut scale,
-                            );
-                            pool.push(off);
-                        }
-                        let (op, oa, ob) = pool[idx];
-                        walk_point = if let Some(add) = native_walk.as_mut() {
-                            native_walk_calls += 1;
-                            add(&mut rel.group_ops, walk_point, op)
-                        } else {
-                            g.add(&mut rel.group_ops, walk_point, op)
+                        walk_point = match joint_gq {
+                            Some(gq) => {
+                                joint_mul(g, &mut rel.group_ops, generator, target, gq, wa, wb)
+                            }
+                            None => {
+                                let ag = g.mul(&mut rel.group_ops, generator, wa);
+                                let bq = g.mul(&mut rel.group_ops, target, wb);
+                                g.add(&mut rel.group_ops, ag, bq)
+                            }
                         };
-                        wa = addmod(wa, oa, r);
-                        wb = addmod(wb, ob, r);
-                        walk_modr_adds += 2;
-                        // A fresh index map for the segment: Fisher–Yates
-                        // over the sixteen jumps, no group operation.
-                        for i in (1..jump_count).rev() {
-                            jump_perm.swap(i, rng.gen_range(0..i + 1));
-                        }
-                        rng_draws += jump_count as u64 - 1;
-                    }
-                    walk_fresh = false;
-                    walk_restarts += 1;
-                    segment_steps = 0;
-                } else {
-                    let hsh = mix(g.key(&walk_point));
-                    let j = jump_perm[((hsh >> 24) as usize) % jump_count];
-                    let (jp, aj, bj) = jumps[j];
-                    walk_point = if let Some(add) = native_walk.as_mut() {
-                        native_walk_calls += 1;
-                        add(&mut rel.group_ops, walk_point, jp)
+                        walk_fresh = false;
+                        stride_restarts += 1;
                     } else {
-                        g.add(&mut rel.group_ops, walk_point, jp)
-                    };
-                    wa = addmod(wa, aj, r);
-                    wb = addmod(wb, bj, r);
-                    walk_modr_adds += 2;
-                    walk_mix_hashes += 1;
-                    walk_steps += 1;
-                    segment_steps += 1;
+                        let (sp, sa, sb) = stride;
+                        walk_point = g.add(&mut rel.group_ops, walk_point, sp);
+                        wa = addmod(wa, sa, r);
+                        wb = addmod(wb, sb, r);
+                        walk_modr_adds += 2;
+                        stride_steps += 1;
+                    }
+                    if g.is_identity(&walk_point) {
+                        walk_fresh = true;
+                        direct_skipped += 1;
+                        continue;
+                    }
+                    (walk_point, wa, wb, None)
                 }
-                if g.is_identity(&walk_point) {
-                    walk_fresh = true;
-                    direct_skipped += 1;
-                    continue;
+                TargetSource::StrideRenewSib { .. } => {
+                    let m = sr_m;
+                    if walk_fresh {
+                        // The start, as `StrideRenew(Joint)` draws it.
+                        rng_draws += 2;
+                        wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
+                        wb = rng.gen_range(1..r);
+                        walk_point = match joint_gq {
+                            Some(gq) => {
+                                joint_mul(g, &mut rel.group_ops, generator, target, gq, wa, wb)
+                            }
+                            None => {
+                                let ag = g.mul(&mut rel.group_ops, generator, wa);
+                                let bq = g.mul(&mut rel.group_ops, target, wb);
+                                g.add(&mut rel.group_ops, ag, bq)
+                            }
+                        };
+                        walk_fresh = false;
+                        stride_restarts += 1;
+                        if let Some(slot) = sr_slot.take() {
+                            sr_unused_plus += sr_plus_unused(slot, m);
+                        }
+                        sr_anchor = (walk_point, wa, wb);
+                        if g.is_identity(&walk_point) {
+                            walk_fresh = true;
+                            direct_skipped += 1;
+                            continue;
+                        }
+                        (walk_point, wa, wb, None)
+                    } else {
+                        if !sr_ready {
+                            // [1]S..[m + 1]S: one doubling and m - 1 additions.
+                            let (sp, sa, sb) = stride;
+                            sr_mults.clear();
+                            sr_mults.push((sp, sa, sb));
+                            for i in 2..=m + 1 {
+                                let (lp, la, lb) = sr_mults[i - 2];
+                                let pt = if i == 2 {
+                                    g.double(&mut rel.group_ops, sp)
+                                } else {
+                                    g.add(&mut rel.group_ops, lp, sp)
+                                };
+                                sr_mults.push((pt, addmod(la, sa, r), addmod(lb, sb, r)));
+                                walk_modr_adds += 2;
+                                sr_multiple_ops += 1;
+                            }
+                            sr_ready = true;
+                        }
+                        let slot = match sr_slot {
+                            Some(slot) => slot,
+                            None => {
+                                // A new block: C = A + [m + 1]S.
+                                let (ap, aa, ab) = sr_anchor;
+                                let (mp, ma, mb) = sr_mults[m];
+                                sr_centre = (
+                                    g.add(&mut rel.group_ops, ap, mp),
+                                    addmod(aa, ma, r),
+                                    addmod(ab, mb, r),
+                                );
+                                walk_modr_adds += 2;
+                                sr_centres += 1;
+                                0
+                            }
+                        };
+                        // The block's last slot hands its point on as the anchor.
+                        sr_slot = (slot < 2 * m).then_some(slot + 1);
+                        let (cp, ca, cb) = sr_centre;
+                        stride_steps += 1;
+                        walk_modr_adds += 2;
+                        let (point, pa, pb) = if slot < m {
+                            // C − [i]S, i = m - slot: form the pair i now.
+                            let i = m - slot;
+                            let (jp, ja, jb) = sr_mults[i - 1];
+                            let (pa, pb) = (submod(ca, ja, r), submod(cb, jb, r));
+                            match g.x_sibling_pair_counted(&mut rel.group_ops, cp, jp) {
+                                Some((plus, minus_x)) => {
+                                    rel.group_ops.adds += 1;
+                                    sw_second += 1;
+                                    sw_pairs += 1;
+                                    sr_plus[i] = Some(plus);
+                                    sw_xprobes += 1;
+                                    let probe = xprobe.as_mut().expect("checked above");
+                                    if !probe(&mut ctr, minus_x) {
+                                        trials += 1;
+                                        continue;
+                                    }
+                                    // A hit: the point itself, one addition.
+                                    sw_lifts += 1;
+                                    (g.add(&mut rel.group_ops, cp, g.neg(jp)), pa, pb)
+                                }
+                                None => {
+                                    // C = ±[i]S or C = O: both signs in full.
+                                    sw_full_pairs += 1;
+                                    sr_plus[i] = Some(g.add(&mut rel.group_ops, cp, jp));
+                                    (g.add(&mut rel.group_ops, cp, g.neg(jp)), pa, pb)
+                                }
+                            }
+                        } else if slot == m {
+                            (cp, ca, cb)
+                        } else {
+                            let i = slot - m;
+                            let (_, ja, jb) = sr_mults[i - 1];
+                            let plus = sr_plus[i].take().expect("formed with its minus side");
+                            (plus, addmod(ca, ja, r), addmod(cb, jb, r))
+                        };
+                        if sr_slot.is_none() {
+                            sr_anchor = (point, pa, pb);
+                        }
+                        if g.is_identity(&point) {
+                            walk_fresh = true;
+                            direct_skipped += 1;
+                            continue;
+                        }
+                        // A target that may yield a relation is the anchor of
+                        // the next block if it does (set below).
+                        walk_point = point;
+                        wa = pa;
+                        wb = pb;
+                        (point, pa, pb, None)
+                    }
                 }
-                (walk_point, wa, wb, None)
-            }
-            TargetSource::Stride
-            | TargetSource::StrideRenew
-            | TargetSource::StrideRenewDeferredGuard => {
-                if walk_fresh {
-                    rng_draws += 2;
-                    wa = scale_coeff(&mut scale, rng.gen_range(1..r), r);
-                    wb = rng.gen_range(1..r);
-                    let ag = g.mul(&mut rel.group_ops, generator, wa);
-                    let bq = g.mul(&mut rel.group_ops, target, wb);
-                    walk_point = g.add(&mut rel.group_ops, ag, bq);
-                    walk_fresh = false;
-                    stride_restarts += 1;
-                } else {
-                    let (sp, sa, sb) = stride;
-                    walk_point = g.add(&mut rel.group_ops, walk_point, sp);
-                    wa = addmod(wa, sa, r);
-                    wb = addmod(wb, sb, r);
-                    walk_modr_adds += 2;
-                    stride_steps += 1;
+                TargetSource::StrideGenerator => {
+                    if walk_fresh {
+                        // R₀ = Q: a = 0, b = 1, no group work.
+                        walk_point = target;
+                        wa = 0;
+                        wb = 1;
+                        walk_fresh = false;
+                        stride_restarts += 1;
+                    } else {
+                        walk_point = g.add(&mut rel.group_ops, walk_point, stride.0);
+                        wa = addmod(wa, stride.1, r);
+                        stride_steps += 1;
+                        if wa == 0 {
+                            // k = r: the progression is back at Q and every
+                            // further target would repeat one already tried.
+                            break;
+                        }
+                    }
+                    if g.is_identity(&walk_point) {
+                        // Q + [k]G = O: step past it; a restart would return to Q.
+                        direct_skipped += 1;
+                        continue;
+                    }
+                    (walk_point, wa, wb, None)
                 }
-                if g.is_identity(&walk_point) {
-                    walk_fresh = true;
-                    direct_skipped += 1;
-                    continue;
-                }
-                (walk_point, wa, wb, None)
-            }
-            TargetSource::StrideGenerator => {
-                if walk_fresh {
-                    // R₀ = Q: a = 0, b = 1, no group work.
-                    walk_point = target;
-                    wa = 0;
-                    wb = 1;
-                    walk_fresh = false;
-                    stride_restarts += 1;
-                } else {
-                    walk_point = g.add(&mut rel.group_ops, walk_point, stride.0);
-                    wa = addmod(wa, stride.1, r);
-                    stride_steps += 1;
-                    if wa == 0 {
-                        // k = r: the progression is back at Q and every
-                        // further target would repeat one already tried.
+                TargetSource::StrideGeneratorSib { .. } => {
+                    let m = sw_m;
+                    let k = sw_next;
+                    if k >= r {
+                        // k = r: back at Q, as `StrideGenerator` stops.
                         break;
                     }
+                    sw_next += 1;
+                    wa = k;
+                    wb = 1;
+                    let point = if k == 0 {
+                        // R₀ = Q: a = 0, b = 1, no group work.
+                        stride_restarts += 1;
+                        target
+                    } else {
+                        if k == 1 {
+                            // Set-up: [1]G..[m]G, [m + 1]G, [2m + 1]G (m + 1
+                            // operations), and the first centre Q + [m + 1]G.
+                            sw_mults.push(generator);
+                            let mut last = generator;
+                            for i in 2..=m {
+                                last = if i == 2 {
+                                    g.double(&mut rel.group_ops, generator)
+                                } else {
+                                    g.add(&mut rel.group_ops, last, generator)
+                                };
+                                sw_mults.push(last);
+                            }
+                            let m1 = if m == 1 {
+                                g.double(&mut rel.group_ops, generator)
+                            } else {
+                                g.add(&mut rel.group_ops, last, generator)
+                            };
+                            sw_step = g.add(&mut rel.group_ops, m1, last);
+                            sw_centre = g.add(&mut rel.group_ops, target, m1);
+                            sw_kc = m + 1;
+                        } else if k == sw_kc + m + 1 {
+                            sw_centre = g.add(&mut rel.group_ops, sw_centre, sw_step);
+                            sw_kc += 2 * m + 1;
+                        }
+                        if k < sw_kc {
+                            // C − [i]G: form the pair i now (C + [i]G is kept).
+                            let i = (sw_kc - k) as usize;
+                            let j = sw_mults[i - 1];
+                            match g.x_sibling_pair(sw_centre, j) {
+                                Some((plus, minus_x)) => {
+                                    rel.group_ops.adds += 1;
+                                    sw_second += 1;
+                                    sw_pairs += 1;
+                                    sw_plus[i] = plus;
+                                    sw_xprobes += 1;
+                                    let probe = xprobe.as_mut().expect("checked above");
+                                    if !probe(&mut ctr, minus_x) {
+                                        trials += 1;
+                                        continue;
+                                    }
+                                    // A hit: the point itself, one addition.
+                                    sw_lifts += 1;
+                                    g.add(&mut rel.group_ops, sw_centre, g.neg(j))
+                                }
+                                None => {
+                                    // C = ±[i]G or C = O: both signs in full.
+                                    sw_full_pairs += 1;
+                                    sw_plus[i] = g.add(&mut rel.group_ops, sw_centre, j);
+                                    g.add(&mut rel.group_ops, sw_centre, g.neg(j))
+                                }
+                            }
+                        } else if k == sw_kc {
+                            sw_centre
+                        } else {
+                            sw_plus[(k - sw_kc) as usize]
+                        }
+                    };
+                    if g.is_identity(&point) {
+                        direct_skipped += 1;
+                        continue;
+                    }
+                    (point, wa, wb, None)
                 }
-                if g.is_identity(&walk_point) {
-                    // Q + [k]G = O: step past it; a restart would return to Q.
-                    direct_skipped += 1;
-                    continue;
+                TargetSource::WalkPrimeLanes { .. } => {
+                    let (lane, point, a, b) = lane_queue.pop_front().expect("nonempty lane round");
+                    (point, a, b, Some(lane))
                 }
-                (walk_point, wa, wb, None)
-            }
-            TargetSource::WalkPrimeLanes { .. } => {
-                let (lane, point, a, b) = lane_queue.pop_front().expect("nonempty lane round");
-                (point, a, b, Some(lane))
-            }
+            };
+            (point, a, b, lane_id, None)
         };
-        trials += 1;
+        // A guard-only sentinel preserves its place in the query order. It
+        // has already charged its trial and guard probe while the batch was
+        // assembled, but never entered the oracle.
+        if from_pending && precomputed.is_none() {
+            continue;
+        }
+        if !from_pending {
+            trials += 1;
+        }
         // The guard: a target this run has already decomposed carries no
         // relation the matrix does not hold, and taking it again would
         // pin the logarithm by collision rather than by relation.
-        if guarded && !defer_guard {
+        if !from_pending && guarded && !defer_guard {
             guard_probes += 1;
             if seen.insert_duplicate(g.key(&point)) {
                 repeats_skipped += 1;
@@ -13753,8 +17171,72 @@ fn collect_and_solve_relations_scaled_touching<
                 continue;
             }
         }
-        measurement::mark(measurement::Phase::TargetPdp);
-        let relations = oracle(&mut rel.group_ops, &mut ctr, point, a, b);
+        let relations = if let Some(relations) = precomputed {
+            // Queue bookkeeping belongs to the target-PDP interval even
+            // when the native kernel evaluated this target in an earlier
+            // batch. Without the mark, an empty queued answer after a hit
+            // inherits the preceding target-descent phase.
+            measurement::mark(measurement::Phase::TargetPdp);
+            relations
+        } else if batch_enabled {
+            // Take the remaining entries from this already-prepared lane
+            // round in scalar query order. The full batch is charged even if
+            // an earlier answer completes the matrix; unused answers are
+            // reported below rather than silently discarded.
+            batch_meta.clear();
+            batch_meta.push((point, a, b, lane_id));
+            let mut guard_skip = None;
+            while batch_meta.len() < batch_width && trials < max_trials {
+                let Some((lane, next, next_a, next_b)) = lane_queue.pop_front() else {
+                    break;
+                };
+                trials += 1;
+                if guarded && !defer_guard {
+                    guard_probes += 1;
+                    if seen.insert_duplicate(g.key(&next)) {
+                        repeats_skipped += 1;
+                        lanes[lane].fresh = true;
+                        guard_skip = Some((next, next_a, next_b, Some(lane)));
+                        break;
+                    }
+                }
+                batch_meta.push((next, next_a, next_b, Some(lane)));
+            }
+            batch_points.clear();
+            batch_points.extend(batch_meta.iter().map(|entry| entry.0));
+            batch_coefficients.clear();
+            batch_coefficients.extend(batch_meta.iter().map(|entry| (entry.1, entry.2)));
+            batch_answers.clear();
+            batch_answers.resize_with(batch_points.len(), Vec::new);
+            measurement::mark(measurement::Phase::TargetPdp);
+            batch_oracle.as_deref_mut().expect("batch callback present")(
+                &mut rel.group_ops,
+                &mut ctr,
+                &batch_points,
+                &batch_coefficients,
+                &mut batch_answers,
+            );
+            oracle_batch_calls += 1;
+            oracle_batch_targets += batch_points.len() as u64;
+            oracle_batch_max_targets = oracle_batch_max_targets.max(batch_points.len() as u64);
+            let first = std::mem::take(
+                batch_answers
+                    .first_mut()
+                    .expect("batch contains current target"),
+            );
+            for index in 1..batch_meta.len() {
+                let (next, next_a, next_b, next_lane) = batch_meta[index];
+                let relations = std::mem::take(&mut batch_answers[index]);
+                batch_pending.push_back((next, next_a, next_b, next_lane, Some(relations)));
+            }
+            if let Some((next, next_a, next_b, next_lane)) = guard_skip {
+                batch_pending.push_back((next, next_a, next_b, next_lane, None));
+            }
+            first
+        } else {
+            measurement::mark(measurement::Phase::TargetPdp);
+            oracle(&mut rel.group_ops, &mut ctr, point, a, b)
+        };
         if relations.is_empty() {
             continue;
         }
@@ -13780,6 +17262,16 @@ fn collect_and_solve_relations_scaled_touching<
                 if !g.is_identity(&stride.0) {
                     break;
                 }
+            }
+            if sr_m > 0 {
+                // The progression continues from this target with the new
+                // stride: the rest of the block is dropped, the next block
+                // is built around `point + [m + 1]S'`.
+                if let Some(slot) = sr_slot.take() {
+                    sr_unused_plus += sr_plus_unused(slot, sr_m);
+                }
+                sr_anchor = (point, a, b);
+                sr_ready = false;
             }
         }
         // The relation enters the target's elimination: in this classic
@@ -13861,7 +17353,17 @@ fn collect_and_solve_relations_scaled_touching<
                 la_timed = true;
                 measurement::mark(measurement::Phase::RecoveryCheck);
                 let v_start = Instant::now();
-                let check = g.mul(&mut ver.group_ops, generator, d);
+                let check = match verify_ladder {
+                    RecoveryCheck::Ladder(ladder) if !ladder.is_empty() => {
+                        ladder_mul(g, &mut ver.group_ops, ladder, d)
+                    }
+                    RecoveryCheck::TauOrbit(tau) => {
+                        let (point, steps) = tau_orbit_mul(g, &mut ver.group_ops, tau, d);
+                        ver.count("tau_naf_recode_steps_uncharged", steps);
+                        point
+                    }
+                    _ => g.mul(&mut ver.group_ops, generator, d),
+                };
                 ver.wall_ns = v_start.elapsed().as_nanos() as u64;
                 if check == target {
                     recovered = Some(d);
@@ -13883,10 +17385,33 @@ fn collect_and_solve_relations_scaled_touching<
     rel.wall_ns = rel_start.elapsed().as_nanos() as u64 - la_ns - ver.wall_ns;
     rel.count("trials", trials);
     rel.count("relations", found);
+    if oracle_batch_calls > 0 {
+        rel.count("oracle_batch_preferred_width", batch_width as u64);
+        rel.count("oracle_batch_max_targets", oracle_batch_max_targets);
+        rel.count("oracle_batch_calls", oracle_batch_calls);
+        rel.count("oracle_batch_targets", oracle_batch_targets);
+        rel.count(
+            "oracle_batch_unused_results",
+            batch_pending
+                .iter()
+                .filter(|entry| entry.4.is_some())
+                .count() as u64,
+        );
+        rel.count(
+            "oracle_batch_unused_guarded_trials",
+            batch_pending
+                .iter()
+                .filter(|entry| entry.4.is_none())
+                .count() as u64,
+        );
+    }
     rel.count("lookups", ctr.lookups);
     rel.count("sqrt_solves", ctr.sqrt_solves);
     rel.count("inversions", ctr.inversions);
     rel.count("s4_pairs", ctr.s4_pairs);
+    if ctr.s4f_pairs > 0 {
+        rel.count("s4f_pairs", ctr.s4f_pairs);
+    }
     rel.count("s4_hits", ctr.s4_hits);
     rel.count("lift_failures", ctr.lift_failures);
     rel.count("unliftable_systems", ctr.unliftable_systems);
@@ -13895,7 +17420,33 @@ fn collect_and_solve_relations_scaled_touching<
     if ctr.frobenius_maps > 0 {
         rel.count("frobenius_maps", ctr.frobenius_maps);
     }
+    if ctr.point_negations > 0 {
+        rel.count("point_negations_uncharged", ctr.point_negations);
+    }
     rel.count("direct_relations_skipped", direct_skipped);
+    if sw_m > 0 {
+        // The sibling walk's own counts (zero-free: absent off the walk).
+        rel.count("walk_sibling_m", sw_m);
+        rel.count("walk_sibling_pairs", sw_pairs);
+        rel.count("walk_sibling_full_pairs", sw_full_pairs);
+        rel.count("walk_sibling_lifts", sw_lifts);
+        rel.count("walk_x_only_probes", sw_xprobes);
+        rel.work("sibling_second_points", sw_second);
+        rel.work("counted:sibling_second_points", 1);
+    }
+    if sr_m > 0 {
+        // The renewed sibling walk's own counts (absent off the walk).
+        rel.count("walk_sibling_m", sr_m as u64);
+        rel.count("walk_sibling_pairs", sw_pairs);
+        rel.count("walk_sibling_full_pairs", sw_full_pairs);
+        rel.count("walk_sibling_lifts", sw_lifts);
+        rel.count("walk_x_only_probes", sw_xprobes);
+        rel.count("walk_sibling_multiple_ops", sr_multiple_ops);
+        rel.count("walk_sibling_centres", sr_centres);
+        rel.count("walk_sibling_unused_plus", sr_unused_plus);
+        rel.work("sibling_second_points", sw_second);
+        rel.work("counted:sibling_second_points", 1);
+    }
     rel.count("repeated_targets_skipped", repeats_skipped);
     rel.count("target_guard_probes", guard_probes);
     if striding {
@@ -13907,6 +17458,7 @@ fn collect_and_solve_relations_scaled_touching<
     }
     if targets.is_walk() {
         rel.count("walk_jumps", walk_jumps + pool.len() as u64);
+        rel.count("walk_jumps_materialised", walk_jumps_materialised);
         rel.count("walk_pool_offsets", pool.len() as u64);
         rel.count("walk_pool_ops", pool_ops.adds + pool_ops.doubles);
         rel.count("walk_pool_restarts", pool_taken);
@@ -14068,6 +17620,7 @@ pub fn price_phase(phase: &mut PhaseCost, calib: &Calibration) {
     gae += conv("sqrt_solves", calib.ns_per_sqrt);
     gae += conv("as_solves", calib.ns_per_as_solve);
     gae += conv("s4_pairs", calib.ns_per_s4_pair);
+    gae += conv("s4f_pairs", calib.ns_per_s4f_pair);
     gae += conv("lookups", Some(calib.ns_per_lookup));
     gae += conv("row_ops", Some(calib.ns_per_row_op));
     gae += conv("legendre_symbols", calib.ns_per_legendre);
@@ -14928,6 +18481,25 @@ fn calibrate_binary(inst: &BinaryInstance, calib: &mut Calibration) {
 
 /// Nanoseconds per pair of the `S₄` pairs-and-solve loop, measured on
 /// random targets of this instance.
+/// [`calibrate_s4`] for the factored oracle, on the same random targets.
+pub fn calibrate_s4f(
+    inst: &BinaryInstance,
+    oracle: &FactoredSubspaceOracle,
+    calib: &mut Calibration,
+) {
+    let mut rng = StdRng::seed_from_u64(inst.r ^ 0x54);
+    let mut pairs = 0u64;
+    let start = Instant::now();
+    let mut tries = 0;
+    while tries < 3 || (pairs < 200_000 && tries < 64) {
+        let xr = rng.gen::<u64>() & inst.gf.mask;
+        let (_, p) = oracle.decompose(xr, &inst.gf);
+        pairs += p;
+        tries += 1;
+    }
+    calib.ns_per_s4f_pair = Some(start.elapsed().as_nanos() as f64 / pairs.max(1) as f64);
+}
+
 pub fn calibrate_s4(inst: &BinaryInstance, oracle: &SubspaceOracle, calib: &mut Calibration) {
     let mut rng = StdRng::seed_from_u64(inst.r ^ 0x54);
     let mut pairs = 0u64;
@@ -15209,6 +18781,13 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
     if let Some(o) = &s4 {
         calibrate_s4(inst, o, &mut calib);
     }
+    // Its factored counterpart (any parity of `n`).
+    let s4f = (m_used == 3 && inst.n <= cfg.s4_max_degree)
+        .then(|| FactoredSubspaceOracle::new(&basis, inst.b, &inst.gf))
+        .flatten();
+    if let Some(o) = &s4f {
+        calibrate_s4f(inst, o, &mut calib);
+    }
     let space = inst.group_order as f64;
     let exact_m2 = exact_decomposition_ceiling(&g, &fb.points, r, 2);
     let exact_m3 = exact_decomposition_ceiling(&g, &fb.points, r, 3);
@@ -15343,6 +18922,15 @@ pub fn run_char2_instance(inst: &BinaryInstance, cfg: &BoundaryConfig) -> Option
                     exact_m3,
                 ));
             }
+        }
+        if let Some(o) = &s4f {
+            variants.push((
+                "semaev_s4_factored_m3".into(),
+                Oracle::SemaevS4Factored { oracle: o },
+                random,
+                &fb,
+                exact_m3,
+            ));
         }
         // Round 2: the negation-folded table, walk targets, and the
         // two-summand row where it fits.
@@ -16108,6 +19696,25 @@ mod tests {
     }
 
     #[test]
+    fn rho_v3_jump_counts_are_powers_of_two() {
+        assert_eq!(round_jumps_pow2(120), 128);
+        assert_eq!(round_jumps_pow2(85), 64);
+        assert_eq!(round_jumps_pow2(16), 16);
+        assert_eq!(round_jumps_pow2(3), 4);
+        for bits in [20u32, 24, 28, 32] {
+            let r = (1u64 << (bits - 1)) | 1;
+            for w in [2u32, 3] {
+                let k = rho_v3_jumps_for(r, 2, w);
+                assert!(k.is_power_of_two(), "bits={bits} w={w} k={k}");
+                assert!((4..=4096).contains(&k), "bits={bits} w={w} k={k}");
+                if w <= 2 {
+                    assert!(k <= 64, "bits={bits} w={w} k={k} exceeds weight-2 cap");
+                }
+            }
+        }
+    }
+
+    #[test]
     fn curve25519_family_miniatures_are_consistent() {
         for k in [20u32, 24, 28, 32] {
             let inst = curve25519_family_instance(k).unwrap_or_else(|| panic!("no k={k}"));
@@ -16187,6 +19794,106 @@ mod tests {
                 reference::invmod(a, m),
                 "invmod({a}, {m})"
             );
+        }
+    }
+
+    /// `NegationClasses` with the select fast path of [`rho_canon`]
+    /// switched off: the branchy form it must equal.
+    struct BranchyNegation(NegationClasses);
+    impl<G: CountedGroup> RhoClasses<G> for BranchyNegation {
+        fn automorphisms(&self) -> u32 {
+            2
+        }
+        fn canon(&self, g: &G, ops: &mut GroupOps, p: G::Elt) -> (G::Elt, u64) {
+            RhoClasses::<G>::canon(&self.0, g, ops, p)
+        }
+        fn method(&self) -> &'static str {
+            "branchy negation"
+        }
+    }
+
+    #[test]
+    fn negation_canonicalisation_by_selects_equals_the_branches() {
+        for (bits, seed) in [(14u32, 59297u64), (20, 3), (30, 11)] {
+            let inst = find_prime_order_curve(bits, seed);
+            let g = &inst.curve;
+            let r = inst.r;
+            let gen = inst.generator_point();
+            let fast = NegationClasses { r };
+            let slow = BranchyNegation(NegationClasses { r });
+            let mut ops = GroupOps::default();
+            let mut points = vec![PrimePoint::INFINITY, gen, g.neg(gen)];
+            // A point of order two has `y = 0`: `neg` is the identity map.
+            points.push(PrimePoint::affine(5 % g.p, 0));
+            let mut pt = gen;
+            for _ in 0..2000 {
+                pt = g.add(&mut ops, pt, gen);
+                points.push(pt);
+            }
+            for (i, &p) in points.iter().enumerate() {
+                let i = i as u64;
+                for (a, b) in [
+                    (0, 0),
+                    (1, r - 1),
+                    (r - 1, 0),
+                    (i * 7919 % r, i * 104729 % r),
+                ] {
+                    let (mut c1, mut c2) = (7u64, 7u64);
+                    let x = rho_canon(g, &fast, &mut ops, p, a, b, r, &mut c1);
+                    let y = rho_canon(g, &slow, &mut ops, p, a, b, r, &mut c2);
+                    assert_eq!(x, y, "p={p:?} a={a} b={b} r={r}");
+                    assert_eq!(c1, c2);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn any_key_equals_matches_a_scan() {
+        let mut x = 0x9E37_79B9_7F4A_7C15u64;
+        let mut next = || {
+            x ^= x << 13;
+            x ^= x >> 7;
+            x ^= x << 17;
+            x
+        };
+        for len in 0..40usize {
+            for _ in 0..200 {
+                let keys: Vec<u64> = (0..len).map(|_| next() % 64).collect();
+                for key in [next() % 64, 0, 63, u64::MAX, 1 << 63] {
+                    assert_eq!(
+                        any_key_equals(&keys, key),
+                        keys.contains(&key),
+                        "len={len} key={key}"
+                    );
+                }
+            }
+        }
+        // Full-width keys, the hit in each lane and in the tail.
+        for len in [8usize, 9, 16, 17] {
+            for hit in 0..len {
+                let mut keys: Vec<u64> = (0..len as u64)
+                    .map(|i| i.wrapping_mul(0x1234_5678_9ABC_DEF1))
+                    .collect();
+                let key = 0xFEDC_BA98_7654_3210u64;
+                assert!(!any_key_equals(&keys, key));
+                keys[hit] = key;
+                assert!(any_key_equals(&keys, key), "len={len} hit={hit}");
+            }
+        }
+    }
+
+    #[test]
+    fn pick_word_is_the_select() {
+        for &(a, b) in &[
+            (0u64, 0u64),
+            (1, 2),
+            (u64::MAX, 0),
+            (0, u64::MAX),
+            (1 << 63, 5),
+        ] {
+            assert_eq!(pick_word(true, a, b), a);
+            assert_eq!(pick_word(false, a, b), b);
         }
     }
 
@@ -16511,6 +20218,26 @@ mod tests {
             );
             assert_eq!(v, 0, "S₃ must vanish on x(P ± Q)");
         }
+    }
+
+    #[test]
+    fn fp_p31_subexp_mersenne_matches_frozen_curve_json() {
+        let inst = fp_p31_subexp_mersenne_instance();
+        assert_eq!(inst.curve.p, 2_147_483_647);
+        assert_eq!(inst.r, 2_147_487_637);
+        assert_eq!(inst.cofactor, 1);
+        let g = inst.generator_point();
+        let mut ops = GroupOps::default();
+        let d = 987_654_321u64;
+        let q = inst.curve.mul(&mut ops, g, d);
+        assert_eq!(q.x, 291_202_666);
+        assert_eq!(q.y, 1_848_813_168);
+        let pinned = Calibration::default().pin("prime", "generated-31bit-2147483647");
+        assert!(
+            !pinned.pinned.is_empty(),
+            "table row must resolve for slug {:?}",
+            inst.name
+        );
     }
 
     #[test]
@@ -18251,6 +21978,186 @@ mod tests {
         assert_eq!(batch.build_ops.doubles, scalar.build_ops.doubles);
         assert_eq!(batch.build_ops.field_ops.invs, fb.abscissae as u64);
         assert!(batch.build_ops.field_ops.invs < scalar.build_ops.field_ops.invs);
+    }
+
+    #[test]
+    fn binary_batch_table_matches_scalar_table_and_witnesses() {
+        for (a, n, dimension) in [(0, 13, 5), (1, 17, 6)] {
+            let inst = koblitz_instance(a, n).expect("Koblitz fixture");
+            let basis: Vec<u64> = (0..dimension).map(|i| 1u64 << i).collect();
+            let fb = binary_subspace_factor_base(&inst, &basis);
+            let g = BinaryGroup(&inst.fast);
+            let scalar = PairTable::build_negation_folded(&g, &fb);
+            let batch = PairTable::build_negation_folded_binary_batch(&g, &fb);
+            assert_eq!(batch.map, scalar.map, "first witness at n={n}");
+            assert_eq!(batch.entries, scalar.entries);
+            assert_eq!(batch.insert_attempts, scalar.insert_attempts);
+            assert_eq!(batch.index_lookups, scalar.index_lookups);
+            assert_eq!(batch.build_ops, scalar.build_ops);
+            let mut scalar_ops = GroupOps::default();
+            let mut batch_ops = GroupOps::default();
+            let mut scalar_ctr = OracleCounters::default();
+            let mut batch_ctr = OracleCounters::default();
+            for k in 1..=200 {
+                let target = g.mul(&mut scalar_ops, inst.generator, k);
+                for m in [2, 3] {
+                    let lhs = decompose_mitm(
+                        &g,
+                        &fb,
+                        &scalar,
+                        m,
+                        &mut scalar_ops,
+                        &mut scalar_ctr,
+                        target,
+                    );
+                    let rhs =
+                        decompose_mitm(&g, &fb, &batch, m, &mut batch_ops, &mut batch_ctr, target);
+                    assert_eq!(rhs, lhs, "decomposition at n={n}, k={k}, m={m}");
+                }
+            }
+            assert_eq!(batch_ctr.lookups, scalar_ctr.lookups);
+        }
+    }
+
+    #[test]
+    fn binary_torsion_batch_preserves_every_first_witness() {
+        use crate::cryptanalysis::koblitz_index_calculus::build_standard_subspace_factor_base;
+
+        for (n, dimension, skipped) in [(13, 5, 16), (19, 7, 69), (23, 8, 137)] {
+            let inst = koblitz_instance(0, n).unwrap();
+            let frob =
+                build_standard_subspace_factor_base(inst.koblitz.as_ref().unwrap(), dimension)
+                    .unwrap();
+            let fb = koblitz_factor_base(
+                &inst,
+                &frob,
+                ColumnFold::SignedFrobeniusOrbit,
+                format!("d={dimension}"),
+            )
+            .unwrap();
+            let group = BinaryGroup(&inst.fast);
+            let scalar = PairTable::build_negation_folded(&group, &fb);
+            let (batch, old_collisions) =
+                PairTable::build_negation_folded_binary_batch_with_collisions(&group, &fb);
+            let (torsion, collisions, stats) =
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(&group, &fb)
+                    .unwrap();
+            assert_eq!(scalar.map, batch.map, "scalar/batch at n={n}");
+            assert_eq!(torsion.map, batch.map, "every first witness at n={n}");
+            for &key in batch.map.keys() {
+                assert_eq!(torsion.get(key), batch.get(key), "probe key {key} at n={n}");
+            }
+            assert_eq!(stats.skipped_twin_collisions, skipped);
+            assert_eq!(stats.inversion_lanes, skipped);
+            assert_eq!(stats.inversion_batches, 1);
+            assert_eq!(old_collisions.len(), collisions.len() + skipped as usize);
+            assert_eq!(torsion.insert_attempts + skipped, batch.insert_attempts);
+            assert_eq!(
+                torsion.build_ops.adds + fb.points.len() as u64,
+                batch.build_ops.adds
+            );
+
+            let mut corrupt = fb.clone();
+            corrupt.neg_index[1] = 0;
+            assert!(
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(
+                    &group, &corrupt,
+                )
+                .is_err()
+            );
+            let mut unsupported = inst.fast.clone();
+            unsupported.b = 2;
+            assert!(
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(
+                    &BinaryGroup(&unsupported),
+                    &fb,
+                )
+                .is_err()
+            );
+        }
+    }
+
+    #[test]
+    fn binary_dense_probe_preserves_torsion_first_witness_and_sign() {
+        use crate::cryptanalysis::koblitz_index_calculus::build_standard_subspace_factor_base;
+
+        for (n, dimension) in [(13, 5), (19, 7), (23, 8)] {
+            let inst = koblitz_instance(0, n).unwrap();
+            let frob =
+                build_standard_subspace_factor_base(inst.koblitz.as_ref().unwrap(), dimension)
+                    .unwrap();
+            let fb = koblitz_factor_base(
+                &inst,
+                &frob,
+                ColumnFold::SignedFrobeniusOrbit,
+                format!("d={dimension}"),
+            )
+            .unwrap();
+            let group = BinaryGroup(&inst.fast);
+            let (hash, hash_collisions, _) =
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(&group, &fb)
+                    .unwrap();
+            let (candidate, dense_collisions, _) =
+                PairTable::build_negation_folded_binary_batch_torsion_with_collisions(&group, &fb)
+                    .unwrap();
+            let dense = candidate.into_binary_dense(n).unwrap();
+            assert_eq!(hash_collisions, dense_collisions);
+            assert_eq!(dense.entries, hash.entries);
+            assert_eq!(dense.insert_attempts, hash.insert_attempts);
+            assert_eq!(dense.build_ops, hash.build_ops);
+            assert_eq!(dense.dense_bytes(), Some(((1u64 << n) + 1) * 8));
+            let work = dense.work_counters();
+            assert_eq!(work.get("table_dense_zero_words"), Some(&((1u64 << n) + 1)));
+            assert_eq!(work.get("table_dense_witness_writes"), Some(&dense.entries));
+            for (&key, &witness) in &hash.map {
+                assert_eq!(dense.get(key), Some(witness), "n={n} key={key}");
+            }
+            for key in [0, 1, 2, 3, 1u64 << n, (1u64 << n) + 1] {
+                assert_eq!(dense.get(key), hash.get(key), "n={n} key={key}");
+            }
+            if n == 13 {
+                for key in 0..=(1u64 << n) {
+                    assert_eq!(dense.get(key), hash.get(key), "all n=13 keys: {key}");
+                }
+            }
+            let mut keys: Vec<_> = hash.map.keys().copied().collect();
+            keys.sort_unstable();
+            for key in keys.into_iter().step_by(if n == 13 { 1 } else { 37 }) {
+                let (i, j) = hash.get(key).unwrap();
+                let target = group.add(
+                    &mut GroupOps::default(),
+                    fb.points[i as usize],
+                    fb.points[j as usize],
+                );
+                for point in [target, group.neg(target)] {
+                    let mut h_ops = GroupOps::default();
+                    let mut d_ops = GroupOps::default();
+                    let mut h_lookups = 0;
+                    let mut d_lookups = 0;
+                    assert_eq!(
+                        dense.probe(&group, &fb, &mut d_ops, &mut d_lookups, point),
+                        hash.probe(&group, &fb, &mut h_ops, &mut h_lookups, point),
+                        "n={n} key={key}"
+                    );
+                    assert_eq!(d_ops, h_ops);
+                    assert_eq!(d_lookups, h_lookups);
+                }
+            }
+            assert!(PairTable::build_negation_folded(&group, &fb)
+                .into_binary_dense(n)
+                .is_err());
+            if n == 13 {
+                assert!(
+                    PairTable::build_negation_folded_binary_batch_torsion_with_collisions(
+                        &group, &fb
+                    )
+                    .unwrap()
+                    .0
+                    .into_binary_dense(24)
+                    .is_err()
+                );
+            }
+        }
     }
 
     #[test]
@@ -20171,13 +24078,13 @@ mod wwalk_table_tests {
                 assert_eq!(n.steps, n.insert_attempts + n.identities_skipped);
                 assert_eq!(n.entries, v.entries);
                 assert_eq!(n.map.len(), v.map.len());
-                for (key, &(u, z, b)) in &v.map {
+                for (key, (u, z, b)) in v.map.iter() {
                     assert_eq!(u & TW_SIGN_BIT, 0);
-                    let &(nu, nz, nb) = n.map.get(key).expect("same keys");
+                    let (nu, nz, nb) = n.map.get(key).expect("same keys");
                     assert_eq!((nu & !TW_SIGN_BIT, nz, nb), (u, z, b));
                 }
                 // The relation loop's probe reads the same entry in both.
-                for &(u, z, b) in v.map.values().take(8) {
+                for (u, z, b) in v.map.values().take(8) {
                     // One seed: the u128 word holds `u` itself.
                     let Some(pt) = v.eval(g, &mut cops, u as u64, 0, z, b) else {
                         continue;
@@ -20265,9 +24172,9 @@ mod wwalk_table_tests {
                 assert_eq!(n.steps_rank_three, v.steps_rank_three);
                 assert_eq!(n.table_probes, v.table_probes);
                 assert_eq!(n.map.len(), v.map.len());
-                for (key, &(u, z, b)) in &v.map {
+                for (key, (u, z, b)) in v.map.iter() {
                     assert_eq!(u & TW_SIGN_BIT, 0);
-                    let &(nu, nz, nb) = n.map.get(key).expect("same keys");
+                    let (nu, nz, nb) = n.map.get(key).expect("same keys");
                     assert_eq!((nu & !TW_SIGN_BIT, nz, nb), (u, z, b));
                 }
                 assert_eq!(n.verify_ops, GroupOps::default());
@@ -20442,9 +24349,9 @@ mod wwalk_table_tests {
 
     /// `sib=m,pool=M` (sibling points): the recovered log equals the true
     /// one with one and two seeds, verified and lazy; the field operations
-    /// of the walk equal the formula (per parent `m` inversions, `2m + 1`
-    /// multiplications, `2m` squarings, less one multiplication and one
-    /// squaring per skipped known-copy minus child); a pair is one group
+    /// of the walk include a batch inversion per parent, one slope
+    /// multiplication and squaring per emitted sibling, and one eager
+    /// ordinate lift per sibling. A pair is one group
     /// addition and a second point is the priced native counter; and with
     /// `sib` off the build, its ledgers and its counters are the walk's.
     #[test]
@@ -20508,9 +24415,14 @@ mod wwalk_table_tests {
                         assert!(degenerate <= t.sib_degenerate);
                         if t.sib_degenerate == 0 {
                             assert_eq!(degenerate, 0);
-                            assert_eq!(f.invs, m as u64 * parents);
-                            assert_eq!(f.muls, (2 * m as u64 + 1) * parents - skipped);
-                            assert_eq!(f.sqrs, 2 * m as u64 * parents - skipped);
+                            // One Montgomery batch inversion per parent
+                            // expansion (was `m` serial inversions).
+                            assert_eq!(f.invs, parents);
+                            let batch_muls = 3 * (m as u64 - 1) * parents;
+                            let siblings = pairs + second;
+                            assert_eq!(t.sib_lifts, siblings);
+                            assert_eq!(f.muls, 2 * siblings + batch_muls);
+                            assert_eq!(f.sqrs, siblings);
                             assert!(skipped <= 2 * parents);
                         }
                         assert_eq!(t.walk_ops.adds, pairs + degenerate);
@@ -20756,6 +24668,176 @@ mod wwalk_table_tests {
         }
     }
 
+    /// `lcheck`: [`ladder_mul`] over the target walk's stored `[2^i]G`
+    /// chain ([`TargetWalk::g_ladder`]) and `g.mul` agree on `[d]G` for 50
+    /// random `d` on a 20-bit prime-order curve, and the ladder charges no
+    /// more group operations than the double-and-add (no doubling at all
+    /// with a full ladder); a short ladder's high-bit path agrees too.
+    #[test]
+    fn lcheck_ladder_mul_agrees_with_mul_and_charges_no_more() {
+        let inst = prime_instance_for(20, 3);
+        let g = &inst.curve;
+        let (r, h) = (inst.r, inst.cofactor);
+        let gen = inst.generator_point();
+        let mut cops = GroupOps::default();
+        let q = g.mul(&mut cops, gen, 1 + r / 3);
+        let fb = prime_factor_base(&inst, 1);
+        let tw = TargetWalk::build_lcheck(
+            g, gen, q, &fb, r, h, 1.5, 16, true, 5, true, 1, true, None, false, true,
+        )
+        .unwrap();
+        let ladder = tw.g_ladder();
+        let rbits = (64 - (r - 1).leading_zeros()) as usize;
+        assert_eq!(ladder.len(), rbits);
+        assert_eq!(ladder[0], gen);
+        for w in ladder.windows(2) {
+            assert_eq!(g.double(&mut cops, w[0]), w[1]);
+        }
+        let mut rng = StdRng::seed_from_u64(0x1C4E_C4);
+        let (mut lad_total, mut mul_total) = (0u64, 0u64);
+        for _ in 0..50 {
+            let d = rng.gen_range(0..r);
+            let (mut lo, mut mo) = (GroupOps::default(), GroupOps::default());
+            let a = ladder_mul(g, &mut lo, &ladder, d);
+            let b = g.mul(&mut mo, gen, d);
+            assert_eq!(a, b, "d = {d}");
+            assert_eq!(lo.scalar_mults, mo.scalar_mults);
+            assert_eq!(lo.doubles, 0);
+            assert!(lo.adds + lo.doubles <= mo.adds + mo.doubles, "d = {d}");
+            assert!(lo.gae() <= mo.gae(), "d = {d}");
+            lad_total += lo.adds + lo.doubles;
+            mul_total += mo.adds + mo.doubles;
+            // A ladder shorter than bits(r): the high bits by double-and-add.
+            let mut so = GroupOps::default();
+            assert_eq!(ladder_mul(g, &mut so, &ladder[..rbits / 2], d), b);
+        }
+        assert!(lad_total < mul_total);
+    }
+
+    /// `lcheck=1` against `lcheck=0` (same seed, lazy, one and two seeds,
+    /// plain and chained jumps): the walk, its collisions, rows, entries,
+    /// rank and every counter but `tw_lazy_check_adds|doubles` are equal;
+    /// the final check runs as often, succeeds as often, and charges no
+    /// more.  `lcheck=0` is `build_ext` exactly.  The pipeline's recovery
+    /// check over the walk's rows recovers the same log with the ladder,
+    /// charging no more verification ops.
+    #[test]
+    fn lcheck_changes_only_the_check_counters() {
+        let inst = prime_instance_for(12, 3);
+        let g = &inst.curve;
+        let (r, h) = (inst.r, inst.cofactor);
+        let gen = inst.generator_point();
+        let mut cops = GroupOps::default();
+        let mut checks = 0u64;
+        let mut pipeline_runs = 0u64;
+        for seeds in [1usize, 2] {
+            let fb = prime_factor_base(&inst, seeds);
+            for cheap in [false, true] {
+                for seed in 0..16u64 {
+                    let k = 1 + (seed * 7919 + 13) % (r - 1);
+                    let q = g.mul(&mut cops, gen, k);
+                    let build = |lcheck| {
+                        TargetWalk::build_lcheck(
+                            g, gen, q, &fb, r, h, 1.5, 16, cheap, seed, true, seeds, true, None,
+                            false, lcheck,
+                        )
+                        .unwrap()
+                    };
+                    let (a, b) = (build(false), build(true));
+                    let base = TargetWalk::build_ext(
+                        g, gen, q, &fb, r, h, 1.5, 16, cheap, seed, true, seeds,
+                    )
+                    .unwrap();
+                    assert_eq!(base.work_counters(), a.work_counters());
+                    assert_eq!(base.build_ops, a.build_ops);
+                    assert_eq!(base.lazy_check_ops, a.lazy_check_ops);
+                    assert_eq!((a.lcheck, b.lcheck), (false, true));
+                    assert_eq!(a.steps, b.steps);
+                    assert_eq!(a.entries, b.entries);
+                    assert_eq!(a.collisions, b.collisions);
+                    assert_eq!(a.rows, b.rows);
+                    assert_eq!((a.rank, a.zero_rows), (b.rank, b.zero_rows));
+                    assert_eq!(a.jump_coefs, b.jump_coefs);
+                    assert_eq!(
+                        (a.setup_ops, a.walk_ops, a.verify_ops),
+                        (b.setup_ops, b.walk_ops, b.verify_ops)
+                    );
+                    assert_eq!(
+                        (a.lazy_checks, a.lazy_failures, a.lazy_dropped_rows),
+                        (b.lazy_checks, b.lazy_failures, b.lazy_dropped_rows)
+                    );
+                    assert_eq!(a.lazy_check_ops.scalar_mults, b.lazy_check_ops.scalar_mults);
+                    assert!(
+                        b.lazy_check_ops.adds + b.lazy_check_ops.doubles
+                            <= a.lazy_check_ops.adds + a.lazy_check_ops.doubles
+                    );
+                    assert_eq!(b.lazy_check_ops.doubles, 0);
+                    checks += b.lazy_checks;
+                    let (ca, cb) = (a.work_counters(), b.work_counters());
+                    assert_eq!(ca.keys().collect::<Vec<_>>(), cb.keys().collect::<Vec<_>>());
+                    for (name, v) in &ca {
+                        if !name.starts_with("tw_lazy_check_") {
+                            assert_eq!(Some(v), cb.get(name), "{name}");
+                        }
+                    }
+                    // The pipeline's recovery check over the walk's rows.
+                    if b.rank < b.need() {
+                        continue;
+                    }
+                    let run = |ladder: Option<&[PrimePoint]>| {
+                        let mut matrix = IncrementalGauss::new(fb.columns + 1, r);
+                        let mut first = true;
+                        collect_and_solve_relations_touching_ladder(
+                            g,
+                            gen,
+                            q,
+                            r,
+                            h,
+                            &fb,
+                            seed,
+                            64,
+                            TargetSource::Random,
+                            RestartPool::Lazy,
+                            &mut matrix,
+                            CompletionRule::TargetPinned,
+                            |_, _, _, _, _| {
+                                if !std::mem::take(&mut first) {
+                                    return Vec::new();
+                                }
+                                b.rows
+                                    .iter()
+                                    .map(|row| Relation::Row {
+                                        columns: row.columns.clone(),
+                                        a: row.a,
+                                        b: row.b,
+                                    })
+                                    .collect()
+                            },
+                            |_| {},
+                            false,
+                            ladder,
+                        )
+                    };
+                    let ladder = b.g_ladder();
+                    let (pa, pb, pn) = (run(None), run(Some(&ladder)), run(Some(&[])));
+                    assert_eq!(pa.recovered, Some(k));
+                    assert!(pa.verified && pb.verified);
+                    assert_eq!(pa.recovered, pb.recovered);
+                    assert_eq!(pa.verify.group_ops, pn.verify.group_ops);
+                    assert_eq!(pa.trials, pb.trials);
+                    assert_eq!(pa.relations.group_ops, pb.relations.group_ops);
+                    assert_eq!(pb.verify.group_ops.doubles, 0);
+                    assert!(
+                        pb.verify.group_ops.adds + pb.verify.group_ops.doubles
+                            <= pa.verify.group_ops.adds + pa.verify.group_ops.doubles
+                    );
+                    pipeline_runs += 1;
+                }
+            }
+        }
+        assert!(checks > 0 && pipeline_runs > 0);
+    }
+
     /// Fault injection: one stored coefficient (`z` of the first collision's
     /// kept entry) is corrupted.  The verified build rejects the collision.
     /// The lazy target walk keeps the row, its in-build final check fails,
@@ -20793,6 +24875,7 @@ mod wwalk_table_tests {
                         Some(0),
                         None,
                         false,
+                        false,
                     )
                     .unwrap();
                     let lazy = TargetWalk::build_inner(
@@ -20811,6 +24894,7 @@ mod wwalk_table_tests {
                         true,
                         Some(0),
                         None,
+                        false,
                         false,
                     )
                     .unwrap();
@@ -21066,5 +25150,416 @@ mod solver_unit_key_tests {
         let mut both = phase;
         price_phase(&mut both, &c);
         assert_eq!(both.gae, 5.0 + 250.0 + 64.0 * 4.0 / 2.0);
+    }
+}
+
+#[cfg(test)]
+mod ksum_wide_index_tests {
+    use super::*;
+
+    /// k ≤ 5 keeps the 12-bit layout every recorded table used; above it the
+    /// width fills a `u64`.
+    #[test]
+    fn index_width_is_twelve_bits_up_to_k5_and_fills_a_u64_above() {
+        for k in 3..=5 {
+            assert_eq!(ksum_index_bits(k), KSUM_INDEX_BITS, "k = {k}");
+        }
+        assert_eq!([6, 7, 8, 9].map(ksum_index_bits), [10, 9, 8, 7]);
+        for k in 3..=KSUM_MAX_K {
+            assert!(k * ksum_index_bits(k) <= 64, "k = {k}");
+        }
+        assert_eq!(KSUM_MAX_K, 9);
+    }
+
+    /// `prune` builds the same table (keys, entries, inserts) and spends
+    /// only the adds of partial sums that can still reach k summands:
+    /// `Σ_{j=2..k} 2^(j-1)·C(a-(k-j), j)` against `Σ 2^(j-1)·C(a, j)`.
+    #[test]
+    fn pruned_build_is_the_same_table_with_fewer_adds() {
+        let inst = prime_instance_for(24, 5);
+        let g = &inst.curve;
+        let choose = |n: u64, j: u64| (0..j).fold(1u64, |c, i| c * (n - i) / (i + 1));
+        for (k, a) in [(3u32, 14usize), (4, 12), (5, 11), (6, 12), (7, 11)] {
+            let fb = prime_factor_base(&inst, a);
+            let full = KSumTable::build_negation_folded_opts(g, &fb, k, true, false).unwrap();
+            let pr = KSumTable::build_negation_folded_opts(g, &fb, k, true, true).unwrap();
+            assert_eq!(full.map, pr.map, "k = {k}");
+            assert_eq!(full.collisions, pr.collisions, "k = {k}");
+            assert_eq!(full.insert_attempts, pr.insert_attempts, "k = {k}");
+            assert_eq!(full.entries, pr.entries, "k = {k}");
+            let a = a as u64;
+            let k = u64::from(k);
+            let want_full: u64 = (2..=k).map(|j| (1u64 << (j - 1)) * choose(a, j)).sum();
+            let want_pr: u64 = (2..=k)
+                .map(|j| (1u64 << (j - 1)) * choose(a - (k - j), j))
+                .sum();
+            // Identities are skipped before their subtree, so the counts
+            // can fall a little short of the formula, never above it.
+            assert!(full.build_ops.adds <= want_full && full.build_ops.adds + 64 >= want_full);
+            assert!(pr.build_ops.adds <= want_pr && pr.build_ops.adds + 64 >= want_pr);
+            assert!(pr.build_ops.adds < full.build_ops.adds, "k = {k}");
+        }
+    }
+
+    /// `split` builds the same table (keys, entries, inserts, collisions,
+    /// in the same order) on prime and binary curves, with or without
+    /// `prune`, and saves the `(k − 1)`-summand partial sums: exactly
+    /// `2^{k−2}·C(a − 1, k − 1) − 2·C(a − k + 2, 2)` adds below the pruned
+    /// build when no partial sum is the identity.
+    #[test]
+    fn split_build_is_the_same_table_with_fewer_adds() {
+        let choose = |n: u64, j: u64| (0..j).fold(1u64, |c, i| c * (n - i) / (i + 1));
+        let check = |name: &str, unsplit: &KSumTable, split: &KSumTable, a: u64, k: u64| {
+            assert_eq!(unsplit.map, split.map, "{name} k = {k}");
+            assert_eq!(unsplit.collisions, split.collisions, "{name} k = {k}");
+            assert_eq!(
+                unsplit.insert_attempts, split.insert_attempts,
+                "{name} k = {k}"
+            );
+            assert_eq!(unsplit.entries, split.entries, "{name} k = {k}");
+            assert_eq!(
+                split.split_pair_adds,
+                2 * choose(a - k + 2, 2),
+                "{name} k = {k}"
+            );
+            assert_eq!(unsplit.split_pair_adds, 0);
+            // k = 3: the pair table costs what level 2 did (2·C(a − 1, 2)),
+            // so only k ≥ 4 saves adds.
+            assert!(
+                split.build_ops.adds <= unsplit.build_ops.adds
+                    && (k == 3 || split.build_ops.adds < unsplit.build_ops.adds),
+                "{name} k = {k}"
+            );
+        };
+        let inst = prime_instance_for(24, 5);
+        let g = &inst.curve;
+        for (k, a) in [(3u32, 14usize), (4, 12), (5, 11), (5, 10), (6, 12), (7, 11)] {
+            let fb = prime_factor_base(&inst, a);
+            let a = fb.abscissae as u64;
+            for prune in [false, true] {
+                let base = KSumTable::build_negation_folded_opts(g, &fb, k, true, prune).unwrap();
+                let sp =
+                    KSumTable::build_negation_folded_split(g, &fb, k, true, prune, true).unwrap();
+                check("prime", &base, &sp, a, u64::from(k));
+                if prune {
+                    let k = u64::from(k);
+                    let level = (1u64 << (k - 2)) * choose(a - 1, k - 1);
+                    let want = base.build_ops.adds - level + 2 * choose(a - k + 2, 2);
+                    // Identity partials skip subtrees in both builds.
+                    assert!(
+                        sp.build_ops.adds <= want && sp.build_ops.adds + 64 >= want,
+                        "prime k = {k}: {} against {want}",
+                        sp.build_ops.adds
+                    );
+                }
+            }
+        }
+        let bin = random_binary_instance(17, 3, 4).expect("binary instance");
+        let bg = BinaryGroup(&bin.fast);
+        let fb = binary_subspace_factor_base(&bin, &[1, 2, 4, 8, 16]);
+        let a = fb.abscissae as u64;
+        assert!(a >= 8, "binary base has {a} abscissae");
+        for k in [3u32, 4, 5] {
+            let base = KSumTable::build_negation_folded_opts(&bg, &fb, k, true, true).unwrap();
+            let sp = KSumTable::build_negation_folded_split(&bg, &fb, k, true, true, true).unwrap();
+            check("binary", &base, &sp, a, u64::from(k));
+        }
+    }
+
+    /// `sib` builds the same table (keys, witnesses, collisions, inserts),
+    /// and each last-level signed pair is one charged addition plus one
+    /// `sibling_second_points`, so exactly that many additions go, and as
+    /// many inversions: one per pair instead of two.
+    #[test]
+    fn sibling_build_is_the_same_table_with_one_inversion_per_last_pair() {
+        let inst = prime_instance_for(24, 5);
+        let g = &inst.curve;
+        for (k, a) in [(3u32, 14usize), (4, 12), (5, 11), (6, 12)] {
+            let fb = prime_factor_base(&inst, a);
+            for prune in [false, true] {
+                let base =
+                    KSumTable::build_negation_folded_full(g, &fb, k, true, prune, false).unwrap();
+                let sib =
+                    KSumTable::build_negation_folded_full(g, &fb, k, true, prune, true).unwrap();
+                assert_eq!(base.map, sib.map, "k = {k}, prune = {prune}");
+                assert_eq!(base.collisions, sib.collisions, "k = {k}");
+                assert_eq!(base.insert_attempts, sib.insert_attempts, "k = {k}");
+                assert_eq!(base.entries, sib.entries, "k = {k}");
+                let pairs = sib.sib_second_points;
+                assert!(pairs > 0, "k = {k}");
+                assert_eq!(base.build_ops.adds, sib.build_ops.adds + pairs, "k = {k}");
+                assert_eq!(
+                    base.build_ops.field_ops.invs,
+                    sib.build_ops.field_ops.invs + pairs,
+                    "k = {k}"
+                );
+                let w = sib.work_counters();
+                assert_eq!(w.get("sibling_second_points"), Some(&pairs));
+                assert_eq!(w.get("counted:sibling_second_points"), Some(&1));
+                assert!(!base.work_counters().contains_key("sibling_second_points"));
+            }
+            // `split` never forms the partials `sib` pairs: an explicit error.
+            let both = KSumTable::build_negation_folded_all(g, &fb, k, true, true, true, true);
+            assert!(both.is_err(), "k = {k}");
+        }
+    }
+
+    /// `prefix` keeps every `k`-sum entry of the build without it (same
+    /// key, same packed summands, same collisions, same group operations)
+    /// and adds entries for the partial sums of fewer than `k` summands
+    /// the build formed anyway, each a correct decomposition: a probe of
+    /// such a sum answers with fewer than `k` summands adding to it.
+    #[test]
+    fn prefix_build_keeps_the_ksum_table_and_adds_shorter_sums() {
+        fn check<G: CountedGroup>(name: &str, g: &G, fb: &FactorBase<G::Elt>, k: u32, split: bool) {
+            let base =
+                KSumTable::build_negation_folded_prefix(g, fb, k, true, true, split, false, false)
+                    .unwrap();
+            let off = KSumTable::build_negation_folded_split(g, fb, k, true, true, split).unwrap();
+            let on =
+                KSumTable::build_negation_folded_prefix(g, fb, k, true, true, split, false, true)
+                    .unwrap();
+            assert_eq!(base.map, off.map, "{name} k = {k}");
+            assert_eq!(base.insert_attempts, off.insert_attempts);
+            assert_eq!(base.prefix_entries, 0);
+            assert_eq!(
+                on.build_ops, base.build_ops,
+                "{name} k = {k}: no added operation"
+            );
+            assert_eq!(on.collisions, base.collisions, "{name} k = {k}");
+            for (key, packed) in &base.map {
+                assert_eq!(on.map.get(key), Some(packed), "{name} k = {k}");
+            }
+            assert_eq!(on.entries, base.entries + on.prefix_entries);
+            assert!(on.prefix_entries > 0, "{name} k = {k}");
+            assert!(on.insert_attempts >= base.insert_attempts + on.prefix_entries);
+            let mut ops = GroupOps::default();
+            let mut lookups = 0;
+            let mut shorter = 0;
+            for (key, packed) in &on.map {
+                let summands = on.unpack(*packed);
+                if base.map.contains_key(key) {
+                    assert_eq!(summands.len(), k as usize);
+                    continue;
+                }
+                assert!(
+                    !summands.is_empty() && summands.len() < k as usize,
+                    "{name}"
+                );
+                let mut s = fb.points[summands[0]];
+                for &i in &summands[1..] {
+                    s = g.add(&mut ops, s, fb.points[i]);
+                }
+                assert_eq!(g.key(&s) >> 1, *key, "{name} k = {k}");
+                for t in [s, g.neg(s)] {
+                    let got = on
+                        .probe(g, fb, &mut ops, &mut lookups, t)
+                        .expect("prefix hit");
+                    assert_eq!(got.len(), summands.len());
+                    assert!(is_sum_of_base(g, fb, &got, t), "{name} k = {k}");
+                }
+                shorter += 1;
+            }
+            assert_eq!(shorter, on.prefix_entries, "{name} k = {k}");
+        }
+        let inst = prime_instance_for(24, 5);
+        for (k, a) in [(3u32, 14usize), (4, 12), (5, 11), (6, 12)] {
+            let fb = prime_factor_base(&inst, a);
+            for split in [false, true] {
+                check("prime", &inst.curve, &fb, k, split);
+            }
+        }
+        let bin = random_binary_instance(17, 3, 4).expect("binary instance");
+        let bg = BinaryGroup(&bin.fast);
+        let fb = binary_subspace_factor_base(&bin, &[1, 2, 4, 8, 16]);
+        for k in [3u32, 4, 5] {
+            check("binary", &bg, &fb, k, true);
+        }
+    }
+
+    fn is_sum_of_base<G: CountedGroup>(
+        g: &G,
+        fb: &FactorBase<G::Elt>,
+        summands: &[usize],
+        target: G::Elt,
+    ) -> bool {
+        let mut ops = GroupOps::default();
+        let mut s = fb.points[summands[0]];
+        for &i in &summands[1..] {
+            s = g.add(&mut ops, s, fb.points[i]);
+        }
+        s == target
+    }
+
+    /// Tables for k = 3..9 hold every signed k-sum: a probe of a sum of k
+    /// base points at distinct abscissae (not an identity) answers with k
+    /// summands that add to it; the entry layout of k = 3, 4, 5 is the old
+    /// 12-bit one (`i0 | i1 << 12 | …`).
+    #[test]
+    fn tables_up_to_k9_answer_every_sum_of_distinct_abscissae() {
+        let inst = prime_instance_for(24, 5);
+        let g = &inst.curve;
+        for (k, a) in [
+            (3u32, 14usize),
+            (4, 12),
+            (5, 11),
+            (6, 12),
+            (7, 11),
+            (8, 10),
+            (9, 10),
+        ] {
+            let fb = prime_factor_base(&inst, a);
+            let t = KSumTable::build_negation_folded(g, &fb, k).expect("table builds");
+            assert_eq!(t.k, k);
+            assert!(t.entries > 0 && t.entries <= t.insert_attempts);
+            // One insert per signed k-sum of distinct abscissae, minus identities.
+            let sums = (1u64 << (k - 1))
+                * (0..u64::from(k)).fold(1u64, |c, i| c * (a as u64 - i) / (i + 1));
+            assert!(
+                t.insert_attempts <= sums && t.insert_attempts + 8 >= sums,
+                "k = {k}"
+            );
+            let bits = ksum_index_bits(k);
+            for &packed in t.map.values().take(2000) {
+                if bits * k < 64 {
+                    assert_eq!(packed >> (bits * k), 0, "k = {k}: stray high bits");
+                }
+                let idx = t.unpack(packed);
+                assert_eq!(idx.len(), k as usize);
+                // Re-pack with the documented layout: first summand lowest.
+                let repacked = idx.iter().rev().fold(0u64, |w, &i| (w << bits) | i as u64);
+                assert_eq!(repacked, packed);
+                if k <= 5 {
+                    assert_eq!(packed & 0xfff, idx[0] as u64, "12-bit layout, k = {k}");
+                }
+            }
+            // Probe sums built from signed points at strictly increasing abscissae.
+            let groups: Vec<&Vec<usize>> = fb
+                .abscissa_list
+                .iter()
+                .map(|x| fb.x_index.get(x).unwrap())
+                .collect();
+            let mut probed = 0;
+            for start in 0..groups.len().saturating_sub(k as usize - 1) {
+                let pick: Vec<usize> = (0..k as usize)
+                    .map(|d| groups[start + d][(start + d) % groups[start + d].len()])
+                    .collect();
+                let mut ops = GroupOps::default();
+                let mut target = fb.points[pick[0]];
+                for &i in &pick[1..] {
+                    target = g.add(&mut ops, target, fb.points[i]);
+                }
+                if g.is_identity(&target) {
+                    continue;
+                }
+                let mut lookups = 0;
+                let mut cops = GroupOps::default();
+                let found = t
+                    .probe(g, &fb, &mut cops, &mut lookups, target)
+                    .unwrap_or_else(|| panic!("k = {k}: a sum of base points is missing"));
+                assert_eq!(found.len(), k as usize);
+                assert!(is_sum_of_base(g, &fb, &found, target), "k = {k}");
+                probed += 1;
+            }
+            assert!(probed > 0, "k = {k}: nothing probed");
+        }
+    }
+
+    /// The packed index limits and the entry guard refuse with a clear error.
+    #[test]
+    fn too_large_a_base_or_arity_is_refused() {
+        let inst = prime_instance_for(24, 5);
+        let g = &inst.curve;
+        let big = prime_factor_base(&inst, 520); // 1040 signed points
+        let msg = |r: Result<KSumTable, String>| r.err().expect("must be refused");
+        assert!(msg(KSumTable::build_negation_folded(g, &big, 6)).contains("10 bits"));
+        let mid = prime_factor_base(&inst, 70); // 140 signed points: too many for k = 9 (7 bits)
+        assert!(msg(KSumTable::build_negation_folded(g, &mid, 9)).contains("7 bits"));
+        let small = prime_factor_base(&inst, 10);
+        assert!(msg(KSumTable::build_negation_folded(g, &small, 2)).contains("k = 3 to 9"));
+        assert!(msg(KSumTable::build_negation_folded(g, &small, 10)).contains("k = 3 to 9"));
+        // 1000 points fit 10 bits, but 2^5 C(500, 6) sums are far above the entry limit.
+        let wide = prime_factor_base(&inst, 500);
+        assert!(msg(KSumTable::build_negation_folded(g, &wide, 6)).contains("above the limit"));
+    }
+}
+
+#[cfg(test)]
+mod tw_table_tests {
+    use super::{TwEntry, TwTable};
+    use std::collections::HashMap;
+
+    /// The table answers like a `HashMap` insert-or-get: same vacancy, same
+    /// stored value on a second insert, same length, across the edge keys
+    /// 0 and `u64::MAX`, a size hint far too small (forces growth) and a
+    /// table above the prefault threshold.
+    fn agree(hint: usize, keys: usize, seed: u64) {
+        let mut state = seed;
+        let mut next = || {
+            state = state
+                .wrapping_mul(6364136223846793005)
+                .wrapping_add(1442695040888963407);
+            state >> 11
+        };
+        let mut table = TwTable::with_capacity(hint);
+        let mut reference: HashMap<u64, (u128, u64, u64)> = HashMap::new();
+        let mut inserted = 0usize;
+        for i in 0..keys {
+            let key = match i % 997 {
+                0 => 0,
+                1 => u64::MAX,
+                _ => next() % (3 * keys as u64 / 2 + 1),
+            };
+            let val = (
+                (u128::from(next()) << 64 | u128::from(next())) & !(1u128 << 127),
+                next(),
+                next(),
+            );
+            match (table.entry(key), reference.get(&key)) {
+                (TwEntry::Vacant(slot), None) => {
+                    slot.insert(val);
+                    reference.insert(key, val);
+                    inserted += 1;
+                }
+                (TwEntry::Occupied(got), Some(want)) => assert_eq!(got, *want, "key {key}"),
+                (TwEntry::Vacant(_), Some(_)) => panic!("key {key}: vacant, but stored"),
+                (TwEntry::Occupied(_), None) => panic!("key {key}: occupied, but never stored"),
+            }
+            assert_eq!(table.len(), inserted);
+            assert_eq!(table.len(), reference.len());
+        }
+    }
+
+    #[test]
+    fn matches_hashmap_with_exact_hint() {
+        agree(20_000, 20_000, 1);
+    }
+
+    #[test]
+    fn matches_hashmap_when_the_hint_is_too_small() {
+        agree(4, 50_000, 2);
+    }
+
+    #[test]
+    fn matches_hashmap_above_the_prefault_threshold() {
+        // 40-byte slots: 12_000 entries is about 640 KiB, above 256 KiB.
+        agree(12_000, 14_000, 3);
+    }
+
+    #[test]
+    fn edge_keys_round_trip() {
+        let mut table = TwTable::with_capacity(8);
+        for key in [0u64, 1, u64::MAX - 1, u64::MAX] {
+            let val = (u128::from(key) << 7, key ^ 5, key.rotate_left(3));
+            match table.entry(key) {
+                TwEntry::Vacant(slot) => slot.insert(val),
+                TwEntry::Occupied(_) => panic!("fresh key {key} occupied"),
+            }
+            match table.entry(key) {
+                TwEntry::Occupied(got) => assert_eq!(got, val),
+                TwEntry::Vacant(_) => panic!("key {key} lost"),
+            }
+        }
+        assert_eq!(table.len(), 4);
     }
 }

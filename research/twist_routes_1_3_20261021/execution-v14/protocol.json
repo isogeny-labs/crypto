@@ -1,0 +1,366 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-rank-repair-v1",
+  "version": 1,
+  "created": "2026-10-28",
+  "repository": "crypto",
+  "study_dir": "research/twist_routes_1_3_20261021/execution-v14",
+  "question": "Which fixed ordinary/twist progression bases and matched alpha augmentations identify the target coordinate from exact relation matrices?",
+  "claims": [
+    {
+      "id": "target-fiber",
+      "text": "Target uniqueness is equivalent to zero target projection on the homogeneous kernel; abstract group theorem with explicit concrete bridge gap.",
+      "class": "theorem",
+      "decided_by": []
+    },
+    {
+      "id": "fixed-panel",
+      "text": "All42 base configurations and252 planned matrix cells are reported, preserving underfills and complete witness/row/kernel/recovery outcomes.",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-check"
+      ]
+    },
+    {
+      "id": "scope",
+      "text": "No measured cost, typical-case, novelty, larger-curve, NIST or original full-campaign conclusion.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "description": "Native complete base/witness/row/RREF/kernel/point-recovery census.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "d377251611bc9fd3da22096c3b128862816ef268",
+        "build": [
+          [
+            "cargo",
+            "+1.90.0",
+            "build",
+            "--release",
+            "--offline",
+            "--locked",
+            "--manifest-path",
+            "research/twist_routes_1_3_20261021/runner/Cargo.toml",
+            "--bin",
+            "twist-rank-repair"
+          ]
+        ],
+        "binary_sha256": "f811e0dac685bc4f97296825e13db05e0d403c0ca0165afed14fd2bb0486bd81",
+        "threads": 1
+      }
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "description": "Independent GP base/map/catalog/matrix/kernel/recovery replay.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "d377251611bc9fd3da22096c3b128862816ef268",
+        "build": [
+          [
+            "gp",
+            "-f",
+            "-q",
+            "verify.gp"
+          ]
+        ],
+        "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+        "threads": 1
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Exact deterministic complete fixed panel, no timing/statistical inference or noise estimate."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Embedded full-rank and deficient-rank/target-fixed systems, F101 complete catalog controls and two archived bases/64 historical queries; no separate measured arm."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Embedded deficient-rank target-ambiguous, duplicate-row and wrong scalar354 controls; no statistical null population."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "base size",
+        "levels": [
+          "8",
+          "12",
+          "16"
+        ]
+      },
+      {
+        "name": "rule",
+        "levels": [
+          "low-x",
+          "curve-orbit shifts1/3",
+          "twist-first shifts1/3",
+          "twist-maximal shifts1/3"
+        ]
+      },
+      {
+        "name": "augmentation",
+        "levels": [
+          "plain",
+          "alpha-half"
+        ]
+      },
+      {
+        "name": "matrix query arity",
+        "levels": [
+          "2",
+          "3",
+          "2+3"
+        ]
+      },
+      {
+        "name": "known internal alpha equations",
+        "levels": [
+          "off",
+          "on"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "Frozen native field/map/fiber code and GP engine; independent algorithms, exact equalities.",
+        "how": "Record source/binary hashes and strict actual process/script/output bindings."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "Public p827/G/Q and archived v8 seeds/bases/queries,v10 map; all fixed rules, no output-selected refill.",
+        "how": "Complete42 configuration census, underfills and zero cases kept; historical bases replayed."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Managed local L0, one thread/CPU0/4GiB, no admitted clock.",
+        "how": "Record actual kernel/CPU/memory; standing EKS access/image fallback."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Same author/host, known fixture motivates panel; no masked statistical analysis.",
+        "how": "Independent GP construction/linear algebra, frozen native aggregator, conditional Lean proof."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-check",
+        "arms": [
+          "native",
+          "pari"
+        ],
+        "differs_in": [
+          "instrument"
+        ],
+        "design": "absolute",
+        "threshold": "All bases/map edges/witness sets/deduplicated equations/ranks/kernel spans/target projections and point recoveries agree; every underfilled/excluded cell retained."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Native produces exact expectations, then independent CAS; no performance comparison.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Deterministic full fixed panel, zero seed metadata only."
+    },
+    "instance_sampling": {
+      "rule": "One public known-answer p827 source;42 fixed target-blind bases. Prior motivating fixture is disclosed, not a heldout population.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact finite verification only; no statistical or comparative claim.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Complete exact finite census only; no population inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 900,
+      "measured_on": "F101 synthetic native/GP controls before freeze; full p827 panel unmeasured. Two prospective300s caps plus metadata allowance bound this correctness workload, not a timing prediction."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "target-identifiable-systems",
+        "name": "Identifiable target-coordinate systems",
+        "unit": "matrix cells",
+        "kind": "exact",
+        "definition": "Filled configurations times three arity modes times alpha-info off/on; target is unique iff all homogeneous kernel vectors project to zero.",
+        "source": "ADMISSION.json summary.target_identifiable_systems",
+        "aggregation": "per_row",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "filled/underfilled configurations",
+      "planned/analyzed/excluded matrices",
+      "queries and zero cases",
+      "raw/distinct equations",
+      "known and new relation rank",
+      "target kernel projection",
+      "public point recovery"
+    ],
+    "record": [
+      "source commit",
+      "binary SHA256",
+      "argv",
+      "input/output hashes",
+      "actual exit/signal",
+      "resource caps",
+      "host metadata"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": 1,
+      "memory_GiB": 4,
+      "paid_resources_created": false
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 900,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": 1,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly42 configurations/252 planned matrix cells; no refill or selected omitted case. Preserve failed/capped actual runs and all underfills. One native and one GP attempt.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Report exact target identifiability and known-information effects on every named configuration. Different bases create different matrix tasks; no speed or generalization inference.",
+    "comparison_ids": [
+      "exact-check"
+    ],
+    "statistic": "Exact complete matrix solution fiber and target projection, independently checked.",
+    "interval": "None: complete finite exhaustion.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Exact per-cell ranks/target fixedness, not cost.",
+    "verdict_vocabulary": [
+      "verified finite equality",
+      "mismatch",
+      "not completed"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/twist_routes_1_3_20261021/runner/src/rank_repair_20261028.rs",
+      "sha256": "8aa3897279b155be8e0cef37f053148dc096ef408c3fb9371c2489af23f6e853"
+    },
+    "inputs": [
+      "archived v8 bases/witnesses/seeds",
+      "v10 certified alpha/degree17 map",
+      "all actual native/GP raw receipts",
+      "frozen native rank-publication aggregator and all excluded-cell records"
+    ],
+    "outputs": [
+      "RESULTS.json",
+      "verify.gp",
+      "ADMISSION.json",
+      "experiment.export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Exact target-identifiable cells by rule/augmentation, known alpha links off/on; explicit underfill counts."
+    ],
+    "report_dir": "research/twist_routes_1_3_20261021/reports/rank-repair-20261028"
+  },
+  "inadmissible": [
+    "Calling standard endomorphism relations novel",
+    "Counting duplicate witnesses as independent equations",
+    "Claiming full rank is necessary for a fixed target",
+    "Discarding underfills/zero queries or refilling after outcomes",
+    "Withholding internal alpha links from ordinary controls",
+    "Calling different bases a same-output solver speed comparison",
+    "Calling exact p827 counts typical,NIST or a cost win",
+    "Opening final E28 labels32-63 or closing original full-campaign criteria"
+  ],
+  "literature": [
+    {
+      "ref": "research/twist_routes_1_3_20261021/execution-v14/PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Prior exact v8-v10 evidence, factor-base/GLV scope, primary PARI affine-fiber/matrix docs and MIT18.783 endomorphism setting reviewed before implementation.",
+      "verified_by": "Successful primary HTML/PDF access and installed GP help on2026-10-28."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "e031cee91eef30ca50d2ddef24cd36c7ca6ee739a3f173bd9885005efb7c61bf",
+    "commit": "d377251611bc9fd3da22096c3b128862816ef268",
+    "frozen_at": "2026-10-28T23:43:34Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "scientific_panel_started": false,
+    "original_full_campaign_discharged": false,
+    "embedded_controls_are_not_separate_arms": true,
+    "backend_authority": "Standing authorized bounded local L0 fallback for documented EKS access/image gap; no paid resource.",
+    "planned_configurations": 42,
+    "planned_matrix_cells": 252
+  }
+}

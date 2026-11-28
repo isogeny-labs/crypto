@@ -1,0 +1,7 @@
+# Independent quartic support and small affine proof review
+
+Fourth-power Frobenius is bijective on GF(2^n); its inverse applies (-2 mod n) ordinary squarings, including n2 where no squaring is needed. X5+cX=X(X+a)^4 implies exact repeated-root support iff a is in the declared F2-subspace. The all-zero tuple and five distinct orderings for a nonzero must be retained. Fourth-power images of arbitrary independent source columns remain independent.
+
+The independent small oracle multiplies every size-five source multiset using coefficient-array field tables, then restores all distinct orderings only for quartic-stratum products. Every ordered tuple has one sorted multiset, proving complete coverage without the16^5 sweep. For actual83 the canonical image positions0,4,...,68 prove rank18/no-wrap, with codimension51 in degree<=68 space only. The actual controls do not admit a norm family.
+
+Synthetic packed coefficient maps are compared to direct enumeration of all2^k assignments, not only to generated row membership. Complete particular/kernel families and inconsistent row-combination witnesses are checked. Three additional fixed consistent packed-map fixtures were added before freezing, retaining all original32fixedSHA cases and four bare elimination fixtures. They guarantee image freedom and coefficient-map kernel cases, even if the random maps are all inconsistent. Counts of parameters are not original roots.

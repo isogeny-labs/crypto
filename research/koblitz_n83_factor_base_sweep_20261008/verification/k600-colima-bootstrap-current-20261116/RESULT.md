@@ -1,0 +1,7 @@
+# Current-checkout K600 producer bootstrap result
+
+The [precommitted protocol](PROTOCOL.md) and [launcher](launch.sh) ran from clean source `ea47352a1d0bc998642d2412ce9553aa6355f07e` on the pinned Linux ARM64 Colima image. The whole interval was **2026-11-16 04:52:17–05:18:36 UTC**, derived **1,579 seconds**. Cargo reported **18m56s** for its cold output-local release build. The [raw log, complete receipts, Docker inspection, ELF, graph and inspected PDF](../../reports/run-20261116-bootstrap-current/REPORT.md) preserve the outcome.
+
+The installed `build-producer` is an **846,392-byte ARM aarch64 ELF**, SHA-256 `b3dcec9005ce87b26a5a7d5b613781d8dbbc2d5534368d7524c4e36ee3941980`. The in-container byte search and independent host `strings` inspection both found the current full-checkout path embedded in the binary. Child, Docker-inspect and cleanup exits were zero, `OOMKilled=false`, final in-container and host source checks were clean, and no named container remained.
+
+This resolves the compiled-source-path implementation blocker for the producer on this exact checkout. It does not complete the charged five-binary/solver/runtime-image build. A versioned new admission and launcher must pin this ELF/hash and use a fresh output directory before any worker gate. The 1,579-second interval and prior setup/failed-attempt intervals remain charged in cold one-target accounting; this bootstrap alone is not a factor-base runtime comparison.

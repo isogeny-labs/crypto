@@ -1,0 +1,29 @@
+{
+  "exit": 0,
+  "command": [
+    "python3",
+    "tools/benchrec.py",
+    "run",
+    "benchmarks/records/20261117T0521Z-fusion-phase-20261117.json",
+    "--",
+    "python3",
+    "/workspace/relation-native-qualifiers/direct-monitor-20261117/isolated_bench.py",
+    "reserve",
+    "--cpus",
+    "0",
+    "--out",
+    "/workspace/fusion-phase-monitor-71.jsonl",
+    "--period",
+    "0.05",
+    "--label",
+    "fusion-phase-71",
+    "--",
+    "taskset",
+    "-c",
+    "0",
+    "/workspace/relation-native-qualifiers/phase-probe-6aeefbe4d-71",
+    "/workspace/fusion-phase-71",
+    "/workspace/relation-native-qualifiers/fused-native-6aeefbe4d-71",
+    "/workspace/fusion-qualification-66"
+  ]
+}

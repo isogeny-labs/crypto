@@ -1,0 +1,126 @@
+{
+  "schema": "prime-leads-preregistration/v1",
+  "date": "2026-11-09",
+  "status": "preregistered_unrun",
+  "base_sha": "4bf664c0d9da0dae721b6314b71cd0e0c48aa979",
+  "source": {
+    "path": "research/prime_leads_new_cycle_20261109/controls.rs",
+    "sha256": "6fc28fcd1824ae3d91fdfdaf7dfb29231fe17db70d4e35ee443d45556768ddeb",
+    "language": "Rust",
+    "dependencies": "std only",
+    "planned_test_functions": 6,
+    "executed": false
+  },
+  "scope": {
+    "model": "finite additive cyclic group Z/19Z, generator 1",
+    "production_backend": false,
+    "scientific_panels": 0,
+    "comparison_admissible": false,
+    "cost": null,
+    "gae": null,
+    "scaling": null,
+    "performance_measurement_planned": false,
+    "novelty_claim": false,
+    "checkpoint_protocol_runtime_bypass": false,
+    "funding_lease_iam_quota_pool_access_changes": false
+  },
+  "original_acceptance": {
+    "authority": "research/prime_ecdlp_three_leads_20261029/PKM_GOALS.md",
+    "G1": "partial",
+    "G2": "partial",
+    "G3": "partial",
+    "G4": "unrun",
+    "G5": "unrun",
+    "G6": "partial",
+    "full_panel_card_pin": "e99f0d598cd89d839060e991b9b157efbd6f286a",
+    "full_panel_card_status": "blocked_unfunded_unimplemented",
+    "software_merge_completes_research": false
+  },
+  "original_leads": [
+    {
+      "id": "symmetric-pkm",
+      "remaining": "Faithful supported-domain m4 extraction, complete accounting and useful yield, paired presentations/external solver, justified optimization/scaling, cold ECDLP and faithful proof bridges; original G1-G6 criteria unchanged.",
+      "this_cycle": "Independent Mathlib exact-order criteria only."
+    },
+    {
+      "id": "five-sum",
+      "remaining": "Hydrate and independently replay all frozen sessions with original provenance, scalar checks and complete-cost recomputation.",
+      "this_cycle": "Finite cyclic collision-retention controls, never substitute replay.",
+      "missing_raw": {
+        "session": "P20",
+        "filename": "records.jsonl",
+        "bytes": 1622069,
+        "sha256": "2e24438edf33b233c5f06f0fc0b2f9a9dac3c55ff23eda30d7bc0cf4916e7b02",
+        "status": "unavailable_no_replay"
+      }
+    },
+    {
+      "id": "hecke-known-log-base",
+      "remaining": "Certified source/normalization/class-label import and efficient prescribed-target attachment with qualified matched comparison.",
+      "this_cycle": "Generic bounded-shift cyclic model; no Hecke generator or non-generic attachment."
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "status": "preregistered_unrun",
+      "label_sets": [[], [1], [1, 4, 7], [2, 5, 11, 17]],
+      "targets_inclusive": [0, 18],
+      "caps_inclusive": [0, 19],
+      "primary_cases": 1520,
+      "prediction": "Every recovery/miss and probe count equals independent translated-set/minimum-distance reference; reversal/rotation invariant; malformed inputs refuse.",
+      "boundary_controls": ["cap0 misses identity", "identity requires one probe", "cap255 saturates at19", "duplicate/corrupt/noncanonical label or target refusal"],
+      "falsification": "Any scalar, miss, probe-count, permutation or refusal disagreement.",
+      "accounting_note": "1520 is the primary fixture grid; reference, permutation and boundary calls are additional real executions."
+    },
+    {
+      "id": "H2",
+      "status": "preregistered_unrun",
+      "label_sets": [[1, 2, 4, 7, 11], [1, 1, 1, 1, 1], [0, 0, 0, 0, 0]],
+      "signed_candidates_per_fixture": 16,
+      "distinct_candidate_universe": 48,
+      "first_sign": "positive",
+      "partial_sum_pruning": false,
+      "identity_final_sums": "excluded",
+      "prediction": "Off/on collision retention preserves candidates, attempts, representatives and all lookups; collision rows annihilate labels; independent ranks agree; nonzero unanchored targets are not isolated.",
+      "conservation": ["insert_attempts + identity_candidates = candidates", "kept + retained_collisions = insert_attempts"],
+      "repeated_label_prediction": {"collision_coefficient_rank": 4, "one_known_first_anchor_isolates_successful_query": true},
+      "all_zero_prediction": {"identity_candidates": 16, "insert_attempts": 0, "collisions": 0, "rank": 0},
+      "falsification": "Any conservation, equation, rank, lookup or malformed-input control disagreement.",
+      "accounting_note": "48 is a fixture universe, not total work; off/on and repeated table constructions are separately executed."
+    },
+    {
+      "id": "H3",
+      "status": "successor_hypothesis_only_unrun",
+      "question": "Does anchor direction relative to the retained kernel/subspace determine target isolation beyond rank or anchor presence alone?",
+      "required_next_controls": ["independent anchor direction", "dependent anchor direction", "orthogonal direction", "rank held fixed where possible"],
+      "prediction_frozen": false
+    },
+    {
+      "id": "H4",
+      "status": "successor_hypothesis_only_unrun",
+      "question": "How does directed finite coverage under fixed caps depend on label geometry, and where does size-only extrapolation fail?",
+      "required_next_controls": ["freeze cap and label geometries", "held-out finite sizes", "separate exact finite coverage from extrapolation"],
+      "prediction_frozen": false,
+      "asymptotic_or_curve_family_conclusion": false
+    }
+  ],
+  "formal_plan": {
+    "project": "research/prime_leads_new_cycle_20261109/lean",
+    "module": "BinaryPrimitiveGuard",
+    "intended_criteria": 2,
+    "imports": "Mathlib only; no old PKM or extraction modules",
+    "statement": "Full binary power equals1 and preceding half power differs from1 imply exact binary order, with positive depth explicit.",
+    "verification_status": "not_claimed_by_this_plan",
+    "rust_polynomial_cost_bridge": "open"
+  },
+  "execution_plan": {
+    "source_commit_required_before_execution": true,
+    "native_test_execution_cap_seconds": 60,
+    "per_compile_or_lint_cap_seconds": 300,
+    "phases": ["pin exact commands/toolchain/source", "native Rust test build", "six native control functions", "strict standalone clippy", "formatting", "separate faithful formal checks", "immutable receipts and descriptive outcome report"],
+    "stop": "Any correctness/reference/refusal disagreement stops the affected comparison; preserve failed attempt and diagnose without relaxing the frozen criteria.",
+    "timeout": "incomplete, never pass",
+    "results": null
+  }
+}

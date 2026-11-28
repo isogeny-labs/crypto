@@ -1,0 +1,142 @@
+{
+  "arms": [
+    {
+      "arm": "unit-untraced",
+      "first32": {
+        "f4_muls": "20422112",
+        "lin_muls": "6673604",
+        "reported_sum": "27095716",
+        "roots": 34,
+        "systems": 32
+      },
+      "input_sha256": "6e1db64631838ebe3bdc918a88b160ced5c8362b70aea8814d16aca83368286d",
+      "recording": {
+        "f4_muls": "0",
+        "lin_muls": "0",
+        "reported_sum": "0",
+        "roots": 0,
+        "systems": 0
+      },
+      "replayed": {
+        "f4_muls": "0",
+        "lin_muls": "0",
+        "reported_sum": "0",
+        "roots": 0,
+        "systems": 0
+      },
+      "shape_mismatch": {
+        "f4_muls": "0",
+        "lin_muls": "0",
+        "reported_sum": "0",
+        "roots": 0,
+        "systems": 0
+      },
+      "total": {
+        "f4_muls": "2179269070",
+        "lin_muls": "716225084",
+        "reported_sum": "2895494154",
+        "roots": 3419,
+        "systems": 3415
+      }
+    },
+    {
+      "arm": "unit-traced",
+      "first32": {
+        "f4_muls": "10379039",
+        "lin_muls": "6673604",
+        "reported_sum": "17052643",
+        "roots": 34,
+        "systems": 32
+      },
+      "input_sha256": "43f4d8bbc9c524063b37c44e2df85bd521b8223704e0f53b645e49cb0caf2328",
+      "recording": {
+        "f4_muls": "637240",
+        "lin_muls": "208428",
+        "reported_sum": "845668",
+        "roots": 1,
+        "systems": 1
+      },
+      "replayed": {
+        "f4_muls": "1051922832",
+        "lin_muls": "701022579",
+        "reported_sum": "1752945411",
+        "roots": 3345,
+        "systems": 3348
+      },
+      "shape_mismatch": {
+        "f4_muls": "45091738",
+        "lin_muls": "14994077",
+        "reported_sum": "60085815",
+        "roots": 73,
+        "systems": 66
+      },
+      "total": {
+        "f4_muls": "1097651810",
+        "lin_muls": "716225084",
+        "reported_sum": "1813876894",
+        "roots": 3419,
+        "systems": 3415
+      }
+    },
+    {
+      "arm": "six-traced",
+      "first32": {
+        "f4_muls": "10232142",
+        "lin_muls": "6375427",
+        "reported_sum": "16607569",
+        "roots": 34,
+        "systems": 32
+      },
+      "input_sha256": "f9bd2377cfb7dccf073d6bd9932bb7149b095efa0bf7f7027ab80d6e50d5f54d",
+      "recording": {
+        "f4_muls": "712847",
+        "lin_muls": "198911",
+        "reported_sum": "911758",
+        "roots": 1,
+        "systems": 1
+      },
+      "replayed": {
+        "f4_muls": "1038146668",
+        "lin_muls": "679737688",
+        "reported_sum": "1717884356",
+        "roots": 3381,
+        "systems": 3381
+      },
+      "shape_mismatch": {
+        "f4_muls": "26167249",
+        "lin_muls": "6543927",
+        "reported_sum": "32711176",
+        "roots": 37,
+        "systems": 33
+      },
+      "total": {
+        "f4_muls": "1065026764",
+        "lin_muls": "686480526",
+        "reported_sum": "1751507290",
+        "roots": 3419,
+        "systems": 3415
+      }
+    }
+  ],
+  "complete_cost": false,
+  "every_coordinate_multiset_equal": true,
+  "independent_signed_verdict": false,
+  "missing_costs": [
+    "tracked RREF of trace learning outside field_ops",
+    "reduction and lifting",
+    "collection and graph elimination",
+    "other native control, setup, RNG, hashing and serialization"
+  ],
+  "new_natural_yield_calls": 0,
+  "new_solver_calls": 0,
+  "new_timing_calls": 0,
+  "no_cross_study_repricing": true,
+  "ratios": null,
+  "recorded_mathematics_only": true,
+  "rho_parity": false,
+  "roots": 3419,
+  "schema": "cover.unit-trace.saved-cohort-counters/v1",
+  "selection": "all3415 saved Run51 systems; no exclusion",
+  "systems": 3415,
+  "units": "solver-reported Fp multiplication counters; decimal strings accumulated in checked u128"
+}

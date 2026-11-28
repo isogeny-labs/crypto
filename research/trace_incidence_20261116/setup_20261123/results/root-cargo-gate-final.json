@@ -1,0 +1,18 @@
+{
+ "schema":"trace-root-integration-final/v1",
+ "required_gate":"cargo test --release --lib",
+ "attempts":[
+  {"id":"a1","mode":"offline","exit":101,"outcome":"tikv-jemallocator missing from registry cache; no root tests executed"},
+  {"id":"a2","mode":"online60second capped dependency build","exit":124,"outcome":"dependency compilation timed out; no root tests executed"},
+  {"id":"a3","mode":"online900second cap,two build jobs,two test threads","exit":101,"outcome":"dependency build progressed to crypto lib test; root parser rejected mismatched/unclosed delimiters in existing source; no root unit tests executed"}
+ ],
+ "blocking_source":"src/cryptanalysis/binary_hyperelliptic_index_calculus.rs",
+ "parser_locations":[640,1233],
+ "worktree_git_blob":"f001a1b641abd48bb0130c1a9a246e37c28bcc3a",
+ "origin_main_git_blob":"f001a1b641abd48bb0130c1a9a246e37c28bcc3a",
+ "origin_main_commit":"816f9c3a942efed569049618c056d12a0c56d693",
+ "source_modified_by_this_study":false,
+ "all_required_checks_green":false,
+ "summary":"Whole-root validation is blocked by existing syntax errors in binary_hyperelliptic_index_calculus.rs:640 and1233; exact working blob matches origin/main. No root tests executed. Scoped native benchmark checks pass, but are not substituted for this gate. The older-compatibility module root-oracle mismatch also remains recorded.",
+ "scope":"Unsigned producer execution metadata; no production source repaired, no test excluded or gate relaxed. Raw commands, logs, unchanged blocking source and hashes retained."
+}

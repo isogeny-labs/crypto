@@ -1,0 +1,9 @@
+# Fixed-mu residual split protocol
+
+CM-RESIDUAL-SPLIT-V1 specifies one exact42480-row census: five curves, six widths,129 offsets at seven radices, and513 direct shifts. The original marked mu is fixed. Relation radix ell must beat both the complete binary-radix control and optimized direct reference for a count claim. No result is a runtime claim. The detailed construction is ../../RESIDUAL_SPLIT.md.
+
+Publish source/checker and exact native binary hashes, then bind all seven inputs, fixed finite bounds and both source hashes, validate/freeze the canonical protocol and publish it before affected data. Zero cloud submissions; one scan attempt, no unchanged retry; each invocation at most120 seconds, one process/thread and2GiB address space. No cryptographic clock is enabled. Any eventual timing panel must include complete cold setup, scalar/plan preparation, normalization, prefix, residual and verification costs.
+
+The first protocol draft used string stopping rules where the schema requires objects; the invalid draft, generator and validation error remain preserved. The corrected draft validates. Its negative admission check exits1 and creates no output directory. Build-v1's two formatting warnings are retained, v2 is warning-free, and final v3 additionally binds the exact binary-radix set and unique seven-input manifest. All three software qualifiers pass3150 point/count cases,450 explicit-map cases and five wrong-remainder controls; only v3 is the eventual frozen instrument. No scientific census has been repeated.
+
+The independent GMP replay reconstructs every scalar and count, rejects missing/duplicate rows, and recomputes all20 minimum sets. Selected plans must additionally pass300 actual point/count cases. Raw and plan corruptions are retained as control inputs; failure or timeout invalidates the affected run rather than authorizing a replacement scan.

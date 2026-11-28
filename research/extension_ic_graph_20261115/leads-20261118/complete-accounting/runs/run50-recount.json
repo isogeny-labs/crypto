@@ -1,0 +1,783 @@
+{
+  "arms": [
+    {
+      "B_unpriced_native_ops": "10664",
+      "L_linear_stage_bitops": "477870025544",
+      "L_source": "ESTIMATE: recorded descent_lin_muls x the stream's increment per legacy linear-stage product",
+      "N_named_gaps_without_counts": [
+        "native containers/normalization/scheduling (graph maps, witness storage, activation queues)",
+        "PRNG generator internals (ChaCha12 blocks behind every recorded draw)",
+        "incremental RREF scans / fixed-factor internals (linear algebra)",
+        "cohort hashing/serialization",
+        "descent linear stage: staircase setup copies, allocation; PolyRing root-splitting RNG draws"
+      ],
+      "R_descent_bitops": "1734424925904",
+      "R_phases": [
+        {
+          "phase": "model",
+          "recorded_bitops": "546251740"
+        },
+        {
+          "phase": "factor_base",
+          "recorded_bitops": "691123606"
+        },
+        {
+          "phase": "relations",
+          "recorded_bitops": "2444913670026"
+        },
+        {
+          "phase": "descent",
+          "recorded_bitops": "1734424925904"
+        },
+        {
+          "phase": "linear_algebra",
+          "recorded_bitops": "344888797878"
+        },
+        {
+          "phase": "verification",
+          "recorded_bitops": "91363260"
+        }
+      ],
+      "R_plus_U_plus_L_bitops": "5003493569542",
+      "R_recorded_subtotal_bitops": "4525556132414",
+      "U_uniform_known_native_priced_bitops": "67411584",
+      "band": [
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "5003493569542",
+          "w_gae": "0"
+        },
+        {
+          "band_bitops": "353245000",
+          "lower_bound_total_bitops": "5003846814542",
+          "w_gae": "0.1"
+        },
+        {
+          "band_bitops": "3532450000",
+          "lower_bound_total_bitops": "5007026019542",
+          "w_gae": "1"
+        }
+      ],
+      "complete": false,
+      "mode": "original-ic"
+    },
+    {
+      "B_unpriced_native_ops": "13976",
+      "L_linear_stage_bitops": "942912085926",
+      "L_source": "replay recount: counted linear stage on the reconstructed Run50 stream (seed 389, 3,415 residuals)",
+      "N_named_gaps_without_counts": [
+        "native containers/normalization/scheduling (graph maps, witness storage, activation queues)",
+        "PRNG generator internals (ChaCha12 blocks behind every recorded draw)",
+        "incremental RREF scans / fixed-factor internals (linear algebra)",
+        "cohort hashing/serialization",
+        "descent linear stage: staircase setup copies, allocation; PolyRing root-splitting RNG draws"
+      ],
+      "R_descent_bitops": "3426280619436",
+      "R_phases": [
+        {
+          "phase": "model",
+          "recorded_bitops": "586808692"
+        },
+        {
+          "phase": "factor_base",
+          "recorded_bitops": "719628892"
+        },
+        {
+          "phase": "relations",
+          "recorded_bitops": "1476022439520"
+        },
+        {
+          "phase": "descent",
+          "recorded_bitops": "3426280619436"
+        },
+        {
+          "phase": "linear_algebra",
+          "recorded_bitops": "327129581910"
+        },
+        {
+          "phase": "verification",
+          "recorded_bitops": "91363260"
+        }
+      ],
+      "R_plus_U_plus_L_bitops": "6173832738004",
+      "R_recorded_subtotal_bitops": "5230830441710",
+      "U_uniform_known_native_priced_bitops": "90210368",
+      "band": [
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "6173832738004",
+          "w_gae": "0"
+        },
+        {
+          "band_bitops": "462955000",
+          "lower_bound_total_bitops": "6174295693004",
+          "w_gae": "0.1"
+        },
+        {
+          "band_bitops": "4629550000",
+          "lower_bound_total_bitops": "6178462288004",
+          "w_gae": "1"
+        }
+      ],
+      "complete": false,
+      "mode": "quadratic-table"
+    },
+    {
+      "B_unpriced_native_ops": "3146544",
+      "L_linear_stage_bitops": "942912085926",
+      "L_source": "replay recount: counted linear stage on the reconstructed Run50 stream (seed 389, 3,415 residuals)",
+      "N_named_gaps_without_counts": [
+        "native containers/normalization/scheduling (graph maps, witness storage, activation queues)",
+        "PRNG generator internals (ChaCha12 blocks behind every recorded draw)",
+        "incremental RREF scans / fixed-factor internals (linear algebra)",
+        "cohort hashing/serialization",
+        "descent linear stage: staircase setup copies, allocation; PolyRing root-splitting RNG draws"
+      ],
+      "R_descent_bitops": "3426280619436",
+      "R_phases": [
+        {
+          "phase": "model",
+          "recorded_bitops": "586808692"
+        },
+        {
+          "phase": "factor_base",
+          "recorded_bitops": "719628892"
+        },
+        {
+          "phase": "relations",
+          "recorded_bitops": "2428576689912"
+        },
+        {
+          "phase": "descent",
+          "recorded_bitops": "3426280619436"
+        },
+        {
+          "phase": "linear_algebra",
+          "recorded_bitops": "379733078380"
+        },
+        {
+          "phase": "verification",
+          "recorded_bitops": "91363260"
+        }
+      ],
+      "R_plus_U_plus_L_bitops": "7198525143938",
+      "R_recorded_subtotal_bitops": "6235988188572",
+      "U_uniform_known_native_priced_bitops": "19624869440",
+      "band": [
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "7198525143938",
+          "w_gae": "0"
+        },
+        {
+          "band_bitops": "104229270000",
+          "lower_bound_total_bitops": "7302754413938",
+          "w_gae": "0.1"
+        },
+        {
+          "band_bitops": "1042292700000",
+          "lower_bound_total_bitops": "8240817843938",
+          "w_gae": "1"
+        }
+      ],
+      "complete": false,
+      "mode": "pair-discriminant"
+    },
+    {
+      "B_unpriced_native_ops": "2647504",
+      "L_linear_stage_bitops": "942912085926",
+      "L_source": "replay recount: counted linear stage on the reconstructed Run50 stream (seed 389, 3,415 residuals)",
+      "N_named_gaps_without_counts": [
+        "native containers/normalization/scheduling (graph maps, witness storage, activation queues)",
+        "PRNG generator internals (ChaCha12 blocks behind every recorded draw)",
+        "incremental RREF scans / fixed-factor internals (linear algebra)",
+        "cohort hashing/serialization",
+        "descent linear stage: staircase setup copies, allocation; PolyRing root-splitting RNG draws"
+      ],
+      "R_descent_bitops": "3426280619436",
+      "R_phases": [
+        {
+          "phase": "model",
+          "recorded_bitops": "586808692"
+        },
+        {
+          "phase": "factor_base",
+          "recorded_bitops": "719628892"
+        },
+        {
+          "phase": "relations",
+          "recorded_bitops": "2042699070612"
+        },
+        {
+          "phase": "descent",
+          "recorded_bitops": "3426280619436"
+        },
+        {
+          "phase": "linear_algebra",
+          "recorded_bitops": "443497764930"
+        },
+        {
+          "phase": "verification",
+          "recorded_bitops": "91363260"
+        }
+      ],
+      "R_plus_U_plus_L_bitops": "6873300847732",
+      "R_recorded_subtotal_bitops": "5913875255822",
+      "U_uniform_known_native_priced_bitops": "16513505984",
+      "band": [
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "6873300847732",
+          "w_gae": "0"
+        },
+        {
+          "band_bitops": "87698570000",
+          "lower_bound_total_bitops": "6960999417732",
+          "w_gae": "0.1"
+        },
+        {
+          "band_bitops": "876985700000",
+          "lower_bound_total_bitops": "7750286547732",
+          "w_gae": "1"
+        }
+      ],
+      "complete": false,
+      "mode": "pair-deferred"
+    },
+    {
+      "B_unpriced_native_ops": "0",
+      "L_linear_stage_bitops": "0",
+      "L_source": "not applicable (no Groebner descent)",
+      "N_named_gaps_without_counts": [
+        "tuned_reference_bitop_pricing (count null in every rho raw)",
+        "rho_setup_and_native_bookkeeping_audit (count null)",
+        "rng_internal_work (count null; 514-544 draws recorded)",
+        "DP table container memory/insert internals beyond the counted hash_probe/word_op"
+      ],
+      "R_descent_bitops": "0",
+      "R_phases": [
+        {
+          "phase": "precompute",
+          "recorded_bitops": "18600779836"
+        },
+        {
+          "phase": "walk",
+          "recorded_bitops": "196263131004928"
+        },
+        {
+          "phase": "collision",
+          "recorded_bitops": "263320383260"
+        },
+        {
+          "phase": "verification",
+          "recorded_bitops": "82336188"
+        }
+      ],
+      "R_plus_U_plus_L_bitops": "196545134504212",
+      "R_recorded_subtotal_bitops": "196545134504212",
+      "U_uniform_known_native_priced_bitops": "0",
+      "band": [
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "196545134504212",
+          "w_gae": "0"
+        },
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "196545134504212",
+          "w_gae": "0.1"
+        },
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "196545134504212",
+          "w_gae": "1"
+        }
+      ],
+      "complete": false,
+      "mode": "rho-plain-b1"
+    },
+    {
+      "B_unpriced_native_ops": "0",
+      "L_linear_stage_bitops": "0",
+      "L_source": "not applicable (no Groebner descent)",
+      "N_named_gaps_without_counts": [
+        "tuned_reference_bitop_pricing (count null in every rho raw)",
+        "rho_setup_and_native_bookkeeping_audit (count null)",
+        "rng_internal_work (count null; 514-544 draws recorded)",
+        "DP table container memory/insert internals beyond the counted hash_probe/word_op"
+      ],
+      "R_descent_bitops": "0",
+      "R_phases": [
+        {
+          "phase": "precompute",
+          "recorded_bitops": "18600779836"
+        },
+        {
+          "phase": "walk",
+          "recorded_bitops": "180846446924138"
+        },
+        {
+          "phase": "collision",
+          "recorded_bitops": "239889104636"
+        },
+        {
+          "phase": "verification",
+          "recorded_bitops": "82336188"
+        }
+      ],
+      "R_plus_U_plus_L_bitops": "181105019144798",
+      "R_recorded_subtotal_bitops": "181105019144798",
+      "U_uniform_known_native_priced_bitops": "0",
+      "band": [
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "181105019144798",
+          "w_gae": "0"
+        },
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "181105019144798",
+          "w_gae": "0.1"
+        },
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "181105019144798",
+          "w_gae": "1"
+        }
+      ],
+      "complete": false,
+      "mode": "rho-neg-b1"
+    },
+    {
+      "B_unpriced_native_ops": "0",
+      "L_linear_stage_bitops": "0",
+      "L_source": "not applicable (no Groebner descent)",
+      "N_named_gaps_without_counts": [
+        "tuned_reference_bitop_pricing (count null in every rho raw)",
+        "rho_setup_and_native_bookkeeping_audit (count null)",
+        "rng_internal_work (count null; 514-544 draws recorded)",
+        "DP table container memory/insert internals beyond the counted hash_probe/word_op"
+      ],
+      "R_descent_bitops": "0",
+      "R_phases": [
+        {
+          "phase": "precompute",
+          "recorded_bitops": "19683264996"
+        },
+        {
+          "phase": "walk",
+          "recorded_bitops": "109860730372666"
+        },
+        {
+          "phase": "collision",
+          "recorded_bitops": "111742424764"
+        },
+        {
+          "phase": "verification",
+          "recorded_bitops": "82336188"
+        }
+      ],
+      "R_plus_U_plus_L_bitops": "109992238398614",
+      "R_recorded_subtotal_bitops": "109992238398614",
+      "U_uniform_known_native_priced_bitops": "0",
+      "band": [
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "109992238398614",
+          "w_gae": "0"
+        },
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "109992238398614",
+          "w_gae": "0.1"
+        },
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "109992238398614",
+          "w_gae": "1"
+        }
+      ],
+      "complete": false,
+      "mode": "rho-plain-b16"
+    },
+    {
+      "B_unpriced_native_ops": "0",
+      "L_linear_stage_bitops": "0",
+      "L_source": "not applicable (no Groebner descent)",
+      "N_named_gaps_without_counts": [
+        "tuned_reference_bitop_pricing (count null in every rho raw)",
+        "rho_setup_and_native_bookkeeping_audit (count null)",
+        "rng_internal_work (count null; 514-544 draws recorded)",
+        "DP table container memory/insert internals beyond the counted hash_probe/word_op"
+      ],
+      "R_descent_bitops": "0",
+      "R_phases": [
+        {
+          "phase": "precompute",
+          "recorded_bitops": "19683264996"
+        },
+        {
+          "phase": "walk",
+          "recorded_bitops": "274229526810166"
+        },
+        {
+          "phase": "collision",
+          "recorded_bitops": "276526959340"
+        },
+        {
+          "phase": "verification",
+          "recorded_bitops": "82336188"
+        }
+      ],
+      "R_plus_U_plus_L_bitops": "274525819370690",
+      "R_recorded_subtotal_bitops": "274525819370690",
+      "U_uniform_known_native_priced_bitops": "0",
+      "band": [
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "274525819370690",
+          "w_gae": "0"
+        },
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "274525819370690",
+          "w_gae": "0.1"
+        },
+        {
+          "band_bitops": "0",
+          "lower_bound_total_bitops": "274525819370690",
+          "w_gae": "1"
+        }
+      ],
+      "complete": false,
+      "mode": "rho-neg-b16"
+    }
+  ],
+  "distance_to_rho_lower_bound_ratios": [
+    {
+      "ic": "original-ic",
+      "ratios": [
+        {
+          "ic_over_rho": "0.025457",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.025459",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.025475",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-plain-b1"
+    },
+    {
+      "ic": "original-ic",
+      "ratios": [
+        {
+          "ic_over_rho": "0.027628",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.027630",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.027647",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-neg-b1"
+    },
+    {
+      "ic": "original-ic",
+      "ratios": [
+        {
+          "ic_over_rho": "0.045490",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.045493",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.045522",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-plain-b16"
+    },
+    {
+      "ic": "original-ic",
+      "ratios": [
+        {
+          "ic_over_rho": "0.018226",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.018227",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.018239",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-neg-b16"
+    },
+    {
+      "ic": "quadratic-table",
+      "ratios": [
+        {
+          "ic_over_rho": "0.031412",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.031414",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.031435",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-plain-b1"
+    },
+    {
+      "ic": "quadratic-table",
+      "ratios": [
+        {
+          "ic_over_rho": "0.034090",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.034092",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.034115",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-neg-b1"
+    },
+    {
+      "ic": "quadratic-table",
+      "ratios": [
+        {
+          "ic_over_rho": "0.056130",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.056134",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.056172",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-plain-b16"
+    },
+    {
+      "ic": "quadratic-table",
+      "ratios": [
+        {
+          "ic_over_rho": "0.022489",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.022491",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.022506",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-neg-b16"
+    },
+    {
+      "ic": "pair-discriminant",
+      "ratios": [
+        {
+          "ic_over_rho": "0.036625",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.037156",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.041928",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-plain-b1"
+    },
+    {
+      "ic": "pair-discriminant",
+      "ratios": [
+        {
+          "ic_over_rho": "0.039748",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.040323",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.045503",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-neg-b1"
+    },
+    {
+      "ic": "pair-discriminant",
+      "ratios": [
+        {
+          "ic_over_rho": "0.065446",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.066393",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.074922",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-plain-b16"
+    },
+    {
+      "ic": "pair-discriminant",
+      "ratios": [
+        {
+          "ic_over_rho": "0.026222",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.026601",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.030018",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-neg-b16"
+    },
+    {
+      "ic": "pair-deferred",
+      "ratios": [
+        {
+          "ic_over_rho": "0.034971",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.035417",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.039433",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-plain-b1"
+    },
+    {
+      "ic": "pair-deferred",
+      "ratios": [
+        {
+          "ic_over_rho": "0.037952",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.038436",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.042794",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-neg-b1"
+    },
+    {
+      "ic": "pair-deferred",
+      "ratios": [
+        {
+          "ic_over_rho": "0.062489",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.063286",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.070462",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-plain-b16"
+    },
+    {
+      "ic": "pair-deferred",
+      "ratios": [
+        {
+          "ic_over_rho": "0.025037",
+          "w_gae": "0"
+        },
+        {
+          "ic_over_rho": "0.025356",
+          "w_gae": "0.1"
+        },
+        {
+          "ic_over_rho": "0.028232",
+          "w_gae": "1"
+        }
+      ],
+      "rho": "rho-neg-b16"
+    }
+  ],
+  "field_bits": "10",
+  "gae_bitops": "331250",
+  "gae_definition": "one affine E(F_{p^6}) addition priced in bitop/v1 from the rho reference's recorded native tower calibration",
+  "gae_primitives": {
+    "field_add": 210,
+    "field_inv": 1,
+    "field_mul": 245,
+    "field_sqr": 0,
+    "field_sqrt": 0,
+    "hash_probe": 0,
+    "legendre": 0,
+    "modr_add": 0,
+    "modr_inv": 0,
+    "modr_mul": 0,
+    "word_op": 0
+  },
+  "label": "recount of recorded Run50 data plus a replay-derived linear-stage term; not a new measurement, not an improvement, not a complete cost",
+  "linear_stage_increment_bitops": "942912085926",
+  "linear_stage_increment_primitives": {
+    "field_add": "697676832",
+    "field_inv": "0",
+    "field_mul": "690959405",
+    "field_sqr": "0",
+    "field_sqrt": "0",
+    "hash_probe": "4810782",
+    "legendre": "0",
+    "modr_add": "0",
+    "modr_inv": "0",
+    "modr_mul": "0",
+    "word_op": "33462474"
+  },
+  "original_ic_legacy_lin_muls": "347909918",
+  "pcc": "unverified",
+  "r_bits": "58",
+  "ranking": "none: every arm, rho included, has named native gaps without emitted counts (section 5a); ratios are between lower bounds",
+  "schema": "complete-accounting.run50-recount/v1",
+  "stream_legacy_lin_muls": "686480526"
+}

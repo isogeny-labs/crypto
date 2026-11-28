@@ -1,0 +1,10 @@
+digraph charged_build {
+  graph [rankdir=LR, bgcolor="white", pad="0.18", nodesep="0.45", ranksep="0.6", fontname="Helvetica"];
+  node [shape=box, style="rounded,filled", fillcolor="#e8f0f6", color="#294b63", fontname="Helvetica", fontsize=13];
+  edge [color="#42586b", penwidth=1.6, fontname="Helvetica", fontsize=11];
+  admit [label="No-work admission\n58 s; exit 0\nsource and inputs matched", fillcolor="#d8eddd", color="#1e7542"];
+  rust [label="Cold Rust binaries\n1,200 s cap reached\n1,214.178 s to receipt", fillcolor="#f5e2d7", color="#a04a32"];
+  pending [label="Solver and image: not started\nK600 worker: blocked\nNo IC runtime comparison", style="rounded,dashed", fillcolor="white", color="#8b6236"];
+  admit -> rust;
+  rust -> pending [style=dashed, label="STOPPED"];
+}

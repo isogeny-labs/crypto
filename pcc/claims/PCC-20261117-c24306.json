@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T04:22:03Z",
+ "id": "PCC-20261117-c24306",
+ "kind": "statement",
+ "producer": {
+  "commit": "5065953d323a816eb2598e752d1530d79a427987",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_rowmap_20261117/checks/artifact-migration-failure.txt",
+    "sha256": "f80b1ab39f48e4d32f2c6e42f19699cd52b937fea0f7b81215800ecbddd7576c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Administrative publication/status receipt; no claim that failed upload or merge completed.",
+ "statement": "PR4497 source and scientific report remote blobs match local bytes. Initial review check passes; artifact migration44016223461 fails with S3 HeadObject403 for three new data keys. Auto-merge is enabled but PR is conflicting after concurrent main metadata advances. These are observed publication/CI states, not a waiver or scientific execution-verification verdict."
+}

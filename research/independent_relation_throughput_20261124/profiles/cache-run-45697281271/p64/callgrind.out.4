@@ -1,0 +1,7300 @@
+# callgrind format
+version: 1
+creator: callgrind-3.22.0
+pid: 23570
+cmd:  target/release/ecbench exec
+part: 4
+
+
+desc: I1 cache: 
+desc: D1 cache: 
+desc: LL cache: 
+
+desc: Timerange: Basic block 689451 - 1233447
+desc: Trigger: Client Request: generic_ic_precompute
+
+positions: line
+events: Ir
+summary: 3919384
+
+
+ob=(4) ???
+fl=(176) ???
+fn=(858) 0x00000000065dc740
+0 2
+cob=(2) /usr/lib/x86_64-linux-gnu/libc.so.6
+cfi=(250) ./string/../sysdeps/x86_64/multiarch/memset-vec-unaligned-erms.S
+cfn=(860) __memset_avx2_unaligned_erms
+calls=1 158 
+0 32793
+
+fn=(800) 0x00000000065dc6b0
+0 70
+cob=(2)
+cfi=(237) ./string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S
+cfn=(802) __memcpy_avx_unaligned_erms
+calls=35 255 
+0 2489
+
+fn=(562) 0x00000000065dc720
+0 2
+cob=(1) /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+cfi=(11) ./elf/./elf/dl-tunables.c
+cfn=(28) __tunable_get_val
+calls=1 387 
+0 24
+
+ob=(1)
+fl=(1) ???
+fn=(0) 0x000000000001f530
+cob=(7) /home/runner/work/crypto/crypto/target/release/ecbench
+cfi=(186) ???
+cfn=(630) (below main)
+calls=0 0 
+0 3919384
+
+fl=(11)
+fn=(28)
+387 1
++3 2
+-3 1
++3 8
++9 1
+-9 2
++26 6
++2 1
+-19 1
++1 1
+
+ob=(7)
+fl=(557) /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand_core-0.6.4/src/lib.rs
+fn=(5512) <rand::rngs::std::StdRng as rand_core::SeedableRng>::seed_from_u64
+335 5
+fi=(196) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/uint_macros.rs
+2758 2
+-76 1
+fe=(557)
+347 5
++1 2
+fi=(295) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/intrinsics/mod.rs
+2164 1
+fi=(196)
+2758 1
+-76 1
+fe=(557)
+347 5
++1 2
+fi=(295)
+2164 1
+fi=(196)
+2758 1
+-76 1
+fe=(557)
+347 5
++1 2
+fi=(295)
+2164 1
+fi=(196)
+2758 1
+-76 1
+fe=(557)
+347 5
++1 2
+fi=(295)
+2164 1
+fi=(196)
+2758 1
+-76 1
+fe=(557)
+347 5
++1 2
+fi=(295)
+2164 2
+fi=(196)
+2758 1
+-76 1
+fe=(557)
+347 5
++1 2
+fi=(295)
+2164 1
+fi=(196)
+2758 1
+-76 1
+fe=(557)
+347 5
++1 2
+fi=(295)
+2164 1
+fi=(196)
+2758 1
+-76 1
+fe=(557)
+347 5
++1 1
+fi=(295)
+2164 2
+fe=(557)
+363 8
+fi=(563) /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand_chacha-0.3.1/src/guts.rs
+73 5
+cfi=(558) /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/x86_64/mod.rs
+cfn=(5514) rand_chacha::guts::init_chacha
+calls=1 337 
+* 362
+fi=(564) /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand_chacha-0.3.1/src/chacha.rs
+-40 17
+fi=(565) /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand_core-0.6.4/src/block.rs
+147 6
+fi=(571) /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand-0.8.8/src/rngs/std.rs
+-84 9
+fe=(557)
+364 6
+
+fl=(563)
+fn=(5550) rand_chacha::guts::refill_wide::impl_avx2
+78 262
+fi=(196)
+2682 131
+fi=(572) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/../../stdarch/crates/core_arch/src/macros.rs
+183 131
+fe=(563)
+-60 131
+fi=(572)
++60 131
+fi=(196)
+2682 131
+fi=(572)
+183 131
+fe=(563)
+-58 131
+fi=(572)
++58 131
+fi=(196)
+2682 131
+fi=(572)
+183 131
+fe=(563)
+-56 131
+fi=(572)
++56 131
+-10 524
+fi=(573) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/../../stdarch/crates/core_arch/src/x86/avx.rs
+3141 131
+fi=(572)
+173 131
+fi=(259) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/cmp.rs
+2215 131
+fi=(310) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/iter/range.rs
+1103 131
+0 1048
+fi=(566) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/../../stdarch/crates/core_arch/src/x86/avx2.rs
+96 262
+3723 262
+2508 524
+96 262
+3145 131
+2315 393
+3145 131
+2315 393
+96 262
+2508 786
+96 262
+3723 262
+2315 786
+fi=(572)
+173 524
+fi=(566)
+-77 262
+2508 1048
+96 1572
+3723 1310
+2508 2620
+96 1310
+3145 655
+2315 1965
+3145 655
+2315 1965
+96 1310
+2508 3930
+96 1310
+3723 1310
+2315 3930
+fi=(572)
+173 2620
+fi=(566)
+-77 1310
+2508 5240
+96 1310
+3723 1310
+2315 3930
+3723 262
+2315 786
+96 262
+2508 524
+96 262
+3723 262
+2315 786
+fi=(572)
+173 786
+fi=(259)
+2215 131
+fi=(310)
+1103 131
+fi=(566)
+96 1310
+2508 2620
+96 1310
+3723 1310
+2315 3930
+fi=(572)
+173 3930
+fi=(259)
+2215 655
+fi=(310)
+1103 655
+fi=(566)
+2564 786
+fi=(196)
+2682 131
+fe=(563)
+150 262
+fi=(572)
++33 262
+fe=(563)
+-22 131
+fi=(541) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/../../stdarch/crates/core_arch/src/x86/sse2.rs
+-50 262
+fi=(256) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/ptr/mod.rs
+1966 131
+fi=(541)
+111 131
+fi=(256)
+1966 131
+fi=(541)
+111 131
+fi=(256)
+1966 131
+fi=(541)
+111 131
+fi=(256)
+1966 131
+fe=(563)
+163 393
+fi=(541)
+-52 131
+fe=(563)
++52 131
+fi=(256)
+1966 131
+fi=(541)
+111 131
+fi=(256)
+1966 131
+fi=(541)
+111 131
+fi=(256)
+1966 131
+fi=(541)
+111 131
+fi=(256)
+1966 131
+fi=(541)
+111 131
+fi=(256)
+1966 131
+fi=(541)
+111 131
+fi=(256)
+1966 131
+fi=(541)
+111 131
+fi=(256)
+1966 131
+fi=(541)
+111 131
+fi=(256)
+1966 131
+fe=(563)
+163 393
+fi=(541)
+-52 131
+fe=(563)
++52 131
+fi=(256)
+1966 131
+fi=(541)
+111 131
+fi=(256)
+1966 131
+fi=(541)
+111 131
+fi=(256)
+1966 131
+fi=(541)
+111 131
+fi=(256)
+1966 131
+fi=(573)
+1124 131
+fi=(558)
+263 131
+fe=(563)
+
+fl=(570) /home/runner/work/crypto/crypto/src/cryptanalysis/ic_framework/linalg.rs
+fn=(5868) crypto_lib::cryptanalysis::ic_framework::linalg::matrix_by_name
+1546 14
+fi=(354) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/slice/memchr.rs
+28 6
+cfn=(2460) core::slice::memchr::memchr_aligned
+calls=1 +25 
+* 45
++1 2
+fi=(320) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/slice/cmp.rs
+-8 3
+-21 1
+21 3
+154 8
+fe=(570)
+0 1
+fi=(284) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/vec/mod.rs
+471 3
+fi=(196)
+3242 8
+fi=(295)
+535 2
+fi=(282) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/raw_vec/mod.rs
+-55 2
+0 1
+cfi=(186)
+cfn=(906) __rustc::__rust_no_alloc_shim_is_unstable_v2
+calls=1 0 
+0 1
+0 1
+fi=(265) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/alloc.rs
+323 3
+cfi=(186)
+cfn=(2930) __rustc::__rust_alloc_zeroed
+calls=1 0 
+* 181
+fi=(282)
+489 2
+0 2
+fe=(570)
+0 2
+1588 1
+fi=(379) /home/runner/work/crypto/crypto/src/cryptanalysis/ic_boundary.rs
+-96 18
+fi=(265)
+156 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+* 1
++2 3
+cfi=(186)
+cfn=(908) __rustc::__rust_alloc
+calls=1 0 
+* 55
+fi=(269) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/boxed.rs
+258 2
+0 2
+305 3
+cob=(2)
+cfi=(237)
+cfn=(802)
+calls=1 -50 
+* 30
+fe=(570)
+1584 2
+0 1
+1628 9
+
+fl=(551) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/float_parse.rs
+fn=(5392) <f64 as core::str::traits::FromStr>::from_str
+68 9
+fi=(313) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/slice/mod.rs
++90 2
+0 2
+fi=(552) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/imp/dec2flt/mod.rs
+213 2
++2 3
+0 1
+222 3
+cfi=(553) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/imp/dec2flt/parse.rs
+cfn=(5398) core::num::imp::dec2flt::parse::parse_number
+calls=1 -33 
+* 103
+* 3
+0 3
+223 2
+fi=(555) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/imp/dec2flt/decimal.rs
+40 9
++29 2
+fi=(552)
+186 1
+fi=(555)
+72 2
+fi=(552)
+-72 2
+fe=(551)
+70 9
+fi=(552)
+180 3
+fi=(504) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/ops/arith.rs
+515 1
+0 1
+fi=(552)
+214 2
+fi=(555)
+87 2
+fe=(551)
+
+fl=(194) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std/src/rt.rs
+fn=(664) std::rt::lang_start_internal
+fi=(463) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/ops/function.rs
+cfn=(924) std::rt::lang_start::<std::process::ExitCode>::{closure#0}
+calls=0 206 
+287 3919384
+fe=(194)
+
+fn=(924)
+cfi=(272) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std/src/sys/backtrace.rs
+cfn=(926) std::sys::backtrace::__rust_begin_short_backtrace::<fn() -> std::process::ExitCode, std::process::ExitCode>
+calls=0 162 
+206 3919384
+
+fl=(559) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std_detect/src/detect/cache.rs
+fn=(5516) std_detect::detect::cache::detect_and_initialize
+191 8
+fi=(561) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/../../stdarch/crates/core_arch/src/x86/cpuid.rs
+88 6
+fi=(560) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std_detect/src/detect/os/x86.rs
+-38 2
+-50 4
+fi=(561)
+88 7
+fi=(560)
+-21 3
+fi=(561)
++21 14
+fi=(560)
++5 9
+-93 2
+fi=(561)
+88 5
+fi=(560)
+-5 3
+fi=(561)
++5 5
+fi=(560)
++5 1
+-93 1
+93 1
++1 16
+fi=(574) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std_detect/src/detect/bit.rs
+-86 2
+fi=(560)
++86 4
+-1 1
++1 5
+fi=(574)
+-86 2
+fi=(560)
++86 55
+fi=(574)
+-86 2
+fi=(560)
++86 7
+fi=(574)
+-86 1
+fi=(560)
++86 1
+fi=(574)
+-86 1
+fi=(560)
+135 1
+0 1
+94 4
++66 6
+0 2
+160 4
++9 4
+0 1
+197 1
+cfi=(562) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/../../stdarch/crates/core_arch/src/x86/xsave.rs
+cfn=(5522) core::core_arch::x86::xsave::_xgetbv
+calls=1 90 
+* 5
+* 2
++2 2
++4 1
++4 1
+0 3
+fe=(559)
+50 4
+fi=(560)
+224 1
+-19 1
++19 1
+-25 1
++31 1
+0 1
+fe=(559)
+11 2
+fi=(560)
+246 2
+fi=(561)
+88 5
+fi=(560)
++5 3
+fi=(574)
+-85 1
+fi=(560)
++86 2
+fi=(574)
+-86 2
+fi=(560)
++86 3
+-94 1
+201 1
+94 23
+fi=(574)
+-86 1
+fi=(560)
++86 13
+279 3
+fi=(455) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/array/equality.rs
+157 4
+fi=(560)
+329 4
+fi=(455)
+157 1
+fi=(560)
+329 1
+fe=(559)
+0 1
+99 2
+fi=(200) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/sync/atomic.rs
+4303 2
+fe=(559)
+177 2
+-78 1
+fi=(200)
+4303 1
+fe=(559)
+178 2
+-79 1
+fi=(200)
+4303 1
+fe=(559)
+193 10
+
+fl=(515) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std/src/sys/time/unix.rs
+fn=(4524) <std::time::Instant>::now
+74 6
+cfi=(516) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std/src/sys/pal/unix/time.rs
+cfn=(4526) <std::sys::pal::unix::time::Timespec>::now
+calls=3 +1 
+* 81
+
+fl=(553)
+fn=(5398)
+189 9
+33 2
+fi=(313)
+-33 3
+201 2
+0 2
+fi=(554) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/imp/dec2flt/common.rs
+43 1
+fi=(196)
+2719 1
+fi=(554)
+44 2
+-1 1
+fi=(196)
+2719 1
+fi=(554)
+44 2
+fi=(196)
+2758 1
+fe=(553)
+44 1
+fi=(196)
+2682 1
+fi=(313)
+201 3
+fe=(553)
+-81 4
+0 1
+fi=(313)
+201 4
+fe=(553)
+33 5
+fi=(313)
+201 3
+fe=(553)
+0 3
+fi=(554)
+44 1
+-44 1
+43 1
+fi=(196)
+2719 1
+fi=(554)
+44 2
+fi=(313)
+201 1
+fi=(196)
+2758 1
+fe=(553)
+44 1
+fi=(196)
+2682 1
+fi=(313)
+201 2
+0 1
+201 1
+fe=(553)
+-74 3
+-7 4
++11 6
+fi=(313)
++70 2
+fi=(361) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/mod.rs
+0 2
+fe=(553)
+149 2
+0 2
+191 2
++1 4
+0 1
+196 9
+
+fl=(534) /home/runner/work/crypto/crypto/src/cryptanalysis/ic_framework/mod.rs
+fn=(5022) crypto_lib::cryptanalysis::ic_framework::run_pipeline_with_base::<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>
+fi=(472) /home/runner/work/crypto/crypto/src/cryptanalysis/ic_measurement.rs
+cfi=(520) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std/src/thread/local.rs
+cfn=(5354) <std::thread::local::LocalKey<core::cell::RefCell<crypto_lib::cryptanalysis::ic_measurement::State>>>::with::<crypto_lib::cryptanalysis::ic_measurement::mark::{closure#0}, ()>
+calls=0 423 
+332 47
+fi=(379)
+168 5
+fe=(534)
+670 4
++1 4
+cfi=(523) /home/runner/work/crypto/crypto/src/cryptanalysis/ic_framework/stages.rs
+cfn=(5366) <crypto_lib::cryptanalysis::ic_framework::stages::Params>::get
+calls=1 65 
+* 77
+fi=(289) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/option.rs
+-37 1
+fe=(534)
++37 1
++3 1
+cfi=(515)
+cfn=(4524)
+calls=1 74 
+* 29
+* 2
+fi=(387) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/borrow.rs
+350 3
+0 5
+fe=(534)
+675 3
+cfi=(524) /home/runner/work/crypto/crypto/src/cryptanalysis/ic_framework/plugins.rs
+cfn=(5378) <crypto_lib::cryptanalysis::ic_framework::plugins::WWalkOracle<crypto_lib::cryptanalysis::ic_boundary::PrimePoint> as crypto_lib::cryptanalysis::ic_framework::stages::DecompositionOracle<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>>::prepare
+calls=1 3497 
+* 3915117
+fi=(268) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/result.rs
+2176 2
+fi=(379)
+701 9
+fe=(534)
+-24 4
+fi=(379)
+197 1
++2 1
+-47 1
++49 3
+fe=(534)
+678 2
+cfi=(523)
+cfn=(5844) <crypto_lib::cryptanalysis::ic_framework::fiber::FiberMitmOracle<crypto_lib::cryptanalysis::ic_boundary::PrimePoint> as crypto_lib::cryptanalysis::ic_framework::stages::DecompositionOracle<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>>::relation_counters
+calls=1 407 
+* 4
+* 1
+fi=(256)
+848 2
+cfi=(365) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/collections/btree/map.rs
+cfn=(5846) <alloc::collections::btree::map::BTreeMap<alloc::string::String, u64> as core::ops::drop::Drop>::drop
+calls=1 207 
+* 50
+fe=(534)
+678 6
++1 2
+cfi=(524)
+cfn=(5852) <crypto_lib::cryptanalysis::ic_framework::plugins::WWalkOracle<crypto_lib::cryptanalysis::ic_boundary::PrimePoint> as crypto_lib::cryptanalysis::ic_framework::stages::DecompositionOracle<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>>::setup_work_native
+calls=1 3682 
+* 3151
+* 1
+fi=(256)
+848 2
+cfi=(365)
+cfn=(5846)
+calls=1 207 
+* 50
+fe=(534)
+679 5
++1 1
+cfi=(544) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std/src/time.rs
+cfn=(5234) <std::time::Instant>::elapsed
+calls=1 388 
+* 89
+fi=(545) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/time.rs
++40 3
+fe=(534)
+-40 1
++1 3
+fi=(463)
+0 1
+fi=(289)
+634 3
+fe=(534)
++60 4
++21 12
+fi=(467) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/bool.rs
+66 1
+cfi=(534)
+cfn=(5866) crypto_lib::cryptanalysis::ic_framework::run_pipeline_inner::<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>::{closure#4}
+calls=1 715 
+* 445
+* 3
+fi=(289)
+2240 2
+fi=(268)
+0 1
+fi=(289)
+634 2
+fe=(534)
++93 2
++9 5
+fi=(289)
+634 1
+fe=(534)
+745 1
++21 1
+cfi=(515)
+cfn=(4524)
+calls=1 74 
+* 29
+* 3
++2 2
+cfi=(523)
+cfn=(5890) <crypto_lib::cryptanalysis::ic_framework::fiber::FiberMitmOracle<crypto_lib::cryptanalysis::ic_boundary::PrimePoint> as crypto_lib::cryptanalysis::ic_framework::stages::DecompositionOracle<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>>::setup_rows
+calls=1 312 
+* 3
+fi=(201) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/ptr/non_null.rs
+1663 1
+fi=(306) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/slice/iter/macros.rs
+180 1
+0 2
+fe=(534)
+748 5
+cfi=(523)
+cfn=(5886) <crypto_lib::cryptanalysis::gaudry_quartic_d4::YLineBase as crypto_lib::cryptanalysis::ic_framework::stages::FactorBaseBuilder<crypto_lib::cryptanalysis::gaudry_quartic::Curve4>>::known_column_logs
+calls=1 199 
+* 6
+fi=(268)
+0 5
+2176 2
+fe=(534)
+0 3
+788 1
+cfi=(544)
+cfn=(5234)
+calls=1 388 
+* 89
+* 2
+0 1
+789 8
+0 3
+fi=(201)
+1663 1
+fi=(312) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/vec/into_iter.rs
+279 1
+0 1
+fi=(282)
+655 1
+fe=(534)
+0 2
+844 2
+cfi=(472)
+cfn=(5892) crypto_lib::cryptanalysis::ic_measurement::begin_online
+calls=1 348 
+* 33
+
+fn=(5866)
+715 10
++9 16
+cfi=(570)
+cfn=(5868)
+calls=1 1546 
+* 419
+
+fl=(516)
+fn=(5236) <std::sys::pal::unix::time::Timespec>::sub_timespec
+112 18
+fi=(259)
+2339 6
+fe=(516)
+25 15
+fi=(259)
+554 3
+fe=(516)
+25 3
+fi=(259)
+554 3
+fe=(516)
+25 3
++94 6
++1 21
+0 3
+fi=(545)
+275 6
+fe=(516)
+136 9
++7 12
+
+fn=(4526)
+75 30
++32 6
+cob=(2)
+cfi=(517) ./time/../sysdeps/unix/sysv/linux/clock_gettime.c
+cfn=(4528) clock_gettime@@GLIBC_2.17
+calls=6 -77 
+* 66
+fi=(199) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std/src/sys/pal/unix/mod.rs
+230 6
++10 6
+fe=(516)
+108 6
+-41 6
+fi=(268)
+1230 6
+fe=(516)
+108 6
++2 24
+
+fl=(562)
+fn=(5522)
+90 4
++1 1
+
+fl=(544)
+fn=(5234)
+388 15
+fi=(515)
+74 6
+cfi=(516)
+cfn=(4526)
+calls=3 +1 
+* 81
+fe=(544)
+389 27
+fi=(515)
+78 3
+cfi=(516)
+cfn=(5236)
+calls=3 +34 
+* 108
+fi=(289)
+1097 15
+fe=(544)
+390 12
+
+fl=(404) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/iter/adapters/map.rs
+fn=(5746) <core::iter::adapters::map::Map<core::slice::iter::Iter<[u64; 4]>, <crypto_lib::cryptanalysis::ic_boundary::TargetWalk<crypto_lib::cryptanalysis::ic_boundary::PrimePoint>>::solve_log_q::{closure#0}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<alloc::vec::Vec<u64>, <alloc::vec::Vec<alloc::vec::Vec<u64>>>::extend_trusted<core::iter::adapters::map::Map<core::slice::iter::Iter<[u64; 4]>, <crypto_lib::cryptanalysis::ic_boundary::TargetWalk<crypto_lib::cryptanalysis::ic_boundary::PrimePoint>>::solve_log_q::{closure#0}>>::{closure#0}>::{closure#0}>
+124 7
++4 2
+-40 2
+fi=(201)
+1663 1
+fi=(306)
+25 1
+-25 1
+fe=(404)
+128 7
+fi=(408) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/ptr/const_ptr.rs
+734 3
+fi=(306)
+28 7
+-28 3
+fi=(379)
+1259 6
+fi=(282)
+635 3
+fi=(256)
+1966 3
+fi=(284)
+1006 3
+fi=(379)
+14323 9
+fi=(256)
+1966 9
+fi=(306)
+279 18
+0 3
+fi=(379)
+14316 12
+fi=(265)
+156 3
+cfi=(186)
+cfn=(906)
+calls=3 0 
+* 3
++2 9
+cfi=(186)
+cfn=(908)
+calls=3 0 
+* 156
+fi=(269)
+258 6
+fi=(379)
+14317 3
+fi=(284)
+1142 15
+fi=(379)
+14318 6
+fi=(284)
+1000 6
+cfi=(282)
+cfn=(5590) <alloc::raw_vec::RawVec<u64>>::grow_one
+calls=3 196 
+* 1360
+fi=(282)
+635 3
+fi=(256)
+1966 3
+fi=(284)
+1006 6
+0 3
+fi=(379)
+14321 12
+1201 18
++14 3
++12 6
+-4 3
+fi=(427) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/convert/num.rs
+154 3
+fi=(284)
+999 9
+fi=(282)
+635 3
+fi=(256)
+1966 3
+fi=(284)
+1006 9
+fi=(379)
+14322 12
+1201 18
++14 3
++12 6
+-4 3
+fi=(427)
+154 3
+fi=(284)
+999 6
+0 3
+fi=(307) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/vec/set_len_on_drop.rs
+31 1
+fe=(404)
++98 8
+
+fn=(5772) <core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<u64>>, crypto_lib::cryptanalysis::ic_boundary::solve_last_unknown::{closure#0}> as core::iter::traits::iterator::Iterator>::fold::<(), core::iter::traits::iterator::Iterator::for_each::call<alloc::vec::Vec<u64>, <alloc::vec::Vec<alloc::vec::Vec<u64>>>::extend_trusted<core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<u64>>, crypto_lib::cryptanalysis::ic_boundary::solve_last_unknown::{closure#0}>>::{closure#0}>::{closure#0}>
+124 7
++4 2
+-40 3
+fi=(201)
+1663 1
+fi=(306)
+25 1
+fe=(404)
+128 4
+fi=(408)
+734 7
+0 3
+fi=(262) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/ptr/mut_ptr.rs
+971 9
+fi=(256)
+1966 9
+fi=(307)
+19 3
+fi=(196)
+1043 3
+fi=(306)
+279 6
+fi=(201)
+627 6
+fi=(306)
+274 6
+fi=(282)
+480 6
+0 3
+fi=(306)
+274 3
+fi=(286) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/vec/spec_from_iter_nested.rs
+0 6
+cfi=(186)
+cfn=(906)
+calls=3 0 
+0 3
+fi=(265)
+158 12
+cfi=(186)
+cfn=(908)
+calls=3 0 
+* 165
+fi=(282)
+489 6
+0 6
+fi=(379)
+12982 9
+fi=(306)
+0 12
+fi=(504)
+602 12
+fi=(306)
+274 12
+fi=(504)
+602 72
+fi=(256)
+1966 12
+fi=(307)
+19 12
+fi=(306)
+279 27
+0 1
+fi=(307)
+31 1
+fe=(404)
++98 8
+
+fl=(266) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std/src/alloc.rs
+fn=(910) __rustc::__rdl_alloc
+474 489
+fi=(267) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std/src/sys/alloc/unix.rs
+30 2934
++1 978
+cob=(2)
+cfi=(217) ./malloc/./malloc/malloc.c
+cfn=(714) malloc
+calls=489 3294 
+* 24069
+fe=(266)
+
+fn=(1000) __rustc::__rdl_realloc
+491 288
+fi=(267)
+70 216
++1 288
+cob=(2)
+cfi=(217)
+cfn=(794) realloc
+calls=36 3407 
+* 20577
+fe=(266)
+
+fn=(2932) __rustc::__rdl_alloc_zeroed
+506 60
+fi=(267)
+52 60
++1 70
+cob=(2)
+cfi=(217)
+cfn=(868) calloc
+calls=10 3699 
+* 69397
+fe=(266)
+
+fl=(558)
+fn=(5528) rand_chacha::guts::init_chacha::impl_avx
+342 1
+fi=(563)
+238 2
++5 4
+fi=(196)
+1122 4
+fi=(563)
+248 4
+-17 1
++17 1
+fe=(558)
++96 1
+
+fn=(5514)
+337 5
+fi=(200)
+4319 2
+fi=(559)
+92 2
+fe=(558)
+-92 4
+fi=(559)
+216 1
+cfn=(5516)
+calls=1 -25 
+* 311
+* 5
+fe=(558)
+350 1
++1 6
+cfn=(5528)
+calls=1 -9 
+* 18
++7 7
+
+fn=(5546) rand_chacha::guts::refill_wide
+254 655
+fi=(200)
+4319 262
+fi=(559)
+92 262
+216 131
+fe=(558)
++70 131
++1 786
+cfi=(563)
+cfn=(5550)
+calls=131 78 
+* 77159
+
+fl=(365)
+fn=(5846)
+207 8
+fi=(256)
+1758 2
+fe=(365)
+1891 4
+0 14
+1927 2
+cfn=(5848) <alloc::collections::btree::map::IntoIter<usize, (u64, usize, usize)>>::dying_next
+calls=2 +12 
+* 54
+* 6
+210 10
+
+fn=(5190) <alloc::collections::btree::map::BTreeMap<alloc::string::String, u64>>::insert
+1046 56
+1507 28
+fi=(377) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/collections/btree/node.rs
+659 30
+404 12
+fi=(306)
+180 6
+0 42
+fi=(378) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/collections/btree/search.rs
+235 12
+fi=(320)
++90 24
++8 6
+cob=(2)
+cfi=(327) ./string/../sysdeps/x86_64/multiarch/memcmp-avx2-movbe.S
+cfn=(2026) __memcmp_avx2_movbe
+calls=6 73 
+* 132
+fi=(378)
+-98 18
+fi=(320)
++90 36
++8 9
+cob=(2)
+cfi=(327)
+cfn=(2026)
+calls=9 73 
+* 198
+* 15
++1 30
+fi=(259)
+2339 60
+fi=(378)
+235 30
+fi=(323) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/iter/adapters/enumerate.rs
+82 9
+fi=(201)
+1663 18
+fi=(306)
+180 9
+fi=(378)
++55 24
+fi=(377)
+751 12
+fe=(365)
+1509 3
+0 1
+1050 2
++2 77
+fi=(375) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/collections/btree/map/entry.rs
+426 7
+cfn=(5192) <alloc::collections::btree::map::entry::VacantEntry<alloc::string::String, u64>>::insert_entry
+calls=7 +21 
+* 1586
+* 14
+0 24
+fe=(365)
+1050 12
++7 56
+
+fn=(5848)
+1939 16
++3 6
+fi=(197) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/mem/mod.rs
+977 8
++1 2
+fi=(289)
+2876 4
+fe=(365)
+1944 2
++6 16
+
+fl=(523)
+fn=(5844)
+407 1
+fi=(365)
+654 2
+fe=(523)
+409 1
+
+fn=(5322) <crypto_lib::cryptanalysis::ic_framework::stages::Params>::flag
+89 32
+fi=(289)
+744 12
+0 4
+fi=(377)
+305 4
++99 8
+fi=(306)
+180 4
+0 1
+fi=(377)
+751 2
+fi=(306)
+0 28
+fi=(378)
+235 8
+fi=(320)
++90 16
++8 4
+cob=(2)
+cfi=(327)
+cfn=(2026)
+calls=4 73 
+* 73
+fi=(378)
+-98 16
+fi=(320)
++90 32
++8 8
+cob=(2)
+cfi=(327)
+cfn=(2026)
+calls=8 73 
+* 137
+* 12
++1 24
+fi=(259)
+2339 48
+fi=(378)
+235 24
+fi=(323)
+82 8
+fi=(201)
+1663 16
+fi=(306)
+180 8
+fi=(378)
++55 12
+fi=(282)
+635 3
+fi=(284)
+1785 3
+fi=(320)
+21 18
+154 6
+0 2
+154 3
+fe=(523)
+-63 32
+
+fn=(4742) <crypto_lib::cryptanalysis::ic_framework::stages::Params>::u64_or
+79 48
+fi=(289)
+744 12
+0 4
+fi=(377)
+305 4
++99 8
+fi=(306)
+180 4
+0 24
+fi=(378)
+235 8
+fi=(320)
++90 16
++8 4
+cob=(2)
+cfi=(327)
+cfn=(2026)
+calls=4 73 
+* 88
+fi=(378)
+-98 36
+fi=(320)
++90 72
++8 18
+cob=(2)
+cfi=(327)
+cfn=(2026)
+calls=18 73 
+* 339
+* 22
++1 44
+fi=(259)
+2339 88
+fi=(378)
+235 44
+fi=(323)
+82 18
+fi=(201)
+1663 36
+fi=(306)
+180 18
+fi=(378)
++55 12
+0 1
+fi=(377)
+751 2
+fi=(282)
+635 3
+fi=(284)
+1785 3
+fe=(523)
+82 6
+fi=(361)
+1796 15
++7 5
+fe=(523)
+0 4
+86 9
+-86 6
+86 27
+fi=(361)
+1803 20
+1589 2
+1803 9
+1589 1
+1837 4
+-21 8
+0 2
+1839 2
+fi=(363) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/char/methods.rs
+415 2
++15 2
+fi=(361)
+1816 2
++23 1
+fi=(363)
+415 1
++15 1
+fi=(361)
+1816 1
+fi=(196)
+2758 3
+fi=(361)
+1840 3
+fi=(196)
+2682 3
+fi=(361)
+1837 14
+fi=(295)
+535 5
+fi=(196)
+3242 1
+fi=(295)
+535 1
+fi=(196)
+3242 18
+fi=(295)
+535 18
+fi=(361)
+1865 19
+fi=(363)
+415 57
++15 19
+fi=(361)
+1816 57
++37 77
+fe=(523)
+
+fn=(5366)
+65 32
+fi=(289)
+744 12
+0 4
+fi=(377)
+305 4
++99 8
+fi=(306)
+180 4
+0 28
+fi=(378)
+235 8
+fi=(320)
++90 16
++8 4
+cob=(2)
+cfi=(327)
+cfn=(2026)
+calls=4 73 
+* 88
+fi=(378)
+-98 20
+fi=(320)
++90 40
++8 10
+cob=(2)
+cfi=(327)
+cfn=(2026)
+calls=10 73 
+* 190
+* 14
++1 28
+fi=(259)
+2339 56
+fi=(378)
+235 28
+fi=(323)
+82 10
+fi=(201)
+1663 20
+fi=(306)
+180 10
+fi=(378)
++55 12
+0 2
+fi=(377)
+751 4
+fi=(282)
+635 2
+fi=(284)
+1785 4
+fe=(523)
+67 32
+-67 2
+fi=(377)
+751 2
+fe=(523)
+
+fn=(5886)
+199 1
++5 4
++1 1
+
+fn=(5890)
+312 3
+
+fl=(286)
+fn=(5766) <alloc::vec::Vec<alloc::vec::Vec<u64>> as alloc::vec::spec_from_iter_nested::SpecFromIterNested<alloc::vec::Vec<u64>, core::iter::adapters::map::Map<core::slice::iter::Iter<alloc::vec::Vec<u64>>, crypto_lib::cryptanalysis::ic_boundary::solve_last_unknown::{closure#0}>>>::from_iter
+50 5
++1 2
+fi=(408)
+734 4
+fi=(295)
+535 1
+fi=(282)
+0 1
+480 2
+0 2
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+0 1
+fi=(265)
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 233
+fi=(282)
+489 2
+0 5
+fi=(284)
+936 4
+4097 4
+fi=(336) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/iter/traits/iterator.rs
+901 3
+cfi=(404)
+cfn=(5772)
+calls=1 124 
+* 458
+fe=(286)
+61 4
++1 7
+
+fl=(267)
+fn=(1600) __rustc::__rdl_dealloc
+65 468
+cob=(2)
+cfi=(217)
+cfn=(832) free
+calls=468 3359 
+* 40547
+
+fl=(481) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/vec/spec_from_iter.rs
+fn=(5740) <alloc::vec::Vec<alloc::vec::Vec<u64>> as alloc::vec::spec_from_iter::SpecFromIter<alloc::vec::Vec<u64>, core::iter::adapters::map::Map<core::slice::iter::Iter<[u64; 4]>, <crypto_lib::cryptanalysis::ic_boundary::TargetWalk<crypto_lib::cryptanalysis::ic_boundary::PrimePoint>>::solve_log_q::{closure#0}>>>::from_iter
+32 6
+fi=(286)
++19 2
+fi=(408)
+734 4
+fi=(295)
+535 1
+fi=(282)
+0 1
+480 2
+0 5
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+0 1
+fi=(265)
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 263
+fi=(282)
+489 2
+0 3
+fi=(284)
+936 4
+4097 4
+fi=(336)
+901 3
+cfi=(404)
+cfn=(5746)
+calls=1 124 
+* 1814
+fi=(286)
+61 4
+fe=(481)
+-27 8
+
+fl=(282)
+fn=(5586) <alloc::raw_vec::RawVec<[u64; 3]>>::grow_one
+196 20
+514 5
++30 5
+fi=(259)
+2316 15
+fe=(282)
+550 30
+cfn=(972) <alloc::raw_vec::RawVecInner>::finish_grow
+calls=5 +15 
+* 2848
+fi=(268)
+2176 10
++1 5
+fe=(282)
+804 5
++2 5
+199 20
+
+fn=(5590)
+196 32
+514 8
++30 8
+fi=(259)
+2316 24
+fe=(282)
+550 48
+cfn=(972)
+calls=8 +15 
+* 3357
+fi=(268)
+2176 16
++1 8
+fe=(282)
+804 8
++2 8
+199 32
+
+fn=(5724) <alloc::raw_vec::RawVec<[u64; 4]>>::grow_one
+196 4
+514 1
++30 1
+fi=(259)
+2316 3
+fe=(282)
+550 6
+cfn=(972)
+calls=1 +15 
+* 96
+fi=(268)
+2176 2
++1 1
+fe=(282)
+804 1
++2 1
+199 4
+
+fn=(972)
+565 280
+fi=(196)
+3242 280
+fi=(295)
+535 105
+0 35
+fe=(282)
+655 35
+fi=(196)
+1431 24
+fi=(265)
+260 120
+cfi=(186)
+cfn=(998) __rustc::__rust_realloc
+calls=24 0 
+* 15767
+fi=(268)
+965 48
+fi=(265)
+331 22
++4 11
+cfi=(186)
+cfn=(906)
+calls=11 0 
+* 11
+158 33
+cfi=(186)
+cfn=(908)
+calls=11 0 
+* 685
+fi=(268)
+965 22
++1 105
+fe=(282)
+0 70
+587 210
+-22 16
+fi=(196)
+3242 16
+fi=(295)
+535 6
+0 2
+fe=(282)
+655 2
+fi=(196)
+1431 1
+fi=(265)
+260 5
+cfi=(186)
+cfn=(998)
+calls=1 0 
+* 65
+fi=(268)
+965 2
+fi=(265)
+331 2
++4 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+* 1
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 52
+fi=(268)
+965 2
++1 6
+fe=(282)
+0 4
+587 12
+-22 64
+fi=(196)
+3242 64
+fi=(295)
+535 24
+0 8
+fe=(282)
+655 8
+fi=(196)
+1431 7
+fi=(265)
+260 35
+cfi=(186)
+cfn=(998)
+calls=7 0 
+* 2981
+fi=(268)
+965 14
+fi=(265)
+331 2
++4 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+* 1
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 55
+fi=(268)
+965 2
++1 24
+fe=(282)
+0 16
+587 48
+-22 48
+fi=(196)
+3242 48
+fi=(295)
+535 18
+fe=(282)
+655 12
+fi=(196)
+1431 4
+fi=(265)
+260 20
+cfi=(186)
+cfn=(998)
+calls=4 0 
+* 2592
+fi=(268)
+965 8
+fi=(265)
+331 4
++4 2
+cfi=(186)
+cfn=(906)
+calls=2 0 
+* 2
+158 6
+cfi=(186)
+cfn=(908)
+calls=2 0 
+* 110
+fi=(268)
+965 4
++1 18
+fe=(282)
+0 12
+587 36
+-22 8
+fi=(196)
+3242 8
+fi=(295)
+535 3
+fe=(282)
+655 2
+fi=(265)
+331 2
++4 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+* 1
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 55
+fi=(268)
+965 2
++1 3
+fe=(282)
+0 2
+587 6
+-22 32
+fi=(196)
+3242 32
+fi=(295)
+535 12
+fe=(282)
+655 8
+fi=(265)
+331 8
++4 4
+cfi=(186)
+cfn=(906)
+calls=4 0 
+* 4
+158 12
+cfi=(186)
+cfn=(908)
+calls=4 0 
+* 220
+fi=(268)
+965 8
++1 12
+fe=(282)
+0 8
+587 24
+
+fn=(1100) <alloc::raw_vec::RawVecInner<_>>::reserve::do_reserve_and_handle::<alloc::alloc::Global>
+683 12
+533 6
+fi=(196)
+968 3
+fi=(295)
+535 3
+0 3
+fe=(282)
+544 6
+fi=(259)
+2316 6
+fe=(282)
+169 21
+fi=(259)
+2316 9
+fe=(282)
+550 12
+cfn=(972)
+calls=3 +15 
+* 288
+fi=(268)
+2176 6
++1 3
+fe=(282)
+804 3
++2 3
+693 12
+
+fn=(5486) <alloc::raw_vec::RawVec<(usize, u64, u64, u64, u64)>>::grow_one
+196 8
+514 2
++30 2
+fi=(259)
+2316 6
+fe=(282)
+550 12
+cfn=(972)
+calls=2 +15 
+* 525
+fi=(268)
+2176 4
++1 2
+fe=(282)
+804 2
++2 2
+199 8
+
+fn=(5492) <alloc::raw_vec::RawVec<[f64; 3]>>::grow_one
+196 96
+514 24
++30 24
+fi=(259)
+2316 72
+fe=(282)
+550 144
+cfn=(972)
+calls=24 +15 
+* 14198
+fi=(268)
+2176 48
++1 24
+fe=(282)
+804 24
++2 24
+199 96
+
+fn=(5622) <alloc::raw_vec::RawVec<crypto_lib::cryptanalysis::sig_fp_tower::SElem>>::grow_one
+196 12
+514 3
++30 3
+fi=(259)
+2316 9
+fe=(282)
+550 18
+cfn=(972)
+calls=3 +15 
+* 1465
+fi=(268)
+2176 6
++1 3
+fe=(282)
+804 3
++2 3
+199 12
+
+fn=(5732) <alloc::raw_vec::RawVec<alloc::vec::Vec<usize>>>::grow_one
+196 4
+514 1
++30 1
+fi=(259)
+2316 3
+fe=(282)
+550 6
+cfn=(972)
+calls=1 +15 
+* 96
+fi=(268)
+2176 2
++1 1
+fe=(282)
+804 1
++2 1
+199 4
+
+fn=(2034) <alloc::raw_vec::RawVecInner>::try_allocate_in
+466 9
+fi=(196)
+3242 7
+fi=(295)
+535 2
+fe=(282)
+-55 2
+0 2
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+0 2
+484 2
++13 3
+0 2
+504 7
+fi=(265)
+158 1
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 230
+fe=(282)
+489 2
+
+fn=(5154) <alloc::raw_vec::RawVec<usize>>::grow_one
+196 4
+514 1
++30 1
+fi=(259)
+2316 3
+fe=(282)
+550 6
+cfn=(972)
+calls=1 +15 
+* 96
+fi=(268)
+2176 2
++1 1
+fe=(282)
+804 1
++2 1
+199 4
+
+fn=(5718) <alloc::raw_vec::RawVec<(usize, u64)>>::grow_one
+196 12
+514 3
++30 3
+fi=(259)
+2316 9
+fe=(282)
+550 18
+cfn=(972)
+calls=3 +15 
+* 288
+fi=(268)
+2176 6
++1 3
+fe=(282)
+804 3
++2 3
+199 12
+
+fn=(5698) <alloc::raw_vec::RawVec<bool>>::grow_one
+196 8
+514 2
++30 2
+fi=(259)
+2316 6
+fe=(282)
+550 12
+cfn=(972)
+calls=2 +15 
+* 198
+fi=(268)
+2176 4
++1 2
+fe=(282)
+804 2
++2 2
+199 8
+
+fn=(5702) <alloc::raw_vec::RawVec<((u128, u64, u64), (u128, u64, u64))>>::grow_one
+196 12
+514 3
++30 3
+fi=(259)
+2316 9
+fe=(282)
+550 18
+cfn=(972)
+calls=3 +15 
+* 1387
+fi=(268)
+2176 6
++1 3
+fe=(282)
+804 3
++2 3
+199 12
+
+fl=(568) /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand-0.8.8/src/rng.rs
+fn=(5576) <rand::rngs::std::StdRng as rand::rng::Rng>::gen_range::<usize, core::ops::range::RangeInclusive<usize>>
+129 56
++5 16
+fi=(259)
+2217 8
+fe=(568)
+134 8
+0 8
+fi=(196)
+2682 8
+fi=(575) /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand-0.8.8/src/distributions/uniform.rs
+537 8
+fi=(565)
+0 8
+fi=(196)
+154 8
+fi=(575)
+551 24
+fi=(196)
+2719 16
+fi=(565)
+205 24
++2 38
+-7 38
+fi=(567) /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rand-0.8.8/src/distributions/utils.rs
+25 19
+fi=(575)
+557 38
+fi=(565)
+206 38
+0 8
+fi=(196)
+2682 8
+fe=(568)
+136 64
+
+fl=(472)
+fn=(4516) crypto_lib::cryptanalysis::ic_measurement::dump
+441 6
++1 2
++8 1
+
+fn=(5892)
+348 4
+fi=(537) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std/src/sys/thread_local/native/mod.rs
+105 2
+fi=(521) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std/src/sys/thread_local/native/lazy.rs
+-46 2
+fi=(279) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/cell.rs
+2069 2
+fi=(197)
+978 1
+fi=(289)
+767 3
+fe=(472)
+121 2
+352 2
+0 2
+356 3
+cfn=(5034) <crypto_lib::cryptanalysis::ic_measurement::Trace>::boundary
+calls=1 149 
+* 10
+
+fn=(5034)
+149 6
++1 1
+-53 2
++53 1
+cfn=(4516)
+calls=1 441 
+* 9
+42 3
++6 2
+cob=(2)
+cfi=(517)
+cfn=(4528)
+calls=1 -18 
+* 11
++2 2
+153 2
++1 1
++1 2
++3 1
++1 2
+0 2
+164 5
+
+fl=(186)
+fn=(630)
+cob=(2)
+cfi=(187) ./csu/../csu/libc-start.c
+cfn=(632) __libc_start_main@@GLIBC_2.34
+calls=0 242 
+0 3919384
+
+fn=(908)
+0 489
+cfi=(266)
+cfn=(910)
+calls=489 474 
+0 28470
+
+fn=(1598) __rustc::__rust_dealloc
+0 468
+cfi=(267)
+cfn=(1600)
+calls=468 65 
+0 41015
+
+fn=(2930)
+0 10
+cfi=(266)
+cfn=(2932)
+calls=10 506 
+0 69587
+
+fn=(998)
+0 36
+cfi=(266)
+cfn=(1000)
+calls=36 491 
+0 21369
+
+fn=(906)
+0 499
+
+fn=(662) main
+cfi=(194)
+cfn=(664)
+calls=0 152 
+0 3919384
+
+fl=(375)
+fn=(5192)
+447 56
++1 14
+0 6
+460 90
+cfi=(377)
+cfn=(5222) <alloc::collections::btree::node::Handle<alloc::collections::btree::node::NodeRef<alloc::collections::btree::node::marker::Mut, alloc::string::String, u64, alloc::collections::btree::node::marker::Leaf>, alloc::collections::btree::node::marker::Edge>>::insert_recursing::<alloc::alloc::Global, <alloc::collections::btree::map::entry::VacantEntry<alloc::string::String, u64>>::insert_entry::{closure#0}>
+calls=6 1093 
+* 546
+fi=(376) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/collections/btree/borrow.rs
+53 6
+fe=(375)
+474 12
+-7 6
+fi=(376)
+53 1
+fi=(265)
+335 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+* 1
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 755
+fi=(269)
+522 2
+fi=(256)
+1966 1
+fi=(289)
+1724 2
+fe=(375)
+457 2
+fi=(377)
+689 1
+fi=(278) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/mem/maybe_uninit.rs
+575 4
+fe=(375)
+471 1
++4 1
+-2 3
++6 6
+-8 6
++4 6
+-2 18
++6 36
+
+fl=(503) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/compiler-builtins/compiler-builtins/src/macros.rs
+fn=(5450) round
+433 4
+fi=(399) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/f64.rs
+1368 4
+fi=(504)
+104 2
+fi=(399)
+1321 2
+fi=(487) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/ops/bit.rs
+613 4
+fi=(502) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/compiler-builtins/compiler-builtins/src/math/../../../libm/src/math/support/float_traits.rs
+183 2
+fi=(576) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/compiler-builtins/compiler-builtins/src/math/../../../libm/src/math/generic/trunc.rs
+12 4
+fi=(502)
+188 2
+fi=(487)
+386 4
+fi=(502)
+188 2
+fi=(576)
+16 4
+fi=(487)
+386 2
+fi=(399)
+1368 2
+fe=(503)
+436 2
+
+fl=(520)
+fn=(5354)
+fi=(472)
+cfi=(472)
+cfn=(5034)
+calls=0 149 
+339 42
+fi=(197)
+978 1
+fe=(520)
+431 4
+
+fl=(354)
+fn=(2460)
+53 3
+fi=(256)
+2383 2
+fe=(354)
+73 2
+-73 2
+83 1
+-83 2
+fi=(361)
+1490 3
+0 2
+fe=(354)
+91 1
+-72 4
++73 1
+-73 3
++74 4
++4 1
+-14 2
+-83 1
+41 2
+-41 1
+42 2
+-1 3
++68 3
+
+fl=(377)
+fn=(5222)
+1093 54
+315 6
+-24 18
+989 6
+-24 6
+1894 6
+fi=(262)
+971 18
+fe=(377)
+1894 12
+965 12
+fi=(262)
++6 18
+fe=(377)
+1895 12
+fi=(256)
+665 36
+cob=(2)
+cfi=(237)
+cfn=(802)
+calls=6 255 
+* 89
+* 6
+fi=(278)
+-90 24
+fi=(262)
+971 24
+fi=(256)
+665 12
+cob=(2)
+cfi=(237)
+cfn=(802)
+calls=6 255 
+* 73
+* 12
+fe=(377)
+961 6
+fi=(278)
+575 6
+fe=(377)
+967 6
++2 12
+fi=(310)
+1103 6
+fe=(377)
+894 18
+1125 48
+
+fl=(269)
+fn=(5480) alloc::boxed::box_new_uninit
+257 2
+fi=(265)
+156 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+* 1
++2 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 55
+fe=(269)
+258 2
++4 2
+
+fl=(524)
+fn=(5428) crypto_lib::cryptanalysis::ic_framework::plugins::wwalk_cv
+3799 8
+fi=(289)
+744 3
+fi=(377)
+305 1
++99 2
+fi=(306)
+180 1
+0 6
+fi=(378)
+235 2
+fi=(320)
++90 5
++8 2
+cob=(2)
+cfi=(327)
+cfn=(2026)
+calls=1 73 
+* 22
+fi=(378)
+-98 2
+fi=(320)
++90 5
++8 2
+cob=(2)
+cfi=(327)
+cfn=(2026)
+calls=1 73 
+* 10
+* 2
++1 4
+fi=(259)
+2339 8
+fi=(378)
+235 4
+fi=(323)
+82 1
+fi=(201)
+1663 2
+fi=(306)
+180 1
+fi=(378)
++55 3
+fi=(377)
+751 2
+fe=(524)
+0 1
+3801 1
+0 2
+3805 8
+
+fn=(5852)
+3682 8
++1 3
+fi=(365)
+654 2
+fi=(379)
+14460 3
+fi=(282)
+0 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+0 1
+fi=(265)
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 55
+fi=(282)
+489 2
+fi=(256)
++85 4
+fi=(291) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/string.rs
+1039 5
+fi=(379)
+14461 2
+cfi=(365)
+cfn=(5190)
+calls=1 1046 
+* 834
++2 3
+fi=(282)
+0 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+0 1
+fi=(265)
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 52
+fi=(282)
+489 2
+fi=(256)
++85 2
+fi=(291)
+1039 5
+fi=(379)
+14464 2
+cfi=(365)
+cfn=(5190)
+calls=1 1046 
+* 228
+fi=(305) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/macros/mod.rs
+434 1
+fi=(379)
+14466 1
+fi=(282)
+0 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+0 1
+fi=(265)
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 55
+fi=(282)
+489 2
+fi=(256)
++85 4
+fi=(291)
+1039 5
+fi=(379)
+14468 2
+cfi=(365)
+cfn=(5190)
+calls=1 1046 
+* 227
+fi=(282)
+0 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+0 1
+fi=(265)
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 55
+fi=(282)
+489 2
+fi=(256)
++85 4
+fi=(291)
+1039 5
+fi=(379)
+14469 2
+cfi=(365)
+cfn=(5190)
+calls=1 1046 
+* 237
+fi=(282)
+0 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+0 1
+fi=(265)
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 55
+fi=(282)
+489 2
+fi=(256)
++85 4
+fi=(291)
+1039 3
+fi=(379)
+14470 4
+cfi=(365)
+cfn=(5190)
+calls=1 1046 
+* 354
++2 3
+fi=(282)
+0 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+0 1
+fi=(265)
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 55
+fi=(282)
+489 2
+fi=(256)
++85 4
+fi=(291)
+1039 5
+fi=(379)
+14473 2
+cfi=(365)
+cfn=(5190)
+calls=1 1046 
+* 396
++2 4
+fi=(282)
+0 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+fi=(265)
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 55
+fi=(282)
+489 2
+fi=(256)
++85 4
+fi=(291)
+1039 5
+fe=(524)
+2439 2
+cfi=(365)
+cfn=(5190)
+calls=1 1046 
+* 322
+* 1
++1 4
+3692 8
+
+fn=(5378)
+3497 13
+fi=(289)
+744 4
+fi=(365)
+-21 3
+fi=(377)
+305 3
++99 2
+fi=(306)
+180 1
+0 6
+fi=(378)
+235 2
+fi=(320)
++90 3
++8 2
+cob=(2)
+cfi=(327)
+cfn=(2026)
+calls=1 73 
+* 10
+fi=(378)
+-98 16
+fi=(320)
++90 24
++8 16
+cob=(2)
+cfi=(327)
+cfn=(2026)
+calls=8 73 
+* 80
+* 27
++1 18
+fi=(259)
+2339 36
+fi=(378)
+235 18
+fi=(323)
+82 8
+fi=(201)
+1663 16
+fi=(306)
+180 8
+fi=(378)
++55 3
+fi=(282)
+635 1
+fi=(284)
+1785 2
+fi=(344) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/str/mod.rs
+2777 1
+cfi=(551)
+cfn=(5392)
+calls=1 68 
+* 167
+fi=(268)
+965 2
++1 2
+fe=(524)
+3510 7
+cfi=(523)
+cfn=(4742)
+calls=1 79 
+* 197
+fi=(268)
+965 4
+2177 1
+fe=(524)
+3514 6
+cfi=(523)
+cfn=(4742)
+calls=1 79 
+* 565
+fi=(268)
+965 2
+fe=(524)
+3680 9
+0 1
+fi=(268)
+2177 3
+fi=(377)
+404 2
+fi=(306)
+180 1
+0 6
+fi=(378)
+235 2
+fi=(320)
++90 5
++8 2
+cob=(2)
+cfi=(327)
+cfn=(2026)
+calls=1 73 
+* 22
+fi=(378)
+-98 4
+fi=(320)
++90 10
++8 4
+cob=(2)
+cfi=(327)
+cfn=(2026)
+calls=2 73 
+* 29
+* 3
++1 6
+fi=(259)
+2339 12
+fi=(378)
+235 6
+fi=(323)
+82 2
+fi=(201)
+1663 4
+fi=(306)
+180 2
+fi=(378)
++55 3
+fi=(282)
+635 1
+fi=(284)
+1785 1
+fi=(320)
+21 7
+fe=(524)
+3519 2
+fi=(361)
+1796 4
++7 13
+1589 1
+1837 2
++2 1
+fi=(363)
+415 1
++15 1
+fi=(361)
+1816 1
++21 2
+0 1
+fi=(289)
+1365 1
+fi=(406) /home/runner/work/crypto/crypto/src/lib.rs
+0 1
+fe=(524)
+3526 3
+cfi=(523)
+cfn=(5322)
+calls=1 89 
+* 101
+* 1
+fi=(377)
+404 2
+fi=(306)
+180 1
+0 5
+fi=(378)
+235 2
+fi=(320)
++90 5
++8 2
+cob=(2)
+cfi=(327)
+cfn=(2026)
+calls=1 73 
+* 22
+fi=(378)
+-98 14
+fi=(320)
++90 35
++8 14
+cob=(2)
+cfi=(327)
+cfn=(2026)
+calls=7 73 
+* 139
+* 8
++1 16
+fi=(259)
+2339 32
+fi=(378)
+235 16
+fi=(323)
+82 7
+fi=(201)
+1663 14
+fi=(306)
+180 7
+fi=(378)
++55 3
+fi=(282)
+635 1
+fi=(284)
+1785 1
+fi=(320)
+21 5
+-21 1
+21 3
+154 2
+fe=(524)
+3530 5
+0 3
+fi=(406)
+0 1
+fe=(524)
+3535 5
+cfi=(523)
+cfn=(5322)
+calls=1 89 
+* 80
+* 5
+cfi=(523)
+cfn=(5322)
+calls=1 89 
+* 194
++1 2
+0 1
+3539 4
+cfi=(523)
+cfn=(5322)
+calls=1 89 
+* 233
++1 3
+fi=(406)
+0 2
+fe=(524)
+3543 1
++1 4
+0 3
+3547 2
+cfn=(5428)
+calls=1 3799 
+* 110
+fi=(268)
+2176 1
+0 1
+2176 2
+fe=(524)
+3548 2
+0 1
+3554 5
+cfi=(523)
+cfn=(5366)
+calls=1 65 
+* 312
+* 5
+cfi=(523)
+cfn=(5366)
+calls=1 65 
+* 228
+* 5
++5 2
++3 6
+cfi=(523)
+cfn=(4742)
+calls=1 79 
+* 358
+fi=(268)
+965 2
+0 1
+fe=(524)
+3572 4
+cfi=(523)
+cfn=(5366)
+calls=1 65 
+* 77
+* 2
+fi=(268)
+2177 1
+fe=(524)
+3564 6
+cfi=(523)
+cfn=(4742)
+calls=1 79 
+* 281
+fi=(268)
+965 2
+2177 1
+fe=(524)
+3566 3
++4 1
++10 2
+0 3
+3581 2
+-27 2
++30 2
++3 2
+0 1
+cfi=(379)
+cfn=(5444) <crypto_lib::cryptanalysis::ic_boundary::TargetWalk<crypto_lib::cryptanalysis::ic_boundary::PrimePoint>>::build_lcheck::<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>
+calls=1 13222 
+0 3910857
+0 1
+fi=(268)
+2176 1
+0 4
+2176 2
++1 1
+fe=(524)
+0 1
+fi=(268)
+2177 2
+cob=(2)
+cfi=(237)
+cfn=(802)
+calls=1 255 
+* 137
+fe=(524)
+0 6
+3650 1
+fi=(284)
+3055 1
+fe=(524)
+3651 1
+fi=(284)
+3055 1
+fe=(524)
+3652 1
++1 1
++1 3
+cfi=(379)
+cfn=(5840) <crypto_lib::cryptanalysis::ic_boundary::GroupOps>::merge
+calls=1 197 
+* 15
+fi=(256)
+848 2
+0 1
+fe=(524)
+3655 1
+fi=(256)
+848 2
+0 1
+fe=(524)
+3656 3
+cob=(2)
+cfi=(237)
+cfn=(802)
+calls=1 255 
+* 137
+0 3
+3554 1
++52 1
++1 2
+0 1
+3612 1
++1 4
++1 4
++2 1
+-5 19
+
+fl=(346) /home/runner/work/crypto/crypto/src/cryptanalysis/ecbench/record.rs
+fn=(4040) crypto_lib::cryptanalysis::ecbench::record::child_main::{closure#1}::{closure#0}
+cfi=(274) /home/runner/work/crypto/crypto/src/cryptanalysis/ecbench/methods.rs
+cfn=(4532) crypto_lib::cryptanalysis::ecbench::methods::solve_measured
+calls=0 4300 
+581 3919384
+
+fn=(2346) crypto_lib::cryptanalysis::ecbench::record::child_main
+cfn=(4040)
+calls=0 551 
+650 3919384
+
+fl=(256)
+fn=(5828) core::ptr::drop_glue::<core::option::Option<crypto_lib::cryptanalysis::ic_boundary::SibWalk<crypto_lib::cryptanalysis::ic_boundary::PrimePoint>>>
+848 2
+0 2
+fi=(282)
+443 2
+655 1
+443 1
+fi=(196)
+1431 1
+fi=(265)
+205 2
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 87
+fi=(282)
+443 2
+655 1
+443 1
+fi=(196)
+1431 1
+fi=(265)
+205 2
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 87
+fi=(282)
+443 2
+655 1
+443 1
+fi=(196)
+1431 1
+fi=(265)
+205 2
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 87
+fi=(282)
+443 2
+655 1
+443 1
+fi=(196)
+1431 1
+fi=(265)
+205 2
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 176
+fi=(282)
+443 2
+655 1
+443 1
+fi=(196)
+1431 2
+fi=(265)
+205 2
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 170
+fi=(282)
+443 2
+655 1
+443 1
+fi=(196)
+1431 1
+fi=(265)
+205 2
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 170
+fe=(256)
+848 4
+cfn=(5832) core::ptr::drop_glue::<crypto_lib::cryptanalysis::ic_boundary::OpenRefMap>
+calls=1 * 
+* 686
+
+fn=(5832)
+848 2
+fi=(282)
+443 2
+655 1
+443 1
+fi=(196)
+1431 1
+fi=(265)
+205 2
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 74
+fi=(282)
+443 2
+655 1
+443 1
+fi=(196)
+1431 1
+fi=(265)
+205 2
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 74
+fi=(282)
+443 2
+655 1
+443 1
+fi=(196)
+1431 1
+fi=(265)
+205 2
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 74
+fi=(282)
+443 2
+655 1
+443 1
+fi=(265)
+205 2
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 353
+fi=(282)
+443 2
+655 1
+443 1
+fi=(196)
+1431 1
+fi=(265)
+205 3
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 74
+fe=(256)
+
+fl=(569) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/collections/vec_deque/mod.rs
+fn=(5620) <alloc::collections::vec_deque::VecDeque<crypto_lib::cryptanalysis::ic_boundary::SibItem>>::grow
+2909 12
+fi=(282)
+640 3
+fe=(569)
+2914 3
+cfi=(282)
+cfn=(5622)
+calls=3 196 
+* 1537
+fi=(259)
+2328 3
+fe=(569)
+715 9
+fi=(259)
+535 3
+fe=(569)
+715 3
+0 2
+719 4
++1 2
++1 18
+2920 4
+fi=(282)
+635 2
+fi=(262)
+971 4
+fi=(256)
+574 10
+cob=(2)
+cfi=(237)
+cfn=(802)
+calls=2 255 
+* 44
+fe=(569)
+
+fl=(379)
+fn=(5696) <crypto_lib::cryptanalysis::ic_boundary::TargetWalk<crypto_lib::cryptanalysis::ic_boundary::PrimePoint>>::rotate_kept
+13929 90
++7 20
+0 50
+13959 80
+
+fn=(5446) crypto_lib::cryptanalysis::ic_boundary::wwalk_plan_check_bits
+11758 13
++7 2
+0 1
+11765 2
+fi=(426) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/ops/range.rs
+891 3
+fe=(379)
+11773 2
++27 7
+-24 3
+0 2
+11779 6
+fi=(399)
+2240 2
+fe=(379)
+11779 1
+fi=(399)
+1982 1
+cfi=(503)
+cfn=(5450)
+calls=1 433 
+* 20
+fe=(379)
+11779 16
++1 2
++5 4
++1 2
++5 6
+fi=(399)
+2240 2
+fe=(379)
+11791 1
+fi=(399)
+1982 1
+cfi=(503)
+cfn=(5450)
+calls=1 433 
+* 20
+fe=(379)
+11791 15
+fi=(259)
+2316 3
+fe=(379)
+11793 4
++1 5
++5 5
++1 1
+
+fn=(5690) <crypto_lib::cryptanalysis::ic_boundary::OpenRefMap>::get
+1170 20
++1 20
+fi=(196)
+2758 30
+fe=(379)
+1121 10
+0 10
+fi=(292) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/slice/index.rs
+238 20
+0 20
+fe=(379)
+1176 10
++1 20
+0 10
+1185 20
+
+fn=(5598) <crypto_lib::cryptanalysis::ic_boundary::SibWalk<crypto_lib::cryptanalysis::ic_boundary::PrimePoint>>::new
+12945 9
+fi=(196)
+3242 7
+fi=(295)
+535 2
+fi=(282)
+0 3
+480 2
+0 3
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+0 1
+fi=(265)
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 55
+fi=(282)
+489 2
+0 4
+fi=(259)
+2215 1
+fi=(310)
+1103 3
+0 6
+fi=(196)
+1043 2
+fi=(256)
+1966 2
+fi=(196)
+1043 2
+fi=(310)
++60 2
+fi=(196)
+-60 30
+fi=(256)
+1966 30
+fi=(196)
+1043 30
+fi=(310)
++60 33
+fi=(259)
+2316 4
+fe=(379)
+12971 1
+cfn=(5608) <crypto_lib::cryptanalysis::ic_boundary::OpenRefMap>::with_capacity_bound
+calls=1 1106 
+* 34856
+0 1
+12953 41
+cob=(2)
+cfi=(237)
+cfn=(802)
+calls=1 255 
+* 30
++20 8
+
+fn=(5500) <crypto_lib::cryptanalysis::ic_boundary::OpenCoefMap>::with_capacity_bound
+998 8
+fi=(259)
+2316 3
+fe=(379)
+987 2
+fi=(196)
+2570 2
+3974 2
+154 3
+3976 3
+0 1
+3242 7
+fi=(295)
+535 2
+fi=(282)
+-55 2
+0 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+0 1
+fi=(265)
+323 3
+cfi=(186)
+cfn=(2930)
+calls=1 0 
+* 33656
+* 1
+fi=(282)
+489 2
+0 2
+fi=(196)
+3242 7
+fi=(295)
+535 2
+fi=(282)
+-55 2
+0 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+0 1
+fi=(265)
+323 3
+cfi=(186)
+cfn=(2930)
+calls=1 0 
+* 340
+fi=(282)
+489 2
+0 2
+480 2
+0 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+fi=(265)
+323 3
+cfi=(186)
+cfn=(2930)
+calls=1 0 
+* 340
+fi=(282)
+489 2
+0 2
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+fi=(265)
+323 3
+cfi=(186)
+cfn=(2930)
+calls=1 0 
+* 340
+fi=(282)
+489 2
+0 1
+489 1
+fe=(379)
+993 1
+-5 16
++14 9
+
+fn=(5608)
+1106 8
+fi=(259)
+2316 3
+fe=(379)
+1107 2
+fi=(196)
+2570 2
+3974 2
+154 3
+3976 3
+3242 7
+fi=(295)
+535 2
+fi=(282)
+0 1
+480 2
+0 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+0 1
+fi=(265)
+323 3
+cfi=(186)
+cfn=(2930)
+calls=1 0 
+* 542
+fi=(282)
+489 2
+fe=(379)
+0 2
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+fi=(265)
+323 3
+cfi=(186)
+cfn=(2930)
+calls=1 0 
+* 340
+fi=(282)
+489 3
+0 2
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+fi=(265)
+323 3
+cfi=(186)
+cfn=(2930)
+calls=1 0 
+* 340
+fi=(282)
+489 2
+0 4
+480 2
+0 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+fi=(265)
+323 3
+cfi=(186)
+cfn=(2930)
+calls=1 0 
+* 33090
+fi=(282)
+489 2
+fe=(379)
+0 1
+fi=(282)
+480 2
+0 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+fi=(265)
+323 3
+cfi=(186)
+cfn=(2930)
+calls=1 0 
+* 428
+fi=(282)
+489 2
+0 3
+fe=(379)
+1114 1
+-6 20
++9 9
+
+fn=(5706) <crypto_lib::cryptanalysis::ic_boundary::TargetWalk<crypto_lib::cryptanalysis::ic_boundary::PrimePoint>>::add_row
+14233 100
++16 10
+13968 50
+14249 10
+13968 10
+14242 20
+0 20
+13968 30
+14242 150
++1 20
+0 10
+1259 20
+14242 150
+0 10
+1259 20
+14251 20
+-9 80
+0 10
+14242 80
+0 10
+1259 20
+14252 20
+-10 140
+0 30
+1259 40
++3 4
+0 36
+14253 18
+0 3
+14253 23
+0 7
+14259 7
+fi=(284)
+471 9
+fi=(259)
+2215 9
+fi=(310)
+1103 3
+0 6
+fe=(379)
+14266 6
+0 3
+fi=(292)
+238 9
+0 3
+fe=(379)
+14266 15
+1215 3
++12 6
+-4 3
+fi=(427)
+154 3
+fe=(379)
+14267 6
++1 6
+fi=(284)
+1000 3
+cfi=(282)
+cfn=(5718)
+calls=3 196 
+* 360
+fi=(282)
+635 3
+fi=(256)
+1966 6
+fi=(284)
+1006 12
+fi=(259)
+2215 6
+fi=(310)
+1103 3
+fe=(379)
+14261 35
+-1 56
++6 12
+1201 3
+14266 3
+fi=(292)
+238 6
+0 3
+fe=(379)
+14266 15
+1215 3
++12 6
+-4 3
+fi=(427)
+154 3
+fe=(379)
+14267 6
+-1 12
+1201 3
+14268 6
+fi=(284)
+999 6
+fi=(282)
+635 6
+fi=(262)
+971 6
+fi=(256)
+1966 6
+fi=(284)
+1006 15
+0 3
+fe=(379)
+13968 3
+fi=(310)
+1103 3
+fe=(379)
+14272 9
++1 27
++1 33
+fi=(284)
+996 3
++3 6
+fe=(379)
+0 1
+fi=(284)
+1000 1
+cfi=(282)
+cfn=(5486)
+calls=1 196 
+* 120
+fi=(282)
+635 3
+fi=(262)
+971 6
+fi=(256)
+1966 21
+fi=(284)
+1006 6
+-10 3
++3 6
+fe=(379)
+14276 1
+fi=(284)
+1000 1
+cfi=(282)
+cfn=(5724)
+calls=1 196 
+* 120
+fi=(282)
+635 3
+fi=(262)
+971 6
+fi=(256)
+1966 21
+fi=(284)
+1006 6
+fe=(379)
+14278 3
+0 3
+cfi=(186)
+cfn=(906)
+calls=3 0 
+0 3
+0 3
+14278 6
+0 3
+fi=(265)
+158 9
+cfi=(186)
+cfn=(908)
+calls=3 0 
+* 383
+fi=(269)
+258 6
+fe=(379)
+14279 27
+fi=(282)
+635 9
+fi=(284)
+1785 3
+fi=(262)
+971 9
+fi=(201)
+1663 6
+fi=(306)
+180 3
+0 21
+fi=(201)
+1663 3
+fi=(306)
+180 3
+fi=(284)
+1785 6
+fi=(201)
+1663 3
+fi=(306)
+180 3
+0 15
+fe=(379)
+14286 3
+fi=(306)
+379 3
+fe=(379)
+14286 1
+fi=(306)
+379 1
++6 1
+fi=(201)
+1663 1
+fi=(306)
+180 1
+0 3
+fi=(292)
+238 6
+fe=(379)
+14288 9
++1 6
+1307 3
+0 3
+1314 6
++94 314
++38 6
+-88 6
++6 6
+fi=(289)
+1164 6
+fe=(379)
++37 9
++14 3
++12 6
+-4 6
+fi=(427)
+154 6
+fe=(379)
+0 9
+fi=(259)
+2311 12
+fi=(389) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/iter/adapters/zip.rs
+300 18
+fe=(379)
+1259 45
+14291 9
+0 9
+fi=(389)
+300 18
+fe=(379)
+14291 36
+1201 18
++14 9
++12 18
+-4 9
+fi=(427)
+154 9
+fe=(379)
+1201 9
+14295 3
+fi=(306)
+327 3
+fe=(379)
+14295 2
+fi=(306)
+327 2
+0 9
+fi=(284)
+999 6
++1 1
+cfi=(282)
+cfn=(5732)
+calls=1 196 
+* 120
+fi=(282)
+635 2
+0 1
+fi=(284)
+1006 1
+fe=(379)
+14298 3
+fi=(201)
+1663 4
+fi=(256)
+1966 3
+fi=(284)
+1006 1
+fe=(379)
+14297 1
++1 3
+0 2
+14304 8
+fi=(282)
+0 2
+fi=(284)
+1006 2
+fe=(379)
+14298 6
+fi=(201)
+1663 8
+fi=(256)
+1966 6
+fi=(284)
+1006 2
+fe=(379)
+14297 2
++1 6
+0 4
+14304 72
+-26 1
+fi=(306)
+180 1
+fe=(379)
+14295 1
+fi=(306)
+327 1
+fe=(379)
+
+fn=(5618) <crypto_lib::cryptanalysis::ic_boundary::TargetWalk<crypto_lib::cryptanalysis::ic_boundary::PrimePoint>>::sib_expand::<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>
+13697 4774
++10 868
+0 433
+13719 866
++1 1728
++2 432
+-1 864
+fi=(256)
+1474 432
+fe=(379)
+13721 864
++1 432
++1 1296
+fi=(256)
+1473 864
++1 432
++1 432
++1 432
+-2 432
++1 864
++1 432
+0 432
+fi=(284)
+3055 432
+fi=(259)
+2215 1728
+fi=(310)
+1103 432
+fi=(256)
+0 1
+fi=(284)
+3055 1
+fi=(259)
+2215 4
+fi=(310)
+1103 1
+0 2165
+fi=(259)
+2215 866
+fi=(568)
+134 433
+fi=(259)
+2215 6062
+fi=(568)
+134 3031
+fi=(196)
++20 3464
+fi=(575)
+551 10392
+fe=(379)
+0 6928
+fi=(196)
+2719 3464
+fi=(565)
+205 6928
++2 8028
+-7 8028
+fi=(567)
+25 4014
+fi=(575)
+557 8028
+fi=(567)
+25 130
+fi=(575)
+557 260
+fi=(565)
+206 8288
++4 130
+fi=(563)
+85 520
+cfi=(558)
+cfn=(5546)
+calls=130 254 
+* 78780
+fi=(565)
++92 130
++23 390
+0 3464
+fi=(284)
+1824 3464
+fi=(313)
+912 6928
+fe=(379)
+0 3464
+fi=(313)
+913 6928
+fe=(379)
+13733 3464
+fi=(256)
+574 3464
++91 6928
+-91 10392
+fi=(259)
+2215 6928
+fi=(310)
+1103 3464
+fi=(284)
+1785 866
+3036 433
+fi=(292)
+408 866
+fi=(282)
+635 433
+795 866
+695 433
+0 430
+fi=(259)
+2215 430
+fi=(284)
+2932 430
+fi=(262)
+971 866
+fi=(256)
+574 866
+cob=(2)
+cfi=(237)
+cfn=(802)
+calls=433 255 
+* 5196
+fi=(284)
+2938 433
+fi=(292)
+238 433
+fi=(284)
+2938 433
+fi=(292)
+238 433
+0 433
+fi=(282)
+635 433
+fi=(284)
+3055 433
+fe=(379)
+13737 866
++2 1732
+fi=(284)
+999 866
+fe=(379)
+0 8
+fi=(284)
+1000 8
+cfi=(282)
+cfn=(5492)
+calls=8 196 
+* 5953
+* 8
+fi=(282)
+635 8
+fi=(262)
+971 8
+fi=(256)
+1966 32
+fi=(284)
+1006 16
+fe=(379)
+13740 8
++1 8
++7 16
+fi=(282)
+635 425
+fi=(262)
+971 425
+fi=(256)
+1966 1700
+fi=(284)
+1006 850
+fe=(379)
+13740 425
++1 425
++7 850
+0 3897
+13968 72744
+13748 1732
+-39 1
+7214 2
+13710 1
+7217 8
+13712 2
++1 4
++1 1
+fi=(282)
+640 1
+fi=(569)
+240 2
+2404 1
+fe=(379)
+13711 1
+fi=(569)
+2405 1
+cfn=(5620)
+calls=1 2909 
+* 216
+fi=(282)
+640 1
+fi=(569)
+2408 1
++1 2
+fi=(196)
+2682 2
+fi=(569)
+3771 3
+fi=(282)
+635 1
+fi=(262)
+971 1
+fi=(256)
+1966 13
+fe=(379)
+13748 866
+0 433
+13748 3464
+fi=(259)
+2215 433
+fi=(310)
+1103 433
+0 9093
+1103 2598
+0 433
+fi=(292)
+238 6928
+0 3464
+fe=(379)
+13760 3464
++1 6928
+0 6928
+fi=(289)
+2444 6928
+0 420
+fe=(379)
+13968 300
+13770 420
+1245 60
+fi=(289)
+0 20424
+fe=(379)
+13968 17020
+13770 23828
+1245 10332
+0 3464
+fi=(196)
+3020 6928
+fe=(379)
+1247 10392
+fi=(196)
+3020 3464
+fe=(379)
+1247 13856
+-2 10392
+0 3464
+fi=(196)
+3020 6928
+fe=(379)
+1247 6928
+fi=(196)
+3020 6928
+fe=(379)
+1247 6928
+13771 6928
+0 3736
+1259 13584
+13968 3396
++46 3396
+0 3396
+1259 13584
+14014 3396
+0 6808
+fi=(289)
+2444 10180
+0 58
+fi=(313)
+2165 58
+0 174
+fi=(320)
+419 870
+fi=(313)
+2165 150
+0 100
+fi=(306)
+180 50
+0 3396
+fe=(379)
+1259 30564
+13780 6928
+0 10392
+13780 65816
++1 27712
+fi=(259)
+2215 17320
+fi=(310)
+1103 3464
+0 1299
+fe=(379)
+13784 5629
+cfn=(5664) <crypto_lib::cryptanalysis::ic_boundary::PrimeCurve as crypto_lib::cryptanalysis::ic_boundary::CountedGroup>::sibling_pairs_batch
+calls=433 6910 
+* 920757
+fi=(289)
+1065 1299
++1 1732
++3 433
+fe=(379)
+13793 1732
+fi=(259)
+2215 433
+fi=(306)
+180 433
+0 12557
+180 3464
+fi=(389)
+0 3464
+fi=(201)
+1663 10392
+fi=(306)
+180 3464
+fi=(201)
+1663 3464
+fi=(312)
+279 3464
+fi=(256)
+1758 3464
+fi=(289)
+2876 6928
+fi=(389)
+0 6928
+fi=(289)
+2877 27712
+fe=(379)
+13793 45032
++1 6928
++2 10392
++1 13856
++1 6928
+0 3396
+13799 10188
+fi=(289)
+1543 24248
+fe=(379)
+0 3464
+7076 10392
+0 3464
+13807 3464
+7079 6928
+1259 6928
+0 5424
+6776 7232
+1259 3616
+-58 1808
+0 3312
+6776 6624
+1259 3312
+-58 15512
++14 3464
++12 6928
+-4 3464
+fi=(427)
+154 3464
+fe=(379)
+1259 6928
+0 1649
+1259 1649
+0 1649
+13812 4947
++1 3298
+1259 1815
+0 1815
+13812 5445
++1 3630
++1 1299
++1 2165
+0 433
+7217 1299
+13820 433
+0 3031
+7217 9093
+13820 3031
+0 1719
+13817 10314
+fi=(282)
+640 1719
+fi=(569)
+240 3438
+2404 1719
+fe=(379)
+13817 10470
+fi=(282)
+640 1745
+fi=(569)
+240 3490
+2404 1745
+0 2
+2405 2
+cfn=(5620)
+calls=2 2909 
+* 1447
+0 2
+fi=(282)
+640 2
+fi=(569)
+2408 2
++1 4
+fi=(196)
+2682 2
+fi=(569)
+3771 4
+2409 6924
+fi=(196)
+2682 3462
+fi=(569)
+3771 6924
+0 1994
+3771 3988
+fi=(282)
+635 1994
+fi=(262)
+971 1994
+fi=(256)
+1966 25922
+fe=(379)
+13823 3988
+fi=(569)
+3771 2940
+fi=(282)
+635 1470
+fi=(262)
+971 1470
+fi=(256)
+1966 19110
+fe=(379)
+13823 2940
+fi=(289)
+1543 13584
+0 6792
+fe=(379)
+7076 13584
+0 3396
+13827 6792
+7079 3396
+1259 6792
+0 5385
+6776 7180
+1259 3590
+-58 1795
+0 3202
+6776 6404
+1259 3202
+-58 15185
++14 3396
++12 6792
+-4 3396
+fi=(427)
+154 6792
+fe=(379)
+1259 6792
+0 1600
+1259 1600
+0 1600
+7217 3200
+13832 8000
+7217 1600
+13836 1600
+1259 1796
+0 1796
+7217 3592
+13832 8980
+7217 1796
+13836 1796
+0 1676
+13833 8380
+fi=(282)
+640 1676
+fi=(569)
+240 3352
+2404 1676
+fe=(379)
+13833 8600
+fi=(282)
+640 1720
+fi=(569)
+240 3440
+2404 1720
++5 6792
+fi=(196)
+2682 3396
+fi=(569)
+3771 6792
+0 1710
+3771 1710
+fi=(282)
+635 1710
+fi=(262)
+971 1710
+fi=(256)
+1966 22230
+fe=(379)
+13823 1710
+fi=(569)
+3771 1686
+fi=(282)
+635 1686
+fi=(262)
+971 1686
+fi=(256)
+1966 21918
+fe=(379)
+13823 1686
+0 1138
+fi=(282)
+655 433
+fi=(196)
+1431 433
+fi=(265)
+205 1299
+cfi=(186)
+cfn=(1598)
+calls=433 0 
+* 37671
+fe=(379)
+13864 3472
+fi=(282)
+699 21
+cfn=(1100)
+calls=3 -16 
+* 396
+* 3
+fi=(284)
+3055 3
+2932 3
+fe=(379)
+
+fn=(5664)
+6910 3031
+fi=(196)
+3242 1732
+fi=(295)
+535 433
+fi=(282)
+0 433
+480 866
+0 2598
+cfi=(186)
+cfn=(906)
+calls=433 0 
+0 433
+0 433
+fi=(265)
+158 1299
+cfi=(186)
+cfn=(908)
+calls=433 0 
+* 23815
+fi=(282)
+489 866
+0 866
+fi=(259)
+2215 1299
+fi=(310)
+1103 3464
+fi=(256)
+1966 3031
+fi=(262)
+971 3031
+fi=(310)
+1103 6062
+0 433
+fi=(256)
+1966 433
+fe=(379)
+6918 866
+7045 3897
+0 433
+6923 32042
+fi=(262)
+971 3464
+fi=(306)
+180 6928
+fe=(379)
+6926 10392
++1 10392
+1259 13856
+6931 6928
+0 3464
+6934 6928
+0 6928
+6934 38104
++1 3464
++1 6928
+fi=(201)
+1663 3464
+fi=(306)
+180 3897
+fe=(379)
+6945 3464
+0 866
+fi=(196)
+1122 433
+fe=(379)
+6809 866
++8 3464
++1 433
++4 1299
+0 6062
+1215 3464
++12 6928
+-4 3464
+fi=(427)
+154 3464
+fi=(310)
+0 3464
+fi=(259)
+2215 3464
+fi=(310)
+1103 3464
+fe=(379)
+6827 3464
++1 6928
+1201 10392
+1314 866
++94 60422
++38 866
+-88 432
++5 648
+-5 434
++6 866
+fi=(289)
+1164 866
+fe=(379)
+6832 3464
++1 6928
+1201 10392
++14 3464
++12 6928
+-4 3464
+fi=(427)
+154 3464
+fe=(379)
+6833 6928
+1201 10392
++14 3464
++12 6928
+-4 6928
+fi=(427)
+154 6928
+fi=(310)
+1145 3464
+0 2598
+1103 2165
+0 433
+fe=(379)
+7020 2598
+1259 2165
+7021 433
+1259 433
+6776 1732
+1201 433
+7020 18186
+1259 15155
+7021 3031
+1259 3031
+6776 12124
+1201 16887
++14 3464
++12 6928
+-4 3464
+fi=(427)
+154 6928
+fe=(379)
+0 3464
+6781 20784
+1201 10392
++14 3464
++12 6928
+-4 6928
+fi=(427)
+154 6928
+fe=(379)
+0 3464
+1259 31176
+7034 6928
+0 10188
+1245 10188
+0 3396
+fi=(196)
+3020 6792
+fe=(379)
+1247 6792
+fi=(196)
+3020 3396
+fe=(379)
+1247 10188
+0 6792
+1259 16980
+-58 16980
++14 3396
++12 6792
+-4 3396
+fi=(427)
+154 3396
+fe=(379)
+1201 3396
+6781 13584
+1201 10188
++14 6792
++12 6792
+-4 3396
+fi=(427)
+154 3396
+fe=(379)
+1201 3396
+0 6792
+1259 23772
+7039 16980
+0 6792
+fi=(292)
+245 6792
+fe=(379)
+0 136
+fi=(292)
+245 136
+0 13856
+245 6928
+fe=(379)
+7042 27712
+fi=(259)
+2215 13856
+0 433
+fe=(379)
+6776 1299
+7044 2165
+
+fn=(5536) <crypto_lib::cryptanalysis::ic_boundary::TargetWalk<crypto_lib::cryptanalysis::ic_boundary::PrimePoint>>::product_jumps::<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>
+14095 11
++7 8
++1 8
+fi=(196)
+3242 2
+fi=(295)
+535 2
+fi=(282)
+0 1
+480 3
+0 3
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+0 1
+fi=(265)
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 55
+fi=(282)
+489 2
+0 7
+fi=(284)
+936 5
+fe=(379)
+14106 2
+0 1
+fi=(196)
+3242 8
+fi=(295)
+535 2
+0 10
+fe=(379)
+14108 2
+0 5
+14112 32
+0 2
+fi=(568)
+134 2
+fi=(565)
++71 4
++2 6
+-7 6
+fi=(567)
+25 3
+fi=(575)
+557 6
+fi=(567)
+25 1
+fi=(575)
+557 2
+fi=(565)
+206 8
++4 1
+fi=(563)
+85 4
+cfi=(558)
+cfn=(5546)
+calls=1 254 
+* 606
+fi=(565)
++92 1
++23 3
+fi=(282)
+635 14
+fi=(292)
+238 14
+fe=(379)
+14120 98
++1 84
+6873 14
++1 98
+cfn=(2856) <crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>::add_raw
+calls=14 6645 
+* 3466
+14123 28
+fi=(284)
+0 2
+fi=(196)
+2682 4
+fi=(565)
+207 6
+-7 6
+fi=(567)
+25 3
+fi=(575)
+557 6
+fi=(565)
+206 6
+fi=(196)
+2682 4
+fe=(379)
+14115 20
+cfn=(5564) <crypto_lib::cryptanalysis::ic_boundary::TargetWalk<crypto_lib::cryptanalysis::ic_boundary::PrimePoint>>::eval::<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>
+calls=2 +60 
+* 19661
+* 2
+fi=(284)
+3055 2
+fe=(379)
+14115 2
+fi=(284)
+999 4
+fi=(282)
+635 2
+fi=(262)
+971 2
+fi=(256)
+1966 12
+fi=(284)
+1006 2
+0 14
+fe=(379)
+1245 84
+fi=(196)
+3020 28
+fe=(379)
+1247 28
+fi=(196)
+3020 14
+fe=(379)
+1247 42
+0 14
+1245 84
+fi=(196)
+3020 28
+fe=(379)
+1247 28
+fi=(196)
+3020 14
+fe=(379)
+1247 28
+fi=(284)
+996 14
++3 42
+fi=(282)
+635 14
+fi=(262)
+971 14
+fi=(256)
+1966 84
+fi=(284)
+1006 28
+fe=(379)
+14106 42
+fi=(284)
+1006 4
+fe=(379)
+14106 6
+0 15
+14108 15
+-1 30
++1 15
+fi=(282)
+443 2
+655 1
+443 1
+fi=(196)
+1431 2
+fi=(265)
+205 2
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 87
+fe=(379)
+14171 8
+fi=(282)
+480 2
+0 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+0 1
+fi=(265)
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 315
+fi=(282)
+489 2
+0 4
+fi=(284)
+936 3
+471 14
+fi=(196)
+1043 28
+fe=(379)
+0 4
+fi=(426)
+401 12
+fe=(379)
+14140 12
+cfi=(568)
+cfn=(5576)
+calls=4 129 
+* 208
+* 4
+0 4
+14141 4
+fi=(426)
+401 16
+fe=(379)
+14142 12
+cfi=(568)
+cfn=(5576)
+calls=4 129 
+* 235
+* 4
++4 44
+cfn=(5564)
+calls=4 +29 
+* 13219
+* 32
+fi=(295)
+535 4
+0 4
+fe=(379)
+14106 4
+fi=(282)
+480 4
+0 4
+cfi=(186)
+cfn=(906)
+calls=4 0 
+0 4
+fi=(265)
+158 12
+cfi=(186)
+cfn=(908)
+calls=4 0 
+* 220
+fi=(282)
+489 8
+0 8
+fi=(284)
+936 12
+1785 4
+fi=(201)
+1663 12
+fi=(306)
+180 4
+0 40
+fi=(282)
+635 64
+fi=(262)
+971 128
+fi=(256)
+1966 512
+fi=(284)
+1006 128
+fi=(201)
+1663 128
+fi=(306)
+180 64
+fe=(379)
+14150 384
+6873 64
++1 448
+cfn=(2856)
+calls=64 6645 
+* 16772
+14152 128
+fi=(284)
+996 64
++3 128
+fi=(282)
+635 4
+fi=(201)
+1663 8
+fi=(306)
+180 4
+0 12
+fi=(282)
+635 128
+fi=(256)
+1966 64
+fi=(284)
+1006 128
+fi=(201)
+1663 128
+fi=(306)
+180 64
+fe=(379)
+14157 128
+fi=(284)
+996 64
++3 128
++1 10
+cfi=(282)
+cfn=(5586)
+calls=5 196 
+* 2968
+fi=(282)
+635 64
+fi=(262)
+971 128
+fi=(256)
+1966 192
+fi=(284)
+1006 128
+-10 64
++3 128
++1 10
+cfi=(282)
+cfn=(5590)
+calls=5 196 
+* 2189
+* 5
+fe=(379)
+14161 12
+fi=(282)
+640 4
+fi=(196)
+2719 4
+fi=(282)
+795 8
+695 4
+fi=(284)
+2932 8
+0 8
+fi=(331) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/vec/spec_extend.rs
+35 8
+fi=(262)
+971 8
+fi=(256)
+574 8
+cob=(2)
+cfi=(237)
+cfn=(802)
+calls=4 255 
+* 500
+* 4
+fe=(379)
+0 4
+fi=(284)
+2938 16
+fi=(282)
+655 4
+fi=(196)
+1431 4
+fi=(265)
+205 16
+cfi=(186)
+cfn=(1598)
+calls=4 0 
+* 348
+0 4
+fi=(259)
+2215 12
+fi=(310)
+1103 5
+fe=(379)
+14165 5
+fi=(282)
+443 3
+655 1
+443 1
+fi=(196)
+1431 2
+fi=(265)
+205 2
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 194
+fe=(379)
+14165 5
++1 1
++1 5
+fi=(282)
+443 2
+655 1
+fe=(379)
+14167 4
++2 9
++1 5
++1 1
+
+fn=(2848) <crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>::double_raw
+6674 868
++1 620
+0 372
+6679 124
+6781 496
+1201 868
+0 124
+1215 248
++12 248
+-4 124
+fi=(427)
+154 248
+fe=(379)
+0 124
+6776 248
+1201 744
++14 124
++12 248
+-4 124
+fi=(427)
+154 372
+fe=(379)
+1245 372
+fi=(196)
+3020 124
+fe=(379)
+1247 372
+fi=(196)
+3020 124
+fe=(379)
+1247 372
+0 124
+6776 248
+1201 1364
++25 124
++1 248
+-4 124
+fi=(427)
+154 124
+fe=(379)
+6786 248
+1314 248
++94 17151
++38 248
+-88 126
++5 189
+-5 122
++6 248
+fi=(289)
+1164 124
+fe=(379)
++37 744
+0 124
+1215 124
++12 248
+-4 248
+fi=(427)
+154 248
+fe=(379)
+0 124
+1201 248
+6781 496
+1201 124
+0 124
+1201 248
++14 124
++12 248
+-4 124
+fi=(427)
+154 124
+fe=(379)
+1201 992
++25 124
++1 248
+-4 124
+fi=(427)
+154 124
+fe=(379)
+1201 124
+0 124
+1259 992
+6776 496
+1201 372
++14 124
++12 248
+-4 124
+fi=(427)
+154 248
+fe=(379)
+0 248
+1259 496
+6503 372
+6692 992
+
+fn=(5444)
+13222 15
++27 5
++52 6
+cfn=(5446)
+calls=1 11758 
+* 152
+fi=(268)
+2176 2
+fi=(406)
+0 1
+fi=(268)
+2177 4
+fe=(379)
+13302 3
+0 1
+13304 4
+fi=(426)
+891 3
+fi=(259)
+2217 4
+fi=(426)
+891 2
+0 1
+fe=(379)
+13317 5
+fi=(284)
+3055 1
+fe=(379)
+13327 2
++7 4
+0 1
+13339 4
+0 3
+13342 1
+cfi=(515)
+cfn=(4524)
+calls=1 74 
+* 29
+* 2
+fi=(282)
+0 1
+cfi=(186)
+cfn=(906)
+calls=1 0 
+0 1
+fi=(265)
+158 3
+cfi=(186)
+cfn=(908)
+calls=1 0 
+* 55
+* 1
+fi=(282)
+489 2
+0 17
+fi=(196)
+2758 2
+fe=(379)
+947 3
+fi=(196)
+2758 1
+fe=(379)
+949 3
+fi=(548) /cargo/registry/25cdd57fae9f0462/hashbrown-0.17.1/src/control/tag.rs
+47 7
+fi=(530) /cargo/registry/25cdd57fae9f0462/hashbrown-0.17.1/src/raw.rs
+-47 1
+fi=(256)
+574 1
+fi=(541)
+1570 3
+fi=(543) /cargo/registry/25cdd57fae9f0462/hashbrown-0.17.1/src/control/bitmask.rs
+40 2
+-40 2
+fi=(542) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/num/nonzero.rs
+628 1
+fi=(530)
+2032 2
+fi=(262)
+1055 3
+fi=(259)
+2176 1
+fi=(295)
+512 1
+fi=(332) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/fmt.rs
+0 1
+fi=(426)
+891 2
+fe=(379)
+13259 8
+0 1
+fi=(292)
+238 2
+fi=(282)
+635 1
+fe=(379)
+13348 2
+fi=(292)
+238 2
+0 1
+238 2
+0 1
+238 1
+fe=(379)
+13355 2
+0 3
+13358 4
+fi=(256)
+1966 11
+fi=(259)
+2215 1
+fi=(310)
+1103 1
+0 4
+fe=(379)
+13367 8
++1 5
+fi=(306)
+0 1
+fe=(379)
+13375 1
+fi=(196)
+154 3
+fe=(379)
+13375 1
+fi=(259)
+2316 3
+fe=(379)
+168 5
+13379 2
+-32 1
+fi=(196)
+2758 3
+fe=(379)
+947 3
+fi=(196)
+2758 1
+fe=(379)
+949 3
+fi=(548)
+47 8
+fi=(530)
+-47 1
+fi=(256)
+574 1
+fi=(541)
+1570 3
+fi=(543)
+40 2
+fi=(542)
+628 1
+fi=(530)
+2032 2
+fi=(262)
+1055 3
+fi=(259)
+2176 1
+fi=(295)
+512 1
+fi=(292)
+238 2
+fi=(282)
+635 1
+fe=(379)
+13348 1
+fi=(292)
+238 5
+fe=(379)
+13355 2
+0 3
+13358 4
+fi=(256)
+1966 9
+fe=(379)
+13360 2
+0 2
+13391 2
+168 1
+13391 7
+fi=(269)
+334 4
+cfn=(5480)
+calls=1 -77 
+* 66
+* 1
+0 5
+fe=(379)
+13393 23
+fi=(284)
+1142 4
+fi=(259)
+2215 3
+fe=(379)
+13394 1
+0 1
+13395 5
+fi=(284)
+1000 1
+cfi=(282)
+cfn=(5486)
+calls=1 196 
+* 453
+fi=(282)
+635 1
+fi=(256)
+1966 7
+fi=(284)
+1006 4
+0 1
+fe=(379)
+13397 2
++6 5
++1 1
+fi=(259)
+2316 2
+fe=(379)
+13404 1
+-1 10
+fi=(259)
+2215 1
+fi=(306)
+180 1
+fe=(379)
+13403 3
++1 1
+fi=(259)
+2316 2
+fe=(379)
+13404 1
++4 2
+fi=(262)
+971 9
+fe=(379)
+0 4
+fi=(201)
+1663 4
+fi=(312)
+279 4
+fi=(256)
+1758 12
+fe=(379)
+13408 44
++2 36
+fi=(284)
+996 4
++3 8
++1 8
+cfi=(282)
+cfn=(5492)
+calls=4 196 
+* 480
+fi=(282)
+635 4
+fi=(262)
+971 4
+fi=(256)
+1966 28
+fi=(284)
+1006 8
+fi=(259)
+2215 4
+fi=(310)
+1103 4
+fi=(289)
++61 8
+fi=(282)
+635 100
+fi=(262)
+971 100
+fi=(256)
+1966 700
+fi=(284)
+1006 200
+fi=(259)
+2215 100
+fi=(310)
+1103 100
+fi=(289)
++61 200
++1 800
+fe=(379)
+6877 100
++1 600
+cfn=(2848)
+calls=100 6674 
+* 31384
+fi=(289)
+1165 600
+1581 300
++2 700
+0 100
+fi=(284)
+996 100
++3 200
++1 24
+cfi=(282)
+cfn=(5492)
+calls=12 196 
+* 8341
+* 12
+0 2
+fi=(282)
+655 1
+fi=(196)
+1431 2
+fi=(265)
+205 3
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 176
+0 1
+fe=(379)
+13420 3
+-1 1
+cfn=(5500)
+calls=1 998 
+* 34788
+* 2
++12 13
+fi=(282)
+453 6
+cfn=(2034)
+calls=1 +13 
+* 272
+0 1
+453 2
+0 1
+fe=(379)
+7217 10
+1911 2
+fi=(196)
+2758 1
+fe=(379)
+1913 4
+fi=(196)
+2758 1
+fe=(379)
+1915 3
+fi=(295)
+2142 1
+fe=(379)
+7217 4
+13444 8
++8 1
+-34 48
+fi=(282)
+454 1
+fe=(379)
+13418 60
+7217 4
+1911 2
+fi=(196)
+2758 1
+fe=(379)
+1913 3
++2 2
+13418 2
+fi=(196)
+2758 1
+fe=(379)
+13483 1
+1915 1
+13483 1
+-65 2
+fi=(259)
+2215 2
+fe=(379)
+13484 1
+7214 2
++3 9
+1911 2
+fi=(196)
+2758 2
+fe=(379)
+1913 3
+fi=(196)
+2758 1
+fe=(379)
+1915 3
+fi=(295)
+2142 1
+fe=(379)
+13485 1
+0 1
+13487 2
+cfi=(557)
+cfn=(5512)
+calls=1 335 
+* 500
++2 6
++1 6
++1 3
++3 8
+cfn=(5536)
+calls=1 14095 
+* 66739
+* 1
+fi=(268)
+0 3
+2176 2
+fi=(406)
+0 3
+fe=(379)
+13501 2
++1 3
+14014 2
+13502 1
+14014 1
+168 13
+13511 2
+fi=(284)
+471 4
+fe=(379)
+0 12
+fi=(289)
+1164 4
+0 1
+1165 4
+fe=(379)
+13517 17
+cfn=(5598)
+calls=1 12945 
+* 35174
+* 2
+0 2
+fi=(289)
+1165 2
+cob=(2)
+cfi=(237)
+cfn=(802)
+calls=1 255 
+* 77
+* 2
+0 30
+fe=(379)
+0 20562
+13519 20565
+0 6854
+13519 13708
+0 2
+13649 3
++5 1
++1 4
+cfn=(5738) <crypto_lib::cryptanalysis::ic_boundary::TargetWalk<crypto_lib::cryptanalysis::ic_boundary::PrimePoint>>::solve_log_q
+calls=1 14310 
+* 7078
++1 7
+fi=(289)
+660 2
++2 3
+cfi=(379)
+cfn=(5822) <crypto_lib::cryptanalysis::ic_boundary::TargetWalk<crypto_lib::cryptanalysis::ic_boundary::PrimePoint>>::build_inner::<crypto_lib::cryptanalysis::ic_boundary::PrimeCurve>::{closure#6}
+calls=1 13656 
+* 12600
+fe=(379)
+13664 2
+fi=(289)
+767 13708
+969 13708
+fi=(569)
+1826 13708
+fe=(379)
+13522 6854
++1 5642
+cfn=(5618)
+calls=434 13697 
+* 2523309
+* 434
+fi=(569)
+1826 868
+fe=(379)
+13524 434
+fi=(569)
+2246 6854
+fi=(196)
+2682 6854
+fi=(282)
+640 6854
+-5 6854
+fi=(569)
+3771 41124
+2247 6854
++1 13708
+fi=(262)
+971 6854
+fi=(256)
+1758 27416
+fi=(289)
+969 27416
+fe=(379)
+13531 82248
+fi=(289)
+970 13708
+fe=(379)
+13532 6854
+fi=(289)
+970 6854
+fe=(379)
+13533 6854
+fi=(289)
+970 6854
+fe=(379)
+13534 6854
++2 34270
+cfn=(5630) <crypto_lib::cryptanalysis::ic_boundary::TargetWalk<crypto_lib::cryptanalysis::ic_boundary::PrimePoint>>::canon_key
+calls=6854 13902 
+* 150788
+* 13708
++1 54832
+-1 6854
++1 13708
+fi=(196)
+2758 20562
+fe=(379)
+1021 6854
+fi=(282)
+635 6854
+fi=(577) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/../../stdarch/crates/core_arch/src/x86/sse.rs
+1946 6854
+fe=(379)
+13545 95956
+cfn=(5634) <crypto_lib::cryptanalysis::ic_boundary::OpenCoefMap>::insert_vacant
+calls=6854 1036 
+* 330552
+-2 13708
+0 10
+13554 40
++2 30
++1 80
++5 20
++1 40
+cfn=(5690)
+calls=10 1170 
+* 190
+* 30
+0 10
+13567 40
+0 6844
+13549 13688
+0 10
+13569 20
++6 40
++1 60
+0 30
+13579 80
+cfn=(5696)
+calls=10 13929 
+* 240
+* 50
++2 20
+fi=(284)
+996 10
++3 20
++1 4
+cfi=(282)
+cfn=(5698)
+calls=2 196 
+* 246
+fi=(282)
+635 10
+fi=(256)
+1966 10
+fi=(284)
+1006 20
+fe=(379)
+13584 90
+fi=(284)
+996 10
++3 20
++1 6
+cfi=(282)
+cfn=(5702)
+calls=3 196 
+* 1459
+fi=(282)
+635 10
+fi=(262)
+971 20
+fi=(256)
+1966 80
+fi=(284)
+1006 20
+fe=(379)
+13585 20
++1 30
+0 110
+cfn=(5706)
+calls=10 14233 
+0 3749
+0 20
+13675 9
++1 8
++1 8
+1031 1
+13678 1
+201 5
+-4 2
+13680 1
+197 2
+13682 1
++1 1
+197 2
++4 1
+-4 1
++2 2
+13680 1
+199 1
+13680 1
++2 1
+199 1
+13682 1
++1 1
+199 3
+-47 4
+13683 1
+152 3
++49 3
+13684 1
+cfi=(544)
+cfn=(5234)
+calls=1 388 
+* 89
+fi=(545)
+720 3
+fe=(379)
+13684 2
++1 3
+cob=(2)
+cfi=(237)
+cfn=(802)
+calls=1 255 
+* 137
+* 1
++1 1
+cfi=(256)
+cfn=(5828)
+calls=1 848 
+* 1514
+fi=(282)
+443 2
+655 1
+fi=(265)
+0 2
+fi=(282)
+655 1
+fi=(196)
+1431 1
+fi=(265)
+205 3
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 170
+* 4
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 87
+fe=(379)
+13686 1
+
+fn=(5634)
+1036 6854
+fi=(196)
+2758 20562
+fe=(379)
+1021 6854
+0 6854
+fi=(292)
+238 13708
+0 13708
+fe=(379)
+1040 6854
++1 13708
+-1 180
++1 360
++11 380
++3 180
+0 180
+fi=(292)
+238 360
+fe=(379)
+1042 6844
+fi=(284)
+1824 6844
+fi=(292)
+245 13688
+fi=(282)
+635 6844
+fe=(379)
+1043 13688
+fi=(292)
+245 13688
+fe=(379)
+1043 13688
+fi=(284)
+1824 6844
+fi=(292)
+245 13688
+fi=(282)
+635 6844
+fe=(379)
+1044 13688
+fi=(284)
+1824 6844
+fi=(292)
+245 13688
+fi=(282)
+635 6844
+fe=(379)
+1045 13688
++1 20532
++1 27376
+0 20532
+1057 13688
+fi=(284)
+1785 10
+fi=(292)
+238 20
+fi=(284)
+1785 10
+fi=(292)
+238 20
+fi=(284)
+1785 10
+fi=(292)
+238 20
+fe=(379)
+1053 50
+fi=(282)
+635 20
+fe=(379)
+1053 70
+0 20
+1057 20
+
+fn=(5738)
+14310 8
++2 2
+-1 2
++1 8
+fi=(282)
+635 1
+fi=(284)
+1785 1
+fi=(262)
+971 2
+fi=(404)
+69 9
+fi=(284)
+3958 1
+cfi=(481)
+cfn=(5740)
+calls=1 32 
+* 2131
+fi=(282)
+635 1
+fi=(284)
+1785 1
+fe=(379)
+14326 5
+cfn=(5764) crypto_lib::cryptanalysis::ic_boundary::solve_last_unknown
+calls=1 12979 
+* 4481
+0 2
+fi=(256)
+848 2
+fi=(282)
+655 3
+fi=(256)
+848 9
+fi=(282)
+443 6
+655 3
+443 3
+fi=(196)
+1431 3
+fi=(265)
+205 6
+cfi=(186)
+cfn=(1598)
+calls=3 0 
+* 261
+* 3
+fi=(282)
+443 2
+655 1
+fi=(196)
+1431 2
+fi=(265)
+205 3
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 106
+fe=(379)
+14327 10
+
+fn=(5822)
+13656 9
++1 1
+0 1
+fi=(284)
+3055 1
+fe=(379)
+0 1
+fi=(284)
+3080 1
+fe=(379)
+13657 1
+0 1
+13658 5
+1858 1
++1 4
+0 1
+fi=(196)
+154 2
+fe=(379)
+1863 4
+fi=(259)
+2215 1
+fi=(310)
+1145 1
+fe=(379)
+1864 4
+fi=(310)
+1145 5
+0 24
+fi=(259)
+2215 96
+fi=(310)
+1145 24
+fe=(379)
+1865 96
+6877 24
++1 120
+cfn=(2848)
+calls=24 6674 
+* 7656
+* 24
+1866 48
+0 16
+6873 16
++1 112
+cfn=(2856)
+calls=16 6645 
+* 4200
+1867 80
+0 1
+13662 1
+6491 3
++1 3
++1 4
+13663 8
+
+fn=(5564)
+14175 78
++9 6
++1 102
+fi=(494) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/ops/index_range.rs
+131 6
+0 24
+131 48
+fi=(292)
++88 72
+fi=(256)
+1758 96
+0 144
+fe=(379)
+14194 24
+0 12
+fi=(259)
+2215 12
+fi=(310)
+1103 6
+fe=(379)
+0 1530
+fi=(259)
+2215 3060
+fi=(310)
+1103 1530
+fe=(379)
+14187 3072
+fi=(292)
+184 160
+fi=(282)
+635 80
+fi=(289)
+2142 80
+fe=(379)
+14190 800
++3 160
+0 74
+6873 74
++1 518
+cfn=(2856)
+calls=74 6645 
+* 19510
+14195 518
+fi=(289)
+1581 222
++2 592
+0 148
+fe=(379)
+14195 74
++5 48
+
+fn=(5764)
+12979 9
+fi=(262)
+971 2
+fi=(404)
+69 6
+fi=(481)
+-36 1
+cfi=(286)
+cfn=(5766)
+calls=1 +17 
+* 742
+fi=(284)
+471 3
+fi=(259)
+2215 1
+fi=(310)
+1103 1
+0 26
+fi=(196)
+1043 15
+fi=(310)
++60 3
+0 3
+fi=(284)
+1785 6
+fi=(292)
+238 6
+fi=(282)
+635 3
+fe=(379)
+12987 3
+fi=(336)
+2504 3
+fi=(313)
+912 6
++1 6
+fi=(262)
++58 3
+fi=(256)
+574 12
++91 12
+-91 12
+fi=(284)
+1785 6
+fi=(292)
+238 6
+fe=(379)
+0 9
+fi=(282)
+635 3
+fe=(379)
+12991 6
+1307 12
++7 6
++94 355
++38 6
+-88 2
++5 3
+-5 4
++6 6
+fi=(289)
+1164 3
+0 3
+fi=(262)
+971 12
+fe=(379)
+1215 12
++12 24
+-4 12
+fi=(427)
+154 12
+fe=(379)
+12993 12
+fi=(201)
+1663 24
+fi=(306)
+180 12
+fe=(379)
+12993 36
+1201 72
+fi=(306)
+0 21
+fi=(259)
+2215 9
+fi=(310)
+1103 9
+fe=(379)
+12996 18
+fi=(292)
+238 24
+fi=(284)
+1785 12
+fi=(292)
+238 12
+fe=(379)
+12996 12
+fi=(282)
+635 6
+fe=(379)
+12996 18
+0 6
+fi=(284)
+1785 6
+fi=(196)
+3242 42
+fi=(295)
+535 12
+0 6
+fi=(282)
+480 18
+0 6
+cfi=(186)
+cfn=(906)
+calls=6 0 
+0 6
+fi=(265)
+158 18
+cfi=(186)
+cfn=(908)
+calls=6 0 
+* 590
+* 12
+fi=(282)
+489 12
+0 24
+fi=(293) /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/alloc/src/slice.rs
+449 12
+0 6
+fi=(256)
+574 18
+cob=(2)
+cfi=(237)
+cfn=(802)
+calls=6 255 
+* 72
+* 6
+fi=(284)
+1824 6
+fi=(259)
+2311 12
+fi=(389)
+300 12
+0 18
+fe=(379)
+1215 24
++12 48
+-4 24
+fi=(427)
+154 24
+fe=(379)
+1259 96
+13000 24
+0 24
+fi=(389)
+300 48
+fe=(379)
+13000 120
+1201 144
+0 30
+fi=(282)
+655 6
+fi=(196)
+1431 6
+fi=(265)
+205 18
+cfi=(186)
+cfn=(1598)
+calls=6 0 
+* 522
+* 6
+fi=(284)
+996 3
++3 6
++1 2
+cfi=(282)
+cfn=(5154)
+calls=1 196 
+* 120
+fi=(282)
+635 6
+fi=(256)
+1966 3
+fi=(284)
+1006 6
+fe=(379)
+13005 3
+fi=(310)
+1103 9
+fi=(259)
+2215 3
+fi=(310)
+1103 3
+fi=(292)
+544 2
+0 1
+fi=(201)
+1663 1
+fi=(306)
+180 2
+fi=(201)
+1663 1
+fi=(306)
+180 1
+0 3
+180 2
+0 1
+fe=(379)
+13013 1
+fi=(306)
+379 1
+fe=(379)
+13013 2
+fi=(306)
+379 2
++6 2
+fi=(201)
+1663 4
+fi=(306)
+180 2
+fi=(196)
+1431 2
+fi=(265)
+205 3
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 87
+fe=(379)
+13015 10
+fi=(292)
+238 2
+fi=(284)
+1785 2
+fi=(196)
+1122 1
+fi=(282)
+635 1
+fi=(201)
+1663 1
+fi=(306)
+180 1
+0 3
+fe=(379)
+13014 1
+fi=(306)
+310 1
+fe=(379)
+13014 1
+fi=(306)
+310 1
+fi=(201)
+1663 4
+fi=(306)
+180 2
+fi=(292)
++58 2
+fe=(379)
+13014 2
+fi=(282)
+443 2
+655 1
+fi=(196)
+1431 1
+fi=(265)
+205 2
+cfi=(186)
+cfn=(1598)
+calls=1 0 
+* 87
+0 1
+fi=(282)
+655 3
+fi=(256)
+848 9
+fi=(282)
+443 6
+655 3
+443 3
+fi=(196)
+1431 3
+fi=(265)
+205 6
+cfi=(186)
+cfn=(1598)
+calls=3 0 
+* 261
+* 3
+0 1
+fi=(282)
+443 2
+655 1
+fe=(379)
+
+fn=(2856)
+6645 1176
++1 336
++3 336
++20 1344
+0 168
+6652 672
+0 168
+1259 504
+6786 168
+1259 168
++48 672
++7 336
++94 24379
++38 336
+-88 166
++5 249
+-5 170
++6 336
+fi=(289)
+1164 168
+fe=(379)
+6661 504
+1259 504
+6776 168
+1307 504
+1201 840
++14 168
++12 336
+-4 168
+fi=(427)
+154 168
+fe=(379)
+1201 168
+1307 336
+6781 504
+1201 168
+0 168
+1201 336
++14 168
++12 336
+-4 168
+fi=(427)
+154 336
+fe=(379)
+0 336
+1259 1848
+6776 672
+1201 504
++14 168
++12 336
+-4 168
+fi=(427)
+154 336
+fe=(379)
+0 504
+1259 504
+6503 504
+6669 168
+
+fn=(5630)
+13902 47978
++1 13708
+fi=(427)
+0 6854
+fe=(379)
+13906 6854
+0 20562
+13922 54832
+
+fn=(5840)
+197 3
++2 1
+-47 1
++45 1
++2 3
++1 1
+-48 2
++49 2
++1 1
+
+fl=(273) /home/runner/work/crypto/crypto/src/bin/ecbench.rs
+fn=(928) ecbench::main
+cfn=(2264) ecbench::run
+calls=0 1324 
+1117 3919384
+
+fn=(2264)
+cfi=(346)
+cfn=(2346)
+calls=0 437 
+2210 3919384
+
+fl=(274)
+fn=(4532)
+cfn=(4606) crypto_lib::cryptanalysis::ecbench::methods::solve_inner
+calls=0 4600 
+4411 3919384
+
+fn=(4606)
+cfn=(4618) crypto_lib::cryptanalysis::ecbench::methods::solve_ic_prime
+calls=0 8293 
+4790 3919384
+
+fn=(4618)
+cfi=(534)
+cfn=(5022)
+calls=0 510 
+8363 3919384
+
+fl=(272)
+fn=(926)
+fi=(463)
+cfi=(273)
+cfn=(928)
+calls=0 1112 
+250 3919384
+fe=(272)
+
+ob=(2)
+fl=(327)
+fn=(2026)
+73 85
++7 85
++1 85
++75 54
++10 54
++1 54
++1 54
++3 108
+401 85
++1 85
++5 63
++1 63
++1 63
++1 63
++1 63
++3 63
++1 63
++1 63
++1 63
++3 63
++1 63
++1 9
++1 18
++31 22
++1 22
++1 22
++1 22
++2 22
+
+fl=(190) ./csu/../sysdeps/nptl/libc_start_call_main.h
+fn=(654) (below main)
+cob=(7)
+cfi=(186)
+cfn=(662)
+calls=0 0 
+58 3919384
+
+fl=(517)
+fn=(4528)
+30 7
++8 14
++2 14
++28 14
++1 14
+-25 14
+
+fl=(250)
+fn=(860)
+158 1
++1 2
++5 1
++1 1
++1 1
++1 1
++1 1
++69 1
++1 1
++87 1
++1 1
++1 1
++1 32777
++1 1
++1 2
+
+fl=(260) ./misc/../sysdeps/unix/sysv/linux/mmap64.c
+fn=(888) mmap
+47 8
++3 16
+-3 48
++6 16
++5 48
++2 32
+-7 40
+
+fl=(556) ./misc/../sysdeps/unix/sysv/linux/setvmaname.c
+fn=(5508) __set_vma_name
+33 56
++2 40
++14 75
+-9 4
+cob=(4)
+cfi=(176)
+cfn=(562)
+calls=1 -40 
+* 26
+* 3
++7 1
++1 1
+
+fl=(217)
+fn=(1044) _int_free_merge_chunk
+4665 110
++1 22
+-1 66
++5 132
++3 44
++5 66
++3 44
++1 44
++1 44
+1992 66
+4689 44
++25 44
++6 44
++4 8
++9 8
+-1 8
++1 24
++1 16
+-1 14
+-1 14
++1 42
++1 28
++2 22
++2 44
++5 22
++1 22
++2 66
++1 22
+-45 22
+-1 44
++1 132
+-1 22
+cfn=(1046) _int_free_maybe_consolidate
+calls=22 +69 
+* 675
++39 24
+-19 14
++1 14
+-1 14
+cfn=(1048) unlink_chunk.isra.0
+calls=14 1608 
+* 306
++1 14
+-47 66
+-2 44
+
+fn=(1046)
+4770 242
++6 44
++22 242
+-20 4
++3 3
+-2 1
+cfn=(2240) malloc_consolidate
+calls=1 +32 
+* 133
+* 1
++5 5
+
+fn=(5836) munmap_chunk
+3024 4
++2 4
+-1 4
++1 8
++2 4
+-3 4
+-1 4
++4 4
++3 8
++7 4
+-8 4
++9 4
+-8 4
++1 4
++6 12
++1 16
++3 4
++1 12
++6 4
+-1 8
+cfi=(261) ./misc/../sysdeps/unix/syscall-template.S
+cfn=(5838) munmap
+calls=4 117 
+* 24
+
+fn=(1048)
+1608 444
++2 1332
+-2 444
++2 888
++3 444
++1 888
++2 1776
+-3 444
++6 444
++1 444
++1 1071
++2 32
++1 48
++3 32
++14 16
++1 16
++3 888
+
+fn=(726) _int_malloc
+3846 583
+1326 106
++19 318
+3887 106
+1794 53
+3914 106
++65 18
+-63 36
++3 9
++2 18
++56 88
++62 296
++1 54
++20 47
+-1 47
+-1 47
++1 94
++1 94
+-2 94
++12 235
+-1 64
++4 64
++1 32
++2 64
+-3 106
++1 53
++2 106
++1 255
++2 85
++1 340
++2 340
+-10 85
++12 170
++1 170
++2 170
++11 234
++29 77
++1 77
++4 154
++29 154
++8 185
++1 9
++1 9
+-1 9
++4 18
+-4 14
++1 14
+-1 14
++4 28
++5 4
+-2 4
++2 12
++1 8
++7 1
+-1 4
++2 3
+3980 35
++2 35
+-2 35
++2 70
++2 6
++1 12
++6 6
+-4 6
++1 6
++1 6
++2 12
++7 24
+-1 12
++1 12
++5 54
++1 24
++2 16
+-76 27
+4041 4
+cfn=(2240)
+calls=2 4811 
+* 31210
+* 2
+4487 636
+1985 6
+4020 6
+1985 12
+4163 124
++1 186
++1 62
+-1 62
++57 124
++9 62
+-9 124
++9 62
+-9 186
++1 62
++1 62
++1 62
++1 62
++6 124
+-10 46
++9 23
+-9 46
++9 23
+-9 69
++1 23
++1 23
++1 23
++1 23
++6 46
+4070 255
+4246 64
++11 141
++2 54
++3 18
+-3 18
++3 36
++1 49
++71 135
+-4 45
++1 45
++1 45
+-1 45
++1 45
++1 90
++1 135
++5 188
++16 127
++2 254
+-4 354
++8 50
++3 100
++2 13
++1 13
++1 13
+-2 52
+-27 13
+-99 340
+4099 42
++2 8
+-1 16
++27 8
++1 8
++4 16
++29 27
++8 55
+4008 8
++1 8
++1 16
+3159 8
+4012 8
+3167 8
+-8 8
++4 8
+4013 8
+3163 8
++2 32
++1 8
++2 8
+-2 8
++1 8
++1 8
+4218 19
+-48 19
++48 57
+4343 42
++3 24
+-3 12
++3 16
++97 8
++1 16
++2 16
++3 24
++17 32
+4070 26
+-91 156
+4169 24
++23 9
++3 1
++1 3
+-3 8
++6 3
++7 2
+-1 8
++2 4
++2 2
++1 6
++2 2
++1 4
+-1 1
++1 2
+-44 10
++33 2
+4343 6
++5 24
++1 12
++24 148
++3 74
++2 37
++3 74
+-3 74
++3 37
+cfn=(1048)
+calls=37 1608 
+* 936
++3 148
++15 62
+-5 31
++5 62
++1 62
++3 31
++1 31
++1 31
++3 62
++1 23
++1 62
++2 16
++3 64
++2 24
++1 8
+1985 8
+4421 8
+1985 16
+4415 184
++2 69
++1 23
+1985 23
+4421 23
+1985 52
+4421 6
+1985 12
+4387 6
+-1 6
++1 12
+2552 8
++12 8
+-12 40
++12 8
++1 24
++3 32
++8 40
+cfn=(5506) sysmalloc_mmap.isra.0
+calls=8 2400 
+* 918
+* 8
++1 16
+4482 16
+-22 30
+cfn=(734) alloc_perturb
+calls=10 1985 
+* 40
++1 10
+-2 4
+4266 2
++1 12
++6 4
++5 2
++1 4
+-1 4
++1 2
+cfn=(1048)
+calls=2 1608 
+* 66
++3 8
++13 2
+-4 1
++4 2
++1 2
++3 1
++1 1
++1 1
++1 2
++5 8
++2 3
++1 1
++3 1
+-28 1
+-1 1
++1 2
+
+fn=(798) _int_realloc
+4914 280
++11 140
++1 175
++1 140
++6 70
++2 70
++1 105
++2 140
++3 70
++89 315
+-79 70
++12 70
++12 140
+cfn=(726)
+calls=35 3846 
+* 9021
+* 35
++1 70
++9 35
+-6 35
++1 35
++5 70
++8 35
+-1 35
+fi=(223) ./malloc/../string/bits/string_fortified.h
+29 35
+fe=(217)
+4993 210
+fi=(223)
+29 35
+cob=(4)
+cfi=(176)
+cfn=(800)
+calls=35 -29 
+* 2559
+fe=(217)
+4997 140
+cfn=(804) _int_free
+calls=35 4495 
+* 3514
++2 35
+-34 17
+-1 34
+
+fn=(868)
+3699 20
++10 10
+-10 70
++10 80
++8 20
++3 30
++2 20
++34 42
+fi=(218) ./malloc/./malloc/arena.c
+153 4
+fe=(217)
+3732 10
++1 10
++21 20
+-21 20
++21 10
+cfn=(726)
+calls=10 +92 
+* 36035
++2 20
++33 8
+fi=(223)
+59 8
+fe=(217)
+3789 16
++48 72
+-78 16
++37 2
+-12 2
++12 4
++3 10
++8 2
++2 4
++2 4
++5 1
++2 1
+-2 1
++3 2
++2 1
++2 2
++2 1
++2 2
+-71 6
++3 6
++78 1
+fi=(223)
+59 2
+fe=(217)
+3837 6
+fi=(223)
+59 1
+cob=(4)
+cfi=(176)
+cfn=(858)
+calls=1 -59 
+* 32795
+fe=(217)
+
+fn=(714)
+3294 3912
++7 978
+1326 978
++19 2440
+3311 968
++2 1956
++3 978
++10 16
++28 48
+-36 1461
+3178 962
++4 962
++4 481
++4 481
+-4 1443
++4 481
++1 481
+3354 2886
+-26 32
+cfn=(726)
+calls=8 3846 
+* 2069
++1 40
+fi=(218)
+153 16
+fe=(217)
+
+fn=(734)
+1985 30
++2 10
+
+fn=(5506)
+2400 40
++13 24
+-13 8
++18 16
++3 72
+cfi=(260)
+cfn=(888)
+calls=8 47 
+* 208
+* 8
++3 16
++4 16
+2008 32
+2432 32
+cfi=(556)
+cfn=(5508)
+calls=8 33 
+* 206
++16 24
++19 8
+-1 8
++5 8
+-4 16
++4 16
++1 40
++3 24
++1 40
++5 56
+
+fn=(832)
+3359 468
++4 936
+-4 1404
++14 468
+-14 1404
++12 468
++4 468
+-4 468
++4 936
++17 1392
+fi=(218)
+153 1392
+fe=(217)
+3398 1392
+cfn=(804)
+calls=464 4495 
+* 25875
++3 464
++1 2784
+-23 12
++2 16
++2 4
++1 4
+-1 4
++1 4
++1 4
++3 8
+cfn=(5836)
+calls=4 3024 
+* 144
++13 4
++1 24
+
+fn=(2240)
+4811 3
++17 3
+-17 15
++28 3
+-28 9
++15 3
++2 3
++13 6
++1 6
+-1 54
++1 54
++62 90
++1 24
+-31 800
++4 400
++2 200
++1 400
++1 400
++2 400
+-4 200
++1 400
++1 400
++2 400
++1 102
++4 51
++2 51
+-2 102
++3 51
++9 102
+-12 349
++2 349
+-2 698
++3 349
++9 1094
+-56 800
++4 1200
++1 1600
++8 400
+-3 800
++3 400
+-3 400
++4 400
+-4 400
++5 400
+-5 400
++5 800
++2 800
++1 191
++2 191
+-1 191
++2 764
++2 1337
+cfn=(1048)
+calls=191 1608 
+* 4014
+* 955
++3 800
++4 200
++1 600
++16 400
+-16 200
+cfn=(1048)
+calls=200 1608 
+* 4329
+* 800
+
+fn=(804)
+4495 3493
++4 1497
++6 1996
++1 998
++4 2495
++8 1996
+-1 998
++1 998
++29 491
+-20 491
+-6 491
++6 982
++20 1964
+1792 24
+4561 48
++11 8
++2 6
+1992 2
+4593 2
+1992 4
+4595 2
++1 2
++4 4
++2 2
+-2 2
++2 2
++4 4
++2 6
++1 2
++19 4
++30 2862
+-21 44
++3 44
++18 22
+-12 22
++12 88
+-12 22
+cfn=(1044)
+calls=22 +19 
+* 2521
+3163 475
++4 475
+-4 475
++2 1900
++1 475
++1 475
+4550 475
+
+fn=(794)
+3407 396
++6 72
++4 72
++7 72
+5241 36
+3433 36
+5242 108
+-1 72
++2 72
+3489 1
++49 324
+5244 36
+3441 72
++2 1
++1 2
++12 105
+fi=(218)
+153 105
+fe=(217)
+3464 140
++1 70
+1326 70
++19 210
+3475 70
++31 70
++2 210
+cfn=(798)
+calls=35 4914 
+* 17735
+* 35
++1 175
+fi=(218)
+153 140
+fe=(217)
+3509 70
+
+fl=(237)
+fn=(802)
+255 498
++1 498
++6 498
++1 498
++2 487
++1 487
++1 487
++3 442
++1 442
++1 442
++3 884
++30 11
++1 11
++2 3
++1 3
++33 8
++1 8
++1 8
++1 8
++2 8
++17 3
++1 3
++1 3
++1 3
++1 3
++7 12
++1 12
++1 12
++1 12
++1 12
++1 12
++1 24
++5 45
++1 45
++5 45
++1 45
++2 21
++1 21
++1 21
++2 9
++1 9
++1 9
++1 9
++1 9
++1 9
++1 9
++1 9
++1 9
++1 9
++1 9
++1 9
++1 9
++1 9
++1 18
++4 24
++1 24
++4 24
++2 24
++4 24
++1 24
++11 24
++3 24
++2 24
++2 24
++4 24
++1 24
++9 23
++1 23
++2 23
++2 23
++1 23
++1 23
++3 23
++2 23
++2 23
++2 46
++6 23
++1 23
++1 23
++1 23
++1 23
++1 23
++1 23
++1 23
++1 23
++1 23
++1 23
++1 23
+-11 148
++1 148
++1 148
++1 148
++1 148
++1 148
++1 148
++1 148
++1 148
++1 148
++1 148
++1 148
++2 23
++1 23
++1 23
++1 23
++2 23
++4 46
++13 1
++1 1
++2 1
++1 1
++1 1
++2 1
++2 1
++2 2
++6 1
++1 1
++1 1
++1 1
++1 1
++1 1
++1 1
++1 1
++1 1
++1 1
++1 1
++1 1
++2 1
++1 1
++1 1
++1 1
++2 1
++1 2
+
+fl=(187)
+fn=(632)
+cfi=(190)
+cfn=(654)
+calls=0 29 
+360 3919384
+
+fl=(261)
+fn=(5838)
+117 20
++5 4
+
+totals: 3919384

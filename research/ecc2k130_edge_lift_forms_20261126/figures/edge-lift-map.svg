@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Support-aware quadratic edge lifts for binary S3</title>
+  <desc id="desc">Three matched product lifts have equal variable count and degree. The mixed ac lift has the smallest distinct monomial union in all 72 toy cells and advances to a closure-degree test.</desc>
+  <defs>
+    <style>
+      .bg{fill:#f7f5ef}.ink{fill:#17202a}.muted{fill:#59636e}.panel{fill:#fff;stroke:#d4d0c6;stroke-width:2}.node{fill:#eef3f7;stroke:#36566f;stroke-width:2}.good{fill:#e7f4ec;stroke:#27734f;stroke-width:3}.warn{fill:#fff3d9;stroke:#a76b00;stroke-width:2}.line{stroke:#6b7785;stroke-width:3;fill:none}.dash{stroke:#a76b00;stroke-width:3;stroke-dasharray:9 8;fill:none}.t{font:700 30px system-ui,sans-serif}.h{font:700 22px system-ui,sans-serif}.b{font:17px system-ui,sans-serif}.s{font:15px system-ui,sans-serif}.mono{font:16px ui-monospace,SFMono-Regular,Menlo,monospace}
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#6b7785"/></marker>
+    <marker id="arrowWarn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#a76b00"/></marker>
+  </defs>
+  <rect class="bg" width="1200" height="720"/>
+  <text class="t ink" x="55" y="58">ECC2K-130: search the lifted edge, not only the polynomial degree</text>
+  <text class="b muted" x="55" y="88">Exact toy support census; solving degree remains unmeasured</text>
+
+  <rect class="panel" x="55" y="120" width="1090" height="135" rx="18"/>
+  <text class="h ink" x="80" y="155">One cubic link, three exact quadratic presentations</text>
+  <text class="mono ink" x="80" y="190">S₃(a,b,c) = (ab + ac + bc)² + abc + β</text>
+  <text class="mono muted" x="80" y="222">lift ij:  wᵢⱼ + xᵢxⱼ = 0;   wᵢⱼ² + (xᵢxₖ)² + (xⱼxₖ)² + wᵢⱼxₖ + β = 0</text>
+
+  <rect class="node" x="80" y="310" width="250" height="145" rx="18"/>
+  <text class="h ink" x="105" y="348">lift ab — baseline</text>
+  <text class="b muted" x="105" y="382">leaf / running-sum edge</text>
+  <text class="b ink" x="105" y="420">distinct support: 1.000×</text>
+
+  <rect class="good" x="475" y="285" width="250" height="195" rx="18"/>
+  <text class="h ink" x="500" y="325">lift ac — candidate</text>
+  <text class="b muted" x="500" y="359">running-sum / output edge</text>
+  <text class="b ink" x="500" y="397">support: 0.479–0.814×</text>
+  <text class="b ink" x="500" y="427">upper median: 0.677×</text>
+  <text class="s muted" x="500" y="458">lower in 72 / 72 cells</text>
+
+  <rect class="node" x="870" y="310" width="250" height="145" rx="18"/>
+  <text class="h ink" x="895" y="348">lift bc — control</text>
+  <text class="b muted" x="895" y="382">new leaf / output edge</text>
+  <text class="b ink" x="895" y="420">upper median: 0.847×</text>
+
+  <path class="line" marker-end="url(#arrow)" d="M330 382 C385 382 415 382 468 382"/>
+  <path class="line" marker-end="url(#arrow)" d="M870 382 C815 382 785 382 732 382"/>
+
+  <rect class="panel" x="55" y="540" width="675" height="125" rx="18"/>
+  <text class="h ink" x="80" y="578">What the census establishes</text>
+  <text class="b ink" x="80" y="612">same variables · same equations · Boolean degree 2 · planted witness holds</text>
+  <text class="s muted" x="80" y="641">n=11,13,17,19; a=0,1; m=3,4,5; ℓ=3,4,5 — 216 systems</text>
+
+  <rect class="warn" x="790" y="525" width="330" height="155" rx="18"/>
+  <text class="h ink" x="815" y="565">Next falsifier</text>
+  <text class="b ink" x="815" y="601">matched closure scan</text>
+  <text class="s muted" x="815" y="630">Does smaller support lower D* or</text>
+  <text class="s muted" x="815" y="653">only change input sparsity?</text>
+  <path class="dash" marker-end="url(#arrowWarn)" d="M700 470 C770 490 820 500 900 520"/>
+</svg>

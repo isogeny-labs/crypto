@@ -1,0 +1,69 @@
+name: Prime31 exact weighted M6 uniform-throughput gate
+
+on:
+  push:
+    branches:
+      - automation/prime31-m6-throughput-ceiling-20261118
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_m6_yield_ceiling.rs
+      - research/prime31_ic_20261115/native/verify_prime31_m6_yield_ceiling.py
+      - research/prime31_ic_20261115/native/PRIME31_M6_UNIFORM_THROUGHPUT_GATE_20261118.md
+      - .github/workflows/prime31-m6-yield-ceiling.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_m6_yield_ceiling.rs
+      - research/prime31_ic_20261115/native/verify_prime31_m6_yield_ceiling.py
+      - research/prime31_ic_20261115/native/PRIME31_M6_UNIFORM_THROUGHPUT_GATE_20261118.md
+      - .github/workflows/prime31-m6-yield-ceiling.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prime31-m6-capacity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout candidate source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout pinned existing Rust source
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Add the new gate to pinned original crate
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_m6_yield_ceiling.rs \
+             pinned/research/prime31_ic_20261115/native/examples/prime31_m6_yield_ceiling.rs
+      - name: Reused Rust library and exact gate unit tests
+        run: |
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_m6_yield_ceiling
+      - name: Exact original-curve diagnostic record
+        run: |
+          cargo +1.100.0 run --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_m6_yield_ceiling > prime31-m6-yield.json
+          test -s prime31-m6-yield.json
+          cat prime31-m6-yield.json
+      - name: Independently reproduce all exact field and support counts
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_m6_yield_ceiling.py \
+            prime31-m6-yield.json
+      - name: Archive original raw output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-m6-yield-exact-curve-control
+          path: prime31-m6-yield.json
+          if-no-files-found: warn
+          retention-days: 30

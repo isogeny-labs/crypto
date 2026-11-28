@@ -1,0 +1,3 @@
+# Next bounded experiment
+
+FreezeleadingdegreeguardsfromtheexactC84proof:sameH3[34],H2[51],H1[68]flags000/110/001,q2=H1[68],q1=0whenq2=0. BindguardstotheSAME76primariesandtestpositivepolynomial-rootproductsbeforesearch. PinCNF/nativeZ3library/runtimehashes,onecore/4GiB,60sengine/90sfullworker;retainallmodels,proof/unknown/streams beforevalidation. Searchonlynecessaryparameterfamily;fullprefixsupport/sourceordering/UrecoveryandindependentUNSATproofbeforeanyconditionalclosureclaim. No original/globalcompletionfromlocalCNFalone. GenuineF4/F5/F6engineeringcontinuesindependently.

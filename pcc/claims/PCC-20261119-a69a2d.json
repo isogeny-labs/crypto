@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T06:10:35Z",
+ "id": "PCC-20261119-a69a2d",
+ "kind": "theorem",
+ "producer": {
+  "commit": "f2f5fcdeb3373dba5fc9d45ca0540dbce657def0",
+  "model": "Codex",
+  "session": "upstream-dilation-bridge-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "504992104a98064be98afe89b481c2c4df93c7decf3c265fcb2407b8e5a3a711",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.divisionPolynomial_ne_zero_at_const_mul_transcendental"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This uses Mathlib nonvanishing of the indexed division polynomial and proves the algebraicity/transcendence contradiction. It does not prove the missing group-law theorem that an n-torsion point makes that polynomial vanish at its x-coordinate.",
+ "statement": "A division polynomial whose integer index remains nonzero in the constant field cannot vanish at a nonzero constant multiple of a transcendental extension parameter."
+}

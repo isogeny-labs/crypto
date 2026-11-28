@@ -208,7 +208,8 @@ pub fn class_number_primitive(d: i64) -> u64 {
 }
 
 fn gcd3(a: i64, b: i64, c: i64) -> i64 {
-    a.gcd(&b).gcd(&c)
+    use crate::gcd::int::{gcd_i64, gcd_u64};
+    gcd_u64(gcd_i64(a, b), c.unsigned_abs()) as i64
 }
 
 fn unit_index(d_k: i64, conductor_is_one: bool) -> u64 {

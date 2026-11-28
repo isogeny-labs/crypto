@@ -1,0 +1,301 @@
+-- Candidate witness refinements only. No proof or kernel acceptance is asserted.
+-- Inputs 0,0; expected representative 0
+refine ⟨(1),(1),0,0,(1),(1),0,(1+X^5),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 0,1; expected representative 1
+refine ⟨(1),(X),(1),(X^4),(1),(X),(1),(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 0,2; expected representative 2
+refine ⟨(1),(X^2),(1),(X^3),(1),(X^2),(1),(X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 0,3; expected representative 3
+refine ⟨(1),(X^2),(Polynomial.C (2:K)),(Polynomial.C (2:K)*X^3),(1),(X^2),(Polynomial.C (2:K)),(X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 0,4; expected representative 4
+refine ⟨(1),(X),(Polynomial.C (2:K)),(Polynomial.C (2:K)*X^4),(1),(X),(Polynomial.C (2:K)),(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 0,5; expected representative 5
+refine ⟨(1),(1+X),0,0,(1),(1+X),0,(1+Polynomial.C (2:K)*X+X^2+Polynomial.C (2:K)*X^3+X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 0,6; expected representative 6
+refine ⟨(1),(X+X^2),(1+X),0,(1),(X+X^2),(1+X),(1+X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 0,7; expected representative 7
+refine ⟨(1),(X+X^2),(Polynomial.C (2:K)+Polynomial.C (2:K)*X),0,(1),(X+X^2),(Polynomial.C (2:K)+Polynomial.C (2:K)*X),(1+X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 0,8; expected representative 8
+refine ⟨(1),(Polynomial.C (2:K)+X+X^2),(X),0,(1),(Polynomial.C (2:K)+X+X^2),(X),(Polynomial.C (2:K)+Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 0,9; expected representative 9
+refine ⟨(1),(Polynomial.C (2:K)+X+X^2),(Polynomial.C (2:K)*X),0,(1),(Polynomial.C (2:K)+X+X^2),(Polynomial.C (2:K)*X),(Polynomial.C (2:K)+Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 1,0; expected representative 1
+refine ⟨(1),(X),(1),(X^4),(X),(1),(1),(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 1,1; expected representative 2
+refine ⟨(1),(X^2),(1),(Polynomial.C (2:K)*X^3),(X),(X),(Polynomial.C (2:K)),(X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 1,2; expected representative 3
+refine ⟨(1),(X^3),(1),(Polynomial.C (2:K)*X^2),(X),(X^2),(Polynomial.C (2:K)),(X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),0,?_,?_,?_⟩⟩
+-- Inputs 1,3; expected representative 4
+refine ⟨(X),(X),(Polynomial.C (2:K)),0,(1),(X),0,(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 1,4; expected representative 0
+refine ⟨(X),(1),0,(1),(1),(1),0,(1+X^5),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 1,5; expected representative 6
+refine ⟨(1),(X+X^2),(1+X),(Polynomial.C (2:K)+X+Polynomial.C (2:K)*X^2+X^3),(X),(1+X),(1),(1+X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 1,6; expected representative 9
+refine ⟨(1),(X^2+X^3),(1+Polynomial.C (2:K)*X^2),(Polynomial.C (2:K)+X+Polynomial.C (2:K)*X^2),(X),(X+X^2),(Polynomial.C (2:K)+X),(Polynomial.C (2:K)+X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(1),?_,?_,?_⟩⟩
+-- Inputs 1,7; expected representative 5
+refine ⟨(X),(1+X),0,(1+Polynomial.C (2:K)*X+X^2+Polynomial.C (2:K)*X^3),(1),(1+X),(Polynomial.C (2:K)),(1+Polynomial.C (2:K)*X+X^2+Polynomial.C (2:K)*X^3+X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 1,8; expected representative 7
+refine ⟨(1),(Polynomial.C (2:K)*X+X^2+X^3),(1+Polynomial.C (2:K)*X^2),(1),(X),(Polynomial.C (2:K)+X+X^2),(1+X),(X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(1),?_,?_,?_⟩⟩
+-- Inputs 1,9; expected representative 8
+refine ⟨(1),(Polynomial.C (2:K)*X+X^2+X^3),(1+X+Polynomial.C (2:K)*X^2),(Polynomial.C (2:K)),(X),(Polynomial.C (2:K)+X+X^2),(1+Polynomial.C (2:K)*X),(Polynomial.C (2:K)+X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(1),?_,?_,?_⟩⟩
+-- Inputs 2,0; expected representative 2
+refine ⟨(1),(X^2),(1),(X^3),(X^2),(1),(1),(X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 2,1; expected representative 3
+refine ⟨(1),(X^3),(1),(Polynomial.C (2:K)*X^2),(X^2),(X),(Polynomial.C (2:K)),(X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),0,?_,?_,?_⟩⟩
+-- Inputs 2,2; expected representative 4
+refine ⟨(1),(X^4),(1),(Polynomial.C (2:K)*X),(X^2),(X^2),(Polynomial.C (2:K)),(X),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),0,?_,?_,?_⟩⟩
+-- Inputs 2,3; expected representative 0
+refine ⟨(X^2),(1),0,(1),(1),(1),0,(1+X^5),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 2,4; expected representative 1
+refine ⟨(X),(X),(1),0,(X),(1),0,(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 2,5; expected representative 9
+refine ⟨(1),(X^2+X^3),(1+Polynomial.C (2:K)*X^2),(1+Polynomial.C (2:K)*X+X^2),(X^2),(1+X),(1),(Polynomial.C (2:K)+X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(1),?_,?_,?_⟩⟩
+-- Inputs 2,6; expected representative 8
+refine ⟨(1),(X^3+X^4),(1+X^3),(1+Polynomial.C (2:K)*X),(X^2),(X+X^2),(Polynomial.C (2:K)+X),(1+Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(2:K),(1+Polynomial.C (2:K)*X),?_,?_,?_⟩⟩
+-- Inputs 2,7; expected representative 6
+refine ⟨(X),(X+X^2),(1+X),(Polynomial.C (2:K)+X+Polynomial.C (2:K)*X^2),(X),(1+X),(Polynomial.C (2:K)),(1+X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 2,8; expected representative 5
+refine ⟨(1),(Polynomial.C (2:K)*X^2+X^3+X^4),(1+Polynomial.C (2:K)*X^2),(1),(X^2),(Polynomial.C (2:K)+X+X^2),(1+X),(1+X),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(Polynomial.C (2:K)+X),?_,?_,?_⟩⟩
+-- Inputs 2,9; expected representative 7
+refine ⟨(1),(Polynomial.C (2:K)*X^2+X^3+X^4),(1+X^3),(Polynomial.C (2:K)),(X^2),(Polynomial.C (2:K)+X+X^2),(1+Polynomial.C (2:K)*X),(Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(2:K),(1+Polynomial.C (2:K)*X),?_,?_,?_⟩⟩
+-- Inputs 3,0; expected representative 3
+refine ⟨(1),(X^2),(Polynomial.C (2:K)),(Polynomial.C (2:K)*X^3),(X^2),(1),(Polynomial.C (2:K)),(X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 3,1; expected representative 4
+refine ⟨(X),(X),(Polynomial.C (2:K)),0,(X),(1),0,(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 3,2; expected representative 0
+refine ⟨(X^2),(1),0,(Polynomial.C (2:K)),(1),(1),0,(1+X^5),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 3,3; expected representative 1
+refine ⟨(1),(X^4),(Polynomial.C (2:K)),(X),(X^2),(X^2),(1),(X),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),0,?_,?_,?_⟩⟩
+-- Inputs 3,4; expected representative 2
+refine ⟨(1),(X^3),(Polynomial.C (2:K)),(X^2),(X^2),(X),(1),(X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),0,?_,?_,?_⟩⟩
+-- Inputs 3,5; expected representative 8
+refine ⟨(1),(X^2+X^3),(Polynomial.C (2:K)+X^2),(Polynomial.C (2:K)+X+Polynomial.C (2:K)*X^2),(X^2),(1+X),(Polynomial.C (2:K)),(Polynomial.C (2:K)+X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(Polynomial.C (2:K)),?_,?_,?_⟩⟩
+-- Inputs 3,6; expected representative 7
+refine ⟨(X),(X+X^2),(Polynomial.C (2:K)+Polynomial.C (2:K)*X),(1+Polynomial.C (2:K)*X+X^2),(X),(1+X),(1),(1+X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 3,7; expected representative 9
+refine ⟨(1),(X^3+X^4),(Polynomial.C (2:K)+Polynomial.C (2:K)*X^3),(Polynomial.C (2:K)+X),(X^2),(X+X^2),(1+Polynomial.C (2:K)*X),(1+Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(2:K),(Polynomial.C (2:K)+X),?_,?_,?_⟩⟩
+-- Inputs 3,8; expected representative 6
+refine ⟨(1),(Polynomial.C (2:K)*X^2+X^3+X^4),(Polynomial.C (2:K)+Polynomial.C (2:K)*X^3),(1),(X^2),(Polynomial.C (2:K)+X+X^2),(Polynomial.C (2:K)+X),(Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(2:K),(Polynomial.C (2:K)+X),?_,?_,?_⟩⟩
+-- Inputs 3,9; expected representative 5
+refine ⟨(1),(Polynomial.C (2:K)*X^2+X^3+X^4),(Polynomial.C (2:K)+X^2),(Polynomial.C (2:K)),(X^2),(Polynomial.C (2:K)+X+X^2),(Polynomial.C (2:K)+Polynomial.C (2:K)*X),(1+X),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(1+Polynomial.C (2:K)*X),?_,?_,?_⟩⟩
+-- Inputs 4,0; expected representative 4
+refine ⟨(1),(X),(Polynomial.C (2:K)),(Polynomial.C (2:K)*X^4),(X),(1),(Polynomial.C (2:K)),(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 4,1; expected representative 0
+refine ⟨(X),(1),0,(Polynomial.C (2:K)),(1),(1),0,(1+X^5),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 4,2; expected representative 1
+refine ⟨(X),(X),(1),0,(1),(X),0,(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 4,3; expected representative 2
+refine ⟨(1),(X^3),(Polynomial.C (2:K)),(X^2),(X),(X^2),(1),(X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),0,?_,?_,?_⟩⟩
+-- Inputs 4,4; expected representative 3
+refine ⟨(1),(X^2),(Polynomial.C (2:K)),(X^3),(X),(X),(1),(X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 4,5; expected representative 7
+refine ⟨(1),(X+X^2),(Polynomial.C (2:K)+Polynomial.C (2:K)*X),(1+Polynomial.C (2:K)*X+X^2+Polynomial.C (2:K)*X^3),(X),(1+X),(Polynomial.C (2:K)),(1+X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 4,6; expected representative 5
+refine ⟨(X),(1+X),0,(Polynomial.C (2:K)+X+Polynomial.C (2:K)*X^2+X^3),(1),(1+X),(1),(1+Polynomial.C (2:K)*X+X^2+Polynomial.C (2:K)*X^3+X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 4,7; expected representative 8
+refine ⟨(1),(X^2+X^3),(Polynomial.C (2:K)+X^2),(1+Polynomial.C (2:K)*X+X^2),(X),(X+X^2),(1+Polynomial.C (2:K)*X),(Polynomial.C (2:K)+X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(Polynomial.C (2:K)),?_,?_,?_⟩⟩
+-- Inputs 4,8; expected representative 9
+refine ⟨(1),(Polynomial.C (2:K)*X+X^2+X^3),(Polynomial.C (2:K)+Polynomial.C (2:K)*X+X^2),(1),(X),(Polynomial.C (2:K)+X+X^2),(Polynomial.C (2:K)+X),(Polynomial.C (2:K)+X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(Polynomial.C (2:K)),?_,?_,?_⟩⟩
+-- Inputs 4,9; expected representative 6
+refine ⟨(1),(Polynomial.C (2:K)*X+X^2+X^3),(Polynomial.C (2:K)+X^2),(Polynomial.C (2:K)),(X),(Polynomial.C (2:K)+X+X^2),(Polynomial.C (2:K)+Polynomial.C (2:K)*X),(X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(Polynomial.C (2:K)),?_,?_,?_⟩⟩
+-- Inputs 5,0; expected representative 5
+refine ⟨(1),(1+X),0,0,(1+X),(1),0,(1+Polynomial.C (2:K)*X+X^2+Polynomial.C (2:K)*X^3+X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 5,1; expected representative 6
+refine ⟨(1),(X+X^2),(1+X),(Polynomial.C (2:K)+X+Polynomial.C (2:K)*X^2+X^3),(1+X),(X),(1),(1+X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 5,2; expected representative 9
+refine ⟨(1),(X^2+X^3),(1+Polynomial.C (2:K)*X^2),(1+Polynomial.C (2:K)*X+X^2),(1+X),(X^2),(1),(Polynomial.C (2:K)+X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(1),?_,?_,?_⟩⟩
+-- Inputs 5,3; expected representative 8
+refine ⟨(1),(X^2+X^3),(Polynomial.C (2:K)+X^2),(Polynomial.C (2:K)+X+Polynomial.C (2:K)*X^2),(1+X),(X^2),(Polynomial.C (2:K)),(Polynomial.C (2:K)+X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(Polynomial.C (2:K)),?_,?_,?_⟩⟩
+-- Inputs 5,4; expected representative 7
+refine ⟨(1),(X+X^2),(Polynomial.C (2:K)+Polynomial.C (2:K)*X),(1+Polynomial.C (2:K)*X+X^2+Polynomial.C (2:K)*X^3),(1+X),(X),(Polynomial.C (2:K)),(1+X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 5,5; expected representative 0
+refine ⟨(1+X),(1),0,0,(1),(1),0,(1+X^5),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 5,6; expected representative 1
+refine ⟨(1+X),(X),(1),(Polynomial.C (2:K)+X+Polynomial.C (2:K)*X^2+X^3),(1),(X),(1),(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 5,7; expected representative 4
+refine ⟨(1+X),(X),(Polynomial.C (2:K)),(1+Polynomial.C (2:K)*X+X^2+Polynomial.C (2:K)*X^3),(1),(X),(Polynomial.C (2:K)),(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 5,8; expected representative 3
+refine ⟨(1),(Polynomial.C (2:K)+Polynomial.C (2:K)*X^2+X^3),(1+Polynomial.C (2:K)*X^2),(1),(1+X),(Polynomial.C (2:K)+X+X^2),(X),(X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(1),?_,?_,?_⟩⟩
+-- Inputs 5,9; expected representative 2
+refine ⟨(1),(Polynomial.C (2:K)+Polynomial.C (2:K)*X^2+X^3),(Polynomial.C (2:K)+X^2),(Polynomial.C (2:K)),(1+X),(Polynomial.C (2:K)+X+X^2),(Polynomial.C (2:K)*X),(X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(Polynomial.C (2:K)),?_,?_,?_⟩⟩
+-- Inputs 6,0; expected representative 6
+refine ⟨(1),(X+X^2),(1+X),0,(X+X^2),(1),(1+X),(1+X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 6,1; expected representative 9
+refine ⟨(1),(X^2+X^3),(1+Polynomial.C (2:K)*X^2),(Polynomial.C (2:K)+X+Polynomial.C (2:K)*X^2),(X+X^2),(X),(Polynomial.C (2:K)+X),(Polynomial.C (2:K)+X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(1),?_,?_,?_⟩⟩
+-- Inputs 6,2; expected representative 8
+refine ⟨(1),(X^3+X^4),(1+X^3),(1+Polynomial.C (2:K)*X),(X+X^2),(X^2),(Polynomial.C (2:K)+X),(1+Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(2:K),(1+Polynomial.C (2:K)*X),?_,?_,?_⟩⟩
+-- Inputs 6,3; expected representative 7
+refine ⟨(X),(X+X^2),(Polynomial.C (2:K)+Polynomial.C (2:K)*X),(1+Polynomial.C (2:K)*X+X^2),(1+X),(X),(1),(1+X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 6,4; expected representative 5
+refine ⟨(X),(1+X),0,(Polynomial.C (2:K)+X+Polynomial.C (2:K)*X^2+X^3),(1+X),(1),(1),(1+Polynomial.C (2:K)*X+X^2+Polynomial.C (2:K)*X^3+X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 6,5; expected representative 1
+refine ⟨(1+X),(X),(1),(Polynomial.C (2:K)+X+Polynomial.C (2:K)*X^2+X^3),(X),(1),(1),(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 6,6; expected representative 2
+refine ⟨(1+X),(X^2),(1),(Polynomial.C (2:K)+X+Polynomial.C (2:K)*X^2),(X),(X),(Polynomial.C (2:K)),(X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 6,7; expected representative 0
+refine ⟨(X+X^2),(1),0,(1+X),(1),(1),0,(1+X^5),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 6,8; expected representative 4
+refine ⟨(1),(Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^3+X^4),(1+Polynomial.C (2:K)*X^2),0,(X+X^2),(Polynomial.C (2:K)+X+X^2),(1+Polynomial.C (2:K)*X),(X),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(X),?_,?_,?_⟩⟩
+-- Inputs 6,9; expected representative 3
+refine ⟨(1),(Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^3+X^4),(1+X^3),(1+X),(X+X^2),(Polynomial.C (2:K)+X+X^2),(1),(Polynomial.C (2:K)*X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(2:K),(Polynomial.C (2:K)*X),?_,?_,?_⟩⟩
+-- Inputs 7,0; expected representative 7
+refine ⟨(1),(X+X^2),(Polynomial.C (2:K)+Polynomial.C (2:K)*X),0,(X+X^2),(1),(Polynomial.C (2:K)+Polynomial.C (2:K)*X),(1+X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 7,1; expected representative 5
+refine ⟨(X),(1+X),0,(1+Polynomial.C (2:K)*X+X^2+Polynomial.C (2:K)*X^3),(1+X),(1),(Polynomial.C (2:K)),(1+Polynomial.C (2:K)*X+X^2+Polynomial.C (2:K)*X^3+X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 7,2; expected representative 6
+refine ⟨(X),(X+X^2),(1+X),(Polynomial.C (2:K)+X+Polynomial.C (2:K)*X^2),(1+X),(X),(Polynomial.C (2:K)),(1+X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 7,3; expected representative 9
+refine ⟨(1),(X^3+X^4),(Polynomial.C (2:K)+Polynomial.C (2:K)*X^3),(Polynomial.C (2:K)+X),(X+X^2),(X^2),(1+Polynomial.C (2:K)*X),(1+Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(2:K),(Polynomial.C (2:K)+X),?_,?_,?_⟩⟩
+-- Inputs 7,4; expected representative 8
+refine ⟨(1),(X^2+X^3),(Polynomial.C (2:K)+X^2),(1+Polynomial.C (2:K)*X+X^2),(X+X^2),(X),(1+Polynomial.C (2:K)*X),(Polynomial.C (2:K)+X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(Polynomial.C (2:K)),?_,?_,?_⟩⟩
+-- Inputs 7,5; expected representative 4
+refine ⟨(1+X),(X),(Polynomial.C (2:K)),(1+Polynomial.C (2:K)*X+X^2+Polynomial.C (2:K)*X^3),(X),(1),(Polynomial.C (2:K)),(X^4),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 7,6; expected representative 0
+refine ⟨(X+X^2),(1),0,(Polynomial.C (2:K)+Polynomial.C (2:K)*X),(1),(1),0,(1+X^5),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 7,7; expected representative 3
+refine ⟨(1+X),(X^2),(Polynomial.C (2:K)),(1+Polynomial.C (2:K)*X+X^2),(X),(X),(1),(X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 7,8; expected representative 2
+refine ⟨(1),(Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^3+X^4),(Polynomial.C (2:K)+Polynomial.C (2:K)*X^3),(Polynomial.C (2:K)+Polynomial.C (2:K)*X),(X+X^2),(Polynomial.C (2:K)+X+X^2),(Polynomial.C (2:K)),(Polynomial.C (2:K)*X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(2:K),(X),?_,?_,?_⟩⟩
+-- Inputs 7,9; expected representative 1
+refine ⟨(1),(Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^3+X^4),(Polynomial.C (2:K)+X^2),0,(X+X^2),(Polynomial.C (2:K)+X+X^2),(Polynomial.C (2:K)+X),(X),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(Polynomial.C (2:K)*X),?_,?_,?_⟩⟩
+-- Inputs 8,0; expected representative 8
+refine ⟨(1),(Polynomial.C (2:K)+X+X^2),(X),0,(Polynomial.C (2:K)+X+X^2),(1),(X),(Polynomial.C (2:K)+Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 8,1; expected representative 7
+refine ⟨(1),(Polynomial.C (2:K)*X+X^2+X^3),(1+Polynomial.C (2:K)*X^2),(1),(Polynomial.C (2:K)+X+X^2),(X),(1+X),(X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(1),?_,?_,?_⟩⟩
+-- Inputs 8,2; expected representative 5
+refine ⟨(1),(Polynomial.C (2:K)*X^2+X^3+X^4),(1+Polynomial.C (2:K)*X^2),(1),(Polynomial.C (2:K)+X+X^2),(X^2),(1+X),(1+X),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(Polynomial.C (2:K)+X),?_,?_,?_⟩⟩
+-- Inputs 8,3; expected representative 6
+refine ⟨(1),(Polynomial.C (2:K)*X^2+X^3+X^4),(Polynomial.C (2:K)+Polynomial.C (2:K)*X^3),(1),(Polynomial.C (2:K)+X+X^2),(X^2),(Polynomial.C (2:K)+X),(Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(2:K),(Polynomial.C (2:K)+X),?_,?_,?_⟩⟩
+-- Inputs 8,4; expected representative 9
+refine ⟨(1),(Polynomial.C (2:K)*X+X^2+X^3),(Polynomial.C (2:K)+Polynomial.C (2:K)*X+X^2),(1),(Polynomial.C (2:K)+X+X^2),(X),(Polynomial.C (2:K)+X),(Polynomial.C (2:K)+X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(Polynomial.C (2:K)),?_,?_,?_⟩⟩
+-- Inputs 8,5; expected representative 3
+refine ⟨(1),(Polynomial.C (2:K)+Polynomial.C (2:K)*X^2+X^3),(1+Polynomial.C (2:K)*X^2),(1),(Polynomial.C (2:K)+X+X^2),(1+X),(X),(X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(1),?_,?_,?_⟩⟩
+-- Inputs 8,6; expected representative 4
+refine ⟨(1),(Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^3+X^4),(1+Polynomial.C (2:K)*X^2),0,(Polynomial.C (2:K)+X+X^2),(X+X^2),(1+Polynomial.C (2:K)*X),(X),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(X),?_,?_,?_⟩⟩
+-- Inputs 8,7; expected representative 2
+refine ⟨(1),(Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^3+X^4),(Polynomial.C (2:K)+Polynomial.C (2:K)*X^3),(Polynomial.C (2:K)+Polynomial.C (2:K)*X),(Polynomial.C (2:K)+X+X^2),(X+X^2),(Polynomial.C (2:K)),(Polynomial.C (2:K)*X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(2:K),(X),?_,?_,?_⟩⟩
+-- Inputs 8,8; expected representative 1
+refine ⟨(1),(1+X+Polynomial.C (2:K)*X^2+Polynomial.C (2:K)*X^3+X^4),(Polynomial.C (2:K)+Polynomial.C (2:K)*X+X^2),(X+Polynomial.C (2:K)*X^2),(Polynomial.C (2:K)+X+X^2),(Polynomial.C (2:K)+X+X^2),(Polynomial.C (2:K)*X),(X),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(1+Polynomial.C (2:K)*X),?_,?_,?_⟩⟩
+-- Inputs 8,9; expected representative 0
+refine ⟨(Polynomial.C (2:K)+X+X^2),(1),0,(X),(1),(1),0,(1+X^5),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 9,0; expected representative 9
+refine ⟨(1),(Polynomial.C (2:K)+X+X^2),(Polynomial.C (2:K)*X),0,(Polynomial.C (2:K)+X+X^2),(1),(Polynomial.C (2:K)*X),(Polynomial.C (2:K)+Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^2+X^3),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 9,1; expected representative 8
+refine ⟨(1),(Polynomial.C (2:K)*X+X^2+X^3),(1+X+Polynomial.C (2:K)*X^2),(Polynomial.C (2:K)),(Polynomial.C (2:K)+X+X^2),(X),(1+Polynomial.C (2:K)*X),(Polynomial.C (2:K)+X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(1),?_,?_,?_⟩⟩
+-- Inputs 9,2; expected representative 7
+refine ⟨(1),(Polynomial.C (2:K)*X^2+X^3+X^4),(1+X^3),(Polynomial.C (2:K)),(Polynomial.C (2:K)+X+X^2),(X^2),(1+Polynomial.C (2:K)*X),(Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(2:K),(1+Polynomial.C (2:K)*X),?_,?_,?_⟩⟩
+-- Inputs 9,3; expected representative 5
+refine ⟨(1),(Polynomial.C (2:K)*X^2+X^3+X^4),(Polynomial.C (2:K)+X^2),(Polynomial.C (2:K)),(Polynomial.C (2:K)+X+X^2),(X^2),(Polynomial.C (2:K)+Polynomial.C (2:K)*X),(1+X),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(1+Polynomial.C (2:K)*X),?_,?_,?_⟩⟩
+-- Inputs 9,4; expected representative 6
+refine ⟨(1),(Polynomial.C (2:K)*X+X^2+X^3),(Polynomial.C (2:K)+X^2),(Polynomial.C (2:K)),(Polynomial.C (2:K)+X+X^2),(X),(Polynomial.C (2:K)+Polynomial.C (2:K)*X),(X+X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(Polynomial.C (2:K)),?_,?_,?_⟩⟩
+-- Inputs 9,5; expected representative 2
+refine ⟨(1),(Polynomial.C (2:K)+Polynomial.C (2:K)*X^2+X^3),(Polynomial.C (2:K)+X^2),(Polynomial.C (2:K)),(Polynomial.C (2:K)+X+X^2),(1+X),(Polynomial.C (2:K)*X),(X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(Polynomial.C (2:K)),?_,?_,?_⟩⟩
+-- Inputs 9,6; expected representative 3
+refine ⟨(1),(Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^3+X^4),(1+X^3),(1+X),(Polynomial.C (2:K)+X+X^2),(X+X^2),(1),(Polynomial.C (2:K)*X^2),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(2:K),(Polynomial.C (2:K)*X),?_,?_,?_⟩⟩
+-- Inputs 9,7; expected representative 1
+refine ⟨(1),(Polynomial.C (2:K)*X+Polynomial.C (2:K)*X^3+X^4),(Polynomial.C (2:K)+X^2),0,(Polynomial.C (2:K)+X+X^2),(X+X^2),(Polynomial.C (2:K)+X),(X),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(Polynomial.C (2:K)*X),?_,?_,?_⟩⟩
+-- Inputs 9,8; expected representative 0
+refine ⟨(Polynomial.C (2:K)+X+X^2),(1),0,(Polynomial.C (2:K)*X),(1),(1),0,(1+X^5),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inl ⟨?_,?_,?_⟩⟩
+-- Inputs 9,9; expected representative 4
+refine ⟨(1),(1+X+Polynomial.C (2:K)*X^2+Polynomial.C (2:K)*X^3+X^4),(1+X+Polynomial.C (2:K)*X^2),(Polynomial.C (2:K)*X+X^2),(Polynomial.C (2:K)+X+X^2),(Polynomial.C (2:K)+X+X^2),(X),(X),
+  ?_,?_,?_,?_,?_,?_,?_,?_,?_,?_,Or.inr ⟨?_,(1:K),(Polynomial.C (2:K)+X),?_,?_,?_⟩⟩

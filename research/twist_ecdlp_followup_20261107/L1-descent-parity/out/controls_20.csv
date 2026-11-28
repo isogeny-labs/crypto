@@ -1,0 +1,11 @@
+test,n,pass,value1,value2,note
+UT1_comb_arm1,200,200,,,target equals aG+bQ
+UT2_solver_vs_independent_arm1,299,299,,,Weil-restriction solver equals per-x1 quadratic method
+UT1_comb_arm4,200,200,,,target equals aG+bQ
+UT2_solver_vs_independent_arm4,300,300,,,Weil-restriction solver equals per-x1 quadratic method
+UT3_C_oracle_vs_exhaustive_S3,648,648,101,54,table lookup equals exhaustive solution of S3 over all pairs in V
+STOPCHECK_A_D(R)=1,5995,5995,5,,first 1000 targets per curve; value1 = degenerate draws excluded (x(R) in F_p)
+PC2a_planted_wrong_k,1000,1000,1000,,verifier rejects k+1; value1 = true k accepted
+PC2b_synthetic_planted_q,200,200,,,200 random systems of weight 1,2,3, exact recovery
+NC2_permuted_targets,1020,1006,371556737560/220669243271,5.5705941276824881591422607653957940307,pass column = rejected; value1 = chance accepts expected sum(1/l*); value2 = chance + 3 sigma; literal criterion falsified if accepted > value2
+NC2b_permuted_targets_collision_rows_moved,1006,1006,368603610636/220669243271,5.5417016051337553206979636300851197284,subset where the shuffle gave at least one of the two colliding rows a foreign (a,b) (identity and the swap of the two rows excluded; the swap returns the true q whenever the two signs agree); same chance bound; falsified if accepted > value2

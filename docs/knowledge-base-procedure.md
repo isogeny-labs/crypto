@@ -2,7 +2,7 @@
 
 This page is the indexed entry point for sessions that search `docs/` before
 they list skills. The canonical procedure, with query recipes and the worked
-receipt, is `.agents/skills/research-kb/SKILL.md`; this page points at it and
+receipt, is `isogeny-labs/workspace:.agents/skills/research-kb/SKILL.md`; this page points at it and
 does not replace it.
 
 ## When to query

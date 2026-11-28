@@ -1,0 +1,13 @@
+optlevel: muladd_u32     peak 2.621e+10 ops/s/core (muladd_u32@avx512); all 4 cores 9.818e+10
+optlevel: muladd_u64     peak 1.027e+10 ops/s/core (muladd_u64@avx512); all 4 cores 4.022e+10
+optlevel: mulwide_u64    peak 1.884e+09 ops/s/core (mulwide_u64@scalar); all 4 cores 7.369e+09
+optlevel: modmuladd_p31  peak 3.835e+09 ops/s/core (modmuladd_p31@avx2); all 4 cores 1.515e+10
+optlevel: modmuladd_p62  peak 6.949e+08 ops/s/core (modmuladd_p62@c-native); all 4 cores 2.725e+09
+optlevel: xor_u64        peak 1.759e+10 ops/s/core (xor_u64@avx512); all 4 cores 6.741e+10
+optlevel: popcnt_u64     peak 1.292e+10 ops/s/core (popcnt_u64@avx512); all 4 cores 4.961e+10
+optlevel: fma_f64        peak 4.298e+10 ops/s/core (fma_f64_reg@c-native); all 4 cores 1.655e+11
+optlevel: ptr_hop        peak 5.720e+08 ops/s/core (chase@avx512); all 4 cores 2.279e+09
+optlevel: bandwidth 1 core(s): 19.55 GB/s (xor_u64@c-native; triad 17.42, xor_u64 19.02, popcnt_u64 14.52, triad@c-native 17.15, xor_u64@c-native 19.55, popcnt_u64@c-native 13.52)
+optlevel: bandwidth 2 core(s): 38.61 GB/s (xor_u64; triad 34.32, xor_u64 38.61, popcnt_u64 28.38, triad@c-native 33.30, xor_u64@c-native 38.32, popcnt_u64@c-native 25.52)
+optlevel: bandwidth 4 core(s): 75.17 GB/s (xor_u64; triad 66.61, xor_u64 75.17, popcnt_u64 55.61, triad@c-native 63.93, xor_u64@c-native 73.43, popcnt_u64@c-native 50.54)
+optlevel: wrote research/optlevel_rs_20261117/ab/ab.calibration.json (host 44113cdb2d87e834, 4 usable CPUs: affinity mask (4 CPUs), flags VIRTUALIZED, CLOCK_UNSTABLE)

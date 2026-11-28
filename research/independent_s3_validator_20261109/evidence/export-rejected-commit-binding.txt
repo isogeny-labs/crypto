@@ -1,0 +1,4 @@
+The first export check returned exit1:
+FINDING: export arm local commit is '770ee2e560370eaaf08d5dca3b8d3a9a596384ba', protocol pinned 275f566e0750db6f3eb58e8325ba03c29e7ab3f5
+FAIL: export export.json against protocol.json (1 finding(s))
+The rejected JSON is preserved verbatim beside this note. The new export binds the instrument to the protocol's source commit; host.json retains the actual checkout commit. No frozen source/protocol/raw data changed. This note transcribes the observed tool output after the failed check; it is not the original captured stderr file.

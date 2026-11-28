@@ -1,0 +1,80 @@
+{
+  "schema": "velu-frobenius-verification/v1",
+  "source_commit": "598dc5fbe4578c4265bf282c9cc1dca554394346",
+  "claim_id": "PCC-20261114-3cb039",
+  "declaration_sha256": "762ed418a4d3a6fe07f37b73f9066c427aa5cf722f3dcfd0c30666e955335fa7",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 24,
+  "gate_declarations": 38,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 89,
+  "actual_verdict": {
+    "claim_id": "PCC-20261114-3cb039",
+    "claim_sha256": "b7d7041df3a64a978e564d8442b2bc4903a4ca83b4160c3d664d317ea8d955e8",
+    "commit": "598dc5fbe4578c4265bf282c9cc1dca554394346",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/velu_frobenius_audit_20261114/lean (VeluFrobeniusCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-14T22:14:11Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261114-3cb039",
+    "claim_sha256": "b7d7041df3a64a978e564d8442b2bc4903a4ca83b4160c3d664d317ea8d955e8",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47684,
+    "sha256": "abc1f184e0487242e73973fdaf34c74f21131a60e96da63eca4e9f4f1cd6f3c5",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 38,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "independent_native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_Mathlib_Point_geometry_and_coordinate_Frobenius_proved": true,
+    "actual_F25_card25_extensiondegree2_proved": true,
+    "actual_prime3_point_outside_own_cyclic_Frobenius_proved": true,
+    "actual_base_nonrationality_and_no_scalar_proved": true,
+    "generic_actual_cyclic_stability_scalar_criterion_proved": true,
+    "stable_irrational_positive_control_proved": true,
+    "literal_unqualified_irrational_extension_refuted": true,
+    "qualified_rational_kernel_complexity_refuted": false,
+    "main_rational_generator_operation_count_verified": false,
+    "rational_kernel_input_sufficiency_verified": false,
+    "eigenvalue_order_minimal_x_degree_claim": false,
+    "whole_isogeny_algorithm_verified": false,
+    "canonical_corpus_promoted": false,
+    "novelty_claim": false,
+    "new_native_cryptographic_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

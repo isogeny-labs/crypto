@@ -1,0 +1,19 @@
+digraph cycles {
+ graph[bgcolor="white",rankdir=LR,ranksep=.25,nodesep=.18,pad=.1];
+ node[shape=box,style="rounded,filled",fillcolor="#e9f0f6",fontname="DejaVu Sans",fontsize=10];
+ edge[color="#456580",fontname="DejaVu Sans",fontsize=9,arrowsize=.6];
+ e0[label="E0 / F101 · #109\ny²=x³+x+46\nj12"];
+ e1[label="E1 / F101 · #109\ny²=x³+26x+58\nj87"];
+ e2[label="E2 / F101 · #109\ny²=x³+59x+27\nj47"];
+ e3[label="E3 / F101 · #109\ny²=x³+5x+62\nj91"];
+ f0[label="F0 / F101 · #113\ny²=x³+44x+21\nj58",fillcolor="#e8f2e9"];
+ f1[label="F1 / F101 · #113\ny²=x³+69x+50\nj92",fillcolor="#e8f2e9"];
+ f2[label="F2 / F101 · #113\ny²=x³+23x+7\nj89",fillcolor="#e8f2e9"];
+ e0->e1->e2->e3[label="7 / λ5"];
+ e3->e0[label="7 / u13",constraint=false];
+ f0->f1->f2[label="7 / λ6"];
+ f2->f0[label="7 / normalized",constraint=false];
+ {rank=same;e0;f0}
+ {rank=same;e1;f1}
+ {rank=same;e2;f2}
+}

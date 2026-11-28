@@ -1,0 +1,18 @@
+from pathlib import Path
+import json,hashlib,subprocess,os,shutil,datetime
+repo=Path('/workspace/relation-supervisor-live');s=repo/'research/relation_fusion_20261117';tools=Path('/workspace/relation-native-qualifiers/flat-supervised-366');source=Path('/workspace/flat-supervised-neutral-367')
+positive=Path('/workspace/flat-supervised-hypothetical20-analysis-368/analysis.json');d=json.loads(positive.read_text());assert d['input_declares_synthetic_fixture'] is True and d['all_complete'] is True and d['independent_whole_proof_replays']==3600 and d['threshold_arithmetic_passes'] is True and d['primary_15x_admitted'] is False;shutil.copy2(positive,s/'FLAT_MATCHED_SYNTHETIC_POSITIVE_368.json')
+def pin():return {str(p.relative_to(source)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source.rglob('*') if p.is_file()}
+before=pin();rows=[];env=dict(os.environ,RAYON_NUM_THREADS='1',OMP_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1')
+for number,mode,expected in [(369,'clock',b'complete phase/boundary binding'),(370,'duplicate',b'missing/duplicate cell')]:
+ out=Path(f'/workspace/flat-supervised-{mode}-canary-{number}');analysis=Path(f'/workspace/flat-supervised-{mode}-analysis-{number}')
+ def call(cmd,label):
+  r=subprocess.run(['taskset','-c','0',*map(str,cmd)],cwd=repo,env=env,capture_output=True)
+  for e,b in [('stdout',r.stdout),('stderr',r.stderr)]:(s/f'development-01/flat-supervised-{label}-{number}.{e}').write_bytes(b)
+  return r
+ r=call([tools/'flat-supervised-fixture','--mutate',source,out,mode],'canary-setup');assert r.returncode==0,(mode,r.returncode,r.stderr)
+ r=call([tools/'flat-supervised-analyze',out,out/'monitor.jsonl',out/'prospective-pins.json',analysis],'canary-analysis');assert r.returncode==1 and expected in r.stderr,(mode,r.returncode,r.stderr)
+ rows.append({'mode':mode,'exit_code':r.returncode,'expected_rejection_reason':expected.decode(),'analysis_report_emitted':(analysis/'analysis.json').exists(),'rejected':True})
+assert pin()==before
+r={'schema':'flat-synthetic-canary-outcome/v1','source':'FLAT_MATCHED_SYNTHETIC_SOURCE_366.json','canaries':rows,'entire_original_neutral_source_file_hash_map_unchanged':True,'source_files_checked':len(before),'synthetic_only':True,'performance_observations_collected':0,'signed_execution_verdict':False,'15x_admitted':False};(s/'FLAT_MATCHED_CANARIES_370.json').write_text(json.dumps(r,indent=2)+'\n');print(json.dumps(r))
+p=repo/'docs/session-logs/2026-11-23.md';p.write_text(p.read_text()+f'''\n## {datetime.datetime.now(datetime.timezone.utc).isoformat()} —368positive calibration and369/370canaries\n\n### What was done (commands, files, features)\n368syntheticfixture+analysis exit0,3600wholeproofreplays, invented20×clocks passexactthresholdarithmetic whileprimary_15x_admittedfalse. Neutral367thresholdfalse. Clock369andduplicate370bothrejectexit1atdeclaredbinding/rosterchecks, noanalysisreportemitted. Everyoriginal367filehash unchangedaftercopiedcanaries. Allsynthetic clocks/monitorfieldsareinvented,noperformanceobservations. [pcc:unverified]\n\n### Decisions made (and why)\nArchivefulltwo3600-cellcohortspluscanarydeltasonly, source/tool contexts andinitial364failure. Keepper-raw-cellproofobligations; separateanalytic7200replaysfromfixtureprechecks. Noactualperformanceadmission evenpositivecalibration.\n\n### Open threads (unfinished, pick up next time)\nFinalsource/frozen253pins,typedclaims,illustratedreport,deterministicpacket/freshextracted7200replayandcanaryreconstruction,thenpublishnewdraftsamePR4989. Original15×/canonicalaccessstillopen.\n\n### Errors (what went wrong, how it was handled)\nNo367/368cohortfailureorunexpectedcanaryoutcome.369/370areexpectedrejections, notfailedrealmeasurements. Sourceinodesnevermutated.\n''')

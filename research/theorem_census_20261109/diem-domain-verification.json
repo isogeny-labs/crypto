@@ -1,0 +1,82 @@
+{
+  "schema": "theorem-audit-verification/v1",
+  "recorded_at": "2026-11-10T06:37:04.263760+00:00",
+  "source_commit": "6e8973a3de1883d2fdbe2e5dc55f49b9f0581daa",
+  "source_plan_sha256": "07c17eaa80322f2e08e82fae49f6aa540268b82e57df2e32d746a8590a3891bc",
+  "source_bytes_equal_commit": true,
+  "formal": {
+    "project": "research/theorem_census_20261109/lean",
+    "theorem": "DiemSmallFieldAudit.diem_domain_audit_certificate",
+    "statement": "theorem diem_domain_audit_certificate : (∀ n q N : ℕ,2≤n → 2^(7*n)≤q → (q:ℝ)+1-(n:ℝ)*2^(n+2)*(Real.sqrt (q:ℝ)+1)≤N → q+1≤2*N) ∧ (¬ ∀ n q N : ℕ,2≤n → (q:ℝ)+1-(n:ℝ)*2^(n+2)*(Real.sqrt (q:ℝ)+1)≤N → q+1≤2*N) ∧ (Nat.card B=2 ∧ Nat.card F=4 ∧ Module.finrank B F=2 ∧ curve.Δ≠0 ∧ Nat.card curve.Point=1 ∧ Function.Bijective (mobiusChart alpha) ∧ Nat.card {P : curve.Point // P∈factorBase curve alpha}=0) ∧ (¬ ∀ (W : WeierstrassCurve.Affine F) (c : F),W.Δ≠0 → Nat.card B+1≤2*Nat.card {P : W.Point // P∈factorBase W c}) ∧ ¬ (2^(7*2)≤(2:ℕ))",
+    "decl_sha256": "d71eb5ac61c483a58ded7c905e20dd06ae2b654d208f4b9aa648168083f77b46",
+    "sources": [
+      {
+        "path": "research/theorem_census_20261109/lean/DiemThreshold.lean",
+        "bytes": 3355,
+        "sha256": "2537128120f15b7ddc6be380ab2e6c7a2c3a800252034364867efe2329d0790d"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/DiemSmallField.lean",
+        "bytes": 9131,
+        "sha256": "ac3c9012cec758c657f824f193da20586062414264155d20d7abef11a998ff68"
+      },
+      {
+        "path": "research/theorem_audit_20261108/lean/S3Roots.lean",
+        "bytes": 9583,
+        "sha256": "2e187c59f0363f7514f95deed05df1eb34e3396b1fc085ead18c417ef45ab106"
+      }
+    ],
+    "gate": {
+      "path": "evidence/diem-domain-gate.log",
+      "declarations": 535,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Universal arithmetic implication n≥2and2^(7n)≤qand explicit lowerestimate N≥q+1−n2^(n+2)(sqrtq+1)implyq+1≤2N; directnegation of this inference withoutsizepremise(syntheticn2/q4/N0, not an actualcurvecount). ActualF4quotientofX²+X+1/F2hascard4/degree2; actualcurve y²+y=x³+alpha hasΔ1andpointcard1; checked Mobiuschartbijectionalpha+1/xcomposedwithactualpointXgivesemptyactualpointpreimageofbaseprojectivechart. Directnegation of unrestricted nonsingularcurve/chart halfbound. Actualq2/n2violates sizehypothesis. Schemecover degree/ramification/Condition2.7identification and geometricgenus/Hasse–Weilestimate remain open; qualifiedDiempropositionnotrefuted."
+  },
+  "proof_packet": {
+    "id": "PCC-20261110-dda065",
+    "local_verdict": {
+      "claim_id": "PCC-20261110-dda065",
+      "claim_sha256": "b4dd5dad9c36e4bda51c026b495ada2f07c23564ef5988965a2bde62e8ac848b",
+      "commit": "6e8973a3de1883d2fdbe2e5dc55f49b9f0581daa",
+      "proofs": [
+        {
+          "kind": "lean",
+          "notes": [
+            "lean: proof gate PASS for research/theorem_census_20261109/lean (DiemSmallField.lean)"
+          ],
+          "reasons": [],
+          "verdict": "pass"
+        }
+      ],
+      "reasons": [],
+      "schema": "pcc.verdict/v1",
+      "verdict": "pass",
+      "verified_at": "2026-11-10T06:31:34Z",
+      "verifier_host": "762f5fc120c9"
+    },
+    "standing": {
+      "claim_id": "PCC-20261110-dda065",
+      "claim_sha256": "b4dd5dad9c36e4bda51c026b495ada2f07c23564ef5988965a2bde62e8ac848b",
+      "standing": "unverified",
+      "verdicts": []
+    }
+  },
+  "report": {
+    "path": "reports/proof-20261110-diem-domain/report.pdf",
+    "bytes": 63616,
+    "sha256": "0429384432f109b3cff3a1c83c958c0ec58358baf3a1629194875af8530e5aa0",
+    "pages": 2,
+    "all_pages_visually_inspected": true,
+    "diagram_inspected": true
+  },
+  "scope": "Universal arithmetic implication n≥2and2^(7n)≤qand explicit lowerestimate N≥q+1−n2^(n+2)(sqrtq+1)implyq+1≤2N; directnegation of this inference withoutsizepremise(syntheticn2/q4/N0, not an actualcurvecount). ActualF4quotientofX²+X+1/F2hascard4/degree2; actualcurve y²+y=x³+alpha hasΔ1andpointcard1; checked Mobiuschartbijectionalpha+1/xcomposedwithactualpointXgivesemptyactualpointpreimageofbaseprojectivechart. Directnegation of unrestricted nonsingularcurve/chart halfbound. Actualq2/n2violates sizehypothesis. Schemecover degree/ramification/Condition2.7identification and geometricgenus/Hasse–Weilestimate remain open; qualifiedDiempropositionnotrefuted.",
+  "paid_compute": 0,
+  "commands": [
+    "timeout 180s lake env lean -o .lake/build/lib/lean/DiemThreshold.olean DiemThreshold.lean",
+    "timeout 180s lake env lean -o .lake/build/lib/lean/DiemSmallField.olean DiemSmallField.lean",
+    "tools/lean/proof-gate.sh --out research/theorem_census_20261109/evidence/diem-domain-gate research/theorem_census_20261109/lean",
+    "python3 tools/pcc/pcc.py verify PCC-20261110-dda065 --json"
+  ]
+}

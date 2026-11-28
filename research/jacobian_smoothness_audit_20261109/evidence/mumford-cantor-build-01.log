@@ -1,0 +1,58 @@
+MumfordCantor.lean:42:4: error: Type mismatch: After simplification, term
+  monic_X_sub_C 1
+ has type
+  @Monic K (ZMod.instField 3).toDivisionRing.toSemiring (X - 1)
+but is expected to have type
+  @Monic K Field.toSemifield.toSemiring (factor 1)
+MumfordCantor.lean:43:4: error: Type mismatch: After simplification, term
+  monic_X_add_C 1
+ has type
+  @Monic K Field.toSemifield.toSemiring (X + 1)
+but is expected to have type
+  @Monic K Field.toSemifield.toSemiring (factor 2)
+MumfordCantor.lean:46:4: error: unsolved goals
+case «3».p1
+⊢ (coeff 1) 2 = 0
+MumfordCantor.lean:56:2: error: Type mismatch: After simplification, term
+  congrArg (⇑C) (of_decide_eq_true (id (Eq.refl true)))
+ has type
+  (3 : K) = 0
+but is expected to have type
+  (3 : K[X]) = 0
+MumfordCantor.lean:89:0: error: (deterministic) timeout at `whnf`, maximum number of heartbeats (200000) has been reached
+
+Note: Use `set_option maxHeartbeats <num>` to set the limit.
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+MumfordCantor.lean:121:6: error: Type mismatch: After simplification, term
+  isCoprime_one_right
+ has type
+  @IsCoprime K[X] commSemiring (if m i = true then factor i else 1) 1
+but is expected to have type
+  @IsCoprime K[X] commSemiring (if m i = true then factor i else 1) (if false = true then factor j else 1)
+MumfordCantor.lean:123:4: error: Type mismatch: After simplification, term
+  isCoprime_one_left
+ has type
+  @IsCoprime K[X] commSemiring 1 (if n j = true then factor j else 1)
+but is expected to have type
+  @IsCoprime K[X] commSemiring (if false = true then factor i else 1) (if n j = true then factor j else 1)
+MumfordCantor.lean:107:8: error: (kernel) unknown constant 'MumfordCantorAudit.factors_pairwise_coprime'
+MumfordCantor.lean:164:40: error: (deterministic) timeout at `whnf`, maximum number of heartbeats (200000) has been reached
+
+Note: Use `set_option maxHeartbeats <num>` to set the limit.
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+MumfordCantor.lean:155:0: error: (deterministic) timeout at `whnf`, maximum number of heartbeats (200000) has been reached
+
+Note: Use `set_option maxHeartbeats <num>` to set the limit.
+
+Hint: Additional diagnostic information may be available using the `set_option diagnostics true` command.
+MumfordCantor.lean:172:12: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  factorProduct n
+in the target expression
+  gcd (factorProduct (commonMask m n) * factorProduct (residualMask m n)) (factorProduct n) =
+    factorProduct (commonMask m n)
+
+m n : Mask
+⊢ gcd (factorProduct (commonMask m n) * factorProduct (residualMask m n)) (factorProduct n) =
+    factorProduct (commonMask m n)

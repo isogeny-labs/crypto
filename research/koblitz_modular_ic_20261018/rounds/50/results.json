@@ -1,0 +1,986 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 50,
+  "runs": [
+    {
+      "attempt": "boundary50-01",
+      "source_revision": "6777e47e46eb01248ae8d9a677dba1a3d1e6d97f",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "BOUNDARY50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "BOUNDARY50_RESULT conjugate_pairs=2 refined_geometric_points=4 plane_closed_points=1 refined_closed_points=2 source_bound_fiber_separation=true"
+      ],
+      "exports": {
+        "boundary-certificate50.sing": {
+          "sha256": "c0b146d5a61486dbad955a1db434be3d6c8d14f56fd7a5dcaad0f8dc69ba7ff4",
+          "bytes": 243
+        }
+      }
+    },
+    {
+      "attempt": "candidate50-01",
+      "source_revision": "47ac238cf8b1958d433dab8fea9ae493223c7144",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "CANDIDATE50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "CANDIDATE50_RESULT norm_degree=32 scale_u_power=4 monic_integral_candidate=true rational_arrays_exported=true model_binding_verified=false normalization_performed=false"
+      ],
+      "exports": {
+        "integral-candidate50.sing": {
+          "sha256": "76dfc62d8586e1dde2dbc6fbb3a3adcfdf8df508cd99c19772c5694db237f7da",
+          "bytes": 1608
+        },
+        "rational-candidate50.sing": {
+          "sha256": "563d2b4f3f1bb0f6bc11ea7cc9839570f0a7c446576a015610271cdf46f2b343",
+          "bytes": 14462
+        }
+      }
+    },
+    {
+      "attempt": "chart50-01",
+      "source_revision": "a267c8d59370d443c78db77409fabe7ed24a5468",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "CHART50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "CHART50_RESULT monic_charts=2 polynomial_degree=32 weighted_degree=128 overlap_products=8 unit_maps=2 inverse_transition_verified=true"
+      ],
+      "exports": {
+        "infinity-candidate50.sing": {
+          "sha256": "42086c6b5a159172ee5e8dae9d0b21b3c5fa6bb5071bd55fa686af23f51b72cd",
+          "bytes": 1565
+        },
+        "overlap-certificate50.sing": {
+          "sha256": "f48b1a2de5b8abdaac6a47387381ccf4576ef5ce028c72ad48740fdf17c91dc8",
+          "bytes": 391124
+        }
+      }
+    },
+    {
+      "attempt": "defect50-01",
+      "source_revision": "214feb878aca3c166c41f02c11b3fa258ad23943",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "DEFECT50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "DEFECT50_RESULT finite_F2_length=898 infinity_local_F2_length=94 global_F2_length=992 plane_arithmetic_genus=1953 refined_arithmetic_genus=961"
+      ],
+      "exports": {
+        "defect-lengths50.sing": {
+          "sha256": "48c20d51f8bd41207204ae1c6512607ade3a65d62547c7eb01ce7c36995161e1",
+          "bytes": 12505
+        }
+      }
+    },
+    {
+      "attempt": "denominator50-01",
+      "source_revision": "c7e237dc2c7933ac86ace2e95f06753b45b57978",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "DENOM50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [
+        "   ? not univariate",
+        "   ? error occurred in or before input.sing line 19: `list controlBez50=extgcd(controlA50,controlB50);`",
+        "   ? `controlBez50` is not defined",
+        "   ? error occurred in or before input.sing line 21: `print(\"DENOM50_STAGE extgcd_control_pass=true actual_Bezout_begin=true\");`",
+        "   ? not univariate",
+        "   ? error occurred in or before input.sing line 22: `list bez50=extgcd(a50,b50);`",
+        "   ? `bez50` is not defined",
+        "   ? error occurred in or before input.sing line 24: `number gcdValue50=leadcoef(bez50[1]);`",
+        "   ? `bez50` is not defined",
+        "   ? error occurred in or before input.sing line 25: `poly x50=bez50[2]/gcdValue50;poly y50=bez50[3]/gcdValue50;`",
+        "   ? expected poly-expression. type 'help poly;'",
+        "   ? `bez50` is not defined",
+        "   ? error occurred in or before input.sing line 25: `poly x50=bez50[2]/gcdValue50;poly y50=bez50[3]/gcdValue50;`",
+        "   ? expected poly-expression. type 'help poly;'",
+        "   ? `x50` is not defined",
+        "   ? error occurred in or before input.sing line 28: `poly inverseB50=x50^2*a50+(y50^2+(u^3+u)*x50^2)*b50;`",
+        "   ? wrong type declaration. type 'help poly;'",
+        "   ? `inverseB50` is not defined",
+        "   ? error occurred in or before input.sing line 31: `link bezOut50=\"ASCII:w denominator-certificate50.sing\";open(bezOut50);`",
+        "   ? `bezOut50` is not defined",
+        "   ? error occurred in or before input.sing line 31: `link bezOut50=\"ASCII:w denominator-certificate50.sing\";open(bezOut50);`",
+        "   ? link expected",
+        "   ? error occurred in or before input.sing line 32: `y50=\"+string(y50)+\";poly inverseB50=\"+string(inverseB50)+\";\");close(bezOut50);`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `bezOut50` is not defined",
+        "   ? error occurred in or before input.sing line 32: `y50=\"+string(y50)+\";poly inverseB50=\"+string(inverseB50)+\";\");close(bezOut50);`",
+        "   ? `candidateIdeal50` is not defined",
+        "   ? error occurred in or before input.sing line 44: `ue integral_scaling_bound=true original_four_forward_equations_pending=true\");`"
+      ],
+      "timeout": false,
+      "status": "rejected",
+      "result_lines": [],
+      "exports": {}
+    },
+    {
+      "attempt": "denominator50-02",
+      "source_revision": "3dad6ed3c30d6d8903ec344b06f30fc37b0556ec",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "DENOM50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "DENOM50_RESULT actual_Bezout_checked=true denominator_unit_certificate=true inverse_corruption_rejected=true norm_source_membership=true reverse_coordinates=true integral_scaling_bound=true original_four_forward_equations_pending=true"
+      ],
+      "exports": {
+        "denominator-certificate50.sing": {
+          "sha256": "c605f130798bce376e61c0a2ba90873860c95ee7dbbc9dd08bed8ac125fa92a0",
+          "bytes": 351687
+        }
+      }
+    },
+    {
+      "attempt": "fiber50-01",
+      "source_revision": "640e0b14d528a8c1e6dc945a87992d2a04d52cc5",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FIBER50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "FIBER50_RESULT plane_fiber_exponent=16 refined_fiber_exponent=8 content_power=8 full_source_product=true witness_separated=1"
+      ],
+      "exports": {
+        "parameter-saturation50.sing": {
+          "sha256": "9ff42350ceeed51182ddcb7560d035de1a71439f1293fcc04b85bc30022cbf73",
+          "bytes": 2293
+        }
+      }
+    },
+    {
+      "attempt": "forward50-01",
+      "source_revision": "9494c9f241ba0b8f771e9e1ac9f47597e0b96f81",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FORWARD50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [
+        "   ? conversion error: denominator!= 1",
+        "   ? error occurred in or before input.sing line 56: ` poly quotient50=image50/monic50;`",
+        "   ? expected poly-expression. type 'help poly;'",
+        "   ? `actualSource50` is not defined",
+        "   ? error occurred in or before input.sing line 82: `products=4 corrupted_equations_rejected=4 rational_source_map_verified=true\");`"
+      ],
+      "timeout": false,
+      "status": "rejected",
+      "result_lines": [],
+      "exports": {
+        "forward-certificate50.sing": {
+          "sha256": "60b0154ede0c3444a0dcbde00f01239d934d7d7e2fc19c978387e351aa477985",
+          "bytes": 1607
+        }
+      }
+    },
+    {
+      "attempt": "forward50-02",
+      "source_revision": "b077db435daf50dfb2f338d26ddd412b2f4732de",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "FORWARD50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "FORWARD50_RESULT original_generators=4 complete_denominator_cleared_products=4 corrupted_equations_rejected=4 rational_source_map_verified=true"
+      ],
+      "exports": {
+        "forward-certificate50.sing": {
+          "sha256": "11d4c32ef358042c430ca16328937eccbc98b6d8939866a1fffa0d7241e404da",
+          "bytes": 760143
+        }
+      }
+    },
+    {
+      "attempt": "lean50-01",
+      "source_revision": "a267c8d59370d443c78db77409fabe7ed24a5468",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_theorems": [
+        "Rational50.bezout_norm_inverse",
+        "Rational50.field_map_bijective_of_equal_finrank",
+        "Rational50.linear_coordinate_numerator",
+        "Rational50.overlap_coordinate_roundtrip",
+        "Rational50.quadratic_norm_zero_iff",
+        "Rational50.zero_denominator_counterexample"
+      ]
+    },
+    {
+      "attempt": "local-lean50-01",
+      "source_revision": "5dd5ecbda0b0c6065a953ab143a08247de9eec88",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_theorems": [
+        "Local50.bezout_intersection_reconstruction",
+        "Local50.exact_eighth_power_nilpotency",
+        "Local50.scaled_quadratic_identity"
+      ]
+    },
+    {
+      "attempt": "local50-01",
+      "source_revision": "5dd5ecbda0b0c6065a953ab143a08247de9eec88",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "LOCAL50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "LOCAL50_RESULT monic_integral_witness=true source_module_presentation=true plane_determinant_product=true CRT_comaximal_product=true block_F2_dimension=128 exact_parameter_exponent=8"
+      ],
+      "exports": {
+        "local-block50.sing": {
+          "sha256": "b285bbf5b643fa705e522bc572c9cfe7b7462695051e0298a1b834dbd6bb24b0",
+          "bytes": 5390
+        }
+      }
+    },
+    {
+      "attempt": "marked-lean50-01",
+      "source_revision": "0a959c557d19394e5bd088395a77e08e6c40351a",
+      "kind": "Lean",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "status": "rejected",
+      "audited_theorems": []
+    },
+    {
+      "attempt": "marked-lean50-02",
+      "source_revision": "d924e5d359f7b9b862bee32176c6dab3192b8f80",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_theorems": [
+        "Marked23_50.binary_prefix23",
+        "Marked23_50.exact_order23"
+      ]
+    },
+    {
+      "attempt": "marked23-50-01",
+      "source_revision": "1631d9529647e30f790f309767bdfbcb7c5bb970",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "MARK23_50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [
+        "   ? error occurred in or before ::add23 line 4: `oly xxx=right[2];poly yyy=right[3];poly slope;poly intercept;poly denominator;`",
+        "   ? wrong type declaration. type 'help poly;'",
+        "   ? last reserved name was `denominator`",
+        "   ? leaving ::add23 (2)",
+        "   ? leaving ::add23 (2)",
+        "   ? `def` == `int` failed",
+        "   ? expected `int` == `int`",
+        "   ? expected `ring` == `int`",
+        "   ? expected `intvec` == `int`",
+        "   ? error occurred in or before ::pointResidual23 line 3: ` poly xx=pt[2];poly yy=pt[3];`",
+        "   ? wrong type declaration. type 'help poly;'",
+        "   ? leaving ::pointResidual23 (0)",
+        "   ? leaving ::add23 (2)",
+        "   ? `def` <> `int` failed",
+        "   ? expected `int` <> `int`",
+        "   ? error occurred in or before input.sing line 128: `link pointOut23=\"ASCII:w marked23-points50.sing\";open(pointOut23);`",
+        "   ? `pointOut23` is not defined",
+        "   ? error occurred in or before input.sing line 128: `link pointOut23=\"ASCII:w marked23-points50.sing\";open(pointOut23);`",
+        "   ? link expected",
+        "   ? error occurred in or before input.sing line 129: `write(pointOut23,\"list prefixPoints23;\");`",
+        "   ? link expected",
+        "   ? error occurred in or before input.sing line 135: `)+\",poly(\"+string(accumulator23[2])+\"),poly(\"+string(accumulator23[3])+\"));\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `pointOut23` is not defined",
+        "   ? error occurred in or before input.sing line 145: `close(pointOut23);close(inverseOut23);`",
+        "   ? MARK23_ORDER_NOT_23"
+      ],
+      "timeout": false,
+      "status": "rejected",
+      "result_lines": [
+        "MARK23_50_RESULT prime_generic_degree=7 inverse_coordinates=true nonsingular_Tate_curve=true point_exact_order=23 checked_prefixes=5 QR7_extension_not_yet_computed=true"
+      ],
+      "exports": {
+        "marked23-field50.sing": {
+          "sha256": "9b3d9c72d1c368e09315fff958236eaeed98416fed5fb7f081b60d32dc267fea",
+          "bytes": 2701
+        },
+        "marked23-inverses50.sing": {
+          "sha256": "259be8a9e07c11107b9d450200efa325ae1db62e42ddfd299cbf6c2c07ecf945",
+          "bytes": 3490
+        }
+      }
+    },
+    {
+      "attempt": "marked23-50-02",
+      "source_revision": "d7b5805cf5ccb3e5ece468d84f6357e63765bb07",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "MARK23_50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "MARK23_50_RESULT prime_generic_degree=7 inverse_coordinates=true nonsingular_Tate_curve=true point_exact_order=23 checked_prefixes=5 QR7_extension_not_yet_computed=true"
+      ],
+      "exports": {
+        "marked23-field50.sing": {
+          "sha256": "9b3d9c72d1c368e09315fff958236eaeed98416fed5fb7f081b60d32dc267fea",
+          "bytes": 2701
+        },
+        "marked23-inverses50.sing": {
+          "sha256": "30e45a25c78270ce8b1532bdc185af26dee17c050b0aab5438d0d429284ba267",
+          "bytes": 17536
+        },
+        "marked23-points50.sing": {
+          "sha256": "10876a9d5fa019c9c0439982bcf1e3e3b77f5e762f2c909722503813074319c1",
+          "bytes": 2491
+        }
+      }
+    },
+    {
+      "attempt": "normal-finite50-01",
+      "source_revision": "84740530e53b90fd197e2f3d9c3d6114bb3ea5c0",
+      "kind": "Singular",
+      "native_exit": 124,
+      "marker": "NORMAL50_PRODUCER_PASS",
+      "marker_present": false,
+      "native_errors": [],
+      "timeout": true,
+      "status": "rejected",
+      "result_lines": [],
+      "exports": {
+        "prime-components50.sing": {
+          "sha256": "9be50cbddab1ad3e1e26bf90afb248d0754c171d626dad14c80ea47748dca020",
+          "bytes": 2548
+        },
+        "selected-prime50.sing": {
+          "sha256": "f7f6acad368cdc565ff925b6cd05709e0aba526d6d9c9870874eb4668ab1eb07",
+          "bytes": 5037
+        }
+      }
+    },
+    {
+      "attempt": "normal-relative-finite50-01",
+      "source_revision": "5dd5ecbda0b0c6065a953ab143a08247de9eec88",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "NORMAL_RELATIVE50_PRODUCER_PASS",
+      "marker_present": true,
+      "native_errors": [
+        "   ? NORMAL_RELATIVE50_COEFFICIENT_DESCENT"
+      ],
+      "timeout": false,
+      "status": "rejected",
+      "result_lines": [
+        "NORMAL_RELATIVE50_RESULT normalization_output_computed=true delta=818 output_variables=22 serialization_checked=true independent_verification_required=true"
+      ],
+      "exports": {
+        "fractional-module50.sing": {
+          "sha256": "45c13706d22b8b85bf61b441bc642311337aa2f3e3535505818c52a516d153c9",
+          "bytes": 66337
+        },
+        "normalization50.sing": {
+          "sha256": "951025a6faa9cbbc9f1844156db471c9e0fd638ed62c15ef81baacf8c780ed82",
+          "bytes": 2699742
+        },
+        "prime-components50.sing": {
+          "sha256": "1e5188aea2adbaaa6acbbd20923ee35b92bd2779799ccf329728fe1159b40e4b",
+          "bytes": 1195
+        },
+        "selected-prime50.sing": {
+          "sha256": "da78bc60419c0c862dbf9f19f8467fe5d5fc4145cbf3d34dc62239252687047a",
+          "bytes": 2331
+        }
+      }
+    },
+    {
+      "attempt": "normal-relative-infinity50-01",
+      "source_revision": "d7b5805cf5ccb3e5ece468d84f6357e63765bb07",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "NORMAL_RELATIVE50_PRODUCER_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "NORMAL_RELATIVE50_COEFFICIENT_FIELD charstr=ZZ/2 characteristic=2 parameters=0",
+        "NORMAL_RELATIVE50_RESULT normalization_output_computed=true delta=376 output_variables=14 serialization_checked=true independent_verification_required=true"
+      ],
+      "exports": {
+        "fractional-module50.sing": {
+          "sha256": "e71ad173db5fa6cdbfd516d333e0e56fbb9a30b87df0e57e4e3466e42f1ee627",
+          "bytes": 16915
+        },
+        "normalization50.sing": {
+          "sha256": "4583cbf1dfa80caa16e98eb194e0a17fbea95811017fe87bde4328934ac8b02f",
+          "bytes": 458173
+        },
+        "prime-components50.sing": {
+          "sha256": "660cc8b8d7a5c480d5c6620f3e158d854303f5aa436655afe1d5e3ff95109394",
+          "bytes": 1212
+        },
+        "selected-prime50.sing": {
+          "sha256": "43eac9d7f5a80fe91daaaa7310bbd24844a58899518aae16eaa0d6df4c88fcb7",
+          "bytes": 2365
+        }
+      }
+    },
+    {
+      "attempt": "quotient50-01",
+      "source_revision": "889be41f73e0ba429e657b858017490dce91290a",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "QUOTIENT50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "QUOTIENT50_RESULT proper_quotient_charts=2 quotient_rank=16 coupled_source_rank=32 overlap_full_products=5 arithmetic_genus=449 normalization_not_computed=true"
+      ],
+      "exports": {
+        "coupled-quotient-finite50.sing": {
+          "sha256": "c5ab8e59b503feffe450ffdb93cf960b824f9939a8b144acb886932b82f262ac",
+          "bytes": 8861
+        },
+        "coupled-quotient-infinity50.sing": {
+          "sha256": "a7615bc45542eb0eacb3d0b75596a2bde726af40d0009a98d74094eacbab96b9",
+          "bytes": 9174
+        },
+        "quotient-finite50.sing": {
+          "sha256": "7c3729c61e518e7d09caa6ea5c8fe87011b13e83b46fe6a0c56934822cac98ca",
+          "bytes": 1053
+        },
+        "quotient-infinity50.sing": {
+          "sha256": "730e7ae08c3ea7dc79f89a1b9367ad6b7f5972f9a7a46b5d424fbb5e2134701c",
+          "bytes": 1060
+        },
+        "quotient-overlap50.sing": {
+          "sha256": "4f180c7e7495ae92df17bb1f9439a21d2ee3d7aa01adb774e3c8ae7733b75192",
+          "bytes": 45055
+        }
+      }
+    },
+    {
+      "attempt": "relative50-01",
+      "source_revision": "ff6a9988e4fd5f7ed81bde8e8036ba4c8ad0d802",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "RELATIVE50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "RELATIVE50_RESULT charts=2 quadratic_base_degree=2 relative_monic_degree=16 generic_degree=32 plane_norm_products=2 overlap_products=12 unit_maps=2 integral_v_adjoined=true"
+      ],
+      "exports": {
+        "relative-finite50.sing": {
+          "sha256": "46cd94628834eddf57756574265ac4b1f4be2a44c76ba7a81e92a290a75c5605",
+          "bytes": 1189
+        },
+        "relative-infinity50.sing": {
+          "sha256": "d5a0a0ef9ab7e8e2a4f2571441bebd5eb4a92e0327b321cc7191a55fa334a782",
+          "bytes": 905
+        },
+        "relative-overlap50.sing": {
+          "sha256": "004414eba5cc1b7426697a9f0c689ebda924841a8daf605fd4f767733d7cab81",
+          "bytes": 100778
+        }
+      }
+    },
+    {
+      "attempt": "rr-field50-01",
+      "source_revision": "889be41f73e0ba429e657b858017490dce91290a",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "RR_FIELD50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "RR_FIELD50_RESULT source_degree=32 descended_sections=68 complete_space_products=196 columns=196 rows=32 coefficient_field=F2(u) module_normalization_not_yet_computed=true"
+      ],
+      "exports": {
+        "rr-field50.sing": {
+          "sha256": "430662a07f0436caa2ce38c82a28c84c9041d200d78d7eb27589adc7816f72e0",
+          "bytes": 1780872
+        }
+      }
+    },
+    {
+      "attempt": "rr-mult50-01",
+      "source_revision": "3ac2609b57c7d3377026467fe7d5efa59df47759",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "RR_MULT50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [
+        "   ? `integerColumns50` is not defined",
+        "   ? error occurred in or before input.sing line 0: `^34+u^31+u^30+u^29+u^27+u^26+u^24+u^23+u^22+u^21+u^20+u^19+u^15+u^14+u^12+u^8;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 4: `setring inverseBaseCertificate50;short=0;option(redSB);`",
+        "   ? `basis50` is not defined",
+        "   ? error occurred in or before input.sing line 5: `matrix numeratorMatrix50=matrix(basis50);`",
+        "   ? expected matrix-expression. type 'help matrix;'",
+        "   ? `numeratorMatrix50` is not defined",
+        "   ? error occurred in or before input.sing line 7: `roductNumerators50;int pair50=0;int left50;int right50;int row50;int column50;`",
+        "   ? wrong type declaration. type 'help module;'",
+        "   ? expected ring-name",
+        "   ? error occurred in or before input.sing line 13: `map pidIntoSource50=inverseBaseCertificate50,u;`",
+        "   ? expected map-expression. type 'help map;'",
+        "   ? `pidIntoSource50` is not defined",
+        "   ? error occurred in or before input.sing line 14: `eratorMatrix50);poly denominatorSource50=pidIntoSource50(commonDenominator50);`",
+        "   ? expected matrix-expression. type 'help matrix;'",
+        "   ? `pidIntoSource50` is not defined",
+        "   ? error occurred in or before input.sing line 14: `eratorMatrix50);poly denominatorSource50=pidIntoSource50(commonDenominator50);`",
+        "   ? expected poly-expression. type 'help poly;'",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? `numeratorSource50` is not defined",
+        "   ? error occurred in or before input.sing line 18: `ion50+numeratorSource50[row50,column50]*l^((row50-1)%16)*v^((row50-1) div 16);`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 42: `  setring inverseBaseCertificate50;`",
+        "   ? RR_MULT50_PAIR_COUNT",
+        "   ? inverseBaseCertificate50 is no name of a ring/qring",
+        "   ? error occurred in or before input.sing line 73: `setring inverseBaseCertificate50;`",
+        "   ? `commonDenominator50` is not defined",
+        "   ? error occurred in or before input.sing line 74: `module denominatorBasis50=commonDenominator50*basis50;`",
+        "   ? expected module-expression. type 'help module;'",
+        "   ? `denominatorBasis50` is not defined",
+        "   ? error occurred in or before input.sing line 76: `matrix table50=lift(denominatorBasis50,productNumerators50);`",
+        "   ? expected matrix-expression. type 'help matrix;'",
+        "   ? `productNumerators50` is not defined",
+        "   ? error occurred in or before input.sing line 77: `matrix productMatrix50=matrix(productNumerators50);`",
+        "   ? expected matrix-expression. type 'help matrix;'",
+        "   ? `table50` is not defined",
+        "   ? error occurred in or before input.sing line 79: `matrix corruptTable50=table50;corruptTable50[1,1]=corruptTable50[1,1]+1;`",
+        "   ? wrong type declaration. type 'help matrix;'",
+        "   ? `corruptTable50` is not defined",
+        "   ? error occurred in or before input.sing line 79: `matrix corruptTable50=table50;corruptTable50[1,1]=corruptTable50[1,1]+1;`",
+        "   ? `denominatorBasis50` is not defined",
+        "   ? error occurred in or before input.sing line 81: `0<=32;column50++){sourcePowerMatrix50[column50,column50]=commonDenominator50;}`",
+        "   ? wrong type declaration. type 'help matrix;'",
+        "   ? `sourcePowerMatrix50` is not defined",
+        "   ? error occurred in or before input.sing line 81: `sourcePowerMatrix50[column50,column50]=commonDenominator50;`",
+        "   ? `numeratorMatrix50` is not defined",
+        "   ? error occurred in or before input.sing line 83: `link tableOut50=\"ASCII:w rr-table50.sing\";open(tableOut50);`",
+        "   ? `tableOut50` is not defined",
+        "   ? error occurred in or before input.sing line 83: `link tableOut50=\"ASCII:w rr-table50.sing\";open(tableOut50);`",
+        "   ? link expected",
+        "   ? error occurred in or before input.sing line 84: `trix table50[32][528];matrix sourceLift50[32][32];intmat parents50[528][2];\");`",
+        "   ? link expected",
+        "   ? error occurred in or before input.sing line 86: `,1])+\";parents50[\"+string(column50)+\",2]=\"+string(parents50[column50,2])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `sourceLift50` is not defined",
+        "   ? error occurred in or before input.sing line 91: `ng(row50)+\",\"+string(column50)+\"]=\"+string(sourceLift50[row50,column50])+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? `tableOut50` is not defined",
+        "   ? error occurred in or before input.sing line 92: `close(tableOut50);`"
+      ],
+      "timeout": false,
+      "status": "rejected",
+      "result_lines": [
+        "RR_MULT50_RESULT PID_algebra_rank=32 complete_product_pairs=528 full_table_product=true source_power_basis_embedding=true corruption_rejected=true normalization_index=376 proper_RR_bridge_recorded=true"
+      ],
+      "exports": {
+        "rr-products50.sing": {
+          "sha256": "cd09a87087356b387dc1d223d78d6e4a96b09451cbb67de288869e99612cbd95",
+          "bytes": 124
+        }
+      }
+    },
+    {
+      "attempt": "rr-mult50-02",
+      "source_revision": "6ef8175e036428f5afa8d3f3b398977886d2ee03",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "RR_MULT50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "RR_MULT50_RESULT PID_algebra_rank=32 complete_product_pairs=528 full_table_product=true source_power_basis_embedding=true corruption_rejected=true normalization_index=376 proper_RR_bridge_recorded=true"
+      ],
+      "exports": {
+        "rr-products50.sing": {
+          "sha256": "5df9e965cc794d95e12b78f29b5173a998741f97bf990f5ed854813adeeefa49",
+          "bytes": 13683387
+        },
+        "rr-table50.sing": {
+          "sha256": "e5fe417a6618346fa4e093482bd71a4c91993397125bdc3d9bbab3951f1b0752",
+          "bytes": 5893538
+        }
+      }
+    },
+    {
+      "attempt": "rr-pid50-01",
+      "source_revision": "d924e5d359f7b9b862bee32176c6dab3192b8f80",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "RR_PID50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "RR_PID50_RESULT source_rank=32 RR_generators=196 PID_basis_rank=32 full_original_lifts=2 source_power_basis_contained=true normalization_index=376 multiplication_table_pending=true"
+      ],
+      "exports": {
+        "rr-pid50.sing": {
+          "sha256": "94ae2d3d75a00b19d0e43740350c8bedee114d73be1adf4bba8a9db738c942e9",
+          "bytes": 2812145
+        }
+      },
+      "export_header_requires_validated_recovery": true,
+      "export_recovery_note": "RR-SERIALIZATION-RECOVERY.md"
+    },
+    {
+      "attempt": "rr-table-reload50-01",
+      "source_revision": "507c3e545481d86a6a8a6e42ef7a7b0275a9f175",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "RR_TABLE_RELOAD50_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "native_errors": [],
+      "timeout": false,
+      "status": "accepted",
+      "result_lines": [
+        "RR_TABLE_RELOAD50_RESULT actual_serialized_rings_reloaded=true product_pairs=528 both_original_module_products=true full_table_product=true full_source_embedding=true corrupted_coefficient_rejected=true"
+      ],
+      "exports": {}
+    },
+    {
+      "attempt": "separation50-01",
+      "source_revision": "6777e47e46eb01248ae8d9a677dba1a3d1e6d97f",
+      "kind": "Lean",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "status": "rejected",
+      "audited_theorems": []
+    },
+    {
+      "attempt": "separation50-02",
+      "source_revision": "ec189014410bcfb440608b6b47d292130dfada25",
+      "kind": "Lean",
+      "compile_exit": 1,
+      "audit_exit": null,
+      "status": "rejected",
+      "audited_theorems": []
+    },
+    {
+      "attempt": "separation50-03",
+      "source_revision": "640e0b14d528a8c1e6dc945a87992d2a04d52cc5",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "status": "accepted",
+      "audited_theorems": [
+        "Separation50.evaluations_exclude_image"
+      ]
+    },
+    {
+      "attempt": "verify-relative-finite50-01",
+      "source_revision": "214feb878aca3c166c41f02c11b3fa258ad23943",
+      "kind": "Singular",
+      "native_exit": 124,
+      "marker": "VERIFY_RELATIVE50_ALL_CHECKS_PASS",
+      "marker_present": false,
+      "native_errors": [],
+      "timeout": true,
+      "status": "rejected",
+      "result_lines": [
+        "VERIFY_RELATIVE50_COEFFICIENT_FIELD charstr=ZZ/2 characteristic=2 parameters=0"
+      ],
+      "exports": {}
+    }
+  ],
+  "status_counts": {
+    "accepted": 20,
+    "rejected": 10
+  },
+  "audited_unique_theorems": [
+    "Local50.bezout_intersection_reconstruction",
+    "Local50.exact_eighth_power_nilpotency",
+    "Local50.scaled_quadratic_identity",
+    "Marked23_50.binary_prefix23",
+    "Marked23_50.exact_order23",
+    "Rational50.bezout_norm_inverse",
+    "Rational50.field_map_bijective_of_equal_finrank",
+    "Rational50.linear_coordinate_numerator",
+    "Rational50.overlap_coordinate_roundtrip",
+    "Rational50.quadratic_norm_zero_iff",
+    "Rational50.zero_denominator_counterexample",
+    "Separation50.evaluations_exclude_image"
+  ],
+  "construction_counts": {
+    "proper_monic_charts": 2,
+    "integral_v_charts": 2,
+    "complete_forward_source_products": 4,
+    "boundary_cyclic_F2_dimension": 128,
+    "boundary_exact_saturation_exponent": 8,
+    "finite_coordinate_defect_F2_dimension": 898,
+    "infinity_coordinate_defect_F2_dimension": 94,
+    "global_coordinate_defect_F2_dimension": 992,
+    "verified_affine_normalizations": 0,
+    "normalization_presentations_computed": 1,
+    "proper_sign_quotient_charts": 2,
+    "RR_product_columns": 196,
+    "RR_PID_basis_rank": 32,
+    "RR_PID_normalization_index": 376,
+    "RR_algebra_product_pairs": 528,
+    "RR_algebra_serialized_reload_checked": 1,
+    "marked23_base_generic_degree": 7,
+    "marked23_point_exact_order": 23,
+    "audited_unique_theorems": 12
+  },
+  "native_arrays_formalized": false,
+  "independent_scientific_replay": false,
+  "independent_semantic_review": false
+}

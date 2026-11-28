@@ -1,0 +1,22 @@
+     Locking 5 packages to highest compatible versions
+      Adding num-bigint v0.4.8 (available: v0.5.1)
+   Compiling autocfg v1.5.1
+   Compiling hec-native-ic v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/crates/hec-native-ic)
+   Compiling num-traits v0.2.19
+   Compiling num-integer v0.1.47
+   Compiling num-bigint v0.4.8
+   Compiling hec-kernel631 v0.1.0 (/Volumes/SSD990-2/hec-inverse-work/research/hec_kernel631_20261115)
+error[E0308]: mismatched types
+  --> main.rs:19:261
+   |
+19 | ...p.0{for v in e{dump+=&format!(" {v}");}}}dump+='\n';}}fs::write(out.join("KERNELS.txt"),dump).unwrap();
+   |                                                   ^^^^ expected `&str`, found `char`
+   |
+help: if you meant to write a string literal, use double quotes
+   |
+19 -  let mut dump=format!("FIELD {P} 13 {}\n",field.c);for(i,set)in ks.iter().enumerate(){for(j,d)in set.iter().enumerate(){dump+=&format!("DIV {i} {j}");for p in [&d.u,&d.v]{dump+=&format!(" {}",p.0.len());for e in &p.0{for v in e{dump+=&format!(" {v}");}}}dump+='\n';}}fs::write(out.join("KERNELS.txt"),dump).unwrap();
+19 +  let mut dump=format!("FIELD {P} 13 {}\n",field.c);for(i,set)in ks.iter().enumerate(){for(j,d)in set.iter().enumerate(){dump+=&format!("DIV {i} {j}");for p in [&d.u,&d.v]{dump+=&format!(" {}",p.0.len());for e in &p.0{for v in e{dump+=&format!(" {v}");}}}dump+="\n";}}fs::write(out.join("KERNELS.txt"),dump).unwrap();
+   |
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `hec-kernel631` (bin "kernel631") due to 1 previous error

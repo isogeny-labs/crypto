@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T07:16:05Z",
+ "id": "PCC-20261123-29c03d",
+ "kind": "statement",
+ "producer": {
+  "commit": "54d7f9f4c02b2aab8a5bbe263b1a675edbe7eb10",
+  "model": "",
+  "session": "chained-transfers-resume-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_primefield_cost_20261117/closed-PR4544-final-CI-20261123/ALL_EVENT_CI_METADATA_AND_RAW_REFERENCES.json",
+    "sha256": "cf8a500903355bfc4caaa281448dc5a9a48bd092cee8ea82ade22db8f96a9f6d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_primefield_cost_20261117/closed-PR4544-final-CI-20261123/FULL_DECODED_JOB_LOG_HASHES_AND_CUSTODY.json",
+    "sha256": "4cf33bf8728301c74e86e4c9d2869f33de75b56662ea84b4bbde6c456efc6384"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_primefield_cost_20261117/closed-PR4544-final-CI-20261123/RECORDED_CHECK_COUNTS.json",
+    "sha256": "4c421707ff4b1a01587aa4ca2587f0da9c8a6af153ef72df097438b9e175ecab"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Unsigned historical CI metadata and decoded-text custody. CurrentPR4990 CI not queried. Full provider API/log backings retain references; no durable local mirror or independent replay claim.",
+ "statement": "All-event/all-page public metadata for closed PR4544 protocolC dd6223fa records21 workflows and30 checks (13 success,7 failure,10 skipped); final437a6303 records19 workflows and30 checks (11 success,9 failure,10 skipped). Thirteen selected complete decoded job logs were retrieved and hashed, with full provider references and temporary local cache status explicit. The PR merged at2026-11-17T15:16:40Z; this does not establish green merge-time CI. No closed branch push or new CI/science dispatch occurred."
+}

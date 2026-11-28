@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T09:08:56Z",
+ "id": "PCC-20261123-ac5831",
+ "kind": "measurement",
+ "producer": {
+  "commit": "b02e76389e753cab9f398972d83d862ed2ddee08",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/trace-learning-audit-20261123/audit-original.json",
+    "sha256": "e3ccc55deb76ee5bd878ec4bf69ef7376ff8bc9a89346fe096ddf9c46f148939"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Eight fixed recorded-input F4calls and six linear-stage controls pass on the first Run51system, plus three arithmetic-bound tests. Per-step upper limits on omitted trace-learning Fp multiplications including Fermat inversion are2097520for five coordinates and3589725for six. Both original/self-replay/ordinary controls reproduce the captured root. Synthetic corrupted row-index reports are rejected by the stated acceptance predicate; all saved66/33mismatch cases satisfy it. These are partial arithmetic upper bounds, not actual event totals, a natural failure or a throughput/parity result."
+}

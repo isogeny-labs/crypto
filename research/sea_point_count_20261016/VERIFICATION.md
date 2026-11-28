@@ -101,7 +101,7 @@ Lean 4.19 also rebuilt
 It derives uniqueness from explicit Hasse interval and divisibility premises
 when the witnessed divisor exceeds the interval width. The theorem's axiom
 audit reports only `propext` and `Quot.sound`. The
-[curve-registry audit](../../docs/curves/audit-20261023/README.md) uses this
+[full-tree registry rebuild](../../docs/curves/registry-rebuild-20261023/README.md) uses this
 lemma for 13,216 computational point-order certificates and counts three
 small fields exhaustively. The Lean theorem does not verify the Python
 point arithmetic, source JSON extraction, Hasse's theorem, or Lagrange's
@@ -136,3 +136,25 @@ Run `bash formal/verify.sh` from any directory, with Java 21, curl, sha256sum,
 timeout and the pinned Lean toolchain on PATH. `TLA_JAR` may point to the
 already downloaded checked JAR. `FORMAL_LOG_DIR` selects a fresh output path;
 committed evidence under `formal/logs` and `lean/logs` is preserved.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[curve-registry audit](../../docs/curves/audit-20261023/README.md) uses this
+
+
+
+
+

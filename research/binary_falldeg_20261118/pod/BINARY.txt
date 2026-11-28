@@ -1,0 +1,11 @@
+binary: target/release/examples/binary_falldeg_arms (upload as /workspace/code/binary_falldeg_arms)
+sha256: 2ed36ccad8a7a3a903792d601704e7afa2eeb254954be3af4be12bb131ad0d54
+size_bytes: 7368384
+source: wt/binary-ladder @ e0ac67a2b5d1c6cd4f6bdf324b6244f698c85fca (no source change)
+build: CARGO_TARGET_DIR=$PWD/target cargo build --release --example binary_falldeg_arms
+rustc: rustc 1.97.0 (2d8144b78 2026-07-07)
+cargo: cargo 1.97.0 (c980f4866 2026-06-30)
+RUSTFLAGS: (unset); no target-cpu/target-feature; no .cargo/config.toml
+ldd: libgcc_s.so.1 libc.so.6 ld-linux-x86-64.so.2
+glibc_min: 2.34 (highest versioned symbol GLIBC_2.34)
+build_host_glibc: ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39

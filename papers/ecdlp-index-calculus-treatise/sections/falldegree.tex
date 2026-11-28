@@ -289,6 +289,17 @@ The bound is attained at $n=17,19$.
   \item Certificate checker: \texttt{verify/cert\_check.py}, which
     rebuilds $F$ from the curve parameters by its own Möbius interpolation
     of $\Sem3$ values.
+  \item Implementation~C: a native Rust closure in this repository,
+    \art{examples/fd_m2_degrees.rs}, sharing no code with A or B. It
+    builds the descent in the repository's Boolean-ring library and runs
+    the full MutantXL closure ($=W_D$) and Boolean F4. In a pilot on a
+    4-core development host, which is not a measurement and has not been
+    independently checked, it reproduced the recorded $d_{\tilde F}$ of
+    eight instances (R11a, R13a, R15a, R19a, P17a, P21a, P21c, U33a) and
+    $1\notin W_4$ on T33a with $\operatorname{rank}W_4=48{,}068$, as
+    recorded. Planted solvable controls were never refuted up to $D=5$.
+    The calibration stage of the frozen protocols below repeats this
+    check before any new row is read.
   \end{itemize}
 \item \emph{Instances.}
   \begin{itemize}
@@ -689,8 +700,17 @@ $e_{\min}=4<5$, certified in both directions: a degree-4 selector satisfying
 all $114{,}688$ constraints, re-checked by separate field arithmetic, and an
 infeasible degree-3 system (838 points; coefficient rank $9{,}371$, augmented
 rank $9{,}372$, by a second row builder with PLUQ elimination). At $k=14,15$
-the value is back at $\lceil k/3\rceil$. Above $n=29$ only lower bounds were
-reached on the 15\,GB container. The selector degree bounds a weaker proof
+the value is back at $\lceil k/3\rceil$. On a 128\,GB RunPod pod
+(12 November) the selector degree is exact at $n=31$ and 33: $e_{\min}=5$ on
+4 of 4 and 3 of 3 instances, below $\lceil k/3\rceil=6$ in both cells, every feasible degree-5 selector checked on a
+second machine and every degree-4 infeasibility re-ranked by the PLUQ path
+(\art{research/lfd_lower_bound_20261111/out/c_runpod/RESULT.md}). At
+$n=33$, $5<\lceil(k-1)/3\rceil=6$, so the weaker form
+$e_{\min}\ge\lceil(k-1)/3\rceil$ is also falsified. The preregistered
+counting model (below) predicted 5 at $n=31$ and held; at $n=33$ it was
+ambiguous and is not scored. At $n=35$ the degree-5 system (441{,}560
+columns) aborted after about 5\,h on a 32-bit row-offset overflow in M4RI
+20200125, so $n\ge35$ remain lower bounds. The selector degree bounds a weaker proof
 system than the closure, and the measured $d_{\tilde F}$ lies one or two
 below it (Table~\ref{tab:fd-selector-gap}).
 
@@ -712,18 +732,22 @@ $n$ & $k$ & $e_{\min}$ (per instance) & $\lceil k/3\rceil$ & instances \\
 \textbf{25} & \textbf{13} & \textbf{4, 4} & \textbf{5} & 2 \\
 27 & 14 & 5, 5 & 5 & 2 \\
 29 & 15 & 5, 5 & 5 & 2 \\
-31, 33, 35 & 16, 17, 18 & $>4$ & 6 & 2 each \\
+\textbf{31} & \textbf{16} & \textbf{5 ($\times4$)} & \textbf{6} & 4 \\
+\textbf{33} & \textbf{17} & \textbf{5 ($\times3$)} & \textbf{6} & 3 \\
+35 & 18 & $>4$ & 6 & 2 \\
 37, 39, 41 & 19, 20, 21 & $>3$ & 7 & 2 each \\
 \bottomrule
 \end{tabular}
 \caption[]{Selector degree $e_{\min}$ on the diagonal $k=\lceil n/2\rceil$,
 first unsatisfiable seeds. Rows $n\le23$ pool the Python computation and
 the C port; $n\ge25$ are the C port, every feasible selector re-checked and
-every infeasible point set re-ranked by a second code path. Bold: the
-counterexample to $e_{\min}\ge\lceil k/3\rceil$. The $n=7$ value 1 is an
-instance with $d_{\tilde F}=2$. Rows $n\ge31$ are lower bounds only (memory
-and container restarts). Unverified, no pcc claim. Source:
-\art{research/lfd_lower_bound_20261111/NOTE.md}, \S6.}
+every infeasible point set re-ranked by a second code path; $n=31$ and
+33 ran on a 128\,GB pod. Bold: the
+counterexamples to $e_{\min}\ge\lceil k/3\rceil$. The $n=7$ value 1 is an
+instance with $d_{\tilde F}=2$. Rows $n\ge35$ are lower bounds only (memory,
+container restarts and, at $n=35$, an M4RI index overflow). Unverified, no
+pcc claim. Source: \art{research/lfd_lower_bound_20261111/NOTE.md}, \S6, and
+\art{research/lfd_lower_bound_20261111/out/c_runpod/RESULT.md}.}
 \label{tab:fd-selector}
 \end{table}
 
@@ -779,6 +803,11 @@ preregistered follow-ups measured the homogeneous selector system.
   chose the counting model. Its one miss is $V\subset\ker\operatorname{Tr}$:
   $k=13$, $e=4$ is infeasible on all three such instances and feasible on
   random $V$ (\art{research/lfd_lower_bound_20261111/out/lead_A2/RESULT.md}).
+  The exact values at $n=31$ and 33 narrow its threshold to
+  $\theta\in(1.2634,1.2698)$; its prediction of an infeasible degree 5 at
+  $n=35$ ($\rho=1.3417$) is the open falsifier, blocked by the M4RI
+  overflow. The diagonal now reads $e_{\min}=3,3,4,4,4,4,5,5,5,5$ for
+  $n=15,17,\ldots,33$.
 \end{itemize}
 These describe the selector system only. The note's reason they do not
 extend to $d_{\tilde F}$: the dual object of Proposition~\ref{prop:cert} must
@@ -903,9 +932,16 @@ apply to it.
 session-reported median last fall degree for $t=1..10$ at
 $p=2{,}013{,}265{,}921$ beside the corrected degree of regularity in PKM's
 own Table~4 for $n_1=1..11$ (also Figure~\ref{fig:fd}, right). The raw
-records were never committed (the study's \texttt{RESTART.md}), so the
-$d_F$ column is session-reported, not re-derivable. From $t=2$ on the two
-columns coincide.
+records of the first run were never committed (the study's
+\texttt{RESTART.md}). A preregistered relaunch on Iso Lab EKS (job
+\texttt{pfd-a-20261108}, 8 November) recomputed stage A from $t=1$, two
+random targets per $t$, and its medians agree with the first run's at every
+$t\le10$ (3, 4, 4, 4, 4, 5, 5, 5, 5, 6), both draws equal to the median at
+every $t$; the uncapped F4 degree $D$ equals $d_F$ on all 72 draws checked
+(gate G2), and the capped-F4 gate G3 found 0 disagreements in 144 runs
+(\art{research/pkm_falldegree_unblock_20261107/RESULTS.md}). The repeat is
+at median level, since the first run's rows are lost. From $t=2$ on the
+$d_F$ column and PKM's coincide.
 
 \begin{table}[t]
 \centering\small
@@ -920,9 +956,112 @@ $D_{\rm reg}^{\rm corr}$ of Petit, Kosters and Messeng, Table~4
 \label{tab:fd-pkm}
 \end{table} So the \emph{growth} is prior art. What
 Theorem~\ref{thm:pkm} adds is the proved constant first fall degree beside
-it, and the presentation dependence. A prediction,
-$d_F=4+\lfloor(t-2)/4\rfloor$, was registered before any $t\ge11$ row and
-is untested.
+it, and the presentation dependence.
+
+\paragraph{The C-step prediction.} A prediction,
+$c^*(t)=4+\lfloor(t-2)/4\rfloor$, was registered (Amendment~6 of the
+prime fall-degree study) before any $t\ge11$ row. Capped F4 brackets
+decide it per draw: cap 5 not refuting gives $d_F\ge6$, cap 6 refuting
+gives $d_F\le6$. At $p=2{,}013{,}265{,}921$ the readings are: $t=11$, $d_F=6$
+on both draws, which holds but is not blind (round-2 rows had already
+shown it); $t=12$ ($N=24$), $d_F=6$ on both draws, ``holds'', the cap-6 runs
+taking $1{,}824.0$ and $1{,}762.8$\,s and $42{,}213{,}325{,}264{,}923$ and
+$42{,}213{,}325{,}353{,}310$ multiply-adds
+(\art{research/pkm_falldegree_unblock_20261107/RESULTS_T12_BRACKET.md}); $t=13$,
+$d_F=6$ on draw 1 in the bracket run
+(\art{research/pkm_falldegree_unblock_20261107/RESULTS_T13_BRACKET.md}) and
+on draw 0 in a RunPod re-run of 15 November, whose cap-6 closure refutes
+after $12{,}372$\,s, so ``holds''
+(\art{research/pkm_falldegree_unblock_20261107/RESULTS_STAGE_B.md});
+$t=14$, where $c^*=7$, gives $d_F\ge7$ on both draws: a first cap-6 attempt
+stopped oversize at degree 6, and re-runs on larger pods (Amendment 14)
+complete cap 6 without refuting; the cap-7 runs are pending
+(\art{research/prime_fall_degree_20261027/reports/growth-law-20261115/README.md}). Every draw has \texttt{grid\_zeros}
+$=0$, so none is decomposable. Since $c^*(12)=c^*(11)$, the $t=12$ cell
+cannot tell the C-step law from a flat 6, nor can $t=13$; the $t=14$ bound
+is the first cell that rules out a flat 6. These cells ran on RunPod after
+owner decision 10 (\art{research/ic_lead_queue_20261114/README.md}) moved
+them off EC2 Spot. Stage C
+of the same relaunch read ``grows in $m$'' on all six fixed-$t$ ladders
+($t=2,3$; Kummer and 2-isogeny towers; $m$ from 2 up to the largest exact
+median), the median $d_F$ rising by 2 or 3 between $m=2$ and that $m$
+(\art{research/pkm_falldegree_unblock_20261107/RESULTS_STAGE_C.md}). All of
+these are \texttt{[pcc:unverified]}. Since 15 November the $\FF_p$-tower closure
+instrument (\art{src/cryptanalysis/hky_fp_tower.rs}, PR~\#4332) writes each
+closure $V_{F,c}$ to a progress file as it finishes, so a run stopped by a
+timeout keeps its decided degrees and resumes at the first undecided one;
+it changes no measured value.
+
+\paragraph{The no-fall degree at $m=3$.} For the two-$\Sem3$ chain on
+Kummer towers at $m=3$, the Nullstellensatz degree in the tower ring
+satisfies $2t+6\le d_{\rm NS}\le3t+5$ (written proofs D10 and D9 of
+\art{research/prime_fall_degree_20261027/DERIVED.md}; D10 needs a
+per-instance condition, certified on 32 of 32 valid instances at three
+primes, $t=2$--5). Measured $d_{\rm NS}$ with multipliers of any $u$-degree
+is 10 on 6 of 6 instances at $t=2$, which meets the lower bound, and at
+most 13 at $t=3$; with $u$-degree at most 1 it is exactly $3t+5$ at
+$t=2$--5. The measured $d_F$ stays near 5 at $t=2,3$. As at $m=2$, the no-fall
+degree grows linearly while the falls absorb everything above a constant;
+nothing here bounds $d_F$ from below
+(\art{research/kummer_m3_ns_degree_20261115/README.md};
+\texttt{[pcc:unverified]}, local 4-vCPU runs). The step that could turn D10 into a bound on
+$d_F$ is open: whether the dual functional, taken modulo the second
+$\Sem3$, is a closure pseudo-solution.
+
+\paragraph{Other presentations of the same base.} PKM's two ways to find
+the maps $L_j$ (smooth $p-1$, or an isogeny chain on an auxiliary curve) are
+Kummer towers of two tori, $\mathbb{G}_m$ (order $p-1$) and the norm-one
+torus $T_2$ (order $p+1$). The supersingular $j=1728$ Vélu 2-isogeny chain
+is the $T_2$ tower up to a scaling per level, checked numerically on 200
+random points at each of three primes and 20 at P-192; since $2^{64}$, $2^{96}$ and $2^{521}$
+divide $p+1$ at P-192, P-256 and P-521, the auxiliary-curve search phase
+is unnecessary at the NIST primes
+(\art{research/pkm_torus_tower_20261114/README.md}). Its frozen prediction
+P1, that the raw polynomial-calculus degree does not depend on the
+presentation, is refuted on two seeds and two primes
+(Table~\ref{tab:fd-torus}). Rational-doubling coordinates cost one degree
+from $t=2$; polynomial presentations (the circle $u^2+v^2=1$, or the
+Kummer tower with a Möbius link) cost one degree from $t=3$; all rejoin the
+Kummer value at $(m,t)=(2,6)$ and $(3,3)$. The staircase that governs the
+lane is reproduced, not changed. A separate frozen test of the Vélu 2-isogeny tower at $p=1{,}048{,}583$ read
+$d_F=5$ at every $t=4$--8 on both instances (and at $t=9$ on one), against
+the Kummer law $\lfloor(t+14)/4\rfloor$ reproduced on the same engine
+(4, 4, 5, 5, 5); Vélu sits at its generator-weight floor of 5 over the whole
+range, so its first step lies at $t\ge10$
+(\art{research/leads_followup_20261114/item09_velu_tower/RESULTS.md};
+numpy prototype, \texttt{[pcc:unverified]}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrccccc@{}}
+\toprule
+$m$ & $t$ & $N$ & K ($p=40{,}961$) & S ($40{,}961$) & T ($8{,}191$) & M ($40{,}961$) & C ($8{,}191$) \\
+\midrule
+2 & 1 & 2 & 4, 4 & 4, 4 & 4, 4 & 4, 4 & 4, 4 \\
+2 & 2 & 4 & 4, 4 & 5, 5 & 5, 5 & 4, 4 & 4, 4 \\
+2 & 3 & 6 & 4, 4 & 5, 5 & 5, 5 & 5, 5 & 5, 5 \\
+2 & 4 & 8 & 4, 4 & 5, 5 & 5, 5 & 5, 5 & 5, 5 \\
+2 & 5 & 10 & 4, 4 & 5, 5 & 5, 5 & 5, 5 & $\ge5$, $\ge5$ \\
+2 & 6 & 12 & 5, 5 & 5, 5 & 5, 5 & 5, 5 & $\ge5$, $\ge5$ \\
+3 & 1 & 3 & 5, 5 & 5, 5 & 5, 5 & 5, 5 & 5, 5 \\
+3 & 2 & 6 & 5, 5 & 6, 6 & 6, 6 & 5, 5 & 5, 5 \\
+3 & 3 & 9 & 6, 6 & 6, 6 & 6, 6 & 6, 6 & --- \\
+\bottomrule
+\end{tabular}
+\caption[]{Raw polynomial-calculus degree of five presentations of the
+same PKM factor base, two random inconsistent targets per cell: K, the
+Kummer tower on $\mathbb{G}_m$; S and T, Möbius (rational-doubling)
+coordinates on $\mathbb{G}_m$ and on $T_2$; M, the Kummer tower with a
+Möbius link; C, the circle presentation of $T_2$. ``$\ge5$'': stopped by the
+column budget or the 1{,}200\,s cap with $1\notin W_4$ certified. Arm T at
+$p=73{,}727$ (one target, $t=2$--5) also reads 5. The native closure agrees
+with an independent Python closure on every per-degree rank in 41 cells
+and on the degrees reached in 7 more; no planted target reached $1\in W_D$.
+Arm K reproduces the earlier certified ladder wherever $D\ge4$. Rows
+$(2,7)$ (K and T: 5) omitted. \texttt{[pcc:unverified]}. Source:
+\art{research/pkm_torus_tower_20261114/README.md}.}
+\label{tab:fd-torus}
+\end{table}
 
 \section{Measured solving degrees in other presentations}
 
@@ -961,12 +1100,19 @@ The first exact value above 4 in the $(m,\ell)=(3,7)$ cell arrived on
 reached $1\in W_5$: $d_F=5$ exactly, after $37{,}889.9$\,s, of which
 $37{,}799.0$\,s at degree 5 ($974{,}982$ columns). Its closure dimensions up
 to degree 4 equal the earlier E10 record, so the draw is valid under the
-study's Amendment~20. The cell rule needs three of four draws; draws 1, 3
-and 4 were still running at the last commit, with the pod deadline and the
-account balance allowing at most one more
-(\art{research/fall_degree_bounds_20261008/e14/pod-r2/out-r2j/A_3-21-7.draw0.jsonl},
-\art{research/fall_degree_bounds_20261008/e14/RESUME-E14.md}; one draw,
-producer-reported, no validator report).
+study's Amendment~20. Draw 1 also read $d_F=5$, in $38{,}240$\,s, with its
+closure up to degree 4 equal to E10; both draws closed degree 5 at full
+rank ($974{,}982$ of $974{,}982$ columns, 4 rounds). The cell rule needs three of
+four draws. Draw 3's record was lost with the pod (check-ins scheduled for
+13 November reached the session only on 14 November, after the pod was
+gone), and draw 4 was cut off by the deadline, so the cell was scored
+``split'' on 14 November; the E14b controls and E14c never started
+(\art{research/fall_degree_bounds_20261008/RESULTS.md}, section E14 r2). A third round
+(Amendment 31) reruns draw 3 alone; it was launched at 00:33Z on
+15 November and had no result at the last commit; a draw-3 reading of 5
+would make the cell read $d_F=5$
+(\art{research/fall_degree_bounds_20261008/e14/RESUME-E14.md}). Two draws,
+producer-reported, no validator report, \texttt{[pcc:unverified]}.
 
 Three further measurements bear on the solver rather than the system:
 \begin{itemize}
@@ -997,8 +1143,8 @@ null). None was observed in $n$ at a fixed base.
     4).
   \item It is certified on named binary instances: $\ge5$ against 2, at
     $n=33$--$45$ and in the $m=t=3$ chain.
-  \item It is session-reported for Kummer towers (6 against 4 at $t=10$;
-    raw data not committed).
+  \item It is measured for Kummer towers (6 against 4 at $t=10$ and $t=12$),
+    reproduced at median level by the EKS relaunch of 8 November.
   \end{itemize}
   Any complexity argument that substitutes the first fall degree for the
   solving degree is unsupported for these systems.
@@ -1011,13 +1157,26 @@ null). None was observed in $n$ at a fixed base.
   The attempt of \S\ref{sec:fd-growth} shows that the question needs a
   fixed or size-bounded presentation (extension variables bring every
   instance to $d_{\tilde F}=2$), and that the selector degree, a weaker
-  proof system, is not $\lceil k/3\rceil+2$ in general ($k=13$). The
+  proof system, is not $\lceil k/3\rceil+2$ in general ($k=13$, 16 and 17). The
   first fall degree of $\Sem4$ is 6 or 7 by a rank condition, and 6 for all
   large $n$ at fixed $n'$ (\S\ref{sec:fd-kw3}).
 \item \emph{Missing before submission.} The certificates are committed
   only as hashes; they regenerate (above) but need public hosting. The
   sample is small: two instances per $n$ at $n\ge33$, one polynomial
   instance at $n\ge41$. The written proofs need expert review. The
-  Kummer-tower data must be regenerated
+  Kummer-tower stage A rows were regenerated on EKS on 8 November
+  (\S\ref{sec:fd-pkm}); the first run's rows remain lost, so the repeat
+  is median-level only
   (\art{research/paper_opportunities_20261029/}).
+\item \emph{Requested data.} The runs that would enlarge the binary sample
+  and add F4 step degrees beside Table~1 of Kousidis and
+  Wiemers~\cite{kousidis2019} are preregistered as two protocols, frozen
+  before any data: \texttt{FD-BINARY-CLOSURE-EXT} and
+  \texttt{FD-F4-STEP-DEGREE}
+  (\art{research/fd_paper_data_request_20261029/}). Both run on
+  Implementation~C. Each must first pass a calibration stage that
+  reproduces every recorded outcome, an A/A check and a negative
+  control. No run has been made yet. New $d_{\tilde F}\ge5$ rows will be
+  marked \emph{closure only} until an independent certificate is
+  checked.
 \end{itemize}

@@ -44,13 +44,13 @@
 //! Nothing here is intended to scale to cryptographic-size curves
 //! (secp256k1, P-256).  The Frobenius trace is computed by brute-
 //! force point counting (`O(p)`), Vélu uses explicit point
-//! enumeration of the kernel, and class-group composition uses
-//! plain Gauss reduction without NUCOMP/NUDUPL.  All asymptotically
-//! better algorithms (SEA point counting, structured Vélu, NUCOMP)
-//! are documented in their respective modules but not implemented
-//! — see [`crate::cryptanalysis::hilbert_class_poly`] and
-//! [`crate::cryptanalysis::modular_polynomial`] for the
-//! cryptographic-scale-aware machinery already in the crate.
+//! enumeration of the kernel (with Round-4 batched inversion on
+//! evaluate), and class-group composition uses plain Gauss reduction
+//! without NUCOMP/NUDUPL.  Prefer
+//! [`crate::cryptanalysis::isogeny_eval::sqrt_velu`] once `ℓ ≳ 73`.
+//! SEA / NUCOMP live in `isogeny_algos` and
+//! [`crate::cryptanalysis::hilbert_class_poly`] /
+//! [`crate::cryptanalysis::modular_polynomial`].
 
 pub mod attack;
 pub mod class_group;

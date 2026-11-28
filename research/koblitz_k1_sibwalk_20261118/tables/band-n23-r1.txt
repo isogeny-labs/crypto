@@ -1,0 +1,28 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | ls | 144/144 | 0.280 | 0.372 | 1.203 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | ls-aa | 144/144 | 0.280 | 0.372 | 1.203 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | ls-off | 144/144 | 0.280 | 0.372 | 1.203 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | rho-strong | 144/144 | 0.889 | 0.954 | 1.542 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | rho-v5 | 144/144 | 0.230 | 0.255 | 0.480 | — |
+| icv1-f2m23-tm5197-1f85e9e1 | 22.00 | sw | 144/144 | 0.200 | 0.296 | 1.160 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m23-tm5197-1f85e9e1 | ls vs ls-aa | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | ls vs ls-off | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | ls vs rho-strong | ls < rho-strong |
+| icv1-f2m23-tm5197-1f85e9e1 | ls vs rho-v5 | rho-v5 < ls |
+| icv1-f2m23-tm5197-1f85e9e1 | ls vs sw | sw < ls |
+| icv1-f2m23-tm5197-1f85e9e1 | ls-aa vs ls-off | unresolved inside the band |
+| icv1-f2m23-tm5197-1f85e9e1 | ls-aa vs rho-strong | ls-aa < rho-strong |
+| icv1-f2m23-tm5197-1f85e9e1 | ls-aa vs rho-v5 | rho-v5 < ls-aa |
+| icv1-f2m23-tm5197-1f85e9e1 | ls-aa vs sw | sw < ls-aa |
+| icv1-f2m23-tm5197-1f85e9e1 | ls-off vs rho-strong | ls-off < rho-strong |
+| icv1-f2m23-tm5197-1f85e9e1 | ls-off vs rho-v5 | rho-v5 < ls-off |
+| icv1-f2m23-tm5197-1f85e9e1 | ls-off vs sw | sw < ls-off |
+| icv1-f2m23-tm5197-1f85e9e1 | rho-strong vs rho-v5 | rho-v5 < rho-strong |
+| icv1-f2m23-tm5197-1f85e9e1 | rho-strong vs sw | sw < rho-strong |
+| icv1-f2m23-tm5197-1f85e9e1 | rho-v5 vs sw | unresolved inside the band |

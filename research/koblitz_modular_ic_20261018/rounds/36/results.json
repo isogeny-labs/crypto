@@ -1,0 +1,220 @@
+{
+  "schema": "koblitz.round-results/v1",
+  "round": 36,
+  "runs": [
+    {
+      "attempt": "quotient36-01",
+      "status": "accepted",
+      "build_exit": 0,
+      "native_exit": 0,
+      "observations": [
+        "QUOT36_STEP label=zero-control generator=1 dimension=260",
+        "QUOT36_STEP label=zero-control generator=3 dimension=164",
+        "QUOT36_STEP label=zero-control generator=101 dimension=68",
+        "QUOT36_QUOTIENT label=zero-control generators=196 dimension=68 construction_products=23376 final_memberships=13328 independent_products=all",
+        "QUOT36_STEP label=flip generator=2 dimension=200",
+        "QUOT36_STEP label=flip generator=3 dimension=196",
+        "QUOT36_STEP label=flip generator=69 dimension=166",
+        "QUOT36_STEP label=flip generator=71 dimension=164",
+        "QUOT36_STEP label=flip generator=101 dimension=70",
+        "QUOT36_STEP label=flip generator=103 dimension=68",
+        "QUOT36_QUOTIENT label=flip generators=196 dimension=68 construction_products=25500 final_memberships=13328 independent_products=all",
+        "QUOT36_STEP label=same-section-double-flip generator=2 dimension=196",
+        "QUOT36_QUOTIENT label=same-section-double-flip generators=68 dimension=196 construction_products=13584 final_memberships=13328 independent_products=all",
+        "QUOT36_RESULT zero_control_dimension=68 flip_dimension=68 double_flip_dimension=196 double_flip_equals_original=true target_dimension=324 nonunit_section=true all_generator_memberships=checked corrupt_membership=rejected",
+        "QUOT36_ALL_CHECKS_PASS"
+      ]
+    },
+    {
+      "attempt": "group36-01",
+      "status": "accepted",
+      "build_exit": 0,
+      "native_exit": 0,
+      "observations": [
+        "QUOT36_STEP label=self generator=1 dimension=196",
+        "QUOT36_STEP label=self generator=2 dimension=72",
+        "QUOT36_STEP label=self generator=3 dimension=68",
+        "QUOT36_STEP label=self generator=69 dimension=38",
+        "QUOT36_STEP label=self generator=71 dimension=36",
+        "QUOT36_STEP label=self generator=101 dimension=1",
+        "QUOT36_QUOTIENT label=self generators=196 dimension=1 construction_products=6331 final_memberships=196 independent_products=all",
+        "GROUP36_EQUALITY label=self equivalent=true witness_dimension=1",
+        "QUOT36_STEP label=source-versus-zero generator=1 dimension=196",
+        "QUOT36_STEP label=source-versus-zero generator=2 dimension=72",
+        "QUOT36_STEP label=source-versus-zero generator=3 dimension=68",
+        "QUOT36_STEP label=source-versus-zero generator=69 dimension=38",
+        "QUOT36_STEP label=source-versus-zero generator=71 dimension=36",
+        "QUOT36_STEP label=source-versus-zero generator=101 dimension=0",
+        "QUOT36_QUOTIENT label=source-versus-zero generators=196 dimension=0 construction_products=6236 final_memberships=0 independent_products=all",
+        "GROUP36_EQUALITY label=source-versus-zero equivalent=false witness_dimension=0",
+        "QUOT36_STEP label=negation-middle generator=1 dimension=164",
+        "QUOT36_STEP label=negation-middle generator=3 dimension=68",
+        "QUOT36_QUOTIENT label=negation-middle generators=68 dimension=68 construction_products=5072 final_memberships=4624 independent_products=all",
+        "QUOT36_STEP label=negation-last-flip generator=2 dimension=228",
+        "QUOT36_STEP label=negation-last-flip generator=37 dimension=196",
+        "QUOT36_QUOTIENT label=negation-last-flip generators=68 dimension=196 construction_products=14704 final_memberships=13328 independent_products=all",
+        "QUOT36_STEP label=negative-versus-zero generator=1 dimension=196",
+        "QUOT36_STEP label=negative-versus-zero generator=2 dimension=132",
+        "QUOT36_STEP label=negative-versus-zero generator=5 dimension=36",
+        "QUOT36_STEP label=negative-versus-zero generator=101 dimension=0",
+        "QUOT36_QUOTIENT label=negative-versus-zero generators=196 dimension=0 construction_products=4372 final_memberships=0 independent_products=all",
+        "GROUP36_EQUALITY label=negative-versus-zero equivalent=false witness_dimension=0",
+        "QUOT36_STEP label=add-to-inverse-first-flip generator=2 dimension=200",
+        "QUOT36_STEP label=add-to-inverse-first-flip generator=3 dimension=196",
+        "QUOT36_STEP label=add-to-inverse-first-flip generator=69 dimension=166",
+        "QUOT36_STEP label=add-to-inverse-first-flip generator=71 dimension=164",
+        "QUOT36_STEP label=add-to-inverse-first-flip generator=101 dimension=70",
+        "QUOT36_STEP label=add-to-inverse-first-flip generator=103 dimension=68",
+        "QUOT36_QUOTIENT label=add-to-inverse-first-flip generators=196 dimension=68 construction_products=25500 final_memberships=13328 independent_products=all",
+        "QUOT36_STEP label=add-to-inverse-sum-divisor generator=1 dimension=196",
+        "QUOT36_STEP label=add-to-inverse-sum-divisor generator=2 dimension=68",
+        "QUOT36_QUOTIENT label=add-to-inverse-sum-divisor generators=68 dimension=68 construction_products=5008 final_memberships=4624 independent_products=all",
+        "QUOT36_STEP label=add-to-inverse-last-flip generator=2 dimension=292",
+        "QUOT36_STEP label=add-to-inverse-last-flip generator=3 dimension=196",
+        "QUOT36_QUOTIENT label=add-to-inverse-last-flip generators=68 dimension=196 construction_products=13680 final_memberships=13328 independent_products=all",
+        "QUOT36_STEP label=cancellation-versus-zero generator=1 dimension=196",
+        "QUOT36_STEP label=cancellation-versus-zero generator=2 dimension=84",
+        "QUOT36_STEP label=cancellation-versus-zero generator=53 dimension=52",
+        "QUOT36_STEP label=cancellation-versus-zero generator=85 dimension=2",
+        "QUOT36_STEP label=cancellation-versus-zero generator=165 dimension=1",
+        "QUOT36_QUOTIENT label=cancellation-versus-zero generators=196 dimension=1 construction_products=6659 final_memberships=196 independent_products=all",
+        "GROUP36_EQUALITY label=cancellation-versus-zero equivalent=true witness_dimension=1",
+        "GROUP36_RESULT source_nonprincipal=true negative_nonprincipal=true self_equivalent=true add_to_inverse_equivalent_zero=true full_generator_memberships=all independent_products=all target_factor_evaluated=false",
+        "GROUP36_ALL_CHECKS_PASS"
+      ]
+    }
+  ],
+  "construction_counts": {
+    "closed_point_algebra_dimension": 770,
+    "large_model_dimension": 324,
+    "complete_divisor_dimension": 196,
+    "flip_dimension": 68,
+    "same_section_double_flip_dimension": 196,
+    "exact_subspace_divisions": 12,
+    "actual_source_classes_tested": 1
+  },
+  "class_tests": {
+    "self_equality_dimension": 1,
+    "source_versus_zero_dimension": 0,
+    "negative_versus_zero_dimension": 0,
+    "add_to_inverse_versus_zero_dimension": 1,
+    "same_section_double_flip_equals_original": true,
+    "signed_E_sum_evaluated": false,
+    "desired_order11_image": null
+  },
+  "controls": {
+    "all_original_generator_memberships_checked": true,
+    "all_construction_and_final_products_independent_arithmetic": true,
+    "all_kernel_recombinations_and_ranknullity": true,
+    "nonunit_section_used": true,
+    "nonmembership_control_rejected": true
+  },
+  "proof_scope": {
+    "geometric_class_interpretation": "uses retained proper/local and complete RR/pole bridge",
+    "native_algorithm_formalized_in_Lean": false,
+    "new_Lean_theorems": 0,
+    "R35_coefficient_lift_proofs_separate": true
+  },
+  "performance_measured": false,
+  "IC_relation_rank": null,
+  "public_input_recoveries": 0,
+  "independent_scientific_replay": false,
+  "quotient_receipts": [
+    {
+      "label": "zero-control",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "23376",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "label": "flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "25500",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "label": "same-section-double-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13584",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "label": "self",
+      "generators": "196",
+      "dimension": "1",
+      "construction_products": "6331",
+      "final_memberships": "196",
+      "independent_products": "all"
+    },
+    {
+      "label": "source-versus-zero",
+      "generators": "196",
+      "dimension": "0",
+      "construction_products": "6236",
+      "final_memberships": "0",
+      "independent_products": "all"
+    },
+    {
+      "label": "negation-middle",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5072",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "label": "negation-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "14704",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "label": "negative-versus-zero",
+      "generators": "196",
+      "dimension": "0",
+      "construction_products": "4372",
+      "final_memberships": "0",
+      "independent_products": "all"
+    },
+    {
+      "label": "add-to-inverse-first-flip",
+      "generators": "196",
+      "dimension": "68",
+      "construction_products": "25500",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "label": "add-to-inverse-sum-divisor",
+      "generators": "68",
+      "dimension": "68",
+      "construction_products": "5008",
+      "final_memberships": "4624",
+      "independent_products": "all"
+    },
+    {
+      "label": "add-to-inverse-last-flip",
+      "generators": "68",
+      "dimension": "196",
+      "construction_products": "13680",
+      "final_memberships": "13328",
+      "independent_products": "all"
+    },
+    {
+      "label": "cancellation-versus-zero",
+      "generators": "196",
+      "dimension": "1",
+      "construction_products": "6659",
+      "final_memberships": "196",
+      "independent_products": "all"
+    }
+  ]
+}

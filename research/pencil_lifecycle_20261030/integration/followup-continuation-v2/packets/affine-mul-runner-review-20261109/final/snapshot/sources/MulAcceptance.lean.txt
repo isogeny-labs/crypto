@@ -1,0 +1,215 @@
+-- Prospective source only; no elaboration or axiom readback performed.
+import DispatchAcceptance
+import Init.Data.UInt.Bitwise
+set_option autoImplicit false
+namespace AffineMulAcceptance
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy StoredInput AffineDispatch
+inductive Event | accumulate | square deriving DecidableEq, Repr
+-- All scalar guards use the literal UInt64 operations of the caller.
+inductive Acc (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) :
+ UInt64 → Stored → Stored → Stored → List Event → Prop
+ | skip (k : UInt64) (r a : Stored) (h : k &&& 1 = 0) : Acc p f k r a r []
+ | add (k : UInt64) (r a out : Stored) (tag : Tag) (h : k &&& 1 ≠ 0)
+   (hr : Runs p f r a tag out) : Acc p f k r a out [.accumulate]
+inductive Square (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) :
+ UInt64 → Stored → Stored → List Event → Prop
+ | skip (a : Stored) : Square p f 0 a a []
+ | add (k : UInt64) (a out : Stored) (tag : Tag) (h : k ≠ 0)
+   (hr : Runs p f a a tag out) : Square p f k a out [.square]
+inductive Run (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) :
+ Stored → Stored → UInt64 → List Event → Stored → Prop
+ | done (r a : Stored) : Run p f r a 0 [] r
+ | step {r a : Stored} {k : UInt64} {r' a' : Stored} {ea es tail : List Event} {out : Stored}
+   (hk : k ≠ 0) (ha : Acc p f k r a r' ea) (hs : Square p f (k >>> 1) a a' es)
+   (rest : Run p f r' a' (k >>> 1) tail out) : Run p f r a k (ea ++ es ++ tail) out
+inductive Reach (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) (a0 : Stored) (k0 : UInt64) :
+ Stored → Stored → UInt64 → Prop
+ | initial : Reach p f a0 k0 identity a0 k0
+ | step {r a : Stored} {k : UInt64} {r' a' : Stored} {ea es : List Event}
+   (prev : Reach p f a0 k0 r a k) (hk : k ≠ 0)
+   (ha : Acc p f k r a r' ea) (hs : Square p f (k >>> 1) a a' es) :
+   Reach p f a0 k0 r' a' (k >>> 1)
+
+theorem identity_wellformed (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64)
+ (hp : 2 < p.toNat) : WellFormed p (wordsPoly p f) identity := by
+ refine ⟨by decide, rfl, rfl, ?_, rfl, ?_⟩
+ · simp [Stored.canonical, identity, Canon]; omega
+ · simp [up, vp, identity, trimFuel, wordsPoly, listPoly]
+
+section
+variable (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64)
+ (hp : 2 < p.toNat) (hbnd : p.toNat < 2^31) (hf : Canon p f)
+ (hfd : (wordsPoly p f).natDegree = 5)
+
+theorem acc_preserves {k : UInt64} {r a out : Stored} {events : List Event}
+ (h : Acc p f k r a out events) (hr : WellFormed p (wordsPoly p f) r)
+ (ha : WellFormed p (wordsPoly p f) a) : WellFormed p (wordsPoly p f) out := by
+ cases h with
+ | skip => exact hr
+ | add k r a out tag hbit hrun =>
+   exact every_execution_preserves p f r a out hp hbnd hf hfd hr ha tag hrun
+
+theorem square_preserves {k : UInt64} {a out : Stored} {events : List Event}
+ (h : Square p f k a out events) (ha : WellFormed p (wordsPoly p f) a) :
+ WellFormed p (wordsPoly p f) out := by
+ cases h with
+ | skip => exact ha
+ | add k a out tag hk hrun =>
+   exact every_execution_preserves p f a a out hp hbnd hf hfd ha ha tag hrun
+
+theorem reached_boundary {a0 r a : Stored} {k0 k : UInt64}
+ (h0 : WellFormed p (wordsPoly p f) a0) (h : Reach p f a0 k0 r a k) :
+ WellFormed p (wordsPoly p f) r ∧ WellFormed p (wordsPoly p f) a := by
+ induction h with
+ | initial => exact ⟨identity_wellformed p f hp, h0⟩
+ | @step r a k r' a' ea es prev hk hac hs ih =>
+   exact ⟨acc_preserves p f hp hbnd hf hfd hac ih.1 ih.2,
+     square_preserves p f hp hbnd hf hfd hs ih.2⟩
+
+theorem run_preserves {r a out : Stored} {k : UInt64} {events : List Event}
+ (h : Run p f r a k events out) : WellFormed p (wordsPoly p f) r →
+ WellFormed p (wordsPoly p f) a → WellFormed p (wordsPoly p f) out := by
+ induction h with
+ | done => intro hr _; exact hr
+ | @step r a k r' a' ea es tail out hk hac hs rest ih =>
+   intro hr ha
+   exact ih (acc_preserves p f hp hbnd hf hfd hac hr ha)
+     (square_preserves p f hp hbnd hf hfd hs ha)
+
+theorem accepted_return {a out : Stored} {k : UInt64} {events : List Event}
+ (ha : WellFormed p (wordsPoly p f) a) (h : Run p f identity a k events out) :
+ StoredValidity.test p f out = true := by
+ exact StoredValidity.test_accepts_wellformed p f out (by omega) hbnd hf
+  (run_preserves p f hp hbnd hf hfd h (identity_wellformed p f hp) ha)
+
+theorem acc_exists (k : UInt64) (r a : Stored)
+ (hr : WellFormed p (wordsPoly p f) r) (ha : WellFormed p (wordsPoly p f) a) :
+ ∃ out events, Acc p f k r a out events ∧ WellFormed p (wordsPoly p f) out := by
+ by_cases h : k &&& 1 = 0
+ · exact ⟨r, [], Acc.skip k r a h, hr⟩
+ · obtain ⟨out, run, hw⟩ := total_preserving_execution p f r a hp hbnd hf hfd hr ha
+   exact ⟨out, [.accumulate], Acc.add k r a out _ h run, hw⟩
+
+theorem square_exists (k : UInt64) (a : Stored) (ha : WellFormed p (wordsPoly p f) a) :
+ ∃ out events, Square p f k a out events ∧ WellFormed p (wordsPoly p f) out := by
+ by_cases h : k = 0
+ · subst k; exact ⟨a, [], Square.skip a, ha⟩
+ · obtain ⟨out, run, hw⟩ := total_preserving_execution p f a a hp hbnd hf hfd ha ha
+   exact ⟨out, [.square], Square.add k a out _ h run, hw⟩
+end
+
+theorem shifted_nat (k : UInt64) : (k >>> 1).toNat = k.toNat / 2 := by
+ simp [UInt64.toNat_shiftRight, Nat.shiftRight_eq_div_pow]
+theorem shift_decreases (k : UInt64) (hk : k ≠ 0) : (k >>> 1).toNat < k.toNat := by
+ rw [shifted_nat]
+ apply Nat.div_lt_self
+ · apply Nat.pos_of_ne_zero
+   intro hz; apply hk; apply UInt64.toNat.inj; simpa using hz
+ · decide
+
+def shiftSteps : Nat → UInt64 → UInt64
+ | 0, k => k
+ | n+1, k => (shiftSteps n k) >>> 1
+
+theorem shiftSteps_nat (n : Nat) (k : UInt64) :
+ (shiftSteps n k).toNat = k.toNat / 2^n := by
+ induction n with
+ | zero => simp [shiftSteps]
+ | succ n ih =>
+   rw [shiftSteps, shifted_nat, ih, Nat.div_div_eq_div_mul]
+   simp [Nat.pow_succ]
+
+theorem sixty_four_shifts_zero (k : UInt64) : shiftSteps 64 k = 0 := by
+ apply UInt64.toNat.inj
+ rw [shiftSteps_nat]
+ have hk := k.toNat_lt_size
+ change k.toNat / 2^64 = 0
+ apply Nat.div_eq_of_lt
+ simpa [UInt64.size] using hk
+
+theorem total_execution (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64)
+ (hp : 2 < p.toNat) (hbnd : p.toNat < 2^31) (hf : Canon p f)
+ (hfd : (wordsPoly p f).natDegree = 5) (r a : Stored) (k : UInt64)
+ (hr : WellFormed p (wordsPoly p f) r) (ha : WellFormed p (wordsPoly p f) a) :
+ ∃ events out, Run p f r a k events out ∧ WellFormed p (wordsPoly p f) out := by
+ have aux : ∀ n : Nat, ∀ k : UInt64, k.toNat = n → ∀ r a : Stored,
+   WellFormed p (wordsPoly p f) r → WellFormed p (wordsPoly p f) a →
+   ∃ events out, Run p f r a k events out ∧ WellFormed p (wordsPoly p f) out := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | h n ih =>
+    intro k hn r a hr ha
+    by_cases hz : k = 0
+    · subst k; exact ⟨[], r, Run.done r a, hr⟩
+    · obtain ⟨r', ea, hac, hwr⟩ := acc_exists p f hp hbnd hf hfd k r a hr ha
+      obtain ⟨a', es, hs, hwa⟩ := square_exists p f hp hbnd hf hfd (k >>> 1) a ha
+      have hlt : (k >>> 1).toNat < n := by rw [←hn]; exact shift_decreases k hz
+      obtain ⟨events, out, rest, hw⟩ := ih _ hlt (k >>> 1) rfl r' a' hwr hwa
+      exact ⟨ea ++ es ++ events, out, Run.step hz hac hs rest, hw⟩
+ exact aux k.toNat k rfl r a hr ha
+
+theorem accepted_execution_exists (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64)
+ (hp : 2 < p.toNat) (hbnd : p.toNat < 2^31) (hf : Canon p f)
+ (hfd : (wordsPoly p f).natDegree = 5) (a : Stored) (k : UInt64)
+ (ha : WellFormed p (wordsPoly p f) a) :
+ ∃ events out, Run p f identity a k events out ∧ StoredValidity.test p f out = true := by
+ obtain ⟨events, out, run, hw⟩ := total_execution p f hp hbnd hf hfd identity a k
+   (identity_wellformed p f hp) ha
+ exact ⟨events, out, run, StoredValidity.test_accepts_wellformed p f out (by omega) hbnd hf hw⟩
+-- This witness counts loop iterations, rather than addition events.
+inductive Steps (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64) :
+ Nat → Stored → Stored → UInt64 → List Event → Stored → Prop
+ | done (r a : Stored) : Steps p f 0 r a 0 [] r
+ | step {n : Nat} {r a : Stored} {k : UInt64} {r' a' : Stored}
+   {ea es tail : List Event} {out : Stored}
+   (hk : k ≠ 0) (ha : Acc p f k r a r' ea) (hs : Square p f (k >>> 1) a a' es)
+   (rest : Steps p f n r' a' (k >>> 1) tail out) :
+   Steps p f (n+1) r a k (ea ++ es ++ tail) out
+
+theorem steps_run (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64)
+ {n : Nat} {r a out : Stored} {k : UInt64} {events : List Event}
+ (h : Steps p f n r a k events out) : Run p f r a k events out := by
+ induction h with
+ | done r a => exact Run.done r a
+ | step hk ha hs rest ih => exact Run.step hk ha hs ih
+
+theorem bounded_execution (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64)
+ (hp : 2 < p.toNat) (hbnd : p.toNat < 2^31) (hf : Canon p f)
+ (hfd : (wordsPoly p f).natDegree = 5) (fuel : Nat) (r a : Stored) (k : UInt64)
+ (hfuel : k.toNat < 2^fuel) (hr : WellFormed p (wordsPoly p f) r)
+ (ha : WellFormed p (wordsPoly p f) a) :
+ ∃ n events out, n ≤ fuel ∧ Steps p f n r a k events out ∧
+   WellFormed p (wordsPoly p f) out := by
+ induction fuel generalizing r a k with
+ | zero =>
+   have hz : k = 0 := by
+    apply UInt64.toNat.inj
+    simp only [Nat.pow_zero] at hfuel
+    change k.toNat = 0
+    omega
+   subst k
+   exact ⟨0, [], r, Nat.le_refl 0, Steps.done r a, hr⟩
+ | succ fuel ih =>
+   by_cases hz : k = 0
+   · subst k; exact ⟨0, [], r, Nat.zero_le _, Steps.done r a, hr⟩
+   · obtain ⟨r', ea, hac, hwr⟩ := acc_exists p f hp hbnd hf hfd k r a hr ha
+     obtain ⟨a', es, hs, hwa⟩ := square_exists p f hp hbnd hf hfd (k >>> 1) a ha
+     have hnext : (k >>> 1).toNat < 2^fuel := by
+      rw [shifted_nat]
+      rw [Nat.pow_succ] at hfuel
+      omega
+     obtain ⟨n, tail, out, hn, rest, hw⟩ := ih r' a' (k >>> 1) hnext hwr hwa
+     exact ⟨n+1, ea ++ es ++ tail, out, Nat.succ_le_succ hn, Steps.step hz hac hs rest, hw⟩
+
+theorem accepted_within_sixty_four (p : UInt64) [Fact p.toNat.Prime] (f : List UInt64)
+ (hp : 2 < p.toNat) (hbnd : p.toNat < 2^31) (hf : Canon p f)
+ (hfd : (wordsPoly p f).natDegree = 5) (a : Stored) (k : UInt64)
+ (ha : WellFormed p (wordsPoly p f) a) :
+ ∃ n events out, n ≤ 64 ∧ Steps p f n identity a k events out ∧
+   Run p f identity a k events out ∧ StoredValidity.test p f out = true := by
+ have hk : k.toNat < 2^64 := by simpa [UInt64.size] using k.toNat_lt_size
+ obtain ⟨n, events, out, hn, steps, hw⟩ := bounded_execution p f hp hbnd hf hfd
+   64 identity a k hk (identity_wellformed p f hp) ha
+ exact ⟨n, events, out, hn, steps, steps_run p f steps,
+   StoredValidity.test_accepts_wellformed p f out (by omega) hbnd hf hw⟩
+end AffineMulAcceptance

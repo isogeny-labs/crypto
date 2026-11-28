@@ -1,0 +1,44 @@
+{
+  "format": "dickson.development_flow/v1",
+  "canonical_experiment_export": false,
+  "canonical_export_status": "schema/tooling unreadable through gh and connector; no check-export validation claimed",
+  "source_commit": "a4cd5ee0b3cf3f83c71c78b96ceb904b69772158",
+  "protocol": "../../COLD_ACCOUNTING.md",
+  "raw": "control.jsonl",
+  "plan": {
+    "arms": [
+      "Direct",
+      "Refined",
+      "ProductionCofactorMsolve"
+    ],
+    "prime": 127,
+    "depth": 4,
+    "seed": 781815,
+    "max_draws": 30
+  },
+  "flow": {
+    "planned_arms": 3,
+    "attempted_arms": 3,
+    "finished_arms": 3,
+    "recovered_arms": 3,
+    "excluded_arms": 0,
+    "unrun_arms": [],
+    "retries": 0
+  },
+  "failures_retained": [
+    {
+      "mode": "ProductionCofactorMsolve",
+      "draws": [
+        2,
+        3,
+        4,
+        8,
+        11
+      ],
+      "reason": "production UnsupportedChart: target-in-base chart not implemented"
+    }
+  ],
+  "qualification": "local_development_only",
+  "signed_verification": false,
+  "cloud_job_submitted": false
+}

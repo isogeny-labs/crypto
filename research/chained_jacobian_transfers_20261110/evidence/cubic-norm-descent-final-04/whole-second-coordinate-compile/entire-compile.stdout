@@ -1,0 +1,50 @@
+research/chained_jacobian_transfers_20261110/lean/CubicNormDescent.lean:103:4: error: unsolved goals
+case snd.fst
+a b c : Fin 223
+three : ↑3 = 3
+⊢ ((↑a % 223 % 223 * (↑b % 223 % 223) % 223 % 223 + ↑b % 223 % 223 * (↑a % 223 % 223) % 223 % 223) % 223 % 223 +
+        3 % 223 * (↑c % 223 % 223 * (↑c % 223 % 223) % 223 % 223) % 223 % 223) %
+      223 =
+    ((↑a % 223 % 223 * (↑b % 223 % 223) % 223 % 223 + ↑b % 223 % 223 * (↑a % 223 % 223) % 223 % 223) % 223 % 223 +
+        3 % 223 * (↑c % 223 % 223) % 223 % 223 * (↑c % 223 % 223) % 223 % 223) %
+      223
+research/chained_jacobian_transfers_20261110/lean/CubicNormDescent.lean:101:84: warning: This simp argument is unused:
+  Nat.mul_assoc
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [originalSquare223, square0, Fin.add_def, Fin.mul_def, Nat.add_mod, Nat.mul_mod, three]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+research/chained_jacobian_transfers_20261110/lean/CubicNormDescent.lean:104:86: warning: This simp argument is unused:
+  Nat.mul_assoc
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [originalSquare223, square1, Fin.add_def, Fin.mul_def, Nat.add_mod, Nat.mul_mod, three]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+research/chained_jacobian_transfers_20261110/lean/CubicNormDescent.lean:106:86: warning: This simp argument is unused:
+  Nat.mul_assoc
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [originalSquare223, square2, Fin.add_def, Fin.mul_def, Nat.add_mod, Nat.mul_mod, three]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+research/chained_jacobian_transfers_20261110/lean/CubicNormDescent.lean:106:100: warning: This simp argument is unused:
+  three
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [originalSquare223, square2, Fin.add_def, Fin.mul_def, Nat.add_mod, Nat.mul_mod, Nat.mul_assoc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'CubicNormDescent.norm_square' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicNormDescent.determinant_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicNormDescent.norm_of_constant_square' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicNormDescent.recover_base_square_root' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicNormDescent.base_nonroots' depends on axioms: [propext, Quot.sound]
+'CubicNormDescent.actual_constant_units' depends on axioms: [propext]
+'CubicNormDescent.no_cubic_square_root12' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicNormDescent.no_cubic_square_root24' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CubicNormDescent.square_constant_control' depends on axioms: [propext, Quot.sound]
+'CubicNormDescent.original_square_coordinates' depends on axioms: [propext, sorryAx, Quot.sound]
+'CubicNormDescent.original_square_ne12' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CubicNormDescent.original_square_ne24' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

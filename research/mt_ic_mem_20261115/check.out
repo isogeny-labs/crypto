@@ -1,0 +1,15 @@
+# Pre-run checks, 2026-11-15T22:31:18Z
+previous binary sha256 ea2f038e5bee00a2  new 5151b2b05311ad8b  (new built from 0bc69900d4)
+## 1. previous vs new binary, all fields but times and pf
+ic5b mt_fieldops_v5_20261112/instances/W28-0.json 1024 43 0.85 4 1.2 flat 32 bi : identical PASS
+ic5b mt_ic_scale_20261115/instances/W36-0.json 1024 43 0.85 4 1.2 flat 32 bi : identical PASS
+rhodpb mt_fieldops_v5_20261112/instances/W32-4.json 1024 43 0.25 0 32 : identical PASS
+## 2. ic:pf and ic:pf+fp counts equal ic:bi (T = 1024)
+  W32-4.json flat    {'table': 1085717, 'trials': 1904484, 'relations': 49, 'p1_trials': 94732, 'I': 213589, 'M': 7557433, 'S': 3235155} ok 1024 / 1024 ms 187.8
+  W32-4.json flat pf {'table': 1085717, 'trials': 1904484, 'relations': 49, 'p1_trials': 94732, 'I': 213589, 'M': 7557433, 'S': 3235155} ok 1024 / 1024 ms 148.7
+  W32-4.json flatf pf {'table': 1085717, 'trials': 1904484, 'relations': 49, 'p1_trials': 94732, 'I': 213589, 'M': 7557433, 'S': 3235155} ok 1024 / 1024 ms 147.4
+  PASS
+  W36-0.json flat    {'table': 4462447, 'trials': 8092020, 'relations': 84, 'p1_trials': 711182, 'I': 801990, 'M': 31762089, 'S': 13555360} ok 1024 / 1024 ms 1047.0
+  W36-0.json flat pf {'table': 4462447, 'trials': 8092020, 'relations': 84, 'p1_trials': 711182, 'I': 801990, 'M': 31762089, 'S': 13555360} ok 1024 / 1024 ms 847.5
+  W36-0.json flatf pf {'table': 4462447, 'trials': 8092020, 'relations': 84, 'p1_trials': 711182, 'I': 801990, 'M': 31762089, 'S': 13555360} ok 1024 / 1024 ms 731.9
+  PASS

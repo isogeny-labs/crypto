@@ -1,0 +1,53 @@
+R17 native analyzer producer receipt [pcc:unverified]
+
+Date: 2026-11-19
+Host: Linux 6.18.57 x86_64
+Compiler: rustc 1.100.0 (0ef1bc386 2026-11-09)
+Working directory: research/quartic_ghs_r0_r99_20261119
+
+Inputs:
+  7ba8e26595e0aaaddcc857bf45329e1c3ad4abad0b4cb6be4726c31775240dee  prototypes/r17_native_analyzer.rs
+  243eff9e1eea808d483c317f450ec884343a6472b8a8b0c84fc69f74fd57ef06  receipts/r17_r36_q223.jsonl
+
+Commands:
+  rustfmt --edition 2021 prototypes/r17_native_analyzer.rs
+  rustc --edition 2021 -D warnings -O prototypes/r17_native_analyzer.rs \
+    -o /tmp/r17-native-analyzer
+  /tmp/r17-native-analyzer check 1/2 receipts/r17_r36_q223.jsonl
+  /tmp/r17-native-analyzer --selftest receipts/r17_r36_q223.jsonl
+
+All complete commands exited 0.
+
+Real-record check:
+  real_fixture_pass rows=5
+  validated_rho_rows=5 explicit_small_div_weight=1/2
+  output rows: 15 (setup, walk, and verify retained separately for five arms)
+
+Exact corruption dispositions:
+  missing-field-kernel: rejected (missing field_kernel)
+  missing-small-div: rejected (missing setup.fq_small_div)
+  malformed-small-div: rejected (setup.fq_small_div is not numeric)
+  unknown-kernel: rejected
+  karatsuba-nonzero-small-div: rejected
+  evaluation5-wrong-small-div: rejected
+  counted-authority-false: rejected
+  fast-authority-true: rejected
+  fast-nonzero-field-count: rejected
+  unknown-arm-class: rejected
+  phase-cross-substitution: rejected
+  duplicate-key: rejected
+
+Invalid weight dispositions:
+  "", "1", "1/0", "-1/2", "1/-2", "1.5/2", and "1/2/3": rejected
+  explicit "0/7": accepted and canonicalized to explicit 0/1
+  omitted weight invocation: exit 2
+
+Final selftest line:
+  SELFTEST OK
+
+Scope:
+  The checker validates authority, field-kernel identities, phase separation,
+  and a caller-selected small-division sensitivity. Its
+  mul_plus_small_div quantity excludes inversions, additions, native work,
+  setup outside the record, and elapsed time. It does not rank candidates or
+  establish a performance result.

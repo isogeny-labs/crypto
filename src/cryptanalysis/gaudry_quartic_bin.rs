@@ -2580,12 +2580,17 @@ pub fn group_order_bin(c: &CurveB, rng: &mut StdRng) -> Option<u128> {
     None
 }
 
-/// Deterministic Miller–Rabin: the bases 2, 3, …, 37 decide every
-/// `n < 3.3·10²⁴` (above `2^81`), which covers `#E(F_{q⁴})` for `m ≤ 20`.
+/// Deterministic Miller–Rabin on the first thirteen prime bases.  The
+/// Sorenson–Webster value `psi_13 = 3317044064679887385961981` is the
+/// exclusive upper bound, which covers `#E(F_{q⁴})` for `m ≤ 20`.
 /// Below `2^64` it is the one-word test every committed curve used.
 fn is_prime(n: u128) -> bool {
     if let Ok(n) = u64::try_from(n) {
         return super::residual_walk::is_prime_u64(n);
+    }
+    const MR_PROOF_BOUND: u128 = 3_317_044_064_679_887_385_961_981;
+    if n >= MR_PROOF_BOUND {
+        return false;
     }
     use super::koblitz_strong_rho::RhoScalar;
     let mulm = |a: u128, b: u128| <u128 as RhoScalar>::mul_mod(a, b, n);
@@ -2605,7 +2610,7 @@ fn is_prime(n: u128) -> bool {
     }
     let s = (n - 1).trailing_zeros();
     let d = (n - 1) >> s;
-    'bases: for a in [2u128, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37] {
+    'bases: for a in [2u128, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41] {
         let mut x = powm(a % n, d);
         if x == 1 || x == n - 1 {
             continue;
@@ -2997,16 +3002,8 @@ fn lp_mul(a: u128, b: u128, r: u128) -> u128 {
 }
 
 fn lp_inv(a: u128, r: u128) -> u128 {
-    // r is prime: a^(r−2).
-    let (mut base, mut e, mut acc) = (a % r, r - 2, 1u128);
-    while e > 0 {
-        if e & 1 == 1 {
-            acc = lp_mul(acc, base, r);
-        }
-        base = lp_mul(base, base, r);
-        e >>= 1;
-    }
-    acc
+    // r is prime: the value a^(r−2) gave, 0 for a ≡ 0.
+    crate::gcd::int::inv_mod_u128(a, r).unwrap_or(0)
 }
 
 fn lp_sub(a: u128, b: u128, r: u128) -> u128 {
@@ -3261,6 +3258,18 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
     }
     fn summands(&self) -> u32 {
         4
+    }
+    /// The set-up interpolates the symmetrised system (solver work, in the
+    /// solver block) and builds no table, so with large primes off there
+    /// are no table inserts to count and the item is complete; the
+    /// large-prime store's pivot inserts are not counted, so with large
+    /// primes on the item stays listed (`ecbench::work`).
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        if self.lp.enabled() {
+            BTreeMap::new()
+        } else {
+            BTreeMap::from([("counted:table_insert_attempts".to_string(), 1)])
+        }
     }
     fn describe(&self, _params: &Params) -> String {
         let form = if self.opts.frobenius {
@@ -3613,6 +3622,15 @@ mod tests {
 #[cfg(test)]
 mod ecbench_tests {
     use super::*;
+
+    #[test]
+    fn primality_uses_the_thirteenth_prime_base() {
+        // psi_12 passes the first twelve prime bases through 37 and is
+        // rejected by the thirteenth base, 41.
+        let psi_12 = 318_665_857_834_031_151_167_461u128;
+        assert!(!is_prime(psi_12));
+        assert!(!is_prime(3_317_044_064_679_887_385_961_981u128));
+    }
 
     #[test]
     fn group_order_and_tower_identity() {

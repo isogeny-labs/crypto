@@ -1,0 +1,111 @@
+Diff in /dev/shm/ct23-g3-first-A/source/research/chained_genus3_quartic_20261123/main_a.rs:27:
+     fn add_reference(&self, a: usize, b: usize) -> usize {
+         let aa = self.digits(a);
+         let bb = self.digits(b);
+-        Self::encode(&aa.iter().zip(bb).map(|(x, y)| (x + y) % 5).collect::<Vec<_>>())
++        Self::encode(
++            &aa.iter()
++                .zip(bb)
++                .map(|(x, y)| (x + y) % 5)
++                .collect::<Vec<_>>(),
++        )
+     }
+ 
+     fn product_reference(&self, a: usize, b: usize) -> usize {
+Diff in /dev/shm/ct23-g3-first-A/source/research/chained_genus3_quartic_20261123/main_a.rs:132:
+                 assert_eq!(self.mul(a, b), self.horner_product(a, b));
+                 assert_eq!(self.add(a, b), self.add(b, a));
+                 assert_eq!(self.mul(a, b), self.mul(b, a));
+-                assert_eq!(self.pow(self.add(a, b), 5), self.add(self.pow(a, 5), self.pow(b, 5)));
+-                assert_eq!(self.pow(self.mul(a, b), 5), self.mul(self.pow(a, 5), self.pow(b, 5)));
++                assert_eq!(
++                    self.pow(self.add(a, b), 5),
++                    self.add(self.pow(a, 5), self.pow(b, 5))
++                );
++                assert_eq!(
++                    self.pow(self.mul(a, b), 5),
++                    self.mul(self.pow(a, 5), self.pow(b, 5))
++                );
+                 for c in 0..self.q {
+                     assert_eq!(self.add(self.add(a, b), c), self.add(a, self.add(b, c)));
+                     assert_eq!(self.mul(self.mul(a, b), c), self.mul(a, self.mul(b, c)));
+Diff in /dev/shm/ct23-g3-first-A/source/research/chained_genus3_quartic_20261123/main_a.rs:140:
+-                    assert_eq!(self.mul(a, self.add(b, c)), self.add(self.mul(a, b), self.mul(a, c)));
++                    assert_eq!(
++                        self.mul(a, self.add(b, c)),
++                        self.add(self.mul(a, b), self.mul(a, c))
++                    );
+                 }
+             }
+         }
+Diff in /dev/shm/ct23-g3-first-A/source/research/chained_genus3_quartic_20261123/main_a.rs:234:
+     }
+     trim(&mut h);
+     assert_eq!(h.len(), if a == 0 { 4 } else { 5 });
+-    let mut derivative: Vec<_> = h.iter().enumerate().skip(1).map(|(i, &x)| i * x % 5).collect();
++    let mut derivative: Vec<_> = h
++        .iter()
++        .enumerate()
++        .skip(1)
++        .map(|(i, &x)| i * x % 5)
++        .collect();
+     trim(&mut derivative);
+     let degree = gcd_degree(h.clone(), derivative.clone());
+     assert_eq!(degree, sylvester_nullity(&h, &derivative));
+Diff in /dev/shm/ct23-g3-first-A/source/research/chained_genus3_quartic_20261123/main_a.rs:242:
+ }
+ 
+ fn polynomial(field: &Field, coefficients: &[usize], x: usize) -> usize {
+-    coefficients.iter().rev().fold(0, |acc, &c| field.add(field.mul(acc, x), c))
++    coefficients
++        .iter()
++        .rev()
++        .fold(0, |acc, &c| field.add(field.mul(acc, x), c))
+ }
+ 
+ fn elliptic_count(field: &Field) -> usize {
+Diff in /dev/shm/ct23-g3-first-A/source/research/chained_genus3_quartic_20261123/main_a.rs:320:
+     println!("PROFILE\tfixed250-F5-bielliptic-quartics-A\tunsigned\tno timing or DLP claim");
+     assert!((0usize..5).all(|x| x * x % 5 != 2));
+     assert!((0usize..5).all(|x| (x * x * x + 2 * x + 1) % 5 != 0));
+-    let fields = [Field::new(1, vec![0]), Field::new(2, vec![2, 0]), Field::new(3, vec![4, 3, 0])];
++    let fields = [
++        Field::new(1, vec![0]),
++        Field::new(2, vec![2, 0]),
++        Field::new(3, vec![4, 3, 0]),
++    ];
+     for (index, field) in fields.iter().enumerate() {
+         field.check();
+         assert_eq!(elliptic_count(field), [7, 35, 112][index]);
+Diff in /dev/shm/ct23-g3-first-A/source/research/chained_genus3_quartic_20261123/main_a.rs:333:
+         let y = 1;
+         let z = 0;
+         let v = field.add(field.mul(kappa, field.square(z)), field.add(x, y));
+-        let d = field.mul(y, field.add(field.add(field.pow(x, 3), field.mul(2, field.mul(x, field.square(y)))), field.pow(y, 3)));
++        let d = field.mul(
++            y,
++            field.add(
++                field.add(field.pow(x, 3), field.mul(2, field.mul(x, field.square(y)))),
++                field.pow(y, 3),
++            ),
++        );
+         assert_eq!(field.sub(field.square(v), d), 0);
+-        let dx = field.sub(field.mul(field.mul(2, v), y), field.mul(y, field.add(field.mul(3, field.square(x)), field.mul(2, field.square(y)))));
+-        let dy = field.sub(field.mul(field.mul(2, v), field.add(x, field.mul(2, y))), field.add(field.add(field.pow(x, 3), field.mul(x, field.square(y))), field.mul(4, field.pow(y, 3))));
++        let dx = field.sub(
++            field.mul(field.mul(2, v), y),
++            field.mul(
++                y,
++                field.add(field.mul(3, field.square(x)), field.mul(2, field.square(y))),
++            ),
++        );
++        let dy = field.sub(
++            field.mul(field.mul(2, v), field.add(x, field.mul(2, y))),
++            field.add(
++                field.add(field.pow(x, 3), field.mul(x, field.square(y))),
++                field.mul(4, field.pow(y, 3)),
++            ),
++        );
+         let dz = field.mul(field.mul(4, kappa), field.mul(z, v));
+         assert_eq!([dx, dy, dz], [0, 0, 0]);
+     }

@@ -1,0 +1,54 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Degree lever: 2-torsion frame</title>
+<style>
+body{font-family:Helvetica,Arial,sans-serif;font-size:11.5px;color:#111;line-height:1.4;margin:0}
+h1{font-size:18px;margin:0 0 4px} h2{font-size:13.5px;margin:14px 0 4px;border-bottom:1px solid #ccc}
+table{border-collapse:collapse;margin:6px 0} td,th{border:1px solid #bbb;padding:2px 6px;text-align:center}
+.tag{color:#a00;font-weight:bold} .small{color:#555;font-size:10px} svg{max-width:100%;height:auto}
+</style></head><body>
+<h1>Does the 2-torsion symmetrised frame change how the fall degree grows with n?</h1>
+<div class="small">research/rootfind_degree_lever_20261123 · 2026-11-23 · <span class="tag">[pcc:unverified]</span> L0, shared 4-vCPU container · protocol frozen before data (PROTOCOL.md; self-attested)</div>
+<p style="border:1px solid #a00;padding:5px 8px;margin:8px 0"><b>The preregistered fidelity gate G0 failed: 62/72 rows matched</b> (raw/replay.out: 62 match, 10 mismatch). The protocol said a failure rejects the instrument and no arm data are reported.
+The gate was relaxed post hoc to d<sub>F</sub> plus the per-degree closed dimensions only (72/72), with the positive-control and m = 2 data already in hand. Why: the 10 rows differ only in the diagnostic
+plain count at the degree where 1 enters (this instrument stops absorbing rows when 1 enters; the library finishes its chunk), and d<sub>F</sub> is decided by the closed space. Every result below rests on that relaxation. <span class="tag">[pcc:unverified]</span></p>
+
+<h2>Question</h2>
+<p>Binary Koblitz curves, Weil descent of Semaev's S<sub>4</sub> (m = 3) and S<sub>3</sub> (m = 2) over a factor base of F<sub>2</sub>-dimension ℓ = n/3. Lever: write the system in the
+translation invariants of the rational 2-torsion point (u = 1/(x+1), w = u²+u, s = Σu; base {P : u(P) ∈ V}, 1 ∈ V). At m = 3 that gives degree-4 equations in 3ℓ−2 unknowns,
+against the production chain (degree 3, 3ℓ+n unknowns) and the direct S<sub>4</sub> (degree 6, 3ℓ unknowns). Metric: HKY last fall degree d<sub>F</sub>
+(least c with 1 in the degree-c mutant closure), and its slope in n.</p>
+
+<h2>Result (m = 3)</h2>
+<!--FIGURE-->
+<table>
+<tr><th>n (ℓ)</th><th>chain d<sub>F</sub> (vars)</th><th>direct S<sub>4</sub> d<sub>F</sub> (vars)</th><th>sym d<sub>F</sub> (vars)</th><th>log₂ cols at d<sub>F</sub>: chain / sym</th><th>gap</th></tr>
+<tr><td>9 (3)</td><td>4 (18)</td><td>7 (9)</td><td>4 (7)</td><td>11.98 / 6.63</td><td>5.35</td></tr>
+<tr><td>12 (4)</td><td>4 (24)</td><td>7 (12)</td><td>5 (10)</td><td>13.66 / 9.32</td><td>4.34</td></tr>
+<tr><td>15 (5)</td><td>4 (30)</td><td>7 (15)</td><td>5 (13)</td><td>14.96 / 11.22</td><td>3.74</td></tr>
+<tr><td>18 (6)</td><td>4 (36)</td><td>&gt;6 censored (18)</td><td>5 (16)</td><td>16.03 / 12.75</td><td>3.28</td></tr>
+<tr><td>21 (7)</td><td>not run</td><td>not run</td><td>6 (19), exploratory</td><td>— / 15.42</td><td>—</td></tr>
+</table>
+<p>Four draws per cell; every draw of every cell gave the same value. The sym arms agree exactly because the sym-frame closure dimensions at m = 3 do not depend on V, so the A/A arm cannot measure noise.
+Arms share n, ℓ, x<sub>R</sub> and V, not the factor-base point set ({P : u(P) ∈ V} vs {P : x(P) ∈ V}).</p>
+
+<h2>Verdicts against the frozen predictions</h2>
+<ul>
+<li><b>H1, lever lowers the d<sub>F</sub> slope: not supported.</b> Slopes per unit n: sym +0.10, chain 0.00, direct 0.00 (direct +0.20 if its censored n = 18 value is taken as 9). The sym − chain difference is nominally the wrong sign for the lever, but that rests on one integer step of the sym arm (4 → 5 between n = 9 and 12) over four grid points.
+The direct n = 18 value is censored by a 600 s wall-clock budget on a shared, loaded host.</li>
+<li><b>H2, sym d<sub>F</sub> stays at its input degree 4: falsified</b> from n = 12 (5); 6 at the exploratory n = 21.</li>
+<li><b>H3, smaller Macaulay matrix than the chain at the fall degree: holds</b> in every cell, but the gap shrinks 5.35 → 3.28 bits over n = 9…18 (cost-proxy slope 0.68 vs 0.45 bits per unit n).</li>
+<li><b>Positive control passes</b> (random quadratics, semi-regular 3/4/5 → measured 3/4/5). <b>A/A: formally met but uninformative</b> (sym closure dimensions are independent of V).
+<b>Fidelity gate G0: failed as preregistered (62/72)</b>; d<sub>F</sub> and the closed dimensions match on all 72 rows, the basis of the post-hoc relaxation.</li>
+</ul>
+
+<h2>Reading</h2>
+<p>Every frame falls at input degree + 1 (chain 4, direct 7, sym 5), far below the semi-regular degree of the same shapes: the known low fall degree of the binary Weil descent.
+The symmetrised system is the most nearly square (n equations, n − 2 unknowns), so its excess over its input degree appears first. The frame trades size for degree;
+it shrinks the matrix by a constant that decreases with n and does not change the growth. At m = 2 all frames read d<sub>F</sub> ∈ {2, 3}; the window base is one degree lower than a random base in the x frame at n = 18 and 21, and in the sym frame only at n = 21.</p>
+
+<h2>Limits</h2>
+<p class="small">Toy range (n ≤ 18 for the paired comparison). One step in four n values carries the slope, so the bootstrap intervals (zero draw variance) understate the uncertainty.
+d<sub>F</sub> only, no F4/F5 solving degree. Instrument is a std-only re-implementation (shared target/ could not take a library rebuild), gated by replay against the library's
+own pilot rows (G0 failed as written, see above). The committed source differs from the primary-run source (sha256 908db436… vs recorded 9ab5350d…; no copy or binary kept);
+the G1 selftest output was not saved. Protocol 2 h cap exceeded (exploratory runs on top). No relation-phase cost, no rho comparison; this is not an improvement claim and adds no leaderboard row.</p>
+</body></html>

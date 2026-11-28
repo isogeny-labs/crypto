@@ -1,0 +1,273 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h4275fa8068385ce3",
+  "statement": {
+    "name": "trace_quartic_discriminant",
+    "source": "research/twist_routes_1_3_20261021/EXPERIMENTS.md; E00 algebraic preconditions only",
+    "variables": [
+      "A",
+      "X",
+      "Y",
+      "m"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "m"
+            },
+            {
+              "op": "var",
+              "args": "m"
+            },
+            {
+              "op": "var",
+              "args": "m"
+            },
+            {
+              "op": "var",
+              "args": "m"
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": -6
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "X"
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "m"
+                    },
+                    {
+                      "op": "var",
+                      "args": "m"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": -8
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "Y"
+                },
+                {
+                  "op": "var",
+                  "args": "m"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": -3
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "X"
+                },
+                {
+                  "op": "var",
+                  "args": "X"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "const",
+              "args": -4
+            },
+            {
+              "op": "var",
+              "args": "A"
+            }
+          ]
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "m"
+                    },
+                    {
+                      "op": "var",
+                      "args": "m"
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "var",
+                    "args": "X"
+                  }
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "m"
+                    },
+                    {
+                      "op": "var",
+                      "args": "m"
+                    }
+                  ]
+                },
+                {
+                  "op": "neg",
+                  "args": {
+                    "op": "var",
+                    "args": "X"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "const",
+                "args": 4
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "X"
+                      },
+                      {
+                        "op": "var",
+                        "args": "X"
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "var",
+                        "args": "X"
+                      },
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "m"
+                          },
+                          {
+                            "op": "var",
+                            "args": "m"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "const",
+                        "args": 2
+                      },
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "m"
+                          },
+                          {
+                            "op": "var",
+                            "args": "Y"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "var",
+                    "args": "A"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261021,
+  "value_digest": "56d61d5a92efca815374b754a6924d2019bc78d1f66251905bca34ce5721c7cd",
+  "independence": "Authoring-session check with repository issuer plus separate exact integer coefficient expansion; independent-host replay not performed.",
+  "proof": null
+}

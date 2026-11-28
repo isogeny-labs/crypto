@@ -1,0 +1,548 @@
+{
+  "schema": "shared-s3-development-receipt/v1",
+  "assembled_at": "2026-11-22T21:57:14Z",
+  "capture_phase": "postcall assembly of preserved build, precall, and postcall records",
+  "command_representation": "normalized invocations reconstructed from the observed calls; not a capture of the complete shell environment",
+  "status": "scoped correctness checks completed; full-library and performance gates open",
+  "evidence_status": "unsigned producer data; PCC-unverified",
+  "scientific_verifier_run": false,
+  "signed_verdict": null,
+  "repository": "isogeny-labs/crypto",
+  "tracking_pr": "https://github.com/isogeny-labs/crypto/pull/4922",
+  "source_provenance": {
+    "base_commit": "50d9478efe3c6c7dd5f3eb35a7e891b4bf258439",
+    "head_during_development": "38f1467ebee77b6fc507d5539760ff7589880114",
+    "worktree_modified_during_builds": true,
+    "publication_commit": "bound by the subsequent PCC statement producer.commit",
+    "binding": "build manifests pin complete new modules, production dependency files and exact selected byte ranges; precall manifests pin separately copied read-only executable bytes",
+    "limitations": [
+      "qualifiers exclude unrelated root-library modules and their legacy tests",
+      "source includes assume no concurrent edit between build-script hashing and rustc reads",
+      "registry bodies, toolchain binaries and system libraries are not a complete hermetic build manifest",
+      "postcall environment and hash checks are identified as later reconstructions"
+    ]
+  },
+  "environment": {
+    "record": "development-environment.postcall.json",
+    "rustc": "1.100.0 (0ef1bc386 2026-11-09)",
+    "target": "x86_64-unknown-linux-gnu",
+    "test_environment": {
+      "RAYON_NUM_THREADS": "1"
+    },
+    "performance_isolation_admitted": false
+  },
+  "builds": [
+    {
+      "id": "unmodified-root-library",
+      "command": "CARGO_TARGET_DIR=/workspace/scratch/012d3e641737/build CARGO_BUILD_JOBS=2 cargo test --offline --release --lib --no-run",
+      "exit_code": 101,
+      "outcome": "compiler terminated by signal 9 (SIGKILL); cause not established",
+      "new_module_declarations_present": false,
+      "output": "baseline-build.postcall.log"
+    },
+    {
+      "id": "modified-root-library",
+      "command": "CARGO_TARGET_DIR=/workspace/scratch/012d3e641737/build CARGO_BUILD_JOBS=1 timeout 900 cargo check --offline --release --lib --tests",
+      "exit_code": 101,
+      "outcome": "compiler terminated by signal 9 (SIGKILL) while checking production library; cause not established",
+      "output": "whole-library-check.postcall.log"
+    },
+    {
+      "id": "component-opt0",
+      "command": "CARGO_BUILD_JOBS=1 cargo test --offline --release --manifest-path research/s3_shared_elimination_20261122/qualifier/Cargo.toml --target-dir /workspace/scratch/012d3e641737/build --lib --no-run --message-format=json",
+      "exit_code": 0,
+      "package_opt_level": 0,
+      "source_manifest": "component-source.build.json",
+      "outputs": [
+        "component-build.postcall.jsonl",
+        "component-build.postcall.log"
+      ]
+    },
+    {
+      "id": "component-opt3",
+      "command": "CARGO_BUILD_JOBS=1 cargo test --offline --release --config 'profile.release.package.shared-s3-component-qualifier.opt-level=3' --manifest-path research/s3_shared_elimination_20261122/qualifier/Cargo.toml --target-dir /workspace/scratch/012d3e641737/build --lib --no-run --message-format=json",
+      "exit_code": 0,
+      "package_opt_level": 3,
+      "source_manifest": "component-optimized-source.build.json",
+      "outputs": [
+        "component-optimized-build.postcall.jsonl",
+        "component-optimized-build.postcall.log"
+      ]
+    },
+    {
+      "id": "integration-build-attempt1",
+      "command": "CARGO_BUILD_JOBS=1 cargo test --offline --release --manifest-path research/s3_shared_elimination_20261122/integration_qualifier/Cargo.toml --target-dir /workspace/scratch/012d3e641737/build --bin shared-s3-matrix --no-run --message-format=json",
+      "exit_code": 101,
+      "outcome": "E0583 child-module lookup failures for the path-bound production F4 source",
+      "correction": "copy complete F4 parent and children byte for byte into the original module layout; no production F4 edit",
+      "source_manifest": "integration-attempt1-source.build.json",
+      "outputs": [
+        "integration-build-attempt1.raw.jsonl",
+        "integration-build-attempt1.postcall.jsonl",
+        "integration-build-attempt1.postcall.log"
+      ]
+    },
+    {
+      "id": "integration-build-attempt2",
+      "command": "CARGO_BUILD_JOBS=1 cargo test --offline --release --manifest-path research/s3_shared_elimination_20261122/integration_qualifier/Cargo.toml --target-dir /workspace/scratch/012d3e641737/build --bin shared-s3-matrix --no-run --message-format=json",
+      "exit_code": 0,
+      "source_manifest": "integration-source.build.json",
+      "outputs": [
+        "integration-build-attempt2.raw.jsonl.gz",
+        "integration-build-attempt2.postcall.jsonl",
+        "integration-build-attempt2.postcall.log"
+      ]
+    },
+    {
+      "id": "integration-build-attempt3",
+      "command": "CARGO_BUILD_JOBS=1 cargo test --offline --release --manifest-path research/s3_shared_elimination_20261122/integration_qualifier/Cargo.toml --target-dir /workspace/scratch/012d3e641737/build --bin shared-s3-matrix --no-run --message-format=json",
+      "exit_code": 0,
+      "source_manifest": "integration-attempt2-source.build.json",
+      "outputs": [
+        "integration-build-attempt3.raw.jsonl.gz",
+        "integration-build-attempt3.postcall.log"
+      ]
+    },
+    {
+      "id": "integration-cli",
+      "command": "CARGO_BUILD_JOBS=1 timeout 600 cargo build --offline --release --manifest-path research/s3_shared_elimination_20261122/integration_qualifier/Cargo.toml --target-dir /workspace/scratch/012d3e641737/build --bin shared-s3-matrix --message-format=json",
+      "exit_code": 0,
+      "source_manifest": "integration-cli-source.build.json",
+      "outputs": [
+        "integration-cli-build.raw.jsonl.gz",
+        "integration-cli-build.postcall.log"
+      ]
+    }
+  ],
+  "test_calls": [
+    {
+      "id": "component-opt0",
+      "command": "RAYON_NUM_THREADS=1 /workspace/scratch/012d3e641737/immutable-qualifiers/component-tests --test-threads=1",
+      "precall": "component-tests.precall.json",
+      "output": "component-tests.postcall.log",
+      "exit_code": 0,
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "id": "component-opt3",
+      "command": "RAYON_NUM_THREADS=1 /workspace/scratch/012d3e641737/immutable-qualifiers/component-optimized-tests --test-threads=1",
+      "precall": "component-optimized-tests.precall.json",
+      "output": "component-optimized-tests.postcall.log",
+      "exit_code": 0,
+      "passed": 16,
+      "failed": 0,
+      "same_test_cases_as": "component-opt0"
+    },
+    {
+      "id": "integration-execution-attempt1",
+      "command": "RAYON_NUM_THREADS=1 timeout 120 /workspace/scratch/012d3e641737/immutable-qualifiers/integration-tests --test-threads=1",
+      "precall": "integration-tests.precall.json",
+      "output": "integration-tests.postcall.log",
+      "exit_code": 101,
+      "passed": 4,
+      "failed": 1,
+      "failure": "existing_f4_keeps_original_equations_and_domains rejected incomplete exhaustive traversal",
+      "fixture_sha256": "869f744651050827f67754af1c923bfefa78b32233e45d64e6fb17de62f10c89",
+      "correction": "solve_visit callbacks return true to stop; exhaustive callback stops only above the unchanged cap, relation callback stops only after a checked witness",
+      "source_reconstruction": "failed-fixture.reconstructed.rs",
+      "source_reconstruction_scope": "postcall reversal of four fix hunks; exact hash matches the captured failed-source SHA256"
+    },
+    {
+      "id": "integration-execution-attempt2",
+      "command": "RAYON_NUM_THREADS=1 timeout 120 /workspace/scratch/012d3e641737/immutable-qualifiers/integration-tests-attempt2 --test-threads=1",
+      "precall": "integration-tests-attempt2.precall.json",
+      "output": "integration-tests-attempt2.postcall.log",
+      "exit_code": 0,
+      "passed": 5,
+      "failed": 0,
+      "fixture_sha256": "87d06d5c272cce98993dd5271e7c5cff6c143a25f1699f007ef39da613e9f74e",
+      "degree_domains_and_caps_unchanged": true,
+      "added_acceptance_check": "found relation requires stopped_early=true after verified witness"
+    }
+  ],
+  "cli_calls": [
+    {
+      "command": "RAYON_NUM_THREADS=1 /workspace/scratch/012d3e641737/immutable-qualifiers/shared-s3-matrix --plan",
+      "precall": "integration-cli.precall.json",
+      "output": "cli-plan.postcall.json",
+      "exit_code": 0
+    },
+    {
+      "command": "RAYON_NUM_THREADS=1 timeout 120 /workspace/scratch/012d3e641737/immutable-qualifiers/shared-s3-matrix --check",
+      "precall": "integration-cli.precall.json",
+      "output": "cli-check.postcall.json.gz",
+      "stderr": "cli-check.postcall.stderr",
+      "exit_code": 0
+    }
+  ],
+  "administrative_controls": {
+    "output": "registration-admin-control.postcall.log",
+    "scope": "disposable Git fixture for the native metadata writer; no scientific verifier or test",
+    "outcomes": 9,
+    "initial_defect_retained": "literal patch-transport plus tokens passed bash -n but failed jq at execution",
+    "reviewed_helper_sha256": "4fa99e147646bf34970445fb2be59c7bdbd6b84e11ec0aa90d85ba7ade0c532e"
+  },
+  "scope_limits": {
+    "three_backends": [
+      "Integer",
+      "Fma",
+      "Split16"
+    ],
+    "f4_and_toy_recovery_backend": "Integer",
+    "finite_affine_chart_only": true,
+    "exceptional_prefix_control_retained": true,
+    "p31_unknown_scalar_recovery": false,
+    "full_root_library_gate_passed": false,
+    "blas_or_gpu_implementation": false,
+    "benchmark_executed": false,
+    "complete_cost_comparison": false,
+    "cost_counter_coverage_complete": false,
+    "runtime_ratios_claimed": false,
+    "test_harness_elapsed_times": "raw diagnostic output only; not admitted comparative measurements"
+  },
+  "open_execution_dependencies": [
+    "full-root-library compile and test gate",
+    "production chained-S3 adapter with complete chart handling",
+    "full cold-cost instrument and supported immutable workload adapter",
+    "exact matched corpus, holdouts, strongest applicable IC incumbent and canonical protocol binding",
+    "readable canonical experiment-protocol skill/checker and successful freeze",
+    "authenticated supported runner, live budget and pool admission, checkpoint gate",
+    "required workflow artifact retrieval or another already authorized supported path"
+  ],
+  "observations": {
+    "status": "passed",
+    "identity_evaluations": 9826,
+    "preconditioning": {
+      "parameter_count": 17,
+      "assignments_per_parameter": 459,
+      "arms": [
+        "integer",
+        "fma",
+        "split16"
+      ]
+    },
+    "f4": {
+      "target_x": 7,
+      "solutions": 15,
+      "original_complete": true,
+      "fresh_complete": true,
+      "shared_complete": true,
+      "original_equations_retained": true
+    },
+    "signed_witnesses": {
+      "exceptional_prefix": {
+        "finite_auxiliary_representations_for_this_sign_choice": 0,
+        "group_relation_valid": true,
+        "handling": "reject this finite chart; full chart fallback belongs to production chain adapter",
+        "relation": "G + (-G) + G = G"
+      },
+      "scope": "p17 finite affine chart; no full point-decomposition exhaustiveness claim",
+      "signed_nonexceptional_witnesses_replayed": 180
+    },
+    "toy_recovery": {
+      "coordinate_modulus": 17,
+      "modulus": 19,
+      "public_target": {
+        "infinity": false,
+        "x": 7,
+        "y": 6
+      },
+      "recovered_scalar": 9,
+      "relation_count": 2,
+      "anchor_relations": 1,
+      "rank": 3,
+      "answer_checked_in_group": true
+    },
+    "p31": {
+      "checks": "point/order replay, original equations, consequences, fresh/shared rank and all arithmetic arms",
+      "cofactor": 1,
+      "complete_dlp_recovery_run": false,
+      "coordinate_witness": [
+        625037715,
+        1923055775,
+        1731809510,
+        265866980
+      ],
+      "cost_counter_coverage_complete": false,
+      "curve": {
+        "a": 847514846,
+        "b": 2087444724,
+        "p": 2147483647
+      },
+      "f4_full_field_search_run": false,
+      "generator": {
+        "infinity": false,
+        "x": 625037715,
+        "y": 2100627251
+      },
+      "point_sum_fixture": "G+2G+4G=7G",
+      "public_target": {
+        "infinity": false,
+        "x": 864723287,
+        "y": 1209733093
+      },
+      "registry_slug": null,
+      "source": "examples/prime31_batched_ic_same_1024q.rs",
+      "subgroup_order": 2147446831
+    },
+    "benchmark_executed": false,
+    "complete_cost_comparison": false,
+    "cost_counter_coverage_complete": false
+  },
+  "test_cases": {
+    "component": [
+      "cryptanalysis::exact_modular_matrix::tests::empty_dimensions_and_dependent_rows",
+      "cryptanalysis::exact_modular_matrix::tests::exhaustive_small_prime_products",
+      "cryptanalysis::exact_modular_matrix::tests::maximal_limb_sum_bound_and_count_aggregation",
+      "cryptanalysis::exact_modular_matrix::tests::naive_double_product_regression",
+      "cryptanalysis::exact_modular_matrix::tests::rectangular_products_subtraction_and_chunk_boundaries",
+      "cryptanalysis::exact_modular_matrix::tests::rejects_invalid_moduli_limits_dimensions_and_values_before_write",
+      "cryptanalysis::exact_modular_matrix::tests::wide_prime_boundaries_and_seeded_products",
+      "cryptanalysis::shared_macaulay::tests::canonical_keys_bind_every_family_input",
+      "cryptanalysis::shared_macaulay::tests::exact_projection_matches_independent_rowspaces_and_all_small_roots",
+      "cryptanalysis::shared_macaulay::tests::full_static_rank_and_empty_family_are_well_defined",
+      "cryptanalysis::shared_macaulay::tests::malformed_inputs_and_resource_caps_fail_before_solution_claims",
+      "cryptanalysis::shared_macaulay::tests::omitted_high_degree_generators_remain_in_originals",
+      "cryptanalysis::shared_macaulay::tests::parameter_coefficients_are_combined_before_elimination",
+      "cryptanalysis::shared_macaulay::tests::rank_drop_after_nontrivial_common_projection_matches_fresh",
+      "cryptanalysis::shared_macaulay::tests::rank_drop_and_vanishing_leading_support_use_frozen_envelope",
+      "cryptanalysis::shared_macaulay::tests::standalone_fresh_survives_shared_specific_setup_refusals"
+    ],
+    "integration": [
+      "tests::committed_p31_nonexceptional_witness_matches_all_backends",
+      "tests::complete_toy_solution_sets_match_all_backends",
+      "tests::existing_f4_keeps_original_equations_and_domains",
+      "tests::signed_witnesses_and_infinite_prefix_control",
+      "tests::toy_public_target_recovers_through_existing_relation_matrix"
+    ]
+  },
+  "postcall_binding_audit": {
+    "schema": "shared-s3-postcall-binding-audit/v1",
+    "capture_phase": "postcall reconstruction",
+    "source_hash_check_exit_code": 0,
+    "binary_hash_check_exit_code": 0,
+    "source_list": "source-bindings.postcall.sha256",
+    "source_output": "source-bindings.postcall.log",
+    "binary_list": "binary-bindings.postcall.sha256",
+    "binary_output": "binary-bindings.postcall.log",
+    "complete_hermetic_build_manifest": false
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "f12ad7d5b77fe96ce52260a3fdc92b54ca08d3bf3a10a5f07e47ad065462249a",
+      "bytes": 2342
+    },
+    {
+      "path": "baseline-build.postcall.log",
+      "sha256": "e7d620d32f36f6bc90ceb43e1fa7ed84bf64d7708d1079c7f7fe77bdecddc555",
+      "bytes": 26379
+    },
+    {
+      "path": "binary-bindings.postcall.log",
+      "sha256": "405740b00c19011846a0ac22810078fe2fdae1e72b773922c804e049695efbc7",
+      "bytes": 389
+    },
+    {
+      "path": "binary-bindings.postcall.sha256",
+      "sha256": "e11d09ee3d46988e1623ef80c48d838359b00ba423ab50be42e4cfbb96a453b5",
+      "bytes": 699
+    },
+    {
+      "path": "bindings-audit.postcall.json",
+      "sha256": "2e7f64288dbd58fe49c4db18f9b8a0f013451e70308c82110c896138c2e2f66b",
+      "bytes": 423
+    },
+    {
+      "path": "cli-check.postcall.json.gz",
+      "sha256": "ad03fdf29c7c16ad92c809e53c44dcb13113901613ff53bd3b46f0d5f5323eeb",
+      "bytes": 6779
+    },
+    {
+      "path": "cli-check.postcall.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "cli-plan.postcall.json",
+      "sha256": "39110d1dde29a6baca2817b1cd1f3a96c3a16813644186ad4e1e1bfd6573d032",
+      "bytes": 1431
+    },
+    {
+      "path": "component-build.postcall.jsonl",
+      "sha256": "cd98f40960c25c6dd7dd03aa02cc8f2e18e452ca70e30801f4c97159ee0fd8f6",
+      "bytes": 33366
+    },
+    {
+      "path": "component-build.postcall.log",
+      "sha256": "79d27d072e37b490b775b05fbf72480de5d8e9396f7d143bdc85ce582d32661d",
+      "bytes": 961
+    },
+    {
+      "path": "component-optimized-build.postcall.jsonl",
+      "sha256": "05d4ffe2f651f8007804c12c5aad4a6239087b849a6af1f72a04be2da3e381aa",
+      "bytes": 33343
+    },
+    {
+      "path": "component-optimized-build.postcall.log",
+      "sha256": "475cbd34580fad87b375720967b7a0eca6252a4108dff2b9c4baf7e18d8b9d01",
+      "bytes": 203
+    },
+    {
+      "path": "component-optimized-source.build.json",
+      "sha256": "074f834472f9a8b93aac115a569dfa8ef500912ea3b622ce44e40b405db1712a",
+      "bytes": 5286
+    },
+    {
+      "path": "component-optimized-tests.postcall.log",
+      "sha256": "0c54adafda2f302fe5cd82f808c5c62a30a0d04a08dba209346b94c8fdd6d3cb",
+      "bytes": 1774
+    },
+    {
+      "path": "component-optimized-tests.precall.json",
+      "sha256": "06533c251739051ea1e5f7f75c09d28a378784efea798f7b022a8a60e9e65439",
+      "bytes": 6201
+    },
+    {
+      "path": "component-source.build.json",
+      "sha256": "b2978f1f440ba2a19a575b647e5859c4a8581082d215c6cb597fb0cc5cad88e1",
+      "bytes": 5286
+    },
+    {
+      "path": "component-tests.postcall.log",
+      "sha256": "efb5e6b80e584d5cdf8be3521afda61837cb3ca54d26da01846393e76747f139",
+      "bytes": 1774
+    },
+    {
+      "path": "component-tests.precall.json",
+      "sha256": "2a3cadb2945bce6c7c2ee5d9bba56f118b938a8c7fc3b63ec5ccb14d0ef03a13",
+      "bytes": 6064
+    },
+    {
+      "path": "development-environment.postcall.json",
+      "sha256": "b5b78d78f422e53982c06a00b48855ce1f49808cf3184aa53b7104cc86708d91",
+      "bytes": 1892
+    },
+    {
+      "path": "failed-fixture.reconstructed.rs",
+      "sha256": "869f744651050827f67754af1c923bfefa78b32233e45d64e6fb17de62f10c89",
+      "bytes": 33077
+    },
+    {
+      "path": "integration-attempt1-source.build.json",
+      "sha256": "bf4b640ecd1d2cc2ebfa311f83ddc04252b2555a28c4ab16de7d846cf3ee542e",
+      "bytes": 31380
+    },
+    {
+      "path": "integration-attempt2-source.build.json",
+      "sha256": "5d41b2f09f17d4404ca0ad1f6b1a9214c913af160e3c600a2b8641455e44600b",
+      "bytes": 32994
+    },
+    {
+      "path": "integration-build-attempt1.postcall.jsonl",
+      "sha256": "73d3708091e3a986a66afbc70ec8f037c5e86a96b6c463763aba5a4e0bff164a",
+      "bytes": 5650
+    },
+    {
+      "path": "integration-build-attempt1.postcall.log",
+      "sha256": "6818ce98354c584cd31978c2a80e7471e6bf7c1fcb0d8f91e36bb8ff248815cd",
+      "bytes": 857
+    },
+    {
+      "path": "integration-build-attempt1.raw.jsonl",
+      "sha256": "f86a2d9a5f864367c75e1737a20a1d0f5f19f2e399b33998a816b569b8ddd0ae",
+      "bytes": 62218
+    },
+    {
+      "path": "integration-build-attempt2.postcall.jsonl",
+      "sha256": "6670c41f28e12a21db18220d58ecd188fbabeda1767373d8ee6dffbd4e9f15cb",
+      "bytes": 25289
+    },
+    {
+      "path": "integration-build-attempt2.postcall.log",
+      "sha256": "0265c2982f3b0541004d64c4bc6ca25552828345c28bba9d08fdf3b5b8e5b72a",
+      "bytes": 217
+    },
+    {
+      "path": "integration-build-attempt2.raw.jsonl.gz",
+      "sha256": "263eba45f44362096fa66cf8dbc57cbc1bd0e7fe4f2c8733466c0fa4bb9e77e4",
+      "bytes": 6335
+    },
+    {
+      "path": "integration-build-attempt3.postcall.log",
+      "sha256": "c15fb7a94872ad35e5f41327b041d1839f5931ffc34757de06a7fc4cc57182a7",
+      "bytes": 217
+    },
+    {
+      "path": "integration-build-attempt3.raw.jsonl.gz",
+      "sha256": "190e7e2a5bba08b50a45b274be1caef33a3ea52d94159f58abbc1d3052b14bb7",
+      "bytes": 6343
+    },
+    {
+      "path": "integration-cli-build.postcall.log",
+      "sha256": "ebe3975db340858b2eb5f712e000dd5107ddec12b9c7e8114d0d9da9a54d4361",
+      "bytes": 217
+    },
+    {
+      "path": "integration-cli-build.raw.jsonl.gz",
+      "sha256": "d6f35689f182c282b07d6ae2229902d1e0fcca38844b3725e3fb404b36966809",
+      "bytes": 6310
+    },
+    {
+      "path": "integration-cli-source.build.json",
+      "sha256": "5d41b2f09f17d4404ca0ad1f6b1a9214c913af160e3c600a2b8641455e44600b",
+      "bytes": 32994
+    },
+    {
+      "path": "integration-cli.precall.json",
+      "sha256": "e7ee0c7e202d5740dc0182a0979b97ac32b054505e66bb4a9e51b25f07071e87",
+      "bytes": 35127
+    },
+    {
+      "path": "integration-source.build.json",
+      "sha256": "1062ffb69adcd859301b833df80360c96c6bfeb6e977d7d3e126b949c4652940",
+      "bytes": 32994
+    },
+    {
+      "path": "integration-tests-attempt2.postcall.log",
+      "sha256": "b1b9b81c9d3b9d2f0ebc0be10ce8932771004dcb0e69e7f434a62f09f36b0822",
+      "bytes": 466
+    },
+    {
+      "path": "integration-tests-attempt2.precall.json",
+      "sha256": "354d1405cfcd39134ae4ba66dfffffff3500bc0dbd391b2eabca34b68425740a",
+      "bytes": 35115
+    },
+    {
+      "path": "integration-tests.postcall.log",
+      "sha256": "68b659e29fec5a605b0aac5caa07b38d94cbb1298e9f985aba5206f4179f86c5",
+      "bytes": 957
+    },
+    {
+      "path": "integration-tests.precall.json",
+      "sha256": "9c4efbe7c3933539cc3e8135553186eb1c08dd56363b0b2e92876c362b359728",
+      "bytes": 35067
+    },
+    {
+      "path": "registration-admin-control.postcall.log",
+      "sha256": "de6a97f735dd929c21ab3b292e85504ff7a190a0e8b608dd6358469c2ab7271e",
+      "bytes": 8484
+    },
+    {
+      "path": "source-bindings.postcall.log",
+      "sha256": "d127bed88370ea29f45cfead1577c5bbe5e777ceecf1bebc4c70f69c35f1c2fb",
+      "bytes": 2903
+    },
+    {
+      "path": "source-bindings.postcall.sha256",
+      "sha256": "fd21da9b391ac17a3628df2a65ee0b9fbb45fa779c039553b0142b630037da31",
+      "bytes": 6437
+    },
+    {
+      "path": "whole-library-check.postcall.log",
+      "sha256": "31ce7f5e43f824076a152c7c1b2ecdc7b0367fceab5a7e41a8812a2859f67480",
+      "bytes": 33383
+    }
+  ]
+}

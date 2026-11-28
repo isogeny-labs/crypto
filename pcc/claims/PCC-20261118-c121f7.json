@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T20:58:47Z",
+ "id": "PCC-20261118-c121f7",
+ "kind": "statement",
+ "producer": {
+  "commit": "b367b5f373ddabb55e4163ea410ebe68b7e0b2f6",
+  "model": "codex",
+  "session": "conductor-endpoint-join-20261118"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/endpoint-join-20261118/summary.json",
+    "sha256": "55c0eb1c1e83bbee506a3fadc628548e3879f5ae01a6295fbe4201ee65ec6695"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/endpoint-join-20261118/pre-call-b.sha256",
+    "sha256": "a8c2c97f95fe5ab7e115ba898b57ced747c166e2fc4b2a60304e7a7f17f4df55"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/endpoint-join-20261118/post-call-b.stdout",
+    "sha256": "34dafe3a06cff12ee5f09c3ef07b93ba762b31afbecd16b4bc4a59ac1f14c3ea"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/endpoint-join-20261118/qualification-b.stdout",
+    "sha256": "0361ef30bc4fc53722cd519e511879917bff7d90ff9512700103f0fa6d3e7805"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/endpoint-join-20261118/results/qualification-b/tests.stdout",
+    "sha256": "b580ea88a5e2dd729fcda235ed253a43c6146bb60baab65737f6a1fde3d2f184"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "src/bin/ecbench/endpoint_pairs.rs",
+    "sha256": "dfa4d5724ccd42731557f6726a86092910e602dcb62285e43b86e4157f31aa6b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "tests/endpoint_pairs.rs",
+    "sha256": "ff53643cfb26458074527ef1afc9de960496ab898579c295bd4bca7d38205b60"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/endpoint-join-20261118/qualify.sh",
+    "sha256": "ad39bfc049162e08ad134872aef40003d9fe876a853640ea33c47a7e672839f3"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "endpoint-join-codec-development",
+ "statement": "The original ecbench CLI endpoint join passes eight focused native codec controls and four unexecuted paired-plan selections across the fixed 202/96-bit fields, 32 targets per selection; historical plan bytes match. No ECDLP or timing session ran and no conductor crossing or statistical comparison is admitted."
+}

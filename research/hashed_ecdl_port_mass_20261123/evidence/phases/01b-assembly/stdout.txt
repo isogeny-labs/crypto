@@ -1,0 +1,7 @@
+Multiset.sum_count_eq_card.{u_1} {ι : Type u_1} [DecidableEq ι] {s : Finset ι} {m : Multiset ι} (hms : ∀ a ∈ m, a ∈ s) :
+  ∑ a ∈ s, Multiset.count a m = m.card
+Multiset.card_map.{v, u_1} {α : Type u_1} {β : Type v} (f : α → β) (s : Multiset α) : (Multiset.map f s).card = s.card
+Multiset.count_add.{u_1} {α : Type u_1} [DecidableEq α] (a : α) (s t : Multiset α) :
+  Multiset.count a (s + t) = Multiset.count a s + Multiset.count a t
+Finset.sum_mul.{u_1, u_4} {ι : Type u_1} {R : Type u_4} [NonUnitalNonAssocSemiring R] (s : Finset ι) (f : ι → R)
+  (a : R) : (∑ i ∈ s, f i) * a = ∑ i ∈ s, f i * a

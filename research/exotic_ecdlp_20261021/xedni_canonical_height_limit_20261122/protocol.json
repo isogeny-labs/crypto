@@ -1,0 +1,10 @@
+{
+  "schema": "xedni-canonical-height-limit-formal-v1",
+  "frozen_at_utc_date": "2026-11-22",
+  "central_statement": "For an additive commutative group G and h:G->R with |h(2P)-4h(P)|<=C uniformly, C>=0, the normalized sequence h(2^n P)/4^n converges for every P, its limit differs from h(P) by at most C/3, and the limit obeys H(2P)=4H(P).",
+  "elliptic_bridge": "Apply Mathlib's approx_parallelogram_law for elliptic naiveHeight to obtain an unspecified uniform doubling-defect constant, then instantiate the limit statement on actual elliptic points.",
+  "source_mathlib": "Mathlib/NumberTheory/Height/EllipticCurve.lean, approx_parallelogram_law",
+  "proof_gate": "Pin Lean and Mathlib manifest, build the actual theorem module, print axioms for every declaration, no sorry/admit/custom research axiom/native evaluation.",
+  "boundary": "This constructs the abstract canonical-height limit and an existential comparison constant; the explicit curve-specific Silverman bound B<14, Mordell-Weil generator and reduction map are separate obligations.",
+  "resource_cap": "Local Lean compilation and read-only Mathlib inspection, no Sage or cloud spend."
+}

@@ -1,0 +1,8 @@
+{"workload": "jv_cover --exp ccov --sizes 53 --seeds 1 --residuals 100 --constructed 4 --oracle-base 0, RAYON_NUM_THREADS=1, callgrind 3.22",
+ "f4_only_toggle": "--toggle-collect=*f4_with_arithmetic*",
+ "arms": [
+  {"arm": "base", "what": "main ca6844d480 + jemalloc default", "f4_ir": 1316805419, "program_ir": 3505806763},
+  {"arm": "new", "what": "+ packed interreduction, lazy columns, reserved hashbrown table", "f4_ir": 1183855519, "program_ir": 3376905416},
+  {"arm": "new2", "what": "+ MonoTable sized from seed terms (rejected: table clearing)", "f4_ir": 1245483671, "program_ir": null},
+  {"arm": "new3", "what": "+ MonoTable starting at 256 slots (shipped)", "f4_ir": 1137381291, "program_ir": 3330705620}
+ ]}

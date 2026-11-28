@@ -1,0 +1,14 @@
+{
+  "record_type":"post_call",
+  "pre_call":"WS68_NATURAL_PARTIAL_VERIFY.pre-call.json",
+  "conductor_task":"T-74",
+  "compile_exit_code":0,
+  "run_exit_code":0,
+  "source_sha256_after":"4d613b1c4d557e42d09aa5ad1328b8e09ffd2140e83bebbdd1a8d6e729892616",
+  "qualifier_sha256_after":"4d613b1c4d557e42d09aa5ad1328b8e09ffd2140e83bebbdd1a8d6e729892616",
+  "binary":{"path":"WS68_NATURAL_PARTIAL_VERIFY.bin","sha256":"f5c437c180ad253f050a45db2d348125d8f86289b778b71888be5ee0b4f58061","custody":"local_only_not_staged"},
+  "stdout":{"path":"WS68_NATURAL_PARTIAL_VERIFY.stdout","bytes":340,"sha256":"7a24092f2cc4cc74647052c3047e1483b7d4c84270d97ba47ae1a9292ed7895e"},
+  "stderr":{"path":"WS68_NATURAL_PARTIAL_VERIFY.stderr","bytes":0,"sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+  "observed":{"source_lines":169,"full_only_identities":17,"partial_arm_identities":152,"full_only_full_variable_rank":9,"partial_arm_full_variable_rank":25,"both_targets_pinned":true,"both_recovered_scalar":701},
+  "limits":"Independent authoring and no producer imports; it reads accepted source records from frozen stdout and checks source identities and full source-matrix rank. It does not independently replay the producer's 136 completed-row witness combinations or measure the collector's costs. Local [pcc:unverified]."
+}

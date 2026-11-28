@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T16:26:04Z",
+ "id": "PCC-20261123-59776e",
+ "kind": "statement",
+ "producer": {
+  "commit": "50a9820906698926868f7c97a6f7ed23755ee29d",
+  "model": "GPT-6 Astra Pro",
+  "session": "vitse-prime31-compatibility-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/root-gate-02/gate-result.json",
+    "sha256": "b8caf969b3c90d94396df9979ef8f8aca3bf111ccc17dcc2484f175fa5d5b59c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/root-gate-02/missing-file-evidence.json",
+    "sha256": "38654b71598b258a35b4ff802ba3d0eab76a4744a268803ab06f1da0220f0d96"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/root-gate-03/gate-result.json",
+    "sha256": "d25abd61330b1d6417cc4df463b21102de71d86a4c230d0f09f58379c970ab75"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/root-gate-03/failure-analysis.json",
+    "sha256": "bb7d8d0ba921bf3cb5393b8f574cb77e190818564e9d01520feb056bba36416e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/root-gate-03/cargo-test-release-lib.log",
+    "sha256": "a3057cb8872a657a557776e028bafb8e3d9b6ca73cfc7783c8d452aba92cf1b8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/main-integration.json",
+    "sha256": "b558e439866bff1ba8e9deb30f8c1bbb763d35c5bb9bf7bb187347d10a292f95"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact baseline 7d61e3b root-library attempts 02 and 03, with checked-main blob comparison; no production source changes or new scientific verification",
+ "statement": "The second full root-library attempt stopped at a missing tracked file in the sparse checkout. After completing transitive module and fixture hydration, the separately frozen third attempt of cargo test --release --lib --locked reached the root library and exited 101 after 4.785 seconds, with four delimiter errors in the unchanged baseline src/prime_ecc/efd/tests.rs; no tests executed. All 2737 materialized tracked-file hashes, the manifest, lock, defaults and toolchain remained unchanged. This broken file has the same Git blob on checked main 26761272d78ff7108e4829808f2d2fa8ecc296f3. Selected PKM, identity-certificate and SHA source blobs also match that main. These are unsigned same-team build and source-identity observations, not a full-suite pass."
+}

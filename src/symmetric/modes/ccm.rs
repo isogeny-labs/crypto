@@ -84,7 +84,7 @@ fn format_aad(aad: &[u8]) -> Vec<u8> {
     out
 }
 
-fn cbc_mac<C: BlockCipher<16>>(cipher: &C, blocks: &[u8]) -> [u8; 16] {
+fn cbc_mac<C: BlockCipher<16> + ?Sized>(cipher: &C, blocks: &[u8]) -> [u8; 16] {
     debug_assert_eq!(blocks.len() % 16, 0);
     let mut x = [0u8; 16];
     for chunk in blocks.chunks(16) {
@@ -108,7 +108,7 @@ fn ctr_block(counter: u32, nonce: &[u8; NONCE_LEN]) -> [u8; 16] {
 ///
 /// `nonce` must be 11 bytes (= 15 − L with our chosen L = 4).
 /// `aad` may be empty.  `plaintext` may be empty.
-pub fn ccm_encrypt<C: BlockCipher<16>>(
+pub fn ccm_encrypt<C: BlockCipher<16> + ?Sized>(
     cipher: &C,
     nonce: &[u8; NONCE_LEN],
     aad: &[u8],
@@ -120,7 +120,7 @@ pub fn ccm_encrypt<C: BlockCipher<16>>(
 }
 
 /// Checked CCM encrypt that rejects plaintext lengths not encodable with L=4.
-pub fn ccm_encrypt_checked<C: BlockCipher<16>>(
+pub fn ccm_encrypt_checked<C: BlockCipher<16> + ?Sized>(
     cipher: &C,
     nonce: &[u8; NONCE_LEN],
     aad: &[u8],
@@ -165,7 +165,7 @@ pub fn ccm_encrypt_checked<C: BlockCipher<16>>(
 
 /// **CCM decrypt + verify**.  Returns `None` on tag mismatch (the
 /// standard CCM failure response).
-pub fn ccm_decrypt<C: BlockCipher<16>>(
+pub fn ccm_decrypt<C: BlockCipher<16> + ?Sized>(
     cipher: &C,
     nonce: &[u8; NONCE_LEN],
     aad: &[u8],

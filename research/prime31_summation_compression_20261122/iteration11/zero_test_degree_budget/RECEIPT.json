@@ -1,0 +1,58 @@
+{
+  "schema": "prime31-zero-test-degree-budget-v1",
+  "date": "2026-11-24",
+  "parent_head": "81aa59b6db0bcd97294be99a2dadd64de990fb7b",
+  "source_blobs": {
+    "historical_gate": "5bbbbb76276b11d806194147a698c4719dd5f7c0",
+    "historical_receipt": "66b4f9bf0fe7d3eb645cf022a1b41d3a1b9bff75",
+    "state": "8e12391480cd5e81e1030c819ce77afc48fcc14d",
+    "active": "83e5fb6f3c2466679f37a3a1ccfb29c64db2e91e",
+    "journal": "71e03c8b3f2b9ba7ca16d967f3dbbcb4c2d76e49"
+  },
+  "p": 2147483647,
+  "r": 2147446831,
+  "B": 31,
+  "D": 961,
+  "N": 2147446830,
+  "H": 618884,
+  "conditional_historical_support": true,
+  "formula": "L=ceil(H/delta); lower=L-delta*L*(L-1)/(2*(N-H))",
+  "rows": [
+    {
+      "delta": 4,
+      "L": 154721,
+      "meanMissLower": 154698.69878749287,
+      "meanAllLower": 154698.70521459662
+    },
+    {
+      "delta": 8,
+      "L": 77361,
+      "meanMissLower": 77349.84932167732,
+      "meanAllLower": 77349.85253524997
+    },
+    {
+      "delta": 32,
+      "L": 19341,
+      "meanMissLower": 19338.212222315648,
+      "meanAllLower": 19338.213025739966
+    },
+    {
+      "delta": 128,
+      "L": 4836,
+      "meanMissLower": 4835.302947475233,
+      "meanAllLower": 4835.303148362467
+    },
+    {
+      "delta": 1024,
+      "L": 605,
+      "meanMissLower": 604.9128504730206,
+      "meanAllLower": 604.9128755891013
+    }
+  ],
+  "random_experiments": 0,
+  "native_tests": 0,
+  "paid_compute": 0,
+  "native_workers": 0,
+  "pcc": "unverified",
+  "impact_score": 3
+}

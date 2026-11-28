@@ -17,8 +17,10 @@
 //! double-and-add from `O`, which only copies its operand.  A batched
 //! call over `k` pairs counts `k`, however many inversions it shares.  A
 //! scalar multiplication counts the doublings and additions its ladder
-//! actually performs (`bits − 1` and `popcount − 1` for a scalar of
-//! `bits` bits with no degenerate step).  Completing a lazy sum's
+//! actually performs. The affine ladders count `bits − 1` doublings and
+//! `popcount − 1` additions without a degenerate step. The binary projective
+//! ladder doubles once for setup, then adds and doubles for each lower bit.
+//! Completing a lazy sum's
 //! ordinate (`FastCurve::finish_lazy`) is not a second addition.
 //!
 //! **Native work beside it.**  The same module counts work the unit does
@@ -221,7 +223,7 @@ mod tests {
     }
 
     #[test]
-    fn a_ladder_counts_bits_minus_one_doublings_and_popcount_minus_one_additions() {
+    fn ladders_count_their_executed_additions_and_doublings() {
         let (kc, fc, g) = setup();
         for k in [1u64, 2, 3, 0b1011_0110_1, 1_234_567] {
             let bits = 64 - u64::from(k.leading_zeros());
@@ -240,8 +242,8 @@ mod tests {
             });
             assert_eq!(
                 (c.doubles, c.adds),
-                (bits - 1, ones - 1),
-                "general ladder, k = {k}"
+                (bits, bits - 1),
+                "binary projective ladder, k = {k}"
             );
             let arith = kc.fast_binary_curve().unwrap();
             let p = Some((g.x, g.y));

@@ -1,0 +1,82 @@
+#!/usr/bin/env python3
+# Thin process/file/hash orchestration only. All research arithmetic is native.
+from pathlib import Path
+import subprocess, os, sys, json, time, hashlib, gzip, shlex
+
+repo=Path.cwd();base=repo/'research/quadratic_twist_field_cost_20261116/projective'
+out=Path(os.environ['PROJECTIVE_OUTPUT']).resolve();assert not out.exists() and not out.is_relative_to(repo)
+assert subprocess.check_output(['git','branch','--show-current'],text=True).strip()=='codex/twist-field-cost'
+assert subprocess.check_output(['git','remote','get-url','origin'],text=True).strip()=='https://github.com/isogeny-labs/crypto.git'
+assert not subprocess.check_output(['git','status','--porcelain'],text=True).strip()
+head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+ref=json.loads(Path(os.environ['PROJECTIVE_REF']).read_text())
+assert ref['head']==head and ref['state']=='open' and ref['auto_merge'] is None and ref['source']=='connected-github-read'
+assert 0<=time.time()-ref['observed_epoch']<=60
+pins=json.loads((base/'PINS.json').read_text())
+for name,h in pins['files'].items():assert hashlib.sha256((base/name).read_bytes()).hexdigest()==h,name
+for name,h in pins.get('external_files',{}).items():assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==h,name
+protocol=json.loads((base/'protocol.json').read_text());assert protocol['freeze']['status']=='frozen'
+subprocess.run([sys.executable,'/workspace/canonical-protocol-20261115/tools/experiment_protocol.py','validate',str(base/'protocol.json')],check=True)
+out.mkdir(mode=0o700);(out/'source-ref.json').write_text(json.dumps(ref,indent=2)+'\n')
+for p in base.iterdir():
+    if p.is_file():(out/p.name).write_bytes(p.read_bytes())
+deadline=1794806700 # 05:25UTC: fixed before data, each subprocess <=600 seconds.
+stages=[]
+def run(name,args,expected=0,env=None):
+    remaining=int(deadline-time.time());assert remaining>0,'iteration deadline'
+    (out/(name+'.command')).write_text(shlex.join(map(str,args))+'\n')
+    with (out/(name+'.log')).open('wb') as log:
+        completed=subprocess.run(['timeout','--signal=TERM','--kill-after=10',str(min(600,remaining)),*map(str,args)],stdout=log,stderr=subprocess.STDOUT,env=env)
+    (out/(name+'.exit')).write_text(str(completed.returncode)+'\n')
+    stages.append({'name':name,'exit':completed.returncode,'expected_exit':expected})
+    (out/'stages.json').write_text(json.dumps(stages,indent=2)+'\n')
+    assert completed.returncode==expected,(name,completed.returncode)
+run('cpp-build',['g++','-std=c++20','-O2','-Wall','-Wextra','-I/workspace/twist-native-tooling/include',base/'projective.cpp','-lcrypto','-lz','-o',out/'producer'])
+env=os.environ.copy();env.update(CARGO_HOME='/workspace/twist-native-tooling/cargo',RUSTUP_HOME='/workspace/twist-native-tooling/rustup',CARGO_BUILD_JOBS='2',CARGO_TARGET_DIR=str(out/'target'),PATH='/workspace/twist-native-tooling/cargo/bin:'+env['PATH'])
+run('rust-build',['cargo','build','--release','--locked','--offline','--manifest-path',base/'Cargo.toml'],env=env)
+audit=out/'target/release/twist_projective_audit'
+(out/'binaries.sha256').write_text(''.join(hashlib.sha256(p.read_bytes()).hexdigest()+'  '+str(p)+'\n' for p in [out/'producer',audit]))
+for tag in ['C','A','B']:run('produce-'+tag,[out/'producer','produce',out/tag,tag])
+run('independent-audit',[audit,out/'C',out/'A',out/'B',out/'audit.json'])
+original=json.loads(gzip.decompress((out/'C/index.json.gz').read_bytes()))
+controls=['map','missing-policy','target','scalar','log','cost','degree','witness','root','source','columns','missing-failure']
+records=[]
+for mode in controls:
+    dest=out/('false-'+mode);dest.mkdir()
+    for p in (out/'C').iterdir():
+        if p.name!='index.json.gz':os.link(p,dest/p.name)
+    j=json.loads(json.dumps(original));changed=False
+    if mode=='map':j['maps'][0][3]=2;changed=True
+    elif mode=='missing-policy':j['cases'].pop(0);changed=True
+    elif mode=='degree':j['cases'][0]['summary']['matrix_degree']=0;changed=True
+    elif mode in ['target','scalar','log','cost']:
+        w=j['cases'][0]['summary']['works'][0]
+        if mode=='target':w['target']=0
+        elif mode=='scalar':w['result']['scalar']=7
+        elif mode=='log':w['result']['logs'][0]=7
+        else:w['result']['counts'][0]=0
+        changed=True
+    else:
+        for entry in j['cases']:
+            name=entry['path']+'.gz';raw=gzip.decompress((out/'C'/name).read_bytes()).decode();lines=raw.splitlines()
+            for i,line in enumerate(lines):
+                v=line.split();selected=(mode in ['witness','root'] and v[:1]==['BR'] and v[3:4]==['C']) or (mode=='missing-failure' and v[:1]==['BR'] and v[3:4]==['U']) or (mode=='source' and i==0) or (mode=='columns' and i==1)
+                if not selected:continue
+                if mode=='missing-failure':lines.pop(i)
+                else:
+                    field={'witness':8,'root':7,'source':4,'columns':1}[mode];value='1,2' if mode in ['witness','root'] else '59' if mode=='source' else '1'
+                    if v[field]==value:value='1,3' if ',' in value else '2'
+                    v[field]=value;lines[i]=' '.join(v)
+                altered=('\n'.join(lines)+'\n').encode();assert altered!=raw.encode()
+                (dest/name).unlink();(dest/name).write_bytes(gzip.compress(altered,mtime=0))
+                entry['sha256']=hashlib.sha256(altered).hexdigest();changed=True;break
+            if changed:break
+    if not changed:
+        assert mode=='missing-failure'
+        run('reject-'+mode,[sys.executable,'-c','print("EXPLICIT NULL: no capped failure in full original native traces; no rejection claimed")'],expected=0)
+        records.append({'mode':mode,'status':'explicit-null-no-capped-failure'});continue
+    assert j!=original
+    (dest/'index.json.gz').write_bytes(gzip.compress(json.dumps(j,separators=(',',':')).encode()+b'\n',mtime=0))
+    receipt=out/('false-'+mode+'-receipt.json');run('reject-'+mode,[audit,dest,out/'A',out/'B',receipt],expected=101);assert not receipt.exists()
+    records.append({'mode':mode,'status':'changed-rehashed-rejected-no-receipt'})
+(out/'controls.json').write_text(json.dumps(records,indent=2)+'\n')

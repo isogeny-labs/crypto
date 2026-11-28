@@ -1,0 +1,7 @@
+# Data-suffixed run outputs (npz, jsonl) exceed the 64 KB data-file policy and the artifact store refuses
+# uploads from this runtime. They stay on the run host; each lead commits SHA256 sums and lossless .json
+# mirrors (under 1 MB each) after its run.
+**/data/**/*.npz
+**/data/**/*.jsonl
+**/data/*.npz
+**/out/*.npz

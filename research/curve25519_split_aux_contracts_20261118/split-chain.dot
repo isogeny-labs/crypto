@@ -1,0 +1,65 @@
+digraph split_aux_contract {
+  graph [
+    rankdir=LR,
+    bgcolor="white",
+    pad="0.25",
+    nodesep="0.38",
+    ranksep="0.60",
+    labelloc="t",
+    label="Curve25519 split-auxiliary contract · p = 2^255 − 19 · RFC prime subgroup",
+    fontname="DejaVu Sans",
+    fontsize=18
+  ];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, color="#334155", fillcolor="#f8fafc", margin="0.12,0.08"];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#475569", arrowsize=0.7];
+
+  subgraph cluster_exact {
+    label="Exact signed witness";
+    color="#86efac";
+    style="rounded";
+    p [label="P = [2]G", fillcolor="#dcfce7"];
+    q [label="Q = [3]G", fillcolor="#dcfce7"];
+    s [label="S = [5]G\nP + Q = S", fillcolor="#bbf7d0"];
+    t [label="T = [7]G", fillcolor="#dcfce7"];
+    r [label="R = [12]G\nS + T = R", fillcolor="#bbf7d0"];
+    p -> s [label="+"];
+    q -> s [label="+"];
+    s -> r [label="+"];
+    t -> r [label="+"];
+  }
+
+  subgraph cluster_xonly {
+    label="x-only split S3 chain";
+    color="#93c5fd";
+    style="rounded";
+    left [label="S3(x(P), x(Q), x(S)) = 0", fillcolor="#dbeafe"];
+    aux [label="auxiliary x(S)\n= x(−S)", fillcolor="#bfdbfe"];
+    right [label="S3(x(S), x(T), x(R)) = 0", fillcolor="#dbeafe"];
+    lost [shape=diamond, label="chosen sign\nnot retained", fillcolor="#fee2e2", color="#ef4444"];
+    left -> aux;
+    aux -> right;
+    aux -> lost [style=dashed, color="#ef4444", label="same x"];
+  }
+
+  subgraph cluster_identity {
+    label="Missing affine branch";
+    color="#fbbf24";
+    style="rounded";
+    inv [label="[2]G + [−2]G", fillcolor="#fef3c7"];
+    infinity [label="S = O\nno affine x-coordinate", fillcolor="#fde68a"];
+    exact [label="O + [7]G = [7]G", fillcolor="#fef3c7"];
+    inv -> infinity;
+    infinity -> exact;
+  }
+
+  target [
+    label="Next target\nprojective (X:Z) auxiliary + lift/sign witness\nthen matched miniature F4 comparison",
+    fillcolor="#ede9fe",
+    color="#7c3aed",
+    penwidth=1.5
+  ];
+
+  r -> left [style=dotted, label="forget y/sign"];
+  lost -> target [color="#7c3aed"];
+  infinity -> target [color="#7c3aed"];
+}

@@ -1,0 +1,80 @@
+{
+  "schema": "miller-affine-ideal-preflight/v1",
+  "build_snapshots": 8,
+  "failed_build_states": [
+    "miller-ideal-build01.exit",
+    "miller-ideal-build02.exit",
+    "miller-ideal-build03.exit",
+    "miller-ideal-build05.exit",
+    "miller-ideal-build06.exit"
+  ],
+  "successful_builds": [
+    "04",
+    "07",
+    "08"
+  ],
+  "final_build": "08, full log no warnings/errors",
+  "attempt03": "Relative edit and snapshot paths were wrong; unchanged source rebuilt, then original state captured before editing again. This is an execution-path error, not a mathematical counterexample.",
+  "gate": {
+    "archive": "research/miller_principal_ideal_audit_20261115/evidence/gate.tar.gz",
+    "files": 5,
+    "unique_objects": 5,
+    "losslessly_deduplicated": false,
+    "roundtrip_equal": true,
+    "inventory": [
+      {
+        "member": "research_miller_principal_ideal_audit_20261115_lean/audit.log",
+        "bytes": 2739,
+        "sha256": "01d7d4716042a85bd1b55e49e419f788832d79a6d4666ec14361b6c8754c7b86"
+      },
+      {
+        "member": "research_miller_principal_ideal_audit_20261115_lean/build.log",
+        "bytes": 1352,
+        "sha256": "9cd385508ef6d6fb2bf9d6f54ef868ca9d6ff04186b709ba21cdcfd3e3c0ca7c"
+      },
+      {
+        "member": "research_miller_principal_ideal_audit_20261115_lean/cache.log",
+        "bytes": 138,
+        "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+      },
+      {
+        "member": "research_miller_principal_ideal_audit_20261115_lean/source-build.log",
+        "bytes": 1352,
+        "sha256": "83585dc78dd44e93737641cd1b248d7da64e3375cadd0dbe4c4eb0a3b4bea8af"
+      },
+      {
+        "member": "research_miller_principal_ideal_audit_20261115_lean/status",
+        "bytes": 5,
+        "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+      }
+    ],
+    "declarations": 25,
+    "failing": 0,
+    "trusted_native": 0,
+    "inherited_audit_tool_deprecation_warnings": 1
+  },
+  "native": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "archive": {
+    "archive": "research/miller_principal_ideal_audit_20261115/evidence/attempts.tar.xz",
+    "files": 100,
+    "unique_objects": 44,
+    "losslessly_deduplicated": true,
+    "roundtrip_equal": true,
+    "inventory_member": "manifest.json"
+  },
+  "actual_affine_ideal_function_evaluation_bridge": true,
+  "projective_infinity_or_canonical_divisor_bridge": false,
+  "canonical_pairing_identification": false,
+  "full14_completion": false,
+  "independent_implementation_or_physicalhost_validation": false,
+  "canonical_corpus_promoted": false,
+  "novelty_claim": false,
+  "paid_compute_and_agent_upload": 0
+}

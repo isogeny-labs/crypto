@@ -1,0 +1,24 @@
+name: Prime31 run61 mixed Jacobian public-shift gate
+on:
+  push:
+    branches:
+      - research/prime31-f4-admission-run51-20261121
+  pull_request:
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_run61_mixed_shift.rs"
+      - ".github/workflows/prime31-run61-mixed-shift.yml"
+  workflow_dispatch:
+
+jobs:
+  mixed-shift:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/prime31_ic_20261115/native
+      - name: Run checked original Rust vs fixed-generator Jacobian shift ablation
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo run --release --example prime31_run61_mixed_shift

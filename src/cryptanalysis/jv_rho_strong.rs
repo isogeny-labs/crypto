@@ -182,7 +182,7 @@ struct Pt {
     y: X6,
 }
 
-struct Arith {
+struct Arith<const COUNT: bool = false> {
     r: Red,
     p: u64,
     w: u64,
@@ -195,20 +195,38 @@ struct Arith {
     flips: u64,
 }
 
-impl Arith {
+impl<const COUNT: bool> Arith<COUNT> {
+    // Deferred reductions do not change the prime-field algebra. The
+    // instrumented instantiation prices these operations in bitop/v1;
+    // production rho uses COUNT=false, eliminating the hooks entirely.
+    #[inline(always)]
+    fn product(&self, a: u64, b: u64) -> u64 {
+        if COUNT {
+            jv_bitops::hook_mul(self.p);
+        }
+        a * b
+    }
+    #[inline(always)]
+    fn sum(&self, a: u64, b: u64) -> u64 {
+        if COUNT {
+            jv_bitops::hook_add(self.p);
+        }
+        a + b
+    }
     #[inline(always)]
     fn fq_mul(&self, a: &[u64], b: &[u64]) -> [u64; 2] {
-        [
-            self.r.r(a[0] * b[0] + self.w * (a[1] * b[1])),
-            self.r.r(a[0] * b[1] + a[1] * b[0]),
-        ]
+        let raw = self.fq_raw(a, b);
+        [self.r.r(raw[0]), self.r.r(raw[1])]
     }
     /// Unreduced `F_q` product (components < 2^35).
     #[inline(always)]
     fn fq_raw(&self, a: &[u64], b: &[u64]) -> [u64; 2] {
         [
-            a[0] * b[0] + self.w * (a[1] * b[1]),
-            a[0] * b[1] + a[1] * b[0],
+            self.sum(
+                self.product(a[0], b[0]),
+                self.product(self.w, self.product(a[1], b[1])),
+            ),
+            self.sum(self.product(a[0], b[1]), self.product(a[1], b[0])),
         ]
     }
     fn mul(&mut self, a: &X6, b: &X6) -> X6 {
@@ -225,8 +243,8 @@ impl Arith {
         for i in 0..3 {
             for j in 0..3 {
                 let t = self.fq_raw(&a[2 * i..2 * i + 2], &b[2 * j..2 * j + 2]);
-                d[i + j][0] += t[0];
-                d[i + j][1] += t[1];
+                d[i + j][0] = self.sum(d[i + j][0], t[0]);
+                d[i + j][1] = self.sum(d[i + j][1], t[1]);
             }
         }
         let d: [[u64; 2]; 5] = core::array::from_fn(|k| [self.r.r(d[k][0]), self.r.r(d[k][1])]);
@@ -243,7 +261,7 @@ impl Arith {
     }
     #[inline(always)]
     fn addp(&self, a: u64, b: u64) -> u64 {
-        let s = a + b;
+        let s = self.sum(a, b);
         if s >= self.p {
             s - self.p
         } else {
@@ -252,6 +270,9 @@ impl Arith {
     }
     #[inline(always)]
     fn subp(&self, a: u64, b: u64) -> u64 {
+        if COUNT {
+            jv_bitops::hook_add(self.p);
+        }
         if a >= b {
             a - b
         } else {
@@ -269,11 +290,18 @@ impl Arith {
     }
     fn fq_inv(&self, a: &[u64]) -> [u64; 2] {
         let n = self.subp(
-            self.r.r(a[0] * a[0]),
-            self.r.r(self.w * self.r.r(a[1] * a[1])),
+            self.r.r(self.product(a[0], a[0])),
+            self.r
+                .r(self.product(self.w, self.r.r(self.product(a[1], a[1])))),
         );
         let ni = inv_mod(n, self.p);
-        [self.r.r(a[0] * ni), self.r.r((self.p - a[1]) % self.p * ni)]
+        if COUNT {
+            jv_bitops::hook_add(self.p);
+        } // the Fp negation
+        [
+            self.r.r(self.product(a[0], ni)),
+            self.r.r(self.product((self.p - a[1]) % self.p, ni)),
+        ]
     }
     /// Adjugate inversion in `F_q[θ]/(θ³ − s)`.
     fn inv(&mut self, a: &X6) -> X6 {
@@ -553,7 +581,7 @@ fn strong_rho_core(
     let n = inst.l;
     let f = Fq3::new(p);
     let mut ex = Extra::default();
-    let mut ar = Arith {
+    let mut ar = Arith::<false> {
         r: Red::new(p),
         p,
         w: f.f.w,
@@ -841,6 +869,17 @@ pub struct CountedRun {
 /// [`strong_rho`] on `inst`, counted for `bitop/v1` ([`rho_tally`]).  Its
 /// [`StrongRun`] is priced in the harness unit as `strong_rho`'s is.
 pub fn strong_rho_counted(inst: &CurveInstance, seed: u64, run: u64, o: StrongOpts) -> CountedRun {
+    strong_rho_counted_with_scalar(inst, seed, run, o).0
+}
+
+/// The same counted reference and walk, also returning its actual collision
+/// scalar for external group replay. Existing result serialization is unchanged.
+pub fn strong_rho_counted_with_scalar(
+    inst: &CurveInstance,
+    seed: u64,
+    run: u64,
+    o: StrongOpts,
+) -> (CountedRun, Option<u64>) {
     validate_options(o).expect("invalid strong rho options");
     let start = Instant::now();
     let ph = harness_prices(inst.p);
@@ -848,7 +887,7 @@ pub fn strong_rho_counted(inst: &CurveInstance, seed: u64, run: u64, o: StrongOp
     let (r, ex) = strong_rho_core(inst, c_e, seed, run, o, start);
     // the attacker checks the scalar it found: [d′]G = Q on the curve
     let f = Fq3::new(inst.p);
-    let mut ar = Arith {
+    let mut ar = Arith::<false> {
         r: Red::new(inst.p),
         p: inst.p,
         w: f.f.w,
@@ -863,20 +902,24 @@ pub fn strong_rho_counted(inst: &CurveInstance, seed: u64, run: u64, o: StrongOp
         .found
         .and_then(|k| ar.mul_scalar(&g, k))
         .is_some_and(|pt| pt.x == q.x && pt.y == q.y);
-    CountedRun {
-        run: r,
-        setup: ex.setup,
-        verify: ar.c,
-        rng_draws: ex.rng_draws,
-        flips: ex.flips,
-        collision_solves: ex.collision_solves,
-        verified,
-    }
+    (
+        CountedRun {
+            run: r,
+            setup: ex.setup,
+            verify: ar.c,
+            rng_draws: ex.rng_draws,
+            flips: ex.flips,
+            collision_solves: ex.collision_solves,
+            verified,
+        },
+        ex.found,
+    )
 }
 
 /// The `bitop/v1` primitives of one `F_{q³}` product, squaring and
-/// inversion of the harness's own arithmetic (`jv_cover::Fq3`, which the
-/// index-calculus arm runs on), counted by the `jv_bitops` hooks.
+/// inversion of a selected arithmetic implementation, counted by hooks.
+/// Use measure_fq3_prims for the IC harness or measure_native_fq3_prims
+/// for the executed native Barrett tower, and retain that scheme identity.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Fq3Prims {
     pub mul: OpTally,
@@ -919,7 +962,49 @@ pub fn measure_fq3_prims(p: u64, l: u64) -> Fq3Prims {
     }
 }
 
-/// `c`'s `F_{q³}` operations at the harness's prices plus its group-law
+/// Count the executed native Barrett tower's prime-field algebra, separately
+/// from the IC harness. Deferred products/sums use the same bitop/v1 Fp
+/// convention; these are model prices, not hardware gate counts. Native
+/// reduction/control internals and the legacy TUNED credits stay separate.
+/// The entire calibration belongs to Harness, not the reconstructed walk.
+pub fn measure_native_fq3_prims(p: u64, l: u64) -> Fq3Prims {
+    assert!(jv_bitops::enabled(), "jv_bitops counting is off");
+    assert!((5..=1823).contains(&p), "bounded native rho prime");
+    jv_bitops::claim();
+    jv_bitops::set_moduli(p, l);
+    let _g = jv_bitops::enter(Phase::Harness);
+    let f = Fq3::new(p);
+    let mut rng = StdRng::seed_from_u64(5);
+    let (a, b) = loop {
+        let a = f.random(&mut rng);
+        let b = f.random(&mut rng);
+        if a != E6::ZERO && b != E6::ZERO {
+            break (to_x6(&a), to_x6(&b));
+        }
+    };
+    let mut ar = Arith::<true> {
+        r: Red::new(p),
+        p,
+        w: f.f.w,
+        s: f.s.0,
+        a2: [0; 6],
+        a4: [0; 6],
+        c: OpCounts::default(),
+        flips: 0,
+    };
+    let before = jv_bitops::snapshot();
+    std::hint::black_box(ar.mul(&a, &b));
+    let mul = jv_bitops::snapshot().since(&before).total();
+    let before = jv_bitops::snapshot();
+    std::hint::black_box(ar.sq(&a));
+    let sq = jv_bitops::snapshot().since(&before).total();
+    let before = jv_bitops::snapshot();
+    std::hint::black_box(ar.inv(&a));
+    let inv = jv_bitops::snapshot().since(&before).total();
+    Fq3Prims { mul, sq, inv }
+}
+
+/// `c`'s `F_{q³}` operations at the selected calibration plus its group-law
 /// `F_p` additions.
 fn add_arith(t: &mut OpTally, c: &OpCounts, pr: &Fq3Prims) {
     for k in Kind::ALL {
@@ -932,7 +1017,8 @@ fn add_arith(t: &mut OpTally, c: &OpCounts, pr: &Fq3Prims) {
 /// A counted run in `bitop/v1` primitives, by phase.
 ///
 /// * every `F_{q³}` product, squaring and inversion at the primitives the
-///   harness's own `Fq3` executes ([`measure_fq3_prims`]); the group law's
+///   selected tower executes ([`measure_fq3_prims`] or
+///   [`measure_native_fq3_prims`]); the group law's
 ///   `F_p` additions as counted (`fp_adds`), less the six a flip is charged
 ///   in `fp_adds` without computing them;
 /// * a canonicalisation: the negation of `y` it computes (6 `field_add`)
@@ -990,6 +1076,114 @@ pub fn run_strong_rho(p: u64, seed: u64, run: u64, o: StrongOpts) -> StrongRun {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn native_quadratic_hand_example_counts_products_adds_and_inverse_once() {
+        jv_bitops::enable(true);
+        jv_bitops::claim();
+        jv_bitops::set_moduli(101, 1_000_003);
+        let _g = jv_bitops::enter(Phase::Harness);
+        let ar = Arith::<true> {
+            r: Red::new(101),
+            p: 101,
+            w: 2,
+            s: [1, 0],
+            a2: [0; 6],
+            a4: [0; 6],
+            c: OpCounts::default(),
+            flips: 0,
+        };
+        let before = jv_bitops::snapshot();
+        assert_eq!(ar.fq_mul(&[2, 3], &[5, 7]), [52, 29]);
+        let t = jv_bitops::snapshot().since(&before).total();
+        assert_eq!(t.get(Kind::FieldMul), 5);
+        assert_eq!(t.get(Kind::FieldAdd), 2);
+        assert_eq!(t.get(Kind::FieldInv), 0);
+        let before = jv_bitops::snapshot();
+        assert_eq!(ar.fq_inv(&[2, 3]), [72, 94]);
+        let t = jv_bitops::snapshot().since(&before).total();
+        assert_eq!(t.get(Kind::FieldMul), 5);
+        assert_eq!(t.get(Kind::FieldAdd), 2);
+        assert_eq!(t.get(Kind::FieldInv), 1);
+    }
+
+    #[test]
+    fn counted_native_tower_matches_harness_and_uninstrumented_values() {
+        jv_bitops::enable(true);
+        jv_bitops::claim();
+        for p in [101, 251, 1009] {
+            jv_bitops::set_moduli(p, 1_000_003);
+            let _g = jv_bitops::enter(Phase::Harness);
+            let f = Fq3::new(p);
+            let mut ar = Arith::<true> {
+                r: Red::new(p),
+                p,
+                w: f.f.w,
+                s: f.s.0,
+                a2: [0; 6],
+                a4: [0; 6],
+                c: OpCounts::default(),
+                flips: 0,
+            };
+            let mut plain = Arith::<false> {
+                r: Red::new(p),
+                p,
+                w: f.f.w,
+                s: f.s.0,
+                a2: [0; 6],
+                a4: [0; 6],
+                c: OpCounts::default(),
+                flips: 0,
+            };
+            let mut rng = StdRng::seed_from_u64(41);
+            let mut operands: Vec<_> = (0..6)
+                .map(|i| {
+                    let mut v = [0; 6];
+                    v[i] = 1;
+                    v
+                })
+                .collect();
+            operands.extend((0..96).map(|_| to_x6(&f.random(&mut rng))));
+            operands.push([0; 6]);
+            for (i, a) in operands.iter().enumerate() {
+                let b = &operands[(i + 1) % operands.len()];
+                let expected = to_x6(&f.mul(&from_x6(a), &from_x6(b)));
+                let before = jv_bitops::snapshot();
+                assert_eq!(ar.mul(a, b), expected);
+                let t = jv_bitops::snapshot().since(&before).total();
+                assert_eq!(t.get(Kind::FieldMul), 55);
+                assert_eq!(t.get(Kind::FieldAdd), 44);
+                assert_eq!(plain.mul(a, b), expected);
+                let expected_square = to_x6(&f.sq(&from_x6(a)));
+                let before = jv_bitops::snapshot();
+                assert_eq!(ar.sq(a), expected_square);
+                let t = jv_bitops::snapshot().since(&before).total();
+                assert_eq!(t.get(Kind::FieldMul), 55);
+                assert_eq!(t.get(Kind::FieldAdd), 44);
+                if *a != [0; 6] {
+                    let expected = to_x6(&f.inv(&from_x6(a)));
+                    let before = jv_bitops::snapshot();
+                    assert_eq!(ar.inv(a), expected);
+                    let t = jv_bitops::snapshot().since(&before).total();
+                    assert_eq!(t.get(Kind::FieldMul), 80);
+                    assert_eq!(t.get(Kind::FieldAdd), 42);
+                    assert_eq!(t.get(Kind::FieldInv), 1);
+                    assert_eq!(plain.inv(a), expected);
+                }
+            }
+            let native = measure_native_fq3_prims(p, 1_000_003);
+            assert_eq!(native.mul, native.sq);
+            assert_eq!(native.mul.get(Kind::FieldMul), 55);
+            assert_eq!(native.inv.get(Kind::FieldMul), 80);
+            assert_eq!(native.inv.get(Kind::FieldAdd), 42);
+            assert_eq!(native.inv.get(Kind::FieldInv), 1);
+            for k in Kind::ALL {
+                if ![Kind::FieldMul, Kind::FieldAdd, Kind::FieldInv].contains(&k) {
+                    assert_eq!(native.mul.get(k) + native.sq.get(k) + native.inv.get(k), 0);
+                }
+            }
+        }
+    }
 
     #[test]
     fn strong_rho_options_reject_invalid_limits() {
@@ -1062,7 +1256,7 @@ mod tests {
         let f = Fq3::new(p);
         let ec = EllE::new(&f, &spec.alpha);
         let mut rng = StdRng::seed_from_u64(3);
-        let mut ar = Arith {
+        let mut ar = Arith::<false> {
             r: Red::new(p),
             p,
             w: f.f.w,
@@ -1144,6 +1338,23 @@ mod tests {
             assert_eq!(
                 t.phase(Phase::RhoWalk).get(Kind::FieldMul),
                 walk.mul * 55 + walk.sq * 55 + walk.inv * 150
+            );
+            let native_pr = measure_native_fq3_prims(p, spec.l);
+            let native = rho_tally(&counted, &native_pr);
+            for (phase, c) in [
+                (Phase::RhoPrecompute, &counted.setup),
+                (Phase::RhoWalk, &walk),
+                (Phase::RhoVerification, &counted.verify),
+            ] {
+                assert_eq!(
+                    native.phase(phase).get(Kind::FieldMul),
+                    c.mul * 55 + c.sq * 55 + c.inv * 80
+                );
+                assert_eq!(native.phase(phase).get(Kind::FieldInv), c.inv);
+            }
+            assert_eq!(
+                native.phase(Phase::RhoCollision).get(Kind::ModrInv),
+                counted.collision_solves
             );
         }
     }

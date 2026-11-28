@@ -1,0 +1,18 @@
+{
+  "schema": "h116-chiral-marked-two-isogeny-halving-parity-launch/v2",
+  "protocol_id": "H116-CHIRAL-MARKED-TWO-ISOGENY-HALVING-PARITY-002",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and exact hashes in CHIRAL_MARKED_TWO_ISOGENY_HALVING_PARITY_SOURCE_GATE.md",
+  "quartic_pairs": [[0, 2], [1, 3], [4, 6], [5, 7]],
+  "feature_order": ["model0_kernel_half", "model0_dual_kernel_half", "model1_kernel_half", "model1_dual_kernel_half", "model2_kernel_half", "model2_dual_kernel_half", "model3_kernel_half", "model3_dual_kernel_half"],
+  "bit_convention": {"rational_half_exists": 1, "rational_half_absent": 0, "singular_quartic": "abstain"},
+  "rules": 512,
+  "target": "canonical_scalar_mod_2",
+  "replicates": 4096,
+  "commands": {
+    "build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_chiral_branch_residual_parity.rs", "-o", "/tmp/h116_chiral_marked_two_isogeny_halving_parity"],
+    "selftest": ["/tmp/h116_chiral_marked_two_isogeny_halving_parity", "--selftest"],
+    "run": ["/tmp/h116_chiral_marked_two_isogeny_halving_parity", "--run-kummer", "CHIRAL_MARKED_TWO_ISOGENY_HALVING_PARITY_RESULT.json"]
+  },
+  "outputs": ["CHIRAL_MARKED_TWO_ISOGENY_HALVING_PARITY_RESULT.json", "CHIRAL_MARKED_TWO_ISOGENY_HALVING_PARITY_RUN.txt", "CHIRAL_MARKED_TWO_ISOGENY_HALVING_PARITY_SHA256SUMS"],
+  "measurement_scope": "all 512 affine Boolean rules on the source/dual marked-kernel rational-halving bits of four target-tethered binary quartic Jacobians, with exact resolvent, two-isogeny coefficient, exhaustive group-law, halving-formula, point-count, inherited branch/resultant/genus-one, and family-wise shuffle controls"
+}

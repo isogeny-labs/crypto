@@ -1,0 +1,87 @@
+# Oriented constraints across public radii
+
+Let r be the certified odd prime subgroup order, h=(r-1)/2, m>=3 divide h,
+and Y=k^m. The existing Fourier extraction identity is
+
+    fplus(b) = m*b^(h-1)*k*F1(b^-m*Y).
+
+For nonzero k, eliminating the same scalar factor at radii a and b gives
+
+    fplus(a)*b^(h-1)*F1(b^-m*Y)
+      - fplus(b)*a^(h-1)*F1(a^-m*Y) = 0.
+
+The factors a^(h-1), b^(h-1) are essential. They are not ordinary signs and
+must not be replaced by a^h,b^h. This relation is homogeneous under a common
+rotation of the candidate scalar, so it defines a constraint on Y. It retains
+relative orientation across radii that the separate products fplus*fminus
+were discarding. It does not require an additional character observation.
+
+## Safe anchors and zero observations
+
+The implementation establishes an anchor only when both observed oriented
+modes are nonzero. The already-imposed product constraint then certifies that
+F1 at the anchor is nonzero at every surviving candidate. No target-dependent
+inversion or nonzero assumption is introduced. Earlier non-anchor observations
+are not retroactively correlated; their existing constraints remain.
+
+When fplus=0, impose F1=0 explicitly. When fminus=0, impose its corresponding
+section=0. On the streaming path the reciprocal identity
+F_(m-1)(V)=(-1)^h V^(L-1) F1(V^-1) makes the inverse-chart F1 an equivalent
+zero constraint because V is nonzero. Both zero observations impose both.
+If no product-nonzero observation occurs, there is no cross-radius anchor;
+the zero constraints and existing summaries remain the available information.
+
+All these equations are necessary for the true scalar. The component makes
+no claim that they encode the complete oriented transcript: nonzero-mode
+inequalities are not added except where the existing product proves them.
+
+## Canonical transport and implementation
+
+Each branch retains the anchor F1 polynomial pair in the common first-radius
+W chart. Later radii use scale=b^-m/a0^-m, with scale^-1*(W-V) for the inverse
+chart. A retained anchor is reduced modulo the current support after filtering.
+Canonical intersections cannot introduce a candidate absent from the predecessor.
+
+The powered path reuses its existing sections[1] and sections[m-1]. The
+streaming path returns both factors from the existing paired coefficient
+stream; at scale1 it constructs the conjugate from the same F1. It does not
+perform another coefficient pass. Additional work includes b^(h-1), storing
+and copying anchor pairs, conjugate construction, remainder reductions and
+canonical intersections. Initial phase-domain expansion remains unchanged.
+The section cap is not a total memory cap. Public source costs, replay and
+point verification remain charged; route/call changes are not timing claims.
+
+## Exact oracle and controls
+
+For fixture scalar j, apply the predecessor summary constraints, initial
+character, and explicit zero-mode constraints. Let a be the first processed
+radius with both target modes nonzero. At every processed radius b from a
+onward, require
+
+    target_plus(a)*candidate_plus(b)
+      = target_plus(b)*candidate_plus(a).
+
+This is the cross-radius polynomial after cancelling the known nonzero
+normalizations and fixture scalar j. Group surviving j by j^m to obtain
+an independent support polynomial. A separate zero-only oracle isolates
+pruning specifically due to cross-radius correlation. Scalar enumeration
+appears only in this correctness oracle, not in runtime recovery.
+
+Fixtures retain both initial characters, zero/wrong-sign controls, repeated
+radii, odd h/L, L1, streaming and powered capacities, and public point checks.
+The predecessor comparison is support inclusion, not equality, because this
+component intentionally adds information.
+
+## Sources and next step
+
+Read the exact signed.rs, transport.rs, powered.rs, balanced-image.rs and
+balanced-checks.rs sources from feature-balanced-reciprocal-lift at
+13f693c7c969ff894c7c63b5c110295d0d5f97e5. The signed-mode and reciprocal
+identities were established and checked in the preceding components;
+NIST DLMF18.5.1-2 provides the reciprocal polynomial basis. KB was unavailable
+in the preceding turn. No novelty or timing claim is made.
+
+Next investigate applying these relative-mode constraints before full phase
+domain expansion, or retaining the oriented modes through an implicit
+multi-radius constraint representation. A smaller surviving explicit state
+alone does not remove the current upfront domain construction.

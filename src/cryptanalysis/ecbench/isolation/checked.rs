@@ -864,4 +864,5 @@ impl<C: Calls> Drop for Collector<C> {
 }
 
 #[cfg(test)]
+#[path = "checked/tests.rs"]
 mod tests;

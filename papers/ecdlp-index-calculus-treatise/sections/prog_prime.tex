@@ -115,7 +115,11 @@ toy plateau at 7 is above it, at $2^{89}$--$2^{98}$ (generous) and
 $2^{129}$--$2^{139}$ (plain) at 131 bits
 (\art{docs/ic/CERTICOM131_IC_PROGRAM.md}). The exponent sum of decompositions
 on the tower is indistinguishable from random at $k=1$--$6$
-(\art{research/ic_exponent_falsifiers_20261013/}).
+(\art{research/ic_exponent_falsifiers_20261013/}). Certified degrees with auxiliary
+unknowns up to $m=8$, the growth law in the tower height and the cost floor
+that removes the projected $m=8$ gain are in \S\ref{sec:pa-pkm}, with the last fall degrees at $m=2$--6 measured on
+15 November (Table~\ref{tab:pa-dfm}) and the symmetric oracle priced with its
+$\Sem5$ build counted (Table~\ref{tab:pa-pkm-priced}).
 
 \paragraph{In ecbench.} We ran the tower end to end with the root-finding
 oracles on five curves of 20--28 bits (896 runs, all verified, all replay
@@ -295,7 +299,10 @@ $\Gamma(F+\tfrac32)/(\Gamma(F+1)\Gamma(\tfrac32))$ times rho. That is
 $1.5\times$ for $F=1$ and $1.875\times$ for $F=2$, where Monte Carlo
 gives $1.889\times$. \texttt{wwalk} has $F=2$, so its $1.8$--$1.9\times$
 is this floor, not an implementation constant. Parity needs $F=0$, which
-is rho under another name.
+is rho under another name. On the 36- and 40-bit prime ladder curves, which the autolab never
+saw, the frozen two-seed recipe costs $1.660$ and $1.685\times$
+\texttt{rho-neg} at $w=0$, with intervals reaching $2.08$ and $2.09$
+(unvalidated, \texttt{[pcc:unverified]}; Table~\ref{tab:pg-ladder}).
 
 Table~\ref{tab:pf-c25519-multi} and Figure~\ref{fig:pf-c25519} give the
 multi-curve re-baseline per curve: the ledger curve and four siblings by

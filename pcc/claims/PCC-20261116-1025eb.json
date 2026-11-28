@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T11:57:06Z",
+ "id": "PCC-20261116-1025eb",
+ "kind": "statement",
+ "producer": {
+  "commit": "1c99a2350ec07305cf78600a43cf13f81311b5f5",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-06/identity-pre-01.json",
+    "sha256": "9f868c6c743dfb8e80e39fd99ebe9e03ca11b2da3feb733fcf16418b5052135d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-06/identity-post-01.json",
+    "sha256": "426b298e037b7618621a1dc45fe9e3a2adb22202aca61599d0a2a313d8327b93"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_field_transfer_goal_20261116/receipts/round-06/identity-run-01.stdout",
+    "sha256": "a8214873d79d7176ca924fc2efb03777b8938769befb2b5de643259fe1e34d67"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "prime-field-transfer/round06/fixed-integer-identities",
+ "statement": "Native producer issuance of four fixed integer decoder-row IDC1 records, 32 derived points each and changed-rhs rejection controls; pointers bind the exact integer Lean source. This is component evidence, not independent replay or a native modular-GCD/transfer proof."
+}

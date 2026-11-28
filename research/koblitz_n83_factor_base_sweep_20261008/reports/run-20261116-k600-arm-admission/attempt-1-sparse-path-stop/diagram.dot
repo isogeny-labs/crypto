@@ -1,0 +1,9 @@
+digraph stop {
+  graph [rankdir=LR, bgcolor="white", fontname="Helvetica", pad="0.3"];
+  node [shape=box, style="rounded,filled", fillcolor="#eef4fb", color="#2b5274", fontname="Helvetica"];
+  h2 [label="Clean H2 source\na30e6749"];
+  sparse [label="Minimal sparse profile\nmaterialized arm + K600 files"];
+  stop [label="Cargo exit 101\nmissing tracked path dependency\ncrates/ecdl-tensor-ic/Cargo.toml", fillcolor="#ffe7e4", color="#a13d34"];
+  pending [label="No binary; no S3 stage\nNo solver work", fillcolor="#fff3dc", color="#976b1d"];
+  h2 -> sparse -> stop -> pending;
+}

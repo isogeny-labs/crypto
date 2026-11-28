@@ -1,0 +1,44 @@
+{
+  "status": "prospective_not_released",
+  "manual_callback_controls_sufficient": false,
+  "software_controls": {
+    "count": 8,
+    "new_faults": [
+      "actual Write failure on candidate callback then later identity callback preserves first Output",
+      "RecordLimit on disposition then later terminal preserves RecordLimit"
+    ]
+  },
+  "actual_producer_controls": [
+    {
+      "entrypoint": "solve_genus2_observed",
+      "required_fixture": "published real curve/target/seed/candidate cap producing identity outcome",
+      "check": "header/candidate/identity/terminal observed from native call; real outcome and source verification compared with no-observer call; no fabricated identity record accepted as integration evidence",
+      "fixture_binding": "pending_before_execution"
+    },
+    {
+      "entrypoint": "solve_genus2_observed",
+      "required_fixture": "published real curve/target/seed/candidate cap containing repeated split divisor",
+      "check": "native duplicate refers to actual first attempt; every native attempt has exactly one disposition; terminal attempts matches full callback stream; actual choices/restarts retained",
+      "fixture_binding": "pending_before_execution"
+    },
+    {
+      "entrypoint": "Labels::ingest_observed",
+      "required_fixture": "existing duplicate_fixture valid same/opposite-sign input pair plus noncanonical-label case",
+      "check": "call actual Labels methods with bound curve/G/Q/r and labels; compare returned Value and underlying counts with original ingest; callback captures both results before caller terminal",
+      "fixture_binding": "bind exact existing duplicate fixture inputs before execution"
+    },
+    {
+      "entrypoint": "solve_genus2_observed plus failing Write",
+      "required_fixture": "same published native identity/duplicate fixtures",
+      "check": "fail at selected actual disposition callback, return Err, no terminal/accepted Outcome, subsequent diagnostic call returns original failure"
+    }
+  ],
+  "stop_conditions": [
+    "missing exact producer fixture bindings",
+    "missing independent source review",
+    "unpublished candidate or command",
+    "no bounded serial coordinator release"
+  ],
+  "new_scientific_cohort": false,
+  "cost_ratio": null
+}

@@ -1,0 +1,81 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "coset-filtered mitm smoke: Koblitz K1 n=23, divisor bases",
+  "description": "Scratch smoke: divisor 0;1 contains x+1 (mixed classes), divisor 2 does not (one class, control). mitm vs mitm-coset on the same base, matched strong signed-Frobenius rho.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 1,
+        "n": 23
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 20261123
+  },
+  "arms": [
+    {
+      "name": "rho-strong",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    },
+    {
+      "name": "mitm-d01",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "mitm:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "coset-d01",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=0;1",
+          "oracle": "mitm-coset:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "mitm-d2",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=2",
+          "oracle": "mitm:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "coset-d2",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "koblitz-orbit:divisor=2",
+          "oracle": "mitm-coset:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 20261124,
+    "isolation_required": "L0",
+    "timeout_seconds": 600
+  }
+}

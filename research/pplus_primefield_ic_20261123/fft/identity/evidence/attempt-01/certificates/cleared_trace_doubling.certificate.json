@@ -1,0 +1,137 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h6bb2bd5b305d062c",
+  "statement": {
+    "name": "Norm-one trace: denominator-cleared doubling identity",
+    "source": "crypto PR #5049; fft/DERIVATION.md; identity/PROTOCOL.md. Elementary butterfly algebra and (Z^2+1)^2-2Z^2=Z^4+1. Certificate scope is only polynomial evaluations over F_(2^61-1).",
+    "variables": [
+      "Z"
+    ],
+    "degree_bound": 4,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "Z"
+                    },
+                    {
+                      "op": "var",
+                      "args": "Z"
+                    }
+                  ]
+                },
+                {
+                  "op": "const",
+                  "args": 1
+                }
+              ]
+            },
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "Z"
+                    },
+                    {
+                      "op": "var",
+                      "args": "Z"
+                    }
+                  ]
+                },
+                {
+                  "op": "const",
+                  "args": 1
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "const",
+                "args": 2
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "var",
+                    "args": "Z"
+                  },
+                  {
+                    "op": "var",
+                    "args": "Z"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "Z"
+                },
+                {
+                  "op": "var",
+                  "args": "Z"
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "Z"
+                },
+                {
+                  "op": "var",
+                  "args": "Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "const",
+          "args": 1
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261123,
+  "value_digest": "89b14f2ed91b953a96ab649c32807038dfd7bf134689bc5da2e6487944f80ee5",
+  "independence": "Same team and production implementation; separate issuer and checker processes; unsigned; deterministic finite evaluations only; no formal proof, independent-verifier, or PCC claim.",
+  "proof": null
+}

@@ -1,0 +1,57 @@
+{
+  "schema": "prime31.publication-main-sync/v1",
+  "scope": "Git/PCC metadata reconciliation only; no native arithmetic or campaign",
+  "lane_published_head": "119a80e149336827faf9408656d136cbc4ea0a1d",
+  "upstream_main": "84956f5a872cd96c937aa1cb73dbd13a4de4cceb",
+  "preserved_main_ledger_prefix_bytes": 894052,
+  "unpublished_claims_reregistered": [
+    {
+      "claim_id": "PCC-20261123-cff73c",
+      "claim_sha256": "e893488e687dea38dc7b9bdcd5462e6a4f899910e61ba62980fb65da6f7a1553",
+      "path": "pcc/claims/PCC-20261123-cff73c.json"
+    },
+    {
+      "claim_id": "PCC-20261123-f873fd",
+      "claim_sha256": "272f0f0a0d06ec336c2fa7eba7f5a7f9f926ea6c62bad6022cd00649c72d6038",
+      "path": "pcc/claims/PCC-20261123-f873fd.json"
+    }
+  ],
+  "original_unpublished_entries": [
+    {
+      "at": "2026-11-23T03:12:08Z",
+      "body": {
+        "claim_id": "PCC-20261123-cff73c",
+        "claim_sha256": "e893488e687dea38dc7b9bdcd5462e6a4f899910e61ba62980fb65da6f7a1553",
+        "path": "pcc/claims/PCC-20261123-cff73c.json"
+      },
+      "hash": "8b2002103072543ccec972caaea105a5ba967fb0532d24bd15f5b39b47cf8470",
+      "prev": "90f7799fb5d77170d64e019939cb9c293dfcbd7829e36e6d39682e4a4cbe7c96",
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1545,
+      "type": "claim"
+    },
+    {
+      "at": "2026-11-23T03:14:02Z",
+      "body": {
+        "claim_id": "PCC-20261123-f873fd",
+        "claim_sha256": "272f0f0a0d06ec336c2fa7eba7f5a7f9f926ea6c62bad6022cd00649c72d6038",
+        "path": "pcc/claims/PCC-20261123-f873fd.json"
+      },
+      "hash": "97fd6d3014e08710a6e780d6ad966540c07e9416df070fd61fefc70f296039bc",
+      "prev": "8b2002103072543ccec972caaea105a5ba967fb0532d24bd15f5b39b47cf8470",
+      "schema": "pcc.ledger-entry/v1",
+      "seq": 1546,
+      "type": "claim"
+    }
+  ],
+  "replacement_entry_hashes": [
+    "141dd73138da75fe1b9d7fe51a287dd9370f3bd2f81b8fa840d37d8034a0b2fa",
+    "8d825f7d90fc7170220b607cb9c20057cec1277647e48ce35b5a0962268d3a04"
+  ],
+  "claim_files_and_subjects_unchanged": true,
+  "maintained_append_function": "tools/pcc/pcc.py::append_entry",
+  "session_log": "Exact current main text plus unchanged local append suffix",
+  "active_queue": "Exact current main text plus only this lane entry",
+  "compiled_input_paths_changed_by_main": [],
+  "fetch_note": "Main ref advanced successfully; recursive submodule fetch reported unavailable verification/pqc-assay/upstream. No submodule needed by this source closure."
+}

@@ -1,0 +1,669 @@
+{
+  "schema": "bounded-native-custody15/v1",
+  "source_commit": "fe5d0da839e0f9496f7b0326feebbedb9b80cc64",
+  "started": "2026-11-17T11:03:49.160641+00:00",
+  "phases": [
+    {
+      "name": "frozen-storage-preflight",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:03:49.160656+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "RAM_available": 11558912,
+        "scratch_available": 11837440,
+        "minimum_RAM": 8388608,
+        "minimum_scratch": 3145728
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:03:49.160681+00:00"
+    },
+    {
+      "name": "exact-public-original-source",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:03:49.161035+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "all_source_commit_blobs_equal": true,
+        "files": 31
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:03:50.029906+00:00"
+    },
+    {
+      "name": "primary-original-source-before",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:03:50.031181+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "primary_sources": 46
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:03:50.038149+00:00"
+    },
+    {
+      "name": "copy-exact-declared-source",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:03:50.038311+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "copied_files": 32,
+        "no_history_tree_copy": true
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:03:50.043026+00:00"
+    },
+    {
+      "name": "copied-source-before-build",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:03:50.043151+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "all_copied_source_hashes_equal": true
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:03:50.043823+00:00"
+    },
+    {
+      "name": "full-locked-prebuilt-dependencies",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:03:50.044051+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "full_dependency_binaries": 3,
+        "no_dependency_build": true
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:03:50.540500+00:00"
+    },
+    {
+      "name": "dependency-binary-before",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:03:50.540763+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "all_full_dependency_hashes_equal": true,
+        "files": 3
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:03:50.548997+00:00"
+    },
+    {
+      "name": "rustc-version",
+      "kind": "subprocess",
+      "started": "2026-11-17T11:03:50.549247+00:00",
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustc",
+        "--version"
+      ],
+      "cwd": "/dev/shm/ct783-first-cubic15B/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct783-cubic15B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct783-first-cubic15B/source"
+      },
+      "stdout": "07-rustc-version.stdout",
+      "stderr": "07-rustc-version.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T11:03:50.613517+00:00"
+    },
+    {
+      "name": "clippy-driver-version",
+      "kind": "subprocess",
+      "started": "2026-11-17T11:03:50.614652+00:00",
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "clippy-driver",
+        "--version"
+      ],
+      "cwd": "/dev/shm/ct783-first-cubic15B/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct783-cubic15B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct783-first-cubic15B/source"
+      },
+      "stdout": "08-clippy-driver-version.stdout",
+      "stderr": "08-clippy-driver-version.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T11:03:50.666840+00:00"
+    },
+    {
+      "name": "rustfmt-version",
+      "kind": "subprocess",
+      "started": "2026-11-17T11:03:50.667185+00:00",
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustfmt",
+        "--version"
+      ],
+      "cwd": "/dev/shm/ct783-first-cubic15B/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct783-cubic15B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct783-first-cubic15B/source"
+      },
+      "stdout": "09-rustfmt-version.stdout",
+      "stderr": "09-rustfmt-version.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T11:03:50.686156+00:00"
+    },
+    {
+      "name": "compiler-tool-binary-custody",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:03:50.686473+00:00",
+      "expected_exit": 0,
+      "detail": [
+        {
+          "tool": "rustc",
+          "path": "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/rustc",
+          "bytes": 648536,
+          "sha256": "b53b780f77f952062f8ca8a3b70aef2390b1e45ad91939be94afdc9543026853"
+        },
+        {
+          "tool": "clippy-driver",
+          "path": "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/clippy-driver",
+          "bytes": 16295440,
+          "sha256": "89b6cc8d0d988b00a3f65bc90c76fedbaedb6bcb442b34563aefe3621f26544b"
+        },
+        {
+          "tool": "rustfmt",
+          "path": "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/rustfmt",
+          "bytes": 5256344,
+          "sha256": "68cb47a2a38daa8ff2ec6d623a2374b0a165d77ec74f1f654216665018c04598"
+        },
+        {
+          "path": "/home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean",
+          "bytes": 9024,
+          "sha256": "bf8d54e4714cc4b03d3f6bb34c83b7202b87e49c8bfcbff6895c085bb90ceb38",
+          "tool": "Lean-compiler-or-import"
+        },
+        {
+          "path": "/home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/lib/lean/Init.olean",
+          "bytes": 5632,
+          "sha256": "84ffd94782b2f2f65408dee401a4332bfa7c3274abc7b1040cea7d7a307314f5",
+          "tool": "Lean-compiler-or-import"
+        },
+        {
+          "path": "/home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/lib/lean/Init/Grind/Ring/Field.olean",
+          "bytes": 142704,
+          "sha256": "3e9607f782e0460b4ca6c5b9e985414e39d59522f14770f12f855d07dfd0d1e4",
+          "tool": "Lean-compiler-or-import"
+        },
+        {
+          "path": "/home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/lib/lean/Std/Tactic.olean",
+          "bytes": 1256,
+          "sha256": "04cfb37a7332d932a764ffa102d22780e5a0ec757763fa33216d0ae43ab0c93a",
+          "tool": "Lean-compiler-or-import"
+        }
+      ],
+      "exit": 0,
+      "finished": "2026-11-17T11:03:50.856178+00:00"
+    },
+    {
+      "name": "clippy-sentinel-positive",
+      "kind": "subprocess",
+      "started": "2026-11-17T11:03:50.856494+00:00",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "rustup",
+        "run",
+        "1.99.1",
+        "clippy-driver",
+        "--crate-name",
+        "clippy_sentinel_positive",
+        "--edition=2021",
+        "--emit=metadata",
+        "-D",
+        "clippy::eq_op",
+        "/dev/shm/ct783-first-cubic15B/source/clippy-sentinel-positive.rs",
+        "-o",
+        "/dev/shm/ct783-first-cubic15B/clippy-sentinel-positive.rmeta"
+      ],
+      "cwd": "/dev/shm/ct783-first-cubic15B/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct783-cubic15B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct783-first-cubic15B/source"
+      },
+      "stdout": "11-clippy-sentinel-positive.stdout",
+      "stderr": "11-clippy-sentinel-positive.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T11:03:50.920379+00:00"
+    },
+    {
+      "name": "clippy-sentinel-negative",
+      "kind": "subprocess",
+      "started": "2026-11-17T11:03:50.921080+00:00",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "rustup",
+        "run",
+        "1.99.1",
+        "clippy-driver",
+        "--crate-name",
+        "clippy_sentinel_negative",
+        "--edition=2021",
+        "--emit=metadata",
+        "-D",
+        "clippy::eq_op",
+        "/dev/shm/ct783-first-cubic15B/source/clippy-sentinel-negative.rs",
+        "-o",
+        "/dev/shm/ct783-first-cubic15B/clippy-sentinel-negative.rmeta"
+      ],
+      "cwd": "/dev/shm/ct783-first-cubic15B/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct783-cubic15B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct783-first-cubic15B/source"
+      },
+      "stdout": "12-clippy-sentinel-negative.stdout",
+      "stderr": "12-clippy-sentinel-negative.stderr",
+      "expected_exit": 1,
+      "exit": 1,
+      "finished": "2026-11-17T11:03:50.978607+00:00"
+    },
+    {
+      "name": "compile-only",
+      "kind": "subprocess",
+      "started": "2026-11-17T11:03:50.979896+00:00",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustc",
+        "--crate-name",
+        "chained_cubic_inverse_15",
+        "--test",
+        "--edition=2021",
+        "src/lib.rs",
+        "-L",
+        "dependency=/dev/shm/ct783-first-cubic15B/deps",
+        "--extern",
+        "num_bigint=/dev/shm/ct783-first-cubic15B/deps/libnum_bigint-93482e592bbb622c.rlib",
+        "--extern",
+        "num_traits=/dev/shm/ct783-first-cubic15B/deps/libnum_traits-8dbbb3fc7f5ad84e.rlib",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "strip=symbols",
+        "-o",
+        "/dev/shm/ct783-first-cubic15B/compiler-output"
+      ],
+      "cwd": "/dev/shm/ct783-first-cubic15B/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct783-cubic15B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct783-first-cubic15B/source"
+      },
+      "stdout": "13-compile-only.stdout",
+      "stderr": "13-compile-only.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T11:03:59.389806+00:00"
+    },
+    {
+      "name": "strict-direct-clippy",
+      "kind": "subprocess",
+      "started": "2026-11-17T11:03:59.390706+00:00",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "rustup",
+        "run",
+        "1.99.1",
+        "clippy-driver",
+        "--crate-name",
+        "chained_cubic_inverse_15",
+        "--test",
+        "--edition=2021",
+        "src/lib.rs",
+        "-L",
+        "dependency=/dev/shm/ct783-first-cubic15B/deps",
+        "--extern",
+        "num_bigint=/dev/shm/ct783-first-cubic15B/deps/libnum_bigint-93482e592bbb622c.rlib",
+        "--extern",
+        "num_traits=/dev/shm/ct783-first-cubic15B/deps/libnum_traits-8dbbb3fc7f5ad84e.rlib",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "strip=symbols",
+        "--emit=metadata",
+        "-D",
+        "warnings",
+        "-o",
+        "/dev/shm/ct783-first-cubic15B/strict-clippy.rmeta"
+      ],
+      "cwd": "/dev/shm/ct783-first-cubic15B/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct783-cubic15B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct783-first-cubic15B/source"
+      },
+      "stdout": "14-strict-direct-clippy.stdout",
+      "stderr": "14-strict-direct-clippy.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T11:03:59.967425+00:00"
+    },
+    {
+      "name": "format",
+      "kind": "subprocess",
+      "started": "2026-11-17T11:03:59.968327+00:00",
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustfmt",
+        "--check",
+        "--edition",
+        "2021",
+        "src/lib.rs"
+      ],
+      "cwd": "/dev/shm/ct783-first-cubic15B/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct783-cubic15B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct783-first-cubic15B/source"
+      },
+      "stdout": "15-format.stdout",
+      "stderr": "15-format.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T11:04:00.078900+00:00"
+    },
+    {
+      "name": "copied-source-before-arithmetic",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:04:00.079890+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "all_copied_source_hashes_equal": true
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:04:00.081198+00:00"
+    },
+    {
+      "name": "immutable-proof-source-before",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:04:00.081754+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "path": "/dev/shm/ct783-first-cubic15B/immutable-proof-source/Inverse15.lean",
+        "sha256": "15de587a93c033b99933dd81a9f762506a5d4967d78b89da74728cd2830b0cdf",
+        "mode": "0444"
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:04:00.082380+00:00"
+    },
+    {
+      "name": "Lean-version",
+      "kind": "subprocess",
+      "started": "2026-11-17T11:04:00.082708+00:00",
+      "argv": [
+        "/home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean",
+        "--version"
+      ],
+      "cwd": "/dev/shm/ct783-first-cubic15B/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct783-cubic15B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct783-first-cubic15B/source"
+      },
+      "stdout": "18-Lean-version.stdout",
+      "stderr": "18-Lean-version.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T11:04:00.211612+00:00"
+    },
+    {
+      "name": "first-frozen-Lean-proof",
+      "kind": "subprocess",
+      "started": "2026-11-17T11:04:00.212586+00:00",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "/home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean",
+        "--root=/dev/shm/ct783-first-cubic15B",
+        "-DwarningAsError=true",
+        "-o",
+        "/dev/shm/ct783-first-cubic15B/proof-output/Inverse15.olean",
+        "/dev/shm/ct783-first-cubic15B/immutable-proof-source/Inverse15.lean"
+      ],
+      "cwd": "/dev/shm/ct783-first-cubic15B/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct783-cubic15B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct783-first-cubic15B/source"
+      },
+      "stdout": "19-first-frozen-Lean-proof.stdout",
+      "stderr": "19-first-frozen-Lean-proof.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T11:04:03.894189+00:00"
+    },
+    {
+      "name": "complete-Lean-axioms-and-source-record",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:04:03.895181+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "complete_printed_axioms": "'ChainedCubicInverse15.norm_cubic' depends on axioms: [propext, Classical.choice, Quot.sound]\n'ChainedCubicInverse15.inverse_by_square' depends on axioms: [propext, Classical.choice, Quot.sound]\n'ChainedCubicInverse15.cubic_inverse_pair' depends on axioms: [propext, Classical.choice, Quot.sound]\n",
+        "standard_logical_axioms_only": true,
+        "conditional_standard_Field_no_Rust_Field_instance": true
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:04:03.895704+00:00"
+    },
+    {
+      "name": "immutable-qualifier-before",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:04:03.896162+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "path": "/dev/shm/ct783-first-cubic15B/immutable-qualifier",
+        "sha256": "fec21f5797c88e92c6c873fef3fafea174acbcba6ff0042e7ce925e46f2e9ac4",
+        "mode": "0o555",
+        "bytes": 1277128
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:04:03.903673+00:00"
+    },
+    {
+      "name": "list-exact-tests",
+      "kind": "subprocess",
+      "started": "2026-11-17T11:04:03.904348+00:00",
+      "argv": [
+        "/dev/shm/ct783-first-cubic15B/immutable-qualifier",
+        "--list"
+      ],
+      "cwd": "/dev/shm/ct783-first-cubic15B/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct783-cubic15B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct783-first-cubic15B/source"
+      },
+      "stdout": "22-list-exact-tests.stdout",
+      "stderr": "22-list-exact-tests.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T11:04:03.907839+00:00"
+    },
+    {
+      "name": "first-frozen-arithmetic",
+      "kind": "subprocess",
+      "started": "2026-11-17T11:04:03.908572+00:00",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "/dev/shm/ct783-first-cubic15B/immutable-qualifier",
+        "nonsplit::map::tests_14::frozen_cubic_inverse_15",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/dev/shm/ct783-first-cubic15B/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct783-cubic15B-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct783-first-cubic15B/source"
+      },
+      "stdout": "23-first-frozen-arithmetic.stdout",
+      "stderr": "23-first-frozen-arithmetic.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T11:04:04.510143+00:00"
+    },
+    {
+      "name": "primary-original-source-after",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:04:04.513165+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "primary_sources": 46
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:04:04.516575+00:00"
+    },
+    {
+      "name": "copied-source-after",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:04:04.517294+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "all_copied_source_hashes_equal": true
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:04:04.521703+00:00"
+    },
+    {
+      "name": "dependency-binary-after",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:04:04.524904+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "all_full_dependency_hashes_equal": true,
+        "files": 3
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:04:04.541127+00:00"
+    },
+    {
+      "name": "compiler-tools-and-Lean-imports-after",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:04:04.541952+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "all_full_compiler_and_Lean_import_hashes_equal": true,
+        "files": 7
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:04:04.579488+00:00"
+    },
+    {
+      "name": "immutable-proof-source-after",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:04:04.580286+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "same_full_proof_source_hash_and_mode": true
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:04:04.580323+00:00"
+    },
+    {
+      "name": "immutable-qualifier-after",
+      "kind": "metadata-control",
+      "started": "2026-11-17T11:04:04.580682+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "same_full_qualifier_hash_and_mode": true
+      },
+      "exit": 0,
+      "finished": "2026-11-17T11:04:04.582107+00:00"
+    }
+  ],
+  "first_failure": null,
+  "compiler_temp_prospectively_excluded": "/run/lock/ct783-cubic15B-compiler-temp",
+  "scientific_language": "Rust",
+  "Python_role": "metadata,I/O,hashes,subprocess only",
+  "new_native_filter": "nonsplit::map::tests_14::frozen_cubic_inverse_15",
+  "no_cold_dependency_build_or_benchmark": true
+}

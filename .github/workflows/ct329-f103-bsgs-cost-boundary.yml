@@ -1,0 +1,73 @@
+name: CT329 pinned-source F103 full BSGS group-add boundary audit
+
+on:
+  pull_request:
+    paths:
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/CT329_BSGS_GROUP_COST_BOUNDARY_PROTOCOL.md"
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct329_*"
+      - ".github/workflows/ct329-f103-bsgs-cost-boundary.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ct329-f103-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  original-f103-bsgs-group-add-boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tests/ct238_native_cubic_norm_compression.rs
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct328_standalone_source.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct329_compose.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct329_full_bsgs.rs.inc
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct329_independent_oracle.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/CT329_BSGS_GROUP_COST_BOUNDARY_PROTOCOL.md
+      - name: Source identity and independent-language F103 oracle
+        shell: bash
+        run: |
+          set -euo pipefail
+          git log -1 --format='CT329_COMMIT %H'
+          git hash-object tests/ct238_native_cubic_norm_compression.rs
+          python3 -B research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct329_independent_oracle.py | tee /tmp/ct329-python.txt
+          python3 -O -B research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct329_independent_oracle.py > /tmp/ct329-python-O.txt
+          cmp /tmp/ct329-python.txt /tmp/ct329-python-O.txt
+          test "$(grep -c '^CT329_PY_ORACLE_PASS logs=109 q73_partial=17 q73_total=34 min_total=18 max_total=39 pcc=unverified$' /tmp/ct329-python.txt)" -eq 1
+      - name: Fail-closed source mutation and unchanged-source composition
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          src=Path('tests/ct238_native_cubic_norm_compression.rs').read_text()
+          assert src.count('const R: i64 = 109;')==1
+          Path('/tmp/ct329-mutated.rs').write_text(src.replace('const R: i64 = 109;', 'const R: i64 = 110;',1))
+          PY
+          BASE=research/chained_jacobian_transfers_20261110/toy_dlp_ct204
+          if python3 -B "$BASE/ct329_compose.py" --source /tmp/ct329-mutated.rs --append "$BASE/ct329_full_bsgs.rs.inc" --out /tmp/ct329-mutated-result.rs ; then
+            echo 'CT329_ERROR: source mutation admitted'; exit 1
+          fi
+          test ! -e /tmp/ct329-mutated-result.rs
+          echo CT329_MUTATED_SOURCE_REFUSED
+          python3 -B "$BASE/ct329_compose.py" --source tests/ct238_native_cubic_norm_compression.rs --append "$BASE/ct329_full_bsgs.rs.inc" --out /tmp/ct329-source.rs
+          sha256sum /tmp/ct329-source.rs
+      - name: Execute source-pinned Rust F103 rho and instrumented original BSGS panel
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustc --version
+          rustc --edition=2021 -O --test /tmp/ct329-source.rs -o /tmp/ct329-tests
+          /tmp/ct329-tests --test-threads=1 --nocapture 2>&1 | tee /tmp/ct329-native.txt
+          test "$(grep -c 'CT327_CORRECTNESS_PASS logs=109 mutations=110 ' /tmp/ct329-native.txt)" -eq 1
+          test "$(grep -c 'CT329_Q73_COUNTS original=17 baby=11 step=7 giant=6 verify=10 total=34 ' /tmp/ct329-native.txt)" -eq 1
+          test "$(grep -c 'CT329_CORRECTNESS_PASS logs=109 min_total=18 max_total=39 ' /tmp/ct329-native.txt)" -eq 1
+          grep 'test result: ok. 2 passed; 0 failed' /tmp/ct329-native.txt
+          echo 'CT329_SCOPE_PASS only original F103 source/rho plus group-add BSGS audit; no root IC or physical norm pricing; pcc-unverified'

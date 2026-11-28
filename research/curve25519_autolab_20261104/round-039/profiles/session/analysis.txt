@@ -1,0 +1,37 @@
+S1-base complete binary 1b86126f records 2048 isolation {'L2': 2044, 'L1': 4}
+S2-new complete binary 38d7d1b0 records 2048 isolation {'L2': 2034, 'L1': 14}
+S3-new complete binary 38d7d1b0 records 2048 isolation {'L2': 2036, 'L1': 12}
+S4-base complete binary 1b86126f records 2048 isolation {'L2': 2044, 'L1': 4}
+
+-- contrast: new / base, mean solve_wall_ns (ABBA pooled)
+sel new/base                                    0.7718  [0.7608, 0.7842]
+inc new/base                                    1.0212  [1.0065, 1.0365]
+sel-aa new/base                                 0.7706  [0.7589, 0.7832]
+inc-aa new/base                                 1.0150  [1.0011, 1.0297]
+
+-- noise floor: same binary, different sessions
+sel S4/S1 (base vs base)                        0.9806  [0.9633, 0.9974]
+sel S3/S2 (new vs new)                          0.9722  [0.9482, 0.9958]
+inc S4/S1 (base vs base)                        0.9825  [0.9674, 0.9969]
+inc S3/S2 (new vs new)                          0.9768  [0.9595, 0.9933]
+
+-- A/A within a session (copy arm / arm)
+S1-base sel-aa/sel                              1.0140  [0.9964, 1.0329]
+S1-base inc-aa/inc                              1.0100  [0.9971, 1.0244]
+S2-new sel-aa/sel                               0.9962  [0.9718, 1.0163]
+S2-new inc-aa/inc                               0.9923  [0.9800, 1.0032]
+S3-new sel-aa/sel                               1.0046  [0.9853, 1.0303]
+S3-new inc-aa/inc                               1.0126  [0.9915, 1.0339]
+S4-base sel-aa/sel                              0.9896  [0.9768, 1.0004]
+S4-base inc-aa/inc                              1.0068  [0.9920, 1.0208]
+
+-- sel / inc within session (the harness ratio)
+S1-base sel/inc                                 1.1454  [1.1147, 1.1750]
+S2-new sel/inc                                  0.8669  [0.8387, 0.9021]
+S3-new sel/inc                                  0.8628  [0.8320, 0.8933]
+S4-base sel/inc                                 1.1432  [1.1120, 1.1765]
+base sessions sel/inc                           1.1443  [1.1161, 1.1781]
+new sessions sel/inc                            0.8649  [0.8366, 0.8967]
+
+-- invariance (counted cost, scalar, status) across the four sessions
+records compared 2048, mismatches 0

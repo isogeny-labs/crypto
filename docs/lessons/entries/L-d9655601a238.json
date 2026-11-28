@@ -1,0 +1,14 @@
+{
+  "action": "subtract the shared descent subtotal per arm and compare the remainders; treat the residual count as a negative-binomial draw and require common random numbers or multiple seeds before ranking arms",
+  "created": "2026-11-18T04:18:37Z",
+  "evidence": [
+    "runpod-deferred-pair-20261117-50/README.md:5-16; leads-20261118/descent-finder/breakdown.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "red-team"
+  ],
+  "trigger": "an N=1 IC arm comparison where descent is ~constant cost per residual and only a handful of residuals succeed",
+  "why": "Run50: graph arms drew 3,415 residuals vs original IC 1,728 for 2 successes each; the descent difference exceeds the whole reported deficit, and the non-descent remainder favours the deferred graph by ~11%"
+}

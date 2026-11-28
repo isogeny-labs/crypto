@@ -1,0 +1,7 @@
+# C121 routing boundary and fallback experiment
+
+The prepared raw-degree triangular solver is exact in F2[X] on its stated prefix domain. Its fast finite-field use requires n>2m−2, not just a declared binary field. Boundary counterexample: in GF4 with modulus X²+X+1, take m=2,a=0,b=X+1. Raw polynomial b has an odd coefficient and no polynomial square root, but in GF4,X²=X+1, so r=Xis a double root. This does not refute the raw solver's contract; it refutes dispatching to it when the field-degree threshold fails. Include this exact case in the next independent oracle.
+
+For arbitrary binary field degree n and m≤n, a general fallback remains exact: construct the F2-linear map r→r²+ar modM from mcolumns in the nbitbasis, solve its affine bitmatrix, and recover every domain root. For a≠0inD_mthe kernel is{0,a}; for a=0squaring is injective. Retain empty fibers, multiplicity and canonical coordinates. Bitmatrix spaceO(mn),naive eliminationO(m²n)bitoperations (bitpacking improves constants); this is a correctness fallback, not a measured speed promise. Compare it as an independent small oracle before considering an implementation/dispatch.
+
+The actual lower factor has m17,n83,so the fast raw-degree branch applies. Larger domains must use their proved routing conditions. Both routes solve a declared quadratic fiber, not the full multivariate coefficient search or original chain, and neither establishes cross-curve/allscale50x performance. Odd-prime integer interval/root-lift cases remain separate.

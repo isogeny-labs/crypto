@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T07:46:40Z",
+ "id": "PCC-20261118-7f57d5",
+ "kind": "statement",
+ "producer": {
+  "commit": "60a192b5fad8211871cc0dcf1cc62e2e641b5745",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/window-audit-20261118/summary.json",
+    "sha256": "4d28b4ae16e8d002c30d5b65b56ffb277d10a8f5ec42612db8c226dc84cc6d69"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/window-audit-20261118/results/target80-zero-leftover-window.json",
+    "sha256": "b8ae007409df73db2b640513031e2db073e74caf621ca0a399ab5944834df6eb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/window-audit-20261118/results/explicit10009.json",
+    "sha256": "04aa62988a436414d532ed4651ef646c649b05dfc4f50523ba7ed254e9a8853d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/window-audit-20261118/results/explicit19.json",
+    "sha256": "1f4de047dad7906e80474320f3d8a5f0280369206827e019763bb59ef98d0d56"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/window-audit-20261118",
+ "statement": "The native evaluator accepts an explicit baby window. A same-target 80-bit metadata model has zero direct leftovers at B=414464344064 and G=440234147840, while retaining multi-terabyte full-window slot requirements and billions of block rectangles. Small direct-PARI option controls match existing outputs; the target was not constructed or timed."
+}

@@ -1,0 +1,13 @@
+default(parisize,268435456);
+default(parisizemax,536870912);
+N=nfinit([x^2-x-5,[1,x],[3,7]]);
+if(N.disc!=21,error("control discriminant"));
+B=bnfinit(N,1);
+if(B.disc!=21,error("bnf initialized-field interface"));
+P=idealadd(B,5,Mod(x,B.pol));
+if(idealnorm(B,P)!=5,error("control ideal norm"));
+R=bnfisprincipal(B,P,4);
+if(#R[1] && R[1]!=vector(#R[1]),error("control ideal is not principal"));
+print("initialized_field_interface=pass; discriminant=21; class_number=",B.no);
+print("control_principal_ideal=pass; compact_generator=",R[2]);
+quit;

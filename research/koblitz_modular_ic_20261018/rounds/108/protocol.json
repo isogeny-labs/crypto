@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R108-MARKED23-BASE-SERIES-128",
+  "version":1,
+  "goal":"extend source-bound x=1 base-completion series beyond N51 denominator orders",
+  "claims":[{"id":"series128","class":"exact_computation","statement":"both R105 base branches have checked s^128 series consistent with R106's first 32 coefficients"}],
+  "arms":{"reference":"R106 exact order-32 series","candidate":"same source-bound Hensel solver at order 128","positive":["R106 low bits match","f residual zero modulo s^128","initial valuations retained"],"negative":["changed source hash rejected"],"baseline":{"not_applicable_reason":"exact algebra"},"A_A":{"not_applicable_reason":"deterministic exact computation"}},
+  "variables":{"fixed":["R105/R106 SHA-256 pins","F2","precision 128"],"measured":["z and t supports","f residual","fresh replay"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"exact computation"},
+  "blinding":{"method":"none","reason":"exact computation"},
+  "sample_size":{"instances":2,"replicates":1,"power":"not applicable"},
+  "metrics":["source residual","low-bit match","series support"],
+  "execution":{"backend":"source-bound Python Hensel solver","source_gate":"committed source/protocol and R105/R106 hashes","queue":"one serial attempt","checkpoint":"retain raw attempts"},
+  "stopping":{"accept":"hashes, residuals, low-bit match, negative control, byte-identical replay","failure":"retain and amend before rerun"},
+  "analysis":{"method":"extend unique simple-root Hensel series","scope":"base series only, not N51 divisor"}
+}

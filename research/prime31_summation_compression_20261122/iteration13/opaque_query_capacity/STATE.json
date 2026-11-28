@@ -1,0 +1,36 @@
+{
+  "schema": "prime31-opaque-query-gate/v1",
+  "status": "written candidate lemma, unverified; independent review pending",
+  "pr": 5125,
+  "base": "ceba74bb64854027c4dd16f00428bf676383bfdb",
+  "report_commit": "c82bb7ae42c3118dfc3e70119715f6ede1af81ff",
+  "report_blob": "8c857634861cb9f4c57efc48c2c534c1db798792",
+  "field_p": 2147483647,
+  "inherited_subgroup_n": 2147446831,
+  "inherited_B": 31,
+  "actual_K_D_measured": false,
+  "capacity": "M(t+1)+t(t+1)/2; double for folded sign comparisons",
+  "necessary_decision": "C>=min(K,L)",
+  "necessary_reporting": "C>=K-1; C>=K if C<L",
+  "expected_miss": "(t+1)(1-C/L) if C<min(K,L)",
+  "conditional_support": "K=Theta(D^2), D^2=o(n), M=O(D polylog D)",
+  "energy_premise": "K+1 >= (2D+1)^4/E(V)",
+  "native_tests_executed": 0,
+  "randomized_trials": 0,
+  "seed_manifest": "not applicable: written mathematics and source reads only; future runs require isogeny-labs/experiment-seeds/v1",
+  "new_pcc_claim": false,
+  "independent_signature": false,
+  "workers": {
+    "coordinator": "source and algebra review; validation checklist",
+    "native_worker_slots": 0,
+    "Rust": "unavailable; no candidate admitted",
+    "validation": "written boundary challenge only"
+  },
+  "source_readback": {
+    "historical_failure": "f001a1b641abd48bb0130c1a9a246e37c28bcc3a",
+    "current_main_base_binary_hec_blob": "715f26d223ddf3b09c1ddd0b934ff15b5fd06389",
+    "current_full_root_build": "not tested"
+  },
+  "space": "bounded read required user input; no mutation or recreation",
+  "next": "Review proof independently; seek actual nonopaque coordinate predicate; prove energy premise or exploit collisions; reassess current root build at exact source; no unadmitted compute."
+}

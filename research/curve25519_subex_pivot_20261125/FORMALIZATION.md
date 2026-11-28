@@ -1,0 +1,922 @@
+# Formalization map for the conditional prime-field ECDL result
+
+This file freezes the statement assembled by the native audits.  It is a map
+of proof obligations, not a kernel-checked theorem and not a practical
+Curve25519 attack.  Every theorem below remains `[pcc:unverified]` until its
+listed dependencies are independently discharged.
+
+## Top-level statement
+
+Let `E/F_p` be an ordinary elliptic curve, let `G` generate a prime-order
+subgroup of order `r`, let the cofactor be fixed, and assume
+`log2(r) = log2(p) + O(1)`.  For
+
+```text
+b = ceil(log2(p)),
+m = ceil((log2(b))^(1/4)),
+L = max(ceil(r^(1/m)), 10m),
+```
+
+the typed hashed-factor-base reduction plus the Appendix D.4 contraction
+routine has expected total bit work
+
+```text
+2^O(b/(log b)^(1/4)) = r^o(1),
+```
+
+including base construction, relation attempts, prefix self-reduction, dense
+linear algebra, and target recovery.  This statement is conditional on the
+contraction-correctness and implementation-refinement obligations below.
+`[pcc:unverified]`
+
+The finite Curve25519 audit is not an instantiation of the asymptotic speedup:
+it reports a 149-bit expected contraction-call bound and a 412-bit dense
+elimination bound before the contraction theorem's hidden constants.
+`[pcc:unverified]`
+
+## Dependency graph
+
+```text
+R1 object refinement ─┬─> C1 contraction correctness ─┐
+R2 uniform history ───┤                               │
+R3 active-call cost ──┼─> C2 complete source cost ────┼─> T total ECDL
+R4 arithmetic widths ─┤                               │
+R5 recursion tree ────┘                               │
+E1 reduction semantics ─> E2 success/cost balance ────┘
+```
+
+An independent review may replace any node with a stronger theorem.  A
+counterexample to any node blocks only its descendants.
+
+## R1 — Rust object refinement
+
+For every active call produced by
+`crates/hashed-ecdl-tensor/src/contraction/recursive.rs`, bind the live objects
+to mathematical values
+
+```text
+(M, K, a, L=2^a, u, i, D=L/2^i, p, degree)
+```
+
+and establish all of the following:
+
+1. `K L <= 3M`, `1 <= u <= a`, `i < u`, and `u <= M`;
+2. the audited packet count includes empty slots and all retained packets;
+3. every old vertex, packet vertex, isolate, edge incidence, and creation
+   precision in the live child is represented in the mathematical child;
+4. the strict branch gives `8 M_child <= M` and child maximum degree at most
+   the root `delta`; and
+5. packet descriptions contain data only, with no callback to a parent
+   evaluator.
+
+The runtime guards and canonical serialization tests are evidence for R1 but
+do not constitute a refinement proof. `[pcc:unverified]`
+
+`IMPLEMENTATION_BOUNDARY.md` records that the positive production recursion is
+unreachable for a host-representable `usize` graph. The first symbolic active
+row has `lambda=131072,u=1`; at `lambda=2^26` all source guards pass but the
+theorem's `u>=lambda^(4/5)` invariant does not. The first passing power-of-two
+scan row is `lambda=2^480`, with 80 active depths. These facts make R1 a
+symbolic/refinement obligation rather than a runnable finite attack path.
+`[pcc:unverified]`
+
+The forced source-object control covers 2,080 `(radix,a,M,family,schedule,i)`
+contexts, 3,388 retained tuple states and 25,490 group-child calls. It checks
+every old vertex, isolate, endpoint/port identity, packet ownership, creation
+precision and total endpoint mass, plus 7,351 generated modes whose packet,
+target-row digit, source-column digit, nonzero coefficients, and weight bound
+all match their descriptions. A balanced radix-64 fixture additionally keeps
+all 262,144 packet vertices, including 254,016 isolates. This substantially
+tests items 2–5, but deliberately bypasses `Setup` admission and therefore
+does not close the live-object refinement. `[pcc:unverified]`
+
+The schema-3 packing-provenance verifier adds a separately implemented finite
+refinement for item 2. From serialized endpoint indices, vertex labels, and
+packet orientation patterns it reconstructs every label class, padding/copy
+index, packet slot, and active endpoint group, then requires exact agreement
+with the accepted schema-2 factorization object. This covers all 596 bounded
+partition certificates and the executed diagnostic. It begins after labels
+have been chosen for that corpus. A separate admitted three-edge control also
+replays the greedy conditional-expectation label selection, exact variance
+inequality, packet capacity, and every-coordinate group balance. The uniform
+arbitrary-size implication now follows from the source guards as stated in
+`PACKING_GUARD_CLOSURE.md`; independent formal refinement of that implication
+and the complete asymptotic R1 object remain open.
+`[pcc:unverified]`
+
+The schema-2 child verifier continues that finite refinement through one group
+child. From schema-3 parent provenance and the accepted factorization object it
+reconstructs selected old vertices and isolates, stable parent tensor sources,
+preserved degrees/ports and creation precision, all packet vertices and
+isolates, packet creation precision, ownership, and complete edge order. It
+binds every packet vertex to the independently checked entry table for its
+`(beta, group, packet)` key. Both groups of the admitted three-edge control
+pass after serialization; port, parent/packet precision, and tuple mutations
+fail. Every producer path also replays every retained `(beta, group)` child for
+the correlated fixture, the 596-case corpus, and the executed diagnostic. This
+family gate requires the exact Cartesian key set, rejects omissions and
+duplicates, checks `2M` child incidences per tuple, and binds the exact packet
+table count. The family summary tests actual eightfold edge shrink and the
+degree guard `max_degree<=delta` with `2L<=delta`, and admits strict refinement
+only with both guards at radix 64. The small control correctly reports false.
+This strengthens R1 items 2–3 through a generic finite tensor-table interface;
+uniform arbitrary-size refinement remains open. `[pcc:unverified]`
+
+The provenance-description envelope counts the schema-3 packing object and
+the complete schema-2 child family from structural atoms, containers and
+fields. Exact family coverage gives child atoms
+`T R(2+Q+2K)+4TV+8TM`, so this trace is `T` times a polynomial factor rather
+than a second tuple exponential. Source isolates are charged through `V` and
+the original description length. Schema 6 composes the remaining nonvertex
+units into 11 header terms plus 3 entry-value terms and binds the vertex factor
+7 without changing the local exponent. `[pcc:unverified]`
+
+The schema-1 node-refinement certificate composes all finite interfaces in one
+verification order: factorization, normalized source dimensions, packing, and
+the complete child family. It checks cross-object `M,K,L,a,i,T,R` equality and
+reports actual maximum child size/degree. Its strict entry point accepts only
+when the fixed radix-64 guards hold. The admitted radix-2 control passes the
+composed finite report but correctly fails strict admission. Thus R1 now has a
+generic finite checker; constructing a uniform accepted family remains open.
+`[pcc:unverified]`
+
+The schema-1 symmetric-source certificate supplies an explicit strict root
+family: a complete bipartite graph on `N` vertices per side with `L` parallel
+edges per pair and cyclic `64^a` labels. It proves uniform class size, `KL=M`,
+exact `M/64` endpoint load per side/group, and `M_child=M/32`, while checking
+the source degree, `LD`, and `2D^2 delta` guards by exponents. It passes at
+`lambda=2^26` and larger checked even exponents. This advances R1 at the root;
+the generic source-guard lemma below removes the need for children to preserve
+that shape.
+`[pcc:unverified]`
+
+The native radix-two child probe separates an under-scale padding failure from
+the first schedule point satisfying `M>=LD`. At `a=3`, `L=8`, `D=64`, the
+`M=32` model is rejected because its padded class mass is 512, but the
+`M=512=LD` root yields four accepted two-group paths. Their next edge counts
+are 512/512/516/508, maximum class 10, padded mass 1024, 74--78 packets,
+one-side group loads 260--262, and maximum degree 32. The final 508-edge path
+is below the next `LD` guard and would fall back. These controls exposed the
+sufficient class inequality but are finite diagnostics, not the proof below.
+`[pcc:unverified]`
+
+The production greedy labeler now computes exact degree-bucket and sparse
+incidence-Gram scores instead of rescanning all ordered edge pairs per
+candidate. The row weight is
+`deg(v)deg(w)+(q-1)sum_r m(v,r)m(w,r)`; the column weight is the dot product of
+row-label incidence profiles. An exhaustive 3,280-case reference comparison
+preserves every first-minimum choice in both the production packer and the
+independent sparse provenance verifier. It cuts the former 107.32-second single
+path to 0.02 seconds and enables the 0.06-second four-path control. The separate
+quadratic objective remains compiled only as a differential oracle.
+`[pcc:unverified]`
+
+Lean now has a transparent version of the verifier's first-minimum rule as
+well. `firstMinimumLabel` scans `List.finRange q` in ascending order and replaces
+the incumbent only on strict cost improvement, so equal costs keep the first
+label. `firstMinimumLabel_le` proves its selected cost is no greater than every
+candidate; `firstMinimumRowLabel_nonincreasing` and
+`firstMinimumColumnLabel_nonincreasing` instantiate the exact conditional
+objective and eliminate the abstract minimizer premise for each executable
+step. `SparseLabelScore.lean` proves that positive affine score transforms
+preserve the strict first-minimum result and that each full row or column
+candidate objective is a label-independent offset plus `2q` times its directed
+selected-label interaction score. The artifact checker evaluates this smaller
+score, while the theorem recovers the exact quadratic objective and first-label
+tie rule. The best observed cold artifact build fell from 229 seconds to 145
+seconds. `IncidenceBucketScore.lean` proves the edge-pair score equal to the
+native degree/right-endpoint-bucket row formula and proves the column score is
+`q` times the native row-label profile dot product. The artifact checker now
+uses those formulas, preserving the executable-schedule theorem and reducing
+the best observed cold build to 55 seconds.
+`BucketStateReplay.lean` supplies the state invariant for that step: the empty
+maps represent all-unknown assignments, each insertion exactly updates the
+degree/right-endpoint or row-label/column-label port counts, and each state
+score equals the corresponding extensional incidence score. A fuel-bounded
+native-order fold now threads those states through rows and columns; its
+soundness theorem maintains the exact prefix assignment, and strong induction
+proves accepted arrays equal the original recursive schedule. The artifact
+checker uses this fold, reducing the best observed cold build to 52 seconds.
+The exact-boundary CSV is now embedded as bounded elaboration-time chunks and
+reassembled into the same public string view. Kernel reduction over that
+chunked character view cuts the parse receipt from 23 seconds to 8.6 seconds.
+The parse, row replay, column replay, and source-guard checks remain separate
+parallel modules, while a single final join replaces the former serial
+trace/parser pair. A forced rebuild of the complete path took 27.82 seconds
+wall clock, down from 40.94 seconds (32.0%), meeting the sub-30-second
+end-to-end target. The theorem statements and strict-parser claim boundary are
+unchanged.
+`[pcc:unverified]`
+`executableRowLabels` and `executableColumnLabels` now use well-founded
+prefix recursion to construct the complete native-order schedule. Its exact
+prefix-minimum receipts prove the fully labeled objective nonincreasing, and
+`class_cap_for_executable_labels` carries those constructed labels through the
+strongest source guard to the final real-valued class cap without a caller-
+supplied label or minimizer family. `PackingLabelArtifact.lean` now parses a
+shared flat projection of the admitted three-edge schema-3 native control. The
+same overflow-checked native projection function runs at every producer
+certificate round trip, including all 596 three- through five-edge corpus
+cases. The formal importer
+checks its exact lengths and endpoint/label bounds, proves its typed endpoints
+and typed labels are their exact serialized natural values rather than modulo
+representatives, checks nonzero radix and `coordinate<packetExponent` exactly
+as the native verifier does, and replays the complete nontrivial native trace: rows
+`[0,1,0]`, then columns `[0,0,1]`.
+`parseReplayedPackingLabelArtifact_classCap` rewrites every accepted artifact's
+serialized label arrays to that executable schedule and feeds them directly
+into the strongest source-guard class-cap theorem. The stricter
+`parseSourceGuardPackingLabelArtifact` additionally recomputes every left/right
+endpoint fiber against the serialized degree cap and the full
+`2(q^2)^2 delta<=M` natural-number guard. Successful imports reach the class cap
+without caller premises. The replay checker uses the serialized row and column
+prefixes directly as auxiliary assignments; well-founded induction proves that
+passing local first-minimum steps equals the recursive executable schedule. A
+shared degree-one, two-label, 32-edge projection satisfies the strongest guard
+at equality and is accepted by both the native verifier and Lean strict parser,
+while the finite three-edge fixture is kernel-proved to be rejected. The
+independent native importer now evaluates the same proved row-bucket and
+column-profile auxiliary-state schedule, with its former quadratic objective
+retained only as a differential test oracle. Exact-boundary matching controls
+pass at packet exponents `a=1,2,3,4`; the largest has `M=131072`, `D=256`,
+maximum class 512, and 8192 packets. The three new rungs complete in 0.71
+seconds after compilation. The remaining boundary is to lift these finite
+code-to-model controls to every arbitrary-size producer object semantically
+and to every live recursive history.
+`[pcc:unverified]`
+The formal artifact itself now has a size-generic canonical projection in the
+same field order expected by the checked importer. Kernel proofs show that the
+unchecked parser is a left inverse under its declared split lengths, that every
+well-formed bounded artifact survives checked parsing, and that the replayed
+and strict source-guard parsers accept the projection when the corresponding
+formal trace and guard predicates hold. These statements quantify over every
+formal artifact. Conversely, every successful unchecked or checked parse
+projects back to the exact complete input list, excluding alternate encodings
+and accepted trailing data. The result does not yet refine Rust construction,
+integer conversion, or serialization to that projection. `[pcc:unverified]`
+Exact iff characterizations isolate that remaining obligation: the checked
+parser accepts exactly well-formed bounded canonical projections; the replayed
+parser adds exactly the formal trace predicate; and the strict parser adds
+exactly the source-class guard. `[pcc:unverified]`
+`PackingLabelSource` now mirrors the named native projection view rather than
+starting from an already flattened list. Its structured edge record flattens
+to four endpoint/port fields with a proved length, while Boolean conditional
+state and optional source cap map to the native numeric header convention. The
+source projection and `source.artifact.projectionValues` are definitionally
+equal. Consequently, source-shaped checked, replayed, and strict parser iff
+theorems expose precisely the well-formedness, bounds, trace, and source-guard
+obligations. The first two are now direct propositions over the named source:
+schema/conditional/context equalities, every structured endpoint bound, and
+every row/column label bound. Separate equivalence theorems discharge the
+flattened artifact's Boolean checks. Rust execution, allocation, integer
+conversion, and serde remain
+outside this formal refinement. `[pcc:unverified]`
+The exact-boundary source is now constructed as structured edges and labels,
+proved to convert to the existing artifact exactly, and accepted from its own
+canonical projection. The strengthened source-to-history endpoint defines the
+maximum class as a finite supremum over every recomputed class, proves that
+strict acceptance's pointwise cap applies to that maximum, and kernel-checks
+the exact native ceil-and-multiply padding inequality before obtaining
+eightfold shrink. It removes the selected-class and padded-height producer
+premises. Source length mass and the exact two-sided child-incidence inequality
+remain to be bound at every live call.
+`[pcc:unverified]`
+The independent native packing verifier now exposes exact length mass and
+padded height. Child replay counts row and column incidences separately, proves
+their sum by exact edge-array reconstruction, and checks the rounded-height
+two-sided inequality for every child. The node verifier composes those facts
+into a distinct radix-64 derived-shrink result and cross-checks observed
+eightfold shrink. A natural-number formal endpoint accepts the same two
+inequalities without caller-managed casts. Cross-language summary refinement
+is still open. `[pcc:unverified]`
+The native node summary now additionally emits an eight-natural compact
+history-shrink projection and independently checks its radix, rounded height,
+length mass, and child incidence arithmetic. `NodeShrinkArtifact.lean` mirrors
+that exact field order, rejects trailing fields, proves unchecked and checked
+projection round trips, and connects any valid aligned artifact to the
+strict-source history theorem. Alignment with a strictly parsed packing source
+is explicit; compiler, allocation, conversion, and serialization refinement
+remain outside the theorem. `[pcc:unverified]`
+The native joint exporter appends the complete packing-label projection to the
+eight summary fields. The formal bundle importer splits that exact interface,
+runs both checked parsers, and verifies edge count, label-class count, and
+maximum class alignment internally. Successful-parse soundness now carries
+directly to eightfold shrink, eliminating external alignment equalities at the
+formal data boundary. Equality with every native execution remains unproved.
+`[pcc:unverified]`
+
+A four-level default control follows all 16 radix-two paths to `a=5` from a
+root with `M=LD=32768`. Every final packing passes with 32755--32786 edges,
+degree 256, maximum class 36--40, padded mass 65536, 1188--1214 packets, and
+maximum one-side load 16406--16463. The proposed class inequality
+`max_class*D<=2M` holds on all paths; seven retain `M>=LD` and nine fall back.
+This is not strict R1 evidence because the finite model does not satisfy
+`M>=2D^2 delta`. `[pcc:unverified]`
+
+`PACKING_GUARD_CLOSURE.md` supplies the graph-generic producer proof. From
+`D sum c^2-M^2<=2M delta D` it obtains
+`sum(c-M/D)^2<=2M delta`. The active guard `M>=2D^2 delta` therefore forces
+`cD<=2M` for every class. With `M>=LD`, padded mass and `KL` are at most `3M`;
+each one-side radix-64 group load is at most `2M/64`; every child has at most
+`M/16` edges; and packet degree is at most `2L<=delta`. The next node either
+rechecks the same guards or falls back. This closes R1's uniform packing,
+capacity, group-balance, shrink, and degree induction on the producer side.
+Independent formal refinement and the external factorization/contraction
+theorem remain open. `[pcc:unverified]`
+
+The schema-6 symbolic transcript independently retains the looser source
+arithmetic: `3M/64` endpoints per side give `6M/64` child edges and eightfold
+shrink. The guard-closure lemma strengthens those figures to `2M/64` per side
+and `M/16` per child. The transcript's constants remain valid; the remaining
+R1 gap is independent object/provenance refinement, not packing or shrink
+arithmetic. `[pcc:unverified]`
+
+## R2 — Uniform precision history
+
+Put `s=M_0`, `lambda=ceil(log2(s))`, and
+`u_d=floor(lambda/(2^17 2^d))`.  Under R1's strict shrink and the fixed root
+leaf cutoff, an active depth satisfies `8^d < floor(sqrt(lambda))`.
+
+For every `lambda >= 2^26`, establish simultaneously at every possible active
+depth:
+
+```text
+u_d >= 32,
+81 floor(sqrt(lambda)) u_d <= 2^(u_d+1),
+8 u_d (a_d+1) <= 2^(a_(d-1)+u_d+1),
+p_next u_d <= 34 M_d (L_d/2^i).
+```
+
+`audit_uniform_history` checks the complete finite depth schedule and the
+negative `lambda=2^23` control.  The following all-lambda derivation is the
+source-schedule proof-obligation sketch. The scalar consequences
+`81hu<=2^(u+1)`, evaluation-loss absorption, active-cutoff comparison, and the
+composition with the existing finite precision-history theorem are now kernel
+checked in `lean/PrecisionAbsorption.lean`. The same module derives `8^d<h`
+from the shrink history and active cutoff, derives the leaf square bound and
+positivity from the exact square-root definition, then derives
+`u>=32,h<=512u` from the source quotient and threshold. Binding those remaining
+typed source/history facts and the numeric recurrence to actual native paths
+remains open. `[pcc:unverified]`
+For `d<=4`, the threshold gives `u_d>=32`; for `d>=5`,
+activity gives `lambda>2^(6d)` and therefore
+`u_d>=2^(5d-17)>=2^d>=32`.  Consequently
+`lambda<2^(17+d)(u_d+1)<2^18*u_d^2`, so
+`floor(sqrt(lambda))<512u_d`.  The inherited absorption follows from its
+`u=32` base case because the exponential right side doubles while its
+quadratic left bound grows by less than two.  For evaluation,
+`(A+2u+1)/2^A` decreases for every integer `A>=0`, so `A=0` is worst; its
+`u=32` base case and the same induction prove the second absorption.
+`[pcc:unverified]`
+
+The schema-versioned transcript in `SYMBOLIC_HISTORY_CERTIFICATE.md` gives a
+separate executable scalar boundary. Its verifier independently reconstructs
+all five threshold depths and composition constants from a 7,718-byte JSON
+fixture without importing the producer dimension audit or graph code. Schema 6
+also reconstructs a normalized `M,K,L,tau,p` family at both coordinate
+endpoints of every depth and checks the exact local identities `KL=3M`,
+`tau D=2L`, `nD=6M`, `pu=34MD`, `npu=204M^2`, and the tuple exponent
+constant `80`. It also checks provenance multipliers `11,3,7,14`, composing
+the complete finite trace into one tuple factor plus polynomial structural
+data without changing `96`, `290`, or `148480`. This strengthens R2's finite
+replay and proves consistency of its scalar premises, but does not discharge
+R1's graph-realization premise. `[pcc:unverified]`
+
+The schema-2 parametric-refinement certificate now separates those normalized
+examples from the generic implication. It consumes the checked root/history
+schedule, assumes the variance/source/precision premise tokens explicitly, and
+reconstructs `cD<=2M`, `KL<=3M`, `nD<=6M`, the `4M/64` derived child bound,
+the history's `6M/64` bound, eightfold shrink, degree preservation, and the
+complete `80,96,290,148480` ledger across every retained depth. Its accepted
+summary reports `mode_dimension_bound_derived=true` while keeping the remaining
+generic premises assumed, so this is not a graph realization or an external
+contraction proof. `[pcc:unverified]`
+
+The accompanying Lean 4.35 project independently kernel-checks the downstream
+real-inequality implications and exact ledger arithmetic. Its theorem
+statements expose nonnegative `M` in the child-shrink steps and positive `D`
+in the mode/precision cancellation. It also proves
+`2^(i+1)*2^(a-i)=2*2^a` and derives `nD<=6M` directly from `KL<=3M` for every
+admitted coordinate. The axiom audit reports only `propext`,
+`Classical.choice`, and `Quot.sound`. The imported finite-history theorem and
+new absorption bridge now derive `pu<=34MD` from explicit numeric path and
+schedule facts. A natural-number composition theorem combines that result with
+the packet-capacity mode bound and cancels the positive power-of-two dimension
+to derive `npu<=204M^2` directly. The native code-to-model bindings for graph
+labels and precision histories, finite factorization realization, and external
+contraction theorem remain explicit hypotheses or out of scope.
+`[pcc:unverified]`
+
+The next Lean module closes two more graph-side algebra layers: capped left and
+right degree sequences have total ordered endpoint charge at most `2M delta`,
+and the scaled collision-objective inequality implies the exact centered
+variance sum and every `c_gamma D<=2M` class cap. Isolates are degree-zero
+entries and parallel edges contribute their full port multiplicity. What is
+now also formalized is the exact one-vertex conditional-expectation step: the
+sum over every row or column label equals `q` times the old partial objective,
+so a minimum choice is nonincreasing. The finite row-then-column composition,
+initial endpoint-charge bound, final class-count identity, scaled collision
+bound, and source-guard per-class cap are now kernel-checked as well. The next
+bridge is a typed correspondence between the native endpoint/label replay and
+these formal inputs, not another scalar variance lemma.
+`[pcc:unverified]`
+
+For the schema-2 factorization description, the same verifier reconstructs
+`Delta_d=2L_d+16(lambda+a_d+u_d+1)` after charging the tuple count and checks
+`Delta_d floor(sqrt(lambda)) ceil(sqrt(u_d))<=2^(lambda-1)` at every retained
+depth. Hence `Delta_d<=M_d/sqrt(u_d)` at any active node. The local exponent
+ledger becomes exactly `80+1+4+5+6=96`, so description output is included in
+R3 without changing its constant. `[pcc:unverified]`
+
+## R3 — One active-call cost
+
+Assuming R1 and R2, prove that one active call with `M` edges and scale `u`
+invokes children at most `[pcc:unverified]`
+
+```text
+2^(96 M/sqrt(u))
+```
+
+up to a fixed-degree polynomial in the input and description lengths.  The
+proof must include zero-filtered mode construction, weighted tuple
+enumeration, all active Hermite nodes, every interpolation sample, all 64
+radix groups, and packet-entry coefficient choices.
+
+The executable ingredients are `audit_node_dimensions`, the exact small
+weighted-tuple enumerations, and the packet-capacity runtime guard.
+`[pcc:unverified]`
+
+## R4 — Arithmetic and representation widths
+
+For the direct algorithms actually called by `active` and `recover`, prove
+that the following bounds cover every stored value and temporary.
+`[pcc:unverified]`
+
+```text
+retained jet coefficients      J <= 8 M L
+maximum multiplicity           q_max <= 4 M
+ring multiplication temporary  <= 2p+1 bits
+rational multiplier            <= (J+q_max)(a+1)+1 bits
+rational accumulator           <= J(J+q_max)(a+1)+J+p+ceil(log2(J+1))+1 bits.
+```
+
+Also refine the direct interpolation and recovery operation counts returned by
+`audit_arithmetic_widths`.  Canonical coefficient reduction and reduced
+`Ratio<BigInt>` representations may lower these widths but cannot be assumed
+without a representation lemma. `[pcc:unverified]`
+
+## R5 — Complete recursion tree
+
+Assuming R1–R4, prove `[pcc:unverified]`
+
+```text
+M_d <= s/8^d,
+u_0 <= 4^(d+1) u_d,
+sum_d M_d/sqrt(u_d) <= 3s/sqrt(u_0).
+```
+
+The active branching exponent is then at most `288s/sqrt(u_0)`.  Direct leaves
+and packet-entry traversal add one unit each, giving
+
+```text
+(s+description)^O(1) * 2^(290s/sqrt(u_0))
+ <= (s+description)^O(1) * 2^(148480s/sqrt(lambda)).
+```
+
+`audit_recursion_composition` checks the finite source schedule at the
+threshold.  The missing step is a quantified theorem linked to R1's live
+recursion tree. `[pcc:unverified]`
+
+## C1 — Contraction correctness
+
+For every admitted bipartite tensor graph and every creation-precision
+history, prove that `active` returns the same ring element as direct tensor
+contraction. `[pcc:unverified]` This decomposes into:
+
+1. the Cauchy kernel and mode expansion equal the original packet entries;
+2. weighted tuple truncation drops only terms divisible by the working
+   precision;
+3. every constructed child represents its intended coefficient product;
+4. interpolation recovers each required Taylor coefficient over the extension
+   of `Z/2^p Z`;
+5. tapered Hermite recovery returns the constant term and is 2-adically
+   integral; and
+6. creation-time representatives are lifted canonically at later precisions.
+
+`HERMITE_IDENTITY.md` states item 5 as an explicit fraction-field identity,
+maps every term to `recover`, and derives an all-parameter recovery loss below
+the existing `8h(L/2^i)` node allowance. Independent checking and the live
+Rust refinement link remain open. `[pcc:unverified]`
+
+For item 4, the sample points are binary-coordinate lifts of distinct elements
+of `GF(2^d)`. Every pairwise difference is therefore nonzero modulo two and
+is a unit at every coefficient precision. Lagrange interpolation over the
+extension of `Z/2^p Z` is exact whenever the guarded sample count is at most
+`2^d`. The native control covers precisions 1/3/17, degrees 1/3/4/8,
+extension-valued coefficients, all retained lengths through nine, and a
+duplicate-node failure. Linking the values returned by `evaluate_at` to the
+claimed deformation polynomial remains in C1 items 1–3. `[pcc:unverified]`
+
+For item 1's scalar kernel step, `mode_coefficient` is the geometric expansion
+of `Cauchy::weight` along a tile `y=y0+2^(i+1)j`. Its weight-`b+1`
+coefficient is divisible by `2^(b+1)`, and the coefficient at `b=p-1` is zero
+modulo `2^p`, justifying the finite series. The native control now checks all
+active nodes for `u=1,a=2,L=4,p=5` and `u=2,a=4,L=16,p=7`, at scalar and
+nontrivial extension sample values. Factoring those scalar identities through
+`modes`, `child`, and all packet ports remains in items 2–3.
+`[pcc:unverified]`
+
+For the packet-local part of items 2–3, an independent exhaustive oracle now
+enumerates every constant/incoming-mode choice per row and filters only by the
+requested exponent vector. It agrees with the production depth-first
+coefficient extractor on all 64 port assignments for four rows, two columns,
+two simultaneous incoming modes of total degree three, local affine terms,
+and two outgoing forms including a square. A separate direct deformation
+oracle sums over independent left/right incidence bits and applies the full
+Cauchy packet kernel without calling `modes`, `child`, `next_tuple`, packet
+entry, or `evaluate_at`. It agrees with the extracted modes-to-child product
+in 1,536 configurations: all 256 endpoint-table pairs for three parallel-port
+label/sample cases and all 256 behavior pairs for each other two-port vertex
+partition (split-left, split-right, and split-both). The cases cover local and
+crossing groups, zero/unit/extension samples, correlated ports, and vertices
+assigned to both groups. Removing a generated mode or flipping its target
+group is also detected against that direct oracle. The remaining link is the
+quantified refinement for every admitted graph, not an untested finite
+semantic target. `[pcc:unverified]`
+
+The direct oracle also exhausts all 25 left/right set-partition pairs of three
+labeled edges, all 64 products of per-vertex delta-table bases, and four label
+schedules, for 6,400 further configurations. Since both sides of the identity
+are separately linear in every old tensor table, this basis determines the
+factorization map for arbitrary tensor entries on each tested structural
+shape. This strengthens the independent finite refinement without claiming
+all packet counts, edge counts, or labelings. `[pcc:unverified]`
+
+At four edges, the control quotients all 225 partition pairs to 33 graph-shape
+orbits under simultaneous edge relabeling, then checks all 256 delta-basis
+coefficients under four label schedules: 33,792 comparisons. A test-only
+symbolic child map batches the coefficients by old-incidence mask while still
+calling production mode construction, tuple enumeration, child construction,
+and packet entries. It agrees with a separately computed direct packet-kernel
+map. The measured Rust 1.78 debug runtime fell from 536.50 seconds for repeated
+delta contractions to 3.96 seconds for the same coefficient set.
+`[pcc:unverified]`
+
+At five edges, the same symbolic kernel covers all 91 graph-shape orbits of
+the 2,704 left/right partition pairs, four label schedules, and all 1,024
+delta-basis coefficients: 372,736 comparisons. A third independent map now
+expands same-group kernel weights and generated mode row/source forms directly,
+without calling child construction, tuple enumeration, or packet entry. All
+three maps agree in 76.17 seconds under Rust 1.78 debug. This meets the
+90-second scaling target but remains a bounded refinement rather than a
+quantified proof. `[pcc:unverified]`
+
+`COEFFICIENT_MAP_REFINEMENT.md` states the reusable incidence-basis lemma
+behind those maps, proves the producer implication `D=E=H`, maps each object
+to Rust, and lists the six checks required from an independent kernel.
+`[pcc:unverified]`
+
+A separate public native certificate verifier now implements those six checks
+over plain certificate data without invoking production child construction
+during verification. Duplicate packet coverage, duplicated mode slots,
+mode-target reassignment, tuple removal, and packet-table mutation are rejected.
+The schema-2 positive certificate round-trips through a stable 2,172-byte JSON
+representation; schema mismatch, noncanonical ring-element, invalid tile
+period, and overflowing structural-count mutations fail closed.
+`[pcc:unverified]`
+
+The serialized checker also covers all 100 combinations of the 25 three-edge
+left/right set-partition pairs and four label schedules. Their total wire size
+is 318,734 bytes, the largest certificate is 10,146 bytes, and the warm Rust
+1.78 debug verification sweep takes 0.34 seconds. `[pcc:unverified]`
+
+For four edges, the same boundary covers 33 graph-shape orbits and four label
+schedules: 132 certificates, 792,556 total bytes, and a 20,777-byte maximum.
+Measured checker time is about 0.60 seconds; production and JSON bring the
+complete warm debug gate to 1.12--1.26 seconds. `[pcc:unverified]`
+
+For five edges, 91 relabeling orbits under four schedules give 364 serialized
+certificates, 3,652,442 total bytes, and a 43,460-byte maximum. The measured
+verifier phase is 2.06 seconds and the complete production/JSON/verification
+gate is 4.93 seconds, below the three-second and six-second targets.
+`[pcc:unverified]`
+
+`CERTIFICATE_DESCRIPTION_ENVELOPE.md` then bounds the complete certificate
+description from `M,K,L,tau,R,Q,T,d,p`. The entry-value term follows from
+`sum_g 2^a_g <= 2^(2L)+R-1`; explicit JSON and canonical-binary ceilings are
+checked on every serialized fixture through five edges. The verifier also
+reconstructs the tile keys and exact weighted tuple set, enforcing
+`Q<=K tau(p-1)` and `log2 T<=5 ceil(sqrt(K tau p))`. This binds `Q` and `T` to
+the existing active-call source ledger while leaving recursive history and
+precision refinement open.
+`[pcc:unverified]`
+
+The producer control constructs `NodeDimensions` from every bounded
+certificate. Of the 596 three- through five-edge partition certificates, 285
+satisfy `K L<=3M`; their packet length, tile period, per-weight and total mode
+ceilings, and tuple-log2 ceiling equal the independent BigUint audit exactly.
+The other 311, plus the correlated two-edge fixture, are retained only as
+algebraic controls and are explicitly rejected by the source packing premise.
+`[pcc:unverified]`
+
+The verifier is now a public module separate from recursive contraction and a
+native `factorization-certificate-check` executable. It imports exact ring
+arithmetic but no contraction, deformation, packing, child, or packet-tensor
+code. The command caps JSON input at 64 MiB and applies explicit work, vector,
+width, and mode-depth limits. This is an executable separation boundary, not a
+theorem-assistant or independently reimplemented arithmetic kernel.
+`[pcc:unverified]`
+
+`GROUP_FACTORIZATION.md` states that remaining theorem as a packet-polynomial
+coefficient identity, maps its constants, incoming coefficients, exponent
+tuple, and outgoing forms to Rust, and isolates the all-graph refinement gate.
+It now also gives the quantified producer proof from the direct deformation
+sum to the product of child contractions: whole-vertex port correlation,
+packet ownership, isolated vertices, target/source placement, finite Fubini,
+and weighted truncation are explicit. `lean/GroupFactorization.lean`
+kernel-checks the generic row expansion, finite fiber regrouping, disjoint
+group-assignment Fubini identity, exact addition of 2-adic weights, and
+high-weight vanishing modulo `2^p`. It also proves the nilpotent truncated
+geometric inverse used by the scalar mode series. The stronger Rust-shaped
+specialization keeps the finite-series remainder, derives the normalized tile
+shift `2^(i+1-v)j`, and proves from `v<=i<=a` that the outer
+`2^(a+1-v)` shift makes the `b=p-1` remainder zero in every coefficient ring
+where `2^p=0`. It now additionally regroups row choices by their complete
+bounded mode-exponent vector, proves the exact `2M` endpoint mass of
+the row/column group fibers, and instantiates Fubini for complete packet/group
+Boolean entry tables and opaque retained-old-tensor terms. The remaining gap
+is narrowed by `GroupAssignmentArtifact.lean`, a checked native-order importer
+for the actual left/right group arrays. It preserves exact typed lookup values
+and instantiates the generic endpoint-fiber theorem at those arrays, giving
+total mass `2M`. `PacketAssignmentArtifact.lean` then imports one native packet
+owner per edge, aligns the packet and group artifacts internally, preserves
+exact typed ownership, and instantiates the complete packet/group child-family
+factorization at those functions. Packet entry values, coefficient values,
+complete child tensors, and the external contraction theorem are still not
+refined by these compact artifacts. The remaining gap is the code-to-model
+link from concrete Rust Cauchy modes and child arrays to
+these typed inputs, rather than the finite rearrangement, child-interface,
+shift, cutoff, or geometric-series algebra itself.
+`[pcc:unverified]`
+
+The scalar half of that link now has a typed native witness. The standalone
+verifier first reruns `Ring::new` and checks the serialized monic bit pattern
+plus the exact length-`d` lower-bit vector corresponding to the formal
+`Fin d -> Bool` parameter. It then reconstructs the signed grid, derivative
+content, unit factors and inverses, base, numerator unit, all packet weights,
+and every emitted nonzero mode coefficient from serialized `(a,i,t,z)` data.
+Its implementation imports
+the exact ring only, not the production deformation or recursion modules. The
+same verifier composes accepted packing-provenance packet pairs with the scalar
+witness to enumerate the complete mode vector in exact source-loop order,
+including all empty-tile, empty-row, zero-form, and zero-row suppressions. The
+formal `ExtensionRingModel` now supplies the exact quotient type
+`(Z/2^p)[U]/f`, power-basis coordinate decoding, additive operations,
+extension nilpotence, and a Cauchy-series specialization with the modulus
+premise discharged. It also proves the binary root relation and one exact
+high-power subtraction step matching the native reduction loop. The formal
+layer now represents each reduction as subtraction of a shifted modulus,
+proves that it clears the targeted coefficient, and proves by induction that
+every finite reduction-offset schedule preserves the quotient value. The
+coordinate-polynomial projection theorem additionally identifies decoded
+multiplication with ordinary polynomial convolution followed by any verified
+reduction schedule. That convolution is now kernel-expanded into the same
+nested finite `i,j` monomial sum as the Rust loops, with the exact conditional
+pair sum for every buffer slot and zero support beyond `2d-1`. The formal fold
+models the zero-initialized mutable loop, both zero-coordinate fast
+paths, and each `i+j` slot update, proving that every final slot equals that
+conditional pair sum. The exact polynomial schedule is no longer a gap:
+offsets `d-2,...,0` preserve the quotient, each cleared high
+coefficient stays cleared through all later lower steps, and every coefficient
+at index at least `d` vanishes after reducing a `2d-1` convolution.
+The mutable reduction inner row is source-shaped as well: it clones the current
+high coefficient, preserves its zero fast path, subtracts it exactly at each set
+lower-polynomial bit, and changes no slot at or above the processed target. The
+retained-high polynomial differs from the logical clearing step only by the
+processed monomial that truncation discards. Induction over the complete reverse
+range now proves every returned low slot equals the logical reduced coefficient;
+the returned coordinate polynomial equals the reduced convolution, and its
+power-basis decoding is exactly the product of the decoded inputs. A native
+`RingMultiplicationWitness` now serializes canonical inputs and output together
+with the deterministic polynomial and lower-bit vector. Its standalone verifier
+independently executes the same zero-fast-path convolution, retained-high reverse
+reduction, and truncation transition order, and rejects a changed output. The
+native control flattens those fields plus exact `16/6` transition counts and
+compares them with `ring_multiplication_witness.csv`. The formal model consumes
+that same artifact through `include_str` and a transparent decimal parser,
+then derives all four degree-sized vector boundaries into a typed record and
+rejects malformed lengths or non-Boolean lower-bit fields. It kernel-checks the
+generic successful-parse implication from the Boolean shape validator, proving
+that every exposed record has four vectors of exactly its encoded degree. It
+then recomputes the monic packed polynomial from the lower-bit vector and checks
+every left, right, and product coordinate against `2^precision`; a second
+generic implication proves every successful canonical import satisfies all of
+those checks. The committed record kernel-checks through that boundary, then
+uses its packed polynomial `19`, lower bits
+`[1,1,0,0]`, separate dense left/right inputs, and product `[30,29,0,3]` in the
+exact source-shaped evaluation without positional field offsets. The concrete
+evaluation is composed with `decodeNativeProductCoordinates`, so the typed
+record's product coordinates now decode as the quotient-ring product of its
+left and right coordinates. The formal layer now also has an executable
+natural-number replay of the exact zero-fast-path convolution, masked updates,
+retained-high reverse reduction, and truncation. Every transition preserves
+representatives below `2^precision`, and the complete replay is proved to cast
+coordinatewise to `nativeProductCoordinates`.
+For arbitrary degree and precision, `parseReplayedRingMultiplicationArtifact`
+packages imported lists as `Fin degree` functions, checks positive degree and
+every recomputed product coordinate, and
+`parsedReplayedRingMultiplicationArtifact_decodes_mul` yields the decoded
+quotient product without an external replay-equality premise. The committed
+degree-four fixture passes that generic executable boundary by kernel
+computation. The remaining boundary is a mechanized compiler refinement from
+concrete Rust `Vec<BigUint>` execution and serialization to this evaluator, plus
+external provenance for supplied records; the Lean-side arbitrary-record
+arithmetic check itself is no longer fixture-specific.
+`parseSelectedReplayedRingMultiplicationArtifact` adds the deterministic
+modulus boundary: it requires degree at least two, reruns the packed search, and
+checks every typed lower bit against the selected packed value. The generic
+`parsedSelectedReplayedRingMultiplicationArtifact_certificate` then combines
+canonicality, exact selection, irreducibility of the artifact's actual
+precision-one `binaryPolynomial`, and quotient multiplication. The degree-four
+fixture passes this combined parser by kernel computation. Thus both search and
+product contents of an arbitrary supplied artifact are checked in Lean; a
+compiler/serialization refinement proving that concrete Rust emitted the
+artifact remains separate.
+`parseMeteredSelectedReplayedRingMultiplicationArtifact` additionally recomputes
+the exact nonzero convolution-product count and the set-bit subtraction count
+while threading the same changing natural-number buffer through descending
+reduction. Its generic certificate carries both serialized-counter equalities
+alongside the complete selected-modulus/product certificate. The degree-four
+fixture passes at `16/6` by kernel computation, so every serialized field is
+checked at the Lean boundary. Concrete Rust compiler/serialization refinement
+and external provenance remain separate.
+The same fixture now has a transparent packed-`GF(2)` deterministic-selection
+model. It mirrors the native remainder, carryless multiplication, gcd, Rabin
+loop, and odd candidate order, proves candidate `17` fails and candidate `19`
+passes, proves the first degree-four result is `19`, and binds that result to the
+typed record's polynomial field. An independent algebraic proof then exhausts
+the two monic linear and four monic quadratic factor shapes over `GF(2)`, proves
+`U^4+U+1` irreducible, and proves the artifact's lower bits decode to exactly
+that polynomial. The combined theorem therefore pairs selection with genuine
+irreducibility for this fixture. This closes the degree-four algebraic check.
+The general result below additionally proves that the deterministic search
+returns a result at every degree at least two and certifies each result's exact
+degree and irreducibility. A Rust compiler refinement of `Ring::new` remains.
+Complete child construction remains a separate concrete binding.
+`[pcc:unverified]`
+
+The first arbitrary-width packed-to-polynomial layer is also formalized.
+`packedGF2Polynomial` reads a fixed window of native bits as coefficients in
+`GF(2)[U]`; coefficient lookup agrees with `Nat.testBit`, XOR agrees with
+polynomial addition, and multiplication by a power of two has the expected
+shifted and zero-low coefficient behavior. The source-shaped carryless-product
+fold then decodes exactly to a polynomial-addition fold of those shifted packed
+values. A width-extension theorem and a complete shift identity compose this
+with finite-sum multiplication: if the left packed value is below
+`2^leftWidth`, the native raw product decodes exactly to ordinary polynomial
+multiplication, with the right decoder using the native `log2(right)+1` bound.
+Each packed remainder step is also transported to addition by `U^shift` times
+the decoded modulus and proved to preserve `modByMonic`. The proof composes over
+arbitrary bounded shift lists; a transparent shift trace exactly replays
+`gf2PackedRemainderFuel`, yielding a conditional semantic theorem for the
+public remainder. A bit-level leading-term proof now shows every aligned step
+clears the current top bit and introduces nothing higher. Consequently every
+emitted shift fits the input `log2+1` window, the configured fuel suffices, and
+the result is zero or has packed `log2` below a nonzero modulus. The remaining
+normal-form bridge is now closed: for nonzero values whose leading bit lies in
+the window, the packed decoder has `natDegree=log2(value)`, is nonzero, and is
+monic. Composing degree, residue, and termination proves that the decoded public
+remainder equals `modByMonic` exactly. The raw carryless fold is additionally
+bounded by the sum of the left and right windows, so the multiplication theorem
+extends to every wider decoder. For nonzero inputs its packed leading degree is
+additive; zero inputs close separately. Thus `gf2PackedProduct` now decodes
+exactly to polynomial multiplication followed by `modByMonic` for every
+nonzero packed modulus. Minimal-window decoding is then proved equivalent to
+the wider product window and composed through an arbitrary number of native
+square-and-reduce steps. The resulting Frobenius iterator theorem identifies a
+reduced start with its exact `2^steps` power modulo the decoded modulus. Since
+the Rabin start is itself a packed remainder, its normalization premise is
+kernel-derived. The packed GCD is now refined separately: minimal-window
+remainder correctness drives a fuel induction, strict right-degree descent
+discharges the public sum-of-degrees bound, and the returned value plus native
+`==1` guard are proved equivalent to Euclidean polynomial GCD and equality to
+one. The Boolean-loop portion is now closed as well:
+fixed-window and minimal-window decoding are injective, so induction over
+`gf2PackedIrreducibleAux` converts every early exit to the polynomial GCD-one
+guard and its terminal comparison to decoded Frobenius equality. The public
+packed predicate is equivalent to that semantic trace. The semantic recursion
+is now additionally unrolled into a nonrecursive indexed
+family of the active Frobenius/GCD checks and terminal equality. Composing the
+arbitrary-step Frobenius theorem identifies that terminal equality with the
+closed `x^(2^degree)=x mod f` condition for every nonzero packed modulus.
+Minimal-window XOR is additionally identified with polynomial addition, and
+GCD invariance removes the inner `modByMonic` from every active guard. Since
+addition equals subtraction over `GF(2)`, each indexed guard now has the exact
+standard form `gcd(f, x^(2^(offset+1))-x)=1`. For soundness, the
+implementation's stronger all-half-degree family is enough: in any nontrivial
+factorization, an
+irreducible factor of degree at most half would divide both the modulus and its
+own `X^(2^i)-X`, contradicting the corresponding GCD-one guard. Thus
+`gf2PackedIrreducible_sound` proves accepted packed polynomials irreducible
+whenever their packed `log2` equals the supplied degree and that degree is at
+least two. Completeness is now proved in the reverse direction as well:
+irreducibility rules out divisibility by every lower Frobenius polynomial,
+which reconstructs each native GCD guard, while the finite-field divisibility
+theorem supplies the terminal native equality. Hence
+`gf2PackedIrreducible_iff_irreducible` gives a full equivalence on matching
+packed degree at least two. An induction over
+`firstIrreducibleBinaryPolynomialAux` preserves the candidate-window invariant
+and proves that any returned value has the requested `log2` and passed the
+packed predicate. Therefore
+`firstIrreducibleBinaryPolynomial_some_irreducible` certifies every successful
+public search result of degree at least two as an exact-degree irreducible
+polynomial. Existence is now closed too: the primitive-element theorem for
+`GF(2^degree)` supplies a monic irreducible minimal polynomial of exact degree;
+support packing and its decoder inverse put that polynomial at an odd index in
+the exact bounded candidate window. Predicate completeness and a second search
+induction prove `firstIrreducibleBinaryPolynomial_exists` for every degree at
+least two. `binaryPolynomial_packedLowerCoefficient` then proves the packed
+decoder equals the precision-one `binaryPolynomial` used by `NativeExtension`,
+and `selectedBinaryPolynomial_irreducible` transfers irreducibility to that
+actual modulus for every selected value. The concrete Rust compiler refinement
+remains separate.
+Sources checked: the all-half-degree loop in
+`crates/hashed-ecdl-tensor/src/ring.rs` and mathlib's verified
+`Irreducible.natDegree_dvd_iff_dvd_X_pow_card_pow_sub_X`,
+`Field.exists_primitive_element_of_finite_bot`, and
+`Field.primitive_element_iff_minpoly_natDegree_eq` theorems in
+`Mathlib.FieldTheory.Finite.Extension` and
+`Mathlib.FieldTheory.PrimitiveElement`. The repository KB wrapper was
+unavailable because no `research-kb` executable was installed.
+`[pcc:unverified]`
+
+Production `next_tuple` also matches an independent Cartesian enumeration in
+83,970 exhaustive small-state configurations, plus two multi-packet fixtures.
+`WEIGHTED_TUPLE_ITERATOR.md` states the general positive-weight cached-state,
+arithmetic-safety, termination, and restricted-odometer argument. This closes
+the producer-side iterator subargument without replacing independent or
+kernel-checked refinement. `[pcc:unverified]`
+
+The native suite covers direct one-level controls, two taper coordinates,
+creation-precision mutation tests, and a nonvacuous three-level one-taper
+control. That callback tree now carries 433 independently verified serialized
+node certificates through active depths zero, one, and two, with exact counts
+`1,20,412` and working precisions `3,67,131`. It remains a non-strict,
+non-shrinking diagnostic and therefore does not establish a source-admitted
+history. An isolated recovery control additionally covers `u=2` and `u=3`,
+all their taper valuations, root precisions 3/5/7 at `u=2`, and scalar plus
+nontrivial extension-coordinate polynomials.  A combined two-taper/deep
+diagnostic remained live past 90 seconds, so these bounded tests do not close
+C1. `[pcc:unverified]`
+
+No allocated strict-history fixture exists for the current backend. A direct
+production `Setup` control at `usize::MAX` returns no recursive parameters;
+the general reason is `lambda<=usize::BITS<128*1024`, hence root `u=0` for
+every host-representable graph. Closing C1 with an executed strict history
+therefore requires an implicit symbolic representation and a new refinement,
+not a larger native allocation. `[pcc:unverified]`
+
+## C2 — Complete source cost
+
+C2 is R1–R5 plus the assertion that all code executed by an active call is
+included: allocation, graph construction, packing, interpolation, recovery,
+packet entry, recursion bookkeeping, and integer/rational arithmetic.  No
+unpriced oracle, parent callback, or depth-dependent hidden description may
+remain. `[pcc:unverified]`
+
+## E1 — Prime-field reduction semantics
+
+For one fixed public seed, establish that:
+
+1. base enumeration is exact and deterministic;
+2. the contraction oracle sees only the public bases and target group element,
+   not its hidden scalar coefficients;
+3. prefix self-reduction is deterministic and returns a replayable witness;
+4. relation dependency selection is deterministic;
+5. duplicated points in different slots remain distinct columns; and
+6. target recovery accepts only after exact scalar replay.
+
+These properties are exercised by the typed network and reduction tests but
+remain part of the end-to-end refinement boundary. `[pcc:unverified]`
+
+## E2 — Success probability and total cost
+
+Using the pinned Bochum v0.2 Theorem 4 and Lemmas 9–13, independently establish
+the fixed-target seed average `>=2/5`, good-seed probability `>=1/4`, enough-row
+probability `>=3/4`, and final nonzero coefficient probability `1-1/r`.  The
+per-trial lower bound is
+
+```text
+3(r-1)/(16r) > 1/6,
+```
+
+so fresh trials have expected count at most six.  Charge factor-base
+enumeration, `O(mb)` prefix contractions per target attempt, an `(N+1)`-row
+dense elimination, and exact target replay. `[pcc:unverified]`
+
+## Acceptance rule
+
+The top-level statement may be promoted only when C1, C2, E1, and E2 have
+independent proofs or a kernel-checked composition, with R1–R5 discharged as
+their named dependencies.  Until then, the result is a conditional producer
+certificate and every finite Curve25519 number is a cost ledger rather than a
+security estimate. `[pcc:unverified]`

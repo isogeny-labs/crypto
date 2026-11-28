@@ -1,0 +1,39 @@
+{
+  "schema": "engineering.managed-workflow-wiring/v1",
+  "baseline_commit": "4305e8bdf8ce6493392bc62d99f0aada6d811f16",
+  "failed_hosted_run": 44617363559,
+  "hosted_tool_tests": 60,
+  "hosted_prefetch_tests": 5,
+  "failure": "Canonical generated pull-step contract missing in the two Rust workflows",
+  "results": {
+    "rust-all-targets.yml": {
+      "managed_steps": 3,
+      "exact_paths": 16,
+      "generator_idempotent": true,
+      "git_source_pinned": true,
+      "notes": [],
+      "source_consuming_commands_retained": true,
+      "sha256": "ac83aff4688ffd1f6428edc1d6e5227bb7436c37a54de092206974b9331f2b5d"
+    },
+    "rust-lint.yml": {
+      "managed_steps": 3,
+      "exact_paths": 1,
+      "generator_idempotent": true,
+      "git_source_pinned": true,
+      "notes": [],
+      "source_consuming_commands_retained": true,
+      "sha256": "f1114568e030cc6f2c26b7c991a9073195bbd6fdcbdb9d1fe541cbed461d9e36"
+    }
+  },
+  "frozen_artifacts_changed": false,
+  "test_deadlines_unchanged": true,
+  "performance_change": false,
+  "checks": [
+    "unchanged source-consuming steps and deadlines",
+    "YAML parsed",
+    "all bash steps syntax checked",
+    "canonical generator idempotence",
+    "three managed hooks per workflow",
+    "Git-only pull source"
+  ]
+}

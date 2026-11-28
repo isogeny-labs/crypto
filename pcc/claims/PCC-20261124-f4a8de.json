@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T22:47:04Z",
+ "id": "PCC-20261124-f4a8de",
+ "kind": "statement",
+ "producer": {
+  "commit": "480b8780e7ca39914775006333c68b51cffc66ae",
+  "model": "GPT-6",
+  "session": "smooth-p-plus-one-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/cold_accounting_v1/unit_tests_initial.txt",
+    "sha256": "071a937ffaeab4981b343bcddd71d0247f7aa34015b3dc8be797c166f8fbb2fa"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-cold-accounting",
+ "statement": "The first cold-accounting implementation passes 21 optional-feature unit tests locally, including Direct through the production RelationAdapter, retained solver failure without fallback, and malformed accounting-receipt rejection. This is unsigned development evidence, not benchmark admission."
+}

@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T22:57:28Z",
+ "id": "PCC-20261112-68c608",
+ "kind": "theorem",
+ "producer": {
+  "commit": "5bec81e36ac9b6f7b91ddc5437766248bf7aacfe",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "93c10637de9f85a50fa3604cfff8eaf3bbe59d53823ddc88647eedf38fe660a9",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/T20DirectNorms.lean",
+   "theorem": "T20DirectNorms.four_norm_compositions"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Faithful cleared ring identities/conditional IntModule norm4/recovery/explicit scalar and raw monic normalization constants;actual curves/jets/Picard/polarization/descent remain explicit written/native bridges. Local Lean pass is not scientific signature.",
+ "statement": "theorem four_norm_compositions {C J A : Type} [IntModule C] [IntModule J] [IntModule A] (r : C \u2192 J) (rh : J \u2192 C) (n : C \u2192 A) (p : A \u2192 C) (pn : \u2200 x, p (n x)=(2 : Int) \u2022 x) (rrh : \u2200 x, r (rh x)=(2 : Int) \u2022 x) (rTwo : \u2200 x, r ((2 : Int) \u2022 x)=(2 : Int) \u2022 r x) (np : \u2200 x, n (p x)=(2 : Int) \u2022 x) (rhr : \u2200 x, rh (r x)=(2 : Int) \u2022 x) (nTwo : \u2200 x, n ((2 : Int) \u2022 x)=(2 : Int) \u2022 n x) : (\u2200 x, r (p (n (rh x)))=(4 : Int) \u2022 x) \u2227 (\u2200 x, n (rh (r (p x)))=(4 : Int) \u2022 x)"
+}

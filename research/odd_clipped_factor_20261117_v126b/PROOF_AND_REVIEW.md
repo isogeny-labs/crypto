@@ -1,0 +1,7 @@
+# Odd-characteristic clipped factor contract
+
+The input is a monic quintic F(Z,u), with leading form Z^2(Z-1)^3 and the registered coefficient-degree envelope. Return the unique monic degree2/3 factor pair within envelopes if its exact product equals F; otherwise report bounded factorization false. This is a factorization contract, not all domain roots.
+
+Since gcd(Z^2,(Z-1)^3)=1 over every field, including characteristic3, the Sylvester correction matrix is invertible. For any genuine bounded pair, induction on u-precision shows the clipped recurrence agrees with the unique full Hensel lift: omitted coefficients are zero in that pair. Conversely, all returned coefficients meet the degree envelopes by construction, and exact full product equality proves a bounded factorization. Repeated roots inside either leading cluster do not affect coprimality of the clusters. Unsupported/noncoprime leading forms raise and require a different route, rather than return an empty root set.
+
+Small independent references enumerate every possible degree2 bounded factor and divide exactly. Random bounded factor pairs give planted positive checks against the previous untruncated lift and exact product. Coefficient arithmetic is exercised over GF3,5,7,11,9,25,27,49 and all five NIST coordinate primes from the preserved source preset snapshot. This is not curve, integer-interval, generalized all-roots or comparative timing coverage. No small field is called hard.

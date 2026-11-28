@@ -1,0 +1,21 @@
+/tmp/ecdlp-precision-audit-20261123/checks/01d-rational-probe-physical-guard/ProbeQ.lean:14:12: error: Type mismatch: After simplification, term
+  hzero
+ has type
+  m 0 ≤ s
+but is expected to have type
+  m 0 ≤ ?m.84 0
+/tmp/ecdlp-precision-audit-20261123/checks/01d-rational-probe-physical-guard/ProbeQ.lean:15:21: error: `simp` made no progress
+/tmp/ecdlp-precision-audit-20261123/checks/01d-rational-probe-physical-guard/ProbeQ.lean:29:54: error: Function expected at
+  Nat.lt_two_pow_self
+but this term has type
+  ?m.17 < 2 ^ ?m.17
+
+Note: Expected a function because this term is being applied to the argument
+  _
+Monotone.seq_le_seq.{u_1} {α : Type u_1} [Preorder α] {f : α → α} {x y : ℕ → α} (hf : Monotone f) (n : ℕ)
+  (h₀ : x 0 ≤ y 0) (hx : ∀ k < n, x (k + 1) ≤ f (x k)) (hy : ∀ k < n, f (y k) ≤ y (k + 1)) : x n ≤ y n
+geom_sum_Ico_le_of_lt_one.{u_1} {K : Type u_1} [Field K] [LinearOrder K] [IsStrictOrderedRing K] {x : K} {m n : ℕ}
+  (hx : 0 ≤ x) (h'x : x < 1) : ∑ i ∈ Ico m n, x ^ i ≤ x ^ m / (1 - x)
+Nat.div_mul_le_self (m n : ℕ) : m / n * n ≤ m
+Nat.lt_two_pow_self {n : ℕ} : n < 2 ^ n
+Nat.pow_le_pow_right {n : ℕ} (hx : n > 0) {i j : ℕ} : i ≤ j → n ^ i ≤ n ^ j

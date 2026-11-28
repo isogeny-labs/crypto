@@ -1,0 +1,26 @@
+{
+  "schema": "artifact-case-alias-custody/v1",
+  "before_source_sha256": "5cad5ee04286bcd157cae3f2d6ae5ededf787645cfe3a471ed5584bc25c97c49",
+  "before_control": {
+    "scope": "disposable repository and file remote",
+    "filesystem_case_alias": true,
+    "exit": 0,
+    "tracked_successor_overwritten": true
+  },
+  "after_source_sha256": "35dfef67a6acda1184353d5e024ab850debfd404dd72241ed369be42daeaaa8d",
+  "ownership_rule": "preserve Git-index paths under NFC normalization and case folding, including omitted paths",
+  "source_and_alias_controls": [
+    [
+      "a.jsonl",
+      "A.JSONL"
+    ],
+    [
+      "café.jsonl",
+      "café.JSONL"
+    ]
+  ],
+  "tests": 48,
+  "existing_entries_checked": 8228,
+  "manifest_directories_checked": 3791,
+  "existing_manifests_changed": 0
+}

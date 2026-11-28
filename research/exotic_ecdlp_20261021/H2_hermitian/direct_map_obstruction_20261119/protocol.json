@@ -1,0 +1,11 @@
+{
+  "schema": "h2-direct-map-obstruction-v1",
+  "question": "Which Legendre curves in the finished H2 cells have the maximal Hermitian-curve quotient point count (p+1)^2 over F_(p^2)?",
+  "source_result": "research/exotic_ecdlp_20261021/H2_hermitian/out/result.json",
+  "source_result_sha256": "17767e02d0d0df3b0ff7b64f1f5160f56e3036260f50d75df1d16e5fa277a40a",
+  "cells": [{"p": 7, "lambda": 5}, {"p": 11, "lambda": 2}, {"p": 13, "lambda": 2}],
+  "method": "For each lambda, independently count y^2=x(x-1)(x-lambda) over F_(p^2) by square tests and compare with Sage EllipticCurve.cardinality and (p+1)^2",
+  "statistics": ["p", "lambda", "field_order", "naive_curve_order", "sage_curve_order", "trace", "hermitian_maximal_quotient_count"],
+  "claim_boundary": "The point-count criterion applies to elliptic quotients of the Hermitian plane-section Jacobian; it does not exclude arbitrary correspondences or pointwise encodings from the Hermitian surface",
+  "status": "frozen before execution"
+}

@@ -1,0 +1,66 @@
+PRESET_R2 (addendum to r7/m8/PRESET.txt, sha256 c64aad44...642e, frozen 2026-11-15T23:40:01Z).
+Written 2026-11-18T01:3xZ, before any run of this round. Standing: everything is [pcc:unverified].
+PRESET.txt stays in force except where this file says otherwise. No commit, no push, no PR.
+
+0. DISCLOSURE (state before this file)
+- Round 1 of r7/m8 (2026-11-15 23:40-00:13Z) produced no value. It started msolve on m=8 N=12 r0 (log ends
+  inside a degree-7 round, 153291 x 202495, the same trace prefix as the parent extension) and two Singular
+  std/degBound probes on m=8 N=8 r0 (c=6, c=7), both killed at the 280 s wall cap. The container then died.
+- Today (01:24Z) the root volume was full: an orphaned git fetch temp pack (2.7 GB, 2026-11-15 23:47) was removed.
+  Free space now ~2.6 GB; no git fetch/pull of crypto main will be attempted (it refills the volume).
+- Route re-checked 01:27Z (route_check.txt): STS GetCallerIdentity -> InvalidClientTokenId; EKS ListClusters ->
+  UnrecognizedClientException; kubectl v1.31.2 downloadable; GH_TOKEN invalid. EKS blocked. Local fallback.
+
+1. KILL RULE: parent section 6 (pkm_m8_runs_20261115/PRESET.txt), UNCHANGED, as restated in PRESET.txt section 5.
+   Reading A (msolve D_cell, both draws finished, min over draws) is the parent's observable and decides.
+
+2. READING B (value, not censor), refined here before data
+- D_PC(cell) = min c with 1 in V_c (PRESET.txt section 4). Each draw gets an interval [L, U]:
+  L = c+1 when 1 notin V_c is shown by I4 below; U = c when msolve (default or I5) finishes with max round
+  degree c and GB = {1}. Cell interval = [min_draws L, min_draws U].
+- sigma bounds: sigma_lo = OLS slope using y = L for rungs with N >= mean(N), y = U for rungs with N < mean(N);
+  sigma_hi uses the opposite. (OLS slope is increasing in y_i iff N_i > mean N, so true sigma lies in
+  [sigma_lo, sigma_hi].) Rungs need the bound they use to be finite. Same rung-count/span requirement as the rule
+  (>= 3 rungs, Delta N >= ceil(m/2)).
+- B-verdict(m): KILL if sigma_lo >= alpha*(m,1); OPEN-LOW if sigma_hi < alpha*(m,2); WEAK-KILL if
+  sigma_lo >= alpha*(m,2) and sigma_hi < alpha*(m,1); otherwise INCONCLUSIVE.
+- Reading A and reading B are both reported. If they differ, both stand; none is chosen after the data.
+
+3. INSTRUMENTS (changes to PRESET.txt section 3)
+- I1 msolve 0.6.5 (apt binary): unchanged. RLIMIT_AS 12e9, wall 7200 s, nice 10, background.
+  Threads T = 3 (one core kept free for the cheap jobs below). Low-memory variant if I1 dies on memory: -m 5000.
+- I2/I3 (Singular std with degBound) are dropped as the primary certificate (too slow: disclosed probes) but
+  Singular is kept as the independent reducer in check (b) below.
+- I4 truncated-basis dump: msolve 0.6.5 built from the upstream v0.6.5 source with a patch: when env
+  MSOLVE_TRUNC_DEG=c is set, at the first F4 round whose selected pair degree exceeds c, write the current basis
+  (all non-redundant elements, full polynomials) to a file and stop. Selftest before use: with the env var unset,
+  the patched binary must give byte-identical .out files and identical round-degree traces to the apt binary on
+  the cheap cells m=8 N=8..11 r0. A mismatch voids I4.
+  Certificate that 1 notin V_c for a dumped G:
+   (a) every input generator reduces to 0 mod G (DRL, full reduction);
+   (b) every S-pair (gi, gj) of G with deg lcm(LT) <= c reduces to 0 mod G, after Buchberger's product criterion
+       and the chain criterion (both valid inside the degree-<=c truncation because the lcms involved divide);
+   (c) no LT(G) is a constant.
+   Then V_c = span{t*g : g in G, deg(t*g) <= c}, LM(V_c) = <LT(G)>_{<=c}, and the rank deficit
+   delta_c = dim F_p[x]_{<=c} - dim V_c = #monomials of degree <= c divisible by no LT(G); delta_c > 0 <=> 1 notin V_c.
+   Levels: FULL = (a),(b) on all pairs,(c), with (a)/(b) done by Singular reduce (independent code).
+           SUPPORTED = (a) all, (c), and (b) on a seeded random sample of >= 2000 pairs (all if fewer).
+   Reading B uses FULL where available, else SUPPORTED, and labels which.
+- I5 degree-capped F4: the patched binary with MSOLVE_CAP_DEG=c drops every pair of degree > c and runs to
+  exhaustion; if 1 appears, U = c (every element built has degree <= c, so it lies in V_c). Used for U only when I1
+  does not finish. If it exhausts without 1, that is a second, msolve-internal witness of 1 notin V_c (not FULL).
+
+4. CELLS AND ORDER (arm B, p = 2013265921; draws r0, r1; systems reused, sha256 checked against .json)
+ (0) I4 selftest on m=8 N=8..11 r0.
+ (1) I1 on m=8 N=12 r0 (background, 2 h). r1 by I1 only if r0 finishes.
+ (2) While (1) runs: I4 at c=7 on m=8 N=12 r0, r1; I4 at c=6 on m=8 N=8..11 r0, r1 (L for the D=7 rungs).
+ (3) I4 at c=7 on m=9 N=13, N=14 and m=10 N=12..15 (r0, r1) and c=6 on m=9 N=9..12, m=10 N=10..11, as time allows.
+ (4) After (1): I1 on m=9 N=13 r0 (2 h), then I5 c=8 on any cell whose I1 run is censored.
+ Total heavy wall budget 8 h. Ladder stop of PRESET.txt applies to I1 only.
+
+5. PREDICTIONS (before data)
+- Q1: delta_7 > 0 for m=8 N=12 (both draws); delta_6 > 0 for N=8..11.  Then reading B at m=8 is KILL by sigma_lo = 0.2.
+- Q2: I1 m=8 N=12 r0 dies on memory or wall before 2 h (60 %). Reading A at m=8 then stays INCONCLUSIVE.
+- Q3: m=9 needs N=14 for the span; reading B at m=9 is KILL if delta_7 > 0 at N=13 and 14 and L at 6 holds for N=9..12.
+- Q4: m=10 N=12 sits below mean(N=10..15); without its U, reading B at m=10 stays INCONCLUSIVE; item verdict
+  INCONCLUSIVE in both readings.

@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T06:57:56Z",
+ "id": "PCC-20261116-0b194b",
+ "kind": "statement",
+ "producer": {
+  "commit": "f5472700fbf4b1eab4436406d3e9a2a22f230295",
+  "model": "",
+  "session": "codex-20261116-nist-three-e2e"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/toy-v3-109/result.json",
+    "sha256": "c06619bf4d982c8e1efd30f9057ca29ed345cefa262d0a35af670148b78b892c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/toy-v3-1009/result.json",
+    "sha256": "acdb0c2f141e22c61b758059d32fc02ac267c5b701abffdde01dfcde472de1bc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/toy-v3-109/public-witness.json",
+    "sha256": "415aab042697519182ab77d3629df6e9c08f38700006f5cbb0c5899e78123cee"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/toy-v3-1009/public-witness.json",
+    "sha256": "c9054ee86c3caf71026551f57cd53b8f52228ffe7297152336c78947f3eae7c2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/toy_ic.cpp",
+    "sha256": "0cfa46ced8a478e3c6495677b35958a1b8a0973f04ed99aac6a3cc7b1ce934b2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/openssl_toy_check.cpp",
+    "sha256": "2110b4eab5b6cbaeec4375577e7c9dcadc78a11fd11db5a53fe7a4521ea395ad"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "The v3 native public F109/F1009 index-calculus correctness results and complete public witnesses are byte-identical to retained v2 for both fixed cases. V3 replaces per-candidate GMP coefficient copies with precomputed curve values and cubic finite differences cross-checked against Horner. The source-verified target counts remain11 and109; the same OpenSSL checks/canaries pass. This is exact-output functional qualification, not a measured runtime speedup, independent signed verification or P-192 attack evidence."
+}

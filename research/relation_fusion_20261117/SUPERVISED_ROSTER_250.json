@@ -1,0 +1,619 @@
+{
+  "canonical_protocol_validation": "pending",
+  "graph": "LAST-star",
+  "n": [
+    3,
+    4,
+    6
+  ],
+  "performance_observations_collected": 0,
+  "planned_calls": 2520,
+  "primary": "packed-dag-487-native",
+  "primes": [
+    2147483647,
+    9007199254740881
+  ],
+  "rounds": 5,
+  "schema": "supervised-match-design-draft/v1",
+  "seed": 7,
+  "stages": [
+    {
+      "arms": [
+        {
+          "arm": "frozen85-sparse-103-wrapped",
+          "kernel": "frontier",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-103-wrapped-copy",
+          "kernel": "frontier",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-103-native",
+          "kernel": "frontier",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-103-native-copy",
+          "kernel": "frontier",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-231-wrapped",
+          "kernel": "packed-products",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-231-wrapped-copy",
+          "kernel": "packed-products",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-231-native",
+          "kernel": "packed-products",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-231-native-copy",
+          "kernel": "packed-products",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-487-wrapped",
+          "kernel": "packed-batch",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-487-wrapped-copy",
+          "kernel": "packed-batch",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-487-native",
+          "kernel": "packed-batch",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-487-native-copy",
+          "kernel": "packed-batch",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 0
+        },
+        {
+          "arm": "frozen96-dag-103-wrapped",
+          "kernel": "frontier",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-103-wrapped-copy",
+          "kernel": "frontier",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-103-native",
+          "kernel": "frontier",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-103-native-copy",
+          "kernel": "frontier",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-231-wrapped",
+          "kernel": "packed-products",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-231-wrapped-copy",
+          "kernel": "packed-products",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-231-native",
+          "kernel": "packed-products",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-231-native-copy",
+          "kernel": "packed-products",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-487-wrapped",
+          "kernel": "packed-batch",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-487-wrapped-copy",
+          "kernel": "packed-batch",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-487-native",
+          "kernel": "packed-batch",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-487-native-copy",
+          "kernel": "packed-batch",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 1
+        },
+        {
+          "arm": "current-sparse-103-wrapped",
+          "kernel": "frontier",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-103-wrapped-copy",
+          "kernel": "frontier",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-103-native",
+          "kernel": "frontier",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-103-native-copy",
+          "kernel": "frontier",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-231-wrapped",
+          "kernel": "packed-products",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-231-wrapped-copy",
+          "kernel": "packed-products",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-231-native",
+          "kernel": "packed-products",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-231-native-copy",
+          "kernel": "packed-products",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-487-wrapped",
+          "kernel": "packed-batch",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-487-wrapped-copy",
+          "kernel": "packed-batch",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-487-native",
+          "kernel": "packed-batch",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-487-native-copy",
+          "kernel": "packed-batch",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-103-wrapped",
+          "kernel": "frontier",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-103-wrapped-copy",
+          "kernel": "frontier",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-103-native",
+          "kernel": "frontier",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-103-native-copy",
+          "kernel": "frontier",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-231-wrapped",
+          "kernel": "packed-products",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-231-wrapped-copy",
+          "kernel": "packed-products",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-231-native",
+          "kernel": "packed-products",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-231-native-copy",
+          "kernel": "packed-products",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-487-wrapped",
+          "kernel": "packed-batch",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-487-wrapped-copy",
+          "kernel": "packed-batch",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-487-native",
+          "kernel": "packed-batch",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-487-native-copy",
+          "kernel": "packed-batch",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 2
+        }
+      ],
+      "stage": "AA"
+    },
+    {
+      "arms": [
+        {
+          "arm": "frozen85-sparse-103-wrapped",
+          "kernel": "frontier",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-103-native",
+          "kernel": "frontier",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-231-wrapped",
+          "kernel": "packed-products",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-231-native",
+          "kernel": "packed-products",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-487-wrapped",
+          "kernel": "packed-batch",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 0
+        },
+        {
+          "arm": "frozen85-sparse-487-native",
+          "kernel": "packed-batch",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 0
+        },
+        {
+          "arm": "frozen96-dag-103-wrapped",
+          "kernel": "frontier",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-103-native",
+          "kernel": "frontier",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-231-wrapped",
+          "kernel": "packed-products",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-231-native",
+          "kernel": "packed-products",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-487-wrapped",
+          "kernel": "packed-batch",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 1
+        },
+        {
+          "arm": "frozen96-dag-487-native",
+          "kernel": "packed-batch",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 1
+        },
+        {
+          "arm": "current-sparse-103-wrapped",
+          "kernel": "frontier",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-103-native",
+          "kernel": "frontier",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-231-wrapped",
+          "kernel": "packed-products",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-231-native",
+          "kernel": "packed-products",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-487-wrapped",
+          "kernel": "packed-batch",
+          "kind": "compact-sparse",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-sparse-487-native",
+          "kernel": "packed-batch",
+          "kind": "compact-sparse",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-103-wrapped",
+          "kernel": "frontier",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-103-native",
+          "kernel": "frontier",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-231-wrapped",
+          "kernel": "packed-products",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-231-native",
+          "kernel": "packed-products",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-487-wrapped",
+          "kernel": "packed-batch",
+          "kind": "compact-dag",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "current-dag-487-native",
+          "kernel": "packed-batch",
+          "kind": "compact-dag",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "packed-sparse-103-wrapped",
+          "kernel": "frontier",
+          "kind": "packed-constructor-sparse",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "packed-sparse-103-native",
+          "kernel": "frontier",
+          "kind": "packed-constructor-sparse",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "packed-sparse-231-wrapped",
+          "kernel": "packed-products",
+          "kind": "packed-constructor-sparse",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "packed-sparse-231-native",
+          "kernel": "packed-products",
+          "kind": "packed-constructor-sparse",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "packed-sparse-487-wrapped",
+          "kernel": "packed-batch",
+          "kind": "packed-constructor-sparse",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "packed-sparse-487-native",
+          "kernel": "packed-batch",
+          "kind": "packed-constructor-sparse",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "packed-dag-103-wrapped",
+          "kernel": "frontier",
+          "kind": "packed-constructor-dag",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "packed-dag-103-native",
+          "kernel": "frontier",
+          "kind": "packed-constructor-dag",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "packed-dag-231-wrapped",
+          "kernel": "packed-products",
+          "kind": "packed-constructor-dag",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "packed-dag-231-native",
+          "kernel": "packed-products",
+          "kind": "packed-constructor-dag",
+          "native": true,
+          "worker": 2
+        },
+        {
+          "arm": "packed-dag-487-wrapped",
+          "kernel": "packed-batch",
+          "kind": "packed-constructor-dag",
+          "native": false,
+          "worker": 2
+        },
+        {
+          "arm": "packed-dag-487-native",
+          "kernel": "packed-batch",
+          "kind": "packed-constructor-dag",
+          "native": true,
+          "worker": 2
+        }
+      ],
+      "stage": "AB"
+    }
+  ]
+}

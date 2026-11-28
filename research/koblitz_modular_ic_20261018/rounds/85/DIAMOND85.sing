@@ -1,0 +1,19 @@
+proc require85(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+ring overlap85=2,(z,V),dp;
+poly E85=V^2+z^2*V+z+z^3;
+poly h85=z+V;
+poly H85=1+z+z^2+z*V;
+poly N85=V+z*V+z^2;
+require85(h85^2+z*H85==E85,"DIA85_FIRST_PRINCIPAL_OPEN_PRODUCT");
+require85(N85+h85+1==H85,"DIA85_SECOND_OPEN_NUMERATOR");
+poly transformed85=h85^2*(N85^2+N85)+h85^5+h85^3;
+ideal source85=E85;ideal sourceStd85=std(source85);
+require85(reduce(transformed85,sourceStd85)==0,"DIA85_TRANSFORMED_SOURCE_REMAINDER");
+matrix witness85=lift(source85,ideal(transformed85));
+require85(matrix(source85)*witness85==matrix(ideal(transformed85)),"DIA85_FULL_TRANSFORMED_SOURCE_LIFT");
+poly corruptN85=N85+z;
+poly corruptTransformed85=h85^2*(corruptN85^2+corruptN85)+h85^5+h85^3;
+require85(reduce(corruptTransformed85,sourceStd85)!=0,"DIA85_CORRUPTED_NUMERATOR_ACCEPTED");
+print("DIA85_RESULT first_open_product=1 second_open_numerator=1 transformed_equation_lift=1 corrupted_numerator_rejected=1 base_roundtrip_bridge=1");
+print("DIAMOND85_ALL_CHECKS_PASS");
+quit;

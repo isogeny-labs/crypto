@@ -1,0 +1,38 @@
+name: CT242 F103 independent non-inverse ECDLP target controls
+
+on:
+  push:
+    branches:
+      - research/ct204-odd-cover-toy-dlp-20261118
+    paths:
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct242_f103_noninverse_targets.py"
+      - ".github/workflows/ct242-f103-noninverse-targets.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  finite-target-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct223_extension_norm_oracle.py
+            research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct237_independent_raw_relation_replay.py
+            research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct238_p103_norm_fiber_pilot.py
+            research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct240_f103_reduced_norm_lp.py
+            research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct242_f103_noninverse_targets.py
+      - name: Independent public-point norm target check
+        shell: bash
+        run: |
+          set -euo pipefail
+          git log -1 --format='CT242_SOURCE_SHA %H'
+          cd research/chained_jacobian_transfers_20261110/toy_dlp_ct204
+          python3 ct242_f103_noninverse_targets.py 2>&1 | tee /tmp/ct242-noninverse.log
+          test "$(grep -c '^CT242_TARGET ' /tmp/ct242-noninverse.log)" -eq 4
+          grep -q '^CT242_COMPLETE ' /tmp/ct242-noninverse.log

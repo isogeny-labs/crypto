@@ -1,0 +1,174 @@
+   Compiling crypto v0.1.0 (/workspace/relation-supervisor-live)
+warning: unused import: `num_integer::Integer`
+  --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_framework/prime_tower_wide.rs:30:5
+   |
+30 | use num_integer::Integer;
+   |     ^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `m`
+   --> /workspace/relation-supervisor-live/src/binary_ecc/f2m.rs:605:13
+    |
+605 |         let m = self.m;
+    |             ^
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+help: you might have meant to pattern match on the similarly named constant `M`
+    |
+605 -         let m = self.m;
+605 +         let cryptanalysis::aux_tower_solver::M = self.m;
+    |
+help: if this is intentional, prefix it with an underscore
+    |
+605 |         let _m = self.m;
+    |             +
+
+warning: unreachable pattern
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:9147:9
+     |
+9130 |         "ksum" => Box::new(KSumOracle::new(ms)),
+     |         ------ matches all the relevant values
+...
+9147 |         "ksum" => Box::new(KSumOracle::new(ms)),
+     |         ^^^^^^ no value can reach this
+     |
+     = note: `#[warn(unreachable_patterns)]` (part of `#[warn(unused)]`) on by default
+
+warning: unreachable pattern
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:9148:9
+     |
+9136 |         "ksum-frobenius" => Box::new(
+     |         ---------------- matches all the relevant values
+...
+9148 |         "ksum-frobenius" => Box::new(FrobeniusKSumOracle::new(ms, inst)),
+     |         ^^^^^^^^^^^^^^^^ no value can reach this
+
+warning: unreachable pattern
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/ecbench/methods.rs:9149:9
+     |
+9133 |         "wwalk" => Box::new(WWalkOracle::<FastPoint>::new()),
+     |         ------- matches all the relevant values
+...
+9149 |         "wwalk" => Box::new(WWalkOracle::new()),
+     |         ^^^^^^^ no value can reach this
+
+warning: unused variable: `two_t`
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_framework/prime_tower_wide.rs:414:9
+    |
+414 |     let two_t = BigUint::one() << t;
+    |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_two_t`
+
+warning: struct `TwTable` is never constructed
+     --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_boundary.rs:12451:8
+      |
+12451 | struct TwTable {
+      |        ^^^^^^^
+      |
+      = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: enum `TwEntry` is never used
+     --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_boundary.rs:12458:6
+      |
+12458 | enum TwEntry<'a> {
+      |      ^^^^^^^
+
+warning: struct `TwVacant` is never constructed
+     --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_boundary.rs:12464:8
+      |
+12464 | struct TwVacant<'a> {
+      |        ^^^^^^^^
+
+warning: method `insert` is never used
+     --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_boundary.rs:12472:8
+      |
+12471 | impl TwVacant<'_> {
+      | ----------------- method in this implementation
+12472 |     fn insert(self, val: (u128, u64, u64)) {
+      |        ^^^^^^
+
+warning: multiple associated items are never used
+     --> /workspace/relation-supervisor-live/src/cryptanalysis/ic_boundary.rs:12490:8
+      |
+12488 | impl TwTable {
+      | ------------ associated items in this implementation
+12489 |     /// Room for `entries` keys at load at most 3/4.
+12490 |     fn with_capacity(entries: usize) -> Self {
+      |        ^^^^^^^^^^^^^
+...
+12505 |     fn prefault(slots: &mut [[u64; 5]]) {
+      |        ^^^^^^^^
+...
+12528 |     fn len(&self) -> usize {
+      |        ^^^
+...
+12532 |     fn unpack(slot: &[u64; 5]) -> (u128, u64, u64) {
+      |        ^^^^^^
+...
+12541 |     fn get(&self, key: u64) -> Option<(u128, u64, u64)> {
+      |        ^^^
+...
+12578 |     fn home(&self, key: u64) -> usize {
+      |        ^^^^
+...
+12583 |     fn grow(&mut self) {
+      |        ^^^^
+...
+12600 |     fn entry(&mut self, key: u64) -> TwEntry<'_> {
+      |        ^^^^^
+
+warning: fields `n` and `p3s` are never read
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/prime_radical_root.rs:598:5
+    |
+596 | pub(crate) struct Cube<R: Ring> {
+    |                   ---- fields in this struct
+597 |     pub r: R,
+598 |     n: u128,
+    |     ^
+...
+616 |     p3s: u128,
+    |     ^^^
+
+warning: function `field_value` is never used
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/prime_root_trace.rs:218:4
+    |
+218 | fn field_value(op: &FieldOp, a: u64, b: u64, p: u64) -> u64 {
+    |    ^^^^^^^^^^^
+
+warning: method `div_general` is never used
+   --> /workspace/relation-supervisor-live/src/cryptanalysis/prime_root_trace.rs:924:4
+    |
+268 | impl Engine<'_> {
+    | --------------- method in this implementation
+...
+924 | fn div_general(&mut self, a: &[u64], b: &[u64]) -> Work<(Vec<u64>, Vec<u64>)> {
+    |    ^^^^^^^^^^^
+
+warning: function `quartic_coordinates` is never used
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/prime_root_trace.rs:2044:4
+     |
+2044 | fn quartic_coordinates(a: &[u64]) -> [u64; 4] {
+     |    ^^^^^^^^^^^^^^^^^^^
+
+warning: function `vquartic_replay_mul` is never used
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/prime_root_trace.rs:2129:4
+     |
+2129 | fn vquartic_replay_mul(a: &[u64], b: &[u64], modulus: &[u64], p: u64) -> Vec<u64> {
+     |    ^^^^^^^^^^^^^^^^^^^
+
+warning: function `vquartic_replay_square` is never used
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/prime_root_trace.rs:2136:4
+     |
+2136 | fn vquartic_replay_square(a: &[u64], modulus: &[u64], p: u64) -> Vec<u64> {
+     |    ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `monic_x_shift` is never used
+    --> /workspace/relation-supervisor-live/src/cryptanalysis/prime_root_trace.rs:2976:4
+     |
+2976 | fn monic_x_shift(a: &[u64]) -> Option<usize> {
+     |    ^^^^^^^^^^^^^
+
+warning: `crypto` (lib) generated 18 warnings (run `cargo fix --lib -p crypto` to apply 2 suggestions)
+   Compiling relation-fusion-root-integration v0.1.0 (/workspace/relation-supervisor-live/research/relation_fusion_20261117/root-integration)
+    Finished `release` profile [unoptimized] target(s) in 3m 33s
+     Running tests/flat_constructor.rs (/workspace/crypto-root-unoptimized-181/release/build/relation-fusion-root-integration/f4b7c4ed6a7c7ccd/out/flat_constructor-f4b7c4ed6a7c7ccd)

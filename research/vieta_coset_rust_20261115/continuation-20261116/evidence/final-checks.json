@@ -1,0 +1,42 @@
+{
+  "schema": "vieta-continuation-final-check/v1",
+  "standing": "producer local checks [pcc:unverified]",
+  "record": {
+    "path": "benchmarks/records/20261116T1553Z-vieta-polynomial-backends.json",
+    "status": "censored",
+    "errors": [],
+    "remote_s3_checked": false
+  },
+  "claims": [
+    {
+      "id": "PCC-20261116-80ec09",
+      "pinned_proof_hashes_match": true,
+      "standing": "unverified"
+    },
+    {
+      "id": "PCC-20261116-480062",
+      "pinned_proof_hashes_match": true,
+      "standing": "unverified"
+    }
+  ],
+  "unchanged_qualified_files": [
+    "src/cryptanalysis/vieta_coset.rs",
+    "research/vieta_coset_rust_20261115/native/poly_compare.rs",
+    "research/vieta_coset_rust_20261115/native/replay.rs",
+    "research/vieta_coset_rust_20261115/native/Cargo.lock"
+  ],
+  "native_checks": {
+    "unit_groups": 7,
+    "cli_tests": 4,
+    "fmt_exit": 0,
+    "clippy_exit": 0
+  },
+  "root_focused_build_exit": 124,
+  "export_checks": {
+    "preflight": 0,
+    "main": 0,
+    "supplemental": 0
+  },
+  "report_pages_visually_reviewed": 4,
+  "scope": "No full-root-suite, L2 clock, independent signature or canonical-promotion assertion."
+}

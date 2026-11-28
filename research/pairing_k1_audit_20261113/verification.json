@@ -1,0 +1,71 @@
+{
+  "schema": "actual-k1-pairing-verification/v1",
+  "source_commit": "5e269a75df54b4704b77e111ab5c049700c81811",
+  "claim_id": "PCC-20261113-39a4c6",
+  "declaration_sha256": "cdaa83475f74e576cd16408e5148181e4b775b0bb57234a019a5cda602f4d076",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 23,
+  "gate_declarations": 116,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 82,
+  "actual_verdict": {
+    "claim_id": "PCC-20261113-39a4c6",
+    "claim_sha256": "95c92f66c27231a900a945a2a212455f6db374063847974c886d989cd87e6216",
+    "commit": "5e269a75df54b4704b77e111ab5c049700c81811",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/pairing_k1_audit_20261113/lean (Certificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-13T20:28:49Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261113-39a4c6",
+    "claim_sha256": "95c92f66c27231a900a945a2a212455f6db374063847974c886d989cd87e6216",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 48466,
+    "sha256": "90334a959362de5e6fb8adf0f5489da8507687fdcfa9a2ea12ee5f6fcb9b854d",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 116,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_decide": false,
+    "raised_limits": false,
+    "global_elaboration_flags": false,
+    "waivers": false,
+    "actual_group_and_quotients": true,
+    "all_actual_point_representatives": true,
+    "all_valid_Tate_and_Weil_auxiliaries": true,
+    "bilateral_nondegeneracy_proper_domains": true,
+    "actual_restriction_disproofs": true,
+    "canonical_divisor_identification": false,
+    "qualified_source_refuted": false,
+    "original_FR94_read": false,
+    "new_native_experiment": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

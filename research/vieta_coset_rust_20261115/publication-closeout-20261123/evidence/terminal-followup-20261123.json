@@ -1,0 +1,332 @@
+{
+  "schema": "vieta-bounded-followup-terminal/v1",
+  "observed_utc": "2026-11-23T16:00:58.989197+00:00",
+  "occurrence": 3,
+  "pr": 4987,
+  "inspected_head": "4d2afb37aff10ce867df59ec5dac7efd2956845b",
+  "state": "OPEN",
+  "merged": false,
+  "github_mergeability": "MERGEABLE",
+  "github_merge_state": "UNSTABLE",
+  "auto_merge_request": null,
+  "current_main": "7d61e3b45de6e93d235345a0061dae08db1f8b44",
+  "ci_snapshot": [
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:06:29Z",
+      "conclusion": "FAILURE",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983414/job/137680135849",
+      "name": "current",
+      "startedAt": "2026-11-23T12:05:22Z",
+      "status": "COMPLETED",
+      "workflowName": "backend-leaderboard"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:07:21Z",
+      "conclusion": "FAILURE",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983851/job/137680138002",
+      "name": "names",
+      "startedAt": "2026-11-23T12:05:21Z",
+      "status": "COMPLETED",
+      "workflowName": "curve-names"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:06:55Z",
+      "conclusion": "FAILURE",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983592/job/137680136536",
+      "name": "parity",
+      "startedAt": "2026-11-23T12:05:22Z",
+      "status": "COMPLETED",
+      "workflowName": "lab-parity"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:06:01Z",
+      "conclusion": "CANCELLED",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983560/job/137680136648",
+      "name": "gate",
+      "startedAt": "2026-11-23T12:05:21Z",
+      "status": "COMPLETED",
+      "workflowName": "pcc-gate"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:05:24Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983706/job/137680136999",
+      "name": "full-tier",
+      "startedAt": "2026-11-23T12:05:21Z",
+      "status": "COMPLETED",
+      "workflowName": "CI tier"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:10:10Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983395/job/137680135851",
+      "name": "corpus",
+      "startedAt": "2026-11-23T12:05:21Z",
+      "status": "COMPLETED",
+      "workflowName": "ECDLP claim corpus and attack graph"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:05:29Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170977775/job/137680125411",
+      "name": "review",
+      "startedAt": "2026-11-23T12:05:20Z",
+      "status": "COMPLETED",
+      "workflowName": "Free LLM pull-request review"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:05:47Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983874/job/137680137711",
+      "name": "native-rust-quadratics",
+      "startedAt": "2026-11-23T12:05:22Z",
+      "status": "COMPLETED",
+      "workflowName": "Rootfinding Round123 quadratic shortcuts native Rust A/B"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:05:31Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983576/job/137680135966",
+      "name": "native-rust-trace-field",
+      "startedAt": "2026-11-23T12:05:21Z",
+      "status": "COMPLETED",
+      "workflowName": "Rootfinding Round124 trace-engine Barrett native Rust A/B"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:06:21Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983733/job/137680137356",
+      "name": "scope",
+      "startedAt": "2026-11-23T12:05:21Z",
+      "status": "COMPLETED",
+      "workflowName": "Rust all targets compile"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:06:11Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983710/job/137680137077",
+      "name": "scope",
+      "startedAt": "2026-11-23T12:05:22Z",
+      "status": "COMPLETED",
+      "workflowName": "Rust lint"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:10:02Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983253/job/137680135792",
+      "name": "learning",
+      "startedAt": "2026-11-23T12:05:22Z",
+      "status": "COMPLETED",
+      "workflowName": "agent-learning"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:05:51Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170977754/job/137680125256",
+      "name": "migrate",
+      "startedAt": "2026-11-23T12:05:20Z",
+      "status": "COMPLETED",
+      "workflowName": "artifact-autofix"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:11:44Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983822/job/137680137577",
+      "name": "artifacts",
+      "startedAt": "2026-11-23T12:05:21Z",
+      "status": "COMPLETED",
+      "workflowName": "artifacts"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:05:37Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983620/job/137680137458",
+      "name": "merges",
+      "startedAt": "2026-11-23T12:05:22Z",
+      "status": "COMPLETED",
+      "workflowName": "binary-merges"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:06:16Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983634/job/137680137060",
+      "name": "scope",
+      "startedAt": "2026-11-23T12:05:21Z",
+      "status": "COMPLETED",
+      "workflowName": "ecbench-smoke"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:06:25Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983598/job/137680137243",
+      "name": "recompute",
+      "startedAt": "2026-11-23T12:05:22Z",
+      "status": "COMPLETED",
+      "workflowName": "ic-leaderboard-recompute"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:11:01Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983383/job/137680136372",
+      "name": "size",
+      "startedAt": "2026-11-23T12:05:21Z",
+      "status": "COMPLETED",
+      "workflowName": "large-files"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:10:21Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45171083148/job/137680475729",
+      "name": "gate",
+      "startedAt": "2026-11-23T12:06:04Z",
+      "status": "COMPLETED",
+      "workflowName": "pcc-gate"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:11:53Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983538/job/137680136421",
+      "name": "gate",
+      "startedAt": "2026-11-23T12:05:21Z",
+      "status": "COMPLETED",
+      "workflowName": "validation-gate"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:10:13Z",
+      "conclusion": "FAILURE",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983634/job/137680636749",
+      "name": "smoke",
+      "startedAt": "2026-11-23T12:06:18Z",
+      "status": "COMPLETED",
+      "workflowName": "ecbench-smoke"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:05:20Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983733/job/137680140805",
+      "name": "Native full library (manual)",
+      "startedAt": "2026-11-23T12:05:20Z",
+      "status": "COMPLETED",
+      "workflowName": "Rust all targets compile"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:06:11Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983710/job/137680595681",
+      "name": "rustfmt (changed files)",
+      "startedAt": "2026-11-23T12:06:11Z",
+      "status": "COMPLETED",
+      "workflowName": "Rust lint"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:05:19Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983560/job/137680139129",
+      "name": "sign",
+      "startedAt": "2026-11-23T12:05:20Z",
+      "status": "COMPLETED",
+      "workflowName": "pcc-gate"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:05:58Z",
+      "conclusion": "SKIPPED",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45171083148/job/137680477737",
+      "name": "sign",
+      "startedAt": "2026-11-23T12:05:58Z",
+      "status": "COMPLETED",
+      "workflowName": "pcc-gate"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:08:41Z",
+      "conclusion": "FAILURE",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983733/job/137680681758",
+      "name": "check",
+      "startedAt": "2026-11-23T12:06:23Z",
+      "status": "COMPLETED",
+      "workflowName": "Rust all targets compile"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:06:17Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983710/job/137680592298",
+      "name": "clippy (crypto)",
+      "startedAt": "2026-11-23T12:06:13Z",
+      "status": "COMPLETED",
+      "workflowName": "Rust lint"
+    },
+    {
+      "__typename": "CheckRun",
+      "completedAt": "2026-11-23T12:06:16Z",
+      "conclusion": "SUCCESS",
+      "detailsUrl": "https://github.com/isogeny-labs/crypto/actions/runs/45170983710/job/137680592163",
+      "name": "clippy (cd_attack)",
+      "startedAt": "2026-11-23T12:06:13Z",
+      "status": "COMPLETED",
+      "workflowName": "Rust lint"
+    }
+  ],
+  "required_success_jobs": {
+    "validation_gate": 137680136421,
+    "pcc_gate": 137680475729,
+    "size": 137680136372,
+    "artifacts": 137680137577
+  },
+  "required_gate_qualification": "Jobs conclude success on the inspected PR head; logs use synthetic merge6fc80b6e5c into then-main143a0b91fb. PCC verify/global prose and artifact recovery substeps still emitted errors; no independent-standing inference.",
+  "other_failed_jobs": {
+    "current": 137680135849,
+    "names": 137680138002,
+    "parity": 137680136536,
+    "smoke": 137680636749,
+    "check": 137680681758
+  },
+  "other_failure_causes": {
+    "current": "frozen leaderboard.json unavailable",
+    "names": "historical curve identifiers",
+    "parity": "result-switch test: four unrecorded Rust environment switches; lab/skills parity itself passes",
+    "smoke_and_check": "unrelated binary_hyperelliptic_index_calculus closing delimiters on synthetic merge; current main5009 changes that source, no rerun here"
+  },
+  "recorded_enforcement_files_equal_main143a0b91fb": {
+    ".github/workflows/validation-gate.yml": true,
+    "tools/artifacts/wire_workflows.py": true,
+    "tools/artifacts/test_artifacts.py": true,
+    "scripts/validation_gate.py": true
+  },
+  "no_compatible_enforcement_repair_observed": true,
+  "decision": "No merge or auto-merge reenabling under recorded no-weakening conflict. Third and final scheduled occurrence; automation disabled, no extension or successor.",
+  "reviews": 0,
+  "comments": 0,
+  "unresolved_threads": 0,
+  "main_merge_or_gate_edit": false,
+  "numerical_goal_reactivated": false,
+  "benchmarks_or_replay_or_tests_run_locally": false,
+  "local_s3_operation": false,
+  "cloud_spend": false,
+  "protected_promotion": false
+}

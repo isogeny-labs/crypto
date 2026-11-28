@@ -1,0 +1,11 @@
+digraph G {
+  graph [rankdir=TB,bgcolor="white",pad="0.15",nodesep="0.25",ranksep="0.3"];
+  node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=11,fillcolor="#edf4fa"];
+  edge [color="#526c81"];
+  old [label="Round 24 actual panel\n180 executions, retained results\nEarly residual rejection reverted"];
+  parent [label="Parent 4939261c\nStored numerator Vec\nNew isolated build: 47 native tests pass"];
+  candidate [label="Candidate c4788625 = current lib\nReverse-pass numerator derivation\nNew isolated build: 47 native tests pass"];
+  plan [label="Same 108 inputs except CPUlib\n12 public targets, m8/batch64\nMain plan: 360 calls; not executed",fillcolor="#fff3dd"];
+  old -> parent; parent -> candidate [label="exact scheduling/storage delta"];
+  parent -> plan; candidate -> plan;
+}

@@ -1,0 +1,9 @@
+{
+  "schema": "xedni-residue10-k3-attempt-v1",
+  "status": "producer_failure",
+  "protocol_commit": "77ea796d785",
+  "stage": "JSON serialization after all selected polynomial cells were computed",
+  "error": "TypeError: Object of type Integer is not JSON serializable; field certificate_prime",
+  "artifact_status": "result.json was empty and no polynomial rows were promoted",
+  "correction": "cast the Sage prime to a Python int before serialization, then rerun the same frozen protocol"
+}

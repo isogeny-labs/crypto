@@ -1,0 +1,23 @@
+{
+  "schema": "root-recovered-unit-qualification-plan/v1",
+  "source": "ROOT_UNIT_SOURCE_345.json",
+  "recorded_before_unit_execution": true,
+  "goal": "Check original recovered production paths and existing assertions through the true root crate; preserve every failure. Correctness only.",
+  "filters": [
+    "cryptanalysis::prime_root_trace::",
+    "cryptanalysis::prime_radical_root::",
+    "cryptanalysis::semaev_projection::",
+    "cryptanalysis::quartic_ladder::",
+    "cryptanalysis::koblitz_sparse_la::",
+    "cryptanalysis::ic_framework::linalg::",
+    "cryptanalysis::ic_framework::prime_tower::",
+    "cryptanalysis::ic_framework::semaev_projection_oracle::",
+    "cryptanalysis::ic_framework::solvers::f4_f2_",
+    "cryptanalysis::pq_f4_f2::"
+  ],
+  "resources": "CPU0,one thread,default features,opt0/noLTO/codegen16; ordinary ignored tests remain ignored, no force-run benchmark",
+  "acceptance": "Every nonignored selected test passes unchanged assertions. Exact failure roster retained if any; not a full-suite pass. No timing interpretation.",
+  "native_requalification": "All36 native flat cases against source345 after unit build; full proof/mutations/refusals retained, compare every payload to322.",
+  "signed_execution_verdict": false,
+  "performance_comparison": false
+}

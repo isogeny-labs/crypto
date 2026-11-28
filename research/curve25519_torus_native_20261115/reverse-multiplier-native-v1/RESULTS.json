@@ -1,0 +1,138 @@
+{
+  "toy_declared": {
+    "admitted_finite_targets": 96,
+    "direct_signed_pairs": 284,
+    "excluded_finite_torsion_targets": 7,
+    "kind": "toy_declared",
+    "multipliers": 102,
+    "reference_method": "direct full torus/group enumeration, no S3/root factorization; shares field/group primitives"
+  },
+  "toy_summary": {
+    "all_pair_sets_equal": true,
+    "direct_pairs": 284,
+    "distinct_geometric_signed_rows": 46,
+    "infinity_lifts": 2,
+    "kind": "toy_summary",
+    "ordered_multiplier_lifts": 284,
+    "scope": "full declared toy correctness, no scalar-DLP recovery",
+    "targets": 96,
+    "zero_result_targets": 38
+  },
+  "actual_summary": {
+    "kind": "actual_summary",
+    "known_geometric_rows": [
+      "[[\"35787927573081745510554705797226115627143620594520670114079251895266655083231\",\"7155380004589019257352002761577394843643829171421900008420130097832749709934\",1],[\"43681704053384304867158238891973524128712473899505289523884781239874464617546\",\"16700338050584208183407871471700830777943622067018672139577953123077068001924\",1]]"
+    ],
+    "known_sigma_one_is_validator_only": true,
+    "one_negation_reciprocal_same_rows": true,
+    "public_queries": 3,
+    "scope": "original-field adapted pair roots only; not original full-base solve, shared-base rank or DLP recovery"
+  },
+  "guard_summary": {
+    "caps_are_incomplete": true,
+    "changed_lifts_refused": 3,
+    "kind": "guard_summary",
+    "refusals": 14
+  },
+  "complete": {
+    "decoder_calls": 0,
+    "groups_attempted": 4,
+    "groups_failed": 0,
+    "kind": "complete",
+    "scalar_recovery": false,
+    "scope": "fixed correctness only; adapted bases; no timing/exponent result",
+    "shared_base_gate": "unimplemented"
+  },
+  "identity": {
+    "check": "Accept { points: 32, extra_points: 32, false_accept_log2: -3691.396601927209 }",
+    "kind": "identity",
+    "plus_one_refused": true,
+    "scope": "evaluated format field2^61-1 only; no formal proof pointer"
+  },
+  "actual_queries": [
+    {
+      "name": "actual-public-u9",
+      "R": [
+        "9",
+        "14781619447589544791020593568409986887264606134616475288964881837755586237401"
+      ],
+      "Q": [
+        "17809203070174708532389388378138548413001352690456714369618601795787323709800",
+        "14237724838796214062159878346316025257270917293071470965816979700682299635925"
+      ],
+      "branch_degrees": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "finite_candidate_records": 4,
+      "ordered_multiplier_lifts": 4,
+      "infinity_lifts": 0,
+      "geometric_rows": 1,
+      "parameter_base_classes": 4,
+      "partial_new_poly_counts": {
+        "cumulative_reserved_coefficient_slots": 77516,
+        "fp2_multiplications": 287978,
+        "scope": "partial new arithmetic only; not total cold work or RSS"
+      }
+    },
+    {
+      "name": "actual-public-minus-u9",
+      "R": [
+        "9",
+        "43114425171068552920764898935933967039370386198203806730763910166200978582548"
+      ],
+      "Q": [
+        "17809203070174708532389388378138548413001352690456714369618601795787323709800",
+        "43658319779861883649625614158027928669364075039748811053911812303274265184024"
+      ],
+      "branch_degrees": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "finite_candidate_records": 4,
+      "ordered_multiplier_lifts": 4,
+      "infinity_lifts": 0,
+      "geometric_rows": 1,
+      "parameter_base_classes": 4,
+      "partial_new_poly_counts": {
+        "cumulative_reserved_coefficient_slots": 77516,
+        "fp2_multiplications": 287978,
+        "scope": "partial new arithmetic only; not total cold work or RSS"
+      }
+    },
+    {
+      "name": "actual-known-consistent-public-R",
+      "R": [
+        "53997248512516474082701969409035836853719354495373393109103591705280686401981",
+        "53922471378073373781812839466600061520880537793056296820078575991091531382868"
+      ],
+      "Q": [
+        "48173329619960954078050199146764420134354751059177422565294150542832202044900",
+        "47328770622582993615148102044202909030051215429879810403631724073618663020849"
+      ],
+      "branch_degrees": [
+        8,
+        8,
+        8,
+        7
+      ],
+      "finite_candidate_records": 3,
+      "ordered_multiplier_lifts": 4,
+      "infinity_lifts": 1,
+      "geometric_rows": 1,
+      "parameter_base_classes": 4,
+      "partial_new_poly_counts": {
+        "cumulative_reserved_coefficient_slots": 63369,
+        "fp2_multiplications": 263677,
+        "scope": "partial new arithmetic only; not total cold work or RSS"
+      }
+    }
+  ],
+  "source_revision": 2,
+  "records": 110,
+  "scope": "Producer fixed correctness, complete declared adapted two-template raw-R domain; no fixed-base solve, shared-base rank/recovery, timing/yield/exponent evidence."
+}

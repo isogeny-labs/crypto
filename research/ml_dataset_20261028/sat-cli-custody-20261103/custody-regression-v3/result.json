@@ -1,0 +1,169 @@
+{
+  "status": "PASS",
+  "commands": [
+    {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "custody",
+        "create",
+        "--out",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/copied-run",
+        "--bundle",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/bundle",
+        "--max-bytes",
+        "16777216",
+        "--max-files",
+        "1000"
+      ],
+      "exit_code": 0,
+      "expected_error": null,
+      "stdout_sha256": "b19c0ea118b92331b16bbc4596e354dc207b5a734407594a04c98625e1abb2ff",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "custody",
+        "verify",
+        "--bundle",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/bundle"
+      ],
+      "exit_code": 0,
+      "expected_error": null,
+      "stdout_sha256": "6ce0d3044294b8209d4ee86a9cddac5dce47f1d3cc0a6363029801ad1c544130",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "custody",
+        "restore",
+        "--bundle",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/bundle",
+        "--destination",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/valid-restore"
+      ],
+      "exit_code": 0,
+      "expected_error": null,
+      "stdout_sha256": "1e945c41b8fdfb3f62a7a55aff1b6e8678dae877dbafdc3292b7a8159b0a954e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "custody",
+        "verify",
+        "--bundle",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/mutation-source_commit"
+      ],
+      "exit_code": 0,
+      "expected_error": null,
+      "stdout_sha256": "f1e41653e030586c81f498a8f54ea6e0b55a4c437dec270e40d4a431071de692",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "custody",
+        "restore",
+        "--bundle",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/mutation-source_commit",
+        "--destination",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/rejected-source_commit"
+      ],
+      "exit_code": 1,
+      "expected_error": "custody producer differs from bound run",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "5a24ea33acec0a4cb9c20e465604a5c58cfdc21e8c6067e362f92ac35e3339f9"
+    },
+    {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "custody",
+        "verify",
+        "--bundle",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/mutation-binary_sha256"
+      ],
+      "exit_code": 0,
+      "expected_error": null,
+      "stdout_sha256": "0ca304d93c823a7443249e3a2ba9d247552dde6db05d4314aab9ce90d723a5b2",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "custody",
+        "restore",
+        "--bundle",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/mutation-binary_sha256",
+        "--destination",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/rejected-binary_sha256"
+      ],
+      "exit_code": 1,
+      "expected_error": "custody producer differs from bound run",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "5a24ea33acec0a4cb9c20e465604a5c58cfdc21e8c6067e362f92ac35e3339f9"
+    },
+    {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "custody",
+        "restore",
+        "--bundle",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/mutation-plan_file_sha256",
+        "--destination",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/rejected-plan_file_sha256"
+      ],
+      "exit_code": 1,
+      "expected_error": "custody missing or changed binding run/plan.json",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "aaa1e4fc7d2c10889596a9634ac013496955f4bda7b6559ed39f16a387bfcb18"
+    },
+    {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "custody",
+        "restore",
+        "--bundle",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/mutation-protocol_file_sha256",
+        "--destination",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/rejected-protocol_file_sha256"
+      ],
+      "exit_code": 1,
+      "expected_error": "custody missing or changed binding run/protocol.json",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "aa79ab38b320f57e806085e85de38131d48d97d221852aac5768599ca626baaa"
+    },
+    {
+      "argv": [
+        "/home/ec2-user/ml-dataset-resume-20261029/sat-cli-combined-release-gate-20261103/crypto",
+        "dataset",
+        "custody",
+        "restore",
+        "--bundle",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/mutation-run_file_sha256",
+        "--destination",
+        "/home/ec2-user/ml-dataset-resume-20261029/custody-four-cell-acceptance-run-20261103-v3/rejected-run_file_sha256"
+      ],
+      "exit_code": 1,
+      "expected_error": "custody missing or changed binding run/run.json",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "ee3173281c2cc7eef8cc62263a0e39cfcd2616481fdc3156522fe9fbcf1b511d"
+    }
+  ],
+  "planned_commands": 10,
+  "cloud_calls": 0,
+  "generate_calls": 0,
+  "original_fixture_unchanged": true,
+  "source_binary_unchanged": true,
+  "elapsed_seconds": 256.1991665099922
+}

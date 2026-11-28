@@ -1,0 +1,232 @@
+MATCH	binding	worktree	validated paths byte-equal to 6016f362e8e1c14fc8eddb080f642c72d953e694, no untracked files
+MATCH	pcc:feaf31	PLAN.md	research/extension_ic_graph_20261115/nagao-e2e/PLAN.md
+MATCH	pcc:feaf31	worker-tests-final.log	research/extension_ic_graph_20261115/nagao-e2e/validation/worker-tests-final.log
+MATCH	pcc:feaf31	qualifier-tests.log	research/extension_ic_graph_20261115/nagao-e2e/validation/qualifier-tests.log
+MATCH	pcc:feaf31	clippy-3.log	research/extension_ic_graph_20261115/nagao-e2e/validation/clippy-3.log
+MISMATCH	pcc:feaf31	ledger-entry	claim file exists but no entry in pcc/ledger.jsonl at 6016f362e8 (nor in any local ref's history)
+MATCH	pcc:6432aa	summary.json	research/extension_ic_graph_20261115/nagao-e2e/results/summary.json
+MATCH	pcc:6432aa	runner.exit	research/extension_ic_graph_20261115/nagao-e2e/results/runner.exit
+MATCH	pcc:6432aa	binaries-after.log	research/extension_ic_graph_20261115/nagao-e2e/results/binaries-after.log
+MISMATCH	pcc:6432aa	ledger-entry	claim file exists but no entry in pcc/ledger.jsonl at 6016f362e8 (nor in any local ref's history)
+MATCH	pcc:e9f39d	PCC-20261117-6432aa.json	pcc/claims/PCC-20261117-6432aa.json
+MATCH	pcc:e9f39d	original-ledger-fork.jsonl	research/extension_ic_graph_20261115/nagao-e2e/results/original-ledger-fork.jsonl
+MATCH	pcc:e9f39d	summary.json	research/extension_ic_graph_20261115/nagao-e2e/results/summary.json
+MATCH	pcc:e9f39d	local-custody.json	research/extension_ic_graph_20261115/nagao-e2e/results/local-custody.json
+MATCH	pcc:e9f39d	report.pdf	research/extension_ic_graph_20261115/nagao-e2e/report.pdf
+MISMATCH	pcc:e9f39d	ledger-entry	claim file exists but no entry in pcc/ledger.jsonl at 6016f362e8 (nor in any local ref's history)
+MATCH	pcc:7defbb	CUSTODY.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/CUSTODY.txt
+MATCH	pcc:7defbb	qualified-original.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/qualified-original.json
+MATCH	pcc:7defbb	original-raw.sha256	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/original-raw.sha256
+MATCH	pcc:7defbb	deletion.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/deletion.json
+MISMATCH	pcc:7defbb	ledger-entry	claim file exists but no entry in pcc/ledger.jsonl at 6016f362e8 (nor in any local ref's history)
+MATCH	pcc:6224b9	run-study.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/run-study.json
+MATCH	pcc:6224b9	deferred_pair_run_study.rs	research/extension_ic_graph_20261115/deferred_pair_run_study.rs
+MISMATCH	pcc:6224b9	ledger-entry	claim file exists but no entry in pcc/ledger.jsonl at 6016f362e8 (nor in any local ref's history)
+MATCH	pcc:853115	report-artifacts.sha256	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/report-artifacts.sha256
+MATCH	pcc:853115	postexecution-source-binary.sha256	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/postexecution-source-binary.sha256
+MATCH	pcc:853115	report.pdf	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/report/report.pdf
+MATCH	pcc:853115	run-study.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/run-study.json
+MISMATCH	pcc:853115	ledger-entry	claim file exists but no entry in pcc/ledger.jsonl at 6016f362e8 (nor in any local ref's history)
+MATCH	nagao	public.json	research/extension_ic_graph_20261115/nagao-e2e/public.json
+MATCH	nagao	public-bytes	250
+MATCH	nagao	input-commit-c1b9bd4e	public.json
+MATCH	nagao	commit 7802b7f86459	exists, ancestor of 6016f362e8
+MATCH	nagao	commit c1b9bd4e8753	exists, ancestor of 6016f362e8
+MATCH	nagao	commit fcda1e22cb0c	exists, ancestor of 6016f362e8
+ABSENT	nagao	producer-commit-86189420	6432aa producer.commit not in this clone
+MATCH	nagao	frozen-source-7802b7f8	no science file present at the freeze was modified or deleted; later commits add results/report
+NOTE	nagao	SESSION.md	session log modified after freeze: 0 removed lines (append-only if 0)
+MATCH	nagao-qualifier-pin	extension_remainder_driver.rs	blob 8a6c2326d92e = fcda1e22 source = snapshot
+MATCH	nagao-qualifier-pin	extension_pipeline_collection_check.rs	blob c5a6338df8db = fcda1e22 source = snapshot
+MATCH	nagao-qualifier-pin	extension_remainder.rs	blob 65f591543f05 = fcda1e22 source = snapshot
+MATCH	nagao-qualifier-pin	extension_pipeline_check.rs	blob ec4827f408c4 = fcda1e22 source = snapshot
+MATCH	nagao-qualifier-pin	two-lp-component-analysis.rs	blob c7b48bc9cf22 = fcda1e22 source = snapshot
+MATCH	nagao-qualifier-pin	two-lp-dlp-analysis.rs	blob fb4dfb32b9a4 = fcda1e22 source = snapshot
+MATCH	nagao-qualifier-pin	rho-native-price-analysis.rs	blob 60e170cbb54e = fcda1e22 source = snapshot
+NOTE	nagao-overlay	jv_cover.rs	differs from fcda1e22 by +33 -3 lines (declared overlay)
+NOTE	nagao-overlay	jv_extension_remainder_dlp.rs	differs from fcda1e22 by +14 -2 lines (declared overlay)
+NOTE	nagao-overlay	jv_sieve_two_large_prime.rs	differs from fcda1e22 by +4 -1 lines (declared overlay)
+MATCH	nagao-snapshot	src/cryptanalysis/bitops.rs = fcda1e22	research/extension_ic_graph_20261115/nagao-e2e/src/cryptanalysis/bitops.rs
+MATCH	nagao-snapshot	docs/units/bitop-v1.vectors.json = fcda1e22	research/extension_ic_graph_20261115/nagao-e2e/docs/units/bitop-v1.vectors.json
+MATCH	nagao-snapshot	docs/units/bitop-v2.vectors.json = fcda1e22	research/extension_ic_graph_20261115/nagao-e2e/docs/units/bitop-v2.vectors.json
+NOTE	nagao-custody	members	109 members; archive /workspace/nagao-e2e-runs/raw-payload.tar.gz 19071290 bytes
+MATCH	nagao-custody	summary.json	research/extension_ic_graph_20261115/nagao-e2e/results/summary.json
+MATCH	nagao-custody	analysis.stdout	research/extension_ic_graph_20261115/nagao-e2e/results/analysis.log
+MATCH	nagao-custody	binaries-after.log	research/extension_ic_graph_20261115/nagao-e2e/results/binaries-after.log
+MATCH	nagao-custody	binaries-before.log	research/extension_ic_graph_20261115/nagao-e2e/validation/binaries-precheck.log
+MATCH	nagao-custody	runner.exit	research/extension_ic_graph_20261115/nagao-e2e/results/runner.exit
+ABSENT	nagao-custody	raw-payload.tar.gz	not retained: /workspace/nagao-e2e-runs/raw-payload.tar.gz
+ABSENT	nagao-custody	cold-20261117-01/control-0-baseline.raw.json	LOCAL only (example; 24 raw.json members absent)
+ABSENT	nagao-custody	cold-20261117-01/control-0-rho.raw.json	LOCAL only (example; 24 raw.json members absent)
+ABSENT	nagao-custody	cold-20261117-01/control-0-unit.raw.json	LOCAL only (example; 24 raw.json members absent)
+ABSENT	nagao-binaries	worker	not retained: /tmp/nagao-e2e-native-4/worker
+ABSENT	nagao-binaries	worker-tests	not retained: /tmp/nagao-e2e-native-4/worker-tests
+ABSENT	nagao-binaries	run	not retained: /tmp/nagao-e2e-native-4/run
+ABSENT	nagao-binaries	qualifier-tests	not retained: /tmp/nagao-e2e-native-4/qualifier-tests
+ABSENT	nagao-binaries	analyze	not retained: /tmp/nagao-e2e-native-4/analyze
+ABSENT	nagao-binaries	prepare	not retained: /tmp/nagao-e2e-native-4/prepare
+ABSENT	run50-post-call	exit-code.txt	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/exit-code.txt
+MATCH	run50-post-call	started-at.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/started-at.txt
+MATCH	run50-post-call	finished-at.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/finished-at.txt
+MATCH	run50-post-call	time.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/time.txt
+ABSENT	run50-post-call	cpu-stat-before.txt	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/cpu-stat-before.txt
+ABSENT	run50-post-call	cpu-stat-after.txt	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/cpu-stat-after.txt
+MATCH	run50-post-call	flow.jsonl	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/flow.jsonl
+MATCH	run50-post-call	pre-workers.sha256	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pre-workers.sha256
+MATCH	run50-post-call	fixture.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/fixture.json
+MATCH	run50-post-call	public.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/public.json
+MATCH	run50-post-call	original-ic.raw.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/original-ic.raw.json
+ABSENT	run50-post-call	pair-deferred.raw.json	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-deferred.raw.json
+ABSENT	run50-post-call	pair-discriminant.raw.json	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-discriminant.raw.json
+ABSENT	run50-post-call	quadratic-table.raw.json	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/quadratic-table.raw.json
+MATCH	run50-post-call	rho-neg-b1.raw.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b1.raw.json
+MATCH	run50-post-call	rho-neg-b16.raw.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b16.raw.json
+MATCH	run50-post-call	rho-plain-b1.raw.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b1.raw.json
+MATCH	run50-post-call	rho-plain-b16.raw.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b16.raw.json
+ABSENT	run50-post-call	fixture.summary.jsonl	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/fixture.summary.jsonl
+MATCH	run50-post-call	original-ic.summary.jsonl	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/original-ic.summary.jsonl
+MATCH	run50-post-call	pair-deferred.summary.jsonl	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-deferred.summary.jsonl
+MATCH	run50-post-call	pair-discriminant.summary.jsonl	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-discriminant.summary.jsonl
+MATCH	run50-post-call	quadratic-table.summary.jsonl	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/quadratic-table.summary.jsonl
+MATCH	run50-post-call	rho-neg-b1.summary.jsonl	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b1.summary.jsonl
+MATCH	run50-post-call	rho-neg-b16.summary.jsonl	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b16.summary.jsonl
+MATCH	run50-post-call	rho-plain-b1.summary.jsonl	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b1.summary.jsonl
+MATCH	run50-post-call	rho-plain-b16.summary.jsonl	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b16.summary.jsonl
+ABSENT	run50-post-call	fixture.exit-code.txt	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/fixture.exit-code.txt
+MATCH	run50-post-call	original-ic.exit-code.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/original-ic.exit-code.txt
+MATCH	run50-post-call	pair-deferred.exit-code.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-deferred.exit-code.txt
+MATCH	run50-post-call	pair-discriminant.exit-code.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-discriminant.exit-code.txt
+MATCH	run50-post-call	quadratic-table.exit-code.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/quadratic-table.exit-code.txt
+MATCH	run50-post-call	rho-neg-b1.exit-code.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b1.exit-code.txt
+MATCH	run50-post-call	rho-neg-b16.exit-code.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b16.exit-code.txt
+MATCH	run50-post-call	rho-plain-b1.exit-code.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b1.exit-code.txt
+MATCH	run50-post-call	rho-plain-b16.exit-code.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b16.exit-code.txt
+ABSENT	run50-post-call	fixture.stderr	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/fixture.stderr
+ABSENT	run50-post-call	original-ic.stderr	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/original-ic.stderr
+ABSENT	run50-post-call	pair-deferred.stderr	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-deferred.stderr
+ABSENT	run50-post-call	pair-discriminant.stderr	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-discriminant.stderr
+ABSENT	run50-post-call	quadratic-table.stderr	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/quadratic-table.stderr
+ABSENT	run50-post-call	rho-neg-b1.stderr	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b1.stderr
+ABSENT	run50-post-call	rho-neg-b16.stderr	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b16.stderr
+ABSENT	run50-post-call	rho-plain-b1.stderr	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b1.stderr
+ABSENT	run50-post-call	rho-plain-b16.stderr	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b16.stderr
+MATCH	run50-post-call	original-ic.time.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/original-ic.time.txt
+MATCH	run50-post-call	pair-deferred.time.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-deferred.time.txt
+MATCH	run50-post-call	pair-discriminant.time.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-discriminant.time.txt
+MATCH	run50-post-call	quadratic-table.time.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/quadratic-table.time.txt
+MATCH	run50-post-call	rho-neg-b1.time.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b1.time.txt
+MATCH	run50-post-call	rho-neg-b16.time.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b16.time.txt
+MATCH	run50-post-call	rho-plain-b1.time.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b1.time.txt
+MATCH	run50-post-call	rho-plain-b16.time.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b16.time.txt
+ABSENT	run50-post-call	fixture.argv.json	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/fixture.argv.json
+MATCH	run50-post-call	original-ic.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/original-ic.argv.json
+MATCH	run50-post-call	pair-deferred.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-deferred.argv.json
+MATCH	run50-post-call	pair-discriminant.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-discriminant.argv.json
+MATCH	run50-post-call	quadratic-table.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/quadratic-table.argv.json
+MATCH	run50-post-call	rho-neg-b1.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b1.argv.json
+MATCH	run50-post-call	rho-neg-b16.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b16.argv.json
+MATCH	run50-post-call	rho-plain-b1.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b1.argv.json
+MATCH	run50-post-call	rho-plain-b16.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b16.argv.json
+MATCH	run50-pre-workers	fixture.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/fixture.json
+MATCH	run50-pre-workers	public.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/public.json
+ABSENT	run50-pre-workers	fixture.argv.json	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/fixture.argv.json
+MATCH	run50-pre-workers	original-ic.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/original-ic.argv.json
+MATCH	run50-pre-workers	pair-deferred.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-deferred.argv.json
+MATCH	run50-pre-workers	pair-discriminant.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-discriminant.argv.json
+MATCH	run50-pre-workers	quadratic-table.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/quadratic-table.argv.json
+MATCH	run50-pre-workers	rho-neg-b1.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b1.argv.json
+MATCH	run50-pre-workers	rho-neg-b16.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b16.argv.json
+MATCH	run50-pre-workers	rho-plain-b1.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b1.argv.json
+MATCH	run50-pre-workers	rho-plain-b16.argv.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b16.argv.json
+ABSENT	run50-pre-call	driver	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/driver
+ABSENT	run50-pre-call	analyzer	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/analyzer
+ABSENT	run50-pre-call	wrapper	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/wrapper
+MATCH	run50-pre-call	runtime-plan.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/runtime-plan.json
+MATCH	run50-pre-call	source-revision.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/source-revision.txt
+ABSENT	run50-pre-call	source-checkpoint.tar	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/source-checkpoint.tar
+ABSENT	run50-pre-call	frozen-root-source.tar	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/frozen-root-source.tar
+ABSENT	run50-pre-call	frozen-root-source.sha256	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/frozen-root-source.sha256
+ABSENT	run50-pre-call	RESUME-before.md	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/RESUME-before.md
+MATCH	run50-pre-call	os.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/os.txt
+MATCH	run50-pre-call	cpu.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/cpu.json
+ABSENT	run50-pre-call	cgroup.txt	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/cgroup.txt
+ABSENT	run50-pre-call	build-rustc.txt	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/build-rustc.txt
+ABSENT	run50-pre-call	bootstrap-rustc.txt	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/bootstrap-rustc.txt
+MATCH	run50-pre-call	allocation.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/allocation.json
+ABSENT	run50-pre-call	driver.ldd.txt	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/driver.ldd.txt
+ABSENT	run50-pre-call	bundle.sha256	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/bundle.sha256
+MATCH	run50-original-raw	original-ic.raw.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/original-ic.raw.json
+ABSENT	run50-original-raw	pair-deferred.raw.json	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-deferred.raw.json
+ABSENT	run50-original-raw	pair-discriminant.raw.json	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/pair-discriminant.raw.json
+ABSENT	run50-original-raw	quadratic-table.raw.json	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/quadratic-table.raw.json
+MATCH	run50-original-raw	rho-neg-b1.raw.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b1.raw.json
+MATCH	run50-original-raw	rho-neg-b16.raw.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-neg-b16.raw.json
+MATCH	run50-original-raw	rho-plain-b1.raw.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b1.raw.json
+MATCH	run50-original-raw	rho-plain-b16.raw.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/rho-plain-b16.raw.json
+MATCH	run50-qualified-output	summary.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/qualified-original.json
+MATCH	run50-qualified-output	analysis-original.log	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/analysis-original.log
+MATCH	run50-qualified-output	analysis-original.exit-code.txt	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/analysis-original.exit-code.txt
+MATCH	run50-report-artifacts	elapsed-150dpi.png	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/report/elapsed-150dpi.png
+MATCH	run50-report-artifacts	elapsed.svg	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/report/elapsed.svg
+MATCH	run50-report-artifacts	figure.typ	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/report/figure.typ
+MATCH	run50-report-artifacts	report-150dpi.png	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/report/report-150dpi.png
+MATCH	run50-report-artifacts	report.pdf	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/report/report.pdf
+MATCH	run50-report-artifacts	report.svg	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/report/report.svg
+MATCH	run50-report-artifacts	report.typ	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/report/report.typ
+MATCH	run50-report-artifacts	elapsed-150dpi.png	benchmarks/20261117-runpod-deferred-pair/elapsed-150dpi.png
+MATCH	run50-report-artifacts	elapsed.svg	benchmarks/20261117-runpod-deferred-pair/elapsed.svg
+MATCH	run50-report-artifacts	report-150dpi.png	benchmarks/20261117-runpod-deferred-pair/report-150dpi.png
+MATCH	run50-report-artifacts	report.pdf	benchmarks/20261117-runpod-deferred-pair/report.pdf
+MATCH	run50-report-artifacts	report.svg	benchmarks/20261117-runpod-deferred-pair/report.svg
+MATCH	run50-postexecution	deferred_pair_run_study.rs	research/extension_ic_graph_20261115/deferred_pair_run_study.rs
+MATCH	run50-postexecution	deferred_pair_run_report.rs	research/extension_ic_graph_20261115/deferred_pair_run_report.rs
+ABSENT	run50-postexecution	run-study	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/run-study
+ABSENT	run50-postexecution	run-report	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/run-report
+ABSENT	run50-artifacts	artifacts.tar.gz	not retained: research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/artifacts.tar.gz
+MATCH	run50-pre-call	frozen-root-source.sha256 (validation/ copy)	research/extension_ic_graph_20261115/validation/deferred50-frozen-root-source.sha256
+MATCH	run50	runtime-plan-public_sha256	public.json
+MATCH	run50	commit 11c9a0312f0b	exists, ancestor of 6016f362e8
+MATCH	run50-source-210	at 11c9a0312f0b	210 match, 0 paths not in the commit tree
+MATCH	run50-format-successor	at 48d6e39c87bb	210 match (commit that published the successor manifest)
+NOTE	run50-format-successor	jv_sieve_two_large_prime.rs	11c9a031 -> 48d6e39c87 changes only the deferred-pair pub-use line layout: 4 changed lines
+NOTE	run50-format-successor	diff	2 manifest lines differ: src/cryptanalysis/jv_sieve_two_large_prime.rs 
+MATCH	df-raw	run3415.jsonl	zcat traced-seed389-n3415.rows.jsonl.gz
+MATCH	df-raw	run401.jsonl	zcat traced-seed401-n1506.rows.jsonl.gz
+MATCH	df-raw	run3415.out (= traced summary)	research/extension_ic_graph_20261115/leads-20261118/descent-finder/runs/traced-seed389-n3415.summary.json
+MATCH	df-raw	run401.out (= traced summary)	research/extension_ic_graph_20261115/leads-20261118/descent-finder/runs/traced-seed401-n1506.summary.json
+MATCH	df-raw	smoke20.out (= DEFECT summary)	research/extension_ic_graph_20261115/leads-20261118/descent-finder/runs/smoke-seed389-n20-multithread-DEFECT.summary.json
+MATCH	df-raw	smoke20b.out (= smoke summary)	research/extension_ic_graph_20261115/leads-20261118/descent-finder/runs/smoke-seed389-n20.summary.json
+MATCH	df-raw	traced-seed389-n3415.rows.jsonl.gz	research/extension_ic_graph_20261115/leads-20261118/descent-finder/runs/traced-seed389-n3415.rows.jsonl.gz
+MATCH	df-raw	traced-seed401-n1506.rows.jsonl.gz	research/extension_ic_graph_20261115/leads-20261118/descent-finder/runs/traced-seed401-n1506.rows.jsonl.gz
+MATCH	df-raw	compare-seed389-n3415.json	research/extension_ic_graph_20261115/leads-20261118/descent-finder/runs/compare-seed389-n3415.json
+MATCH	df-raw	compare-seed401-n1506.json	research/extension_ic_graph_20261115/leads-20261118/descent-finder/runs/compare-seed401-n1506.json
+MATCH	df-raw	smoke-seed389-n20-multithread-DEFECT.summary.json	research/extension_ic_graph_20261115/leads-20261118/descent-finder/runs/smoke-seed389-n20-multithread-DEFECT.summary.json
+MATCH	df-raw	smoke-seed389-n20.summary.json	research/extension_ic_graph_20261115/leads-20261118/descent-finder/runs/smoke-seed389-n20.summary.json
+MATCH	df-raw	traced-seed389-n3415.summary.json	research/extension_ic_graph_20261115/leads-20261118/descent-finder/runs/traced-seed389-n3415.summary.json
+MATCH	df-raw	traced-seed401-n1506.summary.json	research/extension_ic_graph_20261115/leads-20261118/descent-finder/runs/traced-seed401-n1506.summary.json
+MATCH	df-frozen	src/cryptanalysis/bitops.rs	= git show fcda1e22
+MATCH	df-frozen	src/cryptanalysis/f4_fp.rs	= git show fcda1e22
+MATCH	df-frozen	src/cryptanalysis/f4_fp/pair_certificate.rs	= git show fcda1e22
+MATCH	df-frozen	src/cryptanalysis/f4_fp/reuse.rs	= git show fcda1e22
+MATCH	df-frozen	src/cryptanalysis/fx_hash.rs	= git show fcda1e22
+MATCH	df-frozen	src/cryptanalysis/gaudry_cubic.rs	= git show fcda1e22
+MATCH	df-frozen	src/cryptanalysis/glv_invariant_base.rs	= git show fcda1e22
+MATCH	df-frozen	src/cryptanalysis/groebner_f4.rs	= git show fcda1e22
+MATCH	df-frozen	src/cryptanalysis/jv_bitops.rs	= git show fcda1e22
+MATCH	df-frozen	src/cryptanalysis/jv_bitops_uniform.rs	= git show fcda1e22
+MATCH	df-frozen	src/cryptanalysis/jv_cover.rs	= git show fcda1e22
+MATCH	df-frozen	src/cryptanalysis/residual_walk.rs	= git show fcda1e22
+MATCH	df-frozen	src/cryptanalysis/zero_dim_la.rs	= git show fcda1e22
+MATCH	df-frozen	src/prime_hyperelliptic/mod.rs	= git show fcda1e22
+MATCH	df-frozen	src/prime_hyperelliptic/ops.rs	= git show fcda1e22
+ABSENT	df-binaries	traced_descent_check	binary not retained (/dev/shm/mini/target/release/traced_descent_check)
+ABSENT	df-binaries	descent_breakdown	binary not retained (/dev/shm/df-lane/descent_breakdown)
+MATCH	df-binaries	overlay jv_cover.rs	research/extension_ic_graph_20261115/nagao-e2e/library-overlay/jv_cover.rs
+MATCH	df-inputs	public.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/public.json
+MATCH	df-inputs	qualified-original.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/qualified-original.json
+MATCH	df-inputs	run-study.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/run-study.json
+MATCH	df-inputs	original-ic.raw.json	research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/original-ic.raw.json
+MATCH	df-inputs	public.json	research/extension_ic_graph_20261115/nagao-e2e/public.json
+MISMATCH	df-build	Cargo.lock	build.sh copies $here/Cargo.lock under set -e and cargo --locked, but no Cargo.lock is committed (BUILD_MANIFEST lists 3d1cb733)
+NOTE	df-build	fetch_frozen.sh	hard-codes worktree /home/user/crypto/.claude/worktrees/wf_8b7b71c2-376-2 (absent on this host)
+NOTE	df-build	assemble.py	hard-codes worktree /home/user/crypto/.claude/worktrees/wf_8b7b71c2-376-2 (absent on this host)

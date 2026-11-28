@@ -1,0 +1,177 @@
+{
+  "schema": "vieta-local-goal-completion/v1",
+  "observed_utc": "2026-11-23T07:01:39.260182+00:00",
+  "goal_scope": "At least2x matched full construction plus one relation query over Euclid/Newton on explicitly stated local workloads, independent standing reported honestly",
+  "decision": "complete at declared local word62/m16384 scope; not independently verified or L2 admitted",
+  "pr": 4535,
+  "head": "f4b81b8a61f0adecaad487ea4ac332495149d3e1",
+  "merged_at": "2026-11-17T15:13:45Z",
+  "merge": "06d77461111293a8d05e04e4e2815aa9ae0eadb5",
+  "main": "816f9c3a942efed569049618c056d12a0c56d693",
+  "native_stored_rows": [
+    {
+      "protocol": "Original4b",
+      "source": "evidence/primary-summary.json",
+      "group": "coset:word62:m16384:conditioned-sum:finite",
+      "label": "word62 m16384 coset / conditioned",
+      "n": 3,
+      "newton_seconds": 5.304408987,
+      "candidate_seconds": 0.683002929,
+      "lookup_seconds": 0.109921135,
+      "ratio": {
+        "bootstrap_median95": [
+          7.309686959625227,
+          8.235328978564038
+        ],
+        "bootstrap_replicates": 4096,
+        "max": 8.235328978564038,
+        "median": 7.559360743239214,
+        "min": 7.309686959625227,
+        "n": 3,
+        "uncertainty_scope": "descriptive percentile resampling conditional on these sampled targets; small-N, no p-value or population/exponent inference",
+        "values": [
+          7.309686959625227,
+          7.559360743239214,
+          8.235328978564038
+        ]
+      },
+      "lookup_ratio": {
+        "bootstrap_median95": [
+          0.1511604881477333,
+          0.18351302352177776
+        ],
+        "bootstrap_replicates": 4096,
+        "max": 0.18351302352177776,
+        "median": 0.15164448584670712,
+        "min": 0.1511604881477333,
+        "n": 3,
+        "uncertainty_scope": "descriptive percentile resampling conditional on these sampled targets; small-N, no p-value or population/exponent inference",
+        "values": [
+          0.1511604881477333,
+          0.15164448584670712,
+          0.18351302352177776
+        ]
+      }
+    },
+    {
+      "protocol": "Original4b",
+      "source": "evidence/primary-summary.json",
+      "group": "coset:word62:m16384:seeded-random-abscissa:finite",
+      "label": "word62 m16384 coset / random abscissa",
+      "n": 3,
+      "newton_seconds": 5.391713387,
+      "candidate_seconds": 0.69406474,
+      "lookup_seconds": 0.112585084,
+      "ratio": {
+        "bootstrap_median95": [
+          7.424092905223798,
+          8.196568009098723
+        ],
+        "bootstrap_replicates": 4096,
+        "max": 8.196568009098723,
+        "median": 7.608842253152593,
+        "min": 7.424092905223798,
+        "n": 3,
+        "uncertainty_scope": "descriptive percentile resampling conditional on these sampled targets; small-N, no p-value or population/exponent inference",
+        "values": [
+          7.424092905223798,
+          7.608842253152593,
+          8.196568009098723
+        ]
+      },
+      "lookup_ratio": {
+        "bootstrap_median95": [
+          0.158115916196358,
+          0.16221121389915297
+        ],
+        "bootstrap_replicates": 4096,
+        "max": 0.16221121389915297,
+        "median": 0.1618582650613528,
+        "min": 0.158115916196358,
+        "n": 3,
+        "uncertainty_scope": "descriptive percentile resampling conditional on these sampled targets; small-N, no p-value or population/exponent inference",
+        "values": [
+          0.158115916196358,
+          0.1618582650613528,
+          0.16221121389915297
+        ]
+      }
+    }
+  ],
+  "native_stored_control_groups": [
+    {
+      "clock_aa": true,
+      "clock_positive": true,
+      "complete_reference_pairs": true,
+      "count_aa": true,
+      "count_positive": true,
+      "group": "coset:word62:m16384:conditioned-sum:finite",
+      "local_goal": true,
+      "retained_targets": 3,
+      "verdict": "local_goal_observed_unverified"
+    },
+    {
+      "clock_aa": true,
+      "clock_positive": true,
+      "complete_reference_pairs": true,
+      "count_aa": true,
+      "count_positive": true,
+      "group": "coset:word62:m16384:seeded-random-abscissa:finite",
+      "local_goal": true,
+      "retained_targets": 3,
+      "verdict": "local_goal_observed_unverified"
+    }
+  ],
+  "statistics_reestimated": false,
+  "protocol": {
+    "precall_publication": "0b63f6e26eb1e6d63d5d6c84ce2e026f21893db4",
+    "sha256": "27b79eb79dff39d37efe2feed795245c2dc0f0090a16b4894a47b82457836502",
+    "equal_to_final_published_protocol": true,
+    "precall_seed_export_fixture_check": "OK: export research/vieta_coset_rust_20261115/speedup-20261117/export-fiber-qualification.json against research/vieta_coset_rust_20261115/speedup-20261117/protocol-fiber-qualification.json (0 finding(s))",
+    "chronology_receipt": "docs/session-logs/2026-11-17.md sections08:40/08:46"
+  },
+  "complete_set_replays": {
+    "primary": {
+      "checked": 176,
+      "distinct_inputs": 32,
+      "method": "BigUint scalar complete-set replay, including word-field cases; producer-owned, no independent signature",
+      "preserved_failed_rows": 16,
+      "schema": "vieta-speedup-replay/v1"
+    },
+    "budget": {
+      "checked": 48,
+      "distinct_inputs": 8,
+      "method": "BigUint scalar complete-set replay, including word-field cases; producer-owned, no independent signature",
+      "preserved_failed_rows": 0,
+      "schema": "vieta-speedup-replay/v1"
+    }
+  },
+  "study_tree_ids": {
+    "ea564c6a9e0f5e82a45f0ba2ee4af3eb6826335b": "1ae107c845ae7f27736b24a44d3b8f793e095a87",
+    "f4b81b8a61f0adecaad487ea4ac332495149d3e1": "1ae107c845ae7f27736b24a44d3b8f793e095a87",
+    "06d77461111293a8d05e04e4e2815aa9ae0eadb5": "1ae107c845ae7f27736b24a44d3b8f793e095a87",
+    "816f9c3a942efed569049618c056d12a0c56d693": "1ae107c845ae7f27736b24a44d3b8f793e095a87"
+  },
+  "merged_first_parent_ledger_exact_byte_prefix": true,
+  "journal_parent_full_block_audit": [
+    {
+      "parent": "51a2efa1c34bcec72bb48db9cc0189a0ba2a00bd",
+      "journal_files": 43,
+      "missing": []
+    },
+    {
+      "parent": "f4b81b8a61f0adecaad487ea4ac332495149d3e1",
+      "journal_files": 43,
+      "missing": []
+    }
+  ],
+  "signed_standing": "unverified; no verdicts",
+  "full_count_limitation": "Native field constructor internals timed in cold but unpriced in counters; no complete fast cold-count claim",
+  "original_cohort_limitation": "192 calls;176 successes replayed;16 word32768 reference failures preserved; whole first cohort inconclusive",
+  "profile_limitation": "Undercovered gprofng samples; no reliable precise hotspot proportions",
+  "degree_bound_established": false,
+  "benchmarks_rerun": false,
+  "paid_cloud_spend": false,
+  "local_s3_operation": false,
+  "protected_promotion": false
+}

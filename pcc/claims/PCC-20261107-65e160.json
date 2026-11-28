@@ -1,0 +1,29 @@
+{
+ "created_at": "2026-11-07T02:16:50Z",
+ "id": "PCC-20261107-65e160",
+ "kind": "statement",
+ "producer": {
+  "commit": "1f3b1765637fee98eeff395dc610a8db7231b597",
+  "model": "Codex",
+  "session": "nist-pilot-preparation-20261107"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_skip_criterion_20261025/pilot_qualification_20261107/DEVELOPMENT.json",
+    "sha256": "be0675cf5bffbb48e4b0aba38b99ea029ff5cc44c646b7ea67132d962b9516a6"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_skip_criterion_20261025/pilot_qualification_20261107/MANIFEST.sha256",
+    "sha256": "65ddb8b1ec8aff1d8e37bd2d479eb4f9da8bbe0db5236a76439074d330bbd183"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_skip_criterion_20261025/pilot_qualification_20261107",
+ "statement": "Static native NIST packaging development: existing 46 native and seven CLI controls exited zero; all six tested toy recovery states matched uninterrupted journal bytes. No real-field sampling, published image, cloud execution, durable restore qualification or signed execution proof is claimed."
+}

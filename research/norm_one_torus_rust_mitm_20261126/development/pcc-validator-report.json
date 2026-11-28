@@ -1,0 +1,55 @@
+{
+  "schema": "isogeny-labs/norm-one-torus-mitm-validator-report/v1",
+  "status": "pass",
+  "raw_data": [
+    {
+      "path": "research/norm_one_torus_rust_mitm_20261126/results.csv",
+      "sha256": "2cbc31dacebe70f5c8d3e4757dd27fcaf42c367ef74e3dc970c444dcc438a4b1"
+    },
+    {
+      "path": "research/norm_one_torus_rust_mitm_20261126/manifest-pre.json",
+      "sha256": "21c171e847faca3bf01a99374ce2eaeec6c1061e2ea9ba7c7f4fc7e33f3597e3"
+    },
+    {
+      "path": "research/norm_one_torus_rust_mitm_20261126/certificates.json",
+      "sha256": "cb1ca9d7c4629c93171ed0000bae63d4e869fd9c374e920dd04304395cd23354"
+    },
+    {
+      "path": "research/norm_one_torus_rust_mitm_20261126/verifier-report.json",
+      "sha256": "d389ad81d0276afaecfb56557b8f5a7cbead8104b5ae1b6054f6b26ecd8222d9"
+    }
+  ],
+  "headline": [
+    {
+      "name": "individual_total_median_ms",
+      "claimed": 47.289,
+      "recomputed": 47.289,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "batch_quotient_total_median_ms",
+      "claimed": 9.629,
+      "recomputed": 9.629,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "local_nonisolated_total_ratio",
+      "claimed": 4.911101879738,
+      "recomputed": 4.911101879738,
+      "rel_tol": 1e-12
+    },
+    {
+      "name": "individual_setup_inversions",
+      "claimed": 57052,
+      "recomputed": 57052,
+      "rel_tol": 0
+    },
+    {
+      "name": "batch_quotient_setup_inversions",
+      "claimed": 2,
+      "recomputed": 2,
+      "rel_tol": 0
+    }
+  ],
+  "producer_note": "Schema correction over frozen development artifacts. It has no independent keyring signature, does not establish execution provenance, and remains PCC not-covered."
+}

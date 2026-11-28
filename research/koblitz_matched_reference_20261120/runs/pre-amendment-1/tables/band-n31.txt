@@ -1,0 +1,17 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m31-tm90707-c95f16f5 | 20.46 | gen-c2 | 144/144 | 0.563 | 0.736 | 2.292 | — |
+| icv1-f2m31-tm90707-c95f16f5 | 20.46 | rho-strong | 144/144 | 1.211 | 1.274 | 1.836 | — |
+| icv1-f2m31-tm90707-c95f16f5 | 20.46 | rho-v5 | 144/144 | 0.204 | 0.224 | 0.406 | — |
+| icv1-f2m31-tm90707-c95f16f5 | 20.46 | rho-v5-aa | 144/144 | 0.204 | 0.224 | 0.406 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m31-tm90707-c95f16f5 | gen-c2 vs rho-strong | unresolved inside the band |
+| icv1-f2m31-tm90707-c95f16f5 | gen-c2 vs rho-v5 | rho-v5 < gen-c2 |
+| icv1-f2m31-tm90707-c95f16f5 | gen-c2 vs rho-v5-aa | rho-v5-aa < gen-c2 |
+| icv1-f2m31-tm90707-c95f16f5 | rho-strong vs rho-v5 | rho-v5 < rho-strong |
+| icv1-f2m31-tm90707-c95f16f5 | rho-strong vs rho-v5-aa | rho-v5-aa < rho-strong |
+| icv1-f2m31-tm90707-c95f16f5 | rho-v5 vs rho-v5-aa | unresolved inside the band |

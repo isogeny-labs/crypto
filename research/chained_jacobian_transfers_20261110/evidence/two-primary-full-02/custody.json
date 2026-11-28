@@ -1,0 +1,50 @@
+{
+  "at": "2026-11-12T12:18:45.917665+00:00",
+  "full_tests": 32,
+  "failed": 0,
+  "ignored": 0,
+  "filtered": 0,
+  "exit": 0,
+  "source_fixture_subjects": 15,
+  "after_unchanged": true,
+  "models": 3,
+  "elliptic16_each": 256,
+  "lifts_each": 4096,
+  "classes_each": 256,
+  "representations_each": 16,
+  "directions": 6,
+  "group_law_checks_each": 65536,
+  "jacobian4_Frobenius_fixed": [
+    1,
+    1,
+    16,
+    64,
+    256
+  ],
+  "elliptic16_Frobenius_fixed": [
+    1,
+    1,
+    4,
+    64,
+    256
+  ],
+  "extension_degrees": [
+    1,
+    2,
+    3,
+    6,
+    12
+  ],
+  "wrong_quarter_image": 16,
+  "wrong_quarter_zero": 16,
+  "wrong_quarter_differences": 255,
+  "raw_bytes": 55041,
+  "raw_sha256": "a67142e186272871c9e5248c98ba5d0a15c6d664cc719c4cd27520239a505d8f",
+  "archive_bytes": 8252,
+  "archive_sha256": "8a024f00529befa86755d0e5f4d0cecf9b709e6da0bf24df3b2e2b38b493984e",
+  "exact_roundtrip": true,
+  "started": "2026-11-12T12:15:42,729292867+00:00",
+  "finished": "2026-11-12T12:16:41,790379818+00:00",
+  "command": "oldreference/legacy SHAguards;cargo fmt -- --check;cargo clippy --all-targets --offline --locked -- -D warnings;timeout15m cargo test --release --offline --locked -- --nocapture in successor-preflight",
+  "standing": "unsigned complete native;globalquotient/Picard bridge written,no oldproducerA4comparison"
+}

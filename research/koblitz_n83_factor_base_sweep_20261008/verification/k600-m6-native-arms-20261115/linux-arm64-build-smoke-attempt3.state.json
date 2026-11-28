@@ -1,0 +1,32 @@
+{
+  "Id": "96706088d38db59d7085c5f76483a846ba8f1c5294aab7eaf65681a6f7128472",
+  "Image": "sha256:e6f2cff35d0f309acf8433b4f05878ed77092602c5065cc81801177da0bb3a9c",
+  "Config": {
+    "Image": "rust@sha256:e6f2cff35d0f309acf8433b4f05878ed77092602c5065cc81801177da0bb3a9c",
+    "Env": [
+      "CARGO_TARGET_DIR=/build-target",
+      "PATH=/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "RUSTUP_HOME=/usr/local/rustup",
+      "CARGO_HOME=/usr/local/cargo",
+      "RUST_VERSION=1.99.1"
+    ],
+    "Cmd": [
+      "sh",
+      "-c",
+      "timeout 1200 cargo build --release --locked --no-default-features -j 1 --example n83_k600_m6_linux_build --example n83_k600_m6_native_arms --example n83_k600_m6_native_preflight --example n83_k600_m6_budget --example koblitz_n83_mixed_orbit_worker"
+    ]
+  },
+  "HostConfig": {
+    "Memory": 12884901888,
+    "MemorySwap": 12884901888,
+    "NanoCpus": 4000000000,
+    "PidsLimit": 512
+  },
+  "State": {
+    "Status": "exited",
+    "OOMKilled": false,
+    "ExitCode": 101,
+    "StartedAt": "2026-11-15T18:37:17.410920544Z",
+    "FinishedAt": "2026-11-15T18:47:10.204665388Z"
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "schema": "native.cpu.scale.build/v1",
+  "source_commit": "cc893a730fc82918f166286e5506ff39afb1d102",
+  "build_source_unchanged": true,
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "binaries": {
+    "scale": "3b2ef1b1f92bfdd9f913685f135433009a1c1d897a51d1ee8941c8aa9f8fcb08",
+    "hashed-ecdl-cpu": "02d6d740f4e26f938766dfd0c0c5b098c9fb6ea2efb8f6f9de66088309b3d7aa",
+    "analyze": "c3c474aad7625584524a92007bf93a411b24b20e5026de3873f63826313305f2"
+  },
+  "qualified_entries": [
+    {
+      "original": "/tmp/ecdlp-baseline-cohort-20261123/target/release/examples/scale",
+      "name": "scale",
+      "kinds": [
+        "example"
+      ],
+      "test": false,
+      "qualified": "/tmp/ecdlp-baseline-cohort-20261123/qualified/03-scale",
+      "bytes": 871552,
+      "sha256": "3b2ef1b1f92bfdd9f913685f135433009a1c1d897a51d1ee8941c8aa9f8fcb08"
+    },
+    {
+      "original": "/tmp/ecdlp-baseline-cohort-20261123/target/release/hashed-ecdl-cpu",
+      "name": "hashed-ecdl-cpu",
+      "kinds": [
+        "bin"
+      ],
+      "test": false,
+      "qualified": "/tmp/ecdlp-baseline-cohort-20261123/qualified/05-hashed-ecdl-cpu",
+      "bytes": 864832,
+      "sha256": "02d6d740f4e26f938766dfd0c0c5b098c9fb6ea2efb8f6f9de66088309b3d7aa"
+    },
+    {
+      "original": "/tmp/ecdlp-baseline-cohort-20261123/target/scale-analyze",
+      "name": "scale-analyze",
+      "kinds": [
+        "native-analysis"
+      ],
+      "test": false,
+      "qualified": "/tmp/ecdlp-baseline-cohort-20261123/qualified/06-scale-analyze",
+      "bytes": 4638264,
+      "sha256": "c3c474aad7625584524a92007bf93a411b24b20e5026de3873f63826313305f2"
+    }
+  ],
+  "unit_tests": {
+    "passed": 47,
+    "failed": 0,
+    "ignored": 0,
+    "empty_harnesses": 1
+  },
+  "full_root_gate": false,
+  "S3_used": false
+}

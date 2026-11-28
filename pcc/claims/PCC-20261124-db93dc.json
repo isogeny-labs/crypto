@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T03:35:25Z",
+ "id": "PCC-20261124-db93dc",
+ "kind": "statement",
+ "producer": {
+  "commit": "18ca77073b3f7e73b3d780788102e7f653cc87e2",
+  "model": "",
+  "session": "codex-ecc2k-cold15m-20261124"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold15m_20261124/candidate2/grid-audit.json",
+    "sha256": "82d5e39d4d9c490145c3a7ce1d5ea27b6eb8393e9f196bfa843b33105b489ae8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold15m_20261124/candidate2/summary.json",
+    "sha256": "67f905f447bfdabdb6d38231f9ccd43cb10fa9b94499768f978c33e25bd9f51b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold15m_20261124/candidate2/polynomial-replay.json",
+    "sha256": "0e27b2f7c6978882bce13ec14690ca4d59c5e106dd4e03c727e1887612c1505b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold15m_20261124/candidate2/checks/source-final.json",
+    "sha256": "91e5e3cbb938e731748fd770b6207f41771abd5982a5e2bd8940063cceee953d"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Second full panel completes120 exact-output rows, all six non-regression controls pass,80 tuples replay and source inventory is unchanged. Uniform n131 median16,033,438Ir still misses strict15M; retain all rows and refine separately."
+}

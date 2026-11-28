@@ -1,0 +1,60 @@
+{
+  "schema": "pairing-geometric-verification/v1",
+  "source_commit": "d6d36fcc393720ef3cf0727c216f3410ea04bbb8",
+  "source_plan": "sources.json",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 33,
+  "claim_id": "PCC-20261112-803949",
+  "declaration_sha256": "9da3ac3c7a7653a23c9db519bfa1942742d46dc164be1be8ed9e04bc32ee47be",
+  "actual_verdict": {
+    "claim_id": "PCC-20261112-803949",
+    "claim_sha256": "d294ce28baf7d47335994e1911e04478ed16a3ebf8b8932da47e190c4276776c",
+    "commit": "d6d36fcc393720ef3cf0727c216f3410ea04bbb8",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/pairing_geometric_torsion_audit_20261112/lean (GeometricFrobenius.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-12T22:07:43Z",
+    "verifier_host": "2d18c814bc7e"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261112-803949",
+    "claim_sha256": "d294ce28baf7d47335994e1911e04478ed16a3ebf8b8932da47e190c4276776c",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "gate": {
+    "archive": "research/pairing_geometric_torsion_audit_20261112/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 18,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/pairing_geometric_torsion_audit_20261112/evidence/attempts.tar.gz",
+    "files": 29,
+    "roundtrip_equal": true
+  },
+  "report": {
+    "path": "reports/proof-20261112/report.pdf",
+    "pages": 2,
+    "bytes": 48895,
+    "sha256": "1d32b148b7777e1e6f9e465ed6f123f235541509cdf1f5e77c08c1a6bf0682d7",
+    "all_pages_visually_inspected": true
+  },
+  "actual_geometric_case_proved": true,
+  "generic_all_curve_torsion_rank_proved": false,
+  "canonical_divisor_identification_proved": false,
+  "native_experiment": false,
+  "paid_compute": 0
+}

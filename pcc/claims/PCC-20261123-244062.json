@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T21:06:02Z",
+ "id": "PCC-20261123-244062",
+ "kind": "statement",
+ "producer": {
+  "commit": "257bf0f170d578d268454813a093de270c9906c5",
+  "model": "GPT-6",
+  "session": "chained-transfers-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cm19_actual_j4_20261123/maintenance/PR5072_FIRST_HEAD_CI_2058.json",
+    "sha256": "5351c7952a30a74edc7d07ec2136b431feac93933b59ee0356eb1e66bf9403e8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cm19_actual_j4_20261123/maintenance/PR5072_WORKFLOW_TRIGGER_RECEIPTS.json",
+    "sha256": "5921c2494ea2d009c090950206bee9eec7294afaa11909297966cd88bc1e2849"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Scheduled5072 latesthead092e review after50min:3 all-attempt checks(review skipped/success,migrate success),4 all-event runs including failedCT330push. Required merge names gate/size/artifacts absent from complete inventory; exact declared PR triggers inspected, enabled-state endpoint400 leaves cause unresolved. No green/inapplicable/disabled claim, rerun, emptycommit or merge waiver; frozenledgerfork remains. [pcc:unverified]"
+}

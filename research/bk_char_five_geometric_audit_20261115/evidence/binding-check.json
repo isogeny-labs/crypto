@@ -1,0 +1,36 @@
+{
+  "schema": "native-bk-char-five-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "bk-characteristic-five",
+      "expected_decl_sha256": "a625348a8083ec690a7a7b8d5f09b3330f7df44e6f814806b1bd4b61e14b4ee3",
+      "full_characters": 644,
+      "full_decl_sha256": "a625348a8083ec690a7a7b8d5f09b3330f7df44e6f814806b1bd4b61e14b4ee3",
+      "full_normalized_signature": "theorem bk_char_five_geometric_certificate : Nat.Prime 5 ∧ 5 ∣ Nat.card (curve F).Point ∧ ¬ 5 ∣ (5 : ℕ) - 1 ∧ (curve F).Δ ≠ 0 ∧ Nat.card (curve F).Point = 5 ∧ (∀ i s : Bool, addOrderOf (basePoint i s) = 5) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [Algebra F K], (∀ P : (geometricCurve K).Point, (5 : ℕ) • P = 0 → ∃ Q : (curve F).Point, baseMap K Q = P) ∧ Nat.card (GeometricFiveTorsion K) = 5) ∧ allGeometricFiveRational ∧ ¬ (allGeometricFiveRational ↔ 5 ∣ (5 : ℕ) - 1) ∧ (∀ k : ℕ, 0 < k → ¬ 5 ∣ 5 ^ k - 1) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [Algebra F K] [Fintype K], Nat.card (GeometricFiveTorsion K) = 5 ^ 2 ↔ 5 ∣ Fintype.card K - 1)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "bk_char_five_geometric_certificate",
+        "end_byte": 1015,
+        "file": "/workspace/scratch/bk-char-five-binding-input01/CharFiveCertificate.lean",
+        "qualified_decl_id": "BKCharFiveGeometricAudit.bk_char_five_geometric_certificate",
+        "signature": "theorem bk_char_five_geometric_certificate :\n    Nat.Prime 5 ∧ 5 ∣ Nat.card (curve F).Point ∧ ¬ 5 ∣ (5 : ℕ) - 1 ∧\n    (curve F).Δ ≠ 0 ∧ Nat.card (curve F).Point = 5 ∧\n    (∀ i s : Bool, addOrderOf (basePoint i s) = 5) ∧\n    (∀ (K : Type) [Field K] [DecidableEq K] [Algebra F K],\n      (∀ P : (geometricCurve K).Point, (5 : ℕ) • P = 0 →\n        ∃ Q : (curve F).Point, baseMap K Q = P) ∧\n      Nat.card (GeometricFiveTorsion K) = 5) ∧\n    allGeometricFiveRational ∧\n    ¬ (allGeometricFiveRational ↔ 5 ∣ (5 : ℕ) - 1) ∧\n    (∀ k : ℕ, 0 < k → ¬ 5 ∣ 5 ^ k - 1) ∧\n    (∀ (K : Type) [Field K] [DecidableEq K] [Algebra F K] [Fintype K],\n      Nat.card (GeometricFiveTorsion K) = 5 ^ 2 ↔ 5 ∣ Fintype.card K - 1)",
+        "start_byte": 245
+      },
+      "recorded_statement": "theorem bk_char_five_geometric_certificate : Nat.Prime 5 ∧ 5 ∣ Nat.card (curve F).Point ∧ ¬ 5 ∣ (5 : ℕ) - 1 ∧ (curve F).Δ ≠ 0 ∧ Nat.card (curve F).Point = 5 ∧ (∀ i s : Bool, addOrderOf (basePoint i s) = 5) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [Algebra F K], (∀ P : (geometricCurve K).Point, (5 : ℕ) • P = 0 → ∃ Q : (curve F).Point, baseMap K Q = P) ∧ Nat.card (GeometricFiveTorsion K) = 5) ∧ allGeometricFiveRational ∧ ¬ (allGeometricFiveRational ↔ 5 ∣ (5 : ℕ) - 1) ∧ (∀ k : ℕ, 0 < k → ¬ 5 ∣ 5 ^ k - 1) ∧ (∀ (K : Type) [Field K] [DecidableEq K] [Algebra F K] [Fintype K], Nat.card (GeometricFiveTorsion K) = 5 ^ 2 ↔ 5 ∣ Fintype.card K - 1)",
+      "recorded_text_sha256": "a625348a8083ec690a7a7b8d5f09b3330f7df44e6f814806b1bd4b61e14b4ee3",
+      "source_plan": "research/bk_char_five_geometric_audit_20261115/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "BKCharFiveGeometricAudit.bk_char_five_geometric_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Procedural source processing, not kernel parser/hash/physical-host execution refinement."
+}

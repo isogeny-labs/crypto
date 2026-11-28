@@ -1,0 +1,239 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  10pt,
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{DejaVu Serif}
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=18mm]{geometry}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\section{Explicit maps along the twist-derived quotient
+cycle}\label{explicit-maps-along-the-twist-derived-quotient-cycle}
+
+All eight degree17 quotient-to-quotient maps are constructed and
+independently verified on the public p827 example. Both coordinates of
+each generic commuting square agree, and all6584 rational-point/136
+kernel-point checks pass. The initial GP script failed strict
+verification; an explicitly frozen identifier-only correction verifies
+the unchanged native data.
+
+\begin{longtable}[]{@{}lr@{}}
+\toprule\noalign{}
+Recorded result & Exact count \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Degree17 maps and generic squares & 8 \\
+Rational-point checks & 6584 \\
+Kernel-point checks, including infinity & 136 \\
+Wrong-sign rejections & 6576 \\
+Corrupted curve maps rejected & 8 \\
+\end{longtable}
+
+\begin{figure}
+\centering
+\includegraphics{SQUARES.pdf}
+\caption{Representative square with full ICV1 model identifiers and all
+eight point-check populations. Runs: v12 native and v13 corrected GP.}
+\end{figure}
+
+The source \(E:y^2=x^3+x+15\) over\(\mathbb F_{827}\) has order823 and
+generator \(G=(2,5)\); ICV1 \texttt{icv1-fp10-t5-192cb216}. All eight
+archived degree7 maps \(\psi_i:E\to E_i\) and the certified degree17
+endomorphism \(\alpha=(\pi+[1])/[7]\) are unchanged. The previously
+verified kernel cycle is \(0\to4\to7\to5\to2\to3\to1\to6\to0\).
+
+For every archived line\(i\) and its fixed successor\(j\), the new
+explicit \(\beta_i:E_i\to E_j\) satisfies
+
+\[\beta_i\circ\psi_i=\psi_j\circ\alpha.\]
+
+Both sides are verified generically as reduced rational functions; their
+x-coordinate numerator has degree119. On every rational point\(P\),
+\(\beta_i(\psi_i(P))=[353]\psi_j(P)\). Transporting both generator and
+target preserves their DLP scalar; relative to the original
+next-quotient generator, the factor353 is inverted by415 modulo823.
+
+\subsection{Construction and independent
+checks}\label{construction-and-independent-checks}
+
+Let\(K_{17}\) be the archived kernel of\(\alpha\). For each\(i\), native
+Rust forms all17 points of\(\psi_i(K_{17})\), checks their
+order/anti-Frobenius property, and constructs normalized degree17
+Vélu\(W_i\) from eight paired x-roots. The prescribed coordinate scale7
+gives\(\beta_i\). Exact curve polynomial, degree, coprimality,
+kernel/poles/infinity and generic square checks pass. All6584 per-point
+records are retained, rather than a sampled witness list.
+
+PARI/GP independently reconstructs\(\psi_i\) and\(\alpha\) with
+\texttt{ellisogeny}, then uses rational twists of\(E_i\) to build
+each17-kernel and\(W_i\) without sharing the native extension-field
+engine. It checks all coefficients, generic identities and finite/kernel
+cases. Negating the output y-coordinate still gives a map to the correct
+curve but fails the commuting check on all822 nonidentity points per
+edge; curve membership alone would miss it.
+
+Two Lean declarations, \texttt{quotient\_descent} and
+\texttt{quotient\_descent\_unique}, prove the abstract
+quotient-homomorphism existence and uniqueness from
+\(H\subseteq\alpha^{-1}(K)\). Frozen replay/fresh native transitive
+axiom audit pass under Lean4.34.1 and pinned mathlib, standard
+foundations only. The concrete elliptic-curve groups/morphisms, field,
+kernel inclusion and degree bridge remains unformalized. The
+fixed-modulus v1 identity-certificate format does not certify these
+characteristic827 identities; exact native/GP and conditional Lean
+evidence have their stated scope.
+
+This extends the finite kernel symmetry to executable isogenies between
+its quotient curves, using standard theory. Complete
+discovery/evaluation/solver costs and any additional independent
+relations remain unmeasured. No novelty, cheap degree1 automorphism, IC
+advantage or NIST applicability is inferred.
+
+\subsection{Original failure, amendment and
+reproduction}\label{original-failure-amendment-and-reproduction}
+
+The original native source is
+\texttt{9e612b70\allowbreak{}7a85ed29\allowbreak{}1f470386\allowbreak{}126b5b71\allowbreak{}43628c02}; protocol hash
+\texttt{14c12589\allowbreak{}c69bb260\allowbreak{}a9736a8f\allowbreak{}c332f251\allowbreak{}c1e18a85\allowbreak{}c7bba88d\allowbreak{}981dabb9\allowbreak{}e54af812}.
+Native passed. GP used reserved constant \texttt{Pi} as a variable,
+returning0 and the final sentinel with parser/type errors. Strict stderr
+admission rejected that run. Its script/output/archive and correctly
+failed export remain intact.
+
+The new script changes only64 literal \texttt{Pi}→\texttt{iso\_i}
+occurrences. Source \texttt{dc2dddf6\allowbreak{}30c968bc\allowbreak{}1dcbe6fe\allowbreak{}d5599041\allowbreak{}b3f8438d},
+protocol-v2 hash
+\texttt{eb183064\allowbreak{}2eb242ea\allowbreak{}23e616ce\allowbreak{}f59ec851\allowbreak{}5434f070\allowbreak{}39249849\allowbreak{}c76e40a9\allowbreak{}d9a9dcf0},
+freeze/commit and Setec gate precede its single new GP execution. Native
+strict admission verifies exact replacement bytes and unchanged native
+data hashes, process0, sole sentinel and only the declared stack-size
+warning.
+
+Each export has flow
+planned2/attempted2/process-completed2/interrupted0/ resumed0/excluded0.
+Original reference verification fails; successor passes. The successor
+reuses the identical native run. Combined actual total is three
+processes: native1, failed GP1, corrected GP1; never four independent
+runs. Both full protocol/file bindings pass. Same author/host,
+independent implementation; no separate-runner review or statistical
+inference.
+
+Runs were one thread/CPU0/4GiB/300s each on the managed Xeon8573C KVM
+host, L0, under the documented EKS access/image fallback. No clocks are
+admitted, paid resources created or permissions changed. New native
+controls16/16 and complete standalone runner tests pass; the earlier
+full-root-suite gap remains.
+
+Exact intermediate ICV1 records and24 generator-bound EC1 model records
+are in execution-v12, with eight ordered routes. Each endpoint retains
+\(\beta_i(\psi_i(G))\), distinct from the unscaled\(\psi_j(G)\); the
+geometric cycle does not silently equate those generator-bound
+identities.
+
+Raw v12 archive:75692bytes/nine files, SHA256
+\texttt{c1d62b82\allowbreak{}6606698a\allowbreak{}bb30fd7b\allowbreak{}c8210a30\allowbreak{}e4ff0c83\allowbreak{}ca26beba\allowbreak{}a9dea357\allowbreak{}a1448f08}.
+V13 reference archive:1192bytes/six files, SHA256
+\texttt{6f6158cc\allowbreak{}f368277e\allowbreak{}9431a671\allowbreak{}2d57d6e5\allowbreak{}4cf34ac7\allowbreak{}bedbefd1\allowbreak{}82e79789\allowbreak{}5db14dae}.
+Both live in user-confirmed
+\texttt{s3://setec-astronomy-artifacts/store}, with fresh
+downloads/all-member hashes/identical deterministic repacks.
+Execution-v12/v13 READMEs give hydration, exact pins and commands; old
+waves are unchanged.
+
+Literature read before implementation: MIT18.783 Fall2025
+\href{https://math.mit.edu/classes/18.783/2025/LectureNotes5.pdf}{Lecture5},
+Theorem5.11/function-field uniqueness proof, Corollaries5.10/5.12 and
+Theorem5.15;
+\href{https://math.mit.edu/classes/18.783/2025/LectureNotes13.pdf}{Lecture13},
+Frobenius/endomorphism-ring setting. Also repository GLV/isogeny-loop
+note and atlas lead. These are existing constructions, not evidence of
+novelty.
+
+Canonical progress/IC/curve diagrams were checked: no cost row changes.
+This report adds exact maps, not a full volcano census. Original full
+research campaigns, rank repair, charged solving and concrete formal
+bridges stay open.
+
+\end{document}

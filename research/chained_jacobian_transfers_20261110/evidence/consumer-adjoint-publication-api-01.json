@@ -1,0 +1,47 @@
+{
+  "pull_request": {
+    "url": "https://github.com/isogeny-labs/cryptanalysis/pull/1507",
+    "number": 1507,
+    "state": "open",
+    "merged": false,
+    "mergeable": false,
+    "draft": false,
+    "body": "SevenChain.dual now selects a separately constructible first adjoint using the existing F101 norm,polynomial,elliptic,Kohel and Balanced engines. The exact old dual remains dual_reference and the new complete comparison calls it explicitly. Accepted T1 norm/adjoint arithmetic is reused byte-for-byte after path/visibility changes;old forward/reference/naive bodies and original test suffix remain. Scientific standing is unsigned. [pcc:unverified]\n\nComplete changed check.sh03 succeeds:25native/92reference unit+five integrations/one historical ignored,all guards/fmt/strictClippy. New tests cover all12317 old adjoint outputs,bijection/group/model controls,both whole-domain norm7 compositions and every109/113 reverse endpoint. All9source02 hashes stay unchanged. PCCd744cf pins whole136317-byte raw stdout→standardXZ15244/raw+archive hashes/exact roundtrip. Sourceccfb25,failed private-field01/bb323e preserved;no cases filtered. [pcc:unverified]\n\nWritten [PRIME_FIELD_ADJOINT.md](experiments/chained-transfer-reference/PRIME_FIELD_ADJOINT.md)/eceeb1 retains upstream526f9f/4934b4/78176c:4PsiHat=K0alphaHatH1,dual scale29,public rational quarters82/85,support jets/units/infinities and explicit old Picard/quotient/polarization dependencies. Formalization remains partial;no global inverse4. [Final report](experiments/chained-transfer-reference/reports/prime-field-adjoint/adjoint-report.pdf)/8248ae has DOT/SVG/Typst/PDF48202bytes/two inspected pages. Packagingd2f0e5 records prefix-ledger140/benchrec16/prose0;PCC137records135notcovered2localpass0fail exit2,complete verdict XZ/hash/roundtrip. Local pass/CI is separate from signed scientific standing. [pcc:unverified]\n\nDepends on #1506 and targets immediate research/chained-transfer-prime-field-psi-20261112 at b2972eb51fd794e1a6061c41fd5f3828890c08e3. Parent exact focused43180569278 succeeds25native/90reference+five/one historical ignored;whole220108-byte decoded log→XZ28636/API/hash/roundtrip64e1d9 is archived here. New head93587b9dc75ff7ac9bf5b2d157b9179857d49bcd/tree0f032eee4a4fde02a511fcdaa563accf6cbb39c6 needs its own exact-headCI/review. Feature-base auto-merge unavailable;integrate bottom-up,retarget/rerun after parents land with actual gates. Frozen-ledger forks/parent1484 C findings/conflict remain,no bypass/force/rebase/rechain/lineage choice. [pcc:unverified]\n\n[ADJOINT_STATUS.md](experiments/chained-transfer-reference/ADJOINT_STATUS.md),crypto#3877 and queue3904 preserve resume state. Next fresh child integrates accepted T2norm/pullbacks,second forward/reverse and compressed outer norm/pullback routes;isolatede383f2/8e0523/4ac90f are outside92scope. Independent whole-isogeny/geometric-kernel validation and matched cold complete costs remain open. Benchmark admission9e1812 has unknown shared-budget remainder;KB/ecdb unavailable,atlas8edec422a locked/KEY absent,no paidjob or plaintext write. No measured advantage or novelty claim. [pcc:unverified]",
+    "title": "research: evaluate the first Jacobian adjoint over F101",
+    "base": "research/chained-transfer-prime-field-psi-20261112",
+    "base_sha": "b2972eb51fd794e1a6061c41fd5f3828890c08e3",
+    "head": "research/chained-transfer-prime-field-adjoint-20261112",
+    "head_sha": "93587b9dc75ff7ac9bf5b2d157b9179857d49bcd",
+    "head_repo_id": 1376761927,
+    "head_repo_full_name": "isogeny-labs/cryptanalysis",
+    "merge_commit_sha": null,
+    "user": {
+      "login": "aburan28",
+      "name": "aburan28",
+      "email": null,
+      "avatar_url": "https://avatars.githubusercontent.com/u/1086874?v=4",
+      "id": 1086874
+    },
+    "requested_reviewers": null,
+    "requested_team_reviewers": null,
+    "diff": null,
+    "comments": null,
+    "created_at": "2026-11-12T09:23:10Z",
+    "updated_at": "2026-11-12T09:23:10Z",
+    "closed_at": null,
+    "merged_at": null,
+    "commits": 1,
+    "changed_files": 51,
+    "additions": 5429,
+    "deletions": 1,
+    "display_url": "https://github.com/isogeny-labs/cryptanalysis/pull/1507",
+    "display_title": "research: evaluate the first Jacobian adjoint over F101"
+  },
+  "branch_created": {
+    "branch": "research/chained-transfer-prime-field-adjoint-20261112"
+  },
+  "object_commit": "93587b9dc75ff7ac9bf5b2d157b9179857d49bcd",
+  "object_tree": "0f032eee4a4fde02a511fcdaa563accf6cbb39c6",
+  "immediate_parent": "b2972eb51fd794e1a6061c41fd5f3828890c08e3",
+  "ci_dispatch": "2026-11-12T09:23Z;initial list empty;next check10:13Z"
+}

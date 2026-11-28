@@ -1,0 +1,15 @@
+[package]
+name = "vieta-transform-core"
+version = "0.1.0"
+edition = "2021"
+publish = false
+[workspace]
+[dependencies]
+num-bigint = "0.4"
+num-traits = "0.2"
+serde = { version = "1", features = ["derive"] }
+[lib]
+path = "lib.rs"
+[lints.clippy]
+type_complexity = "allow"
+too_many_arguments = "allow"

@@ -762,15 +762,15 @@ its GAE comparison. Several rows are lead tests from the surveys of 11 and
 Change & Cl. & Ratio [95\%] & To rho \\
 \midrule
 \multicolumn{4}{@{}l}{\emph{Joux--Vitse cover of $E(\FF_{p^6})$, weak class, local runs}}\\
-Hilbert early stop, Nagao arm, $p=1301$--$1601$ & E & $0.5276$--$0.5280$ in counted $S$; native F4 $0.983$ & U2: $1.003$, $0.837$, $0.695$ matched negation rho \\
+Hilbert early stop, Nagao arm, $p=1301$--$1601$ & E & $0.5276$--$0.5280$ in counted $S$; native F4 $0.983$ & U2: $1.003$, $0.837$, $0.695$ matched negation rho; fresh rho $1.050$, $0.876$, $0.728$; not validated \\
 Hilbert early stop, sieve descent, $p=1511$ & T & $0.856$ in $S$; native F4 $1.139$ (kill limit $1.10$) & unchanged; killed \\
 Sieve F4, descent, LA additions emitted & A & $0.816$ of the upper-bound proxy & U2 at $w=1$: $0.1196$ \\
 Isogeny walk into the class charged, $M=512$ & A & $0.0141\to0.0155$ (pooled, U2) & $0.0155$ $[0.0125,0.0200]$ \\
 Reach of the weak class from a random start & N & walk reaches 3/60 ($p=1009$), 0/60 ($1511$, $1823$) & --- \\
 \addlinespace
 \multicolumn{4}{@{}l}{\emph{Plane quartic (N4~v2 DL1) after cubic GHS, weak family}}\\
-Factor-base constant $c=2.00\to1.60$, held out at $k=21$, $22$ & E & $0.655$--$0.685$ & row's own: $0.005\times$ near $q=2^{21}$ \\
-128-bit arithmetic, $k$ to 25 & N & exponent $1.099$ $[1.098,1.100]$ ($k=17$--$25$) & $0.0021$ $[0.0017,0.0026]$ rho model, $k=25$ \\
+Factor-base constant $c=2.00\to1.60$, held out at $k=21$, $22$ & E$^{*}$ & $0.655$--$0.685$ (additions unpriced); CPU $1.00$--$1.07$ & DL1: $0.0028\times$ near $q=2^{21}$ \\
+128-bit arithmetic, $k$ to 26 & N & exponent $1.0837$ $[1.0831,1.0843]$ ($k=17$--$26$) & $0.00162$ $[0.00129,0.00199]$ rho model, $k=26$ \\
 \addlinespace
 \multicolumn{4}{@{}l}{\emph{Generic prime-field track: walk arms on miniatures}}\\
 \texttt{twcj}: 4 or 8 jumps vs 16, $k=20$, $24$ & R & $1.220$ $[1.186,1.256]$, $1.268$ $[1.193,1.348]$ (4); $1.008$, $1.050$ (8) & 16 jumps: $1.36\times$, $1.34\times$ rho-neg \\
@@ -792,7 +792,11 @@ two-seed walk. Distances: Joux--Vitse in U2 against matched negation rho;
 walks in GAE against rho-neg, or rho-cubic on $j=0$ curves, with table
 inserts priced. All values unverified; the aut=3 row's GAE comparison is
 validated (stage~4b \texttt{VALIDATION.json}), with the order not holding
-across the band. Sources under \art{research/}:
+across the band. Two rows were revised after 12 November
+(\S\ref{sec:ladder5}): the Nagao row's validation returned
+\emph{insufficient evidence}, and the $c=1.60$ row's validator found the
+gain only in a unit that leaves $\FF_q$ and mod-$\ell$ additions unpriced
+(E$^{*}$: class not established). Sources under \art{research/}:
 \texttt{jv\_nagao\_hilbert\_20261112/}, \texttt{jv\_sieve\_hilbert\_descent\_20261112/},
 \texttt{leads\_20261111/runs/}, \texttt{jv\_walk\_charge\_20261111/},
 \texttt{jv\_weak\_coverage\_20261111/}, \texttt{leads\_chase\_20261112/},
@@ -810,11 +814,14 @@ at scale, halves the Nagao arm's counted cost at equal relations
 the matched negation rho of \S\ref{sec:jac-jv} the arm moves from
 $1.318$--$1.900\times$ rho in textbook $\FF_p$ multiplications to $1.003$,
 $0.837$ and $0.695$ at $p=1301$, $1451$ and $1601$, with the order below
-rho at every weight of the band at the two larger primes
-(\S\ref{sec:ext-jv-nov}). The cover's $\FF_p$ additions are still not
-emitted, so these are lower-bound comparisons, on a local run without a
-validation file. The same stop in the sieve route's descent was killed by
-its preregistered native-operation limit.
+rho at every weight of the band at the two larger primes on the emitted
+counters (\S\ref{sec:ext-jv-nov}). The cover's $\FF_p$ additions are still not
+emitted, so these are lower-bound comparisons, on a local run. A
+validation attempt the same evening replayed all ten records on a second
+host and re-ran rho with the study binary; the validator returned
+\emph{insufficient evidence}, and the order across the band is no longer
+claimed (\S\ref{sec:ladder5}). The same stop in the sieve route's descent
+was killed by its preregistered native-operation limit.
 
 \paragraph{The sieve row: priced, charged and bounded.} The validated sieve
 row was accounting with an upper-bound proxy for the cover's unemitted
@@ -829,16 +836,21 @@ class.
 \paragraph{The plane-quartic row's constant.} On the N4~v2 DL1 solver, a
 percolation model of the large-prime graph put the threshold factor-base
 constant near $1.55$; lowering the frozen $c=2.00$ to $1.60$ cuts the
-charged cost to $0.655$--$0.685$ at $k=21$ and $22$ on held-out seeds,
-with the order holding across the band, and gives no gain at $k=16$
-(\art{research/leads_chase_20261112/RESULTS.md}; engineering,
-unvalidated). A 128-bit fork carried the solver to $k=25$
-($\ell\approx2^{73}$), all 81 records verified; against a calibrated
+counted M-eq to $0.655$--$0.685$ at $k=21$ and $22$ on held-out seeds and
+gives no gain at $k=16$ (\art{research/leads_chase_20261112/RESULTS.md}).
+An independent validation reproduced every counter and certificate and
+returned \emph{insufficient evidence} for the engineering class: the
+M-eq unit leaves $\FF_q$ and mod-$\ell$ additions unpriced, those
+additions rise $1.38$--$1.49\times$ at $c=1.60$, and the solve's CPU time
+does not fall (\S\ref{sec:ladder5}). A 128-bit fork carried the solver to
+$k=25$ ($\ell\approx2^{73}$), all 81 records verified; against a calibrated
 rho-neg model, not a measured rho, DL is $0.0021$ $[0.0017,0.0026]$ at
 $k=25$ (\art{research/leads_20261111/runs/C_quartic_k26/RESULT.md}). The
 skeptic's calibrations put the exponent's lower bound at
 $1.1000$--$1.1034$, at or above the lead's kill line of $1.10$; the rise
-comes from the 128-bit arithmetic step at $k=23$.
+comes from the 128-bit arithmetic step at $k=23$. A clean rerun on one
+dedicated pod reached $k=26$ and did not kill the lead
+(\S\ref{sec:ladder5}).
 
 \paragraph{The walk arms: a constant, not a crossing.} On the generic
 prime-field track the target-in-walk arm \texttt{twcj} sits at
@@ -857,6 +869,267 @@ both 2-descent classes in the ``bits'' and ``isogeny'' bases, so no
 cofactor lift can be skipped and the expected gain is $1\times$, not the
 $2\times$ an earlier note assumed
 (\art{research/curve25519_miniature_descent_class_20261111/README.md}).
+
+\section{The ladder continued, 13--15 November}\label{sec:ladder5}
+
+Work of 12 November (evening) to 15 November falls into three groups
+(Table~\ref{tab:ladder5}): three changes that passed the validation gate
+as sections outside Tables~A--C of the leaderboard, two validations that
+returned \emph{insufficient evidence} for rows of \S\ref{sec:ladder4}, and
+local measurements without a rho arm. Tables~A--C did not change: the board
+still has 28 rows, 19 validated and 9 unvalidated (pre-gate)
+(\art{docs/ic/leaderboard.json} at \texttt{origin/main}
+\texttt{ec3b88e2c4}, and unchanged at \texttt{bb70178877}). Set-up A/Bs of
+15 November on the Koblitz Table~A pipeline are in
+Table~\ref{tab:ladder5-setup}. The reading rules of \S\ref{sec:ladder} apply. Only
+the K1 pair-table rows have a pcc claim (\texttt{PCC-20261114-8ba038},
+unverified); every other value is \texttt{[pcc:unverified]} in its
+source, and ``validated'' means a \texttt{VALIDATION.json} that the gate
+script reports valid.
+
+\begin{table}[p]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}Xl>{\raggedright}p{3.6cm}>{\raggedright\arraybackslash}p{3.4cm}@{}}
+\toprule
+Change & Cl. & Ratio [95\%] & To rho \\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Plane quartic after cubic GHS (N4~v2), weak family, $k=18$--$22$; validated}}\\
+DL: $c_D=2.0\to1.7$ and a fixed addition chain for the square root & Ic & $0.681$--$0.737$ (additions at 0); $0.848$--$0.877$ (additions at 1 M-eq) & DL, $k=22$: $0.0027$, $0.0025$, $0.0018$ negation rho \\
+DL1: the same two changes & Ic & $0.644$--$0.754$; $0.921$--$0.975$ & --- \\
+D (plain Lanczos): the same two changes & R & $1.072$--$1.122$; $1.090$--$1.130$ & --- \\
+Relation stage: open addressing, compiled chain (COMBO) & E & relations CPU $0.463$--$0.545$; DL phase-sum CPU $0.796$--$0.884$ & unchanged (counted work identical) \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Koblitz K1, one target, ecbench counted GAE; validated}}\\
+Pair-table dimension $7\to9$, $n=23$ & E & $-1.32$, $-1.28$, $-1.14$ bits & $5.59$, $5.66$, $5.95$ bits above rho \\
+Pair-table dimension $7\to10$, $n=29$ & E & $-0.89$, $-0.94$, $-1.20$ bits & $9.47$, $9.52$, $9.86$ bits above rho \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Validations of rows of \S\ref{sec:ladder4}: insufficient evidence}}\\
+Joux--Vitse Nagao arm, Hilbert stop, fresh same-binary rho & E & $1.050$, $0.876$, $0.728$ U2 at $w=0$ & band order not established \\
+Plane quartic DL1, $c=1.60$ (J2), validator replay & E$^{*}$ & $0.655$--$0.685$ M-eq; CPU $1.00$--$1.07$ & DL1 $0.0011$--$0.0029$ \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Local measurements}}\\
+Plane quartic DL, one dedicated pod, $k$ to 26 & N & exponent $1.0681$ $[1.0680,1.0682]$ ($k=22$--$26$) & $0.00162$ $[0.00129,0.00199]$ rho model, $k=26$ \\
+Char-2 $D_4$, $m=12$: rank-2 elimination, \texttt{frob\_roots} arm & E & $0.6891$ $[0.6885,0.6896]$ counted $\FF_q$ mult. & unchanged \\
+Curve25519 miniature, $k=20$: cofactor lifts on \texttt{square-bits} & N & hits per F4 mul-add $0.69$ (post hoc) & no rho arm \\
+Curve25519 miniature, $k=20$: isogeny base, seeds 1--20 & N & $2.909$ $[2.525,3.334]$ hits per $10^9$ mul-adds; \texttt{bits} $0.099$ & no rho arm \\
+\bottomrule
+\end{tabularx}
+\caption[]{Changes and validations that landed 12 November (evening) to
+15 November 2026, against their own incumbents; columns and classes as in
+Table~\ref{tab:ladder} (N = null or diagnostic, no cost row; E$^{*}$: the
+producer's class, not established by the validator). Plane-quartic ratios:
+cold M-eq over the frozen $c_D=2.0$ configuration on the same instances,
+geometric mean over seeds 1--3, range over $k=18$--$22$; the second range
+prices $\FF_q$ and mod-$\ell$ additions at 1 M-eq each; ``To rho'' at
+$w=0$, $0.1$, $1$ GAE. COMBO: CPU ratios on an L0 host, geometric mean over
+seeds, A/A floor $0.207$. K1: change of the gap (negative: closer to rho) and the gap, in bits,
+$\log_2(S_{\rm IC}/S_{\rm rho})$, at $w=0$, $0.1$, $1$, against strong
+signed-Frobenius rho in the same session and binary. J2 ``To rho'': DL1 over
+the cheaper rho at $w=0$, $0.1$, $1$, from the validator's recompute.
+Curve25519 rows: counted F4 multiply-adds, no rho measured, so no distance.
+Sources under \art{research/}:
+\texttt{quartic\_dl1\_cd\_sqrt\_20261113/combo/},
+\texttt{ic\_gw\_fasthash\_20261114/},
+\texttt{ml\_cryptanalysis\_pt\_lgrow\_k1\_20261114/},
+\texttt{jv\_nagao\_hilbert\_20261112/validation/},
+\texttt{leads\_followup\_20261114/item03\_j2\_validation/},
+\texttt{leads\_20261111/runs/C\_quartic\_k26/runpod/},
+\texttt{leads\_20261111/runs/B\_d4bin\_probes/rank2/},
+\texttt{curve25519\_descent\_skip\_20261114/},
+\texttt{curve25519\_engine\_other\_bases\_20261114/},
+\texttt{curve25519\_isogeny\_seeds\_20261114/}; leaderboard sections in
+\art{docs/ic/LEADERBOARD.md}.}
+\label{tab:ladder5}
+\end{table}
+
+\paragraph{The plane-quartic row: a smaller base, validated with additions
+priced.} A frozen follow-up to the J2 lead shrank the double-large-prime
+factor base from $c_D=2.0$ to $1.7$ and computed each pair's square root by
+a fixed addition chain with the same values
+(\art{research/quartic_dl1_cd_sqrt_20261113/combo/README.md}). On the
+N4~v2 instances at $k=18$--$22$ the DL arm costs $0.681$--$0.737$ of the
+frozen DL with additions free and $0.848$--$0.877$ with each addition
+priced at one M-eq, below 1 at every seed. DL1 keeps $0.921$--$0.975$ at
+the same price. Plain Lanczos (D) multiplies the $\pm1$ coefficients that
+DL and DL1 add, and becomes dearer: $1.072$--$1.122$. Against the frozen
+negation-map rho at $k=22$, DL with both changes is $0.0027$, $0.0025$ and
+$0.0018$ at $w=0$, $0.1$ and $1$; the validator wrote
+\texttt{VALIDATION.json} with \texttt{order\_holds\_across\_band: true}
+(\art{research/quartic_dl1_cd_sqrt_20261113/combo/validation/VALIDATION.json}).
+A second study rewrote the relation stage with open-addressing hash tables,
+no per-candidate allocation and a compiled square-root chain. Every counted
+field equals the previous version, so the distance to rho does not move;
+the relation stage's CPU falls to $0.463$--$0.545$ (geometric mean over
+seeds, L0 host, A/A floor $0.207$) and the DL phase sum to $0.796$--$0.884$
+(\art{research/ic_gw_fasthash_20261114/README.md}; validated,
+\art{research/ic_gw_fasthash_20261114/validation/VALIDATION.json}).
+Whole-process CPU fell only to $0.90$--$0.96$ in the validator's timing
+replay. The row is a weak family, and both changes are constants.
+Two further validated constant-factor changes of 15 November, block-Lanczos
+reuse and the NRM linear-algebra pass, are in \S\ref{sec:in-la}
+(Table~\ref{tab:in-gw-la}).
+
+\paragraph{The J2 constant does not survive priced additions.} The
+independent validation of $c=1.60$ replayed 84 of 84 units bit for bit,
+certified 22 of 22 instances with its own C code and recomputed every
+printed number
+(\art{research/leads_followup_20261114/item03_j2_validation/VALIDATOR_REPORT.md}).
+Its disposition is \emph{insufficient evidence}. The $0.66$--$0.78$ gains
+exist only in the frozen M-eq unit, which counts $\FF_q$ and mod-$\ell$
+additions without pricing them; at $c=1.60$ the linear algebra's additions
+rise $1.38$--$1.49\times$, the order $c=1.60<1.75<2.00$ reverses at $w=0.1$
+and $1$ once they are priced, and total CPU of DL1 is $1.00$--$1.07$ of
+$c=2.00$ (medians, $k=21$, $22$). Three statements of the producer's
+README are not supported: the threshold flip ``at every $k$'' (no
+$c\le1.50$ data at $k=21$, $22$), seed agreement within 1\% (true for
+$c=2.00$ only), and ``DL1 about $0.005\times$ rho'' (that is DL; DL1 is
+$0.0028$ at $c=2.00$, $k=21$). The $c_D=1.7$ result above is the
+constant that survives the priced unit.
+
+\paragraph{The Nagao row's validation.} The Hilbert-stop records replayed
+on a 32-vCPU pod in every counted field (10 of 10), and rho re-run with the
+study binary reproduced the pooled reference exactly
+(\art{research/jv_nagao_hilbert_20261112/validation/RESULT.md}). A fresh
+sample of 126 walks gives U2 at $w=0$ of $1.050$ $[0.957,1.155]$, $0.876$
+$[0.807,0.956]$ and $0.728$ $[0.672,0.793]$ at $p=1301$, $1451$ and $1601$
+(Table~\ref{tab:ext-jv-hilbert-val}). The validator returned
+\emph{insufficient evidence} on four items: no independent certificate
+for 8 of 9 cover solves or for the rho solves; the cover's native count
+omits its $\FF_p$ additions, F4 pair selection and matrix assembly, and
+priced with an addition proxy the arm would be above rho at $w=0.1$ and
+$1$ at $p=1451$ and $1601$; the preregistered Hilbert/plain band at
+$w=0.1$ and $1$ was missed ($0.821$ and $0.959$ against $[0.50,0.62]$);
+and no S3 benchmark record. \texttt{VALIDATION.json} now records
+\texttt{order\_holds\_across\_band: false}
+(\art{research/jv_nagao_hilbert_20261112/validation/VALIDATION.json}).
+The arm is below rho in counted $\FF_p$ multiplications at $w=0$ at the
+two larger primes; it is not established below rho across the band.
+
+\paragraph{The plane quartic to $k=26$.} One binary on one dedicated
+RunPod pod, with four calibration rounds interleaved, ran all 30 units at
+$k=17$--$26$, 90 of 90 logarithms verified
+(\art{research/leads_20261111/runs/C_quartic_k26/runpod/RESULT.md}). The
+DL exponent over the frozen window $k=22$--$26$ is $1.0681$
+$[1.0680,1.0682]$, below the kill line of $1.10$; over $k=22$--$25$ alone it
+is $1.1107$, above it. The difference is one step at $k=22\to23$, where
+$\ell$ passes $2^{64}$ and the calibrated $r_{\rm lmul}$ rises from
+$2.569$ to $3.701$; past that step the local slopes are $0.979$--$0.991$
+(post hoc). Both numeric predictions missed: the $k=17$--$26$ exponent is
+$1.0837$ $[1.0831,1.0843]$ against $1.00$ $[0.95,1.06]$, and DL over a
+rho-neg model at $k=26$ is $0.00162$ $[0.00129,0.00199]$ at $w=0$ and
+$0.00086$ $[0.00068,0.00105]$ at $w=1$ against a predicted $0.00085$. The
+rho side is a model, not a measured rho.
+
+\paragraph{Rank-2 elimination at $k=4$ in characteristic two.} On the
+Frobenius-reduced $D_4$ system at $m=12$, row-reducing the rank-2 square
+coefficients and taking a resultant in one variable costs $0.6891$
+$[0.6885,0.6896]$ of the current solve in counted $\FF_q$ multiplications
+with the semilinear root finder, cheaper on 300 of 300 targets, with
+identical solution sets; with the baseline root finder it is $1.0069$
+(\art{research/leads_20261111/runs/B_d4bin_probes/rank2/RESULT.md};
+local, unverified). Charging the Newton nodes' inverses gives $0.727$. At
+$m=8$ the current solver misses three solutions with $s_4=0$. The change
+is to one stage, and no distance to rho was recomputed.
+
+\paragraph{Curve25519 miniature: the descent class and the bases in the
+F4 engine.} Three frozen studies on the $k=20$ miniature ($t=5$, $G=3$,
+$m=2$, 20{,}000 targets) measured hits per counted F4 multiply-add; none
+ran a rho arm, so none has a distance to rho
+(\art{research/curve25519_descent_skip_20261114/README.md},
+\art{research/curve25519_engine_other_bases_20261114/README.md},
+\art{research/curve25519_isogeny_seeds_20261114/README.md}).
+\begin{itemize}
+\item On a \texttt{square-bits} base the lift oracle already tries only the
+  four class $+1$ lifts, because it builds $E[8]$ from multiples of base
+  points that all lie in $2E(\FF_p)$; an explicit descent skip fired 0
+  times, and its registered prediction of $0.45$--$0.62\times$ F4 calls
+  is falsified.
+\item Lifts multiply the F4 cost per target by $3.99$ on
+  \texttt{square-bits} and by $7.94$--$8.00$ on every other base. They
+  lower hits per mul-add on 7 of 8 bases in point estimate, resolved at
+  $p<0.05$ on four; pooled over the two \texttt{square-bits} cells the
+  rate ratio is $0.69$ ($p=0.0045$, post hoc).
+\item The isogeny base has the highest yield. Its F4 system is about
+  $17\times$ cheaper per target than \texttt{bits} ($1.77\cdot10^5$
+  against $3.04\cdot10^6$ mul-adds). Over tower seeds 1--20 its blind rate
+  is $2.909$ $[2.525,3.334]$ hits per $10^9$ mul-adds, against $0.099$
+  for \texttt{bits} and $1.205$ for the best coverage-selected digit
+  frame; lifts are neutral there (rate ratio $0.985$, $p=0.82$). Per seed
+  the rate ranges $0.85$--$4.80$, and the tower's set-up is at most
+  $1.9\cdot10^{-6}$ of the F4 work at one operation per mul-add.
+\end{itemize}
+These rank bases against each other in one counted unit at one size.
+They say nothing about rho, scaling in $k$ or wall time.
+
+\paragraph{Set-up and verify phases of the Koblitz pipeline, 15 November.}
+Four more preregistered same-binary A/Bs on suite row \texttt{M1-T01} at
+\texttt{k0n53} ($\log_2r=44.3$) and \texttt{k0n61} ($47.2$) followed the
+levers of \S\ref{sec:in-levers}, on the session's 4-vCPU container, one
+thread, 23--24 rounds a row with a same-session A/A and zero identity
+mismatches (Table~\ref{tab:ladder5-setup}). Sub-step timers and scan
+probes chose each target. Building the collector's point-index hash map
+took $8.1$\,ms of collect-setup's 10--17\,ms at \texttt{k0n53}; building it
+on first use cut collect-setup from $10.4$ to $3.7$\,ms. The verify phase,
+10--13\,ms at \texttt{k0n53}, spent about $7.4$\,ms a repetition building
+sparse log rows through a dense vector with one \texttt{modpow} per
+summand; reading $\lambda^k \bmod r$ from a table and pushing the sparse
+entries directly took verify from $8.76$ to $3.29$\,ms (the summary's
+\texttt{verify\_ms}). The group check of each relation then dominated
+verify; summing through the single-word curve that scalar multiplication
+already used took it from $3.34$ to $1.61$\,ms. Huge-page advice on the
+pair table's scanned arrays took the filter stage from $9.38$ to $8.30$
+cycles a summand at \texttt{k0n61}, where filter, admitted stage, collect
+and set-up are established, and established nothing at \texttt{k0n53}. Two
+explorations of the same day were dropped without an A/B and reverted: an
+orbit-by-orbit projection map saved about $0.4$\,ms of
+\texttt{select\_projection}, about 0.1\% of set-up; one huge-page arena for
+the build's partition streams recovered 1--1.5 of about 4 page-fault cycles
+a stored pair, about 2--3\% of the build against an A/A interval of about
+$\pm4\%$. None of these changes a count, so none changes a distance to rho.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.24\linewidth}lll>{\raggedright\arraybackslash}X@{}}
+\toprule
+Lever & Phase & \texttt{k0n53} & \texttt{k0n61} & Outcome \\
+\midrule
+Lazy point-index map & collect-setup & $\mathbf{2.796}$ $[2.698,2.897]$ & $\mathbf{3.032}$ $[2.832,3.089]$ & established; kept \\
+ & descent-setup & $\mathbf{1.486}$ $[1.446,1.547]$ & $\mathbf{1.596}$ $[1.554,1.618]$ & established \\
+ & set-up & $1.035$ $[0.981,1.071]$ & $1.015$ $[0.994,1.039]$ & not established \\
+Sparse rows built from summands & verify & $\mathbf{2.682}$ $[2.585,2.821]$ & $\mathbf{2.437}$ $[2.373,2.499]$ & established; kept \\
+ & set-up & $1.047$ $[0.999,1.082]$ & $1.011$ $[0.970,1.064]$ & not established \\
+Single-word relation check & verify & $\mathbf{2.099}$ $[2.047,2.177]$ & $\mathbf{2.268}$ $[2.206,2.309]$ & established; kept \\
+ & set-up & $0.980$ $[0.952,0.999]$ & $1.008$ $[0.978,1.023]$ & not established; no regression by the rule \\
+Huge-page advice, pair table & filter & $1.067$ $[0.989,1.086]$ & $\mathbf{1.116}$ $[1.098,1.174]$ & established at \texttt{k0n61}; kept \\
+ & collect & $1.029$ $[1.001,1.066]$ & $\mathbf{1.047}$ $[1.025,1.071]$ & established at \texttt{k0n61} \\
+ & set-up & $1.055$ $[1.017,1.074]$ & $\mathbf{1.040}$ $[1.027,1.070]$ & established at \texttt{k0n61} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Set-up A/Bs of 15 November on the Koblitz Table~A pipeline:
+median paired ratio old/new of the phase's wall time with its 95\%
+interval (above 1: the new arm is faster), rounded to three decimals from
+each \texttt{ab/summary.json}. Bold: established against the same-session
+A/A by the frozen rule (the source's \texttt{*\_established} field). One
+binary per A/B, 23--24 rounds a row, one round dropped at \texttt{k0n61}
+(lazy index) and at \texttt{k0n53} (huge pages). Component results on one
+host class: no validation file, no replay certificate, no matched rho, no
+board row; \texttt{[pcc:unverified]}. Sources:
+\art{research/ic_tool_program/explorations/} \texttt{lazy-index-20261115},
+\texttt{direct-rows-20261115}, \texttt{fast-verify-20261115},
+\texttt{huge-pages-20261115} (each \texttt{ab/summary.json} and
+\texttt{ab/PROTOCOL.md}); dropped explorations: \texttt{orbit-map-20261115},
+\texttt{stream-arena-20261115}.}
+\label{tab:ladder5-setup}
+\end{table}
+
+\paragraph{The live frontier reconciliation.} The leaderboard's 14 November
+reconciliation counted 104 top-level ecbench methods and 33 nested
+algorithms in the live source, and found no evidence that changes Tables
+A--C (\art{docs/ic/LEADERBOARD.md}, ``14 November live-source frontier
+reconciliation''). It records the admitted negation re-measurement of the
+chained transfers at 0 of 162 cells below rho (156 above, 6 unresolved
+lower bounds) and the whole-Jacobian probe above the calibrated band in 7
+of 7 cells (Chapter~\ref{sec:transfer}).
 
 \section{Three frontiers}
 
@@ -881,9 +1154,10 @@ sensitivity pricing), $k=4$ over $\FF_{(2^m)^4}$
 at $m=15$ after corrections; crossover unsupported), and the Joux--Vitse
 cover of $E(\FF_{p^6})$ (the Nagao arm with line search and Hilbert stop
 is $1.003$, $0.837$ and $0.695\times$ a matched negation rho in $\FF_p$
-multiplications at $p=1301$, $1451$ and $1601$, below across the band at
-the two larger primes, a local lower-bound comparison,
-\S\ref{sec:ext-jv-nov}; its sieve arm is $0.0065\times$ a matched negation
+multiplications at $p=1301$, $1451$ and $1601$, and $1.050$, $0.876$ and
+$0.728\times$ a fresh sample; its validation returned insufficient
+evidence and the order across the band is not established,
+\S\ref{sec:ladder5}; its sieve arm is $0.0065\times$ a matched negation
 rho at $p=1511$ and $0.0141\times$ pooled over $p=1009$--$1823$ with the
 table line, both validated, \S\ref{sec:jac-jv}).
 

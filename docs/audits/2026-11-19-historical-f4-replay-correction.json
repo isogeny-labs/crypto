@@ -1,0 +1,87 @@
+{
+  "schema": "engineering.historical-f4-replay-correction/v1",
+  "parent_commit": "869b661772c10451b746391043d2c0a7a9fe3075",
+  "baseline_commit": "4305e8bdf8ce6493392bc62d99f0aada6d811f16",
+  "problem": "Admitted historical profiles reproduced old pricing but selected the newer FL elimination schedule, whose logical XOR count differs from the frozen full-width count.",
+  "original_record": {
+    "path": "research/ecbench_yield_sweep_20261004/sessions/koblitz/records.jsonl",
+    "sha256": "4aa6203a024ccd00606949a4a2ca454ef6efb5a7a4e3c6d9a365e8fb0723ce69",
+    "sequence": 5
+  },
+  "original_kernel": {
+    "commit": "cd0228d4c8e7a6b8d0037e7504b3e3e18b13059f",
+    "path": "src/cryptanalysis/pq_f4_f2.rs",
+    "git_blob": "bf3f28990f47bb36f8032d4d265862ec58434725",
+    "sha256": "92e3cb423f87d28d8e2b46899b46345ee6a5710a73bee575a5553a6b7428272c",
+    "bytes": 102587,
+    "purpose": "source comparison for unchanged frozen record replay; not an alternative validation gate"
+  },
+  "fl_introduction": {
+    "commit": "b72ff385338c4b06d1ed40649540125786ca67ea",
+    "date": "2026-11-17"
+  },
+  "baseline_replay": {
+    "selected": 1,
+    "exit_code": 101,
+    "censored": false
+  },
+  "same_executable_control": {
+    "changed_environment": {
+      "F4_F2_FL": "0"
+    },
+    "selected": 1,
+    "exit_code": 0,
+    "censored": false
+  },
+  "correction": "Admitted legacy profiles hold a thread-local full-width guard. The guard restores its previous value on drop and cannot move across threads. Current execution keeps the existing FL policy.",
+  "local_runtime_validation": {
+    "source_sha256": {
+      "src/cryptanalysis/pq_f4_f2.rs": "e283050e8f2ee80b474e0a4ca35e568bfe8f022f099a03cf014a3f40892ff421",
+      "src/cryptanalysis/ecbench/legacy.rs": "ab447f0a63c8e8ccf30990ebfa0ea0865317d2532c0112ef0a8fb82f23af5b5f"
+    },
+    "replay_tests": 1,
+    "kernel_tests": 21,
+    "legacy_profile_tests": 7,
+    "all_passed": true,
+    "new_tests": 2,
+    "baseline_existing_controls_passed": 26,
+    "host": "aarch64-apple-darwin",
+    "rustc": "1.99.1",
+    "root_package_opt_level": 1
+  },
+  "final_affinity_delta": {
+    "controls": [
+      {
+        "name": "pre-marker-cross-thread",
+        "compile_exit": 0,
+        "source_sha256": "f447c2c0b745452c46ce2d506e00a8fa063a61eac5b2b1a228706de0203f931b",
+        "run_exit": 0
+      },
+      {
+        "name": "final-positive",
+        "compile_exit": 0,
+        "source_sha256": "ba3693ab334ed788a801a1e3c85ec727999f20ef6e7697c8d81f3c84a48e3d36",
+        "run_exit": 0
+      },
+      {
+        "name": "final-cross-thread",
+        "compile_exit": 1,
+        "source_sha256": "928dbaa5c6aa69a7fbd903c1b66bea0138f6f3384b027180f74447d34e2e03e1"
+      }
+    ],
+    "final_source_sha256": "91c6fe2c7dbf8d909506d304fe444562df418839c974f7b99559c1395b814fc0",
+    "runtime_validation_before_zero_size_marker": {
+      "src/cryptanalysis/pq_f4_f2.rs": "e283050e8f2ee80b474e0a4ca35e568bfe8f022f099a03cf014a3f40892ff421",
+      "src/cryptanalysis/ecbench/legacy.rs": "ab447f0a63c8e8ccf30990ebfa0ea0865317d2532c0112ef0a8fb82f23af5b5f"
+    },
+    "final_complete_crate_validation": "pending hosted CI",
+    "marker_effect": "Guard cannot be moved to another thread; replay schedule logic unchanged",
+    "scientific_measurement": false
+  },
+  "admission_lists_unchanged": true,
+  "replay_comparisons_and_original_assertion_unchanged": true,
+  "frozen_artifacts_changed": false,
+  "performance_measurement": false,
+  "final_source_complete_crate_validation": "pending hosted CI; local runtime receipts precede the zero-size thread-affinity marker",
+  "budget_amendment": "docs/audits/2026-11-19-full-library-budget-amendment.json"
+}

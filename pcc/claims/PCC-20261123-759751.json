@@ -1,0 +1,28 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T16:19:04Z",
+ "id": "PCC-20261123-759751",
+ "kind": "theorem",
+ "producer": {
+  "commit": "d562832c7913bb23bf266a856f998ec22e5de0df",
+  "model": "Codex",
+  "session": "root-precision-20261123"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "02c7263d9069f542d250e0c00a60b7868969424f2bcd731f254b765d04f78562",
+   "kind": "lean",
+   "project": "research/hashed_ecdl_root_precision_20261123/formal/RootControls.lean",
+   "theorem": "NativeRootPrecision.normalized_root"
+  },
+  {
+   "decl_sha256": "a781f45952caeba9aa0bdde518422cde726719e2a6a4b6e49cc5b8a9bd722fc6",
+   "kind": "lean",
+   "project": "research/hashed_ecdl_root_precision_20261123/formal/RootControls.lean",
+   "theorem": "NativeRootPrecision.constant34_family"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/hashed_ecdl_root_precision_20261123",
+ "statement": "Shared exact Nat root law gives normalized precision*u<=35*(2E)*2^(2u-i) for E>0,i<u and the source-root array guard. Separate E>=32 family disproves universal34 in the weaker scalar margin domain. Seven study/five shared declarations compile and pass unchanged axiom gates;12 axiom queries use only standard foundations. Official leanchecker --fresh RootControls exits0 after kernel replay. Scalar component only: Rust refinement, graphs, actual histories and complete bit cost remain consumers. Local ledger chain is valid; current main ledger prefix conflict at1564 remains an unsigned publication/merge gate, with no old entry rewritten."
+}

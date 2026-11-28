@@ -1,0 +1,25 @@
+{
+  "schema": "twist.operational-aws-receipt/v1",
+  "started": "2026-10-27T00:28:31.690Z",
+  "finished": "2026-10-27T00:28:32.691Z",
+  "argv": [
+    "/workspace/shared/twist-tools-20261023/awscli/aws/dist/aws",
+    "sts",
+    "get-caller-identity",
+    "--region",
+    "us-east-2",
+    "--query",
+    "{Account:Account}",
+    "--output",
+    "json",
+    "--no-cli-pager"
+  ],
+  "exit_code": 0,
+  "signal": null,
+  "error": null,
+  "stdout": "research/twist_routes_1_3_20261021/execution-v4/checks/aws-supplied-sts.stdout",
+  "stderr": "research/twist_routes_1_3_20261021/execution-v4/checks/aws-supplied-sts.stderr",
+  "stdout_sha256": "5fca0a2cf0729ad4f03b11d48a5353c30e9c5cb5da93f473ce06782c4541724c",
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "credential_values_persisted": false
+}

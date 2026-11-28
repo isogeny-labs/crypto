@@ -1,0 +1,28 @@
+{
+  "schema": "p192.local-execution-authorization/v1",
+  "created_at": "2026-11-24T03:46:58.424151+00:00",
+  "authorization": {
+    "source": "explicit user instruction in this conversation",
+    "instruction": "Run locally",
+    "scope": "execute the existing prepared P-192 relation-collection pipeline in the current workspace",
+    "supersedes": "prior default EKS-only execution/admission restriction for this local run",
+    "not_an_EKS_admission": true
+  },
+  "backend": "existing local execution workspace",
+  "math_source_commit": "ceba74bb64854027c4dd16f00428bf676383bfdb",
+  "driver": "research/nist_cover_three_tests_20261116/collection_preflight_20261124/run-admitted.sh",
+  "driver_blob": "89198dd8471bb021934512e43e7a351635c928c9",
+  "limits": {
+    "build_seconds": 300,
+    "collector_seconds": 600,
+    "checker_seconds": 600,
+    "process_virtual_memory_KiB": 1048576,
+    "outer_seconds": 7200,
+    "cpu_count": 1
+  },
+  "admission_basis": "The user explicitly selected local execution; this record documents that instruction and creates no authority on its own.",
+  "financial_scope": "existing local runtime only; no external compute provisioning or cloud campaign",
+  "signing": "independent CI signing remains unavailable; local arithmetic outcomes are producer-unverified",
+  "original_map_synthesis_cost": "not supplied by replaying pinned inputs; remains a separate accounting obligation",
+  "standing": "producer-unverified"
+}

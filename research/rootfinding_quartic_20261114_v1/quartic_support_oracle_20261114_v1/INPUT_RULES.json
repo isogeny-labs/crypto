@@ -1,0 +1,18 @@
+{
+  "schema": "quartic-support-oracle-inputs/v1",
+  "small_fields": [[2,7],[3,11],[4,19]],
+  "small_basis_rule": "all prefix bases dimensions0..n plus [2] and [3,2^(n-1)]; retain all cases",
+  "coefficient_rule": "all c in each small field",
+  "independent_oracle": "all size5 source multisets, polynomial factor products and all unique orderings of quartic supported products",
+  "affine_cases": "32 SHA-derived fifteen-bit maps with case modulo9 parameters; three additional consistent packed coefficient maps (zero-map kernel, allowed e4 image freedom, canceled e1 offset); exhaustive all parameter assignments; four explicit bare-equation branch fixtures",
+  "actual_field": {"degree":83,"modulus_exponents":[83,45,2,1,0],"basis":"polynomial alpha","domain_dimension":18},
+  "actual_coefficients": "zero,18image basis values,alpha,and44SHA-derived image combinations;64 controls total",
+  "actual_seed": "quartic83-v1|index",
+  "budget": {"seconds":90,"memory_mb":4096,"cores":1,"predicate_checks":200000},
+  "artifact": "raw-controls.json.gz",
+  "command": ["python","-m","research.quartic_support_oracle_20261114_v1.worker","quartic-support-oracle-20261114-v1"],
+  "original_global_solver_claim":false,
+  "actual_norm_cell_admitted":false,
+  "qualified_speedup_claim":false,
+  "novelty_claim":false
+}

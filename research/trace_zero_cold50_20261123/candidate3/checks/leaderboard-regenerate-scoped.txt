@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/workspace/crypto/scripts/build_ic_leaderboard.py", line 7533, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/workspace/crypto/scripts/build_ic_leaderboard.py", line 7494, in main
+    doc = build(allow_unvalidated=args.allow_unvalidated)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/scripts/build_ic_leaderboard.py", line 3857, in build
+    "sources": {k: {"path": v, "sha256": sha256(v)} for k, v in SOURCES.items()},
+                                         ^^^^^^^^^
+  File "/workspace/crypto/scripts/build_ic_leaderboard.py", line 329, in sha256
+    return hashlib.sha256((REPO / rel).read_bytes()).hexdigest()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1019, in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/crypto/research/n83_basis_setup_20261015/reports/run-20261015T1842Z/native_statistics.json'

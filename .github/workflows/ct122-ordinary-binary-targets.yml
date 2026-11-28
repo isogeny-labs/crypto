@@ -1,0 +1,38 @@
+name: CT122 ordinary binary target spectral checks
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct122/**'
+      - '.github/workflows/ct122-ordinary-binary-targets.yml'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct122/**'
+      - '.github/workflows/ct122-ordinary-binary-targets.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ct122:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          sparse-checkout: |
+            research/cross_characteristic_global_torsion_20261112/ct122
+      - name: Exact-target matrix orbits and independent F32 enumeration
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct122
+          python3 -B "$D/ct122_target_spectrum.py" >/tmp/ct122-py.json
+          python3 -O -B "$D/ct122_target_spectrum.py" >/tmp/ct122-pyo.json
+          node "$D/ct122_independent.js" >/tmp/ct122-js.json
+          node --no-opt "$D/ct122_independent.js" >/tmp/ct122-jso.json
+          cmp /tmp/ct122-py.json /tmp/ct122-pyo.json
+          cmp /tmp/ct122-py.json /tmp/ct122-js.json
+          cmp /tmp/ct122-py.json /tmp/ct122-jso.json
+          printf '%s  %s\n' f012249797affb353719e94586e3411e72dcaa1e84cdc15d682edc58278df610 /tmp/ct122-py.json | sha256sum -c

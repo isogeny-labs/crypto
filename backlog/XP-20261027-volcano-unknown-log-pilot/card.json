@@ -7,12 +7,14 @@
     "Codex"
   ],
   "status": "blocked",
-  "status_note": "Native controls pass and the source-only checkpoint passed encrypted S3 readback. The authorized lab identity was denied codebuild:StartBuild; custom image and qualified collector recovery are still missing. No full-width experiment started.",
+  "status_note": "Exact-input command package and explicit 14Gi source admission have local development evidence. Current STS returns InvalidClientTokenId; registry/runtime publication, current budget/checkpoint admission and live collector restore are pending. No full-width experiment started.",
   "blocked_on": [
     "problem:problems/photo-volcano-two-sum-ic-recovery.md",
-    "hw:Lab identity denied codebuild:StartBuild on isolab-experiment-launcher; authorized custom-command route required",
-    "hw:Tested-source immutable custom image not built",
-    "note:No native hash-table serialization or qualified CRIU restore is implemented for this workload"
+    "hw:Current authorized lab key returns InvalidClientTokenId; working execution identity required",
+    "hw:Tested local payload image is not published to a registry and no updated recovery runtime is deployed",
+    "note:Collector-specific live CRIU/EBS worker-loss continuation remains unqualified",
+    "note:Known budget balance and source checkpoint required before launch; proposed recovery PVC 64Gi is unallocated",
+    "note:Original private archives are not present on the replacement filesystem; recovery remains open"
   ],
   "links": {
     "lead": "https://github.com/isogeny-labs/crypto-autoresearcher/blob/main/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-generic-table-decomposition.yaml",
@@ -20,10 +22,14 @@
       "research/volcano_ic_recovery_20261027/README.md",
       "research/volcano_ic_recovery_20261027/PROTOCOL.md",
       "research/volcano_ic_recovery_20261027/LAUNCH_STATUS.md",
-      "research/volcano_ic_recovery_20261027/validation/access_20261028.json"
+      "research/volcano_ic_recovery_20261027/validation/access_20261028.json",
+      "research/volcano_ic_recovery_20261027/command/README.md",
+      "research/volcano_ic_recovery_20261027/command/validation/component.json"
     ],
     "prs": [
-      2707
+      2707,
+      2789,
+      5126
     ]
   },
   "question": "Can bounded coefficients over the original 12 unknown-log factor-base points produce rank 12 and recover the unchanged source C0/G0/K0 target without importing historical DLP answers?",
@@ -34,7 +40,7 @@
   },
   "code": {
     "repo": "https://github.com/isogeny-labs/crypto",
-    "branch": "main",
+    "branch": "lane/volcano-command-readiness-20261124",
     "build": [
       [
         "bash",
@@ -42,26 +48,21 @@
         "/work/validated-development-receipt"
       ]
     ],
-    "commit": "6187036c049b6de2b1521b014f575952e4f1705c"
+    "commit": "e0f26ec5928266b25edb0a795d9099e18dce8519"
   },
   "resources": {
     "cpus": 4,
     "ram_gb": 14,
-    "disk_gb": 20,
+    "disk_gb": 64,
     "gpu": null,
     "est_core_hours": null,
     "est_wall_hours": null,
-    "notes": "Radius-12 table payload is 9566497092 bytes, excluding overhead. Application cap 12 GiB; intended c8a.2xlarge Spot worker. 3600 seconds is a deadline, not a runtime estimate. No cloud allocation occurred."
+    "notes": "Radius-12 table payload is 9566497092 bytes, excluding overhead. Application cap 12 GiB; intended c8a.2xlarge Spot worker. 3600 seconds is a deadline, not a runtime estimate. No cloud allocation occurred. November 24 source preparation requests 64Gi PVC for up to three memory images and outputs; capacity estimate only, no allocation or spending."
   },
   "run": {
     "argv": [
-      "/work/validated-development-receipt/build/runner",
-      "run",
-      "research/volcano_ic_recovery_20261027/public_source_case.json",
-      "research/volcano_ic_recovery_20261027/pilot_config.json",
-      "{out}",
-      "--private-output",
-      "--explicit"
+      "/opt/volcano/launch.sh",
+      "run"
     ],
     "env": {},
     "timeout_per_shard_s": 3600
@@ -79,10 +80,10 @@
   "outputs": {
     "result_schema": "volcano.ic.bounded-summary/v1",
     "verify": [
-      "/work/validated-development-receipt/build/verify",
-      "research/volcano_ic_recovery_20261027/public_source_case.json",
-      "research/volcano_ic_recovery_20261027/pilot_config.json",
-      "{out}/records.private.jsonl"
+      "/opt/volcano/bin/verify",
+      "/opt/volcano/repo/research/volcano_ic_recovery_20261027/public_source_case.json",
+      "/opt/volcano/repo/research/volcano_ic_recovery_20261027/pilot_config.json",
+      "{out}/recovery/records.private.jsonl"
     ],
     "land": "research/volcano_ic_recovery_20261027"
   },
@@ -95,7 +96,7 @@
     "ttl_s": 4200,
     "env": {
       "name": "volcano-ic-unknown-log-native",
-      "recipe": "Build merged source 6187036c049b6de2b1521b014f575952e4f1705c, run native controls, then publish and verify a UID-1000 custom-command image. Image not built or submitted; lab launch permission is denied."
+      "recipe": "Build source e0f26ec5928266b25edb0a795d9099e18dce8519 with pinned bases; local static image and small-fixture replay have producer evidence. Publish registry/runtime images and qualify actual CRIU/EBS continuation before supervisor command mode; the card is not ready for an ordinary executor."
     },
     "exec": {
       "cpus": 4,

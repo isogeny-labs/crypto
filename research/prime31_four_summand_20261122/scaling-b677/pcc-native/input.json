@@ -1,0 +1,57 @@
+{
+  "schema": "rr5.pcc-metadata-input/v1",
+  "specification": {
+    "path": "tools/pcc/pcc.py",
+    "sha256": "00036f8b524bf070a5cf36e02b2599148d390bdf30562d81a1a073df7777da2a"
+  },
+  "reference_claim": {
+    "path": "pcc/claims/PCC-20261123-08018e.json",
+    "canonical_sha256": "a2a355fa229931743f3d018cd3e44f18c59c17bd735cd3cab95f60b235bad1b5"
+  },
+  "session": "rr5-b677-construction-resource-qualification-20261123",
+  "model": "GPT-6 Astra Pro",
+  "published_core": {
+    "commit": "5e536ed93302def2122968aa880b22c4b675d516",
+    "tree": "6c441bcb3643f994abf9e637528d6d1cfad585e2"
+  },
+  "statement": "The preserved native-tests-01 record reports 27 passed and 5 failed fixture-construction tests. The separate native scalar diagnostic records 136769428^7 mod 2147483647 as 1852957275 by two implementations; the original failing sources remain archived. After the narrowly recorded fixture correction, native-tests-02 reports all 32 tests passed (19 existing controls, 8 F4 resource-limit controls, and 5 B677 construction or forced-cap controls). public-example-01 reports all 8 example tests passed against the declared source closure, and driver-build-01 records exit 0. The separate root-library-01 command terminated with timeout exit 124; before that termination its stderr recorded an aws-sdk-s3 encoded-metadata allocation error, and no root tests ran. These are bounded qualification and build observations; the pinned records contain no registered B677 extraction result. admission-01 records exit 1 because the checkpoint upload route was unavailable.",
+  "scope": "Unsigned data statement about the listed raw qualification receipts and their exact source inventories. The qualification runs preceded the source publication commit; the inventories identify the actual bytes tested. producer.commit identifies the published component source/evidence commit supplied by the parent publication task, whose declared tree is checked against the local core tree. This record does not supply a signed verdict, an execution proof, a full-root-library test pass, a B677 completeness result, recovered scalar, complete-cost accounting, or performance comparison.",
+  "phases": [
+    {"name": "build-01", "exit_status": 0},
+    {"name": "native-tests-01", "exit_status": 101, "test_summary": {"status": "FAILED", "passed": 27, "failed": 5}},
+    {"name": "coset7-build-01", "exit_status": 0},
+    {"name": "coset7-check-01", "exit_status": 0},
+    {"name": "build-02", "exit_status": 0},
+    {"name": "native-tests-02", "exit_status": 0, "test_summary": {"status": "ok", "passed": 32, "failed": 0}},
+    {"name": "public-example-01", "exit_status": 0, "test_summary": {"status": "ok", "passed": 8, "failed": 0}},
+    {"name": "driver-build-01", "exit_status": 0},
+    {"name": "root-library-01", "exit_status": 124},
+    {"name": "admission-01", "exit_status": 1}
+  ],
+  "old_source_substitutions": {
+    "research/prime31_four_summand_20261122/native/b677_fixture.rs": "research/prime31_four_summand_20261122/scaling-b677/evidence/source-snapshots/build-01/b677_fixture.rs",
+    "research/prime31_four_summand_20261122/native/b677_controls.rs": "research/prime31_four_summand_20261122/scaling-b677/evidence/source-snapshots/build-01/b677_controls.rs"
+  },
+  "root_library_historical_git_sources": {
+    "src/cryptanalysis/ec_index_calculus.rs": "7f5752d6e38e3b43de886959c16136c0d443304f",
+    "src/cryptanalysis/research_bench.rs": "7f5752d6e38e3b43de886959c16136c0d443304f"
+  },
+  "extra_artifacts": [
+    "research/prime31_four_summand_20261122/scaling-b677/pcc-native/ADMIN_CORRECTION.md",
+    "research/prime31_four_summand_20261122/scaling-b677/pcc-native/source-snapshots/admin-build-01/main.rs",
+    "research/prime31_four_summand_20261122/scaling-b677/PROTOCOL.md",
+    "research/prime31_four_summand_20261122/scaling-b677/MATHEMATICS.md",
+    "research/prime31_four_summand_20261122/scaling-b677/SOURCE_CORRECTION.md",
+    "research/prime31_four_summand_20261122/scaling-b677/evidence/source-snapshots/build-01/SNAPSHOT.md",
+    "research/prime31_four_summand_20261122/scaling-b677/evidence/source-snapshots/build-01/SHA256SUMS",
+    "research/prime31_four_summand_20261122/scaling-b677/evidence/source-snapshots/build-01/b677_fixture.rs",
+    "research/prime31_four_summand_20261122/scaling-b677/evidence/source-snapshots/build-01/b677_controls.rs",
+    "research/prime31_four_summand_20261122/scaling-b677/controls/coset7.rs",
+    "research/prime31_four_summand_20261122/native/b677_fixture.rs",
+    "research/prime31_four_summand_20261122/native/b677_controls.rs",
+    "research/prime31_four_summand_20261122/native/selector_circuit.rs",
+    "research/prime31_four_summand_20261122/native/extractor.rs",
+    "research/prime31_four_summand_20261122/native/b677_gate.rs",
+    "src/cryptanalysis/f4_fp.rs"
+  ]
+}

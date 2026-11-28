@@ -1,0 +1,510 @@
+{
+  "schema": "prime31-fiber-development-receipt/v2",
+  "scope": "research/prime31_aux_matched_20261122/fiber-domain-followup",
+  "source_commit": "559302c7df0cb411ce345b98b2650f33ee6e137d",
+  "build": {
+    "command": [
+      "prlimit",
+      "--as=4294967296",
+      "--cpu=600",
+      "--",
+      "timeout",
+      "--signal=TERM",
+      "--kill-after=5s",
+      "600s",
+      "cargo",
+      "test",
+      "--release",
+      "--offline",
+      "--locked",
+      "--no-run",
+      "--message-format=json",
+      "--manifest-path",
+      "research/prime31_aux_matched_20261122/native/Cargo.toml"
+    ],
+    "exit_code": 0,
+    "attempt": 2
+  },
+  "test_executables": 24,
+  "tests_passed": 104,
+  "tests_failed": 0,
+  "tests_ignored": 0,
+  "tests_filtered": 0,
+  "tests": [
+    {
+      "name": "plain_reference_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "9a3cbb4df73c3a32ba06449cae9b9bfa4767436bd5322cc02b68eb73c89b0f27",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fiber_extract_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "6551eaa25225d8d66709bbff624a47fc15951950a0a1cd884bfb8fb19b90f648",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "pair_control_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "cfcee611d543ae6d81bb43aa926cec2cb62c928956d50a5962da5017ec074db2",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "staged_panel_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "61b89c9c3e092d475b56452ee653c66119dc69b919119539f7298c40f71952d1",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "domain_modes_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "b2cd211c14b7d8c08cf470a2f1386e93c015a29cde32cd154b82a3fe1bbce420",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "recovery_modes_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "ff56574623a3ff5850f1401a3f7095a511260185dfec6e04535f35f17c36d476",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "specialized_control_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "46a7936b6718ffc95b9c9dcbee707ea676c19549766e1afe48c4109cd2efb7d1",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "collector_contracts",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "0ddfae9bdb0697867cef0a8b6e22d663e2b3b7b54ffacade23b407a04c4e172f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "oracle_contracts",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "cc03409fe41b6673d943a256f49c6725c1e3f7b96424d258bfb850e9d36742d0",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "sparse_h2_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "acfd460ab0b599c0898a07c8439c71f0c069b21e8d5caa15b188ef6f35085dc4",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "kernel_fiber_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "c1a8372c0fe4113936c072cbe673b84f1f88b8cc8bda371b81745e396d7ca397",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "rho_v6_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "0b3f661a5baefc9f329b20cdc26f509204d848b39f345c7a94d0faf109ff7a6f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "choice_audit_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "3a245453d1634c7df26cfdecf8fb9304389e9af638433009e6fd00bf6d577db2",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "provenance_contracts",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "8dd4cf1d9155fd0730a7b9eeae3f18ee060ad534588960c20bb5f3c72f049e8d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "incumbent_driver_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "fa490b8868a68846fd3e24d31c2ac413c75328f4acf7727e4fc632eb9fedc667",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "base_certificates",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "f4a17aff6f0720c105c9ac849c89d2a4ac7db67f695365937422692ca1bc1875",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "incumbent_control_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "b22902038de41c429b5e08428961aa83e3235dedd818bb00aae7695489402b82",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "audit_contracts",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "14c078b14b4d536f92cba00ae37b36a4391629acad0fb0a3d9ddd5a212d90906",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "prepared_panel_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "040eeee61cb2a0c44448b2cfe0acf84f80ff6dfa7055c345cfbd0432ec494ce5",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "tower4_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "db72a4cb89cbd43210f1096f93feae853f7acc773d0f1afe4ae734162acd4f58",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "identity_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "b4f22b8e3afe53b5df901404916563a36ef9614f9e3ee28cbf77737a702dbf84",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "prepared_oracle_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "d713e1f99b303762735c5c8cde8ad77f430c65bc3a8fe79297d0cc72c6f5fe9a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "adversarial_contracts",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "75b4d1f2ff8dddd01ad3e4aaa2a4d963118412c7cbf101686f6d81ead842fbee",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "target_transport_contract",
+      "exit_code": 0,
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered": 0,
+      "stdout_sha256": "0e27a843386ecd86adc175b8ca8afe74ec1b92153c869ae027e483c379671657",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "immutable_binaries": [
+    {
+      "name": "adversarial_contracts",
+      "sha256": "cf0ee8c93b00335ad3e9599cc23e4a9fbdb0f145fc761002b5bfd4647c6af2cb"
+    },
+    {
+      "name": "audit_contracts",
+      "sha256": "38cf12e78aabe82e820bce4728a52b6769d4bf8a269350fdb629b049e6234cda"
+    },
+    {
+      "name": "base_certificates",
+      "sha256": "790c8c4c71a35bc197923dfb18ad3137eaaba11a33d8d2b2c70bc31402fb95bc"
+    },
+    {
+      "name": "choice_audit_contract",
+      "sha256": "df2bf5786414dc5a1ec9273c718c960833451210ce1ccc8046c3d3b71c93282b"
+    },
+    {
+      "name": "collector_contracts",
+      "sha256": "62284496332163c080c0fd341369e19c88ab9aad50ec6d5b63f515066d9da628"
+    },
+    {
+      "name": "domain_modes_contract",
+      "sha256": "c037de9c702fb0d61b2459f4b8d0852e594578cfd62434b94eccc4c92f2db57d"
+    },
+    {
+      "name": "fiber_extract_contract",
+      "sha256": "8356ba6ce6b356dcef3b2ec18120cd3a6f36abd41a809eb138ca5a01e8a1cb63"
+    },
+    {
+      "name": "identity_contract",
+      "sha256": "894c06be235cc939240d38dec979d0717f0161683c65d85c203054179c3300b6"
+    },
+    {
+      "name": "incumbent_control_contract",
+      "sha256": "11d221945c5cbfa53ea1147d5bc343a98b24b27a06d47376110e7d1638a15f89"
+    },
+    {
+      "name": "incumbent_driver_contract",
+      "sha256": "2c2b03a53bd71a8a8ad140ade1cf1a7aad0edaea5eb1e343af48ec912765ad1f"
+    },
+    {
+      "name": "kernel_fiber_contract",
+      "sha256": "0fb6c37c8af8496c495e300992603d26d2ff6662a30a900d937ae2ccfef0a34a"
+    },
+    {
+      "name": "oracle_contracts",
+      "sha256": "19682db896490964833da0fde1d090bf6184b6370139fe8721b263ce445a991e"
+    },
+    {
+      "name": "pair_control_contract",
+      "sha256": "13f9bbfd8884796cc93b0987f4c135d98b4a8e75e87050bae1ec9f7f7e996a26"
+    },
+    {
+      "name": "plain_reference_contract",
+      "sha256": "0be8ff532fed0982b062842f000b08abb68b043e7e72ba9b79b0c06c203aab5f"
+    },
+    {
+      "name": "prepared_oracle_contract",
+      "sha256": "94b09a5544be29e512ad84bd4e0d2b9e755b8cc3480ddaa7467586b2045efa17"
+    },
+    {
+      "name": "prepared_panel_contract",
+      "sha256": "9f94b98c2bb0d85a911c0998590e8ad75cc4920ea87e6f82673d0cefe6b6c0d3"
+    },
+    {
+      "name": "prime31-aux-matched",
+      "sha256": "c4d4b1e85ab8c4149eef6a625e6d3e3d5f8b16635bcbd66a7b4a7628bb53e80d"
+    },
+    {
+      "name": "prime31-ic-incumbent",
+      "sha256": "1711499b1c2684ccc990ab387b6c526c5a21174c6e3be2462899cf14410a3e64"
+    },
+    {
+      "name": "prime31-isogeny-choices",
+      "sha256": "f786b5de6592f35954f5716343859c171f871958fb2ee53b63c787cc896692f0"
+    },
+    {
+      "name": "prime31-sparse-identity",
+      "sha256": "19202e70a81a5c222624eb911cd039adb0639d266a24d431b0f3b3a431d3e37b"
+    },
+    {
+      "name": "provenance_contracts",
+      "sha256": "a17162e105d7e3b9c2b2eba4e38aed9829851bad4f6d95b1bc976c3ea15b74d4"
+    },
+    {
+      "name": "recovery_modes_contract",
+      "sha256": "bde225aa267d92d1251c297a1ae6e022afc1ef5d19a581c7f058f52a2a54ffc4"
+    },
+    {
+      "name": "rho_v6_contract",
+      "sha256": "6cd5e7e3b97eec733e60a4319a4da593b06a6e0ec191d19cbcc3635b85d66fbb"
+    },
+    {
+      "name": "sparse_h2_contract",
+      "sha256": "4a4be2d4fd4654460f501922ab425095d768d878682773c2d92a7ae7a83acc66"
+    },
+    {
+      "name": "specialized_control_contract",
+      "sha256": "8d3071359b0d0a9619f679dd946d892fced4a87744fc62fd8cba3562cf5a9cbd"
+    },
+    {
+      "name": "staged_panel_contract",
+      "sha256": "492ed0fb9ff2fa101ace29c2c96af1884da3eeb3363cd409574fba661a322bf7"
+    },
+    {
+      "name": "target_transport_contract",
+      "sha256": "c6aca375e8a8fe28da4a52856f1839e29d61caf215ac115d13a13e9c9f884906"
+    },
+    {
+      "name": "tower4_contract",
+      "sha256": "5236d48988598fa1fdff3aab879b4ed03acfafec1b71bedfab3a97b1b87c445e"
+    }
+  ],
+  "pre_post_binary_hashes_identical": true,
+  "pre_call_manifest_sha256": "4c831fb88e5ac0a0853fbe33e2cc0eaf6700cd1919d52edbb733154beb97e38e",
+  "source_inventory_files": 104,
+  "source_manifest_sha256": "de0f17188090bb41b8aed4e36eef88090eb4e1d84044438eb8e8461e73564802",
+  "source_inventory_matches_checkout": true,
+  "source_check_scope": "Embedded source bytes match checkout and every inventoried file is in HEAD. Launcher must also enforce clean checkout and input custody. Compiler, registry package bodies and external admission are not verified here.",
+  "panels": [
+    {
+      "group": "panels",
+      "stage": "screening",
+      "inputs": 20,
+      "index_sha256": "148d7c412c77e47606b51f9264cc91c45da842f2b1f96046ddbabb3f4aa38f8a",
+      "attempted": 0,
+      "selected": 0
+    },
+    {
+      "group": "panels",
+      "stage": "recovery-candidates",
+      "inputs": 100,
+      "index_sha256": "4332bdca5166f457c7cb375119c7daf8b704917c8ae54b77199201dffe7174e5",
+      "attempted": 0,
+      "selected": 0
+    },
+    {
+      "group": "incumbent-panels",
+      "stage": "screening",
+      "inputs": 3,
+      "index_sha256": "80f6e9d3f82ab1cba1d3ac72151036efe93b4ff3a14dce6762a1b3a974119ac5",
+      "attempted": 0,
+      "selected": 0
+    },
+    {
+      "group": "incumbent-panels",
+      "stage": "recovery-candidates",
+      "inputs": 15,
+      "index_sha256": "b7fd8e64afcbe8e7b072f064253cdd54223390f6534bbb2894afdcad6cb8035f",
+      "attempted": 0,
+      "selected": 0
+    }
+  ],
+  "campaigns_attempted": 0,
+  "selected_for_execution": 0,
+  "natural_prime31_campaign_queries_executed": 0,
+  "native_correctness_fixture_execution_only": true,
+  "archive": {
+    "path": "research/prime31_aux_matched_20261122/fiber-domain-followup/evidence/native-qualification-attempt2.tar.gz",
+    "sha256": "3bb5daf11c8e81e31e132e88672dc06228b5fbfe2bbf8ad7ac2327863711a400",
+    "bytes": 43236,
+    "includes": "Build records, embedded inventory, source check, all fixed test stdout/stderr, exit records and pre/post binary hashes.",
+    "excludes": "Executable bodies remain in the transient immutable qualifier directory; no remote binary archive was uploaded."
+  },
+  "root_library_gate": "Not established: attempt4 executor session unavailable with no terminal result; all four attempts retained separately.",
+  "performance_measurement": false,
+  "end_to_end_advantage_established": false,
+  "pcc_standing": "unverified",
+  "limits": [
+    "Fixed fixture correctness and metadata checks only.",
+    "Test times are diagnostics, not admitted comparative timing.",
+    "Foreign specialized operation ledgers remain partial.",
+    "Complete campaign still requires the existing execution and measurement evidence."
+  ],
+  "prior_receipt": {
+    "path": "research/prime31_aux_matched_20261122/fiber-domain-followup/DEVELOPMENT_RECEIPT.json",
+    "sha256": "4b69ab6e8e3ac9cb2fb87478d5c15af01ac58e1db393a9e2d09415a1e04b42cb",
+    "preserved": true
+  },
+  "independent_metadata_review": {
+    "path": "research/prime31_aux_matched_20261122/fiber-domain-followup/evidence/qualification-review-v2.json",
+    "sha256": "25aeb5df97e569c29d35dbc86ade05627a89776169f714375ad5b14abb5328c8",
+    "scope": "Same-team read-only independent recount and byte comparison; no signed PCC verification."
+  },
+  "panel_parser_qualification": "Existing 138 unselected panel bytes were parsed by the first qualification binary. Candidate2 has the unchanged staged-input contracts; no panel campaign or regeneration was performed.",
+  "change_qualified": "Reuse opaque full-validation paths when constructing the conditional fiber index; preserve original validation and charge remaining structural work."
+}

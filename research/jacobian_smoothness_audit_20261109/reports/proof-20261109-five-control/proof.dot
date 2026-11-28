@@ -1,0 +1,17 @@
+digraph FiveControl {
+  graph [rankdir=TB,bgcolor="white",fontname="DejaVu Sans",nodesep=0.28,ranksep=0.32,pad=0.1];
+  node [shape=box,style="rounded,filled",fillcolor="#edf4fa",color="#3c6382",fontname="DejaVu Sans",fontsize=11,margin="0.13,0.09"];
+  edge [color="#536878",arrowsize=0.7];
+  curve [label="F5: f = X5 - X\nmonic, degree 5, derivative -1\nseparable"];
+  shape [label="Every actual reduced pair\nhas a unique coefficient shape\n651 candidates"];
+  division [label="Actual monic division\nproved equivalent to scalar conditions\nexact quotient/remainder rewrite"];
+  count [label="Kernel finite enumeration\n16 valid pairs; every v = 0"];
+  roots [label="Every valid quadratic u has a root\nproved scalar classification +\nactual polynomial factorization"];
+  smooth [label="All 16 actual u split\nexact control: 16 / 16",fillcolor="#edf8ee",color="#42834c"];
+  native [label="Native calibration still requires\nsource + protocol committed before data",style="rounded,dashed",color="#9c5c5c"];
+  geometry [label="Separate open bridge\ngeometric Picard/Jacobian identification",style="rounded,dashed",color="#9c5c5c"];
+  curve -> shape -> division -> count;
+  count -> roots -> smooth;
+  smooth -> native [style=dashed];
+  smooth -> geometry [style=dashed];
+}

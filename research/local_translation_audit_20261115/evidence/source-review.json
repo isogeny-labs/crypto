@@ -1,0 +1,81 @@
+{
+  "schema": "actual-local-translation-source-review/v1",
+  "recorded_at": "2026-11-15T20:37:39.651696+00:00",
+  "primary": {
+    "url": "https://www.math.auckland.ac.nz/~sgal018/crypto-book/ch7.pdf",
+    "bytes": 281643,
+    "sha256": "c5b9a25eeb00c280f9e723b7290533d3f62ecfcc0995731e9e30e29503a6b942",
+    "pages": "PDF10\u201311 printed132\u2013133",
+    "full_text": true,
+    "individual_visual_pages": [
+      10,
+      11
+    ],
+    "claims": "Lemmas7.4.7/7.4.10\u201314/7.4.16; beginning7.5.1 only",
+    "copyright_local_only": true
+  },
+  "source_ch9": "PDF3\u20134 fulltext reread; prior individual visuals credited; source excludes Q/O",
+  "KB": {
+    "recorded_at": "2026-11-15T20:33:33.045855+00:00",
+    "MCP_relevant_tools": [],
+    "wrapper_calls": [
+      {
+        "args": [
+          "scripts/research-kb",
+          "status"
+        ],
+        "exit": 127,
+        "stdout": "",
+        "stderr": "research-kb: no executable found; set RESEARCH_KB_BIN or put research-kb on PATH\n"
+      },
+      {
+        "args": [
+          "scripts/research-kb",
+          "search",
+          "elliptic translation function field local valuation residue DVR pullback exceptional infinity",
+          "--top-k",
+          "8"
+        ],
+        "exit": 127,
+        "stdout": "",
+        "stderr": "research-kb: no executable found; set RESEARCH_KB_BIN or put research-kb on PATH\n"
+      },
+      {
+        "args": [
+          "scripts/research-kb",
+          "search",
+          "translation valuation mismatch nonunit DVR domination ramification affine formula pole inverse",
+          "--top-k",
+          "8"
+        ],
+        "exit": 127,
+        "stdout": "",
+        "stderr": "research-kb: no executable found; set RESEARCH_KB_BIN or put research-kb on PATH\n"
+      },
+      {
+        "args": [
+          "scripts/research-kb",
+          "theorems",
+          "WeierstrassCurve FunctionField translation valuation localRing map residue"
+        ],
+        "exit": 127,
+        "stdout": "",
+        "stderr": "research-kb: no executable found; set RESEARCH_KB_BIN or put research-kb on PATH\n"
+      }
+    ],
+    "observed_before_approach_code": true
+  },
+  "conductor": {
+    "exit": 127,
+    "stdout": "",
+    "stderr": "/bin/bash: line 1: conductor: command not found\n"
+  },
+  "prior_methods": [
+    "actual FF translations/composition/inverse",
+    "actual point-local DVR/uniformizer factorization/adic value",
+    "actual finite/infinity regular rings and residues",
+    "official rank-one proper-overring theorem read as alternative"
+  ],
+  "approach": "Derive actual infinity coordinate differences/localized map/residue/uniformizer value; actual field composition transports to all points.",
+  "novelty_claim": false
+}

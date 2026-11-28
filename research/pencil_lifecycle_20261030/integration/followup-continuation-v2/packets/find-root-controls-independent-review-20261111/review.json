@@ -1,0 +1,61 @@
+{
+  "schema": "research.independent-proof-source-review/v1",
+  "task": "T-2192",
+  "reviewer": "root/mode_source_review",
+  "recorded_utc": "2026-11-11T03:20:26.411111+00:00",
+  "status": "source_correspondence_pass_compilation_pending",
+  "subject_manifest_sha256": "a591403870575094a5ada81c6e0a1a6db51e9a8d5d87dc47b52d8740a46fbc32",
+  "freeze_sha256": "6b012c09eafd509a048c2be9d33b106dec1bc6612ade088ebafb9a7731eb6b87",
+  "controls_sha256": "fb3a9383a873da62fb49101ef5826fa04496753177c0f9cfe90cd38313bd6139",
+  "parent_freeze_sha256": "71ab465daf4c9060c01726f60e2d39441d50706dfe55a7b8a67966dc5cd193de",
+  "actual_failed_controls_source_sha256": "f43f7d0affc63c3c0902c74f55c34232b5943059d45b941b7a095b7a14240298",
+  "actual_failed_controls_stdout": {
+    "path": "/home/ec2-user/pencil-native-find-root-cardinality-renewal-20261111/Controls.stdout",
+    "sha256": "958a1e5f096bce90d19a625c65b8c90aa0558c2279a49e18af11d31566535a7d"
+  },
+  "proof_changes_exactly": 4,
+  "theorem_statements_unchanged": true,
+  "other_lean_files_unchanged": [
+    "UnionSize.lean.txt",
+    "Composition.lean.txt",
+    "GraphAlgebra.lean.txt",
+    "ExpectedFailure.lean.txt",
+    "Readback.lean.txt",
+    "FindRootCardinality.lean.txt",
+    "Union.lean.txt",
+    "Find.lean.txt",
+    "Cycles.lean.txt",
+    "Forest.lean.txt"
+  ],
+  "modules": 11,
+  "readback_names": 14,
+  "reasoning": [
+    "RootMap definition expands into conjunction of universal quantification over Fin3, equality on Fin3 and iff; existing finite decidability applies after unfolding the named proposition.",
+    "Forest definition expands into universal quantification over Fin3, disjunction of Fin3 equality and natural-number less-than; all instance prerequisites are already present.",
+    "The source transformation changes only four proof bodies, not any definition, statement, assumption, module, name or axiom readback.",
+    "This diagnoses the exact four Decidable synthesis errors; compilation and14named readbacks remain pending."
+  ],
+  "runtime_binding": {
+    "launcher_replay_freeze_workspace_equal": true,
+    "workspace": "/home/ec2-user/pencil-native-find-root-controls-successor-20261111",
+    "workspace_and_outer_absent": true,
+    "launch_replay_changes_only_fresh_paths_and_units": true,
+    "current_accounting_null": true,
+    "phase_seconds": {
+      "pre": 900,
+      "compiler": 600,
+      "post": 900
+    },
+    "absolute_deadline": "2026-11-11T12:00:00Z"
+  },
+  "documentation_note": "Inherited PLAN.md describes the earlier operational renewal and says all mathematical sources are unchanged; for this successor that sentence excludes the four proof-body edits documented in successor-bindings.json and this review. The sealed parent/successor files were not changed.",
+  "native_or_compiler_executed": false,
+  "source_basis": [
+    "Controls.lean.txt",
+    "FindRootCardinality.lean.txt:RootMap",
+    "Find.lean.txt:Forest",
+    "actual failed Controls.stdout",
+    "prior frozen operational renewal"
+  ],
+  "pcc_standing": "unverified"
+}

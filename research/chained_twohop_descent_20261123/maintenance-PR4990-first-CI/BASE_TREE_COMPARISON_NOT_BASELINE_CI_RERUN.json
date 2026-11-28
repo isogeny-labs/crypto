@@ -1,0 +1,54 @@
+{
+  "base": "816f9c3a942efed569049618c056d12a0c56d693",
+  "head": "f48f41b8b24be36ce9d209c56bdabe54bcffe426",
+  "objects": [
+    {
+      "path": ".github",
+      "base_git_object": "3c7dbe40d64d13d4fd19e6ac3dcc33fb66799372",
+      "head_git_object": "3c7dbe40d64d13d4fd19e6ac3dcc33fb66799372",
+      "equal": true
+    },
+    {
+      "path": ".artifacts",
+      "base_git_object": "ea7cee3b048eee5cdba98f690c8c9f90887e2bd3",
+      "head_git_object": "ea7cee3b048eee5cdba98f690c8c9f90887e2bd3",
+      "equal": true
+    },
+    {
+      "path": "tools",
+      "base_git_object": "d6378c0bffc17dce9a2b4faa996c66629895b515",
+      "head_git_object": "d6378c0bffc17dce9a2b4faa996c66629895b515",
+      "equal": true
+    },
+    {
+      "path": "scripts",
+      "base_git_object": "7457d0d453c9565b3fad752bfff3ea7e0ab3d8bc",
+      "head_git_object": "7457d0d453c9565b3fad752bfff3ea7e0ab3d8bc",
+      "equal": true
+    },
+    {
+      "path": "docs/shared-code.lock.json",
+      "base_git_object": "695ff77e603cfcdb9973c8c7254b3fc5b7870a17",
+      "head_git_object": "695ff77e603cfcdb9973c8c7254b3fc5b7870a17",
+      "equal": true
+    },
+    {
+      "path": "pcc/keyring.json",
+      "base_git_object": "f20337486470f138c0e1c890957ce1a6cffdbde2",
+      "head_git_object": "f20337486470f138c0e1c890957ce1a6cffdbde2",
+      "equal": true
+    }
+  ],
+  "source_input_comparison_only": true,
+  "not_a_baseline_CI_rerun_or_a_gate_waiver": true,
+  "observed_failures": [
+    "PCC tests: three NameError failures in unchanged test sources",
+    "artifact tool tests: four stale-pull regression failures in unchanged tool sources",
+    "scope: missing existing recovery/history store bytes",
+    "shared-code lock",
+    "backend current",
+    "validation store hydration"
+  ],
+  "check_budget_observation": "49 explicit filter=all checks on f48, excess retained; no empty rerun or trigger suppression",
+  "old4544_filter_scope_erratum": "Earlier record enumerated all pages/events for workflows, but check-runs used the default latest filter. Its30-check budget assertion is limited to returned checks; all-attempt compliance is not established. Targeted filter=all follow-up remains open under cadence."
+}

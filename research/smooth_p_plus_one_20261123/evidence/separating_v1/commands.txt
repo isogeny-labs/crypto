@@ -1,0 +1,9 @@
+# Frozen source, binaries, fixture and protocol hashes are in pre_call.txt.
+# All panels: RAYON_NUM_THREADS=1, 2 GiB whole-process address-space limit,
+# timeout --kill-after=5s 60; one original three-second query deadline.
+# LD_LIBRARY_PATH=/workspace/scratch/singular/root/usr/lib/x86_64-linux-gnu:/workspace/scratch/msolve/root/usr/lib/x86_64-linux-gnu
+# The wrapper captures complete JSONL into the existing local spool.
+# It does not send externally: the Cloudflare receiving URL is missing.
+/workspace/research_stream/research-stream capture /workspace/research_stream/live-native.jsonl -- timeout --kill-after=5s 60 bash -c 'ulimit -v 2097152; exec "$@"' separating-f127 /workspace/scratch/dickson-separating-v1 127 4 /workspace/scratch/msolve/root/usr/bin/msolve cofactor-msolve refined
+/workspace/research_stream/research-stream capture /workspace/research_stream/live-native.jsonl -- timeout --kill-after=5s 60 bash -c 'ulimit -v 2097152; exec "$@"' separating-f8191-d4 /workspace/scratch/dickson-separating-v1 8191 4 /workspace/scratch/msolve/root/usr/bin/msolve cofactor-msolve
+/workspace/research_stream/research-stream capture /workspace/research_stream/live-native.jsonl -- timeout --kill-after=5s 60 bash -c 'ulimit -v 2097152; exec "$@"' separating-f8191-d5 /workspace/scratch/dickson-separating-v1 8191 5 /workspace/scratch/msolve/root/usr/bin/msolve cofactor-msolve refined

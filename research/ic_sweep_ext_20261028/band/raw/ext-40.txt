@@ -1,0 +1,50 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp40-tm878093-c892adcd | 39.35 | b2-dp4 | 12/12 | 7.232 | 7.413 | 9.039 | — |
+| icv1-fp40-tm878093-c892adcd | 39.35 | b2-dp6 | 12/12 | 12.252 | 12.512 | 14.854 | — |
+| icv1-fp40-tm878093-c892adcd | 39.35 | b8-dp4 | 12/12 | 7.835 | 7.927 | 8.756 | — |
+| icv1-fp40-tm878093-c892adcd | 39.35 | b8-dp6 | 12/12 | 20.924 | 21.078 | 22.462 | — |
+| icv1-fp40-tm878093-c892adcd | 39.35 | bsgs-neg | 12/12 | 1.083 | 1.191 | 2.166 | — |
+| icv1-fp40-tm878093-c892adcd | 39.35 | kangaroo | 12/12 | 1.290 | 1.290 | 1.295 | — |
+| icv1-fp40-tm878093-c892adcd | 39.35 | rho-lanes16 | 12/12 | 0.511 | 0.562 | 1.021 | — |
+| icv1-fp40-tm878093-c892adcd | 39.35 | rho-neg | 12/12 | 0.493 | 0.543 | 0.986 | — |
+| icv1-fp40-tm878093-c892adcd | 39.35 | sweep-b2 | 12/12 | 2.396 | 2.635 | 4.789 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp40-tm878093-c892adcd | b2-dp4 vs b2-dp6 | b2-dp4 < b2-dp6 |
+| icv1-fp40-tm878093-c892adcd | b2-dp4 vs b8-dp4 | unresolved inside the band |
+| icv1-fp40-tm878093-c892adcd | b2-dp4 vs b8-dp6 | b2-dp4 < b8-dp6 |
+| icv1-fp40-tm878093-c892adcd | b2-dp4 vs bsgs-neg | bsgs-neg < b2-dp4 |
+| icv1-fp40-tm878093-c892adcd | b2-dp4 vs kangaroo | kangaroo < b2-dp4 |
+| icv1-fp40-tm878093-c892adcd | b2-dp4 vs rho-lanes16 | rho-lanes16 < b2-dp4 |
+| icv1-fp40-tm878093-c892adcd | b2-dp4 vs rho-neg | rho-neg < b2-dp4 |
+| icv1-fp40-tm878093-c892adcd | b2-dp4 vs sweep-b2 | sweep-b2 < b2-dp4 |
+| icv1-fp40-tm878093-c892adcd | b2-dp6 vs b8-dp4 | b8-dp4 < b2-dp6 |
+| icv1-fp40-tm878093-c892adcd | b2-dp6 vs b8-dp6 | b2-dp6 < b8-dp6 |
+| icv1-fp40-tm878093-c892adcd | b2-dp6 vs bsgs-neg | bsgs-neg < b2-dp6 |
+| icv1-fp40-tm878093-c892adcd | b2-dp6 vs kangaroo | kangaroo < b2-dp6 |
+| icv1-fp40-tm878093-c892adcd | b2-dp6 vs rho-lanes16 | rho-lanes16 < b2-dp6 |
+| icv1-fp40-tm878093-c892adcd | b2-dp6 vs rho-neg | rho-neg < b2-dp6 |
+| icv1-fp40-tm878093-c892adcd | b2-dp6 vs sweep-b2 | sweep-b2 < b2-dp6 |
+| icv1-fp40-tm878093-c892adcd | b8-dp4 vs b8-dp6 | b8-dp4 < b8-dp6 |
+| icv1-fp40-tm878093-c892adcd | b8-dp4 vs bsgs-neg | bsgs-neg < b8-dp4 |
+| icv1-fp40-tm878093-c892adcd | b8-dp4 vs kangaroo | kangaroo < b8-dp4 |
+| icv1-fp40-tm878093-c892adcd | b8-dp4 vs rho-lanes16 | rho-lanes16 < b8-dp4 |
+| icv1-fp40-tm878093-c892adcd | b8-dp4 vs rho-neg | rho-neg < b8-dp4 |
+| icv1-fp40-tm878093-c892adcd | b8-dp4 vs sweep-b2 | sweep-b2 < b8-dp4 |
+| icv1-fp40-tm878093-c892adcd | b8-dp6 vs bsgs-neg | bsgs-neg < b8-dp6 |
+| icv1-fp40-tm878093-c892adcd | b8-dp6 vs kangaroo | kangaroo < b8-dp6 |
+| icv1-fp40-tm878093-c892adcd | b8-dp6 vs rho-lanes16 | rho-lanes16 < b8-dp6 |
+| icv1-fp40-tm878093-c892adcd | b8-dp6 vs rho-neg | rho-neg < b8-dp6 |
+| icv1-fp40-tm878093-c892adcd | b8-dp6 vs sweep-b2 | sweep-b2 < b8-dp6 |
+| icv1-fp40-tm878093-c892adcd | bsgs-neg vs kangaroo | unresolved inside the band |
+| icv1-fp40-tm878093-c892adcd | bsgs-neg vs rho-lanes16 | rho-lanes16 < bsgs-neg |
+| icv1-fp40-tm878093-c892adcd | bsgs-neg vs rho-neg | rho-neg < bsgs-neg |
+| icv1-fp40-tm878093-c892adcd | bsgs-neg vs sweep-b2 | bsgs-neg < sweep-b2 |
+| icv1-fp40-tm878093-c892adcd | kangaroo vs rho-lanes16 | rho-lanes16 < kangaroo |
+| icv1-fp40-tm878093-c892adcd | kangaroo vs rho-neg | rho-neg < kangaroo |
+| icv1-fp40-tm878093-c892adcd | kangaroo vs sweep-b2 | kangaroo < sweep-b2 |
+| icv1-fp40-tm878093-c892adcd | rho-lanes16 vs rho-neg | rho-neg < rho-lanes16 |
+| icv1-fp40-tm878093-c892adcd | rho-lanes16 vs sweep-b2 | rho-lanes16 < sweep-b2 |
+| icv1-fp40-tm878093-c892adcd | rho-neg vs sweep-b2 | rho-neg < sweep-b2 |

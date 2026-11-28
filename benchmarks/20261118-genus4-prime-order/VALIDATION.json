@@ -1,0 +1,37 @@
+{
+ "schema": "validation-gate/v1",
+ "note": "Validator's manifest for genus4_prime_order_20261118 (prime-order genus-4 Jacobians, p = 16411 and 32771, arms x and x*). The band below is arm x* at p = 16411, the binding case of the claim 'x* below the ideal negation bound at all w at both primes' (x* at 32771: 0.0019, 0.0657, 0.6399; x at 32771: 0.0011, 0.0779, 0.7693; x at 16411: 0.0018, 0.1015, 0.9987 with upper bound 1.0023, not ranked by PROTOCOL D1). A genus-4 hyperelliptic result, not an ECDLP one. [pcc:unverified]",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "7015b18119e7479c349ea7e16dc7bbbf76b922c05eeda74a27cc8a295da565ab"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "559ac7428bcabb01641d7d4b6d0ea811548f61873b1b53ed8b25ecf1006ab9ba"
+ },
+ "rho_reference": {
+  "kind": "negation",
+  "protocol": "PROTOCOL.md (frozen 6da1e3c5b2) section 6: R_neg = sqrt(pi r / 4), the ideal negation-rho bound with nothing charged, the D1 reference; section 4's measured plain rho Q (5 runs, p = 16411) is a sanity check only (G3)",
+  "unit": "GAE per key, mean over the 60 keys (5 curves x 6 targets x 2 seeds) at p = 16411: one counted Jacobian group operation = 1; each listed unpriced native operation (rel_mul, rel_add, la_mul, la_add; F_p and mod-r) = w; the negation floor charges no native work at any w",
+  "binary_or_process": "IC arm x*: genus_ladder sha256 493ee2942473b8708a0b52f40ab10095c4da83ab0f0755ed3e5dbc02771b6921 (built from ca72267899; validator rebuild ac1dc60d... has identical code sections and replays the sampled rows identically). The negation floor is a closed form of each instance's r as emitted by that binary and certified by the validator's own arithmetic (r prime, #J = r, [r]G = 0); no other binary or process enters it",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 704935.3333333334,
+    "rho": 239230091.84442943
+   },
+   "0.1": {
+    "ic": 21588998.698333334,
+    "rho": 239230091.84442943
+   },
+   "1": {
+    "ic": 209545568.98333335,
+    "rho": 239230091.84442943
+   }
+  },
+  "order_holds_across_band": true
+ }
+}

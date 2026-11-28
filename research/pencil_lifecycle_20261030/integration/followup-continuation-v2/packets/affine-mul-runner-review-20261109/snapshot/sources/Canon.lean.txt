@@ -1,0 +1,58 @@
+import Post
+set_option autoImplicit false
+namespace MonicRemainder
+open Polynomial CoefficientTraversal ScaleTrim TraversalPolynomial RemainderPolynomial
+
+def Canon (p : UInt64) (xs : List UInt64) : Prop := ∀x∈xs,x.toNat<p.toNat
+def state (xs : List UInt64) : State xs.length := ⟨xs.toArray,by simp⟩
+
+theorem state_good (p : UInt64) (xs : List UInt64) (h : Canon p xs) : Good p (state xs) := by
+ intro i
+ have hm:=h xs[i.val] (List.getElem_mem i.isLt)
+ simpa [state,CoefficientTraversal.read] using hm
+
+theorem list_good {n : Nat} (p : UInt64) (xs : State n) (h : Good p xs) : Canon p xs.val.toList := by
+ intro x hx
+ obtain ⟨i,hi,rfl⟩ := List.mem_iff_getElem.mp hx
+ have hin : i<n := by simpa [xs.property] using hi
+ simpa [CoefficientTraversal.read] using h ⟨i,hin⟩
+
+theorem trim_good (p : UInt64) (fuel : Nat) (xs : List UInt64) (h : Canon p xs) :
+ Canon p (trimFuel fuel xs) := by
+ induction fuel generalizing xs with
+ | zero => exact h
+ | succ fuel ih =>
+   simp only [trimFuel]
+   split_ifs
+   · exact ih _ (by intro x hx; exact h x (List.mem_of_mem_dropLast hx))
+   · exact h
+
+theorem state_polynomial (p : UInt64) [Fact p.toNat.Prime] (xs : List UInt64) :
+ decodedPoly p (state xs)=wordsPoly p xs := by
+ rw [← wordsPoly_array]
+ simp [state]
+
+def selected (p : UInt64) (b r : List UInt64) (hr : r≠[]) (hl : b.length≤r.length) : List UInt64 :=
+ let j:=r.length-b.length
+ let c:=r.getLast hr
+ let out:=(RemainderWord.run p c (events j b (by dsimp [j]; omega)) (state r)).val.toList
+ trimFuel out.length out
+
+theorem selected_correct (p : UInt64) [Fact p.toNat.Prime] (b r : List UInt64)
+ (hr : r≠[]) (hl : b.length≤r.length) (hp : 0<p.toNat) (hb : p.toNat<2^31)
+ (hbs : Canon p b) (hrs : Canon p r) :
+ Canon p (selected p b r hr hl) ∧
+ wordsPoly p (selected p b r hr hl)=wordsPoly p r-
+ C ((r.getLast hr).toNat : ZMod p.toNat)*X^(r.length-b.length)*wordsPoly p b := by
+ have hc:=hrs (r.getLast hr) (List.getLast_mem hr)
+ have hs:=state_good p r hrs
+ constructor
+ · unfold selected
+   apply trim_good
+   apply list_good
+   exact (RemainderWord.run_correct p _ _ _ hp hb hc hs
+    (events_good p _ b _ hbs)).1
+ · simpa only [selected,state_polynomial] using
+    trimmed_polynomial_step p (r.getLast hr) (r.length-b.length) b (by omega) (state r)
+     hp hb hc hs hbs
+end MonicRemainder

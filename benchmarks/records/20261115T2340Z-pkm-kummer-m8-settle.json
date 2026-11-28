@@ -1,0 +1,213 @@
+{
+  "branch": "r7-m8-scratch",
+  "closed_utc": "2026-11-18T05:19:21+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "../scripts/cap.py",
+        "12e9",
+        "7200",
+        "../r2/runs/L_p2013265921_m8_N12_s1k4_r0.I1.log",
+        "../r2/runs/L_p2013265921_m8_N12_s1k4_r0.I1.res.json",
+        "--",
+        "msolve",
+        "-t",
+        "3",
+        "-v",
+        "2",
+        "-g",
+        "2",
+        "-f",
+        "../systems/L_p2013265921_m8_N12_s1k4_r0.ms",
+        "-o",
+        "../r2/runs/L_p2013265921_m8_N12_s1k4_r0.I1.out"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-18T01:29:33+00:00",
+      "wall_s": 5062.707
+    },
+    {
+      "argv": [
+        "python3",
+        "../scripts/cap.py",
+        "12e9",
+        "7200",
+        "../r2/runs/L_p2013265921_m8_N12_s1k4_r0.I1m5000.log",
+        "../r2/runs/L_p2013265921_m8_N12_s1k4_r0.I1m5000.res.json",
+        "--",
+        "msolve",
+        "-t",
+        "3",
+        "-m",
+        "5000",
+        "-v",
+        "2",
+        "-g",
+        "2",
+        "-f",
+        "../systems/L_p2013265921_m8_N12_s1k4_r0.ms",
+        "-o",
+        "../r2/runs/L_p2013265921_m8_N12_s1k4_r0.I1m5000.out"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-18T03:52:39+00:00",
+      "wall_s": 2498.785
+    },
+    {
+      "argv": [
+        "python3",
+        "../scripts/cap.py",
+        "12e9",
+        "7200",
+        "../r2/runs/L_p2013265921_m8_N12_s1k4_r1.I1m5000.log",
+        "../r2/runs/L_p2013265921_m8_N12_s1k4_r1.I1m5000.res.json",
+        "--",
+        "msolve",
+        "-t",
+        "3",
+        "-m",
+        "5000",
+        "-v",
+        "2",
+        "-g",
+        "2",
+        "-f",
+        "../systems/L_p2013265921_m8_N12_s1k4_r1.ms",
+        "-o",
+        "../r2/runs/L_p2013265921_m8_N12_s1k4_r1.I1m5000.out"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-18T04:34:50+00:00",
+      "wall_s": 1982.466
+    }
+  ],
+  "commit": "5524b5137d1e389c4973e3f2220cfc139215ca9d",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T23:40:29+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T2340Z-pkm-kummer-m8-settle",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "d_msolve_m8_n12_r0_lowmem",
+      "note": "msolve_-m5000_unit_GB [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 8.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "d_msolve_m8_n12_r1_lowmem",
+      "note": "msolve_-m5000_unit_GB [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 8.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "delta7_m8_n12",
+      "note": "rank_deficit_V7_FULL_check_r0_r1 [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 88129.0
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": null,
+      "name": "sigma_hat_m8_reading_a",
+      "note": "OLS_slope_D_on_N_N8-12_vs_alpha1_0.1561 [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.2
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "wall_m8_n12_r0_lowmem",
+      "note": "msolve_-m5000 [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 2498.75
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "wall_m8_n12_r1_lowmem",
+      "note": "msolve_-m5000 [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 1982.44
+    }
+  ],
+  "problem": "research:pkm-kummer-chain-m8",
+  "raw": [
+    {
+      "bytes": 9015,
+      "path": "/tmp/claude-0/-home-user/ad79db08-cd5f-5158-81c2-aa769b65fafd/scratchpad/r7/m8/r2/runs/L_p2013265921_m8_N12_s1k4_r0.I1m5000.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/29/2936dac6e918d9bbbc495429adf577ac60fb3567b9213a44157b78f7cf57601c",
+      "sha256": "2936dac6e918d9bbbc495429adf577ac60fb3567b9213a44157b78f7cf57601c",
+      "uploaded": false
+    },
+    {
+      "bytes": 9015,
+      "path": "/tmp/claude-0/-home-user/ad79db08-cd5f-5158-81c2-aa769b65fafd/scratchpad/r7/m8/r2/runs/L_p2013265921_m8_N12_s1k4_r1.I1m5000.log",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e3d205738f116ab917cb5e02f63059461ba095a852c559be0b58651115b5855a",
+      "sha256": "e3d205738f116ab917cb5e02f63059461ba095a852c559be0b58651115b5855a",
+      "uploaded": false
+    },
+    {
+      "bytes": 23377,
+      "path": "/tmp/claude-0/-home-user/ad79db08-cd5f-5158-81c2-aa769b65fafd/scratchpad/r7/m8/r2/i4/results.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/30/3030f62d6a9f472e159dcfdc58fb7a2393cff48a9203d2b828f0bf5d9c32ab33",
+      "sha256": "3030f62d6a9f472e159dcfdc58fb7a2393cff48a9203d2b828f0bf5d9c32ab33",
+      "uploaded": false
+    }
+  ],
+  "repo": "repo",
+  "reports": {
+    "pdf": "research/pkm_m8_settle_20261115/D_PC_vs_N.pdf",
+    "png": [],
+    "svg": [
+      "research/pkm_m8_settle_20261115/D_PC_vs_N.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "pkm-kummer-m8-settle",
+  "status": "measured",
+  "summary": "PKM m=8 N=12: msolve -m 5000 D=8 both draws; delta_7=88129 certified; reading A/B KILL(8); m=9 B KILL; m=10 N=12 blocked by memory; item INCONCLUSIVE [pcc:unverified]",
+  "validation": null
+}

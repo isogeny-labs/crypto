@@ -1,0 +1,45 @@
+Workstream 7 native validation receipt
+Date: 2026-11-19 UTC
+Scope: development correctness and fail-closed behavior only
+Timing observations: 0
+Frontier promotions: 0
+
+Command:
+  cargo fmt --manifest-path research/ghs_frontier_3_7_20261119/ws7_validation_publish/Cargo.toml -- --check
+Outcome: exit 0
+
+Command:
+  jq empty research/ghs_frontier_3_7_20261119/ws7_validation_publish/manifest.schema.json research/ghs_frontier_3_7_20261119/ws7_validation_publish/fixtures/current-blocked.json
+Outcome: exit 0
+
+Command:
+  cargo clippy --locked --manifest-path research/ghs_frontier_3_7_20261119/ws7_validation_publish/Cargo.toml -- -D warnings
+Outcome: exit 0; zero warnings
+
+Command:
+  cargo test --locked --manifest-path research/ghs_frontier_3_7_20261119/ws7_validation_publish/Cargo.toml
+Outcome: exit 0; 2 passed, 0 failed
+Tests:
+  tests::unknown_fields_are_rejected
+  tests::corruption_matrix_is_fail_closed
+
+Command:
+  cargo run --quiet --manifest-path research/ghs_frontier_3_7_20261119/ws7_validation_publish/Cargo.toml -- self-test
+Outcome: exit 0
+Output:
+  publication gate self-test PASS
+  synthetic_complete_bundles_accepted=1
+  corruptions_rejected=35
+  timing_observations=0 frontier_promotions=0
+
+Command:
+  cargo run --quiet --manifest-path research/ghs_frontier_3_7_20261119/ws7_validation_publish/Cargo.toml -- check research/ghs_frontier_3_7_20261119/ws7_validation_publish/fixtures/current-blocked.json
+Outcome: exit 3 as required; ready_for_publication=false; blocker_count=76
+
+Command:
+  cargo run --quiet --manifest-path research/ghs_frontier_3_7_20261119/ws7_validation_publish/Cargo.toml -- authorize research/ghs_frontier_3_7_20261119/ws7_validation_publish/fixtures/current-blocked.json <fresh-temp>/authorization.json
+Outcome: exit 3 as required; authorization.json was not created
+
+Cleanup:
+  cargo clean --manifest-path research/ghs_frontier_3_7_20261119/ws7_validation_publish/Cargo.toml
+Outcome: generated target tree absent; Cargo.lock retained

@@ -1,0 +1,46 @@
+{
+    "SpotInstanceRequests": [
+        {
+            "CreateTime": "2026-10-19T12:42:25+00:00",
+            "InstanceId": "i-0b627b6b12ddea204",
+            "LaunchSpecification": {
+                "ImageId": "ami-0803a33fd43db1fbf",
+                "InstanceType": "c7i.2xlarge",
+                "KeyName": "n83-cache-retry-20261019-8cde893",
+                "NetworkInterfaces": [
+                    {
+                        "DeleteOnTermination": true,
+                        "DeviceIndex": 0,
+                        "SubnetId": "subnet-0ec88345806128652"
+                    }
+                ],
+                "Placement": {
+                    "AvailabilityZone": "us-west-2d",
+                    "Tenancy": "default"
+                },
+                "SecurityGroups": [
+                    {
+                        "GroupId": "sg-0385a48ea263f2070",
+                        "GroupName": "n83-cache-retry-20261019-8cde893"
+                    }
+                ],
+                "Monitoring": {
+                    "Enabled": false
+                }
+            },
+            "LaunchedAvailabilityZone": "us-west-2d",
+            "ProductDescription": "Linux/UNIX",
+            "SpotInstanceRequestId": "sir-hnbqq15g",
+            "SpotPrice": "0.357000",
+            "State": "cancelled",
+            "Status": {
+                "Code": "instance-terminated-no-capacity",
+                "Message": "Your Spot instance was terminated because there is no Spot capacity available that matches your request.",
+                "UpdateTime": "2026-10-19T13:08:25+00:00"
+            },
+            "Tags": [],
+            "Type": "one-time",
+            "InstanceInterruptionBehavior": "terminate"
+        }
+    ]
+}

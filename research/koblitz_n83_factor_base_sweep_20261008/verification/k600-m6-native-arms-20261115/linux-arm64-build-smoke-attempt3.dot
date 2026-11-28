@@ -1,0 +1,11 @@
+digraph Attempt3 {
+  rankdir=LR;
+  graph [fontname="Helvetica", bgcolor="white", pad="0.2"];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fillcolor="#eaf3ff", color="#2b4d74"];
+  edge [color="#466784"];
+  protocol [label="Frozen attempt 3\nsource 687f7d3f\nwarm target, 12 GiB"];
+  library [label="crypto library compiled\n>8 GiB sampled\nno container OOM"];
+  sparse [label="worker example blocked\n3 tracked JSON inputs\nomitted by sparse checkout", fillcolor="#fff0d6", color="#9d6420"];
+  next [label="Materialize exact inputs\nfreeze separate retry\nrestore Docker 7,424 MiB", fillcolor="#eaf8e7", color="#477548"];
+  protocol -> library -> sparse -> next;
+}

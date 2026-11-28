@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T01:30:29Z",
+ "id": "PCC-20261119-77d40e",
+ "kind": "theorem",
+ "producer": {
+  "commit": "6dc02617fe1c1e6295496d5338542a0e8a5dcb0f",
+  "model": "Codex",
+  "session": "dense-cubic-bound-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "6931d60ad2e50edc9f358c47fcebe1e11f2c6c372e9db8e304d6007927f235d8",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.denseCubicRowBoundAtFixedArity"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact natural exponent arithmetic only; implementation, ring-operation counts and bit costs of dense elimination remain external.",
+ "statement": "If X^m is at most p and a dense relation dimension is at most 3X, its cubic natural-power cost satisfies rows^(3m) at most 3^(3m) p^3."
+}

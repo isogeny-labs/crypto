@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T06:54:17Z",
+ "id": "PCC-20261123-5e3cc7",
+ "kind": "statement",
+ "producer": {
+  "commit": "71f1217dd2b412f4b2e0c6b8e140d704324054d6",
+  "model": "",
+  "session": "chained-transfers-resume-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_primefield_cost_20261117/restart-custody-20261123/OBSERVED_RESTART_CUSTODY_GAP.json",
+    "sha256": "e3d4c6068ffec0168797af4807efd07b4ccc071ddcc819e787d9f1160ed2e4ed"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_primefield_cost_20261117/restart-custody-20261123/CANONICAL_MAIN_INTAKE.json",
+    "sha256": "a8e76524778aed1dfe271aabaf8a5ca3c052f842ec231be2a2aeaec7442c6a59"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "PR4990 restart custody; producer authored and unsigned; inspect recorded paths and canonical metadata only.",
+ "statement": "On 2026-11-23 the previously recorded owned cost16B raw-output and private archive paths are absent after workspace restart. Immutable checkpoint 7f9d552c retains the source, aggregate records, guards and inventory; those historical records were not changed and no scientific execution was repeated. Canonical main816 intake reports ledger verification exit0 while preserving151 rejected legacy missing-type payload diagnostics. This is a bounded path and metadata observation, not global irrecoverability, execution verification or an arithmetic result."
+}

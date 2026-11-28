@@ -1,0 +1,23 @@
+{
+  "schema": "xedni-fixed-curve-target-accounting-protocol-v1",
+  "source_height_summary_sha256": "af2e1588fe7fa242b91726c0a63b7ce6b333862e4eb84d46ed779af643ae6f9f",
+  "source_endpoint_result_sha256": "b03252d89ad8c6551ad87e843394a4bfad3520659a6e215f8eda1e96261948e5",
+  "rational_curve_a_invariants": ["0", "-47", "0", "751", "-3997"],
+  "rational_point_Q": ["17", "10"],
+  "reduced_curve_a_invariants": [0, 0, 0, -1, -2],
+  "reduced_prime": 47,
+  "subgroup_order": 43,
+  "target_seed": "xedni-fixed-curve-single-public-target-20261121-v1",
+  "target_fixture_scalar_law": "1 + (first 8 SHA256 digest bytes interpreted big-endian mod 42); fixture constructed outside both arm intervals",
+  "rational_multiple_prefix": 14,
+  "relation_coefficients": [2, 6],
+  "factor_base": "21 sign-folded nonidentity points obtained from exact rational relation endpoints; 42 actual subgroup points before sign folding",
+  "relation_linear_algebra": "28 coefficient-two/six rows over F43 plus one anchor row assigning log_Q(Q)=1; Sage dense Gaussian solve; build and solve charged to target-independent setup",
+  "target_online_interval": "start before fold-and-lookup on supplied public point; stop after independent scalar replay; record query and replay exclusive phases",
+  "rho_online_interval": "start before first target-dependent Floyd-walk state; stop after scalar replay; same public point and same local process",
+  "repetitions": 3,
+  "arm_order": ["table,rho", "rho,table", "table,rho"],
+  "setup_policy": "rebuild rational relation table and matrix from empty cache for each repetition; record exclusive curve setup, relation generation, matrix build, final LA, and table build durations",
+  "timing_tier": "ordinary local correctness and component diagnostic only; no Tier 0 or Tier 1 isolation claim",
+  "status_law": "retain every arm and setup row, including failure, timeout, and first-use cost; no speedup promotion from ordinary-host timing"
+}

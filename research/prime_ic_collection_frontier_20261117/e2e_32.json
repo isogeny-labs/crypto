@@ -1,0 +1,50 @@
+{
+  "host": {
+    "arch": "x86_64",
+    "os": "linux",
+    "threads": 4
+  },
+  "results": [
+    {
+      "B": 1920,
+      "bits": 32,
+      "collect_speedup": 88.98166733271535,
+      "curve": "a3-fast-32bit-p256class",
+      "n": 4294959973,
+      "needed": 1936,
+      "p": 4294967291,
+      "pair_table_entries": 3686400,
+      "rho_wall_s_1thread": 0.012157808,
+      "sweep_collect_s": 68.57099393,
+      "sweep_la_s": 0.050268437,
+      "sweep_rows": [
+        0,
+        1936,
+        0
+      ],
+      "sweep_targets": 1113281,
+      "table_build_s": 0.241388961,
+      "table_collect_s": 0.770619342,
+      "table_la_s": 0.053078389,
+      "table_rows": [
+        0,
+        1936,
+        0
+      ],
+      "table_targets": 1113281,
+      "total_speedup": 64.42786571499103
+    },
+    {
+      "B": 1920,
+      "batched_total_s": 0.403030005,
+      "batched_vs_sweep": 177.2344860601632,
+      "bits": 32,
+      "rho_wall_s_1thread": 0.012157808,
+      "section": "e2e",
+      "sweep_total_s": 71.430815803,
+      "table_total_s": 0.90039256,
+      "table_vs_sweep": 79.33296983595689
+    }
+  ],
+  "seed": 20261117
+}

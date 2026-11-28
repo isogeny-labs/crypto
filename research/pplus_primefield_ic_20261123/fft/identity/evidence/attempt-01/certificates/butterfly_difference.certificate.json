@@ -1,0 +1,97 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1hc0b9bda3040f6fb4",
+  "statement": {
+    "name": "Line FFT: difference of butterfly outputs",
+    "source": "crypto PR #5049; fft/DERIVATION.md; identity/PROTOCOL.md. Elementary butterfly algebra and (Z^2+1)^2-2Z^2=Z^4+1. Certificate scope is only polynomial evaluations over F_(2^61-1).",
+    "variables": [
+      "E",
+      "O",
+      "X"
+    ],
+    "degree_bound": 2,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "var",
+              "args": "E"
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "X"
+                },
+                {
+                  "op": "var",
+                  "args": "O"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "add",
+            "args": [
+              {
+                "op": "var",
+                "args": "E"
+              },
+              {
+                "op": "neg",
+                "args": {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "X"
+                    },
+                    {
+                      "op": "var",
+                      "args": "O"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "const",
+          "args": 2
+        },
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "var",
+              "args": "X"
+            },
+            {
+              "op": "var",
+              "args": "O"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261123,
+  "value_digest": "7c3cebee4b8b0bc268698bdad0eacadfe3de079ff0b9e1460f5842e6e68a846b",
+  "independence": "Same team and production implementation; separate issuer and checker processes; unsigned; deterministic finite evaluations only; no formal proof, independent-verifier, or PCC claim.",
+  "proof": null
+}

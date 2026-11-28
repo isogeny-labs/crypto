@@ -1,0 +1,80 @@
+{
+  "schema": "experiment.export/v1",
+  "experiment_id": "KOBLITZ-R62",
+  "claim_class": "exact_computation",
+  "protocols": [
+    {
+      "attempt": "check62-01",
+      "path": "runs/check62-01/protocol.json",
+      "sha256": "036b19783a8eda06d0096393445e0819a927c30616e7128f0cf06764791ce5ab",
+      "frozen_revision": "c9c71d693559cf28952f9f8d32c606977aece938"
+    },
+    {
+      "attempt": "direct62-01",
+      "path": "runs/direct62-01/protocol.json",
+      "sha256": "036b19783a8eda06d0096393445e0819a927c30616e7128f0cf06764791ce5ab",
+      "frozen_revision": "c9c71d693559cf28952f9f8d32c606977aece938"
+    },
+    {
+      "attempt": "kernel62-01",
+      "path": "runs/kernel62-01/protocol.json",
+      "sha256": "e22028bb09d1d97da60e9721f3b44e2e37e1e0edc1ccdbaad4a9ca34d1cfd545",
+      "frozen_revision": "eda003df5fe3877b791287d15c0eb040b39e1879"
+    },
+    {
+      "attempt": "matrix62-01",
+      "path": "runs/matrix62-01/protocol.json",
+      "sha256": "5385ab208e0347cfac111eb15e0a9e217db96aef0ea37038a3676aca369e18c5",
+      "frozen_revision": "f7472da1ca6be8826a89560600963d3284f63cf4"
+    },
+    {
+      "attempt": "rustcheck62-01",
+      "path": "runs/rustcheck62-01/protocol.json",
+      "sha256": "f20493c98873bae431175bae7ff3ca8089e79d0c4acfaed85b83deb693218860",
+      "frozen_revision": "ba01b7a64084a9cfe0870664aee738baed8f44c7"
+    },
+    {
+      "attempt": "split62-01",
+      "path": "runs/split62-01/protocol.json",
+      "sha256": "22cef602b1728df00b5edb8ba5f3b16d053e28566eb928901fbe781a7db24e7f",
+      "frozen_revision": "603dd7ed7ced9239d6ceac29b33e76c02411a31e"
+    },
+    {
+      "attempt": "split62-02",
+      "path": "runs/split62-02/protocol.json",
+      "sha256": "3275bae2de63e598aba03ded9ec820a99417c078752f94ce33dd64d4e8103b42",
+      "frozen_revision": "9795e5e479ee388235f481ce9d893a9a8071dbd2"
+    },
+    {
+      "attempt": "square-lean62-01",
+      "path": "runs/square-lean62-01/LEAN-PROTOCOL.md",
+      "sha256": "21eccad148b3dd3ae9ebff842861d4f86496385414b856b0c09d3a68ecf3ad56",
+      "frozen_revision": "9795e5e479ee388235f481ce9d893a9a8071dbd2"
+    },
+    {
+      "attempt": "square-lean62-02",
+      "path": "runs/square-lean62-02/LEAN-PROTOCOL.md",
+      "sha256": "f1c560992f2724fd4f413f33295ce8506fb60d6a9b7756d69c27a567023da325",
+      "frozen_revision": "c9c71d693559cf28952f9f8d32c606977aece938"
+    },
+    {
+      "attempt": "square-lean62-03",
+      "path": "runs/square-lean62-03/LEAN-PROTOCOL.md",
+      "sha256": "c6b39aff16ba294099cfc4e880c0e4679286309777d457d313af6b5b4a7e2747",
+      "frozen_revision": "ba01b7a64084a9cfe0870664aee738baed8f44c7"
+    }
+  ],
+  "raw_archive": "runs.tar.xz; content address in .artifacts.json after custody publication",
+  "results": {
+    "path": "results.json",
+    "sha256": "73b4e05ccf5731e115746aad14a26d167a3b82fd4b1b54152082cb0224ceff0c"
+  },
+  "flow": {
+    "accepted": 7,
+    "rejected": 3,
+    "interrupted": 0
+  },
+  "canonical_schema_validation": "unavailable in selected Git index and disk; manual source-byte and exact contract checks only",
+  "protocol_metadata_disclosure": "v4 cache syntax repair before fresh435; v5 independent replay/direct formula;v6 full F2 kernels;v7 independent Rust replay before affected data",
+  "notes": "Native exact certificates and twelve abstract Lean claims have distinct scope; proper-source/RR/normalization premises retained. Global holomorphic forms, Cartier matrix and order11 action remain construction tasks. Changed matrix/root controls are checked; no fuzzing claim. Direct formula shares rational scalar parity helper but does not read the squared-basis operator."
+}

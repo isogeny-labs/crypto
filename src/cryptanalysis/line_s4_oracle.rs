@@ -187,6 +187,7 @@ impl DecompositionOracle<ExtCurve<Fp3>> for LineS4Oracle {
             solving_degree: Some(10),
             timed_out: false,
             extra: Default::default(),
+            ..Default::default()
         };
         let exceeded = triples.is_none();
         let work = cost.ops;

@@ -1,0 +1,7 @@
+# Discriminant-screened graph IC49 source checkpoint
+
+Goal active. Run48hit262144quartic-history cap before rank/descent:417independent rows/508target, no scalar, original qualifier1. Separate component replay0checks94685sources/all262144quartics/candidate/RNG/cohort flow. Original failure and report preserved. All owned pods through48deleted; no49allocation/call. [pcc:unverified]
+
+New typed scalar screen uses counted Euclidean resultants; independent7×7Sylvester determinant controls16906small quartics and all262144retained tails.174615would skip only zero-draw old failures; all86093previously admitted factorizations retained. New complete screened entrypoint keeps old bounded splitter/principal/graph/sparse/affine safeguards; original unscreened API/wire remains.37worker/149qualifier controls, optimized builds/strictClippy and four-arm transport pass. PCC3c2fcf/06f517UNVERIFIED. [pcc:unverified]
+
+Amendment44/discriminant-pair-plan.json register originalIC/table/raised-cap unscreened pair/screened pair, same exposed p1009/389public target. Both pairs524288slow histories, screen1000000early refusals. Publish/hash-freeze code/native/report/protocol before allocation.4CPU8GiB≤0.40USDh, absolute7200seconds, live detached guardian and≥6400seconds remain before sole dispatch; collect/hash/private-scan/delete before interpretation. Complete native/fresh/scaling/signed rho admission remains open. [pcc:unverified]

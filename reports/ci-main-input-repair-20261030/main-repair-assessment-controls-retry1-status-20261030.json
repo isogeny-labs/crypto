@@ -1,0 +1,37 @@
+[
+  {
+    "command": [
+      "node",
+      "--test",
+      "scripts/test_catalog_snapshot.mjs"
+    ],
+    "exit_code": 0,
+    "seconds": 0.13016436001635157,
+    "log": "/workspace/main-repair-assessment-controls-retry1-0-20261030.log",
+    "sha256": "7220b550f9c6afda4e7c823f66de450df8fbf732363111f46050afa7fd9605a4"
+  },
+  {
+    "command": [
+      "python",
+      "-m",
+      "jsonschema",
+      "-i",
+      "docs/curves/cover-transfer-assessments.json",
+      "docs/curves/cover-transfer-assessment.schema.json"
+    ],
+    "exit_code": 0,
+    "seconds": 2.6991709019930568,
+    "log": "/workspace/main-repair-assessment-controls-retry1-1-20261030.log",
+    "sha256": "179d39fa449c3515ce529e6e6b2506d60e639474fd79ea90a8a11518d99885d2"
+  },
+  {
+    "command": [
+      "node",
+      "research/cover_transfer_assessment_20261013/verify_assessment.mjs"
+    ],
+    "exit_code": 1,
+    "seconds": 3.4190532219945453,
+    "log": "/workspace/main-repair-assessment-controls-retry1-2-20261030.log",
+    "sha256": "23eee593968abbd4635affc2e28f3ae0118f26816f96b94c3924d2a522843290"
+  }
+]

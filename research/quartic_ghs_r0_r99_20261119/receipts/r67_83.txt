@@ -1,0 +1,65 @@
+R67-R83 deterministic invariant-screen receipt
+status: producer-side diagnostic [pcc:unverified]
+date: 2026-11-19 UTC
+working tree: codex/ghs-rho-parallel-20261118
+
+Purpose
+-------
+This is a correctness/accounting screen. It contains no elapsed-time sample,
+throughput sample, performance ratio, or frontier result.
+
+Source
+------
+path: research/quartic_ghs_r0_r99_20261119/prototypes/r67_83.rs
+sha256: c7dce5f043e78541e97af5f6f57d9f50cf266f6717af063d7dd9c480d4c285a2
+
+Compiler
+--------
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+host: x86_64-unknown-linux-gnu
+LLVM: 23.1.5
+
+Commands
+--------
+rustfmt research/quartic_ghs_r0_r99_20261119/prototypes/r67_83.rs
+rustfmt --check research/quartic_ghs_r0_r99_20261119/prototypes/r67_83.rs
+rustc --edition 2021 -C opt-level=2 research/quartic_ghs_r0_r99_20261119/prototypes/r67_83.rs -o /tmp/ghs-r67-r83-screen
+/tmp/ghs-r67-r83-screen
+
+Final exit status
+-----------------
+rustfmt: 0
+rustfmt --check: 0
+rustc: 0
+screen: 0
+
+Output
+------
+R67-R83 deterministic invariant screen PASS
+walker_indices_checked=6000
+masked_tail_cells_checked=330
+workers=6 shards=8 stop_delay_rounds=3
+collision_round=10 collision_key=136 collision_shard=0
+useful_steps=66 overshoot_steps=18 total_steps=84
+distinguished_points=11 table_operations=11 occupied_keys=8 sterile_collisions=0
+timing_observations=0 performance_claims=0
+
+Built binary
+------------
+sha256: 177ac838f9308897fca01d95a67917bb246ac5ab845645969d64dc6ddb3bba72
+
+Retained correction
+-------------------
+The first `rustfmt --check` returned exit 1 and printed two formatting diffs.
+It was followed by `rustfmt`, a clean `rustfmt --check`, a fresh build, and the
+output above. The formatting failure did not alter behavior or produce a
+measurement.
+
+Interpretation boundary
+-----------------------
+The screen checks a toy many-to-one state machine, not the elliptic-curve
+walk. It establishes only that this prototype's deterministic worker-index,
+masked-tail, shard-routing, replay, and useful/overshoot accounting assertions
+hold on the stated cells [pcc:unverified]. Integration with the GHS walk,
+collision-scalar recovery, threaded execution, isolation, and scaling remain
+open.

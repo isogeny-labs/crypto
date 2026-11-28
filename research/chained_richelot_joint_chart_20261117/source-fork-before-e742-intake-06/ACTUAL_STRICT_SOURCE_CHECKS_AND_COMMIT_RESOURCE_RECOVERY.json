@@ -1,0 +1,44 @@
+{
+  "time": "2026-11-17T05:34:18.142420+00:00",
+  "original_source_staged_equality_first_attempt": {
+    "exit": 1,
+    "two_ignored_Cargo_lock_files_not_staged": true,
+    "command_wrapper_failed_to_gate_commit": true,
+    "commit_attempt_interrupted_130_before_HEAD_changed": true
+  },
+  "correction": "git add --sparse -f exact two original Cargo.lock files; no compiler-input byte changed",
+  "strict_awaited_source_comparison_against_0bc": 0,
+  "strict_awaited_cached_whitespace_check": 0,
+  "lessons_verify": {
+    "entries": 465,
+    "errors": 0
+  },
+  "autonomy_verify": {
+    "entries": 200,
+    "errors": 0
+  },
+  "PR_body_lint_findings": 0,
+  "ordinary_commit_failure": "prefetching507 missing blobs from already-expanded index siblings, mainly433 unrelated workflows; even quiet/no-status/no-untracked form hit same unavailable blob8492",
+  "ordinary_attempts": [
+    {
+      "terminated_by_SIGINT": true,
+      "exit": 130
+    },
+    {
+      "terminated_by_SIGINT": true,
+      "exit": 130
+    },
+    {
+      "exit": 128,
+      "missing_oid": "8492a7755f131845eb1009389629bbb2c3a8537f"
+    },
+    {
+      "bounded_timeout_seconds": 12,
+      "exit": 124
+    }
+  ],
+  "active_git_hooks": [],
+  "git_hook_directory_contains_only_samples": true,
+  "next_commit_operation": "git commit-tree of the complete checked staged tree; compare-and-swap fast-forward update-ref on this unpublished local feature branch; normal push, regular PR and all CI/merge gates",
+  "no_published_ref_rewrite_or_gate_policy_change": true
+}

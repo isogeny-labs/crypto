@@ -1,0 +1,16 @@
+# Standalone crate for F3. Own empty [workspace] so it does not join any parent
+# workspace. Python-free decision instrument; src/ implemented by the executor
+# from SPEC.md sections 0-12. No external dependencies.
+[workspace]
+
+[package]
+name = "f3"
+version = "0.0.0"
+edition = "2021"
+
+[[bin]]
+name = "f3"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3

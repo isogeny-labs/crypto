@@ -1,0 +1,31 @@
+name: Prime31 run64 homogeneous S3 component gate
+on:
+  push:
+    branches:
+      - research/prime31-f4-admission-run51-20261121
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_run64_projective_s3.rs"
+      - "research/prime31_f4_admission_20261121/run64_independent_verify.py"
+      - ".github/workflows/prime31-run64-projective-s3.yml"
+  pull_request:
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_run64_projective_s3.rs"
+      - "research/prime31_f4_admission_20261121/run64_independent_verify.py"
+      - ".github/workflows/prime31-run64-projective-s3.yml"
+  workflow_dispatch:
+
+jobs:
+  original-rust-s3-component:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/prime31_ic_20261115/native
+      - name: Independent big-integer S3/projective verification
+        run: python3 research/prime31_f4_admission_20261121/run64_independent_verify.py
+      - name: Source-linked original Rust Prime31 S3 correctness and paired component cost
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo run --locked --release --example prime31_run64_projective_s3

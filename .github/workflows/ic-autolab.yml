@@ -44,7 +44,7 @@ jobs:
         if: runner.environment == 'github-hosted'
         run: |
           sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc \
-            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+            /usr/local/.ghcup /opt/hostedtoolcache/CodeQL /usr/local/share/powershell
           df -h /
       - uses: actions/checkout@v4
       - name: Pull store data this workflow reads (tools/artifacts)
@@ -66,7 +66,7 @@ jobs:
             "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
             export ARTIFACTS_AWS="$artifacts_cli_aws"
           fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench research/ic_candidate_tournament_20260915
+          python3 tools/artifacts/artifacts.py pull --jobs 16 research/ic_candidate_tournament_20260915 research/sat_factor_base_review_20260908/autolab
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -142,26 +142,6 @@ jobs:
             docs/ecbench
             docs/ic
             .artifacts
-      - name: Pull store data this workflow reads (tools/artifacts)
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench research/ic_candidate_tournament_20260915
       - uses: dtolnay/rust-toolchain@1.94.1
       - name: Refuse a repeated dispatch of this registered seed
         env:
@@ -193,11 +173,13 @@ jobs:
             --max-processes 1800 --timeout 60
       - name: Run the native tournament once
         run: |
+          set -o pipefail
           "$RUNNER_TEMP/runs/round-0026/evaluator/icprog" tournament run \
             --round "$RUNNER_TEMP/runs/round-0026" \
             | tee "$RUNNER_TEMP/ic-native-round-run.log"
       - name: Independently audit the frozen round
         run: |
+          set -o pipefail
           "$RUNNER_TEMP/runs/round-0026/evaluator/icprog" tournament verify \
             --round "$RUNNER_TEMP/runs/round-0026" \
             | tee "$RUNNER_TEMP/ic-native-round-audit.log"
@@ -237,26 +219,6 @@ jobs:
             /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
           df -h /
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench research/ic_candidate_tournament_20260915
       - uses: dtolnay/rust-toolchain@1.94.1
       - uses: Swatinem/rust-cache@v2
         with:
@@ -289,7 +251,7 @@ jobs:
           retention-days: 30
 
   linux-integration:
-    if: ${{ github.event_name != 'workflow_dispatch' || !inputs.run_native_tournament_pilot }}
+    if: ${{ (!github.event.pull_request.draft) && (github.event_name != 'workflow_dispatch' || !inputs.run_native_tournament_pilot) }}
     needs: [linux-integration-controls, linux-integration-release]
     # Valgrind 3.22.0 is the calibrated Ir unit (autolab.py checks it too).
     # ubuntu-latest is now Ubuntu 26.04, whose apt ships 3.26.0; 24.04 ships 3.22.0.
@@ -297,26 +259,6 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-      - name: Pull store data this workflow reads (tools/artifacts)
-        shell: bash
-        working-directory: ${{ github.workspace }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
-        run: |
-          if ! command -v aws >/dev/null; then
-            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
-            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
-            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
-            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
-              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
-              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
-            fi
-            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
-            export ARTIFACTS_AWS="$artifacts_cli_aws"
-          fi
-          python3 tools/artifacts/artifacts.py pull --jobs 16 docs/curves docs/ecbench research/ic_candidate_tournament_20260915
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

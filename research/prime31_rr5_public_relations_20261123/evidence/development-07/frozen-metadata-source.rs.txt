@@ -1,0 +1,689 @@
+//! Metadata-only export and unsigned PCC registration; no solver is invoked.
+//!
+//! Commands (arguments to `run` omit the executable name):
+//! `export ROOT STUDY_REL OUT_REL`
+//! `register ROOT OBS_REL PRODUCER_COMMIT UTC_TIMESTAMP`
+//!
+//! Export reads the complete frozen STUDY_REL/evidence tree, including failed
+//! builds, development attempts, original-library gates and submission preflight.
+//! It pins raw bytes, copies parsed RR5_* and COMPACT_SELECTOR_SETUP JSON objects,
+//! and extracts the identity certificates actually present in those objects.
+//! Snapshot hashes are historical metadata, not a check of today's source tree.
+//! No duration is converted into a performance result. observation.json is the
+//! last, exclusively created completion artifact; partial output is never erased.
+//!
+//! Registration follows the reviewed tools/pcc/pcc.py canonical UTF-8 JSON,
+//! claim digest and ledger-entry digest rules. It checks the complete current
+//! chain without regrading history, refuses a new-ID collision, exclusively
+//! creates a statement/data claim, and appends only an unsigned `claim` entry.
+//! Missing/sparse ledgers are errors, never a reason to initialize new history.
+//! Integer JSON numbers are canonicalized exactly; floating-point ledger values
+//! fail closed because Rust/Python float formatting is not generally identical.
+//! The inspected existing ledger uses only integer numbers. Observation payloads
+//! may contain numbers of any JSON form, retained with their raw marker text.
+//!
+//! File::try_lock is an advisory append guard on Unix. Other ledger writers must
+//! be quiescent or honor that lock. The raw prefix is checked again immediately
+//! before append and the whole expected byte sequence is checked afterward.
+//! An interrupted/failed write is retained and reported; this tool never repairs,
+//! truncates or retries a ledger. It issues no signature or verifier verdict.
+
+use crypto_lib::hash::sha256::sha256;
+use serde_json::{json, Value};
+use std::collections::{BTreeMap, BTreeSet};
+use std::fs::{self, File, OpenOptions};
+use std::io::{Read, Seek, SeekFrom, Write};
+use std::path::{Component, Path, PathBuf};
+
+type Result<T> = std::result::Result<T, String>;
+
+const OBSERVATION_SCHEMA: &str = "rr5.development-observation/v1";
+const PCC_SOURCE: &str = "tools/pcc/pcc.py";
+const PCC_SOURCE_SHA256: &str =
+    "00036f8b524bf070a5cf36e02b2599148d390bdf30562d81a1a073df7777da2a";
+const LEDGER: &str = "pcc/ledger.jsonl";
+const MAX_FILE_BYTES: u64 = 64 * 1024 * 1024;
+const MAX_TOTAL_BYTES: u64 = 256 * 1024 * 1024;
+const MAX_FILES: usize = 10_000;
+
+fn digest(bytes: &[u8]) -> String {
+    sha256(bytes).iter().map(|b| format!("{b:02x}")).collect()
+}
+
+fn hex(value: &str, length: usize) -> bool {
+    value.len() == length
+        && value.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+}
+
+fn field<'a>(value: &'a Value, key: &str) -> Result<&'a str> {
+    value
+        .get(key)
+        .and_then(Value::as_str)
+        .ok_or_else(|| format!("missing or non-string field {key:?}"))
+}
+
+fn relative(value: &str) -> Result<PathBuf> {
+    if value.is_empty()
+        || value.contains('\\')
+        || value.chars().any(|c| c.is_control() || c == '\u{2028}' || c == '\u{2029}')
+        || value.split('/').any(|part| part.is_empty() || part == "." || part == "..")
+    {
+        return Err(format!("unsafe or noncanonical repository path {value:?}"));
+    }
+    let path = PathBuf::from(value);
+    if path.components().any(|c| !matches!(c, Component::Normal(_))) {
+        return Err(format!("repository-relative path required: {value:?}"));
+    }
+    Ok(path)
+}
+
+fn root(value: &str) -> Result<PathBuf> {
+    let path = fs::canonicalize(value).map_err(|e| format!("root {value:?}: {e}"))?;
+    if !path.is_dir() {
+        return Err("ROOT must be an existing directory".into());
+    }
+    Ok(path)
+}
+
+fn existing(root: &Path, rel: &Path) -> Result<PathBuf> {
+    let mut current = root.to_path_buf();
+    for component in rel.components() {
+        if !matches!(component, Component::Normal(_)) {
+            return Err("noncanonical path component".into());
+        }
+        current.push(component);
+        let metadata = fs::symlink_metadata(&current)
+            .map_err(|e| format!("{}: {e}", current.display()))?;
+        if metadata.file_type().is_symlink() {
+            return Err(format!("symlink refused: {}", current.display()));
+        }
+    }
+    Ok(current)
+}
+
+fn ensure_directory(root: &Path, rel: &Path) -> Result<PathBuf> {
+    let mut current = root.to_path_buf();
+    for component in rel.components() {
+        if !matches!(component, Component::Normal(_)) {
+            return Err("noncanonical directory component".into());
+        }
+        current.push(component);
+        match fs::symlink_metadata(&current) {
+            Ok(m) if m.is_dir() && !m.file_type().is_symlink() => {}
+            Ok(_) => return Err(format!("ordinary directory required: {}", current.display())),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                fs::create_dir(&current).map_err(|e| format!("{}: {e}", current.display()))?;
+            }
+            Err(e) => return Err(format!("{}: {e}", current.display())),
+        }
+    }
+    Ok(current)
+}
+
+fn absent(path: &Path) -> Result<()> {
+    match fs::symlink_metadata(path) {
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(e) => Err(format!("{}: {e}", path.display())),
+        Ok(_) => Err(format!("refusing existing output/collision: {}", path.display())),
+    }
+}
+
+fn read(path: &Path) -> Result<Vec<u8>> {
+    let metadata = fs::symlink_metadata(path).map_err(|e| format!("{}: {e}", path.display()))?;
+    if !metadata.is_file() || metadata.file_type().is_symlink() {
+        return Err(format!("ordinary file required: {}", path.display()));
+    }
+    if metadata.len() > MAX_FILE_BYTES {
+        return Err(format!("file exceeds metadata export bound: {}", path.display()));
+    }
+    let file = File::open(path).map_err(|e| format!("{}: {e}", path.display()))?;
+    let mut bytes = Vec::new();
+    file.take(MAX_FILE_BYTES + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|e| format!("{}: {e}", path.display()))?;
+    if bytes.len() as u64 > MAX_FILE_BYTES {
+        return Err(format!("file grew beyond bound: {}", path.display()));
+    }
+    Ok(bytes)
+}
+
+fn text<'a>(bytes: &'a [u8], label: &str) -> Result<&'a str> {
+    std::str::from_utf8(bytes).map_err(|e| format!("{label}: non-UTF-8 metadata: {e}"))
+}
+
+fn relative_name(root: &Path, path: &Path) -> Result<String> {
+    let name = path
+        .strip_prefix(root)
+        .map_err(|_| "file escaped repository root")?
+        .to_str()
+        .ok_or("non-UTF-8 path")?
+        .to_owned();
+    relative(&name)?;
+    Ok(name)
+}
+
+fn collect_files(dir: &Path, excluded: &Path, depth: usize, files: &mut Vec<PathBuf>) -> Result<()> {
+    if dir == excluded {
+        return Ok(());
+    }
+    if depth > 32 {
+        return Err("evidence directory depth exceeds 32".into());
+    }
+    let mut children: Vec<_> = fs::read_dir(dir)
+        .map_err(|e| format!("{}: {e}", dir.display()))?
+        .map(|entry| entry.map(|e| e.path()))
+        .collect::<std::io::Result<_>>()
+        .map_err(|e| e.to_string())?;
+    children.sort();
+    for path in children {
+        if path == excluded {
+            continue;
+        }
+        let m = fs::symlink_metadata(&path).map_err(|e| e.to_string())?;
+        if m.file_type().is_symlink() {
+            return Err(format!("evidence symlink refused: {}", path.display()));
+        }
+        if m.is_dir() {
+            collect_files(&path, excluded, depth + 1, files)?;
+        } else if m.is_file() {
+            files.push(path);
+            if files.len() > MAX_FILES {
+                return Err("evidence file count exceeds 10000".into());
+            }
+        } else {
+            return Err(format!("non-file evidence refused: {}", path.display()));
+        }
+    }
+    Ok(())
+}
+
+fn pin(path: &str, bytes: &[u8]) -> Value {
+    json!({"path": path, "sha256": digest(bytes), "bytes": bytes.len()})
+}
+
+fn write_new(path: &Path, bytes: &[u8]) -> Result<()> {
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(path)
+        .map_err(|e| format!("exclusive creation of {}: {e}", path.display()))?;
+    file.write_all(bytes)
+        .and_then(|_| file.sync_all())
+        .map_err(|e| format!("{}: write failed; partial file retained: {e}", path.display()))?;
+    if read(path)? != bytes {
+        return Err(format!("{}: output readback mismatch; retained", path.display()));
+    }
+    Ok(())
+}
+
+fn json_file(value: &Value) -> Result<Vec<u8>> {
+    let mut bytes = serde_json::to_vec_pretty(value).map_err(|e| e.to_string())?;
+    bytes.push(b'\n');
+    Ok(bytes)
+}
+
+fn snapshot_manifest(contents: &str, label: &str) -> Result<Value> {
+    let mut entries = Vec::new();
+    for (line_number, line) in contents.lines().enumerate() {
+        if line.trim().is_empty() {
+            continue;
+        }
+        let hash = line.get(..64).ok_or_else(|| format!("{label}: short hash line {}", line_number + 1))?;
+        let separator = line.get(64..66).unwrap_or("");
+        let name = line.get(66..).unwrap_or("");
+        if !hex(hash, 64) || !matches!(separator, "  " | " *") || name.is_empty() {
+            return Err(format!("{label}: unsupported sha256sum line {}", line_number + 1));
+        }
+        entries.push(json!({"recorded_path": name, "recorded_sha256": hash}));
+    }
+    Ok(json!({
+        "format": "sha256sum",
+        "entries": entries,
+        "current_source_rehashed": false,
+        "scope": "Historical snapshot text, including original absolute paths; no referenced file is opened here."
+    }))
+}
+
+fn marker(line: &str) -> Result<Option<(String, String, Value, String)>> {
+    let start = [line.find("RR5_"), line.find("COMPACT_SELECTOR_SETUP")]
+        .into_iter()
+        .flatten()
+        .min();
+    let Some(start) = start else { return Ok(None) };
+    let prefix = line[..start].trim();
+    if !prefix.is_empty() && !(prefix.starts_with("test ") && prefix.ends_with("...")) {
+        return Ok(None);
+    }
+    let tail = &line[start..];
+    let end = tail.find(char::is_whitespace).unwrap_or(tail.len());
+    let name = &tail[..end];
+    if !(name.starts_with("RR5_") || name == "COMPACT_SELECTOR_SETUP")
+        || !name.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_')
+    {
+        return Ok(None);
+    }
+    let raw = tail[end..].trim();
+    if !raw.starts_with('{') {
+        // Non-JSON diagnostic lines remain in the separately pinned raw log.
+        return Ok(None);
+    }
+    let value: Value = serde_json::from_str(raw)
+        .map_err(|e| format!("malformed JSON marker {name}: {e}"))?;
+    if !value.is_object() {
+        return Err(format!("marker {name} must hold a JSON object"));
+    }
+    Ok(Some((name.into(), raw.into(), value, prefix.into())))
+}
+
+fn freeze_check(root: &Path, evidence: &Path, excluded: &Path, files: &[PathBuf], pins: &[Value]) -> Result<()> {
+    let mut now = Vec::new();
+    collect_files(evidence, excluded, 0, &mut now)?;
+    now.sort();
+    if now != files {
+        return Err("evidence file set changed during export; freeze inputs and use a new output".into());
+    }
+    for p in pins {
+        verify_pin(root, p)?;
+    }
+    Ok(())
+}
+
+fn export(root_arg: &str, study_arg: &str, out_arg: &str) -> Result<Value> {
+    let root = root(root_arg)?;
+    let study = relative(study_arg)?;
+    let out_rel = relative(out_arg)?;
+    let evidence_rel = study.join("evidence");
+    let evidence = existing(&root, &evidence_rel)?;
+    if !evidence.is_dir() {
+        return Err("study evidence directory is missing".into());
+    }
+    let excluded = root.join(&out_rel);
+    if evidence.starts_with(&excluded) {
+        return Err("OUT_REL cannot be the evidence directory or its ancestor".into());
+    }
+    // An output subtree under evidence is explicitly excluded from the input set.
+    let mut files = Vec::new();
+    collect_files(&evidence, &excluded, 0, &mut files)?;
+    files.sort();
+    if files.is_empty() {
+        return Err("no frozen evidence files found".into());
+    }
+    absent(&excluded.join("observation.json"))?;
+    let mut total = 0u64;
+    let mut raw_files = Vec::new();
+    let mut records = Vec::new();
+    let mut snapshots = Vec::new();
+    let mut groups: BTreeMap<String, BTreeMap<String, Value>> = BTreeMap::new();
+    let mut certificates: BTreeMap<String, (Value, Vec<Value>)> = BTreeMap::new();
+    for path in &files {
+        let name = relative_name(&root, path)?;
+        let bytes = read(path)?;
+        total = total.checked_add(bytes.len() as u64).ok_or("evidence byte count overflow")?;
+        if total > MAX_TOTAL_BYTES {
+            return Err("evidence exceeds 256 MiB metadata bound".into());
+        }
+        let raw_pin = pin(&name, &bytes);
+        let within = path.strip_prefix(&evidence).map_err(|e| e.to_string())?;
+        let group = if within.components().count() > 1 {
+            within.components().next().unwrap().as_os_str().to_str().ok_or("non-UTF-8 evidence group")?.to_owned()
+        } else {
+            "evidence_root".into()
+        };
+        let file_name = path.file_name().and_then(|x| x.to_str()).ok_or("non-UTF-8 evidence filename")?;
+        let commands = groups.entry(group).or_default();
+        if file_name == "exit" || file_name.ends_with(".exit") {
+            let raw = text(&bytes, &name)?.trim();
+            let code: i32 = raw.parse().map_err(|_| format!("{name}: malformed exit status"))?;
+            let command = file_name.strip_suffix(".exit").unwrap_or("gate");
+            if commands.insert(command.into(), json!({
+                "state": "recorded", "exit_code": code, "raw_file": raw_pin
+            })).is_some() {
+                return Err(format!("ambiguous duplicate exit status for {command} in {name}"));
+            }
+        }
+        if file_name.ends_with(".sha256") {
+            snapshots.push(json!({"raw_file": raw_pin, "metadata": snapshot_manifest(text(&bytes, &name)?, &name)?}));
+        } else if file_name.contains("source") || file_name.contains("toolchain") {
+            snapshots.push(json!({"raw_file": raw_pin, "metadata_text": text(&bytes, &name)?}));
+        }
+        if file_name == "stdout" || file_name.ends_with(".stdout") {
+            for (line_number, line) in text(&bytes, &name)?.lines().enumerate() {
+                if let Some((tag, raw_json, payload, stripped_prefix)) = marker(line)
+                    .map_err(|e| format!("{name}:{}: {e}", line_number + 1))?
+                {
+                    let origin = json!({"raw_path": name, "raw_sha256": raw_pin["sha256"], "line_1based": line_number + 1, "marker": tag});
+                    if let Some(certificate) = payload.get("certificate") {
+                        if certificate.get("schema").and_then(Value::as_str) == Some("identity.certificate/v1") {
+                            let id = field(certificate, "id")?;
+                            if !id.starts_with("IDC1h") || !hex(&id[5..], 16) {
+                                return Err(format!("{name}: unsafe identity certificate id {id:?}"));
+                            }
+                            match certificates.get_mut(id) {
+                                Some((prior, origins)) if &*prior == certificate => origins.push(origin.clone()),
+                                Some(_) => return Err(format!("different identity certificates share id {id}; no output chosen")),
+                                None => { certificates.insert(id.into(), (certificate.clone(), vec![origin.clone()])); }
+                            }
+                        }
+                    }
+                    records.push(json!({"origin": origin, "stripped_test_prefix": stripped_prefix, "raw_json": raw_json, "payload": payload}));
+                }
+            }
+        }
+        raw_files.push(raw_pin);
+    }
+    let attempts: Vec<_> = groups.into_iter().map(|(name, mut commands)| {
+        if name.starts_with("development-") {
+            commands.entry("build".into()).or_insert_with(|| json!({"state": "not_recorded"}));
+            commands.entry("test".into()).or_insert_with(|| json!({"state": "not_recorded"}));
+        }
+        json!({"group": name, "commands": commands})
+    }).collect();
+    freeze_check(&root, &evidence, &excluded, &files, &raw_files)?;
+    let out = ensure_directory(&root, &out_rel)?;
+    let mut identity_files = Vec::new();
+    let mut pending = Vec::new();
+    for (id, (certificate, origins)) in certificates {
+        let file_name = format!("identity-{id}.json");
+        let path = out.join(&file_name);
+        absent(&path)?;
+        let bytes = json_file(&certificate)?;
+        let name = relative_name(&root, &path)?;
+        let mut p = pin(&name, &bytes);
+        p["id"] = json!(id);
+        p["origins"] = json!(origins);
+        p["checker_reexecuted_by_export"] = json!(false);
+        identity_files.push(p);
+        pending.push((path, bytes));
+    }
+    absent(&out.join("observation.json"))?;
+    for (path, bytes) in &pending {
+        write_new(path, bytes)?;
+    }
+    freeze_check(&root, &evidence, &excluded, &files, &raw_files)?;
+    let observation = json!({
+        "schema": OBSERVATION_SCHEMA,
+        "study": study_arg,
+        "evidence_root": relative_name(&root, &evidence)?,
+        "excluded_output_subtree": if excluded.starts_with(&evidence) { Some(out_arg) } else { None },
+        "evidence_tier": "producer_local_development_observation",
+        "unsigned": true,
+        "independent_execution_claimed": false,
+        "complete_cost_comparison_claimed": false,
+        "timings_reinterpreted": false,
+        "pcc_standing": "unverified",
+        "raw_files": raw_files,
+        "attempts_and_gates": attempts,
+        "source_snapshot_metadata": snapshots,
+        "marker_objects": records,
+        "identity_certificates": identity_files,
+        "scope": "Exact raw-file pins and parsed stdout records only. Exit codes are recorded, including failures; missing exits are not inferred. No mathematical or performance verdict is issued."
+    });
+    let bytes = json_file(&observation)?;
+    let observation_path = out.join("observation.json");
+    write_new(&observation_path, &bytes)?;
+    Ok(json!({
+        "operation": "export", "observation": pin(&relative_name(&root, &observation_path)?, &bytes),
+        "raw_files": files.len(), "marker_objects": observation["marker_objects"].as_array().unwrap().len(),
+        "identity_certificates": observation["identity_certificates"].as_array().unwrap().len(),
+        "standing": "unverified", "verifier_executed": false
+    }))
+}
+
+fn quoted(value: &str, out: &mut String) {
+    out.push('"');
+    for c in value.chars() {
+        match c {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\u{0008}' => out.push_str("\\b"),
+            '\u{000c}' => out.push_str("\\f"),
+            '\n' => out.push_str("\\n"),
+            '\r' => out.push_str("\\r"),
+            '\t' => out.push_str("\\t"),
+            c if (c as u32) < 32 => out.push_str(&format!("\\u{:04x}", c as u32)),
+            c => out.push(c),
+        }
+    }
+    out.push('"');
+}
+
+fn canonical_into(value: &Value, out: &mut String) -> Result<()> {
+    match value {
+        Value::Null => out.push_str("null"),
+        Value::Bool(b) => out.push_str(if *b { "true" } else { "false" }),
+        Value::String(s) => quoted(s, out),
+        Value::Number(n) => {
+            let raw = n.to_string();
+            let digits = raw.strip_prefix('-').unwrap_or(&raw);
+            if digits.is_empty() || !digits.bytes().all(|c| c.is_ascii_digit()) {
+                return Err("PCC canonicalization refuses non-integer numbers; no Python-compatible float rule was assumed".into());
+            }
+            out.push_str(if raw == "-0" { "0" } else { &raw });
+        }
+        Value::Array(values) => {
+            out.push('[');
+            for (i, v) in values.iter().enumerate() {
+                if i != 0 { out.push(','); }
+                canonical_into(v, out)?;
+            }
+            out.push(']');
+        }
+        Value::Object(values) => {
+            out.push('{');
+            let mut fields: Vec<_> = values.iter().collect();
+            fields.sort_by(|a, b| a.0.cmp(b.0));
+            for (i, (key, v)) in fields.into_iter().enumerate() {
+                if i != 0 { out.push(','); }
+                quoted(key, out);
+                out.push(':');
+                canonical_into(v, out)?;
+            }
+            out.push('}');
+        }
+    }
+    Ok(())
+}
+
+fn canonical(value: &Value) -> Result<Vec<u8>> {
+    let mut out = String::new();
+    canonical_into(value, &mut out)?;
+    Ok(out.into_bytes())
+}
+
+fn object_digest_without(value: &Value, excluded: &str) -> Result<String> {
+    let mut object = value.as_object().ok_or("PCC digest requires an object")?.clone();
+    object.remove(excluded);
+    Ok(digest(&canonical(&Value::Object(object))?))
+}
+
+struct Chain {
+    count: usize,
+    last_hash: String,
+    mentioned_claims: BTreeSet<String>,
+}
+
+fn check_chain(raw: &[u8]) -> Result<Chain> {
+    let contents = text(raw, LEDGER)?;
+    if !raw.is_empty() && raw.last() != Some(&b'\n') {
+        return Err("ledger has no final LF; refusing to rewrite or concatenate its raw prefix".into());
+    }
+    // Python splitlines recognizes these separators too; refuse unusual raw
+    // separators rather than silently parsing a different set of JSON records.
+    if contents.chars().any(|c| matches!(c, '\r' | '\u{000b}' | '\u{000c}' | '\u{001c}' | '\u{001d}' | '\u{001e}' | '\u{0085}' | '\u{2028}' | '\u{2029}')) {
+        return Err("unsupported raw ledger line separator; history left unchanged".into());
+    }
+    let mut chain = Chain { count: 0, last_hash: "0".repeat(64), mentioned_claims: BTreeSet::new() };
+    for (line_number, line) in contents.lines().enumerate() {
+        if line.trim().is_empty() { continue; }
+        let entry: Value = serde_json::from_str(line)
+            .map_err(|e| format!("ledger line {}: {e}", line_number + 1))?;
+        if !entry.is_object() || field(&entry, "schema")? != "pcc.ledger-entry/v1" {
+            return Err(format!("ledger[{}]: schema mismatch", chain.count));
+        }
+        if entry.get("seq").and_then(Value::as_u64) != Some(chain.count as u64) {
+            return Err(format!("ledger[{}]: sequence mismatch", chain.count));
+        }
+        if field(&entry, "prev")? != chain.last_hash {
+            return Err(format!("ledger[{}]: previous-hash mismatch", chain.count));
+        }
+        let expected = object_digest_without(&entry, "hash")?;
+        if field(&entry, "hash")? != expected {
+            return Err(format!("ledger[{}]: content hash mismatch", chain.count));
+        }
+        if !matches!(field(&entry, "type")?, "genesis" | "claim" | "verdict" | "bypass" | "note") {
+            return Err(format!("ledger[{}]: unknown entry type", chain.count));
+        }
+        if let Some(id) = entry.get("body").and_then(|v| v.get("claim_id")).and_then(Value::as_str) {
+            // Historical duplicates are preserved, not retrospectively rejected.
+            chain.mentioned_claims.insert(id.into());
+        }
+        chain.last_hash = expected;
+        chain.count += 1;
+    }
+    if chain.count == 0 {
+        return Err("current ledger is empty; refusing implicit initialization".into());
+    }
+    Ok(chain)
+}
+
+fn timestamp(value: &str) -> Result<String> {
+    let b = value.as_bytes();
+    if b.len() != 20 || !value.is_ascii()
+        || b[4] != b'-' || b[7] != b'-' || b[10] != b'T'
+        || b[13] != b':' || b[16] != b':' || b[19] != b'Z'
+    {
+        return Err("UTC_TIMESTAMP must be YYYY-MM-DDTHH:MM:SSZ".into());
+    }
+    let number = |a: usize, z: usize| -> Result<u32> {
+        let part = &value[a..z];
+        if !part.bytes().all(|b| b.is_ascii_digit()) { return Err("invalid timestamp digit".into()); }
+        part.parse().map_err(|_| "invalid timestamp number".into())
+    };
+    let (year, month, day) = (number(0, 4)?, number(5, 7)?, number(8, 10)?);
+    let leap = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
+    let max_day = match month { 1 | 3 | 5 | 7 | 8 | 10 | 12 => 31, 4 | 6 | 9 | 11 => 30, 2 if leap => 29, 2 => 28, _ => 0 };
+    if year == 0 || day == 0 || day > max_day || number(11, 13)? > 23 || number(14, 16)? > 59 || number(17, 19)? > 59 {
+        return Err("invalid UTC calendar/time fields".into());
+    }
+    Ok(format!("{:04}{:02}{:02}", year, month, day))
+}
+
+fn verify_pin(root: &Path, value: &Value) -> Result<()> {
+    let name = field(value, "path")?;
+    let want = field(value, "sha256")?;
+    if !hex(want, 64) { return Err(format!("{name}: invalid SHA-256 pin")); }
+    let path = existing(root, &relative(name)?)?;
+    let bytes = read(&path)?;
+    if digest(&bytes) != want || value.get("bytes").and_then(Value::as_u64) != Some(bytes.len() as u64) {
+        return Err(format!("{name}: pinned raw bytes changed"));
+    }
+    Ok(())
+}
+
+fn read_handle(file: &mut File) -> Result<Vec<u8>> {
+    file.seek(SeekFrom::Start(0)).map_err(|e| e.to_string())?;
+    let mut bytes = Vec::new();
+    (&mut *file).take(MAX_FILE_BYTES + 1).read_to_end(&mut bytes).map_err(|e| e.to_string())?;
+    if bytes.len() as u64 > MAX_FILE_BYTES { return Err("ledger exceeds metadata bound".into()); }
+    Ok(bytes)
+}
+
+fn register(root_arg: &str, obs_arg: &str, producer_commit: &str, at: &str) -> Result<Value> {
+    let root = root(root_arg)?;
+    let obs_rel = relative(obs_arg)?;
+    if !hex(producer_commit, 40) { return Err("PRODUCER_COMMIT must be 40 lowercase hex digits".into()); }
+    let day = timestamp(at)?;
+    let pcc = read(&existing(&root, &relative(PCC_SOURCE)?)?)?;
+    if digest(&pcc) != PCC_SOURCE_SHA256 {
+        return Err("PCC source changed since review; no claim or ledger mutation performed".into());
+    }
+    let obs_path = existing(&root, &obs_rel)?;
+    let obs_bytes = read(&obs_path)?;
+    let observation: Value = serde_json::from_slice(&obs_bytes).map_err(|e| format!("observation JSON: {e}"))?;
+    if field(&observation, "schema")? != OBSERVATION_SCHEMA || observation.get("unsigned") != Some(&Value::Bool(true)) {
+        return Err("expected unsigned RR5 development observation".into());
+    }
+    for key in ["raw_files", "identity_certificates"] {
+        let pins = observation.get(key).and_then(Value::as_array).ok_or_else(|| format!("observation lacks {key}"))?;
+        if key == "raw_files" && pins.is_empty() { return Err("observation has no raw evidence pins".into()); }
+        for p in pins { verify_pin(&root, p)?; }
+    }
+    let artifact_hash = digest(&obs_bytes);
+    let id = format!("PCC-{day}-{}", &artifact_hash[..6]);
+    let ledger_path = existing(&root, &relative(LEDGER)?)
+        .map_err(|e| format!("actual current ledger must be materialized; no empty fallback: {e}"))?;
+    let mut ledger = OpenOptions::new().read(true).append(true).open(&ledger_path)
+        .map_err(|e| format!("open existing ledger: {e}"))?;
+    ledger.try_lock().map_err(|e| format!("exclusive ledger lock unavailable: {e}"))?;
+    let prefix = read_handle(&mut ledger)?;
+    let prefix_hash = digest(&prefix);
+    let chain = check_chain(&prefix)?;
+    if chain.mentioned_claims.contains(&id) {
+        return Err(format!("claim id {id} already occurs in ledger; no overwrite or retry"));
+    }
+    let claim_rel = relative(&format!("pcc/claims/{id}.json"))?;
+    let claim_path = root.join(&claim_rel);
+    absent(&claim_path)?;
+    let claim = json!({
+        "schema": "pcc.claim/v1", "id": id, "kind": "statement", "claim_type": "data",
+        "statement": "The pinned artifact records producer-local RR5 development stdout objects, raw-file hashes, source-snapshot metadata and stored process exit codes, including failed or incomplete attempts.",
+        "scope": "Unsigned observation of the pinned files only. No independent execution, formal proof, complete PRIME31 solve, or cold-cost advantage is asserted; no verifier verdict is issued by this registration.",
+        "proofs": [{"kind": "attestation", "subject_kind": "artifact", "subject": {"path": obs_arg, "sha256": artifact_hash}}],
+        "producer": {"commit": producer_commit, "session": "prime31-four-summand-native-evidence"},
+        "created_at": at
+    });
+    let claim_hash = object_digest_without(&claim, "standing")?;
+    let claim_name = claim_rel.to_str().ok_or("non-UTF-8 claim path")?;
+    let mut entry = json!({
+        "schema": "pcc.ledger-entry/v1", "seq": chain.count, "prev": chain.last_hash,
+        "type": "claim", "at": at,
+        "body": {"claim_id": id, "claim_sha256": claim_hash, "path": claim_name}
+    });
+    entry["hash"] = json!(object_digest_without(&entry, "hash")?);
+    let mut line = canonical(&entry)?;
+    line.push(b'\n');
+    let mut claim_bytes = canonical(&claim)?;
+    claim_bytes.push(b'\n');
+    // Preflight every input before creating the immutable claim.
+    if read(&obs_path)? != obs_bytes || digest(&read(&ledger_path)?) != prefix_hash || read_handle(&mut ledger)? != prefix {
+        return Err("observation or ledger prefix changed before claim creation".into());
+    }
+    ensure_directory(&root, &relative("pcc/claims")?)?;
+    write_new(&claim_path, &claim_bytes)?;
+    // This second comparison is intentionally after exclusive claim creation.
+    // Any error leaves that claim present and prevents automatic re-registration.
+    if read(&obs_path)? != obs_bytes || digest(&read(&ledger_path)?) != prefix_hash || read_handle(&mut ledger)? != prefix {
+        return Err(format!("prefix/observation changed; {claim_name} retained, ledger append not attempted"));
+    }
+    ledger.write_all(&line).and_then(|_| ledger.sync_all()).map_err(|e| {
+        format!("{claim_name} retained; ledger append outcome uncertain ({e}); inspect existing bytes, do not retry")
+    })?;
+    let mut expected = prefix;
+    expected.extend_from_slice(&line);
+    let readback = read(&ledger_path)?;
+    if readback != expected || read_handle(&mut ledger)? != expected {
+        return Err(format!("{claim_name} retained; ledger readback/prefix mismatch after append; no rollback or retry"));
+    }
+    check_chain(&readback)?;
+    if read(&claim_path)? != claim_bytes || read(&obs_path)? != obs_bytes {
+        return Err("post-registration artifact changed; registration retained for inspection".into());
+    }
+    Ok(json!({
+        "operation": "register", "claim_id": id, "claim_path": claim_name,
+        "claim_sha256": claim_hash, "observation_sha256": artifact_hash,
+        "ledger_prefix_sha256": prefix_hash, "ledger_seq": entry["seq"], "ledger_hash": entry["hash"],
+        "ledger_raw_prefix_preserved": true, "signature_written": false, "verdict_written": false,
+        "standing": "unverified", "verifier_executed": false,
+        "expected_verifier_coverage": "not_covered",
+        "coverage_basis": "Existing PCC rules classify an intact statement/unsigned-attestation claim as not_covered; this tool did not run the verifier."
+    }))
+}
+
+/// Called only by the explicitly selected metadata CLI command.
+pub fn run(args: &[String]) -> Result<Value> {
+    match args {
+        [command, root, study, out] if command == "export" => export(root, study, out),
+        [command, root, observation, commit, timestamp] if command == "register" => register(root, observation, commit, timestamp),
+        _ => Err("usage: export ROOT STUDY_REL OUT_REL | register ROOT OBS_REL PRODUCER_COMMIT UTC_TIMESTAMP".into()),
+    }
+}

@@ -1,0 +1,21 @@
+# Prime31 relation-family separation: preregistered audit protocol (2026-11-19)
+
+## Question and frozen scope
+Does the **fixed, squarefree, unweighted** B8 RR9 extractor analyzed by #4816 (and #4548) have the same input-language as the **slot-weighted W8** relation pipeline #4728/#4807/#4812? No cost or solver advantage may be transferred between the two without a reduction that preserves both the witness language and extraction costs.
+
+Use the unchanged original-crate `PRIME31` in `research/prime31_ic_20261115/native/lib.rs`: p=2147483647, a=847514846, b=2087444724, n=2147446831, G=(625037715,2100627251), cofactor 1. Reuse `Arithmetic` and `check_curve` from that crate; no new EC implementation in the production Rust test.
+
+Four 8-point windows, in order: 0..7, 8..15, 16..23, 23..30 of the first 31 valid nonzero-y, increasing x ordinary rational points. Seed `0x5252395f57454947`; SplitMix64 as in the existing Prime31 example. 128 deterministic signed **squarefree-permuted** fixtures/window, 512 total. For each fixture use Fisher–Yates permutation descending i=7..1, choosing j=random % (i+1), then choose each leaf sign using next random low bit. The signed leaves contain each x of that window exactly once.
+
+For every fixture form (i) P_plain = sum_{i=0}^7 S_i and (ii) P_weighted = sum_{i=0}^7 [2^i] S_i using original Rust `Arithmetic`. Also record the eight transformed abscissas `x([2^i]S_i)`. Compute exact 256-element fixed-squarefree support of `sum eps_i P_i` from canonical leaves, independently for each window. Record whether P_weighted belongs to that 256-element support, whether P_weighted=P_plain for the identical signed leaves, and whether the multiset of transformed abscissas coincides with the fixed unweighted factor polynomial `H_B`. Verify P_plain is always in the 256-element support and the weighted construction is always a valid original-curve group sum.
+
+This is a **planted-control language discriminator**, not a natural-target hit-rate estimate, a randomized negative population, an F4 timing or an unknown-index solver. Do not compare its grading wall time with ECDLP complete cost. Never assume zero incidence universally based on 512 samples.
+
+## Frozen analytic contrasts
+For fixed squarefree B8, the support has at most 2^8=256 group targets, with uniform-target hit probability at most 256/n, equality only when the 256 signed sums are distinct. Position-weighted W8 admits 16^8 ordered signed witnesses; its mean uniform-target ordered fibre size is exactly 16^8/n (NOT its hit probability). Natural-target W8 hit rates must be measured, not replaced by a Poisson heuristic. The transformed points Q_i=[2^i]S_i have slot-dependent abscissas, so the fixed `M_8=H_B` specialization does not encode them. A weighted RR9 norm section would require selecting from slot-dependent transformed root sets, or the exact Horner chain; neither is the unweighted #4816 problem.
+
+## Admission/cost gate
+The original #4728 W8 rank31/1024 cohort used 1,312 shifted relation requests. The strongest previously measured same-curve 1024-query shared-BSGS result #4532 was 170.113 ms (different source run). A hypothetical fully charged W8 extractor cannot beat 170.113 ms in a matched rerun unless **its average extraction cost over all 1,312 requests is strictly below 170.113/1312 = 0.12966 ms**, even granting *zero* setup, relation linear algebra, rank repair, recovery and verification cost. This is a necessary upper limit, not a performance measurement, extrapolation or predicted implementation speed.
+
+## Validation and prior work
+Run original-Rust library tests plus focused original-crate example and release JSON. Check counts and exact group IDs; independently reproduce with separate Python bigint affine arithmetic; source-specific SHA, artifact and runner evidence required. Existing lanes: #4816 nonenumerative fixed-M8 unweighted RR9, #4728 rank31 weighted W8, #4692 weighted public-only F4 owner, #4812 exact signed Horner x-only chart, #4532 optimized shared BSGS, #4803 cancellation ceiling. Shared research KB MCP unavailable in this runtime: audit is bounded to GitHub primary files and PKM 2016/APS 2018/Kudo et al. 2019 literature, and is not a novelty claim.

@@ -1,0 +1,39 @@
+name: Rootfinding Round124 trace-engine Barrett native Rust A/B
+on:
+  push:
+    branches:
+      - 'automation/radical-root-mersenne-sqrt-round114-20261122'
+  workflow_dispatch:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  native-rust-trace-field:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round124_native_trace_ab.py
+      - name: Materialize the round-124 source this A/B measures
+        run: |
+          set -euo pipefail
+          sha=e4de72b2e6f47fd538832e8067dc954e4e65144c
+          git fetch --no-tags --depth=1 origin "$sha"
+          git show "$sha:src/cryptanalysis/prime_root_trace.rs" > "$RUNNER_TEMP/round124_prime_root_trace.rs"
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Execute source-exact trace-field A/B benchmark and correctness checks
+        env:
+          ROUND124_SOURCE: ${{ runner.temp }}/round124_prime_root_trace.rs
+        run: |
+          set -euo pipefail
+          rustc --version
+          python3 research/amm_digit_perf_20261118/round124_native_trace_ab.py | tee round124_native_rust.csv
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rootfind-round124-native-rust
+          path: round124_native_rust.csv
+          if-no-files-found: warn

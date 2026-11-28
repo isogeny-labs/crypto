@@ -1,0 +1,56 @@
+{
+  "schema": "h116.generator-charpoly-certificate-protocol/v1",
+  "protocol_id": "H116-GENERATOR-CHARPOLY-001",
+  "status": "frozen-before-generator-search",
+  "parent_result": {
+    "path": "POINTWISE_CHARPOLY_RESULT.tsv",
+    "sha256": "5c8f506a81280c650470dac6d2b32deca78c9e63a45282b1a579a6ace66368eb",
+    "known_scope": "eight cells and 5,066 all-point positive checks; one known degenerate missing-inverse control"
+  },
+  "question": "How many deterministic point generators suffice to replace the 5,066 exhaustive characteristic checks through the audited equality-on-generators theorem?",
+  "cells": "exactly the eight ordered cells in POINTWISE_CHARPOLY_PROTOCOL.json",
+  "canonical_point_order": "infinity first, then affine points ordered by polynomial-basis x index and y index",
+  "generator_selection": [
+    "compute every point order by repeated addition",
+    "select the canonical-first point P among points of maximum order",
+    "if <P> is the full group, emit P",
+    "otherwise select the canonical-first Q for which {iP+jQ: 0<=i<ord(P), 0<=j<ord(Q)} is the full group",
+    "if no such Q exists, retain the failed cell"
+  ],
+  "producer": {
+    "path": "h116_generator_charpoly.rs",
+    "build": "rustc --edition=2021 -O -D warnings",
+    "source_hash": "to be sealed by GENERATOR_CHARPOLY_SOURCE_GATE.md before execution"
+  },
+  "independent_verifier": {
+    "path": "h116_generator_charpoly_verify.py",
+    "method": "separate Python field and group implementation; recompute canonical order, point orders, selected generators, closure and checks",
+    "source_hash": "to be sealed by GENERATOR_CHARPOLY_SOURCE_GATE.md before execution"
+  },
+  "positive_checks": [
+    "selected set has one or two nonidentity points",
+    "selected additive closure contains every enumerated point",
+    "Frobenius characteristic expression is zero on every selected generator",
+    "trace is p+1-#E(F_p) and matches the parent result",
+    "wrong-trace and wrong-norm characteristic mutations reject on at least one selected generator"
+  ],
+  "negative_controls": [
+    "remove the second generator when two are selected, or remove the sole generator when one is selected; the resulting set must not generate the nontrivial group",
+    "retain the parent missing-inverse mutation only as a diagnostic because its p=5 degree-two degeneracy is already known"
+  ],
+  "measurements": [
+    "generator count and encoded coordinates",
+    "generator orders and certified closure size",
+    "characteristic evaluations required",
+    "all-points-to-generators compression ratio",
+    "wrong-trace, wrong-norm and missing-inverse generator rejection counts",
+    "producer and verifier elapsed nanoseconds as diagnostics only"
+  ],
+  "acceptance": {
+    "primary": "all eight cells produce a one- or two-point full generating set and every positive check passes",
+    "controls": "the dropped-generator set is proper and both characteristic coefficient mutations reject in every cell",
+    "failure_policy": "retain every row and do not replace the point ordering, maximum-order rule, cell, or control"
+  },
+  "claim_boundary": "A finite proof-carrying compression diagnostic. It does not prove the Frobenius equation over the algebraic closure, identify rational maps, solve ECDLP, or establish a runtime improvement.",
+  "filed_before_affected_data": true
+}

@@ -529,6 +529,11 @@ fn fingerprint(
     for p in system {
         h.update(&(p.terms.len() as u64).to_le_bytes());
         for t in &p.terms {
+            // Checkpoint v1 always hashes sixteen bytes, including in 64-bit builds.
+            #[allow(
+                clippy::unnecessary_cast,
+                reason = "Checkpoint mask encoding is fixed at 128 bits across feature builds."
+            )]
             h.update(&(t.mask as u128).to_le_bytes());
         }
     }

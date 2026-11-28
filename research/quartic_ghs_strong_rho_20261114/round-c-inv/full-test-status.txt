@@ -1,0 +1,14 @@
+First command:
+  CARGO_TARGET_DIR=/dev/shm/ghs-leads/inv-target cargo test --release --lib
+First exit: 101
+First blocker: sparse checkout omitted crates/certified-relations.
+
+The tracked path dependencies were then materialized and the same command was
+started again. It compiled third-party and repository path dependencies for a
+bounded interval but did not reach the crypto crate or execute its tests. The
+run was manually stopped with SIGINT after the parent requested prompt scoped
+completion.
+Second exit: 130
+
+This is no repository-wide test verdict. The source-bound standalone build,
+self-test, fallback control, and q=223 exact walk/count comparator all passed.

@@ -1,0 +1,23 @@
+{
+  "schema": "h116-quotient-multiradix-launch/v1",
+  "protocol_id": "H116-QUOTIENT-MULTIRADIX-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and the exact hashes in QUOTIENT_MULTIRADIX_SOURCE_GATE.md",
+  "radices": [2, 3, 4, 5, 6, 8, 12, 16, 24, 32, 48, 64],
+  "inputs": [
+    "QUOTIENT_DIGIT_OOS_MOMENTS.tsv",
+    "QUOTIENT_DIGIT_OOS_LABELS.tsv",
+    "QUOTIENT_DIGIT_RANK_RESULT.json"
+  ],
+  "commands": {
+    "build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_quotient_multiradix.rs", "-o", "/tmp/h116_quotient_multiradix"],
+    "selftest": ["/tmp/h116_quotient_multiradix", "--selftest"],
+    "measure": ["/tmp/h116_quotient_multiradix", "--measure", "QUOTIENT_DIGIT_OOS_MOMENTS.tsv", "QUOTIENT_DIGIT_OOS_LABELS.tsv", "QUOTIENT_MULTIRADIX_RESULT.json"]
+  },
+  "replicates": 4096,
+  "outputs": [
+    "QUOTIENT_MULTIRADIX_RESULT.json",
+    "QUOTIENT_MULTIRADIX_RUN.txt",
+    "QUOTIENT_MULTIRADIX_SHA256SUMS"
+  ],
+  "measurement_scope": "finite correct-rank and recursive-path scaling under growing radix, with row-preserving rank-sum, top-log-width and cross-radix slope controls; no asymptotic completeness or ECDLP speedup claim"
+}

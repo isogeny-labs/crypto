@@ -1,0 +1,12 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",nodesep=0.25,ranksep=0.35];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf2fb",fontname="DejaVu Sans",fontsize=10];
+ a [label="Qualified arithmetic inputs\nn >= 2; 2^(7n) <= q\nExplicit geometric lower estimate"];
+ b [label="Checked power / square-root estimates\nError <= (q+1)/2\nTherefore q+1 <= 2N",fillcolor="#dcf1e2"];
+ c [label="Actual F4 = F2[alpha], alpha²+alpha+1=0\ny²+y=x³+alpha; discriminant1\nActual rational point count1"];
+ d [label="Checked Möbius chart alpha+1/x\nO maps to alpha outside the base chart\nActual factor base empty: 0 < 3/2",fillcolor="#fff1cf"];
+ e [label="Scopes remain explicit\nSmall field violates the size hypothesis\nQualified ramification / genus bridge still open",fillcolor="#eeeeee"];
+ {rank=same;a;c}
+ {rank=same;b;d}
+ a -> b; c -> d; b -> e; d -> e;
+}

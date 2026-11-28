@@ -1,0 +1,14 @@
+{
+  "standing": "producer observation of failed workflow preparation; no new arithmetic result",
+  "run_id": 45130498900,
+  "source_revision": "85bd7e6e1cc7ff0c7e42d662885fc5bb2d210ec1",
+  "job_id": 137544632896,
+  "conclusion": "failure",
+  "phase": "write-once output directory creation, before native compilation or arithmetic",
+  "error": "mkdir: cannot create directory 'evidence/ci-replay': File exists",
+  "cause": "Fresh CI checkout now includes the committed historical evidence at the fixed workflow output path.",
+  "artifact_caution": "Artifact14797572336 contains preexisting committed evidence, not fresh successful output from this failed run.",
+  "remedy": "Use run-ID/attempt-specific output paths and pass that exact path to exports and isolated signing.",
+  "trigger_correction": "Pull-request path filters consider the whole PR diff; a later metadata push can still trigger replay while native changes remain in that diff.",
+  "original_success_records_modified": false
+}

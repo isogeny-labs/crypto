@@ -1,0 +1,43 @@
+short=0;
+poly primitiveB50=witness50/v;
+if(primitiveB50*v!=witness50 || subst(primitiveB50,v,0)!=primitiveB50 || contentPower50!=8){ERROR("LOCAL50_SOURCE_WITNESS_SHAPE");quit;}
+map actualSource50=relativeFinite50,t,v,u;
+ideal actualRelations50=actualSource50(relativeIdeal50);
+if(parameter50*witness50+planeNumerator50!=sourceGenerator50 || sourceGenerator50!=actualRelations50[2]){ERROR("LOCAL50_SOURCE_SATURATION_PRODUCT");quit;}
+poly originalB50=parameter50*primitiveB50;
+poly integralLeft50=witness50^2+primitiveB50*witness50+(u^3+u)*primitiveB50^2;
+if(integralLeft50!=primitiveB50^2*actualRelations50[1]){ERROR("LOCAL50_MONIC_INTEGRAL_WITNESS");quit;}
+poly secondColumn50=(u^3+u)*originalB50+(planeNumerator50+originalB50)*v;
+if(v*sourceGenerator50+secondColumn50!=originalB50*actualRelations50[1]){ERROR("LOCAL50_MODULE_PRESENTATION");quit;}
+ring localPlane50=2,(t,u),wp(4,1);option(redSB);short=0;
+map planeFromWitness50=parameterSaturation50,t,0,u;
+poly localA50=planeFromWitness50(planeNumerator50);poly localH50=planeFromWitness50(parameter50);poly localBprime50=planeFromWitness50(primitiveB50);poly localB50=localH50*localBprime50;
+if(lead(localA50)!=t^16 || localH50!=(u+1)^8){ERROR("LOCAL50_MONIC_BLOCK_INPUT");quit;}
+map planeEquation50=integralCandidate50,t,u;
+ideal actualPlane50=planeEquation50(candidateIdeal50);
+matrix presentation50[2][2]=localA50,(u^3+u)*localB50,localB50,localA50+localB50;
+if(det(presentation50)!=actualPlane50[1]){ERROR("LOCAL50_PRESENTATION_DETERMINANT");quit;}
+ideal block50=localA50,localH50;ideal blockStd50=std(block50);
+int blockDimension50=vdim(blockStd50);
+if(blockDimension50!=128){ERROR("LOCAL50_BLOCK_DIMENSION");quit;}
+print("LOCAL50_STAGE source_module_presentation_checked=true block_F2_dimension=128 CRT_unit_begin=true");
+ideal unitInput50=localA50,localH50,localBprime50;ideal unitStd50=std(unitInput50);
+if(unitStd50[1]!=1){ERROR("LOCAL50_CRT_NOT_COMAXIMAL");quit;}
+ideal one50=1;matrix unitLift50=lift(unitInput50,one50);
+if(nrows(unitLift50)!=3 || ncols(unitLift50)!=1 || unitLift50[1,1]*localA50+unitLift50[2,1]*localH50+unitLift50[3,1]*localBprime50!=1){ERROR("LOCAL50_FULL_UNIT_PRODUCT");quit;}
+if((unitLift50[1,1]+1)*localA50+unitLift50[2,1]*localH50+unitLift50[3,1]*localBprime50==1){ERROR("LOCAL50_CORRUPTED_UNIT_ACCEPTED");quit;}
+link localOut50="ASCII:w local-block50.sing";open(localOut50);
+write(localOut50,"ring localBlockCertificate50=2,(t,u),wp(4,1);short=0;poly A50="+string(localA50)+";poly h50="+string(localH50)+";poly Bprime50="+string(localBprime50)+";ideal unitCoefficients50;ideal powerRemainders50;");
+int index50;
+for(index50=1;index50<=3;index50++){write(localOut50,"unitCoefficients50["+string(index50)+"]="+string(unitLift50[index50,1])+";");}
+poly powerRemainder50;
+for(index50=0;index50<=8;index50++){
+ powerRemainder50=reduce((u+1)^index50,blockStd50);
+ if(index50<8 && powerRemainder50==0){ERROR("LOCAL50_EARLY_PARAMETER_ANNIHILATION");quit;}
+ if(index50==8 && powerRemainder50!=0){ERROR("LOCAL50_PARAMETER_NOT_ANNIHILATED");quit;}
+ write(localOut50,"powerRemainders50["+string(index50+1)+"]="+string(powerRemainder50)+";");
+ print("LOCAL50_PARAMETER_POWER exponent="+string(index50)+" zero="+string(powerRemainder50==0));
+}
+close(localOut50);
+print("LOCAL50_RESULT monic_integral_witness=true source_module_presentation=true plane_determinant_product=true CRT_comaximal_product=true block_F2_dimension=128 exact_parameter_exponent=8");
+print("LOCAL50_ALL_CHECKS_PASS");quit;

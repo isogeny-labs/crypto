@@ -1,0 +1,79 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T03:51:01Z",
+ "id": "PCC-20261124-695364",
+ "kind": "statement",
+ "producer": {
+  "commit": "435d04b3fbc979b3f4bea49568dc376fa2896b9a",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/attempt-v1/pipeline/result.json",
+    "sha256": "0f5762075fc29a6f22d9c28a65264844bf627a6b93fb731a4da8a4b397cb8c40"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/attempt-v1/pipeline/checker-result.json",
+    "sha256": "077bd8cbc68a6481bc29997962a13e8c324c0455cff1496fdbffbe0b1836a9b4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/attempt-v1/pipeline/pre-collection-manifest.sha256",
+    "sha256": "bde0adeb9423aad1d332d6a983dbe04ad9972eab2e6f1e3969e3a00d0d07d6de"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/LOCAL_PROTOCOL.md",
+    "sha256": "58d9229d74048c13b49f02454a59e437db6e0efaf2ae04e31c4030abae294bef"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/LOCAL_ENVELOPE.json",
+    "sha256": "0aaa7fda9b0b74e9dfd76d05f58561e548135e81d03b77d28113be2543acb906"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/collector.cpp",
+    "sha256": "9c522b4dd514148341db5fc54ca9080aa5d7b4da433387f436be5c58558a4c6a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/split_tangent_20261123/checker.cpp",
+    "sha256": "4d5460f5c7310328db3c51fb329d7c4d93b12966c109ea196182f18a04e7b411"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/attempt-v1/pipeline/collector-cost.json",
+    "sha256": "0200180329e0a26a4832de7dc13c2289c323bdffca96a965703c59502eaa56b1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/local_collection_20261124/evidence/attempt-v1/pipeline/checker-cost.json",
+    "sha256": "66a680385a18697dd4b72116c1376c0c3aa6e9e006ca5c66498ef2bbd21f1818"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "actual user-authorized local P192 split-tangent collection; fixed 102-section domain",
+ "statement": "The actual local collector and separate arithmetic checker both exit zero. The collector reports 102 target principal checks. The checker rederives all 226 selection outcomes, checks 102 tangent products, checks 430 point images and 108 elliptic relation rows, and rejects five corruptions. The resulting matrix has 429 projected columns, full rank108 and new-column rank102; closed old-base rank6 equals baseline rank6, so the added closed-rank gain is zero. The local pipeline and outer wrapper exit zero. These are producer-unverified local arithmetic results, not an independent signed verdict or a complexity/performance claim."
+}

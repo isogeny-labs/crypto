@@ -1,0 +1,39 @@
+error: file is loaded as a module multiple times: `research/extension_ic_graph_20261115/nagao-e2e/native/qualifier/native_analysis/src/bin/two-lp-component-analysis.rs`
+  |
+  = help: replace all but one `mod` item with `use` items
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#duplicate_mod
+  = note: `-D clippy::duplicate-mod` implied by `-D warnings`
+  = help: to override `-D warnings` add `#[allow(clippy::duplicate_mod)]`
+
+error: file is loaded as a module multiple times: `research/extension_ic_graph_20261115/nagao-e2e/native/qualifier/native_analysis/src/bin/../../../../../src/cryptanalysis/bitops.rs`
+  |
+  = help: replace all but one `mod` item with `use` items
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#duplicate_mod
+
+error: you should consider adding a `Default` implementation for `Graph`
+   --> research/extension_ic_graph_20261115/nagao-e2e/native/qualifier/extension_remainder_driver.rs:192:5
+    |
+192 | /     pub fn new() -> Self {
+193 | |         Self {
+194 | |             anchors: BTreeMap::new(),
+195 | |             seen: BTreeSet::new(),
+196 | |         }
+197 | |     }
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#new_without_default
+    = note: `-D clippy::new-without-default` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::new_without_default)]`
+help: try adding this
+    |
+259 ~ }
+260 + 
+261 + impl Default for Graph {
+262 +     fn default() -> Self {
+263 +         Self::new()
+264 +     }
+265 + }
+    |
+
+error: aborting due to 3 previous errors
+

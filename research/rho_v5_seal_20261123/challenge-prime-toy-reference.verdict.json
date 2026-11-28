@@ -1,0 +1,363 @@
+{
+  "acceptance": {
+    "axes": [
+      "ops",
+      "memory"
+    ],
+    "min_runs_per_size": 8,
+    "min_sizes": 4,
+    "require_audit": true,
+    "require_replay_all": true,
+    "uncharged_tolerance": 0.05
+  },
+  "accounting": {
+    "bounded": true,
+    "candidate_unpriced": [
+      "canonicalisations_uncharged",
+      "distinguished_point_table_inserts_uncharged",
+      "distinguished_point_table_queries_uncharged"
+    ],
+    "incumbent_unpriced": [
+      "canonicalisations_uncharged"
+    ],
+    "tolerance": 0.05,
+    "uncharged_ratio": 0.9782762689252623,
+    "uncharged_shift": false
+  },
+  "advances_on": [],
+  "audit": {
+    "files": {
+      "host.json": "91a69b9510f4ac278feea554231fd5e91bdf5cbd4ac902b3946d44bf1e3aee69",
+      "plan.json": "bacdc4fe97472997022c7b44cbd8f9006bce5381aac0e012d3c7b57f44272d18",
+      "records.jsonl": "5b26962cd1a5613653306cd9c93556ee71cb93f439246feaeaba38ac88dd1183",
+      "session.json": "1ca75f17069ced741bae1829a7ccda2d23f377be38b4d0cb918e34421ea42139",
+      "spec.json": "c17863d0e28d144d50582f08d66c44d06c9c97ebc72ac7e10fe4ee160715aa35"
+    },
+    "ok": true,
+    "problems": [],
+    "records": 384,
+    "replay_all": true,
+    "replays": 288,
+    "replays_reproduced": 288,
+    "verified_records": 384
+  },
+  "axes": [
+    {
+      "axis": "ops",
+      "candidate_mean": 1.1453076238977606,
+      "ci95": [
+        0.712211231276954,
+        0.9235438748551745
+      ],
+      "ci_method": "linearised_t",
+      "decides": true,
+      "holm_threshold": 0.05,
+      "incumbent_mean": 1.4121764881551144,
+      "known": true,
+      "p_value": 0.15592203898050974,
+      "pairs": 96,
+      "ratio_candidate_over_incumbent": 0.8110230084583874,
+      "unadjusted_verdict": "indistinguishable",
+      "verdict": "indistinguishable"
+    },
+    {
+      "axis": "memory",
+      "candidate_mean": 0.04724995129728852,
+      "ci95": [
+        1.216124809982446,
+        1.712253475704676
+      ],
+      "ci_method": "cluster",
+      "decides": true,
+      "holm_threshold": 0.025,
+      "incumbent_mean": 0.032898202691500227,
+      "known": true,
+      "p_value": 0.0009995002498750624,
+      "pairs": 96,
+      "ratio_candidate_over_incumbent": 1.4362471938169528,
+      "unadjusted_verdict": "worse",
+      "verdict": "worse"
+    },
+    {
+      "axis": "uncharged",
+      "candidate_mean": 1.0373736549769175,
+      "ci95": [
+        0.8269287056903919,
+        1.1622949833888814
+      ],
+      "ci_method": "cluster",
+      "decides": false,
+      "incumbent_mean": 1.0604097103536816,
+      "known": true,
+      "pairs": 96,
+      "ratio_candidate_over_incumbent": 0.9782762689252623,
+      "verdict": "indistinguishable"
+    },
+    {
+      "axis": "field_muls",
+      "candidate_mean": 2.130490632513879,
+      "ci95": [
+        0.651688891947312,
+        0.8631883461275697
+      ],
+      "ci_method": "cluster",
+      "decides": false,
+      "incumbent_mean": 2.8523851515696514,
+      "known": true,
+      "pairs": 96,
+      "ratio_candidate_over_incumbent": 0.7469154827641291,
+      "verdict": "better"
+    },
+    {
+      "axis": "field_sqrs",
+      "candidate_mean": 1.0484976955794651,
+      "ci95": [
+        0.6623835411807774,
+        0.8880681962835941
+      ],
+      "ci_method": "cluster",
+      "decides": false,
+      "incumbent_mean": 1.3679646596213442,
+      "known": true,
+      "pairs": 96,
+      "ratio_candidate_over_incumbent": 0.7664654844736204,
+      "verdict": "better"
+    },
+    {
+      "axis": "field_invs",
+      "candidate_mean": 1.0150024542245164,
+      "ci95": [
+        0.6989729985620684,
+        0.9527172702723645
+      ],
+      "ci_method": "cluster",
+      "decides": false,
+      "incumbent_mean": 1.2515088272943806,
+      "known": true,
+      "pairs": 96,
+      "ratio_candidate_over_incumbent": 0.8110230084583874,
+      "verdict": "better"
+    }
+  ],
+  "band": {
+    "break_even_price": null,
+    "ci95": [
+      [
+        0.7017384158909196,
+        0.9508461950948089
+      ],
+      [
+        0.7026692694031358,
+        0.9629315432107262
+      ],
+      [
+        0.7520352919889951,
+        1.0417653161957785
+      ]
+    ],
+    "holds_across_band": false,
+    "ratio_candidate_over_incumbent": [
+      0.8110230084583874,
+      0.824087500214461,
+      0.8877372086342351
+    ],
+    "verdicts": [
+      "better",
+      "better",
+      "indistinguishable"
+    ],
+    "weights": [
+      0.0,
+      0.1,
+      1.0
+    ]
+  },
+  "candidate": {
+    "arm": "candidate",
+    "bound_id": null,
+    "method": "rho.negation_v5",
+    "method_id": "ECM1he9b8e5492023",
+    "params": {
+      "cap_multiple": "64"
+    }
+  },
+  "challenge_id": "ECCH1h904625668686",
+  "commitment": {
+    "beacon": "b07138dc3cebffe127835994cd0304d7f2213f0e",
+    "commitment_id": "ECCM1h24e7035ea316",
+    "committed_unix_ms": 1795421703752
+  },
+  "control": {
+    "arm": "incumbent-aa",
+    "ci95": [
+      1.0,
+      1.0
+    ],
+    "purpose": "determinism check: the incumbent against itself with shared seeds is identical by construction, so this reads 1.000 [1.000, 1.000] whatever the noise; it is not a noise gate for ops",
+    "ratio": 1.0
+  },
+  "domain_id": "ECDOM1ha1f283af3a5d",
+  "epoch": 7753219574668632271,
+  "fits": {
+    "candidate": {
+      "alpha": 0.42665327225529076,
+      "alpha_ci95": [
+        0.28039236283287966,
+        0.5102498902431456
+      ],
+      "ratio_to_floor": {
+        "ci95": [
+          0.9736841033168367,
+          1.3236689501657928
+        ],
+        "ci_method": "cluster",
+        "value": 1.1453076238977604
+      },
+      "scaling_claim": true,
+      "sizes": 4
+    },
+    "exponent_moved": false,
+    "incumbent": {
+      "alpha": 0.4424073362129302,
+      "alpha_ci95": [
+        0.32013403196833307,
+        0.5115169316368513
+      ],
+      "ratio_to_floor": {
+        "ci95": [
+          1.234594664253127,
+          1.611077064462981
+        ],
+        "ci_method": "cluster",
+        "value": 1.4121764881551142
+      },
+      "scaling_claim": true,
+      "sizes": 4
+    }
+  },
+  "incumbent": {
+    "arm": "incumbent",
+    "bound_id": "ECBND1h7b69b9787056",
+    "method": "rho.negation",
+    "method_id": "ECM1hefea4e0ebe79",
+    "params": {
+      "cap_multiple": "64"
+    }
+  },
+  "incumbent_drift": {
+    "fresh_ci95": [
+      1.234594664253127,
+      1.611077064462981
+    ],
+    "fresh_ops": 1.4121764881551142,
+    "outside": false,
+    "recorded_bound_id": "ECBND1h7b69b9787056",
+    "recorded_ci95": [
+      1.278072243919189,
+      1.6525760269448382
+    ],
+    "recorded_ops": 1.466137316459902
+  },
+  "level_moved": null,
+  "multiplicity": {
+    "alpha": 0.05,
+    "family": [
+      "memory",
+      "ops"
+    ],
+    "method": "holm"
+  },
+  "outcome": "regresses",
+  "per_curve": [
+    {
+      "ci95": [
+        0.6610701589844514,
+        1.0575959077132826
+      ],
+      "log2_r": 17.696675535624497,
+      "pairs": 24,
+      "ratio_candidate_over_incumbent": 0.8361489669032218,
+      "slug": "icv1-fp18-tm337-d28d5e09"
+    },
+    {
+      "ci95": [
+        0.6130484933272785,
+        1.1094927609396625
+      ],
+      "log2_r": 19.101306328859888,
+      "pairs": 24,
+      "ratio_candidate_over_incumbent": 0.8247259335388835,
+      "slug": "icv1-fp20-t727-cd198a38"
+    },
+    {
+      "ci95": [
+        0.5622665355440786,
+        1.0479329258637993
+      ],
+      "log2_r": 21.215969580418946,
+      "pairs": 24,
+      "ratio_candidate_over_incumbent": 0.7676051170413132,
+      "slug": "icv1-fp22-tm1385-475dcb5f"
+    },
+    {
+      "ci95": [
+        0.5274547474904255,
+        1.229979072330003
+      ],
+      "log2_r": 23.974409950711376,
+      "pairs": 24,
+      "ratio_candidate_over_incumbent": 0.8054553376906316,
+      "slug": "icv1-fp24-t1059-6df599df"
+    }
+  ],
+  "procedure": 2,
+  "reasons": [],
+  "regresses_on": [
+    "memory"
+  ],
+  "resamples": 2000,
+  "schema": "ecbench.verdict/v1",
+  "seed": 20261005,
+  "session": {
+    "binary_sha256": "f273255fc986c1f3e194ee5c3fee56bfd0cc3bf707bfd698a5be0431b559b70b",
+    "dir": "research/rho_v5_seal_20261123/challenge-prime-toy-reference-session",
+    "env_class_id": "ECBENV3ha7153aea3de6",
+    "expected_spec_id": "ECS1h1ffa173a54fb",
+    "git_commit": null,
+    "levels": {
+      "L0": 288
+    },
+    "session_id": "ECBS1hb4e821c19809",
+    "spec_id": "ECS1h1ffa173a54fb",
+    "spec_matches": true,
+    "status": "complete"
+  },
+  "stages": [
+    {
+      "candidate_share": 0.03980662612465709,
+      "incumbent_share": 0.09341330268639564,
+      "name": "setup",
+      "ratio_candidate_over_incumbent": 0.34190146646894054
+    },
+    {
+      "candidate_share": 0.9510234619295183,
+      "incumbent_share": 0.8928725347343363,
+      "name": "search",
+      "ratio_candidate_over_incumbent": 0.8545866182453399
+    },
+    {
+      "candidate_share": 0.009169911945824621,
+      "incumbent_share": 0.013714162579268168,
+      "name": "internal_verification",
+      "ratio_candidate_over_incumbent": 0.5364758698092031
+    },
+    {
+      "candidate_share": 0.0,
+      "incumbent_share": 0.0,
+      "name": "automorphism_setup",
+      "ratio_candidate_over_incumbent": null
+    }
+  ],
+  "statement": "regresses (worse on memory): rho.negation_v5 / rho.negation = 0.8110 [0.712, 0.924] in ecbench.gae over 96 pairs on 4 size(s) (memory worse, uncharged indistinguishable (reported, not deciding), field_muls better (reported, not deciding), field_sqrs better (reported, not deciding), field_invs better (reported, not deciding)); bounded: unpriced work on one or both arms; α 0.427 against 0.442; A/A determinism check 1.0000 [1.000, 1.000]",
+  "verdict_id": "ECVD1h9dced72c7ba9"
+}

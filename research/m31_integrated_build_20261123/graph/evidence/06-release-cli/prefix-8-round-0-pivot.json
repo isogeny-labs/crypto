@@ -1,0 +1,88 @@
+{
+  "schema": "m31-graph-worker/v1",
+  "pid": 136,
+  "executable_sha256": "a8f6ca3921f75518c34534533e825825d00cd43ae967a7ab48c9cf941d08f5e9",
+  "manifest_sha256": "f597f14241d372856bdafe416bfa25a9a64caa1e8ef7482b8329c5c5a28d0262",
+  "input_loading_ns": 20658,
+  "group_admission_ns": 642918,
+  "component_call_ns": 67176,
+  "process_peak_rss_kib": 3348,
+  "process_user_cpu_us": 0,
+  "process_system_cpu_us": 4178,
+  "group_admission_counts": {
+    "extraction_nodes": 0,
+    "fp_inversions": 501,
+    "fp_multiplications": 32406,
+    "group_additions": 546,
+    "polynomial_evaluations": 0,
+    "scalar_inversions": 0,
+    "scalar_multiplications": 0
+  },
+  "record": {
+    "schema": "m31-graph-arm/v1",
+    "arm": "pivot",
+    "coordinate_prime": 2147483647,
+    "relation_prime": 2147446831,
+    "input_sha256": "40b6c49392223dedbbe417551ab913ee17f94b6e671ee1e450703aeed8e348b9",
+    "canonical_prefix_sha256": "5eb05c14378ecd014efe55eb518af9aff8445af41d2ab642b911b5d4f1adda35",
+    "source_manifest_sha256": "f9a42d06a6c4b303db48c35da3a3dc0fb9878d3eaf2ee03be36e9a78f218887c",
+    "rows": 8,
+    "lp_rank": 3,
+    "lp_left_nullity": 5,
+    "status": "accepted",
+    "refusal": null,
+    "output_rows": 5,
+    "useful_small_rank": 3,
+    "augmented_rank": 3,
+    "residual_columns": 3,
+    "residual_nonzeros": 7,
+    "source_terms": 9,
+    "replayed": 5,
+    "output_sha256": "2797495302cc29ace9baf9d9bbbe3c17cb5b81b87fda6a13d40b1fc2bc45115f",
+    "target_scalar": 37,
+    "target_group_verified": true,
+    "phases": {
+      "index_and_lp_rank_ns": 22265,
+      "extraction_ns": 15804,
+      "materialization_ns": 0,
+      "exact_rank_ns": 6191,
+      "source_replay_ns": 5606,
+      "target_recovery_and_group_check_ns": 5553,
+      "forward_product_ns": 0,
+      "transpose_product_ns": 0
+    },
+    "filter_hook_counts": [
+      41,
+      35,
+      6,
+      186
+    ],
+    "algorithm_counters": {
+      "complete_relations": 5,
+      "core_large_vertices": 3,
+      "core_relations": 5,
+      "cycles_closed": 2,
+      "duplicate_relations": 0,
+      "input_large_vertices": 3,
+      "input_relations": 8,
+      "merges": 6,
+      "peeled_relations": 0,
+      "pivots": 3,
+      "rejected_fill": 0
+    },
+    "limits": {
+      "max_small_weight": 4096,
+      "max_sources": 4096,
+      "mst_max_column_degree": 4096,
+      "mst_max_edge_evaluations": 1000000,
+      "max_active_coefficients": 1000000,
+      "tape": {
+        "max_tape_terms": 1000000,
+        "max_pivot_nonzeros": 1000000,
+        "max_build_multiply_add_terms": 20000000
+      }
+    },
+    "complete_cold_solving_cost": null,
+    "measurement_scope": "supplied-group-equation component replay; collection/setup/cold solve unmeasured"
+  }
+}

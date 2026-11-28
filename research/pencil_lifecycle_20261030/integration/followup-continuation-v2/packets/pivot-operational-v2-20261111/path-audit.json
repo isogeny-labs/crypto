@@ -1,0 +1,248 @@
+{
+  "schema": "pencil.static-path-audit/v1",
+  "executed_payload": false,
+  "ast_workspace_literals_equal_freeze": true,
+  "fresh_workspace": "/home/ec2-user/pencil-native-pivot-operational-v2-20261111",
+  "outer_derived_from_launcher_workspace": true,
+  "source_paths_relative_to_packet": true,
+  "receipt_producer_consumer_both_W": true,
+  "compiler_cwd_LEAN_PATH_TMPDIR_outputs_all_W": true,
+  "path_occurrences": [
+    {
+      "file": "launch.py",
+      "line": 6,
+      "source": "W=Path('/home/ec2-user/pencil-native-pivot-operational-v2-20261111')"
+    },
+    {
+      "file": "launch.py",
+      "line": 7,
+      "source": "O=Path(str(W)+'.outer')"
+    },
+    {
+      "file": "launch.py",
+      "line": 14,
+      "source": "assert hashlib.sha256((P/'freeze.json').read_bytes()).hexdigest()==a.freeze_sha256,'freeze mismatch'"
+    },
+    {
+      "file": "launch.py",
+      "line": 15,
+      "source": "F=json.loads((P/'freeze.json').read_text())"
+    },
+    {
+      "file": "launch.py",
+      "line": 16,
+      "source": "assert str(W)==F['workspace'],'workspace binding mismatch'"
+    },
+    {
+      "file": "launch.py",
+      "line": 17,
+      "source": "for name,digest in F['files'].items():assert hashlib.sha256((P/name).read_bytes()).hexdigest()==digest,('frozen input',name)"
+    },
+    {
+      "file": "launch.py",
+      "line": 140,
+      "source": "  native=json.loads((W/(phase+'-receipt.json')).read_text())"
+    },
+    {
+      "file": "launch.py",
+      "line": 154,
+      "source": "  unit='pencil-pivot-operational-v2-20261111-'+phase"
+    },
+    {
+      "file": "launch.py",
+      "line": 155,
+      "source": "  cmd=['sudo','-n','systemd-run','--unit='+unit,'--wait',"
+    },
+    {
+      "file": "launch.py",
+      "line": 156,
+      "source": "   '--property=User=ec2-user','--property=WorkingDirectory='+str(P),"
+    },
+    {
+      "file": "launch.py",
+      "line": 163,
+      "source": "   '/usr/bin/python3',str(P/'replay.py'),phase,a.freeze_sha256]"
+    },
+    {
+      "file": "replay.py",
+      "line": 4,
+      "source": "W=Path('/home/ec2-user/pencil-native-pivot-operational-v2-20261111')"
+    },
+    {
+      "file": "replay.py",
+      "line": 13,
+      "source": "if (mode=='pre' and W.exists()) or (W/(mode+'.started')).exists():"
+    },
+    {
+      "file": "replay.py",
+      "line": 30,
+      "source": "  durable(W/(mode+'-progress.json'),progress)"
+    },
+    {
+      "file": "replay.py",
+      "line": 77,
+      "source": "  durable(W/'campaign-start.json',{'monotonic':start,'absolute_deadline':ABSOLUTE_DEADLINE,'total_seconds':2400})"
+    },
+    {
+      "file": "replay.py",
+      "line": 79,
+      "source": " marker=W/(mode+'.started');fd=os.open(marker,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600);os.close(fd)"
+    },
+    {
+      "file": "replay.py",
+      "line": 81,
+      "source": " campaign_start=json.loads((W/'campaign-start.json').read_text())['monotonic']"
+    },
+    {
+      "file": "replay.py",
+      "line": 84,
+      "source": " assert sha(P/'freeze.json')==EXPECTED_FREEZE,'freeze pin mismatch'"
+    },
+    {
+      "file": "replay.py",
+      "line": 85,
+      "source": " F=json.loads((P/'freeze.json').read_text())"
+    },
+    {
+      "file": "replay.py",
+      "line": 86,
+      "source": " assert str(W)==F['workspace'],'workspace binding mismatch'"
+    },
+    {
+      "file": "replay.py",
+      "line": 87,
+      "source": " for n,h in F['files'].items():assert sha(P/n)==h,('frozen input',n)"
+    },
+    {
+      "file": "replay.py",
+      "line": 104,
+      "source": "  durable(W/(mode+'-hashes.json'),done)"
+    },
+    {
+      "file": "replay.py",
+      "line": 105,
+      "source": "  if mode=='post':assert done==json.loads((W/'pre-hashes.json').read_text())"
+    },
+    {
+      "file": "replay.py",
+      "line": 109,
+      "source": "  rt={k:sha(k) for k in F['runtime']};assert rt==F['runtime'];durable(W/(mode+'-runtime.json'),rt)"
+    },
+    {
+      "file": "replay.py",
+      "line": 112,
+      "source": "  pre=json.loads((W/'pre-receipt.json').read_text());assert pre['status']=='passed'"
+    },
+    {
+      "file": "replay.py",
+      "line": 115,
+      "source": "   (W/(n+'.lean')).write_bytes((P/(n+'.lean.txt')).read_bytes())"
+    },
+    {
+      "file": "replay.py",
+      "line": 116,
+      "source": "  env={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8','LEAN_SYSROOT':str(Path(lean).parent.parent),'LEAN_PATH':':'.join([str(W)]+roots),'TMPDIR':str(W)}"
+    },
+    {
+      "file": "replay.py",
+      "line": 124,
+      "source": "   boundary();cmd=[lean,'-j1','-M3500','-s16384','-o',str(W/(name+'.olean')),str(W/(name+'.lean'))]"
+    },
+    {
+      "file": "replay.py",
+      "line": 126,
+      "source": "   with (W/(name+'.stdout')).open('xb') as so,(W/(name+'.stderr')).open('xb') as se:"
+    },
+    {
+      "file": "replay.py",
+      "line": 130,
+      "source": "     child=subprocess.Popen(cmd,cwd=W,env=env,stdout=so,stderr=se,start_new_session=True,"
+    },
+    {
+      "file": "replay.py",
+      "line": 135,
+      "source": "    durable(W/'commands.json',rows)"
+    },
+    {
+      "file": "replay.py",
+      "line": 140,
+      "source": "    row['end_seconds']=time.monotonic()-start;row['remaining_group']=group_members(child.pid);durable(W/'commands.json',rows)"
+    },
+    {
+      "file": "replay.py",
+      "line": 143,
+      "source": "   raw=(W/(name+'.stdout')).read_text()+(W/(name+'.stderr')).read_text()"
+    },
+    {
+      "file": "replay.py",
+      "line": 145,
+      "source": "  names=json.loads((P/'names.json').read_text());got=audit((W/'Readback.stdout').read_text(),names['producer']+names['reviewer'])"
+    },
+    {
+      "file": "replay.py",
+      "line": 146,
+      "source": "  neg=(W/'ExpectedFailure.stdout').read_text()"
+    },
+    {
+      "file": "replay.py",
+      "line": 155,
+      "source": "  assert not (W/'ExpectedFailure.stderr').read_text().strip(),'unexpected negative stderr'"
+    },
+    {
+      "file": "replay.py",
+      "line": 156,
+      "source": "  durable(W/'axioms.json',{'names':got,'allowed':['propext','Classical.choice','Quot.sound']})"
+    },
+    {
+      "file": "replay.py",
+      "line": 157,
+      "source": "  for n in ('EliminationField','PivotSwap','Controls','Readback','ExpectedFailure'):assert sha(W/(n+'.lean'))==F['files'][n+'.lean.txt']"
+    },
+    {
+      "file": "replay.py",
+      "line": 159,
+      "source": " for n,h in F['files'].items():assert sha(P/n)==h"
+    },
+    {
+      "file": "replay.py",
+      "line": 160,
+      "source": " assert sha(P/'freeze.json')==EXPECTED_FREEZE,'final freeze pin mismatch'"
+    },
+    {
+      "file": "replay.py",
+      "line": 177,
+      "source": " result={'phase':mode,'status':status,'errors':errors,'pending_signals':pending,'elapsed_seconds':time.monotonic()-start,'commands':rows,'compiler_invocations':len(rows),'workspace':str(W),'dependency_files_declared':16736,'dependency_bytes_declared':3111892318,'checked_dependency_files':progress['checked_files'],'checked_dependency_bytes':progress['checked_bytes'],'hash_progress':dict(progress),'machine_review_complete':False,'post_custody_required':True,'scientific_execution':False,'independent_binary_kernel_rechecker':False,'trust':'Pinned shared caches; pre/post checks do not exclude transient concurrent changes.'}"
+    },
+    {
+      "file": "replay.py",
+      "line": 181,
+      "source": "  durable(W/(mode+'-receipt.json'),result)"
+    },
+    {
+      "file": "replay.py",
+      "line": 183,
+      "source": "   status='failed';result['status']='failed';result['late_boundary_failed']=True;durable(W/(mode+'-receipt.json'),result)"
+    }
+  ],
+  "unchanged_files": {
+    "launch.py.patch": "2cfbb47f53f0f6069da0808b6fe0daaff3a4252aa238fbe5fa5548757d747152",
+    "Controls.lean.txt": "f7e17f2ea9b1a331c805cb0faf2be610c4edc691e6d54e132814adaeb88bf9b9",
+    "names.json": "83fb9beccf08c88a28a42393427df16cf10ef38b4982a67ef390fb11fac182e6",
+    "replay.py.patch": "63c9cad7f4d5fb8d43495fe93a3d53e127ef97ed5a771e780e69ac4599fd2e1f",
+    "import-amendments.patch": "d09477486760ffad0cd10682fff1ab6ea71996964bdaa352c3730892f09af49b",
+    "PLAN.md": "f7c0e6634ba1808be00d69feb4ab4ac989bff03b51c354e8385340aea3a91906",
+    "ExpectedFailure.lean.txt": "2be0ca38af19258af54466c6aa9b356f02071b7d2479395093885bab1dc08595",
+    "import-bindings.json": "b0d10d410cb99cf91bd3728211c9ec24d6c6c50ee1d5a798bba0bd7bc6306845",
+    "release-record-template.json": "6ef7a106d9e53e4e8fb4b2365b6d3434dbcbb46c6bc36e76d595a3b213ca2937",
+    "renewal-bindings.json": "5f34bf2d1df8bd55eb04d6308c46ed7908fd88fd3e3c7cd91a3f05b5a877ffc6",
+    "modules.json": "8c0ba5f9b06ff31c9254f983d0bfcf937ebb8d0e69fca437e2d294a0677360db",
+    "Readback.lean.txt": "9580b51aa480241c05543c7b08ebe65b15ffa6f2a869669f43ffab04a34c8079",
+    "PivotSwap.lean.txt": "3b1cd17e1a80b30dbc9d9401be35f198031ad5a7b16b2cbdcbf4156289a6524c",
+    "EliminationField.lean.txt": "f3cbd5bf902740417c34ff20be9b89332103e510aaa8435d4453cc08b43134c4",
+    "additional-runtime-pins.json": "9c4de8d3075b6536e9b0f8c7f457080459c3606b723357d4e73aa4412113b9c1",
+    "SESSION.md": "626cbff3b819146c3ed5cc10d2d89d1ac7007283e7d117730e512a1cc5fc908b",
+    "runtime-pins.json": "03ba74a8437d56f9c7257109676f59c543d9d286693f7691d211f0deee444b41",
+    "prior-bindings.json": "40ae8dc4c71e83254762984aac075701204ca3cb90f1098581dc0452a558e640"
+  },
+  "historical_metadata": "Copied historical source patches and notes retain prior identity references; neither launcher nor replay executes those."
+}

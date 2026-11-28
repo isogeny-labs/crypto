@@ -1,0 +1,83 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Cohort B (B21): BinaryGroup::sibling_pair ksum speedup on Table B primary curve",
+  "description": "Preregistered paired comparison of ksum:m=5,prune=1,sib=1,free=1 against 2026-11-15 ksum:m=4|5,prune=1 incumbents and rho.negation.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "binary_explicit",
+        "n": 21,
+        "modulus": 2097157,
+        "a": 1,
+        "b": 1797947,
+        "group_order": 2094562,
+        "r": 1047281,
+        "gx": 232919,
+        "gy": 1480205
+      }
+    ],
+    "targets_per_curve": 32,
+    "target_seed": 2026111807,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "inc-ksum4-prune",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-multiplier:size=10,mult=1",
+          "oracle": "ksum:m=4,prune=1",
+          "max_trials": "13528399621"
+        }
+      }
+    },
+    {
+      "name": "inc-ksum5-prune",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-multiplier:size=9,mult=1",
+          "oracle": "ksum:m=5,prune=1",
+          "max_trials": "13528399621"
+        }
+      }
+    },
+    {
+      "name": "cand-ksum5-sib-free",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-multiplier:size=10,mult=1",
+          "oracle": "ksum:m=5,prune=1,sib=1,free=1",
+          "max_trials": "13528399621"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 8107,
+    "isolation_required": "L0",
+    "timeout_seconds": 120
+  }
+}

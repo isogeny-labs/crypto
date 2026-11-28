@@ -1,0 +1,98 @@
+   Compiling shared-s3-integration-qualifier v0.1.0 (/workspace/scratch/99b214ce852d/crypto-prime31/research/s3_shared_elimination_20261122/integration_qualifier)
+warning: struct `MaskHasher` is never constructed
+  --> src/../../../../src/cryptanalysis/fx_hash.rs:89:19
+   |
+89 | pub(crate) struct MaskHasher(u64);
+   |                   ^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: type alias `MaskMap` is never used
+   --> src/../../../../src/cryptanalysis/fx_hash.rs:128:17
+    |
+128 | pub(crate) type MaskMap<V> = HashMap<Mask, V, BuildHasherDefault<MaskHasher>>;
+    |                 ^^^^^^^
+
+warning: type alias `MaskSet` is never used
+   --> src/../../../../src/cryptanalysis/fx_hash.rs:131:17
+    |
+131 | pub(crate) type MaskSet = HashSet<Mask, BuildHasherDefault<MaskHasher>>;
+    |                 ^^^^^^^
+
+warning: function `powmod` is never used
+   --> /workspace/scratch/99b214ce852d/build/release/build/shared-s3-integration-qualifier/5b78a306b1e253aa/out/ic_boundary.rs:241:4
+    |
+241 | fn powmod(mut a: u64, mut e: u64, m: u64) -> u64 {
+    |    ^^^^^^
+
+warning: field `r` is never read
+   --> /workspace/scratch/99b214ce852d/build/release/build/shared-s3-integration-qualifier/5b78a306b1e253aa/out/ic_boundary.rs:802:5
+    |
+801 | pub struct CubicClasses {
+    |            ------------ field in this struct
+802 |     r: u64,
+    |     ^
+
+warning: function `add_mod` is never used
+   --> /workspace/scratch/99b214ce852d/build/release/build/shared-s3-integration-qualifier/5b78a306b1e253aa/out/prime_fast.rs:376:4
+    |
+376 | fn add_mod(a: u64, b: u64, n: u64) -> u64 {
+    |    ^^^^^^^
+
+warning: function `neg_mod` is never used
+   --> /workspace/scratch/99b214ce852d/build/release/build/shared-s3-integration-qualifier/5b78a306b1e253aa/out/prime_fast.rs:386:4
+    |
+386 | fn neg_mod(a: u64, n: u64) -> u64 {
+    |    ^^^^^^^
+
+warning: function `add_mod` is never used
+  --> /workspace/scratch/99b214ce852d/build/release/build/shared-s3-integration-qualifier/5b78a306b1e253aa/out/residual_arithmetic.rs:22:4
+   |
+22 | fn add_mod(a: u64, b: u64, p: u64) -> u64 {
+   |    ^^^^^^^
+
+warning: function `sub_mod` is never used
+  --> /workspace/scratch/99b214ce852d/build/release/build/shared-s3-integration-qualifier/5b78a306b1e253aa/out/residual_arithmetic.rs:29:4
+   |
+29 | fn sub_mod(a: u64, b: u64, p: u64) -> u64 {
+   |    ^^^^^^^
+
+warning: constant `SHOUP_MAX_MODULUS` is never used
+  --> /workspace/scratch/99b214ce852d/build/release/build/shared-s3-integration-qualifier/5b78a306b1e253aa/out/residual_arithmetic.rs:37:7
+   |
+37 | const SHOUP_MAX_MODULUS: u64 = 1 << 63;
+   |       ^^^^^^^^^^^^^^^^^
+
+warning: struct `FixedFactor` is never constructed
+  --> /workspace/scratch/99b214ce852d/build/release/build/shared-s3-integration-qualifier/5b78a306b1e253aa/out/residual_arithmetic.rs:48:8
+   |
+48 | struct FixedFactor {
+   |        ^^^^^^^^^^^
+
+warning: associated items `new` and `mul` are never used
+  --> /workspace/scratch/99b214ce852d/build/release/build/shared-s3-integration-qualifier/5b78a306b1e253aa/out/residual_arithmetic.rs:55:8
+   |
+53 | impl FixedFactor {
+   | ---------------- associated items in this implementation
+54 |     #[inline]
+55 |     fn new<const SHOUP: bool>(w: u64, n: u64) -> FixedFactor {
+   |        ^^^
+...
+70 |     fn mul<const SHOUP: bool>(self, x: u64, n: u64) -> u64 {
+   |        ^^^
+
+warning: function `pow_u64` is never used
+  --> /workspace/scratch/99b214ce852d/build/release/build/shared-s3-integration-qualifier/5b78a306b1e253aa/out/numeric_s3.rs:26:4
+   |
+26 | fn pow_u64(mut base: u64, mut exp: u64, p: u64, mults: &mut u64) -> u64 {
+   |    ^^^^^^^
+
+warning: function `inv_u64` is never used
+  --> /workspace/scratch/99b214ce852d/build/release/build/shared-s3-integration-qualifier/5b78a306b1e253aa/out/numeric_s3.rs:42:4
+   |
+42 | fn inv_u64(a: u64, p: u64, mults: &mut u64) -> Option<u64> {
+   |    ^^^^^^^
+
+warning: `shared-s3-integration-qualifier` (lib) generated 14 warnings
+    Finished `release` profile [optimized] target(s) in 6.85s
+  Executable unittests ../../../examples/shared_s3_matrix.rs (/workspace/scratch/99b214ce852d/build/release/build/shared-s3-integration-qualifier/b01f76babaac2646/out/shared_s3_matrix-b01f76babaac2646)

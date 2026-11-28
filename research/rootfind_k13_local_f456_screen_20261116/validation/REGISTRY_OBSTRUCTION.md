@@ -1,0 +1,5 @@
+# Global curve-registry generator mismatch
+
+Observed on current main parent `88112c5a930009c883059c1c2e3c6c92c4b23f18` before K13 data: `python3 scripts/build_curve_registry.py --check` rejects the committed catalog and both derived files. The committed catalog has 22,278 curve entries; a fresh build has 29,695, with 894 reported source problems and no missing inputs. The cause of the global entry-count difference has not been determined. This blocks a claim that the whole checked-in registry is freshly generated from all current sources. It does not by itself prove any curve model incorrect.
+
+For this screen, the K13 entry differs only in a non-mathematical `panel_alias`; all other fields match. The index and alias map are regenerated from the committed catalog, then the release binary's exact K13 registration and workload identities are tested before data. If those local tests fail, the screen remains blocked. Resolving the global obstruction requires a source-by-source catalog diff, a declared authority for historical entries, and a successful full generator check on a complete source checkout; this screen does not claim that resolution.

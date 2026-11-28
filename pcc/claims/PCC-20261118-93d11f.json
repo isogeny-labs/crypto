@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T17:37:37Z",
+ "id": "PCC-20261118-93d11f",
+ "kind": "statement",
+ "producer": {
+  "commit": "2de1d1c709bdfdf5bceba7a9e105d9d6841e8447",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/publication/status.json",
+    "sha256": "b066a782bbb2d25f57ab664830f65b71815f5120bb4a509195b88d4c926e6201"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/publication/autofix-failure-excerpt.txt",
+    "sha256": "00a61f71f85018313a9b5fe616b690df909d1ac01d0f99399f90a6e018ad1906"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/publication/east-region-response.xml",
+    "sha256": "1c8bb302776513d8a9ce6d9484ee67faa8b58e7c0f00df76293c09982ee43a0b"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/wide-harness-20261118/publication",
+ "statement": "Verified S3 publication remains incomplete: the canonical local push lacked an AWS CLI at first, later local STS found no credentials, and the existing trusted artifact-autofix workflow failed signed HeadObject with 403 before upload/replay. A public request at the correct us-east-2 endpoint returned AllAccessDisabled. This is an observed artifact-access blocker, not a mathematical impossibility or an evaluated 80-bit crossing."
+}

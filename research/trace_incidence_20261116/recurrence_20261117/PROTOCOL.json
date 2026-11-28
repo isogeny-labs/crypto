@@ -1,0 +1,23 @@
+{
+  "schema": "root-recurrence-study/v1",
+  "backend": "authorized local shared CPU",
+  "source_baseline": "native/translation.cpp frozen manifest",
+  "arms": [
+    "dense",
+    "quadratic-trace",
+    "flint-recurrence",
+    "hybrid32",
+    "flint-preinverse"
+  ],
+  "hybrid_threshold": 32,
+  "rounds": 5,
+  "warmups": 1,
+  "order": "rotate each round",
+  "translation": "all retained fixtures, degrees8..256; generic,collision,exception_plus,exception_minus; both primes",
+  "root": "paper F83 literal datum with per-call validation,100 repetitions; dense,trace,pullback,external FLINT; isogeny separately",
+  "accounting": "Complete existing benchmark intervals; input parsing, translation checks, exceptional/collision lifting and recovery included as defined by parent harness; output support check outside interval separately retained. No input divisor construction in either arm. CPU/wall/RSS recorded; no L2 claim.",
+  "success": "exact point support and roots; paired cost improvements reported with losses and ranges",
+  "custody": "temporary local workspace, explicit continuation authorization; no S3 claim",
+  "scope": "root-finding/translation, not a full ECDLP timing or Pareto optimality theorem",
+  "isogeny_repetitions": 1
+}

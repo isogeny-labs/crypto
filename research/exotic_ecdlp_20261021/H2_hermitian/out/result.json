@@ -1,0 +1,952 @@
+{
+ "experiment": "EXP-EXOTIC-H2-001",
+ "seed": 20261022,
+ "p_values": [
+  7,
+  11,
+  13,
+  31
+ ],
+ "cells": {
+  "7": {
+   "p": 7,
+   "lines_count_expected": 17200,
+   "lines_count_expected_correct": 2752,
+   "points_count_expected": 17200,
+   "protocol_line_formula_is_actually_point_count": true,
+   "srg_predicted_eigenvalues": [
+    400,
+    41,
+    -8
+   ],
+   "gq_NNt_predicted_eigenvalues": {
+    "nonzero": [
+     400,
+     56
+    ],
+    "zero": 0
+   },
+   "gq_collinearity_adjacency_predicted": [
+    392,
+    48,
+    -8
+   ],
+   "gq_line_graph_adjacency_predicted": [
+    350,
+    6,
+    -50
+   ],
+   "lambda": 5,
+   "u0": 8,
+   "ncols": 26,
+   "E_order_over_Fq": 48,
+   "E_lambda": "y^2 = x(x-1)(x-5) over F_{49}",
+   "trace_over_Fq": 2,
+   "E_order_sage": 48,
+   "E_order_factorization": "2^4 * 3",
+   "ell_largest_prime_factor": 3,
+   "points_count_bruteforce": 17200,
+   "line_count": 2752,
+   "lines_count_bruteforce_pairs": 2752,
+   "points_on_lines_union": 17200,
+   "incidence_gq_check": {
+    "diag_all_p2_plus_1": true,
+    "offdiag_in_{0,1}": true,
+    "line_degree_p(p^2+1)": true,
+    "annihilator_residual_inf_norm": 0.0,
+    "trace_A": 137600,
+    "mult_p2_plus_p_from_trace": 2450,
+    "mult_integral": true,
+    "trace_A2": 7843200,
+    "trace_A2_predicted": 7843200,
+    "trace_A2_matches": true,
+    "rank_NNt_predicted": 2451,
+    "top_eigenvalues_lanczos": [
+     400.0000000000002,
+     56.000000000000114,
+     56.000000000000085,
+     56.00000000000007,
+     56.00000000000007,
+     56.00000000000005
+    ],
+    "full_spectrum_clusters_dense": [
+     [
+      400.0,
+      1
+     ],
+     [
+      56.0,
+      2450
+     ],
+     [
+      0.0,
+      301
+     ]
+    ],
+    "predicted_nonzero_eigenvalues": [
+     400,
+     56
+    ]
+   },
+   "spectrum_residual_vs_srg": 0.0,
+   "spectrum_residual_vs_srg_as_stated_in_protocol": 15.0,
+   "fibre_planes_zeta_count": 8,
+   "surrogate_A": {
+    "ncols": 26,
+    "ncols_hit": 24,
+    "ncols_never_hit": 2,
+    "entries_dropped_on_axis_x3_eq_0": 512,
+    "entries_dropped_nonsquare_rhs": 9216,
+    "nnz": 12288,
+    "density": 0.18604651162790697,
+    "row_weight_mean": 4.465116279069767,
+    "distinct_rows": 42,
+    "rank_Q": 24,
+    "rank_FBIG": 24,
+    "rank_Fell": 24,
+    "ell": 3,
+    "rank_Q_row_differences": 24,
+    "tautological_dim": 24,
+    "rank_S_pencil_sums": 24,
+    "rank_Q_rows_plus_pencil_differences": 24,
+    "pencil_differences_inside_rowspace": true,
+    "generic_rank_min_rows_cols": 24,
+    "nontaut_corank": 0,
+    "nontaut_corank_over_ncols_hit": 0.0,
+    "nontaut_rank_beyond_taut": 0,
+    "nontaut_rank_beyond_taut_generic": 0,
+    "corank_all_columns_incl_never_hit": 2,
+    "top_eigenvalues": [
+     2585.195426972731,
+     900.8621261631662,
+     859.3666207744852,
+     745.1288113874512,
+     678.7552816296952,
+     673.393085635258
+    ],
+    "smallest_eigenvalue_of_gram": 59.38128046816483,
+    "eigenvalue_cluster_count": 24,
+    "eigenvalue_clusters_top": [
+     [
+      2585.195427,
+      1
+     ],
+     [
+      900.862126,
+      1
+     ],
+     [
+      859.366621,
+      1
+     ],
+     [
+      745.128811,
+      1
+     ],
+     [
+      678.755282,
+      1
+     ],
+     [
+      673.393086,
+      1
+     ],
+     [
+      610.300171,
+      1
+     ],
+     [
+      548.449673,
+      1
+     ]
+    ],
+    "M_gram_eig_mismatch_vs_GQ_NNt_nonzero_set_max": 2185.195426972731,
+    "random_matrix_rank_mean": 24.0,
+    "random_matrix_rank_sd": 0.0,
+    "random_matrix_top_eigs_mean": [
+     2705.4958852085906,
+     491.67772887676983,
+     480.9195606552333
+    ],
+    "random_rows_p1_draws_rank_mean": 24.0,
+    "random_rows_p1_draws_rank_sd": 0.0,
+    "random_rows_p1_draws_top_eigs_mean": [
+     7347.113365930959,
+     1072.904628680514,
+     1050.4485314758244
+    ]
+   },
+   "surrogate_B": {
+    "ncols": 26,
+    "ncols_hit": 17,
+    "ncols_never_hit": 9,
+    "entries_dropped_on_axis_x3_eq_0": 512,
+    "entries_dropped_nonsquare_rhs": 6144,
+    "nnz": 13824,
+    "density": 0.2954856361149111,
+    "row_weight_mean": 5.5813953488372094,
+    "distinct_rows": 26,
+    "rank_Q": 17,
+    "rank_FBIG": 17,
+    "rank_Fell": 17,
+    "ell": 3,
+    "rank_Q_row_differences": 17,
+    "tautological_dim": 17,
+    "rank_S_pencil_sums": 17,
+    "rank_Q_rows_plus_pencil_differences": 17,
+    "pencil_differences_inside_rowspace": true,
+    "generic_rank_min_rows_cols": 17,
+    "nontaut_corank": 0,
+    "nontaut_corank_over_ncols_hit": 0.0,
+    "nontaut_rank_beyond_taut": 0,
+    "nontaut_rank_beyond_taut_generic": 0,
+    "corank_all_columns_incl_never_hit": 9,
+    "top_eigenvalues": [
+     5753.720106716684,
+     1754.0316668701923,
+     1660.1022283722968,
+     1597.8199638832873,
+     1218.3076175483627,
+     1024.0000000000005
+    ],
+    "smallest_eigenvalue_of_gram": 61.804348713474035,
+    "eigenvalue_cluster_count": 17,
+    "eigenvalue_clusters_top": [
+     [
+      5753.720107,
+      1
+     ],
+     [
+      1754.031667,
+      1
+     ],
+     [
+      1660.102228,
+      1
+     ],
+     [
+      1597.819964,
+      1
+     ],
+     [
+      1218.307618,
+      1
+     ],
+     [
+      1024.0,
+      1
+     ],
+     [
+      960.841223,
+      1
+     ],
+     [
+      903.324276,
+      1
+     ]
+    ],
+    "M_gram_eig_mismatch_vs_GQ_NNt_nonzero_set_max": 5353.720106716684,
+    "random_matrix_rank_mean": 17.0,
+    "random_matrix_rank_sd": 0.0,
+    "random_matrix_top_eigs_mean": [
+     4673.868759586534,
+     648.2627079648847,
+     635.0617779690423
+    ],
+    "random_rows_p1_draws_rank_mean": 17.0,
+    "random_rows_p1_draws_rank_sd": 0.0,
+    "random_rows_p1_draws_top_eigs_mean": [
+     10367.689370401984,
+     1475.5533969883977,
+     1439.4933416620452
+    ]
+   },
+   "rank_Q": 24,
+   "tautological_dim": 24,
+   "nontaut_corank": 0,
+   "top_eigenvalues": [
+    2585.195426972731,
+    900.8621261631662,
+    859.3666207744852,
+    745.1288113874512,
+    678.7552816296952,
+    673.393085635258
+   ],
+   "random_matrix_rank_mean": 24.0,
+   "random_matrix_rank_sd": 0.0,
+   "nontaut_corank_B": 0,
+   "validation": {
+    "ncols_equals_E_order_over_2_plus_2": true,
+    "E_order_matches_sage": true,
+    "point_count_matches_formula": true,
+    "line_count_matches_correct_formula": true,
+    "line_count_matches_protocol_formula": false,
+    "line_count_bruteforce_matches": true,
+    "all_line_points_on_H": true,
+    "points_union_equals_H_points": true,
+    "each_point_on_p_plus_1_lines": true,
+    "incidence_is_GQ_p2_p_spectrum": true,
+    "random_baseline_computed": true
+   },
+   "seconds": 9.485175132751465
+  },
+  "11": {
+   "p": 11,
+   "lines_count_expected": 162504,
+   "lines_count_expected_correct": 15984,
+   "points_count_expected": 162504,
+   "protocol_line_formula_is_actually_point_count": true,
+   "srg_predicted_eigenvalues": [
+    1464,
+    109,
+    -12
+   ],
+   "gq_NNt_predicted_eigenvalues": {
+    "nonzero": [
+     1464,
+     132
+    ],
+    "zero": 0
+   },
+   "gq_collinearity_adjacency_predicted": [
+    1452,
+    120,
+    -12
+   ],
+   "gq_line_graph_adjacency_predicted": [
+    1342,
+    10,
+    -122
+   ],
+   "lambda": 2,
+   "u0": 13,
+   "ncols": 74,
+   "E_order_over_Fq": 144,
+   "E_lambda": "y^2 = x(x-1)(x-2) over F_{121}",
+   "trace_over_Fq": -22,
+   "E_order_sage": 144,
+   "E_order_factorization": "2^4 * 3^2",
+   "ell_largest_prime_factor": 3,
+   "points_count_bruteforce": 162504,
+   "line_count": 15984,
+   "points_on_lines_union": 162504,
+   "incidence_gq_check": {
+    "diag_all_p2_plus_1": true,
+    "offdiag_in_{0,1}": true,
+    "line_degree_p(p^2+1)": true,
+    "annihilator_residual_inf_norm": 0.0,
+    "trace_A": 1950048,
+    "mult_p2_plus_p_from_trace": 14762,
+    "mult_integral": true,
+    "trace_A2": 259356384,
+    "trace_A2_predicted": 259356384,
+    "trace_A2_matches": true,
+    "rank_NNt_predicted": 14763,
+    "top_eigenvalues_lanczos": [
+     1464.0000000000002,
+     132.00000000000057,
+     132.0000000000004,
+     132.00000000000037,
+     132.00000000000034,
+     132.0000000000003
+    ],
+    "full_spectrum_clusters_dense": null,
+    "predicted_nonzero_eigenvalues": [
+     1464,
+     132
+    ]
+   },
+   "spectrum_residual_vs_srg": 0.0,
+   "spectrum_residual_vs_srg_as_stated_in_protocol": 23.0,
+   "fibre_planes_zeta_count": 12,
+   "surrogate_A": {
+    "ncols": 74,
+    "ncols_hit": 68,
+    "ncols_never_hit": 6,
+    "entries_dropped_on_axis_x3_eq_0": 1728,
+    "entries_dropped_nonsquare_rhs": 72576,
+    "nnz": 117504,
+    "density": 0.10810810810810811,
+    "row_weight_mean": 7.351351351351352,
+    "distinct_rows": 111,
+    "rank_Q": 68,
+    "rank_FBIG": 68,
+    "rank_Fell": 68,
+    "ell": 3,
+    "rank_Q_row_differences": 68,
+    "tautological_dim": 68,
+    "rank_S_pencil_sums": 68,
+    "rank_Q_rows_plus_pencil_differences": 68,
+    "pencil_differences_inside_rowspace": true,
+    "generic_rank_min_rows_cols": 68,
+    "nontaut_corank": 0,
+    "nontaut_corank_over_ncols_hit": 0.0,
+    "nontaut_rank_beyond_taut": 0,
+    "nontaut_rank_beyond_taut_generic": 0,
+    "corank_all_columns_incl_never_hit": 6,
+    "top_eigenvalues": [
+     13396.010751935093,
+     3794.2358092018826,
+     3707.1208135680204,
+     3653.642108567779,
+     3651.906182607543,
+     3368.767874313088
+    ],
+    "smallest_eigenvalue_of_gram": 59.40047095317879,
+    "eigenvalue_cluster_count": 68,
+    "eigenvalue_clusters_top": [
+     [
+      13396.010752,
+      1
+     ],
+     [
+      3794.235809,
+      1
+     ],
+     [
+      3707.120814,
+      1
+     ],
+     [
+      3653.642109,
+      1
+     ],
+     [
+      3651.906183,
+      1
+     ],
+     [
+      3368.767874,
+      1
+     ],
+     [
+      3333.711481,
+      1
+     ],
+     [
+      3088.530149,
+      1
+     ]
+    ],
+    "M_gram_eig_mismatch_vs_GQ_NNt_nonzero_set_max": 11932.010751935093,
+    "random_matrix_rank_mean": 68.0,
+    "random_matrix_rank_sd": 0.0,
+    "random_matrix_top_eigs_mean": [
+     14259.349703034619,
+     1743.3048789917545,
+     1731.0586903626834
+    ],
+    "random_rows_p1_draws_rank_mean": 68.0,
+    "random_rows_p1_draws_rank_sd": 0.0,
+    "random_rows_p1_draws_top_eigs_mean": [
+     33861.56135280449,
+     3179.2739004203336,
+     3148.1307486827454
+    ]
+   },
+   "surrogate_B": {
+    "ncols": 74,
+    "ncols_hit": 39,
+    "ncols_never_hit": 35,
+    "entries_dropped_on_axis_x3_eq_0": 1728,
+    "entries_dropped_nonsquare_rhs": 69120,
+    "nnz": 115776,
+    "density": 0.18572418572418573,
+    "row_weight_mean": 7.5675675675675675,
+    "distinct_rows": 62,
+    "rank_Q": 39,
+    "rank_FBIG": 39,
+    "rank_Fell": 39,
+    "ell": 3,
+    "rank_Q_row_differences": 39,
+    "tautological_dim": 39,
+    "rank_S_pencil_sums": 39,
+    "rank_Q_rows_plus_pencil_differences": 39,
+    "pencil_differences_inside_rowspace": true,
+    "generic_rank_min_rows_cols": 39,
+    "nontaut_corank": 0,
+    "nontaut_corank_over_ncols_hit": 0.0,
+    "nontaut_rank_beyond_taut": 0,
+    "nontaut_rank_beyond_taut_generic": 0,
+    "corank_all_columns_incl_never_hit": 35,
+    "top_eigenvalues": [
+     26704.64583708864,
+     7680.951092048217,
+     6551.505399455642,
+     5917.861746839081,
+     5883.611492493704,
+     5652.117188845987
+    ],
+    "smallest_eigenvalue_of_gram": 94.23260046249335,
+    "eigenvalue_cluster_count": 39,
+    "eigenvalue_clusters_top": [
+     [
+      26704.645837,
+      1
+     ],
+     [
+      7680.951092,
+      1
+     ],
+     [
+      6551.505399,
+      1
+     ],
+     [
+      5917.861747,
+      1
+     ],
+     [
+      5883.611492,
+      1
+     ],
+     [
+      5652.117189,
+      1
+     ],
+     [
+      5128.304664,
+      1
+     ],
+     [
+      4874.907062,
+      1
+     ]
+    ],
+    "M_gram_eig_mismatch_vs_GQ_NNt_nonzero_set_max": 25240.64583708864,
+    "random_matrix_rank_mean": 39.0,
+    "random_matrix_rank_sd": 0.0,
+    "random_matrix_top_eigs_mean": [
+     23887.1085677508,
+     2640.5176244567488,
+     2619.8819575463467
+    ],
+    "random_rows_p1_draws_rank_mean": 39.0,
+    "random_rows_p1_draws_rank_sd": 0.0,
+    "random_rows_p1_draws_top_eigs_mean": [
+     59030.88489255981,
+     5375.607066408878,
+     5328.662543502729
+    ]
+   },
+   "rank_Q": 68,
+   "tautological_dim": 68,
+   "nontaut_corank": 0,
+   "top_eigenvalues": [
+    13396.010751935093,
+    3794.2358092018826,
+    3707.1208135680204,
+    3653.642108567779,
+    3651.906182607543,
+    3368.767874313088
+   ],
+   "random_matrix_rank_mean": 68.0,
+   "random_matrix_rank_sd": 0.0,
+   "nontaut_corank_B": 0,
+   "validation": {
+    "ncols_equals_E_order_over_2_plus_2": true,
+    "E_order_matches_sage": true,
+    "point_count_matches_formula": true,
+    "line_count_matches_correct_formula": true,
+    "line_count_matches_protocol_formula": false,
+    "all_line_points_on_H": true,
+    "points_union_equals_H_points": true,
+    "each_point_on_p_plus_1_lines": true,
+    "incidence_is_GQ_p2_p_spectrum": true,
+    "random_baseline_computed": true
+   },
+   "seconds": 31.860706567764282
+  },
+  "13": {
+   "p": 13,
+   "lines_count_expected": 373660,
+   "lines_count_expected_correct": 30772,
+   "points_count_expected": 373660,
+   "protocol_line_formula_is_actually_point_count": true,
+   "srg_predicted_eigenvalues": [
+    2380,
+    155,
+    -14
+   ],
+   "gq_NNt_predicted_eigenvalues": {
+    "nonzero": [
+     2380,
+     182
+    ],
+    "zero": 0
+   },
+   "gq_collinearity_adjacency_predicted": [
+    2366,
+    168,
+    -14
+   ],
+   "gq_line_graph_adjacency_predicted": [
+    2210,
+    12,
+    -170
+   ],
+   "lambda": 2,
+   "u0": 15,
+   "ncols": 82,
+   "E_order_over_Fq": 160,
+   "E_lambda": "y^2 = x(x-1)(x-2) over F_{169}",
+   "trace_over_Fq": 10,
+   "E_order_sage": 160,
+   "E_order_factorization": "2^5 * 5",
+   "ell_largest_prime_factor": 5,
+   "points_count_bruteforce": 373660,
+   "line_count": 30772,
+   "points_on_lines_union": 373660,
+   "incidence_gq_check": {
+    "diag_all_p2_plus_1": true,
+    "offdiag_in_{0,1}": true,
+    "line_degree_p(p^2+1)": true,
+    "annihilator_residual_inf_norm": 0.0,
+    "trace_A": 5231240,
+    "mult_p2_plus_p_from_trace": 28730,
+    "mult_integral": true,
+    "trace_A2": 957316920,
+    "trace_A2_predicted": 957316920,
+    "trace_A2_matches": true,
+    "rank_NNt_predicted": 28731,
+    "top_eigenvalues_lanczos": [
+     2380.0000000000005,
+     182.0000000000007,
+     182.00000000000068,
+     182.00000000000065,
+     182.00000000000063,
+     182.0000000000006
+    ],
+    "full_spectrum_clusters_dense": null,
+    "predicted_nonzero_eigenvalues": [
+     2380,
+     182
+    ]
+   },
+   "spectrum_residual_vs_srg": 0.0,
+   "spectrum_residual_vs_srg_as_stated_in_protocol": 27.0,
+   "fibre_planes_zeta_count": 14,
+   "surrogate_A": {
+    "ncols": 82,
+    "ncols_hit": 76,
+    "ncols_never_hit": 6,
+    "entries_dropped_on_axis_x3_eq_0": 2744,
+    "entries_dropped_nonsquare_rhs": 219520,
+    "nnz": 208544,
+    "density": 0.08917197452229299,
+    "row_weight_mean": 6.777070063694268,
+    "distinct_rows": 156,
+    "rank_Q": 76,
+    "rank_FBIG": 76,
+    "rank_Fell": 76,
+    "ell": 5,
+    "rank_Q_row_differences": 76,
+    "tautological_dim": 76,
+    "rank_S_pencil_sums": 76,
+    "rank_Q_rows_plus_pencil_differences": 76,
+    "pencil_differences_inside_rowspace": true,
+    "generic_rank_min_rows_cols": 76,
+    "nontaut_corank": 0,
+    "nontaut_corank_over_ncols_hit": 0.0,
+    "nontaut_rank_beyond_taut": 0,
+    "nontaut_rank_beyond_taut_generic": 0,
+    "corank_all_columns_incl_never_hit": 6,
+    "top_eigenvalues": [
+     20211.3605253699,
+     7414.822649726632,
+     6512.224017028061,
+     6256.027202641413,
+     6172.786783729244,
+     6147.331810890702
+    ],
+    "smallest_eigenvalue_of_gram": 448.74453227669017,
+    "eigenvalue_cluster_count": 75,
+    "eigenvalue_clusters_top": [
+     [
+      20211.360525,
+      1
+     ],
+     [
+      7414.82265,
+      1
+     ],
+     [
+      6512.224017,
+      1
+     ],
+     [
+      6256.027203,
+      1
+     ],
+     [
+      6172.786784,
+      1
+     ],
+     [
+      6147.331811,
+      1
+     ],
+     [
+      5846.382201,
+      1
+     ],
+     [
+      5483.090531,
+      1
+     ]
+    ],
+    "M_gram_eig_mismatch_vs_GQ_NNt_nonzero_set_max": 17831.3605253699,
+    "random_matrix_rank_mean": 76.0,
+    "random_matrix_rank_sd": 0.0,
+    "random_matrix_top_eigs_mean": [
+     21113.941817505874,
+     2750.3700504872236,
+     2734.659389710693
+    ],
+    "random_rows_p1_draws_rank_mean": 76.0,
+    "random_rows_p1_draws_rank_sd": 0.0,
+    "random_rows_p1_draws_top_eigs_mean": [
+     79374.80119921683,
+     6225.101160717711,
+     6184.855163123861
+    ]
+   },
+   "surrogate_B": {
+    "ncols": 82,
+    "ncols_hit": 45,
+    "ncols_never_hit": 37,
+    "entries_dropped_on_axis_x3_eq_0": 2744,
+    "entries_dropped_nonsquare_rhs": 197568,
+    "nnz": 220304,
+    "density": 0.15909412597310688,
+    "row_weight_mean": 7.490445859872612,
+    "distinct_rows": 86,
+    "rank_Q": 45,
+    "rank_FBIG": 45,
+    "rank_Fell": 45,
+    "ell": 5,
+    "rank_Q_row_differences": 45,
+    "tautological_dim": 45,
+    "rank_S_pencil_sums": 45,
+    "rank_Q_rows_plus_pencil_differences": 45,
+    "pencil_differences_inside_rowspace": true,
+    "generic_rank_min_rows_cols": 45,
+    "nontaut_corank": 0,
+    "nontaut_corank_over_ncols_hit": 0.0,
+    "nontaut_rank_beyond_taut": 0,
+    "nontaut_rank_beyond_taut_generic": 0,
+    "corank_all_columns_incl_never_hit": 37,
+    "top_eigenvalues": [
+     42611.13443093789,
+     13913.622071051397,
+     12411.381981221713,
+     11711.631846325325,
+     10752.180417301199,
+     10061.879743584077
+    ],
+    "smallest_eigenvalue_of_gram": 711.6898025173233,
+    "eigenvalue_cluster_count": 45,
+    "eigenvalue_clusters_top": [
+     [
+      42611.134431,
+      1
+     ],
+     [
+      13913.622071,
+      1
+     ],
+     [
+      12411.381981,
+      1
+     ],
+     [
+      11711.631846,
+      1
+     ],
+     [
+      10752.180417,
+      1
+     ],
+     [
+      10061.879744,
+      1
+     ],
+     [
+      10011.379194,
+      1
+     ],
+     [
+      8738.813332,
+      1
+     ]
+    ],
+    "M_gram_eig_mismatch_vs_GQ_NNt_nonzero_set_max": 40231.13443093789,
+    "random_matrix_rank_mean": 45.0,
+    "random_matrix_rank_sd": 0.0,
+    "random_matrix_top_eigs_mean": [
+     39169.66483829322,
+     4415.82074032815,
+     4394.535377285452
+    ],
+    "random_rows_p1_draws_rank_mean": 45.0,
+    "random_rows_p1_draws_rank_sd": 0.0,
+    "random_rows_p1_draws_top_eigs_mean": [
+     134044.15146352325,
+     10299.228221801939,
+     10226.264748427737
+    ]
+   },
+   "rank_Q": 76,
+   "tautological_dim": 76,
+   "nontaut_corank": 0,
+   "top_eigenvalues": [
+    20211.3605253699,
+    7414.822649726632,
+    6512.224017028061,
+    6256.027202641413,
+    6172.786783729244,
+    6147.331810890702
+   ],
+   "random_matrix_rank_mean": 76.0,
+   "random_matrix_rank_sd": 0.0,
+   "nontaut_corank_B": 0,
+   "validation": {
+    "ncols_equals_E_order_over_2_plus_2": true,
+    "E_order_matches_sage": true,
+    "point_count_matches_formula": true,
+    "line_count_matches_correct_formula": true,
+    "line_count_matches_protocol_formula": false,
+    "all_line_points_on_H": true,
+    "points_union_equals_H_points": true,
+    "each_point_on_p_plus_1_lines": true,
+    "incidence_is_GQ_p2_p_spectrum": true,
+    "random_baseline_computed": true
+   },
+   "seconds": 114.60639572143555
+  },
+  "31": {
+   "p": 31,
+   "lines_count_expected": 28659904,
+   "lines_count_expected_correct": 953344,
+   "points_count_expected": 28659904,
+   "protocol_line_formula_is_actually_point_count": true,
+   "srg_predicted_eigenvalues": [
+    30784,
+    929,
+    -32
+   ],
+   "gq_NNt_predicted_eigenvalues": {
+    "nonzero": [
+     30784,
+     992
+    ],
+    "zero": 0
+   },
+   "gq_collinearity_adjacency_predicted": [
+    30752,
+    960,
+    -32
+   ],
+   "gq_line_graph_adjacency_predicted": [
+    29822,
+    30,
+    -962
+   ],
+   "lambda": 13,
+   "u0": 35,
+   "ncols": 514,
+   "E_order_over_Fq": 1024,
+   "E_lambda": "y^2 = x(x-1)(x-13) over F_{961}",
+   "trace_over_Fq": -62,
+   "E_order_sage": 1024,
+   "E_order_factorization": "2^10",
+   "ell_largest_prime_factor": 2,
+   "censored": true,
+   "reason": "line enumeration infeasible in budget (953344 lines x 962 pts; M would have ~9.2e+08 nonzeros)",
+   "validation": {
+    "ncols_equals_E_order_over_2_plus_2": true,
+    "E_order_matches_sage": true
+   }
+  }
+ },
+ "model_note": "SURROGATE. No faithful Hermitian-surface -> Legendre-curve map exists (genus/Kodaira mismatch), so the norm-circle fibre of PROTOCOL.md is used: for lambda=N(u0) the fibre F_lambda = {N(x0)=lambda N(x3)} on H is the union of the p+1 planes x0=zeta*x3, N(zeta)=lambda (the norm circle). Each of the (p+1)(p^3+1) lines of H (GQ(p^2,p)) meets F_lambda in exactly p+1 points (one per plane; coincident when the line meets the axis x0=x3=0). Surrogate A pushes a fibre point (zeta x3:x1:x2:x3) to the Legendre x-coordinate X=x1/x2 ; surrogate B to X=x1*x2^p/x3^(p+1). Columns = <+-1>-classes (x-coordinates) of E_lambda(F_{p^2}), E_lambda: y^2=x(x-1)(x-lambda), plus O; a point is dropped if X is not an x-coordinate of an F_{p^2}-point. Entries are UNSIGNED multiplicities (the sign of y is not determined by the surrogate). M = (lines x columns). Tautological relations = span of pencil differences S_P - S_P0, S_P = sum of rows of the p+1 lines through P (= hyperplane section T_P cap F pushed down; all such have the same class). nontaut_corank = min(#lines, #hit columns) - rank_Q(M). Columns never hit by the surrogate image are reported separately (ncols_never_hit) and are not counted as corank. rank_Q = exact rank of Gram M^T M. Protocol formula (p^3+1)(p^2+1) is the number of POINTS of H; the number of lines is (p+1)(p^3+1). The stated SRG eigenvalue list is not the spectrum of N N^T; the derived GQ(p^2,p) incidence spectrum {(p+1)(p^2+1), p^2+p, 0} is used for spectrum_residual_vs_srg, and the as-stated residual is also reported.",
+ "validation": {
+  "p7_ncols_equals_E_order_over_2_plus_2": true,
+  "p7_E_order_matches_sage": true,
+  "p7_point_count_matches_formula": true,
+  "p7_line_count_matches_correct_formula": true,
+  "p7_line_count_matches_protocol_formula": false,
+  "p7_line_count_bruteforce_matches": true,
+  "p7_all_line_points_on_H": true,
+  "p7_points_union_equals_H_points": true,
+  "p7_each_point_on_p_plus_1_lines": true,
+  "p7_incidence_is_GQ_p2_p_spectrum": true,
+  "p7_random_baseline_computed": true,
+  "p11_ncols_equals_E_order_over_2_plus_2": true,
+  "p11_E_order_matches_sage": true,
+  "p11_point_count_matches_formula": true,
+  "p11_line_count_matches_correct_formula": true,
+  "p11_line_count_matches_protocol_formula": false,
+  "p11_all_line_points_on_H": true,
+  "p11_points_union_equals_H_points": true,
+  "p11_each_point_on_p_plus_1_lines": true,
+  "p11_incidence_is_GQ_p2_p_spectrum": true,
+  "p11_random_baseline_computed": true,
+  "p13_ncols_equals_E_order_over_2_plus_2": true,
+  "p13_E_order_matches_sage": true,
+  "p13_point_count_matches_formula": true,
+  "p13_line_count_matches_correct_formula": true,
+  "p13_line_count_matches_protocol_formula": false,
+  "p13_all_line_points_on_H": true,
+  "p13_points_union_equals_H_points": true,
+  "p13_each_point_on_p_plus_1_lines": true,
+  "p13_incidence_is_GQ_p2_p_spectrum": true,
+  "p13_random_baseline_computed": true,
+  "line_count_matches_correct_formula_all": true,
+  "line_count_matches_protocol_formula_all": false,
+  "protocol_formula_mismatch_note": "(p^3+1)(p^2+1) is #points(H); #lines = (p+1)(p^3+1). Count checked against the correct formula.",
+  "random_matrix_baseline_computed": true,
+  "incidence_GQ_spectrum_verified_all": true,
+  "instance_validation_all_pass": true
+ },
+ "finished_p": [
+  7,
+  11,
+  13
+ ],
+ "censored_p": [
+  31
+ ],
+ "errored_p": [],
+ "nontaut_corank": 0,
+ "primary_p": 13,
+ "spectrum_residual_vs_srg_by_p": {
+  "7": 0.0,
+  "11": 0.0,
+  "13": 0.0
+ },
+ "verdict": "kill",
+ "verdict_inputs": {
+  "coranks_A": [
+   0,
+   0,
+   0
+  ],
+  "coranks_B": [
+   0,
+   0,
+   0
+  ],
+  "corank_over_ncols_A": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "incidence_spectrum_residual_lt_1e-6_all_p": true,
+  "instance_validation_all_pass": true,
+  "censored_p": [
+   31
+  ]
+ },
+ "total_seconds": 156.0517933368683
+}

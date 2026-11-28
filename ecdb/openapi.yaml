@@ -160,6 +160,7 @@ paths:
         - { name: name, in: query, schema: { type: string }, description: substring of any alias or standard name }
         - { name: has_isogenies, in: query, schema: { type: boolean } }
         - { name: has_covers, in: query, schema: { type: boolean } }
+        - { name: has_factor_bases, in: query, schema: { type: boolean } }
         - name: sort
           in: query
           schema:
@@ -188,7 +189,8 @@ paths:
         explicit endomorphisms and GLV/GLS decompositions; tau-adic data; subfield descent; twists;
         group structure; subgroups with pairing data and attack-surface summaries; p-adic invariants;
         global data; generation; relations, isogenies, covers, transfers; division polynomials;
-        certificates; external labels; evidence links.
+        certificates; external labels; evidence links; model-ready features, factor bases with object
+        references, feature observations, sweep memberships and dataset memberships.
       parameters: [{ $ref: "#/components/parameters/reference" }]
       responses:
         "200": { description: The curve document. }
@@ -225,7 +227,7 @@ paths:
       responses: { "200": { description: OK } }
   /v1/curves/{reference}/relations:
     get:
-      summary: Typed relations to other curves (quadratic_twist, isomorphism, birational_model_change), each with other_curve_id and other_slug.
+      summary: Typed relations to other curves (quadratic_twist, isomorphism, birational_model_change, prym_complement), each with other_curve_id and other_slug.
       description: Twist pairs are recorded only for j != 0, 1728 and t != 0, where the quadratic twist is the unique curve with the same j and trace -t.
       parameters: [{ $ref: "#/components/parameters/reference" }]
       responses: { "200": { description: "{curve_id, items[]}" } }
@@ -250,6 +252,43 @@ paths:
       description: IC leaderboard rows with recipes, ecbench arm summaries (v_ecbench_arm), sibling-dataset measurements and sibling-repository records with their match kind. Compare within one block only.
       parameters: [{ $ref: "#/components/parameters/reference" }]
       responses: { "200": { description: "{curve_id, ic_leaderboard, ecbench_arms, dataset_measurements, external_records, caution}" } }
+  /v1/curves/{reference}/features:
+    get:
+      summary: One curve's model-ready structural row and typed feature observations.
+      parameters: [{ $ref: "#/components/parameters/reference" }]
+      responses: { "200": { description: "{curve_id, structural, observations[]}" } }
+  /v1/sweeps:
+    get:
+      summary: Saved, versioned curve-sweep plans. Plans describe coverage and controls; they are not results.
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses: { "200": { description: A page of sweep definitions. } }
+  /v1/sweeps/{name}:
+    get:
+      summary: Latest version of one saved sweep with its cells and any frozen members.
+      parameters: [{ name: name, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: Sweep definition. }, "404": { description: Unknown sweep. } }
+  /v1/features:
+    get:
+      summary: Versioned feature semantic contracts for curves, factor bases, FBM1 configurations and other subjects.
+      parameters:
+        - { name: scope, in: query, schema: { type: string, enum: [curve, field, subgroup, factor_base, factor_base_measurement, sweep_cell] } }
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses: { "200": { description: A page of feature definitions. } }
+  /v1/datasets:
+    get:
+      summary: Versioned model-dataset recipes with selection query, split policy and materialized-artifact pointer.
+      parameters:
+        - $ref: "#/components/parameters/limit"
+        - $ref: "#/components/parameters/offset"
+      responses: { "200": { description: A page of dataset recipes. } }
+  /v1/datasets/{name}:
+    get:
+      summary: Latest version of one dataset recipe with pinned feature roles and any frozen members.
+      parameters: [{ name: name, in: path, required: true, schema: { type: string } }]
+      responses: { "200": { description: Dataset definition. }, "404": { description: Unknown dataset. } }
   /v1/ic/leaderboard:
     get:
       summary: The IC leaderboard (docs/ic/leaderboard.json), as frozen there.
@@ -406,7 +445,7 @@ paths:
       responses: { "200": { description: OK } }
   /v1/factor-bases/{key}:
     get:
-      summary: One factor base by FB1/FBS1 id, archive digest, alias (PS1 label, cited digest) or id, with aliases, FBM1 configurations and results by source.
+      summary: One factor base by FB1/FBS1 id, archive digest, alias or id, with FBM1 configurations, results, model-ready features, observations and content-addressed object references.
       parameters:
         - { name: key, in: path, required: true, schema: { type: string } }
       responses: { "200": { description: OK }, "404": { description: unknown }, "409": { description: ambiguous alias } }
@@ -484,6 +523,60 @@ paths:
                   required: [name]
                   properties: { name: { type: string }, method: { type: string }, notes: { type: string } }
       responses: { "201": { description: Created }, "200": { description: Duplicate }, "401": { description: Unauthorized }, "403": { description: Writes disabled } }
+  /v1/features/observations:
+    post:
+      summary: Record one typed, provenance-bearing observation on a curve, factor base or FBM1 configuration.
+      security: [{ bearer: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [feature_key, agent]
+              properties:
+                curve: { type: string, description: Exactly one of curve, factor_base or fbm_id. }
+                factor_base: { type: string }
+                fbm_id: { type: string }
+                feature_key: { type: string }
+                version: { type: integer, default: 1 }
+                value: { description: Must match the feature definition's data_type. }
+                missing_reason: { type: string }
+                context: { type: object }
+                status: { type: string, enum: [proved, probable, bounded, heuristic, conjectural, refuted, unknown, not_evaluated, not_applicable] }
+                observed_at: { type: string, format: date-time }
+                agent:
+                  type: object
+                  required: [name]
+                  properties: { name: { type: string }, method: { type: string }, notes: { type: string } }
+      responses: { "201": { description: Created }, "200": { description: Duplicate }, "400": { description: Type or scope mismatch }, "401": { description: Unauthorized }, "403": { description: Writes disabled } }
+  /v1/factor-base-artifacts:
+    post:
+      summary: Link an already-uploaded content-addressed S3/HTTPS object to an existing factor base.
+      description: The API records identity and location; it does not upload or remotely verify the bytes.
+      security: [{ bearer: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [factor_base, role, sha256, storage_uri, agent]
+              properties:
+                factor_base: { type: string, description: FB1/FBS1/archive key, alias or numeric id. }
+                role: { type: string, enum: [dump, matrix, relations, log_table, certificate, manifest, dataset, other] }
+                is_primary: { type: boolean, default: false }
+                sha256: { type: string, pattern: "^[0-9a-fA-F]{64}$" }
+                size_bytes: { type: integer, minimum: 0 }
+                media_type: { type: string }
+                storage_uri: { type: string, examples: ["s3://bucket/key"] }
+                repo_path: { type: string }
+                description: { type: string }
+                agent:
+                  type: object
+                  required: [name]
+                  properties: { name: { type: string }, method: { type: string }, notes: { type: string } }
+      responses: { "201": { description: Linked }, "200": { description: Duplicate }, "400": { description: Rejected }, "401": { description: Unauthorized }, "403": { description: Writes disabled } }
   /mcp:
     post:
       summary: Model Context Protocol endpoint (streamable HTTP, JSON responses, stateless).
@@ -492,7 +585,8 @@ paths:
         prompts/list return empty lists). Notifications answer 202. initialize, ping and tools/list need no token;
         tools/call forwards the caller's Authorization header to the REST route the tool maps to. Tools:
         ecdb_schema, ecdb_search_curves, ecdb_get_curve, ecdb_curve_detail, ecdb_isogeny_class, ecdb_transfers,
-        ecdb_polynomials, ecdb_results, ecdb_ecbench, ecdb_sql, ecdb_record_evidence.
+        ecdb_polynomials, ecdb_results, ecdb_ecbench, ecdb_factor_bases, ecdb_research, ecdb_sql,
+        ecdb_record_evidence.
       security: [{}]
       requestBody: { required: true, content: { application/json: { schema: { type: object } } } }
       responses: { "200": { description: JSON-RPC response }, "202": { description: notification accepted } }

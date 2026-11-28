@@ -1,0 +1,282 @@
+{
+  "all_verified": true,
+  "calibration": {
+    "ns_per_add": 45.954795,
+    "ns_per_as_solve": null,
+    "ns_per_canon": null,
+    "ns_per_double": 44.004795,
+    "ns_per_frobenius": null,
+    "ns_per_inversion": null,
+    "ns_per_legendre": null,
+    "ns_per_lookup": 0.0,
+    "ns_per_row_op": 0.833822265625,
+    "ns_per_s4_pair": null,
+    "ns_per_sqrt": null,
+    "ns_per_word_xor": 0.26612353515625,
+    "pinned_units": []
+  },
+  "calibration_pins": {
+    "measured": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_word_xor"
+    ],
+    "pinned": []
+  },
+  "configurations_run": 1,
+  "configurations_skipped": [],
+  "cost_qualification": null,
+  "elapsed_seconds": 10.144126375,
+  "instance": "icv1-fp13-tm13-9e2d11f6",
+  "markdown": "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|\n| icv1-fp13-tm13-9e2d11f6 | prime-abscissa[below=48] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk | 52 | 26 | 2.0 | 0.357 | 42 | 15 | 15 | 7.0 | — | 3132941.384 | — | yes |\n",
+  "operation": "bench",
+  "plan": null,
+  "regime": "prime",
+  "rho_reference": null,
+  "rho_reference_candidates": [],
+  "rho_reference_plain": null,
+  "rho_reference_rule": "negation map (A = 2): the only eligible automorphism of this curve",
+  "rows": [
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 220577748.5390357,
+          "group_ops": {
+            "adds": 315,
+            "doubles": 378,
+            "scalar_mults": 36
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 11,
+            "lookups": 0,
+            "pkm_consistent_systems": 26,
+            "pkm_grid_fp_mults_uncharged": 136780,
+            "pkm_system_fp_mults_uncharged": 12669,
+            "pkm_system_specialisations": 41,
+            "pkm_system_terms": 19844,
+            "relations": 15,
+            "repeated_targets_skipped": 1,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "solver_budget_exceeded": 0,
+            "solver_calls": 41,
+            "solver_ops": 82118358831,
+            "sqrt_solves": 0,
+            "target_guard_probes": 42,
+            "trials": 42,
+            "unliftable_systems": 11,
+            "walk_jumps": 17,
+            "walk_jumps_materialised": 16,
+            "walk_pool_offsets": 1,
+            "walk_pool_ops": 32,
+            "walk_pool_restarts": 1,
+            "walk_restarts": 2,
+            "walk_steps": 40
+          },
+          "wall_ns": 10143419250,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 49,
+            "walk_mix_hashes": 40,
+            "walk_modr_adds": 82
+          }
+        },
+        "description": "Semaev S_(m+1) over F_p with each x_i on bits: x = 0 + Σ 2^j b_j, b_j² = b_j (PKM), m = 2, t = 6, mode chain, engine f4",
+        "gae_before_solver": 693.0,
+        "hit_rate": 0.35714285714285715,
+        "name": "pkm-semaev",
+        "relations_found": 15,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 547959
+        },
+        "solver": {
+          "budget_exceeded": 0,
+          "calls": 41,
+          "degree_over_bound": null,
+          "extra": {
+            "max_cols_max": 3541,
+            "max_nnz_max": 2462626,
+            "max_rows_max": 5544,
+            "refutations": 15,
+            "staircase_stops": 0,
+            "steps": 920
+          },
+          "gae": 220577055.5390357,
+          "name": "f4-fp-tower",
+          "ns_per_op": 0.1234385771135675,
+          "op_unit": "F_p multiply-adds (elimination only)",
+          "ops": 82118358831,
+          "peak_bytes": 0,
+          "priced_by": "measured",
+          "semi_regular_degree": null,
+          "solving_degree_max": 7,
+          "solving_degree_mean": 7.0,
+          "solving_degree_sum": 287,
+          "wall_ns": 10136573369
+        },
+        "summands": 2,
+        "system": {
+          "degrees": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2
+          ],
+          "n_equations": 13,
+          "n_vars": 12,
+          "semi_regular_degree": null
+        },
+        "targets_tried": 42
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 26,
+        "columns": 26,
+        "cost": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "abscissae_scanned": 47,
+            "legendre_symbols": 47,
+            "sqrt_solves": 26
+          },
+          "wall_ns": 27625,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 78,
+            "index_point_negations": 26,
+            "index_sort_word_ops": 156
+          }
+        },
+        "description": "every abscissa in [1, 48) carrying a point, one column each",
+        "name": "prime-abscissa",
+        "points_per_column": 2.0,
+        "signed_points": 52
+      },
+      "group_order": 4957,
+      "instance": "icv1-fp13-tm13-9e2d11f6",
+      "label": "prime-abscissa[below=48] + pkm-semaev[bits=6,degree=8,engine=f4,lo=0,m=2,mode=chain] + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 2.9393930933921038,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 27,
+            "pinned_by_repeated_row": 0,
+            "rank": 15,
+            "repeated_column_rows": 0,
+            "row_ops": 162,
+            "rows": 15,
+            "single_column_rows": 0,
+            "two_column_rows": 15
+          },
+          "wall_ns": 31625,
+          "work_native": {
+            "column_part_inserts": 15,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 1476,
+            "pivot_inversion_steps": 390,
+            "row_build_modr_adds": 45,
+            "row_build_modr_muls": 30,
+            "row_build_words": 1185,
+            "row_key_mixes": 30
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 15,
+        "rows": 15,
+        "work": 162,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 12.275251543470327,
+      "r": 4957,
+      "recovered": 1058,
+      "rho_s": null,
+      "s": 3132941.3839039416,
+      "s_over_rho": null,
+      "spec": {
+        "factor_base": "prime-abscissa",
+        "factor_base_params": {
+          "below": "48"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 1000,
+        "oracle": "pkm-semaev",
+        "oracle_params": {
+          "bits": "6",
+          "degree": "8",
+          "engine": "f4",
+          "lo": "0",
+          "m": "2",
+          "mode": "chain"
+        },
+        "seed": 20261185,
+        "solver": null,
+        "solver_budget_seconds": 5,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 220577763.4784288,
+      "verified": true,
+      "verify": {
+        "gae": 12.0,
+        "group_ops": {
+          "adds": 2,
+          "doubles": 10,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 708
+      },
+      "wall_seconds": 10.144077875
+    }
+  ],
+  "schema_version": 1,
+  "software": {
+    "arch": "aarch64",
+    "binary_blake3": "b449282386818d154e1039f7e9c1bdd5d90bcbb40bca8d845a44317bedefeee4",
+    "git_commit": "cc7d6141f26bc02ae02876bc094b6a7783990947",
+    "git_commit_source": "CRYPTO_BUILD_GIT_COMMIT",
+    "git_dirty": false,
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "status": "complete",
+  "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
+  "what_this_is_not": [
+    "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+    "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
+    "not a claim about any deployed curve"
+  ]
+}

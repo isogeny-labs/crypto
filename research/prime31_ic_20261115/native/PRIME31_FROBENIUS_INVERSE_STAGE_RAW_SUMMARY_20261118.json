@@ -1,0 +1,87 @@
+{
+  "schema": "prime31.frobenius_inverse_stage.reconciled_logs.v1",
+  "date_utc": "2026-11-18",
+  "standing": "producer-authorized summary of GitHub Actions JSON/logs; pcc:unverified; not independently signed",
+  "source_curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "n": 2147446831,
+    "g": [
+      625037715,
+      2100627251
+    ],
+    "cofactor": 1
+  },
+  "codomain_curve": {
+    "a": 323891735,
+    "b": 1985248359,
+    "g": [
+      1767020261,
+      634125456
+    ]
+  },
+  "cohort": "fixed nonblinded public caller-only scalars 1..=256; inverse receives only codomain public Q",
+  "public_targets_per_arm": 256,
+  "exact_native_rust_library_tests": 40,
+  "focused_example_tests": 2,
+  "independent_python_bigint_public_points_replayed": 256,
+  "independent_python_scalar_checks": 512,
+  "tests_passed": true,
+  "method_a": "Fp polynomial gcd(F_X,T^p-T), no source scalar, field counts include exponentiation",
+  "method_b": "normalized dual Velu + original native scalar 3 inverse modulo n",
+  "counted": {
+    "a": {
+      "fp_multiplications": 356864,
+      "fp_inversions": 1024,
+      "source_group_additions": 0
+    },
+    "b": {
+      "fp_multiplications": 812288,
+      "fp_inversions": 12544,
+      "source_group_additions": 12544,
+      "normalized_dual_fp_multiplications": 17920,
+      "normalized_dual_fp_inversions": 256,
+      "native_scalar_fp_multiplications": 794368,
+      "native_scalar_fp_inversions": 12288
+    },
+    "a_over_b_fpmul_ratio": 0.43933186259060825,
+    "b_over_a_fpmul_ratio": 2.2761836441893832
+  },
+  "runs": [
+    {
+      "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/44259095918",
+      "artifact_url": "https://github.com/isogeny-labs/crypto/actions/runs/44259095918/artifacts/14406923229",
+      "zip_sha256_provider_reported": "60636d239a218f89b7e1d6344f983a70d191850b8a087d3eeec405fa04d0ffc8",
+      "stage_order": "A then B",
+      "a_ns": 1918110,
+      "b_ns": 3997873,
+      "ratio_b_over_a": 2.084277231232828,
+      "conclusion": "success"
+    },
+    {
+      "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/44259575247",
+      "artifact_url": "https://github.com/isogeny-labs/crypto/actions/runs/44259575247/artifacts/14407278176",
+      "zip_sha256_provider_reported": "01c218ac81b3b05145f39dbb879f77b53a81fcdb030659f86a5b2375e48896ef",
+      "stage_order": "A then B",
+      "a_ns": 1643902,
+      "b_ns": 2978611,
+      "ratio_b_over_a": 1.8119151871583585,
+      "conclusion": "success"
+    },
+    {
+      "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/44259575247",
+      "artifact_url": "https://github.com/isogeny-labs/crypto/actions/runs/44259575247/artifacts/14407278176",
+      "zip_sha256_provider_reported": "01c218ac81b3b05145f39dbb879f77b53a81fcdb030659f86a5b2375e48896ef",
+      "stage_order": "B then A",
+      "a_ns": 1652165,
+      "b_ns": 2990670,
+      "ratio_b_over_a": 1.8101521337154582,
+      "conclusion": "success"
+    }
+  ],
+  "direct_stage_wins_in_all_runs": true,
+  "non_generic_relation_extractors_run": 0,
+  "new_complete_target_logs_recovered": 0,
+  "full_cost_ecdlp_speedup_claim": false
+}

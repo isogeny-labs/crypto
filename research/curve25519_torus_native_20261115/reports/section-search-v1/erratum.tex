@@ -1,0 +1,47 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{amsmath,amssymb,hyperref}
+\setlength{\parindent}{0pt}\setlength{\parskip}{9pt}
+\begin{document}
+\begin{center}{\Large\bfseries Section-search cost scope: addendum}\par
+17 November 2026\end{center}
+\textbf{Status.} Producer interpretive clarification, PCC-20261117-15ef76.
+The original report/PDF remain byte-pinned historical records.
+No coefficient-search experiment or changed exponent is claimed.
+
+\textbf{1. A sufficient budget target, not a lower bound.}
+For the proposed per-seed query upper bound, charging every attempted
+section \(\widetilde O(\sqrt k)\) work gives the sufficient testing budget
+\[
+k=B^\theta,\qquad C_{\rm seed}=B^\chi,\qquad \chi+\theta/2<3.
+\]
+The report/derivation/problem record use ``needs'' or ``requires'' too
+strongly if read as a necessary complexity condition. Early refusals,
+amortized scalar work or a genuinely faster/batched operator could yield
+a tighter full cost. Missing this conservative product-of-upper-bounds
+budget alone does not disprove a route. Every alternative still faces the
+unchanged full cold, useful-yield, memory, private-selection, kernel and
+recovery criteria.
+
+\textbf{2. The sampler actually rejected.}
+For a supplied target-bearing basis, draw a normalized coefficient vector
+uniformly from its \(p^5\) chart, and explicitly generate/test each draw,
+charging at least one ordinary operation per trial. The divisor count gives
+\[
+\Pr[\text{hit}]\le\binom{M+5}{6}/p^5=O(p^{-4})
+\quad\text{at }M=O(p^{1/6}).
+\]
+Thus this explicit-trial model needs \(\Omega(p^4)\) trials; the rejection
+uses that trial-count lower bound, not a query upper bound.
+An algorithm processing a compact seed family with bulk zero search and
+restriction is outside this model, even if some marginal distributions
+are uniform. It must supply its own construction/extraction/cost proof.
+Biased target-conditioned coefficient generation remains open.
+
+\textbf{Preservation and next work.}
+No acceptance threshold is weakened and no data are relabelled. Fixed Rust
+identity controls, the unit-cancellation endpoint, original report and route
+criteria remain unchanged. This is a scope clarification of the written
+cost argument; full geometric/counting and algorithmic verification remains
+open. The existing flow diagram stays proposed and unchanged.
+\end{document}

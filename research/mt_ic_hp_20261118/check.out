@@ -1,0 +1,12 @@
+# Pre-run checks, 2026-11-18T03:02:15Z
+THP mode: always [madvise] never
+new binary (examples/mt_fieldops.rs at 3a53f555ba) sha256 c049a3233c674818; previous instrument (17b57af9f3) built the same way: a97c3c13c3e96908
+build: rustc --edition 2021 -C opt-level=3 -C codegen-units=16 --crate-type bin examples/mt_fieldops.rs -L dependency=target/release/deps --extern rand=librand-995139fa871833e1.rlib --extern serde_json=libserde_json-15598c5810c24e49.rlib (main's library does not compile)
+## 1. new (MTF_HP=0) vs previous instrument; ## 2. new MTF_HP=1 vs MTF_HP=0 (all fields but times)
+ic5b mt_fieldops_v5_20261112/instances/W28-0.json 1024 43 0.85 4 1.2 flatf 128 bi pf,rel : 1 PASS  2 PASS
+ic5b mt_ic_scale_20261115/instances/W36-0.json 1024 43 0.85 4 1.2 flatf 128 bi pf,rel : 1 PASS  2 PASS
+rhodpb mt_fieldops_v5_20261112/instances/W32-4.json 1024 43 0.0 0 64 : 1 PASS  2 PASS
+rhodpb mt_ic_scale_20261115/instances/W36-0.json 1024 43 0.0 0 64 : 1 PASS  2 PASS
+## 3. AnonHugePages during an IC execution at W36-0, T = 16384
+MTF_HP=1: max AnonHugePages 778 MB
+MTF_HP=0: max AnonHugePages 0 MB

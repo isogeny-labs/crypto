@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T19:01:51Z",
+ "id": "PCC-20261112-89e906",
+ "kind": "theorem",
+ "producer": {
+  "commit": "30fa845af46c70b05fb3665cc12d787e0d793daf",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "5261b5dbbe0ce56494480b894f0827a73f64999ceda79638d180bb3fbd2c4224",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/T20Geometry.lean",
+   "theorem": "T20Geometry.common_leading_determinant"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Universal common-row-scale determinant and normalized-bracket product factorization/unit cancellation in a commutative ring; actual Fin101 cube/determinant/leading-square constants. Actual quadratic splitting/Galois kernel/BD4.3 discriminant twist/Picard quotient remain explicit written/native bridges; localpass is not scientificsigning.",
+ "statement": "theorem common_leading_determinant {R : Type} [CommRing R] (q a b c d e f g h i : R) : (q*a)*(q*e)*(q*i)+(q*b)*(q*f)*(q*g)+(q*c)*(q*d)*(q*h)- (q*a)*(q*f)*(q*h)-(q*b)*(q*d)*(q*i)-(q*c)*(q*e)*(q*g) = q^3*(a*e*i+b*f*g+c*d*h-a*f*h-b*d*i-c*e*g)"
+}

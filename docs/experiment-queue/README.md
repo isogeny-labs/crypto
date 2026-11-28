@@ -204,8 +204,8 @@ was not completed after sparse manifest fetches; none of these checks is claimed
 as passing in the validation record.
 
 The implementation reuses the repository's
-[queue protocol](../../.agents/skills/queue-experiment/SKILL.md),
-[native Isolab route](../../.agents/skills/isolab-eks/SKILL.md),
+[queue protocol](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/queue-experiment/SKILL.md),
+[native Isolab route](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/SKILL.md),
 [expspec](../../tools/expspec/README.md), and canonical
 [experiment schemas](https://github.com/isogeny-labs/crypto-autoresearcher/tree/6a69b2d02ecd53f1649bcf56e23e4ffe91d953ad/schemas).
 The latest Isolab skill and remote launcher/verifier were checked at

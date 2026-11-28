@@ -74,10 +74,15 @@ pub struct WorkBlock {
     pub known_uncounted: Vec<String>,
     /// `unpriced` and `known_uncounted` are both empty.
     pub complete: bool,
-    /// Gates a second target on the same curve would not repeat: the
-    /// factor base and the oracle's tables, a walk's jump table, a BSGS
-    /// baby-step table, a target-blind rank ([`is_reusable_phase`]).  Read by
-    /// `ecbench amortize`; absent from blocks written before it existed.
+    /// Gates a second target on the same curve would not repeat: work that
+    /// never touches the target, such as the factor base and the oracle's
+    /// tables, a BSGS baby-step table, a target-blind rank or a jump table
+    /// built from the generator alone ([`is_reusable_phase`]).  A walk whose
+    /// set-up uses the target (tuned rho's `[a]G + [b]Q` jumps, kangaroo's
+    /// wild start) has none.  Read by `ecbench amortize`; absent from
+    /// blocks written before it existed.  A block committed before the
+    /// classification depended on the target carries the old split; the
+    /// readers re-derive it from the phases ([`target_split`]).
     #[serde(default)]
     pub reusable_bitops: String,
     /// The rest: what every further target pays again.
@@ -85,20 +90,175 @@ pub struct WorkBlock {
     pub per_target_bitops: String,
 }
 
-/// Whether a phase is work a further target on the same curve reuses.
-/// For the single-target pipeline only the factor base and the oracle's
-/// tables are: its target rides in the relation stream, so its relations
-/// and elimination are per target (an amortised method that solved the
-/// base's logarithms once would do better, and must be measured as such,
-/// as `ic.shared_rank` is).
+/// Whether a phase is work a further target on the same curve reuses,
+/// which holds exactly when the phase's work does not use the target.
+/// The phase name alone does not say so: a phase named `setup` is
+/// target-free in BSGS (baby steps and the giant stride are multiples of
+/// `G`) and in the strong rho (its jumps are drawn before `Q` is read),
+/// but target-dependent in
+///
+/// - `rho.plain` and `rho.negation`, whose set-up builds `G + Q`, the jumps
+///   `M_j = [a_j]G + [b_j]Q` and the start stride
+///   (`ic_boundary::rho_walk_with`), and
+/// - `kangaroo.vow`, whose set-up holds the wild start `Q + [off]G` and
+///   every restart.  Its `jump_count − 1` jump-table doublings are
+///   target-free but share the phase with the starts and are not
+///   separable from the record, so the whole phase is counted per target
+///   (they are `O(log r)` of the `O(√r)` walk).
+///
+/// Phase names are part of the replay comparison, so the rule is
+/// method-aware rather than the phases renamed.  For the single-target IC
+/// pipeline only the factor base and the oracle's tables are reusable:
+/// its target rides in the relation stream, so its relations and
+/// elimination are per target (an amortised method that solved the base's
+/// logarithms once would do better, and must be measured as such, as
+/// `ic.shared_rank` is).
+///
+/// Two IC methods do solve the base's logarithms before reading the
+/// target, so their database phases are reusable too (an accounting
+/// correction to the split; the total `S` over every phase is unchanged):
+///
+/// - `ic.koblitz_descent` and `ic.koblitz_descent_v2` (both run
+///   `koblitz_descent::pipeline`, `koblitz_descent.rs:444-605`):
+///   `factor_base`, `oracle_setup`, `relations`, `linear_algebra` and
+///   `descent_setup` take only the curve, the base, the seed and the
+///   parameters (the pair table's tier is sized for one target's probes,
+///   a count, not `Q`); `Q` is first read by `descent.solve_report(q)` in
+///   `descent` (`koblitz_descent.rs:603`) and again in `verify`
+///   (`koblitz_descent.rs:608-611`), which stay per target.
+/// - `ic.prime_orbit_relations_v1` (`prime_orbit.rs:136-155`): `relations`
+///   is `OrbitIcReport::precompute_ops`, the group operations of
+///   `solve_logs(c, &fb, opts)` (`prime_orbit_index_calculus.rs:2123`,
+///   called at `:2621` before any target is touched; the base is
+///   `OrbitFactorBase::select(c, orbits, seed)`), and
+///   `relation_postprocess` is that call's remaining wall time at zero
+///   gates; `target_descent` is `descend(c, &db, q, ..)` and stays per
+///   target.  The adapter runs with `learn: false`, so the descent does
+///   not extend the database.
 pub fn is_reusable_phase(method: &str, phase: &str) -> bool {
     if method == "ic.shared_rank" {
         return !phase.starts_with("target_");
+    }
+    if matches!(method, "ic.koblitz_descent" | "ic.koblitz_descent_v2") {
+        return matches!(
+            phase,
+            "factor_base" | "oracle_setup" | "relations" | "linear_algebra" | "descent_setup"
+        );
+    }
+    if method == "ic.prime_orbit_relations_v1" {
+        return matches!(phase, "relations" | "relation_postprocess");
+    }
+    if matches!(method, "rho.plain" | "rho.negation" | "kangaroo.vow") {
+        return false;
     }
     matches!(
         phase,
         "factor_base" | "oracle_setup" | "setup" | "base" | "table"
     )
+}
+
+/// `(reusable, per_target)` gates of a work block, re-derived from its
+/// phases under [`is_reusable_phase`], so a block priced before the rule
+/// depended on the target reads with the current classification.
+pub fn target_split(method: &str, w: &WorkBlock) -> Result<(u128, u128), String> {
+    let total: u128 = w
+        .bitops
+        .parse()
+        .map_err(|_| "bitops is not an integer".to_string())?;
+    let mut reusable: u128 = 0;
+    for p in &w.phases {
+        if is_reusable_phase(method, &p.name) {
+            reusable += p
+                .bitops
+                .parse::<u128>()
+                .map_err(|_| format!("phase `{}`: bitops is not an integer", p.name))?;
+        }
+    }
+    Ok((reusable, total.saturating_sub(reusable)))
+}
+
+/// What a bound fit counts of each run (`bound fit --cost`).
+///
+/// - `total`: every gate of the work block (the default; a bound fitted
+///   before the option existed is a `total` bound).
+/// - `per-target`: the gates a further target on the same curve pays again
+///   ([`target_split`]).
+/// - `search`: the search phases only ([`is_search_phase`]): for the
+///   generic walks and tables (rho, BSGS, kangaroo, claw), the phase named
+///   `search`, leaving out set-up, internal verification, recovery and the
+///   `natives` phase (field additions and hash probes counted outside the
+///   group phases); for index calculus (method family `ic`), `relations`
+///   plus `linear_algebra`, leaving out the factor base, the oracle's
+///   set-up and verification.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum CostBasis {
+    #[default]
+    Total,
+    PerTarget,
+    Search,
+}
+
+impl CostBasis {
+    pub fn is_total(&self) -> bool {
+        *self == CostBasis::Total
+    }
+
+    pub fn parse(s: &str) -> Result<Self, String> {
+        match s {
+            "total" => Ok(Self::Total),
+            "per-target" => Ok(Self::PerTarget),
+            "search" => Ok(Self::Search),
+            o => Err(format!(
+                "no cost basis `{o}`; one of total, per-target, search"
+            )),
+        }
+    }
+
+    /// The suffix the basis adds to the unit (`bitop/v1+per_target`), so a
+    /// bound on a partial cost never shares a domain or an id with a total.
+    pub fn unit_suffix(&self) -> Option<&'static str> {
+        match self {
+            Self::Total => None,
+            Self::PerTarget => Some("per_target"),
+            Self::Search => Some("search"),
+        }
+    }
+}
+
+/// Whether a phase is search work under [`CostBasis::Search`].
+pub fn is_search_phase(family: &str, phase: &str) -> bool {
+    if family == "ic" {
+        matches!(phase, "relations" | "linear_algebra")
+    } else {
+        phase == "search"
+    }
+}
+
+/// The gates of `w` under `basis` for a run of `method` in `family`.
+pub fn basis_bitops(
+    method: &str,
+    family: &str,
+    w: &WorkBlock,
+    basis: CostBasis,
+) -> Result<u128, String> {
+    match basis {
+        CostBasis::Total => w
+            .bitops
+            .parse()
+            .map_err(|_| "bitops is not an integer".to_string()),
+        CostBasis::PerTarget => Ok(target_split(method, w)?.1),
+        CostBasis::Search => {
+            let mut g: u128 = 0;
+            for p in w.phases.iter().filter(|p| is_search_phase(family, &p.name)) {
+                g += p
+                    .bitops
+                    .parse::<u128>()
+                    .map_err(|_| format!("phase `{}`: bitops is not an integer", p.name))?;
+            }
+            Ok(g)
+        }
+    }
 }
 
 /// The Kuhn–Struik series `Σ_{k<T} C(2k,k)/4^k`: the expected cost of
@@ -220,6 +380,7 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         | "walk_pool_restarts"
         | "walk_pool_offsets"
         | "walk_jumps"
+        | "walk_jumps_materialised"
         | "native_walk_calls"
         | "lane_count"
         | "lane_batch_inversion"
@@ -255,6 +416,8 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         | "aux_orders_undetermined"
         | "aux_two_sylow_rejected"
         | "pair_table_representatives"
+        | "ksum_table_representatives"
+        | "orbit_identity_skips"
         | "pair_table_kind"
         | "pair_table_points"
         | "scan_window_len"
@@ -301,7 +464,10 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         | "legacy_as_solves_uncharged"
         | "factor_point_inserts_uncharged" => Shape,
         // Proxies whose work is listed as uncounted (insert attempts).
-        "pair_table_entries" | "aux_bsgs_table_entries" => Shape,
+        "pair_table_entries" | "ksum_table_entries" | "aux_bsgs_table_entries" => Shape,
+        // Outcomes of collision verification (whose group additions and
+        // modular combinations are counted in their phase).
+        "free_collisions_checked" | "free_rows_emitted" => Shape,
         // Memory, reported beside the unit.
         "lane_state_bytes_floor" | "factor_base_vec_bytes_floor_uncharged" => Shape,
         // The solver is priced from the record's solver block.
@@ -356,6 +522,17 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         // `known_uncounted` named; the `counted:<item>` marker beside them
         // takes the item off that list for the record that carries it.
         c if c.starts_with("counted:") => Shape,
+        // `bitop_tally::Tally::add_work_native`: what a base builder or an
+        // oracle's set-up tallied, one primitive each (`WORK_NATIVE_KEYS`).
+        "tally_word_ops" => Prims(&[(WordOp, 1)]),
+        "tally_hash_probes" => HASH,
+        "tally_field_adds" => Prims(&[(FieldAdd, 1)]),
+        "tally_field_muls" => Prims(&[(FieldMul, 1)]),
+        "tally_field_sqrs" => Prims(&[(FieldSqr, 1)]),
+        "tally_field_invs" => Prims(&[(FieldInv, 1)]),
+        // `tallied:<native>`: a marker, no work of its own; `price` skips
+        // that phase's `<native>`, whose work the `tally_*` keys carry.
+        c if c.starts_with(crate::cryptanalysis::bitop_tally::TALLIED_PREFIX) => Shape,
         // Dense and sparse Gauss: one matrix entry read or compared (a
         // pivot-column read, a zero skipped in a pivot row, the leftmost
         // search, the non-zero collection, `pinned`'s scan; for the sparse
@@ -430,6 +607,12 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         "index_inserts" => HASH,
         "index_point_negations" => Prims(&[(FieldAdd, 1)]),
         "index_sort_word_ops" => Prims(&[(WordOp, 1)]),
+        // Extension of 2026-11-07 (ic-acct-7; docs/units/BITOPS.md,
+        // "Extensions"): a column-log combination's products and sums
+        // modulo `r` (`ic.shared_rank`'s descent `Σ coef·log`, its
+        // `h⁻¹`, a full-rank check's `coef·log`).
+        "combination_modr_muls" => Prims(&[(ModrMul, 1)]),
+        "combination_modr_adds" => Prims(&[(ModrAdd, 1)]),
 
         // ── Extension of 2026-10-21 (ic-acct-6; docs/units/BITOPS.md,
         // "Extensions").  No primitive weight changes; these rules classify
@@ -598,9 +781,33 @@ fn generic_rule(method: &str, counter: &str) -> Option<Rule> {
         // A collision whose coefficients do not solve: an inversion and a
         // product modulo r.
         "useless_collisions" => Prims(&[(ModrInv, 1), (ModrMul, 1)]),
+        // The versioned cached-BSGS verification phase already carries every
+        // group operation of `[d]G = Q`; these counters describe its outcome.
+        // Scope the new interpretation to the new id so frozen records keep
+        // their established work-block reading.
+        "verification_checks" | "failed_candidates" if method == "bsgs.negation_table_v2" => {
+            Shape
+        }
+        "point_negations_uncharged" if method == "bsgs.negation_table_v2" => {
+            Prims(&[(FieldAdd, 1)])
+        }
+        "recovery_key_comparisons_uncharged" if method == "bsgs.negation_table_v2" => {
+            Prims(&[(WordOp, 1)])
+        }
+        "recovery_modr_muls_uncharged" if method == "bsgs.negation_table_v2" => {
+            Prims(&[(ModrMul, 1)])
+        }
+        "recovery_modr_adds_uncharged" if method == "bsgs.negation_table_v2" => {
+            Prims(&[(ModrAdd, 1)])
+        }
         // BSGS with negation keys every point by its class: a negation and
         // a comparison before the probe.
-        "inserts_uncharged" | "lookups_uncharged" if method == "bsgs.negation" => {
+        "inserts_uncharged" | "lookups_uncharged"
+            if matches!(
+                method,
+                "bsgs.negation" | "bsgs.negation_table_v2"
+            ) =>
+        {
             Prims(&[(HashProbe, 1), (FieldAdd, 2)])
         }
         "walk_steps"
@@ -664,6 +871,14 @@ fn generic_rule(method: &str, counter: &str) -> Option<Rule> {
         // compare each (`work_native` of the search phase, 2026-11-07;
         // research/rho_cycle_window_bitops_20261107).
         "cycle_window_word_ops" | "brent_word_ops" => Prims(&[(WordOp, 1)]),
+        // The tuned walk's jump-index selection: a shift and a mask or a
+        // remainder per selection, tallied as two word operations each
+        // (research/koblitz_rho_reference_20261115, section 1).
+        "jump_select_word_ops" => Prims(&[(WordOp, 1)]),
+        // The same selections counted once each, for the §5a band
+        // (`band::WALK_SELECT_WORK_COUNTERS`); their word operations are
+        // priced above, so here they are shape, not work.
+        "jump_selections" => Shape,
         "canonicalisations_uncharged" if strong => {
             // canon(x), three more basis conversions, the Montgomery scalar
             // update.
@@ -762,6 +977,109 @@ fn known_uncounted(
     out.into_iter().map(str::to_string).collect()
 }
 
+/// Check the duplicated top-level/phase-native binding of the versioned
+/// cached BSGS counters before either copy is priced.  The top-level copy is
+/// retained for the stable report and band schemas, while the phase copy
+/// determines reusable versus per-target work.  Accepting a missing,
+/// duplicated, misphased or unequal copy would therefore silently change
+/// either the total or its split.
+fn validate_cached_bsgs_native_bindings(x: &Priceable<'_>) -> Result<(), String> {
+    if x.method_id != "bsgs.negation_table_v2" {
+        return Ok(());
+    }
+    const RECOVERY: [&str; 3] = [
+        "recovery_key_comparisons_uncharged",
+        "recovery_modr_muls_uncharged",
+        "recovery_modr_adds_uncharged",
+    ];
+    let verification_checks = x
+        .counters
+        .get("verification_checks")
+        .copied()
+        .unwrap_or(0);
+    if verification_checks > 1 {
+        return Err(format!(
+            "verification_checks: cached BSGS has {verification_checks}, expected zero or one"
+        ));
+    }
+    let recovery_present = RECOVERY
+        .iter()
+        .copied()
+        .filter(|name| x.counters.contains_key(*name))
+        .count();
+    let expected_recovery = if verification_checks == 1 { RECOVERY.len() } else { 0 };
+    if recovery_present != expected_recovery {
+        return Err(format!(
+            "cached BSGS recovery counters must appear together exactly on a verified table hit: found {recovery_present}, expected {expected_recovery}"
+        ));
+    }
+    if x.counters.get("failed_candidates").copied().unwrap_or(0) > verification_checks {
+        return Err("failed_candidates exceeds cached BSGS verification_checks".into());
+    }
+
+    for (counter, expected_phase, required) in [
+        ("inserts_uncharged", "setup", true),
+        ("point_negations_uncharged", "setup", true),
+        ("lookups_uncharged", "search", true),
+        ("recovery_key_comparisons_uncharged", "search", false),
+        ("recovery_modr_muls_uncharged", "search", false),
+        ("recovery_modr_adds_uncharged", "search", false),
+    ] {
+        let bindings: Vec<(&str, u64)> = x
+            .phases
+            .iter()
+            .filter_map(|p| {
+                p.native
+                    .get(counter)
+                    .copied()
+                    .map(|count| (p.name.as_str(), count))
+            })
+            .collect();
+        let Some(top) = x.counters.get(counter).copied() else {
+            if required {
+                return Err(format!(
+                    "{counter}: cached BSGS top-level counter is missing"
+                ));
+            }
+            if !bindings.is_empty() {
+                return Err(format!(
+                    "{counter}: cached BSGS has a phase-native binding without a top-level counter"
+                ));
+            }
+            continue;
+        };
+        let [(phase, count)] = bindings.as_slice() else {
+            return Err(format!(
+                "{counter}: cached BSGS requires exactly one phase-native binding, found {}",
+                bindings.len()
+            ));
+        };
+        if *phase != expected_phase {
+            return Err(format!(
+                "{counter}: cached BSGS binding is in phase `{phase}`, expected `{expected_phase}`"
+            ));
+        }
+        if *count != top {
+            return Err(format!(
+                "{counter}: cached BSGS phase-native count {count} differs from top-level count {top}"
+            ));
+        }
+        if matches!(
+            counter,
+            "point_negations_uncharged"
+                | "recovery_key_comparisons_uncharged"
+                | "recovery_modr_muls_uncharged"
+                | "recovery_modr_adds_uncharged"
+        ) && top != 1
+        {
+            return Err(format!(
+                "{counter}: cached BSGS expected exactly one operation, found {top}"
+            ));
+        }
+    }
+    Ok(())
+}
+
 /// What a solver unit's count leaves out, if anything.
 fn solver_gap(op_unit: &str) -> Option<&'static str> {
     if op_unit.starts_with("word XORs (elimination only)") {
@@ -834,7 +1152,7 @@ fn solver_prims(s: &SolverStats) -> Option<Vec<(Prim, u128)>> {
 
 /// The field of a curve, from its facts.
 pub fn widths_of(curve: &CurveFacts) -> Result<Widths, String> {
-    let r_bits = 128 - curve.r.leading_zeros();
+    let r_bits = curve.r.bits();
     let field = match curve.family.as_str() {
         "prime" => Field::Prime {
             bits: curve.field_bits.ok_or("prime curve without field_bits")?,
@@ -846,6 +1164,12 @@ pub fn widths_of(curve: &CurveFacts) -> Result<Widths, String> {
         },
         "fp4" => Field::Fp4 {
             bits: curve.field_bits.ok_or("fp4 curve without field_bits")?,
+        },
+        // A Jacobian over F_p: its records count F_p primitives directly.
+        "hyperelliptic" => Field::Prime {
+            bits: curve
+                .field_bits
+                .ok_or("hyperelliptic curve without field_bits")?,
         },
         // Extension of 2026-10-21: the two `extension` constructions
         // (`workload.rs`, `Instance::F2m4` and `Instance::Fp4Torsion`),
@@ -921,10 +1245,52 @@ pub struct Priceable<'a> {
     pub solver: Option<&'a SolverStats>,
 }
 
+/// Whether a method counts its own `bitop/v1` primitives (`ecbench::hec`).
+fn is_hec(method: &str) -> bool {
+    method.starts_with("hec.")
+}
+
+/// The primitives a `hec.*` record counts, by name: exactly the kinds of
+/// `prime_hyperelliptic::ops`.
+fn hec_prim(name: &str) -> Option<Prim> {
+    use crate::prime_hyperelliptic::ops::Kind;
+    Kind::ALL
+        .iter()
+        .map(|k| k.prim())
+        .find(|p| p.name() == name)
+}
+
+/// Counters of a `hec.*` record (`ecbench::hec`).  The phases' natives are
+/// primitive counts, priced one to one; everything else is shape: group
+/// operations already inside those primitives, outcomes, and the
+/// validation subset (`validation_<prim>`), which is inside the phase counts
+/// and reported beside them, never added again.
+fn hec_shape(counter: &str) -> bool {
+    matches!(
+        counter,
+        "rng_words"
+            | "jacobian_ops"
+            | "precompute_ops"
+            | "walk_ops"
+            | "restarts"
+            | "fruitless_ops"
+            | "factor_base_size"
+            | "trials"
+            | "smooth_trials"
+            | "relations"
+            | "solve_row_ops"
+            | "smoothness_field_ops"
+    ) || counter
+        .strip_prefix("validation_")
+        .is_some_and(|p| hec_prim(p).is_some())
+}
+
 /// Price a record in `bitop/v1`.
 pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
+    validate_cached_bsgs_native_bindings(x)?;
     let widths = widths_of(x.curve)?;
     let method = x.method_id;
+    let hec = is_hec(method);
     let ic = is_ic(method);
     let strong = method.starts_with("rho.signed_frobenius_strong");
     let mut unpriced: Vec<String> = Vec::new();
@@ -936,6 +1302,25 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
             continue;
         }
         let mut prims: BTreeMap<Prim, u128> = BTreeMap::new();
+        if hec {
+            // Counted primitives, one to one.  Its `gae` is Jacobian group
+            // operations whose field work is already in these counts.
+            for (name, &count) in p.native.iter().chain(p.work_native.iter()) {
+                if count == 0 {
+                    continue;
+                }
+                match hec_prim(name) {
+                    Some(prim) => *prims.entry(prim).or_default() += count as u128,
+                    None if hec_shape(name) => {}
+                    None => push_unique(&mut unpriced, name),
+                }
+            }
+            if p.adds + p.doubles + p.scalar_mults > 0 {
+                push_unique(&mut unpriced, "hec_elliptic_group_operations");
+            }
+            phases.push((p.name.clone(), prims));
+            continue;
+        }
         if gae_carries_group_ops(method) && p.adds + p.doubles == 0 {
             let ops = p.gae.round() as u128;
             let doubles = if p.name == "search" {
@@ -959,7 +1344,17 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
                 p.scalar_mults as u128 * 3 * widths.r_bits as u128 / 2;
         }
         if ic {
-            for (name, &count) in p.native.iter().chain(p.work_native.iter()) {
+            // A native counter this phase marks `tallied:<native>` is
+            // carried by its `tally_*` keys; pricing both would count the
+            // work twice (`bitop_tally::TALLIED_PREFIX`).
+            let tallied = |name: &str| {
+                p.work_native.contains_key(&format!(
+                    "{}{name}",
+                    crate::cryptanalysis::bitop_tally::TALLIED_PREFIX
+                ))
+            };
+            let natives = p.native.iter().filter(|(name, _)| !tallied(name));
+            for (name, &count) in natives.chain(p.work_native.iter()) {
                 if count == 0 {
                     continue;
                 }
@@ -999,9 +1394,23 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
             }
         }
         if !ic {
-            // A generic method's priced work that no counter carries (the
-            // rho window's compares): in `work_native`, so committed records,
-            // which have none, replay and price as before.
+            // This versioned method binds native counters to the phase that
+            // performed them.  Restrict the new reading to its new id: no
+            // frozen generic record acquires a different price or split.
+            if method == "bsgs.negation_table_v2" {
+                for (name, &count) in &p.native {
+                    if count == 0 {
+                        continue;
+                    }
+                    match generic_rule(method, name) {
+                        Some(Shape) => {}
+                        Some(Prims(ps)) => add_prims(&mut prims, ps, count as u128),
+                        None => push_unique(&mut unpriced, name),
+                    }
+                }
+            }
+            // Post-record-schema generic counts such as the rho window's
+            // compares retain their established `work_native` path.
             for (name, &count) in &p.work_native {
                 if count == 0 {
                     continue;
@@ -1022,7 +1431,13 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
         phases.push((p.name.clone(), prims));
     }
 
-    if ic {
+    if hec {
+        for (name, &count) in x.counters {
+            if count != 0 && !hec_shape(name) {
+                push_unique(&mut unpriced, name);
+            }
+        }
+    } else if ic {
         // ic.k4_gaudry keeps its linear algebra and oracle in top-level
         // counters only; every other IC counter repeats a phase native or is
         // a shape figure.
@@ -1087,6 +1502,14 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
             if count == 0 {
                 continue;
             }
+            // A phase-bound copy is the same operation count, not another
+            // charge.  Keep the top-level counter for report/band
+            // compatibility, but price it in its named phase above.
+            if method == "bsgs.negation_table_v2"
+                && x.phases.iter().any(|p| p.native.contains_key(name))
+            {
+                continue;
+            }
             match generic_rule(method, name) {
                 Some(Shape) => {}
                 Some(Prims(ps)) => add_prims(&mut natives, ps, count as u128),
@@ -1123,7 +1546,7 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
             log2_bitops: (gates > 0).then(|| bitops::log2(gates)),
         });
     }
-    let r = x.curve.r as f64;
+    let r = x.curve.r.to_f64();
     let add = widths.gates(GroupAdd).map_err(|e| e.to_string())? as f64;
     let floor =
         (std::f64::consts::PI * r / (2.0 * x.curve.automorphisms_available as f64)).sqrt() * add;
@@ -1170,14 +1593,19 @@ pub fn price_record(
 pub fn bitop_view(
     r: &crate::cryptanalysis::ecbench::record::Record,
 ) -> Result<crate::cryptanalysis::ecbench::record::Record, String> {
-    let w = match &r.work {
+    let mut w = match &r.work {
         Some(w) => w.clone(),
         None => price_record(r)?,
     };
+    // The split as the current rule reads it, whatever the block was
+    // committed with (`target_split`).
+    let (reusable, per_target) = target_split(&r.method.id, &w)?;
+    w.reusable_bitops = reusable.to_string();
+    w.per_target_bitops = per_target.to_string();
     let mut v = r.clone();
     let add = w.widths.gates(Prim::GroupAdd).map_err(|e| e.to_string())? as f64;
     let total: f64 = w.bitops.parse().map_err(|_| "bitops is not an integer")?;
-    let sqrt_r = (r.workload.curve.r as f64).sqrt();
+    let sqrt_r = (r.workload.curve.r.to_f64()).sqrt();
     v.cost.unit = bitops::UNIT.into();
     if r.cost.total_gae.is_some() {
         v.cost.total_gae = Some(total);
@@ -1213,6 +1641,42 @@ pub fn bitop_view(
     Ok(v)
 }
 
+/// The bitop view of a record ([`bitop_view`]) with its cost read on
+/// `basis` ([`CostBasis`]): the total, `S` and the ratio to the floor
+/// count only that basis's gates, and the unit names the basis
+/// (`bitop/v1+per_target`, `bitop/v1+search`), so a fit on it is its own
+/// domain.  The phases are those the basis counts (the per-target phases,
+/// or the search phases), so a bound's stage table divides the basis's
+/// gates by the basis's total and its shares sum to one.  Counts,
+/// identities and timings are unchanged.  The total basis is the bitop
+/// view itself.
+pub fn basis_view(
+    r: &crate::cryptanalysis::ecbench::record::Record,
+    basis: CostBasis,
+) -> Result<crate::cryptanalysis::ecbench::record::Record, String> {
+    let mut v = bitop_view(r)?;
+    let Some(suffix) = basis.unit_suffix() else {
+        return Ok(v);
+    };
+    let w = v.work.as_ref().expect("the bitop view carries its work");
+    let add = w.widths.gates(Prim::GroupAdd).map_err(|e| e.to_string())? as f64;
+    let g = basis_bitops(&r.method.id, &r.method.family, w, basis)? as f64;
+    v.cost.unit = format!("{}+{suffix}", bitops::UNIT);
+    let (method, family) = (r.method.id.as_str(), r.method.family.as_str());
+    v.phases.retain(|p| match basis {
+        CostBasis::Total => true,
+        CostBasis::PerTarget => !is_reusable_phase(method, &p.name),
+        CostBasis::Search => is_search_phase(family, &p.name),
+    });
+    if v.cost.total_gae.is_some() {
+        v.cost.total_gae = Some(g);
+        let s = g / (r.workload.curve.r.to_f64().sqrt() * add);
+        v.cost.s = Some(s);
+        v.boundaries.ratio_to_floor = Some(s / v.boundaries.floor_s);
+    }
+    Ok(v)
+}
+
 /// One line of `ecbench work`: a record's identity and its work.
 #[derive(Debug, Serialize)]
 pub struct WorkLine {
@@ -1239,7 +1703,7 @@ pub fn work_line(r: &crate::cryptanalysis::ecbench::record::Record) -> WorkLine 
         params: r.method.params.clone(),
         curve: r.workload.curve.slug.clone(),
         family: r.workload.curve.family.clone(),
-        log2_r: (r.workload.curve.r as f64).log2(),
+        log2_r: (r.workload.curve.r.to_f64()).log2(),
         status: r.outcome.status.clone(),
         warmup: r.warmup,
         total_gae: r.cost.total_gae,
@@ -1290,7 +1754,7 @@ pub fn summarise(
             );
             params.insert(key.clone(), r.method.params.clone());
             by.entry(key).or_default().push((
-                (r.workload.curve.r as f64).log2(),
+                (r.workload.curve.r.to_f64()).log2(),
                 price_record(&r),
                 r.workload.curve.slug.clone(),
             ));
@@ -1678,7 +2142,7 @@ pub fn work_line_v2(r: &crate::cryptanalysis::ecbench::record::Record) -> WorkLi
         params: r.method.params.clone(),
         curve: r.workload.curve.slug.clone(),
         family: r.workload.curve.family.clone(),
-        log2_r: (r.workload.curve.r as f64).log2(),
+        log2_r: (r.workload.curve.r.to_f64()).log2(),
         status: r.outcome.status.clone(),
         warmup: r.warmup,
         total_gae: r.cost.total_gae,
@@ -1715,9 +2179,9 @@ mod tests {
             construction: String::new(),
             field_degree: (family != "prime").then_some(bits),
             field_bits: (family == "prime").then_some(bits),
-            group_order: r,
-            r,
-            cofactor: 1,
+            group_order: (r).into(),
+            r: r.into(),
+            cofactor: (1u64).into(),
             generator: [String::new(), String::new()],
             automorphisms_available: aut,
             registered: false,
@@ -2249,6 +2713,435 @@ mod tests {
         assert_eq!(w.phases.len(), 1);
     }
 
+    fn setup_and_search(method: &str) -> WorkBlock {
+        let c = curve("prime", 20, (1 << 19) + 21, 2);
+        let phases = vec![
+            PhaseRecord {
+                name: "setup".into(),
+                adds: 10,
+                doubles: 5,
+                gae: 15.0,
+                ..Default::default()
+            },
+            PhaseRecord {
+                name: "search".into(),
+                adds: 100,
+                gae: 100.0,
+                ..Default::default()
+            },
+        ];
+        let params = BTreeMap::new();
+        price(&Priceable {
+            method_id: method,
+            method_params: &params,
+            curve: &c,
+            phases: &phases,
+            counters: &BTreeMap::new(),
+            solver: None,
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn reusable_work_is_work_that_never_touches_the_target() {
+        // Tuned rho's set-up builds G + Q and [a]G + [b]Q; kangaroo's holds
+        // the wild start Q + [off]G: nothing of either survives a new target.
+        for m in ["rho.negation", "rho.plain", "kangaroo.vow"] {
+            let w = setup_and_search(m);
+            assert_eq!(w.reusable_bitops, "0", "{m}");
+            assert_eq!(w.per_target_bitops, w.bitops, "{m}");
+            assert_eq!(target_split(m, &w).unwrap(), (0, w.bitops.parse().unwrap()));
+        }
+        // BSGS's baby steps and stride are multiples of G: reusable.
+        let w = setup_and_search("bsgs.negation");
+        assert_eq!(w.reusable_bitops, w.phases[0].bitops);
+        assert_ne!(w.reusable_bitops, "0");
+        let total: u128 = w.bitops.parse().unwrap();
+        let setup: u128 = w.phases[0].bitops.parse().unwrap();
+        assert_eq!(
+            target_split("bsgs.negation", &w).unwrap(),
+            (setup, total - setup)
+        );
+        // The strong rho draws its jumps before it reads Q.
+        assert!(is_reusable_phase("rho.signed_frobenius_strong", "setup"));
+        // IC: the factor base and the oracle's tables, not the relations.
+        assert!(is_reusable_phase("ic.pipeline", "factor_base"));
+        assert!(is_reusable_phase("ic.pipeline", "oracle_setup"));
+        assert!(!is_reusable_phase("ic.pipeline", "relations"));
+    }
+
+    /// Price `phases` (name, adds) for `method` on a fixed curve.
+    fn priced(method: &str, phases: &[(&str, u64)]) -> WorkBlock {
+        let c = curve("prime", 20, (1 << 19) + 21, 2);
+        let phases: Vec<PhaseRecord> = phases
+            .iter()
+            .map(|&(name, adds)| PhaseRecord {
+                name: name.into(),
+                adds,
+                gae: adds as f64,
+                ..Default::default()
+            })
+            .collect();
+        price(&Priceable {
+            method_id: method,
+            method_params: &BTreeMap::new(),
+            curve: &c,
+            phases: &phases,
+            counters: &BTreeMap::new(),
+            solver: None,
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn database_phases_of_target_blind_ic_methods_are_reusable() {
+        // Accounting correction: the same phases priced under the generic
+        // IC rule (`ic.pipeline`) and under the method's own rule give the
+        // same total S; only the reusable/per-target split moves, by
+        // exactly the phases that never read the target.
+        let koblitz = [
+            ("factor_base", 11),
+            ("oracle_setup", 13),
+            ("relations", 1000),
+            ("linear_algebra", 70),
+            ("descent_setup", 17),
+            ("descent", 300),
+            ("verify", 19),
+        ];
+        let orbit = [
+            ("relations", 2000),
+            ("relation_postprocess", 0),
+            ("target_descent", 500),
+        ];
+        let cases: [(&str, &[(&str, u64)], &[&str]); 3] = [
+            (
+                "ic.koblitz_descent",
+                &koblitz,
+                &["relations", "linear_algebra", "descent_setup"],
+            ),
+            (
+                "ic.koblitz_descent_v2",
+                &koblitz,
+                &["relations", "linear_algebra", "descent_setup"],
+            ),
+            (
+                "ic.prime_orbit_relations_v1",
+                &orbit,
+                &["relations", "relation_postprocess"],
+            ),
+        ];
+        for (method, phases, moved) in cases {
+            let old = priced("ic.pipeline", phases);
+            let new = priced(method, phases);
+            assert_eq!(new.bitops, old.bitops, "{method}: S must not change");
+            let gates = |w: &WorkBlock, n: &str| -> u128 {
+                w.phases
+                    .iter()
+                    .find(|p| p.name == n)
+                    .unwrap()
+                    .bitops
+                    .parse()
+                    .unwrap()
+            };
+            let delta: u128 = moved.iter().map(|n| gates(&new, n)).sum();
+            assert!(delta > 0, "{method}");
+            let r_old: u128 = old.reusable_bitops.parse().unwrap();
+            let r_new: u128 = new.reusable_bitops.parse().unwrap();
+            let p_old: u128 = old.per_target_bitops.parse().unwrap();
+            let p_new: u128 = new.per_target_bitops.parse().unwrap();
+            assert_eq!(r_new, r_old + delta, "{method}");
+            assert_eq!(p_new + delta, p_old, "{method}");
+            assert_eq!(target_split(method, &old).unwrap(), (r_new, p_new));
+            // Phases that read Q stay per target.
+            for p in ["descent", "verify", "target_descent"] {
+                assert!(!is_reusable_phase(method, p), "{method} {p}");
+            }
+        }
+    }
+
+    #[test]
+    fn cached_bsgs_native_table_work_stays_in_its_performed_phase() {
+        let c = curve("prime", 20, (1 << 19) + 21, 2);
+        let phases = vec![
+            PhaseRecord {
+                name: "setup".into(),
+                adds: 10,
+                gae: 10.0,
+                native: [
+                    ("inserts_uncharged".to_string(), 11u64),
+                    ("point_negations_uncharged".to_string(), 1u64),
+                ]
+                    .into_iter()
+                    .collect(),
+                ..Default::default()
+            },
+            PhaseRecord {
+                name: "search".into(),
+                adds: 3,
+                gae: 3.0,
+                native: [
+                    ("lookups_uncharged".to_string(), 4u64),
+                    ("recovery_key_comparisons_uncharged".to_string(), 1u64),
+                    ("recovery_modr_muls_uncharged".to_string(), 1u64),
+                    ("recovery_modr_adds_uncharged".to_string(), 1u64),
+                ]
+                    .into_iter()
+                    .collect(),
+                ..Default::default()
+            },
+        ];
+        // The top-level copies are retained for the report/band schema and
+        // must not become a second synthetic `natives` charge.
+        let counters = [
+            ("inserts_uncharged".to_string(), 11u64),
+            ("point_negations_uncharged".to_string(), 1u64),
+            ("lookups_uncharged".to_string(), 4u64),
+            ("recovery_key_comparisons_uncharged".to_string(), 1u64),
+            ("recovery_modr_muls_uncharged".to_string(), 1u64),
+            ("recovery_modr_adds_uncharged".to_string(), 1u64),
+            ("verification_checks".to_string(), 1u64),
+        ]
+        .into_iter()
+        .collect();
+        let params = BTreeMap::new();
+        assert!(matches!(
+            generic_rule("bsgs.negation_table_v2", "verification_checks"),
+            Some(Shape)
+        ));
+        assert!(matches!(
+            generic_rule("bsgs.negation_table_v2", "failed_candidates"),
+            Some(Shape)
+        ));
+        let w = price(&Priceable {
+            method_id: "bsgs.negation_table_v2",
+            method_params: &params,
+            curve: &c,
+            phases: &phases,
+            counters: &counters,
+            solver: None,
+        })
+        .unwrap();
+        assert_eq!(w.phases.len(), 2, "no duplicate synthetic natives phase");
+        assert_eq!(w.phases[0].prims["hash_probe"], 11);
+        assert_eq!(w.phases[0].prims["field_add"], 23);
+        assert_eq!(w.phases[1].prims["hash_probe"], 4);
+        assert_eq!(w.phases[1].prims["field_add"], 8);
+        assert_eq!(w.phases[1].prims["word_op"], 1);
+        assert_eq!(w.phases[1].prims["modr_mul"], 1);
+        assert_eq!(w.phases[1].prims["modr_add"], 1);
+        assert!(
+            w.complete,
+            "every reported cached-BSGS counter has a rule and no phase copy is double-priced"
+        );
+        let (reusable, per_target) = target_split("bsgs.negation_table_v2", &w).unwrap();
+        assert_eq!(reusable, w.phases[0].bitops.parse().unwrap());
+        assert_eq!(per_target, w.phases[1].bitops.parse().unwrap());
+    }
+
+    #[test]
+    fn cached_bsgs_native_binding_must_be_exact_and_phase_correct() {
+        let c = curve("prime", 20, (1 << 19) + 21, 2);
+        let phases = vec![
+            PhaseRecord {
+                name: "setup".into(),
+                native: [
+                    ("inserts_uncharged".to_string(), 11u64),
+                    ("point_negations_uncharged".to_string(), 1u64),
+                ]
+                    .into_iter()
+                    .collect(),
+                ..Default::default()
+            },
+            PhaseRecord {
+                name: "search".into(),
+                native: [("lookups_uncharged".to_string(), 4u64)]
+                    .into_iter()
+                    .collect(),
+                ..Default::default()
+            },
+        ];
+        let counters: BTreeMap<String, u64> = [
+            ("inserts_uncharged".to_string(), 11u64),
+            ("point_negations_uncharged".to_string(), 1u64),
+            ("lookups_uncharged".to_string(), 4u64),
+        ]
+        .into_iter()
+        .collect();
+        let params = BTreeMap::new();
+        let reject = |phases: &[PhaseRecord], counters: &BTreeMap<String, u64>| {
+            price(&Priceable {
+                method_id: "bsgs.negation_table_v2",
+                method_params: &params,
+                curve: &c,
+                phases,
+                counters,
+                solver: None,
+            })
+            .unwrap_err()
+        };
+        assert!(price(&Priceable {
+            method_id: "bsgs.negation_table_v2",
+            method_params: &params,
+            curve: &c,
+            phases: &phases,
+            counters: &counters,
+            solver: None,
+        })
+        .unwrap()
+        .complete);
+
+        let mut unequal = phases.clone();
+        unequal[0]
+            .native
+            .insert("inserts_uncharged".into(), 10);
+        assert!(reject(&unequal, &counters).contains("differs from top-level"));
+
+        let mut wrong_phase = phases.clone();
+        wrong_phase[0].native.remove("inserts_uncharged");
+        wrong_phase[1]
+            .native
+            .insert("inserts_uncharged".into(), 11);
+        assert!(reject(&wrong_phase, &counters).contains("expected `setup`"));
+
+        let mut duplicated = phases.clone();
+        duplicated[1]
+            .native
+            .insert("inserts_uncharged".into(), 11);
+        assert!(reject(&duplicated, &counters).contains("exactly one"));
+
+        let mut partial_hit = counters.clone();
+        partial_hit.insert("verification_checks".into(), 1);
+        partial_hit.insert("recovery_key_comparisons_uncharged".into(), 1);
+        assert!(reject(&phases, &partial_hit).contains("must appear together"));
+
+        let mut recovery_without_hit = counters.clone();
+        for name in [
+            "recovery_key_comparisons_uncharged",
+            "recovery_modr_muls_uncharged",
+            "recovery_modr_adds_uncharged",
+        ] {
+            recovery_without_hit.insert(name.into(), 1);
+        }
+        assert!(reject(&phases, &recovery_without_hit).contains("exactly on a verified table hit"));
+
+        let mut wrong_recovery_phase = phases.clone();
+        let mut hit = recovery_without_hit;
+        hit.insert("verification_checks".into(), 1);
+        for name in [
+            "recovery_key_comparisons_uncharged",
+            "recovery_modr_muls_uncharged",
+            "recovery_modr_adds_uncharged",
+        ] {
+            wrong_recovery_phase[1].native.insert(name.into(), 1);
+        }
+        wrong_recovery_phase[1]
+            .native
+            .remove("recovery_modr_muls_uncharged");
+        wrong_recovery_phase[0]
+            .native
+            .insert("recovery_modr_muls_uncharged".into(), 1);
+        assert!(reject(&wrong_recovery_phase, &hit).contains("expected `search`"));
+
+        let mut missing = phases;
+        missing[1].native.remove("lookups_uncharged");
+        assert!(reject(&missing, &counters).contains("exactly one"));
+
+        let mut missing_top = counters;
+        missing_top.remove("lookups_uncharged");
+        assert!(reject(&missing, &missing_top).contains("top-level counter is missing"));
+    }
+
+    #[test]
+    fn cost_bases_count_what_they_name() {
+        let w = setup_and_search("rho.negation");
+        let total: u128 = w.bitops.parse().unwrap();
+        let search: u128 = w.phases[1].bitops.parse().unwrap();
+        let b = |m: &str, f: &str, w: &WorkBlock, c| basis_bitops(m, f, w, c).unwrap();
+        assert_eq!(b("rho.negation", "rho", &w, CostBasis::Total), total);
+        assert_eq!(b("rho.negation", "rho", &w, CostBasis::PerTarget), total);
+        assert_eq!(b("rho.negation", "rho", &w, CostBasis::Search), search);
+        let w = setup_and_search("bsgs.negation");
+        let setup: u128 = w.phases[0].bitops.parse().unwrap();
+        assert_eq!(
+            b("bsgs.negation", "bsgs", &w, CostBasis::PerTarget),
+            w.bitops.parse::<u128>().unwrap() - setup
+        );
+        assert!(is_search_phase("ic", "relations") && is_search_phase("ic", "linear_algebra"));
+        assert!(!is_search_phase("ic", "search") && !is_search_phase("ic", "factor_base"));
+        assert!(is_search_phase("kangaroo", "search") && !is_search_phase("rho", "natives"));
+        for (s, c) in [
+            ("total", CostBasis::Total),
+            ("per-target", CostBasis::PerTarget),
+            ("search", CostBasis::Search),
+        ] {
+            assert_eq!(CostBasis::parse(s).unwrap(), c);
+            assert_eq!(serde_json::to_value(c).unwrap(), serde_json::json!(s));
+        }
+        assert!(CostBasis::parse("all").is_err());
+    }
+
+    /// The committed bitop ladder's blocks were priced when a walk's
+    /// `setup` counted as reusable; read through the view they carry the
+    /// target-aware split, and the per-target basis names itself.
+    #[test]
+    fn committed_blocks_read_with_the_target_aware_split() {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("research/bitop_ladder_20261019/sessions/holdout-P24");
+        let recs = crate::cryptanalysis::ecbench::runner::read_records(&dir).unwrap();
+        let first = |arm: &str| recs.iter().find(|r| r.arm == arm && r.counts()).unwrap();
+        for arm in ["rho-neg", "kangaroo"] {
+            let r = first(arm);
+            let stored = r.work.as_ref().unwrap();
+            assert_ne!(
+                stored.reusable_bitops, "0",
+                "{arm}: committed with the old rule"
+            );
+            let v = bitop_view(r).unwrap();
+            let w = v.work.as_ref().unwrap();
+            assert_eq!(w.reusable_bitops, "0", "{arm}");
+            assert_eq!(w.per_target_bitops, w.bitops, "{arm}");
+            let p = basis_view(r, CostBasis::PerTarget).unwrap();
+            assert_eq!(p.cost.unit, "bitop/v1+per_target");
+            assert_eq!(p.cost.total_gae, v.cost.total_gae);
+            let s = basis_view(r, CostBasis::Search).unwrap();
+            assert_eq!(s.cost.unit, "bitop/v1+search");
+            let search: f64 = w
+                .phases
+                .iter()
+                .find(|p| p.name == "search")
+                .unwrap()
+                .bitops
+                .parse()
+                .unwrap();
+            assert_eq!(s.cost.total_gae, Some(search));
+        }
+        let r = first("bsgs-neg");
+        let stored = r.work.as_ref().unwrap();
+        let w = bitop_view(r).unwrap().work.unwrap();
+        assert_eq!(w.reusable_bitops, stored.reusable_bitops);
+        assert_ne!(w.reusable_bitops, "0");
+        let r = first("ic-pair-rule");
+        let s = basis_view(r, CostBasis::Search).unwrap();
+        let w = r.work.as_ref().unwrap();
+        let ph = |n: &str| -> f64 {
+            w.phases
+                .iter()
+                .find(|p| p.name == n)
+                .unwrap()
+                .bitops
+                .parse()
+                .unwrap()
+        };
+        assert_eq!(
+            s.cost.total_gae,
+            Some(ph("relations") + ph("linear_algebra"))
+        );
+        assert_eq!(
+            basis_view(r, CostBasis::Total).unwrap().cost.unit,
+            "bitop/v1"
+        );
+    }
+
     #[test]
     fn memory_of_a_baby_step_table_and_of_a_walk() {
         let c = curve("prime", 20, (1 << 19) + 21, 2);
@@ -2414,7 +3307,14 @@ mod tests {
             // one ulp off the written text for some values, so compare with
             // the line as written: under `arbitrary_precision` a `Value`
             // keeps each number's decimal token, and the comparison is exact.
-            let written: serde_json::Value = serde_json::from_str(line).unwrap();
+            let mut written: serde_json::Value = serde_json::from_str(line).unwrap();
+            // The fixture predates the target-aware split (a rho set-up that
+            // builds `[a]G + [b]Q` is per target); its stored split is read
+            // through `target_split`, as every reader does, and the rest of
+            // the block must match byte for byte.
+            let (reusable, per_target) = target_split(&r.method.id, committed).unwrap();
+            written["work"]["reusable_bitops"] = reusable.to_string().into();
+            written["work"]["per_target_bitops"] = per_target.to_string().into();
             assert_eq!(
                 serde_json::to_value(price_record(r).unwrap()).unwrap(),
                 written["work"],
@@ -2432,5 +3332,28 @@ mod tests {
             assert!(bits > 0);
             assert_eq!(v2.at, mul_decimal(committed.bitops.parse().unwrap(), bits));
         }
+    }
+
+    /// Extension of 2026-11-07 (ic-acct-7): the column-log combination
+    /// counters price one product or one sum modulo `r` each, and no
+    /// other rule moved.
+    #[test]
+    fn combination_counters_price_one_modr_operation_each() {
+        let rule = |c: &str| match ic_rule(c) {
+            Some(Rule::Prims(p)) => p.to_vec(),
+            _ => panic!("{c} has no primitive rule"),
+        };
+        assert_eq!(rule("combination_modr_muls"), vec![(ModrMul, 1)]);
+        assert_eq!(rule("combination_modr_adds"), vec![(ModrAdd, 1)]);
+        // The counters `ic.shared_rank` now writes beside them keep the
+        // rules of 2026-10-16.
+        assert_eq!(rule("target_rng_draws"), vec![(WordOp, 80)]);
+        assert_eq!(rule("row_build_words"), vec![(WordOp, 1)]);
+        assert_eq!(rule("row_build_modr_adds"), vec![(ModrAdd, 1)]);
+        assert_eq!(rule("row_build_modr_muls"), vec![(ModrMul, 1)]);
+        assert_eq!(
+            rule("curve_equation_checks_uncharged"),
+            vec![(FieldMul, 3), (FieldSqr, 2), (FieldAdd, 3)]
+        );
     }
 }

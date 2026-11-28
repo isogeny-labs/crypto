@@ -249,6 +249,23 @@ pub fn verify_hash(
     let u1 = (&z * &w) % &curve.n;
     let u2 = (&sig.r * &w) % &curve.n;
 
+    if curve.is_standard_secp256k1() {
+        return super::secp256k1_point::verify_ecdsa_secp256k1_glv4d(
+            &u1,
+            &public_key.point,
+            &u2,
+            &sig.r,
+        );
+    }
+    if curve.is_standard_p256() {
+        return super::p256_point::verify_ecdsa_p256_shamir(
+            &u1,
+            &public_key.point,
+            &u2,
+            &sig.r,
+        );
+    }
+
     let point = curve
         .generator()
         .scalar_mul(&u1, &a)

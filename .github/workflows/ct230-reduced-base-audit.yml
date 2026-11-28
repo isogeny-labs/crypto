@@ -1,0 +1,41 @@
+name: CT230 frozen native reduced-base independent Rust record audit
+
+on:
+  push:
+    branches:
+      - research/ct204-odd-cover-toy-dlp-20261118
+    paths:
+      - '.github/workflows/ct230-reduced-base-audit.yml'
+      - 'tests/ct230_reduced_base_cost_audit.rs'
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct230_native_reduced_base_pairs.tsv'
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/CT230_REDUCED_BASE_CI_NEGATIVE.md'
+  pull_request:
+    paths:
+      - '.github/workflows/ct230-reduced-base-audit.yml'
+      - 'tests/ct230_reduced_base_cost_audit.rs'
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct230_native_reduced_base_pairs.tsv'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  record-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tests/ct230_reduced_base_cost_audit.rs
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct230_native_reduced_base_pairs.tsv
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98'
+      - name: Independently audit frozen CT229 results and reject seven mutations
+        run: |
+          set -euo pipefail
+          rustc --edition=2021 --test tests/ct230_reduced_base_cost_audit.rs -o /tmp/ct230_audit
+          /tmp/ct230_audit --nocapture

@@ -1,0 +1,31 @@
+name: Rootfind round78 full-solver ablation
+on:
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_root_trace.rs'
+      - 'research/amm_digit_perf_20261118/round78_ablation.py'
+      - '.github/workflows/rootfind-trace-round78-ablation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ablation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            src/cryptanalysis/prime_root_trace.rs
+            research/amm_digit_perf_20261118/round78_ablation.py
+            research/amm_digit_perf_20261118/round78_full_ab.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Full source-file root versus division ablation
+        run: |
+          set -euo pipefail
+          python3 research/amm_digit_perf_20261118/round78_ablation.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: round78-full-root-division-ablation
+          path: research/amm_digit_perf_20261118/round78_ablation_results.csv

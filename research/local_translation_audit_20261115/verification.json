@@ -1,0 +1,87 @@
+{
+  "schema": "local-translation-verification/v1",
+  "source_commit": "896ea08d783255b601919a5e0f2bc1e0c9f65aba",
+  "claim_id": "PCC-20261115-67cf17",
+  "declaration_sha256": "77d0bb9d6c1b5941dec62869d0023c6bb2917322004d870fc762d26ffcc50dc0",
+  "all_source_and_artifact_pins_match": true,
+  "formal_source_files": 117,
+  "gate_declarations": 78,
+  "gate_failures": 0,
+  "trusted_native": 0,
+  "attempt_files": 418,
+  "actual_verdict": {
+    "claim_id": "PCC-20261115-67cf17",
+    "claim_sha256": "8791e56bc369c594051f29b9b1dc362131b7c2ca1b26b2aafded78d61763ae06",
+    "commit": "896ea08d783255b601919a5e0f2bc1e0c9f65aba",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/local_translation_audit_20261115/lean (LocalTranslationCertificate.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-15T21:07:29Z",
+    "verifier_host": "cb6ed9266c53"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261115-67cf17",
+    "claim_sha256": "8791e56bc369c594051f29b9b1dc362131b7c2ca1b26b2aafded78d61763ae06",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "report": {
+    "path": "reports/report.pdf",
+    "pages": 1,
+    "bytes": 47202,
+    "sha256": "54442d2133e0b9a91d6fb1da4342a407e706d00d6f56c5cce1c73ad7ab7965a2",
+    "all_pages_visually_inspected": true
+  },
+  "assurance": {
+    "gate_declarations": 78,
+    "failing": 0,
+    "trusted_native": 0,
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "custom_axioms": false,
+    "native_proof_evaluation": false,
+    "raised_limits": false,
+    "new_global_elaboration_flags": false,
+    "waivers": false,
+    "complete_explicit_written_header": true,
+    "native_written_header_match": true,
+    "native_header_check_not_kernel_refinement": true,
+    "actual_shifted_curve_and_infinity_cancellation": true,
+    "actual_localization_and_field_residue_diagrams": true,
+    "actual_uniformizer_units_derive_normalized_valuation": true,
+    "actual_all_point_valuation_order_residue_derived": true,
+    "actual_regular_ring_RingEquiv_explicit_inverse": true,
+    "actual_principal_divisor_negative_Q_identity": true,
+    "actual_guarded_divisor_evaluation_and_support_iff": true,
+    "actual_ACF5_char5_nonsingular_order3_sign_counter": true,
+    "supplied_local_preservation_or_valuation_residue_invariance_or_ramification_premise": false,
+    "early_latest_only_Lake_roots_defect_preserved": true,
+    "complete_root_rebuild_fixed_state": 17,
+    "automatic_root_coverage_from_state": 18,
+    "final21_all9roots": true,
+    "whole_current_source_gate": true,
+    "separate_Scheme_localRing_comparison": false,
+    "general_basefield_descent": false,
+    "Weil_reciprocity": false,
+    "canonical_pairing_comparison": false,
+    "qualified_source_refuted": false,
+    "new_native_crypto_experiment": false,
+    "novelty_claim": false,
+    "original14_complete": false,
+    "paid_compute_and_agent_upload": 0
+  }
+}

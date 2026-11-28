@@ -1,0 +1,62 @@
+   Compiling isogeny_algos v0.1.0 (/workspace/scratch/ff2114c20d1b/crypto/isogeny_algos)
+    Finished `release` profile [optimized] target(s) in 40.20s
+     Running unittests src/lib.rs (isogeny_algos/target/release/build/isogeny_algos/508bf258cd76a843/out/isogeny_algos-508bf258cd76a843)
+
+running 54 tests
+test binary_volcano::tests::binary_volcano_roots_with_multiplicity ... ok
+test cm::tests::class_numbers_from_forms ... ok
+test eigen_seta::tests::diagonal_masks_apply_coordinatewise ... ok
+test binary_volcano::tests::binary_volcano_frobenius_disc_decomposition ... ok
+test eigen_seta::tests::toy_parameter_checks_are_fail_closed ... ok
+test cm::tests::small_hilbert_polys_match_known_values ... ok
+test binary_volcano::tests::binary_volcano_same_order_a2_and_factor_base ... ok
+test eigen_seta_toy::tests::invalid_parameters_rejected ... ok
+test eigen_seta_toy::tests::two_adic_four_division_matches_basis_coordinates ... ok
+test eigen_seta_toy::tests::two_halves_middle_automorphism_oracle ... ignored, bounded exploratory two-halves odd-torsion oracle; not a scalable decoder
+test eigen_seta_toy::tests::jacobian_start_dual_quotient_exposes_intermediate_product ... ok
+test eigen_seta_toy::tests::cm_key_and_all_sender_indices_round_trip ... ok
+test find::modpoly::e4_tests::normalized_j_series_has_the_known_initial_coefficients ... ok
+test find::modpoly::e4_tests::sieve_matches_independent_divisor_enumeration ... ok
+test eigen_seta_toy::tests::single_chain_decoder_multiple_keys ... ok
+test eigen_seta_toy::tests::special_key_single_chain_splits_and_payload_factors ... ok
+test binary_volcano::tests::binary_volcano_two_sum_yield_matches_brute_force ... ok
+test find::sutherland::cm::tests::rejects_invalid_parameters_and_wrong_norm ... ok
+test find::sea::recombination_tests::progression_bsgs_matches_exhaustive_search_including_low_order_steps ... ok
+test find::sutherland::cm::tests::large_prime_uses_exact_trace_certificate ... ok
+test find::sutherland::crt::tests::reconstructs_signed_bounds_for_arbitrary_targets ... ok
+test find::sutherland::crt::tests::rejects_bad_setup_and_push_is_transactional ... ok
+test gf3n::tests::bitsliced_digits ... ok
+test gf3n::tests::moduli_match_exhaustive_scan ... ok
+test gf3n::tests::mul_inv_match_digit_schoolbook ... ok
+test gls_loop::tests::cheapest_loops_reproduce_known_values ... ok
+test gls_loop::tests::cm_generated_curve_has_requested_order_by_exhaustive_count ... ok
+test gls_loop::tests::invalid_cm_norm_and_unsupported_inputs_are_rejected ... ok
+test gls_loop::tests::loop_closes_and_maps_points_on_a_small_instance ... ok
+test lattice::tests::dependent_rows ... ok
+test lattice::tests::knapsack_planted ... ok
+test lattice::tests::matches_lll_gram_4x4 ... ok
+test lattice::tests::reduced_and_transform ... ok
+test mpoly::tests::integer_roots_basic ... ok
+test mpoly::tests::integer_roots_large ... ok
+test mpoly::tests::resultants ... ok
+test mpoly::tests::ring_ops_and_eval ... ok
+test ntt::tests::multi_limb_extremes ... ok
+test ntt::tests::primes_have_roots ... ok
+test ntt::tests::single_limb_against_naive ... ok
+test padic::tests::constructor_rejects_invalid_residue_fields ... ok
+test padic::tests::field_axioms_in_an_unramified_extension ... ok
+test padic::tests::integers_and_residues_round_trip ... ok
+test padic::tests::max_precision_rejects_unit_characteristic - should panic ... ok
+test padic::tests::max_precision_rejects_zero_characteristic - should panic ... ok
+test padic::tests::ring_arithmetic_matches_big_integers ... ok
+test find::modpoly::e4_tests::large_index_avoids_u64_cube_and_sum_overflow ... ok
+test find::sutherland::cm::tests::talk_fixture_and_noncyclic_surface_match_hecke ... ok
+test find::sutherland::cm::tests::explicit_cm_crt_matches_integer_q_expansion ... ok
+test find::sutherland::cm::tests::selected_degrees_and_v_one_match_hecke ... ok
+test binary_volcano::tests::binary_volcano_bsgs_order_matches_naive_at_n20 ... ok
+test binary_volcano::tests::binary_volcano_levels_match_brute_force_at_n12 ... ok
+test eigen_seta_toy::tests::two_halves_oracle_decoder_multiple_keys ... ok
+test eigen_seta_toy::tests::ciphertext_kani_first_half_reaches_jacobian ... ok
+
+test result: ok. 53 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 3.72s
+

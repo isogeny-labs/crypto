@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T04:07:44Z",
+ "id": "PCC-20261124-9f9ff4",
+ "kind": "execution",
+ "producer": {
+  "commit": "42cbbf529176ef49767575e7415520647dd41959",
+  "model": "GPT-6 Astra Pro",
+  "session": "m31-integrated-build-wrapper-final"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/m31_integrated_build_20261123/evidence/wrapper-final-v1/receipt.json",
+    "sha256": "3c89e23bf43ba17c3d91de75acf143c553d13c844fe2514f4324e1eacdb31010"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/m31_integrated_build_20261123/evidence/ci-preconditions-v1.json",
+    "sha256": "888be3e1109056f446d9d4ef942375a6d96e79950ed11a2530279bd36efa2819"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Bounded cached local development execution and read-only CI precondition inspection; no clean-rebuild, signed execution, scientific performance or whole-repository pass claim",
+ "statement": "In a working tree based on 42cbbf529176ef49767575e7415520647dd41959, the separately SHA-256-pinned corrected component wrapper returned zero for graph, structured and RR5 release gates with 7, 13 and 50 tests passing. Only wrapper target selection changed from the original source manifest. The earlier graph all-targets failure is retained. Read-only inspection found the two observed automatic rootfinding CI failures at baseline-identical source preconditions. These are unsigned producer observations; the whole-repository gate remains unpassed."
+}

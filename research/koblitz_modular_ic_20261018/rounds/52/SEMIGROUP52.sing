@@ -1,0 +1,30 @@
+execute(read("../filtration52-02/filtration-certificate52.sing"));
+setring filtrationCertificate52;
+int n52;int a52;int b52;int represented52;int gapCount52=0;intvec gaps52;intvec residue7_52;intvec residue14_52;int i52;
+for(i52=1;i52<=7;i52++){residue7_52[i52]=0;}
+for(i52=1;i52<=14;i52++){residue14_52[i52]=0;}
+for(n52=0;n52<=66;n52++){
+ represented52=0;
+ for(a52=0;a52<=n52 div 7;a52++){for(b52=0;b52<=n52 div 11;b52++){if(7*a52+11*b52==n52){represented52=1;}}}
+ if(represented52==0){
+  if(n52>=60){ERROR("SEMIGROUP52_CONDUCTOR_WINDOW");quit;}
+  gapCount52++;gaps52[gapCount52]=n52;
+  residue7_52[n52%7+1]=residue7_52[n52%7+1]+1;
+  residue14_52[n52%14+1]=residue14_52[n52%14+1]+1;
+ }
+}
+if(gapCount52!=30 || gaps52[30]!=59){ERROR("SEMIGROUP52_EXACT_GAP_SET");quit;}
+intvec observedZero52;intvec observedOne52;intvec predictedZero52;intvec predictedOne52;
+for(i52=1;i52<=10;i52++){observedZero52[i52]=0;observedOne52[i52]=0;predictedZero52[i52]=0;predictedOne52[i52]=0;}
+for(i52=1;i52<=32;i52++){
+ observedZero52[exponentsZero52[i52]+1]=observedZero52[exponentsZero52[i52]+1]+1;
+ observedOne52[exponentsOne52[i52]+1]=observedOne52[exponentsOne52[i52]+1]+1;
+}
+for(i52=1;i52<=14;i52++){predictedZero52[residue14_52[i52]+1]=predictedZero52[residue14_52[i52]+1]+2;}
+for(i52=1;i52<=7;i52++){predictedOne52[residue7_52[i52]+1]=predictedOne52[residue7_52[i52]+1]+4;}
+predictedZero52[1]=predictedZero52[1]+4;predictedOne52[1]=predictedOne52[1]+4;
+for(i52=1;i52<=10;i52++){if(observedZero52[i52]!=predictedZero52[i52] || observedOne52[i52]!=predictedOne52[i52]){ERROR("SEMIGROUP52_FULL_LOCAL_TYPE_MISMATCH");quit;}}
+print("SEMIGROUP52_GAPS "+string(gaps52));
+print("SEMIGROUP52_HISTOGRAM zero="+string(observedZero52)+" one="+string(observedOne52));
+print("SEMIGROUP52_RESULT gaps=30 conductor=60 zero_weighted_cusp_copies=2 one_weighted_cusp_copies=4 remaining_length=180 full32_local_types_match=true actual_completed_local_ring_identification_pending=true");
+print("SEMIGROUP52_ALL_CHECKS_PASS");quit;

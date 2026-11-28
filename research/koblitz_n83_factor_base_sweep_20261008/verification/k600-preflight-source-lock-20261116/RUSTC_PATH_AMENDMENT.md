@@ -1,0 +1,5 @@
+# macOS supervisor build attempt-2 amendment, frozen before retry
+
+Attempt 1 of the committed host-native supervisor build stopped at 2026-11-16 07:43:41 UTC with child exit 101 before compiling anything. Cargo 1.99.1 resolved `rustc` through the host PATH to Homebrew Rust 1.93.1, below the locked AWS dependency minimum 1.94.1. The command's `rustup run 1.99.1` selected Cargo 1.99.1 but did not override that PATH resolution. No disk stop occurred. The raw attempt-1 log, UTC endpoints and exit receipt remain in the external write-once output and will be copied into the result PR.
+
+[Attempt-2 launcher](build-mac-supervisor-attempt-2.sh) changes only the fresh output directory and adds an explicit `RUSTC=/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc` environment binding. The toolchain binary itself reports Rust 1.99.1. Keep the same source-byte check, Cargo command, 2,400-second cap and 20 GiB disk floor. Do not reuse attempt-1 target/output. Preserve the second terminal outcome independently.

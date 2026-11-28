@@ -1,0 +1,11 @@
+name = "weil_geometric_laws_audit"
+version = "0.1.0"
+defaultTargets = ["WeilGeometricLawsAudit"]
+
+[[require]]
+name = "weil_divisor_choice_audit"
+path = "../../weil_divisor_choice_audit_20261116/lean"
+
+[[lean_lib]]
+name = "WeilGeometricLawsAudit"
+roots = ["LawsInputs", "LawsBilinear", "LawsDiagonalLocal", "LawsAlternating", "LawsCharacteristic", "LawsFiveControl", "LawsThreeBridge", "LawsLevel", "LawsCertificate", "LawsImports"]

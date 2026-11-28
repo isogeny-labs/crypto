@@ -1,0 +1,5 @@
+mod recovery {
+ include!("../hec_coldfiber13_20261115/weil_recovery.rs");
+ pub fn checked(f:&[u64;8],p:u64,ell:u64)->[i64;7]{let a=recurrence(f,p);let b=reference(f,p);assert_eq!(a,b,"independent_polynomial_coefficients");println!("COEFFICIENT_CONTROL p={p} checked={} all_equal=true",a.len());lift(f,p,ell)}
+}
+fn main(){let a:Vec<_>=std::env::args().collect();let text=std::fs::read_to_string(&a[1]).unwrap();let mut it=text.split_whitespace();assert_eq!(it.next(),Some("COLD_INPUT"));let ns:Vec<u64>=it.map(|s|s.parse().unwrap()).collect();assert_eq!(ns[0],3);let(p,ell)=(ns[1],ns[2]);assert_eq!(ns[3],8);let f:[u64;8]=ns[4..12].try_into().unwrap();let l=recovery::checked(&f,p,ell);let cert=std::fs::read_to_string(&a[2]).unwrap();let n:u64=cert.lines().find_map(|s|s.strip_prefix("unique_multiple=")).unwrap().parse().unwrap();let n1:i64=cert.lines().find_map(|s|s.strip_prefix("N1=")).unwrap().parse().unwrap();assert_eq!(l.iter().sum::<i64>(),n as i64);assert_eq!(p as i64+1+l[1],n1);println!("PASS source_weil p={p} f0={} ell={ell} N={n} L={l:?} independent_all_coefficients=true certified_N1_and_N_match=true",f[0]);}

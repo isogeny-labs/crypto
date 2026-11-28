@@ -1,0 +1,13 @@
+[package]
+name = "dspec"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[dependencies]
+rustfft = "6.2"
+rayon = "1.10"
+
+[profile.release]
+opt-level = 3

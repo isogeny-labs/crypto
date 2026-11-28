@@ -1,0 +1,598 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 64,
+  "runs": [
+    {
+      "attempt": "bridge64-01",
+      "source_revision": "e30b77574e0127f06584e46fae2ff542a07eb261",
+      "kind": "Singular",
+      "status": "rejected",
+      "native_exit": 0,
+      "marker": "BRIDGE64_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 23,
+      "first_errors": [
+        "   ? `basis51` is not defined",
+        "   ? error occurred in or before input.sing line 18: `matrix H64=oldCoefficient64(matrix(basis51));`",
+        "   ? expected matrix-expression. type 'help matrix;'",
+        "   ? `H64` is not defined",
+        "   ? error occurred in or before input.sing line 20: `rows(H64)==32 && ncols(H64)==32 && D64!=0,\"BRIDGE64_COMPACT_PID_BASIS_SHAPE\");`",
+        "   ? `H64` is not defined",
+        "   ? error occurred in or before input.sing line 29: `k64++;`",
+        "   ? BRIDGE64_NONZERO_BASIS_FUNCTION",
+        "   ? leaving ::require64 (0)",
+        "   ? BRIDGE64_ALL32_IMAGES_INDEPENDENT"
+      ],
+      "result_lines_accepted": false,
+      "result_lines": [
+        "BRIDGE64_RESULT actual_degree=32 old_source_equations=2 old_basis_functions=32 image_rank=32 both_inverse_products=2 changed_quadratic_rejected=1 changed_image_rejected=1"
+      ],
+      "basis_progress_count": 0,
+      "outcome": "native_error",
+      "started_utc": "2026-11-02T17:39:46Z",
+      "finished_utc": "2026-11-02T17:39:48Z",
+      "native_wall_seconds": 2.0,
+      "artifacts": [
+        {
+          "path": "runs/bridge64-01/PROTOCOL.md",
+          "sha256": "f226d45f6146efc5ee2b5fa592d287a059a2fd110f89b34fdc8705417a85eb69",
+          "bytes": 1903
+        },
+        {
+          "path": "runs/bridge64-01/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/bridge64-01/bridge-basis64.sing",
+          "sha256": "4da0c5f25a944f0da365b0b012e03bcafd71da49d4f9f318688c45cf8c3f46c4",
+          "bytes": 1880
+        },
+        {
+          "path": "runs/bridge64-01/donors.json",
+          "sha256": "f56456a99368f358c2e3d3ae701be52aa1e7ec04a68ec4a51e65e9dcd03a3de0",
+          "bytes": 649
+        },
+        {
+          "path": "runs/bridge64-01/driver.sh",
+          "sha256": "c6e28436babf4c887e226e80b3706cc1b337d4a7e16e814ad7ad634622f919a6",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/bridge64-01/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/bridge64-01/finished-utc.txt",
+          "sha256": "87247c6e416771e4bdc7c76e8b5a3584b7d3ad1b034faad9d345a36123bdbc1d",
+          "bytes": 21
+        },
+        {
+          "path": "runs/bridge64-01/gate.log",
+          "sha256": "5822c9e7787212a0d2e54693720bddb71fe2e026bac2fc05eec3ee65e8c0e57c",
+          "bytes": 160
+        },
+        {
+          "path": "runs/bridge64-01/input.sing",
+          "sha256": "16f9182f48e05cdfd3c852d1ca880de9ad80909ed52b2bb4d9899fda2d7bb803",
+          "bytes": 3630
+        },
+        {
+          "path": "runs/bridge64-01/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/bridge64-01/native.log",
+          "sha256": "5329175d6defa1ffb41311fe34fa90514ab37404e67fe68b1c99d19b60875841",
+          "bytes": 1635
+        },
+        {
+          "path": "runs/bridge64-01/protocol.json",
+          "sha256": "cd293b134f668b397785ecdcffb0c212093d7d7fe1371afc84ab5d2289d2ba32",
+          "bytes": 3060
+        },
+        {
+          "path": "runs/bridge64-01/source-revision.txt",
+          "sha256": "07581b529e8950040cdc3ac9f8e79e6b4fcae7415c79c1ad91cb8e729bb16fdc",
+          "bytes": 41
+        },
+        {
+          "path": "runs/bridge64-01/source.sha256",
+          "sha256": "97577df5c59f18d5ee12b90d171608e0a78cebf9eb20bd2fa3f7543acadca5c6",
+          "bytes": 467
+        },
+        {
+          "path": "runs/bridge64-01/started-utc.txt",
+          "sha256": "2c394cb7c55baa99f24ca74acbc604efc8fa2074a51814f2ad3f29f1e06f6f80",
+          "bytes": 21
+        }
+      ]
+    },
+    {
+      "attempt": "bridge64-02",
+      "source_revision": "5a245e1dd3506ebf2b18078193aeb951508c93f8",
+      "kind": "Singular",
+      "status": "rejected",
+      "native_exit": 0,
+      "marker": "BRIDGE64_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 22,
+      "first_errors": [
+        "   ? BRIDGE64_NONZERO_BASIS_FUNCTION",
+        "   ? leaving ::require64 (0)",
+        "   ? BRIDGE64_ALL32_IMAGES_INDEPENDENT",
+        "   ? leaving ::require64 (0)",
+        "   ? 2nd module does not lie in the first",
+        "   ? error occurred in or before input.sing line 54: `   return(matrix(freemodule(n)));`",
+        "   ? wrong type declaration. type 'help matrix;'",
+        "   ? matrix size not compatible(32x32, 1x1) in *",
+        "   ? error occurred in or before input.sing line 55: `inverse64*imageColumns64==unitmat(32),\"BRIDGE64_BOTH_IMAGE_INVERSE_PRODUCTS\");`",
+        "   ? matrix size not compatible(32x32, 1x1) in *"
+      ],
+      "result_lines_accepted": false,
+      "result_lines": [
+        "BRIDGE64_RESULT actual_degree=32 old_source_equations=2 old_basis_functions=32 image_rank=32 both_inverse_products=2 changed_quadratic_rejected=1 changed_image_rejected=1"
+      ],
+      "basis_progress_count": 3,
+      "outcome": "native_error",
+      "started_utc": "2026-11-02T17:41:37Z",
+      "finished_utc": "2026-11-02T17:41:38Z",
+      "native_wall_seconds": 1.0,
+      "artifacts": [
+        {
+          "path": "runs/bridge64-02/PROTOCOL.md",
+          "sha256": "0b972b73d0424ab3b9fc0427a26c3afaa1a65347957f1b95d2bed326cb7afc83",
+          "bytes": 2498
+        },
+        {
+          "path": "runs/bridge64-02/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/bridge64-02/bridge-basis64.sing",
+          "sha256": "f2bac0f2d8365d00465a73d03aa90603a2bb50b3b8577c5e47adba9853978d05",
+          "bytes": 2044
+        },
+        {
+          "path": "runs/bridge64-02/donors.json",
+          "sha256": "f56456a99368f358c2e3d3ae701be52aa1e7ec04a68ec4a51e65e9dcd03a3de0",
+          "bytes": 649
+        },
+        {
+          "path": "runs/bridge64-02/driver.sh",
+          "sha256": "c6e28436babf4c887e226e80b3706cc1b337d4a7e16e814ad7ad634622f919a6",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/bridge64-02/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/bridge64-02/finished-utc.txt",
+          "sha256": "09c31f6630a8afa5a3b7cac480a4caaa5517d668e535b8cb94186e8453c55cae",
+          "bytes": 21
+        },
+        {
+          "path": "runs/bridge64-02/gate.log",
+          "sha256": "4ff17a93cf5811085cd7e45b755c880aff567e9dee3baebcc95d6109a59bbbbc",
+          "bytes": 161
+        },
+        {
+          "path": "runs/bridge64-02/input.sing",
+          "sha256": "db3dedf19a42460902351e05b7494bcb760c05f6210fa94d8c5348d43ff0e52b",
+          "bytes": 3630
+        },
+        {
+          "path": "runs/bridge64-02/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/bridge64-02/native.log",
+          "sha256": "3642788b59e5165d134c42821fbfeab59ee99fee3f4d2a56e53d0daa57d34de0",
+          "bytes": 1635
+        },
+        {
+          "path": "runs/bridge64-02/protocol.json",
+          "sha256": "670b6af60c8f6f6639b83fdda9f6502b960cbd785032d58936dff602fd63c73b",
+          "bytes": 3398
+        },
+        {
+          "path": "runs/bridge64-02/source-revision.txt",
+          "sha256": "9784eb09f8f7c915645afd4e94cc3ef332e869eae2bbcf16935a82bb5ede5d64",
+          "bytes": 41
+        },
+        {
+          "path": "runs/bridge64-02/source.sha256",
+          "sha256": "60b4fcb26add4a90a80cb6403b0df7db8e38f604c05d750c1da35e7f2d9ebc9c",
+          "bytes": 467
+        },
+        {
+          "path": "runs/bridge64-02/started-utc.txt",
+          "sha256": "c006c118350836c568c720ae1c02c654460dc25699822ab9efe56cd65751112e",
+          "bytes": 21
+        }
+      ]
+    },
+    {
+      "attempt": "bridge64-03",
+      "source_revision": "19b048eb102d5244f8aeba5e4ed67899427f6a36",
+      "kind": "Singular",
+      "status": "rejected",
+      "native_exit": 0,
+      "marker": "BRIDGE64_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 20,
+      "first_errors": [
+        "   ? BRIDGE64_ROW_ORIENTATION_SOURCE_IDENTITY",
+        "   ? leaving ::require64 (0)",
+        "   ? BRIDGE64_NONZERO_BASIS_FUNCTION",
+        "   ? leaving ::require64 (0)",
+        "   ? BRIDGE64_ALL32_IMAGES_INDEPENDENT",
+        "   ? leaving ::require64 (0)",
+        "   ? 2nd module does not lie in the first",
+        "   ? error occurred in or before input.sing line 56: `   return(matrix(freemodule(n)));`",
+        "   ? wrong type declaration. type 'help matrix;'",
+        "   ? matrix size not compatible(32x32, 1x1) in *"
+      ],
+      "result_lines_accepted": false,
+      "result_lines": [
+        "BRIDGE64_RESULT actual_degree=32 old_source_equations=2 old_basis_functions=32 image_rank=32 both_inverse_products=2 changed_quadratic_rejected=1 changed_image_rejected=1"
+      ],
+      "basis_progress_count": 1,
+      "outcome": "native_error",
+      "started_utc": "2026-11-02T17:44:33Z",
+      "finished_utc": "2026-11-02T17:44:34Z",
+      "native_wall_seconds": 1.0,
+      "artifacts": [
+        {
+          "path": "runs/bridge64-03/PROTOCOL.md",
+          "sha256": "360aa432ff6e26343c6cb5c635fca62360a4b115edf3b7b0c8150d0fbb60c7a9",
+          "bytes": 3037
+        },
+        {
+          "path": "runs/bridge64-03/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/bridge64-03/bridge-basis64.sing",
+          "sha256": "1ac017bba5030ae07ef068b14d590ca88d64f3f40819974acffc9d4bf2f191dc",
+          "bytes": 3798
+        },
+        {
+          "path": "runs/bridge64-03/donors.json",
+          "sha256": "f56456a99368f358c2e3d3ae701be52aa1e7ec04a68ec4a51e65e9dcd03a3de0",
+          "bytes": 649
+        },
+        {
+          "path": "runs/bridge64-03/driver.sh",
+          "sha256": "c6e28436babf4c887e226e80b3706cc1b337d4a7e16e814ad7ad634622f919a6",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/bridge64-03/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/bridge64-03/finished-utc.txt",
+          "sha256": "64aa1730ec551b6c7d916afc913fe08e41ed8084d68ee46889593d85c7d2c383",
+          "bytes": 21
+        },
+        {
+          "path": "runs/bridge64-03/gate.log",
+          "sha256": "dde2b50699f0e07a8a83e8ab46053dc0f421e78170b7282e8738f5924e5521b1",
+          "bytes": 161
+        },
+        {
+          "path": "runs/bridge64-03/input.sing",
+          "sha256": "6ead69659c6c5491d1ef18649c6542ae50f2ab28a84c857c780940fe112c46da",
+          "bytes": 3769
+        },
+        {
+          "path": "runs/bridge64-03/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/bridge64-03/native.log",
+          "sha256": "4ae4a0bec3400f35717aa25bd343b6d2f6e3e42f17f8e91fd771147dcaea4417",
+          "bytes": 1422
+        },
+        {
+          "path": "runs/bridge64-03/protocol.json",
+          "sha256": "9313d7b77bddc13a097de784c284b5d88a44485dfb1144eef1bd14942bcc1322",
+          "bytes": 3526
+        },
+        {
+          "path": "runs/bridge64-03/source-revision.txt",
+          "sha256": "f61b5aa5c96a5219da51dd315f3ae24e2c74cf3770398c73a7445ae3141183c2",
+          "bytes": 41
+        },
+        {
+          "path": "runs/bridge64-03/source.sha256",
+          "sha256": "17358f08ebb9b1b6798a1803b2a83f19d35805bcaf35e61c62edd05132a4e398",
+          "bytes": 467
+        },
+        {
+          "path": "runs/bridge64-03/started-utc.txt",
+          "sha256": "3846d5cf1345fcc84b55879e2ff320d97fee3aac8a022f4bc5d89ed333e810b9",
+          "bytes": 21
+        }
+      ]
+    },
+    {
+      "attempt": "bridge64-04",
+      "source_revision": "3e16ff966d40ec56287e7f3d5fe923a5234a118b",
+      "kind": "Singular",
+      "status": "accepted",
+      "native_exit": 0,
+      "marker": "BRIDGE64_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "result_lines_accepted": true,
+      "result_lines": [
+        "BRIDGE64_RESULT actual_degree=32 old_source_equations=2 old_basis_functions=32 image_rank=32 both_inverse_products=2 changed_quadratic_rejected=1 changed_image_rejected=1"
+      ],
+      "basis_progress_count": 32,
+      "outcome": "completed",
+      "started_utc": "2026-11-02T17:46:02Z",
+      "finished_utc": "2026-11-02T17:46:28Z",
+      "native_wall_seconds": 26.0,
+      "artifacts": [
+        {
+          "path": "runs/bridge64-04/PROTOCOL.md",
+          "sha256": "323bf2f5b26af5c3cb4742ca81fac6a737da917dc6f4e8e46deb30942947de6b",
+          "bytes": 3781
+        },
+        {
+          "path": "runs/bridge64-04/binary.sha256",
+          "sha256": "694acb8b172a665cb69337cfcabb8a2acc0c39765dcad1b562571bd4af4b3322",
+          "bytes": 129
+        },
+        {
+          "path": "runs/bridge64-04/bridge-basis64.sing",
+          "sha256": "ed53c367b12b1c5a9d927d6ed6a74a9899ace305c1cd4e640c22f6448064fedf",
+          "bytes": 90954
+        },
+        {
+          "path": "runs/bridge64-04/donors.json",
+          "sha256": "f56456a99368f358c2e3d3ae701be52aa1e7ec04a68ec4a51e65e9dcd03a3de0",
+          "bytes": 649
+        },
+        {
+          "path": "runs/bridge64-04/driver.sh",
+          "sha256": "c6e28436babf4c887e226e80b3706cc1b337d4a7e16e814ad7ad634622f919a6",
+          "bytes": 1971
+        },
+        {
+          "path": "runs/bridge64-04/exit.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2
+        },
+        {
+          "path": "runs/bridge64-04/finished-utc.txt",
+          "sha256": "c99853790fbc84fdeaf48d5c0da0529169188de34efabe9f30a29b9a558da731",
+          "bytes": 21
+        },
+        {
+          "path": "runs/bridge64-04/gate.log",
+          "sha256": "0f21a35c15121fc64ff228cd2ac8aa09fc9a00ca3f4318ff10c99d6ace82ef27",
+          "bytes": 161
+        },
+        {
+          "path": "runs/bridge64-04/input.sing",
+          "sha256": "a80fbb1d2ae8508c71e32f5f3848b7bb941369c94939fecb1a86f219c0aa89b5",
+          "bytes": 3974
+        },
+        {
+          "path": "runs/bridge64-04/launcher.sh",
+          "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634",
+          "bytes": 503
+        },
+        {
+          "path": "runs/bridge64-04/native.log",
+          "sha256": "b2402f49bdc0c16713e095fd968546a0b7aa969d039c165734732be457f38653",
+          "bytes": 1275
+        },
+        {
+          "path": "runs/bridge64-04/protocol.json",
+          "sha256": "cf8cfe542f423a6cfbb334f6b8219bcb17083ce43a8e622be24f497c3645c0f6",
+          "bytes": 3635
+        },
+        {
+          "path": "runs/bridge64-04/source-revision.txt",
+          "sha256": "efc35846e264e226bedff5cbcc23625119e8da84aeda156e4b0dcc4a5a3e5c8e",
+          "bytes": 41
+        },
+        {
+          "path": "runs/bridge64-04/source.sha256",
+          "sha256": "aa4da6347bb8fa0f8d236fa1bd6845a327bb768eccb961ea461fb89adc7f158f",
+          "bytes": 467
+        },
+        {
+          "path": "runs/bridge64-04/started-utc.txt",
+          "sha256": "2d11613e1fff567e84b24ad87e7f4f07515cca66e6a0d62a3c28aa5a22c751db",
+          "bytes": 21
+        }
+      ]
+    }
+  ],
+  "input_pins": [
+    {
+      "attempt": "bridge64-01",
+      "artifact": "input.sing",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/BRIDGE64.sing",
+      "revision": "e30b77574e0127f06584e46fae2ff542a07eb261",
+      "sha256": "16f9182f48e05cdfd3c852d1ca880de9ad80909ed52b2bb4d9899fda2d7bb803"
+    },
+    {
+      "attempt": "bridge64-01",
+      "artifact": "driver.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/NATIVE_DRIVER.sh",
+      "revision": "e30b77574e0127f06584e46fae2ff542a07eb261",
+      "sha256": "c6e28436babf4c887e226e80b3706cc1b337d4a7e16e814ad7ad634622f919a6"
+    },
+    {
+      "attempt": "bridge64-01",
+      "artifact": "launcher.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/REPLAY_CAS.sh",
+      "revision": "e30b77574e0127f06584e46fae2ff542a07eb261",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "bridge64-01",
+      "artifact": "PROTOCOL.md",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/PROTOCOL.md",
+      "revision": "e30b77574e0127f06584e46fae2ff542a07eb261",
+      "sha256": "f226d45f6146efc5ee2b5fa592d287a059a2fd110f89b34fdc8705417a85eb69"
+    },
+    {
+      "attempt": "bridge64-01",
+      "artifact": "protocol.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/protocol.json",
+      "revision": "e30b77574e0127f06584e46fae2ff542a07eb261",
+      "sha256": "cd293b134f668b397785ecdcffb0c212093d7d7fe1371afc84ab5d2289d2ba32"
+    },
+    {
+      "attempt": "bridge64-01",
+      "artifact": "donors.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/donors.json",
+      "revision": "e30b77574e0127f06584e46fae2ff542a07eb261",
+      "sha256": "f56456a99368f358c2e3d3ae701be52aa1e7ec04a68ec4a51e65e9dcd03a3de0"
+    },
+    {
+      "attempt": "bridge64-02",
+      "artifact": "input.sing",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/BRIDGE64.sing",
+      "revision": "5a245e1dd3506ebf2b18078193aeb951508c93f8",
+      "sha256": "db3dedf19a42460902351e05b7494bcb760c05f6210fa94d8c5348d43ff0e52b"
+    },
+    {
+      "attempt": "bridge64-02",
+      "artifact": "driver.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/NATIVE_DRIVER.sh",
+      "revision": "5a245e1dd3506ebf2b18078193aeb951508c93f8",
+      "sha256": "c6e28436babf4c887e226e80b3706cc1b337d4a7e16e814ad7ad634622f919a6"
+    },
+    {
+      "attempt": "bridge64-02",
+      "artifact": "launcher.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/REPLAY_CAS.sh",
+      "revision": "5a245e1dd3506ebf2b18078193aeb951508c93f8",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "bridge64-02",
+      "artifact": "PROTOCOL.md",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/PROTOCOL.md",
+      "revision": "5a245e1dd3506ebf2b18078193aeb951508c93f8",
+      "sha256": "0b972b73d0424ab3b9fc0427a26c3afaa1a65347957f1b95d2bed326cb7afc83"
+    },
+    {
+      "attempt": "bridge64-02",
+      "artifact": "protocol.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/protocol.json",
+      "revision": "5a245e1dd3506ebf2b18078193aeb951508c93f8",
+      "sha256": "670b6af60c8f6f6639b83fdda9f6502b960cbd785032d58936dff602fd63c73b"
+    },
+    {
+      "attempt": "bridge64-02",
+      "artifact": "donors.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/donors.json",
+      "revision": "5a245e1dd3506ebf2b18078193aeb951508c93f8",
+      "sha256": "f56456a99368f358c2e3d3ae701be52aa1e7ec04a68ec4a51e65e9dcd03a3de0"
+    },
+    {
+      "attempt": "bridge64-03",
+      "artifact": "input.sing",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/BRIDGE64.sing",
+      "revision": "19b048eb102d5244f8aeba5e4ed67899427f6a36",
+      "sha256": "6ead69659c6c5491d1ef18649c6542ae50f2ab28a84c857c780940fe112c46da"
+    },
+    {
+      "attempt": "bridge64-03",
+      "artifact": "driver.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/NATIVE_DRIVER.sh",
+      "revision": "19b048eb102d5244f8aeba5e4ed67899427f6a36",
+      "sha256": "c6e28436babf4c887e226e80b3706cc1b337d4a7e16e814ad7ad634622f919a6"
+    },
+    {
+      "attempt": "bridge64-03",
+      "artifact": "launcher.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/REPLAY_CAS.sh",
+      "revision": "19b048eb102d5244f8aeba5e4ed67899427f6a36",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "bridge64-03",
+      "artifact": "PROTOCOL.md",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/PROTOCOL.md",
+      "revision": "19b048eb102d5244f8aeba5e4ed67899427f6a36",
+      "sha256": "360aa432ff6e26343c6cb5c635fca62360a4b115edf3b7b0c8150d0fbb60c7a9"
+    },
+    {
+      "attempt": "bridge64-03",
+      "artifact": "protocol.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/protocol.json",
+      "revision": "19b048eb102d5244f8aeba5e4ed67899427f6a36",
+      "sha256": "9313d7b77bddc13a097de784c284b5d88a44485dfb1144eef1bd14942bcc1322"
+    },
+    {
+      "attempt": "bridge64-03",
+      "artifact": "donors.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/donors.json",
+      "revision": "19b048eb102d5244f8aeba5e4ed67899427f6a36",
+      "sha256": "f56456a99368f358c2e3d3ae701be52aa1e7ec04a68ec4a51e65e9dcd03a3de0"
+    },
+    {
+      "attempt": "bridge64-04",
+      "artifact": "input.sing",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/BRIDGE64.sing",
+      "revision": "3e16ff966d40ec56287e7f3d5fe923a5234a118b",
+      "sha256": "a80fbb1d2ae8508c71e32f5f3848b7bb941369c94939fecb1a86f219c0aa89b5"
+    },
+    {
+      "attempt": "bridge64-04",
+      "artifact": "driver.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/NATIVE_DRIVER.sh",
+      "revision": "3e16ff966d40ec56287e7f3d5fe923a5234a118b",
+      "sha256": "c6e28436babf4c887e226e80b3706cc1b337d4a7e16e814ad7ad634622f919a6"
+    },
+    {
+      "attempt": "bridge64-04",
+      "artifact": "launcher.sh",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/REPLAY_CAS.sh",
+      "revision": "3e16ff966d40ec56287e7f3d5fe923a5234a118b",
+      "sha256": "3f4354bb97220651f846bb8cdcd128b9bcc17cfadd0a5d096a585f581e03a634"
+    },
+    {
+      "attempt": "bridge64-04",
+      "artifact": "PROTOCOL.md",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/PROTOCOL.md",
+      "revision": "3e16ff966d40ec56287e7f3d5fe923a5234a118b",
+      "sha256": "323bf2f5b26af5c3cb4742ca81fac6a737da917dc6f4e8e46deb30942947de6b"
+    },
+    {
+      "attempt": "bridge64-04",
+      "artifact": "protocol.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/protocol.json",
+      "revision": "3e16ff966d40ec56287e7f3d5fe923a5234a118b",
+      "sha256": "cf8cfe542f423a6cfbb334f6b8219bcb17083ce43a8e622be24f497c3645c0f6"
+    },
+    {
+      "attempt": "bridge64-04",
+      "artifact": "donors.json",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/64/donors.json",
+      "revision": "3e16ff966d40ec56287e7f3d5fe923a5234a118b",
+      "sha256": "f56456a99368f358c2e3d3ae701be52aa1e7ec04a68ec4a51e65e9dcd03a3de0"
+    }
+  ],
+  "protocol_metadata_disclosure": "Four historical versions are preserved in immutable raw copies; attempts01-03 rejected despite late markers, attempt04 accepted."
+}

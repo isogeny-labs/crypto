@@ -1,0 +1,9 @@
+   Compiling crypto v0.1.0 (/workspace/crypto-integration-2550)
+error[E0432]: unresolved imports `crate::element`, `crate::ReducedBasis`
+   --> examples/ic_algebraic_followup/wide.rs:261:37
+    |
+261 |         build_decomposition_system, element, find_irreducible_sparse, FieldStructure, ReducedBasis,
+    |                                     ^^^^^^^ no `element` in the root                  ^^^^^^^^^^^^ no `ReducedBasis` in the root
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `crypto` (example "ic_qualified_closure_audit" test) due to 1 previous error

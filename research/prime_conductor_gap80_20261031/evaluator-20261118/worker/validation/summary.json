@@ -1,0 +1,17 @@
+{
+  "schema": "conductor.worker-development/v1",
+  "date": "2026-11-18",
+  "scope": "Local non-root packaging/development checks; no new conductor-gap or runtime result",
+  "base_manifest": "debian@sha256:a72b4433de1cf7d6bae0c4cee74d0547f58601a643b3375f070c51600d63b6b2",
+  "attempt_a": {"source_revision": "3cedf8af6c75d735e8664b726718d8cfbac28a7d", "local_image_id": "sha256:c3d51aa3c65470f5da87bc68aa38b4513cafd4d4043cbcd18a0477a393945839", "build_receipt_exit_code": 0, "outer_build_tool_reported_exit_code": 1, "fixture_exit_code": 127, "reason": "Dynamic loader could not find libgmpxx.so.4; no arithmetic started"},
+  "attempt_b": {"source_revision_prefix": "1df0b39628", "source_revision_receipt": "attempt-b/pre-call-manifest.json", "local_image_id": "sha256:3dcd2c0e240753cd315aadb61dd30375d31c4cabdecf0688156f46c286f56b49", "runtime_fix": "Add libgmpxx4ldbl=2:6.3.0+dfsg-3", "build_exit_code": 0, "fixture_exit_code": 0, "fixture_stderr_empty": true, "fixture_bytes_equal_archived": true, "fixture_sha256": "dfd44f832ae1b1d6f6e8696673f1a20ca32fdc06d351dae75696631c78a52bba", "uid_gid": "1000:1000", "architecture": "amd64", "binary_sha256": "3c16dd628912f1f37c16903447f03f513cd63574e197f246245b383833cebfd7", "source_manifests_match_repository": true},
+  "fixed_fixture_scope": {"map_inputs": 42, "known_answer_endpoint_recoveries": 68, "coverage_rejection_controls": 6, "prime_conductor_gap_record": false},
+  "replay_limits": {"cpu": 2, "memory_bytes": 1073741824, "seconds": 600, "pids": 64, "network": "none", "read_only_root": true},
+  "image_archive_committed": false,
+  "published_worker_registry_digest": null,
+  "aws_job_submitted": false,
+  "large_cm_qualification_executed": false,
+  "minimum_80_bit_goal_met": false,
+  "runtime_measurements": null,
+  "independent_pcc_standing": "not established"
+}

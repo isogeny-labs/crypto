@@ -23,6 +23,7 @@ jobs:
       - name: Compile sm_120
         working-directory: gpu/nist
         run: |
+          set -o pipefail
           make -B bench ARCH=sm_120 NIST_PTX=${{ matrix.ptx }} MAXREG=${{ matrix.maxreg }} 2>&1 | tee ptxas-${{ matrix.ptx }}-${{ matrix.maxreg }}.log
           grep -E 'Used [0-9]+ registers|stack frame|spill|Function properties' ptxas-${{ matrix.ptx }}-${{ matrix.maxreg }}.log || true
       - uses: actions/upload-artifact@v4

@@ -121,9 +121,12 @@ the ℓ-pairing and fiber-polynomial cases spelled out; it is not new.
 Standing assumptions, made explicit after the red-team pass: E ordinary, so
 End(E) is defined over F_p; gcd(n, Δ) = 1 (checked for all ten curves by the
 red team), so s_α below is defined for α ∈ O ⊋ Z[π] and N is prime to the
-conductor; O^× = ±1 (j ∉ {0, 1728}). The exclusion ℓ ≠ n is a convenience,
-not a gap: the two rational n-isogenies are the endomorphisms π − 1 and
-π − p, acting as the scalars 0 and 1 − p.
+conductor; O^× = ±1 (j ∉ {0, 1728}). The exclusion ℓ ≠ n is needed for item (1), which fails there, and is
+covered by item (2): the two rational n-isogenies are π − 1 and π̄ − 1 =
+t − 1 − π, both of degree n (π − p has degree N(π − p) = pn), acting on
+E(F_p) as the scalars 0 and p − 1 ≡ t − 2 (mod n). π − 1 is the zero map on
+E(F_p), not an isomorphism, so item (1) does not apply at ℓ = n; item (2)
+still gives scalar action.
 
 **Theorem (scalar-only action).** Let ℓ be a prime different from n and p.
 Every F_p-rational isogeny φ: E → E′ whose degree is a power of ℓ (in
@@ -135,8 +138,8 @@ the class group, and every vertical ℓ-isogeny), and every endomorphism
    φ([k]P) = [k]φ(P); so a DLP instance transported by φ has the same answer.
 2. α acts on E(F_p) as multiplication by the scalar s_α = α mod N ∈ Z/n,
    computable from the coordinates of α in O (for α = u + vπ, s_α = u + v).
-3. The ℓ-torsion Galois module E[ℓ], its Frobenius eigenvalues λ, μ, the
-   fiber polynomials of φ, and every ℓ-pairing value involving a point of
+3. The ℓ-torsion Galois module E[ℓ], its Frobenius eigenvalues λ, μ, the Galois
+   type of the fibers of φ, and every ℓ-pairing value involving a point of
    E(F_p) are independent of which point of E(F_p) is considered.
 
 *Proof sketch.* (1) deg φ is prime to n, so ker φ ∩ E(F_p) = {O} and φ is
@@ -172,9 +175,12 @@ suspected curve effect not replicated). Two presentations sit outside the
 theorem's hypotheses, as Theorem 15.1's own reading says: the Weil/Tate
 pairing on the n-torsion (needs small embedding degree; the red team
 checked the embedding degree exceeds 20,000 on all ten curves), and the
-p-adic lift. Since π ≡ 1 mod N, the n-torsion of the canonical lift is
-defined over Z_p, so every point of E(F_p) has a computable canonical lift
-with p-adic coordinates, a third presentation that neither the theorem nor
+p-adic lift. Since π ≡ 1 mod N, the (π − 1)-torsion of the canonical lift is defined
+over Z_p. The canonical lift itself is not computable at cryptographic size
+(its two standard descriptions have degree 2p + 2 or class number
+h ≈ 2^95), so this is a presentation, not an algorithm; an arbitrary
+Z_p-lift is Hensel-computable but pattern-independent. This is a third
+presentation that neither the theorem nor
 the measured null covers. For n ≠ p the p-adic elliptic logarithm vanishes
 on torsion, which is why Smart's attack needs n = p; that this closes the
 presentation is a known-result assertion here [pcc:unverified], not a
@@ -273,6 +279,16 @@ caveats stand
 (cutoff chosen after the fact, correlated cutoffs, min-of-three families,
 ten curves). Nothing here bears on the cause.
 
+**Null calibration (2026-11-10, follow-up).** A size-matched conditional
+null holds the ten published field primes fixed, draws `t` uniformly in the
+Hasse interval with `n = p + 1 − t` prime, and pools the ten curves with the
+same conditioned model. Over 10,000 replicates the null mean is
+`z = −0.316`; `P(z_691 ≤ −3.13) = 0.0030` and `P(max over the twelve cutoffs
+≥ 3.13) = 0.0165`. The deficit is therefore suggestive at the chosen cutoff,
+not established at the 1% level once the cutoff scan is charged, and it is
+not disproven. Harness and result:
+`null_calibration/`.
+
 ## 5. The one ECDLP-adjacent effect inside the generic model: horizontal expander degree
 
 The JMV random self-reduction walks the horizontal class along ℓ-isogenies
@@ -341,15 +357,16 @@ Dickson-torus tower that NIST-shape primes need (rule 5 at m = 3; m = 5 undecide
 **P2** choosing the most E-pure coset of a 2-power base gives a constant-factor gain
 (≈ 1.9 / 3.5 at t = 4) that vanishes as the base grows; **P3** across 4,000 random
 prime-order curves, the split-prime statistic does not move exact relation coverage or
-the measured rho cost: the seed is closed for the coordinate track as well as the generic
-one. The Lean core of §3 and the two proposals' lemmas are in aburan28/crypto-lean#3.
+the measured rho cost: no effect at or above the detection floor (1%) was found at 2^24 and
+2^28; the 2^32 arm was not run, so the seed is bounded, not closed, for the
+coordinate track. The Lean core of §3 and the two proposals' lemmas are in aburan28/crypto-lean#3.
 
 ## 7. Status of every statement
 
 | statement | status |
 |---|---|
 | Split counts, expectations, z at twelve cutoffs for ten curves (§4) | measured natively from public parameters; agrees with the uploaded report; not independently verified by a second producer [pcc:unverified] |
-| Theorem and corollary (§3) | derived (proof sketch); no Lean proof; no identity certificate (it is not a bilinear or summation identity) |
+| Theorem and corollary (§3) | derived (proof sketch). Items (1) and (2) are formalized as abstract finite-group statements in `CryptoLean.SplitPrime` (no isogeny or Lenstra identification); item (3) and the corollary are not formalized; no identity certificate (it is not a bilinear or summation identity) |
 | "Model choice within the class is null" | measured by the lab on 2026-11-02 at 24–32 bits, cited, not re-measured |
 | Expander-degree effect (§5) | derived from the counts; transport cost not measured here |
 | Candidate directions (§6) | proposed; not run |

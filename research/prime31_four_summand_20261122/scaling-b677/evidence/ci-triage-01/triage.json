@@ -1,0 +1,252 @@
+{
+  "schema": "rr5.post_publication_ci_triage.v1",
+  "recorded_at_utc": "2026-11-23 05:53:48 UTC",
+  "scope": "Administrative inspection of an already completed hosted GitHub Actions run; no retry, build, test, scientific execution, source repair, PCC modification or report modification performed for this triage.",
+  "repository": "isogeny-labs/crypto",
+  "run_metadata": "run.json",
+  "job_metadata": "jobs.json",
+  "completed_run_conclusion": "failure",
+  "scientific_core_commit": "5e536ed93302def2122968aa880b22c4b675d516",
+  "observations": {
+    "component": {
+      "job_id": 137507635035,
+      "job_url": "https://github.com/isogeny-labs/crypto/actions/runs/45118811731/job/137507635035",
+      "conclusion": "success",
+      "compile_all_targets_before_limits": "success",
+      "native_test_result": {
+        "passed": 32,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "seconds": 1.74
+      },
+      "public_example_test_result": {
+        "passed": 8,
+        "failed": 0,
+        "ignored": 0,
+        "measured": 0,
+        "filtered_out": 0,
+        "seconds": 0
+      },
+      "native_scope": "Declared production source closure, including native RR5 tests, selected F4 resource controls and B677 construction/zero-cap controls; this does not establish completed B677 relation extraction.",
+      "public_example_scope": "Public examples/prime31_rr5_quartic.rs via the declared native production source closure, not the full root-library target.",
+      "identity_step_conclusion": "success",
+      "identity_output_caveat": "The step redirected certificate output into the uploaded artifact. This triage records the successful step and does not claim inspection of that redirected JSON.",
+      "compilation_policy_observed": "Two Cargo workers within the 15-minute job timeout; per-run address-space limit 2097152 KiB and timeout 180 seconds begin after compilation.",
+      "artifact": {
+        "id": 14793046863,
+        "name": "rr5-component-5e536ed93302def2122968aa880b22c4b675d516",
+        "files_reported_uploaded": 7,
+        "bytes_reported_uploaded": 15826,
+        "zip_sha256_reported_by_upload_action": "2e10c0a9b7eb3f9c23c5b426504107e022bf5013ff6d94c1403e1bacb04d39ee",
+        "tool_observed_download_url": "https://github.com/isogeny-labs/crypto/actions/runs/45118811731/artifacts/14793046863"
+      }
+    },
+    "root": {
+      "job_id": 137507635321,
+      "job_url": "https://github.com/isogeny-labs/crypto/actions/runs/45118811731/job/137507635321",
+      "conclusion": "failure",
+      "library_step": {
+        "number": 6,
+        "name": "Full original root-library tests",
+        "command": "cargo test --locked --release --lib",
+        "exit_code": 101,
+        "tests_executed": false
+      },
+      "example_step": {
+        "number": 7,
+        "name": "Original Rust exact-witness and public-input tests",
+        "command": "cargo test --locked --release --example prime31_rr5_quartic -- --nocapture",
+        "exit_code": 101,
+        "tests_executed": false
+      },
+      "following_b4_prototype_step": "skipped",
+      "failure_kind": "Rust source parsing failure",
+      "primary_diagnostics": [
+        {
+          "path": "src/cryptanalysis/binary_hyperelliptic_index_calculus.rs",
+          "line": 640,
+          "column": 94,
+          "message": "mismatched closing delimiter: `)`",
+          "related_line": 656
+        },
+        {
+          "path": "src/cryptanalysis/binary_hyperelliptic_index_calculus.rs",
+          "line": 1233,
+          "column": 2,
+          "message": "this file contains an unclosed delimiter"
+        }
+      ],
+      "qualification": "Both root commands failed while compiling crypto, before any test executable ran. The observed hosted failure is the source parser error, distinct from the earlier local root-library-01 dependency allocation error and timeout exit 124."
+    }
+  },
+  "source_comparison": {
+    "path": "src/cryptanalysis/binary_hyperelliptic_index_calculus.rs",
+    "core_commit": "5e536ed93302def2122968aa880b22c4b675d516",
+    "base_commit": "816f9c3a942efed569049618c056d12a0c56d693",
+    "core_git_blob": "f001a1b641abd48bb0130c1a9a246e37c28bcc3a",
+    "base_git_blob": "f001a1b641abd48bb0130c1a9a246e37c28bcc3a",
+    "identical": true,
+    "blob_size_bytes": 46830,
+    "blob_sha256": "94f99234a3952dafac3f2726f3cfe045d1313718ff9b3b74f48dfe3c7ca861f3",
+    "core_tree": "6c441bcb3643f994abf9e637528d6d1cfad585e2",
+    "tool_observed_urls": [
+      "https://api.github.com/repos/isogeny-labs/crypto/contents/src/cryptanalysis/binary_hyperelliptic_index_calculus.rs?ref=5e536ed93302def2122968aa880b22c4b675d516",
+      "https://api.github.com/repos/isogeny-labs/crypto/contents/src/cryptanalysis/binary_hyperelliptic_index_calculus.rs?ref=816f9c3a942efed569049618c056d12a0c56d693"
+    ],
+    "immutable_source_links": [
+      "https://github.com/isogeny-labs/crypto/blob/5e536ed93302def2122968aa880b22c4b675d516/src/cryptanalysis/binary_hyperelliptic_index_calculus.rs#L640",
+      "https://github.com/isogeny-labs/crypto/blob/816f9c3a942efed569049618c056d12a0c56d693/src/cryptanalysis/binary_hyperelliptic_index_calculus.rs#L75"
+    ],
+    "independent_read_results": [
+      {
+        "command": "git rev-parse 5e536ed93302def2122968aa880b22c4b675d516^{tree} 5e536ed93302def2122968aa880b22c4b675d516:src/cryptanalysis/binary_hyperelliptic_index_calculus.rs 816f9c3a942efed569049618c056d12a0c56d693:src/cryptanalysis/binary_hyperelliptic_index_calculus.rs",
+        "exit_code": 0,
+        "stdout": "6c441bcb3643f994abf9e637528d6d1cfad585e2\nf001a1b641abd48bb0130c1a9a246e37c28bcc3a\nf001a1b641abd48bb0130c1a9a246e37c28bcc3a\n"
+      },
+      {
+        "command": "git cat-file -s f001a1b641abd48bb0130c1a9a246e37c28bcc3a",
+        "exit_code": 0,
+        "stdout": "46830\n"
+      },
+      {
+        "command": "git cat-file blob f001a1b641abd48bb0130c1a9a246e37c28bcc3a | sha256sum",
+        "exit_code": 0,
+        "stdout": "94f99234a3952dafac3f2726f3cfe045d1313718ff9b3b74f48dfe3c7ca861f3  -\n"
+      }
+    ],
+    "classification": "Clear pre-existing malformed Rust source, unchanged between the specified base and scientific core.",
+    "inspected_examples": [
+      "Lines 75–89: the BhecFactorBase struct is not closed before impl, and is_empty/index_of_x lack closing braces.",
+      "Lines 634–656: collect_relations_parallel starts an unfinished function declaration; the threads==1 branch lacks its closing brace; the worker loop at 642 lacks its close before handles at 652.",
+      "Line 1233 is the end-of-file diagnostic after many unclosed delimiters, not an isolated new expression."
+    ],
+    "source_excerpts": "source-excerpts.json"
+  },
+  "retrieval": {
+    "connector_tools": [
+      {
+        "name": "mcp__codex_apps__github_fetch",
+        "arguments": {
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/actions/runs/45118811731"
+        }
+      },
+      {
+        "name": "mcp__codex_apps__github_fetch_workflow_run_jobs",
+        "arguments": {
+          "repo_full_name": "isogeny-labs/crypto",
+          "run_id": 45118811731
+        }
+      },
+      {
+        "name": "mcp__codex_apps__github_fetch_workflow_job_logs",
+        "arguments": {
+          "repo_full_name": "isogeny-labs/crypto",
+          "job_id": 137507635035
+        }
+      },
+      {
+        "name": "mcp__codex_apps__github_fetch_workflow_job_logs",
+        "arguments": {
+          "repo_full_name": "isogeny-labs/crypto",
+          "job_id": 137507635321
+        }
+      },
+      {
+        "name": "mcp__codex_apps__github_fetch",
+        "arguments": {
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/contents/src/cryptanalysis/binary_hyperelliptic_index_calculus.rs?ref=5e536ed93302def2122968aa880b22c4b675d516"
+        }
+      },
+      {
+        "name": "mcp__codex_apps__github_fetch",
+        "arguments": {
+          "url": "https://api.github.com/repos/isogeny-labs/crypto/contents/src/cryptanalysis/binary_hyperelliptic_index_calculus.rs?ref=816f9c3a942efed569049618c056d12a0c56d693"
+        }
+      }
+    ],
+    "source_texts_equal": true,
+    "no_ci_poll_or_retry": true
+  },
+  "log_excerpts": [
+    {
+      "job_id": 137507635035,
+      "file": "component-log-excerpts.txt",
+      "original_decoded_log_lines": 1496,
+      "text_policy": "Selected complete lines from connector-returned decoded log, in original order. Original timestamps, ANSI escapes, text and terminating newlines are retained; gaps are listed here rather than inserted into the excerpt.",
+      "segments": [
+        {
+          "decoded_log_first_line": 558,
+          "decoded_log_last_line": 578,
+          "excerpt_first_line": 1,
+          "excerpt_last_line": 21
+        },
+        {
+          "decoded_log_first_line": 579,
+          "decoded_log_last_line": 595,
+          "excerpt_first_line": 22,
+          "excerpt_last_line": 38
+        },
+        {
+          "decoded_log_first_line": 949,
+          "decoded_log_last_line": 962,
+          "excerpt_first_line": 39,
+          "excerpt_last_line": 52
+        },
+        {
+          "decoded_log_first_line": 1135,
+          "decoded_log_last_line": 1137,
+          "excerpt_first_line": 53,
+          "excerpt_last_line": 55
+        },
+        {
+          "decoded_log_first_line": 1146,
+          "decoded_log_last_line": 1157,
+          "excerpt_first_line": 56,
+          "excerpt_last_line": 67
+        },
+        {
+          "decoded_log_first_line": 1193,
+          "decoded_log_last_line": 1202,
+          "excerpt_first_line": 68,
+          "excerpt_last_line": 77
+        },
+        {
+          "decoded_log_first_line": 1382,
+          "decoded_log_last_line": 1410,
+          "excerpt_first_line": 78,
+          "excerpt_last_line": 106
+        },
+        {
+          "decoded_log_first_line": 1428,
+          "decoded_log_last_line": 1439,
+          "excerpt_first_line": 107,
+          "excerpt_last_line": 118
+        }
+      ]
+    },
+    {
+      "job_id": 137507635321,
+      "file": "root-log-excerpts.txt",
+      "original_decoded_log_lines": 1141,
+      "text_policy": "Selected complete lines from connector-returned decoded log, in original order. Original timestamps, ANSI escapes, text and terminating newlines are retained; gaps are listed here rather than inserted into the excerpt.",
+      "segments": [
+        {
+          "decoded_log_first_line": 547,
+          "decoded_log_last_line": 563,
+          "excerpt_first_line": 1,
+          "excerpt_last_line": 17
+        },
+        {
+          "decoded_log_first_line": 1026,
+          "decoded_log_last_line": 1124,
+          "excerpt_first_line": 18,
+          "excerpt_last_line": 116
+        }
+      ]
+    }
+  ],
+  "frozen_artifacts_modified": false,
+  "canonical_ledger_modified": false
+}

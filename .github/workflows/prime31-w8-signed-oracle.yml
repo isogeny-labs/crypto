@@ -1,0 +1,69 @@
+name: Prime31 W8 signed B4/B8 RR9 grading oracle
+
+on:
+  push:
+    branches:
+      - automation/prime31-rr9-weighted-resultant-20261118
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_w8_signed_oracle.rs
+      - research/prime31_ic_20261115/native/verify_prime31_w8_signed_oracle.py
+      - research/prime31_ic_20261115/rr9/W8_B4_B8_SIGNED_ORACLE_PROTOCOL_20261118.md
+      - .github/workflows/prime31-w8-signed-oracle.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_w8_signed_oracle.rs
+      - research/prime31_ic_20261115/native/verify_prime31_w8_signed_oracle.py
+      - .github/workflows/prime31-w8-signed-oracle.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  signed-w8-graded-control:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout experiment revision
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout immutable Prime31 native Rust source
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only experiment example on unchanged native crate
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_w8_signed_oracle.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_w8_signed_oracle.rs
+      - name: Reused native Rust library tests
+        run: |
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Exact B4/B8 new Rust unit tests
+        run: |
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_signed_oracle
+      - name: Original-curve signed 4+4 grader panel
+        run: |
+          cargo +1.100.0 run --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_signed_oracle > prime31-w8-signed-b4-b8.json
+          test -s prime31-w8-signed-b4-b8.json
+      - name: Independently verify with Python BigInt EC arithmetic
+        run: |
+          python3 research/prime31_ic_20261115/native/verify_prime31_w8_signed_oracle.py \
+            prime31-w8-signed-b4-b8.json
+      - name: Archive reproducible full target multiplicity evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-w8-signed-b4-b8-grader
+          path: prime31-w8-signed-b4-b8.json
+          if-no-files-found: warn
+          retention-days: 30

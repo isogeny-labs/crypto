@@ -1,0 +1,13 @@
+digraph chart {
+  rankdir=TB;
+  bgcolor="transparent";
+  node [shape=box, style="rounded,filled", fillcolor="#edf2f8", color="#284b63", fontname="DejaVu Sans", fontsize=15];
+  edge [color="#284b63", fontname="DejaVu Sans", fontsize=14];
+  source [label="Frozen nonmonic sextic\ny^2 = H(x)"];
+  target [label="Proposed monic chart\nv^2 = F(u)"];
+  { rank=same; source; target; }
+  source -> target [label="rational chart"];
+  target -> source [label="explicit inverse"];
+  pending [label="Richelot/divisor composition\nand dual orientation remain open", fillcolor="#fff2dc", color="#93652e"];
+  target -> pending [style=dashed, label="separate obligation"];
+}

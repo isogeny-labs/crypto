@@ -996,6 +996,9 @@ impl HecIndexCalculusReport {
 #[derive(Clone, Debug, Default)]
 pub struct HecIndexCalculusReport {
     pub factor_base_size: usize,
+    /// Wall-clock nanoseconds spent constructing the factor base when the
+    /// producer records an outer stage clock.
+    pub factor_base_wall_ns: u64,
     pub trials: usize,
     pub smooth_trials: usize,
     /// Smooth, but met a place outside a truncated factor base and was
@@ -1006,6 +1009,9 @@ pub struct HecIndexCalculusReport {
     /// Full relations made by combining two partials.
     pub combined_relations: usize,
     pub relations: usize,
+    /// Complete outer wall time of relation collection, including the walk,
+    /// smoothness oracle, row construction, and collector bookkeeping.
+    pub relation_collection_wall_ns: u64,
     pub jacobian_ops: usize,
     /// Of those, the walk's step precomputation — a fixed cost that
     /// amortises over trials and so dominates at toy `N`, exactly as
@@ -1026,6 +1032,9 @@ pub struct HecIndexCalculusReport {
     pub walk_wall_ns: u64,
     /// Wall-clock nanoseconds spent in the linear algebra.
     pub solve_wall_ns: u64,
+    /// Wall-clock nanoseconds spent replaying a recovered scalar in the
+    /// destination Jacobian.  Older producers leave this at zero.
+    pub verification_wall_ns: u64,
     /// Wall-clock nanoseconds spent storing and combining large-prime
     /// partials.  Bookkeeping multiplies little mod `N` but is not free,
     /// and uncharged bookkeeping is how round six under-priced the solve

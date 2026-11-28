@@ -1,0 +1,69 @@
+{
+  "ECDLP_solved": false,
+  "base_point": "each workload target Q",
+  "batch": 64,
+  "binary_sha256": "48e40b86b8e393df4bf5b34b3e0188cc8ad10e22776047ea00b778554170180f",
+  "conductor_gap": null,
+  "descriptive_by_curve": [
+    {
+      "curve_slug": "icv1-fp202-t4379117826074525589863646596544-20f63a94",
+      "field_bits": 202,
+      "mean_ns_per_mul": 329788.3524576823,
+      "median_ns_per_mul": 325004.7265625,
+      "samples": 192,
+      "wall_admitted": false
+    },
+    {
+      "curve_slug": "icv1-fp202-t4379117826074525589863646596544-67b1c6ab",
+      "field_bits": 202,
+      "mean_ns_per_mul": 329391.5713704427,
+      "median_ns_per_mul": 326785.09375,
+      "samples": 192,
+      "wall_admitted": false
+    },
+    {
+      "curve_slug": "icv1-fp202-t4379117826074525589863646596544-d75a15a8",
+      "field_bits": 202,
+      "mean_ns_per_mul": 330111.02164713544,
+      "median_ns_per_mul": 327712.3984375,
+      "samples": 192,
+      "wall_admitted": false
+    },
+    {
+      "curve_slug": "icv1-fp96-tm125000000302577-0b06b926",
+      "field_bits": 96,
+      "mean_ns_per_mul": 201035.02563476562,
+      "median_ns_per_mul": 198041.765625,
+      "samples": 192,
+      "wall_admitted": false
+    },
+    {
+      "curve_slug": "icv1-fp96-tm125000000302577-2550b472",
+      "field_bits": 96,
+      "mean_ns_per_mul": 202740.45402018228,
+      "median_ns_per_mul": 199807.09375,
+      "samples": 192,
+      "wall_admitted": false
+    },
+    {
+      "curve_slug": "icv1-fp96-tm125000000302577-40959b66",
+      "field_bits": 96,
+      "mean_ns_per_mul": 202577.93774414062,
+      "median_ns_per_mul": 198616.4453125,
+      "samples": 192,
+      "wall_admitted": false
+    }
+  ],
+  "excluded": "curve/target construction, source/input loading, independent expected-result construction, verification and output",
+  "isolation": "L0; not an isolation grader",
+  "planned_samples": 1344,
+  "sample_file_sha256": "3293e8da6be98d59492f067b2a8d161cb2f5c22a61684c743e17fece0b352ad2",
+  "scalar_law": "1+paired_algorithm_seed%(r-1); not asserted uniform",
+  "schema": "ecbench.scalar_timing/v1",
+  "scope": "local descriptive scalar timing; not ECDLP solve or wall admission",
+  "spec_id": "ECS1hcf7bbc497115",
+  "spec_sha256": "cf7bbc497115eb77a27a034f8fc1e62ab2826b94bd40ad5d0b63d05a9639a541",
+  "status": "complete",
+  "timed_interval": "batch of CountedGroup::mul calls, loop/black_box and ledger updates",
+  "wall_admitted": false
+}

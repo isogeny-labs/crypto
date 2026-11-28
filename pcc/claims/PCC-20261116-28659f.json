@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T08:05:16Z",
+ "id": "PCC-20261116-28659f",
+ "kind": "statement",
+ "producer": {
+  "commit": "d85f6a9107d2fcef09be530f6fd327c184335969",
+  "model": "",
+  "session": "rootfind-guarded-reuse-sums-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/rootfind_pair_collision_census_20261116/reports/guarded-reuse-sums-20261116T0805Z/stdout.txt",
+    "sha256": "050655f1e2ee3bf3a90d6decf88f725dfc2d8475ec195e993cf4e2b7afff7059"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/rootfind_pair_collision_census_20261116/reports/guarded-reuse-sums-20261116T0805Z/stderr.txt",
+    "sha256": "89c69f1a79201f012fb6b4e1ec453c168f1e0aea71d649eed6db1616e5ff9aad"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/rootfind_pair_collision_census_20261116/reports/integration-check-20261116T0734Z/stderr.txt",
+    "sha256": "acdbc3c4d3a2e1b676813968e664b83e01516e034880e22b8c8f533b7e1ceafa"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Source commit d85f6a9107d2fcef09be530f6fd327c184335969, public K13/d5 scalar-641 fixture and fixed K13/K19/K23 collision-count controls; independent validation and EKS L2 performance panel absent",
+ "statement": "In a fixed public K13/d5 producer correctness fixture, the guarded opt-in collision-harvest verifier rejected a modified witness and a corrupted negative index, retained 27 collision candidates and five independent seed rows, and recovered and verified scalar 641. Its source-pinned ecbench binary suite passed 21 tests with one ignored; setup additions were 386 and modeled total GAE 2316 versus 440 and 2370 in the earlier five-addition receipt. This is unverified operation-count evidence, not an admitted F4/F5/F6 wall-time comparison."
+}

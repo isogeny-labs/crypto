@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T11:02:17Z",
+ "id": "PCC-20261123-8ff6e0",
+ "kind": "statement",
+ "producer": {
+  "commit": "3d78cc42eba48abb476b594bd57adc6295c7efbe",
+  "model": "",
+  "session": "chained-2power-descent-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_2power_descent_20261123/genus3_boundary/ACTUAL_FIRST_B_CLIPPY_FAILURE.json",
+    "sha256": "d6fcf15afbce7d363b6b0d6ab71d40f5b810e45086f1df42a5e03926645e9b67"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_2power_descent_20261123/genus3_boundary/SOURCE_LOCK_C.json",
+    "sha256": "e2bd3b68a8922fd4cf6370d672d63e98276f0a4d8bfa12e3149e0fc2bfc420ab"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Observed B lint negative and source-first versioned repair; no independent validation result yet.",
+ "statement": "First RREF profile B passes release compilation but fails strict Clippy on two manual parity checks; verification was not reached. Full raw/guards and compiled-output hashes are retained. Prospective C changes only those two expressions in a new source file, keeping original B, A input, all validation criteria/controls/lints and two-GiB/120s limits unchanged."
+}

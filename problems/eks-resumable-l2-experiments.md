@@ -2,7 +2,7 @@
 
 - **Status:** partially resolved; GitHub and broader workload qualification pending
 - **Kind:** implementation gap; runtime constraint
-- **Affected work:** [shared Iso Lab skill](../.agents/skills/isolab-eks/SKILL.md),
+- **Affected work:** [shared Iso Lab skill](https://github.com/isogeny-labs/workspace/blob/main/.agents/skills/isolab-eks/SKILL.md),
   [EKS harness](../taskq/deploy/eks-karpenter/HARNESS.md)
 - **Next action owner:** Iso Lab implementation task T-70
 - **Last updated:** 2026-10-23

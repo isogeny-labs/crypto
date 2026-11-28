@@ -1,0 +1,22 @@
+{
+  "source_repository": "isogeny-labs/crypto",
+  "source_commit": "816f9c3a942efed569049618c056d12a0c56d693",
+  "source_path": "src/cryptanalysis/jv_cover.rs",
+  "source_git_blob": "990760b1f6863f1c0c1df540d0f49c4024f90004",
+  "complete_source_bytes": 181641,
+  "complete_source_sha256": "d7ceed3a41b67ff429bb7ca59095b0aaa63432ca6e70cf40729eb773487418fc",
+  "selections": [
+    {
+      "start_marker": "pub trait Fld {",
+      "end_marker_exclusive": "// \u2500\u2500 F_{p\u00b2}",
+      "sha256": "b369b0d63ac9f28c2a78c5a9ae54cebc7b581f0d5226ecf14db6ae95475c7269"
+    },
+    {
+      "start_marker": "pub type Poly<E>",
+      "end_marker_exclusive": "    /// Scalar multiplication without a fixed-width group-order limit.",
+      "sha256": "635d5570d8b93f724187ad7e54615b69a7067345981317ccb7ca85f699606217"
+    }
+  ],
+  "adaptation": "No selected body changes; add provenance comments and close the existing Hyp impl after its fixed-width scalar method. Unused BigUint method and unrelated production solvers/dependencies are outside this standalone closure.",
+  "usage": "Instantiate the existing Fld contract on a separately qualified F3^12 field; reuse actual generic Cantor bodies, with debug assertions enabled."
+}

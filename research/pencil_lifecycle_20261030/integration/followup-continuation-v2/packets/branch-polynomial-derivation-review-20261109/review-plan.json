@@ -1,0 +1,38 @@
+{
+  "schema": "prospective-source-review-plan/v1",
+  "reviewer": "renew_materializer",
+  "producer": "materializer_qualification",
+  "prior": "Producer statement and proposed examples read to identify claim. Source identity, coefficient correspondence and API not yet inspected for this review. Derivative route plausibly yields simple polynomial support if exact sign and scale match.",
+  "familiarity": "Reviewer authored replay plumbing and proof-repair source in ancestor branch packets, not this direct derivative derivation.",
+  "joints": [
+    {
+      "name": "identity/sign/scale",
+      "attack": "Compare rearranged product with exact source identity; test c=0 so forbidden division would fail."
+    },
+    {
+      "name": "characteristic",
+      "attack": "Test whether argument silently cancels2; in characteristic2 derive surviving term directly."
+    },
+    {
+      "name": "nonzero/multiplicity",
+      "attack": "Do not apply product multiplicity to zero factors; derive nonzero product before additivity."
+    },
+    {
+      "name": "fixture/premises",
+      "attack": "Expand rational factors manually and remove each named premise while retaining all others."
+    },
+    {
+      "name": "source theorem correspondence",
+      "attack": "Compare base-polynomial conclusion and assumptions exactly; reject extension to DVR/geometric conclusions."
+    }
+  ],
+  "execution_permitted": false,
+  "outputs": [
+    "review.json",
+    "REPORT.md",
+    "report.pdf",
+    "derivation.svg",
+    "source-bindings.json",
+    "manifest.json"
+  ]
+}

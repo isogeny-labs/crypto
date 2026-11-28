@@ -1,0 +1,213 @@
+{
+  "schema": "port-mass-source-and-producer-record-consistency-review/v1",
+  "review_id": "PORT-MASS-SOURCE-REVIEW-03",
+  "created_utc": "2026-11-23T18:05:30.163Z",
+  "reviewer_scope": "Same-root-team source/math/record consistency review,not independent execution,formal/native qualification attestation,experiment.review/v1 standing or a signed PCC verdict.",
+  "evidence_manifest": {
+    "path": "port-mass-source-evidence-03.json",
+    "bytes": 85557,
+    "sha256": "190bb0bf9cc59474b09849db663c445e512b13eed952cbdc4dafa96854bc6592",
+    "entries": 170
+  },
+  "disposition": {
+    "minimal_proof": "All three exact theorem declarations are retained; the smaller import composition is mathematically faithful.",
+    "producer_records": "Reviewed source-linked phase09/11 and native records support their stated limited outcomes and denominators as producer evidence.",
+    "native_publication_limit": "Frozen local crate has three additional formatting differences beyond the intended new test/registration. Exact whole published-crate qualification is not established.",
+    "new_concrete_source_errors": []
+  },
+  "shared_source": {
+    "commit": "50b95696db2e7a34b7c5f1ba47eb5408f49ca12d",
+    "git_blob_sha1": "395b114aa3e72855b6396b5a2e77dae2c1631206",
+    "sha256": "7af372d351d1c463393cc0296ad861b36ee85c8a1678bdfba84b6ecb51e87b9d",
+    "bytes": 2772,
+    "exact_current_and_08b_copy_match": true,
+    "statement_comparison": [
+      {
+        "theorem": "grouped_port_mass",
+        "method": "Exact UTF-8 declaration text from theorem keyword through the text immediately before := by; no normalization.",
+        "old_new_byte_equal": true,
+        "sha256": "9989cced30039d2d11ec8f470e0e65b11f142d4ffc1c7d48570d61746a91e870"
+      },
+      {
+        "theorem": "grouped_port_weight",
+        "method": "Exact UTF-8 declaration text from theorem keyword through the text immediately before := by; no normalization.",
+        "old_new_byte_equal": true,
+        "sha256": "975048dee2242ae6c622c691693b3fecd93ea526462a9ed8efb03390953fef33"
+      },
+      {
+        "theorem": "grouped_vertex_mass",
+        "method": "Exact UTF-8 declaration text from theorem keyword through the text immediately before := by; no normalization.",
+        "old_new_byte_equal": true,
+        "sha256": "9c2fad9ecfc83c185c93485f42fc956fb260ec757ab7d6703bc676ccfef96f22"
+      }
+    ]
+  },
+  "proof_fidelity": {
+    "grouped_port_mass": "For a finite decidable label type and a multiset of endpoint pairs,the full sum of left-tag and right-tag multiplicities equals twice edge cardinality. Parallel multiplicity is retained.",
+    "grouped_port_weight": "For arbitrary Nat p,the identical common-weight statement follows by applying existing count_nsmul/card_nsmul and sum_count_eq_card to the p-fold endpoint multiset,then commuting natural multiplication. This formal proof device does not allocate p native copies.",
+    "grouped_vertex_mass": "Old-label counts sum to old vertex cardinality; the constant packet count is added once per group,including groups with no retained ports. Conclusion is oldLabels.card+Fintype.card G*packets.",
+    "consumer": "PortControls is byte-identical to the original03 and minimal09 source. Its Fin radix endpoint wrapper,old-vertex wrapper and nonempty parallel example preserve the generic conclusions. The shared common-weight theorem is included among its six axiom queries.",
+    "source_refinement_limit": "Theorems count explicit multisets; they do not mechanically extract or verify Rust graphs,packet coverage,label extraction,word-size admission or full recursive work."
+  },
+  "read_producer_records": {
+    "phase09": {
+      "exit_code": 0,
+      "axiom_queries": 6,
+      "axioms_each": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "consumer_sha256": "fc95cc1c954ed42e7aed530c8c3b7e0a471fada6eb90a791c207a38ab87cc0cc",
+      "scope": "Read output only; no compiler execution by reviewer."
+    },
+    "phase11": {
+      "started_utc": "2026-11-23T17:54:38Z",
+      "finished_utc": "2026-11-23T17:58:23Z",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "sampled_peak_cgroup_bytes": 14816174080,
+      "fixed_sampled_stop_bytes": 15032385536,
+      "shared_gate": {
+        "theorems": 3,
+        "failed": 0,
+        "trusted_native_decide": 0
+      },
+      "consumer_gate": {
+        "theorems": 3,
+        "failed": 0,
+        "trusted_native_decide": 0
+      },
+      "official_checker": "The unchanged set-e script runs official leanchecker --fresh -v PortControls after both proof gates; its recorded phase exit is0. This is producer evidence,not independently rerun or authenticated execution.",
+      "inputs": "All19 recorded current input hashes match; captured precheck and postcheck logs contain only OK lines."
+    },
+    "interrupted_gates": [
+      {
+        "phase": "05-formal-gates",
+        "exit_code": 143,
+        "physical_stop": 1,
+        "sampled_peak_cgroup_bytes": 15069962240,
+        "verdict": "incomplete;no pass inferred"
+      },
+      {
+        "phase": "07-formal-gates-after-headroom",
+        "exit_code": 143,
+        "physical_stop": 1,
+        "sampled_peak_cgroup_bytes": 15126110208,
+        "verdict": "incomplete;no pass inferred"
+      },
+      {
+        "phase": "10-minimal-formal-gates",
+        "exit_code": 143,
+        "physical_stop": 1,
+        "sampled_peak_cgroup_bytes": 15146377216,
+        "verdict": "incomplete;no pass inferred"
+      }
+    ],
+    "native_phase06": {
+      "exit_code": 0,
+      "physical_stop": 0,
+      "sampled_peak_cgroup_bytes": 13812547584,
+      "stdout_summary": "160 passed;0 failed;0 ignored;0 measured;0 filtered out. The port-mass source-control test is one of these library tests.",
+      "qualified_binary_sha256": "c8e95752b2f64029d065d7934482a7f501f90430b937447f60ae727fcf0d45a2",
+      "inputs": "All100 current input hashes match; captured precheck/postcheck logs contain only OK lines.",
+      "scope": "Library-test producer record for the exact frozen local crate,not all-root/integration/doctest/MSRV or exact whole published-crate qualification."
+    }
+  },
+  "native_census": {
+    "method": "Administrative Node JSON parsing,kind/context-key counting and array-length/integer aggregation of existing producer rows only;no Rust analyzer,native constructor,solver,EC operation or mathematical checker executed.",
+    "rows_sha256": "39c0a23464ac9f4433857e210d0fdd63e0da0f60bcfcbe5f21fa3f1a76ca99f5",
+    "rows_bytes": 932711,
+    "raw_rows": 3394,
+    "base_tuple_rows": 3388,
+    "distinct_base_contexts": 2080,
+    "base_group_calls": 25490,
+    "positive_M_tuple_rows": 3128,
+    "balanced_rows": 1,
+    "balanced_group_calls": 64,
+    "negative_summary_rows": 4,
+    "negative_child_probes": 6,
+    "summary_rows": 1,
+    "failed_flags": 0,
+    "summary_values_match": true,
+    "base_group_cap": 46560,
+    "negative_breakdown": {
+      "beta_length_calls": 1,
+      "omission_groups": 2,
+      "duplicate_groups": 2,
+      "separate_limit_call": 1
+    },
+    "negative_records": "Both coverage mutants report refused_groups[0,1]. Beta reports Invalid(mode exponent tuple); separate vector0 probe reports Limit(child tensor edges),coverage_classification=false. Raw packet-negative rows summarize refused groups; exact error-cause assertions are bound by the previously reviewed source hash.",
+    "balanced_record": {
+      "M": 8192,
+      "packets": 4096,
+      "group_calls": 64,
+      "group_edges_all_256": true,
+      "old_vertices": 16386,
+      "old_isolates": 2,
+      "packet_vertices": 262144,
+      "zero_port_packet_vertices": 254016,
+      "total_vertices": 278530,
+      "maximum_degree": 4
+    },
+    "precision_and_cost_scope": "Native rows describe forced source objects and selected admissible beta states. Full virtual-family accounting does not assert actual evaluate_at traversal after zero-product early exit,nor contraction value,total bit cost,production Setup admission or runtime gain."
+  },
+  "native_source_custody": {
+    "base": "bd20b95dce44a91d7f74a1367853e724f280a3b6",
+    "frozen_inputs": 88,
+    "independently_read_base_files": 87,
+    "byte_identical_to_base": 83,
+    "differences": [
+      {
+        "path": "crates/hashed-ecdl-tensor/src/contraction/port_mass_controls.rs",
+        "frozen_sha256": "8dd661b57073c21f6acc21b89de677290a9c4e1870c6a8f3a0183ef0b3cfbbff",
+        "base_sha256": null,
+        "equal": false
+      },
+      {
+        "path": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+        "frozen_sha256": "4fa8e6bfe28f25e7cdb07d6fcd89da12ee6bd248ec293cc5fc51e692d73fdcb5",
+        "base_sha256": "4f397e0be4868fab1434b81f254dd34e8aa15083b589c9492de87afa1c8c3112",
+        "equal": false
+      },
+      {
+        "path": "crates/hashed-ecdl-tensor/src/floor_sum.rs",
+        "frozen_sha256": "c08cecf66d18aa6ab6364d5531835a6aba087bb5ec1ef4f6fb6724a295e9b52a",
+        "base_sha256": "38b8560b0c850ca61baf1dc21328ce1b903d816d73553807adc3146ce3c211f8",
+        "equal": false
+      },
+      {
+        "path": "crates/hashed-ecdl-tensor/src/short_box.rs",
+        "frozen_sha256": "1f7ca658f2c6dd388b062eff06446d8802b721a2857a4f95a13fd86b0097dde2",
+        "base_sha256": "b08190f7f9ec2f6e22f97c4238c6910778c74e6fde64619e79a9d4ee6212c90d",
+        "equal": false
+      },
+      {
+        "path": "crates/hashed-ecdl-tensor/src/unimodular.rs",
+        "frozen_sha256": "46473973475451c68c7c4f12a4235ad118aa654f44b119b033e6eabf972a5577",
+        "base_sha256": "c9e470793e004ea60c514bb83c28c1a5e380c0a2b8c36adda4c7fea647b3f06c",
+        "equal": false
+      }
+    ],
+    "formatting": "Read diffs confirm floor_sum/short_box/unimodular changes are line wrapping/formatting. They remain in the exact tested snapshot and must be excluded from publication changes; restoring their base bytes makes the whole published crate byte-different from the tested local crate.",
+    "publication": "No native PR5046 result-commit binding is supplied here; this addendum only binds shared theorem file publication and local source/records."
+  },
+  "retained_limits": [
+    "Retained Mathlib56 environment is the focused producer environment. Owner-default cfc pin and full shared library remain unqualified; same Lean4.35/counting-file equality does not establish transitive identity.",
+    "PROOF-MAP-ADDENDUM-02 explicitly preserves the08 preparation chronology failure; this source review does not backdate that addendum.",
+    "05,07 and10 interrupted gates remain incomplete despite later11 success.",
+    "Neither gate labels nor local hashes establish independent execution provenance or signed PCC standing.",
+    "No novelty,candidate improvement,full cryptanalytic counter claim,general bit-work bound or authenticated performance inference."
+  ],
+  "preservation": {
+    "prior_records": {
+      "PORT-MASS-SOURCE-REVIEW-01.json": "e94ba43ae9ac2ec01e14be9049b0f04f88b61b55a42e9d8f5f4e25fd3f867c66",
+      "port-mass-source-evidence-01.json": "0693218bf8d5c633a67bfdc9713e3b114c1c22180d1e2357bcc643f990e21a68",
+      "PORT-MASS-SOURCE-REVIEW-02.json": "fb3530e731287dc1ab61e695f24b75999166aa90f1bbd247280f3935e2cf0e99",
+      "port-mass-source-evidence-02.json": "7ae026d03d01f3b6bd2e5e6f756c124a626f9eeb22ad8b0248ca3c26da25e6b3"
+    },
+    "prior_snapshot_entries_rechecked": 26,
+    "failed": 0,
+    "writes": "Only exclusive new review03 snapshots,manifest and report; repository,oldreviews,raw data and frozen crate left untouched."
+  }
+}

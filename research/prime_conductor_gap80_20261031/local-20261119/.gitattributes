@@ -1,0 +1,7 @@
+# Preserve native diagnostics/test output byte for byte, including rejected runs.
+*.stdout -text -whitespace
+*.stderr -text -whitespace
+stdout -text -whitespace
+stderr -text -whitespace
+# Generated vector paths retain the renderer's whitespace.
+reports/*.svg -whitespace

@@ -1,0 +1,11 @@
+{
+  "context": "quartic_diem_ladder_20261121 analyze.py prices idx_lookups/idx_inserts via r.get(k, 0)",
+  "created": "2026-11-23T17:57:26Z",
+  "evidence": [
+    "research/quartic_diem_ladder_20261121/validation/recompute.py asserts IC_KEYS with []: missing_keys_in_ic_rows = {} over 160 IC rows (research/quartic_diem_ladder_20261121/validation/recompute.json), so the .get defaults never fired; without the check the band's idx pricing could have been 0 silently"
+  ],
+  "kind": "test",
+  "lesson": "L-99ee952350b2",
+  "outcome": "confirm",
+  "schema": "crypto.lesson/v1"
+}

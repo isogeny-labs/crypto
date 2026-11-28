@@ -1,0 +1,63 @@
+name: CT328 pinned-source standalone Rust 109 F103 rho known answers
+
+on:
+  pull_request:
+    paths:
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/CT328_STANDALONE_RUST_RHO_PROTOCOL.md"
+      - "research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct328_standalone_source.py"
+      - ".github/workflows/ct328-standalone-rust-rho.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ct328-standalone-rust-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  original-rho-known-answers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tests/ct238_native_cubic_norm_compression.rs
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct328_standalone_source.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/CT328_STANDALONE_RUST_RHO_PROTOCOL.md
+      - name: Confirm exact revision and preregistered unchanged source
+        run: |
+          set -euo pipefail
+          git log -1 --format='CT328_COMMIT_SHA %H'
+          git hash-object tests/ct238_native_cubic_norm_compression.rs
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct328_standalone_source.py \
+            --source tests/ct238_native_cubic_norm_compression.rs \
+            --out /tmp/ct328-original-rho.rs
+          rustc --version
+      - name: Fail closed on a deliberately changed original source blob
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          data = Path("tests/ct238_native_cubic_norm_compression.rs").read_text()
+          assert data.count("const R: i64 = 109;") == 1
+          Path("/tmp/ct328-mutated-source.rs").write_text(data.replace("const R: i64 = 109;", "const R: i64 = 110;", 1))
+          PY
+          if python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct328_standalone_source.py \
+              --source /tmp/ct328-mutated-source.rs --out /tmp/ct328-mutated-out.rs ; then
+            echo "CT328_ERROR: mutated source wrongly admitted"; exit 1
+          fi
+          test ! -e /tmp/ct328-mutated-out.rs
+          echo 'CT328_MUTATED_SOURCE_REFUSED'
+      - name: Compile unchanged Rust rho body and execute 109 original public known answers
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustc --edition=2021 -O --test /tmp/ct328-original-rho.rs -o /tmp/ct328-rho-tests
+          /tmp/ct328-rho-tests --test-threads=1 --nocapture 2>&1 | tee /tmp/ct328-rho.log
+          test "$(grep -c 'CT327_CORRECTNESS_PASS logs=109 mutations=110 ' /tmp/ct328-rho.log)" -eq 1
+          grep 'test result: ok.' /tmp/ct328-rho.log
+          echo 'CT328_SOURCE_RUST_KNOWN_ANSWERS_PASS; original-root-IC-cold-not-run; pcc-unverified'

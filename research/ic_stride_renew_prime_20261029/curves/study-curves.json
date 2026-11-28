@@ -1,0 +1,150 @@
+{
+ "schema": "ic-study-curves/v1",
+ "what_this_is": "The nine prime_search curves of XP-20261029-stride-renew-prime (pilot included), so the curve registry can resolve their slugs. slug, icv1, p, group_order, subgroup_order, cofactor and generator are as the Rust ecbench binary (sha256 21701be6c420c3507a81767ed20f759e230f1fe5ec002ef3f7bb63a9c0b64503, `ecbench fb --factor-base prime-abscissa:size=2`) printed them in the fb-*.json dumps beside this file; a and b are the unique short-Weierstrass coefficients through two of those Rust-emitted points. Every dumped point and the generator lie on y^2 = x^3 + a x + b, and scripts/curve_id.py reproduces each Rust icv1 exactly (the registry builder re-checks this). Replace with prime:<bits>:<seed> lines in docs/curves/sources/specs.txt when examples/curve_id_generated.rs is next rebuilt.",
+ "curves": [
+  {
+   "slug": "icv1-fp20-tm327-45c21191",
+   "icv1": "ICV1:fp-676099:-327:676427:304448:unk:unk:r:45c2119114f0",
+   "generator_call": "find_prime_order_curve(20, 202610292011)",
+   "p": 676099,
+   "a": 335410,
+   "b": 137087,
+   "group_order": 676427,
+   "subgroup_order": 676427,
+   "cofactor": 1,
+   "generator": {
+    "x": 120880,
+    "y": 80345
+   },
+   "source_dump": "fb-20-202610292011.json"
+  },
+  {
+   "slug": "icv1-fp20-tm1549-7ec9131a",
+   "icv1": "ICV1:fp-857081:-1549:858631:761303:unk:unk:r:7ec9131af9cc",
+   "generator_call": "find_prime_order_curve(20, 202610292012)",
+   "p": 857081,
+   "a": 36478,
+   "b": 194925,
+   "group_order": 858631,
+   "subgroup_order": 858631,
+   "cofactor": 1,
+   "generator": {
+    "x": 846475,
+    "y": 714727
+   },
+   "source_dump": "fb-20-202610292012.json"
+  },
+  {
+   "slug": "icv1-fp20-tm1247-8feb8b3e",
+   "icv1": "ICV1:fp-881143:-1247:882391:76072:unk:unk:r:8feb8b3ec716",
+   "generator_call": "find_prime_order_curve(20, 424242)",
+   "p": 881143,
+   "a": 383585,
+   "b": 153395,
+   "group_order": 882391,
+   "subgroup_order": 882391,
+   "cofactor": 1,
+   "generator": {
+    "x": 110866,
+    "y": 736002
+   },
+   "source_dump": "fb-20-424242.json"
+  },
+  {
+   "slug": "icv1-fp24-tm2059-5a3b6ab8",
+   "icv1": "ICV1:fp-15082673:-2059:15084733:12650319:unk:unk:r:5a3b6ab85e4a",
+   "generator_call": "find_prime_order_curve(24, 20261029241)",
+   "p": 15082673,
+   "a": 1514350,
+   "b": 4999287,
+   "group_order": 15084733,
+   "subgroup_order": 15084733,
+   "cofactor": 1,
+   "generator": {
+    "x": 2237025,
+    "y": 1143406
+   },
+   "source_dump": "fb-24-20261029241.json"
+  },
+  {
+   "slug": "icv1-fp24-tm5549-c2ef82ac",
+   "icv1": "ICV1:fp-16569103:-5549:16574653:9303587:unk:unk:r:c2ef82ac050f",
+   "generator_call": "find_prime_order_curve(24, 20261029242)",
+   "p": 16569103,
+   "a": 4886837,
+   "b": 10829170,
+   "group_order": 16574653,
+   "subgroup_order": 16574653,
+   "cofactor": 1,
+   "generator": {
+    "x": 15505344,
+    "y": 1889116
+   },
+   "source_dump": "fb-24-20261029242.json"
+  },
+  {
+   "slug": "icv1-fp28-tm21435-0b5ad955",
+   "icv1": "ICV1:fp-144501121:-21435:144522557:131563971:unk:unk:r:0b5ad9555ccc",
+   "generator_call": "find_prime_order_curve(28, 20261029281)",
+   "p": 144501121,
+   "a": 30861938,
+   "b": 119921038,
+   "group_order": 144522557,
+   "subgroup_order": 144522557,
+   "cofactor": 1,
+   "generator": {
+    "x": 76798692,
+    "y": 75525370
+   },
+   "source_dump": "fb-28-20261029281.json"
+  },
+  {
+   "slug": "icv1-fp28-t20713-32971d39",
+   "icv1": "ICV1:fp-160004821:20713:159984109:122401184:unk:unk:r:32971d3967cf",
+   "generator_call": "find_prime_order_curve(28, 20261029282)",
+   "p": 160004821,
+   "a": 62168017,
+   "b": 69852693,
+   "group_order": 159984109,
+   "subgroup_order": 159984109,
+   "cofactor": 1,
+   "generator": {
+    "x": 199772,
+    "y": 57226764
+   },
+   "source_dump": "fb-28-20261029282.json"
+  },
+  {
+   "slug": "icv1-fp32-tm62163-8ef9adf3",
+   "icv1": "ICV1:fp-4091955037:-62163:4092017201:3022907621:unk:unk:r:8ef9adf3ce1a",
+   "generator_call": "find_prime_order_curve(32, 20261029321)",
+   "p": 4091955037,
+   "a": 1620402529,
+   "b": 2231692135,
+   "group_order": 4092017201,
+   "subgroup_order": 4092017201,
+   "cofactor": 1,
+   "generator": {
+    "x": 2306667997,
+    "y": 2678269391
+   },
+   "source_dump": "fb-32-20261029321.json"
+  },
+  {
+   "slug": "icv1-fp32-t10863-8c68282c",
+   "icv1": "ICV1:fp-2464344583:10863:2464333721:1181742838:unk:unk:r:8c68282c9610",
+   "generator_call": "find_prime_order_curve(32, 20261029322)",
+   "p": 2464344583,
+   "a": 2213620182,
+   "b": 1499625713,
+   "group_order": 2464333721,
+   "subgroup_order": 2464333721,
+   "cofactor": 1,
+   "generator": {
+    "x": 1529860292,
+    "y": 388698849
+   },
+   "source_dump": "fb-32-20261029322.json"
+  }
+ ]
+}

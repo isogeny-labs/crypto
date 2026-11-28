@@ -1,0 +1,235 @@
+{
+  "schema": "prime31-shared-s3-development-receipt/v1",
+  "assembled_at": "2026-11-22T22:30:06Z",
+  "capture_phase": "postcall assembly of separate build, precall and postcall records",
+  "repository": "isogeny-labs/crypto",
+  "tracking_pr": 4922,
+  "source_tracking_commit": "94bbf986bf62b8d93f7b3f3761d9cb79972579f0",
+  "worktree_modified_during_build": true,
+  "example": {
+    "path": "examples/shared_s3_matrix.rs",
+    "sha256": "2312503e4a71fd5d9118c6ef35dba8a4ab56d36ea1b484fba208ee55907bd1f2"
+  },
+  "status": "scoped Prime31 correctness checks passed",
+  "evidence_status": "unsigned producer observations; PCC-unverified",
+  "scientific_verifier_run": false,
+  "signed_verdict": null,
+  "builds": [
+    {
+      "command": "CARGO_BUILD_JOBS=1 cargo test --offline --release --manifest-path research/s3_shared_elimination_20261122/integration_qualifier/Cargo.toml --target-dir /workspace/scratch/99b214ce852d/build --bin shared-s3-matrix --no-run",
+      "exit_code": 0,
+      "stdout": "evidence/attempt1/build-tests.stdout.log",
+      "stderr": "evidence/attempt1/build-tests.stderr.log"
+    },
+    {
+      "command": "CARGO_BUILD_JOBS=1 cargo build --offline --release --manifest-path research/s3_shared_elimination_20261122/integration_qualifier/Cargo.toml --target-dir /workspace/scratch/99b214ce852d/build --bin shared-s3-matrix",
+      "exit_code": 0,
+      "stdout": "evidence/attempt1/build-cli.stdout.log",
+      "stderr": "evidence/attempt1/build-cli.stderr.log"
+    }
+  ],
+  "test_call": {
+    "precall": "evidence/attempt1/integration-tests.precall.json",
+    "output": "evidence/attempt1/integration-tests.postcall.log",
+    "exit": {
+      "exit_code": 0,
+      "ended_at": "2026-11-22T22:28:36Z"
+    },
+    "passed": 12,
+    "failed": 0,
+    "initial_suite_cases_retained": 5,
+    "new_cases": 7
+  },
+  "cli_call": {
+    "precall": "evidence/attempt1/cli.precall.json",
+    "output": "evidence/attempt1/cli-prime31.postcall.json",
+    "exit": {
+      "exit_code": 0,
+      "ended_at": "2026-11-22T22:29:15Z"
+    }
+  },
+  "observations": {
+    "coordinate_modulus": 2147483647,
+    "subgroup_modulus": 2147446831,
+    "complete_finite_chart_solutions": 9,
+    "original_f4_complete": true,
+    "preconditioning": [
+      {
+        "backend": "integer",
+        "solutions": 9,
+        "shared_complete": true,
+        "fresh_complete": true
+      },
+      {
+        "backend": "fma",
+        "solutions": 9,
+        "shared_complete": true,
+        "fresh_complete": true
+      },
+      {
+        "backend": "split16",
+        "solutions": 9,
+        "shared_complete": true,
+        "fresh_complete": true
+      }
+    ],
+    "recovery": [
+      {
+        "backend": "integer",
+        "recovered_scalar": 7,
+        "relation_count": 3,
+        "anchor_relations": 1,
+        "rank": 4,
+        "public_target": {
+          "infinity": false,
+          "x": 864723287,
+          "y": 1209733093
+        },
+        "answer_checked_in_group": true
+      },
+      {
+        "backend": "fma",
+        "recovered_scalar": 7,
+        "relation_count": 3,
+        "anchor_relations": 1,
+        "rank": 4,
+        "public_target": {
+          "infinity": false,
+          "x": 864723287,
+          "y": 1209733093
+        },
+        "answer_checked_in_group": true
+      },
+      {
+        "backend": "split16",
+        "recovered_scalar": 7,
+        "relation_count": 3,
+        "anchor_relations": 1,
+        "rank": 4,
+        "public_target": {
+          "infinity": false,
+          "x": 864723287,
+          "y": 1209733093
+        },
+        "answer_checked_in_group": true
+      }
+    ]
+  },
+  "scope": {
+    "known_answer_structured_target_and_base": true,
+    "uniform_random_targets": false,
+    "auxiliary_domain": "unrestricted Fp",
+    "finite_chart_only": true,
+    "preconditioning_backends": [
+      "integer",
+      "fma",
+      "split16"
+    ],
+    "downstream_f4": "unchanged production integer implementation",
+    "relation_linear_algebra": "unchanged IncrementalGauss modulo subgroup order",
+    "full_root_library_gate_passed": false,
+    "full_root_library_gate_repeated": false,
+    "root_gate_reason": "same unmodified production dependency body and previously recorded compiler SIGKILL; focused qualifier remains a separate scoped check",
+    "benchmark_executed": false,
+    "complete_cost_comparison": false,
+    "complete_counter_coverage": false,
+    "complete_hermetic_build_manifest": false
+  },
+  "artifacts": [
+    {
+      "path": "evidence/attempt1/binary-bindings.postcall.sha256",
+      "sha256": "6789e1c828720cab2a078e264c723adb146f615fef5787283da91ed38b2cd50d",
+      "bytes": 285
+    },
+    {
+      "path": "evidence/attempt1/build-cli.stderr.log",
+      "sha256": "0a2ffa92d56a0892282d73664652a4b66fd84e70050a25c44aef11c12e08d86e",
+      "bytes": 4065
+    },
+    {
+      "path": "evidence/attempt1/build-cli.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/attempt1/build-tests.stderr.log",
+      "sha256": "d8d8e972f4c0298735dc045e6c2c2e6d7357b525c0032571e80179682604fedc",
+      "bytes": 5644
+    },
+    {
+      "path": "evidence/attempt1/build-tests.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/attempt1/cli-prime31.postcall.json",
+      "sha256": "a4e00d40a55c18f13e44549826b1e284cecfd8074949a149e26bfa350d582277",
+      "bytes": 83979
+    },
+    {
+      "path": "evidence/attempt1/cli-prime31.postcall.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/attempt1/cli-source.build.json",
+      "sha256": "68539f8f650d9b5a21cfeeedf6cefa69ee2ccb575b1e1a5fba87e8b11954a61b",
+      "bytes": 32994
+    },
+    {
+      "path": "evidence/attempt1/cli.exit.json",
+      "sha256": "f0360268f73f3f57b3c291a9bad9eb1a29d617e2cdf47ed8c4d9a32a1667565d",
+      "bytes": 59
+    },
+    {
+      "path": "evidence/attempt1/cli.precall.json",
+      "sha256": "d8bce6fef6383ffea6d88467623e7bae8e5e1fbe9d77c296b9f3f4b780806ab2",
+      "bytes": 675
+    },
+    {
+      "path": "evidence/attempt1/integration-source.build.json",
+      "sha256": "68539f8f650d9b5a21cfeeedf6cefa69ee2ccb575b1e1a5fba87e8b11954a61b",
+      "bytes": 32994
+    },
+    {
+      "path": "evidence/attempt1/integration-tests.exit.json",
+      "sha256": "5c526abe6491cfe9423b1acd0271e4c0fc28e00c08357006aae9b3bcb04a1d9a",
+      "bytes": 59
+    },
+    {
+      "path": "evidence/attempt1/integration-tests.postcall.log",
+      "sha256": "47c1a435fe591baea6870dc455f92193f064861f46ed48ddea55113ed1fb534f",
+      "bytes": 998
+    },
+    {
+      "path": "evidence/attempt1/integration-tests.postcall.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/attempt1/integration-tests.precall.json",
+      "sha256": "99f0f07504ef5f35946bef04184b90c422edeb83ec54268e41bc13abfbbf6829",
+      "bytes": 1051
+    },
+    {
+      "path": "evidence/attempt1/requested-sources.prebuild.sha256",
+      "sha256": "97f9bd91d10c6c1b343f7fc079d9b46299fe6e0947586a535b155326f61459cd",
+      "bytes": 233
+    },
+    {
+      "path": "evidence/attempt1/source-bindings.postcall.log",
+      "sha256": "a3a9be2c5cadae57cdbc2c782e1d5d98f075475f1a7334267f28990bbe1895ca",
+      "bytes": 2493
+    },
+    {
+      "path": "evidence/attempt1/source-bindings.precall.log",
+      "sha256": "a3a9be2c5cadae57cdbc2c782e1d5d98f075475f1a7334267f28990bbe1895ca",
+      "bytes": 2493
+    },
+    {
+      "path": "evidence/attempt1/source-bindings.precall.sha256",
+      "sha256": "fc7833fa5cf6a78d81bc63a8e8920bc5a6725e00dc8d2ae3a6e171ff8232d46c",
+      "bytes": 5655
+    }
+  ]
+}

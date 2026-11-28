@@ -1,0 +1,24 @@
+digraph comparisons {
+  graph [rankdir=LR, pad=0.12, nodesep=0.24, bgcolor="white",
+         label="Exact synthetic outcomes  |  PCC-unverified", labelloc=t,
+         fontname="DejaVu Sans", fontsize=13];
+  node [shape=plain, fontname="DejaVu Sans", fontsize=10];
+  coverage [label=<
+    <TABLE BORDER="0" CELLBORDER="0" CELLPADDING="3">
+      <TR><TD COLSPAN="3"><B>Lower variance at ten probes</B></TD></TR>
+      <TR><TD>Gate</TD><TD>Uniform</TD><TD>Weighted plant</TD></TR>
+      <TR><TD ALIGN="LEFT">Fixed first two</TD><TD BGCOLOR="#C9E0F3">5,122</TD><TD BGCOLOR="#E5EFF8">1,066</TD></TR>
+      <TR><TD ALIGN="LEFT">Fresh pair</TD><TD BGCOLOR="#C9E0F3">5,236</TD><TD BGCOLOR="#E5EFF8">952</TD></TR>
+      <TR><TD COLSPAN="3">6,188 bases per gate</TD></TR>
+    </TABLE>>];
+  ranks [label=<
+    <TABLE BORDER="0" CELLBORDER="0" CELLPADDING="3">
+      <TR><TD COLSPAN="3"><B>Charged units to full primary rank</B></TD></TR>
+      <TR><TD>Field order</TD><TD>Correlated order</TD><TD>Mixed order</TD></TR>
+      <TR><TD>2</TD><TD BGCOLOR="#C1E2CA">28</TD><TD>36</TD></TR>
+      <TR><TD>3</TD><TD BGCOLOR="#C1E2CA">41</TD><TD>62</TD></TR>
+      <TR><TD>5</TD><TD BGCOLOR="#C1E2CA">56</TD><TD>84</TD></TR>
+      <TR><TD>101</TD><TD BGCOLOR="#C1E2CA">74</TD><TD>106</TD></TR>
+    </TABLE>>];
+  coverage -> ranks [style=invis];
+}

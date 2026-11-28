@@ -1,0 +1,11 @@
+{
+  "schema": "xedni-collision-reduction-screen-protocol-v1",
+  "source": "../xedni_coefficient_choice_20261120/source-rows-v2.jsonl.gz",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "input_law": "all 1722 ordered distinct nonidentity source pairs; select the 336 with distinct rational x and first auxiliary x collision at 7 or 11, without consulting any relation flag",
+  "fixed_curve": "E/F47: y^2=x^3-x-2, group order 43; reduce the two exact integer lifted points modulo 47",
+  "relation_test": "independent affine finite-field addition tests P+2Q=O for every selected ordered pair",
+  "post_selection_analysis": "compare to recorded reduced-relation flag and frozen local CRT status; retain all positive and negative rows, plus no-local-gate and constructed counts",
+  "decision": "only pairs passing the fixed-prime relation can support this rational relation on a good-reduction lift with the prescribed reduction; nominate the constructed positive-source pairs for a bounded higher-digit coefficient experiment",
+  "claim_boundary": "fixed source law and P+2Q relation; applying the group-homomorphism implication requires good reduction and compatible point reduction on each rational lift"
+}

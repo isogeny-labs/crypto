@@ -1,0 +1,11 @@
+{
+  "guidance": "Run trusted lab commands as Kubernetes Jobs in the isolab namespace on CPU Spot nodes. Start with isolab_k8s_overview. Submit with a unique job_name; on timeout check that name before retrying. Poll isolab_k8s_status for completion, then read logs and results. Commands receive temporary /work/results and ISOLAB_RESULTS_URI; they must upload outputs before exiting. Spot interruptions can lose unuploaded data. These VM pods do not establish legacy Iso Lab strict fidelity. No cryptographic performance claim follows from job success.",
+  "job": {
+    "created_at": "2026-11-01T03:50:31Z",
+    "job_name": "hashed-ecdl-cpu-round20-20261030",
+    "state": "pending",
+    "status": {},
+    "uid": "79973c63-7787-4804-b55e-63374a15bf2b"
+  },
+  "results_uri": "s3://isolab-results-104186811093-us-east-2/runs/hashed-ecdl-cpu-round20-20261030/"
+}

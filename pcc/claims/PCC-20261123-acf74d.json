@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T00:23:25Z",
+ "id": "PCC-20261123-acf74d",
+ "kind": "execution",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "gpt-6-astra",
+  "session": "prime31-dickson-quotient-20261122"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_ic_20261115/native/examples/prime31_dickson_quotient.rs",
+    "sha256": "b76cd5a1efeff77bc065554d89acc9b53be051e6b17811cca589c2dc93a018b1"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/evidence/correctness-cases-final.stdout",
+    "sha256": "2f491f3250b71bca1597668098f0feecd9a40d9c76714986b482b2c8b8fc6efb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/evidence/new-example-tests-final.stdout",
+    "sha256": "2a895429bcb8c36b114ad383b75bfd7f02e69d7623f2b40edd28905cd90d3772"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/evidence/source-library-tests.stdout",
+    "sha256": "0d15f6bdec3264093fd7cfa2ce751d3f07e430a8abcc75e5e0aec8a379ddfdc4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/evidence/dependency-differences.json",
+    "sha256": "0340a150bd26d3760cf552981591e3af4229d3272967cbdd679f466a3ab9194a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/evidence/independent_review.md",
+    "sha256": "5a62b0732a030fdfa91f7e9f1c04129a836cd966b63c2b04c88d2ad841a51ae4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/evidence/original-lock-build.stderr",
+    "sha256": "e8b1237baeebc4447ded1889b0ebf10d96520e5fb31f4a2967f01340b7a8ff05"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Frozen Rust source b76cd5a1efeff77bc065554d89acc9b53be051e6b17811cca589c2dc93a018b1; deterministic development diagnostic only",
+ "statement": "Unsigned development receipts report 5 component tests, 41 original-library tests, 25 original-curve fixtures and 12 instrumented cases using a cached-dependency adapter. At N=64 and B=31 the recurrence counts 17923 field multiplications versus 8816 for sparse product; setup, extraction, group validation and full ECDLP are excluded. The original-lock offline build fails on unavailable either 1.19.0. No execution-proof backend, signed PCC validation, admitted benchmark or speed advantage is asserted."
+}

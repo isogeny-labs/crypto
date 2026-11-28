@@ -1,0 +1,8 @@
+import Mathlib.LinearAlgebra.Matrix.PosDef
+import Mathlib.Tactic
+
+example (A : Matrix (Fin 1) (Fin 2) ℚ) : (1 + Aᴴ * A).PosDef :=
+  Matrix.PosDef.one.add_posSemidef (Matrix.posSemidef_conjTranspose_mul_self A)
+
+example : (1 + (!![1, -1] : Matrix (Fin 1) (Fin 2) ℚ)ᴴ * !![1, -1]).PosDef :=
+  Matrix.PosDef.one.add_posSemidef (Matrix.posSemidef_conjTranspose_mul_self _)

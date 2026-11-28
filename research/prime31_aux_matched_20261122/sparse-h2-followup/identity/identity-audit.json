@@ -1,0 +1,45 @@
+{
+  "certificate_id": "IDC1hf4aada9d1a00f5d4",
+  "certificate_schema": "identity.certificate/v1",
+  "evaluation_modulus": 2305843009213693951,
+  "evidence_scope": "Unsigned native evaluation/replay of this fixed degree-four polynomial identity over 2^61-1; it does not certify the Prime31 kernel, rational pole handling, complete ECDLP recovery, or performance.",
+  "executable_bytes": 1178912,
+  "executable_sha256": "8568b1447f0e7f4ebdbb29a25fdae9be8285307a725fe4b077be7ee075b7c4ce",
+  "extra_checker_points": 32,
+  "extra_checker_seed": 20261123,
+  "extra_replay": {
+    "extra_points": 32,
+    "issuer_points": 64,
+    "library_conditional_false_accept_log2": -5664.0,
+    "status": "accept"
+  },
+  "formal_proof": null,
+  "independence": "Unsigned producer-native issuance and replay; extra-point stream uses fixed separately registered seed 20261123. No independent operator or formal proof is asserted.",
+  "issuer_points": 64,
+  "issuer_replay": {
+    "extra_points": 0,
+    "issuer_points": 64,
+    "library_conditional_false_accept_log2": -3776.0,
+    "status": "accept"
+  },
+  "issuer_seed": 4188,
+  "native_helper": "prime31-sparse-identity",
+  "negative_controls": {
+    "constant_one_mutation": {
+      "assignment": [
+        275901228929477597,
+        1417406769178692301
+      ],
+      "lhs": 394182144454442848,
+      "point_index": 0,
+      "rhs": 394182144454442849,
+      "status": "refused_false_identity"
+    },
+    "statement_changed_with_retained_id": "refused_id_mismatch",
+    "value_digest_mutation": "refused_digest_mismatch"
+  },
+  "schema": "prime31-sparse-h2.identity-check/v1",
+  "signed_verdict": false,
+  "source_manifest_sha256": "e7f328b24e324c4d8ed53360487e8d37e33419f244a2802f97b6f53a2a29709b",
+  "statistical_scope": "The native library reports the Schwartz-Zippel expression conditional on independent uniformly random evaluation points. These registered seeds and derived streams are deterministic; no unconditional false-accept probability is asserted."
+}

@@ -226,6 +226,47 @@ fn key(x: &F2mElement) -> BigUint {
     x.to_biguint()
 }
 
+/// The lookups every relation search over a fixed factor base needs,
+/// built once by [`PqLookup::new`] and shared by every attempt: the
+/// factor base's `x → index` table, the subspace membership set (read
+/// only by the `n = 2` shortcut) and the descent's `V`-basis.  The
+/// `find_one_pq_relation*` functions build one per call; the `*_with`
+/// variants take a prebuilt one, and the drivers build it once per run.
+#[derive(Clone, Debug)]
+pub struct PqLookup {
+    x_to_idx: HashMap<BigUint, usize>,
+    v_set: HashMap<BigUint, ()>,
+    v_basis: Vec<F2mElement>,
+}
+
+impl PqLookup {
+    /// Index `fb` and `v` (`fb` built over `v` on `curve`).
+    pub fn new(curve: &BinaryCurve, fb: &[PqFactorBaseEntry], v: &PqSubspace) -> Self {
+        // Hash table: x ∈ V → FB index (only on-curve x are kept).
+        let mut x_to_idx: HashMap<BigUint, usize> = HashMap::with_capacity(fb.len());
+        for entry in fb {
+            x_to_idx.insert(key(&entry.x), entry.idx);
+        }
+        // Subspace membership set (every x ∈ V, even those without a
+        // curve point — used to early-reject quadratic roots that aren't
+        // even in V).
+        let mut v_set: HashMap<BigUint, ()> = HashMap::with_capacity(v.elements.len());
+        for x in &v.elements {
+            v_set.insert(key(x), ());
+        }
+        // The V-basis used by the descent (same convention as
+        // PqSubspace::span_low).
+        let v_basis: Vec<F2mElement> = (0..v.m_prime)
+            .map(|k| F2mElement::from_bit_positions(&[k], curve.m))
+            .collect();
+        Self {
+            x_to_idx,
+            v_set,
+            v_basis,
+        }
+    }
+}
+
 /// **Try to find one relation** by random sampling.  Returns `None` if
 /// `max_trials` random `(a, b)` pairs all fail to decompose.
 pub fn find_one_pq_relation(
@@ -237,18 +278,23 @@ pub fn find_one_pq_relation(
     rng: &mut StdRng,
     max_trials: usize,
 ) -> Option<PqRelation> {
-    // Hash table: x ∈ V → FB index (only on-curve x are kept).
-    let mut x_to_idx: HashMap<BigUint, usize> = HashMap::with_capacity(fb.len());
-    for entry in fb {
-        x_to_idx.insert(key(&entry.x), entry.idx);
-    }
-    // Subspace membership set (every x ∈ V, even those without a curve
-    // point — used to early-reject quadratic roots that aren't even
-    // in V).
-    let mut v_set: HashMap<BigUint, ()> = HashMap::with_capacity(v.elements.len());
-    for x in &v.elements {
-        v_set.insert(key(x), ());
-    }
+    let lookup = PqLookup::new(curve, fb, v);
+    find_one_pq_relation_with(curve, g, q, fb, &lookup, rng, max_trials)
+}
+
+/// [`find_one_pq_relation`] with the factor base's lookups prebuilt
+/// ([`PqLookup::new`] on the same `fb`): the same relation for the same
+/// `rng` state.
+pub fn find_one_pq_relation_with(
+    curve: &BinaryCurve,
+    g: &BinaryPoint,
+    q: &BinaryPoint,
+    fb: &[PqFactorBaseEntry],
+    lookup: &PqLookup,
+    rng: &mut StdRng,
+    max_trials: usize,
+) -> Option<PqRelation> {
+    let (x_to_idx, v_set) = (&lookup.x_to_idx, &lookup.v_set);
 
     for _ in 0..max_trials {
         let a = random_scalar_biguint(rng, &curve.order);
@@ -385,11 +431,21 @@ pub fn petit_quisquater_n2_toy(
         return None;
     }
     let target = fb.len() + target_extra.max(1);
+    // The factor base is fixed for the run: index it once.
+    let lookup = PqLookup::new(curve, &fb, v);
 
     let mut rng = StdRng::seed_from_u64(seed);
     let mut relations: Vec<PqRelation> = Vec::with_capacity(target);
     while relations.len() < target {
-        let rel = find_one_pq_relation(curve, g, q, &fb, v, &mut rng, max_trials_per_relation)?;
+        let rel = find_one_pq_relation_with(
+            curve,
+            g,
+            q,
+            &fb,
+            &lookup,
+            &mut rng,
+            max_trials_per_relation,
+        )?;
         relations.push(rel);
     }
 
@@ -472,17 +528,25 @@ pub fn find_one_pq_relation_via_descent(
     rng: &mut StdRng,
     max_trials: usize,
 ) -> Option<PqRelation> {
+    let lookup = PqLookup::new(curve, fb, v);
+    find_one_pq_relation_via_descent_with(curve, g, q, fb, &lookup, rng, max_trials)
+}
+
+/// [`find_one_pq_relation_via_descent`] with the factor base's lookups prebuilt
+/// ([`PqLookup::new`] on the same `fb`): the same relation for the same
+/// `rng` state.
+pub fn find_one_pq_relation_via_descent_with(
+    curve: &BinaryCurve,
+    g: &BinaryPoint,
+    q: &BinaryPoint,
+    fb: &[PqFactorBaseEntry],
+    lookup: &PqLookup,
+    rng: &mut StdRng,
+    max_trials: usize,
+) -> Option<PqRelation> {
     use crate::cryptanalysis::pq_descent::solve_decomposition_via_descent;
 
-    // Build the V-basis used by the descent (same convention as PqSubspace::span_low).
-    let v_basis: Vec<F2mElement> = (0..v.m_prime)
-        .map(|k| F2mElement::from_bit_positions(&[k], curve.m))
-        .collect();
-    // FB lookup by x → idx.
-    let mut x_to_idx: HashMap<BigUint, usize> = HashMap::with_capacity(fb.len());
-    for entry in fb {
-        x_to_idx.insert(key(&entry.x), entry.idx);
-    }
+    let (x_to_idx, v_basis) = (&lookup.x_to_idx, &lookup.v_basis);
 
     for _ in 0..max_trials {
         let a = random_scalar_biguint(rng, &curve.order);
@@ -495,7 +559,7 @@ pub fn find_one_pq_relation_via_descent(
             BinaryPoint::Infinity => continue,
         };
         // Run descent + GB to find all (x_1, x_2) ∈ V × V with S_3 = 0.
-        let candidates = solve_decomposition_via_descent(curve, &x_r, &v_basis);
+        let candidates = solve_decomposition_via_descent(curve, &x_r, v_basis);
         for (x_1, x_2) in candidates {
             let i = match x_to_idx.get(&key(&x_1)) {
                 Some(&i) => i,
@@ -537,15 +601,17 @@ pub fn petit_quisquater_n2_full_pipeline(
         return None;
     }
     let target = fb.len() + target_extra.max(1);
+    // The factor base is fixed for the run: index it once.
+    let lookup = PqLookup::new(curve, &fb, v);
     let mut rng = StdRng::seed_from_u64(seed);
     let mut relations: Vec<PqRelation> = Vec::with_capacity(target);
     while relations.len() < target {
-        let rel = find_one_pq_relation_via_descent(
+        let rel = find_one_pq_relation_via_descent_with(
             curve,
             g,
             q,
             &fb,
-            v,
+            &lookup,
             &mut rng,
             max_trials_per_relation,
         )?;
@@ -615,15 +681,17 @@ pub fn petit_quisquater_n2_full_pipeline_via_wiedemann(
         return None;
     }
     let target = fb.len() + target_extra.max(1);
+    // The factor base is fixed for the run: index it once.
+    let lookup = PqLookup::new(curve, &fb, v);
     let mut rng = StdRng::seed_from_u64(seed);
     let mut relations: Vec<PqRelation> = Vec::with_capacity(target);
     while relations.len() < target {
-        let rel = find_one_pq_relation_via_descent(
+        let rel = find_one_pq_relation_via_descent_with(
             curve,
             g,
             q,
             &fb,
-            v,
+            &lookup,
             &mut rng,
             max_trials_per_relation,
         )?;
@@ -755,15 +823,25 @@ pub fn find_one_pq_relation_n3_via_descent(
     rng: &mut StdRng,
     max_trials: usize,
 ) -> Option<PqRelation> {
+    let lookup = PqLookup::new(curve, fb, v);
+    find_one_pq_relation_n3_via_descent_with(curve, g, q, fb, &lookup, rng, max_trials)
+}
+
+/// [`find_one_pq_relation_n3_via_descent`] with the factor base's lookups prebuilt
+/// ([`PqLookup::new`] on the same `fb`): the same relation for the same
+/// `rng` state.
+pub fn find_one_pq_relation_n3_via_descent_with(
+    curve: &BinaryCurve,
+    g: &BinaryPoint,
+    q: &BinaryPoint,
+    fb: &[PqFactorBaseEntry],
+    lookup: &PqLookup,
+    rng: &mut StdRng,
+    max_trials: usize,
+) -> Option<PqRelation> {
     use crate::cryptanalysis::pq_descent::solve_decomposition_n3_direct;
 
-    let v_basis: Vec<F2mElement> = (0..v.m_prime)
-        .map(|k| F2mElement::from_bit_positions(&[k], curve.m))
-        .collect();
-    let mut x_to_idx: HashMap<BigUint, usize> = HashMap::with_capacity(fb.len());
-    for entry in fb {
-        x_to_idx.insert(key(&entry.x), entry.idx);
-    }
+    let (x_to_idx, v_basis) = (&lookup.x_to_idx, &lookup.v_basis);
 
     for _ in 0..max_trials {
         let a = random_scalar_biguint(rng, &curve.order);
@@ -780,7 +858,7 @@ pub fn find_one_pq_relation_n3_via_descent(
         // real PQ method but doesn't terminate at our parameters
         // because S_4 has total degree 8 and the boolean Buchberger
         // doesn't get the F4/F5-style speedup.
-        let candidates = solve_decomposition_n3_direct(curve, &x_r, &v_basis);
+        let candidates = solve_decomposition_n3_direct(curve, &x_r, v_basis);
         for (x_1, x_2, x_3) in candidates {
             let i = match x_to_idx.get(&key(&x_1)) {
                 Some(&i) => i,
@@ -821,15 +899,25 @@ pub fn find_one_pq_relation_n3_via_xl(
     rng: &mut StdRng,
     max_trials: usize,
 ) -> Option<PqRelation> {
+    let lookup = PqLookup::new(curve, fb, v);
+    find_one_pq_relation_n3_via_xl_with(curve, g, q, fb, &lookup, rng, max_trials)
+}
+
+/// [`find_one_pq_relation_n3_via_xl`] with the factor base's lookups prebuilt
+/// ([`PqLookup::new`] on the same `fb`): the same relation for the same
+/// `rng` state.
+pub fn find_one_pq_relation_n3_via_xl_with(
+    curve: &BinaryCurve,
+    g: &BinaryPoint,
+    q: &BinaryPoint,
+    fb: &[PqFactorBaseEntry],
+    lookup: &PqLookup,
+    rng: &mut StdRng,
+    max_trials: usize,
+) -> Option<PqRelation> {
     use crate::cryptanalysis::pq_descent::solve_decomposition_via_descent_n3_xl;
 
-    let v_basis: Vec<F2mElement> = (0..v.m_prime)
-        .map(|k| F2mElement::from_bit_positions(&[k], curve.m))
-        .collect();
-    let mut x_to_idx: HashMap<BigUint, usize> = HashMap::with_capacity(fb.len());
-    for entry in fb {
-        x_to_idx.insert(key(&entry.x), entry.idx);
-    }
+    let (x_to_idx, v_basis) = (&lookup.x_to_idx, &lookup.v_basis);
 
     for _ in 0..max_trials {
         let a = random_scalar_biguint(rng, &curve.order);
@@ -841,7 +929,7 @@ pub fn find_one_pq_relation_n3_via_xl(
             BinaryPoint::Affine { x, .. } => x.clone(),
             BinaryPoint::Infinity => continue,
         };
-        let candidates = solve_decomposition_via_descent_n3_xl(curve, &x_r, &v_basis);
+        let candidates = solve_decomposition_via_descent_n3_xl(curve, &x_r, v_basis);
         for (x_1, x_2, x_3) in candidates {
             let i = match x_to_idx.get(&key(&x_1)) {
                 Some(&i) => i,
@@ -888,11 +976,20 @@ pub fn petit_quisquater_n3_full_pipeline_via_xl(
         return None;
     }
     let target = fb.len() + target_extra.max(1);
+    // The factor base is fixed for the run: index it once.
+    let lookup = PqLookup::new(curve, &fb, v);
     let mut rng = StdRng::seed_from_u64(seed);
     let mut relations: Vec<PqRelation> = Vec::with_capacity(target);
     while relations.len() < target {
-        let rel =
-            find_one_pq_relation_n3_via_xl(curve, g, q, &fb, v, &mut rng, max_trials_per_relation)?;
+        let rel = find_one_pq_relation_n3_via_xl_with(
+            curve,
+            g,
+            q,
+            &fb,
+            &lookup,
+            &mut rng,
+            max_trials_per_relation,
+        )?;
         relations.push(rel);
     }
 
@@ -941,15 +1038,17 @@ pub fn petit_quisquater_n3_full_pipeline(
         return None;
     }
     let target = fb.len() + target_extra.max(1);
+    // The factor base is fixed for the run: index it once.
+    let lookup = PqLookup::new(curve, &fb, v);
     let mut rng = StdRng::seed_from_u64(seed);
     let mut relations: Vec<PqRelation> = Vec::with_capacity(target);
     while relations.len() < target {
-        let rel = find_one_pq_relation_n3_via_descent(
+        let rel = find_one_pq_relation_n3_via_descent_with(
             curve,
             g,
             q,
             &fb,
-            v,
+            &lookup,
             &mut rng,
             max_trials_per_relation,
         )?;
@@ -1554,6 +1653,92 @@ mod tests {
                 shortcut_set,
                 descent_set,
             );
+        }
+    }
+
+    /// **Hoisted lookups give identical relations.**  For a fixed seed,
+    /// a run of attempts through the per-call functions (lookups rebuilt
+    /// each call) and through the `*_with` variants (one [`PqLookup`])
+    /// yields the same relations and leaves the RNG in the same state.
+    #[test]
+    fn hoisted_lookup_gives_identical_relations() {
+        type Search = fn(
+            &BinaryCurve,
+            &BinaryPoint,
+            &BinaryPoint,
+            &[PqFactorBaseEntry],
+            &PqSubspace,
+            &mut StdRng,
+            usize,
+        ) -> Option<PqRelation>;
+        type SearchWith = fn(
+            &BinaryCurve,
+            &BinaryPoint,
+            &BinaryPoint,
+            &[PqFactorBaseEntry],
+            &PqLookup,
+            &mut StdRng,
+            usize,
+        ) -> Option<PqRelation>;
+        let flat = |r: &Option<PqRelation>| {
+            r.as_ref()
+                .map(|r| (r.coef_a.clone(), r.coef_b.clone(), r.entries.clone()))
+        };
+        let (curve, g, n) = build_toy_curve_and_generator();
+        let q = scalar_mul(&curve, &g, &(&BigUint::from(41u32) % &n));
+        let cases: [(&str, u32, Search, SearchWith, usize, usize); 4] = [
+            (
+                "n2 shortcut",
+                4,
+                find_one_pq_relation,
+                find_one_pq_relation_with,
+                8,
+                500,
+            ),
+            (
+                "n2 descent",
+                4,
+                find_one_pq_relation_via_descent,
+                find_one_pq_relation_via_descent_with,
+                4,
+                200,
+            ),
+            (
+                "n3 direct",
+                4,
+                find_one_pq_relation_n3_via_descent,
+                find_one_pq_relation_n3_via_descent_with,
+                4,
+                100,
+            ),
+            // XL is slow in debug: one call of two trials (a `None` on
+            // both paths is still a like-for-like check).
+            (
+                "n3 xl",
+                3,
+                find_one_pq_relation_n3_via_xl,
+                find_one_pq_relation_n3_via_xl_with,
+                1,
+                2,
+            ),
+        ];
+        for (what, m_prime, per_call, hoisted, attempts, trials) in cases {
+            let v = PqSubspace::span_low(curve.m, m_prime);
+            let fb = build_pq_factor_base(&curve, &v);
+            let lookup = PqLookup::new(&curve, &fb, &v);
+            let mut rng_a = StdRng::seed_from_u64(0x5EED);
+            let mut rng_b = StdRng::seed_from_u64(0x5EED);
+            let mut found = 0;
+            for i in 0..attempts {
+                let a = per_call(&curve, &g, &q, &fb, &v, &mut rng_a, trials);
+                let b = hoisted(&curve, &g, &q, &fb, &lookup, &mut rng_b, trials);
+                assert_eq!(flat(&a), flat(&b), "{what}: attempt {i}");
+                found += usize::from(a.is_some());
+            }
+            assert_eq!(rng_a.gen::<u64>(), rng_b.gen::<u64>(), "{what}: rng state");
+            if what != "n3 xl" {
+                assert!(found > 0, "{what}: no relation found");
+            }
         }
     }
 

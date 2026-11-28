@@ -1,0 +1,19 @@
+................................F................
+======================================================================
+FAIL: test_gate_passes_on_the_committed_tree (__main__.Committed.test_gate_passes_on_the_committed_tree)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/crypto/scripts/test_validation_gate.py", line 413, in test_gate_passes_on_the_committed_tree
+    self.assertEqual(g.check(REPO), [])
+AssertionError: Lists differ: ['benchmarks 20261017-volcano-ecdlp-census[875 chars]ile"] != []
+
+First list contains 6 additional elements.
+First extra element 0:
+'benchmarks 20261017-volcano-ecdlp-census: unvalidated: replay certificate: replay-certificate.json is not a file; validator report: validator-report.json is not a file; row is not in the pre-gate freeze'
+
+Diff is 1011 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 49 tests in 0.709s
+
+FAILED (failures=1)

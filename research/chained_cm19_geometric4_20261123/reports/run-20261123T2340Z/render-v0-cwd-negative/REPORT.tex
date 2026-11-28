@@ -1,0 +1,131 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=18mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,graphicx,booktabs,amsmath,amssymb,array}
+\usepackage[hidelinks]{hyperref}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\begin{document}
+{\Large\bfseries The actual norm-four cover is geometrically primitive}\par
+{\large\bfseries A Frobenius descent and full $S_4$ monodromy argument}\par
+23 November 2026 \quad crypto PR5095 \quad [pcc:unverified]
+
+\textbf{Result and standing.} Using the inherited actual
+$\beta:E^3\simeq J(C)$, global integral map identities and complete
+prime-field automorphism evidence, the written proof derives geometric
+primitivity and geometric/arithmetic $S_4$ monodromy. New native finite
+and local cases pass; two quantified integer lemmas have checked Lean
+proofs. The full geometry remains a readable argument with named
+standard bridges, without a signed independent verdict. Proof a54771;
+native25c352; partial formal b47cfe.
+
+The actual curve and target are
+\[
+ C:\ (Z^2+6X^2+3XY+Y^2)^2=Y(X^3+2XY^2+6Y^3),
+ \qquad E/\mathbb F_7:\ y^2=x^3+2x+6.
+\]
+For $P_-=(1:0:6)$, $f_4(P)=L([P-P_-])$ has degree4 by
+$LL^\dagger=[4]$. Its global integral identity is
+\[
+ [3]L=\pi f_{0*}+(2\pi+[3])f_{1*}-f_{3*},
+ \qquad \pi^2+3\pi+7=0.
+\]
+This uses genuine Hom division through $\beta$, distinct from the
+pointwise inverse3mod11 expression whose global degree is576.
+
+\begin{center}
+\includegraphics[width=\linewidth,height=86mm,keepaspectratio]{proof.pdf}
+\end{center}
+
+\textbf{Why descent works.} Write $F^n=[a_n]+[b_n]F$ with
+$(a_0,b_0)=(1,0)$ and $(a_{n+1},b_{n+1})=(-7b_n,a_n-3b_n)$.
+For every positive index, $a_n=0\pmod7$ and
+$b_n\in\{1,2,4\}\pmod7$, hence $b_n\ne0$. A geometric group
+endomorphism defined over $\mathbb F_{7^n}$ commutes with $F^n$;
+torsion-free Hom then forces commutation with $F$, and relative
+Frobenius naturality gives definition over $\mathbb F_7$.
+Canonical faithfulness extends the actual $S_3$ census to $\overline{\mathbb F}_7$.
+
+\textbf{Why the last branch case fails.} The bitangent $Y=0$ is
+$2P_-+2P_+$. Odd $\#J(\mathbb F_7)=11^3$ makes
+$P_-+P_+$ the unique rational theta class; nonhyperellipticity gives a
+unique effective divisor in it. Two three-cycle branch values in an
+$A_4$ cover would force that divisor to be the two ramification points.
+But differentiating the actual Hom identity gives
+$3f_4^*\eta=3f_1^*\eta-f_3^*\eta$, so $f_4$ is etale at both points.
+The other branch cases and the constant-field alternative are also
+excluded, as shown in the full proof and hypothesis audit.
+\newpage
+{\Large\bfseries Complete case evidence, partial proofs and preserved limits}\par
+
+\begin{center}
+\begin{tabular}{>{\raggedright\arraybackslash}p{48mm}r>{\raggedright\arraybackslash}p{98mm}}
+\toprule
+New fixed case & Count & Qualification scope\\
+\midrule
+Natural permutations / subgroups &24 /30& Every product row and all24 adjoin closures per subgroup\\
+Transitive / primitive groups &9 /2& Only $A_4,S_4$ primitive; complete generation argument\\
+Odd fixed-sheet cases &12& Each has0 or2 fixed sheets\\
+Nontrivial $A_4$ inertia &11& Three order2 and eight order3; each defect2\\
+Odd inertia normalizer cases &36& Every fixed inertia-orbit count is even\\
+Actual curve local checks &2 jets& Split critical polynomials, bitangent, odd fixed-locus parity\\
+Actual coefficient controls &3& Changed jet, $R$ entry, $B$ constant reject; pristine restores\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Native source\texttt{f128ae85}: all seven strict phases exit0 under
+120seconds/2GiB/one worker; source/tool/qualifier guards unchanged.
+All29 whole source, lock and citation-correction files were read back
+before calls. Full17707-byte stdout and40 small original records are
+preserved. No old field, conic, Jacobian or curve-frame population was
+repeated to produce these cases.
+
+\textbf{Quantified Lean dependency.} Source\texttt{db00bbbe} had all63
+whole frozen files read back before first B proof calls. Lean4.35.0
+builds \texttt{coeffResidue} and \texttt{coefficientNonzero}, each
+quantified over every $n:\mathbb N$ for the stated integer recurrence.
+Both use standard\texttt{propext} only. These are recurrence theorems on
+actual standard Int/Nat, rather than a custom group or bounded sample.
+Existing \texttt{Int.mul\_emod} and \texttt{Int.sub\_emod} are applied
+as stated. Version/proof phases0, guards unchanged,20 full small originals.
+The End$(J)$ interpretation, curve quotient/descent, Galois closure,
+theta and differential bridges remain unformalized.
+\texttt{lean4checker} is unavailable; no fresh checker pass is asserted.
+
+\textbf{First negatives remain.} Formal A failed while loading
+\texttt{Lean/Meta/Tactic/Simp/Main.ir}; no theorem or olean resulted.
+The first claim wrongly called that file missing. A separate full-file
+metadata read establishes it exists; appended correction c543f0 leaves
+the bounded loader failure's cause unresolved. B replaces the Omega
+path with an Init-only proof of the same quantified statements, with
+unchanged compiler/default logic and limits. The wrong Vakil chapter
+citation, exact addendum, preparatory staging/publication and journal-label
+metadata errors are preserved. No frozen subject or failed evidence
+was rewritten.
+
+\textbf{Whole original custody.} The actual executed native ELF is
+4642592bytes, SHA256 prefix\texttt{9d4a3974}; the original B olean is
+66496bytes, prefix\texttt{e6623cc3}. Both whole originals remain in RAM,
+pending approved durable custody. Complete small raw files are committed.
+The portable CI workflow preserves new CI originals separately and
+cannot substitute them for the original Cloud binaries. Required CI and
+stacked-parent merge requirements remain open.
+
+\textbf{Computational meaning.} This fixed $\mathbb F_7$ theorem rules
+out geometric degree2 intermediate covers and missing extension-only
+group Homs here. It does not establish a complexity lower bound, a
+crypto-scale CM family or an ECDLP speedup. The genuine nontrivial
+Jacobian transfer still preserves scalars through its global left
+inverse. Next determine true fibre and pole divisor classes and extract
+explicit $f_4$ functions; admit a cost comparison only with a concrete
+mechanism and the strongest matched existing ECDLP reference.
+
+\textbf{Full sources.} The repository study contains
+\texttt{GEOMETRIC\_PRIMITIVITY\_AND\_S4\_C.md}, the21-case hypothesis
+audit, source/runtime locks and complete raw inventories. Standard
+references: Milne AV I10.6/III11.1; Stacks0CC6,0C1B,09I6,0BYA;
+Vakil19.7.3/19.7.D and21.5.B. Existing unsigned upstream dependencies
+are named in the proof. This report and every scientific claim remain
+[pcc:unverified].
+\end{document}

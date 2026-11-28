@@ -1,0 +1,30 @@
+status=development-only-exact-source
+source_binding=exact-pushed-commit
+source_revision=da5760cb903d355c4bcb1128de8a2b0d6aee0801
+source_tree=5b97e218fc4fd4ef01471fdeeaeff0ef9543b30a
+remote_ref=refs/heads/codex/ghs-frontier-3-7-20261119
+remote_revision_observed=da5760cb903d355c4bcb1128de8a2b0d6aee0801
+branch=codex/ghs-frontier-3-7-20261119
+rustc=1.100.0 (0ef1bc386 2026-11-09)
+rustc_host=x86_64-unknown-linux-gnu
+main_rs_sha256=26a035b3c4cb6aa7b614bd966fbb9548b1cadc1e6f2cbcaceb12a91225ead134
+strong_rho_rs_sha256=361dab6e04dcc2269dcfc919f8fc3927c993d05139358e67adcdfb92259fb6c1
+check_sh_sha256=97d88e6b53eeae08b3df9acb54c550da6debc8735395829bfe50e902834462b1
+receipt_readme_sha256=1cabe8c9120744c610c95fdffadc3a30287f300d2bb7adb5d69e633a6e396fe7
+binary_build_command=GHS_SOURCE_REVISION=da5760cb903d355c4bcb1128de8a2b0d6aee0801 rustc --edition 2021 -C opt-level=3 research/quartic_ghs_strong_rho_20261114/main.rs -o ghs-strong-rho
+binary_sha256=6dc3309dc06e3e92182767d9786e47f3f36dc6d0955e3a555ab4e8f57cbebca2
+binary_bytes=5093504
+binary_selftest=PASS
+command=GHS_CPUSET_P1=0 GHS_CPUSET_P2=0,1 GHS_CPUSET_P4=0,1,2,3 GHS_NUMA_NODE=0 GHS_TEST_SOURCE_REVISION=da5760cb903d355c4bcb1128de8a2b0d6aee0801 research/ghs_frontier_3_7_20261119/ws3_parallel_rho/check.sh
+exit_status=0
+WS3 deterministic controls PASS
+sha256_vectors=2
+tail_cells=66
+shard_cells=4
+queue_cells=3
+stop_delay_cells=4
+natural_recovery_cells=6
+exact_replay_pairs=3
+fail_closed_cells=4
+timing_observations=0 performance_claims=0
+boundary=This receipt binds the listed exact pushed code/check source, one local development binary, the separately hashed receipt README, and deterministic controls only. It is not a cross-materialization build, threaded run, L2 measurement, speed result, or frontier evidence.

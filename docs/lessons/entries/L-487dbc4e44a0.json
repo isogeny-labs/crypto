@@ -1,0 +1,15 @@
+{
+  "action": "match the generator's draw order (all draws of one level first vs each drawn unit's children drawn at once) before suspecting data or code; the protocol rarely fixes it; report both orders",
+  "created": "2026-11-18T21:59:47Z",
+  "evidence": [
+    "research/genus4_prime_order_20261118/validation/scripts/recompute.py",
+    "research/genus4_prime_order_20261118/validation/out/recompute.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "a recomputed hierarchical-bootstrap interval differs from the producer's in the 4th decimal while every point estimate matches exactly",
+  "why": "genus4_prime_order_20261118: interleaved order gave [0.994764, 1.002512], the frozen levelwise order reproduced [0.994924, 1.002345] exactly"
+}

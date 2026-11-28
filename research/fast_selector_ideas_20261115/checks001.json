@@ -1,0 +1,63 @@
+[
+  {
+    "command": [
+      "python3",
+      "tools/pcc/pcc.py",
+      "ledger",
+      "verify",
+      "--base",
+      "origin/main"
+    ],
+    "exit_code": 0,
+    "stdout": "ledger: 1089 entries, chain ok\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "tools/lessons.py",
+      "verify",
+      "--base",
+      "origin/main"
+    ],
+    "exit_code": 0,
+    "stdout": "lessons verify: 81 entries, 0 error(s)\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "tools/pcc/pcc.py",
+      "lint-prose",
+      "research/fast_selector_ideas_20261115/PLAN.md",
+      "research/fast_selector_ideas_20261115/PUBLICATION.md",
+      "research/fast_selector_ideas_20261115/handoff001.md"
+    ],
+    "exit_code": 0,
+    "stdout": "lint-prose: 0 finding(s)\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--cached",
+      "--check"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "python3",
+      "tools/pcc/pcc.py",
+      "lint-prose",
+      "--stdin"
+    ],
+    "input": "research/fast_selector_ideas_20261115/pr-body001.md",
+    "exit_code": 0,
+    "stdout": "lint-prose: 0 finding(s)\n",
+    "stderr": ""
+  }
+]

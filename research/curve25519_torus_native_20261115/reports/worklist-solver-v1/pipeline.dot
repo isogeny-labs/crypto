@@ -1,0 +1,16 @@
+digraph worklist {
+  graph [rankdir=TB, bgcolor="white", nodesep=0.3, ranksep=0.35, pad=0.12];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, color="#254250", fillcolor="#e9f0f3", margin="0.12,0.10"];
+  edge [color="#526b77", arrowsize=0.65, fontname="DejaVu Sans", fontsize=9];
+  input [label="Public System + semantic role indices\nNo labels, signs, witness or point list"];
+  sweep [label="Sweep: revise every equation"];
+  queue [label="Worklist: revise dirty dependencies\nAssignment AND rollback invalidate"];
+  extract [label="Same partial linear/quadratic extraction\nSame candidate/root ordering"];
+  branch [label="Unique root: propagate\nTwo roots: semantic inputs only", fillcolor="#fff0d9"];
+  output [label="Root: original equation + row/group replay\nOr precise Cap / Unsupported / NoRootObservation",fillcolor="#e1f3ea"];
+  input -> sweep; input -> queue;
+  sweep -> extract; queue -> extract;
+  extract -> branch; branch -> queue [label="changed support",style=dashed];
+  branch -> output;
+  {rank=same; sweep; queue;}
+}

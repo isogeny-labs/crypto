@@ -1,0 +1,905 @@
+{
+ "build": {
+  "c": {
+   "builds": {
+    "c-native": {
+     "flags": [
+      "-O3",
+      "-march=native",
+      "-ffp-contract=fast"
+     ],
+     "path": "research/optlevel_rs_20261117/equiv/cache/optk-0197263ab0b6-native",
+     "sha256": "b2c79847c8b80043282068c4c1077170933c4c4475a29afd0c1f07a41ef6d3be"
+    },
+    "c-scalar": {
+     "flags": [
+      "-O3",
+      "-march=native",
+      "-ffp-contract=fast",
+      "-fno-tree-vectorize",
+      "-fno-tree-slp-vectorize"
+     ],
+     "path": "research/optlevel_rs_20261117/equiv/cache/optk-0197263ab0b6-scalar",
+     "sha256": "97324297d9c461403c8ffbaa9422c156d20c873acd71f7d131ffcbdd59799ae0"
+    },
+    "c-w512": {
+     "flags": [
+      "-O3",
+      "-march=native",
+      "-ffp-contract=fast",
+      "-mprefer-vector-width=512"
+     ],
+     "path": "research/optlevel_rs_20261117/equiv/cache/optk-0197263ab0b6-w512",
+     "sha256": "9d4b4ec305ddaecb781f0ff920bd7b633bad511305af081b152dc5db79311ad9"
+    }
+   },
+   "compiler": "/usr/bin/cc",
+   "compiler_version": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+   "source_sha256": "6a59435b7350336543a649683ab5d689ebd5fc520153413268e9411b15fe8939"
+  },
+  "exe": "/home/user/crypto-wt/optlevel-rs/tools/optlevel/target/release/optlevel",
+  "exe_sha256": "4fe440ae8dab694d4268c9e06fa22362829c3d940a2ef57f24822a0b0c54e945",
+  "isas": [
+   "avx512",
+   "avx2",
+   "scalar"
+  ],
+  "kernels": "rust (tools/optlevel/src/kernels.rs, inside the optlevel binary; one variant per isa, selected at run time)",
+  "source_sha256": "cb601352c65a8d0c79f77c8cd9653480a23c394e42e4083bd3a05edf9b6cfde4"
+ },
+ "ceiling_rule": "max over repeats and over builds of the summed rate of k pinned copies; the median is kept as the low end",
+ "clock_hz_effective": {
+  "max": 2537005632.4907284,
+  "median": 2101212141.6047583,
+  "min": 2082449287.2815516,
+  "n": 3
+ },
+ "compute": {
+  "fma_f64": {
+   "best_variant": "fma_f64_reg@avx512",
+   "definition": "a <- a*s + b in binary64 (one fused multiply-add; float-encoded modular arithmetic)",
+   "scalar_ops_per_s": 2772669521.658068,
+   "simd_ops_per_s": 42627284241.93081,
+   "total_ops_per_s": {
+    "1": {
+     "max": 42627284241.93081,
+     "median": 40346404681.59352,
+     "min": 36401442367.464836,
+     "n": 3
+    },
+    "2": {
+     "max": 80214197240.90424,
+     "median": 78615729921.59505,
+     "min": 78195868061.89415,
+     "n": 3
+    },
+    "4": {
+     "max": 162767937443.3625,
+     "median": 156122841104.67078,
+     "min": 153727282392.39612,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "fma_f64@avx2": {
+     "max": 11930752794.313707,
+     "median": 11893411546.649115,
+     "min": 10710911570.255022,
+     "n": 3
+    },
+    "fma_f64@avx512": {
+     "max": 19076972033.09281,
+     "median": 18902029473.65767,
+     "min": 18073690010.4672,
+     "n": 3
+    },
+    "fma_f64@c-native": {
+     "max": 7438014181.355461,
+     "median": 5388102160.555191,
+     "min": 3119351751.851669,
+     "n": 3
+    },
+    "fma_f64@c-scalar": {
+     "max": 2579357587.6669817,
+     "median": 1887163230.861491,
+     "min": 1882096512.1569345,
+     "n": 3
+    },
+    "fma_f64@c-w512": {
+     "max": 11121090115.156395,
+     "median": 9423390493.838629,
+     "min": 7180412296.123718,
+     "n": 3
+    },
+    "fma_f64@scalar": {
+     "max": 2772669521.658068,
+     "median": 2577568436.562053,
+     "min": 1925165800.0624073,
+     "n": 3
+    },
+    "fma_f64_reg@avx2": {
+     "max": 22435398609.804962,
+     "median": 21523029636.253647,
+     "min": 20977157227.477337,
+     "n": 3
+    },
+    "fma_f64_reg@avx512": {
+     "max": 42627284241.93081,
+     "median": 40346404681.59352,
+     "min": 36401442367.464836,
+     "n": 3
+    },
+    "fma_f64_reg@c-native": {
+     "max": 40987702038.186226,
+     "median": 38979522473.001625,
+     "min": 38955529690.90741,
+     "n": 3
+    },
+    "fma_f64_reg@c-w512": {
+     "max": 41283328963.92757,
+     "median": 34191674484.633293,
+     "min": 34157186147.846645,
+     "n": 3
+    }
+   }
+  },
+  "modmuladd_p31": {
+   "best_variant": "modmuladd_p31@avx2",
+   "definition": "a <- a + m*b mod p, p < 2^31 (Montgomery, 32x32->64 multiplies)",
+   "scalar_ops_per_s": 687312887.8078176,
+   "simd_ops_per_s": 3753552785.911238,
+   "total_ops_per_s": {
+    "1": {
+     "max": 3753552785.911238,
+     "median": 3019703117.565924,
+     "min": 2521840371.242449,
+     "n": 3
+    },
+    "2": {
+     "max": 6829525805.815025,
+     "median": 6391746626.448742,
+     "min": 6108656178.162725,
+     "n": 3
+    },
+    "4": {
+     "max": 13623764663.928026,
+     "median": 13602091163.121328,
+     "min": 12532628645.562954,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "modmuladd_p31@avx2": {
+     "max": 3753552785.911238,
+     "median": 3019703117.565924,
+     "min": 2521840371.242449,
+     "n": 3
+    },
+    "modmuladd_p31@avx512": {
+     "max": 3302246952.455944,
+     "median": 2881838356.537418,
+     "min": 2877307236.143345,
+     "n": 3
+    },
+    "modmuladd_p31@c-native": {
+     "max": 1735472267.0518687,
+     "median": 1720374828.8120003,
+     "min": 1584456727.5052564,
+     "n": 3
+    },
+    "modmuladd_p31@c-scalar": {
+     "max": 582464410.7338903,
+     "median": 538070489.0158193,
+     "min": 460966736.5645515,
+     "n": 3
+    },
+    "modmuladd_p31@c-w512": {
+     "max": 2086063614.828351,
+     "median": 2083550517.2120142,
+     "min": 2075654332.2137184,
+     "n": 3
+    },
+    "modmuladd_p31@scalar": {
+     "max": 687312887.8078176,
+     "median": 679298045.1626228,
+     "min": 596848285.7345982,
+     "n": 3
+    }
+   }
+  },
+  "modmuladd_p62": {
+   "best_variant": "modmuladd_p62@c-w512",
+   "definition": "a <- a + m*b mod p, p < 2^62 (Montgomery, 64x64->128 multiplies)",
+   "scalar_ops_per_s": 692045193.8306382,
+   "simd_ops_per_s": 712584476.3373137,
+   "total_ops_per_s": {
+    "1": {
+     "max": 712584476.3373137,
+     "median": 674771144.4766064,
+     "min": 454417822.17128265,
+     "n": 3
+    },
+    "2": {
+     "max": 1332804775.182181,
+     "median": 1237280013.2374272,
+     "min": 1189859664.6207256,
+     "n": 3
+    },
+    "4": {
+     "max": 2471713391.7410927,
+     "median": 2308076466.8735495,
+     "min": 2178997697.669827,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "modmuladd_p62@avx2": {
+     "max": 402682718.9529721,
+     "median": 365002670.4896613,
+     "min": 362870319.48590785,
+     "n": 3
+    },
+    "modmuladd_p62@avx512": {
+     "max": 395072512.0354627,
+     "median": 385767349.4303272,
+     "min": 366908762.9966658,
+     "n": 3
+    },
+    "modmuladd_p62@c-native": {
+     "max": 697591280.620992,
+     "median": 624689083.2842008,
+     "min": 477129122.12691885,
+     "n": 3
+    },
+    "modmuladd_p62@c-scalar": {
+     "max": 690909184.1451781,
+     "median": 667675097.6221199,
+     "min": 549153442.018088,
+     "n": 3
+    },
+    "modmuladd_p62@c-w512": {
+     "max": 712584476.3373137,
+     "median": 674771144.4766064,
+     "min": 454417822.17128265,
+     "n": 3
+    },
+    "modmuladd_p62@scalar": {
+     "max": 692045193.8306382,
+     "median": 658561281.0257663,
+     "min": 613848071.6490299,
+     "n": 3
+    }
+   }
+  },
+  "muladd_u32": {
+   "best_variant": "muladd_u32@avx512",
+   "definition": "a <- a*m + c on 32-bit words (wrapping)",
+   "scalar_ops_per_s": 2481724176.197017,
+   "simd_ops_per_s": 21884815870.877106,
+   "total_ops_per_s": {
+    "1": {
+     "max": 21884815870.877106,
+     "median": 20820187233.59136,
+     "min": 17196549596.007496,
+     "n": 3
+    },
+    "2": {
+     "max": 49705757848.994286,
+     "median": 47933320673.66599,
+     "min": 40576161076.9899,
+     "n": 3
+    },
+    "4": {
+     "max": 90941450513.23409,
+     "median": 89427965374.74782,
+     "min": 88259652054.97975,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "muladd_u32@avx2": {
+     "max": 15060414181.663452,
+     "median": 12951096976.15884,
+     "min": 12188402986.62096,
+     "n": 3
+    },
+    "muladd_u32@avx512": {
+     "max": 21884815870.877106,
+     "median": 20820187233.59136,
+     "min": 17196549596.007496,
+     "n": 3
+    },
+    "muladd_u32@c-native": {
+     "max": 11040237363.791578,
+     "median": 8339776214.73041,
+     "min": 6985192362.693051,
+     "n": 3
+    },
+    "muladd_u32@c-scalar": {
+     "max": 1546919713.2435615,
+     "median": 1232530662.2502534,
+     "min": 932684616.9306868,
+     "n": 3
+    },
+    "muladd_u32@c-w512": {
+     "max": 15412508623.898829,
+     "median": 13079006081.047466,
+     "min": 11108658066.916878,
+     "n": 3
+    },
+    "muladd_u32@scalar": {
+     "max": 2481724176.197017,
+     "median": 2477231444.8073792,
+     "min": 2283797116.613382,
+     "n": 3
+    }
+   }
+  },
+  "muladd_u64": {
+   "best_variant": "muladd_u64@avx512",
+   "definition": "a <- a*m + c on 64-bit words (wrapping)",
+   "scalar_ops_per_s": 2735026403.267316,
+   "simd_ops_per_s": 10214678568.169868,
+   "total_ops_per_s": {
+    "1": {
+     "max": 10214678568.169868,
+     "median": 9717897410.435215,
+     "min": 5922239709.756022,
+     "n": 3
+    },
+    "2": {
+     "max": 16008374605.715303,
+     "median": 15969362429.255058,
+     "min": 15195823473.077013,
+     "n": 3
+    },
+    "4": {
+     "max": 38926890994.017456,
+     "median": 35422158023.64125,
+     "min": 31549275301.4235,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "muladd_u64@avx2": {
+     "max": 3750244656.632998,
+     "median": 3688595907.096729,
+     "min": 3549730888.0129576,
+     "n": 3
+    },
+    "muladd_u64@avx512": {
+     "max": 10214678568.169868,
+     "median": 9717897410.435215,
+     "min": 5922239709.756022,
+     "n": 3
+    },
+    "muladd_u64@c-native": {
+     "max": 4562827559.874217,
+     "median": 4512661299.643311,
+     "min": 3934457187.1422777,
+     "n": 3
+    },
+    "muladd_u64@c-scalar": {
+     "max": 2548001480.8472238,
+     "median": 2362752163.9582124,
+     "min": 2168039798.273276,
+     "n": 3
+    },
+    "muladd_u64@c-w512": {
+     "max": 7435507797.025941,
+     "median": 7181596611.331583,
+     "min": 5301266166.936692,
+     "n": 3
+    },
+    "muladd_u64@scalar": {
+     "max": 2735026403.267316,
+     "median": 2482385788.730989,
+     "min": 1922775340.2911918,
+     "n": 3
+    }
+   }
+  },
+  "mulwide_u64": {
+   "best_variant": "mulwide_u64@scalar",
+   "definition": "a <- hi64(a*m) + c: one 64x64->128 multiply per operation",
+   "scalar_ops_per_s": 1811453716.9768682,
+   "simd_ops_per_s": 1755450054.3470585,
+   "total_ops_per_s": {
+    "1": {
+     "max": 1811453716.9768682,
+     "median": 1797156023.6666236,
+     "min": 1539678642.1811707,
+     "n": 3
+    },
+    "2": {
+     "max": 3183910634.645174,
+     "median": 2851508747.6389337,
+     "min": 2802179964.803303,
+     "n": 3
+    },
+    "4": {
+     "max": 6397668485.199585,
+     "median": 6254686843.350593,
+     "min": 5828455038.691046,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "mulwide_u64@avx2": {
+     "max": 1238788429.7436967,
+     "median": 1210727604.8653612,
+     "min": 1042469256.6121004,
+     "n": 3
+    },
+    "mulwide_u64@avx512": {
+     "max": 988977662.2479452,
+     "median": 983936941.5818639,
+     "min": 972341145.5343292,
+     "n": 3
+    },
+    "mulwide_u64@c-native": {
+     "max": 1755450054.3470585,
+     "median": 1684039504.8598917,
+     "min": 1449243135.8022761,
+     "n": 3
+    },
+    "mulwide_u64@c-scalar": {
+     "max": 1275454403.863757,
+     "median": 1179940597.333425,
+     "min": 1141582935.9019926,
+     "n": 3
+    },
+    "mulwide_u64@c-w512": {
+     "max": 1733791687.8557656,
+     "median": 1584229260.5307279,
+     "min": 1181295423.2657142,
+     "n": 3
+    },
+    "mulwide_u64@scalar": {
+     "max": 1811453716.9768682,
+     "median": 1797156023.6666236,
+     "min": 1539678642.1811707,
+     "n": 3
+    }
+   }
+  },
+  "popcnt_u64": {
+   "best_variant": "popcnt_u64@avx512",
+   "definition": "popcount(a and b) on 64-bit words",
+   "scalar_ops_per_s": 2096702578.0310812,
+   "simd_ops_per_s": 11395571053.42831,
+   "total_ops_per_s": {
+    "1": {
+     "max": 11395571053.42831,
+     "median": 11239329623.880184,
+     "min": 10761116731.105541,
+     "n": 3
+    },
+    "2": {
+     "max": 25086982344.18268,
+     "median": 24047833005.56534,
+     "min": 21910266353.766037,
+     "n": 3
+    },
+    "4": {
+     "max": 47774780994.194984,
+     "median": 46297023461.55551,
+     "min": 44354679444.14319,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "popcnt_u64@avx2": {
+     "max": 3675213894.2429886,
+     "median": 3569451313.0330715,
+     "min": 3062921574.573643,
+     "n": 3
+    },
+    "popcnt_u64@avx512": {
+     "max": 11395571053.42831,
+     "median": 11239329623.880184,
+     "min": 10761116731.105541,
+     "n": 3
+    },
+    "popcnt_u64@c-native": {
+     "max": 6394525286.750381,
+     "median": 5203524622.516223,
+     "min": 4451187908.079049,
+     "n": 3
+    },
+    "popcnt_u64@c-scalar": {
+     "max": 2096702578.0310812,
+     "median": 2003043298.399225,
+     "min": 1087706853.1962183,
+     "n": 3
+    },
+    "popcnt_u64@c-w512": {
+     "max": 8443211915.834106,
+     "median": 8114485640.644929,
+     "min": 6098166893.274966,
+     "n": 3
+    },
+    "popcnt_u64@scalar": {
+     "max": 1888379311.8696532,
+     "median": 1831701681.6729312,
+     "min": 1766002456.5916533,
+     "n": 3
+    }
+   }
+  },
+  "ptr_hop": {
+   "best_variant": "chase@avx2",
+   "definition": "one dependent pointer dereference",
+   "scalar_ops_per_s": 567820793.393125,
+   "simd_ops_per_s": 570597758.851692,
+   "total_ops_per_s": {
+    "1": {
+     "max": 570597758.851692,
+     "median": 566749328.543077,
+     "min": 545667461.179765,
+     "n": 3
+    },
+    "2": {
+     "max": 1048223317.4200306,
+     "median": 1036697384.8266308,
+     "min": 1024768653.3666557,
+     "n": 3
+    },
+    "4": {
+     "max": 2280793738.316668,
+     "median": 2274824767.666504,
+     "min": 2253646813.3382435,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "chase@avx2": {
+     "max": 570597758.851692,
+     "median": 566749328.543077,
+     "min": 545667461.179765,
+     "n": 3
+    },
+    "chase@avx512": {
+     "max": 562914547.2774774,
+     "median": 554378986.9438313,
+     "min": 538434832.4943808,
+     "n": 3
+    },
+    "chase@c-native": {
+     "max": 536367999.2716801,
+     "median": 525798342.1621824,
+     "min": 503993624.1629328,
+     "n": 3
+    },
+    "chase@c-scalar": {
+     "max": 530272264.241349,
+     "median": 527514610.28462017,
+     "min": 521968476.1018985,
+     "n": 3
+    },
+    "chase@c-w512": {
+     "max": 530868262.46550983,
+     "median": 511171812.81081563,
+     "min": 508856055.3948512,
+     "n": 3
+    },
+    "chase@scalar": {
+     "max": 567820793.393125,
+     "median": 565417576.8617051,
+     "min": 383632376.0220784,
+     "n": 3
+    }
+   }
+  },
+  "xor_u64": {
+   "best_variant": "xor_u64@avx512",
+   "definition": "a <- a xor b on 64-bit words (one F_2 row-add word)",
+   "scalar_ops_per_s": 2572200215.95103,
+   "simd_ops_per_s": 16975958212.076317,
+   "total_ops_per_s": {
+    "1": {
+     "max": 16975958212.076317,
+     "median": 16964756569.222939,
+     "min": 16424477560.16718,
+     "n": 3
+    },
+    "2": {
+     "max": 30671045502.561157,
+     "median": 24774607651.240067,
+     "min": 24413142290.32584,
+     "n": 3
+    },
+    "4": {
+     "max": 62124261524.99736,
+     "median": 61921877839.692795,
+     "min": 58737370583.37292,
+     "n": 3
+    }
+   },
+   "unit": "operations per second",
+   "variants": {
+    "xor_u64@avx2": {
+     "max": 9900890863.084793,
+     "median": 9874769292.323534,
+     "min": 9694642246.6206,
+     "n": 3
+    },
+    "xor_u64@avx512": {
+     "max": 16975958212.076317,
+     "median": 16964756569.222939,
+     "min": 16424477560.16718,
+     "n": 3
+    },
+    "xor_u64@c-native": {
+     "max": 6905449472.143448,
+     "median": 6840821021.191329,
+     "min": 6765152066.575742,
+     "n": 3
+    },
+    "xor_u64@c-scalar": {
+     "max": 2507728113.5888286,
+     "median": 2492029236.563593,
+     "min": 2473359033.5166073,
+     "n": 3
+    },
+    "xor_u64@c-w512": {
+     "max": 9342447111.507856,
+     "median": 9242365397.458075,
+     "min": 9051864816.444056,
+     "n": 3
+    },
+    "xor_u64@scalar": {
+     "max": 2572200215.95103,
+     "median": 2352248581.9286904,
+     "min": 1995400650.084026,
+     "n": 3
+    }
+   }
+  }
+ },
+ "conditions": {
+  "loadavg_1m_after": 1.97,
+  "loadavg_1m_before": 1.71,
+  "other_cpu_cores": 0.01247374960769316,
+  "psi_cpu_some_avg10_before": 0.1,
+  "steal_cores": 0.014461696982072617,
+  "thermal_throttle_events": null
+ },
+ "created_utc": "2026-11-17T20:09:41Z",
+ "device": "cpu",
+ "flags": [
+  "VIRTUALIZED",
+  "CLOCK_UNSTABLE"
+ ],
+ "host": {
+  "affinity_cpus": 4,
+  "allowed_cpus": [
+   0,
+   1,
+   2,
+   3
+  ],
+  "arch": "x86_64",
+  "caches_bytes": {
+   "L1d": 49152,
+   "L1i": 32768,
+   "L2": 2097152,
+   "L3": 272629760
+  },
+  "cgroup_cpu_max": null,
+  "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "cpu_quota_cores": null,
+  "cpu_quota_source": null,
+  "cpufreq_boost": null,
+  "cpufreq_governor": null,
+  "event_sources": [
+   "breakpoint",
+   "msr",
+   "power",
+   "software",
+   "tracepoint",
+   "uprobe"
+  ],
+  "fingerprint": "44113cdb2d87e834",
+  "hypervisor": true,
+  "isa": [
+   "adx",
+   "avx",
+   "avx2",
+   "avx512_vpopcntdq",
+   "avx512bw",
+   "avx512dq",
+   "avx512f",
+   "avx512ifma",
+   "avx512vl",
+   "bmi2",
+   "fma",
+   "gfni",
+   "pclmulqdq",
+   "popcnt",
+   "sse4_2",
+   "vpclmulqdq"
+  ],
+  "kernel": "6.18.44-fc-v553",
+  "logical_cpus": 4,
+  "mem_total_bytes": 16869134336,
+  "numa_nodes": 1,
+  "perf_event_paranoid": "2",
+  "smt_active": "0",
+  "thread_siblings_cpu0": "0",
+  "turbo_disabled": null,
+  "usable_cpus": 4,
+  "usable_cpus_basis": "affinity mask (4 CPUs)"
+ },
+ "memory": {
+  "bandwidth_bytes_per_s": {
+   "1": {
+    "kernel": "xor_u64",
+    "max": 19272908925.596924,
+    "median": 18761325493.740982,
+    "min": 18704400821.97074,
+    "n": 3
+   },
+   "2": {
+    "kernel": "xor_u64",
+    "max": 37728566152.724785,
+    "median": 37320356752.39674,
+    "min": 37257742297.02299,
+    "n": 3
+   },
+   "4": {
+    "kernel": "xor_u64",
+    "max": 71745505984.93217,
+    "median": 70872074603.34698,
+    "min": 44544748342.38601,
+    "n": 3
+   }
+  },
+  "bandwidth_variants": {
+   "1": {
+    "popcnt_u64": {
+     "max": 12925204195.126303,
+     "median": 11782012333.183651,
+     "min": 11299768300.694025,
+     "n": 3
+    },
+    "popcnt_u64@c-native": {
+     "max": 13193594125.785254,
+     "median": 10731686220.748917,
+     "min": 10262740039.082386,
+     "n": 3
+    },
+    "triad": {
+     "max": 16538432750.942284,
+     "median": 15873443134.503893,
+     "min": 15778678802.71259,
+     "n": 3
+    },
+    "triad@c-native": {
+     "max": 16663632521.943512,
+     "median": 16327160092.727667,
+     "min": 14895664501.106613,
+     "n": 3
+    },
+    "xor_u64": {
+     "max": 19272908925.596924,
+     "median": 18761325493.740982,
+     "min": 18704400821.97074,
+     "n": 3
+    },
+    "xor_u64@c-native": {
+     "max": 18603007715.20899,
+     "median": 18140998092.358883,
+     "min": 16938830461.046612,
+     "n": 3
+    }
+   },
+   "2": {
+    "popcnt_u64": {
+     "max": 27637688964.181625,
+     "median": 25721384960.972893,
+     "min": 22988638794.992638,
+     "n": 3
+    },
+    "popcnt_u64@c-native": {
+     "max": 23909538080.86337,
+     "median": 22774488391.31315,
+     "min": 22689184305.16394,
+     "n": 3
+    },
+    "triad": {
+     "max": 32782440740.395737,
+     "median": 32375996078.09444,
+     "min": 31959631760.99063,
+     "n": 3
+    },
+    "triad@c-native": {
+     "max": 32312845557.657192,
+     "median": 31835154112.859478,
+     "min": 31541056483.694122,
+     "n": 3
+    },
+    "xor_u64": {
+     "max": 37728566152.724785,
+     "median": 37320356752.39674,
+     "min": 37257742297.02299,
+     "n": 3
+    },
+    "xor_u64@c-native": {
+     "max": 36643736528.39706,
+     "median": 34103437379.076897,
+     "min": 32899159392.514744,
+     "n": 3
+    }
+   },
+   "4": {
+    "popcnt_u64": {
+     "max": 50039927897.094284,
+     "median": 46502806075.12251,
+     "min": 45408385366.06054,
+     "n": 3
+    },
+    "popcnt_u64@c-native": {
+     "max": 45262048679.247246,
+     "median": 43582975316.971634,
+     "min": 28716228262.14479,
+     "n": 3
+    },
+    "triad": {
+     "max": 61651502208.54627,
+     "median": 52242265765.0137,
+     "min": 43343183200.86777,
+     "n": 3
+    },
+    "triad@c-native": {
+     "max": 61782948210.32593,
+     "median": 60728860979.63719,
+     "min": 58751351223.5231,
+     "n": 3
+    },
+    "xor_u64": {
+     "max": 71745505984.93217,
+     "median": 70872074603.34698,
+     "min": 44544748342.38601,
+     "n": 3
+    },
+    "xor_u64@c-native": {
+     "max": 65209677806.02579,
+     "median": 61501868108.4207,
+     "min": 28433501309.496964,
+     "n": 3
+    }
+   }
+  },
+  "bytes_convention": "bytes moved over arrays above the LLC: loads + stores + write-allocate reads (triad 32 B/element, xor 24, popcount 16); the ceiling is the best of the three",
+  "latency_definition": "ns per dependent load over a random cycle of 64-byte nodes the size of one triad array",
+  "latency_ns": {
+   "max": 189.43046389848757,
+   "median": 189.0768786308093,
+   "min": 177.32731119791666,
+   "n": 3
+  },
+  "llc_bytes": 272629760,
+  "triad_array_bytes": 408944640
+ },
+ "schema": "optlevel.calibration/v1",
+ "settings": {
+  "c_kernels": true,
+  "repeats": 3,
+  "scale_points": [
+   1,
+   2,
+   4
+  ],
+  "seconds_per_kernel": 0.5
+ },
+ "tool_version": "2.0.0"
+}

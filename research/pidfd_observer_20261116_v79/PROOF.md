@@ -1,0 +1,7 @@
+# Event-driven completion observation contract
+
+The child command, input, output and root algorithm are unchanged by the observer. A pidfd becomes readable on process exit; readiness is followed by blocking wait4 for exact status and rusage. Completion time is stamped immediately after wait4, before observer bookkeeping. A separate monotonic deadline kills the process group, and any observation after the deadline is rejected even if exit status is zero. Unsupported pidfd fails explicitly; no silent polling substitution qualifies timings.
+
+Polling continues only to sample post-exec RSS when no exit event is ready. Thus the sampling interval does not impose a full sleep after an exit. wait4 peak retains inherited/pre-exec scope; sampled RSS is a lower bound. A native probe stamps CLOCK_MONOTONIC immediately before fflush/_exit, independently bounding observed exit tail. That tail includes remaining output/exit work and scheduling, not pure observer overhead. Old raw results are never corrected by subtracting it.
+
+Nonzero exit, malformed JSON and killed partial-output controls must be rejected, never interpreted as empty root sets. A/A uses the same reference function on identical frozen arrays in two fresh processes per pair, including startup and serialization. Pair spread is abs(A-B)/median(A,B). Passing a calibration would not establish exclusive host isolation, hardness or a solver speed ratio. No polynomial output contract changes.

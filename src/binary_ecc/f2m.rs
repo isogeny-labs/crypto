@@ -8,10 +8,9 @@
 //!
 //! - **Addition** = XOR (since `1 + 1 = 0` in `F_2`).
 //! - **Multiplication** = polynomial multiplication then reduction
-//!   mod `m(z)`. Hardware carryless multiplication uses three products
-//!   for two-word operands and six for three-word operands; the general
-//!   path uses word-level schoolbook. An independent improved-Karatsuba
-//!   reference is retained for cross-checking.
+//!   mod `m(z)`.  We use the **improved Karatsuba** scheme from
+//!   Putranto et al. §3.1: divide-and-conquer with three half-size
+//!   multiplications, then combine via two MODSHIFT operations.
 //! - **Squaring** = bit-spread (each bit `b_i` of input goes to
 //!   bit `2i` of output, others = 0) followed by reduction.  Much
 //!   cheaper than general multiplication for binary fields.
@@ -265,9 +264,88 @@ impl F2mElement {
     /// first, big-endian byte order).  Useful for ingesting NIST
     /// curve constants.
     pub fn from_hex(hex: &str, m: u32) -> Self {
+        if let Some(value) = Self::from_ascii_hex(hex, m) {
+            return value;
+        }
         let cleaned: String = hex.chars().filter(|c| !c.is_whitespace()).collect();
         let big = BigUint::parse_bytes(cleaned.as_bytes(), 16).expect("invalid hex");
         Self::from_biguint(&big, m)
+    }
+
+    /// Checked ordinary ASCII hexadecimal, truncating exactly as from_hex.
+    /// Returns None for extended syntax so callers can retain the legacy parser.
+    pub fn from_ascii_hex(hex: &str, m: u32) -> Option<Self> {
+        if hex.is_empty() {
+            return None;
+        }
+        if (1..=192).contains(&m) {
+            let nw = m.div_ceil(64) as usize;
+            let mut words = [0u64; 3];
+            let mut chunks = hex.as_bytes().rchunks_exact(16);
+            for (i, chunk) in chunks.by_ref().enumerate() {
+                let value = parse_ascii_hex16(chunk)?;
+                if i < nw {
+                    words[i] = value;
+                }
+            }
+            let remaining = chunks.remainder();
+            let (mut prefix, rest) = if remaining.len() >= 8 {
+                (parse_ascii_hex8(&remaining[..8])? as u64, &remaining[8..])
+            } else {
+                (0, remaining)
+            };
+            for &byte in rest {
+                let digit = match byte {
+                    b'0'..=b'9' => byte - b'0',
+                    b'a'..=b'f' => byte - b'a' + 10,
+                    b'A'..=b'F' => byte - b'A' + 10,
+                    _ => return None,
+                };
+                prefix = (prefix << 4) | digit as u64;
+            }
+            let i = hex.len() / 16;
+            if i < nw {
+                words[i] = prefix;
+            }
+            if !m.is_multiple_of(64) {
+                words[nw - 1] &= (1u64 << (m % 64)) - 1;
+            }
+            let mut w = [0; INLINE_WORDS];
+            w[..3].copy_from_slice(&words);
+            return Some(Self {
+                bits: Words::Inline { len: nw as u8, w },
+                m,
+            });
+        }
+        let mut out = Self::zero(m);
+        let mut chunks = hex.as_bytes().rchunks_exact(16);
+        for (i, chunk) in chunks.by_ref().enumerate() {
+            let value = parse_ascii_hex16(chunk)?;
+            if i < out.bits.len() {
+                out.bits[i] = value;
+            }
+        }
+        let remaining = chunks.remainder();
+        let (mut prefix, rest) = if remaining.len() >= 8 {
+            (parse_ascii_hex8(&remaining[..8])? as u64, &remaining[8..])
+        } else {
+            (0, remaining)
+        };
+        for &byte in rest {
+            let digit = match byte {
+                b'0'..=b'9' => byte - b'0',
+                b'a'..=b'f' => byte - b'a' + 10,
+                b'A'..=b'F' => byte - b'A' + 10,
+                _ => return None,
+            };
+            prefix = (prefix << 4) | digit as u64;
+        }
+        let i = hex.len() / 16;
+        if i < out.bits.len() {
+            out.bits[i] = prefix;
+        }
+        out.mask_in_place();
+        Some(out)
     }
 
     pub fn from_biguint(v: &BigUint, m: u32) -> Self {
@@ -343,9 +421,26 @@ impl F2mElement {
     }
 
     /// `self + other` = bitwise XOR.
+    #[inline]
     pub fn add(&self, other: &Self) -> Self {
         super::operation_tally::tick(self.m, "add");
         debug_assert_eq!(self.m, other.m);
+        if let (Words::Inline { len: la, w: wa }, Words::Inline { len: lb, w: wb }) =
+            (&self.bits, &other.bits)
+        {
+            let len = (*la).max(*lb);
+            let mut w = [0u64; INLINE_WORDS];
+            let n = len as usize;
+            let mut i = 0;
+            while i < n {
+                w[i] = wa[i] ^ wb[i];
+                i += 1;
+            }
+            return Self {
+                bits: Words::Inline { len, w },
+                m: self.m,
+            };
+        }
         let mut out = self.clone();
         for (a, b) in out.bits.iter_mut().zip(other.bits.iter()) {
             *a ^= *b;
@@ -463,6 +558,51 @@ impl F2mElement {
         super::operation_tally::tick(self.m, "mul");
         debug_assert_eq!(self.m, other.m);
         let m = self.m;
+        #[cfg(target_arch = "aarch64")]
+        if has_hw_clmul() {
+            if let Some(fast) = classify_fast_mod(irreducible) {
+                let a_slice: &[u64] = &self.bits;
+                let b_slice: &[u64] = &other.bits;
+                if a_slice.len() == b_slice.len() {
+                    match a_slice.len() {
+                        2 => {
+                            let r = unsafe { mul2_aarch64(a_slice, b_slice, m as usize, fast) };
+                            let mut w = [0u64; INLINE_WORDS];
+                            w[0] = r[0];
+                            w[1] = r[1];
+                            return Self {
+                                bits: Words::Inline { len: 2, w },
+                                m,
+                            };
+                        }
+                        3 => {
+                            let r = unsafe { mul3_aarch64(a_slice, b_slice, m as usize, fast) };
+                            let mut w = [0u64; INLINE_WORDS];
+                            w[0] = r[0];
+                            w[1] = r[1];
+                            w[2] = r[2];
+                            return Self {
+                                bits: Words::Inline { len: 3, w },
+                                m,
+                            };
+                        }
+                        4 => {
+                            let r = unsafe { mul4_aarch64(a_slice, b_slice, m as usize, fast) };
+                            let mut w = [0u64; INLINE_WORDS];
+                            w[0] = r[0];
+                            w[1] = r[1];
+                            w[2] = r[2];
+                            w[3] = r[3];
+                            return Self {
+                                bits: Words::Inline { len: 4, w },
+                                m,
+                            };
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
         let nw = self.bits.len().max(other.bits.len());
         let mut out = Self::zero(m);
         with_scratch(2 * nw + 1, |prod| {
@@ -481,6 +621,48 @@ impl F2mElement {
     pub fn square(&self, irreducible: &IrreduciblePoly) -> Self {
         super::operation_tally::tick(self.m, "square");
         let m = self.m;
+        #[cfg(target_arch = "aarch64")]
+        if has_hw_clmul() {
+            if let Some(fast) = classify_fast_mod(irreducible) {
+                let a_slice: &[u64] = &self.bits;
+                match a_slice.len() {
+                    2 => {
+                        let r = unsafe { sqr2_k_aarch64(a_slice, 1, m as usize, fast) };
+                        let mut w = [0u64; INLINE_WORDS];
+                        w[0] = r[0];
+                        w[1] = r[1];
+                        return Self {
+                            bits: Words::Inline { len: 2, w },
+                            m,
+                        };
+                    }
+                    3 => {
+                        let r = unsafe { sqr3_k_aarch64(a_slice, 1, m as usize, fast) };
+                        let mut w = [0u64; INLINE_WORDS];
+                        w[0] = r[0];
+                        w[1] = r[1];
+                        w[2] = r[2];
+                        return Self {
+                            bits: Words::Inline { len: 3, w },
+                            m,
+                        };
+                    }
+                    4 => {
+                        let r = unsafe { sqr4_k_aarch64(a_slice, 1, m as usize, fast) };
+                        let mut w = [0u64; INLINE_WORDS];
+                        w[0] = r[0];
+                        w[1] = r[1];
+                        w[2] = r[2];
+                        w[3] = r[3];
+                        return Self {
+                            bits: Words::Inline { len: 4, w },
+                            m,
+                        };
+                    }
+                    _ => {}
+                }
+            }
+        }
         let nw = self.bits.len();
         let mut out = Self::zero(m);
         with_scratch(2 * nw + 1, |sq| {
@@ -498,15 +680,59 @@ impl F2mElement {
 
     /// `self^(2^k)` — `k` repeated squarings.
     pub fn square_k_times(&self, k: u32, irreducible: &IrreduciblePoly) -> Self {
-        let mut acc = self.clone();
         if k == 0 {
-            return acc;
+            return self.clone();
         }
         super::operation_tally::tick_n(self.m, "square", u64::from(k));
+        #[cfg_attr(not(target_arch = "aarch64"), allow(unused_variables))]
+        let m = self.m;
+        #[cfg(target_arch = "aarch64")]
+        if has_hw_clmul() {
+            if let Some(fast) = classify_fast_mod(irreducible) {
+                let a_slice: &[u64] = &self.bits;
+                match a_slice.len() {
+                    2 => {
+                        let r = unsafe { sqr2_k_aarch64(a_slice, k, m as usize, fast) };
+                        let mut w = [0u64; INLINE_WORDS];
+                        w[0] = r[0];
+                        w[1] = r[1];
+                        return Self {
+                            bits: Words::Inline { len: 2, w },
+                            m,
+                        };
+                    }
+                    3 => {
+                        let r = unsafe { sqr3_k_aarch64(a_slice, k, m as usize, fast) };
+                        let mut w = [0u64; INLINE_WORDS];
+                        w[0] = r[0];
+                        w[1] = r[1];
+                        w[2] = r[2];
+                        return Self {
+                            bits: Words::Inline { len: 3, w },
+                            m,
+                        };
+                    }
+                    4 => {
+                        let r = unsafe { sqr4_k_aarch64(a_slice, k, m as usize, fast) };
+                        let mut w = [0u64; INLINE_WORDS];
+                        w[0] = r[0];
+                        w[1] = r[1];
+                        w[2] = r[2];
+                        w[3] = r[3];
+                        return Self {
+                            bits: Words::Inline { len: 4, w },
+                            m,
+                        };
+                    }
+                    _ => {}
+                }
+            }
+        }
+        let mut acc = self.clone();
         let nw = acc.bits.len();
         with_scratch(2 * nw + 1, |sq| {
             for _ in 0..k {
-                sq.iter_mut().for_each(|w| *w = 0);
+                sq[2 * nw] = 0;
                 for (i, &w) in acc.bits.iter().enumerate() {
                     sq[2 * i] = spread32(w);
                     sq[2 * i + 1] = spread32(w >> 32);
@@ -539,38 +765,24 @@ impl F2mElement {
             return None;
         }
         let m = self.m;
-        // We want a^(2^m − 2) = a^(2 · (2^(m−1) − 1)).
-        // Let n = m − 1.
-        let n = m - 1;
-        // Compute a^(2^n − 1) using Itoh-Tsujii (binary-of-n decomposition).
-        let mut bits: Vec<u32> = Vec::new();
-        let mut nn = n;
-        while nn > 0 {
-            bits.push(nn & 1);
-            nn >>= 1;
+        if m <= 1 {
+            return Some(self.clone());
         }
-        bits.reverse(); // MSB first
+        let n = m - 1;
+        let top_bit = 31 - n.leading_zeros();
 
-        // β_0 = a.  After processing bit `b`:
-        //   β ← β^(2^len) · β   where len = current accumulator length.
-        // Plus an extra squaring per `b = 1` bit, multiplying by `a`.
-        // We follow the standard Itoh-Tsujii reduction.
         let mut beta = self.clone();
-        let mut beta_len: u32 = 1; // β = a^(2^1 − 1) = a initially.
-        for &bit in bits.iter().skip(1) {
-            // β ← β^(2^beta_len) · β  ⇒ length doubles.
+        let mut beta_len: u32 = 1;
+        for bit_pos in (0..top_bit).rev() {
             let shifted = beta.square_k_times(beta_len, irreducible);
             beta = beta.mul(&shifted, irreducible);
             beta_len *= 2;
-            if bit == 1 {
-                // β ← (β^2) · a ⇒ length += 1.
+            if (n >> bit_pos) & 1 == 1 {
                 let sq = beta.square(irreducible);
                 beta = sq.mul(self, irreducible);
                 beta_len += 1;
             }
         }
-        // Now β = a^(2^n − 1) where n = m − 1.  Final squaring
-        // gives a^(2^m − 2) = a^(-1).
         Some(beta.square(irreducible))
     }
 
@@ -585,6 +797,102 @@ impl F2mElement {
         e.mask_in_place();
         e
     }
+}
+
+/// Validate sixteen ASCII hex digits and pack one complete field word.
+#[cfg(target_arch = "x86_64")]
+#[inline]
+fn parse_ascii_hex16(bytes: &[u8]) -> Option<u64> {
+    use std::arch::x86_64::*;
+    if bytes.len() != 16 {
+        return None;
+    }
+    // SAFETY: a complete sixteen-byte slice is available; x86-64 has SSE2.
+    unsafe {
+        let v = _mm_loadu_si128(bytes.as_ptr().cast());
+        let lower = _mm_or_si128(v, _mm_set1_epi8(0x20));
+        let digits = _mm_and_si128(
+            _mm_cmpgt_epi8(v, _mm_set1_epi8(b'0' as i8 - 1)),
+            _mm_cmpgt_epi8(_mm_set1_epi8(b':' as i8), v),
+        );
+        let letters = _mm_and_si128(
+            _mm_cmpgt_epi8(lower, _mm_set1_epi8(b'a' as i8 - 1)),
+            _mm_cmpgt_epi8(_mm_set1_epi8(b'g' as i8), lower),
+        );
+        if _mm_movemask_epi8(_mm_or_si128(digits, letters)) != 65535 {
+            return None;
+        }
+        let nibble = _mm_add_epi8(
+            _mm_and_si128(v, _mm_set1_epi8(15)),
+            _mm_and_si128(letters, _mm_set1_epi8(9)),
+        );
+        let pairs = _mm_and_si128(
+            _mm_or_si128(_mm_slli_epi16::<4>(nibble), _mm_srli_epi16::<8>(nibble)),
+            _mm_set1_epi16(255),
+        );
+        Some((_mm_cvtsi128_si64(_mm_packus_epi16(pairs, _mm_setzero_si128())) as u64).swap_bytes())
+    }
+}
+#[cfg(not(target_arch = "x86_64"))]
+#[inline]
+fn parse_ascii_hex16(bytes: &[u8]) -> Option<u64> {
+    if bytes.len() != 16 {
+        return None;
+    }
+    Some(((parse_ascii_hex8(&bytes[..8])? as u64) << 32) | parse_ascii_hex8(&bytes[8..])? as u64)
+}
+
+/// Validate and pack eight ASCII hex digits. SSE2 is part of x86-64's
+/// baseline; this needs no stronger feature or unchecked input load.
+#[cfg(target_arch = "x86_64")]
+#[inline]
+fn parse_ascii_hex8(bytes: &[u8]) -> Option<u32> {
+    use std::arch::x86_64::*;
+    let word = u64::from_le_bytes(bytes.try_into().ok()?);
+    // SAFETY: x86-64 guarantees SSE2; all operations are register-only.
+    unsafe {
+        let v = _mm_cvtsi64_si128(word as i64);
+        let lower = _mm_or_si128(v, _mm_set1_epi8(0x20));
+        let digits = _mm_and_si128(
+            _mm_cmpgt_epi8(v, _mm_set1_epi8(b'0' as i8 - 1)),
+            _mm_cmpgt_epi8(_mm_set1_epi8(b':' as i8), v),
+        );
+        let letters = _mm_and_si128(
+            _mm_cmpgt_epi8(lower, _mm_set1_epi8(b'a' as i8 - 1)),
+            _mm_cmpgt_epi8(_mm_set1_epi8(b'g' as i8), lower),
+        );
+        if _mm_movemask_epi8(_mm_or_si128(digits, letters)) & 255 != 255 {
+            return None;
+        }
+        let high = _mm_and_si128(_mm_srli_epi16::<6>(v), _mm_set1_epi8(1));
+        let nibble = _mm_add_epi8(
+            _mm_and_si128(v, _mm_set1_epi8(15)),
+            _mm_mullo_epi16(high, _mm_set1_epi16(9)),
+        );
+        let pairs = _mm_and_si128(
+            _mm_or_si128(_mm_slli_epi16::<4>(nibble), _mm_srli_epi16::<8>(nibble)),
+            _mm_set1_epi16(255),
+        );
+        let packed = _mm_packus_epi16(pairs, _mm_setzero_si128());
+        Some((_mm_cvtsi128_si32(packed) as u32).swap_bytes())
+    }
+}
+
+#[cfg(not(target_arch = "x86_64"))]
+#[inline]
+fn parse_ascii_hex8(bytes: &[u8]) -> Option<u32> {
+    if bytes.len() != 8 {
+        return None;
+    }
+    bytes.iter().try_fold(0u32, |value, &byte| {
+        let digit = match byte {
+            b'0'..=b'9' => byte - b'0',
+            b'a'..=b'f' => byte - b'a' + 10,
+            b'A'..=b'F' => byte - b'A' + 10,
+            _ => return None,
+        };
+        Some((value << 4) | digit as u32)
+    })
 }
 
 // ── Absolute trace and half-trace ─────────────────────────────────
@@ -653,6 +961,77 @@ struct TraceTables {
     half_trace: Vec<u64>,
 }
 
+/// Limit the new constructor to the complete moduli used by the IC study.
+fn packed_half_trace_modulus(irreducible: &IrreduciblePoly) -> bool {
+    let terms: &[u32] = match irreducible.degree {
+        83 => &[0, 1, 2, 45],
+        131 => &[0, 1, 2, 13],
+        _ => return false,
+    };
+    irreducible.low_terms.len() == terms.len()
+        && terms.iter().all(|t| irreducible.low_terms.contains(t))
+}
+
+/// Construct the exact half-trace, not just an arbitrary quadratic root.
+/// For odd n, B(x)=x²+x+Tr(x) is invertible: its kernel is contained in
+/// F_2, and B(1)=1. If e=((n+1)/2) mod 2, then Tr(H(x))=e*Tr(x), hence
+/// H(x)=B^-1(x)+(1+e)*Tr(x). Newton's trace mask is already available.
+/// Only n basis squarings and a packed binary matrix inverse are needed.
+fn half_trace_basis_by_elimination(
+    irreducible: &IrreduciblePoly,
+    trace_mask: &[u64],
+) -> Option<Vec<F2mElement>> {
+    let n = irreducible.degree as usize;
+    if !(3..=192).contains(&n) || n.is_multiple_of(2) || trace_mask.len() != n.div_ceil(64) {
+        return None;
+    }
+    let mut rows = vec![[0u64; 6]; n];
+    for col in 0..n {
+        let unit = F2mElement::from_bit_positions(&[col as u32], irreducible.degree);
+        let mut image = unit.square(irreducible).add(&unit);
+        image.bits[0] ^= (trace_mask[col / 64] >> (col % 64)) & 1;
+        // A squared monomial plus itself is sparse for these moduli. Visit
+        // its set coefficients instead of testing every matrix row.
+        for (word, &bits) in image.bits.iter().enumerate() {
+            let mut bits = bits;
+            while bits != 0 {
+                let row = word * 64 + bits.trailing_zeros() as usize;
+                rows[row][col / 64] |= 1u64 << (col % 64);
+                bits &= bits - 1;
+            }
+        }
+    }
+    for (row, data) in rows.iter_mut().enumerate() {
+        data[3 + row / 64] = 1u64 << (row % 64);
+    }
+    for col in 0..n {
+        let word = col / 64;
+        let mask = 1u64 << (col % 64);
+        let pivot = (col..n).find(|&r| rows[r][word] & mask != 0)?;
+        rows.swap(col, pivot);
+        let pivot = rows[col];
+        for (r, row) in rows.iter_mut().enumerate() {
+            if r != col && row[word] & mask != 0 {
+                for j in 0..6 {
+                    row[j] ^= pivot[j];
+                }
+            }
+        }
+    }
+    let mut basis = Vec::with_capacity(n);
+    for col in 0..n {
+        let mut words = [0u64; 3];
+        for (r, row) in rows.iter().enumerate() {
+            words[r / 64] |= ((row[3 + col / 64] >> (col % 64)) & 1) << (r % 64);
+        }
+        if n.div_ceil(2).is_multiple_of(2) {
+            words[0] ^= (trace_mask[col / 64] >> (col % 64)) & 1;
+        }
+        basis.push(F2mElement::from_words(&words, irreducible.degree));
+    }
+    Some(basis)
+}
+
 impl TraceTables {
     fn new(irreducible: &IrreduciblePoly) -> Self {
         let m = irreducible.degree;
@@ -689,36 +1068,43 @@ impl TraceTables {
             }
         }
 
-        // Half-trace byte tables (odd m): H(z^i) by its squaring chain,
-        // then every byte combination by linearity.
+        // Exact half-trace basis images, then byte combinations by linearity.
+        // Other moduli, or a singular candidate matrix, retain scalar chains.
         let (n_bytes, half_trace) = if m % 2 == 1 {
-            let basis: Vec<F2mElement> = (0..m)
-                .map(|i| {
-                    let a = F2mElement::from_bit_positions(&[i], m);
-                    let mut h = a.clone();
-                    let mut t = a;
-                    for _ in 0..(m - 1) / 2 {
-                        t = t.square_k_times(2, irreducible);
-                        h.add_assign(&t);
-                    }
-                    h
-                })
-                .collect();
+            let basis: Vec<F2mElement> = packed_half_trace_modulus(irreducible)
+                .then(|| half_trace_basis_by_elimination(irreducible, &trace_mask))
+                .flatten()
+                .unwrap_or_else(|| {
+                    (0..m)
+                        .map(|i| {
+                            let a = F2mElement::from_bit_positions(&[i], m);
+                            let mut h = a.clone();
+                            let mut t = a;
+                            for _ in 0..(m - 1) / 2 {
+                                t = t.square_k_times(2, irreducible);
+                                h.add_assign(&t);
+                            }
+                            h
+                        })
+                        .collect()
+                });
             let n_bytes = m.div_ceil(8) as usize;
             let mut tab = vec![0u64; n_bytes * 256 * nw];
             for k in 0..n_bytes {
+                // Fetch each basis column once per byte, retaining the exact
+                // strided table layout shared by all public field callers.
+                let mut columns = vec![vec![0u64; nw]; 8];
+                for (bit, column) in columns.iter_mut().enumerate() {
+                    if let Some(image) = basis.get(8 * k + bit) {
+                        column.copy_from_slice(&image.bits);
+                    }
+                }
                 for v in 1..256usize {
-                    let j = v.trailing_zeros() as usize;
+                    let column = &columns[v.trailing_zeros() as usize];
                     let prev = (k * 256 + (v & (v - 1))) * nw;
                     let at = (k * 256 + v) * nw;
-                    let bit = 8 * k + j;
                     for w in 0..nw {
-                        let b = if bit < m as usize {
-                            basis[bit].bits[w]
-                        } else {
-                            0
-                        };
-                        tab[at + w] = tab[prev + w] ^ b;
+                        tab[at + w] = tab[prev + w] ^ column[w];
                     }
                 }
             }
@@ -738,6 +1124,21 @@ impl TraceTables {
 
 /// The cached [`TraceTables`] for `irreducible` (built on first use).
 fn trace_tables(irreducible: &IrreduciblePoly) -> Arc<TraceTables> {
+    // These complete polynomials have one immutable map each, independent
+    // of tail-term ordering. Avoid allocating a key and locking a HashMap
+    // on every scalar trace/half-trace call for these qualified fields.
+    if packed_half_trace_modulus(irreducible) {
+        static FIELD83: OnceLock<Arc<TraceTables>> = OnceLock::new();
+        static FIELD131: OnceLock<Arc<TraceTables>> = OnceLock::new();
+        let cache = if irreducible.degree == 83 {
+            &FIELD83
+        } else {
+            &FIELD131
+        };
+        return cache
+            .get_or_init(|| Arc::new(TraceTables::new(irreducible)))
+            .clone();
+    }
     type Cache = Mutex<HashMap<(u32, Vec<u32>), Arc<TraceTables>>>;
     static CACHE: OnceLock<Cache> = OnceLock::new();
     let key = (irreducible.degree, irreducible.low_terms.clone());
@@ -748,6 +1149,72 @@ fn trace_tables(irreducible: &IrreduciblePoly) -> Arc<TraceTables> {
     map.entry(key)
         .or_insert_with(|| Arc::new(TraceTables::new(irreducible)))
         .clone()
+}
+
+/// Shared exact maps for the compact trace-zero workspace. Construction still
+/// occurs on first use and is charged; the workspace does not rebuild the same
+/// byte-combination table in a second layout.
+pub(crate) struct CompactLinearMaps {
+    tables: Arc<TraceTables>,
+}
+impl CompactLinearMaps {
+    pub(crate) fn new(irreducible: &IrreduciblePoly) -> Self {
+        assert!(irreducible.degree <= 192 && irreducible.degree % 2 == 1);
+        Self {
+            tables: trace_tables(irreducible),
+        }
+    }
+    pub(crate) fn trace_mask(&self) -> [u64; 3] {
+        let mut mask = [0; 3];
+        mask[..self.tables.nw].copy_from_slice(&self.tables.trace_mask);
+        mask
+    }
+    #[inline]
+    pub(crate) fn half(&self, a: [u64; 3]) -> [u64; 3] {
+        match self.tables.nw {
+            1 => self.half_words::<1>(a),
+            2 => self.half_words::<2>(a),
+            3 => self.half_words::<3>(a),
+            _ => unreachable!("compact field width"),
+        }
+    }
+    #[inline]
+    fn half_words<const WORDS: usize>(&self, a: [u64; 3]) -> [u64; 3] {
+        match self.tables.n_bytes {
+            11 if WORDS == 2 => self.half_fixed::<WORDS, 11>(a),
+            17 if WORDS == 3 => self.half_fixed::<WORDS, 17>(a),
+            _ => self.half_dynamic::<WORDS>(a),
+        }
+    }
+    #[inline(always)]
+    fn half_fixed<const WORDS: usize, const BYTES: usize>(&self, a: [u64; 3]) -> [u64; 3] {
+        debug_assert_eq!(self.tables.half_trace.len(), BYTES * 256 * WORDS);
+        let mut out = [0; 3];
+        for k in 0..BYTES {
+            let at = (k * 256 + ((a[k / 8] >> (8 * (k % 8))) & 255) as usize) * WORDS;
+            for w in 0..WORDS {
+                // SAFETY: fixed constructor-selected table width; k<BYTES,
+                // byte<256 and w<WORDS give at+w<table.len().
+                out[w] ^= unsafe { *self.tables.half_trace.get_unchecked(at + w) };
+            }
+        }
+        out
+    }
+    #[inline]
+    fn half_dynamic<const WORDS: usize>(&self, a: [u64; 3]) -> [u64; 3] {
+        let mut out = [0; 3];
+        for (word, tables) in self.tables.half_trace.chunks(8 * 256 * WORDS).enumerate() {
+            let mut value = a[word];
+            for table in tables.chunks_exact(256 * WORDS) {
+                let at = (value as usize & 255) * WORDS;
+                for w in 0..WORDS {
+                    out[w] ^= table[at + w];
+                }
+                value >>= 8;
+            }
+        }
+        out
+    }
 }
 
 // ── Internal helpers (unreduced bit-vector arithmetic) ────────────
@@ -895,7 +1362,7 @@ fn reduce_bitwise(value: &mut [u64], irreducible: &IrreduciblePoly) {
 /// Spread the low 32 bits of `x` so that bit `i` lands at bit `2i`:
 /// squaring in characteristic 2 before reduction.
 #[inline(always)]
-fn spread32(x: u64) -> u64 {
+pub(crate) fn spread32(x: u64) -> u64 {
     let mut x = x & 0xFFFF_FFFF;
     x = (x | (x << 16)) & 0x0000_FFFF_0000_FFFF;
     x = (x | (x << 8)) & 0x00FF_00FF_00FF_00FF;
@@ -961,13 +1428,17 @@ fn clmul64_soft(a: u64, b: u64) -> (u64, u64) {
 
 #[inline(always)]
 fn has_hw_clmul() -> bool {
+    #[cfg(all(target_arch = "aarch64", target_os = "macos"))]
+    {
+        true
+    }
+    #[cfg(all(target_arch = "aarch64", not(target_os = "macos")))]
+    {
+        std::arch::is_aarch64_feature_detected!("aes")
+    }
     #[cfg(target_arch = "x86_64")]
     {
         std::arch::is_x86_feature_detected!("pclmulqdq")
-    }
-    #[cfg(target_arch = "aarch64")]
-    {
-        std::arch::is_aarch64_feature_detected!("aes")
     }
     #[cfg(not(any(target_arch = "x86_64", target_arch = "aarch64")))]
     {
@@ -975,10 +1446,345 @@ fn has_hw_clmul() -> bool {
     }
 }
 
-/// `out ^= a · b` over `F_2[z]`. Hardware two- and three-word products
-/// use Karatsuba cross terms; other widths use one carry-less multiply
-/// per limb pair. `out` must hold at least `a.len() + b.len()` words.
-fn mul_words_into(a: &[u64], b: &[u64], out: &mut [u64]) {
+#[cfg(target_arch = "aarch64")]
+#[derive(Clone, Copy)]
+enum FastMod {
+    /// `m(z) = z^m + r(z)` with `deg r < 64` and `m >= deg r + 64`.
+    ClmulLow { r: u64 },
+    /// `m(z) = z^m + z^t + 1` with `t >= 64` and `m >= t + 64` (e.g. B-233 `t = 74`).
+    Trinomial { t: usize },
+}
+
+#[cfg(target_arch = "aarch64")]
+#[inline(always)]
+fn classify_fast_mod(irr: &IrreduciblePoly) -> Option<FastMod> {
+    let m = irr.degree as usize;
+    let terms = &irr.low_terms;
+    if terms.is_empty() || terms.len() > 8 {
+        return None;
+    }
+    let mut t_max = 0usize;
+    let mut i = 0;
+    while i < terms.len() {
+        let ti = terms[i] as usize;
+        if ti > t_max {
+            t_max = ti;
+        }
+        i += 1;
+    }
+    if m < t_max + 64 {
+        return None;
+    }
+    if t_max < 64 {
+        let mut r = 0u64;
+        let mut j = 0;
+        while j < terms.len() {
+            r |= 1u64 << terms[j];
+            j += 1;
+        }
+        return Some(FastMod::ClmulLow { r });
+    }
+    if terms.len() == 2 && (terms[0] == 0 || terms[1] == 0) {
+        let t = (terms[0] | terms[1]) as usize;
+        return Some(FastMod::Trinomial { t });
+    }
+    None
+}
+
+#[cfg(target_arch = "aarch64")]
+#[target_feature(enable = "aes,neon")]
+#[inline]
+unsafe fn kara2_pmull(a0: u64, a1: u64, b0: u64, b1: u64) -> [u64; 4] {
+    use std::arch::aarch64::vmull_p64;
+    let p0 = vmull_p64(a0, b0);
+    let p1 = vmull_p64(a1, b1);
+    let pm = vmull_p64(a0 ^ a1, b0 ^ b1) ^ p0 ^ p1;
+    [
+        p0 as u64,
+        ((p0 >> 64) as u64) ^ (pm as u64),
+        (p1 as u64) ^ ((pm >> 64) as u64),
+        (p1 >> 64) as u64,
+    ]
+}
+
+#[cfg(target_arch = "aarch64")]
+#[target_feature(enable = "aes,neon")]
+#[inline]
+unsafe fn place_clmul_8(v: &mut [u64; 8], pos: usize, w: u64, r: u64) {
+    let p = std::arch::aarch64::vmull_p64(w, r);
+    let lo = p as u64;
+    let hi = (p >> 64) as u64;
+    let i = pos >> 6;
+    let s = (pos & 63) as u32;
+    v[i] ^= lo << s;
+    v[i + 1] ^= ((lo >> 1) >> (63 - s)) | (hi << s);
+    if i + 2 < 8 {
+        v[i + 2] ^= (hi >> 1) >> (63 - s);
+    }
+}
+
+#[cfg(target_arch = "aarch64")]
+#[inline(always)]
+fn xor_word_8(v: &mut [u64; 8], pos: usize, w: u64) {
+    let i = pos >> 6;
+    let s = (pos & 63) as u32;
+    v[i] ^= w << s;
+    v[i + 1] ^= (w >> 1) >> (63 - s);
+}
+
+#[cfg(target_arch = "aarch64")]
+#[target_feature(enable = "aes,neon")]
+#[inline]
+unsafe fn reduce4_aarch64(mut v: [u64; 4], m: usize, fast: FastMod) -> [u64; 2] {
+    let mut buf = [v[0], v[1], v[2], v[3], 0, 0, 0, 0];
+    let bm = m & 63;
+    match fast {
+        FastMod::ClmulLow { r } => {
+            for i in [3usize, 2] {
+                let w = buf[i];
+                if w != 0 {
+                    buf[i] = 0;
+                    place_clmul_8(&mut buf, 64 * i - m, w, r);
+                }
+            }
+            if bm != 0 {
+                let w = buf[1] >> bm;
+                buf[1] &= (1u64 << bm) - 1;
+                let p = std::arch::aarch64::vmull_p64(w, r);
+                buf[0] ^= p as u64;
+                buf[1] ^= (p >> 64) as u64;
+            }
+        }
+        FastMod::Trinomial { t } => {
+            for i in [3usize, 2] {
+                let w = buf[i];
+                if w != 0 {
+                    buf[i] = 0;
+                    let base = 64 * i - m;
+                    xor_word_8(&mut buf, base, w);
+                    xor_word_8(&mut buf, base + t, w);
+                }
+            }
+            if bm != 0 {
+                let w = buf[1] >> bm;
+                buf[1] &= (1u64 << bm) - 1;
+                buf[0] ^= w;
+                xor_word_8(&mut buf, t, w);
+            }
+        }
+    }
+    v[0] = buf[0];
+    v[1] = buf[1];
+    [v[0], v[1]]
+}
+
+#[cfg(target_arch = "aarch64")]
+#[target_feature(enable = "aes,neon")]
+#[inline]
+unsafe fn reduce6_aarch64(v: [u64; 6], m: usize, fast: FastMod) -> [u64; 3] {
+    let mut buf = [v[0], v[1], v[2], v[3], v[4], v[5], 0, 0];
+    let bm = m & 63;
+    match fast {
+        FastMod::ClmulLow { r } => {
+            for i in [5usize, 4, 3] {
+                let w = buf[i];
+                buf[i] = 0;
+                place_clmul_8(&mut buf, 64 * i - m, w, r);
+            }
+            if bm != 0 {
+                let w = buf[2] >> bm;
+                buf[2] &= (1u64 << bm) - 1;
+                let p = std::arch::aarch64::vmull_p64(w, r);
+                buf[0] ^= p as u64;
+                buf[1] ^= (p >> 64) as u64;
+            }
+        }
+        FastMod::Trinomial { t } => {
+            for i in [5usize, 4, 3] {
+                let w = buf[i];
+                buf[i] = 0;
+                let base = 64 * i - m;
+                xor_word_8(&mut buf, base, w);
+                xor_word_8(&mut buf, base + t, w);
+            }
+            if bm != 0 {
+                let w = buf[2] >> bm;
+                buf[2] &= (1u64 << bm) - 1;
+                buf[0] ^= w;
+                xor_word_8(&mut buf, t, w);
+            }
+        }
+    }
+    [buf[0], buf[1], buf[2]]
+}
+
+#[cfg(target_arch = "aarch64")]
+#[target_feature(enable = "aes,neon")]
+#[inline]
+unsafe fn reduce8_aarch64(mut buf: [u64; 8], m: usize, fast: FastMod) -> [u64; 4] {
+    let bm = m & 63;
+    match fast {
+        FastMod::ClmulLow { r } => {
+            for i in [7usize, 6, 5, 4] {
+                let w = buf[i];
+                buf[i] = 0;
+                place_clmul_8(&mut buf, 64 * i - m, w, r);
+            }
+            if bm != 0 {
+                let w = buf[3] >> bm;
+                buf[3] &= (1u64 << bm) - 1;
+                let p = std::arch::aarch64::vmull_p64(w, r);
+                buf[0] ^= p as u64;
+                buf[1] ^= (p >> 64) as u64;
+            }
+        }
+        FastMod::Trinomial { t } => {
+            for i in [7usize, 6, 5, 4] {
+                let w = buf[i];
+                buf[i] = 0;
+                let base = 64 * i - m;
+                xor_word_8(&mut buf, base, w);
+                xor_word_8(&mut buf, base + t, w);
+            }
+            if bm != 0 {
+                let w = buf[3] >> bm;
+                buf[3] &= (1u64 << bm) - 1;
+                buf[0] ^= w;
+                xor_word_8(&mut buf, t, w);
+            }
+        }
+    }
+    [buf[0], buf[1], buf[2], buf[3]]
+}
+
+#[cfg(target_arch = "aarch64")]
+#[target_feature(enable = "aes,neon")]
+unsafe fn mul2_aarch64(a: &[u64], b: &[u64], m: usize, fast: FastMod) -> [u64; 2] {
+    let prod = kara2_pmull(a[0], a[1], b[0], b[1]);
+    reduce4_aarch64(prod, m, fast)
+}
+
+#[cfg(target_arch = "aarch64")]
+#[target_feature(enable = "aes,neon")]
+unsafe fn mul3_aarch64(a: &[u64], b: &[u64], m: usize, fast: FastMod) -> [u64; 3] {
+    use std::arch::aarch64::vmull_p64;
+    let (a0, a1, a2) = (a[0], a[1], a[2]);
+    let (b0, b1, b2) = (b[0], b[1], b[2]);
+    let p0 = vmull_p64(a0, b0);
+    let p1 = vmull_p64(a1, b1);
+    let p2 = vmull_p64(a2, b2);
+    let m01 = vmull_p64(a0 ^ a1, b0 ^ b1) ^ p0 ^ p1;
+    let m02 = vmull_p64(a0 ^ a2, b0 ^ b2) ^ p0 ^ p2;
+    let m12 = vmull_p64(a1 ^ a2, b1 ^ b2) ^ p1 ^ p2;
+    let c2 = m02 ^ p1;
+    let prod = [
+        p0 as u64,
+        ((p0 >> 64) as u64) ^ (m01 as u64),
+        ((m01 >> 64) as u64) ^ (c2 as u64),
+        ((c2 >> 64) as u64) ^ (m12 as u64),
+        ((m12 >> 64) as u64) ^ (p2 as u64),
+        (p2 >> 64) as u64,
+    ];
+    reduce6_aarch64(prod, m, fast)
+}
+
+#[cfg(target_arch = "aarch64")]
+#[target_feature(enable = "aes,neon")]
+unsafe fn mul4_aarch64(a: &[u64], b: &[u64], m: usize, fast: FastMod) -> [u64; 4] {
+    let lo = kara2_pmull(a[0], a[1], b[0], b[1]);
+    let hi = kara2_pmull(a[2], a[3], b[2], b[3]);
+    let mid = kara2_pmull(a[0] ^ a[2], a[1] ^ a[3], b[0] ^ b[2], b[1] ^ b[3]);
+    let m0 = mid[0] ^ lo[0] ^ hi[0];
+    let m1 = mid[1] ^ lo[1] ^ hi[1];
+    let m2 = mid[2] ^ lo[2] ^ hi[2];
+    let m3 = mid[3] ^ lo[3] ^ hi[3];
+    let prod = [
+        lo[0],
+        lo[1],
+        lo[2] ^ m0,
+        lo[3] ^ m1,
+        hi[0] ^ m2,
+        hi[1] ^ m3,
+        hi[2],
+        hi[3],
+    ];
+    reduce8_aarch64(prod, m, fast)
+}
+
+#[cfg(target_arch = "aarch64")]
+#[target_feature(enable = "aes,neon")]
+unsafe fn sqr2_k_aarch64(a: &[u64], k: u32, m: usize, fast: FastMod) -> [u64; 2] {
+    use std::arch::aarch64::vmull_p64;
+    let mut w = [a[0], a[1]];
+    for _ in 0..k {
+        let s0 = vmull_p64(w[0], w[0]);
+        let s1 = vmull_p64(w[1], w[1]);
+        w = reduce4_aarch64(
+            [s0 as u64, (s0 >> 64) as u64, s1 as u64, (s1 >> 64) as u64],
+            m,
+            fast,
+        );
+    }
+    w
+}
+
+#[cfg(target_arch = "aarch64")]
+#[target_feature(enable = "aes,neon")]
+unsafe fn sqr3_k_aarch64(a: &[u64], k: u32, m: usize, fast: FastMod) -> [u64; 3] {
+    use std::arch::aarch64::vmull_p64;
+    let mut w = [a[0], a[1], a[2]];
+    for _ in 0..k {
+        let s0 = vmull_p64(w[0], w[0]);
+        let s1 = vmull_p64(w[1], w[1]);
+        let s2 = vmull_p64(w[2], w[2]);
+        w = reduce6_aarch64(
+            [
+                s0 as u64,
+                (s0 >> 64) as u64,
+                s1 as u64,
+                (s1 >> 64) as u64,
+                s2 as u64,
+                (s2 >> 64) as u64,
+            ],
+            m,
+            fast,
+        );
+    }
+    w
+}
+
+#[cfg(target_arch = "aarch64")]
+#[target_feature(enable = "aes,neon")]
+unsafe fn sqr4_k_aarch64(a: &[u64], k: u32, m: usize, fast: FastMod) -> [u64; 4] {
+    use std::arch::aarch64::vmull_p64;
+    let mut w = [a[0], a[1], a[2], a[3]];
+    for _ in 0..k {
+        let s0 = vmull_p64(w[0], w[0]);
+        let s1 = vmull_p64(w[1], w[1]);
+        let s2 = vmull_p64(w[2], w[2]);
+        let s3 = vmull_p64(w[3], w[3]);
+        w = reduce8_aarch64(
+            [
+                s0 as u64,
+                (s0 >> 64) as u64,
+                s1 as u64,
+                (s1 >> 64) as u64,
+                s2 as u64,
+                (s2 >> 64) as u64,
+                s3 as u64,
+                (s3 >> 64) as u64,
+            ],
+            m,
+            fast,
+        );
+    }
+    w
+}
+
+/// `out ^= a · b` over `F_2[z]`, word-level schoolbook with one
+/// carry-less multiply per pair of limbs.  `out` must hold at least
+/// `a.len() + b.len()` words.
+pub(crate) fn mul_words_into(a: &[u64], b: &[u64], out: &mut [u64]) {
     debug_assert!(out.len() >= a.len() + b.len());
     #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
     if has_hw_clmul() {
@@ -998,60 +1804,205 @@ fn mul_words_into(a: &[u64], b: &[u64], out: &mut [u64]) {
     }
 }
 
-macro_rules! mul_words_hw_body {
-    ($a:ident, $b:ident, $out:ident) => {{
-        let a = $a;
-        let b = $b;
-        let out = $out;
-        if a.len() == 2 && b.len() == 2 {
-            let p0 = clmul64_hw(a[0], b[0]);
-            let p2 = clmul64_hw(a[1], b[1]);
-            let cross = clmul64_hw(a[0] ^ a[1], b[0] ^ b[1]);
-            let p1 = (cross.0 ^ p0.0 ^ p2.0, cross.1 ^ p0.1 ^ p2.1);
-            out[0] ^= p0.0;
-            out[1] ^= p0.1 ^ p1.0;
-            out[2] ^= p1.1 ^ p2.0;
-            out[3] ^= p2.1;
-            return;
-        }
-        if a.len() == 3 && b.len() == 3 {
-            let p0 = clmul64_hw(a[0], b[0]);
-            let p2 = clmul64_hw(a[1], b[1]);
-            let p4 = clmul64_hw(a[2], b[2]);
-            let q01 = clmul64_hw(a[0] ^ a[1], b[0] ^ b[1]);
-            let q12 = clmul64_hw(a[1] ^ a[2], b[1] ^ b[2]);
-            let q02 = clmul64_hw(a[0] ^ a[2], b[0] ^ b[2]);
-            let p1 = (q01.0 ^ p0.0 ^ p2.0, q01.1 ^ p0.1 ^ p2.1);
-            let p3 = (q12.0 ^ p2.0 ^ p4.0, q12.1 ^ p2.1 ^ p4.1);
-            let p2_total = (q02.0 ^ p0.0 ^ p4.0 ^ p2.0, q02.1 ^ p0.1 ^ p4.1 ^ p2.1);
-            out[0] ^= p0.0;
-            out[1] ^= p0.1 ^ p1.0;
-            out[2] ^= p1.1 ^ p2_total.0;
-            out[3] ^= p2_total.1 ^ p3.0;
-            out[4] ^= p3.1 ^ p4.0;
-            out[5] ^= p4.1;
-            return;
-        }
-        for (i, &ai) in a.iter().enumerate() {
-            for (j, &bj) in b.iter().enumerate() {
-                let (lo, hi) = clmul64_hw(ai, bj);
-                out[i + j] ^= lo;
-                out[i + j + 1] ^= hi;
-            }
-        }
-    }};
-}
-
 #[cfg(target_arch = "x86_64")]
 #[target_feature(enable = "pclmulqdq")]
+#[inline]
 unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
-    mul_words_hw_body!(a, b, out)
+    use std::arch::x86_64::*;
+    // The length checks also preserve memory safety for a short output:
+    // that case falls through to the original bounds-checked loop.
+    if a.len() == b.len() && (a.len() == 2 || a.len() == 3) && out.len() >= 2 * a.len() {
+        let av = _mm_loadu_si128(a.as_ptr().cast());
+        let bv = _mm_loadu_si128(b.as_ptr().cast());
+        let p0 = _mm_clmulepi64_si128::<0x00>(av, bv);
+        let p1 = _mm_clmulepi64_si128::<0x11>(av, bv);
+        let a01 = _mm_xor_si128(av, _mm_srli_si128::<8>(av));
+        let b01 = _mm_xor_si128(bv, _mm_srli_si128::<8>(bv));
+        let m01 = _mm_xor_si128(
+            _mm_clmulepi64_si128::<0x00>(a01, b01),
+            _mm_xor_si128(p0, p1),
+        );
+        let low = _mm_xor_si128(p0, _mm_slli_si128::<8>(m01));
+        let mut middle = _mm_xor_si128(p1, _mm_srli_si128::<8>(m01));
+        if a.len() == 3 {
+            let a2 = _mm_cvtsi64_si128(a[2] as i64);
+            let b2 = _mm_cvtsi64_si128(b[2] as i64);
+            let p2 = _mm_clmulepi64_si128::<0x00>(a2, b2);
+            let m02 = _mm_xor_si128(
+                _mm_clmulepi64_si128::<0x00>(_mm_xor_si128(av, a2), _mm_xor_si128(bv, b2)),
+                _mm_xor_si128(p0, p2),
+            );
+            let m12 = _mm_xor_si128(
+                _mm_clmulepi64_si128::<0x00>(
+                    _mm_xor_si128(_mm_srli_si128::<8>(av), a2),
+                    _mm_xor_si128(_mm_srli_si128::<8>(bv), b2),
+                ),
+                _mm_xor_si128(p1, p2),
+            );
+            middle = _mm_xor_si128(middle, _mm_xor_si128(m02, _mm_slli_si128::<8>(m12)));
+            let high = _mm_xor_si128(p2, _mm_srli_si128::<8>(m12));
+            let old = _mm_loadu_si128(out.as_ptr().add(4).cast());
+            _mm_storeu_si128(out.as_mut_ptr().add(4).cast(), _mm_xor_si128(old, high));
+        }
+        let old = _mm_loadu_si128(out.as_ptr().cast());
+        _mm_storeu_si128(out.as_mut_ptr().cast(), _mm_xor_si128(old, low));
+        let old = _mm_loadu_si128(out.as_ptr().add(2).cast());
+        _mm_storeu_si128(out.as_mut_ptr().add(2).cast(), _mm_xor_si128(old, middle));
+        return;
+    }
+    for (i, &ai) in a.iter().enumerate() {
+        for (j, &bj) in b.iter().enumerate() {
+            let (lo, hi) = clmul64_hw(ai, bj);
+            out[i + j] ^= lo;
+            out[i + j + 1] ^= hi;
+        }
+    }
 }
 
 #[cfg(target_arch = "aarch64")]
 #[target_feature(enable = "aes")]
 unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
-    mul_words_hw_body!(a, b, out)
+    for (i, &ai) in a.iter().enumerate() {
+        for (j, &bj) in b.iter().enumerate() {
+            let (lo, hi) = clmul64_hw(ai, bj);
+            out[i + j] ^= lo;
+            out[i + j + 1] ^= hi;
+        }
+    }
+}
+
+/// Fused product/reduction for canonical 131-bit operands and
+/// X^131+X^13+X²+X+1. The caller must select by the complete modulus.
+/// Unsupported instruction sets retain the existing word-field fallback.
+#[cfg(all(test, target_arch = "x86_64"))]
+#[inline]
+#[cfg_attr(not(test), allow(dead_code))]
+pub(crate) fn mul_mod131(a: &[u64; 3], b: &[u64; 3]) -> Option<[u64; 3]> {
+    debug_assert_eq!((a[2] | b[2]) & !7, 0);
+    #[cfg(target_arch = "x86_64")]
+    if has_hw_clmul() {
+        // SAFETY: runtime feature detection; fixed, canonical operand widths.
+        return Some(unsafe { mul_mod131_hw(a, b) });
+    }
+    None
+}
+
+/// Runtime selection for compact callers that retain a private dispatch bit.
+pub(crate) fn compact_mod131_hw_available() -> bool {
+    #[cfg(target_arch = "x86_64")]
+    {
+        has_hw_clmul()
+    }
+    #[cfg(not(target_arch = "x86_64"))]
+    {
+        false
+    }
+}
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "pclmulqdq")]
+pub(crate) unsafe fn mul_mod131_hw(a: &[u64; 3], b: &[u64; 3]) -> [u64; 3] {
+    use std::arch::x86_64::*;
+    let av = _mm_loadu_si128(a.as_ptr().cast());
+    let bv = _mm_loadu_si128(b.as_ptr().cast());
+    let a2 = _mm_cvtsi64_si128(a[2] as i64);
+    let b2 = _mm_cvtsi64_si128(b[2] as i64);
+    let p0 = _mm_clmulepi64_si128::<0>(av, bv);
+    let p1 = _mm_clmulepi64_si128::<0x11>(av, bv);
+    let p2 = _mm_clmulepi64_si128::<0>(a2, b2);
+    let m01 = _mm_xor_si128(
+        _mm_clmulepi64_si128::<0>(
+            _mm_xor_si128(av, _mm_shuffle_epi32::<0x4e>(av)),
+            _mm_xor_si128(bv, _mm_shuffle_epi32::<0x4e>(bv)),
+        ),
+        _mm_xor_si128(p0, p1),
+    );
+    let m02 = _mm_xor_si128(
+        _mm_clmulepi64_si128::<0>(_mm_xor_si128(av, a2), _mm_xor_si128(bv, b2)),
+        _mm_xor_si128(p0, p2),
+    );
+    let m12 = _mm_xor_si128(
+        _mm_clmulepi64_si128::<0>(
+            _mm_xor_si128(_mm_srli_si128::<8>(av), a2),
+            _mm_xor_si128(_mm_srli_si128::<8>(bv), b2),
+        ),
+        _mm_xor_si128(p1, p2),
+    );
+    let low = _mm_xor_si128(p0, _mm_slli_si128::<8>(m01));
+    let mid = _mm_xor_si128(
+        _mm_xor_si128(_mm_srli_si128::<8>(m01), _mm_xor_si128(m02, p1)),
+        _mm_slli_si128::<8>(m12),
+    );
+    let high = _mm_xor_si128(_mm_srli_si128::<8>(m12), p2);
+    // Canonical inputs have product degree<=260. Shift the complete high
+    // part down131 bits, then multiply by the exact sparse modulus tail.
+    let carry = _mm_or_si128(_mm_srli_si128::<8>(mid), _mm_slli_si128::<8>(high));
+    let shifted = _mm_or_si128(_mm_srli_epi64::<3>(mid), _mm_slli_epi64::<61>(carry));
+    let tail = _mm_cvtsi64_si128(0x2007);
+    let q0 = _mm_clmulepi64_si128::<0>(shifted, tail);
+    let q1 = _mm_clmulepi64_si128::<1>(shifted, tail);
+    let q2 = _mm_clmulepi64_si128::<0>(_mm_srli_epi64::<3>(high), tail);
+    let last = _mm_xor_si128(
+        _mm_and_si128(mid, _mm_cvtsi64_si128(7)),
+        _mm_xor_si128(_mm_srli_si128::<8>(q1), q2),
+    );
+    let folded = _mm_clmulepi64_si128::<0>(_mm_srli_epi64::<3>(last), tail);
+    let result = _mm_xor_si128(
+        _mm_xor_si128(low, q0),
+        _mm_xor_si128(_mm_slli_si128::<8>(q1), folded),
+    );
+    [
+        _mm_cvtsi128_si64(result) as u64,
+        _mm_cvtsi128_si64(_mm_srli_si128::<8>(result)) as u64,
+        (_mm_cvtsi128_si64(last) as u64) & 7,
+    ]
+}
+
+/// Canonical131-bit squaring needs only two64-bit carryless squares. The
+/// three-bit high limb is spread directly; other ISAs keep the scalar path.
+#[cfg(test)]
+#[inline]
+#[cfg_attr(not(test), allow(dead_code))]
+pub(crate) fn square_mod131(a: &[u64; 3]) -> Option<[u64; 3]> {
+    debug_assert_eq!(a[2] & !7, 0);
+    #[cfg(target_arch = "x86_64")]
+    if has_hw_clmul() {
+        // SAFETY: runtime detection and complete canonical operand width.
+        return Some(unsafe { square_mod131_hw(a) });
+    }
+    None
+}
+#[cfg(target_arch = "x86_64")]
+#[target_feature(enable = "pclmulqdq")]
+pub(crate) unsafe fn square_mod131_hw(a: &[u64; 3]) -> [u64; 3] {
+    use std::arch::x86_64::*;
+    let v = _mm_loadu_si128(a.as_ptr().cast());
+    let p0 = _mm_clmulepi64_si128::<0>(v, v);
+    let p1 = _mm_clmulepi64_si128::<0x11>(v, v);
+    let top = (a[2] & 1) | ((a[2] & 2) << 1) | ((a[2] & 4) << 2);
+    reduce_mod131_product([
+        _mm_cvtsi128_si64(p0) as u64,
+        _mm_cvtsi128_si64(_mm_srli_si128::<8>(p0)) as u64,
+        _mm_cvtsi128_si64(p1) as u64,
+        _mm_cvtsi128_si64(_mm_srli_si128::<8>(p1)) as u64,
+        top,
+        0,
+    ])
+}
+#[inline(always)]
+fn reduce_mod131_product(p: [u64; 6]) -> [u64; 3] {
+    let s0 = (p[2] >> 3) | (p[3] << 61);
+    let s1 = (p[3] >> 3) | (p[4] << 61);
+    let s2 = (p[4] >> 3) | (p[5] << 61);
+    let lo = s0 ^ (s0 << 1) ^ (s0 << 2) ^ (s0 << 13);
+    let mid = s1 ^ (s1 << 1) ^ (s1 << 2) ^ (s1 << 13) ^ (s0 >> 63) ^ (s0 >> 62) ^ (s0 >> 51);
+    let high = s2 ^ (s2 << 1) ^ (s2 << 2) ^ (s2 << 13) ^ (s1 >> 63) ^ (s1 >> 62) ^ (s1 >> 51);
+    let last = (p[2] & 7) ^ high;
+    let top = last >> 3;
+    [
+        p[0] ^ lo ^ top ^ (top << 1) ^ (top << 2) ^ (top << 13),
+        p[1] ^ mid,
+        last & 7,
+    ]
 }
 
 /// Reduce `value` modulo `m(z)` in place, a whole word at a time.
@@ -1069,7 +2020,7 @@ unsafe fn mul_words_hw(a: &[u64], b: &[u64], out: &mut [u64]) {
 /// Every NIST and SECG field satisfies `m − deg r ≥ 64`.  The toy fields
 /// (`m = 8, 16`) and dense tails do not, and take [`reduce_chunked`].
 /// Both are tested against the bit-at-a-time `reduce_bitwise`.
-fn reduce_words(value: &mut [u64], irreducible: &IrreduciblePoly) {
+pub(crate) fn reduce_words(value: &mut [u64], irreducible: &IrreduciblePoly) {
     let m = irreducible.degree as usize;
     let terms = &irreducible.low_terms;
     let t_max = terms.iter().copied().max().unwrap_or(0) as usize;
@@ -1276,6 +2227,204 @@ fn reduce_chunked(value: &mut [u64], irreducible: &IrreduciblePoly) {
 mod tests {
     use super::*;
 
+    #[test]
+    fn hex_word_pack_validates_every_byte_and_keeps_full_word_order() {
+        for position in 0..16 {
+            for byte in 0..=255u8 {
+                let mut text = *b"01aBCd2378EF4569";
+                text[position] = byte;
+                let expected = if text.iter().all(u8::is_ascii_hexdigit) {
+                    Some(u64::from_str_radix(std::str::from_utf8(&text).unwrap(), 16).unwrap())
+                } else {
+                    None
+                };
+                assert_eq!(
+                    parse_ascii_hex16(&text),
+                    expected,
+                    "position={position}, byte={byte}"
+                );
+            }
+        }
+        assert_eq!(parse_ascii_hex16(b"123456789abcdef"), None);
+        assert_eq!(parse_ascii_hex16(b"123456789abcdef01"), None);
+    }
+
+    #[test]
+    fn canonical_131_square_matches_independent_bit_doubling_and_reduction() {
+        if !has_hw_clmul() {
+            assert_eq!(square_mod131(&[1, 0, 0]), None);
+            return;
+        }
+        let irr = IrreduciblePoly {
+            degree: 131,
+            low_terms: vec![0, 1, 2, 13],
+        };
+        let mut seed = 20261124u64;
+        for trial in 0..643 {
+            let a = if trial < 131 {
+                let mut a = [0; 3];
+                a[trial / 64] = 1u64 << (trial % 64);
+                a
+            } else {
+                let mut draw = || {
+                    seed ^= seed << 13;
+                    seed ^= seed >> 7;
+                    seed ^= seed << 17;
+                    seed
+                };
+                [draw(), draw(), draw() & 7]
+            };
+            let mut raw = [0; 6];
+            for bit in 0..131 {
+                if a[bit / 64] >> (bit % 64) & 1 != 0 {
+                    raw[2 * bit / 64] ^= 1u64 << (2 * bit % 64);
+                }
+            }
+            reduce_bitwise(&mut raw, &irr);
+            assert_eq!(square_mod131(&a).unwrap(), raw[..3], "trial{trial}");
+        }
+    }
+
+    #[cfg(target_arch = "x86_64")]
+    #[test]
+    fn fused_131_matches_bitwise_reduction_on_every_basis_product() {
+        if !has_hw_clmul() {
+            assert_eq!(mul_mod131(&[1, 0, 0], &[1, 0, 0]), None);
+            return;
+        }
+        let irr = IrreduciblePoly {
+            degree: 131,
+            low_terms: vec![0, 1, 2, 13],
+        };
+        for i in 0..131usize {
+            for j in 0..131usize {
+                let mut a = [0; 3];
+                let mut b = [0; 3];
+                a[i / 64] = 1u64 << (i % 64);
+                b[j / 64] = 1u64 << (j % 64);
+                let mut reference = [0; 6];
+                reference[(i + j) / 64] = 1u64 << ((i + j) % 64);
+                reduce_bitwise(&mut reference, &irr);
+                assert_eq!(mul_mod131(&a, &b).unwrap(), reference[..3], "i={i}, j={j}");
+            }
+        }
+    }
+
+    #[test]
+    fn qualified_trace_cache_shares_only_the_complete_same_polynomial() {
+        let first = IrreduciblePoly {
+            degree: 131,
+            low_terms: vec![0, 1, 2, 13],
+        };
+        let permuted = IrreduciblePoly {
+            degree: 131,
+            low_terms: vec![13, 2, 1, 0],
+        };
+        let different = IrreduciblePoly::deg_131();
+        assert!(Arc::ptr_eq(&trace_tables(&first), &trace_tables(&permuted)));
+        assert!(!Arc::ptr_eq(
+            &trace_tables(&first),
+            &trace_tables(&different)
+        ));
+        for irr in [&first, &permuted, &different] {
+            let direct = TraceTables::new(irr);
+            let cached = trace_tables(irr);
+            assert_eq!(direct.trace_mask, cached.trace_mask);
+            assert_eq!(direct.half_trace, cached.half_trace);
+        }
+    }
+
+    #[test]
+    fn direct_hex_matches_legacy_at_word_boundaries_and_preserves_syntax() {
+        let mut seed = 0x50cc_2a13_2026_1123u64;
+        for m in [0, 1, 5, 63, 64, 65, 83, 127, 128, 131, 192, 576, 577, 600] {
+            for len in 1..=170 {
+                let text: String = (0..len)
+                    .map(|_| {
+                        seed ^= seed << 13;
+                        seed ^= seed >> 7;
+                        seed ^= seed << 17;
+                        b"0123456789aBcDeF"[(seed & 15) as usize] as char
+                    })
+                    .collect();
+                let expected = F2mElement::from_biguint(
+                    &BigUint::parse_bytes(text.as_bytes(), 16).unwrap(),
+                    m,
+                );
+                assert_eq!(F2mElement::from_hex(&text, m), expected, "m={m}, len={len}");
+            }
+            for text in ["+a", "1_2_", "  +A_B\t", "\u{2003}FF\u{a0}00", "0__"] {
+                let cleaned: String = text.chars().filter(|c| !c.is_whitespace()).collect();
+                let expected = F2mElement::from_biguint(
+                    &BigUint::parse_bytes(cleaned.as_bytes(), 16).unwrap(),
+                    m,
+                );
+                assert_eq!(F2mElement::from_hex(text, m), expected);
+            }
+        }
+        for text in [
+            "",
+            "  ",
+            "+",
+            "_1",
+            "0x12",
+            "abcdefg",
+            "g000000000000000000000000",
+        ] {
+            assert!(std::panic::catch_unwind(|| F2mElement::from_hex(text, 5)).is_err());
+        }
+    }
+
+    #[test]
+    fn hex_eight_digit_pack_validates_every_byte_at_every_position() {
+        for position in 0..8 {
+            for byte in 0..=255u8 {
+                let mut text = *b"a1B2c3D4";
+                text[position] = byte;
+                let expected = if text.iter().all(u8::is_ascii_hexdigit) {
+                    Some(u32::from_str_radix(std::str::from_utf8(&text).unwrap(), 16).unwrap())
+                } else {
+                    None
+                };
+                assert_eq!(
+                    parse_ascii_hex8(&text),
+                    expected,
+                    "position={position}, byte={byte}"
+                );
+            }
+        }
+        assert_eq!(parse_ascii_hex8(b"1234567"), None);
+        assert_eq!(parse_ascii_hex8(b"123456789"), None);
+    }
+
+    #[cfg(target_arch = "x86_64")]
+    #[test]
+    fn unrolled_clmul_matches_every_basis_pair_and_preserves_accumulation() {
+        if !has_hw_clmul() {
+            return;
+        }
+        for limbs in [2usize, 3] {
+            for i in 0..64 * limbs {
+                for j in 0..64 * limbs {
+                    let mut a = [0; 3];
+                    let mut b = [0; 3];
+                    a[i / 64] = 1u64 << (i % 64);
+                    b[j / 64] = 1u64 << (j % 64);
+                    let mut actual = [0x50c0_ffee_1310_0083u64; 8];
+                    let mut expected = actual;
+                    expected[(i + j) / 64] ^= 1u64 << ((i + j) % 64);
+                    mul_words_into(&a[..limbs], &b[..limbs], &mut actual);
+                    assert_eq!(actual, expected, "limbs={limbs}, i={i}, j={j}");
+                }
+            }
+            let mut short = vec![0u64; 2 * limbs - 1];
+            assert!(std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                mul_words_into(&[u64::MAX; 3][..limbs], &[u64::MAX; 3][..limbs], &mut short)
+            }))
+            .is_err());
+        }
+    }
+
     /// Addition in `F_2^m` is XOR; verify on a small concrete case.
     #[test]
     fn add_is_xor() {
@@ -1452,19 +2601,20 @@ mod tests {
 
     #[test]
     fn operation_tally_counts_batched_squares_and_inversion_internals() {
+        use crate::binary_ecc::operation_tally::OperationTally;
+
         let irr = IrreduciblePoly {
             degree: 7,
             low_terms: vec![0, 1],
         };
         let a = F2mElement::from_bit_positions(&[0, 1, 3], 7);
-        let tally = crate::binary_ecc::operation_tally::OperationTally::begin();
+        let squares = OperationTally::begin();
         let _ = a.square_k_times(5, &irr);
-        let counts = tally.finish();
-        assert_eq!(counts.get("f2m7_square"), Some(&5));
+        assert_eq!(squares.finish().get("f2m7_square"), Some(&5));
 
-        let tally = crate::binary_ecc::operation_tally::OperationTally::begin();
-        let _ = a.flt_inverse(&irr).unwrap();
-        let counts = tally.finish();
+        let inverse = OperationTally::begin();
+        a.flt_inverse(&irr).unwrap();
+        let counts = inverse.finish();
         assert_eq!(counts.get("f2m7_inverse_informational"), Some(&1));
         assert!(counts.get("f2m7_mul").is_some_and(|count| *count > 0));
         assert!(counts.get("f2m7_square").is_some_and(|count| *count > 1));
@@ -1641,10 +2791,9 @@ mod tests {
     /// folded down to degree < m.
     #[test]
     fn reduction_works_at_boundary() {
-        // x⁸ + x⁴ + x³ + x + 1
-        let irr = IrreduciblePoly::deg_8();
-        // a = z⁵, b = z⁵.  a·b = z¹⁰ = z² · z⁸ = z² · (z⁴ + z³ + z + 1)
-        //                       = z⁶ + z⁵ + z³ + z².
+        let irr = IrreduciblePoly::deg_8(); // x⁸ + x⁴ + x³ + x + 1
+                                            // a = z⁵, b = z⁵.  a·b = z¹⁰ = z² · z⁸ = z² · (z⁴ + z³ + z + 1)
+                                            //                       = z⁶ + z⁵ + z³ + z².
         let a = F2mElement::from_bit_positions(&[5], 8);
         let b = a.clone();
         let p = a.schoolbook_mul(&b, &irr);
@@ -1673,6 +2822,113 @@ mod tests {
     /// for trinomial and pentanomial moduli, odd and even `m`; and
     /// `H(a)² + H(a) = a + Tr(a)` for odd `m`.
     #[test]
+    fn packed_half_trace_basis_and_every_byte_entry_match_scalar_chains() {
+        let fields = [
+            IrreduciblePoly {
+                degree: 5,
+                low_terms: vec![0, 2],
+            },
+            IrreduciblePoly {
+                degree: 13,
+                low_terms: vec![0, 1, 3, 4],
+            },
+            IrreduciblePoly {
+                degree: 83,
+                low_terms: vec![0, 1, 2, 45],
+            },
+            IrreduciblePoly {
+                degree: 131,
+                low_terms: vec![0, 1, 2, 13],
+            },
+            IrreduciblePoly::deg_131(),
+        ];
+        for irr in &fields {
+            let n = irr.degree;
+            let tables = TraceTables::new(irr);
+            let packed = half_trace_basis_by_elimination(irr, &tables.trace_mask).unwrap();
+            let reference: Vec<_> = (0..n)
+                .map(|i| {
+                    let a = F2mElement::from_bit_positions(&[i], n);
+                    let mut h = a.clone();
+                    let mut term = a.clone();
+                    for _ in 0..(n - 1) / 2 {
+                        term = term.square_k_times(2, irr);
+                        h.add_assign(&term);
+                    }
+                    assert_eq!(
+                        (tables.trace_mask[i as usize / 64] >> (i % 64)) & 1,
+                        trace_by_squarings(&a, irr) as u64
+                    );
+                    h
+                })
+                .collect();
+            assert_eq!(packed, reference, "all basis images, n={n}");
+            // In particular H(1) is fixed; either Artin--Schreier root alone
+            // would be insufficient to preserve the existing table.
+            assert_eq!(
+                packed[0],
+                if n.div_ceil(2) % 2 == 1 {
+                    F2mElement::one(n)
+                } else {
+                    F2mElement::zero(n)
+                }
+            );
+            for byte in 0..tables.n_bytes {
+                for value in 0..256usize {
+                    let mut want = F2mElement::zero(n);
+                    for bit in 0..8 {
+                        let column = byte * 8 + bit;
+                        if value >> bit & 1 != 0 && column < n as usize {
+                            want.add_assign(&reference[column]);
+                        }
+                    }
+                    let at = (byte * 256 + value) * tables.nw;
+                    assert_eq!(
+                        &tables.half_trace[at..at + tables.nw],
+                        want.raw_bits(),
+                        "n{n}/byte{byte}/value{value}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn packed_half_trace_dispatch_checks_all_terms_and_singular_input_falls_back() {
+        for mut irr in [
+            IrreduciblePoly {
+                degree: 83,
+                low_terms: vec![0, 1, 2, 45],
+            },
+            IrreduciblePoly {
+                degree: 131,
+                low_terms: vec![0, 1, 2, 13],
+            },
+        ] {
+            assert!(packed_half_trace_modulus(&irr));
+            irr.low_terms.reverse();
+            assert!(packed_half_trace_modulus(&irr));
+            irr.low_terms.push(3);
+            assert!(!packed_half_trace_modulus(&irr));
+            irr.low_terms.pop();
+            irr.low_terms[0] += 1;
+            assert!(!packed_half_trace_modulus(&irr));
+        }
+        let even = IrreduciblePoly::deg_8();
+        assert!(!packed_half_trace_modulus(&IrreduciblePoly::deg_131()));
+        assert!(!packed_half_trace_modulus(&even));
+        assert!(half_trace_basis_by_elimination(&even, &[0]).is_none());
+        // X³+1 is reducible: the normalized map is singular. Do not assume
+        // that the type name proves irreducibility or accept a partial inverse.
+        let reducible = IrreduciblePoly {
+            degree: 3,
+            low_terms: vec![0],
+        };
+        let tables = TraceTables::new(&reducible);
+        assert!(half_trace_basis_by_elimination(&reducible, &tables.trace_mask).is_none());
+    }
+
+    #[test]
     fn trace_and_half_trace_tables_match_definitions() {
         let fields = [
             IrreduciblePoly::deg_8(),
@@ -1684,6 +2940,10 @@ mod tests {
             IrreduciblePoly {
                 degree: 13,
                 low_terms: vec![0, 1, 3, 4],
+            },
+            IrreduciblePoly {
+                degree: 83,
+                low_terms: vec![0, 1, 2, 45],
             },
             IrreduciblePoly::deg_113(),
             IrreduciblePoly::deg_131(),

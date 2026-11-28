@@ -1,0 +1,113 @@
+{
+  "schema": "rho-ecbench-source-review/v1",
+  "created": "2026-11-12T21:42:03.405031+00:00",
+  "source_commit": "1d2ad3fd90c4d1f2a6a796d43ced035d7f1b3751",
+  "files": [
+    {
+      "path": "Cargo.toml",
+      "bytes": 12096,
+      "blob_sha1": "a5950cf93a12a64967ef6036f9a05fe74294945c",
+      "sha256": "3b7b32e614bd8658fa0071fc5f804276c3f059bcd54796594691c6ee0f34cfbd"
+    },
+    {
+      "path": "Cargo.lock",
+      "bytes": 65181,
+      "blob_sha1": "426a5848aa26aecc9325b763b496c4761f413455",
+      "sha256": "cf805b650c4e42ce27a9621749abbde2d337266a6856e39aa0b15cf012f444e6"
+    },
+    {
+      "path": "src/cryptanalysis/ic_boundary.rs",
+      "bytes": 669099,
+      "blob_sha1": "bbcd7d08cf1cd704a614a98dd2dc685bdb021f60",
+      "sha256": "c9c271e91812b5c6090da207c306c68944f23111d0778a8bf3032de98325e6c0"
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/methods.rs",
+      "bytes": 458153,
+      "blob_sha1": "aaa8abfcd9b2bf437e899ff07e4897da4a364330",
+      "sha256": "54cc482fd31560081ea81df9501800566020382fc9dad9daac56b97414f70dca"
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/spec.rs",
+      "bytes": 27920,
+      "blob_sha1": "6a2f501f3f8eca21adceb04f33ec92ebed768b55",
+      "sha256": "4b5691a7507de5135cc33ad833f7a879d103c27ae4d90abb5786763a21c76b78"
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/runner.rs",
+      "bytes": 118701,
+      "blob_sha1": "dd00a9ebc24d6ed916e789cf809b928dc854c032",
+      "sha256": "a27e70be76ce43ba60f7c2090d7b19a8150af5a7f97bba69faf151c4d66666ab"
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/compare.rs",
+      "bytes": 105276,
+      "blob_sha1": "89709189f42bf99b181dffb34bd11374dab191b9",
+      "sha256": "d3b2773f9418e36dfdf056fdb12db6e1e6ceb86bd97d9884d59fe6b4070386f9"
+    },
+    {
+      "path": "src/cryptanalysis/ecbench/workload.rs",
+      "bytes": 101266,
+      "blob_sha1": "ff830a0b003267270dac20257ebb27f8b082de76",
+      "sha256": "860ab8bdfd5863141e364af3136572d871507591bd46c755bd0f19e008cca551"
+    },
+    {
+      "path": "src/cryptanalysis/research_bench.rs",
+      "bytes": 58372,
+      "blob_sha1": "a93773873470125f7bb51d016f0f9f0a56b8eb2b",
+      "sha256": "11854a3e5457a565da77e4c9ddf1017668e201181196ff87b29256e47cb55662"
+    },
+    {
+      "path": "docs/ic/boundary_targets.json",
+      "bytes": 1155540,
+      "blob_sha1": "5da9c3b71114c18f0b509c1aa1feed4213e88afd",
+      "sha256": "55fe7c8ba06cc8e5c307e611ca2abd9be3d7e99c66cacd50e3dc04d429625917"
+    },
+    {
+      "path": "docs/curves/registry.json",
+      "bytes": 22416763,
+      "blob_sha1": "61db9881750a6b2128f7dd98dfc713466ce32b35",
+      "sha256": "33a16da0548b7b0c3482b3ba7198500a0285271794f63e9c46e10f9a02186e4f"
+    },
+    {
+      "path": "docs/ic/calibration.json",
+      "bytes": 8844,
+      "blob_sha1": "a758ad524639e5a38bc2d69281dcd57dbcde421e",
+      "sha256": "f0c0a873dc7b27c8baa86c5ac1debe9643d799e93ce0110175d0622cc8f7fff2"
+    },
+    {
+      "path": "docs/curves/standards/parameters.json",
+      "bytes": 405178,
+      "blob_sha1": "a036c6bcc2b3fc332c60494c87226466d990b2d7",
+      "sha256": "587e8e12872df19e64d94a8302bd24082ca981e432d536544707fe13a9c3ea59"
+    },
+    {
+      "path": ".github/workflows/ecbench.yml",
+      "bytes": 57437,
+      "blob_sha1": "92d5a5815a7ab5ea4e1b6cde8afcd68fb1b074fa",
+      "sha256": "becfa51b325d6795c7a3c873f1b5f737b93aef7980008d0eefa73bbd7d5fcf37"
+    }
+  ],
+  "KB": "MCP absent; wrapper127; bounded repository and primary-source fallback.",
+  "sources": [
+    {
+      "url": "https://pure.tue.nl/ws/portalfiles/portal/375666556/safecurves.pdf",
+      "permanent_id": "47f17793322fcaf3ef67f982e2c3ae86b34c17ce",
+      "document_date": "2024-08-09",
+      "access": "Web PDF text successful; direct download403; no local PDF byte hash",
+      "read_scope": "4,4.1–4.5,5intro,B.1–B.2 only",
+      "effect": "sqrt(pi/4) reference for standard negating rho and batched-affine additions; B.1 says not optimal with free memory access. No universal lower-bound inference."
+    },
+    {
+      "url": "https://safecurves.cr.yp.to/rho.html",
+      "access": "web502; search excerpt alone not a paper read"
+    },
+    {
+      "url": "https://eprint.iacr.org/2024/1265.pdf",
+      "access": "web403"
+    }
+  ],
+  "workflow_scope": "Existing PR lane checks session integrity with replay0 and selected smoke/sentinels. Historical full replay is weekly/manual; no independent full replay asserted.",
+  "source_materialization": "Exact Git blobs only; no source stubs. gh token expired401 during later hydration; connector fetched small blobs;22,416,763-byte registry required public REST raw blob after connector transport failure. Initial patch newline differences detected by Git blob check and corrected to exact source bytes.",
+  "benchmark_data_taken": false
+}

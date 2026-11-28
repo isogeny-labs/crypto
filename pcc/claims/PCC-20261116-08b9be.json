@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T19:13:28Z",
+ "id": "PCC-20261116-08b9be",
+ "kind": "statement",
+ "producer": {
+  "commit": "3491a91eec6c4f76c1860411cad785c66917f113",
+  "model": "",
+  "session": "codex-20261116-nist-differential-test"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/differential_twist.cpp",
+    "sha256": "a64be5ec4727e84b674f8160c07551ef1cb86af6de68e9318ed7bbe33f9700ca"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/first_order.hpp",
+    "sha256": "3e119f90bd6eac7c3a6e375f3c9ef08c393d3c0ba33e93306ed8c7b150ecd7e2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/check-differential-twist.sh",
+    "sha256": "415a0444f0872744c72d992c464c8e458536bd45279b75a22175529c6beb369b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/TWIST_PROTOCOL.md",
+    "sha256": "62d2c4317eb2beda28c24628c60e60c9719b099ae327b3259748de2902d1d8e9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/differential-twist-v2/result.json",
+    "sha256": "31d2c2d83c1a473bb6daa5622cab8f33dacf0c7d7b5220fc546cb380924e0102"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/differential-twist-v2/stderr.txt",
+    "sha256": "06a4fe2cb9e2835c6b28be82e0b0674ffadd93ef0892b29bf867f9a97c2cdffc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/differential-twist-v2/pre-call-manifest.sha256",
+    "sha256": "750cfffcc7446fba6c85eefe9239c16419dbd675b1161d17e629ffa101e2f20e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/differential-twist-v2/post-call-source-manifest.sha256",
+    "sha256": "6c11a5ad9435fc6a3ff1d4a68ff67ea0b11ac4b7531f5daa74e934cf8c6a9c2c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "The frozen conditional Weil differential comparison on actual P-192 kernel1 completes: source normalization and source/target dual-number curve/function checks, a base-field projective differential matrix, and four quadratic forms with one common nonzero base-field scalar. The retained scalar character is the producer result, conditional on the reviewed marked-ppav normalization argument; no executable source divisor map or DLP recovery is supplied."
+}

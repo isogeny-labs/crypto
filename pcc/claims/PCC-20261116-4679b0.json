@@ -1,0 +1,114 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T06:12:48Z",
+ "id": "PCC-20261116-4679b0",
+ "kind": "statement",
+ "producer": {
+  "commit": "5d5a41f755aa5ec836b2094fa2b171a8a053f23c",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/target-circuit-v2/PROTOCOL.md",
+    "sha256": "729bf2c6afa3a0f598a3943004bca720cc4959471084c86651bab836ddaeb6cb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/target-circuit-v2/SOURCES.sha256",
+    "sha256": "19c15cdcb5420f7d93af4d9b9c7286c3a962e6d0905647a18f5c318329270fcc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/target-circuit-v2/SOURCE_QUALIFICATION.json",
+    "sha256": "00dde1d8b227bd25607817f6ebe755d544de9b26b38a022fba4196a81dd0def9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/target-circuit-v2/source-v2-post-checks.tar.xz",
+    "sha256": "8c69c14ac4723a1609b8a35202be08e711b28172ec70231543bb2bafd372feb9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/target-circuit-v2/native-v2/pre-call.json",
+    "sha256": "759a5038527529796a09fe13e5ea7e08236ae2f5de614b2df1d3dbb7bbfe948d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/target-circuit-v2/native-v2/controls.json",
+    "sha256": "13e45094bd346ace706fc1918c4f0278b0c0470959d2d2f6843f57c70f1e8370"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/target-circuit-v2/native-v2/toy-target-acceptance.bin",
+    "sha256": "2ac3ce6faf5d05ef75c613c9fea391a7a6be28f107002cb29fdfd56bfe2edb9f"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/target-circuit-v2/native-v2/first-six-member-witness.json",
+    "sha256": "39a70121d2eadf924c3691dc615603dbf0f6f9c937ec83f82444c57815a9599d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/target-circuit-v2/native-v2/six-member-system.json.gz",
+    "sha256": "5b92bf1e7ef2b468175262d0a77e762386f83e364271a34f830624f1f9e87522"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/target-circuit-v2/development/rust-test-02.log",
+    "sha256": "7ed19583414d103c1e2b56a8d7f3eb2b6625b144bcc0202590f0ec750a45d577"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/target-circuit-v2/development/rust-fmt.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/target-circuit-v2/development/rust-clippy-01.log",
+    "sha256": "44ca5928c29a64b5f51fe5f2a4b52869dc51de260fbe31b4b21cc29104ac25f4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/target-circuit-v2/development/rust-build.log",
+    "sha256": "6778d83d675fcfe71194f9f75b5fa55d528c271dc7f1f579c5f629ae1c37f25a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/target-circuit-v2/development/rust-toolchain.txt",
+    "sha256": "be69adad9137eaa0bdac1dd07e2fe286b1831fc8bad193ea27806ca0c7c8e7c6"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/curve25519_torus_native_20261115/target-circuit-v2",
+ "statement": "Fixed native public-target interface controls: six distinct actual Curve25519 raw parameters compile to1059 variables/1089 quadratic equations/3323 terms; all1059 single-variable mutations and listed malformed/target/duplicate/cap controls reject. Eighteen actual signed raw labels are recovered and verified by standard Fp2 BSGS with14600 baby entries. Equal/inverse/identity-intermediate actual controls replay signed indexed rows. The fixed Fp101/A95 fixture has104 curve points/13 cofactor images,44 retained signed leaves and two excluded identity raw columns. All24024 distinct-raw-pair/target canonical assignments agree with native addition;1848 accept, including144 equal-image and144 inverse-image pairs. Snapshot43 inputs and ten compiled-in source hashes match; release tests2/fmt/strict Clippy pass. These are producer-local finite software controls, not compiler/formal group/yield/solver/exponent or signed execution evidence."
+}

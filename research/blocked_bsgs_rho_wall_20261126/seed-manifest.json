@@ -1,0 +1,52 @@
+{
+  "schema": "isogeny-labs/experiment-seeds/v1",
+  "study_id": "blocked-bsgs-rho-wall/v1",
+  "freeze_date_utc": "2026-11-26",
+  "master_seed_hex": "1aaea7ece2a35976043741b3a869b6ddc9a3798b18596b0635ee52829e3bba38",
+  "derivation": {
+    "hash": "SHA-256",
+    "preimage_encoding": "UTF-8 study_id, NUL, UTF-8 curve_slug, NUL, UTF-8 panel, NUL, replicate u64 little-endian, NUL, item u64 little-endian, NUL, UTF-8 stream_label, NUL, 32 raw master-seed bytes",
+    "u64_extraction": "digest bytes 0..8 interpreted little-endian",
+    "target_scalar": "1 + (derived_u64 mod (subgroup_order - 1))",
+    "rho_seed": "derived_u64",
+    "duplicate_policy": "refuse before timing"
+  },
+  "curves": [
+    "icv1-fp24-tm5099-a6f137c6",
+    "icv1-fp28-t28201-65099091",
+    "icv1-fp32-t7319-90da43e9",
+    "icv1-fp36-t454193-44a20818",
+    "icv1-fp40-tm506303-75549727"
+  ],
+  "panels": {
+    "warmup": {"replicate_ids": "0..3", "items_per_replicate": 1},
+    "cold-paired": {"replicate_ids": "0..511", "items_per_replicate": 1},
+    "bsgs-aa": {"replicate_ids": "0..63", "items_per_replicate": 1},
+    "rho-aa": {"replicate_ids": "0..63", "items_per_replicate": 1},
+    "amortized-B64": {"replicate_ids": "0..15", "items_per_replicate": 64}
+  },
+  "streams": [
+    {"label": "target", "relationship": "shared workload input"},
+    {"label": "rho-walk", "relationship": "rho-internal, independent of target"},
+    {"label": "bootstrap-primary", "relationship": "analysis only"},
+    {"label": "bootstrap-bsgs-aa", "relationship": "analysis only"},
+    {"label": "bootstrap-rho-aa", "relationship": "analysis only"},
+    {"label": "bootstrap-amortized", "relationship": "analysis only"}
+  ],
+  "schedule": {
+    "cold-paired": "even replicate: BSGS then rho; odd replicate: rho then BSGS",
+    "aa": "alternate invocation labels by replicate parity",
+    "thread_count": 1
+  },
+  "bootstrap_selection": {
+    "panel_argument": "analysis",
+    "replicate_argument": "bootstrap replicate b in 0..9999",
+    "item_argument": "draw d in 0..N-1",
+    "selection": "derived_u64 mod N",
+    "quantiles": "type-1, sorted zero-based indices 249 and 9749",
+    "custody": "one SHA-256 digest of each complete ordered little-endian selection-index stream is committed before timing"
+  },
+  "full_mapping_artifact": "derived-seeds.jsonl",
+  "full_mapping_scope": "target, rho-walk, schedule, and warm-up identities; bootstrap draw streams are retained by compact ordered-stream digests",
+  "full_mapping_status": "must be emitted, duplicate-checked, committed, and hash-pinned before the first timed row"
+}

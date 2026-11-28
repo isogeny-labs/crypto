@@ -245,6 +245,23 @@ pub fn online_ir(prefix: &Path) -> Result<OnlineIr, String> {
     online_from_solve(solve_ir(prefix)?)
 }
 
+/// Parse already pinned parts in caller-validated numeric order, without
+/// directory discovery or filesystem reads. Useful for a bounded independent
+/// exporter that must reject escaping symlinks before it reads any profile.
+pub fn solve_ir_from_parts(parts: &[(String, String)]) -> Result<SolveIr, String> {
+    summarize(
+        parts
+            .iter()
+            .map(|(name, body)| parse_part(Path::new(name), body))
+            .collect::<Result<_, _>>()?,
+    )
+}
+
+/// Optional nested online frame from the same pinned complete-method parts.
+pub fn online_ir_from_parts(parts: &[(String, String)]) -> Result<OnlineIr, String> {
+    online_from_solve(solve_ir_from_parts(parts)?)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

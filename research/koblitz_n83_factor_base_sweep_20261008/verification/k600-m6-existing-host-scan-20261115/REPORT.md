@@ -1,0 +1,5 @@
+# Existing EC2 host screen for K600 build
+
+**Status: read-only, time-bounded capacity screen.** At the UTC time in [scan.tsv](scan.tsv), the [native shell scan](scan.sh) queried running EC2 instances in 17 enabled regions under each of the two configured AWS accounts. All 34 `describe-instances` calls and both STS identity calls exited successfully. The table retains every empty-region row and each observed instance.
+
+Account `590183823895` had three `t3.small` instances, in `eu-west-1`, `ap-southeast-1`, and `us-east-1`. Account `104186811093` had one `t3.medium` instance, in `us-east-2`. AWS `describe-instance-types` reports `t3.small` as x86_64/2,048 MiB and `t3.medium` as x86_64/4,096 MiB. None matches the frozen Linux ARM64, 12 GiB K600 build envelope. This observation does not establish future availability, other account/provider inventory, or new-instance admission; the separately recorded quota and billing gates remain in force. No instance was changed, no job was submitted, and no IC runtime was measured.

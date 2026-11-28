@@ -1,0 +1,9 @@
+# Frozen constructive anchor intersection gate
+
+Previous turn: progress, new derivation and finite group evidence committed. This gate tests the post-control anchor construction, without claiming timing or changing the tenfold objective. Same literature/KB scope and access limits as THEORY.md. Classical grounded incidence and rank-nullity are the mechanism; no novelty claim.
+
+Synthetic exhaustive n=1..4 graph vertices. Every potential simple edge and ground column has three states: absent, off-anchor, anchor. All3^(n(n-1)/2+n)configurations; coefficient primes3,5,1000003. Include empty-column matrices, closed components, zero component sizes modulo characteristic. Compare component-generated rows to independent full/off Gaussian rank difference; assert exact row containment and off-column zero. Every configuration retained; abort on mismatch.
+
+Curve gate reproduces the original fixed72input/69eligible panel, with original divisor/root/group tests unchanged. New assertions only: anchor prefixes H=min(m,0/g+1/8/16/m), and a half-catalogue rotation of each. Some H values may coincide; retain duplicate policies. Ten policies per eligible input, modulus1000003(algebra prime, not group order). Assert span/rank/full-off identity and row containment. Anchor diagnostics go to a separate stderr capture with literal ANCHOR tag; original stdout must compare byte-for-byte to CONTROL.tsv. No original output overwritten; no replacement curves or parameter retuning.
+
+Freeze source/lock/imports/binaries, commit, checkpoint push/gate before once-only execution. Native-only scientific work. Preserve outputs/exits. Report rank survival at the tested H, including zero rows. This tests a finite panel, not complete solver integration or tenfold cost. No performance benchmark or timing claim. General proof remains separate from finite controls.

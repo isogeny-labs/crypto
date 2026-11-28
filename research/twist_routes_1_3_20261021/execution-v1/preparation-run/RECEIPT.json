@@ -1,0 +1,32 @@
+{
+  "schema": "twist.fixture-preparation-receipt/v1",
+  "source_commit": "d86eb011034066532d3645369a783f44be158b1c",
+  "protocol": "research/twist_routes_1_3_20261021/PREPARATION_PROTOCOL_V1.md",
+  "commands": [
+    "cargo build --release --locked --offline --manifest-path research/twist_routes_1_3_20261021/runner/Cargo.toml",
+    "cargo test --release --locked --offline --manifest-path research/twist_routes_1_3_20261021/runner/Cargo.toml",
+    "research/twist_routes_1_3_20261021/runner/target/release/twist-route-experiments prepare research/twist_routes_1_3_20261021/execution-v1/generated"
+  ],
+  "exit_codes": {
+    "build": 0,
+    "tests": 0,
+    "prepare": 0
+  },
+  "source_sha256": {
+    "research/twist_routes_1_3_20261021/PREPARATION_PROTOCOL_V1.md": "a845e37627cbd78c2cdce1452e28ab138cc45d75862317f301a1cedb9096144d",
+    "research/twist_routes_1_3_20261021/runner/.gitignore": "306fd52e74fca6746e12acc750f232de15e71da917756a1270d74c91f5eb7368",
+    "research/twist_routes_1_3_20261021/runner/Cargo.lock": "f781ec108281a383596a61a9c2c7a38e5d317b63b3ff130399591227f4757a8a",
+    "research/twist_routes_1_3_20261021/runner/Cargo.toml": "980aeb71465b23681b2ebc9b2c544f8e7734efaa0c96d78d22a0c77638d43f4a",
+    "research/twist_routes_1_3_20261021/runner/rust-toolchain.toml": "9cbde07377abdce69bc9580adb0315d52e2a09d6494a2005550a7e6733d9688b",
+    "research/twist_routes_1_3_20261021/runner/src/conditional.rs": "6646dbe8d679753896036c8398e40e57e9985c41908327419ad28277723f60f5",
+    "research/twist_routes_1_3_20261021/runner/src/covers.rs": "8051981d6f78b0f6cbf224396d3bb8c3f859943c25b8a966ec604a488366bfa7",
+    "research/twist_routes_1_3_20261021/runner/src/field.rs": "70cde118504c865719ad7ac4453ec51288e61cd9cf1e73cda2e613431cae250f",
+    "research/twist_routes_1_3_20261021/runner/src/jacobian.rs": "41945b5ce011573fa7b2222123db470ea893d966663cad36f41739d06ae9c75f",
+    "research/twist_routes_1_3_20261021/runner/src/main.rs": "a0048377289bb32832dee00e7fe738bc5bf70efdeedb780a60da685a532ba28f",
+    "research/twist_routes_1_3_20261021/runner/src/trace.rs": "054c199fdea95b8dfa8841ab22062f93d170b7e49330063d5323579a234701d2"
+  },
+  "fixture_manifest_sha256": "8d490a36d65ebf906b93e04eeeb21ac5802f2a9382ef03271a4648fd4b78a4ed",
+  "registry_additions": 54,
+  "supporting_tests_passed": 16,
+  "performance_measurement": false
+}

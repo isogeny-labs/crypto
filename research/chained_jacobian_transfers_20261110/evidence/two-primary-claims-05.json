@@ -1,0 +1,62 @@
+[
+  {
+    "name": "TwoPrimaryQuotient.halving_abscissa_identity",
+    "claim_path": "pcc/claims/PCC-20261112-ace317.json",
+    "statement": "theorem halving_abscissa_identity {R : Type} [CommRing R] (x a b X : R) : (3*x^2+a)^2-4*(x^3+a*x+b)*(2*x+X) = x^4-4*X*x^3-2*a*x^2-(8*b+4*a*X)*x+a^2-4*b*X",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/TwoPrimaryQuotient.lean",
+      "theorem": "TwoPrimaryQuotient.halving_abscissa_identity",
+      "decl_sha256": "12738a702d4fb762b5e82e221c7987a020e026913c47e271fd5b4fd992b8a4cd"
+    }
+  },
+  {
+    "name": "TwoPrimaryQuotient.quotient_lift_independent",
+    "claim_path": "pcc/claims/PCC-20261112-807a28.json",
+    "statement": "theorem quotient_lift_independent {B A C : Type} [IntModule B] [IntModule A] [IntModule C] (k : B \u2192 A) (l : B \u2192 C) (ks : \u2200 b c, k (b-c)=k b-k c) (ls : \u2200 b c, l (b-c)=l b-l c) (included : \u2200 b, k b=0 \u2192 l b=0) (b c : B) (same : k b=k c) : l b=l c",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/TwoPrimaryQuotient.lean",
+      "theorem": "TwoPrimaryQuotient.quotient_lift_independent",
+      "decl_sha256": "bd102c4f6c6b9cdc63431623c19ba23d0293418f4f45249bc1bc123c95a07343"
+    }
+  },
+  {
+    "name": "TwoPrimaryQuotient.four_classes_have_sixteen_lifts",
+    "claim_path": "pcc/claims/PCC-20261112-32c9f0.json",
+    "statement": "theorem four_classes_have_sixteen_lifts {B A : Type} [IntModule B] [IntModule A] (k : B \u2192 A) (h : A \u2192 B) (surjective : \u2200 a, \u2203 b, k b=a) (hz : h 0=0) (linear : \u2200 n : Int, \u2200 a, h (n \u2022 a)=n \u2022 h a) (norm : \u2200 b, h (k b)=(4 : Int) \u2022 b) (a : A) (ha : (4 : Int) \u2022 a=0) : \u2203 b, k b=a \u2227 (16 : Int) \u2022 b=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/TwoPrimaryQuotient.lean",
+      "theorem": "TwoPrimaryQuotient.four_classes_have_sixteen_lifts",
+      "decl_sha256": "fcbd5a4914ac338e87db99f53041570b3c09427c6585803cceb4aa108865838d"
+    }
+  },
+  {
+    "name": "TwoPrimaryQuotient.frobenius_twelve_mod_sixteen",
+    "claim_path": "pcc/claims/PCC-20261112-5dc179.json",
+    "statement": "theorem frobenius_twelve_mod_sixteen {R : Type} [CommRing R] (x : R) (h16 : (16 : R)=0) (hx : x^2+7*x+101=0 \u2228 x^2+11*x+101=0) : x^12=1",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/TwoPrimaryQuotient.lean",
+      "theorem": "TwoPrimaryQuotient.frobenius_twelve_mod_sixteen",
+      "decl_sha256": "d4e1040db2b97aa69fe524ffd885abef303706c31485cca39c9cb52a7833d33c"
+    }
+  },
+  {
+    "name": "TwoPrimaryQuotient.reverse_cross_degree_four",
+    "claim_path": "pcc/claims/PCC-20261112-919e88.json",
+    "statement": "theorem reverse_cross_degree_four (n r s u v : Nat) (hn : 0<n) (hr : n=r*u) (hs : n=s*v) (degree : 4*n=r*s) : n=4*(u*v)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/TwoPrimaryQuotient.lean",
+      "theorem": "TwoPrimaryQuotient.reverse_cross_degree_four",
+      "decl_sha256": "73c71263fcdccf2f97c255b4ccb829eb2f2c097a3de7e7ddae5bcfd679529521"
+    }
+  },
+  {
+    "name": "TwoPrimaryQuotient.integer_cleared_maps_vanish_on_four",
+    "claim_path": "pcc/claims/PCC-20261112-cf3d5a.json",
+    "statement": "theorem integer_cleared_maps_vanish_on_four {A C : Type} [IntModule A] [IntModule C] (f l : A \u2192 C) (fz : f 0=0) (linear : \u2200 n : Int, \u2200 a, f (n \u2022 a)=n \u2022 f a) (cleared : \u2200 a, l a=(4 : Int) \u2022 f a) (a : A) (ha : (4 : Int) \u2022 a=0) : \u2200 n : Int, n \u2022 l a=0",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/TwoPrimaryQuotient.lean",
+      "theorem": "TwoPrimaryQuotient.integer_cleared_maps_vanish_on_four",
+      "decl_sha256": "0d8414641661c2c012912d370aa133c70b1d1c108111ffbb8a1003c5c070b1d5"
+    }
+  }
+]

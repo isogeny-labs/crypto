@@ -240,15 +240,23 @@ impl ECurveFpk {
         }
     }
 
-    /// Compute `y² = x³ + a x + b` and return `(rhs, found_y)` if a
-    /// square root exists; brute-force over `F_{p^k}`.
+    /// Compute `y² = x³ + a x + b` and return a square root if one
+    /// exists.  Tries base-field candidates first (common for Diem FB
+    /// points with `x ∈ F_p`), then brute-force over `F_{p^k}`.
     pub fn lift_x(&self, x: &Fpk) -> Option<Fpk> {
         let x2 = x.mul(x, self.irr_const);
         let x3 = x2.mul(x, self.irr_const);
         let rhs = x3.add(&self.a.mul(x, self.irr_const)).add(&self.b);
+        // Fast path: y ∈ F_p ⊂ F_{p^k}.
+        for v in 0..self.p {
+            let cand = Fpk::from_base(v, self.p, self.k);
+            if cand.mul(&cand, self.irr_const) == rhs {
+                return Some(cand);
+            }
+        }
         // Brute-force a square root in F_{p^k}.
         let q = self.p.pow(self.k);
-        for v in 0..q {
+        for v in self.p..q {
             let coeffs: Vec<u64> = (0..self.k).map(|i| (v / self.p.pow(i)) % self.p).collect();
             let cand = Fpk::from_coeffs(coeffs, self.p, self.k);
             if cand.mul(&cand, self.irr_const) == rhs {
@@ -395,9 +403,13 @@ pub struct Decomposition {
     pub signs: (i32, i32),
 }
 
-/// Brute-force search for `R = ε_1 P_1 + ε_2 P_2` with
-/// `(P_1, P_2) ∈ FB²`.  Returns the *first* decomposition found.
-pub fn find_2_decomposition(curve: &ECurveFpk, fb: &[Pt], r: &Pt) -> Option<Decomposition> {
+/// Brute-force `O(|FB|²)` search for `R = ε_1 P_1 + ε_2 P_2`.
+/// Kept for A/B against [`find_2_decomposition`].
+pub fn find_2_decomposition_brute(
+    curve: &ECurveFpk,
+    fb: &[Pt],
+    r: &Pt,
+) -> Option<Decomposition> {
     for (i, p1) in fb.iter().enumerate() {
         for s1 in [1, -1] {
             let p1s = if s1 == -1 { p1.neg() } else { p1.clone() };
@@ -411,6 +423,53 @@ pub fn find_2_decomposition(curve: &ECurveFpk, fb: &[Pt], r: &Pt) -> Option<Deco
                             signs: (s1, s2),
                         });
                     }
+                }
+            }
+        }
+    }
+    None
+}
+
+fn pt_key(p: &Pt) -> Option<(Vec<u64>, Vec<u64>)> {
+    match (&p.x, &p.y) {
+        (Some(x), Some(y)) => Some((x.coeffs.clone(), y.coeffs.clone())),
+        _ => None,
+    }
+}
+
+/// Hash-accelerated 2-decomposition: for each signed `P_1`, look up
+/// `R − ε_1 P_1` in a map of signed factor-base points.  Cost
+/// `O(|FB|)` curve adds + hash probes instead of `O(|FB|²)`.
+///
+/// Returns the *first* decomposition found (same contract as the
+/// historical brute-force search).  Set `IC_DIEM_DECOMP_BRUTE=1` to
+/// force the quadratic path for A/B measurement.
+pub fn find_2_decomposition(curve: &ECurveFpk, fb: &[Pt], r: &Pt) -> Option<Decomposition> {
+    if std::env::var("IC_DIEM_DECOMP_BRUTE").as_deref() == Ok("1") {
+        return find_2_decomposition_brute(curve, fb, r);
+    }
+    use std::collections::HashMap;
+    let mut map: HashMap<(Vec<u64>, Vec<u64>), (usize, i32)> =
+        HashMap::with_capacity(fb.len().saturating_mul(2));
+    for (j, p2) in fb.iter().enumerate() {
+        if let Some(k) = pt_key(p2) {
+            map.entry(k).or_insert((j, 1));
+        }
+        let neg = p2.neg();
+        if let Some(k) = pt_key(&neg) {
+            map.entry(k).or_insert((j, -1));
+        }
+    }
+    for (i, p1) in fb.iter().enumerate() {
+        for s1 in [1i32, -1] {
+            let p1s = if s1 == -1 { p1.neg() } else { p1.clone() };
+            let rem = curve.add(r, &p1s.neg());
+            if let Some(k) = pt_key(&rem) {
+                if let Some(&(j, s2)) = map.get(&k) {
+                    return Some(Decomposition {
+                        indices: (i, j),
+                        signs: (s1, s2),
+                    });
                 }
             }
         }
@@ -509,5 +568,7 @@ mod tests {
         let r = curve.add(g, h);
         let dec = find_2_decomposition(&curve, &fb, &r);
         assert!(dec.is_some(), "decomposition R = G + H must be found");
+        let brute = find_2_decomposition_brute(&curve, &fb, &r);
+        assert!(brute.is_some(), "brute must also find R = G + H");
     }
 }

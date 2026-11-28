@@ -1,0 +1,16 @@
+digraph BKActual {
+  graph [rankdir=TB, bgcolor="white", fontname="DejaVu Sans", nodesep=0.3, ranksep=0.3];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, fillcolor="#eef3fa", color="#2d4262", margin="0.15,0.10"];
+  edge [color="#53657e", arrowsize=0.7];
+  actual [label="Actual E/F5: y²=x³+1, #E=6, r=3\nPrime/coprime/divisibility and r not dividing q−1 checked"];
+  classification [label="Actual 3P=O gives diagonal S3=0\nx=0 or x³=1; y²=1 or y²=2"];
+  even [label="x²⁵=x and y²⁵=y\nFrobenius² fixes every actual 3-torsion point", fillcolor="#e6f3e9"];
+  witness [label="Actual P=(1,beta), beta²=2\nExact order 3; Frobenius(P)=−P≠P\nOutside the actual F5 point image", fillcolor="#fff2d9"];
+  allk [label="Every k: full actual torsion fixed\niff k even iff 3 divides 5^k−1", fillcolor="#e6f3e9"];
+  descent [label="Actual finite-extension point descent\nChosen field K, #K=5^k, compatible embeddings"];
+  model [label="Every k>0: actual GaloisField 5 k\nCardinality 5^k and an actual embedding into closure\nIts point image satisfies the same exact criterion"];
+  scope [label="Qualified actual-case theorem, no assumed torsion basis\nGeneric rank/cardinality and all-p<500 census remain open\nLocal checking; signed standing unverified", fillcolor="#fce7e7"];
+  actual -> classification; classification -> even;
+  actual -> witness; even -> allk; witness -> allk;
+  allk -> descent; descent -> model; model -> scope;
+}

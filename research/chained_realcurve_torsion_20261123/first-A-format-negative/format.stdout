@@ -1,0 +1,85 @@
+Diff in /dev/shm/ct23-realcurve-first-A/source/research/chained_realcurve_torsion_20261123/census_a.rs:13:
+ }
+ 
+ fn mul9(a: u8, b: u8) -> u8 {
+-    (a % 3 * (b % 3) + 2 * (a / 3) * (b / 3)) % 3
+-        + 3 * ((a % 3 * (b / 3) + a / 3 * (b % 3)) % 3)
++    (a % 3 * (b % 3) + 2 * (a / 3) * (b / 3)) % 3 + 3 * ((a % 3 * (b / 3) + a / 3 * (b % 3)) % 3)
+ }
+ 
+ fn pow9(mut a: u8, mut n: usize) -> u8 {
+Diff in /dev/shm/ct23-realcurve-first-A/source/research/chained_realcurve_torsion_20261123/census_a.rs:136:
+ 
+ fn sector_matches(sector: &str, t: i128, b: i128) -> bool {
+     let p = [9, -3 * t, b, -t, 1].map(|x| x.rem_euclid(2));
+-    p == if sector == "33" { [1, 0, 1, 0, 1] } else { [1, 1, 1, 1, 1] }
++    p == if sector == "33" {
++        [1, 0, 1, 0, 1]
++    } else {
++        [1, 1, 1, 1, 1]
++    }
+ }
+ 
+ fn traces(t: i128, b: i128, maximum: usize) -> Vec<i128> {
+Diff in /dev/shm/ct23-realcurve-first-A/source/research/chained_realcurve_torsion_20261123/census_a.rs:159:
+     for (i, row) in c.iter_mut().enumerate() {
+         for (j, entry) in row.iter_mut().enumerate() {
+             for (k, b_row) in b.iter().enumerate() {
+-                *entry = entry.checked_add(a[i][k].checked_mul(b_row[j]).unwrap()).unwrap();
++                *entry = entry
++                    .checked_add(a[i][k].checked_mul(b_row[j]).unwrap())
++                    .unwrap();
+             }
+         }
+     }
+Diff in /dev/shm/ct23-realcurve-first-A/source/research/chained_realcurve_torsion_20261123/census_a.rs:213:
+                 *entry = i128::from(i == j) - *entry;
+             }
+         }
+-        assert_eq!(order, determinant(difference), "Newton/resultant mismatch at n={n}");
++        assert_eq!(
++            order,
++            determinant(difference),
++            "Newton/resultant mismatch at n={n}"
++        );
+         orders.push(u64::try_from(order).unwrap());
+     }
+     assert_eq!(i128::from(orders[0]), 10 - 4 * t + b);
+Diff in /dev/shm/ct23-realcurve-first-A/source/research/chained_realcurve_torsion_20261123/census_a.rs:272:
+         }
+     }
+     for f in quintics {
+-        curves.push(Curve { sector: "51", f, infinities: 1, horizon: 20 });
++        curves.push(Curve {
++            sector: "51",
++            f,
++            infinities: 1,
++            horizon: 20,
++        });
+     }
+     curves.sort_by(|a, b| a.sector.cmp(b.sector).then(a.f.cmp(&b.f)));
+     assert_eq!(curves.len(), 76);
+Diff in /dev/shm/ct23-realcurve-first-A/source/research/chained_realcurve_torsion_20261123/census_a.rs:308:
+         comparisons += orders.len();
+         let valuations: Vec<_> = orders.iter().map(|x| x.trailing_zeros()).collect();
+         let expected_divisor = if sector_index == 0 { 2 } else { 4 };
+-        assert!(valuations.iter().all(|x| x.is_multiple_of(expected_divisor)));
++        assert!(valuations
++            .iter()
++            .all(|x| x.is_multiple_of(expected_divisor)));
+         assert_eq!(orders[curve.horizon - 1] % 4096, 0);
+         let minimal = valuations[curve.horizon - 1] == 12;
+         minimal_counts[sector_index] += usize::from(minimal);
+Diff in /dev/shm/ct23-realcurve-first-A/source/research/chained_realcurve_torsion_20261123/census_a.rs:317:
+         let factor_text = if let Some(traces) = factors {
+             split_counts[sector_index] += 1;
+             for (i, &order) in orders.iter().enumerate() {
+-                assert_eq!(i128::from(order), elliptic_order(traces[0], i + 1)
+-                    * elliptic_order(traces[1], i + 1));
++                assert_eq!(
++                    i128::from(order),
++                    elliptic_order(traces[0], i + 1) * elliptic_order(traces[1], i + 1)
++                );
+             }
+             if sector_index == 0 && minimal && selected_split.is_none() {
+                 selected_split = Some(id);

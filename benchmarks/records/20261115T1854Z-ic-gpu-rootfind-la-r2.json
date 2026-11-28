@@ -1,0 +1,113 @@
+{
+  "branch": "claude/index-calculus-gpu-optimization-otouqv",
+  "closed_utc": "2026-11-15T19:49:06+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/ic_gpu_rootfind_la_20261115/run_pod.sh"
+      ],
+      "cwd": ".",
+      "exit": 22,
+      "started_utc": "2026-11-15T18:54:15+00:00",
+      "wall_s": 28.088
+    },
+    {
+      "argv": [
+        "bash",
+        "research/ic_gpu_rootfind_la_20261115/run_pod.sh"
+      ],
+      "cwd": ".",
+      "exit": 1,
+      "started_utc": "2026-11-15T18:55:18+00:00",
+      "wall_s": 32.666
+    },
+    {
+      "argv": [
+        "bash",
+        "research/ic_gpu_rootfind_la_20261115/run_pod.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T18:57:03+00:00",
+      "wall_s": 2542.766
+    }
+  ],
+  "commit": "764d5600625496e183bafc4b80f232d7419cced3",
+  "commit_dirty": false,
+  "created_utc": "2026-11-15T18:54:07+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/ic_gpu_rootfind_la_20261115"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39"
+  },
+  "id": "20261115T1854Z-ic-gpu-rootfind-la-r2",
+  "metrics": [
+    {
+      "baseline": 1.541,
+      "better": "lower",
+      "n": 6,
+      "name": "ic_rf3_gpup_echelon_solve_s_r39_f4096",
+      "note": "complete m=3 solve, rootfind-subtract-gpu probe_build=pairs (daemon, cuda, A100) with linalg=incremental-gauss-echelon vs incremental-gauss (baseline), log2 r=39.3, |F_x|=4096: 0.20x; CPU one thread gauss 20.0 s; identical S (383x matched rho); rho median solve 0.087 s (single thread)",
+      "reference": 0.0866,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.305
+    },
+    {
+      "baseline": 1.551,
+      "better": "lower",
+      "n": 6,
+      "name": "ic_rf3_gpup_echelon_solve_s_r37_f4096",
+      "note": "as above at log2 r=37.4, |F_x|=4096: 0.18x; CPU gauss 8.09 s; S 194x matched rho; A/A copy 0.98-1.07x per pair",
+      "reference": 0.0397,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.28
+    },
+    {
+      "baseline": 0.387,
+      "better": "lower",
+      "n": 6,
+      "name": "ic_rf3_gpup_echelon_solve_s_r39_f2048",
+      "note": "as above at log2 r=39.3, |F_x|=2048: 0.58x; CPU gauss 20.2 s (90x); S 737x matched rho",
+      "reference": 0.0866,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.223
+    }
+  ],
+  "problem": "ic-gpu-kernels",
+  "raw": [
+    {
+      "bytes": 145432,
+      "path": "research/ic_gpu_rootfind_la_20261115/raw/out_rla.tgz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f1/f1f774f6c18f2da3f3524e577d67b6de4bda716ddc56ce1c37ff581cafd08c34",
+      "sha256": "f1f774f6c18f2da3f3524e577d67b6de4bda716ddc56ce1c37ff581cafd08c34",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/ic_gpu_rootfind_la_20261115/REPORT.md",
+    "png": [],
+    "svg": [
+      "research/ic_gpu_rootfind_la_20261115/fig_la_gpu.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-gpu-rootfind-la-r2",
+  "status": "censored",
+  "summary": "Round 5 launches: commands 1 and 2 failed at the upload (HTTP 404 just after the pod reported ready; pods deleted, nothing ran); command 3 (run_pod.sh with the upload retry, 8c5ae6a512) ran the frozen job to completion, sha256-checked tarball out_rla.tgz. benchrec refuses measured with failed commands in the record, so the measurement is recorded in 20261115T1955Z-ic-gpu-rootfind-la-r3 (analysis of that tarball); the metrics here are the same values.",
+  "validation": null
+}

@@ -1,0 +1,22 @@
+{
+ "created_at": "2026-11-10T17:27:08Z",
+ "id": "PCC-20261110-743f20",
+ "kind": "measurement",
+ "producer": {
+  "commit": "f79068d307a34332433e912a7133187f17a373da",
+  "model": "Codex",
+  "session": "fourteen-target-20261110"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/msolve_crash_diagnostic_20261110/export.json",
+    "sha256": "775bf70474420b7f811e31c2d90318ba5abebecdc87840717198518afe31e708"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "One fixed Boolean idealF65537, upstream0.6.5 source unchanged, exactl1/l2, original/sanitized, onecall each. No Crefinement, independenthost proof, signedexecution, statistics or timing claim.",
+ "statement": "Producer-local frozen diagnostic retains eight msolve cells: original exactl1 ordinary matches its basis, exactl2 ordinary segfaults, both original saturation calls timeout; allfour combined sanitizer calls stop at hash.c409 signed1<<31. This earlier diagnostic does not establish the original crash/timeout cause. Exact export checks and native success are separate."
+}

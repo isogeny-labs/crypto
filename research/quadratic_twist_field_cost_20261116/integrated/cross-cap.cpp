@@ -1,0 +1,18 @@
+// Explicit post-data interpretation, independent native aggregation of all declared cases.
+#include <nlohmann/json.hpp>
+#include <openssl/sha.h>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <stdexcept>
+#include <filesystem>
+using J=nlohmann::ordered_json;
+void need(bool x,const char*m){if(!x)throw std::runtime_error(m);}
+std::string read(const std::string&p){std::ifstream f(p,std::ios::binary);need(bool(f),"read");return{std::istreambuf_iterator<char>(f),{}};}
+std::string digest(const std::string&s){unsigned char b[32];SHA256((const unsigned char*)s.data(),s.size(),b);std::ostringstream o;for(auto x:b)o<<std::hex<<std::setw(2)<<std::setfill('0')<<(int)x;return o.str();}
+int main(int argc,char**argv){try{need(argc==4,"INPUT EXPECTED_SHA NEW_OUTPUT");auto raw=read(argv[1]);need(digest(raw)==argv[2],"exact native input pin");auto j=J::parse(raw);need(j["schema"]=="twist.integrated-cold.audit/v1"&&j["profiles"]==3640,"scope");auto&all=j["profiles_data"];need(all.size()==3640,"complete profiles");J cross=J::array(),rank=J::array(),matched=J::array();
+for(int route=1;route<4;route++){int scalar_equal=0,both_algebraic=0,kind_equal=0,classified=0,lower_peak=0,not_lower_peak=0,log_equal=0,setup_equal=0;for(int policy=0;policy<455;policy++){auto&b=all[policy*2+1];auto&c=all[route*910+policy*2];need(b["route"]==0&&b["cap"]==4&&c["route"]==route&&c["cap"]==3&&b["policy"]==policy&&c["policy"]==policy,"crosscap alignment");for(int t=0;t<30;t++){auto&x=b["works"][t]["result"];auto&y=c["works"][t]["result"];classified++;kind_equal+=x["kind"]==y["kind"];log_equal+=x["logs"]==y["logs"];setup_equal+=x["setup_m"]==y["setup_m"];if(x["kind"]==1&&y["kind"]==1){both_algebraic++;scalar_equal+=x["scalar"]==y["scalar"];bool lower=y["counts"][9].get<int>()<x["counts"][9].get<int>();lower_peak+=lower;not_lower_peak+=!lower;}}}cross.push_back(J{{"route",route},{"legacy_cap",4},{"candidate_cap",3},{"classified",classified},{"same_recovery_kind",kind_equal},{"same_public_logs",log_equal},{"same_setup_stop",setup_equal},{"both_algebraic",both_algebraic},{"same_original_scalar",scalar_equal},{"lower_actual_constructed_peak",lower_peak},{"not_lower_peak",not_lower_peak}});}
+for(int route=0;route<4;route++)for(int cap:{3,4}){int lo=100000,hi=-1;for(int policy=0;policy<455;policy++){auto&s=all[route*910+policy*2+cap-3];int n=s["rank_numerator"];lo=std::min(lo,n);hi=std::max(hi,n);}rank.push_back(J{{"route",route},{"cap",cap},{"policies",455},{"minimum_initial_rank_sum",lo},{"maximum_initial_rank_sum",hi},{"denominator",30}});}
+for(auto[from,to]:{std::pair{1,2},std::pair{2,3}})for(int cap:{3,4}){int profiles=0,rank_same=0,results_same=0;for(int policy=0;policy<455;policy++){auto&x=all[from*910+policy*2+cap-3];auto&y=all[to*910+policy*2+cap-3];profiles++;rank_same+=x["diagnostic_ranks"]==y["diagnostic_ranks"];for(int t=0;t<30;t++){auto a=x["works"][t]["result"],b=y["works"][t]["result"];a.erase("counts");b.erase("counts");results_same+=a==b;}}matched.push_back(J{{"from",from},{"to",to},{"cap",cap},{"profiles",profiles},{"all31_diagnostic_ranks_equal",rank_same},{"full_recovery_result_equal_except_request_counts",results_same}});}
+J out={{"schema","twist.integrated-cross-cap/v1"},{"input_sha256",argv[2]},{"cross_cap",cross},{"initial_rank_ranges",rank},{"same_cap_map_controls",matched},{"interpretation","Post-data native interpretation; finite field constructed witness and initial coefficient rank, not intrinsic regularity/stationary collection/fastest claim"},{"signed_verdict",false}};need(!std::filesystem::exists(argv[3]),"new output");std::ofstream f(argv[3]);f<<out.dump()<<'\n';return 0;}catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 101;}}

@@ -1,0 +1,61 @@
+name: Prime31 native Dickson2 exact yield
+on:
+  push:
+    branches:
+      - research/prime31-f4-admission-run51-20261121
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_dickson2_yield_census.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_dickson2_collision_rank.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rank_completion_gate.rs'
+      - 'research/prime31_f4_admission_20261121/run57_basis.json'
+      - 'research/prime31_f4_admission_20261121/run57_rank_gate.py'
+      - 'research/prime31_f4_admission_20261121/run57_validate.py'
+      - 'research/prime31_f4_admission_20261121/run58_early_target_model.py'
+      - 'research/prime31_f4_admission_20261121/run58_affine_recovery_verify.py'
+      - 'research/prime31_f4_admission_20261121/RUN55_DICKSON2_YIELD_PROTOCOL.md'
+      - '.github/workflows/prime31-dickson2-yield.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_dickson2_yield_census.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_dickson2_collision_rank.rs'
+      - 'research/prime31_ic_20261115/native/examples/prime31_rank_completion_gate.rs'
+      - 'research/prime31_f4_admission_20261121/run57_basis.json'
+      - 'research/prime31_f4_admission_20261121/run57_rank_gate.py'
+      - 'research/prime31_f4_admission_20261121/run57_validate.py'
+      - 'research/prime31_f4_admission_20261121/run58_early_target_model.py'
+      - 'research/prime31_f4_admission_20261121/run58_affine_recovery_verify.py'
+      - '.github/workflows/prime31-dickson2-yield.yml'
+  workflow_dispatch:
+jobs:
+  native-yield:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/prime31_ic_20261115/native -> target
+          key: prime31-native-dickson2-yield
+      - name: Independently verify 500 exact small-system modular rank cases
+        run: python3 research/prime31_f4_admission_20261121/run57_validate.py
+      - name: Independently verify 51 exact target-graph counts and run58 conditional model
+        timeout-minutes: 3
+        run: python3 research/prime31_f4_admission_20261121/run58_early_target_model.py
+      - name: Independent 64-case actual-curve group-law replay (planted relation control)
+        timeout-minutes: 3
+        run: python3 research/prime31_f4_admission_20261121/run58_affine_recovery_verify.py
+      - name: Compile existing Prime31 native Rust (not monolithic root crate)
+        timeout-minutes: 14
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo build --release --example prime31_dickson2_yield_census --example prime31_dickson2_collision_rank --example prime31_rank_completion_gate
+      - name: Verify full depth-10 signed two-summand support census
+        timeout-minutes: 2
+        working-directory: research/prime31_ic_20261115/native
+        run: |
+          timeout 90s target/release/examples/prime31_dickson2_yield_census
+          timeout 90s target/release/examples/prime31_dickson2_collision_rank
+      - name: Independent signed-rank saturation and run58 target-closure gates (conditional)
+        timeout-minutes: 3
+        working-directory: research/prime31_ic_20261115/native
+        run: timeout 150s target/release/examples/prime31_rank_completion_gate

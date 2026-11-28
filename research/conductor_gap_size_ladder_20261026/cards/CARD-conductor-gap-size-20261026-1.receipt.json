@@ -1,0 +1,138 @@
+{
+  "card_id": "CARD-conductor-gap-size-20261026-1",
+  "card_path": "research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.yaml",
+  "card_sha256": "8e1bdb2a2acb5ec53804686737570d59117b9c262afa79b4211396a544aa5626",
+  "commands": [
+    {
+      "argv": [
+        "target/conductor-gap-size-plan",
+        "--self-test"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "self-test",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "53f99bbe60562de8387557469d6692911e1bfc93ccb1c3debc6da73b91a26806",
+      "stdout_tail": [
+        "Native primality, Pocklington, integer bounds and planning controls passed"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "target/conductor-gap-size-plan",
+        "research/conductor_gap_crater_design_20261025/design.json",
+        "research/conductor_gap_size_ladder_20261026/results"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 3,
+          "seconds": 15.032,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 3,
+      "id": "search",
+      "index": 2,
+      "outputs": {
+        "research/conductor_gap_size_ladder_20261026/results/candidates.csv": "3321de58940fd19ee26bdbe7fdf71d13f144cdd5a6e06de8193fc52c4acfd8e1",
+        "research/conductor_gap_size_ladder_20261026/results/design.json": "c3712e26979d6d68722466035c09d6c778d5d8cafacc64dce455e2bcf64c76bb"
+      },
+      "seconds": 15.032,
+      "stderr_sha256": "7f1d8dd7e215cededb22e5514764b3d6a77249036611719733402a5e8891be4c",
+      "stderr_tail": [
+        "native bits=40 d=43 accepted=8 candidates=446",
+        "native bits=40 d=67 accepted=8 candidates=264",
+        "native bits=47 d=11 accepted=8 candidates=10116",
+        "native bits=47 d=19 accepted=8 candidates=5690",
+        "native bits=47 d=43 accepted=8 candidates=1693",
+        "native bits=47 d=67 accepted=8 candidates=1210",
+        "native bits=54 d=11 accepted=8 candidates=61030",
+        "native bits=54 d=19 accepted=8 candidates=16655",
+        "native bits=54 d=43 accepted=8 candidates=6133",
+        "native bits=54 d=67 accepted=8 candidates=5273",
+        "native bits=61 d=11 accepted=8 candidates=271875",
+        "native bits=61 d=19 accepted=8 candidates=57783",
+        "native bits=61 d=43 accepted=8 candidates=26969",
+        "native bits=61 d=67 accepted=8 candidates=12245",
+        "upper bits=112 d=19 accepted=0 candidates=3000000",
+        "upper bits=112 d=43 accepted=1 candidates=587",
+        "upper bits=160 d=19 accepted=0 candidates=3000000",
+        "upper bits=160 d=43 accepted=1 candidates=46563",
+        "upper bits=256 d=19 accepted=0 candidates=3000000",
+        "upper bits=256 d=43 accepted=1 candidates=488609"
+      ],
+      "stdout_sha256": "d90c6406ee92c951d767137c3edd5307cbc94df395a2d17a85d274f95343ab54",
+      "stdout_tail": [
+        "Parameter candidates retained: 131; complete cells: 19/22; ECDLP solves: 0; explicit models: 0"
+      ],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 3,
+  "commit": "ee0f5489b8a946ccb6ea870c56b7fea6e8300993",
+  "dirty_after": [
+    "research/conductor_gap_size_ladder_20261026/README.md",
+    "research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.search.stderr",
+    "research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.search.stdout",
+    "research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.self-test.stderr",
+    "research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.self-test.stdout",
+    "research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.yaml",
+    "research/conductor_gap_size_ladder_20261026/checks/gate-check-hydrated.log",
+    "research/conductor_gap_size_ladder_20261026/checks/gate-check.exit",
+    "research/conductor_gap_size_ladder_20261026/checks/gate-check.log",
+    "research/conductor_gap_size_ladder_20261026/checks/gate-hydrated.exit",
+    "research/conductor_gap_size_ladder_20261026/checks/gate-tests-hydrated.log",
+    "research/conductor_gap_size_ladder_20261026/checks/gate-tests.log",
+    "research/conductor_gap_size_ladder_20261026/checks/gate.exit",
+    "research/conductor_gap_size_ladder_20261026/checks/rust-lib.exit",
+    "research/conductor_gap_size_ladder_20261026/checks/rust-lib.log",
+    "research/conductor_gap_size_ladder_20261026/checks/site-tests-attempt1.exit",
+    "research/conductor_gap_size_ladder_20261026/checks/site-tests-attempt1.log",
+    "research/conductor_gap_size_ladder_20261026/checks/site-tests.exit",
+    "research/conductor_gap_size_ladder_20261026/checks/site-tests.log",
+    "research/conductor_gap_size_ladder_20261026/checks/validation-hydration-inputs.tsv",
+    "research/conductor_gap_size_ladder_20261026/checks/validation-hydration.log",
+    "research/conductor_gap_size_ladder_20261026/render.py",
+    "research/conductor_gap_size_ladder_20261026/results/candidates.csv",
+    "research/conductor_gap_size_ladder_20261026/results/design.json"
+  ],
+  "dirty_before": [
+    "research/conductor_gap_size_ladder_20261026/README.md",
+    "research/conductor_gap_size_ladder_20261026/cards/CARD-conductor-gap-size-20261026-1.yaml",
+    "research/conductor_gap_size_ladder_20261026/checks/gate-check-hydrated.log",
+    "research/conductor_gap_size_ladder_20261026/checks/gate-check.exit",
+    "research/conductor_gap_size_ladder_20261026/checks/gate-check.log",
+    "research/conductor_gap_size_ladder_20261026/checks/gate-hydrated.exit",
+    "research/conductor_gap_size_ladder_20261026/checks/gate-tests-hydrated.log",
+    "research/conductor_gap_size_ladder_20261026/checks/gate-tests.log",
+    "research/conductor_gap_size_ladder_20261026/checks/gate.exit",
+    "research/conductor_gap_size_ladder_20261026/checks/rust-lib.exit",
+    "research/conductor_gap_size_ladder_20261026/checks/rust-lib.log",
+    "research/conductor_gap_size_ladder_20261026/checks/site-tests-attempt1.exit",
+    "research/conductor_gap_size_ladder_20261026/checks/site-tests-attempt1.log",
+    "research/conductor_gap_size_ladder_20261026/checks/site-tests.exit",
+    "research/conductor_gap_size_ladder_20261026/checks/site-tests.log",
+    "research/conductor_gap_size_ladder_20261026/checks/validation-hydration-inputs.tsv",
+    "research/conductor_gap_size_ladder_20261026/checks/validation-hydration.log",
+    "research/conductor_gap_size_ladder_20261026/render.py"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 2"
+}

@@ -1,0 +1,24 @@
+== Part A: pairs law, blind arms, expected = 20000 x b(b-1)/2/1049624
+seeds 0-20 blind                   arms 21  observed  218  expected   206.2 (95% interval 179..235) obs/exp 1.057 -> H22 SUPPORTED
+screen top 8 blind                 arms  8  observed  146  expected   122.2 (95% interval 101..144) obs/exp 1.195 -> H22 NOT SUPPORTED
+screen bottom 8 blind              arms  8  observed   51  expected    45.3 (95% interval 33..59) obs/exp 1.125 -> H22 SUPPORTED
+descriptive lifts=1 arms (expected x mean lift targets tried per target):
+seeds 0-20 lifts                   observed 1719 expected   1646.1 obs/exp 1.044 (mean lift targets tried per target 7.99)
+screen top 8 lifts                 observed 1014 expected    974.9 obs/exp 1.040 (mean lift targets tried per target 7.98)
+screen bottom 8 lifts              observed  368 expected    362.2 obs/exp 1.016 (mean lift targets tried per target 7.99)
+
+== Part B: t = 6, seeds 101-108 blind, 20000 targets
+arms 8  hits 315 / 489.9 = 0.643 [0.574, 0.718]
+H23 lower bound 0.574 vs 3.334 -> NOT SUPPORTED
+t=6 pairs law                      arms  8  observed  315  expected   306.7 (95% interval 273..341) obs/exp 1.027 -> H24 SUPPORTED
+H25 blind mul-adds/target t=6: 3.0612e+06 .. 3.0635e+06 (band 0.885e5 .. 3.541e5) -> NOT SUPPORTED; ratio to t=5 1.7705e5: 17.3x
+descriptive: base_points [56, 58, 60, 64, 66, 68, 68, 70]; tower ops [1235, 1895, 1903, 3358, 3953, 4394, 4585, 5805]; rate t6/t5 unscreened = 0.22; hits per target t6/t5 = 3.82
+
+== Part C: deeper screen
+H26 chosen seed 1550 has c = 26 (need >= 25) -> SUPPORTED
+chosen seed blind: 30 hits / 3.54 = 8.476 [5.719, 12.101] per 1e9 (unscreened 2.909; top-8 5.155)
+H28 chosen seed pairs law          arms  1  observed   30  expected    25.3 (95% interval 16..36) obs/exp 1.187 -> H28 SUPPORTED
+H27 total tower ops 7725157 vs 1e-2 x 18 x muladds per hit (1.18e+08) = 2.12e+07 -> SUPPORTED
+
+== Part D (descriptive, indicative only; unit mismatch not resolved; not priced in the 0-1 GAE band)
+chosen seed: columns 26 -> 27 relations x 1.18e+08 mul-adds per hit = 3.19e+09 F4 mul-adds; expected rho group ops sqrt(pi*131203/4) = 321; ratio 9.92e+06

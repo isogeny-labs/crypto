@@ -1,0 +1,17 @@
+{
+  "schema": "h4-subgroup-projection-v1",
+  "question": "How many points from the fixed H4 n19 lifted x-base lie directly in the prime-order DLP subgroup, and what base and relation coverage result after cofactor clearing?",
+  "control_result": "research/exotic_ecdlp_20261021/H4_prime_descent/pair_index_20261120/result.json",
+  "control_sha256": "8f447fae29c828ebe4bec64d1b995b69e35ad4df67ee7bf1b93b565c42813ddf",
+  "coverage_result": "research/exotic_ecdlp_20261021/H4_prime_descent/pair_coverage_20261120/result.json",
+  "coverage_sha256": "ba1177d5b07a1a00df9fddc52e8ccad8bad75942be45a25a6c4c0d7ae3fb5331",
+  "group_order": 524448,
+  "prime_subgroup_order": 607,
+  "cofactor": 864,
+  "method": "Reconstruct the exact binary curve and all lifted x-subspace points from frozen integer records. Count direct nonidentity points killed by 607. Project every lifted point by 864, deduplicate and remove identity; verify every projected point is killed by 607 and enumerate the full 607-point subgroup from one nonzero projected point. Build an ordered pair index on the projected base and count its exact three-sum image, then query the two prior targets after projecting them by 864. Charge lifting, direct membership tests, clearing, pair sums, image enumeration, and target lookup as separate stages.",
+  "statistics": ["direct_prime_subgroup_points", "cleared_nonidentity_points", "cleared_identity_count", "cleared_collision_count", "subgroup_order", "projected_three_sum_coverage", "projected_planted_triples", "projected_ordinary_triples", "stage_seconds", "peak_rss_bytes"],
+  "cap_seconds": 90,
+  "host": "local macOS checked Sage; ordinary algorithmic diagnostic tier",
+  "claim_boundary": "Exact fixed-curve subgroup eligibility and projected component coverage; no complete IC candidate or matched same-target speed comparison",
+  "status": "frozen before execution"
+}

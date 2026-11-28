@@ -1,0 +1,18 @@
+  rho reference (A = 2): S = 0.998 (mean of 16, 0.260–1.883)
+  before mark, plain walk (A = 1): S = 3.369
+  prime-abscissa[size=16] + genroot[m=4] + — + walk …
+
+Rows with a cost qualification report partial counted cost only; total-cost and speedup claims are unavailable.
+
+| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |
+|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|
+| icv1-fp20-t1293-3c2999ba | prime-abscissa[size=16] + genroot[m=4] + — + walk | 32 | 16 | 2.0 | 0.044 | 386 | 17 | 17 | — | — | 399.534 | — | yes |
+| icv1-fp20-t1293-3c2999ba | prime-abscissa[size=16] + genroot[m=4] + — + walk | 32 | 16 | 2.0 | 0.054 | 315 | 17 | 17 | — | — | 328.724 | — | yes |
+| icv1-fp20-t1293-3c2999ba | prime-abscissa[size=16] + genroot[m=4] + — + walk | 32 | 16 | 2.0 | 0.031 | 521 | 16 | 16 | — | — | 538.328 | — | yes |
+
+- **icv1-fp20-t1293-3c2999ba / prime-abscissa[size=16] + genroot[m=4] + — + walk**: partial_counted_cost: genroot charges each S3 fiber as two group additions; the root-finding inside a fiber (genroot_field_muls, genroot_field_invs, in arbitrary-precision arithmetic) is counted but not priced; total-cost and speedup unknown
+
+- **icv1-fp20-t1293-3c2999ba / prime-abscissa[size=16] + genroot[m=4] + — + walk**: partial_counted_cost: genroot charges each S3 fiber as two group additions; the root-finding inside a fiber (genroot_field_muls, genroot_field_invs, in arbitrary-precision arithmetic) is counted but not priced; total-cost and speedup unknown
+
+- **icv1-fp20-t1293-3c2999ba / prime-abscissa[size=16] + genroot[m=4] + — + walk**: partial_counted_cost: genroot charges each S3 fiber as two group additions; the root-finding inside a fiber (genroot_field_muls, genroot_field_invs, in arbitrary-precision arithmetic) is counted but not priced; total-cost and speedup unknown
+

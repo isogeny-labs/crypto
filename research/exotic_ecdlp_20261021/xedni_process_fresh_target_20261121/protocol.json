@@ -1,0 +1,20 @@
+{
+  "schema": "xedni-process-fresh-target-protocol-v1",
+  "source_table_runner_sha256": "09245507d5b48d0a1f1de9e96db22eed5658a35fab12fd750b60169b5b906816",
+  "source_audit_sha256": "3c3803a1efae019554cec251376c911c2e1e036420a85c36da4d1b945c356891",
+  "rational_curve_a_invariants": ["0", "-47", "0", "751", "-3997"],
+  "rational_point_Q": ["17", "10"],
+  "reduced_curve_a_invariants": [0, 0, 0, -1, -2],
+  "subgroup_order": 43,
+  "target_seed": "xedni-process-fresh-public-target-20261121-v1",
+  "target_fixture_scalar_law": "1 + (first eight SHA256 digest bytes interpreted big-endian mod 42), fixture generated before both arm intervals",
+  "relation_prefix": 14,
+  "relation_coefficients": [2, 6],
+  "repetitions": 3,
+  "arm_order": ["table,rho", "rho,table", "table,rho"],
+  "process_policy": "one new checked Sage launcher process per repetition; each process builds the 28-row relation matrix, anchored log table and matched rho arm; no application state reused across processes",
+  "timing_boundaries": "coordinator measures launcher wall from subprocess start through exit; worker measures curve setup, relation generation, matrix build, final LA, table build, table online through scalar replay, and rho online through scalar replay; fixture construction precedes both online arms",
+  "wall_cap_seconds_per_process": 60,
+  "timing_tier": "ordinary local correctness and stage diagnostic; no Tier 0 or Tier 1 isolation receipt",
+  "status_law": "retain all three process outcomes, stderr, first-use timings, both arm statuses and scalar replay; no speedup promotion"
+}

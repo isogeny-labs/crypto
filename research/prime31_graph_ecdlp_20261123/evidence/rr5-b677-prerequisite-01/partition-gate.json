@@ -1,0 +1,70 @@
+{
+  "scope": "second ordinary curve over the same p; exact witness counts, not extraction yield",
+  "curve": {
+    "a": 847514846,
+    "b": 2087444724,
+    "g": [
+      625037715,
+      2100627251
+    ],
+    "n": 2147446831,
+    "p": 2147483647
+  },
+  "dickson_factor_base_size": 509,
+  "y7_large_prime_pool_size": 168,
+  "planted_two_lp_control_replay": true,
+  "families": {
+    "0": {
+      "base_terms": 0,
+      "lp_terms": 4,
+      "expected_signed_witnesses_per_uniform_query": 0.2385635595743418,
+      "expectation_numerator": 512302560,
+      "expectation_denominator": 2147446831
+    },
+    "1": {
+      "base_terms": 1,
+      "lp_terms": 3,
+      "expected_signed_witnesses_per_uniform_query": 2.9437297411718784,
+      "expectation_numerator": 6321503104,
+      "expectation_denominator": 2147446831
+    },
+    "2": {
+      "base_terms": 2,
+      "lp_terms": 2,
+      "expected_signed_witnesses_per_uniform_query": 13.51278351068055,
+      "expectation_numerator": 29017984128,
+      "expectation_denominator": 2147446831
+    },
+    "3": {
+      "base_terms": 3,
+      "lp_terms": 1,
+      "expected_signed_witnesses_per_uniform_query": 27.34922650664686,
+      "expectation_numerator": 58731009792,
+      "expectation_denominator": 2147446831
+    },
+    "4": {
+      "base_terms": 4,
+      "lp_terms": 0,
+      "expected_signed_witnesses_per_uniform_query": 20.593316387445405,
+      "expectation_numerator": 44223052016,
+      "expectation_denominator": 2147446831
+    }
+  },
+  "positive_gate_status": "ResourceLimit",
+  "positive_gate_reason": "symbolic_workspace: matrix_entries admission 2000016 exceeds 2000000",
+  "positive_gate_accepted_rows": 0,
+  "larger_cap_attempts": [
+    {
+      "matrix_entry_cap": 8000000,
+      "status": "ResourceLimit",
+      "reason": "symbolic_workspace: matrix_entries admission 8000881 exceeds 8000000",
+      "accepted_rows": 0
+    },
+    {
+      "matrix_entry_cap": 32000000,
+      "status": "ResourceLimit",
+      "reason": "symbolic_workspace: matrix_entries admission 32017996 exceeds 32000000",
+      "accepted_rows": 0
+    }
+  ]
+}

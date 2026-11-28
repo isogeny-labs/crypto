@@ -2090,7 +2090,11 @@ mod tests {
         fs::write(&script, include_str!("../../../submit-job")).unwrap();
         fs::set_permissions(&script, fs::Permissions::from_mode(0o700)).unwrap();
         std::env::set_var("ISOLAB_DEPLOY_DIR", &dir);
-        for memory in [crate::contract::Memory::Gi4, crate::contract::Memory::Gi8] {
+        for memory in [
+            crate::contract::Memory::Gi4,
+            crate::contract::Memory::Gi8,
+            crate::contract::Memory::Gi14,
+        ] {
             let mut req = crate::contract::fixture();
             req.memory = memory;
             let mut state = State::new(req, "test".into(), 1000).unwrap();

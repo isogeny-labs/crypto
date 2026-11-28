@@ -39,6 +39,9 @@ inputs=(
   docs/ic/fixtures/current_head_prime_route_20261024/isogeny_routes.json
   src/cryptanalysis/curve_traits/modular_polynomials.txt
   docs/ic/leaderboard.json docs/ic/progress-timeline.json docs/ic/boundary_targets.json
+  ecdb/features/catalog.json ecdb/datasets/model-ready.json
+  ecdb/sweeps/koblitz-ladder.json ecdb/sweeps/binary-ladder.json
+  ecdb/sweeps/prime-ladder.json ecdb/sweeps/cm-isogeny-strata.json
 )
 for f in "${inputs[@]}"; do
   mkdir -p "$pkg/data/$(dirname "$f")"

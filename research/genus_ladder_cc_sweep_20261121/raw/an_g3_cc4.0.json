@@ -1,0 +1,697 @@
+{
+  "admission": [
+    {
+      "admitted": 3,
+      "family": "hyperelliptic",
+      "g": 3,
+      "kind": "cell",
+      "p": 8209,
+      "rejects": {
+        "order_not_near_prime": 20
+      },
+      "search_wall_s": 472.300430044,
+      "tried": 23
+    },
+    {
+      "admitted": 3,
+      "family": "hyperelliptic",
+      "g": 3,
+      "kind": "cell",
+      "p": 16411,
+      "rejects": {
+        "order_not_near_prime": 40
+      },
+      "search_wall_s": 4728.564287918,
+      "tried": 43
+    }
+  ],
+  "bootstrap": {
+    "resamples": 2000,
+    "scheme": "curves, then runs within a curve",
+    "seed": 20261114
+  },
+  "cells": [
+    {
+      "arm": "C_double_lp+pre",
+      "band_fpm": "unresolved",
+      "band_gae": "unresolved",
+      "curves": 3,
+      "family": "hyperelliptic",
+      "fpm_high": {
+        "hi": 233164463.66666666,
+        "lo": 224784575.5,
+        "mean": 229014647.16666666
+      },
+      "fpm_high_over_rho": {
+        "hi": 1.6958325533200531,
+        "lo": 0.9155730623239211,
+        "ratio": 1.1715481773612577
+      },
+      "fpm_low": {
+        "hi": 37107867.5,
+        "lo": 35969206.5,
+        "mean": 36562697.0
+      },
+      "fpm_low_over_rho": {
+        "hi": 0.4469563807733116,
+        "lo": 0.24094730794602864,
+        "ratio": 0.30807554701680145
+      },
+      "fpm_mid": {
+        "hi": 230063010.33333334,
+        "lo": 221745195.5,
+        "mean": 225937417.16666666
+      },
+      "fpm_mid_over_rho": {
+        "hi": 2.2946159424036128,
+        "lo": 1.2387600338340157,
+        "ratio": 1.5853561533126157
+      },
+      "g": 3,
+      "gae_w0": {
+        "hi": 31542.5,
+        "lo": 30314.666666666668,
+        "mean": 30779.166666666668
+      },
+      "gae_w01": {
+        "hi": 3041198.9,
+        "lo": 2943379.4500000007,
+        "mean": 2994537.6500000004
+      },
+      "gae_w01_over_rho": {
+        "hi": 7.4496142100978515,
+        "lo": 4.015460307302909,
+        "ratio": 5.138945241532967
+      },
+      "gae_w0_over_rho": {
+        "hi": 0.08462698013910559,
+        "lo": 0.04481184406746177,
+        "ratio": 0.05809818002555156
+      },
+      "gae_w1": {
+        "hi": 30128732.0,
+        "lo": 29160194.5,
+        "mean": 29668364.0
+      },
+      "gae_w1_over_rho": {
+        "hi": 40.6109349365911,
+        "lo": 21.88371260194683,
+        "ratio": 28.011802050346603
+      },
+      "mean_candidates": 29374.833333333332,
+      "mean_cantor_inv": 153861.5,
+      "mean_cantor_mul": 6771250.666666667,
+      "mean_core_cols": 1353.3333333333333,
+      "mean_fb_cols": 1628.0,
+      "mean_group_ops": 30779.166666666668,
+      "mean_la_add": 78097071.83333333,
+      "mean_la_mul": 23498745.833333332,
+      "mean_ln_r": 26.16690972767287,
+      "mean_prefilter_rejects": 14704.833333333334,
+      "mean_rel_mul": 6138839.0,
+      "mean_relations": 3874.0,
+      "mean_splits": 4981.0,
+      "mean_steps": 0.0,
+      "mean_trials": 29378.0,
+      "mean_wall_ns": 4670515052.333333,
+      "p": 8209,
+      "runs": 6,
+      "split_fraction": 0.16956691952862143,
+      "split_fraction_times_g_factorial": 1.0174015171717286,
+      "trials": {
+        "hi": 30104.5,
+        "lo": 28919.333333333332,
+        "mean": 29378.0
+      }
+    },
+    {
+      "arm": "C_double_lp+pre+sge(8,3)",
+      "band_fpm": "below",
+      "band_gae": "unresolved",
+      "curves": 3,
+      "family": "hyperelliptic",
+      "fpm_high": {
+        "hi": 54969841.333333336,
+        "lo": 52583845.0,
+        "mean": 53911053.666666664
+      },
+      "fpm_high_over_rho": {
+        "hi": 0.39670602812218275,
+        "lo": 0.21150674396926367,
+        "ratio": 0.2757875858343842
+      },
+      "fpm_low": {
+        "hi": 17303085.5,
+        "lo": 16835792.0,
+        "mean": 17106742.166666668
+      },
+      "fpm_low_over_rho": {
+        "hi": 0.2092029653134626,
+        "lo": 0.10966011731899333,
+        "ratio": 0.1441405963753499
+      },
+      "fpm_mid": {
+        "hi": 51917448.0,
+        "lo": 49544465.0,
+        "mean": 50833823.666666664
+      },
+      "fpm_mid_over_rho": {
+        "hi": 0.5126853774239172,
+        "lo": 0.27378947773969436,
+        "ratio": 0.3566904329392686
+      },
+      "g": 3,
+      "gae_w0": {
+        "hi": 31542.5,
+        "lo": 30284.0,
+        "mean": 30779.166666666668
+      },
+      "gae_w01": {
+        "hi": 1065147.45,
+        "lo": 1030038.0000000001,
+        "mean": 1048942.1666666667
+      },
+      "gae_w01_over_rho": {
+        "hi": 2.6069984696471153,
+        "lo": 1.3748071583591515,
+        "ratio": 1.8000963708153568
+      },
+      "gae_w0_over_rho": {
+        "hi": 0.08462698013910559,
+        "lo": 0.04392339310098744,
+        "ratio": 0.05809818002555156
+      },
+      "gae_w1": {
+        "hi": 10373280.666666666,
+        "lo": 10026780.0,
+        "mean": 10212409.166666666
+      },
+      "gae_w1_over_rho": {
+        "hi": 13.964135602851103,
+        "lo": 7.365561681868048,
+        "ratio": 9.642189371608483
+      },
+      "mean_candidates": 29374.833333333332,
+      "mean_cantor_inv": 153861.5,
+      "mean_cantor_mul": 6771250.666666667,
+      "mean_core_cols": 1353.3333333333333,
+      "mean_fb_cols": 1628.0,
+      "mean_group_ops": 30779.166666666668,
+      "mean_la_add": 30974616.0,
+      "mean_la_mul": 4042791.0,
+      "mean_ln_r": 26.16690972767287,
+      "mean_prefilter_rejects": 14704.833333333334,
+      "mean_rel_mul": 6138839.0,
+      "mean_relations": 3874.0,
+      "mean_splits": 4981.0,
+      "mean_steps": 0.0,
+      "mean_trials": 29378.0,
+      "mean_wall_ns": 1798360036.5,
+      "p": 8209,
+      "runs": 6,
+      "split_fraction": 0.16956691952862143,
+      "split_fraction_times_g_factorial": 1.0174015171717286,
+      "trials": {
+        "hi": 30104.5,
+        "lo": 28914.666666666668,
+        "mean": 29378.0
+      }
+    },
+    {
+      "arm": "R_rho_neg",
+      "curves": 3,
+      "family": "hyperelliptic",
+      "fpm_high": {
+        "hi": 251698338.0,
+        "lo": 132778219.0,
+        "mean": 195480349.5
+      },
+      "fpm_low": {
+        "hi": 152811818.0,
+        "lo": 80613961.5,
+        "mean": 118680944.83333333
+      },
+      "fpm_mid": {
+        "hi": 183500738.0,
+        "lo": 96802869.0,
+        "mean": 142515242.83333334
+      },
+      "g": 3,
+      "gae_w0": {
+        "hi": 682144.0,
+        "lo": 359841.8333333333,
+        "mean": 529778.5
+      },
+      "gae_w01": {
+        "hi": 750316.0,
+        "lo": 395784.4166666667,
+        "mean": 582714.4500000001
+      },
+      "gae_w1": {
+        "hi": 1363864.0,
+        "lo": 719267.6666666666,
+        "mean": 1059138.0
+      },
+      "mean_candidates": 0.0,
+      "mean_cantor_inv": 2648255.3333333335,
+      "mean_cantor_mul": 116032689.5,
+      "mean_core_cols": 0.0,
+      "mean_fb_cols": 0.0,
+      "mean_group_ops": 529778.5,
+      "mean_la_add": 0.0,
+      "mean_la_mul": 0.0,
+      "mean_ln_r": 26.16690972767287,
+      "mean_prefilter_rejects": 0.0,
+      "mean_rel_mul": 0.0,
+      "mean_relations": 0.0,
+      "mean_splits": 0.0,
+      "mean_steps": 510982.8333333333,
+      "mean_trials": 0.0,
+      "mean_wall_ns": 1200636543.1666667,
+      "p": 8209,
+      "runs": 6,
+      "trials": {
+        "hi": 0.0,
+        "lo": 0.0,
+        "mean": 0.0
+      }
+    },
+    {
+      "arm": "C_double_lp+pre",
+      "band_fpm": "unresolved",
+      "band_gae": "unresolved",
+      "curves": 3,
+      "family": "hyperelliptic",
+      "fpm_high": {
+        "hi": 604351020.6666666,
+        "lo": 587978322.6666666,
+        "mean": 595479973.6666666
+      },
+      "fpm_high_over_rho": {
+        "hi": 2.873051598997067,
+        "lo": 1.0117237481579218,
+        "ratio": 1.5039362648411236
+      },
+      "fpm_low": {
+        "hi": 93428585.5,
+        "lo": 91432812.0,
+        "mean": 92300249.66666667
+      },
+      "fpm_low_over_rho": {
+        "hi": 0.7344582047198673,
+        "lo": 0.2587169418920135,
+        "ratio": 0.38397591976899637
+      },
+      "fpm_mid": {
+        "hi": 597443499.3333334,
+        "lo": 581125956.0,
+        "mean": 588603253.6666666
+      },
+      "fpm_mid_over_rho": {
+        "hi": 3.8951551021068775,
+        "lo": 1.3716186589735937,
+        "ratio": 2.0390896863409163
+      },
+      "g": 3,
+      "gae_w0": {
+        "hi": 69325.83333333333,
+        "lo": 68369.0,
+        "mean": 68775.0
+      },
+      "gae_w01": {
+        "hi": 7856957.216666668,
+        "lo": 7668251.083333333,
+        "mean": 7752837.216666668
+      },
+      "gae_w01_over_rho": {
+        "hi": 12.558052207382362,
+        "lo": 4.421150481381356,
+        "ratio": 6.568843933895183
+      },
+      "gae_w0_over_rho": {
+        "hi": 0.12299094570468985,
+        "lo": 0.04342834913859344,
+        "ratio": 0.06409674920051868
+      },
+      "gae_w1": {
+        "hi": 77946952.16666667,
+        "lo": 76061294.83333333,
+        "mean": 76909397.16666667
+      },
+      "gae_w1_over_rho": {
+        "hi": 68.53681700030519,
+        "lo": 24.12354424569642,
+        "ratio": 35.845974901095765
+      },
+      "mean_candidates": 66311.83333333333,
+      "mean_cantor_inv": 343836.0,
+      "mean_cantor_mul": 15115791.5,
+      "mean_core_cols": 2206.0,
+      "mean_fb_cols": 2584.0,
+      "mean_group_ops": 68775.0,
+      "mean_la_add": 222258496.16666666,
+      "mean_la_mul": 61651060.0,
+      "mean_ln_r": 27.271902196476955,
+      "mean_prefilter_rejects": 33158.166666666664,
+      "mean_rel_mul": 15189562.166666666,
+      "mean_relations": 7520.333333333333,
+      "mean_splits": 11114.5,
+      "mean_steps": 0.0,
+      "mean_trials": 66316.33333333333,
+      "mean_wall_ns": 8444795689.0,
+      "p": 16411,
+      "runs": 6,
+      "split_fraction": 0.16760960210721565,
+      "split_fraction_times_g_factorial": 1.005657612643294,
+      "trials": {
+        "hi": 66860.0,
+        "lo": 65945.0,
+        "mean": 66316.33333333333
+      }
+    },
+    {
+      "arm": "C_double_lp+pre+sge(8,3)",
+      "band_fpm": "below",
+      "band_gae": "unresolved",
+      "curves": 3,
+      "family": "hyperelliptic",
+      "fpm_high": {
+        "hi": 158538825.83333334,
+        "lo": 152502973.33333334,
+        "mean": 155474475.16666666
+      },
+      "fpm_high_over_rho": {
+        "hi": 0.7423238623571385,
+        "lo": 0.26400459014176075,
+        "ratio": 0.39266425707068153
+      },
+      "fpm_low": {
+        "hi": 43894545.333333336,
+        "lo": 42963142.0,
+        "mean": 43410749.833333336
+      },
+      "fpm_low_over_rho": {
+        "hi": 0.3444993441307595,
+        "lo": 0.12068204182893108,
+        "ratio": 0.18059195565898564
+      },
+      "fpm_mid": {
+        "hi": 151575582.5,
+        "lo": 145650066.66666666,
+        "mean": 148597755.16666666
+      },
+      "fpm_mid_over_rho": {
+        "hi": 0.9725092112020278,
+        "lo": 0.34609217815075033,
+        "ratio": 0.5147850408339021
+      },
+      "g": 3,
+      "gae_w0": {
+        "hi": 69332.33333333333,
+        "lo": 68369.0,
+        "mean": 68775.0
+      },
+      "gae_w01": {
+        "hi": 2904152.1666666665,
+        "lo": 2825559.733333334,
+        "mean": 2863887.233333334
+      },
+      "gae_w01_over_rho": {
+        "hi": 4.615245550474789,
+        "lo": 1.6269833758107117,
+        "ratio": 2.426521769294923
+      },
+      "gae_w0_over_rho": {
+        "hi": 0.12299094570468985,
+        "lo": 0.04258298274418047,
+        "ratio": 0.06409674920051868
+      },
+      "gae_w1": {
+        "hi": 28414755.666666668,
+        "lo": 27637668.833333332,
+        "mean": 28019897.333333332
+      },
+      "gae_w1_over_rho": {
+        "hi": 24.83797373962588,
+        "lo": 8.757871496634916,
+        "ratio": 13.05952944040581
+      },
+      "mean_candidates": 66311.83333333333,
+      "mean_cantor_inv": 343836.0,
+      "mean_cantor_mul": 15115791.5,
+      "mean_core_cols": 2206.0,
+      "mean_fb_cols": 2584.0,
+      "mean_group_ops": 68775.0,
+      "mean_la_add": 104935103.0,
+      "mean_la_mul": 12761560.166666666,
+      "mean_ln_r": 27.271902196476955,
+      "mean_prefilter_rejects": 33158.166666666664,
+      "mean_rel_mul": 15189562.166666666,
+      "mean_relations": 7520.333333333333,
+      "mean_splits": 11114.5,
+      "mean_steps": 0.0,
+      "mean_trials": 66316.33333333333,
+      "mean_wall_ns": 3581595176.8333335,
+      "p": 16411,
+      "runs": 6,
+      "split_fraction": 0.16760960210721565,
+      "split_fraction_times_g_factorial": 1.005657612643294,
+      "trials": {
+        "hi": 66867.66666666667,
+        "lo": 65945.0,
+        "mean": 66316.33333333333
+      }
+    },
+    {
+      "arm": "R_rho_neg",
+      "curves": 3,
+      "family": "hyperelliptic",
+      "fpm_high": {
+        "hi": 587497693.3333334,
+        "lo": 205942633.33333334,
+        "mean": 395947612.6666667
+      },
+      "fpm_low": {
+        "hi": 356669245.0,
+        "lo": 125029622.16666667,
+        "mean": 240380307.5
+      },
+      "fpm_mid": {
+        "hi": 428305660.0,
+        "lo": 150140556.66666666,
+        "mean": 288659816.0
+      },
+      "g": 3,
+      "gae_w0": {
+        "hi": 1592086.0,
+        "lo": 558077.6666666666,
+        "mean": 1072987.3333333333
+      },
+      "gae_w01": {
+        "hi": 1751251.866666667,
+        "lo": 613843.5833333334,
+        "mean": 1180243.7833333334
+      },
+      "gae_w1": {
+        "hi": 3183744.6666666665,
+        "lo": 1115736.8333333333,
+        "mean": 2145551.8333333335
+      },
+      "mean_candidates": 0.0,
+      "mean_cantor_inv": 5364389.833333333,
+      "mean_cantor_mul": 235015917.66666666,
+      "mean_core_cols": 0.0,
+      "mean_fb_cols": 0.0,
+      "mean_group_ops": 1072987.3333333333,
+      "mean_la_add": 0.0,
+      "mean_la_mul": 0.0,
+      "mean_ln_r": 27.271902196476955,
+      "mean_prefilter_rejects": 0.0,
+      "mean_rel_mul": 0.0,
+      "mean_relations": 0.0,
+      "mean_splits": 0.0,
+      "mean_steps": 1035915.0,
+      "mean_trials": 0.0,
+      "mean_wall_ns": 2360887808.3333335,
+      "p": 16411,
+      "runs": 6,
+      "trials": {
+        "hi": 0.0,
+        "lo": 0.0,
+        "mean": 0.0
+      }
+    }
+  ],
+  "config": {
+    "arms": "c",
+    "cc": 4.0,
+    "curves": 3,
+    "genera": [
+      3
+    ],
+    "kind": "config",
+    "max_h": 8,
+    "max_trials": 200000000,
+    "primes": [
+      8209,
+      16411
+    ],
+    "qc": 3.0,
+    "quartic": false,
+    "restart": 4096,
+    "rho_cap": 30000000.0,
+    "seed_search": 600,
+    "seeds": 2,
+    "sge": [
+      {
+        "fill_max": 3.0,
+        "w_max": 8
+      }
+    ],
+    "smith": false,
+    "smith_census": 0,
+    "threads": 1
+  },
+  "fits": [],
+  "input": "raw/comb_g3_cc4.0.jsonl",
+  "instances": [
+    {
+      "curve_seed": 6,
+      "f": [
+        1440,
+        1065,
+        3206,
+        277,
+        1857,
+        3022,
+        3494,
+        1
+      ],
+      "family": "hyperelliptic",
+      "g": 3,
+      "h": 7,
+      "kind": "instance",
+      "order": 555230990923,
+      "p": 8209,
+      "r": 79318712989
+    },
+    {
+      "curve_seed": 18,
+      "f": [
+        1811,
+        1336,
+        2824,
+        1677,
+        4947,
+        5907,
+        7847,
+        1
+      ],
+      "family": "hyperelliptic",
+      "g": 3,
+      "h": 2,
+      "kind": "instance",
+      "order": 565731006998,
+      "p": 8209,
+      "r": 282865503499
+    },
+    {
+      "curve_seed": 23,
+      "f": [
+        5385,
+        4033,
+        3946,
+        2382,
+        6934,
+        7175,
+        632,
+        1
+      ],
+      "family": "hyperelliptic",
+      "g": 3,
+      "h": 1,
+      "kind": "instance",
+      "order": 551414095951,
+      "p": 8209,
+      "r": 551414095951
+    },
+    {
+      "curve_seed": 8,
+      "f": [
+        12406,
+        10315,
+        13501,
+        10284,
+        2264,
+        16151,
+        13670,
+        1
+      ],
+      "family": "hyperelliptic",
+      "g": 3,
+      "h": 8,
+      "kind": "instance",
+      "order": 4399005088936,
+      "p": 16411,
+      "r": 549875636117
+    },
+    {
+      "curve_seed": 27,
+      "f": [
+        13521,
+        9805,
+        9123,
+        9734,
+        7954,
+        7911,
+        14123,
+        1
+      ],
+      "family": "hyperelliptic",
+      "g": 3,
+      "h": 4,
+      "kind": "instance",
+      "order": 4437372770956,
+      "p": 16411,
+      "r": 1109343192739
+    },
+    {
+      "curve_seed": 43,
+      "f": [
+        3002,
+        453,
+        12720,
+        15358,
+        15470,
+        3930,
+        8004,
+        1
+      ],
+      "family": "hyperelliptic",
+      "g": 3,
+      "h": 8,
+      "kind": "instance",
+      "order": 4465493809576,
+      "p": 16411,
+      "r": 558186726197
+    }
+  ],
+  "not_certified": [],
+  "prefilter": [],
+  "readings": [
+    "gae_w0",
+    "gae_w01",
+    "gae_w1",
+    "fpm_low",
+    "fpm_mid",
+    "fpm_high",
+    "trials"
+  ],
+  "runs_not_certified": 0,
+  "runs_total": 36,
+  "schema": "genus_ladder.analysis/v1",
+  "skipped": [],
+  "smith_admitted": [],
+  "smith_census": [],
+  "smooth_model": []
+}

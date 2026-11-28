@@ -1,0 +1,3 @@
+# Degree-32 replication instance-window extension — 2026-11-23
+
+CLI seeds 20261129..20261140 produced no exact size match; their immutable store remains a censored size-search window. Continue in a new append-only store with seeds 20261141..20261180, in ascending order, under the otherwise unchanged degree-32 replication protocol. Select the first instance where the below-32 interval and ordinary t5 auxiliary seed 5 have exactly equal lifting-abscissa counts. No performance output is observed before selection. If a match exists, run the same interval/candidate/candidate/interval mirrored panel and unchanged robust component gate. Do not pool the size-only preflight rows as performance evidence.

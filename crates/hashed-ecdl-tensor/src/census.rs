@@ -696,6 +696,10 @@ pub fn rewire_functional_definitions_capped(
             return Err(integrity("rewiring input signal overflow"));
         }
     }
+    // Rewired checks may compare one definition's outputs with another's, so
+    // none is implied by its definition any more.
+    program.implied.clear();
+    program.implied_vertices = None;
     for (step, updated_ports) in check_updates {
         let Step::Check { ports, .. } = &mut program.steps[step] else {
             return Err(integrity("rewiring check-step identity"));

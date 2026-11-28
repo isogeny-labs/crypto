@@ -1,0 +1,3 @@
+# Degree-16 replication harness correction — 2026-11-23 11:54 PST
+
+The first replication store ran a literal `prime-isogeny:t=3` candidate, yielding four abscissae against the six-abscissa t=4 interval. Its verdict was invalid/incomplete. Preserve it unchanged. Correct only the candidate command to `prime-isogeny:t=4,seed=1,aux=ordinary` and add an early six-abscissa check. Rerun the original frozen 128 target seeds 20261241–20261368 from cold into `replication_height4_seed1_corrected.jsonl`. The binary, instance, m=2 F4 configuration, budgets, primary ratio-of-sums estimator, bootstrap RNG seed and pass gate from `PROTOCOL_F4_HEIGHT4_REPLICATION_20261123.md` remain unchanged. This is a correction of a protocol violation, not a new target selection.

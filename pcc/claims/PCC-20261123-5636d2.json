@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T16:16:26Z",
+ "id": "PCC-20261123-5636d2",
+ "kind": "statement",
+ "producer": {
+  "commit": "f6d3fbc14d8e8c7497c9ded8fad960d11ccddd54",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cm19_hermitian_20261123/maintenance/PR5007_FIRST_CI.json",
+    "sha256": "7ac91a7f69c330903df22beed215e0f3967102e87419bdf863d2422a179afa7b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cm19_hermitian_20261123/maintenance/PR4990_UNCHANGED_CI.json",
+    "sha256": "21416b6119e6d167ea4a11da305929afd9f8d99a2d3cecacbcbb5310e19b7959"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cm19_hermitian_20261123/maintenance/MAIN_JOURNAL_RECONCILIATION.json",
+    "sha256": "ebb035ae0036e3cb582e7309d528d7d489774cf561a5d0527b9be2ec5300f1b3"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Unsigned CI/metadata only; no source replay, rerun, verifier/lock/gate/policy edit or merge waiver. Both ready source/finite lanes held by normal gates.",
+ "statement": "Scheduled source-bound CI inventory:5007 head38b108be has24 all-attempt checks/21 all-event runs and4 failed gates with full decoded logs retained; existing tools/workflows unchanged from base. Root4990 unchanged49 checks/36 runs exceeds30 cap. New-main journal maximum complete normalized-block multiplicities retained."
+}

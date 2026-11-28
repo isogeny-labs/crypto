@@ -1,0 +1,646 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXP-ROOTFIND-PRODUCTION-PANEL-20261126",
+  "version": 1,
+  "created": "2026-11-26",
+  "repository": "crypto",
+  "study_dir": "research/rootfind_production_panel_20261126",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "ecbench_spec": "research/rootfind_production_panel_20261126/p31-production-panel.json",
+    "diagnostic_instrument": "examples/rootfind_production_panel.rs",
+    "analysis": "research/rootfind_production_panel_20261126/analyze.py",
+    "production_floor": "src/cryptanalysis/ic_framework/rootfind_floor.rs",
+    "semantic_proof": "papers/rootfinding-decomposition/lean/PointDecompositionSAT.lean",
+    "prior_protocol": "research/rootfind_baseline_100x_20261117/PROTOCOL.md"
+  },
+  "question": "Can a versioned production batch decomposition path recover the same point-decomposition witnesses and full IC answers while delivering at least a 50x paired wall-time speedup over legacy rootfind-mitm and no regression versus rootfind-subtract on the frozen ordinary p31 curve?",
+  "claims": [
+    {
+      "id": "production-speedup",
+      "text": "On the frozen ordinary p31 workload, the versioned production batch arm is at least 50x faster than legacy rootfind-mitm in paired full-pipeline L2 wall time and is faster than rootfind-subtract outside the matched A/A noise band.",
+      "class": "comparative",
+      "decided_by": [
+        "batch-vs-legacy",
+        "batch-vs-subtract"
+      ],
+      "if_supported": "The 50x engineering goal is met for this frozen p31 production workload only.",
+      "if_not_supported": "The 50x goal is not met; report the observed ratio and continue optimization without widening the claim."
+    },
+    {
+      "id": "witness-accounting-parity",
+      "text": "Every admitted candidate row independently verifies the recovered ECDLP answer, the versioned arm reports honest batch-call/target/unused counters, and the preflight integration suite establishes scalar/batch witness and charged-work parity on a real prime-field curve.",
+      "class": "exact_computation",
+      "decided_by": [
+        "candidate-correctness"
+      ]
+    },
+    {
+      "id": "p61-scope",
+      "text": "The p61 oracle panel is a full-width diagnostic control, not an admitted end-to-end IC speed claim; a p61 full pipeline at the frozen factor-base scale is outside scope.",
+      "class": "out_of_scope",
+      "decided_by": []
+    },
+    {
+      "id": "lean-scope",
+      "text": "The Lean declarations prove only the semantic finite-domain direct-subtraction refinement and do not verify Rust, IFMA, Bloom filters, accounting, CNF compilation, or a SAT solver implementation.",
+      "class": "theorem",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "Eight-target shared-inversion decomposition reduces native point-decomposition work enough to exceed the legacy MITM table/probe path by 50x without losing the incumbent subtract path on the frozen p31 production pipeline.",
+      "mechanism": "The versioned batch arm amortizes inversion and uses a lane kernel while preserving target order, witness verification and an honestly charged post-hit full sweep.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "full-pipeline-speedup",
+          "direction": "higher",
+          "minimum_effect": "median paired legacy wall_ns / batch wall_ns >= 50.0",
+          "provenance": {
+            "written_at": "2026-11-26",
+            "first_recorded_in": "research/rootfind_baseline_100x_20261117/PLAN.md",
+            "data_seen": [
+              {
+                "path": "research/rootfind_baseline_100x_20261117/RESULTS.md",
+                "measured": "Historical prototype and production measurements were read; they are shared-host [pcc:unverified] and not part of this sample."
+              }
+            ],
+            "sample_status": "partially_in_sample",
+            "decisive_scope": "Only the new EKS L2 rows are decisive; all prior timing is calibration context."
+          },
+          "role": "calibration"
+        },
+        {
+          "id": "P2",
+          "metric": "full-pipeline-speedup-vs-subtract",
+          "direction": "higher",
+          "minimum_effect": "median paired subtract wall_ns / batch wall_ns strictly exceeds max_i max(legacy_i/legacy_aa_i, legacy_aa_i/legacy_i)",
+          "provenance": {
+            "written_at": "2026-11-26",
+            "first_recorded_in": "research/rootfind_production_panel_20261126/protocol.json",
+            "data_seen": [],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "Frozen p31 EKS L2 rows only."
+          },
+          "role": "decisive"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "legacy-mitm",
+      "role": "reference",
+      "description": "Full production ic.pipeline with rootfind-mitm:m=3.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "292dc39e16bb716d364375e841fc04733ec2c4ba",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "target_cpu": "x86-64",
+          "factor_base": "prime-abscissa:size=640",
+          "target_source": "walk-prime-batch-8"
+        },
+        "env": {},
+        "image_digest": null
+      },
+      "parameters": {
+        "oracle": "rootfind-mitm:m=3"
+      }
+    },
+    {
+      "id": "subtract-scalar",
+      "role": "baseline",
+      "description": "Full production ic.pipeline with the rootfind-subtract:m=3 incumbent.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "292dc39e16bb716d364375e841fc04733ec2c4ba",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "target_cpu": "x86-64",
+          "factor_base": "prime-abscissa:size=640",
+          "target_source": "walk-prime-batch-8"
+        },
+        "env": {},
+        "image_digest": null
+      },
+      "parameters": {
+        "oracle": "rootfind-subtract:m=3"
+      }
+    },
+    {
+      "id": "floor-scalar",
+      "role": "candidate",
+      "description": "Current scalar full production ic.pipeline baseline with rootfind-floor:m=3.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "292dc39e16bb716d364375e841fc04733ec2c4ba",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "target_cpu": "x86-64",
+          "factor_base": "prime-abscissa:size=640",
+          "target_source": "walk-prime-batch-8"
+        },
+        "env": {},
+        "image_digest": null
+      },
+      "parameters": {
+        "oracle": "rootfind-floor:m=3"
+      }
+    },
+    {
+      "id": "floor-batch-v1",
+      "role": "candidate",
+      "description": "Implemented versioned production eight-target identity; historical rootfind-floor remains scalar.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "292dc39e16bb716d364375e841fc04733ec2c4ba",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "target_cpu": "x86-64",
+          "factor_base": "prime-abscissa:size=640",
+          "target_source": "walk-prime-batch-8"
+        },
+        "env": {},
+        "image_digest": null
+      },
+      "parameters": {
+        "oracle": "rootfind-floor-batch-v1:m=3"
+      }
+    },
+    {
+      "id": "legacy-mitm-aa",
+      "role": "control_aa",
+      "description": "Byte-identical duplicate of the legacy MITM reference; order is the nuisance factor.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "292dc39e16bb716d364375e841fc04733ec2c4ba",
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "target_cpu": "x86-64",
+          "factor_base": "prime-abscissa:size=640",
+          "target_source": "walk-prime-batch-8"
+        },
+        "env": {},
+        "image_digest": null
+      },
+      "parameters": {
+        "oracle": "rootfind-mitm:m=3"
+      },
+      "same_instrument_as": "legacy-mitm"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "legacy-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Each production row is a known public ECDLP target with mandatory independent [d]G=Q verification; no absence/detector claim is made."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "The production claim never treats a decomposition miss as evidence; reference-negative diagnostics are outside this EKS protocol."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "oracle",
+        "levels": [
+          "rootfind-mitm:m=3",
+          "rootfind-subtract:m=3",
+          "rootfind-floor:m=3",
+          "rootfind-floor-batch-v1:m=3"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "how": "All five ecbench arms use one exact source revision, binary digest, build flags and one thread."
+      },
+      {
+        "name": "arm order",
+        "treatment": "randomized",
+        "how": "ecbench uses the frozen alternate_measured order so each arm occupies multiple order positions."
+      },
+      {
+        "name": "target inputs",
+        "treatment": "fixed",
+        "how": "Each comparison receives the same public target stream and seeds."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Accepted rows record EKS worker, CPU, isolation, scheduler, steal and pressure facts."
+      },
+      {
+        "name": "cache and layout",
+        "treatment": "randomized",
+        "how": "Every measured ecbench round is a fresh process/arm execution under the native harness."
+      },
+      {
+        "name": "factor-base size",
+        "treatment": "fixed",
+        "how": "Every accepted p31 production arm uses the same 640-abscissa factor base."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Analysis is unblinded because method identities are explicit; all raw samples and unfavorable rows are retained."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "batch-vs-legacy",
+        "arms": [
+          "legacy-mitm",
+          "floor-batch-v1"
+        ],
+        "differs_in": [
+          "oracle"
+        ],
+        "design": "one_factor",
+        "threshold": "median paired reference/candidate full-pipeline wall ratio >= 50.0"
+      },
+      {
+        "id": "batch-vs-subtract",
+        "arms": [
+          "subtract-scalar",
+          "floor-batch-v1"
+        ],
+        "differs_in": [
+          "oracle"
+        ],
+        "design": "one_factor",
+        "threshold": "median paired reference/candidate ratio strictly exceeds max_i max(legacy_i/legacy_aa_i, legacy_aa_i/legacy_i)"
+      },
+      {
+        "id": "scalar-baseline",
+        "arms": [
+          "legacy-mitm",
+          "subtract-scalar",
+          "floor-scalar"
+        ],
+        "differs_in": [
+          "oracle"
+        ],
+        "design": "one_factor",
+        "threshold": "report all paired ratios; this comparison cannot satisfy the batch claim"
+      },
+      {
+        "id": "legacy-aa",
+        "arms": [
+          "legacy-mitm",
+          "legacy-mitm-aa"
+        ],
+        "differs_in": [
+          "arm order"
+        ],
+        "design": "aa",
+        "threshold": "calibration only; the observed paired ratio range is the session noise floor"
+      },
+      {
+        "id": "candidate-correctness",
+        "arms": [
+          "floor-scalar",
+          "floor-batch-v1"
+        ],
+        "differs_in": [
+          "oracle"
+        ],
+        "design": "one_factor",
+        "reason": "Exact ECDLP verification and batch-ledger checks are evaluated per production row and are not collapsed into a speed comparison."
+      }
+    ],
+    "crosses_map": false,
+    "transfer_obligations": [
+      {
+        "source": "p31 accepted production run",
+        "destination": "p61",
+        "obligation": "No transfer is claimed. p61 remains a full-width scalar diagnostic until a dedicated admitted microbenchmark contract exists."
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "The accepted spec uses alternate_measured, placing each production arm in multiple order positions.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "nonce": null,
+      "note": "ecbench uses measurement seed 59297, measured-index algorithm seeds and target seed 20261126."
+    },
+    "instance_sampling": {
+      "rule": "The accepted workload is the single frozen explicit p31 curve for every arm.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Method labels remain visible; the fixed thresholds, raw-sample retention and frozen analysis definitions constrain analyst discretion.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 6,
+    "warmups": 1,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 2,
+      "correction": "other",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": false,
+      "note": "Six paired L2 rounds are the fixed EKS design and exceed the native five-round admission minimum. No significance or power claim is made: the preregistered decision is descriptive threshold arithmetic, and the bootstrap interval is descriptive only."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 300,
+      "per_sample_seconds": 120,
+      "threads": 1,
+      "estimated_total_seconds": 4500,
+      "measured_on": "Conservative workflow and provisioning estimate based on the frozen per-method timeout; no affected p31 production-panel run was inspected before this draft."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "full-pipeline-speedup",
+        "name": "Paired full-pipeline speedup versus legacy MITM",
+        "unit": "ratio",
+        "kind": "derived",
+        "definition": "Within each measured EKS round, legacy-mitm method_call_wall_ns divided by floor-batch-v1 method_call_wall_ns; warmup excluded; complete verified rows only; no ratio of independent medians.",
+        "source": "ecbench measured records time.method_call_wall_ns",
+        "formula": "legacy_mitm_wall_ns / floor_batch_v1_wall_ns",
+        "aggregation": "paired_ratio",
+        "resolution": "one nanosecond in each source clock",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "full-pipeline-speedup-vs-subtract",
+        "name": "Paired full-pipeline speedup versus subtract",
+        "unit": "ratio",
+        "kind": "derived",
+        "definition": "Within each measured EKS round, subtract-scalar method_call_wall_ns divided by floor-batch-v1 method_call_wall_ns; warmup excluded; complete verified rows only.",
+        "source": "ecbench measured records time.method_call_wall_ns",
+        "formula": "subtract_scalar_wall_ns / floor_batch_v1_wall_ns",
+        "aggregation": "paired_ratio",
+        "resolution": "one nanosecond in each source clock",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "method-wall-ns",
+        "name": "Full method wall time",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "Wall time from ecbench method entry through verified method return for one arm/workload row.",
+        "source": "ecbench record time.method_call_wall_ns",
+        "formula": null,
+        "aggregation": "distribution",
+        "resolution": "one nanosecond",
+        "uncertainty": "range"
+      },
+      {
+        "id": "counted-total-gae",
+        "name": "Counted pipeline group-addition equivalents",
+        "unit": "gae",
+        "kind": "counted",
+        "definition": "All priced counted group operations across factor base, oracle setup, relations, linear algebra and verification; native unpriced counters remain separately disclosed.",
+        "source": "ecbench record cost.total_gae",
+        "formula": null,
+        "aggregation": "distribution",
+        "resolution": "one counted operation before pricing",
+        "uncertainty": "range"
+      },
+      {
+        "id": "correctness-ledger",
+        "name": "Witness and ledger validation",
+        "unit": "boolean",
+        "kind": "exact",
+        "definition": "Every production row verifies [d]G=Q; the batch arm alone emits preferred/actual-width, call, target and unused-work counters satisfying the frozen analyzer's structural checks.",
+        "source": "native ecbench audit and relations-phase native counters",
+        "formula": null,
+        "aggregation": "per_row",
+        "resolution": "exact pass/fail",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "monotonic",
+    "counters": [
+      "total_gae",
+      "relations.trials",
+      "relations.inversions",
+      "group additions",
+      "field multiplications",
+      "oracle native counters",
+      "oracle_batch_preferred_width",
+      "oracle_batch_max_targets",
+      "oracle_batch_calls",
+      "oracle_batch_targets",
+      "oracle_batch_unused_results",
+      "oracle_batch_unused_guarded_trials",
+      "verification status"
+    ],
+    "record": [
+      "source commit, ecbench SHA-256, OCI image digest and spec SHA-256",
+      "Job and Pod UIDs plus S3 results URI and payload hashes",
+      "CPU model, CPU flags, kernel, governor, SMT, NUMA, affinity and run CPU",
+      "isolation level and blockers, steal, PSI, foreign busy ticks and scheduler observations",
+      "arm order, measured round, target and algorithm seeds, exit status and rusage",
+      "factor-base identity, curve identity, witness/cost records and replay/audit verdicts"
+    ],
+    "timed_primary_justification": "The optimization changes native field arithmetic, batched inversion and SIMD work that group-operation counts do not price comparably. Only L2 rows admitted by the native replay and A/A gate may support the paired clock ratios."
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "isolab cpu-l2-spot",
+    "placement": {
+      "accepted_instance_type": "c8a.2xlarge",
+      "accepted_cpu_request": 4,
+      "accepted_memory": "4Gi",
+      "concurrency": 1,
+      "spot_only": true,
+      "on_demand_fallback": false,
+      "cost_ceiling_usd": 8,
+      "daily_shared_allowance_usd": 200,
+      "absolute_deadline_seconds": 4800
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 4800,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Run exactly one warmup and six measured rounds for every accepted arm; do not stop early for a favorable ratio.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "A correctness failure, replay failure, any row below L2, A/A rejection, source/build mismatch, timeout or nonzero exit makes the experiment unsuccessful and is retained; it is not retried as a measurement.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "Do not launch if Git publication, checkpoint, pool, budget or benchmark-record gates fail or if the remaining daily/monthly cost allowance is unknown.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Support the production-speedup claim only if every candidate row verifies, the EKS result passes native all-record L2/replay/A-A/S3 admission, median paired legacy/batch speedup is at least 50.0 and strictly exceeds the symmetric A/A upper bound, and median paired subtract/batch speedup strictly exceeds that same bound. The symmetric bound is max_i max(legacy_i/legacy_aa_i, legacy_aa_i/legacy_i). Otherwise report the goal as unmet at the observed scope.",
+    "comparison_ids": [
+      "batch-vs-legacy",
+      "batch-vs-subtract"
+    ],
+    "threshold": "legacy/batch median >= 50.0 and > symmetric A/A upper bound; subtract/batch median > the same bound; exact correctness",
+    "statistic": "Median of within-round paired ratios, with all raw pairs retained; paired bootstrap CI95 is descriptive at fixed N=6.",
+    "interval": "Paired bootstrap 95% interval plus the empirical legacy/legacy A/A ratio range.",
+    "multiple_comparison_correction": "other",
+    "effect_size_measure": "Reference wall_ns divided by candidate wall_ns; values above one favor the candidate.",
+    "verdict_vocabulary": [
+      "goal_met",
+      "goal_not_met",
+      "invalid",
+      "censored",
+      "out_of_scope"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/rootfind_production_panel_20261126/analyze.py",
+      "sha256": "dd6cda0f901f97b118667e26be076a43635fcfe3cdeed5bace22ac31018f5698"
+    },
+    "inputs": [
+      "complete native ecbench records.jsonl (input to analyze.py)",
+      "native audit/replay/A-A admission receipt (external mandatory final-verdict gate)",
+      "isolab source/build/image/spec receipt and S3 SHA256SUMS (external mandatory final-verdict gate)"
+    ],
+    "outputs": [
+      "bench.record/v1",
+      "VALIDATION.json",
+      "rootfind-production-analysis/v1 with every raw paired ratio and a timing-only threshold verdict"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "A standalone shared-host or command-Job diagnostic timing is not accepted EKS L2 evidence.",
+    "A p61 diagnostic is not a p61 end-to-end IC speedup claim.",
+    "A reference-negative target is not a completeness-certified unsatisfiable target.",
+    "A ratio of independent medians, best-of repeat, favorable seed, truncated row set or changed hit/miss mix is not a paired speedup.",
+    "Changing seeds, rounds, factor-base size, accounting, identity, unit, timeout or decision threshold after reading affected data is forbidden without a prospective amendment.",
+    "The historical four-thread prototype comparison and all shared-host numbers remain [pcc:unverified].",
+    "The semantic Lean theorem cannot be presented as verification of the Rust implementation, SIMD arithmetic, accounting, compiler, CNF generator or SAT solver."
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "12e5d3b12dea5e8bd6db5295edb1ad319f6759d6bba1a5965fab035e36e10302",
+    "commit": "292dc39e16bb716d364375e841fc04733ec2c4ba",
+    "frozen_at": "2026-11-26T08:32:59Z",
+    "filed_before_affected_data": true
+  }
+}

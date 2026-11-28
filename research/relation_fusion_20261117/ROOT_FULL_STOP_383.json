@@ -1,0 +1,16 @@
+{
+  "schema": "root-full-unit-evidence-directed-stop/v1",
+  "recorded_utc": "2026-11-23T12:41:32.987270+00:00",
+  "source": "ROOT_UNIT_SOURCE_348.json",
+  "plan": "ROOT_FULL_PLAN_380.json",
+  "reason": "At least two reported failures already falsify full-suite pass criterion. Stop expensive remainder and obtain exact failures directly; retain incomplete full run, never label pass.",
+  "observed_failures_before_stop": [
+    "cryptanalysis::binary_radical_root::tests::factored_subspace_oracle_decides_as_subspace_oracle",
+    "cryptanalysis::curve_id::tests::the_binary_search_agrees_with_the_map"
+  ],
+  "failure_thresholds_or_inputs_changed": false,
+  "all_raw_output_preserved": true,
+  "performance_observations_collected": 0,
+  "action": "SIGTERM owned processgroup after source/executable identity check",
+  "pid": 53880
+}

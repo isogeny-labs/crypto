@@ -1,0 +1,36 @@
+name: CT119 invariant-field root-exclusion control
+on:
+  push:
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct119/**'
+      - '.github/workflows/ct119-invariant-field-gate.yml'
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'research/cross_characteristic_global_torsion_20261112/ct119/**'
+      - '.github/workflows/ct119-invariant-field-gate.yml'
+  workflow_dispatch:
+jobs:
+  ct119:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          sparse-checkout: |
+            research/cross_characteristic_global_torsion_20261112/ct119
+      - name: Independently check source split and binary invariant-root exclusions
+        shell: bash
+        run: |
+          set -euo pipefail
+          D=research/cross_characteristic_global_torsion_20261112/ct119
+          python3 -B "$D/ct119_invariant_gate.py" >/tmp/ct119-py.json
+          python3 -O -B "$D/ct119_invariant_gate.py" >/tmp/ct119-pyo.json
+          node "$D/ct119_invariant_gate_independent.js" >/tmp/ct119-js.json
+          node --no-opt "$D/ct119_invariant_gate_independent.js" >/tmp/ct119-jso.json
+          cmp /tmp/ct119-py.json /tmp/ct119-pyo.json
+          cmp /tmp/ct119-py.json /tmp/ct119-js.json
+          cmp /tmp/ct119-py.json /tmp/ct119-jso.json
+          printf '%s  %s\n' 9fc71f62a723e00f8fb2ce21987e6b121174e5fd098d26ff59486c356308e961 /tmp/ct119-py.json | sha256sum -c

@@ -1,0 +1,11 @@
+name = "elliptic_picard_bridge_audit"
+version = "0.1.0"
+defaultTargets = ["EllipticPicardBridgeAudit"]
+
+[[require]]
+name = "finite_point_evaluation_audit"
+path = "../../finite_point_evaluation_audit_20261115/lean"
+
+[[lean_lib]]
+name = "EllipticPicardBridgeAudit"
+roots = ["PicardMaximal", "PicardRegular", "PicardSimplePole", "PicardQuotient", "PicardReduction", "PicardCriterion", "PicardControls", "PicardCertificate"]

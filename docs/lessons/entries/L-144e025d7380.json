@@ -1,0 +1,14 @@
+{
+  "action": "Fetch refs/heads/main explicitly to refs/remotes/origin/main and verify its SHA matches the intended remote main before ledger/keyring checks or diffs; prefer exact-path or name-only diffs.",
+  "created": "2026-11-24T04:16:57Z",
+  "evidence": [
+    "research/relation_trace_exact_20261124/CANONICAL_MERGE_421.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "*"
+  ],
+  "trigger": "Comparing to origin/main in a reused sparse worktree with a custom remote fetch refspec",
+  "why": "Plain fetch origin main updated FETCH_HEAD but left origin/main at an older lane-era commit; broad stat diff triggered a 1.16GB lazy fetch and ENOSPC during a correctness scan."
+}

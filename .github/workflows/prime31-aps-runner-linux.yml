@@ -1,0 +1,26 @@
+name: Prime31 APS Linux cold-runner accounting
+
+on:
+  pull_request:
+    paths:
+      - research/prime31_aps_parallel_20261125/run_heldout_v2.py
+      - research/prime31_aps_parallel_20261125/test_run_heldout_v2_linux.py
+      - .github/workflows/prime31-aps-runner-linux.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  child-accounting:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            research/prime31_aps_parallel_20261125/
+          sparse-checkout-cone-mode: false
+      - name: Check completed and timed-out child receipts
+        run: python3 research/prime31_aps_parallel_20261125/test_run_heldout_v2_linux.py

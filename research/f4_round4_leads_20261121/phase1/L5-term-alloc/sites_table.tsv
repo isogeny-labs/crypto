@@ -1,0 +1,12 @@
+# source: prog_new3.cg (whole program, main+rayon worker), frac-weighted to F4 via scripts/attrib.py / full_f4.py; 104 F4 calls
+category	allocs_total	per_F4_call	evidence
+emitted terms Cols::get (unpack -> Vec<u32>)	408630	3929	Cols::get self 60.48M Ir (148 Ir/call), callers: step emission closure#48 201328, interreduce closure#14 207302
+emitted Poly outer Vec (filter-collect, no size hint)	13109 alloc + 25583 realloc	126+246	do_reserve_and_handle from closure#48 (12419) and closure#14 (13164)
+symbolic row Vec<u32> (Packed::symbolic)	115911	1115	Packed::symbolic -> __rust_alloc
+to_sparse Vec<(u32,u64)> (closure#30)	94306(+15.6k par)	907	SpecFromIter closure#30; incl 57.3M Ir
+elimination buffers (rref32_deferred, closure#1/#7, closure#41 acc/free_cols, u32->u64 widen)	~176000	~1690	rref32_deferred 33.8k, cl#1 31.3k, cl#7 24.0k+19.5k, cl#41 24.2k+16.4k+7.8k zeroed, Vec<u64> from u32 15.3k
+rows_poly multiplier m + seen clone + FxSet<(usize,Vec<u32>)>	~78000	~750	f4_with_arithmetic direct 78.4k allocs; HashMap insert 33486 calls 12.6M Ir incl
+add(): Pair.lcm unpack + new vec + pairs growth	16757+4266+15125 realloc	161+41+145	add::{closure#5} unpack; grow_one (usize,u128)
+input normalise	~10700	~103	normalise::{closure#0} Cloned from_iter
+report() clones	0 on main path	0	basis moved into F4Report (f4_fp.rs:5986-6003)
+F4Report drop in jv_cover (outside F4)	211565 deallocs	2034	drop_glue<F4Report> 26.33M Ir incl, solve_zero_dim_mode

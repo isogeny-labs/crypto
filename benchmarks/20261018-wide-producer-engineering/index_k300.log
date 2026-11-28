@@ -1,0 +1,18 @@
+rep 0 serial: {'states': 6570000, 'states_s': 4.544, 'keys_s': 0.64, 'fill_s': 9.208, 'total_s': 14.392, 'process_wall_s': 22.52752423286438}
+rep 0 batch_inv_1thread: {'states': 6570000, 'states_s': 2.45, 'keys_s': 3.661, 'fill_s': 2.395, 'total_s': 8.506, 'process_wall_s': 17.151479244232178}
+rep 0 threads_only: {'states': 6570000, 'states_s': 1.958, 'keys_s': 1.598, 'fill_s': 2.27, 'total_s': 5.825, 'process_wall_s': 14.72462248802185}
+rep 0 threads_batch_inv: {'states': 6570000, 'states_s': 1.319, 'keys_s': 1.731, 'fill_s': 2.806, 'total_s': 5.855, 'process_wall_s': 14.8780198097229}
+rep 1 batch_inv_1thread: {'states': 6570000, 'states_s': 2.293, 'keys_s': 3.623, 'fill_s': 2.298, 'total_s': 8.213, 'process_wall_s': 17.077404737472534}
+rep 1 threads_only: {'states': 6570000, 'states_s': 1.937, 'keys_s': 1.644, 'fill_s': 2.208, 'total_s': 5.789, 'process_wall_s': 14.012201070785522}
+rep 1 threads_batch_inv: {'states': 6570000, 'states_s': 0.961, 'keys_s': 1.54, 'fill_s': 2.347, 'total_s': 4.848, 'process_wall_s': 13.713910818099976}
+rep 1 serial: {'states': 6570000, 'states_s': 4.767, 'keys_s': 0.502, 'fill_s': 9.327, 'total_s': 14.596, 'process_wall_s': 22.93333125114441}
+rep 2 threads_only: {'states': 6570000, 'states_s': 2.196, 'keys_s': 1.722, 'fill_s': 2.478, 'total_s': 6.396, 'process_wall_s': 14.816085815429688}
+rep 2 threads_batch_inv: {'states': 6570000, 'states_s': 1.129, 'keys_s': 1.679, 'fill_s': 2.75, 'total_s': 5.557, 'process_wall_s': 14.134975910186768}
+rep 2 serial: {'states': 6570000, 'states_s': 5.624, 'keys_s': 0.575, 'fill_s': 9.615, 'total_s': 15.815, 'process_wall_s': 24.990736722946167}
+rep 2 batch_inv_1thread: {'states': 6570000, 'states_s': 2.798, 'keys_s': 7.015, 'fill_s': 2.638, 'total_s': 12.451, 'process_wall_s': 21.595712900161743}
+
+total_s (median [min-max]); ratio = median / serial median
+serial                   14.596 [14.392-15.815]  x1.000
+batch_inv_1thread         8.506 [8.213-12.451]  x0.583
+threads_only              5.825 [5.789-6.396]  x0.399
+threads_batch_inv         5.557 [4.848-5.855]  x0.381

@@ -1,0 +1,15 @@
+{
+  "action": "report the ratio per curve beside the pooled one: IC cost depends on p, not on r, while rho scales as sqrt(r), so the pooled ratio is set by the h mix",
+  "created": "2026-11-18T11:18:31Z",
+  "evidence": [
+    "research/genus4_followup_20261118/validation/out/paired.txt"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "controlled-experiment"
+  ],
+  "trigger": "a pooled IC/rho ratio at one prime mixes curves whose Jacobians have different cofactors h (prime-order and h = 2 subgroups)",
+  "why": "genus-4 follow-up p = 16411: arm x / sqrt(pi r/2) was 0.998 on both h = 2 curves and 0.707 on the h = 1 curve; the pooled 0.877 'below rho' rested on the one prime-order Jacobian"
+}

@@ -1,0 +1,74 @@
+name: Prime31 independent-slot mask parity source-specific Rust gate
+on:
+  push:
+    branches: [automation/prime31-independent-slot-mask-20261118]
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_masked_slot_parity.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_masked_slot_parity.py'
+      - '.github/workflows/prime31-independent-slot-mask.yml'
+  pull_request:
+    paths:
+      - 'research/prime31_ic_20261115/native/examples/prime31_masked_slot_parity.rs'
+      - 'research/prime31_ic_20261115/native/verify_prime31_masked_slot_parity.py'
+      - '.github/workflows/prime31-independent-slot-mask.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prime31-masked:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - name: Checkout candidate and protocol only
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native/examples/prime31_masked_slot_parity.rs
+            research/prime31_ic_20261115/native/verify_prime31_masked_slot_parity.py
+            research/prime31_ic_20261115/native/PRIME31_MASKED_SLOT_PARITY_PROTOCOL_20261118.md
+          sparse-checkout-cone-mode: false
+      - name: Checkout pinned original Prime31 Rust arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: native-pinned
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout: |
+            research/prime31_ic_20261115/native
+            src/cryptanalysis
+      - name: Install pinned Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay exact-source candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git -C native-pinned rev-parse HEAD)" = "1df714645aa683cf975bc76fcacb9842cb4780fd"
+          cp research/prime31_ic_20261115/native/examples/prime31_masked_slot_parity.rs native-pinned/research/prime31_ic_20261115/native/examples/
+      - name: Run original Rust regression tests
+        run: cargo +1.100.0 test --release --locked --lib --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml
+      - name: Exhaustive B4 masked parity Rust test
+        run: cargo +1.100.0 test --release --locked --example prime31_masked_slot_parity --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml
+      - name: Execute frozen original-curve B8 B16 B31 diagnostic
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo +1.100.0 run --release --locked --example prime31_masked_slot_parity --manifest-path native-pinned/research/prime31_ic_20261115/native/Cargo.toml > prime31-masked-slot.json
+          python3 -m json.tool prime31-masked-slot.json >/dev/null
+      - name: Independently replay public points witnesses and B8 B16 parity
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/prime31_ic_20261115/native/verify_prime31_masked_slot_parity.py prime31-masked-slot.json | tee prime31-masked-independent.json
+      - name: Retain raw candidate and independent evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-masked-slot-source-specific
+          path: |
+            prime31-masked-slot.json
+            prime31-masked-independent.json
+          retention-days: 30
+          if-no-files-found: warn

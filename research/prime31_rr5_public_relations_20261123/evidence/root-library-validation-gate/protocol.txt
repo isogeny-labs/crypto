@@ -1,0 +1,4 @@
+Required root-library validation on main source f0ca664eca0081a30adfcc79dcf62a32de40d2af.
+Command: CARGO_BUILD_JOBS=2 timeout 300 cargo test --release --locked --offline --lib -- --test-threads=1
+Scope: original root library; no performance campaign. Separate from standalone RR5 qualification.
+External total process budget: 300 seconds. Preserve all compile/test failures or timeout.

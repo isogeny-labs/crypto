@@ -1,0 +1,158 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp32-t74357-b7396dac | 31.69 | b1024-L16 | 24/24 | 31.083 | 33.732 | 57.574 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | b1024-L32 | 24/24 | 31.726 | 34.499 | 59.460 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | b1024-W | 24/24 | 33.010 | 36.051 | 63.417 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | b1024-blk-L32 | 24/24 | 31.726 | 34.499 | 59.460 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | b2048-L16 | 24/24 | 77.997 | 79.354 | 91.564 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | b2048-L32 | 24/24 | 78.657 | 80.142 | 93.509 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | b2048-W | 24/24 | 77.644 | 78.933 | 90.534 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | b2048-blk-L32 | 24/24 | 78.657 | 80.142 | 93.509 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | b4096-L16 | 24/24 | 288.308 | 289.003 | 295.262 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | b4096-L32 | 24/24 | 288.504 | 289.235 | 295.809 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | b4096-W | 24/24 | 288.765 | 289.565 | 296.758 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | b4096-blk-L32 | 24/24 | 288.504 | 289.235 | 295.809 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | b512-L16 | 24/24 | 34.522 | 40.526 | 94.563 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | b512-L32 | 24/24 | 32.978 | 38.668 | 89.873 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | b512-W | 24/24 | 33.029 | 38.739 | 90.125 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | b512-blk-L32 | 24/24 | 32.978 | 38.668 | 89.873 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | rho-neg | 24/24 | 1.019 | 1.120 | 2.031 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs b1024-L32 | b1024-L16 < b1024-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs b1024-W | b1024-L16 < b1024-W |
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs b1024-blk-L32 | b1024-L16 < b1024-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs b2048-L16 | b1024-L16 < b2048-L16 |
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs b2048-L32 | b1024-L16 < b2048-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs b2048-W | b1024-L16 < b2048-W |
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs b2048-blk-L32 | b1024-L16 < b2048-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs b4096-L16 | b1024-L16 < b4096-L16 |
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs b4096-L32 | b1024-L16 < b4096-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs b4096-W | b1024-L16 < b4096-W |
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs b4096-blk-L32 | b1024-L16 < b4096-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs b512-L16 | b1024-L16 < b512-L16 |
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs b512-L32 | b1024-L16 < b512-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs b512-W | b1024-L16 < b512-W |
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs b512-blk-L32 | b1024-L16 < b512-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-L16 vs rho-neg | rho-neg < b1024-L16 |
+| icv1-fp32-t74357-b7396dac | b1024-L32 vs b1024-W | b1024-L32 < b1024-W |
+| icv1-fp32-t74357-b7396dac | b1024-L32 vs b1024-blk-L32 | unresolved inside the band |
+| icv1-fp32-t74357-b7396dac | b1024-L32 vs b2048-L16 | b1024-L32 < b2048-L16 |
+| icv1-fp32-t74357-b7396dac | b1024-L32 vs b2048-L32 | b1024-L32 < b2048-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-L32 vs b2048-W | b1024-L32 < b2048-W |
+| icv1-fp32-t74357-b7396dac | b1024-L32 vs b2048-blk-L32 | b1024-L32 < b2048-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-L32 vs b4096-L16 | b1024-L32 < b4096-L16 |
+| icv1-fp32-t74357-b7396dac | b1024-L32 vs b4096-L32 | b1024-L32 < b4096-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-L32 vs b4096-W | b1024-L32 < b4096-W |
+| icv1-fp32-t74357-b7396dac | b1024-L32 vs b4096-blk-L32 | b1024-L32 < b4096-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-L32 vs b512-L16 | b1024-L32 < b512-L16 |
+| icv1-fp32-t74357-b7396dac | b1024-L32 vs b512-L32 | b1024-L32 < b512-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-L32 vs b512-W | b1024-L32 < b512-W |
+| icv1-fp32-t74357-b7396dac | b1024-L32 vs b512-blk-L32 | b1024-L32 < b512-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-L32 vs rho-neg | rho-neg < b1024-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-W vs b1024-blk-L32 | b1024-blk-L32 < b1024-W |
+| icv1-fp32-t74357-b7396dac | b1024-W vs b2048-L16 | b1024-W < b2048-L16 |
+| icv1-fp32-t74357-b7396dac | b1024-W vs b2048-L32 | b1024-W < b2048-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-W vs b2048-W | b1024-W < b2048-W |
+| icv1-fp32-t74357-b7396dac | b1024-W vs b2048-blk-L32 | b1024-W < b2048-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-W vs b4096-L16 | b1024-W < b4096-L16 |
+| icv1-fp32-t74357-b7396dac | b1024-W vs b4096-L32 | b1024-W < b4096-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-W vs b4096-W | b1024-W < b4096-W |
+| icv1-fp32-t74357-b7396dac | b1024-W vs b4096-blk-L32 | b1024-W < b4096-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-W vs b512-L16 | b1024-W < b512-L16 |
+| icv1-fp32-t74357-b7396dac | b1024-W vs b512-L32 | unresolved inside the band |
+| icv1-fp32-t74357-b7396dac | b1024-W vs b512-W | b1024-W < b512-W |
+| icv1-fp32-t74357-b7396dac | b1024-W vs b512-blk-L32 | unresolved inside the band |
+| icv1-fp32-t74357-b7396dac | b1024-W vs rho-neg | rho-neg < b1024-W |
+| icv1-fp32-t74357-b7396dac | b1024-blk-L32 vs b2048-L16 | b1024-blk-L32 < b2048-L16 |
+| icv1-fp32-t74357-b7396dac | b1024-blk-L32 vs b2048-L32 | b1024-blk-L32 < b2048-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-blk-L32 vs b2048-W | b1024-blk-L32 < b2048-W |
+| icv1-fp32-t74357-b7396dac | b1024-blk-L32 vs b2048-blk-L32 | b1024-blk-L32 < b2048-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-blk-L32 vs b4096-L16 | b1024-blk-L32 < b4096-L16 |
+| icv1-fp32-t74357-b7396dac | b1024-blk-L32 vs b4096-L32 | b1024-blk-L32 < b4096-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-blk-L32 vs b4096-W | b1024-blk-L32 < b4096-W |
+| icv1-fp32-t74357-b7396dac | b1024-blk-L32 vs b4096-blk-L32 | b1024-blk-L32 < b4096-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-blk-L32 vs b512-L16 | b1024-blk-L32 < b512-L16 |
+| icv1-fp32-t74357-b7396dac | b1024-blk-L32 vs b512-L32 | b1024-blk-L32 < b512-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-blk-L32 vs b512-W | b1024-blk-L32 < b512-W |
+| icv1-fp32-t74357-b7396dac | b1024-blk-L32 vs b512-blk-L32 | b1024-blk-L32 < b512-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b1024-blk-L32 vs rho-neg | rho-neg < b1024-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-L16 vs b2048-L32 | b2048-L16 < b2048-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-L16 vs b2048-W | b2048-W < b2048-L16 |
+| icv1-fp32-t74357-b7396dac | b2048-L16 vs b2048-blk-L32 | b2048-L16 < b2048-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-L16 vs b4096-L16 | b2048-L16 < b4096-L16 |
+| icv1-fp32-t74357-b7396dac | b2048-L16 vs b4096-L32 | b2048-L16 < b4096-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-L16 vs b4096-W | b2048-L16 < b4096-W |
+| icv1-fp32-t74357-b7396dac | b2048-L16 vs b4096-blk-L32 | b2048-L16 < b4096-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-L16 vs b512-L16 | unresolved inside the band |
+| icv1-fp32-t74357-b7396dac | b2048-L16 vs b512-L32 | b512-L32 < b2048-L16 |
+| icv1-fp32-t74357-b7396dac | b2048-L16 vs b512-W | b512-W < b2048-L16 |
+| icv1-fp32-t74357-b7396dac | b2048-L16 vs b512-blk-L32 | b512-blk-L32 < b2048-L16 |
+| icv1-fp32-t74357-b7396dac | b2048-L16 vs rho-neg | rho-neg < b2048-L16 |
+| icv1-fp32-t74357-b7396dac | b2048-L32 vs b2048-W | b2048-W < b2048-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-L32 vs b2048-blk-L32 | unresolved inside the band |
+| icv1-fp32-t74357-b7396dac | b2048-L32 vs b4096-L16 | b2048-L32 < b4096-L16 |
+| icv1-fp32-t74357-b7396dac | b2048-L32 vs b4096-L32 | b2048-L32 < b4096-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-L32 vs b4096-W | b2048-L32 < b4096-W |
+| icv1-fp32-t74357-b7396dac | b2048-L32 vs b4096-blk-L32 | b2048-L32 < b4096-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-L32 vs b512-L16 | unresolved inside the band |
+| icv1-fp32-t74357-b7396dac | b2048-L32 vs b512-L32 | b512-L32 < b2048-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-L32 vs b512-W | b512-W < b2048-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-L32 vs b512-blk-L32 | b512-blk-L32 < b2048-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-L32 vs rho-neg | rho-neg < b2048-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-W vs b2048-blk-L32 | b2048-W < b2048-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-W vs b4096-L16 | b2048-W < b4096-L16 |
+| icv1-fp32-t74357-b7396dac | b2048-W vs b4096-L32 | b2048-W < b4096-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-W vs b4096-W | b2048-W < b4096-W |
+| icv1-fp32-t74357-b7396dac | b2048-W vs b4096-blk-L32 | b2048-W < b4096-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-W vs b512-L16 | unresolved inside the band |
+| icv1-fp32-t74357-b7396dac | b2048-W vs b512-L32 | b512-L32 < b2048-W |
+| icv1-fp32-t74357-b7396dac | b2048-W vs b512-W | b512-W < b2048-W |
+| icv1-fp32-t74357-b7396dac | b2048-W vs b512-blk-L32 | b512-blk-L32 < b2048-W |
+| icv1-fp32-t74357-b7396dac | b2048-W vs rho-neg | rho-neg < b2048-W |
+| icv1-fp32-t74357-b7396dac | b2048-blk-L32 vs b4096-L16 | b2048-blk-L32 < b4096-L16 |
+| icv1-fp32-t74357-b7396dac | b2048-blk-L32 vs b4096-L32 | b2048-blk-L32 < b4096-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-blk-L32 vs b4096-W | b2048-blk-L32 < b4096-W |
+| icv1-fp32-t74357-b7396dac | b2048-blk-L32 vs b4096-blk-L32 | b2048-blk-L32 < b4096-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-blk-L32 vs b512-L16 | unresolved inside the band |
+| icv1-fp32-t74357-b7396dac | b2048-blk-L32 vs b512-L32 | b512-L32 < b2048-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-blk-L32 vs b512-W | b512-W < b2048-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-blk-L32 vs b512-blk-L32 | b512-blk-L32 < b2048-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b2048-blk-L32 vs rho-neg | rho-neg < b2048-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b4096-L16 vs b4096-L32 | b4096-L16 < b4096-L32 |
+| icv1-fp32-t74357-b7396dac | b4096-L16 vs b4096-W | b4096-L16 < b4096-W |
+| icv1-fp32-t74357-b7396dac | b4096-L16 vs b4096-blk-L32 | b4096-L16 < b4096-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b4096-L16 vs b512-L16 | b512-L16 < b4096-L16 |
+| icv1-fp32-t74357-b7396dac | b4096-L16 vs b512-L32 | b512-L32 < b4096-L16 |
+| icv1-fp32-t74357-b7396dac | b4096-L16 vs b512-W | b512-W < b4096-L16 |
+| icv1-fp32-t74357-b7396dac | b4096-L16 vs b512-blk-L32 | b512-blk-L32 < b4096-L16 |
+| icv1-fp32-t74357-b7396dac | b4096-L16 vs rho-neg | rho-neg < b4096-L16 |
+| icv1-fp32-t74357-b7396dac | b4096-L32 vs b4096-W | b4096-L32 < b4096-W |
+| icv1-fp32-t74357-b7396dac | b4096-L32 vs b4096-blk-L32 | unresolved inside the band |
+| icv1-fp32-t74357-b7396dac | b4096-L32 vs b512-L16 | b512-L16 < b4096-L32 |
+| icv1-fp32-t74357-b7396dac | b4096-L32 vs b512-L32 | b512-L32 < b4096-L32 |
+| icv1-fp32-t74357-b7396dac | b4096-L32 vs b512-W | b512-W < b4096-L32 |
+| icv1-fp32-t74357-b7396dac | b4096-L32 vs b512-blk-L32 | b512-blk-L32 < b4096-L32 |
+| icv1-fp32-t74357-b7396dac | b4096-L32 vs rho-neg | rho-neg < b4096-L32 |
+| icv1-fp32-t74357-b7396dac | b4096-W vs b4096-blk-L32 | b4096-blk-L32 < b4096-W |
+| icv1-fp32-t74357-b7396dac | b4096-W vs b512-L16 | b512-L16 < b4096-W |
+| icv1-fp32-t74357-b7396dac | b4096-W vs b512-L32 | b512-L32 < b4096-W |
+| icv1-fp32-t74357-b7396dac | b4096-W vs b512-W | b512-W < b4096-W |
+| icv1-fp32-t74357-b7396dac | b4096-W vs b512-blk-L32 | b512-blk-L32 < b4096-W |
+| icv1-fp32-t74357-b7396dac | b4096-W vs rho-neg | rho-neg < b4096-W |
+| icv1-fp32-t74357-b7396dac | b4096-blk-L32 vs b512-L16 | b512-L16 < b4096-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b4096-blk-L32 vs b512-L32 | b512-L32 < b4096-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b4096-blk-L32 vs b512-W | b512-W < b4096-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b4096-blk-L32 vs b512-blk-L32 | b512-blk-L32 < b4096-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b4096-blk-L32 vs rho-neg | rho-neg < b4096-blk-L32 |
+| icv1-fp32-t74357-b7396dac | b512-L16 vs b512-L32 | b512-L32 < b512-L16 |
+| icv1-fp32-t74357-b7396dac | b512-L16 vs b512-W | b512-W < b512-L16 |
+| icv1-fp32-t74357-b7396dac | b512-L16 vs b512-blk-L32 | b512-blk-L32 < b512-L16 |
+| icv1-fp32-t74357-b7396dac | b512-L16 vs rho-neg | rho-neg < b512-L16 |
+| icv1-fp32-t74357-b7396dac | b512-L32 vs b512-W | b512-L32 < b512-W |
+| icv1-fp32-t74357-b7396dac | b512-L32 vs b512-blk-L32 | unresolved inside the band |
+| icv1-fp32-t74357-b7396dac | b512-L32 vs rho-neg | rho-neg < b512-L32 |
+| icv1-fp32-t74357-b7396dac | b512-W vs b512-blk-L32 | b512-blk-L32 < b512-W |
+| icv1-fp32-t74357-b7396dac | b512-W vs rho-neg | rho-neg < b512-W |
+| icv1-fp32-t74357-b7396dac | b512-blk-L32 vs rho-neg | rho-neg < b512-blk-L32 |

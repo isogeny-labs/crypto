@@ -1,0 +1,45 @@
+--- solve4-pivot-swap-replay-20261109/launch.py
++++ solve4-pivot-swap-renewal-20261111/launch.py
+@@ -3,9 +3,9 @@
+ from pathlib import Path
+ import argparse,hashlib,json,os,subprocess,time,signal
+ P=Path(__file__).resolve().parent
+-W=Path('/home/ec2-user/pencil-native-solve4-pivot-swap-20261109')
++W=Path('/home/ec2-user/pencil-native-solve4-pivot-swap-renewal-20261111')
+ O=Path(str(W)+'.outer')
+-DEADLINE=1794287499
++DEADLINE=1794398400
+ BOOT='31b37cfb156242ff8b0ffadc5cec5a12'
+ ap=argparse.ArgumentParser();ap.add_argument('--execute',action='store_true');ap.add_argument('--freeze-sha256',required=True)
+ ap.add_argument('--release-record',required=True);ap.add_argument('--release-sha256',required=True)
+@@ -22,11 +22,12 @@
+ assert release['schema']=='solve4-pivot-swap-coordinator-release/v1' and release['released'] is True
+ assert release['freeze_sha256']==a.freeze_sha256
+ assert release['attempt_limit']==1 and release['automatic_retry'] is False
+-assert release['campaign_total_seconds']==43200 and release['deadline']=='2026-11-10T05:11:39Z'
++assert release['campaign_total_seconds']==129600 and release['deadline']=='2026-11-11T12:00:00Z'
+ assert type(F['prior_attempt_conservative_debit_seconds']) is int, 'campaign ledger binding pending'
+ assert type(F['remaining_before_attempt_seconds']) is int
+-assert 0<=F['prior_attempt_conservative_debit_seconds']<=43200-2400
+-assert F['prior_attempt_conservative_debit_seconds']+F['remaining_before_attempt_seconds']==43200
++assert F['prior_attempt_conservative_debit_seconds']==1200
++assert F['remaining_before_attempt_seconds']==128400
++assert F['prior_attempt_conservative_debit_seconds']+F['remaining_before_attempt_seconds']==129600
+ assert release['prior_debit_seconds']==F['prior_attempt_conservative_debit_seconds']
+ assert release['remaining_before_attempt_seconds']==F['remaining_before_attempt_seconds']
+ assert type(F['materializer_conservative_debit_seconds']) is int and F['materializer_conservative_debit_seconds']>=0
+@@ -144,12 +145,12 @@
+ results=[]
+ try:
+  durable('coordinator-release.json',release)
+- durable('admission.json',{'freeze_sha256':a.freeze_sha256,'start_utc_seconds':time.time(),'campaign_seconds':43200,'prior_debit_seconds':release['prior_debit_seconds'],'remaining_before_attempt_seconds':release['remaining_before_attempt_seconds'],'lane':'solve4_pivot_swap','successor_attempt_limit':1,'coordinator_release_sha256':a.release_sha256,'boot_id':BOOT,'continuation_ceiling_seconds':2400,'deadline':DEADLINE,'retries':0})
++ durable('admission.json',{'freeze_sha256':a.freeze_sha256,'start_utc_seconds':time.time(),'campaign_seconds':129600,'prior_debit_seconds':release['prior_debit_seconds'],'remaining_before_attempt_seconds':release['remaining_before_attempt_seconds'],'lane':'solve4_pivot_swap','successor_attempt_limit':1,'coordinator_release_sha256':a.release_sha256,'boot_id':BOOT,'continuation_ceiling_seconds':2400,'deadline':DEADLINE,'retries':0})
+  for phase,limit in [('pre',900),('compiler',600),('post',900)]:
+   if phase=='compiler' and not results[-1]['passed']:break
+   # Post-custody remains required after any compiler attempt, including failed attempts.
+   assert time.time()+limit<DEADLINE and time.monotonic()-start+limit<=2400,'insufficient remaining phase allowance'
+-  unit='pencil-pivot-swap-20261109-'+phase
++  unit='pencil-pivot-swap-renewal-20261111-'+phase
+   cmd=['sudo','-n','systemd-run','--unit='+unit,'--wait',
+    '--property=User=ec2-user','--property=WorkingDirectory='+str(P),
+    '--property=CPUQuota=100%','--property=MemoryMax=8G','--property=MemorySwapMax=0',

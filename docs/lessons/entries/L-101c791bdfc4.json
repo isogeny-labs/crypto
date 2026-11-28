@@ -1,0 +1,15 @@
+{
+  "action": "Use the general Khuri-Makdisi equality preimage criterion and qualify a point class D0+P-R0 against zero before group operations; do not assume W_D intersect L(D0) decides zero for every representative.",
+  "created": "2026-11-16T17:07:29Z",
+  "evidence": [
+    "research/nist_cover_three_tests_20261116/evidence/target-km-v2/stderr.txt",
+    "research/nist_cover_three_tests_20261116/evidence/target-km-v3/result.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "ecdlp-surfaces"
+  ],
+  "trigger": "Reusing a small-model Jacobian zero shortcut on an effective divisor sharing the base-divisor support",
+  "why": "The direct point-class control rejected the shortcut before any addflip; the general criterion preserves the unchanged addition/cancellation/principal tests."
+}

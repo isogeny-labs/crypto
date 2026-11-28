@@ -1,0 +1,31 @@
+import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+import Mathlib.Data.Fintype.Basic
+open scoped BigOperators
+
+example {G : Type*} [Fintype G] [DecidableEq G] (edges : Multiset (G × G)) :
+    (∑ g : G, (edges.map Prod.fst).count g + (edges.map Prod.snd).count g) =
+      2 * edges.card := by
+  calc
+    _ = ∑ g : G, (edges.map Prod.fst + edges.map Prod.snd).count g := by
+      simp only [Multiset.count_add]
+    _ = (edges.map Prod.fst + edges.map Prod.snd).card :=
+      Multiset.sum_count_eq_card (by intro g _; exact Finset.mem_univ g)
+    _ = edges.card + edges.card := by rw [Multiset.card_add, Multiset.card_map, Multiset.card_map]
+    _ = 2 * edges.card := (two_mul _).symm
+
+example {G : Type*} [Fintype G] [DecidableEq G] (edges : Multiset (G × G)) (p : Nat)
+    (hmass : (∑ g : G, (edges.map Prod.fst).count g + (edges.map Prod.snd).count g) =
+      2 * edges.card) :
+    (∑ g : G, ((edges.map Prod.fst).count g + (edges.map Prod.snd).count g) * p) =
+      2 * edges.card * p := by
+  rw [← Finset.sum_mul, hmass]
+
+example : (∑ g : Fin 2,
+    (({(0, 1), (0, 1), (1, 1)} : Multiset (Fin 2 × Fin 2)).map Prod.fst).count g +
+    (({(0, 1), (0, 1), (1, 1)} : Multiset (Fin 2 × Fin 2)).map Prod.snd).count g) = 6 := by
+  decide
+
+#check Multiset.sum_count_eq_card
+#check Multiset.card_map
+#check Multiset.count_add
+#check Finset.sum_mul

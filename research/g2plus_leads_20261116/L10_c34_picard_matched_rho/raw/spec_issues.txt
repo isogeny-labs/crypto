@@ -1,0 +1,16 @@
+SPEC 13 resource limit event (recorded as required).
+
+Command: l10 measure --p 16411 --families P,C,Q --out raw/measure.jsonl
+Run under `ulimit -t 600` (10 CPU-minutes) and `ulimit -v 4000000`. The process was stopped by the
+CPU limit ("Killed") after 599.87 s user CPU (wall 10m03.9s), after writing 23 of the 24 rows of this
+command. The instance set was NOT changed (SPEC 13). Missing row: family Q, arm Q_full, p=16411,
+curve_seed=3, solver_seed=2 (the last row in the fixed order). All 12 P_full/P_orbit rows (6 pairs),
+all 6 C_full rows and 5 of 6 Q_full rows exist. Maximum RSS of the process was small (about 10 MB
+resident at the 1-minute probe); the memory limit was not reached.
+
+Consequences for analysis: H3 (P pairs), H3', PC (C rows) and A/A (P rows) at p=16411 use all
+planned runs. The Q_full cell at p=16411 has 5 runs instead of 6.
+
+Earlier commands (p = 271 .. 8209) finished within the limit (largest: p=8209, 152 s wall).
+Other issue: the lab file's own #[cfg(test)] module needs serde_json (not available, no
+dependencies allowed), so `cargo test` of the crate cannot include the lab file. See DEVIATIONS.md.

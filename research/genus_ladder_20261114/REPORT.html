@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Genus ladder</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+<style>body{font-family:system-ui,sans-serif;font-size:10.5pt;line-height:1.4;max-width:1000px;margin:auto;color:#0b0b0b}
+table{border-collapse:collapse;margin:8px 0;font-size:9.5pt}th,td{border:1px solid #d8d7d2;padding:3px 7px}th{background:#f1f0ec}
+img{max-width:100%}code{font-size:9pt;background:#f4f3ef;padding:0 2px}pre{background:#f4f3ef;padding:8px;font-size:8.5pt;white-space:pre-wrap}
+h1{font-size:17pt}h2{font-size:13.5pt;margin-top:18px}h3{font-size:11.5pt}header{display:none}</style></head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Genus ladder</h1>
+</header>
+<h1
+id="genus-ladder-the-discrete-logarithm-at-genus-2-3-4-5-over-one-field-results-2026-11-14">Genus
+ladder: the discrete logarithm at genus 2, 3, 4, 5 over one field —
+results (2026-11-14)</h1>
+<p>Status: <code>[pcc:unverified]</code>. One session on a shared 4-vCPU
+container, no isolation, no independent replay, no signed pcc claim.
+Nothing here is a row of the IC leaderboard or of
+<code>benchmarks/README.md</code> (validation gate). Synthetic random
+curves; no statement about any deployed curve. Protocol: <a
+href="PROTOCOL.md"><code>PROTOCOL.md</code></a>, frozen in commit
+<code>6e937a2a60</code> before any grid datum
+(<code>frozen.sha256</code>, <code>binary.sha256</code>). Data:
+<code>part_a.jsonl</code>, <code>part_b.jsonl</code> (raw, one JSON
+object per run), <code>analysis.json</code>
+(<code>genus_ladder_analyze</code>), <a
+href="tables.md"><code>tables.md</code></a> (every cell),
+<code>data.sha256</code>.</p>
+<h2 id="what-was-built">What was built</h2>
+<ul>
+<li><code>src/cryptanalysis/genus_ladder.rs</code>: one counted
+instrument for imaginary hyperelliptic Jacobians of genus 2 to 5 over
+<code>F_p</code> (<code>p &lt; 2^31</code>): Cantor arithmetic with a
+tally of the <code>F_p</code> multiplications and inversions behind
+every group operation, exact <code>#J</code>, full-base and
+double-large-prime index calculus on the linear algebra of the genus-3
+positive control, the lab’s negation-map rho, and a discriminant-parity
+smoothness prefilter.</li>
+<li><code>src/cryptanalysis/quartic_ladder.rs</code>: the discrete
+logarithm in <code>Pic^0</code> of a generic smooth plane quartic (genus
+3, not hyperelliptic): Diem’s line relations (full base and double large
+prime) and rho, on <code>plane_quartic_pic</code>.</li>
+<li><code>src/bin/genus_ladder.rs</code> (grid driver, JSONL) and
+<code>src/bin/genus_ladder_analyze.rs</code> (cell means, hierarchical
+bootstrap, band verdicts, exponent fits).</li>
+<li>Unit tests: group law against <code>H64Curve</code> divisor for
+divisor (g = 2, 3); group axioms (g = 2..5); <code>#J</code> against a
+brute-force zeta function (g = 2, 3, 4) and the brute-force order
+annihilating random divisors (g = 4, 5); prefilter exactness; every arm
+certifying; the quartic conventions (<code>kappa</code>,
+decompositions), its order against an independent count, and its arms
+end to end.</li>
+</ul>
+<h2 id="what-was-run">What was run</h2>
+<p>1,809 runs, <strong>all certified</strong> (<code>[t]G = T</code>
+twice, <code>t</code> equal to the planted value): 7 primes (67 to 4099;
+genus 5 to 1031), 4 admitted curves per cell (<code>#J = h r</code>,
+<code>h &lt;= 8</code>), 3 solver seeds, arms A, a, C, c, R and the
+three quartic arms. Three rho runs were skipped by the frozen cap (genus
+5, <code>p = 1031</code>, the curve with the largest <code>r</code>).
+Wall clock 1,318 s + 399 s on four workers (indicative only).</p>
+<figure>
+<img src="fig_cost.png" alt="cost" />
+<figcaption aria-hidden="true">cost</figcaption>
+</figure>
+<p><em>Cost of one logarithm in <code>F_p</code>-multiplication
+equivalents (primary reading:
+<code>cantor_mul + 10 inv + rel_mul + g^2 la_mul</code>), same y scale
+in every panel. Bars are 95% bootstrap intervals (curves, then
+runs).</em></p>
+<figure>
+<img src="fig_ratio.png" alt="ratio" />
+<figcaption aria-hidden="true">ratio</figcaption>
+</figure>
+<p><em>The cheaper index-calculus arm over rho on the same
+instances.</em></p>
+<h2 id="findings">Findings</h2>
+<h3 id="difficulty-by-genus-on-one-field">1. Difficulty by genus on one
+field</h3>
+<p>Mean cost at <code>p = 1031</code> (FPM, primary reading; 95%
+interval):</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>curve kind</th>
+<th style="text-align: right;">group size <code>ln r</code></th>
+<th style="text-align: right;">best IC arm</th>
+<th style="text-align: right;">rho (negation)</th>
+<th style="text-align: right;">IC / rho</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>hyperelliptic g = 2</td>
+<td style="text-align: right;">12.3</td>
+<td style="text-align: right;">2.74e5 (C+pre)</td>
+<td style="text-align: right;">9.74e4</td>
+<td style="text-align: right;">2.82 [2.09, 4.03]</td>
+</tr>
+<tr class="even">
+<td>hyperelliptic g = 3</td>
+<td style="text-align: right;">20.1</td>
+<td style="text-align: right;">5.50e6 (C+pre)</td>
+<td style="text-align: right;">7.32e6</td>
+<td style="text-align: right;">0.75 [0.46, 1.40]</td>
+</tr>
+<tr class="odd">
+<td>hyperelliptic g = 4</td>
+<td style="text-align: right;">26.9</td>
+<td style="text-align: right;">3.32e7 (C+pre)</td>
+<td style="text-align: right;">2.84e8</td>
+<td style="text-align: right;">0.117 [0.077, 0.216]</td>
+</tr>
+<tr class="even">
+<td>hyperelliptic g = 5</td>
+<td style="text-align: right;">33.6</td>
+<td style="text-align: right;">1.50e8 (C+pre)</td>
+<td style="text-align: right;">1.80e10 (3 curves)</td>
+<td style="text-align: right;">0.0084 [0.0047, 0.020]</td>
+</tr>
+<tr class="odd">
+<td>plane quartic g = 3</td>
+<td style="text-align: right;">19.5</td>
+<td style="text-align: right;">4.58e6 (2LP)</td>
+<td style="text-align: right;">1.72e8</td>
+<td style="text-align: right;">0.027 [0.019, 0.037]</td>
+</tr>
+</tbody>
+</table>
+<p>Each extra unit of genus multiplies the group by about <code>p</code>
+and rho’s cost by about <code>sqrt(p)</code> times the dearer group law
+(90, 219, 393, 693 field multiplications per Cantor step at genus 2, 3,
+4, 5), while the index calculus grows by a factor 4 to 20. Fitted
+exponents in <code>p</code> (FPM primary; 7 primes, 5 at genus 5):</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: right;">rho</th>
+<th style="text-align: right;">IC full base</th>
+<th style="text-align: right;">IC double large prime</th>
+<th>theory: rho / 2LP</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>g = 2</td>
+<td style="text-align: right;">0.77 [0.66, 0.87]</td>
+<td style="text-align: right;">1.45 [1.33, 1.57]</td>
+<td style="text-align: right;">0.50 [0.37, 0.59]</td>
+<td>1 / 1</td>
+</tr>
+<tr class="even">
+<td>g = 3</td>
+<td style="text-align: right;">1.47 [1.37, 1.55]</td>
+<td style="text-align: right;">1.59 [1.56, 1.63]</td>
+<td style="text-align: right;">1.08 [1.04, 1.11]</td>
+<td>1.5 / 1.33</td>
+</tr>
+<tr class="odd">
+<td>g = 4</td>
+<td style="text-align: right;">1.90 [1.74, 2.05]</td>
+<td style="text-align: right;">1.55 [1.53, 1.56]</td>
+<td style="text-align: right;">1.29 [1.27, 1.30]</td>
+<td>2 / 1.5</td>
+</tr>
+<tr class="even">
+<td>g = 5</td>
+<td style="text-align: right;">2.69 [2.42, 2.92]</td>
+<td style="text-align: right;">1.03 [0.94, 1.13]</td>
+<td style="text-align: right;">1.02 [0.93, 1.12]</td>
+<td>2.5 / 1.6</td>
+</tr>
+<tr class="odd">
+<td>quartic</td>
+<td style="text-align: right;">1.36 [1.24, 1.46]</td>
+<td style="text-align: right;">1.67 [1.64, 1.70]</td>
+<td style="text-align: right;">0.69 [0.63, 0.76]</td>
+<td>1.5 / 1</td>
+</tr>
+</tbody>
+</table>
+<p>The measured exponents sit below the asymptotic ones wherever a
+constant set-up (walk jump table, distinguished points, the quartic’s
+decomposition rows) is still a large share of the cost: genus 2
+everywhere, genus 5 and the quartic 2LP arm at these sizes. They are
+fits over the stated primes, not asymptotic statements.</p>
+<p>Band verdicts against rho (T3 of <code>tables.md</code>):</p>
+<ul>
+<li><strong>FPM band</strong> (the cross-genus unit): genus 2 above rho
+at every prime but one (2053, unresolved); genus 3 above at
+<code>p &lt;= 131</code> and unresolved from 257 (ratio 0.75 to 0.85 for
+arm c from <code>p = 1031</code>, intervals include 1); genus 4 below
+from <code>p = 131</code>; genus 5 below from <code>p = 131</code>;
+quartic below at every prime.</li>
+<li><strong>GAE band</strong> (<code>w = 0, 0.1, 1</code> per native
+multiplication, AGENTS.md 5a): no cell is below rho across the whole
+band. At <code>w = 0</code> genus 3, 4, 5 and the quartics are far
+below; at <code>w = 1</code> they are above or unresolved, because one
+relation trial drags hundreds of native multiplications (smoothness
+test, roots) and the band prices each like a whole Cantor step. Genus 5
+at <code>p = 1031</code>: 0.0030, 0.090, 0.48 [0.27, 1.14].</li>
+</ul>
+<h3 id="hyperelliptic-against-non-hyperelliptic-at-genus-3">2.
+Hyperelliptic against non-hyperelliptic at genus 3</h3>
+<p>At <code>p = 4099</code> the best arm on a random plane quartic costs
+1.33e7 FPM [1.04e7, 1.73e7] against 3.32e7 [3.26e7, 3.38e7] on a random
+genus-3 hyperelliptic curve, and the fitted exponents are 0.69 against
+1.08. The quartic’s rho is 44 times dearer than the hyperelliptic rho at
+the same prime (about 8,900 field multiplications per <code>Pic</code>
+addition against 219 per Cantor step), which is why its IC/rho ratio is
+so small; the comparison that matters for an attacker is IC against IC.
+The two populations are independent random samples: these are not the
+same logarithm problems.</p>
+<h3 id="smiths-isogeny">3. Smith’s isogeny</h3>
+<p>Census of 2,000 random squarefree genus-3 curves
+<code>y^2 = f(x)</code>, <code>deg f = 7</code>, per prime (Propositions
+2 and 4, <code>smith_prop24::analyze_curve</code>):</p>
+<table>
+<thead>
+<tr class="header">
+<th>p</th>
+<th style="text-align: right;">67</th>
+<th style="text-align: right;">131</th>
+<th style="text-align: right;">257</th>
+<th style="text-align: right;">521</th>
+<th style="text-align: right;">1031</th>
+<th style="text-align: right;">2053</th>
+<th style="text-align: right;">4099</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>full_success</code></td>
+<td style="text-align: right;">331</td>
+<td style="text-align: right;">334</td>
+<td style="text-align: right;">327</td>
+<td style="text-align: right;">328</td>
+<td style="text-align: right;">347</td>
+<td style="text-align: right;">338</td>
+<td style="text-align: right;">359</td>
+</tr>
+<tr class="even">
+<td>share</td>
+<td style="text-align: right;">0.166</td>
+<td style="text-align: right;">0.167</td>
+<td style="text-align: right;">0.164</td>
+<td style="text-align: right;">0.164</td>
+<td style="text-align: right;">0.174</td>
+<td style="text-align: right;">0.169</td>
+<td style="text-align: right;">0.180</td>
+</tr>
+</tbody>
+</table>
+<p>Pooled 2,364 / 14,000 = 0.169 (Wilson 95%: 0.163 to 0.175). That is
+inside the predicted range and below Smith’s 0.1857; these models all
+have a rational Weierstrass point at infinity, which changes the mix of
+Frobenius cycle types (reading not checked here).</p>
+<p>Among the 28 <strong>admitted</strong> genus-3 instances (near-prime
+order, <code>h &lt;= 8</code>) only 1 passes (p = 521, seed 5,
+<code>h = 4</code>), against about 4.7 expected at 0.169: a binomial
+tail of about 0.04. One sample of 28 and a post-hoc look, so this is a
+lead, not a finding: near-prime Jacobians may pass Smith’s conditions
+less often than random ones. The census needed to test it is cheap
+(condition on the 2-part of <code>#J</code>).</p>
+<p>What a Smith-positive curve gains is finding 2: its logarithm moves
+to a plane quartic, 2.5 times cheaper at <code>p = 4099</code> in this
+instrument with a lower exponent. That sentence joins two measurements
+by a model. The explicit isogeny is not built in this repository, so no
+logarithm was carried across.</p>
+<h3
+id="curve-to-curve-difficulty-the-split-rate-follows-the-point-count">4.
+Curve-to-curve difficulty: the split rate follows the point count</h3>
+<p>The share of walk elements whose <code>u</code> splits is not
+<code>1/g!</code> but <code>C(n_x, g) 2^g / #J</code>, with
+<code>n_x</code> the number of abscissae carrying two rational points.
+Observed over model, pooled per cell, is 0.967 to 1.020 in all 18 cells
+with <code>p &gt;= 257</code>. The spread of the model across curves of
+one genus widens with the genus: standard deviation of
+<code>ln(model x g!)</code> 0.07, 0.14, 0.19, 0.38 at genus 2, 3, 4, 5
+(range 0.31 to 1.12 of <code>1/g!</code> at genus 5). Since the base
+also has <code>n_x</code> columns, trials per logarithm scale as
+<code>n_x^{1-g}</code>: at genus 5 a curve with 5% more points needs
+about 18% fewer trials. Two instances of the same genus over the same
+field can differ in index-calculus cost by a factor 2 or more for this
+reason alone, and the factor is predictable from <code>N_1</code>.</p>
+<h3 id="the-parity-prefilter">5. The parity prefilter</h3>
+<p>624 of 624 paired runs have identical trials, candidates, splits,
+relations, group operations, Cantor field work and linear algebra; only
+the relation phase’s native multiplications change. Mean ratio on/off of
+<code>rel_mul</code> per cell: 0.60 to 0.65 (genus 2), 0.72 to 0.76
+(genus 3), 0.63 to 0.70 (genus 4), 0.61 to 0.67 (genus 5). On the whole
+logarithm it is worth 1% to 9% in FPM (primary) and 3% to 35% at
+<code>w = 0.1</code> GAE, largest at genus 5, because the linear algebra
+(priced at <code>g^2</code> per multiplication modulo <code>r</code>)
+and the Cantor arithmetic are the larger shares in FPM. An improvement
+of a component of the index-calculus baseline, small on the total;
+unverified until replayed.</p>
+<h2 id="scorecard-of-the-frozen-predictions">Scorecard of the frozen
+predictions</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>id</th>
+<th>outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>H1 rho exponent <code>g/2 +- 0.2</code></td>
+<td><strong>failed at genus 2</strong> (0.77 [0.66, 0.87]: set-up and
+distinguished-point overhead at <code>r &lt; 2^24</code>); held at genus
+3 (1.47), 4 (1.89); genus 5 2.68 [2.42, 2.91] overlaps the range</td>
+</tr>
+<tr class="even">
+<td>H2 full-base trials exponent in [0.8, 1.25]</td>
+<td>not falsified, but the point estimates at genus 2 (0.71 [0.52,
+0.99]) and 5 (0.76 [0.66, 0.88]) are below the range; genus 3 0.85,
+genus 4 0.92</td>
+</tr>
+<tr class="odd">
+<td>H3 <code>GAE_0(A)/GAE_0(R)</code> falls with the genus</td>
+<td>held at 4 of 5 primes; at 131 genus 5 (0.221) is above genus 4
+(0.183), inside the intervals</td>
+</tr>
+<tr class="even">
+<td>H4 band verdicts</td>
+<td>genus 2: held (no IC arm below rho). Genus 4 at 4099, FPM band: held
+(0.064 [0.033, 0.135]). Genus 5 at 1031: FPM band held; <strong>GAE band
+failed</strong> (unresolved at <code>w = 1</code>: 0.48 [0.27,
+1.14])</td>
+</tr>
+<tr class="odd">
+<td>H5 split rate model in [0.9, 1.1] per cell</td>
+<td><strong>failed in 3 of the 23 cells with at least 500
+splits</strong>, all at <code>p &lt;= 131</code>: (g, p) = (3, 131)
+0.69, (4, 67) 1.14, (5, 131) 1.14; held in every cell with
+<code>p &gt;= 257</code>. Widening with genus: held</td>
+</tr>
+<tr class="even">
+<td>H6 prefilter</td>
+<td>held (624/624 identical; ratios 0.595 to 0.761)</td>
+</tr>
+<tr class="odd">
+<td>H7 Smith census share in [0.15, 0.22]</td>
+<td>held at all 7 primes</td>
+</tr>
+<tr class="even">
+<td>H8 quartic IC below quartic rho, FPM band</td>
+<td>held at every prime</td>
+</tr>
+<tr class="odd">
+<td>H9 every run certifies</td>
+<td>held (1,809 / 1,809)</td>
+</tr>
+</tbody>
+</table>
+<h2
+id="amendment-1-post-hoc-not-preregistered-the-walk-restart">Amendment 1
+(post hoc, not preregistered): the walk restart</h2>
+<p>The frozen instrument restarts the relation walk every 4096 steps
+(inherited from the genus-3 positive control). In a group of order
+<code>r</code> a walk meets itself after about
+<code>sqrt(pi r / 2)</code> steps and then repeats, so cells with
+<code>r</code> below about <code>2^24</code> (all of genus 2, genus 3 at
+<code>p &lt;= 257</code>) can waste trials. After seeing the data, the
+driver got <code>--restart-sqrt</code>
+(<code>min(4096, max(16, sqrt(r)/2))</code>). The rebuilt binary
+reproduces the frozen rows exactly without the flag
+(<code>repro.jsonl</code>: 240 rows, 0 mismatches). With it
+(<code>amend1.jsonl</code>, genus 2 and 3, same instances and seeds, 840
+runs, all certified):</p>
+<ul>
+<li>trials fall where the walk was cycling: (2, 67) 420 to 83; (3, 131)
+819 to 501; elsewhere within noise;</li>
+<li>the split-rate model then holds in every genus-2 and genus-3 cell
+(0.976 to 1.051), so the H5 failure at (3, 131) was this artifact; (4,
+67) and (5, 131) are not covered by the amendment and stay
+unexplained;</li>
+<li>the fitted exponent of full-base trials at genus 2 becomes 0.965
+[0.932, 0.997];</li>
+<li>no band verdict of section 1 changes: genus 2 stays above rho, genus
+3 unresolved. The shorter walks pay more restarts (two scalar
+multiplications each), so genus-2 FPM does not fall.</li>
+</ul>
+<p>Source note: the amendment (the <code>restart</code> parameter and
+flag), three clippy fixes and a <code>rustfmt</code> pass were applied
+after the grid, so <code>genus_ladder.rs</code>, the driver and the
+analysis binary no longer match <code>frozen.sha256</code> (the frozen
+bytes are commit <code>6e937a2a60</code>). The final build was checked
+against the frozen data: 312 rows of <code>part_a.jsonl</code> (p = 67,
+131; genus 2, 3; quartics) rerun with 0 mismatches in any counted field,
+and <code>analysis.json</code> regenerated identically.</p>
+<h2 id="limits">Limits</h2>
+<ul>
+<li>Toy sizes: groups up to about <code>2^48</code>. Exponents are fits
+over 5 to 7 primes.</li>
+<li>Rho at genus 2 and the small-prime cells are dominated by fixed
+set-up.</li>
+<li>The GAE band prices a native multiplication like a group operation
+at <code>w = 1</code> whatever the genus; the FPM band depends on
+<code>I</code> (inversion) and <code>kappa</code> (modulus size) prices
+that are assumptions, bracketed, not measured.</li>
+<li>Group law: generic Cantor by extended gcd, not explicit formulas;
+explicit formulas would lower every hyperelliptic row, rho
+included.</li>
+<li>Smith’s map is not built; non-hyperelliptic curves of genus 4 and 5
+are not covered; single large prime and sieving are not
+implemented.</li>
+<li><code>quartic_ladder.rs</code>: clippy was not run to completion on
+it; its double-large-prime <code>exhausted</code> path is not exercised
+by a test.</li>
+<li>No research-kb or lead-atlas query was possible in this container
+(no backend); the theory cited is from the repository’s own notes and
+the standard literature, not re-read here. No Conductor task, no S3
+checkpoint, no isolab-eks run: none of the three is available in this
+container.</li>
+</ul>
+<h2 id="next-steps">Next steps</h2>
+<ol type="1">
+<li>The two largest shares of the best arm’s primary FPM at
+<code>p = 1031</code>: linear algebra (about two thirds at genus 3, half
+at genus 5, under <code>kappa = g^2</code>) and the generic Cantor
+arithmetic (about a fifth to a third). Tune the base constant and the
+elimination before the Wiedemann step; explicit-formula group law for
+genus 2, 3.</li>
+<li>The Smith census conditioned on the 2-part of <code>#J</code> (the
+lead in finding 3), then the explicit <code>(2,2,2)</code> map so a
+logarithm can be carried to the quartic.</li>
+<li>Bind <code>r</code> to <code>p</code> (<code>h = 1</code> or 2) and
+extend genus 4 and the quartics to <code>p ~ 2^16</code> on isolated
+hosts, with a validator replay, to make rows eligible for the gate.</li>
+<li>Use <code>N_1</code> to pick or predict easy instances (finding 4)
+in the factor-base studies.</li>
+</ol>
+<h2 id="reproduce">Reproduce</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">cargo</span> test <span class="at">--release</span> <span class="at">--lib</span> genus_ladder <span class="kw">&amp;&amp;</span> <span class="ex">cargo</span> test <span class="at">--release</span> <span class="at">--lib</span> quartic_ladder</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">cargo</span> build <span class="at">--release</span> <span class="at">--bin</span> genus_ladder <span class="at">--bin</span> genus_ladder_analyze</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># section 6 of PROTOCOL.md, then:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> part_a.jsonl part_b.jsonl <span class="op">&gt;</span> ladder.jsonl</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">target/release/genus_ladder_analyze</span> ladder.jsonl analysis.json</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">python3</span> render.py analysis.json</span></code></pre></div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+
+running 46 tests
+test sat::tests::add_clause_drops_tautologies_before_checking_literals ... ok
+test sat::tests::add_clause_refuses_literal_zero - should panic ... ok
+test sat::tests::add_clause_refuses_a_literal_past_the_variables_after_add_vars - should panic ... ok
+test sat::tests::arena_reclamation_relocates_reasons_and_preserves_incremental_exports ... ok
+test sat::tests::deferred_xor_still_checks_a_complete_assignment ... ok
+test sat::tests::dimacs_roundtrip ... ok
+test sat::tests::expired_deadline_stops_conflict_free_search ... ok
+test sat::tests::aggressive_clause_reduction_preserves_answers ... ok
+test sat::tests::extended_dimacs_export_round_trips_xors_and_root_unsat ... ok
+test sat::tests::external_assignment_checks_original_cnf_and_xor_rows ... ok
+test sat::tests::incremental_matrix_matches_full_elimination ... ok
+test sat::tests::lazy_clause_callback_installs_guarded_theory_consequences_on_current_trail ... ok
+test sat::tests::lazy_clause_conflict_backjumps_and_preserves_theory_answer ... ok
+test sat::tests::lazy_theory_clause_past_the_variables_panics - should panic ... ok
+test sat::tests::lazy_trigger_past_the_variables_panics_after_add_vars - should panic ... ok
+test sat::tests::luby_sequence_starts_correctly ... ok
+test sat::tests::observer_errors_always_censor_including_terminal_unsat ... ok
+test sat::tests::observer_preserves_answers_all_work_counters_and_reconstructs_cnf_search ... FAILED
+test sat::tests::observer_reconstructs_xor_operations_and_copies_reasons ... FAILED
+test sat::tests::observer_replays_incremental_units_and_censors_root_conflicts ... ok
+test sat::tests::observer_retains_immediate_incremental_contradictions_and_censors_sink_errors ... FAILED
+test sat::tests::optional_progress_observer_preserves_sat_and_unsat_search ... ok
+test sat::tests::parse_dimacs_xor_reads_parity_convention ... ok
+test sat::tests::pigeonhole_3_into_2_is_unsat ... ok
+test sat::tests::pigeonhole_5_into_4_is_unsat ... ok
+test sat::tests::random_3sat_around_threshold ... ok
+test sat::tests::deferred_xor_mixed_cnf_agrees_with_exhaustive_search ... ok
+test sat::tests::root_propagation_keeps_sat_state_for_solve ... ok
+test sat::tests::root_propagation_keeps_unsat_state_for_solve ... ok
+test sat::tests::add_vars_one_at_a_time_recentres_logarithmically ... ok
+test sat::tests::resume_after_budget_stop_is_sound ... ok
+test sat::tests::simple_sat ... ok
+test sat::tests::storage_inventory_partitions_clause_words_and_nested_buffers ... ok
+test sat::tests::storage_observation_leaves_the_search_and_model_unchanged ... ok
+test sat::tests::storage_sampling_is_limited_to_boundaries_and_ten_thousand_conflicts ... ok
+test sat::tests::targeted_saved_phase_changes_first_decision_without_changing_satisfiability ... ok
+test sat::tests::trivial_unsat ... ok
+test sat::tests::xor_and_cnf_interact ... ok
+test sat::tests::xor_duplicate_vars_cancel ... ok
+test sat::tests::xor_empty_row_with_true_rhs_is_unsat ... ok
+test sat::tests::indexed_words_match_dense_across_growth_and_blocking ... ok
+test sat::tests::xor_odd_cycle_is_unsat ... ok
+test sat::tests::xor_system_propagates_to_unique_solution ... ok
+test sat::tests::xor_engine_agrees_with_brute_force ... ok
+test sat::tests::search_trace_is_pinned_across_word_boundaries ... ok
+test sat::tests::search_trace_is_pinned ... ok
+
+failures:
+
+---- sat::tests::observer_preserves_answers_all_work_counters_and_reconstructs_cnf_search stdout ----
+
+thread 'sat::tests::observer_preserves_answers_all_work_counters_and_reconstructs_cnf_search' (158307) panicked at ../../../src/cryptanalysis/sat.rs:3858:49:
+called `Result::unwrap()` on an `Err` value: "reason was not unit on prior trail"
+
+---- sat::tests::observer_reconstructs_xor_operations_and_copies_reasons stdout ----
+
+thread 'sat::tests::observer_reconstructs_xor_operations_and_copies_reasons' (158308) panicked at ../../../src/cryptanalysis/sat.rs:3920:45:
+called `Result::unwrap()` on an `Err` value: "unknown reason clause"
+
+---- sat::tests::observer_retains_immediate_incremental_contradictions_and_censors_sink_errors stdout ----
+
+thread 'sat::tests::observer_retains_immediate_incremental_contradictions_and_censors_sink_errors' (158310) panicked at ../../../src/cryptanalysis/sat.rs:4006:49:
+called `Result::unwrap()` on an `Err` value: "unknown reason clause"
+
+
+failures:
+    sat::tests::observer_preserves_answers_all_work_counters_and_reconstructs_cnf_search
+    sat::tests::observer_reconstructs_xor_operations_and_copies_reasons
+    sat::tests::observer_retains_immediate_incremental_contradictions_and_censors_sink_errors
+
+test result: FAILED. 43 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+

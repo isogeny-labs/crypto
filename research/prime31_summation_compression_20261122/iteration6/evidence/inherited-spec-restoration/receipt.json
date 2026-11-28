@@ -1,0 +1,147 @@
+{
+  "schema": "ecbench.inherited-spec-repair-audit/v1",
+  "scope": "Static source restoration and Rust syntax parsing only; no arithmetic experiment, full compilation, or test execution",
+  "repo": "isogeny-labs/crypto",
+  "source_path": "src/cryptanalysis/ecbench/spec.rs",
+  "failed_ci": {
+    "run": "45096187034",
+    "job": "137436389923",
+    "commit": "bf56de345c02ef6f1c55bfa047087b0e880cb09e"
+  },
+  "bad_blob": "af585eb7a0b4b8e1a63bea08d1ae6f3222c32702",
+  "culprit_merge": {
+    "commit": "52e986e114c97b7a46eb156e55b7553e1d5023b1",
+    "parent1": "58356b85fbbb5bd3e2457f15816aac59f57090c5",
+    "parent1_blob": "8dcd2a368e81d7c2e2bc0fcb901aa9b484f8d600",
+    "parent2": "05714baf67a5eb8a77f53563050fddfef7ab7a07",
+    "parent2_blob": "837b2bc18a4f51722f95af27bafd53d7043f9f14",
+    "merge_base": "ad2a014c0022cf000845014499a9649b6c2cef2d",
+    "merge_base_blob": "43b88239a9465a92c49442da73ad9fd0c1701842",
+    "three_way_conflicts": 3
+  },
+  "candidate": {
+    "path": "spec.restored.rs",
+    "git_blob": "ed85acbb242a11a1412da7c842cef70872235dcc",
+    "sha256": "25c33ec0e00eb358a9ef896cc92a09c108478a43d2a061a3ac389ed9ae41c176",
+    "bytes": 54094,
+    "lines": 1331
+  },
+  "patch": {
+    "path": "restore_spec_rs.patch",
+    "sha256": "0f88db6da738654f2d150d048ad5f1d1dea5d575f48501188ea6b0456d54603d",
+    "inserted_lines": 289,
+    "deleted_lines": 0
+  },
+  "fixture_reconciliation": "binary_groebner_spec schema uses LEGACY_SPEC_SCHEMA, preserving main parent's original ecbench.spec/v1 data after SPEC_SCHEMA was advanced to v2 on phase-policy lane",
+  "parser": {
+    "version": "rustfmt 1.11.0-stable (0ef1bc3860 2026-11-09)",
+    "command": "rustfmt --edition 2021 --emit stdout --config skip_children=true <file>",
+    "candidate_exit": 0,
+    "bad_source_exit": 1,
+    "bad_stderr": "parser_bad.log"
+  },
+  "isolated_patch_check": {
+    "check_exit": 0,
+    "apply_exit": 0,
+    "applied_byte_identical_to_candidate": true
+  },
+  "static_preservation_checks": {
+    "lane_validate_curve_policy_exact": true,
+    "lane_require_current_curve_policy_exact": true,
+    "main_binary_method_detection_exact": true,
+    "main_validate_field_profile_exact": true,
+    "main_plan_for_new_run_exact": true,
+    "current_plan_exact": true,
+    "restored_curve_policy_identity": true,
+    "retained_field_profile_identity": true,
+    "main_binary_fixture_exact_after_schema_alias": true
+  },
+  "test_inventory": {
+    "oldTests": [
+      "plan_rejects_an_arm_its_curve_cannot_run",
+      "plan_pairs_seeds_and_alternates",
+      "default_seed_round_preserves_legacy_serialization_and_expansion",
+      "measured_seed_round_preserves_streams_across_warmup_counts",
+      "alternate_measured_counts_measured_rounds_only",
+      "existing_alternate_expansion_is_unchanged_and_odd_rounds_only_warn",
+      "a_committed_sessions_plan_still_expands_identically",
+      "label_does_not_change_the_spec_id",
+      "a_curve_listed_twice_is_refused",
+      "prime_only_arm_on_a_binary_curve_is_refused_at_plan_time",
+      "koblitz_only_arm_on_a_prime_curve_is_refused",
+      "v2_requires_an_explicit_curve_policy_while_v1_remains_replayable"
+    ],
+    "laneTests": [
+      "plan_rejects_an_arm_its_curve_cannot_run",
+      "plan_pairs_seeds_and_alternates",
+      "default_seed_round_preserves_legacy_serialization_and_expansion",
+      "measured_seed_round_preserves_streams_across_warmup_counts",
+      "alternate_measured_counts_measured_rounds_only",
+      "existing_alternate_expansion_is_unchanged_and_odd_rounds_only_warn",
+      "a_committed_sessions_plan_still_expands_identically",
+      "label_does_not_change_the_spec_id",
+      "a_curve_listed_twice_is_refused",
+      "prime_only_arm_on_a_binary_curve_is_refused_at_plan_time",
+      "koblitz_only_arm_on_a_prime_curve_is_refused",
+      "v2_requires_an_explicit_curve_policy_while_v1_remains_replayable",
+      "phase_policy_uses_panel_cells_and_enforces_public_target_count",
+      "field_five_fixture_is_smoke_only_not_a_phase_measurement"
+    ],
+    "mainTests": [
+      "plan_rejects_an_arm_its_curve_cannot_run",
+      "plan_pairs_seeds_and_alternates",
+      "default_seed_round_preserves_legacy_serialization_and_expansion",
+      "measured_seed_round_preserves_streams_across_warmup_counts",
+      "alternate_measured_counts_measured_rounds_only",
+      "existing_alternate_expansion_is_unchanged_and_odd_rounds_only_warn",
+      "a_committed_sessions_plan_still_expands_identically",
+      "label_does_not_change_the_spec_id",
+      "a_curve_listed_twice_is_refused",
+      "prime_only_arm_on_a_binary_curve_is_refused_at_plan_time",
+      "koblitz_only_arm_on_a_prime_curve_is_refused",
+      "new_binary_groebner_runs_require_the_canonical_field_profile"
+    ],
+    "newTests": [
+      "plan_rejects_an_arm_its_curve_cannot_run",
+      "plan_pairs_seeds_and_alternates",
+      "default_seed_round_preserves_legacy_serialization_and_expansion",
+      "measured_seed_round_preserves_streams_across_warmup_counts",
+      "alternate_measured_counts_measured_rounds_only",
+      "existing_alternate_expansion_is_unchanged_and_odd_rounds_only_warn",
+      "a_committed_sessions_plan_still_expands_identically",
+      "label_does_not_change_the_spec_id",
+      "a_curve_listed_twice_is_refused",
+      "prime_only_arm_on_a_binary_curve_is_refused_at_plan_time",
+      "koblitz_only_arm_on_a_prime_curve_is_refused",
+      "v2_requires_an_explicit_curve_policy_while_v1_remains_replayable",
+      "phase_policy_uses_panel_cells_and_enforces_public_target_count",
+      "field_five_fixture_is_smoke_only_not_a_phase_measurement",
+      "new_binary_groebner_runs_require_the_canonical_field_profile"
+    ],
+    "expected": [
+      "plan_rejects_an_arm_its_curve_cannot_run",
+      "plan_pairs_seeds_and_alternates",
+      "default_seed_round_preserves_legacy_serialization_and_expansion",
+      "measured_seed_round_preserves_streams_across_warmup_counts",
+      "alternate_measured_counts_measured_rounds_only",
+      "existing_alternate_expansion_is_unchanged_and_odd_rounds_only_warn",
+      "a_committed_sessions_plan_still_expands_identically",
+      "label_does_not_change_the_spec_id",
+      "a_curve_listed_twice_is_refused",
+      "prime_only_arm_on_a_binary_curve_is_refused_at_plan_time",
+      "koblitz_only_arm_on_a_prime_curve_is_refused",
+      "v2_requires_an_explicit_curve_policy_while_v1_remains_replayable",
+      "phase_policy_uses_panel_cells_and_enforces_public_target_count",
+      "field_five_fixture_is_smoke_only_not_a_phase_measurement",
+      "new_binary_groebner_runs_require_the_canonical_field_profile"
+    ]
+  },
+  "remote_mutations": false,
+  "actual_checkout_source_mutations": false,
+  "limitations": [
+    "No type checking or complete root-lock build performed by this audit",
+    "No tests executed by this audit",
+    "Initial failed CI receipt must be retained",
+    "No proof certificate or cryptographic speedup claim"
+  ]
+}

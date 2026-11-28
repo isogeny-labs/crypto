@@ -1,0 +1,202 @@
+{
+  "branch": "research/conductor-widefield-harness-20261118",
+  "closed_utc": null,
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/run-map.sh",
+        "case0-main",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/case0-main.txt",
+        "2"
+      ],
+      "cwd": ".",
+      "exit": 127,
+      "started_utc": "2026-11-19T19:08:23+00:00",
+      "wall_s": 0.007
+    },
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/run-map-b.sh",
+        "case0-main-b",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/case0-main.txt",
+        "2"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T19:08:54+00:00",
+      "wall_s": 8.668
+    },
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/run-map-b.sh",
+        "case0-probe-b",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/case0-probe.txt",
+        "1"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T19:09:12+00:00",
+      "wall_s": 0.585
+    },
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/run-map-b.sh",
+        "case0-dual-b",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/case0-dual.txt",
+        "2"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T19:11:34+00:00",
+      "wall_s": 8.599
+    },
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/run-map-b.sh",
+        "main-repeat2",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/case0-main.txt",
+        "2"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T19:20:32+00:00",
+      "wall_s": 8.669
+    },
+    {
+      "argv": [
+        "bash",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/run-map-b.sh",
+        "main-repeat3",
+        "research/prime_conductor_gap80_20261031/twist-transport-20261119/case0-main.txt",
+        "2"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-19T19:20:47+00:00",
+      "wall_s": 8.461
+    }
+  ],
+  "commit": "7314ee267f930db7e4af85bc0ae466a2fb0f8267",
+  "commit_dirty": true,
+  "created_utc": "2026-11-19T19:08:14+00:00",
+  "curve_uid": null,
+  "entries": [
+    "research/prime_conductor_gap80_20261031/twist-transport-20261119"
+  ],
+  "host": {
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "cpus_online": 5,
+    "hostname": "fd3f496179cc",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41"
+  },
+  "id": "20261119T1908Z-conductor-prime33555419-crossing",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "certified_end_conductor_ratio",
+      "note": "Fixed ordinary CM source1/target33555419;26-bit prime ratio, not original80-bit completion; arithmetic certificate plus standard order argument.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 33555419.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "case0-main-b.whole_constructor_seconds",
+      "note": "L0 whole quotient construction plus supplied point evaluations;1 auxiliary probe or33 actual inputs; not separated phase costs; RSS unobserved.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 8.661
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "main-repeat2.whole_constructor_seconds",
+      "note": "L0 whole quotient construction plus supplied point evaluations;1 auxiliary probe or33 actual inputs; not separated phase costs; RSS unobserved.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 8.664
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "main-repeat3.whole_constructor_seconds",
+      "note": "L0 whole quotient construction plus supplied point evaluations;1 auxiliary probe or33 actual inputs; not separated phase costs; RSS unobserved.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 8.457
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "case0-probe-b.whole_constructor_seconds",
+      "note": "L0 whole quotient construction plus supplied point evaluations;1 auxiliary probe or33 actual inputs; not separated phase costs; RSS unobserved.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.578
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "case0-dual-b.whole_constructor_seconds",
+      "note": "L0 whole quotient construction plus supplied point evaluations;1 auxiliary probe or33 actual inputs; not separated phase costs; RSS unobserved.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 8.594
+    }
+  ],
+  "problem": "kernel:twisted-sqrt-velu",
+  "raw": [
+    {
+      "bytes": 61700,
+      "path": "research/prime_conductor_gap80_20261031/twist-transport-20261119/raw-results.tar.xz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/e3/e33b1259ac0710fb7a1b8a87bb5091a5c0b8477356276cbd489b485430eec259",
+      "sha256": "e33b1259ac0710fb7a1b8a87bb5091a5c0b8477356276cbd489b485430eec259",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/report.pdf",
+    "png": [
+      "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/rho.png",
+      "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/scalar.png"
+    ],
+    "svg": [
+      "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/rho.svg",
+      "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/scalar.svg",
+      "research/prime_conductor_gap80_20261031/twist-transport-20261119/reports/map.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "conductor-prime33555419-crossing",
+  "status": "open",
+  "summary": "Full fixed prime33555419 End-conductor crossing with33 original-subgroup images and normalized dual controls;3 identical full constructor outputs. Failed launcher retained. All times descriptive L0; record remains open pending authenticated S3 publication.",
+  "validation": "research/prime_conductor_gap80_20261031/twist-transport-20261119/summary.json"
+}

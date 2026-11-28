@@ -1,0 +1,39 @@
+{
+  "schema": "pencil.lock-gate-source-delta/v1",
+  "predecessor": "signed-kummer-lock-gate-v3-20261111",
+  "successor": "signed-kummer-lock-gate-v4-20261111",
+  "predecessor_manifest_sha256": "43d5a914ea5414d8379c3bd8ea3bc8f07dbe96b8f2049361d819c25c4869db63",
+  "changed_executable_files": {
+    "launch.py": {
+      "before_sha256": "7b9d073e1fdd2a9158b71e2970c9ac0215839077faab568d6812dd27b786c3e2",
+      "after_sha256": "8e0fb499762c7592a7b10e8d03a1d8d3f670f75b4088923009cdcba530faef38",
+      "changes": [
+        "require deadline terminal Z and parse deadline[:-1] + '+00:00'",
+        "replace v3 workspace and unit with unique v4 identities"
+      ]
+    },
+    "generate_lock.py": {
+      "before_sha256": "4724f9664b98975a012613efac5e3eb4ce35b1b84b6bc4bbbce8335809da9907",
+      "after_sha256": "6e053efeb468a12a3331f254c5ab9d344e1757d10fd7dffe1addf95a6d26b821",
+      "changes": [
+        "require deadline terminal Z and parse deadline[:-1] + '+00:00'",
+        "replace v3 workspace and caller-owner unit assertion with unique v4 identities"
+      ]
+    },
+    "commands.json": {
+      "before_sha256": "5255da5659ba13a9a316e24f4f2b5b54312fdce144457037947c5f82c66d06eb",
+      "after_sha256": "12600faef37dac7b41620215bfcb3d861a786205477071742a4227f6771de8e8",
+      "changes": [
+        "replace v3 unit, writable workspace, output paths, worker path, and caller path with v4 identities"
+      ]
+    }
+  },
+  "byte_identical_executable_inputs": {
+    "lock-inputs.json": "f16a0ffc365bf63ee5b931a157d0ec77eb497ddf0b5f2fbebefdc9a11a96a172",
+    "rustc-query.py": "3a358ba4a695e85b093472b3cc6b7baf3c2c48edc5b87a1ce565d89390e8747e",
+    "driver-Cargo.toml": "a23852199afe78c85654727350901ba65b0207bfd511f297a13e53358b02fa12",
+    "native-Cargo.toml": "55443ed606286f12d6ccdd1cbd898bf306348e4b62f4c6f26d710f57402ba9f2"
+  },
+  "runtime_effects_observed": 0,
+  "released": false
+}

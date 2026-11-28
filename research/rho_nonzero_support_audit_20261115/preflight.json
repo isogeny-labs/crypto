@@ -1,0 +1,104 @@
+{
+  "schema": "rho-nonzero-preflight/v1",
+  "build_snapshots": 3,
+  "failed_states": [
+    "01"
+  ],
+  "successful_states": [
+    "02",
+    "03"
+  ],
+  "gate": {
+    "archive": "research/rho_nonzero_support_audit_20261115/evidence/gate.tar.gz",
+    "files": 5,
+    "unique_objects": 5,
+    "losslessly_deduplicated": false,
+    "roundtrip_equal": true,
+    "inventory": [
+      {
+        "member": "research_rho_nonzero_support_audit_20261115_lean/audit.log",
+        "bytes": 2143,
+        "sha256": "9bef8c253dbf0fb2dcec16db10804ca561c4200396555fb4c5ebb1d604b26033"
+      },
+      {
+        "member": "research_rho_nonzero_support_audit_20261115_lean/build.log",
+        "bytes": 6678,
+        "sha256": "67a3bb37e34ba07e75b74943b05371dd071595999e7746bc6f7916a003c39974"
+      },
+      {
+        "member": "research_rho_nonzero_support_audit_20261115_lean/cache.log",
+        "bytes": 138,
+        "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+      },
+      {
+        "member": "research_rho_nonzero_support_audit_20261115_lean/source-build.log",
+        "bytes": 6678,
+        "sha256": "64e13797ad0863b6230bb40ae1760dcba082af4e97ac1d028d0fa54d82810049"
+      },
+      {
+        "member": "research_rho_nonzero_support_audit_20261115_lean/status",
+        "bytes": 5,
+        "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+      }
+    ],
+    "declarations": 20,
+    "failing": 0,
+    "trusted_native": 0,
+    "new_modules": 4,
+    "concrete_modules": 4,
+    "import_only_adapter": 0,
+    "credited_dependency_modules": 17,
+    "credited_prior_gate": 70,
+    "new_source_warnings": 0,
+    "inherited_advisories": {
+      "final-build": [
+        "warning: WalkBoundary.lean: imports `Mathlib.Probability.ProbabilityMassFunction.Constructions` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: CollisionTails.lean: imports `Mathlib.Data.Fintype.Fin` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+      ],
+      "build.log": [
+        "warning: WalkBoundary.lean: imports `Mathlib.Probability.ProbabilityMassFunction.Constructions` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: CollisionTails.lean: imports `Mathlib.Data.Fintype.Fin` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+      ],
+      "source-build.log": [
+        "warning: WalkBoundary.lean: imports `Mathlib.Probability.ProbabilityMassFunction.Constructions` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: WalkBoundary.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: CollisionTails.lean: imports `Mathlib.Data.Fintype.Fin` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+      ],
+      "audit.log": [
+        "/workspace/crypto-audit/tools/lean/AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead"
+      ]
+    }
+  },
+  "native": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "archive": {
+    "archive": "research/rho_nonzero_support_audit_20261115/evidence/attempts.tar.xz",
+    "files": 78,
+    "unique_objects": 38,
+    "losslessly_deduplicated": true,
+    "roundtrip_equal": true,
+    "inventory_member": "manifest.json"
+  },
+  "credited_dependency_modules": 17,
+  "copied_modules": 0,
+  "all51predecessor_pins_checked_each_state_and_gate": true,
+  "new_modules": 4,
+  "actual_uniform_nonzero_distinct_support_and_static_hash": true,
+  "conditional_mean_comparison": true,
+  "no_uniform_sqrt_bound": true,
+  "p2empty_p3two_actual_supports": true,
+  "qualified_large_partition_conjecture_refuted": false,
+  "full14complete": false,
+  "paid_compute_and_agent_upload": 0
+}

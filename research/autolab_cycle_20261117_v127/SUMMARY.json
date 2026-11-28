@@ -1,0 +1,252 @@
+{
+  "frobenius_pair": {
+    "out": {
+      "exhaustive_assignments": 32768,
+      "supported_assignments": 200,
+      "random_assignments": 128,
+      "actual_value_controls": 32,
+      "formulation": {
+        "inputs": 63,
+        "variables": 48973,
+        "clauses": 175388,
+        "graph_sha256": "62d6ecb4c9d950232b74b5fbd3b0de6b427878df42e9334249bb3fbb41f576e7",
+        "control_variables": 47422,
+        "control_clauses": 169937
+      },
+      "original_complete": false,
+      "cold_compile_seconds": 0.21279159700497985,
+      "total_seconds": 1.9527075340156443
+    },
+    "error": null
+  },
+  "early_clipping_defects": {
+    "out": {
+      "variants": {
+        "2": {
+          "variables": 47423,
+          "clauses": 169943,
+          "graph_sha256": "f12b4fe78ad1d7b53371d13448bc93d951865430dd73b3bdcd97a18487e9fe12",
+          "nonconstant_defects": 2,
+          "constant_zero_defects": 0,
+          "constant_one_defects": 0,
+          "affine_forms": [
+            null,
+            null
+          ],
+          "rows": [
+            {
+              "precision": 18,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 18,
+              "factor": "B",
+              "coefficient": 2
+            }
+          ],
+          "compile_and_check_seconds": 0.5943890050111804
+        },
+        "4": {
+          "variables": 47424,
+          "clauses": 169949,
+          "graph_sha256": "82ebc5f20bdd88007804706eb0b8d81b742ec6d58723a6f0219e367648b11f27",
+          "nonconstant_defects": 4,
+          "constant_zero_defects": 0,
+          "constant_one_defects": 0,
+          "affine_forms": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "rows": [
+            {
+              "precision": 18,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 18,
+              "factor": "B",
+              "coefficient": 2
+            },
+            {
+              "precision": 19,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 19,
+              "factor": "B",
+              "coefficient": 2
+            }
+          ],
+          "compile_and_check_seconds": 0.35122652200516313
+        },
+        "8": {
+          "variables": 47426,
+          "clauses": 169961,
+          "graph_sha256": "9e4e684549e916239306ea1a32cb3447464470c3bcbe7b2018b4086b4a7b52b9",
+          "nonconstant_defects": 8,
+          "constant_zero_defects": 0,
+          "constant_one_defects": 0,
+          "affine_forms": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ],
+          "rows": [
+            {
+              "precision": 18,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 18,
+              "factor": "B",
+              "coefficient": 2
+            },
+            {
+              "precision": 19,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 19,
+              "factor": "B",
+              "coefficient": 2
+            },
+            {
+              "precision": 20,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 20,
+              "factor": "B",
+              "coefficient": 2
+            },
+            {
+              "precision": 21,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 21,
+              "factor": "B",
+              "coefficient": 2
+            }
+          ],
+          "compile_and_check_seconds": 0.3863995790015906
+        }
+      },
+      "exhaustive_assignments": 98304,
+      "supported_assignments": 600,
+      "random_assignments": 384,
+      "actual_acceptance_controls": 96,
+      "original_complete": false,
+      "selected_count": 2,
+      "total_seconds": 3.411694353999337
+    },
+    "error": null
+  },
+  "hard_search": {
+    "out": {
+      "models": [],
+      "original_complete": false,
+      "original_exact_root_count": null,
+      "independent_unsat_certificate": false,
+      "scope": "conditional k3only,fixednecessarynormfamily;otherstrata/outerfamilies/source/Uunresolved",
+      "inputs": 63,
+      "variables": 47423,
+      "cold_compile_seconds": 0.1034206319891382,
+      "soft_total_target_seconds": 40,
+      "graph_sha256": "f12b4fe78ad1d7b53371d13448bc93d951865430dd73b3bdcd97a18487e9fe12",
+      "selected_defect_count": 2,
+      "defect_rows": [
+        {
+          "precision": 18,
+          "factor": "A",
+          "coefficient": 1
+        },
+        {
+          "precision": 18,
+          "factor": "B",
+          "coefficient": 2
+        }
+      ],
+      "backend_configuration_readback": {
+        "threads": "1",
+        "cut": "true",
+        "cut.xor": "true",
+        "cut.aig": "true",
+        "cut.delay": "0",
+        "anf": "false"
+      },
+      "formulation_seconds": 2.804541665012948,
+      "version": "4.15.4",
+      "cpu_affinity": [
+        0
+      ],
+      "last_answer": "unknown",
+      "termination": "unknown",
+      "reason_unknown": "timeout",
+      "statistics": {
+        "sat mk clause 2ary": "180419",
+        "sat mk clause 3ary": "74268",
+        "sat mk clause nary": "351989",
+        "sat mk var": "94601",
+        "sat gc clause": "104196",
+        "sat del clause": "248795",
+        "sat conflicts": "146874",
+        "sat decisions": "164653",
+        "sat propagations 2ary": "24689869",
+        "sat propagations nary": "130176437",
+        "sat restarts": "13052",
+        "sat minimized lits": "962164",
+        "sat subs resolution dyn": "11911",
+        "sat units": "551",
+        "sat elim bool vars res": "23071",
+        "sat backjumps": "146872",
+        "sat backtracks": "2",
+        "sat elim clauses": "537",
+        "sat elim literals": "576",
+        "sat subsumed": "5728",
+        "sat subs resolution": "5876",
+        "sat bce": "2",
+        "sat ate": "287",
+        "sat scc elim vars": "47438",
+        "sat scc elim binary": "59",
+        "sat tr": "103",
+        "sat probing assigned": "2",
+        "sat-cut.eqs": "268",
+        "sat-cut.cuts": "182357",
+        "sat-cut.ands": "19385",
+        "sat-cut.xors": "27791",
+        "sat-cut.xands": "9384",
+        "sat-cut.xites": "10571",
+        "sat-cut.xxors": "18069",
+        "sat-cut.dc-reduce": "6565",
+        "rlimit count": "150353074",
+        "max memory": "231.82",
+        "memory": "83.88",
+        "num allocs": "19702900962.0",
+        "time": "37.253"
+      },
+      "engine_seconds": 40.06148709199624,
+      "soft_target_overshoot_seconds": 0.06148709199624136,
+      "complete": false,
+      "exact_root_count": null
+    },
+    "error": "nativeunknown"
+  },
+  "original_complete": false,
+  "qualified_speedup": null,
+  "goal_active": true
+}

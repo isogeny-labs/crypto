@@ -1,0 +1,27 @@
+{
+  "schema": "trace-zero-static-counts/v1",
+  "date": "2026-11-09",
+  "scope": "Exact constructed circuit sizes, one public fixture per field, no runtime or solver-performance samples",
+  "current_source": "SOURCES.sha256",
+  "evidence": "checks/native-tests.txt",
+  "specialization": [
+    {"n": 83, "default": 42413, "target": 28635, "fixed_domain": 1079, "fixed_domain_ands": 0},
+    {"n": 131, "default": 104669, "target": 70347, "fixed_domain": 1703, "fixed_domain_ands": 0}
+  ],
+  "inverse_models": [
+    {"n": 83, "mode": "raw", "variables": 166, "equations": 86, "degree": 2, "terms": 23486, "and_aux": 6889},
+    {"n": 83, "mode": "compact", "variables": 164, "equations": 84, "degree": 2, "terms": 23160, "and_aux": 6724},
+    {"n": 83, "mode": "d16-compact", "variables": 98, "equations": 84, "degree": 2, "terms": 2338, "and_aux": 1312},
+    {"n": 131, "mode": "raw", "variables": 262, "equations": 134, "degree": 2, "terms": 51589, "and_aux": 17161},
+    {"n": 131, "mode": "compact", "variables": 260, "equations": 132, "degree": 2, "terms": 51071, "and_aux": 16900},
+    {"n": 131, "mode": "d16-compact", "variables": 146, "equations": 132, "degree": 2, "terms": 3627, "and_aux": 2080}
+  ],
+  "implicit_subspace": [
+    {"n": 83, "d": 16, "m": 3, "variables": 10794, "s3_and_gates": 5485, "clauses": 28666, "xors": 1331},
+    {"n": 131, "d": 16, "m": 3, "variables": 16890, "s3_and_gates": 8509, "clauses": 44938, "xors": 2099}
+  ],
+  "outcomes": [
+    {"n": 83, "case": "inverse-membership-singleton", "outcome": "UNKNOWN", "conflict_cap": 2000, "deadline_seconds": 2, "variables": 21331},
+    {"n": 131, "case": "inverse-membership-singleton", "outcome": "UNKNOWN", "conflict_cap": 2000, "deadline_seconds": 2, "variables": 52531}
+  ]
+}

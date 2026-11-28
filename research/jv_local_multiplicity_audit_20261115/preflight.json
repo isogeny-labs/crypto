@@ -1,0 +1,137 @@
+{
+  "schema": "jv-local-preflight/v1",
+  "build_snapshots": 11,
+  "failed_states": [
+    "01",
+    "02",
+    "04",
+    "06",
+    "08",
+    "09"
+  ],
+  "successful_states": [
+    "03",
+    "05",
+    "07",
+    "10",
+    "11"
+  ],
+  "gate": {
+    "archive": "research/jv_local_multiplicity_audit_20261115/evidence/gate.tar.gz",
+    "files": 5,
+    "unique_objects": 5,
+    "losslessly_deduplicated": false,
+    "roundtrip_equal": true,
+    "inventory": [
+      {
+        "member": "research_jv_local_multiplicity_audit_20261115_lean/audit.log",
+        "bytes": 6854,
+        "sha256": "6c93048d4502af3ab27e3a674d66f2177614cde7aa6b50adf05b4d695392e1fc"
+      },
+      {
+        "member": "research_jv_local_multiplicity_audit_20261115_lean/build.log",
+        "bytes": 7466,
+        "sha256": "151e9da8db59ab788c673fec477f2991be51cf8dde5e8804e69a4b8bd6f32513"
+      },
+      {
+        "member": "research_jv_local_multiplicity_audit_20261115_lean/cache.log",
+        "bytes": 138,
+        "sha256": "5d8ed8e576d6bbe678a48e0d0fa65fda9ffcb00ce9e332845ce6ed31da64dbc7"
+      },
+      {
+        "member": "research_jv_local_multiplicity_audit_20261115_lean/source-build.log",
+        "bytes": 7466,
+        "sha256": "ed33e15a63d3201e79a3dd5b778311e91743a2f8f8c2fb195abb6a2fdb29c2eb"
+      },
+      {
+        "member": "research_jv_local_multiplicity_audit_20261115_lean/status",
+        "bytes": 5,
+        "sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431"
+      }
+    ],
+    "declarations": 73,
+    "failing": 0,
+    "trusted_native": 0,
+    "fresh_project_modules": 6,
+    "credited_dependency_modules": 18,
+    "credited_prior_gate_declarations": [
+      26,
+      28
+    ],
+    "inherited_advisories": {
+      "final-numbered-build": [
+        "warning: LiteralQuadratics.lean: imports `Mathlib.RingTheory.MvPolynomial.Homogeneous` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: LiteralQuadratics.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: DualBasis.lean: imports `Mathlib.LinearAlgebra.Dimension.StrongRankCondition` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: QuotientBasis.lean: imports `Mathlib.LinearAlgebra.Basis.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: QuotientBasis.lean: imports `Mathlib.RingTheory.Length` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: GradedBasis.lean: imports `Mathlib.RingTheory.MvPolynomial.Homogeneous` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: GradedBasis.lean: imports `Mathlib.LinearAlgebra.Dimension.Constructions` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: CanonicalPieces.lean: imports `Mathlib.LinearAlgebra.Isomorphisms` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: CanonicalPieces.lean: imports `Mathlib.RingTheory.GradedAlgebra.Homogeneous.Ideal` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: PowerBasisLength.lean: imports `Mathlib.RingTheory.PowerBasis` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: PowerBasisLength.lean: imports `Mathlib.RingTheory.Length` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: PowerBasisLength.lean: imports `Mathlib.Order.RelSeries` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+      ],
+      "build.log": [
+        "warning: LiteralQuadratics.lean: imports `Mathlib.RingTheory.MvPolynomial.Homogeneous` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: LiteralQuadratics.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: DualBasis.lean: imports `Mathlib.LinearAlgebra.Dimension.StrongRankCondition` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: QuotientBasis.lean: imports `Mathlib.LinearAlgebra.Basis.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: QuotientBasis.lean: imports `Mathlib.RingTheory.Length` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: GradedBasis.lean: imports `Mathlib.RingTheory.MvPolynomial.Homogeneous` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: GradedBasis.lean: imports `Mathlib.LinearAlgebra.Dimension.Constructions` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: CanonicalPieces.lean: imports `Mathlib.LinearAlgebra.Isomorphisms` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: CanonicalPieces.lean: imports `Mathlib.RingTheory.GradedAlgebra.Homogeneous.Ideal` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: PowerBasisLength.lean: imports `Mathlib.RingTheory.PowerBasis` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: PowerBasisLength.lean: imports `Mathlib.RingTheory.Length` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: PowerBasisLength.lean: imports `Mathlib.Order.RelSeries` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+      ],
+      "source-build.log": [
+        "warning: LiteralQuadratics.lean: imports `Mathlib.RingTheory.MvPolynomial.Homogeneous` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: LiteralQuadratics.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: DualBasis.lean: imports `Mathlib.LinearAlgebra.Dimension.StrongRankCondition` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: QuotientBasis.lean: imports `Mathlib.LinearAlgebra.Basis.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: QuotientBasis.lean: imports `Mathlib.RingTheory.Length` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: GradedBasis.lean: imports `Mathlib.RingTheory.MvPolynomial.Homogeneous` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: GradedBasis.lean: imports `Mathlib.LinearAlgebra.Dimension.Constructions` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: CanonicalPieces.lean: imports `Mathlib.LinearAlgebra.Isomorphisms` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: CanonicalPieces.lean: imports `Mathlib.RingTheory.GradedAlgebra.Homogeneous.Ideal` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: PowerBasisLength.lean: imports `Mathlib.RingTheory.PowerBasis` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: PowerBasisLength.lean: imports `Mathlib.RingTheory.Length` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file",
+        "warning: PowerBasisLength.lean: imports `Mathlib.Order.RelSeries` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file"
+      ],
+      "audit.log": [
+        "/workspace/crypto-audit/tools/lean/AuditAxioms.lean:49:13: warning: `String.mk` has been deprecated: Use `String.ofList` instead"
+      ]
+    },
+    "new_source_warnings": 0
+  },
+  "native": {
+    "audit_complete": true,
+    "cases": 1,
+    "complete": 1,
+    "summary": true,
+    "truncated_prefixes": 0,
+    "unresolved": 0
+  },
+  "archive": {
+    "archive": "research/jv_local_multiplicity_audit_20261115/evidence/attempts.tar.xz",
+    "files": 206,
+    "unique_objects": 86,
+    "losslessly_deduplicated": true,
+    "roundtrip_equal": true,
+    "inventory_member": "manifest.json"
+  },
+  "credited_dependency_modules": 18,
+  "copied_modules": 0,
+  "new_modules": 6,
+  "all61predecessor_pins_checked_each_state": true,
+  "qualified_Diem_bound_refuted": false,
+  "Scheme_localRing_cycle_comparison": false,
+  "second_root_uniqueness": false,
+  "new_native_experiment": false,
+  "novelty_claim": false,
+  "original14_complete": false,
+  "paid_compute_and_agent_upload": 0
+}

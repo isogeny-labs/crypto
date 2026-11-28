@@ -1,0 +1,468 @@
+{
+ "schema": "experiment.protocol/v1",
+ "protocol_id": "EXT-IC-GRAPH-L1C1-COST-20261120",
+ "version": 1,
+ "created": "2026-11-20",
+ "repository": "crypto",
+ "study_dir": "research/extension_ic_graph_20261115/leads-20261118/l1c1-cost",
+ "authors": [
+  "Claude Opus 5.5 (l1c1-cost protocol lane; written before any data)"
+ ],
+ "pcc": "unverified",
+ "status_note": "Frozen by the commit that first adds this file at this path. No data existed when it was written. Runner: a separate session, run.sh only, after drand round R >= freeze + 1 h.",
+ "links": {
+  "human_readable": "PROTOCOL.md",
+  "l1_prior": "../l1-paired/results/README.md",
+  "c1_prior": [
+   "../descent-finder/README.md",
+   "../descent-walltime/README.md"
+  ],
+  "accounting": "../complete-accounting/README.md",
+  "l5": "../l5-kernel-split/README.md",
+  "critic": "../CRITIC_ROUND2.md",
+  "generator": "../fresh-scaling/gen"
+ },
+ "question": "On fresh p1009 targets and identical descent streams, does L1 (accepting (1^4,2), (1^2,2^2), (2^3) solutions whose quadratic classes are in D_exact) reduce the actual cost of descent to K = 2 verified successes, does C1 (F4 trace replay), and do they compose multiplicatively?",
+ "claims": [
+  {
+   "id": "Q1",
+   "class": "comparative",
+   "text": "L1 main effect on counted descent cost to K: R_L1 = sum C_l1 / sum C_base with 95% cluster-bootstrap interval; verdict per decision_rule",
+   "decided_by": [
+    "counted"
+   ]
+  },
+  {
+   "id": "Q2",
+   "class": "comparative",
+   "text": "C1 main effect: R_C1 = sum C_c1 / sum C_base",
+   "decided_by": [
+    "counted"
+   ]
+  },
+  {
+   "id": "Q3",
+   "class": "comparative",
+   "text": "Interaction I = R_L1C1 / (R_L1 R_C1) and composition (S_C1|L1, S_L1|C1)",
+   "decided_by": [
+    "counted"
+   ]
+  },
+  {
+   "id": "Q4",
+   "class": "comparative (indicative)",
+   "text": "The same three on thread CPU time of the same window",
+   "decided_by": [
+    "wall"
+   ]
+  },
+  {
+   "id": "Q5",
+   "class": "exact computation",
+   "text": "Every accepted success passes group identity, anchor identity, affine path, certified projection and elliptic replay; counted matcher rows equal the audit rows",
+   "decided_by": [
+    "gates"
+   ]
+  }
+ ],
+ "hypotheses": {
+  "H_L1": "R_L1 < 1 (material if < 0.8)",
+  "H_C1": "R_C1 < 1 (material if < 0.8)",
+  "H_I": "I = 1 (multiplicative), equivalence margin +-10%",
+  "model_predictions_unverified": {
+   "R_L1": 0.42,
+   "R_C1": 0.63,
+   "I": 1.14,
+   "note": "design model only (PROTOCOL.md 2.1); decides nothing"
+  }
+ },
+ "family": {
+  "curve": "jv_cover weak cover y^2 = x(x-alpha)(x-sigma alpha) over F_{q^3}, q = p^2",
+  "p": 1009,
+  "cofactor": 4,
+  "l_bound": "l < 2^62",
+  "same_as": "Run50 public.json and the l1-paired targets"
+ },
+ "targets": {
+  "generator": "fresh-scaling-gen (../fresh-scaling/gen), scheme fresh-scaling/v1|family=jv-weak-cover-fp6, kind public",
+  "nonce_scheme": {
+   "command": "fresh-scaling-gen nonce --protocol-sha256 H --commit C --drand-round R --drand-randomness X",
+   "H": "sha256 of protocol.json at the freeze commit",
+   "C": "first commit adding protocol.json at study_dir",
+   "R": "first drand mainnet default-chain round (chain 8990e7a9aaed2ffed73dbd7092123d6f289930540d7651336225dc172e51b2ce, genesis 1595431050, period 30 s) with time >= freeze committer time + 3600 s",
+   "X": "that round's randomness from api.drand.sh / api2.drand.sh / drand.cloudflare.com; round number checked",
+   "fallback": "R = 0, X = freeze tree id; disclosed as grindable; recorded as drand_source=fallback:freeze-tree"
+  },
+  "admission": "fresh-scaling-gen check; check_unseen.py (git-tracked *public*.json, every line of git-tracked *publics*.jsonl incl. the 96 l1-paired targets, dry-run tarballs, earlier candidates; equal input or shared curve (p, alpha) refused); public transfer (exit 10 refused, not counted); exit 11 counts toward T with no rows",
+  "pool": "indices 0.. in order, first T + 16 then 16 at a time, cap 192",
+  "seeds": {
+   "l1c1-collect": "collection seed = primary stream seed",
+   "l1c1-aa-stream": "counted A/A stream",
+   "l1c1-order": "wall arm order (Fisher-Yates)",
+   "l1c1-bootstrap": "index 0"
+  },
+  "planted": "pilot-nonce --protocol-sha256 H, indices 0 and 1, PC2 only"
+ },
+ "arms": [
+  {
+   "id": "base",
+   "solver": "production staircase F4 + linear stage",
+   "accepts": "(1^6) materializer decompositions"
+  },
+  {
+   "id": "l1",
+   "solver": "production",
+   "accepts": "(1^6) or L1 rows (counted l1_match)"
+  },
+  {
+   "id": "c1",
+   "solver": "traced (descent-finder traced_solver; one trace per process; fallback F4 on rejection, both charged)",
+   "accepts": "(1^6)"
+  },
+  {
+   "id": "l1c1",
+   "solver": "traced",
+   "accepts": "(1^6) or L1 rows"
+  },
+  {
+   "id": "base-aa",
+   "role": "wall A/A repeat of base (own process, derived position)"
+  }
+ ],
+ "pairing": "all arms on the same target, collection, factor base, D_exact, certified quotient and residual stream; one process per arm",
+ "endpoint": {
+  "K": 2,
+  "definition": "cost from stream start to the residual whose rank-raising accepted rows bring the arm's two-column affine system to rank 2, plus the two-column solve and [d]G = Q",
+  "acceptance_order": "residual order; within a residual (1^6) rows in decomposition order, then L1 rows in sorted-solution order",
+  "ncap": 8192,
+  "censoring": "base not at rank 2 by NCAP: cost to NCAP, reported; biases against L1",
+  "secondary_K": 1
+ },
+ "instrument": {
+  "source": "l1c1_cost.rs (audit section = l1_paired.rs lines 60-839 byte for byte + one marked insertion)",
+  "builds": {
+   "frozen": "zero_dim_la.rs 5ae85b3458c92dd4350604830966b1a83b240e2340f584e976ae2516ac4a841d: prepare, audit, wall arms",
+   "counted": "--features counted, complete-accounting zero_dim_la.rs f0c50f5f3cf8c9150932524b45255a2ee0a948f76146c2b3775aa16d33e17ec5: counted arms"
+  },
+  "library": "11c9a031 deferred-pair modules over the Root41-equivalent fcda1e22 closure, nagao-e2e jv_cover overlay efc554a4..., assembled by ../l1-steps-2-3/build (unchanged) + build/overlay_counted.py",
+  "pipeline_options": {
+   "b_count": 1018081,
+   "max_descent_residuals": 8192,
+   "max_accepted_descents": 32,
+   "max_split_records": 524288,
+   "max_deferred_edges": 262144,
+   "threads": 1,
+   "env": {
+    "JV_ADDS_INC": "1",
+    "JV_ADDS_SHARE": "1",
+    "JV_SIEVE_PROGRESS": "1"
+   }
+  },
+  "toolchain": "RUSTUP_TOOLCHAIN=1.98, CARGO_INCREMENTAL=0, cargo -j 1 --offline --locked --release"
+ },
+ "metrics": {
+  "counted": {
+   "id": "C_X",
+   "unit": "bitop/v1, b = bits(p) = 10, r = bits(l)",
+   "label": "counted lower bound",
+   "includes": [
+    "stream set-up and advances",
+    "Weil forms, F4 or replay, counted linear stage",
+    "C1 rejected replay + fallback F4",
+    "C1 learning RREF at its upper bound (fp_mul + fp_add per multiply-add)",
+    "materializer, verify_dec, projection",
+    "all L1 work: D_exact table, Weil forms, sextic, squarefree and DDF tests, equal-degree splitting, factor-base probes, ordinate checks, resultants, V, V^2 = H mod U, canonical key, D_exact probes, principal-divisor identity, anchor identity once per class per target, substituted row and projection",
+    "rank test, two-column solve, [d]G = Q"
+   ],
+   "excludes": [
+    "collection, linear algebra and the pipeline's own descent (shared)",
+    "process set-up"
+   ],
+   "unpriced": [
+    "F4 replay bookkeeping beyond f4_fp hooks",
+    "symbolic preprocessing, hashing outside hooks, allocation, containers",
+    "dense row buffer"
+   ]
+  },
+  "wall": {
+   "id": "W_X",
+   "definition": "thread CPU ns (/proc/thread-self/schedstat) of the same window; frozen build, hooks off; one process per arm; five processes per target in derived order",
+   "label": "INDICATIVE (non-isolated host)"
+  },
+  "statistics": {
+   "ratios": [
+    "R_L1 = sum C_l1 / sum C_base",
+    "R_C1 = sum C_c1 / sum C_base",
+    "R_L1C1 = sum C_l1c1 / sum C_base",
+    "I = R_L1C1 / (R_L1 R_C1)",
+    "S_C1|L1 = sum C_l1c1 / sum C_l1",
+    "S_L1|C1 = sum C_l1c1 / sum C_c1"
+   ],
+   "interval": "target-cluster percentile bootstrap, B = 20000, indices 500/19499 (95%) and 100/19899 (99%), SplitMix64 exact rejection sampling, seed l1c1-bootstrap"
+  },
+  "secondary": [
+   "counted without the learning bound (Cn)",
+   "K = 1 ratios",
+   "per-target geometric means",
+   "mean residuals to K per arm",
+   "L1 added-work share",
+   "audit F, M, rho_hat",
+   "trace rejections",
+   "censored count"
+  ]
+ },
+ "decision_rule": {
+  "order": [
+   "INVALID (all) if any per-target gate, any control (pc1, pc1b, pc1c, pc2, dc, unseen) or the counted A/A fails",
+   "KILL-CORRECTNESS (L1) if replay_fail_M > 0; KILL-CORRECTNESS (C1) if a traced solution chain differs from the production audit; interaction and composition then KILL-CORRECTNESS",
+   "INCONCLUSIVE-UNDERPOWERED if T < 50",
+   "rules below"
+  ],
+  "main_effect": {
+   "MATERIAL-REDUCTION": "U95 < 0.8",
+   "REDUCES": "U95 < 1.0",
+   "INCREASES": "L95 > 1.0",
+   "INCONCLUSIVE": "otherwise"
+  },
+  "interaction": {
+   "direction": {
+    "SUB-MULTIPLICATIVE": "L95(I) > 1",
+    "SUPER-MULTIPLICATIVE": "U95(I) < 1",
+    "NOT-DISTINGUISHED-FROM-MULTIPLICATIVE": "otherwise"
+   },
+   "equivalence": {
+    "MULTIPLICATIVE-WITHIN-10%": "[L95, U95] within [0.90, 1.10]"
+   }
+  },
+  "composition": {
+   "COMPOSES": "U95(S_C1|L1) < 1 and U95(S_L1|C1) < 1",
+   "DOES-NOT-COMPOSE": "either L95 > 1",
+   "INCONCLUSIVE": "otherwise"
+  },
+  "counted_aa": "first 32 targets, independent stream: 99% intervals of sum C_base^aa / sum C_base and R_L1^aa / R_L1 contain 1",
+  "wall": "same rules on W; wall A/A (sum W_base / sum W_base-aa, 99%) must contain 1 (else INVALID-WALL-AA) and lie within [0.95, 1.05] (else NO-WALL-VERDICT-NOISE-FLOOR); always labelled INDICATIVE",
+  "rho_distance": "not computed: descent-phase component measurement, no leaderboard row (critic F3/F5)",
+  "implemented_in": "l1c1_analyze.rs analyze"
+ },
+ "controls": {
+  "positive": [
+   {
+    "id": "PC1",
+    "what": "Run50 public.json, seeds 389/389, frozen prepare + audit N 30000 PRIMARY_N 3415",
+    "pass": "../l1-paired/compare_pc1.py unchanged (Run50 phase subtotal 5913875255822, descent phase 3426280619436, D_exact sha d7246223..., rows sha 61ced7ab..., F = 31, M = 57, 57/57 flips)"
+   },
+   {
+    "id": "PC1c",
+    "what": "counted base and c1 FIXED_N 3415 on the Run50 stream; four K-stop counted arms",
+    "pass": "nagao 4358996976408 (production), 2483262669096 (traced); learning bound 112775271840; trace (1, 3414, 33, 0); full splits {263, 3414}; identical chains; tau_base 3414; K-stop arms pass every collect gate"
+   },
+   {
+    "id": "PC1b",
+    "what": "l1-paired first measured target (publics.jsonl line 1, recorded collect_seed), frozen prepare + audit FIXED 4096",
+    "pass": "every column of target.primary.tsv equals ../l1-paired/results/targets.tsv row 1 except public_sha256"
+   },
+   {
+    "id": "PC2",
+    "what": "2 planted fresh targets, full procedure incl. wall",
+    "pass": "every gate; every arm's d = owner answer; audit owner_check; not censored"
+   }
+  ],
+  "negative": [
+   {
+    "id": "NC",
+    "what": "sign-flipped L1 rows (first class D_key -> -D_key)",
+    "pass": "every flip refused by elliptic replay"
+   }
+  ],
+  "a_a": [
+   {
+    "id": "AA-counted",
+    "what": "independent stream on 32 targets"
+   },
+   {
+    "id": "AA-wall",
+    "what": "base twice per target, 64 targets"
+   }
+  ],
+  "determinism": {
+   "id": "DC",
+   "what": "first measured target's counted procedure twice",
+   "pass": "dexact, quotient, rows, accepted, soldig, four arm det files byte-identical; collect line identical except timing columns"
+  },
+  "c1_correctness": "per residual: solution chain equal to the production audit; accepted replays certified (not timed out, no pair above bound, 1 in J or staircase <= 64); rejected replay + fallback both charged; rejections reported"
+ },
+ "gates": {
+  "audit": [
+   "group_bad = 0",
+   "anchor_bad = 0",
+   "replay_fail_F = 0",
+   "affine_inconsistent = 0",
+   "flip_refused = flip_total",
+   "unreplayable <= 1%",
+   "pipeline_rows_match",
+   "pipeline_consistency",
+   "owner_check where an owner exists"
+  ],
+  "per_arm": [
+   "audit covers the arm's residuals",
+   "solution chain equals the audit's",
+   "production-checked rows equal the audit's rows up to tau, in order",
+   "every accepted row audit-replayed",
+   "d verified and equal to the pipeline's verified scalar",
+   "foreign_hook_calls = 0",
+   "components sum to the window",
+   "unattributed = 0"
+  ],
+  "cross_arm": [
+   "tau_c1 = tau_base",
+   "tau_l1c1 = tau_l1",
+   "tau_l1 <= tau_base"
+  ],
+  "wall": [
+   "tau, chain, accepted rows and scalar equal the counted arm's"
+  ]
+ },
+ "variable_ledger": {
+  "arm": "2x2 on shared state and stream; one process per arm",
+  "instrument": "one source, two builds differing only in zero_dim_la.rs; outputs build-independent (checked)",
+  "target": "nonce-derived fresh curves; cluster bootstrap",
+  "stream": "derived per target and role",
+  "order": "counted arms deterministic; wall processes in a derived permutation of five",
+  "host": "shared, not isolated: wall INDICATIVE with an A/A noise-floor gate",
+  "trace_state": "one trace per process, learned on residual 0, RREF charged at its bound",
+  "censoring": "NCAP 8192, reported",
+  "analyst": "frozen program"
+ },
+ "randomization": {
+  "seed_derivation": {
+   "method": "nonce_after_freeze"
+  },
+  "instance_sampling": {
+   "rule": "first T admitted indices",
+   "independent_of_arm": true
+  },
+  "arm_order": "Fisher-Yates from l1c1-order per target (wall)",
+  "blinding": {
+   "note": "costs are produced by the runner and read only by the frozen analysis program"
+  }
+ },
+ "sample_size": {
+  "T": 128,
+  "T_min": 50,
+  "wall_targets": 64,
+  "aa_targets": 32,
+  "successes_per_arm": "K = 2 per uncensored target (256 at T = 128; >= 100 at T >= 50)",
+  "power_table": "power-design.csv (l1c1_analyze power 1000 2000)",
+  "power_summary": {
+   "g_1.0": {
+    "P_L1_REDUCES": 0.0
+   },
+   "g_1.15_T128": {
+    "P_L1_REDUCES": 1.0,
+    "P_L1_MATERIAL": 0.0
+   },
+   "g_1.6_T128": {
+    "P_L1_MATERIAL": 1.0
+   },
+   "g_2.42_T50": {
+    "P_L1_MATERIAL": 1.0
+   },
+   "C1": {
+    "P_MATERIAL": 1.0
+   },
+   "I_at_g_2.42": {
+    "mean_I_hat": 1.142,
+    "P_within_10pct": 0.0
+   }
+  }
+ },
+ "budget": {
+  "hard_cpu_hours": 8,
+  "model_cpu_hours": 4.4,
+  "model_cpu_hours_if_1.5x": 6.0,
+  "local_only": true,
+  "threads": 1,
+  "builds": "-j 1",
+  "paid_compute": false,
+  "network": "drand fetch only"
+ },
+ "stopping_rules": [
+  "budget: before each target stop if spent + 1.5 x max target CPU > 8 h - 900 s; analyze completed targets with budget_truncated=1; T < 50 -> INCONCLUSIVE-UNDERPOWERED",
+  "PC1/PC1b/PC1c/PC2/DC failure: stop, no verdict, amendment required",
+  "runner exit other than 0/10/11: stop",
+  "no stop reads a cost, tau or ratio"
+ ],
+ "invalidation_rules": [
+  "any change to a file in SOURCES.sha256 after the freeze without a prior amendment",
+  "a re-run under the same nonce after any data were seen, except the DC rerun",
+  "targets not derived from the frozen nonce scheme",
+  "decisions taken from wall fields without the INDICATIVE label"
+ ],
+ "inadmissible": [
+  "multiplying l1-paired's acceptance gain by descent-walltime's ratios (critic F6)",
+  "calling the counted metric complete or conservative",
+  "ranking arms under section 5a from counted lower bounds",
+  "any rho distance or leaderboard row from this protocol"
+ ],
+ "recording": {
+  "scratch": "$S: per-target state, audit, arm det/time files, logs; large files gzip -n; SHA-256 in $S/RAW.sha256",
+  "committed": "run.sh stages $S/commit/ (targets.tsv, aa.tsv, analysis.json, controls.kv, pc1.json, pc1c.json, refused.tsv, publics.jsonl, nonce.txt, freeze.txt, cpu.tsv, build.log, RAW.sha256, COMMIT.sha256); each <= 64 KiB, larger split into .partNN of <= 60000 bytes",
+  "after_data": "results README with verdicts as printed; bench.record/v1 and research-visuals report in the results PR (not inputs to any verdict)"
+ },
+ "execution": {
+  "commands": [
+   "export S=<scratchpad>/l1c1-cost-run && mkdir -p $S",
+   "cd research/extension_ic_graph_20261115/leads-20261118/l1c1-cost",
+   "sha256sum -c SOURCES.sha256",
+   "bash run.sh"
+  ]
+ },
+ "sources_sha256": {
+  "l1c1_cost.rs": "2cac7460de61cee6b18b89c9339f6cb31f04b2f221056e8cf45fc2702b4bc1bf",
+  "l1c1_analyze.rs": "7d2c6258f352aa525d5134bd62a7b406e8dc6cd8d8d737da8542fe7fd0ebe128",
+  "run.sh": "c3cf4bdf364848ebe93e1b1755b0589627ab178dd386e4071b21d96549d5c7d7",
+  "build/build.sh": "f925d84dd086fcf96323db6d04e93dfea9155b286681823d0a4cea8a512c5b18",
+  "build/Cargo.toml.in": "c29ffdfc63a3142a884326220b813a7ac7fc0bc9934721c79e6c3bd59b471000",
+  "build/overlay_counted.py": "9859b7f7b6e68f9f64e4ceedd1c4ba4c2fbb690c3f4dac8ede85ac05122d63e0",
+  "check_unseen.py": "d60a1aaa482cac99c6a4e14637c3548bcb57b7620bda429845e3cab1c4e3d6d9",
+  "compare_pc1c.py": "80f73f0ec300c7ea89b8c58bc6a1ce78033a15e91ae9ce59f8b8326831a1eb96",
+  "power-design.csv": "0141ef01d9d5a25ef1445e4882b8603cf43ca9a634843f6038a4050d2fca3587",
+  "../l1-paired/l1_paired.rs": "4a7cafcdc5da5e6196f6fcec218c75f205b691f89d3ec47cbd7b5b42a16871bc",
+  "../l1-paired/compare_pc1.py": "3f7a8d884810bba877137c2f1532abe47eaf69250ca75f33001d5210c7b8bcb5",
+  "../l1-paired/results/targets.tsv": "cc60eec52710f5fcb065c537e90e8b1d0a763ee44faacf3b440814ddbe17f971",
+  "../l1-paired/results/publics.jsonl": "3e13406ee41533c8a7edddbc33857b1cde7f140ee34b7ce76dcea37607e21be6",
+  "../l1-steps-2-3/ffield.rs": "756fbc6100e9bde25c8e266fd7ea9ba3eee28d367aec508a4d996dd2fc4d105d",
+  "../l1-steps-2-3/build/fetch.sh": "5944120c4b89ec781f6b8d2b7587fb02c2b49508f710ab4bef9e3495b7bef553",
+  "../l1-steps-2-3/build/assemble.py": "dd636759b3459f8f47edf48249507359dbc69b8f461911d6b4d57122ce62e4f1",
+  "../l1-steps-2-3/build/extract_helper.py": "771fd263648d626b8f3d4d454dca59b153508a049391d05c2f8aeace4482d7de",
+  "../l1-steps-2-3/build/Cargo.lock": "e971af3a65581e7c49a5c315bc2028eb98d57b987fcab9ed70f7e74c27ed5f89",
+  "../l1-steps-2-3/runs/run50-control.json": "f70ed5afc6463fd96066e89cae476ebd838aa037d583cb0e29f20961a9616a1d",
+  "../l1-steps-2-3/runs/match-n3415.summary.json": "8fe820f4d464ec2cf78b980addaaa5d54690984d90fcf732e1363c54751b68ff",
+  "../l1-steps-2-3/runs/match-n30000.summary.json": "221f868bad391a8353ad08c6fa686942542049fdebd65ecef6721285992c15ba",
+  "../l1-steps-2-3/runs/RAW.sha256": "c7671e52b15bfd0581a316cefc57b617bbb24a040f94b139ece22178aa760aad",
+  "../fresh-scaling/gen/src/curve.rs": "657aa0a0f3b11d7ff59559cd45d7e0fe53d2390a56407348d20dbf6f202143f6",
+  "../fresh-scaling/gen/src/field.rs": "d1139f5216f5dbfdbd29752ba16aa54fd7f2aa77c5c44da12d27dc1a995d547d",
+  "../fresh-scaling/gen/src/gen.rs": "e54e0f4692bcc2e15ec34d39fc70fe05f23d0d60b5eda1fe42ab213cf0b65389",
+  "../fresh-scaling/gen/src/json.rs": "2c003d606104937d1101bc80cd1814d5dae3aa80b882438afdb0e70a48a28e70",
+  "../fresh-scaling/gen/src/main.rs": "b2a1e0bca9baf4e4caa7f8900280c1ae483c9e80347d6dc4c7a087280b433d32",
+  "../fresh-scaling/gen/src/sha256.rs": "3ce19a92a24612b6c0060fa7f4510b677957d62d2bfa77a4d34ded5b56120052",
+  "../fresh-scaling/gen/Cargo.toml": "2e3a778c36b01cabd05cba6b59e280ce55e8e669ed58a4e980c4e3b3dbc84318",
+  "../fresh-scaling/gen/Cargo.lock": "857420fe07e8cafb7ed877b44e8dcc8173e6bdbf98eda46c424f43ffb2a2f74e",
+  "../complete-accounting/counted-linear-stage/zero_dim_la.rs": "f0c50f5f3cf8c9150932524b45255a2ee0a948f76146c2b3775aa16d33e17ec5",
+  "../complete-accounting/runs/recount-seed389-n3415.json": "f8e8bd8182598eb44619e5e7a60bb1a778197785f3c700f264455ff0959803dd",
+  "../descent-walltime/runs/counted-compare-seed389.json": "04f94cb478049d96ce10543831daa979c314d347468dab96b61a4877b489960b",
+  "../../runpod-deferred-pair-20261117-50/public.json": "b3ae4f93974456bdd6a772caf7daa0208d64c17f7341f70ee4187d327fd6462e",
+  "../../nagao-e2e/library-overlay/jv_cover.rs": "efc554a4a7f7d8e84d06bf3860c7ef99a294721103a041b4a4dd314c30a60f17",
+  "../../validation/extension-pipeline-source.sha256": "a671577a1fa692deba5b9a2990155c8d355e2a97144f8d9513ca5072e0836a68",
+  "../../validation/deferred50-source.sha256": "5bba805017c884ce6708355fea8b4e98a197f642530d4003ac099b5fca424f5d"
+ },
+ "knowledge_base": "research-kb unavailable on this host (scripts/research-kb: no executable; no MCP tools), 2026-11-20; ecdb not queried; no literature, novelty or curve-database claim is made",
+ "amendments": [],
+ "freeze": {
+  "status": "frozen-by-first-commit",
+  "protocol_sha256": "computed by run.sh from the freeze commit",
+  "commit": "first commit adding this file",
+  "filed_before_affected_data": true,
+  "requirement": "the freeze commit must force-add (git add -f) ../l1-steps-2-3/build/Cargo.lock and ../fresh-scaling/gen/Cargo.lock, which .gitignore (**/Cargo.lock) excludes; otherwise sha256sum -c stops a fresh-checkout runner"
+ }
+}

@@ -1,0 +1,131 @@
+{
+  "title": "Prime31 run63 normalized affine-coordinate query cost",
+  "date_utc": "2026-11-22",
+  "curve": {
+    "p": 2147483647,
+    "n": 2147446831,
+    "a": 847514846,
+    "b": 2087444724,
+    "G": [
+      625037715,
+      2100627251
+    ],
+    "cofactor": 1
+  },
+  "repository": "isogeny-labs/crypto",
+  "pr": 4901,
+  "source_commit": "75169e5c14c522178650d2d501db9254e1f069f2",
+  "source": "research/prime31_ic_20261115/native/examples/prime31_run63_normalized_probe.rs",
+  "workflow": ".github/workflows/prime31-run63-normalized-probe.yml",
+  "rust_version": "1.100.0",
+  "workflow_run_id": 45026992197,
+  "workflow_url": "https://github.com/isogeny-labs/crypto/actions/runs/45026992197",
+  "independent_original_rust_reference": {
+    "cases": 40,
+    "steps_per_case": 192,
+    "total_group_steps": 7680,
+    "x_pass": true,
+    "xy_pass": true,
+    "exceptional": [
+      "O",
+      "G",
+      "-G",
+      "order wrap"
+    ]
+  },
+  "benchmark": {
+    "iterations_per_repetition": 250000,
+    "repetitions": 5,
+    "batch_size": 256,
+    "arm_rotation": true,
+    "all_scalar_endpoints_passed": true,
+    "runs": [
+      {
+        "attempt": 1,
+        "job_id": 137222066807,
+        "conclusion": "success",
+        "ns_per_probe": {
+          "projective": [
+            16.6655,
+            16.4228,
+            16.4223,
+            16.246,
+            16.4051
+          ],
+          "x_only": [
+            21.8773,
+            21.8684,
+            21.982,
+            21.7745,
+            21.5624
+          ],
+          "xy": [
+            23.4431,
+            23.1132,
+            23.0823,
+            22.767,
+            23.0222
+          ]
+        },
+        "medians_ns": {
+          "projective": 16.4223,
+          "x_only": 21.8684,
+          "xy": 23.0823
+        },
+        "digest": 1273258821
+      },
+      {
+        "attempt": 2,
+        "job_id": 137222651551,
+        "conclusion": "success",
+        "ns_per_probe": {
+          "projective": [
+            22.5185,
+            22.3176,
+            22.3356,
+            22.3473,
+            23.8736
+          ],
+          "x_only": [
+            30.1501,
+            29.9276,
+            29.8406,
+            29.9199,
+            29.9312
+          ],
+          "xy": [
+            30.8825,
+            30.9015,
+            30.9814,
+            31.009,
+            31.0196
+          ]
+        },
+        "medians_ns": {
+          "projective": 22.3473,
+          "x_only": 29.9276,
+          "xy": 30.9814
+        },
+        "digest": 1273258821
+      }
+    ]
+  },
+  "historical_cross_run_sensitivity": {
+    "synthetic_run59_queries_for_1024": 4699949,
+    "historical_shared_bsgs_ms": 170.113,
+    "budget_ns_per_query": 36.1946481,
+    "run1_projected_x_ms": 102.7803647,
+    "run2_projected_x_ms": 140.6581937,
+    "run1_other_cost_margin_ns_per_query": 14.3262481,
+    "run2_other_cost_margin_ns_per_query": 6.2670481,
+    "matched_runner": false
+  },
+  "scope": {
+    "actual_non_generic_roots": 0,
+    "blind_logs": 0,
+    "complete_solver": false,
+    "new_full_solver_cost_ms": null,
+    "pcc": "unverified",
+    "claim": "original-Rust checked component cost only"
+  }
+}

@@ -1,0 +1,7 @@
+# Conditional parameter-count bound for the queued rank study
+
+Unexecuted derivation. For the63-bit chart,choose60quotient coordinates and3delayed coordinates. The early map through precision3has measured rank8and annihilates the delayed directions. Each of its256states therefore contains exactly2^52quotient assignments before correction constraints,and2^55full chart parameters.
+
+At state s let r_s be the exact rank of the3x3tangent matrix for corrections18,19,20. For each quotient assignment,the linear system has either no delayed solutions or exactly2^(3-r_s). Hence the number of parameters satisfying these three necessary corrections is at most U=sum_s 2^(55-r_s). This is an upper bound without assuming compatibility. If r_s=3,there is one solution for every quotient assignment,so that state's count is exactly2^52. If r_s<3,compatibility constraints on the cofactor right-hand side must still be kept. No generic-rank assumption is used.
+
+The existing universal c18direction implies rank>=1at every state and therefore U<=2^62,matching the current one-selector reduction. A preregistered stronger development target for the next component is U<=2^61,at least a4fold reduction of this conditional raw parameter domain,with all256states covered and all singular branches retained. This is not a4xspeed target or an original root count. A later compiler still has to charge cofactor construction,conditional matrix/readback logic,remaining constraints and all original branches. Larger requested end-to-end gains remain governed by the unchanged performance gate.

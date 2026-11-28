@@ -1,0 +1,150 @@
+{
+  "binary_custody": {
+    "all_actual_immutable_hashes_match": true,
+    "all_cargo_artifact_paths_and_build_cache_hashes_match_copies": true,
+    "all_four_cli_binaries_contain_exact_embedded_manifest_bytes": true,
+    "cli_manifest_verification_method": "static byte inspection; no CLI invocation during this review",
+    "four_cli_identities": [
+      {
+        "name": "prime31-aux-matched",
+        "sha256": "97b393f711cfc091da6903d75093bce8d90b2eefa0a604fc559de84714bc84c9"
+      },
+      {
+        "name": "prime31-isogeny-choices",
+        "sha256": "abafcde6b1b5422e795b9a3053e8ed9564f4d1cbc89ba7ea51600c5d9c37d6f0"
+      },
+      {
+        "name": "prime31-sparse-identity",
+        "sha256": "9ab1e7d4ff145e89325d07a5aaf4c48f5120dd1e3947f31d06c7e800827fe4f8"
+      },
+      {
+        "name": "prime31-ic-incumbent",
+        "sha256": "396015cc21c7d2e0c3f4b9c169e2fa5aa2e4c264759a69c162862ac62e5c0956"
+      }
+    ],
+    "pre_equals_post": true,
+    "pre_post_hash_entries": 28
+  },
+  "build": {
+    "all_native_artifacts_fresh": true,
+    "cargo_build_finished_success": true,
+    "cli_executables": 4,
+    "compiler_errors": 0,
+    "compiler_warning_records": 23,
+    "native_artifacts": 28,
+    "opt_level": "3",
+    "recorded_exit_code": 0,
+    "recorded_offline_locked_release_no_run": true,
+    "test_executables": 24,
+    "warning_scope": "unused code or fields in retained source closure"
+  },
+  "evidence_hashes": {
+    "artifacts.tsv": "9ea9e6d75a273ac8e14109ab08b4f705a9c592a431d501bc4b6756d31f12e164",
+    "build.jsonl": "88775d72f1137c35e61cf84c0dcb996def1da3aee86624ec6e4ba86528ad71fd",
+    "command.json": "0b4881d9b7feb7521c4bf2a52079d51982d9ce3cb919e9a5595a3b748891301f",
+    "embedded-source-manifest.json": "a854604966697dff26e59feec553217f67b861ab326b3caffad9d90ace84bae6",
+    "incumbent-source-check.json": "588557a6cdf05ddd5e6b6516f61f207bcea9a70b1eb1e3e48d6a99efe53a4fe4",
+    "post-call.sha256": "48e07daf192eadf68aab3a77d9b8a13c8f1892e1578661262974f28bbf0bb8e9",
+    "pre-call.sha256": "48e07daf192eadf68aab3a77d9b8a13c8f1892e1578661262974f28bbf0bb8e9",
+    "result.json": "be621c569ccd6e8e17225ff2e66d122f1a53a6de48350ef39f3ba8b7f8d43aa0",
+    "source-check-before.json": "0fc2cd058e279b283edb93927137fa4635b8d2e38c203d6a0e23059988f702cd",
+    "source-revision.txt": "8fcfbfcf7470bb0d354f4fb15731fa8f7dfa586c081f4e3baea9c8560f217299",
+    "tests/command.json": "2e48935a0674971e848c5fd11eda087592acd1641a839ee17be3c4713703aec9",
+    "tests/exits.tsv": "bd6b48a9e6ebcaddc0a876a2ab6933586effa04c86b9b61a7362eb21d8593e2b"
+  },
+  "raw_attempt_directory": "/workspace/scratch/caf932c2ca37/tmp/fiber_domains/native-attempt1",
+  "review_execution": {
+    "benchmarks_or_campaigns_executed": false,
+    "builds_executed": false,
+    "metadata_and_source_inspection_only": true,
+    "native_programs_executed": false,
+    "tests_executed": false
+  },
+  "reviewed_at_utc": "2026-11-23T05:08:36.898865+00:00",
+  "reviewer": "/root/baseline_extractor_review",
+  "schema": "prime31-fiber-domain-independent-qualification-review/v1",
+  "scope_limits": {
+    "complete_cold_prime31_advantage_established": false,
+    "fixed_fixture_correctness_and_integration_only": true,
+    "general_negative_search_exhaustion_established": false,
+    "natural_prime31_yield_established": false,
+    "new_asymptotic_claim": false,
+    "performance_or_timing_admission": false,
+    "root_library_gate_reviewed": false,
+    "signed_pcc_status": "unverified",
+    "unverified_execution_dimensions": [
+      "signed PCC",
+      "compiler reproducibility",
+      "registry package bodies and external execution admission"
+    ]
+  },
+  "source_custody": {
+    "actual_new_contract_sources_and_specialized_dependency_closure_inventoried": true,
+    "all_104_current_source_files_match_inventory": true,
+    "all_104_source_files_match_frozen_git_revision_bytes": true,
+    "both_saved_source_checks_verified": true,
+    "complete_hermetic_build_manifest": false,
+    "embedded_source_manifest_sha256": "004174bd4047c40bf64239232d30998a233a0155c3840eb8150296a30b220ed9",
+    "saved_manifest_file_sha256": "a854604966697dff26e59feec553217f67b861ab326b3caffad9d90ace84bae6",
+    "saved_manifest_has_one_trailing_print_newline": true,
+    "source_check_binary_ids_match_choice_and_incumbent_clis": true,
+    "unique_sources": 104
+  },
+  "source_revision": "6dd952d6b5a848f69a65afa5e00ef59e708628a5",
+  "static_audit_review": {
+    "additional_blocking_defects_found": false,
+    "incumbent_scalar_only_audit": "explicitly denies frozen-input/hash/source-execution/timing-admission verification",
+    "specialized_complete_negative_receipt": "requires cancellation check and native-call record; does not verify search exhaustion",
+    "specialized_identity_fallback_binding": "matches canonical query target infinity flag",
+    "specialized_tampering_contract": "conditional branch is reached and mutations address query_result record index 6",
+    "specialized_target_cancellation_binding": "matches producer branches",
+    "unavailable_native_field_counters": "required null with incomplete arithmetic flag"
+  },
+  "status": "passed_fixed_fixture_qualification_metadata_review",
+  "test_results": {
+    "all_24_source_contract_files_executed_once_in_saved_logs": true,
+    "all_named_cases_match_source_test_definitions": true,
+    "all_test_stderr_files_empty": true,
+    "executable_exits_all_zero": true,
+    "failed": 0,
+    "filtered_out": 0,
+    "ignored": 0,
+    "measured": 0,
+    "new_requested_contracts_passed": {
+      "fiber_extract_contract": 7,
+      "incumbent_control_contract": 4,
+      "incumbent_driver_contract": 2,
+      "prepared_oracle_contract": 4,
+      "prepared_panel_contract": 3,
+      "recovery_modes_contract": 3,
+      "specialized_control_contract": 4
+    },
+    "passed": 103,
+    "per_executable_passed": {
+      "adversarial_contracts": 2,
+      "audit_contracts": 5,
+      "base_certificates": 8,
+      "choice_audit_contract": 7,
+      "collector_contracts": 5,
+      "domain_modes_contract": 1,
+      "fiber_extract_contract": 7,
+      "identity_contract": 1,
+      "incumbent_control_contract": 4,
+      "incumbent_driver_contract": 2,
+      "kernel_fiber_contract": 2,
+      "oracle_contracts": 8,
+      "pair_control_contract": 6,
+      "plain_reference_contract": 8,
+      "prepared_oracle_contract": 4,
+      "prepared_panel_contract": 3,
+      "provenance_contracts": 2,
+      "recovery_modes_contract": 3,
+      "rho_v6_contract": 5,
+      "sparse_h2_contract": 4,
+      "specialized_control_contract": 4,
+      "staged_panel_contract": 3,
+      "target_transport_contract": 3,
+      "tower4_contract": 6
+    }
+  }
+}

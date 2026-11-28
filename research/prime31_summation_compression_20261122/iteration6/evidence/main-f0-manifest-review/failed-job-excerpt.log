@@ -1,0 +1,24 @@
+2026-11-23T02:34:19.5689653Z [36;1mcargo test --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --lib 2>&1 | tee correctness-receipts/library-tests.txt[0m
+2026-11-23T02:34:19.5713413Z shell: /usr/bin/bash -e {0}
+2026-11-23T02:34:19.5713555Z env:
+2026-11-23T02:34:19.5713673Z   CARGO_HOME: /home/runner/.cargo
+2026-11-23T02:34:19.5713820Z   CARGO_INCREMENTAL: 0
+2026-11-23T02:34:19.5714206Z   CARGO_TERM_COLOR: always
+2026-11-23T02:34:19.5714391Z   CACHE_ON_FAILURE: false
+2026-11-23T02:34:19.5714586Z ##[endgroup]
+2026-11-23T02:34:19.5912425Z [1m[91merror[0m[1m: duplicate key[0m
+2026-11-23T02:34:19.5912651Z    [1m[94m--> [0mCargo.toml:132:1
+2026-11-23T02:34:19.5912825Z     [1m[94m|[0m
+2026-11-23T02:34:19.5913056Z [1m[94m132[0m [1m[94m|[0m name = "curve-transfer-sweep"
+2026-11-23T02:34:19.5913287Z     [1m[94m|[0m [1m[91m^^^^[0m
+2026-11-23T02:34:19.5917954Z [1m[91merror[0m: failed searching for potential workspace
+2026-11-23T02:34:19.5918364Z package manifest: `/home/runner/work/crypto/crypto/research/prime31_ic_20261115/native/Cargo.toml`
+2026-11-23T02:34:19.5918707Z invalid potential workspace manifest: `/home/runner/work/crypto/crypto/Cargo.toml`
+2026-11-23T02:34:19.5918892Z 
+2026-11-23T02:34:19.5919197Z help: to avoid searching for a non-existent workspace, add `[workspace]` to the package manifest
+2026-11-23T02:34:19.5931509Z ##[error]Process completed with exit code 101.
+2026-11-23T02:34:19.5978882Z ##[group]Run actions/upload-artifact@v4
+2026-11-23T02:34:19.5979243Z with:
+2026-11-23T02:34:19.5979458Z   name: prime31-dickson-correctness-4a40be161b9b3e6bc4db8a8dc16864e82d754d7b
+2026-11-23T02:34:19.5979711Z   path: correctness-receipts/
+2026-11-23T02:34:19.5979862Z   retention-days: 14

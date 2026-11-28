@@ -1,0 +1,14 @@
+{
+  "action": "enumerate the exact bootstrap law (multisets with multinomial weights, strata convolved for the pooled statistic) and run repeated MC bootstraps to measure noise; judge the producer's endpoints against that range, not by eye",
+  "created": "2026-11-24T08:18:18Z",
+  "evidence": [
+    "research/quartic_diem_la_20261123/validation/recompute.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "comparing a producer's Monte Carlo cluster-bootstrap interval when each stratum has few clusters (about 6 or fewer)",
+  "why": "quartic_diem_la_20261123: 5 curves per prime; producer endpoints differed from the exact law by up to 1.7% but all lay inside the range of 400 independent 4000-replicate runs"
+}

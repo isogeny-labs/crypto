@@ -1,0 +1,92 @@
+R17/R36 independent deterministic-record validation
+Date: 2026-11-19
+Claim standing: pcc:unverified
+Timing/frontier interpretation: none
+
+Validator independence
+----------------------
+The validator in prototypes/r17_r36_validate.rs was authored from the record
+schema and the exact deltas in R17_PRODUCTION.md and R36_PRODUCTION.md. It
+does not call strong_rho.rs, main.rs, the producer jq program, or either
+producer-side Rust oracle. It uses a separately written fail-closed flat-JSON
+parser.
+
+Build and run
+-------------
+commands:
+rustfmt --edition 2021 research/quartic_ghs_r0_r99_20261119/prototypes/r17_r36_validate.rs
+rustc --edition 2021 -D warnings -O research/quartic_ghs_r0_r99_20261119/prototypes/r17_r36_validate.rs -o /tmp/r17-r36-independent-validator
+/tmp/r17-r36-independent-validator --selftest research/quartic_ghs_r0_r99_20261119/receipts/r17_r36_q223.jsonl
+
+exit: 0
+stdout:
+R17-R36 independent record validation PASS
+records=7 rho_arms=5 recovered_scalar=1765657
+trajectory_pairs=4 native_count_pairs=4
+r17_phase_relations=6 r36_exact_setup_vectors=2
+counted_fast_zero_field_counters=27
+timing_fields=retained_not_interpreted
+tamper_rejections=8/8
+
+toolchain:
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+digests:
+7e0d3676352c6458c26283680f206aecd7a588f02673650493a766dbac456392  research/quartic_ghs_r0_r99_20261119/prototypes/r17_r36_validate.rs
+243eff9e1eea808d483c317f450ec884343a6472b8a8b0c84fc69f74fd57ef06  research/quartic_ghs_r0_r99_20261119/receipts/r17_r36_q223.jsonl
+ebb1ec03c647a6393369bdf186ca3a25ebd69a5169928077cdc08a973b8553f3  /tmp/r17-r36-independent-validator
+
+Checks performed
+----------------
+- Exactly seven records: one instance, one development calibration, and the
+  five required rho arms with no extra or duplicate arm.
+- Exact q=223 instance identity, subgroup order, planted target, seed, policy,
+  and the producer token source_revision=worktree-r17-r36.
+- All five arms recover scalar 1765657 with ok=true.
+- Every candidate matches the baseline trajectory tuple and every setup/walk
+  native counter.
+- Each standalone and composed mul5 phase removes exactly one fq_mul per
+  f3_mul, adds exactly four fq_small_div per f3_mul, and preserves fq_inv,
+  f3_mul, f3_sq, f3_inv, batch_inv, and group_add.
+- The baseline and R36 setup vectors equal the values stated in
+  R36_PRODUCTION.md; all R36 walk and verification field counters are equal
+  to the baseline.
+- Complete totals equal the stated values for baseline, mul5, and combined
+  arms: fq_mul/fq_inv/fq_add/fq_small_div respectively
+  110435/782/400276/0, 96884/782/670668/54204, and
+  89423/559/633370/51844.
+- The fast composed arm has count_authoritative=false and all 27 field/group
+  counters are zero while its trajectory and native counters match the
+  counted composed arm.
+- wall_s and calibration clock fields are retained but not parsed, compared,
+  ranked, or interpreted.
+
+Fail-closed self-test
+---------------------
+The validator required rejection of eight corruptions:
+1. wrong recovered scalar;
+2. changed candidate step count;
+3. off-by-one composed setup fq_mul;
+4. nonzero fast walk.fq_mul;
+5. missing walk_native.hash;
+6. an unexpected sixth rho arm;
+7. mismatched source-revision token; and
+8. duplicate JSON keys.
+
+Provenance limitation
+---------------------
+The record is internally consistent under the checks above, but it is not yet
+source-bound evidence. Its instance says source_revision=worktree-r17-r36,
+while main.rs and strong_rho.rs were modified relative to checked-out commit
+67e251c8c60bf8e3a9d5bea5da3fc6c480a16bd8. At validation time their working
+tree SHA-256 values were:
+
+d4ea3e3318f47ce797e6474f03947ce7efdb2cb13524ce692ed3568e090c5ec6  research/quartic_ghs_strong_rho_20261114/main.rs
+30178eaf990ff84671565893c1cd32b11a64a055a864ddc8c07c728da47a60d3  research/quartic_ghs_strong_rho_20261114/strong_rho.rs
+
+The JSONL does not carry those source hashes or a binary hash. Therefore this
+receipt validates the deterministic record contents only. It is not a replay
+certificate, execution proof, source-binding certificate, validation-gate
+artifact, timing result, end-to-end ratio, or frontier result. A rerun from a
+pushed commit with commit/source/binary hashes remains required before
+promotion.

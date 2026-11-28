@@ -1,0 +1,433 @@
+{
+  "schema": "koblitz.results/v1",
+  "round": 53,
+  "runs": [
+    {
+      "attempt": "alphaunit53-01",
+      "source_revision": "bb8333e65c21f7145ba09012a9517ec94c271274",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "ALPHAUNIT53_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-10-31T09:26:48Z",
+      "finished_utc": "2026-10-31T09:29:09Z",
+      "native_wall_seconds": 141.0
+    },
+    {
+      "attempt": "compactfiber53-01",
+      "source_revision": "21b758d24ccf3cf059c9c28ffe9e105dcc4e45bf",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "COMPACTFIBER53_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-10-31T10:19:10Z",
+      "finished_utc": "2026-10-31T10:19:11Z",
+      "native_wall_seconds": 1.0
+    },
+    {
+      "attempt": "discrim53-01",
+      "source_revision": "f39ae15ddc697ff20d764714bf889f0515c0a800",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "DISCRIM53_ALL_CHECKS_PASS",
+      "marker_present": false,
+      "error_count": 89,
+      "first_errors": [
+        "   ? can not convert $INVALID$(unitmat(16)) -> matrix",
+        "   ? error occurred in or before input.sing line 20: `matrix power53=unitmat(16);ideal genericTraces53;`",
+        "   ? expected matrix-expression. type 'help matrix;'",
+        "   ? `power53` is not defined",
+        "   ? error occurred in or before input.sing line 22: `tr53=tr53+power53[i53,i53];`",
+        "   ? `power53` is undefined",
+        "   ? error occurred in or before input.sing line 23: ` genericTraces53[k53+1]=tr53;power53=power53*companion53;`",
+        "   ? wrong range[2] in ideal/module _(1)"
+      ],
+      "status": "rejected",
+      "outcome": "native_error",
+      "started_utc": "2026-10-31T09:23:16Z",
+      "finished_utc": "2026-10-31T09:24:05Z",
+      "native_wall_seconds": 49.0,
+      "manual_stop": "SIGTERM for diagnosed invalid continuation; native handler exit0; strict errors/marker gate rejects"
+    },
+    {
+      "attempt": "discrim53-02",
+      "source_revision": "c414490b70e34e4a3e0063b296569cc448931369",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "DISCRIM53_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-10-31T09:25:17Z",
+      "finished_utc": "2026-10-31T09:26:10Z",
+      "native_wall_seconds": 53.0
+    },
+    {
+      "attempt": "packet53-01",
+      "source_revision": "e5b107be031175e5ba1216414167c2ae9de9e810",
+      "kind": "Singular",
+      "status": "rejected",
+      "native_exit": null,
+      "error_count": 0,
+      "interruption": {
+        "schema": "koblitz.interrupted-run/v1",
+        "status": "rejected",
+        "reason": "serialization receipt ambiguity followed by live runner edit/interpreter offset error",
+        "first_native_pid": 3304436,
+        "first_native_stop": "SIGTERM delivered",
+        "unexpected_second_native_pid": 3307056,
+        "unexpected_second_native_stop": "SIGTERM to owned driver3304103,timeout3307053,and native3307056",
+        "exit_receipt": "driver interrupted;no native exit status claimed",
+        "observed_driver_error": "line21:m:command not found",
+        "metadata_may_have_been_overwritten": true,
+        "prior_first_native_started_utc": "2026-10-31T09:50:12Z",
+        "first_raw_runner_source_revision": "e5b107be0311 (full revision recoverable from Git)",
+        "recorded_utc": "2026-10-31T09:52:04.675388+00:00"
+      },
+      "input_pin_status": "invalid intermediate custody; retained files only",
+      "retained_sha256": {
+        "source.sha256": "be7c9508a303f9c2c99525951e67266caa982ac082742168d96819e2b5ab3795",
+        "binary.sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "interrupted.json": "e6c2c30947e4a31821058c90edc880cc5a9b695fbfab6c8683637399955d5b69",
+        "started-utc.txt": "b83a83f3a2fd6031cb847d0149b81034f8b7d56981dbffd9de68c7c0e7eb5cd4",
+        "gate.log": "436f03ddfd3519b2fc0c04714c0339404f2734ee51128e87bd81be01338fbd39",
+        "runner.sh": "15c204968c68853fd97228f00e55658637bc56c08c65c538cc41f2c7485c4fd8",
+        "source-revision.txt": "6cebcbbdedd61a285a6c1da96602ceabe08d55d5c5c7b3e6e8675754aea5a385",
+        "native.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "input.sing": "28b52da11a826ddb12a431ae984dea1b85baa86ea3e7c7a3de1a1ee24e491f05"
+      }
+    },
+    {
+      "attempt": "packet53-02",
+      "source_revision": "90b9db219f5602d2247c497a966c34de522e37f0",
+      "kind": "Singular",
+      "native_exit": 124,
+      "marker": "PACKET53_ALL_CHECKS_PASS",
+      "marker_present": false,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "rejected",
+      "outcome": "time_cap",
+      "started_utc": "2026-10-31T09:53:22Z",
+      "finished_utc": "2026-10-31T10:13:22Z",
+      "native_wall_seconds": 1200.0
+    },
+    {
+      "attempt": "supersingular53-01",
+      "source_revision": "cb65219e6e7deb48b01e6753e7d552c2e7dd58c1",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "SUPERSINGULAR53_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-10-31T10:15:10Z",
+      "finished_utc": "2026-10-31T10:15:11Z",
+      "native_wall_seconds": 1.0
+    },
+    {
+      "attempt": "tate53-01",
+      "source_revision": "a910fc58db2eb1e7b2c361f95b4b5676a926273c",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "TATE53_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 106,
+      "first_errors": [
+        "   ? `source51` is not defined",
+        "   ? error occurred in or before input.sing line 6: `poly psi53=sourceMap53(source51[3]);ideal gb53=std(ideal(psi53));`",
+        "   ? expected poly-expression. type 'help poly;'",
+        "   ? `psi53` is not defined",
+        "   ? error occurred in or before input.sing line 6: `poly psi53=sourceMap53(source51[3]);ideal gb53=std(ideal(psi53));`",
+        "   ? expected ideal-expression. type 'help ideal;'",
+        "   ? `psi53` is not defined",
+        "   ? error occurred in or before ::inv53 line 2: ` matrix W=lift(ideal(psi53,p),ideal(1));`"
+      ],
+      "status": "rejected",
+      "outcome": "native_error",
+      "started_utc": "2026-10-31T09:30:09Z",
+      "finished_utc": "2026-10-31T09:30:10Z",
+      "native_wall_seconds": 1.0
+    },
+    {
+      "attempt": "tate53-02",
+      "source_revision": "976f893f6b7ec67052a464b8cef0c88d6e9ccac5",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "TATE53_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 8,
+      "first_errors": [
+        "   ? conversion error: denominator!= 1",
+        "   ? error occurred in or before input.sing line 33: `ring(pointResidual53)+\";poly pointLift53=\"+string(pointResidual53/psi53)+\";\");`",
+        "   ? wrong type declaration. type 'help string;'",
+        "   ? conversion error: denominator!= 1",
+        "   ? error occurred in or before input.sing line 46: `poly lift53=residual53/psi53;`",
+        "   ? expected poly-expression. type 'help poly;'",
+        "   ? `lift53` is not defined",
+        "   ? error occurred in or before input.sing line 47: `require53(lift53*psi53==residual53,\"TATE53_FULL_CURVE_PRODUCT\");`"
+      ],
+      "status": "rejected",
+      "outcome": "native_error",
+      "started_utc": "2026-10-31T09:32:06Z",
+      "finished_utc": "2026-10-31T09:32:25Z",
+      "native_wall_seconds": 19.0
+    },
+    {
+      "attempt": "tate53-03",
+      "source_revision": "d06e948be66f373a13567db21efd92366d97430c",
+      "kind": "Singular",
+      "native_exit": 0,
+      "marker": "TATE53_ALL_CHECKS_PASS",
+      "marker_present": true,
+      "error_count": 0,
+      "first_errors": [],
+      "status": "accepted",
+      "outcome": "completed",
+      "started_utc": "2026-10-31T09:33:48Z",
+      "finished_utc": "2026-10-31T09:34:18Z",
+      "native_wall_seconds": 30.0
+    },
+    {
+      "attempt": "transfer-lean53-01",
+      "source_revision": "d06e948be66f373a13567db21efd92366d97430c",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 1,
+      "declarations": [],
+      "status": "rejected"
+    },
+    {
+      "attempt": "transfer-lean53-02",
+      "source_revision": "e5b107be031175e5ba1216414167c2ae9de9e810",
+      "kind": "Lean",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "declarations": [
+        "Transfer53.alpha_isUnit",
+        "Transfer53.alpha_product",
+        "Transfer53.discriminant_change"
+      ],
+      "status": "accepted"
+    }
+  ],
+  "input_pins": [
+    {
+      "attempt": "alphaunit53-01",
+      "artifact": "input.sing",
+      "revision": "bb8333e65c21f7145ba09012a9517ec94c271274",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/ALPHAUNIT53.sing",
+      "sha256": "a831127bdf403ea331876c35fcd6e58d1d3fe62591aceefdc40c83f069cc767a"
+    },
+    {
+      "attempt": "alphaunit53-01",
+      "artifact": "runner.sh",
+      "revision": "bb8333e65c21f7145ba09012a9517ec94c271274",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/REPLAY_CAS.sh",
+      "sha256": "15c204968c68853fd97228f00e55658637bc56c08c65c538cc41f2c7485c4fd8"
+    },
+    {
+      "attempt": "compactfiber53-01",
+      "artifact": "input.sing",
+      "revision": "21b758d24ccf3cf059c9c28ffe9e105dcc4e45bf",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/COMPACTFIBER53.sing",
+      "sha256": "6c9c7c04522572954f88eea47d091b7c268b69e635033776d28e816c4e42ab5d"
+    },
+    {
+      "attempt": "compactfiber53-01",
+      "artifact": "runner.sh",
+      "revision": "21b758d24ccf3cf059c9c28ffe9e105dcc4e45bf",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/REPLAY_CAS.sh",
+      "sha256": "9f3f5549c8ab74524f3a82d7e0249c1b9241fd2a890185d2068d244b5caae131"
+    },
+    {
+      "attempt": "discrim53-01",
+      "artifact": "input.sing",
+      "revision": "f39ae15ddc697ff20d764714bf889f0515c0a800",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/DISCRIM53.sing",
+      "sha256": "34a7be5c87161121c2ebd8f5a8a5f09c06158e5db186c5f50d86cce08fef477a"
+    },
+    {
+      "attempt": "discrim53-01",
+      "artifact": "runner.sh",
+      "revision": "f39ae15ddc697ff20d764714bf889f0515c0a800",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/REPLAY_CAS.sh",
+      "sha256": "15c204968c68853fd97228f00e55658637bc56c08c65c538cc41f2c7485c4fd8"
+    },
+    {
+      "attempt": "discrim53-02",
+      "artifact": "input.sing",
+      "revision": "c414490b70e34e4a3e0063b296569cc448931369",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/DISCRIM53.sing",
+      "sha256": "de21ae6df1cf0ea689f7109866f8afda115147d9d8098beddf10fac4ca5bc5d3"
+    },
+    {
+      "attempt": "discrim53-02",
+      "artifact": "runner.sh",
+      "revision": "c414490b70e34e4a3e0063b296569cc448931369",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/REPLAY_CAS.sh",
+      "sha256": "15c204968c68853fd97228f00e55658637bc56c08c65c538cc41f2c7485c4fd8"
+    },
+    {
+      "attempt": "packet53-02",
+      "artifact": "input.sing",
+      "revision": "90b9db219f5602d2247c497a966c34de522e37f0",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/PACKET53.sing",
+      "sha256": "28b52da11a826ddb12a431ae984dea1b85baa86ea3e7c7a3de1a1ee24e491f05"
+    },
+    {
+      "attempt": "packet53-02",
+      "artifact": "runner.sh",
+      "revision": "90b9db219f5602d2247c497a966c34de522e37f0",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/REPLAY_CAS.sh",
+      "sha256": "9f3f5549c8ab74524f3a82d7e0249c1b9241fd2a890185d2068d244b5caae131"
+    },
+    {
+      "attempt": "supersingular53-01",
+      "artifact": "input.sing",
+      "revision": "cb65219e6e7deb48b01e6753e7d552c2e7dd58c1",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/SUPERSINGULAR53.sing",
+      "sha256": "d5493d93bba8026017341a9f1636174b46d1840ef061c4ba6a78c2a37d6cf0dd"
+    },
+    {
+      "attempt": "supersingular53-01",
+      "artifact": "runner.sh",
+      "revision": "cb65219e6e7deb48b01e6753e7d552c2e7dd58c1",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/REPLAY_CAS.sh",
+      "sha256": "9f3f5549c8ab74524f3a82d7e0249c1b9241fd2a890185d2068d244b5caae131"
+    },
+    {
+      "attempt": "tate53-01",
+      "artifact": "input.sing",
+      "revision": "a910fc58db2eb1e7b2c361f95b4b5676a926273c",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/TATE53.sing",
+      "sha256": "dcd50456d5fb84b04583347bea38fe1aa2ad46e59365bfcef9794c35e4637cf0"
+    },
+    {
+      "attempt": "tate53-01",
+      "artifact": "runner.sh",
+      "revision": "a910fc58db2eb1e7b2c361f95b4b5676a926273c",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/REPLAY_CAS.sh",
+      "sha256": "15c204968c68853fd97228f00e55658637bc56c08c65c538cc41f2c7485c4fd8"
+    },
+    {
+      "attempt": "tate53-02",
+      "artifact": "input.sing",
+      "revision": "976f893f6b7ec67052a464b8cef0c88d6e9ccac5",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/TATE53.sing",
+      "sha256": "8cdd2ffba91211115048c4c771443c20ef2a97cb870afa2e4297231e4c5edcc1"
+    },
+    {
+      "attempt": "tate53-02",
+      "artifact": "runner.sh",
+      "revision": "976f893f6b7ec67052a464b8cef0c88d6e9ccac5",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/REPLAY_CAS.sh",
+      "sha256": "15c204968c68853fd97228f00e55658637bc56c08c65c538cc41f2c7485c4fd8"
+    },
+    {
+      "attempt": "tate53-03",
+      "artifact": "input.sing",
+      "revision": "d06e948be66f373a13567db21efd92366d97430c",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/TATE53.sing",
+      "sha256": "8f945f18e149c2dd81720399592c827a76d59688512ff56cdac1c7fa9ea22f16"
+    },
+    {
+      "attempt": "tate53-03",
+      "artifact": "runner.sh",
+      "revision": "d06e948be66f373a13567db21efd92366d97430c",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/REPLAY_CAS.sh",
+      "sha256": "15c204968c68853fd97228f00e55658637bc56c08c65c538cc41f2c7485c4fd8"
+    },
+    {
+      "attempt": "transfer-lean53-01",
+      "artifact": "Transfer53.lean",
+      "revision": "d06e948be66f373a13567db21efd92366d97430c",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/lean/Transfer53.lean",
+      "sha256": "ef80547eeba18ef74b8276982a6070a92ffd9954c41c092a59e964bffe87ec8c"
+    },
+    {
+      "attempt": "transfer-lean53-01",
+      "artifact": "AuditAxioms.lean",
+      "revision": "d06e948be66f373a13567db21efd92366d97430c",
+      "git_source": "tools/lean/AuditAxioms.lean",
+      "sha256": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929"
+    },
+    {
+      "attempt": "transfer-lean53-01",
+      "artifact": "runner.sh",
+      "revision": "d06e948be66f373a13567db21efd92366d97430c",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/REPLAY_LEAN.sh",
+      "sha256": "bdf9baf8a9bb401e469573a312011e2a7a61d647fa30d4b7267ee7b9fe99973d"
+    },
+    {
+      "attempt": "transfer-lean53-02",
+      "artifact": "Transfer53.lean",
+      "revision": "e5b107be031175e5ba1216414167c2ae9de9e810",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/lean/Transfer53.lean",
+      "sha256": "ef80547eeba18ef74b8276982a6070a92ffd9954c41c092a59e964bffe87ec8c"
+    },
+    {
+      "attempt": "transfer-lean53-02",
+      "artifact": "AuditAxioms.lean",
+      "revision": "e5b107be031175e5ba1216414167c2ae9de9e810",
+      "git_source": "tools/lean/AuditAxioms.lean",
+      "sha256": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929"
+    },
+    {
+      "attempt": "transfer-lean53-02",
+      "artifact": "runner.sh",
+      "revision": "e5b107be031175e5ba1216414167c2ae9de9e810",
+      "git_source": "research/koblitz_modular_ic_20261018/rounds/53/REPLAY_LEAN.sh",
+      "sha256": "9b104ace26659f81cc819cf39c5e6efa7e0650a1b1ddfb3b70d6f8eb732f964d"
+    }
+  ],
+  "audited_unique_declarations": [
+    "Transfer53.alpha_isUnit",
+    "Transfer53.alpha_product",
+    "Transfer53.discriminant_change"
+  ],
+  "native_observations": {
+    "supersingular53-01": [
+      "SUPER53_RESULT dimension=16 Jacobian_unit=1 quartic_member=1 compact_N_zero=0",
+      "SUPER53_ACTUAL_RESULT dimension=16 Jacobian_unit=1 quartic_member=1 compact_N_zero=0",
+      "SUPER53_DESCENDED_RESULT dimension=16 Jacobian_unit=1 quartic_member=1 full_descent=1 rectangular4x4=1"
+    ],
+    "compactfiber53-01": [
+      "COMPACT53_RESULT label=generic gcd_Q_exponent=2 quotient_vdim=-1",
+      "COMPACT53_RESULT label=actual gcd_Q_exponent=2 quotient_vdim=-1"
+    ],
+    "packet53-02": {
+      "completed_prefix_markers": [
+        "PACKET53_INVERSE_AND_LINE_PASS",
+        "PACKET53_COORDINATES_SAVED"
+      ],
+      "coordinate_export_bytes": 79509,
+      "five_target_equations": "not completed before time cap",
+      "target_delta_unit_lift_serialized": false
+    },
+    "discrim53-02": {
+      "prediction_flags": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  }
+}

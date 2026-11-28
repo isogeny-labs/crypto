@@ -1,0 +1,133 @@
+{
+  "label": "Prime31 run62 exception-safe Mersenne-fold mixed Jacobian, primitive only",
+  "date_utc": "2026-11-22",
+  "curve": {
+    "p": 2147483647,
+    "n": 2147446831,
+    "a": 847514846,
+    "b": 2087444724,
+    "G": [
+      625037715,
+      2100627251
+    ],
+    "cofactor": 1
+  },
+  "pre_registered_protocol": "research/prime31_f4_admission_20261121/RUN62_COMPLETE_SHIFT_PROTOCOL.md",
+  "protocol_commit": "b06f6fc890f9a3d7c9008a6b311dbb7f1b8cb0fb",
+  "rust_source": "research/prime31_ic_20261115/native/examples/prime31_run62_complete_shift.rs",
+  "source_introduction_commit": "66fac6482193493b2bd3400ce26ea40a5086f1e6",
+  "workflow_introduction_commit": "a0c63206805924035d35801deb9ca6fb645f23f7",
+  "native_ci": {
+    "url": "https://github.com/isogeny-labs/crypto/actions/runs/45022038604",
+    "run_id": 45022038604,
+    "job_id": 137206872980,
+    "conclusion": "success",
+    "rust_version": "1.100.0",
+    "original_crate": "research/prime31_ic_20261115/native",
+    "release_build_seconds": 12.86
+  },
+  "correctness": {
+    "native_field_pairs": 120049,
+    "native_group_chains": 96,
+    "native_group_steps": 12288,
+    "exception_branches": [
+      "infinity",
+      "G doubling",
+      "negative G cancellation",
+      "(n-1)G order wrap"
+    ],
+    "native_all_passed": true,
+    "independent_python_local_field_pairs": 120025,
+    "independent_python_local_group_chains": 96,
+    "independent_python_local_group_steps": 12288,
+    "independent_python_passed": true
+  },
+  "benchmark": {
+    "repetitions": 5,
+    "iterations_each": 250000,
+    "source": "same-process original Rust release runner, rotated arm order",
+    "complete_folded_ns_per_step": [
+      21.7635,
+      21.5597,
+      21.5963,
+      21.5482,
+      21.5085
+    ],
+    "partial_prior_ns_per_step": [
+      23.6105,
+      23.8345,
+      23.5962,
+      23.3134,
+      23.723
+    ],
+    "original_affine_ns_per_step": [
+      290.9099,
+      289.9687,
+      290.101,
+      289.9325,
+      289.9812
+    ],
+    "median_complete_folded_ns": 21.5597,
+    "median_partial_prior_ns": 23.6105,
+    "median_original_affine_ns": 289.9812,
+    "matched_original_over_complete_speedup": 13.4501,
+    "matched_partial_over_complete_speedup": 1.0951,
+    "digest": 1372725649
+  },
+  "hypothetical_not_same_run_solver_comparison": {
+    "run59_conditional_uniform_queries_for_1024": 4699949,
+    "historical_cross_run_bsgs_ms": 170.113,
+    "complete_shift_only_projected_ms": 101.3296,
+    "remaining_hypothetical_ms": 68.7834,
+    "remaining_per_query_ns": 14.635,
+    "same_host": false
+  },
+  "scope": {
+    "new_full_ecdlp_logs": 0,
+    "blind_non_generic_roots": 0,
+    "complete_index_calculus_solver": false,
+    "measured_complete_solver_advantage": false,
+    "independent_signed_pcc": "unverified"
+  },
+  "native_ci_with_independent_python": {
+    "url": "https://github.com/isogeny-labs/crypto/actions/runs/45022156215",
+    "run_id": 45022156215,
+    "job_id": 137207239654,
+    "status_at_log_retrieval": "job steps all successful; workflow concluding",
+    "python_120025_field_12288_group": "pass",
+    "rust_120049_field_12288_group": "pass",
+    "rust_version": "1.100.0",
+    "release_build_seconds": 6.3,
+    "benchmark": {
+      "complete_folded_ns_per_step": [
+        21.7497,
+        21.8733,
+        21.8971,
+        21.8566,
+        21.8786
+      ],
+      "partial_prior_ns_per_step": [
+        21.6424,
+        21.9587,
+        21.8177,
+        21.9612,
+        22.3461
+      ],
+      "original_affine_ns_per_step": [
+        385.601,
+        385.2714,
+        384.8678,
+        384.2782,
+        384.3006
+      ],
+      "median_complete_folded_ns": 21.8733,
+      "median_partial_prior_ns": 21.9587,
+      "median_original_affine_ns": 384.8678,
+      "original_over_complete": 17.5954,
+      "partial_over_complete": 1.0039,
+      "projected_1024_shift_only_ms": 102.8032,
+      "digest": 1372725649
+    }
+  },
+  "validation_note": "The same-source second run reports nearly equal complete-folded vs prior partial (1.0039x), despite first-run 1.0951x. Do not claim a robust 9.5% fold benefit. Both runs validate exceptional completeness and show ~21.6-21.9ns complete primitive. Cross-run original affine timing drift is large; never aggregate unmatched ratios."
+}

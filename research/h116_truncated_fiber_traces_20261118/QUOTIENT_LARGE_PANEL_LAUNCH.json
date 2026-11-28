@@ -1,0 +1,23 @@
+{
+  "schema": "h116-quotient-large-panel-launch/v1",
+  "protocol_id": "H116-QUOTIENT-LARGE-PANEL-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and exact hashes in QUOTIENT_LARGE_PANEL_SOURCE_GATE.md",
+  "radices": [2, 3, 4, 5, 6, 8, 10, 12, 16],
+  "commands": {
+    "producer_build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_quotient_large_producer.rs", "-o", "/tmp/h116_quotient_large_producer"],
+    "scorer_build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_quotient_large_scorer.rs", "-o", "/tmp/h116_quotient_large_scorer"],
+    "producer_selftest": ["/tmp/h116_quotient_large_producer", "--selftest"],
+    "scorer_selftest": ["/tmp/h116_quotient_large_scorer", "--selftest"],
+    "produce": ["/tmp/h116_quotient_large_producer", "--generate", "QUOTIENT_LARGE_PANEL_MOMENTS.tsv", "QUOTIENT_LARGE_PANEL_LABELS.tsv"],
+    "score": ["/tmp/h116_quotient_large_scorer", "--score", "QUOTIENT_LARGE_PANEL_MOMENTS.tsv", "QUOTIENT_LARGE_PANEL_LABELS.tsv", "QUOTIENT_LARGE_PANEL_RESULT.json"]
+  },
+  "replicates": 4096,
+  "outputs": [
+    "QUOTIENT_LARGE_PANEL_MOMENTS.tsv",
+    "QUOTIENT_LARGE_PANEL_LABELS.tsv",
+    "QUOTIENT_LARGE_PANEL_RESULT.json",
+    "QUOTIENT_LARGE_PANEL_RUN.txt",
+    "QUOTIENT_LARGE_PANEL_SHA256SUMS"
+  ],
+  "measurement_scope": "fixed-small-radix/order rank scaling and multi-level recursive path completeness on three deterministically selected larger prime-order curves; no asymptotic completeness or ECDLP speedup claim"
+}

@@ -86,7 +86,10 @@ belong to the same matrix. They are never inferred from output basis degree.
 | Hybrid guess → F4 | `python -m groebner_compare.research_worker hybrid-f4` fixes the three most involved variables on the ECC fixture, checks each branch basis, and returns a *witness* |
 | Hybrid guess → CryptoMiniSat | `python -m groebner_compare.research_worker hybrid-cryptominisat` specializes the same variables and sends each surviving Boolean system to native XOR SAT; all failed branches are charged, but their UNSAT result is not independently certified |
 | Original M5GB C++ | `python -m groebner_compare.research_worker m5gb` invokes an **externally built** bridge for the actual upstream source at `manschga/M5GB` commit `2d063f748e8a16ac5a1d74641c79725df29f67ac`; missing binary, upstream errors, uncertified output and watchdog exits are recorded, not replaced with F5 |
-| Magma Boolean F4, msolve, hybrid XL/Crossbred | Not implemented here; use the worker contract below only after field-correct adapters and independent checks exist |
+| msolve F4 | `python -m groebner_compare.external_worker msolve`; `-g 2` reduced DRL basis only, `-v 2` round table parsed for step degree and matrix size; GF(2) parametrisation output is not used (degenerate on multi-root toy systems) |
+| CryptoMiniSat CLI | `python -m groebner_compare.external_worker cryptominisat5 [--max-solutions K]`; Tseitin AND gates plus native XOR rows, enumerates up to K models (default 64); UNSAT stays `unknown` |
+| Magma Boolean F4 | `python -m groebner_compare.external_worker magma`; always `unavailable` until a licensed binary exists **and** the adapter is validated against it |
+| Hybrid XL/Crossbred | Not implemented here |
 
 Build and select the M5GB bridge from separately obtained upstream source:
 
@@ -148,6 +151,47 @@ unimplemented adapters are deliberately absent from this runnable matrix.
 Reference API: [Groebner.jl learn/apply](https://sumiya11.github.io/Groebner.jl/interface/).
 The exact certificate follows the zeros-and-staircase argument already used
 in `cryptanalysis/experiments/pdp-scaling/boolean_basis.py`.
+
+## Semaev decomposition systems over GF(2^n)
+
+`semaev.py` generates deterministic planted Weil-descended decomposition
+systems on y^2+xy=x^3+ax^2+b, factor base = abscissae in <1,z,...,z^(l-1)>:
+`plain` (chained S3, any m >= 3, cubic), `symmetrised` (m = 3, b = 1, x plus
+e variables with the sigma correspondence) and `symmetrised-e` (m = 3, e only,
+quadratic). There is no binary symmetrised S5, so m = 4 is `plain` only. The
+planted assignment lives in the manifest's `planted_answers`, which the runner
+never sends to workers; it only records `planted_in_certified_solutions`.
+
+```sh
+python -m groebner_compare.semaev --m 3 --n 5 --l 2 --a 0 --variant plain \
+  --count 1 --output /tmp/m3.json [--export-dir /tmp/m3-exports]
+python -m unittest groebner_compare.test_semaev -v
+python -m groebner_compare.runner /tmp/m3.json --output /tmp/m3-receipt
+```
+
+Manifests above 12 variables set `"certificate": "witness-replay"` (up to 128
+variables): a returned basis is not certified as a Gröbner basis; its zeros are
+enumerated (`certificate.basis_roots`) and only those satisfying the original
+equations count, as `verified_witness` with `root_count` null. At or below 12
+variables the exhaustive certificate applies unchanged. Every certified root is
+then sent to `semaev_verifier`, which regenerates the instance by seed, rejects
+any drift, decodes the abscissae (e-only: factor-base roots of
+T^3+e1T^2+e2T+e3) and accepts only if some sign choice re-adds to the target
+under curve arithmetic (`curve_witness`). Summaries add `availability`
+(`UNAVAILABLE` when every solver request was unavailable, with
+`unavailable_reasons`), `backend_reported_solver_peak_rss_bytes` (sampled
+VmHWM of the external solver process; the wait4 `ru_maxrss` is kept only as an
+upper bound because Linux carries the forking worker's RSS across exec) and
+`backend_reported_solver_wall_seconds`.
+
+The existing Groebner.jl learn/apply backend is the fixed-schedule F4 arm.
+Over GF(2), distinct targets of one (m, n, l) cell generally have different
+generator supports (zero coefficients drop terms), so `worker.jl` rejects the
+apply as `incompatible` and the runner charges a fallback; a same-support
+template encoding would be needed before that arm measures reuse across
+targets. The repository's Python `BooleanF4` prototype exceeds a 30 s watchdog
+even on the 9- and 11-variable cells. Tiny-cell runs are correctness controls,
+not performance evidence.
 
 ## Worker contract
 

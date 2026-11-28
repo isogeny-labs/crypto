@@ -1,0 +1,15 @@
+{
+  "action": "confirm it twice without the counter: a paired invariant (with shared RNG draws, equal attempt counts on every pair means no rescue) and the mechanism (the binary's uncounted rank diagnosis: rank == rank_no_t < cols on every failed attempt means no solve of that attempt could certify t); run the diagnosis on held-out seeds, not only the ones a parent study checked",
+  "created": "2026-11-26T04:51:40Z",
+  "evidence": [
+    "research/quartic_diem_nofb_20261126/validation/diag_check.json",
+    "research/quartic_diem_nofb_20261126/validation/recompute.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "a study claims that a skipped fallback or retry branch would never have succeeded (e.g. 0 rescues), resting on a counter the same binary emits",
+  "why": "nofb validation: attempts equal on all 80 pairs, and on all 32 failed attempts (16 per arm, 15 pairs, 7 of them on held-out seeds 3-4 the parent never diagnosed) t was undetermined, so a rescue was impossible, not merely unobserved; the --quartic-diag flag left every committed field unchanged in 88 of 88 runs"
+}

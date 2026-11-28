@@ -1,0 +1,14 @@
+digraph PagedPairIndex {
+  graph [rankdir=LR, bgcolor="#f8fafc", pad=0.12, nodesep=0.28, ranksep=0.42];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, color="#64748b", fillcolor="#e2e8f0"];
+  edge [color="#475569", arrowsize=0.7, fontname="Helvetica", fontsize=9];
+  stream [label="Ordered pair-sum stream\n(key, i, j)"];
+  page [label="Directory[key >> 4]\n0 = absent", fillcolor="#dbeafe"];
+  slot [label="Page[key & 15]\npacked first witness", fillcolor="#ccfbf1"];
+  fresh [label="Zero slot: store (i+1, j)\nand count new key", fillcolor="#dcfce7"];
+  collision [label="Occupied slot: return first\nwitness for collision row", fillcolor="#ffedd5"];
+  stream -> page [label="direct build"];
+  page -> slot [label="allocate page once"];
+  slot -> fresh;
+  slot -> collision;
+}

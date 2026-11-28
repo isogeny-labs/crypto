@@ -1,0 +1,25 @@
+name: Graph-IC rectangular Wiedemann source-bound Rust gate
+
+on:
+  pull_request:
+    paths:
+      - src/cryptanalysis/pq_wiedemann.rs
+      - src/cryptanalysis/pq_sparse_la.rs
+      - research/lp_graph_algorithms_20261123/native_pq_gram/**
+      - .github/workflows/graph-ic-gram-native.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  original-source-pq:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Native original PQ module tests, isolated from root-crate blockers
+        shell: bash
+        run: |
+          bash research/lp_graph_algorithms_20261123/native_pq_gram/run.sh

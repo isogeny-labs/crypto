@@ -1,0 +1,15 @@
+{
+  "action": "count the zero readings: with RLIMIT_CPU armed the process CPU clock advances in 4 ms ticks here, so most readings are 0 and the mean rests on a handful of ticks; propagate a Poisson interval on the tick count or use wait4 rusage / ns timers before trusting a ratio near a threshold",
+  "created": "2026-11-17T08:46:13Z",
+  "evidence": [
+    "research/groebner_solver_shootout_20261116/run-local/cells.json rho.per_dlp: 990/1000 cpu_s == 0.0, 10 readings ~0.004 s; validator replay of the same gc_rho_match binary (sha256 f619af1f…8de4) on the same 1000 DLPs: 0/1000 zero readings without RLIMIT_CPU, 991/1000 with ulimit -t 60"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator",
+    "controlled-experiment"
+  ],
+  "trigger": "when a run reports per-call in-process CPU (CLOCK_PROCESS_CPUTIME_ID) for sub-tick work, e.g. a rho adapter's per-DLP cpu_s, and the child runs under RLIMIT_CPU",
+  "why": "a ratio built on a 10-tick mean has a 95% factor range of about x0.48-x1.84 (about 1 bit)"
+}

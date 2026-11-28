@@ -1,0 +1,60 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp32-t74357-b7396dac | 31.69 | pair-table-b1024 | 36/36 | 33.010 | 36.051 | 63.417 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | rho-lanes16 | 36/36 | 1.059 | 1.164 | 2.111 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | rho-neg | 36/36 | 1.019 | 1.120 | 2.031 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | sweep-b128 | 36/36 | 11.549 | 12.704 | 23.096 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | sweep-b16 | 36/36 | 5.384 | 5.920 | 10.746 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | sweep-b2 | 36/36 | 2.824 | 3.103 | 5.621 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | sweep-b32 | 36/36 | 6.796 | 7.474 | 13.572 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | sweep-b4 | 36/36 | 3.132 | 3.442 | 6.238 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | sweep-b64 | 36/36 | 9.414 | 10.354 | 18.816 | — |
+| icv1-fp32-t74357-b7396dac | 31.69 | sweep-b8 | 36/36 | 4.245 | 4.667 | 8.466 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp32-t74357-b7396dac | pair-table-b1024 vs rho-lanes16 | rho-lanes16 < pair-table-b1024 |
+| icv1-fp32-t74357-b7396dac | pair-table-b1024 vs rho-neg | rho-neg < pair-table-b1024 |
+| icv1-fp32-t74357-b7396dac | pair-table-b1024 vs sweep-b128 | sweep-b128 < pair-table-b1024 |
+| icv1-fp32-t74357-b7396dac | pair-table-b1024 vs sweep-b16 | sweep-b16 < pair-table-b1024 |
+| icv1-fp32-t74357-b7396dac | pair-table-b1024 vs sweep-b2 | sweep-b2 < pair-table-b1024 |
+| icv1-fp32-t74357-b7396dac | pair-table-b1024 vs sweep-b32 | sweep-b32 < pair-table-b1024 |
+| icv1-fp32-t74357-b7396dac | pair-table-b1024 vs sweep-b4 | sweep-b4 < pair-table-b1024 |
+| icv1-fp32-t74357-b7396dac | pair-table-b1024 vs sweep-b64 | sweep-b64 < pair-table-b1024 |
+| icv1-fp32-t74357-b7396dac | pair-table-b1024 vs sweep-b8 | sweep-b8 < pair-table-b1024 |
+| icv1-fp32-t74357-b7396dac | rho-lanes16 vs rho-neg | rho-neg < rho-lanes16 |
+| icv1-fp32-t74357-b7396dac | rho-lanes16 vs sweep-b128 | rho-lanes16 < sweep-b128 |
+| icv1-fp32-t74357-b7396dac | rho-lanes16 vs sweep-b16 | rho-lanes16 < sweep-b16 |
+| icv1-fp32-t74357-b7396dac | rho-lanes16 vs sweep-b2 | rho-lanes16 < sweep-b2 |
+| icv1-fp32-t74357-b7396dac | rho-lanes16 vs sweep-b32 | rho-lanes16 < sweep-b32 |
+| icv1-fp32-t74357-b7396dac | rho-lanes16 vs sweep-b4 | rho-lanes16 < sweep-b4 |
+| icv1-fp32-t74357-b7396dac | rho-lanes16 vs sweep-b64 | rho-lanes16 < sweep-b64 |
+| icv1-fp32-t74357-b7396dac | rho-lanes16 vs sweep-b8 | rho-lanes16 < sweep-b8 |
+| icv1-fp32-t74357-b7396dac | rho-neg vs sweep-b128 | rho-neg < sweep-b128 |
+| icv1-fp32-t74357-b7396dac | rho-neg vs sweep-b16 | rho-neg < sweep-b16 |
+| icv1-fp32-t74357-b7396dac | rho-neg vs sweep-b2 | rho-neg < sweep-b2 |
+| icv1-fp32-t74357-b7396dac | rho-neg vs sweep-b32 | rho-neg < sweep-b32 |
+| icv1-fp32-t74357-b7396dac | rho-neg vs sweep-b4 | rho-neg < sweep-b4 |
+| icv1-fp32-t74357-b7396dac | rho-neg vs sweep-b64 | rho-neg < sweep-b64 |
+| icv1-fp32-t74357-b7396dac | rho-neg vs sweep-b8 | rho-neg < sweep-b8 |
+| icv1-fp32-t74357-b7396dac | sweep-b128 vs sweep-b16 | sweep-b16 < sweep-b128 |
+| icv1-fp32-t74357-b7396dac | sweep-b128 vs sweep-b2 | sweep-b2 < sweep-b128 |
+| icv1-fp32-t74357-b7396dac | sweep-b128 vs sweep-b32 | sweep-b32 < sweep-b128 |
+| icv1-fp32-t74357-b7396dac | sweep-b128 vs sweep-b4 | sweep-b4 < sweep-b128 |
+| icv1-fp32-t74357-b7396dac | sweep-b128 vs sweep-b64 | sweep-b64 < sweep-b128 |
+| icv1-fp32-t74357-b7396dac | sweep-b128 vs sweep-b8 | sweep-b8 < sweep-b128 |
+| icv1-fp32-t74357-b7396dac | sweep-b16 vs sweep-b2 | sweep-b2 < sweep-b16 |
+| icv1-fp32-t74357-b7396dac | sweep-b16 vs sweep-b32 | sweep-b16 < sweep-b32 |
+| icv1-fp32-t74357-b7396dac | sweep-b16 vs sweep-b4 | sweep-b4 < sweep-b16 |
+| icv1-fp32-t74357-b7396dac | sweep-b16 vs sweep-b64 | sweep-b16 < sweep-b64 |
+| icv1-fp32-t74357-b7396dac | sweep-b16 vs sweep-b8 | sweep-b8 < sweep-b16 |
+| icv1-fp32-t74357-b7396dac | sweep-b2 vs sweep-b32 | sweep-b2 < sweep-b32 |
+| icv1-fp32-t74357-b7396dac | sweep-b2 vs sweep-b4 | sweep-b2 < sweep-b4 |
+| icv1-fp32-t74357-b7396dac | sweep-b2 vs sweep-b64 | sweep-b2 < sweep-b64 |
+| icv1-fp32-t74357-b7396dac | sweep-b2 vs sweep-b8 | sweep-b2 < sweep-b8 |
+| icv1-fp32-t74357-b7396dac | sweep-b32 vs sweep-b4 | sweep-b4 < sweep-b32 |
+| icv1-fp32-t74357-b7396dac | sweep-b32 vs sweep-b64 | sweep-b32 < sweep-b64 |
+| icv1-fp32-t74357-b7396dac | sweep-b32 vs sweep-b8 | sweep-b8 < sweep-b32 |
+| icv1-fp32-t74357-b7396dac | sweep-b4 vs sweep-b64 | sweep-b4 < sweep-b64 |
+| icv1-fp32-t74357-b7396dac | sweep-b4 vs sweep-b8 | sweep-b4 < sweep-b8 |
+| icv1-fp32-t74357-b7396dac | sweep-b64 vs sweep-b8 | sweep-b8 < sweep-b64 |

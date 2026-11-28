@@ -1,0 +1,53 @@
+{
+  "schema": "vieta-upstream-enforcement-review/v1",
+  "observed_utc": "2026-11-23T12:04:00.547968+00:00",
+  "pr": 4987,
+  "inspected_head": "e73c8996307e67438515d46e7696062d42a2e871",
+  "current_main": "143a0b91fb00b08f02a7e0850aec7f245a8d1516",
+  "upstream_repair_pr": 5001,
+  "upstream_repair_merge": "710b485409e12b6e01cca6868d8f4d69afcc40e8",
+  "useful_repairs": [
+    "paths/detail binding in artifact workflow generator",
+    "PCC subgroup verifier return and test variables",
+    "shared-code lock hashes"
+  ],
+  "workflow_excerpt": "      - name: Pull store data this workflow reads (tools/artifacts)\n        continue-on-error: true\n",
+  "changed_soft_fail_test": "    def test_check_allows_temporary_soft_fail_on_validation_gate_pull(self):\n        # wire() still omits soft-fail for validation gates; --check ignores\n        # continue-on-error drift while the TEMPORARY store-outage fallback is live.\n        source = self.BEFORE + \"      - run: python3 scripts/validation_gate.py check\\n\"\n        wired = wire_workflows.wire(source, self._paths(source))[0]\n        self.assertNotIn(\"continue-on-error: true\", wired)\n        stale = wired.replace(\"        shell: bash\", \"        continue-on-error: true\\n        shell: bash\", 1)\n        with tempfile.TemporaryDirectory() as d:\n            wf = Path(d) / \"wf.yml\"\n            wf.write_text(stale)\n            self.assertEqual(self._main(wf, \"--check\").returncode, 0, self._main(wf, \"--check\").stdout)\n\n",
+  "archive_matching_function": "def archive_covers_removed_row(directory: str, archived: str, base_line: str) -> bool:\n    \"\"\"Whether an archival record covers a row removed from the base admitted table.\n\n    Exact equality is the normal case. Multi-variant directories (several wordings\n    joined by benchmark_groups) match when the archive stores the same set or a\n    subset of those variants. A post-archive README edit that left the row\n    admitted (then removed here) is accepted when both texts still parse as that\n    directory \u2014 otherwise ARCHIVE vs base text drift is an unresolvable catch-22\n    under --base (E2GATEARC).\n    \"\"\"\n    if archived == base_line:\n        return True\n    base_variants = [ln.strip() for ln in base_line.splitlines() if ln.strip()]\n    arch_variants = [ln.strip() for ln in archived.splitlines() if ln.strip()]\n    if arch_variants and set(arch_variants) <= set(base_variants):\n        return True\n    ap, bp = benchmark_rows(archived), benchmark_rows(base_line)\n    return bool(ap) and bool(bp) and {d for d, _ in ap} | {d for d, _ in bp} == {directory}\n",
+  "decision": "Do not merge this upstream bundle into the maintained branch under the task no-weakening constraint. MERGE auto-merge paused; no new approval requested. Await compatible upstream enforcement repair or an explicit owner direction.",
+  "scope": "This is a review of the named changes, not a conclusion that every final gate check passes or fails open. No bypass is attempted.",
+  "source_pins": {
+    ".github/workflows/validation-gate.yml": {
+      "816f9c3a942efed569049618c056d12a0c56d693": "07a71a6fb6b9f3766e58f58f4c02244ff7e0cb8b7ca52a957f7ea79c0ba1b477",
+      "143a0b91fb00b08f02a7e0850aec7f245a8d1516": "83b3172c62b249f0e78043ab1839abc7a54ea1831e24cefbe43daad52a9fa199"
+    },
+    "scripts/validation_gate.py": {
+      "816f9c3a942efed569049618c056d12a0c56d693": "68badc09937574a1fc7e493a2b3f221ffc1f82f11e5fea47b66c955601f644de",
+      "143a0b91fb00b08f02a7e0850aec7f245a8d1516": "b1a1e6f67bda61dabb9f26df1e9cdc90e6e236ef3abb794842efbdf9a4c62b40"
+    },
+    "tools/artifacts/wire_workflows.py": {
+      "816f9c3a942efed569049618c056d12a0c56d693": "b4b5c6c6f5b473b2778bf47c6262d2c4d32924ce610934ab1e0cc9d152a4f7d6",
+      "143a0b91fb00b08f02a7e0850aec7f245a8d1516": "85a98b62bb5b44b5dbc88a7a530fa2e4c79e87e1f66421de133b3ba7886da598"
+    },
+    "tools/artifacts/test_artifacts.py": {
+      "816f9c3a942efed569049618c056d12a0c56d693": "c82f7bbbaf517362f7cd22d88c5c7015c3b20e4b30c2164d6ce300aa336f4432",
+      "143a0b91fb00b08f02a7e0850aec7f245a8d1516": "b6f609015267d5c2a9c22a1c97bc8adc87a6a2bb102a4966a05f13b9b897b7c6"
+    },
+    "tools/pcc/pcc.py": {
+      "816f9c3a942efed569049618c056d12a0c56d693": "00036f8b524bf070a5cf36e02b2599148d390bdf30562d81a1a073df7777da2a",
+      "143a0b91fb00b08f02a7e0850aec7f245a8d1516": "85d787ed7cec0c02a0e2cb81cf435691d448221c1d46e3a4cecb54e64d674fcb"
+    },
+    "tools/pcc/test_pcc.py": {
+      "816f9c3a942efed569049618c056d12a0c56d693": "1e76778ab72c52f39f647223af21783e4e5b93c67f05357c97188cf4abd43215",
+      "143a0b91fb00b08f02a7e0850aec7f245a8d1516": "1016692153a59f4099afa91074bd5ebeddc8a845d2cacbe1670184805aacbeb0"
+    },
+    "docs/shared-code.lock.json": {
+      "816f9c3a942efed569049618c056d12a0c56d693": "cbd292d35ec62a5bd316e6f53022c2b36f340f3b93b0e8ead1bb3c57305523e0",
+      "143a0b91fb00b08f02a7e0850aec7f245a8d1516": "9c0a8f0b668bb1c3a93c4564eba4148be0b713062f4bb80b5fdec6dd16de756d"
+    }
+  },
+  "local_s3_operation": false,
+  "benchmark_or_replay_run": false,
+  "main_merged_into_branch": false,
+  "gate_or_workflow_edited_by_this_followup": false
+}

@@ -1,0 +1,13 @@
+# C70: exact orbit solver and stronger cold comparisons
+
+The conditional solver fixes three ordered source offsets, a binary field, a shift domain and target. It returns every permitted shift and every finite intermediate solving both original S3 equations. This is not a search over independent source offsets.
+
+The monic degree-12 resultant is intersected with the shift-domain subspace polynomial by GCD. Exact coset splitting recovers every shift; polynomial GCD and an F2-linear Artin-Schreier solver recover all intermediate roots, including even extension degrees and repeated/linear cases. Every tuple is checked in the literal equations. Large free-auxiliary outputs raise an unresolved exception; valid nonzero-B inputs avoid that case.
+
+Independent calibration passed 256 small-field systems and 9,216 literal shift/auxiliary checks, including even binary extensions and a zero-coefficient control. Both ordinary and repeated GF(2^83) fixtures matched complete prefix-12 Horner and ANF/zeta scans. All 4,096 table values per fixture were checked directly. The observed smaller-domain ANF scan was faster than domain GCD, so no uniform crossover is claimed.
+
+The larger prefix-21 input was frozen before comparison. Four fresh-process runs per method charged startup, parsing, field/AS setup, resultant construction, domain or full-field GCD/table construction, all auxiliary roots, verification and serialization. All twelve runs returned exactly the same one original conditional root. Median domain GCD: 0.072971519 s; field-first GCD: 0.158065900 s; strong ANF/zeta enumeration: 1.791984845 s. Ratios are 2.16613x against the univariate comparator and 24.5573x against enumeration. These must not be presented as a fiftyfold generalized-rootfinding result.
+
+Repeat span/median was 32.52%, 30.43% and 4.10%, respectively. The fast methods do not establish the required repeatability. Peak wait4 RSS was 9,856 KiB for both GCD methods and 124,672 KiB for enumeration, including startup/pre-exec effects. No qualified host isolation, genuine F4/F5/F6 ratio, hard-instance floor, twenty-instance panel or requested many-field performance is established. The case is exposed planted training and the full five-source search remains open.
+
+Two frozen 90-second, 4-GiB, one-core experiments ran through checked resume/run-ready. All code, inputs, raw cold outputs, timings, memory and late-result checks remain. Next: implement the odd-prime univariate backend and exact interval predicates, with finite-difference scanning as a strong competitor, then exercise the five requested NIST fields. Novelty review must distinguish this classical resultant/GCD machinery from any new complete-search contribution. The scientific fiftyfold goal stays active.

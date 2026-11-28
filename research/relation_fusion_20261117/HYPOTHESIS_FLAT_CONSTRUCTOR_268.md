@@ -1,0 +1,11 @@
+# Opt-in sorted-vector packed constructor
+
+Implement the flat-vector map ablation proposed in hypothesis 182. Recorded instruction attribution 179 motivates reducing generic map allocation/update overhead; it does not predict wall-time improvement. No performance experiment is declared or run here. The original 15× goal remains open. [pcc:unverified]
+
+Keep the existing packed monomials and all arithmetic/projection/coordinate/change-of-order/provenance kernels. Move the packed constructor body into one shared include and instantiate it with the original BTreeMap and an opt-in private sorted-vector map. Preserve every original test assertion. The private map must match the used BTreeMap contracts: sorted unique keys, last duplicate wins on collection, insert/remove/get/mutable value behavior, iteration order and entry defaults. No unsafe code, cached answer, oracle or checker arithmetic constructs a result.
+
+Qualification requires differential map-operation tests, all existing producer/checker tests, fixed-prime n3/4/6 seed7 LAST-star complete wire/basis/stat equality for sparse and DAG across all three qualified kernels, complete independent proof replay and mutation/refusal coverage. Root adapter changes require their actual source matrix before an actual-root timing claim. No F4 solve or degree-of-regularity result is inferred.
+
+The old BTreeMap backend remains an eligible strongest control, including any faster existing frozen worker. Both receive identical launchers, proof formats and complete checks in any later comparison. Unsupported shapes/caps/nonunits remain explicit refusals or charged existing fallbacks. The canonical protocol/export tool is still locked, so actual timing remains pending a separate prospectively frozen protocol and complete source/tool/input pins. [pcc:unverified]
+
+Primary references: maintained packed_constructor.rs and six shared kernels; HYPOTHESIS_PACKED_PIPELINE_182.md and PROFILE_REPORT_179.md. Standard container contracts: Rust BTreeMap, Vec::binary_search_by and slice::sort_by documentation. This storage substitution is an established technique; no novelty claim. LocalCPU0, one thread, no cloud and checkpoint/S3 waiver persist.

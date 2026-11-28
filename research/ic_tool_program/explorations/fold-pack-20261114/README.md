@@ -25,8 +25,8 @@ packed.
 
 | row | build | set-up | collect |
 |:--|:--|:--|:--|
-| k0n53 | **1.244** [1.214, 1.276], established | **1.068** [1.051, 1.080], established | 0.981, no regression |
-| k0n61 | **1.252** [1.223, 1.266], established | 1.038 [1.020, 1.050], not established | 1.009, no regression |
+| icv1-f2m53-tm56619371-dac20a85 | **1.244** [1.214, 1.276], established | **1.068** [1.051, 1.080], established | 0.981, no regression |
+| icv1-f2m61-t158598901-ab42b6c5 | **1.252** [1.223, 1.266], established | 1.038 [1.020, 1.050], not established | 1.009, no regression |
 
 - **Mechanism:** stream push 13.28 → 7.11 and 14.83 → 7.90 ns per stored
   pair.

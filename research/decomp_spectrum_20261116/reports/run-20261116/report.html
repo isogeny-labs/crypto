@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>EXP-DSPEC-001</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">EXP-DSPEC-001</h1>
+</header>
+<h1
+id="exp-dspec-001-is-there-a-sieve-for-elliptic-decomposition-binary-curves-m-2">EXP-DSPEC-001:
+is there a sieve for elliptic decomposition? (binary curves, m = 2)</h1>
+<p><strong>Date.</strong> 2026-11-16. <strong>Type.</strong>
+Preregistered toy experiment (exact combinatorics, no timing).
+<strong>Standing.</strong> <code>[pcc:unverified]</code>: single local
+host, no independent replay, no pcc claim filed.
+<strong>Outcome.</strong> <strong>FLAT at this scope.</strong> The
+frozen rule fired once (SIGNAL, 1 of 95 cells). The replication in
+Amendment 1 did not uphold it (R2: 0 of 20). Only an x-coordinate
+subspace factor base with an exponentially rare spectrum could still
+carry sieve-type structure; none was found.</p>
+<figure>
+<img src="spectrum.svg" alt="spectrum" />
+<figcaption aria-hidden="true">spectrum</figcaption>
+</figure>
+<h2 id="question">Question</h2>
+<p>The user’s thesis (2026-11-16) was that index-calculus relation
+finding needs a number-theoretic oracle rather than an algebraic one.
+Over F_p^* that oracle is sieving, and sieving exists because “divisible
+by ell” is periodic along candidates.</p>
+<p>The elliptic analogue would be a factor base FB whose m = 2
+decomposable set D = {+-(k1 +- k2) : k1, k2 in FB} (discrete-log
+coordinates) has a biased indicator along some arithmetic progression R0
++ jG. All progressions together are the Fourier transform of 1_D on Z/N,
+so the test statistic is Z = max_{a != 0} |hat 1_D(a)| / sd.</p>
+<h2 id="design-frozen-protocol.md-sha256-in-protocol.sha256">Design
+(frozen: <a href="PROTOCOL.md">PROTOCOL.md</a>, sha256 in <a
+href="PROTOCOL.sha256">PROTOCOL.sha256</a>)</h2>
+<ul>
+<li><strong>Fields.</strong> F_{2^17}, F_{2^19}, F_{2^23}.</li>
+<li><strong>Curves.</strong> 14 in total: the Koblitz curves K0 and K1
+where #E = hN (K0 at n = 17 was skipped because its order is not of that
+form), plus 3 seeded random a = 1 curves per n. Subgroups have N from 65
+419 to 4 196 903.</li>
+<li><strong>Arms.</strong>
+<ul>
+<li><code>poly</code>: the low-degree polynomial-basis subspace,
+dimension ceil(n/2). This is the Diem / Petit–Quisquater / Courtois
+factor base.</li>
+<li><code>frob</code>: a Frobenius-stable F_2-subspace ker((s+1)g(s)),
+dimension 9 at n = 17 and 12 at n = 23.</li>
+<li><code>rsub</code>: random subspaces, 5 seeds.</li>
+</ul></li>
+<li><strong>Controls.</strong>
+<ul>
+<li>Null: 20 random index sets per arm, size-matched.</li>
+<li>Positive <code>pint</code>: a DL interval.</li>
+<li>Sensitivity <code>pmix</code>: 10% planted interval.</li>
+</ul></li>
+<li><strong>Exact check.</strong> On the Koblitz curves the
+<code>frob</code> factor base is invariant under k -&gt; lambda k: 0
+violations in all 3 cells.</li>
+<li><strong>Tool.</strong> Rust: <a href="native/">native/</a>
+(<code>dspec</code>, <code>score</code>, <code>rep</code>), built from
+commit 92b7b35f + this branch. Python (<a href="plot.py">plot.py</a>)
+only plots the recorded TSV.</li>
+<li><strong>Host.</strong> Local container, 4 vCPU, 15 GiB, about 10 min
+in total. This deviates from the default route: isolab-eks was not
+reachable because the container has no AWS identity. The values are
+exact counts, so the host does not affect them.</li>
+</ul>
+<h2
+id="results-measured-runsscore.tsv-raw-runs.jsonl-hashes-in-runssha256sums">Results
+(measured; <a href="runs/SCORE.tsv">runs/SCORE.tsv</a>, raw
+<code>runs/*.jsonl</code>, hashes in <a
+href="runs/SHA256SUMS">runs/SHA256SUMS</a>)</h2>
+<table>
+<thead>
+<tr class="header">
+<th>arm</th>
+<th>cells</th>
+<th>non-flat (frozen rule)</th>
+<th>Z / null max, range</th>
+<th>yield</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>poly</code></td>
+<td>14</td>
+<td>0</td>
+<td>0.56 – 1.00</td>
+<td>0.989 – 1.013</td>
+</tr>
+<tr class="even">
+<td><code>frob</code></td>
+<td>9</td>
+<td>0</td>
+<td>0.48 – 1.09</td>
+<td>0.966 – 1.008</td>
+</tr>
+<tr class="odd">
+<td><code>rsub</code></td>
+<td>70</td>
+<td>1 (n=23 K1 seed 5)</td>
+<td>0.57 – 1.17</td>
+<td>0.984 – 1.014</td>
+</tr>
+<tr class="even">
+<td><code>pint</code> (positive)</td>
+<td>14</td>
+<td>14</td>
+<td>1.36 – 3.58</td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td><code>pmix</code> (10% planted)</td>
+<td>14</td>
+<td>3 (all at n = 23)</td>
+<td>0.65 – 1.60</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Detector.</strong> Valid: <code>pint</code> is non-flat on
+all 14 curves. Its margin grows with n (1.36–1.67x at n = 17, 2.48–3.58x
+at n = 23).</li>
+<li><strong>Sensitivity.</strong> A 10% planted structure is detected
+only at n = 23, on 3 of 5 curves. The instrument therefore sees biases
+of roughly Z ≈ 1.5x the null median at n = 23 and nothing weaker. This
+bounds what “flat” means here.</li>
+<li><strong>Yield.</strong> Relation counts for every subspace factor
+base are within 3.4% of a random factor base of the same size: the
+subspace adds no extra decompositions.</li>
+<li><strong><code>frob</code> arm.</strong> On the Koblitz curves this
+arm sits at or below its nulls (0.48–0.84). That is consistent with the
+lambda symmetry: |hat f| is constant on lambda-orbits, so there are
+fewer independent coefficients to take a maximum over.</li>
+</ul>
+<h2
+id="amendment-1-frozen-before-replication-data-amendment-1.md-scores-in-runsamendment1_score.txt">Amendment
+1 (frozen before replication data: <a
+href="AMENDMENT-1.md">AMENDMENT-1.md</a>; scores in <a
+href="runs/AMENDMENT1_SCORE.txt">runs/AMENDMENT1_SCORE.txt</a>)</h2>
+<ul>
+<li><strong>R1.</strong> The flagged factor base against 200 fresh
+nulls: Z = 23.96, null 99th percentile 21.23, maximum 23.64, empirical p
+= 0.005. The protocol counts this as replicated. However, the cell was
+<em>selected</em> as the extreme of 95, so p = 0.005 is a winner’s-curse
+figure: Bonferroni over 95 cells gives about 0.48.</li>
+<li><strong>R3.</strong> Base rate of the frozen rule on
+null-versus-null comparisons: 10 / 1860 = 0.54%. One hit in 95 cells
+(expected 0.51) is in line with that rate.</li>
+<li><strong>R2.</strong> 20 fresh random subspaces on the same curve:
+<strong>0 / 20 non-flat</strong>, binomial p = 1.0. Not replicated.</li>
+<li><strong>Verdict.</strong> The amendment requires both R1 and R2, so
+the SIGNAL is not upheld. Reading: <strong>FLAT</strong>.</li>
+<li><strong>n = 29.</strong> Not attempted. It needs FFTs over more than
+2^28 points (over 16 GiB) and has no EKS route here.</li>
+</ul>
+<h2 id="reading-at-this-scope">Reading at this scope</h2>
+<ul>
+<li>For m = 2 on binary curves with n ≤ 23, no x-coordinate factor base
+tested shows progression structure in its decomposable set. That covers
+the low-degree polynomial subspace, Frobenius-stable subspaces and 25
+random subspaces.</li>
+<li>No arithmetic progression of targets is easier to decompose than a
+random target, at the instrument’s sensitivity.</li>
+<li>A sieve-type, number-theoretic decomposition oracle therefore does
+not arise from these factor bases.</li>
+<li>This agrees with the earlier prime-field spectrum result
+(IDEA-20261109-032af4, interval / mu_B / Legendre bases, flat,
+<code>[pcc:unverified]</code>).</li>
+</ul>
+<p><strong>Not covered:</strong> - m ≥ 3; - n ≥ 29; - non-linear
+families of targets: Frobenius orbits are multiplicative and are covered
+only through the lambda-invariance check; - factor bases not defined by
+x-coordinates; - prime fields in this run.</p>
+<p>A large Fourier coefficient on a set defined by x-coordinates would
+amount to a linear DL leak on that set. If such leaks exist, they are
+rarer than this sampling can see.</p>
+<h2 id="sources-checked">Sources checked</h2>
+<ul>
+<li><code>research-kb</code> was not available in this container (no
+executable). The repos were searched with grep instead.</li>
+<li>Prior closures this builds on:
+<ul>
+<li><code>crypto:research/non_semaev_decomposition_20261113/README.md</code>
+(Lemma T);</li>
+<li><code>crypto:research/iwasawa_leads_20261113/REPORT.md</code> I-12
+(Kolyvagin classes);</li>
+<li><code>crypto:research/lead_sweep_20261110/LEAD-EXO-elliptic-code-list-decoding/RESULT.md</code>;</li>
+<li><code>crypto:research/prime_leads_chase_20261113/L2-lattice/REPORT.md</code>;</li>
+<li><code>crypto:research/prime_ic_lead_heatmap_20261114/TABLES.md</code>
+(IDEA-032af4, IDEA-d881c1, IDEA-dd7eed, IDEA-879c4f).</li>
+</ul></li>
+<li>Literature: Galbraith–Gaudry, “Recent progress on the ECDLP”, §2;
+Courtois, “On splitting a point with summation polynomials in binary
+elliptic curves”, §5. Both were read from the user’s photographs.</li>
+</ul>
+<h2 id="reproduce">Reproduce</h2>
+<pre><code>cd native &amp;&amp; cargo build --release &amp;&amp; cd ..
+for n in 17 19 23; do native/target/release/dspec $n runs/n$n.jsonl; done
+native/target/release/score runs/n17.jsonl runs/n19.jsonl runs/n23.jsonl &gt; runs/SCORE.tsv
+DSPEC_ONLY_CURVE=K1 DSPEC_RSUB_FROM=5 DSPEC_RSUB_TO=5 DSPEC_NULLS=200 DSPEC_SALT=63717 native/target/release/dspec 23 runs/rep_R1.jsonl
+DSPEC_ONLY_CURVE=K1 DSPEC_RSUB_FROM=6 DSPEC_RSUB_TO=25 DSPEC_NULLS=20 DSPEC_SALT=63717 native/target/release/dspec 23 runs/rep_R2.jsonl
+native/target/release/rep runs/rep_R1.jsonl runs/rep_R2.jsonl runs/n17.jsonl runs/n19.jsonl runs/n23.jsonl</code></pre>
+<p>Note: the <code>DSPEC_*</code> options were added after the primary
+run, for Amendment 1. With the variables unset, the null seeds are
+identical to those of the primary run.</p>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "schema": "h116-genus3-trace-parity-launch/v1",
+  "protocol_id": "H116-GENUS3-TRACE-PARITY-001",
+  "source_revision_rule": "execute the first pushed commit containing this manifest and exact hashes in GENUS3_TRACE_PARITY_SOURCE_GATE.md",
+  "multipliers": [1, 2, 3, 4, 5, 6, 7, 8],
+  "rules": 512,
+  "coordinate_scales": [1, 2, 3],
+  "replicates": 4096,
+  "commands": {
+    "build": ["rustc", "--edition=2021", "-O", "-D", "warnings", "h116_genus3_trace_parity.rs", "-o", "/tmp/h116_genus3_trace_parity"],
+    "selftest": ["/tmp/h116_genus3_trace_parity", "--selftest"],
+    "run": ["/tmp/h116_genus3_trace_parity", "--run", "GENUS3_TRACE_PARITY_RESULT.json"]
+  },
+  "outputs": ["GENUS3_TRACE_PARITY_RESULT.json", "GENUS3_TRACE_PARITY_RUN.txt", "GENUS3_TRACE_PARITY_SHA256SUMS"],
+  "measurement_scope": "affine Boolean rules on parity bits of Frobenius traces of eight smooth genus-three covers, with Weil-bound, coordinate-rescaling, planted-scorer and family-wise shuffle controls; direct point counts are a toy oracle for theoretically fixed-genus point counting, not a timing claim"
+}

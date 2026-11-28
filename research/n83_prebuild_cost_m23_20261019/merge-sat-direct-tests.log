@@ -1,0 +1,41 @@
+
+running 36 tests
+test tests::add_clause_drops_tautologies_before_checking_literals ... ok
+test tests::add_clause_refuses_literal_zero - should panic ... ok
+test tests::decided_xor_cache_invalidates_on_backjump_and_matrix_changes ... ok
+test tests::decided_xor_cache_skips_only_until_unassignment_or_rebuild ... ok
+test tests::dimacs_roundtrip ... ok
+test tests::aggressive_clause_reduction_preserves_answers ... ok
+test tests::extended_dimacs_export_round_trips_xors_and_root_unsat ... ok
+test tests::generation_xor_cache_wraparound_cannot_reuse_old_certificate ... ok
+test tests::decided_xor_cache_matches_brute_force_on_mixed_cnf_xor ... ok
+test tests::lazy_trigger_past_the_variables_panics_after_add_vars - should panic ... ok
+test tests::add_clause_refuses_a_literal_past_the_variables_after_add_vars - should panic ... ok
+test tests::lazy_clause_callback_installs_guarded_theory_consequences_on_current_trail ... ok
+test tests::lazy_clause_conflict_backjumps_and_preserves_theory_answer ... ok
+test tests::lazy_theory_clause_past_the_variables_panics - should panic ... ok
+test tests::luby_sequence_starts_correctly ... ok
+test tests::optional_progress_observer_preserves_sat_and_unsat_search ... ok
+test tests::incremental_matrix_matches_full_elimination ... ok
+test tests::decided_xor_cache_matches_mixed_cnf_xor_truth_tables ... ok
+test tests::add_vars_one_at_a_time_recentres_logarithmically ... ok
+test tests::parse_dimacs_xor_reads_parity_convention ... ok
+test tests::pigeonhole_3_into_2_is_unsat ... ok
+test tests::random_3sat_around_threshold ... ok
+test tests::root_propagation_keeps_sat_state_for_solve ... ok
+test tests::root_propagation_keeps_unsat_state_for_solve ... ok
+test tests::pigeonhole_5_into_4_is_unsat ... ok
+test tests::simple_sat ... ok
+test tests::trivial_unsat ... ok
+test tests::xor_and_cnf_interact ... ok
+test tests::xor_cache_policy_switch_rechecks_existing_matrix ... ok
+test tests::xor_empty_row_with_true_rhs_is_unsat ... ok
+test tests::xor_duplicate_vars_cancel ... ok
+test tests::xor_odd_cycle_is_unsat ... ok
+test tests::xor_system_propagates_to_unique_solution ... ok
+test tests::xor_engine_agrees_with_brute_force ... ok
+test tests::search_trace_is_pinned_across_word_boundaries ... ok
+test tests::search_trace_is_pinned ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.66s
+

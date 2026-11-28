@@ -1,0 +1,447 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/aburan28/crypto/blob/main/docs/curves/binary-subgroup-transfer-source-verification.schema.json",
+  "title": "Binary transfer producer-source verification receipt",
+  "description": "Repository-mode provenance receipt binding the binary transfer corpus producer digest and reviewed source closure to a recorded Git tree. It is not independent arithmetic, solver, or advantage evidence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "corpus",
+    "producer_commit",
+    "source_sha256",
+    "source_digest_encoding",
+    "source_files_checked",
+    "source_files",
+    "verifier",
+    "checks",
+    "claim_boundary"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "binary-subgroup-transfer-source-verification/v1"
+    },
+    "status": {
+      "const": "producer_source_digest_bound_to_recorded_git_tree"
+    },
+    "corpus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "binary-subgroup-transfer-certificates/v1"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "producer_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_digest_encoding": {
+      "const": "u64be(path_utf8_bytes)||path_utf8||u64be(content_utf8_bytes)||content_utf8, repeated in source-path order"
+    },
+    "source_files_checked": {
+      "const": 21
+    },
+    "source_files": {
+      "type": "array",
+      "minItems": 21,
+      "maxItems": 21,
+      "prefixItems": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/bin/curve_cover_check/checker.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/bin/curve_cover_check/links.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/bin/curve_cover_check/models.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/bin/hyperelliptic_cover.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/binary_ecc/cover_transfer.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/binary_ecc/curve.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/binary_ecc/f2m.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/binary_ecc/hyperelliptic.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/binary_ecc/mod.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/binary_ecc/operation_tally.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/binary_ecc/poly_f2m.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/cryptanalysis/ecc2k130_guard.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/cryptanalysis/group_op_count.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/prime_hyperelliptic/fp2.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/prime_hyperelliptic/mod.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/prime_hyperelliptic/primality.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/hash/sha256.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "src/utils/mod.rs"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "docs/curves/binary-subgroup-transfer-certificates.schema.json"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "Cargo.toml"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_file"
+            },
+            {
+              "properties": {
+                "path": {
+                  "const": "Cargo.lock"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "items": false
+    },
+    "verifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "const": "scripts/verify_binary_transfer_source.mjs"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "corpus_schema_and_producer_metadata_valid",
+        "commit_object_resolved",
+        "producer_source_path_list_matches_verifier",
+        "all_source_blobs_utf8",
+        "individual_source_hashes_computed",
+        "framed_source_digest_equal"
+      ],
+      "properties": {
+        "corpus_schema_and_producer_metadata_valid": {
+          "const": true
+        },
+        "commit_object_resolved": {
+          "const": true
+        },
+        "producer_source_path_list_matches_verifier": {
+          "const": true
+        },
+        "all_source_blobs_utf8": {
+          "const": true
+        },
+        "individual_source_hashes_computed": {
+          "const": true
+        },
+        "framed_source_digest_equal": {
+          "const": true
+        }
+      }
+    },
+    "claim_boundary": {
+      "const": "this repository-mode check binds the binary corpus's saved producer source digest and reviewed 21-path closure to blobs in the recorded Git commit; it does not attest that an executable was built from that commit, independently verify cover, Jacobian, transfer, or subgroup arithmetic, provide signed PCC standing, or establish a solver or computational advantage"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "bytes",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    }
+  }
+}

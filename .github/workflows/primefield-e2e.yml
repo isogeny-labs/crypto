@@ -1,0 +1,47 @@
+name: Prime-field complexity accounting
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/cryptanalysis/ecbench/complexity_model.rs'
+      - 'src/cryptanalysis/ecbench/complexity_accounting.rs'
+      - 'tools/primefield-e2e/**'
+      - 'research/primefield_e2e_20261125/**'
+      - '.github/workflows/primefield-e2e.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-accounting:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /tools/primefield-e2e/
+            /src/cryptanalysis/ecbench/complexity_model.rs
+            /src/cryptanalysis/ecbench/complexity_accounting.rs
+            /research/primefield_e2e_20261125/
+      - name: Install the qualified native toolchain
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Test original modules
+        run: cargo +1.100.0 test --locked --release --manifest-path tools/primefield-e2e/Cargo.toml
+      - name: Recompute pinned archived accounting and conditional models
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --depth=1 origin aab505dd2d24cd5c98f9be1a2bd2243793a2001b
+          tool=tools/primefield-e2e/target/release/primefield-e2e
+          cargo +1.100.0 build --locked --release --manifest-path tools/primefield-e2e/Cargo.toml
+          "$tool" analyze . research/primefield_e2e_20261125/sources.json /tmp/primefield-e2e
+          "$tool" models /tmp/primefield-e2e
+          "$tool" evaluate research/primefield_e2e_20261125/pipeline-input.json /tmp/primefield-e2e/pipeline-result.json
+          for file in results.json measurements.csv model-results.json model-curves.csv pipeline-result.json; do
+            cmp "research/primefield_e2e_20261125/$file" "/tmp/primefield-e2e/$file"
+          done

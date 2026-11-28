@@ -1,0 +1,14 @@
+{
+  "action": "Use the connector, fetch its temporary file reference into the workspace, and check the GitHub ZIP digest, CRCs and report/raw-data hashes. Keep temporary URLs out of permanent evidence and never execute downloaded binaries.",
+  "created": "2026-11-23T17:02:50Z",
+  "evidence": [
+    "research/nist_cover_three_tests_20261116/closure_20261123/evidence/main-signing-replay.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "research-visuals"
+  ],
+  "trigger": "GitHub artifact CLI ZIP redirects fail but the supported artifact connector is available",
+  "why": "The supported connector recovered both main P192 ZIPs after earlier direct redirects failed403; all ZIP and33 manifest bindings match."
+}

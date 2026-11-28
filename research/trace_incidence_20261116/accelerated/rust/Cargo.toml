@@ -1,0 +1,13 @@
+[package]
+name = "trace-incidence-accelerated"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+crypto = { path = "../../../.." }
+
+[workspace]

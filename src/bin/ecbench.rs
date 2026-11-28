@@ -2,6 +2,7 @@
 //!
 //! ```text
 //! ecbench methods                      what can be measured
+//! ecbench panel [--phase N] [--family F]  canonical curve ladder
 //! ecbench optimize inventory           registry-wide optimization coverage
 //! ecbench optimize audit --development S... --holdout H...
 //! ecbench host                         the host capsule and its class id
@@ -34,12 +35,22 @@
 //!
 //! The standard is `docs/ecbench/README.md`.
 
+#[path = "ecbench/endpoint_pairs.rs"]
+mod endpoint_pairs;
+#[path = "ecbench/isogeny_eval.rs"]
+mod isogeny_eval;
+#[cfg(test)]
+use crypto_lib::{ct_bignum, ecc};
 #[path = "ecbench/pdp3_koblitz.rs"]
 mod pdp3_koblitz;
 #[path = "ecbench/pdp_split_oracle.rs"]
 mod pdp_split_oracle;
 #[path = "ecbench/pkm_tower.rs"]
 mod pkm_tower;
+#[path = "ecbench/retained_chain_study.rs"]
+mod retained_chain_study;
+#[path = "ecbench/scalar_timing.rs"]
+mod scalar_timing;
 #[path = "ecbench/structured_s4.rs"]
 mod structured_s4;
 
@@ -51,8 +62,8 @@ use clap::{Parser, Subcommand};
 
 use crypto_lib::cryptanalysis::ecbench::{
     audit, bounds, calibration, callgrind, canonical, challenge, claim, compare, db, fbm, frontier,
-    full_price, gpu, host, isolab, isolation, methods, optimization, record, resources, runner,
-    signals, spec, stats, trend, wordram_price, workload,
+    full_price, gpu, host, isolab, isolation, methods, optimization, panel, record, resources,
+    runner, signals, spec, stats, trend, wordram_price, workload,
 };
 
 #[derive(Parser)]
@@ -68,6 +79,63 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
+    /// Complete public-input isogeny evaluation in Rust with FLINT primitives.
+    IsogenyEvaluate {
+        #[arg(long)]
+        input: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long)]
+        native_library: PathBuf,
+        #[arg(long)]
+        native_sha256: String,
+        #[arg(long, default_value = "1")]
+        twist_scale: String,
+        #[arg(long)]
+        max_window: usize,
+        #[arg(long)]
+        block: usize,
+        #[arg(long, default_value_t = 0)]
+        baby_window: usize,
+        #[arg(long, default_value_t = 64)]
+        projective_batch: usize,
+        #[arg(long, default_value = isolation::DEFAULT_LOCK)]
+        lock: String,
+    },
+    /// Descriptive local timings of the existing counted scalar multiplication.
+    ScalarTiming {
+        #[arg(long)]
+        spec: PathBuf,
+        #[arg(long)]
+        out: PathBuf,
+        #[arg(long, default_value_t = 64)]
+        batch: u64,
+        #[arg(long, default_value = isolation::DEFAULT_LOCK)]
+        lock: String,
+    },
+    /// Join distinct endpoint workloads without admitting costs or timings.
+    EndpointPairs {
+        #[arg(long)]
+        dir: PathBuf,
+        #[arg(long)]
+        source_curve: String,
+        #[arg(long)]
+        destination_curve: String,
+        #[arg(long)]
+        arm: String,
+        /// Validate an unexecuted plan; refuses existing observations/sessions.
+        #[arg(long)]
+        plan_only: bool,
+    },
+    /// Run the frozen retained-chain probe or complete toy relation pipeline.
+    /// Counters are raw observations; this command does not admit timings.
+    RetainedChainStudy {
+        #[arg(long)]
+        phase: String,
+        /// Must be a new directory; historical evidence is never overwritten.
+        #[arg(long)]
+        out: PathBuf,
+    },
     /// Check pinned diagnostic metadata without launching work.
     DiagnosticPreflight {
         #[arg(long)]
@@ -200,6 +268,24 @@ enum Cmd {
         #[arg(long)]
         json: bool,
     },
+    /// List the canonical 20/30/60/80-bit curve ladder and exact cell ids.
+    Panel {
+        /// Only cells in this phase (1, 2, 3, or 4).
+        #[arg(long)]
+        phase: Option<u8>,
+        /// Show admission for one independently promoted benchmark lane.
+        #[arg(long)]
+        lane: Option<String>,
+        /// Only this family: koblitz, binary, prime, or genus2.
+        #[arg(long)]
+        family: Option<String>,
+        /// Omit blocked cells that have no runnable curve spec.
+        #[arg(long)]
+        runnable: bool,
+        /// Print the selected phase/cell records as JSON.
+        #[arg(long)]
+        json: bool,
+    },
     /// Inventory and audit the registry-wide optimization loop.
     Optimize(OptimizeArgs),
     /// Measure the full-pricing units (src/cryptanalysis/ecbench/full_prices.json) on
@@ -246,7 +332,7 @@ enum Cmd {
     },
     /// Validate a spec and print what it expands to.
     Plan {
-        /// An `ecbench.spec/v1` file.
+        /// An `ecbench.spec/v2` file, or a frozen v1 file for audit/replay.
         #[arg(long)]
         spec: PathBuf,
         /// Print the whole plan (workloads, arms, every execution) as JSON.
@@ -256,6 +342,11 @@ enum Cmd {
         /// writes it.
         #[arg(long, conflicts_with = "json")]
         doc: bool,
+        /// Expand a committed historical spec as replay does (`spec::plan`):
+        /// a pinned field profile still binds, but an unpinned pre-policy
+        /// spec is not refused. New runs always use the strict plan.
+        #[arg(long)]
+        replay: bool,
     },
     /// Run a session.
     Run {
@@ -274,9 +365,12 @@ enum Cmd {
         /// The host `w_cal` was measured on.
         #[arg(long)]
         w_cal_host: Option<String>,
-        /// An `ecbench.spec/v1` file; `plan` shows what it expands to.
+        /// An `ecbench.spec/v2` file; `plan` shows what it expands to.
         #[arg(long)]
         spec: PathBuf,
+        /// Reproduce a frozen v1 spec. New sessions use v2 curve_policy.
+        #[arg(long)]
+        allow_legacy_spec: bool,
         /// A new directory; `${VAR}` is expanded from the environment.
         #[arg(long)]
         out: String,
@@ -432,6 +526,8 @@ enum Cmd {
         /// `--weight` or several `--dir`; the §5a band is not computed.
         #[arg(long)]
         unit: Option<String>,
+        #[command(flatten)]
+        w_cal: WCalOverride,
     },
     /// The one-unit table: every arm on every curve, mean S, ratio to the
     /// floor and to the reference arm.
@@ -569,6 +665,9 @@ enum Cmd {
         /// The spec the worker runs.
         #[arg(long)]
         spec: PathBuf,
+        /// Reproduce a frozen v1 spec. New jobs use v2 curve_policy.
+        #[arg(long)]
+        allow_legacy_spec: bool,
         /// Upload this binary (built for the worker's architecture).
         #[arg(long, conflicts_with_all = ["git_url", "commit"])]
         binary: Option<String>,
@@ -615,6 +714,31 @@ enum Cmd {
         #[command(subcommand)]
         cmd: ChallengeCmd,
     },
+}
+
+/// A `w_cal` override (AGENTS.md §5a, 2026-11-12) for `compare`,
+/// `challenge verdict` and `bound fit`: takes precedence over the sessions'
+/// own reading (`options.w_cal` or the `w_cal.json` sidecar), is recorded as
+/// `source: "override"`, and is refused unless positive and finite.
+#[derive(clap::Args, Clone, Debug, Default)]
+struct WCalOverride {
+    /// Calibrated weight overriding the sessions' own: time of one native
+    /// mulmod over time of one group addition on the same curve and host.
+    /// Needs --w-cal-method and --w-cal-host.
+    #[arg(long, requires_all = ["w_cal_method", "w_cal_host"])]
+    w_cal: Option<f64>,
+    /// `perf-ipc` or `best-of-N timing`.
+    #[arg(long)]
+    w_cal_method: Option<String>,
+    /// The host `w_cal` was measured on.
+    #[arg(long)]
+    w_cal_host: Option<String>,
+}
+
+impl WCalOverride {
+    fn get(self) -> Result<Option<crypto_lib::cryptanalysis::ecbench::band::WCal>, String> {
+        wcal_from_flags(self.w_cal, self.w_cal_method, self.w_cal_host)
+    }
 }
 
 #[derive(clap::Args)]
@@ -700,6 +824,8 @@ enum BoundCmd {
         /// bounds are version 2.
         #[arg(long, default_value_t = bounds::FIT_VERSION)]
         fit_version: u32,
+        #[command(flatten)]
+        w_cal: WCalOverride,
         #[arg(long)]
         out: Option<PathBuf>,
     },
@@ -740,6 +866,7 @@ enum FrontierCmd {
 }
 
 #[derive(Subcommand)]
+#[allow(clippy::large_enum_variant)]
 enum ChallengeCmd {
     /// Validate a drafted challenge (its curves build, lie in its domain,
     /// and number enough sizes) and seal it.
@@ -845,6 +972,8 @@ enum ChallengeCmd {
         /// Exit 1 when the verdict is inadmissible.
         #[arg(long)]
         exit_code: bool,
+        #[command(flatten)]
+        w_cal: WCalOverride,
     },
 }
 
@@ -868,6 +997,9 @@ enum ClaimCmd {
         /// first measured round both arms ran).
         #[arg(long)]
         round: Option<u32>,
+        /// Rebuild a historical claim from a frozen v1 session.
+        #[arg(long)]
+        allow_legacy_spec: bool,
         /// An audit receipt (`ecbench verify --replay-all --out`) made on
         /// another host class that reproduced both runs.
         #[arg(long, requires = "pointer")]
@@ -896,6 +1028,9 @@ enum ClaimCmd {
         workload: String,
         #[arg(long)]
         round: Option<u32>,
+        /// Rebuild a historical claim from a frozen v1 session.
+        #[arg(long)]
+        allow_legacy_spec: bool,
         #[arg(long)]
         base_report: PathBuf,
         #[arg(long)]
@@ -928,9 +1063,36 @@ enum DbCmd {
     },
 }
 
+fn sixsum_oracle<'i>(
+    name: &str,
+    _summands: u32,
+    instance: &'i crypto_lib::cryptanalysis::ic_boundary::BinaryInstance,
+) -> Option<
+    Box<
+        dyn crypto_lib::cryptanalysis::ic_framework::stages::DecompositionOracle<
+                crypto_lib::cryptanalysis::ic_boundary::BinaryGroup<'i>,
+            > + 'i,
+    >,
+> {
+    (name == "sixsum-extract").then(|| {
+        Box::new(
+            crypto_lib::cryptanalysis::koblitz_sixsum_extract::SixSumOracle::new(
+                crypto_lib::cryptanalysis::koblitz_sixsum_extract::Kernel::FourSum,
+                instance,
+            ),
+        )
+            as Box<
+                dyn crypto_lib::cryptanalysis::ic_framework::stages::DecompositionOracle<
+                        crypto_lib::cryptanalysis::ic_boundary::BinaryGroup<'i>,
+                    > + 'i,
+            >
+    })
+}
+
 /// Every plug-in this binary links: `pdp3_koblitz`'s, then
 /// `pdp_split_oracle`'s (the `pdp-split` oracle and the `koblitz-closure`
-/// base).  Names do not overlap, so the order only fixes lookup.
+/// base), then the higher-arity pair-table oracle.  Names do not overlap,
+/// so the order only fixes lookup.
 fn binary_plugins() -> crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugins {
     crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugins {
         base: |name, instance| {
@@ -941,6 +1103,7 @@ fn binary_plugins() -> crypto_lib::cryptanalysis::ecbench::methods::BinaryPlugin
         oracle: |name, summands, instance| {
             (pdp3_koblitz::plugins().oracle)(name, summands, instance)
                 .or_else(|| pdp_split_oracle::oracle(name, summands, instance))
+                .or_else(|| sixsum_oracle(name, summands, instance))
                 .or_else(|| structured_s4::oracle(name, summands, instance))
         },
     }
@@ -1124,6 +1287,23 @@ fn compare_pooled_cmd(
             band.order
         );
     }
+    if let Some(cal) = &c.calibrated {
+        match &cal.declined {
+            Some(why) => println!("calibrated (pooled): declined: {why}"),
+            None => println!(
+                "calibrated (pooled, {}, w_cal {}..{}): {}; ranked at calibrated price: {}",
+                cal.rule,
+                cal.w_cal_min.unwrap_or(f64::NAN),
+                cal.w_cal_max.unwrap_or(f64::NAN),
+                cal.order_at
+                    .iter()
+                    .map(|(k, v)| format!("{k}: {v}"))
+                    .collect::<Vec<_>>()
+                    .join(", "),
+                cal.ranked_at_calibrated_price
+            ),
+        }
+    }
     for s in &c.sessions {
         println!(
             "  {} {} [{}]: {} pairs, {} workloads, ratio {}",
@@ -1143,6 +1323,51 @@ fn compare_pooled_cmd(
 
 fn run(cli: Cli) -> Result<ExitCode, String> {
     match cli.cmd {
+        Cmd::IsogenyEvaluate {
+            input,
+            out,
+            native_library,
+            native_sha256,
+            twist_scale,
+            max_window,
+            block,
+            baby_window,
+            projective_batch,
+            lock,
+        } => isogeny_eval::run(
+            &input,
+            &out,
+            &native_library,
+            &native_sha256,
+            &twist_scale,
+            max_window,
+            block,
+            baby_window,
+            projective_batch,
+            &lock,
+        )?,
+        Cmd::ScalarTiming {
+            spec,
+            out,
+            batch,
+            lock,
+        } => scalar_timing::run(&spec, &out, batch, &lock)?,
+        Cmd::EndpointPairs {
+            dir,
+            source_curve,
+            destination_curve,
+            arm,
+            plan_only,
+        } => {
+            print_json(&endpoint_pairs::join(
+                &dir,
+                &source_curve,
+                &destination_curve,
+                &arm,
+                plan_only,
+            )?)?;
+        }
+        Cmd::RetainedChainStudy { phase, out } => retained_chain_study::run(&phase, &out)?,
         Cmd::DiagnosticPreflight {
             request,
             request_sha256,
@@ -1231,11 +1456,20 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             let mut by: std::collections::BTreeMap<(String, String), Vec<(f64, f64, bool)>> =
                 Default::default();
             let mut log2_r: std::collections::BTreeMap<String, f64> = Default::default();
+            let mut skipped_amortized = 0usize;
             for d in &dir {
                 for r in crypto_lib::cryptanalysis::ecbench::runner::read_records(d)
                     .map_err(|e| format!("{}: {e}", d.display()))?
                 {
                     if !r.counts() || (r.arm != arm && r.arm != reference) {
+                        continue;
+                    }
+                    // A run whose factor-base logs came from a store paid
+                    // no collection or linear algebra: its reusable share
+                    // is missing, so it cannot enter a reusable +
+                    // per-target split.  Counted, never averaged in.
+                    if r.log_table_amortized() {
+                        skipped_amortized += 1;
                         continue;
                     }
                     let w = match &r.work {
@@ -1245,12 +1479,17 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     let f = |s: &str| s.parse::<f64>().unwrap_or(f64::NAN);
                     log2_r.insert(
                         r.workload.curve.slug.clone(),
-                        (r.workload.curve.r as f64).log2(),
+                        (r.workload.curve.r.to_f64()).log2(),
                     );
                     by.entry((r.workload.curve.slug.clone(), r.arm.clone()))
                         .or_default()
                         .push((f(&w.reusable_bitops), f(&w.per_target_bitops), w.complete));
                 }
+            }
+            if skipped_amortized > 0 {
+                eprintln!(
+                    "ecbench amortize: skipped {skipped_amortized} record(s) whose factor-base logs came from a store (amortized, not cold)"
+                );
             }
             let mean = |v: &[(f64, f64, bool)]| {
                 let n = v.len() as f64;
@@ -1326,6 +1565,226 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                                 .map(|d| format!("default {d:?}"))
                                 .unwrap_or_else(|| "REQUIRED".into()),
                             p.help
+                        );
+                    }
+                }
+            }
+        }
+        Cmd::Panel {
+            phase,
+            lane,
+            family,
+            runnable,
+            json,
+        } => {
+            if let Some(value) = &family {
+                if !["koblitz", "binary", "prime", "genus2"].contains(&value.as_str()) {
+                    return Err(format!(
+                        "panel family is koblitz, binary, prime, or genus2, not `{value}`"
+                    ));
+                }
+            }
+            let catalog = panel::catalog()?;
+            if let Some(number) = phase {
+                catalog
+                    .phase(number)
+                    .ok_or_else(|| format!("canonical panel has no phase {number}"))?;
+            }
+            if let Some(value) = &lane {
+                catalog
+                    .lane(value)
+                    .ok_or_else(|| format!("canonical panel has no benchmark lane `{value}`"))?;
+            }
+            let lane_rows = catalog
+                .phases
+                .iter()
+                .filter(|record| phase.is_none_or(|number| record.phase == number))
+                .flat_map(|record| {
+                    record
+                        .lanes
+                        .iter()
+                        .filter(|entry| lane.as_deref().is_none_or(|value| entry.lane_id == value))
+                        .map(move |entry| (record, entry))
+                })
+                .collect::<Vec<_>>();
+            let show_source_cells = lane.as_deref().is_none_or(|value| {
+                catalog
+                    .lane(value)
+                    .is_some_and(|definition| definition.curve_selector == "source_panel_cells")
+            });
+            let show_destination_cells = lane.as_deref().is_none_or(|value| {
+                catalog.lane(value).is_some_and(|definition| {
+                    definition.curve_selector == "registered_destination_cells"
+                })
+            });
+            let show_transfer_routes = lane.as_deref().is_none_or(|value| {
+                catalog.lane(value).is_some_and(|definition| {
+                    definition.curve_selector == "registered_transfer_routes"
+                })
+            });
+            let mut rows = Vec::new();
+            let mut destination_rows = Vec::new();
+            for record in &catalog.phases {
+                if phase.is_some_and(|number| record.phase != number) {
+                    continue;
+                }
+                if show_source_cells {
+                    for cell in &record.curves {
+                        if family.as_deref().is_some_and(|value| value != cell.family)
+                            || (runnable && !cell.runnable())
+                        {
+                            continue;
+                        }
+                        rows.push((record, cell));
+                    }
+                }
+                if show_destination_cells {
+                    for cell in &record.destination_cells {
+                        if family.as_deref().is_some_and(|value| value != cell.family)
+                            || (runnable && !cell.runnable())
+                        {
+                            continue;
+                        }
+                        destination_rows.push((record, cell));
+                    }
+                }
+            }
+            let route_rows = catalog
+                .transfer_routes
+                .iter()
+                .filter(|_| show_transfer_routes)
+                .filter(|route| phase.is_none_or(|number| route.phase == number))
+                .filter(|route| {
+                    family.as_deref().is_none_or(|value| {
+                        catalog
+                            .cell(&route.source_cell)
+                            .is_some_and(|(_, cell)| cell.family == value)
+                    })
+                })
+                .collect::<Vec<_>>();
+            if json {
+                print_json(&serde_json::json!({
+                    "schema": panel::PANEL_SCHEMA,
+                    "source": panel::PANEL_SOURCE,
+                    "size_metric": catalog.size_metric,
+                    "gate_defaults": catalog.gate_defaults,
+                    "lanes": lane_rows.iter().map(|(record, entry)| serde_json::json!({
+                        "phase": record.phase,
+                        "nominal_subgroup_bits": record.nominal_subgroup_bits,
+                        "definition": catalog.lane(&entry.lane_id),
+                        "admission": entry,
+                    })).collect::<Vec<_>>(),
+                    "cells": rows.iter().map(|(record, cell)| serde_json::json!({
+                        "phase": record.phase,
+                        "nominal_subgroup_bits": record.nominal_subgroup_bits,
+                        "subgroup_bit_window": record.subgroup_bit_window,
+                        "minimum_public_targets_per_curve": record.minimum_public_targets_per_curve,
+                        "admission_state": record.admission_state,
+                        "cell": cell,
+                    })).collect::<Vec<_>>(),
+                    "destinations": destination_rows.iter().map(|(record, cell)| serde_json::json!({
+                        "phase": record.phase,
+                        "nominal_subgroup_bits": record.nominal_subgroup_bits,
+                        "subgroup_bit_window": record.subgroup_bit_window,
+                        "minimum_public_targets_per_curve": record.minimum_public_targets_per_curve,
+                        "admission_state": record.admission_state,
+                        "cell": cell,
+                    })).collect::<Vec<_>>(),
+                    "transfer_routes": route_rows,
+                }))?;
+            } else {
+                println!(
+                    "canonical panel: subgroup bits = ceil(log2(r)); source {}",
+                    panel::PANEL_SOURCE
+                );
+                println!("{:<5} {:<34} {:<22} blockers", "phase", "lane", "state");
+                for (record, entry) in lane_rows {
+                    println!(
+                        "{:<5} {:<34} {:<22} {}",
+                        record.phase,
+                        entry.lane_id,
+                        entry.admission_state,
+                        if entry.blockers.is_empty() {
+                            "-".to_string()
+                        } else {
+                            entry.blockers.join("; ")
+                        }
+                    );
+                }
+                if !rows.is_empty() {
+                    println!();
+                    println!("source cells");
+                    println!(
+                        "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} status",
+                        "phase", "cell", "family", "r bits", "field", "identity"
+                    );
+                    for (record, cell) in rows {
+                        let identity = cell
+                            .identity
+                            .icv1
+                            .as_deref()
+                            .or(cell.identity.external_name.as_deref())
+                            .unwrap_or("-");
+                        println!(
+                            "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} {}",
+                            record.phase,
+                            cell.cell_id,
+                            cell.family,
+                            cell.size.subgroup_bits,
+                            cell.size.field_bits_or_degree,
+                            identity,
+                            cell.ecbench.status
+                        );
+                    }
+                }
+                if !destination_rows.is_empty() {
+                    println!();
+                    println!("destination cells");
+                    println!(
+                        "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} status",
+                        "phase", "cell", "family", "r bits", "field", "identity"
+                    );
+                    for (record, cell) in destination_rows {
+                        let identity = cell
+                            .identity
+                            .icv1
+                            .as_deref()
+                            .or(cell.identity.external_name.as_deref())
+                            .unwrap_or("-");
+                        println!(
+                            "{:<5} {:<26} {:<8} {:>6} {:>6} {:<45} {}",
+                            record.phase,
+                            cell.cell_id,
+                            cell.family,
+                            cell.size.subgroup_bits,
+                            cell.size.field_bits_or_degree,
+                            identity,
+                            cell.ecbench.status
+                        );
+                    }
+                }
+                if !route_rows.is_empty() {
+                    println!();
+                    println!("transfer routes");
+                    println!(
+                        "{:<5} {:<27} {:<14} {:>6} {:<28} destination methods / controls",
+                        "phase", "route", "source", "degree", "source reference"
+                    );
+                    for route in route_rows {
+                        println!(
+                            "{:<5} {:<27} {:<14} {:>6} {:<28} {}",
+                            route.phase,
+                            route.route_id,
+                            route.source_cell,
+                            route.map_degree,
+                            route.source_reference,
+                            route
+                                .destination_methods
+                                .iter()
+                                .chain(route.destination_controls.iter())
+                                .cloned()
+                                .collect::<Vec<_>>()
+                                .join(",")
                         );
                     }
                 }
@@ -1592,9 +2051,15 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             spec: path,
             json,
             doc,
+            replay,
         } => {
             let text = read(&path)?;
-            let p = spec::plan(spec::Spec::from_json(&text)?)?;
+            let parsed = spec::Spec::from_json(&text)?;
+            let p = if replay {
+                spec::plan(parsed)?
+            } else {
+                spec::plan_for_new_run(parsed)?
+            };
             for w in &p.warnings {
                 eprintln!("ecbench: warning: {w}");
             }
@@ -1602,6 +2067,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 print_json(&runner::PlanDoc {
                     schema: "ecbench.plan/v1".into(),
                     spec_id: p.spec_id.clone(),
+                    curve_policy: p.spec.curve_policy.clone(),
                     arms: p.arms.clone(),
                     workloads: p.workloads.clone(),
                     executions: p.executions.clone(),
@@ -1633,7 +2099,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         "  workload {} {} r=2^{:.2} A={} registered={} ec1={}",
                         w.workload_id,
                         w.curve.slug,
-                        (w.curve.r as f64).log2(),
+                        (w.curve.r.to_f64()).log2(),
                         w.curve.automorphisms_available,
                         w.curve.registered,
                         w.curve.ec1.as_deref().unwrap_or("-")
@@ -1658,6 +2124,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             w_cal_method,
             w_cal_host,
             spec: path,
+            allow_legacy_spec,
             out,
             cpus,
             lock,
@@ -1672,6 +2139,14 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             // take minutes): a rebuild meanwhile cannot null or swap it.
             host::pin_binary_hash();
             let text = read(&path)?;
+            let parsed = spec::Spec::from_json(&text)?;
+            if !allow_legacy_spec {
+                parsed.require_current_curve_policy()?;
+            } else if parsed.curve_policy.is_legacy() {
+                eprintln!(
+                    "ecbench: warning: reproducing a legacy v1 spec; this session is not canonical-panel claim evidence"
+                );
+            }
             let out = PathBuf::from(isolab::expand_env(&out)?);
             let mut req = isolation::CpuRequest::parse(&cpus)?;
             if req == isolation::CpuRequest::Auto && isolation::topology().cpus.is_empty() {
@@ -1909,7 +2384,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             price_table_work: _,
             no_price_table_work,
             unit,
+            w_cal,
         } => {
+            let w_cal = w_cal.get()?;
             let bitop = match unit.as_deref() {
                 None => false,
                 Some("bitop/v1") => true,
@@ -1926,7 +2403,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     table_work: !no_price_table_work,
                 },
                 bitop,
-                w_cal: None,
+                w_cal,
             };
             if dir.len() > 1 {
                 return compare_pooled_cmd(
@@ -2083,7 +2560,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         "| {} | {} | {:.2} | {} | {} | {} |",
                         w.workload_id,
                         w.slug,
-                        (w.r as f64).log2(),
+                        (w.r.to_f64()).log2(),
                         o(w.a_mean_s),
                         o(w.b_mean_s),
                         o(w.ratio_b_over_a)
@@ -2236,6 +2713,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 rho,
                 workload,
                 round,
+                allow_legacy_spec,
                 independent_receipt,
                 pointer,
                 out,
@@ -2245,7 +2723,15 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     (Some(p), Some(pointer)) => Some(load_independent(&p, pointer)?),
                     _ => None,
                 };
-                let report = claim::build(&dir, &ic, &rho, &workload, round, independent.as_ref())?;
+                let report = claim::build(
+                    &dir,
+                    &ic,
+                    &rho,
+                    &workload,
+                    round,
+                    independent.as_ref(),
+                    allow_legacy_spec,
+                )?;
                 return emit_claim(report, out, exit_code);
             }
             ClaimCmd::Attach {
@@ -2254,6 +2740,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 rho,
                 workload,
                 round,
+                allow_legacy_spec,
                 base_report,
                 independent_receipt,
                 pointer,
@@ -2271,6 +2758,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     round,
                     &original,
                     &independent,
+                    allow_legacy_spec,
                 )?;
                 return emit_claim(report, out, exit_code);
             }
@@ -2316,6 +2804,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
         },
         Cmd::IsolabJob {
             spec: path,
+            allow_legacy_spec,
             binary,
             git_url,
             commit,
@@ -2327,7 +2816,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             timeout_seconds,
         } => {
             let text = read(&path)?;
-            let p = spec::plan(spec::Spec::from_json(&text)?)?;
+            let p = spec::plan_for_new_run(spec::Spec::from_json(&text)?)?;
             let delivery = match (binary, git_url, commit) {
                 (Some(b), None, None) => isolab::Delivery::Binary { path: b },
                 (None, Some(url), Some(commit)) => isolab::Delivery::Source { url, commit },
@@ -2344,6 +2833,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     image,
                     timeout_seconds,
                     policy,
+                    allow_legacy_spec,
                 },
             )?;
             print_json(&job)?;
@@ -2365,8 +2855,10 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 param_rule,
                 oracle,
                 fit_version,
+                w_cal,
                 out,
             } => {
+                let w_cal = w_cal.get()?;
                 let b = bounds::bound_from_sessions(&bounds::FitInputs {
                     dirs: &dir,
                     arm: &arm,
@@ -2384,6 +2876,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         param_rule,
                         oracle,
                         fit_version,
+                        w_cal,
                     },
                     audit_refs: &[],
                 })?;
@@ -2629,7 +3122,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         )
                     }
                 };
-                let p = spec::plan(s.clone())?;
+                let p = spec::plan_for_new_run(s.clone())?;
                 let text = serde_json::to_string_pretty(&s).map_err(|e| e.to_string())? + "\n";
                 write_or_print(out.as_deref(), &text)?;
                 eprintln!(
@@ -2660,7 +3153,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 bound_out,
                 audit_out,
                 exit_code,
+                w_cal,
             } => {
+                let w_cal = w_cal.get()?;
                 let c = challenge::Challenge::read(&path)?;
                 let cm = commitment
                     .as_deref()
@@ -2695,6 +3190,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     root: &root,
                     resamples,
                     seed,
+                    w_cal: w_cal.as_ref(),
                 })?;
                 if let Some(a) = &audit_out {
                     std::fs::write(a, &o.audit_text)
@@ -2816,7 +3312,7 @@ fn audit_ir_one(
         "params": input.method.params,
         "curve": w.curve.slug,
         "family": w.curve.family,
-        "log2_r": (w.curve.r as f64).log2(),
+        "log2_r": (w.curve.r.to_f64()).log2(),
         "recovered": report.recovered.map(|x| x.to_string()),
         "solve_ir": ir.solve_ir,
         "bitops": block.bitops,
@@ -3047,7 +3543,7 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                             .collect();
                         methods::pooled_row_flags(
                             &r.workload.curve.family,
-                            (r.workload.curve.r as f64).log2(),
+                            (r.workload.curve.r.to_f64()).log2(),
                             &arm.method.family,
                             &runs,
                         )
@@ -3059,7 +3555,7 @@ fn table(dirs: &[PathBuf], reference: Option<&str>) -> Result<(), String> {
                     arm.name,
                     arm.method.id,
                     slug,
-                    any.map(|r| (r.workload.curve.r as f64).log2())
+                    any.map(|r| (r.workload.curve.r.to_f64()).log2())
                         .unwrap_or(f64::NAN),
                     ok.len(),
                     mine.len(),

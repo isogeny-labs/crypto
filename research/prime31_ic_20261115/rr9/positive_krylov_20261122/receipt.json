@@ -1,0 +1,27 @@
+{
+  "base_commit": "ce396efc71",
+  "branch": "codex/prime31-b8-positive-extractor-20261122",
+  "classification": "local-development-diagnostic",
+  "files_sha256": {
+    "research/prime31_ic_20261115/native/examples/prime31_rr9_d9_blackbox_core.rs": "49727186e780988cae930a94901917dc06a667a5ef254668116a3fb64f1ea9ab",
+    "research/prime31_ic_20261115/native/examples/prime31_rr9_d9_positive_krylov.rs": "87268996b6e75ce4d33c10a9f99d1a287faae21d9a5a2de2497379bbed91cad5",
+    "research/prime31_ic_20261115/native/examples/prime31_rr9_public_macaulay.rs": "555eb25f333748942d0e05068e71b22e9ba36c81354bb7cfc32d3dc69e810342",
+    "research/prime31_ic_20261115/rr9/RR9_D9_POSITIVE_KRYLOV_PROTOCOL_20261122.md": "196bacfe6bf3d5096615c513f70418a40aa99c88b2ec7251d75170a0ebad335e",
+    "research/prime31_ic_20261115/rr9/positive_krylov_20261122/generic_control.json": "7bc6045ff940e9720985cc749c48f7f1562f930be298f669736ff6f6096a5c73",
+    "research/prime31_ic_20261115/rr9/positive_krylov_20261122/independent_replay.json": "f78c1578277afa8ae79ec5bc6e9af8c8a953996757308e0feb1deb6286be5c78",
+    "research/prime31_ic_20261115/rr9/positive_krylov_20261122/positive.json": "32eb6d2dbc2671a37634df7c424b7d7762b9265d29306e05089273adb732a91e",
+    "research/prime31_ic_20261115/rr9/verify_d9_positive_krylov.py": "a71413b8b93356cc55df356a31d812fdede09f54e2e4aa7707aa859c0858e5e3"
+  },
+  "generic_command": "cargo +stable run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_b8_generic_mitm",
+  "generic_exit": 0,
+  "host": "Mac.attlocal.net",
+  "native_library_tests": "41 passed; 0 failed",
+  "pcc": "unverified",
+  "platform": "macOS-27.2-arm64-arm-64bit-Mach-O",
+  "positive_command": "cargo +stable run --locked --release --manifest-path research/prime31_ic_20261115/native/Cargo.toml --example prime31_rr9_d9_positive_krylov",
+  "positive_exit": 0,
+  "post_run_editorial_change": "Reworded verifies to checks for pcc prose lint; experiment seed, inputs, algorithm and caps unchanged.",
+  "pre_run_protocol_sha256": "119732bbcf98ea3352a70a0ef4401c485d055ced1adc534907609c293f199999",
+  "rustc": "rustc 1.100.0 stable",
+  "schema": "prime31.rr9.d9-positive-run-receipt.v1"
+}

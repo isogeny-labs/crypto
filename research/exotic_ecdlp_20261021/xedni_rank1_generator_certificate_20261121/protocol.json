@@ -1,0 +1,15 @@
+{
+  "schema": "xedni-rank1-generator-certificate-protocol-v1",
+  "source_rank_audit_sha256": "b8070ba201f437d56e1907f00f032cd0d04afd87527082411896ad52048dc82b",
+  "source_target_result_sha256": "72c17f13ff0d2789ce47a27996b492dac0e4f833c5b8e7f53c9e75cbdd2cf0c2",
+  "curve_a_invariants": ["0", "-47", "0", "751", "-3997"],
+  "Q": ["17", "10"],
+  "reduction_prime": 47,
+  "reduced_order": 43,
+  "public_target": [10, 1],
+  "known_fixture_scalar_for_replay": 22,
+  "method": "checked Sage E.gens(proof=True,use_database=False,algorithm='mwrank_lib',sat_bound=1000), E.gens_certain(), torsion_subgroup().order(), and exact Q-versus-generator check",
+  "wall_cap_seconds": 90,
+  "status_law": "retain generator, torsion, certainty, equality, warning, error, or cap; do not call Q primitive unless proof-enabled generator status and torsion relation establish it",
+  "height_followup": "If Q is a proved primitive generator with trivial torsion, test exact canonical-height ratios for n=1..21 and the minimal absolute lift multiplier in the target congruence class modulo 43"
+}

@@ -1,0 +1,41 @@
+name: Prime31 run72 authentic-RHS certificate width sweep
+on:
+  push:
+    branches:
+      - research/prime31-f4-admission-run51-20261121
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_run72_k*_rhs_width.rs"
+      - ".github/workflows/prime31-run72-rhs-width-sweep.yml"
+  pull_request:
+    paths:
+      - "research/prime31_ic_20261115/native/examples/prime31_run72_k*_rhs_width.rs"
+      - ".github/workflows/prime31-run72-rhs-width-sweep.yml"
+  workflow_dispatch:
+jobs:
+  original-rust-width:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: ["0x68B677A1D1", "0x9D3A6F5C127", "0x2C6478EB19D"]
+    env:
+      PRIME31_RUN72_SEED: ${{ matrix.seed }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.100.0
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: research/prime31_ic_20261115/native
+      - name: Original Rust library tests
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo test --locked --release --lib
+      - name: K2 cold authentic-RHS difference versus same-seed reference
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo run --locked --release --example prime31_run72_k2_rhs_width
+      - name: K3 cold authentic-RHS difference versus same-seed reference
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo run --locked --release --example prime31_run72_k3_rhs_width
+      - name: K4 cold authentic-RHS difference and Run71 replay gate
+        working-directory: research/prime31_ic_20261115/native
+        run: cargo run --locked --release --example prime31_run72_k4_rhs_width

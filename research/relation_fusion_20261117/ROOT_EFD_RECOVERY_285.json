@@ -1,0 +1,20 @@
+{
+  "schema": "root-efd-source-recovery/v1",
+  "failed_attempt": "flat-root-matrix-284",
+  "exit_code": 101,
+  "native_test_cases_executed": 0,
+  "affected_source": "src/cryptanalysis/efd_representations.rs",
+  "before_equal_current_base": true,
+  "before_sha256": "37a5896994cfa89d40c0a9d84501e951057f58941fc7e421eb418dd064dc8b5f",
+  "reference": "c488cf6f8c:src/cryptanalysis/efd_representations.rs",
+  "restored_exact_reference_sha256": "79ea17e2d21db56c819284d60c511b73410bd4754f6ce4b1edabdfaaa7bd2c81",
+  "all_current_function_and_test_names_retained": true,
+  "reviewed_features": [
+    "representation/chart metadata",
+    "formula_ids chart_add chart_double chart_formula",
+    "modulus/shape checks and original formula tests"
+  ],
+  "reason": "corrupt merge moved partial chart arithmetic and test fragments after the original body while dropping delimiters and arguments; complete qualified source retains those methods and assertions in their proper scopes",
+  "semantic_or_full_root_verification": "pending; name inventory is structural only",
+  "performance_claim": false
+}

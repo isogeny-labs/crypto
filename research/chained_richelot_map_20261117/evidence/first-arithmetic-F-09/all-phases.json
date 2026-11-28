@@ -1,0 +1,540 @@
+{
+  "schema": "bounded-native-custody14/v1",
+  "source_commit": "f35867831245560527428e3562ab55d74eefb5a0",
+  "started": "2026-11-17T08:29:08.621524+00:00",
+  "phases": [
+    {
+      "name": "frozen-storage-preflight",
+      "kind": "metadata-control",
+      "started": "2026-11-17T08:29:08.621535+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "RAM_available": 8708096,
+        "scratch_available": 3784704,
+        "minimum_RAM": 8388608,
+        "minimum_scratch": 3145728
+      },
+      "exit": 0,
+      "finished": "2026-11-17T08:29:08.621553+00:00"
+    },
+    {
+      "name": "exact-public-original-source",
+      "kind": "metadata-control",
+      "started": "2026-11-17T08:29:08.621741+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "all_source_commit_blobs_equal": true,
+        "files": 34
+      },
+      "exit": 0,
+      "finished": "2026-11-17T08:29:09.457189+00:00"
+    },
+    {
+      "name": "primary-original-source-before",
+      "kind": "metadata-control",
+      "started": "2026-11-17T08:29:09.457537+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "primary_sources": 11
+      },
+      "exit": 0,
+      "finished": "2026-11-17T08:29:09.459774+00:00"
+    },
+    {
+      "name": "copy-exact-declared-source",
+      "kind": "metadata-control",
+      "started": "2026-11-17T08:29:09.459948+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "copied_files": 35,
+        "no_history_tree_copy": true
+      },
+      "exit": 0,
+      "finished": "2026-11-17T08:29:09.464502+00:00"
+    },
+    {
+      "name": "copied-source-before-build",
+      "kind": "metadata-control",
+      "started": "2026-11-17T08:29:09.464625+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "all_copied_source_hashes_equal": true
+      },
+      "exit": 0,
+      "finished": "2026-11-17T08:29:09.465578+00:00"
+    },
+    {
+      "name": "full-locked-prebuilt-dependencies",
+      "kind": "metadata-control",
+      "started": "2026-11-17T08:29:09.465698+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "full_dependency_binaries": 3,
+        "no_dependency_build": true
+      },
+      "exit": 0,
+      "finished": "2026-11-17T08:29:09.935535+00:00"
+    },
+    {
+      "name": "dependency-binary-before",
+      "kind": "metadata-control",
+      "started": "2026-11-17T08:29:09.935948+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "all_full_dependency_hashes_equal": true,
+        "files": 3
+      },
+      "exit": 0,
+      "finished": "2026-11-17T08:29:09.949984+00:00"
+    },
+    {
+      "name": "rustc-version",
+      "kind": "subprocess",
+      "started": "2026-11-17T08:29:09.950341+00:00",
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustc",
+        "--version"
+      ],
+      "cwd": "/dev/shm/ct750-first-map14-F/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct750-map14-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct750-first-map14-F/source"
+      },
+      "stdout": "07-rustc-version.stdout",
+      "stderr": "07-rustc-version.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T08:29:10.005106+00:00"
+    },
+    {
+      "name": "clippy-driver-version",
+      "kind": "subprocess",
+      "started": "2026-11-17T08:29:10.005628+00:00",
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "clippy-driver",
+        "--version"
+      ],
+      "cwd": "/dev/shm/ct750-first-map14-F/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct750-map14-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct750-first-map14-F/source"
+      },
+      "stdout": "08-clippy-driver-version.stdout",
+      "stderr": "08-clippy-driver-version.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T08:29:10.029894+00:00"
+    },
+    {
+      "name": "rustfmt-version",
+      "kind": "subprocess",
+      "started": "2026-11-17T08:29:10.030270+00:00",
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustfmt",
+        "--version"
+      ],
+      "cwd": "/dev/shm/ct750-first-map14-F/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct750-map14-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct750-first-map14-F/source"
+      },
+      "stdout": "09-rustfmt-version.stdout",
+      "stderr": "09-rustfmt-version.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T08:29:10.054656+00:00"
+    },
+    {
+      "name": "compiler-tool-binary-custody",
+      "kind": "metadata-control",
+      "started": "2026-11-17T08:29:10.055027+00:00",
+      "expected_exit": 0,
+      "detail": [
+        {
+          "tool": "rustc",
+          "path": "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/rustc",
+          "bytes": 648536,
+          "sha256": "b53b780f77f952062f8ca8a3b70aef2390b1e45ad91939be94afdc9543026853"
+        },
+        {
+          "tool": "clippy-driver",
+          "path": "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/clippy-driver",
+          "bytes": 16295440,
+          "sha256": "89b6cc8d0d988b00a3f65bc90c76fedbaedb6bcb442b34563aefe3621f26544b"
+        },
+        {
+          "tool": "rustfmt",
+          "path": "/home/agent/.rustup/toolchains/1.99.1-x86_64-unknown-linux-gnu/bin/rustfmt",
+          "bytes": 5256344,
+          "sha256": "68cb47a2a38daa8ff2ec6d623a2374b0a165d77ec74f1f654216665018c04598"
+        }
+      ],
+      "exit": 0,
+      "finished": "2026-11-17T08:29:10.209593+00:00"
+    },
+    {
+      "name": "clippy-sentinel-positive",
+      "kind": "subprocess",
+      "started": "2026-11-17T08:29:10.209892+00:00",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "rustup",
+        "run",
+        "1.99.1",
+        "clippy-driver",
+        "--crate-name",
+        "clippy_sentinel_positive",
+        "--edition=2021",
+        "--emit=metadata",
+        "-D",
+        "clippy::eq_op",
+        "/dev/shm/ct750-first-map14-F/source/clippy-sentinel-positive.rs",
+        "-o",
+        "/dev/shm/ct750-first-map14-F/clippy-sentinel-positive.rmeta"
+      ],
+      "cwd": "/dev/shm/ct750-first-map14-F/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct750-map14-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct750-first-map14-F/source"
+      },
+      "stdout": "11-clippy-sentinel-positive.stdout",
+      "stderr": "11-clippy-sentinel-positive.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T08:29:10.320273+00:00"
+    },
+    {
+      "name": "clippy-sentinel-negative",
+      "kind": "subprocess",
+      "started": "2026-11-17T08:29:10.320839+00:00",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "rustup",
+        "run",
+        "1.99.1",
+        "clippy-driver",
+        "--crate-name",
+        "clippy_sentinel_negative",
+        "--edition=2021",
+        "--emit=metadata",
+        "-D",
+        "clippy::eq_op",
+        "/dev/shm/ct750-first-map14-F/source/clippy-sentinel-negative.rs",
+        "-o",
+        "/dev/shm/ct750-first-map14-F/clippy-sentinel-negative.rmeta"
+      ],
+      "cwd": "/dev/shm/ct750-first-map14-F/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct750-map14-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct750-first-map14-F/source"
+      },
+      "stdout": "12-clippy-sentinel-negative.stdout",
+      "stderr": "12-clippy-sentinel-negative.stderr",
+      "expected_exit": 1,
+      "exit": 1,
+      "finished": "2026-11-17T08:29:10.389300+00:00"
+    },
+    {
+      "name": "compile-only",
+      "kind": "subprocess",
+      "started": "2026-11-17T08:29:10.390655+00:00",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustc",
+        "--crate-name",
+        "chained_richelot_operational_map_14",
+        "--test",
+        "--edition=2021",
+        "src/lib.rs",
+        "-L",
+        "dependency=/dev/shm/ct750-first-map14-F/deps",
+        "--extern",
+        "num_bigint=/dev/shm/ct750-first-map14-F/deps/libnum_bigint-93482e592bbb622c.rlib",
+        "--extern",
+        "num_traits=/dev/shm/ct750-first-map14-F/deps/libnum_traits-8dbbb3fc7f5ad84e.rlib",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "strip=symbols",
+        "-o",
+        "/dev/shm/ct750-first-map14-F/compiler-output"
+      ],
+      "cwd": "/dev/shm/ct750-first-map14-F/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct750-map14-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct750-first-map14-F/source"
+      },
+      "stdout": "13-compile-only.stdout",
+      "stderr": "13-compile-only.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T08:29:16.937217+00:00"
+    },
+    {
+      "name": "strict-direct-clippy",
+      "kind": "subprocess",
+      "started": "2026-11-17T08:29:16.938683+00:00",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "rustup",
+        "run",
+        "1.99.1",
+        "clippy-driver",
+        "--crate-name",
+        "chained_richelot_operational_map_14",
+        "--test",
+        "--edition=2021",
+        "src/lib.rs",
+        "-L",
+        "dependency=/dev/shm/ct750-first-map14-F/deps",
+        "--extern",
+        "num_bigint=/dev/shm/ct750-first-map14-F/deps/libnum_bigint-93482e592bbb622c.rlib",
+        "--extern",
+        "num_traits=/dev/shm/ct750-first-map14-F/deps/libnum_traits-8dbbb3fc7f5ad84e.rlib",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-C",
+        "strip=symbols",
+        "--emit=metadata",
+        "-D",
+        "warnings",
+        "-o",
+        "/dev/shm/ct750-first-map14-F/strict-clippy.rmeta"
+      ],
+      "cwd": "/dev/shm/ct750-first-map14-F/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct750-map14-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct750-first-map14-F/source"
+      },
+      "stdout": "14-strict-direct-clippy.stdout",
+      "stderr": "14-strict-direct-clippy.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T08:29:17.537160+00:00"
+    },
+    {
+      "name": "format",
+      "kind": "subprocess",
+      "started": "2026-11-17T08:29:17.538378+00:00",
+      "argv": [
+        "rustup",
+        "run",
+        "1.99.1",
+        "rustfmt",
+        "--check",
+        "--edition",
+        "2021",
+        "src/lib.rs"
+      ],
+      "cwd": "/dev/shm/ct750-first-map14-F/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct750-map14-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct750-first-map14-F/source"
+      },
+      "stdout": "15-format.stdout",
+      "stderr": "15-format.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T08:29:17.613639+00:00"
+    },
+    {
+      "name": "copied-source-before-arithmetic",
+      "kind": "metadata-control",
+      "started": "2026-11-17T08:29:17.614129+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "all_copied_source_hashes_equal": true
+      },
+      "exit": 0,
+      "finished": "2026-11-17T08:29:17.615348+00:00"
+    },
+    {
+      "name": "immutable-qualifier-before",
+      "kind": "metadata-control",
+      "started": "2026-11-17T08:29:17.615645+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "path": "/dev/shm/ct750-first-map14-F/immutable-qualifier",
+        "sha256": "6cfe24ac837ee6a23d4e403245f10a26d4a034c4b06785a4e3cd96ec804b63a8",
+        "mode": "0o555",
+        "bytes": 1254936
+      },
+      "exit": 0,
+      "finished": "2026-11-17T08:29:17.621676+00:00"
+    },
+    {
+      "name": "list-exact-tests",
+      "kind": "subprocess",
+      "started": "2026-11-17T08:29:17.622098+00:00",
+      "argv": [
+        "/dev/shm/ct750-first-map14-F/immutable-qualifier",
+        "--list"
+      ],
+      "cwd": "/dev/shm/ct750-first-map14-F/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct750-map14-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct750-first-map14-F/source"
+      },
+      "stdout": "18-list-exact-tests.stdout",
+      "stderr": "18-list-exact-tests.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T08:29:17.624282+00:00"
+    },
+    {
+      "name": "first-frozen-arithmetic",
+      "kind": "subprocess",
+      "started": "2026-11-17T08:29:17.624654+00:00",
+      "argv": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "120s",
+        "/dev/shm/ct750-first-map14-F/immutable-qualifier",
+        "nonsplit::map::tests_14::frozen_joint_chart_divisor_map_14",
+        "--exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/dev/shm/ct750-first-map14-F/source",
+      "complete_scientific_environment": {
+        "PATH": "/home/agent/.cargo/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+        "HOME": "/home/agent",
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TMPDIR": "/run/lock/ct750-map14-compiler-temp",
+        "RUST_TEST_THREADS": "1",
+        "CLIPPY_CONF_DIR": "/dev/shm/ct750-first-map14-F/source"
+      },
+      "stdout": "19-first-frozen-arithmetic.stdout",
+      "stderr": "19-first-frozen-arithmetic.stderr",
+      "expected_exit": 0,
+      "exit": 0,
+      "finished": "2026-11-17T08:29:19.153186+00:00"
+    },
+    {
+      "name": "primary-original-source-after",
+      "kind": "metadata-control",
+      "started": "2026-11-17T08:29:19.155435+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "primary_sources": 11
+      },
+      "exit": 0,
+      "finished": "2026-11-17T08:29:19.158891+00:00"
+    },
+    {
+      "name": "copied-source-after",
+      "kind": "metadata-control",
+      "started": "2026-11-17T08:29:19.159365+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "all_copied_source_hashes_equal": true
+      },
+      "exit": 0,
+      "finished": "2026-11-17T08:29:19.161156+00:00"
+    },
+    {
+      "name": "dependency-binary-after",
+      "kind": "metadata-control",
+      "started": "2026-11-17T08:29:19.161521+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "all_full_dependency_hashes_equal": true,
+        "files": 3
+      },
+      "exit": 0,
+      "finished": "2026-11-17T08:29:19.179172+00:00"
+    },
+    {
+      "name": "immutable-qualifier-after",
+      "kind": "metadata-control",
+      "started": "2026-11-17T08:29:19.179708+00:00",
+      "expected_exit": 0,
+      "detail": {
+        "same_full_qualifier_hash_and_mode": true
+      },
+      "exit": 0,
+      "finished": "2026-11-17T08:29:19.181440+00:00"
+    }
+  ],
+  "first_failure": null,
+  "compiler_temp_prospectively_excluded": "/run/lock/ct750-map14-compiler-temp",
+  "scientific_language": "Rust",
+  "Python_role": "metadata,I/O,hashes,subprocess only",
+  "new_native_filter": "nonsplit::map::tests_14::frozen_joint_chart_divisor_map_14",
+  "no_cold_dependency_build_or_benchmark": true
+}

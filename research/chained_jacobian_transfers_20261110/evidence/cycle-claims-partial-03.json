@@ -1,0 +1,92 @@
+[
+  {
+    "name": "IsogenyCycles.quadratic_norm_multiplicative",
+    "claim_path": "pcc/claims/PCC-20261112-3175ff.json",
+    "statement": "theorem quadratic_norm_multiplicative {R : Type} [CommRing R] (t p a b c d : R) : (a^2+t*a*b+p*b^2)*(c^2+t*c*d+p*d^2) = (a*c-p*b*d)^2+t*(a*c-p*b*d)*(a*d+b*c+t*b*d)+ p*(a*d+b*c+t*b*d)^2",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+      "theorem": "IsogenyCycles.quadratic_norm_multiplicative",
+      "decl_sha256": "cb76abf873ff6ddbc835a8deab88e0ada20f7b2ff13e781f9831cf782db20be9"
+    }
+  },
+  {
+    "name": "IsogenyCycles.first_cycle_polynomial",
+    "claim_path": "pcc/claims/PCC-20261112-8c6bed.json",
+    "statement": "theorem first_cycle_polynomial {R : Type} [CommRing R] (x : R) : (x-1)^3-1=(x^2-x+1)*(x-2)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+      "theorem": "IsogenyCycles.first_cycle_polynomial",
+      "decl_sha256": "89d23b4ba68d7e93e2cbbc83112f5b38ec8161cfc6613c86685ca10e155b1648"
+    }
+  },
+  {
+    "name": "IsogenyCycles.second_cycle_polynomial",
+    "claim_path": "pcc/claims/PCC-20261112-77c7ba.json",
+    "statement": "theorem second_cycle_polynomial {R : Type} [CommRing R] (x : R) : (x+2)^4+x=(x^2-x+1)*(x^2+9*x+32)+4*(14*x-4)",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+      "theorem": "IsogenyCycles.second_cycle_polynomial",
+      "decl_sha256": "698f152df3467b312fc737c6b42a9562e1cb72cde4cc9bb1a83726484d60495d"
+    }
+  },
+  {
+    "name": "IsogenyCycles.cm_cycle_norms",
+    "claim_path": "pcc/claims/PCC-20261112-c03a03.json",
+    "statement": "theorem cm_cycle_norms : (31 : Int)^2-7*31*5+101*5^2=7^4 \u2227 (22 : Int)^2-11*22+101=7^3",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+      "theorem": "IsogenyCycles.cm_cycle_norms",
+      "decl_sha256": "b47c1ebfb610caf51f0b7287a38251f374bddd4b1d6a9ea0cd1a808a7d8e83f4"
+    }
+  },
+  {
+    "name": "IsogenyCycles.exact_finite_monodromy",
+    "claim_path": "pcc/claims/PCC-20261112-5e7c11.json",
+    "statement": "theorem exact_finite_monodromy : (\u2200 a b : Fin 4, iterate frobenius4 3 (a,b)=opposite4 (a,b)) \u2227 (\u2200 a b : Fin 4, iterate firstCycle4 3 (a,b)=(a,b)) \u2227 (\u2200 a b : Fin 4, iterate secondCycle4 4 (a,b)=iterate frobenius4 4 (a,b)) \u2227 (\u2200 a b : Fin 4, iterate secondCycle4 12 (a,b)=(a,b))",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+      "theorem": "IsogenyCycles.exact_finite_monodromy",
+      "decl_sha256": "4d32750e1d84ca450a28621dedd492dd21b0f5db77460326105f4d8ed056438f"
+    }
+  },
+  {
+    "name": "IsogenyCycles.no_early_relative_sign",
+    "claim_path": "pcc/claims/PCC-20261112-353d0a.json",
+    "statement": "theorem no_early_relative_sign : \u2200 n : Fin 2, (\u2203 a b : Fin 4, iterate secondCycle4 (4*(n.val+1)) (a,b)\u2260(a,b)) \u2227 (\u2203 a b : Fin 4, iterate secondCycle4 (4*(n.val+1)) (a,b)\u2260opposite4 (a,b))",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+      "theorem": "IsogenyCycles.no_early_relative_sign",
+      "decl_sha256": "e6a4370c963ac17a53ef62a2165336104aba6afb9cde13e3236ba9f274f06bbf"
+    }
+  },
+  {
+    "name": "IsogenyCycles.noncentral_action_does_not_close_graph",
+    "claim_path": "pcc/claims/PCC-20261112-243a61.json",
+    "statement": "theorem noncentral_action_does_not_close_graph {E F : Type} (k : E \u2192 F) (T neg : F \u2192 F) (onto : \u2200 q, \u2203 p, k p=q) (notIdentity : \u2203 q, T q\u2260q) (notNegative : \u2203 q, T q\u2260neg q) : \u00ac ((\u2200 p, T (k p)=k p) \u2228 (\u2200 p, T (k p)=neg (k p)))",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+      "theorem": "IsogenyCycles.noncentral_action_does_not_close_graph",
+      "decl_sha256": "7d5f2d3b23fb6fe5c1507de9010352f2cc88215b9b68c96749985e59bff6cf93"
+    }
+  },
+  {
+    "name": "IsogenyCycles.public_closed_walk_crt",
+    "claim_path": "pcc/claims/PCC-20261112-a91e55.json",
+    "statement": "theorem public_closed_walk_crt : (12035 : Nat)%109=45 \u2227 (12035 : Nat)%113=57 \u2227 (73 : Nat)^9%109=45 \u2227 (23 : Nat)^12%113=56 \u2227 (113-56 : Nat)=57",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+      "theorem": "IsogenyCycles.public_closed_walk_crt",
+      "decl_sha256": "b82aba464983e8b640792824856bc93aad1c2d0e9253301c7c780c5c33001604"
+    }
+  },
+  {
+    "name": "IsogenyCycles.principal_pullback_forced",
+    "claim_path": "pcc/claims/PCC-20261112-84fce9.json",
+    "statement": "theorem principal_pullback_forced (a b n : Nat) (hn : 0<n) (degree : a*b=n*n) (left : n*n\u2264a*a) (right : n*n\u2264b*b) : a=n \u2227 b=n",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+      "theorem": "IsogenyCycles.principal_pullback_forced",
+      "decl_sha256": "cbd5f29bb9fcbcb70dfc825185f90dbcf6052bba6731c6e508231ed553e11d7f"
+    }
+  }
+]

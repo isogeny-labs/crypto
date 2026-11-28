@@ -1,0 +1,43 @@
+make: Entering directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations native.cpp -o /tmp/cm-marked-scalar-build/native -lcrypto
+In file included from native.cpp:63:
+relation_verify.hpp: In function ‘std::pair<std::vector<Big>, std::vector<Big> > poly_divmod(Field&, Poly, const Poly&)’:
+relation_verify.hpp:43:3: warning: this ‘for’ clause does not guard... [-Wmisleading-indentation]
+   43 |   for(size_t j=0;j<b.size();++j)a[offset+j]=f.sub(a[offset+j],f.mul(c,b[j]));trim(a);
+      |   ^~~
+relation_verify.hpp:43:78: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   43 |   for(size_t j=0;j<b.size();++j)a[offset+j]=f.sub(a[offset+j],f.mul(c,b[j]));trim(a);
+      |                                                                              ^~~~
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations bench.cpp -o /tmp/cm-marked-scalar-build/bench -lcrypto
+In file included from native.cpp:63,
+                 from bench.cpp:2:
+relation_verify.hpp: In function ‘std::pair<std::vector<Big>, std::vector<Big> > poly_divmod(Field&, Poly, const Poly&)’:
+relation_verify.hpp:43:3: warning: this ‘for’ clause does not guard... [-Wmisleading-indentation]
+   43 |   for(size_t j=0;j<b.size();++j)a[offset+j]=f.sub(a[offset+j],f.mul(c,b[j]));trim(a);
+      |   ^~~
+relation_verify.hpp:43:78: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   43 |   for(size_t j=0;j<b.size();++j)a[offset+j]=f.sub(a[offset+j],f.mul(c,b[j]));trim(a);
+      |                                                                              ^~~~
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations isolate.cpp -o /tmp/cm-marked-scalar-build/isolate -pthread -lcrypto
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations analysis.cpp -o /tmp/cm-marked-scalar-build/analysis -lcrypto
+In file included from analysis.cpp:14:
+analysis_load.hpp: In function ‘Samples load(const string&, const string&)’:
+analysis_load.hpp:21:3: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   21 |   if(outputs.count(output_key)&&outputs.at(output_key)!=output)throw std::runtime_error("unequal point outputs");outputs[output_key]=output;
+      |   ^~
+analysis_load.hpp:21:114: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   21 |   if(outputs.count(output_key)&&outputs.at(output_key)!=output)throw std::runtime_error("unequal point outputs");outputs[output_key]=output;
+      |                                                                                                                  ^~~~~~~
+analysis_load.hpp:24:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   24 |  if(seen.size()!=2*6*7*7*expected_points)throw std::runtime_error("missing design rows");return out;
+      |  ^~
+analysis_load.hpp:24:90: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   24 |  if(seen.size()!=2*6*7*7*expected_points)throw std::runtime_error("missing design rows");return out;
+      |                                                                                          ^~~~~~
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations replay.cpp -o /tmp/cm-marked-scalar-build/replay -lcrypto
+make: Leaving directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'

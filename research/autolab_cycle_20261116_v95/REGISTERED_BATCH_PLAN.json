@@ -1,0 +1,48 @@
+{
+  "id": "prime-target-batch-20261116-v95b",
+  "hypothesis": "After sumscanloses, reuse source normalized roots across16targets;botharms share batched denominators,chargecacheconstruction andwholecoldoutput.",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "-m",
+    "research.prime_target_batch_20261116_v95b.worker",
+    "prime-target-batch-20261116-v95b",
+    "raw"
+  ],
+  "source_paths": [
+    "lab/runner.py",
+    "performance_gate.py",
+    "performance/GATE.md",
+    "research/twist_auxiliary_20261116_v86/algebra.py",
+    "research/odd_cached_quadratic_20261116_v94b/kernel.py",
+    "research/prime_target_batch_20261116_v95b/PROOF_AND_REVIEW.md",
+    "research/prime_target_batch_20261116_v95b/worker.py",
+    "research/prime_target_batch_20261116_v95b/child.py",
+    "research/prime_target_batch_20261116_v95b/kernel.py",
+    "research/prime_target_batch_20261116_v95b/common.py"
+  ],
+  "input_paths": [
+    "research/prime_target_batch_20261116_v95b/DATA.json"
+  ],
+  "expected_sha256": {
+    "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+    "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+    "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+    "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+    "research/odd_cached_quadratic_20261116_v94b/kernel.py": "8557d67949924122999dbc08b0dc98a5923b73afe7125392aec3479ebdacd3d1",
+    "research/prime_target_batch_20261116_v95b/PROOF_AND_REVIEW.md": "adc63df3ec5534401fa909a7b534518d8b022a12215cc924cddf7034f05a9098",
+    "research/prime_target_batch_20261116_v95b/worker.py": "0833b32701d48ac3b28437146bad51aca7c4e9649cf9a3f2bf93a06c12875647",
+    "research/prime_target_batch_20261116_v95b/child.py": "7399c46eaf1ebfca513da79e4f31832ee497db041cab2565456566acda26f392",
+    "research/prime_target_batch_20261116_v95b/kernel.py": "84dbb0e57c83369336bc42596f76b2f2bf1fe12976f8bf0ed8e97162cbc30a01",
+    "research/prime_target_batch_20261116_v95b/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+    "research/prime_target_batch_20261116_v95b/DATA.json": "15d1a0f86c37201e60dad422078fc1933ae861dcbf96422e9470b7479a6a7ec8"
+  },
+  "timeout_seconds": 90,
+  "memory_limit_mb": 4096,
+  "cpu": 0,
+  "depends_on": [
+    "prime-pair-sum-oracles-20261116-v95"
+  ],
+  "artifact_paths": [
+    "research/prime_target_batch_20261116_v95b/raw.json"
+  ]
+}

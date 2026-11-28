@@ -1,0 +1,131 @@
+{
+  "branch": "research/hec-principal-relations-20261114",
+  "closed_utc": "2026-11-15T10:59:34+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/Users/adamburan/pq-work/hec-followup-target/point-cold-frozen/collector",
+        "/Users/adamburan/pq-work/hec-followup-target/point-cold-frozen/worker",
+        "research/hec_point_cold_20261115/run",
+        "research/hec_point_sieve_20261115/fixtures"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-15T10:55:18+00:00",
+      "wall_s": 6.046
+    }
+  ],
+  "commit": "cd441f8d6601881ec42dfcf0a51ea3363d5e7dab",
+  "commit_dirty": true,
+  "created_utc": "2026-11-15T10:55:17+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-hec-point-cold"
+  ],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "unstated",
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O"
+  },
+  "id": "20261115T1055Z-hec-point-cold",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g2_p1009_best_over_point_lazy",
+      "note": "Recorded same-target three-seed median; fastest of 14 existing controls / point lazy; L0 producer observations",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.16758879917539943
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g2_p16381_best_over_point_lazy",
+      "note": "Recorded same-target three-seed median; fastest of 14 existing controls / point lazy; L0 producer observations",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.2969290140475169
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g3_p127_best_over_point_lazy",
+      "note": "Recorded same-target three-seed median; fastest of 14 existing controls / point lazy; L0 producer observations",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.06572252111615978
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g3_p1009_best_over_point_lazy",
+      "note": "Recorded same-target three-seed median; fastest of 14 existing controls / point lazy; L0 producer observations",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.43029458053052416
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g4_p31_best_over_point_lazy",
+      "note": "Recorded same-target three-seed median; fastest of 14 existing controls / point lazy; L0 producer observations",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.24914098265355908
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 3,
+      "name": "g4_p127_best_over_point_lazy",
+      "note": "Recorded same-target three-seed median; fastest of 14 existing controls / point lazy; L0 producer observations",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.19224235692960806
+    }
+  ],
+  "problem": "kernel:hec-point-cold-genus2-3-4",
+  "raw": [
+    {
+      "bytes": 125569,
+      "path": "research/hec_point_cold_20261115/POINT-COLD-RAW.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/65/6562bcb8f72a3c027b2ef56fbbd6f72c049e5d733e7d82b6fe333529bfe77298",
+      "sha256": "6562bcb8f72a3c027b2ef56fbbd6f72c049e5d733e7d82b6fe333529bfe77298",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/hec_point_cold_20261115/REPORT.pdf",
+    "png": [],
+    "svg": [
+      "research/hec_point_cold_20261115/POINT-COLD.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "hec-point-cold",
+  "status": "measured",
+  "summary": "E8 exactness passes, E9 cost fails on every fixture; 18 targets recovered; 306 cold cells; primary medians 0.066..0.430, A/Amax2.923; all losses retained.",
+  "validation": null
+}

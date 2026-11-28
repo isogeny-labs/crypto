@@ -1,0 +1,4 @@
+Required root-library validation on integration basee51060051c6963b8852f86844f1ec53dc61f895f.
+Command: CARGO_TARGET_DIR=/workspace/scratch/22854d1d6689/crypto-current/target CARGO_BUILD_JOBS=2 timeout60 cargo test --release --locked --offline --lib -- --test-threads=1
+Scope: existing root library,including new optional F4 visitor timing; no performance campaign.
+Use the previously populated development compilation cache. External total process cap60seconds; retain compile/test failure or timeout. No cold or runtime claim.

@@ -1,0 +1,27 @@
+{
+  "card_id": "CARD-native-arena-reclamation-continuation-k2048-c1",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "outcome": "stopped",
+  "execution_conforms_to_frozen_argv": true,
+  "stopped_at_step": "k2048-c1",
+  "recommendation": "respecify",
+  "interpretation": "not_assessed",
+  "specification_errors": ["Frozen continuation request was rejected by the unchanged worker: primary chained-S3 search caps or base selection outside supported domain"],
+  "card_sha256": "ebc1bc26d5ae52917e15212e9502cfc459b3e80ffa1646fd9a1092b38c07294a",
+  "prompt_sha256": "ec78b2beb8e64a6f9c7faaf7c0f9d348f08d2152a986492b2b60b9eaa20b4833",
+  "relay_sha256": "f614a7471893b5e88dc158ddaf55f764ec34f7895df093d79b7f3c71f99a37c6",
+  "commit": "a591f1daa3f26628ac1dadb0561acd366ef61ca2",
+  "worker_sha256": "4fcda42fe79c90912c4ba4e8f702945dc0cc2914d93d3c1941dd3966d481d060",
+  "guard_sha256": "b49c6f92a1dedebaff0184db0144b65afa9721d1a18173b533b51cdc59e02105",
+  "reasons": [
+    "Native card-check exited0 with relay_verbatim=true, record_digests_verified=true and status=stopped at command1; see card-check.stdout.",
+    "Receipt and relay are byte-identical by cmp, relay hash matches executor return; regenerated native prompt is byte-identical to authoritative prompt.",
+    "Frozen HEAD, card, prompt, worker and guard hashes match. Native card-check validates all binds and every nonnull recorded output/stream digest.",
+    "Receipt contains one exact frozen command, one attempt, exit_code1, timed_out=false, elapsed12.87025458seconds and succeeded=false.",
+    "Runner stderr reports Error: empty memory profile. Worker stderr.log reports Error: primary chained-S3 search caps or base selection outside supported domain.",
+    "audit.json absent; memory-profile.jsonl and stdout.log empty. Failed/missing outputs remain preserved, not accepted as completed continuation evidence.",
+    "Receipt card_changed=false, dirty_before and dirty_after empty; current tracked git status empty. Outer cleanup_verified=true."
+  ],
+  "assessment_scope": "Execution conformance and custody only. The command was relayed correctly but the continuation did not complete. No retry, source edit, build or new dispatch performed. Scientific interpretation not assessed."
+}

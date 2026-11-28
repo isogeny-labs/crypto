@@ -1,0 +1,122 @@
+Merge made by the 'ort' strategy.
+ .../.artifacts.json                                |     3 +
+ .../.gitignore                                     |     3 +
+ .../koblitz-report.pdf                             | 12535 ----------
+ .../prime-ic-report.pdf                            | 11419 ---------
+ .../prime-report.pdf                               | 23921 -------------------
+ .../20261022-algorithm-perf-round2/.artifacts.json |     6 +
+ .../20261022-algorithm-perf-round2/.gitignore      |     3 +
+ .../20261022-algorithm-perf-round2/REPORT.pdf      |   Bin 107587 -> 0 bytes
+ .../.artifacts.json                                |     6 +
+ .../20261022-ecbench-harness-overhead/.gitignore   |     3 +
+ .../20261022-ecbench-harness-overhead/REPORT.pdf   |   Bin 163374 -> 0 bytes
+ benchmarks/20261022-ic-generator-orbit/REPORT.pdf  |  2453 ++
+ .../cost/.artifacts.json                           |     3 +-
+ .../20261027-twist-progression/cost/.gitignore     |     1 +
+ .../20261027-twist-progression/cost/RESULTS.pdf    |   Bin 156062 -> 0 bytes
+ .../geometry/.artifacts.json                       |     3 +-
+ .../20261027-twist-progression/geometry/.gitignore |     1 +
+ .../geometry/RESULTS.pdf                           |   Bin 131106 -> 0 bytes
+ .../preflight/.artifacts.json                      |     3 +-
+ .../preflight/.gitignore                           |     1 +
+ .../preflight/RESULTS.pdf                          |   Bin 135096 -> 0 bytes
+ research/dreg_closure_m4_20261018/.artifacts.json  |     1 +
+ research/dreg_closure_m4_20261018/.gitignore       |     1 +
+ research/dreg_closure_m4_20261018/RESULTS.pdf      |  1168 -
+ .../reports/koblitz/.artifacts.json                |     6 +
+ .../reports/koblitz/.gitignore                     |     3 +
+ .../reports/koblitz/report.pdf                     | 12535 ----------
+ .../reports/prime-ic/.artifacts.json               |     6 +
+ .../reports/prime-ic/.gitignore                    |     3 +
+ .../reports/prime-ic/report.pdf                    | 11419 ---------
+ .../reports/prime/.artifacts.json                  |     1 +
+ .../reports/prime/.gitignore                       |     1 +
+ .../reports/prime/report.pdf                       | 23921 -------------------
+ .../ecbench_generator_orbit_20261022/REPORT.pdf    |  2453 ++
+ .../.artifacts.json                                |     6 +
+ .../ecbench_overhead_review_20261022/.gitignore    |     3 +
+ .../ecbench_overhead_review_20261022/REPORT.pdf    |   Bin 163374 -> 0 bytes
+ .../ecbench_perf_round2_20261022/.artifacts.json   |     6 +
+ research/ecbench_perf_round2_20261022/.gitignore   |     3 +
+ research/ecbench_perf_round2_20261022/REPORT.pdf   |   Bin 107587 -> 0 bytes
+ .../.artifacts.json                                |     2 +
+ .../ecdlp_exponent_assessment_20261018/.gitignore  |     2 +
+ .../ecdlp_exponent_assessment_20261018/LEADS.pdf   |  3735 ---
+ .../ecdlp_exponent_assessment_20261018/REPORT.pdf  |  2687 ---
+ .../ghs_cubic_quartic_ic_20261012/.artifacts.json  |     6 +
+ research/ghs_cubic_quartic_ic_20261012/.gitignore  |     3 +
+ .../SCALING_20261018.pdf                           |  2124 --
+ .../koblitz_halfdim_base_20261018/.artifacts.json  |     1 +
+ research/koblitz_halfdim_base_20261018/.gitignore  |     1 +
+ research/koblitz_halfdim_base_20261018/README.pdf  |  1867 --
+ .../reports/n23/.artifacts.json                    |     6 +
+ .../reports/n23/.gitignore                         |     3 +
+ .../reports/n23/report.pdf                         |  6494 -----
+ .../reports/n31/.artifacts.json                    |     6 +
+ .../reports/n31/.gitignore                         |     3 +
+ .../reports/n31/report.pdf                         |  5076 ----
+ .../.artifacts.json                                |     1 +
+ .../s5_small_roots_variants_20261018/.gitignore    |     1 +
+ .../s5_small_roots_variants_20261018/README.pdf    |  2005 --
+ .../generators-20261027/full-order/.artifacts.json |     3 +-
+ .../generators-20261027/full-order/.gitignore      |     1 +
+ .../generators-20261027/full-order/RESULTS.pdf     |   Bin 145647 -> 0 bytes
+ .../maximal-order/.artifacts.json                  |     3 +-
+ .../generators-20261027/maximal-order/.gitignore   |     1 +
+ .../generators-20261027/maximal-order/RESULTS.pdf  |   Bin 175297 -> 0 bytes
+ .../reports/overlap-20261027/.artifacts.json       |     3 +-
+ .../reports/overlap-20261027/.gitignore            |     1 +
+ .../reports/overlap-20261027/RESULTS.pdf           |   Bin 204621 -> 0 bytes
+ .../progression-20261027/cost/.artifacts.json      |     3 +-
+ .../reports/progression-20261027/cost/.gitignore   |     1 +
+ .../reports/progression-20261027/cost/RESULTS.pdf  |   Bin 156062 -> 0 bytes
+ .../progression-20261027/geometry/.artifacts.json  |     3 +-
+ .../progression-20261027/geometry/.gitignore       |     1 +
+ .../progression-20261027/geometry/RESULTS.pdf      |   Bin 131106 -> 0 bytes
+ 74 files changed, 5029 insertions(+), 120914 deletions(-)
+ delete mode 100644 benchmarks/20261018-ecbench-comprehensive-sweep/koblitz-report.pdf
+ delete mode 100644 benchmarks/20261018-ecbench-comprehensive-sweep/prime-ic-report.pdf
+ delete mode 100644 benchmarks/20261018-ecbench-comprehensive-sweep/prime-report.pdf
+ create mode 100644 benchmarks/20261022-algorithm-perf-round2/.artifacts.json
+ create mode 100644 benchmarks/20261022-algorithm-perf-round2/.gitignore
+ delete mode 100644 benchmarks/20261022-algorithm-perf-round2/REPORT.pdf
+ create mode 100644 benchmarks/20261022-ecbench-harness-overhead/.artifacts.json
+ create mode 100644 benchmarks/20261022-ecbench-harness-overhead/.gitignore
+ delete mode 100644 benchmarks/20261022-ecbench-harness-overhead/REPORT.pdf
+ create mode 100644 benchmarks/20261022-ic-generator-orbit/REPORT.pdf
+ delete mode 100644 benchmarks/20261027-twist-progression/cost/RESULTS.pdf
+ delete mode 100644 benchmarks/20261027-twist-progression/geometry/RESULTS.pdf
+ delete mode 100644 benchmarks/20261027-twist-progression/preflight/RESULTS.pdf
+ delete mode 100644 research/dreg_closure_m4_20261018/RESULTS.pdf
+ create mode 100644 research/ecbench_comprehensive_sweep_20261018/reports/koblitz/.artifacts.json
+ create mode 100644 research/ecbench_comprehensive_sweep_20261018/reports/koblitz/.gitignore
+ delete mode 100644 research/ecbench_comprehensive_sweep_20261018/reports/koblitz/report.pdf
+ create mode 100644 research/ecbench_comprehensive_sweep_20261018/reports/prime-ic/.artifacts.json
+ create mode 100644 research/ecbench_comprehensive_sweep_20261018/reports/prime-ic/.gitignore
+ delete mode 100644 research/ecbench_comprehensive_sweep_20261018/reports/prime-ic/report.pdf
+ delete mode 100644 research/ecbench_comprehensive_sweep_20261018/reports/prime/report.pdf
+ create mode 100644 research/ecbench_generator_orbit_20261022/REPORT.pdf
+ create mode 100644 research/ecbench_overhead_review_20261022/.artifacts.json
+ create mode 100644 research/ecbench_overhead_review_20261022/.gitignore
+ delete mode 100644 research/ecbench_overhead_review_20261022/REPORT.pdf
+ create mode 100644 research/ecbench_perf_round2_20261022/.artifacts.json
+ create mode 100644 research/ecbench_perf_round2_20261022/.gitignore
+ delete mode 100644 research/ecbench_perf_round2_20261022/REPORT.pdf
+ delete mode 100644 research/ecdlp_exponent_assessment_20261018/LEADS.pdf
+ delete mode 100644 research/ecdlp_exponent_assessment_20261018/REPORT.pdf
+ create mode 100644 research/ghs_cubic_quartic_ic_20261012/.artifacts.json
+ create mode 100644 research/ghs_cubic_quartic_ic_20261012/.gitignore
+ delete mode 100644 research/ghs_cubic_quartic_ic_20261012/SCALING_20261018.pdf
+ delete mode 100644 research/koblitz_halfdim_base_20261018/README.pdf
+ create mode 100644 research/koblitz_halfdim_base_20261018/reports/n23/.artifacts.json
+ create mode 100644 research/koblitz_halfdim_base_20261018/reports/n23/.gitignore
+ delete mode 100644 research/koblitz_halfdim_base_20261018/reports/n23/report.pdf
+ create mode 100644 research/koblitz_halfdim_base_20261018/reports/n31/.artifacts.json
+ create mode 100644 research/koblitz_halfdim_base_20261018/reports/n31/.gitignore
+ delete mode 100644 research/koblitz_halfdim_base_20261018/reports/n31/report.pdf
+ delete mode 100644 research/s5_small_roots_variants_20261018/README.pdf
+ delete mode 100644 research/twist_routes_1_3_20261021/reports/generators-20261027/full-order/RESULTS.pdf
+ delete mode 100644 research/twist_routes_1_3_20261021/reports/generators-20261027/maximal-order/RESULTS.pdf
+ delete mode 100644 research/twist_routes_1_3_20261021/reports/overlap-20261027/RESULTS.pdf
+ delete mode 100644 research/twist_routes_1_3_20261021/reports/progression-20261027/cost/RESULTS.pdf
+ delete mode 100644 research/twist_routes_1_3_20261021/reports/progression-20261027/geometry/RESULTS.pdf

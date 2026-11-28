@@ -1,0 +1,19 @@
+digraph APS {
+  graph [rankdir=TB, bgcolor="white", pad="0.15", nodesep="0.28", ranksep="0.34", fontname="Helvetica"];
+  node [shape=box, style="rounded,filled", fillcolor="#eaf1f8", color="#496680", fontname="Helvetica", fontsize=11, margin="0.15,0.10"];
+  edge [color="#496680", fontname="Helvetica", fontsize=10];
+  input [label="One target + explicit seed\nCold per-target trace pool; no known logarithm"];
+  base [label="Sample / retain labeled base\nUnequal profiles; capped partial draws retained"];
+  plan [label="Literal search cells\nCoordinate guesses OR nonhorizontal chart + horizontal cell"];
+  coverage [label="Retained growth control\nFull region OR certified first-new-coordinate frontier"];
+  f4 [label="F4 + exact roots\nLearn / replay + numerical checks / fallback\nOne shared deadline; all attempts retained"];
+  witness [label="Signed point relation + nonzero B\nScalar recovery and ordinary-residue checks"];
+  transcript [label="Sealed output\nLiteral equations, cells, coverage, counters, partial/failure states"];
+  reader [label="Separate ordinary-residue reader\nWitness + bounded complete-set oracle\nFull / frontier / partial classifications"];
+  ir [label="Optional inclusive Ir evidence\nMatching replay + every method part\n+ separate scalar-check frame", fillcolor="#edf4eb"];
+  export [label="Native unified export\nEvery planned/observed outcome retained\nMissing required evidence blocks qualification", fillcolor="#edf4eb"];
+  admission [label="Performance admission still pending\nSuccessful approved source checkpoint + pilot\nFrozen held-out protocol + accounting/replay + EKS gates", fillcolor="#fff1dd", color="#a87936"];
+  input -> base -> plan -> coverage -> f4 -> witness -> transcript -> reader -> export;
+  transcript -> ir -> export;
+  export -> admission [style=dashed, label="source consistency alone is insufficient"];
+}

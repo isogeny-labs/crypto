@@ -1,0 +1,5 @@
+# Horizontal fibres as initial relations
+
+On y²=f(x) with monic f of degree 2g+1, the function y-b has a pole of order 2g+1 at infinity. Its zeros for nonzero b have multiplicities given by f(x)-b². A completely split fibre gives one signed relation among catalogue places. Count b from 1 through (p-1)/2, since -b gives the negative row. Omit b=0, whose places already have zero projection into the odd-order subgroup.
+
+For every registered curve reconstruct the catalogue in increasing x and the solver's small-base cutoff. Group rational abscissae by square value, divide out every root with multiplicity and check the residual degree. Count all complete fibres, those with at most two distinct large places (eligible in the initially unjoined forest), and those wholly inside the small base. Falsifier for use as a universal startup source: any registered curve with zero eligible rows. This tests admission before target-dependent joins. It does not measure runtime, later eligibility or independence. Freeze code and protocol in remote Git before enumeration.

@@ -1,0 +1,837 @@
+{
+  "cells": {
+    "scale-n131-d12-cancellation/adjoint": {
+      "metrics": {
+        "field_mul": {
+          "max": 2991,
+          "median": 2991,
+          "min": 2991
+        },
+        "field_square": {
+          "max": 1994,
+          "median": 1994,
+          "min": 1994
+        },
+        "instructions": {
+          "max": 32399425,
+          "median": 32399425,
+          "min": 32399425
+        },
+        "oracle_instructions": {
+          "max": 6292691,
+          "median": 6292691,
+          "min": 6292691
+        },
+        "post_instructions": {
+          "max": 1086096,
+          "median": 1086096,
+          "min": 1086096
+        },
+        "setup_instructions": {
+          "max": 25020638,
+          "median": 25020638,
+          "min": 25020638
+        }
+      },
+      "rows": 5
+    },
+    "scale-n131-d12-cancellation/baseline": {
+      "metrics": {
+        "field_mul": {
+          "max": 2991,
+          "median": 2991,
+          "min": 2991
+        },
+        "field_square": {
+          "max": 1994,
+          "median": 1994,
+          "min": 1994
+        },
+        "instructions": {
+          "max": 32452734,
+          "median": 32452734,
+          "min": 32452734
+        },
+        "oracle_instructions": {
+          "max": 6346027,
+          "median": 6346027,
+          "min": 6346027
+        },
+        "post_instructions": {
+          "max": 1086096,
+          "median": 1086096,
+          "min": 1086096
+        },
+        "setup_instructions": {
+          "max": 25020611,
+          "median": 25020611,
+          "min": 25020611
+        }
+      },
+      "rows": 5
+    },
+    "scale-n131-d12-cancellation/baseline-aa": {
+      "metrics": {
+        "field_mul": {
+          "max": 2991,
+          "median": 2991,
+          "min": 2991
+        },
+        "field_square": {
+          "max": 1994,
+          "median": 1994,
+          "min": 1994
+        },
+        "instructions": {
+          "max": 32452785,
+          "median": 32452785,
+          "min": 32452785
+        },
+        "oracle_instructions": {
+          "max": 6346027,
+          "median": 6346027,
+          "min": 6346027
+        },
+        "post_instructions": {
+          "max": 1086096,
+          "median": 1086096,
+          "min": 1086096
+        },
+        "setup_instructions": {
+          "max": 25020662,
+          "median": 25020662,
+          "min": 25020662
+        }
+      },
+      "rows": 5
+    },
+    "scale-n131-d12-distinct-planted-0/adjoint": {
+      "metrics": {
+        "field_mul": {
+          "max": 7459,
+          "median": 7459,
+          "min": 7459
+        },
+        "field_square": {
+          "max": 2766,
+          "median": 2766,
+          "min": 2766
+        },
+        "instructions": {
+          "max": 36264943,
+          "median": 36264943,
+          "min": 36264943
+        },
+        "oracle_instructions": {
+          "max": 10155487,
+          "median": 10155487,
+          "min": 10155487
+        },
+        "post_instructions": {
+          "max": 1086329,
+          "median": 1086329,
+          "min": 1086329
+        },
+        "setup_instructions": {
+          "max": 25023127,
+          "median": 25023127,
+          "min": 25023127
+        }
+      },
+      "rows": 5
+    },
+    "scale-n131-d12-distinct-planted-0/baseline": {
+      "metrics": {
+        "field_mul": {
+          "max": 7735,
+          "median": 7735,
+          "min": 7735
+        },
+        "field_square": {
+          "max": 2766,
+          "median": 2766,
+          "min": 2766
+        },
+        "instructions": {
+          "max": 39031522,
+          "median": 39031522,
+          "min": 39031522
+        },
+        "oracle_instructions": {
+          "max": 12922053,
+          "median": 12922053,
+          "min": 12922053
+        },
+        "post_instructions": {
+          "max": 1086329,
+          "median": 1086329,
+          "min": 1086329
+        },
+        "setup_instructions": {
+          "max": 25023140,
+          "median": 25023140,
+          "min": 25023140
+        }
+      },
+      "rows": 5
+    },
+    "scale-n131-d12-distinct-planted-0/baseline-aa": {
+      "metrics": {
+        "field_mul": {
+          "max": 7735,
+          "median": 7735,
+          "min": 7735
+        },
+        "field_square": {
+          "max": 2766,
+          "median": 2766,
+          "min": 2766
+        },
+        "instructions": {
+          "max": 39031569,
+          "median": 39031569,
+          "min": 39031569
+        },
+        "oracle_instructions": {
+          "max": 12922053,
+          "median": 12922053,
+          "min": 12922053
+        },
+        "post_instructions": {
+          "max": 1086329,
+          "median": 1086329,
+          "min": 1086329
+        },
+        "setup_instructions": {
+          "max": 25023187,
+          "median": 25023187,
+          "min": 25023187
+        }
+      },
+      "rows": 5
+    },
+    "scale-n131-d12-uniform/adjoint": {
+      "metrics": {
+        "field_mul": {
+          "max": 17285,
+          "median": 17285,
+          "min": 17285
+        },
+        "field_square": {
+          "max": 5027,
+          "median": 5027,
+          "min": 5027
+        },
+        "instructions": {
+          "max": 44024513,
+          "median": 44024513,
+          "min": 44024513
+        },
+        "oracle_instructions": {
+          "max": 18070727,
+          "median": 18070727,
+          "min": 18070727
+        },
+        "post_instructions": {
+          "max": 925086,
+          "median": 925086,
+          "min": 925086
+        },
+        "setup_instructions": {
+          "max": 25028700,
+          "median": 25028700,
+          "min": 25028700
+        }
+      },
+      "rows": 5
+    },
+    "scale-n131-d12-uniform/baseline": {
+      "metrics": {
+        "field_mul": {
+          "max": 17561,
+          "median": 17561,
+          "min": 17561
+        },
+        "field_square": {
+          "max": 5027,
+          "median": 5027,
+          "min": 5027
+        },
+        "instructions": {
+          "max": 46922548,
+          "median": 46922548,
+          "min": 46922548
+        },
+        "oracle_instructions": {
+          "max": 20968749,
+          "median": 20968749,
+          "min": 20968749
+        },
+        "post_instructions": {
+          "max": 925086,
+          "median": 925086,
+          "min": 925086
+        },
+        "setup_instructions": {
+          "max": 25028713,
+          "median": 25028713,
+          "min": 25028713
+        }
+      },
+      "rows": 5
+    },
+    "scale-n131-d12-uniform/baseline-aa": {
+      "metrics": {
+        "field_mul": {
+          "max": 17561,
+          "median": 17561,
+          "min": 17561
+        },
+        "field_square": {
+          "max": 5027,
+          "median": 5027,
+          "min": 5027
+        },
+        "instructions": {
+          "max": 46922599,
+          "median": 46922599,
+          "min": 46922599
+        },
+        "oracle_instructions": {
+          "max": 20968749,
+          "median": 20968749,
+          "min": 20968749
+        },
+        "post_instructions": {
+          "max": 925086,
+          "median": 925086,
+          "min": 925086
+        },
+        "setup_instructions": {
+          "max": 25028764,
+          "median": 25028764,
+          "min": 25028764
+        }
+      },
+      "rows": 5
+    },
+    "scale-n83-d12-cancellation/adjoint": {
+      "metrics": {
+        "field_mul": {
+          "max": 3012,
+          "median": 3012,
+          "min": 3012
+        },
+        "field_square": {
+          "max": 2008,
+          "median": 2008,
+          "min": 2008
+        },
+        "instructions": {
+          "max": 24698227,
+          "median": 24698227,
+          "min": 24698227
+        },
+        "oracle_instructions": {
+          "max": 5600230,
+          "median": 5600230,
+          "min": 5600230
+        },
+        "post_instructions": {
+          "max": 1055994,
+          "median": 1055994,
+          "min": 1055994
+        },
+        "setup_instructions": {
+          "max": 18042003,
+          "median": 18042003,
+          "min": 18042003
+        }
+      },
+      "rows": 5
+    },
+    "scale-n83-d12-cancellation/baseline": {
+      "metrics": {
+        "field_mul": {
+          "max": 3012,
+          "median": 3012,
+          "min": 3012
+        },
+        "field_square": {
+          "max": 2008,
+          "median": 2008,
+          "min": 2008
+        },
+        "instructions": {
+          "max": 24752165,
+          "median": 24752165,
+          "min": 24752165
+        },
+        "oracle_instructions": {
+          "max": 5654155,
+          "median": 5654155,
+          "min": 5654155
+        },
+        "post_instructions": {
+          "max": 1055994,
+          "median": 1055994,
+          "min": 1055994
+        },
+        "setup_instructions": {
+          "max": 18042016,
+          "median": 18042016,
+          "min": 18042016
+        }
+      },
+      "rows": 5
+    },
+    "scale-n83-d12-cancellation/baseline-aa": {
+      "metrics": {
+        "field_mul": {
+          "max": 3012,
+          "median": 3012,
+          "min": 3012
+        },
+        "field_square": {
+          "max": 2008,
+          "median": 2008,
+          "min": 2008
+        },
+        "instructions": {
+          "max": 24751982,
+          "median": 24751982,
+          "min": 24751982
+        },
+        "oracle_instructions": {
+          "max": 5653961,
+          "median": 5653961,
+          "min": 5653961
+        },
+        "post_instructions": {
+          "max": 1055994,
+          "median": 1055994,
+          "min": 1055994
+        },
+        "setup_instructions": {
+          "max": 18042027,
+          "median": 18042027,
+          "min": 18042027
+        }
+      },
+      "rows": 5
+    },
+    "scale-n83-d12-distinct-planted-0/adjoint": {
+      "metrics": {
+        "field_mul": {
+          "max": 8627,
+          "median": 8627,
+          "min": 8627
+        },
+        "field_square": {
+          "max": 3022,
+          "median": 3022,
+          "min": 3022
+        },
+        "instructions": {
+          "max": 28519674,
+          "median": 28519674,
+          "min": 28519674
+        },
+        "oracle_instructions": {
+          "max": 9420346,
+          "median": 9420346,
+          "min": 9420346
+        },
+        "post_instructions": {
+          "max": 1057061,
+          "median": 1057061,
+          "min": 1057061
+        },
+        "setup_instructions": {
+          "max": 18042267,
+          "median": 18042267,
+          "min": 18042267
+        }
+      },
+      "rows": 5
+    },
+    "scale-n83-d12-distinct-planted-0/baseline": {
+      "metrics": {
+        "field_mul": {
+          "max": 8903,
+          "median": 8903,
+          "min": 8903
+        },
+        "field_square": {
+          "max": 3022,
+          "median": 3022,
+          "min": 3022
+        },
+        "instructions": {
+          "max": 29542434,
+          "median": 29542434,
+          "min": 29542434
+        },
+        "oracle_instructions": {
+          "max": 10443093,
+          "median": 10443093,
+          "min": 10443093
+        },
+        "post_instructions": {
+          "max": 1057061,
+          "median": 1057061,
+          "min": 1057061
+        },
+        "setup_instructions": {
+          "max": 18042280,
+          "median": 18042280,
+          "min": 18042280
+        }
+      },
+      "rows": 5
+    },
+    "scale-n83-d12-distinct-planted-0/baseline-aa": {
+      "metrics": {
+        "field_mul": {
+          "max": 8903,
+          "median": 8903,
+          "min": 8903
+        },
+        "field_square": {
+          "max": 3022,
+          "median": 3022,
+          "min": 3022
+        },
+        "instructions": {
+          "max": 29542481,
+          "median": 29542481,
+          "min": 29542481
+        },
+        "oracle_instructions": {
+          "max": 10443093,
+          "median": 10443093,
+          "min": 10443093
+        },
+        "post_instructions": {
+          "max": 1057061,
+          "median": 1057061,
+          "min": 1057061
+        },
+        "setup_instructions": {
+          "max": 18042327,
+          "median": 18042327,
+          "min": 18042327
+        }
+      },
+      "rows": 5
+    },
+    "scale-n83-d12-uniform/adjoint": {
+      "metrics": {
+        "field_mul": {
+          "max": 16854,
+          "median": 16854,
+          "min": 16854
+        },
+        "field_square": {
+          "max": 4671,
+          "median": 4671,
+          "min": 4671
+        },
+        "instructions": {
+          "max": 33333976,
+          "median": 33333976,
+          "min": 33333976
+        },
+        "oracle_instructions": {
+          "max": 14396615,
+          "median": 14396615,
+          "min": 14396615
+        },
+        "post_instructions": {
+          "max": 894073,
+          "median": 894073,
+          "min": 894073
+        },
+        "setup_instructions": {
+          "max": 18043288,
+          "median": 18043288,
+          "min": 18043288
+        }
+      },
+      "rows": 5
+    },
+    "scale-n83-d12-uniform/baseline": {
+      "metrics": {
+        "field_mul": {
+          "max": 17130,
+          "median": 17130,
+          "min": 17130
+        },
+        "field_square": {
+          "max": 4671,
+          "median": 4671,
+          "min": 4671
+        },
+        "instructions": {
+          "max": 34457766,
+          "median": 34457766,
+          "min": 34457766
+        },
+        "oracle_instructions": {
+          "max": 15520392,
+          "median": 15520392,
+          "min": 15520392
+        },
+        "post_instructions": {
+          "max": 894073,
+          "median": 894073,
+          "min": 894073
+        },
+        "setup_instructions": {
+          "max": 18043301,
+          "median": 18043301,
+          "min": 18043301
+        }
+      },
+      "rows": 5
+    },
+    "scale-n83-d12-uniform/baseline-aa": {
+      "metrics": {
+        "field_mul": {
+          "max": 17130,
+          "median": 17130,
+          "min": 17130
+        },
+        "field_square": {
+          "max": 4671,
+          "median": 4671,
+          "min": 4671
+        },
+        "instructions": {
+          "max": 34457817,
+          "median": 34457817,
+          "min": 34457817
+        },
+        "oracle_instructions": {
+          "max": 15520392,
+          "median": 15520392,
+          "min": 15520392
+        },
+        "post_instructions": {
+          "max": 894073,
+          "median": 894073,
+          "min": 894073
+        },
+        "setup_instructions": {
+          "max": 18043352,
+          "median": 18043352,
+          "min": 18043352
+        }
+      },
+      "rows": 5
+    }
+  },
+  "contrasts": [
+    {
+      "instance": "scale-n131-d12-cancellation",
+      "left": "baseline",
+      "left_median": 32452734,
+      "metric": "instructions",
+      "ratio": 1.001645368706389,
+      "relative_difference": 0.0016426659152969979,
+      "right": "adjoint",
+      "right_median": 32399425,
+      "scope": "complete cold query, lazy context fixed"
+    },
+    {
+      "instance": "scale-n131-d12-cancellation",
+      "left": "baseline",
+      "left_median": 6346027,
+      "metric": "oracle_instructions",
+      "ratio": 1.0084758650949173,
+      "relative_difference": 0.008404628596758255,
+      "right": "adjoint",
+      "right_median": 6292691,
+      "scope": "complete algebraic relation oracle"
+    },
+    {
+      "instance": "scale-n131-d12-cancellation",
+      "left": "baseline",
+      "left_median": 32452734,
+      "metric": "instructions",
+      "ratio": 0.9999984284861838,
+      "relative_difference": 1.5715162858081541e-6,
+      "right": "baseline-aa",
+      "right_median": 32452785,
+      "scope": "A/A"
+    },
+    {
+      "instance": "scale-n131-d12-distinct-planted-0",
+      "left": "baseline",
+      "left_median": 39031522,
+      "metric": "instructions",
+      "ratio": 1.0762879732087267,
+      "relative_difference": 0.07088063335065438,
+      "right": "adjoint",
+      "right_median": 36264943,
+      "scope": "complete cold query, lazy context fixed"
+    },
+    {
+      "instance": "scale-n131-d12-distinct-planted-0",
+      "left": "baseline",
+      "left_median": 12922053,
+      "metric": "oracle_instructions",
+      "ratio": 1.2724208105431083,
+      "relative_difference": 0.21409647522727232,
+      "right": "adjoint",
+      "right_median": 10155487,
+      "scope": "complete algebraic relation oracle"
+    },
+    {
+      "instance": "scale-n131-d12-distinct-planted-0",
+      "left": "baseline",
+      "left_median": 39031522,
+      "metric": "instructions",
+      "ratio": 0.9999987958465109,
+      "relative_difference": 1.2041549391796713e-6,
+      "right": "baseline-aa",
+      "right_median": 39031569,
+      "scope": "A/A"
+    },
+    {
+      "instance": "scale-n131-d12-uniform",
+      "left": "baseline",
+      "left_median": 46922548,
+      "metric": "instructions",
+      "ratio": 1.0658277582763949,
+      "relative_difference": 0.061762097829810944,
+      "right": "adjoint",
+      "right_median": 44024513,
+      "scope": "complete cold query, lazy context fixed"
+    },
+    {
+      "instance": "scale-n131-d12-uniform",
+      "left": "baseline",
+      "left_median": 20968749,
+      "metric": "oracle_instructions",
+      "ratio": 1.1603710797025488,
+      "relative_difference": 0.1382067189606781,
+      "right": "adjoint",
+      "right_median": 18070727,
+      "scope": "complete algebraic relation oracle"
+    },
+    {
+      "instance": "scale-n131-d12-uniform",
+      "left": "baseline",
+      "left_median": 46922548,
+      "metric": "instructions",
+      "ratio": 0.9999989131036838,
+      "relative_difference": 1.0868974975527757e-6,
+      "right": "baseline-aa",
+      "right_median": 46922599,
+      "scope": "A/A"
+    },
+    {
+      "instance": "scale-n83-d12-cancellation",
+      "left": "baseline",
+      "left_median": 24752165,
+      "metric": "instructions",
+      "ratio": 1.0021838814583734,
+      "relative_difference": 0.0021791225131215794,
+      "right": "adjoint",
+      "right_median": 24698227,
+      "scope": "complete cold query, lazy context fixed"
+    },
+    {
+      "instance": "scale-n83-d12-cancellation",
+      "left": "baseline",
+      "left_median": 5654155,
+      "metric": "oracle_instructions",
+      "ratio": 1.0096290688061027,
+      "relative_difference": 0.009537234122516981,
+      "right": "adjoint",
+      "right_median": 5600230,
+      "scope": "complete algebraic relation oracle"
+    },
+    {
+      "instance": "scale-n83-d12-cancellation",
+      "left": "baseline",
+      "left_median": 24752165,
+      "metric": "instructions",
+      "ratio": 1.0000073933473288,
+      "relative_difference": 7.393292667530295e-6,
+      "right": "baseline-aa",
+      "right_median": 24751982,
+      "scope": "A/A"
+    },
+    {
+      "instance": "scale-n83-d12-distinct-planted-0",
+      "left": "baseline",
+      "left_median": 29542434,
+      "metric": "instructions",
+      "ratio": 1.0358615599883785,
+      "relative_difference": 0.034620031646681516,
+      "right": "adjoint",
+      "right_median": 28519674,
+      "scope": "complete cold query, lazy context fixed"
+    },
+    {
+      "instance": "scale-n83-d12-distinct-planted-0",
+      "left": "baseline",
+      "left_median": 10443093,
+      "metric": "oracle_instructions",
+      "ratio": 1.1085678806277393,
+      "relative_difference": 0.0979352573035594,
+      "right": "adjoint",
+      "right_median": 9420346,
+      "scope": "complete algebraic relation oracle"
+    },
+    {
+      "instance": "scale-n83-d12-distinct-planted-0",
+      "left": "baseline",
+      "left_median": 29542434,
+      "metric": "instructions",
+      "ratio": 0.9999984090706532,
+      "relative_difference": 1.5909318778540726e-6,
+      "right": "baseline-aa",
+      "right_median": 29542481,
+      "scope": "A/A"
+    },
+    {
+      "instance": "scale-n83-d12-uniform",
+      "left": "baseline",
+      "left_median": 34457766,
+      "metric": "instructions",
+      "ratio": 1.0337130500123957,
+      "relative_difference": 0.03261354784288686,
+      "right": "adjoint",
+      "right_median": 33333976,
+      "scope": "complete cold query, lazy context fixed"
+    },
+    {
+      "instance": "scale-n83-d12-uniform",
+      "left": "baseline",
+      "left_median": 15520392,
+      "metric": "oracle_instructions",
+      "ratio": 1.0780584185935373,
+      "relative_difference": 0.0724064830321296,
+      "right": "adjoint",
+      "right_median": 14396615,
+      "scope": "complete algebraic relation oracle"
+    },
+    {
+      "instance": "scale-n83-d12-uniform",
+      "left": "baseline",
+      "left_median": 34457766,
+      "metric": "instructions",
+      "ratio": 0.9999985199294547,
+      "relative_difference": 1.480072735998033e-6,
+      "right": "baseline-aa",
+      "right_median": 34457817,
+      "scope": "A/A"
+    }
+  ],
+  "rows": 90,
+  "schema": "trace-zero-projection-setup-summary/v1",
+  "scope": "Disclosed fixed single-query payloads; simulated instructions with calibrated setup/oracle/post counter partitions. No native-time or external-best claim."
+}

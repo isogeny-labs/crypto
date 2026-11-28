@@ -1,0 +1,52 @@
+{
+  "schema": "ecbench.spec/v2",
+  "label": "canonical Phase 1 genus-2 Jacobian lane",
+  "description": "Preregistered direct higher-genus Phase 1 comparison on the pinned 18-bit prime subgroup of Jac(y^2 = 706 + 731x + 331x^2 + 360x^3 + 270x^4 + x^5) over F_769. Public targets, the strongest same-Jacobian rho comparator, a repeated A/A control, and the implemented hyperelliptic index-calculus candidate are fixed here. This executable spec is not a completed benchmark result.",
+  "curve_policy": {
+    "mode": "phase",
+    "phase": 1,
+    "lane": "hyperelliptic_jacobian"
+  },
+  "workloads": {
+    "curves": [
+      {
+        "kind": "panel_destination",
+        "cell": "P1-JG2-18"
+      }
+    ],
+    "targets_per_curve": 32,
+    "target_seed": 202611190101,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-negation",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "hyperelliptic-ic",
+      "role": "candidate",
+      "method": {
+        "id": "ic.hyperelliptic_v2"
+      }
+    },
+    {
+      "name": "rho-negation-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 4,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 202611190102,
+    "isolation_required": "L2",
+    "timeout_seconds": 600
+  }
+}

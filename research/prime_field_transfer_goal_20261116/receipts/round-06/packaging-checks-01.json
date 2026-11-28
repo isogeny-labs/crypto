@@ -1,0 +1,68 @@
+{
+  "at": "2026-11-16T12:12:35.361Z",
+  "checks": [
+    {
+      "name": "ledger-base-01",
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "ledger",
+        "verify",
+        "--base",
+        "origin/main"
+      ],
+      "exit": 1,
+      "log": "research/prime_field_transfer_goal_20261116/receipts/round-06/ledger-base-01.log"
+    },
+    {
+      "name": "ledger-published-prefix-01",
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "ledger",
+        "verify",
+        "--base",
+        "dfe88f759a52d3e84f44783f94dee62ac47b3e03"
+      ],
+      "exit": 0,
+      "log": "research/prime_field_transfer_goal_20261116/receipts/round-06/ledger-published-prefix-01.log"
+    },
+    {
+      "name": "ledger-chain-01",
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "ledger",
+        "verify"
+      ],
+      "exit": 0,
+      "log": "research/prime_field_transfer_goal_20261116/receipts/round-06/ledger-chain-01.log"
+    },
+    {
+      "name": "wire-01",
+      "command": [
+        "python3",
+        "tools/artifacts/wire_workflows.py",
+        "--check",
+        ".github/workflows/prime-field-transfer-goal.yml"
+      ],
+      "exit": null,
+      "log": "research/prime_field_transfer_goal_20261116/receipts/round-06/wire-01.log"
+    },
+    {
+      "name": "prose-01",
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "lint-prose",
+        "research/prime_field_transfer_goal_20261116/reports/round-06.md",
+        "research/prime_field_transfer_goal_20261116/round-06/RESULT.md",
+        "research/prime_field_transfer_goal_20261116/round-06/PROOF-MAP.md",
+        "problems/cm-weber-oriented-evaluation.md"
+      ],
+      "exit": 0,
+      "log": "research/prime_field_transfer_goal_20261116/receipts/round-06/prose-01.log"
+    }
+  ],
+  "unresolved": "Current-base ledger prefix fails already at published dfe88f759; no canonical repair or waiver."
+}

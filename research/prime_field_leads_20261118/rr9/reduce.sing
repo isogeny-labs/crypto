@@ -1,0 +1,22 @@
+poly recon2=-subst(I[8],v2,0)/2;
+poly pivot1=subst(I[7],v2,recon2);
+poly recon1=-subst(pivot1,v1,0)/2;
+poly pivot0=subst(subst(I[6],v2,recon2),v1,recon1);
+poly recon0=-subst(pivot0,v0,0)/2;
+if (I[8]!=2*(v2-recon2) || pivot1!=2*(v1-recon1) || pivot0!=2*(v0-recon0)) {
+  ERROR("triangular pivot mismatch");
+}
+for (i=6;i>=1;i--) {
+  if (i>5) { I[i]=0; }
+  else { I[i]=subst(subst(subst(I[i],v2,recon2),v1,recon1),v0,recon0); }
+}
+I[7]=0; I[8]=0;
+for (i=1;i<=5;i++) {
+  if (I[i]!=subst(subst(subst(I[i],v2,0),v1,0),v0,0)) { ERROR("elimination mismatch"); }
+}
+ring R=2147483647,(a0,a1,a2,a3),dp;
+ideal I=imap(full,I);
+poly recon2=imap(full,recon2);
+poly recon1=imap(full,recon1);
+poly recon0=imap(full,recon0);
+print("R0 "+string(recon0)); print("R1 "+string(recon1)); print("R2 "+string(recon2));

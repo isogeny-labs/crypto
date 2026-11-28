@@ -115,7 +115,7 @@ impl LaunchContext {
         })
     }
 }
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 pub(super) fn monotonic_ns() -> Result<u64, String> {
     let mut ts = libc::timespec {
         tv_sec: 0,
@@ -135,15 +135,52 @@ pub(super) fn monotonic_ns() -> Result<u64, String> {
         .and_then(|s| s.checked_add(nanos))
         .ok_or_else(|| "monotonic clock overflow".into())
 }
-#[cfg(not(target_os = "linux"))]
+#[cfg(not(any(target_os = "linux", target_os = "macos")))]
 pub(super) fn monotonic_ns() -> Result<u64, String> {
     Err("supervised execution context currently requires Linux CLOCK_MONOTONIC".into())
 }
+#[cfg(not(target_os = "macos"))]
 fn boot_id() -> Result<String, String> {
     std::fs::read_to_string("/proc/sys/kernel/random/boot_id")
         .map(|s| s.trim().to_owned())
         .map_err(|e| e.to_string())
 }
+#[cfg(target_os = "macos")]
+fn boot_id() -> Result<String, String> {
+    let mut bytes = [0u8; 128];
+    let mut length = bytes.len();
+    let status = unsafe {
+        libc::sysctlbyname(
+            c"kern.bootsessionuuid".as_ptr(),
+            bytes.as_mut_ptr().cast(),
+            &mut length,
+            std::ptr::null_mut(),
+            0,
+        )
+    };
+    if status != 0 || length > bytes.len() {
+        return Err(format!(
+            "cannot read boot-session UUID: {}",
+            std::io::Error::last_os_error()
+        ));
+    }
+    let bytes = &bytes[..length];
+    let end = bytes.iter().position(|b| *b == 0).unwrap_or(bytes.len());
+    let value = std::str::from_utf8(&bytes[..end]).map_err(|e| e.to_string())?;
+    if value.len() != 36
+        || !value.bytes().enumerate().all(|(i, b)| {
+            if matches!(i, 8 | 13 | 18 | 23) {
+                b == b'-'
+            } else {
+                b.is_ascii_hexdigit()
+            }
+        })
+    {
+        return Err("invalid kernel boot-session UUID".into());
+    }
+    Ok(value.to_ascii_lowercase())
+}
+
 /// Apply the supervisor's terminal decision. Retained worker result.json is
 /// separate evidence; a censored manifest never inherits its success labels.
 pub(super) fn terminal_outcome(
@@ -232,6 +269,17 @@ pub(super) fn verify(dir: &Path, artifacts: &[Artifact]) -> Result<(), String> {
 
 #[cfg(test)]
 mod tests {
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    #[test]
+    fn native_clock_and_boot_session_are_stable() {
+        let boot = super::boot_id().unwrap();
+        let before = super::monotonic_ns().unwrap();
+        assert_eq!(boot, super::boot_id().unwrap());
+        assert_eq!(boot.len(), 36);
+        assert!(before > 0);
+        assert!(super::monotonic_ns().unwrap() >= before);
+    }
+
     use super::*;
     fn fixture() -> (LaunchContext, Value) {
         let binding = AttemptBinding {

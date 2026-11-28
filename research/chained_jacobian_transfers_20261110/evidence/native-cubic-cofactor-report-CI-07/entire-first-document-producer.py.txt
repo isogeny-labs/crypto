@@ -1,0 +1,188 @@
+"""Documentation, diagram and CI source from frozen Rust/Lean metadata only."""
+from pathlib import Path
+import hashlib,json,subprocess
+r=Path('/workspace/crypto');p=r/'research/chained_jacobian_transfers_20261110';n=p/'native-cubic-cofactor-inverse-06';out=p/'report-native-cubic-cofactor-06';out.mkdir(exist_ok=True)
+e=p/'evidence/native-cubic-cofactor-report-CI-07';e.mkdir(exist_ok=True)
+sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
+proof=p/'lean/CubicCofactorWordBridge22307.lean';assert sha(proof)=='22bd90207f04182513291a40a25a52a951c975502d4eaf35c3985f8fdb2f0c16'
+assert sha(p/'evidence/cubic-word-final-raw-value-proof-03/entire-original-common.rs.txt')=='832fd28810909194875a9438e164ec1b45dcefbaa83257b4e3fad3095ef865d6'
+bindings=json.loads((p/'evidence/native-cubic-cofactor-word-final-06/exact-eleven-complete-word-statement-bindings.json').read_text())
+md='''# Native cubic cofactor inverse and exact raw-word bridge
+
+The separately versioned Rust candidate replaces the two-Frobenius cofactor with the established polynomial P=(a²−3bc,3c²−ab,b²−ac) in the exact q223 context. All15 public fixtures pass the three preregistered development tests, with equal original inverse output and both product orders equal to one. The entire original common.rs is compiled unchanged as the reference dependency, SHA832fd288. Protocol/fixtures were normally committed and tagged at5f7c710d before candidate creation, data4dd1ec. All claims remain unsigned. [pcc:unverified]
+
+## Implementation and declared accounting
+
+`native-cubic-cofactor-inverse-06/src/lib.rs` validates the original q223,c3,w183,w2=39,size11089567 context and normalized coefficients. Zero inverse, noncanonical input, malformed parameters and zero norm have distinct explicit rejections. The cofactor uses six squares/cross-products, two constant products and three original Fp.sub calls. The candidate then uses the literal original norm block, original Fp.inv and original mul_fq. Original engine/population/runtime sources are untouched. [pcc:unverified]
+
+| Original declared counters, MUL/INV/ADD | Frozen reference | Candidate |
+| --- | --- | --- |
+| Cofactor |15/0/8 |8/0/3 |
+| Full inverse |23/1/8 |16/1/3 |
+
+All15 rows match these prospective counter predictions, data0ebbb8. The literal original norm block charges5 MUL for four explicit word-product expressions and omits its additions. Both variants preserve that same charge/block. Validation/setup/division/compiler/counter overhead is unpriced. These are declared diagnostic units, with the historical discrepancy retained; no physical instruction count, calibrated cost, runtime ratio or end-to-end improvement is inferred. No benchmark was executed. [pcc:unverified]
+
+The15 fixed public canonical inputs cover axes, mixed coefficients and boundary residues, SHA b574f4c9ebfda9e453241e72f1d509657ffdb436da29b8941348ea3283dea1e2. Every fixture checks the cofactor against the two original Frobenius images multiplied, exact original inverse equality, both inverse product identities, and base-valued nonzero cofactor product. All invalid-domain controls, five malformed parameter controls and the deliberate wrong-sign control pass. The original zero-inverse panic is caught as the expected negative behavior; its full stderr remains retained. This finite unit set is not a universal nonzero-norm proof. [pcc:unverified]
+
+## Raw UInt64 refinement
+
+`lean/CubicCofactorWordBridge22307.lean` preserves the exact old WordBridge01 prefix5743a021 and models the native multiply, canonical subtraction and exact cofactor expression order. Under input word values<223, products are at most49284, the subtraction adjustment at most445, and all outputs remain canonical. Decoding commutes with each multiply/subtract; the cofactor's three raw toNat outputs equal the Fin223 polynomial values exactly, rather than only agreeing after another modular reduction. Both unchanged original Lean4.35/4.34.1 gates audit42/0 failing/0 trusted each, data15a361:27 old,11 new named and4 new generated equations. Four nonfatal deprecated-if warnings per build are retained. No native decision, custom axiom or gate/resource relaxation is used. [pcc:unverified]
+
+The model checks cofactor(1,1,1)=(221,2,0), cofactor(0,1,1)=(220,3,1), and a noncanonical2^63-times2 overflow counterexample to an unconditional decode homomorphism. Full bindings and hypotheses follow. [pcc:unverified]
+
+| New declaration | Complete unsigned binding |
+| --- | --- |
+'''
+for x in bindings:md+=f"| `{x['theorem']}` | `{Path(x['claim']).stem}`. [pcc:unverified] |\n"
+md+='''
+This correspondence covers normalized cofactor word arithmetic. It does not prove compiler equivalence, the native norm block or Fp.inv loop, universal nonzero norm/field construction, original counters, Jacobian maps or running time. Full04 already supplies the abstract ring product/norm/conditional inverse implication60bdae, and trace05 remains a separate additive descent criterion1421da. Next formal work is to remove the supplied nonzero-norm/base-inverse gap for q223 using the existing no-base-cube-root certificate and finite base-field units. [pcc:unverified]
+
+## Checks, evidence and primary sources
+
+First native release-unit command is retained in the entire run tree: Rust1.99.1, offline, one compiler/test worker, timeout120s, all3 tests pass, no ignored/measured/filtered test. Whole source, hardware/cgroup/tool versions, command, stdout/stderr, original-byte checks and target outputs remain in `evidence/native-cubic-first-unit-and-broad-lint-negative-03/entire-native-unit-and-Clippy-run-tree.tar.xz` (381024B). The archive was assembled after the broad lint attempt and includes those debug outputs; it is not a pre-lint cache snapshot. Build/test elapsed fields are not performance evidence. [pcc:unverified]
+
+Broad cargo fmt1 and strict Clippy101 fail on immutable historical reference formatting/Rng::next/manual_is_multiple_of. These failures remain0ebbb8; the historical reference is not edited or suppressed. Required new-code scope then passes package-only format and no-deps/all-target strict Clippy0, data495eb9. All original test assertions and code bytes remain. New CI replays exactly this new-package scope and all15 unit fixtures, and both original proof gates preserve j1/120s/default proof memory. [pcc:unverified]
+
+Sources checked before code3eafa4: entire original common.rs and full04/old WordBridge, official Arkworks algebra v0.5.0 ff/src/fields/models/{fp3.rs,cubic_extension.rs}, exact Git blobs96007f3fa4f31aaab58d44d6397f34add3c3be7d/1049908bf99900c0e510617f3cc07d9894b84ad6, full Apache/MIT licenses. Arkworks already implements this cofactor method and documents the negative sign in s2; no novelty or fastest claim. Its cited Algorithm17 paper was not itself reviewed. Raw primary sources, responses, licenses and hashes remain in native-cubic-cofactor-primary-review-01. Word refinement preregistrationbcce0b reads the actual UInt64/Fin interfaces. KB status/exact/negative/adjacent/theorem wrappers127 and conductor127; locked atlas unread, no absence inference. [pcc:unverified]
+
+Canonical chain.dot,cubic.dot and F101 psi.dot are unchanged: this implements arithmetic without adding a geometric transfer edge. Current c91 whole ownCI3dd59d succeeds on six proof components but original S3 pulls/migration still fail403 and block normal merge. Original full scientific LP/360/witness/controls/feedback/post, runtime/admission and matched-cost obligations remain open under paide42949STOP. [pcc:unverified]
+'''
+(p/'NATIVE_CUBIC_COFACTOR_06.md').write_text(md)
+(out/'cofactor-word-boundary.dot').write_text('''digraph C {
+ graph [rankdir=LR,bgcolor="white",pad="0.2",ranksep="0.35"];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf3fa",fontname="DejaVu Sans",fontsize=11,margin="0.12,0.10",color="#456987"];
+ edge [fontname="DejaVu Sans",fontsize=10,color="#456987"];
+ input [label="Canonical UInt64 triple\na,b,c < 223"];
+ cofactor [label="P=(a²-3bc,3c²-ab,b²-ac)\nExact raw canonical values",fillcolor="#eaf5ed"];
+ norm [label="Original norm + Fp.inv\nFull native refinement open",fillcolor="#fff2df"];
+ input -> cofactor [label="Word07: 11 named lemmas"];
+ cofactor -> norm [label="Rust15 fixture parity"];
+}'''+ '\n')
+subprocess.run(['dot','-Tsvg',str(out/'cofactor-word-boundary.dot'),'-o',str(out/'cofactor-word-boundary.svg')],check=True)
+f=out/'cofactor-word-boundary.svg';f.write_text('\n'.join(x.rstrip()for x in f.read_text().splitlines()).rstrip()+'\n')
+(out/'report.typ').write_text('''#set page(paper: "a4", margin: 17mm)
+#set text(size: 10pt, font: "DejaVu Sans")
+#set par(justify: false, leading: 0.6em, spacing: 0.7em)
+#set heading(numbering: none)
+= Native cubic cofactor inverse
+#text("The separately versioned Rust implementation passes all15 frozen public inputs and all3 preregistered development tests against the byte-identical original reference. The established cofactor formula also has an exact normalized UInt64-to-Fin223 proof. Protocol/fixtures were committed/tagged5f7 before code. Claims unsigned. [pcc:unverified]")
+== Exact context and calculation
+#text("Validate q223,c3,w183,w2=39,size11089567 and a,b,c<223. Compute P=(a²−3bc,3c²−ab,b²−ac), retain the literal original norm block, original Fp.inv and final mul_fq. The reference is the complete unchanged common.rs832fd288 compiled as a path dependency. [pcc:unverified]")
+#image("cofactor-word-boundary.svg", width: 100%)
+#table(columns: (46%,27%,27%), inset: 6pt,
+ [Declared MUL/INV/ADD], [Original], [Candidate],
+ [Cofactor], [15/0/8], [8/0/3],
+ [Full inverse], [23/1/8], [16/1/3],
+)
+#text("All15 rows equal the prospective declared-counter predictions0ebbb8. The original norm block charges5 despite four explicit word-product expressions, and omits additions; both variants retain the same block/charge. Setup/validation/division/compiler/counter overhead is unpriced. These diagnostics are not physical instruction counts, calibrated cost, runtime ratios or end-to-end gains. No benchmark ran. [pcc:unverified]")
+== All fixtures and controls retained
+#text("Every canonical axis/mixed/boundary tuple checks the original Frobenius-product cofactor, exact inverse output, both inverse product orders, and a base-valued nonzero cofactor product. Zero/noncanonical/five malformed parameter controls and a deliberate wrong-sign control pass. The expected original zero-inverse panic is caught; full stderr retained. A finite unit table does not prove universal nonzero norm. [pcc:unverified]")
+#text("Rust1.99.1/offline/j1/test-threads1/120s;3 passed,0 failed/ignored/measured/filtered. Whole raw tree/commands/source/host/target preserved in381024B entire archive03. It includes later broad-lint debug outputs and is not a pre-lint snapshot. Build/unit elapsed fields are not performance evidence. [pcc:unverified]")
+#pagebreak()
+= Exact raw word cofactor bridge
+#text("Word07 source22bd9020 preserves the exact Word01 prefix5743a021. Under input word values<223, raw multiplication does not overflow (products≤49284); canonical subtraction adjustment≤445. Every cofactor output is canonical and its raw toNat value equals the Fin223 polynomial value, beyond agreement after an additional modular reduction. [pcc:unverified]")
+#table(columns: (36%,64%), inset: 6pt,
+ [Original proof gates], [Both Lean4.35/4.34.1 audit42/0 failing/0 trusted;27 old+11 new named+4 new generated equations. Full bindings15a361.],
+ [Resources/foundations], [One worker/120s/default proof memory; standard foundations only, no native decision/custom axiom. Four nonfatal deprecated-if warnings per build retained.],
+ [Finite controls], [P(1,1,1)=(221,2,0); P(0,1,1)=(220,3,1); noncanonical2^63 times2 wraps and rejects unconditional decode multiplicativity.],
+ [Proof boundary], [Normalized cofactor arithmetic only. Compiler/norm block/Fp.inv loop/field/nonzero norm/counters/Jacobian/runtime remain separate.],
+)
+== Preserved failures and exact CI scope
+#text("Broad format1/Clippy101 remain failed on the immutable historical reference (Rng::next and two manual-is-multiple-of lints plus formatting). No original source edit or lint suppression. Required new-package format and no-deps/all-target strict Clippy pass0,495eb9. CI replays those scoped checks, all15 fixtures and both unchanged original proof gates. No source/gate/resource weakening. [pcc:unverified]")
+== Primary sources and next dependency
+#text("Before code3eafa4: full original common.rs/full04/old WordBridge; official Arkworks algebra v0.5.0 full Fp3/cubic-extension files and Apache/MIT licenses, exact Git blobs retained. Arkworks uses the same established cofactor and documents s2's negative sign; no novelty/fastest claim. Its cited Algorithm17 paper was not itself reviewed. KB wrappers/conductor127, locked atlas unread, no absence inference. Word preregistrationbcce0b reads actual UInt64/Fin interfaces. [pcc:unverified]")
+#text("Full04 provides the abstract ring cofactor/norm and conditional inverse implication60bdae; next remove the supplied nonzero-norm gap for q223 using the no-base-cube-root certificate and finite base units. Existing chain/cubic/F101 graphs stay unchanged: no geometric edge added. [pcc:unverified]")
+#text("Current c91 ownCI3dd59d retains seven whole ZIPs/413 members and six proof successes; original S3pull/migration403 still blocks normal merge. Original full scientific LP/360/witness/controls/feedback/post/runtime/admission/matched costs remain open under paid STOP. [pcc:unverified]")
+''')
+# New additive workflow; the immutable original workflows are never edited.
+wf=r/'.github/workflows/chained-transfer-native-cubic-cofactor-proof-06.yml'
+s=(r/'.github/workflows/chained-transfer-cubic-frobenius-trace-proof-05.yml').read_text()
+for a,b in [('Cubic Frobenius trace descent original dual gates05','Native cubic cofactor and original word proof gates06'),('CubicFrobeniusTraceDescent05','CubicCofactorWordBridge22307'),('cubic-Frobenius-trace-descent-final-04','native-cubic-cofactor-word-final-06'),('chained-transfer-cubic-frobenius-trace-proof-05','chained-transfer-native-cubic-cofactor-proof-06'),('cubic-frobenius-trace-proof-custody','cubic-cofactor-word-proof-custody'),('cubic-frobenius-trace-original-gates','cubic-cofactor-word-original-gates'),('46e4993775a2c0c64f1aa079b28fb1d13b6e671df035a182f038a16f2e07ef43',sha(proof))]:s=s.replace(a,b)
+s=s.replace('    paths:\n',"    paths:\n      - 'research/chained_jacobian_transfers_20261110/native-cubic-cofactor-inverse-06/**'\n",1)
+s+='''  native-cofactor-development:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SOURCE_REVISION: ${{ github.event.pull_request.head.sha || github.sha }}
+      RUSTUP_TOOLCHAIN: 1.99.1
+    steps:
+      - name: Initialize complete partial native custody
+        run: |
+          mkdir "$RUNNER_TEMP/cubic-cofactor-native-custody"
+          date -u +%FT%TZ > "$RUNNER_TEMP/cubic-cofactor-native-custody/start.txt"
+          printf '%s\\n' '${{ github.workflow_sha }}' > "$RUNNER_TEMP/cubic-cofactor-native-custody/workflow-revision.txt"
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: crypto
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/chained_jacobian_transfers_20261110/native-cubic-cofactor-inverse-06/
+            /research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/entire-original-common.rs.txt
+      - name: Retain actual executing native workflow
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ github.workflow_sha }}
+          path: actual-workflow
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/workflows/chained-transfer-native-cubic-cofactor-proof-06.yml
+      - name: Install declared native toolchain
+        run: rustup toolchain install 1.99.1 --profile minimal --component rustfmt --component clippy
+      - name: Check exact sources and replay all frozen development units
+        working-directory: crypto
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/cubic-cofactor-native-custody"
+          component=research/chained_jacobian_transfers_20261110/native-cubic-cofactor-inverse-06
+          original=research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/entire-original-common.rs.txt
+          test "$(git rev-parse HEAD)" = "$SOURCE_REVISION"
+          test -z "$(git status --porcelain --untracked-files=all)"
+          echo '832fd28810909194875a9438e164ec1b45dcefbaa83257b4e3fad3095ef865d6  research/chained_jacobian_transfers_20261110/evidence/cubic-word-final-raw-value-proof-03/entire-original-common.rs.txt' | sha256sum --check
+          echo 'b574f4c9ebfda9e453241e72f1d509657ffdb436da29b8941348ea3283dea1e2  research/chained_jacobian_transfers_20261110/native-cubic-cofactor-inverse-06/fixtures-06.tsv' | sha256sum --check
+          echo 'NATIVEHASH  research/chained_jacobian_transfers_20261110/native-cubic-cofactor-inverse-06/src/lib.rs' | sha256sum --check
+          git rev-parse HEAD > "$out/actual-source-head.txt"
+          cp -r "$component" "$out/entire-native-source"
+          cp "$original" "$out/entire-original-common.rs.txt"
+          cp ../actual-workflow/.github/workflows/chained-transfer-native-cubic-cofactor-proof-06.yml "$out/entire-actual-workflow.yml"
+          rustc --version --verbose > "$out/actual-rustc.txt"
+          cargo --version > "$out/actual-cargo.txt"
+          uname -a > "$out/actual-host.txt"
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/cubic-cofactor-native-target" CARGO_BUILD_JOBS=1 CARGO_INCREMENTAL=0
+          failed=0
+          phase() {
+            local label=$1 code
+            shift
+            set +e
+            timeout 120 "$@" > "$out/$label.stdout.txt" 2> "$out/$label.stderr.txt"
+            code=$?
+            set -e
+            printf '%s\\n' "$code" > "$out/$label.exit"
+            printf '%s %s\\n' "$label" "$code" >> "$out/actual-phases.txt"
+            cat "$out/$label.stdout.txt" "$out/$label.stderr.txt"
+            return "$code"
+          }
+          phase all-frozen-units cargo test --manifest-path "$component/Cargo.toml" --locked --offline --release --lib -- --nocapture --test-threads=1 || failed=1
+          phase new-package-format cargo fmt --manifest-path "$component/Cargo.toml" --package chained-transfer-cubic-cofactor-inverse-06 -- --check || failed=1
+          phase new-package-strict-Clippy cargo clippy --manifest-path "$component/Cargo.toml" --locked --offline --package chained-transfer-cubic-cofactor-inverse-06 --no-deps --all-targets -- -D warnings || failed=1
+          cp -r "$CARGO_TARGET_DIR" "$out/entire-build-output"
+          sha256sum "$original" "$component/src/lib.rs" "$component/fixtures-06.tsv" > "$out/final-source-bytes.sha256"
+          git status --porcelain --untracked-files=all > "$out/final-source-status.txt"
+          test ! -s "$out/final-source-status.txt" || failed=1
+          printf '%s\\n' "$failed" > "$out/original.exit"
+          date -u +%FT%TZ > "$out/finish.txt"
+          exit "$failed"
+      - name: Retain all complete and partial native outcomes
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cubic-cofactor-native-development-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/cubic-cofactor-native-custody
+          if-no-files-found: error
+'''.replace('NATIVEHASH',sha(n/'src/lib.rs'))
+assert 'CubicFrobeniusTraceDescent05'not in s and 'cubic-Frobenius-trace-descent-final-04'not in s
+wf.write_text(s)
+(e/'FROZEN_NATIVE_WORD_REPORT_CI_INPUTS.json').write_text(json.dumps(dict(files=[dict(path=str(f.relative_to(r)),sha256=sha(f),bytes=f.stat().st_size)for f in [proof,n/'src/lib.rs',n/'fixtures-06.tsv',n/'PROTOCOL_06.md',n/'Cargo.toml',n/'Cargo.lock',n/'original-reference/Cargo.toml',wf]],native_claims=['0ebbb8','495eb9'],word_claim='15a361',original_protocol_commit='5f7c710d6d9b3f442107d9d97425b2b4d04ed283',canonical_graphs=[dict(path=str((p/f).relative_to(r)),sha256=sha(p/f))for f in ['chain.dot','cubic.dot','reports/prime-field-actual-04/psi.dot']]),indent=2)+'\n')
+print('documented native',sha(n/'src/lib.rs'),'word',sha(proof),'workflow',sha(wf))

@@ -1,0 +1,1 @@
+Decoded JSON response content supplied by the connected GitHub GET tool, retained with a final newline. These are not raw server-wire bytes or signed receipts. Required check lifecycle fields are observed after merge and compared with the immutable merged_at timestamp. No failed-job cause or human authorization is inferred. [pcc:unverified]

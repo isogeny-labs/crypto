@@ -1,0 +1,123 @@
+diff --git a/examples/ic_projected_query_law.rs b/examples/ic_projected_query_law.rs
+index f166d5076..32b52bddf 100644
+--- a/examples/ic_projected_query_law.rs
++++ b/examples/ic_projected_query_law.rs
+@@ -105,6 +105,118 @@ mod tests {
+         }
+     }
+ 
++    #[test]
++    fn original_e0_fixture_constructs_and_independently_checks_its_kernel() {
++        use crypto_lib::cryptanalysis::{
++            ic_boundary::ArtinSchreier, koblitz_fast::FastCurve,
++            koblitz_index_calculus::find_irreducible_sparse, semaev_decomp::Gf2,
++        };
++
++        // Fixed public fixture from fixture-subgroups-enumerated-20261025.
++        // Its already recorded ambient order is an input, not a new point count.
++        let irreducible = find_irreducible_sparse(22).unwrap();
++        let gf = Gf2::new(&irreducible);
++        assert_eq!(gf.irr, 4_194_307);
++        let generator = BinaryPoint::Affine {
++            x: gf.to_element(97_814),
++            y: gf.to_element(2_630_359),
++        };
++        let curve = BinaryCurve {
++            m: 22,
++            irreducible: irreducible.clone(),
++            a: gf.to_element(0),
++            b: gf.to_element(1),
++            generator: generator.clone(),
++            order: 991u64.into(),
++            cofactor: 4232u64.into(),
++        };
++        let instance = BinaryInstance {
++            name: "original-e0-conformance-fixture".into(),
++            n: 22,
++            irreducible,
++            fast: FastCurve::new(&curve).unwrap(),
++            artin_schreier: ArtinSchreier::new(&gf),
++            gf,
++            a: 0,
++            b: 1,
++            group_order: 4_193_912,
++            r: 991,
++            cofactor: 4232,
++            generator: lift(&generator),
++            koblitz: None,
++        };
++        assert!(curve.is_on_curve(&generator));
++        assert_ne!(generator, BinaryPoint::Infinity);
++        assert_eq!(
++            scalar_mul(&curve, &generator, &991u64.into()),
++            BinaryPoint::Infinity
++        );
++        let candidates: Vec<_> = (0..64)
++            .flat_map(|x| points_with_x(&curve, &instance.gf.to_element(x)))
++            .map(|point| lift(&point))
++            .collect();
++        let mut backend = BinaryBackend {
++            instance: &instance,
++            operations: GroupOps::default(),
++        };
++        let law = law::Law::certify_from_points(
++            &mut backend,
++            instance.generator,
++            instance.r,
++            instance.cofactor,
++            &candidates,
++        )
++        .unwrap();
++        assert_eq!(law.kernel().len(), 4232);
++        assert_eq!(
++            law.kernel().iter().copied().collect::<HashSet<_>>().len(),
++            4232
++        );
++        for &point in law.kernel() {
++            let reference = lower(point, &instance);
++            assert!(curve.is_on_curve(&reference));
++            assert_eq!(
++                scalar_mul(&curve, &reference, &4232u64.into()),
++                BinaryPoint::Infinity
++            );
++        }
++        // Known-scalar API conformance only; no unknown logarithm is discovered.
++        for d in [0u64, 1, 123, 990] {
++            let target = scalar_mul(&curve, &generator, &d.into());
++            for offset in [0u64, 456, 990] {
++                for index in [0, 2116, 4231] {
++                    let query = law
++                        .query(&mut backend, lift(&target), offset, index)
++                        .unwrap();
++                    let shifted = point_add(
++                        &curve,
++                        &target,
++                        &scalar_mul(&curve, &generator, &offset.into()),
++                    );
++                    let expected =
++                        point_add(&curve, &shifted, &lower(law.kernel()[index], &instance));
++                    assert_eq!(query.point(), lift(&expected));
++                    assert_eq!(
++                        query.projected(),
++                        lift(&scalar_mul(&curve, &expected, &4232u64.into()))
++                    );
++                    let recovered = law
++                        .recover(
++                            &mut backend,
++                            &query,
++                            &[law::Term {
++                                point: query.point(),
++                                log: 4232 * ((d + offset) % 991) % 991,
++                                negative: false,
++                            }],
++                        )
++                        .unwrap();
++                    assert_eq!(recovered.scalar, d);
++                }
++            }
++        }
++    }
++
+     #[test]
+     fn binary_adapter_checks_full_query_coverage_and_relation_recovery_against_reference() {
+         let mut instance = random_binary_instance(7, 202_610_260_001, 16).unwrap();

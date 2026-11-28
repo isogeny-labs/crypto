@@ -40,7 +40,7 @@
 //! vary), and we never divide.  See SECURITY.md for the full picture.
 
 use num_bigint::BigUint;
-use subtle::{Choice, ConditionallySelectable};
+use subtle::Choice;
 
 /// A multi-precision unsigned integer stored as `LIMBS` 64-bit limbs
 /// in little-endian order: `limbs[0]` is the least significant.
@@ -127,20 +127,26 @@ impl<const LIMBS: usize> Uint<LIMBS> {
     // ── Conditional selection ────────────────────────────────────────────
 
     /// `cmov(a, b, choice)` returns `b` if `choice == 1`, else `a`.
-    /// Limb-wise `subtle::ConditionallySelectable`.
+    /// Single opaque bitmask barrier across all limbs.
+    #[inline]
     pub fn cmov(a: &Self, b: &Self, choice: Choice) -> Self {
+        let mask = core::hint::black_box(0u64.wrapping_sub((choice.unwrap_u8() & 1) as u64));
         let mut out = [0u64; LIMBS];
         for i in 0..LIMBS {
-            out[i] = u64::conditional_select(&a.0[i], &b.0[i], choice);
+            out[i] = a.0[i] ^ (mask & (a.0[i] ^ b.0[i]));
         }
         Self(out)
     }
 
     /// Swap `a` and `b` iff `choice == 1`.  Used by the Montgomery
     /// ladder over the new field type.
+    #[inline]
     pub fn cswap(a: &mut Self, b: &mut Self, choice: Choice) {
+        let mask = core::hint::black_box(0u64.wrapping_sub((choice.unwrap_u8() & 1) as u64));
         for i in 0..LIMBS {
-            u64::conditional_swap(&mut a.0[i], &mut b.0[i], choice);
+            let diff = mask & (a.0[i] ^ b.0[i]);
+            a.0[i] ^= diff;
+            b.0[i] ^= diff;
         }
     }
 
@@ -272,7 +278,20 @@ impl<const LIMBS: usize> Uint<LIMBS> {
     /// - `p` is odd
     /// - `a < p` and `b < p`
     /// - `p_inv_low == (-p[0])^(-1) mod 2^64`
+    #[inline]
     pub fn mont_mul(a: &Self, b: &Self, p: &Self, p_inv_low: u64) -> Self {
+        if LIMBS == 4 {
+            let a4: [u64; 4] = [a.0[0], a.0[1], a.0[2], a.0[3]];
+            let b4: [u64; 4] = [b.0[0], b.0[1], b.0[2], b.0[3]];
+            let p4: [u64; 4] = [p.0[0], p.0[1], p.0[2], p.0[3]];
+            let r4 = mont_mul_4(&a4, &b4, &p4, p_inv_low);
+            let mut out = [0u64; LIMBS];
+            out[0] = r4[0];
+            out[1] = r4[1];
+            out[2] = r4[2];
+            out[3] = r4[3];
+            return Self(out);
+        }
         // Conceptual `2·LIMBS+1`-limb scratch, split into:
         //   lo[0..LIMBS]    = positions 0..LIMBS
         //   hi[0..LIMBS]    = positions LIMBS..2·LIMBS
@@ -283,7 +302,6 @@ impl<const LIMBS: usize> Uint<LIMBS> {
         // comparison, so it does not introduce a secret-dependent branch.
         let mut lo = [0u64; LIMBS];
         let mut hi = [0u64; LIMBS];
-        let mut extra: u64 = 0;
 
         // Phase 1: lo:hi = a * b  (full 2·LIMBS-limb schoolbook product)
         for i in 0..LIMBS {
@@ -304,24 +322,18 @@ impl<const LIMBS: usize> Uint<LIMBS> {
                 }
                 carry = (acc >> 64) as u64;
             }
-            // Position i+LIMBS is hi[i]; the final carry of this row
-            // is the only thing written there in Phase 1, so we just
-            // assign rather than accumulate.
             hi[i] = carry;
         }
 
-        // Phase 2: Montgomery reduction.  Each iteration zeros one low
-        // limb of the conceptual buffer by adding a multiple of `p`;
-        // after LIMBS iterations, the result lives in `hi`, with at
-        // most a 1-bit overflow into `extra`.
-        for i in 0..LIMBS {
-            // `m` is chosen so that lo[i] + m * p[0] ≡ 0 (mod 2^64),
-            // which makes the subsequent add zero the i-th low limb.
-            let m = lo[i].wrapping_mul(p_inv_low);
+        Self::mont_reduce_wide(lo, hi, p, p_inv_low)
+    }
 
-            // Add m * p starting at conceptual position i.  Inner-loop
-            // index ranges i..i+LIMBS; this can straddle the lo/hi
-            // boundary, but `idx < LIMBS` is a public comparison.
+    /// Constant-time SOS Montgomery reduction of a `2·LIMBS`-word product `lo:hi`.
+    #[inline]
+    fn mont_reduce_wide(mut lo: [u64; LIMBS], mut hi: [u64; LIMBS], p: &Self, p_inv_low: u64) -> Self {
+        let mut extra: u64 = 0;
+        for i in 0..LIMBS {
+            let m = lo[i].wrapping_mul(p_inv_low);
             let mut carry: u64 = 0;
             for j in 0..LIMBS {
                 let idx = i + j;
@@ -339,41 +351,390 @@ impl<const LIMBS: usize> Uint<LIMBS> {
                 }
                 carry = (acc >> 64) as u64;
             }
-
-            // Propagate the final carry from position i+LIMBS onward.
-            // Position i+LIMBS is hi[i]; propagation continues through
-            // hi[i+1..LIMBS] and then the single `extra` slot at
-            // position 2·LIMBS.  The loop bound shrinks with `i`, but
-            // the *total* op count across the full reduction depends
-            // only on the public constant `LIMBS`, not on operand
-            // values.
             for k in i..LIMBS {
                 let acc = (hi[k] as u128) + (carry as u128);
                 hi[k] = acc as u64;
                 carry = (acc >> 64) as u64;
             }
-            // Final carry into `extra`.  The high half of the u128
-            // result is provably zero given a well-formed odd modulus
-            // (the accumulator can grow by at most one bit per
-            // reduction step), so we drop it.
-            let acc = (extra as u128) + (carry as u128);
-            extra = acc as u64;
+            extra = extra.wrapping_add(carry);
         }
 
         let result = Self(hi);
-
-        // Conditional final subtraction: result >= p OR extra == 1.
         let (sub, borrow) = Self::sbb(&result, p);
         let need_sub = Choice::from(((extra | (borrow ^ 1)) & 1) as u8);
         Self::cmov(&result, &sub, need_sub)
     }
 
-    /// Convenience: Montgomery squaring.  Same as `mont_mul(a, a, ..)`,
-    /// kept as a separate method to make call sites self-documenting
-    /// and to leave room for a dedicated squaring routine later.
+    /// Symmetry-exploiting constant-time Montgomery squaring (`L(L+1)/2` limb
+    /// products instead of `L²`).
+    #[inline]
     pub fn mont_sqr(a: &Self, p: &Self, p_inv_low: u64) -> Self {
-        Self::mont_mul(a, a, p, p_inv_low)
+        if LIMBS == 4 {
+            let a4: [u64; 4] = [a.0[0], a.0[1], a.0[2], a.0[3]];
+            let p4: [u64; 4] = [p.0[0], p.0[1], p.0[2], p.0[3]];
+            let r4 = mont_sqr_4(&a4, &p4, p_inv_low);
+            let mut out = [0u64; LIMBS];
+            out[0] = r4[0];
+            out[1] = r4[1];
+            out[2] = r4[2];
+            out[3] = r4[3];
+            return Self(out);
+        }
+        let mut lo = [0u64; LIMBS];
+        let mut hi = [0u64; LIMBS];
+
+        // 1. Off-diagonal cross products: sum_{0 <= i < j < LIMBS} a[i] * a[j] * 2^(64*(i+j))
+        for i in 0..LIMBS {
+            let mut carry: u64 = 0;
+            for j in (i + 1)..LIMBS {
+                let idx = i + j;
+                let cur = if idx < LIMBS {
+                    lo[idx]
+                } else {
+                    hi[idx - LIMBS]
+                };
+                let acc = (cur as u128) + (a.0[i] as u128) * (a.0[j] as u128) + (carry as u128);
+                let new = acc as u64;
+                if idx < LIMBS {
+                    lo[idx] = new;
+                } else {
+                    hi[idx - LIMBS] = new;
+                }
+                carry = (acc >> 64) as u64;
+            }
+            if i + LIMBS < 2 * LIMBS {
+                hi[i] = carry;
+            }
+        }
+
+        // 2. Double the off-diagonal sum (left shift by 1 bit across lo:hi).
+        let mut shift_carry = 0u64;
+        for i in 0..LIMBS {
+            let next = lo[i] >> 63;
+            lo[i] = (lo[i] << 1) | shift_carry;
+            shift_carry = next;
+        }
+        for i in 0..LIMBS {
+            let next = hi[i] >> 63;
+            hi[i] = (hi[i] << 1) | shift_carry;
+            shift_carry = next;
+        }
+
+        // 3. Add diagonal squares a[i]^2 at word positions 2*i and 2*i + 1.
+        let mut carry: u128 = 0;
+        for i in 0..LIMBS {
+            let sq = (a.0[i] as u128) * (a.0[i] as u128);
+            let idx0 = 2 * i;
+            let idx1 = 2 * i + 1;
+            let cur0 = if idx0 < LIMBS { lo[idx0] } else { hi[idx0 - LIMBS] };
+            let cur1 = if idx1 < LIMBS { lo[idx1] } else { hi[idx1 - LIMBS] };
+            let s0 = (cur0 as u128) + (sq as u64 as u128) + carry;
+            let s1 = (cur1 as u128) + (sq >> 64) + (s0 >> 64);
+            if idx0 < LIMBS {
+                lo[idx0] = s0 as u64;
+            } else {
+                hi[idx0 - LIMBS] = s0 as u64;
+            }
+            if idx1 < LIMBS {
+                lo[idx1] = s1 as u64;
+            } else {
+                hi[idx1 - LIMBS] = s1 as u64;
+            }
+            carry = s1 >> 64;
+        }
+
+        Self::mont_reduce_wide(lo, hi, p, p_inv_low)
     }
+}
+
+/// Unrolled, register-resident constant-time CIOS Montgomery multiplication for 4 limbs.
+#[inline(always)]
+fn mont_mul_4(a: &[u64; 4], b: &[u64; 4], p: &[u64; 4], p_inv_low: u64) -> [u64; 4] {
+    let mut t0 = 0u64;
+    let mut t1 = 0u64;
+    let mut t2 = 0u64;
+    let mut t3 = 0u64;
+    let mut t4 = 0u64;
+
+    let mut i = 0;
+    while i < 4 {
+        let bi = b[i] as u128;
+
+        let s = (t0 as u128) + (a[0] as u128) * bi;
+        let r0 = s as u64;
+        let c = s >> 64;
+
+        let s = (t1 as u128) + (a[1] as u128) * bi + c;
+        let r1 = s as u64;
+        let c = s >> 64;
+
+        let s = (t2 as u128) + (a[2] as u128) * bi + c;
+        let r2 = s as u64;
+        let c = s >> 64;
+
+        let s = (t3 as u128) + (a[3] as u128) * bi + c;
+        let r3 = s as u64;
+        let c = s >> 64;
+
+        let s = (t4 as u128) + c;
+        let r4 = s as u64;
+        let r5 = (s >> 64) as u64;
+
+        let m = r0.wrapping_mul(p_inv_low) as u128;
+        let c = ((r0 as u128) + m * (p[0] as u128)) >> 64;
+
+        let s = (r1 as u128) + m * (p[1] as u128) + c;
+        t0 = s as u64;
+        let c = s >> 64;
+
+        let s = (r2 as u128) + m * (p[2] as u128) + c;
+        t1 = s as u64;
+        let c = s >> 64;
+
+        let s = (r3 as u128) + m * (p[3] as u128) + c;
+        t2 = s as u64;
+        let c = s >> 64;
+
+        let s = (r4 as u128) + c;
+        t3 = s as u64;
+        t4 = r5.wrapping_add((s >> 64) as u64);
+
+        i += 1;
+    }
+
+    let (d0, b1) = t0.overflowing_sub(p[0]);
+    let (d1, b2) = t1.overflowing_sub(p[1]);
+    let (d1, b2b) = d1.overflowing_sub(b1 as u64);
+    let br = (b2 | b2b) as u64;
+    let (d2, b3) = t2.overflowing_sub(p[2]);
+    let (d2, b3b) = d2.overflowing_sub(br);
+    let br = (b3 | b3b) as u64;
+    let (d3, b4) = t3.overflowing_sub(p[3]);
+    let (d3, b4b) = d3.overflowing_sub(br);
+    let borrow = (b4 | b4b) as u64;
+
+    let need_sub = (t4 | (borrow ^ 1)) & 1;
+    let mask = core::hint::black_box(0u64.wrapping_sub(need_sub));
+    [
+        t0 ^ (mask & (t0 ^ d0)),
+        t1 ^ (mask & (t1 ^ d1)),
+        t2 ^ (mask & (t2 ^ d2)),
+        t3 ^ (mask & (t3 ^ d3)),
+    ]
+}
+
+/// Unrolled 4×4 → 8-limb unsigned product (`16` `u64×u64 → u128` products).
+#[inline(always)]
+pub(crate) fn mul_wide_4(a: &[u64; 4], b: &[u64; 4]) -> [u64; 8] {
+    let a0 = a[0] as u128;
+    let a1 = a[1] as u128;
+    let a2 = a[2] as u128;
+    let a3 = a[3] as u128;
+
+    let b0 = b[0] as u128;
+    let s = a0 * b0;
+    let u0 = s as u64;
+    let s = a1 * b0 + (s >> 64);
+    let mut u1 = s as u64;
+    let s = a2 * b0 + (s >> 64);
+    let mut u2 = s as u64;
+    let s = a3 * b0 + (s >> 64);
+    let mut u3 = s as u64;
+    let mut u4 = (s >> 64) as u64;
+
+    let b1 = b[1] as u128;
+    let s = (u1 as u128) + a0 * b1;
+    u1 = s as u64;
+    let s = (u2 as u128) + a1 * b1 + (s >> 64);
+    u2 = s as u64;
+    let s = (u3 as u128) + a2 * b1 + (s >> 64);
+    u3 = s as u64;
+    let s = (u4 as u128) + a3 * b1 + (s >> 64);
+    u4 = s as u64;
+    let mut u5 = (s >> 64) as u64;
+
+    let b2 = b[2] as u128;
+    let s = (u2 as u128) + a0 * b2;
+    u2 = s as u64;
+    let s = (u3 as u128) + a1 * b2 + (s >> 64);
+    u3 = s as u64;
+    let s = (u4 as u128) + a2 * b2 + (s >> 64);
+    u4 = s as u64;
+    let s = (u5 as u128) + a3 * b2 + (s >> 64);
+    u5 = s as u64;
+    let mut u6 = (s >> 64) as u64;
+
+    let b3 = b[3] as u128;
+    let s = (u3 as u128) + a0 * b3;
+    u3 = s as u64;
+    let s = (u4 as u128) + a1 * b3 + (s >> 64);
+    u4 = s as u64;
+    let s = (u5 as u128) + a2 * b3 + (s >> 64);
+    u5 = s as u64;
+    let s = (u6 as u128) + a3 * b3 + (s >> 64);
+    u6 = s as u64;
+    let u7 = (s >> 64) as u64;
+
+    [u0, u1, u2, u3, u4, u5, u6, u7]
+}
+
+/// Unrolled symmetry-exploiting 4 → 8-limb unsigned squaring (`10` `u64×u64 → u128` products).
+#[inline(always)]
+pub(crate) fn sqr_wide_4(a: &[u64; 4]) -> [u64; 8] {
+    let a0 = a[0] as u128;
+    let a1 = a[1] as u128;
+    let a2 = a[2] as u128;
+    let a3 = a[3] as u128;
+
+    let s = a0 * a1;
+    let r1 = s as u64;
+    let s = a0 * a2 + (s >> 64);
+    let r2 = s as u64;
+    let s = a0 * a3 + (s >> 64);
+    let r3 = s as u64;
+    let r4 = (s >> 64) as u64;
+
+    let s = (r3 as u128) + a1 * a2;
+    let r3 = s as u64;
+    let s = (r4 as u128) + a1 * a3 + (s >> 64);
+    let r4 = s as u64;
+    let r5 = (s >> 64) as u64;
+
+    let s = (r5 as u128) + a2 * a3;
+    let r5 = s as u64;
+    let r6 = (s >> 64) as u64;
+
+    let w1 = r1 << 1;
+    let w2 = (r2 << 1) | (r1 >> 63);
+    let w3 = (r3 << 1) | (r2 >> 63);
+    let w4 = (r4 << 1) | (r3 >> 63);
+    let w5 = (r5 << 1) | (r4 >> 63);
+    let w6 = (r6 << 1) | (r5 >> 63);
+    let w7 = r6 >> 63;
+
+    let sq0 = a0 * a0;
+    let u0 = sq0 as u64;
+    let s = (w1 as u128) + (sq0 >> 64);
+    let u1 = s as u64;
+    let c = s >> 64;
+
+    let sq1 = a1 * a1;
+    let s = (w2 as u128) + (sq1 as u64 as u128) + c;
+    let u2 = s as u64;
+    let s = (w3 as u128) + (sq1 >> 64) + (s >> 64);
+    let u3 = s as u64;
+    let c = s >> 64;
+
+    let sq2 = a2 * a2;
+    let s = (w4 as u128) + (sq2 as u64 as u128) + c;
+    let u4 = s as u64;
+    let s = (w5 as u128) + (sq2 >> 64) + (s >> 64);
+    let u5 = s as u64;
+    let c = s >> 64;
+
+    let sq3 = a3 * a3;
+    let s = (w6 as u128) + (sq3 as u64 as u128) + c;
+    let u6 = s as u64;
+    let s = (w7 as u128) + (sq3 >> 64) + (s >> 64);
+    let u7 = s as u64;
+
+    [u0, u1, u2, u3, u4, u5, u6, u7]
+}
+
+/// Unrolled, register-resident constant-time SOS Montgomery squaring for 4 limbs (10 products).
+#[inline(always)]
+fn mont_sqr_4(a: &[u64; 4], p: &[u64; 4], p_inv_low: u64) -> [u64; 4] {
+    let [u0, u1, u2, u3, u4, u5, u6, u7] = sqr_wide_4(a);
+
+    // Unrolled 4-step Montgomery reduction of u0..u7
+    let p0 = p[0] as u128;
+    let p1 = p[1] as u128;
+    let p2 = p[2] as u128;
+    let p3 = p[3] as u128;
+
+    // Step 0
+    let m = u0.wrapping_mul(p_inv_low) as u128;
+    let c = ((u0 as u128) + m * p0) >> 64;
+    let s = (u1 as u128) + m * p1 + c;
+    let u1 = s as u64;
+    let s = (u2 as u128) + m * p2 + (s >> 64);
+    let u2 = s as u64;
+    let s = (u3 as u128) + m * p3 + (s >> 64);
+    let u3 = s as u64;
+    let s = (u4 as u128) + (s >> 64);
+    let u4 = s as u64;
+    let s = (u5 as u128) + (s >> 64);
+    let u5 = s as u64;
+    let s = (u6 as u128) + (s >> 64);
+    let u6 = s as u64;
+    let s = (u7 as u128) + (s >> 64);
+    let u7 = s as u64;
+    let mut extra = (s >> 64) as u64;
+
+    // Step 1
+    let m = u1.wrapping_mul(p_inv_low) as u128;
+    let c = ((u1 as u128) + m * p0) >> 64;
+    let s = (u2 as u128) + m * p1 + c;
+    let u2 = s as u64;
+    let s = (u3 as u128) + m * p2 + (s >> 64);
+    let u3 = s as u64;
+    let s = (u4 as u128) + m * p3 + (s >> 64);
+    let u4 = s as u64;
+    let s = (u5 as u128) + (s >> 64);
+    let u5 = s as u64;
+    let s = (u6 as u128) + (s >> 64);
+    let u6 = s as u64;
+    let s = (u7 as u128) + (s >> 64);
+    let u7 = s as u64;
+    extra = extra.wrapping_add((s >> 64) as u64);
+
+    // Step 2
+    let m = u2.wrapping_mul(p_inv_low) as u128;
+    let c = ((u2 as u128) + m * p0) >> 64;
+    let s = (u3 as u128) + m * p1 + c;
+    let u3 = s as u64;
+    let s = (u4 as u128) + m * p2 + (s >> 64);
+    let u4 = s as u64;
+    let s = (u5 as u128) + m * p3 + (s >> 64);
+    let u5 = s as u64;
+    let s = (u6 as u128) + (s >> 64);
+    let u6 = s as u64;
+    let s = (u7 as u128) + (s >> 64);
+    let u7 = s as u64;
+    extra = extra.wrapping_add((s >> 64) as u64);
+
+    // Step 3
+    let m = u3.wrapping_mul(p_inv_low) as u128;
+    let c = ((u3 as u128) + m * p0) >> 64;
+    let s = (u4 as u128) + m * p1 + c;
+    let t0 = s as u64;
+    let s = (u5 as u128) + m * p2 + (s >> 64);
+    let t1 = s as u64;
+    let s = (u6 as u128) + m * p3 + (s >> 64);
+    let t2 = s as u64;
+    let s = (u7 as u128) + (s >> 64);
+    let t3 = s as u64;
+    extra = extra.wrapping_add((s >> 64) as u64);
+
+    let (d0, b1) = t0.overflowing_sub(p[0]);
+    let (d1, b2) = t1.overflowing_sub(p[1]);
+    let (d1, b2b) = d1.overflowing_sub(b1 as u64);
+    let br = (b2 | b2b) as u64;
+    let (d2, b3) = t2.overflowing_sub(p[2]);
+    let (d2, b3b) = d2.overflowing_sub(br);
+    let br = (b3 | b3b) as u64;
+    let (d3, b4) = t3.overflowing_sub(p[3]);
+    let (d3, b4b) = d3.overflowing_sub(br);
+    let borrow = (b4 | b4b) as u64;
+
+    let need_sub = (extra | (borrow ^ 1)) & 1;
+    let mask = core::hint::black_box(0u64.wrapping_sub(need_sub));
+    [
+        t0 ^ (mask & (t0 ^ d0)),
+        t1 ^ (mask & (t1 ^ d1)),
+        t2 ^ (mask & (t2 ^ d2)),
+        t3 ^ (mask & (t3 ^ d3)),
+    ]
 }
 
 // ── Specialised methods for the four-limb / 256-bit case ─────────────────

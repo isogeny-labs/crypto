@@ -1,0 +1,39 @@
+{
+ "schema": "validation-gate/v1",
+ "replay_certificate": {
+  "path": "replay-certificate.json",
+  "sha256": "6c91957b47068e6f72210f074cac64f1988b4721f51ef395a33f387221717c9f"
+ },
+ "validator_report": {
+  "path": "validator-report.json",
+  "sha256": "daed41e7e40986b7525aae65eb350690ebf419af199530f5dceb448023bdf10a"
+ },
+ "rho_reference": {
+  "kind": "negation_frobenius",
+  "protocol": "strong rho (examples/n83_rho_optimization_eval, rho_config fold backend, 64 lanes, dp 6) on each of the 20 panel points, three draws per point with seeds 2026101900 + 10 i + d, in the same runner allocation as the IC arms (PROTOCOL.md)",
+  "unit": "group additions per one-target solve (counted, from the rho receipts); IC wall seconds against rho online seconds reported beside",
+  "binary_or_process": "one GitHub Actions runner allocation (run 39296352594), both binaries built from the PR head 4b2b3efa6 in the same job",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "strongest_available_basis": "N83 a=1 Koblitz curve: negation and the Frobenius eigenvalue, both folded by the strong reference (signed Frobenius, 2n = 166 classes)",
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+   "0": {
+    "ic": 283395603.5,
+    "rho": 8248365.466666667
+   },
+   "0.1": {
+    "ic": 407305548.025,
+    "rho": 9910767.55
+   },
+   "1": {
+    "ic": 1522495048.75,
+    "rho": 24872386.3
+   }
+  },
+  "gae_band_statistic": "padd arm, mean per one-target solve over the 20 points. IC group additions = rank_probes / 2 (each padd candidate's two partner roots x(T+R), x(T-R) come from one point addition with a shared inversion; rank anchors and lifts not counted, so a lower bound). IC unpriced = 2 x (rank + target probes) (one canonicalisation, one table query each) + 2 x regular index states (one S3 root solve, one insertion each) + target probes / 2 (target-scan S3 root solves). Rho = group additions + w x (canonicalizations + partition hashes + table inserts + table queries) from its receipts (analysis.json section_5a).",
+  "order_holds_across_band": true,
+  "order_basis": "rho below the IC at w = 0, 0.1 and 1 (34x, 41x, 61x)"
+ }
+}

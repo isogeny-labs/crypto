@@ -1,0 +1,18 @@
+=== F3 PILOT SUMMARY ===
+G-order  cheap #J == F_p^2 jac_order on 8 tiny primes, mismatches=0; study p=8191 #J=66919357 a1=23 a2=15291 bsgs_ops=459  PASS=True
+G-solve P (pencil end-to-end) at p=131,257: pass=True
+   g2_p131: t_planted=29 t_recovered=29 hom_rank=73 n_cols=74 pencil_rows_bad=0 labelled_bad=0 pass=True
+   g2_p257: t_planted=12740 t_recovered=12740 hom_rank=128 n_cols=129 pencil_rows_bad=0 labelled_bad=0 pass=True
+G-solve W (walk end-to-end) at p=251: rows=138 t=409 t_rec=409 pass=True
+G-solve R (rho) recovery: pass=True
+   p=131 r=2477 t=1004 t_rec=1004 verify=True steps=40
+   p=257 r=13297 t=10559 t_rec=10559 verify=True steps=146
+   p=521 r=66739 t=56847 t_rec=56847 verify=True steps=432
+G-split pencil (p=8191): obs/tuple=1332.8 model=1365.2 ratio=0.976 PASS=True
+G-split walk   (p=8191): obs=0.50693 model=0.50117 ratio=1.011 PASS=True
+R step calib  (p=8191): r=8388581 expected=3630 mean_steps/expected=1.295 all_verify=True
+   seed=1 steps=4520 ratio=1.245 verify=True
+   seed=2 steps=2790 ratio=0.769 verify=True
+   seed=3 steps=5480 ratio=1.510 verify=True
+   seed=4 steps=6009 ratio=1.655 verify=True
+wall_seconds=76.0

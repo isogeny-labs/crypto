@@ -1,0 +1,54 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "F3 smoke: E_0-family Koblitz a=0 n=61, launch shape",
+ "description": "research/ecc2k130_followups_20261116/F3-m83-counted/PROTOCOL.md (frozen). Counted units only (S = GAE/sqrt(r)); isolation L0 because counts, not times, decide. Public synthetic targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "koblitz",
+    "a": 0,
+    "n": 61
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 20261116301,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-strong",
+   "role": "reference",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  },
+  {
+   "name": "ic-pipeline",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "compact-orbit-scan:columns=537,raw_x_cap=100000000",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-frobenius-counted:m=2",
+     "targets": "walk"
+    }
+   }
+  },
+  {
+   "name": "rho-strong-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.signed_frobenius_strong"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261116302,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

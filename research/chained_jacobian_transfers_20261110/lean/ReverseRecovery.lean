@@ -1,0 +1,33 @@
+import Init.Grind.Module.Basic
+
+/-! Rational-group inversion of an admitted two-hop adjoint pair.
+Actual Jacobians,group orders,homomorphisms and norm49 identities remain
+explicit hypotheses with separate written/native evidence. -/
+set_option autoImplicit false
+namespace ReverseRecovery
+open Lean.Grind
+
+theorem recovery49_order12317 {A : Type} [IntModule A]
+    (a : A) (ha : (12317 : Int) • a = 0) :
+    (4776 : Int) • ((49 : Int) • a) = a := by grind
+
+theorem two_sided_inverse_from_norm49 {A B : Type} [IntModule A] [IntModule B]
+    (f : A → B) (fh : B → A)
+    (hf : ∀ a, fh (f a) = (49 : Int) • a)
+    (hg : ∀ b, f (fh b) = (49 : Int) • b)
+    (fl : ∀ (n : Int) a, f (n • a) = n • f a)
+    (ha : ∀ a : A, (12317 : Int) • a = 0)
+    (hb : ∀ b : B, (12317 : Int) • b = 0) :
+    (∀ a, (4776 : Int) • fh (f a) = a) ∧
+    (∀ b, f ((4776 : Int) • fh b) = b) := by
+  constructor
+  · intro a
+    rw [hf]
+    exact recovery49_order12317 a (ha a)
+  · intro b
+    rw [fl, hg]
+    exact recovery49_order12317 b (hb b)
+
+end ReverseRecovery
+#print axioms ReverseRecovery.recovery49_order12317
+#print axioms ReverseRecovery.two_sided_inverse_from_norm49

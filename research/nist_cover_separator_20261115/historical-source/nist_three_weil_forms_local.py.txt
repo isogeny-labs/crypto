@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+"""Recover canonical Weil forms from explicit order-three tangent functions."""
+from pathlib import Path
+import json
+import sympy as S
+from flint import fmpz_mod_poly_ctx,fq_default_ctx,fq_default_poly_ctx
+from nist_cover_three_score_certificate import elliptic_order
+
+ROOT=Path(__file__).parent
+
+
+def primitive_base_root(p):
+    s=int(S.sqrt_mod(-3%p,p));inv2=pow(2,-1,p)
+    return min((-1+s)*inv2%p,(-1-s)*inv2%p)
+
+
+def prym_form(matrix):
+    fam=matrix['family'];c=matrix['candidate'];d=matrix['cover_parameter_d'];source=matrix['source_model'];p=int(source['p']);b=int(source['b'])
+    cert=json.loads((ROOT/'nist_cover_prym_three_local'/f'{fam}_{c}_d{d}.json').read_text())
+    P=fmpz_mod_poly_ctx(p);mod=P(matrix['finite_field_modulus_coefficients']);assert mod.is_irreducible()
+    F=fq_default_ctx(modulus=mod,check_prime=False,check_modulus=False);R=fq_default_poly_ctx(F)
+    basis=[tuple(R([F(a) for a in polynomial]) for polynomial in point) for point in matrix['basis_Mumford_coefficients']]
+    cp=R(cert['Kummer_characteristic_polynomial_coefficients']);up=R(cert['u_polynomial_coefficients']);wp=R(cert['w_polynomial_coefficients']);lp=R(cert['lambda_polynomial_coefficients'])
+    x=S.Symbol('x');ff=S.Poly(x*(x-1)*((x+d)**3-3*(x+d)*(x-1)**2+b*(x-1)**3),x,modulus=p);f4=int(ff.nth(4))%p
+    cubics=[];lamvals=[]
+    for U,V in basis:
+        square=R([-U[0],0,1]);rem=cp%square
+        if rem.degree()!=1:rem=(up-U[1])%square
+        assert rem.degree()==1
+        k=-rem[0]/rem[1];assert k*k==U[0] and cp(k)==0 and up(k)==U[1]
+        lam=lp(k);w=wp(k);u=U[1];z=(f4*lam-w*w+3*u*u+3*k*k)/2
+        C0=R([k**3,z,w,1]);red=C0%U;ii=next(i for i in range(2) if red[i]!=0)
+        c3=V[ii]/red[ii];C=c3*C0
+        assert c3*c3*lam==1 and C%U==V
+        cubics.append(C);lamvals.append(lam)
+    values={}
+    def res(U,H):
+        assert U.degree()==2 and U[2]==1
+        h=H%U;a=h[1];b=h[0]
+        return b*b-U[1]*a*b+U[0]*a*a
+    for i in range(4):
+        for j in range(i+1,4):
+            Ui,Vi=basis[i];Uj,Vj=basis[j]
+            n=res(Uj,Vj-cubics[i]);den=res(Ui,Vi-cubics[j]);assert n!=0 and den!=0
+            e=n/den*lamvals[i]/lamvals[j];assert e**3==1
+            values[i,j]=e
+    zeta=F(primitive_base_root(p)) if p%3==1 else next(e for e in values.values() if e!=1)
+    assert zeta!=1 and zeta**3==1
+    J=[[0]*4 for _ in range(4)]
+    for (i,j),e in values.items():
+        a=0 if e==1 else 1 if e==zeta else 2 if e==zeta*zeta else None
+        assert a is not None;J[i][j]=a;J[j][i]=-a%3
+    JJ=S.Matrix(J);AA=S.Matrix(matrix['Prym_Frobenius_matrix_mod3'])
+    assert int(JJ.det())%3!=0 and all(int(v)%3==0 for v in AA*JJ*AA.T-(p%3)*JJ)
+    return {'canonical_Prym_Weil_matrix_mod3':J,'primitive_third_root_coefficients':[int(a) for a in zeta.to_list()],
+            'all_pairing_values_cube_to_one':True,'pairing_nondegenerate':True,'pairing_Frobenius_multiplier_verified':True,
+            'basis_cubic_tangent_functions':[[[int(v) for v in c.to_list()] for c in C.coeffs()] for C in cubics]}
+
+
+def elliptic_module(r):
+    dest=ROOT/'nist_elliptic_three_weil_modules';dest.mkdir(exist_ok=True);cache=dest/f'{r["family"]}_{r["candidate"]}.json'
+    if cache.exists():return json.loads(cache.read_text())
+    p=int(r['p']);b=int(r['b']);m=elliptic_order(r);F=fq_default_ctx(p,m,'z');R=fq_default_poly_ctx(F)
+    psi=R([-3,4*b,-6,0,1]);roots=psi.roots(multiplicities=False);assert len(roots)==4
+    def neg(P):return None if P is None else (P[0],-P[1])
+    def add(P,Q):
+        if P is None:return Q
+        if Q is None:return P
+        x,y=P;xx,yy=Q
+        if x==xx and y==-yy:return None
+        slope=(3*x*x-3)/(2*y) if P==Q else (yy-y)/(xx-x)
+        xxx=slope*slope-x-xx;yyy=slope*(x-xxx)-y
+        return xxx,yyy
+    basis=[]
+    for x in roots:
+        y=(x**3-3*x+b).sqrt();P=(x,y);assert add(P,P)==neg(P)
+        if not basis:basis.append(P)
+        elif P!=basis[0] and P!=neg(basis[0]):basis.append(P);break
+    assert len(basis)==2
+    def coordinates(P):
+        for a in range(3):
+            for bb in range(3):
+                A=None if a==0 else basis[0] if a==1 else neg(basis[0]);B=None if bb==0 else basis[1] if bb==1 else neg(basis[1])
+                if add(A,B)==P:return [a,bb]
+        raise AssertionError('elliptic basis does not span')
+    A=[coordinates(tuple(c.frobenius() for c in P)) for P in basis]
+    def line(P,Q):
+        x,y=P;xx,yy=Q;slope=(3*x*x-3)/(2*y)
+        return yy-y-slope*(xx-x)
+    e=-line(basis[0],basis[1])/line(basis[1],basis[0]);assert e!=1 and e**3==1
+    zeta=F(primitive_base_root(p)) if p%3==1 else e
+    a=1 if e==zeta else 2 if e==zeta*zeta else None;assert a is not None
+    J=[[0,a],[-a%3,0]];AA=S.Matrix(A);JJ=S.Matrix(J)
+    assert all(int(v)%3==0 for v in AA*JJ*AA.T-(p%3)*JJ)
+    z={'family':r['family'],'candidate':r['candidate'],'source_model':{'p':str(r['p']),'b':str(r['b'])},
+       'full_three_torsion_field_degree':m,'finite_field_modulus_coefficients':[int(c) for c in F.modulus().coeffs()],
+       'basis_point_coefficients':[[[int(v) for v in c.to_list()] for c in P] for P in basis],
+       'Frobenius_matrix_mod3':A,'canonical_Weil_matrix_mod3':J,'primitive_third_root_coefficients':[int(v) for v in zeta.to_list()],
+       'pairing_function':'Tangent-line Weil formula -f_P(Q)/f_Q(P); fixed common Fp primitive third root when p=1 mod3.'}
+    cache.write_text(json.dumps(z,indent=2)+'\n');return z
+
+
+if __name__=='__main__':
+    path=ROOT/'nist_cover_prym_three_local_matrix'/'256_1842_d1.json'
+    print(json.dumps(prym_form(json.loads(path.read_text())),indent=2))

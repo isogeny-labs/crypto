@@ -1,0 +1,43 @@
+distinct recorded scalars: 1 (242624768583643540)
+== /home/user/crypto/research/extension_ic_graph_20261115/nagao-e2e/public.json
+PASS p_prime: p = 1009
+PASS p_not_3_mod_dividing: p mod 3 = 1
+PASS L_prime_miller_rabin_12_bases: L = 263807419614139553
+PASS w_nonresidue: w = 11
+PASS s_noncube_in_Fp2: s = (2, 0)
+PASS frobenius_order_divides_6: u^(p^6) = u
+PASS u_not_in_Fp2: u^(p^2) != u
+PASS curve_nonsingular: 0, alpha, sigma(alpha) distinct
+PASS G_on_curve: 
+PASS Q_on_curve: 
+PASS G_on_short_weierstrass_model: 
+PASS Q_on_short_weierstrass_model: 
+PASS L_times_G_is_infinity: [L]G = O, L prime so ord(G) = L
+NOTE group_order_context: p^6 = 1055229678769825441; if #E = 4L then trace = 313267230, Hasse bound 2054487458: true
+PASS scalar_242624768583643540_in_range: 0 < d < L
+PASS scalar_242624768583643540_relation_Q_eq_dG: independent Jacobian left-to-right ladder
+PASS scalar_242624768583643540_negative_control_d_plus_1: [d+1]G != Q
+PASS scalar_242624768583643540_negative_control_L_minus_d: [L-d]G = -Q != Q
+PASS affine_dG_equals_recorded_Q_coordinates: model coordinates
+SUMMARY ec: 18 checks, 0 failed
+== /home/user/crypto/research/extension_ic_graph_20261115/runpod-deferred-pair-20261117-50/public.json
+PASS p_prime: p = 1009
+PASS p_not_3_mod_dividing: p mod 3 = 1
+PASS L_prime_miller_rabin_12_bases: L = 263807419614139553
+PASS w_nonresidue: w = 11
+PASS s_noncube_in_Fp2: s = (2, 0)
+PASS frobenius_order_divides_6: u^(p^6) = u
+PASS u_not_in_Fp2: u^(p^2) != u
+PASS curve_nonsingular: 0, alpha, sigma(alpha) distinct
+PASS G_on_curve: 
+PASS Q_on_curve: 
+PASS G_on_short_weierstrass_model: 
+PASS Q_on_short_weierstrass_model: 
+PASS L_times_G_is_infinity: [L]G = O, L prime so ord(G) = L
+NOTE group_order_context: p^6 = 1055229678769825441; if #E = 4L then trace = 313267230, Hasse bound 2054487458: true
+PASS scalar_242624768583643540_in_range: 0 < d < L
+PASS scalar_242624768583643540_relation_Q_eq_dG: independent Jacobian left-to-right ladder
+PASS scalar_242624768583643540_negative_control_d_plus_1: [d+1]G != Q
+PASS scalar_242624768583643540_negative_control_L_minus_d: [L-d]G = -Q != Q
+PASS affine_dG_equals_recorded_Q_coordinates: model coordinates
+SUMMARY ec: 18 checks, 0 failed

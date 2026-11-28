@@ -1,0 +1,80 @@
+{
+  "schema": "vieta-publication-closeout/v1",
+  "observed_utc": "2026-11-23T06:46:37.205758+00:00",
+  "pr": 4525,
+  "head": "9c66263eb62f1e91685f2ac60eef92ba8c1ef4c0",
+  "merge": "4bf2d9dae80ea1c7d6f70478492d95dd0ddb2dac",
+  "merged_at": "2026-11-17T15:09:49Z",
+  "parents": [
+    "c5cbb67b19fe39864da7f8c9b29726696ba01580",
+    "9c66263eb62f1e91685f2ac60eef92ba8c1ef4c0"
+  ],
+  "inspected_main": "816f9c3a942efed569049618c056d12a0c56d693",
+  "study_path": "research/vieta_coset_rust_20261115/speed-20261117",
+  "study_tree_at_head": "8f1ee2e1e4c366c8880da97947feead0e959a1ae",
+  "study_tree_at_merge": "8f1ee2e1e4c366c8880da97947feead0e959a1ae",
+  "study_tree_at_current_main": "8f1ee2e1e4c366c8880da97947feead0e959a1ae",
+  "head_study_preserved_in_merge": true,
+  "claim_blob_sha256": {
+    "9c66263eb62f1e91685f2ac60eef92ba8c1ef4c0": "878ac136837964598970a9d1e116e8df9cad8a5d05f831c60541d66cb7bbe123",
+    "4bf2d9dae80ea1c7d6f70478492d95dd0ddb2dac": "878ac136837964598970a9d1e116e8df9cad8a5d05f831c60541d66cb7bbe123",
+    "816f9c3a942efed569049618c056d12a0c56d693": "878ac136837964598970a9d1e116e8df9cad8a5d05f831c60541d66cb7bbe123"
+  },
+  "first_parent_ledger_exact_byte_prefix": true,
+  "first_parent_ledger_entries": 1357,
+  "merged_ledger_entries": 1358,
+  "journal_comparison": {
+    "method": "all Markdown files under docs/session-logs; unchanged Git blobs accepted; other files compared as full level-two sections plus preamble, whitespace-normalized, using multiset multiplicity",
+    "parents": [
+      {
+        "parent": "c5cbb67b19fe39864da7f8c9b29726696ba01580",
+        "journal_files": 41,
+        "byte_equal_files": 40,
+        "changed_files": [
+          {
+            "path": "docs/session-logs/2026-11-17.md",
+            "parent_blocks": 113,
+            "merge_blocks": 137,
+            "missing_occurrences": 0,
+            "missing_normalized_block_digests": []
+          }
+        ]
+      },
+      {
+        "parent": "9c66263eb62f1e91685f2ac60eef92ba8c1ef4c0",
+        "journal_files": 41,
+        "byte_equal_files": 41,
+        "changed_files": []
+      }
+    ],
+    "missing_occurrences": 0
+  },
+  "historical_record": {
+    "path": "benchmarks/records/20261105T0828Z-icb-large-prime-n53-s1-archive.json",
+    "sha256": "cceddc4549b0a35a9acb5ad5001d4dd335ab9d82a70c7cdc945927cfa600f501",
+    "command_1": {
+      "argv": [
+        "flock",
+        "-s",
+        "/dev/shm/cpu.lock",
+        "/dev/shm/tgt-q/release/ecbench",
+        "run",
+        "--spec",
+        "specs/n53-s1.json",
+        "--out",
+        "sessions/n53-s1",
+        "--allow-busy",
+        "--wait"
+      ],
+      "cwd": "research/icb_large_prime_n53_n61_20261029",
+      "exit": null,
+      "provenance": "Documentary launcher command from frozen run_ladder.sh; this import did not execute it. Exact process start and exit code were not captured by that launcher record.",
+      "started_utc": null,
+      "wall_s": null
+    }
+  },
+  "own_record_status_at_main": "open",
+  "benchmarks_rerun": false,
+  "local_s3_operation": false,
+  "independent_scientific_validation_claim": false
+}

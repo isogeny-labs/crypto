@@ -1,0 +1,180 @@
+{
+  "accepted_pairs": 20,
+  "c2_effort_status": "error",
+  "c2_simon_perturb_intervals": [
+    [
+      "none",
+      3,
+      3
+    ],
+    [
+      "one",
+      3,
+      3
+    ],
+    [
+      "two",
+      3,
+      3
+    ],
+    [
+      "four_with_inverses",
+      3,
+      3
+    ]
+  ],
+  "curves": [
+    {
+      "id": "C0",
+      "max_algorithm_error": "0E-38",
+      "max_parallelogram_residual": "0E-38",
+      "maximum_selected_height": "3.0379988841621461013013210247146468060",
+      "minimum_selected_height": "2.6363648853986839843220485119413659212",
+      "torsion_order": 1
+    },
+    {
+      "id": "C1",
+      "max_algorithm_error": "0E-38",
+      "max_parallelogram_residual": "2.3509887016445750159374730744444913556E-38",
+      "maximum_selected_height": "3.1975509858248639787152353286586908461",
+      "minimum_selected_height": "2.7412103126640860493532954497767342184",
+      "torsion_order": 1
+    },
+    {
+      "id": "C2",
+      "max_algorithm_error": "0E-38",
+      "max_parallelogram_residual": "9.4039548065783000637498922977779654225E-38",
+      "maximum_selected_height": "4.7781829311248571279357273828070047415",
+      "minimum_selected_height": "3.7875646434114497447255331466770523195",
+      "torsion_order": 1
+    }
+  ],
+  "proof_arm_statuses": [
+    {
+      "algorithm": "pari",
+      "id": "C0",
+      "status": "complete"
+    },
+    {
+      "algorithm": "mwrank_lib",
+      "id": "C0",
+      "status": "complete"
+    },
+    {
+      "algorithm": "pari",
+      "id": "C1",
+      "status": "complete"
+    },
+    {
+      "algorithm": "mwrank_lib",
+      "id": "C1",
+      "status": "complete"
+    },
+    {
+      "algorithm": "pari",
+      "id": "C2",
+      "status": "error"
+    },
+    {
+      "algorithm": "mwrank_lib",
+      "id": "C2",
+      "status": "timeout"
+    }
+  ],
+  "rank_intervals": [
+    {
+      "id": "C0",
+      "result": {
+        "id": "C0",
+        "rank_lower": 3,
+        "rank_upper": 3,
+        "status": "complete"
+      },
+      "status": "complete"
+    },
+    {
+      "id": "C1",
+      "result": {
+        "id": "C1",
+        "rank_lower": 3,
+        "rank_upper": 3,
+        "status": "complete"
+      },
+      "status": "complete"
+    },
+    {
+      "id": "C2",
+      "result": {
+        "id": "C2",
+        "rank_lower": 3,
+        "rank_upper": 3,
+        "status": "complete"
+      },
+      "status": "complete"
+    }
+  ],
+  "schema": "xedni-selected-height-audit-v1",
+  "source_rows": 1722,
+  "status": "PASS",
+  "torsion_coprime_pairs": [
+    {
+      "id": "C0",
+      "orders": [
+        7,
+        9
+      ],
+      "primes": [
+        3,
+        5
+      ]
+    },
+    {
+      "id": "C1",
+      "orders": [
+        7,
+        10
+      ],
+      "primes": [
+        3,
+        5
+      ]
+    },
+    {
+      "id": "C2",
+      "orders": [
+        7,
+        4
+      ],
+      "primes": [
+        3,
+        7
+      ]
+    }
+  ],
+  "torsion_exclusion_status": [
+    {
+      "candidate_primes": [
+        3,
+        7
+      ],
+      "excluded": 2,
+      "id": "C0"
+    },
+    {
+      "candidate_primes": [
+        3,
+        7
+      ],
+      "excluded": 2,
+      "id": "C1"
+    },
+    {
+      "candidate_primes": [
+        3,
+        7
+      ],
+      "excluded": 2,
+      "id": "C2"
+    }
+  ]
+}

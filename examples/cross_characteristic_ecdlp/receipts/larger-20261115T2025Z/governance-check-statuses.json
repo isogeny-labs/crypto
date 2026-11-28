@@ -1,0 +1,45 @@
+[
+  {
+    "name": "ledger-author-parent",
+    "command": [
+      "python3",
+      "tools/pcc/pcc.py",
+      "ledger",
+      "verify",
+      "--base",
+      "HEAD"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "ledger-incoming-main",
+    "command": [
+      "python3",
+      "tools/pcc/pcc.py",
+      "ledger",
+      "verify",
+      "--base",
+      "origin/main"
+    ],
+    "exit": 1
+  },
+  {
+    "name": "pr-body-lint",
+    "command": [
+      "python3",
+      "tools/pcc/pcc.py",
+      "lint-prose",
+      "--stdin"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "source-diff-check",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0
+  }
+]

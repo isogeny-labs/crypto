@@ -1,0 +1,86 @@
+{
+  "schema": "chained-rational-Jacobian-first-failure/v1",
+  "profile": "A",
+  "source_commit": "dc102243a8d817cbd167d58f4ffed342765c79a4",
+  "phases": {
+    "format.phase": {
+      "recorded": "2026-11-23T14:33:48.584875+00:00",
+      "name": "format",
+      "expected_exit": 0,
+      "exit": 1,
+      "complete_stdout": {
+        "bytes": 21277,
+        "sha256": "70409ed1d6a3f3c7ee85250a9f9c943ef4e19e53e2c734865fdf4afea11d2738",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    "rustfmt-version.phase": {
+      "recorded": "2026-11-23T14:33:48.494311+00:00",
+      "name": "rustfmt-version",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 46,
+        "sha256": "5599925a145edaa750ffdd40d2dc1adb031362d0932dd5935e20440a5f51d2be",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    "clippy-version.phase": {
+      "recorded": "2026-11-23T14:33:48.417115+00:00",
+      "name": "clippy-version",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 38,
+        "sha256": "514f4171a1bed07e7d27a872fc29ebb3e32360eb297e28acf00ab796f80e1038",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    },
+    "rustc-version.phase": {
+      "recorded": "2026-11-23T14:33:48.261830+00:00",
+      "name": "rustc-version",
+      "expected_exit": 0,
+      "exit": 0,
+      "complete_stdout": {
+        "bytes": 36,
+        "sha256": "55cd0529c005d3f62869ea6e2271bfa9d5196f56dc65a8be00a371af114a4a98",
+        "mode": 384
+      },
+      "complete_stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "mode": 384
+      }
+    }
+  },
+  "outer_exit": 1,
+  "guard_failures": [],
+  "full_format_diagnostic": {
+    "bytes": 21277,
+    "sha256": "70409ed1d6a3f3c7ee85250a9f9c943ef4e19e53e2c734865fdf4afea11d2738"
+  },
+  "unreached": [
+    "compile",
+    "Clippy",
+    "rational-class arithmetic",
+    "maps",
+    "matching classification",
+    "dual signs"
+  ],
+  "scope": "Actual strict-format negative, no mathematical result or impossibility claim."
+}

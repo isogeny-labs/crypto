@@ -1,0 +1,2 @@
+Corrected missing sparse path dependencies by materializing tracked crates/; no source or manifest edit.
+timeout 60s env CARGO_BUILD_JOBS=1 CARGO_TARGET_DIR=/workspace/scratch/457a488177fc/crypto-quotient/.build-root cargo check --lib --locked --offline

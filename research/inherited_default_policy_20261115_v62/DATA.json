@@ -1,0 +1,32 @@
+{
+  "input": "research/ordinary_boolean_encoding_20261115_v61/neutral.json",
+  "encoding_receipt": "research/ordinary_boolean_encoding_20261115_v61/raw.json",
+  "engines": [
+    {
+      "label": "inherited_F4_reference",
+      "scope": "modified source-derived384-bit inheritedF4; no geometry oracle; NOTF6",
+      "command": [
+        "research/local_baseline_deps_20261115_v62/baselines/crypto_native/target/release/f6-inherited-width-wrapper-v1",
+        "--input",
+        "{input}",
+        "--expected-input-sha256",
+        "{sha}",
+        "--mode",
+        "solve",
+        "--max-seconds",
+        "5",
+        "--max-input-bytes",
+        "16777216",
+        "--max-terms",
+        "300000",
+        "--max-nodes",
+        "10000",
+        "--max-roots",
+        "100"
+      ]
+    }
+  ],
+  "rule": "rerun only the interface-rejected inheritedF4 with its required absent environment overrides; same input/binary/default caps/5sbudget; no unchangedMSolve/F5B timeout retry",
+  "bindings": "research/wide_baseline_local_20261115_v62/BINDINGS.json",
+  "library_dir": "research/local_baseline_deps_20261115_v62/vendor/msolve-local/usr/lib/x86_64-linux-gnu"
+}

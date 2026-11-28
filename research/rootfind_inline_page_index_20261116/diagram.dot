@@ -1,0 +1,18 @@
+digraph inline_page {
+  graph [rankdir=LR, bgcolor="white", pad="0.18", nodesep="0.38", ranksep="0.48"];
+  node [shape=box, style="rounded,filled", fillcolor="#edf5fa", color="#3b6075", fontname="Helvetica", fontsize=10];
+  edge [color="#537083", arrowsize=0.65, fontname="Helvetica", fontsize=9];
+
+  key [label="Binary sum key\nx + 1"];
+  dir [label="Four-byte directory word\nkey >> 4", fillcolor="#e3efff"];
+  empty [label="Empty: store slot +\nfirst packed pair", fillcolor="#def4e8"];
+  same [label="Same slot: return\noriginal witness", fillcolor="#def4e8"];
+  promote [label="Different slot: promote\nto 16-word spill page", fillcolor="#fff0d8"];
+  spill [label="Spill pointer: read\nword at key & 15", fillcolor="#fff0d8"];
+
+  key -> dir;
+  dir -> empty [label="zero"];
+  dir -> same [label="inline, equal slot"];
+  dir -> promote [label="inline, new slot"];
+  dir -> spill [label="high bit set"];
+}

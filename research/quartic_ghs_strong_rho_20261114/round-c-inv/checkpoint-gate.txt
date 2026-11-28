@@ -1,0 +1,9 @@
+command: scripts/checkpoint.sh gate
+exit: 2
+
+checkpoint gate: a resume checkpoint must be in S3 before an experiment runs.
+  - missing .resume/RESUME.md (run: scripts/checkpoint.sh init, then fill it in)
+Fill in .resume/RESUME.md (scripts/checkpoint.sh init writes the template) so a fresh
+session could resume from it alone, then re-run. The checkpoint is pushed automatically.
+
+No profile, timing screen, q=4051 diagnostic, paid run, or frontier grid was run.

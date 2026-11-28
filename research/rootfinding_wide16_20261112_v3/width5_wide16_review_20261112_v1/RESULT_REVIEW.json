@@ -1,0 +1,69 @@
+{
+  "schema": "independent-recorded-evidence-review/v1",
+  "created_utc": "2026-11-12T05:36:55.202692+00:00",
+  "decision": "PASSED_CONDITIONAL_EMPTY_BLOCK_COMPONENT_ONLY",
+  "review_operation": "Recorded hashes, exact row-ID/batch/tuple/mask coverage and timing medians only; no scientific algorithm rerun",
+  "results": [
+    {
+      "mode": "controls",
+      "root_union_size": 38,
+      "all_arm_unions_identical": true,
+      "arms": 3,
+      "recorded_complete_native_fibers": 135,
+      "native_recovery_batches": 7,
+      "mask_rows": 10,
+      "stored_mask_vectors": 370,
+      "candidate_u_checks": 3330,
+      "wall_seconds": 7.348322713998641,
+      "whole_process_peak_rss_kib": 194204,
+      "native_process_rss_range_kib": [
+        14336,
+        14936
+      ],
+      "raw_sha256": "692277b81a86dec423c88eaf6ccfc894d957d20e8e2c22b4d1cb4c0cf7e71427",
+      "batch_controls": {
+        "empty_batch_complete": true,
+        "faults_rejected": [
+          "missing-second",
+          "capped-second",
+          "duplicate-second-id"
+        ],
+        "real_batch_sizes": [
+          40,
+          5
+        ],
+        "whole_dense_fibers": 45
+      }
+    },
+    {
+      "mode": "profile",
+      "root_union_size": 0,
+      "all_arm_unions_identical": true,
+      "arms": 9,
+      "recorded_complete_native_fibers": 240,
+      "native_recovery_batches": 12,
+      "mask_rows": 30,
+      "stored_mask_vectors": 1110,
+      "candidate_u_checks": 17760,
+      "wall_seconds": 45.055540640998515,
+      "whole_process_peak_rss_kib": 194140,
+      "native_process_rss_range_kib": [
+        14336,
+        17244
+      ],
+      "raw_sha256": "2142a92e507188cd087bf98892f6af86d3a7f802cc4abe4844563b86aec02044",
+      "medians": {
+        "all": 9.421229293999204,
+        "seven": 2.8772669389982184,
+        "five": 0.8153129439997429
+      },
+      "observed_all_over_five": 11.555353515891408,
+      "observed_seven_over_five": 3.529033802508998,
+      "empty_conditional_blocks_only": true
+    }
+  ],
+  "qualified_speedup": null,
+  "global_original_root_complete": false,
+  "genuine_F4_F5_F6_measured": false,
+  "interpretation": "Observed 11.555x versus all-h and 3.529x versus 7D measure faster certification of finite EMPTY conditional blocks; global original roots and genuine GB gate remain unresolved."
+}

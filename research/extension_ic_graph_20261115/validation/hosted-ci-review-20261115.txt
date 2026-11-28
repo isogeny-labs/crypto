@@ -1,0 +1,21 @@
+Reviewed head: 05c4ec6fd076d4b20a3023a878bfd9f899893c6f
+Reviewed at: 2026-11-15T20:00Z
+CI is not globally passing. Source-specific change required:
+- rust-lint job 132888849504: clippy::match_ref_pats at gaudry_cubic_symmetric.rs:106
+  Correct by dereferencing the matched slice once and removing the & prefixes.
+  This is a syntax-only fix; post-fix native verification is recorded separately.
+Unchanged-file finding in the same job:
+- koblitz_index_calculus.rs:22579: clippy::unnecessary_find_map
+  The file is byte-identical between original PR base c42559e96 and reviewed head.
+Inherited evidence failures:
+- job 132899206155: research/pkm_priced_20261115/results/sess/rho-t4/records.jsonl absent
+- job 132899206139: research/pkm_priced_20261115/results/sess/rho-t3/records.jsonl absent
+- job 132899206228: research/ic_ladder_wwalk_ksum_20261115/results/test/P40 and P36 records absent
+- job 132899206277: research/ic_ladder_wwalk_ksum_20261115/results/control/PC32 records absent
+- bench-record job 132888709856: unrelated genus-ladder record 20261115T0609Z remains open
+Validation gate, size, artifacts, latest PCC gate and all-target compilation passed on reviewed head.
+A prior cancelled PCC attempt is not represented as a passing attempt.
+No test, audit, historical record, exclusion, or evidence file was changed to suppress these findings.
+Canonical run/job links: https://github.com/isogeny-labs/crypto/actions/runs/43739302233/job/132888849504
+https://github.com/isogeny-labs/crypto/actions/runs/43739303205
+https://github.com/isogeny-labs/crypto/actions/runs/43739302290/job/132888709856

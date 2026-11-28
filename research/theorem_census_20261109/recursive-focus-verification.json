@@ -1,0 +1,86 @@
+{
+  "schema": "theorem-audit-verification/v1",
+  "recorded_at": "2026-11-10T03:02:42.253255+00:00",
+  "source_commit": "a55402b891eb1bc2af51d065a98e26369ca58a47",
+  "source_plan_sha256": "fcf4683273a7231f6b9552a884d863ac99e733c887b6098951a64abef137f69b",
+  "source_bytes_equal_commit": true,
+  "formal": {
+    "project": "research/theorem_census_20261109/lean",
+    "theorem": "RecursiveSemaevFocusAudit.focus_degree_audit_certificate",
+    "statement": "theorem focus_degree_audit_certificate : (\u2200 (A : Type*) [CommRing A] [IsDomain A] (D : \u2115) (f : A[X][X]) (b2 b4 b6 b8 : A), f.natDegree\u2264D \u2192 f\u22600 \u2192 (rotate (resultantStep D f (C b2) (C b4) (C b6) (C b8))).natDegree= 2*(Polynomial.Bivariate.swap f).natDegree \u2227 (rotate (resultantStep D f (C b2) (C b4) (C b6) (C b8))).coeff (2*(Polynomial.Bivariate.swap f).natDegree)= resultantStep D (Polynomial.Bivariate.swap f).leadingCoeff b2 b4 b6 b8) \u2227 (\u2200 (K : Type*) [Field K] (W : WeierstrassCurve.Affine K) (n : \u2115), (rotate (S",
+    "decl_sha256": "876900255f33fabf51b83a5fba2ce1bef91f626091fcdfd27ddb6dee579f8d2b",
+    "sources": [
+      {
+        "path": "research/theorem_census_20261109/lean/S4Degree.lean",
+        "bytes": 17208,
+        "sha256": "b26b20cddee5ec12369b5b3447c6d3b352f878a1f9201219090271ed201f2c20"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/ResultantDegreeStep.lean",
+        "bytes": 13874,
+        "sha256": "3a360ba0006ff7112f6c54cd389dcf8719d0c59c0cc816be4075e9a4970231f6"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RecursiveSemaevDegree.lean",
+        "bytes": 6783,
+        "sha256": "cea5acca394aa203c125416ce1d69247079749e48de38ce4d67faaf7a5ae9edf"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RecursiveSemaevSymmetry.lean",
+        "bytes": 3484,
+        "sha256": "09e0206649e749081ab65eff3d5dcbd88c56ed85c353c58699a79d22581a2f3e"
+      },
+      {
+        "path": "research/theorem_census_20261109/lean/RecursiveSemaevFocus.lean",
+        "bytes": 10979,
+        "sha256": "3f32120f2621966715310381b20fd5ceb6e494a75b1b90ce9cfeed9c14819331"
+      }
+    ],
+    "gate": {
+      "path": "evidence/recursive-focus-gate.log",
+      "declarations": 357,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Over every domain, actual fixed-size resultant doubles the formal degree of a surviving old coefficient variable, with f nonzero, elimination degree\u2264D and b_i constant in that variable; exact old leading coefficient is the same fixed-size resultant on the previous old leading coefficient. Actual canonical third-newest degree2^(m\u22122)at every aritym\u22655. All other older canonical input degrees/transport and full permutation symmetry, geometric recursion and irreducibility remain open."
+  },
+  "proof_packet": {
+    "id": "PCC-20261110-2c396d",
+    "local_verdict": {
+      "claim_id": "PCC-20261110-2c396d",
+      "claim_sha256": "243b0a1c4a91a8d4d2326b1d4756c69db575e4ccbab2757e74f4c3f97567393a",
+      "commit": "a55402b891eb1bc2af51d065a98e26369ca58a47",
+      "proofs": [
+        {
+          "kind": "lean",
+          "notes": [
+            "lean: proof gate PASS for research/theorem_census_20261109/lean (RecursiveSemaevFocus.lean)"
+          ],
+          "reasons": [],
+          "verdict": "pass"
+        }
+      ],
+      "reasons": [],
+      "schema": "pcc.verdict/v1",
+      "verdict": "pass",
+      "verified_at": "2026-11-10T03:01:24Z",
+      "verifier_host": "762f5fc120c9"
+    },
+    "standing": {
+      "claim_id": "PCC-20261110-2c396d",
+      "claim_sha256": "243b0a1c4a91a8d4d2326b1d4756c69db575e4ccbab2757e74f4c3f97567393a",
+      "standing": "unverified",
+      "verdicts": []
+    }
+  },
+  "report": {
+    "path": "reports/proof-20261110-recursive-focus/report.pdf",
+    "bytes": 58259,
+    "sha256": "8672f6f8bbb784b74248a4c255e86485739e5fab79ae039ccf30991692a7fed6",
+    "pages": 2,
+    "all_pages_visually_inspected": true,
+    "diagram_inspected": true
+  },
+  "scope": "Over every domain, actual fixed-size resultant doubles the formal degree of a surviving old coefficient variable, with f nonzero, elimination degree\u2264D and b_i constant in that variable; exact old leading coefficient is the same fixed-size resultant on the previous old leading coefficient. Actual canonical third-newest degree2^(m\u22122)at every aritym\u22655. All other older canonical input degrees/transport and full permutation symmetry, geometric recursion and irreducibility remain open.",
+  "paid_compute": 0
+}

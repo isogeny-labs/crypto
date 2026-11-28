@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T03:57:00Z",
+ "id": "PCC-20261123-3048b0",
+ "kind": "statement",
+ "producer": {
+  "commit": "260e5fb7bdb36f287d4586cc5f1ab9a4c78c5af8",
+  "model": "GPT-6 Astra Pro",
+  "session": "rr5-qualification-followup-20261122"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/evidence/qualification-06/stdout.txt",
+    "sha256": "93981977b4e0676d8ef2e3fc468f4888d1e23899892cab8603e130eea5be9663"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/evidence/b8-positive-02/stdout.txt",
+    "sha256": "545e58c3fd5af52d496f3be67bb28e88070fb687cd345b91c2bb787458f3b5b3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/evidence/b8-empty-02/stdout.txt",
+    "sha256": "17d1a76e7de7b073812299748d59e6d45e0f2142b3837009de3c5f4e44fdbbba"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/evidence/public-example-01/stdout.txt",
+    "sha256": "3471fd5ca2c9c7823e25a83eb158ec2949a850df139fdf47270af004bfecd5a8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/evidence/development-06/build-sources.sha256",
+    "sha256": "0dac7b349560ef0f7fffe70663339ad6c5c2b96c80ab1e489e963d2d6a3262d9"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_four_summand_20261122/evidence/qualification-06/pre-call-binary.sha256",
+    "sha256": "b669b4df178778b66bd3fbd5bed3e2c96afe34939892d5bf1dd5f6ddfc26e5fe"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "qualification-06, b8-positive-02, b8-empty-02 and public-example-01; unsigned local development correctness only",
+ "statement": "The final RR5 native source passed17 component/construction tests plus two separate unchanged B8 completeness tests; the public example passed8 tests against its declared production-source closure. All frozen source and executable rechecks passed. Full root-library qualification was not completed."
+}

@@ -1,0 +1,59 @@
+{
+  "host": {
+    "arch": "x86_64",
+    "os": "linux",
+    "threads": 4
+  },
+  "results": [
+    {
+      "B": 645,
+      "bits": 28,
+      "collect_speedup": 51.172153083480396,
+      "curve": "a3-fast-28bit-p256class",
+      "n": 268407199,
+      "needed": 661,
+      "p": 268435399,
+      "pair_table_entries": 416025,
+      "rho_wall_s_1thread": 0.004840081,
+      "sweep_collect_s": 4.375892463,
+      "sweep_la_s": 0.004029623,
+      "sweep_rows": [
+        0,
+        661,
+        0
+      ],
+      "sweep_targets": 219748,
+      "table_build_s": 0.01746191,
+      "table_collect_s": 0.085513159,
+      "table_la_s": 0.003881139,
+      "table_rows": [
+        0,
+        661,
+        0
+      ],
+      "table_targets": 219748,
+      "total_speedup": 40.98893426949981
+    },
+    {
+      "bits": 28,
+      "fast_B": 645,
+      "fast_total_s": 0.038200817,
+      "fast_vs_sweep": 112.42870316098215,
+      "section": "e2e_fast",
+      "sweep_B": 645,
+      "sweep_total_s": 4.294868315
+    },
+    {
+      "B": 645,
+      "batched_total_s": 0.042717294,
+      "batched_vs_sweep": 100.54167557991853,
+      "bits": 28,
+      "rho_wall_s_1thread": 0.004840081,
+      "section": "e2e",
+      "sweep_total_s": 4.294868315,
+      "table_total_s": 0.105537797,
+      "table_vs_sweep": 40.69507263828901
+    }
+  ],
+  "seed": 20261117
+}

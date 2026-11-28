@@ -1,0 +1,31 @@
+{
+  "schema": "native-cost16-custody/v1",
+  "source_commit": "8f3d314c9f6ba549f27d660776888b65b63e29f1",
+  "phases": [
+    {
+      "name": "init",
+      "recorded": "2026-11-17T12:27:44.263628+00:00",
+      "kind": "metadata-control",
+      "exit": 1,
+      "expected_exit": 0,
+      "detail": {
+        "complete_error": "CalledProcessError(128, ['git', 'cat-file', 'blob', '8f3d314c9f6ba549f27d660776888b65b63e29f1:research/chained_primefield_cost_20261117/Cargo.lock'])"
+      }
+    },
+    {
+      "name": "finish",
+      "recorded": "2026-11-17T12:27:44.339363+00:00",
+      "kind": "metadata-control",
+      "exit": 1,
+      "expected_exit": 0,
+      "detail": {
+        "complete_error": "RuntimeError([{'guard': 'copied', 'complete_error': \"FileNotFoundError(2, 'No such file or directory')\"}, {'guard': 'dependencies', 'complete_error': \"FileNotFoundError(2, 'No such file or directory')\"}, {'guard': 'tools', 'complete_error': \"FileNotFoundError(2, 'No such file or directory')\"}])"
+      }
+    }
+  ],
+  "first_failure": "init",
+  "scientific_logic": "Rust",
+  "build_run_control": "thin shell",
+  "Python_role": "file/hash/JSON/process metadata only",
+  "compiler_temp_prospectively_excluded": "/run/lock/ct807-cost16A-compiler-temp"
+}

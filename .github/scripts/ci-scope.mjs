@@ -31,6 +31,12 @@ const isogenyEmbeddedInputs = new Set([
   'research/p192_p224_large_degree_isogenies_20261009/verification_poly.rs',
   'research/p192_p224_large_degree_isogenies_20261009/verification_kernel.rs',
 ]);
+// The odd-transfer release binary compile-time embeds this conditional Lean
+// artifact. Keep the release classification explicit as a fail-safe in
+// addition to automatic include_str! discovery.
+const oddTransferEmbeddedInputs = new Set([
+  'research/chained_jacobian_transfers_20261110/lean/ChainTransfer.lean',
+]);
 const prose = /\.(md|rst|txt|pdf|svg|png|jpg|jpeg|gif)$/i;
 const control = /^\.github\/scripts\/.*ci-scope.*$/;
 // These trees are copied into every Rust release archive. Documentation is
@@ -59,7 +65,7 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
       || rustReleasePayload.test(file) || rustReleaseRootPayload.test(file)
       || releaseAttributes || embedded.has(file)
       || isogenyCliRust.test(file) || isogenyAlgosInputs.test(file)
-      || isogenyEmbeddedInputs.has(file);
+      || isogenyEmbeddedInputs.has(file) || oddTransferEmbeddedInputs.has(file);
     // Both Makefile targets compile src/main.cu against include/ and the
     // committed generated headers; research benchmark sources are separate.
     const client = file === 'ecc2k130/src/main.cu' || file === 'ecc2k130/Makefile'
@@ -95,7 +101,7 @@ export function classify(files, embedded = new Set(), cargoSources = new Set()) 
     if (/^\.github\/workflows\/release\.ya?ml$/.test(file)) {
       result.release_rust = result.release_native = result.release_cuda = true;
     }
-    if (/^\.github\/workflows\/ecbench\.ya?ml$/.test(file)) result.ecbench_replay = true;
+    if (/^\.github\/workflows\/ecbench(-smoke)?\.ya?ml$/.test(file)) result.ecbench_replay = true;
     if (/^\.github\/workflows\/codeql\.ya?ml$/.test(file)) {
       result.actions = result.c_cpp = result.javascript = result.python = result.rust = true;
     }
@@ -221,11 +227,33 @@ export function sourceFiles(cwd) {
   return sources;
 }
 
+// Runtime readers do not use include_str!, so declare their exact tracked
+// fixtures. Retain them without hydrating a whole archive or generating data.
+export function runtimeInputs(cwd) {
+  const registry = 'tests/fixtures/rust-runtime-inputs.json';
+  const tracked = new Set(trackedFiles(cwd));
+  if (!tracked.has(registry)) return new Set();
+  const record = JSON.parse(sourceText(cwd, registry));
+  if (record.schema !== 'crypto.rust-runtime-inputs/v1' || !Array.isArray(record.paths)) {
+    throw new Error('invalid Rust runtime input registry');
+  }
+  const inputs = new Set([registry]);
+  for (const file of record.paths) {
+    if (typeof file !== 'string' || !/^[A-Za-z0-9._/-]+$/.test(file)
+        || path.posix.normalize(file) !== file || file.startsWith('/')
+        || file.split('/').includes('..') || !tracked.has(file) || inputs.has(file)) {
+      throw new Error('invalid or missing tracked Rust runtime input');
+    }
+    inputs.add(file);
+  }
+  return inputs;
+}
+
 // Compile-time include inputs are dependencies even when they are JSON,
 // SQL or historical research fixtures. Keep them derived from source rather
 // than a hand-maintained exclusion list that can miss the next include_str!.
 export function embeddedInputs(cwd, sources = sourceFiles(cwd)) {
-  const inputs = new Set();
+  const inputs = runtimeInputs(cwd);
   for (const file of sources) {
     const text = sourceText(cwd, file);
     for (const match of text.matchAll(/include_(?:str|bytes)!\(\s*"([^"\n]+)"/g)) {
@@ -289,7 +317,7 @@ export function materializeInputs(cwd = process.cwd()) {
     throw new Error('compile-time input escapes the checkout');
   }
   if (inputs.length) git(['sparse-checkout', 'add', ...inputs.map(input => `/${input}`)], cwd);
-  console.log(`materialized ${inputs.length} compile-time inputs`);
+  console.log(`materialized ${inputs.length} compile-time and declared runtime inputs`);
 }
 
 export function select({ event, base, head = 'HEAD', cwd = process.cwd() }) {

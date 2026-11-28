@@ -1,0 +1,909 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "HASHED-NATIVE-ECBENCH-20261030-FEASIBILITY-v2",
+  "version": 2,
+  "created": "2026-10-30",
+  "repository": "crypto",
+  "study_dir": "research/hashed_ecdl_ecbench_20261030",
+  "authors": [
+    "Codex for the native Certicom implementation request"
+  ],
+  "links": {
+    "spec": "research/hashed_ecdl_ecbench_20261030/spec.json",
+    "source": "Actual crates/hashed-ecdl-tensor through ic.hashed_native_v1; commit/image/binary/spec identities must be authenticated in checkpoint and Iso Lab receipts before execution.",
+    "prior_frozen_study": "research/hashed_ecdl_speed_20261029/PROTOCOL.md (separate; not replaced)",
+    "implementation": "src/cryptanalysis/ecbench/hashed_native.rs",
+    "superseded_protocol": "research/hashed_ecdl_ecbench_20261030/protocol.v1.superseded-before-data.json"
+  },
+  "question": "Which native hashed-base backends complete independently verified one-target solves within fixed work/resource budgets on four registered small prime curves, and in which exclusive phase do incomplete attempts stop, alongside matched rho and bundled IC references?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Every planned attempt is retained as a verified scalar or an explicitly recorded incomplete/invalid outcome; a resource limit is unknown, never a zero witness count or nonexistence proof.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "General runtime gains, full arithmetic S rankings, statistical scaling/crossover, fastest-tool status, challenge scalars and the independent theorem/implementation audit are outside this initial feasibility protocol.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-neg",
+      "role": "reference",
+      "description": "rho.negation; rho-neg; policies exactly as spec.json",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "profile": "release; static x86_64-unknown-linux-musl; default_features=false; RUSTFLAGS=-C target-cpu=x86-64; one identical authenticated source/image/binary for all arms"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "rho.negation"
+      }
+    },
+    {
+      "id": "rho-neg-aa",
+      "role": "control_aa",
+      "description": "rho.negation; rho-neg-aa; policies exactly as spec.json",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "profile": "release; static x86_64-unknown-linux-musl; default_features=false; RUSTFLAGS=-C target-cpu=x86-64; one identical authenticated source/image/binary for all arms"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "rho.negation"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "rho-neg-v2",
+      "role": "control_positive",
+      "description": "rho.negation_v2; rho-neg-v2; policies exactly as spec.json",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "profile": "release; static x86_64-unknown-linux-musl; default_features=false; RUSTFLAGS=-C target-cpu=x86-64; one identical authenticated source/image/binary for all arms"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "rho.negation_v2"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "native-source",
+      "role": "baseline",
+      "description": "ic.hashed_native_v1; native-source; policies exactly as spec.json",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "profile": "release; static x86_64-unknown-linux-musl; default_features=false; RUSTFLAGS=-C target-cpu=x86-64; one identical authenticated source/image/binary for all arms"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.hashed_native_v1",
+        "backend": "source",
+        "m": "2",
+        "trials": "16",
+        "columns": "4096",
+        "steps": "5000000",
+        "vector": "2000000",
+        "bits": "1000000",
+        "threshold": "32",
+        "derive_last": "1",
+        "smallest_first": "1",
+        "cache_entries": "4096",
+        "rank": "16",
+        "slices": "16",
+        "outer_multiplier": "2",
+        "attempts": "4096"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "native-selectors",
+      "role": "candidate",
+      "description": "ic.hashed_native_v1; native-selectors; policies exactly as spec.json",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "profile": "release; static x86_64-unknown-linux-musl; default_features=false; RUSTFLAGS=-C target-cpu=x86-64; one identical authenticated source/image/binary for all arms"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.hashed_native_v1",
+        "backend": "selectors",
+        "m": "2",
+        "trials": "16",
+        "columns": "4096",
+        "steps": "5000000",
+        "vector": "2000000",
+        "bits": "1000000",
+        "threshold": "32",
+        "derive_last": "1",
+        "smallest_first": "1",
+        "cache_entries": "4096",
+        "rank": "16",
+        "slices": "16",
+        "outer_multiplier": "2",
+        "attempts": "4096"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "native-selectors-aa",
+      "role": "control_aa",
+      "description": "ic.hashed_native_v1; native-selectors-aa; policies exactly as spec.json",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "profile": "release; static x86_64-unknown-linux-musl; default_features=false; RUSTFLAGS=-C target-cpu=x86-64; one identical authenticated source/image/binary for all arms"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.hashed_native_v1",
+        "backend": "selectors",
+        "m": "2",
+        "trials": "16",
+        "columns": "4096",
+        "steps": "5000000",
+        "vector": "2000000",
+        "bits": "1000000",
+        "threshold": "32",
+        "derive_last": "1",
+        "smallest_first": "1",
+        "cache_entries": "4096",
+        "rank": "16",
+        "slices": "16",
+        "outer_multiplier": "2",
+        "attempts": "4096"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "native-width",
+      "role": "candidate",
+      "description": "ic.hashed_native_v1; native-width; policies exactly as spec.json",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "profile": "release; static x86_64-unknown-linux-musl; default_features=false; RUSTFLAGS=-C target-cpu=x86-64; one identical authenticated source/image/binary for all arms"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.hashed_native_v1",
+        "backend": "width",
+        "m": "2",
+        "trials": "16",
+        "columns": "4096",
+        "steps": "5000000",
+        "vector": "2000000",
+        "bits": "1000000",
+        "threshold": "32",
+        "derive_last": "1",
+        "smallest_first": "1",
+        "cache_entries": "4096",
+        "rank": "16",
+        "slices": "16",
+        "outer_multiplier": "2",
+        "attempts": "4096"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "native-partial",
+      "role": "candidate",
+      "description": "ic.hashed_native_v1; native-partial; policies exactly as spec.json",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "profile": "release; static x86_64-unknown-linux-musl; default_features=false; RUSTFLAGS=-C target-cpu=x86-64; one identical authenticated source/image/binary for all arms"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.hashed_native_v1",
+        "backend": "partial",
+        "m": "2",
+        "trials": "16",
+        "columns": "4096",
+        "steps": "5000000",
+        "vector": "2000000",
+        "bits": "1000000",
+        "threshold": "32",
+        "derive_last": "1",
+        "smallest_first": "1",
+        "cache_entries": "4096",
+        "rank": "16",
+        "slices": "16",
+        "outer_multiplier": "2",
+        "attempts": "4096"
+      },
+      "same_instrument_as": "rho-neg"
+    },
+    {
+      "id": "ic-mitm",
+      "role": "baseline",
+      "description": "ic.pipeline; ic-mitm; policies exactly as spec.json",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--no-default-features",
+            "--target",
+            "x86_64-unknown-linux-musl",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "profile": "release; static x86_64-unknown-linux-musl; default_features=false; RUSTFLAGS=-C target-cpu=x86-64; one identical authenticated source/image/binary for all arms"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1,
+        "image_digest": null
+      },
+      "parameters": {
+        "method": "ic.pipeline",
+        "factor_base": "prime-abscissa:size=32",
+        "oracle": "mitm:negation_folded=1"
+      },
+      "same_instrument_as": "rho-neg"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-rho-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "rho-neg-v2",
+      "expected_detection": "The complete rho.negation_v2 positive control must recover and independently verify every same public target. It checks the workload/harness, not a population of native relation yields. Native known-answer and zero-budget controls remain mandatory development gates; any native resource failure is unknown, not a null finding.",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Every public target belongs to a prime cyclic subgroup and has a logarithm; no no-solution population or nonexistence claim is tested. Explicit zero-budget/exhaustion and forged-witness controls are development gates, not success rows in this panel."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "rho-neg",
+          "rho-neg-v2",
+          "native-source",
+          "native-selectors",
+          "native-width",
+          "native-partial",
+          "ic-mitm"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "curve",
+        "treatment": "fixed",
+        "value": "prime_roster indices 10/12/14/16; actual field bits 10/12/14/16; all require registered ICV1 and readable EC1",
+        "how": "Registered=true required from ecbench plan; retain exact ICV1/EC1 and subgroup identities."
+      },
+      {
+        "name": "targets",
+        "treatment": "fixed",
+        "value": "8 public targets per curve; hash_to_subgroup_v1; target_seed=2026103001",
+        "how": "32 one-target workloads, sampled independently of arm; no target logarithm supplied to the native solver."
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One release binary/image and source, resolved before execution in authenticated receipts",
+        "how": "All arms share the executable; bind source manifest, source checkpoint/readback, build-info, binary SHA-256, OCI digest, workflow SHA and spec hash. Null pre-build identity fields are not admission."
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Native observer is scoped and single-threaded; fixed thread environment; four-vCPU isolated pod retains housekeeping cores."
+      },
+      {
+        "name": "native_policy",
+        "treatment": "fixed",
+        "value": "All native arms share m=2, tau=32, 5M steps, vector=2M, columns=4096 and every explicit spec policy",
+        "how": "Only backend changes. Source uses the current unmodified reduction entry; unused backend-specific knobs are declared but do not change that entry. Partial outer threshold is min(2*tau,s)."
+      },
+      {
+        "name": "algorithm_seed",
+        "treatment": "randomized",
+        "how": "ecbench derives one shared seed per workload/round from measurement.seed=2026103002, workload ID and absolute round; warmups use a separate domain."
+      },
+      {
+        "name": "arm_order",
+        "treatment": "randomized",
+        "how": "spec order=shuffle, deterministic Fisher-Yates per workload/round from the frozen seed."
+      },
+      {
+        "name": "host",
+        "treatment": "fixed",
+        "value": "one c8a.2xlarge EKS Spot worker; one epoch; 4GiB",
+        "how": "Record actual CPU/model/kernel/SMT/NUMA/frequency/cgroup/image and host class; no cross-host timing."
+      },
+      {
+        "name": "host_load",
+        "treatment": "measured",
+        "how": "Every row retains L2 grade/blockers, CPU placement, steal/PSI and foreign activity; A/A is mandatory."
+      },
+      {
+        "name": "warmup",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "One warmup per workload/arm, retained but excluded by rule from measured comparisons."
+      },
+      {
+        "name": "spot_interruption",
+        "treatment": "measured",
+        "how": "One original 1800s deadline including provisioning; zero retries/restores; incomplete/interrupted records retained, no restored timing."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded feasibility assessment",
+        "how": "Backend/error signatures reveal arm identity; report all rows and scope every observation, with no significance or speed claim."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-rho-aa",
+        "arms": [
+          "rho-neg",
+          "rho-neg-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-native-aa",
+        "arms": [
+          "native-selectors",
+          "native-selectors-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-source-selectors",
+        "arms": [
+          "native-source",
+          "native-selectors"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-source-width",
+        "arms": [
+          "native-source",
+          "native-width"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-source-partial",
+        "arms": [
+          "native-source",
+          "native-partial"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-native-rho",
+        "arms": [
+          "rho-neg",
+          "native-selectors"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "absolute",
+        "threshold": "Descriptive reference only: any returned scalar must verify; no comparative gain or full-cost ranking is decided in C2."
+      },
+      {
+        "id": "C-native-v2",
+        "arms": [
+          "rho-neg-v2",
+          "native-selectors"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "absolute",
+        "threshold": "Descriptive reference only: any returned scalar must verify; no comparative gain or full-cost ranking is decided in C2."
+      },
+      {
+        "id": "C-native-ic",
+        "arms": [
+          "ic-mitm",
+          "native-selectors"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "absolute",
+        "threshold": "Descriptive reference only: any returned scalar must verify; no comparative gain or full-cost ranking is decided in C2."
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "spec measurement.seed=2026103002; algorithm seed derive_u64(ecbench.algorithm_seed,[seed,workload_id_u64,absolute_round]), warmup uses ecbench.warmup_seed; all arms share the seed per workload/round. Shuffle order uses ecbench.order independently."
+    },
+    "instance_sampling": {
+      "rule": "32 public targets, 8 per registered prime_roster index 10/12/14/16, target_seed=2026103001, hash_to_subgroup_v1",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Unblinded feasibility/correctness report, with all arms, failures and limits retained; no statistical significance decision.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 32,
+    "replicates": 5,
+    "warmups": 1,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "C1 is exact verification/census of the frozen 1728 executions (1440 measured plus 288 warmup), not a power claim. Eight targets/curve do not establish a minimum detectable effect, scaling or general success probability. All comparative analyses are exploratory/out of scope for C2."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 1800,
+      "measured_on": "No matched native runtime preflight is available before the required checkpoint/image gates. 1800 is the hard original job-budget ceiling, not a measured runtime prediction. This bounded first feasibility run records warmup/first-call behavior without adapting the frozen plan. No local test timing or unrelated fixture is substituted. This explicit bootstrap limitation is part of the protocol."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "total_gae",
+        "name": "Counted native group-call GAE",
+        "unit": "group-addition equivalents",
+        "kind": "counted",
+        "definition": "All native checked prime group calls, including identity/inverse cases, from curve setup through final internal replay. Scalar products are expanded into their group calls, never double charged. Other native arithmetic is not completely priced.",
+        "source": "records.jsonl cost.total_gae and phases",
+        "aggregation": "per_row",
+        "resolution": "1 GAE",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "s",
+        "name": "S lower bound",
+        "unit": "GAE/sqrt(r)",
+        "kind": "derived",
+        "definition": "Cold total counted GAE normalized by subgroup size; incomplete native arithmetic inventory makes this a lower bound.",
+        "source": "records.jsonl cost.s",
+        "formula": "cost.total_gae / sqrt(workload.curve.r)",
+        "aggregation": "per_row",
+        "resolution": "1/sqrt(r)",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "solve_wall_seconds",
+        "name": "Instrumented native cold solve wall",
+        "unit": "s",
+        "kind": "timed",
+        "definition": "Actual instrumented solve from observer/setup start through native return including all retries, failure work, elimination and internal replay. Runner process/startup/final independent verification are separately retained. Observer overhead is included and not calibrated away.",
+        "source": "records.jsonl time.solve_wall_ns; phases.wall_ns; online",
+        "aggregation": "per_row",
+        "resolution": "nanosecond clock field; effective resolution recorded by host",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "native_meter_attempts",
+        "name": "Unpriced native meter attempts",
+        "unit": "diagnostic meter attempts",
+        "kind": "counted",
+        "definition": "All attempted meter charges by exclusive phase, including exhausted work; not calibrated primitive arithmetic and not a complete native-operation inventory.",
+        "source": "records.jsonl counters *.native_meter_attempts_uncharged",
+        "aggregation": "per_row",
+        "resolution": "one diagnostic charged step",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "randomized",
+    "clock": "counted",
+    "counters": [
+      "native_steps",
+      "selector_decodes",
+      "selector_cache_hits",
+      "derived_checks",
+      "functional_assignments",
+      "edge_assignments",
+      "witness_searches",
+      "*.native_meter_attempts_uncharged"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "env_class_id",
+      "isolation.level",
+      "isolation.blockers",
+      "steal_ticks",
+      "psi",
+      "run_cpu",
+      "threads",
+      "exclusive cold and online clocks",
+      "all failed attempts/restarts"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-l2-spot",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "cpus": 4,
+      "spot": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 1800,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Fixed design: 9 arms x 32 workloads x (1 warmup + 5 measured rounds) = 1728 executions. Each child has 30s and every native call a 5M-step bound. One original 1800s job deadline includes provisioning and the maintained harness quiet period.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stop on the original deadline, interruption, input/integrity failure or execution/admission failure; preserve every partial artifact and row. Unknown native outcomes remain explicit; never drop them or extend the budget to obtain a full comparison.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "a row with outcome.status other than verified is excluded from the decisive comparison and reported",
+    "a wall-time value on a row below L2 is descriptive only (wall_valid false); counted units stand at any level"
+  ],
+  "decision_rule": {
+    "text": "Report exact attempted/verified/exhausted/error/interrupted flow per backend and curve, exclusive cost/failure stages, all scalars checked by the harness and exact replays. Any incomplete arm prevents a complete cross-arm cost comparison. Require all maintained L2/replay/A-A/S3 gates unchanged; their failure is an invalid/incomplete measurement, never a fast success. C2 remains out of scope regardless of exploratory ratios.",
+    "comparison_ids": [
+      "C-source-selectors"
+    ],
+    "threshold": "exact scalar validation and replay for every completed row; fixed budgets and intact admission for any timing",
+    "statistic": "per-curve complete-row census and phase costs; exploratory paired totals only when complete",
+    "interval": "none for exact C1; any exploratory ecbench paired-bootstrap interval is scoped to the sampled targets and admission",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "raw per-curve outcomes/counts; ratios only with complete verified pairs and full disclosure of unpriced work",
+    "verdict_vocabulary": [
+      "verified_within_budget",
+      "incomplete_unknown",
+      "invalid_measurement",
+      "not_attempted"
+    ]
+  },
+  "analysis_plan": {
+    "script": null,
+    "inputs": [
+      "session/records.jsonl",
+      "session/session.json",
+      "audit.json",
+      "l2-gate.json",
+      "control-comparison.json",
+      "build/source/image/checkpoint receipts"
+    ],
+    "outputs": [
+      "ecbench verify --dir SESSION --replay-all --exit-code",
+      "ecbench table --dir SESSION",
+      "ecbench compare --dir SESSION --a rho-neg --b rho-neg-aa --save",
+      "ecbench compare --dir SESSION --a native-selectors --b native-selectors-aa --save",
+      "ecbench compare --dir SESSION --a native-source --b native-selectors --save (incomplete stays incomplete)",
+      "ecbench compare --dir SESSION --a rho-neg --b native-selectors --save (bounded native S is not ranked)",
+      "canonical experiment_protocol.py from-ecbench/check-export/flow; independent replay on a different host class before any promotion"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "S per arm per workload with the A/A interval"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Replacing this actual native arm with ic.tensor_contraction_v1 or an unrelated fixture",
+    "Changing source, workloads, parameters, order, seeds, unit, budgets, sample size or accounting after seeing data",
+    "Discarding failed/incomplete rows, ranking successful-only subsets as the full solve, or treating a resource limit as nonexistence",
+    "Launching without a fresh exact-source S3 checkpoint/readback and authenticated exact-image/native-execution admission",
+    "Reporting local development/preflight timings as this experiment, or pretending the hard budget ceiling is a measured runtime prediction",
+    "Treating diagnostic meter steps as a complete calibrated arithmetic price; all arms' unpriced counters must be shown at 0, 0.1 and 1 without promoting a full ranking",
+    "Claiming uninstrumented/native production speed, a scaling theorem/crossover, best external tool, or either Certicom challenge scalar",
+    "Replacing the original frozen native A/B study or its profiling; omitting the open binary end-to-end adapter, schoolbook full-pipeline integration, and independent general audit gaps",
+    "Automatic resubmission/retry, changing job identity after an ambiguous submission, or reusing an interrupted clock"
+  ],
+  "literature": [
+    {
+      "ref": "https://github.com/bochum-crypto/subexponential-ecdl/tree/1ee44e562b1b9a50ea339f3b8f81112b5a24b96f",
+      "provenance": "retrieved",
+      "claim": "Source fixed affine hash modulus and point-constraint reduction; no finite-size speed claim follows from its asymptotic theorem.",
+      "verified_by": "Prior native implementation review; pinned PDF section 3 and source constants retained in native docs."
+    },
+    {
+      "ref": "research/hashed_ecdl_finite_size_20261030/README.md",
+      "provenance": "internal",
+      "claim": "Selector, width and partial implementations are finite bounded strategies; source packet theorem/guard is unchanged; binary domains and schoolbook primitives are not full measured pipelines."
+    },
+    {
+      "ref": "docs/ecbench/README.md and .agents/skills/ecbench-measure/SKILL.md",
+      "provenance": "retrieved",
+      "claim": "Registered curves, shared seeds, all-phase counted units, L2/A-A, replay-all, incomplete comparisons and symmetric unpriced-work band."
+    },
+    {
+      "ref": "taskq/deploy/eks-karpenter/HARNESS.md and ACCESS.md",
+      "provenance": "retrieved",
+      "claim": "Authenticated source/image/job/pod identity, fixed deadlines, S3 hash verification and zero automatic retries; no legacy fixture substitution."
+    }
+  ],
+  "amendments": [
+    {
+      "id": "A1-complete-source-publication",
+      "filed": "2026-10-30",
+      "filed_before_affected_data": true,
+      "reason": "The publication inventory caught two tested checkpoint helpers omitted from the first source commit. Freeze the complete source after committing those helpers; preserve the original frozen v1 unchanged. No scientific run or affected data exists.",
+      "changes": [
+        "Include already validated checkpoint-source and test-checkpoint-source.sh in the published source history before source checkpoint/readback.",
+        "Bind v2 freeze to the complete source commit. Algorithm, panel, seeds, controls, sample counts, budgets and analysis plan are unchanged."
+      ],
+      "supersedes_fields": [
+        "freeze.commit",
+        "version",
+        "protocol_id"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "7c190b2d666fe3c1d648d085457cf81ef0b87c96d81454a575a69c415c126e2e",
+    "commit": "0c80eded0a095c4be39e58a9e18823baa1c64c92",
+    "frozen_at": "2026-10-30T17:20:32Z",
+    "filed_before_affected_data": true
+  }
+}

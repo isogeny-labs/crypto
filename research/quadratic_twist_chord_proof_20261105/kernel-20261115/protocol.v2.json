@@ -1,0 +1,576 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "twist-chord-kernel-20261115",
+  "version": 2,
+  "created": "2026-11-15",
+  "repository": "crypto",
+  "study_dir": "research/quadratic_twist_chord_proof_20261105/kernel-20261115",
+  "authors": [
+    "producer"
+  ],
+  "question": "Do the unchanged five chord statements elaborate after using the existing2nonzero hypothesis in denominator-clearing tactics, with the same official axiom gate and five meaningful false-source controls?",
+  "claims": [
+    {
+      "id": "chord-algebra",
+      "text": "Scoped elaboration and standard-axiom audit of five exact generic field-algebra statements",
+      "class": "exact_computation",
+      "decided_by": [
+        "exact-coverage"
+      ]
+    },
+    {
+      "id": "yield-degree-speed",
+      "text": "No new useful-yield, minimum-degree, point-group reduction or speed conclusion from this algebra proof alone",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "gate-source-A",
+      "role": "candidate",
+      "description": "gate-source-A on exact pre-filed Lean source with current unmodified official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "source_bundle": "five original declarations, false statement only on negative arms"
+      }
+    },
+    {
+      "id": "gate-source-B",
+      "role": "control_aa",
+      "description": "gate-source-B on exact pre-filed Lean source with current unmodified official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "source_bundle": "five original declarations, false statement only on negative arms"
+      }
+    },
+    {
+      "id": "gate-positive",
+      "role": "control_positive",
+      "description": "gate-positive on exact pre-filed Lean source with current unmodified official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 0,
+        "source_bundle": "five original declarations, false statement only on negative arms"
+      }
+    },
+    {
+      "id": "reject-curve-line",
+      "role": "control_negative",
+      "description": "reject-curve-line on exact pre-filed Lean source with current unmodified official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1,
+        "source_bundle": "five original declarations, false statement only on negative arms"
+      }
+    },
+    {
+      "id": "reject-cubic-remainder",
+      "role": "control_negative",
+      "description": "reject-cubic-remainder on exact pre-filed Lean source with current unmodified official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1,
+        "source_bundle": "five original declarations, false statement only on negative arms"
+      }
+    },
+    {
+      "id": "reject-vanishing-sound",
+      "role": "control_negative",
+      "description": "reject-vanishing-sound on exact pre-filed Lean source with current unmodified official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1,
+        "source_bundle": "five original declarations, false statement only on negative arms"
+      }
+    },
+    {
+      "id": "reject-distinct-complete",
+      "role": "control_negative",
+      "description": "reject-distinct-complete on exact pre-filed Lean source with current unmodified official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1,
+        "source_bundle": "five original declarations, false statement only on negative arms"
+      }
+    },
+    {
+      "id": "reject-diagonal",
+      "role": "control_negative",
+      "description": "reject-diagonal on exact pre-filed Lean source with current unmodified official gate",
+      "instrument": {
+        "repo": "leanprover/lean4",
+        "commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+        "build": null,
+        "binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+        "threads": 2,
+        "flags": {
+          "official_gate": "c0ee51e36b2c45e09d1341882d8f2fe9be58a30d",
+          "audit": "5d346e4df70b264c339c49c334f56167184d63a1",
+          "import_trust_level": "0"
+        }
+      },
+      "parameters": {
+        "expected_exit": 1,
+        "source_bundle": "five original declarations, false statement only on negative arms"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "determinism",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "gate-positive",
+      "expected_detection": "Fresh true-source elaboration and scoped axiom audit accept all five exact declarations with0 failing/trusted axioms",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "reject-curve-line",
+      "null_population": {
+        "description": "Five pre-filed single-statement false sources, otherwise byte-identical passing source",
+        "generator": "Literal source text replacements and hashes in CONTROL_SOURCES.v1.json; generated copies strictly byte-equal",
+        "n": 5,
+        "why_n": "One meaningful false statement for each proposed theorem; not statistical power",
+        "matched_on": [
+          "source except one statement",
+          "compiler",
+          "Mathlib/dependencies",
+          "official gate/auditor",
+          "resource budget"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "source_truth",
+        "levels": [
+          "five original stated identities",
+          "one false conclusion per negative source"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source",
+        "treatment": "fixed",
+        "value": "Original Chord.lean SHA4d288b3...",
+        "how": "Exact source hash and typed theorem statements, no pre-run tactic correction"
+      },
+      {
+        "name": "dependencies",
+        "treatment": "fixed",
+        "value": "Lean4.34.1,Mathlibd13f23,8 exact packages",
+        "how": "Public release SHA and full compiled-library inventory before launch"
+      },
+      {
+        "name": "process_repeat",
+        "treatment": "fixed",
+        "value": [
+          "A",
+          "B",
+          "positive"
+        ],
+        "how": "Fresh elaborations/audits, compare reports not wall times"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": [
+          "gate-source-A",
+          "gate-source-B",
+          "gate-positive",
+          "reject-curve-line",
+          "reject-cubic-remainder",
+          "reject-vanishing-sound",
+          "reject-distinct-complete",
+          "reject-diagonal"
+        ],
+        "how": "Fixed gates; first unexpected failure stops full plan"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "exact-coverage",
+        "arms": [
+          "gate-source-A",
+          "gate-source-B",
+          "gate-positive",
+          "reject-curve-line",
+          "reject-cubic-remainder",
+          "reject-vanishing-sound",
+          "reject-distinct-complete",
+          "reject-diagonal"
+        ],
+        "differs_in": [
+          "source_truth"
+        ],
+        "design": "absolute",
+        "threshold": "All five public names accepted by official axiom gate with0 failing/trusted; five false-source gates exit1/FAIL by mathematical diagnostic"
+      },
+      {
+        "id": "determinism",
+        "arms": [
+          "gate-source-A",
+          "gate-source-B"
+        ],
+        "differs_in": [
+          "process_repeat"
+        ],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": false,
+    "transfer_obligations": []
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Dependency-ordered exact finite enumeration and adversarial controls; no clock statistic",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "note": "Deterministic census; seed0 records no randomness"
+    },
+    "instance_sampling": {
+      "rule": "One full finite bundle; no sampling or independent-challenge interpretation",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit algorithms and semantic attacks; exact equality criteria frozen before full data"
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exact finite source/control bundle, no statistical confidence or timing inference; source never elaborated at freeze."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 30,
+      "threads": 2,
+      "estimated_total_seconds": 300,
+      "measured_on": "Conservative UNMEASURED task-proof estimate after public dependency restore; all real stage600s/outer3600s caps enforced"
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "exit_code",
+        "name": "Native exit code",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Native exit code; no timing or pricing inference",
+        "source": "*.exit",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "audited_theorems",
+        "name": "audited_theorems",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "All in-scope theorem declarations reported by unmodified Lean axiom audit, including helpers",
+        "source": "official gate/audit logs",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "failing_axioms",
+        "name": "failing_axioms",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Non-foundational axioms in scope",
+        "source": "official gate/audit logs",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "trusted_native",
+        "name": "trusted_native",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Native-trust declarations, required0",
+        "source": "official gate/audit logs",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "audited_theorems",
+      "failing_axioms",
+      "trusted_native"
+    ],
+    "record": [
+      "actual published source head",
+      "exact true/false sources",
+      "compiler release/binary SHA",
+      "Mathlib/dependency identities and cache inventory",
+      "gate/auditor/trust-file SHA",
+      "all commands/exits/build/audit/status logs"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "placement": {
+      "outer_seconds": 3600,
+      "max_local_workers": 2,
+      "paid_resources": false
+    },
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Run all8 gate stages or stop on first unexpected true-source/gate/infrastructure failure, missing theorem, forbidden axiom, false source accepted or non-mathematical negative failure",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stage600seconds and outer3600seconds; any cap means incomplete, not a null",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "All five exact public declarations plus every in-scope theorem accepted by official standard-axiom audit, and each false-source control genuinely rejected; otherwise failed/incomplete, preserve source/logs",
+    "comparison_ids": [
+      "exact-coverage"
+    ],
+    "threshold": "All true gates0, all five false gates1/FAIL by math diagnostic;0 failing/extra trusted axioms; no zero-theorem gate",
+    "statistic": "Exact Lean elaboration, scope/name and transitive-axiom output, false-source rejection",
+    "interval": "none; finite deterministic enumeration",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "No numerical algorithm gain; source theorem/control completeness",
+    "verdict_vocabulary": [
+      "scoped_kernel_observation_unsigned",
+      "failed",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "../../../tools/lean/AuditAxioms.lean",
+      "sha256": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929"
+    },
+    "inputs": [
+      "Same original five statements with only denominator-clearing tactics corrected; exact new source hash",
+      "all5 false source templates",
+      "ENVIRONMENT.json",
+      "unmodified gate and audit sources"
+    ],
+    "outputs": [
+      "all gate build/audit/status logs",
+      "axiom declarations",
+      "exact attempted sources and exits"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Dependency/branch diagram and theorem/control acceptance inventory, no performance figure"
+    ],
+    "report_dir": "reports/kernel-20261115"
+  },
+  "inadmissible": [
+    "Skip/patch/fake official gate or its trust manifest",
+    "Weaken a theorem hypothesis/conclusion after failure",
+    "Use sorry/new axiom/native_decide/unsafe evaluation",
+    "Count rejected false source or failed build as proof",
+    "Publish false .lean fixtures as global claimed proofs",
+    "Claim kernel output is signed PCC standing or generic DLP/degree result",
+    "Upload denied result assets, credentials or paid resources"
+  ],
+  "literature": [
+    {
+      "ref": "../Chord.lean and original PROTOCOL.md",
+      "provenance": "internal",
+      "claim": "Exact five source-only field algebra obligations; no previous elaboration"
+    },
+    {
+      "ref": "tools/lean/proof-gate.sh and AuditAxioms.lean current official blobs",
+      "provenance": "internal",
+      "claim": "Unmodified scope/axiom policy and zero-theorem rejection"
+    },
+    {
+      "ref": "Mathlibd13f23 Cache/README.md and lake-manifest.json",
+      "provenance": "retrieved",
+      "claim": "Exact public dependency/cache restoration, no decryption or result upload"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "use-existing-nonzero-two",
+      "filed": "2026-11-15",
+      "filed_before_affected_data": true,
+      "reason": "Faithful first kernel attempt failed diagonal proof ring normalization; original source/logs retained",
+      "changes": [
+        "Only field_simp[h2] tactic use, no statement/hypothesis/definition changes",
+        "Regenerate all five single-false-statement fixtures from corrected true base before any negative execution",
+        "Keep complete8-stage plan, current official tools, dependency/binary pins, budgets and standard-axiom criterion unchanged"
+      ],
+      "supersedes_fields": [
+        "extensions.source_sha256",
+        "analysis_plan.inputs"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "a8a36316a96ec9f7b477e3ee7d23c6fa324fb9279262d6c0aa010066f20f9fa2",
+    "commit": "e9b345ea4cfa7a50e0b96b5cc85039d12932a1d3",
+    "frozen_at": "2026-11-15T06:51:31Z",
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "checkpoint": "Existing explicit user-selected GitHub transport for same branch, fresh connected head receipt<=60s, clean committed source and exact file pins; no S3/skip flag",
+    "canonical_tool_commit": "0ca36c9d5b49f2fcba56f79a51456a715b7aae5e",
+    "modes": [
+      "curve-line",
+      "cubic-remainder",
+      "vanishing-sound",
+      "distinct-complete",
+      "diagonal"
+    ],
+    "source_sha256": "3f661b823cfc9c89c23602ad78e689668c2cc233135c58cc578ee009bb51672d",
+    "environment_inventory_sha256": "ea34f2a336b1ddbe7b2e1d2df3b1fdafb59b907a1cbf7be23cd31784ab5b3ba7",
+    "task_proof_execution_before_freeze": false,
+    "earlier_native_iteration": "FINISHED; new<=3600s window starts at first target gate, no old native process in flight",
+    "first_source_failure": {
+      "checkpoint": "d72c01e8b312b7983a92f57644ed95b3fbfc873f",
+      "source_sha256": "4d288b3a06290371c95912bb8ff01084c8727a0c8eb76d3cf405f833229756aa",
+      "status": "FAIL_build",
+      "gate_exit": 1,
+      "diagnostic": "diagonal_quadratic ring inverse2 normalization",
+      "unaccepted_sorryAx": true
+    },
+    "controls_manifest": "CONTROL_SOURCES.v2.json",
+    "source_commit": "e9b345ea4cfa7a50e0b96b5cc85039d12932a1d3"
+  }
+}

@@ -1,0 +1,201 @@
+--- ${SCRATCH}/leads/isolab/isolab-experiment.origin-main.yml	2026-11-16 21:50:45.527135377 +0000
++++ ${SCRATCH}/leads/isolab/work/.github/workflows/isolab-experiment.yml	2026-11-16 21:50:52.342291041 +0000
+@@ -28,6 +28,14 @@
+         description: Run the frozen exact norm-branch rank census as one non-timing Spot command Job
+         type: boolean
+         default: false
++      f4_fp_ab:
++        description: Run the frozen f4_fp_bench A/B/A-A payload (research/f4_fp_ab_isolab_20261116) as one command Job
++        type: boolean
++        default: false
++      f4ab_cpu:
++        description: Exclusive CPUs for the f4_fp_ab command Job (even, 2..14)
++        type: string
++        default: '14'
+       instance_type:
+         description: Spot worker type; c8a has one thread per core
+         type: string
+@@ -141,7 +149,7 @@
+             examples
+       - name: Materialize native build inputs
+         working-directory: source
+-        run: ../control/scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos --path crates --path research/pencil_large_prime_20261029 --path research/five_leads_e2e_20261019/native --path research/prime_leads_chase_20261113/norm-branch-census --path .artifacts --path taskq/deploy/eks-karpenter/resume/fresh-owner
++        run: ../control/scripts/sparse-checkout.sh apply --profile minimal --path isogeny_algos --path crates --path research/pencil_large_prime_20261029 --path research/five_leads_e2e_20261019/native --path research/prime_leads_chase_20261113/norm-branch-census --path research/f4_fp_ab_isolab_20261116 --path .artifacts --path taskq/deploy/eks-karpenter/resume/fresh-owner
+       - name: Pull store data needed by the tested source
+         working-directory: source
+         env:
+@@ -199,6 +207,31 @@
+             '.norm_branch_produce_sha256=$producer | .norm_branch_check_sha256=$checker | .norm_branch_protocol_sha256=$protocol' \
+             "$RUNNER_TEMP/isolab-build/build-info.json" > "$RUNNER_TEMP/isolab-build/build-info.next.json"
+           mv "$RUNNER_TEMP/isolab-build/build-info.next.json" "$RUNNER_TEMP/isolab-build/build-info.json"
++      - name: Build the frozen f4_fp_bench A/B payload without AWS credentials
++        if: inputs.f4_fp_ab
++        working-directory: source
++        run: |
++          set -euo pipefail
++          study=research/f4_fp_ab_isolab_20261116
++          export CARGO_BUILD_JOBS=2
++          export CARGO_TARGET_DIR="$GITHUB_WORKSPACE/source/target"
++          export RUSTFLAGS='-C target-cpu=x86-64'
++          cargo +1.99.1 build --locked --release --no-default-features \
++            --target x86_64-unknown-linux-musl --example f4_fp_bench
++          install -m755 "$CARGO_TARGET_DIR/x86_64-unknown-linux-musl/release/examples/f4_fp_bench" \
++            "$RUNNER_TEMP/isolab-build/f4_fp_bench"
++          install -m755 "$study/launch/run.sh" "$RUNNER_TEMP/isolab-build/f4ab-run"
++          install -m644 "$study/protocol.json" "$RUNNER_TEMP/isolab-build/f4ab-protocol.json"
++          readelf -h "$RUNNER_TEMP/isolab-build/f4_fp_bench" | grep -q 'Advanced Micro Devices X86-64'
++          if readelf -l "$RUNNER_TEMP/isolab-build/f4_fp_bench" | grep -q INTERP; then
++            echo 'f4_fp_bench must be statically linked' >&2; exit 2
++          fi
++          bench_sha=$(sha256sum "$RUNNER_TEMP/isolab-build/f4_fp_bench" | cut -d' ' -f1)
++          protocol_sha=$(sha256sum "$RUNNER_TEMP/isolab-build/f4ab-protocol.json" | cut -d' ' -f1)
++          jq --arg bench "$bench_sha" --arg protocol "$protocol_sha" \
++            '.f4_fp_bench_sha256=$bench | .f4ab_protocol_sha256=$protocol' \
++            "$RUNNER_TEMP/isolab-build/build-info.json" > "$RUNNER_TEMP/isolab-build/build-info.next.json"
++          mv "$RUNNER_TEMP/isolab-build/build-info.next.json" "$RUNNER_TEMP/isolab-build/build-info.json"
+       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+         with:
+           name: isolab-build-${{ github.run_id }}-${{ github.run_attempt }}
+@@ -210,6 +243,9 @@
+             ${{ runner.temp }}/isolab-build/norm-branch-check
+             ${{ runner.temp }}/isolab-build/norm-branch-run
+             ${{ runner.temp }}/isolab-build/norm-branch-protocol.json
++            ${{ runner.temp }}/isolab-build/f4_fp_bench
++            ${{ runner.temp }}/isolab-build/f4ab-run
++            ${{ runner.temp }}/isolab-build/f4ab-protocol.json
+           if-no-files-found: error
+           retention-days: 7
+           compression-level: 0
+@@ -268,8 +304,13 @@
+           SIZE_SWEEP: ${{ inputs.size_sweep }}
+           RESUMABLE: ${{ inputs.resumable }}
+           NORM_BRANCH_CENSUS: ${{ inputs.norm_branch_census }}
++          F4_FP_AB: ${{ inputs.f4_fp_ab }}
+         run: |
+           set -euo pipefail
++          if [[ "$F4_FP_AB" == true && ( "$PUBLISH_ONLY" == true || "$SIZE_SWEEP" == true || "$RESUMABLE" == true || "$NORM_BRANCH_CENSUS" == true ) ]]; then
++            echo 'f4_fp_ab cannot be combined with another mode' >&2
++            exit 2
++          fi
+           if [[ "$NORM_BRANCH_CENSUS" == true && ( "$PUBLISH_ONLY" == true || "$SIZE_SWEEP" == true || "$RESUMABLE" == true ) ]]; then
+             echo 'norm_branch_census cannot be combined with publish_only, size_sweep, or resumable' >&2
+             exit 2
+@@ -283,7 +324,7 @@
+             sudo "$RUNNER_TEMP/awscli-install/aws/install"
+           fi
+       - name: Read the experiment spec from the tested commit
+-        if: '!inputs.publish_only && !inputs.size_sweep && !inputs.norm_branch_census'
++        if: '!inputs.publish_only && !inputs.size_sweep && !inputs.norm_branch_census && !inputs.f4_fp_ab'
+         env:
+           GH_TOKEN: ${{ github.token }}
+           SPEC_PATH: ${{ inputs.spec_path }}
+@@ -324,6 +365,24 @@
+             --user 1000:1000 --workdir /work --env HOME=/work \
+             --label "org.opencontainers.image.revision=$SOURCE_REVISION" \
+             --out "$RUNNER_TEMP/norm-branch-image.json"
++      - name: Publish the frozen f4_fp_ab payload as a digest-pinned layer
++        if: inputs.f4_fp_ab
++        run: |
++          set -euo pipefail
++          export AWS_CA_BUNDLE="${AWS_CA_BUNDLE:-/etc/ssl/certs/ca-certificates.crt}"
++          layer="$RUNNER_TEMP/f4ab-layer"
++          install -d -m755 "$layer/usr/local/bin" "$layer/opt/isolab/f4ab"
++          install -m755 "$RUNNER_TEMP/isolab-build/f4_fp_bench" "$layer/usr/local/bin/f4_fp_bench"
++          install -m755 "$RUNNER_TEMP/isolab-build/f4ab-run" "$layer/opt/isolab/f4ab/run"
++          install -m644 "$RUNNER_TEMP/isolab-build/f4ab-protocol.json" "$layer/opt/isolab/f4ab/protocol.json"
++          install -m644 "$RUNNER_TEMP/isolab-build/build-info.json" "$layer/opt/isolab/build-info.json"
++          python3 taskq/deploy/eks-karpenter/oci-layer-publish.py \
++            --base "$(jq -er .image_uri "$RUNNER_TEMP/isolab-image.json")" \
++            --layer-dir "$layer" --target "$ISOLAB_IMAGE_REPOSITORY" \
++            --tag "gh-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${SOURCE_REVISION}-f4ab" \
++            --user 1000:1000 --workdir /work --env HOME=/work \
++            --label "org.opencontainers.image.revision=$SOURCE_REVISION" \
++            --out "$RUNNER_TEMP/f4ab-image.json"
+       - name: Add the trusted recovery runtime
+         if: inputs.resumable
+         run: taskq/deploy/eks-karpenter/resume/publish-runtime "$RUNNER_TEMP/isolab-image.json" "$RUNNER_TEMP/isolab-recovery-image.json"
+@@ -345,7 +404,7 @@
+           if-no-files-found: warn
+           retention-days: 7
+       - name: Prepare the versioned experiment request
+-        if: '!inputs.publish_only && !inputs.size_sweep && !inputs.norm_branch_census'
++        if: '!inputs.publish_only && !inputs.size_sweep && !inputs.norm_branch_census && !inputs.f4_fp_ab'
+         env:
+           INSTANCE_TYPE: ${{ inputs.instance_type }}
+           DEADLINE: ${{ inputs.seconds }}
+@@ -430,8 +489,65 @@
+           producer_verdict=$(grep -o 'verdict=[A-Z_]*' "$artifacts/producer.stdout")
+           checker_verdict=$(grep -o 'verdict=[A-Z_]*' "$artifacts/checker.stdout")
+           [[ -n "$producer_verdict" && "$producer_verdict" == "$checker_verdict" ]]
++      - name: Prepare the frozen f4_fp_ab command request
++        if: inputs.f4_fp_ab
++        env:
++          INSTANCE_TYPE: ${{ inputs.instance_type }}
++          DEADLINE: ${{ inputs.seconds }}
++          F4AB_CPU: ${{ inputs.f4ab_cpu }}
++        run: |
++          set -euo pipefail
++          [[ "$DEADLINE" =~ ^[1-9][0-9]{0,3}$ && "$DEADLINE" -le 3000 ]]
++          [[ "$F4AB_CPU" =~ ^(2|4|6|8|10|12|14)$ ]]
++          protocol_sha=$(sha256sum "$RUNNER_TEMP/isolab-build/f4ab-protocol.json" | cut -d' ' -f1)
++          [[ "$protocol_sha" == "$(jq -er .f4ab_protocol_sha256 "$RUNNER_TEMP/isolab-build/build-info.json")" ]]
++          jq -n --arg name "gh-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT-f4ab" \
++            --arg image "$(jq -er .image_uri "$RUNNER_TEMP/f4ab-image.json")" \
++            --arg revision "$SOURCE_REVISION" --arg protocol "$protocol_sha" \
++            --arg instance "$INSTANCE_TYPE" --argjson seconds "$DEADLINE" --argjson cpu "$F4AB_CPU" \
++            '{schema:"isolab.eks.command-request/v1",
++              job:{job_name:$name,image:$image,
++                command:["/opt/isolab/f4ab/run",$revision,$protocol],
++                cpu:$cpu,memory:"8Gi",seconds:$seconds,isolation_profile:"standard",
++                instance_type:$instance,retries:0,wait_seconds:$seconds},
++              provenance:{harness:"github-actions",source_revision:$revision,
++                study:"f4_fp_ab_isolab_20261116",protocol_sha256:$protocol,
++                note:"Interleaved F4 A/B/A-A; outputs gated; timing indicative, no native L2 grade."}}' \
++            > "$RUNNER_TEMP/f4ab-request.json"
++      - name: Launch the frozen f4_fp_ab Spot command Job
++        if: inputs.f4_fp_ab
++        run: taskq/deploy/eks-karpenter/remote/launch-remote-command "$RUNNER_TEMP/f4ab-request.json"
++      - name: Download and verify the f4_fp_ab S3 payload
++        if: inputs.f4_fp_ab
++        run: |
++          set -euo pipefail
++          receipt="$ISOLAB_CLIENT_OUTPUT/result.json"
++          jq -e '.schema=="isolab.eks.command-result/v1" and .state=="succeeded"
++            and ([.pods[] | select(.exit_code==0)] | length)==1' "$receipt" >/dev/null
++          job=$(jq -er .job_name "$receipt")
++          pod_uid=$(jq -er '.pods[] | select(.exit_code==0) | .uid' "$receipt")
++          artifacts="$RUNNER_TEMP/f4ab-artifacts"
++          mkdir -p "$artifacts"
++          aws s3 cp "s3://$ISOLAB_BUCKET/runs/$job/$pod_uid/" "$artifacts/" --recursive --only-show-errors
++          (cd "$artifacts" && sha256sum -c SHA256SUMS)
++          cmp "$artifacts/build-info.json" "$RUNNER_TEMP/isolab-build/build-info.json"
++          cmp "$artifacts/protocol.json" "$RUNNER_TEMP/isolab-build/f4ab-protocol.json"
++          jq -e 'all(.[]; .distinct==1)' "$artifacts/identity.json" >/dev/null
++          jq -e 'all(.[]; .distinct==1)' "$artifacts/counters.json" >/dev/null
++      - name: Retain f4_fp_ab receipts
++        if: always() && inputs.f4_fp_ab
++        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
++        with:
++          name: isolab-f4ab-${{ github.run_id }}-${{ github.run_attempt }}
++          path: |
++            ${{ runner.temp }}/f4ab-image.json
++            ${{ runner.temp }}/f4ab-request.json
++            ${{ runner.temp }}/f4ab-artifacts
++            ${{ github.workspace }}/isolab-launch-output
++          if-no-files-found: warn
++          retention-days: 30
+       - name: Launch, await and verify the EKS experiment
+-        if: '!inputs.publish_only && !inputs.resumable && !inputs.size_sweep && !inputs.norm_branch_census'
++        if: '!inputs.publish_only && !inputs.resumable && !inputs.size_sweep && !inputs.norm_branch_census && !inputs.f4_fp_ab'
+         run: taskq/deploy/eks-karpenter/remote/launch-remote "$RUNNER_TEMP/isolab-request.json"
+       - name: Submit resumable computation and verify its fresh L2 epoch
+         if: '!inputs.publish_only && inputs.resumable && !inputs.size_sweep && !inputs.norm_branch_census'
+@@ -442,7 +558,7 @@
+           "$client" submit "$RUNNER_TEMP/isolab-request.json" "$ISOLAB_CLIENT_OUTPUT"
+           "$client" wait "$RUNNER_TEMP/isolab-request.json" "$ISOLAB_CLIENT_OUTPUT"
+       - name: Report the outcome
+-        if: always() && !inputs.publish_only && !inputs.size_sweep && !inputs.norm_branch_census
++        if: always() && !inputs.publish_only && !inputs.size_sweep && !inputs.norm_branch_census && !inputs.f4_fp_ab
+         run: |
+           if [[ -f "$ISOLAB_CLIENT_OUTPUT/result.json" ]]; then
+             if jq -e '.schema=="isolab.eks.recovery-result/v1"' "$ISOLAB_CLIENT_OUTPUT/result.json" >/dev/null; then

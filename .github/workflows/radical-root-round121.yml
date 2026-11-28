@@ -1,0 +1,35 @@
+name: Rootfinding Round121 narrow Jacobi native Rust A/B
+on:
+  push:
+    branches:
+      - 'automation/radical-root-mersenne-sqrt-round114-20261122'
+  pull_request:
+    paths:
+      - 'src/cryptanalysis/prime_radical_root.rs'
+      - 'research/amm_digit_perf_20261118/round121_jacobi_ab.py'
+      - '.github/workflows/radical-root-round121.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-rust-jacobi:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            src/cryptanalysis/prime_radical_root.rs
+            research/amm_digit_perf_20261118/round121_jacobi_ab.py
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Source-exact Rust complete quadratic A/B and correctness
+        run: |
+          set -euo pipefail
+          rustc --version
+          python3 research/amm_digit_perf_20261118/round121_jacobi_ab.py | tee round121_native_jacobi.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rootfind-round121-jacobi
+          path: round121_native_jacobi.txt
+          if-no-files-found: warn

@@ -1,0 +1,72 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T00:15:52Z",
+ "id": "PCC-20261124-0bd716",
+ "kind": "statement",
+ "producer": {
+  "commit": "7f1099ea972d6f471b88f9ff1fd0dddeea4dbc3b",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/norm_pair_20261124/PROTOCOL.md",
+    "sha256": "8a131e1c4b2a462f0fdbed6df43d840c19350c1754c1b4a0f547459e48579adf"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/norm_pair_20261124/audit.cpp",
+    "sha256": "0f59ff4c299c63c38823d3327a255f871f2ccf7e76b98ddebbc438c5c6bb0a49"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/norm_pair_20261124/target.cpp",
+    "sha256": "982cc60af0719514aed72bc422bf06e571bc93322c6919ba33879a2a1a57a283"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/norm_pair_20261124/classify.cpp",
+    "sha256": "ca67da17a636c1f6ec70b89c37d3cbb11a8aca221b4ea1818c46d750aec94779"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/norm_pair_20261124/evidence/qualification-v1/result.json",
+    "sha256": "7355660b90d210d970219f8f66af75c709a40a0757d8ff99dd245bd6978f6730"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/norm_pair_20261124/evidence/qualification-v1/target-result.json",
+    "sha256": "eba0b64133093895c38dd775911c8361b5b2c6cdb90df96a894a5417974f9786"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/norm_pair_20261124/evidence/qualification-v1/classification-result.json",
+    "sha256": "dcc7cc3f765ac8163af710b4d2c3b82785b908e62861d77907de24233d8dc87c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/norm_pair_20261124/evidence/qualification-v1/pre-call-manifest.sha256",
+    "sha256": "464ef0a77c5d5ceae57e8e0d31389c6e008147345b9840c5f8c98ff3d60b3d9b"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "p192-tangent-pair-audit",
+ "statement": "Frozen norm-pair qualification-v1 strictly builds three native workers and finishes all with exit0. Full101926 signed-pair fingerprints match OpenSSL/direct GMP and the frozen prior stream. Independent grouped/sorted query joins agree for all226 tangent traces,including102 split cases. No pair witness or new coefficient row occurs;all-norm/principal ranks stay6. Seven query/arithmetic controls pass;target checks six original principal classes and rejects a mutation. No new curve points or production collection. Producer unsigned;finite domain only."
+}

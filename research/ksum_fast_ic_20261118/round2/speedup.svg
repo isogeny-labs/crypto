@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="300" font-family="Helvetica,Arial,sans-serif" font-size="12">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="410.0" y="20" text-anchor="middle" font-size="14" font-weight="bold">Round 2 (sibling probe): speed-up over the library pipeline</text>
+<text x="410.0" y="36" text-anchor="middle" fill="#555">same curve, 48 targets, 2 rounds; library median 94.8 ms a solve (one thread); bars: median ratio, whiskers: 95 % bootstrap</text>
+<line x1="330.0" y1="42" x2="330.0" y2="262" stroke="#e5e5e5"/>
+<text x="330.0" y="276" text-anchor="middle" fill="#555">1x</text>
+<line x1="376.2" y1="42" x2="376.2" y2="262" stroke="#e5e5e5"/>
+<text x="376.2" y="276" text-anchor="middle" fill="#555">2x</text>
+<line x1="437.2" y1="42" x2="437.2" y2="262" stroke="#e5e5e5"/>
+<text x="437.2" y="276" text-anchor="middle" fill="#555">5x</text>
+<line x1="483.4" y1="42" x2="483.4" y2="262" stroke="#e5e5e5"/>
+<text x="483.4" y="276" text-anchor="middle" fill="#555">10x</text>
+<line x1="529.6" y1="42" x2="529.6" y2="262" stroke="#e5e5e5"/>
+<text x="529.6" y="276" text-anchor="middle" fill="#555">20x</text>
+<line x1="590.6" y1="42" x2="590.6" y2="262" stroke="#e5e5e5"/>
+<text x="590.6" y="276" text-anchor="middle" fill="#555">50x</text>
+<line x1="636.8" y1="42" x2="636.8" y2="262" stroke="#e5e5e5"/>
+<text x="636.8" y="276" text-anchor="middle" fill="#555">100x</text>
+<line x1="683.0" y1="42" x2="683.0" y2="262" stroke="#e5e5e5"/>
+<text x="683.0" y="276" text-anchor="middle" fill="#555">200x</text>
+<line x1="636.8" y1="42" x2="636.8" y2="262" stroke="#c0392b" stroke-dasharray="5,4"/>
+<text x="640.8" y="52" fill="#c0392b">100x</text>
+<text x="322" y="63" text-anchor="end">sibling probe, A = 16, 480 lanes, 1 thread</text>
+<rect x="330.0" y="51" width="216.3" height="18" fill="#2f6db5"/>
+<line x1="541.5" y1="60" x2="548.8" y2="60" stroke="#111"/>
+<text x="554.8" y="64">26x (3.69 ms)</text>
+<text x="322" y="97" text-anchor="end">no sibling (round 1 kernel), A = 17, 4 threads</text>
+<rect x="330.0" y="85" width="260.2" height="18" fill="#2f6db5"/>
+<line x1="587.9" y1="94" x2="592.3" y2="94" stroke="#111"/>
+<text x="598.3" y="98">50x (1.91 ms)</text>
+<text x="322" y="131" text-anchor="end">sibling probe, A = 16, 256 lanes, 4 threads</text>
+<rect x="330.0" y="119" width="273.2" height="18" fill="#2f6db5"/>
+<line x1="601.1" y1="128" x2="605.4" y2="128" stroke="#111"/>
+<text x="611.4" y="132">60x (1.57 ms)</text>
+<text x="322" y="165" text-anchor="end">sibling probe, A = 17, 480 lanes, 4 threads</text>
+<rect x="330.0" y="153" width="264.6" height="18" fill="#2f6db5"/>
+<line x1="588.3" y1="162" x2="597.0" y2="162" stroke="#111"/>
+<text x="603.0" y="166">53x (1.79 ms)</text>
+<text x="322" y="199" text-anchor="end">sibling probe, A = 16, 480 lanes, 4 threads</text>
+<rect x="330.0" y="187" width="264.7" height="18" fill="#2f6db5"/>
+<line x1="591.9" y1="196" x2="596.7" y2="196" stroke="#111"/>
+<text x="602.7" y="200">53x (1.78 ms)</text>
+<text x="322" y="233" text-anchor="end">sibling, table once per curve, A = 21, 4 threads</text>
+<rect x="330.0" y="221" width="341.5" height="18" fill="#9aa5b1"/>
+<line x1="669.6" y1="230" x2="673.1" y2="230" stroke="#111"/>
+<text x="679.1" y="234">168x (0.56 ms)</text>
+<text x="520.0" y="294" text-anchor="middle" fill="#333">speed-up (log scale); grey: table built once per curve (multi-target accounting, not the per-solve parity number)</text>
+</svg>

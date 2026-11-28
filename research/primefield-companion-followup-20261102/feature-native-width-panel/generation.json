@@ -1,0 +1,50 @@
+[
+  {
+    "source": "../feature-native-work-accounting/modes.rs",
+    "output": "main.rs",
+    "source_sha256": "b6048e9f4574105ebe60f264508f55d1a1e4e6ab1011822e0a9895c451f99509",
+    "sha256": "80926c6089b69ae1aba3ab883e802675f89f420395db44189049be730677748e",
+    "edits": [
+      [
+        "path=\"metered-polynomial.rs\"",
+        "path=\"../feature-native-work-accounting/metered-polynomial.rs\""
+      ],
+      [
+        "path=\"lib.rs\"",
+        "path=\"../feature-native-work-accounting/lib.rs\""
+      ],
+      [
+        "mod meter;",
+        "#[path=\"../feature-native-work-accounting/meter.rs\"] mod meter;"
+      ],
+      [
+        "include!(\"meter-checks.rs\");",
+        "include!(\"instrument-checks.rs\");"
+      ],
+      [
+        "include!(\"reference.rs\");",
+        "include!(\"../feature-native-work-accounting/reference.rs\");"
+      ],
+      [
+        "include!(\"orbit.rs\");",
+        "include!(\"../feature-native-work-accounting/orbit.rs\");"
+      ],
+      [
+        "",
+        "\ninclude!(\"panel.rs\");\n"
+      ]
+    ]
+  },
+  {
+    "source": "../feature-native-work-accounting/meter-checks.rs",
+    "output": "instrument-checks.rs",
+    "source_sha256": "4200f0ca6061b4de3dd286c2f820586eb05a6d7eefaa4989abb9ef936c4782b1",
+    "sha256": "a9185e324fc29eff2fb71b616414db73c0f574d7bf7fa7835976755a6731d0a2",
+    "edits": [
+      [
+        "fn main(){",
+        "fn instrument_main(){"
+      ]
+    ]
+  }
+]

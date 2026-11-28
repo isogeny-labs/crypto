@@ -1,0 +1,130 @@
+{
+ "p": 1031,
+ "g": 4,
+ "r": 144616107149,
+ "ncols": 196,
+ "core_rows": 207,
+ "nnz_full": 2290,
+ "nnz_square": 2171,
+ "nonunit_square": 108,
+ "planted": 22144964564,
+ "binary_wied": {
+  "mul": 135338,
+  "add": 932795,
+  "total": 1068133
+ },
+ "binary_coord_out": 32543609363,
+ "arms": {
+  "W": {
+   "cnt": {
+    "mul": 135338,
+    "add": 932795,
+    "total": 1068133,
+    "lane_spmv": 394,
+    "block_passes": 394,
+    "dense_mul": 0,
+    "dense_add": 0
+   },
+   "x_ct": 32543609363,
+   "ok": true,
+   "matches_binary_counts": true,
+   "matches_binary_value": true,
+   "wall_s": 0.2
+  },
+  "L1": {
+   "b": 1,
+   "pad": 0,
+   "iterations": 196,
+   "cnt": {
+    "mul": 288619,
+    "add": 1045478,
+    "total": 1334097,
+    "lane_spmv": 393,
+    "block_passes": 393,
+    "dense_mul": 207563,
+    "dense_add": 192275
+   },
+   "x_ct": 32543609363,
+   "ok": true,
+   "rho_spmv": 0.9974619289340102,
+   "rho_ops": 1.2489989542500795,
+   "wall_s": 0.1
+  },
+  "L2": {
+   "b": 2,
+   "pad": 0,
+   "iterations": 98,
+   "cnt": {
+    "mul": 482172,
+    "add": 1240506,
+    "total": 1722678,
+    "lane_spmv": 394,
+    "block_passes": 197,
+    "dense_mul": 400812,
+    "dense_add": 385132
+   },
+   "x_ct": 32543609363,
+   "ok": true,
+   "rho_spmv": 1.0,
+   "rho_ops": 1.6127935378833909,
+   "wall_s": 0.2
+  },
+  "L4": {
+   "b": 4,
+   "pad": 0,
+   "iterations": 49,
+   "cnt": {
+    "mul": 871588,
+    "add": 1632872,
+    "total": 2504460,
+    "lane_spmv": 396,
+    "block_passes": 99,
+    "dense_mul": 789620,
+    "dense_add": 773156
+   },
+   "x_ct": 32543609363,
+   "ok": true,
+   "rho_spmv": 1.0050761421319796,
+   "rho_ops": 2.344708009208591,
+   "wall_s": 0.2
+  },
+  "L8": {
+   "b": 8,
+   "pad": 4,
+   "iterations": 25,
+   "cnt": {
+    "mul": 1726152,
+    "add": 2509480,
+    "total": 4235632,
+    "lane_spmv": 408,
+    "block_passes": 51,
+    "dense_mul": 1640488,
+    "dense_add": 1622088
+   },
+   "x_ct": 32543609363,
+   "ok": true,
+   "rho_spmv": 1.0355329949238579,
+   "rho_ops": 3.9654537403113657,
+   "wall_s": 0.2
+  },
+  "L1_rect": {
+   "b": 1,
+   "pad": 0,
+   "iterations": 196,
+   "cnt": {
+    "mul": 292751,
+    "add": 1092245,
+    "total": 1384996,
+    "lane_spmv": 393,
+    "block_passes": 393,
+    "dense_mul": 207563,
+    "dense_add": 192275
+   },
+   "x_ct": 32543609363,
+   "ok": true,
+   "rho_spmv": 0.9974619289340102,
+   "rho_ops": 1.2966512597214017,
+   "wall_s": 0.1
+  }
+ }
+}

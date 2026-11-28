@@ -1,0 +1,114 @@
+{
+  "schema": "prime31.parallel-pr-integration-audit/v1",
+  "scope": "Read-only source-bound mathematical and integration review. No crypto execution, native tests, symbolic residual reruns, benchmarks, remote writes or shared-file changes.",
+  "pr4979": {
+    "url": "https://github.com/isogeny-labs/crypto/pull/4979",
+    "state": "open",
+    "draft": true,
+    "merged": false,
+    "head": "research/prime31-s3-double-resultant-review-20261123",
+    "head_sha": "1a9f3e3c6966258f1a94068d95ec3f3e337b7196",
+    "base_sha": "816f9c3a942efed569049618c056d12a0c56d693",
+    "created_at": "2026-11-23T06:02:27Z",
+    "updated_at": "2026-11-23T06:09:45Z",
+    "merged_at": null,
+    "synthetic_merge_commit_sha": "87c8dd4eb681ecc71ffde73377756b57f2d37cf6",
+    "synthetic_sha_is_evidence_of_merge": false,
+    "changed_files": [
+      {
+        "path": "docs/ACTIVE.md",
+        "status": "modified",
+        "git_blob": "53275c60a8795513a80cd6dbbabb4c5345f3f27b",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "docs/session-logs/2026-11-23.md",
+        "status": "modified",
+        "git_blob": "fcd1c778348145a2cf1e80c29dcdc9d95f41e600",
+        "additions": 45,
+        "deletions": 0
+      },
+      {
+        "path": "research/prime31_summation_compression_20261122/iteration10/DOUBLE_RESULTANT_AND_SUPPORT.md",
+        "status": "added",
+        "git_blob": "db62fd8a58435c9b103d767dc6a86d9da58e5ef7",
+        "additions": 146,
+        "deletions": 0
+      },
+      {
+        "path": "research/prime31_summation_compression_20261122/iteration10/REPORT.md",
+        "status": "added",
+        "git_blob": "7ccc41f147440c74ad2008fca1d04a1d592f66e8",
+        "additions": 63,
+        "deletions": 0
+      },
+      {
+        "path": "research/prime31_summation_compression_20261122/iteration10/RESULTANT_GATES.svg",
+        "status": "added",
+        "git_blob": "e906f9dcddf5b77b0904198e337e829d8bfd16db",
+        "additions": 36,
+        "deletions": 0
+      },
+      {
+        "path": "research/prime31_summation_compression_20261122/iteration10/STATE.json",
+        "status": "added",
+        "git_blob": "4562f2591fecff7d89739d3c831e262d5f8d2bdc",
+        "additions": 93,
+        "deletions": 0
+      },
+      {
+        "path": "research/prime31_summation_compression_20261122/iteration10/VALIDATION.md",
+        "status": "added",
+        "git_blob": "000456f3e6052eb1d3681a468f8e3e379443b89e",
+        "additions": 43,
+        "deletions": 0
+      }
+    ]
+  },
+  "compared_pr4977": {
+    "url": "https://github.com/isogeny-labs/crypto/pull/4977",
+    "head_sha": "d6e1d03aff64ff168bd1d1d565a08c8f5032ef62",
+    "base_sha": "816f9c3a942efed569049618c056d12a0c56d693",
+    "head": "lane/prime31-s3-pencil-family",
+    "source_note_path": "research/prime31_summation_compression_20261122/iteration10/S3_PENCIL_CONTRACTION.md",
+    "source_git_blob": "da12c7a459405f4fdea44118cc03ade721d5eb90",
+    "source_sha256": "9e9e64e76208202d05957794e7bd9371f9e427b2a5dded9f88aceb3ca40588ed"
+  },
+  "path_collisions": [
+    {
+      "path": "docs/ACTIVE.md",
+      "pr4979_blob": "53275c60a8795513a80cd6dbbabb4c5345f3f27b",
+      "pr4977_blob": "7a2399d5bb4b128175132c079aec8ce71283c391"
+    },
+    {
+      "path": "docs/session-logs/2026-11-23.md",
+      "pr4979_blob": "fcd1c778348145a2cf1e80c29dcdc9d95f41e600",
+      "pr4977_blob": "46b972b54f6f71f28773a683d39c070f1662ec93"
+    },
+    {
+      "path": "research/prime31_summation_compression_20261122/iteration10/STATE.json",
+      "pr4979_blob": "4562f2591fecff7d89739d3c831e262d5f8d2bdc",
+      "pr4977_blob": "229808f8fd242f8c5801c507c6401d0434bdbe81"
+    }
+  ],
+  "review_status": {
+    "pcc": "unverified",
+    "support_cap_338272": "mathematically valid under stated assumptions; weaker than cancellation-reduced cap",
+    "cancellation_reduced_cap": 309442,
+    "inherited_n": 2147446831,
+    "nonidentity_x_count": 1073723415,
+    "subgroup_order_recounted": false,
+    "group_arithmetic_executed": false,
+    "producer_symbolic_residuals_reexecuted": false,
+    "independent_native_validation": false,
+    "asymptotic_gain_established": false
+  },
+  "integration_recommendation": {
+    "rename_only_our_unfrozen_state": "iteration10/STATE.json -> iteration10/PENCIL_FAMILY_STATE.json",
+    "preserve_producer_state_and_provenance": true,
+    "preserve_frozen_notes_and_hashes": true,
+    "append_both_active_and_session_records": true,
+    "reference_both_immutable_heads": true
+  }
+}

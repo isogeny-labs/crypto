@@ -1,0 +1,17 @@
+{
+  "id": "C103-table-vanishing-relations",
+  "hypothesis": "Exact split tables may have useful low-degree Boolean vanishing relations whose shared-parameter substitution is much smaller than arithmetic nilpotency or a full BDD.",
+  "mechanism": "For each fixed-trace table, form evaluation rows of all squarefree monomials through degree2, then degree3 only under a frozen feature cap; compute the kernel. Every resulting relation is verified on every allowed tuple before substitution.",
+  "contract": "Necessary cuts only; no local or original completeness without retaining exact table/nilpotency predicate and recovering all original variables.",
+  "oracle": "Exhaust tiny coefficient cubes and compare kernel relations with literal product/division tables, including all repeated roots. Verify witnesses for every derived row.",
+  "bounds": {
+    "initial_seconds": 90,
+    "memory_mb": 4096,
+    "cpu": 0,
+    "feature_cap": 2048,
+    "actual_field_q_max": 32
+  },
+  "falsifier": "No independent low-degree relations or substitution fill exceeding the unchanged arithmetic circuit; retire route if observed.",
+  "next_after_negative": "Native XOR backend or bounded local parity DAG reuse, with a fresh implementation hash and unchanged necessary family; independently verified UNSAT proofs if found.",
+  "qualified_speedup": null
+}

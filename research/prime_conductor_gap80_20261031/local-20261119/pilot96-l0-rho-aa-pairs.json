@@ -1,0 +1,168 @@
+{
+  "schema": "ecbench.endpoint_pairs/v1",
+  "scope": "structural_join_only",
+  "plan_only": false,
+  "spec_id": "ECS1h743af55c17c8",
+  "spec_sha256": "743af55c17c880e5a2966502326d254be66fdb30d45f02a6c2cc5d4e9f34a54a",
+  "plan_sha256": "ead9fc1146e7649217828bba013f565f06fa89579c3e71bfd6303adb441ff85c",
+  "session_sha256": "77cfe436112b4954d6f319b42a05c1d91c9a56f8f12f2a31ff8a605b1e422797",
+  "records_sha256": "37075906a771ab0da10cb90116006d6fbec3e5cf751545d9e536265685f3526f",
+  "session": {
+    "schema": "ecbench.session/v1",
+    "session_id": "ECBS1h71e554f9e2d4",
+    "label": "Authorized local96bit pilot; horizontal degree5 control, no80bit claim",
+    "spec_id": "ECS1h743af55c17c8",
+    "spec_sha256": "743af55c17c880e5a2966502326d254be66fdb30d45f02a6c2cc5d4e9f34a54a",
+    "env_class_id": "ECBENV3h8756b061d3c3",
+    "host_sha256": "87035135349c990c8916aee71600cca6a6286f5791f79dde685fbd6877cfd7ae",
+    "plan_sha256": "ead9fc1146e7649217828bba013f565f06fa89579c3e71bfd6303adb441ff85c",
+    "binary_sha256": "9c8db223d0d6be523460519f5339863cbf0935df61cbe0edc69917e24ee2f990",
+    "git_commit": null,
+    "git_dirty": null,
+    "options": {
+      "cpus": "none",
+      "lock_path": "/tmp/crypto-bench.lock",
+      "wait_for_lock": true,
+      "allow_busy": false,
+      "thresholds": {
+        "settle_seconds": 2.0,
+        "max_other_cpu": 0.1,
+        "max_psi": 5.0,
+        "max_preemptions_per_second": 50.0
+      },
+      "exe": "/proc/self/exe"
+    },
+    "cpu_plan": null,
+    "preflight": null,
+    "eviction": null,
+    "runner_on_run_cpu": false,
+    "runner_cpus": null,
+    "ticks_per_second": 100,
+    "grading_version": 3,
+    "accounting_versions": {
+      "f6_ic_tree": 2,
+      "inherited_f4_specialise": 2
+    },
+    "child_env_sha256": "5fcca52408a68c08609b1aebe24bb4f03f94c8f0ec0e418fdf510c73a93a4e98",
+    "child_env": {
+      "HOME": "/home/agent",
+      "LC_ALL": "C",
+      "OMP_NUM_THREADS": "1",
+      "PATH": "/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override:/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin:/opt/codex/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/agent/.local/bin:/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/fallback",
+      "RAYON_NUM_THREADS": "1",
+      "RUST_BACKTRACE": "0",
+      "RUST_MIN_STACK": "8388608"
+    },
+    "started_unix_ms": 1795112112821,
+    "finished_unix_ms": 1795112786361,
+    "status": "complete",
+    "executions_planned": 12,
+    "records_written": 12,
+    "records_sha256": "37075906a771ab0da10cb90116006d6fbec3e5cf751545d9e536265685f3526f",
+    "status_counts": {
+      "verified": 12
+    },
+    "last_seq": 11
+  },
+  "source_curve": "icv1-fp96-tm125000000302577-0b06b926",
+  "destination_curve": "icv1-fp96-tm125000000302577-2550b472",
+  "arm": {
+    "name": "rho-aa",
+    "role": "control",
+    "method": {
+      "id": "rho.negation",
+      "family": "rho",
+      "params": {
+        "cap_multiple": "64"
+      },
+      "method_id": "ECM1hefea4e0ebe79",
+      "method_sha256": "efea4e0ebe79dadfedeb75106dab92e25fc26bfe282155ee0326380d4184e995",
+      "entry": "ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())"
+    }
+  },
+  "observations_in_input": 12,
+  "observations_selected": 4,
+  "pairs": [
+    {
+      "r": "125000000302579",
+      "target_seed": 20261119,
+      "target_index": 0,
+      "round": 0,
+      "warmup": false,
+      "source": {
+        "execution": {
+          "seq": 2,
+          "round": 0,
+          "warmup": false,
+          "arm": 2,
+          "workload": 0,
+          "algorithm_seed": 7701010587527600627
+        },
+        "workload_id": "W682659e2d870",
+        "workload_sha256": "682659e2d870d53e451a2905ed478990db574eed1f23614b36d5148ad1038a7d",
+        "record": {"schema":"ecbench.record/v1","record_id":"ECR1hb6428b286a83","session_id":"ECBS1h71e554f9e2d4","run_id":"ECM1hefea4e0ebe79W682659e2d870R2","seq":2,"round":0,"warmup":false,"arm":"rho-aa","role":"control","method":{"id":"rho.negation","family":"rho","params":{"cap_multiple":"64"},"method_id":"ECM1hefea4e0ebe79","method_sha256":"efea4e0ebe79dadfedeb75106dab92e25fc26bfe282155ee0326380d4184e995","entry":"ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())"},"workload":{"workload_id":"W682659e2d870","workload_sha256":"682659e2d870d53e451a2905ed478990db574eed1f23614b36d5148ad1038a7d","curve_spec":{"kind":"prime_mont4_explicit","p":"78125000378223625457769953627","a":"18274853889642953323454959912","b":"32133284755955526260408304513","group_order":"78125000378223750457770256205","r":125000000302579,"gx":"56427920970213953953111743943","gy":"4354194121617047333390549409"},"curve":{"slug":"icv1-fp96-tm125000000302577-0b06b926","icv1":"ICV1:fp-78125000378223625457769953627:-125000000302577:78125000378223750457770256205:78125000378223625457769068891:unk:unk:r:0b06b926cae3","family":"prime","construction":"PrimeMont4 { p: 78125000378223625457769953627, a: 18274853889642953323454959912, b: 32133284755955526260408304513 } (explicit)","field_degree":null,"field_bits":96,"group_order":"78125000378223750457770256205","r":125000000302579,"cofactor":625000001512895,"generator":["0xb654150d3cc0bf7b386c1dc7","0xe11b4784dd59db0e1dc81a1"],"automorphisms_available":2,"registered":false,"ec1":null,"curve_uid":null},"target_law":"uniform_scalar_sha256_shared_v1","target_seed":20261119,"target_index":0,"target":["0xc7168b6bbc12ed61d413c2ac","0x7eb22ebcff6625c53013ff19"],"planted":79059150462809},"algorithm_seed":"7701010587527600627","outcome":{"status":"verified","recovered":"79059150462809","matches_target":true,"matches_planted":true,"error":null,"exit":"exit 0","stderr_sha256":null},"cost":{"unit":"ecbench.gae","total_gae":3536675.0,"s":0.3163298281901037,"lower_bound":true,"unpriced":["canonicalisations_uncharged"],"deterministic":true,"nondeterminism":[]},"boundaries":{"automorphisms_available":2,"automorphisms_used":2,"floor_s":0.8862269254527579,"ratio_to_floor":0.35693998806061583,"floor_rule":"automorphisms/v2"},"phases":[{"name":"setup","adds":155,"doubles":216,"scalar_mults":0,"gae":371.0,"wall_ns":null,"native":{}},{"name":"search","adds":0,"doubles":0,"scalar_mults":18,"gae":3536233.0,"wall_ns":null,"native":{},"work_native":{"cycle_window_word_ops":60858278}},{"name":"internal_verification","adds":0,"doubles":0,"scalar_mults":0,"gae":71.0,"wall_ns":null,"native":{}}],"counters":{"canonicalisations_uncharged":3536234,"cycle_escape_doublings":3932,"cycles_length_2":113,"cycles_length_4":3334,"cycles_other_length":485,"distinguished_point_bits":11,"distinguished_points":1686,"jump_coefficient_bits":12,"jumps":16,"look_ahead_additions":114534,"setup_additions":155,"setup_doublings":216,"start_additions":1687,"steps":3416080,"useless_collisions":1,"verification_operations":71,"walk_operations":3534546,"walks":1688,"walks_abandoned_in_a_cycle":0,"walks_capped":2},"factor_base":null,"detail":{"expected_steps":9908318.256007224,"method":"negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts"},"online":{"wall_ns":11100506516,"phases_ns":{"rho_solve":11100506516},"zero_phases":{},"start_event":"first target-dependent operation (the jump table [a]G + [b]Q, or the first table step)","stop_event":"[d]G = Q verified inside the method","included_stages":["walk","collision","recovery_check"],"mapping":"rho: the whole target-dependent solve, one exclusive phase"},"solver":null,"allocator":{"name":"glibc 2.41","pre_solve_trim":true,"trim_result":1},"field_ops":{"muls":7073350,"sqrs":3540870,"invs":3536675},"time":{"solve_wall_ns":11099433562,"method_call_wall_ns":11102799004,"parent_audit_verification_ns":387876,"online_clock_diagnostics":{"error":null},"process_wall_ns":11110454347,"user_ns":11075888000,"sys_ns":4010000,"max_rss_kib":13648,"minor_faults":702,"major_faults":0,"voluntary_switches":1,"involuntary_switches":175,"schedstat_solve":{"cpu_ns":11070106901,"run_delay_ns":29296017,"timeslices":174},"hw_solve":{"instructions":null,"cycles":null,"instructions_time_enabled_ns":null,"instructions_time_running_ns":null,"cycles_time_enabled_ns":null,"cycles_time_running_ns":null,"error":"perf_event_open: Operation not permitted (os error 1)"},"solve":{"threads_before":1,"threads_after":1,"involuntary_switches":174,"voluntary_switches":0,"minor_faults":34,"major_faults":0,"schedstat_all":{"cpu_ns":11072925960,"run_delay_ns":29296017,"timeslices":174},"cpu":null,"irq":null,"cpu_sched":null}},"isolation":{"level":"L0","blockers":["L1: no CPU reservation (--cpus none, or no affinity control on this OS)"],"run_cpu":null,"reserved":[],"node":null,"placement":{"affinity":[0,1,2,3,4],"cpu_at_start":4,"cpu_at_end":1,"mems_allowed":"0","mempolicy":null,"anon_pages_by_node":{"0":209}},"foreign_busy_ticks":null,"steal_ticks":null,"idle_sibling_busy_ticks":null,"before":{"unix_ms":1795112210840,"loadavg":[0.8154296875,0.31884765625,0.18212890625],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}},"after":{"unix_ms":1795112221952,"loadavg":[0.85693359375,0.35302734375,0.1953125],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}}},"env_class_id":"ECBENV3h8756b061d3c3","binary_sha256":"9c8db223d0d6be523460519f5339863cbf0935df61cbe0edc69917e24ee2f990","work":{"schema":"ecbench.work/v1","unit":"bitop/v1","widths":{"field":{"kind":"prime","bits":96},"r_bits":47},"phases":[{"name":"setup","prims":{"group_add":155,"group_double":216},"bitops":"239574240","log2_bitops":27.835897551106296},{"name":"search","prims":{"group_add":3532301,"group_double":3932,"word_op":60858278},"bitops":"2054450588576","log2_bitops":40.90188977143009},{"name":"internal_verification","prims":{"group_add":71,"group_double":0},"bitops":"41161824","log2_bitops":25.294803577868333},{"name":"natives","prims":{"field_add":7072468,"hash_probe":1686,"modr_inv":1,"modr_mul":1},"bitops":"8827171571","log2_bitops":33.03930409319921}],"bitops":"2063558496211","log2_bitops":40.90827147401165,"bitops_per_sqrt_r":184570.28269961316,"floor_bitops":5744288059010.652,"ratio_to_floor":0.3592365972966909,"unpriced":[],"known_uncounted":[],"complete":true,"reusable_bitops":"0","per_target_bitops":"2063558496211"}}
+      },
+      "destination": {
+        "execution": {
+          "seq": 5,
+          "round": 0,
+          "warmup": false,
+          "arm": 2,
+          "workload": 1,
+          "algorithm_seed": 7701010587527600627
+        },
+        "workload_id": "Wf94d257e6bd1",
+        "workload_sha256": "f94d257e6bd189157fed5ed5151b620df3291a0d8797100b306a5317a60c85cc",
+        "record": {"schema":"ecbench.record/v1","record_id":"ECR1h5d8a0e169656","session_id":"ECBS1h71e554f9e2d4","run_id":"ECM1hefea4e0ebe79Wf94d257e6bd1R2","seq":5,"round":0,"warmup":false,"arm":"rho-aa","role":"control","method":{"id":"rho.negation","family":"rho","params":{"cap_multiple":"64"},"method_id":"ECM1hefea4e0ebe79","method_sha256":"efea4e0ebe79dadfedeb75106dab92e25fc26bfe282155ee0326380d4184e995","entry":"ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())"},"workload":{"workload_id":"Wf94d257e6bd1","workload_sha256":"f94d257e6bd189157fed5ed5151b620df3291a0d8797100b306a5317a60c85cc","curve_spec":{"kind":"prime_mont4_explicit","p":"78125000378223625457769953627","a":"15990497153433373631697108307","b":"48428362807562559250646568586","group_order":"78125000378223750457770256205","r":125000000302579,"gx":"23468729782310777244428981341","gy":"73111346012038691962804678190"},"curve":{"slug":"icv1-fp96-tm125000000302577-2550b472","icv1":"ICV1:fp-78125000378223625457769953627:-125000000302577:78125000378223750457770256205:78125000378223625457769068891:unk:unk:r:2550b4723dd2","family":"prime","construction":"PrimeMont4 { p: 78125000378223625457769953627, a: 15990497153433373631697108307, b: 48428362807562559250646568586 } (explicit)","field_degree":null,"field_bits":96,"group_order":"78125000378223750457770256205","r":125000000302579,"cofactor":625000001512895,"generator":["0x4bd4e0d6c5d833654f8ed45d","0xec3c49b8fac650644e92ae2e"],"automorphisms_available":2,"registered":false,"ec1":null,"curve_uid":null},"target_law":"uniform_scalar_sha256_shared_v1","target_seed":20261119,"target_index":0,"target":["0x48162f77731f812c65e699a5","0xbc608da84d9fce1ad4048bcf"],"planted":79059150462809},"algorithm_seed":"7701010587527600627","outcome":{"status":"verified","recovered":"79059150462809","matches_target":true,"matches_planted":true,"error":null,"exit":"exit 0","stderr_sha256":null},"cost":{"unit":"ecbench.gae","total_gae":8201521.0,"s":0.733566338107835,"lower_bound":true,"unpriced":["canonicalisations_uncharged"],"deterministic":true,"nondeterminism":[]},"boundaries":{"automorphisms_available":2,"automorphisms_used":2,"floor_s":0.8862269254527579,"ratio_to_floor":0.8277409736034241,"floor_rule":"automorphisms/v2"},"phases":[{"name":"setup","adds":155,"doubles":216,"scalar_mults":0,"gae":371.0,"wall_ns":null,"native":{}},{"name":"search","adds":0,"doubles":0,"scalar_mults":18,"gae":8201079.0,"wall_ns":null,"native":{},"work_native":{"cycle_window_word_ops":141180541}},{"name":"internal_verification","adds":0,"doubles":0,"scalar_mults":0,"gae":71.0,"wall_ns":null,"native":{}}],"counters":{"canonicalisations_uncharged":8201080,"cycle_escape_doublings":9254,"cycles_length_2":266,"cycles_length_4":7798,"cycles_other_length":1190,"distinguished_point_bits":11,"distinguished_points":3875,"jump_coefficient_bits":12,"jumps":16,"look_ahead_additions":262831,"setup_additions":155,"setup_doublings":216,"start_additions":3876,"steps":7925118,"useless_collisions":0,"verification_operations":71,"walk_operations":8197203,"walks":3877,"walks_abandoned_in_a_cycle":0,"walks_capped":2},"factor_base":null,"detail":{"expected_steps":9908318.256007224,"method":"negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts"},"online":{"wall_ns":24979020802,"phases_ns":{"rho_solve":24979020802},"zero_phases":{},"start_event":"first target-dependent operation (the jump table [a]G + [b]Q, or the first table step)","stop_event":"[d]G = Q verified inside the method","included_stages":["walk","collision","recovery_check"],"mapping":"rho: the whole target-dependent solve, one exclusive phase"},"solver":null,"allocator":{"name":"glibc 2.41","pre_solve_trim":true,"trim_result":1},"field_ops":{"muls":16403042,"sqrs":8211038,"invs":8201521},"time":{"solve_wall_ns":24978110665,"method_call_wall_ns":24980543816,"parent_audit_verification_ns":343360,"online_clock_diagnostics":{"error":null},"process_wall_ns":24989304924,"user_ns":24920754000,"sys_ns":11919000,"max_rss_kib":13912,"minor_faults":783,"major_faults":1,"voluntary_switches":2,"involuntary_switches":324,"schedstat_solve":{"cpu_ns":24924770207,"run_delay_ns":54325335,"timeslices":323},"hw_solve":{"instructions":null,"cycles":null,"instructions_time_enabled_ns":null,"instructions_time_running_ns":null,"cycles_time_enabled_ns":null,"cycles_time_running_ns":null,"error":"perf_event_open: Operation not permitted (os error 1)"},"solve":{"threads_before":1,"threads_after":1,"involuntary_switches":323,"voluntary_switches":0,"minor_faults":108,"major_faults":0,"schedstat_all":{"cpu_ns":24925293873,"run_delay_ns":54325335,"timeslices":323},"cpu":null,"irq":null,"cpu_sched":null}},"isolation":{"level":"L0","blockers":["L1: no CPU reservation (--cpus none, or no affinity control on this OS)"],"run_cpu":null,"reserved":[],"node":null,"placement":{"affinity":[0,1,2,3,4],"cpu_at_start":4,"cpu_at_end":2,"mems_allowed":"0","mempolicy":null,"anon_pages_by_node":{"0":235}},"foreign_busy_ticks":null,"steal_ticks":null,"idle_sibling_busy_ticks":null,"before":{"unix_ms":1795112329726,"loadavg":[0.9775390625,0.548828125,0.2861328125],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}},"after":{"unix_ms":1795112354718,"loadavg":[0.986328125,0.58642578125,0.3056640625],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}}},"env_class_id":"ECBENV3h8756b061d3c3","binary_sha256":"9c8db223d0d6be523460519f5339863cbf0935df61cbe0edc69917e24ee2f990","work":{"schema":"ecbench.work/v1","unit":"bitop/v1","widths":{"field":{"kind":"prime","bits":96},"r_bits":47},"phases":[{"name":"setup","prims":{"group_add":155,"group_double":216},"bitops":"239574240","log2_bitops":27.835897551106296},{"name":"search","prims":{"group_add":8191825,"group_double":9254,"word_op":141180541},"bitops":"4764611079904","log2_bitops":42.115495594967555},{"name":"internal_verification","prims":{"group_add":71,"group_double":0},"bitops":"41161824","log2_bitops":25.294803577868333},{"name":"natives","prims":{"field_add":16402160,"hash_probe":3875},"bitops":"20471383680","log2_bitops":34.25288956763989}],"bitops":"4785363199648","log2_bitops":42.12176556522919,"bitops_per_sqrt_r":428015.8959395185,"floor_bitops":5744288059010.652,"ratio_to_floor":0.8330646288083593,"unpriced":[],"known_uncounted":[],"complete":true,"reusable_bitops":"0","per_target_bitops":"4785363199648"}}
+      },
+      "source_status": "verified",
+      "destination_status": "verified"
+    },
+    {
+      "r": "125000000302579",
+      "target_seed": 20261119,
+      "target_index": 0,
+      "round": 1,
+      "warmup": false,
+      "source": {
+        "execution": {
+          "seq": 9,
+          "round": 1,
+          "warmup": false,
+          "arm": 2,
+          "workload": 0,
+          "algorithm_seed": 12033083312777092757
+        },
+        "workload_id": "W682659e2d870",
+        "workload_sha256": "682659e2d870d53e451a2905ed478990db574eed1f23614b36d5148ad1038a7d",
+        "record": {"schema":"ecbench.record/v1","record_id":"ECR1hc1cb5e45def9","session_id":"ECBS1h71e554f9e2d4","run_id":"ECM1hefea4e0ebe79W682659e2d870R3","seq":9,"round":1,"warmup":false,"arm":"rho-aa","role":"control","method":{"id":"rho.negation","family":"rho","params":{"cap_multiple":"64"},"method_id":"ECM1hefea4e0ebe79","method_sha256":"efea4e0ebe79dadfedeb75106dab92e25fc26bfe282155ee0326380d4184e995","entry":"ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())"},"workload":{"workload_id":"W682659e2d870","workload_sha256":"682659e2d870d53e451a2905ed478990db574eed1f23614b36d5148ad1038a7d","curve_spec":{"kind":"prime_mont4_explicit","p":"78125000378223625457769953627","a":"18274853889642953323454959912","b":"32133284755955526260408304513","group_order":"78125000378223750457770256205","r":125000000302579,"gx":"56427920970213953953111743943","gy":"4354194121617047333390549409"},"curve":{"slug":"icv1-fp96-tm125000000302577-0b06b926","icv1":"ICV1:fp-78125000378223625457769953627:-125000000302577:78125000378223750457770256205:78125000378223625457769068891:unk:unk:r:0b06b926cae3","family":"prime","construction":"PrimeMont4 { p: 78125000378223625457769953627, a: 18274853889642953323454959912, b: 32133284755955526260408304513 } (explicit)","field_degree":null,"field_bits":96,"group_order":"78125000378223750457770256205","r":125000000302579,"cofactor":625000001512895,"generator":["0xb654150d3cc0bf7b386c1dc7","0xe11b4784dd59db0e1dc81a1"],"automorphisms_available":2,"registered":false,"ec1":null,"curve_uid":null},"target_law":"uniform_scalar_sha256_shared_v1","target_seed":20261119,"target_index":0,"target":["0xc7168b6bbc12ed61d413c2ac","0x7eb22ebcff6625c53013ff19"],"planted":79059150462809},"algorithm_seed":"12033083312777092757","outcome":{"status":"verified","recovered":"79059150462809","matches_target":true,"matches_planted":true,"error":null,"exit":"exit 0","stderr_sha256":null},"cost":{"unit":"ecbench.gae","total_gae":18047497.0,"s":1.614217202675228,"lower_bound":true,"unpriced":["canonicalisations_uncharged"],"deterministic":true,"nondeterminism":[]},"boundaries":{"automorphisms_available":2,"automorphisms_used":2,"floor_s":0.8862269254527579,"ratio_to_floor":1.821449062665922,"floor_rule":"automorphisms/v2"},"phases":[{"name":"setup","adds":155,"doubles":216,"scalar_mults":0,"gae":371.0,"wall_ns":null,"native":{}},{"name":"search","adds":0,"doubles":0,"scalar_mults":18,"gae":18047055.0,"wall_ns":null,"native":{},"work_native":{"cycle_window_word_ops":310635851}},{"name":"internal_verification","adds":0,"doubles":0,"scalar_mults":0,"gae":71.0,"wall_ns":null,"native":{}}],"counters":{"canonicalisations_uncharged":18047056,"cycle_escape_doublings":20570,"cycles_length_2":546,"cycles_length_4":17456,"cycles_other_length":2568,"distinguished_point_bits":11,"distinguished_points":8385,"jump_coefficient_bits":12,"jumps":16,"look_ahead_additions":580406,"setup_additions":155,"setup_doublings":216,"start_additions":8387,"steps":17437692,"useless_collisions":0,"verification_operations":71,"walk_operations":18038668,"walks":8388,"walks_abandoned_in_a_cycle":0,"walks_capped":3},"factor_base":null,"detail":{"expected_steps":9908318.256007224,"method":"negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts"},"online":{"wall_ns":56891547998,"phases_ns":{"rho_solve":56891547998},"zero_phases":{},"start_event":"first target-dependent operation (the jump table [a]G + [b]Q, or the first table step)","stop_event":"[d]G = Q verified inside the method","included_stages":["walk","collision","recovery_check"],"mapping":"rho: the whole target-dependent solve, one exclusive phase"},"solver":null,"allocator":{"name":"glibc 2.41","pre_solve_trim":true,"trim_result":1},"field_ops":{"muls":36094994,"sqrs":18068330,"invs":18047497},"time":{"solve_wall_ns":56891527217,"method_call_wall_ns":56891747451,"parent_audit_verification_ns":207093,"online_clock_diagnostics":{"error":null},"process_wall_ns":56897033917,"user_ns":56859806000,"sys_ns":8389000,"max_rss_kib":13484,"minor_faults":880,"major_faults":0,"voluntary_switches":1,"involuntary_switches":251,"schedstat_solve":{"cpu_ns":56859206715,"run_delay_ns":26669228,"timeslices":251},"hw_solve":{"instructions":null,"cycles":null,"instructions_time_enabled_ns":null,"instructions_time_running_ns":null,"cycles_time_enabled_ns":null,"cycles_time_running_ns":null,"error":"perf_event_open: Operation not permitted (os error 1)"},"solve":{"threads_before":1,"threads_after":1,"involuntary_switches":251,"voluntary_switches":0,"minor_faults":213,"major_faults":0,"schedstat_all":{"cpu_ns":56863273866,"run_delay_ns":26669228,"timeslices":251},"cpu":null,"irq":null,"cpu_sched":null}},"isolation":{"level":"L0","blockers":["L1: no CPU reservation (--cpus none, or no affinity control on this OS)"],"run_cpu":null,"reserved":[],"node":null,"placement":{"affinity":[0,1,2,3,4],"cpu_at_start":4,"cpu_at_end":1,"mems_allowed":"0","mempolicy":null,"anon_pages_by_node":{"0":235}},"foreign_busy_ticks":null,"steal_ticks":null,"idle_sibling_busy_ticks":null,"before":{"unix_ms":1795112582555,"loadavg":[1.0,0.81689453125,0.46826171875],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}},"after":{"unix_ms":1795112639453,"loadavg":[1.0,0.85009765625,0.50048828125],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}}},"env_class_id":"ECBENV3h8756b061d3c3","binary_sha256":"9c8db223d0d6be523460519f5339863cbf0935df61cbe0edc69917e24ee2f990","work":{"schema":"ecbench.work/v1","unit":"bitop/v1","widths":{"field":{"kind":"prime","bits":96},"r_bits":47},"phases":[{"name":"setup","prims":{"group_add":155,"group_double":216},"bitops":"239574240","log2_bitops":27.835897551106296},{"name":"search","prims":{"group_add":18026485,"group_double":20570,"word_op":310635851},"bitops":"10484884692704","log2_bitops":43.253376229049486},{"name":"internal_verification","prims":{"group_add":71,"group_double":0},"bitops":"41161824","log2_bitops":25.294803577868333},{"name":"natives","prims":{"field_add":36094112,"hash_probe":8385},"bitops":"45048671616","log2_bitops":35.39076551370789}],"bitops":"10530214100384","log2_bitops":43.25960000308283,"bitops_per_sqrt_r":941850.9807034794,"floor_bitops":5744288059010.652,"ratio_to_floor":1.8331626116601185,"unpriced":[],"known_uncounted":[],"complete":true,"reusable_bitops":"0","per_target_bitops":"10530214100384"}}
+      },
+      "destination": {
+        "execution": {
+          "seq": 6,
+          "round": 1,
+          "warmup": false,
+          "arm": 2,
+          "workload": 1,
+          "algorithm_seed": 12033083312777092757
+        },
+        "workload_id": "Wf94d257e6bd1",
+        "workload_sha256": "f94d257e6bd189157fed5ed5151b620df3291a0d8797100b306a5317a60c85cc",
+        "record": {"schema":"ecbench.record/v1","record_id":"ECR1h602510d0715a","session_id":"ECBS1h71e554f9e2d4","run_id":"ECM1hefea4e0ebe79Wf94d257e6bd1R3","seq":6,"round":1,"warmup":false,"arm":"rho-aa","role":"control","method":{"id":"rho.negation","family":"rho","params":{"cap_multiple":"64"},"method_id":"ECM1hefea4e0ebe79","method_sha256":"efea4e0ebe79dadfedeb75106dab92e25fc26bfe282155ee0326380d4184e995","entry":"ic_boundary::rho_walk_with(NegationClasses, RhoWalk::negation())"},"workload":{"workload_id":"Wf94d257e6bd1","workload_sha256":"f94d257e6bd189157fed5ed5151b620df3291a0d8797100b306a5317a60c85cc","curve_spec":{"kind":"prime_mont4_explicit","p":"78125000378223625457769953627","a":"15990497153433373631697108307","b":"48428362807562559250646568586","group_order":"78125000378223750457770256205","r":125000000302579,"gx":"23468729782310777244428981341","gy":"73111346012038691962804678190"},"curve":{"slug":"icv1-fp96-tm125000000302577-2550b472","icv1":"ICV1:fp-78125000378223625457769953627:-125000000302577:78125000378223750457770256205:78125000378223625457769068891:unk:unk:r:2550b4723dd2","family":"prime","construction":"PrimeMont4 { p: 78125000378223625457769953627, a: 15990497153433373631697108307, b: 48428362807562559250646568586 } (explicit)","field_degree":null,"field_bits":96,"group_order":"78125000378223750457770256205","r":125000000302579,"cofactor":625000001512895,"generator":["0x4bd4e0d6c5d833654f8ed45d","0xec3c49b8fac650644e92ae2e"],"automorphisms_available":2,"registered":false,"ec1":null,"curve_uid":null},"target_law":"uniform_scalar_sha256_shared_v1","target_seed":20261119,"target_index":0,"target":["0x48162f77731f812c65e699a5","0xbc608da84d9fce1ad4048bcf"],"planted":79059150462809},"algorithm_seed":"12033083312777092757","outcome":{"status":"verified","recovered":"79059150462809","matches_target":true,"matches_planted":true,"error":null,"exit":"exit 0","stderr_sha256":null},"cost":{"unit":"ecbench.gae","total_gae":23059999.0,"s":2.0625490105067508,"lower_bound":true,"unpriced":["canonicalisations_uncharged"],"deterministic":true,"nondeterminism":[]},"boundaries":{"automorphisms_available":2,"automorphisms_used":2,"floor_s":0.8862269254527579,"ratio_to_floor":2.327337334569281,"floor_rule":"automorphisms/v2"},"phases":[{"name":"setup","adds":155,"doubles":216,"scalar_mults":0,"gae":371.0,"wall_ns":null,"native":{}},{"name":"search","adds":0,"doubles":0,"scalar_mults":18,"gae":23059557.0,"wall_ns":null,"native":{},"work_native":{"cycle_window_word_ops":396967321}},{"name":"internal_verification","adds":0,"doubles":0,"scalar_mults":0,"gae":71.0,"wall_ns":null,"native":{}}],"counters":{"canonicalisations_uncharged":23059558,"cycle_escape_doublings":26197,"cycles_length_2":731,"cycles_length_4":22161,"cycles_other_length":3305,"distinguished_point_bits":11,"distinguished_points":10770,"jump_coefficient_bits":12,"jumps":16,"look_ahead_additions":738738,"setup_additions":155,"setup_doublings":216,"start_additions":10774,"steps":22283848,"useless_collisions":1,"verification_operations":71,"walk_operations":23048783,"walks":10775,"walks_abandoned_in_a_cycle":0,"walks_capped":5},"factor_base":null,"detail":{"expected_steps":9908318.256007224,"method":"negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts"},"online":{"wall_ns":70527901187,"phases_ns":{"rho_solve":70527901187},"zero_phases":{},"start_event":"first target-dependent operation (the jump table [a]G + [b]Q, or the first table step)","stop_event":"[d]G = Q verified inside the method","included_stages":["walk","collision","recovery_check"],"mapping":"rho: the whole target-dependent solve, one exclusive phase"},"solver":null,"allocator":{"name":"glibc 2.41","pre_solve_trim":true,"trim_result":1},"field_ops":{"muls":46119998,"sqrs":23086459,"invs":23059999},"time":{"solve_wall_ns":70527775978,"method_call_wall_ns":70528205286,"parent_audit_verification_ns":210208,"online_clock_diagnostics":{"error":null},"process_wall_ns":70540663546,"user_ns":70499639000,"sys_ns":12443000,"max_rss_kib":13984,"minor_faults":884,"major_faults":0,"voluntary_switches":1,"involuntary_switches":269,"schedstat_solve":{"cpu_ns":70496768473,"run_delay_ns":25732244,"timeslices":269},"hw_solve":{"instructions":null,"cycles":null,"instructions_time_enabled_ns":null,"instructions_time_running_ns":null,"cycles_time_enabled_ns":null,"cycles_time_running_ns":null,"error":"perf_event_open: Operation not permitted (os error 1)"},"solve":{"threads_before":1,"threads_after":1,"involuntary_switches":269,"voluntary_switches":0,"minor_faults":209,"major_faults":0,"schedstat_all":{"cpu_ns":70500312528,"run_delay_ns":25732244,"timeslices":269},"cpu":null,"irq":null,"cpu_sched":null}},"isolation":{"level":"L0","blockers":["L1: no CPU reservation (--cpus none, or no affinity control on this OS)"],"run_cpu":null,"reserved":[],"node":null,"placement":{"affinity":[0,1,2,3,4],"cpu_at_start":4,"cpu_at_end":2,"mems_allowed":"0","mempolicy":null,"anon_pages_by_node":{"0":235}},"foreign_busy_ticks":null,"steal_ticks":null,"idle_sibling_busy_ticks":null,"before":{"unix_ms":1795112354723,"loadavg":[0.986328125,0.58642578125,0.3056640625],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}},"after":{"unix_ms":1795112425265,"loadavg":[0.99755859375,0.67626953125,0.3603515625],"psi_cpu_some_avg10":null,"psi_cpu_some_total_us":null,"psi_memory_some_avg10":null,"psi_memory_some_total_us":null,"reserved_ticks":{}}},"env_class_id":"ECBENV3h8756b061d3c3","binary_sha256":"9c8db223d0d6be523460519f5339863cbf0935df61cbe0edc69917e24ee2f990","work":{"schema":"ecbench.work/v1","unit":"bitop/v1","widths":{"field":{"kind":"prime","bits":96},"r_bits":47},"phases":[{"name":"setup","prims":{"group_add":155,"group_double":216},"bitops":"239574240","log2_bitops":27.835897551106296},{"name":"search","prims":{"group_add":23033360,"group_double":26197,"word_op":396967321},"bitops":"13397015833024","log2_bitops":43.606976911654925},{"name":"internal_verification","prims":{"group_add":71,"group_double":0},"bitops":"41161824","log2_bitops":25.294803577868333},{"name":"natives","prims":{"field_add":46119116,"hash_probe":10770,"modr_inv":1,"modr_mul":1},"bitops":"57560876531","log2_bitops":35.74436951032811}],"bitops":"13454857445619","log2_bitops":43.61319233922322,"bitops_per_sqrt_r":1203439.033582389,"floor_bitops":5744288059010.652,"ratio_to_floor":2.3423020063405997,"unpriced":[],"known_uncounted":[],"complete":true,"reusable_bitops":"0","per_target_bitops":"13454857445619"}}
+      },
+      "source_status": "verified",
+      "destination_status": "verified"
+    }
+  ],
+  "result_admitted": false,
+  "conductor_gap": null,
+  "cost_ratio": null,
+  "wall_ratio": null,
+  "obligations": [
+    "Independent ecbench verify/replay and record accounting audit",
+    "Certified endpoint conductors, explicit isogeny and subgroup/target transport",
+    "Missing/failure/censoring and unpriced-work analysis before statistics",
+    "Target-cluster statistics; warmups excluded; no complete-case substitution",
+    "Wall isolation, host/binary, A/A, registration and sample-size admission"
+  ]
+}

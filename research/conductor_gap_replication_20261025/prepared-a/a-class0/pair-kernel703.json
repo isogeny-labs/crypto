@@ -1,0 +1,100 @@
+{
+  "class": {
+    "cofactor": 192,
+    "disc": "-14548945664",
+    "expected_levels_per_side": [
+      1,
+      3,
+      6,
+      12,
+      24
+    ],
+    "frobenius_conductor": 36368,
+    "fundamental_disc": -11,
+    "gap_prime": 2273,
+    "gap_prime_over_p_quarter": 9.242547118394143,
+    "log_p_gap_prime": 0.35099010138425946,
+    "n": 19051481,
+    "order": 3657884352,
+    "order_mod_N": 4,
+    "order_proof": "a point P != O with [n]P = O, n prime, n > 4 sqrt(p): the Hasse interval holds one multiple of n, and it is h*n",
+    "p": 3657893441,
+    "rho_negation_expected_gae": 3868.203483194929,
+    "search_candidates_examined": 203,
+    "search_s": 0.000090737,
+    "t": 9090,
+    "t_plus_2_mod_N": 0,
+    "twist_order": 3657902532,
+    "two_depth": 4,
+    "v_N_twist_order": 2
+  },
+  "command": "target/release/volcano-gap construct --bits 32 --depth 4 --d0 11 --max-cofactor 256 --seed 2026102501 --kernel-seed 703 --out research/conductor_gap_replication_20261025/prepared-a/a-class0/pair-kernel703.json",
+  "dual": {
+    "codomain_j_is_j_d0": true,
+    "degree": 2273,
+    "direction": "ascending S2 -> S1",
+    "field_mults": 134488,
+    "kernel_generator_on_twist": [
+      1372053401,
+      1647288820
+    ],
+    "psi_phi_is_plus_minus_N_checks": 5,
+    "u_squared": 5166529
+  },
+  "isogeny": {
+    "codomain_order_checks": 8,
+    "construct_field_mults": 30928,
+    "construct_s": 0.000109986,
+    "degree": 2273,
+    "direction": "descending S1 -> S2",
+    "eval_field_mults_per_point": 10356,
+    "eval_s_per_point": 0.000070526,
+    "generator_order_preserved": true,
+    "homomorphism_checks": 8,
+    "kernel": "<K>, K of order N on the quadratic twist by the non-residue, abscissae x(iK)/c for i = 1..(N-1)/2",
+    "kernel_draws": 1,
+    "kernel_generator_on_twist": [
+      514174954,
+      2161411131
+    ],
+    "transfer_field_mults_per_instance": 20712
+  },
+  "params": {
+    "bits": 32,
+    "d0": -11,
+    "depth": 4,
+    "kernel_seed": 703,
+    "max_cofactor": 256,
+    "seed": 2026102501
+  },
+  "s1_root": {
+    "a": 2477052119,
+    "b": 1296210797,
+    "conductor": 1,
+    "generator": [
+      1839150587,
+      427959402
+    ],
+    "j": 3657860673,
+    "side": "S1",
+    "twist_n_rank": 2
+  },
+  "s2_root": {
+    "a": 2531310623,
+    "b": 445336797,
+    "conductor": 2273,
+    "generator": [
+      2384580228,
+      2699994764
+    ],
+    "j": 2639078063,
+    "side": "S2",
+    "twist_cyclic_witness": [
+      2362082667,
+      3198577063
+    ],
+    "twist_n_rank": 1
+  },
+  "schema": "volcano-gap/pair/v1",
+  "twist_nonresidue": 3
+}

@@ -1,0 +1,92 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "ic_ksum_prefix_joint_20261118 pilot B27",
+ "description": "Pilot (not data). 2x2 on the k-sum -psr arm (prune=1, split=1, stride-renew): L1 prefix=1 (key the partial sums the build forms anyway), L2 stride-renew-joint (Shamir joint double-and-add for the three set-up [a]G+[b]Q). Generic decomposition track (bounded by sqrt(r); cannot beat rho). PROTOCOL.md. Public synthetic curve and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "binary_explicit",
+    "n": 27,
+    "modulus": 134217767,
+    "a": 1,
+    "b": 8672354,
+    "group_order": 134205186,
+    "r": 22367531,
+    "gx": 72506017,
+    "gy": 18815364
+   }
+  ],
+  "targets_per_curve": 64,
+  "target_seed": 20261118407,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "inc",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=12,mult=1",
+     "oracle": "ksum:m=5,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "prefix",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=12,mult=1",
+     "oracle": "ksum:m=5,prune=1,split=1,prefix=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew"
+    }
+   }
+  },
+  {
+   "name": "joint",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=12,mult=1",
+     "oracle": "ksum:m=5,prune=1,split=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew-joint"
+    }
+   }
+  },
+  {
+   "name": "prefix-joint",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "binary-multiplier:size=12,mult=1",
+     "oracle": "ksum:m=5,prune=1,split=1,prefix=1",
+     "max_trials": "13528399621",
+     "targets": "stride-renew-joint"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261118457,
+  "isolation_required": "L0",
+  "timeout_seconds": 1800
+ }
+}

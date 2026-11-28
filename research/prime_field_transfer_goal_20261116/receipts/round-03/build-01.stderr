@@ -1,0 +1,39 @@
+research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp: In function ‘Factors factor_small(unsigned int)’:
+research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp:17:5: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   17 |     if(d>1)++out[Z(d)];return out;
+      |     ^~
+research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp:17:24: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   17 |     if(d>1)++out[Z(d)];return out;
+      |                        ^~~~~~
+research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp: In function ‘void print_factors(const Factors&, const PrimeCert*)’:
+research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp:38:9: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   38 |         if(comma)std::cout<<',';comma=true;
+      |         ^~
+research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp:38:33: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   38 |         if(comma)std::cout<<',';comma=true;
+      |                                 ^~~~~
+research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp: In function ‘Jac signed_times(const Group&, const Point&, const Z&)’:
+research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp:141:5: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+  141 |     if(n<0)out.y=mod(-out.y,group.modulus);return out;
+      |     ^~
+research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp:141:44: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  141 |     if(n<0)out.y=mod(-out.y,group.modulus);return out;
+      |                                            ^~~~~~
+research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp: In function ‘bool small_prime(unsigned int)’:
+research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp:161:5: error: this ‘for’ clause does not guard... [-Werror=misleading-indentation]
+  161 |     for(unsigned d=2;d*d<=q;++d)if(q%d==0)return false;return true;
+      |     ^~~
+research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp:161:56: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+  161 |     for(unsigned d=2;d*d<=q;++d)if(q%d==0)return false;return true;
+      |                                                        ^~~~~~
+research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp: In function ‘Aux common_field(const Z&, const Z&, const Z&, const Z&, const Factors&)’:
+research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp:177:13: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+  177 |             if(n<0)continue;mpz_sqrt(v.get_mpz_t(),n.get_mpz_t());
+      |             ^~
+In file included from /usr/include/gmpxx.h:44,
+                 from research/prime_field_transfer_goal_20261116/round-03/../round-02/local_torsion.cpp:3,
+                 from research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp:4:
+research/prime_field_transfer_goal_20261116/round-03/wild_target.cpp:177:29: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  177 |             if(n<0)continue;mpz_sqrt(v.get_mpz_t(),n.get_mpz_t());
+      |                             ^~~~~~~~
+cc1plus: all warnings being treated as errors

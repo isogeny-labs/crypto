@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T09:25:35Z",
+ "id": "PCC-20261116-09a995",
+ "kind": "measurement",
+ "producer": {
+  "commit": "b2f32242572997d1b37d397546f257defa5c9cc5",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/callgrind-development/qualification-summary-17.json",
+    "sha256": "5b81dff9b13fb97ec802ac4485ae4e5f7cd2336f85efac8e3b71f13b73d44e6b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/callgrind-development/reporter-audit-18.json",
+    "sha256": "03613644ce4c1cfde941939ba410f71e81b13a5a8404adf43c2a0ce3e0c53009"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/callgrind-development/parser-tests-01.log",
+    "sha256": "8f0800ab8d4c21ec0853b8208c16fa631865960e44b0da99051ef387ff9b3204"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/callgrind-development/clippy-03.log",
+    "sha256": "9a74794c9d0fbf94c877e773e774a6adab4dfb0f0bca491695e89b473d507da8"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Instruction-profile capture qualification on old n3 completes exact frozen basis/root mode with unchanged program/runtime pins and native symbols. Four Rust parser tests, strict lint/build and read-only report agree all self/call counts with raw summary/totals and profiler Collected line. Qualification only; no speed diagnosis from its counters."
+}

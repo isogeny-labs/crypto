@@ -1,0 +1,6 @@
+# exp16b_descent: d=5 (Q=32), m=n=4, curve y^2+xy=x^3+b, target 2*random point
+# kind | dim span{1,r,r^2,r^3} | odd-exponent monomial counts (s1..s4) over the 4 eqs | dim U (measured; predicted 4-span) | ideal deg (cpu) | adapted: odd counts in y1..y4 | reduced deg (cpu) | ratio
+c1 through0 (c0=0) | 1 | [0, 0, 0, 137] | 3 (pred 3) | 4096 (0.38s) | [0, 0, 0, 137] | 512 (0.37s) | 8.00
+c1 c0=u*z, z in F_Q* | 1 | [136, 136, 136, 136] | 3 (pred 3) | 4096 (6.40s) | [0, 0, 0, 138] | 512 (0.45s) | 8.00
+c1 c0=u*r, r in F_Q^2\F_Q | 2 | [134, 135, 137, 135] | 2 (pred 2) | 4096 (32.81s) | [0, 0, 136, 136] | 1024 (3.28s) | 4.00
+EXIT 124

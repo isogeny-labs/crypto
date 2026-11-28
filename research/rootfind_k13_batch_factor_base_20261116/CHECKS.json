@@ -1,0 +1,196 @@
+{
+  "amended_source_commit": "0c23166d62",
+  "cargo_version": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "claim": "PCC-20261116-7748c7",
+  "claim_standing": "unverified",
+  "host_arch": "aarch64-apple-darwin",
+  "host_os": "macOS 27.2 (26B123)",
+  "independent_replay": false,
+  "koblitz_module_screen": {
+    "full2_failed": 1,
+    "full2_tests_reported": 185,
+    "new_batch_tests_passed": 2,
+    "pre_candidate_baseline_binary": {
+      "binary_build_commit_provenance": "not established",
+      "path": "/Volumes/SSD990-2/crypto/wt/codex-rootfind-k13-admission-20261115/target/release/deps/crypto_lib-7afba7a5a589a2c4",
+      "sha256": "2b4ed613091281970fd7bce5536167ebd86bcac886c1d8d1f9ee7acee87ff7bc",
+      "source_sha256": "6f0d8af209a59b790cd0c371ae37e60b89a2c123471daffcf9fafe8624b3d952",
+      "worktree_head_at_replay": "557f28efa880a07589dd806d42693697c0993411"
+    }
+  },
+  "prior_attempts": [
+    {
+      "exit": {
+        "bytes": 4,
+        "path": "test-first.exit",
+        "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+      },
+      "exit_code": 101,
+      "id": "test-first",
+      "interpretation": "K17 constructor fixture failure, amended before retest",
+      "source_commit": "5b74bae8ff",
+      "stderr": {
+        "bytes": 24574,
+        "path": "test-first.stderr",
+        "sha256": "7fb50797ded139ef91982eee4a95623044fe0459fe403909d0ed91d93270e189"
+      },
+      "stdout": {
+        "bytes": 3270,
+        "path": "test-first.stdout",
+        "sha256": "9d0caed8b2ce2844b39d5e2d577172ba1bd02c1cfbfd9d7c5bbd46133a863d7e"
+      }
+    },
+    {
+      "exit_code": null,
+      "id": "test-interrupted",
+      "interpretation": "external interruption before exit receipt; not a test result",
+      "source_commit": "5b74bae8ff",
+      "stderr": {
+        "bytes": 21953,
+        "path": "test-interrupted.stderr",
+        "sha256": "299aff98d101a2e25a4359b55a5d76df6118b43c62eff2c9e1ef05d30ef359c2"
+      },
+      "stdout": {
+        "bytes": 0,
+        "path": "test-interrupted.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "protocol_commit": "3febee7878",
+  "runs": [
+    {
+      "command": "RUSTC=/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc /Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/cargo test --release --locked -j 2 --lib batched_ -- --nocapture",
+      "exit": {
+        "bytes": 2,
+        "path": "test.exit",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "exit_code": 0,
+      "id": "test",
+      "interpretation": "28 passed, 0 failed; local producer correctness screen",
+      "stderr": {
+        "bytes": 24074,
+        "path": "test.stderr",
+        "sha256": "edd8ea8f871fb4fdd28a3f256faabf3c1ac8bc7831b02f486f6c94a3c8e40522"
+      },
+      "stdout": {
+        "bytes": 3028,
+        "path": "test.stdout",
+        "sha256": "8cf778c31e5b58a354ed23d4773c33b67c9075dbf4be81b47ada1997cc028d60"
+      }
+    },
+    {
+      "command": "RUSTC=/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc /opt/homebrew/bin/gtimeout 600 /Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/cargo test --release --locked -j 2 --lib -- --test-threads=4",
+      "exit": {
+        "bytes": 4,
+        "path": "full.exit",
+        "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff"
+      },
+      "exit_code": 124,
+      "id": "full",
+      "interpretation": "watchdog-censored at 600 seconds; chained S3 test failed before censor",
+      "stderr": {
+        "bytes": 15192,
+        "path": "full.stderr",
+        "sha256": "6b907717964790fdfa9a16c215bcdd6d9a7ba3dc546e56c0b3aa8997d316ceb3"
+      },
+      "stdout": {
+        "bytes": 333811,
+        "path": "full.stdout",
+        "sha256": "4342f509506a82d3f5bcf39f48739ae2f35b6c964eb215c7f929996e9843b4ae"
+      }
+    },
+    {
+      "command": "RUSTC=/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc /opt/homebrew/bin/gtimeout 1800 /Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/cargo test --release --locked -j 2 --lib -- --test-threads=4",
+      "exit": {
+        "bytes": 4,
+        "path": "full2.exit",
+        "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff"
+      },
+      "exit_code": 124,
+      "id": "full2",
+      "interpretation": "watchdog-censored at 1800 seconds; chained S3 test failed before censor",
+      "stderr": {
+        "bytes": 15192,
+        "path": "full2.stderr",
+        "sha256": "da0b6a4b7346b6d04bdaaacc1951b1fc8a2f73c0756c74159c98e670a57b7efd"
+      },
+      "stdout": {
+        "bytes": 387918,
+        "path": "full2.stdout",
+        "sha256": "f5197cf40060dee444e4755d19ebd68894b3f51f7602e33780b3d6cd72fcd386"
+      }
+    },
+    {
+      "command": "/opt/homebrew/bin/gtimeout 300 target/release/deps/crypto_lib-7afba7a5a589a2c4 cryptanalysis::koblitz_index_calculus::tests::chained_s3_strategy_feeds_verified_relation_rank_and_target_solve --exact --nocapture",
+      "exit": {
+        "bytes": 4,
+        "path": "isolate.exit",
+        "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+      },
+      "exit_code": 101,
+      "id": "isolate",
+      "interpretation": "same 16-versus-0 assertion, candidate binary, isolated",
+      "stderr": {
+        "bytes": 329,
+        "path": "isolate.stderr",
+        "sha256": "601f0242b7e6c48ad4d8820da14d936358e6e794a08ecc15eee783880ee7c912"
+      },
+      "stdout": {
+        "bytes": 385,
+        "path": "isolate.stdout",
+        "sha256": "7a390064438cf7733ec95f79eb2e3680f77d71cd9de692b0babbbc9b0855bec6"
+      }
+    },
+    {
+      "command": "/opt/homebrew/bin/gtimeout 300 /Volumes/SSD990-2/crypto/wt/codex-rootfind-k13-admission-20261115/target/release/deps/crypto_lib-7afba7a5a589a2c4 cryptanalysis::koblitz_index_calculus::tests::chained_s3_strategy_feeds_verified_relation_rank_and_target_solve --exact --nocapture",
+      "exit": {
+        "bytes": 4,
+        "path": "baseline.exit",
+        "sha256": "39b8dc3fc8b44765c8e6f1adee04c5b465e555ab791cc42d0d9e810d5b64297c"
+      },
+      "exit_code": 101,
+      "id": "baseline",
+      "interpretation": "same 16-versus-0 assertion in a pre-candidate executable; its build commit is not independently pinned",
+      "stderr": {
+        "bytes": 329,
+        "path": "baseline.stderr",
+        "sha256": "5d9ba9349af69a9dc2cf9f069bbea08dd976a5bccd6c0735f6b43fec997f3071"
+      },
+      "stdout": {
+        "bytes": 385,
+        "path": "baseline.stdout",
+        "sha256": "1d86e3146cf39080bbd9010f5e5a90981424eea0ef0c4a195524ff78b54e538e"
+      }
+    },
+    {
+      "command": "rustfmt --edition 2021 --check src/cryptanalysis/koblitz_index_calculus.rs",
+      "exit": {
+        "bytes": 2,
+        "path": "fmt.exit",
+        "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      },
+      "exit_code": 0,
+      "id": "fmt",
+      "interpretation": "targeted formatting check",
+      "stderr": {
+        "bytes": 0,
+        "path": "fmt.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 0,
+        "path": "fmt.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "rustc_version": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "schema": "rootfind-batch-lift-source-screen/v1",
+  "source": {
+    "path": "src/cryptanalysis/koblitz_index_calculus.rs",
+    "sha256": "e510c07f96c2cdb114ddd2814e39ce71415932d1f7fe3cb078ffc1c648a4a82c"
+  },
+  "timing_or_speed_claim": false
+}

@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T06:35:26Z",
+ "id": "PCC-20261117-13ccb4",
+ "kind": "execution",
+ "producer": {
+  "commit": "8478ebfe4cea21b8f927fd88eadb26ff6ff29b24",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "/tmp/ic-pair48-native/worker-tests-serial.log",
+    "sha256": "4b25ff066c57ca5b0241617f0dcaae87212e4988cf81bfbc49de31d48a471afb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "/tmp/ic-pair48-native/worker-tests-serial.status",
+    "sha256": "152f2731f501294d34178a5aea1cbca61989a74f486cb48ed168b0ca7f439299"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "/tmp/ic-pair48-native/worker-tests.log",
+    "sha256": "c1c1054f6b49e725265e8b950e221b98512c979740ca8e4c5bebf5bcc855be3f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Grounded two-quadratic collector and combined native worker compile; 36 controls pass with test-threads=1. Initial default-parallel run failed two shared global accounting assertions and is retained. This is source/unit integration only; full independent qualifier and natural-yield measurement remain pending."
+}

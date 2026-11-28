@@ -1,0 +1,38 @@
+{
+  "schema": "actual-root-native-requalification-context/v1",
+  "source": "ROOT_UNIT_SOURCE_348.json",
+  "original_plan": "ROOT_RECOVERED_UNIT_PLAN_346.json",
+  "command": [
+    "taskset",
+    "-c",
+    "0",
+    "/home/agent/.cargo/bin/cargo",
+    "test",
+    "--release",
+    "--locked",
+    "--manifest-path",
+    "research/relation_fusion_20261117/root-integration/Cargo.toml",
+    "--test",
+    "flat_constructor",
+    "--",
+    "--test-threads=1"
+  ],
+  "environment": {
+    "CARGO_PROFILE_RELEASE_OPT_LEVEL": "0",
+    "CARGO_PROFILE_RELEASE_LTO": "off",
+    "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "16",
+    "CARGO_BUILD_JOBS": "1",
+    "CARGO_TARGET_DIR": "/workspace/crypto-root-unoptimized-181",
+    "RAYON_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "RUST_TEST_THREADS": "1",
+    "RELATION_ROOT_INTEGRATION_OUT": "/workspace/flat-root-matrix-352"
+  },
+  "features": "root-integration depends on actual crypto default-features=false; distinct from348default-feature unit binary",
+  "planned_cases": 36,
+  "predicted_scope": "Same complete proofs/native checks/basis/mutations/refusals as322. Every stored artifact must be byte-identical. No performance interpretation.",
+  "recorded_before_build_and_calls": true,
+  "signed_execution_verdict": false,
+  "performance_comparison": false
+}

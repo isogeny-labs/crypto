@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T06:51:52Z",
+ "id": "PCC-20261118-8b3a31",
+ "kind": "statement",
+ "producer": {
+  "commit": "410dcfae404efcf01a6bec17d994ff04abe675d0",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/evaluator-20261118/worker/validation/summary.json",
+    "sha256": "36beb9563603d8f1c361f53b19645623be3b8e8d7a478f2ecee4021ddc2a1dbe"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/evaluator-20261118/worker/validation/attempt-a/fixtures.stderr",
+    "sha256": "f46e05d7db2b5909a90bbc660c56622e2eac634e6cf921fbf601b4f9dda11624"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/evaluator-20261118/worker/validation/attempt-b/fixtures.jsonl",
+    "sha256": "dfd44f832ae1b1d6f6e8696673f1a20ca32fdc06d351dae75696631c78a52bba"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/evaluator-20261118/worker/validation/attempt-b/image-source-manifest.sha256",
+    "sha256": "21dc819d2143b50ca9223cf9f8f21ba2e380bde9018e64956b1484a9cc358591"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/evaluator-20261118/worker/validation/attempt-b/image-binary-manifest.sha256",
+    "sha256": "bc5eece0a694c1297932f15295cbde6ec693fa21c21664e62b31864c6359efbf"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/evaluator-20261118/worker/validation/attempt-b/runtime-identity.txt",
+    "sha256": "e02633b3e3160a15fc3f3f98b658ca400774e81dac5cab00dbb5486e94004a13"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/evaluator-20261118/worker",
+ "statement": "A corrected standalone amd64 FLINT/PARI evaluator worker runs as UID/GID 1000 and reproduces the frozen native fixture bytes under finite local development limits. The initial missing-GMP-C++ loader failure is retained. No large-case experiment, registry publication, conductor-gap record or runtime measurement is produced."
+}

@@ -1,0 +1,2179 @@
+{
+ "schema": "validator-report/v1",
+ "status": "pass",
+ "independent": true,
+ "disposition": "validated",
+ "study": "research/genus4_prime_order_20261118",
+ "commit_validated": "7c0e84dedacc4acd5d6d587bfc6015fcbd2247ba",
+ "freeze_commit": "6da1e3c5b28342e2afd3a8753f844be9398bc5b8",
+ "binary_commit": "ca722678990abd7c2396310808a84c20b2457398",
+ "pr": "isogeny-labs/crypto#4693",
+ "validator": "Validator subagent (Claude Opus 5.5), 2026-11-18; recompute, certificates, prefilter tests and replay comparison with the validator's own code in research/genus4_prime_order_20261118/validation/scripts; analyze.py, tune.py, curves.py and report.py were read, never run or imported",
+ "raw_data_base": "benchmarks/20261118-genus4-prime-order",
+ "raw_data": [
+  {
+   "path": "../../research/genus4_prime_order_20261118/a_cc1.4.jsonl.gz",
+   "sha256": "82bbe8880aa8070f47b3a4e4fe39f2df6398feadb44eeab429cc44e329b190a3"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/a_cc2.0.jsonl.gz",
+   "sha256": "145dea537cdd36721b2afc5a9d0d308707ae0634314e20665f6e031accc501e4"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/a_cc2.8.jsonl.gz",
+   "sha256": "38f9f45b6848a3bc4f9d89d06586b7558dc867a4a68fbaff3942740a5e28d6fb"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/b_p16411_q.jsonl.gz",
+   "sha256": "1e53df6d533eb07bc4eaa67831158c735a0753f55de2447c5e78ccd651b0f136"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/b_p16411_x.jsonl.gz",
+   "sha256": "96b186020b8c809d241b36ae5671cf0356cd04e5924a0554bab9d85a507c5a9e"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/b_p16411_xstar.jsonl.gz",
+   "sha256": "bdec1befb18af007b07caa929b02e74e8c4d783d7bdc8988c3f8e50d12a26924"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/b_p32771_x.jsonl.gz",
+   "sha256": "499637a37583867c1c49254c8f1913016521c16d7c6f0eb15ced5cff499b47bf"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/b_p32771_xstar.jsonl.gz",
+   "sha256": "dd87a5345a12aabcd2722328cf186e8eaa5eaf15f3e48ef5c289765d7430ea4a"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p16411_1_0.jsonl.gz",
+   "sha256": "8b30e7e37336a1a83f11b91ee6ffe6fb147c5d0ede8f9ee5b6a63c5e07d40dd5"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p16411_1_1.jsonl.gz",
+   "sha256": "6c955c4289395942492ba2cf1d74afcb3c95dc17d5503f1504cbd1bd1a95a655"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p16411_1_2.jsonl.gz",
+   "sha256": "a7af21374f3d563c3fa8f860796e131131eaffa39b86e41178e4df52e69c467d"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p16411_1_3.jsonl.gz",
+   "sha256": "a9304f26546a121279de48b08d565c2215da121adc4e8490c9b560d0bdefbee3"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_1_0.jsonl.gz",
+   "sha256": "6d0ec9c7b9484a8a32710514489d35b960eb8ef1215a69cfbb2c91d3d9c37b89"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_1_1.jsonl.gz",
+   "sha256": "b90d403188b9de5bb92fdb675436d4dde1221b5985e0079bca3fa0dd528e9c99"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_1_2.jsonl.gz",
+   "sha256": "d0e4953090693476b33c1c48815b378b20955f74f7bdc36c0673f56dd2546ef3"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_1_3.jsonl.gz",
+   "sha256": "372b61c813a6b6fe453b4a2ff5590121883814b7ed649f5b8ea5318f78f5d4e7"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w0_c0.jsonl.gz",
+   "sha256": "359a503e1c60a5e27c836445465cda435447e40b6f54a7e4aa1f306ad8dac523"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w0_c112.jsonl.gz",
+   "sha256": "cee15c3aa2ba159f0d8e50e6aaa425ab2568bdfd0a07629079517cd07d87300d"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w0_c28.jsonl.gz",
+   "sha256": "343dedb8ae3cc71870028b9d326407398cff2e57653ef29dc2bb83f5561005db"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w0_c56.jsonl.gz",
+   "sha256": "71fb86e7d1038637b0900a88bb2644e4700e8dcda342ce92b14b1095126b9532"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w0_c84.jsonl.gz",
+   "sha256": "3a86b879c3cf8ca5039eb1c0365190b29b547870aa7f6e556a49c195e41cfc8f"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w1_c0.jsonl.gz",
+   "sha256": "4dbdb719c02b782d96c994f9091a6c44c9519e2b1f29bb32472857a2aa47ae22"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w1_c112.jsonl.gz",
+   "sha256": "9620e89a9d0e9374417a29cce7ebf5f228c61e64858430804ebc967578a88675"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w1_c28.jsonl.gz",
+   "sha256": "0d213b4306fc3703a2dc57f62b49ef2bd60fbb748a5d1cc6b644170ed2b2822e"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w1_c56.jsonl.gz",
+   "sha256": "52ae34aaf7aae681814381e121a65533dac29a129a95d63fe416f45946514fcd"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w1_c84.jsonl.gz",
+   "sha256": "7cf6ba0fe1c0c9e70212d59c9e49bac980466e2eedfa9c4b102559905c614879"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w2_c0.jsonl.gz",
+   "sha256": "86d6f731b4a119ff94de576e2867ec957aee09f851d2ffa00ec69cde78878443"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w2_c28.jsonl.gz",
+   "sha256": "a898316df6179ed486b452c2170bc36ba8ffc4f80ad204639e59011f99cdb3a5"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w2_c56.jsonl.gz",
+   "sha256": "54458bd159d1d0fbc8c0cc3f5366f3757ff61845d2c0623c786f09f7fd0a9587"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w2_c84.jsonl.gz",
+   "sha256": "721e3612661a9db613c70e5ae08cf0d62f5305ca25b7a030a6c178744d8b0623"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w3_c0.jsonl.gz",
+   "sha256": "4150fd164e9d0d554920458208769b997a79e06837eddef0ae2b7790026c2633"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w3_c28.jsonl.gz",
+   "sha256": "72cd1f23f031f3c9dff573e7a88642cd66ee2dc04e5673d3939dc52e234995c5"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w3_c56.jsonl.gz",
+   "sha256": "ac50c95138a1c4623a7c8a1cc613e8b33896b18c61a8402a22dbc13ed85b2f66"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1-1800-3_w3_c84.jsonl.gz",
+   "sha256": "f32c9863623d020e89ad69a741aa9560724cdd902d897ea8be4b9a4546ca5ce2"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w0_c0.jsonl.gz",
+   "sha256": "68a1a959498db11e6c43720232545ffd731683c9bee0800c47359123d7649498"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w0_c28.jsonl.gz",
+   "sha256": "806273f7ffba32c4148fb9ffdeea89af9b1943a9f5e6d6667f6b2495da195246"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w0_c56.jsonl.gz",
+   "sha256": "eef5c23539f71a781e5a9a5c776cc60302ee6cb06f10e676dcb57fc82fdebb63"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w0_c84.jsonl.gz",
+   "sha256": "38e190111553301af68139955748128711348718d89e4acf7b8d1423dfd7e3b7"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w1_c0.jsonl.gz",
+   "sha256": "bd43c4ca09aa775379c489ba227b563966e441f113c2553d2c544d30b92be8cf"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w1_c28.jsonl.gz",
+   "sha256": "b7b06a230a00c3d42fd389cc6f9925cb8fddf506637d0d2b485a6469a0551969"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w1_c56.jsonl.gz",
+   "sha256": "eff34f795c2164aa131102a0911761e683c29f9bc7900da977470e385b38811c"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w1_c84.jsonl.gz",
+   "sha256": "0fb7ed5c593b4f98bacc100b656438e71ff77f808f15c1f9cbe8b752c2efd3ca"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w2_c0.jsonl.gz",
+   "sha256": "a995a8c4e64fcfe0aa5fb0b6cc23a441648cd7828ea167db805a1035a8b089ec"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w2_c28.jsonl.gz",
+   "sha256": "a69e3a2cfcd5dd9caf503c43788b23dafeb90442f755d0febf3ac26c1c41628e"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w2_c56.jsonl.gz",
+   "sha256": "f1967f8bd53b4820943fb62542b321f827b10fea850974fec4165e50b914f187"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w2_c84.jsonl.gz",
+   "sha256": "553d09f8c6b3da04acd3c430b2392cfc08eefaf75042d30ee7bd4579875f453d"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w3_c0.jsonl.gz",
+   "sha256": "77f82841785e8848a08e5f7195238b22097aa03d933a63f206828eade02a8e16"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w3_c28.jsonl.gz",
+   "sha256": "588947f3f45b396e00a708e1227b77b1627a5b12849f57cbdbc1539205d1675e"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w3_c56.jsonl.gz",
+   "sha256": "7d8395f84bcefc17c28d400de887f393b82121191267c04c503a6888ad7e2443"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r1801-2200-all_w3_c84.jsonl.gz",
+   "sha256": "46e37c0898c806da162d324d7e4b6865b54cfcacea70855b8eb12f1ed0e181fc"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w0_c0.jsonl.gz",
+   "sha256": "6575fdf9b4286d860cc89ed7ad8c613a06b71c6ef1f822ab71507660bb1bff5e"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w0_c28.jsonl.gz",
+   "sha256": "0dd515166250f2656c8d8ac02668f08c1393d5575b2ccca060540dbff90c01ba"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w0_c56.jsonl.gz",
+   "sha256": "effbdfdce4fd781b9f71cec6b188607dea33a9d031ce4f789acb53f55f82399b"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w0_c84.jsonl.gz",
+   "sha256": "485d2f2e169ad8c3214f3af4869e3a511477c76e1670c2616d784b503c41a533"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w1_c0.jsonl.gz",
+   "sha256": "9f1c9347429b543f94b6cec5a21b7b80c9af13b58fa0d4165ff775ad79777e75"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w1_c28.jsonl.gz",
+   "sha256": "68d4e31d4256f0d2769be0ca8df9c65537322b6df5ba2cd27c4a976561542793"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w1_c56.jsonl.gz",
+   "sha256": "fb546417ca104781bcb6dd4b0b198ece524bda2514d6dc8d5ff28cf677c28ac3"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w1_c84.jsonl.gz",
+   "sha256": "59c42b4ef52341654885d87f07b015f24e88c631fdd3eafc6e4d9bab34e31ce3"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w2_c0.jsonl.gz",
+   "sha256": "9d196c965dd7ff5e1a30f53709dcf66913b2ca1fcb1572f17fbebf2f01926070"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w2_c28.jsonl.gz",
+   "sha256": "aa0912ad1ebce984b09d2e4a25fde809d0eec195a9ca1ced2eee83b8948f80e3"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w2_c56.jsonl.gz",
+   "sha256": "eedfa8fc0f8c21cc117d136cf888cecdbe81694c6a8f465f57c28af5eeea1a29"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w2_c84.jsonl.gz",
+   "sha256": "0165bf6e8e5ea390951eea093f1833ea1037eb5367e02e4ed69badc00734931e"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w3_c0.jsonl.gz",
+   "sha256": "9f119c32bc856c866bbfab57fe6dc1ae7de6f93571bc125ae79bc86d785aea9c"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w3_c28.jsonl.gz",
+   "sha256": "670992c4f0a6fc1c94a7640db64bae98c84fbe2233345b03399092903b0ecc20"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w3_c56.jsonl.gz",
+   "sha256": "9a153aaed003002d316578905e25fbeccd7df886cb16cd94eb5ed1a0b70c2a79"
+  },
+  {
+   "path": "../../research/genus4_prime_order_20261118/search_p32771_r2201-2600-all_w3_c84.jsonl.gz",
+   "sha256": "53edf41f44f431ecd26423e1b6323bf0ed885e9bea7e59efc50cdb604f2ca834"
+  }
+ ],
+ "headline": [
+  {
+   "name": "analysis.json/tune/w_max",
+   "claimed": 4,
+   "recomputed": 4,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/tune/fill_max",
+   "claimed": 1.5,
+   "recomputed": 1.5,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/tune/runs",
+   "claimed": 12,
+   "recomputed": 12,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/tune/mean_cost_w1",
+   "claimed": 209536985.08333334,
+   "recomputed": 209536985.08333334,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/q_check/runs",
+   "claimed": 5,
+   "recomputed": 5,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/q_check/mean_over_sqrt_pi_r_2",
+   "claimed": 0.8041435539036706,
+   "recomputed": 0.8041435539036706,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/keys",
+   "claimed": 60,
+   "recomputed": 60,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/curves[0]",
+   "claimed": 373,
+   "recomputed": 373,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/curves[1]",
+   "claimed": 455,
+   "recomputed": 455,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/curves[2]",
+   "claimed": 548,
+   "recomputed": 548,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/curves[3]",
+   "claimed": 752,
+   "recomputed": 752,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/curves[4]",
+   "claimed": 875,
+   "recomputed": 875,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/neg_w0/ratio",
+   "claimed": 0.0017844227428724573,
+   "recomputed": 0.0017844227428724573,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/neg_w0/lo",
+   "claimed": 0.0017718628786976627,
+   "recomputed": 0.0017718628786976627,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/neg_w0/hi",
+   "claimed": 0.0017952812712150425,
+   "recomputed": 0.0017952812712150425,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/neg_w0.1/ratio",
+   "claimed": 0.10147180029140883,
+   "recomputed": 0.10147180029140883,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/neg_w0.1/lo",
+   "claimed": 0.10109385199553066,
+   "recomputed": 0.10109385199553066,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/neg_w0.1/hi",
+   "claimed": 0.10184457998355866,
+   "recomputed": 0.10184457998355866,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/neg_w1/ratio",
+   "claimed": 0.998658198228236,
+   "recomputed": 0.998658198228236,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/neg_w1/lo",
+   "claimed": 0.9949237570204839,
+   "recomputed": 0.9949237570204839,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/neg_w1/hi",
+   "claimed": 1.0023446412815091,
+   "recomputed": 1.0023446412815091,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/plain_w0/ratio",
+   "claimed": 0.0012617774219886137,
+   "recomputed": 0.0012617774219886137,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/plain_w0/lo",
+   "claimed": 0.0012528962568598345,
+   "recomputed": 0.0012528962568598345,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/plain_w0/hi",
+   "claimed": 0.0012694555610133621,
+   "recomputed": 0.0012694555610133621,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/plain_w0.1/ratio",
+   "claimed": 0.07175139808526228,
+   "recomputed": 0.07175139808526228,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/plain_w0.1/lo",
+   "claimed": 0.07148414828230891,
+   "recomputed": 0.07148414828230891,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/plain_w0.1/hi",
+   "claimed": 0.07201499313347005,
+   "recomputed": 0.07201499313347005,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/plain_w1/ratio",
+   "claimed": 0.7061579840547252,
+   "recomputed": 0.7061579840547252,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/plain_w1/lo",
+   "claimed": 0.7035173353527809,
+   "recomputed": 0.7035173353527809,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/plain_w1/hi",
+   "claimed": 0.7087646929361525,
+   "recomputed": 0.7087646929361525,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/mean_cost_w1",
+   "claimed": 238909092.48333332,
+   "recomputed": 238909092.48333332,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/la_share_w1",
+   "claimed": 0.7659557368922627,
+   "recomputed": 0.7659557368922627,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/fb_cols",
+   "claimed": 2900.0,
+   "recomputed": 2900.0,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/per_curve_neg_w1/373",
+   "claimed": 0.9991578777640722,
+   "recomputed": 0.9991578777640722,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/per_curve_neg_w1/455",
+   "claimed": 0.9990948921466417,
+   "recomputed": 0.9990948921466417,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/per_curve_neg_w1/548",
+   "claimed": 0.998687666469667,
+   "recomputed": 0.998687666469667,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/per_curve_neg_w1/752",
+   "claimed": 0.9972756745718608,
+   "recomputed": 0.9972756745718608,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x/per_curve_neg_w1/875",
+   "claimed": 0.9990809988490338,
+   "recomputed": 0.9990809988490338,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/neg_w0/ratio",
+   "claimed": 0.00294668337038365,
+   "recomputed": 0.00294668337038365,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/neg_w0/lo",
+   "claimed": 0.0029275131918385855,
+   "recomputed": 0.0029275131918385855,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/neg_w0/hi",
+   "claimed": 0.002963499717884285,
+   "recomputed": 0.002963499717884285,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/neg_w0.1/ratio",
+   "claimed": 0.09024365844566323,
+   "recomputed": 0.09024365844566323,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/neg_w0.1/lo",
+   "claimed": 0.08980515030052032,
+   "recomputed": 0.08980515030052032,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/neg_w0.1/hi",
+   "claimed": 0.0906348733261903,
+   "recomputed": 0.0906348733261903,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/neg_w1/ratio",
+   "claimed": 0.8759164341231793,
+   "recomputed": 0.8759164341231793,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/neg_w1/lo",
+   "claimed": 0.871708656890283,
+   "recomputed": 0.871708656890283,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/neg_w1/hi",
+   "claimed": 0.8797115608352073,
+   "recomputed": 0.8797115608352073,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/plain_w0/ratio",
+   "claimed": 0.00208361979320791,
+   "recomputed": 0.00208361979320791,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/plain_w0/lo",
+   "claimed": 0.002070064429962138,
+   "recomputed": 0.002070064429962138,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/plain_w0/hi",
+   "claimed": 0.0020955107465603987,
+   "recomputed": 0.0020955107465603987,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/plain_w0.1/ratio",
+   "claimed": 0.06381190284601113,
+   "recomputed": 0.06381190284601113,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/plain_w0.1/lo",
+   "claimed": 0.06350183076297503,
+   "recomputed": 0.06350183076297503,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/plain_w0.1/hi",
+   "claimed": 0.0640885335409329,
+   "recomputed": 0.0640885335409329,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/plain_w1/ratio",
+   "claimed": 0.61936645032124,
+   "recomputed": 0.61936645032124,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/plain_w1/lo",
+   "claimed": 0.6163911025061365,
+   "recomputed": 0.6163911025061365,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/plain_w1/hi",
+   "claimed": 0.6220500101547771,
+   "recomputed": 0.6220500101547771,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/mean_cost_w1",
+   "claimed": 209545568.98333332,
+   "recomputed": 209545568.98333332,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/la_share_w1",
+   "claimed": 0.5597863075914676,
+   "recomputed": 0.5597863075914676,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/fb_cols",
+   "claimed": 2030.0,
+   "recomputed": 2030.0,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/per_curve_neg_w1/373",
+   "claimed": 0.8760934410140336,
+   "recomputed": 0.8760934410140336,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/per_curve_neg_w1/455",
+   "claimed": 0.8754229920841103,
+   "recomputed": 0.8754229920841103,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/per_curve_neg_w1/548",
+   "claimed": 0.8792022945896887,
+   "recomputed": 0.8792022945896887,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/per_curve_neg_w1/752",
+   "claimed": 0.8703494206129151,
+   "recomputed": 0.8703494206129151,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/arms/x*/per_curve_neg_w1/875",
+   "claimed": 0.878539362644722,
+   "recomputed": 0.878539362644722,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/xstar_over_x_w1/ratio",
+   "claimed": 0.8770933194932777,
+   "recomputed": 0.8770933194932777,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/xstar_over_x_w1/lo",
+   "claimed": 0.8730039680918396,
+   "recomputed": 0.8730039680918396,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/16411/xstar_over_x_w1/hi",
+   "claimed": 0.8813235327739208,
+   "recomputed": 0.8813235327739208,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/keys",
+   "claimed": 60,
+   "recomputed": 60,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/curves[0]",
+   "claimed": 355,
+   "recomputed": 355,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/curves[1]",
+   "claimed": 882,
+   "recomputed": 882,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/curves[2]",
+   "claimed": 1461,
+   "recomputed": 1461,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/curves[3]",
+   "claimed": 1623,
+   "recomputed": 1623,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/curves[4]",
+   "claimed": 2374,
+   "recomputed": 2374,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/neg_w0/ratio",
+   "claimed": 0.0011332265156455826,
+   "recomputed": 0.0011332265156455826,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/neg_w0/lo",
+   "claimed": 0.0011286218286423256,
+   "recomputed": 0.0011286218286423256,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/neg_w0/hi",
+   "claimed": 0.0011392538663538621,
+   "recomputed": 0.0011392538663538621,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/neg_w0.1/ratio",
+   "claimed": 0.07794892209142974,
+   "recomputed": 0.07794892209142974,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/neg_w0.1/lo",
+   "claimed": 0.07769234857678466,
+   "recomputed": 0.07769234857678466,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/neg_w0.1/hi",
+   "claimed": 0.07819809750235626,
+   "recomputed": 0.07819809750235626,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/neg_w1/ratio",
+   "claimed": 0.7692901822734871,
+   "recomputed": 0.7692901822734871,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/neg_w1/lo",
+   "claimed": 0.7667034561805969,
+   "recomputed": 0.7667034561805969,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/neg_w1/hi",
+   "claimed": 0.7717819199761331,
+   "recomputed": 0.7717819199761331,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/plain_w0/ratio",
+   "claimed": 0.0008013121538333947,
+   "recomputed": 0.0008013121538333947,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/plain_w0/lo",
+   "claimed": 0.0007980561484281501,
+   "recomputed": 0.0007980561484281501,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/plain_w0/hi",
+   "claimed": 0.0008055741343918086,
+   "recomputed": 0.0008055741343918086,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/plain_w0.1/ratio",
+   "claimed": 0.055118211397031845,
+   "recomputed": 0.055118211397031845,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/plain_w0.1/lo",
+   "claimed": 0.05493678652495345,
+   "recomputed": 0.05493678652495345,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/plain_w0.1/hi",
+   "claimed": 0.055294405019802935,
+   "recomputed": 0.055294405019802935,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/plain_w1/ratio",
+   "claimed": 0.5439703045858179,
+   "recomputed": 0.5439703045858179,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/plain_w1/lo",
+   "claimed": 0.542141213024463,
+   "recomputed": 0.542141213024463,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/plain_w1/hi",
+   "claimed": 0.5457322292122969,
+   "recomputed": 0.5457322292122969,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/mean_cost_w1",
+   "claimed": 732056151.2166667,
+   "recomputed": 732056151.2166667,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/la_share_w1",
+   "claimed": 0.8063921323324122,
+   "recomputed": 0.8063921323324122,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/fb_cols",
+   "claimed": 4872.0,
+   "recomputed": 4872.0,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/per_curve_neg_w1/355",
+   "claimed": 0.769535495219447,
+   "recomputed": 0.769535495219447,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/per_curve_neg_w1/882",
+   "claimed": 0.7654029208555273,
+   "recomputed": 0.7654029208555273,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/per_curve_neg_w1/1461",
+   "claimed": 0.76961353254029,
+   "recomputed": 0.76961353254029,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/per_curve_neg_w1/1623",
+   "claimed": 0.771131413994566,
+   "recomputed": 0.771131413994566,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x/per_curve_neg_w1/2374",
+   "claimed": 0.7707568864731679,
+   "recomputed": 0.7707568864731679,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/neg_w0/ratio",
+   "claimed": 0.0019274081382446514,
+   "recomputed": 0.0019274081382446514,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/neg_w0/lo",
+   "claimed": 0.0019219728442849344,
+   "recomputed": 0.0019219728442849344,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/neg_w0/hi",
+   "claimed": 0.0019327209279236764,
+   "recomputed": 0.0019327209279236764,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/neg_w0.1/ratio",
+   "claimed": 0.06572142277026846,
+   "recomputed": 0.06572142277026846,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/neg_w0.1/lo",
+   "claimed": 0.06556212627222693,
+   "recomputed": 0.06556212627222693,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/neg_w0.1/hi",
+   "claimed": 0.06587851040025702,
+   "recomputed": 0.06587851040025702,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/neg_w1/ratio",
+   "claimed": 0.6398675544584828,
+   "recomputed": 0.6398675544584828,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/neg_w1/lo",
+   "claimed": 0.6382939078878485,
+   "recomputed": 0.6382939078878485,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/neg_w1/hi",
+   "claimed": 0.6413844341589613,
+   "recomputed": 0.6413844341589613,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/plain_w0/ratio",
+   "claimed": 0.0013628833646669315,
+   "recomputed": 0.0013628833646669315,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/plain_w0/lo",
+   "claimed": 0.0013590400314502735,
+   "recomputed": 0.0013590400314502735,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/plain_w0/hi",
+   "claimed": 0.0013666400742759885,
+   "recomputed": 0.0013666400742759885,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/plain_w0.1/ratio",
+   "claimed": 0.0464720637100848,
+   "recomputed": 0.0464720637100848,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/plain_w0.1/lo",
+   "claimed": 0.046359424076100365,
+   "recomputed": 0.046359424076100365,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/plain_w0.1/hi",
+   "claimed": 0.04658314143849024,
+   "recomputed": 0.04658314143849024,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/plain_w1/ratio",
+   "claimed": 0.45245468681884565,
+   "recomputed": 0.45245468681884565,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/plain_w1/lo",
+   "claimed": 0.4513419506575592,
+   "recomputed": 0.4513419506575592,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/plain_w1/hi",
+   "claimed": 0.4535272827412982,
+   "recomputed": 0.4535272827412982,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/mean_cost_w1",
+   "claimed": 608897643.5666667,
+   "recomputed": 608897643.5666667,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/la_share_w1",
+   "claimed": 0.6044160351991447,
+   "recomputed": 0.6044160351991447,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/fb_cols",
+   "claimed": 3410.0,
+   "recomputed": 3410.0,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/per_curve_neg_w1/355",
+   "claimed": 0.6395201820484593,
+   "recomputed": 0.6395201820484593,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/per_curve_neg_w1/882",
+   "claimed": 0.639671103866511,
+   "recomputed": 0.639671103866511,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/per_curve_neg_w1/1461",
+   "claimed": 0.6395640086725394,
+   "recomputed": 0.6395640086725394,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/per_curve_neg_w1/1623",
+   "claimed": 0.6400736497705081,
+   "recomputed": 0.6400736497705081,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/arms/x*/per_curve_neg_w1/2374",
+   "claimed": 0.640506320719576,
+   "recomputed": 0.640506320719576,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/xstar_over_x_w1/ratio",
+   "claimed": 0.8317635779095465,
+   "recomputed": 0.8317635779095465,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/xstar_over_x_w1/lo",
+   "claimed": 0.8290608595213451,
+   "recomputed": 0.8290608595213451,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/primes/32771/xstar_over_x_w1/hi",
+   "claimed": 0.8346280368122728,
+   "recomputed": 0.8346280368122728,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/slope/x/ratio_vs_neg_w1/slope",
+   "claimed": -0.37730956443583896,
+   "recomputed": -0.37730956443583896,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/slope/x/ratio_vs_neg_w1/lo",
+   "claimed": -0.3841233790283694,
+   "recomputed": -0.3841233790283694,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/slope/x/ratio_vs_neg_w1/hi",
+   "claimed": -0.370591417126839,
+   "recomputed": -0.370591417126839,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/slope/x/ic_cost_w1_in_p",
+   "claimed": 1.6191249845415534,
+   "recomputed": 1.6191249845415534,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/slope/x*/ratio_vs_neg_w1/slope",
+   "claimed": -0.45403853847632314,
+   "recomputed": -0.45403853847632314,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/slope/x*/ratio_vs_neg_w1/lo",
+   "claimed": -0.4621696937194344,
+   "recomputed": -0.4621696937194344,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/slope/x*/ratio_vs_neg_w1/hi",
+   "claimed": -0.4455310511122419,
+   "recomputed": -0.4455310511122419,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "analysis.json/slope/x*/ic_cost_w1_in_p",
+   "claimed": 1.5423960105010694,
+   "recomputed": 1.5423960105010694,
+   "claimed_source": "research/genus4_prime_order_20261118/analysis.json"
+  },
+  {
+   "name": "tune.json/grid/1.4|4,1.5/runs",
+   "claimed": 12,
+   "recomputed": 12,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/1.4|4,1.5/mean_cost_w1",
+   "claimed": 209536985.08333334,
+   "recomputed": 209536985.08333334,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/1.4|8,2/runs",
+   "claimed": 12,
+   "recomputed": 12,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/1.4|8,2/mean_cost_w1",
+   "claimed": 211044205.66666666,
+   "recomputed": 211044205.66666666,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/1.4|16,3/runs",
+   "claimed": 12,
+   "recomputed": 12,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/1.4|16,3/mean_cost_w1",
+   "claimed": 240117273.0,
+   "recomputed": 240117273.0,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/1.4|32,4/runs",
+   "claimed": 12,
+   "recomputed": 12,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/1.4|32,4/mean_cost_w1",
+   "claimed": 313642138.6666667,
+   "recomputed": 313642138.6666667,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.0|4,1.5/runs",
+   "claimed": 12,
+   "recomputed": 12,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.0|4,1.5/mean_cost_w1",
+   "claimed": 238149582.75,
+   "recomputed": 238149582.75,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.0|8,2/runs",
+   "claimed": 12,
+   "recomputed": 12,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.0|8,2/mean_cost_w1",
+   "claimed": 232557762.91666666,
+   "recomputed": 232557762.91666666,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.0|16,3/runs",
+   "claimed": 12,
+   "recomputed": 12,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.0|16,3/mean_cost_w1",
+   "claimed": 272817215.8333333,
+   "recomputed": 272817215.8333333,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.0|32,4/runs",
+   "claimed": 12,
+   "recomputed": 12,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.0|32,4/mean_cost_w1",
+   "claimed": 377576231.4166667,
+   "recomputed": 377576231.4166667,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.8|4,1.5/runs",
+   "claimed": 12,
+   "recomputed": 12,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.8|4,1.5/mean_cost_w1",
+   "claimed": 292495223.9166667,
+   "recomputed": 292495223.9166667,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.8|8,2/runs",
+   "claimed": 12,
+   "recomputed": 12,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.8|8,2/mean_cost_w1",
+   "claimed": 271669506.6666667,
+   "recomputed": 271669506.6666667,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.8|16,3/runs",
+   "claimed": 12,
+   "recomputed": 12,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.8|16,3/mean_cost_w1",
+   "claimed": 318250069.4166667,
+   "recomputed": 318250069.4166667,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.8|32,4/runs",
+   "claimed": 12,
+   "recomputed": 12,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/grid/2.8|32,4/mean_cost_w1",
+   "claimed": 452092409.3333333,
+   "recomputed": 452092409.3333333,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/choice/w_max",
+   "claimed": 4,
+   "recomputed": 4,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/choice/fill_max",
+   "claimed": 1.5,
+   "recomputed": 1.5,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  },
+  {
+   "name": "tune.json/choice/mean_cost_w1",
+   "claimed": 209536985.08333334,
+   "recomputed": 209536985.08333334,
+   "claimed_source": "research/genus4_prime_order_20261118/tune.json"
+  }
+ ],
+ "headline_max_rel_diff": 0.0,
+ "recomputed_readings": {
+  "16411": {
+   "x": {
+    "neg_w0": {
+     "ratio": 0.0017844227428724573,
+     "lo": 0.0017718628786976627,
+     "hi": 0.0017952812712150425,
+     "lo_interp": 0.0017718622536752242,
+     "hi_interp": 0.0017952831499131463,
+     "lo_interleaved": 0.0017720628409521792,
+     "hi_interleaved": 0.00179571686778146
+    },
+    "neg_w0.1": {
+     "ratio": 0.10147180029140883,
+     "lo": 0.10109385199553066,
+     "hi": 0.10184457998355866,
+     "lo_interp": 0.1010938216622859,
+     "hi_interp": 0.10184458754065982,
+     "lo_interleaved": 0.10107567674805702,
+     "hi_interleaved": 0.10185834007445092
+    },
+    "neg_w1": {
+     "ratio": 0.998658198228236,
+     "lo": 0.9949237570204839,
+     "hi": 1.0023446412815091,
+     "lo_interp": 0.9949237348180896,
+     "hi_interp": 1.0023447407343535,
+     "lo_interleaved": 0.9947644698384099,
+     "hi_interleaved": 1.0025118693528294
+    },
+    "plain_w1": {
+     "ratio": 0.7061579840547252,
+     "lo": 0.7035173353527809,
+     "hi": 0.7087646929361525,
+     "lo_interp": 0.7035173196533174,
+     "hi_interp": 0.7087647632599332,
+     "lo_interleaved": 0.7034047023061805,
+     "hi_interleaved": 0.7088829410393879
+    },
+    "below_neg_all_w": false,
+    "mean_cost_w1": 238909092.48333332,
+    "la_share_w1": 0.7659557368922627,
+    "la_share_of_native": 0.7673268120178759,
+    "per_curve_neg_w1": {
+     "373": 0.9991578777640722,
+     "455": 0.9990948921466417,
+     "548": 0.998687666469667,
+     "752": 0.9972756745718608,
+     "875": 0.9990809988490338
+    },
+    "break_even_w_vs_neg": 1.0013460097002858
+   },
+   "x*": {
+    "neg_w0": {
+     "ratio": 0.00294668337038365,
+     "lo": 0.0029275131918385855,
+     "hi": 0.002963499717884285,
+     "lo_interp": 0.002927512361885371,
+     "hi_interp": 0.00296350083767519,
+     "lo_interleaved": 0.002928307544355022,
+     "hi_interleaved": 0.002963643697435609
+    },
+    "neg_w0.1": {
+     "ratio": 0.09024365844566323,
+     "lo": 0.08980515030052032,
+     "hi": 0.0906348733261903,
+     "lo_interp": 0.08980513188148609,
+     "hi_interp": 0.09063488398322579,
+     "lo_interleaved": 0.08981785811120128,
+     "hi_interleaved": 0.09063676096204526
+    },
+    "neg_w1": {
+     "ratio": 0.8759164341231793,
+     "lo": 0.871708656890283,
+     "hi": 0.8797115608352073,
+     "lo_interp": 0.871707721047785,
+     "hi_interp": 0.8797115956451569,
+     "lo_interleaved": 0.8717722633926765,
+     "hi_interleaved": 0.8797503369858605
+    },
+    "plain_w1": {
+     "ratio": 0.61936645032124,
+     "lo": 0.6163911025061365,
+     "hi": 0.6220500101547771,
+     "lo_interp": 0.61639044076556,
+     "hi_interp": 0.6220500347691286,
+     "lo_interleaved": 0.6164360790953067,
+     "hi_interleaved": 0.6220774290338523
+    },
+    "below_neg_all_w": true,
+    "mean_cost_w1": 209545568.98333332,
+    "la_share_w1": 0.5597863075914676,
+    "la_share_of_native": 0.561675849585478,
+    "per_curve_neg_w1": {
+     "373": 0.8760934410140336,
+     "455": 0.8754229920841103,
+     "548": 0.8792022945896887,
+     "752": 0.8703494206129151,
+     "875": 0.878539362644722
+    },
+    "break_even_w_vs_neg": 1.142139593920429
+   },
+   "xstar_over_x_w1": {
+    "ratio": 0.8770933194932777,
+    "lo": 0.8730039680918396,
+    "hi": 0.8813235327739208,
+    "lo_interp": 0.8730020441040416,
+    "hi_interp": 0.8813248468118605,
+    "lo_interleaved": 0.87300153607211,
+    "hi_interleaved": 0.8812528744562027
+   },
+   "xstar_over_x_w1_paired_per_key": {
+    "mean": 0.8771781289089001,
+    "median": 0.8757520989822007,
+    "min": 0.8504317998884277,
+    "max": 0.9095872386893604,
+    "xstar_cheaper_keys": 60
+   }
+  },
+  "32771": {
+   "x": {
+    "neg_w0": {
+     "ratio": 0.0011332265156455826,
+     "lo": 0.0011286218286423256,
+     "hi": 0.0011392538663538621,
+     "lo_interp": 0.0011286218003570376,
+     "hi_interp": 0.0011392542768925906,
+     "lo_interleaved": 0.0011286517790653947,
+     "hi_interleaved": 0.0011391243434012842
+    },
+    "neg_w0.1": {
+     "ratio": 0.07794892209142974,
+     "lo": 0.07769234857678466,
+     "hi": 0.07819809750235626,
+     "lo_interp": 0.07769229233798834,
+     "hi_interp": 0.07819809792419942,
+     "lo_interleaved": 0.07768884217931014,
+     "hi_interleaved": 0.07820886619259126
+    },
+    "neg_w1": {
+     "ratio": 0.7692901822734871,
+     "lo": 0.7667034561805969,
+     "hi": 0.7717819199761331,
+     "lo_interp": 0.766702942282359,
+     "hi_interp": 0.771782008381072,
+     "lo_interleaved": 0.7667049383983853,
+     "hi_interleaved": 0.7718813175667647
+    },
+    "plain_w1": {
+     "ratio": 0.5439703045858179,
+     "lo": 0.542141213024463,
+     "hi": 0.5457322292122969,
+     "lo_interp": 0.5421408496435343,
+     "hi_interp": 0.5457322917240287,
+     "lo_interleaved": 0.5421422611107124,
+     "hi_interleaved": 0.5458025139226662
+    },
+    "below_neg_all_w": true,
+    "mean_cost_w1": 732056151.2166667,
+    "la_share_w1": 0.8063921323324122,
+    "la_share_of_native": 0.8075817654399658,
+    "per_curve_neg_w1": {
+     "355": 0.769535495219447,
+     "882": 0.7654029208555273,
+     "1461": 0.76961353254029,
+     "1623": 0.771131413994566,
+     "2374": 0.7707568864731679
+    },
+    "break_even_w_vs_neg": 1.3003420277551239
+   },
+   "x*": {
+    "neg_w0": {
+     "ratio": 0.0019274081382446514,
+     "lo": 0.0019219728442849344,
+     "hi": 0.0019327209279236764,
+     "lo_interp": 0.001921971230500718,
+     "hi_interp": 0.0019327213369180745,
+     "lo_interleaved": 0.0019222866442472114,
+     "hi_interleaved": 0.00193264877586771
+    },
+    "neg_w0.1": {
+     "ratio": 0.06572142277026846,
+     "lo": 0.06556212627222693,
+     "hi": 0.06587851040025702,
+     "lo_interp": 0.06556204726099711,
+     "hi_interp": 0.06587851294227591,
+     "lo_interleaved": 0.06556975088764172,
+     "hi_interleaved": 0.06588003621606527
+    },
+    "neg_w1": {
+     "ratio": 0.6398675544584828,
+     "lo": 0.6382939078878485,
+     "hi": 0.6413844341589613,
+     "lo_interp": 0.6382937641945279,
+     "hi_interp": 0.6413846062752137,
+     "lo_interleaved": 0.6383695340546514,
+     "hi_interleaved": 0.6414173443263013
+    },
+    "plain_w1": {
+     "ratio": 0.45245468681884565,
+     "lo": 0.4513419506575592,
+     "hi": 0.4535272827412982,
+     "lo_interp": 0.45134184905103786,
+     "hi_interp": 0.4535274044458675,
+     "lo_interleaved": 0.45139542643294067,
+     "hi_interleaved": 0.4535505537437943
+    },
+    "below_neg_all_w": true,
+    "mean_cost_w1": 608897643.5666667,
+    "la_share_w1": 0.6044160351991447,
+    "la_share_of_native": 0.6062421569628369,
+    "per_curve_neg_w1": {
+     "355": 0.6395201820484593,
+     "882": 0.639671103866511,
+     "1461": 0.6395640086725394,
+     "1623": 0.6400736497705081,
+     "2374": 0.640506320719576
+    },
+    "break_even_w_vs_neg": 1.5645238783275055
+   },
+   "xstar_over_x_w1": {
+    "ratio": 0.8317635779095465,
+    "lo": 0.8290608595213451,
+    "hi": 0.8346280368122728,
+    "lo_interp": 0.8290606860791443,
+    "hi_interp": 0.8346280886773011,
+    "lo_interleaved": 0.8289276576791673,
+    "hi_interleaved": 0.8347419205319108
+   },
+   "xstar_over_x_w1_paired_per_key": {
+    "mean": 0.8318067158556951,
+    "median": 0.8312599757119166,
+    "min": 0.8150723344955085,
+    "max": 0.8512877739192035,
+    "xstar_cheaper_keys": 60
+   }
+  },
+  "slope": {
+   "x": {
+    "ratio_vs_neg_w1": {
+     "slope": -0.37730956443583896,
+     "lo": -0.3841233790283694,
+     "hi": -0.370591417126839
+    },
+    "ratio_vs_neg_w1_independent_streams": {
+     "lo": -0.3847316357497159,
+     "hi": -0.3698699936726217
+    },
+    "ic_cost_w1_in_p": 1.6191249845415534,
+    "ic_cost_w0_in_p": 1.3399405575593502,
+    "R_neg_in_p": 1.9964345489773925
+   },
+   "x*": {
+    "ratio_vs_neg_w1": {
+     "slope": -0.45403853847632314,
+     "lo": -0.4621696937194344,
+     "hi": -0.4455310511122419
+    },
+    "ratio_vs_neg_w1_independent_streams": {
+     "lo": -0.46119789076841217,
+     "hi": -0.4462525972463577
+    },
+    "ic_cost_w1_in_p": 1.5423960105010694,
+    "ic_cost_w0_in_p": 1.3826275555667176,
+    "R_neg_in_p": 1.9964345489773925
+   }
+  },
+  "partA": {
+   "choice": {
+    "cc": "1.4",
+    "w_max": 4,
+    "fill_max": 1.5,
+    "mean_cost_w1": 209536985.08333334
+   },
+   "choice_over_baseline": 0.8798545127131169,
+   "runner_up": {
+    "cell": "1.4|8,2",
+    "over_choice": 1.0071931004578207
+   },
+   "best_cc2.0_over_choice": 1.1098649855259581
+  },
+  "q_check": {
+   "runs": 5,
+   "keys": [
+    [
+     373,
+     373,
+     1
+    ],
+    [
+     455,
+     455,
+     1
+    ],
+    [
+     548,
+     548,
+     1
+    ],
+    [
+     752,
+     752,
+     1
+    ],
+    [
+     875,
+     875,
+     1
+    ]
+   ],
+   "all_certified_ok": true,
+   "arm": [
+    "R_rho_plain_nowin"
+   ],
+   "compares_uncharged": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "mean_over_sqrt_pi_r_2": 0.8041435539036706,
+   "per_run": [
+    0.48067012889001615,
+    0.5208185958436689,
+    0.8515702630929869,
+    0.7873539978654386,
+    1.3829673674682346
+   ],
+   "G3_in_0.6_1.6": true,
+   "instances_match_part_B": true
+  }
+ },
+ "checks": [
+  {
+   "id": "C1",
+   "requirement": "frozen files (PROTOCOL.md, search.sh, curves.py, tune.py, run.sh, analyze.py) hash to frozen.sha256 at the freeze commit 6da1e3c5b2 and at the validated commit; frozen.sha256 and binary.sha256 unchanged since; the freeze commit has no data and its parent no study files; all 66 data files enter later; no src/Cargo/crates change from the binary commit ca72267899 (the freeze's parent) to the validated commit",
+   "pass": true,
+   "evidence": [
+    "research/genus4_prime_order_20261118/validation/out/freeze_check.json",
+    "research/genus4_prime_order_20261118/validation/scripts/freeze_check.py"
+   ]
+  },
+  {
+   "id": "C1b",
+   "requirement": "each deviation committed before the data it concerns",
+   "pass": true,
+   "note": "D1 (d09efa5d95) and the fixed search_chunks.sh (3a54c389f9) precede the residue-3 re-scan data (b4e483061d). D2 (8c54acb9e2) was written after the 1801-2200 data (d202be88ca) and in the same commit as the 2201-2600 data; the extensions it records are the frozen rule (PROTOCOL section 2), announced in the commit messages of b4e483061d and d202be88ca before their data, and its one genuine deviation (stopping 2601-3000) cannot change the five smallest seeds because 1..2600 is fully covered (finding F1)",
+   "evidence": [
+    "research/genus4_prime_order_20261118/validation/out/freeze_check.json"
+   ]
+  },
+  {
+   "id": "C2",
+   "requirement": "prefilter soundness: for y^2 = f(x), deg f = 9, reducible f implies #J(F_p) even; implementation never calls an irreducible f reducible; no seed below the fifth chosen seed was skipped wrongly",
+   "pass": true,
+   "detail": {
+    "theorem": "#J(F_p)[2] = 2^(m-1), m = number of irreducible factors of f (odd degree); constructive: a factor w | f with 1 <= deg w <= 4 gives the non-zero rational 2-torsion divisor (w, 0)",
+    "numeric_test_independent_seeds": {
+     "11": {
+      "curves": 120,
+      "reducible": 111,
+      "even": 111,
+      "certs_checked": 111
+     },
+     "13": {
+      "curves": 120,
+      "reducible": 113,
+      "even": 113,
+      "certs_checked": 113
+     },
+     "17": {
+      "curves": 100,
+      "reducible": 87,
+      "even": 87,
+      "certs_checked": 87
+     },
+     "19": {
+      "curves": 80,
+      "reducible": 69,
+      "even": 69,
+      "certs_checked": 69
+     },
+     "23": {
+      "curves": 60,
+      "reducible": 55,
+      "even": 55,
+      "certs_checked": 55
+     },
+     "29": {
+      "curves": 40,
+      "reducible": 33,
+      "even": 33,
+      "certs_checked": 33
+     }
+    },
+    "validator_L1_vs_library_order": {
+     "curves": 229,
+     "library_orders": 88,
+     "equal": 88
+    },
+    "differential_test": {
+     "irreducible": 300,
+     "3x3x3": 24,
+     "1x8": 24,
+     "2x7": 24,
+     "4x5": 24,
+     "3x6": 24,
+     "2x2x5": 24,
+     "1x1x7": 24,
+     "1x1x1x1x1x1x1x1x1": 24,
+     "nonsquarefree g^2 h": 24,
+     "random": 600
+    },
+    "per_seed_library_vs_validator": {
+     "compared": 5000,
+     "agree": 5000,
+     "by_p": {
+      "16411": {
+       "seeds": 2000,
+       "rust_irreducible": 196,
+       "validator_irreducible": 196
+      },
+      "32771": {
+       "seeds": 3000,
+       "rust_irreducible": 350,
+       "validator_irreducible": 350
+      }
+     }
+    },
+    "skipped_seeds_below_fifth_with_checked_certificate": {
+     "16411": 790,
+     "32771": 2103
+    }
+   },
+   "evidence": [
+    "research/genus4_prime_order_20261118/validation/out/prefilter_theory.json",
+    "research/genus4_prime_order_20261118/validation/out/theory_crosscheck.json",
+    "research/genus4_prime_order_20261118/validation/out/prefilter_diff.json",
+    "research/genus4_prime_order_20261118/validation/out/prefilter_rust_vs_validator.json",
+    "research/genus4_prime_order_20261118/validation/out/prefilter_rust_flags.json",
+    "research/genus4_prime_order_20261118/validation/out/select_check.json",
+    "research/genus4_prime_order_20261118/validation/scripts/polyfp.py",
+    "research/genus4_prime_order_20261118/validation/scripts/prefilter_diff.py",
+    "research/genus4_prime_order_20261118/validation/scripts/prefilter_theory.py",
+    "research/genus4_prime_order_20261118/validation/scripts/theory_crosscheck.py"
+   ]
+  },
+  {
+   "id": "C3",
+   "requirement": "chosen seeds are the 5 smallest admitted over fully covered ranges (cell rows, tried counts); residue 3 and the extension blocks complete",
+   "pass": true,
+   "detail": {
+    "16411": {
+     "contiguous_covered_1_to": 2000,
+     "admitted": [
+      373,
+      455,
+      548,
+      752,
+      875,
+      1036,
+      1041,
+      1317,
+      1331,
+      1438,
+      1718
+     ],
+     "chosen": [
+      373,
+      455,
+      548,
+      752,
+      875
+     ],
+     "seeds_below_fifth_not_admitted": 870,
+     "of_which_reducible_with_checked_certificate": 790,
+     "of_which_irreducible_rejected_after_point_count": 80
+    },
+    "32771": {
+     "contiguous_covered_1_to": 2600,
+     "admitted": [
+      355,
+      882,
+      1461,
+      1623,
+      2374,
+      2508,
+      2579,
+      2600
+     ],
+     "chosen": [
+      355,
+      882,
+      1461,
+      1623,
+      2374
+     ],
+     "seeds_below_fifth_not_admitted": 2369,
+     "of_which_reducible_with_checked_certificate": 2103,
+     "of_which_irreducible_rejected_after_point_count": 266
+    },
+    "reasons_seen": [
+     "f_reducible_even_order",
+     "order_not_near_prime"
+    ],
+    "curves_json_matches": {
+     "16411": true,
+     "32771": true
+    },
+    "partial_file_excluded": "search_p32771_1_3.jsonl.gz (no cell row; its 355 and 1623 are found again by the re-scan)"
+   },
+   "evidence": [
+    "research/genus4_prime_order_20261118/validation/out/select_check.json",
+    "research/genus4_prime_order_20261118/validation/scripts/select_check.py"
+   ]
+  },
+  {
+   "id": "C4a",
+   "requirement": "producer binary equals binary.sha256; validator rebuild from git archive of ca72267899 in a validator-owned tree and target directory has identical code sections",
+   "pass": true,
+   "evidence": [
+    "research/genus4_prime_order_20261118/validation/out/binary_diff.txt",
+    "research/genus4_prime_order_20261118/validation/scripts/build.sh",
+    "research/genus4_prime_order_20261118/validation/scripts/paths.py"
+   ]
+  },
+  {
+   "id": "C4b",
+   "requirement": "nonce-drawn replay with the validator build: part A several cc and SGE settings, part B >= 10 x and >= 10 x* rows per prime, >= 1 Q row, plus search cells: every field except wall time identical",
+   "pass": true,
+   "detail": {
+    "rows_identical": {
+     "A": 24,
+     "B16x": 12,
+     "B16xs": 12,
+     "B32x": 12,
+     "B32xs": 12,
+     "Q": 1
+    },
+    "search_cells_identical": 3,
+    "nonce": "e57128a78a513434ef225010299714d3 2026-11-18T21:26:34Z"
+   },
+   "evidence": [
+    "research/genus4_prime_order_20261118/validation/out/replay_compare.json",
+    "research/genus4_prime_order_20261118/validation/out/plan.json",
+    "research/genus4_prime_order_20261118/validation/out/nonce.txt",
+    "research/genus4_prime_order_20261118/validation/out/replay/"
+   ]
+  },
+  {
+   "id": "C5",
+   "requirement": "independent certificates: r prime, h = 1, order = r inside Hasse-Weil, [r]G = 0, [t]G = T for every key; recovered logs for a sample; F_p-automorphisms; drawn order_not_near_prime rejections certified not prime",
+   "pass": true,
+   "detail": {
+    "curves": 10,
+    "keys_ok": "60/60",
+    "logs": 49,
+    "ord_certified": "16/16",
+    "tamper_control": {
+     "t+1": 3,
+     "count+1": 3,
+     "T coeff": 3,
+     "tried": 3
+    },
+    "automorphism_controls": {
+     "automorphism_scan": {
+      "odd_f_finds_a=-1": true,
+      "f(x^3)_finds_order_3": true
+     }
+    }
+   },
+   "evidence": [
+    "research/genus4_prime_order_20261118/validation/out/certs.json",
+    "research/genus4_prime_order_20261118/validation/scripts/certs.py",
+    "research/genus4_prime_order_20261118/validation/scripts/jac.py",
+    "research/genus4_prime_order_20261118/validation/scripts/val_po.rs"
+   ]
+  },
+  {
+   "id": "C6",
+   "requirement": "every number in analysis.json and tune.json recomputed from the raw rows with the validator's own code (protocol section 6 bootstrap, seed 20261124)",
+   "pass": true,
+   "detail": {
+    "cells": 187,
+    "exact": 187,
+    "max_rel_diff": 0.0
+   },
+   "evidence": [
+    "research/genus4_prime_order_20261118/validation/out/recompute.json",
+    "research/genus4_prime_order_20261118/validation/out/compare_claims.json",
+    "research/genus4_prime_order_20261118/validation/scripts/recompute.py"
+   ]
+  },
+  {
+   "id": "C7",
+   "requirement": "gates G1-G3 with real keys (indexed with [])",
+   "pass": true,
+   "detail": {
+    "G1": true,
+    "G2": true,
+    "G3": true
+   },
+   "evidence": [
+    "research/genus4_prime_order_20261118/validation/out/recompute.json"
+   ]
+  },
+  {
+   "id": "C8",
+   "requirement": "section 5a band against the strongest reference, every listed unpriced counter shown",
+   "pass": true,
+   "evidence": [
+    "research/genus4_prime_order_20261118/validation/out/band.json",
+    "research/genus4_prime_order_20261118/validation/scripts/band.py"
+   ]
+  },
+  {
+   "id": "C9",
+   "requirement": "claims of RESULTS.md, framing and scope",
+   "pass": true,
+   "note": "findings F1-F9 (validator-report.md)",
+   "evidence": [
+    "benchmarks/20261118-genus4-prime-order/validator-report.md"
+   ]
+  }
+ ],
+ "findings": [
+  {
+   "id": "F1",
+   "severity": "minor",
+   "topic": "deviation record",
+   "text": "DEVIATIONS.md says each deviation was logged before the data it concerns was read. D2 (20:50 UTC, 8c54acb9e2) lists the seeds found in 2201-2600 and was committed with that block, after the 1801-2200 block (d202be88ca). The extensions are the frozen rule and were announced in commit messages before their data; the stop of 2601-3000 cannot change the five smallest seeds (1..2600 fully covered). Its 'deleted unread' statement cannot be verified from git."
+  },
+  {
+   "id": "F2",
+   "severity": "minor",
+   "topic": "pricing symmetry",
+   "text": "The IC walk's per-step mix64 hash and two coefficient additions mod r (genus_ladder.rs 1590-1594) and the large-prime table operations are not emitted, so 'fully charged' / 'every native operation is charged' is slightly overstated. Pricing 3 per walk step moves x* from 0.8759 to 0.8848 (p = 16411) and 0.6399 to 0.6457 (p = 32771) at w = 1; x at 16411 from 0.9987 to 1.0040. No D1 decision changes."
+  },
+  {
+   "id": "F3",
+   "severity": "interpretation",
+   "topic": "scope of 'below the ideal negation-rho bound at all w'",
+   "text": "Correct as stated for x* at both primes and x at 32771 (upper bound < 1 at w = 0, 0.1, 1). Scope: 5 prime-order genus-4 Jacobians per prime (#J about 2^56 and 2^60), 6 targets x 2 seeds each, counted group operations plus w per native operation; reference is the closed-form expected cost of an ideal random walk on the r/2 negation classes (a heuristic floor, not a measured walk and not a proven lower bound); by linearity the order holds for every w up to 1.142 (x*, 16411), 1.565 (x*, 32771), 1.300 (x, 32771). No wall-clock statement."
+  },
+  {
+   "id": "F4",
+   "severity": "interpretation",
+   "topic": "'known in theory, now measured'",
+   "text": "The theory cited is right (Gaudry 2000; Gaudry-Thome-Theriault-Diem 2007, O~(q^(2-2/g)); rho O~(q^(g/2))). 'What is new here' is a novelty statement not checked against the knowledge base (unavailable to producer and validator) and should be scoped to this lab's implementation. The crossing is at the pessimistic w = 1 end; at w = 0 and 0.1 the IC arm was already below the floor in the earlier study. The 'p^1.62 / p^1.54' figures are two-point local slopes between p and 2p, not exponent fits (AGENTS.md section 5 asks for at least four sizes); at w = 0 the slopes are 1.340 and 1.383."
+  },
+  {
+   "id": "F5",
+   "severity": "minor",
+   "topic": "prose",
+   "text": "'linear algebra from 77-81% of native work to 56-60%': the 56-60% are LA over total w = 1 cost (la_share_w1); over native work they are 76.7-80.8% and 56.2-60.6%."
+  },
+  {
+   "id": "F6",
+   "severity": "note",
+   "topic": "tuning",
+   "text": "cc* = 1.4 is at the lower edge of the grid {1.4, 2.0, 2.8}; the optimum is not located. The best cc = 2.0 cell costs 1.110x the choice, so the cc choice is robust; the SGE choice (4,1.5) over (8,2) at cc 1.4 is a 0.72% margin on 12 keys. 'The optimum falls with p' is consistent (p = 8209 chose the upper edge 2.0) but neither optimum is located."
+  },
+  {
+   "id": "F7",
+   "severity": "note",
+   "topic": "bootstrap",
+   "text": "analyze.py reseeds the same generator for both primes, and both have the same design, so replicate j uses the same index pattern at both primes: the D2 slope interval is not from independent per-prime bootstraps as PROTOCOL section 6 says. With an independent stream at 32771: x [-0.3847, -0.3699], x* [-0.4612, -0.4463] (claimed [-0.3841, -0.3706], [-0.4622, -0.4455]). The protocol does not fix the draw order; an interleaved order moves interval ends by at most about 2e-4. No decision changes."
+  },
+  {
+   "id": "F8",
+   "severity": "note",
+   "topic": "section 5a calibrated weight",
+   "text": "No w_cal was measured for the mod-p and mod-r counters (owner rule 2026-11-12). Because the order holds up to the break-even w (1.14 or more), it holds at w_cal and 10 w_cal for any w_cal below 0.114 GAE per operation; one Jacobian group operation here is about 394 counted F_p multiplications and 7 inversions. 'Ranked at calibrated price' is an inference, not a measurement. Pricing mod-r operations like F_p operations is not material to the verdict: with F_p relation work at 1 GAE, x* reaches the floor only if a mod-r LA operation costs more than 1.25 GAE (16411) or 1.93 GAE (32771)."
+  },
+  {
+   "id": "F9",
+   "severity": "note",
+   "topic": "records and reference",
+   "text": "Bench record 20261118T1652Z-genus4-prime-order is still open (closed_utc null), raw entries not uploaded (no S3, disclosed), the 58 search files are not listed in it; its 8 raw hashes match the blobs and its 5 metrics match the recompute. The measured plain-rho sanity check (5 runs, 0.804x sqrt(pi r/2), per run 0.48-1.38) is noisy by design; no measured rho at p = 32771 (disclosed)."
+  }
+ ],
+ "rho_reference_assessment": {
+  "kind": "negation",
+  "reference": "ideal negation bound sqrt(pi r/4) group operations, nothing charged (PROTOCOL section 6 R_neg, the D1 reference)",
+  "strongest_available": "F_p-automorphisms of all 10 curves are the identity and the hyperelliptic involution (affine scan with planted controls; f irreducible so infinity is the only rational Weierstrass point); Frobenius is trivial on J(F_p)",
+  "measured_rho_sanity": "plain rho Q at p = 16411, 5 runs: 0.804x sqrt(pi r/2) (1.137x the negation floor), replayed key 455 identical",
+  "band": {
+   "16411 x": {
+    "mean_group_ops": 426887.61666666664,
+    "mean_native_U": 238482204.86666667,
+    "mean_walk_ops": 426564.2166666667,
+    "mean_R_neg": 239230091.84442943,
+    "mean_R_plain": 338322440.4141532,
+    "band": {
+     "0": {
+      "ic": 426887.61666666664,
+      "rho_neg": 239230091.84442943,
+      "ic_over_rho_neg": 0.0017844227428724573,
+      "ic_over_rho_plain_expect": 0.0012617774219886137,
+      "ci_hi_over_rho_neg": 0.0017952812712150425
+     },
+     "0.1": {
+      "ic": 24275108.103333335,
+      "rho_neg": 239230091.84442943,
+      "ic_over_rho_neg": 0.10147180029140883,
+      "ic_over_rho_plain_expect": 0.07175139808526228,
+      "ci_hi_over_rho_neg": 0.10184457998355866
+     },
+     "1": {
+      "ic": 238909092.48333335,
+      "rho_neg": 239230091.84442943,
+      "ic_over_rho_neg": 0.9986581982282362,
+      "ic_over_rho_plain_expect": 0.7061579840547253,
+      "ci_hi_over_rho_neg": 1.0023446412815091
+     }
+    },
+    "band_with_walk_hash_coef": {
+     "0": {
+      "ic": 426887.61666666664,
+      "ic_over_rho_neg": 0.0017844227428724573
+     },
+     "0.1": {
+      "ic": 24403077.368333336,
+      "ic_over_rho_neg": 0.10200672156328301
+     },
+     "1": {
+      "ic": 240188785.13333336,
+      "ic_over_rho_neg": 1.004007410946978
+     }
+    },
+    "break_even_w_vs_neg": 1.0013460097002858,
+    "break_even_w_la_with_rel_w1": 1.0017541543957604,
+    "break_even_w_la_with_rel_w0": 1.304979826088702,
+    "cantor_inv_per_group_op": 6.999220677011128,
+    "cantor_mul_per_group_op": 393.7596394320332,
+    "order_below_at_all_w_point": true,
+    "order_below_at_all_w_ci_hi": false,
+    "order_below_with_walk_hash_coef": false
+   },
+   "16411 x*": {
+    "mean_group_ops": 704935.3333333334,
+    "mean_native_U": 208840633.65,
+    "mean_walk_ops": 704611.9333333333,
+    "mean_R_neg": 239230091.84442943,
+    "mean_R_plain": 338322440.4141532,
+    "band": {
+     "0": {
+      "ic": 704935.3333333334,
+      "rho_neg": 239230091.84442943,
+      "ic_over_rho_neg": 0.00294668337038365,
+      "ic_over_rho_plain_expect": 0.00208361979320791,
+      "ci_hi_over_rho_neg": 0.002963499717884285
+     },
+     "0.1": {
+      "ic": 21588998.698333334,
+      "rho_neg": 239230091.84442943,
+      "ic_over_rho_neg": 0.09024365844566323,
+      "ic_over_rho_plain_expect": 0.06381190284601113,
+      "ci_hi_over_rho_neg": 0.0906348733261903
+     },
+     "1": {
+      "ic": 209545568.98333335,
+      "rho_neg": 239230091.84442943,
+      "ic_over_rho_neg": 0.8759164341231794,
+      "ic_over_rho_plain_expect": 0.6193664503212402,
+      "ci_hi_over_rho_neg": 0.8797115608352073
+     }
+    },
+    "band_with_walk_hash_coef": {
+     "0": {
+      "ic": 704935.3333333334,
+      "ic_over_rho_neg": 0.00294668337038365
+     },
+     "0.1": {
+      "ic": 21800382.278333332,
+      "ic_over_rho_neg": 0.09112725790579077
+     },
+     "1": {
+      "ic": 211659404.78333336,
+      "ic_over_rho_neg": 0.8847524287244549
+     }
+    },
+    "break_even_w_vs_neg": 1.142139593920429,
+    "break_even_w_la_with_rel_w1": 1.2530633888306386,
+    "break_even_w_la_with_rel_w0": 2.033449710831147,
+    "cantor_inv_per_group_op": 6.9992144905963,
+    "cantor_mul_per_group_op": 393.74669459042576,
+    "order_below_at_all_w_point": true,
+    "order_below_at_all_w_ci_hi": true,
+    "order_below_with_walk_hash_coef": true
+   },
+   "32771 x": {
+    "mean_group_ops": 1078377.7833333334,
+    "mean_native_U": 730977773.4333333,
+    "mean_walk_ops": 1078048.3166666667,
+    "mean_R_neg": 951599497.9335594,
+    "mean_R_plain": 1345764915.925068,
+    "band": {
+     "0": {
+      "ic": 1078377.7833333334,
+      "rho_neg": 951599497.9335594,
+      "ic_over_rho_neg": 0.0011332265156455826,
+      "ic_over_rho_plain_expect": 0.0008013121538333947,
+      "ci_hi_over_rho_neg": 0.0011392538663538621
+     },
+     "0.1": {
+      "ic": 74176155.12666667,
+      "rho_neg": 951599497.9335594,
+      "ic_over_rho_neg": 0.07794892209142973,
+      "ic_over_rho_plain_expect": 0.05511821139703183,
+      "ci_hi_over_rho_neg": 0.07819809750235626
+     },
+     "1": {
+      "ic": 732056151.2166666,
+      "rho_neg": 951599497.9335594,
+      "ic_over_rho_neg": 0.7692901822734869,
+      "ic_over_rho_plain_expect": 0.5439703045858177,
+      "ci_hi_over_rho_neg": 0.7717819199761331
+     }
+    },
+    "band_with_walk_hash_coef": {
+     "0": {
+      "ic": 1078377.7833333334,
+      "ic_over_rho_neg": 0.0011332265156455826
+     },
+     "0.1": {
+      "ic": 74499569.62166667,
+      "ic_over_rho_neg": 0.07828878617889752
+     },
+     "1": {
+      "ic": 735290296.1666666,
+      "ic_over_rho_neg": 0.7726888231481649
+     }
+    },
+    "break_even_w_vs_neg": 1.3003420277551239,
+    "break_even_w_la_with_rel_w1": 1.3719029336818909,
+    "break_even_w_la_with_rel_w0": 1.6101676429589828,
+    "cantor_inv_per_group_op": 6.999609506050191,
+    "cantor_mul_per_group_op": 393.8058590536925,
+    "order_below_at_all_w_point": true,
+    "order_below_at_all_w_ci_hi": true,
+    "order_below_with_walk_hash_coef": true
+   },
+   "32771 x*": {
+    "mean_group_ops": 1834120.6166666667,
+    "mean_native_U": 607063522.95,
+    "mean_walk_ops": 1833791.15,
+    "mean_R_neg": 951599497.9335594,
+    "mean_R_plain": 1345764915.925068,
+    "band": {
+     "0": {
+      "ic": 1834120.6166666667,
+      "rho_neg": 951599497.9335594,
+      "ic_over_rho_neg": 0.0019274081382446514,
+      "ic_over_rho_plain_expect": 0.0013628833646669315,
+      "ci_hi_over_rho_neg": 0.0019327209279236764
+     },
+     "0.1": {
+      "ic": 62540472.91166668,
+      "rho_neg": 951599497.9335594,
+      "ic_over_rho_neg": 0.06572142277026848,
+      "ic_over_rho_plain_expect": 0.046472063710084804,
+      "ci_hi_over_rho_neg": 0.06587851040025702
+     },
+     "1": {
+      "ic": 608897643.5666667,
+      "rho_neg": 951599497.9335594,
+      "ic_over_rho_neg": 0.6398675544584828,
+      "ic_over_rho_plain_expect": 0.45245468681884565,
+      "ci_hi_over_rho_neg": 0.6413844341589613
+     }
+    },
+    "band_with_walk_hash_coef": {
+     "0": {
+      "ic": 1834120.6166666667,
+      "ic_over_rho_neg": 0.0019274081382446514
+     },
+     "0.1": {
+      "ic": 63090610.256666675,
+      "ic_over_rho_neg": 0.06629954134451599
+     },
+     "1": {
+      "ic": 614399017.0166668,
+      "ic_over_rho_neg": 0.645648740200958
+     }
+    },
+    "break_even_w_vs_neg": 1.5645238783275055,
+    "break_even_w_la_with_rel_w1": 1.9311854542674296,
+    "break_even_w_la_with_rel_w0": 2.580691329955485,
+    "cantor_inv_per_group_op": 6.999607032387374,
+    "cantor_mul_per_group_op": 393.8004682843605,
+    "order_below_at_all_w_point": true,
+    "order_below_at_all_w_ci_hi": true,
+    "order_below_with_walk_hash_coef": true
+   }
+  },
+  "order_holds": {
+   "16411 x": false,
+   "16411 x*": true,
+   "32771 x": true,
+   "32771 x*": true
+  }
+ },
+ "lessons_applied": [
+  "L-546d37ca7750",
+  "L-99ee952350b2",
+  "L-3f39e1d8b3a9",
+  "L-7f8877029be4",
+  "L-ce5e4e4b764b",
+  "L-ca1840e60dc0",
+  "L-b0626ec2a4c0",
+  "L-26895912385b",
+  "L-10ef4b64c2a6",
+  "L-f19644df279f",
+  "L-c53b34f2a6ce",
+  "L-1a5a6b64022c",
+  "L-8d86e8fc352c"
+ ]
+}

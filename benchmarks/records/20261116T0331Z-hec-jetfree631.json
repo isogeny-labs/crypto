@@ -1,0 +1,117 @@
+{
+  "branch": "research/hec-principal-relations-20261114",
+  "closed_utc": "2026-11-16T03:34:44+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/Volumes/SSD990-2/hec-jetfreeprod631-target/release/compare-jetfree631",
+        "collect",
+        "/Volumes/SSD990-2/hec-inverse-work",
+        "/Volumes/SSD990-2/hec-inverse-work/research/hec_jetfreeprod631_20261116/timing"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-16T03:31:51+00:00",
+      "wall_s": 58.948
+    }
+  ],
+  "commit": "de0bddf85eead81764a39986e7fcc12701ff9f4a",
+  "commit_dirty": true,
+  "created_utc": "2026-11-16T03:31:39+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261115-hec-jetfree631"
+  ],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "unstated",
+    "platform": "macOS-27.2-arm64-arm-64bit-Mach-O"
+  },
+  "id": "20261116T0331Z-hec-jetfree631",
+  "metrics": [
+    {
+      "baseline": 5.887982083,
+      "better": "lower",
+      "n": 5,
+      "name": "inverse_component_wall",
+      "note": "Strong run-order drift; no stable speedup/regression inference. Component only, common setup excluded.",
+      "reference": 5.887982083,
+      "reference_kind": "baseline",
+      "spread": [
+        2.136444166,
+        9.979136209
+      ],
+      "unit": "wall_s",
+      "value": 6.329883375
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "prior_direct_component_wall",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        2.295271584,
+        8.760866375
+      ],
+      "unit": "wall_s",
+      "value": 5.887982083
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "prior_direct_over_production",
+      "note": "Derived ratio of medians; tenfold gate failed; strong drift, no stable algorithmic conclusion.",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 0.930188083126
+    }
+  ],
+  "problem": "ic:hec-f631-c49-inverse-pair",
+  "raw": [
+    {
+      "bytes": 980589,
+      "path": "research/hec_jetfreeprod631_20261116/raw-timing.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/49/49d4f57af095577d9cc7c24fd1361a97fce7eef500fa594f9b0afca1e71f9e2b",
+      "sha256": "49d4f57af095577d9cc7c24fd1361a97fce7eef500fa594f9b0afca1e71f9e2b",
+      "uploaded": true
+    },
+    {
+      "bytes": 299,
+      "path": "research/hec_jetfreeprod631_20261116/SUMMARY-TIMING.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/0c/0c8ee291dde9115d514764f4f9339a675c6311f7c8c14e16e0df280109aa7b88",
+      "sha256": "0c8ee291dde9115d514764f4f9339a675c6311f7c8c14e16e0df280109aa7b88",
+      "uploaded": true
+    },
+    {
+      "bytes": 374,
+      "path": "research/hec_jetfreeprod631_20261116/timing/cells.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/73/732a92d2ece2153daa9b80fd64b949b79c621cc5551b5b865204234d69200817",
+      "sha256": "732a92d2ece2153daa9b80fd64b949b79c621cc5551b5b865204234d69200817",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261115-hec-jetfree631/REPORT.pdf",
+    "png": [
+      "benchmarks/20261115-hec-jetfree631/REPORT.png"
+    ],
+    "svg": [
+      "benchmarks/20261115-hec-jetfree631/COST.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "hec-jetfree631",
+  "status": "measured",
+  "summary": "All10cells verified; ratio0.930 with strong run-order drift; tenfold gate failed; no demonstrated speedup; component only.",
+  "validation": null
+}

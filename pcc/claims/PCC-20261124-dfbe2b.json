@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T00:56:27Z",
+ "id": "PCC-20261124-dfbe2b",
+ "kind": "execution",
+ "producer": {
+  "commit": "e2463d62a8db46f567c3c76f863da2d99a0248aa",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-cost-20261124/validation/counted-tests-initial.log",
+    "sha256": "6efa4fadded10421cc54b722291d00a77c1d33073551ea76320f329ec20b230e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-cost-20261124/validation/counted-build-first.log",
+    "sha256": "ca7a3cf93181aa4d251858d90e7cd8e83135da422b48c29397d11a26cbf677a4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/template-cost-20261124/validation/initial-counted-source.sha256",
+    "sha256": "fb270b7ce9c49bc7ba9a5a05f55fb939fc9c32617f236d7331db63ab278d22b0"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Initial scoped counted template/root adapter qualification passes nineteen Rust controls after rebuilding certified-relations against Root41 pinned dependencies. The first mixed-dependency link failed E0463 before tests and is retained; the exact unresolved transitive cause is not asserted. This is partial source qualification: feature-off and actual Nagao materializer controls remain pending; no cost or fresh-target measurement."
+}

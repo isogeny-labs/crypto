@@ -1,0 +1,173 @@
+[
+  {
+    "id": "polynomial-bridge-oracles-20261116-v90b",
+    "hypothesis": "Project-local unchanged baseline copy admits exact fieldpolynomial->BooleanmatchedF4/F5bridge;all roots and setup/output retained",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.polynomial_bridge_20261116_v90b.oracles",
+      "polynomial-bridge-oracles-20261116-v90b",
+      "oracles_raw"
+    ],
+    "source_paths": [
+      "lab/runner.py",
+      "performance/GATE.md",
+      "performance_gate.py",
+      "research/twist_auxiliary_20261116_v86/algebra.py",
+      "research/twist_three_isogeny_20261116_v86b/curve.py",
+      "research/polynomial_bridge_20261116_v90b/codec.py",
+      "research/polynomial_bridge_20261116_v90b/binary.py",
+      "research/polynomial_bridge_20261116_v90b/oracle.py",
+      "research/polynomial_bridge_20261116_v90b/common.py",
+      "research/polynomial_bridge_20261116_v90b/block.py",
+      "research/polynomial_bridge_20261116_v90b/oracles.py",
+      "research/polynomial_bridge_20261116_v90b/child.py",
+      "research/polynomial_bridge_20261116_v90b/cold.py",
+      "research/polynomial_bridge_20261116_v90b/PROOF_AND_REVIEW.md",
+      "research/polynomial_bridge_20261116_v90b/REPAIR.md"
+    ],
+    "input_paths": [
+      "research/polynomial_bridge_20261116_v90b/DATA.json",
+      "research/polynomial_bridge_20261116_v90b/NIST.json"
+    ],
+    "artifact_paths": [
+      "research/polynomial_bridge_20261116_v90b/oracles_raw.json"
+    ],
+    "timeout_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cpu": 0,
+    "depends_on": [],
+    "expected_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+      "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+      "research/twist_three_isogeny_20261116_v86b/curve.py": "835fe32b0632ad87571289176a708919b669c9e2ea3792c2be644069e8612d1b",
+      "research/polynomial_bridge_20261116_v90b/codec.py": "a17e06a626dd0b619c2c875922d7d1d7d07ec56b7a03c2d6798f83c7c05d5a58",
+      "research/polynomial_bridge_20261116_v90b/binary.py": "e5a5f12165fa89a36e2a2fbde88b1f2f4c99984336139fe0f207b10c7b68ed8a",
+      "research/polynomial_bridge_20261116_v90b/oracle.py": "26519b15f78594a32f16ff3299b0a41bc9ea24d02ca42ff1942f97324470e622",
+      "research/polynomial_bridge_20261116_v90b/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+      "research/polynomial_bridge_20261116_v90b/block.py": "d1fc2ad2ca95a7cfc7742b42b03529b094757a1e50b6a8415d13e70c7cc37b30",
+      "research/polynomial_bridge_20261116_v90b/oracles.py": "c968d515ef9aa4c135109dfbc69a1bf1401452995a88cd389a996c3b866f3348",
+      "research/polynomial_bridge_20261116_v90b/child.py": "d1aea85c2bdeaa5cbc5fda448d46f9915abe33e1363ae7a604676e58d24a293d",
+      "research/polynomial_bridge_20261116_v90b/cold.py": "af96b7021c76460f0e3946709f02a074d21f6b196c600c87281a43fb755bd19c",
+      "research/polynomial_bridge_20261116_v90b/PROOF_AND_REVIEW.md": "11080ad23523c3c29f1287135344bc7efd2ee8025e59632cd5c2e2ce1ce6f0e1",
+      "research/polynomial_bridge_20261116_v90b/REPAIR.md": "64d3cd4e3948c4020b465ea1e876de752ba8f220dd7a3bd2360081754d083097",
+      "research/polynomial_bridge_20261116_v90b/DATA.json": "f52db31a47f5d2526f24e47882d86976c7d47ec953567d9b525ff331964b5589",
+      "research/polynomial_bridge_20261116_v90b/NIST.json": "a614dac35438fce60fb05d822d0e90f0149bdfde616986f32255f10722ea2a7c"
+    }
+  },
+  {
+    "id": "polynomial-bridge-cold-20261116-v90b",
+    "hypothesis": "Project-local unchanged baseline copy admits exact fieldpolynomial->BooleanmatchedF4/F5bridge;all roots and setup/output retained",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.polynomial_bridge_20261116_v90b.cold",
+      "polynomial-bridge-cold-20261116-v90b",
+      "cold_raw"
+    ],
+    "source_paths": [
+      "lab/runner.py",
+      "performance/GATE.md",
+      "performance_gate.py",
+      "research/twist_auxiliary_20261116_v86/algebra.py",
+      "research/twist_three_isogeny_20261116_v86b/curve.py",
+      "research/polynomial_bridge_20261116_v90b/codec.py",
+      "research/polynomial_bridge_20261116_v90b/binary.py",
+      "research/polynomial_bridge_20261116_v90b/oracle.py",
+      "research/polynomial_bridge_20261116_v90b/common.py",
+      "research/polynomial_bridge_20261116_v90b/block.py",
+      "research/polynomial_bridge_20261116_v90b/oracles.py",
+      "research/polynomial_bridge_20261116_v90b/child.py",
+      "research/polynomial_bridge_20261116_v90b/cold.py",
+      "research/polynomial_bridge_20261116_v90b/PROOF_AND_REVIEW.md",
+      "research/polynomial_bridge_20261116_v90b/REPAIR.md",
+      "vendor/chain_native_v90/main.rs",
+      "vendor/chain_native_v90/chain-native-baseline"
+    ],
+    "input_paths": [
+      "research/polynomial_bridge_20261116_v90b/DATA.json",
+      "research/polynomial_bridge_20261116_v90b/NIST.json"
+    ],
+    "artifact_paths": [
+      "research/polynomial_bridge_20261116_v90b/cold_raw.json"
+    ],
+    "timeout_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cpu": 0,
+    "depends_on": [
+      "polynomial-bridge-oracles-20261116-v90b"
+    ],
+    "expected_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+      "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+      "research/twist_three_isogeny_20261116_v86b/curve.py": "835fe32b0632ad87571289176a708919b669c9e2ea3792c2be644069e8612d1b",
+      "research/polynomial_bridge_20261116_v90b/codec.py": "a17e06a626dd0b619c2c875922d7d1d7d07ec56b7a03c2d6798f83c7c05d5a58",
+      "research/polynomial_bridge_20261116_v90b/binary.py": "e5a5f12165fa89a36e2a2fbde88b1f2f4c99984336139fe0f207b10c7b68ed8a",
+      "research/polynomial_bridge_20261116_v90b/oracle.py": "26519b15f78594a32f16ff3299b0a41bc9ea24d02ca42ff1942f97324470e622",
+      "research/polynomial_bridge_20261116_v90b/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+      "research/polynomial_bridge_20261116_v90b/block.py": "d1fc2ad2ca95a7cfc7742b42b03529b094757a1e50b6a8415d13e70c7cc37b30",
+      "research/polynomial_bridge_20261116_v90b/oracles.py": "c968d515ef9aa4c135109dfbc69a1bf1401452995a88cd389a996c3b866f3348",
+      "research/polynomial_bridge_20261116_v90b/child.py": "d1aea85c2bdeaa5cbc5fda448d46f9915abe33e1363ae7a604676e58d24a293d",
+      "research/polynomial_bridge_20261116_v90b/cold.py": "af96b7021c76460f0e3946709f02a074d21f6b196c600c87281a43fb755bd19c",
+      "research/polynomial_bridge_20261116_v90b/PROOF_AND_REVIEW.md": "11080ad23523c3c29f1287135344bc7efd2ee8025e59632cd5c2e2ce1ce6f0e1",
+      "research/polynomial_bridge_20261116_v90b/REPAIR.md": "64d3cd4e3948c4020b465ea1e876de752ba8f220dd7a3bd2360081754d083097",
+      "vendor/chain_native_v90/main.rs": "635c288e48e66def6effa550b59a57172756bb2cf8c5543245833f5b297db007",
+      "vendor/chain_native_v90/chain-native-baseline": "9eaa4b09d120e1f51b6bb5ccb542d04963dc57d218ddbb7e9be9412e00b31725",
+      "research/polynomial_bridge_20261116_v90b/DATA.json": "f52db31a47f5d2526f24e47882d86976c7d47ec953567d9b525ff331964b5589",
+      "research/polynomial_bridge_20261116_v90b/NIST.json": "a614dac35438fce60fb05d822d0e90f0149bdfde616986f32255f10722ea2a7c"
+    }
+  },
+  {
+    "id": "linearized-domain-profile-20261116-v90c",
+    "hypothesis": "Exact affine subspace polynomial replaces exponential domain product and certifies actualGF83D18linearconstraint rank;not a rootsearch",
+    "command": [
+      "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "-m",
+      "research.linearized_bridge_20261116_v90c.worker",
+      "linearized-domain-profile-20261116-v90c",
+      "raw"
+    ],
+    "source_paths": [
+      "lab/runner.py",
+      "performance/GATE.md",
+      "performance_gate.py",
+      "research/twist_auxiliary_20261116_v86/algebra.py",
+      "research/polynomial_bridge_20261116_v90b/codec.py",
+      "research/polynomial_bridge_20261116_v90b/oracle.py",
+      "research/linearized_bridge_20261116_v90c/common.py",
+      "research/linearized_bridge_20261116_v90c/worker.py",
+      "research/linearized_bridge_20261116_v90c/subspace.py",
+      "research/linearized_bridge_20261116_v90c/PROOF_AND_REVIEW.md"
+    ],
+    "input_paths": [
+      "research/linearized_bridge_20261116_v90c/DATA.json"
+    ],
+    "artifact_paths": [
+      "research/linearized_bridge_20261116_v90c/raw.json",
+      "research/linearized_bridge_20261116_v90c/GF83_affine_D18_original_encoded.json"
+    ],
+    "timeout_seconds": 90,
+    "memory_limit_mb": 4096,
+    "cpu": 0,
+    "depends_on": [
+      "polynomial-bridge-oracles-20261116-v90b"
+    ],
+    "expected_sha256": {
+      "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+      "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+      "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+      "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+      "research/polynomial_bridge_20261116_v90b/codec.py": "a17e06a626dd0b619c2c875922d7d1d7d07ec56b7a03c2d6798f83c7c05d5a58",
+      "research/polynomial_bridge_20261116_v90b/oracle.py": "26519b15f78594a32f16ff3299b0a41bc9ea24d02ca42ff1942f97324470e622",
+      "research/linearized_bridge_20261116_v90c/common.py": "57a71b57d28df666ee3b1ec03df2d914c5bb45778828be2f1db8dc504ea0211a",
+      "research/linearized_bridge_20261116_v90c/worker.py": "22d92e4d02d418fafa31a20dd7cbb32f4c0d7d366b8f27a38cc75966eeb9a3f5",
+      "research/linearized_bridge_20261116_v90c/subspace.py": "0c125908ad25e63f8dd32607bc6bae35e4621cfd13307b5f77604e712df6828d",
+      "research/linearized_bridge_20261116_v90c/PROOF_AND_REVIEW.md": "eb84b34a4b4eea143cc3d902480ee322e601c34cfc27ad0f0da529fc6532b0aa",
+      "research/linearized_bridge_20261116_v90c/DATA.json": "6bd4aaef0c391b5d73a3b7a08d6d9fae72b7f8e86ae6e10df61602fb9390853e"
+    }
+  }
+]

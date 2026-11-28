@@ -1,0 +1,57 @@
+{
+  "schema": "vieta-closeout-ci-diagnosis/v1",
+  "observed_head": "7d1b8408a063354497fe5aecfdd66e4997d63563",
+  "pr": 4987,
+  "required_size": "SUCCESS at137538409555",
+  "required_artifacts": "FAILURE at137538411616",
+  "required_validation_gate": "FAILURE at137538413411",
+  "reviews": 0,
+  "comments": 0,
+  "unresolved_threads": 0,
+  "jobs": [
+    {
+      "job": 137538316917,
+      "name": "scope",
+      "cause": "Git-only archived-input recovery failed for ic_planner_validation_20261020/sessions/c24/records.jsonl, expected75eb4c4f167d5fed1455e00e433897799adb3f246df590c2a1c34039c48c7993,1628822bytes; secondary recovery file missing. CI says S3 not contacted."
+    },
+    {
+      "job": 137538411616,
+      "name": "artifacts",
+      "cause": "Four inherited artifact-tool test failures; wire_workflows.py raises NameError: paths at line562 and existing fixture retains continue-on-error. One unchanged test reproduced locally."
+    },
+    {
+      "job": 137538316997,
+      "name": "current",
+      "cause": "Backend frozen report verification: frozen report output unavailable: leaderboard.json;34unit tests ran with33pass/1ignored before failure."
+    },
+    {
+      "job": 137538334625,
+      "name": "names",
+      "cause": "Historical retired/unregistered curve identifiers in unchanged old journals/research/registry; no new curve metadata changed."
+    },
+    {
+      "job": 137538335147,
+      "name": "parity",
+      "cause": "PCC source/test SHA256 differs from shared-code lock; source/test/lock byte-equal to main."
+    },
+    {
+      "job": 137538371203,
+      "name": "gate (pcc)",
+      "cause": "Inherited claim-verifier findings, inherited49-test suite3NameError errors(reasons/q),17base prose findings plus ONE PR-owned unqualified sentence; PR body0findings and ledger1564 chain passes. Own prose sentence now qualified; full old block archived."
+    },
+    {
+      "job": 137538413411,
+      "name": "gate (validation)",
+      "cause": "Stops before gate tests: Git-only retrieval of ic_packed_filter_20261029/P28/counted/analysis/facts.json failed expected SHA256d22767f410e1966d335b6c6b270aa35c27805cda3c91fe79d2fcc18b6c12d34b,440351bytes. CI says S3 not contacted."
+    },
+    {
+      "job": 137538456634,
+      "name": "check",
+      "cause": "Dependent scope or release metadata failure; refuses to skip validation."
+    }
+  ],
+  "scientific_goal_reactivated": false,
+  "benchmarks_rerun": false,
+  "local_s3_operation": false,
+  "cloud_spend": false
+}

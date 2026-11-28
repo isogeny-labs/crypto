@@ -1,4 +1,147 @@
+<!--
+Sections "Reporting a vulnerability" through "Ethics" are the canonical
+isogeny-labs policy (trunk docs/policy/SECURITY-TEMPLATE.md; action plan
+2026-11-21, row F4), copied unchanged. "What this repository is" and
+"Components with dual-use capability" are specific to this repository.
+Owner actions before this text is relied on:
+  1. enable GitHub private vulnerability reporting on this repository
+     (Settings > Code security > Private vulnerability reporting);
+  2. create the security@isogenylabs.io mailbox, or replace the address below.
+This is a policy draft, not legal advice. Counsel reviews it with F6 and F9.
+-->
+
 # Security policy
+
+This file has two parts. The first is the policy: how to report a problem,
+what the code may be used for, and which components can be used to attack.
+The second, [Library security status](#library-security-status), is the
+long-standing account of what the library does and does not protect.
+
+## Reporting a vulnerability
+
+Please report security problems privately. Do not open a public issue.
+
+- **GitHub:** use "Report a vulnerability" on this repository's Security tab.
+- **Email:** security@isogenylabs.io
+
+Tell us what you found, how to reproduce it, and what you think the impact
+is. We confirm receipt within 3 business days and tell you what we will do
+within 10 business days. Our default is coordinated disclosure after
+90 days, or sooner once a fix is released. We credit reporters who want to be
+credited.
+
+We will not pursue legal action against good-faith research that stays
+within this policy: it avoids privacy violations, data destruction and
+service disruption, uses only accounts and data you own or are authorised
+to use, and gives us reasonable time to respond before anything is made
+public.
+
+## What this repository is, and what it is not
+
+This is Isogeny Labs' research repository: an educational, from-scratch
+cryptography library in Rust and the cryptanalysis, GPU, FPGA and
+measurement code the lab uses to study what attacks cost. **None of it is
+meant for production use** ([Library security status](#library-security-status)).
+Many components implement attacks: discrete-logarithm solvers (Pollard rho,
+kangaroo, BSGS, index calculus) for elliptic curves, including GPU kernels
+for secp256k1, P-256 and the Certicom challenge curves; key recovery from
+biased ECDSA nonces, invalid-curve inputs, ML-KEM decryption leakage and
+ML-DSA faults; and FPGA engines and cost models for rho and for SHA-1
+chosen-prefix collisions. They exist to measure the cost of attacks on
+public challenges, toy parameters and the lab's own implementations, and to
+audit signatures and keys their owners provide. Nothing here probes
+networks. The table [below](#components-with-dual-use-capability) lists
+each component, what it is for and its safeguards.
+
+## Acceptable use
+
+Some code here implements published cryptanalytic techniques: attacks on
+weak parameters, key recovery from flawed signatures or leakage, and network
+probes that read how a system negotiates cryptography. We publish it for
+research, education, and defensive assessment.
+
+- Use it only on systems, keys, signatures and data that you own, or that
+  you have written authorisation to test.
+- Do not use it to obtain anyone else's keys, funds, messages or data, or to
+  get into systems you are not authorised to access.
+- Network probes complete ordinary handshakes and read what the server
+  offers. Do not point them at networks you do not operate or have
+  permission to assess, and respect the target's rate limits.
+- If you recover key material that is not yours, stop. Do not use it or
+  share it; report it privately as above.
+
+## How Isogeny Labs runs client engagements
+
+When we assess a client's systems, these rules hold whatever the contract
+says on top of them:
+
+1. **Written authorisation first.** No active test starts before a signed
+   authorisation that names the systems, the adversary model, what counts as
+   a finding, the testing window and the client's emergency contact.
+2. **Public data by default.** We analyse public material (signatures, public
+   keys, certificates, handshakes) unless the client agrees in writing to
+   provide more.
+3. **Recovered key material.** If an analysis recovers a private key or
+   other secret, we tell the client's named contact at once through the
+   agreed secure channel. We never store it in plaintext, never put it in a
+   repository, ticket, report or log, and delete it at the end of the
+   engagement, confirming the deletion in writing.
+4. **Evidence, not exploitation.** We show a finding with the smallest proof
+   that establishes it: a verified result, a test, a signed evidence record.
+   We do not use it beyond that.
+5. **Third parties.** A weakness found in someone else's product is reported
+   to that vendor under coordinated disclosure (90 days by default), with
+   the client's agreement where the client's data was involved.
+
+## Ethics
+
+We build attacks so that their cost is measured rather than guessed, and so
+that weak deployments are found by their owners first. We do not sell attack
+capability, target individuals, or take work whose purpose is to defeat
+security that people rely on without their owner's consent.
+
+## Components with dual-use capability
+
+Each row was checked against the component's own README or module
+documentation on 2026-11-22. "Full size out of reach" means the generic
+cost at the deployed parameter is about 2^128 group operations or more
+(see `docs/cost-to-break/` when it lands).
+
+| Path | What it does | Intended use | Safeguards and limits |
+|:--|:--|:--|:--|
+| `gpu/btcpuzzle/` | Pollard kangaroo for the interval discrete log on secp256k1, multi-GPU, framed around the public 2015 Bitcoin puzzle series | Interval and small-range key research; cost of the interval ECDLP | Interval ECDLP only: no address scanner, no HASH160 kernel, no wallet or Bitcoin-network access. Real puzzle public keys are not shipped; the registry holds synthetic keys only. An unknown recovered key goes to a mode-0600 file and is not printed by default. Its README states that no kernel has been run on a GPU. **Decision pending:** [`docs/policy/btcpuzzle-decision.md`](docs/policy/btcpuzzle-decision.md) |
+| `gpu/ecc/` | secp256k1 GPU Pollard rho (Z/6 automorphism fold) and BSGS, full-group and interval | Cost measurement; toy and planted instances | Full size out of reach. Its README says no kernel has been run on a GPU, but `gpu/ecc/validation/` records later device runs (RTX 4090, 2026-10-13; RTX PRO 6000, 2026-10-17) on toy curves and throughput walks |
+| `gpu/nist/`, `src/cryptanalysis/ecdlp_nist/` | P-256 and P-384 Pollard rho engine (CUDA and CPU) | Measured rho rate for cost-to-break estimates | Full size out of reach. Its tests solve a planted toy curve of about 2^20 points; the device runs measured walk throughput only (`gpu/nist/README.md`, `RESULTS.md`) |
+| `gpu/certicom/`, `gpu/certicom131/`, `src/cryptanalysis/certicom_dlp*` | rho, BSGS and index calculus on the published Certicom ECC2-131 and ECCp-131 challenge curves; native 131-bit arithmetic | Public-challenge research | Public challenge curves that protect nothing. Correctness references; no challenge solution is claimed |
+| `ecc2k130/`, `gpu/ecc2k/`, `hdl/ecc2k130/` | GPU client and FPGA engine for the Certicom ECC2K-130 public challenge (distinguished-point rho on a 131-bit Koblitz curve) | Public-challenge campaign; reference family for binary-field cost | The challenge curve protects nothing |
+| `hdl/ecc/`, `docs/ecc_fpga_cost_model.md`, `ecc2k130/FPGA-CEILING.md` | FPGA rho datapath for secp256k1 and cost models comparing FPGA with GPU | Cost estimation | The secp256k1 document states nothing was run on an FPGA or GPU; full size out of reach |
+| `hdl/sha1/`, `docs/sha1_fpga_cost_model.md` | FPGA pipeline and cost model for the birthday phase of the 2020 SHA-1 chosen-prefix collision (Leurent–Peyrin) | Cost estimation of a published attack | Numbers are estimates (the document says so). SHA-1 is deprecated for signatures |
+| `src/cryptanalysis/hnp_ecdsa.rs`, `bleichenbacher.rs`, `ecdsa_audit.rs`, `multi_key_hnp.rs`; `secp256k1_cm_audit/glv_hnp_*` | Biased-nonce ECDSA key recovery (lattice HNP, Bleichenbacher's spectral bias test), a transcript auditor that detects bias and recovers keys from P-256, secp256k1 and P-384 signature streams, joint HNP across BIP32 child keys, GLV-HNP on a toy curve | Defensive audit of signature corpora their owners provide (action plan P8, pack 1) | Run only on your own or authorised signatures; recovered keys follow engagement rule 3. `multi_key_hnp.rs` aims at HD-wallet master secrets: flagged for the Principal Cryptographer's review |
+| `src/cryptanalysis/invalid_curve_attack.rs`, `ml_kem_pco.rs`, `ml_dsa_fault.rs` | Invalid-curve key recovery (simulated victim), chosen-ciphertext key recovery from ML-KEM decryption leakage (modelled oracles), fault attacks on ML-DSA-65 | Teaching and testing implementation countermeasures | Run against the library's own implementations and simulated oracles; no remote target code |
+| `cd_attack/`, `eigen_seta/` | Castryck–Decru key recovery on SIDH | Education | SIDH/SIKE is withdrawn and not deployed |
+| `quantum_circuit_secp256k1/` | Reversible circuit for one secp256k1 point addition (the public ecdsa.fail challenge), the inner step of Shor's algorithm | Quantum resource estimation | No quantum hardware; a circuit-size study only |
+| `src/cryptopals/` | Solutions to the public Cryptopals challenges (padding oracles, CBC bit-flipping, and the like) | Education | Run against local toy oracles |
+
+Checked and not dual-use: `gpu/mlwe/` computes the ML-KEM key-generation
+equation `t = A*s + e` and nothing else; it attacks nothing.
+`RESEARCH_P256_BACKDOOR_SPECULATION.md` and the `p256_*` modules are
+speculation with falsifiers; the note states that no weakness in P-256 is
+claimed or found.
+
+### Decisions under this policy
+
+- `gpu/btcpuzzle/`: options and a recommendation in
+  [`docs/policy/btcpuzzle-decision.md`](docs/policy/btcpuzzle-decision.md).
+  **The Principal Cryptographer decides** (action plan F5); until then the
+  directory is unchanged.
+- Licence: MIT ([`LICENSE`](LICENSE)), with the third-party exceptions in
+  [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). The action plan's D5
+  default is MIT **or making this repository private** if `gpu/btcpuzzle`
+  and the other offensive kernels stay; the owners choose.
+
+---
+
+# Library security status
 
 ## Status
 
@@ -34,10 +177,26 @@ does not change this conclusion.
 
 ### What this library now does
 
-- **Entropy** — All secret material is drawn from `OsRng` (OS CSPRNG via
+- **Entropy** — Default secret-material generation uses `OsRng` (OS CSPRNG via
   the `getrandom` crate: `getrandom(2)` on Linux, `BCryptGenRandom` on
   Windows, `getentropy(2)` on Darwin).  No user-space PRNG is used for
-  long-term keys.
+  long-term keys. The fallible `try_random_*_with_rng` helpers and
+  `EccKeyPair::try_generate_with_rng` accept caller-owned
+  `rand::RngCore + rand::CryptoRng` providers. Callers must supply a correctly
+  seeded CSPRNG; the marker trait cannot establish that a provider is secure.
+  Entropy errors propagate, and partially written random-byte outputs are
+  scrubbed before returning an error. BigUint scalar sampling is variable-time.
+- **Secret diagnostics** — ECC, RSA, Kyber and McEliece private-key `Debug`
+  implementations redact secrets, as does `MontgomeryContext` (whose modulus
+  may be a CRT prime). `KeyBundle::summary` and `write_summary` emit public
+  metadata only. Explicit private-key export remains available; redaction
+  cannot protect a caller that formats the public secret fields directly.
+- **Shared field-offset arithmetic** — CMAC, SIV, OCB3, PMAC and XTS use
+  `symmetric::gf128` for doubling (and PMAC halving), with fixed-width loops
+  and `subtle` selection instead of branches on key-derived carry bits.
+  Both big-endian and XTS little-endian conventions are explicit. This
+  removes those source-level branches; it does not establish constant-time
+  behavior of an entire mode or of a caller-supplied block-cipher provider.
 - **Constant-time MAC verification** — `aes_gcm_decrypt` and
   `chacha20_poly1305_decrypt` compare authentication tags using
   `subtle::ConstantTimeEq`.  A public `hmac_sha256_verify` is exposed for
@@ -196,8 +355,8 @@ does not change this conclusion.
     - Builds a runtime `MontgomeryContext<LIMBS>` from `n` (the public
       modulus) — `m' = -n^(-1) mod 2^64` via the const-callable
       Newton-iteration `compute_minv64`, plus `R mod n` and `R² mod n`
-      via one-time `BigUint` reductions.  Setup leaks no secret-
-      dependent timing because `n` is public.
+      via exactly `128 * LIMBS` branchless modular doublings. Setup uses no
+      `BigUint` division and also supports secret moduli such as CRT primes.
     - Runs a square-and-multiply ladder over Montgomery form for
       *exactly* `64 · LIMBS` iterations — high zero bits of `d` are
       still scanned, so the iteration count is a function of the
@@ -238,13 +397,13 @@ does not change this conclusion.
     - The recombination's multiplicative step uses one `mont_mul`
       against `p`; the final additive step uses `mul_wide` + `adc`
       over `Uint<FULL>`.  Both are limb-level branchless.
-    - `MontgomeryContext::new(p)` and `MontgomeryContext::new(q)`
-      perform the per-prime setup using `BigUint` for `R mod p` and
-      `R² mod p`.  This setup runs once per loaded key, not once per
-      message, and an attacker positioned to observe per-key setup
-      timing already has the in-memory `key.p` available.  The
-      setup leakage is structurally unavoidable without a CT
-      modular reduction we don't have on stable Rust.
+    - `MontgomeryContext::new(p)` and `MontgomeryContext::new(q)` use
+      fixed-width modular doubling, including when rebuilt per private
+      operation. This replaces secret-modulus `BigUint` reductions; the
+      earlier documentation incorrectly called that leakage unavoidable
+      and described the contexts as cached per key. Surrounding `BigUint`
+      import/export conversions remain variable-time. These arithmetic
+      properties do not establish end-to-end constant-time RSA.
   Cross-checked at 1024 bits (CRT result equals direct
   `rsa_mod_pow_ct`); 2048-bit equivalent has a slow `#[ignore]`d
   test that runs under `cargo test -- --ignored`.  Sizes outside
@@ -1197,14 +1356,15 @@ does not change this conclusion.
 
 ### What this library does NOT protect against
 
-These are structural — they cannot be fixed by configuration or by
-patches that don't fundamentally re-architect the crate:
+These limits remain after the targeted hardening. See
+[the Rust extension and hardening record](docs/rust-extension-hardening.md)
+for its verified scope and the remaining audit requirements.
 
-- **Timing side-channels in big-integer arithmetic — closed for
-  every supported secret-key path on both ECC and RSA.**
-  Every secret-scalar / secret-exponent path in this codebase now
-  routes through `ct_bignum::Uint<LIMBS>`-backed Montgomery
-  arithmetic:
+- **Timing side-channels in big-integer arithmetic — partially hardened.**
+  The following paths use `ct_bignum::Uint<LIMBS>`-backed arithmetic
+  internally; their surrounding `BigUint` conversions, key generation,
+  protocol logic and import/export require separate review. This is not
+  an end-to-end constant-time guarantee for every ECC or RSA operation:
     - **ECC** (secp256k1 + P-256): keypair generation, ECDH, and the
       ECDSA signer's `k·G` use `ecc::ct::scalar_mul_secret` over the
       Renes–Costello–Batina projective ladder.  The ECDSA verifier's
@@ -1219,8 +1379,8 @@ patches that don't fundamentally re-architect the crate:
       set fall back to the non-CRT `rsa_mod_pow_ct`, and thence to
       the legacy `BigUint`-backed `mod_pow_ct`, which has uniform
       per-bit op count but is not limb-level constant-time.
-  The remaining caveats are about *micro-architectural* timing
-  channels rather than the source-level operation count:
+  In addition to the remaining variable-time boundaries, there are
+  *micro-architectural* timing caveats:
     - The variable-time multiplication-or-not behaviour of `*` on
       Cortex-A53, ARM7, and a few older Intel CPUs is not addressed —
       we use a fixed-cycle `mul` instruction on x86-64 / aarch64 in
@@ -1231,9 +1391,9 @@ patches that don't fundamentally re-architect the crate:
       target/CPU/compiler combination.
     - Cache, port-contention, and speculative-execution channels
       are out of scope — see the AES entry below for a related case.
-  None of these can be addressed at the Rust source level; closing
-  them requires a verified-CT compiler backend, hardware crypto
-  intrinsics, or both.
+  Fixed source-level operation counts alone cannot establish timing
+  resistance on a particular target; generated-code and hardware analysis
+  are still required.
 - **Cache-timing side-channels in AES — partially mitigated.**
   The S-box is now scanned in full on every byte substitution
   (see "What this library now does"), which closes the cache-line
@@ -1272,13 +1432,14 @@ patches that don't fundamentally re-architect the crate:
   Criteria evaluated.  PCI-DSS environments specifically require FIPS-
   validated cryptographic modules.
 
-## Reporting a vulnerability
+## Reporting a weakness in the library
 
-If you believe you have found a bug in this library, open an issue on
-GitHub.  Because the library is explicitly educational, there is no
-embargo or coordinated-disclosure process — the appropriate response to
-a vulnerability is to update the docs and recommend that consumers move
-to an audited crate.
+Report it privately, as in [Reporting a vulnerability](#reporting-a-vulnerability)
+above. (Until 2026-11-22 this section asked for a public GitHub issue with no
+embargo; the lab-wide policy replaces that.) Because the library is
+educational and not for production, the usual response to a confirmed
+weakness is to fix it or document it in this file and to recommend that
+consumers move to an audited crate.
 
 ## Versioning
 

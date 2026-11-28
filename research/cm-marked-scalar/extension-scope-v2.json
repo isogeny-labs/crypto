@@ -1,0 +1,14 @@
+{
+ "id":"CM-NATIVE-ORIENTED-EXTENSION-V2",
+ "amends":"extension-scope.json",
+ "reason":"V1 preflight rejected P-192 degree 5 because the characteristic root is repeated, and P-256 root 2 because 1-rho=-1 projects trivially to every odd prime in the fixed list. Both refusals and commands are preserved. No map was constructed for either refused case.",
+ "filed_before_affected_construction":true,
+ "primary_target":"P-192",
+ "targets":["P-192","P-224","P-256"],
+ "fixed_edges":{"P-192":{"degree":13,"root_rule":"smallest nonzero distinct characteristic root"},"P-224":{"degree":11,"root":10},"P-256":{"degree":11,"root":8}},
+ "marked_order_rule":"Unchanged V1 fixed prime list and nonidentity projection rule.",
+ "positive_control":{"curve":"P-521","degree":7,"root":6,"check":"reproduce published closure coefficients before the three new target constructions"},
+ "checks":"Unchanged V1 exact checks, including native relation-driven orbit minima against OpenSSL public references.",
+ "limits":{"processes":1,"threads":1,"memory_gib":2,"construction_seconds_per_curve":120,"build_seconds":120,"unchanged_retries":0,"cloud_submissions":0},
+ "timing":"No clocks collected; exact construction and software correctness only."
+}

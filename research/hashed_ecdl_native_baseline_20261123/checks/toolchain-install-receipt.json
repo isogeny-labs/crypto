@@ -1,0 +1,324 @@
+{
+  "started_utc": "2026-11-23T09:06:36.792Z",
+  "plan_sha256": "6ac41c5554fbdb41d4818e55a7ca8fee0c01a51f63854ee9d8bed486ee37c7c1",
+  "steps": [
+    {
+      "cmd": "curl",
+      "args": [
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--connect-timeout",
+        "20",
+        "--max-time",
+        "180",
+        "--output",
+        "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads/rustc-1.99.1-x86_64-unknown-linux-gnu.tar.xz",
+        "https://static.rust-lang.org/dist/2026-10-15/rustc-1.99.1-x86_64-unknown-linux-gnu.tar.xz"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123",
+      "started_utc": "2026-11-23T09:06:36.796Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:39.057Z"
+    },
+    {
+      "component": "rustc",
+      "sha256": "2ff05ff9c08a90861e7f6e4065b40a8b87463b4576186fd613871c3e37f2091f",
+      "archive_bytes": 84098960,
+      "digest_matches": true
+    },
+    {
+      "cmd": "tar",
+      "args": [
+        "-xJf",
+        "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads/rustc-1.99.1-x86_64-unknown-linux-gnu.tar.xz",
+        "-C",
+        "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123",
+      "started_utc": "2026-11-23T09:06:39.228Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:45.474Z"
+    },
+    {
+      "cmd": "sh",
+      "args": [
+        "install.sh",
+        "--prefix=/tmp/ecdlp-native-tools-20261123/rust-1.99.1",
+        "--disable-ldconfig"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads/rustc-1.99.1-x86_64-unknown-linux-gnu",
+      "started_utc": "2026-11-23T09:06:45.475Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:46.655Z"
+    },
+    {
+      "cmd": "curl",
+      "args": [
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--connect-timeout",
+        "20",
+        "--max-time",
+        "180",
+        "--output",
+        "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads/cargo-1.99.1-x86_64-unknown-linux-gnu.tar.xz",
+        "https://static.rust-lang.org/dist/2026-10-15/cargo-1.99.1-x86_64-unknown-linux-gnu.tar.xz"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123",
+      "started_utc": "2026-11-23T09:06:46.694Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:47.174Z"
+    },
+    {
+      "component": "cargo",
+      "sha256": "53f3521949404d595efb06a55c12c5658d4ed1c75566f33d3d514eaebe70bd8a",
+      "archive_bytes": 10954816,
+      "digest_matches": true
+    },
+    {
+      "cmd": "tar",
+      "args": [
+        "-xJf",
+        "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads/cargo-1.99.1-x86_64-unknown-linux-gnu.tar.xz",
+        "-C",
+        "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123",
+      "started_utc": "2026-11-23T09:06:47.196Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:47.806Z"
+    },
+    {
+      "cmd": "sh",
+      "args": [
+        "install.sh",
+        "--prefix=/tmp/ecdlp-native-tools-20261123/rust-1.99.1",
+        "--disable-ldconfig"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads/cargo-1.99.1-x86_64-unknown-linux-gnu",
+      "started_utc": "2026-11-23T09:06:47.807Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:48.693Z"
+    },
+    {
+      "cmd": "curl",
+      "args": [
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--connect-timeout",
+        "20",
+        "--max-time",
+        "180",
+        "--output",
+        "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads/rust-std-1.99.1-x86_64-unknown-linux-gnu.tar.xz",
+        "https://static.rust-lang.org/dist/2026-10-15/rust-std-1.99.1-x86_64-unknown-linux-gnu.tar.xz"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123",
+      "started_utc": "2026-11-23T09:06:48.697Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:49.559Z"
+    },
+    {
+      "component": "rust-std",
+      "sha256": "109b074225bf5b9ea3820890876bfdf4ed161adbfaf94b2b4b5984c85ee5d958",
+      "archive_bytes": 31563228,
+      "digest_matches": true
+    },
+    {
+      "cmd": "tar",
+      "args": [
+        "-xJf",
+        "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads/rust-std-1.99.1-x86_64-unknown-linux-gnu.tar.xz",
+        "-C",
+        "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123",
+      "started_utc": "2026-11-23T09:06:49.605Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:52.140Z"
+    },
+    {
+      "cmd": "sh",
+      "args": [
+        "install.sh",
+        "--prefix=/tmp/ecdlp-native-tools-20261123/rust-1.99.1",
+        "--disable-ldconfig"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads/rust-std-1.99.1-x86_64-unknown-linux-gnu",
+      "started_utc": "2026-11-23T09:06:52.141Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:53.385Z"
+    },
+    {
+      "cmd": "curl",
+      "args": [
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--connect-timeout",
+        "20",
+        "--max-time",
+        "180",
+        "--output",
+        "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads/rustfmt-1.99.1-x86_64-unknown-linux-gnu.tar.xz",
+        "https://static.rust-lang.org/dist/2026-10-15/rustfmt-1.99.1-x86_64-unknown-linux-gnu.tar.xz"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123",
+      "started_utc": "2026-11-23T09:06:53.395Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:53.576Z"
+    },
+    {
+      "component": "rustfmt-preview",
+      "sha256": "e3b36c4c7ec3486c059d8067ff48787676612007123aad7a4e8ec12c48ee9ba2",
+      "archive_bytes": 2488800,
+      "digest_matches": true
+    },
+    {
+      "cmd": "tar",
+      "args": [
+        "-xJf",
+        "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads/rustfmt-1.99.1-x86_64-unknown-linux-gnu.tar.xz",
+        "-C",
+        "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123",
+      "started_utc": "2026-11-23T09:06:53.581Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:53.702Z"
+    },
+    {
+      "cmd": "sh",
+      "args": [
+        "install.sh",
+        "--prefix=/tmp/ecdlp-native-tools-20261123/rust-1.99.1",
+        "--disable-ldconfig"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads/rustfmt-1.99.1-x86_64-unknown-linux-gnu",
+      "started_utc": "2026-11-23T09:06:53.702Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:53.951Z"
+    },
+    {
+      "cmd": "curl",
+      "args": [
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--connect-timeout",
+        "20",
+        "--max-time",
+        "180",
+        "--output",
+        "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads/clippy-1.99.1-x86_64-unknown-linux-gnu.tar.xz",
+        "https://static.rust-lang.org/dist/2026-10-15/clippy-1.99.1-x86_64-unknown-linux-gnu.tar.xz"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123",
+      "started_utc": "2026-11-23T09:06:53.952Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:54.197Z"
+    },
+    {
+      "component": "clippy-preview",
+      "sha256": "458339712a058e52cc4522ff9ef8b59cd1ea1340312216cd94194c464a3f6dc5",
+      "archive_bytes": 5254436,
+      "digest_matches": true
+    },
+    {
+      "cmd": "tar",
+      "args": [
+        "-xJf",
+        "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads/clippy-1.99.1-x86_64-unknown-linux-gnu.tar.xz",
+        "-C",
+        "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123",
+      "started_utc": "2026-11-23T09:06:54.206Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:54.494Z"
+    },
+    {
+      "cmd": "sh",
+      "args": [
+        "install.sh",
+        "--prefix=/tmp/ecdlp-native-tools-20261123/rust-1.99.1",
+        "--disable-ldconfig"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123/rust-installer-downloads/clippy-1.99.1-x86_64-unknown-linux-gnu",
+      "started_utc": "2026-11-23T09:06:54.494Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:54.718Z"
+    },
+    {
+      "cmd": "/tmp/ecdlp-native-tools-20261123/rust-1.99.1/bin/rustc",
+      "args": [
+        "--version"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123",
+      "started_utc": "2026-11-23T09:06:54.720Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:54.733Z"
+    },
+    {
+      "cmd": "/tmp/ecdlp-native-tools-20261123/rust-1.99.1/bin/cargo",
+      "args": [
+        "--version"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123",
+      "started_utc": "2026-11-23T09:06:54.733Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:54.739Z"
+    },
+    {
+      "cmd": "/tmp/ecdlp-native-tools-20261123/rust-1.99.1/bin/rustfmt",
+      "args": [
+        "--version"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123",
+      "started_utc": "2026-11-23T09:06:54.739Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:54.752Z"
+    },
+    {
+      "cmd": "/tmp/ecdlp-native-tools-20261123/rust-1.99.1/bin/cargo-clippy",
+      "args": [
+        "--version"
+      ],
+      "cwd": "/tmp/ecdlp-native-bootstrap-20261123",
+      "started_utc": "2026-11-23T09:06:54.752Z",
+      "exit_code": 0,
+      "signal": null,
+      "finished_utc": "2026-11-23T09:06:54.760Z"
+    }
+  ],
+  "peak_cgroup_bytes": 14194343936,
+  "stop_reason": null,
+  "status": "installed",
+  "finished_utc": "2026-11-23T09:06:54.760Z"
+}

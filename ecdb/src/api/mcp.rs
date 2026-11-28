@@ -20,7 +20,8 @@ strings in the field's encoding. Every derived value has a status (proved, proba
 conjectural, unknown, ...); unknown is null, never 0. Transfer costs are formula estimates, not measured speedups. \
 Measured results (IC leaderboard, progress, boundary ledger, benchmarks, ecbench sessions and runs, sibling-repository \
 datasets) keep their producer's unit and reference: ecdb_results, ecdb_ecbench, ecdb_curve_detail part=measurements. \
-Start with ecdb_schema or ecdb_search_curves; use ecdb_sql for anything the other tools do not cover.";
+Saved sweep plans, versioned feature definitions and ML dataset recipes are exposed by ecdb_research. Start with \
+ecdb_schema or ecdb_search_curves; use ecdb_sql for anything the other tools do not cover.";
 
 fn tools() -> Value {
     let s = |props: Value, required: &[&str]| json!({ "type": "object", "properties": props, "required": required });
@@ -50,6 +51,7 @@ fn tools() -> Value {
                 "standard": { "type": "string", "description": "substring of a standard name" },
                 "name": { "type": "string", "description": "substring of any alias or standard name" },
                 "isogeny_class": { "type": "string" }, "has_isogenies": { "type": "boolean" }, "has_covers": { "type": "boolean" },
+                "has_factor_bases": { "type": "boolean" },
                 "sort": { "type": "string", "enum": ["id", "icv1_slug", "field_bits", "group_order_bits", "subgroup_bits", "trace", "class_number", "conductor_bits", "embedding_degree", "cm_discriminant", "isogeny_count", "cover_count"] },
                 "order": { "type": "string", "enum": ["asc", "desc"] },
                 "limit": { "type": "integer", "minimum": 1, "maximum": 1000 }, "offset": { "type": "integer", "minimum": 0 }
@@ -65,7 +67,7 @@ fn tools() -> Value {
             "description": "One part of a curve in full: isogenies (kernel polynomials, codomains, certificates), graph (recorded isogeny graph; depth 0-8, optional ell), transfers (priced DLP routes), covers (cover curves and maps), traits (verbatim producer records), relations (twists, isomorphisms, model changes), endomorphisms (with GLV lattices), division-polynomials (coefficients).",
             "inputSchema": s(json!({
                 "ref": curve_ref,
-                "part": { "type": "string", "enum": ["isogenies", "graph", "transfers", "covers", "traits", "relations", "endomorphisms", "division-polynomials", "measurements"], "description": "measurements: the curve's IC leaderboard rows with recipes, ecbench arm summaries, sibling-dataset measurements and sibling-repository records" },
+                "part": { "type": "string", "enum": ["isogenies", "graph", "transfers", "covers", "traits", "relations", "endomorphisms", "division-polynomials", "measurements", "features"], "description": "measurements: result records; features: the model-ready structural row and typed observations" },
                 "depth": { "type": "integer", "minimum": 0, "maximum": 8 }, "ell": { "type": "string" }
             }), &["ref", "part"]),
         },
@@ -126,6 +128,16 @@ fn tools() -> Value {
                 "results": { "type": "boolean" }, "points": { "type": "boolean" }, "source": { "type": "string" },
                 "fbm_id": { "type": "string" }, "limit": { "type": "integer" }, "offset": { "type": "integer" }
             }), &[]),
+        },
+        {
+            "name": "ecdb_research",
+            "description": "Saved research configuration. kind=sweeps returns versioned curve-sweep plans and cells (name selects one); kind=features returns versioned feature contracts (optional scope); kind=datasets returns reproducible model-dataset recipes, feature roles and split policies (name selects one). Plans and recipes are not measurement evidence.",
+            "inputSchema": s(json!({
+                "kind": { "type": "string", "enum": ["sweeps", "features", "datasets"] },
+                "name": { "type": "string" },
+                "scope": { "type": "string", "enum": ["curve", "field", "subgroup", "factor_base", "factor_base_measurement", "sweep_cell"] },
+                "limit": { "type": "integer" }, "offset": { "type": "integer" }
+            }), &["kind"]),
         },
         {
             "name": "ecdb_sql",
@@ -196,6 +208,7 @@ fn route(name: &str, args: &Map<String, Value>) -> Result<(Method, String, Optio
                 "endomorphisms",
                 "division-polynomials",
                 "measurements",
+                "features",
             ];
             if !PARTS.contains(&part) {
                 return Err(format!("part must be one of {PARTS:?}"));
@@ -239,6 +252,18 @@ fn route(name: &str, args: &Map<String, Value>) -> Result<(Method, String, Optio
                 None => (Method::GET, format!("/v1/factor-bases{}", query(args, &["key", "results", "points"])), None),
             }
         }
+        "ecdb_research" => match arg(args, "kind")? {
+            "sweeps" => match args.get("name").and_then(Value::as_str) {
+                Some(name) => (Method::GET, format!("/v1/sweeps/{}", enc(name)), None),
+                None => (Method::GET, format!("/v1/sweeps{}", query(args, &["kind", "name"])), None),
+            },
+            "features" => (Method::GET, format!("/v1/features{}", query(args, &["kind", "name"])), None),
+            "datasets" => match args.get("name").and_then(Value::as_str) {
+                Some(name) => (Method::GET, format!("/v1/datasets/{}", enc(name)), None),
+                None => (Method::GET, format!("/v1/datasets{}", query(args, &["kind", "name"])), None),
+            },
+            other => return Err(format!("unknown research kind {other:?}")),
+        },
         "ecdb_sql" => (Method::POST, "/v1/sql".into(), Some(Value::Object(args.clone()))),
         "ecdb_record_evidence" => (Method::POST, "/v1/evidence".into(), Some(Value::Object(args.clone()))),
         other => return Err(format!("unknown tool {other:?}")),
@@ -394,6 +419,10 @@ mod tests {
         c.insert("kind".into(), json!("claims"));
         c.insert("summary".into(), json!(true));
         assert_eq!(route("ecdb_results", &c).unwrap().1, "/v1/ic/claims?summary=true");
-        assert_eq!(tools().as_array().unwrap().len(), 12);
+        let mut research = Map::new();
+        research.insert("kind".into(), json!("datasets"));
+        research.insert("name".into(), json!("fbm1-solver-outcomes"));
+        assert_eq!(route("ecdb_research", &research).unwrap().1, "/v1/datasets/fbm1-solver-outcomes");
+        assert_eq!(tools().as_array().unwrap().len(), 13);
     }
 }

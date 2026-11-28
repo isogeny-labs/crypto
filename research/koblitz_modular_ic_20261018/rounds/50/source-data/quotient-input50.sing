@@ -1,0 +1,74 @@
+ring relativeFinite50=2,(t,v,u),wp(4,2,1);short=0;ideal relativeIdeal50;relativeIdeal50[1]=v^2+v+u^3+u;relativeIdeal50[2]=t^16+(u^8+1)*t^8*v+(u^32+u^24+u^20+u^14+u^11+u^10+u^9+u^6+u^4+u^3+u^2+u+1)*t^8+(u^41+u^39+u^37+u^32+u^31+u^30+u^19+u^17+u^16+u^14+u^13+u^11)*t^4*v+(u^42+u^39+u^37+u^34+u^31+u^28+u^26+u^25+u^24+u^23+u^22+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^12+u^11)*t^4+(u^53+u^52+u^51+u^50+u^48+u^45+u^41+u^38+u^36+u^35+u^32+u^31+u^30+u^29+u^28+u^27+u^26+u^25+u^21+u^15+u^12+u^11)*t*v+(u^54+u^47+u^46+u^43+u^42+u^41+u^34+u^33+u^31+u^30+u^28+u^23+u^22+u^20+u^15+u^11)*t+(u^54+u^53+u^50+u^49+u^48+u^45+u^43+u^40+u^39+u^38+u^36+u^30+u^24+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^13+u^12+u^8+1)*v+(u^64+u^56+u^55+u^53+u^52+u^51+u^50+u^49+u^45+u^44+u^40+u^37+u^35+u^33+u^32+u^31+u^29+u^28+u^26+u^25+u^24+u^22+u^20+u^17+u^16+u^12+u^11+u^10+u^9+u^6+u^4+u^3+u^2+u+1);poly relativeB50=(u^8+1)*t^8+(u^41+u^39+u^37+u^32+u^31+u^30+u^19+u^17+u^16+u^14+u^13+u^11)*t^4+(u^53+u^52+u^51+u^50+u^48+u^45+u^41+u^38+u^36+u^35+u^32+u^31+u^30+u^29+u^28+u^27+u^26+u^25+u^21+u^15+u^12+u^11)*t+(u^54+u^53+u^50+u^49+u^48+u^45+u^43+u^40+u^39+u^38+u^36+u^30+u^24+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^13+u^12+u^8+1);
+
+ring relativeInfinity50=2,(T,V,z),wp(4,2,1);short=0;ideal relativeInfinityIdeal50;relativeInfinityIdeal50[1]=V^2+(z^2)*V+(z^3+z);relativeInfinityIdeal50[2]=T^16+(z^30+z^22)*T^8*V+(z^32+z^31+z^30+z^29+z^28+z^26+z^23+z^22+z^21+z^18+z^12+z^8+1)*T^8+(z^35+z^33+z^32+z^30+z^29+z^27+z^16+z^15+z^14+z^9+z^7+z^5)*T^4*V+(z^37+z^36+z^34+z^33+z^32+z^31+z^30+z^29+z^27+z^26+z^25+z^24+z^23+z^22+z^20+z^17+z^14+z^11+z^9+z^6)*T^4+(z^47+z^46+z^43+z^37+z^33+z^32+z^31+z^30+z^29+z^28+z^27+z^26+z^23+z^22+z^20+z^17+z^13+z^10+z^8+z^7+z^6+z^5)*T*V+(z^49+z^45+z^40+z^38+z^37+z^32+z^30+z^29+z^27+z^26+z^19+z^18+z^17+z^14+z^13+z^6)*T+(z^62+z^54+z^50+z^49+z^48+z^47+z^46+z^45+z^44+z^43+z^41+z^38+z^32+z^26+z^24+z^23+z^22+z^19+z^17+z^14+z^13+z^12+z^9+z^8)*V+(z^64+z^63+z^62+z^61+z^60+z^58+z^55+z^54+z^53+z^52+z^48+z^47+z^44+z^42+z^40+z^39+z^38+z^36+z^35+z^33+z^32+z^31+z^29+z^27+z^24+z^20+z^19+z^15+z^14+z^13+z^12+z^11+z^9+z^8+1);
+
+ring quotientWork50=2,(t,w,v,p),wp(4,8,2,1);short=0;option(redSB);
+map finiteSource50=relativeFinite50,t,v,p;
+map infinitySource50=relativeInfinity50,t,v,p;
+ideal finiteSourceValues50=finiteSource50(relativeIdeal50);
+ideal infinitySourceValues50=infinitySource50(relativeInfinityIdeal50);
+int case50;int entry50;int genericQuotientDegree50;int genericCoupledDegree50;
+ideal sourceValues50;ideal auxiliary50;ideal auxiliaryStd50;
+poly delta50;poly deltaConstant50;poly deltaLinear50;poly normDelta50;
+poly baseLinear50;poly baseConstant50;poly quotientEquation50;poly shift50;
+poly quotientFiniteEquation50;poly quotientInfinityEquation50;
+poly finiteDelta50=p^4+p^3+(p+1)*v+1;
+poly infinityDelta50=1+p+(p+p^2)*v+p^4;
+matrix lift50;matrix residual50;string filename50;
+for(case50=1;case50<=2;case50++){
+ if(case50==1){sourceValues50=finiteSourceValues50;delta50=finiteDelta50;filename50="quotient-finite50.sing";}
+ else{sourceValues50=infinitySourceValues50;delta50=infinityDelta50;filename50="quotient-infinity50.sing";}
+ auxiliary50=sourceValues50[1],t^2+delta50*t+w;auxiliaryStd50=std(auxiliary50);
+ quotientEquation50=reduce(sourceValues50[2],auxiliaryStd50);
+ if(subst(quotientEquation50,t,0)!=quotientEquation50 || lead(quotientEquation50)!=w^8){ERROR("QUOTIENT50_NOT_MONIC_DEGREE8");quit;}
+ lift50=lift(auxiliary50,ideal(sourceValues50[2]+quotientEquation50));
+ residual50=matrix(auxiliary50)*lift50-matrix(ideal(sourceValues50[2]+quotientEquation50));
+ if(residual50[1,1]!=0){ERROR("QUOTIENT50_FULL_COUPLED_LIFT");quit;}
+ link out50="ASCII:w "+filename50;open(out50);
+ write(out50,"ring quotientChart50=2,(w,v,p),wp(8,2,1);short=0;ideal quotientIdeal50="+string(sourceValues50[1])+","+string(quotientEquation50)+";poly delta50="+string(delta50)+";");close(out50);
+ link coupled50="ASCII:w coupled-"+filename50;open(coupled50);
+ write(coupled50,"ring coupledChart50=2,(t,w,v,p),wp(4,8,2,1);ideal auxiliary50="+string(auxiliary50)+";poly sourceQ50="+string(sourceValues50[2])+";poly quotientEquation50="+string(quotientEquation50)+";ideal coupledLift50;");
+ for(entry50=1;entry50<=2;entry50++){write(coupled50,"coupledLift50["+string(entry50)+"]="+string(lift50[entry50,1])+";");}
+ shift50=subst(sourceValues50[2],t,t+delta50)+sourceValues50[2];
+ lift50=lift(ideal(sourceValues50[1]),ideal(shift50));
+ if(lift50[1,1]*sourceValues50[1]!=shift50){ERROR("QUOTIENT50_SIGN_SHIFT_IDENTITY");quit;}
+ write(coupled50,"poly shiftLift50="+string(lift50[1,1])+";");
+ deltaConstant50=subst(delta50,v,0);deltaLinear50=(delta50-deltaConstant50)/v;
+ baseConstant50=subst(sourceValues50[1],v,0);baseLinear50=(sourceValues50[1]-v^2-baseConstant50)/v;
+ normDelta50=deltaConstant50^2+baseLinear50*deltaConstant50*deltaLinear50+baseConstant50*deltaLinear50^2;
+ if(normDelta50==0 || delta50*(delta50+baseLinear50*deltaLinear50)+normDelta50!=deltaLinear50^2*sourceValues50[1]){ERROR("QUOTIENT50_NONZERO_DELTA_NORM");quit;}
+ write(coupled50,"poly normDelta50="+string(normDelta50)+";");close(coupled50);
+ ring quotientProbe50=(2,parameter50),(t,w,v,p),dp;
+ ideal probeSource50=imap(quotientWork50,sourceValues50);
+ ideal probeAuxiliary50=imap(quotientWork50,auxiliary50);
+ poly probeQuotient50=imap(quotientWork50,quotientEquation50);
+ ideal quotientProbeIdeal50=probeSource50[1],probeQuotient50,p-parameter50,t;
+ genericQuotientDegree50=vdim(std(quotientProbeIdeal50));
+ ideal coupledProbeIdeal50=probeSource50,probeAuxiliary50[2],p-parameter50;
+ genericCoupledDegree50=vdim(std(coupledProbeIdeal50));
+ setring quotientWork50;kill quotientProbe50;
+ if(genericQuotientDegree50!=16 || genericCoupledDegree50!=32){ERROR("QUOTIENT50_GENERIC_DEGREES");quit;}
+ if(case50==1){quotientFiniteEquation50=quotientEquation50;}else{quotientInfinityEquation50=quotientEquation50;}
+ print("QUOTIENT50_CHART case="+string(case50)+" monic_degree=8 quotient_generic_degree=16 coupled_generic_degree=32 full_lift_checked=true delta_norm_nonzero=true");
+}
+poly finiteDoubleCover50=t^2+finiteDelta50*t+w;
+poly infinityDoubleCover50=t^2+infinityDelta50*t+w;
+ring quotientOverlap50=2,(t,w,v,p,s),dp;short=0;
+map finiteOverlap50=quotientWork50,t,w,v,p;
+map infinityOverlap50=quotientWork50,t*s^4,w*s^8,v*s^2,s;
+ideal finiteOverlapSource50=finiteOverlap50(finiteSourceValues50);
+ideal infinityOverlapSource50=infinityOverlap50(infinitySourceValues50);
+ideal overlapDifferences50=infinityOverlap50(quotientInfinityEquation50)+s^64*finiteOverlap50(quotientFiniteEquation50),infinityOverlapSource50[1]+s^4*finiteOverlapSource50[1],infinityOverlap50(infinityDelta50)+s^4*finiteOverlap50(finiteDelta50),infinityOverlap50(infinityDoubleCover50)+s^8*finiteOverlap50(finiteDoubleCover50),w*(p*s)^8+w;
+ideal unit50=p*s+1;
+matrix overlapLift50=lift(unit50,overlapDifferences50);
+matrix overlapResidual50=matrix(unit50)*overlapLift50-matrix(overlapDifferences50);
+for(entry50=1;entry50<=5;entry50++){if(overlapResidual50[1,entry50]!=0){ERROR("QUOTIENT50_OVERLAP_PRODUCT");quit;}}
+link overlapOut50="ASCII:w quotient-overlap50.sing";open(overlapOut50);
+write(overlapOut50,"ring quotientOverlapCertificate50=2,(t,w,v,p,s),dp;ideal differences50="+string(overlapDifferences50)+";ideal liftCoefficients50;");
+for(entry50=1;entry50<=5;entry50++){write(overlapOut50,"liftCoefficients50["+string(entry50)+"]="+string(overlapLift50[1,entry50])+";");}
+close(overlapOut50);
+int quotientWeightSum50=0;int i50;int j50;
+for(i50=0;i50<8;i50++){for(j50=0;j50<2;j50++){quotientWeightSum50=quotientWeightSum50+8*i50+2*j50;}}
+if(quotientWeightSum50!=464){ERROR("QUOTIENT50_TRANSITION_WEIGHT_SUM");quit;}
+print("QUOTIENT50_RESULT proper_quotient_charts=2 quotient_rank=16 coupled_source_rank=32 overlap_full_products=5 arithmetic_genus=449 normalization_not_computed=true");
+print("QUOTIENT50_ALL_CHECKS_PASS");quit;

@@ -1,0 +1,300 @@
+P1: 224 run records from 17 files; duplicates: 0
+
+| g | p | pairs | c/rhoE | D/rhoE | E/rhoE | D/rhoE(g2) | E/rhoE(g2) | best | gain(GM c/best) | GM c/min(D,E) per pair | c exh | D/E exh | exec-rho/rhoE |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 6 | 31 | 6 | 4.136 | 0.4479 | 0.4252 | 1.327 | 0.4534 | E | 9.726 | 10.25 | 0 | 0 | 0.959 |
+| 6 | 53 | 4 | 0.5858 | 0.1856 | 0.1332 | 0.899 | 0.1408 | E | 4.397 | 4.397 | 0 | 0 | 1.03 |
+| 6 | 101 | 6 | 0.1711 | 0.1539 | 0.07157 | 1.622 | 0.07464 | E | 2.391 | 2.391 | 0 | 0 | 0.866 |
+| 6 | 211 | 4 | 0.03086 | 0.1375 | 0.024 | 2.935 | 0.02518 | E | 1.286 | 1.286 | 0 | 0 | 1.06 |
+| 7 | 17 | 6 | >=1192 | 1.19 | 3.434 | 1.548 | 3.474 | D | >=1002 | >=1002 | 6 | 0 | 0.887 |
+| 7 | 31 | 6 | 23.06 | 0.2138 | 0.3843 | 0.3843 | 0.3901 | D | 107.8 | 107.8 | 0 | 0 | 0.916 |
+| 7 | 53 | 6 | 0.754 | 0.06414 | 0.07845 | 0.2125 | 0.08025 | D | 11.76 | 11.76 | 0 | 0 | 1 |
+| 8 | 11 | 6 | >=709.9 | 1.028 | 9.849 | 1.106 | 9.893 | D | >=690.7 | >=690.7 | 6 | 0 | 0.725 |
+| 8 | 17 | 6 | >=217.6 | 0.4439 | 2.989 | 0.5287 | 2.999 | D | >=490.3 | >=490.3 | 6 | 0 | 0.613 |
+| 8 | 31 | 2 | 6.256 | 0.06643 | 0.151 | 0.1067 | 0.1531 | D | 94.17 | 94.17 | 0 | 0 | 1.18 |
+| 10 | 11 | 4 | >=145.7 | 0.7245 | 37.24 | 0.7437 | 37.27 | D | >=201.1 | >=201.1 | 4 | 0 | 1.02 |
+
+Compare with P1/RESULTS.md table:
+  g=6 p=31 pairs: reported '6' recomputed 6 (rel diff 0.00%) -> ok
+  g=6 p=31 c/rho: reported '4.14' recomputed 4.136 (rel diff 0.10%) -> ok
+  g=6 p=31 D/rho: reported '0.448' recomputed 0.4479 (rel diff 0.02%) -> ok
+  g=6 p=31 E/rho: reported '**0.425**' recomputed 0.4252 (rel diff 0.05%) -> ok
+  g=6 p=31 D/rho(g2): reported '1.33' recomputed 1.327 (rel diff 0.21%) -> ok
+  g=6 p=31 gain: reported '9.7x (E)' recomputed 9.726 (rel diff 0.27%) -> ok
+  g=6 p=53 pairs: reported '4' recomputed 4 (rel diff 0.00%) -> ok
+  g=6 p=53 c/rho: reported '0.586' recomputed 0.5858 (rel diff 0.03%) -> ok
+  g=6 p=53 D/rho: reported '0.186' recomputed 0.1856 (rel diff 0.19%) -> ok
+  g=6 p=53 E/rho: reported '**0.133**' recomputed 0.1332 (rel diff 0.18%) -> ok
+  g=6 p=53 D/rho(g2): reported '0.899' recomputed 0.899 (rel diff 0.00%) -> ok
+  g=6 p=53 gain: reported '4.4x (E)' recomputed 4.397 (rel diff 0.06%) -> ok
+  g=6 p=101 pairs: reported '6' recomputed 6 (rel diff 0.00%) -> ok
+  g=6 p=101 c/rho: reported '0.171' recomputed 0.1711 (rel diff 0.08%) -> ok
+  g=6 p=101 D/rho: reported '0.154' recomputed 0.1539 (rel diff 0.04%) -> ok
+  g=6 p=101 E/rho: reported '**0.0716**' recomputed 0.07157 (rel diff 0.04%) -> ok
+  g=6 p=101 D/rho(g2): reported '1.62' recomputed 1.622 (rel diff 0.09%) -> ok
+  g=6 p=101 gain: reported '2.4x (E)' recomputed 2.391 (rel diff 0.36%) -> ok
+  g=6 p=211 pairs: reported '4' recomputed 4 (rel diff 0.00%) -> ok
+  g=6 p=211 c/rho: reported '0.0309' recomputed 0.03086 (rel diff 0.15%) -> ok
+  g=6 p=211 D/rho: reported '0.138' recomputed 0.1375 (rel diff 0.35%) -> ok
+  g=6 p=211 E/rho: reported '**0.0240**' recomputed 0.024 (rel diff 0.00%) -> ok
+  g=6 p=211 D/rho(g2): reported '2.94' recomputed 2.935 (rel diff 0.16%) -> ok
+  g=6 p=211 gain: reported '1.29x (E)' recomputed 1.286 (rel diff 0.34%) -> ok
+  g=7 p=17 pairs: reported '6' recomputed 6 (rel diff 0.00%) -> ok
+  g=7 p=17 c/rho: reported '>=1190' recomputed 1192 (rel diff 0.18%) -> ok
+  g=7 p=17 D/rho: reported '**1.19**' recomputed 1.19 (rel diff 0.02%) -> ok
+  g=7 p=17 E/rho: reported '3.43' recomputed 3.434 (rel diff 0.12%) -> ok
+  g=7 p=17 D/rho(g2): reported '1.55' recomputed 1.548 (rel diff 0.10%) -> ok
+  g=7 p=17 gain: reported '>=1000x (D)' recomputed 1002 (rel diff 0.21%) -> ok
+  g=7 p=31 pairs: reported '6' recomputed 6 (rel diff 0.00%) -> ok
+  g=7 p=31 c/rho: reported '23.1' recomputed 23.06 (rel diff 0.19%) -> ok
+  g=7 p=31 D/rho: reported '**0.214**' recomputed 0.2138 (rel diff 0.11%) -> ok
+  g=7 p=31 E/rho: reported '0.384' recomputed 0.3843 (rel diff 0.07%) -> ok
+  g=7 p=31 D/rho(g2): reported '0.384' recomputed 0.3843 (rel diff 0.09%) -> ok
+  g=7 p=31 gain: reported '108x (D)' recomputed 107.8 (rel diff 0.14%) -> ok
+  g=7 p=53 pairs: reported '6' recomputed 6 (rel diff 0.00%) -> ok
+  g=7 p=53 c/rho: reported '0.754' recomputed 0.754 (rel diff 0.01%) -> ok
+  g=7 p=53 D/rho: reported '**0.0641**' recomputed 0.06414 (rel diff 0.07%) -> ok
+  g=7 p=53 E/rho: reported '0.0785' recomputed 0.07845 (rel diff 0.06%) -> ok
+  g=7 p=53 D/rho(g2): reported '0.213' recomputed 0.2125 (rel diff 0.23%) -> ok
+  g=7 p=53 gain: reported '11.8x (D)' recomputed 11.76 (rel diff 0.38%) -> ok
+  g=8 p=11 pairs: reported '6' recomputed 6 (rel diff 0.00%) -> ok
+  g=8 p=11 c/rho: reported '>=710' recomputed 709.9 (rel diff 0.01%) -> ok
+  g=8 p=11 D/rho: reported '**1.03**' recomputed 1.028 (rel diff 0.21%) -> ok
+  g=8 p=11 E/rho: reported '9.85' recomputed 9.849 (rel diff 0.01%) -> ok
+  g=8 p=11 D/rho(g2): reported '1.11' recomputed 1.106 (rel diff 0.35%) -> ok
+  g=8 p=11 gain: reported '>=691x (D)' recomputed 690.7 (rel diff 0.05%) -> ok
+  g=8 p=17 pairs: reported '6' recomputed 6 (rel diff 0.00%) -> ok
+  g=8 p=17 c/rho: reported '>=218' recomputed 217.6 (rel diff 0.17%) -> ok
+  g=8 p=17 D/rho: reported '**0.444**' recomputed 0.4439 (rel diff 0.03%) -> ok
+  g=8 p=17 E/rho: reported '2.99' recomputed 2.989 (rel diff 0.04%) -> ok
+  g=8 p=17 D/rho(g2): reported '0.529' recomputed 0.5287 (rel diff 0.06%) -> ok
+  g=8 p=17 gain: reported '>=490x (D)' recomputed 490.3 (rel diff 0.06%) -> ok
+  g=8 p=31 pairs: reported '2' recomputed 2 (rel diff 0.00%) -> ok
+  g=8 p=31 c/rho: reported '6.26' recomputed 6.256 (rel diff 0.06%) -> ok
+  g=8 p=31 D/rho: reported '**0.0664**' recomputed 0.06643 (rel diff 0.05%) -> ok
+  g=8 p=31 E/rho: reported '0.151' recomputed 0.151 (rel diff 0.02%) -> ok
+  g=8 p=31 D/rho(g2): reported '0.107' recomputed 0.1067 (rel diff 0.31%) -> ok
+  g=8 p=31 gain: reported '94x (D)' recomputed 94.17 (rel diff 0.18%) -> ok
+  g=10 p=11 pairs: reported '4' recomputed 4 (rel diff 0.00%) -> ok
+  g=10 p=11 c/rho: reported '>=146' recomputed 145.7 (rel diff 0.19%) -> ok
+  g=10 p=11 D/rho: reported '**0.725**' recomputed 0.7245 (rel diff 0.07%) -> ok
+  g=10 p=11 E/rho: reported '37.2' recomputed 37.24 (rel diff 0.12%) -> ok
+  g=10 p=11 D/rho(g2): reported '0.744' recomputed 0.7437 (rel diff 0.04%) -> ok
+  g=10 p=11 gain: reported '>=201x (D)' recomputed 201.1 (rel diff 0.06%) -> ok
+
+P1 side claims (recomputed):
+  P-a: min per-pair c/E over g in 6,7,8 = 1.078 at (6, 211, 28, 2) (reported 1.08 at g=6 p=211); pairs with c/E<1: 0
+  P-a: g=6 p=31 per-pair c/D range 4.45-44.8; pairs c/D<1: 0/6
+  P-a: g=6 p=53 per-pair c/D range 2.79-3.65; pairs c/D<1: 0/4
+  P-a: g=6 p=101 per-pair c/D range 0.557-1.77; pairs c/D<1: 2/6
+  P-a: g=6 p=211 per-pair c/D range 0.179-0.273; pairs c/D<1: 4/4
+  P-a: g=10 p=11 GM E/D = 51.41 (reported 50x); min pair c/E = 0.8801 (reported 0.88)
+  P-b: g=6 gains [9.726, 4.397, 2.391, 1.286]; LSQ log-log slope = -1.035 (reported -1.05)
+  P-b: crossover at LSQ slope from p=211: p* = 269; at slope -1: 271.3 (reported ~270)
+  P-c: g=6 p=53 GM D_g2/E_g2 = 6.384 (min pair 6.17) (reported 6x at 53, 117x at 211)
+  P-c: g=6 p=101 GM D_g2/E_g2 = 21.72 (min pair 18.5) (reported 6x at 53, 117x at 211)
+  P-c: g=6 p=211 GM D_g2/E_g2 = 116.6 (min pair 103) (reported 6x at 53, 117x at 211)
+  P-d: (8, 11) GM E/D (FPM_1) = 9.583 (min pair 2.3) (reported range 2.3-51x)
+  P-d: (8, 17) GM E/D (FPM_1) = 6.734 (min pair 3.39) (reported range 2.3-51x)
+  P-d: (8, 31) GM E/D (FPM_1) = 2.272 (min pair 2.14) (reported range 2.3-51x)
+  P-d: (10, 11) GM E/D (FPM_1) = 51.41 (min pair 15.3) (reported range 2.3-51x)
+  mech: (6, 31) trials/relation GM c=1714 [639.6-1.171e+04] D=9.686 E=12.61; rels E/c=8.23; D LA share=0.056
+  mech: (6, 53) trials/relation GM c=1084 [948.5-1292] D=9.787 E=11.86; rels E/c=12.9; D LA share=0.11
+  mech: (6, 101) trials/relation GM c=1145 [421.9-2030] D=10.25 E=13.14; rels E/c=22.6; D LA share=0.272
+  mech: (6, 211) trials/relation GM c=881.4 [680.1-1112] D=9.826 E=12.45; rels E/c=32.3; D LA share=0.581
+  mech: (7, 17) trials/relation GM c=nan D=41.44 E=130; rels E/c=nan; D LA share=0.00619
+  mech: (7, 31) trials/relation GM c=5.71e+04 D=30.95 E=72.34; rels E/c=8.89; D LA share=0.0165
+  mech: (7, 53) trials/relation GM c=8489 D=23.56 E=44.08; rels E/c=13.5; D LA share=0.048
+  mech: (8, 11) trials/relation GM c=nan D=131.2 E=587.2; rels E/c=nan; D LA share=0.000996
+  mech: (8, 17) trials/relation GM c=6.063e+05 D=86.51 E=633.6; rels E/c=9.22; D LA share=0.00302
+  mech: (8, 31) trials/relation GM c=6.334e+04 D=50.21 E=145; rels E/c=7.31; D LA share=0.00957
+  mech: (10, 11) trials/relation GM c=nan D=411.1 E=7359; rels E/c=nan; D LA share=0.000253
+
+P2 crossover: 24 run records; duplicates: 0
+  g=7 p=101 pairs=4 c/rhoE=0.1953 D=0.02374 E=0.02683 best=D gain=8.227 c-exhausted=0 D/E-exhausted=0
+  g=8 p=53 pairs=2 c/rhoE=>=7.815 D=0.04017 E=0.2313 best=D gain=>=194.6 c-exhausted=2 D/E-exhausted=0
+Compare with P2/RESULTS_crossover.md table:
+  P2 g=7 p=101 pairs: reported '4 (2 curves)' recomputed 4 (rel diff 0.00%) -> ok
+  P2 g=7 p=101 c/rho: reported '0.195' recomputed 0.1953 (rel diff 0.17%) -> ok
+  P2 g=7 p=101 D/rho: reported '**0.0237**' recomputed 0.02374 (rel diff 0.19%) -> ok
+  P2 g=7 p=101 E/rho: reported '0.0268' recomputed 0.02683 (rel diff 0.10%) -> ok
+  P2 g=7 p=101 gain: reported '8.2x (D)' recomputed 8.227 (rel diff 0.33%) -> ok
+  P2 g=8 p=53 pairs: reported '2 (1 curve)' recomputed 2 (rel diff 0.00%) -> ok
+  P2 g=8 p=53 c/rho: reported '>=7.82 (exhausted at 2x10^7)' recomputed 7.815 (rel diff 0.06%) -> ok
+  P2 g=8 p=53 D/rho: reported '**0.0402**' recomputed 0.04017 (rel diff 0.07%) -> ok
+  P2 g=8 p=53 E/rho: reported '0.231' recomputed 0.2313 (rel diff 0.11%) -> ok
+  P2 g=8 p=53 gain: reported '>=195x (D)' recomputed 194.6 (rel diff 0.23%) -> ok
+Decay slopes (log-log, adjacent p) from recomputed gains:
+  g=6 p=(31, 53, 101, 211) gains=[9.726, 4.397, 2.391, 1.286] slopes=[-1.48, -0.945, -0.842]
+     p* at slope -1 from p=211: 271.3
+  g=7 p=(31, 53, 101) gains=[107.85, 11.755, 8.227] slopes=[-4.133, -0.554]
+     p* at slope -1 from p=101: 830.9
+  g=8 p=(31, 53) gains=[94.173, 194.553] slopes=[1.353]
+     p* at slope -1 from p=53: 1.031e+04
+
+P2 lever F (pilot):
+  E control: 30 reruns, 0 mismatches (all fields except wall_ns)
+  g=6 p=101 phi=0.03 pairs=2 cols=130 F/rhoE=0.07492 c/F=2.762 min(D,E)/F=0.8391 certified=True
+  F g=6 p=101 phi=0.03 cols: reported '130' recomputed 130 (rel diff 0.00%) -> ok
+  F g=6 p=101 phi=0.03 F: reported '0.075' recomputed 0.07492 (rel diff 0.11%) -> ok
+  F g=6 p=101 phi=0.03 cF: reported '2.8' recomputed 2.762 (rel diff 1.34%) -> ok
+  F g=6 p=101 phi=0.03 bF: reported '0.84' recomputed 0.8391 (rel diff 0.11%) -> ok
+  g=6 p=101 phi=0.1 pairs=2 cols=320 F/rhoE=0.08307 c/F=2.491 min(D,E)/F=0.7567 certified=True
+  F g=6 p=101 phi=0.1 cols: reported '320' recomputed 320 (rel diff 0.00%) -> ok
+  F g=6 p=101 phi=0.1 F: reported '0.083' recomputed 0.08307 (rel diff 0.09%) -> ok
+  F g=6 p=101 phi=0.1 cF: reported '2.5' recomputed 2.491 (rel diff 0.35%) -> ok
+  F g=6 p=101 phi=0.1 bF: reported '0.76' recomputed 0.7567 (rel diff 0.43%) -> ok
+  g=6 p=101 phi=0.3 pairs=2 cols=822 F/rhoE=0.08969 c/F=2.307 min(D,E)/F=0.7009 certified=True
+  F g=6 p=101 phi=0.3 cols: reported '822' recomputed 822 (rel diff 0.00%) -> ok
+  F g=6 p=101 phi=0.3 F: reported '0.090' recomputed 0.08969 (rel diff 0.34%) -> ok
+  F g=6 p=101 phi=0.3 cF: reported '2.3' recomputed 2.307 (rel diff 0.33%) -> ok
+  F g=6 p=101 phi=0.3 bF: reported '0.70' recomputed 0.7009 (rel diff 0.13%) -> ok
+  g=6 p=211 phi=0.03 pairs=2 cols=428 F/rhoE=0.02509 c/F=0.7122 min(D,E)/F=0.6267 certified=True
+  F g=6 p=211 phi=0.03 cols: reported '428' recomputed 428 (rel diff 0.00%) -> ok
+  F g=6 p=211 phi=0.03 F: reported '0.025' recomputed 0.02509 (rel diff 0.36%) -> ok
+  F g=6 p=211 phi=0.03 cF: reported '0.71' recomputed 0.7122 (rel diff 0.31%) -> ok
+  F g=6 p=211 phi=0.03 bF: reported '0.63' recomputed 0.6267 (rel diff 0.52%) -> ok
+  g=6 p=211 phi=0.1 pairs=2 cols=1205 F/rhoE=0.03095 c/F=0.5774 min(D,E)/F=0.5081 certified=True
+  F g=6 p=211 phi=0.1 cols: reported '1205' recomputed 1205 (rel diff 0.00%) -> ok
+  F g=6 p=211 phi=0.1 F: reported '0.031' recomputed 0.03095 (rel diff 0.17%) -> ok
+  F g=6 p=211 phi=0.1 cF: reported '0.58' recomputed 0.5774 (rel diff 0.45%) -> ok
+  F g=6 p=211 phi=0.1 bF: reported '0.51' recomputed 0.5081 (rel diff 0.37%) -> ok
+  g=6 p=211 phi=0.3 pairs=2 cols=3442 F/rhoE=0.03908 c/F=0.4572 min(D,E)/F=0.4024 certified=True
+  F g=6 p=211 phi=0.3 cols: reported '3442' recomputed 3442 (rel diff 0.00%) -> ok
+  F g=6 p=211 phi=0.3 F: reported '0.039' recomputed 0.03908 (rel diff 0.21%) -> ok
+  F g=6 p=211 phi=0.3 cF: reported '0.46' recomputed 0.4572 (rel diff 0.60%) -> ok
+  F g=6 p=211 phi=0.3 bF: reported '0.40' recomputed 0.4024 (rel diff 0.59%) -> ok
+  g=7 p=53 phi=0.03 pairs=2 cols=51 F/rhoE=0.07765 c/F=9.076 min(D,E)/F=0.8524 certified=True
+  F g=7 p=53 phi=0.03 cols: reported '51' recomputed 51 (rel diff 0.00%) -> ok
+  F g=7 p=53 phi=0.03 F: reported '0.078' recomputed 0.07765 (rel diff 0.45%) -> ok
+  F g=7 p=53 phi=0.03 cF: reported '9.1' recomputed 9.076 (rel diff 0.27%) -> ok
+  F g=7 p=53 phi=0.03 bF: reported '0.85' recomputed 0.8524 (rel diff 0.28%) -> ok
+  g=7 p=53 phi=0.1 pairs=2 cols=99 F/rhoE=0.07393 c/F=9.531 min(D,E)/F=0.8952 certified=True
+  F g=7 p=53 phi=0.1 cols: reported '99' recomputed 99 (rel diff 0.00%) -> ok
+  F g=7 p=53 phi=0.1 F: reported '0.074' recomputed 0.07393 (rel diff 0.09%) -> ok
+  F g=7 p=53 phi=0.1 cF: reported '9.5' recomputed 9.531 (rel diff 0.33%) -> ok
+  F g=7 p=53 phi=0.1 bF: reported '0.90' recomputed 0.8952 (rel diff 0.54%) -> ok
+  g=7 p=53 phi=0.3 pairs=2 cols=245 F/rhoE=0.06561 c/F=10.74 min(D,E)/F=1.009 certified=True
+  F g=7 p=53 phi=0.3 cols: reported '245' recomputed 245 (rel diff 0.00%) -> ok
+  F g=7 p=53 phi=0.3 F: reported '0.066' recomputed 0.06561 (rel diff 0.59%) -> ok
+  F g=7 p=53 phi=0.3 cF: reported '10.7' recomputed 10.74 (rel diff 0.38%) -> ok
+  F g=7 p=53 phi=0.3 bF: reported '1.01' recomputed 1.009 (rel diff 0.12%) -> ok
+  g=8 p=31 phi=0.03 pairs=2 cols=27 F/rhoE=0.1358 c/F=46.06 min(D,E)/F=0.4891 certified=True
+  F g=8 p=31 phi=0.03 cols: reported '27' recomputed 27 (rel diff 0.00%) -> ok
+  F g=8 p=31 phi=0.03 F: reported '0.136' recomputed 0.1358 (rel diff 0.12%) -> ok
+  F g=8 p=31 phi=0.03 cF: reported '46' recomputed 46.06 (rel diff 0.12%) -> ok
+  F g=8 p=31 phi=0.03 bF: reported '0.49' recomputed 0.4891 (rel diff 0.19%) -> ok
+  g=8 p=31 phi=0.1 pairs=2 cols=50 F/rhoE=0.1067 c/F=58.61 min(D,E)/F=0.6224 certified=True
+  F g=8 p=31 phi=0.1 cols: reported '50' recomputed 50 (rel diff 0.00%) -> ok
+  F g=8 p=31 phi=0.1 F: reported '0.107' recomputed 0.1067 (rel diff 0.25%) -> ok
+  F g=8 p=31 phi=0.1 cF: reported '59' recomputed 58.61 (rel diff 0.66%) -> ok
+  F g=8 p=31 phi=0.1 bF: reported '0.62' recomputed 0.6224 (rel diff 0.39%) -> ok
+  g=8 p=31 phi=0.3 pairs=2 cols=94 F/rhoE=0.07912 c/F=79.07 min(D,E)/F=0.8396 certified=True
+  F g=8 p=31 phi=0.3 cols: reported '94' recomputed 94 (rel diff 0.00%) -> ok
+  F g=8 p=31 phi=0.3 F: reported '0.079' recomputed 0.07912 (rel diff 0.15%) -> ok
+  F g=8 p=31 phi=0.3 cF: reported '79' recomputed 79.07 (rel diff 0.09%) -> ok
+  F g=8 p=31 phi=0.3 bF: reported '0.84' recomputed 0.8396 (rel diff 0.04%) -> ok
+  g=10 p=11 phi=0.03 pairs=2 cols=12 F/rhoE=2.645 c/F=>=47.53 min(D,E)/F=0.1913 certified=True
+  F g=10 p=11 phi=0.03 cols: reported '12' recomputed 12 (rel diff 0.00%) -> ok
+  F g=10 p=11 phi=0.03 F: reported '2.64' recomputed 2.645 (rel diff 0.18%) -> ok
+  F g=10 p=11 phi=0.03 cF: reported '>=48' recomputed 47.53 (rel diff 0.99%) -> ok
+  F g=10 p=11 phi=0.03 bF: reported '0.19' recomputed 0.1913 (rel diff 0.67%) -> ok
+  g=10 p=11 phi=0.1 pairs=2 cols=14 F/rhoE=1.451 c/F=>=86.64 min(D,E)/F=0.3487 certified=True
+  F g=10 p=11 phi=0.1 cols: reported '14' recomputed 14 (rel diff 0.00%) -> ok
+  F g=10 p=11 phi=0.1 F: reported '1.45' recomputed 1.451 (rel diff 0.05%) -> ok
+  F g=10 p=11 phi=0.1 cF: reported '>=87' recomputed 86.64 (rel diff 0.42%) -> ok
+  F g=10 p=11 phi=0.1 bF: reported '0.35' recomputed 0.3487 (rel diff 0.38%) -> ok
+  g=10 p=11 phi=0.3 pairs=2 cols=19 F/rhoE=0.893 c/F=>=140.7 min(D,E)/F=0.5664 certified=True
+  F g=10 p=11 phi=0.3 cols: reported '19' recomputed 19 (rel diff 0.00%) -> ok
+  F g=10 p=11 phi=0.3 F: reported '0.89' recomputed 0.893 (rel diff 0.34%) -> ok
+  F g=10 p=11 phi=0.3 cF: reported '>=141' recomputed 140.7 (rel diff 0.18%) -> ok
+  F g=10 p=11 phi=0.3 bF: reported '0.57' recomputed 0.5664 (rel diff 0.62%) -> ok
+
+[certs] P1 table: 224 run records used; 22 exhausted {'C_double_lp+pre': 22}; 0 non-exhausted runs without certified=true/ok=true
+[certs] P2 crossover table: 24 run records used; 2 exhausted {'C_double_lp+pre': 2}; 0 non-exhausted runs without certified=true/ok=true
+[certs] P2 F pilot (F and E reruns): 60 run records used; 0 exhausted {}; 0 non-exhausted runs without certified=true/ok=true
+
+Validator 5a-style sensitivity (FPM units; w FPM per unpriced add/hash/compare on every arm):
+| g | p | w | rho U variant | c/rhoE | D/rhoE | E/rhoE | GM c/min(D,E) |
+|---|---|---|---|---|---|---|---|
+| 6 | 31 | 0.0 | uncharged only | 4.136 | 0.4479 | 0.4252 | 10.25 |
+| 6 | 31 | 0.0 | +native | 4.136 | 0.4479 | 0.4252 | 10.25 |
+| 6 | 31 | 0.1 | uncharged only | 4.18 | 0.4704 | 0.4411 | 9.956 |
+| 6 | 31 | 0.1 | +native | 4.18 | 0.4704 | 0.4411 | 9.956 |
+| 6 | 31 | 1.0 | uncharged only | 4.57 | 0.6697 | 0.5816 | 8.083 |
+| 6 | 31 | 1.0 | +native | 4.566 | 0.6691 | 0.5811 | 8.083 |
+| 6 | 53 | 0.0 | uncharged only | 0.5858 | 0.1856 | 0.1332 | 4.397 |
+| 6 | 53 | 0.0 | +native | 0.5858 | 0.1856 | 0.1332 | 4.397 |
+| 6 | 53 | 0.1 | uncharged only | 0.5932 | 0.1983 | 0.1388 | 4.275 |
+| 6 | 53 | 0.1 | +native | 0.5931 | 0.1983 | 0.1387 | 4.275 |
+| 6 | 53 | 1.0 | uncharged only | 0.6579 | 0.3103 | 0.1877 | 3.506 |
+| 6 | 53 | 1.0 | +native | 0.6574 | 0.31 | 0.1875 | 3.506 |
+| 6 | 101 | 0.0 | uncharged only | 0.1711 | 0.1539 | 0.07157 | 2.391 |
+| 6 | 101 | 0.0 | +native | 0.1711 | 0.1539 | 0.07157 | 2.391 |
+| 6 | 101 | 0.1 | uncharged only | 0.1737 | 0.1711 | 0.0749 | 2.319 |
+| 6 | 101 | 0.1 | +native | 0.1736 | 0.1711 | 0.07489 | 2.319 |
+| 6 | 101 | 1.0 | uncharged only | 0.1959 | 0.323 | 0.1043 | 1.877 |
+| 6 | 101 | 1.0 | +native | 0.1957 | 0.3227 | 0.1042 | 1.877 |
+| 6 | 211 | 0.0 | uncharged only | 0.03086 | 0.1375 | 0.024 | 1.286 |
+| 6 | 211 | 0.0 | +native | 0.03086 | 0.1375 | 0.024 | 1.286 |
+| 6 | 211 | 0.1 | uncharged only | 0.03138 | 0.1637 | 0.02523 | 1.243 |
+| 6 | 211 | 0.1 | +native | 0.03137 | 0.1637 | 0.02523 | 1.243 |
+| 6 | 211 | 1.0 | uncharged only | 0.03598 | 0.3951 | 0.03614 | 0.9954 |
+| 6 | 211 | 1.0 | +native | 0.03595 | 0.3947 | 0.03611 | 0.9954 |
+| 7 | 17 | 0.0 | uncharged only | 1192 | 1.19 | 3.434 | 1002 |
+| 7 | 17 | 0.0 | +native | 1192 | 1.19 | 3.434 | 1002 |
+| 7 | 17 | 0.1 | uncharged only | 1204 | 1.227 | 3.542 | 981.8 |
+| 7 | 17 | 0.1 | +native | 1204 | 1.227 | 3.542 | 981.8 |
+| 7 | 17 | 1.0 | uncharged only | 1313 | 1.555 | 4.507 | 843.8 |
+| 7 | 17 | 1.0 | +native | 1312 | 1.555 | 4.505 | 843.8 |
+| 7 | 31 | 0.0 | uncharged only | 23.06 | 0.2138 | 0.3843 | 107.8 |
+| 7 | 31 | 0.0 | +native | 23.06 | 0.2138 | 0.3843 | 107.8 |
+| 7 | 31 | 0.1 | uncharged only | 23.3 | 0.2227 | 0.399 | 104.6 |
+| 7 | 31 | 0.1 | +native | 23.3 | 0.2227 | 0.399 | 104.6 |
+| 7 | 31 | 1.0 | uncharged only | 25.45 | 0.3018 | 0.5299 | 84.3 |
+| 7 | 31 | 1.0 | +native | 25.43 | 0.3016 | 0.5295 | 84.3 |
+| 7 | 53 | 0.0 | uncharged only | 0.754 | 0.06414 | 0.07845 | 11.76 |
+| 7 | 53 | 0.0 | +native | 0.754 | 0.06414 | 0.07845 | 11.76 |
+| 7 | 53 | 0.1 | uncharged only | 0.7632 | 0.06755 | 0.08162 | 11.3 |
+| 7 | 53 | 0.1 | +native | 0.7632 | 0.06755 | 0.08162 | 11.3 |
+| 7 | 53 | 1.0 | uncharged only | 0.845 | 0.09785 | 0.1098 | 8.636 |
+| 7 | 53 | 1.0 | +native | 0.8445 | 0.0978 | 0.1097 | 8.636 |
+| 7 | 101 | 0.0 | uncharged only | 0.1953 | 0.02374 | 0.02683 | 8.534 |
+| 7 | 101 | 0.0 | +native | 0.1953 | 0.02374 | 0.02683 | 8.534 |
+| 7 | 101 | 0.1 | uncharged only | 0.1981 | 0.0256 | 0.02801 | 8.121 |
+| 7 | 101 | 0.1 | +native | 0.1981 | 0.0256 | 0.02801 | 8.121 |
+| 7 | 101 | 1.0 | uncharged only | 0.2226 | 0.0421 | 0.03854 | 6.106 |
+| 7 | 101 | 1.0 | +native | 0.2225 | 0.04207 | 0.03851 | 6.106 |
+| 8 | 11 | 0.0 | uncharged only | 709.9 | 1.028 | 9.849 | 690.7 |
+| 8 | 11 | 0.0 | +native | 709.9 | 1.028 | 9.849 | 690.7 |
+| 8 | 11 | 0.1 | uncharged only | 715.6 | 1.056 | 10.14 | 677.5 |
+| 8 | 11 | 0.1 | +native | 715.6 | 1.056 | 10.14 | 677.5 |
+| 8 | 11 | 1.0 | uncharged only | 766.5 | 1.31 | 12.7 | 585.1 |
+| 8 | 11 | 1.0 | +native | 766.2 | 1.31 | 12.69 | 585.1 |
+| 8 | 17 | 0.0 | uncharged only | 217.6 | 0.4439 | 2.989 | 490.3 |
+| 8 | 17 | 0.0 | +native | 217.6 | 0.4439 | 2.989 | 490.3 |
+| 8 | 17 | 0.1 | uncharged only | 219.8 | 0.4577 | 3.084 | 480.2 |
+| 8 | 17 | 0.1 | +native | 219.8 | 0.4577 | 3.084 | 480.2 |
+| 8 | 17 | 1.0 | uncharged only | 239.4 | 0.5812 | 3.929 | 411.9 |
+| 8 | 17 | 1.0 | +native | 239.3 | 0.5809 | 3.927 | 411.9 |
+| 8 | 31 | 0.0 | uncharged only | 6.256 | 0.06643 | 0.151 | 94.17 |
+| 8 | 31 | 0.0 | +native | 6.256 | 0.06643 | 0.151 | 94.17 |
+| 8 | 31 | 0.1 | uncharged only | 6.321 | 0.06911 | 0.1567 | 91.46 |
+| 8 | 31 | 0.1 | +native | 6.321 | 0.06911 | 0.1567 | 91.46 |
+| 8 | 31 | 1.0 | uncharged only | 6.899 | 0.09301 | 0.208 | 74.18 |
+| 8 | 31 | 1.0 | +native | 6.896 | 0.09297 | 0.208 | 74.18 |
+| 8 | 53 | 0.0 | uncharged only | 7.815 | 0.04017 | 0.2313 | 194.6 |
+| 8 | 53 | 0.0 | +native | 7.815 | 0.04017 | 0.2313 | 194.6 |
+| 8 | 53 | 0.1 | uncharged only | 7.912 | 0.04191 | 0.2405 | 188.8 |
+| 8 | 53 | 0.1 | +native | 7.911 | 0.04191 | 0.2405 | 188.8 |
+| 8 | 53 | 1.0 | uncharged only | 8.771 | 0.05746 | 0.3231 | 152.6 |
+| 8 | 53 | 1.0 | +native | 8.767 | 0.05744 | 0.323 | 152.6 |
+| 10 | 11 | 0.0 | uncharged only | 145.7 | 0.7245 | 37.24 | 201.1 |
+| 10 | 11 | 0.0 | +native | 145.7 | 0.7245 | 37.24 | 201.1 |
+| 10 | 11 | 0.1 | uncharged only | 146.8 | 0.7441 | 38.27 | 197.3 |
+| 10 | 11 | 0.1 | +native | 146.8 | 0.7441 | 38.27 | 197.3 |
+| 10 | 11 | 1.0 | uncharged only | 156.4 | 0.9199 | 47.48 | 170 |
+| 10 | 11 | 1.0 | +native | 156.3 | 0.9196 | 47.47 | 170 |
+Order flips across the band (arm vs rho at 1; best(D,E) vs c at 1): [((6, 211), 'best-vs-c', '')]
+
+0 findings

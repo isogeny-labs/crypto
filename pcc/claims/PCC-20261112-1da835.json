@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T02:11:49Z",
+ "id": "PCC-20261112-1da835",
+ "kind": "theorem",
+ "producer": {
+  "commit": "01bd06b70d5a343be92d0e59f0e22b612680f534",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "62264e53ef405dc3ed24bab32592dcd338555d3d0660f9ddcc81e9961e382705",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/RootTable.lean",
+   "theorem": "RootTable.first_match_filter"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Ordered-list algorithm implication only:every matching candidate must satisfy the retention predicate. Actual finite fields,basis/no-zero-divisors and concrete axis-grid enumeration remain explicit written bridges;formalization partial.",
+ "statement": "theorem first_match_filter {A : Type} (xs : List A) (keep hit : A \u2192 Bool) (h : \u2200 x, hit x = true \u2192 keep x = true) : (xs.filter keep).find? hit = xs.find? hit"
+}

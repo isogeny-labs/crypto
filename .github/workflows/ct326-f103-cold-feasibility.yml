@@ -1,0 +1,32 @@
+name: CT326 source-bound F103 cold feasibility
+on:
+  pull_request:
+    paths:
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct326_f103_cold_frontier.py'
+      - 'research/chained_jacobian_transfers_20261110/toy_dlp_ct204/CT326_TWO_PHASE_COLD_FEASIBILITY.md'
+      - '.github/workflows/ct326-f103-cold-feasibility.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  frozen-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate untouched original CT241 row blob and all CT326 mutation controls
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct326_f103_cold_frontier.py > /tmp/ct326-normal.json
+          python3 -O research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct326_f103_cold_frontier.py > /tmp/ct326-optimized.json
+          cmp /tmp/ct326-normal.json /tmp/ct326-optimized.json
+          python3 - <<'PY'
+          import json
+          obj = json.load(open('/tmp/ct326-normal.json'))
+          assert obj['original_rows'] == 15
+          assert obj['mutation_rejections'] == 11
+          assert len(obj['data']) == 5
+          assert all(x['single_phase_free_still_loses_all_rows'] for x in obj['data'])
+          print("CT326_RECORD_ONLY_PASS: 15 original pairs, 5 arms, 11 mutations")
+          PY

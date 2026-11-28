@@ -1,0 +1,127 @@
+{
+  "schema": "pkm.independent-replay-accounting-native/v1",
+  "recorded_utc": "2026-11-05T17:06:50.032946+00:00",
+  "source_commit": "f866dd7a4578a5c02cb60ee7d3c2101f3b044cde",
+  "source_objects_clean_equal": {
+    "src": "b044c4974fe2dbbf2a4da2280de1b9e96b063bb0",
+    "crates": "cb0a697e787d418fbeb448a606102b46630528b4",
+    "Cargo.toml": "4863d96e15c3fe919e4b744f2a246d55fc1b8104",
+    "Cargo.lock": "426a5848aa26aecc9325b763b496c4761f413455",
+    "examples/pkm_oracle_program.rs": "60986c64dfa501d0512fc5de52895432ee1a0144",
+    "examples/pkm_oracle_program": "79009cfa0a695000da43f3bb16497155cac959ee",
+    "examples/pkm_symmetric_complete.rs": "0fb50ab47dab4256dd29f4ac8eb84fb5313168e8",
+    "examples/hecke_target_router.rs": "6cbba7cbe8b673b313c08583d0a9fd00e343bf75",
+    "tools/factor-base": "7ddafa821c968783132462b62f2e051c508e7172",
+    "tools/volcano-cli": "52b1c64049002561f3ff55b149c300cdb4656f34",
+    "scripts/checkpoint.sh": "41fe3054e9ec1a980677b95c6000daa51208c0c7",
+    "tools/lean": "ba3a29487f9b75366f56ce5213eb73dcbc4f1fb9",
+    "tests": "5a5ccad9afd3d9cd1771c00f79900c0359c3dc35",
+    "research/prime_ecdlp_three_leads_20261029/lean": "1c366822536c08b212a7d36045580ee715f327a0",
+    "research/aps_measurement_20261029/spec-controls.json": "c11e5f1515b0080aae37539e8321cc82be573f3c",
+    "research/aps_measurement_20261029/spec-orbit-controls.json": "4f832f6190d8347f42892e304fec986453e59f66",
+    "backlog/XP-20261029-pkm-verified-oracle-program/card.json": "e99f0d598cd89d839060e991b9b157efbd6f286a",
+    "isogeny_algos": "8b57bb4a80eac0e2ec1f254fbf82a01aeb2a4baa",
+    "research/pencil_large_prime_20261029": "adfb8daf1615549a49ecbd00e3d90a3989c41438",
+    "research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/durable_attempt.rs": "0d4acf23d34597507ecd2518e372d31f494eac51",
+    "research/curve25519_algebraic_ecbench_20261102/fixtures/pkm_iso_t6_g4_target3.record.json": "865150d97b350d7de7807388a20c6949fd811c36",
+    "research/prime_ecdlp_three_leads_20261029/continuation-20261030/validation/replay-accounting-20261105/rank-harness.rs": "619787cc1565ca088e0187b53800c7f1badaa1db"
+  },
+  "pre_collection_all_tracked_clean": true,
+  "commands": "committed validate.sh;22object/globaltrackedclean beforeeveryphase",
+  "recipe": {
+    "path": "/workspace/crypto/research/prime_ecdlp_three_leads_20261029/continuation-20261030/validation/replay-accounting-20261105/validate.sh",
+    "bytes": 2779,
+    "sha256": "a1ffe53ad62df72ffe18d9c8197768dcc028bf39ce3ce9d0ee73ea3a67944176"
+  },
+  "phases": {
+    "cli-build": {
+      "started": "2026-11-05T16:54:28Z",
+      "finished": "2026-11-05T16:54:40Z",
+      "exit": 0
+    },
+    "cli-gate": {
+      "started": "2026-11-05T16:54:44Z",
+      "finished": "2026-11-05T16:54:49Z",
+      "exit": 1
+    },
+    "example-tests": {
+      "started": "2026-11-05T16:47:02Z",
+      "finished": "2026-11-05T16:54:21Z",
+      "exit": 0
+    },
+    "format": {
+      "started": "2026-11-05T16:54:25Z",
+      "finished": "2026-11-05T16:54:25Z",
+      "exit": 0
+    },
+    "rank-build": {
+      "started": "2026-11-05T16:46:51Z",
+      "finished": "2026-11-05T16:46:51Z",
+      "exit": 0
+    },
+    "rank-clippy": {
+      "started": "2026-11-05T16:46:59Z",
+      "finished": "2026-11-05T16:46:59Z",
+      "exit": 0
+    },
+    "rank-tests": {
+      "started": "2026-11-05T16:46:55Z",
+      "finished": "2026-11-05T16:46:55Z",
+      "exit": 0
+    },
+    "scoped-clippy": {
+      "started": "2026-11-05T16:54:53Z",
+      "finished": "2026-11-05T16:58:42Z",
+      "exit": 101
+    },
+    "toolchain": {
+      "started": "2026-11-05T16:46:46Z",
+      "finished": "2026-11-05T16:46:46Z",
+      "exit": 0
+    }
+  },
+  "supervisor_exit": 101,
+  "supervisor_finished": "2026-11-05T16:58:42Z",
+  "standalone_rank": {
+    "passed": 6,
+    "failed": 0,
+    "ignored": 0,
+    "new_controls": 3
+  },
+  "oracle_examples": {
+    "passed": 23,
+    "failed": 0,
+    "ignored": 0,
+    "new_replay_controls": 2,
+    "embedded_new_rank_controls": 3
+  },
+  "new_binary_hashes": [
+    {
+      "path": "/workspace/pkm-replay-accounting-20261105/native/rank-tests",
+      "bytes": 7549400,
+      "sha256": "c501eac866661d3084ebfe8c7148fa27314d6a1db0bbb707071f342987490f28"
+    },
+    {
+      "path": "/workspace/pkm-replay-accounting-20261105/native/rank-clippy-tests",
+      "bytes": 7546496,
+      "sha256": "d8857802f8b1f622fa38ae528b50db2e8cd016f1f6362abda4c48f3fb5a7d1a7"
+    },
+    {
+      "path": "/workspace/crypto/target/release/examples/pkm_oracle_program-74cbc51b8a68a70f",
+      "bytes": 7397448,
+      "sha256": "21464da7c20dc86094c0114285c2ac2e2a1b9fef51d6456f8f05a20faf7ef283"
+    },
+    {
+      "path": "/workspace/crypto/target/release/examples/pkm_oracle_program",
+      "bytes": 6895664,
+      "sha256": "5a85504ec73e8cde01c0ae9471cbb8674d148c919320c1b4e4c57d264c89c15e"
+    }
+  ],
+  "captures": "phase-captures.json exact UTF8 reconstruction",
+  "cli_gate": "expected1 and refusalmessage; no input/replay failure envelope reached",
+  "strict_lint": "FAIL101:2inheritedlibrary errors; finalchangedCargoexample strictlint notqualified",
+  "aggregate": "FAIL;no lint waiver or whole-suite pass",
+  "coverage": "instrumentedsourcecalls only; incomplete/overlapping views, overflow/failedinternalwork unavailable; no calibratedprice",
+  "comparison_admissible": false,
+  "pcc_standing": "unverified producer observation"
+}

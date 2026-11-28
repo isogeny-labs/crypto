@@ -1,0 +1,141 @@
+Diff in /dev/shm/ct23-hermitian-first-A/source/research/chained_cm19_hermitian_20261123/main_a.rs:24:
+     }
+ 
+     fn mul(self, rhs: Self) -> Self {
+-        Self(self.0 * rhs.0 - 5 * self.1 * rhs.1, self.0 * rhs.1 + self.1 * rhs.0 + self.1 * rhs.1)
++        Self(
++            self.0 * rhs.0 - 5 * self.1 * rhs.1,
++            self.0 * rhs.1 + self.1 * rhs.0 + self.1 * rhs.1,
++        )
+     }
+ 
+     fn conj(self) -> Self {
+Diff in /dev/shm/ct23-hermitian-first-A/source/research/chained_cm19_hermitian_20261123/main_a.rs:59:
+ }
+ 
+ fn mmul(a: Matrix, b: Matrix) -> Matrix {
+-    std::array::from_fn(|i| std::array::from_fn(|j| {
+-        (0..3).fold(ZERO, |acc, k| acc.add(a[i][k].mul(b[k][j])))
+-    }))
++    std::array::from_fn(|i| {
++        std::array::from_fn(|j| (0..3).fold(ZERO, |acc, k| acc.add(a[i][k].mul(b[k][j]))))
++    })
+ }
+ 
+ fn adjoint(a: Matrix) -> Matrix {
+Diff in /dev/shm/ct23-hermitian-first-A/source/research/chained_cm19_hermitian_20261123/main_a.rs:85:
+ 
+ fn inverse_unimodular(a: Matrix) -> Matrix {
+     assert_eq!(determinant(a), ONE);
+-    std::array::from_fn(|i| std::array::from_fn(|j| {
+-        let rows: Vec<_> = (0..3).filter(|&r| r != j).collect();
+-        let cols: Vec<_> = (0..3).filter(|&c| c != i).collect();
+-        let minor = a[rows[0]][cols[0]].mul(a[rows[1]][cols[1]]).sub(a[rows[0]][cols[1]].mul(a[rows[1]][cols[0]]));
+-        minor.mul(Z(if (i + j) % 2 == 0 { 1 } else { -1 }, 0))
+-    }))
++    std::array::from_fn(|i| {
++        std::array::from_fn(|j| {
++            let rows: Vec<_> = (0..3).filter(|&r| r != j).collect();
++            let cols: Vec<_> = (0..3).filter(|&c| c != i).collect();
++            let minor = a[rows[0]][cols[0]]
++                .mul(a[rows[1]][cols[1]])
++                .sub(a[rows[0]][cols[1]].mul(a[rows[1]][cols[0]]));
++            minor.mul(Z(if (i + j) % 2 == 0 { 1 } else { -1 }, 0))
++        })
++    })
+ }
+ 
+ fn det_int(mut a: Vec<Vec<i128>>) -> i128 {
+Diff in /dev/shm/ct23-hermitian-first-A/source/research/chained_cm19_hermitian_20261123/main_a.rs:123:
+ }
+ 
+ fn trace_gram() -> Vec<Vec<i128>> {
+-    (0..6).map(|i| (0..6).map(|j| {
+-        let x = if i % 2 == 0 { ONE } else { W };
+-        let y = if j % 2 == 0 { ONE } else { W };
+-        x.conj().mul(H[i / 2][j / 2]).mul(y).trace()
+-    }).collect()).collect()
++    (0..6)
++        .map(|i| {
++            (0..6)
++                .map(|j| {
++                    let x = if i % 2 == 0 { ONE } else { W };
++                    let y = if j % 2 == 0 { ONE } else { W };
++                    x.conj().mul(H[i / 2][j / 2]).mul(y).trace()
++                })
++                .collect()
++        })
++        .collect()
+ }
+ 
+ fn hermitian(a: Matrix) -> bool {
+Diff in /dev/shm/ct23-hermitian-first-A/source/research/chained_cm19_hermitian_20261123/main_a.rs:192:
+ }
+ 
+ fn subsets(k: u32) -> Vec<Vec<usize>> {
+-    (0u32..64).filter(|mask| mask.count_ones() == k).map(|mask| {
+-        (0..6).filter(|&i| mask & (1 << i) != 0).collect()
+-    }).collect()
++    (0u32..64)
++        .filter(|mask| mask.count_ones() == k)
++        .map(|mask| (0..6).filter(|&i| mask & (1 << i) != 0).collect())
++        .collect()
+ }
+ 
+ fn smith(a: Matrix) -> Vec<i128> {
+Diff in /dev/shm/ct23-hermitian-first-A/source/research/chained_cm19_hermitian_20261123/main_a.rs:208:
+         let mut divisor = 0;
+         for rows in &sets {
+             for cols in &sets {
+-                let minor = rows.iter().map(|&i| cols.iter().map(|&j| integer[i][j]).collect()).collect();
++                let minor = rows
++                    .iter()
++                    .map(|&i| cols.iter().map(|&j| integer[i][j]).collect())
++                    .collect();
+                 divisor = gcd(divisor, det_int(minor));
+                 minors += 1;
+             }
+Diff in /dev/shm/ct23-hermitian-first-A/source/research/chained_cm19_hermitian_20261123/main_a.rs:267:
+         }
+     }
+     assert!(out[1].is_empty());
+-    println!("VECTOR_GRID\tfirst={}\tother={}\tgrid={grid}\tcomplete bounds [24,60,60]\tnorm1=0", first.len(), other.len());
++    println!(
++        "VECTOR_GRID\tfirst={}\tother={}\tgrid={grid}\tcomplete bounds [24,60,60]\tnorm1=0",
++        first.len(),
++        other.len()
++    );
+     for (norm, rows) in out.iter().enumerate().skip(1) {
+         println!("VECTOR_COUNT\tnorm={norm}\tcount={}", rows.len());
+     }
+Diff in /dev/shm/ct23-hermitian-first-A/source/research/chained_cm19_hermitian_20261123/main_a.rs:278:
+     let mut out = Vec::new();
+     let m = multiplier as i128;
+     for &a in &vectors[2 * multiplier] {
+-        let seconds: Vec<_> = vectors[3 * multiplier].iter().copied().filter(|&b| inner(a, b) == Z(m, 0)).collect();
+-        let thirds: Vec<_> = vectors[3 * multiplier].iter().copied().filter(|&c| inner(a, c) == Z(-m, 0)).collect();
++        let seconds: Vec<_> = vectors[3 * multiplier]
++            .iter()
++            .copied()
++            .filter(|&b| inner(a, b) == Z(m, 0))
++            .collect();
++        let thirds: Vec<_> = vectors[3 * multiplier]
++            .iter()
++            .copied()
++            .filter(|&c| inner(a, c) == Z(-m, 0))
++            .collect();
+         for &b in &seconds {
+             for &c in &thirds {
+                 if inner(b, c) == Z(-2 * m, m) {
+Diff in /dev/shm/ct23-hermitian-first-A/source/research/chained_cm19_hermitian_20261123/main_a.rs:319:
+     let inverse = inverse_unimodular(H);
+     assert_eq!(mmul(H, inverse), identity());
+     assert_eq!(mmul(inverse, H), identity());
+-    assert_eq!([inverse[0][0], inverse[1][1], inverse[2][2]], [Z(2, 0), Z(5, 0), Z(5, 0)]);
++    assert_eq!(
++        [inverse[0][0], inverse[1][1], inverse[2][2]],
++        [Z(2, 0), Z(5, 0), Z(5, 0)]
++    );
+     let gram = trace_gram();
+     for k in 1..=6 {
+         let leading = gram[..k].iter().map(|row| row[..k].to_vec()).collect();

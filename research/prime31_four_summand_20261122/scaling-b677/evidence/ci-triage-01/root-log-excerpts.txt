@@ -1,0 +1,116 @@
+2026-11-23T05:38:19.8491821Z 5e536ed93302def2122968aa880b22c4b675d516
+2026-11-23T05:38:19.8519984Z 3533cd5ac59cfb78bf7250e78b8f7fc761b8c951cfe2eec9ad4accdc62e9993a  examples/prime31_rr5_quartic.rs
+2026-11-23T05:38:19.8520938Z 192c1d7e8bf2c3bbfb084721d192a6ab08d86d67adbb452cc3f79cff70ccfec0  Cargo.lock
+2026-11-23T05:38:19.8636736Z rustc 1.100.0 (0ef1bc386 2026-11-09)
+2026-11-23T05:38:19.8677459Z ##[group]Run cargo test --locked --release --lib
+2026-11-23T05:38:19.8677861Z [36;1mcargo test --locked --release --lib[0m
+2026-11-23T05:38:19.8710548Z shell: /usr/bin/bash -e {0}
+2026-11-23T05:38:19.8710804Z env:
+2026-11-23T05:38:19.8710999Z   CARGO_BUILD_JOBS: 2
+2026-11-23T05:38:19.8711223Z   RAYON_NUM_THREADS: 1
+2026-11-23T05:38:19.8711455Z   CARGO_HOME: /home/runner/.cargo
+2026-11-23T05:38:19.8711722Z   CARGO_INCREMENTAL: 0
+2026-11-23T05:38:19.8711947Z   CARGO_TERM_COLOR: always
+2026-11-23T05:38:19.8712184Z   CACHE_ON_FAILURE: false
+2026-11-23T05:38:19.8712414Z ##[endgroup]
+2026-11-23T05:38:19.9173788Z [1m[92m    Updating[0m crates.io index
+2026-11-23T05:38:20.2516633Z [1m[92m Downloading[0m crates ...
+2026-11-23T05:47:32.5841193Z [1m[92m   Compiling[0m crypto v0.1.0 (/home/runner/work/crypto/crypto)
+2026-11-23T05:47:32.6728910Z [1m[91merror[0m[1m: mismatched closing delimiter: `)`[0m
+2026-11-23T05:47:32.6729927Z    [1m[94m--> [0msrc/cryptanalysis/binary_hyperelliptic_index_calculus.rs:640:94
+2026-11-23T05:47:32.6730608Z     [1m[94m|[0m
+2026-11-23T05:47:32.6740253Z [1m[94m640[0m [1m[94m|[0m     let chunks: Vec<(Vec<HecRelation>, HecIndexCalculusReport)> = std::thread::scope(|scope| {
+2026-11-23T05:47:32.6741978Z     [1m[94m|[0m                                                                                     [1m[94m-[0m        [1m[91m^[0m [1m[91munclosed delimiter[0m
+2026-11-23T05:47:32.6742943Z     [1m[94m|[0m                                                                                     [1m[94m|[0m
+2026-11-23T05:47:32.6743593Z     [1m[94m|[0m                                                                                     [1m[94mclosing delimiter possibly meant for this[0m
+2026-11-23T05:47:32.6744340Z [1m[94m...[0m
+2026-11-23T05:47:32.6744611Z [1m[94m656[0m [1m[94m|[0m     });
+2026-11-23T05:47:32.6745031Z     [1m[94m|[0m      [1m[91m^[0m [1m[91mmismatched closing delimiter[0m
+2026-11-23T05:47:32.6745302Z 
+2026-11-23T05:47:32.6745553Z [1m[91merror[0m[1m: this file contains an unclosed delimiter[0m
+2026-11-23T05:47:32.6746376Z     [1m[94m--> [0msrc/cryptanalysis/binary_hyperelliptic_index_calculus.rs:1233:2
+2026-11-23T05:47:32.6746821Z      [1m[94m|[0m
+2026-11-23T05:47:32.6747131Z [1m[94m  75[0m [1m[94m|[0m pub struct BhecFactorBase {
+2026-11-23T05:47:32.6747588Z      [1m[94m|[0m                           [1m[94m-[0m [1m[94munclosed delimiter[0m
+2026-11-23T05:47:32.6747959Z [1m[94m...[0m
+2026-11-23T05:47:32.6748239Z [1m[94m  79[0m [1m[94m|[0m impl BhecFactorBase {
+2026-11-23T05:47:32.6748653Z      [1m[94m|[0m                     [1m[94m-[0m [1m[94munclosed delimiter[0m
+2026-11-23T05:47:32.6749008Z [1m[94m...[0m
+2026-11-23T05:47:32.6749326Z [1m[94m  84[0m [1m[94m|[0m     pub fn is_empty(&self) -> bool {
+2026-11-23T05:47:32.6749842Z      [1m[94m|[0m                                    [1m[94m-[0m [1m[94munclosed delimiter[0m
+2026-11-23T05:47:32.6750236Z [1m[94m...[0m
+2026-11-23T05:47:32.6750624Z [1m[94m  87[0m [1m[94m|[0m     pub fn index_of_x(&self, x: &BigUint) -> Option<usize> {
+2026-11-23T05:47:32.6751220Z      [1m[94m|[0m                                                            [1m[94m-[0m [1m[94munclosed delimiter[0m
+2026-11-23T05:47:32.6751636Z [1m[94m...[0m
+2026-11-23T05:47:32.6752162Z [1m[94m 103[0m [1m[94m|[0m pub fn affine_point_for_x(curve: &HyperellipticCurve, x: &F2mElement) -> Option<F2mElement> {
+2026-11-23T05:47:32.6752986Z      [1m[94m|[0m                                                                                             [1m[94m-[0m [1m[94munclosed delimiter[0m
+2026-11-23T05:47:32.6753442Z [1m[94m...[0m
+2026-11-23T05:47:32.6753935Z [1m[94m 128[0m [1m[94m|[0m fn artin_schreier_solve(a: &F2mElement, irr: &IrreduciblePoly) -> Option<F2mElement> {
+2026-11-23T05:47:32.6755228Z      [1m[94m|[0m                                                                                      [1m[94m-[0m [1m[94manother 198 unclosed delimiters begin from here[0m
+2026-11-23T05:47:32.6755740Z [1m[94m...[0m
+2026-11-23T05:47:32.6756038Z [1m[94m 642[0m [1m[94m|[0m         for t in 0..threads {
+2026-11-23T05:47:32.6756585Z      [1m[94m|[0m                             [1m[94m-[0m [1m[94mthis delimiter might not be properly closed...[0m
+2026-11-23T05:47:32.6757018Z [1m[94m...[0m
+2026-11-23T05:47:32.6757254Z [1m[94m 656[0m [1m[94m|[0m     });
+2026-11-23T05:47:32.6757720Z      [1m[94m|[0m     [1m[94m-[0m [1m[94m...as it matches this but it has different indentation[0m
+2026-11-23T05:47:32.6758141Z [1m[94m...[0m
+2026-11-23T05:47:32.6758371Z [1m[94m1233[0m [1m[94m|[0m
+2026-11-23T05:47:32.6758638Z      [1m[94m|[0m [1m[91m^[0m
+2026-11-23T05:47:32.6758794Z 
+2026-11-23T05:47:32.6828668Z [1m[91merror[0m: could not compile `crypto` (lib test) due to 2 previous errors
+2026-11-23T05:47:32.7563673Z ##[error]Process completed with exit code 101.
+2026-11-23T05:47:32.7615404Z ##[group]Run cargo test --locked --release --example prime31_rr5_quartic -- --nocapture
+2026-11-23T05:47:32.7616060Z [36;1mcargo test --locked --release --example prime31_rr5_quartic -- --nocapture[0m
+2026-11-23T05:47:32.7686900Z shell: /usr/bin/bash -e {0}
+2026-11-23T05:47:32.7687166Z env:
+2026-11-23T05:47:32.7687363Z   CARGO_BUILD_JOBS: 2
+2026-11-23T05:47:32.7687593Z   RAYON_NUM_THREADS: 1
+2026-11-23T05:47:32.7687826Z   CARGO_HOME: /home/runner/.cargo
+2026-11-23T05:47:32.7688085Z   CARGO_INCREMENTAL: 0
+2026-11-23T05:47:32.7688312Z   CARGO_TERM_COLOR: always
+2026-11-23T05:47:32.7688551Z   CACHE_ON_FAILURE: false
+2026-11-23T05:47:32.7688774Z ##[endgroup]
+2026-11-23T05:47:32.9213848Z [1m[92m   Compiling[0m crypto v0.1.0 (/home/runner/work/crypto/crypto)
+2026-11-23T05:47:33.0057391Z [1m[91merror[0m[1m: mismatched closing delimiter: `)`[0m
+2026-11-23T05:47:33.0058424Z    [1m[94m--> [0msrc/cryptanalysis/binary_hyperelliptic_index_calculus.rs:640:94
+2026-11-23T05:47:33.0059051Z     [1m[94m|[0m
+2026-11-23T05:47:33.0059945Z [1m[94m640[0m [1m[94m|[0m     let chunks: Vec<(Vec<HecRelation>, HecIndexCalculusReport)> = std::thread::scope(|scope| {
+2026-11-23T05:47:33.0061006Z     [1m[94m|[0m                                                                                     [1m[94m-[0m        [1m[91m^[0m [1m[91munclosed delimiter[0m
+2026-11-23T05:47:33.0061823Z     [1m[94m|[0m                                                                                     [1m[94m|[0m
+2026-11-23T05:47:33.0062643Z     [1m[94m|[0m                                                                                     [1m[94mclosing delimiter possibly meant for this[0m
+2026-11-23T05:47:33.0063236Z [1m[94m...[0m
+2026-11-23T05:47:33.0063540Z [1m[94m656[0m [1m[94m|[0m     });
+2026-11-23T05:47:33.0064315Z     [1m[94m|[0m      [1m[91m^[0m [1m[91mmismatched closing delimiter[0m
+2026-11-23T05:47:33.0064685Z 
+2026-11-23T05:47:33.0065932Z [1m[91merror[0m[1m: this file contains an unclosed delimiter[0m
+2026-11-23T05:47:33.0066758Z     [1m[94m--> [0msrc/cryptanalysis/binary_hyperelliptic_index_calculus.rs:1233:2
+2026-11-23T05:47:33.0067309Z      [1m[94m|[0m
+2026-11-23T05:47:33.0067704Z [1m[94m  75[0m [1m[94m|[0m pub struct BhecFactorBase {
+2026-11-23T05:47:33.0068303Z      [1m[94m|[0m                           [1m[94m-[0m [1m[94munclosed delimiter[0m
+2026-11-23T05:47:33.0068770Z [1m[94m...[0m
+2026-11-23T05:47:33.0069075Z [1m[94m  79[0m [1m[94m|[0m impl BhecFactorBase {
+2026-11-23T05:47:33.0069536Z      [1m[94m|[0m                     [1m[94m-[0m [1m[94munclosed delimiter[0m
+2026-11-23T05:47:33.0069924Z [1m[94m...[0m
+2026-11-23T05:47:33.0070275Z [1m[94m  84[0m [1m[94m|[0m     pub fn is_empty(&self) -> bool {
+2026-11-23T05:47:33.0070814Z      [1m[94m|[0m                                    [1m[94m-[0m [1m[94munclosed delimiter[0m
+2026-11-23T05:47:33.0071515Z [1m[94m...[0m
+2026-11-23T05:47:33.0071940Z [1m[94m  87[0m [1m[94m|[0m     pub fn index_of_x(&self, x: &BigUint) -> Option<usize> {
+2026-11-23T05:47:33.0072597Z      [1m[94m|[0m                                                            [1m[94m-[0m [1m[94munclosed delimiter[0m
+2026-11-23T05:47:33.0073049Z [1m[94m...[0m
+2026-11-23T05:47:33.0073633Z [1m[94m 103[0m [1m[94m|[0m pub fn affine_point_for_x(curve: &HyperellipticCurve, x: &F2mElement) -> Option<F2mElement> {
+2026-11-23T05:47:33.0074717Z      [1m[94m|[0m                                                                                             [1m[94m-[0m [1m[94munclosed delimiter[0m
+2026-11-23T05:47:33.0075211Z [1m[94m...[0m
+2026-11-23T05:47:33.0075752Z [1m[94m 128[0m [1m[94m|[0m fn artin_schreier_solve(a: &F2mElement, irr: &IrreduciblePoly) -> Option<F2mElement> {
+2026-11-23T05:47:33.0076877Z      [1m[94m|[0m                                                                                      [1m[94m-[0m [1m[94manother 198 unclosed delimiters begin from here[0m
+2026-11-23T05:47:33.0077478Z [1m[94m...[0m
+2026-11-23T05:47:33.0077803Z [1m[94m 642[0m [1m[94m|[0m         for t in 0..threads {
+2026-11-23T05:47:33.0078407Z      [1m[94m|[0m                             [1m[94m-[0m [1m[94mthis delimiter might not be properly closed...[0m
+2026-11-23T05:47:33.0078888Z [1m[94m...[0m
+2026-11-23T05:47:33.0079142Z [1m[94m 656[0m [1m[94m|[0m     });
+2026-11-23T05:47:33.0079656Z      [1m[94m|[0m     [1m[94m-[0m [1m[94m...as it matches this but it has different indentation[0m
+2026-11-23T05:47:33.0080088Z [1m[94m...[0m
+2026-11-23T05:47:33.0080316Z [1m[94m1233[0m [1m[94m|[0m
+2026-11-23T05:47:33.0080584Z      [1m[94m|[0m [1m[91m^[0m
+2026-11-23T05:47:33.0080745Z 
+2026-11-23T05:47:33.0130561Z [1m[91merror[0m: could not compile `crypto` (lib) due to 2 previous errors
+2026-11-23T05:47:33.0367200Z ##[error]Process completed with exit code 101.

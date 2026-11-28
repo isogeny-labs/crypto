@@ -1,0 +1,186 @@
+{
+  "schema": "maintenance.bound-input-checkout/v1",
+  "head": "8fd119e9012dfe9e619f675fae7a038562e4c108",
+  "reviewed_main": "4c44ad2ab582f0cd38b9fcf0dd0dd49df2800dd6",
+  "common_base": "a2e8fbc1d08f3369ddcd647311a4a6faf408b986",
+  "ordinary_two_parents": [
+    "8fd119e9012dfe9e619f675fae7a038562e4c108",
+    "4c44ad2ab582f0cd38b9fcf0dd0dd49df2800dd6"
+  ],
+  "branch_leaves": 23,
+  "incoming_leaves": 220,
+  "overlap": [
+    "docs/session-logs/2026-11-06.md"
+  ],
+  "workflow_clean_three_way_merge_equals_exact_head": true,
+  "production_edit": "Only batch exact original bound-record path selector with original complete session candidate checkout BEFORE S3 hydration; remove setup from late validator step",
+  "all_other_workflow_fields_jobs_exact_merged_head": true,
+  "original_all16_K_of16_calls_and5_audit_lanes_exact": true,
+  "all_original_late_validators_assertions_inputs_timeouts_guards_permissions_preserved": true,
+  "pcc_base_head_main_exact": true,
+  "all_main_nonoverlaps_exact": true,
+  "all_old_branch_receipts_exact_full_paths": true,
+  "local_controls": {
+    "scope": "LOCAL ONLY synthetic Git/CLI metadata controls, no AWS/native/scientific run or actual future timing guarantee",
+    "head": "8fd119e9012dfe9e619f675fae7a038562e4c108",
+    "only_setup_change": "Batch exact original bound-record selector with original complete session checkout before S3 hydration; retain all late bound/challenge/frontier validators",
+    "all_other_workflow_semantics_exact": true,
+    "audit_and_sentinel_jobs_exact": true,
+    "all_original_timeouts_commands_validators_assertions_inputs_preserved": true,
+    "bash_syntax": "PASS all original/repaired run blocks",
+    "actionlint": "PASS 1.7.12; external shellcheck/pyflakes absent",
+    "canonical_budget": "PASS 0 violations for exact workflow",
+    "canonical_policy_tests": 15,
+    "fixture_controls": [
+      {
+        "case": "normal",
+        "original": {
+          "exit": 0,
+          "calls": 2,
+          "sessions": "research/a\nresearch/session with spaces\n",
+          "files": [
+            "evidence/bound receipt.txt",
+            "other/session.json",
+            "research/a/session.json",
+            "research/session with spaces/session.json"
+          ]
+        },
+        "repaired": {
+          "exit": 0,
+          "calls": 1,
+          "sessions": "research/a\nresearch/session with spaces\n",
+          "files": [
+            "evidence/bound receipt.txt",
+            "other/session.json",
+            "research/a/session.json",
+            "research/session with spaces/session.json"
+          ]
+        }
+      },
+      {
+        "case": "malformed-record",
+        "original": {
+          "exit": 5,
+          "calls": 2,
+          "sessions": "research/a\nresearch/session with spaces\n",
+          "files": [
+            "other/session.json",
+            "research/a/session.json",
+            "research/session with spaces/session.json"
+          ]
+        },
+        "repaired": {
+          "exit": 5,
+          "calls": 1,
+          "sessions": null,
+          "files": [
+            "other/session.json",
+            "research/a/session.json",
+            "research/session with spaces/session.json"
+          ]
+        }
+      },
+      {
+        "case": "selector-failure",
+        "original": {
+          "exit": 44,
+          "calls": 2,
+          "sessions": "research/a\nresearch/session with spaces\n",
+          "files": [
+            "other/session.json",
+            "research/a/session.json",
+            "research/session with spaces/session.json"
+          ]
+        },
+        "repaired": {
+          "exit": 44,
+          "calls": 1,
+          "sessions": null,
+          "files": [
+            "other/session.json",
+            "research/a/session.json",
+            "research/session with spaces/session.json"
+          ]
+        }
+      },
+      {
+        "case": "git-failure",
+        "original": {
+          "exit": 43,
+          "calls": 1,
+          "sessions": null,
+          "files": []
+        },
+        "repaired": {
+          "exit": 43,
+          "calls": 1,
+          "sessions": null,
+          "files": []
+        }
+      }
+    ],
+    "actual_new_head_ci": "not published; unobserved",
+    "hypothesis": "One early Git sparse-checkout pass avoids late index reprocessing after S3 hydration. Actual45minute harness/all5lanes/all16exits/sentinel still required."
+  },
+  "actual_new_head_ci": "PENDING",
+  "corpus_validation_hold": {
+    "actual_8fd_failure": "3 unlinked paths",
+    "actual_3541_29c_failure": "3 duplicate cited_by paths",
+    "current_main_blob": "cf2da8b3a1b734f6b17a32073a8df7bec92eeeee",
+    "current_main_sha256": "5bbd118974534a0891e9117e5d1d07f802d7db16751fb980d4bb10a5de8ea1b2",
+    "duplicate_entries": {
+      "papers/ecdlp-index-calculus-treatise/sections/hardness.tex": [
+        {
+          "path": "papers/ecdlp-index-calculus-treatise/sections/hardness.tex",
+          "use": "reports",
+          "note": "treatise hardness chapter: definitional pitfall"
+        },
+        {
+          "path": "papers/ecdlp-index-calculus-treatise/sections/hardness.tex",
+          "use": "reports",
+          "note": "section on the four cells and three repairs"
+        }
+      ],
+      "papers/ecdlp-index-calculus-treatise/survey/ic-engine.md": [
+        {
+          "path": "papers/ecdlp-index-calculus-treatise/survey/ic-engine.md",
+          "use": "reports",
+          "note": "treatise source survey digest"
+        },
+        {
+          "path": "papers/ecdlp-index-calculus-treatise/survey/ic-engine.md",
+          "use": "reports",
+          "note": "first-fall-degree audit: Lemma 4 false over F2"
+        }
+      ],
+      "papers/ecdlp-index-calculus-treatise/survey/structure.md": [
+        {
+          "path": "papers/ecdlp-index-calculus-treatise/survey/structure.md",
+          "use": "reports",
+          "note": "treatise source survey digest"
+        },
+        {
+          "path": "papers/ecdlp-index-calculus-treatise/survey/structure.md",
+          "use": "mention"
+        }
+      ]
+    },
+    "resolution": "UNCHANGED exact main corpus bytes. structure.md use differs reports vs mention; no evidence-side classification selected. Source owner resolution and actual strict validators required."
+  },
+  "independent_holds": [
+    "consumer original archive HEAD plus boundedGET/fullSHA unobserved",
+    "native3463 combined source/identity/provenance validation",
+    "all older frozen PCC/native/isolation/custody/review holds"
+  ],
+  "sources_checked_KB": "MCP/wrapper unavailable: exact workflow, unchanged canonical budget checker/tests, docs/bounds/README section8, actual full rawCI logs, current validator source and complete Git graph",
+  "conductor": "command absent127; documented fallback, no reservation",
+  "scope": "infrastructure transport only, no AWS/native/scientific experiment, immutable record/progress change or evidence admission",
+  "pcc_standing": "unverified producer assertion",
+  "journal": {
+    "main_bytes": 68580,
+    "head_bytes": 79976,
+    "new_bytes": 151724,
+    "blob": "59fded7524559e27d239b69cd3dbb71dd0dfe942",
+    "both_parents_contiguous_verbatim": true
+  }
+}

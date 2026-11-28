@@ -1,0 +1,104 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T03:25:39Z",
+ "id": "PCC-20261116-ac25ef",
+ "kind": "theorem",
+ "producer": {
+  "commit": "6c123eb24953a6791ec066dc84d23fb0c19be634",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "406dc2e930caaafa03133da5eb2006fc271d36ab904d18fc61f27c5f854c8fa3",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-cosets-v1",
+   "theorem": "Curve25519CosetInstance.indexed_injective"
+  },
+  {
+   "decl_sha256": "14a39d8725e3157cf29aa040361b7c6e32937687801b22da8152cb7c77951285",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-cosets-v1",
+   "theorem": "Curve25519CosetInstance.raw_cardinality"
+  },
+  {
+   "decl_sha256": "039160db7737cd2abfe81547078542e88b5faf0ff172b386f66b70824f8d1207",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-cosets-v1",
+   "theorem": "Curve25519CosetInstance.no_identity"
+  },
+  {
+   "decl_sha256": "55354c3e541c5cd29d9eea60482e3d0149905f5fa98af8e98315eac3eea0b7ce",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-cosets-v1",
+   "theorem": "Curve25519CosetInstance.no_inverse_pair"
+  },
+  {
+   "decl_sha256": "221dbf9795318fb117aaf436f8d18890c0ebffeda880e9a1321b6669c798b12f",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-cosets-v1",
+   "theorem": "Curve25519CosetInstance.in_parent_roots"
+  },
+  {
+   "decl_sha256": "e50f22ebbb8e087c108d413d96db6f2d649f003c8591daa3842d6919dda536bb",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-cosets-v1",
+   "theorem": "Curve25519CosetInstance.odd_roots_not_opposite"
+  },
+  {
+   "decl_sha256": "179b51ecaba1592e506d679d28e15c8a6ccebdf1f5a1da56512cea63726f1194",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-cosets-v1",
+   "theorem": "Curve25519CosetInstance.membership_fibers"
+  },
+  {
+   "decl_sha256": "85d04634a35c315c501bf302c92a28aad1de46592c1e54432d77a65743bf4456",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-cosets-v1",
+   "theorem": "Curve25519CosetInstance.membership_lookup"
+  },
+  {
+   "decl_sha256": "9717dce4336b79270b3aeb73cf63b1538ee83e176cf70e0164efdba2b23ce075",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-cosets-v1",
+   "theorem": "Curve25519CosetInstance.no_sign_pair"
+  },
+  {
+   "decl_sha256": "eb6bdb3eea85acab7cec50d9263770ea8fa6205f898c74db0f56edc0fedd381e",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-cosets-v1",
+   "theorem": "Curve25519CosetInstance.no_negative_inverse_pair"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-cosets-v1/CosetInstance.lean",
+    "sha256": "85a0d7971510d5f0f1ff441ac7c0fab2f12f8008ada1c77f2496c4c7db75ef67"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-cosets-v1/lakefile.toml",
+    "sha256": "259c1d02f63977947d8a6adfaf71543464da146bb7e86d5e6b50d32b70512275"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-cosets-v1/lake-manifest.json",
+    "sha256": "434f6ca2bd398320b66eff450c062ba4cff89d1392760b9139125dc5695b64aa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-cosets-v1/lean-toolchain",
+    "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/curve25519_torus_native_20261115/lean-cosets-v1",
+ "statement": "Ten conditional fixed-parameter Mathlib endpoints establish injection/cardinality of the 20633 by 213156431 torus index image, identity/inverse/sign exclusions and complete q-power membership recognition, assuming an ambient field, exact order 12965132697890207 for h, and characteristic not two for sign conclusions. The actual Fp2/order/point instance and decomposition costs are not certified."
+}

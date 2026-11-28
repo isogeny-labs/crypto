@@ -1,0 +1,12 @@
+{
+  "schema": "xedni-anchor-rank1-search-protocol-v1",
+  "source_result_sha256": "207aabe462cf5f90bb48e239cd652d3ac119c20522053ae9a1b8a55caf684c8d",
+  "source_index": 425,
+  "point_pair": {"P": [14, 7], "Q": [17, 10]},
+  "offset_order": [-1, 0, 1],
+  "grid_law": "Enumerate (u,v) lexicographically with a1=47*u and a3=47*v; derive a2,a4,a6 from the same tangent construction as the rank-one replacement panel",
+  "rank_method": "For every curve, Simon two-descent with known Q and limbigprime=0; if completed upper bound <=1, run Sage proof-enabled PARI rank with use_database=False and only_use_mwrank=True",
+  "per_method_wall_cap_seconds": 25,
+  "status_law": "Retain all nine grid cells, including rank intervals, errors, and timeouts; a certified rank-one witness requires matching completed Simon 1-1 bounds and proof-enabled exact rank one",
+  "selection": "first certified rank-one cell in lexicographic (u,v) order, without stopping the grid"
+}

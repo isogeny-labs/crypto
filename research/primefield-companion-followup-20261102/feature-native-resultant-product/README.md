@@ -1,0 +1,11 @@
+# Scalar resultant accumulation in the projected source
+
+The successor source uses value_product in its geometry residual. Full-field remainder-tree traversal returns scalar child products instead of materializing the evaluation vector. See DERIVATION.md for the induction, orientation, derived operation count, and storage boundary.
+
+Validation: build plus eight selected native methods passed with overflow checks enabled. The new method checks 245 root/point cases over F5, F7, F13, F509 and F65537, with each dimension in {1,2,3,12,13,27,65}. References are the prior vector evaluator and direct products of differences; Karatsuba/Newton counters agree. Another 980 coefficient cases cover empty, zero, constant and noncanonical polynomial coefficients. Empty root/point arrays and foreign modulus trees are rejected. Paired-source checks retain 499 subgroup rows, 100 splits, 1375 advances and 450 skips; 2500 synthetic geometry cases retain 1349 valid agreements and 1151 common rejections. Each selected method filters 89 other methods. [pcc:unverified]
+
+PCC-20261107-2beb31 binds the receipt and selected logs as unsigned producer attestations. It does not claim execution-proof verification or independent review. Sources, binary/compiler metadata and transitive Rust input hashes are recorded. Generator replay reproduces exactly the tested bytes. No native failure occurred. The original 4563-case cohort is unchanged.
+
+Replay from repository root: python3 research/primefield-companion-followup-20261102/feature-native-resultant-product/generate.py then run-record.py at the same path. The runner overwrites its output files, so use a disposable checkout to preserve published evidence. Limits: 90s build, 60s principal/product tests, 30s other methods, one local development invocation. No cloud job, timing panel, recovery run or peak-memory measurement.
+
+Sources checked (KB unavailable): prior native low-product engine, projected residual and FLINT multipoint-evaluation documentation, linked in DERIVATION.md. These support the remainder-tree invariant; no novelty claim. Next: complete source/decoder accounting and structural reduction of polynomial work. Historical PR PCC failures remain separate.

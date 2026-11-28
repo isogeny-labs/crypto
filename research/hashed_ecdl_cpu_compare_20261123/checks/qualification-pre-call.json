@@ -1,0 +1,144 @@
+{
+  "schema": "cpu-variant-qualification/v1",
+  "scope": "Copied native executables before unit calls",
+  "binaries": [
+    {
+      "variant": "parent",
+      "target": "scale",
+      "kind": [
+        "example"
+      ],
+      "test": false,
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-parent/release/examples/scale",
+      "destination": "/tmp/ecdlp-cpu-comparison-20261123/qualified/parent-00-scale",
+      "sha256": "abd2bd503e39073c33c2725a4bd4f8dc88a146d88e0a90a0cafbb45bfd4094ca"
+    },
+    {
+      "variant": "parent",
+      "target": "complete",
+      "kind": [
+        "example"
+      ],
+      "test": false,
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-parent/release/examples/complete",
+      "destination": "/tmp/ecdlp-cpu-comparison-20261123/qualified/parent-01-complete",
+      "sha256": "6d46d67b9cf10a50c1fdfe00645189cb7cd2bf7495845d540f51996b14a933ec"
+    },
+    {
+      "variant": "parent",
+      "target": "hashed-ecdl-cpu",
+      "kind": [
+        "bin"
+      ],
+      "test": true,
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-parent/release/deps/hashed_ecdl_cpu-97ae2e8da9f20dca",
+      "destination": "/tmp/ecdlp-cpu-comparison-20261123/qualified/parent-02-hashed-ecdl-cpu",
+      "sha256": "77998200dc433e91361e610f3ef832af118a97b19cf2573d1bbc955438abb46b"
+    },
+    {
+      "variant": "parent",
+      "target": "fixture",
+      "kind": [
+        "example"
+      ],
+      "test": false,
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-parent/release/examples/fixture",
+      "destination": "/tmp/ecdlp-cpu-comparison-20261123/qualified/parent-03-fixture",
+      "sha256": "53f105d0eefced52e28c41def6daca33b0a9a63ac469ecf94ac012d4f94f7bc8"
+    },
+    {
+      "variant": "parent",
+      "target": "hashed_ecdl_cpu",
+      "kind": [
+        "lib"
+      ],
+      "test": true,
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-parent/release/deps/hashed_ecdl_cpu-daa47b9e25b43e80",
+      "destination": "/tmp/ecdlp-cpu-comparison-20261123/qualified/parent-04-hashed_ecdl_cpu",
+      "sha256": "8a105569fab2f160ca6335d8aa2abffd8946071fd14dc626b448ccef1353708b"
+    },
+    {
+      "variant": "parent",
+      "target": "hashed-ecdl-cpu",
+      "kind": [
+        "bin"
+      ],
+      "test": false,
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-parent/release/hashed-ecdl-cpu",
+      "destination": "/tmp/ecdlp-cpu-comparison-20261123/qualified/parent-05-hashed-ecdl-cpu",
+      "sha256": "380c0ad8d99a515157e3ad8d109ba2d02c99b0749677e2e2824b64e077b80648"
+    },
+    {
+      "variant": "candidate",
+      "target": "hashed-ecdl-cpu",
+      "kind": [
+        "bin"
+      ],
+      "test": true,
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-candidate/release/deps/hashed_ecdl_cpu-8e477254e1af33d5",
+      "destination": "/tmp/ecdlp-cpu-comparison-20261123/qualified/candidate-00-hashed-ecdl-cpu",
+      "sha256": "79197d6137d8023cefc46312db21b7296e297242ddcd7c9b3c72a81d0482faca"
+    },
+    {
+      "variant": "candidate",
+      "target": "fixture",
+      "kind": [
+        "example"
+      ],
+      "test": false,
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-candidate/release/examples/fixture",
+      "destination": "/tmp/ecdlp-cpu-comparison-20261123/qualified/candidate-01-fixture",
+      "sha256": "5489bed6552948dbd3a56ff593c16af16b716dbbaeb181bc1335e2043793bf8c"
+    },
+    {
+      "variant": "candidate",
+      "target": "complete",
+      "kind": [
+        "example"
+      ],
+      "test": false,
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-candidate/release/examples/complete",
+      "destination": "/tmp/ecdlp-cpu-comparison-20261123/qualified/candidate-02-complete",
+      "sha256": "7edceb3ae2aa0bc7827c23e3fab2287f3a37fd27ca97fdba7e4497f5705679ed"
+    },
+    {
+      "variant": "candidate",
+      "target": "scale",
+      "kind": [
+        "example"
+      ],
+      "test": false,
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-candidate/release/examples/scale",
+      "destination": "/tmp/ecdlp-cpu-comparison-20261123/qualified/candidate-03-scale",
+      "sha256": "2a648031cf8f02c6dc6f69f4cd457941b907411e743ed0e36d67a8d52ccaee69"
+    },
+    {
+      "variant": "candidate",
+      "target": "hashed_ecdl_cpu",
+      "kind": [
+        "lib"
+      ],
+      "test": true,
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-candidate/release/deps/hashed_ecdl_cpu-b3975533b311508b",
+      "destination": "/tmp/ecdlp-cpu-comparison-20261123/qualified/candidate-04-hashed_ecdl_cpu",
+      "sha256": "7cd0ea5d40a0e8319c3c6a4b6747703a557b3d3c93eac9d413dcec2855a310a9"
+    },
+    {
+      "variant": "candidate",
+      "target": "hashed-ecdl-cpu",
+      "kind": [
+        "bin"
+      ],
+      "test": false,
+      "source": "/tmp/ecdlp-cpu-comparison-20261123/target-candidate/release/hashed-ecdl-cpu",
+      "destination": "/tmp/ecdlp-cpu-comparison-20261123/qualified/candidate-05-hashed-ecdl-cpu",
+      "sha256": "e4adb5d7c164c09c980772f3b53d1abf7acaf221696cccb3c4e74f8f2e3f2712"
+    }
+  ],
+  "workers": {
+    "parent": "/tmp/ecdlp-cpu-comparison-20261123/qualified/parent-00-scale",
+    "candidate": "/tmp/ecdlp-cpu-comparison-20261123/qualified/candidate-03-scale",
+    "verifier": "/tmp/ecdlp-cpu-comparison-20261123/qualified/candidate-05-hashed-ecdl-cpu"
+  },
+  "test_harnesses": 4
+}

@@ -1,0 +1,47 @@
+{
+  "measured_utc_day": "2026-11-18",
+  "source_commit": "e01120c39f003f6061b0b4cbf68640bb368ee15d",
+  "source_note": "sweep recorded from this commit plus the uncommitted sparse-LA change; see the PR",
+  "executable_sha256": {
+    "a3_s4_ladder": "165f7109d933e601f60bafd22ce84af306520e85ed83a2f1e28f85a18ac74fce"
+  },
+  "host_id": {
+    "node": "Mac.attlocal.net",
+    "machine": "arm64",
+    "platform": "macOS-27.2-arm64-arm-64bit",
+    "cpus": 14,
+    "load_average_at_report": [
+      11.4267578125,
+      28.84765625,
+      55.77587890625
+    ]
+  },
+  "resource_caps": {
+    "rungs": "run one at a time (serial shell queue)",
+    "threads": "single-threaded example",
+    "wall_cap_per_rung": "none",
+    "memory": "not capped; peak RSS not recorded"
+  },
+  "fixtures": {
+    "policy": "bench_curves_a_minus_3 rungs; each run prints curve, p, n, fb and the public target q",
+    "rungs": [
+      "a3-bench-16bit-p256class",
+      "a3-bench-24bit-p256class",
+      "a3-bench-28bit-p256class"
+    ]
+  },
+  "seeds": [
+    20261005
+  ],
+  "data_files": {
+    "sweep.jsonl": "c7a3ae0db6a5ee1b9892c06c411ff41a0d2ad884d5dc3430585feab1763058e2",
+    "progress.txt": "8584ac8d6e1ce2c45178ca3666cea6f214d436e06740aeb1eef602832b1c85fa",
+    "REPORT.md": "c22975590b9f84d063cb87e4f79f929d4061050717a3f1339a80f153d29eba23"
+  },
+  "claim_boundary_non_claims": [
+    "public synthetic known-answer fixtures only",
+    "no deployed-curve, key-recovery, vs_rho or asymptotic claim",
+    "wall times exploratory: shared host, single run per cell, load 6-8 on 14 cores",
+    "rank is solved once after collection, not recomputed per relation"
+  ]
+}

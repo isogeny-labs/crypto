@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T00:38:18Z",
+ "id": "PCC-20261123-526846",
+ "kind": "execution",
+ "producer": {
+  "commit": "0000000000000000000000000000000000000000",
+  "model": "gpt-6-astra",
+  "session": "prime31-dickson-quotient-20261122"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/evidence/original-lock-ci/receipt.json",
+    "sha256": "c2e156832b498d744d296281394f622b1c9a72bcc7020484f60dea8e50cd6d72"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/evidence/original-lock-ci/source-sha256.txt",
+    "sha256": "dbe43c24ab207f3c74f51151f5be36e5ba52253636f5e8e829346b14090f698a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/evidence/original-lock-ci/library-tests.txt",
+    "sha256": "c0c7964daf019c6037bdf362d7a6883231343d4fbd72e588843ca39142fe14fd"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/evidence/original-lock-ci/component-tests.txt",
+    "sha256": "019af8e5d79ae4483716a38e2d2be760e7ebada7dd9109cdf58ba850d9d5b716"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/evidence/original-lock-ci/correctness-cases.json",
+    "sha256": "2f491f3250b71bca1597668098f0feecd9a40d9c76714986b482b2c8b8fc6efb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime31_summation_compression_20261122/evidence/original-lock-ci/job.log",
+    "sha256": "ddc899bc084165922c2ac6f37d5bd4947e209dba9b24708e5b260523a20452bd"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Original native Cargo manifest and lock at published source commit; full diagnostic output retained; no complete ECDLP solve",
+ "statement": "Hosted original-lock CI run 45089569480, job 137415823110, reports success at repository checkout 109fc024e33f122fd678d2c93a18b2c0438a8668, with 41 native-library tests and 5 component tests passing. Retained source hashes bind the unchanged native manifest/lock and gate SHA256 b76cd5a1efeff77bc065554d89acc9b53be051e6b17811cca589c2dc93a018b1. Artifact14781056289 diagnostic JSON is byte-identical to the local-adapter diagnostic and retains the adverse17923 versus8816 field-multiplication comparison. This is source-bound producer CI evidence, not an independent signed execution proof or performance/asymptotic claim."
+}

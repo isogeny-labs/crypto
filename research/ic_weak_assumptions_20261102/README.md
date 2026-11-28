@@ -12,6 +12,13 @@ kernel for the arity-three canonical IR. It also records why the named yield
 batch cannot presently run and sharpens the PKM, Wagner, and xedni next objects.
 No scientific performance run was taken in that continuation either.
 
+The six lanes have since been promoted into the repository-wide canonical
+claim graph. Start from the
+[foundational attack queue](../../docs/ecdlp-hardness-corpus/FOUNDATIONAL_ATTACK_QUEUE.md)
+for the finite next objects and from
+[`ic-six-obligations-20261117.json`](../../docs/ecdlp-hardness-corpus/ic-six-obligations-20261117.json)
+for their typed dependencies and machine-checkable acceptance criteria.
+
 ## Outcome
 
 The security argument is not one hardness assumption. It is a serial chain of

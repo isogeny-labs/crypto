@@ -493,11 +493,8 @@ pub fn velu_preimage_point(
     }
 }
 
-fn gcd_u64(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        (a, b) = (b, a % b);
-    }
-    a
+fn gcd_u64(a: u64, b: u64) -> u64 {
+    crate::gcd::int::gcd_u64(a, b)
 }
 
 /// Evaluate a Hasse derivative without constructing a polynomial.  Lucas's

@@ -1,0 +1,11 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp24-tm5099-a6f137c6 | 24.00 | fb1024 | 16/16 | 257.754 | 283.809 | 518.305 | — |
+| icv1-fp24-tm5099-a6f137c6 | 24.00 | fb128 | 16/16 | 13.533 | 15.751 | 35.708 | — |
+| icv1-fp24-tm5099-a6f137c6 | 24.00 | fb256 | 16/16 | 21.004 | 23.555 | 46.520 | — |
+| icv1-fp24-tm5099-a6f137c6 | 24.00 | fb32 | 16/16 | 50.202 | 60.083 | 149.009 | — |
+| icv1-fp24-tm5099-a6f137c6 | 24.00 | fb512 | 16/16 | 66.593 | 73.525 | 135.914 | — |
+| icv1-fp24-tm5099-a6f137c6 | 24.00 | fb64 | 16/16 | 20.352 | 24.218 | 59.010 | — |
+| icv1-fp24-tm5099-a6f137c6 | 24.00 | rho | 16/16 | 0.929 | 1.013 | 1.768 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.

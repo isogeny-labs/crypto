@@ -1,0 +1,85 @@
+{
+  "title": "Prime31 B8 cached Vandermonde RR9 four-row half-table build",
+  "date_utc": "2026-11-19",
+  "status": "source-specific CI PASS, independent Python and separate BigInt raw replay PASS; signed PCC unverified; only chart construction",
+  "protocol": "research/prime31_ic_20261115/rr9/RR9_CACHED_VANDERMONDE_PROTOCOL_20261119.md",
+  "source_commit": "936d12053c64b65f41b74f6a1ab8e7604218fdaa",
+  "frozen_original_rust": "1df714645aa683cf975bc76fcacb9842cb4780fd",
+  "github_actions_run": "https://github.com/isogeny-labs/crypto/actions/runs/44465566138",
+  "raw_artifact": "https://github.com/isogeny-labs/crypto/actions/runs/44465566138/artifacts/14502390564",
+  "raw_zip_sha256": "3e64baefd91c74cc4c0405ee5129c833a310c8293234a224129bfb5af7f3bea7",
+  "raw_json_sha256": "38a283660e2b80eb4109e3c7747d6da704357b6a56401f30c5a6c46244942aa1",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "group_order": 2147446831,
+    "cofactor": 1,
+    "generator": [
+      625037715,
+      2100627251
+    ],
+    "base_x": [
+      0,
+      1,
+      2,
+      3,
+      5,
+      6,
+      8,
+      9
+    ],
+    "weights": [
+      1,
+      3,
+      5,
+      7,
+      11,
+      13,
+      17,
+      19
+    ]
+  },
+  "benchmark": {
+    "targets": [
+      "public generator G",
+      "nontrivial sum of signed first-slot leaves"
+    ],
+    "table_entries_per_two_target_arm": 262144,
+    "cache_unsigned_tuples_both_halves": 8192,
+    "cache_setup_ms": 7.953809,
+    "fresh_wall_ms": [
+      175.625104,
+      166.112302
+    ],
+    "cached_wall_ms": [
+      25.700974,
+      25.721692
+    ],
+    "fresh_mean_ms": 170.868703,
+    "cached_mean_ms": 25.711333,
+    "warm_chart_build_ratio": 6.645657111593551,
+    "two_target_mean_plus_cache_ms": 33.665142,
+    "two_target_cache_included_ratio": 5.075537866437634,
+    "digest": 1790301562,
+    "baseline_pivot_inversions_per_target": 524288,
+    "cached_online_denominator_inversions_per_target": 64,
+    "chart_tables_computed_per_target": 131072
+  },
+  "validation": {
+    "complete_b8_entrywise_equality": "2 public targets x both halves x 65536 signed charts = 262144",
+    "independent_python_bigint_half_charts": 128,
+    "independent_python_bigint_schur_det8_pairs": 64,
+    "source_specific_ci": "passed",
+    "original_rust_lib_tests": "40/40 passed",
+    "singular_denominator_failure_closed": "passed",
+    "signed_independent_pcc": "pending",
+    "existing_plus_focused_example_rust_tests": "8/8 passed"
+  },
+  "limitations": [
+    "This is not an unknown-index extractor. It still checks 4294967296 algebraic pairs on a complete negative B8 public target.",
+    "No complete prime-field ECDLP advantage demonstrated by this component alone.",
+    "Some old/new timings exclude EC supports, group relation finding, rank learning, online DLP verification and any linear algebra; different workload from BSGS/rho."
+  ],
+  "next_gate": "Integrate with #4692 only if B8 nonenumerative unknown-index extractor passes 46-positive/18-negative natural corpus, then #4728 rank31 and 1024 blinded complete logs fully charged versus strongest IC/BSGS/rho."
+}

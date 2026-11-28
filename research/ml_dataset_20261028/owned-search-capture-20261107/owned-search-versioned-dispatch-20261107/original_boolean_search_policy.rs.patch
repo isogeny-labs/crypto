@@ -1,0 +1,68 @@
+--- a/src/ml_dataset/original_boolean_search_policy.rs
++++ b/src/ml_dataset/original_boolean_search_policy.rs
+@@ -1,11 +1,10 @@
+-//! Proposed owner-only entry policy; no CLI schema or active dispatch is added.
++//! Finite owner entry for the explicit v5 matrix-continuation request.
+ //! The existing affine worker's finite ceilings are a conservative envelope,
+ //! not an assertion that this matrix continuation policy was already approved.
+ use super::*;
+ use crate::ml_dataset::types::CaseConfig;
+ 
+-/// Explicit source-level opt-in. A future worker request must freeze and bind
+-/// this choice before dispatch. No existing v1-v4 channel implies this choice.
++/// Explicit finite policy bound by the v5 request. No v1-v4 channel implies it.
+ #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+ pub(in crate::ml_dataset::solvers) enum ProposedPolicy {
+     ConservativeAffineEnvelopeV1,
+@@ -24,19 +23,8 @@
+ ];
+ 
+ fn eligible(config: &CaseConfig, policy: ProposedPolicy) -> bool {
+-    eligible_inputs(config.channels.is_some(), &config.solver,
+-        super::super::profile(&config.family, config.n, config.m),
+-        config.factor_base_size > 0, config.work_limit, config.degree_bound, policy)
+-}
+-// Pure request gate used by the authentic CaseConfig projection above.
+-fn eligible_inputs(has_channels: bool, solver: &str, profile: bool,
+-    factor_base_nonempty: bool, work: u64, degree: u32, policy: ProposedPolicy) -> bool {
+-    match policy {
+-        ProposedPolicy::ConservativeAffineEnvelopeV1 => !has_channels
+-            && solver == "f4" && profile && factor_base_nonempty && work > 0 && degree > 0,
+-    }
+-}
+-
++    super::super::owned_search_worker::selection(config).is_some_and(|(_,chosen)|chosen==policy)
++}
+ /// Called by the consuming entry only after its existing setup reservation and
+ /// actual sink/attempt checks, before it moves the original fields. The caller
+ /// performs a final Budget::check after this bounded, allocation-free factory.
+@@ -44,7 +32,8 @@
+     owner: &OriginalOwner<'_>,
+     policy: ProposedPolicy,
+ ) -> Result<Caps, Stop> {
+-    if !eligible(owner.original.config, policy) {
++    if !eligible(owner.original.config, policy)
++        || super::super::owned_search_worker::selection(owner.original.config).map(|(pattern,_)|pattern)!=owner.pattern {
+         return Err(Stop::InvalidLimits);
+     }
+     from_budget(&owner.budget, owner.original.config.degree_bound)
+@@ -235,18 +224,4 @@
+         assert!(matches!(from_budget(&b, 0), Err(Stop::InvalidLimits)));
+     }
+ 
+-    #[test]
+-    fn new_choice_does_not_reinterpret_existing_channel_requests() {
+-        let policy = ProposedPolicy::ConservativeAffineEnvelopeV1;
+-        assert!(eligible_inputs(false,"f4",true,true,16384,3,policy));
+-        for solver in ["f5","sat",""] {
+-            assert!(!eligible_inputs(false,solver,true,true,16384,3,policy));
+-        }
+-        // Every existing channel schema has Some(channels), including v1-v4.
+-        assert!(!eligible_inputs(true,"f4",true,true,16384,3,policy));
+-        assert!(!eligible_inputs(false,"f4",false,true,16384,3,policy));
+-        assert!(!eligible_inputs(false,"f4",true,false,16384,3,policy));
+-        assert!(!eligible_inputs(false,"f4",true,true,0,3,policy));
+-        assert!(!eligible_inputs(false,"f4",true,true,16384,0,policy));
+-    }
+-}
++}

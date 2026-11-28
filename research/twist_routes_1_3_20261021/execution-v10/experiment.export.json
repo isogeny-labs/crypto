@@ -1,0 +1,256 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "twist-endo-symmetry-20261027-v1",
+  "created": "2026-10-27T14:32:03Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "1bfb4a24bf342ec370dfaa59b861449fd7b59c422effd85def05139f47df5523",
+    "protocol_id": "twist-endo-symmetry-v1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": "GPT-6",
+    "session": "twist-endo-symmetry-20261027",
+    "role": "research-and-implementation"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "c12290db2fd94b4a929b2e0586ff8973dd8079a1",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": "HOST.json",
+    "sha256": "3b9a00f6457bdb5a8f9c7c9289d9f8f4f83f35fafe4659a68e24468ade6c4eb8",
+    "class_id": null,
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "memory_bytes": 18882674688,
+      "kernel": "Linux 6.18.55 #1 SMP Wed Oct 14 19:45:18 UTC 2026 x86_64 GNU/Linux",
+      "hypervisor": "KVM",
+      "isolation_tier_max": "L0"
+    }
+  },
+  "arms": [
+    {
+      "id": "native",
+      "role": "baseline",
+      "binary_sha256": "7b418e9571f0a90ee87578e44d1053363c2efd486306361450c5088e2c6603ae",
+      "commit": "c12290db2fd94b4a929b2e0586ff8973dd8079a1"
+    },
+    {
+      "id": "pari",
+      "role": "reference",
+      "binary_sha256": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "commit": "c12290db2fd94b4a929b2e0586ff8973dd8079a1"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "endo-native-000",
+      "arm": "native",
+      "instance_id": "p827-fixed-degree17-endomorphism",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "source_rational_checks": 823
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "twist_rational_checks": 833,
+          "generic_norm_compositions": 2,
+          "scalar_multiplicative_order": 274
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact correctness experiment; no performance comparison."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "native exact generic/finite endomorphism identities and independent PARI construction/group replay"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "725ce0e6d3b12a0437fb3e2cecc2b2c63880913bdaf337d4c560aa90fd15a819",
+          "bytes": 3988,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "d44883126457aa18a18e0e42a677d3e03be0cf6742a8a4a4bca4438303db4603",
+          "bytes": 1355,
+          "kind": "receipt"
+        },
+        {
+          "path": "ADMISSION.json",
+          "sha256": "3bccc6f8a18a32e5af193196564ec451cc58d8a03892a85b74d71f9a43e4b5e1",
+          "bytes": 5993,
+          "kind": "receipt"
+        },
+        {
+          "path": "runs/pari-v1/RECEIPT.json",
+          "sha256": "7aae51845662e35b29c7de0c4e3dab1b6f0df3ff4982e441a60782bbdbb38405",
+          "bytes": 1043,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": "2026-10-27T15:18:02.477Z",
+      "finished_at": "2026-10-27T15:18:02.991Z",
+      "worker": "7b418e9571f0a90ee87578e44d1053363c2efd486306361450c5088e2c6603ae",
+      "backend_ref": "runs/endo-v1"
+    },
+    {
+      "run_id": "endo-pari-000",
+      "arm": "pari",
+      "instance_id": "p827-fixed-degree17-endomorphism",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "measurements": {
+        "counted": {
+          "source_rational_checks": 823
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "twist_rational_checks": 833,
+          "generic_norm_compositions": 2,
+          "scalar_multiplicative_order": 274
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "Exact correctness experiment; no performance comparison."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "native exact generic/finite endomorphism identities and independent PARI construction/group replay"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "runs.tar.xz",
+          "sha256": "725ce0e6d3b12a0437fb3e2cecc2b2c63880913bdaf337d4c560aa90fd15a819",
+          "bytes": 3988,
+          "kind": "raw"
+        },
+        {
+          "path": "RAW_MEMBERS.json",
+          "sha256": "d44883126457aa18a18e0e42a677d3e03be0cf6742a8a4a4bca4438303db4603",
+          "bytes": 1355,
+          "kind": "receipt"
+        },
+        {
+          "path": "ADMISSION.json",
+          "sha256": "3bccc6f8a18a32e5af193196564ec451cc58d8a03892a85b74d71f9a43e4b5e1",
+          "bytes": 5993,
+          "kind": "receipt"
+        },
+        {
+          "path": "runs/pari-v1/RECEIPT.json",
+          "sha256": "7aae51845662e35b29c7de0c4e3dab1b6f0df3ff4982e441a60782bbdbb38405",
+          "bytes": 1043,
+          "kind": "receipt"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "96db9f9c75bcf665232278476bb752777086f6a86d1f645cb03a966987b96140",
+      "backend_ref": "runs/pari-v1"
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 2,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "FROZEN.json",
+      "sha256": "d297ad25f76f2968fb6b4771fc307551f230cef6f0f0a8da1f0c5abbf209a3e5",
+      "bytes": 2020,
+      "kind": "receipt"
+    },
+    {
+      "path": "protocol.json",
+      "sha256": "f223bae6ccf30ec499c282049960256877691d630716e0bbb78c91a1694cb8e9",
+      "bytes": 10851,
+      "kind": "protocol"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../runner/src/endo_experiment_20261027.rs",
+      "sha256": "c440677a3b8e9f1387b23d31a50fdb26fb6b087d88266724602ff55d4f5a7425",
+      "bytes": 9713,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "ADMISSION.json",
+        "sha256": "3bccc6f8a18a32e5af193196564ec451cc58d8a03892a85b74d71f9a43e4b5e1",
+        "bytes": 5993,
+        "kind": "analysis"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "One fixed public degree17 endomorphism: exact generic Frobenius/norm identities, full source/twist finite checks and scalar action. Counts are exact, not independent DLP samples or calibrated cost. No novelty, unknown-log, NIST or speed claim.",
+      "by": "native publication tool"
+    }
+  ],
+  "reviews_dir": "reviews"
+}

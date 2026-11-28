@@ -1,0 +1,20 @@
+{
+  "schema": "ecdb.research_sweep/v1",
+  "name": "cm-isogeny-strata",
+  "version": 1,
+  "description": "Cross-field CM, endomorphism-order, automorphism, isomorphism and isogeny-connectivity cohorts for confounder-aware models.",
+  "objective": "Separate field-size effects from imaginary-quadratic order, class group, conductor, automorphism, isomorphism and recorded-isogeny effects.",
+  "selection_policy": {"order_by":"field_bits","order":"asc","secondary_order":"icv1_slug","deduplicate_by":"icv1_slug","freeze_membership_before_measurement":true},
+  "feature_keys": ["field.kind","field.order_bits","frobenius.trace_ratio","cm.fundamental_discriminant","cm.frobenius_conductor_bits","cm.maximal_order_class_number","endomorphism.discriminant","endomorphism.conductor","endomorphism.is_maximal","endomorphism.class_number","endomorphism.class_group_rank","endomorphism.class_group_two_rank","automorphism.base_field_order","isogeny_class.curve_count","graph.isogeny_count","graph.isogeny_prime_count","graph.isomorphism_relation_count","graph.volcano_level_count"],
+  "labels": {"campaign":"structural-ml","focus":"imaginary quadratic orders, isomorphism and isogeny classes"},
+  "cells": [
+    {"key":"maximal-order","ordinal":0,"target_curves":256,"selection_seed":"2026111731","curve_filter":{"genus":1,"end_is_maximal":true},"factor_base_selectors":[],"measurement_plan":{"stratify_by":["field_kind","field_bits","endomorphism.discriminant"]}},
+    {"key":"class-number-1","ordinal":1,"target_curves":256,"selection_seed":"2026111732","curve_filter":{"genus":1,"class_number":"1"},"factor_base_selectors":[],"measurement_plan":{"stratify_by":["field_kind","field_bits","cm.fundamental_discriminant"]}},
+    {"key":"class-number-2-to-4","ordinal":2,"target_curves":256,"selection_seed":"2026111733","curve_filter":{"genus":1,"class_number_max":"4"},"factor_base_selectors":[],"measurement_plan":{"post_filter":"cm.maximal_order_class_number >= 2","stratify_by":["field_kind","field_bits","cm.maximal_order_class_number"]}},
+    {"key":"small-frobenius-conductor","ordinal":3,"target_curves":256,"selection_seed":"2026111734","curve_filter":{"genus":1,"conductor_bits_max":8},"factor_base_selectors":[],"measurement_plan":{"stratify_by":["field_kind","field_bits","cm.frobenius_conductor_bits"]}},
+    {"key":"j-zero","ordinal":4,"target_curves":256,"selection_seed":"2026111735","curve_filter":{"genus":1,"j_invariant":"0"},"factor_base_selectors":[{"family":"glv-orbit"}],"measurement_plan":{"controls":["same-size factor base without automorphism quotient"],"stratify_by":["field_kind","field_bits","automorphism.base_field_order"]}},
+    {"key":"j-1728","ordinal":5,"target_curves":256,"selection_seed":"2026111736","curve_filter":{"genus":1,"j_invariant":"1728"},"factor_base_selectors":[{"family":"glv-orbit"}],"measurement_plan":{"controls":["same-size factor base without automorphism quotient"],"stratify_by":["field_kind","field_bits","automorphism.base_field_order"]}},
+    {"key":"recorded-isogeny-graphs","ordinal":6,"target_curves":256,"selection_seed":"2026111737","curve_filter":{"genus":1,"has_isogenies":true},"factor_base_selectors":[],"measurement_plan":{"stratify_by":["field_kind","field_bits","graph.isogeny_prime_count","endomorphism.conductor"]}},
+    {"key":"explicit-isomorphisms","ordinal":7,"target_curves":256,"selection_seed":"2026111738","curve_filter":{"genus":1},"factor_base_selectors":[],"measurement_plan":{"post_filter":"graph.isomorphism_relation_count > 0","stratify_by":["field_kind","field_bits","curve.model"]}}
+  ]
+}

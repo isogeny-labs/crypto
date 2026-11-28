@@ -1,0 +1,33 @@
+[package]
+name = "nagao-template-probe"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[lib]
+name = "nagao_template"
+path = "../../../../src/cryptanalysis/jv_nagao_template.rs"
+
+[[bin]]
+name = "nagao-template-probe"
+path = "src/main.rs"
+
+[[bin]]
+name = "nagao-koszul-probe"
+path = "src/koszul.rs"
+
+[[bin]]
+name = "nagao-saved-shape"
+path = "src/shape.rs"
+
+[[bin]]
+name = "nagao-degree7-probe"
+path = "src/degree7.rs"
+
+[dependencies]
+certified-relations = { path = "../../../../crates/certified-relations", features = ["count-field-ops"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"

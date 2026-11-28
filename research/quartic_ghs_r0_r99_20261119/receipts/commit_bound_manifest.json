@@ -1,0 +1,136 @@
+{
+  "schema": "ghs-r0-r99-source-bound-correctness-v1",
+  "scope": "q223-correctness-only",
+  "standing": "pcc-unverified",
+  "created_utc": "2026-11-19T05:48:34Z",
+  "repository": "aburan28/crypto",
+  "source_commit": "95297ce1d098e124e72d45effc07fe8c640de82b",
+  "source_tree": "aaf30505039899dfce2125579cf1256d308ecd1b",
+  "source_materialization": {
+    "method": "git archive",
+    "command": "git archive 95297ce1d098e124e72d45effc07fe8c640de82b research/quartic_ghs_strong_rho_20261114 research/quartic_n4_20261019 research/quartic_n4v2_20261020 src/cryptanalysis/plane_quartic_pic.rs | tar -x -C <fresh-mktemp-dir>",
+    "source_sha256_manifest": "fe70a65528a474488875b55a61be084c4a17a17e19c0ee77c5aa4c04ae364290",
+    "pre_post_source_hashes_equal": true,
+    "files": [
+      {
+        "path": "research/quartic_ghs_strong_rho_20261114/main.rs",
+        "git_blob": "8faa6c149d59b6100290e99cfe644cb3b7b0ac84",
+        "sha256": "957557d731a983e58887b9c51a89d5ef107f1162084b4689dc8c94a332dc19fd"
+      },
+      {
+        "path": "research/quartic_ghs_strong_rho_20261114/strong_rho.rs",
+        "git_blob": "b85a94e2d5a3c3c33183cfbaf324698511e4e63f",
+        "sha256": "b1d223a1e8d812d55250edc42b8e5afe48cf2544aec0aec161ca6568085f0464"
+      },
+      {
+        "path": "research/quartic_n4_20261019/common.rs",
+        "git_blob": "8b39bbf68f600ee0b7d8c34a74dd8517985219f9",
+        "sha256": "832fd28810909194875a9438e164ec1b45dcefbaa83257b4e3fad3095ef865d6"
+      },
+      {
+        "path": "research/quartic_n4_20261019/ghs.rs",
+        "git_blob": "00bbc4cd3df26b31f4c31a957cdb8c74873a1b65",
+        "sha256": "652b4760c993e0daa2687837d81f5bd49447dd5d1a562425c55302b4df66abf2"
+      },
+      {
+        "path": "research/quartic_n4v2_20261020/rho2.rs",
+        "git_blob": "8219eb8eb3912fd8aa035ce11db5b7654500b1a8",
+        "sha256": "e18d2802e72ff71e8bc20e5c834b7085124c5aa5d756b9e49773b97f519fd7ec"
+      },
+      {
+        "path": "src/cryptanalysis/plane_quartic_pic.rs",
+        "git_blob": "dab87ba5c1e3bbc31110b5d6f6d5ada29234e823",
+        "sha256": "e6cf9d5337f1ba3d6b2bc22b1d4f29f4093831817721452e1702a055cf3d1c37"
+      }
+    ]
+  },
+  "compiler": {
+    "version": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "commit_hash": "0ef1bc386059596dada8fb65b50425aab2ea637a",
+    "host": "x86_64-unknown-linux-gnu",
+    "llvm_version": "23.1.5",
+    "verbose_output_sha256": "be69adad9137eaa0bdac1dd07e2fe286b1831fc8bad193ea27806ca0c7c8e7c6"
+  },
+  "build": {
+    "command": "GHS_SOURCE_REVISION=95297ce1d098e124e72d45effc07fe8c640de82b rustc --edition 2021 -C opt-level=3 -C codegen-units=1 -C strip=debuginfo --remap-path-prefix <archive-root>=/source <archive-root>/research/quartic_ghs_strong_rho_20261114/main.rs -o <scratch>/ghs-strong-rho",
+    "path_policy": "The fresh archive root is normalized to /source; no absolute scratch path is evidentiary.",
+    "binary_sha256": "cbd81182cd5bf6d91ebb53e45d3b353644fae48372eaddc856415808124f28b5",
+    "binary_bytes": 848736,
+    "independent_archive_rebuilds": 2,
+    "independent_archive_rebuild_sha256_equal": true,
+    "rebuild_script": "../prototypes/rebuild_commit_bound.sh",
+    "rebuild_script_sha256": "f78661498666b53ca6d28cfbd32e447b73b4c6c0b95967a3ff827ebf4dbb4f9b",
+    "rebuild_receipt": "commit_bound_rebuild.txt",
+    "rebuild_receipt_sha256": "30f06f45904cbd47ea3b081822ad1d2ed44c659406b120792ce939ff42136f63",
+    "binary_format": "ELF 64-bit LSB PIE executable, x86-64, dynamically linked"
+  },
+  "selftest": {
+    "command": "<scratch>/ghs-strong-rho selftest",
+    "exit_code": 0,
+    "stdout": "commit_bound_selftest.stdout.txt",
+    "stdout_sha256": "a375a9767b166ca9b90914835eef192a5f7cd2acba5a09d7b5f16a008ecd5e38",
+    "stdout_bytes": 12,
+    "stderr": "commit_bound_selftest.stderr.txt",
+    "stderr_sha256": "e04b10c45ecf697666f0172d84c5d1e3eb79af1c255b4cc4e3b9b648ffb228fd",
+    "stderr_bytes": 2227,
+    "final_stdout_line": "SELFTEST OK"
+  },
+  "run": {
+    "environment": {
+      "GHS_CALIB_TRIPLES": "1",
+      "GHS_ISOLATION": "correctness-only"
+    },
+    "command": "<scratch>/ghs-strong-rho run 223 1 0 1 ic-repeat strong-b8,strong-b8-mul6,strong-b8-mul5,strong-b8-walker-table,strong-b8-mul6-walker-table,strong-b8-mul5-walker-table,fast-b8-mul5-walker-table,bare-b8-mul5-walker-table",
+    "exit_code": 0,
+    "record": "commit_bound_q223.jsonl",
+    "record_sha256": "761bdf3a2ef4d85a587f952e7cfc1e1313b8f3aadab01b6578a6b7ad2925bc6b",
+    "record_bytes": 12711,
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_bytes": 0,
+    "line_count": 10,
+    "rho_record_count": 8,
+    "arms": [
+      "strong-b8",
+      "strong-b8-mul6",
+      "strong-b8-mul5",
+      "strong-b8-walker-table",
+      "strong-b8-mul6-walker-table",
+      "strong-b8-mul5-walker-table",
+      "fast-b8-mul5-walker-table",
+      "bare-b8-mul5-walker-table"
+    ]
+  },
+  "record_schema": {
+    "field_counter_names": [
+      "fq_mul",
+      "fq_inv",
+      "fq_add",
+      "fq_small_div",
+      "f3_mul",
+      "f3_sq",
+      "f3_inv",
+      "batch_inv",
+      "group_add"
+    ],
+    "native_counter_names": [
+      "rng",
+      "hash",
+      "canon",
+      "lookahead_test",
+      "dp",
+      "table",
+      "cycle_cmp",
+      "scalar_add",
+      "scalar_mul",
+      "scalar_inv",
+      "band_ops"
+    ]
+  },
+  "evidence_boundary": {
+    "source_bound": true,
+    "correctness_and_deterministic_counts_admissible": true,
+    "timing_admissible": false,
+    "leaderboard_admissible": false,
+    "reason": "The q=223 cell is a deterministic correctness and counter-control replay with one calibration triple in a non-isolated workspace. wall_s and calibration timing fields are incidental and excluded."
+  }
+}

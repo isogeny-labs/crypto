@@ -1,0 +1,53 @@
+Study: trace_zero_leads_20261109; date2026-11-09 UTC.
+Parent revision: b6f3c1aa011f5c7ab5bf251eefe6eb23a48e4e7b.
+Repository: isogeny-labs/crypto; branch codex/ecc2k-trace-homomorphism.
+Workspace: /workspace/crypto-trace. Final source identity is SOURCES.sha256.
+Runtime: Linux6.18.57 x86_64 GNU/Linux, rustc1.99.1(58cf8f9c3), cargo1.99.1.
+Host: shared development workspace; no CPU isolation or benchmark claim.
+Profiles: ordinary unoptimized Rust test/dev, no custom optimization flags.
+Workload: exact deterministic polynomial/circuit constructions, exhaustive small-field unit checks,
+production public n83/131 fixtures and bounded singleton-domain correctness controls.
+No statistical inference, timing normalization or performance ratio is reported.
+
+New focused suite, exit0:
+cargo test --locked --manifest-path research/trace_zero_leads_20261109/native/Cargo.toml -- --nocapture --test-threads=1
+Seven tests. Raw output: new-tests.txt. Includes sign-restricted and multiple-x finite bases.
+Initial seven-test run before the additional multiple-x base cases also passed.
+Original six-test development run had two unused-import warnings, subsequently removed.
+The test harness elapsed durations are not benchmark measurements.
+
+Original production-source regression suite, exit0:
+cargo test --locked --manifest-path research/full_trace_zero_variety_20261109/native/Cargo.toml -- --nocapture --test-threads=1
+Ten tests; raw output: original-regressions.txt. Explicit n83 bounded control remains UNKNOWN.
+No ordinary whole-root test pass is asserted.
+
+Root integration type-check, exit0:
+cargo check --lib --no-default-features
+Raw output: root-check.txt.
+
+Deterministic constructor:
+cargo run --locked --quiet --manifest-path research/trace_zero_leads_20261109/native/Cargo.toml
+stdout: ../models.json. n83/131; d8/16/32/64; all three modes on identical supplied bases.
+Includes m3 identity masks0/1 on the same singleton x domain, before full-point pins.
+No solver is run by this constructor. Test controls use1 second and2000 conflicts;
+the certified m2 oracle control uses2 seconds and2000 conflicts. All are known-answer fixtures.
+
+Integral certificate generation/replay, exit0:
+cargo run --locked --quiet --manifest-path research/trace_zero_leads_20261109/native/Cargo.toml --bin certify_subtrace_polarization
+stdout: ../subtrace-polarization.identity.json; stderr: identity-check.txt.
+Seed20261109,32 issued plus32 local replay points, degree2 over2^61-1.
+The unit suite adds another32-point replay stream and changed-degree-bound rejection.
+No independent signature, formal proof or char2 descent certificate is asserted.
+
+Prior-art receipt:
+KB tools absent; scripts/research-kb status exit127/no executable.
+Remote current atlas README and four scoped lead rows read using GitHub connector;
+primary arXiv1503.08001,1304.0521 and initially retrieved AFRICACRYPT2020 primary text.
+PMC follow-up served recaptcha; no absence/novelty claim follows.
+Conductor binary absent; docs/CONDUCTOR.md no-binary fallback used.
+No EKS job, paid run, natural-target solver benchmark or sibling-ledger mutation.
+
+Report: Typst0.15.1, report.typ and leads.svg, final report.pdf3 pages.
+Every page rasterized and visually inspected. Final page re-inspected after
+adding the required quadraticized-S3 baseline caveat for TZL-03.
+No displayed input-degree claim substitutes for a matched solving-degree result.

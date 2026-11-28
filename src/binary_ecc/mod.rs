@@ -61,13 +61,14 @@ pub mod f2m;
 pub mod hyperelliptic;
 pub mod operation_tally;
 pub mod poly_f2m;
+pub mod trace_zero;
 
 pub use cover_transfer::{
     BinaryCoverCertificate, BinaryCoverPoint, ClosedPointPushforwardCertificate,
-    CoverTransferError, ImageEndomorphismCertificate, JacobianPushforwardCertificate,
-    OrdinaryBinaryCover, PullPushCompositionCertificate, PullbackClosedPointCertificate,
-    PullbackFiberKind, SubgroupTransferStatus, TorsionProjectorCertificate,
-    UnsupportedCoverOperation,
+    CoverTransferError, GeneratedSubgroupTransferCertificate, ImageEndomorphismCertificate,
+    JacobianPushforwardCertificate, OrdinaryBinaryCover, PullPushCompositionCertificate,
+    PullbackClosedPointCertificate, PullbackFiberKind, SubgroupTransferStatus,
+    TorsionProjectorCertificate, UnsupportedCoverOperation,
 };
 pub use curve::{BinaryCurve, BinaryPoint};
 pub use f2m::{F2mElement, IrreduciblePoly};
@@ -77,3 +78,8 @@ pub use hyperelliptic::{
     MAX_CHECKED_FIELD_DEGREE,
 };
 pub use poly_f2m::F2mPoly;
+pub use trace_zero::{
+    TraceZeroAffineMode, TraceZeroAffineSystem, TraceZeroCoordinates, TraceZeroError,
+    TraceZeroFactorBase, TraceZeroKummerMode, TraceZeroKummerSystem, TraceZeroSubspaceProfile,
+    TraceZeroVariety,
+};

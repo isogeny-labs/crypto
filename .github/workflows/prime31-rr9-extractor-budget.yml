@@ -1,0 +1,62 @@
+name: Prime31 RR9 public-only extractor budget replay
+on:
+  push:
+    branches:
+      - automation/prime31-rr9-extractor-budget-gate-20261119
+    paths:
+      - ".github/workflows/prime31-rr9-extractor-budget.yml"
+      - "research/prime31_ic_20261115/native/examples/prime31_rr9_extractor_budget.rs"
+      - "research/prime31_ic_20261115/rr9/RR9_EXTRACTOR_COST_GATE_INPUT_20261119.json"
+  pull_request:
+    paths:
+      - ".github/workflows/prime31-rr9-extractor-budget.yml"
+      - "research/prime31_ic_20261115/native/examples/prime31_rr9_extractor_budget.rs"
+      - "research/prime31_ic_20261115/rr9/RR9_EXTRACTOR_COST_GATE_INPUT_20261119.json"
+permissions:
+  contents: read
+jobs:
+  replay:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Pin and checkout already verified original Prime31 Rust source
+        uses: actions/checkout@v4
+        with:
+          repository: isogeny-labs/crypto
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Install Rust 1.100.0
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay only cost replay example and its frozen input
+        run: |
+          mkdir -p pinned/research/prime31_ic_20261115/rr9
+          cp research/prime31_ic_20261115/native/examples/prime31_rr9_extractor_budget.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_rr9_extractor_budget.rs
+          cp research/prime31_ic_20261115/rr9/RR9_EXTRACTOR_COST_GATE_INPUT_20261119.json \
+            pinned/research/prime31_ic_20261115/rr9/RR9_EXTRACTOR_COST_GATE_INPUT_20261119.json
+      - name: Check frozen cost replay input and source hashes
+        run: |
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_rr9_extractor_budget.rs
+          sha256sum research/prime31_ic_20261115/rr9/RR9_EXTRACTOR_COST_GATE_INPUT_20261119.json
+      - name: Focused original-source Rust tests
+        run: |
+          cargo +1.100.0 test --locked --manifest-path \
+            pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_extractor_budget
+      - name: Deterministic source-bound arithmetic replay (not a solver benchmark)
+        run: |
+          cargo +1.100.0 run --locked --release --manifest-path \
+            pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_rr9_extractor_budget > prime31-rr9-extractor-budget-output.json
+          cat prime31-rr9-extractor-budget-output.json
+          sha256sum prime31-rr9-extractor-budget-output.json
+      - name: Preserve replay output
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-rr9-extractor-budget-replay
+          path: prime31-rr9-extractor-budget-output.json
+          if-no-files-found: error

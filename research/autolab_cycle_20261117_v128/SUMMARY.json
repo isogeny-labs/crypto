@@ -1,0 +1,373 @@
+{
+  "binary_basis": {
+    "out": {
+      "variants": {
+        "1": {
+          "variables": 47423,
+          "clauses": 169942,
+          "unique_nonconstant_rows": 1,
+          "graph_sha256": "36b4a6c48ce5d0b2439046c390536810f69870c7c881144ed59284ad16eac1e1",
+          "rows": [
+            {
+              "precision": 18,
+              "factor": "A",
+              "coefficient": 1
+            }
+          ],
+          "compile_and_check_seconds": 0.5027490539941937
+        },
+        "2": {
+          "variables": 47424,
+          "clauses": 169947,
+          "unique_nonconstant_rows": 2,
+          "graph_sha256": "d2037c4ea6e3302deabb3de01a785fc71598264b7bc2a5f1ca3637567378516b",
+          "rows": [
+            {
+              "precision": 18,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 19,
+              "factor": "A",
+              "coefficient": 1
+            }
+          ],
+          "compile_and_check_seconds": 0.32097727901418693
+        },
+        "4": {
+          "variables": 47426,
+          "clauses": 169957,
+          "unique_nonconstant_rows": 4,
+          "graph_sha256": "6884bfeaad57c7ebd186379f4af23adf31b7262bc5af5fe009ac128854adaf80",
+          "rows": [
+            {
+              "precision": 18,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 19,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 20,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 21,
+              "factor": "A",
+              "coefficient": 1
+            }
+          ],
+          "compile_and_check_seconds": 0.3221682260045782
+        },
+        "8": {
+          "variables": 47430,
+          "clauses": 169977,
+          "unique_nonconstant_rows": 8,
+          "graph_sha256": "256c3b08787e5c1352c6b9518e838c4b9c0791152f94d5c68cc5170d9c5f6768",
+          "rows": [
+            {
+              "precision": 18,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 19,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 20,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 21,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 22,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 23,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 24,
+              "factor": "A",
+              "coefficient": 1
+            },
+            {
+              "precision": 25,
+              "factor": "A",
+              "coefficient": 1
+            }
+          ],
+          "compile_and_check_seconds": 0.33896165000624023
+        }
+      },
+      "exhaustive_assignments": 131072,
+      "supported_assignments": 800,
+      "random_assignments": 512,
+      "basis_equivalence_checks": 33096,
+      "coefficient_identity_checks": 100272,
+      "counterexample_checks": 1,
+      "actual_acceptance_controls": 128,
+      "selected_count": 8,
+      "original_complete": false,
+      "source": {
+        "variables": 47422,
+        "clauses": 169937,
+        "graph_sha256": "c3ce8ebaecb0114f3f1242388a7e3c5680ab75619cf76cc4631b88466feac2f8"
+      },
+      "total_seconds": 4.741552507010056
+    },
+    "error": null
+  },
+  "field_basis": {
+    "out": {
+      "contexts": [
+        {
+          "name": "GF2",
+          "p": 2,
+          "degree": 1,
+          "q": 2
+        },
+        {
+          "name": "GF4",
+          "p": 2,
+          "degree": 2,
+          "q": 4
+        },
+        {
+          "name": "GF8",
+          "p": 2,
+          "degree": 3,
+          "q": 8
+        },
+        {
+          "name": "GF2^83",
+          "p": 2,
+          "degree": 83,
+          "q": 9671406556917033397649408
+        },
+        {
+          "name": null,
+          "p": 3,
+          "degree": 1,
+          "q": 3
+        },
+        {
+          "name": null,
+          "p": 5,
+          "degree": 1,
+          "q": 5
+        },
+        {
+          "name": null,
+          "p": 3,
+          "degree": 2,
+          "q": 9
+        },
+        {
+          "name": null,
+          "p": 5,
+          "degree": 2,
+          "q": 25
+        },
+        {
+          "name": null,
+          "p": 3,
+          "degree": 3,
+          "q": 27
+        },
+        {
+          "name": null,
+          "p": 7,
+          "degree": 1,
+          "q": 7
+        },
+        {
+          "name": null,
+          "p": 11,
+          "degree": 1,
+          "q": 11
+        },
+        {
+          "name": null,
+          "p": 7,
+          "degree": 2,
+          "q": 49
+        },
+        {
+          "name": "P-192",
+          "p": 6277101735386680763835789423207666416083908700390324961279,
+          "degree": 1,
+          "q": 6277101735386680763835789423207666416083908700390324961279
+        },
+        {
+          "name": "P-224",
+          "p": 26959946667150639794667015087019630673557916260026308143510066298881,
+          "degree": 1,
+          "q": 26959946667150639794667015087019630673557916260026308143510066298881
+        },
+        {
+          "name": "P-256",
+          "p": 115792089210356248762697446949407573530086143415290314195533631308867097853951,
+          "degree": 1,
+          "q": 115792089210356248762697446949407573530086143415290314195533631308867097853951
+        },
+        {
+          "name": "P-384",
+          "p": 39402006196394479212279040100143613805079739270465446667948293404245721771496870329047266088258938001861606973112319,
+          "degree": 1,
+          "q": 39402006196394479212279040100143613805079739270465446667948293404245721771496870329047266088258938001861606973112319
+        },
+        {
+          "name": "P-521",
+          "p": 6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151,
+          "degree": 1,
+          "q": 6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151
+        }
+      ],
+      "planted_pairs": 204,
+      "reference_cases": 28,
+      "inverse_checks": 187,
+      "coefficient_identity_checks": 1224,
+      "basis_equivalence_checks": 1530,
+      "full_lift_comparisons": 204,
+      "counterexamples": 17,
+      "repeated_factor_checks": 17,
+      "original_complete": false
+    },
+    "error": null
+  },
+  "hard_search": {
+    "out": {
+      "models": [],
+      "original_complete": false,
+      "original_exact_root_count": null,
+      "independent_unsat_certificate": false,
+      "scope": "conditional k3only,fixednecessarynormfamily;otherstrata/outerfamilies/source/Uunresolved",
+      "inputs": 63,
+      "variables": 47430,
+      "cold_compile_seconds": 0.25905931298621,
+      "soft_total_target_seconds": 40,
+      "graph_sha256": "256c3b08787e5c1352c6b9518e838c4b9c0791152f94d5c68cc5170d9c5f6768",
+      "selected_defect_count": 8,
+      "defect_rows": [
+        {
+          "precision": 18,
+          "factor": "A",
+          "coefficient": 1
+        },
+        {
+          "precision": 19,
+          "factor": "A",
+          "coefficient": 1
+        },
+        {
+          "precision": 20,
+          "factor": "A",
+          "coefficient": 1
+        },
+        {
+          "precision": 21,
+          "factor": "A",
+          "coefficient": 1
+        },
+        {
+          "precision": 22,
+          "factor": "A",
+          "coefficient": 1
+        },
+        {
+          "precision": 23,
+          "factor": "A",
+          "coefficient": 1
+        },
+        {
+          "precision": 24,
+          "factor": "A",
+          "coefficient": 1
+        },
+        {
+          "precision": 25,
+          "factor": "A",
+          "coefficient": 1
+        }
+      ],
+      "backend_configuration_readback": {
+        "threads": "1",
+        "cut": "true",
+        "cut.xor": "true",
+        "cut.aig": "true",
+        "cut.delay": "0",
+        "anf": "false"
+      },
+      "formulation_seconds": 3.9677272209955845,
+      "version": "4.15.4",
+      "cpu_affinity": [
+        0
+      ],
+      "last_answer": "unknown",
+      "termination": "unknown",
+      "reason_unknown": "timeout",
+      "statistics": {
+        "sat mk clause 2ary": "177751",
+        "sat mk clause 3ary": "73717",
+        "sat mk clause nary": "323150",
+        "sat mk var": "94615",
+        "sat gc clause": "82971",
+        "sat del clause": "222661",
+        "sat conflicts": "119255",
+        "sat decisions": "158311",
+        "sat propagations 2ary": "17292637",
+        "sat propagations nary": "163260161",
+        "sat restarts": "11266",
+        "sat minimized lits": "5212071",
+        "sat subs resolution dyn": "61099",
+        "sat units": "569",
+        "sat elim bool vars res": "22817",
+        "sat backjumps": "119255",
+        "sat elim clauses": "552",
+        "sat elim literals": "636",
+        "sat subsumed": "3657",
+        "sat subs resolution": "3979",
+        "sat scc elim vars": "47438",
+        "sat scc elim binary": "1",
+        "sat tr": "65",
+        "sat probing assigned": "2",
+        "sat-cut.eqs": "258",
+        "sat-cut.cuts": "82347",
+        "sat-cut.ands": "19385",
+        "sat-cut.xors": "27798",
+        "sat-cut.xands": "4713",
+        "sat-cut.xites": "6384",
+        "sat-cut.xxors": "11080",
+        "sat-cut.dc-reduce": "2502",
+        "rlimit count": "179423668",
+        "max memory": "231.82",
+        "memory": "83.88",
+        "num allocs": "11231440967.0",
+        "time": "36.107"
+      },
+      "engine_seconds": 40.078629344003275,
+      "soft_target_overshoot_seconds": 0.07862934400327504,
+      "complete": false,
+      "exact_root_count": null
+    },
+    "error": "nativeunknown"
+  },
+  "original_complete": false,
+  "qualified_speedup": null,
+  "goal_active": true
+}

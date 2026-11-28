@@ -1,0 +1,37 @@
+{
+  "card_id": "CARD-n83-native-phase-20261019-v2-controls",
+  "relay_verbatim": true,
+  "record_digests_verified": true,
+  "outcome": "executed_as_specified",
+  "stopped_at_step": null,
+  "recommendation": "proceed_to_analysis",
+  "reasons": [
+    "Native card-check independently returned record_digests_verified=true, relay_verbatim=true, status=completed for the actual controls-relay.txt.",
+    "Receipt records all three frozen commands succeeded with exit 0 and no timeouts; card_changed=false; dirty_before and dirty_after are empty.",
+    "Exact small-field original-group assertion test passed; trace checker reported four SAT returns across six segments.",
+    "Native witness audit status is PASS_KNOWN_WITNESS_MODEL_AND_INDEPENDENT_GROUP_SUM; control variant fixed_coordinates_representatives_and_phases; SAT_verified_witness_x; model_verified=true; conflicts=0 within cap5000.",
+    "Witness outer record has exit_code=0, wall_censored=false, cleanup_verified=true.",
+    "V1 free-selector control remains separately wall-censored at180s and did not satisfy its gate; this v2 predicate does not discharge that search gap."
+  ],
+  "interpretation": "not_assessed",
+  "evidence": {
+    "card": "/home/ec2-user/scratch/n83-native-phase-20261019/v2/cards/controls.json",
+    "card_sha256": "c73a8ec8cd6ffca7558546aa3ccb588451bf50b538ccc1e77e570b164868878a",
+    "relay": "/home/ec2-user/scratch/n83-native-phase-20261019/v2/controls-relay.txt",
+    "relay_sha256": "d292ef6732674a685ce0b471a3853cea0f75500703b0acb9b4d41f2778f8538f",
+    "receipt": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/controls.receipt.json",
+    "witness_audit": "/home/ec2-user/crypto-n83-resume/research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/exec/witness/audit.json",
+    "source_commit": "c259497ec9cf1fde358ffc91eabe8c2cff242f95"
+  },
+  "retained_arm_gate": {
+    "v2_controls_completed": true,
+    "protocol": "research/koblitz_n83_factor_base_sweep_20261008/verification/native-phase-20261019-v2/PROTOCOL.md",
+    "authorized_sequence": [
+      "K2048",
+      "K4096"
+    ],
+    "dispatch_owner": "parent",
+    "scope": "Separately frozen natural one-trial cards with no selector pins; no automatic retries; K4096 remains requested after controls even if K2048 has an unsupported disposition.",
+    "performance_or_scalar_promotion": false
+  }
+}

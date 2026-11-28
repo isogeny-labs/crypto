@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T16:35:06Z",
+ "id": "PCC-20261123-fb8892",
+ "kind": "statement",
+ "producer": {
+  "commit": "50a9820906698926868f7c97a6f7ed23755ee29d",
+  "model": "GPT-6 Astra Pro",
+  "session": "vitse-prime31-compatibility-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/root-gate-04/gate-result.json",
+    "sha256": "05a2ce5da8a5c9581896d3f95736fbe366267ac6e4705cd82f34a246d5f16643"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/root-gate-04/failure-analysis.json",
+    "sha256": "95308d27e8b7bb25d0b22c48d64e68f455b220d38f7aa988b665b3bdc9059203"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/root-gate-04/cargo-test-release-lib.log",
+    "sha256": "435d6cf1f658b32f72e8d66bc311085f6b7a4c0d8777d5bd38db8fb4b7deb357"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/vitse_prime31_compatibility_20261123/evidence/final-main-integration.json",
+    "sha256": "62f9454d36ac7e7bb83f584d9db747cbb5bdb11857134917db8b6796975f7cc9"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Current-main root attempt04 and exact selected-source comparison; historical attempts and earlier claim payloads remain unchanged",
+ "statement": "After main changed the previously failing EFD test source, the separately frozen full root-library gate ran cargo test --release --lib --locked at exact revision 71408278696c957d4b5983d4049bdac3e1bc98ba with unchanged defaults and one job. It exited 101 after 20.599 seconds on Rust E0428: duplicate round73_mersenne_single_fold test modules at lines 5097 and 5409 of src/cryptanalysis/prime_radical_root.rs. No root tests executed. All 2737 materialized tracked files matched the committed blobs and remained unchanged, as did the manifest, lock and toolchain. The selected PKM, identity, SHA and selector blobs remain identical to the audit baseline. This is an unsigned same-team execution and source observation, not a full-suite pass or independent scientific verification."
+}

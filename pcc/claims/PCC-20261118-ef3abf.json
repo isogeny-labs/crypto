@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T18:10:23Z",
+ "id": "PCC-20261118-ef3abf",
+ "kind": "statement",
+ "producer": {
+  "commit": "83d6c8b17141c74fd3b344d5c2ad1a513c7ac580",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/construction-audit-20261118/summary.json",
+    "sha256": "11245810750b8ae10a27af80801964382d3dc6c6ddd7283b4ca316a39d6c7256"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/construction-audit-20261118/attempt-b/positive.json",
+    "sha256": "004cd059df987723813297f74266f6879944e9c8f54e3bcd9584a73107c0426d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/construction-audit-20261118/attempt-b/dependent.stderr",
+    "sha256": "44622455a8a5f29785426fe26188023a3848dab47e66afbabdfcf4172ab42912"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/construction-audit-20261118/pre-call-v2.sha256",
+    "sha256": "0cfc2634e7e671d119e91e16aed74ed2706e9f022d8ed95327ec890470fa2792"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/construction-audit-20261118",
+ "statement": "On the frozen 80-bit ordinary source, the corrected signed-input native checker matches 128 CM degree-2 images against PARI across both conjugate branches and two 32-scalar panels. K and alpha(K) have a primitive prime-order Weil pairing; a dependent pair rejects. Given the frozen CM trace/maximal-order input, native ring and PARI matrix checks certify 80 full-two-power-torsion orders; E[2^41] needs degree 549755813888 and E[2^80] needs degree 302231454903657293676544 for the specific power-of-two routes. This is source prerequisite evidence only: no target quotient, target non-kernel image, timing, general impossibility or completed conductor crossing is established. The invalid unsigned-parser attempt and failed API build remain retained."
+}

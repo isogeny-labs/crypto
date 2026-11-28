@@ -1,0 +1,21 @@
+import StoredDecode
+set_option autoImplicit false
+namespace StoredInput
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy FastPrelude FastCalls FastPayload
+
+theorem stored_fast_calls (p : UInt64) [Fact p.toNat.Prime]
+ (f : List UInt64) (a b : Stored) (hp : 2<p.toNat) (hbound : p.toNat<2^31)
+ (hf : Canon p f) (hfd : (wordsPoly p f).natDegree=5)
+ (ha : WellFormed p (wordsPoly p f) a) (hb : WellFormed p (wordsPoly p f) b)
+ (hda : a.degree=2) (hdb : b.degree=2)
+ (hn : normWord p (extract a b)≠0) (hs : s1Word p (extract a b)≠0) :
+ ∃ q r, FallbackWord.exactDiv p (ResidualWord.residual p f (v p (extract a b))) (u p (extract a b))=some q ∧
+ FallbackGeometry.remainder p (ResidualWord.pneg p (v p (extract a b))) (scaled p (extract a b) q)=some r ∧
+ Canon p (scaled p (extract a b) q) ∧ Normal (scaled p (extract a b) q) ∧ Canon p r ∧ Normal r ∧
+ (scaled p (extract a b) q).length=3 ∧ (scaled p (extract a b) q).getLast?=some 1 ∧ r.length≤2 ∧
+ MumfordValidity.Valid (wordsPoly p f) (wordsPoly p (scaled p (extract a b) q)) (wordsPoly p r) := by
+ obtain ⟨hc,_,_,_,_,hva,hvb⟩:=degree_two_inputs p _ a b ha hb hda hdb
+ obtain ⟨q,r,hq,hr,_,_,huc,hun,hrc,hrn,hl,hm,hrs,hval⟩ :=
+  fast_output_exists p (extract a b) f hp hbound hc hn hs hf hfd hva hvb
+ exact ⟨q,r,hq,hr,huc,hun,hrc,hrn,hl,hm,hrs,hval⟩
+end StoredInput

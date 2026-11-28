@@ -1,0 +1,32 @@
+[
+  {
+    "name": "IndependentMapChart.support_chart_homogenization",
+    "claim_path": "pcc/claims/PCC-20261112-175646.json",
+    "statement": "theorem support_chart_homogenization {K : Type} [CommRing K] (x a l w u0 u1 u2 u3 u4 : K) (hc : (x-a)*w=l) : w^4*(u4*x^4+u3*x^3+u2*x^2+u1*x+u0) = u4*(a*w+l)^4+u3*w*(a*w+l)^3+u2*w^2*(a*w+l)^2+ u1*w^3*(a*w+l)+u0*w^4",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/IndependentMapChart.lean",
+      "theorem": "IndependentMapChart.support_chart_homogenization",
+      "decl_sha256": "9343cae99d96f1d3e54e1716a222d50b951edb84c212249cecfe651b1efff744"
+    }
+  },
+  {
+    "name": "IndependentMapChart.ordinate_chart_homogenization",
+    "claim_path": "pcc/claims/PCC-20261112-fe086f.json",
+    "statement": "theorem ordinate_chart_homogenization {K : Type} [CommRing K] (x a l w y z v0 v1 v2 v3 : K) (hc : (x-a)*w=l) (hy : y=v3*x^3+v2*x^2+v1*x+v0) (hz : l*z=y*w^3) : l*z=v3*(a*w+l)^3+v2*w*(a*w+l)^2+v1*w^2*(a*w+l)+v0*w^3",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/IndependentMapChart.lean",
+      "theorem": "IndependentMapChart.ordinate_chart_homogenization",
+      "decl_sha256": "a2ba5f8771f6e79d3a1bfb99d0132a442bc43501feb643ef6953df8466653096"
+    }
+  },
+  {
+    "name": "IndependentMapChart.seven_torsion_omitted_map_control",
+    "claim_path": "pcc/claims/PCC-20261112-73e237.json",
+    "statement": "theorem seven_torsion_omitted_map_control {A B : Type} [IntModule A] [IntModule B] (norm : A \u2192 B) (pull : B \u2192 A) (hl : \u2200 (n : Int) b, pull (n \u2022 b)=n \u2022 pull b) (hn : \u2200 a, pull (norm a)=(4 : Int) \u2022 a) (a : A) (ha : (7 : Int) \u2022 a=0) : pull ((2 : Int) \u2022 norm a)=a",
+    "proof": {
+      "path": "research/chained_jacobian_transfers_20261110/lean/IndependentMapChart.lean",
+      "theorem": "IndependentMapChart.seven_torsion_omitted_map_control",
+      "decl_sha256": "37c4c0c72d4c591703adabf9ed4c9d31266bd54f91311f8b9a40804da7420645"
+    }
+  }
+]

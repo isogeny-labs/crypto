@@ -1,0 +1,16 @@
+{
+  "schema": "xedni-six-pair-shift-gate-v1",
+  "source_sha256": "9a594d96f369fb14f1a4cf6270b1c811ceda515e1c2a7eccab4d011ca8f3f322",
+  "prior_runner_sha256": "bdbb530aceca894f6de9d06ccc5261906dfaeac58c4d126f28d45075bd4e1a7b",
+  "prior_result_sha256": "0091afb272d1a105d1bd3de4d07ffa5274e16712e6e9280018280517ea83fc5b",
+  "input_indices": [201, 243, 425, 467, 511, 553],
+  "input_law": "all 24 ordered local witness pairs per surviving source pair under the prior full-law CRT policy",
+  "shift_law": "for centered k1,k2,k3, set each k_j to k_j+77u_j for arbitrary integer u_j, retain a_j=47k_j for j=1,2,3, and reconstruct a4,a6 from exact point incidence",
+  "relation_word": "P+Q+Q=0",
+  "observable": "integer tangent residual R=D^2(47k2+x1+2x2)-47k1 D Y-Y^2; record R modulo 47*77 for every local witness pair",
+  "null": "some witness class with nonzero centered residual has zero residue modulo 47*77 and could be made relation-positive by a higher CRT shift",
+  "result_categories": ["centered_relation_necessary", "shift_excluded_mod3619", "shift_unresolved_mod3619"],
+  "expected_rows": 144,
+  "resource": "complete finite local-witness census plus exact integer arithmetic, no wall-time comparison",
+  "claim_boundary": "modular necessity under all integer 77-shifts; a zero residual is a necessary relation condition, with curve nonsingularity and point-group relation verified separately"
+}

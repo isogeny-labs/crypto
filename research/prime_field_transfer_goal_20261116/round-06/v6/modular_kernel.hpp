@@ -1,0 +1,59 @@
+#pragma once
+#include <optional>
+// Classical modular GCD reconstruction; exact certificates are mandatory.
+std::optional<w::Q> kernel_reconstruct(const Z& value,const Z& modulus){
+    Z limit;Z half=modulus/2;mpz_sqrt(limit.get_mpz_t(),half.get_mpz_t());
+    Z a=modulus,b=mod(value,modulus),s=0,t=1;
+    while(abs(b)>limit){Z q=a/b,next=a-q*b,coefficient=s-q*t;a=b;b=next;s=t;t=coefficient;}
+    if(t==0||abs(t)>limit||gcd_z(b,t)!=1||gcd_z(t,modulus)!=1)return std::nullopt;
+    if(t<0){t=-t;b=-b;}
+    if(mod(b-value*t,modulus)!=0)return std::nullopt;
+    w::Q out(b,t);out.canonicalize();return out;
+}
+bool kernel_coprime(const P& a,const P& b,unsigned prime,const Z& omega){
+    MP aa=projection(a,Z(prime),omega,1),bb=projection(b,Z(prime),omega,1);
+    return aa.size()==a.size()&&bb.size()==b.size()&&mgcd(aa,bb,Z(prime)).size()==1;
+}
+w::Kernel modular_kernel(unsigned u){
+    auto a=w::times(u-1),b=w::times(2*u-1);unsigned degree=3*u*(u-1)/6;
+    P nx=a.f.n*b.f.d-w::scale(b.f.n*a.f.d,E(w::Q(0),w::Q(1)));
+    P ny=a.g.n*b.g.d+b.g.n*a.g.d;
+    std::vector<Z> re(degree+1),im(degree+1);Z modulus=1;unsigned used=0;
+    for(unsigned prime=7;prime<=65521&&used<64;++prime){
+        if(prime%3!=1||prime==3*u*(u-1)+1||!small_prime(prime))continue;
+        Z omega=powmod(sixth_class_generator(Z(prime)),Z((prime-1)/3),Z(prime));
+        Z conjugate=mod(omega*omega,Z(prime));MP c1,c2;
+        try{
+            MP x1=projection(nx,Z(prime),omega,1),y1=projection(ny,Z(prime),omega,1),
+               x2=projection(nx,Z(prime),conjugate,1),y2=projection(ny,Z(prime),conjugate,1);
+            if(x1.size()!=nx.size()||y1.size()!=ny.size()||x2.size()!=nx.size()||y2.size()!=ny.size())continue;
+            c1=mgcd(x1,y1,Z(prime));c2=mgcd(x2,y2,Z(prime));
+        }catch(const std::exception&){continue;}
+        if(c1.size()!=degree+1||c2.size()!=degree+1)continue;
+        Z root_inverse=inv(omega-conjugate,Z(prime)),crt_inverse=inv(modulus,Z(prime));
+        for(unsigned j=0;j<=degree;++j){
+            Z imaginary=mod((c1[j]-c2[j])*root_inverse,Z(prime));
+            Z real=mod(c1[j]-omega*imaginary,Z(prime));
+            re[j]+=modulus*mod((real-re[j])*crt_inverse,Z(prime));
+            im[j]+=modulus*mod((imaginary-im[j])*crt_inverse,Z(prime));
+        }
+        modulus*=prime;++used;P candidate(degree+1);bool reconstructed=true;
+        for(unsigned j=0;j<=degree;++j){auto real=kernel_reconstruct(re[j],modulus),imaginary=kernel_reconstruct(im[j],modulus);
+            if(!real||!imaginary){reconstructed=false;break;}candidate[j]=E(*real,*imaginary);}
+        if(!reconstructed||candidate.back()!=E(1))continue;
+        auto qx=w::divide(nx,candidate);if(!qx.second.empty())continue;
+        auto qy=w::divide(ny,candidate);if(!qy.second.empty())continue;
+        bool valid=false;
+        try{
+            valid=kernel_coprime(qx.first,qy.first,prime,omega);
+            for(const P* den:{&a.f.d,&b.f.d,&a.g.d,&b.g.d})
+                valid=valid&&kernel_coprime(candidate,*den,prime,omega);
+        }catch(const std::exception&){valid=false;}
+        if(!valid)continue;
+        std::cout<<"{\"kind\":\"modular_kernel_certificate\",\"u\":"<<u<<",\"crt_primes\":"<<used
+                 <<",\"crt_bits\":"<<mpz_sizeinbase(modulus.get_mpz_t(),2)<<",\"certificate_prime\":"<<prime
+                 <<",\"certificate_omega\":\""<<omega<<"\",\"exact_divisions\":true,\"coprime_cofactors_and_denominators\":true}\n";
+        return {candidate,nx,ny,qx.first,qy.first};
+    }
+    throw std::runtime_error("modular kernel reconstruction budget exhausted");
+}

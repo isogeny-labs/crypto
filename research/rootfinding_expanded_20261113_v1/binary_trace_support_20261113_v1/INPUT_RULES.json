@@ -1,0 +1,14 @@
+{
+  "schema": "binary-trace-support-inputs/v1",
+  "fields": [{"degree":2,"modulus":7},{"degree":3,"modulus":11}],
+  "domains": [[0],[0,1]],
+  "GF4_rule": "All4^5 ascending coefficient tuples c0..c4, followed by monic coefficient1.",
+  "GF8_rule": "64SHA256(binary-trace-gf8-v1|index) first5bytes mod8, deduplicated; add all D^5 product polynomials and explicit X(X+1)^2(X+2)^2.",
+  "output": "Every candidate H,domain,R8,charpoly,odd traces and complete ordered D-source tuples. No original curve roots.",
+  "candidate": "Three quotient-ring squarings; odd traces are a refuted relaxation, full charpoly/four residuals are exact scoped comparisons.",
+  "limits": {"seconds":90,"memory_mb":4096,"cores":1,"predicates":200000},
+  "command": ["python","-m","research.binary_trace_support_20261113_v1.worker","binary-trace-support-20261113-v1"],
+  "raw_artifact": "raw-controls.json.gz",
+  "actual_GF2_83_control": "ONE supplied H=X5+alpha*X over modulusX83+X45+X2+X+1; V low18span;18annihilatorbasissteps, no domain enumeration. Not asserted in actual73parameter norm family. Prior modulus setup reused.",
+  "qualified_gain_claim": false
+}

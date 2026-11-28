@@ -1,0 +1,54 @@
+{
+  "schema": "torus.branch-affine.source-qualification/v1",
+  "standing": "producer unsigned/unverified",
+  "post_call_at": "2026-11-16T23:21:56.529950+00:00",
+  "source_inputs": 98,
+  "all_source_inputs_match": true,
+  "all35_compiled_source_fixture_bindings_match": true,
+  "same28_public_requests_match_old_core_members": true,
+  "archives": [
+    {
+      "path": "research/curve25519_torus_native_20261115/target-circuit-v2/source-v2-post-checks.tar.xz",
+      "bytes": 55368,
+      "sha256": "8c69c14ac4723a1609b8a35202be08e711b28172ec70231543bb2bafd372feb9",
+      "inputs": 43,
+      "round_trip_matches": true
+    },
+    {
+      "path": "research/curve25519_torus_native_20261115/indexed-circuit-v1/source-v1-delta.tar.xz",
+      "bytes": 34384,
+      "sha256": "c19bcfc224c111f8c3b14ab99f2575aac8c94e36467906ce30a191542e457eff",
+      "inputs": 6,
+      "round_trip_matches": true
+    },
+    {
+      "path": "research/curve25519_torus_native_20261115/worklist-solver-v1/source-v1-delta.tar.xz",
+      "bytes": 12952,
+      "sha256": "f75bac5d5ec48202ee39a00cbdf0b7442a1c4b268cd78da2f28e33ea8333fb3a",
+      "inputs": 6,
+      "round_trip_matches": true
+    },
+    {
+      "path": "research/curve25519_torus_native_20261115/affine-closure-v1/source-v1-delta.tar.xz",
+      "bytes": 53152,
+      "sha256": "41d9bda83e9ea5adbd42ec3fc85375ffb09658cbaff4b489d740a9bfa852d7ab",
+      "inputs": 9,
+      "round_trip_matches": true
+    },
+    {
+      "path": "research/curve25519_torus_native_20261115/branch-affine-v1/source-v1-delta.tar.xz",
+      "bytes": 18960,
+      "sha256": "f0735ae1100e76b91587221b0e662a2ad5ba30c99552c1cd00c5e49694d76ae8",
+      "inputs": 34,
+      "round_trip_matches": true
+    }
+  ],
+  "native_binary_matches_pre_call": true,
+  "binary": {
+    "path": "/workspace/curve25519-native-binaries/branch-affine-control-v1",
+    "bytes": 3432840,
+    "sha256": "87e5872e4f5743884237b56b740a27be6f03c2e1127adde1ccf60c149ebcfb4f"
+  },
+  "qualifier_sha256": "b7e0e8d7649c3336b05ac17c821e59a029caaf55878bf8fc1b239edfeebfe9a7",
+  "scope": "native fixed controls and metadata identity, not signed execution/formal verification or complete cost"
+}

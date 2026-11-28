@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T10:03:39Z",
+ "id": "PCC-20261117-e9bd73",
+ "kind": "measurement",
+ "producer": {
+  "commit": "7c1f20a41f770f178dddad1c89ac22db7bfe63b8",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/deferred-graph50/recorded49-graph-replay.json",
+    "sha256": "f90cda349fc821d34417f21ab29b846fbf7a9c5a755f19782dc361b1eba4da52"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/deferred-graph50/component-source-binary.sha256",
+    "sha256": "fc3e167953ee3ca7a15a51692b28b03359a67fa0afc5ee39386e939c2a38e377"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/deferred-graph50/controls.log",
+    "sha256": "7b70b78092ab1979ec2c71d1ff4267b295df1902a1e05ef5316b4ac6dc39e1b0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "src/cryptanalysis/jv_deferred_pair_graph.rs",
+    "sha256": "7195f6e7a85d6b76f7e4e78f5f895c00251f1e1614e51b6bfa81b5c1f8f27919"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "examples/jv_sieve_deferred_pair_replay.rs",
+    "sha256": "8dc393dd1140fbad2b7e88dedf055dcbba0f289c7d9c1d0012620dafbbd04aa6"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "New bounded deferred-edge graph Rust core,13combined finite controls/strict Clippy pass; hash-bound Runpod49 recorded-source replay checks exact integer anchor/full incidences, original graph decisions and projected kernel residuals, and records actual rank prefixes. Graph projection only, no new natural-yield/performance/DLP trial and no signed admission."
+}

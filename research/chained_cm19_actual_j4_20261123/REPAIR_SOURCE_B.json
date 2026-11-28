@@ -1,0 +1,22 @@
+{
+  "recorded": "2026-11-23T20:49:11.966713+00:00",
+  "A_source": "71d7c4d18988dc357647e3443bd7fa794f3d97b9",
+  "A_failure": "PCC-20261123-4a1d37",
+  "A_scientific_call": false,
+  "native_code_edits": [
+    {
+      "path": "cm_b.rs",
+      "exact_change": "(i+j)%2==0 -> (i+j).is_multiple_of(2), usize parity only"
+    },
+    {
+      "path": "main_b.rs",
+      "exact_change": "CM module path cm_a.rs -> cm_b.rs only"
+    }
+  ],
+  "exact_two_replacements_verified": true,
+  "all_frozen_A_input_hashes_unchanged": true,
+  "metadata_changes": "New B lock name and shell crate/main/CM source names only; native originalbinary output posthash unchanged.",
+  "ordinary_B_formatting": 0,
+  "strict_B_calls": false,
+  "scientific_parameters_or_limits_or_policies_changed": false
+}

@@ -168,11 +168,21 @@ impl ZpInt {
 }
 
 fn extended_gcd(a: &BigInt, b: &BigInt) -> (BigInt, BigInt, BigInt) {
-    if b.is_zero() {
-        return (a.clone(), BigInt::one(), BigInt::zero());
-    }
-    let (g, x, y) = extended_gcd(b, &(a % b));
-    (g, y.clone(), x - (a / b) * y)
+    // Shared extended gcd on |a|, |b| (g >= 0), signs folded back into the
+    // cofactors.  The only caller passes a ZpInt value in [0, m) and m > 0, where
+    // g and x mod m equal the old recursive Euclid's.
+    let (g, s, t) = crate::gcd::int::xgcd_big(a.magnitude(), b.magnitude());
+    let x = if a.sign() == num_bigint::Sign::Minus {
+        -s
+    } else {
+        s
+    };
+    let y = if b.sign() == num_bigint::Sign::Minus {
+        -t
+    } else {
+        t
+    };
+    (BigInt::from(g), x, y)
 }
 
 // ── Curve arithmetic over Z_p ─────────────────────────────────────────────

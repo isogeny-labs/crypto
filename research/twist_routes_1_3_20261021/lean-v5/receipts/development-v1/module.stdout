@@ -1,0 +1,12 @@
+TwistKernelRelations.lean:18:59: error: No goals to be solved
+TwistKernelRelations.lean:20:29: error: unsolved goals
+A : Type u_1
+B : Type u_2
+inst✝¹ : AddCommGroup A
+inst✝ : AddCommGroup B
+f : A →+ B
+d : B →+ A
+hdual : ∀ (a : A), d (f a) = 7 • a
+ht : ∀ (a : A), 823 • a = 0
+a : A
+⊢ a + 823 • 5 • a = a + 5 • 823 • a

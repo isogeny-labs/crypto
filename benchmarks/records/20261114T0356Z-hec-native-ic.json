@@ -1,0 +1,211 @@
+{
+  "branch": "research/hec-native-ic-20261113",
+  "closed_utc": "2026-11-14T04:05:17+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/hec_ic_speedup_20261113/run_record.sh",
+        "research/hec_ic_speedup_20261113/rec-20261113"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-14T03:56:25+00:00",
+      "wall_s": 257.415
+    }
+  ],
+  "commit": "93047a9f60ba146d8f8c6c095cf0a6bb7723d3a0",
+  "commit_dirty": true,
+  "created_utc": "2026-11-14T03:56:17+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261113-hec-native-ic"
+  ],
+  "host": {
+    "cpu": "arm",
+    "cpus_online": 14,
+    "hostname": "Mac.attlocal.net",
+    "isolation": "unstated",
+    "platform": "macOS-27.2-arm64-arm-64bit"
+  },
+  "id": "20261114T0356Z-hec-native-ic",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "solve_ref_over_fast_g2_p503",
+      "note": "Solver::Reference / Solver::Fast mean solve ms, same binary and rows; median ratio 3.045; E4 bar 2.0 (PLAN.md section 7)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 3.1872202576720503
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "solve_ref_over_fast_g2_p1009",
+      "note": "Solver::Reference / Solver::Fast mean solve ms, same binary and rows; median ratio 3.449; E4 bar 2.0 (PLAN.md section 7)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 3.4323759464363928
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "solve_ref_over_fast_g2_p2003",
+      "note": "Solver::Reference / Solver::Fast mean solve ms, same binary and rows; median ratio 3.4; E4 bar 2.0 (PLAN.md section 7)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 3.4020747754647362
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "solve_ref_over_fast_g2_p4001",
+      "note": "Solver::Reference / Solver::Fast mean solve ms, same binary and rows; median ratio 3.435; E4 bar 2.0 (PLAN.md section 7)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 3.4409436752968134
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "biguint_over_native_total_g2_p4001",
+      "note": "BigUint wall_ic_ms (theta=1, round eight) / native S2a total_ms; post hoc, E2 was registered for S1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 8.730653653341422
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "biguint_over_native_total_g3_p401",
+      "note": "BigUint wall_ic_ms (theta=1, round eight) / native S2a total_ms; post hoc, E2 was registered for S1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 12.619067208159027
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 5,
+      "name": "biguint_over_native_total_g4_p61",
+      "note": "BigUint wall_ic_ms (theta=1, round eight) / native S2a total_ms; post hoc, E2 was registered for S1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 16.73350205490963
+    },
+    {
+      "baseline": 0.02626024,
+      "better": "lower",
+      "n": 5,
+      "name": "native_fast_total_g2_p4001",
+      "note": "mean native total per run with Solver::Fast; baseline = Solver::Reference in the same process",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 0.01160554
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "fast_solve_share_g2_p503",
+      "note": "S2a solve as percent of native S2a total; S2b trigger is >50",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "percent",
+      "value": 58.85460631640226
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 55,
+      "name": "e3_runs_identical",
+      "note": "(row, seed) pairs where both solvers agree on k, trials, pivot hash, pivots, row_ops, mulmods",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 55.0
+    }
+  ],
+  "problem": "hec:g234-native-engine",
+  "raw": [
+    {
+      "bytes": 37283,
+      "path": "research/hec_ic_speedup_20261113/rec-20261113/biguint.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/80/805dc8a04e6d0edf6babcc603273a09064a52a52b8d88d8e49bab98f7cb07e53",
+      "sha256": "805dc8a04e6d0edf6babcc603273a09064a52a52b8d88d8e49bab98f7cb07e53",
+      "uploaded": false
+    },
+    {
+      "bytes": 68778,
+      "path": "research/hec_ic_speedup_20261113/rec-20261113/native_both.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2d/2d50f251e5d9ded2a9b52470bf72733d3a7b92ba451963bed5f400b29618a72d",
+      "sha256": "2d50f251e5d9ded2a9b52470bf72733d3a7b92ba451963bed5f400b29618a72d",
+      "uploaded": false
+    },
+    {
+      "bytes": 292,
+      "path": "research/hec_ic_speedup_20261113/rec-20261113/binaries.sha256",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c3/c31df7f78ba9087f11de30d5f288c4d40c60bc440b14883875829a901c9e508c",
+      "sha256": "c31df7f78ba9087f11de30d5f288c4d40c60bc440b14883875829a901c9e508c",
+      "uploaded": false
+    },
+    {
+      "bytes": 140,
+      "path": "research/hec_ic_speedup_20261113/rec-20261113/host.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2d/2d2639591bedc7c7b4e11d1c31311e4d7c261c3105fe0124ecb3a53f18ffa6bb",
+      "sha256": "2d2639591bedc7c7b4e11d1c31311e4d7c261c3105fe0124ecb3a53f18ffa6bb",
+      "uploaded": false
+    },
+    {
+      "bytes": 6132,
+      "path": "research/hec_ic_speedup_20261113/rec-20261113/summary.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/be/be558405e6faa59145c75e494b349c1f780c08274d62c5425ef59969224f6baf",
+      "sha256": "be558405e6faa59145c75e494b349c1f780c08274d62c5425ef59969224f6baf",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261113-hec-native-ic/REPORT.pdf",
+    "png": [
+      "benchmarks/20261113-hec-native-ic/solve_times.png",
+      "benchmarks/20261113-hec-native-ic/end_to_end.png",
+      "benchmarks/20261113-hec-native-ic/phases.png"
+    ],
+    "svg": [
+      "benchmarks/20261113-hec-native-ic/solve_times.svg",
+      "benchmarks/20261113-hec-native-ic/end_to_end.svg",
+      "benchmarks/20261113-hec-native-ic/phases.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "hec-native-ic",
+  "status": "measured",
+  "summary": "native genus 2-4 hyperelliptic IC: S2a solver pivot-identical (55/55), g2 p>=503 solve 3.2-3.4x faster; native S2a engine 7.6-18.9x faster than BigUint end to end",
+  "validation": null
+}

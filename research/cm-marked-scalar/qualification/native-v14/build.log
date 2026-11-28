@@ -1,0 +1,29 @@
+make: Entering directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations native.cpp -o /tmp/cm-marked-scalar-build/native -lcrypto
+In file included from native.cpp:62:
+relation_verify.hpp: In function ‘std::pair<std::vector<Big>, std::vector<Big> > poly_divmod(Field&, Poly, const Poly&)’:
+relation_verify.hpp:43:3: warning: this ‘for’ clause does not guard... [-Wmisleading-indentation]
+   43 |   for(size_t j=0;j<b.size();++j)a[offset+j]=f.sub(a[offset+j],f.mul(c,b[j]));trim(a);
+      |   ^~~
+relation_verify.hpp:43:78: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   43 |   for(size_t j=0;j<b.size();++j)a[offset+j]=f.sub(a[offset+j],f.mul(c,b[j]));trim(a);
+      |                                                                              ^~~~
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations bench.cpp -o /tmp/cm-marked-scalar-build/bench -lcrypto
+In file included from native.cpp:62,
+                 from bench.cpp:2:
+relation_verify.hpp: In function ‘std::pair<std::vector<Big>, std::vector<Big> > poly_divmod(Field&, Poly, const Poly&)’:
+relation_verify.hpp:43:3: warning: this ‘for’ clause does not guard... [-Wmisleading-indentation]
+   43 |   for(size_t j=0;j<b.size();++j)a[offset+j]=f.sub(a[offset+j],f.mul(c,b[j]));trim(a);
+      |   ^~~
+relation_verify.hpp:43:78: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   43 |   for(size_t j=0;j<b.size();++j)a[offset+j]=f.sub(a[offset+j],f.mul(c,b[j]));trim(a);
+      |                                                                              ^~~~
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations isolate.cpp -o /tmp/cm-marked-scalar-build/isolate -pthread -lcrypto
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations analysis.cpp -o /tmp/cm-marked-scalar-build/analysis -lcrypto
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations replay.cpp -o /tmp/cm-marked-scalar-build/replay -lcrypto
+make: Leaving directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'

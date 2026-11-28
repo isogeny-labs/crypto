@@ -1,0 +1,12 @@
+protocol_s56_sha256: c7a3ef99a143184012ab9466d27a0accb3967b55f9f02583be7a9c2871827737
+cmd: nist_cover_quartic_map wide --bits 56 --gamma-max 400 --seed 1592612438 --out runs_s56.json
+E: p = 72057594037927931 (2^56 - 5), a = -3, b = 60, n = 72057594202405003 (prime), G = (2, 795920743654909)
+planted k = 19837203754012257; [k]G agrees across two implementations: true; [n]G = O: true
+gamma = 15 (first Smith-positive of 15 tried); f = [0, 3375, 0, 630, 60, 42, 0, 1]
+trigonal map: n1 = 43179290915374657, n0 = 67832436536749340, d1 = 37767896783818060, d0 = 0
+phi*: G nonzero true; [n]phi*G = 0 true; phi*([k]G) = [k]phi*G true; additive true; wrong-k control matches (must be false) false
+C fitted from 40 points (38 draws): [1, 44858746782548416, 0, 37572650059108326, 60844269658931211, 56389912100593629, 6018521062645660, 29095700753429674, 61315470249296059, 0, 71497452090043392, 29684774564308524, 41647834419698634, 49418112992754898, 398084569319130]
+held-out: 120/120 on C (50 rational); perturbed-C control: 0/120
+smoothness certificate: true (chart z=1: deg R_a 12, deg R_b 12, deg gcd 0; chart y=1: deg R_a 12, deg R_b 12, deg gcd 0; (1:0:0) nonsingular: true)
+=> OK
+exit: 0

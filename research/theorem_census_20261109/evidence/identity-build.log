@@ -1,0 +1,68 @@
+    Updating crates.io index
+     Locking 11 packages to highest compatible versions
+ Downloading crates ...
+  Downloaded itoa v1.0.19
+  Downloaded serde v1.0.229
+  Downloaded unicode-ident v1.0.27
+  Downloaded quote v1.0.47
+  Downloaded zmij v1.0.23
+  Downloaded serde_derive v1.0.229
+  Downloaded serde_core v1.0.229
+  Downloaded serde_json v1.0.154
+  Downloaded memchr v2.8.3
+  Downloaded proc-macro2 v1.0.107
+  Downloaded syn v3.0.9
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.154
+   Compiling serde v1.0.229
+   Compiling itoa v1.0.19
+   Compiling memchr v2.8.3
+   Compiling syn v3.0.9
+   Compiling serde_derive v1.0.229
+   Compiling theorem-audit-identity v0.1.0 (/workspace/crypto-audit/research/theorem_census_20261109/identity)
+error[E0433]: cannot find module or crate `hex` in this scope
+   --> src/../../../../src/cryptanalysis/identity_certificate.rs:380:24
+    |
+380 |     format!("IDC1h{}", hex::encode(&h[..8]))
+    |                        ^^^ use of unresolved module or unlinked crate `hex`
+    |
+    = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `hex` in this scope
+   --> src/../../../../src/cryptanalysis/identity_certificate.rs:434:5
+    |
+434 |     hex::encode(sha256(&buf))
+    |     ^^^ use of unresolved module or unlinked crate `hex`
+    |
+    = help: if you wanted to use a crate named `hex`, use `cargo add hex` to add it to your `Cargo.toml`
+
+error[E0308]: mismatched types
+   --> src/main.rs:29:42
+    |
+ 29 |  assert!(matches!(check_with_extra(&cert,(0x5e4a_e001,11)).unwrap(),Verdict::Accept{..}));
+    |                   ----------------       ^^^^^^^^^^^^^^^^ expected `Option<(u64, u32)>`, found `({integer}, {integer})`
+    |                   |
+    |                   arguments to this function are incorrect
+    |
+    = note: expected enum `std::option::Option<(u64, u32)>`
+              found tuple `({integer}, {integer})`
+note: function defined here
+   --> src/../../../../src/cryptanalysis/identity_certificate.rs:534:8
+    |
+534 | pub fn check_with_extra(
+    |        ^^^^^^^^^^^^^^^^
+535 |     c: &IdentityCertificate,
+536 |     extra: Option<(u64, u32)>,
+    |     -------------------------
+help: try wrapping the expression in `Some`
+    |
+ 29 |  assert!(matches!(check_with_extra(&cert,Some((0x5e4a_e001,11))).unwrap(),Verdict::Accept{..}));
+    |                                          +++++                +
+
+Some errors have detailed explanations: E0308, E0433.
+For more information about an error, try `rustc --explain E0308`.
+error: could not compile `theorem-audit-identity` (bin "theorem-audit-identity") due to 3 previous errors

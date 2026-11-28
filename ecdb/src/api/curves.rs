@@ -87,6 +87,7 @@ pub struct CurveQuery {
     pub name: Option<String>,
     pub has_isogenies: Option<bool>,
     pub has_covers: Option<bool>,
+    pub has_factor_bases: Option<bool>,
     pub sort: Option<String>,
     pub order: Option<String>,
     pub limit: Option<i64>,
@@ -156,6 +157,11 @@ pub fn curve_filters(q: &CurveQuery) -> Filters {
     match q.has_covers {
         Some(true) => f.raw("cover_count > 0"),
         Some(false) => f.raw("cover_count = 0"),
+        None => {}
+    }
+    match q.has_factor_bases {
+        Some(true) => f.raw("EXISTS (SELECT 1 FROM ec.factor_base fb WHERE fb.curve_id = id)"),
+        Some(false) => f.raw("NOT EXISTS (SELECT 1 FROM ec.factor_base fb WHERE fb.curve_id = id)"),
         None => {}
     }
     f

@@ -1,0 +1,36 @@
+{
+  "canonical_export": {
+    "cause": "referenced canonical skill and JSONschemas are encrypted VLT1 blobs, cannot read/validate; connector retrieval failed",
+    "native_report_and_flow_preserved": true,
+    "status": "blocked"
+  },
+  "checks": {
+    "dedicated_call": 0,
+    "fmt198": 0,
+    "fmt199": 0,
+    "native_transport_control": 0,
+    "prose": 0,
+    "rust198_package_tests": {
+      "cli_passed": 2,
+      "failed": 0,
+      "library_passed": 10,
+      "note": "CLI guards test allthree binaries; Rust/lockbytes matched publicsource"
+    },
+    "source_pinned_build": 0,
+    "strict_clippy198": 0,
+    "strict_clippy199": 0
+  },
+  "not_run": [
+    "Rust1.99 runtime tests",
+    "root full-library tests",
+    "latest-main source integration",
+    "timing/performance/scaling/EKS"
+  ],
+  "retained_failure": {
+    "cause": "complex tuple return; replaced with named VisitResult, no lint suppression or assertion change",
+    "strict_clippy198_attempt1": 101
+  },
+  "schema": "aps.encoding-validation/v1",
+  "source": "b0919b72b1688dbd9983381470d23d1d81b5fb05",
+  "standing": "unverified"
+}

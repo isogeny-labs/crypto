@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-19T05:43:17Z",
+ "id": "PCC-20261119-0f3ed3",
+ "kind": "theorem",
+ "producer": {
+  "commit": "f7c592e225884de304b42dae0f5ea80f3c91f0d3",
+  "model": "Codex",
+  "session": "semaev-cubic-orbit-20261119"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "3808252772b88a55a79b046f2ff12bbafbe81233991ec624fecfdf87ba6a4219",
+   "kind": "lean",
+   "project": "research/tensor_boolean_breakthrough_20261031/lean",
+   "theorem": "TensorBoundaryBounds.zmodNoFullCubicOrbitInShortInterval"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "This checks the short-interval full-orbit exclusion used in the A=0 repair of Lemma N'. It does not construct the Kummer character classes.",
+ "statement": "Three positive representatives a, omega*a, and omega^2*a cannot all lie in [1,X] modulo p when 3X < p and omega^2 + omega + 1 = 0."
+}

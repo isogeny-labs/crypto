@@ -1,0 +1,89 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-f2m19-t35-729beea1 | 18.00 | f4-default9 | 8/8 | 4.200 | 123071.907 | 1230681.266 | — |
+| icv1-f2m19-t35-729beea1 | 18.00 | f4-half9 | 8/8 | 3.738 | 34326.523 | 343231.591 | — |
+| icv1-f2m19-t35-729beea1 | 18.00 | mitm-default9 | 8/8 | 133.690 | 134.302 | 139.808 | — |
+| icv1-f2m19-t35-729beea1 | 18.00 | mitm-default9b | 8/8 | 133.690 | 134.302 | 139.808 | — |
+| icv1-f2m19-t35-729beea1 | 18.00 | mitm-half9 | 8/8 | 34.940 | 35.403 | 39.576 | — |
+| icv1-f2m19-t35-729beea1 | 18.00 | rho-neg | 8/8 | 1.118 | 1.200 | 1.932 | — |
+| icv1-f2m19-t35-729beea1 | 18.00 | rho-plain | 8/8 | 1.703 | 1.703 | 1.703 | — |
+| icv1-f2m21-t1139-d1c809ff | 20.00 | f4-default9 | 8/8 | 3.822 | 32386.813 | 323833.732 | — |
+| icv1-f2m21-t1139-d1c809ff | 20.00 | f4-half9 | 8/8 | 3.977 | 9996.485 | 99929.055 | — |
+| icv1-f2m21-t1139-d1c809ff | 20.00 | mitm-default9 | 8/8 | 64.619 | 65.231 | 70.735 | — |
+| icv1-f2m21-t1139-d1c809ff | 20.00 | mitm-default9b | 8/8 | 64.619 | 65.231 | 70.735 | — |
+| icv1-f2m21-t1139-d1c809ff | 20.00 | mitm-half9 | 8/8 | 17.655 | 18.269 | 23.798 | — |
+| icv1-f2m21-t1139-d1c809ff | 20.00 | rho-neg | 8/8 | 1.260 | 1.370 | 2.358 | — |
+| icv1-f2m21-t1139-d1c809ff | 20.00 | rho-plain | 8/8 | 1.523 | 1.523 | 1.523 | — |
+| icv1-f2m23-t335-2ca65573 | 22.00 | f4-default9 | 8/8 | 5.026 | 30157.414 | 301528.911 | — |
+| icv1-f2m23-t335-2ca65573 | 22.00 | f4-half9 | 8/8 | 5.520 | 2321.561 | 23165.927 | — |
+| icv1-f2m23-t335-2ca65573 | 22.00 | mitm-default9 | 8/8 | 32.123 | 33.009 | 40.980 | — |
+| icv1-f2m23-t335-2ca65573 | 22.00 | mitm-default9b | 8/8 | 32.123 | 33.009 | 40.980 | — |
+| icv1-f2m23-t335-2ca65573 | 22.00 | mitm-half9 | 8/8 | 12.367 | 13.332 | 22.018 | — |
+| icv1-f2m23-t335-2ca65573 | 22.00 | rho-neg | 8/8 | 0.988 | 1.078 | 1.889 | — |
+| icv1-f2m23-t335-2ca65573 | 22.00 | rho-plain | 8/8 | 1.163 | 1.163 | 1.163 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-f2m19-t35-729beea1 | f4-default9 vs f4-half9 | f4-half9 < f4-default9 |
+| icv1-f2m19-t35-729beea1 | f4-default9 vs mitm-default9 | unresolved inside the band |
+| icv1-f2m19-t35-729beea1 | f4-default9 vs mitm-default9b | unresolved inside the band |
+| icv1-f2m19-t35-729beea1 | f4-default9 vs mitm-half9 | unresolved inside the band |
+| icv1-f2m19-t35-729beea1 | f4-default9 vs rho-neg | rho-neg < f4-default9 |
+| icv1-f2m19-t35-729beea1 | f4-default9 vs rho-plain | rho-plain < f4-default9 |
+| icv1-f2m19-t35-729beea1 | f4-half9 vs mitm-default9 | unresolved inside the band |
+| icv1-f2m19-t35-729beea1 | f4-half9 vs mitm-default9b | unresolved inside the band |
+| icv1-f2m19-t35-729beea1 | f4-half9 vs mitm-half9 | unresolved inside the band |
+| icv1-f2m19-t35-729beea1 | f4-half9 vs rho-neg | rho-neg < f4-half9 |
+| icv1-f2m19-t35-729beea1 | f4-half9 vs rho-plain | rho-plain < f4-half9 |
+| icv1-f2m19-t35-729beea1 | mitm-default9 vs mitm-default9b | unresolved inside the band |
+| icv1-f2m19-t35-729beea1 | mitm-default9 vs mitm-half9 | mitm-half9 < mitm-default9 |
+| icv1-f2m19-t35-729beea1 | mitm-default9 vs rho-neg | rho-neg < mitm-default9 |
+| icv1-f2m19-t35-729beea1 | mitm-default9 vs rho-plain | rho-plain < mitm-default9 |
+| icv1-f2m19-t35-729beea1 | mitm-default9b vs mitm-half9 | mitm-half9 < mitm-default9b |
+| icv1-f2m19-t35-729beea1 | mitm-default9b vs rho-neg | rho-neg < mitm-default9b |
+| icv1-f2m19-t35-729beea1 | mitm-default9b vs rho-plain | rho-plain < mitm-default9b |
+| icv1-f2m19-t35-729beea1 | mitm-half9 vs rho-neg | rho-neg < mitm-half9 |
+| icv1-f2m19-t35-729beea1 | mitm-half9 vs rho-plain | rho-plain < mitm-half9 |
+| icv1-f2m19-t35-729beea1 | rho-neg vs rho-plain | unresolved inside the band |
+| icv1-f2m21-t1139-d1c809ff | f4-default9 vs f4-half9 | unresolved inside the band |
+| icv1-f2m21-t1139-d1c809ff | f4-default9 vs mitm-default9 | unresolved inside the band |
+| icv1-f2m21-t1139-d1c809ff | f4-default9 vs mitm-default9b | unresolved inside the band |
+| icv1-f2m21-t1139-d1c809ff | f4-default9 vs mitm-half9 | unresolved inside the band |
+| icv1-f2m21-t1139-d1c809ff | f4-default9 vs rho-neg | rho-neg < f4-default9 |
+| icv1-f2m21-t1139-d1c809ff | f4-default9 vs rho-plain | rho-plain < f4-default9 |
+| icv1-f2m21-t1139-d1c809ff | f4-half9 vs mitm-default9 | unresolved inside the band |
+| icv1-f2m21-t1139-d1c809ff | f4-half9 vs mitm-default9b | unresolved inside the band |
+| icv1-f2m21-t1139-d1c809ff | f4-half9 vs mitm-half9 | unresolved inside the band |
+| icv1-f2m21-t1139-d1c809ff | f4-half9 vs rho-neg | rho-neg < f4-half9 |
+| icv1-f2m21-t1139-d1c809ff | f4-half9 vs rho-plain | rho-plain < f4-half9 |
+| icv1-f2m21-t1139-d1c809ff | mitm-default9 vs mitm-default9b | unresolved inside the band |
+| icv1-f2m21-t1139-d1c809ff | mitm-default9 vs mitm-half9 | mitm-half9 < mitm-default9 |
+| icv1-f2m21-t1139-d1c809ff | mitm-default9 vs rho-neg | rho-neg < mitm-default9 |
+| icv1-f2m21-t1139-d1c809ff | mitm-default9 vs rho-plain | rho-plain < mitm-default9 |
+| icv1-f2m21-t1139-d1c809ff | mitm-default9b vs mitm-half9 | mitm-half9 < mitm-default9b |
+| icv1-f2m21-t1139-d1c809ff | mitm-default9b vs rho-neg | rho-neg < mitm-default9b |
+| icv1-f2m21-t1139-d1c809ff | mitm-default9b vs rho-plain | rho-plain < mitm-default9b |
+| icv1-f2m21-t1139-d1c809ff | mitm-half9 vs rho-neg | rho-neg < mitm-half9 |
+| icv1-f2m21-t1139-d1c809ff | mitm-half9 vs rho-plain | rho-plain < mitm-half9 |
+| icv1-f2m21-t1139-d1c809ff | rho-neg vs rho-plain | unresolved inside the band |
+| icv1-f2m23-t335-2ca65573 | f4-default9 vs f4-half9 | unresolved inside the band |
+| icv1-f2m23-t335-2ca65573 | f4-default9 vs mitm-default9 | unresolved inside the band |
+| icv1-f2m23-t335-2ca65573 | f4-default9 vs mitm-default9b | unresolved inside the band |
+| icv1-f2m23-t335-2ca65573 | f4-default9 vs mitm-half9 | unresolved inside the band |
+| icv1-f2m23-t335-2ca65573 | f4-default9 vs rho-neg | rho-neg < f4-default9 |
+| icv1-f2m23-t335-2ca65573 | f4-default9 vs rho-plain | rho-plain < f4-default9 |
+| icv1-f2m23-t335-2ca65573 | f4-half9 vs mitm-default9 | unresolved inside the band |
+| icv1-f2m23-t335-2ca65573 | f4-half9 vs mitm-default9b | unresolved inside the band |
+| icv1-f2m23-t335-2ca65573 | f4-half9 vs mitm-half9 | unresolved inside the band |
+| icv1-f2m23-t335-2ca65573 | f4-half9 vs rho-neg | rho-neg < f4-half9 |
+| icv1-f2m23-t335-2ca65573 | f4-half9 vs rho-plain | rho-plain < f4-half9 |
+| icv1-f2m23-t335-2ca65573 | mitm-default9 vs mitm-default9b | unresolved inside the band |
+| icv1-f2m23-t335-2ca65573 | mitm-default9 vs mitm-half9 | mitm-half9 < mitm-default9 |
+| icv1-f2m23-t335-2ca65573 | mitm-default9 vs rho-neg | rho-neg < mitm-default9 |
+| icv1-f2m23-t335-2ca65573 | mitm-default9 vs rho-plain | rho-plain < mitm-default9 |
+| icv1-f2m23-t335-2ca65573 | mitm-default9b vs mitm-half9 | mitm-half9 < mitm-default9b |
+| icv1-f2m23-t335-2ca65573 | mitm-default9b vs rho-neg | rho-neg < mitm-default9b |
+| icv1-f2m23-t335-2ca65573 | mitm-default9b vs rho-plain | rho-plain < mitm-default9b |
+| icv1-f2m23-t335-2ca65573 | mitm-half9 vs rho-neg | rho-neg < mitm-half9 |
+| icv1-f2m23-t335-2ca65573 | mitm-half9 vs rho-plain | rho-plain < mitm-half9 |
+| icv1-f2m23-t335-2ca65573 | rho-neg vs rho-plain | unresolved inside the band |

@@ -1,0 +1,13 @@
+# Prospective counted comparison — DRAFT, not launch authorization
+
+Question: on fixed matched root/point lists, which backend reduces which separate arithmetic or storage dimensions for projected resultants? No weighted total or timing claim. No cutoff tuning on the evaluation panel.
+
+Proposed panel: caller-certified primes509 and1000003, root counts16/32/64/128, point counts n/2,n,2n, two case classes (disjoint and one planted common root):48 cases. Generate disjoint lists without replacement, then plant one common root in the paired zero case. Bind exact native generator, explicit seeds and TSV hashes before data. p13 software self-tests are excluded. Original4563-case cohort is unchanged; this is a polynomial component panel.
+
+Arms: scalar accumulation plus projection; ordinary Euclidean quotient classes; half-GCD quotient classes; identical scalar A/A; positive instrumentation control using scalar plus one explicitly charged multiplication by1. The positive control entry point is not implemented yet. One shared binary, compiler/flags/host, single thread, identical borrowed inputs and interval. Rotate fixed arm order by case index; counted-only primary metrics, no clock inference. Use a direct native product oracle outside counters, including zero cases and signs. Reject any wrong value, missing/duplicate row, nonzero final-live bytes, accounting error, overflow, A/A disagreement or incorrect positive-control delta. Keep every failure.
+
+Metrics: modular products primary; all other arithmetic events, helper calls, allocator requests/bytes and peak requested live bytes secondary, each reported separately. No significance tests or population generalization; finite-panel exact counts for the pinned build. Allocator observations may change with compiler optimization. Zero cases report independently; early returns are part of those cases and cannot be substituted for nonzero costs.
+
+Proposed ceiling: one attempt,120s,1CPU,1024MiB,concurrency1,USD1 total including failed attempts/build/idle/storage/transfer. Reserved funds0; remaining shared funds and live capacity unverified. No submission permitted. No retries by renaming a run. EKS job-submitter role only; no resource-policy changes.
+
+Before launch: implement generator, positive-control entry point, strict complete-panel exporter/analyzer and independent oracle; validate canonical experiment.protocol/v1 including preflight runtime, source/build/input/seed/analysis hashes; commit/push and verify publication; freeze before panel data; obtain authoritative budget/capacity admission. This document is deliberately not a schema-valid frozen protocol. No comparative data exist for this instrument.

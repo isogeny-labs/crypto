@@ -1,0 +1,176 @@
+{
+  "schema": "finite-precision-history-peer-review/v1",
+  "created_utc": "2026-11-23T11:06:45.563Z",
+  "scope": "Read-only source/algebra/control and pre-existing receipt review. No Lean, build, proof gate, verifier, native test, cryptographic experiment, cloud/S3 operation or cache restoration was run. Node/shell performed only administrative inspection and hashing. No native/source/old-review bytes were edited.",
+  "disposition": {
+    "numeric_history_component": "supported_within_scope; no blocking algebra or control defect found",
+    "formal_execution_provenance": "not independently established by this unsigned read-only review",
+    "pcc": "dc026e and8bf465 remain unsigned/unverified; malformedf665ec is retained and not accepted as evidence",
+    "publication": "New history sources and records are local/uncommitted at review; later committed publication binding remains separate"
+  },
+  "source_bindings": {
+    "history_sha256": "0a23557953ddc0f74205b6812689bd400d6044c0ae0c607c1805aa09a70cd4b4",
+    "controls_sha256": "a2dc575b5d2d9f2d27c440e0b7fe7a5848ef377a4fe7032d8f7493d315bff001",
+    "history_matches_frozen13c": true,
+    "controls_match_frozen16": true,
+    "shared_core_sha256": "92e4300c71c4b1570ab193df4de22fe31b04a9d7ca0f0212191169555951989a",
+    "shared_core_commit": "3e47fb776a4eb5231de4c8aad2bb6e756c2f89a1",
+    "mathlib_pin": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "dependency_scope": "This instance uses the explicitly identified older public-proof Mathlib cache on Lean4.35.0. It does not use or change shared crypto-lean Mathlib pin cfc55fc58714a59dc06e6e79edc6d1d95140d3c2; shared precision core remains Std-only.",
+    "native_main_pin": "816f9c3a942efed569049618c056d12a0c56d693",
+    "endpoint_decl_sha256": "94e6d3b3d053f6c67f8014c4fb8a1ebd158dd58dfc7dcbba9aa13dfbce9afc8d",
+    "canonical_claim_digest": "89f25a0ea25d5f465832f97477378f4a1c8ed94cb112d66bf176bc8405f380d9"
+  },
+  "theorem_reviews": [
+    {
+      "name": "inherited_precision_le",
+      "status": "sound_on_source_review",
+      "hypotheses": "Natural s,A,d and total Nat-indexed arrays M,u,a,i,p; M0<=s,p0<=s; for k<d:8*M(k+1)<=M(k),0<u(k)<=M(k),a(k)<=A,and p(k+1)=childPrecision(p(k),M(k),u(k),a(k),i(k)).",
+      "conclusion": "p(d)<=81*s*2^A",
+      "finite_indices": "seq_le_seq at j<d uses hstep only for k<j, weakened by k<j<d. It does not require infinite positive shrinkage. The final shrink condition k=d-1 is harmlessly stronger than needed for summing M0..M(d-1). Total array values outside the finite range are unused.",
+      "algebra": "Nat shrink casts into Rat exactly, giving Mj<=(1/8)^j*s; finite geometric sum<=8/7 yields mass<=2s. Shared increment_le plus a(j)<=A bounds the increment sum by80*s*2^A. Induction for n<=d uses hprecision at n<d and sum_range_succ to telescope exactly. p0<=s<=s*2^A supplies the remaining coefficient1. No inherited precision budget is assumed as a substitute for the recurrence."
+    },
+    {
+      "name": "nonempty_normalization",
+      "status": "sound_integer_lemma_with_fidelity_limit",
+      "statement": "For E>0,E<=2E and E+1<=2E.",
+      "native_binding": "Native Counter::count uses s=2E and p0=E+1 for nonempty input. Bipartite::from_boolean constructs exactly2E graph edges, so actual root M0=s, and M0<=s follows by equality. The first lemma conjunct E<=2E concerns unsubdivided E, not identification of native root M0. No Rust root-construction theorem is proved."
+    },
+    {
+      "name": "next_precision_mul_le",
+      "status": "sound_composition_on_source_review",
+      "hypotheses": "Previous finite-history hypotheses; current hnext sets p(d+1)=childPrecision(p(d),M(d),u(d),A+2u(d),i(d)); currentu<=M,i<u,s<=M*q,81*q*u<=2^(u+1),8*u*(A+2u+1)<=2^(A+u+1).",
+      "conclusion": "p(d+1)*u(d)<=34*M(d)*2^(A+2u(d)-i(d))",
+      "review": "The proof applies the shared scalar endpoint at c=81, supplying its inherited budget from inherited_precision_le. Thus this component discharges the former numeric inherited-budget premise for supplied finite histories. It still assumes current dimension absorptions and current formula."
+    }
+  ],
+  "controls": {
+    "count": 8,
+    "positives": [
+      {
+        "name": "positive_empty_history",
+        "review": "d0,root7,p0=5,s7,A0 gives5<=567. Finite step premises are legitimately vacuous at the empty boundary; root/initial bounds are satisfied."
+      },
+      {
+        "name": "positive_two_step",
+        "review": "M=(64,8,1),u=1,a=(2,4),p=(64,7744,11136),s64,A4,d2. Both shrink equalities and exact increments7680/3392 hold;11136<=82944. This supplies a nonempty finite witness."
+      },
+      {
+        "name": "positive_composed_endpoint",
+        "review": "d1,E128,s256,p0=129,M=(128,16),u=(1,16),pastA2,p1=15489,p2=12602881. Every stated history/current premise holds; multiplied endpoint201646096<=285212672. This is a synthetic numeric witness with native-sized initial precision, not an actual admitted Rust path."
+      }
+    ],
+    "deletions": [
+      {
+        "name": "without_initial_budget",
+        "removed": "p0<=s",
+        "review": "Other named premises hold for two steps; badStart=(1000000000,1000007680,1000011072), final1000011072>82944."
+      },
+      {
+        "name": "without_root_edge_bound",
+        "removed": "M0<=s",
+        "review": "s1,p0=1,M0=1000000,M1=0,u1,A0 and exact increment32000000 keep other premises;32000001>81."
+      },
+      {
+        "name": "without_edge_shrink",
+        "removed": "8*M(k+1)<=M(k)",
+        "review": "ConstantM1,u1,A0 and p(k)=1+32k keep other premises;d4 gives129>81."
+      },
+      {
+        "name": "without_exponent_cap",
+        "removed": "a(k)<=A",
+        "review": "M1→0,p0=1,u1,A0 but step exponent10 gives exactp1=24665>81."
+      },
+      {
+        "name": "without_exact_recurrence",
+        "removed": "The precision recurrence",
+        "review": "M1→0,p0=1,u1,A0 satisfy other premises while arbitraryp1=1000>81."
+      }
+    ],
+    "interpretation": "These are five isolated deletion counterexamples for the named history assumptions. The separate positive-scale/scale<=edge condition remains required and is not deletion-tested by these five. No minimality or pointwise necessity is established; an upper-bound recurrence could be sufficient even though deleting all recurrence control fails. No controls are solver executions."
+  },
+  "nonblocking_fidelity_notes": [
+    {
+      "id": "H1",
+      "detail": "Actual subdivided root hasM0=2E, while the composed scalar witness choosesM0=E=128<=s256. Keep the claimed normalization arithmetic separate from actual graph-history extraction."
+    },
+    {
+      "id": "H2",
+      "detail": "The theorem does not constrain past valuationi(k)<u(k), half-scale recursionu(k+1), or cumulative exponent identities; the coarse increment law does not need them. The current hnext directly usesA+2u(d), and does not assert arraya(d)=A+2u(d). The composed witness keeps past-arraya(k)=2 but uses current exponent34 and increasesu from1 to16; it cannot be identified with the native parameter path."
+    }
+  ],
+  "recorded_qualification": {
+    "phases": [
+      {
+        "phase": "13-finite-native-history",
+        "exit_code": 1,
+        "physical_stop": 0,
+        "peak_whole_cgroup_bytes": 13442043904,
+        "stdout_sha256": "c73ed7a6306d1dcf858a20d4fb6691b87931442003934cf72aaaa4a459a8e026",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "phase": "13b-finite-native-history",
+        "exit_code": 0,
+        "physical_stop": 0,
+        "peak_whole_cgroup_bytes": 13443567616,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "phase": "13c-history-composed-endpoint",
+        "exit_code": 0,
+        "physical_stop": 0,
+        "peak_whole_cgroup_bytes": 13459365888,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "phase": "16-composed-history-controls",
+        "exit_code": 0,
+        "physical_stop": 0,
+        "peak_whole_cgroup_bytes": 13453029376,
+        "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "phase": "17-all-history-axioms",
+        "exit_code": 0,
+        "physical_stop": 0,
+        "peak_whole_cgroup_bytes": 13442899968,
+        "stdout_sha256": "9c0d765f634d52fa1983b6146cecbf70a07147cd202d0b258896c6c7be5c02ff",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "phase": "18-history-pcc-verifier",
+        "exit_code": 0,
+        "physical_stop": 0,
+        "peak_whole_cgroup_bytes": 15005417472,
+        "stdout_sha256": "9bbb1b62a6b74331200a5f34b2a392837950962ad5402a02558bfca55b4984c2",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "axioms": "Phase17 queries exactly3 history/normalization/composed theorems and8 controls. Three theorems and3 positive controls report only propext,Classical.choice,Quot.sound; the5 deletion controls report propext,Quot.sound. No sorry/admit/custom axiom/native_decide/unsafe proof shortcut was found in the inspected source. These are recorded kernel outputs, not a repeated independent kernel check.",
+    "failed_phase13": "Retained exit1 includes wrong Nat.cast_nonneg parameterR and an omega failure on nonlinear reassociation. Subsequent source usesα and explicit rearrangement. This is a development typing/normalization failure, not an algebraic counterexample or relaxed theorem premise.",
+    "gate18": "Now terminal: exit0,physical-stop0,peak15005417472bytes, empty stderr, local unsigned pcc.verdict/v1 pass fordc026e. Exact normalized declaration hash and canonical claim digest match its source/proof record. No signed ledger verdict or execution attestation follows."
+  },
+  "malformed_claim": {
+    "id": "PCC-20261123-f665ec",
+    "status": "retained_local_verifier_fail; not evidence",
+    "reason": "Absolute project reference to history-pcc-proof.json escapes repository and names a JSON proof description rather than a Lean source target. The malformed record was not silently repaired. New structured claimdc026e pins a repository-relative Lean source, exact theorem and declaration hash."
+  },
+  "cache_and_limits": {
+    "restoration": "Plan/receipt disclose455 external .olean.private cache entries,total122739848bytes,for the required Mathlib import closure. Safe relative suffix paths and plan counts/byte totals agree with receipt. Receipt reports all restored hashes match and the source archive remains retained. Reviewer did not restore or run the compiler/cache verifier.",
+    "remaining_cache": "Only that subset was restored. Other private/editor caches remain compacted; restore required dependencies and preflight resources before broader Mathlib work. No dependency pin or owned source/proof/checkpoint bytes were changed by this review.",
+    "execution": "Original Lean4.35.0,one worker,600-second phase cap,15032385536-byte whole-cgroup guard; no resource/time/performance result inferred."
+  },
+  "remaining_obligations": [
+    "Construct/refine actual successful Rust histories with the correct2E root,precision recurrence,strict child-edge shrinkage,scale/valuation/cumulative-exponent identities and representable checked arithmetic.",
+    "Derive current root/current comparison and both absorption conditions from actual source admission rather than supplying them as scalar hypotheses.",
+    "Hermite/packet/mode semantics,creation precision,allocation unions,rational widths,entry bit-work,total counter correctness/complexity,shared-library/current-root CI and general mathematical audit remain separate.",
+    "No ECDLP algorithm improvement,solver comparison,84-case completion,challenge scalar,L2 timing,asymptotic gain or novelty clearance is established.",
+    "Commit/publish exact history source and evidence,then bind it in a new addendum. Do not alter this local snapshot or earlier reviews."
+  ],
+  "evidence_manifest": "history-evidence-03.sha256",
+  "evidence_manifest_sha256": "69a565c57bb2ff0f57437b6969129d0cd89fe108d27e56abfb1e04f7ea34b3d9"
+}

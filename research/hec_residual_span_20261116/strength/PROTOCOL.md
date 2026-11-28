@@ -1,0 +1,7 @@
+# Strong-subgroup coverage screen, not performance
+
+Prospectivefixed8genus/fieldpairs:g2p101/251/401/601/1021,g3p113/211/421. No genus4order9familyasgenericcontrol. Prime/congruencechecks. Scanexistingc1..32 inascendingorder,retainallrejections,firstmodelmeetingoriginalalgebraic/subgroup/operator/pointmapchecks PLUS4ell≥U. U=(ceil_sqrt(p)+1)^(2g), computedexactinteger, isaconservativeHasseupperboundfor#J. Sinceverifiedsourceorderell divides#J and#J≤U,wholeJacobiancofactor#J/ell≤floor(U/ell)≤4. Thisisstrongerthananunspecifiedprime-orderfractionanddoesnotcompute#Jexactly. No floatingthreshold, no source-pointLCM=#J assumption.
+
+Qualificationcopyfromholdout changesonlystrengthcheck;pointorderBSGSbudget200000andallotherconditionsretained. Retainfieldswithnoeligiblemodel; do notreplacefields/cafteroutcomes. Firstcselectionnotbasedonruntime/target. Positivecontrols g2F101ell7481/g3F421ell77152909mustqualify;all8fieldsclassified. Noeligibleotherfieldsisanegativescreenresult,notexperimentfailure; recordcount. Sourcesnonzeroand[ell]source=0. No targetconstruction orsolves; no counts/speedup/instruction/wallclaim. Exactmodel/subgroupreceiptsenablealaterdistinctsolvegatenotimplicitexecutionofone.
+
+Compile/freeze/pushsource/protocol/native/import/binarybeforeonce-only600srun;clean/nooverwrite/GitcustodywhileS3down. Counterdisabled(commonqualification), no oldexperimentrerun/retry/adaptivefields/budgets. RawCONTROL/FIXTURES/stderr/run/exit/hashesretained. Thisaddressesinputstrength,notmathematical10xobjectivecompletion.

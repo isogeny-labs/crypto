@@ -1,0 +1,46 @@
+proc require91r(int ok,string tag){if(!ok){print("REPLAY91_FATAL "+tag);exit;}}
+string saved91r=read("rr-pid50.sing");
+int start91r=find(saved91r,"ring inverseBaseCertificate50=");
+require91r(start91r>0,"PID_HEADER");
+execute(saved91r[start91r,size(saved91r)-start91r+1]);
+setring inverseBaseCertificate50;
+matrix B091r=matrix(basis50);
+poly F091r=commonDenominator50;
+ring replayField91=(2,u),(c),dp;
+map replayMap91=inverseBaseCertificate50,u;
+matrix Br91=replayMap91(B091r);
+poly Fr91=replayMap91(F091r);
+require91r(nrows(Br91)==32 && ncols(Br91)==32,"BASIS_SHAPE");
+execute(read("transport91.sing"));
+require91r(size(forwardM91)==32 && size(reverseM91)==32,"POWER_COUNT");
+require91r(Br91*forwardC91==Fr91*forwardW91,"FORWARD_FULL_PRODUCT");
+require91r(Br91*reverseC91==Fr91*reverseW91,"REVERSE_FULL_PRODUCT");
+int direction91r;int column91r;int row91r;int checked91r=0;
+matrix C91r[32][1];matrix W91r[32][1];matrix bad91r[32][1];
+for(direction91r=1;direction91r<=2;direction91r++){
+ for(column91r=1;column91r<=32;column91r++){
+  if(direction91r==1){
+   require91r(forwardM91[column91r]>=0 && forwardM91[column91r]<=61,"FORWARD_POWER_RANGE");
+   for(row91r=1;row91r<=32;row91r++){
+    C91r[row91r,1]=forwardC91[row91r,column91r];
+    W91r[row91r,1]=forwardW91[row91r,column91r];
+   }
+  } else {
+   require91r(reverseM91[column91r]>=0 && reverseM91[column91r]<=61,"REVERSE_POWER_RANGE");
+   for(row91r=1;row91r<=32;row91r++){
+    C91r[row91r,1]=reverseC91[row91r,column91r];
+    W91r[row91r,1]=reverseW91[row91r,column91r];
+   }
+  }
+  require91r(Br91*C91r==Fr91*W91r,"COLUMN_PRODUCT");
+  for(row91r=1;row91r<=32;row91r++){
+   require91r(C91r[row91r,1]==leadcoef(C91r[row91r,1]) && denominator(leadcoef(C91r[row91r,1]))==1,"NONPOLYNOMIAL_COORDINATE");
+  }
+  bad91r=C91r;bad91r[1,1]=bad91r[1,1]+1;
+  require91r(Br91*bad91r!=Fr91*W91r,"CORRUPTION_UNDETECTED");
+  checked91r=checked91r+1;
+ }
+}
+print("REPLAY91_RESULT columns="+string(checked91r)+" full_products=2 polynomial_coordinates=2048 corruption_rejections=64");
+print("REPLAY91_ALL_CHECKS_PASS");
+quit;

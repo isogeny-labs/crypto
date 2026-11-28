@@ -1,0 +1,145 @@
+{
+  "format": "correspondence-assessment-draft-v1",
+  "assessment_state": "draft",
+  "authority": "companion artifact; not a ledger record or certificate",
+  "source": {
+    "object_uid": "n83-target-E-r",
+    "representation_uid": "binary-elliptic-affine",
+    "equations": "y^2 + x*y = x^3 + 1",
+    "field": "GF(2^83)",
+    "dimension": 1,
+    "subgroup_order": "2417851639230796216685689"
+  },
+  "destination": {
+    "object_uid": "n83-genus3-JC",
+    "representation_uid": "binary-hyperelliptic-mumford",
+    "equations": "v^2 + u^2*v = u^7 + u",
+    "field": "GF(2^83)",
+    "dimension": 3,
+    "ambient_group_order": "not used by the projected cost model"
+  },
+  "transformation": {
+    "kind": "degree-three curve morphism with induced Jacobian pullback and norm pushforward",
+    "family": "complete degree-d effective representatives followed by projected closed-point norms",
+    "degree": "cover degree 3; effective degree d>=5",
+    "field_of_definition": "GF(2)",
+    "formulas": "phi(u,v)=(u^3,u*v+1); V=h+v0+k*u0; U=(f+h*V+V^2)/u0 for the degree-five affine chart",
+    "exceptional_cases": [
+      "identity labels are removed",
+      "equal projected labels are merged",
+      "ramified and nonsplit supports are delegated to the prior general norm certificate",
+      "the higher-degree chart itself was not implemented after the cost gate failed"
+    ],
+    "normalization": "unit-normalize U to monic form and use V mod U"
+  },
+  "obligations": {
+    "existence": {
+      "state": "supported",
+      "evidence": ["PROTOCOL.md", "../n83_jacobian_projector_20261031/RESULTS.md"],
+      "scope": "cover, pullback, arbitrary closed-point norm and complete linear systems"
+    },
+    "explicit_construction": {
+      "state": "supported",
+      "evidence": ["PROTOCOL.md#complete-higher-degree-family"],
+      "scope": "formula-level degree-five affine chart; not executable higher-degree code"
+    },
+    "map_correctness": {
+      "state": "supported",
+      "evidence": ["../n83_jacobian_projector_20261031/RESULTS.md"],
+      "scope": "prior general norm/projector certificate, not a new higher-degree run"
+    },
+    "subgroup_preservation": {
+      "state": "supported",
+      "evidence": ["../n83_jacobian_projector_20261031/RESULTS.md"],
+      "scope": "r-primary image; Prym order is coprime to r"
+    },
+    "computational_advantage": {
+      "state": "refuted",
+      "evidence": ["SCREEN.json", "VALIDATION.json", "RESULTS.md"],
+      "scope": "registered random/generic projected-label family"
+    },
+    "scaling_support": {
+      "state": "refuted",
+      "evidence": ["SCREEN.json", "RESULTS.md#why-the-additional-parameters-do-not-move-the-exponent"],
+      "scope": "every merged arity in the registered family; no claim about a future non-generic norm-preimage algorithm"
+    }
+  },
+  "preservation_certificate": {
+    "identity": "phi_* phi^* = [3] and e^2=[3]e",
+    "kernel_intersection": "gcd(r,#Prym)=1",
+    "recovery_map": "pushforward to E, cofactor four, solve modulo r",
+    "scalar_multiplier": "[4]phi_*phi^*=[12] on E[r]",
+    "proof_artifact": "../n83_jacobian_projector_20261031/RESULTS.md"
+  },
+  "mechanism": {
+    "proposed_benefit": "use q^(d-3) effective representatives per transported class and merge many source closed-point preimages into a smaller projected factor base",
+    "prediction": "additional representatives increase candidate supply but uniform projected membership remains (B/r)^a",
+    "falsification_condition": "a complete route with exponent below 1/2 in r or a concrete finite crossover",
+    "assumptions": [
+      "unit-cost factorization, norm, projection and membership",
+      "uniform independent nonidentity projected labels",
+      "independent useful rows until full rank",
+      "random graph/hypergraph large-prime behavior"
+    ]
+  },
+  "cost_comparison": {
+    "workload": "one discrete logarithm in the order-r transported image",
+    "baseline": "strong source rho, r^(1/2)",
+    "units": "leading exponent in r; n=83 leading bits are secondary",
+    "construction": "complete degree-d system has Theta(q^(d-3)) candidates per class",
+    "transfer": "granted unit cost per candidate in the optimistic screen",
+    "destination": "small-base r^(2a/(a+1)); two-large-prime r^(2-2/a); optimistic all-large graph r",
+    "recovery": "arity-one collision table is B+r/B and reaches only r^(1/2); other target stages do not lower total precomputation",
+    "verification": "seven formula-replay groups",
+    "failed_attempts_and_duplicates": "charged favorably as zero beyond candidate count",
+    "memory_and_data": "at least factor-base/matrix scale B; all-large graph order r",
+    "setup_reuse": "precomputation is included; no amortized-only advantage is claimed",
+    "uncertainty": "projected-label distribution is modeled, not measured; all grants favor the candidate",
+    "evidence_label": "modeled"
+  },
+  "controls": [
+    "prior exhaustive degree-four n=9 random-label check",
+    "ordinary ambient genus-three q^(4/3) calculus",
+    "source and destination generic rho/BSGS",
+    "arity-one known-log collision table",
+    "optimistic all-large-prime random hypergraph"
+  ],
+  "protocol": {
+    "parameter_scope": "complete d=5..31 executable grid plus general d>=5 and every 1<=a<=d formula",
+    "sample_selection": "not applicable; exact symbolic enumeration",
+    "stopping_rules": "stop when no named route has exponent strictly below 1/2 or a finite crossover",
+    "invalidation_rules": "registration hash mismatch, formula replay failure, or discovery of an omitted non-generic norm-label mechanism",
+    "hardware_manifest": "not applicable; no scientific timing run",
+    "execution_route": "local deterministic Python formula screen"
+  },
+  "exploration_boundary": {
+    "families": [
+      "complete higher-degree Riemann--Roch representatives",
+      "split and nonsplit closed-point norms",
+      "small-base, double-large-prime and all-large-prime random-label routes"
+    ],
+    "parameters": "d>=5, merged arity 1..d, actual order r",
+    "completed_scope": "machine grid d=5..31; formulas monotone/general for all d>=5",
+    "completeness_claim": "complete only within the registered random/generic projected-label model"
+  },
+  "composition": {
+    "edge_ids": ["phi^*", "complete-linear-system", "closed-point-norm", "cofactor-project"],
+    "junction_compatibility": "supported by prior norm/projector certificate",
+    "weakest_open_obligation": "non-generic targeted norm-preimage or projected-label law"
+  },
+  "sources": [
+    "https://arxiv.org/abs/math/0606607",
+    "https://eprint.iacr.org/2005/119.pdf",
+    "https://www.shoup.net/papers/dlbounds1.pdf",
+    "PROTOCOL.md",
+    "../n83_jacobian_projector_20261031/RESULTS.md",
+    "../n83_norm_fiber_rr_router_20261118/RESULTS.md"
+  ],
+  "open_obligations": [
+    "construct and cost a sublinear targeted norm-preimage algorithm, if one exists",
+    "identify an explicit non-random projected-label law before any further measurement",
+    "obtain independent PCC verification before promoting the modeled claims"
+  ],
+  "recommended_next_action": "stop this family; reopen only for a named non-generic norm-label mechanism with a complete sub-rho model",
+  "official_status_change": "none"
+}

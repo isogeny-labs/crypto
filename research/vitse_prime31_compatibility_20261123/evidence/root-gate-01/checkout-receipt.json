@@ -1,0 +1,55 @@
+{
+  "patterns": [
+    "/AGENTS.md",
+    "/Cargo.toml",
+    "/Cargo.lock",
+    "/build.rs",
+    "/.cargo/",
+    "/src/",
+    "/crates/",
+    "/tools/factor-base/",
+    "/tools/volcano-cli/",
+    "/isogeny_algos/",
+    "/research/pencil_large_prime_20261029/Cargo.toml",
+    "/research/pencil_large_prime_20261029/src/"
+  ],
+  "commands": [
+    {
+      "command": [
+        "git",
+        "-C",
+        "/workspace/scratch/857f9e575d1c/work/vitse-current-root",
+        "sparse-checkout",
+        "init",
+        "--no-cone"
+      ],
+      "exit_code": 0,
+      "seconds": 0.0047037601470947266
+    },
+    {
+      "command": [
+        "git",
+        "-C",
+        "/workspace/scratch/857f9e575d1c/work/vitse-current-root",
+        "sparse-checkout",
+        "set",
+        "--no-cone",
+        "--stdin"
+      ],
+      "exit_code": 0,
+      "seconds": 0.010920047760009766
+    },
+    {
+      "command": [
+        "git",
+        "-C",
+        "/workspace/scratch/857f9e575d1c/work/vitse-current-root",
+        "checkout",
+        "--detach",
+        "7d61e3b45de6e93d235345a0061dae08db1f8b44"
+      ],
+      "exit_code": 0,
+      "seconds": 11.713261604309082
+    }
+  ]
+}

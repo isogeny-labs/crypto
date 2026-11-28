@@ -1,0 +1,11 @@
+name = "statement_binding_audit"
+version = "0.1.0"
+defaultTargets = ["StatementBindingAudit"]
+
+[[require]]
+name = "support_gaussian_audit"
+path = "../../support_gaussian_audit_20261114/lean"
+
+[[lean_lib]]
+name = "StatementBindingAudit"
+roots = ["HeaderControls", "BindingProbe", "HeaderCertificate"]

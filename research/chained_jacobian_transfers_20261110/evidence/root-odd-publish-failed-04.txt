@@ -1,0 +1,16 @@
+fatal: remote error: upload-pack: not our ref 01bd06b70d22425faf6d7ec80e828b1a07cb9161
+fatal: remote error: upload-pack: not our ref 01bd06b70d22425faf6d7ec80e828b1a07cb9161
+fatal: Invalid revision range 1e4f8e795f770ea39320ab694623cafe8b7563ad..01bd06b70d22425faf6d7ec80e828b1a07cb9161
+Traceback (most recent call last):
+  File "/workspace/scratch/publish_checkpoint_objects.py", line 43, in <module>
+    commits=git('rev-list','--reverse',f'{expected}..{head}').decode().splitlines()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/publish_checkpoint_objects.py", line 20, in git
+    return subprocess.check_output(['git',*args])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'rev-list', '--reverse', '1e4f8e795f770ea39320ab694623cafe8b7563ad..01bd06b70d22425faf6d7ec80e828b1a07cb9161']' returned non-zero exit status 128.

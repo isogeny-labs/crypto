@@ -1,0 +1,23 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T01:04:04Z",
+ "id": "PCC-20261124-1da4bf",
+ "kind": "statement",
+ "producer": {
+  "commit": "9561195b516c9747d36686f5ddb0d15dc80a8f6b",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/collection_preflight_20261124/evidence/existing-workflow-status.json",
+    "sha256": "af6b203bebbdd8b8150bae1a30bdb4c7b5b1211f023b3635ab537269efda7269"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "p192-existing-execution-dependencies",
+ "statement": "Read-only existing-workflow metadata lists latest budget run45219644370 and replay dispatch45221063854 still as completed failures at their original sources/timestamps. Listed PR replay successes predate the failed dispatch. No new workflow was dispatched,credential attempt repeated,remaining budget observed,or external IAM/secret state inspected. This supplies no evidence that the recorded admission/signing dependencies have changed. Producer-unverified metadata observation only."
+}

@@ -1,0 +1,35 @@
+{
+  "schema": "independent.prospective-source-review/v1",
+  "task": "T-2178",
+  "reviewed_manifest_sha256": "9eed70cf44043501e573590f389d48da59177b8ac5cf8e4cdb1ee9db57f21698",
+  "reviewed_freeze_sha256": "c0268d01960267fe0d782bd62367cac75141a6ff18249e459a5cd8a7a983ea91",
+  "count_erratum_sha256": "219aa640621425b77f8b418444014e3b88c15e70deaae145b8d2db6ed64d6947",
+  "prior_mathematical_review_sha256": "a14fa5ab2f817374f8fecf0f421bbe88da1f595ae675492f105f9b86df5671bc",
+  "status": "source_checked_final_accounting_binding_pending",
+  "five_modules_byte_identical_to_approved_successor": true,
+  "readback_names": 17,
+  "producer_names": 9,
+  "reviewer_names": 8,
+  "workspace_consistent_and_absent": "/home/ec2-user/pencil-native-pivot-control-operational-v1-20261111",
+  "deadline_utc": "2026-11-11T12:00:00Z",
+  "total_seconds": 2400,
+  "phase_seconds": {
+    "pre": 900,
+    "compiler": 600,
+    "post": 900
+  },
+  "retry_limit": 0,
+  "current_accounting_null": true,
+  "checks": [
+    "All semantic manifest members and freeze file pins verified",
+    "Five mathematical files byte-identical to prior rfl successor; names unchanged and present in Readback",
+    "Launcher and replay literal workspace and deadline agree with freeze",
+    "Additive count erratum correctly replaces group count 2 with declaration count 17"
+  ],
+  "obligations": [
+    "Populate current ledger in an additive final freeze/release successor and reseal affected pins before execution; reviewed draft is intentionally unreleased and launcher rejects null accounting",
+    "Bind current serial terminal, live lease, publication and independent review receipts before release"
+  ],
+  "compiler_or_native_execution": false,
+  "source_modified": false
+}

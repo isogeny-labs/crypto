@@ -1,0 +1,22 @@
+Development qualification only; no scientific solver panel, benchmark or stream capture.
+RUSTUP_HOME=/workspace/scratch/rust/rustup
+CARGO_HOME=/workspace/scratch/rust/cargo
+CARGO_TARGET_DIR=/workspace/scratch/auxiliary-isogeny-target
+CARGO_BUILD_JOBS=2
+RUST_TEST_THREADS=1
+cargo=/workspace/scratch/rust/cargo/bin/cargo
+manifest=research/smooth_p_plus_one_20261123/auxiliary-isogeny/Cargo.toml
+
+/workspace/scratch/rust/rustup/toolchains/1.90.0-x86_64-unknown-linux-gnu/bin/rustfmt --edition 2021 research/smooth_p_plus_one_20261123/auxiliary-isogeny/src/lib.rs
+Initial prose-lint invocation stopped the planned lock generation on the word "verifies".
+The dependent test invocation was mistakenly started before inspecting that nonzero result:
+/workspace/scratch/rust/cargo/bin/cargo +1.99.1 test --release --locked --manifest-path research/smooth_p_plus_one_20261123/auxiliary-isogeny/Cargo.toml
+  tests_1.txt, tests_1.exit: exit101, no compilation or tests because Cargo.lock was absent.
+Reworded the standard-identity sentence; final protocol lint passes.
+/workspace/scratch/rust/cargo/bin/cargo +1.99.1 generate-lockfile --offline --manifest-path research/smooth_p_plus_one_20261123/auxiliary-isogeny/Cargo.toml
+  succeeded; dependency-free Cargo.lock version4 retained.
+/workspace/scratch/rust/cargo/bin/cargo +1.99.1 test --release --locked --manifest-path research/smooth_p_plus_one_20261123/auxiliary-isogeny/Cargo.toml
+  tests_2.txt, tests_2.exit: exit0,9 unit tests pass,0 doc tests.
+/workspace/scratch/rust/cargo/bin/cargo +1.99.1 build --release --locked --manifest-path research/smooth_p_plus_one_20261123/auxiliary-isogeny/Cargo.toml
+  build_1.txt, build_1.exit: exit0.
+Only one actual unit-suite execution; no passing suite was repeated.

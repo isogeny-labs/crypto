@@ -1,0 +1,17 @@
+digraph {
+ graph [rankdir=TB,bgcolor="white",pad=0.2,nodesep=0.25,ranksep=0.35];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf1fa",fontname="DejaVu Sans",fontsize=11];
+ edge [color="#46566b"];
+ input [label="Seven public integers\np, a, b, Gx, Gy, Qx, Qy"];
+ lift [label="Four fixed coefficient lifts\nHensel quotients + inverse products"];
+ trace [label="Eight explicit traces over Z/(p²)\n1,680 kernel-checked transitions"];
+ phi [label="Terminal inverse products\nparameter coefficients + recovery"];
+ actual [label="Actual Mathlib curve points\nprime p; order(G)=p; Q=dG"];
+ cert [label="Each fixed arithmetic attempt returns d\nand that returned d satisfies dG=Q",fillcolor="#d9efe1"];
+ native [label="Frozen native run\n3 calls; all outcomes retained",fillcolor="#f7eedb"];
+ scope [label="Concrete mathematical certificate\nNative execution standing remains separate",fillcolor="#f7eedb"];
+ input->lift->trace->phi->cert;
+ input->actual->cert;
+ native->trace [style=dashed,label="untrusted witnesses"];
+ cert->scope;
+}

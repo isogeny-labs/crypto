@@ -1,0 +1,58 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T20:57:20Z",
+ "id": "PCC-20261116-869d20",
+ "kind": "statement",
+ "producer": {
+  "commit": "7525e4e361b25cbec4c9e718e280d3cb1276564b",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/pr-closure-4397-20261116/PR_SNAPSHOT.json",
+    "sha256": "fb906249df0eca7a9456f7837afe77c50f94d6fa686624b85fb89cd9ae023bd4"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/pr-closure-4397-20261116/CHECK_SNAPSHOT.json",
+    "sha256": "2d2507f70e22ce067738dd8f5f901a5f0dbe9719c16a91da087785d0b89e1a7c"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/pr-closure-4397-20261116/RETENTION.json",
+    "sha256": "7f060547f744565f42a95037a7e599f3c8c5dcfba9fdac031eb8e4d23cb2a529"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/pr-closure-4397-20261116/merge-commit.txt",
+    "sha256": "5bed5247368d184fec4b578d5df9bcd23608bae5efd23e3a63bd39011cb5effe"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/pr-closure-4397-20261116/head-commit.txt",
+    "sha256": "6761312594cfb58dba288f8187907ee8acfb1e3ff6c22ff9dd7a4b802d325537"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/pr-closure-4397-20261116/README.md",
+    "sha256": "732e3099e0c9dd5342ba2681735a3759ec52c3b7d7c0a3690650f4030c5d8287"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "PR4397 terminal immutable metadata and retention audit",
+ "statement": "PR4397 externally merged20:16:38Z into main as cd6194a7, head9dff with identical merge tree. Prior study and claim files retain exact blobs, but the canonical1215-row ledger omits38 formerly published lane registrations after1098 shared rows, and the old journal block multiset is not fully retained. This continuation neither merged nor repaired/rechained/re-registered published history. Final41-check snapshot is postmerge; no all-green-at-merge, exact premerge failure, signed science, complete original-session coverage or recovery attribution inferred. Episode E-9ad1262e3c79 and outcome O-ffce2552fe60 are partial publication-only coverage; checker disabled."
+}

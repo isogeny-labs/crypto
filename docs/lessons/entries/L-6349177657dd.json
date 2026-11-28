@@ -1,0 +1,14 @@
+{
+  "action": "Export an explicit list of committed blobs with git show, retaining a revision and per-file hashes",
+  "created": "2026-11-24T04:48:53Z",
+  "evidence": [
+    "research/volcano_ic_recovery_20261027/command/validation/component.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "isolab-eks"
+  ],
+  "trigger": "Exporting selected source from this blobless checkout with git archive initiated a broad promisor fetch",
+  "why": "The interrupted baseline archive requested hundreds of thousands of objects; enumerated baseline and image exports stayed within their declared source sets."
+}

@@ -1,0 +1,47 @@
+{
+  "schema": "bounded.qualification-commands/v1",
+  "exact_tests": [
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::partial_rows_do_not_change_the_frozen_expected_set",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::retry_requires_present_same_slot_attempt_zero_parent",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::same_seed_different_workload_or_plan_never_forms_one_triplet",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::caller_eligibility_and_cost_injection_are_unknown_fields",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::null_or_partial_nine_category_rows_are_not_admitted",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::changed_file_bytes_do_not_match_a_retained_pin",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::distinct_retry_resource_snapshot_uses_primary_plan_not_primary_session",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::partial_primary_and_retry_sessions_keep_expected_slots",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::missing_custody_or_diagnostics_prevents_comparison_even_with_priced_data",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::adversarial_controls::observed_rows_respect_native_written_prefix_and_unwritten_boundary",
+    "cryptanalysis::ecbench::retained_attempt_join_v4::qualification::full_frozen_enrollment_empty_interrupted_files_export_6300_null_triplets"
+  ],
+  "materialization": [
+    "/usr/bin/python3",
+    "-B",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/exporter-v4-qualification-v2-20261111/materialize.py"
+  ],
+  "root_lock": [
+    "cargo",
+    "generate-lockfile",
+    "--offline"
+  ],
+  "compile": [
+    "cargo",
+    "test",
+    "--release",
+    "--lib",
+    "--locked",
+    "--offline",
+    "--no-run",
+    "--message-format=json"
+  ],
+  "total_seconds": 2400,
+  "build_phase_seconds": 1800,
+  "execution_phase_seconds": 600,
+  "build_phase_includes": [
+    "all hashing",
+    "materialization",
+    "offline lock generation",
+    "compilation"
+  ],
+  "source_manifest_sha256": "4210f7425d1042296f17a635a523f3bd3cd11ade343f6af46700ab813b4ceb0a",
+  "scientific_solver_invoked": false
+}

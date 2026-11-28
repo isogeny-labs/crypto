@@ -1,0 +1,115 @@
+name: Prime31 signed W8 ternary vs legacy ABBA complete-control
+
+on:
+  push:
+    branches:
+      - automation/prime31-w8-ternary-weight-screen-20261118
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_w8_weight_ab.rs
+      - research/prime31_ic_20261115/native/verify_prime31_w8_weight_ab.py
+      - research/prime31_ic_20261115/rr9/W8_TERNARY_WEIGHT_PROTOCOL_20261118.md
+      - .github/workflows/prime31-w8-weight-ab.yml
+  pull_request:
+    paths:
+      - research/prime31_ic_20261115/native/examples/prime31_w8_weight_ab.rs
+      - research/prime31_ic_20261115/native/verify_prime31_w8_weight_ab.py
+      - research/prime31_ic_20261115/rr9/W8_TERNARY_WEIGHT_PROTOCOL_20261118.md
+      - .github/workflows/prime31-w8-weight-ab.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prime31-full-weight-ab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Checkout candidate source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Pin original native elliptic-curve arithmetic
+        uses: actions/checkout@v4
+        with:
+          ref: 1df714645aa683cf975bc76fcacb9842cb4780fd
+          path: pinned
+          persist-credentials: false
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.100.0 --profile minimal
+      - name: Overlay ONLY paired native Rust example
+        run: |
+          cp research/prime31_ic_20261115/native/examples/prime31_w8_weight_ab.rs \
+            pinned/research/prime31_ic_20261115/native/examples/prime31_w8_weight_ab.rs
+          git rev-parse HEAD
+          git -C pinned rev-parse HEAD
+          sha256sum research/prime31_ic_20261115/native/examples/prime31_w8_weight_ab.rs
+      - name: Original Rust regression library
+        run: |
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml --lib
+      - name: Old and ternary source tests, including 32 public solves each
+        run: |
+          cargo +1.100.0 test --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_weight_ab
+      - name: Paired 1024-Q complete solves, balanced OLD-TERNARY-TERNARY-OLD order
+        run: |
+          PRIME31_WEIGHT_ARM=old cargo +1.100.0 run --quiet --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_weight_ab > weight-old-A.json
+          PRIME31_WEIGHT_ARM=ternary cargo +1.100.0 run --quiet --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_weight_ab > weight-ternary-A.json
+          PRIME31_WEIGHT_ARM=ternary cargo +1.100.0 run --quiet --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_weight_ab > weight-ternary-B.json
+          PRIME31_WEIGHT_ARM=old cargo +1.100.0 run --quiet --release --locked \
+            --manifest-path pinned/research/prime31_ic_20261115/native/Cargo.toml \
+            --example prime31_w8_weight_ab > weight-old-B.json
+      - name: Independent BigInt ECC and 1024 target replay, every arm
+        run: |
+          for f in weight-old-A.json weight-ternary-A.json weight-ternary-B.json weight-old-B.json; do
+            python3 research/prime31_ic_20261115/native/verify_prime31_w8_weight_ab.py "$f"
+          done
+      - name: Exact source-bound paired panel summary and fail-closed matching target audit
+        run: |
+          python3 - <<'PY'
+          import json
+          files=['weight-old-A.json','weight-ternary-A.json','weight-ternary-B.json','weight-old-B.json']
+          arms=[json.load(open(f,encoding='utf-8')) for f in files]
+          ref=[x['public_q'] for x in arms[0]['recovered_targets']]
+          assert all([x['public_q'] for x in a['recovered_targets']]==ref for a in arms)
+          assert all(a['rank']==31 and a['target_count']==1024 and a['verified_target_count']==1024 for a in arms)
+          assert all(a['generic_four_plus_four_grader_used'] and a['genuine_nongeneric_rr9_extractors']==0 for a in arms)
+          output=[]
+          for name,a in zip(files,arms):
+            ns=sum(int(x) for x in a['times_ns'].values())
+            item={'source':name, 'time_ms':ns/1e6, 'setup_ms':int(a['times_ns']['setup'])/1e6,
+              'training_ms':int(a['times_ns']['training_and_log_verification'])/1e6,
+              'online_ms':int(a['times_ns']['target_recovery_and_verification'])/1e6,
+              'rank':a['rank'], 'online_queries':a['online_queries'],
+              'training_trials':sum(x['trials'] for x in a['window_training']),
+              'ec_additions':a['counts']['total_ec_additions'],
+              'field_multiplies':a['counts']['total_fp_multiplies'],
+              'field_inversions':a['counts']['total_fp_inversions'],
+              'weights':a['weights'], 'targets':a['verified_target_count']}
+            output.append(item)
+          with open('weight-ab-summary.json','w') as f:
+            json.dump({'schema':'prime31.w8.weight-ab.v1','status':'producer-side, generic table grader only, pcc unverified',
+             'same_public_targets':True,'arms':output},f,indent=2)
+          print(json.dumps(output,indent=2))
+          PY
+      - name: Publish frozen original-curve paired evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prime31-w8-weight-abba-full-1024
+          path: |
+            weight-old-A.json
+            weight-ternary-A.json
+            weight-ternary-B.json
+            weight-old-B.json
+            weight-ab-summary.json
+          if-no-files-found: warn
+          retention-days: 30

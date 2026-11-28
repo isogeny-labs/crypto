@@ -1,0 +1,34 @@
+# Graph/order screen: no eligible follow-up
+
+Unsigned producer L0 single-call screen, PCC-20261116-c431fc. All eighteen cases and all three native arms completed and matched three mature references. No family met both paid ratios>=10; no follow-up, confidence interval or confirmed 10x/15x result is claimed. [pcc:unverified]
+
+| Configuration | Graph width | Observed F4 degree | F4 max columns | Compact root | Local proof terms | F4/compact paid | Expanded/compact paid |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| path-n6-s7 | 2 | 5 | 174 | 5 | 442 | 0.907x | 3.110x |
+| balanced-n6-s7 | 1 | 5 | 171 | 5 | 442 | 0.902x | 1.815x |
+| star-n6-s7 | 1 | 5 | 175 | 5 | 226 | 0.983x | 1.485x |
+| permuted-cycle-n6-s7 | 2 | 5 | 193 | 5 | 442 | 0.887x | 3.984x |
+| path-n7-s7 | 2 | 5 | 265 | 6 | 537 | 0.936x | 8.024x |
+| balanced-n7-s7 | 1 | 5 | 271 | 6 | 537 | 1.098x | 1.685x |
+| star-n7-s7 | 1 | 5 | 245 | 6 | 249 | 0.937x | 1.302x |
+| permuted-cycle-n7-s7 | 2 | 5 | 316 | 6 | 537 | 0.892x | 4.743x |
+| path-n8-s7 | 2 | 5 | 375 | 7 | 632 | 0.882x | 18.826x |
+| balanced-n8-s7 | 1 | 5 | 345 | 7 | 632 | 0.856x | 4.460x |
+| star-n8-s7 | 1 | 5 | 327 | 7 | 272 | 0.942x | 1.292x |
+| permuted-cycle-n8-s7 | 2 | 5 | 423 | 7 | 632 | 0.995x | 10.071x |
+| star-first-n6-s7 | 5 | 5 | 279 | 0 | 251 | 0.935x | 1.319x |
+| balanced-first-n6-s7 | 3 | 5 | 196 | 5 | 442 | 0.884x | 2.713x |
+| star-first-n7-s7 | 6 | 5 | 435 | 0 | 275 | 0.887x | 1.186x |
+| balanced-first-n7-s7 | 3 | 5 | 291 | 6 | 537 | 0.947x | 2.718x |
+| star-first-n8-s7 | 7 | 5 | 641 | 0 | 299 | 0.981x | 1.295x |
+| balanced-first-n8-s7 | 3 | 5 | 415 | 7 | 632 | 0.911x | 13.376x |
+
+Exact mature reference polynomial arrays equal within each variable count: **true**. Supplied homogeneous top forms vanish on every coordinate axis in all recorded cases: **true**. These are producer checks on the recorded inputs/results. [pcc:unverified]
+
+The first-zero-Hilbert-function statistic for these supplied top forms is unavailable: restriction to a coordinate axis leaves nonzero pure powers in every degree. This is not a measurement of intrinsic regularity. Graph width is computed by an x0-first graph elimination, whereas the solver uses grevlex. Neither graph width nor certificate product degree is an F4 solving degree. Only the complete worker's observed productive degree is labelled as such. [pcc:unverified]
+
+The eight-variable path's paid expanded/compact ratio exceeded15 in its one screening call, while its F4/compact ratio was below1. The prospective rule requires both controls; no family is selected. Do not turn a one-call point into a confidence claim, replace the null selection or reuse original conditional fresh targets. [pcc:unverified]
+
+![Single-call paid ratios](screen.svg){width=85%}
+
+Each point is one planned call, not a median or interval. Blue=F4/compact, orange=expanded/compact. Larger than1 favors compact; lines mark1/10/15. All shared reference generation, preparation and per-call checking are charged. Read raw traces.json for matrix/frontier and certificate diagnostics; no degree-of-regularity improvement is claimed. [pcc:unverified]

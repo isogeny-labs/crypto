@@ -1,0 +1,43 @@
+// Generic polynomial pushforward of a line under the retained degree3 map.
+ring normLine52=(2,b,c),(w,y,x,t,l,n),lp;short=0;
+poly A52=1+c;poly H52=x+t;poly K52=A52*t+b;
+poly E52=y^2+A52*x*y+b*y+x^3+b*x^2;
+poly EQ52=w^2+K52*w+t^3+b*t^2;
+poly psi52=t^4+A52^2*t^3+A52*b*t^2+b^2*t+b^3;
+ideal source52=E52,EQ52,psi52;ideal standard52=std(source52);
+poly m52=y+w;poly mm52=m52+K52;
+poly xp52=m52^2+A52*m52*H52+(b+x+t)*H52^2;
+poly xm52=mm52^2+A52*mm52*H52+(b+x+t)*H52^2;
+poly yp52=m52*(x*H52^2+xp52)+(y+b)*H52^3+A52*xp52*H52;
+poly ym52=mm52*(x*H52^2+xm52)+(y+b)*H52^3+A52*xm52*H52;
+poly X52=x*H52^2+xp52+xm52;
+poly Y52=reduce(y*H52^3+yp52+ym52+K52*H52^3,std(ideal(EQ52)));
+poly line52=y+l*x+n;
+poly plus52=yp52+l*xp52*H52+n*H52^3;
+poly minus52=ym52+l*xm52*H52+n*H52^3;
+poly normNumerator52=line52*plus52*minus52;
+poly alpha52=t^3+(b+l^2+A52*l)*t^2+(A52*n+b*l)*t+n^2+b*n;
+poly residual52=reduce(normNumerator52+alpha52*Y52*H52^3,standard52);
+if(subst(residual52,w,0)!=residual52 || subst(residual52,y,0)!=residual52){ERROR("NORMLINE52_Y_COEFFICIENT_OR_KERNEL_DESCENT");quit;}
+poly beta52=subst(residual52/x^7,x,0);
+poly next52=reduce(residual52+beta52*X52*H52^4,standard52);
+poly gamma52=subst(next52/x^6,x,0);
+poly fullResidual52=normNumerator52+alpha52*Y52*H52^3+beta52*X52*H52^4+gamma52*H52^6;
+if(reduce(fullResidual52,standard52)!=0){ERROR("NORMLINE52_IMAGE_LINE_IDENTITY");quit;}
+matrix lift52=lift(source52,ideal(fullResidual52));
+if(matrix(source52)*lift52!=matrix(ideal(fullResidual52))){ERROR("NORMLINE52_FULL_SOURCE_PRODUCT");quit;}
+if(reduce(fullResidual52+H52^6,standard52)==0){ERROR("NORMLINE52_INTERCEPT_CORRUPTION_ACCEPTED");quit;}
+// Sign transport is the conjugacy needed for subsequent gamma descent.
+
+poly signAlpha52=subst(subst(alpha52,l,l+A52),n,n+b);
+poly signBeta52=subst(subst(beta52,l,l+A52),n,n+b);
+poly signGamma52=subst(subst(gamma52,l,l+A52),n,n+b);
+ideal signResiduals52=signAlpha52+alpha52,signBeta52+beta52+A52*alpha52,signGamma52+gamma52+b*alpha52;
+matrix signLift52=lift(ideal(psi52),signResiduals52);
+if(matrix(ideal(psi52))*signLift52!=matrix(signResiduals52)){ERROR("NORMLINE52_FULL_SIGN_EQUIVARIANCE");quit;}
+link out52="ASCII:w normline-certificate52.sing";open(out52);
+write(out52,"ring normLineCertificate52=(2,b,c),(w,y,x,t,l,n),lp;short=0;ideal source52="+string(source52)+";poly H52="+string(H52)+";poly X52="+string(X52)+";poly Y52="+string(Y52)+";poly alpha52="+string(alpha52)+";poly beta52="+string(beta52)+";poly gamma52="+string(gamma52)+";poly normNumerator52="+string(normNumerator52)+";poly residual52="+string(fullResidual52)+";ideal signResiduals52="+string(signResiduals52)+";matrix lift52[3][1];matrix signLift52[1][3];");
+int i52;for(i52=1;i52<=3;i52++){write(out52,"lift52["+string(i52)+",1]="+string(lift52[i52,1])+";signLift52[1,"+string(i52)+"]="+string(signLift52[1,i52])+";");}close(out52);
+print("NORMLINE52_COEFFICIENT alpha="+string(alpha52));print("NORMLINE52_COEFFICIENT beta="+string(beta52));print("NORMLINE52_COEFFICIENT gamma="+string(gamma52));
+print("NORMLINE52_RESULT full_norm_image_line_product=true sign_equivariance_products=3 changed_intercept_rejected=true actual_QR_unit_and_Tate_normalization_still_pending=true");
+print("NORMLINE52_ALL_CHECKS_PASS");quit;

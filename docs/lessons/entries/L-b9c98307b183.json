@@ -1,0 +1,16 @@
+{
+  "action": "Use valid Lean identifier segments in every module path and check String.toName on the derived name before the complete audit; retain every tracked probe in the source inventory.",
+  "created": "2026-11-15T21:52:03Z",
+  "evidence": [
+    "research/selector_kernel_assessment_20261115/owner/docs/receipts/interpolation-kernels-20261115/module-name001.log",
+    "research/selector_kernel_assessment_20261115/owner/docs/receipts/interpolation-kernels-20261115/gate002/_/audit.log",
+    "research/selector_kernel_assessment_20261115/owner/docs/receipts/interpolation-kernels-20261115/gate003/_/audit.log"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "lean-instance-gate"
+  ],
+  "trigger": "Adding tracked auxiliary Lean probes that the canonical gate imports by deriving module names from paths",
+  "why": "The failed audit exposed an anonymous Name from hyphenated diagnostic paths; byte-preserving valid-path renames allowed the same auditor to check the complete inventory."
+}

@@ -1,0 +1,52 @@
+error: using `chunks_exact` with a constant chunk size
+   --> examples/../src/cryptanalysis/zero_dim_la.rs:193:20
+    |
+193 |     let mut ca = a.chunks_exact(8);
+    |                    ^^^^^^^^^^^^^^^
+    |
+help: consider using `as_chunks::<8>()` instead
+   --> examples/../src/cryptanalysis/zero_dim_la.rs:193:20
+    |
+193 |     let mut ca = a.chunks_exact(8);
+    |                    ^^^^^^^^^^^^^^^
+    = note: you can access the chunks using `ca.0.iter()`, and the remainder using `ca.1`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#chunks_exact_to_as_chunks
+    = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: using `chunks_exact` with a constant chunk size
+   --> examples/../src/cryptanalysis/zero_dim_la.rs:194:20
+    |
+194 |     let mut cb = b.chunks_exact(8);
+    |                    ^^^^^^^^^^^^^^^
+    |
+help: consider using `as_chunks::<8>()` instead
+   --> examples/../src/cryptanalysis/zero_dim_la.rs:194:20
+    |
+194 |     let mut cb = b.chunks_exact(8);
+    |                    ^^^^^^^^^^^^^^^
+    = note: you can access the chunks using `cb.0.iter()`, and the remainder using `cb.1`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#chunks_exact_to_as_chunks
+
+error: the loop variable `n` is used to index `seq`
+   --> examples/../src/cryptanalysis/zero_dim_la.rs:860:14
+    |
+860 |     for n in 0..len {
+    |              ^^^^^^
+    |
+note: for this index operation
+   --> examples/../src/cryptanalysis/zero_dim_la.rs:866:19
+    |
+866 |             f.add(seq[n], f.dot(&c[1..=top], &rev[start..start + top]))
+    |                   ^^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#needless_range_loop
+    = note: `-D clippy::needless-range-loop` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_range_loop)]`
+help: consider using an iterator and `.enumerate()`
+    |
+860 -     for n in 0..len {
+860 +     for (n, <item>) in seq.iter().enumerate().take(len) {
+    |
+
+error: aborting due to 3 previous errors
+

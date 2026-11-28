@@ -1,5 +1,7 @@
 # N83 packed-root primary run (2026-10-13 09:42 UTC)
 
+> **Correction 2026-10-20 (validation sweep B, verdict 110.1: contradicted).** The N83 18.528 rho/IC ratio below compares against rho with an empty table on one L0 target. It is superseded and is not an improvement; precomputed rho wins every N83 matched pair (`benchmarks/20261016-n83-precomputed-rho-control`). The within-IC K1798 vs K1500 result stands.
+
 The opt-in dense table preserved K1271's first witness and reduced its
 allocated packed slots from 8 GiB to 4 GiB. The pre-panel K1798 capacity
 extension solved the same public target with a 298,468-point base, 111,004

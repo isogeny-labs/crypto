@@ -1,0 +1,16 @@
+digraph quotient {
+  graph [rankdir=LR,bgcolor="white",pad=0.2,ranksep=0.5];
+  node [shape=box,style="rounded,filled",fontname="Helvetica",fontsize=11,fillcolor="#e7f3ec",color="#286345"];
+  edge [fontname="Helvetica",fontsize=10,color="#286345"];
+  E [label="P-192 / Fp\nPublic G, Q"];
+  H [label="J(H) / Fp\nGenus3 hyperelliptic cover"];
+  C [label="J(C) / Fp\nSmooth nonhyperelliptic quartic"];
+  K [label="Recorded K: 27 elements\n26 principal image witnesses\nOutside torsion remains nonzero"];
+  degrees [label="Exact heights: 36 and 72\nTheta pullback degree: 9\nDegree27; polarization3"];
+  E -> H [label="pi*; degree2 cover"];
+  H -> C [label="phi; (3,3,3)-isogeny"];
+  K -> H [style=dotted,arrowhead=none];
+  degrees -> C [style=dotted,arrowhead=none];
+  C -> E [label="Executed f_* norm\nComposition [6] on public subgroup",constraint=false];
+  graph [label="Producer standing; generic transpose dual and individual descent not executed",labelloc=b,fontname="Helvetica",fontsize=10];
+}

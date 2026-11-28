@@ -1,0 +1,20 @@
+{
+  "schema": "native.build-record/v1",
+  "scope": "post-build metadata; no pre-build timestamp assertion",
+  "source_parent": "579c8383a16b50f9953aa562dc0703a56eb4cc79",
+  "binary": "/workspace/curve25519-native-binaries/section-operator-control-v1",
+  "binary_bytes": 953248,
+  "binary_sha256": "0eb6ccd2128f0780ac3c2f2c8e2c5c30d0dc2afa834208892cc8544b0c3c3cc6",
+  "commands": [
+    "cargo test --release --lib",
+    "cargo clippy --release --all-targets -- -D warnings",
+    "cargo build --release",
+    "cargo fmt --check"
+  ],
+  "development_logs": {
+    "unit-first.log": "01a012e906d6c93604323e685728b5f4401ce680653b3c87c5989afd74fbe074",
+    "clippy-first.log": "5c4b48e797b0baf99c21766763edd186e56000e0321a23d58cafc701f31e1aa1",
+    "build-first.log": "067bd983ce41fc5d5337a7346098bf27c785867e3aded7457ef6355b0a01b777"
+  },
+  "qualified_control_calls": 0
+}

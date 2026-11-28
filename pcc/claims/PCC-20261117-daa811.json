@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-17T11:21:59Z",
+ "id": "PCC-20261117-daa811",
+ "kind": "statement",
+ "producer": {
+  "commit": "57199d2b3db5d1e64fa5627c7e97d6edb0fd0269",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_inverse_20261117/ACTUAL_QUEUE_PUBLICATION_15.json",
+    "sha256": "dcbff0b216aaded3f6a1dc62da7067cc15106a79d6484f3759a85380ccf29c52"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_inverse_20261117/QUEUE_ACTUAL_READBACK_15.json",
+    "sha256": "73c29a1c4d396c11823f7d9be6600a320d25789e3e5e9cb6261a7308528452df"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/chained_cubic_inverse_20261117/QUEUE_UPDATE_PROPOSAL_15.json",
+    "sha256": "da2d32d3f1c336398348fe8783a7919bf680bb0036bf905160794e29a015d504"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Inverse15 result57199d2 is normally pushed to its result checkpoint with exact remote readback; artifact-policy check exits0 and final report/handoff prose lint has0 findings. Issue3904 actual update at11:18:00Z is exactly9679 characters and SHA07d47e2b, equal to the frozen proposal without newline drift; whole previous8591-character body is retained. Source/proof/result negatives and all current CI failures remain explicit. Ordinary lane PR publication of the new15 payload is next, not claimed completed by this record."
+}

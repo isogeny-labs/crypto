@@ -1,0 +1,15 @@
+{
+  "action": "run a direct research/ + docs/ fallback sweep for already-measured or killed studies before asserting untried; a single Sonnet Explore grounding pass can miss prior dirs, so grep for the mechanism name across research/*/README.md and treat a miss as not-proof-of-absence",
+  "created": "2026-11-24T15:59:45Z",
+  "evidence": [
+    "research/hybrid_ic_directions_20261120/SOURCES.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "research-kb",
+    "idea-generator"
+  ],
+  "trigger": "asserting a direction is 'not tried' or novel while research-kb and the lead atlas are unavailable in-container",
+  "why": "2026-11-20: twist_ecdlp_20261027 (D2 already measured) and sat_smt_leads_20261114 (D3 already killed) were missed by grounding and caught only by the fallback sweep"
+}

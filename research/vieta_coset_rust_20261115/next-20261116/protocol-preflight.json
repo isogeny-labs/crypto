@@ -1,0 +1,603 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "VIETA-HALF-TOWER-PREFLIGHT-20261116",
+  "version": 1,
+  "created": "2026-11-16",
+  "repository": "crypto",
+  "study_dir": "research/vieta_coset_rust_20261115",
+  "authors": [
+    "Codex"
+  ],
+  "question": "What complete charged construction-plus-query and separate query counts does half-GCD produce on the same instances as classical Euclid/Newton and batched lookup, for coset and certified rational membership?",
+  "claims": [
+    {
+      "id": "C-output",
+      "class": "exact_computation",
+      "text": "Successful complete ordered relation sets match scalar subtraction and separate native wide replay.",
+      "decided_by": [
+        "C-half",
+        "C-lookup"
+      ]
+    },
+    {
+      "id": "C-counts",
+      "class": "comparative",
+      "text": "Descriptive paired cold arithmetic and query counts; no time, exponent, fastest or whole-DLP inference.",
+      "decided_by": [
+        "C-half",
+        "C-lookup",
+        "C-null"
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "newton",
+      "role": "baseline",
+      "description": "Karatsuba/Newton with classical Euclid.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "9d2106eb2a9f65ffe94020b237301ce910a799e1",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml",
+            "--bins"
+          ]
+        ],
+        "binary_sha256": "42d0cfd089122041b85c935f55ed7a4cf548c157c439889073ba574106f41e78",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "newton"
+      }
+    },
+    {
+      "id": "half",
+      "role": "candidate",
+      "description": "Same plus recursive half-GCD.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "9d2106eb2a9f65ffe94020b237301ce910a799e1",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml",
+            "--bins"
+          ]
+        ],
+        "binary_sha256": "42d0cfd089122041b85c935f55ed7a4cf548c157c439889073ba574106f41e78",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "half"
+      },
+      "same_instrument_as": "newton"
+    },
+    {
+      "id": "half-aa",
+      "role": "control_aa",
+      "description": "Exact repeat of half-GCD; count determinism control.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "9d2106eb2a9f65ffe94020b237301ce910a799e1",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml",
+            "--bins"
+          ]
+        ],
+        "binary_sha256": "42d0cfd089122041b85c935f55ed7a4cf548c157c439889073ba574106f41e78",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "half-aa"
+      },
+      "same_instrument_as": "newton"
+    },
+    {
+      "id": "lookup",
+      "role": "reference",
+      "description": "Batched subtraction including necessary descriptor/base build.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "9d2106eb2a9f65ffe94020b237301ce910a799e1",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml",
+            "--bins"
+          ]
+        ],
+        "binary_sha256": "42d0cfd089122041b85c935f55ed7a4cf548c157c439889073ba574106f41e78",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "lookup"
+      },
+      "same_instrument_as": "newton"
+    },
+    {
+      "id": "lookup-fast",
+      "role": "control_negative",
+      "description": "Identical lookup under unused half-GCD query flag.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": "9d2106eb2a9f65ffe94020b237301ce910a799e1",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--manifest-path",
+            "research/vieta_coset_rust_20261115/native/Cargo.toml",
+            "--bins"
+          ]
+        ],
+        "binary_sha256": "42d0cfd089122041b85c935f55ed7a4cf548c157c439889073ba574106f41e78",
+        "threads": 1
+      },
+      "parameters": {
+        "arm": "lookup-fast"
+      },
+      "same_instrument_as": "newton"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Input-level conditioned sums must return nonempty complete sets on every arm; separate literal Euclidean matrix/gcd tests exercise recursive half-GCD. Query counters record actual half-GCD activation; no substitute speed-positive arm."
+    },
+    "negative": {
+      "present": true,
+      "arm": "lookup-fast",
+      "null_population": {
+        "description": "Matched batched lookup with an unused half-GCD flag.",
+        "generator": "Same native next_compare v1 fixtures/targets/binary/stage limits.",
+        "n": 12,
+        "why_n": "One unaffected-path comparison per retained target; descriptive exact-count invariance, no distributional inference.",
+        "matched_on": [
+          "field",
+          "curve",
+          "m",
+          "target",
+          "seed",
+          "binary",
+          "budgets",
+          "lookup algorithm"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "polynomial_backend",
+        "levels": [
+          "newton",
+          "half"
+        ]
+      },
+      {
+        "name": "method",
+        "levels": [
+          "vieta",
+          "lookup"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "representation_field_and_m",
+        "treatment": "crossed",
+        "value": [
+          [
+            "coset",
+            "word62",
+            8192
+          ],
+          [
+            "coset",
+            "word62",
+            16384
+          ],
+          [
+            "coset",
+            "p224",
+            2048
+          ],
+          [
+            "rational",
+            "word62",
+            2048
+          ],
+          [
+            "rational",
+            "p224",
+            128
+          ],
+          [
+            "rational",
+            "p224",
+            512
+          ]
+        ],
+        "how": "Keep configurations separate. Rational fixtures are Mobius conjugates of squaring, not auxiliary-isogeny search benchmarks. Word62 has no prime-order subgroup assertion; P224 standard curve."
+      },
+      {
+        "name": "target_population",
+        "treatment": "crossed",
+        "value": [
+          "uniform-x-rational",
+          "conditioned-sum"
+        ],
+        "how": "Alternating inputs, same exact target across all arms; identity separate."
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One immutable native release binary, locked dependencies, one CPU.",
+        "how": "Source/build/binary/analysis hashes recorded before calls."
+      },
+      {
+        "name": "arm_order",
+        "treatment": "fixed",
+        "value": "cyclic offset per target, reversed on odd target index",
+        "how": "Five arms interleaved with cyclic offset, reversed on odd input index."
+      },
+      {
+        "name": "host_environment",
+        "treatment": "measured",
+        "how": "Unmodified isolated_bench CPU4; missing PSI/unmovable host threads mean below-L2 clocks."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded descriptive native analyzer",
+        "how": "Raw per-input values/ranges retained; no statistical significance test."
+      },
+      {
+        "name": "construction_backend",
+        "treatment": "fixed",
+        "value": "KaratsubaNewton for all descriptor/certification work; query backend only is changed for C-half",
+        "how": "Each arm freshly builds its descriptor. Lookup additionally builds its required point table/hash set; candidates build no unused table for finite targets. Counter phases remain separate."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-half",
+        "arms": [
+          "newton",
+          "half"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "polynomial_backend"
+        ]
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "half",
+          "half-aa"
+        ],
+        "design": "aa",
+        "differs_in": []
+      },
+      {
+        "id": "C-null",
+        "arms": [
+          "lookup",
+          "lookup-fast"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "polynomial_backend"
+        ]
+      },
+      {
+        "id": "C-lookup",
+        "arms": [
+          "half",
+          "lookup"
+        ],
+        "design": "one_factor",
+        "differs_in": [
+          "method"
+        ]
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "next_compare.rs v1: fixture0x686763642d7631 XOR m; root0x48470000+input index. Same exact inputs across arms. Rational representative3 and certificate seed42 fixed."
+    },
+    "instance_sampling": {
+      "rule": "[['coset', 'word62', 8192], ['coset', 'word62', 16384], ['coset', 'p224', 2048], ['rational', 'word62', 2048], ['rational', 'p224', 128], ['rational', 'p224', 512]]; 0 excluded warmups then 2 retained, alternating uniform-x-rational and constructed sums. No uniform-point claim; identity separated.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicitly unblinded deterministic descriptive counts; no inferential selection.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 6,
+    "replicates": 2,
+    "warmups": 0,
+    "power": {
+      "method": "other",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": false,
+      "note": "Descriptive exact per-target observations, medians/ranges; not powered for population significance or exponent claims."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 900,
+      "measured_on": "Bootstrap calibration itself, no calls yet:900s is its enforced conservative outer envelope, NOT an observed runtime forecast. It measures every exact main size/arm; actual native per-class forecast will be inserted into the separate main protocol before primary freeze. No timing claim from bootstrap."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "muls",
+        "name": "Fresh construction plus query field multiplications",
+        "unit": "field multiplications",
+        "kind": "counted",
+        "definition": "Per arm execute descriptor/full-fiber certification, necessary point-table lifting/hash build, then query. All primitive multiplications, including inverse/sqrt internals; memory/hash/sort unpriced. Candidate finite queries do not build an unused point table. Source row.work equals construction_work+query_work.",
+        "source": "row.work.muls",
+        "aggregation": "median",
+        "resolution": "1",
+        "uncertainty": "range"
+      },
+      {
+        "id": "relations",
+        "name": "Complete ordered relations",
+        "unit": "point pairs",
+        "kind": "exact",
+        "definition": "Length and SHA-256 of sorted complete pair set, compared across arms and replayed by wide scalar subtraction.",
+        "source": "row.relations and row.result_sha256",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "elapsed",
+        "name": "Stage wall interval",
+        "unit": "nanoseconds",
+        "kind": "timed",
+        "definition": "Diagnostic elapsed interval covers each fresh construction and query, also recorded separately; external fixture creation/draw/scalar verifier excluded and recorded. BelowL2, wall_valid=false, no timing comparison.",
+        "source": "row.elapsed_ns",
+        "aggregation": "median",
+        "resolution": "monotonic Instant, actual host resolution recorded",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "counted",
+    "counters": [
+      "adds",
+      "muls",
+      "inversions",
+      "square_roots",
+      "polynomial_products",
+      "polynomial_divisions",
+      "split_attempts",
+      "group_adds",
+      "membership_lookups",
+      "karatsuba_nodes",
+      "newton_divisions",
+      "half_gcd_nodes",
+      "half_gcd_batches",
+      "rational_map_steps",
+      "certified_fibers"
+    ],
+    "record": [
+      "source_revision",
+      "binary_sha256",
+      "rustc",
+      "cpu_model",
+      "kernel",
+      "SMT",
+      "NUMA",
+      "memory",
+      "PSI",
+      "affinity",
+      "co_tenants",
+      "interruptions",
+      "isolation",
+      "A/A",
+      "failures"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "cpus": [
+        4
+      ],
+      "max_memory_gib": 8,
+      "cloud_spend_usd": 0,
+      "git_only_checkpoint_authorized": true
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 900,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "6 configurations*5 arms*(0 warmups+2 retained)=60 planned calls.30s and4e9 multiplications per construction/query context;65536 root split attempts. Per-configuration cap300s preflight/600s main. Overall cap900s. All failed/missing calls retained, no adaptive retry."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Complete-set mismatch or positive-control miss invalidates its input; do not select configurations based on improvement. Retain remaining arm outcomes."
+    }
+  ],
+  "decision_rule": {
+    "text": "Descriptive paired fresh construction-plus-query counts and separate query counts after complete-set checks/wide replay. Configurations/populations/identity separate; no timing, exponent, fastest or whole-DLP inference. Retain failures and missing rows.",
+    "comparison_ids": [
+      "C-half",
+      "C-lookup",
+      "C-null"
+    ],
+    "statistic": "Frozen native median/min/max/all values and median of exact matched-input ratios, successful pairs only with failed counts adjacent.",
+    "interval": "Observed range, not a confidence interval.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "newton/half, half/lookup at total-arithmetic and query-only scope; half/half-aa and lookup/lookup-fast are deterministic count controls.",
+    "verdict_vocabulary": [
+      "descriptive_only",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/next_compare.rs",
+      "sha256": "fc4b55c92195ebf596d0176406b3a8fb5d235e54bfa78b610190597cff82e3a5"
+    },
+    "inputs": [
+      "next-20261116/run/preflight/*/*.jsonl"
+    ],
+    "outputs": [
+      "summary.json",
+      "replay.json",
+      "forecast.json",
+      "export.json",
+      "report.pdf",
+      "counts.svg"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "Launch before source/analysis/binary-hash/protocol publication",
+    "Change frozen matrix, targets, limits, analysis or repeats after affected calls",
+    "Pool configurations/populations/identity or calibration with primary",
+    "Drop construction or price lookup setup as free",
+    "Claim time/exponent/fastest/end-to-end DLP from these generic arithmetic counts",
+    "Claim auxiliary-isogeny search costs from Mobius-Kummer fixtures",
+    "Promote producer checks to independent signed standing",
+    "Rerun old completed experiments or spend on cloud"
+  ],
+  "literature": [
+    {
+      "ref": "FLINTv3.3.1 src/nmod_poly/hgcd.c and src/gr_poly/hgcd.c; src/cryptanalysis/isogeny_eval/poly.rs; ic_framework/prime_tower.rs",
+      "provenance": "retrieved",
+      "claim": "Standard recursive polynomial half reduction, counted multiplication and normalized Velu-map source assumptions. No novelty claim.",
+      "verified_by": "Producer primary/internal source read; KB MCP/wrapper unavailable."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "72e70723e7472370cec78bb1b61af11ad325edc2d4586595c28ee5803d956aa6",
+    "commit": "9d2106eb2a9f65ffe94020b237301ce910a799e1",
+    "frozen_at": "2026-11-16T19:38:23Z",
+    "filed_before_affected_data": true
+  },
+  "invalidation_rules": [
+    "Counted results require complete-set equality and separate-process replay.",
+    "All local wall values are diagnostic, wall_valid=false for L2 claims, even when the isolated runner reports no detected contention.",
+    "Retain failures, timeouts, missing rows and warmups; report their actual flow."
+  ],
+  "extensions": {
+    "panel": "next-preflight",
+    "matrix": [
+      [
+        "coset",
+        "word62",
+        8192
+      ],
+      [
+        "coset",
+        "word62",
+        16384
+      ],
+      [
+        "coset",
+        "p224",
+        2048
+      ],
+      [
+        "rational",
+        "word62",
+        2048
+      ],
+      [
+        "rational",
+        "p224",
+        128
+      ],
+      [
+        "rational",
+        "p224",
+        512
+      ]
+    ],
+    "fixture_policy": "next-v1",
+    "planned_calls": 60,
+    "user_authorization": "Explicit continued local/Git-only authorization, no cloud or S3 operations.",
+    "standard_panel_exception": "Use existing word62/P224 component curves to attribute the algorithm change, no prime-group assertion for word62. Rational fixtures certify all fibers and have a different field subset; no cross-representation speed claim.",
+    "binary_custody": "Immutable ignored local cache; exact Git sources/compiler/build/lockfile and binary SHA published; no remote binary-archive availability claim.",
+    "primary_warmups": 2,
+    "primary_retained": 6
+  }
+}

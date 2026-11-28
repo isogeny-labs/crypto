@@ -1,0 +1,55 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T00:43:53Z",
+ "id": "PCC-20261116-0bbe9a",
+ "kind": "theorem",
+ "producer": {
+  "commit": "43bb330419a234fbf2010fd4b31970e95b59c238",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "85597fb7006e989ad96b8f068682fd34bbe8ecd0ecb67ee694a9f49fa55813ce",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-kernel",
+   "theorem": "Curve25519KernelInstance.extract_scalar"
+  },
+  {
+   "decl_sha256": "eeba90225559e5889134db8666fc40bef26cb2837edcbd4e4059acf866bc8f32",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-kernel",
+   "theorem": "Curve25519KernelInstance.mixed_label_fiber"
+  },
+  {
+   "decl_sha256": "4c2387c66526b8cdccb23af4df577d8cea044bbd4df58b4d9d8a25d4985ab929",
+   "kind": "lean",
+   "path": "research/curve25519_torus_native_20261115/lean-kernel",
+   "theorem": "Curve25519KernelInstance.annihilator_card"
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-kernel/KernelInstance.lean",
+    "sha256": "8e4cd5a3a5d2bdca55ef55478c7487b173c4c7d8002c55c47a59066ea4d71ea3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-kernel/lake-manifest.json",
+    "sha256": "434f6ca2bd398320b66eff450c062ba4cff89d1392760b9139125dc5695b64aa"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/curve25519_torus_native_20261115/lean-kernel/gate-v1/audit.log",
+    "sha256": "e0eee7ac742cedc6697a023622bf0dac75838fd8ac374acde1273120c9733c65"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Three scalar-field Lean endpoints reuse pinned existing Mathlib/CryptoLean laws: kernel cancellation under checked matrix/vector and nonzero-tag contracts; exact mixed-label fiber cardinality; and exact nonzero-functional annihilator cardinality times ell equals ell^r. Scalar modulus is the standard Curve25519 ell, under an explicit primality hypothesis. Producer gate passes with only propext, Classical.choice and Quot.sound, no native exception. Full curve-group, retained-row uniformity/selection, geometry and decomposition-cost bridges are outside these theorem statements; no attack exponent or unknown DLP solve is proved."
+}

@@ -1,0 +1,6 @@
+# Exact odd-prime conditional orbit roots
+The same monic degree-12 resultant contains every solution of the two original short-Weierstrass S3 equations on fixed source offsets. gcd(R,X^p-X) contains exactly its distinct Fp shift roots. Bounded splitting returns every linear factor, checking factor products and root counts; exhausted attempts raise unresolved rather than truncate. Canonical interval filtering is explicit and never replaced by an Fp subspace.
+
+Every common finite intermediate is recovered from the polynomial GCD of the two quadratics. Linear, proportional, zero-discriminant and Tonelli-Shanks cases are retained. Characteristic three uses no division by three. A genuinely free auxiliary is exhaustively returned only in small fields; a larger output raises unresolved. All emitted tuples are checked in both literal equations.
+
+The finite-difference comparator computes the exact degree-12 sequence using additions and setup values, including characteristic-three periodic cases, without factorial inverses. Every small shift/auxiliary pair is independently enumerated before large-field use. Random splitting affects bounded completion only; returned complete roots are exact. This is a conditional orbit backend, not independent-source root search or a genuine GB speed comparison.

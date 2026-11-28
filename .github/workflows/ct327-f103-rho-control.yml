@@ -1,0 +1,84 @@
+name: CT327 bounded public F103 rho control against cold IC and BSGS
+
+on:
+  pull_request:
+    paths:
+      - "tests/ct238_native_cubic_norm_compression.rs"
+      - ".github/workflows/ct327-f103-rho-control.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ct327-f103-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  native-f103-rho-control:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      CARGO_BUILD_JOBS: '2'
+      CARGO_INCREMENTAL: '0'
+      CARGO_PROFILE_RELEASE_DEBUG: '0'
+    steps:
+      - name: Recover hosted-runner disk
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup
+          df -h .
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/*/
+            /src/
+            /tests/prime_cover_toy_complete_dlp.rs
+            /tests/prime_cover_toy_cold_cost.rs
+            /tests/ct226_native_genus4_transferred_ic.rs
+            /tests/ct238_native_cubic_norm_compression.rs
+            /tests/ct229_impl/probe.rs
+            /tests/ct231_impl/probe.rs
+            /tests/ct233_impl/probe.rs
+            /tests/ct235_impl/probe.rs
+            /.cargo/
+            /build.rs
+            /crates/
+            /compat/ct_dynamic_audit.rs
+            /research/ct_dynamic_audit_20261102/
+            /docs/ecdlp-audit/
+            /research/full_volcano_graphwide_ic_20261017/execution/
+            /research/chained_jacobian_transfers_20261110/lean/
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct209_native_source_preflight.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/test_ct209_native_source_preflight.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct214_cost_log_validator.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct215_paired_cost_audit.py
+            /research/chained_jacobian_transfers_20261110/toy_dlp_ct204/test_ct214_cost_log_validator.py
+            /research/n83_highk_beyond4405_20261021/native_exclusion_audit.rs
+            /research/n83_jacobian_projector_20261031/
+            /docs/ic/
+            /docs/ecbench/
+            /docs/curves/
+            /research/pencil_large_prime_20261029/
+            /tools/factor-base/
+            /tools/volcano-cli/
+            /isogeny_algos/
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.98'
+      - name: Fail fast on missing manifest sources
+        run: |
+          (cd research/chained_jacobian_transfers_20261110/toy_dlp_ct204 && python3 -m unittest -v test_ct209_native_source_preflight.py)
+          python3 research/chained_jacobian_transfers_20261110/toy_dlp_ct204/ct209_native_source_preflight.py .
+      - name: Compile and exercise CT327 109 public source toy rho logs and 3 matched cold triplets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git log -1 --format='CT327_SOURCE_SHA %H'
+          cargo test --locked --release --test ct238_native_cubic_norm_compression ct327 -- --test-threads=1 --nocapture 2>&1 | tee /tmp/ct327-f103-native.log
+          test "$(grep -c '^.*CT327_CORRECTNESS_PASS logs=109 mutations=110 ' /tmp/ct327-f103-native.log)" -eq 1
+          test "$(grep -c 'CT327_MATCHED_Q73_JSON' /tmp/ct327-f103-native.log)" -eq 3
+          grep 'CT327_CORRECTNESS_PASS\|CT327_MATCHED_Q73_JSON' /tmp/ct327-f103-native.log

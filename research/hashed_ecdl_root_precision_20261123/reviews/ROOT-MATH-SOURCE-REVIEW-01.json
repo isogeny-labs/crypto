@@ -1,0 +1,134 @@
+{
+  "schema": "root-precision-written-math-source-review/v1",
+  "review_id": "ROOT-MATH-SOURCE-REVIEW-01",
+  "created_utc": "2026-11-23T16:01:00.212Z",
+  "reviewer": "Same-root-team written source/math review; not independent execution or compiler/PCC attestation.",
+  "scope": "Proposed universal Nat root35 inequality,array-guard margin,normalized34counterexample and translated-unbounded Setup scalar witness. Native source/reference shared core/paper are inspected; no repository or old artifact bytes edited.",
+  "repository_head": "d562832c7913bb23bf266a856f998ec22e5de0df",
+  "evidence_manifest": {
+    "path": "root-math-source-evidence-01.json",
+    "bytes": 2992,
+    "sha256": "948e1a0e56bfdc6fc3563d42e7d26d3ec8e27e3c881b541a5cdc63e08b3214a7",
+    "entries": 7
+  },
+  "disposition": {
+    "constant35": "VALID under exactlyp<=M,32*u<=M,i<u witha=2*u. Written component proof is sound.",
+    "constant34": "FALSE over that same arithmetic domain,including normalizedp=E+1,M=2E family withE>=32.",
+    "array_margin": "VALID:rootarrayguard implies32*u<=M; handleu0trivially andpositiveu by powers.",
+    "translated_unbounded_witness": "VALID for the numerical Setup inequalities withsize=s=M and explicitmaximum_degree<=delta,for example2. No graph or admitted productionusize call follows.",
+    "formal_status": "Not checked by execution. Assembly source only composes assumed component bounds plus one concrete arithmetic example; this review does not certify compilation,a full generic Lean proof,axioms or a proof gate.",
+    "old_results": "Unchanged conditional34andfinitehistory81remain outside any counterexample claim; shared TaperedPrecision.lean retains SHA25692e4300c71c4b1570ab193df4de22fe31b04a9d7ca0f0212191169555951989a."
+  },
+  "written_root35_proof": {
+    "domain": "p,M,u,i:Nat;hp:p<=M;hm:32*u<=M;hi:i<u. hi impliesu>=1,andthenM>=32.",
+    "definitions": "D=2^(2*u-i),h=(3*M+u-1)/u. Sincei<=u-1,D>=2^(u+1); no truncated-exponent ambiguity remains.",
+    "elementary_bounds": [
+      {
+        "bound": "4*u<=2^(u+1)",
+        "reason": "Baseu1isequality; foru>=1,double induction follows since2^(u+1)>=4."
+      },
+      {
+        "bound": "16*u*(2*u+1)<=21*2^(u+1)",
+        "reason": "Basesu1:48<=84,u2:160<=168,u3:336=336. Foru>=3,2*u^2-3*u-3>=0,soP(u+1)<=2P(u) forP(u)=16*u*(2*u+1). This is multiplicative factor2,not additive2."
+      },
+      {
+        "bound": "h*u<=3*M+u",
+        "reason": "Nat floor-division remainder law givesh*u<=3*M+u-1<=3*M+u. Positiveu makesh the exact sourceceiling."
+      }
+    ],
+    "scaled_components": [
+      {
+        "term": "4*(p*u)",
+        "bound": "<=M*D",
+        "reason": "p<=M and4*u<=2^(u+1)<=D."
+      },
+      {
+        "term": "4*(8*h*D*u)",
+        "bound": "<=97*M*D",
+        "reason": "<=32*(3*M+u)*D=96*M*D+32*u*D<=97*M*D."
+      },
+      {
+        "term": "4*(8*M*(2*u+1)*u)",
+        "bound": "<=42*M*D",
+        "reason": "=2*M*(16*u*(2*u+1))<=42*M*2^(u+1)<=42*M*D."
+      }
+    ],
+    "conclusion": "ExpandchildPrecision_formula,distribute multiplication andadd bounds:4*(childPrecision*pure_u)<=140*M*D,wherepure_u denotes the outerfactoru,not a changed argument. Cancelling positive4 yieldschildPrecision(p,M,u,2*u,i)*u<=35*M*D.",
+    "notation_clarification": "The conclusion means4*(childPrecision(p,M,u,2*u,i)*u)<=140*M*D. Noextraassumption beyondthe stateddomain is used."
+  },
+  "counterexample34": {
+    "normalized_family": "M=2E,p=E+1,u2,a4,i1,D8;h=3E;childPrecision=273E+1. Therefore2*childPrecision=546E+2>544E=34*M*D.",
+    "domain_requirements": "p<=M holdsforE>=1;32u<=M needsE>=32. The fullarrayguard additionally needsE>=2^51. Thus positiveE alone is not a complete witness to all root35hypotheses.",
+    "small_arithmetic_instance": {
+      "E": 32,
+      "M": 64,
+      "p": 33,
+      "u": 2,
+      "a": 4,
+      "i": 1,
+      "childPrecision": 8737,
+      "child_times_u": 17474,
+      "rhs34": 17408,
+      "rhs35": 17920,
+      "scope": "Checks abstractroot35domain only; not the fullSetuparrayguard or an actualsource-admittedroot."
+    },
+    "conditional34_not_refuted": "Existing theorem has extra inherited/absorption hypotheses. In thisrootu2,A0case its evaluationabsorption condition would require80<=8,which is false. No conditional theorem contradiction follows."
+  },
+  "array_guard_proof": {
+    "identity": "2^(2*u)*64^(4*u)=2^(26*u).",
+    "u_zero": "32*0=0<=M trivially.",
+    "u_positive": "u<=2^u andu+5<=26u yield32u<=2^(u+5)<=2^(26u)<=M.",
+    "source_binding": "Atdepth0,Setup.parameters hasa=2*root_u=2u,L=2^(2u),array64^(2a)=64^(4u),andtestsL*array<=M after checkedlength/array creation. This is a source-shape inference conditional on those values,not on arbitrary Parameters bypassing Setup."
+  },
+  "translated_setup_witness": {
+    "inputs": "size=s=M=2^262150,E=2^262149,p=E+1,maximum_degree2,depth0,t2.",
+    "lambda": "bit_length(M-1)=ceil(log2M)=262150.",
+    "sqrt": "512^2=262144<=262150<263169=513^2;floorroot512andmax1hasnoeffect.",
+    "leaf": "leaf_size=floor(M/512)=2^262141<M. For thispowerof2,the paperceilcutoff andsourcefloorcutoff agree.",
+    "delta": "delta=2^235935 since10*235935=9*262150=2359350;delta^10=M^9exactly,soceilroot addsnothing. maximum_degree2<=delta avoids thezero-delta fallback.",
+    "scale": "floor262150/131072=2;u2,a4,L16,array64^8=2^48.",
+    "numeric_guards": [
+      "size>=2,delta>0,M>leaf_size",
+      "u2<=a4andu2<=M",
+      "2*array^2*delta=2^236032<=2^262150=M",
+      "L*array=2^52<=M",
+      "2L=32<=delta"
+    ],
+    "active_node": "t2liesin[-16,16),valuation(t)=1<u2;source length>>i=8=2^(a-i).",
+    "normalized_precision": "p=E+1<=2E=M forE>=1. Counter.countsetsM=2E,s=M andinitialprecisionE+1 exactly on a positive-edge recursive root.",
+    "boundedness": "M,E,delta,pand3Mdo notfitcurrentusize. Production uses checkedusize arithmetic andlimits before graph/ring allocation; this is expressly an unbounded translated scalar witness,not a successful RustSetup call or constructed/admittedgraph."
+  },
+  "control_design_notes": [
+    {
+      "topic": "Missing degree input",
+      "finding": "To assertalltranslatedSetupnumeric guards,the witness must give maximum_degree<=delta. Choose2explicitly; do not infer degree fromM/E alone."
+    },
+    {
+      "topic": "Margin deletion",
+      "finding": "A failure can be shown only after dropping32u<=M from the weaker arithmeticdomain. If thefullarrayguard is retained,margin remains implied and a counterexample is impossible.",
+      "example": "p=M3,u2,i1 giveschild*u886>35*M*D840; it doesnot satisfythefullarrayguard."
+    },
+    {
+      "topic": "Other scalar premise deletions",
+      "finding": "Written diagnostic examples exist without additional runs: deletingp<=M allowsp1024,M32,u1,i0 and4864>4480; deletingi<u allowsp=M32,u1,i1 and2336>2240. These are weakened scalar-domain controls,not admittedSetup instances."
+    },
+    {
+      "topic": "Paper asymptotic scope",
+      "finding": "D.11 is anO_Cbound under a sufficiently-large regime,not an explicituniversal34constant. Proposedhuge witness hasu2andlambda262150,so itdoesnot satisfythepaperconsequenceu>=lambda^(4/5). Itis not a counterexample to thepaper theorem or BigO statement."
+    }
+  ],
+  "native_and_history_limits": [
+    "On current64-bit productionusize,lambda<=64,so root_u=floor(lambda/131072)=0. The public root remains a fallback; internal forcedParameters examples do not change admission.",
+    "Rootshapea=2u applies atdepth0. Higherdepthsa=2sum(u_j) require the separate inherited/history/source path contracts. No full-path35or generalprecision-complexity claim is established.",
+    "Neither arbitrary graphconstruction,actual sourcepath extraction,memory admission,totalbitcost nor an algorithm/runtime improvement follows from this root scalar inequality.",
+    "No compiler,proof gate,axiomquery,nativeBigUintexperiment,solver,replay,cloud orS3work was performed by reviewer. Existingcompiler ownership/lock was untouched."
+  ],
+  "retrieval": "Parent reports KBwrapper127and bounded GitHub searches without hits. This review uses the exact source/primaryTeX snapshots; no novelty or broad absence claim follows.",
+  "primary_source_binding": {
+    "tex_sha256": "671642d7b53154d92344e8c4be0240f18929632ebcfdf73b07c3e9939b873860",
+    "tex_git_blob_sha1": "51ba54efc29f51bbc0426f848003030da484f354",
+    "sections": "Parameter/cutoff lines75..108andD.11precision/recovery lines245..385.",
+    "shared_core_sha256": "92e4300c71c4b1570ab193df4de22fe31b04a9d7ca0f0212191169555951989a"
+  },
+  "preservation": "Only newexclusive review/source snapshots underrequested/tmpreviewdirectory. No repositoryfile,oldrevieworcompiledartifact modified."
+}

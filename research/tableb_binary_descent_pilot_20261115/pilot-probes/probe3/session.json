@@ -1,0 +1,58 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1he40879db709d",
+  "label": "tableb_binary_descent_pilot_20261115 n21 (pilot, not data)",
+  "spec_id": "ECS1hb613394539fd",
+  "spec_sha256": "b613394539fd5a3e3c79c8bd4ceee5fb66e5462497940328b2a93244c8dca056",
+  "env_class_id": "ECBENV3hb516f42f4ab3",
+  "host_sha256": "27b3c24b0f0174437550caa125862675c09bebccb0394242080707f9e4f92767",
+  "plan_sha256": "6b1bed194e64d9c812f81e1e0deb254870fe2e555e8abd1d4f2a4abdb0bf472b",
+  "binary_sha256": "e8abdeb8d178d72fb5e6094cef39d12bc74c6d48dff6fd0aa69f6afee06c1355",
+  "git_commit": "beef8a051f9a848fe26ff787e8c675eb25ea193c",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": false,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "f6_ic_tree": 2,
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1794770617526,
+  "finished_unix_ms": 1794770727118,
+  "status": "complete",
+  "executions_planned": 3,
+  "records_written": 3,
+  "records_sha256": "8abca44d63c278d1aa3677a33fc1cc05a850c0432931e9787bd26d2a3c331c32",
+  "status_counts": {
+    "crashed": 2,
+    "verified": 1
+  },
+  "last_seq": 2
+}

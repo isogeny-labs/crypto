@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T18:47:48Z",
+ "id": "PCC-20261116-e52985",
+ "kind": "statement",
+ "producer": {
+  "commit": "8485824cfc46274f1bb37249fad4a6e637d68cc6",
+  "model": "",
+  "session": "p256-aux-resume-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_aux_smooth_20261114/continuation_20261116/evidence/api-unit003/response.json",
+    "sha256": "1bee2e3b09e99b55c511c91bcbc33cceaffdc86ebf23f0b9ca0563d6309a4fd2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/p256_aux_smooth_20261114/continuation_20261116/evidence/api-unit003/replay.json",
+    "sha256": "16328b913f3089fd5c73516c8034bab75fb61a2b3ae22429aa5c450496b2cd2e"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/p256_aux_smooth_20261114/continuation_20261116",
+ "statement": "Public request003 returned success=true, exit_code0, truncated=false and no warnings; exact-field probe succeeded and Magma F4/Variety returned the two ordered m2d1 planted solutions. Native GMP/OpenSSL replay accepted both and their unique ordered count matches the complete reference. Target is infinity and projected nonzero rows are0; this is tiny correctness qualification, not natural yield, regularity or a timing improvement."
+}

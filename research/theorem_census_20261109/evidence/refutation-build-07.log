@@ -1,0 +1,51 @@
+⚠ [3155/3201] Replayed S3Roots
+warning: S3Roots.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean: imports `Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean:137:63: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:137:63: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Roots.lean:161:55: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:161:55: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+⚠ [3156/3201] Replayed RationalCounterexample
+warning: RationalCounterexample.lean: imports `Mathlib.Data.ZMod.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+⚠ [9050/9052] Built DescentCounterexample (7.5s)
+warning: DescentCounterexample.lean: imports `Mathlib` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: DescentCounterexample.lean: imports `Mathlib.RingTheory.Regular.RegularSequence` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: DescentCounterexample.lean:41:2: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+warning: DescentCounterexample.lean:61:27: This simp argument is unused:
+  eq_comm
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [Polynomial.coeff_C]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: DescentCounterexample.lean:142:2: Try this: 
+  haveI̵
+
+The goal is a proposition, so `have` is preferred over `haveI`.
+The difference between `have` and `haveI` is that `haveI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+ℹ [9051/9052] Built Refutations (4.6s)
+info: Refutations.lean:4:0: 'SkepticalAudit.rational_only_s3_converse_false' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:5:0: 'SkepticalAudit.extensionPolynomial_irreducible' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:6:0: 'SkepticalAudit.coordinate_constant' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:7:0: 'SkepticalAudit.actual_descended_equations' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:8:0: 'SkepticalAudit.actual_descent_not_regular' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Refutations.lean:9:0: 'SkepticalAudit.actual_descent_top_parts_not_regular' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (9052 jobs).

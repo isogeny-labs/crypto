@@ -1,7 +1,12 @@
 /target
+research/ecbench_open_questions_20261014/native-publish/target/
 **/Cargo.lock
 /store/index.json.lock
 !/Cargo.lock
+!research/ecbench_open_questions_20261014/native-publish/Cargo.lock
+!research/ecbench_open_questions_20261014/locked/Cargo.lock
+!research/ecbench_leads_20261015/decimal-reference/Cargo.lock
+research/ecbench_leads_20261015/decimal-reference/target/
 !ecc2k130/dp-ingest/Cargo.lock
 !research/ic_candidate_tournament_20260915/goal_20260924/native-f5-control-v1/build-validation-v1/data/Cargo.lock
 
@@ -138,3 +143,32 @@ research/notes/ecc2k130/compact_frozen_source_replay_20260929/frozen-materialize
 
 # Token-usage Stop hook log (.claude/hooks/token-usage-hook.sh)
 /.claude/hooks/token-usage.log
+
+# prepared crates.io copy, see third_party/cryptominisat-rs-patches
+third_party/cryptominisat-rs/
+tools/b0-ext-solvers/target/
+tools/optlevel/target/
+
+# second cargo target dir for solver development while frozen row binaries run
+target-dev/
+
+# B0 exported CNF instances (0.9-5 MB each) are regenerated deterministically by the frozen
+# binary from the seed; the smaller XOR-DIMACS (.xnf) files stay tracked.
+research/sat_pdp_exotic_20261115/b0/inst/**/*.cnf
+target-rootfind-floor/
+
+# Local executable receipts for the bounded EC checks; hashes remain in the PR.
+/research/prime_field_100_ideas_20261123/WS68_FILTER_REPLAY.attempt2.bin
+/research/prime_field_100_ideas_20261123/WS68_EC_GRAPH_V2_VERIFY.bin
+/research/prime_field_100_ideas_20261123/WS68_SUPPORT_RANK.bin
+/research/prime_field_100_ideas_20261123/WS68_STRUCTURAL.bin
+/research/prime_field_100_ideas_20261123/WS68_WINDOW_CG.bin
+/research/prime_field_100_ideas_20261123/WS68_BASE_POLICY.bin
+/research/prime_field_100_ideas_20261123/WS68_BASE_POLICY_V2.bin
+/research/prime_field_100_ideas_20261123/WS68_RS_RECORD.bin
+/research/prime_field_100_ideas_20261123/WS68_KNOWNLOG_SUBSTITUTE.bin
+/research/prime_field_100_ideas_20261123/WS68_INTERVAL_POLICY.bin
+/research/prime_field_100_ideas_20261123/WS68_YIELD_BASE.bin
+/research/prime_field_100_ideas_20261123/WS68_YIELD_BASE.stdout
+/research/prime_field_100_ideas_20261123/WS68_NATURAL_PARTIAL.bin
+/research/prime_field_100_ideas_20261123/WS68_NATURAL_PARTIAL_VERIFY.bin

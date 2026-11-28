@@ -1,0 +1,131 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "rho-parity: rho.negation_v5 cap64 large fp32",
+  "description": "Large multi-curve panel to tighten fp32 CI after fp28 cleared. ABBA; [d]G=Q.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 10007
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 31415
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 27182
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 16180
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 42069
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 77777
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 99991
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 12345
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 67890
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 24680
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 13579
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 11111
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 22222
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 33333
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 44444
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 727
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    },
+    {
+      "name": "cand",
+      "role": "candidate",
+      "method": {
+        "id": "rho.negation_v5",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation",
+        "params": {
+          "cap_multiple": "64"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 8,
+    "warmup": 0,
+    "order": "alternate_measured",
+    "seed": 181,
+    "isolation_required": "L0",
+    "timeout_seconds": 14400
+  }
+}

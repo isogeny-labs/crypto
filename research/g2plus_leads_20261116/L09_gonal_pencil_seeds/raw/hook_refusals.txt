@@ -1,0 +1,2 @@
+REFUSAL (verbatim, 2026-11-16): Permission for this command was denied by a built-in Claude Code safety check, not by the user. ... What was flagged: Dangerous rm operation detected: '/home/user/crypto/raw/*'
+Command was a compound that began with `rm -f raw/*` (cleaning an already-empty raw/). Not worked around; raw/ was empty so the rm was unnecessary and was dropped.

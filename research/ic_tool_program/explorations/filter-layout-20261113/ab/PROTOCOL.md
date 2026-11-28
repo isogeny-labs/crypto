@@ -39,14 +39,14 @@ change behind a layout tag. The motivation is the build-step diagnostic
 ## Workload
 
 - `ic price --params research/ic_tool_program/suite/v1/params/S/<row>/M1-T01.json
-  --json --single-target --rho-seed <suite seed>` for `k0n53` (2^44.3) and
-  `k0n61` (2^47.2).
+  --json --single-target --rho-seed <suite seed>` for `icv1-f2m53-tm56619371-dac20a85` (2^44.3) and
+  `icv1-f2m61-t158598901-ab42b6c5` (2^47.2).
 - Every process runs under `isolated_bench run --wait --cpus 2` with
   `RAYON_NUM_THREADS=1`. Busy-gate refusals are retried and counted.
 
 ## Schedule
 
-42 rounds. Round `r` runs `k0n53` then `k0n61`, each in permutation
+42 rounds. Round `r` runs `icv1-f2m53-tm56619371-dac20a85` then `icv1-f2m61-t158598901-ab42b6c5`, each in permutation
 `(r − 1) mod 6` of `[a q t, a t q, q a t, q t a, t a q, t q a]`.
 
 ## Metrics and statistics
@@ -77,8 +77,8 @@ Medians `a / t`:
 
 | row | build | set-up | collect |
 |:--|:--|:--|:--|
-| k0n53 | [1.05, 1.25] | [1.01, 1.07] | [0.97, 1.03] |
-| k0n61 | [1.05, 1.25] | [1.00, 1.04] | [0.97, 1.03] |
+| icv1-f2m53-tm56619371-dac20a85 | [1.05, 1.25] | [1.01, 1.07] | [0.97, 1.03] |
+| icv1-f2m61-t158598901-ab42b6c5 | [1.05, 1.25] | [1.00, 1.04] | [0.97, 1.03] |
 
 ## Identity
 

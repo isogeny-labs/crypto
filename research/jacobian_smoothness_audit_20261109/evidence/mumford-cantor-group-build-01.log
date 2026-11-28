@@ -1,0 +1,43 @@
+MumfordCantorGroup.lean:38:31: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  groupEquiv (point ?i)
+in the target expression
+  groupEquiv.addEquiv (point i) + groupEquiv.addEquiv (point j) = bits (sumIndex i j)
+
+i j : Fin 8
+⊢ groupEquiv.addEquiv (point i) + groupEquiv.addEquiv (point j) = bits (sumIndex i j)
+MumfordCantorGroup.lean:98:36: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype ↥smallSubgroup
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+MumfordCantorGroup.lean:101:9: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype ↥smallSubgroup
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+MumfordCantorGroup.lean:118:4: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype { P // (↑P).u.Splits }
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+MumfordCantorGroup.lean:119:6: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype { x // (↑x).u.Splits }
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+MumfordCantorGroup.lean:118:60: error: unsolved goals
+⊢ sorry = 2
+MumfordCantorGroup.lean:123:3: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype { P // (↑P).u.Splits }
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+MumfordCantorGroup.lean:123:57: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Fintype ↥smallSubgroup
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+MumfordCantorGroup.lean:125:8: warning: declaration uses `sorry`
+MumfordCantorGroup.lean:128:2: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+MumfordCantorGroup.lean:127:2: warning: Unused tactic linter: `rw [subgroup_smooth_cardinality, smallSubgroup_cardinality]` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+MumfordCantorGroup.lean:128:2: warning: Unused tactic linter: `norm_num` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`

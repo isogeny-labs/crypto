@@ -1,0 +1,108 @@
+{
+  "at": "2026-11-23T16:11:51.286255+00:00",
+  "certificate_before": {
+    "bytes": 16518,
+    "path": "/workspace/scratch/857f9e575d1c/work/vitse_prime31_compatibility_20261123/identity/identity.certificate.json",
+    "sha256": "dab1ee01be679af66b3109b8213fd921807dd294d18ff8b9080dc7bface009bf"
+  },
+  "command": [
+    "/workspace/scratch/857f9e575d1c/tmp/vitse-rust-toolchain/installed/bin/cargo",
+    "test",
+    "--release",
+    "--manifest-path",
+    "/workspace/scratch/857f9e575d1c/work/vitse_prime31_compatibility_20261123/identity/Cargo.toml",
+    "--frozen",
+    "--offline",
+    "--locked",
+    "--",
+    "--test-threads=1"
+  ],
+  "cwd": "/workspace/scratch/857f9e575d1c/work/vitse_prime31_compatibility_20261123/identity",
+  "source_build": {
+    "bytes": 7867,
+    "path": "/workspace/scratch/857f9e575d1c/work/vitse_prime31_compatibility_20261123/evidence/identity-tests-01/source-build.json",
+    "sha256": "a8b3126e30f4db66025c685943aa384de945780d51ea6bc2564952d006d13fe7"
+  },
+  "source_closure_unchanged": true,
+  "test_binaries": [
+    {
+      "actual": {
+        "bytes": 1072600,
+        "path": "/workspace/scratch/857f9e575d1c/work/vitse_prime31_compatibility_20261123/identity/target/release/build/vitse-prime31-identity/626b6fa9cc23e484/out/check_identity-626b6fa9cc23e484",
+        "sha256": "e996f975cba147ceee60f147d417b388cf0c0176c83d35b1e7248b4ab07d1eec"
+      },
+      "frozen": {
+        "bytes": 1072600,
+        "path": "/workspace/scratch/857f9e575d1c/work/vitse_prime31_compatibility_20261123/evidence/identity-tests-01/test-binaries/0-check_identity",
+        "sha256": "e996f975cba147ceee60f147d417b388cf0c0176c83d35b1e7248b4ab07d1eec"
+      },
+      "target": {
+        "crate_types": [
+          "bin"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2021",
+        "kind": [
+          "bin"
+        ],
+        "name": "check_identity",
+        "src_path": "/workspace/scratch/857f9e575d1c/work/vitse_prime31_compatibility_20261123/identity/src/bin/check_identity.rs",
+        "test": true
+      }
+    },
+    {
+      "actual": {
+        "bytes": 1072600,
+        "path": "/workspace/scratch/857f9e575d1c/work/vitse_prime31_compatibility_20261123/identity/target/release/build/vitse-prime31-identity/323761330afec509/out/issue_identity-323761330afec509",
+        "sha256": "27635105aec5f11667a6776e2537bf758f5d78c5f1397adf9a39c7183b6abc79"
+      },
+      "frozen": {
+        "bytes": 1072600,
+        "path": "/workspace/scratch/857f9e575d1c/work/vitse_prime31_compatibility_20261123/evidence/identity-tests-01/test-binaries/1-issue_identity",
+        "sha256": "27635105aec5f11667a6776e2537bf758f5d78c5f1397adf9a39c7183b6abc79"
+      },
+      "target": {
+        "crate_types": [
+          "bin"
+        ],
+        "doc": true,
+        "doctest": false,
+        "edition": "2021",
+        "kind": [
+          "bin"
+        ],
+        "name": "issue_identity",
+        "src_path": "/workspace/scratch/857f9e575d1c/work/vitse_prime31_compatibility_20261123/identity/src/bin/issue_identity.rs",
+        "test": true
+      }
+    },
+    {
+      "actual": {
+        "bytes": 1451680,
+        "path": "/workspace/scratch/857f9e575d1c/work/vitse_prime31_compatibility_20261123/identity/target/release/build/vitse-prime31-identity/2c9b68113cdc45d1/out/vitse_prime31_identity-2c9b68113cdc45d1",
+        "sha256": "de4481e4f6ede132a293ff42ec01f539f220ce7dcf9ba3bca428bceaf5e2457f"
+      },
+      "frozen": {
+        "bytes": 1451680,
+        "path": "/workspace/scratch/857f9e575d1c/work/vitse_prime31_compatibility_20261123/evidence/identity-tests-01/test-binaries/2-vitse_prime31_identity",
+        "sha256": "de4481e4f6ede132a293ff42ec01f539f220ce7dcf9ba3bca428bceaf5e2457f"
+      },
+      "target": {
+        "crate_types": [
+          "lib"
+        ],
+        "doc": true,
+        "doctest": true,
+        "edition": "2021",
+        "kind": [
+          "lib"
+        ],
+        "name": "vitse_prime31_identity",
+        "src_path": "/workspace/scratch/857f9e575d1c/work/vitse_prime31_compatibility_20261123/identity/src/lib.rs",
+        "test": true
+      }
+    }
+  ],
+  "timeout_seconds": 60
+}

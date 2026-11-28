@@ -1,0 +1,5 @@
+# Genuine-coordinate D: transparent return-type alias
+
+Cf59b78e5 format and release compile0; strict Clippy1 reports only type_complexity on the inherited pxgcd return triple, with whole733B stderr retained. Actual coordinates were not reached; its whole compiled ELF was never executed and remains private custody-pending. A/B/C sources and failures remain unchanged. [pcc:unverified]
+
+D introduces only a transparent Bezout<E> alias for exactly the prior triple and uses it in the return signature of new inherited_d.rs. Every selected function body remains byte-identical. INHERITANCE_D.json states the exact delta; the original INHERITANCE.json/inherited.rs remain unchanged. Main_d selects that module; field_b/curve_b are unchanged. Format-check the new alias module explicitly as well as main/field/chart. All strict Clippy/warning/debug/overflow/resource/seed/population/control rules in PROTOCOL_A remain unchanged. No suppression, new algebraic law or computational outcome. Publish and fully read back before first D phases. [pcc:unverified]

@@ -1,0 +1,48 @@
+R36 production review receipt
+date_utc: 2026-11-19
+scope: deterministic non-timing controls and static source audit
+strong_rho_sha256: 439489bd8933b78c1d2fbcfd821d92728ade3f883c309bdd2dd9f566368e504c
+main_sha256: 20e7e2bc9e80a62867583f17159b982c4c6d5dac63b67b332373b01596956c33
+compiler: rustc 1.100.0 (0ef1bc386 2026-11-09)
+
+[build]
+command: rustc --edition 2021 -O main.rs -o /tmp/ghs-r36-review
+exit_status: 0
+
+[selftest]
+command: /tmp/ghs-r36-review selftest
+exit_status: 0
+selected_output:
+selftest: production mul5 matches Karatsuba/frozen field on 20000 pairs; per call 5 fq_mul + 4 fq_small_div
+selftest: complete batches and width-2 simultaneous multiplication match frozen curve; cold table=FieldCounts { fq_mul: 459, fq_inv: 3, fq_add: 1642, fq_small_div: 0, f3_mul: 58, f3_sq: 15, f3_inv: 3, batch_inv: 3, group_add: 13 }
+selftest: setup state exact; field legacy=FieldCounts { fq_mul: 86017, fq_inv: 2374, fq_add: 273888, fq_small_div: 0, f3_mul: 6309, f3_sq: 3935, f3_inv: 2374, batch_inv: 0, group_add: 2454 } batch=FieldCounts { fq_mul: 56756, fq_inv: 520, fq_add: 204914, fq_small_div: 0, f3_mul: 6456, f3_sq: 2356, f3_inv: 520, batch_inv: 33, group_add: 1463 } walker_table=FieldCounts { fq_mul: 47881, fq_inv: 272, fq_add: 176800, fq_small_div: 0, f3_mul: 5807, f3_sq: 1955, f3_inv: 272, batch_inv: 272, group_add: 1207 }
+selftest: counted and counter-free planted logs match at widths 1, 4, 8, 16, and 32
+selftest: full trajectory exact; setup legacy=FieldCounts { fq_mul: 84767, fq_inv: 2340, fq_add: 269884, fq_small_div: 0, f3_mul: 6217, f3_sq: 3877, f3_inv: 2340, batch_inv: 0, group_add: 2421 } batch=FieldCounts { fq_mul: 56050, fq_inv: 487, fq_add: 203048, fq_small_div: 0, f3_mul: 6431, f3_sq: 2324, f3_inv: 487, batch_inv: 33, group_add: 1441 } walker_table=FieldCounts { fq_mul: 47912, fq_inv: 261, fq_add: 177210, fq_small_div: 0, f3_mul: 5835, f3_sq: 1954, f3_inv: 261, batch_inv: 250, group_add: 1207 } mul5=FieldCounts { fq_mul: 49619, fq_inv: 487, fq_add: 331406, fq_small_div: 25724, f3_mul: 6431, f3_sq: 2324, f3_inv: 487, batch_inv: 33, group_add: 1441 } combined=FieldCounts { fq_mul: 42077, fq_inv: 261, fq_add: 293706, fq_small_div: 23340, f3_mul: 5835, f3_sq: 1954, f3_inv: 261, batch_inv: 250, group_add: 1207 }
+SELFTEST OK
+
+[q223-matrix]
+workload: q=223; seeds=1,2,3; widths=1,4,8,16,32; target index 0; ic-repeat
+arms_per_cell: strong-bW, strong-bW-walker-table, strong-bW-mul5, strong-bW-mul5-walker-table, fast-bW-mul5-walker-table
+verifier: jq required equal recovered scalar, ok, steps, DPs, restarts, lookahead, cycles, cycle additions, setup-native tuple, walk-native tuple, unchanged Karatsuba walk/verify counts under table reuse, exact one-fq_mul-per-f3_mul mul5 delta, and zero field counts in fast arms
+exit_status: 0
+output:
+{"status":"PASS","cells":15,"retry_cells":[]}
+
+[q7-forced-natural-retry-sweep]
+workload: q=7; seeds=1..40; width=8; target index 0; ic-repeat
+arms_per_cell: strong-b8, strong-b8-walker-table, strong-b8-mul5-walker-table
+verifier: jq required equal trajectory, setup-native tuple, walk-native tuple, equal RNG draws, and exact mul5 setup identity; it also required at least one setup retry inferred from draws > 80
+exit_status: 0
+output:
+{"status":"PASS","cells":40,"retry_cells":[{"seed":10,"rng":82,"retries":1},{"seed":21,"rng":82,"retries":1},{"seed":27,"rng":82,"retries":1},{"seed":35,"rng":82,"retries":1}]}
+
+[q7-seed10-selected-raw-records]
+command: /tmp/ghs-r36-review run 7 10 0 1 ic-repeat strong-b8,strong-b8-walker-table,strong-b8-mul5-walker-table | jq -c 'select(.rec=="rho") | {arm,setup_mode,field_kernel,ok,k_found,steps,dps,restarts,lookahead,cycles,cycle_adds,setup_rng:."setup_native.rng",setup_canon:."setup_native.canon",setup_scalar_add:."setup_native.scalar_add",setup_fq_mul:."setup.fq_mul",setup_fq_inv:."setup.fq_inv",setup_fq_add:."setup.fq_add",setup_fq_small_div:."setup.fq_small_div",setup_f3_mul:."setup.f3_mul",setup_f3_sq:."setup.f3_sq",setup_f3_inv:."setup.f3_inv",setup_batch_inv:."setup.batch_inv",setup_group_add:."setup.group_add",walk_fq_mul:."walk.fq_mul",verify_fq_mul:."verify.fq_mul"}'
+exit_status: 0
+records:
+{"arm":"strong-b8","setup_mode":"batched-window2-jumps","field_kernel":"karatsuba6","ok":true,"k_found":31,"steps":18,"dps":3,"restarts":0,"lookahead":2,"cycles":0,"cycle_adds":0,"setup_rng":82,"setup_canon":8,"setup_scalar_add":6,"setup_fq_mul":15529,"setup_fq_inv":154,"setup_fq_add":49528,"setup_fq_small_div":0,"setup_f3_mul":1741,"setup_f3_sq":647,"setup_f3_inv":154,"setup_batch_inv":12,"setup_group_add":442,"walk_fq_mul":851,"verify_fq_mul":276}
+{"arm":"strong-b8-walker-table","setup_mode":"batched-window2-jumps-walkers","field_kernel":"karatsuba6","ok":true,"k_found":31,"steps":18,"dps":3,"restarts":0,"lookahead":2,"cycles":0,"cycle_adds":0,"setup_rng":82,"setup_canon":8,"setup_scalar_add":6,"setup_fq_mul":13284,"setup_fq_inv":91,"setup_fq_add":43223,"setup_fq_small_div":0,"setup_f3_mul":1577,"setup_f3_sq":546,"setup_f3_inv":91,"setup_batch_inv":83,"setup_group_add":370,"walk_fq_mul":851,"verify_fq_mul":276}
+{"arm":"strong-b8-mul5-walker-table","setup_mode":"batched-window2-jumps-walkers","field_kernel":"evaluation5","ok":true,"k_found":31,"steps":18,"dps":3,"restarts":0,"lookahead":2,"cycles":0,"cycle_adds":0,"setup_rng":82,"setup_canon":8,"setup_scalar_add":6,"setup_fq_mul":11707,"setup_fq_inv":91,"setup_fq_add":72529,"setup_fq_small_div":6308,"setup_f3_mul":1577,"setup_f3_sq":546,"setup_f3_inv":91,"setup_batch_inv":83,"setup_group_add":370,"walk_fq_mul":738,"verify_fq_mul":256}
+
+[interpretation_boundary]
+The commands above are deterministic correctness/counting controls. Development wall_s fields were ignored. No performance or frontier claim is made.

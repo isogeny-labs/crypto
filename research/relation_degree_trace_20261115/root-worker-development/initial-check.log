@@ -1,0 +1,41 @@
+    Checking relation-native-qualification v0.1.0 (/workspace/crypto-integrate/research/relation_degree_trace_20261115/rust-integration)
+error[E0277]: a value of type `[(Vec<u32>, u64)]` cannot be built from an iterator over elements of type `(_, u64)`
+  --> src/bin/native-root-worker.rs:90:18
+   |
+90 |                 .collect();
+   |                  ^^^^^^^ value of type `[(Vec<u32>, u64)]` cannot be built from `std::iter::Iterator<Item=(_, u64)>`
+   |
+   = help: the trait `FromIterator<(_, u64)>` is not implemented for `[(Vec<u32>, u64)]`
+note: the method call chain might not have had the expected associated types
+  --> src/bin/native-root-worker.rs:88:18
+   |
+87 |             let f = f
+   |                     - this expression has type `BTreeMap<Vec<usize>, u64>`
+88 |                 .into_iter()
+   |                  ^^^^^^^^^^^ `Iterator::Item` is `(Vec<usize>, u64)` here
+89 |                 .map(|(m, c)| (m.into_iter().map(|e| e as u32).collect(), c))
+   |                  ------------------------------------------------------------ `Iterator::Item` remains `(_, u64)` here
+note: required by a bound in `std::iter::Iterator::collect`
+  --> /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/iter/traits/iterator.rs:2087:4
+
+error[E0277]: the size for values of type `[(Vec<u32>, u64)]` cannot be known at compilation time
+  --> src/bin/native-root-worker.rs:87:17
+   |
+87 |             let f = f
+   |                 ^ doesn't have a size known at compile-time
+   |
+   = help: the trait `Sized` is not implemented for `[(Vec<u32>, u64)]`
+   = note: all local variables must have a statically known size
+
+error[E0277]: the size for values of type `[(Vec<u32>, u64)]` cannot be known at compilation time
+  --> src/bin/native-root-worker.rs:90:18
+   |
+90 |                 .collect();
+   |                  ^^^^^^^ doesn't have a size known at compile-time
+   |
+   = help: the trait `Sized` is not implemented for `[(Vec<u32>, u64)]`
+note: required by an implicit `Sized` bound in `std::iter::Iterator::collect`
+  --> /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/iter/traits/iterator.rs:2087:4
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `relation-native-qualification` (bin "native-root-worker") due to 3 previous errors

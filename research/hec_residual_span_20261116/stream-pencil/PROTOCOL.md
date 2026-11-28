@@ -1,0 +1,11 @@
+# Streaming completed-pencil buckets
+
+Question: can early processing of complete buckets avoid enough anchor scan work to materially improve the strongest retained incremental-pencil solver? Engineering/classical-sieve scheduling, no novelty claim. Exact same8models,32workloads,seeds,source1/17,normalization/setup and16/128anchor limits as incremental-pencil; same independent per-prefix solve_for_last gate and original-source final verification. Two counted repetitions per workload,64calls. Keep incomplete cases, no adaptive inputs/retry/budget increase.
+
+Only change: process FBpoints in fixed batches16 in original increasing-x order, batch-invert only current denominators, insert both signs (zero once), then process newly complete buckets in increasing-t order within that batch. A degree-g+1 residual with g+1distinct disjoint roots is exhausted; it may be emitted before scanning the remaining factor base. Retain exact residual reconstruction, signed weights, all source validation and final check costs. This changes row order, so row counts and determining anchors can change; compare identical public inputs/outcomes rather than claiming identical prefixes with the old stream. Each candidate prefix must still agree with the independent retained solver. Failed completion or excess work remains visible.
+
+Prospective cost case: avoid unused suffixes on the final anchor. More inversions from smaller batches, changed rank arrival, and row processing may erase the gain. No claim that stopping gives tenfold; measure separate modulus16componentvectors against the original retained records. No arbitrary modulus weighting or wall/CPU claim. Old baseline producer is not rerun. Full-cost gain and mathematical10x genus2+ objective remain distinct.
+
+Primary sieve source https://www-fourier.univ-grenoble-alpes.fr/~viva/research/articles/SievingB.pdf sections2.2–2.3 already read. Existing pencil/production equivalence checks establish distinct-root exhaustion; streaming emission uses that same algebra. No prior-art absence claim.
+
+Compile then freeze/push all source/native/import/input/binary hashes before once-only execution under600CPU seconds. Save raw count/gate/stderr/exit/run/hash records in Git while S3 unavailable. LocalRust1.93.1 sharedARM, no paidresources. No overwrite/rerun. Summaries are derived without producer execution.

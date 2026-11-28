@@ -1,0 +1,5 @@
+# Primary-source boundary
+
+Re-read [Neiger, Rosenkilde and Schost (2017)](https://arxiv.org/abs/1705.10658), abstract: their algorithm represents all power-series roots for a given polynomial at a supplied precision, including multiple roots, with a near input/output-size bound. That is important prior art for our lifting/root extraction; it does not itself search the unknown 63-parameter norm family. No full-text novelty certification is claimed here.
+
+[Official mockturtle linear-resynthesis documentation](https://mockturtle.readthedocs.io/en/latest/algorithms/linear_resynthesis.html) describes extracting linear components from XOR/AND graphs, matrix-based resynthesis and merging back the AND gates. It documents greedy pair substitution and exact SAT synthesis. C125's recipe preservation belongs to this established circuit-optimization landscape. It is an implementation experiment, not a new root-finding complexity theorem. Degree clipping plus final exact certification is the fresh program hypothesis; independent literature review is still required before calling it novel.

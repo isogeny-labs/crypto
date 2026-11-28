@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T07:24:46Z",
+ "id": "PCC-20261116-ab0c8b",
+ "kind": "statement",
+ "producer": {
+  "commit": "f5472700fbf4b1eab4436406d3e9a2a22f230295",
+  "model": "",
+  "session": "codex-20261116-nist-three-e2e"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/toy_ic_v4.cpp",
+    "sha256": "9e31f8b5c38da43d9ae961bd4944f1c8922ae6c8778f41d543575823bdffe64b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/e2e-v2.tar.gz",
+    "sha256": "20b65bfd153f2002398b756eaf53e46ca806fd3c968fe04a40bf55baf9522abb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/e2e-v2/COMPLETE.txt",
+    "sha256": "022b2a31a3fcd00bc238b393835efb3107fcf2f5ec19d1526f30b08a2d316ca0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/evidence/e2e-v2/MANIFEST.sha256",
+    "sha256": "ae0474833c3253ca3df8dd743db3bde74c0a4bcf185af32c4d48c2678dfcd9eb"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_cover_three_tests_20261116",
+ "statement": "Active v4 public small-curve norm-projected index-calculus solver rejects nonzero auxiliary 3-cosets with zero projection, recovers all 11 and 109 valid subgroup targets, and preserves v3 public witnesses byte for byte. Combined development suite e2e-v2 passes P-192 map checks, both recoveries, OpenSSL source checks and corruption controls. Producer unsigned correctness evidence only; no full P-192 scalar recovery, plane quartic, timing or speed result."
+}

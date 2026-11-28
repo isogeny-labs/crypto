@@ -1,0 +1,14 @@
+{
+  "action": "use research/quartic_diem_ladder_20261121/validation/picarith.py (Riemann-Roch linear algebra over F_p: residual rule with the saturated complete intersection (c, F), sums as products of generating spaces); prove #J = r from r prime, [r]G = 0, G != 0 and 2r > (sqrt p + 1)^6, and compare RREF nets exactly; include [t+1]G != T and a tampered-net control",
+  "created": "2026-11-23T17:57:38Z",
+  "evidence": [
+    "research/quartic_diem_ladder_20261121/validation/verify_certificates.py: 40 curves, 210 rows (80 new, 80 sfb, 50 rho) verified, < 7 s per curve at p = 131101; associativity/commutativity/inverse/linearity checks in research/quartic_diem_ladder_20261121/validation/grouplaw_checks.py"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "re-verifying discrete-log certificates on non-hyperelliptic genus-3 plane quartics (Typ/Exc class records) on a host without PARI, Sage or Magma",
+  "why": "the solver's own Pic code must not certify itself; the linear-algebra law needs only numpy and runs in seconds per curve"
+}

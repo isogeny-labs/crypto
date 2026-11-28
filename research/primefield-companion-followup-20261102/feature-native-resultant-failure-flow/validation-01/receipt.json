@@ -1,0 +1,92 @@
+{
+  "scope": "journal/canonical failure software tests; no native comparison panel",
+  "source_hashes": {
+    "feature-native-resultant-accounting/README.md": "0615b67de4037abf887baf81d3ebf23284cc9d827a264d7e6b3d37c70a22d7cb",
+    "feature-native-resultant-accounting/generated/euclid.rs": "81c327ea821163701f0a9fdd29a8a2c6db9e3ea78b509ecac194dd8d73c2b85b",
+    "feature-native-resultant-accounting/generated/half.rs": "96afe40aeab98356548528bce6074bcf9886f997e49082ab37193d0b5879fb20",
+    "feature-native-resultant-accounting/generated/scalar.rs": "978093fb1bdd5e847f6c094e241b6524486bff1e065ec609a57f4c8d346f54cb",
+    "feature-native-resultant-accounting/meter.rs": "99443bf3affb9a19c6dc3c014b33923255c7fc8ff23c5eb31983fd24a83c46c8",
+    "feature-native-resultant-accounting/names.rs": "ca2f39c064827c488cbf0fc64043ad241148c61302b03636ec166613d881b810",
+    "feature-native-resultant-failure-flow/capture.py": "d74f4ceaf0474a43b72aa36b4a52cc46d87dad1990459700d5c0a76da97d0e78",
+    "feature-native-resultant-failure-flow/failure.py": "97bcda047af2a3b9bcf73473c3ec4203fe50f1280d0fde6d842f8dc2c9b8f45b",
+    "feature-native-resultant-failure-flow/generate.py": "7c4fa06ae19486c8d818786094afb52ef31e75f7f155876ea9788c281ad1d6fd",
+    "feature-native-resultant-failure-flow/generation.json": "f669d95ee3acbf58c9defde61f640347112a457842a81691400bcfd85722b3ee",
+    "feature-native-resultant-failure-flow/journal.rs": "d648c97f64c85bb45c04b76b168092a4b90d98cf928ede6894cacd09d084e5bb",
+    "feature-native-resultant-failure-flow/main.rs": "410158c17262ce05911a83815c58bb424fdf6103cb475c3c79d4b35a27dd4728",
+    "feature-native-resultant-failure-flow/prepare_protocol.py": "b79cabec523811d01a29eaf517a39afe42d74cca5e3f3f7a9c96de3df1a22405",
+    "feature-native-resultant-failure-flow/protocol.draft.json": "a1621f1866911adadf4d42e958865fd0979f2e3aa6c87da5ecf86a97c10a9f24",
+    "feature-native-resultant-failure-flow/success.py": "b7168aa829e164e2bb44f7a02eb431cfd57acc070cd1ae8e43900bb2ba99683b",
+    "feature-native-resultant-failure-flow/test_failure.py": "0662052bf05ade1d31006c0533890ac39b9deb828896a637d9aac5b78a77135e",
+    "feature-native-resultant-failure-flow/validate.py": "7b67f17b75b473d3ae2bb46076c54aecf07aef53e4acd64c93c7d8a243d42f18",
+    "feature-native-resultant-panel/analyze.py": "2a28a9cb2eddb10d3fc94be7542f54a35abe89fb01d0ce76cc2c9027d0926dd7",
+    "feature-native-resultant-panel/inputs.tsv": "ade4adbda52cfc01290b5262eca1fa258e2407d42a527ce417e480764f478575",
+    "feature-native-resultant-panel/metrics.txt": "5de4571ed18f0142b807a198c20bb1f4945ea3cdd7f71f392bc121ff16cb4640",
+    "feature-native-resultant-panel/panel.rs": "c64418ce6fc3d30fa7b07e973acf1fadb2e6c996206d02ccc445eb9998d2de00",
+    "feature-native-resultant-protocol/authority/docs/experiment-protocol.md": "111beee86ce91364cc23098ab232a151b1ece271eabdc544df49ba56067fecf2",
+    "feature-native-resultant-protocol/authority/schemas/experiment-export.v1.json": "108f0ae9c1be3ed141bca3c22216eba049f2c76677f11013109a4740f19bd757",
+    "feature-native-resultant-protocol/authority/schemas/experiment-protocol.v1.json": "a9b948f2be323f862b98301eb7a5aa147ecc29db35041737f0aa3dfd03ad2443",
+    "feature-native-resultant-protocol/authority/tools/experiment_protocol.py": "0f46a2b856bb1df2d155c4a676b46c6118d82c45cf8e5cc0492315aeb45c84e4",
+    "feature-native-resultant-protocol/authority.json": "aa66f939fe8d47a0e25f4dfeadaf8ed8ded1ed6dcaea775b418a7ad5a8756c0a",
+    "feature-native-resultant-protocol/common.py": "1e8af5f95aa18b67a7003b049bb15d1663d3c7a4ccb1b8e133a654d8ab2cd4d0",
+    "feature-native-resultant-protocol/export.py": "f8e66d378b086ace31caa708fd226070f73b612fda4e95dc9a321d9f01258bea",
+    "feature-native-resultant-protocol/protocol.draft.json": "99b70cd046bf762dd117eeb7bee98eeeb6acb3c61fc8228a0929735b6ca86e9d"
+  },
+  "commands": [
+    {
+      "name": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-C",
+        "opt-level=2",
+        "-C",
+        "overflow-checks=yes",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-resultant-failure-flow/main.rs",
+        "-o",
+        "/tmp/resultant-journal-check-fzw0ohct/runner"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "bcb3c7632736a760965bdae37dc5fc4331d9abdf6640c9eb8b8ab5355435c90f"
+    },
+    {
+      "name": "native-test",
+      "argv": [
+        "/tmp/resultant-journal-check-fzw0ohct/runner",
+        "--self-test"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0,
+      "stdout_sha256": "7252fd48024c6f75e461d5b5016e586055f9d4ab49ac9aae9a7eaa4c381ff880",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "canonical-draft",
+      "argv": [
+        "/home/ec2-user/primefield-ecdlp-research-20261028/.venv/bin/python",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-resultant-protocol/authority/tools/experiment_protocol.py",
+        "validate",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-resultant-failure-flow/protocol.draft.json"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0,
+      "stdout_sha256": "8b380547da5ca3d88b8b5e362815a3943765f6063bf84d24c93dae7936dac56a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "failure-tests",
+      "argv": [
+        "/home/ec2-user/primefield-ecdlp-research-20261028/.venv/bin/python",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-resultant-failure-flow/test_failure.py"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "da7136b432b1cb6486e212fbcc573f28714902e3495773b7fd876e48c51989ab"
+    }
+  ],
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "binary_sha256": "119faf05af35841021adca30a1cc47f26af35e0eac7d919269a22e9b1e8059e1",
+  "passed": true
+}

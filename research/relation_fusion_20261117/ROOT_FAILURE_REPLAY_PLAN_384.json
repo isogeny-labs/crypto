@@ -1,0 +1,26 @@
+{
+  "schema": "root-failed-unit-diagnostic-replay-plan/v1",
+  "recorded_utc": "2026-11-23T12:42:52.495368+00:00",
+  "source": "ROOT_UNIT_SOURCE_348.json",
+  "initial_failed_partial_run": "ROOT_FULL_OUTCOME_380.json",
+  "executable": "/workspace/crypto-root-unoptimized-181/release/build/crypto/e7435ac0b284a6c7/out/crypto_lib-e7435ac0b284a6c7",
+  "executable_sha256": "076a8cd17eda8cc636803141a921561ae6b51c2edf1a439cd20ca54dca30aab3",
+  "exact_tests": [
+    "cryptanalysis::binary_radical_root::tests::factored_subspace_oracle_decides_as_subspace_oracle",
+    "cryptanalysis::curve_id::tests::the_binary_search_agrees_with_the_map"
+  ],
+  "purpose": "Get panic/assert details, compare isolated with original full-run failures. A passing isolated replay does not erase full-run failure or qualify full suite.",
+  "flags": [
+    "--exact",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "cpu": 0,
+  "threads": 1,
+  "wall_limit_seconds_each": 600,
+  "address_space_bytes": 12884901888,
+  "each_raw_output_file_limit_bytes": 16777216,
+  "input_seed_or_assertion_changes": false,
+  "performance_observations_collected": 0,
+  "15x_admitted": false
+}

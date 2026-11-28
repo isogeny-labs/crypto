@@ -1,0 +1,20 @@
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+warning: associated function `from_u64` is never used
+  --> frozen/exact_bounds.rs:11:8
+   |
+ 8 | impl Nat {
+   | -------- associated function in this implementation
+...
+11 |     fn from_u64(x: u64) -> Self {
+   |        ^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: 1 warning emitted
+

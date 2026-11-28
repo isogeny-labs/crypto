@@ -1,0 +1,185 @@
+Amazon Linux 2023 Kernel Livepatch repository   750 kB/s |  89 kB     00:00    
+Package pkgconf-pkg-config-1.8.0-4.amzn2023.0.2.x86_64 is already installed.
+Dependencies resolved.
+================================================================================
+ Package                 Arch    Version                     Repository    Size
+================================================================================
+Installing:
+ cargo                   x86_64  1.98.1-1.amzn2023           amazonlinux  8.3 M
+ docker                  x86_64  25.0.16-1.amzn2023.0.5      amazonlinux   47 M
+ gcc                     x86_64  11.5.0-5.amzn2023.0.5       amazonlinux   36 M
+ openssl-devel           x86_64  1:3.5.8-1.amzn2023.0.3      amazonlinux  3.5 M
+ rust                    x86_64  1.98.1-1.amzn2023           amazonlinux   61 M
+Installing dependencies:
+ annobin-docs            noarch  12.69-1.amzn2023.0.1        amazonlinux   93 k
+ annobin-plugin-gcc      x86_64  12.69-1.amzn2023.0.1        amazonlinux  974 k
+ container-selinux       noarch  4:2.245.0-1.amzn2023        amazonlinux   58 k
+ containerd              x86_64  2.3.5-1.amzn2023.0.1        amazonlinux   24 M
+ cpp                     x86_64  11.5.0-5.amzn2023.0.5       amazonlinux   11 M
+ gc                      x86_64  8.0.4-5.amzn2023.0.2        amazonlinux  105 k
+ gcc-plugin-annobin      x86_64  11.5.0-5.amzn2023.0.5       amazonlinux   38 k
+ glibc-devel             x86_64  2.34-231.amzn2023.0.5       amazonlinux   33 k
+ glibc-headers-x86       noarch  2.34-231.amzn2023.0.5       amazonlinux  439 k
+ guile22                 x86_64  2.2.7-2.amzn2023.0.3        amazonlinux  6.4 M
+ iptables-libs           x86_64  1.8.8-3.amzn2023.0.2        amazonlinux  401 k
+ iptables-nft            x86_64  1.8.8-3.amzn2023.0.2        amazonlinux  183 k
+ kernel6.18-headers      x86_64  1:6.18.54-121.166.amzn2023  amazonlinux  1.6 M
+ libcgroup               x86_64  3.0-1.amzn2023.0.1          amazonlinux   75 k
+ libmpc                  x86_64  1.2.1-2.amzn2023.0.2        amazonlinux   62 k
+ libnetfilter_conntrack  x86_64  1.0.8-2.amzn2023.0.2        amazonlinux   58 k
+ libnfnetlink            x86_64  1.0.1-19.amzn2023.0.2       amazonlinux   30 k
+ libnftnl                x86_64  1.2.2-2.amzn2023.0.2        amazonlinux   84 k
+ libtool-ltdl            x86_64  2.4.7-1.amzn2023.0.3        amazonlinux   38 k
+ libxcrypt-devel         x86_64  4.4.33-7.amzn2023           amazonlinux   32 k
+ make                    x86_64  1:4.3-5.amzn2023.0.2        amazonlinux  534 k
+ pigz                    x86_64  2.5-1.amzn2023.0.4          amazonlinux   83 k
+ runc                    x86_64  1.4.3-1.amzn2023.0.1        amazonlinux  3.7 M
+ rust-std-static         x86_64  1.98.1-1.amzn2023           amazonlinux   40 M
+
+Transaction Summary
+================================================================================
+Install  29 Packages
+
+Total download size: 245 M
+Installed size: 884 M
+Downloading Packages:
+(1/29): annobin-plugin-gcc-12.69-1.amzn2023.0.1  35 MB/s | 974 kB     00:00    
+(2/29): annobin-docs-12.69-1.amzn2023.0.1.noarc 2.8 MB/s |  93 kB     00:00    
+(3/29): container-selinux-2.245.0-1.amzn2023.no 2.1 MB/s |  58 kB     00:00    
+(4/29): cargo-1.98.1-1.amzn2023.x86_64.rpm       81 MB/s | 8.3 MB     00:00    
+(5/29): cpp-11.5.0-5.amzn2023.0.5.x86_64.rpm     81 MB/s |  11 MB     00:00    
+(6/29): gc-8.0.4-5.amzn2023.0.2.x86_64.rpm      4.0 MB/s | 105 kB     00:00    
+(7/29): containerd-2.3.5-1.amzn2023.0.1.x86_64.  83 MB/s |  24 MB     00:00    
+(8/29): gcc-plugin-annobin-11.5.0-5.amzn2023.0. 1.4 MB/s |  38 kB     00:00    
+(9/29): glibc-devel-2.34-231.amzn2023.0.5.x86_6 1.3 MB/s |  33 kB     00:00    
+(10/29): glibc-headers-x86-2.34-231.amzn2023.0.  15 MB/s | 439 kB     00:00    
+(11/29): guile22-2.2.7-2.amzn2023.0.3.x86_64.rp  80 MB/s | 6.4 MB     00:00    
+(12/29): iptables-libs-1.8.8-3.amzn2023.0.2.x86  19 MB/s | 401 kB     00:00    
+(13/29): iptables-nft-1.8.8-3.amzn2023.0.2.x86_ 8.9 MB/s | 183 kB     00:00    
+(14/29): kernel6.18-headers-6.18.54-121.166.amz  60 MB/s | 1.6 MB     00:00    
+(15/29): libcgroup-3.0-1.amzn2023.0.1.x86_64.rp 2.3 MB/s |  75 kB     00:00    
+(16/29): gcc-11.5.0-5.amzn2023.0.5.x86_64.rpm    82 MB/s |  36 MB     00:00    
+(17/29): libmpc-1.2.1-2.amzn2023.0.2.x86_64.rpm 865 kB/s |  62 kB     00:00    
+(18/29): docker-25.0.16-1.amzn2023.0.5.x86_64.r  76 MB/s |  47 MB     00:00    
+(19/29): libnetfilter_conntrack-1.0.8-2.amzn202 786 kB/s |  58 kB     00:00    
+(20/29): libnfnetlink-1.0.1-19.amzn2023.0.2.x86 409 kB/s |  30 kB     00:00    
+(21/29): libxcrypt-devel-4.4.33-7.amzn2023.x86_ 1.4 MB/s |  32 kB     00:00    
+(22/29): libtool-ltdl-2.4.7-1.amzn2023.0.3.x86_ 1.5 MB/s |  38 kB     00:00    
+(23/29): libnftnl-1.2.2-2.amzn2023.0.2.x86_64.r 2.5 MB/s |  84 kB     00:00    
+(24/29): make-4.3-5.amzn2023.0.2.x86_64.rpm      16 MB/s | 534 kB     00:00    
+(25/29): pigz-2.5-1.amzn2023.0.4.x86_64.rpm     2.9 MB/s |  83 kB     00:00    
+(26/29): openssl-devel-3.5.8-1.amzn2023.0.3.x86  58 MB/s | 3.5 MB     00:00    
+(27/29): runc-1.4.3-1.amzn2023.0.1.x86_64.rpm    79 MB/s | 3.7 MB     00:00    
+(28/29): rust-std-static-1.98.1-1.amzn2023.x86_  82 MB/s |  40 MB     00:00    
+(29/29): rust-1.98.1-1.amzn2023.x86_64.rpm       83 MB/s |  61 MB     00:00    
+--------------------------------------------------------------------------------
+Total                                           157 MB/s | 245 MB     00:01     
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1 
+  Installing       : runc-1.4.3-1.amzn2023.0.1.x86_64                      1/29 
+  Installing       : libmpc-1.2.1-2.amzn2023.0.2.x86_64                    2/29 
+  Installing       : cpp-11.5.0-5.amzn2023.0.5.x86_64                      3/29 
+  Installing       : containerd-2.3.5-1.amzn2023.0.1.x86_64                4/29 
+  Running scriptlet: containerd-2.3.5-1.amzn2023.0.1.x86_64                4/29 
+  Installing       : pigz-2.5-1.amzn2023.0.4.x86_64                        5/29 
+  Installing       : libtool-ltdl-2.4.7-1.amzn2023.0.3.x86_64              6/29 
+  Installing       : libnftnl-1.2.2-2.amzn2023.0.2.x86_64                  7/29 
+  Installing       : libnfnetlink-1.0.1-19.amzn2023.0.2.x86_64             8/29 
+  Installing       : libnetfilter_conntrack-1.0.8-2.amzn2023.0.2.x86_64    9/29 
+  Installing       : iptables-libs-1.8.8-3.amzn2023.0.2.x86_64            10/29 
+  Installing       : iptables-nft-1.8.8-3.amzn2023.0.2.x86_64             11/29 
+  Running scriptlet: iptables-nft-1.8.8-3.amzn2023.0.2.x86_64             11/29 
+  Installing       : libcgroup-3.0-1.amzn2023.0.1.x86_64                  12/29 
+  Installing       : kernel6.18-headers-1:6.18.54-121.166.amzn2023.x86_   13/29 
+  Installing       : glibc-headers-x86-2.34-231.amzn2023.0.5.noarch       14/29 
+  Installing       : libxcrypt-devel-4.4.33-7.amzn2023.x86_64             15/29 
+  Installing       : glibc-devel-2.34-231.amzn2023.0.5.x86_64             16/29 
+  Installing       : gc-8.0.4-5.amzn2023.0.2.x86_64                       17/29 
+  Installing       : guile22-2.2.7-2.amzn2023.0.3.x86_64                  18/29 
+  Installing       : make-1:4.3-5.amzn2023.0.2.x86_64                     19/29 
+  Installing       : gcc-11.5.0-5.amzn2023.0.5.x86_64                     20/29 
+  Running scriptlet: gcc-11.5.0-5.amzn2023.0.5.x86_64                     20/29 
+  Installing       : rust-std-static-1.98.1-1.amzn2023.x86_64             21/29 
+  Installing       : rust-1.98.1-1.amzn2023.x86_64                        22/29 
+  Running scriptlet: container-selinux-4:2.245.0-1.amzn2023.noarch        23/29 
+  Installing       : container-selinux-4:2.245.0-1.amzn2023.noarch        23/29 
+  Running scriptlet: container-selinux-4:2.245.0-1.amzn2023.noarch        23/29 
+  Installing       : annobin-docs-12.69-1.amzn2023.0.1.noarch             24/29 
+  Installing       : annobin-plugin-gcc-12.69-1.amzn2023.0.1.x86_64       25/29 
+  Running scriptlet: annobin-plugin-gcc-12.69-1.amzn2023.0.1.x86_64       25/29 
+  Running scriptlet: docker-25.0.16-1.amzn2023.0.5.x86_64                 26/29 
+  Installing       : docker-25.0.16-1.amzn2023.0.5.x86_64                 26/29 
+  Running scriptlet: docker-25.0.16-1.amzn2023.0.5.x86_64                 26/29 
+Created symlink /etc/systemd/system/sockets.target.wants/docker.socket → /usr/lib/systemd/system/docker.socket.
+
+  Installing       : cargo-1.98.1-1.amzn2023.x86_64                       27/29 
+  Installing       : gcc-plugin-annobin-11.5.0-5.amzn2023.0.5.x86_64      28/29 
+  Installing       : openssl-devel-1:3.5.8-1.amzn2023.0.3.x86_64          29/29 
+  Running scriptlet: container-selinux-4:2.245.0-1.amzn2023.noarch        29/29 
+  Running scriptlet: openssl-devel-1:3.5.8-1.amzn2023.0.3.x86_64          29/29 
+  Verifying        : annobin-docs-12.69-1.amzn2023.0.1.noarch              1/29 
+  Verifying        : annobin-plugin-gcc-12.69-1.amzn2023.0.1.x86_64        2/29 
+  Verifying        : cargo-1.98.1-1.amzn2023.x86_64                        3/29 
+  Verifying        : container-selinux-4:2.245.0-1.amzn2023.noarch         4/29 
+  Verifying        : containerd-2.3.5-1.amzn2023.0.1.x86_64                5/29 
+  Verifying        : cpp-11.5.0-5.amzn2023.0.5.x86_64                      6/29 
+  Verifying        : docker-25.0.16-1.amzn2023.0.5.x86_64                  7/29 
+  Verifying        : gc-8.0.4-5.amzn2023.0.2.x86_64                        8/29 
+  Verifying        : gcc-11.5.0-5.amzn2023.0.5.x86_64                      9/29 
+  Verifying        : gcc-plugin-annobin-11.5.0-5.amzn2023.0.5.x86_64      10/29 
+  Verifying        : glibc-devel-2.34-231.amzn2023.0.5.x86_64             11/29 
+  Verifying        : glibc-headers-x86-2.34-231.amzn2023.0.5.noarch       12/29 
+  Verifying        : guile22-2.2.7-2.amzn2023.0.3.x86_64                  13/29 
+  Verifying        : iptables-libs-1.8.8-3.amzn2023.0.2.x86_64            14/29 
+  Verifying        : iptables-nft-1.8.8-3.amzn2023.0.2.x86_64             15/29 
+  Verifying        : kernel6.18-headers-1:6.18.54-121.166.amzn2023.x86_   16/29 
+  Verifying        : libcgroup-3.0-1.amzn2023.0.1.x86_64                  17/29 
+  Verifying        : libmpc-1.2.1-2.amzn2023.0.2.x86_64                   18/29 
+  Verifying        : libnetfilter_conntrack-1.0.8-2.amzn2023.0.2.x86_64   19/29 
+  Verifying        : libnfnetlink-1.0.1-19.amzn2023.0.2.x86_64            20/29 
+  Verifying        : libnftnl-1.2.2-2.amzn2023.0.2.x86_64                 21/29 
+  Verifying        : libtool-ltdl-2.4.7-1.amzn2023.0.3.x86_64             22/29 
+  Verifying        : libxcrypt-devel-4.4.33-7.amzn2023.x86_64             23/29 
+  Verifying        : make-1:4.3-5.amzn2023.0.2.x86_64                     24/29 
+  Verifying        : openssl-devel-1:3.5.8-1.amzn2023.0.3.x86_64          25/29 
+  Verifying        : pigz-2.5-1.amzn2023.0.4.x86_64                       26/29 
+  Verifying        : runc-1.4.3-1.amzn2023.0.1.x86_64                     27/29 
+  Verifying        : rust-1.98.1-1.amzn2023.x86_64                        28/29 
+  Verifying        : rust-std-static-1.98.1-1.amzn2023.x86_64             29/29 
+
+Installed:
+  annobin-docs-12.69-1.amzn2023.0.1.noarch                                      
+  annobin-plugin-gcc-12.69-1.amzn2023.0.1.x86_64                                
+  cargo-1.98.1-1.amzn2023.x86_64                                                
+  container-selinux-4:2.245.0-1.amzn2023.noarch                                 
+  containerd-2.3.5-1.amzn2023.0.1.x86_64                                        
+  cpp-11.5.0-5.amzn2023.0.5.x86_64                                              
+  docker-25.0.16-1.amzn2023.0.5.x86_64                                          
+  gc-8.0.4-5.amzn2023.0.2.x86_64                                                
+  gcc-11.5.0-5.amzn2023.0.5.x86_64                                              
+  gcc-plugin-annobin-11.5.0-5.amzn2023.0.5.x86_64                               
+  glibc-devel-2.34-231.amzn2023.0.5.x86_64                                      
+  glibc-headers-x86-2.34-231.amzn2023.0.5.noarch                                
+  guile22-2.2.7-2.amzn2023.0.3.x86_64                                           
+  iptables-libs-1.8.8-3.amzn2023.0.2.x86_64                                     
+  iptables-nft-1.8.8-3.amzn2023.0.2.x86_64                                      
+  kernel6.18-headers-1:6.18.54-121.166.amzn2023.x86_64                          
+  libcgroup-3.0-1.amzn2023.0.1.x86_64                                           
+  libmpc-1.2.1-2.amzn2023.0.2.x86_64                                            
+  libnetfilter_conntrack-1.0.8-2.amzn2023.0.2.x86_64                            
+  libnfnetlink-1.0.1-19.amzn2023.0.2.x86_64                                     
+  libnftnl-1.2.2-2.amzn2023.0.2.x86_64                                          
+  libtool-ltdl-2.4.7-1.amzn2023.0.3.x86_64                                      
+  libxcrypt-devel-4.4.33-7.amzn2023.x86_64                                      
+  make-1:4.3-5.amzn2023.0.2.x86_64                                              
+  openssl-devel-1:3.5.8-1.amzn2023.0.3.x86_64                                   
+  pigz-2.5-1.amzn2023.0.4.x86_64                                                
+  runc-1.4.3-1.amzn2023.0.1.x86_64                                              
+  rust-1.98.1-1.amzn2023.x86_64                                                 
+  rust-std-static-1.98.1-1.amzn2023.x86_64                                      
+
+Complete!

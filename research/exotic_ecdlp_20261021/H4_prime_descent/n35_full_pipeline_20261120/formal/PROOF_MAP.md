@@ -1,0 +1,10 @@
+# n35 full-pipeline proof map
+
+| Result used in the run | Lean declaration | Exact hypotheses and status |
+| --- | --- | --- |
+| The 35-bit coordinate key is injective and below the identity sentinel `2^70` | `H4PackedPointKey35.key_injective`, `H4PackedPointKey35.key_lt_sentinel` in `../../n35_packed_pair_20261120/formal/PackedPointKey35.lean` | Natural-number coordinates each below `2^35`; checked under pinned Lean `v4.35.0-rc4` with only `propext` and `Quot.sound` in `#print axioms`. |
+| Pair-index membership is equivalent to existence of an ordered three-point sum | `H4PairIndex.pair_lookup_iff` in `../../pair_coverage_20261120/formal/PairIndexCoverage.lean` | Explicit associative group operations, zero, inverses, subtraction, and base predicate; checked. |
+| Cofactor multiplication preserves a three-point relation | `H4CofactorProjection.additive_map_preserves_three_sum` in `../../subgroup_projection_20261120/formal/CofactorProjection.lean` | An additive map between two group laws and an existing three-point equality; checked. |
+| A log of `Q+tG` gives a log of `Q` after subtracting `t` | `H4ShiftedTargetRecovery.recover_from_shift` in `../../n29_full_pipeline_20261120/formal/ShiftedTargetRecovery.lean` | Ring scalar action on an additive commutative group and the shifted-point equality; checked against pinned Mathlib in its source packet. The n35 run succeeded at `t=0`. |
+
+The exact n35 curve cardinality, 4,096-point base, 8,321,091 distinct pair sums, 2,048 matrix rank, and solved scalar are finite-instance calculations audited by `verify.py`; they are not substituted with an assumed Lean conclusion. A full Lean theorem for this concrete curve would require formal definitions for the binary extension field, Sage curve model, point encoding, exact group order, and the 6,362-row relation matrix. Those bridges are open. The checked structural declarations and their `#print axioms` outputs remain in their linked frozen packets. The n35 verifier reconstructs the concrete objects and replays every relation and scalar certificate.

@@ -1,0 +1,65 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-16T02:42:20Z",
+ "id": "PCC-20261116-c37de3",
+ "kind": "execution",
+ "producer": {
+  "commit": "f451eefc0ae296553793e6a0286df9b397953711",
+  "model": "GPT-6",
+  "session": "graph-screen-20261116"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/graph-screen-development/core-post-call-01.json",
+    "sha256": "6f9445c399a43a0905457e85760a3ce9ba320f9fc7b6ea1c930cd734cfd1b5e2"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/graph-screen-development/counter-post-call-01.json",
+    "sha256": "acc4760c789d6f8f35daca3fe57c591bd9a979ab08a21a4518a66d099d7ca3af"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/graph-screen-development/library-post-call-01.json",
+    "sha256": "127a281a5139e5f70e727e7546cc0289cd0b4f2c23a4b545fc21eaa77a56c43a"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/graph-screen-development/parser-post-call-01.json",
+    "sha256": "05a148d86b960731e908b7e97c55956c4bbd3f566e1d943961f9ac987bebbfeb"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/graph-screen-development/cli-post-call-01.json",
+    "sha256": "03dccf0d1d48571e00dea76888ed5c2d88e3f30f9531212da9075d85508c194b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/graph-screen-development/capture-clippy-01.log",
+    "sha256": "c9f7d5a50a1be498ccdd5a7ced90b4eb403ea9a677d37e20fe12fc15fd7e9580"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/relation_degree_trace_20261115/graph-screen-development/core-clippy-01.log",
+    "sha256": "d7e08d9cb16b10e5c34935b13fac7526a735102053ad2f5b90f1e95488faeee5"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/relation_degree_trace_20261115",
+ "statement": "Immutable source-f451eefc0 graph-generator/capture qualifiers completed 35 shared release and 36 counter-feature tests, 11 analysis-library, five capture/parser and three CLI checks; nine legacy cycle input hashes match exactly and strict release clippy passes. These are fixed qualification calls, with no graph-screen timing ratio."
+}

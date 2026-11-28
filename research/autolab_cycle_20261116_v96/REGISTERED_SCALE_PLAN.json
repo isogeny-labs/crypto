@@ -1,0 +1,57 @@
+{
+  "id": "binary-rebracket-scale-20261116-v96b",
+  "hypothesis": "Newd16exactmiddleblock:fixednumberofrebracketingfibersavoids65536sourceiterations;allthreecoldrepsmustcomplete,nottimeoutratio.",
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "-m",
+    "research.binary_rebracket_scale_20261116_v96b.cold",
+    "binary-rebracket-scale-20261116-v96b",
+    "cold_raw"
+  ],
+  "source_paths": [
+    "lab/runner.py",
+    "performance_gate.py",
+    "performance/GATE.md",
+    "research/twist_auxiliary_20261116_v86/algebra.py",
+    "research/separator_images_20261116_v91/kernel.py",
+    "research/disjoint_separator_20261116_v92/kernel.py",
+    "research/symmetric_pair_20261116_v93b/kernel.py",
+    "research/linearized_bridge_20261116_v90c/subspace.py",
+    "research/polynomial_bridge_20261116_v90b/codec.py",
+    "research/binary_rebracket_scale_20261116_v96b/PROOF_AND_REVIEW.md",
+    "research/binary_rebracket_scale_20261116_v96b/cold.py",
+    "research/binary_rebracket_scale_20261116_v96b/common.py",
+    "research/binary_rebracket_scale_20261116_v96b/child.py",
+    "research/binary_rebracket_scale_20261116_v96b/kernel.py"
+  ],
+  "input_paths": [
+    "research/binary_rebracket_scale_20261116_v96b/DATA.json"
+  ],
+  "expected_sha256": {
+    "lab/runner.py": "f385c82a7064c7645a41299dfcb6a1fba9dd4fc7d491eb7a29865bbc87d8cf18",
+    "performance_gate.py": "a01ed8a4b996d0ff769a12968888e7353b867ffb2fcc4a93a2d5f2796b9fcafb",
+    "performance/GATE.md": "fa62d4f19d5b222b534ac1cfa7c4dde265492ac60553d67eea9f0baab7e427fc",
+    "research/twist_auxiliary_20261116_v86/algebra.py": "6a7cf6168419269725bd8bb5d81c4b5ad52e5762fea48f2c182b3114620734e8",
+    "research/separator_images_20261116_v91/kernel.py": "e0ba2d3ef2b528a78b9cebbc6dca6c8f6beda5c94275fd921bf7486591bc5c3f",
+    "research/disjoint_separator_20261116_v92/kernel.py": "ae46a6cf9b68c59740b9470c7f417eafb313b2733ae2758e5a7653f2bab4b0d9",
+    "research/symmetric_pair_20261116_v93b/kernel.py": "7cda1a93a40c6bce29135ba24b9af48d5db5c7c556b550af04b8380c83332aac",
+    "research/linearized_bridge_20261116_v90c/subspace.py": "0c125908ad25e63f8dd32607bc6bae35e4621cfd13307b5f77604e712df6828d",
+    "research/polynomial_bridge_20261116_v90b/codec.py": "a17e06a626dd0b619c2c875922d7d1d7d07ec56b7a03c2d6798f83c7c05d5a58",
+    "research/binary_rebracket_scale_20261116_v96b/PROOF_AND_REVIEW.md": "d047096067df34ea68afaaec4c803e45ebfbf7174d4be4a21f617bf3e21414c1",
+    "research/binary_rebracket_scale_20261116_v96b/cold.py": "ffd34dfe84085ef6d44c3711b073d7aa0cca06a9a1210057b9c4c5ff1ee0b8e2",
+    "research/binary_rebracket_scale_20261116_v96b/common.py": "2799ae33edcb2b1342f55d6ff9e630d414bb340bb32017323cca2897f6fe3a8c",
+    "research/binary_rebracket_scale_20261116_v96b/child.py": "034a7d431bbb86ec77f38bff7a40bba5cf6d1ab83cb60a79b5f7c584471b5bff",
+    "research/binary_rebracket_scale_20261116_v96b/kernel.py": "55e69598fc6835f083179526d8a81c5f026959c5ae46db214f151c7965ed011d",
+    "research/binary_rebracket_scale_20261116_v96b/DATA.json": "68f38bc6ad8fe7ae016c15383acee574063c4f4d34a44c1ea66d7264bf13c6a5"
+  },
+  "timeout_seconds": 150,
+  "memory_limit_mb": 4096,
+  "cpu": 0,
+  "depends_on": [
+    "binary-rebracket-oracles-20261116-v96",
+    "binary-rebracket-cold-20261116-v96"
+  ],
+  "artifact_paths": [
+    "research/binary_rebracket_scale_20261116_v96b/cold_raw.json"
+  ]
+}

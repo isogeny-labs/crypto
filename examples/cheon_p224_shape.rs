@@ -20,7 +20,6 @@ use crypto_lib::cryptanalysis::cheon_counted::{
     cheon_pminus1, cheon_pplus1, distinct_prime_factors, find_shaped_curve, leaked_powers,
     next_prime, scalar_mul_plain, shape_divisor, Side,
 };
-use crypto_lib::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crypto_lib::cryptanalysis::ecbench::methods::{resolve, solve, MethodSpec};
 use crypto_lib::cryptanalysis::ecbench::workload::{CurveSpec, TargetKind, Workload};
 use crypto_lib::cryptanalysis::ic_boundary::{GroupOps, PrimeCurve, PrimePoint};
@@ -247,7 +246,11 @@ fn execute(
     let cspec = explicit_spec(c);
     let inst = cspec.build().expect("build curve");
     let w = Workload::on(&cspec, &inst, TARGET_SEED, t, TargetKind::Planted).expect("workload");
-    let alpha = w.planted.expect("planted") as u64;
+    let alpha = w
+        .planted
+        .expect("planted")
+        .checked_u64()
+        .expect("a one-word planted scalar");
     let parse = |s: &str| u64::from_str_radix(s.trim_start_matches("0x"), 16).unwrap();
     let q = PrimePoint::affine(parse(&w.target[0]), parse(&w.target[1]));
     let g0 = PrimePoint::affine(u(c, "gx"), u(c, "gy"));
@@ -448,7 +451,7 @@ fn replay(args: &[String]) {
             let seed: u64 = rec["algorithm_seed"].as_str().unwrap().parse().unwrap();
             let rep = solve(&rho_method, &inst, &w.curve, &w.target, seed).expect("rho solve");
             let recorded = rec["cost"]["total_gae"].as_f64().unwrap();
-            let verified = rep.recovered == w.planted.map(ExactScalar::from);
+            let verified = rep.recovered == w.planted;
             let same_rho = rep.total_gae == recorded && verified;
             all_ok &= same_rho;
             eprintln!(

@@ -1,0 +1,99 @@
+{
+  "run": "prime31-run58",
+  "date_utc": "2026-11-22",
+  "claim_status": "conditional-model-only",
+  "replay": "python3 research/prime31_f4_admission_20261121/run58_early_target_model.py",
+  "curve": {
+    "p": 2147483647,
+    "a": 847514846,
+    "b": 2087444724,
+    "group_order": 2147446831,
+    "cofactor": 1
+  },
+  "source": "research/prime31_f4_admission_20261121/run57_basis.json",
+  "sampling": "uniform nonidentity signed-pair template; all real unsuccessful group support queries accounted algebraically, but no live algebraic extraction",
+  "python_seed": "0x58ac16e3 + 0x9e3779b1 * trial + arm_offset",
+  "python_trials_per_arm": 256,
+  "small_graph_exhaustive_checks": 51,
+  "grid": [
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900,
+    1000,
+    1200,
+    1500,
+    1800,
+    2300,
+    2800,
+    3500
+  ],
+  "baselines": {
+    "dickson": {
+      "B": 509,
+      "nonidentity_support": 518084,
+      "preexisting_free_rank": 13
+    },
+    "hybrid": {
+      "B": 677,
+      "nonidentity_support": 916468,
+      "preexisting_free_rank": 88
+    }
+  },
+  "best_model_uniform_queries": {
+    "dickson": {
+      "1": {
+        "positive_base_hits": 300,
+        "queries": 1335005
+      },
+      "32": {
+        "positive_base_hits": 400,
+        "queries": 2000851
+      },
+      "128": {
+        "positive_base_hits": 500,
+        "queries": 2928025
+      },
+      "1024": {
+        "positive_base_hits": 700,
+        "queries": 7907205
+      }
+    },
+    "hybrid": {
+      "1": {
+        "positive_base_hits": 400,
+        "queries": 988031
+      },
+      "32": {
+        "positive_base_hits": 500,
+        "queries": 1405729
+      },
+      "128": {
+        "positive_base_hits": 600,
+        "queries": 1980307
+      },
+      "1024": {
+        "positive_base_hits": 900,
+        "queries": 5002567
+      }
+    }
+  },
+  "not_included": [
+    "actual blind S3/F4 extraction",
+    "group scalar-multiplication costs",
+    "original Rust wall-clock extraction",
+    "rootfinding failures/caps",
+    "factor base setup",
+    "rank/LA runtime",
+    "actual target logarithm verification",
+    "same-host rho BSGS index-calculus comparison",
+    "real relation oracle output bias"
+  ],
+  "current_objective": "Verify blind roots and full-cost cheaper complete ECDLP before making any solver speedup claim."
+}

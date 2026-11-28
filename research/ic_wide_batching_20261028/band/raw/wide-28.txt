@@ -1,0 +1,41 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp28-tm3161-380f655a | 27.96 | batch-1024 | 36/36 | 29.780 | 31.481 | 46.790 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | batch-16 | 36/36 | 24.917 | 26.624 | 41.995 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | batch-256 | 36/36 | 25.659 | 27.281 | 41.872 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | batch-64 | 36/36 | 25.542 | 27.327 | 43.392 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | fast | 36/36 | 24.799 | 26.495 | 41.760 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | rho-neg | 36/36 | 1.029 | 1.130 | 2.035 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | serial-1024 | 36/36 | 29.780 | 31.481 | 46.790 | — |
+| icv1-fp28-tm3161-380f655a | 27.96 | walk | 36/36 | 24.799 | 26.495 | 41.760 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp28-tm3161-380f655a | batch-1024 vs batch-16 | batch-16 < batch-1024 |
+| icv1-fp28-tm3161-380f655a | batch-1024 vs batch-256 | batch-256 < batch-1024 |
+| icv1-fp28-tm3161-380f655a | batch-1024 vs batch-64 | batch-64 < batch-1024 |
+| icv1-fp28-tm3161-380f655a | batch-1024 vs fast | fast < batch-1024 |
+| icv1-fp28-tm3161-380f655a | batch-1024 vs rho-neg | rho-neg < batch-1024 |
+| icv1-fp28-tm3161-380f655a | batch-1024 vs serial-1024 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | batch-1024 vs walk | walk < batch-1024 |
+| icv1-fp28-tm3161-380f655a | batch-16 vs batch-256 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | batch-16 vs batch-64 | batch-16 < batch-64 |
+| icv1-fp28-tm3161-380f655a | batch-16 vs fast | fast < batch-16 |
+| icv1-fp28-tm3161-380f655a | batch-16 vs rho-neg | rho-neg < batch-16 |
+| icv1-fp28-tm3161-380f655a | batch-16 vs serial-1024 | batch-16 < serial-1024 |
+| icv1-fp28-tm3161-380f655a | batch-16 vs walk | walk < batch-16 |
+| icv1-fp28-tm3161-380f655a | batch-256 vs batch-64 | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | batch-256 vs fast | fast < batch-256 |
+| icv1-fp28-tm3161-380f655a | batch-256 vs rho-neg | rho-neg < batch-256 |
+| icv1-fp28-tm3161-380f655a | batch-256 vs serial-1024 | batch-256 < serial-1024 |
+| icv1-fp28-tm3161-380f655a | batch-256 vs walk | walk < batch-256 |
+| icv1-fp28-tm3161-380f655a | batch-64 vs fast | fast < batch-64 |
+| icv1-fp28-tm3161-380f655a | batch-64 vs rho-neg | rho-neg < batch-64 |
+| icv1-fp28-tm3161-380f655a | batch-64 vs serial-1024 | batch-64 < serial-1024 |
+| icv1-fp28-tm3161-380f655a | batch-64 vs walk | walk < batch-64 |
+| icv1-fp28-tm3161-380f655a | fast vs rho-neg | rho-neg < fast |
+| icv1-fp28-tm3161-380f655a | fast vs serial-1024 | fast < serial-1024 |
+| icv1-fp28-tm3161-380f655a | fast vs walk | unresolved inside the band |
+| icv1-fp28-tm3161-380f655a | rho-neg vs serial-1024 | rho-neg < serial-1024 |
+| icv1-fp28-tm3161-380f655a | rho-neg vs walk | rho-neg < walk |
+| icv1-fp28-tm3161-380f655a | serial-1024 vs walk | walk < serial-1024 |

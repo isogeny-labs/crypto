@@ -1,0 +1,26 @@
+module
+public import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
+public import Mathlib.Data.ZMod.Basic
+
+public section
+namespace SpectrumAssembly
+
+/-- A finite instance of a standard nilpotent multiplication matrix. -/
+def toyNilpotent : Matrix (Fin 2) (Fin 2) (ZMod 101) := !![0, 1; 0, 0]
+
+/-- The spectrum matches two zero eigenvalues, using Mathlib's formula. -/
+theorem toy_charpoly : toyNilpotent.charpoly = Polynomial.X ^ 2 := by
+  letI : Fact (1 < (101 : ℕ)) := ⟨by decide⟩
+  rw [Matrix.charpoly_fin_two, Matrix.trace_fin_two, Matrix.det_fin_two]
+  simp [toyNilpotent]
+
+/-- Finite ring arithmetic; no native evaluation is trusted. -/
+theorem toy_square_zero : toyNilpotent ^ 2 = 0 := by decide
+
+/-- For H(T)=T, H(N) is nonzero despite the matching repeated spectrum. -/
+theorem toy_nonzero : toyNilpotent ≠ 0 := by decide
+
+#print axioms toy_charpoly
+#print axioms toy_square_zero
+#print axioms toy_nonzero
+end SpectrumAssembly

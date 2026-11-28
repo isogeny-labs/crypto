@@ -1,0 +1,36 @@
+{
+  "schema": "native-general-degree-two-collision-written-header-check/v1",
+  "observations": [
+    {
+      "case_id": "general-degree-two-collision",
+      "expected_decl_sha256": "5802fbd3152989fdd4805235c86098686c69810ad95be92dadfca6606495d47c",
+      "full_characters": 777,
+      "full_decl_sha256": "5802fbd3152989fdd4805235c86098686c69810ad95be92dadfca6606495d47c",
+      "full_normalized_signature": "theorem general_degree_two_collision_certificate : ∀ (G I : Type*) [AddCommGroup G] [Fintype G] [Fintype I] [DecidableEq G] [DecidableEq I] (p : I → ℝ) (hp0 : ∀ i, 0 ≤ p i) (hp : ∑ i, p i = 1) (g : I → G), TwoStepCollisionAudit.DegreeTwoGeneric g → (∀ v : G, expectation p (fun h : Hash G I => pairCount g h v) = 1 - TwoStepCollisionAudit.secondMoment p - (TwoStepCollisionAudit.secondMoment p)^2 + TwoStepCollisionAudit.fourthMoment p) ∧ (∀ z : JointSample G I, (jointLaw p hp0 hp z).toReal = (∏ x : G, p (z.1 x)) / (Fintype.card G : ℝ)^2) ∧ (jointLaw p hp0 hp).toOuterMeasure (freshEvent g : Set (JointSample G I)) = ENNReal.ofReal ((1 - TwoStepCollisionAudit.secondMoment p - (TwoStepCollisionAudit.secondMoment p)^2 + TwoStepCollisionAudit.fourthMoment p) / Fintype.card G)",
+      "omitted_suffix": "",
+      "parsed_header": {
+        "command_parse_error": false,
+        "decl_id": "general_degree_two_collision_certificate",
+        "end_byte": 1047,
+        "file": "/workspace/scratch/general-two-step-input01/GeneralCollisionCertificate.lean",
+        "qualified_decl_id": "GeneralTwoStepCollisionAudit.general_degree_two_collision_certificate",
+        "signature": "theorem general_degree_two_collision_certificate :\n    ∀ (G I : Type*) [AddCommGroup G] [Fintype G] [Fintype I]\n      [DecidableEq G] [DecidableEq I] (p : I → ℝ)\n      (hp0 : ∀ i, 0 ≤ p i) (hp : ∑ i, p i = 1) (g : I → G),\n      TwoStepCollisionAudit.DegreeTwoGeneric g →\n      (∀ v : G, expectation p (fun h : Hash G I => pairCount g h v) =\n        1 - TwoStepCollisionAudit.secondMoment p - (TwoStepCollisionAudit.secondMoment p)^2 +\n          TwoStepCollisionAudit.fourthMoment p) ∧\n      (∀ z : JointSample G I, (jointLaw p hp0 hp z).toReal =\n        (∏ x : G, p (z.1 x)) / (Fintype.card G : ℝ)^2) ∧\n      (jointLaw p hp0 hp).toOuterMeasure (freshEvent g : Set (JointSample G I)) =\n        ENNReal.ofReal ((1 - TwoStepCollisionAudit.secondMoment p -\n          (TwoStepCollisionAudit.secondMoment p)^2 + TwoStepCollisionAudit.fourthMoment p) /\n            Fintype.card G)",
+        "start_byte": 146
+      },
+      "recorded_statement": "theorem general_degree_two_collision_certificate : ∀ (G I : Type*) [AddCommGroup G] [Fintype G] [Fintype I] [DecidableEq G] [DecidableEq I] (p : I → ℝ) (hp0 : ∀ i, 0 ≤ p i) (hp : ∑ i, p i = 1) (g : I → G), TwoStepCollisionAudit.DegreeTwoGeneric g → (∀ v : G, expectation p (fun h : Hash G I => pairCount g h v) = 1 - TwoStepCollisionAudit.secondMoment p - (TwoStepCollisionAudit.secondMoment p)^2 + TwoStepCollisionAudit.fourthMoment p) ∧ (∀ z : JointSample G I, (jointLaw p hp0 hp z).toReal = (∏ x : G, p (z.1 x)) / (Fintype.card G : ℝ)^2) ∧ (jointLaw p hp0 hp).toOuterMeasure (freshEvent g : Set (JointSample G I)) = ENNReal.ofReal ((1 - TwoStepCollisionAudit.secondMoment p - (TwoStepCollisionAudit.secondMoment p)^2 + TwoStepCollisionAudit.fourthMoment p) / Fintype.card G)",
+      "recorded_text_sha256": "5802fbd3152989fdd4805235c86098686c69810ad95be92dadfca6606495d47c",
+      "source_plan": "research/general_two_step_collision_audit_20261114/sources.json",
+      "status": "complete_under_frozen_normalization",
+      "theorem": "GeneralTwoStepCollisionAudit.general_degree_two_collision_certificate"
+    },
+    {
+      "audit_complete": true,
+      "cases": 1,
+      "complete": 1,
+      "summary": true,
+      "truncated_prefixes": 0,
+      "unresolved": 0
+    }
+  ],
+  "scope": "Unsigned native source-processing check; complete arbitrary finitegroup/labels/actual sourceguard/fixedterminal count/jointPMFpointmass/actual event coefficient certificate. Not proved by mathematical certificate."
+}

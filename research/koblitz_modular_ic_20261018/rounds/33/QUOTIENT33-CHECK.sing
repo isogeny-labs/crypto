@@ -1,0 +1,30 @@
+ideal residueQC33=std(ideal(T^2+T+1));int casesQC33;
+proc inverseQC33(poly f){
+ ideal gens=residueQC33,f;if(std(gens)[1]!=1){ERROR("QUOTIENT33_REQUIRED_UNIT");}
+ matrix wit=lift(gens,ideal(1));poly ans=reduce(wit[nrows(wit),1],residueQC33);
+ if(reduce(f*ans+1,residueQC33)!=0){ERROR("QUOTIENT33_INVERSE_IDENTITY");}return(ans);
+}
+proc checkQuotient33(string label,number b,number c,number descentL,number descentN){
+ if(c==0){ERROR("QUOTIENT33_C_EXCEPTION");}number u0=(b+c)/c^2;if(u0==0 || u0==1){ERROR("QUOTIENT33_U_EXCEPTION");}
+ number v0=((b/c)*u0^3+1)/(u0+1);number rn=(u0+1)*v0+1;number cn=rn+u0^3;
+ if(v0^2+v0!=u0^3+u0 || b!=rn*cn/u0^7 || c!=cn/u0^4){ERROR("QUOTIENT33_PLANE_INVERSE");}
+ list family=quotientFamily33(u0,descentN+b*T,descentL+(1+c)*T,v0);
+ ideal values=reduce(family[1],residueQC33);if(size(values)!=0){ERROR("QUOTIENT33_SOURCE_POINT");}
+ matrix jac=family[2];poly hv=family[3];poly dv=family[4];poly hi=inverseQC33(hv);poly di=inverseQC33(dv);list gs=family[5];list ds=family[6];
+ int omit;int row;int col;int next;int k;int productCount;matrix mm[3][3];ideal products;ideal coeffs;poly determinant;
+ for(omit=1;omit<=4;omit++){
+  next=0;for(row=1;row<=4;row++){if(row!=omit){next++;for(col=1;col<=3;col++){mm[next,col]=reduce(jac[row,col],residueQC33);}}}
+  determinant=reduce(det(mm),residueQC33);coeffs=gs[omit];
+  for(k=1;k<=ncols(matrix(coeffs));k++){productCount++;products[productCount]=reduce(coeffs[k]*determinant,residueQC33);}
+ }
+ ideal gens=residueQC33,products;
+ if(std(gens)[1]!=1){ERROR("QUOTIENT33_NO_LOCAL_PRESENTATION");}
+ matrix witness=lift(gens,ideal(1));matrix reconstructed=matrix(gens)*witness;
+ if(reconstructed[1,1]!=1){ERROR("QUOTIENT33_UNIT_WITNESS_IDENTITY");}
+ if(std(residueQC33)[1]==1){ERROR("QUOTIENT33_ZERO_FAMILY_ACCEPTED");}
+ link out="ASCII:w quotient-local-"+label+".sing";open(out);
+ write(out,"poly localHValue33="+string(hv)+";poly localHInverse33="+string(hi)+";poly localDValue33="+string(dv)+";poly localDInverse33="+string(di)+";ideal localGenerators33;matrix localWitness33["+string(nrows(witness))+"][1];");
+ for(k=1;k<=ncols(matrix(gens));k++){write(out,"localGenerators33["+string(k)+"]="+string(gens[k])+";localWitness33["+string(k)+",1]="+string(witness[k,1])+";");}
+ close(out);casesQC33++;
+ print("QUOTIENT33_LOCAL_CHECK "+label+" coefficient_denominators="+string(size(ds))+" products="+string(productCount)+" exact_presentation=standard_etale_over_u");
+}

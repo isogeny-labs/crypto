@@ -1,0 +1,22 @@
+{
+  "schema": "xedni-relation-acquisition-protocol-v1",
+  "source_panel_protocol": "research/exotic_ecdlp_20261021/xedni_preregistered_prime_panel_20261120/protocol.json",
+  "source_prime_rows": "research/exotic_ecdlp_20261021/xedni_preregistered_prime_panel_20261120/prime-rows.jsonl",
+  "source_prime_rows_raw_sha256": "dde18ca90a0cacfd1837734f03f39f8343521c86123a62900eeb6bae7f3428df",
+  "source_rho_solver": "research/exotic_ecdlp_20261021/xedni_fresh_target_pair_20261120/run_sage.py",
+  "source_rho_solver_raw_sha256": "b35b225581e7994121e60277c1956c37eaa0b132ab8a84c3fbf50da3344b2907",
+  "cells": [
+    {"p": 1531, "q": 1553, "coefficient_radius": 41, "expected_lambda_for_postsolve_audit": 11},
+    {"p": 2287, "q": 2251, "coefficient_radius": 49, "expected_lambda_for_postsolve_audit": 1238}
+  ],
+  "public_target": "Rbar, the reduction of supplied exact rational R; rho receives this same public point; R is a supplied target lift and its acquisition is outside both timed intervals",
+  "collision_arm": "fresh height-ordered scan of nonzero aQ+bR, reducing each rational point; first nonzero reduction collision or zero reduction with nonzero b difference yields lambda by modular division; stop only after lambda*Qbar=Rbar verification",
+  "rho_arm": "pinned deterministic three-partition Floyd rho from source_rho_solver, solving the same Rbar target with a new hashed seed per repetition",
+  "repetitions_per_cell": 5,
+  "arm_order": "collision then rho on odd one-based repetitions; rho then collision on even repetitions",
+  "rho_seed_text": "xedni-lambda-rho-v1-20261120",
+  "time_cap_per_arm_seconds": 60,
+  "online_interval": "start before first target-dependent rational construction or rho walk; stop after lambda recovery and independent public-point verification; include failed attempts/restarts; exclude checked-runtime startup, curve/pairing/order setup and construction of supplied rational R",
+  "status_policy": "retain verified, coefficient_cap_exhausted, rho_cap_exhausted, wall_cap_exhausted and error rows, including censored intervals and work counters",
+  "claim_boundary": "repeated special-target ordinary-host component diagnostic with supplied rational target lift; no inference for arbitrary public target or Tier 0/1 speedup"
+}

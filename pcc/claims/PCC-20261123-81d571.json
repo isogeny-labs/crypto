@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T16:58:23Z",
+ "id": "PCC-20261123-81d571",
+ "kind": "statement",
+ "producer": {
+  "commit": "7e58383e2a007acbca7a16ea8a0d0e40d0e45d98",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/closure_20261123/evidence/main-signing-replay.json",
+    "sha256": "8e1b43b478a6259cf63fa99792f31ab299667bc482ccb4f410eef93497d3ea36"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/closure_20261123/evidence/main-unsigned-proof-verdict.json",
+    "sha256": "803e3b295160e3340541a37957a50e995195278afd308e7e01c629a57aa5f2f0"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-45221063854-1/replay-certificate.json",
+    "sha256": "62a3e2d026e395e09b800a1ff7c54fc8455fa5a1b40a83e5879ff67298170fd7"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_cover_three_tests_20261116/replay_20261123/evidence/ci-45221063854-1/validator-report.json",
+    "sha256": "380cfc0478647b24bc24850e48bf8d145ebb05a4f01f0ff028af21cb62fba7ed"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "p192-admission-and-closure",
+ "statement": "First deployed main-only replay/signing run45221063854 at e5f6de1b6d passes the fixed replay, then signer fails explicitly because PCC_SIGNING_KEY is unset. Supported artifact connector recovers raw and report ZIPs; both API digests and CRCs match. All149 file members inventoried;36 data files retained, binary/source payload custody local only and no downloaded code executed. Report raw_data hashes match. Unsigned proof preview is not_covered; no independent or admitted performance result."
+}

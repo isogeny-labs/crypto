@@ -1,0 +1,13 @@
+# Exhaustive eigenvalue-cover certificates constructed
+
+[pcc:unverified] Freezee14406ead25 pushed before one invocation; input hashes pass, exit0. All12originalgenus-two targets supply complete4root covers,48exactmatrix certificates total:36contradiction witnesses and12scalar witnesses. Each actualaction reference branch supplies the originalk; everyotherbranch is excluded. All48weightmutations rejected; product of distinctroot factors equalsPhi5 exactly. Principal polynomial identities with multiplicities and diagnostic originalgroup relation checks pass.
+
+For excludedroot r the witness satisfies w^TA_r=0,w^Tb_r=1. For survivingroot it satisfies w^TA_r=e_T,w^Tb_r=k. Under the unchanged qualifiedwholeprimeorder premise, D!=0 generates J(Fp) and sigma has an actual scalar root ofPhi5. That root cannot admit a contradiction certificate; its scalarcertificate proves T=kD. The direct principaldivisor proof Phi5(sigma)=0 in THEORY.md avoids runtimecharacter computation as a mathematical requirement, while retaining it here as independent diagnostic reference. Allfourroot coverage is mandatory, not actualroot selection by producerlabel.
+
+This run is an algebraic constructive gate, not replacement production verifier, fullmutation suite or costresult. It reconstructs conditional rows internally ratherthan consuming an adversarial boundcover packet. A separate verifier must bind originalcurve/order/source/target/rotation, complete rootset, primitive identities, phases/signs, allbranchwitnesses and commonk; missing/duplicatedroot mutations mustreject. Current48weightmutations do not substitute for these requirements. Source/nonzero/primescope premises remain explicit. Sharednative checks and proof need independentreview.
+
+Potential gain: replace character-sum/bootstrap/actionverification with exhaustive conditional certificates; potential loss: rootgeneration plusfourproofconstruction/checking costs in Fell may exceed avoidedwork. No cost/timing/10x claim. Next prospectivegate must independently rederive fullcoverpacket/mutation checks and completecoldcounts against triangular-witness andbothretainedarms, including everybranch andproofselection. Consider structuredtriangular branchproof construction only with contradictionprovenance preserved.
+
+Priorincrementalbucket idea was rejected withoutimplementation because all12retainedtraces have scans=anchors, so eachanchor already visitedonce. Broader workloads mayrescan, but no benefitonthispanel is assumed.
+
+Genus3/4 extensions are unqualified: n7analog requires cyclicstablegroup andcomplete6root coverage, n9norm isS9, notPhi9; order3componentscannotbeignored. No newsubgroup/model selection or broadcoverage claim. Gitcustody,noS3/cloud/retry. Originalgenus2+10xgoal remainsactive.

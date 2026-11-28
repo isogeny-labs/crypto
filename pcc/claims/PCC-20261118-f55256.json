@@ -1,0 +1,51 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-18T16:28:50Z",
+ "id": "PCC-20261118-f55256",
+ "kind": "statement",
+ "producer": {
+  "commit": "a1ceeeeadc82a3e86b074d17c8d758e0d8f04067",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/summary.json",
+    "sha256": "5bf8fd3285718e47b4dca588fbb337143816063af8f5662dbbb7bf37b077eb7e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/focused-build-inputs.sha256",
+    "sha256": "13d96116d792e94b18a91f7b5b0b2cae98fc81e577f13ebe72afc11d810b37f3"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/focused-pre-call.sha256",
+    "sha256": "c9961d749443410d6225311bcc971262c45cfd2a0e039c7bd76dd211b1432812"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/results/focused-a/tests.stdout",
+    "sha256": "18617de317a14118867b9b12f604738e4d3497e53832626e1203a58bad16fb5b"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/prime_conductor_gap80_20261031/wide-harness-20261118/results/focused-a/exit.json",
+    "sha256": "6d24833db8073194014871066cea0b4b693f5dad8254f459818b77f83c14d290"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_conductor_gap80_20261031/wide-harness-20261118",
+ "statement": "The source-pinned focused release test executable passes all five bounded tests: the four-limb adapter and canonical ecbench shared workloads each agree with 64 PARI source-scalar vectors over the actual 202-bit source and 96-bit pilot, and tiny BSGS plus rho/BSGS dispatch/replay controls pass. Both sets contain 32 distinct scalars. The full legacy unit build remains failed on a pre-existing duplicate test name. No large-field ECDLP timing, index-calculus execution, target quotient or evaluated 80-bit crossing is established."
+}

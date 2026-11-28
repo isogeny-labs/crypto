@@ -1,0 +1,7 @@
+# Legacy parent-schema normalization review
+
+Decision: ADMITTED_METADATA_REGISTRATION_V2. Reviewed exactdiff and verified V2 equals admittedV1 plus only the six-line legacy-schema adapter. V1 failure was a safe pre-mutation KeyError on an October23parent using path/receipt/terminal_sha256 rather than sealed_path. V1 and failure remain preserved; no scientific execution or failed experiment retry.
+
+For legacyentry, V2 reads its referenced historical verificationreceipt, requires journal_sha256, last_record_sha256 and sealed_path match the immutable parententry journal/terminal/path fields, then applies unchanged sealed statehash verification and epoch-cycle/duplicate scans. This preserves chain traversal instead of dropping legacyhistory. Actual inspectedreceipt is research/s3_source_activation_20261024_v1/PARENT_VERIFICATION.json, with pinned statehash and prior canonical terminal verification. Reviewer independently verified actual legacyjournal/statefile hashes matchreceipt and actual terminalrecordSHA/state matchreceipt/cache, as read-only metadata replay. No helper execution or oldcachewrite by reviewer.
+
+All other admittedV1 guards remain byte-identical, including final manifestmove preservation, fail-closed duplicate/provenance checks, nooldresume and explicit freshrawartifact. The adapter is a changed metadata format assumption, not a new scientific mechanism or permission to repeat failed science. Actual registrationresult still requires its own receipt.

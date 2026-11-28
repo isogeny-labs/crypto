@@ -1,0 +1,269 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "priced_table_work": [
+    "table_insert_attempts"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "inc",
+      "runs": 12,
+      "verified": 12,
+      "mean_s": [
+        3.272745886191071,
+        3.696415553108345,
+        7.509442555363807
+      ],
+      "charged_sum": 633492.0,
+      "native_sum": 820080,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 34460.0
+      }
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "ksum5f-n32",
+      "runs": 12,
+      "verified": 12,
+      "mean_s": [
+        234.0994163213497,
+        259.34500514983716,
+        486.55530460622475
+      ],
+      "charged_sum": 45313664.0,
+      "native_sum": 48866851,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 3222016.0
+      }
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "mitmbatch-n402",
+      "runs": 12,
+      "verified": 12,
+      "mean_s": [
+        20.71325072523548,
+        23.834615608183658,
+        51.92689955471723
+      ],
+      "charged_sum": 4009379.0,
+      "native_sum": 6041898,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 161604.0
+      }
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "mitmblocked-n402",
+      "runs": 12,
+      "verified": 12,
+      "mean_s": [
+        20.71325072523548,
+        23.834615608183658,
+        51.92689955471723
+      ],
+      "charged_sum": 4009379.0,
+      "native_sum": 6041898,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 161604.0
+      }
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "rho-neg",
+      "runs": 12,
+      "verified": 12,
+      "mean_s": [
+        0.9949324797978624,
+        1.0920451431698608,
+        1.9660591135178445
+      ],
+      "charged_sum": 192585.0,
+      "native_sum": 187977,
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "wsum-b12-n4",
+      "runs": 12,
+      "verified": 12,
+      "mean_s": [
+        12.436792901753028,
+        13.696669776391865,
+        25.03556164814142
+      ],
+      "charged_sum": 2407339.0,
+      "native_sum": 2438692,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 195312.0
+      }
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "log2_r": 27.955005572422284,
+      "arm": "wsum-b20-n4",
+      "runs": 12,
+      "verified": 12,
+      "mean_s": [
+        87.70633711088193,
+        96.47188211572302,
+        175.36178715929273
+      ],
+      "charged_sum": 16976956.0,
+      "native_sum": 16967106,
+      "uncounted": [],
+      "table_work_mean_counts": {
+        "table_insert_attempts": 1412880.0
+      }
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "inc",
+      "b": "ksum5f-n32",
+      "verdict": "inc < ksum5f-n32"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "inc",
+      "b": "mitmbatch-n402",
+      "verdict": "inc < mitmbatch-n402"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "inc",
+      "b": "mitmblocked-n402",
+      "verdict": "inc < mitmblocked-n402"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "inc",
+      "b": "rho-neg",
+      "verdict": "rho-neg < inc"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "inc",
+      "b": "wsum-b12-n4",
+      "verdict": "inc < wsum-b12-n4"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "inc",
+      "b": "wsum-b20-n4",
+      "verdict": "inc < wsum-b20-n4"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "ksum5f-n32",
+      "b": "mitmbatch-n402",
+      "verdict": "mitmbatch-n402 < ksum5f-n32"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "ksum5f-n32",
+      "b": "mitmblocked-n402",
+      "verdict": "mitmblocked-n402 < ksum5f-n32"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "ksum5f-n32",
+      "b": "rho-neg",
+      "verdict": "rho-neg < ksum5f-n32"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "ksum5f-n32",
+      "b": "wsum-b12-n4",
+      "verdict": "wsum-b12-n4 < ksum5f-n32"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "ksum5f-n32",
+      "b": "wsum-b20-n4",
+      "verdict": "wsum-b20-n4 < ksum5f-n32"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "mitmbatch-n402",
+      "b": "mitmblocked-n402",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "mitmbatch-n402",
+      "b": "rho-neg",
+      "verdict": "rho-neg < mitmbatch-n402"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "mitmbatch-n402",
+      "b": "wsum-b12-n4",
+      "verdict": "wsum-b12-n4 < mitmbatch-n402"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "mitmbatch-n402",
+      "b": "wsum-b20-n4",
+      "verdict": "mitmbatch-n402 < wsum-b20-n4"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "mitmblocked-n402",
+      "b": "rho-neg",
+      "verdict": "rho-neg < mitmblocked-n402"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "mitmblocked-n402",
+      "b": "wsum-b12-n4",
+      "verdict": "wsum-b12-n4 < mitmblocked-n402"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "mitmblocked-n402",
+      "b": "wsum-b20-n4",
+      "verdict": "mitmblocked-n402 < wsum-b20-n4"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-neg",
+      "b": "wsum-b12-n4",
+      "verdict": "rho-neg < wsum-b12-n4"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "rho-neg",
+      "b": "wsum-b20-n4",
+      "verdict": "rho-neg < wsum-b20-n4"
+    },
+    {
+      "curve": "icv1-fp28-tm3161-380f655a",
+      "a": "wsum-b12-n4",
+      "b": "wsum-b20-n4",
+      "verdict": "wsum-b12-n4 < wsum-b20-n4"
+    }
+  ]
+}

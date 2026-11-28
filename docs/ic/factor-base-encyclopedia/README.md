@@ -1,5 +1,7 @@
 # An encyclopedia of the factor bases we have tried
 
+> **Correction 2026-10-20 (validation sweep B, verdict 108.1: contradicted).** The n=61 13.9x [9.8, 19.1] and N83 18.5x online ratios below compare against rho with an empty distinguished-point table. They are superseded and are not improvements: Bernstein-Lange rho at equal advice is 53-317x faster online (`benchmarks/20261014-ic-next10-09-equal-advice`) and precomputed rho beats the N83 IC (`benchmarks/20261016-n83-precomputed-rho-control`). The cold conclusion (signed-Frobenius rho remains best) stands.
+
 **Date:** 2026-10-15.
 **Scope:** every factor-base construction for elliptic-curve and Jacobian
 index calculus that this repository (`aburan28/crypto`, at `a80b15bbc`) or the
@@ -109,8 +111,12 @@ generic-field engine `f4_tower_generic`
 now runs the Kummer tower at the P-224 prime and the Dickson torus tower at
 the P-192 and P-256 primes. It gives the recorded small-prime `D`, width and
 step count in all 82 cells run (§0.1). The isogeny tower has an auxiliary
-curve and a built `V` at the P-192 prime (PR #1925, §0.2), but **no F4 run at
-P-192 yet**: its system builder is still `u64`. Both are stage diagnostics of
+curve and a built `V` at the P-192 prime (PR #1925, §0.2), and since
+2026-11-01 a **wide system builder** (`prime_tower_wide.rs`, generic over
+`fp_backend::PrimeField`): the supersingular auxiliary curve at P-192 and
+solved F4 cells on the isogeny tower at NIST primes
+(`research/pkm_isogeny_wide_p192_20261101/`); the `u64` pilot remains the
+small-prime instrument. Both are stage diagnostics of
 the solver or of the construction. Neither family has a priced relation phase
 (`S`, ratio to rho) at a NIST size; the `prime-kummer` and `prime-isogeny`
 plug-ins work in `u64` (`prime_tower.rs`, and `primitive_two_power_root`
@@ -516,8 +522,10 @@ its twist, `ss-j0`, `ss-j0-twist`). Three pre-registered questions:
 only, `N ≤ 20`. Priced end to end in ecbench at 20–28 bits (PRs #1889, #1947;
 accounting: no gain over a plain base for a table oracle). At P-192 the
 auxiliary curve and `V` are built (PR #1925), and the supersingular curve
-makes the auxiliary search free (PR #1947); no F4 run or relation phase has
-run at P-192, because the plug-in and the isogeny system builder are `u64`.
+makes the auxiliary search free (PR #1947); solved F4 cells on the isogeny
+tower at P-192 exist since 2026-11-01 (`prime_tower_wide`,
+`research/pkm_isogeny_wide_p192_20261101/`), but no relation phase: the
+priced `prime-isogeny` plug-in (ecbench) is still `u64`.
 The autoresearcher program cites the construction (`AR:KN-LIT-025`) but never
 built it: `AR:H-RELN-96e3ba` calls the PKM arm "unmaterialised".
 The P-192 `t = 48` auxiliary search card (§8) is abandoned as superseded
@@ -1349,10 +1357,11 @@ file is missing on `main`.
     218.03 [172.36, 285.57]**; prepared-online IC/rho 1.382 [1.036, 1.882].
     IC took 1,054.6 s per fresh process (1,047.9 s of it reusable
     preparation; 5.8 GB peak) against 5.07 s for rho.
+  - *Superseded 2026-10-20:* the 54.10 below compares against an empty-table rho with 580-640 s IC setup excluded; the matched Bernstein-Lange control (`research/20261016-n83-precomputed-rho-control/`, K3300 and K600, not K3240) has precomputed rho faster online in every matched arm (IC/rho 3.74x to 395x). Median of per-point ratios; ratio of means 44.09.
   - *Online, Tier 1, K3240 `root21`*
     ([`n83_tier1_final_results_20261014/RESULT.md`](../../../research/n83_tier1_final_results_20261014/RESULT.md),
     PR #1824; five unseen public points, one GitHub Actions allocation):
-    median **rho/IC 54.10**, bootstrap interval **[17.18, 58.90]**, every
+    median **rho/IC 54.10 (SUPERSEDED 2026-10-20, empty-table rho)**, bootstrap interval **[17.18, 58.90]**, every
     relation and scalar replayed. The IC clock starts after base, index and
     factor logs are ready: setup, 580–640 s per process and rebuilt for each
     point, is excluded, against rho's 1.2–5.0 s per solve.
@@ -1663,11 +1672,17 @@ this round.
      plain base of its size unresolved on two curves and not held on the
      third. "The 11-core-year ordinary search buys nothing these experiments
      can see."
-   - **Still open:** an F4 run and a relation phase at P-192 (the isogeny
-     system builder and the plug-in are `u64`), and the decision the backlog
-     card records: whether a supersingular `E'` is acceptable (the card is
-     abandoned as superseded since the 2026-10-16 claim audit). Lead 1 remains
-     the gate for all of it.
+   - **2026-11-01/03 update:** the wide system builder
+     (`prime_tower_wide.rs`, generic over `fp_backend::PrimeField`) runs
+     solved F4 cells on the isogeny tower at the P-192 prime itself —
+     `m = 2` `D = 5` at `N = 8 … 18` and `D = 6` at `N = 20, 22` (matching
+     the Kummer ladder at `p₀` cell for cell), `m = 3` `D = 6` at
+     `N = 12` and `D = 7` at `N = 15` (the small-prime `m = 3` staircase),
+     `m = 4` `D = 7` at `N = 12` — with every row exhaustively verified
+     ([`research/pkm_isogeny_wide_p192_20261101/`](../../../research/pkm_isogeny_wide_p192_20261101/README.md)).
+     Random-target yield there is 0/20, as `|V|^m/p` predicts at toy `t`.
+     Still open: the relation phase at P-192 (the priced ecbench plug-in
+     is `u64`), and lead 1 remains the gate for all of it.
 3. **The Dickson torus case** (`2^t | p + 1`) — **measured; H_same** (PR #1893,
    [`research/pkm_dickson_torus_20261015/`](../../../research/pkm_dickson_torus_20261015/README.md);
    A5c). The torus tower, which exists on P-192 (`t ≤ 64`) and P-256

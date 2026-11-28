@@ -1,0 +1,11 @@
+name = "semaev_symmetry_audit"
+version = "0.1.0"
+defaultTargets = ["SemaevSymmetryAudit"]
+
+[[require]]
+name = "semaev_reassociation_audit"
+path = "../../semaev_reassociation_audit_20261113/lean"
+
+[[lean_lib]]
+name = "SemaevSymmetryAudit"
+roots = ["NewestThree", "ThreeActions", "CanonicalTower", "AdjacentCanonical", "TowerVariables", "FullSymmetry"]

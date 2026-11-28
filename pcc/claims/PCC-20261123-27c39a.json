@@ -1,0 +1,15 @@
+{
+ "claim_type": "literature",
+ "created_at": "2026-11-23T19:13:35Z",
+ "id": "PCC-20261123-27c39a",
+ "kind": "statement",
+ "producer": {
+  "commit": "bead41bdd6d961c5b030832a45c5cf77fb365664",
+  "model": "Codex",
+  "session": "cohort-validation-20261123"
+ },
+ "proofs": [],
+ "schema": "pcc.claim/v1",
+ "scope": "research/hashed_ecdl_cohort_validation_20261123",
+ "statement": "Source review for larger-cohort validation: frozen scale.rs and point-audit-v2 restrict seeds101/202; the future-only unadopted protocol still describes the same12targets. Curve::with_order_witness already validates prime field/order,nonsingularity,nonzero r-torsion generator and a unique Hasse multiple; its scalar multiplication does not reduce by advertised r. SEC1v2 section3.1.1.2.1 and Sutherland18.783Fall2025Lecture7 provide existing domain/order validation and Hasse unique-multiple methods; Std Nat.eq_of_dvd_of_lt_two_mul is available. An independent replay would be validation of existing methods, not a new mechanism or a claim that the constructor lacks them. No new admission/solver experiment has run."
+}

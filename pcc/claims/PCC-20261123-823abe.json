@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T06:44:52Z",
+ "id": "PCC-20261123-823abe",
+ "kind": "execution",
+ "producer": {
+  "commit": "02d296ba3c80034a4a8a806d627db10d596b96cb",
+  "model": "gpt-6-astra",
+  "session": "fass-signed-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/signed_extraction/evidence/producer/attempt1/qualifier/stdout.jsonl",
+    "sha256": "aac7736e0977f829eb2b638fc3a0ec45a134ebf9dd034c2103c4682c2b1dd7f8"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/signed_extraction/evidence/producer/attempt1/immutable-binaries.json",
+    "sha256": "5748b56cf56a641d456eddd24d05205036e26ec15c08657f61fedc0eab27a180"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/signed_extraction/evidence/producer/attempt1/qualifier/pre-call-inputs.sha256",
+    "sha256": "4fada7e9193721e1634c9b9a576a9f2f5c73b271ac8a84bdac04fe6caf319625"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/signed_extraction/evidence/producer/attempt1/qualifier/post-call-inputs.sha256",
+    "sha256": "4fada7e9193721e1634c9b9a576a9f2f5c73b271ac8a84bdac04fe6caf319625"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/fass_prime31_20261122/signed_extraction; fixed132-case native component qualification only",
+ "statement": "The frozen signed-extraction qualifier at source4d1e768c7d0a6fdeef75d9a7f2597e262b87231b completed the declared132-case panel, agreed with its separately coded exhaustive group oracle for all cases, retained42 predetermined result/input pairs, and refused16 invalid inputs. Its recorded aggregate1496 ordered triples includes1166 finite-prefix and330 identity-prefix outputs across repeated fixed calls, not independent relations; Prime31d63x1 has201 inverse-pair triples and no noncancelling output under either F policy. This is an unsigned finite development observation, not a cost, rank or ECDLP recovery claim."
+}

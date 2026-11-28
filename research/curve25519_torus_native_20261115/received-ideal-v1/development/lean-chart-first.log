@@ -1,0 +1,17 @@
+✖ [1347/1348] Building ReceivedIdeal (1.8s)
+trace: .> LEAN_PATH=/workspace/isogeny-labs/crypto-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/packages/mathlib/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-lean/.lake/build/lib/lean:/workspace/isogeny-labs/crypto-spectrum-assessment-20261123/research/curve25519_torus_native_20261115/received-ideal-v1/lean/.lake/build/lib/lean /workspace/curve25519-lean-tools/elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /workspace/isogeny-labs/crypto-spectrum-assessment-20261123/research/curve25519_torus_native_20261115/received-ideal-v1/lean/ReceivedIdeal.lean -o /workspace/isogeny-labs/crypto-spectrum-assessment-20261123/research/curve25519_torus_native_20261115/received-ideal-v1/lean/.lake/build/lib/lean/ReceivedIdeal.olean -i /workspace/isogeny-labs/crypto-spectrum-assessment-20261123/research/curve25519_torus_native_20261115/received-ideal-v1/lean/.lake/build/lib/lean/ReceivedIdeal.ilean -c /workspace/isogeny-labs/crypto-spectrum-assessment-20261123/research/curve25519_torus_native_20261115/received-ideal-v1/lean/.lake/build/ir/ReceivedIdeal.c --setup /workspace/isogeny-labs/crypto-spectrum-assessment-20261123/research/curve25519_torus_native_20261115/received-ideal-v1/lean/.lake/build/ir/ReceivedIdeal.setup.json --json
+error: ReceivedIdeal.lean:41:2: ring failed, ring expressions not equal
+K : Type u_1
+inst✝ : Field K
+A tau e : K
+ht : tau ≠ 0
+h2 : 2 ≠ 0
+he : e ^ 2 = 1
+h4 : 4 ≠ 0
+⊢ -(A ^ 2 * 3) + A ^ 2 * e ^ 2 * 3 = 0
+info: ReceivedIdeal.lean:43:0: 'ReceivedIdeal.received_quartic' depends on axioms: [propext, Quot.sound]
+info: ReceivedIdeal.lean:44:0: 'ReceivedIdeal.cleared_quartic' depends on axioms: [propext, Quot.sound]
+info: ReceivedIdeal.lean:45:0: 'ReceivedIdeal.raw_branch_quad' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- ReceivedIdeal
+error: build failed

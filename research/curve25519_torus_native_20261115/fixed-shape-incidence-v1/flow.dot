@@ -1,0 +1,14 @@
+digraph Incidence {
+  graph [rankdir=TB, bgcolor="white", pad="0.2", nodesep="0.35", ranksep="0.4"];
+  node [shape=box, style="rounded,filled", fillcolor="#edf2f7", fontname="Helvetica", fontsize=11];
+  edge [color="#526277", arrowsize=0.65];
+  enc [label="Original signed column\n<=32 admitted encodings", fillcolor="#dcecf4"];
+  role [label="Fixed relative role\nfixes multiplier sigma"];
+  targ [label="<=2^m signed tuples\nC_m=32 m 2^m targets"];
+  pair [label="Fresh target pairs\nbounded support overlap", fillcolor="#e2ecdf"];
+  block [label="No cross-target columns\n=> every kernel tag is zero"];
+  next [label="Growing family / extra transport\nneeds costed useful closure", fillcolor="#f4e8cf"];
+  {rank=same; enc; role; targ;}
+  {rank=same; pair; block; next;}
+  enc -> role -> targ -> pair -> block -> next;
+}

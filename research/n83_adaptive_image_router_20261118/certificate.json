@@ -1,0 +1,111 @@
+{
+  "decision": {
+    "projector_only_router_supplies_independent_rank": false,
+    "reason": "projection retains only the elliptic norm label and discards the kernel/Prym residue; image-closed relations are the source elliptic relations",
+    "speedup_claim": false,
+    "timing_experiment_admitted": false
+  },
+  "derived_identities": {
+    "converse_boundary": "sum(c_i phi_*(D_i))=0 only implies sum(c_i D_i) lies in ker(phi_*)",
+    "forward_relation_implication": "sum(c_i D_i)=0 implies sum(c_i phi_*(D_i))=0",
+    "image_injectivity": "phi^* is injective on r-torsion because phi_*phi^*=[3] and gcd(3,r)=1",
+    "kernel_coset_collapse": "K in ker(phi_*) implies p(D+K)=p(D)"
+  },
+  "fixed_f8_exhaustive_control": {
+    "checks_passed": true,
+    "cover_parameters": {
+      "a": "0x1",
+      "b": "0x3"
+    },
+    "field": "GF(8)",
+    "jacobian_presentation": {
+      "all_classes_distinct": true,
+      "classes": 486,
+      "generator_A_order": 27,
+      "generator_B_order": 54,
+      "presentation_window": "0<=i<9, 0<=j<54",
+      "relation": "[9]A=[18]B"
+    },
+    "negative_control": {
+      "description": "nonzero kernel class paired with the identity",
+      "jacobian_sum_is_zero": false,
+      "kernel_witness": {
+        "u": {
+          "coefficients_low_to_high": [
+            "0x3",
+            "0x0",
+            "0x7",
+            "0x1"
+          ],
+          "degree": 3
+        },
+        "v": {
+          "coefficients_low_to_high": [
+            "0x0",
+            "0x3",
+            "0x7"
+          ],
+          "degree": 2
+        }
+      },
+      "projected_sum_is_zero": true
+    },
+    "norm": {
+      "all_fibers_equal": true,
+      "fiber_sizes_by_multiple_of_Q": [
+        81,
+        81,
+        81,
+        81,
+        81,
+        81
+      ],
+      "kernel_size": 81,
+      "target_points": 6
+    },
+    "ordered_pair_control": {
+      "arbitrary_class_homomorphism_failures": 0,
+      "arbitrary_class_homomorphism_pairs_checked": 236196,
+      "exact_jacobian_zero_pairs": 486,
+      "exact_pairs_not_projected_zero": 0,
+      "false_projected_zero_pairs": 38880,
+      "kernel_ambiguity_factor": 81,
+      "population": 236196,
+      "projected_zero_pair_lifts_exactly_probability": {
+        "denominator": 39366,
+        "numerator": 486,
+        "reduced": "1/81"
+      },
+      "projected_zero_pairs": 39366
+    }
+  },
+  "n83_projector_replay": {
+    "checks_passed": true,
+    "complementary_component_is_zero": true,
+    "cover_curve": "v^2+u^2v=u^7+u",
+    "cover_degree": 3,
+    "degree_inverse_mod_r": "1611901092820530811123793",
+    "elliptic_curve": "y^2+xy=x^3+1",
+    "field": "GF(2^83)",
+    "gcd_cover_degree_r": 1,
+    "general_norm_of_pullback_equals_three_times_point": true,
+    "map": "phi(u,v)=(u^3,uv+1)",
+    "normalized_projector_is_idempotent": true,
+    "pinned_point": {
+      "infinity": false,
+      "x": "0x477f77103dfad59850800",
+      "y": "0x2fa5e737d542c4e4fd5c3"
+    },
+    "pullback_is_fixed_by_normalized_projector": true,
+    "r_times_pinned_point_is_zero": true,
+    "subgroup_order_r": "2417851639230796216685689"
+  },
+  "open_obligations": [
+    "a broader growing-degree/adaptive design remains unclassified if it supplies an additional non-generic label/descent or Prym-cancellation oracle",
+    "such a design must define its non-reduced or Riemann--Roch representation because reduced genus-three Mumford support has degree at most three",
+    "any surviving design must cost relation search, projected independent rank, matrix and memory, blind individual logarithms, and finite crossover in the actual order r"
+  ],
+  "schema": "crypto.n83-adaptive-image-router-audit/v1",
+  "scope": "projector-only routing; no additional label, descent, or Prym-cancellation oracle",
+  "status": "rejected_as_new_relation_mechanism"
+}

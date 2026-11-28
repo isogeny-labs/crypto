@@ -1,0 +1,1247 @@
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SplitQuotients.lean:14:30: error: `grind` failed
+case grind
+K : Type
+inst : CommRing K
+x t y z s b a₂ a₄ : K
+hs : s ^ 2 = b
+ht : x * t = s
+hz : z * x ^ 3 = b * y
+hy : y ^ 2 = x ^ 6 + a₂ * x ^ 4 + a₄ * x ^ 2 + b
+h : ¬x ^ 2 * t ^ 2 = b
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] s ^ 2 = b
+    [prop] x * t = s
+    [prop] z * x ^ 3 = b * y
+    [prop] y ^ 2 = x ^ 6 + a₂ * x ^ 4 + a₄ * x ^ 2 + b
+    [prop] ¬x ^ 2 * t ^ 2 = b
+  [eqc] False propositions
+    [prop] x ^ 2 * t ^ 2 = b
+  [eqc] Equivalence classes
+    [eqc] {s, x * t}
+    [eqc] {b, s ^ 2}
+    [eqc] {x ^ 6 + a₂ * x ^ 4 + a₄ * x ^ 2 + b, y ^ 2}
+    [eqc] {z * x ^ 3, b * y}
+  [ematch] E-matching patterns
+    [thm] Nat.pow_pos: [@HPow.hPow `[Nat] `[Nat] `[Nat] `[instHPow] #2 #1]
+    [thm] Nat.div_pow_of_pos: [@HPow.hPow `[Nat] `[Nat] `[Nat] `[instHPow] #2 #1]
+  [ring] Ring `K`
+    [basis] Basis
+      [_] ⋯ + ⋯ + 2 * ⋯ + -1 * (⋯ * y ^ 3) + -1 * (t * z ^ 6 * y ^ 5) + 3 * (t * z ^ 4 * b ^ 2 * y ^ 5) +
+                                                                                                      -3 *
+                                                                                                        (t * z ^ 2 *
+                                                                                                            b ^ 4 *
+                                                                                                          y ^ 5) +
+                                                                                                    t * b ^ 6 * y ^ 5 +
+                                                                                                  s ^ 2 * x * t *
+                                                                                                        z ^ 5 *
+                                                                                                      b ^ 2 *
+                                                                                                    a₂ +
+                                                                                                -1 *
+                                                                                                  (t ^ 3 * z ^ 4 *
+                                                                                                        b ^ 3 *
+                                                                                                      y *
+                                                                                                    a₂) +
+                                                                                              s * z ^ 5 * b * y ^ 4 *
+                                                                                                a₂ +
+                                                                                            -2 *
+                                                                                              (s * z ^ 3 * b ^ 3 *
+                                                                                                  y ^ 4 *
+                                                                                                a₂) +
+                                                                                          s * z * b ^ 5 * y ^ 4 * a₂ +
+                                                                                        s * t ^ 2 * z ^ 3 * b ^ 4 *
+                                                                                          a₂ ^ 2 +
+                                                                                      -1 *
+                                                                                        (s * x * z ^ 4 * b ^ 3 * y *
+                                                                                          a₂ ^ 2) +
+                                                                                    s * x * z ^ 2 * b ^ 5 * y * a₂ ^ 2 +
+                                                                                  t * z ^ 2 * b ^ 5 * y * a₂ ^ 3 +
+                                                                                -1 *
+                                                                                  (s * t ^ 2 * z ^ 5 * b * y ^ 2 * a₄) +
+                                                                              s * t ^ 2 * z ^ 3 * b ^ 3 * y ^ 2 * a₄ +
+                                                                            -3 * (s * x * z ^ 6 * y ^ 3 * a₄) +
+                                                                          5 * (s * x * z ^ 4 * b ^ 2 * y ^ 3 * a₄) +
+                                                                        -2 * (s * x * z ^ 2 * b ^ 4 * y ^ 3 * a₄) +
+                                                                      2 * (s * x ^ 2 * z ^ 5 * b ^ 2 * a₂ * a₄) +
+                                                                    2 * (s ^ 2 * t * z ^ 4 * b ^ 2 * y * a₂ * a₄) +
+                                                                  2 * (s ^ 2 * t * z ^ 2 * b ^ 4 * y * a₂ * a₄) +
+                                                                3 * (t * z ^ 4 * b ^ 2 * y ^ 3 * a₂ * a₄) +
+                                                              -4 * (t * z ^ 2 * b ^ 4 * y ^ 3 * a₂ * a₄) +
+                                                            -1 * (s * z ^ 3 * b ^ 3 * y ^ 2 * a₂ ^ 2 * a₄) +
+                                                          2 * (s * z * b ^ 5 * y ^ 2 * a₂ ^ 2 * a₄) +
+                                                        s ^ 2 * x * t * z ^ 5 * b * a₄ ^ 2 +
+                                                      -2 * (s ^ 2 * x * t * z ^ 3 * b ^ 3 * a₄ ^ 2) +
+                                                    t ^ 3 * z ^ 4 * b ^ 2 * y * a₄ ^ 2 +
+                                                  2 * (x * t * z ^ 3 * b ^ 3 * y ^ 2 * a₄ ^ 2) +
+                                                4 * (s * x * z ^ 4 * b ^ 2 * y * a₂ * a₄ ^ 2) +
+                                              2 * (s * x ^ 2 * z ^ 5 * b * a₄ ^ 3) +
+                                            -2 * (s * x ^ 2 * z ^ 3 * b ^ 3 * a₄ ^ 3) +
+                                          s ^ 2 * t * z ^ 6 * b * y +
+                                        -1 * (s ^ 2 * t * z ^ 4 * b ^ 3 * y) +
+                                      3 * (t * z ^ 6 * b * y ^ 3) +
+                                    -6 * (t * z ^ 4 * b ^ 3 * y ^ 3) +
+                                  3 * (t * z ^ 2 * b ^ 5 * y ^ 3) +
+                                -1 * (s * z ^ 5 * b ^ 2 * y ^ 2 * a₂) +
+                              s * z ^ 3 * b ^ 4 * y ^ 2 * a₂ +
+                            s * t ^ 2 * z ^ 5 * b ^ 2 * a₄ +
+                          3 * (s * x * z ^ 6 * b * y * a₄) +
+                        -2 * (s * x * z ^ 4 * b ^ 3 * y * a₄) +
+                      -2 * (t * z ^ 4 * b ^ 3 * y * a₂ * a₄) +
+                    2 * (x * t * z ^ 5 * b ^ 2 * a₄ ^ 2) +
+                  t * z ^ 4 * b ^ 2 * y * a₄ ^ 3 +
+                -2 * (t * z ^ 6 * b ^ 2 * y) +
+              2 * (t * z ^ 4 * b ^ 4 * y) =
+            0
+      [_] s * z ^ 2 * b ^ 4 * y * a₂ ^ 3 + s * x * z ^ 3 * b ^ 3 * a₂ ^ 2 * a₄ + -1 * (s * z ^ 6 * y ^ 3) +
+                                          3 * (s * z ^ 4 * b ^ 2 * y ^ 3) +
+                                        -3 * (s * z ^ 2 * b ^ 4 * y ^ 3) +
+                                      s * b ^ 6 * y ^ 3 +
+                                    s * x * z ^ 5 * b ^ 2 * a₂ +
+                                  -1 * (s * x * z ^ 3 * b ^ 4 * a₂) +
+                                t * z ^ 3 * b ^ 4 * a₂ ^ 2 +
+                              2 * (s * z ^ 4 * b ^ 2 * y * a₂ * a₄) +
+                            -2 * (s * z ^ 2 * b ^ 4 * y * a₂ * a₄) +
+                          s * x * z ^ 5 * b * a₄ ^ 2 +
+                        -1 * (s * x * z ^ 3 * b ^ 3 * a₄ ^ 2) +
+                      s * z ^ 6 * b * y +
+                    -2 * (s * z ^ 4 * b ^ 3 * y) +
+                  s * z ^ 2 * b ^ 5 * y +
+                t * z ^ 5 * b ^ 2 * a₄ +
+              -1 * (t * z ^ 3 * b ^ 4 * a₄) =
+            0
+      [_] z ^ 2 * b ^ 4 * y ^ 2 * a₂ ^ 3 + -1 * (z ^ 6 * y ^ 4) + 3 * (z ^ 4 * b ^ 2 * y ^ 4) +
+                                          -3 * (z ^ 2 * b ^ 4 * y ^ 4) +
+                                        b ^ 6 * y ^ 4 +
+                                      -1 * (t ^ 2 * z ^ 4 * b ^ 3 * a₂) +
+                                    -1 * (s * t * z ^ 5 * b * y * a₄) +
+                                  s * t * z ^ 3 * b ^ 3 * y * a₄ +
+                                3 * (z ^ 4 * b ^ 2 * y ^ 2 * a₂ * a₄) +
+                              -3 * (z ^ 2 * b ^ 4 * y ^ 2 * a₂ * a₄) +
+                            t ^ 2 * z ^ 4 * b ^ 2 * a₄ ^ 2 +
+                          3 * (z ^ 6 * b * y ^ 2) +
+                        -6 * (z ^ 4 * b ^ 3 * y ^ 2) +
+                      3 * (z ^ 2 * b ^ 5 * y ^ 2) +
+                    -2 * (z ^ 4 * b ^ 3 * a₂ * a₄) +
+                  z ^ 4 * b ^ 2 * a₄ ^ 3 +
+                -2 * (z ^ 6 * b ^ 2) +
+              2 * (z ^ 4 * b ^ 4) =
+            0
+      [_] s * t * z ^ 3 * b ^ 3 * a₂ ^ 2 + z ^ 2 * b ^ 4 * y * a₂ ^ 3 + x ^ 2 * z ^ 6 * y * a₄ +
+                                          -1 * (s * t * z * b ^ 4 * y ^ 2 * a₄) +
+                                        x * z ^ 3 * b ^ 3 * a₂ ^ 2 * a₄ +
+                                      -1 * (z ^ 6 * y ^ 3) +
+                                    3 * (z ^ 4 * b ^ 2 * y ^ 3) +
+                                  -3 * (z ^ 2 * b ^ 4 * y ^ 3) +
+                                b ^ 6 * y ^ 3 +
+                              x * z ^ 5 * b ^ 2 * a₂ +
+                            -1 * (x * z ^ 3 * b ^ 4 * a₂) +
+                          -2 * (s * t * z ^ 3 * b ^ 3 * a₄) +
+                        z ^ 4 * b ^ 2 * y * a₂ * a₄ +
+                      -3 * (z ^ 2 * b ^ 4 * y * a₂ * a₄) +
+                    -2 * (x * z ^ 3 * b ^ 3 * a₄ ^ 2) +
+                  z ^ 6 * b * y +
+                -2 * (z ^ 4 * b ^ 3 * y) +
+              z ^ 2 * b ^ 5 * y =
+            0
+      [_] t * b ^ 5 * y ^ 2 * a₂ ^ 2 + s * z * b ^ 4 * y * a₂ ^ 3 + s * x * z ^ 2 * b ^ 3 * a₂ ^ 2 * a₄ +
+                                -1 * (s * z ^ 5 * y ^ 3) +
+                              2 * (s * z ^ 3 * b ^ 2 * y ^ 3) +
+                            -1 * (s * z * b ^ 4 * y ^ 3) +
+                          s * x * z ^ 4 * b ^ 2 * a₂ +
+                        t * z ^ 2 * b ^ 4 * a₂ ^ 2 +
+                      2 * (s * z ^ 3 * b ^ 2 * y * a₂ * a₄) +
+                    s * x * z ^ 4 * b * a₄ ^ 2 +
+                  s * z ^ 5 * b * y +
+                -1 * (s * z ^ 3 * b ^ 3 * y) +
+              t * z ^ 4 * b ^ 2 * a₄ =
+            0
+      [_] x * b ^ 5 * y ^ 2 * a₂ + -1 * (s * t * z ^ 2 * b ^ 3 * a₂ ^ 2) + -1 * (z * b ^ 4 * y * a₂ ^ 3) +
+                                        -1 * (x ^ 2 * z ^ 5 * y * a₄) +
+                                      2 * (s * t * b ^ 4 * y ^ 2 * a₄) +
+                                    -1 * (x * z ^ 2 * b ^ 3 * a₂ ^ 2 * a₄) +
+                                  z ^ 5 * y ^ 3 +
+                                -3 * (z ^ 3 * b ^ 2 * y ^ 3) +
+                              2 * (z * b ^ 4 * y ^ 3) +
+                            -1 * (x * z ^ 4 * b ^ 2 * a₂) +
+                          x * z ^ 2 * b ^ 4 * a₂ +
+                        2 * (s * t * z ^ 2 * b ^ 3 * a₄) +
+                      -1 * (z ^ 3 * b ^ 2 * y * a₂ * a₄) +
+                    3 * (z * b ^ 4 * y * a₂ * a₄) +
+                  2 * (x * z ^ 2 * b ^ 3 * a₄ ^ 2) +
+                -1 * (z ^ 5 * b * y) +
+              2 * (z ^ 3 * b ^ 3 * y) =
+            0
+      [_] t * z * b ^ 3 * y ^ 2 * a₂ ^ 2 + -1 * (s * z ^ 4 * y ^ 3) + 2 * (s * z ^ 2 * b ^ 2 * y ^ 3) +
+                          -1 * (s * b ^ 4 * y ^ 3) +
+                        s * x * z ^ 3 * b ^ 2 * a₂ +
+                      2 * (s * z ^ 2 * b ^ 2 * y * a₂ * a₄) +
+                    s * x * z ^ 3 * b * a₄ ^ 2 +
+                  s * z ^ 4 * b * y +
+                -1 * (s * z ^ 2 * b ^ 3 * y) +
+              t * z ^ 3 * b ^ 2 * a₄ =
+            0
+      [_] s * x * b ^ 3 * y ^ 2 * a₂ + t * b ^ 3 * y ^ 2 * a₂ ^ 2 + -1 * (s * z ^ 3 * y ^ 3) + s * z * b ^ 2 * y ^ 3 +
+                        s * x * z ^ 2 * b ^ 2 * a₂ +
+                      t * b ^ 3 * y ^ 2 * a₄ +
+                    2 * (s * z * b ^ 2 * y * a₂ * a₄) +
+                  s * x * z ^ 2 * b * a₄ ^ 2 +
+                s * z ^ 3 * b * y +
+              t * z ^ 2 * b ^ 2 * a₄ =
+            0
+      [_] x * z ^ 4 * y ^ 2 + -2 * (x * z ^ 2 * b ^ 2 * y ^ 2) + x * b ^ 4 * y ^ 2 + -1 * (s * t * z ^ 2 * b ^ 2 * a₂) +
+                        -1 * (z * b ^ 3 * y * a₂ ^ 2) +
+                      -1 * (x * z ^ 2 * b ^ 2 * a₂ * a₄) +
+                    -1 * (x * z ^ 4 * b) +
+                  x * z ^ 2 * b ^ 3 +
+                -1 * (z ^ 3 * b * y * a₄) +
+              z * b ^ 3 * y * a₄ =
+            0
+      [_] s * x ^ 5 + s * x ^ 3 * a₂ + -1 * (t * y ^ 2) + s * x * a₄ + t * b = 0
+      [_] x ^ 6 + x ^ 4 * a₂ + x ^ 2 * a₄ + -1 * y ^ 2 + b = 0
+      [_] s * t ^ 3 * b ^ 2 + x ^ 3 * b ^ 3 + x * b ^ 3 * a₂ + s * t * b ^ 2 * a₄ + -1 * (z * b ^ 2 * y) = 0
+      [_] t ^ 4 * b ^ 2 + x ^ 2 * b ^ 3 + -1 * (s * t * z * b * y) + t ^ 2 * b ^ 2 * a₄ + b ^ 3 * a₂ = 0
+      [_] s * t ^ 2 * z * b ^ 2 + -1 * (s * x * z ^ 2 * b * y) + s * x * b ^ 3 * y + t * b ^ 3 * y * a₂ +
+              s * z * b ^ 2 * a₄ =
+            0
+      [_] t ^ 3 * z * b ^ 2 + s * x * z * b ^ 2 * a₂ + -1 * (s * z ^ 2 * b * y) + s * b ^ 3 * y + t * z * b ^ 2 * a₄ = 0
+      [_] s * t ^ 3 * y ^ 2 + -1 * (s * t ^ 3 * b) + -1 * (x ^ 3 * b ^ 2) + -1 * (x * b ^ 2 * a₂) +
+              -1 * (s * t * b * a₄) =
+            0
+      [_] t ^ 4 * y ^ 2 + -1 * (t ^ 4 * b) + -1 * (x ^ 2 * b ^ 2) + -1 * (t ^ 2 * b * a₄) + -1 * (b ^ 2 * a₂) = 0
+      [_] s * x * z ^ 2 * y ^ 2 + -1 * (s * x * b ^ 2 * y ^ 2) + -1 * (t * b ^ 2 * y ^ 2 * a₂) +
+                -1 * (s * x * z ^ 2 * b) +
+              -1 * (s * z * b * y * a₄) =
+            0
+      [_] s * t * b ^ 2 * y * a₂ + t ^ 2 * z * b ^ 2 + -1 * (x * z ^ 2 * b * y) + x * b ^ 3 * y + z * b ^ 2 * a₄ = 0
+      [_] s * t * b * y ^ 2 * a₂ + -1 * (x * z ^ 2 * y ^ 2) + x * b ^ 2 * y ^ 2 + x * z ^ 2 * b + z * b * y * a₄ = 0
+      [_] s * x ^ 3 * b + -1 * (t ^ 3 * y ^ 2) + t ^ 3 * b + s * x * b * a₂ + t * b * a₄ = 0
+      [_] x ^ 4 * b + -1 * (t ^ 2 * y ^ 2) + x ^ 2 * b * a₂ + t ^ 2 * b + b * a₄ = 0
+      [_] s * x ^ 2 * b * y + -1 * (t * z * y ^ 2) + s * b * y * a₂ + s * x * z * a₄ + t * z * b = 0
+      [_] x ^ 3 * b * y + x * b * y * a₂ + x ^ 2 * z * a₄ + -1 * (z * y ^ 2) + z * b = 0
+      [_] x ^ 2 * b ^ 2 * y + -1 * (s * t * z * y ^ 2) + s * t * z * b + b ^ 2 * y * a₂ + x * z * b * a₄ = 0
+      [_] x ^ 2 * z * y ^ 2 + -1 * (s * t * y ^ 3) = 0
+      [_] t ^ 2 * z * y ^ 2 + -1 * (s * t * b * y * a₂) + -1 * (t ^ 2 * z * b) + -1 * (x * b ^ 2 * y) +
+              -1 * (z * b * a₄) =
+            0
+      [_] t * z ^ 2 * y ^ 2 + -1 * (t * b ^ 2 * y ^ 2) + -1 * (s * z * b * y * a₂) + -1 * (s * x * z ^ 2 * a₄) +
+              -1 * (t * z ^ 2 * b) =
+            0
+      [_] t ^ 2 * y ^ 3 + -1 * (x * z * y ^ 2) = 0
+      [_] x * z * b * y * a₂ + x ^ 2 * z ^ 2 * a₄ + -1 * (z ^ 2 * y ^ 2) + b ^ 2 * y ^ 2 + z ^ 2 * b = 0
+      [_] s * x ^ 2 * z + -1 * (t * b * y) = 0
+      [_] x ^ 3 * z + -1 * (b * y) = 0
+      [_] x ^ 2 * z * b + -1 * (s * t * b * y) = 0
+      [_] t ^ 2 * b * y + -1 * (x * z * b) = 0
+      [_] s ^ 2 + -1 * b = 0
+      [_] x * t + -1 * s = 0
+    [diseqs] Disequalities
+      [_] ¬x ^ 2 * t ^ 2 + -1 * s ^ 2 = 0
+  [limits] Thresholds reached
+    [limit] maximum number of ring steps has been reached, threshold: `(ringSteps := 100000)`
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SplitQuotients.lean:15:32: error: `grind` failed
+case grind
+K : Type
+inst : CommRing K
+x t y z s b a₂ a₄ : K
+hs : s ^ 2 = b
+ht : x * t = s
+hz : z * x ^ 3 = b * y
+hy : y ^ 2 = x ^ 6 + a₂ * x ^ 4 + a₄ * x ^ 2 + b
+h₂ : x ^ 2 * t ^ 2 = b
+h : ¬x ^ 4 * t ^ 4 = b ^ 2
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] s ^ 2 = b
+    [prop] x * t = s
+    [prop] z * x ^ 3 = b * y
+    [prop] y ^ 2 = x ^ 6 + a₂ * x ^ 4 + a₄ * x ^ 2 + b
+    [prop] x ^ 2 * t ^ 2 = b
+    [prop] ¬x ^ 4 * t ^ 4 = b ^ 2
+  [eqc] False propositions
+    [prop] x ^ 4 * t ^ 4 = b ^ 2
+  [eqc] Equivalence classes
+    [eqc] {s, x * t}
+    [eqc] {b, x ^ 2 * t ^ 2, s ^ 2}
+    [eqc] {x ^ 6 + a₂ * x ^ 4 + a₄ * x ^ 2 + b, y ^ 2}
+    [eqc] {z * x ^ 3, b * y}
+  [ematch] E-matching patterns
+    [thm] Nat.pow_pos: [@HPow.hPow `[Nat] `[Nat] `[Nat] `[instHPow] #2 #1]
+    [thm] Nat.div_pow_of_pos: [@HPow.hPow `[Nat] `[Nat] `[Nat] `[instHPow] #2 #1]
+  [ring] Ring `K`
+    [basis] Basis
+      [_] ⋯ + ⋯ + 2 * ⋯ + -1 * (⋯ * y ^ 3) + -1 * (t * z ^ 6 * y ^ 5) + 3 * (t * z ^ 4 * b ^ 2 * y ^ 5) +
+                                                                                                      -3 *
+                                                                                                        (t * z ^ 2 *
+                                                                                                            b ^ 4 *
+                                                                                                          y ^ 5) +
+                                                                                                    t * b ^ 6 * y ^ 5 +
+                                                                                                  s ^ 2 * x * t *
+                                                                                                        z ^ 5 *
+                                                                                                      b ^ 2 *
+                                                                                                    a₂ +
+                                                                                                -1 *
+                                                                                                  (t ^ 3 * z ^ 4 *
+                                                                                                        b ^ 3 *
+                                                                                                      y *
+                                                                                                    a₂) +
+                                                                                              s * z ^ 5 * b * y ^ 4 *
+                                                                                                a₂ +
+                                                                                            -2 *
+                                                                                              (s * z ^ 3 * b ^ 3 *
+                                                                                                  y ^ 4 *
+                                                                                                a₂) +
+                                                                                          s * z * b ^ 5 * y ^ 4 * a₂ +
+                                                                                        s * t ^ 2 * z ^ 3 * b ^ 4 *
+                                                                                          a₂ ^ 2 +
+                                                                                      -1 *
+                                                                                        (s * x * z ^ 4 * b ^ 3 * y *
+                                                                                          a₂ ^ 2) +
+                                                                                    s * x * z ^ 2 * b ^ 5 * y * a₂ ^ 2 +
+                                                                                  t * z ^ 2 * b ^ 5 * y * a₂ ^ 3 +
+                                                                                -1 *
+                                                                                  (s * t ^ 2 * z ^ 5 * b * y ^ 2 * a₄) +
+                                                                              s * t ^ 2 * z ^ 3 * b ^ 3 * y ^ 2 * a₄ +
+                                                                            -3 * (s * x * z ^ 6 * y ^ 3 * a₄) +
+                                                                          5 * (s * x * z ^ 4 * b ^ 2 * y ^ 3 * a₄) +
+                                                                        -2 * (s * x * z ^ 2 * b ^ 4 * y ^ 3 * a₄) +
+                                                                      2 * (s * x ^ 2 * z ^ 5 * b ^ 2 * a₂ * a₄) +
+                                                                    2 * (s ^ 2 * t * z ^ 4 * b ^ 2 * y * a₂ * a₄) +
+                                                                  2 * (s ^ 2 * t * z ^ 2 * b ^ 4 * y * a₂ * a₄) +
+                                                                3 * (t * z ^ 4 * b ^ 2 * y ^ 3 * a₂ * a₄) +
+                                                              -4 * (t * z ^ 2 * b ^ 4 * y ^ 3 * a₂ * a₄) +
+                                                            -1 * (s * z ^ 3 * b ^ 3 * y ^ 2 * a₂ ^ 2 * a₄) +
+                                                          2 * (s * z * b ^ 5 * y ^ 2 * a₂ ^ 2 * a₄) +
+                                                        s ^ 2 * x * t * z ^ 5 * b * a₄ ^ 2 +
+                                                      -2 * (s ^ 2 * x * t * z ^ 3 * b ^ 3 * a₄ ^ 2) +
+                                                    t ^ 3 * z ^ 4 * b ^ 2 * y * a₄ ^ 2 +
+                                                  2 * (x * t * z ^ 3 * b ^ 3 * y ^ 2 * a₄ ^ 2) +
+                                                4 * (s * x * z ^ 4 * b ^ 2 * y * a₂ * a₄ ^ 2) +
+                                              2 * (s * x ^ 2 * z ^ 5 * b * a₄ ^ 3) +
+                                            -2 * (s * x ^ 2 * z ^ 3 * b ^ 3 * a₄ ^ 3) +
+                                          s ^ 2 * t * z ^ 6 * b * y +
+                                        -1 * (s ^ 2 * t * z ^ 4 * b ^ 3 * y) +
+                                      3 * (t * z ^ 6 * b * y ^ 3) +
+                                    -6 * (t * z ^ 4 * b ^ 3 * y ^ 3) +
+                                  3 * (t * z ^ 2 * b ^ 5 * y ^ 3) +
+                                -1 * (s * z ^ 5 * b ^ 2 * y ^ 2 * a₂) +
+                              s * z ^ 3 * b ^ 4 * y ^ 2 * a₂ +
+                            s * t ^ 2 * z ^ 5 * b ^ 2 * a₄ +
+                          3 * (s * x * z ^ 6 * b * y * a₄) +
+                        -2 * (s * x * z ^ 4 * b ^ 3 * y * a₄) +
+                      -2 * (t * z ^ 4 * b ^ 3 * y * a₂ * a₄) +
+                    2 * (x * t * z ^ 5 * b ^ 2 * a₄ ^ 2) +
+                  t * z ^ 4 * b ^ 2 * y * a₄ ^ 3 +
+                -2 * (t * z ^ 6 * b ^ 2 * y) +
+              2 * (t * z ^ 4 * b ^ 4 * y) =
+            0
+      [_] s * z ^ 2 * b ^ 4 * y * a₂ ^ 3 + s * x * z ^ 3 * b ^ 3 * a₂ ^ 2 * a₄ + -1 * (s * z ^ 6 * y ^ 3) +
+                                          3 * (s * z ^ 4 * b ^ 2 * y ^ 3) +
+                                        -3 * (s * z ^ 2 * b ^ 4 * y ^ 3) +
+                                      s * b ^ 6 * y ^ 3 +
+                                    s * x * z ^ 5 * b ^ 2 * a₂ +
+                                  -1 * (s * x * z ^ 3 * b ^ 4 * a₂) +
+                                t * z ^ 3 * b ^ 4 * a₂ ^ 2 +
+                              2 * (s * z ^ 4 * b ^ 2 * y * a₂ * a₄) +
+                            -2 * (s * z ^ 2 * b ^ 4 * y * a₂ * a₄) +
+                          s * x * z ^ 5 * b * a₄ ^ 2 +
+                        -1 * (s * x * z ^ 3 * b ^ 3 * a₄ ^ 2) +
+                      s * z ^ 6 * b * y +
+                    -2 * (s * z ^ 4 * b ^ 3 * y) +
+                  s * z ^ 2 * b ^ 5 * y +
+                t * z ^ 5 * b ^ 2 * a₄ +
+              -1 * (t * z ^ 3 * b ^ 4 * a₄) =
+            0
+      [_] z ^ 2 * b ^ 4 * y ^ 2 * a₂ ^ 3 + -1 * (z ^ 6 * y ^ 4) + 3 * (z ^ 4 * b ^ 2 * y ^ 4) +
+                                          -3 * (z ^ 2 * b ^ 4 * y ^ 4) +
+                                        b ^ 6 * y ^ 4 +
+                                      -1 * (t ^ 2 * z ^ 4 * b ^ 3 * a₂) +
+                                    -1 * (s * t * z ^ 5 * b * y * a₄) +
+                                  s * t * z ^ 3 * b ^ 3 * y * a₄ +
+                                3 * (z ^ 4 * b ^ 2 * y ^ 2 * a₂ * a₄) +
+                              -3 * (z ^ 2 * b ^ 4 * y ^ 2 * a₂ * a₄) +
+                            t ^ 2 * z ^ 4 * b ^ 2 * a₄ ^ 2 +
+                          3 * (z ^ 6 * b * y ^ 2) +
+                        -6 * (z ^ 4 * b ^ 3 * y ^ 2) +
+                      3 * (z ^ 2 * b ^ 5 * y ^ 2) +
+                    -2 * (z ^ 4 * b ^ 3 * a₂ * a₄) +
+                  z ^ 4 * b ^ 2 * a₄ ^ 3 +
+                -2 * (z ^ 6 * b ^ 2) +
+              2 * (z ^ 4 * b ^ 4) =
+            0
+      [_] s * t * z ^ 3 * b ^ 3 * a₂ ^ 2 + z ^ 2 * b ^ 4 * y * a₂ ^ 3 + x ^ 2 * z ^ 6 * y * a₄ +
+                                          -1 * (s * t * z * b ^ 4 * y ^ 2 * a₄) +
+                                        x * z ^ 3 * b ^ 3 * a₂ ^ 2 * a₄ +
+                                      -1 * (z ^ 6 * y ^ 3) +
+                                    3 * (z ^ 4 * b ^ 2 * y ^ 3) +
+                                  -3 * (z ^ 2 * b ^ 4 * y ^ 3) +
+                                b ^ 6 * y ^ 3 +
+                              x * z ^ 5 * b ^ 2 * a₂ +
+                            -1 * (x * z ^ 3 * b ^ 4 * a₂) +
+                          -2 * (s * t * z ^ 3 * b ^ 3 * a₄) +
+                        z ^ 4 * b ^ 2 * y * a₂ * a₄ +
+                      -3 * (z ^ 2 * b ^ 4 * y * a₂ * a₄) +
+                    -2 * (x * z ^ 3 * b ^ 3 * a₄ ^ 2) +
+                  z ^ 6 * b * y +
+                -2 * (z ^ 4 * b ^ 3 * y) +
+              z ^ 2 * b ^ 5 * y =
+            0
+      [_] t * b ^ 5 * y ^ 2 * a₂ ^ 2 + s * z * b ^ 4 * y * a₂ ^ 3 + s * x * z ^ 2 * b ^ 3 * a₂ ^ 2 * a₄ +
+                                -1 * (s * z ^ 5 * y ^ 3) +
+                              2 * (s * z ^ 3 * b ^ 2 * y ^ 3) +
+                            -1 * (s * z * b ^ 4 * y ^ 3) +
+                          s * x * z ^ 4 * b ^ 2 * a₂ +
+                        t * z ^ 2 * b ^ 4 * a₂ ^ 2 +
+                      2 * (s * z ^ 3 * b ^ 2 * y * a₂ * a₄) +
+                    s * x * z ^ 4 * b * a₄ ^ 2 +
+                  s * z ^ 5 * b * y +
+                -1 * (s * z ^ 3 * b ^ 3 * y) +
+              t * z ^ 4 * b ^ 2 * a₄ =
+            0
+      [_] x * b ^ 5 * y ^ 2 * a₂ + -1 * (s * t * z ^ 2 * b ^ 3 * a₂ ^ 2) + -1 * (z * b ^ 4 * y * a₂ ^ 3) +
+                                        -1 * (x ^ 2 * z ^ 5 * y * a₄) +
+                                      2 * (s * t * b ^ 4 * y ^ 2 * a₄) +
+                                    -1 * (x * z ^ 2 * b ^ 3 * a₂ ^ 2 * a₄) +
+                                  z ^ 5 * y ^ 3 +
+                                -3 * (z ^ 3 * b ^ 2 * y ^ 3) +
+                              2 * (z * b ^ 4 * y ^ 3) +
+                            -1 * (x * z ^ 4 * b ^ 2 * a₂) +
+                          x * z ^ 2 * b ^ 4 * a₂ +
+                        2 * (s * t * z ^ 2 * b ^ 3 * a₄) +
+                      -1 * (z ^ 3 * b ^ 2 * y * a₂ * a₄) +
+                    3 * (z * b ^ 4 * y * a₂ * a₄) +
+                  2 * (x * z ^ 2 * b ^ 3 * a₄ ^ 2) +
+                -1 * (z ^ 5 * b * y) +
+              2 * (z ^ 3 * b ^ 3 * y) =
+            0
+      [_] t * z * b ^ 3 * y ^ 2 * a₂ ^ 2 + -1 * (s * z ^ 4 * y ^ 3) + 2 * (s * z ^ 2 * b ^ 2 * y ^ 3) +
+                          -1 * (s * b ^ 4 * y ^ 3) +
+                        s * x * z ^ 3 * b ^ 2 * a₂ +
+                      2 * (s * z ^ 2 * b ^ 2 * y * a₂ * a₄) +
+                    s * x * z ^ 3 * b * a₄ ^ 2 +
+                  s * z ^ 4 * b * y +
+                -1 * (s * z ^ 2 * b ^ 3 * y) +
+              t * z ^ 3 * b ^ 2 * a₄ =
+            0
+      [_] s * x * b ^ 3 * y ^ 2 * a₂ + t * b ^ 3 * y ^ 2 * a₂ ^ 2 + -1 * (s * z ^ 3 * y ^ 3) + s * z * b ^ 2 * y ^ 3 +
+                        s * x * z ^ 2 * b ^ 2 * a₂ +
+                      t * b ^ 3 * y ^ 2 * a₄ +
+                    2 * (s * z * b ^ 2 * y * a₂ * a₄) +
+                  s * x * z ^ 2 * b * a₄ ^ 2 +
+                s * z ^ 3 * b * y +
+              t * z ^ 2 * b ^ 2 * a₄ =
+            0
+      [_] x * z ^ 4 * y ^ 2 + -2 * (x * z ^ 2 * b ^ 2 * y ^ 2) + x * b ^ 4 * y ^ 2 + -1 * (s * t * z ^ 2 * b ^ 2 * a₂) +
+                        -1 * (z * b ^ 3 * y * a₂ ^ 2) +
+                      -1 * (x * z ^ 2 * b ^ 2 * a₂ * a₄) +
+                    -1 * (x * z ^ 4 * b) +
+                  x * z ^ 2 * b ^ 3 +
+                -1 * (z ^ 3 * b * y * a₄) +
+              z * b ^ 3 * y * a₄ =
+            0
+      [_] s * x ^ 5 + s * x ^ 3 * a₂ + -1 * (t * y ^ 2) + s * x * a₄ + t * b = 0
+      [_] x ^ 6 + x ^ 4 * a₂ + x ^ 2 * a₄ + -1 * y ^ 2 + b = 0
+      [_] s * t ^ 3 * b ^ 2 + x ^ 3 * b ^ 3 + x * b ^ 3 * a₂ + s * t * b ^ 2 * a₄ + -1 * (z * b ^ 2 * y) = 0
+      [_] t ^ 4 * b ^ 2 + x ^ 2 * b ^ 3 + -1 * (s * t * z * b * y) + t ^ 2 * b ^ 2 * a₄ + b ^ 3 * a₂ = 0
+      [_] s * t ^ 2 * z * b ^ 2 + -1 * (s * x * z ^ 2 * b * y) + s * x * b ^ 3 * y + t * b ^ 3 * y * a₂ +
+              s * z * b ^ 2 * a₄ =
+            0
+      [_] t ^ 3 * z * b ^ 2 + s * x * z * b ^ 2 * a₂ + -1 * (s * z ^ 2 * b * y) + s * b ^ 3 * y + t * z * b ^ 2 * a₄ = 0
+      [_] s * t ^ 3 * y ^ 2 + -1 * (s * t ^ 3 * b) + -1 * (x ^ 3 * b ^ 2) + -1 * (x * b ^ 2 * a₂) +
+              -1 * (s * t * b * a₄) =
+            0
+      [_] t ^ 4 * y ^ 2 + -1 * (t ^ 4 * b) + -1 * (x ^ 2 * b ^ 2) + -1 * (t ^ 2 * b * a₄) + -1 * (b ^ 2 * a₂) = 0
+      [_] s * x * z ^ 2 * y ^ 2 + -1 * (s * x * b ^ 2 * y ^ 2) + -1 * (t * b ^ 2 * y ^ 2 * a₂) +
+                -1 * (s * x * z ^ 2 * b) +
+              -1 * (s * z * b * y * a₄) =
+            0
+      [_] s * t * b ^ 2 * y * a₂ + t ^ 2 * z * b ^ 2 + -1 * (x * z ^ 2 * b * y) + x * b ^ 3 * y + z * b ^ 2 * a₄ = 0
+      [_] s * t * b * y ^ 2 * a₂ + -1 * (x * z ^ 2 * y ^ 2) + x * b ^ 2 * y ^ 2 + x * z ^ 2 * b + z * b * y * a₄ = 0
+      [_] s * x ^ 3 * b + -1 * (t ^ 3 * y ^ 2) + t ^ 3 * b + s * x * b * a₂ + t * b * a₄ = 0
+      [_] x ^ 4 * b + -1 * (t ^ 2 * y ^ 2) + x ^ 2 * b * a₂ + t ^ 2 * b + b * a₄ = 0
+      [_] s * x ^ 2 * b * y + -1 * (t * z * y ^ 2) + s * b * y * a₂ + s * x * z * a₄ + t * z * b = 0
+      [_] x ^ 3 * b * y + x * b * y * a₂ + x ^ 2 * z * a₄ + -1 * (z * y ^ 2) + z * b = 0
+      [_] x ^ 2 * b ^ 2 * y + -1 * (s * t * z * y ^ 2) + s * t * z * b + b ^ 2 * y * a₂ + x * z * b * a₄ = 0
+      [_] x ^ 2 * z * y ^ 2 + -1 * (s * t * y ^ 3) = 0
+      [_] t ^ 2 * z * y ^ 2 + -1 * (s * t * b * y * a₂) + -1 * (t ^ 2 * z * b) + -1 * (x * b ^ 2 * y) +
+              -1 * (z * b * a₄) =
+            0
+      [_] t * z ^ 2 * y ^ 2 + -1 * (t * b ^ 2 * y ^ 2) + -1 * (s * z * b * y * a₂) + -1 * (s * x * z ^ 2 * a₄) +
+              -1 * (t * z ^ 2 * b) =
+            0
+      [_] t ^ 2 * y ^ 3 + -1 * (x * z * y ^ 2) = 0
+      [_] x * z * b * y * a₂ + x ^ 2 * z ^ 2 * a₄ + -1 * (z ^ 2 * y ^ 2) + b ^ 2 * y ^ 2 + z ^ 2 * b = 0
+      [_] s * x ^ 2 * z + -1 * (t * b * y) = 0
+      [_] x ^ 3 * z + -1 * (b * y) = 0
+      [_] x ^ 2 * z * b + -1 * (s * t * b * y) = 0
+      [_] t ^ 2 * b * y + -1 * (x * z * b) = 0
+      [_] s ^ 2 + -1 * b = 0
+      [_] x * t + -1 * s = 0
+    [diseqs] Disequalities
+      [_] ¬x ^ 4 * t ^ 4 + -1 * b ^ 2 = 0
+  [limits] Thresholds reached
+    [limit] maximum number of ring steps has been reached, threshold: `(ringSteps := 100000)`
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SplitQuotients.lean:16:32: error: `grind` failed
+case grind
+K : Type
+inst : CommRing K
+x t y z s b a₂ a₄ : K
+hs : s ^ 2 = b
+ht : x * t = s
+hz : z * x ^ 3 = b * y
+hy : y ^ 2 = x ^ 6 + a₂ * x ^ 4 + a₄ * x ^ 2 + b
+h₂ : x ^ 2 * t ^ 2 = b
+h₄ : x ^ 4 * t ^ 4 = b ^ 2
+h : ¬x ^ 6 * t ^ 6 = b ^ 3
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] s ^ 2 = b
+    [prop] x * t = s
+    [prop] z * x ^ 3 = b * y
+    [prop] y ^ 2 = x ^ 6 + a₂ * x ^ 4 + a₄ * x ^ 2 + b
+    [prop] x ^ 2 * t ^ 2 = b
+    [prop] x ^ 4 * t ^ 4 = b ^ 2
+    [prop] ¬x ^ 6 * t ^ 6 = b ^ 3
+  [eqc] False propositions
+    [prop] x ^ 6 * t ^ 6 = b ^ 3
+  [eqc] Equivalence classes
+    [eqc] {s, x * t}
+    [eqc] {b, x ^ 2 * t ^ 2, s ^ 2}
+    [eqc] {x ^ 6 + a₂ * x ^ 4 + a₄ * x ^ 2 + b, y ^ 2}
+    [eqc] {z * x ^ 3, b * y}
+    [eqc] {x ^ 4 * t ^ 4, b ^ 2}
+  [ematch] E-matching patterns
+    [thm] Nat.pow_pos: [@HPow.hPow `[Nat] `[Nat] `[Nat] `[instHPow] #2 #1]
+    [thm] Nat.div_pow_of_pos: [@HPow.hPow `[Nat] `[Nat] `[Nat] `[instHPow] #2 #1]
+  [ring] Ring `K`
+    [basis] Basis
+      [_] ⋯ + ⋯ + 2 * ⋯ + -1 * (⋯ * y ^ 3) + -1 * (t * z ^ 6 * y ^ 5) + 3 * (t * z ^ 4 * b ^ 2 * y ^ 5) +
+                                                                                                      -3 *
+                                                                                                        (t * z ^ 2 *
+                                                                                                            b ^ 4 *
+                                                                                                          y ^ 5) +
+                                                                                                    t * b ^ 6 * y ^ 5 +
+                                                                                                  s ^ 2 * x * t *
+                                                                                                        z ^ 5 *
+                                                                                                      b ^ 2 *
+                                                                                                    a₂ +
+                                                                                                -1 *
+                                                                                                  (t ^ 3 * z ^ 4 *
+                                                                                                        b ^ 3 *
+                                                                                                      y *
+                                                                                                    a₂) +
+                                                                                              s * z ^ 5 * b * y ^ 4 *
+                                                                                                a₂ +
+                                                                                            -2 *
+                                                                                              (s * z ^ 3 * b ^ 3 *
+                                                                                                  y ^ 4 *
+                                                                                                a₂) +
+                                                                                          s * z * b ^ 5 * y ^ 4 * a₂ +
+                                                                                        s * t ^ 2 * z ^ 3 * b ^ 4 *
+                                                                                          a₂ ^ 2 +
+                                                                                      -1 *
+                                                                                        (s * x * z ^ 4 * b ^ 3 * y *
+                                                                                          a₂ ^ 2) +
+                                                                                    s * x * z ^ 2 * b ^ 5 * y * a₂ ^ 2 +
+                                                                                  t * z ^ 2 * b ^ 5 * y * a₂ ^ 3 +
+                                                                                -1 *
+                                                                                  (s * t ^ 2 * z ^ 5 * b * y ^ 2 * a₄) +
+                                                                              s * t ^ 2 * z ^ 3 * b ^ 3 * y ^ 2 * a₄ +
+                                                                            -3 * (s * x * z ^ 6 * y ^ 3 * a₄) +
+                                                                          5 * (s * x * z ^ 4 * b ^ 2 * y ^ 3 * a₄) +
+                                                                        -2 * (s * x * z ^ 2 * b ^ 4 * y ^ 3 * a₄) +
+                                                                      2 * (s * x ^ 2 * z ^ 5 * b ^ 2 * a₂ * a₄) +
+                                                                    2 * (s ^ 2 * t * z ^ 4 * b ^ 2 * y * a₂ * a₄) +
+                                                                  2 * (s ^ 2 * t * z ^ 2 * b ^ 4 * y * a₂ * a₄) +
+                                                                3 * (t * z ^ 4 * b ^ 2 * y ^ 3 * a₂ * a₄) +
+                                                              -4 * (t * z ^ 2 * b ^ 4 * y ^ 3 * a₂ * a₄) +
+                                                            -1 * (s * z ^ 3 * b ^ 3 * y ^ 2 * a₂ ^ 2 * a₄) +
+                                                          2 * (s * z * b ^ 5 * y ^ 2 * a₂ ^ 2 * a₄) +
+                                                        s ^ 2 * x * t * z ^ 5 * b * a₄ ^ 2 +
+                                                      -2 * (s ^ 2 * x * t * z ^ 3 * b ^ 3 * a₄ ^ 2) +
+                                                    t ^ 3 * z ^ 4 * b ^ 2 * y * a₄ ^ 2 +
+                                                  2 * (x * t * z ^ 3 * b ^ 3 * y ^ 2 * a₄ ^ 2) +
+                                                4 * (s * x * z ^ 4 * b ^ 2 * y * a₂ * a₄ ^ 2) +
+                                              2 * (s * x ^ 2 * z ^ 5 * b * a₄ ^ 3) +
+                                            -2 * (s * x ^ 2 * z ^ 3 * b ^ 3 * a₄ ^ 3) +
+                                          s ^ 2 * t * z ^ 6 * b * y +
+                                        -1 * (s ^ 2 * t * z ^ 4 * b ^ 3 * y) +
+                                      3 * (t * z ^ 6 * b * y ^ 3) +
+                                    -6 * (t * z ^ 4 * b ^ 3 * y ^ 3) +
+                                  3 * (t * z ^ 2 * b ^ 5 * y ^ 3) +
+                                -1 * (s * z ^ 5 * b ^ 2 * y ^ 2 * a₂) +
+                              s * z ^ 3 * b ^ 4 * y ^ 2 * a₂ +
+                            s * t ^ 2 * z ^ 5 * b ^ 2 * a₄ +
+                          3 * (s * x * z ^ 6 * b * y * a₄) +
+                        -2 * (s * x * z ^ 4 * b ^ 3 * y * a₄) +
+                      -2 * (t * z ^ 4 * b ^ 3 * y * a₂ * a₄) +
+                    2 * (x * t * z ^ 5 * b ^ 2 * a₄ ^ 2) +
+                  t * z ^ 4 * b ^ 2 * y * a₄ ^ 3 +
+                -2 * (t * z ^ 6 * b ^ 2 * y) +
+              2 * (t * z ^ 4 * b ^ 4 * y) =
+            0
+      [_] s * z ^ 2 * b ^ 4 * y * a₂ ^ 3 + s * x * z ^ 3 * b ^ 3 * a₂ ^ 2 * a₄ + -1 * (s * z ^ 6 * y ^ 3) +
+                                          3 * (s * z ^ 4 * b ^ 2 * y ^ 3) +
+                                        -3 * (s * z ^ 2 * b ^ 4 * y ^ 3) +
+                                      s * b ^ 6 * y ^ 3 +
+                                    s * x * z ^ 5 * b ^ 2 * a₂ +
+                                  -1 * (s * x * z ^ 3 * b ^ 4 * a₂) +
+                                t * z ^ 3 * b ^ 4 * a₂ ^ 2 +
+                              2 * (s * z ^ 4 * b ^ 2 * y * a₂ * a₄) +
+                            -2 * (s * z ^ 2 * b ^ 4 * y * a₂ * a₄) +
+                          s * x * z ^ 5 * b * a₄ ^ 2 +
+                        -1 * (s * x * z ^ 3 * b ^ 3 * a₄ ^ 2) +
+                      s * z ^ 6 * b * y +
+                    -2 * (s * z ^ 4 * b ^ 3 * y) +
+                  s * z ^ 2 * b ^ 5 * y +
+                t * z ^ 5 * b ^ 2 * a₄ +
+              -1 * (t * z ^ 3 * b ^ 4 * a₄) =
+            0
+      [_] z ^ 2 * b ^ 4 * y ^ 2 * a₂ ^ 3 + -1 * (z ^ 6 * y ^ 4) + 3 * (z ^ 4 * b ^ 2 * y ^ 4) +
+                                          -3 * (z ^ 2 * b ^ 4 * y ^ 4) +
+                                        b ^ 6 * y ^ 4 +
+                                      -1 * (t ^ 2 * z ^ 4 * b ^ 3 * a₂) +
+                                    -1 * (s * t * z ^ 5 * b * y * a₄) +
+                                  s * t * z ^ 3 * b ^ 3 * y * a₄ +
+                                3 * (z ^ 4 * b ^ 2 * y ^ 2 * a₂ * a₄) +
+                              -3 * (z ^ 2 * b ^ 4 * y ^ 2 * a₂ * a₄) +
+                            t ^ 2 * z ^ 4 * b ^ 2 * a₄ ^ 2 +
+                          3 * (z ^ 6 * b * y ^ 2) +
+                        -6 * (z ^ 4 * b ^ 3 * y ^ 2) +
+                      3 * (z ^ 2 * b ^ 5 * y ^ 2) +
+                    -2 * (z ^ 4 * b ^ 3 * a₂ * a₄) +
+                  z ^ 4 * b ^ 2 * a₄ ^ 3 +
+                -2 * (z ^ 6 * b ^ 2) +
+              2 * (z ^ 4 * b ^ 4) =
+            0
+      [_] s * t * z ^ 3 * b ^ 3 * a₂ ^ 2 + z ^ 2 * b ^ 4 * y * a₂ ^ 3 + x ^ 2 * z ^ 6 * y * a₄ +
+                                          -1 * (s * t * z * b ^ 4 * y ^ 2 * a₄) +
+                                        x * z ^ 3 * b ^ 3 * a₂ ^ 2 * a₄ +
+                                      -1 * (z ^ 6 * y ^ 3) +
+                                    3 * (z ^ 4 * b ^ 2 * y ^ 3) +
+                                  -3 * (z ^ 2 * b ^ 4 * y ^ 3) +
+                                b ^ 6 * y ^ 3 +
+                              x * z ^ 5 * b ^ 2 * a₂ +
+                            -1 * (x * z ^ 3 * b ^ 4 * a₂) +
+                          -2 * (s * t * z ^ 3 * b ^ 3 * a₄) +
+                        z ^ 4 * b ^ 2 * y * a₂ * a₄ +
+                      -3 * (z ^ 2 * b ^ 4 * y * a₂ * a₄) +
+                    -2 * (x * z ^ 3 * b ^ 3 * a₄ ^ 2) +
+                  z ^ 6 * b * y +
+                -2 * (z ^ 4 * b ^ 3 * y) +
+              z ^ 2 * b ^ 5 * y =
+            0
+      [_] t * b ^ 5 * y ^ 2 * a₂ ^ 2 + s * z * b ^ 4 * y * a₂ ^ 3 + s * x * z ^ 2 * b ^ 3 * a₂ ^ 2 * a₄ +
+                                -1 * (s * z ^ 5 * y ^ 3) +
+                              2 * (s * z ^ 3 * b ^ 2 * y ^ 3) +
+                            -1 * (s * z * b ^ 4 * y ^ 3) +
+                          s * x * z ^ 4 * b ^ 2 * a₂ +
+                        t * z ^ 2 * b ^ 4 * a₂ ^ 2 +
+                      2 * (s * z ^ 3 * b ^ 2 * y * a₂ * a₄) +
+                    s * x * z ^ 4 * b * a₄ ^ 2 +
+                  s * z ^ 5 * b * y +
+                -1 * (s * z ^ 3 * b ^ 3 * y) +
+              t * z ^ 4 * b ^ 2 * a₄ =
+            0
+      [_] x * b ^ 5 * y ^ 2 * a₂ + -1 * (s * t * z ^ 2 * b ^ 3 * a₂ ^ 2) + -1 * (z * b ^ 4 * y * a₂ ^ 3) +
+                                        -1 * (x ^ 2 * z ^ 5 * y * a₄) +
+                                      2 * (s * t * b ^ 4 * y ^ 2 * a₄) +
+                                    -1 * (x * z ^ 2 * b ^ 3 * a₂ ^ 2 * a₄) +
+                                  z ^ 5 * y ^ 3 +
+                                -3 * (z ^ 3 * b ^ 2 * y ^ 3) +
+                              2 * (z * b ^ 4 * y ^ 3) +
+                            -1 * (x * z ^ 4 * b ^ 2 * a₂) +
+                          x * z ^ 2 * b ^ 4 * a₂ +
+                        2 * (s * t * z ^ 2 * b ^ 3 * a₄) +
+                      -1 * (z ^ 3 * b ^ 2 * y * a₂ * a₄) +
+                    3 * (z * b ^ 4 * y * a₂ * a₄) +
+                  2 * (x * z ^ 2 * b ^ 3 * a₄ ^ 2) +
+                -1 * (z ^ 5 * b * y) +
+              2 * (z ^ 3 * b ^ 3 * y) =
+            0
+      [_] t * z * b ^ 3 * y ^ 2 * a₂ ^ 2 + -1 * (s * z ^ 4 * y ^ 3) + 2 * (s * z ^ 2 * b ^ 2 * y ^ 3) +
+                          -1 * (s * b ^ 4 * y ^ 3) +
+                        s * x * z ^ 3 * b ^ 2 * a₂ +
+                      2 * (s * z ^ 2 * b ^ 2 * y * a₂ * a₄) +
+                    s * x * z ^ 3 * b * a₄ ^ 2 +
+                  s * z ^ 4 * b * y +
+                -1 * (s * z ^ 2 * b ^ 3 * y) +
+              t * z ^ 3 * b ^ 2 * a₄ =
+            0
+      [_] s * x * b ^ 3 * y ^ 2 * a₂ + t * b ^ 3 * y ^ 2 * a₂ ^ 2 + -1 * (s * z ^ 3 * y ^ 3) + s * z * b ^ 2 * y ^ 3 +
+                        s * x * z ^ 2 * b ^ 2 * a₂ +
+                      t * b ^ 3 * y ^ 2 * a₄ +
+                    2 * (s * z * b ^ 2 * y * a₂ * a₄) +
+                  s * x * z ^ 2 * b * a₄ ^ 2 +
+                s * z ^ 3 * b * y +
+              t * z ^ 2 * b ^ 2 * a₄ =
+            0
+      [_] x * z ^ 4 * y ^ 2 + -2 * (x * z ^ 2 * b ^ 2 * y ^ 2) + x * b ^ 4 * y ^ 2 + -1 * (s * t * z ^ 2 * b ^ 2 * a₂) +
+                        -1 * (z * b ^ 3 * y * a₂ ^ 2) +
+                      -1 * (x * z ^ 2 * b ^ 2 * a₂ * a₄) +
+                    -1 * (x * z ^ 4 * b) +
+                  x * z ^ 2 * b ^ 3 +
+                -1 * (z ^ 3 * b * y * a₄) +
+              z * b ^ 3 * y * a₄ =
+            0
+      [_] s * x ^ 5 + s * x ^ 3 * a₂ + -1 * (t * y ^ 2) + s * x * a₄ + t * b = 0
+      [_] x ^ 6 + x ^ 4 * a₂ + x ^ 2 * a₄ + -1 * y ^ 2 + b = 0
+      [_] s * t ^ 3 * b ^ 2 + x ^ 3 * b ^ 3 + x * b ^ 3 * a₂ + s * t * b ^ 2 * a₄ + -1 * (z * b ^ 2 * y) = 0
+      [_] t ^ 4 * b ^ 2 + x ^ 2 * b ^ 3 + -1 * (s * t * z * b * y) + t ^ 2 * b ^ 2 * a₄ + b ^ 3 * a₂ = 0
+      [_] s * t ^ 2 * z * b ^ 2 + -1 * (s * x * z ^ 2 * b * y) + s * x * b ^ 3 * y + t * b ^ 3 * y * a₂ +
+              s * z * b ^ 2 * a₄ =
+            0
+      [_] t ^ 3 * z * b ^ 2 + s * x * z * b ^ 2 * a₂ + -1 * (s * z ^ 2 * b * y) + s * b ^ 3 * y + t * z * b ^ 2 * a₄ = 0
+      [_] s * t ^ 3 * y ^ 2 + -1 * (s * t ^ 3 * b) + -1 * (x ^ 3 * b ^ 2) + -1 * (x * b ^ 2 * a₂) +
+              -1 * (s * t * b * a₄) =
+            0
+      [_] t ^ 4 * y ^ 2 + -1 * (t ^ 4 * b) + -1 * (x ^ 2 * b ^ 2) + -1 * (t ^ 2 * b * a₄) + -1 * (b ^ 2 * a₂) = 0
+      [_] s * x * z ^ 2 * y ^ 2 + -1 * (s * x * b ^ 2 * y ^ 2) + -1 * (t * b ^ 2 * y ^ 2 * a₂) +
+                -1 * (s * x * z ^ 2 * b) +
+              -1 * (s * z * b * y * a₄) =
+            0
+      [_] s * t * b ^ 2 * y * a₂ + t ^ 2 * z * b ^ 2 + -1 * (x * z ^ 2 * b * y) + x * b ^ 3 * y + z * b ^ 2 * a₄ = 0
+      [_] s * t * b * y ^ 2 * a₂ + -1 * (x * z ^ 2 * y ^ 2) + x * b ^ 2 * y ^ 2 + x * z ^ 2 * b + z * b * y * a₄ = 0
+      [_] s * x ^ 3 * b + -1 * (t ^ 3 * y ^ 2) + t ^ 3 * b + s * x * b * a₂ + t * b * a₄ = 0
+      [_] x ^ 4 * b + -1 * (t ^ 2 * y ^ 2) + x ^ 2 * b * a₂ + t ^ 2 * b + b * a₄ = 0
+      [_] s * x ^ 2 * b * y + -1 * (t * z * y ^ 2) + s * b * y * a₂ + s * x * z * a₄ + t * z * b = 0
+      [_] x ^ 3 * b * y + x * b * y * a₂ + x ^ 2 * z * a₄ + -1 * (z * y ^ 2) + z * b = 0
+      [_] x ^ 2 * b ^ 2 * y + -1 * (s * t * z * y ^ 2) + s * t * z * b + b ^ 2 * y * a₂ + x * z * b * a₄ = 0
+      [_] x ^ 2 * z * y ^ 2 + -1 * (s * t * y ^ 3) = 0
+      [_] t ^ 2 * z * y ^ 2 + -1 * (s * t * b * y * a₂) + -1 * (t ^ 2 * z * b) + -1 * (x * b ^ 2 * y) +
+              -1 * (z * b * a₄) =
+            0
+      [_] t * z ^ 2 * y ^ 2 + -1 * (t * b ^ 2 * y ^ 2) + -1 * (s * z * b * y * a₂) + -1 * (s * x * z ^ 2 * a₄) +
+              -1 * (t * z ^ 2 * b) =
+            0
+      [_] t ^ 2 * y ^ 3 + -1 * (x * z * y ^ 2) = 0
+      [_] x * z * b * y * a₂ + x ^ 2 * z ^ 2 * a₄ + -1 * (z ^ 2 * y ^ 2) + b ^ 2 * y ^ 2 + z ^ 2 * b = 0
+      [_] s * x ^ 2 * z + -1 * (t * b * y) = 0
+      [_] x ^ 3 * z + -1 * (b * y) = 0
+      [_] x ^ 2 * z * b + -1 * (s * t * b * y) = 0
+      [_] t ^ 2 * b * y + -1 * (x * z * b) = 0
+      [_] s ^ 2 + -1 * b = 0
+      [_] x * t + -1 * s = 0
+    [diseqs] Disequalities
+      [_] ¬x ^ 6 * t ^ 6 + -1 * b ^ 3 = 0
+  [limits] Thresholds reached
+    [limit] maximum number of ring steps has been reached, threshold: `(ringSteps := 100000)`
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SplitQuotients.lean:17:37: error: `grind` failed
+case grind
+K : Type
+inst : CommRing K
+x t y z s b a₂ a₄ : K
+hs : s ^ 2 = b
+ht : x * t = s
+hz : z * x ^ 3 = b * y
+hy : y ^ 2 = x ^ 6 + a₂ * x ^ 4 + a₄ * x ^ 2 + b
+h₂ : x ^ 2 * t ^ 2 = b
+h₄ : x ^ 4 * t ^ 4 = b ^ 2
+h₆ : x ^ 6 * t ^ 6 = b ^ 3
+h : ¬z ^ 2 * x ^ 6 = b ^ 2 * y ^ 2
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] s ^ 2 = b
+    [prop] x * t = s
+    [prop] z * x ^ 3 = b * y
+    [prop] y ^ 2 = x ^ 6 + a₂ * x ^ 4 + a₄ * x ^ 2 + b
+    [prop] x ^ 2 * t ^ 2 = b
+    [prop] x ^ 4 * t ^ 4 = b ^ 2
+    [prop] x ^ 6 * t ^ 6 = b ^ 3
+    [prop] ¬z ^ 2 * x ^ 6 = b ^ 2 * y ^ 2
+  [eqc] False propositions
+    [prop] z ^ 2 * x ^ 6 = b ^ 2 * y ^ 2
+  [eqc] Equivalence classes
+    [eqc] {s, x * t}
+    [eqc] {b, x ^ 2 * t ^ 2, s ^ 2}
+    [eqc] {x ^ 6 + a₂ * x ^ 4 + a₄ * x ^ 2 + b, y ^ 2}
+    [eqc] {z * x ^ 3, b * y}
+    [eqc] {x ^ 4 * t ^ 4, b ^ 2}
+    [eqc] {x ^ 6 * t ^ 6, b ^ 3}
+  [ematch] E-matching patterns
+    [thm] Nat.pow_pos: [@HPow.hPow `[Nat] `[Nat] `[Nat] `[instHPow] #2 #1]
+    [thm] Nat.div_pow_of_pos: [@HPow.hPow `[Nat] `[Nat] `[Nat] `[instHPow] #2 #1]
+  [ring] Ring `K`
+    [basis] Basis
+      [_] ⋯ + ⋯ + -1 * ⋯ + -1 * (s ^ 2 * t * z ^ 6 * y ^ 3) + 2 * (s ^ 2 * t * z ^ 4 * b ^ 2 * y ^ 3) +
+                                                                                                        -1 *
+                                                                                                          (s ^ 2 * t *
+                                                                                                                z ^ 2 *
+                                                                                                              b ^ 4 *
+                                                                                                            y ^ 3) +
+                                                                                                      -1 *
+                                                                                                        (t * z ^ 6 *
+                                                                                                          y ^ 5) +
+                                                                                                    3 *
+                                                                                                      (t * z ^ 4 *
+                                                                                                          b ^ 2 *
+                                                                                                        y ^ 5) +
+                                                                                                  -3 *
+                                                                                                    (t * z ^ 2 * b ^ 4 *
+                                                                                                      y ^ 5) +
+                                                                                                t * b ^ 6 * y ^ 5 +
+                                                                                              s ^ 2 * x * t * z ^ 5 *
+                                                                                                  b ^ 2 *
+                                                                                                a₂ +
+                                                                                            -1 *
+                                                                                              (t ^ 3 * z ^ 4 * b ^ 3 *
+                                                                                                  y *
+                                                                                                a₂) +
+                                                                                          s * z ^ 5 * b * y ^ 4 * a₂ +
+                                                                                        -2 *
+                                                                                          (s * z ^ 3 * b ^ 3 * y ^ 4 *
+                                                                                            a₂) +
+                                                                                      s * z * b ^ 5 * y ^ 4 * a₂ +
+                                                                                    s * t ^ 2 * z ^ 3 * b ^ 4 * a₂ ^ 2 +
+                                                                                  -1 *
+                                                                                    (s * x * z ^ 4 * b ^ 3 * y *
+                                                                                      a₂ ^ 2) +
+                                                                                s * x * z ^ 2 * b ^ 5 * y * a₂ ^ 2 +
+                                                                              t * z ^ 2 * b ^ 5 * y * a₂ ^ 3 +
+                                                                            -1 * (s * t ^ 2 * z ^ 5 * b * y ^ 2 * a₄) +
+                                                                          s * t ^ 2 * z ^ 3 * b ^ 3 * y ^ 2 * a₄ +
+                                                                        -2 * (s * x * z ^ 6 * y ^ 3 * a₄) +
+                                                                      2 * (s * x * z ^ 4 * b ^ 2 * y ^ 3 * a₄) +
+                                                                    s * x ^ 2 * z ^ 5 * b ^ 2 * a₂ * a₄ +
+                                                                  s * x ^ 2 * z ^ 3 * b ^ 4 * a₂ * a₄ +
+                                                                2 * (s ^ 2 * t * z ^ 4 * b ^ 2 * y * a₂ * a₄) +
+                                                              2 * (s ^ 2 * t * z ^ 2 * b ^ 4 * y * a₂ * a₄) +
+                                                            3 * (t * z ^ 4 * b ^ 2 * y ^ 3 * a₂ * a₄) +
+                                                          -4 * (t * z ^ 2 * b ^ 4 * y ^ 3 * a₂ * a₄) +
+                                                        -1 * (s * z ^ 3 * b ^ 3 * y ^ 2 * a₂ ^ 2 * a₄) +
+                                                      2 * (s * z * b ^ 5 * y ^ 2 * a₂ ^ 2 * a₄) +
+                                                    s ^ 2 * x * t * z ^ 5 * b * a₄ ^ 2 +
+                                                  t ^ 3 * z ^ 4 * b ^ 2 * y * a₄ ^ 2 +
+                                                2 * (x * t * z ^ 3 * b ^ 3 * y ^ 2 * a₄ ^ 2) +
+                                              3 * (s * x * z ^ 4 * b ^ 2 * y * a₂ * a₄ ^ 2) +
+                                            3 * (s * x * z ^ 2 * b ^ 4 * y * a₂ * a₄ ^ 2) +
+                                          2 * (s * x ^ 2 * z ^ 5 * b * a₄ ^ 3) +
+                                        s ^ 2 * t * z ^ 6 * b * y +
+                                      -1 * (s ^ 2 * t * z ^ 4 * b ^ 3 * y) +
+                                    3 * (t * z ^ 6 * b * y ^ 3) +
+                                  -6 * (t * z ^ 4 * b ^ 3 * y ^ 3) +
+                                3 * (t * z ^ 2 * b ^ 5 * y ^ 3) +
+                              -1 * (s * z ^ 5 * b ^ 2 * y ^ 2 * a₂) +
+                            s * z ^ 3 * b ^ 4 * y ^ 2 * a₂ +
+                          s * t ^ 2 * z ^ 5 * b ^ 2 * a₄ +
+                        2 * (s * x * z ^ 6 * b * y * a₄) +
+                      -2 * (t * z ^ 4 * b ^ 3 * y * a₂ * a₄) +
+                    2 * (x * t * z ^ 5 * b ^ 2 * a₄ ^ 2) +
+                  t * z ^ 4 * b ^ 2 * y * a₄ ^ 3 +
+                -2 * (t * z ^ 6 * b ^ 2 * y) +
+              2 * (t * z ^ 4 * b ^ 4 * y) =
+            0
+      [_] s * z ^ 2 * b ^ 4 * y * a₂ ^ 3 + s * x * z ^ 3 * b ^ 3 * a₂ ^ 2 * a₄ + -1 * (s * z ^ 6 * y ^ 3) +
+                                          3 * (s * z ^ 4 * b ^ 2 * y ^ 3) +
+                                        -3 * (s * z ^ 2 * b ^ 4 * y ^ 3) +
+                                      s * b ^ 6 * y ^ 3 +
+                                    s * x * z ^ 5 * b ^ 2 * a₂ +
+                                  -1 * (s * x * z ^ 3 * b ^ 4 * a₂) +
+                                t * z ^ 3 * b ^ 4 * a₂ ^ 2 +
+                              2 * (s * z ^ 4 * b ^ 2 * y * a₂ * a₄) +
+                            -2 * (s * z ^ 2 * b ^ 4 * y * a₂ * a₄) +
+                          s * x * z ^ 5 * b * a₄ ^ 2 +
+                        -1 * (s * x * z ^ 3 * b ^ 3 * a₄ ^ 2) +
+                      s * z ^ 6 * b * y +
+                    -2 * (s * z ^ 4 * b ^ 3 * y) +
+                  s * z ^ 2 * b ^ 5 * y +
+                t * z ^ 5 * b ^ 2 * a₄ +
+              -1 * (t * z ^ 3 * b ^ 4 * a₄) =
+            0
+      [_] z ^ 2 * b ^ 4 * y ^ 2 * a₂ ^ 3 + -1 * (z ^ 6 * y ^ 4) + 3 * (z ^ 4 * b ^ 2 * y ^ 4) +
+                                          -3 * (z ^ 2 * b ^ 4 * y ^ 4) +
+                                        b ^ 6 * y ^ 4 +
+                                      -1 * (t ^ 2 * z ^ 4 * b ^ 3 * a₂) +
+                                    -1 * (s * t * z ^ 5 * b * y * a₄) +
+                                  s * t * z ^ 3 * b ^ 3 * y * a₄ +
+                                3 * (z ^ 4 * b ^ 2 * y ^ 2 * a₂ * a₄) +
+                              -3 * (z ^ 2 * b ^ 4 * y ^ 2 * a₂ * a₄) +
+                            t ^ 2 * z ^ 4 * b ^ 2 * a₄ ^ 2 +
+                          3 * (z ^ 6 * b * y ^ 2) +
+                        -6 * (z ^ 4 * b ^ 3 * y ^ 2) +
+                      3 * (z ^ 2 * b ^ 5 * y ^ 2) +
+                    -2 * (z ^ 4 * b ^ 3 * a₂ * a₄) +
+                  z ^ 4 * b ^ 2 * a₄ ^ 3 +
+                -2 * (z ^ 6 * b ^ 2) +
+              2 * (z ^ 4 * b ^ 4) =
+            0
+      [_] s * t * z ^ 3 * b ^ 3 * a₂ ^ 2 + z ^ 2 * b ^ 4 * y * a₂ ^ 3 + x ^ 2 * z ^ 6 * y * a₄ +
+                                          -1 * (s * t * z * b ^ 4 * y ^ 2 * a₄) +
+                                        x * z ^ 3 * b ^ 3 * a₂ ^ 2 * a₄ +
+                                      -1 * (z ^ 6 * y ^ 3) +
+                                    3 * (z ^ 4 * b ^ 2 * y ^ 3) +
+                                  -3 * (z ^ 2 * b ^ 4 * y ^ 3) +
+                                b ^ 6 * y ^ 3 +
+                              x * z ^ 5 * b ^ 2 * a₂ +
+                            -1 * (x * z ^ 3 * b ^ 4 * a₂) +
+                          -2 * (s * t * z ^ 3 * b ^ 3 * a₄) +
+                        z ^ 4 * b ^ 2 * y * a₂ * a₄ +
+                      -3 * (z ^ 2 * b ^ 4 * y * a₂ * a₄) +
+                    -2 * (x * z ^ 3 * b ^ 3 * a₄ ^ 2) +
+                  z ^ 6 * b * y +
+                -2 * (z ^ 4 * b ^ 3 * y) +
+              z ^ 2 * b ^ 5 * y =
+            0
+      [_] t * b ^ 5 * y ^ 2 * a₂ ^ 2 + s * z * b ^ 4 * y * a₂ ^ 3 + s * x * z ^ 2 * b ^ 3 * a₂ ^ 2 * a₄ +
+                                -1 * (s * z ^ 5 * y ^ 3) +
+                              2 * (s * z ^ 3 * b ^ 2 * y ^ 3) +
+                            -1 * (s * z * b ^ 4 * y ^ 3) +
+                          s * x * z ^ 4 * b ^ 2 * a₂ +
+                        t * z ^ 2 * b ^ 4 * a₂ ^ 2 +
+                      2 * (s * z ^ 3 * b ^ 2 * y * a₂ * a₄) +
+                    s * x * z ^ 4 * b * a₄ ^ 2 +
+                  s * z ^ 5 * b * y +
+                -1 * (s * z ^ 3 * b ^ 3 * y) +
+              t * z ^ 4 * b ^ 2 * a₄ =
+            0
+      [_] x * b ^ 5 * y ^ 2 * a₂ + -1 * (s * t * z ^ 2 * b ^ 3 * a₂ ^ 2) + -1 * (z * b ^ 4 * y * a₂ ^ 3) +
+                                        -1 * (x ^ 2 * z ^ 5 * y * a₄) +
+                                      2 * (s * t * b ^ 4 * y ^ 2 * a₄) +
+                                    -1 * (x * z ^ 2 * b ^ 3 * a₂ ^ 2 * a₄) +
+                                  z ^ 5 * y ^ 3 +
+                                -3 * (z ^ 3 * b ^ 2 * y ^ 3) +
+                              2 * (z * b ^ 4 * y ^ 3) +
+                            -1 * (x * z ^ 4 * b ^ 2 * a₂) +
+                          x * z ^ 2 * b ^ 4 * a₂ +
+                        2 * (s * t * z ^ 2 * b ^ 3 * a₄) +
+                      -1 * (z ^ 3 * b ^ 2 * y * a₂ * a₄) +
+                    3 * (z * b ^ 4 * y * a₂ * a₄) +
+                  2 * (x * z ^ 2 * b ^ 3 * a₄ ^ 2) +
+                -1 * (z ^ 5 * b * y) +
+              2 * (z ^ 3 * b ^ 3 * y) =
+            0
+      [_] t * z * b ^ 3 * y ^ 2 * a₂ ^ 2 + -1 * (s * z ^ 4 * y ^ 3) + 2 * (s * z ^ 2 * b ^ 2 * y ^ 3) +
+                          -1 * (s * b ^ 4 * y ^ 3) +
+                        s * x * z ^ 3 * b ^ 2 * a₂ +
+                      2 * (s * z ^ 2 * b ^ 2 * y * a₂ * a₄) +
+                    s * x * z ^ 3 * b * a₄ ^ 2 +
+                  s * z ^ 4 * b * y +
+                -1 * (s * z ^ 2 * b ^ 3 * y) +
+              t * z ^ 3 * b ^ 2 * a₄ =
+            0
+      [_] s * x * b ^ 3 * y ^ 2 * a₂ + t * b ^ 3 * y ^ 2 * a₂ ^ 2 + -1 * (s * z ^ 3 * y ^ 3) + s * z * b ^ 2 * y ^ 3 +
+                        s * x * z ^ 2 * b ^ 2 * a₂ +
+                      t * b ^ 3 * y ^ 2 * a₄ +
+                    2 * (s * z * b ^ 2 * y * a₂ * a₄) +
+                  s * x * z ^ 2 * b * a₄ ^ 2 +
+                s * z ^ 3 * b * y +
+              t * z ^ 2 * b ^ 2 * a₄ =
+            0
+      [_] x * z ^ 4 * y ^ 2 + -2 * (x * z ^ 2 * b ^ 2 * y ^ 2) + x * b ^ 4 * y ^ 2 + -1 * (s * t * z ^ 2 * b ^ 2 * a₂) +
+                        -1 * (z * b ^ 3 * y * a₂ ^ 2) +
+                      -1 * (x * z ^ 2 * b ^ 2 * a₂ * a₄) +
+                    -1 * (x * z ^ 4 * b) +
+                  x * z ^ 2 * b ^ 3 +
+                -1 * (z ^ 3 * b * y * a₄) +
+              z * b ^ 3 * y * a₄ =
+            0
+      [_] s * x ^ 5 + s * x ^ 3 * a₂ + -1 * (t * y ^ 2) + s * x * a₄ + t * b = 0
+      [_] x ^ 6 + x ^ 4 * a₂ + x ^ 2 * a₄ + -1 * y ^ 2 + b = 0
+      [_] s * t ^ 3 * b ^ 2 + x ^ 3 * b ^ 3 + x * b ^ 3 * a₂ + s * t * b ^ 2 * a₄ + -1 * (z * b ^ 2 * y) = 0
+      [_] t ^ 4 * b ^ 2 + x ^ 2 * b ^ 3 + -1 * (s * t * z * b * y) + t ^ 2 * b ^ 2 * a₄ + b ^ 3 * a₂ = 0
+      [_] s * t ^ 2 * z * b ^ 2 + -1 * (s * x * z ^ 2 * b * y) + s * x * b ^ 3 * y + t * b ^ 3 * y * a₂ +
+              s * z * b ^ 2 * a₄ =
+            0
+      [_] t ^ 3 * z * b ^ 2 + s * x * z * b ^ 2 * a₂ + -1 * (s * z ^ 2 * b * y) + s * b ^ 3 * y + t * z * b ^ 2 * a₄ = 0
+      [_] s * t ^ 3 * y ^ 2 + -1 * (s * t ^ 3 * b) + -1 * (x ^ 3 * b ^ 2) + -1 * (x * b ^ 2 * a₂) +
+              -1 * (s * t * b * a₄) =
+            0
+      [_] t ^ 4 * y ^ 2 + -1 * (t ^ 4 * b) + -1 * (x ^ 2 * b ^ 2) + -1 * (t ^ 2 * b * a₄) + -1 * (b ^ 2 * a₂) = 0
+      [_] s * x * z ^ 2 * y ^ 2 + -1 * (s * x * b ^ 2 * y ^ 2) + -1 * (t * b ^ 2 * y ^ 2 * a₂) +
+                -1 * (s * x * z ^ 2 * b) +
+              -1 * (s * z * b * y * a₄) =
+            0
+      [_] s * t * b ^ 2 * y * a₂ + t ^ 2 * z * b ^ 2 + -1 * (x * z ^ 2 * b * y) + x * b ^ 3 * y + z * b ^ 2 * a₄ = 0
+      [_] s * t * b * y ^ 2 * a₂ + -1 * (x * z ^ 2 * y ^ 2) + x * b ^ 2 * y ^ 2 + x * z ^ 2 * b + z * b * y * a₄ = 0
+      [_] s * x ^ 3 * b + -1 * (t ^ 3 * y ^ 2) + t ^ 3 * b + s * x * b * a₂ + t * b * a₄ = 0
+      [_] x ^ 4 * b + -1 * (t ^ 2 * y ^ 2) + x ^ 2 * b * a₂ + t ^ 2 * b + b * a₄ = 0
+      [_] s * x ^ 2 * b * y + -1 * (t * z * y ^ 2) + s * b * y * a₂ + s * x * z * a₄ + t * z * b = 0
+      [_] x ^ 3 * b * y + x * b * y * a₂ + x ^ 2 * z * a₄ + -1 * (z * y ^ 2) + z * b = 0
+      [_] x ^ 2 * b ^ 2 * y + -1 * (s * t * z * y ^ 2) + s * t * z * b + b ^ 2 * y * a₂ + x * z * b * a₄ = 0
+      [_] x ^ 2 * z * y ^ 2 + -1 * (s * t * y ^ 3) = 0
+      [_] t ^ 2 * z * y ^ 2 + -1 * (s * t * b * y * a₂) + -1 * (t ^ 2 * z * b) + -1 * (x * b ^ 2 * y) +
+              -1 * (z * b * a₄) =
+            0
+      [_] t * z ^ 2 * y ^ 2 + -1 * (t * b ^ 2 * y ^ 2) + -1 * (s * z * b * y * a₂) + -1 * (s * x * z ^ 2 * a₄) +
+              -1 * (t * z ^ 2 * b) =
+            0
+      [_] t ^ 2 * y ^ 3 + -1 * (x * z * y ^ 2) = 0
+      [_] x * z * b * y * a₂ + x ^ 2 * z ^ 2 * a₄ + -1 * (z ^ 2 * y ^ 2) + b ^ 2 * y ^ 2 + z ^ 2 * b = 0
+      [_] s * x ^ 2 * z + -1 * (t * b * y) = 0
+      [_] x ^ 3 * z + -1 * (b * y) = 0
+      [_] x ^ 2 * z * b + -1 * (s * t * b * y) = 0
+      [_] t ^ 2 * b * y + -1 * (x * z * b) = 0
+      [_] s ^ 2 + -1 * b = 0
+      [_] x * t + -1 * s = 0
+    [diseqs] Disequalities
+      [_] ¬x ^ 6 * z ^ 2 + -1 * (b ^ 2 * y ^ 2) = 0
+  [limits] Thresholds reached
+    [limit] maximum number of ring steps has been reached, threshold: `(ringSteps := 100000)`
+/workspace/crypto/research/chained_jacobian_transfers_20261110/lean/SplitQuotients.lean:18:2: error: `grind` failed
+case grind
+K : Type
+inst : CommRing K
+x t y z s b a₂ a₄ : K
+hs : s ^ 2 = b
+ht : x * t = s
+hz : z * x ^ 3 = b * y
+hy : y ^ 2 = x ^ 6 + a₂ * x ^ 4 + a₄ * x ^ 2 + b
+h₂ : x ^ 2 * t ^ 2 = b
+h₄ : x ^ 4 * t ^ 4 = b ^ 2
+h₆ : x ^ 6 * t ^ 6 = b ^ 3
+hzx : z ^ 2 * x ^ 6 = b ^ 2 * y ^ 2
+h : ¬x ^ 6 * (z ^ 2 - (t ^ 6 + a₄ * t ^ 4 + a₂ * b * t ^ 2 + b ^ 2)) = 0
+⊢ False
+[grind] Goal diagnostics
+  [facts] Asserted facts
+    [prop] s ^ 2 = b
+    [prop] x * t = s
+    [prop] z * x ^ 3 = b * y
+    [prop] y ^ 2 = x ^ 6 + a₂ * x ^ 4 + a₄ * x ^ 2 + b
+    [prop] x ^ 2 * t ^ 2 = b
+    [prop] x ^ 4 * t ^ 4 = b ^ 2
+    [prop] x ^ 6 * t ^ 6 = b ^ 3
+    [prop] z ^ 2 * x ^ 6 = b ^ 2 * y ^ 2
+    [prop] ¬x ^ 6 * (z ^ 2 - (t ^ 6 + a₄ * t ^ 4 + a₂ * b * t ^ 2 + b ^ 2)) = 0
+  [eqc] False propositions
+    [prop] x ^ 6 * (z ^ 2 - (t ^ 6 + a₄ * t ^ 4 + a₂ * b * t ^ 2 + b ^ 2)) = 0
+  [eqc] Equivalence classes
+    [eqc] {s, x * t}
+    [eqc] {b, x ^ 2 * t ^ 2, s ^ 2}
+    [eqc] {x ^ 6 + a₂ * x ^ 4 + a₄ * x ^ 2 + b, y ^ 2}
+    [eqc] {z * x ^ 3, b * y}
+    [eqc] {x ^ 4 * t ^ 4, b ^ 2}
+    [eqc] {x ^ 6 * t ^ 6, b ^ 3}
+    [eqc] {z ^ 2 * x ^ 6, b ^ 2 * y ^ 2}
+  [ematch] E-matching patterns
+    [thm] Nat.pow_pos: [@HPow.hPow `[Nat] `[Nat] `[Nat] `[instHPow] #2 #1]
+    [thm] Nat.div_pow_of_pos: [@HPow.hPow `[Nat] `[Nat] `[Nat] `[instHPow] #2 #1]
+  [ring] Ring `K`
+    [basis] Basis
+      [_] ⋯ + ⋯ + -1 * ⋯ + -1 * (s ^ 2 * t * z ^ 6 * y ^ 3) + 2 * (s ^ 2 * t * z ^ 4 * b ^ 2 * y ^ 3) +
+                                                                                                        -1 *
+                                                                                                          (s ^ 2 * t *
+                                                                                                                z ^ 2 *
+                                                                                                              b ^ 4 *
+                                                                                                            y ^ 3) +
+                                                                                                      -1 *
+                                                                                                        (t * z ^ 6 *
+                                                                                                          y ^ 5) +
+                                                                                                    3 *
+                                                                                                      (t * z ^ 4 *
+                                                                                                          b ^ 2 *
+                                                                                                        y ^ 5) +
+                                                                                                  -3 *
+                                                                                                    (t * z ^ 2 * b ^ 4 *
+                                                                                                      y ^ 5) +
+                                                                                                t * b ^ 6 * y ^ 5 +
+                                                                                              s ^ 2 * x * t * z ^ 5 *
+                                                                                                  b ^ 2 *
+                                                                                                a₂ +
+                                                                                            -1 *
+                                                                                              (t ^ 3 * z ^ 4 * b ^ 3 *
+                                                                                                  y *
+                                                                                                a₂) +
+                                                                                          s * z ^ 5 * b * y ^ 4 * a₂ +
+                                                                                        -2 *
+                                                                                          (s * z ^ 3 * b ^ 3 * y ^ 4 *
+                                                                                            a₂) +
+                                                                                      s * z * b ^ 5 * y ^ 4 * a₂ +
+                                                                                    s * t ^ 2 * z ^ 3 * b ^ 4 * a₂ ^ 2 +
+                                                                                  -1 *
+                                                                                    (s * x * z ^ 4 * b ^ 3 * y *
+                                                                                      a₂ ^ 2) +
+                                                                                s * x * z ^ 2 * b ^ 5 * y * a₂ ^ 2 +
+                                                                              t * z ^ 2 * b ^ 5 * y * a₂ ^ 3 +
+                                                                            -1 * (s * t ^ 2 * z ^ 5 * b * y ^ 2 * a₄) +
+                                                                          s * t ^ 2 * z ^ 3 * b ^ 3 * y ^ 2 * a₄ +
+                                                                        -2 * (s * x * z ^ 6 * y ^ 3 * a₄) +
+                                                                      2 * (s * x * z ^ 4 * b ^ 2 * y ^ 3 * a₄) +
+                                                                    s * x ^ 2 * z ^ 5 * b ^ 2 * a₂ * a₄ +
+                                                                  s * x ^ 2 * z ^ 3 * b ^ 4 * a₂ * a₄ +
+                                                                2 * (s ^ 2 * t * z ^ 4 * b ^ 2 * y * a₂ * a₄) +
+                                                              2 * (s ^ 2 * t * z ^ 2 * b ^ 4 * y * a₂ * a₄) +
+                                                            3 * (t * z ^ 4 * b ^ 2 * y ^ 3 * a₂ * a₄) +
+                                                          -4 * (t * z ^ 2 * b ^ 4 * y ^ 3 * a₂ * a₄) +
+                                                        -1 * (s * z ^ 3 * b ^ 3 * y ^ 2 * a₂ ^ 2 * a₄) +
+                                                      2 * (s * z * b ^ 5 * y ^ 2 * a₂ ^ 2 * a₄) +
+                                                    s ^ 2 * x * t * z ^ 5 * b * a₄ ^ 2 +
+                                                  t ^ 3 * z ^ 4 * b ^ 2 * y * a₄ ^ 2 +
+                                                2 * (x * t * z ^ 3 * b ^ 3 * y ^ 2 * a₄ ^ 2) +
+                                              3 * (s * x * z ^ 4 * b ^ 2 * y * a₂ * a₄ ^ 2) +
+                                            3 * (s * x * z ^ 2 * b ^ 4 * y * a₂ * a₄ ^ 2) +
+                                          2 * (s * x ^ 2 * z ^ 5 * b * a₄ ^ 3) +
+                                        s ^ 2 * t * z ^ 6 * b * y +
+                                      -1 * (s ^ 2 * t * z ^ 4 * b ^ 3 * y) +
+                                    3 * (t * z ^ 6 * b * y ^ 3) +
+                                  -6 * (t * z ^ 4 * b ^ 3 * y ^ 3) +
+                                3 * (t * z ^ 2 * b ^ 5 * y ^ 3) +
+                              -1 * (s * z ^ 5 * b ^ 2 * y ^ 2 * a₂) +
+                            s * z ^ 3 * b ^ 4 * y ^ 2 * a₂ +
+                          s * t ^ 2 * z ^ 5 * b ^ 2 * a₄ +
+                        2 * (s * x * z ^ 6 * b * y * a₄) +
+                      -2 * (t * z ^ 4 * b ^ 3 * y * a₂ * a₄) +
+                    2 * (x * t * z ^ 5 * b ^ 2 * a₄ ^ 2) +
+                  t * z ^ 4 * b ^ 2 * y * a₄ ^ 3 +
+                -2 * (t * z ^ 6 * b ^ 2 * y) +
+              2 * (t * z ^ 4 * b ^ 4 * y) =
+            0
+      [_] s * z ^ 2 * b ^ 4 * y * a₂ ^ 3 + s * x * z ^ 3 * b ^ 3 * a₂ ^ 2 * a₄ + -1 * (s * z ^ 6 * y ^ 3) +
+                                          3 * (s * z ^ 4 * b ^ 2 * y ^ 3) +
+                                        -3 * (s * z ^ 2 * b ^ 4 * y ^ 3) +
+                                      s * b ^ 6 * y ^ 3 +
+                                    s * x * z ^ 5 * b ^ 2 * a₂ +
+                                  -1 * (s * x * z ^ 3 * b ^ 4 * a₂) +
+                                t * z ^ 3 * b ^ 4 * a₂ ^ 2 +
+                              2 * (s * z ^ 4 * b ^ 2 * y * a₂ * a₄) +
+                            -2 * (s * z ^ 2 * b ^ 4 * y * a₂ * a₄) +
+                          s * x * z ^ 5 * b * a₄ ^ 2 +
+                        -1 * (s * x * z ^ 3 * b ^ 3 * a₄ ^ 2) +
+                      s * z ^ 6 * b * y +
+                    -2 * (s * z ^ 4 * b ^ 3 * y) +
+                  s * z ^ 2 * b ^ 5 * y +
+                t * z ^ 5 * b ^ 2 * a₄ +
+              -1 * (t * z ^ 3 * b ^ 4 * a₄) =
+            0
+      [_] z ^ 2 * b ^ 4 * y ^ 2 * a₂ ^ 3 + -1 * (z ^ 6 * y ^ 4) + 3 * (z ^ 4 * b ^ 2 * y ^ 4) +
+                                          -3 * (z ^ 2 * b ^ 4 * y ^ 4) +
+                                        b ^ 6 * y ^ 4 +
+                                      -1 * (t ^ 2 * z ^ 4 * b ^ 3 * a₂) +
+                                    -1 * (s * t * z ^ 5 * b * y * a₄) +
+                                  s * t * z ^ 3 * b ^ 3 * y * a₄ +
+                                3 * (z ^ 4 * b ^ 2 * y ^ 2 * a₂ * a₄) +
+                              -3 * (z ^ 2 * b ^ 4 * y ^ 2 * a₂ * a₄) +
+                            t ^ 2 * z ^ 4 * b ^ 2 * a₄ ^ 2 +
+                          3 * (z ^ 6 * b * y ^ 2) +
+                        -6 * (z ^ 4 * b ^ 3 * y ^ 2) +
+                      3 * (z ^ 2 * b ^ 5 * y ^ 2) +
+                    -2 * (z ^ 4 * b ^ 3 * a₂ * a₄) +
+                  z ^ 4 * b ^ 2 * a₄ ^ 3 +
+                -2 * (z ^ 6 * b ^ 2) +
+              2 * (z ^ 4 * b ^ 4) =
+            0
+      [_] s * t * z ^ 3 * b ^ 3 * a₂ ^ 2 + z ^ 2 * b ^ 4 * y * a₂ ^ 3 + x ^ 2 * z ^ 6 * y * a₄ +
+                                          -1 * (s * t * z * b ^ 4 * y ^ 2 * a₄) +
+                                        x * z ^ 3 * b ^ 3 * a₂ ^ 2 * a₄ +
+                                      -1 * (z ^ 6 * y ^ 3) +
+                                    3 * (z ^ 4 * b ^ 2 * y ^ 3) +
+                                  -3 * (z ^ 2 * b ^ 4 * y ^ 3) +
+                                b ^ 6 * y ^ 3 +
+                              x * z ^ 5 * b ^ 2 * a₂ +
+                            -1 * (x * z ^ 3 * b ^ 4 * a₂) +
+                          -2 * (s * t * z ^ 3 * b ^ 3 * a₄) +
+                        z ^ 4 * b ^ 2 * y * a₂ * a₄ +
+                      -3 * (z ^ 2 * b ^ 4 * y * a₂ * a₄) +
+                    -2 * (x * z ^ 3 * b ^ 3 * a₄ ^ 2) +
+                  z ^ 6 * b * y +
+                -2 * (z ^ 4 * b ^ 3 * y) +
+              z ^ 2 * b ^ 5 * y =
+            0
+      [_] t * b ^ 5 * y ^ 2 * a₂ ^ 2 + s * z * b ^ 4 * y * a₂ ^ 3 + s * x * z ^ 2 * b ^ 3 * a₂ ^ 2 * a₄ +
+                                -1 * (s * z ^ 5 * y ^ 3) +
+                              2 * (s * z ^ 3 * b ^ 2 * y ^ 3) +
+                            -1 * (s * z * b ^ 4 * y ^ 3) +
+                          s * x * z ^ 4 * b ^ 2 * a₂ +
+                        t * z ^ 2 * b ^ 4 * a₂ ^ 2 +
+                      2 * (s * z ^ 3 * b ^ 2 * y * a₂ * a₄) +
+                    s * x * z ^ 4 * b * a₄ ^ 2 +
+                  s * z ^ 5 * b * y +
+                -1 * (s * z ^ 3 * b ^ 3 * y) +
+              t * z ^ 4 * b ^ 2 * a₄ =
+            0
+      [_] x * b ^ 5 * y ^ 2 * a₂ + -1 * (s * t * z ^ 2 * b ^ 3 * a₂ ^ 2) + -1 * (z * b ^ 4 * y * a₂ ^ 3) +
+                                        -1 * (x ^ 2 * z ^ 5 * y * a₄) +
+                                      2 * (s * t * b ^ 4 * y ^ 2 * a₄) +
+                                    -1 * (x * z ^ 2 * b ^ 3 * a₂ ^ 2 * a₄) +
+                                  z ^ 5 * y ^ 3 +
+                                -3 * (z ^ 3 * b ^ 2 * y ^ 3) +
+                              2 * (z * b ^ 4 * y ^ 3) +
+                            -1 * (x * z ^ 4 * b ^ 2 * a₂) +
+                          x * z ^ 2 * b ^ 4 * a₂ +
+                        2 * (s * t * z ^ 2 * b ^ 3 * a₄) +
+                      -1 * (z ^ 3 * b ^ 2 * y * a₂ * a₄) +
+                    3 * (z * b ^ 4 * y * a₂ * a₄) +
+                  2 * (x * z ^ 2 * b ^ 3 * a₄ ^ 2) +
+                -1 * (z ^ 5 * b * y) +
+              2 * (z ^ 3 * b ^ 3 * y) =
+            0
+      [_] t * z * b ^ 3 * y ^ 2 * a₂ ^ 2 + -1 * (s * z ^ 4 * y ^ 3) + 2 * (s * z ^ 2 * b ^ 2 * y ^ 3) +
+                          -1 * (s * b ^ 4 * y ^ 3) +
+                        s * x * z ^ 3 * b ^ 2 * a₂ +
+                      2 * (s * z ^ 2 * b ^ 2 * y * a₂ * a₄) +
+                    s * x * z ^ 3 * b * a₄ ^ 2 +
+                  s * z ^ 4 * b * y +
+                -1 * (s * z ^ 2 * b ^ 3 * y) +
+              t * z ^ 3 * b ^ 2 * a₄ =
+            0
+      [_] s * x * b ^ 3 * y ^ 2 * a₂ + t * b ^ 3 * y ^ 2 * a₂ ^ 2 + -1 * (s * z ^ 3 * y ^ 3) + s * z * b ^ 2 * y ^ 3 +
+                        s * x * z ^ 2 * b ^ 2 * a₂ +
+                      t * b ^ 3 * y ^ 2 * a₄ +
+                    2 * (s * z * b ^ 2 * y * a₂ * a₄) +
+                  s * x * z ^ 2 * b * a₄ ^ 2 +
+                s * z ^ 3 * b * y +
+              t * z ^ 2 * b ^ 2 * a₄ =
+            0
+      [_] x * z ^ 4 * y ^ 2 + -2 * (x * z ^ 2 * b ^ 2 * y ^ 2) + x * b ^ 4 * y ^ 2 + -1 * (s * t * z ^ 2 * b ^ 2 * a₂) +
+                        -1 * (z * b ^ 3 * y * a₂ ^ 2) +
+                      -1 * (x * z ^ 2 * b ^ 2 * a₂ * a₄) +
+                    -1 * (x * z ^ 4 * b) +
+                  x * z ^ 2 * b ^ 3 +
+                -1 * (z ^ 3 * b * y * a₄) +
+              z * b ^ 3 * y * a₄ =
+            0
+      [_] s * x ^ 5 + s * x ^ 3 * a₂ + -1 * (t * y ^ 2) + s * x * a₄ + t * b = 0
+      [_] x ^ 6 + x ^ 4 * a₂ + x ^ 2 * a₄ + -1 * y ^ 2 + b = 0
+      [_] s * t ^ 3 * b ^ 2 + x ^ 3 * b ^ 3 + x * b ^ 3 * a₂ + s * t * b ^ 2 * a₄ + -1 * (z * b ^ 2 * y) = 0
+      [_] t ^ 4 * b ^ 2 + x ^ 2 * b ^ 3 + -1 * (s * t * z * b * y) + t ^ 2 * b ^ 2 * a₄ + b ^ 3 * a₂ = 0
+      [_] s * t ^ 2 * z * b ^ 2 + -1 * (s * x * z ^ 2 * b * y) + s * x * b ^ 3 * y + t * b ^ 3 * y * a₂ +
+              s * z * b ^ 2 * a₄ =
+            0
+      [_] t ^ 3 * z * b ^ 2 + s * x * z * b ^ 2 * a₂ + -1 * (s * z ^ 2 * b * y) + s * b ^ 3 * y + t * z * b ^ 2 * a₄ = 0
+      [_] s * t ^ 3 * y ^ 2 + -1 * (s * t ^ 3 * b) + -1 * (x ^ 3 * b ^ 2) + -1 * (x * b ^ 2 * a₂) +
+              -1 * (s * t * b * a₄) =
+            0
+      [_] t ^ 4 * y ^ 2 + -1 * (t ^ 4 * b) + -1 * (x ^ 2 * b ^ 2) + -1 * (t ^ 2 * b * a₄) + -1 * (b ^ 2 * a₂) = 0
+      [_] s * x * z ^ 2 * y ^ 2 + -1 * (s * x * b ^ 2 * y ^ 2) + -1 * (t * b ^ 2 * y ^ 2 * a₂) +
+                -1 * (s * x * z ^ 2 * b) +
+              -1 * (s * z * b * y * a₄) =
+            0
+      [_] s * t * b ^ 2 * y * a₂ + t ^ 2 * z * b ^ 2 + -1 * (x * z ^ 2 * b * y) + x * b ^ 3 * y + z * b ^ 2 * a₄ = 0
+      [_] s * t * b * y ^ 2 * a₂ + -1 * (x * z ^ 2 * y ^ 2) + x * b ^ 2 * y ^ 2 + x * z ^ 2 * b + z * b * y * a₄ = 0
+      [_] s * x ^ 3 * b + -1 * (t ^ 3 * y ^ 2) + t ^ 3 * b + s * x * b * a₂ + t * b * a₄ = 0
+      [_] x ^ 4 * b + -1 * (t ^ 2 * y ^ 2) + x ^ 2 * b * a₂ + t ^ 2 * b + b * a₄ = 0
+      [_] s * x ^ 2 * b * y + -1 * (t * z * y ^ 2) + s * b * y * a₂ + s * x * z * a₄ + t * z * b = 0
+      [_] x ^ 3 * b * y + x * b * y * a₂ + x ^ 2 * z * a₄ + -1 * (z * y ^ 2) + z * b = 0
+      [_] x ^ 2 * b ^ 2 * y + -1 * (s * t * z * y ^ 2) + s * t * z * b + b ^ 2 * y * a₂ + x * z * b * a₄ = 0
+      [_] x ^ 2 * z * y ^ 2 + -1 * (s * t * y ^ 3) = 0
+      [_] t ^ 2 * z * y ^ 2 + -1 * (s * t * b * y * a₂) + -1 * (t ^ 2 * z * b) + -1 * (x * b ^ 2 * y) +
+              -1 * (z * b * a₄) =
+            0
+      [_] t * z ^ 2 * y ^ 2 + -1 * (t * b ^ 2 * y ^ 2) + -1 * (s * z * b * y * a₂) + -1 * (s * x * z ^ 2 * a₄) +
+              -1 * (t * z ^ 2 * b) =
+            0
+      [_] t ^ 2 * y ^ 3 + -1 * (x * z * y ^ 2) = 0
+      [_] x * z * b * y * a₂ + x ^ 2 * z ^ 2 * a₄ + -1 * (z ^ 2 * y ^ 2) + b ^ 2 * y ^ 2 + z ^ 2 * b = 0
+      [_] s * x ^ 2 * z + -1 * (t * b * y) = 0
+      [_] x ^ 3 * z + -1 * (b * y) = 0
+      [_] x ^ 2 * z * b + -1 * (s * t * b * y) = 0
+      [_] t ^ 2 * b * y + -1 * (x * z * b) = 0
+      [_] s ^ 2 + -1 * b = 0
+      [_] x * t + -1 * s = 0
+    [diseqs] Disequalities
+      [_] ¬-1 * (x ^ 6 * t ^ 6) + -1 * (x ^ 6 * t ^ 4 * a₄) + -1 * (x ^ 6 * t ^ 2 * b * a₂) + x ^ 6 * z ^ 2 +
+                -1 * (x ^ 6 * b ^ 2) =
+              0
+  [limits] Thresholds reached
+    [limit] maximum number of ring steps has been reached, threshold: `(ringSteps := 100000)`
+'SplitQuotients.reciprocal_curve_cleared' depends on axioms: [sorryAx]
+'SplitQuotients.reciprocal_inverse_cleared' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SplitQuotients.complementary_norms' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SplitQuotients.odd_halving' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SplitQuotients.split_reconstruction' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SplitQuotients.target_first_component' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SplitQuotients.target_other_component' depends on axioms: [propext, Classical.choice, Quot.sound]
+toolchain pin: leanprover/lean4:v4.35.0

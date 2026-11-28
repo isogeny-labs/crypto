@@ -1,0 +1,17 @@
+# Next lead: exact unit derivatives from the Hensel precision filtration
+
+Derived hypothesis,unexecuted. Let the normalized coefficient family F(theta) be affine in the63Boolean chart selectors. At precision n,the A1 correction has the form c_n(theta)=lambda(F_n(theta))+g(F_<n(theta)),where lambda is the corresponding fixed Sylvester-inverse row. This follows because the Hensel recurrence uses only earlier factor coefficients in its nonlinear product term.
+
+For a direction v preserving every coefficient below n,write v in ker(L_<n). Then c_n(theta+v)+c_n(theta)=lambda(F_n(v)),independent of theta. If that value is1,the necessary equation c_n=0 has exactly one solution along every pair{theta,theta+v}. Choose an invertible chart coordinate map with v as one basis direction;the solved selector is the correction evaluated with that selector fixed0. This eliminates one search bit without expanding the entire polynomial. Preserve the cofactor circuit and nonlinear source reconstruction;do not substitute into an affine theta readback without updating it.
+
+Bounded next experiment: independently exhaust small affine coefficient families and the unit-direction identity;then compute exact binary ranks of L_<n and the rank of its augmentation by lambda F_n on the frozen actual chart at n18through25. A strict rank increase certifies a usable direction and gives an explicit witness. Rank equality refutes only this sufficient filtration route,not arbitrary unit derivatives. Do not assume generic rank. Keep all quotient lifts and exact final product equality. This is a component reduction,not a full original all-roots solution or a measured gain. The analogous coefficient-field statement uses a nonzero directional scalar and its inverse;prime-interval parametrizations need separate treatment.
+
+# Guard against an invalid converse of the filtration test
+
+Algebraic derivation only,not another executed worker. In the binary d2,m1 normalized family take F(Z,u)=Z^2(Z+1)^3+x*u*Z with the single selector x in F2. At precision1 the clipped lift has A0_1=0,A1_1=x,B0_1=x,B1_1=x,B2_1=x. At precision2 the Z^0 product coefficient is0 and the Z^1 product coefficient is x^2. Hence the expired A1 correction is x^2=x.
+
+The earlier-coefficient map L_<2 already contains x and has rank1. The current projected coefficient row lambda*F_2 is zero,so appending it does not increase rank. No nonzero direction preserving all earlier coefficients toggles the correction. Nevertheless the correction is exactly x,so a global unit direction exists outside that kernel.
+
+Thus rank equality refutes only the sufficient precision-filtration route;it cannot prove that no useful unit derivative exists. Mandatory next small oracle:use tiny assignment0or32 (F1 coefficient of u is bit5),verify the precision2A1 correction equals x,the augmented ranks stay1,and the global difference is1. Retain the final raw-product verifier and full original recovery obligations.
+
+Implementation uses exact binary elimination plus exhaustive small image/kernel oracles. The numeric Hensel oracle uses the general Sylvester matrix overField2,independent of the specialized Boolean circuit. Actual witnesses,if any,must toggle the corresponding compiled correction on16fixed samples;the universal identity follows from the filtration proof,not those samples. Coefficient-field directional controls use all17registered fields and a nonzero scalar slope;these are not prime-interval solver tests.

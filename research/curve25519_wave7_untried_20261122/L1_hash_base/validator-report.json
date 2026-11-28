@@ -1,0 +1,2427 @@
+{
+ "schema": "validator-report/v1 (L1 wave 7)",
+ "lead": "L1 keyed-hash factor-base membership in C = 2 table-and-probe search",
+ "directory": "research/curve25519_wave7_untried_20261122/L1_hash_base",
+ "validated_commit": "190daab37583c88cca0b8bea595e081140a12af9",
+ "head_at_end_of_validation": "1e42afc88d65368595a9503f63cb5c61f1ce1899 (L3-only change since 190daab375)",
+ "protocol_commit": "91f2f2bcde (freeze, 2026-11-22T03:10:00Z)",
+ "run_launch": "run.log: launch 2026-11-22T03:10:04Z from commit 91f2f2bcde",
+ "analysis_commit": "e783d12a5b130e2759ce9685275cb9e1187d7ca1",
+ "writeup_commit": "190daab37583c88cca0b8bea595e081140a12af9",
+ "validator_date": "2026-11-22",
+ "verdict": "pass_with_errata",
+ "verdict_reason": "Independent code reproduced every measured number in README.md and analysis/summary.json from the raw per-base counts. Point estimates are identical; the validator's own bootstrap intervals agree within Monte Carlo noise; all ten verdicts P1-P8 hold with the same counts. The validator rebuilt each base from the protocol rules and recomputed its exact coverage with its own point arithmetic: all 512 bases of every arm in both k = 16 cells and 16 to 32 bases of every arm in the other eight cells, 0 mismatches. An end-to-end k = 16 replay with its own targets re-verified 2.07 M hits with 0 failures and matched the recorded rates within sampling error. Curve facts were confirmed by two independent methods; the hash rule (key, theta, |V| = N) and window disjointness were confirmed in all ten cells. The main result stands: pooled hash/rand 1.0013 [0.9978, 1.0048]. The errata concern disclosure, labelling and accounting: undisclosed overlap of the pre-freeze smoke with 300 of 512 bases of the two k = 16 cells (verdicts hold without them), the commit label, an inverted citation, an unlabelled exact range, shared native work excluded from the band, artifact and hash_proj disclosures, and tag granularity. No erratum changes a count, a ratio or a verdict.",
+ "independence": "Validator code lives in the session scratchpad: vfacts.py, vdata.py, vdata_holdout.py, vcompare.py, vreplay.py, vreport.py. It imports none of l1lib.py, run_l1.py, analyse_l1.py, export_json.py or figure.py. Reused from the producer: the protocol text (seed rule, arm definitions, estimator, thresholds), the key bytes and the curve parameters. Bases were rebuilt with numpy Generator calls following the protocol seed rule so that per-base exact counts could be compared one to one. Targets, generator, discrete-log table, square roots, point arithmetic, coverage and verification are the validator's own. No producer script was executed.",
+ "environment": {
+  "python": "3.13.18",
+  "numpy": "2.5.3",
+  "host": "4-core shared host, one core pinned with taskset (cores 2-3), OMP/OPENBLAS threads = 1",
+  "scratch": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/val",
+  "validator_script_sha256": {
+   "vfacts.py": "d3cf0abd762aa4f0a2f9b16d3b83638f3e75c7861a1f680ae9a55958c236d9a3",
+   "vdata.py": "1a084339910c5b4f47ecd9c5798278e24e54756ebea1d7bd732633002b9ca438",
+   "vdata_holdout.py": "878ccbac639b1875c3fc3508372a8dae4500e00115f04426e40ffb45069c233d",
+   "vcompare.py": "931e41a49294d79514502cd7c685d646a0b5e6331dbc0fed4b19c6501909f2ec",
+   "vreplay.py": "89c0fc3c8f8b832e3117dd158b1dfca6d772fcc0cf3f1f95cc69f9846244f993"
+  }
+ },
+ "checks": [
+  {
+   "name": "binding: validated commit and tree state",
+   "result": "pass",
+   "detail": "Validated the L1 files as of 190daab37583c88cca0b8bea595e081140a12af9 (last commit touching L1_hash_base; HEAD moved to 1e42afc88d during validation through an L3-only commit; `git diff 190daab375 HEAD -- L1_hash_base` empty). `git status` for L1_hash_base clean; the only untracked file is the ignored out/cell_k24_N579.npz, bound by out/SHA256SUMS. Freeze commit 91f2f2bcde is an ancestor of HEAD."
+  },
+  {
+   "name": "(7) frozen files byte-identical between 91f2f2bcde, the run and the write-up",
+   "result": "pass",
+   "detail": "sha256 of l1lib.py e1c09a5b..., run_l1.py 202f8123..., analyse_l1.py 2b402f39..., PROTOCOL.md 4ab666fb... identical at 91f2f2bcde, e783d12a5b, 190daab375 and in the worktree; `sha256sum -c FREEZE.sha256` OK for all four. No commit between 91f2f2bcde and 190daab375 modifies them (git diff-tree per commit). Freeze commit 03:10:00Z precedes run.log launch 03:10:04Z (\"commit 91f2f2bcde; FREEZE.sha256 verified\") and the first data commit 376b26f92a (03:10:22Z). The pre-freeze commit 9a45d456d4 already held byte-identical analyse_l1.py, run_l1.py and l1lib.py."
+  },
+  {
+   "name": "data integrity: npz, JSON mirrors, in-history blobs, run.log",
+   "result": "pass",
+   "detail": "10/10 out/*.npz match out/SHA256SUMS; 10/10 out_json/*.json match out_json/SHA256SUMS; every array of every JSON mirror equals the npz exactly (dtype, shape, values; validator code, not export_json.py). The 9 npz committed during the run (376b26f92a..969a857783) hash in Git history to the same values as on disk and in SHA256SUMS, so no cell was altered after its first commit. The 10 JSON meta lines in run.log equal the npz meta exactly; smoke=false in all."
+  },
+  {
+   "name": "(1) curve facts by an independent method",
+   "result": "pass",
+   "detail": "#E from the Euler-criterion character sum (vectorised square-and-multiply, not the producer's squares table) and, independently, from an x-only Montgomery-ladder point of exact order 8r plus Hasse uniqueness (4 sqrt p < r); twist order 2p+2-#E with a twist point of order divisible by r'; r and r' prime by deterministic Miller-Rabin. All five: #E = 8r with r = 8209, 32887, 131203, 524731, 2098009; twist 4r' with r' = 16301, 65293, 261881, 1047689, 4192553; E(F_p) cyclic (point of order 8r); p = 5 mod 8; A^2-4 non-square; r > 2^(k-3); valid columns 4r-4 = 32832, 131544, 524808, 2098920, 8392032 equal run.log; N = 18, 36, 36, 73, 72, 145, 145, 290, 290, 579. Agrees with curve_facts.json and PROTOCOL section 3."
+  },
+  {
+   "name": "structure of the raw counts",
+   "result": "pass",
+   "detail": "Every cell: 512 rows per arm, 1 for bits_lo0; N_actual = N (plant arms in {floor(fN), floor(fN)+1}); m = m_u = ceil(800r/N^2) for unprojected, m_p = ceil(100(r-1)/N^2) for projected arms; T0 columns only on rand and >= the blind columns; exact counts even (negation-symmetric); verified_ok equals counted hits (+ T0-only hits) and verified_fail = 0 everywhere; instrument_check_failures = 0."
+  },
+  {
+   "name": "(2) every pooled and per-cell ratio recomputed",
+   "result": "pass",
+   "detail": "All 10 comparisons x 10 cells and the 10 pooled values, MC and exact: point estimates identical to analysis/summary.json (max abs difference 5.6e-17). Validator bootstrap (4000 resamples, own seed, independent per arm, paired for T0) gives CI endpoints within 0.13 % (relative) of the producer's; ratio-estimator delta-method intervals agree. Borderline cell CIs keep their side of 1 (k18 N36 hash/rand lower 1.0001 vs 1.0004; k20 N72 hash/hash2 lower 0.9998 vs 0.9999; k24 N290 hash/hash2 upper 0.9987 vs 0.9991)."
+  },
+  {
+   "name": "(2) prediction verdicts P1-P8 recomputed",
+   "result": "pass",
+   "detail": "All ten hold under validator code with the same counts: P1 9/10 cell CIs contain 1; P1p 10/10 half-widths <= 0.03; P2 both pooled in band; P2b percentiles identical; P3 0 ceiling violations, projected 0.8563-0.9663 of ceiling, rand_proj/rand exact 6.867-7.700 and MC 6.908-7.713, hash_proj/rand_proj pooled 1.0006; P4 exact 1.956-2.004, 10/10 exclude 1; P5 design 1.03087/1.05058, pooled 1.0299/1.0486, 10/10 and 10/10 exclude 1; P6 9/10 and 9/10; P7 0 failures, worst z -2.54 (k24 N290 plant3); P8 holds by construction."
+  },
+  {
+   "name": "(3) exact covered-point ratios and the ceiling 2N^2/(r-1)",
+   "result": "pass",
+   "detail": "Ceiling re-derived: signed pair sums with i <= j number 4 C(N,2) + 2N = 2N^2, targets uniform on E[r]\\{O}, so P(hit) <= 2N^2/(r-1). Exact coverage checked against it for every base of every arm (including rand2, bits_lo0, plant arms at their own N', projected arms): 0 violations; the largest projected base reaches exactly 1.0 of its ceiling (k16 N18, no collision, allowed by <=), the largest unprojected base 0.256. Cross-check: unprojected E[#sums in E[r]] = N(N+1)/4 from the coset distribution (1/8, 1/8, 1/4, 1/4, 1/4 for {0},{4},{+-1},{+-2},{+-3}); recorded rand means are 0.980-0.997 of it (birthday loss about N(N+1)/(8(r-1))); projected arms sit 0.0002-0.008 above the random-collision model (1-e^-x)/x, x = 2N^2/(r-1), the excess shrinking with N as expected from sums that share an index (they cannot coincide in one orientation)."
+  },
+  {
+   "name": "(4) independent end-to-end replay, k = 16, both sizes",
+   "result": "pass",
+   "detail": "Own Euler mask, Tonelli-Shanks square roots, affine arithmetic, own generator (u = 2) and own discrete-log table; every signed pair sum computed by explicit addition; bases rebuilt from the PROTOCOL rules (seed rule, hash windows, bits offset, rand choice, plant N', projection). All 512 bases of all 9 arms plus bits_lo0 in both cells (9,218 bases): exact coverage, N_actual and T0 coverage equal the recorded columns exactly (0 mismatches). MC with own targets (own seed, own generator, m_u/m_p per base): 2,073,673 hits, each re-verified by explicit arithmetic, 0 failures; rates agree with the recorded rates (|z| <= 1.30 against the 512-base record, <= 1.47 against the same bases, <= 2.10 against own exact)."
+  },
+  {
+   "name": "(4b) exact-coverage spot check in the other eight cells",
+   "result": "pass",
+   "detail": "Coset method (no log table): t_i from [r]P_i matched against [t]Q, Q = [r]G, only coset-cancelling signed sums added explicitly. bits_lo0 and bases 0..31 (k = 18, 20, 22) or 0..15 (k = 24) for all 9 arms: exact coverage, N_actual and T0 coverage equal the recorded columns exactly in all eight cells (2,024 bases, 0 mismatches)."
+  },
+  {
+   "name": "(5) hash base construction rule",
+   "result": "pass",
+   "detail": "Key bytes from the l1lib.py source text (PROTOCOL section 4 points to HASH_KEYS); H(u) = SHA-256(key || u as 4 bytes LE)[:8] big-endian over the valid u (E[8] excluded). Validator theta_b0 equals run.log in all 10 cells; |{u valid: H(u) <= theta_b0}| = N exactly and |{H(u) < H_(N+1)}| = N (no 64-bit ties for either key on any curve). Windows [bN, (b+1)N) for b < 512 are pairwise disjoint for hash and hash2, and the exact-coverage matches above confirm these windows produced the data. hash_proj borrows from window b+1 when projected images collide (erratum E7)."
+  },
+  {
+   "name": "(6) cost table at w = 0, 0.1, 1 and ranking language",
+   "result": "pass_with_errata",
+   "detail": "All 60 table entries (N^2, p, p/N, ratios at w = 0, 0.1, 1) recomputed and equal to README after rounding; ranges p/N 1,818-57,852, w = 0.1 5.92-21.23, w = 1 50.19-203.27. The order does not flip inside the band (tie at w = 0, hash costlier at 0.1 and 1), and README claims no strict ranking, consistent with section 5a. Shared native work is excluded rather than priced (erratum E5); pricing it changes no order."
+  },
+  {
+   "name": "(7) k = 24 member choice disclosed",
+   "result": "pass",
+   "detail": "PROTOCOL section 3 and 13 and README Disclosures state p = 16777141, A = 7842 (brief's faithful member, twist 4*4192553) instead of the frame-search smooth-family member p = 16777213, A = 318; matches BRIEF.md."
+  },
+  {
+   "name": "(7) PROTOCOL section 9 hash-evaluation range discrepancy",
+   "result": "pass",
+   "detail": "Disclosed in README: section 9 says \"3,600 to 29,000\" per column; computed p/N is 1,818 to 57,852 (the quoted range matches only the c = 0.2 cells at k = 16-22). The frozen text was not edited (hash unchanged). The adjacent design-ratio range is also slightly off and not disclosed (erratum E8)."
+  },
+  {
+   "name": "(8) README numbers against data and recomputation",
+   "result": "pass_with_errata",
+   "detail": "260 automated comparisons (pooled table, both per-cell tables, cost table) pass; prose numbers (1.0013, [0.9978, 1.0048], 1.0026, 1.0299 [1.0263, 1.0337] vs design 1.0309, 1.0486 vs 1.0506, 1.9767 [1.9733, 1.9803], 0.9984, 1.0018, 1.0006, 0.856-0.966, 7.25x, P1p half-widths, P2b percentiles, P4 1.956-2.004, worst z -2.54, hit totals 87,601-112,645 per arm and cell, \"about 100,000\") all supported. Errata: commit label (E1), undisclosed smoke overlap (E2), inverted citation (E3), unlabelled exact range (E4), artifact disclosure (E6), hash_proj disjointness (E7). REPORT.typ carries the same numbers."
+  },
+  {
+   "name": "(8) [pcc:unverified] on result sentences",
+   "result": "pass_with_note",
+   "detail": "`python3 tools/pcc/pcc.py lint-prose README.md`: 0 findings. Every result paragraph or bullet ends with the tag, but the tag is per item rather than per sentence and tables are untagged (erratum E9, note)."
+  },
+  {
+   "name": "(8) derived vs measured labelled; distance to rho imported only; no relabelling",
+   "result": "pass",
+   "detail": "README \"Measured versus derived\" separates measured hit rates and exact counts from the derived ceiling, design ratios and cost table. Distance to rho is only imported: 7.8x rho at k = 20 and 2.6x (w = 0) to 1.4e5x (w = 0.1) for the algebraic arms are in curve25519_frame_search_20261103/README.md lines 107-110; the T0 range 1.944-2.016 is in curve25519_t0_symmetry_20261102/README.md line 42. The class line says it is not a leaderboard row and changes no order; no rho or BSGS arm is labelled index calculus; no improvement is claimed."
+  },
+  {
+   "name": "preregistration hygiene: smoke versus data",
+   "result": "finding",
+   "detail": "The smoke B = 300 rows (generated before the freeze) are byte-identical to bases 0-299 of both k = 16 data cells (erratum E2). The thresholds printed by the smoke-time analysis equal the frozen ones, and all verdicts hold on the held-out rows."
+  },
+  {
+   "name": "controls and reference arms",
+   "result": "pass",
+   "detail": "Positive controls present and detected: T0 key (about 2x, exact 1.956-2.004) and planted 3 % / 5 % (recovered 1.0299 / 1.0486 against designs 1.0309 / 1.0506). A/A arms rand2 and hash2 inside +-1.5 %. Reference population rand and the cheaper interval base bits_rand both measured; projected ceiling arm present. No cross-method comparison is made, so no rho arm or external fastest implementation is required (distance to rho imported only)."
+  },
+  {
+   "name": "certificate discipline",
+   "result": "pass",
+   "detail": "No discrete-log solve, relation for linear algebra or closure is claimed. Each counted hit carries a real-arithmetic verification (verified_ok = hits, verified_fail = 0). The validator independently re-verified 2,073,673 own-target hits at k = 16 with its own arithmetic."
+  },
+  {
+   "name": "section 5a canonical band (lesson L-546d37ca7750)",
+   "result": "not_applicable",
+   "detail": "No ecbench session and no rho or BSGS arm; the only band is the per-hash-evaluation price, recomputed directly above."
+  },
+  {
+   "name": "artifact policy",
+   "result": "pass",
+   "detail": "The tracked npz are 27-30 KB, under the 64 KiB data-suffix threshold; JSON mirrors are 140-160 KB, under 1 MiB, and .json is not data-suffixed; PNG 24 KB. No policy violation; disclosure inaccuracy recorded as E6."
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "minor",
+   "text": "README header \"Run commit: `e783d12a5b`\" mislabels the run. run.log line 1 records the launch from frozen commit 91f2f2bcde at 2026-11-22T03:10:04Z. Nine cell npz were committed progressively (376b26f92a to 969a857783) and cell_k24_N579.npz was never committed; e783d12a5b added analysis/ and the final run.log, and the write-up is 190daab375. Neither README nor REPORT.typ names 91f2f2bcde.",
+   "suggested_fix": "Replace with: \"Protocol and code frozen at 91f2f2bcde (FREEZE.sha256); run launched from it at 03:10:04Z; outputs and frozen analysis committed at e783d12a5b; write-up 190daab375.\" Put it in the README Errata section or a sibling ERRATA.md (this report pins README sha256 231f143d...)."
+  },
+  {
+   "id": "E2",
+   "severity": "moderate",
+   "text": "\"Frozen before any data\" is not literally true for the two k = 16 cells. The seed rule takes neither B nor a smoke/run role as input. As a result, smoke/out_pipeline/cell_k16_N18.npz and cell_k16_N36.npz (B = 300, smoke = true, generated about 03:07 and committed in 9a45d456d4 at 03:09:10Z, before the freeze commit 91f2f2bcde at 03:10:00Z) are byte-identical in every arm to bases 0-299 of the 512 in out/cell_k16_N18.npz and out/cell_k16_N36.npz. smoke/out/cell_k16_N18.npz (B = 40) is likewise identical to bases 0-39. PROTOCOL section 7 quotes results from these rows (CV, plant3/rand 1.034, plant5/rand 1.044). README does not disclose this. Mitigation checked by the validator: analyse_l1.py, run_l1.py and l1lib.py at 9a45d456d4 equal the frozen files. The smoke-time RESULTS.md prints the same thresholds. The only pre-freeze design change was HITS_PER_BASE 50 to 200 (2d683358c2 to 9a45d456d4). All P1-P8 verdicts still hold with bases 0-299 of both k = 16 cells dropped (hash/rand pooled 1.0026 [0.9982, 1.0071]); P1 then has exactly the threshold, 8 of 10 cell CIs containing 1.",
+   "suggested_fix": "Disclose the overlap and the held-out result in an erratum (README Errata section or ERRATA.md). In later protocols, add a \"smoke\" role to the seed parts so smoke draws can never coincide with data draws."
+  },
+  {
+   "id": "E3",
+   "severity": "minor",
+   "text": "Citation direction and quantity are wrong. README Mechanism (and frozen PROTOCOL section 2) say lead_sweep_20261110/LEAD-EXO-coordinate-revealing-oracles found \"coordinate/random 0.998 at 2^20 but with per-size ratios 0.97 to 1.75\". The source RESULT.md line 13 reports \"Negative control randfb/coord at largest size = 0.998 ... Per size: 0.97, 1.04, 1.75, 1.38, 1.00\", and that lead's PROTOCOL.md defines it as a ratio of counted additions (cost to collect relations), not of relation yield. Coordinate/random would be 1.002 at 2^20 (0.57 to 1.03 per size). The point being made (that study was not powered for 3 %) is unaffected.",
+   "suggested_fix": "\"found a random-base/coordinate-base addition-count ratio of 0.998 at 2^20 (per size 0.97 to 1.75, 9 to 101 relations)\"."
+  },
+  {
+   "id": "E4",
+   "severity": "minor",
+   "text": "The P3 line \"rand_proj/rand is 6.87 to 7.70 in every cell\" quotes the exact-coverage ratio (validator: 6.867 to 7.700). The per-cell table above lists the MC ratio (6.908 to 7.713) under the same name with no label. Both ranges lie inside the frozen [6.0, 8.4].",
+   "suggested_fix": "\"rand_proj/rand exact 6.87 to 7.70 (MC 6.91 to 7.71) in every cell\"."
+  },
+  {
+   "id": "E5",
+   "severity": "minor",
+   "text": "The cost table prices the hash evaluations at w but excludes the shared native work as \"matched across arms\": about 2N Legendre or square-root tests per base on every arm, plus the T0 extra inversions. Section 5a asks that every arm's unpriced counter be listed with its count and priced at the band. Pricing 2N native operations at w on both arms lowers hash/rand at w = 1 from 202.97 to 182.77 (k16 N18), from 51.49 to 48.83 (k16 N36) and from 203.26 to 192.62 (k18 N36), and by under 3 % elsewhere; at w = 0.1 the change is under 1.2 %. The order (tie at w = 0, hash costlier at 0.1 and 1) and the \"no strict ranking\" statement are unchanged. P8 holds by construction (N^2 + w p >= N^2): it is a derived statement, not a measurement.",
+   "suggested_fix": "Add the per-base native count (2N, both arms) to the cost table and price it in the band, or call the listed ratios upper bounds. Label P8 \"derived (holds by construction)\"."
+  },
+  {
+   "id": "E6",
+   "severity": "minor",
+   "text": "README says the binary out/*.npz are mirrored as out_json/*.json, and the wave .gitignore says data-suffixed outputs stay on the run host. In fact 9 of the 10 npz are tracked in Git at 190daab375. They were committed during the run (376b26f92a to 969a857783), before the ignore rule of 048030bee7 existed. Only out/cell_k24_N579.npz is untracked and ignored; it is bound by out/SHA256SUMS (cd4f30e1...) and its JSON mirror (7720c5a3...). The tracked blobs match SHA256SUMS. At 27-30 KB they are under the 64 KiB threshold, so no policy is broken.",
+   "suggested_fix": "State which npz files are in Git and that cell_k24_N579.npz exists only on the run host, bound by its sha256 and its lossless JSON mirror."
+  },
+  {
+   "id": "E7",
+   "severity": "minor",
+   "text": "\"Hash replicates are disjoint rank windows\" holds for hash and hash2 but not strictly for hash_proj. Base b draws rank positions [bN, bN + floor(1.3N) + 10) and keeps the first N distinct [8]P images, so when images collide it borrows positions from window b+1. Validator replay counts: 24 of 512 bases (k16 N18), 69 of 512 (k16 N36), and 0 to 6 of the first 16 or 32 bases in the other cells. The effect on hash_proj/rand_proj is negligible.",
+   "suggested_fix": "Qualify the disclosure: hash and hash2 windows are disjoint; hash_proj windows overlap the next window when a projected image collides."
+  },
+  {
+   "id": "E8",
+   "severity": "minor",
+   "text": "The disclosed PROTOCOL section 9 discrepancy covers only \"3,600 to 29,000\" hash evaluations per column. The same paragraph's design ratios (\"w = 0.1: 6.0 to 21.2; w = 1: 50 to 203\") also differ from the computed 5.92 to 21.23 and 50.19 to 203.27, and this is not disclosed.",
+   "suggested_fix": "Extend the existing disclosure to this range. Leave the frozen text unedited."
+  },
+  {
+   "id": "E9",
+   "severity": "note",
+   "text": "[pcc:unverified] appears once per paragraph or bullet rather than after every result sentence: 15 items hold 2 to 4 result sentences under one trailing tag, and the tables carry none. `pcc lint-prose` reports 0 findings.",
+   "suggested_fix": "Add a file-level line stating that every number and table in README.md is [pcc:unverified], or tag each result sentence."
+  }
+ ],
+ "recomputed": {
+  "curve_facts": [
+   {
+    "k": 16,
+    "p": 65437,
+    "A": 1058,
+    "order_euler": 65672,
+    "twist_order_euler": 65204,
+    "zeros_of_f": 1,
+    "r": 8209,
+    "r_prime_MR": true,
+    "r_gt_2^(k-3)": true,
+    "twist_div4": true,
+    "twist_r": 16301,
+    "twist_r_prime_MR": true,
+    "p_mod_8": 5,
+    "A2m4_nonsquare": true,
+    "hasse_width_lt_r": true,
+    "E_point_order_8r_x": 2,
+    "twist_point_x_order_div_by_r_prime": 5,
+    "hasse_multiples_of_8r": [
+     65672
+    ],
+    "hasse_multiples_of_4rprime": [
+     65204
+    ],
+    "E8_u_values": [
+     0,
+     1,
+     7466,
+     39292
+    ],
+    "valid_columns_expected": 32832,
+    "N": [
+     18,
+     36
+    ]
+   },
+   {
+    "k": 18,
+    "p": 262133,
+    "A": 78,
+    "order_euler": 263096,
+    "twist_order_euler": 261172,
+    "zeros_of_f": 1,
+    "r": 32887,
+    "r_prime_MR": true,
+    "r_gt_2^(k-3)": true,
+    "twist_div4": true,
+    "twist_r": 65293,
+    "twist_r_prime_MR": true,
+    "p_mod_8": 5,
+    "A2m4_nonsquare": true,
+    "hasse_width_lt_r": true,
+    "E_point_order_8r_x": 5,
+    "twist_point_x_order_div_by_r_prime": 2,
+    "hasse_multiples_of_8r": [
+     263096
+    ],
+    "hasse_multiples_of_4rprime": [
+     261172
+    ],
+    "E8_u_values": [
+     0,
+     97349,
+     259583,
+     262132
+    ],
+    "valid_columns_expected": 131544,
+    "N": [
+     36,
+     73
+    ]
+   },
+   {
+    "k": 20,
+    "p": 1048573,
+    "A": 926,
+    "order_euler": 1049624,
+    "twist_order_euler": 1047524,
+    "zeros_of_f": 1,
+    "r": 131203,
+    "r_prime_MR": true,
+    "r_gt_2^(k-3)": true,
+    "twist_div4": true,
+    "twist_r": 261881,
+    "twist_r_prime_MR": true,
+    "p_mod_8": 5,
+    "A2m4_nonsquare": true,
+    "hasse_width_lt_r": true,
+    "E_point_order_8r_x": 8,
+    "twist_point_x_order_div_by_r_prime": 2,
+    "hasse_multiples_of_8r": [
+     1049624
+    ],
+    "hasse_multiples_of_4rprime": [
+     1047524
+    ],
+    "E8_u_values": [
+     0,
+     490207,
+     872316,
+     1048572
+    ],
+    "valid_columns_expected": 524808,
+    "N": [
+     72,
+     145
+    ]
+   },
+   {
+    "k": 22,
+    "p": 4194301,
+    "A": 43186,
+    "order_euler": 4197848,
+    "twist_order_euler": 4190756,
+    "zeros_of_f": 1,
+    "r": 524731,
+    "r_prime_MR": true,
+    "r_gt_2^(k-3)": true,
+    "twist_div4": true,
+    "twist_r": 1047689,
+    "twist_r_prime_MR": true,
+    "p_mod_8": 5,
+    "A2m4_nonsquare": true,
+    "hasse_width_lt_r": true,
+    "E_point_order_8r_x": 2,
+    "twist_point_x_order_div_by_r_prime": 4,
+    "hasse_multiples_of_8r": [
+     4197848
+    ],
+    "hasse_multiples_of_4rprime": [
+     4190756
+    ],
+    "E8_u_values": [
+     0,
+     1,
+     2980796,
+     3542229
+    ],
+    "valid_columns_expected": 2098920,
+    "N": [
+     145,
+     290
+    ]
+   },
+   {
+    "k": 24,
+    "p": 16777141,
+    "A": 7842,
+    "order_euler": 16784072,
+    "twist_order_euler": 16770212,
+    "zeros_of_f": 1,
+    "r": 2098009,
+    "r_prime_MR": true,
+    "r_gt_2^(k-3)": true,
+    "twist_div4": true,
+    "twist_r": 4192553,
+    "twist_r_prime_MR": true,
+    "p_mod_8": 5,
+    "A2m4_nonsquare": true,
+    "hasse_width_lt_r": true,
+    "E_point_order_8r_x": 8,
+    "twist_point_x_order_div_by_r_prime": 2,
+    "hasse_multiples_of_8r": [
+     16784072
+    ],
+    "hasse_multiples_of_4rprime": [
+     16770212
+    ],
+    "E8_u_values": [
+     0,
+     1,
+     405648,
+     797523
+    ],
+    "valid_columns_expected": 8392032,
+    "N": [
+     290,
+     579
+    ]
+   }
+  ],
+  "pooled": {
+   "hash/rand": {
+    "mc": 1.00131,
+    "mc_ci_validator_bootstrap": [
+     0.9978,
+     1.0049
+    ],
+    "exact": 1.00256,
+    "exact_ci_validator_bootstrap": [
+     1.0002,
+     1.0049
+    ]
+   },
+   "hash/bits_rand": {
+    "mc": 0.99842,
+    "mc_ci_validator_bootstrap": [
+     0.995,
+     1.002
+    ],
+    "exact": 0.99966,
+    "exact_ci_validator_bootstrap": [
+     0.9972,
+     1.0022
+    ]
+   },
+   "bits_rand/rand": {
+    "mc": 1.00289,
+    "mc_ci_validator_bootstrap": [
+     0.9994,
+     1.0066
+    ],
+    "exact": 1.0029,
+    "exact_ci_validator_bootstrap": [
+     1.0005,
+     1.0053
+    ]
+   },
+   "hash_proj/rand_proj": {
+    "mc": 1.00057,
+    "mc_ci_validator_bootstrap": [
+     0.9979,
+     1.0032
+    ],
+    "exact": 0.99984,
+    "exact_ci_validator_bootstrap": [
+     0.9995,
+     1.0002
+    ]
+   },
+   "rand_proj/rand": {
+    "mc": 7.24944,
+    "mc_ci_validator_bootstrap": [
+     7.227,
+     7.272
+    ],
+    "exact": 7.25333,
+    "exact_ci_validator_bootstrap": [
+     7.2414,
+     7.2655
+    ]
+   },
+   "rand/rand2 (A/A)": {
+    "mc": 0.99927,
+    "mc_ci_validator_bootstrap": [
+     0.9957,
+     1.0028
+    ],
+    "exact": 0.99932,
+    "exact_ci_validator_bootstrap": [
+     0.997,
+     1.0016
+    ]
+   },
+   "hash/hash2 (A/A)": {
+    "mc": 1.00176,
+    "mc_ci_validator_bootstrap": [
+     0.9983,
+     1.0054
+    ],
+    "exact": 1.00233,
+    "exact_ci_validator_bootstrap": [
+     0.9999,
+     1.0047
+    ]
+   },
+   "plant3/rand": {
+    "mc": 1.02995,
+    "mc_ci_validator_bootstrap": [
+     1.0264,
+     1.0336
+    ],
+    "exact": 1.03098,
+    "exact_ci_validator_bootstrap": [
+     1.0285,
+     1.0335
+    ]
+   },
+   "plant5/rand": {
+    "mc": 1.04863,
+    "mc_ci_validator_bootstrap": [
+     1.0449,
+     1.0525
+    ],
+    "exact": 1.04958,
+    "exact_ci_validator_bootstrap": [
+     1.0472,
+     1.052
+    ]
+   },
+   "T0/blind": {
+    "mc": 1.97673,
+    "mc_ci_validator_bootstrap": [
+     1.9733,
+     1.9803
+    ],
+    "exact": 1.97634,
+    "exact_ci_validator_bootstrap": [
+     1.974,
+     1.9786
+    ]
+   }
+  },
+  "per_cell": [
+   {
+    "k": 16,
+    "N": 18,
+    "ratios": {
+     "hash/rand": {
+      "mc": 1.01153,
+      "ci": [
+       0.9922,
+       1.0313
+      ],
+      "exact": 1.01289,
+      "half_width": 0.0196
+     },
+     "hash/bits_rand": {
+      "mc": 0.99593,
+      "ci": [
+       0.9767,
+       1.0167
+      ],
+      "exact": 0.99329,
+      "half_width": 0.02
+     },
+     "bits_rand/rand": {
+      "mc": 1.01566,
+      "ci": [
+       0.996,
+       1.0369
+      ],
+      "exact": 1.01973,
+      "half_width": 0.0204
+     },
+     "hash_proj/rand_proj": {
+      "mc": 0.99821,
+      "ci": [
+       0.9897,
+       1.0068
+      ],
+      "exact": 1.00057,
+      "half_width": 0.0086
+     },
+     "rand_proj/rand": {
+      "mc": 7.39377,
+      "ci": [
+       7.2859,
+       7.5065
+      ],
+      "exact": 7.40397,
+      "half_width": 0.1103
+     },
+     "rand/rand2 (A/A)": {
+      "mc": 0.99618,
+      "ci": [
+       0.9761,
+       1.0157
+      ],
+      "exact": 0.99977,
+      "half_width": 0.0198
+     },
+     "hash/hash2 (A/A)": {
+      "mc": 1.00688,
+      "ci": [
+       0.9873,
+       1.0258
+      ],
+      "exact": 1.00791,
+      "half_width": 0.0192
+     },
+     "plant3/rand": {
+      "mc": 1.04386,
+      "ci": [
+       1.0226,
+       1.0654
+      ],
+      "exact": 1.04289,
+      "half_width": 0.0214
+     },
+     "plant5/rand": {
+      "mc": 1.05284,
+      "ci": [
+       1.0322,
+       1.074
+      ],
+      "exact": 1.05305,
+      "half_width": 0.0209
+     },
+     "T0/blind": {
+      "mc": 2.00318,
+      "ci": [
+       1.9826,
+       2.0239
+      ],
+      "exact": 2.00379,
+      "half_width": 0.0206
+     }
+    },
+    "pct_bits_lo0": 53.03,
+    "pct_hash_lit": 75.78,
+    "ceiling_rate_2N2_over_rm1": 0.078947,
+    "proj_over_ceiling": {
+     "rand_proj": 0.9658,
+     "hash_proj": 0.9663
+    },
+    "rand_over_ceiling": 0.1304,
+    "max_base_over_own_ceiling_all_arms": 1.0,
+    "plant_design_meanNp2_over_N2": {
+     "plant3": 1.03457,
+     "plant5": 1.05487
+    }
+   },
+   {
+    "k": 16,
+    "N": 36,
+    "ratios": {
+     "hash/rand": {
+      "mc": 1.00523,
+      "ci": [
+       0.9931,
+       1.0177
+      ],
+      "exact": 1.00157,
+      "half_width": 0.0123
+     },
+     "hash/bits_rand": {
+      "mc": 1.00972,
+      "ci": [
+       0.997,
+       1.022
+      ],
+      "exact": 1.00585,
+      "half_width": 0.0125
+     },
+     "bits_rand/rand": {
+      "mc": 0.99555,
+      "ci": [
+       0.9836,
+       1.0078
+      ],
+      "exact": 0.99574,
+      "half_width": 0.0121
+     },
+     "hash_proj/rand_proj": {
+      "mc": 0.98941,
+      "ci": [
+       0.9815,
+       0.9974
+      ],
+      "exact": 0.99796,
+      "half_width": 0.0079
+     },
+     "rand_proj/rand": {
+      "mc": 6.91071,
+      "ci": [
+       6.8408,
+       6.9832
+      ],
+      "exact": 6.86658,
+      "half_width": 0.0712
+     },
+     "rand/rand2 (A/A)": {
+      "mc": 0.99833,
+      "ci": [
+       0.9852,
+       1.011
+      ],
+      "exact": 0.99908,
+      "half_width": 0.0129
+     },
+     "hash/hash2 (A/A)": {
+      "mc": 1.00753,
+      "ci": [
+       0.9948,
+       1.0202
+      ],
+      "exact": 1.00328,
+      "half_width": 0.0127
+     },
+     "plant3/rand": {
+      "mc": 1.03873,
+      "ci": [
+       1.0253,
+       1.0528
+      ],
+      "exact": 1.03356,
+      "half_width": 0.0138
+     },
+     "plant5/rand": {
+      "mc": 1.04434,
+      "ci": [
+       1.0315,
+       1.0573
+      ],
+      "exact": 1.04528,
+      "half_width": 0.0129
+     },
+     "T0/blind": {
+      "mc": 1.95893,
+      "ci": [
+       1.9469,
+       1.9712
+      ],
+      "exact": 1.95628,
+      "half_width": 0.0122
+     }
+    },
+    "pct_bits_lo0": 6.64,
+    "pct_hash_lit": 10.55,
+    "ceiling_rate_2N2_over_rm1": 0.315789,
+    "proj_over_ceiling": {
+     "rand_proj": 0.8654,
+     "hash_proj": 0.8637
+    },
+    "rand_over_ceiling": 0.126,
+    "max_base_over_own_ceiling_all_arms": 0.9144,
+    "plant_design_meanNp2_over_N2": {
+     "plant3": 1.03146,
+     "plant5": 1.05017
+    }
+   },
+   {
+    "k": 18,
+    "N": 36,
+    "ratios": {
+     "hash/rand": {
+      "mc": 1.01327,
+      "ci": [
+       1.0001,
+       1.0262
+      ],
+      "exact": 1.00932,
+      "half_width": 0.013
+     },
+     "hash/bits_rand": {
+      "mc": 0.99609,
+      "ci": [
+       0.9829,
+       1.0095
+      ],
+      "exact": 0.99738,
+      "half_width": 0.0133
+     },
+     "bits_rand/rand": {
+      "mc": 1.01725,
+      "ci": [
+       1.0047,
+       1.0302
+      ],
+      "exact": 1.01196,
+      "half_width": 0.0127
+     },
+     "hash_proj/rand_proj": {
+      "mc": 1.00549,
+      "ci": [
+       0.997,
+       1.0144
+      ],
+      "exact": 1.00046,
+      "half_width": 0.0087
+     },
+     "rand_proj/rand": {
+      "mc": 7.57558,
+      "ci": [
+       7.4936,
+       7.6569
+      ],
+      "exact": 7.55683,
+      "half_width": 0.0816
+     },
+     "rand/rand2 (A/A)": {
+      "mc": 0.9869,
+      "ci": [
+       0.974,
+       0.9993
+      ],
+      "exact": 0.99456,
+      "half_width": 0.0126
+     },
+     "hash/hash2 (A/A)": {
+      "mc": 0.99642,
+      "ci": [
+       0.9832,
+       1.0101
+      ],
+      "exact": 1.00526,
+      "half_width": 0.0134
+     },
+     "plant3/rand": {
+      "mc": 1.03778,
+      "ci": [
+       1.0247,
+       1.0506
+      ],
+      "exact": 1.03191,
+      "half_width": 0.0129
+     },
+     "plant5/rand": {
+      "mc": 1.05792,
+      "ci": [
+       1.0449,
+       1.0709
+      ],
+      "exact": 1.05187,
+      "half_width": 0.013
+     },
+     "T0/blind": {
+      "mc": 1.99898,
+      "ci": [
+       1.986,
+       2.0114
+      ],
+      "exact": 1.99312,
+      "half_width": 0.0127
+     }
+    },
+    "pct_bits_lo0": 3.61,
+    "pct_hash_lit": 50.68,
+    "ceiling_rate_2N2_over_rm1": 0.078818,
+    "proj_over_ceiling": {
+     "rand_proj": 0.9634,
+     "hash_proj": 0.9638
+    },
+    "rand_over_ceiling": 0.1275,
+    "max_base_over_own_ceiling_all_arms": 0.9846,
+    "plant_design_meanNp2_over_N2": {
+     "plant3": 1.03124,
+     "plant5": 1.05116
+    }
+   },
+   {
+    "k": 18,
+    "N": 73,
+    "ratios": {
+     "hash/rand": {
+      "mc": 1.00021,
+      "ci": [
+       0.9905,
+       1.0102
+      ],
+      "exact": 1.00074,
+      "half_width": 0.0098
+     },
+     "hash/bits_rand": {
+      "mc": 0.996,
+      "ci": [
+       0.9865,
+       1.0057
+      ],
+      "exact": 1.00028,
+      "half_width": 0.0096
+     },
+     "bits_rand/rand": {
+      "mc": 1.00423,
+      "ci": [
+       0.995,
+       1.0136
+      ],
+      "exact": 1.00046,
+      "half_width": 0.0093
+     },
+     "hash_proj/rand_proj": {
+      "mc": 1.00433,
+      "ci": [
+       0.9963,
+       1.0123
+      ],
+      "exact": 0.99958,
+      "half_width": 0.008
+     },
+     "rand_proj/rand": {
+      "mc": 6.90832,
+      "ci": [
+       6.8482,
+       6.9701
+      ],
+      "exact": 6.90566,
+      "half_width": 0.0609
+     },
+     "rand/rand2 (A/A)": {
+      "mc": 0.9942,
+      "ci": [
+       0.9844,
+       1.0043
+      ],
+      "exact": 0.99624,
+      "half_width": 0.0099
+     },
+     "hash/hash2 (A/A)": {
+      "mc": 1.00275,
+      "ci": [
+       0.9928,
+       1.0128
+      ],
+      "exact": 0.99893,
+      "half_width": 0.01
+     },
+     "plant3/rand": {
+      "mc": 1.03144,
+      "ci": [
+       1.0216,
+       1.0415
+      ],
+      "exact": 1.02672,
+      "half_width": 0.0099
+     },
+     "plant5/rand": {
+      "mc": 1.04844,
+      "ci": [
+       1.0385,
+       1.0587
+      ],
+      "exact": 1.04971,
+      "half_width": 0.0101
+     },
+     "T0/blind": {
+      "mc": 1.95955,
+      "ci": [
+       1.9503,
+       1.9682
+      ],
+      "exact": 1.95921,
+      "half_width": 0.0089
+     }
+    },
+    "pct_bits_lo0": 42.97,
+    "pct_hash_lit": 59.38,
+    "ceiling_rate_2N2_over_rm1": 0.324089,
+    "proj_over_ceiling": {
+     "rand_proj": 0.8576,
+     "hash_proj": 0.8572
+    },
+    "rand_over_ceiling": 0.1242,
+    "max_base_over_own_ceiling_all_arms": 0.8786,
+    "plant_design_meanNp2_over_N2": {
+     "plant3": 1.03026,
+     "plant5": 1.04976
+    }
+   },
+   {
+    "k": 20,
+    "N": 72,
+    "ratios": {
+     "hash/rand": {
+      "mc": 0.99895,
+      "ci": [
+       0.9893,
+       1.0088
+      ],
+      "exact": 1.00226,
+      "half_width": 0.0098
+     },
+     "hash/bits_rand": {
+      "mc": 0.99277,
+      "ci": [
+       0.9828,
+       1.0026
+      ],
+      "exact": 0.99973,
+      "half_width": 0.0099
+     },
+     "bits_rand/rand": {
+      "mc": 1.00623,
+      "ci": [
+       0.9965,
+       1.0157
+      ],
+      "exact": 1.00253,
+      "half_width": 0.0096
+     },
+     "hash_proj/rand_proj": {
+      "mc": 1.00249,
+      "ci": [
+       0.9941,
+       1.0112
+      ],
+      "exact": 0.99985,
+      "half_width": 0.0086
+     },
+     "rand_proj/rand": {
+      "mc": 7.59437,
+      "ci": [
+       7.5286,
+       7.6638
+      ],
+      "exact": 7.62168,
+      "half_width": 0.0676
+     },
+     "rand/rand2 (A/A)": {
+      "mc": 1.00098,
+      "ci": [
+       0.9918,
+       1.0106
+      ],
+      "exact": 1.00052,
+      "half_width": 0.0094
+     },
+     "hash/hash2 (A/A)": {
+      "mc": 1.00967,
+      "ci": [
+       0.9998,
+       1.0193
+      ],
+      "exact": 1.00748,
+      "half_width": 0.0098
+     },
+     "plant3/rand": {
+      "mc": 1.02415,
+      "ci": [
+       1.014,
+       1.034
+      ],
+      "exact": 1.02911,
+      "half_width": 0.01
+     },
+     "plant5/rand": {
+      "mc": 1.04992,
+      "ci": [
+       1.0397,
+       1.0601
+      ],
+      "exact": 1.05242,
+      "half_width": 0.0102
+     },
+     "T0/blind": {
+      "mc": 1.99137,
+      "ci": [
+       1.982,
+       2.0011
+      ],
+      "exact": 1.98959,
+      "half_width": 0.0095
+     }
+    },
+    "pct_bits_lo0": 39.45,
+    "pct_hash_lit": 87.6,
+    "ceiling_rate_2N2_over_rm1": 0.079023,
+    "proj_over_ceiling": {
+     "rand_proj": 0.9626,
+     "hash_proj": 0.9624
+    },
+    "rand_over_ceiling": 0.1263,
+    "max_base_over_own_ceiling_all_arms": 0.9784,
+    "plant_design_meanNp2_over_N2": {
+     "plant3": 1.03096,
+     "plant5": 1.0509
+    }
+   },
+   {
+    "k": 20,
+    "N": 145,
+    "ratios": {
+     "hash/rand": {
+      "mc": 0.99598,
+      "ci": [
+       0.9873,
+       1.0047
+      ],
+      "exact": 0.99948,
+      "half_width": 0.0087
+     },
+     "hash/bits_rand": {
+      "mc": 1.00099,
+      "ci": [
+       0.9921,
+       1.01
+      ],
+      "exact": 0.99913,
+      "half_width": 0.0089
+     },
+     "bits_rand/rand": {
+      "mc": 0.995,
+      "ci": [
+       0.9861,
+       1.0039
+      ],
+      "exact": 1.00036,
+      "half_width": 0.0089
+     },
+     "hash_proj/rand_proj": {
+      "mc": 1.00182,
+      "ci": [
+       0.9937,
+       1.0098
+      ],
+      "exact": 0.99989,
+      "half_width": 0.0081
+     },
+     "rand_proj/rand": {
+      "mc": 6.91657,
+      "ci": [
+       6.8552,
+       6.9761
+      ],
+      "exact": 6.94484,
+      "half_width": 0.0605
+     },
+     "rand/rand2 (A/A)": {
+      "mc": 1.00353,
+      "ci": [
+       0.9949,
+       1.0122
+      ],
+      "exact": 1.00116,
+      "half_width": 0.0087
+     },
+     "hash/hash2 (A/A)": {
+      "mc": 0.99763,
+      "ci": [
+       0.9884,
+       1.0063
+      ],
+      "exact": 0.999,
+      "half_width": 0.0089
+     },
+     "plant3/rand": {
+      "mc": 1.02859,
+      "ci": [
+       1.0195,
+       1.0379
+      ],
+      "exact": 1.02759,
+      "half_width": 0.0092
+     },
+     "plant5/rand": {
+      "mc": 1.04934,
+      "ci": [
+       1.0404,
+       1.0589
+      ],
+      "exact": 1.04887,
+      "half_width": 0.0092
+     },
+     "T0/blind": {
+      "mc": 1.95994,
+      "ci": [
+       1.9508,
+       1.9691
+      ],
+      "exact": 1.95934,
+      "half_width": 0.0091
+     }
+    },
+    "pct_bits_lo0": 32.03,
+    "pct_hash_lit": 55.86,
+    "ceiling_rate_2N2_over_rm1": 0.320498,
+    "proj_over_ceiling": {
+     "rand_proj": 0.8572,
+     "hash_proj": 0.8571
+    },
+    "rand_over_ceiling": 0.1234,
+    "max_base_over_own_ceiling_all_arms": 0.8673,
+    "plant_design_meanNp2_over_N2": {
+     "plant3": 1.03033,
+     "plant5": 1.04964
+    }
+   },
+   {
+    "k": 22,
+    "N": 145,
+    "ratios": {
+     "hash/rand": {
+      "mc": 0.99502,
+      "ci": [
+       0.9858,
+       1.0043
+      ],
+      "exact": 0.99992,
+      "half_width": 0.0093
+     },
+     "hash/bits_rand": {
+      "mc": 0.99607,
+      "ci": [
+       0.9872,
+       1.005
+      ],
+      "exact": 1.001,
+      "half_width": 0.0089
+     },
+     "bits_rand/rand": {
+      "mc": 0.99895,
+      "ci": [
+       0.9902,
+       1.008
+      ],
+      "exact": 0.99892,
+      "half_width": 0.0089
+     },
+     "hash_proj/rand_proj": {
+      "mc": 1.00288,
+      "ci": [
+       0.9946,
+       1.0108
+      ],
+      "exact": 1.00004,
+      "half_width": 0.0081
+     },
+     "rand_proj/rand": {
+      "mc": 7.66001,
+      "ci": [
+       7.5915,
+       7.7279
+      ],
+      "exact": 7.67312,
+      "half_width": 0.0682
+     },
+     "rand/rand2 (A/A)": {
+      "mc": 1.00413,
+      "ci": [
+       0.995,
+       1.0135
+      ],
+      "exact": 1.00182,
+      "half_width": 0.0093
+     },
+     "hash/hash2 (A/A)": {
+      "mc": 0.99996,
+      "ci": [
+       0.9911,
+       1.0087
+      ],
+      "exact": 1.00168,
+      "half_width": 0.0088
+     },
+     "plant3/rand": {
+      "mc": 1.02647,
+      "ci": [
+       1.0173,
+       1.0358
+      ],
+      "exact": 1.03071,
+      "half_width": 0.0092
+     },
+     "plant5/rand": {
+      "mc": 1.0471,
+      "ci": [
+       1.0369,
+       1.0565
+      ],
+      "exact": 1.04754,
+      "half_width": 0.0098
+     },
+     "T0/blind": {
+      "mc": 1.99197,
+      "ci": [
+       1.9833,
+       2.0012
+      ],
+      "exact": 1.99048,
+      "half_width": 0.009
+     }
+    },
+    "pct_bits_lo0": 54.69,
+    "pct_hash_lit": 85.84,
+    "ceiling_rate_2N2_over_rm1": 0.080136,
+    "proj_over_ceiling": {
+     "rand_proj": 0.9615,
+     "hash_proj": 0.9615
+    },
+    "rand_over_ceiling": 0.1253,
+    "max_base_over_own_ceiling_all_arms": 0.9681,
+    "plant_design_meanNp2_over_N2": {
+     "plant3": 1.02994,
+     "plant5": 1.04926
+    }
+   },
+   {
+    "k": 22,
+    "N": 290,
+    "ratios": {
+     "hash/rand": {
+      "mc": 0.99781,
+      "ci": [
+       0.989,
+       1.0063
+      ],
+      "exact": 1.00092,
+      "half_width": 0.0087
+     },
+     "hash/bits_rand": {
+      "mc": 1.00317,
+      "ci": [
+       0.9944,
+       1.012
+      ],
+      "exact": 1.00078,
+      "half_width": 0.0088
+     },
+     "bits_rand/rand": {
+      "mc": 0.99465,
+      "ci": [
+       0.9859,
+       1.003
+      ],
+      "exact": 1.00015,
+      "half_width": 0.0086
+     },
+     "hash_proj/rand_proj": {
+      "mc": 1.00133,
+      "ci": [
+       0.9937,
+       1.0088
+      ],
+      "exact": 0.99988,
+      "half_width": 0.0075
+     },
+     "rand_proj/rand": {
+      "mc": 6.92932,
+      "ci": [
+       6.8738,
+       6.9882
+      ],
+      "exact": 6.96255,
+      "half_width": 0.0572
+     },
+     "rand/rand2 (A/A)": {
+      "mc": 1.00558,
+      "ci": [
+       0.9968,
+       1.0142
+      ],
+      "exact": 0.99992,
+      "half_width": 0.0087
+     },
+     "hash/hash2 (A/A)": {
+      "mc": 1.00185,
+      "ci": [
+       0.9933,
+       1.0105
+      ],
+      "exact": 1.00131,
+      "half_width": 0.0086
+     },
+     "plant3/rand": {
+      "mc": 1.02283,
+      "ci": [
+       1.0146,
+       1.0314
+      ],
+      "exact": 1.02858,
+      "half_width": 0.0084
+     },
+     "plant5/rand": {
+      "mc": 1.04453,
+      "ci": [
+       1.0357,
+       1.0537
+      ],
+      "exact": 1.04868,
+      "half_width": 0.009
+     },
+     "T0/blind": {
+      "mc": 1.95608,
+      "ci": [
+       1.9474,
+       1.9646
+      ],
+      "exact": 1.96062,
+      "half_width": 0.0086
+     }
+    },
+    "pct_bits_lo0": 48.24,
+    "pct_hash_lit": 66.99,
+    "ceiling_rate_2N2_over_rm1": 0.320546,
+    "proj_over_ceiling": {
+     "rand_proj": 0.8564,
+     "hash_proj": 0.8563
+    },
+    "rand_over_ceiling": 0.123,
+    "max_base_over_own_ceiling_all_arms": 0.8619,
+    "plant_design_meanNp2_over_N2": {
+     "plant3": 1.02992,
+     "plant5": 1.04994
+    }
+   },
+   {
+    "k": 24,
+    "N": 290,
+    "ratios": {
+     "hash/rand": {
+      "mc": 0.99375,
+      "ci": [
+       0.985,
+       1.0025
+      ],
+      "exact": 0.99886,
+      "half_width": 0.0087
+     },
+     "hash/bits_rand": {
+      "mc": 0.99582,
+      "ci": [
+       0.9871,
+       1.0043
+      ],
+      "exact": 0.99943,
+      "half_width": 0.0086
+     },
+     "bits_rand/rand": {
+      "mc": 0.99792,
+      "ci": [
+       0.9893,
+       1.0064
+      ],
+      "exact": 0.99943,
+      "half_width": 0.0086
+     },
+     "hash_proj/rand_proj": {
+      "mc": 0.99377,
+      "ci": [
+       0.9856,
+       1.0021
+      ],
+      "exact": 1.00008,
+      "half_width": 0.0082
+     },
+     "rand_proj/rand": {
+      "mc": 7.71287,
+      "ci": [
+       7.6466,
+       7.7789
+      ],
+      "exact": 7.70032,
+      "half_width": 0.0661
+     },
+     "rand/rand2 (A/A)": {
+      "mc": 1.00373,
+      "ci": [
+       0.9949,
+       1.0129
+      ],
+      "exact": 1.00041,
+      "half_width": 0.009
+     },
+     "hash/hash2 (A/A)": {
+      "mc": 0.99042,
+      "ci": [
+       0.9814,
+       0.9987
+      ],
+      "exact": 0.99915,
+      "half_width": 0.0086
+     },
+     "plant3/rand": {
+      "mc": 1.01786,
+      "ci": [
+       1.0093,
+       1.0269
+      ],
+      "exact": 1.02913,
+      "half_width": 0.0088
+     },
+     "plant5/rand": {
+      "mc": 1.04366,
+      "ci": [
+       1.0348,
+       1.0526
+      ],
+      "exact": 1.0493,
+      "half_width": 0.0089
+     },
+     "T0/blind": {
+      "mc": 1.98716,
+      "ci": [
+       1.9786,
+       1.9956
+      ],
+      "exact": 1.99084,
+      "half_width": 0.0085
+     }
+    },
+    "pct_bits_lo0": 39.65,
+    "pct_hash_lit": 84.57,
+    "ceiling_rate_2N2_over_rm1": 0.080171,
+    "proj_over_ceiling": {
+     "rand_proj": 0.9612,
+     "hash_proj": 0.9613
+    },
+    "rand_over_ceiling": 0.1248,
+    "max_base_over_own_ceiling_all_arms": 0.9644,
+    "plant_design_meanNp2_over_N2": {
+     "plant3": 1.02998,
+     "plant5": 1.0501
+    }
+   },
+   {
+    "k": 24,
+    "N": 579,
+    "ratios": {
+     "hash/rand": {
+      "mc": 1.00155,
+      "ci": [
+       0.9933,
+       1.0098
+      ],
+      "exact": 0.99973,
+      "half_width": 0.0083
+     },
+     "hash/bits_rand": {
+      "mc": 0.9978,
+      "ci": [
+       0.9893,
+       1.0061
+      ],
+      "exact": 0.99982,
+      "half_width": 0.0084
+     },
+     "bits_rand/rand": {
+      "mc": 1.00376,
+      "ci": [
+       0.995,
+       1.0124
+      ],
+      "exact": 0.99991,
+      "half_width": 0.0087
+     },
+     "hash_proj/rand_proj": {
+      "mc": 1.00608,
+      "ci": [
+       0.9981,
+       1.0139
+      ],
+      "exact": 1.00008,
+      "half_width": 0.0079
+     },
+     "rand_proj/rand": {
+      "mc": 6.97189,
+      "ci": [
+       6.9134,
+       7.0305
+      ],
+      "exact": 6.97688,
+      "half_width": 0.0585
+     },
+     "rand/rand2 (A/A)": {
+      "mc": 0.99925,
+      "ci": [
+       0.9909,
+       1.0078
+      ],
+      "exact": 0.99973,
+      "half_width": 0.0085
+     },
+     "hash/hash2 (A/A)": {
+      "mc": 1.00466,
+      "ci": [
+       0.9959,
+       1.0133
+      ],
+      "exact": 0.99934,
+      "half_width": 0.0087
+     },
+     "plant3/rand": {
+      "mc": 1.02805,
+      "ci": [
+       1.0198,
+       1.037
+      ],
+      "exact": 1.02972,
+      "half_width": 0.0086
+     },
+     "plant5/rand": {
+      "mc": 1.04829,
+      "ci": [
+       1.0395,
+       1.0569
+      ],
+      "exact": 1.04906,
+      "half_width": 0.0087
+     },
+     "T0/blind": {
+      "mc": 1.96099,
+      "ci": [
+       1.9527,
+       1.9692
+      ],
+      "exact": 1.96087,
+      "half_width": 0.0082
+     }
+    },
+    "pct_bits_lo0": 29.1,
+    "pct_hash_lit": 39.45,
+    "ceiling_rate_2N2_over_rm1": 0.31958,
+    "proj_over_ceiling": {
+     "rand_proj": 0.8563,
+     "hash_proj": 0.8564
+    },
+    "rand_over_ceiling": 0.1227,
+    "max_base_over_own_ceiling_all_arms": 0.8594,
+    "plant_design_meanNp2_over_N2": {
+     "plant3": 1.02999,
+     "plant5": 1.04997
+    }
+   }
+  ],
+  "predictions": {
+   "P1": {
+    "holds": true,
+    "pooled": {
+     "mc": 1.0013,
+     "mc_ci": [
+      0.9978,
+      1.0049
+     ],
+     "exact": 1.0026,
+     "exact_ci": [
+      1.0002,
+      1.0049
+     ]
+    },
+    "cells_ci_contain_1": 9
+   },
+   "P1p": {
+    "holds": true,
+    "half_widths": [
+     0.0196,
+     0.0123,
+     0.013,
+     0.0098,
+     0.0098,
+     0.0087,
+     0.0093,
+     0.0087,
+     0.0087,
+     0.0083
+    ],
+    "n_le_003": 10
+   },
+   "P2": {
+    "holds": true,
+    "hash_bits": {
+     "mc": 0.9984,
+     "mc_ci": [
+      0.995,
+      1.002
+     ],
+     "exact": 0.9997,
+     "exact_ci": [
+      0.9972,
+      1.0022
+     ]
+    },
+    "bits_rand": {
+     "mc": 1.0029,
+     "mc_ci": [
+      0.9994,
+      1.0066
+     ],
+     "exact": 1.0029,
+     "exact_ci": [
+      1.0005,
+      1.0053
+     ]
+    }
+   },
+   "P2b": {
+    "holds": true,
+    "bits_lo0_pct": [
+     53.0273,
+     6.6406,
+     3.6133,
+     42.9688,
+     39.4531,
+     32.0312,
+     54.6875,
+     48.2422,
+     39.6484,
+     29.1016
+    ],
+    "hash_lit_pct": [
+     75.7812,
+     10.5469,
+     50.6836,
+     59.375,
+     87.5977,
+     55.8594,
+     85.8398,
+     66.9922,
+     84.5703,
+     39.4531
+    ]
+   },
+   "P3": {
+    "holds": true,
+    "ceiling_violations_all_arms": 0,
+    "proj_over_ceiling_range": [
+     0.8563,
+     0.9663
+    ],
+    "rand_proj_over_rand_exact_range": [
+     6.8666,
+     7.7003
+    ],
+    "rand_proj_over_rand_mc_range": [
+     6.9083,
+     7.7129
+    ],
+    "hash_proj_pooled": {
+     "mc": 1.0006,
+     "mc_ci": [
+      0.9979,
+      1.0032
+     ],
+     "exact": 0.9998,
+     "exact_ci": [
+      0.9995,
+      1.0002
+     ]
+    }
+   },
+   "P4": {
+    "holds": true,
+    "exact": [
+     2.0038,
+     1.9563,
+     1.9931,
+     1.9592,
+     1.9896,
+     1.9593,
+     1.9905,
+     1.9606,
+     1.9908,
+     1.9609
+    ],
+    "cells_excl_1": 10
+   },
+   "P5": {
+    "holds": true,
+    "design3": 1.0309,
+    "design5": 1.0506,
+    "pooled3": {
+     "mc": 1.0299,
+     "mc_ci": [
+      1.0264,
+      1.0336
+     ],
+     "exact": 1.031,
+     "exact_ci": [
+      1.0285,
+      1.0335
+     ]
+    },
+    "pooled5": {
+     "mc": 1.0486,
+     "mc_ci": [
+      1.0449,
+      1.0525
+     ],
+     "exact": 1.0496,
+     "exact_ci": [
+      1.0472,
+      1.052
+     ]
+    },
+    "cells_excl_1_plant3": 10,
+    "cells_excl_1_plant5": 10,
+    "abs_dev3": 0.0009,
+    "abs_dev5": 0.0019
+   },
+   "P6": {
+    "holds": true,
+    "rand": {
+     "mc": 0.9993,
+     "mc_ci": [
+      0.9957,
+      1.0028
+     ],
+     "exact": 0.9993,
+     "exact_ci": [
+      0.997,
+      1.0016
+     ]
+    },
+    "hash": {
+     "mc": 1.0018,
+     "mc_ci": [
+      0.9983,
+      1.0054
+     ],
+     "exact": 1.0023,
+     "exact_ci": [
+      0.9999,
+      1.0047
+     ]
+    },
+    "c1_rand": 9,
+    "c1_hash": 9
+   },
+   "P7": {
+    "holds": true,
+    "verification_failures": 0,
+    "verified_minus_counted": 0,
+    "instrument_check_failures": 0,
+    "worst_z": [
+     24,
+     290,
+     "plant3",
+     -2.5422
+    ]
+   },
+   "P8": {
+    "holds": true,
+    "note": "derived inequality G + w p >= G; equal at w = 0, strict above"
+   }
+  },
+  "holdout_k16_bases_300_511": {
+   "description": "bases 0..299 of both k = 16 cells dropped (these rows equal the pre-freeze smoke rows); other cells unchanged",
+   "predictions_hold": {
+    "P1": true,
+    "P1p": true,
+    "P2": true,
+    "P2b": true,
+    "P3": true,
+    "P4": true,
+    "P5": true,
+    "P6": true,
+    "P7": true,
+    "P8": true
+   },
+   "P1_cells_ci_contain_1": 8,
+   "pooled": {
+    "hash/rand": {
+     "mc": 1.0026,
+     "ci": [
+      0.9982,
+      1.0071
+     ]
+    },
+    "hash/bits_rand": {
+     "mc": 0.9984,
+     "ci": [
+      0.9937,
+      1.0029
+     ]
+    },
+    "bits_rand/rand": {
+     "mc": 1.0042,
+     "ci": [
+      0.9997,
+      1.0089
+     ]
+    },
+    "hash_proj/rand_proj": {
+     "mc": 1.0002,
+     "ci": [
+      0.9972,
+      1.0031
+     ]
+    },
+    "rand_proj/rand": {
+     "mc": 7.2614,
+     "ci": [
+      7.2347,
+      7.2884
+     ]
+    },
+    "rand/rand2 (A/A)": {
+     "mc": 0.9985,
+     "ci": [
+      0.994,
+      1.0031
+     ]
+    },
+    "hash/hash2 (A/A)": {
+     "mc": 1.003,
+     "ci": [
+      0.9985,
+      1.0076
+     ]
+    },
+    "plant3/rand": {
+     "mc": 1.0319,
+     "ci": [
+      1.0275,
+      1.0366
+     ]
+    },
+    "plant5/rand": {
+     "mc": 1.0501,
+     "ci": [
+      1.0455,
+      1.0547
+     ]
+    },
+    "T0/blind": {
+     "mc": 1.9779,
+     "ci": [
+      1.9735,
+      1.9825
+     ]
+    }
+   }
+  },
+  "replay_k16": {
+   "18": {
+    "bases_rebuilt": 513,
+    "arms_per_base": 9,
+    "exact_mismatches": {},
+    "N_mismatches": {},
+    "t0_exact_mismatches": 0,
+    "theta_b0_validator": 8529324334280593,
+    "theta_b0_recorded": 8529324334280593,
+    "hash_set_size_at_theta": 18,
+    "hash_windows_disjoint": true,
+    "hash_proj_bases_borrowing_from_next_window": 24,
+    "own_target_hits_verified": 1066435,
+    "own_target_verify_failures": 0,
+    "replay_ratios_own_targets": {
+     "hash/rand": 1.0044,
+     "hash/bits_rand": 0.9836,
+     "hash/hash2": 1.0023,
+     "rand/rand2": 1.0029,
+     "hash_proj/rand_proj": 1.0002,
+     "rand_proj/rand": 7.3764,
+     "plant3/rand": 1.038,
+     "plant5/rand": 1.0489,
+     "T0/blind": 1.9997
+    },
+    "mc_rates": {
+     "bits_rand": {
+      "validator": 0.010537,
+      "recorded_512": 0.010471,
+      "z_vs_recorded_512": 0.6,
+      "z_vs_recorded_same_bases": 1.47,
+      "z_vs_own_exact": 1.13
+     },
+     "rand": {
+      "validator": 0.010319,
+      "recorded_512": 0.010309,
+      "z_vs_recorded_512": 0.1,
+      "z_vs_recorded_same_bases": 0.23,
+      "z_vs_own_exact": 0.7
+     },
+     "T0": {
+      "validator": 0.020636,
+      "recorded_512": 0.020651,
+      "z_vs_recorded_512": -0.11,
+      "z_vs_recorded_same_bases": -0.24,
+      "z_vs_own_exact": 0.04
+     },
+     "rand2": {
+      "validator": 0.01029,
+      "recorded_512": 0.010349,
+      "z_vs_recorded_512": -0.58,
+      "z_vs_recorded_same_bases": -1.33,
+      "z_vs_own_exact": -0.32
+     },
+     "hash": {
+      "validator": 0.010364,
+      "recorded_512": 0.010428,
+      "z_vs_recorded_512": -0.61,
+      "z_vs_recorded_same_bases": -1.43,
+      "z_vs_own_exact": -2.1
+     },
+     "hash2": {
+      "validator": 0.010341,
+      "recorded_512": 0.010357,
+      "z_vs_recorded_512": -0.16,
+      "z_vs_recorded_same_bases": -0.36,
+      "z_vs_own_exact": -0.24
+     },
+     "rand_proj": {
+      "validator": 0.07612,
+      "recorded_512": 0.076224,
+      "z_vs_recorded_512": -0.31,
+      "z_vs_recorded_same_bases": -0.32,
+      "z_vs_own_exact": -0.53
+     },
+     "hash_proj": {
+      "validator": 0.076135,
+      "recorded_512": 0.076088,
+      "z_vs_recorded_512": 0.14,
+      "z_vs_recorded_same_bases": 0.14,
+      "z_vs_own_exact": -0.65
+     },
+     "plant3": {
+      "validator": 0.010712,
+      "recorded_512": 0.010761,
+      "z_vs_recorded_512": -0.44,
+      "z_vs_recorded_same_bases": -1.1,
+      "z_vs_own_exact": -0.86
+     },
+     "plant5": {
+      "validator": 0.010824,
+      "recorded_512": 0.010854,
+      "z_vs_recorded_512": -0.27,
+      "z_vs_recorded_same_bases": -0.66,
+      "z_vs_own_exact": -0.62
+     }
+    }
+   },
+   "36": {
+    "bases_rebuilt": 513,
+    "arms_per_base": 9,
+    "exact_mismatches": {},
+    "N_mismatches": {},
+    "t0_exact_mismatches": 0,
+    "theta_b0_validator": 17143986520194111,
+    "theta_b0_recorded": 17143986520194111,
+    "hash_set_size_at_theta": 36,
+    "hash_windows_disjoint": true,
+    "hash_proj_bases_borrowing_from_next_window": 69,
+    "own_target_hits_verified": 1007238,
+    "own_target_verify_failures": 0,
+    "replay_ratios_own_targets": {
+     "hash/rand": 0.9992,
+     "hash/bits_rand": 1.0034,
+     "hash/hash2": 0.9956,
+     "rand/rand2": 0.9957,
+     "hash_proj/rand_proj": 0.9957,
+     "rand_proj/rand": 6.8716,
+     "plant3/rand": 1.0386,
+     "plant5/rand": 1.0496,
+     "T0/blind": 1.954
+    },
+    "mc_rates": {
+     "bits_rand": {
+      "validator": 0.039594,
+      "recorded_512": 0.03957,
+      "z_vs_recorded_512": 0.09,
+      "z_vs_recorded_same_bases": 0.14,
+      "z_vs_own_exact": -0.3
+     },
+     "rand": {
+      "validator": 0.039762,
+      "recorded_512": 0.039747,
+      "z_vs_recorded_512": 0.06,
+      "z_vs_recorded_same_bases": 0.09,
+      "z_vs_own_exact": -0.31
+     },
+     "T0": {
+      "validator": 0.077695,
+      "recorded_512": 0.077862,
+      "z_vs_recorded_512": -0.49,
+      "z_vs_recorded_same_bases": -0.71,
+      "z_vs_own_exact": -0.99
+     },
+     "rand2": {
+      "validator": 0.039933,
+      "recorded_512": 0.039814,
+      "z_vs_recorded_512": 0.45,
+      "z_vs_recorded_same_bases": 0.69,
+      "z_vs_own_exact": 0.79
+     },
+     "hash": {
+      "validator": 0.03973,
+      "recorded_512": 0.039955,
+      "z_vs_recorded_512": -0.89,
+      "z_vs_recorded_same_bases": -1.31,
+      "z_vs_own_exact": -1.09
+     },
+     "hash2": {
+      "validator": 0.039905,
+      "recorded_512": 0.039656,
+      "z_vs_recorded_512": 1.01,
+      "z_vs_recorded_same_bases": 1.45,
+      "z_vs_own_exact": 1.43
+     },
+     "rand_proj": {
+      "validator": 0.273228,
+      "recorded_512": 0.274682,
+      "z_vs_recorded_512": -1.3,
+      "z_vs_recorded_same_bases": -1.31,
+      "z_vs_own_exact": -0.08
+     },
+     "hash_proj": {
+      "validator": 0.272064,
+      "recorded_512": 0.271774,
+      "z_vs_recorded_512": 0.26,
+      "z_vs_recorded_same_bases": 0.26,
+      "z_vs_own_exact": -0.86
+     },
+     "plant3": {
+      "validator": 0.041296,
+      "recorded_512": 0.041287,
+      "z_vs_recorded_512": 0.03,
+      "z_vs_recorded_same_bases": 0.05,
+      "z_vs_own_exact": 1.3
+     },
+     "plant5": {
+      "validator": 0.041734,
+      "recorded_512": 0.04151,
+      "z_vs_recorded_512": 0.86,
+      "z_vs_recorded_same_bases": 1.28,
+      "z_vs_own_exact": 1.06
+     }
+    }
+   }
+  },
+  "exact_coverage_spot_checks": {
+   "k18_N36": {
+    "base_indices": "bits_lo0 and b = 0..31",
+    "arms_per_base": 9,
+    "exact_mismatches": {},
+    "N_mismatches": {},
+    "t0_exact_mismatches": 0,
+    "theta_b0_equal": true,
+    "theta_b0": 5993718311970969,
+    "hash_set_size_at_theta": 36,
+    "hash_windows_disjoint_all_512": true,
+    "hash_proj_bases_borrowing_from_next_window": 3
+   },
+   "k18_N73": {
+    "base_indices": "bits_lo0 and b = 0..31",
+    "arms_per_base": 9,
+    "exact_mismatches": {},
+    "N_mismatches": {},
+    "t0_exact_mismatches": 0,
+    "theta_b0_equal": true,
+    "theta_b0": 11403794891839770,
+    "hash_set_size_at_theta": 73,
+    "hash_windows_disjoint_all_512": true,
+    "hash_proj_bases_borrowing_from_next_window": 5
+   },
+   "k20_N72": {
+    "base_indices": "bits_lo0 and b = 0..31",
+    "arms_per_base": 9,
+    "exact_mismatches": {},
+    "N_mismatches": {},
+    "t0_exact_mismatches": 0,
+    "theta_b0_equal": true,
+    "theta_b0": 2363816738317058,
+    "hash_set_size_at_theta": 72,
+    "hash_windows_disjoint_all_512": true,
+    "hash_proj_bases_borrowing_from_next_window": 1
+   },
+   "k20_N145": {
+    "base_indices": "bits_lo0 and b = 0..31",
+    "arms_per_base": 9,
+    "exact_mismatches": {},
+    "N_mismatches": {},
+    "t0_exact_mismatches": 0,
+    "theta_b0_equal": true,
+    "theta_b0": 4675296192130086,
+    "hash_set_size_at_theta": 145,
+    "hash_windows_disjoint_all_512": true,
+    "hash_proj_bases_borrowing_from_next_window": 3
+   },
+   "k22_N145": {
+    "base_indices": "bits_lo0 and b = 0..31",
+    "arms_per_base": 9,
+    "exact_mismatches": {},
+    "N_mismatches": {},
+    "t0_exact_mismatches": 0,
+    "theta_b0_equal": true,
+    "theta_b0": 1191728608815442,
+    "hash_set_size_at_theta": 145,
+    "hash_windows_disjoint_all_512": true,
+    "hash_proj_bases_borrowing_from_next_window": 3
+   },
+   "k22_N290": {
+    "base_indices": "bits_lo0 and b = 0..31",
+    "arms_per_base": 9,
+    "exact_mismatches": {},
+    "N_mismatches": {},
+    "t0_exact_mismatches": 0,
+    "theta_b0_equal": true,
+    "theta_b0": 2513680726708258,
+    "hash_set_size_at_theta": 290,
+    "hash_windows_disjoint_all_512": true,
+    "hash_proj_bases_borrowing_from_next_window": 6
+   },
+   "k24_N290": {
+    "base_indices": "bits_lo0 and b = 0..15",
+    "arms_per_base": 9,
+    "exact_mismatches": {},
+    "N_mismatches": {},
+    "t0_exact_mismatches": 0,
+    "theta_b0_equal": true,
+    "theta_b0": 667944537039947,
+    "hash_set_size_at_theta": 290,
+    "hash_windows_disjoint_all_512": true,
+    "hash_proj_bases_borrowing_from_next_window": 0
+   },
+   "k24_N579": {
+    "base_indices": "bits_lo0 and b = 0..15",
+    "arms_per_base": 9,
+    "exact_mismatches": {},
+    "N_mismatches": {},
+    "t0_exact_mismatches": 0,
+    "theta_b0_equal": true,
+    "theta_b0": 1239634789737715,
+    "hash_set_size_at_theta": 579,
+    "hash_windows_disjoint_all_512": true,
+    "hash_proj_bases_borrowing_from_next_window": 0
+   }
+  },
+  "cost": [
+   {
+    "k": 16,
+    "N": 18,
+    "table_group_ops_N2": 324,
+    "hash_evals_p": 65437,
+    "hash_evals_per_column": 3635.4,
+    "hash_over_rand_w0": 1.0,
+    "hash_over_rand_w0_1": 21.197,
+    "hash_over_rand_w1": 202.97,
+    "with_shared_2N_native_priced_w0_1": 20.975,
+    "with_shared_2N_native_priced_w1": 182.77,
+    "cost_per_relation_ratio_measured_rates": {
+     "w0": 0.9886,
+     "w0.1": 20.955,
+     "w1": 200.65
+    },
+    "instrument_hashed_valid_u_only": 32832
+   },
+   {
+    "k": 16,
+    "N": 36,
+    "table_group_ops_N2": 1296,
+    "hash_evals_p": 65437,
+    "hash_evals_per_column": 1817.7,
+    "hash_over_rand_w0": 1.0,
+    "hash_over_rand_w0_1": 6.049,
+    "hash_over_rand_w1": 51.49,
+    "with_shared_2N_native_priced_w0_1": 6.021,
+    "with_shared_2N_native_priced_w1": 48.83,
+    "cost_per_relation_ratio_measured_rates": {
+     "w0": 0.9948,
+     "w0.1": 6.018,
+     "w1": 51.22
+    },
+    "instrument_hashed_valid_u_only": 32832
+   },
+   {
+    "k": 18,
+    "N": 36,
+    "table_group_ops_N2": 1296,
+    "hash_evals_p": 262133,
+    "hash_evals_per_column": 7281.5,
+    "hash_over_rand_w0": 1.0,
+    "hash_over_rand_w0_1": 21.226,
+    "hash_over_rand_w1": 203.26,
+    "with_shared_2N_native_priced_w0_1": 21.115,
+    "with_shared_2N_native_priced_w1": 192.62,
+    "cost_per_relation_ratio_measured_rates": {
+     "w0": 0.9869,
+     "w0.1": 20.948,
+     "w1": 200.6
+    },
+    "instrument_hashed_valid_u_only": 131544
+   },
+   {
+    "k": 18,
+    "N": 73,
+    "table_group_ops_N2": 5329,
+    "hash_evals_p": 262133,
+    "hash_evals_per_column": 3590.9,
+    "hash_over_rand_w0": 1.0,
+    "hash_over_rand_w0_1": 5.919,
+    "hash_over_rand_w1": 50.19,
+    "with_shared_2N_native_priced_w0_1": 5.906,
+    "with_shared_2N_native_priced_w1": 48.88,
+    "cost_per_relation_ratio_measured_rates": {
+     "w0": 0.9998,
+     "w0.1": 5.918,
+     "w1": 50.18
+    },
+    "instrument_hashed_valid_u_only": 131544
+   },
+   {
+    "k": 20,
+    "N": 72,
+    "table_group_ops_N2": 5184,
+    "hash_evals_p": 1048573,
+    "hash_evals_per_column": 14563.5,
+    "hash_over_rand_w0": 1.0,
+    "hash_over_rand_w0_1": 21.227,
+    "hash_over_rand_w1": 203.27,
+    "with_shared_2N_native_priced_w0_1": 21.171,
+    "with_shared_2N_native_priced_w1": 197.8,
+    "cost_per_relation_ratio_measured_rates": {
+     "w0": 1.0011,
+     "w0.1": 21.249,
+     "w1": 203.49
+    },
+    "instrument_hashed_valid_u_only": 524808
+   },
+   {
+    "k": 20,
+    "N": 145,
+    "table_group_ops_N2": 21025,
+    "hash_evals_p": 1048573,
+    "hash_evals_per_column": 7231.5,
+    "hash_over_rand_w0": 1.0,
+    "hash_over_rand_w0_1": 5.987,
+    "hash_over_rand_w1": 50.87,
+    "with_shared_2N_native_priced_w0_1": 5.98,
+    "with_shared_2N_native_priced_w1": 50.19,
+    "cost_per_relation_ratio_measured_rates": {
+     "w0": 1.004,
+     "w0.1": 6.011,
+     "w1": 51.08
+    },
+    "instrument_hashed_valid_u_only": 524808
+   },
+   {
+    "k": 22,
+    "N": 145,
+    "table_group_ops_N2": 21025,
+    "hash_evals_p": 4194301,
+    "hash_evals_per_column": 28926.2,
+    "hash_over_rand_w0": 1.0,
+    "hash_over_rand_w0_1": 20.949,
+    "hash_over_rand_w1": 200.49,
+    "with_shared_2N_native_priced_w0_1": 20.922,
+    "with_shared_2N_native_priced_w1": 197.78,
+    "cost_per_relation_ratio_measured_rates": {
+     "w0": 1.005,
+     "w0.1": 21.054,
+     "w1": 201.49
+    },
+    "instrument_hashed_valid_u_only": 2098920
+   },
+   {
+    "k": 22,
+    "N": 290,
+    "table_group_ops_N2": 84100,
+    "hash_evals_p": 4194301,
+    "hash_evals_per_column": 14463.1,
+    "hash_over_rand_w0": 1.0,
+    "hash_over_rand_w0_1": 5.987,
+    "hash_over_rand_w1": 50.87,
+    "with_shared_2N_native_priced_w0_1": 5.984,
+    "with_shared_2N_native_priced_w1": 50.53,
+    "cost_per_relation_ratio_measured_rates": {
+     "w0": 1.0022,
+     "w0.1": 6.0,
+     "w1": 50.98
+    },
+    "instrument_hashed_valid_u_only": 2098920
+   },
+   {
+    "k": 24,
+    "N": 290,
+    "table_group_ops_N2": 84100,
+    "hash_evals_p": 16777141,
+    "hash_evals_per_column": 57852.2,
+    "hash_over_rand_w0": 1.0,
+    "hash_over_rand_w0_1": 20.949,
+    "hash_over_rand_w1": 200.49,
+    "with_shared_2N_native_priced_w0_1": 20.935,
+    "with_shared_2N_native_priced_w1": 199.12,
+    "cost_per_relation_ratio_measured_rates": {
+     "w0": 1.0063,
+     "w0.1": 21.081,
+     "w1": 201.75
+    },
+    "instrument_hashed_valid_u_only": 8392032
+   },
+   {
+    "k": 24,
+    "N": 579,
+    "table_group_ops_N2": 335241,
+    "hash_evals_p": 16777141,
+    "hash_evals_per_column": 28976.1,
+    "hash_over_rand_w0": 1.0,
+    "hash_over_rand_w0_1": 6.005,
+    "hash_over_rand_w1": 51.05,
+    "with_shared_2N_native_priced_w0_1": 6.003,
+    "with_shared_2N_native_priced_w1": 50.87,
+    "cost_per_relation_ratio_measured_rates": {
+     "w0": 0.9985,
+     "w0.1": 5.995,
+     "w1": 50.97
+    },
+    "instrument_hashed_valid_u_only": 8392032
+   }
+  ],
+  "readme_numeric_comparisons": {
+   "total": 260,
+   "failed": 0
+  },
+  "summary_json_agreement": {
+   "max_abs_point_diff": 5.551115123125783e-17,
+   "max_abs_ci_endpoint_diff": 0.008910578013351156
+  }
+ },
+ "frozen_hashes": {
+  "l1lib.py": "e1c09a5b6f9043f04895c6e69bd8bc6e7f71fe73ee2b9016275a5118d09a1bed",
+  "run_l1.py": "202f81235c4dc9a4aa33438b25da297c6df83e04b1c26d35b9164ba10a646462",
+  "analyse_l1.py": "2b402f394d40bdfa81783f308b1c3b0c3baccf3e9ce2765e039a9263778dfbca",
+  "PROTOCOL.md": "4ab666fb8a62794bf2916d88e588b76fd8496261b4d4682aabb667726cedde25",
+  "FREEZE.sha256": "35dc6c737329fd44c838053a5834c728033e6309a6a0a78a72cad39c5e5d1ed7"
+ },
+ "artifact_sha256_at_validation": {
+  "README.md": "231f143d2c2f99994adfa50ae49e35ce7843e69c61c07d67ff8364b08de8be18",
+  "REPORT.typ": "eb7fd20ca553144464a984c83084874bc472487ce9e1e9d002c186d137b49de2",
+  "REPORT.pdf": "54440a3550f10a1e9903e56d2fa90a3f15eea0b9e69758b803628855344d9597",
+  "run.log": "86a85e0baa08558f811c25fb532513e6c6aaa7798fc722130c44e272064f537f",
+  "analysis/RESULTS.md": "209d41ce60078ac222d9012d03bbca31cc437b85f00765f3084673ae74c97d01",
+  "analysis/summary.json": "16acf0c985f85a8c2541a9a65d5ad5db3fc27b86513c433a48b78236b80f0459",
+  "curve_facts.json": "1c94cb0826723ffc0fb0048523ff2c52c7a99d43380653bbc371363c99aed650",
+  "export_json.py": "bc2ccfffc95cfa224252a87a82c2f77a878347a703aa4f4878f64daa387ccc76",
+  "out/SHA256SUMS": "3b04fb02e532535c2a8cac4742e90e04d9bbc061430f8413af9b2c601815bb38",
+  "out_json/SHA256SUMS": "c865f33b474cb60416043aec9768ae2edbdde9bdd5f38f72a91fe460f857b796",
+  "out/*.npz and out_json/*.json": "as listed in out/SHA256SUMS and out_json/SHA256SUMS; all 20 verified"
+ },
+ "pinning_note": "This report pins README.md at 231f143d...; put corrections in the README Errata section only if the gate file records the post-errata hash, otherwise use a sibling ERRATA.md (lesson L-8d86e8fc352c).",
+ "commands": [
+  "cd /home/user/crypto && git rev-parse HEAD; git status --porcelain --ignored -- research/curve25519_wave7_untried_20261122/L1_hash_base",
+  "for c in 91f2f2bcde e783d12a5b 190daab375: git show $c:<L1>/{l1lib.py,run_l1.py,analyse_l1.py,PROTOCOL.md,FREEZE.sha256} | sha256sum; (cd <L1> && sha256sum -c FREEZE.sha256)",
+  "git rev-list 91f2f2bcde..190daab375 | xargs -n1 git diff-tree --no-commit-id --name-status -r -- <L1>",
+  "for each out/*.npz: git show <first-add-commit>:<path> | sha256sum vs disk vs out/SHA256SUMS",
+  "git diff 9a45d456d4 91f2f2bcde -- <L1>/{analyse_l1.py,run_l1.py,l1lib.py}; git diff 2d683358c2 9a45d456d4 -- <L1>/{run_l1.py,l1lib.py}",
+  "taskset -c 3 python3 -I vfacts.py > vfacts.json",
+  "VFACTS=vfacts.json taskset -c 3 python3 -I vdata.py <L1> vdata.json",
+  "HOLDOUT=1 VFACTS=vfacts.json taskset -c 2 python3 -I vdata_holdout.py <L1> vdata_holdout.json",
+  "python3 -I vcompare.py <L1>",
+  "taskset -c 3 python3 -I vreplay.py <L1> full 16 512 vreplay_k16.json",
+  "taskset -c 3 python3 -I vreplay.py <L1> spot {18,20,22} 32 vspot2_k{k}.json; taskset -c 3 python3 -I vreplay.py <L1> spot 24 16 vspot2_k24.json",
+  "python3 -I (smoke rows vs data rows: np.array_equal(smoke[a], data[a][:B]) for every arm)",
+  "python3 tools/pcc/pcc.py lint-prose <L1>/README.md",
+  "python3 -I vreport.py"
+ ],
+ "not_applicable": [
+  "ecbench band replay (no ecbench session, no rho/BSGS arm)",
+  "binary-to-commit binding (pure Python; no compiled binary)",
+  "validation gate VALIDATION.json (no leaderboard or benchmarks row is proposed)"
+ ],
+ "edits_by_validator": [
+  "research/curve25519_wave7_untried_20261122/L1_hash_base/validator-report.json (this file only)"
+ ],
+ "lessons_proposed_for_main_session": [
+  "python3 tools/lessons.py outcome --scope validator --task 'wave-7 L1 hash-base validation' --result success --applied L-99ee952350b2,L-26895912385b,L-1a5a6b64022c,L-8d86e8fc352c --evidence research/curve25519_wave7_untried_20261122/L1_hash_base/validator-report.json",
+  "python3 tools/lessons.py test --lesson L-99ee952350b2 --outcome confirm --context 'L1 vcompare/vdata indexed summary.json and npz keys with []' --evidence research/curve25519_wave7_untried_20261122/L1_hash_base/validator-report.json",
+  "python3 tools/lessons.py test --lesson L-26895912385b --outcome confirm --context 'L1 ratios recomputed from raw per-base counts; T0 paired' --evidence research/curve25519_wave7_untried_20261122/L1_hash_base/validator-report.json",
+  "python3 tools/lessons.py add --scope validator --trigger 'validating a study whose smoke test uses the same seed rule as the run (seed parts without a smoke role or B)' --action 'compare the smoke outputs row by row with the first rows of the data; if identical, recompute every verdict on the held-out rows and report the pre-freeze overlap' --why 'wave-7 L1: smoke B = 300 rows were byte-identical to bases 0-299 of both k = 16 data cells and preceded the freeze' --evidence research/curve25519_wave7_untried_20261122/L1_hash_base/validator-report.json"
+ ]
+}

@@ -1,0 +1,67 @@
+"""Normal owned source checkpoint; original policy failures stay explicit, no scientific execution."""
+from pathlib import Path
+from datetime import datetime,timezone
+import hashlib,json,lzma,os,re,shutil,subprocess
+r=Path('/workspace/crypto');p=r/'research/chained_jacobian_transfers_20261110';base='5f7c710d6d9b3f442107d9d97425b2b4d04ed283';published='c91b4802af77e32d6821ba89a95715228e699b58';h=Path('/workspace/scratch/ct521-native-word-preserved-raw-source-checkpoint');h.mkdir()
+shutil.copyfile(r/'.git/index',h/'entire-canonical-index-before');shutil.copyfile('/workspace/scratch/ct520-native-word-complete-source-checkpoint/actual-current-index',h/'actual-current-index')
+env={**os.environ,'GIT_OPTIONAL_LOCKS':'0','GIT_TERMINAL_PROMPT':'0','GIT_INDEX_FILE':str(h/'actual-current-index')}
+def git(*a):return ['git','-c','gc.auto=0','-c','splitIndex.maxPercentChange=100','-c','splitIndex.sharedIndexExpire=never',*a]
+assert subprocess.check_output(git('rev-parse','HEAD'),cwd=r,env=env,text=True).strip()==base
+assert subprocess.run(git('diff','--cached','--quiet'),cwd=r,env=env).returncode==1
+(h/'actual-inherited-staged-paths0').write_bytes(subprocess.check_output(git('diff','--cached','--name-only','-z'),cwd=r,env=env))
+g=p/'evidence/native-cofactor-word-source-governance-09';g.mkdir();shutil.copyfile(__file__,g/'entire-original-checkpoint-caller.py.txt')
+def run(n,args,want=0):
+ q=subprocess.run(args,cwd=r,env=env,capture_output=True,timeout=120);(g/(n+'.stdout.xz')).write_bytes(lzma.compress(q.stdout));(g/(n+'.stderr.xz')).write_bytes(lzma.compress(q.stderr));(g/(n+'.exit')).write_text(str(q.returncode)+'\n');print(n,q.returncode,flush=True);assert q.returncode==want,(n,q.stdout[-1000:],q.stderr[-1000:]);return q.stdout+q.stderr
+scope=['research/chained_jacobian_transfers_20261110','pcc/claims','pcc/ledger.jsonl','docs/session-logs/2026-11-16.md','.resume/RESUME.md','.github/workflows/pcc-gate.yml','.github/workflows/chained-transfer-native-cubic-cofactor-proof-06.yml','problems/chained-transfer-current-store-and-startup.md']
+lock='research/chained_jacobian_transfers_20261110/native-cubic-cofactor-inverse-06/Cargo.lock'
+def stage():
+ ns=sorted((set(subprocess.check_output(git('ls-files','--modified','--others','--exclude-standard','-z','--',*scope),cwd=r,env=env).split(b'\0'))|set(subprocess.check_output(git('diff','--cached','--name-only','-z'),cwd=r,env=env).split(b'\0'))|{lock.encode()})-{b''})
+ (h/'selected-paths0').write_bytes(b'\0'.join(x for x in ns if x not in [b'.resume/RESUME.md',lock.encode()])+b'\0');subprocess.run(git('add','--sparse','--pathspec-from-file='+str(h/'selected-paths0'),'--pathspec-file-nul'),cwd=r,env=env,check=True);subprocess.run(git('add','--sparse','-u','--','.resume/RESUME.md'),cwd=r,env=env,check=True);subprocess.run(git('add','--sparse','-f','--',lock),cwd=r,env=env,check=True)
+ assert set(subprocess.check_output(git('diff','--cached','--name-only','-z'),cwd=r,env=env).split(b'\0'))-{b''}==set(ns)
+ return ns
+run('original-local5f7-prefix',['python3','tools/pcc/pcc.py','ledger','verify','--base',base]);run('original-current-publishedc91-prefix',['python3','tools/pcc/pcc.py','ledger','verify','--base',published])
+run('authored-prose',['python3','tools/pcc/pcc.py','lint-prose','docs/session-logs/2026-11-16.md','.resume/RESUME.md',str(p/'NATIVE_CUBIC_COFACTOR_06.md'),str(p/'report-native-cubic-cofactor-06/report.typ'),'problems/chained-transfer-current-store-and-startup.md'])
+stage();raw=run('initial-original-cached-whitespace',git('diff','--cached','--check'),2)
+assert raw.decode()=='research/chained_jacobian_transfers_20261110/evidence/native-cubic-first-unit-and-broad-lint-negative-03/entire-original-unit.stdout:24: new blank line at EOF.\n'
+run('initial-scoped-authored-whitespace',git('diff','--cached','--check','--','.',':(exclude)research/chained_jacobian_transfers_20261110/evidence/native-cubic-first-unit-and-broad-lint-negative-03/entire-original-unit.stdout'))
+tree=subprocess.check_output(git('write-tree'),cwd=r,env=env,text=True).strip();raw=run('original-two-new-entire-object-policy',['python3','tools/artifacts/artifacts.py','check',base,tree],1)
+payloads={m.group(2).decode():int(m.group(1).replace(b',',b''))for m in re.finditer(rb'^ +([0-9,]+)  (.+)$',raw,re.M)}
+expected=['research/chained_jacobian_transfers_20261110/evidence/current-c91-whole-six-proof-CI-and-store-failure-43/entire-current-c91-public-CI-hold.tar.xz','research/chained_jacobian_transfers_20261110/evidence/native-cubic-first-unit-and-broad-lint-negative-03/entire-native-unit-and-Clippy-run-tree.tar.xz']
+assert set(payloads)==set(expected),payloads
+w=r/'.github/workflows/pcc-gate.yml';prior=w.read_text();assert prior==subprocess.check_output(git('show',base+':.github/workflows/pcc-gate.yml'),cwd=r,env=env,text=True)
+lines=prior.splitlines(keepends=True);changed=0
+for j,line in enumerate(lines):
+ if 'python3 tools/artifacts/artifacts.py pull --jobs 16 'in line and 'whole-Consumer-original-docs-payloads-30/payloads/'in line:lines[j]=line.rstrip('\n')+' '+' '.join(sorted(payloads))+'\n';changed+=1
+assert changed==2;w.write_text(''.join(lines));assert all(w.read_text().count(x)==2 for x in payloads)
+(g/'EXACT_TWO_ADDITIVE_WHOLE_POLICY_OBJECTS.json').write_text(json.dumps([dict(path=x,bytes=payloads[x],sha256=hashlib.sha256((r/x).read_bytes()).hexdigest(),scope='entire immutable original run/CI hold, no member selection or sharding')for x in sorted(payloads)],indent=2)+'\n')
+run('both-new-PCC-and-native-workflow-actionlint',['/workspace/scratch/actionlint-bin/actionlint','-shellcheck=','.github/workflows/pcc-gate.yml','.github/workflows/chained-transfer-native-cubic-cofactor-proof-06.yml'])
+oldw=h/'actual-base-workflow/pcc-gate.yml';oldw.parent.mkdir();oldw.write_text(prior)
+a=run('original5f7-PCC-wiring-diagnostic',['python3','tools/artifacts/wire_workflows.py','--check',str(oldw)],1);b=run('current-PCC-wiring-diagnostic',['python3','tools/artifacts/wire_workflows.py','--check','.github/workflows/pcc-gate.yml'],1);assert a==b
+for name in ['tools/pcc/pcc.py','pcc/keyring.json','tools/lean/proof-gate.sh','tools/lean/AuditAxioms.lean','tools/artifacts/artifacts.py','.artifacts/config.json','.github/workflows/chained-transfer-cubic-frobenius-trace-proof-05.yml','.github/workflows/chained-transfer-cubic-relative-norm-proof-04.yml']:
+ assert(r/name).read_bytes()==subprocess.check_output(git('show',base+':'+name),cwd=r,env=env)
+assert hashlib.sha256((p/'lean/CubicCofactorWordBridge22307.lean').read_bytes()).hexdigest()=='22bd90207f04182513291a40a25a52a951c975502d4eaf35c3985f8fdb2f0c16'
+assert hashlib.sha256((p/'native-cubic-cofactor-inverse-06/src/lib.rs').read_bytes()).hexdigest()=='c29c96650bd301596d38ccd8d2298b69f8ca417275689cff0be9f0952d50b8bd'
+stage();tree=subprocess.check_output(git('write-tree'),cwd=r,env=env,text=True).strip();raw=run('original-currentc91-two-new-whole-object-policy',['python3','tools/artifacts/artifacts.py','check',published,tree],1)
+assert {m.group(2).decode():int(m.group(1).replace(b',',b''))for m in re.finditer(rb'^ +([0-9,]+)  (.+)$',raw,re.M)}==payloads
+raw=run('original-cumulative-seventeen-whole-object-policy',['python3','tools/artifacts/artifacts.py','check','d3c9dc35627dae5b058e1b1396fdbcca87af6b4a',tree],1)
+cumulative={m.group(2).decode():int(m.group(1).replace(b',',b''))for m in re.finditer(rb'^ +([0-9,]+)  (.+)$',raw,re.M)}
+old=json.loads((p/'evidence/combined-norm-trace-current-CI-source-governance-36/EXACT_FIFTEEN_PENDING_WHOLE_POLICY_OBJECTS.json').read_text());assert len(cumulative)==17 and all(cumulative[x['path']]==x['bytes']for x in old)and all(cumulative[x]==z for x,z in payloads.items())
+(g/'EXACT_SEVENTEEN_PENDING_WHOLE_POLICY_OBJECTS.json').write_text(json.dumps([dict(path=x,bytes=z,sha256=hashlib.sha256((r/x).read_bytes()).hexdigest())for x,z in sorted(cumulative.items())],indent=2)+'\n')
+a=['python3','tools/pcc/pcc.py','claim','new','--kind','statement','--claim-type','data','--statement','Completed substantive native06/word07/report/CI checkpoint: c29c9665 native established cofactor compiles exact832fd288 reference, all3 units/all15 fixtures/parity/two-sided controls and prospective original declared counters0ebbb8; scoped format/Clippy0 and preserved historical broad1/101495eb9. Word22bd9020 original dual42/0/eleven complete bindings15a361, inspected46663B2-page report/new workflow actionlint0c13b66. Complete currentc91 seven ZIPs/413 members/all logs3dd59d and actual Consumer12cc failure scope retained in updated store problem; original S3Head403/pull failure still blocks merge. Original5f7/c91 prefixes/prose/scoped-authored/PCC+native actionlint0; original whole cached2 stays2 on exact immutable unit stdout0ebbb8/newblankEOF, no raw rewrite; generic wiring1 is byte-identical5f7/not green. Original policy selects two new entire immutable holds and cumulatively17 pending whole objects; only both Root pull input lines append these2 paths. Original verifiers/keyring/policy/workflows/native reference unchanged; only required generated package Cargo.lock force-staged under global ignore. Normal authored child5f7 and expected-c91 descendant FF/tag, current ownCI/full original remote replay/reviews still required. No performance/physical/signed/paid/native-execution promotion.']
+for f in sorted(g.iterdir()):a+=['--proof','attestation:'+str(f.relative_to(r))]
+c=subprocess.check_output(a,cwd=r,env=env,text=True).strip()
+s='\n---\n\n'+datetime.now(timezone.utc).isoformat()+'\n# Checkpoint complete native cofactor and raw word bridge\n\n## What was done\n'+c+': frozen native3tests/all15/counter diagnostics, word42/0/11bindings, inspected2-page report/new exact-source CI c13b66 and entire currentc91 custody3dd59d. Original5f7/c91 prefixes/prose/scoped-authored/actionlint0; original whole cached2 stays2 solely on immutable unit stdout/newblankEOF, preserved; original policy1 selects exactly2 new whole holds/cumulative17. Generic wiring1 unchanged5f7/not green. [pcc:unverified]\n\n## Decisions made\nNormal authored child5f7/expected-c91 descendant FF/new immutable tag; update existing ready4425 to completed component scope. Original authenticated full17 replay/final current-head gates remain required. New proof lead only after primary review/preregistration. [pcc:unverified]\n\n## Open threads\nCurrent new ownCI/gates/store/reviews/normal merge; Consumer metadata checkpoint and original store, full nonzero-norm/base inverse/compiler/field/Jacobian and original full scientific/runtime/admission/matched costs. [pcc:unverified]\n\n## Errors\nCurrent S3403 remains, old startup failure historical; initial metadata/prose/index/storage/broad lint/proof failures retained. No policy/source/gate waiver or native-execution/paid/signed/performance promotion. [pcc:unverified]\n'
+for f in[r/'docs/session-logs/2026-11-16.md',r/'.resume/RESUME.md']:
+ with f.open('a')as o:o.write(s)
+ns=stage()
+for x in ns:
+ if x.startswith(b'pcc/claims/'):
+  for pr in json.loads((r/x.decode()).read_text()).get('proofs',[]):
+   if pr.get('kind')=='attestation':z=pr['subject'];assert hashlib.sha256((r/z['path']).read_bytes()).hexdigest()==z['sha256']
+raw=run('final-original-cached-whitespace',git('diff','--cached','--check'),2)
+assert raw.decode()=='research/chained_jacobian_transfers_20261110/evidence/native-cubic-first-unit-and-broad-lint-negative-03/entire-original-unit.stdout:24: new blank line at EOF.\n'
+run('final-scoped-authored-whitespace',git('diff','--cached','--check','--','.',':(exclude)research/chained_jacobian_transfers_20261110/evidence/native-cubic-first-unit-and-broad-lint-negative-03/entire-original-unit.stdout'));stage()
+subprocess.run(git('commit','--quiet','-m','research: implement cubic cofactor inverse and prove raw word refinement'),cwd=r,env=env,check=True)
+head=subprocess.check_output(git('rev-parse','HEAD'),cwd=r,env=env,text=True).strip();assert subprocess.check_output(git('rev-parse','HEAD^'),cwd=r,env=env,text=True).strip()==base
+shutil.copyfile(h/'actual-current-index',r/'.git/index');assert(r/'.git/index').read_bytes()==(h/'actual-current-index').read_bytes()
+(h/'ACTUAL_NORMAL_COMPLETE_COMMIT.json').write_text(json.dumps(dict(time=datetime.now(timezone.utc).isoformat(),head=head,parent=base,paths=len(ns),claim=c,remote_expected=published,pending_original_whole_objects=17),indent=2)+'\n');print('COMMIT',head,'paths',len(ns),'claim',c,flush=True)

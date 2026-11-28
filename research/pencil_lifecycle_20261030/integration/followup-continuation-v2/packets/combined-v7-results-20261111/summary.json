@@ -1,0 +1,63 @@
+{
+  "schema": "research.terminal-result/v1",
+  "attempt": "signed-kummer-combined-v7-20261111",
+  "status": "failed",
+  "seal_status": "passed",
+  "cleanup_complete": true,
+  "sealed_after_owned_cgroup_empty": true,
+  "materialization": {
+    "status": "passed",
+    "source_files": 4485,
+    "source_manifest_sha256": "a9423e8a2b468c159402c65f9608b870058a423f82ca1ba06d63223ceab50871",
+    "fresh_cache_manifest_sha256": "9eae2a2fc003071692c5058e52b6e712f2d3ee0ad87e5c2086bc08240479c850",
+    "cache_mode_inventory_sha256": "c432da2dff731eaf5cd58593ef3267500c64bc13e53f25e57f22184b990bf241",
+    "cache_mode_files": 2165,
+    "cache_executable_files": 82,
+    "cache_modes_preserved": true,
+    "workspace": "/var/tmp/pencil-signed-kummer-combined-v7-20261111",
+    "build_end_monotonic": 433306.423633865,
+    "absolute_deadline": "2026-11-11T12:00:00Z",
+    "compiler_started": false,
+    "donor_modified": false
+  },
+  "commands_executed": [
+    "materialize",
+    "compile"
+  ],
+  "command_reaped_exits": [
+    0,
+    -9
+  ],
+  "all_commands_reaped": true,
+  "tests_invoked": false,
+  "unattempted": [
+    "root signed/Labels tests",
+    "full739 driver",
+    "forced probes",
+    "adapter negatives"
+  ],
+  "failure": {
+    "repr": "FileNotFoundError(2, 'No such file or directory')",
+    "traceback": "Traceback (most recent call last):\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v7-20261111/durable-worker.py\", line 202, in <module>\n    output=command('compile',[cargo,'test','--release','--lib','--locked','--offline','--no-run','--message-format=json'])\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v7-20261111/durable-worker.py\", line 100, in command\n    for base,dirs,names in os.walk(target,onerror=traversal_error):\n  File \"/usr/lib64/python3.9/os.py\", line 418, in _walk\n    yield from _walk(new_path, topdown, onerror, followlinks)\n  File \"/usr/lib64/python3.9/os.py\", line 418, in _walk\n    yield from _walk(new_path, topdown, onerror, followlinks)\n  File \"/usr/lib64/python3.9/os.py\", line 418, in _walk\n    yield from _walk(new_path, topdown, onerror, followlinks)\n  File \"/usr/lib64/python3.9/os.py\", line 360, in _walk\n    onerror(error)\n  File \"/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-kummer-combined-runner-v7-20261111/durable-worker.py\", line 76, in traversal_error\n    raise error\n  File \"/usr/lib64/python3.9/os.py\", line 357, in _walk\n    scandir_it = scandir(top)\nFileNotFoundError: [Errno 2] No such file or directory: '/var/tmp/pencil-signed-kummer-combined-v7-20261111/cache/target/release/deps/rmetaOgIf8S'\n"
+  },
+  "elapsed_seconds": {
+    "materializer": 36.524531087023206,
+    "compile_command": 287.0881788529805,
+    "worker": 385.7453632270335,
+    "completion": 387.0096686129691,
+    "caller": 387.1508384119952
+  },
+  "cgroup_cpu_seconds": 318.248421,
+  "nested_intervals_not_additive": true,
+  "attempt_charge_seconds": 2400,
+  "campaign_charged_seconds": 18180,
+  "campaign_remaining_seconds": 111420,
+  "deadline_utc": "2026-11-11T12:00:00Z",
+  "raw_files": 19,
+  "raw_terminal_entries_rehashed": 11,
+  "reporter_self_checks": true,
+  "independent_result_review": false,
+  "dollar_cost": null,
+  "scientific_cost_ratio": null,
+  "source_and_cache_modified_by_reporter": false
+}

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Transfer into characteristic two</title>
+<style>
+@page { size: A4; margin: 17mm; }
+body { font: 10.5pt/1.4 "DejaVu Sans",sans-serif; color: #17332d; max-width:175mm; margin:auto; }
+h1 { font-size:24pt; line-height:1.15; } h2 { font-size:14pt; margin-bottom:2mm; }
+p { margin:2.5mm 0; } img { width:100%; margin:3mm 0; } code { font-size:9pt; }
+.meta { font-size:8.5pt; color:#52675f; } a { color:#286357; }
+.result { padding:3mm; background:#eef5f1; border-left:3px solid #286357; }
+</style><body>
+<p class="meta">Lean worked example · 15 November 2026 · characteristic-two extension</p>
+<h1>Transfer into characteristic two</h1>
+<p>The source is <b>y² = x³ + 1 over F₅</b>. The target is the nonsingular
+binary model <b>y² + y = x³ over F₄</b>. Lean checks both generator orders
+as 3. F₄ is <code>GaloisField 2 2</code>, with cardinality 4 checked using
+Mathlib; it is not the ring of integers modulo 4. [pcc:unverified]</p>
+<img src="binary-transfer.png" alt="The complete scalar table for order-three subgroups over F5 and F4">
+<p class="result">For every integer k, <b>S = [k]R ⇔ Q = [k]P ⇔ 2 ≡ k (mod 3)</b>.
+The endpoints are <code>F5_to_F4_dlog</code> and <code>target_scalar_mod</code>
+in <code>CrossCharacteristicTwo</code>. [pcc:unverified]</p>
+<h2>Proof and exact assumptions</h2>
+<p>The binary model and its points are checked over any field K of characteristic
+2; the coordinates already lie in its prime subfield. Doubling gives R + R = S,
+and S + R = O, so the nonzero R has order 3. The imported source P also has
+order 3. Mathlib's <code>addEquivOfAddOrderOfEq</code> supplies Φ and Φ(P) = R.
+Its existing scalar law gives Φ(Q) = Φ([2]P) = [2]R = S; injectivity reflects
+all scalar equalities. The original three-row source exhaustion makes this
+the entire subgroup table. [pcc:unverified]</p>
+<h2>Scope and local validation</h2>
+<p>Other source and binary target subgroups need matching generator orders.
+The construction uses classical choice of scalar representatives and supplies
+no general efficient evaluator for arbitrary encoded points. It is an abstract
+subgroup isomorphism. A unital field map F₅ → K is excluded by the checked
+characteristic mismatch. Reducing the earlier short model modulo 2 instead
+would give a singular curve. [pcc:unverified]</p>
+<p>Run <code>lake build</code> and <code>lake env lean AxiomAudit.lean</code>
+with Lean 4.24.0 and the exact manifest pins. Versioned binary receipts retain
+the assembly probe, unsuccessful development attempts, successful build and
+transitive-axiom gate. PCC claim <code>PCC-20261115-6a7830</code> is unsigned;
+the local kernel audit uses only propext, Classical.choice and Quot.sound.
+No performance measurement is reported. [pcc:unverified]</p>
+<p class="meta">Sources:
+<a href="https://github.com/isogeny-labs/crypto/blob/codex/cross-characteristic-lean-example/examples/cross_characteristic_ecdlp/CrossCharacteristicTwo.lean">Lean module</a> ·
+<a href="https://github.com/isogeny-labs/crypto/blob/codex/cross-characteristic-lean-example/examples/cross_characteristic_ecdlp/PROOF-MAP.md">proof map</a> ·
+<a href="https://github.com/leanprover-community/mathlib4/blob/v4.24.0/Mathlib/GroupTheory/SpecificGroups/Cyclic.lean">Mathlib cyclic construction</a> ·
+<a href="https://github.com/leanprover-community/mathlib4/blob/v4.24.0/Mathlib/FieldTheory/Finite/GaloisField.lean">finite field</a>.
+</p></body></html>

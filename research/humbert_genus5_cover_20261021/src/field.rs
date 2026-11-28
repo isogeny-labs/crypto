@@ -1,4 +1,4 @@
-//! Toy finite fields: F_p (p < 2^15), K4 = F_p[t]/(m(t)) with m the
+//! Toy finite fields: F_p (p < 2^17; products and their sums here are u128), K4 = F_p[t]/(m(t)) with m the
 //! minimal polynomial of alpha = t, and L = K4[s]/(s^2 - nu) = F_{p^8}.
 //! Every element of F_{p^4} is a K4 element; every square root of a K4
 //! element lives in L.
@@ -251,7 +251,74 @@ pub struct L {
     /// s^p = s * nu^((p-1)/2)
     pub s_frob: E4,
     two_adic: u32,
-    odd_part: u128,
+    /// odd part of p^8 - 1 (< 2^136 for p < 2^17, so three u64 limbs, little endian;
+    /// a u128 overflowed for p >= 2^16)
+    odd_part: [u64; 3],
+    /// (odd_part + 1) / 2
+    odd_half: [u64; 3],
+}
+
+/// Little-endian 3-limb (192-bit) exponents for L, whose group order p^8 - 1 is
+/// >= 2^128 for p >= 2^16.
+fn big_mul_u128(a: u128, b: u128) -> [u64; 4] {
+    let (a0, a1) = (a as u64 as u128, a >> 64);
+    let (b0, b1) = (b as u64 as u128, b >> 64);
+    let mut out = [0u64; 4];
+    let mut acc = [0u128; 4];
+    for (i, x) in [a0, a1].iter().enumerate() {
+        for (j, y) in [b0, b1].iter().enumerate() {
+            // x, y < 2^64: x y < 2^128; add the two 64-bit halves into acc
+            let pr = x * y;
+            acc[i + j] += pr as u64 as u128;
+            acc[i + j + 1] += pr >> 64;
+        }
+    }
+    let mut carry = 0u128;
+    for i in 0..4 {
+        let v = acc[i] + carry;
+        out[i] = v as u64;
+        carry = v >> 64;
+    }
+    assert_eq!(carry, 0);
+    out
+}
+fn big_odd_part_minus_one(n: [u64; 4]) -> (u32, [u64; 3]) {
+    // n >= 2; (n - 1) = 2^s t with t odd
+    let mut m = n;
+    let mut i = 0;
+    loop {
+        let (v, borrow) = m[i].overflowing_sub(1);
+        m[i] = v;
+        if !borrow {
+            break;
+        }
+        i += 1;
+    }
+    let tz = {
+        let mut z = 0u32;
+        for limb in m.iter() {
+            if *limb == 0 {
+                z += 64;
+            } else {
+                z += limb.trailing_zeros();
+                break;
+            }
+        }
+        z
+    };
+    let t = big_shr(m, tz);
+    assert_eq!(t[3], 0, "odd part must fit in 192 bits");
+    (tz, [t[0], t[1], t[2]])
+}
+fn big_shr(m: [u64; 4], sh: u32) -> [u64; 4] {
+    let (w, b) = ((sh / 64) as usize, sh % 64);
+    let mut out = [0u64; 4];
+    for i in 0..4 {
+        let lo = if i + w < 4 { m[i + w] } else { 0 };
+        let hi = if i + w + 1 < 4 { m[i + w + 1] } else { 0 };
+        out[i] = if b == 0 { lo } else { (lo >> b) | (hi << (64 - b)) };
+    }
+    out
 }
 
 impl L {
@@ -259,10 +326,18 @@ impl L {
         assert_eq!(k.chi(&nu), -1, "nu must be a non-square in K4");
         let p = k.p;
         let s_frob = k.pow(&nu, ((p - 1) / 2) as u128);
-        let order: u128 = (p as u128).pow(8) - 1;
-        let two_adic = order.trailing_zeros();
-        let odd_part = order >> two_adic;
-        L { k, nu, s_frob, two_adic, odd_part }
+        let p4 = (p as u128).pow(4);
+        let (two_adic, odd_part) = big_odd_part_minus_one(big_mul_u128(p4, p4));
+        // odd_part is odd: (odd_part + 1) / 2 = (odd_part >> 1) + 1
+        let mut odd_half = [odd_part[0] >> 1 | odd_part[1] << 63, odd_part[1] >> 1 | odd_part[2] << 63, odd_part[2] >> 1];
+        for limb in odd_half.iter_mut() {
+            let (v, c) = limb.overflowing_add(1);
+            *limb = v;
+            if !c {
+                break;
+            }
+        }
+        L { k, nu, s_frob, two_adic, odd_part, odd_half }
     }
     pub fn emb(&self, a: &E4) -> EL {
         (*a, [0; 4])
@@ -296,6 +371,21 @@ impl L {
         }
         r
     }
+    /// a^e for a 192-bit exponent: the same right-to-left square-and-multiply as
+    /// `pow` (same products in the same order, so the same K4 counters).
+    pub fn pow_big(&self, a: &EL, e: &[u64; 3]) -> EL {
+        let mut r = self.one();
+        let mut b = *a;
+        let mut e = *e;
+        while e != [0; 3] {
+            if e[0] & 1 == 1 {
+                r = self.mul(&r, &b);
+            }
+            b = self.mul(&b, &b);
+            e = [e[0] >> 1 | e[1] << 63, e[1] >> 1 | e[2] << 63, e[2] >> 1];
+        }
+        r
+    }
     /// Tonelli-Shanks square root in L (every K4 element has one).
     pub fn sqrt(&self, a: &EL) -> Option<EL> {
         if self.is_zero(a) {
@@ -304,11 +394,11 @@ impl L {
         if self.chi(a) != 1 {
             return None;
         }
-        let g = self.pow(&([0; 4], [1, 0, 0, 0]), self.odd_part); // s is a non-square in L
+        let g = self.pow_big(&([0; 4], [1, 0, 0, 0]), &self.odd_part); // s is a non-square in L
         let mut m = self.two_adic;
         let mut c = g;
-        let mut t = self.pow(a, self.odd_part);
-        let mut r = self.pow(a, (self.odd_part + 1) / 2);
+        let mut t = self.pow_big(a, &self.odd_part);
+        let mut r = self.pow_big(a, &self.odd_half);
         let one = self.one();
         while t != one {
             let mut i = 0;
@@ -434,5 +524,74 @@ impl Gfk {
         let r = self.pow(a, e);
         debug_assert!(r[1..].iter().all(|&x| x == 0));
         r[0]
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::curve::Rng;
+
+    fn random_k4(p: u64, rng: &mut Rng) -> K4 {
+        loop {
+            let m = vec![rng.below(p), rng.below(p), rng.below(p), rng.below(p), 1];
+            if crate::poly::is_irreducible_quartic(&m, p) {
+                break K4::new(p, [m[0], m[1], m[2], m[3]]);
+            }
+        }
+    }
+
+    /// p^8 - 1 >= 2^128 for p >= 2^16: L keeps its odd part in 192 bits. The
+    /// decomposition 2^s t = p^8 - 1 is exact (checked with u128 arithmetic on
+    /// p^8 - 1 = (p^4 - 1)(p^4 + 1)), pow_big equals pow below 2^128 with the same
+    /// K4 product count, and Tonelli-Shanks in L returns square roots of K4
+    /// elements at p = 131071 (it hit `assert!(i < m)` with the wrapped u128).
+    #[test]
+    fn l_big_exponent_and_sqrt_up_to_2_17() {
+        let mut rng = Rng(8);
+        for &p in &[101u64, 65521, 65537, 131071] {
+            let k = random_k4(p, &mut rng);
+            let nu = loop {
+                let c = [rng.below(p), rng.below(p), rng.below(p), rng.below(p)];
+                if k.chi(&c) == -1 {
+                    break c;
+                }
+            };
+            let l = L::new(k.clone(), nu);
+            let p4 = (p as u128).pow(4);
+            // 2^s t = (p^4 - 1)(p^4 + 1): compare the 2-adic valuation and t mod a few moduli
+            let (a, b) = (p4 - 1, p4 + 1);
+            assert_eq!(l.two_adic, a.trailing_zeros() + b.trailing_zeros(), "p={p}");
+            let t_big = |m: u128| -> u128 {
+                // t mod m from the limbs
+                let w = (1u128 << 64) % m;
+                ((l.odd_part[2] as u128 % m) * w % m * w % m + (l.odd_part[1] as u128 % m) * w % m + l.odd_part[0] as u128 % m) % m
+            };
+            for m in [1_000_003u128, 4_294_967_291, 998_244_353] {
+                let want = ((a >> a.trailing_zeros()) % m) * ((b >> b.trailing_zeros()) % m) % m;
+                assert_eq!(t_big(m), want, "p={p} m={m}");
+            }
+            assert_eq!(l.odd_part[0] & 1, 1);
+            // odd_half = (odd_part + 1) / 2: 2 odd_half - 1 = odd_part
+            let dbl = [l.odd_half[0] << 1, l.odd_half[1] << 1 | l.odd_half[0] >> 63, l.odd_half[2] << 1 | l.odd_half[1] >> 63];
+            assert_eq!([dbl[0] - 1, dbl[1], dbl[2]], l.odd_part);
+            // pow_big = pow for exponents below 2^128, same number of K4 products
+            for _ in 0..5 {
+                let x: EL = ([rng.below(p), rng.below(p), rng.below(p), rng.below(p)], [rng.below(p), rng.below(p), rng.below(p), rng.below(p)]);
+                let e = (rng.next() as u128) << 64 | rng.next() as u128;
+                let m0 = l.k.muls.get();
+                let r1 = l.pow(&x, e);
+                let m1 = l.k.muls.get();
+                let r2 = l.pow_big(&x, &[e as u64, (e >> 64) as u64, 0]);
+                let m2 = l.k.muls.get();
+                assert_eq!(r1, r2);
+                assert_eq!(m1 - m0, m2 - m1);
+            }
+            for _ in 0..6 {
+                let x = [rng.below(p), rng.below(p), rng.below(p), rng.below(p)];
+                let r = l.sqrt(&l.emb(&x)).expect("every K4 element is a square in L");
+                assert_eq!(l.mul(&r, &r), l.emb(&x), "p={p}");
+            }
+        }
     }
 }

@@ -1,0 +1,29 @@
+{
+ "created_at": "2026-11-16T00:10:24Z",
+ "id": "PCC-20261116-bc6b12",
+ "kind": "statement",
+ "producer": {
+  "commit": "6cd3d70173705fd3488404cefcf88f8ea4c11186",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_tuning_20261115/checks/validation-tests.txt",
+    "sha256": "23e5474a31c4c268ddc44e2840f5aeed78ae4695b2e7ddf861185919c2430145"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_tuning_20261115/checks/root-check.txt",
+    "sha256": "6a3c22686e333651e84952dc21cd4a91b58e53c114cf64d57da252e7142e55ef"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Unsigned pre-primary implementation checks; no speed result yet.",
+ "statement": "Compact trace-zero workspace passes19 focused release tests, including exact65-case parity across v1/projected/tuned eager/lazy modes, small complete arithmetic/admission/group comparisons and wide independent operand comparisons. Root library check passes. This is producer evidence before the new primary experiment, not independently signed verification."
+}

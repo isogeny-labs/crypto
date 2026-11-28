@@ -1,0 +1,39 @@
+{
+  "created_utc": "2026-11-16T03:44:49.303012+00:00",
+  "status": "parallel implementation and validation; not a scientific preregistration or isolation certificate",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "allowed_cpus": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "backend": {
+    "python_flint": "0.9.0",
+    "native_threads": 1
+  },
+  "cpu_assignment": {
+    "fast_trace": 0,
+    "incidence": 1,
+    "repo_controls": 2,
+    "pool_design": 3,
+    "root_and_trace_audit": 4
+  },
+  "requirements": [
+    "Trace and dense translation must handle same exceptional points and collisions.",
+    "Independent trace point-law audit and mutation controls.",
+    "Incidence samples use random mixed-labelled pools with r approximately B^3.",
+    "Structured bases retain an explicit label-availability boundary.",
+    "No uncharged pair table or algebra dimension in candidate.",
+    "Include pool generation, setup, misses, witness/sign recovery, scalar verification and memory.",
+    "Retain censored rows as censored, not UNSAT or successful runtime observations.",
+    "Repository source identities and exact-replay versus port distinctions retained."
+  ],
+  "scientific_limits": [
+    "CPU affinity does not establish physical-host isolation.",
+    "Parallel workstreams may share memory bandwidth; native timing ratios remain exploratory.",
+    "Small-instance fits do not establish asymptotic exponents or an ECDLP breakthrough."
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schema": "prime31-original-lock-correctness-failure/v1",
+  "source_commit": "a4ddc035c0c7519d6bab7a438d8a168f74ae40db",
+  "run_id": 45097885135,
+  "job_id": 137441679059,
+  "artifact_id": 14784865238,
+  "artifact_zip_sha256": "915598d695abeb8f35368527093cd1be101db1c0f457a9aeda2c44707aaf1693",
+  "zip_sha256_verified": true,
+  "conclusion": "failure",
+  "scope": "Original-root-lock compile failed at inherited ic_framework/mod.rs unclosed delimiter after prior spec.rs syntax restoration; zero library or new candidate tests executed; identity issuer skipped.",
+  "error_path": "src/cryptanalysis/ic_framework/mod.rs",
+  "error_line": 4528,
+  "prior_source_restoration": "src/cryptanalysis/ecbench/spec.rs blobed85acbb242a11a1412da7c842cef70872235dcc unchanged",
+  "files": {
+    "checkout-commit.txt": {
+      "bytes": 41,
+      "sha256": "cf2d9719ecb4a32bf462bd071e315588fe90914a7b02856ee3212878cb8099ac"
+    },
+    "job.log.gz": {
+      "bytes": 18214,
+      "sha256": "5976049b187842ca0934d6ac72fd49c95453f65c98fcb527d3ba36d3ec82958a"
+    },
+    "source-sha256.txt": {
+      "bytes": 1110,
+      "sha256": "19c5cf71dbc223bb51177bcf712c601ffc9847ff53ae7cd3b91232dbb6046069"
+    },
+    "spec-tests.txt": {
+      "bytes": 22049,
+      "sha256": "7d544b79f476d103ae88d8f2692dc07418e9c81aadbe15cf16c21049b2b986d4"
+    }
+  },
+  "decoded_job_log_sha256": "05a95f891c1bfb0e46f9251e043922506d227ab3c23501cd077ae66070c04ab7",
+  "observed_at": "2026-11-23T04:22:06.897945+00:00",
+  "standing": "pcc:unverified"
+}

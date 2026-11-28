@@ -1,0 +1,41 @@
+-- HANDWRITTEN SOURCE ONLY. NOT ELABORATED OR AXIOM AUDITED.
+-- Outside proof-gate projects until the approved checkpoint can succeed.
+-- Intended dependencies: Lean4.34.1 / Mathlib d13f23b723b8a846827a245b89c10fc7d3f11612.
+-- Actual Frobenius/group coverage and IDC bindings remain separate obligations.
+import Mathlib.Tactic
+
+namespace TwistAuxiliaryDraft
+variable {K : Type*} [Field K]
+
+theorem discriminant_expansion (a b A l : K) :
+    (l^2-a)^2 - 4*(a*l^2+2*b*l+a^2+A) =
+      l^4-6*a*l^2-8*b*l-3*a^2-4*A := by
+  ring
+
+theorem four_residual (s p x : K) :
+    4*(x^2-s*x+p) = (2*x-s)^2-(s^2-4*p) := by
+  ring
+
+theorem residual_vanish (s p x : K) (h2 : (2 : K) ≠ 0)
+    (h : (2*x-s)^2 = s^2-4*p) : x^2-s*x+p = 0 := by
+  have h4 : (4 : K) ≠ 0 := by
+    simpa using mul_ne_zero h2 h2
+  have hz : (4 : K)*(x^2-s*x+p) = 0 := by
+    rw [four_residual, h, sub_self]
+  exact (mul_eq_zero.mp hz).resolve_left h4
+
+theorem scaled_quadratic_root (s p x w t d : K)
+    (h2 : (2 : K) ≠ 0) (hx : 2*x-s = w*t)
+    (hw : w^2 = d) (hdisc : s^2-4*p = d*t^2) :
+    x^2-s*x+p = 0 := by
+  apply residual_vanish s p x h2
+  calc
+    (2*x-s)^2 = (w*t)^2 := congrArg (fun z : K => z^2) hx
+    _ = d*t^2 := by rw [mul_pow, hw]
+    _ = s^2-4*p := hdisc.symm
+
+#print axioms discriminant_expansion
+#print axioms four_residual
+#print axioms residual_vanish
+#print axioms scaled_quadratic_root
+end TwistAuxiliaryDraft

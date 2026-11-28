@@ -1,0 +1,49 @@
+=== Workstream 2: Prime PKM Semaev / T2-Torus Acceleration & P-256 Aux Chase ===
+suites=p0_1c
+
+[1/4] Running Lead P0-1c (ParamS5, Prime-Algebraic Rungs 12..20, M17/M31 Dickson Torus)...
+  -> algebraic rung bits=12 target=0 (pkm-semaev:m=2,guess=2,trace=1,inherit=1,descent=1)...
+  -> algebraic rung bits=12 target=1 (pkm-semaev:m=2,guess=2,trace=1,inherit=1,descent=1)...
+  -> algebraic rung bits=14 target=0 (pkm-semaev:m=2,guess=2,trace=1,inherit=1,descent=1)...
+  -> algebraic rung bits=14 target=1 (pkm-semaev:m=2,guess=2,trace=1,inherit=1,descent=1)...
+  -> algebraic rung bits=16 target=0 (pkm-semaev:m=2,guess=2,trace=1,inherit=1,descent=1)...
+  -> algebraic rung bits=16 target=1 (pkm-semaev:m=2,guess=2,trace=1,inherit=1,descent=1)...
+  -> algebraic rung bits=20 target=0 (pkm-semaev:m=2,guess=3,trace=1,inherit=1,descent=1)...
+  -> algebraic rung bits=12 target=0 (pkm-semaev:m=3,guess=1,mode=sym,trace=1,inherit=1,descent=1)...
+  -> M13 blind Dickson m=3 t=3 mode=chain...
+  ! M17 m=3: descent did not cut grid() (29512 > 7344); recording negative finding
+  -> M13 blind Dickson m=4 t=2 mode=sym...
+  -> M31 Dickson m=3 t=3 mode=chain...
+  ! M31 m=3: descent did not cut grid() (28197 > 9792); recording negative finding
+  -> M31 Dickson m=4 t=2 mode=chain...
+  -> M31 Dickson m=4 t=2 mode=sym...
+  -> M31 Dickson m=5 t=2 mode=chain...
+  ParamS3 (alg-k20 (icv1-fp20-t727-cd198a38), m=2): setup=659 mults, spec=7 mults vs grid=1850 (264.3x), mismatches=0
+  ParamS4 (alg-k20 (icv1-fp20-t727-cd198a38), m=3): setup=21785 mults, spec=97 mults vs grid=64800 (668.0x), mismatches=0
+  ParamS5 (alg-k20 (icv1-fp20-t727-cd198a38), m=4): setup=27207299 mults, spec=3547 mults vs grid=2951786 (832.2x), mismatches=0
+  ParamS3 (M31 (2^31 - 1), m=2): setup=920 mults, spec=7 mults vs grid=1850 (264.3x), mismatches=0
+  ParamS4 (M31 (2^31 - 1), m=3): setup=22945 mults, spec=97 mults vs grid=64800 (668.0x), mismatches=0
+  ParamS5 (M31 (2^31 - 1), m=4): setup=27351110 mults, spec=3547 mults vs grid=2951786 (832.2x), mismatches=0
+  Rung k=12 (icv1-fp12-tm53-6c9ff4bb, pkm-semaev:m=2,guess=2,trace=1,inherit=1,descent=1): verified=true, ops 1.16x (7375482 -> 6355968), S(0.1) 1.16x (12360.29 -> 10657.37, rho=4.72), wall 2.89x (568.3ms -> 196.6ms)
+  Rung k=12 (icv1-fp12-tm53-6c9ff4bb, pkm-semaev:m=2,guess=2,trace=1,inherit=1,descent=1): verified=true, ops 1.17x (5386314 -> 4601840), S(0.1) 1.17x (9031.27 -> 7720.95, rho=2.69), wall 2.57x (387.7ms -> 150.8ms)
+  Rung k=14 (icv1-fp14-tm143-dec4cf6b, pkm-semaev:m=2,guess=2,trace=1,inherit=1,descent=1): verified=true, ops 1.64x (67380439 -> 41164704), S(0.1) 1.63x (56008.88 -> 34262.66, rho=2.21), wall 25.22x (5065.3ms -> 200.9ms)
+  Rung k=14 (icv1-fp14-tm143-dec4cf6b, pkm-semaev:m=2,guess=2,trace=1,inherit=1,descent=1): verified=true, ops 1.64x (35584976 -> 21752619), S(0.1) 1.63x (29590.22 -> 18116.13, rho=1.71), wall 18.32x (2798.8ms -> 152.8ms)
+  Rung k=16 (icv1-fp16-t295-8d3c3165, pkm-semaev:m=2,guess=2,trace=1,inherit=1,descent=1): verified=true, ops 2.05x (1089855536 -> 532513290), S(0.1) 2.05x (472959.51 -> 231129.28, rho=2.55), wall 20.88x (15315.7ms -> 733.6ms)
+  Rung k=16 (icv1-fp16-t295-8d3c3165, pkm-semaev:m=2,guess=2,trace=1,inherit=1,descent=1): verified=true, ops 2.05x (1410987261 -> 689160152), S(0.1) 2.05x (612314.10 -> 299114.20, rho=1.33), wall 18.68x (17652.7ms -> 945.2ms)
+  Rung k=20 (icv1-fp20-t727-cd198a38, pkm-semaev:m=2,guess=3,trace=1,inherit=1,descent=1): verified=true, ops 2.17x (16503536339 -> 7588740114), S(0.1) 2.17x (2200750.96 -> 1012019.19, rho=0.84), wall 18.31x (142536.0ms -> 7786.2ms)
+  Rung k=12 (icv1-fp12-tm53-6c9ff4bb, pkm-semaev:m=3,guess=1,mode=sym,trace=1,inherit=1,descent=1): verified=true, ops 0.93x (19705252493 -> 21254544827), S(0.1) 0.93x (32920009.80 -> 35508284.24, rho=4.72), wall 0.93x (11174.6ms -> 11951.8ms)
+  M13 (2^13 - 1, blind pipeline) (m=3, t=3, mode=chain): verified=true, ops/call 0.99x (164320222 -> 166568154), S(0.1) 0.99x (4.96e7 -> 5.03e7, rho=2.05), wall 1.01x (9841.6ms -> 9749.1ms)
+  M13 (2^13 - 1, blind pipeline) (m=4, t=2, mode=sym): verified=true, ops/call 2.46x (136671796 -> 55517512), S(0.1) 2.46x (3.00e7 -> 1.22e7, rho=2.05), wall 2.78x (8516.6ms -> 3060.8ms)
+  M31 (2^31 - 1, T2/Dickson + mod-r LA) (m=3, t=3, mode=chain): verified=true, ops/call 1.96x (164984980 -> 84283327), S(0.1) 3.23x (6.67e10 -> 2.07e10, rho=1.12), wall 1.46x (1516.0ms -> 1036.1ms)
+  M31 (2^31 - 1, T2/Dickson + mod-r LA) (m=4, t=2, mode=chain): verified=true, ops/call 1.21x (50302216 -> 41597725), S(0.1) 1.43x (1.13e12 -> 7.87e11, rho=1.12), wall 1.50x (878.6ms -> 584.1ms)
+  M31 (2^31 - 1, T2/Dickson + mod-r LA) (m=4, t=2, mode=sym): verified=true, ops/call 1.87x (136781439 -> 73077234), S(0.1) 2.66x (3.17e12 -> 1.19e12, rho=1.12), wall 1.81x (1798.5ms -> 991.9ms)
+  M31 (2^31 - 1, T2/Dickson + mod-r LA) (m=5, t=2, mode=chain): verified=true, ops/call 1.02x (992341543 -> 974151868), S(0.1) 1.28x (2.66e13 -> 2.08e13, rho=1.12), wall 0.86x (3863.7ms -> 4490.2ms)
+
+[2/4] Skipping Lead P1-3a
+
+[3/4] Skipping Lead P2-5
+
+[4/4] Skipping Panel A
+
+Completed suites [p0_1c] in 264.28s. Wrote /Volumes/SSD990-2/wt-3858/crypto-pkm/research/prime_pkm_aux_chase_20261119/RESULTS_P0_DESCENT.json
+EXIT:0

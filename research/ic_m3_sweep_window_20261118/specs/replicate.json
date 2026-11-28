@@ -1,0 +1,100 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "Replication control for the sweep-window study: rf3la's seed 20261128, so the sweep=1 arms must equal round 5's rf3-cpu-echelon records",
+ "description": "research/ic_m3_sweep_window_20261118, added after the main session started because specs/sweep.json froze seed 20261182 instead of rf3la's 20261128 (protocol deviation, PROTOCOL.md). Seed derivation is per (session seed, workload, round), shared by all arms.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 179789274499,
+    "a": 179789274496,
+    "b": 173964404864,
+    "group_order": 179789343343,
+    "r": 179789343343,
+    "gx": 59620662219,
+    "gy": 171377409987
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 697556657731,
+    "a": 697556657728,
+    "b": 166992763911,
+    "group_order": 697556764217,
+    "r": 697556764217,
+    "gx": 32890058555,
+    "gy": 671668786987
+   }
+  ],
+  "targets_per_curve": 3,
+  "target_seed": 20261127
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rf3-f1-F2048",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract:m=3",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-f8-F2048",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2048",
+     "oracle": "rootfind-subtract:m=3,sweep=1/8",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-f1-F4096",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract:m=3",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  },
+  {
+   "name": "rf3-f8-F4096",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4096",
+     "oracle": "rootfind-subtract:m=3,sweep=1/8",
+     "targets": "walk-prime-batch-1024",
+     "linalg": "incremental-gauss-echelon"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 2,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261128,
+  "isolation_required": "L0",
+  "timeout_seconds": 7200
+ }
+}

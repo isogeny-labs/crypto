@@ -1,0 +1,22 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-12T14:16:35Z",
+ "id": "PCC-20261112-5e7c11",
+ "kind": "theorem",
+ "producer": {
+  "commit": "0796b36df6ee9712bfa335d81191abc26ed937ce",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "4d32750e1d84ca450a28621dedd492dd21b0f5db77460326105f4d8ed056438f",
+   "kind": "lean",
+   "path": "research/chained_jacobian_transfers_20261110/lean/IsogenyCycles.lean",
+   "theorem": "IsogenyCycles.exact_finite_monodromy"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Exact CM polynomial/norm identities,complete finite16-vector monodromy and noncentral relative-sign graph obstruction,publicCRT and forcedprincipal diagonal degrees. Actual curves/CMendomorphism classification,quotientexistence,Galois/moduleidentifications,polarizationdescent,andglobalAV/Jacobiancatalog remain explicitwritten bridges. No native evaluation or signed scientific standing.",
+ "statement": "theorem exact_finite_monodromy : (\u2200 a b : Fin 4, iterate frobenius4 3 (a,b)=opposite4 (a,b)) \u2227 (\u2200 a b : Fin 4, iterate firstCycle4 3 (a,b)=(a,b)) \u2227 (\u2200 a b : Fin 4, iterate secondCycle4 4 (a,b)=iterate frobenius4 4 (a,b)) \u2227 (\u2200 a b : Fin 4, iterate secondCycle4 12 (a,b)=(a,b))"
+}

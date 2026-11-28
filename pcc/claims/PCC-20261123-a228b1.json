@@ -1,0 +1,44 @@
+{
+ "claim_type": "interpretive",
+ "created_at": "2026-11-23T05:19:25Z",
+ "id": "PCC-20261123-a228b1",
+ "kind": "statement",
+ "producer": {
+  "commit": "240f04abc38fcea95930971376331c1ac5082069",
+  "model": "gpt-6-astra",
+  "session": "fass-quotient-query-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/THEORY.md",
+    "sha256": "6c5b6f3e41da3146046df64aa949b031ac3dcb24d77348ee03ea60a5a1d99517"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/PROOF_MAP.md",
+    "sha256": "65d38454e5a2fe45ce1a4a750e1a6a0ea6c1f0eb6dfdd090d7b80ea664054566"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/CANCELLATION_PREDICTION.md",
+    "sha256": "0250383b885c4aaa6a6e3a40f3d4dbe34f49d40adb84f113217b11d27d034d6e"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/fass_prime31_20261122/quotient_query/evidence/independent/MATH_REVIEW.md",
+    "sha256": "bd7b6fbd082eb31615bcd622a0013e31f5f0642864eaf9fec647cc599fa626b6"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "THEORY.md Propositions 1-2 and CANCELLATION_PREDICTION.md; not a global Groebner basis, original-system solving-degree bound, signed-relation count or implementation speed claim.",
+ "statement": "The written CRT and monic gcd argument derives a triangular decomposition of the split squarefree finite-grid ideal from partition, divisibility and Bezout identities; each positive component has a reduced lexicographic Groebner basis for x>t and its degree product gives exact affine support. A separate selector-target argument derives the 2e-1 support lower bound under the explicitly stated non-2-torsion hypotheses. These are written, source-reviewed arguments, without a Lean/kernel proof or a signed verification verdict."
+}

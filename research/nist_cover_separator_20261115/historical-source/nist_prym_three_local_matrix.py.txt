@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+"""Actual Prym Frobenius matrices using local finite-field Cantor arithmetic."""
+import itertools
+import json
+from pathlib import Path
+import time
+import sympy as S
+from flint import fq_default_ctx,fq_default_poly_ctx
+from nist_prym_three_local import one
+from nist_cover_prym_three_matrix_audit import profile
+
+ROOT=Path(__file__).parent
+
+
+def matrix_for(r,d):
+    start=time.monotonic();z=one(r,d);p=int(r['p']);b=int(r['b']);m=z['Prym_full_three_torsion_field_degree']
+    F=fq_default_ctx(p,m,'z');R=fq_default_poly_ctx(F);zero=(R([1]),R([]))
+    x=S.Symbol('x');ff=S.Poly(x*(x-1)*((x+d)**3-3*(x+d)*(x-1)**2+b*(x-1)**3),x,modulus=p)
+    lc=int(ff.LC());f=R([int(ff.nth(i))*pow(lc,4-i,p)%p for i in range(6)])
+    def add(P,Q):
+        if P==zero:return Q
+        if Q==zero:return P
+        a,v=P;c,w=Q
+        if a==c and v==-w:return zero
+        dd,e1,e2=a.xgcd(c);g,c1,c2=dd.xgcd(v+w)
+        u=(a*c)//(g*g)
+        numerator=c1*e1*a*w+c1*e2*c*v+c2*(v*w+f)
+        assert numerator%g==0
+        vv=(numerator//g)%u
+        while u.degree()>2:
+            nn=f-vv*vv;assert nn%u==0
+            uu=nn//u;uu=uu.monic();vv=(-vv)%uu;u=uu
+        u=u.monic();vv=vv%u
+        assert (f-vv*vv)%u==0
+        return u,vv
+    def neg(P):return P[0],-P[1]
+    def frob(P):return tuple(R([c.frobenius() for c in a.coeffs()]) for a in P)
+    def span(B):
+        out=[]
+        for coeff in itertools.product(range(3),repeat=len(B)):
+            P=zero
+            for a,Q in zip(coeff,B):
+                if a:P=add(P,Q if a==1 else neg(Q))
+            out.append((P,list(coeff)))
+        return out
+    def coordinates(P,B):
+        left=span(B[:len(B)//2]);right=span(B[len(B)//2:])
+        for L,lc in left:
+            target=add(P,neg(L))
+            for RR,rc in right:
+                if target==RR:return lc+rc
+        return None
+    def ev(coeff,k):
+        val=F(0)
+        for c in reversed(coeff):val=val*k+F(c)
+        return val
+    basis=[]
+    for part in sorted(z['Kummer_irreducible_factors'],key=lambda part:-part['degree']):
+        roots=R(part['coefficients']).roots(multiplicities=False);assert len(roots)==part['degree']
+        k=roots[0];lam=ev(z['lambda_polynomial_coefficients'],k);cc=(1/lam).sqrt()
+        uu=ev(z['u_polynomial_coefficients'],k);ww=ev(z['w_polynomial_coefficients'],k)
+        zz=(F(int(ff.nth(4))*pow(lc,0,p)%p)*lam-ww*ww+3*uu*uu+3*k*k)/2
+        # f4 = coefficient(ff,4)*lc^(4-4), so no scaling is needed here.
+        U=R([k*k,uu,1]);V=(cc*R([k**3,zz,ww,1]))%U;P=(U,V)
+        assert (f-V*V)%U==0 and add(P,P)==neg(P)
+        for j in range(5):
+            co=coordinates(P,basis)
+            if co is not None:break
+            basis.append(P)
+            if len(basis)==4:break
+            P=frob(P)
+        if len(basis)==4:break
+    assert len(basis)==4
+    A=[]
+    for P in basis:
+        co=coordinates(frob(P),basis);assert co is not None;A.append(co)
+    assert profile(A)==z['Prym_nonzero_three_torsion_orbit_lengths']
+    cp=[int(v)%3 for v in reversed(S.Matrix(A).charpoly().all_coeffs())]
+    return {'family':r['family'],'candidate':r['candidate'],'cover_parameter_d':d,'complete':True,
+            'source_model':{'p':str(r['p']),'b':str(r['b']),'d':d},
+            'finite_field_modulus_coefficients':[int(c) for c in F.modulus().coeffs()],
+            'basis_Mumford_coefficients':[[[[int(v) for v in c.to_list()] for c in a.coeffs()] for a in P] for P in basis],
+            'Prym_Frobenius_matrix_mod3':A,'Prym_characteristic_coefficients_mod3':cp,
+            'Prym_orbit_profile_independently_recomputed':True,'elapsed_seconds':time.monotonic()-start}
+
+
+if __name__=='__main__':
+    r=next(r for r in json.loads((ROOT/'nist_selection_audit.json').read_text())['rows'] if r['family']=='256' and r['candidate']==1842)
+    print(json.dumps(matrix_for(r,1),indent=2),flush=True)

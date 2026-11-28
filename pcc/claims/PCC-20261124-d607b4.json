@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-24T03:50:53Z",
+ "id": "PCC-20261124-d607b4",
+ "kind": "measurement",
+ "producer": {
+  "commit": "a2c085beed182c1ed9fb6a8d6db1ab9855434e18",
+  "model": "GPT-6",
+  "session": "codex-extension-ic-graph"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/forced-divisor-h6-20261124/fiber-pilot-01/results/analysis/derived.json",
+    "sha256": "f6c3eacfce6cda6db9abdb03cb4a6c745807034ce9a0d95125d686753f9af598"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/forced-divisor-h6-20261124/fiber-pilot-01/results/raw.tar.xz",
+    "sha256": "0a5babe9106710c143a66b087bd614866b173ed6fab252617035932ef5bf480d"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/extension_ic_graph_20261115/forced-divisor-h6-20261124/fiber-pilot-01/analyze.rs",
+    "sha256": "6527cd79b006f36c2580f5ac22f348588c7083305db79384b6de93582b745f2c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Rust analysis of complete H6 pilot checks27 ordered cases and all full-reference comparisons. Across9 fibers, solver F4+linear products are23196730 full-reference,16414425 plain and12480689 traced, ratio traced/plain0.7603488395115882 with8 replays and all70-dimensional quotients. Each arm finds10 norm functions,8 on development values and0 admissible development rows; only the seeded relation is recovered. Constructor/post legacy counters stay separate; no full-native or wall gain claim. Raw archive replay reproduces JSON/SVG, strict analyzer Clippy passes, all evidence producer-unsigned."
+}

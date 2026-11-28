@@ -1,0 +1,16 @@
+{
+  "schema":"experiment.protocol/v1",
+  "id":"KOBLITZ-R102-MARKED23-NU-X1-POLES",
+  "version":1,
+  "goal":"compute exact x+1 orders and a coefficientwise local clearing exponent for all actual N51 rational coefficients",
+  "claims":[{"id":"nu_x1_orders102","class":"exact_computation","statement":"all 105 N51 rational coefficients have source-bound x+1 valuations and a verified least coefficientwise clearing exponent"}],
+  "arms":{"reference":"R51/R63 accepted triangular donor","candidate":"exhaustive GF2[x] valuation scanner","positive":["exact donor hash","106-term n-leading assignment","105 distinct monomials"],"negative":["planted non-x denominator rejection"],"baseline":{"not_applicable_reason":"exact source audit"},"A_A":{"not_applicable_reason":"deterministic exact source audit"}},
+  "variables":{"fixed":["R51 donor SHA-256","F2[x]","Python 3 standard library"],"measured":["105 coefficient orders","clearing exponent","fresh replay"],"statistical":"not applicable"},
+  "randomization":{"method":"fixed","reason":"exact computation","seeds":[102]},
+  "blinding":{"method":"none","reason":"exact computation"},
+  "sample_size":{"instances":1,"replicates":1,"warmups":0,"power":"not applicable"},
+  "metrics":["coefficient count","order histogram","least coefficientwise clearing exponent","replay identity"],
+  "execution":{"backend":"local source-bound Python 3","backend_reason":"small exact text-and-polynomial audit","timeout_seconds_per_program":30,"threads":1,"seed":102,"queue":"one serial exact audit","source_gate":"committed checker/protocol and donor hash","checkpoint":"retain raw output and failures"},
+  "stopping":{"accept":"hash, all 105 coefficients, planted rejection, least bound and byte-identical replay","failure":"retain and amend under new attempt"},
+  "analysis":{"method":"exact GF2[x] division by x+1 for every rational coefficient","scope":"coefficientwise N51 x=1 clearing bound; not normalized function valuation"}
+}

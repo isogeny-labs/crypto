@@ -1,0 +1,110 @@
+{
+  "schema": "solver-multiplicity-provenance/v1",
+  "msolve": {
+    "repository": "https://github.com/algebraic-solving/msolve",
+    "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+    "tag": "v0.6.5",
+    "source_clean": true,
+    "tarball_url": "https://msolve.lip6.fr/downloads/v0.6.5/msolve-0.6.5.tar.gz",
+    "tarball_sha256": "30e3712eab4077438e2b3228d5958adb7e8488e523244a02320f80bd8c412c89",
+    "src_matches_tarball": true,
+    "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+    "build_script": "build-msolve.sh",
+    "build_env": {
+      "DEPS": "/workspace/msolve-deps/root",
+      "BUILD": "/workspace/msolve-deps/build"
+    },
+    "source_sha256": {
+      "src/msolve/main.c": "b8a5d781bff902a70559b8d008499f5ce6b8c3d1edc335397b9eb00089c159aa",
+      "src/msolve/msolve.c": "70bfa76e534c2c33e04b82f148619f65ffd9dd8392af09ed54271939c7cac3cb",
+      "src/neogb/f4.c": "1b78cc3be2bc82f39e52a21ad4fe4859c18a063d1732213a20087a356548ae14",
+      "src/neogb/symbol.c": "33c5466bfada78d2bb8707312ee4864b944986637e136c9151b97de6baf24062",
+      "src/neogb/f4sat.c": "218a6e1432969cb3b944ed79e8a934ef7c1aba9469b83c3d3f2746e651b3ae7d"
+    },
+    "runtime_libraries": [
+      "linux-vdso.so.1 (0x00007f0ce33af000)",
+      "\tlibflint.so.17 => /workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu/libflint.so.17 (0x00007f0ce2bbd000)",
+      "\tlibgmp.so.10 => /lib/x86_64-linux-gnu/libgmp.so.10 (0x00007f0ce2b10000)",
+      "\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f0ce2a20000)",
+      "\tlibgomp.so.1 => /lib/x86_64-linux-gnu/libgomp.so.1 (0x00007f0ce29cb000)",
+      "\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f0ce27d5000)",
+      "\tlibmpfr.so.6 => /lib/x86_64-linux-gnu/libmpfr.so.6 (0x00007f0ce2712000)",
+      "\tlibntl.so.44 => /workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu/libntl.so.44 (0x00007f0ce2466000)",
+      "\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f0ce2200000)",
+      "\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f0ce21d3000)",
+      "\t/lib64/ld-linux-x86-64.so.2 (0x00007f0ce33b1000)",
+      "\tlibgf2x.so.3 => /workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu/libgf2x.so.3 (0x00007f0ce21c0000)"
+    ]
+  },
+  "dependencies": [
+    {
+      "name": "libflint17.deb",
+      "url": "https://deb.debian.org/debian/pool/main/f/flint/libflint17_2.9.0-5_amd64.deb",
+      "sha256": "114f2ec9184fdfd5de242bb14c5ff134e578ebee1eb5d5f3fcd2acc7405cb107",
+      "package": "Package: libflint17\nVersion: 2.9.0-5"
+    },
+    {
+      "name": "libflint-dev.deb",
+      "url": "https://deb.debian.org/debian/pool/main/f/flint/libflint-dev_2.9.0-5_amd64.deb",
+      "sha256": "134855d68e018fb01e103eca2e43470cda9243744ca176d0210e0f8c02769fa5",
+      "package": "Package: libflint-dev\nVersion: 2.9.0-5"
+    },
+    {
+      "name": "libmpfr-dev.deb",
+      "url": "https://deb.debian.org/debian/pool/main/m/mpfr4/libmpfr-dev_4.2.0-1_amd64.deb",
+      "sha256": "9831a86897b68d401ff371a3af5ac2c29b4f9447e0228731ec9f2e571fef3fe5",
+      "package": "Package: libmpfr-dev\nVersion: 4.2.0-1"
+    },
+    {
+      "name": "libntl44.deb",
+      "url": "https://deb.debian.org/debian/pool/main/n/ntl/libntl44_11.5.1-1+b2_amd64.deb",
+      "sha256": "1ec859c23f8875141a2ddb4c7a81f0a1b837b64cd4cb822917b1e3f725c4540e",
+      "package": "Package: libntl44\nVersion: 11.5.1-1+b2"
+    },
+    {
+      "name": "libgf2x3.deb",
+      "url": "https://deb.debian.org/debian/pool/main/g/gf2x/libgf2x3_1.3.0-2_amd64.deb",
+      "sha256": "432d96c40aed60c25987fe1456eb5ea8b1cf6bc60032a90ab06325505786d1bd",
+      "package": "Package: libgf2x3\nVersion: 1.3.0-2"
+    }
+  ],
+  "analysis": {
+    "source": "native/analyze.cpp",
+    "source_sha256": "5c809337803de22ec66939d6838df18a722db4181c67a8fc8fe96d9a6af7e6d2",
+    "binary_sha256": "835e5854faee3f38e550fc4cc45a13153138731388a923f48d4625adabb4a786",
+    "build": [
+      "g++",
+      "-O2",
+      "-std=c++20",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "research/solver_multiplicity_audit_20261109/native/analyze.cpp",
+      "-o",
+      "/workspace/msolve-deps/build/analyze"
+    ]
+  },
+  "host": {
+    "os": "Linux",
+    "release": "6.18.57",
+    "arch": "x64",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+    "compiler": "gcc (Debian 14.2.0-19) 14.2.0",
+    "cpp_compiler": "g++ (Debian 14.2.0-19) 14.2.0",
+    "isolation": "none; single shared local host",
+    "paid_spend": 0
+  },
+  "preflight": {
+    "seen_before_freeze": [
+      "evidence/preflight/*",
+      "evidence/preflight-loader-failure/*",
+      "upstream output_files/nonradical_shape-31.res"
+    ],
+    "confirmatory_outputs_seen": false,
+    "gb_seconds": 0.012,
+    "param_seconds": 0.217,
+    "analysis": "evidence/preflight/analysis.json",
+    "clock_use": "budget only",
+    "lost_attempt": "initial /usr/bin/time absent; first stderr overwritten before preservation; subsequent loader failure retained"
+  }
+}

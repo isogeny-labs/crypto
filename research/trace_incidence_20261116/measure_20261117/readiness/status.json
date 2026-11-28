@@ -1,0 +1,26 @@
+{
+  "schema": "trace-local-readiness/v1",
+  "timings_collected": false,
+  "runpod": {
+    "http_status": 0,
+    "proxy_status": 403,
+    "authentication_reached": false,
+    "allocation_created": false
+  },
+  "previous_source_checkpoint": {
+    "run_id": 43959592776,
+    "source_closure": "success",
+    "s3_gate": "failure",
+    "raw_upload_authorization": "skipped",
+    "log_retrieval": "forbidden; exact current S3 error not inferred"
+  },
+  "local_checkpoint": {
+    "gate_exit": 1,
+    "cause": "no upload transport or credentials",
+    "succeeded": false
+  },
+  "candidate_source": "f1549fc821220641406b51a60324ef4ec81ab69b",
+  "snapshot_manifest_sha256": "7fa7de0440d923e0fdb382f47a88add5fa35569f1810f8a990326a4ed6609a90",
+  "authorization": "pending explicit local execution and temporary local checkpoint/raw custody exception",
+  "new_paid_resources": 0
+}

@@ -1,0 +1,1683 @@
+{
+ "schema": "validator-report (wave-7 L3)",
+ "lead": "L3_translated_involution",
+ "date": "2026-11-22",
+ "verdict": "pass_with_errata",
+ "disposition": "validated",
+ "summary": "Desk theorems hold under independent checks: 60/60 checks at k = 16, curve facts at k = 16, 18, 20. All 16 verdicts were recomputed from the raw arrays with the frozen thresholds and the same outcomes; counts are identical except A/A, which depends on the bootstrap stream (27 or 28 of 30, held). 50,000 recorded frames were replayed frame-exactly with independent code. The reduced independent census agrees except one recorded cell, explained as a sampling excursion. Frozen files are byte-identical. Errata: one direction inversion in a README result sentence (E1, medium) and six low-severity wording, precision or provenance items. No measured claim or verdict changes.",
+ "validated_commit": "1e42afc88d65368595a9503f63cb5c61f1ce1899",
+ "head_at_report_time": "5e7db008a97a237b4c3b8cd9c6b6bd2623b818b4 (L3 subtree identical to 1e42afc88d; working tree clean for L3)",
+ "freeze_commit": "0e3c0fbda0",
+ "run_outputs_commit": "6d9cb1674a",
+ "run_complete_commit": "e783d12a5b",
+ "writeup_commit": "1e42afc88d",
+ "artifact_sha256": {
+  "README.md": "f2f4e172eaf1ea5339c5bb62d3e72aacb5961eb87b5320024646d0e22fda0f1a",
+  "REPORT.typ": "abc664670fd5b339217a6dba36ba1c496fb1ebbd89c07c193c4f56c65c5f3995",
+  "REPORT.pdf": "07b70232fb560fb944cc7d9712094c644a65fc0f823a1124df60c07f5e4889f7",
+  "PROTOCOL.md": "1f155c5b3195864b5f7384e8babd81b46f2cc444580675930faf9008a79757f4",
+  "DESK.md": "804b4dc891895b3ba44373708b95d117f8958288d65ea31ea9282b2e4b0ce0da",
+  "FREEZE.sha256": "931459953d6573c6733e8b40765f291ff6f1585ecb690a56d18521cb8f23448a",
+  "model_predictions.json": "5daf9fb7a117aa1939f891353c8d4d5d1b3d6ea02f1776f5edd8d0b6ba62f9d0",
+  "run.log": "5387389e544a0461d10fdf72a762e3ed0a5e928041ad700dd733947fcf4c347e",
+  "analysis/summary.json": "70c75a6d34f553409355cd9f9bc876cffe0955a91f9cdef8f74005144b1b652f",
+  "analysis/VERDICTS.md": "0bc794ede6d538aa233137a62a580b75f42381a40d88da57f834b0fb5f0cd592",
+  "data/SHA256SUMS": "933cda19e19347b7e72213266a9130e6e9c50a70112f6486e7b363c20cc3d86a",
+  "data_json/SHA256SUMS": "be29e009c395e91c029cccdd2cefa832b98afb5874eff2c95f8540c5fda30fb8"
+ },
+ "checks": [
+  {
+   "name": "artifact_binding_frozen_commit",
+   "result": "pass",
+   "detail": "Validated the L3 subtree at 1e42afc88d65368595a9503f63cb5c61f1ce1899 (branch claude/curve25519-index-calculus-i674j4). Repository HEAD moved to 5e7db008a9 during validation (other leads only); `git diff --quiet 1e42afc88d -- L3_translated_involution` is clean, so the tracked L3 files and the working tree are byte-identical to 1e42afc88d. Freeze commit 0e3c0fbda0 (03:23:35Z) precedes the launch line in run.log (03:23:39Z, \"FREEZE.sha256 verified\") and the first npz (03:24); script mtimes 03:12-03:18."
+  },
+  {
+   "name": "frozen_files_byte_identical",
+   "result": "pass",
+   "detail": "FREEZE.sha256 (sha256 9314599...448a) lists 9 files; all 9 hash-match in the working tree and at 0e3c0fbda0, e783d12a5b and 1e42afc88d (git show | sha256sum). PROTOCOL.md is not listed in FREEZE.sha256 but is byte-identical at 0e3c0fbda0 and 1e42afc88d (sha256 1f155c5b...57f4). The short hashes quoted in PROTOCOL.md match FREEZE.sha256."
+  },
+  {
+   "name": "data_hashes_and_json_mirrors",
+   "result": "pass",
+   "detail": "data/SHA256SUMS: 51/51 OK (45 npz, 3 meta.json, 3 desk json; paths relative to scripts/). data_json/SHA256SUMS: 45/45 OK. Validator reader: every JSON mirror carries the npz sha256 as source_sha256 and equals the npz in all 1470 arrays (0 mismatches), matching data_json/CHECK.txt."
+  },
+  {
+   "name": "data_produced_by_the_protocol_instrument_frame_exact_replay",
+   "result": "pass",
+   "detail": "With the protocol seed rule (sha256 \"wave7-L3|k=|t=|arm=\", random.Random, nu then T draws) and the validator's own bases and coverage counting (pointwise slope tables for h_T, not line-cubic solving), 50000/50000 recorded k = 16 frames match covered_D, covered_full and n_points exactly: Ep.huff_x, E.x, Ep.x, E.iota_odd, Ep.iota_c01 at t = 4..8, 2000 frames each."
+  },
+  {
+   "name": "model_predictions_equal_desk_closed_forms",
+   "result": "pass",
+   "detail": "model_predictions.json (frozen, sha256 5daf9fb7...f9d0) equals the DESK section 5 closed forms recomputed by the validator (sat(E[N(N-1)]/4 + w E[N]) with w = 1/2 on E, 1 on E', 0 for no-half; JI sat(E[N4(N4-1)]/2 + w4 E[N4])): max relative difference 0.0 over 225 arm cells. The PROTOCOL.md table matches the JSON except an unnoted k-dependence of ji_s at t = 7 (erratum E8)."
+  },
+  {
+   "name": "desk_curve_facts_k16_k18_k20",
+   "result": "pass",
+   "detail": "Own code, all three k: p and r prime (trial division), #E = 8r by character sum, a point of order 8r (E cyclic), A^2-4 non-square, own Velu (Washington 12.16) for kernel (0,0) gives y^2 = x^3 + A x^2 - 4x - 4A, shift X = x + A gives X(X-(A+2))(X-(A-2)), #E' = #E, E'[2] rational with v2(#E') = 3 so E'(F_p) = Z/2 x Z/4r, generator of order 4r found, phi on-curve and homomorphic (400 pairs), phi injective E[r] -> E'[r] (all 8208 points at k = 16; 1500 distinct at k = 18, 20). Twist order 65204 at k = 16. 36/36 pass."
+  },
+  {
+   "name": "desk_lemma3_E_which_T_have_a_rational_half",
+   "result": "pass",
+   "detail": "k = 16 exhaustive over all 65671 affine points, with 2E(F_p) built by doubling every point (no logs): P in 2E <=> log even <=> x_P square (0 mismatches, |2E| = 32836 incl. O). T0 = (0,0) has exactly 2 rational halves, both with x = 1 at k = 16 (A+2 square), so y/x = h_T0 is a translated frame."
+  },
+  {
+   "name": "desk_lemma3_Ep_which_T_have_a_rational_half_and_Kummer_map",
+   "result": "pass",
+   "detail": "k = 16 exhaustive: 2E'(F_p) by doubling = class (0,0) = {X - e_i all squares} (0 mismatches, |2E'| = 16418). Exactly one 2-torsion point lies in 2E': e0 = A+2 = 1060. Explicit F_{p^2} halving of 400 sampled T: every T has a half over F_{p^2}; pi(S) - S gives the bijection {'(0, 1)': ['1060'], '(0, 0)': ['None'], '(1, 1)': ['0'], '(1, 0)': ['1056']} (validator's own generator; (0,1) is canonical = class of the 2-torsion outside 2E'; the (1,0)/(1,1) labels depend on the generator choice and here agree with DESK)."
+  },
+  {
+   "name": "desk_halves_of_odd_T_on_E_defined_over_Fp4_not_Fp2",
+   "result": "pass",
+   "detail": "For 147 odd-log T at k = 16 the halving quartic (x^2-1)^2 - 4 x_T x (x^2+Ax+1) has no root in F_p or F_{p^2} (gcd with x^p - x and x^{p^2} - x), hence is irreducible, and f(x) = x^3+Ax^2+x is a square in F_p[x]/(H) = F_{p^4}, so the halves are defined over F_{p^4} and not over F_{p^2}. All 153 even T have a rational half. The brief correction holds."
+  },
+  {
+   "name": "desk_every_degree2_function_is_iota_T_invariant",
+   "result": "pass",
+   "detail": "18 degree-2 F_p functions covering every polar-divisor type (2O: Moebius of x; O+Q: h_Q incl. Q = T0; P1+P2 rational, conjugate pair and double point via (y - l(x))/q(x)), each composed with a random Moebius map: exhaustive over all points, every fibre has <= 2 points, every 2-point fibre has the same group sum T, T equals the polar-divisor sum (rational), and the 1-point fibres are exactly the rational halves of T. Since L(D) = <1, f_D>, this covers every degree-2 function up to Moebius (the general statement is the standard Riemann-Roch argument in DESK section 1, which is correct)."
+  },
+  {
+   "name": "desk_theorem1_translated_xframe",
+   "result": "pass",
+   "detail": "6 random T = 2S at k = 16: a Moebius mu fitted on 3 points satisfies mu o h_T = M o x o tau_{-S} on every point; B_f(V) = S + B_x(M^{-1}V) as sets; B_f - S negation-closed; D_f = B_x +- B_x and the signed set of B_f = Sigma_x u (Sigma_x + T) u (Sigma_x - T) as sets of group elements; P_i + P_j = T + (Q_i + Q_j) by curve arithmetic. Also 900 E.iota_even control frames (t = 4, 5, 6) with the validator's own per-frame check (fit on curve points, verify on ALL points, census equal to the x-frame census on M^{-1}(V)): 900/900."
+  },
+  {
+   "name": "desk_lemma2_B_eq_T_minus_B",
+   "result": "pass",
+   "detail": "6 odd-T bases at k = 16: B = T - B and all signed pair sums = D u (D + T) u (D - T) exactly."
+  },
+  {
+   "name": "desk_theorem4_no_within_fibre_relations",
+   "result": "pass",
+   "detail": "k = 16: for 40 odd T and every point a, 2a - T is never in E[r] (0 hits); 300 curve-arithmetic spot checks agree; even T give 16415-16416 hits per T. On E', classes (0,1), (1,0), (1,1) give 0 hits, class (0,0) gives hits. Self-paired fraction of x-frame points: 0.25 on E (2 of 8 cosets), 0.4999 on E' (4 of 8)."
+  },
+  {
+   "name": "desk_huff_coordinates_T_class",
+   "result": "pass",
+   "detail": "Own Huff model (e0 = 1060, ea = 0, eb = 1056): a x (y^2-1) = b y (x^2-1) holds on every point. Huff x: degree 2 (fibre histogram [0, 1, 32834]), constant fibre sum T = (0,0) = Wa; Huff y: T = (1056,0) = Wb. Both are 2-torsion, outside 2E', class (0,1)."
+  },
+  {
+   "name": "desk_jacobi_intersection_degree4_and_pullbacks",
+   "result": "pass",
+   "detail": "alpha s^2 + c^2 = 1 and beta s^2 + d^2 = 1 on every point. Fibre histograms show degree 4 (16416-16417 values with 4 points, <= 4 exceptional values). Invariance: c under {-1, tau_eb, iota_eb}, d under {-1, tau_ea, iota_ea}, s under {tau_(0,0), iota_ea, iota_eb} and not under -1. Own Velu isogenies: c = Moebius o x o phi_<(A-2,0)> and d = Moebius o x o phi_<(A+2,0)> on every point; s = g o phihat with phihat of kernel (0,0) (codomain order n, j equal to E's), g = Moebius o x o tau_{-S} with S rational of order 4, 2S = T_g = (2116, 0). The s identification, labelled derived in the README, now also has a pointwise check at k = 16."
+  },
+  {
+   "name": "verdict_CAL1_recomputed",
+   "result": "pass",
+   "detail": "Validator: held 30/30; study: held 30/30. {}"
+  },
+  {
+   "name": "verdict_CAL2_recomputed",
+   "result": "pass",
+   "detail": "Validator: held 15/15; study: held 15.0/15. {\"own_se_variant\": \"15\", \"z\": [-0.66, -0.16, 0.6, 0.88, 1.23, -1.44, -0.01, -0.29, 0.64, -1.37, -0.75, 0.71, 0.48, -0.79, -0.23]}"
+  },
+  {
+   "name": "verdict_CAL3_recomputed",
+   "result": "pass",
+   "detail": "Validator: held 30/30; study: held 30.0/30. {\"range\": [0.9901, 1.0124]}"
+  },
+  {
+   "name": "verdict_C1_recomputed",
+   "result": "pass",
+   "detail": "Validator: held 89966/90000; study: held 89966/90000. {\"code0\": 0, \"code2\": 34, \"code2_cells\": [[16, 4, \"E.iota_even\", 1], [16, 4, \"E.iota_T0\", 2], [16, 4, \"Ep.iota_2E\", 4], [18, 4, \"E.iota_even\", 6], [18, 4, \"E.iota_T0\", 5], [18, 4, \"Ep.iota_2E\", 3], [20, 4, \"E.iota_even\", 5], [20, 4, \"E.iota_T0\", 4], [20, 4, \"Ep.iota_2E\", 4]]}"
+  },
+  {
+   "name": "verdict_C2_recomputed",
+   "result": "pass",
+   "detail": "Validator: held 45/45; study: held 45.0/45. {\"range\": [0.9734, 1.0245]}"
+  },
+  {
+   "name": "verdict_AA_recomputed",
+   "result": "pass_with_note",
+   "detail": "Validator: held 27/30; study: held 28/30. {\"excluded\": [[16, 6, \"E.x\", 0.9786, 0.9563, 0.9994], [20, 4, \"Ep.x\", 1.0734, 1.0295, 1.1206], [20, 6, \"E.x\", 0.9714, 0.9511, 0.9937]]} Validator B = 2000 stream: 27/30 (adds k=16 t=6 E.x, CI 0.9563-0.9994); B = 10000: 28/30. Study: 28/30 with that cell's upper bound 1.0008. Held in every variant (>= 27). Erratum E4."
+  },
+  {
+   "name": "verdict_PC1_recomputed",
+   "result": "pass",
+   "detail": "Validator: held 24/24; study: held 24/24. {\"direction\": \"9/9\", \"model\": \"15/15\", \"max_hi\": 0.9496}"
+  },
+  {
+   "name": "verdict_PC2_recomputed",
+   "result": "pass",
+   "detail": "Validator: held 9/9; study: held 9/9. {\"gains\": {\"16|5\": 2.748, \"16|6\": 1.981, \"16|7\": 1.546, \"18|5\": 2.693, \"18|6\": 2.18, \"18|7\": 1.635, \"20|5\": 2.62, \"20|6\": 2.06, \"20|7\": 1.724}}"
+  },
+  {
+   "name": "verdict_P1_recomputed",
+   "result": "pass",
+   "detail": "Validator: held 126/126; study: held 126/126. {\"direction\": \"36/36\", \"model\": \"90/90\", \"max_hi_t45\": 0.9082}"
+  },
+  {
+   "name": "verdict_P2_recomputed",
+   "result": "pass",
+   "detail": "Validator: held 21/21; study: held 21/21. {\"direction\": \"6/6\", \"model\": \"15/15\"}"
+  },
+  {
+   "name": "verdict_P3_recomputed",
+   "result": "pass",
+   "detail": "Validator: held 72/72; study: held 72/72. {\"direction\": \"27/27\", \"model\": \"45/45\", \"max_hi\": 0.6305}"
+  },
+  {
+   "name": "verdict_P4a_recomputed",
+   "result": "pass",
+   "detail": "Validator: held 36/36; study: held 36/36. {\"ratio_range\": [0.976, 1.0367], \"max_ks\": 0.0585, \"crit\": 0.0617}"
+  },
+  {
+   "name": "verdict_P4b_recomputed",
+   "result": "pass",
+   "detail": "Validator: held 36/36; study: held 36.0/36. {\"ratio_range\": [0.9844, 1.0165]}"
+  },
+  {
+   "name": "verdict_P5_recomputed",
+   "result": "pass",
+   "detail": "Validator: held 60/60; study: held 60/60. {\"full_over_D_range\": [1.975, 4.073], \"full_over_D_min_cell\": [16, 8, \"E.iota_odd\"], \"ratio_range\": [1.0025, 1.174]}"
+  },
+  {
+   "name": "verdict_P6_recomputed",
+   "result": "pass",
+   "detail": "Validator: held 6/6; study: held 6/6. {\"arms\": {\"E.iota_odd\": {\"geomean\": 0.9708, \"max\": 1.1315, \"min\": 0.8333}, \"Ep.iota_c01\": {\"geomean\": 0.8527, \"max\": 0.9727, \"min\": 0.6818}, \"Ep.iota_c10\": {\"geomean\": 0.8356, \"max\": 1.0139, \"min\": 0.6364}, \"Ep.iota_c11\": {\"geomean\": 0.8841, \"max\": 1.1068, \"min\": 0.7348}, \"Ep.huff_x\": {\"geomean\": 0.865, \"max\": 0.9909, \"min\": 0.6364}, \"Ep.huff_y\": {\"geomean\": 0.815, \"max\": 0.9216, \"min\": 0.5985}}}"
+  },
+  {
+   "name": "verdict_P7_recomputed",
+   "result": "pass",
+   "detail": "Validator: held 1/1; study: held 1/1. {\"geomean\": 1.1172, \"range\": [1.0317, 1.3895], \"cells\": {\"16|5\": [206, 192, 1.0729], \"16|6\": [658, 530, 1.2415], \"16|7\": [1762, 1536, 1.1471], \"18|5\": [264, 190, 1.3895], \"18|6\": [656, 586, 1.1195], \"18|7\": [1760, 1706, 1.0317], \"20|5\": [192, 186, 1.0323], \"20|6\": [574, 556, 1.0324], \"20|7\": [1866, 1798, 1.0378]}}"
+  },
+  {
+   "name": "reduced_independent_census_replay_k16",
+   "result": "pass_with_note",
+   "detail": "Validator frames (own PCG64 seeds, own Moebius draws, own bases, own counting), K = 1000 per cell, arms E.x (with one odd-T shift), E.iota_odd, Ep.huff_x, Ep.x at t = 4..8, plus E.iota_even at t = 4..6 (300 frames): 22/23 covered_D cells within 2 SE of the recorded means; 48/48 frames re-counted by curve arithmetic agree. Exception: 16|5|Ep.huff_x, z = -3.89 (60.06 vs 63.62); a fresh 4000-frame rerun gives 61.47 (z = -3.18). Frame-exact replay reproduces all 2000 recorded frames of that cell, and the recorded huff_y, c01, c10, c11 cells (same distribution by Lemma 2) average 61.49, so the recorded cell is a +3.4 SE excursion of the seeded sample (look-elsewhere p about 0.15 over 225 cells), not an instrument fault. Recorded n_points means over all 225 cells against their exact expectation 2^t (#finite-valued points)/(p+1): mean z -0.02, sd 0.998, 8 with |z| > 2, 0 with |z| > 3 (frame generation unbiased)."
+  },
+  {
+   "name": "C1_exceptions_34_code2_frames",
+   "result": "pass",
+   "detail": "control_ok values: code 0 = 0, code 2 = 34, all at t = 4: [[16, 4, 'E.iota_even', 1], [16, 4, 'E.iota_T0', 2], [16, 4, 'Ep.iota_2E', 4], [18, 4, 'E.iota_even', 6], [18, 4, 'E.iota_T0', 5], [18, 4, 'Ep.iota_2E', 3], [20, 4, 'E.iota_even', 5], [20, 4, 'E.iota_T0', 4], [20, 4, 'Ep.iota_2E', 4]]; no other values. Code 2 means fewer than 3 distinct x(P - S), i.e. fewer than 3 fibres; with N ~ Bin(16, 0.502) P(N <= 2) = 0.0021, so about 37.6 are expected in 18,000 t = 4 control frames; 34 is consistent (Poisson). 34/90000 = 0.038% <= 1%."
+  },
+  {
+   "name": "AA_28_of_30_explanation",
+   "result": "pass_with_note",
+   "detail": "The two excluded cells named in the README (k=20 t=4 Ep.x 1.0734, CI 1.0256-1.1212; k=20 t=6 E.x 0.9714, CI 0.9507-0.9931) are the frozen run's and are reproduced by the validator stream. Two (or three) misses in 30 is consistent with a 5% rate (expected 1.5). The count is stream-sensitive at the third cell (erratum E4)."
+  },
+  {
+   "name": "readme_k20_census_table",
+   "result": "pass",
+   "detail": "70/70 k = 20 means in the README census table equal the validator's means rounded to 0.1."
+  },
+  {
+   "name": "readme_k20_ratio_table",
+   "result": "pass",
+   "detail": "All 16 entries: point ratios and model values equal the validator's to 3 decimals; CIs agree within bootstrap noise (<= 0.002)."
+  },
+  {
+   "name": "readme_answer_and_prediction_numbers",
+   "result": "pass_with_note",
+   "detail": "Recomputed: E odd T / null at t = 4 [0.7874, 0.8101]; E' no-half / null at t = 4 [0.6399, 0.6729]; JI / Ep.x [0.4798, 0.6966]; Ep.x/E.x t = 4 [1.2062, 1.2361], t = 5 [1.1004, 1.1186], t = 8 [1.0105, 1.0195], smallest CI lower bound over all 15 cells 1.0045; P5 full/shift ratio [1.0025, 1.174]; full/D [1.975, 4.073] with minimum at [16, 8, 'E.iota_odd']; CAL3 [0.9901, 1.0124]; C2 [0.9734, 1.0245]; P4a ratios [0.976, 1.0367], max KS 0.0585; P4b [0.9844, 1.0165]; PC2 {'16|5': 2.748, '16|6': 1.981, '16|7': 1.546, '18|5': 2.693, '18|6': 2.18, '18|7': 1.635, '20|5': 2.62, '20|6': 2.06, '20|7': 1.724}; P6 {'E.iota_odd': {'geomean': 0.9708, 'max': 1.1315, 'min': 0.8333}, 'Ep.iota_c01': {'geomean': 0.8527, 'max': 0.9727, 'min': 0.6818}, 'Ep.iota_c10': {'geomean': 0.8356, 'max': 1.0139, 'min': 0.6364}, 'Ep.iota_c11': {'geomean': 0.8841, 'max': 1.1068, 'min': 0.7348}, 'Ep.huff_x': {'geomean': 0.865, 'max': 0.9909, 'min': 0.6364}, 'Ep.huff_y': {'geomean': 0.815, 'max': 0.9216, 'min': 0.5985}}; P7 geomean 1.1172 range [1.0317, 1.3895]. All README numbers agree except: item 4 direction (E1), PC1 bound 0.992 (E3), \"1.5% at t = 8\" (E7), N/4 unit (E2)."
+  },
+  {
+   "name": "readme_pcc_tags",
+   "result": "partial",
+   "detail": "Most result sentences carry [pcc:unverified]; several do not (erratum E6)."
+  },
+  {
+   "name": "readme_derived_vs_measured_labelled",
+   "result": "pass",
+   "detail": "A \"Derived vs measured\" section separates derived algebra (with numerical checks) from measured exact counts; the multidegree (2,2,2) and 3x target degree are labelled sketches, not engine-tested; no timings or F4 runs are claimed."
+  },
+  {
+   "name": "predicted_positive_not_overstated_engine_caveat_present",
+   "result": "pass",
+   "detail": "E' over E x-frames is reported as a measured coverage-only component effect (1.21-1.24x at t = 4 fading to 1.01-1.02x at t = 8; selected geomean 1.117), with four stated reasons why it needs an engine check (cost vs coverage, 1/N fade, isogeny transport charge, selection noise) and the specific check (pkm-semaev on E' vs E, same seeds). No ledger or leaderboard use is claimed."
+  },
+  {
+   "name": "distance_to_rho_imported_only",
+   "result": "pass",
+   "detail": "The figures (generic baseline 7.8x rho at k = 20; best algebraic arm vs rho-neg 18x / 9.6e5x / 5.9e6x at w = 0 / 0.1 / 1) equal research/curve25519_frame_search_20261103/README.md lines 109-111; nothing about rho is measured or invented here."
+  },
+  {
+   "name": "no_relabelling",
+   "result": "pass",
+   "detail": "covered_full (the D +- T sets) is reported as bookkeeping at 3x target degree, never as a gain (P5); no rho/BSGS work is relabelled; \"not a leaderboard row, not a solve\" is stated."
+  },
+  {
+   "name": "section5a_band",
+   "result": "not_applicable",
+   "detail": "No cross-method cost comparison is measured; the README only states that a <= 1.24x coverage change cannot reorder arms 18x to 5.9e6x apart across the imported band (lesson L-546d37ca7750 has nothing to recompute)."
+  },
+  {
+   "name": "certificates",
+   "result": "not_applicable",
+   "detail": "No discrete-log solve, factor-base relation or closure is claimed. The exact counts were instead re-derived frame by frame (50,000 frames) with independent code."
+  },
+  {
+   "name": "disclosures",
+   "result": "pass",
+   "detail": "README discloses no Conductor task, no EKS route, no S3 resume checkpoint (token expired, run.log line 1), no bench.record and no pcc claim; the BRIEF directed a local one-core run. Runtime claim \"about 20 minutes, peak RSS 253 MB\" matches meta.json (census 372.6 + 382.9 + 329.2 s, desk 92 s; maxrss 253.0 MB at k = 20)."
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "medium",
+   "text": "README answer item 4 (line 43) and REPORT.typ line 65 invert a measured direction: \"An x-frame with the same T-shifted targets gets 1.00-1.17x of that count.\" The recorded ratio is the no-half arm's covered_full divided by the x-null's covered_shift in the same class: 1.0025-1.1740 over 60 cells (model 1.002-1.151; P5 60/60). So the no-half full set is 1.00-1.17x the x-frame set, and the x-frame gets 0.85-1.00x of the no-half count.",
+   "suggested_fix": "Reword to: \"Their full signed set is 1.00-1.17x the set an x-frame covers when it decomposes the same T-shifted targets R, R - T and R + T (model 1.00-1.15; P5 60/60). Both need three decompositions of the same degree, so this is accounting, not a gain. [pcc:unverified]\" Apply the same change in REPORT.typ and rebuild REPORT.pdf."
+  },
+  {
+   "id": "E2",
+   "severity": "low",
+   "text": "Unit slip. DESK.md section 3 (line 123), copied in REPORT.typ line 617, says \"E' x-frames have about N/4 more than E x-frames\" right after giving the deficits in covered points (N/2 on E, N on E'). In covered points the model and data give about N/2: Ep.x minus E.x at t = 4 is 4.23 / 3.92 / 4.45 (k = 16 / 18 / 20) against N/2 = 4.0, and at t = 5 8.29 / 7.08 / 7.25 against 8.0. N/4 is the number of extra self-paired fibres, each covering 2 points. README line 211 (\"adds about N/4 within-fibre relations\") is right only if a relation means an unordered fibre pair.",
+   "suggested_fix": "DESK.md is pinned by FREEZE.sha256, so leave it byte-equal and record the correction in README \"Errata\" (or a sibling ERRATA.md). Reword README line 211 and REPORT.typ lines 385 and 617 to \"about N/4 more self-paired fibres, i.e. about N/2 more covered points\"."
+  },
+  {
+   "id": "E3",
+   "severity": "low",
+   "text": "README PC1 line (171) and REPORT.typ line 335: \"detected at t = 4-6 in every k (CI upper bound <= 0.992)\". At t = 4-6 the largest upper bound is 0.950 (summary.json 0.9495 at k = 16, t = 6; validator 0.9496). 0.992 is the k = 16 and k = 20 t = 8 value, and the t = 8 maximum is 0.993 (k = 18). The statement is true but cites the wrong cells.",
+   "suggested_fix": "Change to \"(CI upper bound <= 0.950)\"."
+  },
+  {
+   "id": "E4",
+   "severity": "low",
+   "text": "A/A \"held, 28/30\" depends on the bootstrap stream. In the frozen run the k = 16, t = 6 E.x split interval is 0.9574-1.0008. With the validator's independent stream it is 0.9563-0.9994 at B = 2000 (27/30, exactly at the threshold) and contains 1 at B = 10000 (28/30). The verdict holds in every variant.",
+   "suggested_fix": "Add: \"A third cell (k = 16, t = 6, E x-frame) has an upper bound of 1.0008; with another bootstrap stream it falls just below 1 (27/30, still at the threshold).\""
+  },
+  {
+   "id": "E5",
+   "severity": "low",
+   "text": "Provenance: README line 8 and REPORT.typ line 16 say \"the run was committed at e783d12a5b\". That commit touches only L1 files. The L3 run outputs (analysis/summary.json, VERDICTS.md, model_table.txt, data/SHA256SUMS, data/k20/meta.json and the final run.log) were added in 6d9cb1674a (03:43:40Z); data/k16 and k18 meta.json came in earlier sweep commits (3ccc863cc4, c36e9d186a). They are present in the e783d12a5b tree.",
+   "suggested_fix": "Say \"the run outputs were committed at 6d9cb1674a (and are present at e783d12a5b)\"."
+  },
+  {
+   "id": "E6",
+   "severity": "low",
+   "text": "Some result sentences lack [pcc:unverified]. In \"Desk results\": the curve-facts sub-bullets, Lemma 3 \"Checked exactly on 2000 points per curve\", Huff \"the curve equation was checked on every point\", JI \"checked on every point\", \"read off the fibre histograms\" and the invariance-group identification. Also both bullets of \"Corrections to the brief\", the \"Why.\" paragraph (the N/4 claim), and items 2 (\"1.5% at t = 8\") and 4 (\"ranging 1.03-1.39 across cells\") of the engine-check list.",
+   "suggested_fix": "Append [pcc:unverified] to each listed sentence (README and REPORT.typ)."
+  },
+  {
+   "id": "E7",
+   "severity": "low",
+   "text": "README line 217 and REPORT.typ line 393: \"it is 1.5% at t = 8\". The measured Ep.x/E.x at t = 8 is 1.0105 / 1.0163 / 1.0195 (k = 16 / 18 / 20), i.e. 1.1-2.0%. 1.5% is the k = 20 model value (model 1.012-1.015).",
+   "suggested_fix": "Change to \"1-2% at t = 8 (measured; model 1.2-1.5%)\"."
+  },
+  {
+   "id": "E8",
+   "severity": "info",
+   "text": "The PROTOCOL.md model table says k = 18 and k = 20 are within 0.01 of k = 16 \"except where noted\". Ep.ji_s / Ep.x at t = 7 is 0.517 at k = 16 but 0.504 and 0.501 at k = 18 and k = 20, and this is not noted. The file is frozen. Verdicts are unaffected because analyse.py reads model_predictions.json, which equals the DESK section 5 closed forms exactly.",
+   "suggested_fix": "No change to PROTOCOL.md (frozen). Optionally list this in README \"Errata\"."
+  },
+  {
+   "id": "E9",
+   "severity": "info",
+   "text": "The recorded 16|5|Ep.huff_x cell (mean 63.62) lies +3.4 SE above the pooled same-distribution estimate: recorded huff_y, c01, c10 and c11 at that cell average 61.49 over 8000 frames, and the validator's 5000 independent frames give 61.19. A frame-exact replay reproduces all 2000 recorded frames, so this is a sampling excursion of the seeded sample, not a fault. It is also the cell with P4a's narrowest margins (ratio 1.037 against the 1.05 bound; KS 0.0575 against 0.0617).",
+   "suggested_fix": "None required. Optionally note it beside P4a."
+  }
+ ],
+ "recomputed": {
+  "verdicts": {
+   "CAL1": {
+    "held": true,
+    "n_ok": 30,
+    "n_total": 30
+   },
+   "CAL2": {
+    "held": true,
+    "n_ok": 15,
+    "n_total": 15
+   },
+   "CAL3": {
+    "held": true,
+    "n_ok": 30,
+    "n_total": 30
+   },
+   "C1": {
+    "held": true,
+    "n_ok": 89966,
+    "n_total": 90000
+   },
+   "C2": {
+    "held": true,
+    "n_ok": 45,
+    "n_total": 45
+   },
+   "AA": {
+    "held": true,
+    "n_ok": 27,
+    "n_total": 30
+   },
+   "PC1": {
+    "held": true,
+    "n_ok": 24,
+    "n_total": 24
+   },
+   "PC2": {
+    "held": true,
+    "n_ok": 9,
+    "n_total": 9
+   },
+   "P1": {
+    "held": true,
+    "n_ok": 126,
+    "n_total": 126
+   },
+   "P2": {
+    "held": true,
+    "n_ok": 21,
+    "n_total": 21
+   },
+   "P3": {
+    "held": true,
+    "n_ok": 72,
+    "n_total": 72
+   },
+   "P4a": {
+    "held": true,
+    "n_ok": 36,
+    "n_total": 36
+   },
+   "P4b": {
+    "held": true,
+    "n_ok": 36,
+    "n_total": 36
+   },
+   "P5": {
+    "held": true,
+    "n_ok": 60,
+    "n_total": 60
+   },
+   "P6": {
+    "held": true,
+    "n_ok": 6,
+    "n_total": 6
+   },
+   "P7": {
+    "held": true,
+    "n_ok": 1,
+    "n_total": 1
+   }
+  },
+  "verdicts_detail": {
+   "CAL1": {},
+   "CAL2": {
+    "own_se_variant": "15",
+    "z": [
+     -0.66,
+     -0.16,
+     0.6,
+     0.88,
+     1.23,
+     -1.44,
+     -0.01,
+     -0.29,
+     0.64,
+     -1.37,
+     -0.75,
+     0.71,
+     0.48,
+     -0.79,
+     -0.23
+    ]
+   },
+   "CAL3": {
+    "range": [
+     0.9901,
+     1.0124
+    ]
+   },
+   "C1": {
+    "code0": 0,
+    "code2": 34,
+    "code2_cells": [
+     [
+      16,
+      4,
+      "E.iota_even",
+      1
+     ],
+     [
+      16,
+      4,
+      "E.iota_T0",
+      2
+     ],
+     [
+      16,
+      4,
+      "Ep.iota_2E",
+      4
+     ],
+     [
+      18,
+      4,
+      "E.iota_even",
+      6
+     ],
+     [
+      18,
+      4,
+      "E.iota_T0",
+      5
+     ],
+     [
+      18,
+      4,
+      "Ep.iota_2E",
+      3
+     ],
+     [
+      20,
+      4,
+      "E.iota_even",
+      5
+     ],
+     [
+      20,
+      4,
+      "E.iota_T0",
+      4
+     ],
+     [
+      20,
+      4,
+      "Ep.iota_2E",
+      4
+     ]
+    ]
+   },
+   "C2": {
+    "range": [
+     0.9734,
+     1.0245
+    ]
+   },
+   "AA": {
+    "excluded": [
+     [
+      16,
+      6,
+      "E.x",
+      0.9786,
+      0.9563,
+      0.9994
+     ],
+     [
+      20,
+      4,
+      "Ep.x",
+      1.0734,
+      1.0295,
+      1.1206
+     ],
+     [
+      20,
+      6,
+      "E.x",
+      0.9714,
+      0.9511,
+      0.9937
+     ]
+    ]
+   },
+   "PC1": {
+    "direction": "9/9",
+    "model": "15/15",
+    "max_hi": 0.9496
+   },
+   "PC2": {
+    "gains": {
+     "16|5": 2.748,
+     "16|6": 1.981,
+     "16|7": 1.546,
+     "18|5": 2.693,
+     "18|6": 2.18,
+     "18|7": 1.635,
+     "20|5": 2.62,
+     "20|6": 2.06,
+     "20|7": 1.724
+    }
+   },
+   "P1": {
+    "direction": "36/36",
+    "model": "90/90",
+    "max_hi_t45": 0.9082
+   },
+   "P2": {
+    "direction": "6/6",
+    "model": "15/15"
+   },
+   "P3": {
+    "direction": "27/27",
+    "model": "45/45",
+    "max_hi": 0.6305
+   },
+   "P4a": {
+    "ratio_range": [
+     0.976,
+     1.0367
+    ],
+    "max_ks": 0.0585,
+    "crit": 0.0617
+   },
+   "P4b": {
+    "ratio_range": [
+     0.9844,
+     1.0165
+    ]
+   },
+   "P5": {
+    "full_over_D_range": [
+     1.975,
+     4.073
+    ],
+    "full_over_D_min_cell": [
+     16,
+     8,
+     "E.iota_odd"
+    ],
+    "ratio_range": [
+     1.0025,
+     1.174
+    ]
+   },
+   "P6": {
+    "arms": {
+     "E.iota_odd": {
+      "geomean": 0.9708,
+      "max": 1.1315,
+      "min": 0.8333
+     },
+     "Ep.iota_c01": {
+      "geomean": 0.8527,
+      "max": 0.9727,
+      "min": 0.6818
+     },
+     "Ep.iota_c10": {
+      "geomean": 0.8356,
+      "max": 1.0139,
+      "min": 0.6364
+     },
+     "Ep.iota_c11": {
+      "geomean": 0.8841,
+      "max": 1.1068,
+      "min": 0.7348
+     },
+     "Ep.huff_x": {
+      "geomean": 0.865,
+      "max": 0.9909,
+      "min": 0.6364
+     },
+     "Ep.huff_y": {
+      "geomean": 0.815,
+      "max": 0.9216,
+      "min": 0.5985
+     }
+    }
+   },
+   "P7": {
+    "geomean": 1.1172,
+    "range": [
+     1.0317,
+     1.3895
+    ],
+    "cells": {
+     "16|5": [
+      206,
+      192,
+      1.0729
+     ],
+     "16|6": [
+      658,
+      530,
+      1.2415
+     ],
+     "16|7": [
+      1762,
+      1536,
+      1.1471
+     ],
+     "18|5": [
+      264,
+      190,
+      1.3895
+     ],
+     "18|6": [
+      656,
+      586,
+      1.1195
+     ],
+     "18|7": [
+      1760,
+      1706,
+      1.0317
+     ],
+     "20|5": [
+      192,
+      186,
+      1.0323
+     ],
+     "20|6": [
+      574,
+      556,
+      1.0324
+     ],
+     "20|7": [
+      1866,
+      1798,
+      1.0378
+     ]
+    }
+   }
+  },
+  "AA_B10000": {
+   "held": true,
+   "n_ok": 28,
+   "n_total": 30,
+   "excluded": [
+    [
+     20,
+     4,
+     "Ep.x",
+     1.0734,
+     1.0271,
+     1.1222
+    ],
+    [
+     20,
+     6,
+     "E.x",
+     0.9714,
+     0.9497,
+     0.9942
+    ]
+   ]
+  },
+  "readme_ranges": {
+   "E_odd_t4": [
+    0.7874,
+    0.8101
+   ],
+   "Ep_nohalf_t4": [
+    0.6399,
+    0.6729
+   ],
+   "JI_all": [
+    0.4798,
+    0.6966
+   ],
+   "P2_t4": [
+    1.2062,
+    1.2361
+   ],
+   "P2_t5": [
+    1.1004,
+    1.1186
+   ],
+   "P2_t8": [
+    1.0105,
+    1.0195
+   ],
+   "P2_lo_all": 1.0045,
+   "P5_ratio": [
+    1.0025,
+    1.174
+   ]
+  },
+  "P2_cells_ratio_lo_hi_model": {
+   "16|4": [
+    1.2227,
+    1.1839,
+    1.2625,
+    1.2096
+   ],
+   "16|5": [
+    1.1186,
+    1.0931,
+    1.1447,
+    1.1134
+   ],
+   "16|6": [
+    1.0587,
+    1.0428,
+    1.0757,
+    1.0585
+   ],
+   "16|7": [
+    1.0271,
+    1.0164,
+    1.0376,
+    1.0285
+   ],
+   "16|8": [
+    1.0105,
+    1.0045,
+    1.0167,
+    1.0118
+   ],
+   "18|4": [
+    1.2062,
+    1.1681,
+    1.2449,
+    1.2098
+   ],
+   "18|5": [
+    1.1004,
+    1.0749,
+    1.1249,
+    1.1138
+   ],
+   "18|6": [
+    1.0589,
+    1.0432,
+    1.0764,
+    1.0592
+   ],
+   "18|7": [
+    1.033,
+    1.022,
+    1.0437,
+    1.0299
+   ],
+   "18|8": [
+    1.0163,
+    1.0089,
+    1.0234,
+    1.0144
+   ],
+   "20|4": [
+    1.2361,
+    1.1953,
+    1.2754,
+    1.2103
+   ],
+   "20|5": [
+    1.1022,
+    1.0776,
+    1.1271,
+    1.1142
+   ],
+   "20|6": [
+    1.0546,
+    1.0385,
+    1.0712,
+    1.0596
+   ],
+   "20|7": [
+    1.0338,
+    1.0225,
+    1.0456,
+    1.0304
+   ],
+   "20|8": [
+    1.0195,
+    1.012,
+    1.0272,
+    1.0152
+   ]
+  },
+  "k20_means": {
+   "20|4|E.x": 18.868,
+   "20|4|E.x_noself": 18.636,
+   "20|4|E.iota_even": 19.151,
+   "20|4|E.iota_T0": 18.932,
+   "20|4|E.iota_odd": 15.253,
+   "20|4|Ep.x": 23.322,
+   "20|4|Ep.iota_2E": 22.725,
+   "20|4|Ep.iota_c01": 15.595,
+   "20|4|Ep.iota_c10": 15.066,
+   "20|4|Ep.iota_c11": 14.923,
+   "20|4|Ep.huff_x": 15.072,
+   "20|4|Ep.huff_y": 14.96,
+   "20|4|Ep.ji_s": 11.467,
+   "20|4|Ep.ji_c": 15.624,
+   "20|4|Ep.ji_d": 11.189,
+   "20|5|E.x": 70.985,
+   "20|5|E.x_noself": 69.717,
+   "20|5|E.iota_even": 69.1,
+   "20|5|E.iota_T0": 70.413,
+   "20|5|E.iota_odd": 61.66,
+   "20|5|Ep.x": 78.24,
+   "20|5|Ep.iota_2E": 79.424,
+   "20|5|Ep.iota_c01": 62.279,
+   "20|5|Ep.iota_c10": 61.271,
+   "20|5|Ep.iota_c11": 62.024,
+   "20|5|Ep.huff_x": 61.308,
+   "20|5|Ep.huff_y": 62.526,
+   "20|5|Ep.ji_s": 38.825,
+   "20|5|Ep.ji_c": 47.886,
+   "20|5|Ep.ji_d": 39.856,
+   "20|6|E.x": 269.89,
+   "20|6|E.x_noself": 267.547,
+   "20|6|E.iota_even": 266.722,
+   "20|6|E.iota_T0": 266.593,
+   "20|6|E.iota_odd": 251.216,
+   "20|6|Ep.x": 284.637,
+   "20|6|Ep.iota_2E": 282.772,
+   "20|6|Ep.iota_c01": 253.507,
+   "20|6|Ep.iota_c10": 251.242,
+   "20|6|Ep.iota_c11": 252.299,
+   "20|6|Ep.huff_x": 251.23,
+   "20|6|Ep.huff_y": 250.781,
+   "20|6|Ep.ji_s": 139.927,
+   "20|6|Ep.ji_c": 158.594,
+   "20|6|Ep.ji_d": 140.106,
+   "20|7|E.x": 1043.097,
+   "20|7|E.x_noself": 1046.13,
+   "20|7|E.iota_even": 1041.876,
+   "20|7|E.iota_T0": 1051.271,
+   "20|7|E.iota_odd": 1012.158,
+   "20|7|Ep.x": 1078.33,
+   "20|7|Ep.iota_2E": 1084.713,
+   "20|7|Ep.iota_c01": 1013.185,
+   "20|7|Ep.iota_c10": 1021.305,
+   "20|7|Ep.iota_c11": 1008.828,
+   "20|7|Ep.huff_x": 1010.7,
+   "20|7|Ep.huff_y": 1016.233,
+   "20|7|Ep.ji_s": 541.828,
+   "20|7|Ep.ji_c": 572.978,
+   "20|7|Ep.ji_d": 536.375,
+   "20|8|E.x": 4082.669,
+   "20|8|E.x_noself": 4081.304,
+   "20|8|E.iota_even": 4098.098,
+   "20|8|E.iota_T0": 4085.735,
+   "20|8|E.iota_odd": 4022.616,
+   "20|8|Ep.x": 4162.156,
+   "20|8|Ep.iota_2E": 4128.665,
+   "20|8|Ep.iota_c01": 4044.647,
+   "20|8|Ep.iota_c10": 4036.078,
+   "20|8|Ep.iota_c11": 4017.979,
+   "20|8|Ep.huff_x": 4034.518,
+   "20|8|Ep.huff_y": 4018.263,
+   "20|8|Ep.ji_s": 2096.918,
+   "20|8|Ep.ji_c": 2152.372,
+   "20|8|Ep.ji_d": 2098.504
+  },
+  "model_max_rel_diff": 0.0,
+  "desk": {
+   "n_pass": 60,
+   "n_total": 60,
+   "facts": {
+    "k18_facts": {
+     "p": 262133,
+     "A": 78,
+     "n": 263096,
+     "r": 32887,
+     "nE": 263096,
+     "nEp": 263096,
+     "twist": 261172,
+     "g": [
+      5,
+      34452
+     ],
+     "gp": [
+      2,
+      18637
+     ],
+     "hp": [
+      80,
+      0
+     ],
+     "s": 1.0
+    },
+    "k20_facts": {
+     "p": 1048573,
+     "A": 926,
+     "n": 1049624,
+     "r": 131203,
+     "nE": 1049624,
+     "nEp": 1049624,
+     "twist": 1047524,
+     "g": [
+      8,
+      277396
+     ],
+     "gp": [
+      2,
+      518068
+     ],
+     "hp": [
+      928,
+      0
+     ],
+     "s": 3.7
+    },
+    "k16_facts": {
+     "p": 65437,
+     "A": 1058,
+     "n": 65672,
+     "r": 8209,
+     "nE": 65672,
+     "nEp": 65672,
+     "twist": 65204,
+     "g": [
+      2,
+      59324
+     ],
+     "gp": [
+      2,
+      31537
+     ],
+     "hp": [
+      1056,
+      0
+     ],
+     "s": 0.4
+    }
+   },
+   "Ep_e0": 1060,
+   "kummer_own_labels": {
+    "(0, 1)": [
+     "1060"
+    ],
+    "(0, 0)": [
+     "None"
+    ],
+    "(1, 1)": [
+     "0"
+    ],
+    "(1, 0)": [
+     "1056"
+    ]
+   }
+  },
+  "reduced_census": {
+   "K_per_cell": 1000,
+   "cells": {
+    "16|4|E.x": {
+     "D": {
+      "mine": 19.266,
+      "recorded": 18.986,
+      "z": 0.69,
+      "ratio": 1.0147
+     },
+     "full": {
+      "mine": 19.266,
+      "recorded": 18.986,
+      "z": 0.69,
+      "ratio": 1.0147
+     },
+     "npts": {
+      "mine": 16.122,
+      "recorded": 16.072,
+      "z": 0.32,
+      "ratio": 1.0031
+     },
+     "shift": {
+      "mine": 49.52,
+      "recorded": 49.233,
+      "z": 0.29,
+      "ratio": 1.0058
+     }
+    },
+    "16|4|E.iota_odd": {
+     "D": {
+      "mine": 14.758,
+      "recorded": 15.38,
+      "z": -1.72,
+      "ratio": 0.9596
+     },
+     "full": {
+      "mine": 52.95,
+      "recorded": 53.611,
+      "z": -0.64,
+      "ratio": 0.9877
+     },
+     "npts": {
+      "mine": 15.994,
+      "recorded": 16.148,
+      "z": -0.99,
+      "ratio": 0.9905
+     }
+    },
+    "16|4|Ep.huff_x": {
+     "D": {
+      "mine": 15.406,
+      "recorded": 14.995,
+      "z": 1.18,
+      "ratio": 1.0274
+     },
+     "full": {
+      "mine": 39.21,
+      "recorded": 37.834,
+      "z": 1.88,
+      "ratio": 1.0364
+     },
+     "npts": {
+      "mine": 16.446,
+      "recorded": 16.096,
+      "z": 2.24,
+      "ratio": 1.0218
+     }
+    },
+    "16|4|Ep.x": {
+     "D": {
+      "mine": 23.388,
+      "recorded": 23.214,
+      "z": 0.38,
+      "ratio": 1.0075
+     },
+     "full": {
+      "mine": 23.388,
+      "recorded": 23.214,
+      "z": 0.38,
+      "ratio": 1.0075
+     },
+     "npts": {
+      "mine": 16.078,
+      "recorded": 16.134,
+      "z": -0.36,
+      "ratio": 0.9966
+     }
+    },
+    "16|5|E.x": {
+     "D": {
+      "mine": 70.452,
+      "recorded": 69.86,
+      "z": 0.57,
+      "ratio": 1.0085
+     },
+     "full": {
+      "mine": 70.452,
+      "recorded": 69.86,
+      "z": 0.57,
+      "ratio": 1.0085
+     },
+     "npts": {
+      "mine": 32.195,
+      "recorded": 32.062,
+      "z": 0.6,
+      "ratio": 1.0041
+     },
+     "shift": {
+      "mine": 194.514,
+      "recorded": 192.068,
+      "z": 0.91,
+      "ratio": 1.0127
+     }
+    },
+    "16|5|E.iota_odd": {
+     "D": {
+      "mine": 62.246,
+      "recorded": 62.011,
+      "z": 0.25,
+      "ratio": 1.0038
+     },
+     "full": {
+      "mine": 200.776,
+      "recorded": 200.04,
+      "z": 0.27,
+      "ratio": 1.0037
+     },
+     "npts": {
+      "mine": 32.086,
+      "recorded": 32.107,
+      "z": -0.09,
+      "ratio": 0.9993
+     }
+    },
+    "16|5|Ep.huff_x": {
+     "D": {
+      "mine": 60.064,
+      "recorded": 63.622,
+      "z": -3.89,
+      "ratio": 0.9441
+     },
+     "full": {
+      "mine": 135.244,
+      "recorded": 142.392,
+      "z": -3.85,
+      "ratio": 0.9498
+     },
+     "npts": {
+      "mine": 31.64,
+      "recorded": 32.365,
+      "z": -3.34,
+      "ratio": 0.9776
+     }
+    },
+    "16|5|Ep.x": {
+     "D": {
+      "mine": 79.154,
+      "recorded": 78.146,
+      "z": 0.92,
+      "ratio": 1.0129
+     },
+     "full": {
+      "mine": 79.154,
+      "recorded": 78.146,
+      "z": 0.92,
+      "ratio": 1.0129
+     },
+     "npts": {
+      "mine": 32.217,
+      "recorded": 32.144,
+      "z": 0.32,
+      "ratio": 1.0023
+     }
+    },
+    "16|6|E.x": {
+     "D": {
+      "mine": 267.372,
+      "recorded": 267.577,
+      "z": -0.08,
+      "ratio": 0.9992
+     },
+     "full": {
+      "mine": 267.372,
+      "recorded": 267.577,
+      "z": -0.08,
+      "ratio": 0.9992
+     },
+     "npts": {
+      "mine": 64.494,
+      "recorded": 64.405,
+      "z": 0.28,
+      "ratio": 1.0014
+     },
+     "shift": {
+      "mine": 746.954,
+      "recorded": 744.422,
+      "z": 0.37,
+      "ratio": 1.0034
+     }
+    },
+    "16|6|E.iota_odd": {
+     "D": {
+      "mine": 248.146,
+      "recorded": 250.063,
+      "z": -0.76,
+      "ratio": 0.9923
+     },
+     "full": {
+      "mine": 750.72,
+      "recorded": 754.749,
+      "z": -0.58,
+      "ratio": 0.9947
+     },
+     "npts": {
+      "mine": 64.06,
+      "recorded": 64.196,
+      "z": -0.44,
+      "ratio": 0.9979
+     }
+    },
+    "16|6|Ep.huff_x": {
+     "D": {
+      "mine": 248.188,
+      "recorded": 247.052,
+      "z": 0.48,
+      "ratio": 1.0046
+     },
+     "full": {
+      "mine": 518.54,
+      "recorded": 516.786,
+      "z": 0.37,
+      "ratio": 1.0034
+     },
+     "npts": {
+      "mine": 64.106,
+      "recorded": 63.9,
+      "z": 0.68,
+      "ratio": 1.0032
+     }
+    },
+    "16|6|Ep.x": {
+     "D": {
+      "mine": 280.838,
+      "recorded": 283.297,
+      "z": -0.89,
+      "ratio": 0.9913
+     },
+     "full": {
+      "mine": 280.838,
+      "recorded": 283.297,
+      "z": -0.89,
+      "ratio": 0.9913
+     },
+     "npts": {
+      "mine": 64.188,
+      "recorded": 64.488,
+      "z": -0.95,
+      "ratio": 0.9953
+     }
+    },
+    "16|7|E.x": {
+     "D": {
+      "mine": 989.068,
+      "recorded": 993.38,
+      "z": -0.67,
+      "ratio": 0.9957
+     },
+     "full": {
+      "mine": 989.068,
+      "recorded": 993.38,
+      "z": -0.67,
+      "ratio": 0.9957
+     },
+     "npts": {
+      "mine": 128.409,
+      "recorded": 128.686,
+      "z": -0.64,
+      "ratio": 0.9978
+     },
+     "shift": {
+      "mine": 2573.254,
+      "recorded": 2580.083,
+      "z": -0.47,
+      "ratio": 0.9974
+     }
+    },
+    "16|7|E.iota_odd": {
+     "D": {
+      "mine": 955.492,
+      "recorded": 960.41,
+      "z": -0.77,
+      "ratio": 0.9949
+     },
+     "full": {
+      "mine": 2577.83,
+      "recorded": 2593.623,
+      "z": -1.08,
+      "ratio": 0.9939
+     },
+     "npts": {
+      "mine": 127.908,
+      "recorded": 128.306,
+      "z": -0.9,
+      "ratio": 0.9969
+     }
+    },
+    "16|7|Ep.huff_x": {
+     "D": {
+      "mine": 969.788,
+      "recorded": 962.319,
+      "z": 1.17,
+      "ratio": 1.0078
+     },
+     "full": {
+      "mine": 1871.374,
+      "recorded": 1856.672,
+      "z": 1.3,
+      "ratio": 1.0079
+     },
+     "npts": {
+      "mine": 129.07,
+      "recorded": 128.392,
+      "z": 1.52,
+      "ratio": 1.0053
+     }
+    },
+    "16|7|Ep.x": {
+     "D": {
+      "mine": 1017.802,
+      "recorded": 1020.276,
+      "z": -0.38,
+      "ratio": 0.9976
+     },
+     "full": {
+      "mine": 1017.802,
+      "recorded": 1020.276,
+      "z": -0.38,
+      "ratio": 0.9976
+     },
+     "npts": {
+      "mine": 128.318,
+      "recorded": 128.63,
+      "z": -0.72,
+      "ratio": 0.9976
+     }
+    },
+    "16|8|E.x": {
+     "D": {
+      "mine": 3289.602,
+      "recorded": 3278.707,
+      "z": 0.89,
+      "ratio": 1.0033
+     },
+     "full": {
+      "mine": 3289.602,
+      "recorded": 3278.707,
+      "z": 0.89,
+      "ratio": 1.0033
+     },
+     "npts": {
+      "mine": 257.945,
+      "recorded": 257.256,
+      "z": 1.12,
+      "ratio": 1.0027
+     },
+     "shift": {
+      "mine": 6395.684,
+      "recorded": 6381.393,
+      "z": 1.08,
+      "ratio": 1.0022
+     }
+    },
+    "16|8|E.iota_odd": {
+     "D": {
+      "mine": 3246.62,
+      "recorded": 3239.945,
+      "z": 0.54,
+      "ratio": 1.0021
+     },
+     "full": {
+      "mine": 6404.6,
+      "recorded": 6397.358,
+      "z": 0.54,
+      "ratio": 1.0011
+     },
+     "npts": {
+      "mine": 257.666,
+      "recorded": 257.353,
+      "z": 0.51,
+      "ratio": 1.0012
+     }
+    },
+    "16|8|Ep.huff_x": {
+     "D": {
+      "mine": 3221.958,
+      "recorded": 3228.839,
+      "z": -0.57,
+      "ratio": 0.9979
+     },
+     "full": {
+      "mine": 5214.16,
+      "recorded": 5224.183,
+      "z": -0.69,
+      "ratio": 0.9981
+     },
+     "npts": {
+      "mine": 256.38,
+      "recorded": 256.7,
+      "z": -0.53,
+      "ratio": 0.9988
+     }
+    },
+    "16|8|Ep.x": {
+     "D": {
+      "mine": 3312.87,
+      "recorded": 3313.033,
+      "z": -0.01,
+      "ratio": 1.0
+     },
+     "full": {
+      "mine": 3312.87,
+      "recorded": 3313.033,
+      "z": -0.01,
+      "ratio": 1.0
+     },
+     "npts": {
+      "mine": 257.129,
+      "recorded": 257.169,
+      "z": -0.07,
+      "ratio": 0.9998
+     }
+    },
+    "16|4|E.iota_even": {
+     "D": {
+      "mine": 19.047,
+      "recorded": 18.964,
+      "z": 0.13
+     }
+    },
+    "16|5|E.iota_even": {
+     "D": {
+      "mine": 70.82,
+      "recorded": 70.857,
+      "z": -0.02
+     }
+    },
+    "16|6|E.iota_even": {
+     "D": {
+      "mine": 261.46,
+      "recorded": 264.756,
+      "z": -0.77
+     }
+    }
+   },
+   "control_theorem1": {
+    "frames": 900,
+    "ok": 900,
+    "viol": []
+   },
+   "spot_pointwise": {
+    "n": 48,
+    "ok": 48
+   },
+   "huff5_rerun_4000": {
+    "16|5|Ep.huff_x": {
+     "D": {
+      "mine": 61.472,
+      "recorded": 63.622,
+      "z": -3.18,
+      "ratio": 0.9662
+     },
+     "full": {
+      "mine": 138.145,
+      "recorded": 142.392,
+      "z": -3.1,
+      "ratio": 0.9702
+     },
+     "npts": {
+      "mine": 31.962,
+      "recorded": 32.365,
+      "z": -2.56,
+      "ratio": 0.9875
+     }
+    }
+   }
+  },
+  "frame_exact_replay": {
+   "16|4|Ep.huff_x": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null,
+    "recorded_mean_D": 14.995
+   },
+   "16|5|Ep.huff_x": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null,
+    "recorded_mean_D": 63.622
+   },
+   "16|6|Ep.huff_x": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null,
+    "recorded_mean_D": 247.052
+   },
+   "16|7|Ep.huff_x": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null,
+    "recorded_mean_D": 962.319
+   },
+   "16|8|Ep.huff_x": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null,
+    "recorded_mean_D": 3228.839
+   },
+   "16|4|E.x": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null,
+    "recorded_mean_D": 18.986
+   },
+   "16|5|E.x": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null,
+    "recorded_mean_D": 69.86
+   },
+   "16|6|E.x": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null,
+    "recorded_mean_D": 267.577
+   },
+   "16|7|E.x": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null,
+    "recorded_mean_D": 993.38
+   },
+   "16|8|E.x": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null,
+    "recorded_mean_D": 3278.707
+   },
+   "16|4|Ep.x": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null,
+    "recorded_mean_D": 23.214
+   },
+   "16|5|Ep.x": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null,
+    "recorded_mean_D": 78.146
+   },
+   "16|6|Ep.x": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null,
+    "recorded_mean_D": 283.297
+   },
+   "16|7|Ep.x": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null,
+    "recorded_mean_D": 1020.276
+   },
+   "16|8|Ep.x": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null,
+    "recorded_mean_D": 3313.033
+   },
+   "16|4|E.iota_odd": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null
+   },
+   "16|5|E.iota_odd": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null
+   },
+   "16|6|E.iota_odd": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null
+   },
+   "16|7|E.iota_odd": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null
+   },
+   "16|8|E.iota_odd": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null
+   },
+   "16|4|Ep.iota_c01": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null
+   },
+   "16|5|Ep.iota_c01": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null
+   },
+   "16|6|Ep.iota_c01": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null
+   },
+   "16|7|Ep.iota_c01": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null
+   },
+   "16|8|Ep.iota_c01": {
+    "frames": 2000,
+    "exact_match": 2000,
+    "first_mismatch": null
+   }
+  },
+  "npoints_global_check": "225 recorded cells: mean z -0.02, sd 0.998, |z|>2: 8, |z|>3: 0 (exact expectation 2^t * #finite-valued points/(p+1))",
+  "ep_minus_e_xframe_mean_difference_points": {
+   "k16": [
+    4.23,
+    8.29,
+    15.72
+   ],
+   "k18": [
+    3.92,
+    7.08,
+    15.84
+   ],
+   "k20": [
+    4.45,
+    7.25,
+    14.75
+   ],
+   "N_over_2": [
+    4.0,
+    8.0,
+    16.0
+   ],
+   "t": [
+    4,
+    5,
+    6
+   ]
+  },
+  "C1_expected_code2": "18000 * P(Bin(16, 0.502) <= 2) = 37.6; observed 34"
+ },
+ "commands": [
+  "cd /home/user/crypto && git rev-parse HEAD && git status --porcelain && git diff --quiet 1e42afc88d -- research/curve25519_wave7_untried_20261122/L3_translated_involution",
+  "cd L3 && sha256sum -c FREEZE.sha256; for c in 0e3c0fbda0 e783d12a5b 1e42afc88d: git show $c:<path> | sha256sum (9 frozen files + PROTOCOL.md)",
+  "cd L3/scripts && sha256sum -c ../data/SHA256SUMS; cd L3/data_json && sha256sum -c SHA256SUMS",
+  "python3 desk_val.py desk_val.json            # own desk checks, k = 16 (theorems) and k = 16/18/20 (curve facts)",
+  "python3 verdicts_val.py verdicts_val.json 2000   # all verdicts from raw npz + JSON-mirror equality",
+  "python3 verdicts_val.py verdicts_val_b10k.json 10000",
+  "python3 census_val.py census_val.json 1000   # reduced independent census, k = 16",
+  "SALT=rerun2| ARMS=Ep.huff_x TS=5 CTRL=0 python3 census_val.py census_val_huff5_rerun.json 4000",
+  "python3 exact_replay.py exact_replay.json; python3 exact_replay_odd.py exact_replay_odd.json   # frame-exact replays",
+  "python3 npts_check.py; python3 readme_check.py"
+ ],
+ "validator_code": {
+  "location": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/val (session scratch; not committed)",
+  "imports": "stdlib + numpy + own vcore.py only (no study module imported)",
+  "sha256": {
+   "vcore.py": "51936956b3f93725461749ed25bf21a26cdeeff4e5be764245142c2406f81d28",
+   "desk_val.py": "a7fe2b9f9fcbc80b29ba51155b721891e743fa447e8fd4e5ba0cf186db4c82a1",
+   "verdicts_val.py": "46fa59aff1d3b2997c397a73477d56aacca14b15c49a7ece11a661c672543fd0",
+   "census_val.py": "45ff2402220991a9a0b883b4e374e28788fb137cf58ed84720a51b024999bf36",
+   "exact_replay.py": "9ef124d72722c767d4bf75453d068bdc4effceba665cf62a5148314b8e6b7c93",
+   "exact_replay_odd.py": "fe493b50c1dac692119084c9bff0608b130afe255c24a570b96f074923c5fc3b",
+   "npts_check.py": "6cc9b75cc71d76e25be863439ad9255a587a753af644b985863cdd3c40591817",
+   "readme_check.py": "716d1c0ef44a82d9b7664a5f1a177b791be5c77fb23776cdfe94e42239a17418",
+   "make_report.py": "7dc443a09a000d2565fc235be90bd7ec20a8b7f7867105c84c3f860d40fe5917"
+  },
+  "note": "exact_replay*.py mirror the protocol seed rule and draw order (and, to map recorded T labels, the study's generator convention); bases and counts are the validator's own."
+ },
+ "environment": {
+  "python": "3.13.18",
+  "numpy": "2.5.3",
+  "host": "4 cores shared with other agents; one core used (nice 5)",
+  "wall_s": {
+   "desk": 16,
+   "verdicts": 15,
+   "census": 97,
+   "exact_replay": 41,
+   "exact_replay_odd": 206
+  }
+ },
+ "lessons_applied": [
+  "L-99ee952350b2 (index with []; study analyse.py and export_json.py --check also read real keys)",
+  "L-26895912385b (ratios recomputed from unrounded means; paired ratios not applicable: arms use independent seeds)",
+  "L-546d37ca7750 (not applicable: no band computed)",
+  "L-1a5a6b64022c (report written only when every check was complete)",
+  "L-8d86e8fc352c (E2: DESK.md is hash-pinned, so corrections go to README Errata or ERRATA.md)"
+ ]
+}

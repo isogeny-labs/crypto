@@ -1,0 +1,58 @@
+{
+  "card_changed": false,
+  "card_id": "CARD-native-natural-1m-k2048-v15",
+  "card_path": "/home/ec2-user/scratch/n83-natural-1m-20261020/cards/k2048-v15.json",
+  "card_sha256": "08d627cd15b5d3d921393b27638d3b7d169e08833832b85a440894bffa755ea6",
+  "commands": [
+    {
+      "argv": [
+        "/home/ec2-user/scratch/n83-natural-1m-20261020/bin/runner-v15",
+        "run",
+        "/home/ec2-user/scratch/n83-natural-1m-20261020/specs/k2048.json",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v15"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 1,
+          "seconds": 39.349220755,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 1,
+      "id": "k2048-v15",
+      "index": 1,
+      "outputs": {
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v15/audit.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v15/config.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v15/custody.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v15/inspect-final.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v15/inspect-live.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v15/isolation-after.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v15/isolation-before.json": "920d3eb1019d42e170e172534f3742e2b84c03a97a2f8d736e23052bef541da3",
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v15/memory-profile.jsonl": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v15/outer.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v15/spec.json": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v15/stderr.log": null,
+        "research/koblitz_n83_factor_base_sweep_20261008/verification/native-natural-1m-20261020/exec/k2048-v15/stdout.log": null
+      },
+      "seconds": 39.349220755,
+      "stderr_sha256": "60c4fb3838b39f1b0e1d3f5228edf6eef7e924e91628f531ef1d8581bf149b55",
+      "stderr_tail": [
+        "Error: \"CPU reservation preflight failed; observations retained, no timed worker launched\""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": false,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 1,
+  "commit": "f26d93845fe8d4b4be0a6668c74c359b7cb99fa0",
+  "dirty_after": "",
+  "dirty_before": "",
+  "native_executor": "n83-sweep-runner strict frozen-command subset/v1",
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "stopped at command 1"
+}

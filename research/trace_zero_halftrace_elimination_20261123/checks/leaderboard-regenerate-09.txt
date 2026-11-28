@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/workspace/crypto/scripts/build_ic_leaderboard.py", line 7533, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/workspace/crypto/scripts/build_ic_leaderboard.py", line 7494, in main
+    doc = build(allow_unvalidated=args.allow_unvalidated)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/scripts/build_ic_leaderboard.py", line 3799, in build
+    ladder, kob, kob1 = ladder_rows(names), koblitz_rows(names), koblitz_one_target_rows(names)
+                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/crypto/scripts/build_ic_leaderboard.py", line 748, in koblitz_one_target_rows
+    par = json.loads((REPO / RULE_V9_RUNS / f"k{a}n{n}" / "T01.params.json").read_text())
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1027, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/crypto/research/ic_tool_program/rule/v9/runs/k0n61/T01.params.json'

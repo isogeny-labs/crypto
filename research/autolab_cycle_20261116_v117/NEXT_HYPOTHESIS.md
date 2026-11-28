@@ -1,0 +1,7 @@
+# C118 guarded integration and exact residual deflation
+
+Freeze a new variant that imports the deterministic k1 root/tail circuit through the canonical65input map. Require each tail bit to be zero only on selector0(k1); selectors1/2 retain k3/k5 behavior, and invalid/padding guards remain. Compare full original feasible parameter sets on small exhaustive complete covers; never enforce the k1 constraint globally. Check recovered root against raw H on actual controls. Profile all setup, final clauses and memory before a changed native search.
+
+New falsifiable prediction: eliminating root-selector variables and enforcing the68finite-tail identities strengthens propagation enough to offset added gates. If integration grows too costly, use the deterministic high root to deflate H exactly by T+x and derive a bounded quartic support circuit, measuring against the retained14predicates. This is not justified until exact division/branch coverage tests pass. Preserve all lower-root multiplicities. Primary literature includes known Hensel/power-series lifting (Neiger,Rosenkilde,Schost2017;Roth-Ruckenstein2000); no novelty claim is established for this component.
+
+Budget next cycle: at most3workers,90seconds each,4GiB,one core. Oracle first, guarded profile second, changed cold native diagnostic third only if measured formulation is bounded. Include cold compilation, recovery/verification and output in total timing; UNKNOWN remains unresolved.

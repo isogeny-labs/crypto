@@ -1,0 +1,10 @@
+{
+  "schema": "pfd.r4-pins/v1",
+  "note": "Amendment R4 (draft) binary pins. pkm_tower_pilot_r4 = musl static build of f13a690df016d0a457bd40579fbb9d054f486adf with gaux/aux_order_f13a690df0.patch applied by `git apply` (patched examples/pkm_tower_pilot.rs SHA-256 9c63c61a0db94842e8f3c9240b07c154b89e6ffbb403c8e3472fd220970e374d); recipe of image/build_layer_r2.sh, rustc 1.97.0, RUSTFLAGS=-C target-cpu=x86-64. The other two are the frozen study binaries (image/image.json). repo.tar is `git archive <commit>` of iso/BUNDLE_PATHS and is recorded per job with its commit.",
+  "sha256": {
+    "pkm_tower_pilot_r4": "705b151b6f35b3fdfd7a6b2ae80630edaf5fb1b7f0b75bf3c81f8e3882aa4888",
+    "prime_fall_degree_tools": "7e8a67030e8db88ab06be468ee3b01f7163eb6b5aa80275e690cc71102df9e7a",
+    "hky_fp_tower_check": "c36d324e8a60b0d8e827982baf7e07e0ce155664c67ce8c11b4debc410b95c6e"
+  },
+  "rayon_num_threads": 12
+}

@@ -1,0 +1,30 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T23:38:28Z",
+ "id": "PCC-20261123-68a84b",
+ "kind": "statement",
+ "producer": {
+  "commit": "94a09308a1708ac9abbc1714fc27b86118ec2c2d",
+  "model": "",
+  "session": "codex-ecc2k-cold50-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50_20261123/candidate2/equivalence-rows.jsonl",
+    "sha256": "fbffbe82d046eb9ba4f277e909cf2e4a55d21c58849e95f3ad54875afe2d2343"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_zero_cold50_20261123/candidate2/checks/equivalence.exit",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "",
+ "statement": "Candidate2 three separately built executables agree across all65 retained inputs,195 native rows, with exact original dispositions, witnesses/models/order, replay/group flags and projected diagnostics. All current frozen source input hashes match. This is unsigned producer qualification before candidate2 counters; the earlier below-target candidate1 remains preserved."
+}

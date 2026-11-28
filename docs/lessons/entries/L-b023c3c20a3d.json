@@ -1,0 +1,15 @@
+{
+  "action": "Use path.relative on canonical paths, verify realpath containment and exact dependency exclusion, then archive/compare originals before deleting only enumerated files",
+  "created": "2026-11-23T18:09:48Z",
+  "evidence": [
+    "research/hashed_ecdl_port_mass_20261123/SESSION-LOG.md",
+    "research/hashed_ecdl_port_mass_20261123/evidence/idle-rust-archive-receipt.json"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "artifact-compaction"
+  ],
+  "trigger": "A cache selector derives relative paths by substring slicing, and its root may end with a separator",
+  "why": "A doubled separator made the earlier selector falsely report zero unused objects; it selected and removed nothing. A corrected inventory and bounded compared archives supplied fixed-ceiling proof headroom."
+}

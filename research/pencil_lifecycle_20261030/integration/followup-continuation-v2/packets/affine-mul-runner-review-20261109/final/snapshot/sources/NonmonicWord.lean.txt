@@ -1,0 +1,54 @@
+import NonmonicStorage
+set_option autoImplicit false
+namespace NonmonicStorage
+open Polynomial CoefficientTraversal TraversalPolynomial ScaleTrim MonicRemainder QuotientStorage
+def wordDiv (p a:UInt64) (b input:List UInt64) (fuel:Nat) : Option (List UInt64×List UInt64) :=
+ (wloop p a b fuel (ProductPolynomial.zeros (input.length-b.length+1)) (trimFuel input.length input)).map
+ (fun z=>(finish z.1,z.2))
+
+theorem word_projection (p a:UInt64) [Fact p.toNat.Prime] (b input:List UInt64)
+ (hp:1<p.toNat) (hb:p.toNat<2^31) (ha:a.toNat<p.toNat) (hn:a≠0)
+ (hbs:Canon p b) (hi:Canon p input) (hm:b.getLast?=some a) (fuel:Nat) :
+ (wordDiv p a b input fuel).map (fun z=>(wordsPoly p z.1,z.2))=NonmonicDivision.divide p a b input fuel := by
+ unfold wordDiv NonmonicDivision.divide
+ rw [Option.map_map]
+ have h:=loop_refines p a b hp hb ha hn hbs hm input.length fuel
+   (ProductPolynomial.zeros (input.length-b.length+1)) (trimFuel input.length input)
+   (trim_good p _ input hi) (trim_length _ _) (by omega)
+ simpa only [Function.comp_def,finish_decode,ProductPolynomial.zeros_polynomial] using h
+
+theorem word_good (p a:UInt64) [Fact p.toNat.Prime] (b input:List UInt64)
+ (hp:1<p.toNat) (hb:p.toNat<2^31) (ha:a.toNat<p.toNat) (hn:a≠0)
+ (hbs:Canon p b) (hi:Canon p input) (fuel:Nat) (q out:List UInt64)
+ (ho:wordDiv p a b input fuel=some (q,out)) : Canon p q ∧ Canon p out := by
+ unfold wordDiv at ho
+ cases he:wloop p a b fuel (ProductPolynomial.zeros (input.length-b.length+1)) (trimFuel input.length input) with
+ | none => simp [he] at ho
+ | some z =>
+   rw [he] at ho
+   have hz:(finish z.1,z.2)=(q,out):=Option.some.inj ho
+   have hg:=loop_good p a b hp hb ha hn hbs fuel _ z.1 _ z.2
+     (ProductPolynomial.zeros_good p _ (by omega)) (trim_good p _ input hi) he
+   have hq:finish z.1=q:=congrArg Prod.fst hz
+   have hr:z.2=out:=congrArg Prod.snd hz
+   exact ⟨hq ▸ finish_good p z.1 hg.1,hr ▸ hg.2⟩
+
+theorem word_exact (p a:UInt64) [Fact p.toNat.Prime] (b input:List UInt64)
+ (hp:1<p.toNat) (hb:p.toNat<2^31) (ha:a.toNat<p.toNat) (hn:a≠0)
+ (hbs:Canon p b) (hi:Canon p input) (hm:b.getLast?=some a)
+ (fuel:Nat) (hf:input.length≤fuel) (wanted:(ZMod p.toNat)[X])
+ (hw:wordsPoly p input=wanted*wordsPoly p b) :
+ ∃q,wordDiv p a b input fuel=some (q,[]) ∧ Canon p q ∧ wordsPoly p q=wanted := by
+ have hx:=NonmonicDivision.exact_endpoint p a b input hp hb ha hn hbs hi hm fuel hf wanted hw
+ have hproj:=word_projection p a b input hp hb ha hn hbs hi hm fuel
+ rw [hx] at hproj
+ cases he:wordDiv p a b input fuel with
+ | none => simp [he] at hproj
+ | some z =>
+   rw [he] at hproj
+   have hz:(wordsPoly p z.1,z.2)=(wanted,[]):=Option.some.inj hproj
+   have hq:=congrArg Prod.fst hz
+   have hr:z.2=[]:=congrArg Prod.snd hz
+   refine ⟨z.1,?_,(word_good p a b input hp hb ha hn hbs hi fuel z.1 z.2 he).1,hq⟩
+   exact congrArg some (Prod.ext rfl hr)
+end NonmonicStorage

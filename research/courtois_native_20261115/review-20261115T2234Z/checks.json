@@ -1,0 +1,34 @@
+{
+  "schema": "courtois.development-review/v1",
+  "claim_standing": "pcc:unverified",
+  "performance_eligible": false,
+  "checks": [
+    {
+      "name": "native-first",
+      "crypto_head": "f2de3ffde441fd918786550ab0647b86e7bbcd2b",
+      "command": "CARGO_BUILD_JOBS=1 CARGO_TARGET_DIR=/workspace/isogeny-labs/crypto/target /home/agent/.cargo/bin/cargo test --locked --manifest-path research/courtois_native_20261115/Cargo.toml -- --test-threads=1",
+      "result": "8 tests pass; raw output retained; initial shell session handle lost; repeat below explicitly captured exit 0",
+      "log": "native-tests-initial.txt"
+    },
+    {
+      "name": "native-confirm",
+      "command": "same command as native-first",
+      "exit_status": 0,
+      "log": "native-tests-confirm.txt",
+      "reason": "Capture explicit shell exit status after original tool result was truncated"
+    },
+    {
+      "name": "compatibility",
+      "cryptanalysis_head": "29093722c9e04f25e9f1dcb6d1a62a284e018f29",
+      "command": "CARGO_BUILD_JOBS=1 CARGO_PROFILE_DEV_DEBUG=0 CARGO_TARGET_DIR=/workspace/isogeny-labs/cryptanalysis-target /home/agent/.cargo/bin/cargo test --locked --manifest-path bindings/rust/hashed-ecdl-tensor/Cargo.toml --lib binary::tests",
+      "exit_status": 0,
+      "log": "compatibility-tests.txt"
+    },
+    {
+      "name": "field-replay",
+      "command": "CARGO_BUILD_JOBS=1 CARGO_PROFILE_DEV_DEBUG=0 CARGO_TARGET_DIR=/workspace/isogeny-labs/cryptanalysis-target /home/agent/.cargo/bin/cargo test --locked --manifest-path research/courtois_native_20261115/replay-cryptanalysis/Cargo.toml -- --nocapture",
+      "exit_status": 0,
+      "log": "field-replay.txt"
+    }
+  ]
+}

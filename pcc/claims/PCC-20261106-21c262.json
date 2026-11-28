@@ -1,0 +1,22 @@
+{
+ "created_at": "2026-11-06T21:42:41Z",
+ "id": "PCC-20261106-21c262",
+ "kind": "statement",
+ "producer": {
+  "commit": "63f168e4aaad06dc1d6999d8e814891140c081ee",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_cost_leads_20261106/validation/source-custody-repair.json",
+    "sha256": "719f6d24690edab6239cb6780e84ba1d9e0a408540e3da243d6d2f3fb02ba41f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "APS administrative source-custody repair only",
+ "statement": "The first hosted APS source-custody preflight failed before the standard gate or upload. A local native Git check identifies the copied tracked lockfile as ignored; a new regression reproduces the refusal before repair, and all thirteen custody tests pass after exact capture-local ignore handling. Authentication and any later upload remain unobserved."
+}

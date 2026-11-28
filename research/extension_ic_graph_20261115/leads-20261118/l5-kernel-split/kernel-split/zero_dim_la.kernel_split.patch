@@ -1,0 +1,202 @@
+--- a/zero_dim_la.rs
++++ b/zero_dim_la.rs
+@@ -80,6 +80,9 @@
+     pub total_ms: f64,
+     /// Why the stage gave up, when it did.
+     pub gave_up: Option<&'static str>,
++    /// L5 kernel split: this call's [`LinOps`] by kernel, indexed as
++    /// [`KERNELS`] (sums to the call's [`LinOps`] field by field).
++    pub kernel_ops: [LinOps; NK],
+ }
+ 
+ impl FastStats {
+@@ -187,13 +190,86 @@
+     LIN.with(|c| c.get())
+ }
+ 
++// ── L5 kernel split (l5-kernel-split lane) ──────────────────────────────
++//
++// Every count made through `lin` is also added to the bucket of the kernel
++// that is current on this thread. The kernel is set by `KScope` guards in
++// `fast_inner` and `roots_in_fp`; bucket 0 (`unscoped`) receives counts made
++// outside any guard (none inside `fast_stage`, by the conservation check).
++
++/// Number of kernel buckets.
++pub const NK: usize = 10;
++/// Kernel names, in bucket order.
++pub const KERNELS: [&str; NK] = [
++    "unscoped",
++    "setup",
++    "nf",
++    "krylov",
++    "bm",
++    "xpow_mod_f",
++    "gcd",
++    "ring_split",
++    "readout",
++    "candidate_eval",
++];
++const K_SETUP: usize = 1;
++const K_NF: usize = 2;
++const K_KRYLOV: usize = 3;
++const K_BM: usize = 4;
++const K_XPOW: usize = 5;
++const K_GCD: usize = 6;
++const K_RING: usize = 7;
++const K_READOUT: usize = 8;
++const K_CAND: usize = 9;
++
++thread_local! {
++    static KER: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
++    static LINK: std::cell::RefCell<[LinOps; NK]> = const {
++        std::cell::RefCell::new([LinOps {
++            mul: 0, add: 0, mac: 0, word: 0, probe: 0, rng: 0,
++            mul_outside_legacy: 0, legacy_overcount: 0, ring_muls: 0,
++        }; NK])
++    };
++}
++
++/// This thread's cumulative per-kernel counts.
++pub fn kernel_ops_snapshot() -> [LinOps; NK] {
++    LINK.with(|c| *c.borrow())
++}
++
++/// `a − b`, bucket by bucket.
++pub fn kernel_ops_since(a: &[LinOps; NK], b: &[LinOps; NK]) -> [LinOps; NK] {
++    let mut out = [LinOps::default(); NK];
++    for k in 0..NK {
++        out[k] = a[k].since(&b[k]);
++    }
++    out
++}
++
++/// Sets the current kernel; restores the previous one on drop.
++struct KScope(usize);
++impl KScope {
++    #[inline(always)]
++    fn enter(k: usize) -> KScope {
++        KScope(KER.with(|c| c.replace(k)))
++    }
++}
++impl Drop for KScope {
++    #[inline(always)]
++    fn drop(&mut self) {
++        KER.with(|c| c.set(self.0));
++    }
++}
++
+ #[inline(always)]
+-fn lin(f: impl FnOnce(&mut LinOps)) {
++fn lin(f: impl Fn(&mut LinOps)) {
+     LIN.with(|c| {
+         let mut v = c.get();
+         f(&mut v);
+         c.set(v);
+     });
++    let k = KER.with(|c| c.get());
++    LINK.with(|c| f(&mut c.borrow_mut()[k]));
+ }
+ #[inline(always)]
+ fn c_mul(n: u64) {
+@@ -240,6 +316,7 @@
+ /// (`bits(k)` squarings and `popcount(k)` products) and one product; one
+ /// addition per term. The value is `f4_fp::eval`'s own.
+ fn eval_counted(f: &Poly, x: &[u64], p: u64) -> u64 {
++    let _k = KScope::enter(K_CAND);
+     let mut m = 0u64;
+     for (e, _) in f {
+         for &k in e.iter() {
+@@ -1368,11 +1445,13 @@
+     let d = f.len() - 1;
+     let ring = PolyRing::new(fp.p);
+     if d <= 2 {
++        let _k = KScope::enter(K_RING);
+         let r = ring.roots(&UPoly(f.to_vec()), rng);
+         *muls += ring.muls.get();
+         lin(|v| v.ring_muls += ring.muls.get());
+         return r;
+     }
++    let kx = KScope::enter(K_XPOW);
+     let mf = ModF::new(fp, f, muls);
+     let mut xp: Vec<u64> = x_pow_p(fp, &mf, muls).iter().map(|&c| c as u64).collect();
+     // x^p − x
+@@ -1380,11 +1459,15 @@
+     while xp.last() == Some(&0) {
+         xp.pop();
+     }
++    drop(kx);
++    let kg = KScope::enter(K_GCD);
+     let g = poly_gcd(fp, f, &xp, muls);
++    drop(kg);
+     if g.len() <= 1 {
+         return Vec::new();
+     }
+     // g has small degree (the number of roots): split it with the ring
++    let _k = KScope::enter(K_RING);
+     let r = ring.roots(&UPoly(g), rng);
+     *muls += ring.muls.get();
+     lin(|v| v.ring_muls += ring.muls.get());
+@@ -1433,8 +1516,10 @@
+ ) -> Option<Vec<Vec<u64>>> {
+     let t0 = Instant::now();
+     let before = lin_ops_snapshot();
++    let kbefore = kernel_ops_snapshot();
+     let out = fast_inner(basis, input, n, p, rng, st);
+     charge_lin(&lin_ops_snapshot().since(&before));
++    st.kernel_ops = kernel_ops_since(&kernel_ops_snapshot(), &kbefore);
+     st.total_ms = t0.elapsed().as_secs_f64() * 1e3;
+     out
+ }
+@@ -1452,6 +1537,7 @@
+         return None;
+     }
+     let fp = Fp::new(p);
++    let _ks = KScope::enter(K_SETUP);
+     c_rng(1);
+     let mut lrng = StdRng::seed_from_u64(rng.gen());
+     let t = Instant::now();
+@@ -1520,6 +1606,7 @@
+     let mut dmat: Vec<u32> = Vec::new();
+     // columns at most a quarter full stay sparse: (position, [(row, coef)])
+     let mut sparse_cols: Vec<(usize, Vec<(u32, u32)>)> = Vec::new();
++    let kn = KScope::enter(K_NF);
+     for (j, b) in std_mons.iter().enumerate() {
+         match tab.nf(pack(b) + unit) {
+             None => {
+@@ -1574,6 +1661,7 @@
+     st.nf_rows = tab.rows.len();
+     st.nf_muls = tab.muls;
+     drop(tab);
++    drop(kn);
+     st.nf_ms = t.elapsed().as_secs_f64() * 1e3;
+ 
+     let mut seqs: Vec<Vec<u64>> = Vec::new();
+@@ -1581,6 +1669,7 @@
+     for _try in 0..4 {
+         st.functionals_tried += 1;
+         let t = Instant::now();
++        let kk = KScope::enter(K_KRYLOV);
+         let mut w: Vec<u32> = (0..delta).map(|_| lrng.gen_range(0..p) as u32).collect();
+         c_rng(delta as u64);
+         let mut y = vec![0u32; delta];
+@@ -1659,9 +1748,12 @@
+                 as u64;
+             std::mem::swap(&mut w, &mut y);
+         }
++        drop(kk);
+         st.krylov_ms += t.elapsed().as_secs_f64() * 1e3;
+         let t = Instant::now();
++        let kb = KScope::enter(K_BM);
+         fpoly = berlekamp_massey(&fp, &seqs[xn], &mut st.bm_muls);
++        drop(kb);
+         st.bm_ms += t.elapsed().as_secs_f64() * 1e3;
+         if fpoly.len() == delta + 1 {
+             break;
+@@ -1676,6 +1768,7 @@
+     st.roots = roots.len();
+     st.roots_ms = t.elapsed().as_secs_f64() * 1e3;
+     let t = Instant::now();
++    let _kr = KScope::enter(K_READOUT);
+     let mut sols: Vec<Vec<u64>> = Vec::with_capacity(roots.len());
+     let mut q = vec![0u64; delta];
+     for xi in roots {

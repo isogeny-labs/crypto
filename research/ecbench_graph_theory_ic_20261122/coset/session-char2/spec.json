@@ -1,0 +1,118 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "coset-filtered mitm smoke: char2 n=19, 21, 23, base dimension 6, 8, 10",
+  "description": "Scratch smoke for mitm-coset against mitm on the same binary-subspace base, with matched negation rho. Not a claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "binary_random",
+        "n": 19,
+        "seed": 827675,
+        "max_cofactor": 8
+      },
+      {
+        "kind": "binary_random",
+        "n": 21,
+        "seed": 827675,
+        "max_cofactor": 8
+      },
+      {
+        "kind": "binary_random",
+        "n": 23,
+        "seed": 827675,
+        "max_cofactor": 8
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 20261122
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "mitm-d6",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=6",
+          "oracle": "mitm:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "mitm-coset-d6",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=6",
+          "oracle": "mitm-coset:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "mitm-d8",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=8",
+          "oracle": "mitm:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "mitm-coset-d8",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=8",
+          "oracle": "mitm-coset:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "mitm-d10",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=10",
+          "oracle": "mitm:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    },
+    {
+      "name": "mitm-coset-d10",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "binary-subspace:dimension=10",
+          "oracle": "mitm-coset:m=2",
+          "linalg": "incremental-gauss"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 20261123,
+    "isolation_required": "L0",
+    "timeout_seconds": 600
+  }
+}

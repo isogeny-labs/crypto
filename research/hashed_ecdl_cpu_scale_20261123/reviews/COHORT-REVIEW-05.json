@@ -1,0 +1,430 @@
+{
+  "schema": "native-cpu-cohort-artifact-review/v1",
+  "created_utc": "2026-11-23T12:25:10.216Z",
+  "review_id": "COHORT-REVIEW-05",
+  "scope": "Read-only protocol/source/evidence and metadata reconciliation. No solver, build, native replay, OpenSSL checker, metadata test, Clippy, primary analyzer or audit tool was rerun by this reviewer. No cloud/S3 operation, secret read, study edit or old-record mutation was performed. Node/shell performed administrative hashing/parsing only.",
+  "schema_choice": {
+    "requested_reference": "experiment.review/v1",
+    "reference_sha256": "afdf927fb6ecbcbf8c4bc31569144a6ab4aad024cebab3e8f76a7f10c9829ad3",
+    "reason": "That schema requires same_session_as_producer:false. This is a separate same-team reviewer agent within the same root thread/host, with no fresh independent execution or sampled replay; this artifact-consistency schema avoids asserting the required independent-runner status."
+  },
+  "reviewer": {
+    "role": "same-team read-only artifact reviewer",
+    "same_root_thread_as_producer": true,
+    "same_host": true,
+    "independent_execution": false,
+    "declared_conflicts": [
+      "Shared parent session, filesystem and producer-supplied evidence.",
+      "Semantic/source review and metadata recomputation are separate from signed independent execution attestation."
+    ]
+  },
+  "disposition": {
+    "artifact_consistency": "supported_within_scope; no concrete source/raw-flow/hash inconsistency found",
+    "recorded_cohort": "24 completed calls on12 fixed public targets,12 A/A certificate pairs identical; all six tested field levels complete",
+    "standing": "Unsigned producer observations; no PCC execution or independently signed replay standing is established by this review",
+    "publication": "Protocol/preregistration are committed; new result/audit/export payload binding is local here and requires a later publication addendum",
+    "new_blocking_findings": []
+  },
+  "export": {
+    "path": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_scale_20261123/export.json",
+    "schema": "experiment.export/v1",
+    "export_id": "HASHED-ECDL-CPU-SCALE-LOCAL-20261123",
+    "sha256": "ec8e0e8dd6865c543ce088886ddff3e2c044163a5a12e7ac911010637d0adb19",
+    "bytes": 121658,
+    "local_only": true,
+    "reviewer_note": "Size exceeds64KiB data threshold. This review does not rename/compress it into Git or assert remote raw publication. All328 artifact-reference occurrences inspected in the export match actual file hashes/declared byte lengths where present. Full captured export-schema validator was not run by this reviewer."
+  },
+  "protocol": {
+    "publication_commit": "c691d21db7a03726e06c6ae1c0b542cdc0ce38c3",
+    "publication_tree": "328600ea73a3478ac6a520b92e409d4f3a5e79c1",
+    "publication_recorded_utc": "2026-11-23T11:54:21Z",
+    "canonical_sha256": "f4154a35224588ece8fd2b6a6c6d089a95907c9f1c5e468322c2098e88350bad",
+    "file_sha256": "5ea00e14eade38f1b16d0d4d447d4485b9e5afbfe74c538aee5b2acc03b4d2b9",
+    "freeze_recorded_at": "2026-11-23T11:53:12Z",
+    "precall_created_at": "2026-11-23T11:55:23.895Z",
+    "precall_sha256": "47dbbb8c8e302b1f59512f1137a59ac35cf21f42d4881a4021e744d4ee6b6df7",
+    "prospective_claim": "PCC-20261123-c84309",
+    "claim_scope": "Unsigned prospective statement,not a result/replay/measurement attestation.",
+    "chronology": "Committed frozen protocol, bundle/session/checkpoint copies are byte-identical. Canonical JSON hash excluding freeze matchesf415.... Pre-call snapshot records zero calls and is dated before the recorded11:55:37 start. Primary analyze.rs source/hash is identical to preregistration. Post-run OpenSSL/exporter tools are explicitly outside that preregistered analysis plan; their development/build/audit stages begin after the cohort ended.",
+    "limits": {
+      "cells_seconds": 120,
+      "external_replay_seconds": 60,
+      "total_seconds": 1500,
+      "process_virtual_bytes": 4294967296,
+      "whole_cgroup_guard_bytes": 15032385536,
+      "one_attempt": true,
+      "stop_before_next_level_after_failure": true
+    }
+  },
+  "checks": [
+    {
+      "id": "frozen-inputs",
+      "kind": "hashes",
+      "result": "pass",
+      "detail": "108 source inputs match cc893a730fc82918f166286e5506ff39afb1d102,current files and pre-run checkpoint copies. All165 checkpoint payload entries match their digest manifest. Source-manifest digest8427f752a2911a989929b688a9e9c7dca095e32173d722ec6c796721fccd9d9a agrees with pre-call record."
+    },
+    {
+      "id": "binary-identities",
+      "kind": "hashes",
+      "result": "pass",
+      "detail": "All14 original/qualified binary paths match the seven-entry pre-call manifest. Three bundle executables and checkpoint copies match bundle manifest. Same copied scale executable/code path is used foru/x. Two post-run auditor binaries and both auditor source files match their separate pre-audit manifests. These hash checks bind current/recorded bytes,not independent compiler or execution provenance."
+    },
+    {
+      "id": "qualification",
+      "kind": "controls",
+      "result": "pass",
+      "detail": "Recorded unchanged release build and known-answer qualification exit0 before cohort calls. Raw library harness reports47 passed,0failed/ignored; a separate binary harness has0tests. Final post-run adapter metadata suite reports8 passed,0failed/ignored and strict Clippy stderr records successful completion. No such check was rerun by reviewer; none substitutes for a full-root,MSRV or broader lint gate."
+    },
+    {
+      "id": "full-cohort-flow",
+      "kind": "protocol_adherence",
+      "result": "pass",
+      "detail": "24 scheduled IDs agree in order with all status and CSV rows and individual row files. Every status has solver0/replay0; no failed/skipped/interrupted/resumed/excluded cell. Original120/60-second runner timeouts and level stopping rule remain in preregistered runner. Cohort interval11:55:37–11:56:53 is within1500s. The stage command receipt records the inner command; outer1500s configuration is bound by pre-call/launcher records rather than a separate signed invocation receipt."
+    },
+    {
+      "id": "AA-certificates",
+      "kind": "recompute",
+      "result": "pass",
+      "detail": "12u/x full certificate pairs are byte-identical and structural counters match.12 distinct nonidentity public target records exist; all recovered scalars and targety coordinates are nonzero. Certificate scalar,relation length and attempt metadata agree with rows. Across24calls relation total3284/attempt total4584 include duplicated A/A workloads and are not unique scientific yield."
+    },
+    {
+      "id": "primary-analysis",
+      "kind": "hashes",
+      "result": "pass",
+      "detail": "Frozen primary analyzer source e03abd22f720277e1293cb6a9fb556e12d4d1b4739b9b247479a48ab3a1d13c2 matches preregistration. Its original and post-run readback logs agree on planned24/attempted24/verified24/failed0/not_attempted0. All106 primary scratch files match raw-session copies,including byte-identical scale.svg. This is inspected producer rerun evidence,not a new reviewer analyzer execution."
+    },
+    {
+      "id": "postrun-replays-controls",
+      "kind": "replay",
+      "result": "pass",
+      "detail": "Inspected logs contain24 original external native replays plus24 additional post-run native replay records,24 OpenSSL positives,24 wrong-scalar rejections and24 consistent-negated-target/scalar rejections. All post-run messages match intended cause. Stage05 reports exit0/physical-stop0. These are producer-run post hoc validation outputs; reviewer replay.performed isfalse."
+    },
+    {
+      "id": "independent-execution",
+      "kind": "provenance",
+      "result": "not_covered",
+      "detail": "No new independent arithmetic replay,nonce-based sampling,signed validator/replay report or trusted execution proof was performed/established. Unkeyed hashes and same-team source agreement do not attest that raw execution occurred as described."
+    },
+    {
+      "id": "scope",
+      "kind": "scope",
+      "result": "pass",
+      "detail": "Current generic-decomposition CachedMitm CPU validation only; no candidate/novelty comparison. Export marks all L0 clocks wall_valid:false. Field sizes20/24/28/32/36/40 correspond to exact prime-order bit lengths20/25/28/32/36/41; do not relabel field bits as subgroup-order bits or claim globally largest feasibility."
+    }
+  ],
+  "target_identity": {
+    "constructor": "Six fixed prime-frontier(p,a,b,r,Gx,Gy) tuples; seed101 or202 sets x=seed*1009 modp; choose first decodable even-y point via decode(2x). No target scalar is constructed or passed to the solver. Source C fixture tuples match all raw certificate curves/generators.",
+    "native_admission": "Curve::with_order_witness checks deterministic u64 primality ofp/r,nonsingularity,nonidentity generator,rG=O and uniqueness ofr as a multiple in the Hasse interval; ambiguous tiny cases use exact constructor. Scalar multiplication consumes the unreduced input integer. This is source inspection,not a new independent primality/cardinality calculation.",
+    "field_bits": [
+      20,
+      24,
+      28,
+      32,
+      36,
+      40
+    ],
+    "prime_order_bits": [
+      20,
+      25,
+      28,
+      32,
+      36,
+      41
+    ],
+    "targets": [
+      {
+        "case": 0,
+        "seed": 101,
+        "field_bits": 20,
+        "prime_order_bits": 20,
+        "relations": 57,
+        "attempts": 57,
+        "certificate_sha256": "db2415d8a490647e44790b45d25e7595ec36a148c2968c2f04ce422586481ada",
+        "target": [
+          101909,
+          1760
+        ],
+        "scalar": 310847
+      },
+      {
+        "case": 0,
+        "seed": 202,
+        "field_bits": 20,
+        "prime_order_bits": 20,
+        "relations": 49,
+        "attempts": 60,
+        "certificate_sha256": "cabf2a1c1c3e675533a9dd6e23a7097f2f2783b92c78a7b395a07b618b7257fe",
+        "target": [
+          203820,
+          410306
+        ],
+        "scalar": 668178
+      },
+      {
+        "case": 1,
+        "seed": 101,
+        "field_bits": 24,
+        "prime_order_bits": 25,
+        "relations": 71,
+        "attempts": 86,
+        "certificate_sha256": "61af6252973193c2bce24acf92fae0ae46e1b0c0fcf9e1cfe1c70a8df5ab5257",
+        "target": [
+          101910,
+          12830146
+        ],
+        "scalar": 744442
+      },
+      {
+        "case": 1,
+        "seed": 202,
+        "field_bits": 24,
+        "prime_order_bits": 25,
+        "relations": 79,
+        "attempts": 80,
+        "certificate_sha256": "419d9a1a65ddffc5c92a8bb68ca9297131f4302a03c1733b540e5d7f8755768a",
+        "target": [
+          203818,
+          13163216
+        ],
+        "scalar": 15803566
+      },
+      {
+        "case": 2,
+        "seed": 101,
+        "field_bits": 28,
+        "prime_order_bits": 28,
+        "relations": 105,
+        "attempts": 106,
+        "certificate_sha256": "8ce05ada18fbea648a1c521613f9bfc1e975cd4762db4b1f006769a428863740",
+        "target": [
+          101909,
+          191454634
+        ],
+        "scalar": 94842328
+      },
+      {
+        "case": 2,
+        "seed": 202,
+        "field_bits": 28,
+        "prime_order_bits": 28,
+        "relations": 109,
+        "attempts": 111,
+        "certificate_sha256": "1571e0537cacd4fc40d9f9cdb34dda0b42bcb33afb434aff718aab99208c4638",
+        "target": [
+          203818,
+          83760734
+        ],
+        "scalar": 167028945
+      },
+      {
+        "case": 3,
+        "seed": 101,
+        "field_bits": 32,
+        "prime_order_bits": 32,
+        "relations": 128,
+        "attempts": 215,
+        "certificate_sha256": "5ecf760ee459f7e51c66ce4933648ad934db5ecc1d1963b70c9118cc7d8e37aa",
+        "target": [
+          101909,
+          923987306
+        ],
+        "scalar": 68371522
+      },
+      {
+        "case": 3,
+        "seed": 202,
+        "field_bits": 32,
+        "prime_order_bits": 32,
+        "relations": 136,
+        "attempts": 185,
+        "certificate_sha256": "6ef29a64e77bd14d37f7b215a3bc1ba2a5d3d31b05039a88faead5d379f0295d",
+        "target": [
+          203820,
+          1904850698
+        ],
+        "scalar": 3690355995
+      },
+      {
+        "case": 4,
+        "seed": 101,
+        "field_bits": 36,
+        "prime_order_bits": 36,
+        "relations": 183,
+        "attempts": 300,
+        "certificate_sha256": "ebb6f3d785557670d9d874d2a4f1e356492579f38692b615cd633b19b360d0de",
+        "target": [
+          101909,
+          25853932850
+        ],
+        "scalar": 58877213907
+      },
+      {
+        "case": 4,
+        "seed": 202,
+        "field_bits": 36,
+        "prime_order_bits": 36,
+        "relations": 178,
+        "attempts": 380,
+        "certificate_sha256": "157fe40887dda03c985b4d9367cbbc6277cebe4f339d29835bb8730f246711e0",
+        "target": [
+          203825,
+          59605409622
+        ],
+        "scalar": 33141879433
+      },
+      {
+        "case": 5,
+        "seed": 101,
+        "field_bits": 40,
+        "prime_order_bits": 41,
+        "relations": 267,
+        "attempts": 380,
+        "certificate_sha256": "5f5066291d3858a0e4e469c71a67f0d58a7db8388ab4beafa4b4b1fd6b7ce323",
+        "target": [
+          101909,
+          72976884138
+        ],
+        "scalar": 123288977944
+      },
+      {
+        "case": 5,
+        "seed": 202,
+        "field_bits": 40,
+        "prime_order_bits": 41,
+        "relations": 280,
+        "attempts": 332,
+        "certificate_sha256": "371475722818b39083324ad6a187092ba704e051e41fbe91ea62b1c15a415491",
+        "target": [
+          203821,
+          258345193296
+        ],
+        "scalar": 856338293436
+      }
+    ]
+  },
+  "independent_checker": {
+    "source": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_scale_20261123/independent/openssl_point_check.c",
+    "source_sha256": "e8cd6eef64f14fa8e6acaafa37f045f532304c5f703eba549fc8bb0d20cde1ee",
+    "binary_sha256": "2cabda898c4ac6d37660a96e9357c881d46d43828b44ed316d7311da0edbf853",
+    "library_record": "OpenSSL3.5.7,cc14.2.0,64-bit BN_ULONG; linked libcrypto recorded.",
+    "implementation_scope": "Separate OpenSSL EC_POINT operations from Rust field/group code. Exact fixed fixture/seed binding,canonical coordinates/scalar,nonidentity points,independent even-y target reconstruction,explicit BN-bit point-double/add loop forrP=O andkP=Q. No group generator/order metadata is installed and EC_POINT_mul is not used,avoiding reduction by an asserted order.",
+    "limits": "C checker is a post-run point audit,not a solver/full relation verifier. It does not independently prove primality,Hasse cardinality,linear dependence,full relation correctness,work counters,timing or execution history. Its target search has a256-position validator bound; actual fixed targets pass it. Native replay separately rebuilds bases/relations and scalar dependency but shares the solver arithmetic library.",
+    "negative_causes": {
+      "wrong_scalar": "Replacek by(k+1)%r with unchanged target. Every raw stderr is exactly VERIFY SCALAR kP=Q,so rejection is at the scalar equation rather than range/fixture parsing.",
+      "consistent_substitution": "ReplaceQy byp-Qy andk byr-k. Nonzerok/y ensure nontrivial canonical negation. Positive rP=O andkP=Q make this pair algebraically consistent,but every raw stderr is exactly VERIFY BINDING public target. Checker rejects the changed public instance before its scalar multiplication; this is an instance-binding control,not a claim that the negative pair was separately passed through scalar verification."
+    },
+    "provenance": "Written and compiled after original data,run by producer,with pre-audit source/binary manifests. Algorithmic implementation independence from Rust is distinct from independent actor or signed PCC provenance."
+  },
+  "exporter": {
+    "source": "/tmp/ecdlp-native-crypto-20261123/research/hashed_ecdl_cpu_20261030/native-panel-tools/src/bin/scale-export.rs",
+    "source_sha256": "b3d2556b419c059e4d56f9b15b3464b7968cdbe6497f05faea423eeef291f686",
+    "binary_sha256": "607d6ca1e18d94130bb4dcc86d82b5e4c3618f49f2043360bca39a2972d5ec15",
+    "role": "Explicitly post-run complete24-row metadata adapter and validation driver. Enforces expected cell/status set,A/A structural/full-byte certificate equality,cert/row metadata and native/OpenSSL outcomes; calls no solver. Primary analysis source stays unchanged.",
+    "tests": "Eight metadata controls cover complete input,missing/duplicate row,failed replay,missing status,unexpected arm,structural mismatch andnonfinite clock. Recorded final8-test and strict Clippy successes apply to this source,not to arbitrary crypto correctness."
+  },
+  "replay": {
+    "performed": false,
+    "method": null,
+    "units_sampled": 0,
+    "nonce": null,
+    "identical": 0,
+    "mismatched": 0,
+    "miss_probability": null,
+    "detail": "Reviewer performed administrative record reconciliation only. Existing producer replay/point-check outputs are described separately and not relabeled as fresh independent reviewer execution."
+  },
+  "stage_records": [
+    {
+      "stage": "01-unchanged-cpu-build",
+      "started_at": "2026-11-23T11:37:35Z",
+      "finished_at": "2026-11-23T11:38:30Z",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13549395968,
+      "stdout_sha256": "13e1b058a88ac7cf8d9d7801a1969be70fa26a37c421d8ff101702dbe58afbe7",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "stage": "02-cpu-known-answer-qualification",
+      "started_at": "2026-11-23T11:39:34Z",
+      "finished_at": "2026-11-23T11:39:35Z",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13201797120,
+      "stdout_sha256": "5ce85b58f405b03874d7a461d47b2b9e07944aed2ce722edbc2a1215b1e8f938",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "stage": "03-cpu-public-target-ladder",
+      "started_at": "2026-11-23T11:55:37Z",
+      "finished_at": "2026-11-23T11:56:53Z",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13337882624,
+      "stdout_sha256": "d4b4aef0969439cf62b2daea06625ab98359ff3539f0e5981fda7409a6c5142f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "stage": "04-postrun-auditor-build",
+      "started_at": "2026-11-23T12:08:39Z",
+      "finished_at": "2026-11-23T12:08:50Z",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13351288832,
+      "stdout_sha256": "fc09504d9b5c684a7ed1458ce227795ca17bf937fcbb7bd805a071ae52700a12",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "stage": "04b-final-postrun-auditor-build",
+      "started_at": "2026-11-23T12:13:37Z",
+      "finished_at": "2026-11-23T12:13:41Z",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13320957952,
+      "stdout_sha256": "40fcf49a184a1ae2ad99ee2bff18b6c00ef36d7655f0d69995f11bf614391d33",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "stage": "05-independent-openssl-and-export",
+      "started_at": "2026-11-23T12:16:32Z",
+      "finished_at": "2026-11-23T12:16:33Z",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13228179456,
+      "stdout_sha256": "a74101ab201725c262f8c24126a444b61ba17056cad8d2472df33c8ae21f2bcf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "judgments": [
+    {
+      "claim_id": "C1",
+      "verdict": "supported_within_scope",
+      "basis": "Raw source-bound records and post-run validation outputs support24complete calls on12fixed public targets across the six tested field levels. This review confirms consistency and scope,not signed independent execution."
+    },
+    {
+      "claim_id": "C2",
+      "verdict": "supported_within_scope",
+      "basis": "No comparative timing,asymptotic,global feasibility,novelty or cryptographic-size conclusion is supplied; sampled L0 memory/clocks and repeated identical arms remain descriptive."
+    }
+  ],
+  "open_questions": [
+    "Bind result/audit/source/export bytes to a later publication snapshot while explicitly retaining local-only oversized raw payloads.",
+    "Independent signed replay/validator or trusted execution provenance is not established.",
+    "The full-root/MSRV/broader gates and general counter proof remain separate.",
+    "This cohort does not complete the frozen84-case tensor comparison or identify the globally strongest/current CPU candidate; matched external/rho/common-operation costs and candidate comparison are absent."
+  ],
+  "recommendation": {
+    "action": "no_action",
+    "reason": "No rerun is warranted by the inspected records. Preserve exact raw evidence,source/post-run validation distinction and the stated local/provenance limits; publication binding is the next administrative step."
+  },
+  "asserts_nothing_about": [
+    "official research status",
+    "independent authenticated execution",
+    "certified runtime or operation-count speedup",
+    "asymptotic exponent or novelty",
+    "strongest external/rho comparison",
+    "largest globally feasible scale",
+    "cryptographic-size security or challenge recovery"
+  ],
+  "evidence_manifest": "cohort-evidence-05.sha256",
+  "evidence_manifest_sha256": "1f90ef79635f5e2e709814976975cabd1b3a5bfd58a87fbeedbdaf7f1843a491"
+}

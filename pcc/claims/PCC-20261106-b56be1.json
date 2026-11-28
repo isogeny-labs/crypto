@@ -1,0 +1,22 @@
+{
+ "created_at": "2026-11-06T23:09:46Z",
+ "id": "PCC-20261106-b56be1",
+ "kind": "statement",
+ "producer": {
+  "commit": "63f168e4aaad06dc1d6999d8e814891140c081ee",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/aps_cost_leads_20261106/validation/broad-library-final.json",
+    "sha256": "103a35e186be004e690a6ba465a52e92c3a6d47ca0acba9dd46a70ad7c10fa0c"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "APS broad correctness outcome at sourceFFD and separate hosted-status observation at F33",
+ "statement": "The completed broad release library command on compiled sourceFFD exited101 with6098passed,11failed,133ignored. Six failures lacked tracked inputs, three were introduced APS registry/optimization omissions later repaired in separate targeted checks, and two require unavailable Linux diagnostic-clock procfs. Later targeted passes do not replace the failed broad result. Current-headF33 required hosted jobs passed but do not establish a new-head full-library pass or performance result."
+}

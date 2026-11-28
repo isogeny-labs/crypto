@@ -1,0 +1,132 @@
+rootfind-kmitm vs ksum  bits=28 |Fx|=128 targets=64  [pcc:unverified]
+m= 3  split 2/1  kmitm build    1240260 ns  left 16384    right_pre 0       probe     4666.4 ns/tgt  lanes4     4399.8 ns/tgt (1.06x)  thr1/2/4     4505.1/    4156.5/    2656.8 (1.08x/1.70x) hits 0/0/0/0/0   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a
+m= 4  split 3/1  kmitm build  174467062 ns  left 1358719  right_pre 0       probe     6251.0 ns/tgt  lanes4     3802.3 ns/tgt (1.64x)  thr1/2/4     4110.2/   10231.2/    6043.4 (0.40x/0.68x) hits 33/33/33/33/33   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a
+m= 5  split 4/1  kmitm build 22415843622 ns  left 62592091 right_pre 0       probe     4290.7 ns/tgt  lanes4     2827.8 ns/tgt (1.52x)  thr1/2/4     2434.5/    8621.8/    7662.9 (0.28x/0.32x) hits 64/64/64/64/64   ksum build      n/a     probe      n/a        ratio build/probe    n/a /    n/a
+m= 6  kmitm prepare refused: a 5-sum table over 128 abscissae would hold about 4233062400 sums, above the limit 2147483648
+m= 8  kmitm prepare refused: a 7-sum table over 128 abscissae would hold about 6049650892800 sums, above the limit 2147483648
+m=10  kmitm prepare refused: a k-sum table with k = 9 packs base indices in 7 bits; the base has 256 points (fewer than 128 are allowed)
+m=12  kmitm prepare refused: a k-sum table with k = 9 packs base indices in 7 bits; the base has 256 points (fewer than 128 are allowed)
+{
+  "abscissae": 128,
+  "bits": 28,
+  "classification": "engineering",
+  "factor_base_size": 128,
+  "pcc": "unverified",
+  "rows": [
+    {
+      "abscissae": 128,
+      "build_speedup_ksum_over_kmitm": null,
+      "kmitm_build_ns": 1240260.0,
+      "kmitm_hits": 0,
+      "kmitm_hits_lanes4": 0,
+      "kmitm_hits_thr1": 0,
+      "kmitm_hits_thr2": 0,
+      "kmitm_hits_thr4": 0,
+      "kmitm_lanes4_speedup": 1.0606029397663954,
+      "kmitm_left_entries": 16384,
+      "kmitm_probe_ns_per_target": 4666.4375,
+      "kmitm_probe_ns_per_target_lanes4": 4399.796875,
+      "kmitm_probe_ns_per_target_thr1": 4505.078125,
+      "kmitm_probe_ns_per_target_thr2": 4156.546875,
+      "kmitm_probe_ns_per_target_thr4": 2656.84375,
+      "kmitm_right_precomputed": 0,
+      "kmitm_thr2_speedup": 1.0838511534890365,
+      "kmitm_thr4_speedup": 1.6956503840318047,
+      "ksum_build_ns": null,
+      "ksum_hits": null,
+      "ksum_insert_attempts": null,
+      "ksum_ok": false,
+      "ksum_probe_ns_per_target": null,
+      "left_k": 2,
+      "m": 3,
+      "probe_speedup_ksum_over_kmitm": null,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 128,
+      "build_speedup_ksum_over_kmitm": null,
+      "kmitm_build_ns": 174467062.0,
+      "kmitm_hits": 33,
+      "kmitm_hits_lanes4": 33,
+      "kmitm_hits_thr1": 33,
+      "kmitm_hits_thr2": 33,
+      "kmitm_hits_thr4": 33,
+      "kmitm_lanes4_speedup": 1.643996893350702,
+      "kmitm_left_entries": 1358719,
+      "kmitm_probe_ns_per_target": 6251.015625,
+      "kmitm_probe_ns_per_target_lanes4": 3802.328125,
+      "kmitm_probe_ns_per_target_thr1": 4110.234375,
+      "kmitm_probe_ns_per_target_thr2": 10231.171875,
+      "kmitm_probe_ns_per_target_thr4": 6043.390625,
+      "kmitm_right_precomputed": 0,
+      "kmitm_thr2_speedup": 0.40173642132270404,
+      "kmitm_thr4_speedup": 0.6801205862809836,
+      "ksum_build_ns": null,
+      "ksum_hits": null,
+      "ksum_insert_attempts": null,
+      "ksum_ok": false,
+      "ksum_probe_ns_per_target": null,
+      "left_k": 3,
+      "m": 4,
+      "probe_speedup_ksum_over_kmitm": null,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 128,
+      "build_speedup_ksum_over_kmitm": null,
+      "kmitm_build_ns": 22415843622.0,
+      "kmitm_hits": 64,
+      "kmitm_hits_lanes4": 64,
+      "kmitm_hits_thr1": 64,
+      "kmitm_hits_thr2": 64,
+      "kmitm_hits_thr4": 64,
+      "kmitm_lanes4_speedup": 1.5173362655335703,
+      "kmitm_left_entries": 62592091,
+      "kmitm_probe_ns_per_target": 4290.71875,
+      "kmitm_probe_ns_per_target_lanes4": 2827.796875,
+      "kmitm_probe_ns_per_target_thr1": 2434.453125,
+      "kmitm_probe_ns_per_target_thr2": 8621.8125,
+      "kmitm_probe_ns_per_target_thr4": 7662.921875,
+      "kmitm_right_precomputed": 0,
+      "kmitm_thr2_speedup": 0.28235978513798576,
+      "kmitm_thr4_speedup": 0.3176925413975984,
+      "ksum_build_ns": null,
+      "ksum_hits": null,
+      "ksum_insert_attempts": null,
+      "ksum_ok": false,
+      "ksum_probe_ns_per_target": null,
+      "left_k": 4,
+      "m": 5,
+      "probe_speedup_ksum_over_kmitm": null,
+      "right_k": 1,
+      "split": "probe"
+    },
+    {
+      "abscissae": 128,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "a 5-sum table over 128 abscissae would hold about 4233062400 sums, above the limit 2147483648",
+      "m": 6
+    },
+    {
+      "abscissae": 128,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "a 7-sum table over 128 abscissae would hold about 6049650892800 sums, above the limit 2147483648",
+      "m": 8
+    },
+    {
+      "abscissae": 128,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 256 points (fewer than 128 are allowed)",
+      "m": 10
+    },
+    {
+      "abscissae": 128,
+      "kmitm_ok": false,
+      "kmitm_prepare_error": "a k-sum table with k = 9 packs base indices in 7 bits; the base has 256 points (fewer than 128 are allowed)",
+      "m": 12
+    }
+  ],
+  "targets": 64
+}

@@ -1,0 +1,34 @@
+{
+  "status": "prepared_not_released",
+  "source": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v4-20261109/qualify-permit.py",
+  "source_sha256": "14a87cdd104c1af60aa63d1036999bcb9ad527291eb343fb872c4e8f2e3a2993",
+  "review_sha256": "f2cee314385887fada2df605908c67d0ef2a2f2193bc0253b23cf0cdb1e82365",
+  "parent_ledger_sha256": "30e244a78e15f61c362b40e291e5bdbd6be592713bd41650a1a9e75651a03b1c",
+  "worker_seconds": 60,
+  "expected_cases": 24,
+  "output": "/var/tmp/pencil-root-v4-permit-qualification-20261109",
+  "caller_control": "/var/tmp/pencil-root-v4-permit-qualification-20261109-control",
+  "command": [
+    "/usr/bin/timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    "55s",
+    "/usr/bin/python3",
+    "-B",
+    "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/root-library-validation-v4-20261109/qualify-permit.py",
+    "--output",
+    "/var/tmp/pencil-root-v4-permit-qualification-20261109"
+  ],
+  "shell_limits": {
+    "ulimit_v_kib": 524288,
+    "ulimit_f_blocks": 1024
+  },
+  "publication": null,
+  "released": false,
+  "receipt_requirements": [
+    "Reject existing output/control before invocation. Create caller control exclusively0700; stdout/stderr exclusively0600.",
+    "Capture exact publication/release/source hashes, start/end wall and monotonic times, timeout return code, stdout/stderr and full60s charge.",
+    "Failure before native result is recorded as incomplete qualification, not silently retried. Native output directory is created only by qualification.",
+    "Require exit0, native passedtrue,24 case rows allpassed and sourcepins exact before any later qualification-dependent release."
+  ]
+}

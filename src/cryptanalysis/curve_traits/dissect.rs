@@ -27,6 +27,21 @@
 //!   polynomial `ψ_ℓ` over `GF(q)`, as Frobenius orbits on
 //!   `(E[ℓ] − O)/±1` (`division_polynomials`, `ℓ ≤ 5`).
 //!
+//! ## Hyperelliptic transfer (prime fields)
+//!
+//! The same-field genus-2 cover of `COVERS.md` exists for every prime
+//! model with `p > 3`: with `F(x) = x³ + ax + b`, choose the least
+//! `c ∈ {0, 1, 2, 3}` with `F(c) ≠ 0` and set
+//! `H: v² = F(u² + c)`, `(u, v) ↦ (u² + c, v)`.  The map has degree 2 and
+//! `H` has genus 2.  The pullback is injective on the prime subgroup when
+//! `gcd(r, 2) = 1`; that is a necessary condition for carrying a
+//! logarithm, not a solver result.  The family records this cover and the
+//! leading-exponent comparison: genus-2 index calculus on `Jac(H)` leads
+//! with `2 − 2/g = 1`, while rho on `E` leads with `1/2`, so the route is
+//! a **boundary** and no constant factor crosses rho
+//! (`JACOBIAN_TRANSFERS.md`; measured instances in
+//! `research/chained_prime_transfer_20261111/` are 8–47× rho).
+//!
 //! ## Factorisations
 //!
 //! `kn±1`, the traces `t_d` over `GF(q^d)`, and the twist orders over
@@ -98,6 +113,42 @@ pub struct DissectRecord {
     /// For `w = 1, 2, 3` where at most [`HAMMING_MAX`] values are tried:
     /// how many `x` of Hamming weight `w` are x-coordinates of points.
     pub hamming_x: BTreeMap<String, u64>,
+    /// The same-field hyperelliptic transfer family; absent (with
+    /// `not_applicable`) outside prime models with `p > 3`.
+    pub transfer: TransferRecord,
+}
+
+/// The explicit same-field genus-2 cover of a prime-field curve:
+/// `H: v² = F(u² + c)`, `F(x) = x³ + ax + b`, `(u, v) ↦ (u² + c, v)`.
+/// Existence and geometry are checked in `COVERS.md`; this record copies
+/// the construction parameters, not a solver result.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct PrimeQuadraticCover {
+    /// Least `c ∈ {0, 1, 2, 3}` with `F(c) ≠ 0`.
+    pub shift: u32,
+    /// The degree of `H -> E`, 2.
+    pub map_degree: u32,
+    /// The genus of `H`, 2.
+    pub genus: u32,
+    /// `gcd(r, 2) = 1`: the pullback is injective on the prime subgroup.
+    /// `None` when the subgroup order `r` is unknown.
+    pub subgroup_coprime_to_degree: Option<bool>,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct TransferRecord {
+    /// `None` when the model is not a prime field with `p > 3`.
+    pub prime_quadratic: Option<PrimeQuadraticCover>,
+    /// Why `prime_quadratic` is absent; `None` when it is present.
+    pub not_applicable: Option<String>,
+    /// Leading exponent of the best same-field solver on `Jac(H)`:
+    /// `2 − 2/g` with `g = 2` is 1.
+    pub destination_exponent: Option<f64>,
+    /// Leading exponent of rho on `E`: `1/2`.
+    pub rho_exponent: Option<f64>,
+    /// `boundary` when the destination exponent is at least rho's, so no
+    /// constant factor on this route crosses rho.
+    pub route_class: Option<String>,
 }
 
 /// The most field elements `hamming_x` tries for one weight.
@@ -391,6 +442,72 @@ fn for_weight(bits: u64, w: u32, f: &mut dyn FnMut(BigUint)) {
     rec(0, bits, w, &BigUint::zero(), f);
 }
 
+/// `F(c) = c³ + ac + b mod p` for `F(x) = x³ + ax + b`.
+fn prime_f_at(p: &BigUint, a: &BigUint, b: &BigUint, c: u32) -> BigUint {
+    let cc = BigUint::from(c);
+    let c3 = (&cc * &cc % p) * &cc % p;
+    (c3 + (a * &cc) % p + b) % p
+}
+
+/// The same-field hyperelliptic transfer family for one model: the
+/// `prime_quadratic_pullback_v1` cover of `COVERS.md` and the leading
+/// exponent of the destination solver.  Records geometry and a boundary
+/// class only; it does not construct the map or measure a solve.
+pub fn transfer_record(model: &Model, r: Option<&BigUint>) -> TransferRecord {
+    let (p, a, b) = match model {
+        Model::Prime { p, a, b } => (p, a, b),
+        _ => {
+            return TransferRecord {
+                prime_quadratic: None,
+                not_applicable: Some(
+                    "the prime quadratic pullback is defined only for prime-field models".into(),
+                ),
+                destination_exponent: None,
+                rho_exponent: None,
+                route_class: None,
+            };
+        }
+    };
+    if p <= &BigUint::from(3u8) {
+        return TransferRecord {
+            prime_quadratic: None,
+            not_applicable: Some(
+                "the prime quadratic pullback needs p > 3 so that 0, 1, 2, 3 are distinct".into(),
+            ),
+            destination_exponent: None,
+            rho_exponent: None,
+            route_class: None,
+        };
+    }
+    // A cubic has at most three roots and 0, 1, 2, 3 are four distinct
+    // elements of GF(p), so one of them is not a root.
+    let shift = (0..=3u32)
+        .find(|&c| !prime_f_at(p, a, b, c).is_zero())
+        .expect("a cubic has at most three roots");
+    let g = 2.0f64;
+    let destination_exponent = 2.0 - 2.0 / g;
+    let rho_exponent = 0.5;
+    TransferRecord {
+        prime_quadratic: Some(PrimeQuadraticCover {
+            shift,
+            map_degree: 2,
+            genus: 2,
+            subgroup_coprime_to_degree: r.map(|r| r.is_odd()),
+        }),
+        not_applicable: None,
+        destination_exponent: Some(destination_exponent),
+        rho_exponent: Some(rho_exponent),
+        route_class: Some(
+            if destination_exponent >= rho_exponent {
+                "boundary"
+            } else {
+                "advantage"
+            }
+            .into(),
+        ),
+    }
+}
+
 /// Every family for one curve.  `scalar(ℓ)` says whether Frobenius is a
 /// scalar on `E[ℓ]` (see the module docs); `r` is the prime subgroup
 /// order when known.
@@ -481,6 +598,7 @@ pub fn compute(
         pow_distance: pow,
         x962_invariant,
         hamming_x,
+        transfer: transfer_record(model, r),
     }
 }
 
@@ -524,6 +642,58 @@ mod tests {
             let u = lucas_u(&t, &q, d);
             assert_eq!(lhs, &u * &u * BigInt::from(-7));
         }
+    }
+
+    #[test]
+    fn prime_quadratic_cover_records_the_pullback() {
+        // E: y² = x³ + x + 1 over F_101: F(0) = 1, so c = 0.
+        let model = Model::Prime {
+            p: BigUint::from(101u8),
+            a: BigUint::from(1u8),
+            b: BigUint::from(1u8),
+        };
+        let t = transfer_record(&model, Some(&BigUint::from(17u8)));
+        let c = t.prime_quadratic.expect("cover exists");
+        assert_eq!(c.shift, 0);
+        assert_eq!((c.map_degree, c.genus), (2, 2));
+        assert_eq!(c.subgroup_coprime_to_degree, Some(true));
+        assert_eq!(t.destination_exponent, Some(1.0));
+        assert_eq!(t.rho_exponent, Some(0.5));
+        assert_eq!(t.route_class.as_deref(), Some("boundary"));
+
+        // b = 0 makes F(0) = 0; the least usable shift is then 1.
+        let zero_b = Model::Prime {
+            p: BigUint::from(101u8),
+            a: BigUint::from(1u8),
+            b: BigUint::from(0u8),
+        };
+        assert_eq!(
+            transfer_record(&zero_b, None)
+                .prime_quadratic
+                .expect("cover exists")
+                .shift,
+            1
+        );
+
+        // An even subgroup order is not coprime to the map degree.
+        assert_eq!(
+            transfer_record(&model, Some(&BigUint::from(18u8)))
+                .prime_quadratic
+                .expect("cover exists")
+                .subgroup_coprime_to_degree,
+            Some(false)
+        );
+
+        // p = 3 is outside the construction, and a binary model is not a
+        // prime field.
+        let small = Model::Prime {
+            p: BigUint::from(3u8),
+            a: BigUint::from(1u8),
+            b: BigUint::from(1u8),
+        };
+        let t = transfer_record(&small, None);
+        assert!(t.prime_quadratic.is_none());
+        assert!(t.not_applicable.is_some());
     }
 
     #[test]

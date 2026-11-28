@@ -1,0 +1,68 @@
+{
+ "caveats": [
+  "Same charged work holds to 1.7e-6 (24 bits), 3.2e-7 (28) and 3.8e-8 (32), not exactly. dg charges one extra GAE for each repeated target its deferred guard catches after decomposition (repeated_targets_skipped): 20, 24 and 19 of 288 pairs, +22, +24 and +20 GAE in total, never fewer than srenew. Section 6.1 condition 8 (|ratio - 1| < 0.0005 at w = 0) holds. Consequence: dg and srenew are not ordered in counted units across the section 5a band (srenew lower at w = 0 on every curve, dg lower at w = 0.1 and 1). The admitted improvement is wall-clock per charged GAE only. The counted headline S is unchanged at w = 0 to within 2e-6.",
+  "ns per GAE is an upper bound on the cost per operation for both arms, since both carry unpriced native work. The ratio is wall per charged GAE on one host class (EKS c8a.2xlarge, env class ECBENV3hc1c5e5126853).",
+  "Wall time cannot be replayed. The replay certificate covers counted scalars only. The wall statistic rests on four things: in-job L2 grading of all 1,680 executions per wall session, native A/A admission (control-comparison.json), the srenew/srenew-aa A/A at 0.9998, 0.99994 and 0.9987 (intervals contain 1), and the validator's recompute.",
+  "Order confound, checked. Under the frozen 'alternate' order, dg ran at position 2 of the 5-run block in all 288 blocks; srenew and srenew-aa ran at positions 1 and 3. The A/A therefore cannot detect a position-2 effect. Within-run null objects bound one: the oracle_setup phase does identical work in the same process and position, and its wall ratio dg/srenew is 1.0016, 0.9985 and 0.9994. Against that, the relations phase ratio is 0.870, 0.834 and 0.793, and it carries 98.6-102% of the solve-wall saving. The per-pair saving tracks removed guard probes (r = 0.89, 0.90, 0.93) with a negative intercept. The A/A difference does not track them (r = -0.0001, -0.016, 0.092).",
+  "Two curves per size. The per-curve corrected ratios differ between the two curves beyond their intervals at 24 bits (0.907 vs 0.920) and 32 bits (0.865 vs 0.836). The pooled interval therefore describes these two curves, not curves in general. The target-clustered intervals are close to the frozen pair interval; at 32 bits it is wider ([0.8433, 0.8539] against [0.8451, 0.8521]). Every upper bound is below 1.",
+  "With the A/A including arm A over the same 288 pairs, the corrected ratio equals ns(dg) / ns(srenew-aa) exactly. The independent-error combination counts srenew's noise twice and is conservative.",
+  "Memory alongside time. dg's mean max RSS is lower at 32 bits (96,243 to 80,383 KiB) and its mean minor faults in the solve are lower at every size (366 to 265, 2,085 to 1,430, 16,288 to 10,529). Part of the saving is the guard table's memory work. That is executed native work, not accounting.",
+  "28 bits: E6 condition 2 fails on both curves (sum total_gae dg - srenew = +12 on each curve), so srenew stays the 28-bit baseline, as the producer reports. The protocol places only a 24/32-bit component speed-up and a 28-bit baseline change. A 28-bit component speed-up row is not specified, so that placement is the Coordinator's decision.",
+  "Not used, because they are working-tree only at f1e65b1c74 (untracked): README.md, UNSEALED-EARLIER.md and figures/. The post-verdict report of the earlier sessions (section 8) and the README/figure/PDF (section 10) count only once committed."
+ ],
+ "limitations": [
+  "The measurement and the replay used the same binary (88070375), because no other binary contains these targets; the replay host (Intel Xeon @ 2.1 GHz, 4 CPUs) differs from the measuring pods. The implementation-independent checks are the validator's stdlib recompute and [d]G = Q on all 12,072 records.",
+  "The frozen interval (linearised t over 288 pairs) treats pairs as independent although they are 48 targets x 6 rounds. The target-clustered linearised and bootstrap intervals (10,000 resamples, seed 20261029) are descriptive and decide nothing.",
+  "Counted-session rho executions graded L1 because the solve was under the 1 ms grading floor: 672 at 24 bits, 269 at 28 and 15 at 32. Their counts are used; their wall time is not.",
+  "Scope: prime-field IC at N_inc, mitm:negation_folded=1, incremental-gauss, image cf0dcc8b, ecbench be2969ce, c8a.2xlarge, the six curves of PROTOCOL section 3. Engineering constant only; no exponent claim and no transfer to other hosts or sizes."
+ ],
+ "predictions_vs_measured": {
+  "frozen_prediction": "PROTOCOL.md section 7 (frozen at 6e4804417b before any launch): corrected dg/srenew ns per GAE in 0.89-0.97 at 24, 28 and 32 bits; guard insert 55-70 ns; it decides nothing",
+  "measured_corrected": {"P24": 0.9128, "P28": 0.8862, "P32": 0.8486},
+  "inside_predicted_range": {"P24": true, "P28": false, "P32": false},
+  "reading": "The gain at 28 and 32 bits is larger than predicted. The model weighted the guard's share by the relation phase's GAE share (0.48); the relation phase carries 0.68-0.73 of srenew's solve wall. Its own wall ratio dg/srenew (0.870, 0.834, 0.793) is a 13-21% saving inside the phase. The implied saving per removed probe, 18.7, 24.9 and 37.6 ns by totals (per-pair slope 22.4, 30.0 and 52.3 ns), is below the model's 55-70 ns and grows with the guard table, as the protocol's cache model-risk note anticipates. Descriptive only."
+ },
+ "review_attestation": {
+  "joints_owned": ["PROTOCOL.md section 10 independent validation, items 1-6 of the task (recompute, 6.1 for both sessions, the four 28-bit conditions, independent replay, matched rho band, relabelling/accounting check)"],
+  "sources_read": [
+   "/home/user/crypto-autoresearcher/docs/agent-runtime-core.md",
+   "/home/user/crypto-autoresearcher/agents/validator.md",
+   "backlog/XP-20261029-dg-wall/{PROTOCOL.md,APPROVAL.md,spec-P{24,28,32}{,-rho}.json} at f1e65b1c74 (git show; PRELAUNCH-CHECKS.md extracted, not read)",
+   "backlog/XP-20261029-srenew-deferred-guard-v3/PROTOCOL.md section 6.1 at origin/claude/ic-srenew-deferred-guard-run-20261029",
+   "src/cryptanalysis/ecbench/{compare.rs (wall_figures, choose_aa, wall_data, wall_compare, match_pairs, ratio_report, compare_loaded_weighted), stats.rs (t_quantile, Linearised, influence_se, linearised_ratio, divide_independent), band.rs (pricing), record.rs (counts)} at be2969ce, read for definitions, not executed or reused",
+   "research/ic_dg_wall_20261029/P{24,28,32}/{wall,counted}/{eks-results,launch,analysis}: receipts, SHA256SUMS, .artifacts.json, session files, records.jsonl, audit.json, l2-gate.json, control-comparison.json, compare-*.json, band.md, wall_gate.json, counted_gate-stdout.txt, e6-stdout.txt, binary-path.txt",
+   "research/ic_dg_wall_20261029/VERDICT.md (producer claim, committed)",
+   "research/ic_dg_wall_20261029/UNSEALED-EARLIER.md (working-tree only; read while listing, before knowing it was uncommitted; its numbers are not used)",
+   "research/ic_dg_wall_20261029/cards/card-launch.md (grep for the freeze SHA and spec hashes only); cards/tools not read",
+   "wt-pbo docs/VALIDATION_GATE.md and scripts/validation_gate.py (schema); research/ic_srenew_deferred_guard_20261029/VALIDATION.json and the key layout of v3/validation/validator-report.json, .artifacts.json and replay-P24.verify.log, provenance.txt lines 85-115 (format only)",
+   "S3 originals: SHA256SUMS and session/records.jsonl of the six pods (hashed, not read)"
+  ],
+  "not_read": ["the earlier sessions' wall blocks in research/ic_srenew_deferred_guard_20261029/{first-study,v3}/P*/analysis (sealed by section 8 until the verdict push; not needed)", "research/ic_dg_wall_20261029/cards/tools/*.py", "research/ic_dg_wall_20261029/README.md and figures/"],
+  "read_sibling_reports": false,
+  "sibling_note": "No other reviewer's report for this round was read. The v3 validator's VALIDATION.json (a different experiment) was read for format, as the caller asked.",
+  "verdict": "passed"
+ },
+ "validation_report": {
+  "id": "__ID__",
+  "task_id": "not supplied by the caller (independent validation of XP-20261029-dg-wall requested by the main session)",
+  "run_ids": ["ic-dgw-p24-20261029/cf67b9ea-0711-4cb3-ae80-b07bcfc23a1d (ECBS1h70619e799ebb)", "ic-dgw-rho-p24-20261029/99417436-ee70-41ec-beab-bb3d726f1edd (ECBS1h0c9a2859026c)", "ic-dgw-p28-20261029/e20f20c1-238e-4834-914e-d7e68c059d6a (ECBS1h1ef145fb521c)", "ic-dgw-rho-p28-20261029/9b4236aa-613e-435b-b1ed-e28a07f64a23 (ECBS1h6f4f2f3b72ab)", "ic-dgw-p32-20261029/0a2c6cc8-9100-4049-b2d0-5dafe097721d (ECBS1h353fffc21b5e)", "ic-dgw-rho-p32-20261029/e4ad7560-2a77-415f-af82-a36450565d40 (ECBS1hcadcd05e97ab)"],
+  "artifact_checks": ["committed snapshot f1e65b1c74 pushed; tracked evidence equals HEAD", "111 SHA256SUMS lines and 21 artifact pointers verified", "SHA256SUMS and records.jsonl of all six pods equal the S3 originals; one pod per job; no reruns", "request.job.spec, input-spec.json and session/spec.json JSON-equal to the frozen specs; request sha256 equals result receipt; card records freeze SHA and the six spec sha256", "build-info be2969ce / 88070375; image cf0dcc8b; c8a.2xlarge; 3600 s", "freeze pushed 09:53:31Z before first session 10:05:05Z; no commit to backlog/ after the freeze", "12,072 record seals recomputed: 0 failures"],
+  "metric_recomputations": ["wall block of srenew/dg and 5 other wall-session pairs, every field, 3 weight files: agree within 1e-9", "ops ratio, ci95 and per-curve rows of 9 wall-session and 4 counted-session pairs at w = 0, 0.1, 1: agree within 1e-9", "control-comparison.json wall block (walk/srenew-aa): agrees", "E6 sums and probe counts: exact", "band.md (counted): 54 cells agree at printed precision", "2,363 numeric headline numbers (and 96 non-numeric fields compared for equality), 0 mismatches"],
+  "control_checks": ["counted A/A srenew-aa/srenew and rho-neg-aa/rho-neg exactly 1.0 at w = 0, 0.1, 1 with identical counts and seeds pair by pair", "wall A/A srenew-aa/srenew 0.9998 [0.9983, 1.0013], 0.99994 [0.9986, 1.0013], 0.9987 [0.9970, 1.0005]", "within-run null: oracle_setup wall dg/srenew 1.0016, 0.9985, 0.9994", "null-object regression of the A/A difference on removed probes: r = -0.0001, -0.016, 0.092", "cross-session: counted-session srenew and dg identical to the wall session's in GAE, unpriced counts and seeds on all 288 pairs"],
+  "heuristic_validation_checks": ["not a heuristic-validation experiment; the section 7 predictions were frozen before any launch and decide nothing (measured 0.913 in range; 0.886 and 0.849 below it)"],
+  "cost_model_checks": ["unit declared: ns of solve wall per charged ecbench.gae, an upper bound per operation for both arms", "counted S priced at 0, 0.1, 1 GAE per unpriced native operation (section 5a) for every arm including rho", "memory reported alongside time (max RSS, minor faults)", "success probability 1: 288/288 measured runs verified per arm, no censoring; no expected-cost scaling needed"],
+  "proof_architecture_checks": [],
+  "verdict": "passed",
+  "limitations": "see limitations[]",
+  "artifact_paths": ["/dev/shm/dgw-validation/validator-report.json", "/dev/shm/dgw-validation/replay-certificate.json", "/dev/shm/dgw-validation/VALIDATION.draft.json", "/dev/shm/dgw-validation/REPORT.md", "/dev/shm/dgw-validation/SHA256SUMS", "/dev/shm/dgw-validation/replay/", "/dev/shm/dgw-validation/work/", "/dev/shm/dgw-validation/code/"]
+ },
+ "gate_caveats": [
+  "24 and 32 bits: pass. Wall-clock improvement of dg over srenew at N_inc, corrected dg/srenew ns per GAE 0.9128 [0.9099, 0.9157] at 24 bits and 0.8486 [0.8451, 0.8521] at 32 bits, as a component speed-up outside tables A-C. 28 bits: pass with caveats, 0.8862 [0.8837, 0.8887], but E6 condition 2 fails, so srenew stays the 28-bit baseline.",
+  "Not a counted improvement: dg charges +1 GAE per late-caught repeated target (about 7% of pairs), so dg/srenew is about 1.000002 at w = 0 and below 1 at w = 0.1 and 1. The two are not ordered across the band in counted units.",
+  "ns per GAE is an upper bound per operation for both arms, on EKS c8a.2xlarge only. The wall time is not replayable; the counted scalars are, with 7,776 of 7,776 runs identical on another host.",
+  "Two fresh curves per size, 24 targets x 6 rounds. The per-curve ratios differ beyond their intervals at 24 and 32 bits.",
+  "dg always ran at the middle position of the alternate order. The within-run null (oracle_setup wall ratio within 0.2% of 1) and the probe dose-response bound any position effect far below the measured gain."
+ ],
+ "promotion_blockers": [],
+ "promotion_note": "No evidence blocker known to the validator remains for the 24- and 32-bit rows. For the 28-bit rows the evidence is admissible, but the protocol gives no placement for a 28-bit component speed-up when E6 fails, and srenew stays the 28-bit baseline. Before the gate is used, commit the research-visuals outputs (README, figure, PDF) and the section 8 post-verdict table, which are working-tree only at f1e65b1c74. Promotion is the Coordinator's decision: this file records evidence admissibility, not authorization."
+}

@@ -18,7 +18,7 @@ cd ecdb
 cargo build --release
 export DATABASE_URL='postgres://postgres@localhost:5432/ecdb' ECDB_PG_TLS=disable
 
-./target/release/ecdb migrate                      # schema ec, eight migrations
+./target/release/ecdb migrate                      # schema ec, sixteen migrations
 ./target/release/ecdb import --repo-root .. all    # registry ... enrich, siblings, results, ecbench
 ./target/release/ecdb serve                        # http://0.0.0.0:8080
 
@@ -56,6 +56,10 @@ curl -s -X POST localhost:8080/v1/sql -H 'content-type: application/json' \
     with their measurements.
 - `results` loads `docs/ic/leaderboard.json`, `progress-timeline.json`,
   `boundary_targets.json` and the `benchmarks/` index.
+- `factor-bases` loads FB1/FBM1 identities, stored points and their result
+  links. `research` loads the versioned feature catalog, saved Koblitz/binary/
+  prime/CM-isogeny sweeps and model-ready dataset recipes; see
+  [`docs/RESEARCH_SWEEPS.md`](docs/RESEARCH_SWEEPS.md).
 - `ecbench` loads every ecbench session under the checkout: about 1,100
   sessions and 543k runs, in 8 minutes.
 - `generated PATH...` loads the JSONL that `sage/generate.sage` writes:
@@ -94,6 +98,9 @@ record it refused, with the reason.
 | `GET /v1/curves/{ref}/endomorphisms` | Frobenius, GLV (with eigenvalue) and subfield-tau endomorphisms, GLV decomposition lattices |
 | `GET /v1/curves/{ref}/division-polynomials` | psi_2..psi_5 in x, ascending coefficients over the curve's field |
 | `GET /v1/curves/{ref}/measurements` | the curve's IC leaderboard rows and recipes, ecbench arm summaries, sibling-dataset measurements and sibling-repository records |
+| `GET /v1/curves/{ref}/features`, `GET /v1/features` | model-ready structural row and typed observations; versioned feature contracts |
+| `GET /v1/sweeps`, `GET /v1/sweeps/{name}` | saved Koblitz, binary, prime and CM/isogeny sweep plans and cells |
+| `GET /v1/datasets`, `GET /v1/datasets/{name}` | saved selection queries, feature roles, split policies and materialized artifact pointers |
 | `GET /v1/ic/leaderboard?family=&regime=&validation=&recipes=` | the IC leaderboard: families with units and references, priced rows |
 | `GET /v1/ic/progress?series=`, `GET /v1/ic/boundary?regime=&stage=` | the progress timeline; the boundary ledger |
 | `GET /v1/benchmarks?listed=&q=` | the `benchmarks/` index with each entry's `VALIDATION.json` |
@@ -105,13 +112,13 @@ record it refused, with the reason.
 | `GET /v1/polynomials/{sha256}` | the content-addressed polynomial store |
 | `GET /v1/modular-polynomials?level=&coefficients=` | Phi_l over Z, l = 2..19 |
 | `GET /v1/class-polynomials`, `GET /v1/summation-polynomials` | H_D for class number one; Semaev S_2, S_3 |
-| `GET /v1/factor-bases`, `GET /v1/factor-bases/{key}`, `GET /v1/factor-bases/{key}/results?points=` | factor bases of the IC work (FB1, FBM1, archive and FBS1 spec ids) with their sizes, aliases, measurement configurations, results and points |
+| `GET /v1/factor-bases`, `GET /v1/factor-bases/{key}`, `GET /v1/factor-bases/{key}/results?points=` | factor bases of the IC work (FB1, FBM1, archive and FBS1 spec ids) with sizes, aliases, configurations, results, points, ML row and object references |
 | `GET /v1/factor-base-designs`, `GET /v1/factor-bases?design=` | factor-base design grids (the n83 sweep) and their member specs |
 | `GET /v1/ic/claims?summary=&rule_version=&curve=&candidate_id=` | IC tool-program claims: IC online against matched rho per target, with the cold ratio (set-up included) |
 | `POST /v1/sql` | one read-only query |
 | `GET /v1/export`, `GET /v1/export/{table}?offset=&limit=` | bulk export for mirrors: the manifest (tables, copyable columns, primary keys, exact row counts), then gzipped COPY-text pages in primary-key order, at most 4 MiB each (413 asks for a smaller `limit`) |
-| `POST /v1/evidence`, `POST /v1/isogenies` | token-gated agent writes |
-| `POST /mcp` | MCP (streamable HTTP, JSON responses, stateless): twelve tools over the routes above |
+| `POST /v1/evidence`, `POST /v1/isogenies`, `POST /v1/features/observations`, `POST /v1/factor-base-artifacts` | token-gated provenance-bearing writes |
+| `POST /mcp` | MCP (streamable HTTP, JSON responses, stateless): thirteen tools over the routes above |
 
 Integers beyond 2^53 come back as decimal strings. Unknown values are
 `null` with a status, never 0. An ambiguous name returns 409 with the
@@ -126,7 +133,7 @@ candidates.
 | `ECDB_PG_CA_FILE` | webpki roots | PEM bundle of trusted CAs. RDS needs the Amazon RDS bundle (`global-bundle.pem`) |
 | `ECDB_LISTEN` | `0.0.0.0:8080` | |
 | `ECDB_READ_TOKEN` | unset | bearer token required on reads; unset means reads are open |
-| `ECDB_WRITE_TOKEN`, `ECDB_WRITE_DATABASE_URL` | unset | enable `POST /v1/evidence` and `POST /v1/isogenies`; the write login is a member of `ecdb_writer` |
+| `ECDB_WRITE_TOKEN`, `ECDB_WRITE_DATABASE_URL` | unset | enable the evidence, isogeny, feature-observation and factor-base-artifact write endpoints; the write login is a member of `ecdb_writer` |
 | `ECDB_SQL_ROLE` | unset | role `POST /v1/sql` switches to (`ecdb_reader`) |
 | `ECDB_SQL_TIMEOUT_MS`, `ECDB_SQL_MAX_ROWS` | 15000, 5000 | limits of `POST /v1/sql` |
 | `ECDB_MIGRATE_ON_START` | false | run pending migrations before serving |

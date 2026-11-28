@@ -1,0 +1,26 @@
+{
+ "schema_version": 1,
+ "spec": "docs/ic/STANDARD_PANEL.md",
+ "frozen": "2026-11-10",
+ "what_this_is": "The standard benchmark panel: one short alias per curve, each pinned to exactly one ICV1 identity. scripts/build_curve_registry.py copies each alias into its registry entry as panel_alias and fails if any row disagrees with the registry.",
+ "alias_grammar": {
+  "K": "Koblitz y^2+xy=x^3+ax^2+1 over GF(2^n): K<a>-<n>, e.g. K0-23",
+  "B": "binary, not Koblitz: B<n><letter>, letter = next free slot, e.g. B23a",
+  "P": "prime field: P<bits of p><letter>, letter = next free slot, e.g. P36a"
+ },
+ "curves": [
+  {"alias": "K0-13", "slug": "icv1-f2m13-t181-515ee569", "role": "smoke", "r_bits": 10.97, "cofactor": 4, "m_max": 16, "exhaustive": true},
+  {"alias": "K1-17", "slug": "icv1-f2m17-tm101-00378d4e", "role": "exhaustive", "r_bits": 16.0, "cofactor": 2, "m_max": 16, "exhaustive": true},
+  {"alias": "K0-19", "slug": "icv1-f2m19-t797-b6cf2467", "role": "exhaustive", "r_bits": 17.0, "cofactor": 4, "m_max": 16, "exhaustive": true},
+  {"alias": "K1-19", "slug": "icv1-f2m19-tm797-9c54981b", "role": "exhaustive", "r_bits": 18.0, "cofactor": 2, "m_max": 16, "exhaustive": true},
+  {"alias": "K0-23", "slug": "icv1-f2m23-t5197-69e76b73", "role": "primary", "r_bits": 21.0, "cofactor": 4, "m_max": 16, "exhaustive": true},
+  {"alias": "K1-23", "slug": "icv1-f2m23-tm5197-1f85e9e1", "role": "twin", "r_bits": 22.0, "cofactor": 2, "m_max": 16, "exhaustive": true},
+  {"alias": "K0-41", "slug": "icv1-f2m41-tm2308219-7f48b14a", "role": "anchor", "r_bits": 39.0, "cofactor": 4, "m_max": 4, "exhaustive": false},
+  {"alias": "K1-83", "slug": "icv1-f2m83-t6151469093347-9eba6cd5", "role": "anchor", "r_bits": 52.93, "cofactor": 1128547018, "m_max": 4, "exhaustive": false, "note": "the repository's N83; the m = 83 confidence-gate model of the same curve (icv1-f2m83-t6151469093347-cdcc5432) is not aliased"},
+  {"alias": "K0-131", "slug": "icv1-f2m131-tm22283658519494248867-115e0dc5", "role": "target", "r_bits": 129.0, "cofactor": 4, "m_max": null, "exhaustive": false, "note": "ECC2K-130; that standard name stays valid"},
+  {"alias": "P24a", "slug": "icv1-fp24-tm5099-a6f137c6", "role": "prime", "r_bits": 24.0, "cofactor": 1, "m_max": null, "exhaustive": true},
+  {"alias": "P32a", "slug": "icv1-fp32-t7319-90da43e9", "role": "prime", "r_bits": 32.0, "cofactor": 1, "m_max": null, "exhaustive": false},
+  {"alias": "P36a", "slug": "icv1-fp36-t454193-44a20818", "role": "prime", "r_bits": 36.0, "cofactor": 1, "m_max": null, "exhaustive": false},
+  {"alias": "P40a", "slug": "icv1-fp40-tm924137-0ecaaeb9", "role": "prime", "r_bits": 40.0, "cofactor": 1, "m_max": null, "exhaustive": false}
+ ]
+}

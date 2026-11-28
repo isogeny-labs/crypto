@@ -1,0 +1,101 @@
+{
+  "schema": "koblitz.metrics-validation/v1",
+  "committed_ref_rows": [
+    {
+      "metric": "koblitz_modular.cm_block_inverse_cases",
+      "value": 3.0,
+      "date": "2026-10-30",
+      "problem": "ecdlp-index-calculus",
+      "unit": "fixed cases",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Explicit CM-block polynomial inverses; no evaluated geometric transfer",
+      "source": "research/koblitz_modular_ic_20261018/rounds/42/results.json@bb858e1006c2"
+    },
+    {
+      "metric": "koblitz_modular.cm_block_recovery_max_n",
+      "value": 131.0,
+      "date": "2026-10-30",
+      "problem": "ecdlp-index-calculus",
+      "unit": "cyclic length",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Largest actual CM-block inverse case; not a larger-n point transfer",
+      "source": "research/koblitz_modular_ic_20261018/rounds/42/results.json@bb858e1006c2"
+    },
+    {
+      "metric": "koblitz_modular.cm_denominator_lattices",
+      "value": 4.0,
+      "date": "2026-10-30",
+      "problem": "ecdlp-index-calculus",
+      "unit": "fixed integral lattices",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Exact least scalar for fixed denominator maps; not full modular Hom lattices",
+      "source": "research/koblitz_modular_ic_20261018/rounds/42/results.json@bb858e1006c2"
+    },
+    {
+      "metric": "koblitz_modular.source_jet_precision",
+      "value": 615.0,
+      "date": "2026-10-30",
+      "problem": "ecdlp-index-calculus",
+      "unit": "local coefficients",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Actual source jets with full R35 regression; no target factor map",
+      "source": "research/koblitz_modular_ic_20261018/rounds/43/results.json@cd6df158b453"
+    },
+    {
+      "metric": "koblitz_modular.complete_rr_L4D0_dimension",
+      "value": 452.0,
+      "date": "2026-10-30",
+      "problem": "ecdlp-index-calculus",
+      "unit": "F2 dimensions",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Exact product rank; completeness uses retained proper/pole/RR bridge, not IC rank",
+      "source": "research/koblitz_modular_ic_20261018/rounds/43/results.json@cd6df158b453"
+    },
+    {
+      "metric": "koblitz_modular.complete_rr_L6D0_dimension",
+      "value": 708.0,
+      "date": "2026-10-30",
+      "problem": "ecdlp-index-calculus",
+      "unit": "F2 dimensions",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Exact product rank; completeness uses retained proper/pole/RR bridge, not IC rank",
+      "source": "research/koblitz_modular_ic_20261018/rounds/43/results.json@cd6df158b453"
+    },
+    {
+      "metric": "koblitz_modular.complete_rr_L12D0_dimension",
+      "value": 1476.0,
+      "date": "2026-10-30",
+      "problem": "ecdlp-index-calculus",
+      "unit": "F2 dimensions",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Exact product rank; completeness uses retained proper/pole/RR bridge, not IC rank",
+      "source": "research/koblitz_modular_ic_20261018/rounds/43/results.json@cd6df158b453"
+    },
+    {
+      "metric": "koblitz_modular.complete_rr_L24D0_dimension",
+      "value": 3012.0,
+      "date": "2026-10-30",
+      "problem": "ecdlp-index-calculus",
+      "unit": "F2 dimensions",
+      "better": "neutral",
+      "kind": "gauge",
+      "label": "Exact product rank; completeness uses retained proper/pole/RR bridge, not IC rank",
+      "source": "research/koblitz_modular_ic_20261018/rounds/43/results.json@cd6df158b453"
+    }
+  ],
+  "timeout_seconds": 60,
+  "command_completed": true,
+  "source": "--ref HEAD, committed Git blobs only",
+  "default_main_integration_claimed": false,
+  "default_ref_command_completed_within_60_seconds": true,
+  "default_ref_command": "python3 tools/progress_metrics.py --since 2026-10-01",
+  "default_ref_exit": 0,
+  "default_ref_check": "subprocess check=True timeout60"
+}

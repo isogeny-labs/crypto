@@ -1,0 +1,26 @@
+    Blocking waiting for file lock on build directory
+   Compiling crypto v0.1.0 (/workspace/crypto)
+    Finished `release` profile [optimized] target(s) in 11m 00s
+     Running unittests examples/gaudry_cubic_s4_f4_probe.rs (target/release/build/crypto/55c732ec216b1038/out/gaudry_cubic_s4_f4_probe-55c732ec216b1038)
+
+running 4 tests
+test tests::native_basis_preserves_actual_s4_reference_solutions ... ok
+test tests::quotient_bounds_and_reference_root_checks_are_exact ... ok
+test tests::sparse_and_dense_graph_pipelines_recover_the_same_relation_prefix ... ok
+test tests::sparse_coordinate_extraction_matches_dense_on_all_tiny_targets_and_holdouts ... FAILED
+
+failures:
+
+---- tests::sparse_coordinate_extraction_matches_dense_on_all_tiny_targets_and_holdouts stdout ----
+
+thread 'tests::sparse_coordinate_extraction_matches_dense_on_all_tiny_targets_and_holdouts' (16243) panicked at examples/gaudry_cubic_s4_f4_probe.rs:391:17:
+p=7 d=171
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tests::sparse_coordinate_extraction_matches_dense_on_all_tiny_targets_and_holdouts
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.65s
+
+error: test failed, to rerun pass `--example gaudry_cubic_s4_f4_probe`

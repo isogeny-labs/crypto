@@ -1,0 +1,44 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-23T07:56:20Z",
+ "id": "PCC-20261123-ca2f33",
+ "kind": "measurement",
+ "producer": {
+  "commit": "b84fdbbbf69cb39e81afbd6ce72c708a7f7319b8",
+  "model": "Codex",
+  "session": "trace-setup-20261123"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/kernel-holdout-qualification.json",
+    "sha256": "2b3978731305084cd82f6b03e4e198b73b5114680de602614d349f2a53607a13"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/test-canonical.json",
+    "sha256": "116b9e3c3ce604a309ebae66d96c66e2a9fd00939421b1acb5b2e994d58f3307"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/results/current-rho-suite.json",
+    "sha256": "97a35bee5270e337930c7aa8b6fafbfbfa38cbb2ace1b64fdc7416ed70543093"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/trace_incidence_20261116/setup_20261123/canonical.hpp",
+    "sha256": "9f3f23c3b4890fcaef2774ff996c32fcd840f86f9710c6c01a009e7a3501e16f"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/trace_incidence_20261116/setup_20261123",
+ "statement": "Fresh public-target kernel qualification passes540 no-timer target/mode/kernel calls, every generated label and hit/miss/scalar checked against independent affine/frozen-pair controls. Field products160000 and malformed cases10 pass. Current rho-module preset preflight returns checked scalars for all five policies. Broad mixed-version module suite20pass/1root-oracle mismatch/1ignored, with rho/group tests passing; failure remains unresolved and retained. Producer qualification, no runtime/parity claim."
+}

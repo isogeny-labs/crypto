@@ -1,0 +1,15 @@
+# exp16b_dimU: d=5 (Q=32), m=n=4; kind | span dim of {1,r,r^2,r^3} | odd counts s1..s4 | dim U measured (pred 4-span) | cpu
+c1 through0 | 1 | [0, 0, 0, 135] | 3 (pred 3) | 0.6s
+c1 c0=u*z | 1 | [135, 135, 135, 135] | 3 (pred 3) | 29.2s
+c1 r in F_Q^2 | 2 | [137, 139, 137, 137] | 2 (pred 2) | 31.7s
+c1 r generic #0 | 4 | [138, 134, 136, 136] | 0 (pred 0) | 33.9s
+c1 r generic #1 | 4 | [134, 137, 135, 131] | 0 (pred 0) | 32.3s
+c1 r generic #2 | 4 | [137, 135, 135, 137] | 0 (pred 0) | 32.1s
+c2 through0 | 1 | [0, 0, 0, 138] | 3 (pred 3) | 0.6s
+c2 c0=u*z | 1 | [135, 135, 135, 135] | 3 (pred 3) | 31.9s
+c2 r in F_Q^2 | 2 | [133, 132, 132, 134] | 2 (pred 2) | 31.0s
+c2 r generic #0 | 4 | [138, 137, 133, 138] | 0 (pred 0) | 33.6s
+c2 r generic #1 | 4 | [139, 134, 136, 137] | 0 (pred 0) | 33.4s
+c2 r generic #2 | 4 | [138, 134, 138, 135] | 0 (pred 0) | 33.7s
+DONE
+EXIT 0

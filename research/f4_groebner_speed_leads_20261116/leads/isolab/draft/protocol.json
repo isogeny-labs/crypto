@@ -1,0 +1,56 @@
+{
+  "schema": "f4.fp-ab-protocol/v1",
+  "status": "DRAFT - freeze (and convert to experiment.protocol/v1) before any run",
+  "question": "Does the default F4 path at SOURCE_REVISION run faster than the env-restored old path on many cores, with identical output?",
+  "binary": "/usr/local/bin/f4_fp_bench",
+  "bench_argv": [
+    "1",
+    "large"
+  ],
+  "arms": [
+    {
+      "name": "A1",
+      "role": "baseline_default",
+      "env": {}
+    },
+    {
+      "name": "A2",
+      "role": "aa_control_default",
+      "env": {}
+    },
+    {
+      "name": "B",
+      "role": "old_path",
+      "env": {
+        "F4_FP_PAR_OLD": "1"
+      }
+    }
+  ],
+  "threads": [
+    1,
+    4,
+    8,
+    14
+  ],
+  "warmup_rounds": 1,
+  "measured_rounds": 15,
+  "order": "per round, arms rotated by round index (A1,A2,B / A2,B,A1 / B,A1,A2); thread settings outermost per round",
+  "identity_required": [
+    "basis_fp",
+    "solve_fp",
+    "solutions",
+    "basis_len"
+  ],
+  "primary_metric": "per-case median f4_ms ratio old/new, per thread count",
+  "noise_floor": "per-case median f4_ms ratio A2/A1 with paired bootstrap 95% interval",
+  "decision": "report ratio with interval; a ratio is admissible only where the A/A interval contains 1 and is narrower than the B/A effect",
+  "timing_admission": "none: command Jobs carry no native L2 grade; wall-clock here is indicative (L0/L1 at most)",
+  "counters_constant_within_arm": [
+    "steps",
+    "max_rows",
+    "max_cols",
+    "field_ops",
+    "solve_field_ops"
+  ],
+  "counters_note": "counters may differ between arms only where the lead declares it (e.g. F4_FP_FL changes field_ops 399,396,830 vs 331,473,535 on quad_n9); they must be constant within an arm across rounds and thread counts"
+}

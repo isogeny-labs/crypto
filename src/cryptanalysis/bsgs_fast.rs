@@ -751,21 +751,11 @@ impl BsgsFastPlan {
     ) -> Self {
         let workers = workers.max(1);
         let chains_per_worker = chains_per_worker.max(1);
-        let isqrt = |v: u64| {
-            let mut s = (v as f64).sqrt() as u64;
-            while s > 0 && s.saturating_mul(s) > v {
-                s -= 1;
-            }
-            while (s + 1).saturating_mul(s + 1) <= v {
-                s += 1;
-            }
-            s
-        };
         let ceil_div = |a: u64, b: u64| a.div_ceil(b);
         let m = if neg_map {
-            ceil_div(isqrt(width), 2).max(1)
+            ceil_div(isqrt_u64(width), 2).max(1)
         } else {
-            isqrt(ceil_div(width, 2)).max(1)
+            isqrt_u64(ceil_div(width, 2)).max(1)
         }
         // j has to fit the table's 32-bit index field.
         .min(0xFFFF_FFF0);
@@ -2035,23 +2025,25 @@ pub fn reference_scalar_mul(c: &CurveParams, k: u64) -> Point {
 
 /// `√v`, rounded down.
 fn isqrt_u64(v: u64) -> u64 {
-    let mut s = (v as f64).sqrt() as u64;
-    while s > 0 && s.saturating_mul(s) > v {
-        s -= 1;
-    }
-    while (s + 1).saturating_mul(s + 1) <= v {
-        s += 1;
-    }
-    s
+    v.isqrt()
 }
 
 /// `S = operations / √width`, the unit the repository's ECDLP threads
 /// report in, so a row here sits in the same table as a row from the GPU
 /// engine or from Pollard rho.
 pub fn cost_ratio(stats: &BsgsFastStats, width: u64, targets: u64) -> f64 {
-    let ops = stats.baby_steps + stats.giant_steps + stats.candidates;
+    // Preserve ordinary rounding; accumulated counters can have a finite
+    // floating-point total even when their exact sum exceeds one word.
+    let ops = match stats
+        .baby_steps
+        .checked_add(stats.giant_steps)
+        .and_then(|sum| sum.checked_add(stats.candidates))
+    {
+        Some(sum) => sum as f64,
+        None => stats.baby_steps as f64 + stats.giant_steps as f64 + stats.candidates as f64,
+    };
     let sqrt_w = isqrt_u64(width).max(1) as f64;
-    ops as f64 / targets.max(1) as f64 / sqrt_w
+    ops / targets.max(1) as f64 / sqrt_w
 }
 
 // ── tests ───────────────────────────────────────────────────────────────
@@ -2060,6 +2052,53 @@ pub fn cost_ratio(stats: &BsgsFastStats, width: u64, targets: u64) -> f64 {
 mod tests {
     use super::*;
     use crate::cryptanalysis::ecdlp_variants::{bsgs as slow, EcGroup};
+
+    #[test]
+    fn full_width_square_root_boundaries() {
+        let values = [
+            0,
+            1,
+            2,
+            3,
+            4,
+            15,
+            16,
+            17,
+            u32::MAX as u64,
+            (u32::MAX as u64).pow(2) - 1,
+            (u32::MAX as u64).pow(2),
+            u64::MAX - 1,
+            u64::MAX,
+        ];
+        for value in values {
+            let root = isqrt_u64(value) as u128;
+            assert!(root * root <= value as u128);
+            assert!((root + 1) * (root + 1) > value as u128);
+        }
+        assert_eq!(isqrt_u64(u64::MAX), u32::MAX as u64);
+        let plan = BsgsFastPlan::new(u64::MAX, 0, true, 1, 1);
+        assert_eq!(plan.m, 1u64 << 31);
+        let stats = BsgsFastStats::default();
+        assert_eq!(cost_ratio(&stats, u64::MAX, 1), 0.0);
+    }
+
+    #[test]
+    fn cost_ratio_retains_accumulated_counter_magnitude() {
+        let stats = BsgsFastStats {
+            baby_steps: u64::MAX,
+            giant_steps: u64::MAX,
+            candidates: u64::MAX,
+            ..BsgsFastStats::default()
+        };
+        assert_eq!(cost_ratio(&stats, 4, 1), 3.0 * (u64::MAX as f64) / 2.0);
+        let ordinary = BsgsFastStats {
+            baby_steps: 15,
+            giant_steps: 17,
+            candidates: 3,
+            ..BsgsFastStats::default()
+        };
+        assert_eq!(cost_ratio(&ordinary, 81, 2), 35.0 / 2.0 / 9.0);
+    }
 
     /// A deterministic xorshift, so a failure is reproducible.
     struct Rng(u64);

@@ -1,0 +1,18 @@
+[package]
+name = "ghs-matched-frontier-gate"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+serde_json = "1.0"
+sha2 = "0.10"
+
+[[bin]]
+name = "ghs-m3-validate"
+path = "src/bin/validate.rs"
+
+[[bin]]
+name = "ghs-m3-analyze"
+path = "src/bin/analyze.rs"
+

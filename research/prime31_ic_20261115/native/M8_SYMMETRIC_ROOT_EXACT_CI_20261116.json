@@ -1,0 +1,59 @@
+{
+  "standing": "[pcc:unverified]",
+  "evidence_type": "producer-development GitHub Actions exact-source executed Rust release test + CLI",
+  "tested_commit": "d1a92b3251d06b465c38d8b486f7aaab9f827cc4",
+  "workflow_run_id": 43828425745,
+  "job_id": 133167637017,
+  "workflow_url": "https://github.com/isogeny-labs/crypto/actions/runs/43828425745",
+  "test_status": "success",
+  "cli_status": "success",
+  "compiler": "Rust 1.100.0, release",
+  "warning_at_tested_source": "unused poly_eval dead_code (removed in successor commit 1a3882044; successor still needs its own execution receipt)",
+  "actual_stdout": {
+    "B31_unordered_x_multisets": "48903492",
+    "cofactor": 1,
+    "curve_field": 2147483647,
+    "full_cold_validation_ns": "29564569",
+    "group_order": 2147446831,
+    "limitations": "enumerative candidate-f validator, not target-conditioned S9 solving; cannot claim non-generic or full ECDLP improvement",
+    "matched_target_tests": 1172,
+    "no_target_log_or_group_point_sum_in_algebraic_side": true,
+    "panels": [
+      {
+        "base_size": 4,
+        "candidate_selection": "all 165 unordered multisets",
+        "diagonal_infinity_branches": 295,
+        "false_negative": 0,
+        "false_positive": 0,
+        "field_only_candidate_evaluation_ns": "2924984",
+        "field_s3_calls": 5975,
+        "identity_positive_multisets": 35,
+        "independent_signed_group_verification_ns": "8502694",
+        "multisets": 165,
+        "scope": "given-f only; no S9 target-conditioned root search",
+        "tamper_tests_rejected": 3,
+        "target_tests": 660,
+        "true_positive_target_checks": 200
+      },
+      {
+        "base_size": 8,
+        "candidate_selection": "128 seeded distinct unordered multisets",
+        "diagonal_infinity_branches": 81,
+        "false_negative": 0,
+        "false_positive": 0,
+        "field_only_candidate_evaluation_ns": "4539249",
+        "field_s3_calls": 8925,
+        "identity_positive_multisets": 3,
+        "independent_signed_group_verification_ns": "12802130",
+        "multisets": 128,
+        "scope": "given-f only; no S9 target-conditioned root search",
+        "tamper_tests_rejected": 3,
+        "target_tests": 512,
+        "true_positive_target_checks": 131
+      }
+    ],
+    "standing": "[pcc:unverified]",
+    "study": "finite-rational S9 signed-semantics correctness gate; not a DLP algorithm"
+  },
+  "cost_scope": "in-process program wall is small-B enumerative validation of given f, not target-dependent polynomial-system solving, not cold ECDLP time"
+}

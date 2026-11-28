@@ -1,0 +1,44 @@
+{
+  "schema": "experiment.protocol/v1",
+  "id": "KOBLITZ-R90-RANK32-RR-TRANSPORT",
+  "version": 1,
+  "goal": "test bidirectional localized-ring membership for every accepted R50 rank-32 RR basis generator",
+  "claims": [{"id": "rank32_transport90", "class": "exact_computation", "statement": "all 32 generators in both diamond directions have pole-cleared polynomial module coordinates with full products and corrupted-coordinate rejection"}],
+  "arms": {
+    "reference": "R50 accepted rank-32 PID basis, source embedding, and relative field",
+    "candidate": "R85/R86 forward and R88 inverse diamond substitutions",
+    "positive": ["32 source-basis columns", "32 forward images", "32 inverse images", "64 power-vector reconstructions", "64 full module products", "64 polynomial-coordinate checks"],
+    "negative": ["one corrupted module coordinate per image"],
+    "baseline": {"not_applicable_reason": "exact symbolic membership"},
+    "A_A": {"not_applicable_reason": "deterministic field and module computation"}
+  },
+  "variables": {
+    "fixed": ["F2 source field degree 32", "R50 PID denominator degree 37 and index 376", "maximum coefficient degree 37", "pole bound 61", "one Singular/FLINT thread", "1200 seconds", "4 GiB virtual memory"],
+    "measured": ["source and donor hashes", "first pole power per column", "full product identities", "polynomial coefficients", "corruption failures", "native exit/errors"],
+    "statistical": "not applicable"
+  },
+  "randomization": {"method": "fixed", "reason": "exact algebra", "seeds": [90]},
+  "blinding": {"method": "none", "reason": "exact algebra"},
+  "sample_size": {"instances": 64, "replicates": 1, "warmups": 0, "power": "not applicable"},
+  "metrics": ["64 polynomial-coordinate columns", "64 full module products", "64 corruption rejections", "certificate export"],
+  "execution": {
+    "launchers": ["REPLAY_CAS.sh transport90-01 TRANSPORT90.sing TRANSPORT90_ALL_CHECKS_PASS"],
+    "backend": "authorized local Singular",
+    "backend_reason": "pinned local native CAS continuation; digest-pinned EKS Singular image not yet available",
+    "timeout_seconds_per_program": 1200,
+    "virtual_KiB_native": 4194304,
+    "threads": 1,
+    "seed": 90,
+    "queue": "one serial math job",
+    "source_gate": "committed Git bytes and SHA-256/byte-count donor manifest",
+    "checkpoint": "existing checkpoint gate and immutable raw copy"
+  },
+  "stopping": {
+    "accept": "exit 0, exact marker, zero native ? errors, all 64 columns within power 61, full products and corrupted controls, exported certificate",
+    "failure": "retain raw and freeze repair under a new attempt ID"
+  },
+  "analysis": {
+    "method": "F2(z) quotient-field evaluation and rank-32 PID source embedding",
+    "scope": "localized normal-chart generator transport; proper projective quotient geometry remains separate"
+  }
+}

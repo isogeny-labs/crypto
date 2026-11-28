@@ -1,0 +1,37 @@
+import ReductionStep
+set_option autoImplicit false
+namespace ReductionWord
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest MonicTermination
+
+inductive Run (p : UInt64) (f : List UInt64) : List UInt64 → List UInt64 → List UInt64 → List UInt64 → Prop
+ | stop (u v) (h : u.length≤3) : Run p f u v u v
+ | step (u v q r a b)
+   (long : 3<u.length)
+   (exact : FallbackWord.exactDiv p (ResidualWord.residual p f v) u=some q)
+   (rem : FallbackGeometry.remainder p (ResidualWord.pneg p v) (monic p q)=some r)
+   (tail : Run p f (monic p q) r a b) : Run p f u v a b
+
+theorem initialized_run (p : UInt64) [Fact p.toNat.Prime] (f u v : List UInt64)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31)
+ (hf : Canon p f) (hu : Canon p u) (hv : Canon p v) (hun : Normal u) (hvn : Normal v)
+ (hum : u.getLast?=some 1) (hshort : v.length<u.length)
+ (hfd : (wordsPoly p f).natDegree=5) (hu4 : (wordsPoly p u).natDegree≤4)
+ (hvalid : wordsPoly p u ∣ wordsPoly p f-(wordsPoly p v)^2) :
+ ∃ a b, Run p f u v a b ∧ Canon p a ∧ Canon p b ∧ a ≠ [] ∧ a.length≤3 ∧ b.length≤2 ∧
+ MumfordValidity.Valid (wordsPoly p f) (wordsPoly p a) (wordsPoly p b) := by
+ have hune := monic_nonempty u hum
+ have hpos : 0<u.length := List.length_pos_iff.mpr hune
+ by_cases hs : u.length≤3
+ · have hval := ResidualAcceptance.shape_valid p (u.length-1) u v (wordsPoly p f)
+     (by omega) (by omega) (by omega) hum hvalid
+   exact ⟨u,v,Run.stop u v hs,hu,hv,hune,hs,by omega,hval⟩
+ · have hud : 3≤(wordsPoly p u).natDegree := by
+     rw [ResidualAcceptance.monic_list_natDegree p u hum]; omega
+   have hvd : (wordsPoly p v).natDegree<(wordsPoly p u).natDegree := by
+     by_cases he : v=[]
+     · have hz : wordsPoly p v=0 := by simp [he,wordsPoly,listPoly]
+       rw [hz,natDegree_zero]; omega
+     · rw [normal_natDegree p v hp hv hvn he,ResidualAcceptance.monic_list_natDegree p u hum]; omega
+   obtain ⟨q,r,hq,hr,hqc,hrc,hrn,hne,hql,hrl,hval⟩ := step_exists p f u v hp hb hf hu hv hun hfd hud hu4 hvd hvalid
+   exact ⟨monic p q,r,Run.step u v q r (monic p q) r (by omega) hq hr (Run.stop _ _ hql),hqc,hrc,hne,hql,hrl,hval⟩
+end ReductionWord

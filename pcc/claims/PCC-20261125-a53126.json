@@ -1,0 +1,37 @@
+{
+ "claim_type": "data",
+ "created_at": "2026-11-25T02:17:03Z",
+ "id": "PCC-20261125-a53126",
+ "kind": "execution",
+ "producer": {
+  "commit": "ac4f7da306369d736fd819b17d9d441538fa2439",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/rur_record_audit_v1/tests.txt",
+    "sha256": "e8d18e7487d80bc1dd1c1431166020240f4c95240e7f8c45de1d4efd4041df31"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/evidence/rur_record_audit_v1/build.txt",
+    "sha256": "cf8088d51b3f75a7ec50a2dbacea67611edcd99285bf4e6dca04f7de9094ef99"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/smooth_p_plus_one_20261123/native/examples/rur-audit.rs",
+    "sha256": "877b966b05b7c99816443ee9fc06fedb82bb7a0e3b5a66d3fec5f4053c7bb7f3"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "smooth-p-plus-one-rur-record-audit",
+ "statement": "The standalone Rust retained-RUR auditor passes four synthetic tests and builds. Controls cover the documented negative-numerator convention, equation/form residuals, a coordinate mutation that preserves the dimension guard, malformed degree metadata and duplicate or unknown input monomials. No recorded scientific RUR has yet been audited by this new executable."
+}

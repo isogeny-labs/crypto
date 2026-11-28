@@ -1,0 +1,462 @@
+{
+  "ProjectiveLawBoundary": [
+    "Mathlib.Algebra.Field.Basic",
+    "Mathlib.Tactic.Ring"
+  ],
+  "RuntimeSemantics": [
+    "ProjectiveLawBoundary"
+  ],
+  "SameSupport": [
+    "RuntimeSemantics",
+    "Mathlib.Algebra.Polynomial.Degree.SmallDegree",
+    "Mathlib.Algebra.Polynomial.Degree.Domain",
+    "Mathlib.Tactic.FieldSimp"
+  ],
+  "Add11": [
+    "SameSupport"
+  ],
+  "WeightedAdd11": [
+    "Add11"
+  ],
+  "MixedCancellation": [
+    "WeightedAdd11"
+  ],
+  "SameUMixed": [
+    "MixedCancellation",
+    "SameSupport"
+  ],
+  "WeightedExtract": [
+    "SameUMixed"
+  ],
+  "MixedGeneric": [
+    "MixedCancellation"
+  ],
+  "Doubling": [
+    "Add11"
+  ],
+  "PositiveDistinct": [
+    "MixedGeneric",
+    "Doubling"
+  ],
+  "LocalSmooth": [
+    "WeightedExtract",
+    "PositiveDistinct"
+  ],
+  "GlobalSmooth": [
+    "LocalSmooth",
+    "Mathlib.Algebra.Polynomial.Derivative",
+    "Mathlib.RingTheory.Coprime.Basic"
+  ],
+  "BZero": [
+    "GlobalSmooth"
+  ],
+  "Transport": [
+    "BZero"
+  ],
+  "Loop": [
+    "Transport",
+    "Mathlib.Data.Nat.Choose.Sum"
+  ],
+  "SameSupportClassifier": [
+    "SameSupport"
+  ],
+  "CanonicalResidue": [
+    "Mathlib.Data.ZMod.Basic",
+    "SameSupportClassifier"
+  ],
+  "UInt64Residue": [
+    "CanonicalResidue"
+  ],
+  "NatClassifier": [
+    "UInt64Residue",
+    "Mathlib.Algebra.Field.ZMod"
+  ],
+  "WordClassifier": [
+    "NatClassifier"
+  ],
+  "CrossScaling": [
+    "WordClassifier"
+  ],
+  "WordAdd11": [
+    "CrossScaling",
+    "WeightedAdd11"
+  ],
+  "WeightedSameSupport": [
+    "SameSupportClassifier"
+  ],
+  "WordErrorExclusion": [
+    "CrossScaling",
+    "WeightedSameSupport"
+  ],
+  "WordCoefficient": [
+    "Loop",
+    "WordAdd11",
+    "WordErrorExclusion"
+  ],
+  "Wide": [
+    "WordCoefficient"
+  ],
+  "Inversion": [
+    "Wide"
+  ],
+  "FastBatchInverse": [
+    "Inversion"
+  ],
+  "Storage": [
+    "Inversion"
+  ],
+  "Traversal": [
+    "Storage"
+  ],
+  "Schedule": [
+    "Traversal"
+  ],
+  "Identify": [
+    "Schedule",
+    "Loop"
+  ],
+  "Reconstruct": [
+    "Identify"
+  ],
+  "Scale": [
+    "Reconstruct"
+  ],
+  "Trim": [
+    "Scale"
+  ],
+  "Bridge": [
+    "Trim"
+  ],
+  "Validity": [
+    "Transport",
+    "Mathlib.Algebra.Polynomial.Degree.Lemmas"
+  ],
+  "Stored": [
+    "Bridge",
+    "Validity"
+  ],
+  "Cancel": [
+    "Stored",
+    "WordAdd11"
+  ],
+  "Events": [
+    "Cancel"
+  ],
+  "Connect": [
+    "Events"
+  ],
+  "Post": [
+    "Connect"
+  ],
+  "Canon": [
+    "Post"
+  ],
+  "Outer": [
+    "Canon"
+  ],
+  "Admit": [
+    "Outer"
+  ],
+  "Descent": [
+    "Admit"
+  ],
+  "Fuel": [
+    "Descent"
+  ],
+  "Normalized": [
+    "Fuel"
+  ],
+  "ZeroTest": [
+    "Normalized"
+  ],
+  "CZero": [
+    "ZeroTest"
+  ],
+  "FastCRTCertificates": [
+    "CZero"
+  ],
+  "FastPreludeExpr": [
+    "FastBatchInverse",
+    "FastCRTCertificates"
+  ],
+  "FastPreludeDecode": [
+    "FastPreludeExpr"
+  ],
+  "FastCRTInterpolation": [
+    "FastCRTCertificates"
+  ],
+  "FastInterpolationShape": [
+    "FastCRTInterpolation"
+  ],
+  "FastQuotientShape": [
+    "FastInterpolationShape"
+  ],
+  "FastPayloadWords": [
+    "FastPreludeDecode",
+    "FastQuotientShape"
+  ],
+  "FastPayloadPolynomial": [
+    "FastPayloadWords"
+  ],
+  "QuotientWrite": [
+    "ZeroTest"
+  ],
+  "DivisionLoop": [
+    "QuotientWrite"
+  ],
+  "ExactDivision": [
+    "DivisionLoop"
+  ],
+  "DivisionInterface": [
+    "ExactDivision"
+  ],
+  "NonmonicCoefficient": [
+    "DivisionInterface",
+    "Inversion"
+  ],
+  "NonmonicStep": [
+    "NonmonicCoefficient"
+  ],
+  "NonmonicLoop": [
+    "NonmonicStep"
+  ],
+  "NonmonicExact": [
+    "NonmonicLoop"
+  ],
+  "Pegcd": [
+    "NonmonicExact"
+  ],
+  "Fallback": [
+    "Pegcd"
+  ],
+  "WordStep": [
+    "Pegcd"
+  ],
+  "Composition": [
+    "Fallback",
+    "WordStep"
+  ],
+  "PegcdTotal": [
+    "Composition"
+  ],
+  "PegcdStored": [
+    "PegcdTotal"
+  ],
+  "PegcdEndpoint": [
+    "PegcdStored"
+  ],
+  "ProductWord": [
+    "Stored",
+    "WordAdd11"
+  ],
+  "ProductRow": [
+    "Events",
+    "ProductWord"
+  ],
+  "Product": [
+    "ProductRow",
+    "Canon"
+  ],
+  "QuotientStorage": [
+    "DivisionInterface",
+    "Product"
+  ],
+  "StoredLoop": [
+    "QuotientStorage"
+  ],
+  "StoredDivision": [
+    "StoredLoop"
+  ],
+  "NonmonicStorage": [
+    "StoredDivision",
+    "NonmonicExact"
+  ],
+  "NonmonicWord": [
+    "NonmonicStorage"
+  ],
+  "Residual": [
+    "Product",
+    "WordAdd11"
+  ],
+  "PegcdWordState": [
+    "PegcdEndpoint",
+    "NonmonicWord",
+    "Residual"
+  ],
+  "PegcdWordDivision": [
+    "PegcdWordState"
+  ],
+  "PegcdWordLoop": [
+    "PegcdWordDivision"
+  ],
+  "PegcdWordScale": [
+    "PegcdWordLoop"
+  ],
+  "PegcdWordOutput": [
+    "PegcdWordScale"
+  ],
+  "FallbackWordExact": [
+    "PegcdWordOutput"
+  ],
+  "FallbackWordChain": [
+    "FallbackWordExact"
+  ],
+  "FallbackWordNumerator": [
+    "FallbackWordChain"
+  ],
+  "FallbackWordNormal": [
+    "FallbackWordNumerator"
+  ],
+  "FallbackWordDivisions": [
+    "FallbackWordNormal"
+  ],
+  "FallbackNormIdentity": [
+    "FallbackWordDivisions"
+  ],
+  "FallbackWordInvariant": [
+    "FallbackNormIdentity"
+  ],
+  "FallbackWordRemainder": [
+    "FallbackWordInvariant"
+  ],
+  "ReductionWordMonic": [
+    "FallbackWordRemainder"
+  ],
+  "ListGuards": [
+    "ZeroTest"
+  ],
+  "ReductionWordDegree": [
+    "ReductionWordMonic",
+    "ListGuards"
+  ],
+  "ReductionQuinticBound": [
+    "ReductionWordDegree"
+  ],
+  "ReductionFinalStorage": [
+    "ReductionQuinticBound"
+  ],
+  "FastCallInputs": [
+    "FastPayloadPolynomial",
+    "ReductionFinalStorage",
+    "FallbackWordRemainder"
+  ],
+  "FastCallQuotient": [
+    "FastCallInputs"
+  ],
+  "FastCallFinish": [
+    "FastCallQuotient"
+  ],
+  "DivisorArrayCopy": [
+    "FastCallFinish"
+  ],
+  "DivisorArrayAccess": [
+    "DivisorArrayCopy"
+  ],
+  "DivisorArrayValidity": [
+    "DivisorArrayAccess"
+  ],
+  "StoredInput": [
+    "DivisorArrayValidity"
+  ],
+  "StoredDecode": [
+    "StoredInput"
+  ],
+  "StoredFast": [
+    "StoredDecode"
+  ],
+  "ReductionStep": [
+    "ReductionFinalStorage"
+  ],
+  "ReductionRun": [
+    "ReductionStep"
+  ],
+  "StrictStep": [
+    "ReductionRun"
+  ],
+  "StrictRun": [
+    "StrictStep"
+  ],
+  "StrictEntry": [
+    "StrictRun"
+  ],
+  "ReductionEntry": [
+    "ReductionRun"
+  ],
+  "StrictFallback": [
+    "StrictEntry",
+    "ReductionEntry"
+  ],
+  "AffineConstruct": [
+    "StoredFast",
+    "StrictFallback"
+  ],
+  "AffineRelation": [
+    "AffineConstruct"
+  ],
+  "AffineTotal": [
+    "AffineRelation"
+  ],
+  "AffineDeterminism": [
+    "AffineTotal"
+  ],
+  "AffineUnique": [
+    "AffineDeterminism"
+  ],
+  "StoredRemainder": [
+    "StoredFast"
+  ],
+  "StoredValid": [
+    "StoredRemainder"
+  ],
+  "DispatchAcceptance": [
+    "AffineUnique",
+    "StoredValid"
+  ],
+  "FastPreludeControls": [
+    "FastPreludeDecode"
+  ],
+  "FastPayloadControls": [
+    "FastPayloadPolynomial",
+    "FastPreludeControls"
+  ],
+  "FastCallControls": [
+    "FastCallFinish",
+    "FastPayloadControls"
+  ],
+  "StoredControls": [
+    "StoredFast",
+    "FastCallControls"
+  ],
+  "AffineControls": [
+    "AffineUnique",
+    "StoredControls"
+  ],
+  "StoredValidControls": [
+    "StoredValid",
+    "StoredControls"
+  ],
+  "AcceptanceControls": [
+    "DispatchAcceptance",
+    "AffineControls",
+    "StoredValidControls"
+  ],
+  "MulAcceptance": [
+    "DispatchAcceptance",
+    "Init.Data.UInt.Bitwise"
+  ],
+  "Controls": [
+    "MulAcceptance",
+    "AcceptanceControls",
+    "AffineControls"
+  ],
+  "Readback": [
+    "Controls"
+  ],
+  "ExpectedFailure": [
+    "Controls"
+  ],
+  "Mathlib.Algebra.Field.ZMod": [
+    "Mathlib.Algebra.Field.Basic",
+    "Mathlib.Data.ZMod.Basic"
+  ]
+}

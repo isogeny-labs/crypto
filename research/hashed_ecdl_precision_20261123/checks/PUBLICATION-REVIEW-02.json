@@ -1,0 +1,160 @@
+{
+  "schema": "tapered-precision-publication-review/v1",
+  "created_utc": "2026-11-23T10:49:49.767Z",
+  "scope": "Read-only publication binding and recorded qualification review. No Lean, proof verifier, proof gate, build, native tests, cryptographic experiment, cloud/S3 operation, restoration or secret read was run. Standard shell/Node administrative hashing/source inspection only.",
+  "publication": {
+    "repository": "isogeny-labs/crypto",
+    "pr": 4996,
+    "commit": "46249ffddaf4ec36dbf81310aa9693062c8ce46a",
+    "tree": "5176ea8448504cca0f163f6b18966b1bb4b46825",
+    "evidence_directory": "research/hashed_ecdl_precision_20261123",
+    "observed_remote_tracking_ref": "46249ffddaf4ec36dbf81310aa9693062c8ce46a",
+    "shared_repository": "aburan28/crypto-lean",
+    "shared_pr": 35,
+    "shared_commit": "3e47fb776a4eb5231de4c8aad2bb6e756c2f89a1",
+    "shared_blob": "42ed02cde305b5df5c8145cff3e83df653580831"
+  },
+  "disposition": {
+    "committed_artifact_consistency": "supported_within_scope",
+    "prior_scalar_algebra_review": "unchanged; no blocking issue found in SCALAR-REVIEW-01",
+    "recorded_gate_results": "09 local theorem verifier pass;10 seven-control gate pass;11 fresh Std-only qualification pass, all within conditional scalar scope",
+    "independent_execution_provenance": "not established by this read-only unsigned review",
+    "pcc_ledger_standing": "unverified; no signed verdict or execution attestation",
+    "new_discrepancies": []
+  },
+  "preserved_original_review": {
+    "review_sha256": "1ef3f1e5791b3b32baee7dc44befa8ccf411584eb8d3c80c762c21137ee4fbc9",
+    "evidence_manifest_sha256": "a0790eb122901b6a8e7ae6b983d7e65e393faffce5c2fedee167c782021142ea",
+    "published_copies_match_originals": true,
+    "all_62_original_input_entries_rechecked": true,
+    "reviewed_map_sha256": "b1bbd09729177b58bd6b3b8824a445fb5d685afbb70785914a22e45ec9a7f8a8",
+    "reviewed_map_published_as": "checks/PROOF-MAP-reviewed-snapshot.md",
+    "successor_map_sha256": "935fe830f97c4f9ba2d712fc04ba3ff08918f6f25c1c5be04b7b3f5e40d2b4c3",
+    "successor_map_role": "Published PROOF-MAP.md equals versioned local PROOF-UPDATE-01.md. It is not silently substituted into the old62-input review. The inadvertent append/restoration is disclosed in publication-administration.json."
+  },
+  "checks": [
+    {
+      "requirement": "Complete committed study manifest",
+      "status": "pass_within_scope",
+      "detail": "All202 SHA256SUMS entries match exact Git blob bytes. Every one of203 study files other than SHA256SUMS itself is covered. All203 working-study files match the committed copies;159 directly corresponding local check files also match."
+    },
+    {
+      "requirement": "Shared and native source identity",
+      "status": "pass_within_scope",
+      "detail": "Published shared dependency copy SHA25692e4300c71c4b1570ab193df4de22fe31b04a9d7ca0f0212191169555951989a and Git blob42ed02cde305b5df5c8145cff3e83df653580831 match the unchanged shared PR35 source and frozen03c. Controls SHA2563b7a406635eda2b7320241cfbc90ef8d06980dfba99ccd96ab2bc0269a7d1321 match frozen04. No native Rust crate, PCC verifier, proof-gate/auditor, trust list or keyring differs from main816f9c3a."
+    },
+    {
+      "requirement": "Gate09 theorem binding",
+      "status": "pass_as_recorded_local_output",
+      "detail": "Exit0, physical-stop0, empty stderr. Raw stdout is identical to published pcc-local-verdict.json and reports lean proof-gate pass for the exact conditional theorem. Canonical PCC claim digest a67483a0cd024abcd5454982323c3d6300e71b61f79cc6c71d1312563e26007a matches committed claim and both local verdicts. It is a canonical JSON digest, distinct from the pretty-printed claim file byte hash. Declaration digest72b48b96db59bc71d059360987abec830ef5c8019625d01758dbd3ba1e7034c1 remains unchanged. These are unsigned producer/local verifier records, not an independently observed execution."
+    },
+    {
+      "requirement": "Gate10 exact control census",
+      "status": "pass_as_recorded_local_output",
+      "detail": "Exit0, physical-stop0, empty stderr; raw audit names exactly the seven declared controls. It reports0 failing and0 trusted(native_decide), plus PASS status. Positive instance has only propext/Quot.sound; six deletion controls have no axioms. A String.mk deprecation warning is retained in the audit and is not hidden or treated as proof failure."
+    },
+    {
+      "requirement": "Fresh phase11 Std-only reproduction",
+      "status": "pass_as_recorded_local_output",
+      "detail": "Exit0, physical-stop0. Published fresh-reproduction metadata reconciles with raw phase records. All14 published fresh raw files equal their originals. Three frozen input digests match published core/control/axiom sources; pre/post checks are OK. Fresh axiom output is byte-identical to05. Core and control compiler stdout/stderr are empty, local PCC JSON reports pass and the control gate reports seven theorems/zero trusted. Reproduction/check.sh explicitly restricts LEAN_PATH to the fresh library and pinned standard library; standalone proof-gate branch preserves that search path. No Mathlib import is needed for this component."
+    },
+    {
+      "requirement": "Failure preservation and resource scope",
+      "status": "pass_within_scope",
+      "detail": "Gates06/07 remain published separately as exit143/physical-stop1, empty stdout/stderr, no verdict. Their peaks are15044296704/15032705024 bytes. Later passes do not rewrite those failures. Phase records and qualification metadata agree; guards remain one worker,600-second phase deadline and15032385536-byte whole-cgroup stop, without runtime/performance inference."
+    },
+    {
+      "requirement": "PCC status and publication boundary",
+      "status": "unverified",
+      "detail": "The inspected ledger preserves the previous publication prefix and appends only the theorem/control claim rows, not verdict rows. Standing record says unverified with zero verdicts. Local verdicts name the producer registration commit e33eb5511d84ea8ae596601ca53c99185d5453ae; this review separately binds their source/artifact bytes to publication46249ffd and does not relabel them as signed or independently executed."
+    }
+  ],
+  "phase_records": [
+    {
+      "phase": "06-pcc-lean-verifier",
+      "exit_code": 143,
+      "physical_stop": 1,
+      "peak_whole_cgroup_bytes": 15044296704,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "07-pcc-verifier-after-cache-compaction",
+      "exit_code": 143,
+      "physical_stop": 1,
+      "peak_whole_cgroup_bytes": 15032705024,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "09-pcc-verifier-after-bounded-cache-compaction",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14011281408,
+      "stdout_sha256": "2d73121ed73a4fecec0abafde08649e08985a82c06b563933985317fb6156863",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "10-native-controls-gate",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 13992992768,
+      "stdout_sha256": "4104f346dd1184a7fbcd4472028568ae10de6ced8dee3f65682669b774c8877f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "phase": "11-fresh-std-only-reproduction",
+      "exit_code": 0,
+      "physical_stop": 0,
+      "peak_whole_cgroup_bytes": 14009532416,
+      "stdout_sha256": "70d3448682509e4a4dbf22128d39f7d073b27171127e52ac661d22badb884b80",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "compaction_review": {
+    "published_receipts_match_local": true,
+    "editor_index": {
+      "files": 8643,
+      "uncompressed_bytes": 289914149,
+      "archive_bytes": 43482563,
+      "archive_sha256": "397490d1832c0493b5d047c013adb8c6ccf76ee036450a80da1f640f5d91fbee"
+    },
+    "bounded_private_dependency_cache": {
+      "files": 3708,
+      "uncompressed_bytes": 1499860416,
+      "archive_bytes": 482054328,
+      "archive_sha256": "ab140b503318036e9e30e50a2451370d883cbdf414eab5f4f8ed91b4ddb1abe3"
+    },
+    "reviewer_check": "Both local archive files were streamed through standard SHA256 hashing and match their published receipt digests. Receipts disclose local restore commands and availability changes. Full pre-compaction byte comparisons are producer records; reviewer did not restore or independently replay the compaction. The archive payloads/manifests remain local-only, while small receipts are committed.",
+    "scope": "Private external .olean.private dependency-cache availability was changed until restoration; preserve that distinction from owned research/partial proof checkpoints. Restore the documented caches before Mathlib work. No mathematical theorem, execution or runtime claim follows from compaction."
+  },
+  "retained_scope": [
+    "The same seven logical controls were requalified in phase11; this is not14 independent instances or an additional solver cohort.",
+    "The full81 inherited-history theorem and actual source-guard absorption remain open. The six-premise34 bound is conditional scalar arithmetic, with no full Rust/history/refinement, source admission or counter-complexity conclusion.",
+    "Original initial-budget normalization P0<=s and M0<=s is required by the written81 chain; source P0<=C*s alone does not fix81.",
+    "No new algorithm improvement, asymptotic result, challenge solve,84-case solve/comparison, L2 measurement or novelty clearance is claimed.",
+    "Focused Std-only checks do not discharge whole shared-library Mathlib/current-root CI or broader native-root checks.",
+    "The original62-path manifest remains a local snapshot receipt with absolute paths; it does not assert every local artifact/cache/primary-source payload was committed. This new manifest explicitly identifies committed publication paths.",
+    "Report PDF bytes and README scope are bound here; no new visual PDF inspection was performed by this reviewer."
+  ],
+  "important_hashes": {
+    "SHA256SUMS": "17480f488b3e04133c7a40d3aa3fb3f3b1801e865ee6ea9bdb38dab95f40dd3a",
+    "formal/CryptoLeanCore/TaperedPrecision.lean": "92e4300c71c4b1570ab193df4de22fe31b04a9d7ca0f0212191169555951989a",
+    "formal/PrecisionControls.lean": "3b7a406635eda2b7320241cfbc90ef8d06980dfba99ccd96ab2bc0269a7d1321",
+    "checks/SCALAR-REVIEW-01.json": "1ef3f1e5791b3b32baee7dc44befa8ccf411584eb8d3c80c762c21137ee4fbc9",
+    "checks/scalar-evidence-01.sha256": "a0790eb122901b6a8e7ae6b983d7e65e393faffce5c2fedee167c782021142ea",
+    "checks/PROOF-MAP-reviewed-snapshot.md": "b1bbd09729177b58bd6b3b8824a445fb5d685afbb70785914a22e45ec9a7f8a8",
+    "PROOF-MAP.md": "935fe830f97c4f9ba2d712fc04ba3ff08918f6f25c1c5be04b7b3f5e40d2b4c3",
+    "checks/qualification.json": "a363c284c4f49cceff051211ef93ffe8c5ff56c0980829e1644323a3efc20e37",
+    "checks/fresh-reproduction.json": "ff96e29cb3dd3ee5178f034016f670ad34a382f766e56a6236cefda972ce0002",
+    "checks/pcc-local-verdict.json": "2d73121ed73a4fecec0abafde08649e08985a82c06b563933985317fb6156863",
+    "checks/pcc-standing.json": "8083e3c0bd5f7a5ab80418a2c7b47a2e4ecab46a0949db31e0edc3ef1a0ea25a",
+    "checks/cache-compaction-receipt.json": "30231a5672d94f28e61a6c7c77a9633d130e96a0ff731d143d4c0ef3aea36634",
+    "checks/private-cache-compaction-receipt.json": "3da12f9a7fa3fee425504b419afdfad917872afd380a4438acb86ac8e2be827d",
+    "reproduction/check.sh": "b8b92cdbe482a3ba6c5f27b3c52a8374b6fa0a966f3a43a70b787aa8a42eed50",
+    "README.md": "d26abb342b08e7e2d7c48bb52007696dd1d2fcfa2f6e65c8ee05c8fba808ab95",
+    "report.pdf": "ebb359cef0a4b256ad8a8057129e39fae7887adc1430f962bf99a537faceca2f"
+  },
+  "publication_evidence_manifest": "publication-evidence-02.sha256",
+  "publication_evidence_manifest_sha256": "414369315beb1e637ddca1eebc9e5348cd0a8413e508af3428d519f21f12f1af"
+}

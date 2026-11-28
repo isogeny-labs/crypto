@@ -1,0 +1,89 @@
+{
+  "schema": "h116.frobenius-boundary-panel-protocol/v1",
+  "protocol_id": "H116-FROBENIUS-BOUNDARY-PANEL-001",
+  "status": "frozen-before-prospective-expansion",
+  "question": "Do retained full V-1 maps first differ from independently constructed normalized scalar [t-1] maps at coefficient (p-1)/2 with full-minus-scalar delta 2/(t-1)?",
+  "calibration": {
+    "source": "FROBENIUS_BOUNDARY_V2_RESULT.tsv",
+    "sha256": "d2efcf9d8eb20962b057e079be04a17e6e64d70b22a067b293a58950fb0bcad2",
+    "p": 31,
+    "first_difference": 15,
+    "delta": 10,
+    "prospective": false
+  },
+  "input_oracle": {
+    "path": "FORMAL_SCALAR_OOS_ORACLE.json",
+    "sha256": "8fb0dad351eb1b7948e42f553b6e9ff7f33ae91527e4bd09d8566ed767fe4eaf",
+    "construction": "separately frozen extension-field kernel walk and Velu map",
+    "previously_examined_prefix_length": 11
+  },
+  "prospective_cells": [
+    {
+      "slug": "fp211-r197-d4",
+      "p": 211,
+      "r": 197,
+      "source_a": 2,
+      "source_b": 24,
+      "trace": 15,
+      "scale_t_minus_one": 14,
+      "precision": 108,
+      "predicted_first_difference": 105,
+      "predicted_delta": 181
+    },
+    {
+      "slug": "fp241-r257-d4",
+      "p": 241,
+      "r": 257,
+      "source_a": 2,
+      "source_b": 4,
+      "trace": -15,
+      "scale_t_minus_one": 225,
+      "precision": 123,
+      "predicted_first_difference": 120,
+      "predicted_delta": 30
+    }
+  ],
+  "producer": {
+    "path": "h116_frobenius_boundary_panel.rs",
+    "sha256": "0cfc8232cfb9a1ddb9d24822163601074253604f52a09176a0b386f9fcdcde4a",
+    "scalar_construction": "division-polynomial recurrence",
+    "build": "rustc --edition=2021 -O -D warnings"
+  },
+  "independent_verifier": {
+    "path": "h116_frobenius_boundary_panel_verify.rs",
+    "sha256": "5ccfacafa0f80227a40d189e04aa75b6c717422bf3a66ab6af117a4b37df8f82",
+    "method": "exhaustive base-field point actions plus cleared polynomial identities; no division-polynomial construction",
+    "build": "rustc --edition=2021 -O -D warnings"
+  },
+  "positive_checks": [
+    "retained full map cleared curve identity",
+    "normalized scalar map cleared curve identity",
+    "scalar map action equals scaled x([t-1]P) on every affine base-field x-coordinate",
+    "full map action equals scaled x([t-2]P) on every affine base-field x-coordinate"
+  ],
+  "negative_controls": [
+    "omitting scalar target scaling must first differ at coefficient zero",
+    "wrong target scaling exponents must fail the cleared curve identity",
+    "adding one to the predicted-boundary numerator coefficient must first differ there and fail the curve identity",
+    "the verifier's wrong scalar action [t] must disagree on at least one base-field point"
+  ],
+  "acceptance": {
+    "primary": "both prospective cells equal their frozen first-difference and delta predictions",
+    "correctness": "all positive checks pass and every negative control rejects",
+    "failure_policy": "retain every row; do not replace a cell, precision, prediction, source, or input after execution"
+  },
+  "execution": {
+    "requested_route": "Iso Lab EKS Spot ordinary correctness run",
+    "cpu": 1,
+    "memory_gib": 2,
+    "deadline_minutes": 15,
+    "maximum_attempts": 1,
+    "dollar_ceiling": 0.10,
+    "timing_claim": false,
+    "result_path": "FROBENIUS_BOUNDARY_PANEL_RESULT.tsv",
+    "verification_path": "FROBENIUS_BOUNDARY_PANEL_VERIFY.json"
+  },
+  "claim_boundary": "A two-cell prospective mechanism test. It is not a growing-family complexity result or a construction of the missing elliptic formal-group instance.",
+  "filed_before_affected_data": true
+}
+

@@ -1,0 +1,15 @@
+name = "jv_local_multiplicity_audit"
+version = "0.1.0"
+defaultTargets = ["JVLocalMultiplicityAudit"]
+
+[[require]]
+name = "jv_graded_hilbert_audit"
+path = "../../jv_graded_hilbert_audit_20261114/lean"
+
+[[require]]
+name = "local_algebra_length_audit"
+path = "../../local_algebra_length_audit_20261114/lean"
+
+[[lean_lib]]
+name = "JVLocalMultiplicityAudit"
+roots = ["JVTailFlags", "JVOrigin", "JVLocalization", "JVCharts", "JVConePoints", "JVLocalCertificate"]

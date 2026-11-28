@@ -1,0 +1,118 @@
+{
+  "schema": "dickson.development_flow/v1",
+  "scope": "local software qualification only; canonical experiment export not validated",
+  "planned_suites": 4,
+  "attempted_suites": 4,
+  "completed_suites": 4,
+  "excluded_suites": 0,
+  "retries": 0,
+  "planned_arms": 12,
+  "completed_arms": 12,
+  "unrun_arms": 0,
+  "suites": [
+    {
+      "policy": "original",
+      "records": 37,
+      "exit": 0,
+      "stderr_bytes": 0,
+      "arms": [
+        {
+          "mode": "Direct",
+          "status": "recovered",
+          "calls": 9,
+          "incomplete_queries": 0
+        },
+        {
+          "mode": "Refined",
+          "status": "recovered",
+          "calls": 10,
+          "incomplete_queries": 0
+        },
+        {
+          "mode": "ProductionCofactorMsolve",
+          "status": "recovered",
+          "calls": 12,
+          "incomplete_queries": 5
+        }
+      ]
+    },
+    {
+      "policy": "lookup",
+      "records": 29,
+      "exit": 0,
+      "stderr_bytes": 0,
+      "arms": [
+        {
+          "mode": "Direct",
+          "status": "recovered",
+          "calls": 4,
+          "incomplete_queries": 0
+        },
+        {
+          "mode": "Refined",
+          "status": "recovered",
+          "calls": 4,
+          "incomplete_queries": 0
+        },
+        {
+          "mode": "ProductionCofactorMsolve",
+          "status": "recovered",
+          "calls": 4,
+          "incomplete_queries": 0
+        }
+      ]
+    },
+    {
+      "policy": "full",
+      "records": 20,
+      "exit": 0,
+      "stderr_bytes": 0,
+      "arms": [
+        {
+          "mode": "Direct",
+          "status": "recovered",
+          "calls": 2,
+          "incomplete_queries": 0
+        },
+        {
+          "mode": "Refined",
+          "status": "recovered",
+          "calls": 7,
+          "incomplete_queries": 0
+        },
+        {
+          "mode": "ProductionCofactorMsolve",
+          "status": "recovered",
+          "calls": 5,
+          "incomplete_queries": 3
+        }
+      ]
+    },
+    {
+      "policy": "full_lookup",
+      "records": 19,
+      "exit": 0,
+      "stderr_bytes": 0,
+      "arms": [
+        {
+          "mode": "Direct",
+          "status": "recovered",
+          "calls": 1,
+          "incomplete_queries": 0
+        },
+        {
+          "mode": "Refined",
+          "status": "recovered",
+          "calls": 4,
+          "incomplete_queries": 0
+        },
+        {
+          "mode": "ProductionCofactorMsolve",
+          "status": "recovered",
+          "calls": 1,
+          "incomplete_queries": 0
+        }
+      ]
+    }
+  ]
+}

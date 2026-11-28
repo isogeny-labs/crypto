@@ -1,0 +1,48 @@
+{
+  "schema": "crypto.experiment-protocol/v1-local-fallback",
+  "study_id": "EXP-SEMAEV-ORACLE-REPLACEMENTS-001",
+  "status": "frozen-before-measurement",
+  "date": "2026-11-17",
+  "claim_scope": "toy oracle-stage experiment; no ECDLP or rho speedup claim",
+  "command": [
+    "cargo",
+    "run",
+    "--release",
+    "--example",
+    "semaev_oracle_replacements",
+    "--",
+    "--p",
+    "251",
+    "--a",
+    "2",
+    "--b",
+    "3",
+    "--bounds",
+    "8,16,24,32"
+  ],
+  "fixed": {
+    "prime": 251,
+    "curve_a": 2,
+    "curve_b": 3,
+    "interval_bounds": [8, 16, 24, 32],
+    "targets": "all F_p",
+    "recurrence_train_fraction": "floor(2p/3)",
+    "control": "independent signed elliptic-curve group additions"
+  },
+  "predictions": {
+    "P1": "zero target-set disagreements and every returned tuple independently reaches its target",
+    "P2": "projection retains O(B^2) table/query class",
+    "P3": "compatibility interpolant degree >= 0.75p and support >= 0.50p",
+    "P4": "recurrence order >= 0.20p or holdout correctness < 0.90",
+    "P5": "Boolean saturation is not evidence of compression"
+  },
+  "amendments": [
+    {
+      "number": 1,
+      "date": "2026-11-17",
+      "timing": "before any measured run",
+      "change": "independently re-add every returned tuple under all sign choices"
+    }
+  ],
+  "canonical_schema_status": "unavailable: sibling autoresearcher checkout is encrypted VLT1 in this environment"
+}
