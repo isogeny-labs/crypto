@@ -1,0 +1,9 @@
+# Main-only native pair publication proposal
+
+The new workflow has only a manual dispatch trigger and both jobs require `refs/heads/main`. The build job has read-only contents permission and no AWS identity. It rechecks a frozen source/spec/protocol manifest, builds and tests the native trio from reviewed exact Git revisions, and transfers the artifact as data. The separate publication job checks the same-run artifact, exact main manifest and complete publisher policy before requesting the existing temporary OIDC role. It copies the checked executables into a pinned-base image and retains the immutable image receipt; it contains no experiment launch. [pcc:unverified]
+
+The committed `publish-inputs.json` has blocked status and null spec/protocol fields. Current dispatch therefore fails before source checkout/build/publication. A later reviewed main commit must freeze final source revisions and the exact spec/protocol hashes. The existing OIDC role's ECR permissions, actual trusted workflow execution and checkpoint admission are unverified. No image was built or published here. [pcc:unverified]
+
+Local checks parsed the workflow, verified the main-only and job-permission boundary, passed every embedded Bash syntax block and the pinned actionlint 1.7.12 release (archive SHA-256 `8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8`). The current manifest's frozen-status gate correctly rejects. Offline publisher tests accept a correct bundle and reject tampering before any AWS/Docker call. Complete local logs and source hashes are retained losslessly. `conductor check` exited 127 because the CLI is absent; no Conductor pass is claimed. [pcc:unverified]
+
+A scoped local `wire_workflows.py --check` did not finish its global artifact-selection scan and was interrupted; it is not reported as a pass. Hosted artifact/wiring qualification remains required. [pcc:unverified]

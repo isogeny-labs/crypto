@@ -32,6 +32,7 @@ pub const ROW_SCHEMA: &str = "hashed-ecdl-panel.run-row/v1";
 pub const ANALYSIS_SCHEMA: &str = "hashed-ecdl-panel.analysis/v1";
 const RECEIPT_SCHEMA: &str = "hashed-ecdl-tensor/v1";
 const PANEL_SCHEMA: &str = "hashed-ecdl-panel/v1";
+pub const FRESH_PANEL_SCHEMA: &str = "hashed-ecdl-panel/v2";
 const RECEIPT_LIMIT: u64 = 16 * 1024 * 1024;
 /// Frozen protocol minimums (PROTOCOL.md "Measurement and execution").
 pub const MIN_AA_ROUNDS: usize = 5;
@@ -75,6 +76,7 @@ pub struct Manifest {
     pub execution: String,
     pub measurements: Value,
     pub cases: Vec<ManifestCase>,
+    pub seed_manifest_sha256: Option<String>,
 }
 json_record!(
     Manifest,
@@ -93,7 +95,9 @@ json_record!(
         measurements,
         cases
     },
-    optional {}
+    optional {
+        seed_manifest_sha256
+    }
 );
 
 /// The union of the baseline and candidate runners' problem fields. The
@@ -263,10 +267,14 @@ pub fn parse_sha256_list(text: &str) -> Result<BTreeMap<String, String>> {
     Ok(map)
 }
 
-/// `sha256sum`-format list of a prepared panel: manifest.json and every
-/// problems/*.json, sorted bytewise by path. Other files are not inputs.
+/// `sha256sum`-format list of a prepared panel: manifest.json, every
+/// problems/*.json, and the v2 seed manifest, sorted bytewise by path.
 pub fn hash_list(panel: &Path) -> Result<String> {
     let mut paths = vec![String::from("manifest.json")];
+    let manifest: Manifest = serde_json::from_slice(&fs::read(panel.join("manifest.json"))?)?;
+    if manifest.schema == FRESH_PANEL_SCHEMA {
+        paths.push(String::from("seed-manifest.json"));
+    }
     for entry in fs::read_dir(panel.join("problems"))? {
         let name = entry?
             .file_name()
@@ -500,6 +508,96 @@ pub struct Validation {
     pub scalar: Option<String>,
     pub certificate_sha256: Option<String>,
     pub diagnostics: Value,
+}
+
+/// Check the optimized arm's informational recorder before using its phase
+/// data in a matched panel. Certificate correctness is checked separately.
+fn validate_native_metrics(diagnostics: &Value, solve_wall_ns: u128) -> Result<Value> {
+    let native = &diagnostics["native_metrics"];
+    if !native
+        .as_object()
+        .is_some_and(|object| object.contains_key("calibrated_total_operations"))
+    {
+        return Err("missing explicit native calibration status".into());
+    }
+    if native["schema"] != "hashed-ecdl.native-metrics/v1"
+        || native["online_start_phase"] != "target_validation"
+        || !native["calibrated_total_operations"].is_null()
+    {
+        return Err("native metric identity or calibration status differs".into());
+    }
+    let online = native["online_phases_ns"]
+        .as_object()
+        .ok_or("missing native online phase map")?;
+    const PHASES: [&str; 5] = [
+        "target_validation",
+        "target_query",
+        "target_PDP",
+        "target_relation_check",
+        "target_recovery_check",
+    ];
+    if online.len() != PHASES.len() {
+        return Err("native online phase map is not the five-phase partition".into());
+    }
+    let mut online_sum = 0u64;
+    for name in PHASES {
+        let value = online
+            .get(name)
+            .and_then(Value::as_u64)
+            .ok_or("missing or invalid native online phase")?;
+        online_sum = online_sum
+            .checked_add(value)
+            .ok_or("native online phase sum overflow")?;
+    }
+    let online_wall = native["online_wall_ns"]
+        .as_u64()
+        .ok_or("missing native online wall time")?;
+    if online_sum != online_wall {
+        return Err("native online phases do not sum to online wall time".into());
+    }
+    let phases = native["phases"]
+        .as_object()
+        .ok_or("missing native cold phase map")?;
+    if !phases.contains_key("setup") || !phases.contains_key("factor_base") {
+        return Err("native cold phases omit setup or factor base".into());
+    }
+    let mut cold_wall = 0u64;
+    let mut charged_steps = 0u64;
+    for phase in phases.values() {
+        for field in ["adds", "doubles", "scalar_mults"] {
+            if phase[field].as_u64().is_none() {
+                return Err("native group counter is missing or invalid".into());
+            }
+        }
+        cold_wall = cold_wall
+            .checked_add(
+                phase["wall_ns"]
+                    .as_u64()
+                    .ok_or("invalid native phase clock")?,
+            )
+            .ok_or("native cold phase sum overflow")?;
+        charged_steps = charged_steps
+            .checked_add(
+                phase["meter_steps"]
+                    .as_u64()
+                    .ok_or("invalid native meter counter")?,
+            )
+            .ok_or("native meter sum overflow")?;
+    }
+    if cold_wall < online_wall || u128::from(cold_wall) > solve_wall_ns {
+        return Err("native cold clock falls outside the process interval".into());
+    }
+    if diagnostics["charged_steps"].as_u64() != Some(charged_steps) {
+        return Err("native meter sum differs from the solve receipt".into());
+    }
+    Ok(json!({
+        "schema": "hashed-ecdl-panel.native-metrics/v1",
+        "online_phases_ns": online,
+        "online_wall_ns": online_wall,
+        "internal_cold_wall_ns": cold_wall,
+        "charged_steps": charged_steps,
+        "calibrated_total_operations": Value::Null,
+    }))
 }
 
 /// Validate one receipt against its input problem and manifest entry. The
@@ -749,6 +847,9 @@ pub struct RunOptions {
     pub inputs_sha256: PathBuf,
     pub baseline: PathBuf,
     pub candidate: PathBuf,
+    /// One immutable options file shared by both optimized arms. None keeps
+    /// the frozen legacy `solve` command and its original row semantics.
+    pub optimized_options: Option<PathBuf>,
     pub out: PathBuf,
     pub seed: u64,
     pub aa_rounds: usize,
@@ -776,8 +877,10 @@ pub fn load_panel(panel: &Path, hashes: &Path) -> Result<LoadedPanel> {
         return Err("manifest.json is not pinned by the input hash list".into());
     }
     let manifest: Manifest = serde_json::from_slice(&manifest_bytes)?;
-    if manifest.schema != PANEL_SCHEMA || manifest.status != "prepared" {
-        return Err("manifest schema/status is not a prepared hashed-ecdl-panel/v1".into());
+    if !matches!(manifest.schema.as_str(), PANEL_SCHEMA | FRESH_PANEL_SCHEMA)
+        || manifest.status != "prepared"
+    {
+        return Err("manifest schema/status is not a prepared hashed-ecdl-panel/v1 or v2".into());
     }
     let mut ids = BTreeSet::new();
     let mut problems = Vec::new();
@@ -806,6 +909,49 @@ pub fn load_panel(panel: &Path, hashes: &Path) -> Result<LoadedPanel> {
         let problem: PanelProblem = serde_json::from_slice(&bytes)?;
         problems.push((problem, hash, path));
     }
+    if manifest.schema == FRESH_PANEL_SCHEMA {
+        let seed_bytes = fs::read(panel.join("seed-manifest.json"))?;
+        let seed_hash = sha256_hex(&seed_bytes);
+        if manifest.seed_manifest_sha256.as_deref() != Some(seed_hash.as_str())
+            || pinned.get("seed-manifest.json") != Some(&seed_hash)
+        {
+            return Err(
+                "fresh seed manifest is not pinned by both panel manifest and input hash list"
+                    .into(),
+            );
+        }
+        let seeds: Value = serde_json::from_slice(&seed_bytes)?;
+        if seeds["schema"] != "point-index-fresh-seeds/v1"
+            || seeds["cases"].as_array().map(Vec::len) != Some(manifest.cases.len())
+            || seeds["schedule_seeds"].as_array().map(Vec::len) != Some(3)
+        {
+            return Err("fresh seed manifest has unexpected schema or panel dimensions".into());
+        }
+        let mut unique_seeds = BTreeSet::new();
+        for ((case, (problem, _, _)), row) in manifest
+            .cases
+            .iter()
+            .zip(&problems)
+            .zip(seeds["cases"].as_array().unwrap())
+        {
+            let seed = row["fixture_seed"]
+                .as_u64()
+                .ok_or("fresh seed manifest has a missing fixture seed")?;
+            if row["id"] != case.id
+                || row["split"] != case.split
+                || row["expected_scalar"] != case.expected_scalar
+                || row["curve_p"].as_u64().map(|p| p.to_string()).as_deref()
+                    != Some(problem.p.as_str())
+                || problem.fixture_seed != Some(seed)
+                || !unique_seeds.insert(seed)
+                || matches!(seed, 1..=10 | 101..=104)
+            {
+                return Err("fresh seed manifest differs from the public problem panel".into());
+            }
+        }
+    } else if manifest.seed_manifest_sha256.is_some() {
+        return Err("v1 panel cannot claim a fresh seed manifest".into());
+    }
     Ok(LoadedPanel {
         manifest,
         manifest_sha256,
@@ -815,6 +961,22 @@ pub fn load_panel(panel: &Path, hashes: &Path) -> Result<LoadedPanel> {
 
 fn absolute(path: &Path) -> Result<PathBuf> {
     Ok(fs::canonicalize(path)?)
+}
+
+fn solve_args<'a>(
+    problem: &'a Path,
+    receipt: &'a Path,
+    optimized_options: Option<&'a Path>,
+) -> Vec<&'a Path> {
+    match optimized_options {
+        Some(options) => vec![
+            Path::new("solve-hashed-optimized"),
+            problem,
+            options,
+            receipt,
+        ],
+        None => vec![Path::new("solve"), problem, receipt],
+    }
 }
 
 /// Execute the schedule; rows stream to `rows.jsonl` as they finish, so a
@@ -840,8 +1002,17 @@ pub fn run(options: &RunOptions) -> Result<Value> {
     if selected.iter().collect::<BTreeSet<_>>().len() != selected.len() {
         return Err("--cases lists a case id more than once".into());
     }
+    let source_freeze_pending = panel.manifest.schema == FRESH_PANEL_SCHEMA
+        && (panel.manifest.baseline == "pending-final-source-freeze"
+            || panel.manifest.paired_baseline == "pending-final-source-freeze");
+    if source_freeze_pending && !options.allow_incomplete_panel {
+        return Err(
+            "fresh panel needs a reviewed final source freeze before a complete run".into(),
+        );
+    }
     let protocol_complete = options.cases.is_none()
         && panel.manifest.cases.len() == PANEL_CASES
+        && !source_freeze_pending
         && options.aa_rounds >= MIN_AA_ROUNDS
         && options.ab_rounds >= MIN_AB_ROUNDS.max(PROTOCOL_REPETITIONS)
         && options.deadline.as_secs() <= PROTOCOL_DEADLINE_SECS;
@@ -852,6 +1023,17 @@ pub fn run(options: &RunOptions) -> Result<Value> {
     let candidate = absolute(&options.candidate)?;
     let baseline_sha = file_sha256(&baseline)?;
     let candidate_sha = file_sha256(&candidate)?;
+    let optimized_options = options
+        .optimized_options
+        .as_ref()
+        .map(|path| {
+            let path = absolute(path)?;
+            let bytes = fs::read(&path)?;
+            let policy: hashed_ecdl_tensor::optimized::Options = serde_json::from_slice(&bytes)?;
+            policy.validate()?;
+            Ok::<_, Box<dyn std::error::Error>>((path, sha256_hex(&bytes)))
+        })
+        .transpose()?;
     fs::create_dir(&options.out)?;
     for sub in ["receipts", "logs"] {
         fs::create_dir(options.out.join(sub))?;
@@ -893,12 +1075,15 @@ pub fn run(options: &RunOptions) -> Result<Value> {
             "position": execution.position, "slot": execution.slot,
             "pair_member": execution.pair_member, "arm": execution.arm(),
             "binary_sha256": binary_sha, "case_id": case.id, "split": case.split,
-            "problem_sha256": problem_sha, "command": "solve",
+            "problem_sha256": problem_sha,
+            "command": if optimized_options.is_some() { "solve-hashed-optimized" } else { "solve" },
+            "optimized_options_sha256": optimized_options.as_ref().map(|(_, hash)| hash),
             "status": Value::Null, "reason": Value::Null, "exit_code": Value::Null,
             "solve_wall_ns": Value::Null, "limit_ms": Value::Null,
             "replay_status": Value::Null, "replay_wall_ns": Value::Null,
             "checks": Checks::default().json(), "scalar": Value::Null,
             "certificate_sha256": Value::Null, "meter_diagnostics": Value::Null,
+            "native_metrics": Value::Null, "native_metrics_check": Value::Null,
             "phase_ns": phase_ns(None),
             "unpriced_common_operations": Value::Null, "s_over_rho": Value::Null,
         });
@@ -909,9 +1094,14 @@ pub fn run(options: &RunOptions) -> Result<Value> {
             let limit = options.case_limit.min(remaining);
             row["limit_ms"] = json!(limit.as_millis() as u64);
             let logs = options.out.join("logs");
+            let command = solve_args(
+                problem_path,
+                &receipt_path,
+                optimized_options.as_ref().map(|(path, _)| path.as_path()),
+            );
             let outcome = run_child(
                 binary,
-                &[Path::new("solve"), problem_path, &receipt_path],
+                &command,
                 &logs.join(format!("{stem}.solve.out")),
                 &logs.join(format!("{stem}.solve.err")),
                 limit,
@@ -945,6 +1135,10 @@ pub fn run(options: &RunOptions) -> Result<Value> {
                 let remaining = options.deadline.saturating_sub(started.elapsed());
                 if remaining.is_zero() {
                     row["replay_status"] = json!("not_run_deadline");
+                    if row["status"] == "validated" {
+                        row["status"] = json!("not_run_deadline");
+                        row["reason"] = json!("deadline elapsed before arm replay");
+                    }
                 } else {
                     let replay = run_child(
                         binary,
@@ -966,18 +1160,41 @@ pub fn run(options: &RunOptions) -> Result<Value> {
                     }
                 }
             }
+            if optimized_options.is_some() && row["status"] == "validated" {
+                match validate_native_metrics(
+                    &row["meter_diagnostics"],
+                    outcome.wall_ns.unwrap_or(0),
+                ) {
+                    Ok(summary) => {
+                        row["native_metrics_check"] = json!("validated");
+                        row["native_metrics"] = summary;
+                        row["phase_ns"]["accounting"] =
+                            json!("native metrics validated separately; legacy stage mapping remains null");
+                    }
+                    Err(error) => {
+                        row["native_metrics_check"] = json!("rejected");
+                        row["status"] = json!("rejected");
+                        row["reason"] = json!(format!("native metrics: {error}"));
+                    }
+                }
+            }
         }
         writeln!(rows_file, "{}", serde_json::to_string(&row)?)?;
         rows_file.sync_data()?;
         rows.push(row);
     }
-    // Binaries must not change under the driver.
+    // Neither arm nor its shared policy may change under the driver.
     let binaries_unchanged =
         file_sha256(&baseline)? == baseline_sha && file_sha256(&candidate)? == candidate_sha;
+    let options_unchanged = optimized_options.as_ref().map_or(true, |(path, hash)| {
+        file_sha256(path).ok().as_ref() == Some(hash)
+    });
     let mut analysis = analyze(&rows);
     analysis["label"] = json!(options.label);
     analysis["protocol_complete"] = json!(protocol_complete);
-    analysis["evidence_class"] = json!(if protocol_complete {
+    analysis["evidence_class"] = json!(if !binaries_unchanged || !options_unchanged {
+        "invalid_mutated_arm_or_policy"
+    } else if protocol_complete {
         "protocol_schedule_requires_external_L2_admission"
     } else {
         "diagnostic_incomplete_panel"
@@ -989,7 +1206,8 @@ pub fn run(options: &RunOptions) -> Result<Value> {
     });
     analysis["arms"] = json!({
         "baseline_sha256": baseline_sha, "candidate_sha256": candidate_sha,
-        "unchanged_after_run": binaries_unchanged,
+        "optimized_options_sha256": optimized_options.as_ref().map(|(_, hash)| hash),
+        "unchanged_after_run": binaries_unchanged && options_unchanged,
     });
     analysis["schedule"] = json!({
         "seed": options.seed.to_string(), "aa_rounds": options.aa_rounds,
@@ -1007,11 +1225,17 @@ pub fn run(options: &RunOptions) -> Result<Value> {
     if !binaries_unchanged {
         return Err("an arm binary changed during the run; analysis retained but invalid".into());
     }
+    if !options_unchanged {
+        return Err(
+            "optimized options changed during the run; analysis retained but invalid".into(),
+        );
+    }
     Ok(analysis)
 }
 
-/// The arm binaries expose no internal phase timers. Only the separately
-/// spawned replay is a disjoint phase; the rest stay null rather than guessed.
+/// Legacy arm binaries expose no internal phase timers. Optimized metrics are
+/// checked and stored separately; the original stage map stays null rather
+/// than assigning the new native buckets to different historical stages.
 fn phase_ns(replay: Option<u128>) -> Value {
     json!({
         "accounting": "arm_binaries_expose_no_phase_timers; solve_wall_ns covers setup through extraction",
@@ -1166,13 +1390,14 @@ fn value<'a>(args: &'a [String], i: &mut usize, flag: &str) -> Result<&'a str> {
         .ok_or_else(|| format!("{flag} needs a value").into())
 }
 
-pub const USAGE: &str = "usage: hashed-ecdl-panel run --panel DIR --inputs-sha256 FILE --baseline BIN --candidate BIN --out NEW_DIR --seed U64 --case-limit-secs S [--deadline-secs 1800] [--aa-rounds 5] [--ab-rounds 5] [--cases ID,ID] [--label TEXT] [--allow-incomplete-panel]\n       hashed-ecdl-panel analyze ROWS.jsonl\n       hashed-ecdl-panel hash PANEL_DIR";
+pub const USAGE: &str = "usage: hashed-ecdl-panel run --panel DIR --inputs-sha256 FILE --baseline BIN --candidate BIN --out NEW_DIR --seed U64 --case-limit-secs S [--optimized-options FILE] [--deadline-secs 1800] [--aa-rounds 5] [--ab-rounds 5] [--cases ID,ID] [--label TEXT] [--allow-incomplete-panel]\n       hashed-ecdl-panel analyze ROWS.jsonl\n       hashed-ecdl-panel hash PANEL_DIR";
 
 pub fn cli_run(args: &[String]) -> Result<()> {
     let mut panel = None;
     let mut hashes = None;
     let mut baseline = None;
     let mut candidate = None;
+    let mut optimized_options = None;
     let mut out = None;
     let mut seed = None;
     let mut case_limit = None;
@@ -1190,6 +1415,9 @@ pub fn cli_run(args: &[String]) -> Result<()> {
             "--inputs-sha256" => hashes = Some(PathBuf::from(value(args, &mut i, flag)?)),
             "--baseline" => baseline = Some(PathBuf::from(value(args, &mut i, flag)?)),
             "--candidate" => candidate = Some(PathBuf::from(value(args, &mut i, flag)?)),
+            "--optimized-options" => {
+                optimized_options = Some(PathBuf::from(value(args, &mut i, flag)?))
+            }
             "--out" => out = Some(PathBuf::from(value(args, &mut i, flag)?)),
             "--seed" => seed = Some(value(args, &mut i, flag)?.parse::<u64>()?),
             "--case-limit-secs" => case_limit = Some(value(args, &mut i, flag)?.parse::<f64>()?),
@@ -1220,6 +1448,7 @@ pub fn cli_run(args: &[String]) -> Result<()> {
         inputs_sha256: hashes.ok_or_else(|| missing("--inputs-sha256"))?,
         baseline: baseline.ok_or_else(|| missing("--baseline"))?,
         candidate: candidate.ok_or_else(|| missing("--candidate"))?,
+        optimized_options,
         out: out.ok_or_else(|| missing("--out"))?,
         seed: seed.ok_or_else(|| missing("--seed"))?,
         aa_rounds: aa,
@@ -1264,6 +1493,81 @@ pub fn cli_analyze(args: &[String]) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn native_metrics_require_five_exclusive_phases_and_explicit_unpriced_cost() {
+        let phase = |wall_ns, meter_steps| {
+            json!({
+                "adds": 0, "doubles": 0, "scalar_mults": 0,
+                "meter_steps": meter_steps, "wall_ns": wall_ns,
+            })
+        };
+        let valid = json!({
+            "charged_steps": 6,
+            "native_metrics": {
+                "schema": "hashed-ecdl.native-metrics/v1",
+                "online_start_phase": "target_validation",
+                "online_wall_ns": 5,
+                "online_phases_ns": {
+                    "target_validation": 1, "target_query": 1, "target_PDP": 1,
+                    "target_relation_check": 1, "target_recovery_check": 1,
+                },
+                "phases": {
+                    "setup": phase(3, 1), "factor_base": phase(2, 2),
+                    "target_validation": phase(1, 1),
+                    "relation_search": phase(2, 1),
+                    "recovery_check": phase(2, 1),
+                },
+                "calibrated_total_operations": null,
+            },
+        });
+        let summary = validate_native_metrics(&valid, 20).unwrap();
+        assert_eq!(summary["internal_cold_wall_ns"], 10);
+        assert_eq!(summary["online_wall_ns"], 5);
+        assert!(summary["calibrated_total_operations"].is_null());
+        assert!(validate_native_metrics(&valid, 9).is_err());
+        let mut bad = valid.clone();
+        bad["native_metrics"]["online_phases_ns"]["target_PDP"] = json!(2);
+        assert!(validate_native_metrics(&bad, 20).is_err());
+        let mut bad = valid.clone();
+        bad["native_metrics"]["online_phases_ns"]
+            .as_object_mut()
+            .unwrap()
+            .remove("target_PDP");
+        assert!(validate_native_metrics(&bad, 20).is_err());
+        let mut bad = valid.clone();
+        bad["native_metrics"]["phases"]["factor_base"]["meter_steps"] = json!(3);
+        assert!(validate_native_metrics(&bad, 20).is_err());
+        let mut bad = valid.clone();
+        bad["native_metrics"]
+            .as_object_mut()
+            .unwrap()
+            .remove("calibrated_total_operations");
+        assert!(validate_native_metrics(&bad, 20).is_err());
+        let mut bad = valid;
+        bad["native_metrics"]["calibrated_total_operations"] = json!(5);
+        assert!(validate_native_metrics(&bad, 20).is_err());
+    }
+
+    #[test]
+    fn optimized_panel_uses_the_same_policy_for_either_arm() {
+        let problem = Path::new("problem.json");
+        let receipt = Path::new("receipt.json");
+        let options = Path::new("options.json");
+        assert_eq!(
+            solve_args(problem, receipt, Some(options)),
+            [
+                Path::new("solve-hashed-optimized"),
+                problem,
+                options,
+                receipt,
+            ]
+        );
+        assert_eq!(
+            solve_args(problem, receipt, None),
+            [Path::new("solve"), problem, receipt]
+        );
+    }
 
     #[test]
     fn sha256_matches_fips_vectors() {

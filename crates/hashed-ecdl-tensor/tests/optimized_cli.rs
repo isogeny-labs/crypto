@@ -71,6 +71,34 @@ fn success(result: &Output) {
     );
 }
 
+fn assert_native_metrics(receipt: &Value) {
+    let metrics = &receipt["diagnostics"]["native_metrics"];
+    assert_eq!(metrics["schema"], "hashed-ecdl.native-metrics/v1");
+    assert_eq!(metrics["online_start_phase"], "target_validation");
+    assert!(metrics["calibrated_total_operations"].is_null());
+    let phases = metrics["phases"].as_object().unwrap();
+    assert!(phases["factor_base"]["meter_steps"].as_u64().unwrap() > 0);
+    let total = metrics["online_wall_ns"].as_u64().unwrap();
+    assert_eq!(
+        metrics["online_phases_ns"]
+            .as_object()
+            .unwrap()
+            .values()
+            .map(|n| n.as_u64().unwrap())
+            .sum::<u64>(),
+        total
+    );
+    for name in [
+        "target_validation",
+        "target_query",
+        "target_PDP",
+        "target_relation_check",
+        "target_recovery_check",
+    ] {
+        assert!(metrics["online_phases_ns"][name].is_u64(), "missing {name}");
+    }
+}
+
 #[test]
 fn default_options_match_the_old_joint_receipt_and_replay() {
     let fixture = Fixture::new();
@@ -94,6 +122,7 @@ fn default_options_match_the_old_joint_receipt_and_replay() {
     assert!(receipt["diagnostics"]["statistics"].is_object());
     assert_eq!(receipt["diagnostics"]["scalar_decimal"], "3");
     assert!(receipt["diagnostics"]["charged_steps"].as_u64().unwrap() > 0);
+    assert_native_metrics(&receipt);
     success(&fixture.verify(&output));
 
     let old_output = fixture.path("old-joint.json");
@@ -134,6 +163,7 @@ fn all_five_options_produce_a_v1_receipt_with_effective_configuration() {
     assert_eq!(receipt["certificate"]["version"], 1);
     assert_eq!(receipt["diagnostics"]["options"], configured);
     assert_eq!(receipt["diagnostics"]["scalar_decimal"], "3");
+    assert_native_metrics(&receipt);
     success(&fixture.verify(&output));
 }
 
