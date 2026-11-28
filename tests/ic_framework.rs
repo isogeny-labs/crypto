@@ -121,7 +121,7 @@ fn verbosity_selects_relations_coordinates_and_failed_attempts() {
         ("-vvv", true, true),
     ] {
         let file = path();
-        let output = Command::new(env!("CARGO_BIN_EXE_ic"))
+        let output = Command::new(ic_binary())
             .args(args)
             .arg(flag)
             .arg("--out")
@@ -171,7 +171,7 @@ fn pluggable_bench_streams_equations_and_keeps_json_clean() {
         "--max-trials",
         "10000",
     ];
-    let output = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let output = Command::new(ic_binary())
         .args(args)
         .arg("-v")
         .output()

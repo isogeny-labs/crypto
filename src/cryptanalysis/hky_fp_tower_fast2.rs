@@ -55,6 +55,7 @@ use std::time::Instant;
 
 use rayon::prelude::*;
 
+use crate::cryptanalysis::fp_gemm;
 use crate::cryptanalysis::hky_fp_tower::{
     count_monomials, Closure, FallDegrees, HkyLimits, HkyRing, NfPoly,
 };
@@ -163,7 +164,10 @@ impl Default for Fast2Options {
             batch_min: 32,
             batch_max: 256,
             target_pivots: 32,
-            interreduce: 0.25,
+            // 0.65 with lead-cover skip + κ-wave batches: E2LOCMS45 P2 ≈33–52s
+            // / ~88B muladds (was ~153s / 1.17T before κ-waves; baseline 620.6s /
+            // 4.45T), P1 ≈2.3s; closures without 1 verify_closed clean.
+            interreduce: 0.65,
             interreduce_min: 256,
             interreduce_block: 256,
             rebucket: true,
@@ -176,10 +180,13 @@ impl Default for Fast2Options {
             deg_weight: 1,
             np_epochs: true,
             sweep: true,
-            sweep_ratio: 4,
+            sweep_ratio: 1,
             sweep_tile_bytes: 1 << 20,
             sweep_max_words: 1 << 28,
-            skip: false,
+            // Lead-cover skip is exact (PROOF.md). Forming products in
+            // ascending-κ waves within a batch lets a cover mint skip a
+            // higher-κ sibling before it is formed (same span, fewer products).
+            skip: true,
             skip_order: 1,
             skip_witness: 1,
             skip_witness_max: 0,
@@ -552,6 +559,8 @@ struct Ctx {
     p2: u64,
     barrett_m: u64,
     simd: Simd,
+    gemm_simd: fp_gemm::GemmSimd,
+    use_gemm: bool,
     bitmap: bool,
 }
 
@@ -742,6 +751,1019 @@ impl Echelon {
         for (j, &c) in self.np_cols.iter().enumerate() {
             self.of_col[c as usize] = j as u32;
         }
+    }
+
+    /// Fused interreduction + new epoch using blocked triangular back-substitution
+    /// and exact-integer `f64` AVX-512/AVX2 GEMM (`C -= A * B mod p`).
+    /// Mathematically identical to row-by-row `reduce_tail` followed by `new_epoch`.
+    fn interreduce_and_epoch_gemm(&mut self, cx: &Ctx, dense: (usize, usize)) -> (u64, u64) {
+        let m_old = self.np_cols.len();
+        let mut p_new_cols: Vec<u32> = Vec::new();
+        let mut p_new_rows: Vec<usize> = Vec::new();
+        let mut j_to_p = vec![NONE; m_old];
+        let mut np_next: Vec<u32> = Vec::with_capacity(m_old);
+        let mut j_to_np = vec![NONE; m_old];
+
+        for (j, &c) in self.np_cols.iter().enumerate() {
+            let piv = self.pivot[c as usize];
+            if piv != NONE {
+                j_to_p[j] = p_new_cols.len() as u32;
+                p_new_cols.push(c);
+                p_new_rows.push(piv as usize);
+            } else {
+                j_to_np[j] = np_next.len() as u32;
+                np_next.push(c);
+            }
+        }
+        let k_tot = p_new_cols.len();
+        let m_next = np_next.len();
+        if k_tot == 0 {
+            return (0, 0);
+        }
+
+        let p = cx.p;
+        let bm = cx.barrett_m;
+        let simd = cx.gemm_simd;
+        let nr = fp_gemm::nr_for(simd);
+        let k_safe = fp_gemm::k_safe_f64(p);
+        let kc_max = 256usize.min(k_safe);
+        let nc_tile = (240usize.div_ceil(nr) * nr).max(nr);
+        let (d_num, d_den) = dense;
+
+        let start_next = |lead: u32| np_next.partition_point(|&c| c <= lead);
+        let start_old = |lead: u32| self.np_cols.partition_point(|&c| c <= lead);
+
+        let make_row_next = |lead: u32, mut terms: Row| -> RowS {
+            let s = start_next(lead);
+            let span = 1 + m_next - s;
+            if terms.len() * d_den > span * d_num {
+                let mut v = vec![0u32; span];
+                v[0] = 1;
+                for &(nj, x) in &terms[1..] {
+                    v[1 + nj as usize - s] = x;
+                }
+                RowS::Dense {
+                    lead,
+                    v,
+                    nnz: terms.len() as u32,
+                }
+            } else {
+                terms.shrink_to_fit();
+                RowS::Sparse(terms)
+            }
+        };
+
+        let prof = std::env::var_os("HKY3_PROF").is_some();
+        let t_ir0 = Instant::now();
+        let mut is_new_piv = vec![false; self.rows.len()];
+        for &ri in &p_new_rows {
+            is_new_piv[ri] = true;
+        }
+
+        let mut total_ops = 0u64;
+        let mut total_changed = 0u64;
+
+        // Phase A: back-substitute the `k_tot` new pivots in reverse blocks of TB=128
+        // into `b_rows[0..k_tot]` (in `NP_next` coordinates).
+        let mut b_rows: Vec<RowS> = (0..k_tot).map(|_| RowS::Sparse(Vec::new())).collect();
+        const TB: usize = 128;
+        let mut b1 = k_tot;
+        while b1 > 0 {
+            let b0 = b1.saturating_sub(TB);
+            let bs = b1 - b0;
+            let col0 = start_next(p_new_cols[b0]);
+            let w_all = m_next - col0;
+
+            let mut a_diag: Vec<Vec<(usize, u32)>> = vec![Vec::new(); bs];
+            let mut a_ext: Vec<Vec<(usize, u32)>> = vec![Vec::new(); bs];
+            let mut init_np: Vec<Vec<(usize, u32)>> = vec![Vec::new(); bs];
+            let mut any_dense_ext = false;
+            let mut block_ops = 0u64;
+
+            for i in 0..bs {
+                let ri = p_new_rows[b0 + i];
+                let row = &self.rows[ri];
+                match row {
+                    RowS::Sparse(r) => {
+                        for &(j, x) in &r[1..] {
+                            let pk = j_to_p[j as usize];
+                            if pk != NONE {
+                                let pku = pk as usize;
+                                if pku < b1 {
+                                    a_diag[i].push((pku - b0, x));
+                                } else {
+                                    if matches!(b_rows[pku], RowS::Dense { .. }) {
+                                        any_dense_ext = true;
+                                    }
+                                    block_ops += b_rows[pku].nnz() as u64;
+                                    a_ext[i].push((pku, x));
+                                }
+                            } else {
+                                init_np[i].push((j_to_np[j as usize] as usize - col0, x));
+                            }
+                        }
+                    }
+                    RowS::Dense { lead, v, .. } => {
+                        let s = start_old(*lead);
+                        for (off_i, &x) in v[1..].iter().enumerate() {
+                            if x == 0 {
+                                continue;
+                            }
+                            let j = s + off_i;
+                            let pk = j_to_p[j];
+                            if pk != NONE {
+                                let pku = pk as usize;
+                                if pku < b1 {
+                                    a_diag[i].push((pku - b0, x));
+                                } else {
+                                    if matches!(b_rows[pku], RowS::Dense { .. }) {
+                                        any_dense_ext = true;
+                                    }
+                                    block_ops += b_rows[pku].nnz() as u64;
+                                    a_ext[i].push((pku, x));
+                                }
+                            } else {
+                                init_np[i].push((j_to_np[j] as usize - col0, x));
+                            }
+                        }
+                    }
+                }
+                if !a_diag[i].is_empty() || !a_ext[i].is_empty() {
+                    total_changed += 1;
+                }
+            }
+            total_ops += block_ops;
+
+            if w_all == 0 {
+                for i in 0..bs {
+                    b_rows[b0 + i] = RowS::Sparse(vec![(p_new_cols[b0 + i], 1)]);
+                }
+                b1 = b0;
+                continue;
+            }
+
+            // Fast sparse path when no dense external pivots exist and total block work is tiny.
+            if !any_dense_ext && block_ops < (w_all as u64) * 8 {
+                let mut acc = vec![0u64; w_all];
+                let mut touched: Vec<usize> = Vec::new();
+                for i in (0..bs).rev() {
+                    touched.clear();
+                    for &(col_rel, x) in &init_np[i] {
+                        if acc[col_rel] == 0 {
+                            touched.push(col_rel);
+                        }
+                        acc[col_rel] += u64::from(x);
+                    }
+                    let mut apply_sp = |b_row: &RowS, x: u32| {
+                        let f = p - u64::from(x);
+                        match b_row {
+                            RowS::Sparse(r) => {
+                                for &(nj, val) in &r[1..] {
+                                    let c = nj as usize - col0;
+                                    if acc[c] == 0 {
+                                        touched.push(c);
+                                    }
+                                    let t = acc[c] + f * u64::from(val);
+                                    acc[c] = t.min(t.wrapping_sub(cx.p2));
+                                }
+                            }
+                            RowS::Dense { lead, v, .. } => {
+                                let s = start_next(*lead) - col0;
+                                for (k_off, &val) in v[1..].iter().enumerate() {
+                                    if val != 0 {
+                                        let c = s + k_off;
+                                        if acc[c] == 0 {
+                                            touched.push(c);
+                                        }
+                                        let t = acc[c] + f * u64::from(val);
+                                        acc[c] = t.min(t.wrapping_sub(cx.p2));
+                                    }
+                                }
+                            }
+                        }
+                    };
+                    for &(pku, x) in &a_ext[i] {
+                        apply_sp(&b_rows[pku], x);
+                    }
+                    for &(jl, x) in &a_diag[i] {
+                        total_ops += b_rows[b0 + jl].nnz() as u64;
+                        apply_sp(&b_rows[b0 + jl], x);
+                    }
+                    touched.sort_unstable();
+                    touched.dedup();
+                    let lead = p_new_cols[b0 + i];
+                    let mut terms: Row = Vec::with_capacity(touched.len() + 1);
+                    terms.push((lead, 1));
+                    for &c in &touched {
+                        let v = barrett(acc[c], p, bm);
+                        acc[c] = 0;
+                        if v != 0 {
+                            terms.push(((col0 + c) as u32, v as u32));
+                        }
+                    }
+                    b_rows[b0 + i] = make_row_next(lead, terms);
+                }
+                b1 = b0;
+                continue;
+            }
+
+            // Dense/GEMM path for Phase A block.
+            let mut c_blk = vec![0.0f64; bs * w_all];
+            for i in 0..bs {
+                let row_c = &mut c_blk[i * w_all..(i + 1) * w_all];
+                for &(col_rel, x) in &init_np[i] {
+                    row_c[col_rel] = x as f64;
+                }
+            }
+
+            // Split external pivots into sparse (apply directly) and dense (GEMM once!).
+            let mut dense_mark = vec![NONE; k_tot - b1];
+            let mut dense_ext: Vec<(usize, usize)> = Vec::new(); // (start_next, pku)
+            for i in 0..bs {
+                let row_c = &mut c_blk[i * w_all..(i + 1) * w_all];
+                for &(pku, x) in &a_ext[i] {
+                    match &b_rows[pku] {
+                        RowS::Sparse(r) => {
+                            let f = (p - u64::from(x)) as f64;
+                            for &(nj, val) in &r[1..] {
+                                row_c[nj as usize - col0] += f * (val as f64);
+                            }
+                        }
+                        RowS::Dense { lead, v, .. } => {
+                            if v.len() > 1 {
+                                let rel = pku - b1;
+                                if dense_mark[rel] == NONE {
+                                    dense_mark[rel] = dense_ext.len() as u32;
+                                    dense_ext.push((start_next(*lead), pku));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if !dense_ext.is_empty() {
+                // Sort dense_ext by start_next so each column tile uses a contiguous prefix!
+                dense_ext.sort_unstable_by_key(|&(s, _)| s);
+                for (new_idx, &(_, pku)) in dense_ext.iter().enumerate() {
+                    dense_mark[pku - b1] = new_idx as u32;
+                }
+                let kd = dense_ext.len();
+                let mut a_dense = vec![0.0f64; bs * kd];
+                let mut a_nnz = 0usize;
+                for i in 0..bs {
+                    for &(pku, x) in &a_ext[i] {
+                        let dm = dense_mark[pku - b1];
+                        if dm != NONE {
+                            a_dense[i * kd + dm as usize] = (p - u64::from(x)) as f64;
+                            a_nnz += 1;
+                        }
+                    }
+                }
+                let use_dense_gemm = bs >= 6 && kd >= 8 && a_nnz * 5 >= bs * kd;
+                let a_sparse: Vec<Vec<(u32, f64)>> = if use_dense_gemm {
+                    Vec::new()
+                } else {
+                    (0..bs)
+                        .map(|i| {
+                            let mut v: Vec<(u32, f64)> = a_ext[i]
+                                .iter()
+                                .filter_map(|&(pku, x)| {
+                                    let dm = dense_mark[pku - b1];
+                                    (dm != NONE).then_some((dm, (p - u64::from(x)) as f64))
+                                })
+                                .collect();
+                            v.sort_unstable_by_key(|t| t.0);
+                            v
+                        })
+                        .collect()
+                };
+
+                let tiles: Vec<(usize, usize)> = (0..w_all)
+                    .step_by(nc_tile)
+                    .map(|t0| (t0, (t0 + nc_tile).min(w_all)))
+                    .collect();
+                let b_ref = &b_rows;
+                let dex_ref = &dense_ext;
+                let ad_ref = &a_dense;
+                let as_ref = &a_sparse;
+                let c_tiles: Vec<(usize, usize, Vec<f64>)> = tiles
+                    .into_par_iter()
+                    .with_max_len(1)
+                    .map(|(t0, t1)| {
+                        let tw = t1 - t0;
+                        let j0 = col0 + t0;
+                        let j1 = col0 + t1;
+                        let mut ct = vec![0.0f64; bs * tw];
+                        for i in 0..bs {
+                            ct[i * tw..(i + 1) * tw]
+                                .copy_from_slice(&c_blk[i * w_all + t0..i * w_all + t1]);
+                        }
+                        fp_gemm::reduce_f64_slice_mod_p(&mut ct, p, bm);
+                        let kd_act = dex_ref.partition_point(|&(s, _)| s < j1);
+                        let mut k_acc = 0usize;
+                        if use_dense_gemm {
+                            let mut b_pack = Vec::new();
+                            let mut kk0 = 0;
+                            while kk0 < kd_act {
+                                let kc = (kd_act - kk0).min(kc_max);
+                                if k_acc + kc > k_safe {
+                                    fp_gemm::reduce_f64_slice_mod_p(&mut ct, p, bm);
+                                    k_acc = 0;
+                                }
+                                fp_gemm::prepare_b_pack(&mut b_pack, kc, tw, nr);
+                                for kk in 0..kc {
+                                    let (s, pku) = dex_ref[kk0 + kk];
+                                    if let RowS::Dense { v, .. } = &b_ref[pku] {
+                                        let a_col = s.max(j0);
+                                        let src = &v[1 + a_col - s..1 + j1 - s];
+                                        fp_gemm::pack_b_put_u32_row(
+                                            simd,
+                                            &mut b_pack,
+                                            kc,
+                                            nr,
+                                            kk,
+                                            a_col - j0,
+                                            src,
+                                        );
+                                    }
+                                }
+                                fp_gemm::gemm_f64_with_packed_b(
+                                    simd,
+                                    bs,
+                                    tw,
+                                    kc,
+                                    &ad_ref[kk0..],
+                                    kd,
+                                    &b_pack,
+                                    &mut ct,
+                                    tw,
+                                );
+                                k_acc += kc;
+                                kk0 += kc;
+                            }
+                        } else {
+                            let ldb = tw.div_ceil(8) * 8;
+                            let mut b_tile = Vec::new();
+                            let mut kk0 = 0;
+                            while kk0 < kd_act {
+                                let kc = (kd_act - kk0).min(kc_max);
+                                let kk1 = kk0 + kc;
+                                if k_acc + kc > k_safe {
+                                    fp_gemm::reduce_f64_slice_mod_p(&mut ct, p, bm);
+                                    k_acc = 0;
+                                }
+                                b_tile.clear();
+                                b_tile.resize(kc * ldb, 0.0);
+                                for kk in 0..kc {
+                                    let (s, pku) = dex_ref[kk0 + kk];
+                                    if let RowS::Dense { v, .. } = &b_ref[pku] {
+                                        let a_col = s.max(j0);
+                                        let src = &v[1 + a_col - s..1 + j1 - s];
+                                        let dst =
+                                            &mut b_tile[kk * ldb + (a_col - j0)..][..src.len()];
+                                        fp_gemm::cvt_u32_to_f64(simd, src, dst);
+                                    }
+                                }
+                                let mut sub_a: Vec<(u32, f64)> = Vec::new();
+                                for i in 0..bs {
+                                    let row_s = &as_ref[i];
+                                    let lo = row_s.partition_point(|t| (t.0 as usize) < kk0);
+                                    let hi = row_s.partition_point(|t| (t.0 as usize) < kk1);
+                                    if lo < hi {
+                                        sub_a.clear();
+                                        for &(k_idx, f) in &row_s[lo..hi] {
+                                            sub_a.push((k_idx - kk0 as u32, f));
+                                        }
+                                        fp_gemm::spmm_row_f64(
+                                            simd,
+                                            &mut ct[i * tw..(i + 1) * tw],
+                                            tw,
+                                            &sub_a,
+                                            &b_tile,
+                                            ldb,
+                                        );
+                                    }
+                                }
+                                k_acc += kc;
+                                kk0 = kk1;
+                            }
+                        }
+                        fp_gemm::reduce_f64_slice_mod_p(&mut ct, p, bm);
+                        (t0, tw, ct)
+                    })
+                    .collect();
+                for (t0, tw, ct) in c_tiles {
+                    for i in 0..bs {
+                        c_blk[i * w_all + t0..i * w_all + t0 + tw]
+                            .copy_from_slice(&ct[i * tw..(i + 1) * tw]);
+                    }
+                }
+            } else {
+                fp_gemm::reduce_f64_slice_mod_p(&mut c_blk, p, bm);
+            }
+
+            // In-block triangular back-substitution (reverse order i = bs-1..0).
+            for i in (0..bs).rev() {
+                if a_diag[i].is_empty() {
+                    continue;
+                }
+                let si = start_next(p_new_cols[b0 + i]) - col0;
+                let (top, bot) = c_blk.split_at_mut((i + 1) * w_all);
+                let row_i = &mut top[i * w_all..];
+                let mut k_acc = 0usize;
+                for &(jl, x) in &a_diag[i] {
+                    if k_acc >= k_safe {
+                        fp_gemm::reduce_f64_slice_mod_p(&mut row_i[si..], p, bm);
+                        k_acc = 0;
+                    }
+                    let sj = start_next(p_new_cols[b0 + jl]) - col0;
+                    let row_j = &bot[(jl - i - 1) * w_all..(jl - i) * w_all];
+                    let f = (p - u64::from(x)) as f64;
+                    fp_gemm::axpy_f64(simd, &mut row_i[sj..], &row_j[sj..], f);
+                    total_ops += (w_all - sj) as u64;
+                    k_acc += 1;
+                }
+                fp_gemm::reduce_f64_slice_mod_p(&mut row_i[si..], p, bm);
+            }
+
+            // Convert each solved row of c_blk into compact RowS in NP_next coordinates.
+            let built: Vec<RowS> = (0..bs)
+                .into_par_iter()
+                .map(|i| {
+                    let lead = p_new_cols[b0 + i];
+                    let si = start_next(lead) - col0;
+                    let span = 1 + m_next - (col0 + si);
+                    let row_c = &c_blk[i * w_all + si..(i + 1) * w_all];
+                    let mut v = vec![0u32; span];
+                    v[0] = 1;
+                    let nnz = 1 + fp_gemm::reduce_f64_to_u32(simd, row_c, &mut v[1..], p, bm);
+                    if (nnz as usize) * d_den > span * d_num {
+                        RowS::Dense { lead, v, nnz }
+                    } else {
+                        let mut terms: Row = Vec::with_capacity(nnz as usize);
+                        terms.push((lead, 1));
+                        for (off_j, &x) in v[1..].iter().enumerate() {
+                            if x != 0 {
+                                terms.push(((col0 + si + off_j) as u32, x));
+                            }
+                        }
+                        RowS::Sparse(terms)
+                    }
+                })
+                .collect();
+            for (i, r) in built.into_iter().enumerate() {
+                b_rows[b0 + i] = r;
+            }
+            b1 = b0;
+        }
+        let t_phase_a = t_ir0.elapsed().as_secs_f64();
+
+        // Phase B: Classify all old rows (not in p_new_rows) into untouched, sparse-affected,
+        // and dense-affected (rows that touch at least one dense `b_rows` pivot).
+        let b_is_dense: Vec<bool> = b_rows
+            .iter()
+            .map(|r| matches!(r, RowS::Dense { v, .. } if v.len() > 1))
+            .collect();
+        let mut untouched: Vec<usize> = Vec::new();
+        let mut affected_sparse: Vec<usize> = Vec::new();
+        let mut affected_dense: Vec<(u32, usize)> = Vec::new();
+        for (ri, row) in self.rows.iter().enumerate() {
+            if is_new_piv[ri] {
+                continue;
+            }
+            let mut has_p = false;
+            let mut hits_dense_b = false;
+            match row {
+                RowS::Sparse(r) => {
+                    for &(j, _) in &r[1..] {
+                        let pk = j_to_p[j as usize];
+                        if pk != NONE {
+                            has_p = true;
+                            if b_is_dense[pk as usize] {
+                                hits_dense_b = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                RowS::Dense { lead, v, .. } => {
+                    let s = start_old(*lead);
+                    for (i, &x) in v[1..].iter().enumerate() {
+                        if x != 0 {
+                            let pk = j_to_p[s + i];
+                            if pk != NONE {
+                                has_p = true;
+                                if b_is_dense[pk as usize] {
+                                    hits_dense_b = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if !has_p {
+                untouched.push(ri);
+            } else if hits_dense_b {
+                affected_dense.push((lead_of(row), ri));
+            } else {
+                affected_sparse.push(ri);
+            }
+        }
+        total_changed += (affected_dense.len() + affected_sparse.len()) as u64;
+
+        // 1. Remap untouched rows directly into NP_next coordinates in parallel.
+        let untouched_built: Vec<(usize, RowS)> = untouched
+            .into_par_iter()
+            .with_min_len(64)
+            .map(|ri| {
+                let row = &self.rows[ri];
+                let lead = lead_of(row);
+                let mut terms: Row = Vec::with_capacity(row.nnz());
+                terms.push((lead, 1));
+                match row {
+                    RowS::Sparse(r) => {
+                        for &(j, x) in &r[1..] {
+                            terms.push((j_to_np[j as usize], x));
+                        }
+                    }
+                    RowS::Dense { v, .. } => {
+                        let s = start_old(lead);
+                        for (i, &x) in v[1..].iter().enumerate() {
+                            if x != 0 {
+                                terms.push((j_to_np[s + i], x));
+                            }
+                        }
+                    }
+                }
+                (ri, make_row_next(lead, terms))
+            })
+            .collect();
+
+        // 2. Reduce rows that only touch sparse `b_rows` in parallel without dense allocation.
+        let b_ref = &b_rows;
+        let rows_ref = &self.rows;
+        let j_to_p_ref = &j_to_p;
+        let j_to_np_ref = &j_to_np;
+        let sparse_res: Vec<(u64, Vec<(usize, RowS)>)> = affected_sparse
+            .par_chunks(128)
+            .map(|chunk| {
+                let mut acc = vec![0u64; m_next];
+                let mut touched: Vec<usize> = Vec::new();
+                let mut ops = 0u64;
+                let mut out = Vec::with_capacity(chunk.len());
+                for &ri in chunk {
+                    touched.clear();
+                    let row = &rows_ref[ri];
+                    let lead = lead_of(row);
+                    let mut apply = |j: usize, x: u32| {
+                        let pk = j_to_p_ref[j];
+                        if pk != NONE {
+                            let f = p - u64::from(x);
+                            if let RowS::Sparse(br) = &b_ref[pk as usize] {
+                                ops += br.len() as u64;
+                                for &(nj, val) in &br[1..] {
+                                    let c = nj as usize;
+                                    if acc[c] == 0 {
+                                        touched.push(c);
+                                    }
+                                    let t = acc[c] + f * u64::from(val);
+                                    acc[c] = t.min(t.wrapping_sub(cx.p2));
+                                }
+                            }
+                        } else {
+                            let c = j_to_np_ref[j] as usize;
+                            if acc[c] == 0 {
+                                touched.push(c);
+                            }
+                            let t = acc[c] + u64::from(x);
+                            acc[c] = t.min(t.wrapping_sub(cx.p2));
+                        }
+                    };
+                    match row {
+                        RowS::Sparse(r) => {
+                            for &(j, x) in &r[1..] {
+                                apply(j as usize, x);
+                            }
+                        }
+                        RowS::Dense { v, .. } => {
+                            let s = start_old(lead);
+                            for (i, &x) in v[1..].iter().enumerate() {
+                                if x != 0 {
+                                    apply(s + i, x);
+                                }
+                            }
+                        }
+                    }
+                    touched.sort_unstable();
+                    touched.dedup();
+                    let mut terms: Row = Vec::with_capacity(touched.len() + 1);
+                    terms.push((lead, 1));
+                    for &c in &touched {
+                        let v = barrett(acc[c], p, bm);
+                        acc[c] = 0;
+                        if v != 0 {
+                            terms.push((c as u32, v as u32));
+                        }
+                    }
+                    out.push((ri, make_row_next(lead, terms)));
+                }
+                (ops, out)
+            })
+            .collect();
+
+        // 3. Split rows touching dense `b_rows` into high-fan-in (`dense_a`, >= 32 dense hits)
+        //    vs low-fan-in (`sparse_a`), so dense 6x24 GEMM never wastes flops on sparse rows!
+        let mut affected_dense_hi: Vec<(u32, usize)> = Vec::new();
+        let mut affected_dense_lo: Vec<(u32, usize)> = Vec::new();
+        for &(ld, ri) in &affected_dense {
+            let hits = match &self.rows[ri] {
+                RowS::Sparse(r) => r[1..]
+                    .iter()
+                    .filter(|&&(j, _)| {
+                        let pk = j_to_p[j as usize];
+                        pk != NONE && b_is_dense[pk as usize]
+                    })
+                    .count(),
+                RowS::Dense { v, .. } => {
+                    let s = start_old(ld);
+                    v[1..]
+                        .iter()
+                        .enumerate()
+                        .filter(|&(i, &x)| {
+                            if x == 0 {
+                                return false;
+                            }
+                            let pk = j_to_p[s + i];
+                            pk != NONE && b_is_dense[pk as usize]
+                        })
+                        .count()
+                }
+            };
+            if hits >= 32 {
+                affected_dense_hi.push((ld, ri));
+            } else {
+                affected_dense_lo.push((ld, ri));
+            }
+        }
+        affected_dense_hi.par_sort_unstable_by_key(|&(ld, _)| ld);
+        affected_dense_lo.par_sort_unstable_by_key(|&(ld, _)| ld);
+
+        let mut updated_affected: Vec<(usize, RowS)> = Vec::with_capacity(affected_dense.len());
+        for (bucket_is_hi, bucket) in [(true, &affected_dense_hi), (false, &affected_dense_lo)] {
+            let mut idx = 0usize;
+            while idx < bucket.len() {
+                let min_lead = bucket[idx].0;
+                let min_np = start_next(min_lead);
+                let span_max = (m_next - min_np).max(1);
+                let cap_rows = if bucket_is_hi { 1536 } else { 768 };
+                let m_super = ((48_000_000usize / span_max).clamp(192, cap_rows) / 6).max(1) * 6;
+                let end = (idx + m_super).min(bucket.len());
+                let chunk = &bucket[idx..end];
+                idx = end;
+                let ms = chunk.len();
+
+                // Precompute dense_b list + sparse_b contributions ONCE for this super-strip.
+                let mut dense_mark = vec![NONE; k_tot];
+                let mut dense_b: Vec<(usize, usize)> = Vec::new(); // (start_next, pku)
+                let mut row_p_dense: Vec<Vec<(usize, u32)>> = Vec::with_capacity(ms);
+                let mut row_p_sparse: Vec<Vec<(usize, u32)>> = Vec::with_capacity(ms);
+                let mut row_np: Vec<Vec<(u32, u32)>> = Vec::with_capacity(ms);
+                let mut strip_ops = 0u64;
+
+                for &(lead, ri) in chunk {
+                    let mut rpd = Vec::new();
+                    let mut rps = Vec::new();
+                    let mut rnp = Vec::new();
+                    let mut visit = |j: usize, x: u32| {
+                        let pk = j_to_p_ref[j];
+                        if pk != NONE {
+                            let pku = pk as usize;
+                            strip_ops += b_ref[pku].nnz() as u64;
+                            if b_is_dense[pku] {
+                                if dense_mark[pku] == NONE {
+                                    dense_mark[pku] = dense_b.len() as u32;
+                                    dense_b.push((start_next(p_new_cols[pku]), pku));
+                                }
+                                rpd.push((pku, x));
+                            } else {
+                                rps.push((pku, x));
+                            }
+                        } else {
+                            rnp.push((j_to_np_ref[j], x));
+                        }
+                    };
+                    match &rows_ref[ri] {
+                        RowS::Sparse(r) => {
+                            for &(j, x) in &r[1..] {
+                                visit(j as usize, x);
+                            }
+                        }
+                        RowS::Dense { v, .. } => {
+                            let s = start_old(lead);
+                            for (i, &x) in v[1..].iter().enumerate() {
+                                if x != 0 {
+                                    visit(s + i, x);
+                                }
+                            }
+                        }
+                    }
+                    row_p_dense.push(rpd);
+                    row_p_sparse.push(rps);
+                    row_np.push(rnp);
+                }
+                total_ops += strip_ops;
+
+                // Sort dense_b by start_next so tile [j0, j1) uses prefix 0..kd_act!
+                dense_b.sort_unstable_by_key(|&(s, _)| s);
+                for (new_idx, &(_, pku)) in dense_b.iter().enumerate() {
+                    dense_mark[pku] = new_idx as u32;
+                }
+                let kd = dense_b.len();
+                let a_nnz: usize = row_p_dense.iter().map(|r| r.len()).sum();
+                let use_dense_gemm = bucket_is_hi && ms >= 6 && kd >= 8 && a_nnz * 3 >= ms * kd;
+
+                let mut a_dense: Vec<f64> = Vec::new();
+                let mut a_sparse: Vec<Vec<(u32, f64)>> = Vec::new();
+                if use_dense_gemm {
+                    a_dense.resize(ms * kd, 0.0);
+                    for i in 0..ms {
+                        let base = i * kd;
+                        for &(pku, x) in &row_p_dense[i] {
+                            a_dense[base + dense_mark[pku] as usize] = (p - u64::from(x)) as f64;
+                        }
+                    }
+                } else {
+                    a_sparse = (0..ms)
+                        .map(|i| {
+                            let mut v: Vec<(u32, f64)> = row_p_dense[i]
+                                .iter()
+                                .map(|&(pku, x)| (dense_mark[pku], (p - u64::from(x)) as f64))
+                                .collect();
+                            v.sort_unstable_by_key(|t| t.0);
+                            v
+                        })
+                        .collect();
+                }
+
+                let row_starts: Vec<usize> =
+                    chunk.iter().map(|&(lead, _)| start_next(lead)).collect();
+                let mut v_rows: Vec<Vec<u32>> = row_starts
+                    .iter()
+                    .map(|&s| {
+                        let mut v = vec![0u32; 1 + m_next - s];
+                        v[0] = 1;
+                        v
+                    })
+                    .collect();
+
+                // Pre-seed v_rows with each row's own NP_next entries + sparse `b_rows` ONCE in parallel!
+                v_rows.par_iter_mut().enumerate().for_each(|(i, v)| {
+                    let s = row_starts[i];
+                    if row_p_sparse[i].is_empty() {
+                        for &(nj, x) in &row_np[i] {
+                            v[1 + nj as usize - s] = x;
+                        }
+                    } else {
+                        let span_t = m_next - s;
+                        let mut acc = vec![0u64; span_t];
+                        for &(nj, x) in &row_np[i] {
+                            acc[nj as usize - s] = u64::from(x);
+                        }
+                        for &(pku, x) in &row_p_sparse[i] {
+                            let f = p - u64::from(x);
+                            if let RowS::Sparse(br) = &b_ref[pku] {
+                                for &(nj, val) in &br[1..] {
+                                    let idx_c = nj as usize - s;
+                                    let t = acc[idx_c] + f * u64::from(val);
+                                    acc[idx_c] = t.min(t.wrapping_sub(cx.p2));
+                                }
+                            }
+                        }
+                        for (off_j, &val) in acc.iter().enumerate() {
+                            if val != 0 {
+                                v[1 + off_j] = barrett(val, p, bm) as u32;
+                            }
+                        }
+                    }
+                });
+
+                let row_ptrs: Vec<usize> =
+                    v_rows.iter_mut().map(|v| v.as_mut_ptr() as usize).collect();
+                let tiles: Vec<(usize, usize)> = (min_np..m_next)
+                    .step_by(nc_tile)
+                    .map(|j0| (j0, (j0 + nc_tile).min(m_next)))
+                    .collect();
+                let db_ref = &dense_b;
+                let ad_ref = &a_dense;
+                let as_ref = &a_sparse;
+
+                let tile_nnz: Vec<Vec<u32>> = tiles
+                    .into_par_iter()
+                    .with_max_len(1)
+                    .map(|(j0, j1)| {
+                        let w = j1 - j0;
+                        let kd_act = db_ref.partition_point(|&(s, _)| s < j1);
+                        let mut c_tile = vec![0.0f64; ms * w];
+                        for i in 0..ms {
+                            let s = row_starts[i];
+                            if s >= j1 {
+                                continue;
+                            }
+                            let a = s.max(j0);
+                            // SAFETY: disjoint column range [j0, j1) owned by this tile.
+                            let src_u32 = unsafe {
+                                std::slice::from_raw_parts(
+                                    (row_ptrs[i] as *const u32).add(1 + a - s),
+                                    j1 - a,
+                                )
+                            };
+                            fp_gemm::cvt_u32_to_f64(
+                                simd,
+                                src_u32,
+                                &mut c_tile[i * w + (a - j0)..i * w + w],
+                            );
+                        }
+
+                        let mut k_acc = 0usize;
+                        if use_dense_gemm {
+                            let mut b_pack = Vec::new();
+                            let mut kk0 = 0;
+                            while kk0 < kd_act {
+                                let kc = (kd_act - kk0).min(kc_max);
+                                if k_acc + kc > k_safe {
+                                    fp_gemm::reduce_f64_slice_mod_p(&mut c_tile, p, bm);
+                                    k_acc = 0;
+                                }
+                                fp_gemm::prepare_b_pack(&mut b_pack, kc, w, nr);
+                                for kk in 0..kc {
+                                    let (s, pku) = db_ref[kk0 + kk];
+                                    if let RowS::Dense { v, .. } = &b_ref[pku] {
+                                        let a_col = s.max(j0);
+                                        let src = &v[1 + a_col - s..1 + j1 - s];
+                                        fp_gemm::pack_b_put_u32_row(
+                                            simd,
+                                            &mut b_pack,
+                                            kc,
+                                            nr,
+                                            kk,
+                                            a_col - j0,
+                                            src,
+                                        );
+                                    }
+                                }
+                                fp_gemm::gemm_f64_with_packed_b(
+                                    simd,
+                                    ms,
+                                    w,
+                                    kc,
+                                    &ad_ref[kk0..],
+                                    kd,
+                                    &b_pack,
+                                    &mut c_tile,
+                                    w,
+                                );
+                                k_acc += kc;
+                                kk0 += kc;
+                            }
+                        } else {
+                            let ldb = w.div_ceil(8) * 8;
+                            let mut b_tile = Vec::new();
+                            let mut sub_a: Vec<(u32, f64)> = Vec::new();
+                            let mut kk0 = 0;
+                            while kk0 < kd_act {
+                                let kc = (kd_act - kk0).min(kc_max);
+                                let kk1 = kk0 + kc;
+                                if k_acc + kc > k_safe {
+                                    fp_gemm::reduce_f64_slice_mod_p(&mut c_tile, p, bm);
+                                    k_acc = 0;
+                                }
+                                b_tile.clear();
+                                b_tile.resize(kc * ldb, 0.0);
+                                for kk in 0..kc {
+                                    let (s, pku) = db_ref[kk0 + kk];
+                                    if let RowS::Dense { v, .. } = &b_ref[pku] {
+                                        let a_col = s.max(j0);
+                                        let src = &v[1 + a_col - s..1 + j1 - s];
+                                        let dst =
+                                            &mut b_tile[kk * ldb + (a_col - j0)..][..src.len()];
+                                        fp_gemm::cvt_u32_to_f64(simd, src, dst);
+                                    }
+                                }
+                                for i in 0..ms {
+                                    let row_s = &as_ref[i];
+                                    let lo = row_s.partition_point(|t| (t.0 as usize) < kk0);
+                                    let hi = row_s.partition_point(|t| (t.0 as usize) < kk1);
+                                    if lo < hi {
+                                        sub_a.clear();
+                                        for &(k_idx, f) in &row_s[lo..hi] {
+                                            sub_a.push((k_idx - kk0 as u32, f));
+                                        }
+                                        fp_gemm::spmm_row_f64(
+                                            simd,
+                                            &mut c_tile[i * w..(i + 1) * w],
+                                            w,
+                                            &sub_a,
+                                            &b_tile,
+                                            ldb,
+                                        );
+                                    }
+                                }
+                                k_acc += kc;
+                                kk0 = kk1;
+                            }
+                        }
+
+                        let mut nnz_local = vec![0u32; ms];
+                        for i in 0..ms {
+                            let s = row_starts[i];
+                            if s >= j1 {
+                                continue;
+                            }
+                            let a = s.max(j0);
+                            let src = &c_tile[i * w + (a - j0)..i * w + w];
+                            // SAFETY: each tile owns disjoint column range [j0, j1) of row i.
+                            let dst = unsafe {
+                                std::slice::from_raw_parts_mut(
+                                    (row_ptrs[i] as *mut u32).add(1 + a - s),
+                                    j1 - a,
+                                )
+                            };
+                            nnz_local[i] = fp_gemm::reduce_f64_to_u32(simd, src, dst, p, bm);
+                        }
+                        nnz_local
+                    })
+                    .collect();
+
+                let mut total_nnz = vec![1u32; ms];
+                for tn in &tile_nnz {
+                    for i in 0..ms {
+                        total_nnz[i] += tn[i];
+                    }
+                }
+
+                let built: Vec<(usize, RowS)> = chunk
+                    .par_iter()
+                    .zip(v_rows.into_par_iter())
+                    .zip(row_starts.par_iter())
+                    .zip(total_nnz.par_iter())
+                    .map(|(((&(lead, ri), v), &s), &nnz)| {
+                        let span = 1 + m_next - s;
+                        if (nnz as usize) * d_den > span * d_num {
+                            (ri, RowS::Dense { lead, v, nnz })
+                        } else {
+                            let mut terms: Row = Vec::with_capacity(nnz as usize);
+                            terms.push((lead, 1));
+                            for (off_j, &x) in v[1..].iter().enumerate() {
+                                if x != 0 {
+                                    terms.push(((s + off_j) as u32, x));
+                                }
+                            }
+                            (ri, RowS::Sparse(terms))
+                        }
+                    })
+                    .collect();
+                updated_affected.extend(built);
+            }
+        }
+
+        // Install all updated rows and commit the new epoch.
+        for (ri, r) in untouched_built {
+            self.rows[ri] = r;
+        }
+        for (ops, built) in sparse_res {
+            total_ops += ops;
+            for (ri, r) in built {
+                self.rows[ri] = r;
+            }
+        }
+        for (ri, r) in updated_affected {
+            self.rows[ri] = r;
+        }
+        let b_dense = b_rows
+            .iter()
+            .filter(|r| matches!(r, RowS::Dense { .. }))
+            .count();
+        for (k, r) in b_rows.into_iter().enumerate() {
+            self.rows[p_new_rows[k]] = r;
+        }
+        self.np_cols = np_next;
+        self.of_col.iter_mut().for_each(|x| *x = NONE);
+        for (j, &c) in self.np_cols.iter().enumerate() {
+            self.of_col[c as usize] = j as u32;
+        }
+        if prof {
+            let t_tot = t_ir0.elapsed().as_secs_f64();
+            eprintln!(
+                "  [ir_prof] k={k_tot} (b_dense={b_dense}) m_next={m_next} aff_d={} aff_s={} tot={t_tot:.3}s phaseA={t_phase_a:.3}s phaseB={:.3}s ops={total_ops} ({:.1} G/s)",
+                affected_dense.len(),
+                affected_sparse.len(),
+                t_tot - t_phase_a,
+                (total_ops as f64) / t_tot.max(1e-9) / 1e9
+            );
+        }
+        (total_ops, total_changed)
     }
 
     /// `acc[tail] += f · tail` of a stored row, in epoch coordinates.
@@ -1263,15 +2285,31 @@ fn reduce_products(
                 .max(1)
         })
         .collect();
+    // Precompute per-part product list so dense tiles can execute AVX-512 GEMM.
+    let mut prods_in_part: Vec<Vec<usize>> = vec![Vec::new(); n_parts];
+    let mut prod_local = vec![0usize; prods.len()];
+    for (k, (q, _)) in prods.iter().enumerate() {
+        let pq = *q as usize;
+        prod_local[k] = prods_in_part[pq].len();
+        prods_in_part[pq].push(k);
+    }
     let mut tiles: Vec<(usize, usize, usize)> = Vec::new();
     for (q, e) in ech.iter().enumerate() {
         if runs[q].is_empty() {
             continue;
         }
         let m = e.np_cols.len();
-        let w = (opts.sweep_tile_bytes / (8 * nprod_q[q]))
-            .min(m.div_ceil(4 * rayon::current_num_threads()))
-            .clamp(64, m.max(64));
+        let w = if cx.use_gemm {
+            let nr = fp_gemm::nr_for(cx.gemm_simd);
+            let raw = (opts.sweep_tile_bytes / (8 * nprod_q[q]))
+                .min(m.div_ceil(4 * rayon::current_num_threads()))
+                .clamp(96, m.max(96));
+            (raw.div_ceil(nr) * nr).min(m.max(nr))
+        } else {
+            (opts.sweep_tile_bytes / (8 * nprod_q[q]))
+                .min(m.div_ceil(4 * rayon::current_num_threads()))
+                .clamp(64, m.max(64))
+        };
         let mut j0 = 0;
         while j0 < m {
             let j1 = (j0 + w).min(m);
@@ -1280,19 +2318,24 @@ fn reduce_products(
         }
     }
     let p2 = cx.p2;
+    let gemm_simd = cx.gemm_simd;
+    let use_gemm = cx.use_gemm;
+    let k_safe = fp_gemm::k_safe_f64(cx.p);
+    let kc_max = 256usize.min(k_safe.max(1));
     tiles.par_iter().with_max_len(1).for_each(|&(q, j0, j1)| {
         if opts.fault == 5 && j0 == 0 {
             return;
         }
         let e = &ech[q];
         let rs = &runs[q];
+        let mut dense_rows: Vec<(u32, u32, u32, usize)> = Vec::new();
         for &(row_i, i0, i1, a, b) in &meta[q] {
             if (a as usize) >= j1 || (b as usize) < j0 {
                 continue;
             }
-            let users = &rs[i0 as usize..i1 as usize];
             match &e.rows[row_i as usize] {
                 RowS::Sparse(rr) => {
+                    let users = &rs[i0 as usize..i1 as usize];
                     let tail = &rr[1..];
                     if tail.is_empty()
                         || (tail[0].0 as usize) >= j1
@@ -1321,49 +2364,520 @@ fn reduce_products(
                         continue;
                     }
                     let s = e.np_start(*lead);
-                    let a = s.max(j0);
-                    let b = j1; // the dense tail runs to the last epoch column
-                    if a >= b {
-                        continue;
+                    if s < j1 {
+                        dense_rows.push((row_i, i0, i1, s));
                     }
-                    let src = &v[1 + a - s..1 + b - s];
-                    for &(_, k, f) in users {
+                }
+            }
+        }
+        if dense_rows.is_empty() {
+            return;
+        }
+        let b_q = prods_in_part[q].len();
+        if use_gemm && b_q >= 1 && dense_rows.len() >= 2 {
+            let w = j1 - j0;
+            let ldb = w.div_ceil(8) * 8;
+            let mut c_tile = vec![0.0f64; b_q * w];
+            let mut b_tile: Vec<f64> = Vec::new();
+            let mut a_sub: Vec<Vec<(u32, f64)>> = vec![Vec::new(); b_q];
+            let mut a_dense_buf: Vec<f64> = Vec::new();
+            let mut b_pack_buf: Vec<f64> = Vec::new();
+            let mut k_acc = 0usize;
+            for chunk in dense_rows.chunks(kc_max) {
+                let kc = chunk.len();
+                if k_acc + kc > k_safe {
+                    fp_gemm::reduce_f64_slice_mod_p(&mut c_tile, cx.p, cx.barrett_m);
+                    k_acc = 0;
+                }
+                b_tile.clear();
+                b_tile.resize(kc * ldb, 0.0);
+                for a_r in a_sub.iter_mut() {
+                    a_r.clear();
+                }
+                for (kk, &(row_i, i0, i1, s)) in chunk.iter().enumerate() {
+                    if let RowS::Dense { v, .. } = &e.rows[row_i as usize] {
+                        let a_col = s.max(j0);
+                        let src = &v[1 + a_col - s..1 + j1 - s];
+                        let dst = &mut b_tile[kk * ldb + (a_col - j0)..][..src.len()];
+                        fp_gemm::cvt_u32_to_f64(gemm_simd, src, dst);
+                    }
+                    for &(_, k, f) in &rs[i0 as usize..i1 as usize] {
+                        a_sub[prod_local[k as usize]].push((kk as u32, f as f64));
+                    }
+                }
+                fp_gemm::spmm_or_gemm_f64(
+                    gemm_simd,
+                    b_q,
+                    w,
+                    kc,
+                    &a_sub,
+                    &b_tile,
+                    ldb,
+                    &mut c_tile,
+                    w,
+                    &mut a_dense_buf,
+                    &mut b_pack_buf,
+                );
+                k_acc += kc;
+            }
+            for (li, &k) in prods_in_part[q].iter().enumerate() {
+                let o = off[k];
+                // SAFETY: [o + j0, o + j1) is this tile's columns of product k.
+                let dst = unsafe { std::slice::from_raw_parts_mut(base.ptr().add(o + j0), w) };
+                fp_gemm::add_f64_reduced_into_u64(
+                    dst,
+                    &c_tile[li * w..(li + 1) * w],
+                    cx.p,
+                    cx.barrett_m,
+                    p2,
+                );
+            }
+        } else {
+            for &(row_i, i0, i1, s) in &dense_rows {
+                if let RowS::Dense { v, .. } = &e.rows[row_i as usize] {
+                    let a = s.max(j0);
+                    let src = &v[1 + a - s..1 + j1 - s];
+                    for &(_, k, f) in &rs[i0 as usize..i1 as usize] {
                         let o = off[k as usize];
-                        // SAFETY: as above; the slice is this tile's columns
-                        // of product k.
-                        let dst =
-                            unsafe { std::slice::from_raw_parts_mut(base.ptr().add(o + a), b - a) };
+                        let dst = unsafe {
+                            std::slice::from_raw_parts_mut(base.ptr().add(o + a), j1 - a)
+                        };
                         axpy_dense(cx.simd, dst, src, f, p2);
                     }
                 }
             }
         }
     });
-    // The cascade, per product, in its own accumulator range.
-    let done: Vec<(Row, Red)> = prods
-        .par_iter()
-        .with_max_len(1)
-        .zip(plans.par_iter())
-        .zip(off.par_iter())
-        .map(|(((q, _), pl), &o)| {
-            let e = &ech[*q as usize];
-            let m = e.np_cols.len();
-            let mut red = Red {
-                ops: pl.ops0,
-                nred: pl.core.len() as u32,
-                ops0: pl.ops0,
-            };
-            let mut out: Row = Vec::new();
-            if pl.first != usize::MAX {
-                // SAFETY: [o, o + m) belongs to this product alone.
-                let acc = unsafe { std::slice::from_raw_parts_mut(base.ptr().add(o), m) };
-                e.scan(cx, acc, pl.first, pl.last, &mut red, &mut out);
-            }
-            red.ops += normalise(&mut out, p);
-            (out, red)
+    // Optional blocked cascade: classical scan on each column tile (exact), then
+    // AVX-512 GEMM of that tile's pivot tails onto later columns for all products
+    // at once. Gate with HKY3_CASC_GEMM=1; default remains the classical scan.
+    // Opt-in blocked cascade GEMM (HKY3_CASC_GEMM=1). Correct but currently
+    // slower than the classical per-product scan on P1-scale batches; kept for
+    // further tuning. Default remains the classical scan.
+    let use_casc_gemm = cx.use_gemm
+        && prods.len() >= 32
+        && matches!(
+            std::env::var("HKY3_CASC_GEMM").ok().as_deref(),
+            Some("1") | Some("on") | Some("true")
+        );
+    let done: Vec<(Row, Red)> = if use_casc_gemm {
+        cascade_blocked_gemm(ech, cx, prods, &plans, &off, base.ptr(), n_parts, p, p2)
+    } else {
+        prods
+            .par_iter()
+            .with_max_len(1)
+            .zip(plans.par_iter())
+            .zip(off.par_iter())
+            .map(|(((q, _), pl), &o)| {
+                let e = &ech[*q as usize];
+                let m = e.np_cols.len();
+                let mut red = Red {
+                    ops: pl.ops0,
+                    nred: pl.core.len() as u32,
+                    ops0: pl.ops0,
+                };
+                let mut out: Row = Vec::new();
+                if pl.first != usize::MAX {
+                    // SAFETY: [o, o + m) belongs to this product alone.
+                    let acc = unsafe { std::slice::from_raw_parts_mut(base.ptr().add(o), m) };
+                    e.scan(cx, acc, pl.first, pl.last, &mut red, &mut out);
+                }
+                red.ops += normalise(&mut out, p);
+                (out, red)
+            })
+            .collect()
+    };
+    (done, true)
+}
+
+/// Left-looking blocked cascade with a persistent f64 panel: classical in-tile
+/// decisions, AVX-512 GEMM trailing updates, one u64↔f64 conversion per part.
+fn cascade_blocked_gemm(
+    ech: &[Echelon],
+    cx: &Ctx,
+    prods: &[(u8, Row)],
+    plans: &[Plan],
+    off: &[usize],
+    base_ptr: *mut u64,
+    n_parts: usize,
+    p: u64,
+    p2: u64,
+) -> Vec<(Row, Red)> {
+    let _ = (base_ptr, p2); // panel owns the data after conversion
+    let bm_ = cx.barrett_m;
+    let simd = cx.gemm_simd;
+    let nr = fp_gemm::nr_for(simd);
+    let k_safe = fp_gemm::k_safe_f64(p).max(1);
+    let kc_max = 64usize.min(k_safe);
+    let nc = (512usize.div_ceil(nr) * nr).max(nr);
+    let mut out_rows: Vec<Row> = vec![Vec::new(); prods.len()];
+    let mut reds: Vec<Red> = plans
+        .iter()
+        .map(|pl| Red {
+            ops: pl.ops0,
+            nred: pl.core.len() as u32,
+            ops0: pl.ops0,
         })
         .collect();
-    (done, true)
+    let mut lasts: Vec<usize> = plans.iter().map(|pl| pl.last).collect();
+
+    for q in 0..n_parts {
+        let idxs: Vec<usize> = (0..prods.len())
+            .filter(|&k| prods[k].0 as usize == q)
+            .collect();
+        if idxs.is_empty() {
+            continue;
+        }
+        let e = &ech[q];
+        let m = e.np_cols.len();
+        let nprod = idxs.len();
+        let (mut g_first, mut g_last) = (m, 0usize);
+        for &k in &idxs {
+            if plans[k].first != usize::MAX {
+                g_first = g_first.min(plans[k].first);
+                g_last = g_last.max(lasts[k]);
+            }
+        }
+        if g_first > g_last {
+            continue;
+        }
+        // Persistent f64 panel for [g_first, m); convert once from the u64 sweep.
+        let width = m - g_first;
+        let mut panel = vec![0.0f64; nprod * width];
+        for (li, &k) in idxs.iter().enumerate() {
+            if plans[k].first == usize::MAX {
+                continue;
+            }
+            let o = off[k];
+            let acc = unsafe { std::slice::from_raw_parts(base_ptr.add(o + g_first), width) };
+            for j in 0..width {
+                let raw = acc[j];
+                if raw != 0 {
+                    panel[li * width + j] = raw as f64;
+                }
+            }
+            unsafe { std::slice::from_raw_parts_mut(base_ptr.add(o + g_first), width).fill(0) };
+        }
+
+        let mut j0 = g_first;
+        while j0 <= g_last {
+            let j1 = (j0 + nc).min(g_last + 1);
+            // Parallel in-tile scans (products independent). Factors keyed by
+            // absolute pivot-row index; remapped to a dense K list afterwards.
+            let j1_local = j1 - g_first;
+            let panel_ptr = panel.as_mut_ptr() as usize;
+            let tile_outs: Vec<(usize, Vec<(u32, u32)>, Vec<(usize, f64)>, usize, u32, u64)> = (0
+                ..nprod)
+                .into_par_iter()
+                .map(|li| {
+                    let k = idxs[li];
+                    let mut emits: Vec<(u32, u32)> = Vec::new();
+                    let mut fac: Vec<(usize, f64)> = Vec::new();
+                    let mut nred = 0u32;
+                    let mut ops = 0u64;
+                    if plans[k].first == usize::MAX || lasts[k] < j0 {
+                        return (li, emits, fac, lasts[k], nred, ops);
+                    }
+                    // SAFETY: each li owns a disjoint panel row.
+                    let row_p = unsafe {
+                        std::slice::from_raw_parts_mut(
+                            (panel_ptr as *mut f64).add(li * width),
+                            width,
+                        )
+                    };
+                    let mut ci = j0 - g_first;
+                    let mut last_local = lasts[k] - g_first;
+                    while ci < j1_local && ci <= last_local {
+                        let mut raw = row_p[ci];
+                        if raw != 0.0 {
+                            let mut tmp = [raw];
+                            fp_gemm::reduce_f64_slice_mod_p(&mut tmp, p, bm_);
+                            raw = tmp[0];
+                            row_p[ci] = 0.0;
+                        }
+                        if raw == 0.0 {
+                            ci += 1;
+                            continue;
+                        }
+                        let v = raw as u64;
+                        let col = e.np_cols[g_first + ci];
+                        let piv = e.pivot[col as usize];
+                        if piv == NONE {
+                            emits.push((col, v as u32));
+                            ci += 1;
+                            continue;
+                        }
+                        let brow = &e.rows[piv as usize];
+                        nred += 1;
+                        ops += brow.nnz() as u64;
+                        let f = (p - v) as f64;
+                        match brow {
+                            RowS::Sparse(rr) => {
+                                for &(jj, x) in &rr[1..] {
+                                    let ju = jj as usize;
+                                    if ju >= j1 {
+                                        break;
+                                    }
+                                    if ju > g_first + ci {
+                                        row_p[ju - g_first] += f * (x as f64);
+                                    }
+                                }
+                                if rr.len() > 1 {
+                                    last_local =
+                                        last_local.max(rr[rr.len() - 1].0 as usize - g_first);
+                                }
+                            }
+                            RowS::Dense { lead, v: vv, .. } => {
+                                let s = e.np_start(*lead);
+                                let a = (g_first + ci + 1).max(s);
+                                if a < j1 && vv.len() > 1 {
+                                    let src = &vv[1 + a - s..1 + j1 - s];
+                                    // SIMD f64 axpy when the in-tile span is long.
+                                    if src.len() >= 16 {
+                                        let mut src_f = vec![0.0f64; src.len()];
+                                        fp_gemm::cvt_u32_to_f64(simd, src, &mut src_f);
+                                        fp_gemm::axpy_f64(
+                                            simd,
+                                            &mut row_p[a - g_first..a - g_first + src.len()],
+                                            &src_f,
+                                            f,
+                                        );
+                                    } else {
+                                        for (off_j, &x) in src.iter().enumerate() {
+                                            row_p[a - g_first + off_j] += f * (x as f64);
+                                        }
+                                    }
+                                }
+                                last_local = width - 1;
+                            }
+                        }
+                        let extends = match brow {
+                            RowS::Sparse(rr) => rr.len() > 1 && (rr[rr.len() - 1].0 as usize) >= j1,
+                            RowS::Dense { lead, v: vv, .. } => {
+                                vv.len() > 1 && e.np_start(*lead) + vv.len() - 1 > j1
+                            }
+                        };
+                        if extends {
+                            fac.push((piv as usize, f));
+                        }
+                        ci += 1;
+                    }
+                    let lo = (j0 - g_first + 1).min(width);
+                    let hi = j1_local.min(width);
+                    if lo < hi {
+                        fp_gemm::reduce_f64_slice_mod_p(&mut row_p[lo..hi], p, bm_);
+                    }
+                    (li, emits, fac, g_first + last_local, nred, ops)
+                })
+                .collect();
+
+            let mut piv_rows: Vec<usize> = Vec::new();
+            let mut piv_mark = vec![NONE; e.rows.len()];
+            let mut factors: Vec<Vec<(u32, f64)>> = vec![Vec::new(); nprod];
+            for (li, emits, fac, last_k, nred, ops) in tile_outs {
+                let k = idxs[li];
+                out_rows[k].extend(emits);
+                reds[k].nred += nred;
+                reds[k].ops += ops;
+                lasts[k] = lasts[k].max(last_k);
+                g_last = g_last.max(lasts[k]);
+                for (pri, f) in fac {
+                    let pm = &mut piv_mark[pri];
+                    if *pm == NONE {
+                        *pm = piv_rows.len() as u32;
+                        piv_rows.push(pri);
+                    }
+                    factors[li].push((*pm, f));
+                }
+            }
+
+            // Trailing GEMM onto panel[:, j1 - g_first ..].
+            if !piv_rows.is_empty() && j1 < m {
+                let ka = piv_rows.len();
+                let mut t0 = j1 - g_first;
+                while t0 < width {
+                    let tw = (width - t0).min(nc);
+                    // C is a view into panel columns [t0, t0+tw).
+                    let mut ct = vec![0.0f64; nprod * tw];
+                    for li in 0..nprod {
+                        ct[li * tw..(li + 1) * tw]
+                            .copy_from_slice(&panel[li * width + t0..li * width + t0 + tw]);
+                    }
+                    let mut k_acc = 0usize;
+                    let mut kk0 = 0usize;
+                    let mut b_pack = Vec::new();
+                    let mut a_dense = Vec::new();
+                    let mut a_sub: Vec<Vec<(u32, f64)>> = vec![Vec::new(); nprod];
+                    while kk0 < ka {
+                        let kc = (ka - kk0).min(kc_max);
+                        if k_acc + kc > k_safe {
+                            fp_gemm::reduce_f64_slice_mod_p(&mut ct, p, bm_);
+                            k_acc = 0;
+                        }
+                        let mut nnz = 0usize;
+                        for li in 0..nprod {
+                            a_sub[li].clear();
+                            for &(pm, f) in &factors[li] {
+                                let pmu = pm as usize;
+                                if pmu >= kk0 && pmu < kk0 + kc {
+                                    a_sub[li].push(((pmu - kk0) as u32, f));
+                                    nnz += 1;
+                                }
+                            }
+                        }
+                        if nnz == 0 {
+                            kk0 += kc;
+                            continue;
+                        }
+                        let jj0 = g_first + t0;
+                        let jj1 = jj0 + tw;
+                        let ldb = tw.div_ceil(8) * 8;
+                        let mut b_tile = vec![0.0f64; kc * ldb];
+                        for kk in 0..kc {
+                            match &e.rows[piv_rows[kk0 + kk]] {
+                                RowS::Sparse(rr) => {
+                                    for &(jj, x) in &rr[1..] {
+                                        let ju = jj as usize;
+                                        if ju >= jj1 {
+                                            break;
+                                        }
+                                        if ju >= jj0 {
+                                            b_tile[kk * ldb + (ju - jj0)] = x as f64;
+                                        }
+                                    }
+                                }
+                                RowS::Dense { lead, v, .. } => {
+                                    if v.len() > 1 {
+                                        let s = e.np_start(*lead);
+                                        let a = s.max(jj0);
+                                        if a < jj1 {
+                                            let src = &v[1 + a - s..1 + jj1 - s];
+                                            fp_gemm::cvt_u32_to_f64(
+                                                simd,
+                                                src,
+                                                &mut b_tile[kk * ldb + (a - jj0)..][..src.len()],
+                                            );
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        let use_dense = nprod >= 6 && kc >= 4 && nnz * 3 >= nprod * kc;
+                        if use_dense {
+                            a_dense.clear();
+                            a_dense.resize(nprod * kc, 0.0);
+                            for li in 0..nprod {
+                                for &(pk, f) in &a_sub[li] {
+                                    a_dense[li * kc + pk as usize] = f;
+                                }
+                            }
+                            fp_gemm::prepare_b_pack(&mut b_pack, kc, tw, nr);
+                            for kk in 0..kc {
+                                let src = &b_tile[kk * ldb..][..tw];
+                                let n_panels = tw.div_ceil(nr);
+                                for p_idx in 0..n_panels {
+                                    let j_off = p_idx * nr;
+                                    let w = (tw - j_off).min(nr);
+                                    b_pack[p_idx * kc * nr + kk * nr..][..w]
+                                        .copy_from_slice(&src[j_off..j_off + w]);
+                                }
+                            }
+                            fp_gemm::gemm_f64_with_packed_b(
+                                simd, nprod, tw, kc, &a_dense, kc, &b_pack, &mut ct, tw,
+                            );
+                        } else {
+                            for li in 0..nprod {
+                                if !a_sub[li].is_empty() {
+                                    fp_gemm::spmm_row_f64(
+                                        simd,
+                                        &mut ct[li * tw..(li + 1) * tw],
+                                        tw,
+                                        &a_sub[li],
+                                        &b_tile,
+                                        ldb,
+                                    );
+                                }
+                            }
+                        }
+                        k_acc += kc;
+                        kk0 += kc;
+                    }
+                    fp_gemm::reduce_f64_slice_mod_p(&mut ct, p, bm_);
+                    for li in 0..nprod {
+                        panel[li * width + t0..li * width + t0 + tw]
+                            .copy_from_slice(&ct[li * tw..(li + 1) * tw]);
+                    }
+                    t0 += tw;
+                }
+            }
+            j0 = j1;
+        }
+        // Emit remaining non-pivot terms from the panel.
+        for (li, &k) in idxs.iter().enumerate() {
+            if plans[k].first == usize::MAX {
+                continue;
+            }
+            let row_p = &mut panel[li * width..(li + 1) * width];
+            fp_gemm::reduce_f64_slice_mod_p(row_p, p, bm_);
+            for j in 0..width {
+                let v = row_p[j];
+                if v == 0.0 {
+                    continue;
+                }
+                let col = e.np_cols[g_first + j];
+                if e.pivot[col as usize] == NONE {
+                    out_rows[k].push((col, v as u32));
+                } else {
+                    // Leftover pivot: apply classically into a scratch u64 span.
+                    let mut scratch = vec![0u64; m];
+                    for jj in 0..width {
+                        scratch[g_first + jj] = row_p[jj] as u64;
+                        row_p[jj] = 0.0;
+                    }
+                    let piv = e.pivot[col as usize];
+                    let brow = &e.rows[piv as usize];
+                    reds[k].nred += 1;
+                    reds[k].ops += brow.nnz() as u64;
+                    let mut last = m - 1;
+                    let mut c2 = g_first + j;
+                    let v_u = v as u64;
+                    scratch[c2] = 0;
+                    let l = e.apply(cx, brow, p - v_u, &mut scratch, &mut [], false);
+                    last = last.max(l);
+                    c2 += 1;
+                    while c2 <= last {
+                        let raw2 = scratch[c2];
+                        if raw2 == 0 {
+                            c2 += 1;
+                            continue;
+                        }
+                        scratch[c2] = 0;
+                        let v2 = barrett(raw2, p, bm_);
+                        if v2 == 0 {
+                            c2 += 1;
+                            continue;
+                        }
+                        let col2 = e.np_cols[c2];
+                        let piv2 = e.pivot[col2 as usize];
+                        if piv2 == NONE {
+                            out_rows[k].push((col2, v2 as u32));
+                            c2 += 1;
+                            continue;
+                        }
+                        let brow2 = &e.rows[piv2 as usize];
+                        reds[k].nred += 1;
+                        reds[k].ops += brow2.nnz() as u64;
+                        let l = e.apply(cx, brow2, p - v2, &mut scratch, &mut [], false);
+                        last = last.max(l);
+                        c2 += 1;
+                    }
+                    break;
+                }
+            }
+            reds[k].ops += normalise(&mut out_rows[k], p);
+        }
+    }
+    out_rows.into_iter().zip(reds).collect()
 }
 
 /// The closedness check of [`Fast2Options::verify_closed`]. `W` is the span
@@ -1510,6 +3024,10 @@ pub fn closure_fast2(
         p2: if opts.fault == 2 { p * p - 1 } else { p * p },
         barrett_m: (u128::from(u64::MAX) / u128::from(p)) as u64,
         simd,
+        gemm_simd: fp_gemm::detect_gemm_simd(),
+        use_gemm: opts.fault == 0
+            && fp_gemm::supports_f64_gemm(p)
+            && std::env::var_os("HKY3_NO_GEMM").is_none(),
         bitmap: opts.bitmap,
     };
     let nv = ring.n_vars();
@@ -1688,111 +3206,181 @@ pub fn closure_fast2(
         if batch.is_empty() {
             continue 'outer;
         }
-        let take = batch.len();
         stats.batches += 1;
         let t0 = Instant::now();
-        let ech_ref = &ech;
-        let cov = &cover;
-        let kappa = &kappa;
-        let formed_items: Vec<(ItemOut, Vec<(u8, Row)>)> = batch
-            .par_iter()
-            .with_max_len(1)
-            .map(|item| {
-                let mut o = ItemOut {
-                    cands: Vec::new(),
-                    ops: 0,
-                    nred: 0,
-                    formed: 0,
-                    prod_nnz: 0,
-                    src_deg: 0,
-                    src_age: 0,
-                    src_nnz: 0,
-                    max_task: 0,
-                    ops0: 0,
-                    zero_ops: 0,
-                    core: Vec::new(),
-                    cls: 31,
-                    coverable: false,
-                    covers: Vec::new(),
-                };
-                let mut formed: Vec<(u8, Row)> = Vec::new();
-                match item {
-                    Item::Row(q, r) => formed.push((*q, r.clone())),
-                    Item::Prod { part, row, var } => {
-                        let e = &ech_ref[*part as usize];
-                        let src = &e.rows[*row as usize];
-                        // products are formed in the part's columns
-                        let full = RowS::Sparse(e.row_full(*row as usize));
-                        o.ops += space.multiply(*part as usize, &full, *var as usize, &mut formed);
-                        // PROOF.md: covers given by this product, and whether
-                        // the criterion covers it (counted when formed)
-                        let ld = lead_of(src);
-                        let ds = u32::from(space.parts[*part as usize].deg[ld as usize]);
-                        let ka = kappa[*var as usize];
-                        o.coverable = covered(cov, *part, ld, ka, opts.fault);
-                        o.cls = (2 * ds.min(14) as u8
-                            + u8::from(covered(cov, *part, ld, NO_COVER, 0)))
-                        .min(30);
-                        {
-                            for (q, r) in &formed {
-                                if let Some(&(pl, _)) = r.first() {
-                                    let dp = u32::from(space.parts[*q as usize].deg[pl as usize]);
-                                    if (dp == ds + 1 && ds + 2 <= c) || opts.fault == 7 {
-                                        o.covers.push((*q, pl, ka));
+        // When lead-cover skip is on, form products in ascending-κ waves so a
+        // cover minted by a lower-κ product in this batch can skip a higher-κ
+        // sibling before it is formed (PROOF.md; same span, fewer products).
+        // Off: one wave = the whole batch (previous schedule).
+        let mut pending: Vec<Item> = batch;
+        let mut outs: Vec<ItemOut> = Vec::with_capacity(pending.len());
+        let mut take = 0usize;
+        loop {
+            if pending.is_empty() {
+                break;
+            }
+            let wave: Vec<Item> = if opts.skip {
+                let mut kept: Vec<Item> = Vec::with_capacity(pending.len());
+                for it in pending.drain(..) {
+                    if let Item::Prod { part, row, var } = &it {
+                        let ld = lead_of(&ech[*part as usize].rows[*row as usize]);
+                        if covered(&cover, *part, ld, kappa[*var as usize], opts.fault) {
+                            stats.skipped_items += 1;
+                            continue;
+                        }
+                    }
+                    kept.push(it);
+                }
+                if kept.is_empty() {
+                    break;
+                }
+                let min_k = kept
+                    .iter()
+                    .map(|it| match it {
+                        Item::Row(..) => 0u16,
+                        Item::Prod { var, .. } => kappa[*var as usize],
+                    })
+                    .min()
+                    .unwrap_or(0);
+                let mut wave = Vec::new();
+                let mut rest = Vec::new();
+                for it in kept {
+                    let k = match &it {
+                        Item::Row(..) => 0u16,
+                        Item::Prod { var, .. } => kappa[*var as usize],
+                    };
+                    if k == min_k {
+                        wave.push(it);
+                    } else {
+                        rest.push(it);
+                    }
+                }
+                pending = rest;
+                wave
+            } else {
+                std::mem::take(&mut pending)
+            };
+            if wave.is_empty() {
+                break;
+            }
+            take += wave.len();
+            let ech_ref = &ech;
+            let cov = &cover;
+            let kappa_ref = &kappa;
+            let formed_items: Vec<(ItemOut, Vec<(u8, Row)>)> = wave
+                .par_iter()
+                .with_max_len(1)
+                .map(|item| {
+                    let mut o = ItemOut {
+                        cands: Vec::new(),
+                        ops: 0,
+                        nred: 0,
+                        formed: 0,
+                        prod_nnz: 0,
+                        src_deg: 0,
+                        src_age: 0,
+                        src_nnz: 0,
+                        max_task: 0,
+                        ops0: 0,
+                        zero_ops: 0,
+                        core: Vec::new(),
+                        cls: 31,
+                        coverable: false,
+                        covers: Vec::new(),
+                    };
+                    let mut formed: Vec<(u8, Row)> = Vec::new();
+                    match item {
+                        Item::Row(q, r) => formed.push((*q, r.clone())),
+                        Item::Prod { part, row, var } => {
+                            let e = &ech_ref[*part as usize];
+                            let src = &e.rows[*row as usize];
+                            // products are formed in the part's columns
+                            let full = RowS::Sparse(e.row_full(*row as usize));
+                            o.ops +=
+                                space.multiply(*part as usize, &full, *var as usize, &mut formed);
+                            // PROOF.md: covers given by this product, and whether
+                            // the criterion covers it (counted when formed)
+                            let ld = lead_of(src);
+                            let ds = u32::from(space.parts[*part as usize].deg[ld as usize]);
+                            let ka = kappa_ref[*var as usize];
+                            o.coverable = covered(cov, *part, ld, ka, opts.fault);
+                            o.cls = (2 * ds.min(14) as u8
+                                + u8::from(covered(cov, *part, ld, NO_COVER, 0)))
+                            .min(30);
+                            {
+                                for (q, r) in &formed {
+                                    if let Some(&(pl, _)) = r.first() {
+                                        let dp =
+                                            u32::from(space.parts[*q as usize].deg[pl as usize]);
+                                        if (dp == ds + 1 && ds + 2 <= c) || opts.fault == 7 {
+                                            o.covers.push((*q, pl, ka));
+                                        }
                                     }
                                 }
                             }
-                        }
-                        if tracing {
-                            o.src_deg = space.parts[*part as usize].deg[lead_of(src) as usize];
-                            o.src_age = (e.rows.len() - *row as usize) as u64;
-                            o.src_nnz = src.nnz() as u64;
-                        }
-                    }
-                }
-                o.formed = formed.len() as u32;
-                if tracing {
-                    for (q, r) in &formed {
-                        let e = &ech_ref[*q as usize];
-                        for &(col, _) in r {
-                            if e.of_col[col as usize] == NONE {
-                                o.core
-                                    .push(u64::from(*q) << 32 | u64::from(e.pivot[col as usize]));
+                            if tracing {
+                                o.src_deg = space.parts[*part as usize].deg[lead_of(src) as usize];
+                                o.src_age = (e.rows.len() - *row as usize) as u64;
+                                o.src_nnz = src.nnz() as u64;
                             }
                         }
                     }
-                }
-                (o, formed)
-            })
-            .collect();
-        // Reduce every product of the batch (alone, or by the sweep).
-        let mut prods: Vec<(u8, Row)> = Vec::new();
-        let mut items: Vec<ItemOut> = Vec::with_capacity(formed_items.len());
-        for (o, formed) in formed_items {
-            prods.extend(formed);
-            items.push(o);
-        }
-        let (done, swept) = reduce_products(&ech, &cx, &prods, &pool, &mut sweep_buf, opts);
-        stats.swept_batches += u64::from(swept);
-        let mut done = done.into_iter().zip(prods);
-        let outs: Vec<ItemOut> = items
-            .into_iter()
-            .map(|mut o| {
-                for ((red, rd), (q, r)) in done.by_ref().take(o.formed as usize) {
-                    o.prod_nnz += r.len() as u64;
-                    o.ops += rd.ops;
-                    o.max_task = o.max_task.max(rd.ops);
-                    o.nred += u64::from(rd.nred);
-                    o.ops0 += rd.ops0;
-                    if red.is_empty() {
-                        o.zero_ops += rd.ops;
-                    } else {
-                        o.cands.push((q, red));
+                    o.formed = formed.len() as u32;
+                    if tracing {
+                        for (q, r) in &formed {
+                            let e = &ech_ref[*q as usize];
+                            for &(col, _) in r {
+                                if e.of_col[col as usize] == NONE {
+                                    o.core.push(
+                                        u64::from(*q) << 32 | u64::from(e.pivot[col as usize]),
+                                    );
+                                }
+                            }
+                        }
                     }
+                    (o, formed)
+                })
+                .collect();
+            // Reduce every product of the wave (alone, or by the sweep).
+            let mut prods: Vec<(u8, Row)> = Vec::new();
+            let mut items: Vec<ItemOut> = Vec::with_capacity(formed_items.len());
+            for (o, formed) in formed_items {
+                prods.extend(formed);
+                items.push(o);
+            }
+            let (done, swept) = reduce_products(&ech, &cx, &prods, &pool, &mut sweep_buf, opts);
+            stats.swept_batches += u64::from(swept);
+            let mut done = done.into_iter().zip(prods);
+            let wave_outs: Vec<ItemOut> = items
+                .into_iter()
+                .map(|mut o| {
+                    for ((red, rd), (q, r)) in done.by_ref().take(o.formed as usize) {
+                        o.prod_nnz += r.len() as u64;
+                        o.ops += rd.ops;
+                        o.max_task = o.max_task.max(rd.ops);
+                        o.nred += u64::from(rd.nred);
+                        o.ops0 += rd.ops0;
+                        if red.is_empty() {
+                            o.zero_ops += rd.ops;
+                        } else {
+                            o.cands.push((q, red));
+                        }
+                    }
+                    o
+                })
+                .collect();
+            // Mint covers before the next higher-κ wave so siblings can skip.
+            for o in &wave_outs {
+                for &(q, col, ka) in &o.covers {
+                    let x = &mut cover[q as usize][col as usize];
+                    *x = (*x).min(ka);
                 }
-                o
-            })
-            .collect();
+            }
+            outs.extend(wave_outs);
+            if !opts.skip {
+                break;
+            }
+        }
         let par_dt = t0.elapsed().as_secs_f64();
         stats.parallel_s += par_dt;
         let t1 = Instant::now();
@@ -1842,10 +3430,7 @@ pub fn closure_fast2(
                 stats.coverable_items += 1;
                 stats.coverable_ops += o.ops;
             }
-            for &(q, col, ka) in &o.covers {
-                let x = &mut cover[q as usize][col as usize];
-                *x = (*x).min(ka);
-            }
+            // covers already applied per wave above; still collect cands
             cands.extend(o.cands);
         }
         stats.muladds += b_ops;
@@ -2193,34 +3778,41 @@ pub fn closure_fast2(
             let mut words = 0u64;
             let (mut n_dense, mut n_sparse) = (0u64, 0u64);
             for e in ech.iter_mut() {
-                let mut order: Vec<u32> = (0..e.rows.len() as u32).collect();
-                order.sort_unstable_by_key(|&i| std::cmp::Reverse(lead_of(&e.rows[i as usize])));
-                for chunk in order.chunks(opts.interreduce_block.max(1)) {
-                    let e_ref = &*e;
-                    let new: Vec<Option<(RowS, Red)>> = chunk
-                        .par_iter()
-                        .with_max_len(1)
-                        .map(|&ri| {
-                            let row = &e_ref.rows[ri as usize];
-                            e_ref.tail_meets_pivot(row).then(|| {
-                                let (mut r, rd) = pool.with(|s| e_ref.reduce_tail(&cx, row, s));
-                                if opts.fault == 3 && r.len() > 1 {
-                                    r.pop();
-                                }
-                                (e_ref.densify(e_ref.to_epoch(&r), dense.0, dense.1), rd)
+                if cx.use_gemm && opts.np_epochs {
+                    let (ops_e, ch_e) = e.interreduce_and_epoch_gemm(&cx, dense);
+                    ir_ops += ops_e;
+                    changed += ch_e;
+                } else {
+                    let mut order: Vec<u32> = (0..e.rows.len() as u32).collect();
+                    order
+                        .sort_unstable_by_key(|&i| std::cmp::Reverse(lead_of(&e.rows[i as usize])));
+                    for chunk in order.chunks(opts.interreduce_block.max(1)) {
+                        let e_ref = &*e;
+                        let new: Vec<Option<(RowS, Red)>> = chunk
+                            .par_iter()
+                            .with_max_len(1)
+                            .map(|&ri| {
+                                let row = &e_ref.rows[ri as usize];
+                                e_ref.tail_meets_pivot(row).then(|| {
+                                    let (mut r, rd) = pool.with(|s| e_ref.reduce_tail(&cx, row, s));
+                                    if opts.fault == 3 && r.len() > 1 {
+                                        r.pop();
+                                    }
+                                    (e_ref.densify(e_ref.to_epoch(&r), dense.0, dense.1), rd)
+                                })
                             })
-                        })
-                        .collect();
-                    for (&ri, x) in chunk.iter().zip(new) {
-                        if let Some((row, rd)) = x {
-                            ir_ops += rd.ops;
-                            changed += 1;
-                            e.rows[ri as usize] = row;
+                            .collect();
+                        for (&ri, x) in chunk.iter().zip(new) {
+                            if let Some((row, rd)) = x {
+                                ir_ops += rd.ops;
+                                changed += 1;
+                                e.rows[ri as usize] = row;
+                            }
                         }
                     }
-                }
-                if opts.np_epochs {
-                    e.new_epoch(dense.0, dense.1, opts.fault);
+                    if opts.np_epochs {
+                        e.new_epoch(dense.0, dense.1, opts.fault);
+                    }
                 }
                 for r in &e.rows {
                     words += r.words() as u64;
