@@ -224,6 +224,14 @@ pub fn scalar_mul_arm(arm: &str, p: &Point, k: &BigUint, a: &FieldElement) -> Op
         "adx_qp" => mont_dispatch::<AdxQpKernel>(x, y, k, a, Binary, false, false),
         // Two-word Montgomery reduction asm kernels at 4 and 6 limbs.
         "adx_tw" => mont_dispatch::<AdxTwKernel>(x, y, k, a, Binary, false, false),
+        // AVX-512 IFMA single-product kernel at 4 and 6 limbs (52-bit limbs).
+        #[cfg(target_arch = "x86_64")]
+        "ifma1" => {
+            if !super::mont_ifma::has_ifma() {
+                return None;
+            }
+            mont_dispatch::<super::mont_ifma::IfmaKernel>(x, y, k, a, Binary, false, false)
+        }
         "adx" => mont_dispatch::<AdxKernel>(x, y, k, a, Binary, false, false),
         "adx_sqr" => mont_dispatch::<AdxSqrKernel>(x, y, k, a, Binary, false, false),
         "mulx" => mont_dispatch::<MulxKernel>(x, y, k, a, Binary, false, false),
@@ -266,6 +274,12 @@ pub fn field_kernel_probe(
         let ctx = Mont::<N>::new(p)?;
         let mut acc = ctx.enter(a)?;
         let bm = ctx.enter(b)?;
+        #[cfg(target_arch = "x86_64")]
+        if matches!(op, "ifma1_mul" | "ifma8_mul" | "adx8_mul") {
+            let (ns, check) = super::mont_ifma::probe(op, &ctx, &acc, &bm, iters)?;
+            std::hint::black_box(check);
+            return Some((ns, ctx.leave(&acc)));
+        }
         let t0 = std::time::Instant::now();
         match op {
             "cios_mul" => (0..iters).for_each(|_| acc = ctx.mul(std::hint::black_box(&acc), &bm)),
@@ -2136,7 +2150,8 @@ mod mont_kernel_arms {
         BigUint::from(1u8) << e
     }
 
-    const ARMS: [&str; 18] = [
+    const ARMS: [&str; 19] = [
+        "ifma1",
         "adx_tw",
         "adx_qp",
         "adx_il",

@@ -37,6 +37,9 @@ pub(crate) struct Mont<const N: usize> {
     /// [`mont_mul4_adx_qp`] / [`mont_mul6_adx_qp`], `n1` the two-word factor's
     /// high word for [`mont_mul4_adx_tw`] / [`mont_mul6_adx_tw`].
     pn0: [u64; 20],
+    /// `p` in 52-bit limbs (`⌈64N/52⌉` used, zero padded) for the IFMA
+    /// kernels.
+    p52: [u64; 8],
 }
 
 fn limbs<const N: usize>(v: &BigUint) -> Option<[u64; N]> {
@@ -84,6 +87,23 @@ fn sub_in_place<const N: usize>(a: &mut [u64; N], b: &[u64; N]) -> bool {
 }
 
 impl<const N: usize> Mont<N> {
+    /// The modulus words (for kernels outside this file).
+    #[allow(dead_code)] // unused where this file is included by path
+    #[inline(always)]
+    pub(crate) fn p_words(&self) -> &[u64; N] {
+        &self.p
+    }
+
+    /// `p` as `L = ⌈64N/52⌉`-limb 52-bit words (padded to 8) and
+    /// `-p⁻¹ mod 2^52`, for the IFMA kernels (`ecc::mont_ifma`).
+    #[allow(dead_code)] // unused where this file is included by path
+    #[inline(always)]
+    pub(crate) fn ifma_consts(&self) -> (&[u64; 8], u64) {
+        (&self.p52, self.n0 & ((1u64 << 52) - 1))
+    }
+}
+
+impl<const N: usize> Mont<N> {
     /// The context for `modulus`, or `None` if it is even, below 3, or
     /// wider than `N` words.
     pub(crate) fn new(modulus: &BigUint) -> Option<Self> {
@@ -115,6 +135,20 @@ impl<const N: usize> Mont<N> {
         let n128 = inv128.wrapping_neg();
         debug_assert_eq!(n128 as u64, inv.wrapping_neg());
         pn0[2 * N + 1] = (n128 >> 64) as u64;
+        // p in 52-bit limbs (up to 8 = 416 bits; zero beyond).
+        let mut p52 = [0u64; 8];
+        for (k, w) in p52.iter_mut().enumerate() {
+            let bit = 52 * k;
+            if bit >= 64 * N {
+                break;
+            }
+            let (i, o) = (bit / 64, bit % 64);
+            let mut v = p[i] >> o;
+            if o > 12 && i + 1 < N {
+                v |= p[i + 1] << (64 - o);
+            }
+            *w = v & ((1u64 << 52) - 1);
+        }
         Some(Mont {
             p,
             n0: inv.wrapping_neg(),
@@ -122,6 +156,7 @@ impl<const N: usize> Mont<N> {
             one,
             r3,
             pn0,
+            p52,
         })
     }
 
