@@ -1793,9 +1793,10 @@ and support size for all 48 signed marks on each of two order-97
 curves. The P-192 factor count is derived symbolically; the replay
 does not form that product. [pcc:unverified]
 
-### Oriented-y batch replay protocol (pending)
+### Oriented-y batch replay and cost gate
 
-This follow-up tests the exact point-input product
+The protocol for this follow-up was committed as `8b3d49d09d3`
+before the native replay. It tests the exact point-input product
 `Y(P)=∏_(j=1)^n y([j]P)` with `n=(r−1)/2`, normalized by `Y(G)`.
 Gauss's lemma gives `Y([d]G)/Y(G)=χ_r(d)` for the P-192
 parameters. The proposed evaluation partitions `1..n` into
@@ -1805,6 +1806,10 @@ short Weierstrass curve `y²=x³+ax+b`, the paired product
 (x(U)−x(V))³`. A balanced product in the offset variable,
 followed by a product-tree remainder evaluation at the centers,
 would form the paired product without enumerating every `j`.
+The native replay uses a balanced polynomial product with
+quadratic multiplication and direct Horner evaluation at centers;
+it verifies the algebraic batching identity but does **not**
+implement a fast quasi-linear polynomial kernel. [pcc:unverified]
 
 The replay will accept `E`, `G`, and a target point `Q` through
 its coordinates, with no target scalar inside the evaluator.
@@ -1818,6 +1823,39 @@ center and offset counts, include base and target setup, and
 compare fully charged point and polynomial work against
 `R≈2^95.826` additions with a 1-PiB storage ceiling. A finite
 identity alone will not satisfy that gate. [pcc:unverified]
+
+The native [`oriented_y_batch.rs`](native/src/bin/oriented_y_batch.rs)
+replay gives 96/96 direct-product and scalar-sign matches on each
+order-97 curve and 4/4 on the order-10009 curve. The evaluator's
+input is the point; `d` occurs only in the control harness. The
+pair formula uses `u=x(U)`, `v=x(V)` and
+
+`N=a³+a²(u²+3uv+v²)+2ab(u+v)−a(u³v+3u²v²+uv³)+8b²−b(u³+9u²v+9uv²+v³)−u³v³`.
+
+It follows by substituting the chord formulas for `U+V` and
+`U−V` and reducing with `y(U)²=u³+au+b` and
+`y(V)²=v³+av+b`. The paired index blocks cover `1..n`
+exactly, leaving at most three direct factors. [pcc:unverified]
+
+At P-192, one evaluation has
+`39,614,081,257,132,168,796,771,975,170` centers and
+`55,470,196,593,803,169,285,008,934,149` offsets, zero
+direct tail, and `95,084,277,850,935,338,081,780,909,319`
+point samples (`2^96.263`). Base plus target doubles that
+sample count; charging one full-addition equivalent per sample
+would be about `2.708R` **before** polynomial work. This is
+an illustrative unit-cost comparison, not a measured P-192
+implementation or a universal point-generation lower bound.
+The largest numerator polynomial alone needs at least
+`3,802,951,800,684,688,204,490,109,616,064` bytes at 32
+bytes per coefficient (`2^101.585` bytes), far above 1 PiB.
+Even generously allowing `2^45` offset values under that cap,
+pair coverage forces at least
+`44,601,490,397,061,246,283,071,436,545,072,138,910,705,880`
+centers (about `2^145`) in this two-set decomposition. Thus
+the standard product-tree route fails the stated memory gate;
+its native finite replay does not establish a below-reference
+sign computation. [pcc:unverified]
 
 ### Trace-index division-polynomial residue screen
 
