@@ -1,0 +1,14 @@
+{
+  "action": "Inspect the command exit_code and exit the JavaScript script on nonzero before calling the mutation; awaited tool completion alone does not enforce shell success.",
+  "created": "2026-11-26T23:23:07Z",
+  "evidence": [
+    "docs/session-logs/2026-11-26.md"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "codex-tool-orchestration"
+  ],
+  "trigger": "A functions.exec script runs a validation command before a connected mutation",
+  "why": "An unguarded local PR-body lint returned exit1 but a subsequent connector update still ran; the corrected guarded update passed before review readiness."
+}

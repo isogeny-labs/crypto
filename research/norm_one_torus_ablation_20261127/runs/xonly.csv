@@ -1,0 +1,7 @@
+arm,config,setup_median_ms,query_median_ms,total_median_ms,ratio_vs_pr_control,ci95_low,ci95_high,ratio_vs_fair_control,ci95_low,ci95_high,query_multiplications,query_squarings,query_inversions
+PR #5229 control,indiv+full+inv128+sip,11.658,16.443,28.114,1.000,1.000,1.000,0.548,0.548,0.549,822459,410648,83060
+Fair control (i64 inv + Fx),indiv+full+inv64+fx,6.207,9.203,15.410,1.824,1.822,1.827,1.000,1.000,1.000,822459,410648,83060
+PR #5229 candidate,batch+quot+inv128+sip,1.928,4.277,6.195,4.538,4.515,4.554,2.487,2.476,2.497,1093603,419280,179
+PR candidate + i64 inv + Fx,batch+quot+inv64+fx,1.477,3.458,4.930,5.703,5.693,5.713,3.126,3.123,3.131,1093603,419280,179
+Affine x-only query,batch+quot+inv64+fx+xonly,1.476,1.874,3.358,8.373,8.356,8.397,4.589,4.580,4.604,335768,81897,179
+result_digest=5092f4a55ebcf6f105ea7ca64b531e1685813aee82e0b91f0a3eefcc20b0a353
