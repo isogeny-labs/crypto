@@ -31,7 +31,44 @@ road for the enumeration PDP: §2.4 of `RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRA
 shows that any enumeration/table PDP stays on the generic `S·T² ≳ p` line
 whatever its constant.
 
-### 1.2 Binary fields — algebraic PDP (F4 on the Weil-descended system)
+### 1.2 Fixed-arity table baseline: cheap attempts and certified rank
+
+Here is a complete asymptotic accounting for the elementary table approach,
+with group order \(N=p^{1+o(1)}\), a prime-order subgroup
+\(G=\langle P\rangle\), fixed \(1\le m<N\), and a factor base of
+\(t=p^{o(1)}\) independently uniform points of \(G\). Set
+\(M=\binom{t+m-1}{m}=p^{o(1)}\). Precomputing all \(M\) unordered
+\(m\)-fold sums takes \(O(mM)\) group operations and \(O(M)\) storage.
+For each fresh \(R=aP+bQ\), computing \(R\) and looking it up costs
+\(O(\log N)\) group operations plus a dictionary lookup, hence
+\(p^{o(1)}\) per attempt, including failed lookups. For two distinct
+multiplicity vectors, equality of their sums has probability \(1/N\)
+when \(m<N\); the union bound makes the chance of *any* collision at most
+\(\binom M2/N=o(1)\). Detecting and resampling a colliding base leaves
+expected preprocessing \(p^{o(1)}\).
+
+This construction also gives an explicit full-rank stopping argument. After
+collision-free preprocessing, each \(mB_i\) has the unique multiplicity
+vector \(m e_i\). Uniform independent targets encounter all \(t\) of these
+points in \(NH_t\) expected attempts, where \(H_t=\sum_{j=1}^t1/j\);
+their coefficient rows span \(\mathbb F_N^t\). Conditional on \(R\), the
+random \(b\) is uniform because \((a,b)\mapsto(R,b)\) is bijective.
+A repeat of any one \(mB_i\) with a different \(b\) takes at most
+\(N/[t(1-1/N)]\) more expected attempts. Subtracting its two rows leaves
+zero factor-base coefficients and a nonzero \(Q\) coefficient, so the
+full relation matrix has rank \(t+1\). The expected collection bound is
+\(NH_t+N/[t(1-1/N)]=p^{1+o(1)}\), before the
+\(p^{o(1)}\) final elimination. Conversely, any one-row-per-attempt
+method using these fixed-arity sums needs at least \((t+1)N/M=p^{1-o(1)}\)
+expected uniform targets merely to obtain \(t+1\) hits.
+
+This is an explicit witness for cheap *attempts* and eventual rank. Its
+nearly linear total count agrees with the enumeration boundary in
+[the prime-field program](RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md#1-generic-ceiling-in-the-units-this-repository-already-uses).
+The PDP and relation conventions follow
+[Kudo et al., *Complexity bounds on Semaev's naive index calculus method for ECDLP*](https://doi.org/10.1515/jmc-2019-0029).
+
+### 1.3 Binary fields — algebraic PDP (F4 on the Weil-descended system)
 
 The ledger's binary cells solve the PDP with matrix-F4 on the
 Weil-restricted Semaev system; the cost is dense `F₂` elimination of the
