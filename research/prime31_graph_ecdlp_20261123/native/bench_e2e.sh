@@ -24,7 +24,7 @@ for round in $(seq 1 "$rounds"); do
       --argjson wall_ms "$(( (t1 - t0) / 1000000 ))" --argjson user_s "$user" --argjson sys_s "$sys" --arg hash "$hash" \
       '{round:$round, arm:$arm, bin:$bin, process_wall_ms:$wall_ms, cpu_user_s:$user_s, cpu_sys_s:$sys_s,
         output_hash:$hash, recovered_scalar, queries:(.queries|length), cold_wall_ms, table_ms,
-        collection_ms:([.queries[].source_ms]|add), stage_us:(.stage_us // null), levers:(.levers // "baseline")}' \
+        collection_ms:([.queries[].source_ms]|add), stage_us:(.stage_us // null), vm_hwm_kb:(.vm_hwm_kb // null), levers:(.levers // "baseline")}' \
       "$tmp/out.json" >> "$out"
   done
 done

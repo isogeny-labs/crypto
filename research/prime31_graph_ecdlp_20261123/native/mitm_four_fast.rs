@@ -971,6 +971,10 @@ fn fneg(y: u64) -> u64 {
 struct CoupleTable {
     xy: Vec<[u32; 2]>,
     ij: Vec<[u16; 2]>,
+    /// Per build thread: its couple range and x-index bucket histogram.
+    parts: Vec<(usize, usize, Vec<u32>)>,
+    /// Couples with y = 0 (points of order two; normally none).
+    zero_y: Vec<u32>,
 }
 
 const SIGNS: [(i8, i8); 4] = [(1, 1), (1, -1), (-1, 1), (-1, -1)];
@@ -1033,61 +1037,81 @@ impl CoupleTable {
             ij_rest = ib;
         }
         let pts = &pts;
-        let results: Vec<Counts> = std::thread::scope(|scope| {
-            let handles: Vec<_> = work
-                .into_iter()
-                .map(|(i0, i1, xy, ij)| {
-                    scope.spawn(move || {
-                        let mut c = Counts::default();
-                        let mut mults = 0u64;
-                        let mut prefix: Vec<u32> = Vec::with_capacity(ij.len());
-                        let mut acc = 1u64;
-                        let mut g = 0;
-                        for i in i0..i1 {
-                            for j in i + 1..n {
-                                ij[g] = [i as u16, j as u16];
-                                g += 1;
-                                prefix.push(acc as u32);
-                                acc = fmul_lazy(acc, fsub(pts[j].0, pts[i].0, true));
-                                mults += 1;
+        let results: Vec<(Counts, usize, usize, Vec<u32>, Vec<u32>)> =
+            std::thread::scope(|scope| {
+                let handles: Vec<_> = work
+                    .into_iter()
+                    .map(|(i0, i1, xy, ij)| {
+                        scope.spawn(move || {
+                            let q0 = 2 * before(i0);
+                            let q1 = q0 + xy.len();
+                            let mut hist = vec![0u32; 1 << BBITS];
+                            let mut zero_y = Vec::new();
+                            let mut c = Counts::default();
+                            let mut mults = 0u64;
+                            let mut prefix: Vec<u32> = Vec::with_capacity(ij.len());
+                            let mut acc = 1u64;
+                            let mut g = 0;
+                            for i in i0..i1 {
+                                for j in i + 1..n {
+                                    ij[g] = [i as u16, j as u16];
+                                    g += 1;
+                                    prefix.push(acc as u32);
+                                    acc = fmul_lazy(acc, fsub(pts[j].0, pts[i].0, true));
+                                    mults += 1;
+                                }
                             }
-                        }
-                        if prefix.is_empty() {
-                            return c;
-                        }
-                        c.fp_inversions += 1;
-                        let mut inv = finv(canon(acc), true, &mut mults);
-                        for g in (0..ij.len()).rev() {
-                            let [i, j] = ij[g];
-                            let ((x, y), (z, w)) = (pts[i as usize], pts[j as usize]);
-                            let d = fsub(z, x, true);
-                            let inv_d = fmul_lazy(inv, prefix[g] as u64);
-                            inv = fmul_lazy(inv, d);
-                            // P_i + P_j and P_i - P_j share the denominator z - x.
-                            let s1 = fmul_lazy(fsub_lazy(w, y), inv_d);
-                            let x1 = canon(fsub_lazy(fsub_lazy(fmul_lazy(s1, s1), x), z));
-                            let y1 = canon(fsub_lazy(fmul_lazy(s1, fsub_lazy(x, x1)), y));
-                            let s2 = fmul_lazy(fsub_lazy(fneg(w), y), inv_d);
-                            let x2 = canon(fsub_lazy(fsub_lazy(fmul_lazy(s2, s2), x), z));
-                            let y2 = canon(fsub_lazy(fmul_lazy(s2, fsub_lazy(x, x2)), y));
-                            mults += 8;
-                            xy[2 * g] = [x1 as u32, y1 as u32];
-                            xy[2 * g + 1] = [x2 as u32, y2 as u32];
-                        }
-                        c.group_additions += 4 * ij.len() as u64;
-                        c.fp_multiplications += mults;
-                        c
+                            if prefix.is_empty() {
+                                return (c, q0, q1, hist, zero_y);
+                            }
+                            c.fp_inversions += 1;
+                            let mut inv = finv(canon(acc), true, &mut mults);
+                            for g in (0..ij.len()).rev() {
+                                let [i, j] = ij[g];
+                                let ((x, y), (z, w)) = (pts[i as usize], pts[j as usize]);
+                                let d = fsub(z, x, true);
+                                let inv_d = fmul_lazy(inv, prefix[g] as u64);
+                                inv = fmul_lazy(inv, d);
+                                // P_i + P_j and P_i - P_j share the denominator z - x.
+                                let s1 = fmul_lazy(fsub_lazy(w, y), inv_d);
+                                let x1 = canon(fsub_lazy(fsub_lazy(fmul_lazy(s1, s1), x), z));
+                                let y1 = canon(fsub_lazy(fmul_lazy(s1, fsub_lazy(x, x1)), y));
+                                let s2 = fmul_lazy(fsub_lazy(fneg(w), y), inv_d);
+                                let x2 = canon(fsub_lazy(fsub_lazy(fmul_lazy(s2, s2), x), z));
+                                let y2 = canon(fsub_lazy(fmul_lazy(s2, fsub_lazy(x, x2)), y));
+                                mults += 8;
+                                xy[2 * g] = [x1 as u32, y1 as u32];
+                                xy[2 * g + 1] = [x2 as u32, y2 as u32];
+                            }
+                            c.group_additions += 4 * ij.len() as u64;
+                            c.fp_multiplications += mults;
+                            for (q, &[x, y]) in xy.iter().enumerate() {
+                                hist[XIndex::bucket(XIndex::hash(x as u64))] += 1;
+                                if y == 0 {
+                                    zero_y.push((q0 + q) as u32);
+                                }
+                            }
+                            (c, q0, q1, hist, zero_y)
+                        })
                     })
-                })
-                .collect();
-            handles.into_iter().map(|h| h.join().unwrap()).collect()
-        });
-        for c in results {
+                    .collect();
+                handles.into_iter().map(|h| h.join().unwrap()).collect()
+            });
+        let mut parts = Vec::new();
+        let mut zero_y = Vec::new();
+        for (c, q0, q1, hist, z) in results {
+            zero_y.extend(z);
             counts.group_additions += c.group_additions;
             counts.fp_inversions += c.fp_inversions;
             counts.fp_multiplications += c.fp_multiplications;
+            parts.push((q0, q1, hist));
         }
-        Some(CoupleTable { xy, ij })
+        Some(CoupleTable {
+            xy,
+            ij,
+            parts,
+            zero_y,
+        })
     }
 }
 
@@ -1125,7 +1149,19 @@ impl XIndex {
     fn bucket(h: u32) -> usize {
         (h >> (32 - BBITS)) as usize
     }
-    fn build(xy: &[[u32; 2]], threads: usize) -> Self {
+    /// Build from the couple table's per-thread bucket histograms: global
+    /// offsets, a stable scatter of each thread's own couple range, then
+    /// filter bits and distinct counts over thread-owned bucket ranges.
+    fn build(t: &CoupleTable, threads: usize) -> Self {
+        struct SyncPtr(*mut u64);
+        // SAFETY: threads write disjoint indices (see the scatter below).
+        unsafe impl Sync for SyncPtr {}
+        impl SyncPtr {
+            fn get(&self) -> *mut u64 {
+                self.0
+            }
+        }
+        let xy = &t.xy;
         let nb = 1usize << BBITS;
         let fbits = 23u32;
         let fwords = (1usize << fbits) / 64;
@@ -1134,63 +1170,55 @@ impl XIndex {
         let fwbits = fbits - 6;
         let fshift = 32 - fwbits;
         let wpb = fwords / nb;
-        let ranges: Vec<(usize, usize)> = (0..threads)
-            .map(|t| (t * nb / threads, (t + 1) * nb / threads))
-            .collect();
-        // Pass 1: per-bucket counts, each thread over its bucket range.
         let mut off = vec![0u32; nb + 1];
+        let mut starts: Vec<Vec<u32>> = t.parts.iter().map(|_| vec![0u32; nb]).collect();
+        let mut acc = 0u32;
+        for b in 0..nb {
+            off[b] = acc;
+            for (k, (_, _, hist)) in t.parts.iter().enumerate() {
+                starts[k][b] = acc;
+                acc += hist[b];
+            }
+        }
+        off[nb] = acc;
+        assert_eq!(acc as usize, xy.len());
+        let mut ent = vec![0u64; xy.len()];
+        let ptr = SyncPtr(ent.as_mut_ptr());
         std::thread::scope(|scope| {
-            let mut rest: &mut [u32] = &mut off[..nb];
-            for &(lo, hi) in &ranges {
-                let (mine, tail) = rest.split_at_mut(hi - lo);
-                rest = tail;
+            for ((q0, q1, _), mut pos) in t.parts.iter().zip(starts) {
+                let (q0, q1, ptr) = (*q0, *q1, &ptr);
                 scope.spawn(move || {
-                    for &[x, _] in xy {
+                    for (q, &[x, _]) in xy.iter().enumerate().take(q1).skip(q0) {
                         let b = Self::bucket(Self::hash(x as u64));
-                        if (lo..hi).contains(&b) {
-                            mine[b - lo] += 1;
-                        }
+                        // SAFETY: positions of (thread k, bucket b) are
+                        // [starts[k][b], starts[k][b] + hist_k[b]), disjoint
+                        // across (k, b) and inside `ent`.
+                        unsafe { *ptr.get().add(pos[b] as usize) = ((x as u64) << 32) | q as u64 };
+                        pos[b] += 1;
                     }
                 });
             }
         });
-        let mut acc = 0u32;
-        for o in off.iter_mut() {
-            let c = *o;
-            *o = acc;
-            acc += c;
-        }
-        let mut ent = vec![0u64; xy.len()];
         let mut filter = vec![0u64; fwords];
-        // Pass 2: stable scatter, filter bits and distinct-point count.
+        let ranges: Vec<(usize, usize)> = (0..threads)
+            .map(|k| (k * nb / threads, (k + 1) * nb / threads))
+            .collect();
         let distinct: usize = std::thread::scope(|scope| {
-            let off = &off;
-            let mut erest: &mut [u64] = &mut ent;
+            let (off, ent) = (&off, &ent);
             let mut frest: &mut [u64] = &mut filter;
             let mut handles = Vec::new();
             for &(lo, hi) in &ranges {
-                let (base, end) = (off[lo] as usize, off[hi] as usize);
-                let (e, et) = erest.split_at_mut(end - base);
-                erest = et;
                 let (f, ft) = frest.split_at_mut((hi - lo) * wpb);
                 frest = ft;
                 handles.push(scope.spawn(move || {
-                    let mut fill: Vec<u32> = off[lo..hi].iter().map(|&o| o - base as u32).collect();
                     let fbase = lo * wpb;
-                    for (q, &[x, _]) in xy.iter().enumerate() {
-                        let h = Self::hash(x as u64);
-                        let b = Self::bucket(h);
-                        if !(lo..hi).contains(&b) {
-                            continue;
-                        }
-                        let k = &mut fill[b - lo];
-                        e[*k as usize] = ((x as u64) << 32) | q as u64;
-                        *k += 1;
-                        f[(h >> fshift) as usize - fbase] |= Self::bloom_mask(h);
-                    }
                     let mut distinct = 0usize;
                     for b in lo..hi {
-                        let bucket = &e[off[b] as usize - base..off[b + 1] as usize - base];
+                        let bucket = &ent[off[b] as usize..off[b + 1] as usize];
+                        for &v in bucket {
+                            let h = Self::hash(v >> 32);
+                            f[(h >> fshift) as usize - fbase] |= Self::bloom_mask(h);
+                        }
                         distinct += Self::bucket_distinct(bucket, xy);
                     }
                     distinct
@@ -1198,25 +1226,38 @@ impl XIndex {
             }
             handles.into_iter().map(|h| h.join().unwrap()).sum()
         });
-        XIndex {
+        let mut index = XIndex {
             off,
             ent,
             fshift,
             filter,
             distinct,
+        };
+        // A y = 0 couple alone on its x was counted as two points; it is one.
+        for &q in &t.zero_y {
+            let head = index.head(xy[q as usize][0] as u64);
+            if index.chain(head).count() == 1 {
+                index.distinct -= 1;
+            }
         }
+        index
     }
-    /// Distinct points (x, +-y) among one bucket's couples.
+    /// Distinct points (x, +-y) among one bucket's couples, counting two
+    /// per x held by a single couple (`build` corrects for y = 0 couples)
+    /// and reading y only for x shared by several couples.
     fn bucket_distinct(bucket: &[u64], xy: &[[u32; 2]]) -> usize {
         let mut total = 0;
         for (k, &v) in bucket.iter().enumerate() {
             let x = v >> 32;
-            if bucket[..k].iter().any(|&w| w >> 32 == x) {
+            let shared = bucket
+                .iter()
+                .enumerate()
+                .any(|(l, &w)| l != k && w >> 32 == x);
+            if !shared {
+                total += 2;
                 continue;
             }
-            let same = bucket[k + 1..].iter().filter(|&&w| w >> 32 == x).count();
-            if same == 0 {
-                total += if xy[v as u32 as usize][1] == 0 { 1 } else { 2 };
+            if bucket[..k].iter().any(|&w| w >> 32 == x) {
                 continue;
             }
             let mut ys = Vec::new();
@@ -1398,28 +1439,28 @@ mod avx2 {
     #[inline]
     #[target_feature(enable = "avx2")]
     unsafe fn vmul(a: __m256i, b: __m256i, p: __m256i) -> __m256i {
+        // Inputs in [0, p): the product folds to t <= 2p - 1 (high half 0);
+        // min(t, t - p) on u32 halves is the conditional subtraction
+        // (t - p wraps above t when t < p). Output in [0, p).
         let t = _mm256_mul_epu32(a, b);
         let t = _mm256_add_epi64(_mm256_and_si256(t, p), _mm256_srli_epi64(t, 31));
-        let r = _mm256_sub_epi64(t, p);
-        _mm256_castpd_si256(_mm256_blendv_pd(
-            _mm256_castsi256_pd(r),
-            _mm256_castsi256_pd(t),
-            _mm256_castsi256_pd(r),
-        ))
+        _mm256_min_epu32(t, _mm256_sub_epi32(t, p))
+    }
+
+    /// x + y mod p for x, y in [0, p) (u32 halves, high halves zero).
+    #[inline]
+    #[target_feature(enable = "avx2")]
+    unsafe fn vadd(x: __m256i, y: __m256i, p: __m256i) -> __m256i {
+        let s = _mm256_add_epi32(x, y);
+        _mm256_min_epu32(s, _mm256_sub_epi32(s, p))
     }
 
     #[inline]
     #[target_feature(enable = "avx2")]
     unsafe fn vsub(x: __m256i, y: __m256i, p: __m256i) -> __m256i {
-        let r = _mm256_sub_epi64(x, y);
-        let m = _mm256_cmpgt_epi64(y, x);
-        _mm256_add_epi64(r, _mm256_and_si256(m, p))
-    }
-
-    #[inline]
-    #[target_feature(enable = "avx2")]
-    unsafe fn vcanon(v: __m256i, p: __m256i) -> __m256i {
-        _mm256_andnot_si256(_mm256_cmpeq_epi64(v, p), v)
+        // x - y wraps above x - y + p exactly when y > x (inputs < 2^31).
+        let d = _mm256_sub_epi32(x, y);
+        _mm256_min_epu32(d, _mm256_add_epi32(d, p))
     }
 
     /// Bloom prefilter for four x values (u64 lanes): bit l set if lane l
@@ -1477,10 +1518,12 @@ mod avx2 {
         let one = _mm256_set1_epi64x(1);
         let src = xy.as_ptr() as *const __m256i;
         let pre = prefix.as_mut_ptr() as *mut __m256i;
+        let nryv = _mm256_set1_epi64x(fneg(ry) as i64);
+        // x - rx, with 1 in place of 0 (x = rx lanes are handled exactly in
+        // the scalar special path).
         let den = |x: __m256i| {
             let sp = _mm256_cmpeq_epi64(x, rxv);
-            let d = vsub(x, rxv, p);
-            _mm256_or_si256(_mm256_andnot_si256(sp, d), _mm256_and_si256(sp, one))
+            _mm256_or_si256(vsub(x, rxv, p), _mm256_and_si256(sp, one))
         };
         let mut acc = [one, one];
         for s in 0..blocks {
@@ -1511,11 +1554,12 @@ mod avx2 {
                 let y = _mm256_srli_epi64(v, 32);
                 let inv_q = vmul(inv[h], _mm256_loadu_si256(pre.add(2 * s + h)), p);
                 inv[h] = vmul(inv[h], den(x), p);
-                let ny = vcanon(_mm256_sub_epi64(p, y), p);
-                let s0 = vmul(vsub(ny, ryv, p), inv_q, p);
-                let x0 = vcanon(vsub(vsub(vmul(s0, s0, p), rxv, p), x, p), p);
+                // All operands canonical, so every result is in [0, p).
+                let w = vadd(rxv, x, p);
+                let s0 = vmul(vsub(nryv, y, p), inv_q, p);
+                let x0 = vsub(vmul(s0, s0, p), w, p);
                 let s1 = vmul(vsub(y, ryv, p), inv_q, p);
-                let x1 = vcanon(vsub(vsub(vmul(s1, s1, p), rxv, p), x, p), p);
+                let x1 = vsub(vmul(s1, s1, p), w, p);
                 _mm256_storeu_si256(xs0.as_mut_ptr().add(4 * h) as *mut __m256i, x0);
                 _mm256_storeu_si256(xs1.as_mut_ptr().add(4 * h) as *mut __m256i, x1);
                 _mm256_storeu_si256(ss0.as_mut_ptr().add(4 * h) as *mut __m256i, s0);
@@ -1695,6 +1739,13 @@ fn main() {
     }
 }
 
+/// Peak resident set (VmHWM, kB) of this process so far; None off Linux.
+fn vm_hwm_kb() -> Option<u64> {
+    let status = std::fs::read_to_string("/proc/self/status").ok()?;
+    let line = status.lines().find(|l| l.starts_with("VmHWM:"))?;
+    line.split_whitespace().nth(1)?.parse().ok()
+}
+
 fn add_counts(dst: &mut Counts, src: &Counts) {
     dst.group_additions += src.group_additions;
     dst.fp_multiplications += src.fp_multiplications;
@@ -1788,7 +1839,7 @@ fn run<S: BuildHasher + Default>(max_queries: usize, levers: Levers, threads: us
         }
     };
     ledger.lap("c1_table_pairs");
-    let xidx = ctab.as_ref().map(|t| XIndex::build(&t.xy, threads));
+    let xidx = ctab.as_ref().map(|t| XIndex::build(t, threads));
     let pair_entries = ctab.as_ref().map_or(pairs.len(), CoupleTable::entries);
     let mut buffers: Vec<(Vec<u64>, Vec<u32>)> = vec![(Vec::new(), Vec::new()); threads];
     ledger.lap("c2_table_xindex");
@@ -2101,9 +2152,17 @@ fn run<S: BuildHasher + Default>(max_queries: usize, levers: Levers, threads: us
             "table_ms": table_ms,
             "cold_wall_ms": cold.elapsed().as_millis(),
             "stage_us": stage_us,
+            "vm_hwm_kb": vm_hwm_kb(),
             "charged_group_work": ar.counts,
             "total_group_additions": fixture.counts().group_additions + ar.counts.group_additions,
         }))
         .unwrap()
     );
+    // The record is complete; with lever 8, flush and exit without running
+    // destructors for the tables (the OS reclaims the pages at once).
+    if couple_ok {
+        use std::io::Write;
+        std::io::stdout().flush().expect("flush stdout");
+        std::process::exit(0);
+    }
 }
