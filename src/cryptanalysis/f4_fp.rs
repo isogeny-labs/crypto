@@ -513,11 +513,27 @@ fn count_ops(n: usize) {
 
 #[inline]
 fn record_row_diagnostics(n: usize) {
-    FIELD_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
-    FIELD_OPS_THREAD.with(|c| c.set(c.get() + n as u64));
+    let n = n as u64;
+    FIELD_OPS_THREAD.with(|c| c.set(c.get() + n));
+    // Batch the process atomic: every `add_lazy` under multi-thread FL /
+    // deferred contended one cache line until #5314; the VisitAccount
+    // wide-reducer split later flushed every op again.
+    if thread_ops_mode() {
+        // Reports read the thread-local only; skip the process atomic.
+    } else {
+        FIELD_OPS_BUF.with(|b| {
+            let v = b.get() + n;
+            if v >= FIELD_OPS_BUF_FLUSH {
+                FIELD_OPS.fetch_add(v, AtomicOrdering::Relaxed);
+                b.set(0);
+            } else {
+                b.set(v);
+            }
+        });
+    }
     // bitop/v1 (`jv_bitops`, off unless a study turns it on): one row
     // operation is a multiply-subtract
-    super::jv_bitops::row_ops(n as u64);
+    super::jv_bitops::row_ops(n);
 }
 
 /// Exclusive accounting route for matrix and polynomial reducer work.
@@ -8610,6 +8626,18 @@ fn f4_with_arithmetic(
                     Err(stop) => abort_call!(stop),
                 }
             } else {
+                // Wide primes (above the narrow/deferred gate at 2¹⁶) still admit
+                // Faugère–Lachartre when coefficients fit in `u32` and exact `f64`
+                // panels are safe — the NTT prime 786433 is the motivating case.
+                // `F4_FP_FL=0` keeps the cascade below as a same-binary control.
+                // Restored here after the VisitAccount wide-reducer split dropped
+                // this gate (main tip had cascade-only for p > 2¹⁶).
+                let fl_wide = resume_here.is_none()
+                    && opts.resource_limits.is_none()
+                    && fl_enabled()
+                    && n_cols >= fl_min_cols()
+                    && reducers.len().saturating_mul(free_cols.len()) <= FL_MAX_ENTRIES
+                    && super::fp_gemm::supports_f64_gemm(p);
                 let reduce_pair_row = |r: &Vec<(u32, u64)>| -> Option<Vec<u64>> {
                     if deadline.is_some_and(|d| Instant::now() > d) {
                         return None;
@@ -8669,7 +8697,7 @@ fn f4_with_arithmetic(
                     }
                     count_ops(row_ops);
                     Some(free_cols.iter().map(|&c| acc[c]).collect())
-            };
+                };
             // an in-step snapshot stands in for the reducer pass and the finished
             // part of the reduction.
             //
@@ -8888,6 +8916,7 @@ fn f4_with_arithmetic(
                     }
                 }
             })
+            }
         };
         drop(account_rows);
         account_or_abort!(account.control());
