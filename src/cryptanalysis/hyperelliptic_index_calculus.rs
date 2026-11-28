@@ -927,6 +927,64 @@ pub fn classify_counted_with(
     }
 }
 
+/// Split a reduced divisor over the factor base and at most two other
+/// rational places. The off-base pairs contain the canonical x-coordinate
+/// and its signed multiplicity. This is an opt-in oracle for the two-large-
+/// prime graph collector; the single-prime oracle above keeps its original
+/// accounting and outcomes.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum TwoLargePrimeDecomposition {
+    Split {
+        entries: Vec<(usize, i64)>,
+        off_base: Vec<(BigUint, i64)>,
+    },
+    TooManyOffBase,
+    NotSmooth,
+}
+
+pub fn classify_two_large_primes_counted_with(
+    curve: &HyperellipticCurveP,
+    d: &MumfordDivisorP,
+    fb: &HecFactorBase,
+    ops: &mut usize,
+    test: &SmoothnessTest,
+) -> TwoLargePrimeDecomposition {
+    let p = &curve.p;
+    let half = (p - BigUint::one()) >> 1;
+    let roots = match split_counted_with(&d.u, p, ops, test) {
+        Some(r) => r,
+        None => return TwoLargePrimeDecomposition::NotSmooth,
+    };
+    let mut acc: HashMap<usize, i64> = HashMap::new();
+    let mut off_base = Vec::with_capacity(2);
+    for (x, mult) in roots {
+        *ops += d.v.degree().unwrap_or(0);
+        let y = d.v.eval(&x);
+        debug_assert!(curve.is_on_curve(&x, &y));
+        ops::word_op(1);
+        ops::hash_probe(1);
+        let sign = if y.is_zero() || y <= half { 1 } else { -1 };
+        match fb.index_of_x(&x) {
+            Some(idx) => {
+                debug_assert_eq!(fb.entries[idx].y, if sign > 0 { y.clone() } else { p - &y });
+                ops::hash_probe(1);
+                *acc.entry(idx).or_insert(0) += sign * mult as i64;
+            }
+            None => {
+                if off_base.len() == 2 {
+                    return TwoLargePrimeDecomposition::TooManyOffBase;
+                }
+                off_base.push((x, sign * mult as i64));
+            }
+        }
+    }
+    let mut entries: Vec<_> = acc.into_iter().filter(|&(_, c)| c != 0).collect();
+    ops::word_op(ops::sort_cost(entries.len()));
+    entries.sort_unstable_by_key(|&(i, _)| i);
+    off_base.sort_unstable_by(|a, b| a.0.cmp(&b.0));
+    TwoLargePrimeDecomposition::Split { entries, off_base }
+}
+
 /// As [`decompose_over_factor_base_counted`], choosing the oracle.
 pub fn decompose_counted_with(
     curve: &HyperellipticCurveP,
@@ -2259,6 +2317,37 @@ mod tests {
             assert!(e.y <= half, "non-canonical representative in factor base");
             assert_eq!(fb.index_of_x(&e.x).map(|i| &fb.entries[i].x), Some(&e.x));
         }
+    }
+
+    #[test]
+    fn two_large_prime_oracle_keeps_both_signed_places() {
+        let curve = toy_curve(41);
+        let full = build_factor_base(&curve, usize::MAX);
+        let fb = build_factor_base(&curve, 2);
+        assert!(full.len() >= 5);
+        let p = &full.entries[3];
+        let q = &full.entries[4];
+        let d = p.divisor.add(&q.divisor.neg(&curve), &curve);
+        let mut field_ops = 0;
+        let got = classify_two_large_primes_counted_with(
+            &curve,
+            &d,
+            &fb,
+            &mut field_ops,
+            &SmoothnessTest::Scan,
+        );
+        assert_eq!(
+            got,
+            TwoLargePrimeDecomposition::Split {
+                entries: vec![],
+                off_base: vec![(p.x.clone(), 1), (q.x.clone(), -1)],
+            }
+        );
+        assert!(field_ops > 0);
+        assert_eq!(
+            classify_counted_with(&curve, &d, &fb, &mut 0, &SmoothnessTest::Scan),
+            Decomposition::SmoothOffBase
+        );
     }
 
     #[test]
