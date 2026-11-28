@@ -54,7 +54,7 @@ mod scalar_timing;
 #[path = "ecbench/structured_s4.rs"]
 mod structured_s4;
 
-use std::io::Write as _;
+use std::io::{Read as _, Write as _};
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
@@ -1206,6 +1206,117 @@ fn print_json(v: &impl serde::Serialize) -> Result<(), String> {
     Ok(())
 }
 
+/// Read the measured-child request without allowing an untrusted stdin stream
+/// to allocate past the protocol's fixed input ceiling. Reading one byte past
+/// the ceiling distinguishes an exact-size request from an oversized one.
+fn read_child_input(reader: impl std::io::Read) -> Result<String, String> {
+    let maximum = record::MAX_DIAGNOSTIC_CHILD_BYTES;
+    let limit = u64::try_from(
+        maximum
+            .checked_add(1)
+            .ok_or("child input byte bound overflow")?,
+    )
+    .map_err(|_| "child input byte bound exceeds u64")?;
+    let mut bytes = Vec::with_capacity(maximum.min(64 * 1024));
+    reader
+        .take(limit)
+        .read_to_end(&mut bytes)
+        .map_err(|error| format!("read child input: {error}"))?;
+    if bytes.len() > maximum {
+        return Err(format!("child input exceeds {maximum}-byte protocol bound"));
+    }
+    String::from_utf8(bytes).map_err(|error| format!("child input is not UTF-8: {error}"))
+}
+
+#[cfg(test)]
+mod child_input_bound_tests {
+    use super::{read_child_input, rebuild_profile_workload};
+    use crypto_lib::cryptanalysis::ecbench::{
+        methods::MethodSpec,
+        record::{
+            ChildInput, PublicStudyExecution, PublicStudyItem, CHILD_INPUT_SCHEMA,
+            MAX_DIAGNOSTIC_CHILD_BYTES,
+        },
+        workload::{CurveSpec, TargetKind, Workload},
+    };
+
+    #[test]
+    fn accepts_exact_bound_and_rejects_one_byte_more() {
+        assert_eq!(
+            read_child_input(&vec![b'x'; MAX_DIAGNOSTIC_CHILD_BYTES][..])
+                .unwrap()
+                .len(),
+            MAX_DIAGNOSTIC_CHILD_BYTES
+        );
+        assert!(
+            read_child_input(&vec![b'x'; MAX_DIAGNOSTIC_CHILD_BYTES + 1][..])
+                .unwrap_err()
+                .contains("exceeds")
+        );
+    }
+
+    #[test]
+    fn rejects_non_utf8_within_the_bound() {
+        assert!(read_child_input(&[0xff][..])
+            .unwrap_err()
+            .contains("not UTF-8"));
+    }
+
+    #[test]
+    fn fixed_study_profile_rebuild_uses_the_explicit_public_point() {
+        let curve = CurveSpec::PrimeExplicit {
+            p: 16_777_199,
+            a: 16_777_196,
+            b: 31,
+            group_order: 16_782_299,
+            r: 16_782_299,
+            gx: 2,
+            gy: 5_412_647,
+        };
+        let instance = curve.build().unwrap();
+        let target = ["0x2".to_string(), format!("0x{:x}", 5_412_647u64)];
+        let expected =
+            Workload::from_explicit_public_target(&curve, &instance, target.clone()).unwrap();
+        let study = PublicStudyExecution {
+            study: "blocked-bsgs-rho-wall/v1".into(),
+            curve_slug: expected.curve.slug.clone(),
+            panel: "warmup".into(),
+            replicate: 0,
+            arm: "bsgs-cold".into(),
+            copy: "main".into(),
+            schedule_position: 0,
+            items: vec![PublicStudyItem {
+                item: 0,
+                target,
+                rho_derived_u64_hex: Some("0000000000000001".into()),
+            }],
+        };
+        let mut input = ChildInput {
+            diagnostics: None,
+            diagnostic_lifecycle: None,
+            study: Some(study),
+            schema: CHILD_INPUT_SCHEMA.into(),
+            curve,
+            target_seed: 0,
+            target_index: 0,
+            target_kind: TargetKind::Public,
+            expected_workload_id: expected.workload_id.clone(),
+            method: MethodSpec {
+                id: "bsgs.prime_paired_v1".into(),
+                params: Default::default(),
+            },
+            expected_method_id: "not-needed-for-workload-rebuild".into(),
+            algorithm_seed: 0,
+        };
+        assert_eq!(rebuild_profile_workload(&input).unwrap(), expected);
+
+        input.expected_workload_id = "Wtampered".into();
+        assert!(rebuild_profile_workload(&input)
+            .unwrap_err()
+            .contains("not the planned"));
+    }
+}
+
 fn load_independent(path: &Path, pointer: String) -> Result<claim::Independent, String> {
     let bytes = std::fs::read(path).map_err(|e| format!("{}: {e}", path.display()))?;
     Ok(claim::Independent {
@@ -2204,9 +2315,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             );
         }
         Cmd::Exec => {
-            let mut input = String::new();
-            std::io::Read::read_to_string(&mut std::io::stdin(), &mut input)
-                .map_err(|e| e.to_string())?;
+            let stdin = std::io::stdin();
+            let input = read_child_input(stdin.lock())?;
             let out = record::child_main(&input);
             println!(
                 "{}",
@@ -3231,15 +3341,26 @@ fn profile_input(path: &Path, seq: u64) -> Result<record::ChildInput, String> {
         .ok_or_else(|| format!("sequence {seq} is not in the plan"))?;
     let arm = &p.arms[ex.arm];
     let w = &p.workloads[ex.workload];
+    let study = ex
+        .study
+        .as_ref()
+        .map(record::PublicStudyExecution::from_parent)
+        .transpose()?;
+    let fixed_study = study.is_some();
     Ok(record::ChildInput {
         schema: record::CHILD_INPUT_SCHEMA.into(),
         diagnostics: None,
         diagnostic_lifecycle: None,
+        study,
         curve: workload::CurveSpec::explicit(p.instance(ex.workload))
             .unwrap_or_else(|| w.curve_spec.clone()),
-        target_seed: w.target_seed,
-        target_index: w.target_index,
-        target_kind: w.kind(),
+        target_seed: if fixed_study { 0 } else { w.target_seed },
+        target_index: if fixed_study { 0 } else { w.target_index },
+        target_kind: if fixed_study {
+            workload::TargetKind::Public
+        } else {
+            w.kind()
+        },
         expected_workload_id: w.workload_id.clone(),
         method: methods::MethodSpec {
             id: arm.method.id.clone(),
@@ -3248,6 +3369,50 @@ fn profile_input(path: &Path, seq: u64) -> Result<record::ChildInput, String> {
         expected_method_id: arm.method.method_id.clone(),
         algorithm_seed: ex.algorithm_seed,
     })
+}
+
+/// Rebuild the workload described by a profiling child input. Fixed-study
+/// inputs are coordinate-only: deriving another public point from their
+/// redacted zero seed would profile and price the wrong target.
+fn rebuild_profile_workload(input: &record::ChildInput) -> Result<workload::Workload, String> {
+    let workload = if let Some(study) = &input.study {
+        study.validate()?;
+        if input.target_seed != 0
+            || input.target_index != 0
+            || input.target_kind != workload::TargetKind::Public
+        {
+            return Err("fixed-study profile input carries target derivation data".into());
+        }
+        let instance = input.curve.build()?;
+        let first = study
+            .items
+            .first()
+            .ok_or("fixed-study profile input has no public target")?;
+        let workload = workload::Workload::from_explicit_public_target(
+            &input.curve,
+            &instance,
+            first.target.clone(),
+        )?;
+        if workload.curve.slug != study.curve_slug {
+            return Err("fixed-study profile input curve identity mismatch".into());
+        }
+        workload
+    } else {
+        workload::Workload::build(
+            &input.curve,
+            input.target_seed,
+            input.target_index,
+            input.target_kind,
+        )?
+        .0
+    };
+    if workload.workload_id != input.expected_workload_id {
+        return Err(format!(
+            "rebuilt profile workload {} is not the planned {}",
+            workload.workload_id, input.expected_workload_id
+        ));
+    }
+    Ok(workload)
 }
 
 /// One execution under Callgrind, priced.
@@ -3289,12 +3454,7 @@ fn audit_ir_one(
     let report = child_out
         .report
         .ok_or_else(|| format!("seq {seq}: {}", child_out.error.unwrap_or_default()))?;
-    let (w, _) = workload::Workload::build(
-        &input.curve,
-        input.target_seed,
-        input.target_index,
-        input.target_kind,
-    )?;
+    let w = rebuild_profile_workload(&input)?;
     let ir = callgrind::solve_ir(&prefix)?;
     let block = work::price(&work::Priceable {
         method_id: &input.method.id,

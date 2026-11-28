@@ -1,0 +1,330 @@
+{
+  "schema": "experiment.protocol/v1 (b2lsp-protocol/v1)",
+  "study": "b2lsp-20261127/v1",
+  "builds_on": "crypto PR #5291 (arm D2, b2lp-20261127/v1, head 73bf5f4e) and PR #5290 (arm D-S, bdsl-20261127/v1, head 92f096c1), both on #5261 / #5253",
+  "seed_policy": "isogeny-labs/experiment-seeds/v1",
+  "single_target": "every solve is one cold solve of one public Q; no multi-target amortisation (owner instruction)",
+  "seed_derivation": "unchanged #5253 seeds.rs: seed(parts) = first 8 bytes big-endian of SHA-256('bcr-20261126/v1|' + '|'.join(parts)); stream = SplitMix64(seed). Curves, targets and A1 streams are bitwise those of #5253/#5261/#5290/#5291.",
+  "streams": {
+    "curve": [
+      "curve",
+      "<n>",
+      "<ci>"
+    ],
+    "target": [
+      "target",
+      "<n>",
+      "<ci>",
+      "<ti>"
+    ],
+    "ic_relation_targets (A1; shared with D, D-S, D2)": [
+      "icstream-a1",
+      "<n>",
+      "<ci>",
+      "<ti>"
+    ],
+    "la (D2S, D2S23)": [
+      "la-d2s",
+      "<n>",
+      "<ci>",
+      "<ti>",
+      "<arm>"
+    ],
+    "la (D2Sall; = #5290's D-S stream)": [
+      "la-ds",
+      "<n>",
+      "<ci>",
+      "<ti>"
+    ],
+    "rho": [
+      "rho",
+      "<n>",
+      "<ci>",
+      "<ti>",
+      "<si>"
+    ],
+    "alpha pilot (held out)": [
+      "d2spilot-curve | d2spilot-target | d2spilot-stream | d2spilot-la",
+      "<n>",
+      "<ci>",
+      "<ti>",
+      "<alpha>"
+    ],
+    "rho lane pilot n=60 (held out)": [
+      "pilot-curve | pilot-target | pilot-rho",
+      "60",
+      "<ci>",
+      "<ti>",
+      "<W>"
+    ],
+    "prediction simulation": [
+      "b2lsp-predict | b2lsp-predict-la",
+      "<n>",
+      "<beta>",
+      "<theta>",
+      "<rep>"
+    ],
+    "bootstrap": [
+      "boot",
+      "b2lsp",
+      "main | slope | slopediff"
+    ]
+  },
+  "custody": "d drawn from the 'target' stream inside the evaluator; solvers receive (curve, G, Q, ell); [d]G = Q checked inside the counted solve; d == d_true compared after the solve",
+  "arms_d2s": {
+    "D2S": {
+      "beta": 0.5,
+      "theta": 99.58909231956032,
+      "rule": "fs = min(F-1, ceil(theta*F^beta)); (beta, theta) from the part A pilot rule (raw OLS beta 0.359 clamped to 0.5, theta refitted)"
+    },
+    "D2S23": {
+      "beta": 0.6666666666666666,
+      "theta": 17.616469727098906,
+      "rule": "beta = 2/3 (textbook k = 3 2LP balance), theta = gmean of the pilot's fs*/F^(2/3)"
+    },
+    "D2Sall": {
+      "beta": 0.6666666666666666,
+      "theta": -1.0,
+      "rule": "every class small on #5290's LA stream: must reproduce D-S bitwise (d, targets, relations, LA phase counters, la_report, LA calls)"
+    }
+  },
+  "la": "#5290 sparse_la.rs unchanged: SGE (kmax 64, cost-model stop) + scalar Wiedemann (4 attempts, |u| = 16, excess <= 2); #5290 stopping rule on Y_ub and fs (start 0.70 fs, step ceil(fs/256))",
+  "forest": "BFS rebuilt at every checkpoint (from SV, else the union-find root), deepest-first cycle reduction, empty combinations dropped (amendment A1)",
+  "references": {
+    "DS": "#5290 data/runs_ds.jsonl, arm DS (n = 18..54; 12 cases at n = 51, 4 at n = 54)",
+    "D2": "#5291 data/runs_d2.jsonl, arm D2 (n = 18..54; 4 cases at n = 51, 2 at n = 54)",
+    "RHO": "16 seeds per target: #5253 runs.jsonl (n <= 33), #5261 runs_ext_ref.jsonl (36..48), n = 51 W = 128 (#5291 runs_ext_rho.jsonl 4 cases + this study 8 cases), n = 54 W = 64 (#5290 runs_rho_new.jsonl, 4 cases), n = 57 W = 256 and n = 60 (this study)",
+    "RHO_W64 (sensitivity)": "#5290's n = 51 W = 64 records"
+  },
+  "curves_per_rung": 4,
+  "targets_per_curve": 3,
+  "rho_seeds_per_target": 16,
+  "rungs": [
+    {
+      "n": 18,
+      "np": 6,
+      "run_arms": [
+        "D2S",
+        "D2S23",
+        "D2Sall"
+      ]
+    },
+    {
+      "n": 21,
+      "np": 7,
+      "run_arms": [
+        "D2S",
+        "D2S23",
+        "D2Sall"
+      ]
+    },
+    {
+      "n": 24,
+      "np": 8,
+      "run_arms": [
+        "D2S",
+        "D2S23",
+        "D2Sall"
+      ]
+    },
+    {
+      "n": 27,
+      "np": 9,
+      "run_arms": [
+        "D2S",
+        "D2S23",
+        "D2Sall"
+      ]
+    },
+    {
+      "n": 30,
+      "np": 10,
+      "run_arms": [
+        "D2S",
+        "D2S23",
+        "D2Sall"
+      ]
+    },
+    {
+      "n": 33,
+      "np": 11,
+      "run_arms": [
+        "D2S",
+        "D2S23",
+        "D2Sall"
+      ],
+      "curves": 2,
+      "targets": 2
+    },
+    {
+      "n": 36,
+      "np": 12,
+      "run_arms": [
+        "D2S",
+        "D2S23",
+        "D2Sall"
+      ]
+    },
+    {
+      "n": 39,
+      "np": 13,
+      "run_arms": [
+        "D2S",
+        "D2S23",
+        "D2Sall"
+      ]
+    },
+    {
+      "n": 42,
+      "np": 14,
+      "run_arms": [
+        "D2S",
+        "D2S23"
+      ]
+    },
+    {
+      "n": 45,
+      "np": 15,
+      "run_arms": [
+        "D2S",
+        "D2S23"
+      ]
+    },
+    {
+      "n": 48,
+      "np": 16,
+      "run_arms": [
+        "D2S",
+        "D2S23"
+      ],
+      "curves": 2,
+      "targets": 2
+    },
+    {
+      "n": 51,
+      "np": 17,
+      "run_arms": [
+        "D2S",
+        "D2S23"
+      ]
+    },
+    {
+      "n": 54,
+      "np": 18,
+      "run_arms": [
+        "D2S",
+        "D2S23"
+      ],
+      "curves": 2,
+      "targets": 2
+    },
+    {
+      "n": 57,
+      "np": 19,
+      "run_arms": [
+        "D2S",
+        "D2S23"
+      ],
+      "curves": 2,
+      "targets": 2
+    },
+    {
+      "n": 60,
+      "np": 20,
+      "run_arms": [
+        "D2S",
+        "D2S23"
+      ],
+      "curves": 2,
+      "targets": 2
+    }
+  ],
+  "rho_rungs": [
+    {
+      "n": 51,
+      "np": 17,
+      "run_arms": [
+        "RHO"
+      ],
+      "rho_lanes": 128,
+      "cases": [
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          2
+        ],
+        [
+          2,
+          0
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          0
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          3,
+          2
+        ]
+      ]
+    },
+    {
+      "n": 57,
+      "np": 19,
+      "run_arms": [
+        "RHO"
+      ],
+      "rho_lanes": 256,
+      "curves": 2,
+      "targets": 2
+    },
+    {
+      "n": 60,
+      "np": 20,
+      "run_arms": [
+        "RHO"
+      ],
+      "rho_lanes": 256,
+      "curves": 2,
+      "targets": 2
+    }
+  ],
+  "resources": {
+    "per_process_address_space": "prlimit --as 12 GiB",
+    "wall_budget_per_rung_process_s": {
+      "<=48": 7200,
+      "51": 10800,
+      "54": 14400,
+      "57": 21600,
+      "60": 28800
+    },
+    "threads": 3,
+    "rule": "a killed/failed process is a resource-limit record, never a negative result; the run continues with the next rung"
+  },
+  "primary_metric": "Meq(s=1,u=1) of the whole cold solve (fb, setup, targets, oracle, resolve, graph, LA, verify); #5253 unit",
+  "band": "u in {0, 0.1, 1} for non-field units, s in {1, 0.25}; orders stated only where they hold across the band (AGENTS.md 5a); +/-1 products and LA bookkeeping charged as sensitivities",
+  "checks": {
+    "logs": "[d]G = Q in-solve and d == d_true for every record; D2S/D2S23 d equal to DS's and D2's d on shared cases",
+    "rows": "every row fed to every LA call checked by the group law sum e_c [h]P_c = [a][h]G + [b][h]Q (uncounted)",
+    "yield_identity": "at every checkpoint: BFS yields + empty_dropped = #5291 LpGraph yields on the same relations (uncounted shadow)",
+    "kernel": "n <= 30: the sparse dependency traced back to the input rows satisfies sum c_j row_j = 0 and gives d (#5290 track check), and #5253's echelon on the same rows gives the same d",
+    "D2Sall_eq_DS": "n <= 39: bitwise as above",
+    "replay": "n = 30, ci = 0, ti = 0, arm D2S rerun from the frozen manifest; all fields but wall times compared"
+  },
+  "falsifier": "parity at a rung if the upper 95% bound of D2S/rho (or D2S23/rho) <= 1 there",
+  "exclusions": "none; every record, failure, kill and mismatch is retained"
+}

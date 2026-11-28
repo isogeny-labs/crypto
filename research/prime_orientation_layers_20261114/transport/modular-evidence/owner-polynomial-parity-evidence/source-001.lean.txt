@@ -1,0 +1,48 @@
+module
+public import Mathlib.Algebra.Polynomial.Expand
+public import Mathlib.RingTheory.Ideal.Quotient.Basic
+public import Mathlib.Tactic
+
+public section
+namespace CryptoLean.PolynomialParity
+open Polynomial
+
+section CommSemiring
+variable {R : Type*} [CommSemiring R]
+
+theorem fourth_linear_expand_two (s : R) (h4 : (4:R)=0) :
+    (1+C s*X : R[X])^4 =
+      expand R 2 (1+C (6*s^2)*X+C (s^4)*X^2) := by
+  have h4P : (4:R[X])=0 := by
+    have H := congrArg (fun r : R => (C r : R[X])) h4
+    simpa only [map_ofNat,map_zero] using H
+  simp only [map_add,map_one,map_mul,expand_C,expand_X,map_pow,map_ofNat]
+  calc
+    _ = (1+(6:R[X])*(C s)^2*X^2+(C s)^4*X^4)+
+        (4:R[X])*(C s*X+(C s)^3*X^3) := by ring
+    _ = _ := by
+      rw [h4P,zero_mul,add_zero]
+      ring
+
+end CommSemiring
+
+section CommRing
+variable {R : Type*} [CommRing R]
+
+theorem dvd_odd_coeff_of_quotient_expand (d : R) (P : R[X])
+    (Q : (R ⧸ Ideal.span ({d}:Set R))[X])
+    (h : P.map (Ideal.Quotient.mk (Ideal.span ({d}:Set R)))=
+      expand (R ⧸ Ideal.span ({d}:Set R)) 2 Q) (b : ℕ) :
+    d ∣ P.coeff (2*b+1) := by
+  apply (Ideal.Quotient.eq_zero_iff_dvd d (P.coeff (2*b+1))).mp
+  have H := congrArg (fun A : (R ⧸ Ideal.span ({d}:Set R))[X] => A.coeff (2*b+1)) h
+  rw [coeff_map,coeff_expand (by decide : 0 < 2)] at H
+  have hodd : ¬ 2 ∣ 2*b+1 := by
+    rintro ⟨k,hk⟩
+    omega
+  simpa only [ite_neg hodd] using H
+
+end CommRing
+end CryptoLean.PolynomialParity
+#print axioms CryptoLean.PolynomialParity.fourth_linear_expand_two
+#print axioms CryptoLean.PolynomialParity.dvd_odd_coeff_of_quotient_expand
