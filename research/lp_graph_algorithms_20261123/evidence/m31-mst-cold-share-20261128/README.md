@@ -52,12 +52,21 @@ ten-query stream.
 | MST filter, exhaustive, pre-#5183 loop (same input, saved pre-change build) | 4.78–4.90 ms | 0.094–0.096 % |
 | MST filter inside `lp_graph_eval` (warm runs 2–3) | 1.48–1.50 ms | 0.029 % |
 | exact projected-rank audit of the MST output (`lp_graph_eval`) | 97–125 ms | 1.9–2.5 % |
+| pivot (Markowitz) filter, same input (`lp_graph_eval`, three runs) | 0.67–1.19 ms | 0.013–0.023 % |
 
 **Outputs.**
 - All three arms give identical output: 507 complete relations, 0 replay failures.
 - The exact rank of that output is 506 useful and 506 augmented, the rank at which the producer recovered the scalar.
 - The rank audit is a dense correctness auditor, not a production solver; the producer's own incremental rank step does the equivalent work in about 25 ms.
 - The first `lp_graph_eval` run, a cold cache, measured 3.67 ms for the MST step.
+
+## Qualifications
+
+- **Timing repeats, not independent instances.** The producer has one fixed public target and one fixed SplitMix64 seed. Its only argument is the query cap. The five runs repeat one target and one relation stream; no target or seed panel was run.
+- **Hash randomness.** The pair table (`HashMap`) and per-query deduplication (`HashSet`) use Rust's default randomized `RandomState`. Relation rows are sorted, so outputs are identical, but layout-dependent timing is not frozen.
+- **Clock boundary.** `cold_wall_ms` is the producer's in-process `Instant`. It is read while the result JSON is built, so it excludes process start-up and the JSON printing. The listed stages sum to 14–15 ms less than it in every run (unattributed work and millisecond rounding).
+- **Pivot filter.** In `lp_graph_eval` the pivot filter is quicker than MST on this stream: MST/pivot is 5.48, 1.26 and 2.17 across the three runs, the first including a cold cache. Both give 507 rows with rank 506.
+- **Other runs.** These figures should not be pooled with timings from other curves, subgroups or clock boundaries. Matched rho and isolated timing were not part of this measurement.
 
 ## Reading
 
