@@ -52,3 +52,19 @@ Rows: `harness_b2.json`, `harness_b11.json` (both `status: complete`,
   oracle's isogeny membership generalised past a linear `ψ`, which is the next
   piece of work.
 * One instance, one seed, one curve.
+
+## Reproducibility
+
+Both rows were re-run after rebuilding the binary from the same patch: `S =
+289.0` (213.9× ρ) and `S = 366.0` (270.9× ρ), identical to the committed rows,
+`verified: true` in both cases.
+
+The branch commit applies this patch to the branch's newer `bench.rs` and
+`prime_tower.rs`. That combination is **not buildable in the build checkout**
+used here — the branch's `bench.rs` needs a newer library API than the checkout
+has (`E0061: this function takes 5 arguments but 4 were supplied`) — so the
+numbers above were produced by the checkout's own files plus the same patch,
+and the branch-tip build needs CI or a full checkout to confirm. The patch
+itself is `+84/−1` on those two files; an earlier commit that staged the
+checkout's older copies over the branch's newer ones was repaired in
+`946b17734f4`.
