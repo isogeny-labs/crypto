@@ -116,7 +116,9 @@ def main():
                                "wall_ratio": ratio_summary(pairs[key]["wall_s"]),
                                "cpu_ratio": ratio_summary(pairs[key]["process_cpu_s"]),
                                "rss_ratio": ratio_summary(pairs[key]["peak_rss_kib"])})
-    full = len(results) == 576 and replay.get("claim_qualified") is True
+    # The independent replayer always leaves claim_qualified false: it audits
+    # identities and receipts, while native cost is assessed separately here.
+    full = len(results) == 576 and replay.get("complete") is True
     output = {"schema": "pkm-z2xz8-cold-paired-analysis/v1",
               "store_sha256": hashlib.sha256(data).hexdigest(),
               "replay_sha256": hashlib.sha256(args.replay.read_bytes()).hexdigest(),
