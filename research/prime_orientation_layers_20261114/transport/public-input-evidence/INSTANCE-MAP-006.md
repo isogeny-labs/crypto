@@ -1,0 +1,8 @@
+# Uniform higher multiplicity via the actual leading coefficient
+
+1. Structure: actual bivariate polynomial p in K[X][Y], homogeneous extension degree ell>=natDegreeYp, weights(1,a,a-2),2a abscissas, paired distinct ordinates. XJet is explicitly ofFn of inner-X shifted coefficient jets. FullMultiplicity r means EVERY mixed shifted coefficient t,k with t+k<r is zero; no directional-only weakening or factorial division.
+2. Existing laws AS STATED: Polynomial.ofFn_coeff_eq_val_of_lt/ofFn_natDegree_lt; X_sub_C_pow_dvd_iff/X_pow_dvd_iff; isCoprime linear powers and mul_dvd; natDegree_le_of_dvd/mul/pow; Finset.prod_dvd_of_coprime/prod_pow and Lagrange.nodal degree. No new generic root/cancellation/adic induction.
+3. Objects: explicit mixed Taylor coefficients of the actual coefficient polynomial; uniform full multiplicities at both signs and literal strict natural coefficient budget<2a*r.
+4. Chain: validate r1 evaluation and full mixed jet/factor equivalence. Actual leading Y degree d<2r. Put s=r-floor(d/2)>0. For every t<s, the X-jet polynomial has degree<=d but two roots of multiplicity r-t, so it is zero. Hence leading coefficient has nodalG^s divisor and degree>=2a*s. Strict budget demands less than2ar-d*a, contradicted by2s+d>=2r.
+5. Tests full uniform multiplicity, all r including0, arbitrary homogeneous degree. Nonuniform multiplicities/other weights/budgets/public-input correlations are outside. No solver or all-algorithm ECDLP nonexistence conclusion.
+6. Supersedes only the unvalidated proposed local cancellation proof route: existing univariate bounds avoid missing multivariate cancellation law entirely. Primary2013Theorem6/read receipt and prior source009 are retained. KB unavailable; direct Mathlib definitions read. [pcc:unverified]

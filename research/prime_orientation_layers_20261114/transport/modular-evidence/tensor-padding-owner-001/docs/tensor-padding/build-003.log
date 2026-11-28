@@ -1,0 +1,28 @@
+docs/tensor-padding/source-003.lean.txt:28:36: error: Tactic `rewrite` failed: motive is not type correct:
+  fun _a => (if _a then 1 else 0) = if x = d0 then 1 else 0
+Error: Application type mismatch: The argument
+  decidableDforallFinset
+has type
+  Decidable (∀ a ∈ univ, x a = d0 a)
+but is expected to have type
+  Decidable _a
+in the application
+  @ite R _a decidableDforallFinset
+
+Explanation: The rewrite tactic rewrites an expression 'e' using an equality 'a = b' by the following process. First, it looks for all 'a' in 'e'. Second, it tries to abstract these occurrences of 'a' to create a function 'm := fun _a => ...', called the *motive*, with the property that 'm a' is definitionally equal to 'e'. Third, we observe that 'congrArg' implies that 'm a = m b', which can be used with lemmas such as 'Eq.mpr' to change the goal. However, if 'e' depends on specific properties of 'a', then the motive 'm' might not typecheck.
+
+Possible solutions: use rewrite's 'occs' configuration option to limit which occurrences are rewritten, or use 'simp' or 'conv' mode, which have strategies for certain kinds of dependencies (these tactics can handle proofs and 'Decidable' instances whose types depend on the rewritten term, and 'simp' can apply user-defined '@[congr]' theorems as well).
+
+R : Type u_1
+D : Type u_3
+Sigma : Type u_4
+inst✝⁴ : CommSemiring R
+inst✝³ : Fintype D
+inst✝² : Fintype Sigma
+inst✝¹ : DecidableEq D
+inst✝ : DecidableEq Sigma
+d0 x : D → Sigma
+he : (∀ d ∈ univ, x d = d0 d) ↔ x = d0
+⊢ (if ∀ i ∈ univ, x i = d0 i then 1 else 0) = if x = d0 then 1 else 0
+'CryptoLean.TensorPadding.dummyWeight_eq' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CryptoLean.TensorPadding.contraction_padded' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

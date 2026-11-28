@@ -1,0 +1,29 @@
+import Mathlib.Algebra.Polynomial.Derivative
+import Mathlib.Algebra.Polynomial.Eval.Coeff
+
+namespace CryptoLean.PolynomialFirstMoment
+open Polynomial Finset
+
+variable {R ι : Type*} [CommSemiring R]
+
+theorem coeff_one_prod_linear_powers (S : Finset ι) (s : ι → R) (m : ι → ℕ) :
+    (∏ j ∈ S, (1 + C (s j) * X : R[X])^(m j)).coeff 1 =
+      ∑ j ∈ S, (m j : R) * s j := by
+  classical
+  calc
+    _ = (derivative (∏ j ∈ S, (1 + C (s j) * X : R[X])^(m j))).eval 0 := by
+      simp only [← coeff_zero_eq_eval_zero,coeff_derivative,zero_add,Nat.cast_zero,mul_one]
+    _ = _ := by
+      rw [derivative_prod_finset,eval_finsetSum]
+      apply Finset.sum_congr rfl
+      intro j _
+      simp [derivative_pow,eval_prod]
+
+theorem coeff_zero_prod_linear_powers (S : Finset ι) (s : ι → R) (m : ι → ℕ) :
+    (∏ j ∈ S, (1 + C (s j) * X : R[X])^(m j)).coeff 0 = 1 := by
+  rw [coeff_zero_eq_eval_zero]
+  simp [eval_prod]
+
+end CryptoLean.PolynomialFirstMoment
+#print axioms CryptoLean.PolynomialFirstMoment.coeff_one_prod_linear_powers
+#print axioms CryptoLean.PolynomialFirstMoment.coeff_zero_prod_linear_powers

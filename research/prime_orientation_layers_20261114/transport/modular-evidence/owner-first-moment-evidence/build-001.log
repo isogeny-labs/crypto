@@ -1,0 +1,36 @@
+CryptoLean/PolynomialFirstMoment.lean:13:73: error: unsolved goals
+R : Type u_1
+ι : Type u_2
+inst✝¹ : CommSemiring R
+inst✝ : DecidableEq ι
+S : Finset ι
+s : ι → R
+m : ι → ℕ
+⊢ (∏ j ∈ S, (1 + C (s j) * X) ^ m j).coeff 1 = (∏ j ∈ S, (1 + C (s j) * X) ^ m j).coeff 1 * (↑0 + 1)
+CryptoLean/PolynomialFirstMoment.lean:14:69: warning: This simp argument is unused:
+  Nat.cast_one
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [← coeff_zero_eq_eval_zero, coeff_derivative, zero_add, mul_one]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+CryptoLean/PolynomialFirstMoment.lean:14:82: warning: This simp argument is unused:
+  mul_one
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [← coeff_zero_eq_eval_zero, coeff_derivative, zero_add, Nat.cast_one]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+CryptoLean/PolynomialFirstMoment.lean:21:0: warning: automatically included section variable(s) unused in theorem `CryptoLean.PolynomialFirstMoment.coeff_zero_prod_linear_powers`:
+  [DecidableEq ι]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [DecidableEq ι] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+'CryptoLean.PolynomialFirstMoment.coeff_one_prod_linear_powers' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'CryptoLean.PolynomialFirstMoment.coeff_zero_prod_linear_powers' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

@@ -1,0 +1,61 @@
+'OrientationPublicHankel.momentLogged_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.momentLogged_multiply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.momentLogged_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.momentsLogged_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.momentsLogged_multiply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.momentsLogged_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.kernelLogged_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.kernelLogged_multiply' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.kernelLogged_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.kernelLogged_zero_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.exists_kernelLogged_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.branch_square' depends on axioms: [propext, Quot.sound]
+'OrientationPublicHankel.wordPorts_card' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.wordPorts_cubic' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.literal_incidence_edges' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPublicHankel.literal_incidence_cubic' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCurveAuxiliary.curveAux_eval' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCurveAuxiliary.curveAux_branch' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCurveAuxiliary.curveAux_nonzero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCurveAuxiliary.curveAux_natDegree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCurveAuxiliary.curveAux_power_nonzero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCurveAuxiliary.curveAux_power_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCurveAuxiliary.curveAux_power_not_strict' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationCurveAuxiliary.public_curveAux_boundary' depends on axioms: [propext, Classical.choice, Quot.sound]
+/workspace/audit/orientation-proof-cache-20261117/public-hankel006-ed79571ed14a.lean.txt:302:37: error: Application type mismatch: The argument
+  NormSignedHankel.nodalDivides S q0 fun x hx => (hroots x hx).left
+has type
+  Lagrange.nodal S id ∣ q0
+but is expected to have type
+  ?m.345 ≠ 0
+in the application
+  natDegree_le_of_dvd ?m.346 (NormSignedHankel.nodalDivides S q0 fun x hx => (hroots x hx).left)
+/workspace/audit/orientation-proof-cache-20261117/public-hankel006-ed79571ed14a.lean.txt:302:34: error: Application type mismatch: The argument
+  hn
+has type
+  ¬q0 = 0
+but is expected to have type
+  ?m.344 ∣ ?m.345
+in the application
+  natDegree_le_of_dvd hn
+/workspace/audit/orientation-proof-cache-20261117/public-hankel006-ed79571ed14a.lean.txt:307:37: error: Application type mismatch: The argument
+  NormSignedHankel.nodalDivides S q1 fun x hx => (hroots x hx).right
+has type
+  Lagrange.nodal S id ∣ q1
+but is expected to have type
+  ?m.371 ≠ 0
+in the application
+  natDegree_le_of_dvd ?m.372 (NormSignedHankel.nodalDivides S q1 fun x hx => (hroots x hx).right)
+/workspace/audit/orientation-proof-cache-20261117/public-hankel006-ed79571ed14a.lean.txt:307:34: error: Application type mismatch: The argument
+  hn
+has type
+  ¬q1 = 0
+but is expected to have type
+  ?m.370 ∣ ?m.371
+in the application
+  natDegree_le_of_dvd hn
+'OrientationQuadraticRecovery.strictBudget_coefficients' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationQuadraticRecovery.strict_quadratic_interpolator_zero' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]

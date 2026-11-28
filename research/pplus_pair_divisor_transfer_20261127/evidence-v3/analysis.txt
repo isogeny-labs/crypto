@@ -1,0 +1,10 @@
+RATIO kind=dag series=g17_second_pair_norm from_depth=1 to_depth=2 state=11.667447307 arithmetic=11.583026800
+RATIO kind=dag series=g1_second_pair_norm from_depth=1 to_depth=2 state=11.667447307 arithmetic=11.583026800
+RATIO kind=dag series=second_pair_norm from_depth=1 to_depth=2 state=14.388406477 arithmetic=14.446828578
+ANALYSIS schema=pplus-pair-divisor-transfer-analysis-v3 exactness_ok=1 coverage_complete=0 candidate_complete=1 cross_target_amortization=0 pair_aggregate=0 recurrence_rho_lt_4=0 poly_cells=2 dag_cells=6 poly_stops=3 dag_stops=3 errors=0 verdict=INDETERMINATE_CAP
+STOP_DETAIL POLY_STOP label=second_pair_norm depth=1 reason=Cap prior_slots=16752
+STOP_DETAIL POLY_STOP label=g1_second_pair_norm depth=2 reason=Cap prior_slots=85833
+STOP_DETAIL POLY_STOP label=g17_second_pair_norm depth=2 reason=Cap prior_slots=85833
+STOP_DETAIL DAG_STOP label=second_pair_norm depth=3 reason=CAP prior_nodes=61309 attempted_peak=323453
+STOP_DETAIL DAG_STOP label=g1_second_pair_norm depth=3 reason=CAP prior_nodes=44838 attempted_peak=306982
+STOP_DETAIL DAG_STOP label=g17_second_pair_norm depth=3 reason=CAP prior_nodes=44838 attempted_peak=306982

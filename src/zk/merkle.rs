@@ -29,11 +29,11 @@
 //!
 //! # Unbalanced trees
 //!
-//! When `N` is not a power of 2, the standard convention is to
-//! **duplicate the last node** at each level until pairs form.
-//! Bitcoin and CT both use this convention.  Note this is
-//! second-preimage-resistant only because of the leaf/node tag
-//! distinction.
+//! When a level has odd length `> 1`, the trailing lonely node `L` is
+//! paired on the right with a domain-separated odd-padding sibling
+//! `SHA256(0x02 ‖ L)` rather than duplicating `L` directly.  Power-of-two
+//! trees never invoke `0x02`, while unbalanced trees avoid the
+//! Bitcoin-style `[a, b, c]` vs `[a, b, c, c]` root/proof collision.
 
 use crate::hash::sha256::sha256;
 
@@ -42,6 +42,7 @@ pub type Hash32 = [u8; 32];
 
 const LEAF_TAG: u8 = 0x00;
 const NODE_TAG: u8 = 0x01;
+const ODD_PAD_TAG: u8 = 0x02;
 
 /// Hash a single leaf with domain separation.
 fn hash_leaf(data: &[u8]) -> Hash32 {
@@ -57,6 +58,14 @@ fn hash_node(left: &Hash32, right: &Hash32) -> Hash32 {
     input.push(NODE_TAG);
     input.extend_from_slice(left);
     input.extend_from_slice(right);
+    sha256(&input)
+}
+
+/// Domain-separated synthetic right sibling for an unpaired trailing node.
+fn hash_odd_pad(left: &Hash32) -> Hash32 {
+    let mut input = Vec::with_capacity(1 + 32);
+    input.push(ODD_PAD_TAG);
+    input.extend_from_slice(left);
     sha256(&input)
 }
 
@@ -107,13 +116,12 @@ impl MerkleTree {
             let mut i = 0;
             while i < prev.len() {
                 let left = &prev[i];
-                // Duplicate last node when level has odd length.
                 let right = if i + 1 < prev.len() {
-                    &prev[i + 1]
+                    prev[i + 1]
                 } else {
-                    &prev[i]
+                    hash_odd_pad(left)
                 };
-                next.push(hash_node(left, right));
+                next.push(hash_node(left, &right));
                 i += 2;
             }
             nodes.push(next);
@@ -145,21 +153,17 @@ impl MerkleTree {
         let mut idx = leaf_index;
         for level in 0..(self.nodes.len() - 1) {
             let level_nodes = &self.nodes[level];
-            let sibling_idx = if idx.is_multiple_of(2) {
-                // We're the LEFT child; sibling is right (idx+1 or
-                // duplicate of self if at boundary).
+            let (sibling, sibling_is_left) = if idx.is_multiple_of(2) {
                 if idx + 1 < level_nodes.len() {
-                    idx + 1
+                    (level_nodes[idx + 1], false)
                 } else {
-                    idx
+                    (hash_odd_pad(&level_nodes[idx]), false)
                 }
             } else {
-                // We're the RIGHT child; sibling is left.
-                idx - 1
+                (level_nodes[idx - 1], true)
             };
-            path.push(level_nodes[sibling_idx]);
-            // direction: did sibling come from the LEFT?
-            directions.push(sibling_idx < idx);
+            path.push(sibling);
+            directions.push(sibling_is_left);
             idx /= 2;
         }
         Some(MerkleProof {
@@ -184,10 +188,11 @@ pub fn merkle_proof(leaves: &[Vec<u8>], leaf_index: usize) -> Option<MerkleProof
 /// proof, and the expected root, recompute the root by hashing
 /// upward and compare.
 pub fn merkle_verify(leaf_data: &[u8], proof: &MerkleProof, expected_root: &Hash32) -> bool {
-    if proof.path.len() != proof.directions.len() {
+    let depth = proof.path.len();
+    if depth != proof.directions.len() || depth >= usize::BITS as usize {
         return false;
     }
-    if proof.path.is_empty() && proof.leaf_index != 0 {
+    if (proof.leaf_index >> depth) != 0 {
         return false;
     }
     for (level, sibling_is_left) in proof.directions.iter().enumerate() {
@@ -346,6 +351,26 @@ mod tests {
         assert!(merkle_verify(&leaves[2], &proof, &tree.root()));
         proof.leaf_index = 0;
         assert!(!merkle_verify(&leaves[2], &proof, &tree.root()));
+        // VULN-4a regression: setting upper bits (2 + 4 = 6) must be rejected.
+        proof.leaf_index = 6;
+        assert!(!merkle_verify(&leaves[2], &proof, &tree.root()));
+    }
+
+    /// VULN-4b regression: odd-length `[a, b, c]` must NOT share its root or
+    /// accept a synthetic index-3 proof from `[a, b, c, c]`.
+    #[test]
+    fn odd_leaf_tree_does_not_collide_with_duplicated_tail() {
+        let three = vec![b"a".to_vec(), b"b".to_vec(), b"c".to_vec()];
+        let four = vec![b"a".to_vec(), b"b".to_vec(), b"c".to_vec(), b"c".to_vec()];
+        let tree3 = MerkleTree::from_leaves(&three);
+        let tree4 = MerkleTree::from_leaves(&four);
+        assert_ne!(tree3.root(), tree4.root());
+
+        let mut forged_idx3 = tree3.proof(2).unwrap();
+        forged_idx3.leaf_index = 3;
+        forged_idx3.directions[0] = true;
+        forged_idx3.path[0] = hash_leaf(b"c");
+        assert!(!merkle_verify(b"c", &forged_idx3, &tree3.root()));
     }
 
     /// Empty list: degenerate root, no leaves.

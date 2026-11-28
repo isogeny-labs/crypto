@@ -56,6 +56,13 @@ pub trait EcdlpGroup: Sync {
     fn identity(&self) -> Self::Elt;
     fn is_identity(&self, p: &Self::Elt) -> bool;
     fn add(&self, p: &Self::Elt, q: &Self::Elt) -> Self::Elt;
+    /// `ps[i] + qs[i]` for every `i`, equal to [`add`](Self::add) pair by
+    /// pair.  Groups with a batched kernel override it (the prime-field
+    /// group on AVX-512 IFMA); the lockstep rho worker calls it once per
+    /// step for all of its walks.
+    fn add_many(&self, ps: &[Self::Elt], qs: &[&Self::Elt]) -> Vec<Self::Elt> {
+        ps.iter().zip(qs).map(|(p, q)| self.add(p, q)).collect()
+    }
     fn double(&self, p: &Self::Elt) -> Self::Elt;
     fn neg(&self, p: &Self::Elt) -> Self::Elt;
     /// `[k]P` by double-and-add (variable time; every scalar here is public).
@@ -158,6 +165,37 @@ impl EcdlpGroup for PrimeGroup {
     }
     fn add(&self, p: &Point, q: &Point) -> Point {
         p.add_vartime(q, &self.a)
+    }
+    /// Eight walks per AVX-512 IFMA vector with one shared inversion per
+    /// lane (`ecc::ifma_batch::add_affine_batch`) when the CPU has IFMA and
+    /// there are at least eight pairs; pairs with the point at infinity or
+    /// `x_P = x_Q` go through [`add`](EcdlpGroup::add).  Equal to `add`.
+    fn add_many(&self, ps: &[Point], qs: &[&Point]) -> Vec<Point> {
+        #[cfg(target_arch = "x86_64")]
+        if ps.len() >= 8 {
+            let mut idx = Vec::with_capacity(ps.len());
+            let mut a1 = Vec::with_capacity(ps.len());
+            let mut a2 = Vec::with_capacity(ps.len());
+            for (i, (p, q)) in ps.iter().zip(qs).enumerate() {
+                if let (Point::Affine { x: x1, y: y1 }, Point::Affine { x: x2, y: y2 }) = (p, *q) {
+                    idx.push(i);
+                    a1.push((&x1.value, &y1.value));
+                    a2.push((&x2.value, &y2.value));
+                }
+            }
+            if let Some(sums) = crate::ecc::ifma_batch::add_affine_batch(&a1, &a2, &self.curve.p) {
+                let mut out: Vec<Option<Point>> = vec![None; ps.len()];
+                for (k, r) in idx.into_iter().zip(sums) {
+                    out[k] = r.map(|(x, y)| self.point(&x, &y));
+                }
+                return out
+                    .into_iter()
+                    .enumerate()
+                    .map(|(i, r)| r.unwrap_or_else(|| self.add(&ps[i], qs[i])))
+                    .collect();
+            }
+        }
+        ps.iter().zip(qs).map(|(p, q)| self.add(p, q)).collect()
     }
     fn double(&self, p: &Point) -> Point {
         p.double_vartime(&self.a)
