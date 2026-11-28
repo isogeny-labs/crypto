@@ -1,0 +1,165 @@
+{
+  "schema": "isogeny-labs/cayley-residual-publication-validation/v1",
+  "publication_date_local": "2026-11-26",
+  "timezone": "America/Los_Angeles",
+  "pull_request": "https://github.com/isogeny-labs/crypto/pull/5266",
+  "base_commit": "c0a238743cf9afed77688a39cc1c33bfc135053f",
+  "scope": "Publication metadata, frozen-byte custody, document QA and applicable repository gates; no new scientific execution.",
+  "scientific_sources_changed": false,
+  "new_native_compilation": false,
+  "new_scientific_executions": 0,
+  "historical_native_evidence": {
+    "receipt": "evidence/receipt.json",
+    "compiler": "Rust 1.100.0",
+    "build_exit_code": 0,
+    "run_exit_codes": [
+      0,
+      0
+    ],
+    "standing": "Inherited producer evidence; not re-executed in this publication environment."
+  },
+  "archive_restoration": {
+    "filename": "Cayley_Gauss_M31_Residual_Transport_20261125.zip",
+    "sha256": "2a00cc7dfd3449f2acbc66ef6ed296051dc619fd94754ae2be6bbca7fff7e322",
+    "size_bytes": 2508966,
+    "all_original_manifest_entries_matched": 50
+  },
+  "artifact_recovery": {
+    "command": "ARTIFACTS_CACHE=<fresh task-local directory> python3 tools/artifacts/artifacts.py pull research/cayley_residual_transport_m31_20261125/evidence --source git",
+    "logical_paths_hydrated": 6,
+    "unique_payloads": 3,
+    "verify_output": "6 entries: 6 hydrated, 0 not pulled, 0 problems",
+    "original_recovery_entries_unchanged": 630,
+    "initial_zero_selection": "The first pull before staging selected no manifests. It was not counted; staging followed by a fresh-cache pull hydrated all six paths."
+  },
+  "custody_payload_check": {
+    "historical_call_manifests_verified": 4,
+    "historical_checker": {
+      "archive_reference": "Cayley_Gauss_M31_Residual_Transport_20261125.zip; sha256=2a00cc7dfd3449f2acbc66ef6ed296051dc619fd94754ae2be6bbca7fff7e322; ChatGPT Library file libfile_fde3_f-790afa236a8c81918d8dbed41f79d6d7_7882a560ed1081919cf1037d42f78352",
+      "locally_verified": false,
+      "original_path": "evidence/validation-attempt-1/checker",
+      "sha256_from_original_manifest": "f4a05b459d9c5889c6287759960333c5f191fc9f8354bf4fbc187207e51fa62c",
+      "size_bytes_declared": 4683976,
+      "status": "archive_only_not_repository_verified"
+    },
+    "historical_raw_files_verified": 8,
+    "historical_source_snapshot_entries": 9,
+    "historical_summary_files_verified": 2,
+    "mapped_original_files_verified": 49,
+    "ok": true,
+    "original_manifest_entries": 50,
+    "publication_files_verified": 16,
+    "registered_source_files_verified": 10,
+    "replay_comparison": {
+      "historical_binary_identity_required": false,
+      "new_binary_or_runtime_independently_validated": false,
+      "new_execution_performed_by_this_verifier": false,
+      "new_output_files_compared": 0,
+      "requested": false
+    },
+    "schema": "isogeny-labs/cayley-residual-publication-verification/v1",
+    "scientific_or_signed_validation": false,
+    "scope": "publication_metadata_and_byte_integrity_only"
+  },
+  "custody_receipt_boundary": "The recorded payload check precedes addition of this validation receipt to publication_files. The verifier is rerun after final receipt/inventory updates; no original mapped or registered scientific file changes.",
+  "support_validation": {
+    "receipt": "publication/support-validation.json",
+    "checks": 8,
+    "scientific_runs": 0,
+    "scope": "Hash/shell controls with copied historical output fixtures."
+  },
+  "pdf_qa": {
+    "pages": 3,
+    "render_dpi": 150,
+    "all_pages_visually_inspected": true,
+    "standalone_svgs_visually_inspected": 2,
+    "source_link_annotations": 13,
+    "pdf_sha256": "52be9ab41da7ae88d2bf3b48d2537d08ba797775abeeec100aaf9ef0df161ff1",
+    "source": "report/build_report.py",
+    "receipt": "report/README.md"
+  },
+  "local_check_results": [
+    {
+      "name": "research_gate",
+      "exit_code": 0,
+      "output": "STATUS: OK (base=origin/main, claims_touched=0, unverified=0, added_md=8)"
+    },
+    {
+      "name": "parity",
+      "exit_code": 0,
+      "output": "lab-parity: OK for crypto (21 file(s))"
+    },
+    {
+      "name": "artifacts_policy",
+      "exit_code": 0,
+      "output": "artifacts check: no data files committed"
+    },
+    {
+      "name": "size",
+      "exit_code": 0,
+      "output": "check-large-files: no added or modified file over 10485760 bytes"
+    },
+    {
+      "name": "benchrec",
+      "exit_code": 1,
+      "output": "FAIL: progress report is stale: benchmarks/progress/progress.json, benchmarks/progress/PROGRESS.md, benchmarks/progress/progress.svg, benchmarks/progress/progress.pdf (run python3 tools/benchrec.py report)\nbenchrec: 1 problem(s) across 0 record(s)"
+    },
+    {
+      "name": "publication_prose",
+      "exit_code": 0,
+      "output": "lint-prose: 0 finding(s)"
+    },
+    {
+      "name": "authored_whitespace",
+      "exit_code": 0,
+      "output": ""
+    }
+  ],
+  "prose_scope": [
+    "README.md",
+    "report/README.md",
+    ".artifacts/recovery/README.md (repository path)",
+    "docs/session-logs/2026-11-27.md (repository path)",
+    "final PR body"
+  ],
+  "final_pr_body_lint": "lint-prose: 0 finding(s)",
+  "whitespace": {
+    "full_diff_exit_code": 2,
+    "diagnostic": "research/cayley_residual_transport_m31_20261125/upstream/arithmetic.rs:125: new blank line at EOF.",
+    "handling": "Registered original bytes retained. Publication-authored paths pass; no whitespace policy altered."
+  },
+  "benchrec_scope": {
+    "status": "inconclusive",
+    "reason": "Sparse checkout exposes zero benchmark records and omits canonical progress outputs. Exit 1 is retained; not claimed as a benchmark gate pass; no report regenerated from incomplete inputs."
+  },
+  "base_validation_failure": {
+    "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/45885436747",
+    "job_id": 140134866716,
+    "test": "scripts/test_validation_gate.py::Committed::test_gate_passes_on_the_committed_tree",
+    "diagnostic": "benchmarks 20261029-ic-aimed-gather: unvalidated: validator report raw_data ../../docs/curves/registry.json: sha256 mismatch; row is not in the pre-gate freeze",
+    "affected_paths_changed": false
+  },
+  "canonical_graphs": {
+    "decision": "checked_for_applicability_and_unchanged",
+    "basis": "AGENTS section 7d: no priced IC/rho row, reference, registered curve, factor-base identity, ecbench session, tournament/candidate identity, or measured component-performance change.",
+    "review_scope": "Dashboard coverage contracts and applicable prose/source inputs; not a full historical corpus regeneration.",
+    "paths": [
+      "docs/index-calculus-scoreboard.html",
+      "docs/ic/progress-timeline.json",
+      "docs/ic-current-state.html",
+      "docs/ic-leaderboard.html",
+      "docs/ic/LEADERBOARD.md",
+      "docs/ic/leaderboard.json",
+      "docs/browser/data.json",
+      "docs/performance-gains/comparisons.csv",
+      "docs/performance-gains/data.json",
+      "docs/performance-gains/summary.svg",
+      "docs/performance-gains/summary.png",
+      "docs/performance-gains/summary.pdf"
+    ],
+    "full_browser_regeneration_run": false,
+    "full_dashboard_coverage_run": false
+  },
+  "claim_standing": "Derived algebra and producer correctness evidence only; no new PCC ID, signed verdict, Lean/kernel certificate or IDC1h certificate.",
+  "impact_score": 5
+}

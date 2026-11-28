@@ -1,0 +1,119 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXT-IC-GRAPH-ANCHORED-MP-20261126",
+  "version": 1,
+  "created": "2026-11-26",
+  "repository": "crypto",
+  "study_dir": "research/extension_ic_graph_20261115/anchored_multi_pattern_20261126",
+  "pcc": "unverified",
+  "status_note": "Preregistered before executing any benchmark panel. Verified post-run by copied standalone binary /tmp/immutable_jv_graph_ic_anchored_qualify.",
+  "links": {
+    "protocol_typst": "PROTOCOL.typ",
+    "report_typst": "REPORT.typ",
+    "report_pdf": "report.pdf",
+    "prior_accounting": "../complete-accounting/README.md",
+    "prior_critic": "../CRITIC_ROUND2.md",
+    "prior_leads": "../scout-graph-ic/LEADS.md"
+  },
+  "questions": [
+    "Q1: Does closing the remaining zero_dim_la and tracked_rref_contributors bitop/v1 hooks plus executing a native 32-mul Karatsuba / 28-mul Chung-Hasan F_{p^6} tower reconcile 100% with legacy algebraic counts while pricing Pollard rho symmetrically?",
+    "Q2: Does O(1) abscissa lookup + tail-first discriminant screening + inversion-free ordinate binding cut Phase-1 collection bit-ops by >= 25% while preserving byte-identical Phase-1 certificates and kernels?",
+    "Q3: Does graph-anchored multi-pattern descent over (1^6), (1^4,2), (1^2,2^2), (2^3) combined with cold-process F4 trace replay obey the exact quadratic-universe binomial law M(f) = 1 + 15f + 45f^2 + 15f^3 and cut Phase-3 descent bit-ops by >= 45%?",
+    "Q4: How much additional anchor density do frustrated odd-sign 2-LP cycles (scale = 2 half-anchors) contribute on p in [307, 1009]?",
+    "Q5: Across p in {307, 383, 503, 661, 1009} (3 fresh seeds per prime), where does finite-B-space 1-LP exhaust vs 2-LP succeed, what are the empirical per-phase bit-op scaling exponents in log p, and where does cold end-to-end graph IC cross executed Karatsuba Pollard rho?"
+  ],
+  "hypotheses": {
+    "H1_accounting_and_karatsuba": {
+      "prediction": "Exact integer reconciliation counted_ring_muls == legacy_muls + mul_outside_legacy - legacy_overcount across all action_variable in 0..n; F4Report::field_ops unchanged; KaratsubaArith achieves (32, 28, 65) F_p multiplications per F_{p^6} (mul, sq, inv) vs (55, 55, 80) schoolbook.",
+      "falsification": "Any nonzero discrepancy in unit or qualifier repricing checks, or any mismatch between KaratsubaArith and schoolbook F_{p^6} arithmetic."
+    },
+    "H2_fast_phase1_extractor": {
+      "prediction": "Byte-identical Phase-1 certificates, anchor tables, homogeneous kernels, and recovered scalars between SparseTable vs SparseTableFast and DeferredPairs vs DeferredPairsFast, with >= 25% reduction in Phase-1 Collection w=0 bit-ops on Run50 (p=1009, seed=389).",
+      "falsification": "Any divergence in accepted source count, kernel vector, or recovered scalar, or < 25% Phase-1 bit-op reduction."
+    },
+    "H3_anchored_multi_pattern_binomial_law": {
+      "prediction": "Empirical descent yield multiplier M = N_MP / N_(1^6) tracks M_pred(f) = 1 + 15f + 45f^2 + 15f^3 with f = |V_anc| / |Q_2(p)| measured against the exact Galois-conjugate + norm-QR universe |Q_2(p)|, achieving M >= 1.25 on 2-LP at p=1009 with 100% Cantor Jacobian replay [scale]R == sum d_k B_k.",
+      "falsification": "M < 1.25 on 2-LP at p=1009 or any Cantor Jacobian / affine projection failure."
+    },
+    "H4_cold_trace_and_anchored_descent_cost": {
+      "prediction": "TracedAnchored cuts Phase-3 Descent w=0 bit-ops by >= 45% vs Original (1^6) descent on matched collectors by combining single-residual cold F4 trace recording/replay with early AnchorTable lookup before splitting gcd(S, x^p - x).",
+      "falsification": "< 45% Phase-3 Descent w=0 bit-op reduction on Run50."
+    },
+    "H5_frustrated_odd_cycle_half_anchors": {
+      "prediction": "Every harvested odd-sign cycle yields a valid scale=2 witness (+2 D(v)) passing [2]R == sum d_k B_k; competing null hypothesis predicts sparse unanchored subgraphs may yield small delta |V_anc| / |Q_2(p)| < 0.02 at rank-stop.",
+      "falsification": "Any invalid scale=2 witness or failure of odd-divisibility scaling in affine projection."
+    },
+    "H6_multiprime_transition_and_scaling": {
+      "prediction": "1-LP exhausts B <= p^2 before full column rank on small primes where |B_small| / p^2 is tighter, whereas 2-LP achieves 100% solve completion across p in {307, 383, 503, 661, 1009}; end-to-end IC bit-op slope is sub-exponential/polynomial in p vs rho O(p^3) (slope ~ 3 in log p).",
+      "falsification": "2-LP rank failure on p in {307, 383, 503, 661, 1009} or failure of [d]G == Q on any solved instance."
+    },
+    "H7_signed_matroid_partial_relation_graph": {
+      "prediction": "Online Z-exact SignedMatroidGraph (O(1) HashMap interning + DSU union-by-size + smaller-tree re-rooting + LCA shared-suffix cancellation + Zaslavsky balanced/frustrated cycle harvesting + multi-source Dijkstra shortest-witness anchors) combined with HitBuckets sieve and deterministic zero-RNG Frobenius-norm resolvent quartic splitting reduces Phase-1 Relations w=0 bit-ops by >= 2.5x vs legacy DeferredPairs while attaining >= certified factor-base rank and lower graph_bitops than legacy BTreeMap BFS across the 7-engine head-to-head stream comparison; competing S_6 yield analysis predicts SignedMatroid2lp beats SignedMatroid3lp on total bit-ops because (2^2) quartics have 1/8 = 12.5% yield vs 1/48 = 2.08% for (2^3) sextics.",
+      "falsification": "SignedMatroid2lp achieves < 2.5x Phase-1 Relations speedup vs DeferredPairs, lower certified rank on identical input stream than DeferredPairs, or any certificate verification failure."
+    }
+  },
+  "panels": {
+    "panel_a_run50": {
+      "p": 1009,
+      "seed": 389,
+      "arms": [
+        "sparse-table:original",
+        "sparse-table:traced",
+        "sparse-table:anchored",
+        "sparse-table:traced-anchored",
+        "sparse-table-fast:traced-anchored",
+        "deferred-pairs:original",
+        "deferred-pairs:traced",
+        "deferred-pairs:anchored",
+        "deferred-pairs:traced-anchored",
+        "deferred-pairs-fast:traced-anchored",
+        "deferred-pairs-fast-cycle:traced-anchored",
+        "signed-matroid-2lp:traced-anchored",
+        "signed-matroid-3lp:traced-anchored"
+      ],
+      "graph_engine_head_to_head": [
+        "1lp-singleton-table",
+        "2lp-deferred-bfs",
+        "2lp-forest-witness-fl",
+        "2lp-signed-matroid-dsu",
+        "klp-markowitz-2core",
+        "klp-sharedkey-prim-mst",
+        "3lp-signed-matroid-hyper"
+      ],
+      "rho_walks": 1
+    },
+    "panel_b_multiprime": {
+      "primes": [307, 383, 503, 661, 1009],
+      "fresh_seeds": [101, 211, 307],
+      "arms_per_target": [
+        "sparse-table-fast:traced-anchored",
+        "deferred-pairs:original",
+        "deferred-pairs-fast:traced-anchored",
+        "signed-matroid-2lp:traced-anchored"
+      ],
+      "rho_walks_per_target": {
+        "p<=661": 5,
+        "p==1009": 1
+      }
+    },
+    "panel_c_overflow_control": {
+      "cases": [
+        {"p": 307, "seed": 101},
+        {"p": 383, "seed": 211},
+        {"p": 503, "seed": 307}
+      ],
+      "builds": [
+        "standard release (overflow-checks=off)",
+        "checked release (RUSTFLAGS=-C overflow-checks=on)"
+      ],
+      "acceptance": "Exact equality of verified, recovered_scalar, accepted_sources, anchor_count, residuals_tried, observed_bitops, w0_bitops, and foreign_hook_calls == 0."
+    }
+  },
+  "controls_and_custody": {
+    "secret_isolation": "run_anchored_ic_dlp_on never reads Spec.d; rho uses strong_rho_counted_with_scalar without secret input.",
+    "foreign_hooks": "foreign_hook_calls == 0 enforced on every bundle.",
+    "artifact_size_cap_bytes": 64512,
+    "pre_call_manifest": "pre-call.sha256 recorded before Panel A/B/C execution, including /tmp/immutable_jv_graph_ic_anchored_qualify.",
+    "independent_qualifier": "examples/jv_graph_ic_anchored_qualify.rs copied to /tmp/immutable_jv_graph_ic_anchored_qualify before running benchmarks, plus 4 negative sabotage unit tests."
+  }
+}

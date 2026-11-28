@@ -755,6 +755,22 @@ pub fn registry() -> &'static [MethodDecl] {
         MethodDecl{id:"ic.three_leads_genus2_projective_chart_v1",family:"ic",summary:"Two-choice genus2 collector with charged projective CRT numerator chart, one normalization and complete exceptional Cantor fallback",entry:"three_leads_followup::solve_genus2_projective",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_target_rank_v1",family:"ic",summary:"Projective two-choice genus2 collector choosing continuation by charged signed target-coefficient rank preview; both valid relations inserted",entry:"three_leads_followup::solve_genus2_target_rank",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
         MethodDecl {
+            id: super::prime_fixed_controls::RHO_ID,
+            family: "rho",
+            summary: "frozen prime_fast tuned one-thread negation rho on the five public wall-study fixtures; max_steps=64*ceil_sqrt(r), evaluator replay and teardown charged",
+            entry: "prime_fast::rho_parallel(RhoConfig::tuned(r), threads=1, max_steps=64*ceil_sqrt(r))",
+            applies: Applies::PrimeOnly,
+            params: &[],
+        },
+        MethodDecl {
+            id: super::prime_fixed_controls::RHO_BATCH64_ID,
+            family: "rho",
+            summary: "fixed 64-target sequential prime_fast rho batch on the five public wall-study fixtures; every target-dependent table, walk, replay, and teardown is charged",
+            entry: "prime_fixed_controls::solve_batch64_measured(rho.prime_fast_batch64_v1)",
+            applies: Applies::PrimeOnly,
+            params: &[],
+        },
+        MethodDecl {
             id: "rho.plus_model_v1",
             family: "rho",
             summary: "counted seeded selection-walk control; hashed predicates, not the CUDA kernel",
@@ -1066,6 +1082,22 @@ pub fn registry() -> &'static [MethodDecl] {
             entry: "binary_hyperelliptic_index_calculus::binary_hec_projected_index_calculus_dlp + binary_cubic_pullback_nine_phase_v2",
             applies: Applies::BinaryOnly,
             params: GENUS3_PROJECTED_IC_PARAMS,
+        },
+        MethodDecl {
+            id: super::prime_fixed_controls::BSGS_ID,
+            family: "bsgs",
+            summary: "frozen paired x-coordinate blocked BSGS on the five public wall-study fixtures; cold table build, search, evaluator replay, and teardown are charged",
+            entry: "bsgs_fast::BsgsFastPlan::new(r,0,true,1,8).with_kernel(StepKernel::Paired,32)",
+            applies: Applies::PrimeOnly,
+            params: &[],
+        },
+        MethodDecl {
+            id: super::prime_fixed_controls::BSGS_BATCH64_ID,
+            family: "bsgs",
+            summary: "fixed 64-target paired x-coordinate BSGS batch on the five public wall-study fixtures; one shared table, every ordered search/replay, and teardown are charged",
+            entry: "prime_fixed_controls::solve_batch64_measured(bsgs.prime_paired_batch64_v1)",
+            applies: Applies::PrimeOnly,
+            params: &[],
         },
         MethodDecl {
             id: "bsgs.textbook",
@@ -2448,6 +2480,26 @@ impl SolverStats {
     }
 }
 
+/// One independently replayed item of the fixed 64-target wall-study batch.
+/// Targets and rho seeds are public. Target-derivation provenance is absent
+/// from the measured child, and fixed-study public targets have no planted
+/// scalar.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct BatchItemReport {
+    pub item: u64,
+    pub target: [String; 2],
+    /// Fixed-width lowercase hexadecimal, when this is a rho item.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rho_seed: Option<String>,
+    pub recovered: Option<ExactScalar>,
+    pub exhausted: bool,
+    pub evaluator_correct: bool,
+    pub solver_wall_ns: u64,
+    pub verification_wall_ns: u64,
+    pub drop_wall_ns: u64,
+    pub counters: BTreeMap<String, u64>,
+}
+
 /// What a solve reports.  The runner adds verification and timing.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct SolveReport {
@@ -3807,6 +3859,12 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
     {
         return Err(prime_only_refusal(id, curve));
     }
+    if super::prime_fixed_controls::is_method(id) {
+        let Instance::Prime(i) = inst else {
+            return Err(prime_only_refusal(id, curve));
+        };
+        super::prime_fixed_controls::applicable(id, i, curve)?;
+    }
     if id == "ic.k3_gaudry" && !matches!(inst, Instance::Fp3(_)) {
         return Err(format!(
             "`ic.k3_gaudry` runs on fp3_random curves only; {} is {}",
@@ -4457,6 +4515,36 @@ pub fn solve_measured(
     Ok(rep)
 }
 
+/// Run one fixed 64-target wall-study batch. The measured child supplies only
+/// ordered public coordinates and independent rho seeds; no target seed or
+/// planted logarithm crosses this interface.
+pub(crate) fn solve_batch64_measured(
+    m: &ResolvedMethod,
+    inst: &Instance,
+    curve: &CurveFacts,
+    items: &[([String; 2], Option<u64>)],
+) -> Result<(SolveReport, Vec<BatchItemReport>), String> {
+    if !super::prime_fixed_controls::is_batch_method(&m.id) {
+        return Err(format!("`{}` is not a fixed 64-target batch method", m.id));
+    }
+    applicable(m, inst, curve)?;
+    let Instance::Prime(prime) = inst else {
+        return Err(prime_only_refusal(&m.id, curve));
+    };
+    let session = measurement::Session::begin().ok();
+    let (mut report, item_reports) =
+        super::prime_fixed_controls::solve_batch64(&m.id, prime, curve, items)?;
+    match session.map(|session| session.finish()) {
+        Some(Ok(snapshot)) if report.online.is_none() => {
+            report.online = online_window(&m.family, &m.id, &snapshot);
+        }
+        Some(Ok(_)) => {}
+        Some(Err(error)) => report.online_error = Some(error.to_string()),
+        None => report.online_error = Some("a measurement session was already active".into()),
+    }
+    Ok((report, item_reports))
+}
+
 /// `d` of a Cheon method: an integer, or `shape:RATIO:TOL`.
 fn cheon_d(m: &ResolvedMethod, n: u64, side: Side) -> Result<u64, String> {
     let raw = m.params["d"].as_str();
@@ -4698,6 +4786,9 @@ fn solve_inner(
         return solve_neg_strong(m, i, target, seed);
     }
     match (inst, d.family) {
+        (Instance::Prime(i), _) if super::prime_fixed_controls::is_method(&m.id) => {
+            super::prime_fixed_controls::solve(m.id.as_str(), i, curve, tx, ty, seed)
+        }
         (Instance::Binary(i), _) if m.id == "ic.orbit_rank_v1" => {
             super::orbit_ic::solve_narrow(m, i, curve, FastPoint::affine(tx, ty), seed)
         }
@@ -7121,6 +7212,24 @@ fn online_window(family: &str, id: &str, snap: &Snapshot) -> Option<OnlineWindow
         w.stop_event = "[d]G = Q verified inside the method".into();
         w.included_stages = vec!["giant_steps".into(), "recovery_check".into()];
         w.mapping = "cached BSGS: setup and table inserts are reusable and excluded from the online clock; giant steps, table lookups, collision recovery, and final scalar replay are per-target and inside it".into();
+    }
+    if matches!(
+        id,
+        super::prime_fixed_controls::BSGS_ID | super::prime_fixed_controls::BSGS_BATCH64_ID
+    ) {
+        w.start_event = "first target-dependent giant-step search after the frozen G-only paired baby table is complete".into();
+        w.stop_event = "the separately timed evaluator scalar replay regenerated Q".into();
+        w.included_stages = vec![
+            "giant_steps".into(),
+            "candidate_verification".into(),
+            "evaluator_verification".into(),
+        ];
+        w.mapping = if id == super::prime_fixed_controls::BSGS_BATCH64_ID {
+            "frozen paired BSGS batch: one target-independent shared table build and teardown remain in solve_wall_ns but outside the online clock; all 64 ordered target searches, native candidate replays, and evaluator replays are inside it"
+        } else {
+            "frozen paired BSGS: target-independent cold table construction and teardown remain in solve_wall_ns but outside the online clock; target search, native candidate replay, and evaluator replay are inside it"
+        }
+        .into();
     }
     Some(w)
 }

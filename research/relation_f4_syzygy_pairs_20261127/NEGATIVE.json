@@ -1,0 +1,59 @@
+{
+  "all_original_data_bytes_unchanged": true,
+  "original_15x_achieved": false,
+  "original_files_checked": 213,
+  "records": [
+    {
+      "canary": "gate_boolean",
+      "exit": 1,
+      "expected_diagnostic": "incomplete/unsupported space decision",
+      "forbidden_summary_absent": true,
+      "rejected": true
+    },
+    {
+      "canary": "missing_cap",
+      "exit": 1,
+      "expected_diagnostic": "incomplete/unsupported space decision",
+      "forbidden_summary_absent": true,
+      "rejected": true
+    },
+    {
+      "canary": "claimed_rank",
+      "exit": 1,
+      "expected_diagnostic": "rank drift",
+      "forbidden_summary_absent": true,
+      "rejected": true
+    },
+    {
+      "canary": "snapshot_coefficient",
+      "exit": 1,
+      "expected_diagnostic": "original-ideal witness fails",
+      "forbidden_summary_absent": true,
+      "rejected": true
+    },
+    {
+      "canary": "basis_coefficient",
+      "exit": 1,
+      "expected_diagnostic": "basis not nonzero monic",
+      "forbidden_summary_absent": true,
+      "rejected": true
+    },
+    {
+      "canary": "aa_counter",
+      "exit": 1,
+      "expected_diagnostic": "fresh A/A or prior original/full comparison mismatch",
+      "forbidden_summary_absent": true,
+      "rejected": true
+    },
+    {
+      "canary": "unsupported_observation",
+      "exit": 1,
+      "expected_diagnostic": "fabricated unsupported observation",
+      "forbidden_summary_absent": true,
+      "rejected": true
+    }
+  ],
+  "reference_constructions": 0,
+  "schema": "syzygy-pair-negative-replay/v1",
+  "solver_calls": 0
+}

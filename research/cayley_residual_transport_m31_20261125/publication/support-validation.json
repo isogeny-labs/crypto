@@ -1,0 +1,120 @@
+{
+  "scope": "metadata/hash-only validation; comparison-fixture outputs are copies of historical records, not new executions",
+  "scientific_runs": 0,
+  "tests": [
+    {
+      "name": "valid_copied_publication",
+      "exit_code": 0,
+      "report": {
+        "historical_call_manifests_verified": 4,
+        "historical_checker": {
+          "archive_reference": "Original recovered source bundle retained by publishing agent; metadata-fixture declaration only",
+          "locally_verified": false,
+          "original_path": "evidence/validation-attempt-1/checker",
+          "sha256_from_original_manifest": "f4a05b459d9c5889c6287759960333c5f191fc9f8354bf4fbc187207e51fa62c",
+          "size_bytes_declared": 4683976,
+          "status": "archive_only_not_repository_verified"
+        },
+        "historical_raw_files_verified": 8,
+        "historical_source_snapshot_entries": 9,
+        "historical_summary_files_verified": 2,
+        "mapped_original_files_verified": 49,
+        "ok": true,
+        "original_manifest_entries": 50,
+        "publication_files_verified": 4,
+        "registered_source_files_verified": 10,
+        "replay_comparison": {
+          "historical_binary_identity_required": false,
+          "new_binary_or_runtime_independently_validated": false,
+          "new_execution_performed_by_this_verifier": false,
+          "new_output_files_compared": 0,
+          "requested": false
+        },
+        "schema": "isogeny-labs/cayley-residual-publication-verification/v1",
+        "scientific_or_signed_validation": false,
+        "scope": "publication_metadata_and_byte_integrity_only"
+      }
+    },
+    {
+      "name": "missing_hydrated_evidence_fails",
+      "exit_code": 1,
+      "report": {
+        "error": "Missing publication file: evidence/validation-attempt-1/run1/cases.jsonl. Hydrate historical evidence with the repository artifact tool before verification; do not regenerate archival records.",
+        "ok": false,
+        "schema": "isogeny-labs/cayley-residual-publication-verification/v1",
+        "scope": "publication_metadata_and_byte_integrity_only"
+      }
+    },
+    {
+      "name": "tampered_publication_fails",
+      "exit_code": 1,
+      "report": {
+        "error": "Byte-size mismatch: README.md",
+        "ok": false,
+        "schema": "isogeny-labs/cayley-residual-publication-verification/v1",
+        "scope": "publication_metadata_and_byte_integrity_only"
+      }
+    },
+    {
+      "name": "tampered_registered_source_fails",
+      "exit_code": 1,
+      "report": {
+        "error": "Byte-size mismatch: evidence/validation-attempt-1/source/main.rs",
+        "ok": false,
+        "schema": "isogeny-labs/cayley-residual-publication-verification/v1",
+        "scope": "publication_metadata_and_byte_integrity_only"
+      }
+    },
+    {
+      "name": "existing_copied_output_comparison",
+      "exit_code": 0,
+      "report": {
+        "historical_call_manifests_verified": 4,
+        "historical_checker": {
+          "archive_reference": "Original recovered source bundle retained by publishing agent; metadata-fixture declaration only",
+          "locally_verified": false,
+          "original_path": "evidence/validation-attempt-1/checker",
+          "sha256_from_original_manifest": "f4a05b459d9c5889c6287759960333c5f191fc9f8354bf4fbc187207e51fa62c",
+          "size_bytes_declared": 4683976,
+          "status": "archive_only_not_repository_verified"
+        },
+        "historical_raw_files_verified": 8,
+        "historical_source_snapshot_entries": 9,
+        "historical_summary_files_verified": 2,
+        "mapped_original_files_verified": 49,
+        "ok": true,
+        "original_manifest_entries": 50,
+        "publication_files_verified": 4,
+        "registered_source_files_verified": 10,
+        "replay_comparison": {
+          "historical_binary_identity_required": false,
+          "new_binary_or_runtime_independently_validated": false,
+          "new_execution_performed_by_this_verifier": false,
+          "new_output_files_compared": 10,
+          "requested": true
+        },
+        "schema": "isogeny-labs/cayley-residual-publication-verification/v1",
+        "scientific_or_signed_validation": false,
+        "scope": "publication_metadata_and_byte_integrity_only"
+      }
+    },
+    {
+      "name": "mismatched_copied_output_fails",
+      "exit_code": 1,
+      "report": {
+        "error": "Byte-size mismatch: new summary 2",
+        "ok": false,
+        "schema": "isogeny-labs/cayley-residual-publication-verification/v1",
+        "scope": "publication_metadata_and_byte_integrity_only"
+      }
+    },
+    {
+      "name": "shell_syntax",
+      "exit_code": 0
+    },
+    {
+      "name": "wrapper_help",
+      "exit_code": 0
+    }
+  ]
+}

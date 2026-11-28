@@ -1,0 +1,104 @@
+{
+  "schema": "matched-optimized-no-clock-build-plan/v3",
+  "created_utc": "2026-11-27T20:58:35.019438+00:00",
+  "current_head": "bb8006610ae20c5de692353d61235697bd3cc316",
+  "historical_head": "82e77fbefdbef0d382ae64f50c7ca5cc15328216",
+  "current_source_context": "research/relation_scan_call_instrument_20261127/SOURCE_V2.sha256",
+  "historical_source_context": "research/relation_root_call_instrument_20261127/SOURCE_V2.sha256",
+  "source_and_algorithms_changed": false,
+  "compiler": "rustc1.100.0 0ef1bc386059596dada8fb65b50425aab2ea637a LLVM23.1.5",
+  "profile": {
+    "release": true,
+    "opt_level": 3,
+    "lto": "off",
+    "codegen_units": 16,
+    "debug": 0,
+    "incremental": false,
+    "default_features": false,
+    "jobs": 1,
+    "RUSTFLAGS": null
+  },
+  "profile_rationale": "Change only opt0 to normal Cargo release opt3, retaining prior explicit LTOoff/codegen16/debug0/incrementalfalse flags symmetrically. Not canonical timing settings, not tuned using observed runtimes. Existing lab thin-LTO/codegen1 profile not selected for this bounded qualification.",
+  "resources": {
+    "cpu": 0,
+    "numerical_threads": 1,
+    "new_cloud_compute": false,
+    "compiler_address_space_bytes": 10737418240,
+    "compiler_file_bytes": 1073741824,
+    "fresh_target_max_bytes": 1610612736,
+    "minimum_tmpfs_free_bytes": 536870912,
+    "cgroup_stop_above_bytes": 16106127360,
+    "compile_wall_seconds_per_command": 1200,
+    "total_compile_wall_seconds_cap": 3600,
+    "poll_seconds": 2,
+    "fresh_target": "/dev/shm/relation-opt-build-target-20261127",
+    "temp_inside_fresh_target": true,
+    "original_build_targets_untouched": true,
+    "fresh_target_disposable_only_after_preserving_source_logs_and_frozen_executables": true
+  },
+  "sequence": [
+    "Current root-worker only, then its two existing units and unchanged standalone36/108 integration targets if build budget permits. Never root libtest.",
+    "Freeze executable hashes; run432 complete existing no-clock transports and independent audits of144 native proofs; compare proof/native/receipt outputs to exact opt0 references.",
+    "Attempt historical source/build only if current succeeds, target<=1342177280bytes, tmpfs free>=1342177280bytes and cgroup memory<=10737418240bytes; materialize exact manifest inputs from pinned historical Git blobs in isolated source tree, without patching.",
+    "Same optimized flags, budget, existing tests/proofs/refusals for historical worker. Preserve every failure and partial output."
+  ],
+  "historical_eligibility": {
+    "current_success_required": true,
+    "target_max_bytes_before_old": 1342177280,
+    "tmpfs_min_free_bytes_before_old": 1342177280,
+    "cgroup_max_bytes_before_old": 10737418240
+  },
+  "qualification": {
+    "worker_mode": "--qualify only; all phase clocks null",
+    "transport_calls_each_worker": 432,
+    "parent_full_proof_replays_each_worker": 432,
+    "semantic_canaries_each_worker": 1728,
+    "native_integration_each_source": "36original/108matched with existing1116mutations and6unsupported refusals",
+    "separate_native_proofs_each_source": 144,
+    "no_fresh_selection_seed": true,
+    "no_repeated_synthetic_15120_campaign": true
+  },
+  "fixed_inputs": {
+    "primes": [
+      2147483647,
+      9007199254740881
+    ],
+    "n": [
+      3,
+      4,
+      6
+    ],
+    "seed": 7,
+    "graph": "LAST-star"
+  },
+  "future_design_unchanged": {
+    "controls": 156,
+    "candidates": 36,
+    "AA": 312,
+    "AB": 192,
+    "rounds": 5,
+    "calls": 15120,
+    "primary": "scan-root-pairgraph-flat-dag-487-native",
+    "boundary": "unchanged complete parent application call"
+  },
+  "canonical_protocol_validation": "pending; separate existing document-only choice unanswered",
+  "actual_comparative_timing_authorized_by_this_plan": false,
+  "performance_observations_collected": 0,
+  "15x_admitted": false,
+  "new_PCC_ids": false,
+  "signed_execution_attestation": false,
+  "current_worker_terminal_step": "worker-as10",
+  "historical_worker_terminal_step": "worker",
+  "focused_remedy": {
+    "first_two_failures_retained": [
+      "FIRST_BUILD_FAILURE.json",
+      "SECOND_BUILD_FAILURE.json"
+    ],
+    "changes": "Final scoped AS10GiB attempt only; compiler optimization flags/source/algorithms/tests unchanged. BothAS6/8 root builds fail allocation, with last observed cgroup13.7GB below15GiB refusal and no OOM kill.",
+    "physical_refusal_and_cache_target_threshold_unchanged": true,
+    "no_further_AS_increase_in_this_plan": true,
+    "same_AS10_for_subsequent_current_and_historical_commands": true,
+    "global3600second_compile_budget_includes_all_prior_attempts": true,
+    "not_canonical_performance_configuration": true
+  }
+}

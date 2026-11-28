@@ -1,0 +1,32 @@
+{
+  "schema": "whole-root-unit-final-outcome/v1",
+  "status": "Whole default-feature root-unit compilation remains unqualified: both bounded attempts failed memory allocation; no full-suite runtime was executed",
+  "source": "ROOT_UNIT_SOURCE.sha256",
+  "default_features": true,
+  "test_or_algorithm_exclusions": false,
+  "first": {
+    "exit_code": 101,
+    "address_space_bytes": 12884901888,
+    "root_codegen_units": 16,
+    "allocation_request_bytes": 84934672,
+    "compiler_signal": "SIGABRT6"
+  },
+  "retry": {
+    "exit_code": 101,
+    "address_space_bytes": 15032385536,
+    "root_codegen_units": 256,
+    "allocation_request_bytes": 239075344,
+    "compiler_signal": "SIGABRT6",
+    "observed_options": "ROOT_UNIT_RETRY_OBSERVED_OPTIONS.json"
+  },
+  "cgroup_memory_max_bytes": 17179869184,
+  "cgroup_memory_events": "low 0\nhigh 0\nmax 771\noom 0\noom_kill 0\noom_group_kill 0\n",
+  "all_source_pins_unchanged": true,
+  "usable_worker_produced": false,
+  "runtime_executed": false,
+  "full_suite_qualified": false,
+  "scoped_native_and_component_results": "unchanged; see CANONICAL_OUTCOME.json and producer/checker raw logs",
+  "benchmark": false,
+  "15x_admitted": false,
+  "signed_verdict": false
+}

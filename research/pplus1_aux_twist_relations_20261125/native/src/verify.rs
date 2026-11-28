@@ -1,4 +1,8 @@
-use std::{collections::BTreeMap, env, fs, path::Path};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    env, fs,
+    path::Path,
+};
 
 const P: i64 = 127;
 const R: i64 = 131;
@@ -85,6 +89,17 @@ fn main() {
         let (x, y) = pt.unwrap();
         assert_eq!(m(y * y - x * x * x - x - 26, P), 0);
         entry.push(pt);
+    }
+    for (name, fb) in &bases {
+        assert_eq!(fb.len(), 4);
+        let mut sums = BTreeSet::new();
+        for &left in fb {
+            for &right in fb {
+                sums.insert(plus(left, right));
+            }
+        }
+        println!("{name}: {} distinct signed pair sums", sums.len());
+        assert_eq!(sums.len(), 9);
     }
     let mut rows: BTreeMap<String, Vec<[i64; 4]>> = BTreeMap::new();
     let mut count = 0;

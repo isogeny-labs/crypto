@@ -1,0 +1,8 @@
+digraph G {
+ rankdir=LR;node[shape=box,style="rounded,filled",fillcolor="#eef5fb",fontname="Helvetica",fontsize=11];
+ a[label="ACTUAL SHORT RESIDUAL CERTIFICATE\nJ = product of n point ideals, n <= 2\nnonzero h; span(h) = I(P)^4 J"];
+ b[label="ACTUAL GROUP RELATION\n4P + sum Q_i = 0\npad missing terms with group identity"];
+ c[label="FIXED BASE B, INJECTIVE4\ncertified target count <= (|B|+1)^2"];
+ d[label="FINITE COPRIME4 GROUP\nsmall base bound < grouporder\n-> some target lacks short certificate"];
+ a->b->c->d;
+}

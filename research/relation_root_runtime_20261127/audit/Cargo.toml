@@ -1,0 +1,13 @@
+[package]
+name="relation-pairgraph-artifact-replay"
+version="0.1.0"
+edition="2021"
+publish=false
+[workspace]
+[dependencies]
+relation-replay-checker={path="../../../crates/relation-replay-checker"}
+serde_json="1"
+sha2="0.10"
+[[bin]]
+name="pairgraph-audit"
+path="main.rs"

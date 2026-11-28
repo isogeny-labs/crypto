@@ -1,0 +1,9 @@
+digraph G { rankdir=TB;node[shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="Helvetica",fontsize=12];edge[fontname="Helvetica",fontsize=10];
+ a[label="Actual nonzero h / integral residual J\n(h)=product(I_i^n_i)*J\n096/102/local051"];
+ b[label="EXPLICIT PREMISE\nJ=product of nonsingular rational point ideals",fillcolor="#fff1d5"];
+ c[label="Flatten weighted points / actual principal relation\nsum(n_i*P_i)+sum(R_j)=0\n098/104/local052"];
+ d[label="Residual group sum fixed by prescribed inputs\nSingle residual point determined"];
+ e[label="Q+sP+R=0 implies\nR=rP iff Q=(-s-r)P"];
+ f[label="OPEN: obtain useful labeled residual factors\nActual distribution / support / retry / bit cost",style="rounded,dashed",fillcolor="white"];
+ a->c;b->c;c->d;d->e;e->f[style=dashed,label="new obligation"];
+}

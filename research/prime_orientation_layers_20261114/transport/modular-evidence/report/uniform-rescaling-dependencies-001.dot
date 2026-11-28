@@ -1,0 +1,17 @@
+digraph G {
+rankdir=TB;node[shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="Helvetica",fontsize=15];
+a[label="Actual half-slopes and chart
+all crossing columns"];
+b[label="Normalized denominator parity
+even Content0, odd Content2"];
+c[label="Actual numerator and finite geometric sum
+full odd right Content2"];
+d[label="Integral rational rescaling
+right/4, left*4; exact product/residual"];
+e[label="All-node schedule and child admission
+separate from selected-node weight",fillcolor="#fff1dc"];
+f[label="Creation, modes, preparation and public cost
+remain separate obligations",fillcolor="#fff1dc"];
+{rank=same;a;b;} {rank=same;c;d;} {rank=same;e;f;}
+a->b;b->c;c->d;d->e[style=dashed,label="requires test"];e->f[style=dashed];
+}

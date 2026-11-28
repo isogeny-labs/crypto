@@ -1,0 +1,36 @@
+{
+  "schema": "isogeny-labs/experiment-seeds/v1",
+  "study_id": "norm-one-torus-m7-affine-leaf-public-precommit-20261126",
+  "frozen_before_implementation_utc": "2026-11-26T21:06:22Z",
+  "precommit_intent": "Follow-up design frozen after the first four-arm result and before implementing or executing the affine-leaf arm.",
+  "prior_run_disclosure": "The same target already showed retained-3-prefix16-centered as the first-run cold winner; this follow-up is a paired optimization of that arm.",
+  "master_seed_hex": "4c85d0b299da4b82f7e31a4a97794dff042b5eb0df725e1f75dc16d71a1c5b91",
+  "master_seed_derivation": "SHA-256 of the ASCII string isogeny-labs/norm-one-torus-m7-single-target/2026-11-26/v1",
+  "stream_derivation": {
+    "domain": "isogeny-labs/norm-one-torus-m7-single-target/public-precommit/2026-11-26/v1",
+    "construction": "SHA-256(domain || 0x00 || master_seed || 0x00 || stream_name || 0x00 || u64be(index)); reduce the big-endian digest modulo the requested range"
+  },
+  "configuration": {
+    "curve": "icv1-fp31-tm3989-ae9db972",
+    "dickson_height": 6,
+    "dickson_lo": 0,
+    "dickson_c_top": 0,
+    "targets": 1,
+    "target_kind": "same-public-planted-target-as-first-run",
+    "arity": 7,
+    "rounds": 9,
+    "query_block_size": 2048,
+    "prefix_bits": 16
+  },
+  "new_arm": "retain3-prefix16-affine-leaf",
+  "single_target_accounting": {
+    "cross_target_amortization": false,
+    "retained_table_rebuilt_per_arm_per_round": true,
+    "target_cache_shared_between_arms": false,
+    "scan_after_first_hit": "complete",
+    "setup_and_query_both_charged": true
+  },
+  "primary_evidence": "exact operation vectors, complete candidate counts, same-target witness validity, and independent affine replay",
+  "secondary_evidence": "non-isolated local wall-clock diagnostics only"
+}
+

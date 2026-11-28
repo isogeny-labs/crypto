@@ -1,0 +1,9 @@
+# Active research continuation: asymmetric surviving support
+
+Read latestNov23journal, public-input-evidence/STATUS-20261123-010.md and PROTOCOL-014.md. Latestaccepted080/build086/local042/PCC-20261123-a97e80:205local/5new/0warnings/allstandard/267pins. Actualresidualunitv=principal(h)*targetunit^-4, actualexactspanh=I4JderivesvrepresentsintegralJ; actualclass inversefourthtargetclass independentofnonzeroh without rational splitting. [pcc:unverified]
+
+Earlier078/build084/local041/PCC-89ca74:200local, actual0/1/2rationalresidualcertificate coverage<=(B.card+1)^2andmissingtargetunderactualfinitecoprime4groupcard/smallbase.077/197/PCC-7eef03exactlytwopointB^2,073/191/PCC-6acf43actualresidualdimension2 remainexact. Allunsignedoutsidehistoricalshared53/57/fresh. Two newesteditable1page reports separatelyinspected/final0warnings/overflow/prose, allpriorpending/final/failurebytespinned. No componentjobrunningafter086; inspectcompletedstatebeforeanyrerun.
+
+Resume actualasymmetricbranchproof: rplus/rminus actualFullMultiplicity onoppositebranches gives normorder rplus+rminus; derivecommoncoefficientfactor atmin usingactualjetmonotonicity/pairedcoefflaw. Then proveactualnormalized orientedpointmultiplicity, notnormrootonly. Equalbranchescontrolmustreproducecancelledpairedsupport; unpairedcontrolretainsknownpointfactor. Nextactualgrowingpublickernel/nonzeroimage/degree/coeffentrybits/group/knownscalarfinder/density/retry/full expectedcost. All originalnonscalarorigin/rank-directedWjet interfaces remainseparate/open; no novelalgorithm/ETA/backgroundjobclaim.
+
+Broadergoalactive; subordinatewatcherstoppedonlywatcher, do notrearm. ProtectedcanonicalPCCchainconflict remainsremotepublication-only; no push/merge/rechain/reissue/waive/forcepush/alternatebranchevasion. Preserve everyoldsource/raw/report/claim/owner/ledgerprefix; no paidcloud/nativecrypto/attack/timingcampaign/vault/signing/resource/trustoverride or unrelatededit.

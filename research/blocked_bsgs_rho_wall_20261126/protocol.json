@@ -1,0 +1,906 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "blocked-bsgs-rho-wall-v1",
+  "version": 1,
+  "created": "2026-11-26",
+  "repository": "crypto",
+  "study_dir": "research/blocked_bsgs_rho_wall_20261126",
+  "authors": [
+    "Codex research session; design frozen before any harness timing"
+  ],
+  "links": {
+    "human_protocol": "research/blocked_bsgs_rho_wall_20261126/PROTOCOL.md",
+    "cpu_envelope_addendum": "research/blocked_bsgs_rho_wall_20261126/PROTOCOL-ADDENDUM-1.md",
+    "seed_custody_addendum": "research/blocked_bsgs_rho_wall_20261126/PROTOCOL-ADDENDUM-2.md",
+    "seed_manifest": "research/blocked_bsgs_rho_wall_20261126/seed-manifest.json",
+    "derived_seed_mapping": "research/blocked_bsgs_rho_wall_20261126/derived-seeds.json",
+    "ecbench_spec": "research/blocked_bsgs_rho_wall_20261126/isolab-spec.json",
+    "bsgs_source": "src/cryptanalysis/bsgs_fast.rs",
+    "rho_source": "src/cryptanalysis/prime_fast.rs"
+  },
+  "question": "On each of five fixed public prime-order toy curves, is the existing paired x-coordinate blocked BSGS implementation faster in cold one-target elapsed time than the existing tuned one-thread batched negation-map Pollard rho implementation when both solve and independently verify the same target and every BSGS table cost is charged? [pcc:unverified]",
+  "claims": [
+    {
+      "id": "C1-cold-timing",
+      "text": "For each curve separately, paired blocked BSGS has lower cold one-target elapsed time than tuned one-thread rho only when every scalar is correct, no row is censored, both same-instrument A/A intervals contain one, and the 95% paired-bootstrap interval for sum(rho total)/sum(BSGS total) lies wholly above one.",
+      "class": "comparative",
+      "decided_by": [
+        "cold-bsgs-vs-rho",
+        "bsgs-aa",
+        "rho-aa"
+      ],
+      "if_supported": "A host-, compiler-, implementation-, and size-specific constant-factor cold timing advantage on that curve.",
+      "if_not_supported": "The curve is reported as unresolved or as a BSGS loss; no faster-than-rho conclusion is made."
+    },
+    {
+      "id": "C2-ten-percent",
+      "text": "A gain of at least ten percent on a curve is reported only when the lower endpoint of the same primary interval exceeds 1.10 and all correctness, censoring, and A/A gates pass.",
+      "class": "comparative",
+      "decided_by": [
+        "cold-bsgs-vs-rho",
+        "bsgs-aa",
+        "rho-aa"
+      ],
+      "if_supported": "At least a ten-percent host-specific cold timing advantage for the measured implementations on that curve.",
+      "if_not_supported": "No ten-percent claim; a smaller supported advantage may still be reported under C1."
+    },
+    {
+      "id": "C3-amortized-diagnostic",
+      "text": "The 64-target shared-table panel is a separately labelled amortized implementation comparison and never licenses the cold one-target claim.",
+      "class": "out_of_scope",
+      "decided_by": []
+    },
+    {
+      "id": "C4-asymptotic",
+      "text": "No asymptotic-exponent, memory-neutral, universal, production-key, or external-target conclusion is admissible from this study.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "Paired blocked BSGS has lower cold one-target elapsed time than tuned one-thread rho on at least some registered sizes despite its square-root memory cost.",
+      "mechanism": "A prior arithmetic accounting suggested a possible constant-factor advantage, but it did not measure matched wall time and is not outcome evidence.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "rho-over-bsgs-cold-total",
+          "direction": "higher",
+          "minimum_effect": "For a curve, the two-sided 95% paired-bootstrap interval has lower endpoint above 1.0 after all correctness, censoring, and A/A gates pass.",
+          "provenance": {
+            "written_at": "2026-11-26",
+            "first_recorded_in": "research/blocked_bsgs_rho_wall_20261126/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/blocked_bsgs_rho_wall_20261126/PROTOCOL.md",
+                "measured": "Frozen design and source inspection only; no matched harness timing."
+              }
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "Five fixed public 24-, 28-, 32-, 36-, and 40-bit prime-order toy curves under the frozen native-L2 protocol."
+          },
+          "role": "decisive"
+        },
+        {
+          "id": "P2",
+          "metric": "aa-ratio",
+          "direction": "equal_within",
+          "minimum_effect": "Both BSGS and rho A/A 95% intervals contain 1.0.",
+          "provenance": {
+            "written_at": "2026-11-26",
+            "first_recorded_in": "research/blocked_bsgs_rho_wall_20261126/PROTOCOL.md",
+            "data_seen": [],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "Same-instrument timing stability on the admitted host."
+          },
+          "role": "calibration"
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-cold",
+      "role": "reference",
+      "description": "Tuned batched negation-map Pollard rho, one thread, target-dependent setup and evaluator check charged.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "source": "src/cryptanalysis/prime_fast.rs",
+          "config": "RhoConfig::tuned(n); threads=1; max_steps=64*ceil_sqrt(n)",
+          "seed": "derived rho-walk seed"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "image_digest": null
+      },
+      "parameters": {
+        "panels": [
+          "warmup",
+          "cold-paired",
+          "rho-aa",
+          "amortized-B64"
+        ]
+      }
+    },
+    {
+      "id": "bsgs-cold",
+      "role": "candidate",
+      "description": "Paired x-coordinate blocked BSGS with cold table allocation, build, search, deallocation, and evaluator check charged.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "source": "src/cryptanalysis/bsgs_fast.rs",
+          "plan": "BsgsFastPlan::new(n,0,true,1,8)",
+          "kernel": "StepKernel::Paired",
+          "pair_k": "32"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "image_digest": null
+      },
+      "parameters": {
+        "panels": [
+          "warmup",
+          "cold-paired",
+          "bsgs-aa"
+        ]
+      }
+    },
+    {
+      "id": "bsgs-aa-copy",
+      "role": "control_aa",
+      "description": "Second identical cold BSGS invocation on each bsgs-aa target; copy orientation is invocation-2 over invocation-1.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "source": "src/cryptanalysis/bsgs_fast.rs",
+          "plan": "BsgsFastPlan::new(n,0,true,1,8)",
+          "kernel": "StepKernel::Paired",
+          "pair_k": "32"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "image_digest": null
+      },
+      "parameters": {
+        "panel": "bsgs-aa",
+        "invocation": 2
+      },
+      "same_instrument_as": "bsgs-cold"
+    },
+    {
+      "id": "rho-aa-copy",
+      "role": "control_aa",
+      "description": "Second identical rho invocation with the same walk seed on each rho-aa target; copy orientation is invocation-2 over invocation-1.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "source": "src/cryptanalysis/prime_fast.rs",
+          "config": "RhoConfig::tuned(n); threads=1; max_steps=64*ceil_sqrt(n)",
+          "seed": "same derived rho-walk seed as invocation 1"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "image_digest": null
+      },
+      "parameters": {
+        "panel": "rho-aa",
+        "invocation": 2
+      },
+      "same_instrument_as": "rho-cold"
+    },
+    {
+      "id": "bsgs-amortized-b64",
+      "role": "candidate",
+      "description": "One paired BSGS table built per batch and reused for 64 independently derived targets; secondary panel only.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "source": "src/cryptanalysis/bsgs_fast.rs",
+          "batch_size": "64",
+          "table_reuse": "one table per batch"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "image_digest": null
+      },
+      "parameters": {
+        "panel": "amortized-B64",
+        "batches_per_curve": 16,
+        "targets_per_batch": 64
+      },
+      "same_instrument_as": "bsgs-cold"
+    },
+    {
+      "id": "rho-amortized-b64",
+      "role": "reference",
+      "description": "Sixty-four sequential one-thread rho invocations per secondary batch, with all target-dependent setup charged.",
+      "instrument": {
+        "repo": "isogeny-labs/crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "+1.99.1",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "ecbench",
+            "--target",
+            "x86_64-unknown-linux-musl"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "source": "src/cryptanalysis/prime_fast.rs",
+          "batch_size": "64",
+          "table_reuse": "none"
+        },
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        },
+        "image_digest": null
+      },
+      "parameters": {
+        "panel": "amortized-B64",
+        "batches_per_curve": 16,
+        "targets_per_batch": 64
+      },
+      "same_instrument_as": "rho-cold"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "bsgs-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Every measured row is itself a known-answer correctness fixture: the evaluator retains k, constructs Q=[k]G independently, and rejects any returned scalar that does not regenerate Q."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "The question is a paired timing comparison of exact solvers, not detection against a null population."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "curve",
+        "levels": [
+          "icv1-fp24-tm5099-a6f137c6",
+          "icv1-fp28-t28201-65099091",
+          "icv1-fp32-t7319-90da43e9",
+          "icv1-fp36-t454193-44a20818",
+          "icv1-fp40-tm506303-75549727"
+        ]
+      },
+      {
+        "name": "panel",
+        "levels": [
+          "warmup",
+          "cold-paired",
+          "bsgs-aa",
+          "rho-aa",
+          "amortized-B64"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "solver implementation",
+        "treatment": "crossed",
+        "value": [
+          "paired blocked BSGS",
+          "tuned batched rho"
+        ],
+        "how": "Both solvers receive the same independently prepared target within every cold pair."
+      },
+      {
+        "name": "execution order",
+        "treatment": "fixed",
+        "value": "replicate parity",
+        "how": "Even cold replicates run BSGS then rho; odd replicates run rho then BSGS. A/A invocation labels likewise alternate by parity."
+      },
+      {
+        "name": "thread count",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Each solver is pinned to one workload CPU with RAYON_NUM_THREADS=1."
+      },
+      {
+        "name": "curve size",
+        "treatment": "crossed",
+        "value": "five fixed registered toy curves",
+        "how": "Every panel is run separately on every curve and conclusions remain separate by curve."
+      },
+      {
+        "name": "target and rho-walk randomness",
+        "treatment": "fixed",
+        "value": "seed-manifest.json",
+        "how": "All seeds are deterministically derived from the precommitted 256-bit master seed in separate domains before timing."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "cold-bsgs-vs-rho",
+        "arms": [
+          "rho-cold",
+          "bsgs-cold"
+        ],
+        "differs_in": [
+          "solver implementation",
+          "memory use",
+          "Montgomery backend"
+        ],
+        "design": "one_factor",
+        "reason": "End-to-end implementation comparison on the same target; table build and target-dependent setup are charged."
+      },
+      {
+        "id": "bsgs-aa",
+        "arms": [
+          "bsgs-cold",
+          "bsgs-aa-copy"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "reason": "Two identical cold BSGS invocations on each of 64 dedicated targets per curve."
+      },
+      {
+        "id": "rho-aa",
+        "arms": [
+          "rho-cold",
+          "rho-aa-copy"
+        ],
+        "differs_in": [],
+        "design": "aa",
+        "reason": "Two identical rho invocations with the same walk seed on each of 64 dedicated targets per curve."
+      },
+      {
+        "id": "amortized-b64",
+        "arms": [
+          "rho-amortized-b64",
+          "bsgs-amortized-b64"
+        ],
+        "differs_in": [
+          "solver implementation",
+          "cross-target BSGS table reuse",
+          "memory use"
+        ],
+        "design": "confounded",
+        "reason": "Deliberately separate secondary throughput panel; it cannot substitute for the cold one-target comparison."
+      }
+    ],
+    "crosses_map": false,
+    "aa_not_applicable": null
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "Deterministic parity balancing was frozen before data: each solver leads 256 of the 512 cold pairs per curve.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        "1aaea7ece2a35976043741b3a869b6ddc9a3798b18596b0635ee52829e3bba38"
+      ],
+      "nonce": null,
+      "note": "SHA-256 KDF and every domain, range, extraction rule, duplicate refusal, and bootstrap selection rule are frozen in seed-manifest.json. Addendum 2 changes only the lossless physical encoding of the complete mapping to derived-seeds.json schema blocked-bsgs-rho-wall/derived-seeds/v2."
+    },
+    "instance_sampling": {
+      "rule": "Five fixed registered public curves; target scalar k=1+(derived_u64 mod (n-1)) in each frozen panel identity; no target is rerolled, dropped, or silently repeated.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Solver identity is needed to invoke different APIs; analysis, thresholds, target streams, and scheduling were frozen before any harness timing.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 2560,
+    "replicates": 1,
+    "warmups": 4,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 5,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": false,
+      "note": "The fixed 512-pair sample per curve targets interval precision, not a claimed prospective power calculation. Curves are reported separately and no family-wide conclusion is licensed."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "rho-over-bsgs-cold-total",
+        "name": "Cold rho-to-BSGS ratio of arithmetic-mean elapsed time",
+        "unit": "ratio",
+        "kind": "derived",
+        "definition": "For each curve, sum of 512 correctness-checked rho charged totals divided by the sum of the paired 512 correctness-checked cold BSGS charged totals; fixture construction and serialization are excluded.",
+        "source": "Native analyzer over event-sourced cold-paired result rows",
+        "formula": "sum(rho_total_ns)/sum(bsgs_total_ns)",
+        "aggregation": "paired_ratio",
+        "resolution": "integer nanosecond inputs",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "cold-total-ns",
+        "name": "Per-arm cold charged elapsed time",
+        "unit": "nanoseconds",
+        "kind": "timed",
+        "definition": "BSGS includes allocation, build, search, candidate verification, evaluator check, and deallocation; rho includes target-dependent table, walks, collision recovery, internal check, and evaluator check.",
+        "source": "Integer total_ns in each result event",
+        "formula": null,
+        "aggregation": "mean",
+        "resolution": "one nanosecond clock representation",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "paired-mean-difference",
+        "name": "Arithmetic mean paired elapsed-time difference",
+        "unit": "nanoseconds",
+        "kind": "derived",
+        "definition": "Arithmetic mean over cold pairs of rho_total_ns minus bsgs_total_ns, separately by curve.",
+        "source": "Native analyzer over cold-paired result rows",
+        "formula": "mean(rho_total_ns-bsgs_total_ns)",
+        "aggregation": "mean",
+        "resolution": "integer nanosecond inputs",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "normalized-time",
+        "name": "Elapsed time normalized by square-root group order",
+        "unit": "nanoseconds per sqrt(n)",
+        "kind": "derived",
+        "definition": "Mean charged total elapsed time divided by sqrt(n), separately for each arm and curve.",
+        "source": "Native analyzer and fixed curve order",
+        "formula": "mean(total_ns)/sqrt(n)",
+        "aggregation": "mean",
+        "resolution": null,
+        "uncertainty": "bootstrap_ci95"
+      },
+      {
+        "id": "aa-ratio",
+        "name": "Same-instrument invocation-2 to invocation-1 ratio",
+        "unit": "ratio",
+        "kind": "derived",
+        "definition": "For each curve and solver, sum of invocation-2 total_ns divided by sum of invocation-1 total_ns over 64 dedicated A/A pairs.",
+        "source": "Native analyzer over bsgs-aa and rho-aa result rows",
+        "formula": "sum(copy2_total_ns)/sum(copy1_total_ns)",
+        "aggregation": "paired_ratio",
+        "resolution": "integer nanosecond inputs",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "amortized-b64-ratio",
+        "name": "Secondary 64-target batch rho-to-BSGS elapsed ratio",
+        "unit": "ratio",
+        "kind": "derived",
+        "definition": "Per curve, ratio of summed rho batch totals to summed BSGS batch totals over 16 whole batches; bootstrap resamples batches, not targets.",
+        "source": "Native analyzer over amortized-B64 batch result rows",
+        "formula": "sum(rho_batch_total_ns)/sum(bsgs_batch_total_ns)",
+        "aggregation": "paired_ratio",
+        "resolution": "integer nanosecond inputs",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "resource-and-operation-counters",
+        "name": "Memory and exact implementation counters",
+        "unit": "bytes and operation counts",
+        "kind": "counted",
+        "definition": "BSGS planned table bytes and every BsgsFastStats field; rho DP counts, every RhoResult and RhoOpCounts field; process peak RSS where available.",
+        "source": "Per-arm result events and host envelope",
+        "formula": null,
+        "aggregation": "per_row",
+        "resolution": "one byte or one counted operation",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 4,
+    "order": "alternate",
+    "clock": "monotonic",
+    "counters": [
+      "BsgsFastStats all fields",
+      "BsgsFastPlan table_bytes",
+      "RhoResult all fields",
+      "RhoOpCounts all fields",
+      "process peak RSS",
+      "context switches",
+      "faults",
+      "load and PSI"
+    ],
+    "record": [
+      "source commit and source hashes",
+      "lockfile and binary SHA-256",
+      "compiler and Cargo versions",
+      "CPU model and features",
+      "kernel and OS",
+      "memory and cgroup limits",
+      "CPU affinity and RAYON_NUM_THREADS",
+      "isolation level and contention status",
+      "load and PSI",
+      "context switches and faults",
+      "canonical target coordinates and derived seed identities",
+      "full solver configurations",
+      "event intent/result status and censoring"
+    ],
+    "timed_primary_justification": "This is an end-to-end comparison of two existing implementations with different Montgomery backends and memory behavior; their internal operation counts are not a common cost unit. Native L2 isolation plus two same-instrument A/A panels are required before the monotonic clock can support the host-specific conclusion."
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-l2-spot",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "allocated_vcpus": 4,
+      "workload_cpus": 1,
+      "memory_bytes": 4294967296,
+      "architecture": "x86_64",
+      "solver_threads": 1,
+      "dollar_ceiling_usd": 2.0
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Stop after the fixed panel sizes on all five curves; never add, reroll, drop, or silently repeat a scientific row.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stop the job at 3600 seconds, 4 GiB resident memory, or the USD 2.00 study ceiling; preserve partial intent/result events.",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "Reject before timing on a source, manifest, binary, curve, target-coordinate, thread-count, seed-duplication, or writable-evidence-store mismatch.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "For each curve separately, report BSGS faster only when every scalar passes independent evaluation, no row is censored, both solver A/A intervals contain 1.0, and the type-1 two-sided 95% paired-bootstrap interval for sum(rho total_ns)/sum(BSGS total_ns) has lower endpoint above 1.0. Report at least ten percent only when that lower endpoint exceeds 1.10. Otherwise report unresolved, loss, or invalid as dictated by the interval and gates.",
+    "comparison_ids": [
+      "cold-bsgs-vs-rho",
+      "bsgs-aa",
+      "rho-aa"
+    ],
+    "threshold": "Primary lower CI endpoint >1.0; ten-percent lower CI endpoint >1.10; both A/A intervals must contain 1.0.",
+    "statistic": "Per-curve ratio of sums of paired cold elapsed totals, with arithmetic mean paired difference reported beside it.",
+    "interval": "10,000 whole-pair percentile-bootstrap resamples; type-1 empirical quantiles at sorted zero-based indices 249 and 9749. A/A uses invocation-2/invocation-1; amortized analysis resamples whole batches.",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "rho elapsed divided by BSGS elapsed; values above one favor BSGS",
+    "verdict_vocabulary": [
+      "bsgs-at-least-10pct-faster",
+      "bsgs-faster",
+      "unresolved",
+      "bsgs-not-faster",
+      "invalid"
+    ]
+  },
+  "analysis_plan": {
+    "script": null,
+    "inputs": [
+      "event-sourced raw intent/result log",
+      "derived seed mapping and compact bootstrap stream digests",
+      "fixed curve registry entries",
+      "source, build, binary, and host manifests"
+    ],
+    "outputs": [
+      "per-curve primary and A/A bootstrap summaries",
+      "per-curve amortized-B64 diagnostic",
+      "independent affine-verifier report",
+      "benchmark record and raw artifact manifest"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "invalidation_rules": [
+    "Any incorrect scalar or unequal canonical target construction blocks a positive result on that curve.",
+    "Any unmatched intent, solver failure, cap, timeout, panic, malformed row, or external interruption is explicit censoring and blocks an unconditional positive result on that curve.",
+    "Any source, manifest, lockfile, binary, curve, seed, thread-count, isolation, or evidence-store mismatch rejects the timed run.",
+    "A failed BSGS or rho A/A gate blocks the primary timing conclusion on that curve.",
+    "A resumed measurement row has invalid wall time and cannot enter the primary estimate.",
+    "The secondary amortized panel cannot rescue a failed or unresolved cold one-target panel."
+  ],
+  "inadmissible": [
+    "Any claim of a smaller asymptotic exponent or a generic algorithm that beats Pollard rho asymptotically.",
+    "Any memory-neutral conclusion; blocked BSGS uses O(sqrt(n)) memory while rho has much smaller state.",
+    "Any universal, production-key, external-target, non-prime-field, non-x86_64, multi-thread, or unmeasured-host conclusion.",
+    "Any positive conclusion from local smoke timing, contended timing, a failed A/A gate, censored rows, or only the amortized-B64 panel.",
+    "Any pooling of the five sizes into one headline conclusion or fitted asymptotic exponent."
+  ],
+  "amendments": [
+    {
+      "id": "A1-admitted-cpu-envelope",
+      "filed": "2026-11-26",
+      "filed_before_affected_data": true,
+      "reason": "The repository's admitted native-L2 lane allocates four vCPUs rather than the two-vCPU allocation stated in the first Markdown freeze.",
+      "changes": [
+        "Allocate four native-L2 vCPUs while pinning each solver to one workload CPU; reserve the remaining CPUs for the parent process and isolation machinery."
+      ],
+      "supersedes_fields": [
+        "execution.placement.allocated_vcpus"
+      ]
+    },
+    {
+      "id": "A2-lossless-seed-custody",
+      "filed": "2026-11-26",
+      "filed_before_affected_data": true,
+      "reason": "The fully expanded JSONL mapping is 4,650,727 bytes and requires an unavailable external artifact store, while a deterministic indexed JSON object retains every logical value within the ordinary tracked-file limit.",
+      "changes": [
+        "Commit the complete derived mapping as derived-seeds.json with schema blocked-bsgs-rho-wall/derived-seeds/v2 instead of one JSON object per line in derived-seeds.jsonl.",
+        "Require the emitter and independent verifier to expand the indexed object to the same 19,680 logical records, verify every KDF value and count, reject duplicate derived u64 values, and reproduce the canonical file SHA-256 before timing."
+      ],
+      "supersedes_fields": [
+        "links.derived_seed_mapping",
+        "extensions.seed_custody.encoding"
+      ]
+    }
+  ],
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-curve paired cold elapsed distributions and ratio intervals",
+      "Per-curve BSGS and rho A/A interval plots",
+      "Per-curve memory and elapsed trade-off",
+      "Separate amortized-B64 batch interval plot"
+    ],
+    "report_dir": "research/blocked_bsgs_rho_wall_20261126/results"
+  },
+  "extensions": {
+    "protocol_anchors": {
+      "human_protocol_sha256": "53548103cbf898dab3f39bf0de8bebb5ced07184855baa82556079395e58c773",
+      "cpu_envelope_addendum_sha256": "45cf548ae2c1fa71e55f713e933f74b743052bb403fd1846767026eef4082801",
+      "seed_custody_addendum_sha256": "d581de654830d1730eac4a3019e323752f5dc98cbb4d7276e9943c954191a1c1",
+      "seed_manifest_sha256": "45fa0e04de6c91c567dea346849fc74c12d9537814124086649dc47ade8e6c5f",
+      "bsgs_source_sha256": "ebe890abcbdcfb2e719eff99e046847f4f1efb0864f627ba2ad2a073a5f4a7bb",
+      "rho_source_sha256": "6a9dc015b1558045935912688beebf141a6b4161c045c821faac81fc3a430bc1"
+    },
+    "curves": [
+      {
+        "slug": "icv1-fp24-tm5099-a6f137c6",
+        "p": 16777199,
+        "a": 16777196,
+        "b": 31,
+        "gx": 2,
+        "gy": 5412647,
+        "n": 16782299
+      },
+      {
+        "slug": "icv1-fp28-t28201-65099091",
+        "p": 268435399,
+        "a": 268435396,
+        "b": 3,
+        "gx": 1,
+        "gy": 1,
+        "n": 268407199
+      },
+      {
+        "slug": "icv1-fp32-t7319-90da43e9",
+        "p": 4294967291,
+        "a": 4294967288,
+        "b": 31,
+        "gx": 2,
+        "gy": 2120051858,
+        "n": 4294959973
+      },
+      {
+        "slug": "icv1-fp36-t454193-44a20818",
+        "p": 68719476731,
+        "a": 68719476728,
+        "b": 33,
+        "gx": 2,
+        "gy": 51741851039,
+        "n": 68719022539
+      },
+      {
+        "slug": "icv1-fp40-tm506303-75549727",
+        "p": 649522587953,
+        "a": 552810359288,
+        "b": 555863716954,
+        "gx": 549251065028,
+        "gy": 609044633619,
+        "n": 649523094257
+      }
+    ],
+    "panels": {
+      "warmup": {
+        "replicate_ids": "0..3",
+        "items_per_replicate": 1,
+        "timed": false
+      },
+      "cold-paired": {
+        "replicate_ids": "0..511",
+        "items_per_replicate": 1,
+        "observations_per_curve": 512
+      },
+      "bsgs-aa": {
+        "replicate_ids": "0..63",
+        "items_per_replicate": 1,
+        "pairs_per_curve": 64
+      },
+      "rho-aa": {
+        "replicate_ids": "0..63",
+        "items_per_replicate": 1,
+        "pairs_per_curve": 64
+      },
+      "amortized-B64": {
+        "replicate_ids": "0..15",
+        "items_per_replicate": 64,
+        "batches_per_curve": 16
+      }
+    },
+    "bootstrap": {
+      "resamples": 10000,
+      "selection": "SHA-256 KDF with panel=analysis, replicate=b, item=d, stream label by comparison; derived_u64 mod N",
+      "quantile_indices_zero_based": [
+        249,
+        9749
+      ],
+      "unit": "whole pairs for cold and A/A; whole 64-target batches for amortized-B64"
+    },
+    "seed_custody": {
+      "path": "research/blocked_bsgs_rho_wall_20261126/derived-seeds.json",
+      "schema": "blocked-bsgs-rho-wall/derived-seeds/v2",
+      "encoding": "lossless indexed JSON ordered by frozen curve, panel, replicate, and item dimensions",
+      "logical_records": 19680,
+      "target_derived_u64_values": 8340,
+      "target_scalars": 8340,
+      "rho_walk_derived_u64_values": 8020,
+      "schedule_codes": 3300,
+      "bootstrap_stream_digests": 20,
+      "canonical_file_sha256": "89a9d8982cf867a9174953b1682006c50cbadd30e4d65316acf258c21ea5f311",
+      "canonical_file_bytes": 403302,
+      "status": "emitted and independently verified before timing"
+    },
+    "raw_event_contract": {
+      "key": [
+        "curve_slug",
+        "panel",
+        "replicate",
+        "item",
+        "arm",
+        "copy"
+      ],
+      "before_each_charge": "flush one intent event",
+      "after_each_charge": "flush exactly one matching result event",
+      "unmatched_intent": "censored"
+    },
+    "admission": {
+      "ecbench_spec_path": "research/blocked_bsgs_rho_wall_20261126/isolab-spec.json",
+      "required_spec_schema": "ecbench.spec/v1",
+      "required_wrapper": "A fixed ecbench method must internally enforce the unequal primary, A/A, and amortized panel sizes and emit verifier-compatible events; stock global arm counts cannot represent this design.",
+      "status": "blocked until the fixed study-wrapper method and exact spec validate"
+    }
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "a6c0cf1afac40deda80081b5c9eeedf94b0d8884b1f679c8a2f412d995f888bc",
+    "commit": "3836060de5f98919d5019d7d11e3881b6ca8a9ec",
+    "frozen_at": "2026-11-26T06:00:11Z",
+    "filed_before_affected_data": true
+  }
+}

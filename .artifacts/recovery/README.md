@@ -63,3 +63,22 @@ payload supplies both named files. The study manifest retains the original
 size and digest; the normal artifact reader checks both before installation.
 This is a publication of existing correctness evidence, with no new sample
 and no claim that the disabled S3 store received an upload. [pcc:unverified]
+
+## Residual chord-label M31 correctness records (2026-11-26)
+
+Three deterministic gzip objects preserve the completed development outputs from
+`research/cayley_residual_transport_m31_20261125/evidence/validation-attempt-1/`.
+The per-run manifests retain both logical run paths, while the payloads deduplicate
+identical content. The normal artifact reader verifies original sizes and SHA-256
+digests before installation; no S3 upload is claimed. [pcc:unverified]
+
+| Original stream | Original bytes per run | Original SHA-256 |
+|---|---:|---|
+| `cases.jsonl` | 3,269,068 | `0b4610bf5299faedade387a3f043360de47175df017a063cf654e5f2f833400f` |
+| `intersections.jsonl` | 589,830 | `1f30cd92ab96660a56a77429419f97104ba5140159c5c529382f188fd8c42a49` |
+| `prefixes.jsonl` | 91,837 | `4a879dd8d1bc7ffa76ad093f27683f70a2f58704863a4fb89f6357a9e17be9d3` |
+
+These are unchanged historical correctness records. Publication does not generate
+new research samples. The study's `publication/packaging.json` preserves the
+original-manifest mapping and distinguishes the original executable retained only
+in its archive.

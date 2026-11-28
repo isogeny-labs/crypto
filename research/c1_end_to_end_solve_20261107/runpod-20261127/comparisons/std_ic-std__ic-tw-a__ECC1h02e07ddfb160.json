@@ -1,0 +1,225 @@
+{
+  "schema": "ecbench.comparison/v2",
+  "comparison_id": "ECC1h02e07ddfb160",
+  "pricing_weight": 1.0,
+  "resample_seed": 20261002,
+  "a": {
+    "session_id": "ECBS1hca14a07b7b51",
+    "arm": "ic-std",
+    "method_id": "ECM1h8eee4e36138f",
+    "method": "ic.pipeline",
+    "measured": 30,
+    "verified": 30,
+    "statuses": {
+      "verified": 30
+    },
+    "mean_s": 66076.44733886865,
+    "mean_ratio_to_floor": 74559.28661286313,
+    "lower_bound": false,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 30,
+      "median_s": 62761.891760035185,
+      "max_s": 112245.52200228829,
+      "max_over_median": 1.7884343325954801,
+      "top_run_share": 0.05662407031189426,
+      "top_run_id": "ECM1h8eee4e36138fW97e304fc3a46R6",
+      "heavy_tail": false
+    },
+    "unpriced_counts": {}
+  },
+  "b": {
+    "session_id": "ECBS1hf61d0f772b8e",
+    "arm": "ic-tw-a",
+    "method_id": "ECM1hb60e72d682ab",
+    "method": "ic.pipeline",
+    "measured": 30,
+    "verified": 30,
+    "statuses": {
+      "verified": 30
+    },
+    "mean_s": 8500.32448089922,
+    "mean_ratio_to_floor": 9591.589057798656,
+    "lower_bound": false,
+    "deterministic": true,
+    "censored": 0,
+    "tail": {
+      "runs": 30,
+      "median_s": 8260.467700192396,
+      "max_s": 11716.60361900653,
+      "max_over_median": 1.418394701638218,
+      "top_run_share": 0.045945711230728103,
+      "top_run_id": "ECM1hb60e72d682abW4af9d0263718R7",
+      "heavy_tail": false
+    },
+    "unpriced_counts": {}
+  },
+  "workloads": [
+    {
+      "workload_id": "W22d81380d7d6",
+      "slug": "icv1-f2m20-t133-d7e842ba",
+      "r": 262111,
+      "floor_s": 0.8862269254527579,
+      "pairs": 5,
+      "a_mean_s": 64869.55029920399,
+      "b_mean_s": 8939.952699598385,
+      "ratio_b_over_a": 0.13781431593658028,
+      "censored_pairs": 0
+    },
+    {
+      "workload_id": "W40fbd4cad15a",
+      "slug": "icv1-f2m20-t133-d7e842ba",
+      "r": 262111,
+      "floor_s": 0.8862269254527579,
+      "pairs": 5,
+      "a_mean_s": 59407.92397768679,
+      "b_mean_s": 8461.284392001815,
+      "ratio_b_over_a": 0.14242686539896285,
+      "censored_pairs": 0
+    },
+    {
+      "workload_id": "W4af9d0263718",
+      "slug": "icv1-f2m20-t133-d7e842ba",
+      "r": 262111,
+      "floor_s": 0.8862269254527579,
+      "pairs": 5,
+      "a_mean_s": 61697.9872234005,
+      "b_mean_s": 9003.634321999078,
+      "ratio_b_over_a": 0.14593076252873652,
+      "censored_pairs": 0
+    },
+    {
+      "workload_id": "W94cb9278fc28",
+      "slug": "icv1-f2m20-t133-d7e842ba",
+      "r": 262111,
+      "floor_s": 0.8862269254527579,
+      "pairs": 5,
+      "a_mean_s": 65432.24294048037,
+      "b_mean_s": 8005.072524447339,
+      "ratio_b_over_a": 0.1223414048595133,
+      "censored_pairs": 0
+    },
+    {
+      "workload_id": "W97e304fc3a46",
+      "slug": "icv1-f2m20-t133-d7e842ba",
+      "r": 262111,
+      "floor_s": 0.8862269254527579,
+      "pairs": 5,
+      "a_mean_s": 75575.78061442672,
+      "b_mean_s": 8506.034437544009,
+      "ratio_b_over_a": 0.11254973972336696,
+      "censored_pairs": 0
+    },
+    {
+      "workload_id": "Wb5c9de5713d1",
+      "slug": "icv1-f2m20-t133-d7e842ba",
+      "r": 262111,
+      "floor_s": 0.8862269254527579,
+      "pairs": 5,
+      "a_mean_s": 69486.79742512666,
+      "b_mean_s": 8113.7192658728845,
+      "ratio_b_over_a": 0.11676634362974594,
+      "censored_pairs": 0
+    }
+  ],
+  "curves": [
+    {
+      "slug": "icv1-f2m20-t133-d7e842ba",
+      "log2_r": 17.99981837488851,
+      "workloads": 6,
+      "pairs": 30,
+      "ratio_b_over_a": 0.12871001912733743,
+      "ci95": [
+        0.11449803604598006,
+        0.14468605397831358
+      ],
+      "ci_method": "linearised_t",
+      "indicative": false,
+      "censored_pairs": 0,
+      "ci95_bootstrap": [
+        0.11502725822312361,
+        0.14439503079196822
+      ]
+    }
+  ],
+  "ops": {
+    "status": "ok",
+    "unit": "ecbench.gae",
+    "ratio_b_over_a": 0.12871001912733743,
+    "ci95": [
+      0.11449803604598006,
+      0.14468605397831358
+    ],
+    "ci_method": "linearised_t",
+    "pairs": 30,
+    "unpaired_runs": 0,
+    "same_seeds": true,
+    "same_session": false,
+    "pooled_curves": 1,
+    "bounded": false,
+    "resamples": 4000,
+    "workloads": 6,
+    "dof": 5.0,
+    "indicative": false,
+    "interval_scope": "workloads",
+    "ci95_bootstrap": [
+      0.11502725822312361,
+      0.14439503079196822
+    ],
+    "ci_bootstrap_method": "cluster",
+    "censored_pairs": 0,
+    "verified_only_ratio": 0.12871001912733743,
+    "band": {
+      "weights": [
+        0.0,
+        0.1,
+        1.0
+      ],
+      "ratio_b_over_a": [
+        0.1286426227111373,
+        0.12864936253652567,
+        0.12871001912733743
+      ],
+      "order": "ic-tw-a < ic-std at every weight",
+      "pairs": 30,
+      "note": "point ratios of totals; rank only where the order holds at every weight"
+    }
+  },
+  "wall": {
+    "status": "refused",
+    "reasons": [
+      "the arms ran in different sessions, so no pair shares a host window"
+    ],
+    "required_level": "L2",
+    "pairs": 0,
+    "pairs_below_level": 0,
+    "median_ratio": null,
+    "ci95": null,
+    "aa_arms": null,
+    "aa_pairs": 0,
+    "aa_median_ratio": null,
+    "aa_ci95": null,
+    "outside_noise": null,
+    "self_aa": false
+  },
+  "quality": {
+    "score": null,
+    "rubric": "average paired isolation points (L0=0, L1=40, L2=75, L3=90); +10 only for an L2-or-higher A/A 95% interval containing 1 within [0.9,1.1]",
+    "paired_attempts": 0,
+    "verified_pairs": 0,
+    "admitted_pairs": 0,
+    "levels": {},
+    "p95_foreign_busy_percent": null,
+    "p95_run_queue_percent": null,
+    "contention_observed_runs": 0,
+    "notes": [
+      "different sessions: no shared host window for a fidelity score"
+    ]
+  },
+  "verdict": "ops (ok): ic-tw-a / ic-std = 0.1287 [0.114, 0.145] (linearised_t, df 5) over 30 pairs on 6 workloads, 1 curve(s); band (w=0: 0.1286, w=0.1: 0.1286, w=1: 0.1287): ic-tw-a < ic-std at every weight; wall: refused (the arms ran in different sessions, so no pair shares a host window)",
+  "a_session_status": "complete",
+  "b_session_status": "complete",
+  "allow_interrupted": false,
+  "admissible": true
+}

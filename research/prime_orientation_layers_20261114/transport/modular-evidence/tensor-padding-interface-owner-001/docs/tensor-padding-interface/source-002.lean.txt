@@ -1,0 +1,29 @@
+module
+public import CryptoLean.TensorPadding
+import all CryptoLean.TensorPadding
+public section
+namespace CryptoLean.TensorPadding
+open Finset
+variable {R I D Sigma : Type*}
+
+theorem contraction_eq_sum [CommSemiring R] [Fintype I] [Fintype Sigma] [DecidableEq I] (A B : (I → Sigma) → R) :
+    contraction A B=∑ x, A x*B x := by
+  simp only [contraction]
+
+theorem dummyWeight_eq_prod [CommSemiring R] [Fintype D] [DecidableEq Sigma] (d0 x : D → Sigma) :
+    dummyWeight (R:=R) d0 x=∏ d, (if x d=d0 d then 1 else 0) := by
+  simp only [dummyWeight]
+
+theorem leftPad_eq [CommSemiring R] [Fintype D] [DecidableEq Sigma] (A : (I → Sigma) → R) (d0 : D → Sigma) (x : I ⊕ D → Sigma) :
+    leftPad A d0 x=A (fun i => x (Sum.inl i))*dummyWeight d0 (fun d => x (Sum.inr d)) := by
+  simp only [leftPad]
+
+theorem rightPad_eq (B : (I → Sigma) → R) (x : I ⊕ D → Sigma) :
+    rightPad B x=B (fun i => x (Sum.inl i)) := by
+  simp only [rightPad]
+
+end CryptoLean.TensorPadding
+#print axioms CryptoLean.TensorPadding.contraction_eq_sum
+#print axioms CryptoLean.TensorPadding.dummyWeight_eq_prod
+#print axioms CryptoLean.TensorPadding.leftPad_eq
+#print axioms CryptoLean.TensorPadding.rightPad_eq
