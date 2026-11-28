@@ -1093,22 +1093,21 @@ impl CoupleTable {
 
 const EMPTY: u32 = u32::MAX;
 
-/// Flat x-keyed index of couples: slots pack (x, head couple) in one u64,
-/// chains link couples with equal x, and a 1 MB bitmap prefilters lookups.
-/// Slots and bitmap are split into power-of-two partitions by the top hash
-/// bits and probed within a partition, so threads build partitions
-/// independently; a chain lists its couples in descending order whatever
-/// the thread count.
+/// x-keyed index of couples in compressed-bucket form: entries pack
+/// (x, couple) in one u64, grouped by the top `BBITS` hash bits with couples
+/// ascending inside a bucket, so equal-x couples are found by scanning one
+/// short bucket. A 1 MB blocked Bloom filter prefilters lookups. Threads own
+/// disjoint bucket ranges (and the matching filter words), so the build has
+/// no shared writes and the layout does not depend on the thread count.
 struct XIndex {
-    shift: u32,
-    pmask: usize,
-    slots: Vec<u64>,
-    next: Vec<u32>,
+    off: Vec<u32>,
+    ent: Vec<u64>,
     fshift: u32,
     filter: Vec<u64>,
+    distinct: usize,
 }
 
-const EMPTY_SLOT: u64 = u64::MAX;
+const BBITS: u32 = 16;
 
 impl XIndex {
     /// Blocked Bloom filter: the word is chosen by the top hash bits, and
@@ -1122,66 +1121,119 @@ impl XIndex {
     fn hash(x: u64) -> u32 {
         (x as u32).wrapping_mul(0x9e37_79b1)
     }
+    #[inline]
+    fn bucket(h: u32) -> usize {
+        (h >> (32 - BBITS)) as usize
+    }
     fn build(xy: &[[u32; 2]], threads: usize) -> Self {
-        use std::sync::atomic::{AtomicU32, Ordering};
-        let couples = xy.len();
-        let bits = (usize::BITS - couples.leading_zeros()).clamp(8, 30) + 1;
-        let parts = threads.next_power_of_two().min(64);
-        let size = 1usize << bits;
-        let psize = size / parts;
+        let nb = 1usize << BBITS;
         let fbits = 23u32;
         let fwords = (1usize << fbits) / 64;
-        // Word index from the top (fbits - 6) hash bits.
+        // Word index from the top (fbits - 6) hash bits; a bucket range maps
+        // to a contiguous, disjoint word range.
         let fwbits = fbits - 6;
-        let mut slots = vec![EMPTY_SLOT; size];
-        let mut filter = vec![0u64; fwords];
-        let next: Vec<AtomicU32> = (0..couples).map(|_| AtomicU32::new(EMPTY)).collect();
-        let (shift, fshift) = (32 - bits, 32 - fwbits);
-        let pshift = (psize.trailing_zeros()) as usize;
+        let fshift = 32 - fwbits;
+        let wpb = fwords / nb;
+        let ranges: Vec<(usize, usize)> = (0..threads)
+            .map(|t| (t * nb / threads, (t + 1) * nb / threads))
+            .collect();
+        // Pass 1: per-bucket counts, each thread over its bucket range.
+        let mut off = vec![0u32; nb + 1];
         std::thread::scope(|scope| {
-            let mut schunks = slots.chunks_mut(psize);
-            let mut fchunks = filter.chunks_mut(fwords / parts);
-            for part in 0..parts {
-                let (sl, f) = (schunks.next().unwrap(), fchunks.next().unwrap());
-                let next = &next;
+            let mut rest: &mut [u32] = &mut off[..nb];
+            for &(lo, hi) in &ranges {
+                let (mine, tail) = rest.split_at_mut(hi - lo);
+                rest = tail;
                 scope.spawn(move || {
-                    let base_f = part * (fwords / parts);
-                    for (q, &[x, _]) in xy.iter().enumerate() {
-                        let hash = Self::hash(x as u64);
-                        let slot = (hash >> shift) as usize;
-                        if slot >> pshift != part {
-                            continue;
-                        }
-                        let fw = (hash >> fshift) as usize - base_f;
-                        f[fw] |= Self::bloom_mask(hash);
-                        let mut at = slot & (psize - 1);
-                        loop {
-                            let v = sl[at];
-                            if v == EMPTY_SLOT {
-                                sl[at] = ((x as u64) << 32) | q as u64;
-                                break;
-                            }
-                            if (v >> 32) as u32 == x {
-                                next[q].store(v as u32, Ordering::Relaxed);
-                                sl[at] = ((x as u64) << 32) | q as u64;
-                                break;
-                            }
-                            at = (at + 1) & (psize - 1);
+                    for &[x, _] in xy {
+                        let b = Self::bucket(Self::hash(x as u64));
+                        if (lo..hi).contains(&b) {
+                            mine[b - lo] += 1;
                         }
                     }
                 });
             }
         });
+        let mut acc = 0u32;
+        for o in off.iter_mut() {
+            let c = *o;
+            *o = acc;
+            acc += c;
+        }
+        let mut ent = vec![0u64; xy.len()];
+        let mut filter = vec![0u64; fwords];
+        // Pass 2: stable scatter, filter bits and distinct-point count.
+        let distinct: usize = std::thread::scope(|scope| {
+            let off = &off;
+            let mut erest: &mut [u64] = &mut ent;
+            let mut frest: &mut [u64] = &mut filter;
+            let mut handles = Vec::new();
+            for &(lo, hi) in &ranges {
+                let (base, end) = (off[lo] as usize, off[hi] as usize);
+                let (e, et) = erest.split_at_mut(end - base);
+                erest = et;
+                let (f, ft) = frest.split_at_mut((hi - lo) * wpb);
+                frest = ft;
+                handles.push(scope.spawn(move || {
+                    let mut fill: Vec<u32> = off[lo..hi].iter().map(|&o| o - base as u32).collect();
+                    let fbase = lo * wpb;
+                    for (q, &[x, _]) in xy.iter().enumerate() {
+                        let h = Self::hash(x as u64);
+                        let b = Self::bucket(h);
+                        if !(lo..hi).contains(&b) {
+                            continue;
+                        }
+                        let k = &mut fill[b - lo];
+                        e[*k as usize] = ((x as u64) << 32) | q as u64;
+                        *k += 1;
+                        f[(h >> fshift) as usize - fbase] |= Self::bloom_mask(h);
+                    }
+                    let mut distinct = 0usize;
+                    for b in lo..hi {
+                        let bucket = &e[off[b] as usize - base..off[b + 1] as usize - base];
+                        distinct += Self::bucket_distinct(bucket, xy);
+                    }
+                    distinct
+                }));
+            }
+            handles.into_iter().map(|h| h.join().unwrap()).sum()
+        });
         XIndex {
-            shift,
-            pmask: psize - 1,
-            slots,
-            next: next.into_iter().map(AtomicU32::into_inner).collect(),
+            off,
+            ent,
             fshift,
             filter,
+            distinct,
         }
     }
-    /// First couple with this x, or EMPTY.
+    /// Distinct points (x, +-y) among one bucket's couples.
+    fn bucket_distinct(bucket: &[u64], xy: &[[u32; 2]]) -> usize {
+        let mut total = 0;
+        for (k, &v) in bucket.iter().enumerate() {
+            let x = v >> 32;
+            if bucket[..k].iter().any(|&w| w >> 32 == x) {
+                continue;
+            }
+            let same = bucket[k + 1..].iter().filter(|&&w| w >> 32 == x).count();
+            if same == 0 {
+                total += if xy[v as u32 as usize][1] == 0 { 1 } else { 2 };
+                continue;
+            }
+            let mut ys = Vec::new();
+            for &w in &bucket[k..] {
+                if w >> 32 == x {
+                    let y = xy[w as u32 as usize][1] as u64;
+                    ys.push(y);
+                    ys.push(fneg(y));
+                }
+            }
+            ys.sort_unstable();
+            ys.dedup();
+            total += ys.len();
+        }
+        total
+    }
+    /// Position of the first entry with this x, or EMPTY.
     #[inline]
     fn head(&self, x: u64) -> u32 {
         let h = Self::hash(x);
@@ -1191,48 +1243,30 @@ impl XIndex {
         }
         self.head_unfiltered(x)
     }
-    /// `head` without the bitmap test (for callers that already did it).
+    /// `head` without the filter test (for callers that already did it).
     #[inline]
     fn head_unfiltered(&self, x: u64) -> u32 {
-        let h = Self::hash(x);
-        let mut slot = (h >> self.shift) as usize;
-        let base = slot & !self.pmask;
-        loop {
-            let v = self.slots[slot];
-            if v == EMPTY_SLOT {
-                return EMPTY;
+        let b = Self::bucket(Self::hash(x));
+        for k in self.off[b]..self.off[b + 1] {
+            if self.ent[k as usize] >> 32 == x {
+                return k;
             }
-            if v >> 32 == x {
-                return v as u32;
-            }
-            slot = base | ((slot + 1) & self.pmask);
         }
+        EMPTY
+    }
+    /// Couples with the x of entry `pos` (a `head` result), ascending.
+    #[inline]
+    fn chain(&self, pos: u32) -> impl Iterator<Item = u32> + '_ {
+        let x = self.ent[pos as usize] >> 32;
+        let end = self.off[Self::bucket(Self::hash(x)) + 1];
+        self.ent[pos as usize..end as usize]
+            .iter()
+            .filter(move |&&w| w >> 32 == x)
+            .map(|&w| w as u32)
     }
     /// Distinct table points (the baseline's index length).
-    fn distinct_points(&self, xy: &[[u32; 2]]) -> usize {
-        let mut total = 0;
-        for &v in &self.slots {
-            if v == EMPTY_SLOT {
-                continue;
-            }
-            let q = v as u32;
-            if self.next[q as usize] == EMPTY {
-                total += if xy[q as usize][1] == 0 { 1 } else { 2 };
-                continue;
-            }
-            let mut ys = Vec::new();
-            let mut q = q;
-            while q != EMPTY {
-                let y = xy[q as usize][1] as u64;
-                ys.push(y);
-                ys.push(fneg(y));
-                q = self.next[q as usize];
-            }
-            ys.sort_unstable();
-            ys.dedup();
-            total += ys.len();
-        }
-        total
+    fn distinct_points(&self, _xy: &[[u32; 2]]) -> usize {
+        self.distinct
     }
 }
 
@@ -1248,8 +1282,7 @@ fn record_x_matches(
     unique: &mut HashSet<Vec<(u16, i8)>>,
 ) {
     let left = t.pair(left_entry);
-    let mut q = head;
-    while q != EMPTY {
+    for q in idx.chain(head) {
         let (m, c) = (q as usize / 2, q as usize % 2);
         let y = t.xy[q as usize][1] as u64;
         // The couple's entries 4m + c (y) and 4m + 3 - c (-y).
@@ -1270,7 +1303,6 @@ fn record_x_matches(
             terms.sort_unstable_by_key(|term| term.0);
             unique.insert(terms);
         }
-        q = idx.next[q as usize];
     }
 }
 
@@ -1431,8 +1463,13 @@ mod avx2 {
         let (rx, ry) = r.expect("query point is affine");
         let len = 8 * blocks;
         let xy = &t.xy[q0..q0 + len];
+        // Every slot is written by the forward pass before the backward pass
+        // reads it; no zero fill.
         prefix.clear();
-        prefix.resize(len, 0);
+        prefix.reserve(len);
+        // SAFETY: u64 has no invalid bit patterns or drop glue, capacity is
+        // at least `len`, and slots are written before being read.
+        unsafe { prefix.set_len(len) };
         let p = _mm256_set1_epi64x(P as i64);
         let lo = _mm256_set1_epi64x(0xffff_ffff);
         let rxv = _mm256_set1_epi64x(rx as i64);
@@ -1574,8 +1611,61 @@ fn couple_probe_range(
     couple_probe_chunk(t, idx, r, q0, q1, buf32, counts, unique);
 }
 
-/// Lever 8 probes for one query over all couples, split over threads with
-/// persistent per-thread buffers; relation sets merged, counts summed.
+/// Couples per work chunk: fixed boundaries, so the batch-inversion chains
+/// (and the charged counts) do not depend on the thread count, and a
+/// chunk's prefix buffer (32 KB) stays in L1.
+const CHUNK: usize = 4096;
+
+/// Lever 8 probes for one query over all couples. Threads pull fixed chunks
+/// from a shared counter (dynamic balance); worker 0 first runs `prelude`
+/// (the previous query's graph stage when pipelined). Relation sets merged,
+/// counts summed.
+fn couple_probe_with<R: Send>(
+    t: &CoupleTable,
+    idx: &XIndex,
+    r: Point,
+    buffers: &mut [(Vec<u64>, Vec<u32>)],
+    counts: &mut Counts,
+    prelude: Option<impl FnOnce() -> R + Send>,
+) -> (HashSet<Vec<(u16, i8)>>, Option<R>) {
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    let couples = t.xy.len();
+    let chunks = couples.div_ceil(CHUNK);
+    let next = AtomicUsize::new(0);
+    let mut prelude = prelude;
+    let (results, out) = std::thread::scope(|scope| {
+        let next = &next;
+        let work = move |buf64: &mut Vec<u64>, buf32: &mut Vec<u32>| {
+            let mut c = Counts::default();
+            let mut u = HashSet::new();
+            loop {
+                let k = next.fetch_add(1, Ordering::Relaxed);
+                if k >= chunks {
+                    break;
+                }
+                let (q0, q1) = (k * CHUNK, ((k + 1) * CHUNK).min(couples));
+                couple_probe_range(t, idx, r, q0, q1, buf64, buf32, &mut c, &mut u);
+            }
+            (c, u)
+        };
+        let (first, rest) = buffers.split_first_mut().expect("at least one thread");
+        let handles: Vec<_> = rest
+            .iter_mut()
+            .map(|(buf64, buf32)| scope.spawn(move || work(buf64, buf32)))
+            .collect();
+        let out = prelude.take().map(|f| f());
+        let mut results = vec![work(&mut first.0, &mut first.1)];
+        results.extend(handles.into_iter().map(|h| h.join().unwrap()));
+        (results, out)
+    });
+    let mut unique = HashSet::new();
+    for (c, u) in results {
+        add_counts(counts, &c);
+        unique.extend(u);
+    }
+    (unique, out)
+}
+
 fn couple_probe(
     t: &CoupleTable,
     idx: &XIndex,
@@ -1583,32 +1673,7 @@ fn couple_probe(
     buffers: &mut [(Vec<u64>, Vec<u32>)],
     counts: &mut Counts,
 ) -> HashSet<Vec<(u16, i8)>> {
-    let threads = buffers.len();
-    let couples = t.xy.len();
-    let results: Vec<(Counts, HashSet<Vec<(u16, i8)>>)> = std::thread::scope(|scope| {
-        let handles: Vec<_> = buffers
-            .iter_mut()
-            .enumerate()
-            .map(|(k, (buf64, buf32))| {
-                let (q0, q1) = (k * couples / threads, (k + 1) * couples / threads);
-                scope.spawn(move || {
-                    let mut c = Counts::default();
-                    let mut u = HashSet::new();
-                    couple_probe_range(t, idx, r, q0, q1, buf64, buf32, &mut c, &mut u);
-                    (c, u)
-                })
-            })
-            .collect();
-        handles.into_iter().map(|h| h.join().unwrap()).collect()
-    });
-    let mut unique = HashSet::new();
-    for (c, u) in results {
-        counts.group_additions += c.group_additions;
-        counts.fp_inversions += c.fp_inversions;
-        counts.fp_multiplications += c.fp_multiplications;
-        unique.extend(u);
-    }
-    unique
+    couple_probe_with(t, idx, r, buffers, counts, None::<fn()>).0
 }
 
 fn main() {
@@ -1628,6 +1693,16 @@ fn main() {
     } else {
         run::<RandomState>(max_queries, levers, threads)
     }
+}
+
+fn add_counts(dst: &mut Counts, src: &Counts) {
+    dst.group_additions += src.group_additions;
+    dst.fp_multiplications += src.fp_multiplications;
+    dst.fp_inversions += src.fp_inversions;
+    dst.scalar_multiplications += src.scalar_multiplications;
+    dst.scalar_inversions += src.scalar_inversions;
+    dst.polynomial_evaluations += src.polynomial_evaluations;
+    dst.extraction_nodes += src.extraction_nodes;
 }
 
 /// Microsecond stage ledger; `lap` charges the time since the last lap.
@@ -1746,7 +1821,140 @@ fn run<S: BuildHasher + Default>(max_queries: usize, levers: Levers, threads: us
     let mut recovered = None;
     let mut scratch = Scratch::default();
     ledger.lap("d_columns_setup");
-    for label in 0..max_queries {
+    // Lever 8 with two or more threads: query k's sort, replay and rank run
+    // on their own thread while query k + 1 is collected. Query k + 1 is
+    // speculative: if query k recovers the scalar, its setup and collection
+    // (and their counts) are discarded, so every output equals the
+    // sequential loop's.
+    let pipelined = couple_ok && threads >= 2;
+    if pipelined {
+        let t = ctab.as_ref().expect("couple table");
+        let xidx = xidx.as_ref().expect("x-index");
+        let (signed, base, columns) = (&signed, &base, &columns);
+        let graph = |unique: HashSet<Vec<(u16, i8)>>,
+                     label: usize,
+                     a: u64,
+                     b: u64,
+                     r: Point,
+                     rank: &mut Rank| {
+            let mut gc = Counts::default();
+            let mut relations: Vec<_> = unique.into_iter().collect();
+            relations.sort();
+            let graph_start = Instant::now();
+            let mut classes = [0usize; 5];
+            let mut rows = Vec::with_capacity(relations.len());
+            for terms in &relations {
+                let mut sum = None;
+                let mut base_terms = 0;
+                let mut row = vec![0u64; WIDTH];
+                for &(i, sign) in terms {
+                    let i = i as usize;
+                    base_terms += usize::from(base[i]);
+                    let point = if sign == 1 {
+                        signed[i][0]
+                    } else {
+                        signed[i][1]
+                    };
+                    sum = exact_add(sum, point, &mut gc);
+                    row[columns[i]] = if sign == 1 { 1 } else { PRIME31.n - 1 };
+                }
+                assert_eq!(sum, r, "every emitted equation must replay");
+                classes[base_terms] += 1;
+                rows.push(json!({"label": label, "terms": terms}));
+                if base_terms >= 2 {
+                    row[TARGET] = mod_sub(0, b);
+                    row[RHS] = a;
+                    rank.add(row);
+                }
+            }
+            (
+                relations.len(),
+                classes,
+                rows,
+                graph_start.elapsed().as_millis(),
+                gc,
+            )
+        };
+        let graph = &graph;
+        type Pending = (usize, u64, u64, Point, HashSet<Vec<(u16, i8)>>, u128);
+        let mut pending: Option<Pending> = None;
+        let mut label = 0usize;
+        loop {
+            let next = (label < max_queries).then(|| {
+                let saved = std::mem::take(&mut ar.counts);
+                let a = next_word(&mut seed) % PRIME31.n;
+                let b = next_word(&mut seed) % PRIME31.n;
+                let ag = ar.scalar(PRIME31, a, Some(PRIME31.g));
+                let bq = ar.scalar(PRIME31, b, Q);
+                let r = ar.add(PRIME31, ag, bq);
+                assert!(r.is_some());
+                let setup = std::mem::replace(&mut ar.counts, saved);
+                (label, a, b, r, setup)
+            });
+            ledger.lap("e_query_scalar_setup");
+            if pending.is_none() && next.is_none() {
+                break;
+            }
+            let rank_ref = &mut rank;
+            let prelude = pending.take().map(|(pl, pa, pb, pr, pu, psrc)| {
+                move || (pl, pa, pb, pr, psrc, graph(pu, pl, pa, pb, pr, rank_ref))
+            });
+            let (gout, cout) = match next {
+                Some((nl, na, nb, nr, setup)) => {
+                    let mut qc = Counts::default();
+                    let start = Instant::now();
+                    let (u, g) = couple_probe_with(t, xidx, nr, &mut buffers, &mut qc, prelude);
+                    (
+                        g,
+                        Some((nl, na, nb, nr, u, start.elapsed().as_millis(), setup, qc)),
+                    )
+                }
+                None => (prelude.map(|f| f()), None),
+            };
+            ledger.lap("fg_collection_with_graph");
+            if let Some((pl, pa, pb, pr, psrc, (nrel, classes, rows, graph_ms, gc))) = gout {
+                add_counts(&mut ar.counts, &gc);
+                all_rows.extend(rows);
+                for k in 0..5 {
+                    all_classes[k] += classes[k];
+                }
+                query_records.push(json!({
+                    "label": pl,
+                    "a": pa,
+                    "b": pb,
+                    "query": pr,
+                    "classes_by_base_terms": classes,
+                    "source_ms": psrc,
+                    "graph_and_replay_ms": graph_ms,
+                    "lp_rank": rank.lp_rank(),
+                    "projected_rows": rank.projected_rows(),
+                    "factor_base_target_rank": rank.fb_rank(),
+                }));
+                eprintln!(
+                    "query {pl}: relations={nrel} lp_rank={} projected={} fb_rank={} source_ms={psrc}",
+                    rank.lp_rank(),
+                    rank.projected_rows(),
+                    rank.fb_rank()
+                );
+                ledger.lap("h_query_record");
+                if let Some(d) = rank.target_scalar() {
+                    assert_eq!(ar.scalar(PRIME31, d, Some(PRIME31.g)), Q);
+                    recovered = Some(d);
+                    ledger.lap("i_recovery_check");
+                    break;
+                }
+            }
+            let Some((nl, na, nb, nr, u, src, setup, qc)) = cout else {
+                break;
+            };
+            add_counts(&mut ar.counts, &setup);
+            add_counts(&mut ar.counts, &qc);
+            total_probe_additions += pair_entries as u64;
+            pending = Some((nl, na, nb, nr, u, src));
+            label += 1;
+        }
+    }
+    for label in 0..if pipelined { 0 } else { max_queries } {
         let a = next_word(&mut seed) % PRIME31.n;
         let b = next_word(&mut seed) % PRIME31.n;
         let ag = ar.scalar(PRIME31, a, Some(PRIME31.g));
