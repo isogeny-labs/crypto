@@ -2435,8 +2435,14 @@ fn ug_gcd_monic(a: Vec<u64>, b: Vec<u64>, p: u64, mults: &mut u64) -> Vec<u64> {
 // multiplication is counted in `*mults`, an inversion as `UG_INV_MULTS`.
 // ---------------------------------------------------------------------------
 
-/// Below this many coefficients division is classical.
+/// Below this many quotient coefficients division is classical.
 const UG_FAST_DIV_MIN: usize = 64;
+/// Newton division also needs a divisor at least this long: counted, against
+/// monic remaindering at quotient/divisor shapes 2m/m and 4m/m (p = 65521),
+/// it costs 1.07x / 1.15x at m = 1024 and 0.80x / 0.86x at m = 2048 on
+/// Karatsuba, and 1.50x / 1.17x at m = 512 and 0.82x / 0.63x at m = 1024 on NTT.
+const UG_FAST_DIV_MIN_DIVISOR_KARATSUBA: usize = 2048;
+const UG_FAST_DIV_MIN_DIVISOR_NTT: usize = 1024;
 /// Below this degree the half-GCD runs classical Euclid steps. Measured
 /// with the counted multiplications (random monic pairs, p = 65521):
 /// half / classical = 2.1, 1.7, 1.3, 1.02, 0.78 at degree 512, 1024, 2048,
@@ -2557,7 +2563,12 @@ fn ug_divmod(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> (Vec<u64>, Vec<u6
         return (Vec::new(), a.to_vec());
     }
     let n = a.len() - b.len() + 1; // quotient length
-    if n < UG_FAST_DIV_MIN || b.len() < UG_FAST_DIV_MIN {
+    let min_divisor = if UG_USE_NTT.with(|c| c.get()) {
+        UG_FAST_DIV_MIN_DIVISOR_NTT
+    } else {
+        UG_FAST_DIV_MIN_DIVISOR_KARATSUBA
+    };
+    if n < UG_FAST_DIV_MIN || b.len() < min_divisor {
         return ug_divmod_classical(a, b, p, mults);
     }
     let ra: Vec<u64> = a.iter().rev().copied().collect();

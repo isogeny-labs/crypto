@@ -33,6 +33,7 @@ for t in ${TS:-3 4 5 6 7 8}; do
   nt=50; [ $t -ge 9 ] && nt=20
   run m3-resgcd      $t "$C" "pkm-semaev:m=3,engine=resgcd" $nt
   [ -n "${HALF:-}" ] && run m3-resgcd-half $t "$C" "pkm-semaev:m=3,engine=resgcd,gcd=half" $nt
+  [ -n "${NTT:-}" ] && run m3-resgcd-ntt $t "$C" "pkm-semaev:m=3,engine=resgcd,mul=ntt" $nt
   [ -n "${NTT:-}" ] && run m3-resgcd-half-ntt $t "$C" "pkm-semaev:m=3,engine=resgcd,gcd=half,mul=ntt" $nt
   run m3-grid        $t "$C" "pkm-semaev:m=3,engine=exhaustive" $nt
   [ -z "${NOF4:-}" ] && [ $t -le 5 ] && run m3-f4-chain $t "$C" "pkm-semaev:m=3,engine=f4,degree=8,mode=chain" $([ $t -le 4 ] && echo 50 || echo 5)
