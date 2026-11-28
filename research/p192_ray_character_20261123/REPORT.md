@@ -2067,6 +2067,34 @@ the separate paired identity above. The paper's result supplies the
 additive-index framework, not a signed evaluator with a smaller
 dense polynomial. [pcc:unverified]
 
+### Unreduced Miller-function character screen
+
+A compact point-input candidate uses the Miller function
+`f_(r,G)` with divisor `r(G)-r(O)`. For a public shift
+`S=[j]G`, evaluate `f_(r,G)(Q+S)/f_(r,G)(S)` by a binary Miller
+loop, take its field quadratic character, and normalize by the
+same construction at `G`. The replay tries public `j=2,...,79`
+in order until neither evaluation encounters an intermediate zero
+or pole. The target enters only by its coordinates; the known
+scalar is confined to the control harness. This is an unreduced
+Miller value, not a pairing invariant, so a shift chosen for one
+target cannot be silently identified with another shift.
+
+The native [`miller_sign_screen.rs`](native/src/bin/miller_sign_screen.rs)
+checks all 96 nonzero markings on each of two order-97 curves.
+Its normalized character agrees with the scalar sign on 49/96
+and 53/96 respectively. On 14 selected P-192 markings it agrees
+on 4/14. More decisively, the fixed public shift `S=[4]G` is
+valid for both `Q=G` and `Q=[4]G`; the normalized character at
+`[4]G` is `-1` although `χ_r(4)=+1`. This is a coordinate-input
+exactness falsifier with no shift-change ambiguity. The same
+result is reproduced by supplying the recorded `[4]G`
+coordinates on the command line. The selected P-192 panel does
+not estimate bias, and this failed exact feature has no qualified
+cold same-target cost. Raw output and source/binary hashes are
+in [`MILLER_SIGN_RESULTS.txt`](MILLER_SIGN_RESULTS.txt).
+[pcc:unverified]
+
 ## Reproduction and checks
 
 From the repository root:
