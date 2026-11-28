@@ -1309,11 +1309,11 @@ impl MulKernel for MulxKernel {
     }
 }
 
-/// [`ProdAdxKernel`] with the six-limb asm product ([`mont_mul6_adx`]) for
-/// products and squares at `N = 6`.  Dispatch only after [`has_adx`].
+/// The six-limb asm product ([`mont_mul6_adx`]) for products and squares at
+/// `N = 6` (what [`ProdAdxKernel`] now does there), [`ProdAdxKernel`] elsewhere.  Dispatch only after [`has_adx`].
 pub(crate) struct Adx6Kernel;
-/// [`ProdAdxKernel`] with the six-limb asm product for products only; squares
-/// stay on the `mulx` intrinsic CIOS.  Dispatch only after [`has_adx`].
+/// The six-limb asm product for products only at `N = 6`; squares on the
+/// `mulx` intrinsic CIOS (the 2026-11-25 production choice).  Dispatch only after [`has_adx`].
 pub(crate) struct Adx6MulKernel;
 
 impl MulKernel for Adx6Kernel {
@@ -1337,6 +1337,11 @@ impl MulKernel for Adx6MulKernel {
     }
     #[inline(always)]
     fn sqr<const N: usize>(ctx: &Mont<N>, a: &[u64; N]) -> [u64; N] {
+        #[cfg(target_arch = "x86_64")]
+        if N >= 6 {
+            // SAFETY: dispatched only after has_adx().
+            return unsafe { ctx.mul_mulx(a, a) };
+        }
         ProdAdxKernel::sqr(ctx, a)
     }
 }
@@ -1345,8 +1350,11 @@ impl MulKernel for Adx6MulKernel {
 /// (`docs/notes/adx-hgcd-20261125/`): the inline-asm dual-carry-chain
 /// product at `N = 4` with [`TunedKernel`] squares (+1.5% end to end), the
 /// `mulx` intrinsic CIOS for products and squares at `N ≥ 6` (+5–12%), and
-/// [`TunedKernel`] at `N ≤ 3` and `N = 5`, where neither won.  Dispatch only
-/// after [`has_adx`] returned true.
+/// [`TunedKernel`] at `N ≤ 3` and `N = 5`, where neither won.  At `N = 6`
+/// the inline-asm six-limb product ([`mont_mul6_adx`]) for products and
+/// squares, from the 2026-11-28 run (`docs/notes/adx6-20261128/`: about 8%
+/// end to end over the `mulx` CIOS).  Dispatch only after [`has_adx`]
+/// returned true.
 pub(crate) struct ProdAdxKernel;
 
 impl MulKernel for ProdAdxKernel {
@@ -1360,6 +1368,12 @@ impl MulKernel for ProdAdxKernel {
                     return r;
                 }
             }
+            if N == 6 {
+                // SAFETY: as above.
+                if let Some(r) = unsafe { ctx.mul_adx6_unchecked(a, b) } {
+                    return r;
+                }
+            }
             if N >= 6 {
                 // SAFETY: as above.
                 return unsafe { ctx.mul_mulx(a, b) };
@@ -1370,9 +1384,17 @@ impl MulKernel for ProdAdxKernel {
     #[inline(always)]
     fn sqr<const N: usize>(ctx: &Mont<N>, a: &[u64; N]) -> [u64; N] {
         #[cfg(target_arch = "x86_64")]
-        if N >= 6 {
-            // SAFETY: dispatched only after has_adx().
-            return unsafe { ctx.mul_mulx(a, a) };
+        {
+            if N == 6 {
+                // SAFETY: dispatched only after has_adx().
+                if let Some(r) = unsafe { ctx.mul_adx6_unchecked(a, a) } {
+                    return r;
+                }
+            }
+            if N >= 6 {
+                // SAFETY: as above.
+                return unsafe { ctx.mul_mulx(a, a) };
+            }
         }
         TunedKernel::sqr(ctx, a)
     }

@@ -1,7 +1,56 @@
 {
   "branch": "feat/lucid-cray-tckh5e",
   "closed_utc": null,
-  "commands": [],
+  "commands": [
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "3",
+        "./target/release/mont_mul_bench",
+        "--fields",
+        "p320_pmax,p352_pmax,p384_nist,p448_goldilocks",
+        "--rounds",
+        "41",
+        "--batch",
+        "30",
+        "--kernel-iters",
+        "2000000",
+        "--seed",
+        "7885634870099998001",
+        "--out",
+        "docs/notes/adx6-20261128/raw_run1.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-28T00:35:46+00:00",
+      "wall_s": 69.193
+    },
+    {
+      "argv": [
+        "taskset",
+        "-c",
+        "3",
+        "./target/release/mont_mul_bench",
+        "--fields",
+        "p320_pmax,p352_pmax,p384_nist,p448_goldilocks",
+        "--rounds",
+        "41",
+        "--batch",
+        "30",
+        "--kernel-iters",
+        "2000000",
+        "--seed",
+        "7885634870099998002",
+        "--out",
+        "docs/notes/adx6-20261128/raw_run2.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-28T00:36:56+00:00",
+      "wall_s": 70.201
+    }
+  ],
   "commit": "6d0a2afcddb1bd42626f0becf46d733ad6a3bddb",
   "commit_dirty": false,
   "created_utc": "2026-11-28T00:35:42+00:00",
@@ -19,7 +68,22 @@
   "id": "20261128T0035Z-adx6-kernel",
   "metrics": [],
   "problem": "kernel:mont_vt_scalar_mul",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 33074,
+      "path": "docs/notes/adx6-20261128/raw_run1.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/43/4309b681e5e4f59a2f2b6b11b3085d9183fff93fb80a8f89238d93031ed75eac",
+      "sha256": "4309b681e5e4f59a2f2b6b11b3085d9183fff93fb80a8f89238d93031ed75eac",
+      "uploaded": false
+    },
+    {
+      "bytes": 33189,
+      "path": "docs/notes/adx6-20261128/raw_run2.jsonl.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/26/269ec4e98082be92cf3cffe35c8df24a868da65d9095c619987a39ece8aee215",
+      "sha256": "269ec4e98082be92cf3cffe35c8df24a868da65d9095c619987a39ece8aee215",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
     "pdf": null,
