@@ -1,0 +1,60 @@
+{
+  "binary_sha256": "de461514bcb5f6538781ee25785f11ac33940711a93c0b6cb6a5dfbe0a587002",
+  "build_receipt_sha256": "21b70ef0dc1799f545efd257b5d858ff8bda82cc65d6a9f4b87f378280cf82cf",
+  "command": [
+    "/Volumes/SSD990-2/pkm-oracle-rebuild-build-20261128/release/ic",
+    "bench",
+    "--prime-workload",
+    "/Volumes/SSD990-2/pkm-z2xz8-join-builders-20261128/inputs/t5_c0_q0.json",
+    "--factor-base",
+    "prime-isogeny:t=5,seed=0,aux=ordinary,family=z2xz8,selection=equal-size",
+    "--oracle",
+    "pkm-semaev:m=2,engine=f4,degree=8,mode=chain",
+    "--targets",
+    "walk",
+    "--linalg",
+    "incremental-gauss-full-rank-checked",
+    "--audit-rank",
+    "--max-trials",
+    "1",
+    "--solver-budget-seconds",
+    "5",
+    "--rho-runs",
+    "0",
+    "--seed",
+    "1234567",
+    "--json"
+  ],
+  "configurations_run": 1,
+  "configurations_skipped": [],
+  "exit_code": 1,
+  "factor_base_group_ops": {
+    "adds": 415,
+    "doubles": 538,
+    "scalar_mults": 2
+  },
+  "oracle_setup_group_ops": {
+    "adds": 415,
+    "doubles": 538,
+    "scalar_mults": 2
+  },
+  "oracle_setup_native": {
+    "pkm_oracle_aux_curves_tried": 2,
+    "pkm_oracle_aux_other_field_work_uncharged": 1,
+    "pkm_oracle_aux_search_gae": 879,
+    "pkm_oracle_aux_selection_cosets_tested": 10,
+    "pkm_oracle_aux_selection_sqrt_calls": 523,
+    "pkm_oracle_aux_selection_sqrt_muls_uncharged": 109224,
+    "pkm_oracle_aux_selection_target_legendre_uncharged": 352,
+    "pkm_oracle_aux_tower_build_gae": 74,
+    "pkm_oracle_aux_velu_evaluations_uncharged": 10
+  },
+  "qualification": "development-only correctness; one trial; contended host; non-group work unpriced",
+  "raw_sha256": "1ce2716d94d1b099642edba38a2e2d517ee492c9325b31fb370fc896c6e7aa5c",
+  "schema": "pkm-oracle-rebuild-diagnostic/v1",
+  "solver_calls": 1,
+  "source_commit": "62908d5299c04c0b9bda686eba7f19e271b09786",
+  "status": "incomplete",
+  "trials": 1,
+  "workload_sha256": "308af169b073895797122bf0feeba731cac8da42da20f1394abd4cc0cdeab810"
+}

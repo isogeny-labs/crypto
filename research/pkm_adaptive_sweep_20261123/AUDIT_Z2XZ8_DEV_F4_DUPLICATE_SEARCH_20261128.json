@@ -1,0 +1,162 @@
+{
+  "complete_cold_cost": false,
+  "independent_replay_sha256": "e8f5c7294eb51dc48e592129134a0d006f07db3cf60f8ee5e4fb82c4dd1100cc",
+  "method": "from_spec and factor-base build each execute the same deterministic selected-tower search; add the factor-base auxiliary group ledger once more to the reported lower bound",
+  "oracle_source_sha256": "b016eadafeabae244a7980ea9ae14488bd90892722e1581f3bfd135b049393aa",
+  "pairs": [
+    {
+      "adjusted_partial_candidate_over_interval": 0.4289846717299047,
+      "curve": "t5_c0"
+    },
+    {
+      "adjusted_partial_candidate_over_interval": 0.456013217427375,
+      "curve": "t5_c1"
+    },
+    {
+      "adjusted_partial_candidate_over_interval": 0.5203527432169636,
+      "curve": "t5_c2"
+    }
+  ],
+  "qualification": "This is still a partial lower bound: duplicate field arithmetic, coefficient and Jacobi work, Velu evaluations, rank normalization and other positive native work remain unpriced. Development curves on a contended host.",
+  "raw_receipts_sha256": "35d5b6fd8599f43569fb90ab4f1ea3e5b9485aef6d7929041cca23b563af4717",
+  "rows": [
+    {
+      "adjusted_partial_gae_minimum": 127737199.74070491,
+      "arm": "candidate_a",
+      "curve": "t5_c0",
+      "peak_rss_kib": 26992,
+      "process_cpu_s_contended": 39.681276,
+      "reported_partial_gae": 127736246.74070491,
+      "second_tower_group_gae": 953,
+      "second_tower_native_counters_duplicated": {
+        "aux_bsgs_table_entries": 0,
+        "aux_count_gae": 0,
+        "aux_curves_filtered_out": 0,
+        "aux_curves_singular": 1,
+        "aux_curves_tried": 2,
+        "aux_filter_false_positives": 0,
+        "aux_legendre_symbols": 0,
+        "aux_orders_computed": 0,
+        "aux_orders_undetermined": 0,
+        "aux_search_gae": 879,
+        "aux_selection_cosets_tested": 10,
+        "aux_selection_m": 2,
+        "aux_selection_peak_coset_entries": 10,
+        "aux_selection_peak_frontier": 256,
+        "aux_selection_sqrt_calls": 523,
+        "aux_selection_sqrt_muls": 109224,
+        "aux_selection_target_legendre": 352,
+        "aux_selection_x_scanned": 14,
+        "aux_sqrt_solves": 0,
+        "aux_tower_build_gae": 74,
+        "aux_two_sylow_rejected": 0,
+        "velu_evaluations_uncharged": 10
+      },
+      "stdout_sha256": "bb32e5cc0e47d18516349907f4b3711c15effd131a40df417abb447c1805da64"
+    },
+    {
+      "adjusted_partial_gae_minimum": 297766349.6124407,
+      "arm": "interval_a",
+      "curve": "t5_c0",
+      "peak_rss_kib": 54448,
+      "process_cpu_s_contended": 74.991225,
+      "reported_partial_gae": 297766349.6124407,
+      "second_tower_group_gae": 0,
+      "second_tower_native_counters_duplicated": {},
+      "stdout_sha256": "e7841c4889d53299f4633acc36dea15cb348adcc7da56980df4fc08af6ec944c"
+    },
+    {
+      "adjusted_partial_gae_minimum": 214704460.8866745,
+      "arm": "candidate_a",
+      "curve": "t5_c1",
+      "peak_rss_kib": 27072,
+      "process_cpu_s_contended": 68.529858,
+      "reported_partial_gae": 214703508.8866745,
+      "second_tower_group_gae": 952,
+      "second_tower_native_counters_duplicated": {
+        "aux_bsgs_table_entries": 0,
+        "aux_count_gae": 0,
+        "aux_curves_filtered_out": 0,
+        "aux_curves_singular": 1,
+        "aux_curves_tried": 4,
+        "aux_filter_false_positives": 0,
+        "aux_legendre_symbols": 0,
+        "aux_orders_computed": 0,
+        "aux_orders_undetermined": 0,
+        "aux_search_gae": 878,
+        "aux_selection_cosets_tested": 15,
+        "aux_selection_m": 4,
+        "aux_selection_peak_coset_entries": 15,
+        "aux_selection_peak_frontier": 128,
+        "aux_selection_sqrt_calls": 391,
+        "aux_selection_sqrt_muls": 39832,
+        "aux_selection_target_legendre": 512,
+        "aux_selection_x_scanned": 30,
+        "aux_sqrt_solves": 0,
+        "aux_tower_build_gae": 74,
+        "aux_two_sylow_rejected": 2,
+        "velu_evaluations_uncharged": 10
+      },
+      "stdout_sha256": "f6975a7947e648ff54557a9c4301ab9b8c77518b6df21ba178bd52f892c5f59a"
+    },
+    {
+      "adjusted_partial_gae_minimum": 470829468.7113285,
+      "arm": "interval_a",
+      "curve": "t5_c1",
+      "peak_rss_kib": 54480,
+      "process_cpu_s_contended": 123.585307,
+      "reported_partial_gae": 470829468.7113285,
+      "second_tower_group_gae": 0,
+      "second_tower_native_counters_duplicated": {},
+      "stdout_sha256": "6fa3a45f5226495e2c78a677c9cb5acc9df5e3edc8d002150de967ac9811584d"
+    },
+    {
+      "adjusted_partial_gae_minimum": 150754438.68829638,
+      "arm": "candidate_a",
+      "curve": "t5_c2",
+      "peak_rss_kib": 26848,
+      "process_cpu_s_contended": 54.189482,
+      "reported_partial_gae": 150753892.68829638,
+      "second_tower_group_gae": 546,
+      "second_tower_native_counters_duplicated": {
+        "aux_bsgs_table_entries": 0,
+        "aux_count_gae": 0,
+        "aux_curves_filtered_out": 0,
+        "aux_curves_singular": 1,
+        "aux_curves_tried": 10,
+        "aux_filter_false_positives": 0,
+        "aux_legendre_symbols": 0,
+        "aux_orders_computed": 0,
+        "aux_orders_undetermined": 0,
+        "aux_search_gae": 472,
+        "aux_selection_cosets_tested": 3,
+        "aux_selection_m": 10,
+        "aux_selection_peak_coset_entries": 3,
+        "aux_selection_peak_frontier": 48,
+        "aux_selection_sqrt_calls": 596,
+        "aux_selection_sqrt_muls": 50549,
+        "aux_selection_target_legendre": 128,
+        "aux_selection_x_scanned": 7,
+        "aux_sqrt_solves": 0,
+        "aux_tower_build_gae": 74,
+        "aux_two_sylow_rejected": 8,
+        "velu_evaluations_uncharged": 10
+      },
+      "stdout_sha256": "65a0fd53e2ed431c40cfec58c39c7bedca3d7c1a29045573a683fb3c9807eeba"
+    },
+    {
+      "adjusted_partial_gae_minimum": 289715852.66619533,
+      "arm": "interval_a",
+      "curve": "t5_c2",
+      "peak_rss_kib": 53104,
+      "process_cpu_s_contended": 87.16309,
+      "reported_partial_gae": 289715852.66619533,
+      "second_tower_group_gae": 0,
+      "second_tower_native_counters_duplicated": {},
+      "stdout_sha256": "1bd5ae6a13b34d022c1533ecd531412547d7bb7e314739cadf584cd0951ae60c"
+    }
+  ],
+  "schema": "pkm-z2xz8-dev-f4-duplicate-search-audit/v1",
+  "source_commit": "5f8ddfd0ff43d151d7b35c5d81003905c59d12fc",
+  "tower_source_sha256": "ee3b7f81c520618b1d902657c6b706612dc60a0e0397892e9406b409c3c378e2"
+}
