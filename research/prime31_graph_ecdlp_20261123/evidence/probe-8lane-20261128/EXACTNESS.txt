@@ -1,0 +1,12 @@
+# Exactness: jq-normalised output hash, recovered scalar, distinct pair sums, charged work
+# filter: {rows:.relation_rows, q:[.queries[]|del(.source_ms,.graph_and_replay_ms)], s:.recovered_scalar, rep:.recovered_scalar_replay, lp:.lp_rank, pr:.projected_rows, fb:.factor_base_target_rank, probes:.probe_additions, cls:.classes_by_base_terms}
+lane4 levers=12345678 threads=1 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 work=[10987529,38109222,13052]
+lane4 levers=12345678 threads=4 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 work=[10987529,38109405,13055]
+lane8 levers=12345678 threads=1 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 work=[10987529,38109222,13052]
+lane8 levers=12345678 threads=2 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 work=[10987529,38109283,13053]
+lane8 levers=12345678 threads=3 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 work=[10987529,38109344,13054]
+lane8 levers=12345678 threads=4 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 work=[10987529,38109405,13055]
+lane8 levers=12345678 threads=8 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 work=[10987529,38109649,13059]
+lane8 levers=124568 threads=1 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 work=[10987529,38109222,13052]
+lane8 levers=1234567 threads=1 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 work=[10987529,64045545,3163]
+# unit test: cargo test --release --bin prime31-graph-mitm-fast -> 3 passed (avx2_couple_kernel_matches_scalar_kernel, plus main's two batched-arithmetic tests)

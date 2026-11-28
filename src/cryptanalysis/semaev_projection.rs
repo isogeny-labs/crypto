@@ -1944,6 +1944,88 @@ impl PairProjection {
         self.decompose_four_dispatch(target, true)
     }
 
+    /// Visit every compatible pair-root witness in deterministic pair-root order.
+    /// Returning `false` from `visit` stops before the next root is examined.
+    /// Each root retains one factor-base pair from the projection; this does
+    /// not enumerate every pair with the same sum. The caller must lift and
+    /// verify the returned abscissae against its signed target point.
+    ///
+    /// The batched cache is supplied by `build` and `build_fast`. The legacy
+    /// `build_generic` constructor has no cache and is rejected explicitly.
+    pub fn decompose_four_visit<F>(&self, target: u64, mut visit: F) -> Result<QueryStats, String>
+    where
+        F: FnMut(FourSumWitness) -> bool,
+    {
+        if self.finite_list.is_empty() && !self.finite_witnesses.is_empty() {
+            return Err("multi-witness query requires a batched pair-root cache".into());
+        }
+        let mut stats = QueryStats::default();
+        let mut ops = FpOpCounts::default();
+        let target = target % self.curve.p;
+        stats.cancellation_checks += 1;
+        if let (Some(&cancel), Some(&(x3, x4))) =
+            (self.base.first(), self.finite_witnesses.get(&target))
+        {
+            if !visit(FourSumWitness {
+                x: [cancel, cancel, x3, x4],
+                auxiliaries: [None, Some(target)],
+            }) {
+                return Ok(stats);
+            }
+        }
+        if self.finite_list.is_empty() {
+            return Ok(stats);
+        }
+        let y_target = lift_canonical_counted(&self.curve, target, &mut ops);
+        if !self.singular && y_target.is_none() {
+            return Ok(stats);
+        }
+        let mut batch = Vec::with_capacity(QUERY_BATCH);
+        for chunk in self.finite_list.chunks(QUERY_BATCH) {
+            batch.clear();
+            for &(u, yu, _) in chunk {
+                batch.push((u, Some(yu), target, y_target));
+            }
+            let roots_block = s3_pair_roots_rational_batched(&self.curve, &batch, &mut ops);
+            for (&(u, _, (x1, x2)), roots) in chunk.iter().zip(roots_block) {
+                stats.quadratics += 1;
+                match roots {
+                    QuadraticRoots::None => {}
+                    QuadraticRoots::All => {
+                        if let Some(&(v, _, (x3, x4))) = self.finite_list.first() {
+                            stats.compatible_keys += 1;
+                            if !visit(FourSumWitness {
+                                x: [x1, x2, x3, x4],
+                                auxiliaries: [Some(u), Some(v)],
+                            }) {
+                                return Ok(stats);
+                            }
+                        }
+                    }
+                    QuadraticRoots::Finite(keys) => {
+                        stats.root_keys += keys.len() as u64;
+                        for key in keys {
+                            let QuadraticRootKey::Base(v) = key else {
+                                continue;
+                            };
+                            stats.lookups += 1;
+                            if let Some(&(x3, x4)) = self.finite_witnesses.get(&v) {
+                                stats.compatible_keys += 1;
+                                if !visit(FourSumWitness {
+                                    x: [x1, x2, x3, x4],
+                                    auxiliaries: [Some(u), Some(v)],
+                                }) {
+                                    return Ok(stats);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Ok(stats)
+    }
+
     fn decompose_four_dispatch(
         &self,
         target: u64,
@@ -2624,6 +2706,42 @@ mod tests {
             hits > 0 && beyond_first_block > 0,
             "{hits} {beyond_first_block}"
         );
+    }
+
+    #[test]
+    fn four_visit_replays_all_compatible_roots_and_first_stop() {
+        let e = curve();
+        let base = interval_factor_base(&e, 30);
+        for proj in [
+            PairProjection::build(e, &base).unwrap(),
+            PairProjection::build_fast(e, &base).unwrap(),
+        ] {
+            for t in 0..e.p {
+                let mut seen = Vec::new();
+                let all = proj
+                    .decompose_four_visit(t, |w| {
+                        seen.push(w);
+                        true
+                    })
+                    .unwrap();
+                let (_, reference) = proj.decompose_four_exhaustive(t);
+                assert_eq!(all.compatible_keys, reference.compatible_keys, "target {t}");
+                assert!(seen.iter().all(|w| witness_reaches(&e, &w.x, t)));
+                let mut first = None;
+                let stopped = proj
+                    .decompose_four_visit(t, |w| {
+                        first = Some(w);
+                        false
+                    })
+                    .unwrap();
+                assert_eq!(first, proj.decompose_four(t).0, "target {t}");
+                if first.is_some() {
+                    assert!(stopped.quadratics <= all.quadratics);
+                }
+            }
+        }
+        let generic = PairProjection::build_generic(e, &base).unwrap();
+        assert!(generic.decompose_four_visit(0, |_| true).is_err());
     }
 
     #[test]
