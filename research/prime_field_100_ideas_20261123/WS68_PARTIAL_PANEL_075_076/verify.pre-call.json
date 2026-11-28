@@ -1,0 +1,12 @@
+{
+  "date": "2026-11-27",
+  "conductor_task": "T-13062",
+  "source_sha256": "8f9e1cc172229b71189514602fc9a38d99e0ac7fcee79f613a65890c7f0fe405",
+  "producer_source_sha256": "99d8d12795a75ff869987cd4cae4999cc234ca1012014158cb4ba5f95d7c462b",
+  "producer_stdout_sha256": ["31d4ab6273601dc2e5b96f6318122d20e0e73c0921496386c838c1d9d495d9f1","ea83d67d7d981c5af81d4fa089ea1aa27e8cf0af82256c3c09278a5c19557423","ca2c84a146f58f3bf39371cbda5ffd697c78aee790f893d7fd766325173904d5","337b324aa4dadaa36a103c6e8790748a195a0bcf73f0fdec9ffe8d64478e914e"],
+  "method": "separate Rust implementation reconstructs all 512 candidate points and both decomposition tables per target, demands every accepted source row in trial order, checks each point identity, independently eliminates large columns, checks completed EC identities and modular rank/target outputs",
+  "compile": "rustc --edition=2021 -O verify.rs -o /tmp/ws68_partial_panel_verify.bin",
+  "runs": ["verify 0","verify 1","verify 2","verify 3"],
+  "admission": "bounded local-only verification under existing user-authorized checkpoint bypass",
+  "acceptance": "VERIFY_OK=1 on each target and runtime stderr empty"
+}

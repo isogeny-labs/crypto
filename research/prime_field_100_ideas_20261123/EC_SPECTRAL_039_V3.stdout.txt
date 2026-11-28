@@ -1,0 +1,11 @@
+source_witnesses=152 kinds=[17, 68, 67] input_bytes=23188 curve=F1009:y2=x3+x+14 order=1013
+all complete_witnesses=136
+graph rows=136 vertices=8 pair_tests=3808 total_edge_weight=65 fiedler_eigenvalues=[3.4200527989312327e-16, 4.366909348685323, 7.384023953489874, 11.157666314087516, 16.198176190672825, 21.271814157446983, 30.71977491016218, 38.90163512545529] rotations=82 max_residual=8.155e-13 fiedler_vector=[-0.10171933159052471, -0.13201271417222007, -0.2952940474188117, -0.15226999883916456, -0.1055121886120077, -0.11092652422026249, -0.017737188338905245, 0.9154719931918971]
+seed=0x39020261127 seed_final_state=4264492163853479667 random_left=[2, 3, 4, 6] cut_pair_tests_per_arm=28 cut_row_column_tests_per_arm=1088
+partition label=spectral left=[1, 2, 3, 5] cross_edge_weight=39 crossing_rows=39 crossing_rows_with_target=39 normalized_cut=1.218457102
+solve label=spectral rank=9 target=701 adds=3440 muls=3530 invs=9 pivot_scans=73 rows_checked=136
+partition label=fixed left=[0, 1, 2, 3] cross_edge_weight=39 crossing_rows=39 crossing_rows_with_target=39 normalized_cut=1.229090909
+solve label=fixed rank=9 target=701 adds=3840 muls=3930 invs=9 pivot_scans=67 rows_checked=136
+partition label=seeded_control left=[2, 3, 4, 6] cross_edge_weight=31 crossing_rows=31 crossing_rows_with_target=31 normalized_cut=1.033068444
+solve label=seeded_control rank=9 target=701 adds=4100 muls=4190 invs=9 pivot_scans=80 rows_checked=136
+filter_cost adds=4862 muls=5278 invs=16 cell_scans=2312 source_group_witnesses=152 complete_group_witnesses=136 claim_boundary=bounded_EFp_spectral_partition_only eigen_setup_not_modular_cost=true

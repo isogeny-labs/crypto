@@ -1,0 +1,21 @@
+error[E0308]: mismatched types
+  --> research/prime_field_100_ideas_20261123/EC_GRAPH_CYCLE_RS.rs:25:750
+   |
+25 | ... [gd,cd,rd].into_iter().flatten(){assert_eq!(mul(d,g),q)}println!("generic complete={} rank_base={} rank_aug={} target={:?} filter_cos...
+   |                                                 --- ^ expected `i64`, found `&i64`
+   |                                                 |
+   |                                                 arguments to this function are incorrect
+   |
+note: function defined here
+  --> research/prime_field_100_ideas_20261123/EC_GRAPH_CYCLE_RS.rs:8:4
+   |
+ 8 | fn mul(mut k:i64,mut p:Pt)->Pt{if k<0{k=-k;p=match p{Pt::O=>p,Pt::A(x,y)=>Pt::A(x,m(-y,P))}}let mut out=Pt::O;while k>0{if k&1!=0{out=add...
+   |    ^^^ ---------
+help: consider dereferencing the borrow
+   |
+25 | fn main(){let base=base();let g=Pt::A(0,425);let q=Pt::A(779,357);assert_eq!(base[0],g);assert_eq!(mul(N,g),Pt::O);let src=sources();check(&src,&base,g,q);let mut cg=Cost::default();let generic=generic(&src,&mut cg);check_complete("generic",&generic,&base,g,q);let mut cc=Cost::default();let(comp,groups)=component(&src,&mut cc);check_complete("component",&comp,&base,g,q);let mut cr=Cost::default();let(ring,forest,closed,failed,path_edges)=cycle(&src,&mut cr);check_complete("cycle",&ring,&base,g,q);let mut rg=Cost::default();let mut rc=Cost::default();let mut rr=Cost::default();let (gb,ga,gd)=ranks(&generic,&mut rg);let(cb,ca,cd)=ranks(&comp,&mut rc);let(rb,ra,rd)=ranks(&ring,&mut rr);for d in [gd,cd,rd].into_iter().flatten(){assert_eq!(mul(*d,g),q)}println!("generic complete={} rank_base={} rank_aug={} target={:?} filter_cost=adds:{} muls:{} invs:{} cells:{} rank_cost=adds:{} muls:{} invs:{} cells:{}",generic.len(),gb,ga,gd,cg.adds,cg.muls,cg.invs,cg.cell_scans,rg.adds,rg.muls,rg.invs,rg.cell_scans);println!("component groups={} complete={} rank_base={} rank_aug={} target={:?} filter_cost=adds:{} muls:{} invs:{} cells:{} edge_visits:{} rank_cost=adds:{} muls:{} invs:{} cells:{}",groups,comp.len(),cb,ca,cd,cc.adds,cc.muls,cc.invs,cc.cell_scans,cc.edge_visits,rc.adds,rc.muls,rc.invs,rc.cell_scans);println!("cycle complete={} rank_base={} rank_aug={} target={:?} tree_edges={} closures={} nonclosing={} path_edges={} filter_cost=adds:{} muls:{} invs:{} cells:{} path_scans:{} rank_cost=adds:{} muls:{} invs:{} cells:{}",ring.len(),rb,ra,rd,forest,closed,failed,path_edges,cr.adds,cr.muls,cr.invs,cr.cell_scans,cr.path_scans,rr.adds,rr.muls,rr.invs,rr.cell_scans);assert_eq!(forest+closed+failed+17,src.len());println!("scope=source_replay_and_filter_only setup_and_candidate_cost_from_WS68_required=true modular_costs_include_dense_row_ops=true point_arithmetic_unpriced=true");}
+   |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              +
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0308`.

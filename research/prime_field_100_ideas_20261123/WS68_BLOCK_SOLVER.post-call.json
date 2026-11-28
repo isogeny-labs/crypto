@@ -1,0 +1,16 @@
+{
+  "record_type":"post_call",
+  "created_utc":"2026-11-25T21:51:46Z",
+  "pre_call":"WS68_BLOCK_SOLVER.pre-call.json",
+  "conductor_task":"T-117",
+  "compile_exit_code":0,
+  "run_exit_code":0,
+  "source_sha256_after":"b30b75afb5c35b4475b5bd14c6e2e2d382e5bdc452c8f3a9b38f4159f5ec63d9",
+  "qualifier_sha256_after":"b30b75afb5c35b4475b5bd14c6e2e2d382e5bdc452c8f3a9b38f4159f5ec63d9",
+  "binary":{"path":"WS68_BLOCK_SOLVER.bin","sha256":"a9af1861abaab5301494f542accfe27149c56444d06106075a2e93c1809a058a","custody":"local_only_not_staged"},
+  "stdout":{"path":"WS68_BLOCK_SOLVER.stdout","bytes":863,"sha256":"982f66a8878ce6f090a43bafad7ca9ab59ca52a0034b24971b7fba9a9bd29bb6"},
+  "stderr":{"path":"WS68_BLOCK_SOLVER.stderr","bytes":0,"sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"},
+  "observed":{"source_rows":152,"complete_rows":136,"completed_witness_and_EC_group_replays":136,"large_pivots":16,"selected_core_dimension":9,"selected_core_nonzeros":22,"selected_row_ids_including_anchor":[0,1,2,3,4,5,10,14,40],"core_rank":9,"gaussian_verified":true,"block_krylov_first_probe_rank":9,"block_krylov_verified":true,"checked_target_scalar":701,"probe_failures":0,"censored_arms":0},
+  "costs":{"shared_materialize_and_verify_wall_us":739,"shared_filter_mod_adds":33286,"shared_filter_mod_muls":36134,"shared_filter_mod_invs":16,"shared_core_selection_mod_adds":3687,"shared_core_selection_mod_muls":6746,"shared_core_selection_mod_invs":571,"gaussian":{"field_adds":72,"field_muls":126,"field_invs":9,"solve_wall_us":2},"block_krylov":{"matrix_vector_products":15,"sparse_nonzeros_visited":330,"krylov_rank_adds":360,"krylov_rank_muls":405,"krylov_rank_invs":9,"dense_projection_solve_adds":384,"dense_projection_solve_muls":438,"dense_projection_solve_invs":9,"block_spmv_and_accumulation_adds":411,"block_spmv_and_accumulation_muls":411,"solve_wall_us":10},"shared_solution_verification":{"square_matvec_per_arm":1,"square_nonzeros_per_arm":22,"original_complete_rows_including_anchor_per_arm":137,"original_dense_row_muls_per_arm_derived":1233,"original_dense_row_adds_per_arm_derived":1233}},
+  "limits":"Single-call microsecond wall values are diagnostics. Source/group verification field operations and memory allocation are not completely priced; prior collector receipt counts its own source and completed-row group additions, not this independent replay's exact operations. There is no full wall-speed or end-to-end cost claim. This is an exact three-lane block-Krylov projection with dense projection solve on a 9x9 square reduction, not block Lanczos recurrence, block diagonalization, or a partitioned distributed solve. [pcc:unverified]"
+}

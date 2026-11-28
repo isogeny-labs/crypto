@@ -1,0 +1,9 @@
+{
+  "record_type":"immutable_pre_call_amendment",
+  "parent_pre_call":"WS68_YIELD_HELDOUT.pre-call.json",
+  "conductor_tasks":["T-140","T-147"],
+  "attempt1":{"source":"WS68_YIELD_HELDOUT.attempt1.rs","source_sha256":"a9e95da56a5797c7b77166c499512f290f937f3d785630308e215e62d81c848a","stderr":"WS68_YIELD_HELDOUT.attempt1.stderr","stderr_sha256":"db9e10d44b56fcff6ae06a333da299e99993328a33e3b374c53a3a9a84489902","compile_exit_code":1,"run_executed":false},
+  "correction":"Cast the x-scan count from i64 to u64 in the reporting tuple. No target, seed, factor base, policy, cost boundary or stopping rule changed.",
+  "attempt2":{"source":"WS68_YIELD_HELDOUT.rs","source_sha256":"4a00a0378db0d377c70688315d157808b497487c9058dc82436574e794f055a3","qualifier":"WS68_YIELD_HELDOUT.qualifier.rs","qualifier_sha256":"4a00a0378db0d377c70688315d157808b497487c9058dc82436574e794f055a3","compile_argv":["rustc","-O","--edition","2021","--crate-name","WS68_YIELD_HELDOUT","WS68_YIELD_HELDOUT.qualifier.rs","-o","WS68_YIELD_HELDOUT.bin"]},
+  "admission":"same bounded user-authorized local bypass; compile failure preserved, no prior execution"
+}

@@ -1,0 +1,12 @@
+{
+  "date": "2026-11-27",
+  "conductor_task": "T-13062",
+  "prior_compile_exit": 1,
+  "prior_source_sha256": "8f9e1cc172229b71189514602fc9a38d99e0ac7fcee79f613a65890c7f0fe405",
+  "prior_compile_stderr_sha256": "167c7f2795e5f746cc0df5054bf516d9f38fd6df24f1676fa13a153f508ea622",
+  "failure": "Rust could not infer parsed b integer type in independent verifier",
+  "change": "explicit b:i64 annotation only; no algorithm, target, input or bound change",
+  "source_sha256": "e559373e3b9667f5242a0262b946beed1ddf22873921d7580d8b47540c486cef",
+  "compile": "rustc --edition=2021 -O verify.rs -o /tmp/ws68_partial_panel_verify.bin",
+  "run": "verify 0..3 as frozen in verify.pre-call.json"
+}
