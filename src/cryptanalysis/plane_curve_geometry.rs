@@ -36,6 +36,13 @@ pub struct RationalLineFactorization {
     pub residual_degree: usize,
 }
 
+/// A completely rational line section on a smooth plane curve.
+/// Points use the first nonzero coordinate scaled to one.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RationalLineDivisor {
+    pub points: Vec<([u32; 3], usize)>,
+}
+
 fn prime(n: u32) -> bool {
     if n < 2 {
         return false;
@@ -263,6 +270,71 @@ impl PlaneCurve {
             .map(|root| root.parameter)
             .collect())
     }
+
+    /// Return a line's effective divisor when every intersection is rational.
+    /// `None` means a nonrational factor remains. A rational singular point
+    /// is rejected because its branches need a normalization model.
+    pub fn rational_line_divisor(
+        &self,
+        u: [u32; 3],
+        v: [u32; 3],
+    ) -> Result<Option<RationalLineDivisor>, &'static str> {
+        let section = self.line_section(u, v)?;
+        let factors = self.rational_line_factors(&section)?;
+        if factors.residual_degree != 0 {
+            return Ok(None);
+        }
+        let mut points = BTreeMap::<[u32; 3], usize>::new();
+        for root in factors.roots {
+            let [s, t] = root.parameter;
+            let point = std::array::from_fn(|i| {
+                ((u64::from(mul(s, u[i] % self.p, self.p))
+                    + u64::from(mul(t, v[i] % self.p, self.p)))
+                    % u64::from(self.p)) as u32
+            });
+            let Some(&leading) = point.iter().find(|&&coordinate| coordinate != 0) else {
+                return Err("line parameter gave the zero projective point");
+            };
+            let inverse = pow(leading, (self.p - 2) as usize, self.p);
+            let normalized = point.map(|coordinate| mul(coordinate, inverse, self.p));
+            if self.eval(normalized) != 0 {
+                return Err("line root is not on the curve");
+            }
+            if self.gradient(normalized) == [0; 3] {
+                return Err("line meets a singular rational point");
+            }
+            *points.entry(normalized).or_default() += root.multiplicity;
+        }
+        debug_assert_eq!(points.values().sum::<usize>(), self.degree);
+        Ok(Some(RationalLineDivisor {
+            points: points.into_iter().collect(),
+        }))
+    }
+
+    /// Coefficients of `div(line_a / line_b)` at rational points.
+    /// The caller must independently establish geometric smoothness of the
+    /// whole curve. This method rejects only singularities it encounters.
+    pub fn rational_line_relation(
+        &self,
+        line_a: ([u32; 3], [u32; 3]),
+        line_b: ([u32; 3], [u32; 3]),
+    ) -> Result<Option<BTreeMap<[u32; 3], i32>>, &'static str> {
+        let Some(a) = self.rational_line_divisor(line_a.0, line_a.1)? else {
+            return Ok(None);
+        };
+        let Some(b) = self.rational_line_divisor(line_b.0, line_b.1)? else {
+            return Ok(None);
+        };
+        let mut relation = BTreeMap::<[u32; 3], i32>::new();
+        for (point, multiplicity) in a.points {
+            *relation.entry(point).or_default() += multiplicity as i32;
+        }
+        for (point, multiplicity) in b.points {
+            *relation.entry(point).or_default() -= multiplicity as i32;
+        }
+        relation.retain(|_, coefficient| *coefficient != 0);
+        Ok(Some(relation))
+    }
 }
 
 #[cfg(test)]
@@ -341,6 +413,53 @@ mod tests {
                 residual_degree: 2,
             }
         );
+        assert_eq!(c.rational_line_divisor([1, 0, 0], [0, 1, 0]).unwrap(), None);
+    }
+
+    #[test]
+    fn cubic_line_divisors_give_a_principal_relation() {
+        // Smooth elliptic cubic y^2 z = x^3 + x z^2 over F_5.
+        let c = PlaneCurve::new(
+            5,
+            3,
+            &[
+                PlaneTerm {
+                    x_exp: 0,
+                    y_exp: 2,
+                    z_exp: 1,
+                    coeff: 1,
+                },
+                PlaneTerm {
+                    x_exp: 3,
+                    y_exp: 0,
+                    z_exp: 0,
+                    coeff: 4,
+                },
+                PlaneTerm {
+                    x_exp: 1,
+                    y_exp: 0,
+                    z_exp: 2,
+                    coeff: 4,
+                },
+            ],
+        )
+        .unwrap();
+        let x_zero = ([0, 1, 0], [0, 0, 1]);
+        let z_zero = ([1, 0, 0], [0, 1, 0]);
+        let divisor = c
+            .rational_line_divisor(x_zero.0, x_zero.1)
+            .unwrap()
+            .unwrap();
+        assert_eq!(divisor.points, vec![([0, 0, 1], 2), ([0, 1, 0], 1)]);
+        let relation = c.rational_line_relation(x_zero, z_zero).unwrap().unwrap();
+        assert_eq!(relation, BTreeMap::from([([0, 0, 1], 2), ([0, 1, 0], -2)]));
+        assert_eq!(relation.values().sum::<i32>(), 0);
+    }
+
+    #[test]
+    fn reject_singular_line_divisor() {
+        let c = PlaneCurve::new(7, 5, &[term(5, 0, 0), term(0, 3, 2), term(0, 0, 5)]).unwrap();
+        assert!(c.rational_line_divisor([1, 0, 0], [0, 1, 0]).is_err());
     }
 
     #[test]
