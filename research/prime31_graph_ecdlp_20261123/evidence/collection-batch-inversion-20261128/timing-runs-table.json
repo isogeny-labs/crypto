@@ -1,8 +1,9 @@
 {
-  "schema": "m31-collection-levers-timing/v1",
-  "order": "7 rounds, arms interleaved base,123,134,1234 per round; each run a separate process; 4-lever build",
+  "schema": "m31-collection-levers-timing/v2",
+  "order": "7 rounds; within each round the arms ran in the fixed order base,123,134,1234; each run a separate process; 4-lever build; round = round index",
   "runs": [
     {
+      "round": 1,
       "arm": "base",
       "cold_wall_ms": 5194,
       "table_ms": 510,
@@ -21,114 +22,7 @@
       }
     },
     {
-      "arm": "base",
-      "cold_wall_ms": 4947,
-      "table_ms": 492,
-      "collection_ms": 4417,
-      "graph_ms": 24,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 10986799,
-        "fp_multiplications": 703155831,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
-      "arm": "base",
-      "cold_wall_ms": 4994,
-      "table_ms": 529,
-      "collection_ms": 4424,
-      "graph_ms": 24,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 10986799,
-        "fp_multiplications": 703155831,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
-      "arm": "base",
-      "cold_wall_ms": 5184,
-      "table_ms": 573,
-      "collection_ms": 4570,
-      "graph_ms": 26,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 10986799,
-        "fp_multiplications": 703155831,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
-      "arm": "base",
-      "cold_wall_ms": 5154,
-      "table_ms": 561,
-      "collection_ms": 4554,
-      "graph_ms": 24,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 10986799,
-        "fp_multiplications": 703155831,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
-      "arm": "base",
-      "cold_wall_ms": 5088,
-      "table_ms": 538,
-      "collection_ms": 4510,
-      "graph_ms": 24,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 10986799,
-        "fp_multiplications": 703155831,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
-      "arm": "base",
-      "cold_wall_ms": 5123,
-      "table_ms": 583,
-      "collection_ms": 4497,
-      "graph_ms": 24,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 10986799,
-        "fp_multiplications": 703155831,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
+      "round": 1,
       "arm": "123",
       "cold_wall_ms": 1213,
       "table_ms": 496,
@@ -147,114 +41,7 @@
       }
     },
     {
-      "arm": "123",
-      "cold_wall_ms": 1204,
-      "table_ms": 492,
-      "collection_ms": 653,
-      "graph_ms": 26,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 918466,
-        "fp_multiplications": 119192550,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
-      "arm": "123",
-      "cold_wall_ms": 1294,
-      "table_ms": 499,
-      "collection_ms": 729,
-      "graph_ms": 32,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 918466,
-        "fp_multiplications": 119192550,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
-      "arm": "123",
-      "cold_wall_ms": 1272,
-      "table_ms": 513,
-      "collection_ms": 699,
-      "graph_ms": 27,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 918466,
-        "fp_multiplications": 119192550,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
-      "arm": "123",
-      "cold_wall_ms": 1204,
-      "table_ms": 492,
-      "collection_ms": 654,
-      "graph_ms": 26,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 918466,
-        "fp_multiplications": 119192550,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
-      "arm": "123",
-      "cold_wall_ms": 1402,
-      "table_ms": 650,
-      "collection_ms": 693,
-      "graph_ms": 26,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 918466,
-        "fp_multiplications": 119192550,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
-      "arm": "123",
-      "cold_wall_ms": 1327,
-      "table_ms": 529,
-      "collection_ms": 735,
-      "graph_ms": 28,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 918466,
-        "fp_multiplications": 119192550,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
+      "round": 1,
       "arm": "134",
       "cold_wall_ms": 1095,
       "table_ms": 230,
@@ -273,114 +60,7 @@
       }
     },
     {
-      "arm": "134",
-      "cold_wall_ms": 1066,
-      "table_ms": 215,
-      "collection_ms": 792,
-      "graph_ms": 26,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 3163,
-        "fp_multiplications": 64045545,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
-      "arm": "134",
-      "cold_wall_ms": 1112,
-      "table_ms": 210,
-      "collection_ms": 836,
-      "graph_ms": 28,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 3163,
-        "fp_multiplications": 64045545,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
-      "arm": "134",
-      "cold_wall_ms": 1223,
-      "table_ms": 237,
-      "collection_ms": 923,
-      "graph_ms": 28,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 3163,
-        "fp_multiplications": 64045545,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
-      "arm": "134",
-      "cold_wall_ms": 1185,
-      "table_ms": 253,
-      "collection_ms": 870,
-      "graph_ms": 26,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 3163,
-        "fp_multiplications": 64045545,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
-      "arm": "134",
-      "cold_wall_ms": 1126,
-      "table_ms": 240,
-      "collection_ms": 829,
-      "graph_ms": 27,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 3163,
-        "fp_multiplications": 64045545,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
-      "arm": "134",
-      "cold_wall_ms": 1133,
-      "table_ms": 246,
-      "collection_ms": 829,
-      "graph_ms": 26,
-      "queries": 11,
-      "recovered_scalar": 987654321,
-      "charged_group_work": {
-        "extraction_nodes": 0,
-        "fp_inversions": 3163,
-        "fp_multiplications": 64045545,
-        "group_additions": 10987529,
-        "polynomial_evaluations": 0,
-        "scalar_inversions": 0,
-        "scalar_multiplications": 0
-      }
-    },
-    {
+      "round": 1,
       "arm": "1234",
       "cold_wall_ms": 935,
       "table_ms": 200,
@@ -399,6 +79,64 @@
       }
     },
     {
+      "round": 2,
+      "arm": "base",
+      "cold_wall_ms": 4947,
+      "table_ms": 492,
+      "collection_ms": 4417,
+      "graph_ms": 24,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 10986799,
+        "fp_multiplications": 703155831,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 2,
+      "arm": "123",
+      "cold_wall_ms": 1204,
+      "table_ms": 492,
+      "collection_ms": 653,
+      "graph_ms": 26,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 918466,
+        "fp_multiplications": 119192550,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 2,
+      "arm": "134",
+      "cold_wall_ms": 1066,
+      "table_ms": 215,
+      "collection_ms": 792,
+      "graph_ms": 26,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 3163,
+        "fp_multiplications": 64045545,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 2,
       "arm": "1234",
       "cold_wall_ms": 967,
       "table_ms": 212,
@@ -417,6 +155,64 @@
       }
     },
     {
+      "round": 3,
+      "arm": "base",
+      "cold_wall_ms": 4994,
+      "table_ms": 529,
+      "collection_ms": 4424,
+      "graph_ms": 24,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 10986799,
+        "fp_multiplications": 703155831,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 3,
+      "arm": "123",
+      "cold_wall_ms": 1294,
+      "table_ms": 499,
+      "collection_ms": 729,
+      "graph_ms": 32,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 918466,
+        "fp_multiplications": 119192550,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 3,
+      "arm": "134",
+      "cold_wall_ms": 1112,
+      "table_ms": 210,
+      "collection_ms": 836,
+      "graph_ms": 28,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 3163,
+        "fp_multiplications": 64045545,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 3,
       "arm": "1234",
       "cold_wall_ms": 948,
       "table_ms": 204,
@@ -435,6 +231,64 @@
       }
     },
     {
+      "round": 4,
+      "arm": "base",
+      "cold_wall_ms": 5184,
+      "table_ms": 573,
+      "collection_ms": 4570,
+      "graph_ms": 26,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 10986799,
+        "fp_multiplications": 703155831,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 4,
+      "arm": "123",
+      "cold_wall_ms": 1272,
+      "table_ms": 513,
+      "collection_ms": 699,
+      "graph_ms": 27,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 918466,
+        "fp_multiplications": 119192550,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 4,
+      "arm": "134",
+      "cold_wall_ms": 1223,
+      "table_ms": 237,
+      "collection_ms": 923,
+      "graph_ms": 28,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 3163,
+        "fp_multiplications": 64045545,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 4,
       "arm": "1234",
       "cold_wall_ms": 968,
       "table_ms": 206,
@@ -453,6 +307,64 @@
       }
     },
     {
+      "round": 5,
+      "arm": "base",
+      "cold_wall_ms": 5154,
+      "table_ms": 561,
+      "collection_ms": 4554,
+      "graph_ms": 24,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 10986799,
+        "fp_multiplications": 703155831,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 5,
+      "arm": "123",
+      "cold_wall_ms": 1204,
+      "table_ms": 492,
+      "collection_ms": 654,
+      "graph_ms": 26,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 918466,
+        "fp_multiplications": 119192550,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 5,
+      "arm": "134",
+      "cold_wall_ms": 1185,
+      "table_ms": 253,
+      "collection_ms": 870,
+      "graph_ms": 26,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 3163,
+        "fp_multiplications": 64045545,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 5,
       "arm": "1234",
       "cold_wall_ms": 924,
       "table_ms": 191,
@@ -471,6 +383,64 @@
       }
     },
     {
+      "round": 6,
+      "arm": "base",
+      "cold_wall_ms": 5088,
+      "table_ms": 538,
+      "collection_ms": 4510,
+      "graph_ms": 24,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 10986799,
+        "fp_multiplications": 703155831,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 6,
+      "arm": "123",
+      "cold_wall_ms": 1402,
+      "table_ms": 650,
+      "collection_ms": 693,
+      "graph_ms": 26,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 918466,
+        "fp_multiplications": 119192550,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 6,
+      "arm": "134",
+      "cold_wall_ms": 1126,
+      "table_ms": 240,
+      "collection_ms": 829,
+      "graph_ms": 27,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 3163,
+        "fp_multiplications": 64045545,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 6,
       "arm": "1234",
       "cold_wall_ms": 933,
       "table_ms": 223,
@@ -489,6 +459,64 @@
       }
     },
     {
+      "round": 7,
+      "arm": "base",
+      "cold_wall_ms": 5123,
+      "table_ms": 583,
+      "collection_ms": 4497,
+      "graph_ms": 24,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 10986799,
+        "fp_multiplications": 703155831,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 7,
+      "arm": "123",
+      "cold_wall_ms": 1327,
+      "table_ms": 529,
+      "collection_ms": 735,
+      "graph_ms": 28,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 918466,
+        "fp_multiplications": 119192550,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 7,
+      "arm": "134",
+      "cold_wall_ms": 1133,
+      "table_ms": 246,
+      "collection_ms": 829,
+      "graph_ms": 26,
+      "queries": 11,
+      "recovered_scalar": 987654321,
+      "charged_group_work": {
+        "extraction_nodes": 0,
+        "fp_inversions": 3163,
+        "fp_multiplications": 64045545,
+        "group_additions": 10987529,
+        "polynomial_evaluations": 0,
+        "scalar_inversions": 0,
+        "scalar_multiplications": 0
+      }
+    },
+    {
+      "round": 7,
       "arm": "1234",
       "cold_wall_ms": 1040,
       "table_ms": 223,

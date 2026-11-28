@@ -81,6 +81,31 @@ collection, 7.5x fewer instructions per query, and 3.8x fewer in the fixed part.
 only inside the batched path. Lever 3 helps more once batching has removed
 the inversions.
 
+## Memory
+
+Peak RSS (`peak-rss.json`, `VmHWM` polled every 5 ms, three runs each, 40-query cap):
+
+| arm | peak RSS |
+|---|---:|
+| baseline | 129.7–130.0 MB |
+| 1+2+3 | 172.0 MB (+42 MB) |
+| 1+3+4 | 193.5–193.6 MB |
+| 1+2+3+4 | 193.4–193.5 MB (+64 MB) |
+
+The batch buffers are a real cost and are not free. The per-query probe
+buffers (`kind`, `num`, `den`, `prefix` and 24-byte output points for
+915,304 probes) account for most of the first increase. The table-build
+buffers and 915,304 table sums account for the second.
+
+## Timing records
+
+Both timing files carry a `round` index (v2). The arms ran in a fixed order
+within each round, not counterbalanced, and there is no A/A arm. The cold
+clock is the producer's in-process `Instant`; it excludes process start-up
+and final JSON printing. For levers 1234, cold wall minus collection minus
+table is 54–68 ms per run: fixture, setup, graph/rank/replay and other work
+outside those two stage clocks, not separately instrumented here.
+
 ## What dominates now, and context
 
 - **Collection again.** With the table batched (206 ms, now mostly hashing

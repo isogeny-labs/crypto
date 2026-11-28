@@ -30,7 +30,8 @@ profiles, with inlined standard-library code charged to its own file
 **Memory** (`cache-sim.txt`, same differencing):
 - Per query there are 73.9 M data references (81 per probe) and 4.40 M L1-data misses (4.8 per probe).
 - Callgrind models only L1 and a last-level cache sized from this host's 260 MB L3, so L2 behaviour is not shown.
-- Wall time is consistent with a mostly compute-bound loop: collection is 683 ms over 11 queries, about 68 ns or 142 cycles per probe at 2.1 GHz for 276 instructions, about 1.9 instructions per cycle. That is an estimate from wall time and nominal frequency, not a counter reading; this host has no PMU.
+- Wall time gives a rough instructions-per-cycle figure: collection is 683 ms over 11 queries, about 68 ns or 142 cycles per probe at a nominal 2.1 GHz for 276 instructions, about 1.9 per cycle. It does not suggest heavy memory stalls, but it does not establish compute-boundedness: it is not a counter reading (this host has no PMU), the frequency is nominal, and the cache simulation covers L1 and a last-level cache only.
+- The `q2 - q1` difference is incremental whole-process work, not a stage-exclusive counter. It also includes one query's graph and replay step and any layout effects of the randomized hash in the de-duplication set.
 
 ## Reading
 
