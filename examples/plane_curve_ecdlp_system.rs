@@ -58,6 +58,36 @@ fn rank(rows: &[SparseRow<u64>], columns: usize) -> usize {
 }
 
 fn main() {
+    let mut target = Pt::affine(1, 2);
+    let mut cado_dir = None;
+    let mut cado_sol = None;
+    let mut args = std::env::args_os().skip(1);
+    while let Some(flag) = args.next() {
+        if flag == "--target" {
+            let x = args.next().expect("--target needs x and y");
+            let y = args.next().expect("--target needs x and y");
+            target = Pt::affine(
+                x.to_str()
+                    .unwrap()
+                    .parse()
+                    .expect("target x must be an integer"),
+                y.to_str()
+                    .unwrap()
+                    .parse()
+                    .expect("target y must be an integer"),
+            );
+        } else if flag == "--cado-dir" {
+            cado_dir = Some(std::path::PathBuf::from(
+                args.next().expect("--cado-dir needs a path"),
+            ));
+        } else if flag == "--cado-sol" {
+            cado_sol = Some(std::path::PathBuf::from(
+                args.next().expect("--cado-sol needs a path"),
+            ));
+        } else {
+            panic!("usage: plane_curve_ecdlp_system [--target X Y] [--cado-dir PATH] [--cado-sol PATH]");
+        }
+    }
     // y²z = x³ + 2xz² + z³, with seven F_5-rational points.
     let curve = PlaneCurve::new(
         P,
@@ -92,8 +122,12 @@ fn main() {
     .unwrap();
     assert_eq!(curve.certify_geometric_smoothness(), Ok(true));
     let generator = Pt::affine(0, 1);
-    let target = Pt::affine(1, 2); // Public coordinates, not a scalar input.
+    // The public target is supplied by coordinates, never by its scalar.
     let group = Curve::new(P as u64, 2, 1, N, generator);
+    assert!(
+        target.x < P as u64 && target.y < P as u64,
+        "target coordinates must be canonical residues"
+    );
     assert!(group.is_on_curve(&generator) && group.is_on_curve(&target));
     assert_eq!(group.mul(&generator, N), Pt::INFINITY);
     assert_ne!(generator, Pt::INFINITY);
@@ -172,7 +206,9 @@ fn main() {
     };
     let recovered = solution[columns.target_column() as usize];
     assert_eq!(group.mul(&generator, recovered), target);
-    assert_eq!(recovered, 5);
+    if target == Pt::affine(1, 2) {
+        assert_eq!(recovered, 5);
+    }
     let mut matrix = Vec::new();
     let mut rhs = Vec::new();
     let exported = write_square_system(&rows, columns.columns(), N, &mut matrix, &mut rhs).unwrap();
@@ -187,23 +223,17 @@ fn main() {
         verify_solution(&rows, columns.columns(), N, &cado_words).unwrap(),
         solution
     );
-    let mut args = std::env::args_os().skip(1);
-    while let Some(flag) = args.next() {
-        let path = args.next().expect("option requires a path");
-        if flag == "--cado-dir" {
-            let directory = std::path::PathBuf::from(path);
-            std::fs::create_dir_all(&directory).unwrap();
-            std::fs::write(directory.join("matrix.bin"), &matrix).unwrap();
-            std::fs::write(directory.join("rhs.txt"), &rhs).unwrap();
-        } else if flag == "--cado-sol" {
-            let words = std::fs::read(path).unwrap();
-            let external = verify_solution(&rows, columns.columns(), N, &words).unwrap();
-            assert_eq!(external[columns.target_column() as usize], recovered);
-            assert_eq!(group.mul(&generator, recovered), target);
-            println!("external CADO solution verified: log={recovered}");
-        } else {
-            panic!("usage: plane_curve_ecdlp_system [--cado-dir PATH] [--cado-sol PATH]");
-        }
+    if let Some(directory) = cado_dir {
+        std::fs::create_dir_all(&directory).unwrap();
+        std::fs::write(directory.join("matrix.bin"), &matrix).unwrap();
+        std::fs::write(directory.join("rhs.txt"), &rhs).unwrap();
+    }
+    if let Some(path) = cado_sol {
+        let words = std::fs::read(path).unwrap();
+        let external = verify_solution(&rows, columns.columns(), N, &words).unwrap();
+        assert_eq!(external[columns.target_column() as usize], recovered);
+        assert_eq!(group.mul(&generator, recovered), target);
+        println!("external CADO solution verified: log={recovered}");
     }
     println!(
         "curve-derived plane DLP: points=7 split_lines={split_lines} rank=7 log={recovered} verified=true cado_nonzeros={}",
