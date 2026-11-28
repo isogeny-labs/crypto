@@ -1,0 +1,12 @@
+[package]
+name = "prime31-four-summand"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+prime31-algebraic-ic = { path = "../../../../prime31_four_summand_20261122/native/original-native" }
+serde = { version = "1", features = ["derive"] }
