@@ -25,6 +25,7 @@ pub mod composition_boundary_certificate;
 pub mod contraction;
 pub mod curve;
 pub mod encoding;
+mod factor_base_lsh;
 pub mod factoring;
 pub mod factorization_certificate;
 pub mod finite;
