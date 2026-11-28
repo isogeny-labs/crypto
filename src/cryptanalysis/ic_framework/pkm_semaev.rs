@@ -909,6 +909,9 @@ pub struct PkmSemaevOracle {
     engine: PkmEngine,
     /// `F_V = ∏_{v ∈ V}(X − v)` for `engine=resgcd`, built on first use.
     resgcd_fv: Option<Vec<u64>>,
+    /// `gcd=half`: `engine=resgcd` takes gcds by half-GCD (Newton division,
+    /// Thull–Yap recursion) instead of classical Euclid.
+    resgcd_half: bool,
     max_degree: u32,
     max_nnz: Option<u64>,
     stop_staircase: Option<usize>,
@@ -999,6 +1002,7 @@ impl PkmSemaevOracle {
             mode: PkmMode::Chain,
             engine: PkmEngine::F4,
             resgcd_fv: None,
+            resgcd_half: false,
             max_degree: 12,
             max_nnz: None,
             stop_staircase: None,
@@ -1254,9 +1258,23 @@ impl PkmSemaevOracle {
                 ))
             }
         };
+        self.resgcd_half = match params.get("gcd") {
+            None | Some("classical") => false,
+            Some("half") => true,
+            Some(o) => return Err(format!("pkm-semaev: gcd is classical or half, not {o}")),
+        };
+        if self.resgcd_half && self.engine != PkmEngine::ResGcd {
+            return Err("pkm-semaev: gcd=half needs engine=resgcd".into());
+        }
         match self.engine {
             PkmEngine::Exhaustive => self.totals.solver = "tower-exhaustive".into(),
-            PkmEngine::ResGcd => self.totals.solver = "univariate-resultant-gcd".into(),
+            PkmEngine::ResGcd => {
+                self.totals.solver = if params.get("gcd") == Some("half") {
+                    "univariate-resultant-half-gcd".into()
+                } else {
+                    "univariate-resultant-gcd".into()
+                }
+            }
             PkmEngine::Scan => self.totals.solver = "quadratic-scan".into(),
             PkmEngine::F4 => {}
         }
@@ -2403,6 +2421,235 @@ fn ug_gcd_monic(a: Vec<u64>, b: Vec<u64>, p: u64, mults: &mut u64) -> Vec<u64> {
     r0
 }
 
+// ---------------------------------------------------------------------------
+// Subquadratic gcd for `engine=resgcd,gcd=half`: Newton-iteration division
+// and the recursive half-GCD (Thull–Yap), over `ug_karatsuba`. Polynomials
+// are trimmed `Vec<u64>` (low to high, empty = 0); every `F_p`
+// multiplication is counted in `*mults`, an inversion as `UG_INV_MULTS`.
+// ---------------------------------------------------------------------------
+
+/// Below this many coefficients division is classical.
+const UG_FAST_DIV_MIN: usize = 64;
+/// Below this degree the half-GCD runs classical Euclid steps.
+const UG_HGCD_MIN: usize = 48;
+
+type UgMat = [[Vec<u64>; 2]; 2];
+
+fn ug_deg(a: &[u64]) -> isize {
+    a.len() as isize - 1
+}
+
+fn ug_mul(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> Vec<u64> {
+    let mut r = ug_karatsuba(a, b, p, mults);
+    ug_trim(&mut r);
+    r
+}
+
+fn ug_add(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    let mut r: Vec<u64> = (0..a.len().max(b.len()))
+        .map(|i| addm(*a.get(i).unwrap_or(&0), *b.get(i).unwrap_or(&0), p))
+        .collect();
+    ug_trim(&mut r);
+    r
+}
+
+fn ug_sub(a: &[u64], b: &[u64], p: u64) -> Vec<u64> {
+    let mut r: Vec<u64> = (0..a.len().max(b.len()))
+        .map(|i| subm(*a.get(i).unwrap_or(&0), *b.get(i).unwrap_or(&0), p))
+        .collect();
+    ug_trim(&mut r);
+    r
+}
+
+fn ug_neg(a: &[u64], p: u64) -> Vec<u64> {
+    a.iter().map(|&c| subm(0, c, p)).collect()
+}
+
+/// `a` truncated mod `x^n`, trimmed.
+fn ug_trunc(a: &[u64], n: usize) -> Vec<u64> {
+    let mut r = a[..a.len().min(n)].to_vec();
+    ug_trim(&mut r);
+    r
+}
+
+/// `⌊a / x^k⌋`.
+fn ug_shr(a: &[u64], k: usize) -> Vec<u64> {
+    if a.len() <= k {
+        Vec::new()
+    } else {
+        a[k..].to_vec()
+    }
+}
+
+/// `g` with `f·g ≡ 1 (mod x^n)`, `f[0] ≠ 0`, by Newton iteration
+/// `g ← g·(2 − f·g)`.
+fn ug_inv_series(f: &[u64], n: usize, p: u64, mults: &mut u64) -> Vec<u64> {
+    let f0 = *f.first().expect("f(0) != 0");
+    debug_assert!(f0 != 0);
+    *mults += UG_INV_MULTS;
+    let mut g = vec![crate::cryptanalysis::residual_walk::pow_mod(f0, p - 2, p)];
+    let mut len = 1usize;
+    while len < n {
+        let len2 = (2 * len).min(n);
+        let fg = ug_trunc(&ug_mul(&ug_trunc(f, len2), &g, p, mults), len2);
+        let mut h = ug_neg(&fg, p);
+        if h.is_empty() {
+            h.push(0);
+        }
+        h[0] = addm(h[0], 2, p);
+        ug_trim(&mut h);
+        g = ug_trunc(&ug_mul(&g, &h, p, mults), len2);
+        len = len2;
+    }
+    g
+}
+
+/// `(q, r)` with `a = q·b + r`, `deg r < deg b`, classical (one inversion).
+fn ug_divmod_classical(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> (Vec<u64>, Vec<u64>) {
+    let db = b.len() - 1;
+    let mut r = a.to_vec();
+    ug_trim(&mut r);
+    if r.len() <= db {
+        return (Vec::new(), r);
+    }
+    let inv = crate::cryptanalysis::residual_walk::pow_mod(b[db], p - 2, p);
+    *mults += UG_INV_MULTS;
+    let mut q = vec![0u64; r.len() - db];
+    while r.len() > db {
+        let top = r.len() - 1;
+        let c = mulm(r[top], inv, p);
+        *mults += 1;
+        let shift = top - db;
+        q[shift] = c;
+        if c != 0 {
+            for j in 0..db {
+                r[shift + j] = subm(r[shift + j], mulm(c, b[j], p), p);
+            }
+            *mults += db as u64;
+        }
+        r.pop();
+        ug_trim(&mut r);
+    }
+    ug_trim(&mut q);
+    (q, r)
+}
+
+/// `(q, r)` with `a = q·b + r`, `deg r < deg b`; Newton division of the
+/// reversed polynomials when both quotient and divisor are long.
+fn ug_divmod(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> (Vec<u64>, Vec<u64>) {
+    assert!(!b.is_empty(), "division by zero polynomial");
+    if a.len() < b.len() {
+        return (Vec::new(), a.to_vec());
+    }
+    let n = a.len() - b.len() + 1; // quotient length
+    if n < UG_FAST_DIV_MIN || b.len() < UG_FAST_DIV_MIN {
+        return ug_divmod_classical(a, b, p, mults);
+    }
+    let ra: Vec<u64> = a.iter().rev().copied().collect();
+    let rb: Vec<u64> = b.iter().rev().copied().collect();
+    let g = ug_inv_series(&ug_trunc(&rb, n), n, p, mults);
+    let mut qr = ug_trunc(&ug_mul(&ug_trunc(&ra, n), &g, p, mults), n);
+    qr.resize(n, 0);
+    let mut q: Vec<u64> = qr.into_iter().rev().collect();
+    ug_trim(&mut q);
+    let r = ug_trunc(&ug_sub(a, &ug_mul(b, &q, p, mults), p), b.len() - 1);
+    (q, r)
+}
+
+fn ug_mat_identity() -> UgMat {
+    [[vec![1], Vec::new()], [Vec::new(), vec![1]]]
+}
+
+/// `[[0, 1], [1, −q]] · m`.
+fn ug_mat_step(q: &[u64], m: &UgMat, p: u64, mults: &mut u64) -> UgMat {
+    let r0 = [m[1][0].clone(), m[1][1].clone()];
+    let r1 = [
+        ug_sub(&m[0][0], &ug_mul(q, &m[1][0], p, mults), p),
+        ug_sub(&m[0][1], &ug_mul(q, &m[1][1], p, mults), p),
+    ];
+    [r0, r1]
+}
+
+fn ug_mat_mul(a: &UgMat, b: &UgMat, p: u64, mults: &mut u64) -> UgMat {
+    let e = |i: usize, j: usize, mults: &mut u64| {
+        ug_add(
+            &ug_mul(&a[i][0], &b[0][j], p, mults),
+            &ug_mul(&a[i][1], &b[1][j], p, mults),
+            p,
+        )
+    };
+    [[e(0, 0, mults), e(0, 1, mults)], [e(1, 0, mults), e(1, 1, mults)]]
+}
+
+fn ug_mat_apply(m: &UgMat, a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> (Vec<u64>, Vec<u64>) {
+    (
+        ug_add(&ug_mul(&m[0][0], a, p, mults), &ug_mul(&m[0][1], b, p, mults), p),
+        ug_add(&ug_mul(&m[1][0], a, p, mults), &ug_mul(&m[1][1], b, p, mults), p),
+    )
+}
+
+/// Half-GCD: for `deg a > deg b`, a matrix `M` (a product of Euclid
+/// quotient steps) with `M·(a, b) = (c, d)`, `deg c ≥ ⌈deg a / 2⌉ > deg d`.
+fn ug_hgcd(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> UgMat {
+    let da = ug_deg(a);
+    debug_assert!(da > ug_deg(b));
+    let m = ((da + 1) / 2) as usize;
+    if ug_deg(b) < m as isize {
+        return ug_mat_identity();
+    }
+    if (da as usize) < UG_HGCD_MIN {
+        // Classical Euclid steps until the remainder drops below degree m.
+        let mut mat = ug_mat_identity();
+        let (mut x, mut y) = (a.to_vec(), b.to_vec());
+        while ug_deg(&y) >= m as isize {
+            let (q, r) = ug_divmod_classical(&x, &y, p, mults);
+            mat = ug_mat_step(&q, &mat, p, mults);
+            x = y;
+            y = r;
+        }
+        return mat;
+    }
+    let r = ug_hgcd(&ug_shr(a, m), &ug_shr(b, m), p, mults);
+    let (d, e) = ug_mat_apply(&r, a, b, p, mults);
+    if ug_deg(&e) < m as isize {
+        return r;
+    }
+    let (q, f) = ug_divmod(&d, &e, p, mults);
+    let qr = ug_mat_step(&q, &r, p, mults);
+    if ug_deg(&f) < m as isize {
+        return qr;
+    }
+    let k = 2 * m - ug_deg(&e) as usize;
+    let s = ug_hgcd(&ug_shr(&e, k), &ug_shr(&f, k), p, mults);
+    ug_mat_mul(&s, &qr, p, mults)
+}
+
+/// Monic `gcd(a, b)` for monic `a` with `deg a ≥ 1`, by half-GCD steps
+/// (classical Euclid once the degree drops below `UG_HGCD_MIN`).
+fn ug_gcd_half(a: Vec<u64>, b: Vec<u64>, p: u64, mults: &mut u64) -> Vec<u64> {
+    let mut x = a;
+    let mut y = ug_divmod(&b, &x, p, mults).1;
+    loop {
+        if y.is_empty() {
+            ug_monic(&mut x, p, mults);
+            return x;
+        }
+        if x.len() <= UG_HGCD_MIN {
+            ug_monic(&mut x, p, mults);
+            return ug_gcd_monic(x, y, p, mults);
+        }
+        let mat = ug_hgcd(&x, &y, p, mults);
+        let (c, d) = ug_mat_apply(&mat, &x, &y, p, mults);
+        if d.is_empty() {
+            x = c;
+            continue;
+        }
+        let r = ug_divmod(&c, &d, p, mults).1;
+        x = d;
+        y = r;
+    }
+}
+
 impl PkmSemaevOracle {
     /// `engine=resgcd` (`m = 2`): every unordered `(x_1, x_2) ∈ V²` with
     /// `S₃(x_1, x_2, x_R) = 0`, in `grid()` order, and the `F_p`
@@ -2453,7 +2700,11 @@ impl PkmSemaevOracle {
         let tree0 = mults;
         let r = ug_product_tree(leaves, p, &mut mults);
         let tree = mults - tree0;
-        let g = ug_gcd_monic(fv, r, p, &mut mults);
+        let g = if self.resgcd_half {
+            ug_gcd_half(fv, r, p, &mut mults)
+        } else {
+            ug_gcd_monic(fv, r, p, &mut mults)
+        };
         let gcd_mults = mults - tree0 - tree;
         self.bump("pkm_resgcd_tree_fp_mults", tree);
         self.bump("pkm_resgcd_gcd_fp_mults", gcd_mults);
@@ -2590,7 +2841,11 @@ impl PkmSemaevOracle {
             };
             let t1 = mults;
             tree += t1 - t0;
-            let g = ug_gcd_monic(fv.clone(), r, p, &mut mults);
+            let g = if self.resgcd_half {
+                ug_gcd_half(fv.clone(), r, p, &mut mults)
+            } else {
+                ug_gcd_monic(fv.clone(), r, p, &mut mults)
+            };
             gcdm += mults - t1;
             if g.len() <= 1 {
                 continue;
@@ -3775,8 +4030,11 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
             ),
             (
                 "engine",
-                "f4 (f4_fp_tower, default) or exhaustive (the V^m grid reference)",
+                "f4 (f4_fp_tower, default), exhaustive (the V^m grid reference), resgcd \
+                 (univariate resultant + gcd with F_V; m = 2, 3) or scan (per-v quadratic + \
+                 hash membership; m = 2)",
             ),
+            ("gcd", "engine=resgcd only: classical (Euclid, default) or half (half-GCD)"),
             ("degree", "F4 degree bound, default 12"),
             (
                 "max_nnz",
@@ -4573,6 +4831,51 @@ mod tests {
     /// coefficients of `(a0 + a1)(b0 + b1)` cancel often (the t = 11
     /// resgcd disagreements came from a cancelled `z1` leaving `z0`/`z2`
     /// overhang unsubtracted), on balanced and unbalanced lengths.
+    /// Newton division equals classical division, and the half-GCD
+    /// satisfies its degree postcondition and returns classical Euclid's
+    /// monic gcd, on random and planted-common-factor inputs over tiny and
+    /// 16-bit primes (degenerate remainder sequences are common for p = 3).
+    #[test]
+    fn half_gcd_and_fast_division_match_classical() {
+        let mut rng = StdRng::seed_from_u64(97);
+        let rand_poly = |rng: &mut StdRng, len: usize, p: u64, monic: bool| -> Vec<u64> {
+            let mut v: Vec<u64> = (0..len).map(|_| rng.gen_range(0..p)).collect();
+            if monic || v.last() == Some(&0) {
+                *v.last_mut().unwrap() = if monic { 1 } else { 1 + rng.gen_range(0..p - 1) };
+            }
+            v
+        };
+        for p in [3u64, 5, 7, 65_521] {
+            for round in 0..160 {
+                // Division.
+                let lb = rng.gen_range(1..300usize);
+                let la = lb + rng.gen_range(0..400usize);
+                let a = rand_poly(&mut rng, la, p, false);
+                let b = rand_poly(&mut rng, lb, p, false);
+                let (q1, r1) = ug_divmod_classical(&a, &b, p, &mut 0);
+                let (q2, r2) = ug_divmod(&a, &b, p, &mut 0);
+                assert_eq!((&q1, &r1), (&q2, &r2), "divmod p = {p}, {la}/{lb}");
+                // Half-GCD postcondition on a pair of decreasing degrees.
+                let (x, y) = if ug_deg(&a) > ug_deg(&r1) { (a.clone(), r1.clone()) } else { continue };
+                let mat = ug_hgcd(&x, &y, p, &mut 0);
+                let (c, d) = ug_mat_apply(&mat, &x, &y, p, &mut 0);
+                let m = (ug_deg(&x) + 1) / 2;
+                assert!(ug_deg(&c) >= m && ug_deg(&d) < m, "hgcd postcondition p = {p}, deg {}", ug_deg(&x));
+                // gcd with a planted common factor.
+                let lg = if round % 3 == 0 { 1 } else { rng.gen_range(1..120usize) };
+                let g = rand_poly(&mut rng, lg, p, true);
+                let (lu, lv) = (rng.gen_range(2..500usize), rng.gen_range(1..700usize));
+                let u = rand_poly(&mut rng, lu, p, true);
+                let v = rand_poly(&mut rng, lv, p, false);
+                let fa = ug_mul(&g, &u, p, &mut 0);
+                let fb = ug_mul(&g, &v, p, &mut 0);
+                let want = ug_gcd_monic(fa.clone(), fb.clone(), p, &mut 0);
+                let got = ug_gcd_half(fa, fb, p, &mut 0);
+                assert_eq!(got, want, "gcd p = {p}, round {round}");
+            }
+        }
+    }
+
     #[test]
     fn karatsuba_matches_schoolbook_under_cancellation() {
         let mut rng = StdRng::seed_from_u64(11);
@@ -4930,6 +5233,7 @@ mod tests {
         let mut f4 = prep(&format!("m=2,crosscheck=1{extra}"));
         let mut grid = prep("m=2,engine=exhaustive");
         let mut resgcd = prep("m=2,engine=resgcd,crosscheck=1");
+        let mut half = prep("m=2,engine=resgcd,gcd=half,crosscheck=1");
         let mut scan = prep("m=2,engine=scan,crosscheck=1");
         let mut rng = StdRng::seed_from_u64(29);
         let g = inst.generator_point();
@@ -4964,6 +5268,7 @@ mod tests {
             let (a, c) = (run(&mut f4), run(&mut grid));
             assert_eq!(a, c, "{label}: F4 against the grid, target {k}");
             assert_eq!(run(&mut resgcd), c, "{label}: resgcd against the grid, target {k}");
+            assert_eq!(run(&mut half), c, "{label}: half-GCD resgcd against the grid, target {k}");
             assert_eq!(run(&mut scan), c, "{label}: scan against the grid, target {k}");
             assert_eq!(
                 c,
@@ -4973,7 +5278,7 @@ mod tests {
             hits += usize::from(c);
         }
         assert!(hits >= 5, "{label}: planted targets decompose ({hits})");
-        for (name, o) in [("resgcd", &resgcd), ("scan", &scan)] {
+        for (name, o) in [("resgcd", &resgcd), ("half", &half), ("scan", &scan)] {
             let n = o.relation_counters();
             assert!(n["pkm_crosscheck_systems"] > 0, "{label}: {name} crosschecked");
             assert_eq!(
@@ -5409,6 +5714,7 @@ mod tests {
         let mut full = prep(&format!("m=3,mode=full,crosscheck=1{extra}"));
         let mut grid = prep("m=3,engine=exhaustive");
         let mut resgcd = prep("m=3,engine=resgcd,crosscheck=1");
+        let mut half = prep("m=3,engine=resgcd,gcd=half,crosscheck=1");
         let mut rng = StdRng::seed_from_u64(31);
         let g = inst.generator_point();
         let mut hits = 0;
@@ -5444,6 +5750,7 @@ mod tests {
             assert_eq!(a, c, "{label}: chain F4 against the grid, target {k}");
             assert_eq!(b, c, "{label}: full F4 against the grid, target {k}");
             assert_eq!(run(&mut resgcd), c, "{label}: resgcd against the grid, target {k}");
+            assert_eq!(run(&mut half), c, "{label}: half-GCD resgcd against the grid, target {k}");
             assert_eq!(
                 c,
                 decomposable.contains(&curve.key(&target)),
@@ -5452,13 +5759,15 @@ mod tests {
             hits += usize::from(c);
         }
         assert!(hits >= 5, "{label}: planted targets decompose ({hits})");
-        let n = resgcd.relation_counters();
-        assert!(n["pkm_crosscheck_systems"] > 0, "{label}: resgcd m=3 crosschecked");
-        assert_eq!(
-            n.get("pkm_crosscheck_disagreements").copied().unwrap_or(0),
-            0,
-            "{label}: resgcd m=3 solution sets equal the grid's"
-        );
+        for (name, o) in [("resgcd", &resgcd), ("half", &half)] {
+            let n = o.relation_counters();
+            assert!(n["pkm_crosscheck_systems"] > 0, "{label}: {name} m=3 crosschecked");
+            assert_eq!(
+                n.get("pkm_crosscheck_disagreements").copied().unwrap_or(0),
+                0,
+                "{label}: {name} m=3 solution sets equal the grid's"
+            );
+        }
         for o in [&chain, &full] {
             let n = o.relation_counters();
             assert_eq!(
