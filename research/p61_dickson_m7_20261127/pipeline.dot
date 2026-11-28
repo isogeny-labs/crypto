@@ -1,0 +1,23 @@
+digraph p61_dickson_m7 {
+  graph [rankdir=TB, bgcolor="white", fontname="DejaVu Sans", label="P-61 Dickson seven-sum path · status at 2026-11-27", labelloc=t, fontsize=19, pad=0.22, nodesep=0.32, ranksep=0.36];
+  node [shape=box, style="rounded,filled", color="#387d5b", fillcolor="#e7f5ec", fontname="DejaVu Sans", fontsize=15, margin="0.16,0.10"];
+  edge [color="#637381", fontname="DejaVu Sans", fontsize=12, arrowsize=0.7];
+
+  curve [label="Public testbed P-61\np = 2^61 - 1; prime-order E", fillcolor="#e7eef8", color="#466b9a"];
+  selector [label="Dickson D_1024 roots\n1,024 distinct x values"];
+  leaves [label="Rational leaves, u = 1\n486 x; 972 signed points"];
+  pairs [label="Exact pair x-spectrum\n236,196 nonzero distinct x"];
+  oracle [label="Exact target-specific 7SUM\nmisses + signed witness + cost\nMISSING", style="rounded,dashed,filled", fillcolor="#fff0da", color="#cc7722"];
+  relation [label="487 relation outputs\nthen left kernel + replay\nNOT RUN", style="rounded,dashed,filled", fillcolor="#f1f2f4", color="#7b838e"];
+  coverage [label="Random-model coverage\nproposed lower bound δ ≥ 2.18×10^-15\nNOT a measured yield", style="rounded,dashed,filled", fillcolor="#fff8d9", color="#ae8b20"];
+  nulls [label="No pair x in T\nno 3-leaf zero sum\nNo D_2^j fold merges pair x (j ≤ 10)", fontsize=10];
+
+  curve -> selector [label="norm-one torus"];
+  selector -> leaves [label="curve lift"];
+  leaves -> pairs [label="all pair charts"];
+  pairs -> oracle [label="query structure"];
+  oracle -> relation [label="conditional"];
+  selector -> coverage [style=dashed, color="#ae8b20", label="vary u"];
+  coverage -> oracle [style=dashed, color="#ae8b20", label="yield premise"];
+  pairs -> nulls [color="#387d5b", label="finite check"];
+}

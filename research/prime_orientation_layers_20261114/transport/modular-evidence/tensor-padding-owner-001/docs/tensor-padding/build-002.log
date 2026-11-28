@@ -1,0 +1,78 @@
+docs/tensor-padding/source-002.lean.txt:19:53: error: unsolved goals
+R : Type u_1
+D : Type u_3
+Sigma : Type u_4
+inst✝⁴ : CommSemiring R
+inst✝³ : Fintype D
+inst✝² : Fintype Sigma
+inst✝¹ : DecidableEq D
+inst✝ : DecidableEq Sigma
+d0 x : D → Sigma
+⊢ (if (fun x_1 x_2 => x x_1) = fun x x_1 => d0 x then 1 else 0) = if x = d0 then 1 else 0
+docs/tensor-padding/source-002.lean.txt:22:29: warning: This simp argument is unused:
+  true_implies
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [Finset.mem_univ, ← funext_iff]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+docs/tensor-padding/source-002.lean.txt:37:5: error: unsolved goals
+case pos
+R : Type u_1
+I : Type u_2
+D : Type u_3
+Sigma : Type u_4
+inst✝⁶ : CommSemiring R
+inst✝⁵ : Fintype I
+inst✝⁴ : Fintype D
+inst✝³ : Fintype Sigma
+inst✝² : DecidableEq I
+inst✝¹ : DecidableEq D
+inst✝ : DecidableEq Sigma
+A B : (I → Sigma) → R
+d0 : D → Sigma
+x : I ⊕ D → Sigma
+h✝¹ : (fun d => x (Sum.inr d)) = d0
+h✝ : ((Equiv.sumArrowEquivProdArrow I D Sigma) x).2 = d0
+⊢ ((A fun i => x (Sum.inl i)) * B fun i => x (Sum.inl i)) =
+    A ((Equiv.sumArrowEquivProdArrow I D Sigma) x).1 * B ((Equiv.sumArrowEquivProdArrow I D Sigma) x).1
+
+case neg
+R : Type u_1
+I : Type u_2
+D : Type u_3
+Sigma : Type u_4
+inst✝⁶ : CommSemiring R
+inst✝⁵ : Fintype I
+inst✝⁴ : Fintype D
+inst✝³ : Fintype Sigma
+inst✝² : DecidableEq I
+inst✝¹ : DecidableEq D
+inst✝ : DecidableEq Sigma
+A B : (I → Sigma) → R
+d0 : D → Sigma
+x : I ⊕ D → Sigma
+h✝¹ : (fun d => x (Sum.inr d)) = d0
+h✝ : ¬((Equiv.sumArrowEquivProdArrow I D Sigma) x).2 = d0
+⊢ ((A fun i => x (Sum.inl i)) * B fun i => x (Sum.inl i)) = 0
+
+case pos
+R : Type u_1
+I : Type u_2
+D : Type u_3
+Sigma : Type u_4
+inst✝⁶ : CommSemiring R
+inst✝⁵ : Fintype I
+inst✝⁴ : Fintype D
+inst✝³ : Fintype Sigma
+inst✝² : DecidableEq I
+inst✝¹ : DecidableEq D
+inst✝ : DecidableEq Sigma
+A B : (I → Sigma) → R
+d0 : D → Sigma
+x : I ⊕ D → Sigma
+h✝¹ : ¬(fun d => x (Sum.inr d)) = d0
+h✝ : ((Equiv.sumArrowEquivProdArrow I D Sigma) x).2 = d0
+⊢ 0 = A ((Equiv.sumArrowEquivProdArrow I D Sigma) x).1 * B ((Equiv.sumArrowEquivProdArrow I D Sigma) x).1
+'CryptoLean.TensorPadding.dummyWeight_eq' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'CryptoLean.TensorPadding.contraction_padded' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]

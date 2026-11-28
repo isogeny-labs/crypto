@@ -1,0 +1,108 @@
+'OrientationNonscalarOrigin.kernel_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonscalarOrigin.kernel_nonzero_node' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonscalarOrigin.kernel_diagonal_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonscalarOrigin.kernel_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.pairing_no_fixed' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.pairing_matching' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.weight_oneModTwo' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.weight_inverse_integral' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.origin_entry' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.origin_two_sided_inverse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.actual_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.actual_diagonal_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.actual_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.correction_polynomial' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.cauchy_polynomial_transfer' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.actual_partner_cancellation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.paired_displacement' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.retained_denominator_valuation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.retained_displacement_ratio' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.retained_chart_slope' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.pairedChart_denominator_identity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.pairedChart_content_gain' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.actual_paired_absolute_content' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.actual_profile_lower' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.actual_nonmatching_profile_gain' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.actual_nonmatching_normalized_content' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'OrientationPairedOrigin.matching_self_or_pair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.whole_crossing_content' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.whole_crossing_absolute_content' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.crossingChart_content' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.identityKernel_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.identityKernel_nonzero_node' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.identityKernel_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.identity_crossing_content' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.identity_crossing_absolute_content' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSparseExtension.sparseOrigin_minimal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSparseExtension.sparse_far_not_content_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationSparseExtension.source_root_sparse_gain_fails' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationDenseOrigin.correction_polynomial' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationDenseOrigin.weight_oneModTwo' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationDenseOrigin.matching_cancellation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationDenseOrigin.weight_reduction' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationDenseOrigin.integralOrigin_coe' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationDenseOrigin.origin_reduction_blocks' depends on axioms: [propext, Classical.choice, Quot.sound]
+../modular-evidence/draft-155.lean.txt:931:6: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  HMul (Matrix ?m.25 Unit ℕ) (Matrix Unit ?m.32 ℕ) (Matrix (Fin (2 ^ (a - u))) (Fin (2 ^ (a - u))) (ZMod 2))
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+../modular-evidence/draft-155.lean.txt:938:2: error: unsolved goals
+case neg
+a u : ℕ
+x y : Fin (2 ^ (a - u))
+h : ¬x = y
+⊢ sorry a u x y = 1
+../modular-evidence/draft-155.lean.txt:937:10: warning: declaration uses `sorry`
+../modular-evidence/draft-155.lean.txt:937:22: warning: This simp argument is unused:
+  Matrix.mul_apply
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [fiberMatrix, Matrix.one_apply]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-155.lean.txt:937:39: warning: This simp argument is unused:
+  Matrix.one_apply
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [fiberMatrix, Matrix.mul_apply]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-155.lean.txt:938:22: warning: This simp argument is unused:
+  Matrix.mul_apply
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [fiberMatrix, Matrix.one_apply, h]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-155.lean.txt:938:39: warning: This simp argument is unused:
+  Matrix.one_apply
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [fiberMatrix, Matrix.mul_apply, h]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-155.lean.txt:941:6: warning: declaration uses `sorry`
+../modular-evidence/draft-155.lean.txt:940:8: warning: declaration uses `sorry`
+../modular-evidence/draft-155.lean.txt:940:35: warning: Variable name `ha` is not explicitly referenced.
+
+Hint: The binding can be removed (if unused) or named `_` (if used implicitly). Alternatively, prefix the name with `_` to silence this warning:
+  [apply] _ha
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+../modular-evidence/draft-155.lean.txt:942:2: warning: Unused tactic linter: `simp [dotProduct, Nat.cast_pow, show (2 : ZMod 2) = 0 by decide,
+  show a - u ≠ 0 by omega]` does nothing.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+../modular-evidence/draft-155.lean.txt:942:2: warning: this tactic is never executed
+
+Note: This linter can be disabled with `set_option linter.unreachableTactic false`
+'OrientationDenseOrigin.fiberMatrix_det' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationDenseOrigin.integralOrigin_reduction_block' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound]
+'OrientationDenseOrigin.determinant_reduction' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationDenseOrigin.determinant_valuation' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationDenseOrigin.integral_two_sided_inverse' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
