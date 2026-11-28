@@ -1,0 +1,10 @@
+digraph G {
+ rankdir=TB; graph [bgcolor="white",pad=.15]; node [shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="Helvetica",fontsize=12]; edge [fontname="Helvetica",fontsize=10];
+ owner [label="Committed generic polynomial jet\n10 statements / focused audit10/0/0"];
+ kernel [label="Actual curve jet: kernel I^n\n092/098/local048"];
+ growing [label="Actual coefficient space dimension2d+1\nNonzero h and norm degree<=2d+1\n094/100/local049"];
+ product [label="Distinct coordinate pairs / coprime powers\nProduct quotient dimension=sumlevels\n095/101/local050"];
+ residual [label="Construct integral J\n(h)=product(I_i^n_i)*J\nsumlevels+dim(R/J)<=2d+1\n096/102/local051",fillcolor="#dcefdc"];
+ open [label="OPEN: executable useful scalar relations\nSupport / residual logs / retry / full bit cost",style="rounded,dashed",fillcolor="white"];
+ owner->kernel;kernel->growing;kernel->product;growing->residual;product->residual;residual->open [style=dashed,label="requires new proof"];
+}

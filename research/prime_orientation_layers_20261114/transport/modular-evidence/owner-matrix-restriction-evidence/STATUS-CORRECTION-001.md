@@ -1,0 +1,3 @@
+# Administrative post-call self-binding correction
+
+Original postcall001 enumerated artifacts after opening itself,and thus recorded its own empty in-progress file as one artifact. That selfbinding is INVALID. All other original bindings match. The source/readonlyqualifier/importbuild/audit are unchanged and accepted at their original scope;no proof rerun was performed. Original postcall001/owner739ffeb bytes preserved. New postcall-correction001 snapshots complete prior files BEFORE exclusive creation and binds original receipt actual bytes. This correction is append-only and is not a signed verifier verdict. [pcc:unverified]

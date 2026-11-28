@@ -1,0 +1,196 @@
+{
+  "aa_symmetric_upper_bound": 2.651274730426937,
+  "bootstrap": {
+    "percentile_method": "linear interpolation at (N-1)*p",
+    "resamples": 100000,
+    "role": "descriptive_only",
+    "seed": 20261126
+  },
+  "comparisons": {
+    "legacy_aa": {
+      "denominator": "legacy-mitm-aa",
+      "descriptive_bootstrap_ci95": [
+        0.5611660435973567,
+        1.4755026353130325
+      ],
+      "median": 1.0963183146542161,
+      "numerator": "legacy-mitm",
+      "pair_keys": [
+        {
+          "algorithm_seed": "6267923901400743447",
+          "round": 1,
+          "workload_id": "W1b7e81d14e4e"
+        },
+        {
+          "algorithm_seed": "16638781638643934044",
+          "round": 2,
+          "workload_id": "W1b7e81d14e4e"
+        },
+        {
+          "algorithm_seed": "14457735782419604088",
+          "round": 3,
+          "workload_id": "W1b7e81d14e4e"
+        },
+        {
+          "algorithm_seed": "3284634150492312011",
+          "round": 4,
+          "workload_id": "W1b7e81d14e4e"
+        },
+        {
+          "algorithm_seed": "16166117938155091536",
+          "round": 5,
+          "workload_id": "W1b7e81d14e4e"
+        },
+        {
+          "algorithm_seed": "7411702603642335969",
+          "round": 6,
+          "workload_id": "W1b7e81d14e4e"
+        }
+      ],
+      "paired_ratios": [
+        1.4427702615408449,
+        0.7451550302403142,
+        1.5082350090852203,
+        0.3771770569543991,
+        1.2589035448289485,
+        0.9337330844794836
+      ],
+      "range": [
+        0.3771770569543991,
+        1.5082350090852203
+      ]
+    },
+    "legacy_over_batch": {
+      "denominator": "floor-batch-v1",
+      "descriptive_bootstrap_ci95": [
+        5.913591977850848,
+        11.93508383848595
+      ],
+      "median": 7.735928248865588,
+      "numerator": "legacy-mitm",
+      "pair_keys": [
+        {
+          "algorithm_seed": "6267923901400743447",
+          "round": 1,
+          "workload_id": "W1b7e81d14e4e"
+        },
+        {
+          "algorithm_seed": "16638781638643934044",
+          "round": 2,
+          "workload_id": "W1b7e81d14e4e"
+        },
+        {
+          "algorithm_seed": "14457735782419604088",
+          "round": 3,
+          "workload_id": "W1b7e81d14e4e"
+        },
+        {
+          "algorithm_seed": "3284634150492312011",
+          "round": 4,
+          "workload_id": "W1b7e81d14e4e"
+        },
+        {
+          "algorithm_seed": "16166117938155091536",
+          "round": 5,
+          "workload_id": "W1b7e81d14e4e"
+        },
+        {
+          "algorithm_seed": "7411702603642335969",
+          "round": 6,
+          "workload_id": "W1b7e81d14e4e"
+        }
+      ],
+      "paired_ratios": [
+        13.565886212744372,
+        5.125500547540567,
+        7.790540895304134,
+        6.701683408161128,
+        10.304281464227527,
+        7.681315602427042
+      ],
+      "range": [
+        5.125500547540567,
+        13.565886212744372
+      ]
+    },
+    "subtract_over_batch": {
+      "denominator": "floor-batch-v1",
+      "descriptive_bootstrap_ci95": [
+        2.161430018143128,
+        4.343861985773077
+      ],
+      "median": 2.864354224452774,
+      "numerator": "subtract-scalar",
+      "pair_keys": [
+        {
+          "algorithm_seed": "6267923901400743447",
+          "round": 1,
+          "workload_id": "W1b7e81d14e4e"
+        },
+        {
+          "algorithm_seed": "16638781638643934044",
+          "round": 2,
+          "workload_id": "W1b7e81d14e4e"
+        },
+        {
+          "algorithm_seed": "14457735782419604088",
+          "round": 3,
+          "workload_id": "W1b7e81d14e4e"
+        },
+        {
+          "algorithm_seed": "3284634150492312011",
+          "round": 4,
+          "workload_id": "W1b7e81d14e4e"
+        },
+        {
+          "algorithm_seed": "16166117938155091536",
+          "round": 5,
+          "workload_id": "W1b7e81d14e4e"
+        },
+        {
+          "algorithm_seed": "7411702603642335969",
+          "round": 6,
+          "workload_id": "W1b7e81d14e4e"
+        }
+      ],
+      "paired_ratios": [
+        3.5382968567664546,
+        1.865446832248725,
+        5.1494271147797,
+        2.457413204037531,
+        3.207660089110543,
+        2.5210483597950053
+      ],
+      "range": [
+        1.865446832248725,
+        5.1494271147797
+      ]
+    }
+  },
+  "decision": {
+    "admission_status": "not_evaluated",
+    "final_verdict": "requires_external_admission",
+    "legacy_pass": false,
+    "legacy_threshold": 50.0,
+    "required_external_admission": [
+      "exact source, binary, image and spec identity",
+      "all measured records admitted at L2",
+      "native replay and audit pass",
+      "native A/A admission pass",
+      "S3 payload hashes verified"
+    ],
+    "rule": "median(legacy/batch) >= 50 and strictly above max_i max(AA_i,1/AA_i); median(subtract/batch) strictly above the same symmetric A/A upper bound",
+    "significance_test": null,
+    "subtract_pass": true,
+    "timing_thresholds_met": false,
+    "timing_verdict": "goal_not_met"
+  },
+  "input": {
+    "measured_records": 30,
+    "path": "research/rootfind_e2e_measurement_20261127/local-run-busy/records.jsonl",
+    "records": 35,
+    "sha256": "8467aa21d144761c858b0910c609565835bf9f81bbed821f297771a1ac84db23",
+    "warmup_records": 5
+  },
+  "schema": "rootfind-production-analysis/v1"
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "pkm.rootfinder-e2e-local-validation/v1",
+  "purpose": "Local build and native planning only; not performance evidence or an admitted task image.",
+  "source_commit": "62a79cf21f43657aed7ca5c20d3400ee67bdee6c",
+  "build_command": "cargo build --release --no-default-features --locked --bin ecbench -j 2",
+  "build_exit_code": 0,
+  "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)",
+  "binary_sha256": "e5a99edc17710b0eb597d2a06b11e4497e7f82e79cee2d0dd0efd3d98fb8e5cd",
+  "binary_bytes": 135258864,
+  "build_log_sha256": "04b4247d8da98172354ac76ce9c88500d13c049f849903aa238e9184aa8e2ea9",
+  "host_sha256": "b53f2dbedb22714ad0a2cfbc50ccc7628884dccba11e43183d26cb103c8ba908",
+  "plans": [
+    {
+      "seed": 20261185,
+      "path": "plans/plan-20261185.json",
+      "sha256": "742aed7d88b8299819b93b1e780108b4c3f47219bbf7e9f7080a5b85b8034c0a",
+      "spec_id": "ECS1hca14aa7e8fe4",
+      "curve_slug": "icv1-fp13-tm13-9e2d11f6",
+      "subgroup_order": 4957,
+      "registered": false,
+      "workloads": 8,
+      "measured": 384,
+      "warmup": 64,
+      "paired_algorithm_seeds": true,
+      "planner_exit_code": 0
+    },
+    {
+      "seed": 20261221,
+      "path": "plans/plan-20261221.json",
+      "sha256": "ce9c6d26ed889029630b7eade7a13d85671529441c4ba317b4173559e3128e57",
+      "spec_id": "ECS1h7f6222185cb0",
+      "curve_slug": "icv1-fp13-tm101-1737775c",
+      "subgroup_order": 6113,
+      "registered": false,
+      "workloads": 8,
+      "measured": 384,
+      "warmup": 64,
+      "paired_algorithm_seeds": true,
+      "planner_exit_code": 0
+    },
+    {
+      "seed": 20261276,
+      "path": "plans/plan-20261276.json",
+      "sha256": "e97e954f15df755d0cfbac718505f147fae7d68c5e0a477b89534432e4728208",
+      "spec_id": "ECS1h04be2525674b",
+      "curve_slug": "icv1-fp13-tm137-9a89da76",
+      "subgroup_order": 7699,
+      "registered": false,
+      "workloads": 8,
+      "measured": 384,
+      "warmup": 64,
+      "paired_algorithm_seeds": true,
+      "planner_exit_code": 0
+    }
+  ],
+  "benchmark_executions_attempted": 0,
+  "performance_result": null
+}

@@ -3,15 +3,23 @@ on:
   workflow_dispatch:
     inputs:
       source_revision:
-        description: Full immutable source SHA; data is archived, never executed here
+        description: Full immutable executable-source SHA S; data is archived, never executed here
+        required: true
+        type: string
+      control_revision:
+        description: Full immutable control SHA F containing the finalized spec, plan, and protocol
         required: true
         type: string
       spec_path:
-        description: Frozen ECBench spec JSON at the source revision
+        description: Frozen ECBench spec JSON at the control revision
         required: true
         type: string
       protocol_path:
-        description: Frozen experiment protocol JSON at the source revision
+        description: Frozen experiment protocol JSON at the control revision
+        required: true
+        type: string
+      plan_path:
+        description: Deterministic ECBench plan JSON pinned by the protocol at the control revision
         required: true
         type: string
 permissions:
@@ -28,12 +36,15 @@ jobs:
       - name: Validate immutable source and input paths
         env:
           SOURCE_REVISION: ${{ inputs.source_revision }}
+          CONTROL_REVISION: ${{ inputs.control_revision }}
           SPEC_PATH: ${{ inputs.spec_path }}
           PROTOCOL_PATH: ${{ inputs.protocol_path }}
+          PLAN_PATH: ${{ inputs.plan_path }}
         run: |
           set -euo pipefail
           [[ "$SOURCE_REVISION" =~ ^[a-f0-9]{40}$ ]]
-          for relative in "$SPEC_PATH" "$PROTOCOL_PATH"; do
+          [[ "$CONTROL_REVISION" =~ ^[a-f0-9]{40}$ ]]
+          for relative in "$SPEC_PATH" "$PROTOCOL_PATH" "$PLAN_PATH"; do
             [[ "$relative" =~ ^[a-zA-Z0-9_./-]+\.json$ && "$relative" != /* && "/$relative/" != *'/../'* ]]
           done
       - name: Check out trusted workflow tooling
@@ -71,14 +82,26 @@ jobs:
             /docs/ic/calibration.json
             /research/pencil_large_prime_20261029/
             /research/five_leads_e2e_20261019/native/
+      - name: Check out finalized experiment controls as data
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ inputs.control_revision }}
+          path: experiment-control
+          persist-credentials: false
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
             /${{ inputs.spec_path }}
             /${{ inputs.protocol_path }}
+            /${{ inputs.plan_path }}
       - name: Mark the revision fetched by checkout as published
         env:
           SOURCE_REVISION: ${{ inputs.source_revision }}
+          CONTROL_REVISION: ${{ inputs.control_revision }}
         run: |
           set -euo pipefail
           test "$(git -C source rev-parse HEAD)" = "$SOURCE_REVISION"
+          test "$(git -C experiment-control rev-parse HEAD)" = "$CONTROL_REVISION"
           # A detached shallow checkout has no remote-tracking branch. The
           # trusted checkout just fetched this exact public revision; record
           # that provenance so checkpoint.sh need not bundle absent history.
@@ -92,8 +115,10 @@ jobs:
       - name: Upload checkpoint and verify readback
         env:
           SOURCE_REVISION: ${{ inputs.source_revision }}
+          CONTROL_REVISION: ${{ inputs.control_revision }}
           SPEC_PATH: ${{ inputs.spec_path }}
           PROTOCOL_PATH: ${{ inputs.protocol_path }}
+          PLAN_PATH: ${{ inputs.plan_path }}
           AWS_REGION: us-east-2
         run: |
           set -euo pipefail
@@ -103,7 +128,9 @@ jobs:
             sudo "$RUNNER_TEMP/aws-install/aws/install"
           fi
           bash control/taskq/deploy/eks-karpenter/checkpoint-source \
-            "$GITHUB_WORKSPACE/source" "$SOURCE_REVISION" "$SPEC_PATH" "$PROTOCOL_PATH" "$RUNNER_TEMP/source-checkpoint"
+            "$GITHUB_WORKSPACE/source" "$SOURCE_REVISION" \
+            "$GITHUB_WORKSPACE/experiment-control" "$CONTROL_REVISION" \
+            "$SPEC_PATH" "$PROTOCOL_PATH" "$PLAN_PATH" "$RUNNER_TEMP/source-checkpoint"
       - name: Retain non-secret checkpoint receipts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -116,5 +143,6 @@ jobs:
             ${{ runner.temp }}/source-checkpoint/gate.txt
             ${{ runner.temp }}/source-checkpoint/payload.sha256
             ${{ runner.temp }}/source-checkpoint/source-check.txt
+            ${{ runner.temp }}/source-checkpoint/control-check.txt
             ${{ runner.temp }}/source-checkpoint/payload-readback.txt
           if-no-files-found: warn
