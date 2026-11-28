@@ -254,13 +254,22 @@ export function runtimeInputs(cwd) {
 // than a hand-maintained exclusion list that can miss the next include_str!.
 export function embeddedInputs(cwd, sources = sourceFiles(cwd)) {
   const inputs = runtimeInputs(cwd);
+  const tracked = new Set(trackedFiles(cwd));
+  const manifestDir = file => {
+    let dir = path.posix.dirname(file);
+    for (;;) {
+      if (tracked.has(dir === '.' ? 'Cargo.toml' : `${dir}/Cargo.toml`)) return dir;
+      if (dir === '.') return '.'; // source-only fixtures use the checkout root
+      dir = path.posix.dirname(dir);
+    }
+  };
   for (const file of sources) {
     const text = sourceText(cwd, file);
     for (const match of text.matchAll(/include_(?:str|bytes)!\(\s*"([^"\n]+)"/g)) {
       inputs.add(path.posix.normalize(path.posix.join(path.posix.dirname(file), match[1])));
     }
     for (const match of text.matchAll(/include_(?:str|bytes)!\(\s*concat!\(\s*env!\("CARGO_MANIFEST_DIR"\),\s*"([^"\n]+)"/g)) {
-      inputs.add(match[1].replace(/^\//, ''));
+      inputs.add(path.posix.normalize(path.posix.join(manifestDir(file), match[1].replace(/^\//, ''))));
     }
   }
   return inputs;

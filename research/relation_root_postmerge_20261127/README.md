@@ -1,0 +1,17 @@
+# Relation integration after the native rootfinder merge
+
+This scope qualifies production source64856724f02a7819f5f407a9ce650292c576eca5, incorporating main addead2953bbe8b637351a0220f32a4e8a3d84d0. Exactly three production files changed from the previous repaired canonical context: f4_fp.rs, glv_invariant_base.rs and pkm_semaev.rs. Shared task/journal conflicts retain both sessions' entries. No upstream rootfinder algorithm or test was removed.
+
+The full production library and unchanged native harness compile with default-features=false. Fresh immutable workers pass36 original cases and108 matched pairs, including1116 mutation assertions and six unsupported refusals. Both unchanged separate auditors replay all144 proofs and reject the two original/five new sabotage views. Every181/433 mathematical payload file matches the preceding repaired canonical scope byte for byte. These are unsigned same-host results; native operation counts are not independently reexecuted. [pcc:unverified]
+
+`OUTCOME.json` binds this scope. `PLAN.json`, `SOURCE.sha256` and `LITERAL_POST_AUDIT.json` precede compilation; `PRECALL.json` precedes native calls. All552 tracked literal targets match Git and source pins remain unchanged. The initial literal audit records missing files removed by sparse-checkout reapplication; exact sparse patterns and indexed bytes were restored before admission. Earlier report, manifests, failure logs and the329-file payload index remain unchanged. [pcc:unverified]
+
+Use this directory's `SOURCE.sha256` at the merged PR source. The previous study's `CANONICAL_SOURCE.sha256` belongs to the earlier153fbfb45c91ae2fec81368f078d0328f8dfe92a evidence commit and deliberately differs on the three upstream files. The earlier two-page report describes that frozen scope; the identical payloads above link its mathematical results to this separately qualified integration.
+
+The two failed whole-default-feature libtest compiler attempts remain historical allocation failures. This scope does not attempt those configurations again or claim a full-current-root unit pass. Producer, checker and pruning source bytes are unchanged, so their completed component suites are not repeated.
+
+`native-postmerge.tar.gz` contains both complete mathematical cohorts. `NATIVE_PAYLOAD.sha256` uses paths relative to the archive extraction directory. `workers-postmerge.tar.gz` contains the two fresh immutable libtest workers; auditor workers remain in the previous study's `qualifiers-final.tar.gz`. Archive sidecars use repository-relative paths. Inspect source and custody records before executing local worker archives; hashes are not signed execution attestations.
+
+For fresh correctness calls, follow `build.sh`, `freeze-workers.py` and `run.sh` with NEW receipt/worker/output paths. Existing scripts refuse replacement. The profile is release opt0/LTOoff/debug0/codegen16, CPU0/jobs1, one numerical thread; it is not a performance profile. Stored-proof replay needs no root rebuild: use the two unchanged Rust auditors and frozen reference inputs as described in the previous study's `REPRODUCE.md`, pointing at the postmerge cohorts.
+
+No comparative timing ran and15× remains unachieved. The original full application-call boundary, strongest matched controls, both primes, n=3/4/6, seed7 LAST-star, repetitions/A/A and complete proofs remain required. Conductor and checkpoint/S3 waivers persist. The separate canonical timing-document dependency and full-call instrument qualification remain open. [pcc:unverified]

@@ -1,0 +1,42 @@
+{
+  "schema": "current-root-pairgraph-qualification/v1",
+  "prospective_before_build_and_calls": true,
+  "source": "CANDIDATE_SOURCE.sha256",
+  "root_delta": "pending-pairgraph.patch plus qualified producer prune.rs export; baseline-source preserves prior production bytes",
+  "build": "cargo test --release --locked --offline --manifest-path research/relation_root_runtime_20261127/harness/Cargo.toml --tests --no-run -j1",
+  "profile": "opt0/LTOoff/debug0/codegen16, current historical-integration default-features=false",
+  "cpu": 0,
+  "jobs_and_threads": 1,
+  "build_wall_seconds": 1800,
+  "build_address_space_bytes": 12884901888,
+  "runtime_wall_seconds": 1200,
+  "runtime_address_space_bytes": 2147483648,
+  "old_integration_cases": 36,
+  "new_matched_cases": 108,
+  "new_constructions": 216,
+  "new_mutations": 864,
+  "new_unsupported_refusals": 4,
+  "old_mutations": 252,
+  "old_unsupported_refusals": 2,
+  "forms": [
+    "compact-sparse",
+    "compact-dag",
+    "packed-sparse",
+    "packed-dag",
+    "flat-sparse",
+    "flat-dag"
+  ],
+  "kernels": [
+    "frontier103",
+    "products231",
+    "batch487"
+  ],
+  "fixed_prime_n_seed_graph": "both original primes,n3/4/6,seed7,LAST-star",
+  "strong_controls": "same original/proof/basis/replay stats across native checkers for every old form/kernel; old public API remains exhaustive",
+  "stats_scope": "native certification operation diagnostics only; no comparison of full application runtimes",
+  "unit_tests_followup": "entire producer lib and separate checker regression; full default-feature root-unit build remains separate",
+  "failure_policy": "retain every failure and change source only after a new context; no tests or algorithms removed",
+  "benchmark": false,
+  "15x_admitted": false,
+  "signed_verdict": false
+}

@@ -1,0 +1,15 @@
+{
+  "schema":"integrated-component-regression/v1",
+  "recorded_before_build_and_calls":true,
+  "source":"CANDIDATE_SOURCE.sha256",
+  "builds":["certified-relations --lib","certified-relations --lib --features count-field-ops","relation-replay-checker --lib"],
+  "roster":"entire existing lib suite in each configuration, no test filters; new producer module contributes six test functions",
+  "profile":"release opt0/LTOoff/debug0/codegen16; correctness only",
+  "cpu":0,
+  "jobs_and_threads":1,
+  "address_space_bytes":2147483648,
+  "wall_seconds_each":1200,
+  "worker_policy":"copy each freshly compiled worker to a distinct read-only path; record SHA256 and roster before calls",
+  "benchmark":false,
+  "signed_verdict":false
+}

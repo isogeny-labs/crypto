@@ -103,6 +103,7 @@ impl Fixture {
                 error: Some("synthetic codec fixture, no solver invocation".into()),
                 exit: None,
                 stderr_sha256: None,
+                batch: None,
             },
             cost: record::Cost {
                 unit: record::UNIT.into(),
@@ -115,6 +116,9 @@ impl Fixture {
                 total_gae_store: None,
                 s_store: None,
                 cost_basis: None,
+                batch_size: None,
+                total_gae_per_target: None,
+                s_per_target: None,
             },
             boundaries: record::Boundaries {
                 automorphisms_available: 2,
@@ -129,6 +133,7 @@ impl Fixture {
             fbm_id: None,
             detail: json!({"scope":"synthetic_codec_only"}),
             online: None,
+            study: None,
             solver: None,
             allocator: None,
             field_ops: None,

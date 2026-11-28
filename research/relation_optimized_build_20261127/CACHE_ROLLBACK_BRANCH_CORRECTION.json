@@ -1,0 +1,9 @@
+{
+  "schema": "cache-rollback-branch-correction/v1",
+  "executed_release_source": "initial-source/release-cache.py",
+  "executed_release_outcome": "CACHE_RELEASE_OUTCOME.json",
+  "rollback_branch_executed": false,
+  "static_correction": "Acquire archive member stream once before chunk loop; repeatedly reopening would attempt an invalid backward seek in streaming mode. Corrected before any restoration use.",
+  "restoration_is_not_claimed_tested": true,
+  "actual_release_and_worker_source_guards_unchanged": true
+}

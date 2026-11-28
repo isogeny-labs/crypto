@@ -1,0 +1,88 @@
+{
+  "schema": "optimized-build-final-feasibility-outcome/v1",
+  "initial_context_outcome_preserved": "OUTCOME.json",
+  "attempts": [
+    {
+      "step": "worker",
+      "address_space_GiB": 6,
+      "root_codegen_units": 16,
+      "exit": 101,
+      "source_postcheck_exit": 0,
+      "diagnostic": [
+        "memory allocation of 2097152 bytes failed"
+      ],
+      "result": "allocation failure SIGABRT6"
+    },
+    {
+      "step": "worker-as8",
+      "address_space_GiB": 8,
+      "root_codegen_units": 16,
+      "exit": 101,
+      "source_postcheck_exit": 0,
+      "diagnostic": [
+        "memory allocation of 107136 bytes failed"
+      ],
+      "result": "allocation failure SIGABRT6"
+    },
+    {
+      "step": "worker-as10",
+      "address_space_GiB": 10,
+      "root_codegen_units": 16,
+      "exit": 143,
+      "source_postcheck_exit": 0,
+      "diagnostic": [],
+      "result": "physical-memory supervisor refusal",
+      "refusal": {
+        "resource_refusal": true,
+        "target_bytes": 960240626,
+        "cgroup_memory_bytes": 16114987008,
+        "tmpfs_free_bytes": 2438209536,
+        "aggregate_compile_seconds": 1439
+      }
+    },
+    {
+      "step": "worker-cache-recovery",
+      "address_space_GiB": 10,
+      "root_codegen_units": 16,
+      "exit": 143,
+      "source_postcheck_exit": 0,
+      "diagnostic": [],
+      "result": "physical-memory supervisor refusal",
+      "refusal": {
+        "resource_refusal": true,
+        "target_bytes": 1233362517,
+        "cgroup_memory_bytes": 16153776128,
+        "tmpfs_free_bytes": 3512647680,
+        "aggregate_compile_seconds": 1674
+      }
+    },
+    {
+      "step": "worker-root256",
+      "address_space_GiB": 10,
+      "root_codegen_units": 256,
+      "exit": 101,
+      "source_postcheck_exit": 0,
+      "diagnostic": [
+        "memory allocation of 7471120 bytes failed"
+      ],
+      "result": "allocation failure SIGABRT6"
+    }
+  ],
+  "actual_source_modified": false,
+  "mathematical_inputs_or_algorithms_modified": false,
+  "source_postchecks_pass": true,
+  "optimized_worker_produced": false,
+  "optimized_units_native144_transport432": "unexecuted",
+  "historical_source_build_qualification": "unexecuted; current-success guard unmet",
+  "prepared_helpers_executed": false,
+  "protected_qualified_workers": 46,
+  "compiler_seconds_used": 1917,
+  "cgroup_oom_kill": 0,
+  "actual_application_performance_observations": 0,
+  "15x_admitted": false,
+  "intrinsic_regularity": null,
+  "actual_F4_solving_degree": null,
+  "canonical_protocol_validation": "pending; existing document-only question unanswered",
+  "signed_execution_attestation": false,
+  "interpretation": "These exact compiler/resource configurations failed or were refused; no general mathematical or build-impossibility conclusion. Existing opt0 source-scoped evidence remains separate."
+}

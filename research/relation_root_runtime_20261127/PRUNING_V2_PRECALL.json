@@ -1,0 +1,30 @@
+{
+  "unit_worker": {
+    "path": "/dev/shm/relation-root-workers-20261127/pruning-v2-unit",
+    "sha256": "8f9394588c6bd99e7c9f9484281bb5f2df6dce635563bd2400d0ea9e16c16933"
+  },
+  "driver": {
+    "path": "/dev/shm/relation-root-workers-20261127/pruning-v2",
+    "sha256": "94229faee79d80004c45a4814ed22e3d6625a272671653f02320159a6500ed38"
+  },
+  "source": "PRUNING_V2_SOURCE.sha256",
+  "inputs": "PRUNING_INPUTS.json",
+  "output": "/dev/shm/joint-pruning-v2-matrix-20261127",
+  "order": [
+    "unit12",
+    "scan6",
+    "replay6"
+  ],
+  "all_accepted_caps_required": [
+    2,
+    3,
+    4
+  ],
+  "cpu": 0,
+  "threads": 1,
+  "wall_seconds_each": 1200,
+  "address_space_bytes": 2147483648,
+  "file_limit_bytes": 134217728,
+  "performance_experiment": false,
+  "signed_verdict": false
+}
