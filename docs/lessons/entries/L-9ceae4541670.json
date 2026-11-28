@@ -1,0 +1,15 @@
+{
+  "action": "classify every file in the linked crypto_lib dep-info against the dep-info file's own mtime (rustc writes it once all sources are read, here 10 s after invocation): unmodified-before-invocation-and-equal-to-the-freeze, rewritten-later-and-changed-in-git, or modified-inside-the-build-window (the only failing class); add the reflog HEAD timeline (git reflog --date=unix) and the bench record's commit / commit_dirty at run start; tie the bin to the lib via the u64 in bin-<name>.json deps, which lib-<crate> stores as little-endian hex",
+  "created": "2026-11-28T05:14:51Z",
+  "evidence": [
+    "research/quartic_diem_p0lines_20261128/validation/checks_extra.json",
+    "research/quartic_diem_p0lines_20261128/validation/checks_extra.py"
+  ],
+  "kind": "lesson",
+  "schema": "crypto.lesson/v1",
+  "scope": [
+    "validator"
+  ],
+  "trigger": "binding a no-rebuild binary to its freeze commit when the producer's worktree was fast-forwarded or merged after the build (sources rewritten later, so mtimes after the compile no longer mean tampering)",
+  "why": "p0lines: worktree fast-forwarded 3 s after run start (03:45:46) and again at 04:00:32; 39 of 1187 lib sources had later mtimes, all changed in git by the merges; 1148 unmodified and equal to 7f67f384ece; reflog kept HEAD at the freeze 03:28:06-03:45:46 and benchrec said clean at 03:45:36"
+}
