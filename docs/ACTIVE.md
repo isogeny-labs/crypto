@@ -19,6 +19,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
+- [ ] Screen the shift-corrected Miller theta character for a P-192 scalar sign (Codex, started 2026-11-28, branch codex/p192-miller-theta-screen-20261128).
 - [x] Screen a coordinate-input Miller-function character for the P-192 scalar sign (Codex, completed 2026-11-28, branch codex/p192-miller-sign-screen-20261128, result PR #5410; fixed-shift P-192 doubling witness rejects exactness, with all order-97 markings replayed). [pcc:unverified]
 - [ ] Continue the 100 E(F_p) proposals with frozen #24 S4, #13 non-fibre transfer, and #75/#76/#84 partial-relation experiments (Codex, started 2026-11-28, branch codex/ec100-next-experiments-20261128, draft PR #5405)
 - [x] Screen exact pair support of held-out selected PKM maps against equal-size intervals (Codex, completed 2026-11-28, branch codex/pkm-z2xz8-pair-support-results-20261128, PR #5399; no consistent two-rung multi-row gain)
