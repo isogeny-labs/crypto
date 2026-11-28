@@ -131,7 +131,10 @@ impl Curve {
         let mut constant: Option<BigUint> = None;
         let mut first_shift = 0;
         let mut checked = 0;
-        for j in 2..80u32 {
+        // Each of the at most 2*bitlen(r) Miller line steps excludes at
+        // most three shifts per evaluation. This range leaves well over
+        // three valid shifts on the 192-bit prime-order P-192 group.
+        for j in 2..4096u32 {
             let s = self.scale(g, j.into());
             let qs = self.add(q, &s);
             if s.is_none() || qs.is_none() {
