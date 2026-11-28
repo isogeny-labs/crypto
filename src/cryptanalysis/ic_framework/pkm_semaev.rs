@@ -2641,7 +2641,9 @@ fn ug_gcd_half(a: Vec<u64>, b: Vec<u64>, p: u64, mults: &mut u64) -> Vec<u64> {
         let mat = ug_hgcd(&x, &y, p, mults);
         let (c, d) = ug_mat_apply(&mat, &x, &y, p, mults);
         if d.is_empty() {
+            // The remainder sequence ended inside the half-GCD: c is the gcd.
             x = c;
+            y = Vec::new();
             continue;
         }
         let r = ug_divmod(&c, &d, p, mults).1;
