@@ -66,7 +66,7 @@ This is an explicit witness for cheap *attempts* and eventual rank. Its
 nearly linear total count agrees with the enumeration boundary in
 [the prime-field program](RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md#1-generic-ceiling-in-the-units-this-repository-already-uses).
 The PDP and relation conventions follow
-[Kudo et al., *Complexity bounds on Semaev's naive index calculus method for ECDLP*](https://doi.org/10.1515/jmc-2019-0029).
+[Yokoyama et al., *Complexity bounds on Semaev's naive index calculus method for ECDLP*](https://doi.org/10.1515/jmc-2019-0029).
 
 ### 1.3 Binary fields — algebraic PDP (F4 on the Weil-descended system)
 
