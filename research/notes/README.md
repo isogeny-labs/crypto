@@ -17,6 +17,7 @@ its old name still identify it.
 |:--|:--|
 | [`RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md`](ecdlp-general/RESEARCH_COMPREHENSIVE_ECDLP_AUDIT_PLAN.md) | Proposed eight-workstream charter for an authorized audit of elliptic-curve private-key recovery: exact units, five-lane taxonomy, E0–E7 evidence, complete cost accounting, literature/incidents, cover-transfer closure, and independent governance. Planning artifact; no completion or attack claim |
 | [`RESEARCH_ECDLP_STATE_OF_THE_ART.md`](ecdlp-general/RESEARCH_ECDLP_STATE_OF_THE_ART.md) | The ECDLP: state of the art, 2025–2026 |
+| [`RESEARCH_EPRINT_2026_3020.md`](ecdlp-general/RESEARCH_EPRINT_2026_3020.md) | Liu, Zhang, and Ren on conditional deterministic subexponential discrete logarithms over prime fields. Includes the archived preprint and its SHA-256. |
 | [`RESEARCH_TORSION_AUXILIARY_INPUTS.md`](ecdlp-general/RESEARCH_TORSION_AUXILIARY_INPUTS.md) | Auxiliary inputs (Cheon) and torsion points against rho and index calculus |
 | [`RESEARCH_SRS_CHEON_CENSUS.md`](ecdlp-general/RESEARCH_SRS_CHEON_CENSUS.md) | Cheon's attack on deployed powers-of-tau setups: EIP-4844, Sapling, Filecoin, Ignition, PPoT |
 | [`RESEARCH_REPRESENTATION_STRUCTURE.md`](ecdlp-general/RESEARCH_REPRESENTATION_STRUCTURE.md) | Where exploitable structure can come from: the transfer pattern, an R1–R5 admissibility test for candidate handles, and why murmurations fail it |
