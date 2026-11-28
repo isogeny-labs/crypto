@@ -3300,6 +3300,24 @@ identity. The `pkm-semaev` oracle currently offers the affine chain through
 `m = 7` and a projective split only at `m = 3`; a general exact projective
 `m ≥ 4` oracle is not established by its existing chain mode.
 
+**Would a smoother auxiliary curve help?** The isogeny tower of §2.1
+already uses degree-two maps, the smallest nontrivial degree, and obtains a
+fully split `2^t)-point preimage on an auxiliary curve `E'`. Making
+`#E'(F_p)` more smooth could reduce the search and construction cost, which
+must be rebuilt for each target under the no-preprocessing rule. It does
+not add summation constraints or reduce the chain's separator width. In
+the measured isogeny family, F4's solving degree rises from 5 to 6 at
+`m = 2, N = 20` (§11.7), so smooth preimages have not supplied a
+depth-independent solver bound. A nonconstant `F_p)-morphism
+`E' → E` between elliptic curves is a translation of an isogeny;
+isogenous curves have the same number of `F_p)-points. Thus an
+auxiliary curve with `2^t | #E'(F_p)` cannot have such a map into a
+prime-order target `E(F_p)`. A map that does not preserve the elliptic
+addition law can still supply factor-base abscissae, as PKM does, but
+its smoothness alone gives no cancellation in `S_q`. The distinction
+is also developed in `research/ic_tree_gluing_20261103/THEORY.md`
+§1; that note's broader dichotomy is explicitly heuristic.
+
 **Cold cost and rank boundary.** The target-specialized `m = 7` Dickson
 tower plus six-`S₃` left chain in
 `research/pplus_dickson_m7_elimination_20261127/REPORT.md` rebuilds the
