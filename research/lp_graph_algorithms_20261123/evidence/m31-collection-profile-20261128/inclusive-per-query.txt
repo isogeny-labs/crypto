@@ -1,0 +1,31 @@
+one query (q2 - q1), inclusive; total 1.898 G instructions
+  3796.2 M 200.0%  rt::lang_start_internal
+  3796.2 M 200.0%  sys::backtrace::__rust_begin_short_backtrace::<fn(), ()>
+  2218.2 M 116.9%  prime31_graph_mitm_control::main
+  1898.1 M 100.0%  ./csu/../csu/libc-start.c:__libc_start_main@@GLIBC_2.34
+  1898.1 M 100.0%  ./csu/../sysdeps/nptl/libc_start_call_main.h:(below main)
+  1898.1 M 100.0%  ???:(below main)
+  1898.1 M 100.0%  ???:0x000000000001f530
+  1898.1 M 100.0%  ???:main
+  1898.1 M 100.0%  rt::lang_start::<()>::{closure#0}
+  1571.1 M  82.8%  <Arithmetic>::add
+  1406.4 M  74.1%  __umodti3
+   333.2 M  17.6%  <hash::random::RandomState as hash::BuildHasher>::hash_one::<&option::Option<(u64, u64)>>
+   299.6 M  15.8%  <hash::random::DefaultHasher as hash::Hasher>::write
+     2.1 M   0.1%  <&serde_json::value::Value as serde_ser::Serialize>::serialize::<serde_json::value::ser::Serializer>'2
+     2.0 M   0.1%  <serde_json::value::ser::Serializer as serde_ser::Serializer>::collect_seq::<&vec::Vec<serde_json::value::Value>>'2
+     1.3 M   0.1%  <serde_json::value::ser::Serializer as serde_ser::Serializer>::collect_seq::<&vec::Vec<serde_json::value::Value>>
+     1.3 M   0.1%  <&serde_json::value::Value as serde_ser::Serialize>::serialize::<serde_json::value::ser::Serializer>
+     1.3 M   0.1%  <serde_json::value::ser::SerializeMap as serde_ser::SerializeMap>::serialize_entry::<string::String, serde_json::value::Value>
+     1.0 M   0.1%  ptr::drop_glue::<serde_json::value::Value>'2
+     1.0 M   0.1%  <serde_json::value::Value as serde_ser::Serialize>::serialize::<&mut serde_json::ser::Serializer<&mut vec::Vec<u8>, serde_json::ser::PrettyF
+     0.9 M   0.0%  <serde_json::value::ser::SerializeMap as serde_ser::SerializeStruct>::serialize_field::<string::String>
+     0.9 M   0.0%  <serde_json::value::ser::NumberValueEmitter as serde_ser::Serializer>::serialize_str
+     0.9 M   0.0%  __rustc::__rdl_alloc
+     0.7 M   0.0%  <&mut serde_json::ser::Serializer<&mut vec::Vec<u8>, serde_json::ser::PrettyFormatter> as serde_ser::Serializer>::collect_seq::<&vec::Vec<se
+     0.6 M   0.0%  __rustc::__rdl_alloc_zeroed
+     0.6 M   0.0%  ptr::drop_glue::<serde_json::value::Value>
+     0.5 M   0.0%  <serde_json::ser::Compound<&mut vec::Vec<u8>, serde_json::ser::PrettyFormatter> as serde_ser::SerializeMap>::serialize_entry::<string::Strin
+     0.5 M   0.0%  <serde_json::value::Value as serde_ser::Serialize>::serialize::<&mut serde_json::ser::Serializer<&mut vec::Vec<u8>, serde_json::ser::PrettyF
+     0.5 M   0.0%  <&mut serde_json::ser::Serializer<&mut vec::Vec<u8>, serde_json::ser::PrettyFormatter> as serde_ser::Serializer>::collect_seq::<&vec::Vec<se
+     0.5 M   0.0%  <serde_json::ser::Compound<&mut vec::Vec<u8>, serde_json::ser::PrettyFormatter> as serde_ser::SerializeMap>::serialize_entry::<string::Strin
