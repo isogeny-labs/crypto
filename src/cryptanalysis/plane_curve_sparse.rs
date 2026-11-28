@@ -8,7 +8,7 @@
 use std::collections::BTreeMap;
 
 use super::koblitz_sparse_la::SparseRow;
-use super::plane_curve_geometry::PlaneCurve;
+use super::plane_curve_geometry::{PlaneCurve, PlaneLinePlace};
 use super::residual_walk::is_prime_u64;
 
 pub type RationalPlanePoint = [u32; 3];
@@ -123,5 +123,179 @@ impl PlaneRelationColumns {
             .map(|(&point, &coefficient)| (point, i64::from(coefficient)))
             .collect();
         self.encode(&coefficients, 0, 0, modulus)
+    }
+}
+
+/// Sparse columns for rational and degree-two places. A quadratic place
+/// represents the class `[Q - 2P0]`; a rational place represents `[P - P0]`.
+/// Principal line-ratio relations therefore use their original divisor
+/// multiplicities as logarithm coefficients.
+#[derive(Clone, Debug)]
+pub struct MixedPlaneRelationColumns {
+    base_point: RationalPlanePoint,
+    places: Vec<PlaneLinePlace>,
+    index: BTreeMap<PlaneLinePlace, u32>,
+}
+
+impl MixedPlaneRelationColumns {
+    pub fn new_certified(
+        curve: &PlaneCurve,
+        base_point: RationalPlanePoint,
+        places: Vec<PlaneLinePlace>,
+    ) -> Result<Self, &'static str> {
+        if !curve.certify_geometric_smoothness()? {
+            return Err("plane curve is geometrically singular");
+        }
+        Self::new(curve, base_point, places)
+    }
+
+    pub fn new(
+        curve: &PlaneCurve,
+        base_point: RationalPlanePoint,
+        places: Vec<PlaneLinePlace>,
+    ) -> Result<Self, &'static str> {
+        PlaneRelationColumns::new(curve, base_point, Vec::new())?;
+        if places.len() >= u32::MAX as usize {
+            return Err("too many factor-base columns");
+        }
+        let canonical_rational = |point: &[u32; 3]| {
+            point.iter().all(|&coordinate| coordinate < curve.p)
+                && point.iter().find(|&&coordinate| coordinate != 0) == Some(&1)
+                && curve.eval(*point) == 0
+                && curve.gradient(*point) != [0; 3]
+        };
+        let mut index = BTreeMap::new();
+        for (i, &place) in places.iter().enumerate() {
+            let valid = match place {
+                PlaneLinePlace::Rational(point) => {
+                    point != base_point && canonical_rational(&point)
+                }
+                PlaneLinePlace::Quadratic(key) => curve.valid_quadratic_line_place(&key),
+            };
+            if !valid || index.insert(place, i as u32).is_some() {
+                return Err("invalid or repeated factor-base place");
+            }
+        }
+        Ok(Self {
+            base_point,
+            places,
+            index,
+        })
+    }
+
+    pub fn columns(&self) -> usize {
+        self.places.len() + 1
+    }
+
+    pub fn target_column(&self) -> u32 {
+        self.places.len() as u32
+    }
+
+    pub fn encode(
+        &self,
+        coefficients: &BTreeMap<PlaneLinePlace, i64>,
+        target_coeff: i64,
+        rhs: i128,
+        modulus: u64,
+    ) -> Result<SparseRow<u64>, &'static str> {
+        if modulus < 3 || modulus >= (1u64 << 63) || !is_prime_u64(modulus) {
+            return Err("modulus must be an odd prime below 2^63");
+        }
+        let reduced = |value: i128| value.rem_euclid(modulus as i128) as u64;
+        let mut entries = Vec::with_capacity(coefficients.len() + 1);
+        for (&place, &coefficient) in coefficients {
+            if place == PlaneLinePlace::Rational(self.base_point) {
+                continue;
+            }
+            let Some(&column) = self.index.get(&place) else {
+                return Err("relation uses a place outside the factor base");
+            };
+            entries.push((column, reduced(coefficient as i128)));
+        }
+        entries.push((self.target_column(), reduced(target_coeff as i128)));
+        Ok(SparseRow::new(entries, reduced(rhs), modulus))
+    }
+
+    pub fn encode_line_relation(
+        &self,
+        relation: &BTreeMap<PlaneLinePlace, i32>,
+        modulus: u64,
+    ) -> Result<SparseRow<u64>, &'static str> {
+        let coefficients = relation
+            .iter()
+            .map(|(&place, &coefficient)| (place, i64::from(coefficient)))
+            .collect();
+        self.encode(&coefficients, 0, 0, modulus)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::cryptanalysis::plane_curve_geometry::PlaneTerm;
+
+    #[test]
+    fn mixed_conic_relation_maps_to_sparse_columns() {
+        let curve = PlaneCurve::new(
+            3,
+            2,
+            &[
+                PlaneTerm {
+                    x_exp: 2,
+                    y_exp: 0,
+                    z_exp: 0,
+                    coeff: 1,
+                },
+                PlaneTerm {
+                    x_exp: 0,
+                    y_exp: 2,
+                    z_exp: 0,
+                    coeff: 1,
+                },
+                PlaneTerm {
+                    x_exp: 0,
+                    y_exp: 0,
+                    z_exp: 2,
+                    coeff: 1,
+                },
+            ],
+        )
+        .unwrap();
+        let relation = curve
+            .certified_line_relation_degree_two(([1, 0, 0], [0, 1, 0]), ([1, 1, 0], [0, 0, 1]))
+            .unwrap()
+            .unwrap();
+        let base_point = relation
+            .keys()
+            .find_map(|place| match place {
+                PlaneLinePlace::Rational(point) => Some(*point),
+                PlaneLinePlace::Quadratic(_) => None,
+            })
+            .unwrap();
+        let places: Vec<_> = relation
+            .keys()
+            .copied()
+            .filter(|place| *place != PlaneLinePlace::Rational(base_point))
+            .collect();
+        let columns =
+            MixedPlaneRelationColumns::new_certified(&curve, base_point, places.clone()).unwrap();
+        assert_eq!(columns.columns(), 3);
+        let row = columns.encode_line_relation(&relation, 7).unwrap();
+        assert_eq!(row.rhs, 0);
+        assert_eq!(row.entries, vec![(0, 6), (1, 1)]);
+        assert!(columns.encode_line_relation(&relation, 9).is_err());
+        assert!(
+            MixedPlaneRelationColumns::new(&curve, base_point, places[1..].to_vec())
+                .unwrap()
+                .encode_line_relation(&relation, 7)
+                .is_err()
+        );
+        let mut forged = places.clone();
+        for place in &mut forged {
+            if let PlaneLinePlace::Quadratic(key) = place {
+                key.point[0][0] = 0;
+            }
+        }
+        assert!(MixedPlaneRelationColumns::new(&curve, base_point, forged).is_err());
     }
 }
