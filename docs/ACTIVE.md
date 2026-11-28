@@ -19,7 +19,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Freeze source-specific arithmetic calibration for the selected PKM map (Codex, started 2026-11-28, branch codex/pkm-selected-primitive-price-20261128)
+- [ ] Freeze source-specific arithmetic calibration for the selected PKM map (Codex, started 2026-11-28, branch codex/pkm-selected-primitive-price-20261128, PR #5390)
 - [ ] Count selected-tower coefficient and Vélu field work in the PKM setup ledger (Codex, started 2026-11-28, branch codex/pkm-selected-field-ledger-20261128, draft PR #5388).
 - [ ] Freeze and publish quiet-host field-multiplication prices for the six held-out PKM primes (Codex, started 2026-11-28, branch codex/pkm-heldout-fp-price-20261128, draft PR #5387 stacked on #5386).
 - [x] Publish the source-pinned PKM X1(2,8) held-out cold cohort and resumable runner (Codex, started 2026-11-28, branch codex/pkm-heldout-cold-cohort-20261128, PR #5386; frozen inputs and control plane published, cold measurements pending the host gate).
