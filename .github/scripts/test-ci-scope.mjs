@@ -192,6 +192,28 @@ test('real git diffs include renames, deletes, unusual names and over 300 files'
   } finally { rmSync(cwd, { recursive: true, force: true }); }
 });
 
+test('manifest-relative embeds in nested crates stay inside the checkout', () => {
+  const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-nested-embed-'));
+  const git = (...args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();
+  const write = (file, text) => { mkdirSync(path.dirname(path.join(cwd, file)), { recursive: true }); writeFileSync(path.join(cwd, file), text); };
+  try {
+    git('init', '-q'); git('config', 'user.email', 'ci@example.invalid'); git('config', 'user.name', 'CI scope test');
+    write('Cargo.toml', '[package]\nname="root"\nversion="0.1.0"\n[dependencies]\nnested = { path = "crates/nested" }\n');
+    write('src/lib.rs', 'pub fn root() {}\n');
+    write('crates/nested/Cargo.toml', '[package]\nname="nested"\nversion="0.1.0"\n');
+    write('crates/nested/src/lib.rs', 'const DATA: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/../../research/witness.csv"));\n');
+    write('research/witness.csv', 'one,two\n');
+    git('add', '.'); git('commit', '-qm', 'nested embed');
+    assert.deepEqual([...embeddedInputs(cwd)], ['research/witness.csv']);
+    git('sparse-checkout', 'set', '--no-cone', '/Cargo.toml', '/src/', '/crates/nested/Cargo.toml', '/crates/nested/src/');
+    materializeInputs(cwd);
+    assert.equal(existsSync(path.join(cwd, 'research/witness.csv')), true);
+    write('crates/nested/src/lib.rs', 'const BAD: &str = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/../../../outside.csv"));\n');
+    git('add', '.'); git('commit', '-qm', 'escaping embed');
+    assert.throws(() => materializeInputs(cwd), /compile-time input escapes the checkout/);
+  } finally { rmSync(cwd, { recursive: true, force: true }); }
+});
+
 test('sparse compilation restores only embedded inputs, preserving archived files off disk', () => {
   const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-ci-inputs-'));
   const git = (...args) => execFileSync('git', args, { cwd, encoding: 'utf8' }).trim();

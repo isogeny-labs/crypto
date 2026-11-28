@@ -1,0 +1,11 @@
+{
+  "schema": "raw-records-archive/v1",
+  "sha256": "ca313aebbf779d0bdd900779f6c396c66b2941b405ff732a248788472d7d7978",
+  "bytes": 34632,
+  "verified_file_members": 102,
+  "every_member_byte_matches": true,
+  "deterministic_command": "tar --sort=name --mtime='2026-11-27 00:00:00Z' --owner=0 --group=0 --numeric-owner --mode='u+rwX,go+rX,go-w' --format=gnu -cf - raw attempt-v1/raw report.aux report.log report.out | xz -6 -T1 > run-records.tar.xz",
+  "loose_exception": "six case exit/stderr pairs consumed directly by Rust replay; other raw logs archived",
+  "index_setup_error": "first Python index command used repository-relative path from study cwd and failed before writing; corrected here, archive members/bytes fully checked",
+  "generated_tex_logs": "retained byte-exactly in archive after diff-check flags generated trailing whitespace; not trimmed"
+}

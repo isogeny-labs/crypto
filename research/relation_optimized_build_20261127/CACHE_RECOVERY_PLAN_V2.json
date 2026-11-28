@@ -1,0 +1,34 @@
+{
+  "schema": "reversible-cache-memory-recovery-plan/v2",
+  "created_utc": "2026-11-27T21:39:47.788088+00:00",
+  "previous_build_plan_result": "OUTCOME.json (three failed/refused contexts, not overwritten)",
+  "scope": "Rebuildable compiler outputs only, exact34file inventory; no source, proof, algorithm, test, key, gate or qualified executable removal.",
+  "selected_directories": [
+    "/dev/shm/relation-root-build-20261127/release/build/crypto/e7435ac0b284a6c7",
+    "/dev/shm/relation-root-build-20261127/release/build/crypto/37b9da3435de8dd7",
+    "/dev/shm/relation-root-build-20261127/release/build/crypto/b1af7d8773d35e6c"
+  ],
+  "inventory": "CACHE_FILE_INVENTORY.json",
+  "protected_workers": "FROZEN_WORKER_GUARD_BEFORE.json",
+  "backup": "/dev/shm/relation-opt-cache-backup-20261127.tar.xz",
+  "backup_creation": "CPU0/thread1 xz-level1, no cloud compute",
+  "before_release": [
+    "Exact backup/file roster bytes/modes verified",
+    "At least1GiB net eligible headroom",
+    "All inspectable live same-user selected references absent; no live same-user compiler",
+    "Frozen worker hashes unchanged before/after; actual filesystem reclamation >=1GiB or restore"
+  ],
+  "release": "Unlink only exact inventoried cache files after verified backup, retain directories and backup for byte-exact restoration. Original source/evidence and all other caches stay untouched.",
+  "followup": "One additional unchanged-codegen AS10 attempt under existing15GiB cgroup monitor,1.5GiB target threshold and3600aggregate compiler seconds including prior1440. No further AS increase.",
+  "reversible": true,
+  "compiler_seconds_budget_includes_prior_attempts": true,
+  "performance_observations": 0,
+  "15x_admitted": false,
+  "process_visibility_refinement": {
+    "initial_guard_result": "Backup bytes/modes/roster pass; initial all-procfs-readable assertion fails before release.",
+    "observed": "Every unreadable current-UID context is zombie; other-UID contexts are runuser/rootless-container services. Their references are unknown, not claimed absent.",
+    "current_guard": "Refuse any known selected reference or live same-user compiler; inspect all live same-user contexts. Keep exact verified backup; measure actual filesystem reclamation, restore selected cache if below1GiB. Open files/mappings retain their bytes across Unix unlink. No process is killed.",
+    "mathematical_and_frozen_evidence_checks_unchanged": true
+  },
+  "release_script_sha256": "58f67706d37543f9bc41aedb85e7676286c447eb884c7874a711f0b13f0e4aa0"
+}

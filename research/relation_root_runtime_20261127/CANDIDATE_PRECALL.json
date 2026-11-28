@@ -1,0 +1,29 @@
+{
+  "workers": {
+    "candidate-original": {
+      "path": "/dev/shm/relation-root-workers-20261127/candidate-original",
+      "sha256": "bd60e75a05177bd2648e4971c5c02292f1ab5018968ad21c819493528c05e55f"
+    },
+    "candidate-pairgraph": {
+      "path": "/dev/shm/relation-root-workers-20261127/candidate-pairgraph",
+      "sha256": "cb9c487e9f3e92ac4cd36d9a9974234cac2fd19104f86e7cfa5915122be63677"
+    }
+  },
+  "source": "CANDIDATE_SOURCE.sha256",
+  "cpu": 0,
+  "threads": 1,
+  "old_output": "/dev/shm/root-native-candidate-original-20261127",
+  "new_output": "/dev/shm/root-native-pairgraph-20261127",
+  "sequence": [
+    "original2tests36cases",
+    "pairgraph2tests108pairs",
+    "separate_old_proof_audit"
+  ],
+  "expected_old_mutations": 252,
+  "expected_new_mutations": 864,
+  "old_unsupported": 2,
+  "new_unsupported": 4,
+  "benchmark": false,
+  "native_operation_counts_independently_reexecuted_by_separate_auditor": false,
+  "signed_verdict": false
+}
