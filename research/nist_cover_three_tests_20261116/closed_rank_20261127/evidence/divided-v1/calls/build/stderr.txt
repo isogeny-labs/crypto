@@ -1,0 +1,109 @@
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:30:76: error: reference to ‘SSL’ is ambiguous
+   30 | void division_check(const Point& divided,const Point& original,int m,const SSL& ssl) {
+      |                                                                            ^~~
+In file included from /usr/include/openssl/ec.h:21,
+                 from /workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/norm_arithmetic.hpp:2,
+                 from /workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/norms.cpp:1,
+                 from /workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:2:
+/usr/include/openssl/types.h:198:23: note: candidates are: ‘typedef struct ssl_st SSL’
+  198 | typedef struct ssl_st SSL;
+      |                       ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/norm_arithmetic.hpp:42:8: note:                 ‘struct audit::SSL’
+   42 | struct SSL {
+      |        ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp: In function ‘void divided_test::division_check(const audit::Point&, const audit::Point&, int, const int&)’:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:32:16: error: request for member ‘make’ in ‘ssl’, which is of non-class type ‘const int’
+   32 |     auto p=ssl.make(divided),result=ssl.make({});
+      |                ^~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:32:48: error: expected ‘,’ or ‘;’ before ‘)’ token
+   32 |     auto p=ssl.make(divided),result=ssl.make({});
+      |                                                ^
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:34:30: error: request for member ‘group’ in ‘ssl’, which is of non-class type ‘const int’
+   34 |     require(EC_POINT_mul(ssl.group.get(),result.get(),nullptr,p.get(),scalar.get(),ssl.context.get())==1,
+      |                              ^~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:34:42: error: ‘result’ was not declared in this scope
+   34 |     require(EC_POINT_mul(ssl.group.get(),result.get(),nullptr,p.get(),scalar.get(),ssl.context.get())==1,
+      |                                          ^~~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:34:88: error: request for member ‘context’ in ‘ssl’, which is of non-class type ‘const int’
+   34 |     require(EC_POINT_mul(ssl.group.get(),result.get(),nullptr,p.get(),scalar.get(),ssl.context.get())==1,
+      |                                                                                        ^~~~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:36:17: error: request for member ‘encode’ in ‘ssl’, which is of non-class type ‘const int’
+   36 |     require(ssl.encode(result.get())==key(original),"named-curve divided point multiplication back");
+      |                 ^~~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp: At global scope:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:39:74: error: reference to ‘SSL’ is ambiguous
+   39 | bool ssl_row_zero(const Sparse& row,const std::vector<Point>& base,const SSL& ssl) {
+      |                                                                          ^~~
+/usr/include/openssl/types.h:198:23: note: candidates are: ‘typedef struct ssl_st SSL’
+  198 | typedef struct ssl_st SSL;
+      |                       ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/norm_arithmetic.hpp:42:8: note:                 ‘struct audit::SSL’
+   42 | struct SSL {
+      |        ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp: In function ‘bool divided_test::ssl_row_zero(const norm_test::Sparse&, const std::vector<audit::Point>&, const int&)’:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:40:18: error: request for member ‘make’ in ‘ssl’, which is of non-class type ‘const int’
+   40 |     auto sum=ssl.make({}),term=ssl.make({});
+      |                  ^~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:40:43: error: expected ‘,’ or ‘;’ before ‘)’ token
+   40 |     auto sum=ssl.make({}),term=ssl.make({});
+      |                                           ^
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:42:20: error: request for member ‘make’ in ‘ssl’, which is of non-class type ‘const int’
+   42 |         auto p=ssl.make(base.at(size_t(column)));
+      |                    ^~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:44:34: error: request for member ‘group’ in ‘ssl’, which is of non-class type ‘const int’
+   44 |         require(EC_POINT_mul(ssl.group.get(),term.get(),nullptr,p.get(),scalar.get(),ssl.context.get())==1,
+      |                                  ^~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:44:46: error: ‘term’ was not declared in this scope; did you mean ‘tm’?
+   44 |         require(EC_POINT_mul(ssl.group.get(),term.get(),nullptr,p.get(),scalar.get(),ssl.context.get())==1,
+      |                                              ^~~~
+      |                                              tm
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:44:90: error: request for member ‘context’ in ‘ssl’, which is of non-class type ‘const int’
+   44 |         require(EC_POINT_mul(ssl.group.get(),term.get(),nullptr,p.get(),scalar.get(),ssl.context.get())==1,
+      |                                                                                          ^~~~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:46:54: error: request for member ‘group’ in ‘ssl’, which is of non-class type ‘const int’
+   46 |         if(coefficient<0)require(EC_POINT_invert(ssl.group.get(),term.get(),ssl.context.get())==1,
+      |                                                      ^~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:46:81: error: request for member ‘context’ in ‘ssl’, which is of non-class type ‘const int’
+   46 |         if(coefficient<0)require(EC_POINT_invert(ssl.group.get(),term.get(),ssl.context.get())==1,
+      |                                                                                 ^~~~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:48:34: error: request for member ‘group’ in ‘ssl’, which is of non-class type ‘const int’
+   48 |         require(EC_POINT_add(ssl.group.get(),sum.get(),sum.get(),term.get(),ssl.context.get())==1,
+      |                                  ^~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:48:81: error: request for member ‘context’ in ‘ssl’, which is of non-class type ‘const int’
+   48 |         require(EC_POINT_add(ssl.group.get(),sum.get(),sum.get(),term.get(),ssl.context.get())==1,
+      |                                                                                 ^~~~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:51:40: error: request for member ‘group’ in ‘ssl’, which is of non-class type ‘const int’
+   51 |     return EC_POINT_is_at_infinity(ssl.group.get(),sum.get())==1;
+      |                                        ^~~~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp: In function ‘divided_test::Search divided_test::search(const std::vector<audit::Point>&, const audit::Point&, const norm_test::Sparse&, const std::string&)’:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:93:5: error: reference to ‘SSL’ is ambiguous
+   93 |     SSL ssl;
+      |     ^~~
+/usr/include/openssl/types.h:198:23: note: candidates are: ‘typedef struct ssl_st SSL’
+  198 | typedef struct ssl_st SSL;
+      |                       ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/norm_arithmetic.hpp:42:8: note:                 ‘struct audit::SSL’
+   42 | struct SSL {
+      |        ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:105:34: error: ‘ssl’ was not declared in this scope
+  105 |             division_check(q,p,m,ssl);
+      |                                  ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:110:39: error: ‘ssl’ was not declared in this scope
+  110 |         division_check(target,kappa,m,ssl);
+      |                                       ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:144:39: error: ‘ssl’ was not declared in this scope
+  144 |         require(ssl_row_zero(row,base,ssl),"named-curve primitive candidate group sum");
+      |                                       ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp: In function ‘int divided_test::run(int, char**)’:
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:198:5: error: reference to ‘SSL’ is ambiguous
+  198 |     SSL ssl;
+      |     ^~~
+/usr/include/openssl/types.h:198:23: note: candidates are: ‘typedef struct ssl_st SSL’
+  198 | typedef struct ssl_st SSL;
+      |                       ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/norm_arithmetic.hpp:42:8: note:                 ‘struct audit::SSL’
+   42 | struct SSL {
+      |        ^~~
+/workspace/crypto-p192-verification/research/nist_cover_three_tests_20261116/closed_rank_20261127/evidence/divided-v1/source/divided.cpp:199:50: error: ‘ssl’ was not declared in this scope
+  199 |     const auto generator=EC_GROUP_get0_generator(ssl.group.get());
+      |                                                  ^~~

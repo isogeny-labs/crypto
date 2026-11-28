@@ -1756,6 +1756,43 @@ compress the separate oriented `y` product. No bias or cold
 evaluation claim follows from the selected markings.
 [pcc:unverified]
 
+### Exact Vandermonde orientation and direct-product gate
+
+The same unordered rational-subgroup roots give an exact **ordered**
+sign formula. For `n=(r−1)/2`, define
+`V(P)=∏_{1≤i<j≤n}(x([i]P)−x([j]P))` with the displayed index order.
+Multiplication by `d` permutes the signed classes
+`(Z/rZ)×/{±1}`. Here `r≡1 (mod 4)` and `n` is even. A primitive
+root rotates these `n` classes by one position, a permutation
+of sign `−1`; its quadratic character modulo `r` is also `−1`.
+Thus the permutation sign of multiplication by any `d` is
+`χ_r(d)`, and
+`V([d]G)/V(G)=χ_r(d)` as a field element. Because P-192 has
+`p≡3 (mod 4)`, its field quadratic character also reads this
+ratio as `χ_r(d)`. This is an exact point-dependent characteristic,
+but the direct definition has `n(n−1)/2` pair factors.
+
+The division-polynomial difference formula reduces each pair to
+`x([i]P)−x([j]P)=ψ_(i+j)(P)ψ_(j−i)(P)/(ψ_i(P)²ψ_j(P)²)`
+for `i<j`. Modulo squares, only the parity of each `ψ_k` exponent
+matters. For `1≤k≤n` and even `n`, the exponents at `k` and
+`r−k` have parity respectively
+`⌊(k−1)/2⌋+n−k` and `⌊k/2⌋`.
+Their sum is `n−1` modulo two, hence **exactly one** of each
+opposite-index pair survives. The reduced product has exactly
+`n=3138550867693340381917894711588029506883597386591421142040`
+division-polynomial factors, about `2^191`; this exceeds the
+`2^95.8` rho reference by about `2^95.2` in factor count alone.
+This gates the explicit pair-difference expansion, not all possible
+ways to evaluate `V` or its character. No below-reference method
+for its square-root branch follows from the identity.
+
+[`vandermonde_sign_gate.sage`](vandermonde_sign_gate.sage) checks
+the exact field ratio, quadratic character, pair-expansion parity,
+and support size for all 48 signed marks on each of two order-97
+curves. The P-192 factor count is derived symbolically; the replay
+does not form that product. [pcc:unverified]
+
 ### Trace-index division-polynomial residue screen
 
 A separate fixed-index screen evaluated the quadratic character

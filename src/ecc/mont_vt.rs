@@ -30,9 +30,16 @@ pub(crate) struct Mont<const N: usize> {
     one: [u64; N],
     /// `R³ mod p`: converts a plain inverse `(aR)⁻¹` back to `a⁻¹R`.
     r3: [u64; N],
-    /// `p` followed by `n0` (`pn0[N] = n0`), contiguous for the ADX kernel,
-    /// which reads both through one pointer register.
-    pn0: [u64; 10],
+    /// `p`, `n0`, `H = (n0·p + 1)/2^64` and `n1` (`pn0[N] = n0`,
+    /// `pn0[N+1..2N+1] = H`, `pn0[2N+1] = n1` with `n0 + n1·2^64 = -p⁻¹ mod
+    /// 2^128`), contiguous for the ADX kernels, which read them through one
+    /// pointer register.  `H` is the quotient-pipelining constant of
+    /// [`mont_mul4_adx_qp`] / [`mont_mul6_adx_qp`], `n1` the two-word factor's
+    /// high word for [`mont_mul4_adx_tw`] / [`mont_mul6_adx_tw`].
+    pn0: [u64; 20],
+    /// `p` in 52-bit limbs (`⌈64N/52⌉` used, zero padded) for the IFMA
+    /// kernels.
+    p52: [u64; 8],
 }
 
 fn limbs<const N: usize>(v: &BigUint) -> Option<[u64; N]> {
@@ -80,6 +87,23 @@ fn sub_in_place<const N: usize>(a: &mut [u64; N], b: &[u64; N]) -> bool {
 }
 
 impl<const N: usize> Mont<N> {
+    /// The modulus words (for kernels outside this file).
+    #[allow(dead_code)] // unused where this file is included by path
+    #[inline(always)]
+    pub(crate) fn p_words(&self) -> &[u64; N] {
+        &self.p
+    }
+
+    /// `p` as `L = ⌈64N/52⌉`-limb 52-bit words (padded to 8) and
+    /// `-p⁻¹ mod 2^52`, for the IFMA kernels (`ecc::mont_ifma`).
+    #[allow(dead_code)] // unused where this file is included by path
+    #[inline(always)]
+    pub(crate) fn ifma_consts(&self) -> (&[u64; 8], u64) {
+        (&self.p52, self.n0 & ((1u64 << 52) - 1))
+    }
+}
+
+impl<const N: usize> Mont<N> {
     /// The context for `modulus`, or `None` if it is even, below 3, or
     /// wider than `N` words.
     pub(crate) fn new(modulus: &BigUint) -> Option<Self> {
@@ -96,9 +120,35 @@ impl<const N: usize> Mont<N> {
         let one = limbs::<N>(&(&r % modulus))?;
         let r2 = limbs::<N>(&((&r * &r) % modulus))?;
         let r3 = limbs::<N>(&((&r * &r * &r) % modulus))?;
-        let mut pn0 = [0u64; 10];
+        let mut pn0 = [0u64; 20];
         pn0[..N].copy_from_slice(&p);
         pn0[N] = inv.wrapping_neg();
+        // H = (n0·p + 1)/2^64 < 2^(64N): n0·p ≡ -1 mod 2^64, so exact.
+        let h: BigUint = (modulus * BigUint::from(inv.wrapping_neg()) + 1u32) >> 64usize;
+        for (k, d) in h.iter_u64_digits().enumerate() {
+            pn0[N + 1 + k] = d;
+        }
+        // n1: high word of -p⁻¹ mod 2^128 (one more Newton step in u128).
+        let p128 = p[0] as u128 | ((if N > 1 { p[1] } else { 0 }) as u128) << 64;
+        let mut inv128 = inv as u128;
+        inv128 = inv128.wrapping_mul(2u128.wrapping_sub(p128.wrapping_mul(inv128)));
+        let n128 = inv128.wrapping_neg();
+        debug_assert_eq!(n128 as u64, inv.wrapping_neg());
+        pn0[2 * N + 1] = (n128 >> 64) as u64;
+        // p in 52-bit limbs (up to 8 = 416 bits; zero beyond).
+        let mut p52 = [0u64; 8];
+        for (k, w) in p52.iter_mut().enumerate() {
+            let bit = 52 * k;
+            if bit >= 64 * N {
+                break;
+            }
+            let (i, o) = (bit / 64, bit % 64);
+            let mut v = p[i] >> o;
+            if o > 12 && i + 1 < N {
+                v |= p[i + 1] << (64 - o);
+            }
+            *w = v & ((1u64 << 52) - 1);
+        }
         Some(Mont {
             p,
             n0: inv.wrapping_neg(),
@@ -106,6 +156,7 @@ impl<const N: usize> Mont<N> {
             one,
             r3,
             pn0,
+            p52,
         })
     }
 
@@ -776,6 +827,2061 @@ pub(crate) unsafe fn mont_mul4_adx(a: &[u64; 4], b: &[u64; 4], pn0: &[u64]) -> [
     t
 }
 
+/// `a·b·R⁻¹ mod p` for six-word `a, b < p` by CIOS on `mulx`/`adcx`/`adox`,
+/// in `[0, p)`: [`mont_mul4_adx`] widened to six limbs.  `pn0` is
+/// `[p₀, …, p₅, n0]`.
+///
+/// Eight accumulator words, the `mulx` multiplier, two product halves, a
+/// zero and three pointers need fifteen registers, two more than Rust lets
+/// inline asm name (`rbx` and `rbp` are reserved), so the block saves `rbx`
+/// and `rbp` on the stack, uses them as accumulators and restores them
+/// before it ends (no operand is addressed through either).
+///
+/// # Safety
+/// The CPU must support ADX and BMI2 ([`has_adx`]).
+#[cfg(target_arch = "x86_64")]
+#[inline]
+pub(crate) unsafe fn mont_mul6_adx(a: &[u64; 6], b: &[u64; 6], pn0: &[u64]) -> [u64; 6] {
+    debug_assert!(pn0.len() >= 7);
+    // Six rows as in mont_mul4_adx; the accumulators rotate through
+    // r8..r13, rbx, rbp (t_j of row i is register (i + j) mod 8).
+    // rsi = a, rdi = b, rcx = [p₀..p₅, n0], rax = 0 after each xor.
+    let (t0, t1, t2, t3, t4, t5, t6): (u64, u64, u64, u64, u64, u64, u64);
+    core::arch::asm!(
+        "push rbx",
+        "push rbp",
+        "xor r8d, r8d",
+        "xor r9d, r9d",
+        "xor r10d, r10d",
+        "xor r11d, r11d",
+        "xor r12d, r12d",
+        "xor r13d, r13d",
+        "xor ebx, ebx",
+        "xor ebp, ebp",
+        // row 0
+        "mov rdx, [rdi + 0]",
+        "xor eax, eax",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "adcx rbx, rax",
+        "adox rbp, rax",
+        "adcx rbp, rax",
+        "mov rdx, r8",
+        "imul rdx, [rcx + 48]",
+        "xor eax, eax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "adcx rbx, rax",
+        "adox rbp, rax",
+        "adcx rbp, rax",
+        // row 1
+        "mov rdx, [rdi + 8]",
+        "xor eax, eax",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "adcx rbp, rax",
+        "adox r8, rax",
+        "adcx r8, rax",
+        "mov rdx, r9",
+        "imul rdx, [rcx + 48]",
+        "xor eax, eax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "adcx rbp, rax",
+        "adox r8, rax",
+        "adcx r8, rax",
+        // row 2
+        "mov rdx, [rdi + 16]",
+        "xor eax, eax",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "adcx r8, rax",
+        "adox r9, rax",
+        "adcx r9, rax",
+        "mov rdx, r10",
+        "imul rdx, [rcx + 48]",
+        "xor eax, eax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "adcx r8, rax",
+        "adox r9, rax",
+        "adcx r9, rax",
+        // row 3
+        "mov rdx, [rdi + 24]",
+        "xor eax, eax",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "adcx r9, rax",
+        "adox r10, rax",
+        "adcx r10, rax",
+        "mov rdx, r11",
+        "imul rdx, [rcx + 48]",
+        "xor eax, eax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "adcx r9, rax",
+        "adox r10, rax",
+        "adcx r10, rax",
+        // row 4
+        "mov rdx, [rdi + 32]",
+        "xor eax, eax",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "adcx r10, rax",
+        "adox r11, rax",
+        "adcx r11, rax",
+        "mov rdx, r12",
+        "imul rdx, [rcx + 48]",
+        "xor eax, eax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "adcx r10, rax",
+        "adox r11, rax",
+        "adcx r11, rax",
+        // row 5
+        "mov rdx, [rdi + 40]",
+        "xor eax, eax",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "adcx r11, rax",
+        "adox r12, rax",
+        "adcx r12, rax",
+        "mov rdx, r13",
+        "imul rdx, [rcx + 48]",
+        "xor eax, eax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "adcx r11, rax",
+        "adox r12, rax",
+        "adcx r12, rax",
+        "mov r14, rbx",
+        "mov r15, rbp",
+        "pop rbp",
+        "pop rbx",
+        in("rsi") a.as_ptr(),
+        in("rdi") b.as_ptr(),
+        in("rcx") pn0.as_ptr(),
+        out("rax") _,
+        out("rdx") _,
+        out("r14") t0,
+        out("r15") t1,
+        out("r8") t2,
+        out("r9") t3,
+        out("r10") t4,
+        out("r11") t5,
+        out("r12") t6,
+        out("r13") _,
+        options(pure, readonly),
+    );
+    // t₆·2^384 + t < 2p: subtract p once when t₆ = 1 or t ≥ p.
+    let mut t = [t0, t1, t2, t3, t4, t5];
+    let p = [pn0[0], pn0[1], pn0[2], pn0[3], pn0[4], pn0[5]];
+    if t6 != 0 || geq(&t, &p) {
+        sub_in_place(&mut t, &p);
+    }
+    t
+}
+
+/// [`mont_mul4_adx`] with each row's Montgomery factor formed ahead of
+/// its products: `m = (t₀ + a₀·bᵢ)·n0 = t₀·n0 + bᵢ·(a₀·n0)`, with `a₀·n0`
+/// computed once into a stack slot.  Row i's `m` then depends only on the
+/// t₀ the previous reduction left, so its two `imul`s overlap the end of
+/// that reduction and the reduction of row i starts as soon as the products
+/// are issued.  The register freed by dropping the zero register holds `m`:
+/// rows end with an immediate `adc` or an add from a register known to be
+/// zero (t_(N+1) before the products, t₀ after the reduction), which also
+/// leaves CF = OF = 0, so no per-row `xor`.  Same result as
+/// [`mont_mul4_adx`], in `[0, p)`.
+///
+/// # Safety
+/// The CPU must support ADX and BMI2 ([`has_adx`]).
+#[cfg(target_arch = "x86_64")]
+#[inline]
+pub(crate) unsafe fn mont_mul4_adx_il(a: &[u64; 4], b: &[u64; 4], pn0: &[u64]) -> [u64; 4] {
+    debug_assert!(pn0.len() >= 5);
+    // Accumulators rotate through r8..r13 (t_j of row i is register
+    // (i + j) mod 6); rsi = a, rdi = b, rcx = [p₀..p_3, n0], rax = m.
+    let (t0, t1, t2, t3, t4): (u64, u64, u64, u64, u64);
+    core::arch::asm!(
+        "xor r8d, r8d",
+        "xor r9d, r9d",
+        "xor r10d, r10d",
+        "xor r11d, r11d",
+        "xor r12d, r12d",
+        "xor r13d, r13d",
+        // [rsp] = a0*n0 mod 2^64, used to form each row's m ahead of its products
+        "mov r14, [rsi]",
+        "imul r14, [rcx + 32]",
+        "push r14",
+        // row 0: m = t0*n0 + b0*(a0*n0), off the carry chains
+        "mov rdx, [rdi + 0]",
+        "mov rax, r8",
+        "imul rax, [rcx + 32]",
+        "mov r14, rdx",
+        "imul r14, [rsp]",
+        "add rax, r14",
+        "xor r13d, r13d",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "adox r13, r13",
+        "adc r12, 0",
+        "adc r13, 0",
+        // CF = OF = 0 here (t_{N+1} small); reduction t += m*p
+        "mov rdx, rax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "adcx r12, r8",
+        "adox r13, r8",
+        "adcx r13, r8",
+        // row 1: m = t0*n0 + b1*(a0*n0), off the carry chains
+        "mov rdx, [rdi + 8]",
+        "mov rax, r9",
+        "imul rax, [rcx + 32]",
+        "mov r14, rdx",
+        "imul r14, [rsp]",
+        "add rax, r14",
+        "xor r8d, r8d",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "adox r8, r8",
+        "adc r13, 0",
+        "adc r8, 0",
+        // CF = OF = 0 here (t_{N+1} small); reduction t += m*p
+        "mov rdx, rax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "adcx r13, r9",
+        "adox r8, r9",
+        "adcx r8, r9",
+        // row 2: m = t0*n0 + b2*(a0*n0), off the carry chains
+        "mov rdx, [rdi + 16]",
+        "mov rax, r10",
+        "imul rax, [rcx + 32]",
+        "mov r14, rdx",
+        "imul r14, [rsp]",
+        "add rax, r14",
+        "xor r9d, r9d",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r13, r14",
+        "adox r8, r15",
+        "adox r9, r9",
+        "adc r8, 0",
+        "adc r9, 0",
+        // CF = OF = 0 here (t_{N+1} small); reduction t += m*p
+        "mov rdx, rax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r13, r14",
+        "adox r8, r15",
+        "adcx r8, r10",
+        "adox r9, r10",
+        "adcx r9, r10",
+        // row 3: m = t0*n0 + b3*(a0*n0), off the carry chains
+        "mov rdx, [rdi + 24]",
+        "mov rax, r11",
+        "imul rax, [rcx + 32]",
+        "mov r14, rdx",
+        "imul r14, [rsp]",
+        "add rax, r14",
+        "xor r10d, r10d",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r13, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "adox r10, r10",
+        "adc r9, 0",
+        "adc r10, 0",
+        // CF = OF = 0 here (t_{N+1} small); reduction t += m*p
+        "mov rdx, rax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r13, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "adcx r9, r11",
+        "adox r10, r11",
+        "adcx r10, r11",
+        "add rsp, 8",
+        in("rsi") a.as_ptr(),
+        in("rdi") b.as_ptr(),
+        in("rcx") pn0.as_ptr(),
+        out("rax") _,
+        out("rdx") _,
+        out("r12") t0,
+        out("r13") t1,
+        out("r8") t2,
+        out("r9") t3,
+        out("r10") t4,
+        out("r11") _,
+        out("r14") _,
+        out("r15") _,
+        options(pure, readonly),
+    );
+    let mut t = [t0, t1, t2, t3];
+    let p = [pn0[0], pn0[1], pn0[2], pn0[3]];
+    if t4 != 0 || geq(&t, &p) {
+        sub_in_place(&mut t, &p);
+    }
+    t
+}
+
+/// [`mont_mul6_adx`] with each row's Montgomery factor formed ahead of
+/// its products: `m = (t₀ + a₀·bᵢ)·n0 = t₀·n0 + bᵢ·(a₀·n0)`, with `a₀·n0`
+/// computed once into a stack slot.  Row i's `m` then depends only on the
+/// t₀ the previous reduction left, so its two `imul`s overlap the end of
+/// that reduction and the reduction of row i starts as soon as the products
+/// are issued.  The register freed by dropping the zero register holds `m`:
+/// rows end with an immediate `adc` or an add from a register known to be
+/// zero (t_(N+1) before the products, t₀ after the reduction), which also
+/// leaves CF = OF = 0, so no per-row `xor`.  Same result as
+/// [`mont_mul6_adx`], in `[0, p)`.
+///
+/// # Safety
+/// The CPU must support ADX and BMI2 ([`has_adx`]).
+#[cfg(target_arch = "x86_64")]
+#[inline]
+pub(crate) unsafe fn mont_mul6_adx_il(a: &[u64; 6], b: &[u64; 6], pn0: &[u64]) -> [u64; 6] {
+    debug_assert!(pn0.len() >= 7);
+    // Accumulators rotate through r8..r13, rbx, rbp (t_j of row i is register
+    // (i + j) mod 8); rsi = a, rdi = b, rcx = [p₀..p_5, n0], rax = m.
+    let (t0, t1, t2, t3, t4, t5, t6): (u64, u64, u64, u64, u64, u64, u64);
+    core::arch::asm!(
+        "push rbx",
+        "push rbp",
+        "xor r8d, r8d",
+        "xor r9d, r9d",
+        "xor r10d, r10d",
+        "xor r11d, r11d",
+        "xor r12d, r12d",
+        "xor r13d, r13d",
+        "xor ebx, ebx",
+        "xor ebp, ebp",
+        // [rsp] = a0*n0 mod 2^64, used to form each row's m ahead of its products
+        "mov r14, [rsi]",
+        "imul r14, [rcx + 48]",
+        "push r14",
+        // row 0: m = t0*n0 + b0*(a0*n0), off the carry chains
+        "mov rdx, [rdi + 0]",
+        "mov rax, r8",
+        "imul rax, [rcx + 48]",
+        "mov r14, rdx",
+        "imul r14, [rsp]",
+        "add rax, r14",
+        "xor ebp, ebp",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "adox rbp, rbp",
+        "adc rbx, 0",
+        "adc rbp, 0",
+        // CF = OF = 0 here (t_{N+1} small); reduction t += m*p
+        "mov rdx, rax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "adcx rbx, r8",
+        "adox rbp, r8",
+        "adcx rbp, r8",
+        // row 1: m = t0*n0 + b1*(a0*n0), off the carry chains
+        "mov rdx, [rdi + 8]",
+        "mov rax, r9",
+        "imul rax, [rcx + 48]",
+        "mov r14, rdx",
+        "imul r14, [rsp]",
+        "add rax, r14",
+        "xor r8d, r8d",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "adox r8, r8",
+        "adc rbp, 0",
+        "adc r8, 0",
+        // CF = OF = 0 here (t_{N+1} small); reduction t += m*p
+        "mov rdx, rax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "adcx rbp, r9",
+        "adox r8, r9",
+        "adcx r8, r9",
+        // row 2: m = t0*n0 + b2*(a0*n0), off the carry chains
+        "mov rdx, [rdi + 16]",
+        "mov rax, r10",
+        "imul rax, [rcx + 48]",
+        "mov r14, rdx",
+        "imul r14, [rsp]",
+        "add rax, r14",
+        "xor r9d, r9d",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "adox r9, r9",
+        "adc r8, 0",
+        "adc r9, 0",
+        // CF = OF = 0 here (t_{N+1} small); reduction t += m*p
+        "mov rdx, rax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "adcx r8, r10",
+        "adox r9, r10",
+        "adcx r9, r10",
+        // row 3: m = t0*n0 + b3*(a0*n0), off the carry chains
+        "mov rdx, [rdi + 24]",
+        "mov rax, r11",
+        "imul rax, [rcx + 48]",
+        "mov r14, rdx",
+        "imul r14, [rsp]",
+        "add rax, r14",
+        "xor r10d, r10d",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "adox r10, r10",
+        "adc r9, 0",
+        "adc r10, 0",
+        // CF = OF = 0 here (t_{N+1} small); reduction t += m*p
+        "mov rdx, rax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "adcx r9, r11",
+        "adox r10, r11",
+        "adcx r10, r11",
+        // row 4: m = t0*n0 + b4*(a0*n0), off the carry chains
+        "mov rdx, [rdi + 32]",
+        "mov rax, r12",
+        "imul rax, [rcx + 48]",
+        "mov r14, rdx",
+        "imul r14, [rsp]",
+        "add rax, r14",
+        "xor r11d, r11d",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "adox r11, r11",
+        "adc r10, 0",
+        "adc r11, 0",
+        // CF = OF = 0 here (t_{N+1} small); reduction t += m*p
+        "mov rdx, rax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "adcx r10, r12",
+        "adox r11, r12",
+        "adcx r11, r12",
+        // row 5: m = t0*n0 + b5*(a0*n0), off the carry chains
+        "mov rdx, [rdi + 40]",
+        "mov rax, r13",
+        "imul rax, [rcx + 48]",
+        "mov r14, rdx",
+        "imul r14, [rsp]",
+        "add rax, r14",
+        "xor r12d, r12d",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "adox r12, r12",
+        "adc r11, 0",
+        "adc r12, 0",
+        // CF = OF = 0 here (t_{N+1} small); reduction t += m*p
+        "mov rdx, rax",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r13, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "adcx r11, r13",
+        "adox r12, r13",
+        "adcx r12, r13",
+        "add rsp, 8",
+        "mov r14, rbx",
+        "mov r15, rbp",
+        "pop rbp",
+        "pop rbx",
+        in("rsi") a.as_ptr(),
+        in("rdi") b.as_ptr(),
+        in("rcx") pn0.as_ptr(),
+        out("rax") _,
+        out("rdx") _,
+        out("r14") t0,
+        out("r15") t1,
+        out("r8") t2,
+        out("r9") t3,
+        out("r10") t4,
+        out("r11") t5,
+        out("r12") t6,
+        out("r13") _,
+        options(pure, readonly),
+    );
+    let mut t = [t0, t1, t2, t3, t4, t5];
+    let p = [pn0[0], pn0[1], pn0[2], pn0[3], pn0[4], pn0[5]];
+    if t6 != 0 || geq(&t, &p) {
+        sub_in_place(&mut t, &p);
+    }
+    t
+}
+
+/// `a·b·R⁻¹ mod p` for 4-word `a, b < p` with quotient pipelining: rows
+/// `0..3` reduce modulo `M̃ = n0·p` (`n0 = -p⁻¹ mod 2^64`, so
+/// `M̃ ≡ -1 mod 2^64` and `M̃ ≡ 0 mod p`), whose Montgomery factor is just
+/// `m = t₀`: `t ← (t − m)/2^64 + m·H` with `H = (M̃ + 1)/2^64` (4 words), the
+/// low word cancelling exactly.  The row-to-row recurrence loses its
+/// `m = t₀·n0` multiplication (it becomes `mulx m·H₀` and adds).  The last
+/// row reduces with the standard quotient modulo `p`, which bounds the
+/// result by `3p + p·2^-63`; up to three subtractions bring it into
+/// `[0, p)`.  `pn0` is `[p₀..p_3, n0, H₀..H_3]`.
+///
+/// # Safety
+/// The CPU must support ADX and BMI2 ([`has_adx`]).
+#[cfg(target_arch = "x86_64")]
+#[inline]
+pub(crate) unsafe fn mont_mul4_adx_qp(a: &[u64; 4], b: &[u64; 4], pn0: &[u64]) -> [u64; 4] {
+    debug_assert!(pn0.len() >= 9);
+    // 7 accumulators rotate through r8, r9, r10, r11, r12, r13, rax (t_j of row i is
+    // register (i + j) mod 7); rsi = a, rdi = b, rcx = pn0.
+    let (t0, t1, t2, t3, t4, t5): (u64, u64, u64, u64, u64, u64);
+    core::arch::asm!(
+        "xor r8d, r8d",
+        "xor r9d, r9d",
+        "xor r10d, r10d",
+        "xor r11d, r11d",
+        "xor r12d, r12d",
+        "xor r13d, r13d",
+        // row 0: t_(N+2) = rax (the register that held the previous row's m) is zeroed; this also clears CF/OF
+        "xor eax, eax",
+        "mov rdx, [rdi + 0]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "adox r13, rax",
+        "adcx r12, rax",
+        "adcx r13, rax",
+        // pipelined quotient: m = t0 (M~ = n0*p = -1 mod 2^64); t <- (t - m)/2^64 + m*H, the low word cancels
+        "mov rdx, r8",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 48]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 56]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 64]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "adox rax, rax",
+        "adc r13, 0",
+        "adc rax, 0",
+        // row 1: t_(N+2) = r8 (the register that held the previous row's m) is zeroed; this also clears CF/OF
+        "xor r8d, r8d",
+        "mov rdx, [rdi + 8]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "adox rax, r8",
+        "adcx r13, r8",
+        "adcx rax, r8",
+        // pipelined quotient: m = t0 (M~ = n0*p = -1 mod 2^64); t <- (t - m)/2^64 + m*H, the low word cancels
+        "mov rdx, r9",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 48]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 56]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 64]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "adox r8, r8",
+        "adc rax, 0",
+        "adc r8, 0",
+        // row 2: t_(N+2) = r9 (the register that held the previous row's m) is zeroed; this also clears CF/OF
+        "xor r9d, r9d",
+        "mov rdx, [rdi + 16]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "adox r8, r9",
+        "adcx rax, r9",
+        "adcx r8, r9",
+        // pipelined quotient: m = t0 (M~ = n0*p = -1 mod 2^64); t <- (t - m)/2^64 + m*H, the low word cancels
+        "mov rdx, r10",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 48]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 56]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rcx + 64]",
+        "adcx rax, r14",
+        "adox r8, r15",
+        "adox r9, r9",
+        "adc r8, 0",
+        "adc r9, 0",
+        // row 3: t_(N+2) = r10 (the register that held the previous row's m) is zeroed; this also clears CF/OF
+        "xor r10d, r10d",
+        "mov rdx, [rdi + 24]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx rax, r14",
+        "adox r8, r15",
+        "adox r9, r10",
+        "adcx r8, r10",
+        "adcx r9, r10",
+        // last row: standard quotient q = t0*n0 with modulus p, so the result stays below 3p + p/2^63
+        "mov rdx, r11",
+        "imul rdx, [rcx + 32]",
+        "xor r10d, r10d",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx rax, r14",
+        "adox r8, r15",
+        "adox r9, r10",
+        "adcx r8, r10",
+        "adcx r9, r10",
+        in("rsi") a.as_ptr(),
+        in("rdi") b.as_ptr(),
+        in("rcx") pn0.as_ptr(),
+        out("rax") t2,
+        out("rdx") _,
+        out("r8") t3,
+        out("r9") t4,
+        out("r10") t5,
+        out("r11") _,
+        out("r12") t0,
+        out("r13") t1,
+        out("r14") _,
+        out("r15") _,
+        options(pure, readonly, nostack),
+    );
+    let mut t = [t0, t1, t2, t3];
+    let mut hi = (t4, t5);
+    let p: &[u64; 4] = pn0[..4].try_into().unwrap();
+    while hi != (0, 0) || geq(&t, p) {
+        let br = sub_in_place(&mut t, p);
+        let (h0, c) = hi.0.overflowing_sub(br as u64);
+        hi = (h0, hi.1 - c as u64);
+    }
+    t
+}
+
+/// `a·b·R⁻¹ mod p` for 6-word `a, b < p` with quotient pipelining: rows
+/// `0..5` reduce modulo `M̃ = n0·p` (`n0 = -p⁻¹ mod 2^64`, so
+/// `M̃ ≡ -1 mod 2^64` and `M̃ ≡ 0 mod p`), whose Montgomery factor is just
+/// `m = t₀`: `t ← (t − m)/2^64 + m·H` with `H = (M̃ + 1)/2^64` (6 words), the
+/// low word cancelling exactly.  The row-to-row recurrence loses its
+/// `m = t₀·n0` multiplication (it becomes `mulx m·H₀` and adds).  The last
+/// row reduces with the standard quotient modulo `p`, which bounds the
+/// result by `3p + p·2^-63`; up to three subtractions bring it into
+/// `[0, p)`.  `pn0` is `[p₀..p_5, n0, H₀..H_5]`.
+///
+/// # Safety
+/// The CPU must support ADX and BMI2 ([`has_adx`]).
+#[cfg(target_arch = "x86_64")]
+#[inline]
+pub(crate) unsafe fn mont_mul6_adx_qp(a: &[u64; 6], b: &[u64; 6], pn0: &[u64]) -> [u64; 6] {
+    debug_assert!(pn0.len() >= 13);
+    // 9 accumulators rotate through r8, r9, r10, r11, r12, r13, rax, rbx, rbp (t_j of row i is
+    // register (i + j) mod 9); rsi = a, rdi = b, rcx = pn0.
+    let (t0, t1, t2, t3, t4, t5, t6, t7): (u64, u64, u64, u64, u64, u64, u64, u64);
+    core::arch::asm!(
+        "push rbx",
+        "push rbp",
+        "xor r8d, r8d",
+        "xor r9d, r9d",
+        "xor r10d, r10d",
+        "xor r11d, r11d",
+        "xor r12d, r12d",
+        "xor r13d, r13d",
+        "xor eax, eax",
+        "xor ebx, ebx",
+        // row 0: t_(N+2) = rbp (the register that held the previous row's m) is zeroed; this also clears CF/OF
+        "xor ebp, ebp",
+        "mov rdx, [rdi + 0]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "adox rbx, rbp",
+        "adcx rax, rbp",
+        "adcx rbx, rbp",
+        // pipelined quotient: m = t0 (M~ = n0*p = -1 mod 2^64); t <- (t - m)/2^64 + m*H, the low word cancels
+        "mov rdx, r8",
+        "mulx r15, r14, [rcx + 56]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 64]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 72]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 80]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 88]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rcx + 96]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "adox rbp, rbp",
+        "adc rbx, 0",
+        "adc rbp, 0",
+        // row 1: t_(N+2) = r8 (the register that held the previous row's m) is zeroed; this also clears CF/OF
+        "xor r8d, r8d",
+        "mov rdx, [rdi + 8]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "adox rbp, r8",
+        "adcx rbx, r8",
+        "adcx rbp, r8",
+        // pipelined quotient: m = t0 (M~ = n0*p = -1 mod 2^64); t <- (t - m)/2^64 + m*H, the low word cancels
+        "mov rdx, r9",
+        "mulx r15, r14, [rcx + 56]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 64]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 72]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 80]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rcx + 88]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 96]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "adox r8, r8",
+        "adc rbp, 0",
+        "adc r8, 0",
+        // row 2: t_(N+2) = r9 (the register that held the previous row's m) is zeroed; this also clears CF/OF
+        "xor r9d, r9d",
+        "mov rdx, [rdi + 16]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "adox r8, r9",
+        "adcx rbp, r9",
+        "adcx r8, r9",
+        // pipelined quotient: m = t0 (M~ = n0*p = -1 mod 2^64); t <- (t - m)/2^64 + m*H, the low word cancels
+        "mov rdx, r10",
+        "mulx r15, r14, [rcx + 56]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 64]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 72]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rcx + 80]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 88]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rcx + 96]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "adox r9, r9",
+        "adc r8, 0",
+        "adc r9, 0",
+        // row 3: t_(N+2) = r10 (the register that held the previous row's m) is zeroed; this also clears CF/OF
+        "xor r10d, r10d",
+        "mov rdx, [rdi + 24]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "adox r9, r10",
+        "adcx r8, r10",
+        "adcx r9, r10",
+        // pipelined quotient: m = t0 (M~ = n0*p = -1 mod 2^64); t <- (t - m)/2^64 + m*H, the low word cancels
+        "mov rdx, r11",
+        "mulx r15, r14, [rcx + 56]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 64]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rcx + 72]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 80]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rcx + 88]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rcx + 96]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "adox r10, r10",
+        "adc r9, 0",
+        "adc r10, 0",
+        // row 4: t_(N+2) = r11 (the register that held the previous row's m) is zeroed; this also clears CF/OF
+        "xor r11d, r11d",
+        "mov rdx, [rdi + 32]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "adox r10, r11",
+        "adcx r9, r11",
+        "adcx r10, r11",
+        // pipelined quotient: m = t0 (M~ = n0*p = -1 mod 2^64); t <- (t - m)/2^64 + m*H, the low word cancels
+        "mov rdx, r12",
+        "mulx r15, r14, [rcx + 56]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rcx + 64]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 72]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rcx + 80]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rcx + 88]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rcx + 96]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "adox r11, r11",
+        "adc r10, 0",
+        "adc r11, 0",
+        // row 5: t_(N+2) = r12 (the register that held the previous row's m) is zeroed; this also clears CF/OF
+        "xor r12d, r12d",
+        "mov rdx, [rdi + 40]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "adox r11, r12",
+        "adcx r10, r12",
+        "adcx r11, r12",
+        // last row: standard quotient q = t0*n0 with modulus p, so the result stays below 3p + p/2^63
+        "mov rdx, r13",
+        "imul rdx, [rcx + 48]",
+        "xor r12d, r12d",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "adox r11, r12",
+        "adcx r10, r12",
+        "adcx r11, r12",
+        "mov r14, rbx",
+        "mov r15, rbp",
+        "pop rbp",
+        "pop rbx",
+        in("rsi") a.as_ptr(),
+        in("rdi") b.as_ptr(),
+        in("rcx") pn0.as_ptr(),
+        out("rax") t0,
+        out("rdx") _,
+        out("r8") t3,
+        out("r9") t4,
+        out("r10") t5,
+        out("r11") t6,
+        out("r12") t7,
+        out("r13") _,
+        out("r14") t1,
+        out("r15") t2,
+        options(pure, readonly),
+    );
+    let mut t = [t0, t1, t2, t3, t4, t5];
+    let mut hi = (t6, t7);
+    let p: &[u64; 6] = pn0[..6].try_into().unwrap();
+    while hi != (0, 0) || geq(&t, p) {
+        let br = sub_in_place(&mut t, p);
+        let (h0, c) = hi.0.overflowing_sub(br as u64);
+        hi = (h0, hi.1 - c as u64);
+    }
+    t
+}
+
+/// `a·b·R⁻¹ mod p` for 4-word `a, b < p` with two-word Montgomery reduction:
+/// 2 double rows, each adding `a·(b_2k + b_(2k+1)·2^64)` and then `m·p` for
+/// the two-word factor `m = t mod 2^128 · (-p⁻¹ mod 2^128) mod 2^128`
+/// (`m₀ = lo(t₀n₀)`, `m₁ = hi(t₀n₀) + lo(t₀n₁) + lo(t₁n₀)`), then shifting by
+/// two words.  Half as many factor computations and shifts as one-word
+/// CIOS; `t < 2p` at the end, so one conditional subtraction.  `pn0` is
+/// `[p₀..p_3, n₀, H₀..H_3, n₁]` (`n₀ + n₁·2^64 = -p⁻¹ mod 2^128`).
+///
+/// # Safety
+/// The CPU must support ADX and BMI2 ([`has_adx`]).
+#[cfg(target_arch = "x86_64")]
+#[inline]
+pub(crate) unsafe fn mont_mul4_adx_tw(a: &[u64; 4], b: &[u64; 4], pn0: &[u64]) -> [u64; 4] {
+    debug_assert!(pn0.len() >= 10);
+    // 7 accumulators rotate through r8, r9, r10, r11, r12, r13, rax (t_j of double row k is
+    // register (2k + j) mod 7); rsi = a, rdi = b, rcx = pn0, [rsp] = m₁.
+    let (t0, t1, t2, t3, t4): (u64, u64, u64, u64, u64);
+    core::arch::asm!(
+        "sub rsp, 8",
+        "xor r8d, r8d",
+        "xor r9d, r9d",
+        "xor r10d, r10d",
+        "xor r11d, r11d",
+        "xor r12d, r12d",
+        "xor r13d, r13d",
+        "xor eax, eax",
+        // double row 0: t += a*b0 (t_(N+1), t_(N+2) are zero here)
+        "mov rdx, [rdi + 0]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "adox r13, rax",
+        "adcx r12, rax",
+        "adcx r13, rax",
+        // t += a*b1*2^64
+        "mov rdx, [rdi + 8]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "adox rax, rax",
+        "adc r13, 0",
+        "adc rax, 0",
+        // m = (t0 + t1*2^64)*(n0 + n1*2^64) mod 2^128: m0 = lo(t0*n0), m1 = hi(t0*n0) + lo(t0*n1) + lo(t1*n0)
+        "mov rdx, r8",
+        "mulx r15, r14, [rcx + 32]",
+        "imul rdx, [rcx + 72]",
+        "add r15, rdx",
+        "mov rdx, r9",
+        "imul rdx, [rcx + 32]",
+        "add r15, rdx",
+        "mov [rsp], r15",
+        "mov rdx, r14",
+        "test r14, r14",
+        // t += m0*p: t0 becomes zero
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "adox r13, r8",
+        "adox rax, r8",
+        "adcx r12, r8",
+        "adcx r13, r8",
+        "adcx rax, r8",
+        // t += m1*p*2^64: t1 becomes zero
+        "mov rdx, [rsp]",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "adox rax, r9",
+        "adcx r13, r9",
+        "adcx rax, r9",
+        // double row 1: t += a*b2 (t_(N+1), t_(N+2) are zero here)
+        "mov rdx, [rdi + 16]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "adox r8, r9",
+        "adcx rax, r9",
+        "adcx r8, r9",
+        // t += a*b3*2^64
+        "mov rdx, [rdi + 24]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx rax, r14",
+        "adox r8, r15",
+        "adox r9, r9",
+        "adc r8, 0",
+        "adc r9, 0",
+        // m = (t0 + t1*2^64)*(n0 + n1*2^64) mod 2^128: m0 = lo(t0*n0), m1 = hi(t0*n0) + lo(t0*n1) + lo(t1*n0)
+        "mov rdx, r10",
+        "mulx r15, r14, [rcx + 32]",
+        "imul rdx, [rcx + 72]",
+        "add r15, rdx",
+        "mov rdx, r11",
+        "imul rdx, [rcx + 32]",
+        "add r15, rdx",
+        "mov [rsp], r15",
+        "mov rdx, r14",
+        "test r14, r14",
+        // t += m0*p: t0 becomes zero
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "adox r8, r10",
+        "adox r9, r10",
+        "adcx rax, r10",
+        "adcx r8, r10",
+        "adcx r9, r10",
+        // t += m1*p*2^64: t1 becomes zero
+        "mov rdx, [rsp]",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx rax, r14",
+        "adox r8, r15",
+        "adox r9, r11",
+        "adcx r8, r11",
+        "adcx r9, r11",
+        "add rsp, 8",
+        in("rsi") a.as_ptr(),
+        in("rdi") b.as_ptr(),
+        in("rcx") pn0.as_ptr(),
+        out("rax") t2,
+        out("rdx") _,
+        out("r8") t3,
+        out("r9") t4,
+        out("r10") _,
+        out("r11") _,
+        out("r12") t0,
+        out("r13") t1,
+        out("r14") _,
+        out("r15") _,
+        options(pure, readonly),
+    );
+    let mut t = [t0, t1, t2, t3];
+    let p: &[u64; 4] = pn0[..4].try_into().unwrap();
+    if t4 != 0 || geq(&t, p) {
+        sub_in_place(&mut t, p);
+    }
+    t
+}
+
+/// `a·b·R⁻¹ mod p` for 6-word `a, b < p` with two-word Montgomery reduction:
+/// 3 double rows, each adding `a·(b_2k + b_(2k+1)·2^64)` and then `m·p` for
+/// the two-word factor `m = t mod 2^128 · (-p⁻¹ mod 2^128) mod 2^128`
+/// (`m₀ = lo(t₀n₀)`, `m₁ = hi(t₀n₀) + lo(t₀n₁) + lo(t₁n₀)`), then shifting by
+/// two words.  Half as many factor computations and shifts as one-word
+/// CIOS; `t < 2p` at the end, so one conditional subtraction.  `pn0` is
+/// `[p₀..p_5, n₀, H₀..H_5, n₁]` (`n₀ + n₁·2^64 = -p⁻¹ mod 2^128`).
+///
+/// # Safety
+/// The CPU must support ADX and BMI2 ([`has_adx`]).
+#[cfg(target_arch = "x86_64")]
+#[inline]
+pub(crate) unsafe fn mont_mul6_adx_tw(a: &[u64; 6], b: &[u64; 6], pn0: &[u64]) -> [u64; 6] {
+    debug_assert!(pn0.len() >= 14);
+    // 9 accumulators rotate through r8, r9, r10, r11, r12, r13, rax, rbx, rbp (t_j of double row k is
+    // register (2k + j) mod 9); rsi = a, rdi = b, rcx = pn0, [rsp] = m₁.
+    let (t0, t1, t2, t3, t4, t5, t6): (u64, u64, u64, u64, u64, u64, u64);
+    core::arch::asm!(
+        "push rbx",
+        "push rbp",
+        "sub rsp, 8",
+        "xor r8d, r8d",
+        "xor r9d, r9d",
+        "xor r10d, r10d",
+        "xor r11d, r11d",
+        "xor r12d, r12d",
+        "xor r13d, r13d",
+        "xor eax, eax",
+        "xor ebx, ebx",
+        "xor ebp, ebp",
+        // double row 0: t += a*b0 (t_(N+1), t_(N+2) are zero here)
+        "mov rdx, [rdi + 0]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "adox rbx, rbp",
+        "adcx rax, rbp",
+        "adcx rbx, rbp",
+        // t += a*b1*2^64
+        "mov rdx, [rdi + 8]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "adox rbp, rbp",
+        "adc rbx, 0",
+        "adc rbp, 0",
+        // m = (t0 + t1*2^64)*(n0 + n1*2^64) mod 2^128: m0 = lo(t0*n0), m1 = hi(t0*n0) + lo(t0*n1) + lo(t1*n0)
+        "mov rdx, r8",
+        "mulx r15, r14, [rcx + 48]",
+        "imul rdx, [rcx + 104]",
+        "add r15, rdx",
+        "mov rdx, r9",
+        "imul rdx, [rcx + 48]",
+        "add r15, rdx",
+        "mov [rsp], r15",
+        "mov rdx, r14",
+        "test r14, r14",
+        // t += m0*p: t0 becomes zero
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "adox rbx, r8",
+        "adox rbp, r8",
+        "adcx rax, r8",
+        "adcx rbx, r8",
+        "adcx rbp, r8",
+        // t += m1*p*2^64: t1 becomes zero
+        "mov rdx, [rsp]",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "adox rbp, r9",
+        "adcx rbx, r9",
+        "adcx rbp, r9",
+        // double row 1: t += a*b2 (t_(N+1), t_(N+2) are zero here)
+        "mov rdx, [rdi + 16]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "adox r8, r9",
+        "adcx rbp, r9",
+        "adcx r8, r9",
+        // t += a*b3*2^64
+        "mov rdx, [rdi + 24]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "adox r9, r9",
+        "adc r8, 0",
+        "adc r9, 0",
+        // m = (t0 + t1*2^64)*(n0 + n1*2^64) mod 2^128: m0 = lo(t0*n0), m1 = hi(t0*n0) + lo(t0*n1) + lo(t1*n0)
+        "mov rdx, r10",
+        "mulx r15, r14, [rcx + 48]",
+        "imul rdx, [rcx + 104]",
+        "add r15, rdx",
+        "mov rdx, r11",
+        "imul rdx, [rcx + 48]",
+        "add r15, rdx",
+        "mov [rsp], r15",
+        "mov rdx, r14",
+        "test r14, r14",
+        // t += m0*p: t0 becomes zero
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r10, r14",
+        "adox r11, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "adox r8, r10",
+        "adox r9, r10",
+        "adcx rbp, r10",
+        "adcx r8, r10",
+        "adcx r9, r10",
+        // t += m1*p*2^64: t1 becomes zero
+        "mov rdx, [rsp]",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r11, r14",
+        "adox r12, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "adox r9, r11",
+        "adcx r8, r11",
+        "adcx r9, r11",
+        // double row 2: t += a*b4 (t_(N+1), t_(N+2) are zero here)
+        "mov rdx, [rdi + 32]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "adox r10, r11",
+        "adcx r9, r11",
+        "adcx r10, r11",
+        // t += a*b5*2^64
+        "mov rdx, [rdi + 40]",
+        "mulx r15, r14, [rsi + 0]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rsi + 8]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rsi + 16]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rsi + 24]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rsi + 32]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rsi + 40]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "adox r11, r11",
+        "adc r10, 0",
+        "adc r11, 0",
+        // m = (t0 + t1*2^64)*(n0 + n1*2^64) mod 2^128: m0 = lo(t0*n0), m1 = hi(t0*n0) + lo(t0*n1) + lo(t1*n0)
+        "mov rdx, r12",
+        "mulx r15, r14, [rcx + 48]",
+        "imul rdx, [rcx + 104]",
+        "add r15, rdx",
+        "mov rdx, r13",
+        "imul rdx, [rcx + 48]",
+        "add r15, rdx",
+        "mov [rsp], r15",
+        "mov rdx, r14",
+        "test r14, r14",
+        // t += m0*p: t0 becomes zero
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r12, r14",
+        "adox r13, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "adox r10, r12",
+        "adox r11, r12",
+        "adcx r9, r12",
+        "adcx r10, r12",
+        "adcx r11, r12",
+        // t += m1*p*2^64: t1 becomes zero
+        "mov rdx, [rsp]",
+        "mulx r15, r14, [rcx + 0]",
+        "adcx r13, r14",
+        "adox rax, r15",
+        "mulx r15, r14, [rcx + 8]",
+        "adcx rax, r14",
+        "adox rbx, r15",
+        "mulx r15, r14, [rcx + 16]",
+        "adcx rbx, r14",
+        "adox rbp, r15",
+        "mulx r15, r14, [rcx + 24]",
+        "adcx rbp, r14",
+        "adox r8, r15",
+        "mulx r15, r14, [rcx + 32]",
+        "adcx r8, r14",
+        "adox r9, r15",
+        "mulx r15, r14, [rcx + 40]",
+        "adcx r9, r14",
+        "adox r10, r15",
+        "adox r11, r13",
+        "adcx r10, r13",
+        "adcx r11, r13",
+        "add rsp, 8",
+        "mov r14, rbx",
+        "mov r15, rbp",
+        "pop rbp",
+        "pop rbx",
+        in("rsi") a.as_ptr(),
+        in("rdi") b.as_ptr(),
+        in("rcx") pn0.as_ptr(),
+        out("rax") t0,
+        out("rdx") _,
+        out("r8") t3,
+        out("r9") t4,
+        out("r10") t5,
+        out("r11") t6,
+        out("r12") _,
+        out("r13") _,
+        out("r14") t1,
+        out("r15") t2,
+        options(pure, readonly),
+    );
+    let mut t = [t0, t1, t2, t3, t4, t5];
+    let p: &[u64; 6] = pn0[..6].try_into().unwrap();
+    if t6 != 0 || geq(&t, p) {
+        sub_in_place(&mut t, p);
+    }
+    t
+}
+
 impl<const N: usize> Mont<N> {
     /// CIOS on the `mulx` / `addcarry` intrinsics for any `N`, compiled for
     /// ADX+BMI2 (the compiler chooses the instructions; it usually emits
@@ -858,6 +2964,161 @@ impl<const N: usize> Mont<N> {
         None
     }
 
+    /// [`mont_mul6_adx`] when `N = 6`, without the CPU check (as
+    /// [`mul_adx4_unchecked`](Self::mul_adx4_unchecked)).  Other `N`: `None`.
+    ///
+    /// # Safety
+    /// The CPU must support ADX and BMI2.
+    #[inline(always)]
+    pub(crate) unsafe fn mul_adx6_unchecked(&self, a: &[u64; N], b: &[u64; N]) -> Option<[u64; N]> {
+        #[cfg(target_arch = "x86_64")]
+        if N == 6 {
+            let a6 = &*(a as *const [u64; N] as *const [u64; 6]);
+            let b6 = &*(b as *const [u64; N] as *const [u64; 6]);
+            let r = mont_mul6_adx(a6, b6, &self.pn0);
+            return Some(*(&r as *const [u64; 6] as *const [u64; N]));
+        }
+        let _ = (a, b);
+        None
+    }
+
+    /// [`mont_mul6_adx`] when `N = 6` and the CPU has ADX, else `None`.
+    #[inline(always)]
+    pub(crate) fn mul_adx6(&self, a: &[u64; N], b: &[u64; N]) -> Option<[u64; N]> {
+        if N == 6 && has_adx() {
+            // SAFETY: has_adx() checked the CPU features.
+            return unsafe { self.mul_adx6_unchecked(a, b) };
+        }
+        let _ = (a, b);
+        None
+    }
+
+    /// [`mont_mul4_adx_il`] / [`mont_mul6_adx_il`] when `N` is 4 / 6, without
+    /// the CPU check.  Other `N`: `None`.
+    ///
+    /// # Safety
+    /// The CPU must support ADX and BMI2.
+    #[inline(always)]
+    pub(crate) unsafe fn mul_adx_il_unchecked(
+        &self,
+        a: &[u64; N],
+        b: &[u64; N],
+    ) -> Option<[u64; N]> {
+        #[cfg(target_arch = "x86_64")]
+        {
+            if N == 4 {
+                let a4 = &*(a as *const [u64; N] as *const [u64; 4]);
+                let b4 = &*(b as *const [u64; N] as *const [u64; 4]);
+                let r = mont_mul4_adx_il(a4, b4, &self.pn0);
+                return Some(*(&r as *const [u64; 4] as *const [u64; N]));
+            }
+            if N == 6 {
+                let a6 = &*(a as *const [u64; N] as *const [u64; 6]);
+                let b6 = &*(b as *const [u64; N] as *const [u64; 6]);
+                let r = mont_mul6_adx_il(a6, b6, &self.pn0);
+                return Some(*(&r as *const [u64; 6] as *const [u64; N]));
+            }
+        }
+        let _ = (a, b);
+        None
+    }
+
+    /// [`mul_adx_il_unchecked`](Self::mul_adx_il_unchecked) when the CPU has
+    /// ADX, else `None`.
+    #[inline(always)]
+    pub(crate) fn mul_adx_il(&self, a: &[u64; N], b: &[u64; N]) -> Option<[u64; N]> {
+        if has_adx() {
+            // SAFETY: has_adx() checked the CPU features.
+            return unsafe { self.mul_adx_il_unchecked(a, b) };
+        }
+        let _ = (a, b);
+        None
+    }
+
+    /// [`mont_mul4_adx_qp`] / [`mont_mul6_adx_qp`] when `N` is 4 / 6, without
+    /// the CPU check.  Other `N`: `None`.
+    ///
+    /// # Safety
+    /// The CPU must support ADX and BMI2.
+    #[inline(always)]
+    pub(crate) unsafe fn mul_adx_qp_unchecked(
+        &self,
+        a: &[u64; N],
+        b: &[u64; N],
+    ) -> Option<[u64; N]> {
+        #[cfg(target_arch = "x86_64")]
+        {
+            if N == 4 {
+                let a4 = &*(a as *const [u64; N] as *const [u64; 4]);
+                let b4 = &*(b as *const [u64; N] as *const [u64; 4]);
+                let r = mont_mul4_adx_qp(a4, b4, &self.pn0);
+                return Some(*(&r as *const [u64; 4] as *const [u64; N]));
+            }
+            if N == 6 {
+                let a6 = &*(a as *const [u64; N] as *const [u64; 6]);
+                let b6 = &*(b as *const [u64; N] as *const [u64; 6]);
+                let r = mont_mul6_adx_qp(a6, b6, &self.pn0);
+                return Some(*(&r as *const [u64; 6] as *const [u64; N]));
+            }
+        }
+        let _ = (a, b);
+        None
+    }
+
+    /// [`mul_adx_qp_unchecked`](Self::mul_adx_qp_unchecked) when the CPU has
+    /// ADX, else `None`.
+    #[inline(always)]
+    pub(crate) fn mul_adx_qp(&self, a: &[u64; N], b: &[u64; N]) -> Option<[u64; N]> {
+        if has_adx() {
+            // SAFETY: has_adx() checked the CPU features.
+            return unsafe { self.mul_adx_qp_unchecked(a, b) };
+        }
+        let _ = (a, b);
+        None
+    }
+
+    /// [`mont_mul4_adx_tw`] / [`mont_mul6_adx_tw`] when `N` is 4 / 6, without
+    /// the CPU check.  Other `N`: `None`.
+    ///
+    /// # Safety
+    /// The CPU must support ADX and BMI2.
+    #[inline(always)]
+    pub(crate) unsafe fn mul_adx_tw_unchecked(
+        &self,
+        a: &[u64; N],
+        b: &[u64; N],
+    ) -> Option<[u64; N]> {
+        #[cfg(target_arch = "x86_64")]
+        {
+            if N == 4 {
+                let a4 = &*(a as *const [u64; N] as *const [u64; 4]);
+                let b4 = &*(b as *const [u64; N] as *const [u64; 4]);
+                let r = mont_mul4_adx_tw(a4, b4, &self.pn0);
+                return Some(*(&r as *const [u64; 4] as *const [u64; N]));
+            }
+            if N == 6 {
+                let a6 = &*(a as *const [u64; N] as *const [u64; 6]);
+                let b6 = &*(b as *const [u64; N] as *const [u64; 6]);
+                let r = mont_mul6_adx_tw(a6, b6, &self.pn0);
+                return Some(*(&r as *const [u64; 6] as *const [u64; N]));
+            }
+        }
+        let _ = (a, b);
+        None
+    }
+
+    /// [`mul_adx_tw_unchecked`](Self::mul_adx_tw_unchecked) when the CPU has
+    /// ADX, else `None`.
+    #[inline(always)]
+    pub(crate) fn mul_adx_tw(&self, a: &[u64; N], b: &[u64; N]) -> Option<[u64; N]> {
+        if has_adx() {
+            // SAFETY: has_adx() checked the CPU features.
+            return unsafe { self.mul_adx_tw_unchecked(a, b) };
+        }
+        let _ = (a, b);
+        None
+    }
+
     /// [`mont_mul4_adx`] when `N = 4` and the CPU has ADX, else `None`.
     #[inline(always)]
     pub(crate) fn mul_adx4(&self, a: &[u64; N], b: &[u64; N]) -> Option<[u64; N]> {
@@ -933,12 +3194,125 @@ impl MulKernel for MulxKernel {
     }
 }
 
+/// [`ProdAdxKernel`] with the two-word-reduction asm kernels
+/// ([`mont_mul4_adx_tw`], [`mont_mul6_adx_tw`]): products at 4 limbs (squares
+/// stay tuned), products and squares at 6.  Benchmark arm only.  Dispatch
+/// only after [`has_adx`].
+pub(crate) struct AdxTwKernel;
+
+impl MulKernel for AdxTwKernel {
+    #[inline(always)]
+    fn mul<const N: usize>(ctx: &Mont<N>, a: &[u64; N], b: &[u64; N]) -> [u64; N] {
+        // SAFETY: dispatched only after has_adx().
+        unsafe { ctx.mul_adx_tw_unchecked(a, b) }.unwrap_or_else(|| ProdAdxKernel::mul(ctx, a, b))
+    }
+    #[inline(always)]
+    fn sqr<const N: usize>(ctx: &Mont<N>, a: &[u64; N]) -> [u64; N] {
+        if N == 6 {
+            // SAFETY: as above.
+            if let Some(r) = unsafe { ctx.mul_adx_tw_unchecked(a, a) } {
+                return r;
+            }
+        }
+        ProdAdxKernel::sqr(ctx, a)
+    }
+}
+
+/// [`ProdAdxKernel`] with the quotient-pipelined asm kernels
+/// ([`mont_mul4_adx_qp`], [`mont_mul6_adx_qp`]): products at 4 limbs (squares
+/// stay tuned), products and squares at 6.  Benchmark arm only.  Dispatch
+/// only after [`has_adx`].
+pub(crate) struct AdxQpKernel;
+
+impl MulKernel for AdxQpKernel {
+    #[inline(always)]
+    fn mul<const N: usize>(ctx: &Mont<N>, a: &[u64; N], b: &[u64; N]) -> [u64; N] {
+        // SAFETY: dispatched only after has_adx().
+        unsafe { ctx.mul_adx_qp_unchecked(a, b) }.unwrap_or_else(|| ProdAdxKernel::mul(ctx, a, b))
+    }
+    #[inline(always)]
+    fn sqr<const N: usize>(ctx: &Mont<N>, a: &[u64; N]) -> [u64; N] {
+        if N == 6 {
+            // SAFETY: as above.
+            if let Some(r) = unsafe { ctx.mul_adx_qp_unchecked(a, a) } {
+                return r;
+            }
+        }
+        ProdAdxKernel::sqr(ctx, a)
+    }
+}
+
+/// [`ProdAdxKernel`] with the interleaved asm kernels ([`mont_mul4_adx_il`],
+/// [`mont_mul6_adx_il`]) in place of [`mont_mul4_adx`] / [`mont_mul6_adx`]:
+/// products at 4 limbs (squares stay tuned), products and squares at 6.
+/// Benchmark arm only.  Dispatch only after
+/// [`has_adx`].
+pub(crate) struct AdxIlKernel;
+
+impl MulKernel for AdxIlKernel {
+    #[inline(always)]
+    fn mul<const N: usize>(ctx: &Mont<N>, a: &[u64; N], b: &[u64; N]) -> [u64; N] {
+        // SAFETY: dispatched only after has_adx().
+        unsafe { ctx.mul_adx_il_unchecked(a, b) }.unwrap_or_else(|| ProdAdxKernel::mul(ctx, a, b))
+    }
+    #[inline(always)]
+    fn sqr<const N: usize>(ctx: &Mont<N>, a: &[u64; N]) -> [u64; N] {
+        if N == 6 {
+            // SAFETY: as above.
+            if let Some(r) = unsafe { ctx.mul_adx_il_unchecked(a, a) } {
+                return r;
+            }
+        }
+        ProdAdxKernel::sqr(ctx, a)
+    }
+}
+
+/// The six-limb asm product ([`mont_mul6_adx`]) for products and squares at
+/// `N = 6` (what [`ProdAdxKernel`] now does there), [`ProdAdxKernel`] elsewhere.  Dispatch only after [`has_adx`].
+pub(crate) struct Adx6Kernel;
+/// The six-limb asm product for products only at `N = 6`; squares on the
+/// `mulx` intrinsic CIOS (the 2026-11-25 production choice).  Dispatch only after [`has_adx`].
+pub(crate) struct Adx6MulKernel;
+
+impl MulKernel for Adx6Kernel {
+    #[inline(always)]
+    fn mul<const N: usize>(ctx: &Mont<N>, a: &[u64; N], b: &[u64; N]) -> [u64; N] {
+        // SAFETY: dispatched only after has_adx().
+        unsafe { ctx.mul_adx6_unchecked(a, b) }.unwrap_or_else(|| ProdAdxKernel::mul(ctx, a, b))
+    }
+    #[inline(always)]
+    fn sqr<const N: usize>(ctx: &Mont<N>, a: &[u64; N]) -> [u64; N] {
+        // SAFETY: as above.
+        unsafe { ctx.mul_adx6_unchecked(a, a) }.unwrap_or_else(|| ProdAdxKernel::sqr(ctx, a))
+    }
+}
+
+impl MulKernel for Adx6MulKernel {
+    #[inline(always)]
+    fn mul<const N: usize>(ctx: &Mont<N>, a: &[u64; N], b: &[u64; N]) -> [u64; N] {
+        // SAFETY: dispatched only after has_adx().
+        unsafe { ctx.mul_adx6_unchecked(a, b) }.unwrap_or_else(|| ProdAdxKernel::mul(ctx, a, b))
+    }
+    #[inline(always)]
+    fn sqr<const N: usize>(ctx: &Mont<N>, a: &[u64; N]) -> [u64; N] {
+        #[cfg(target_arch = "x86_64")]
+        if N >= 6 {
+            // SAFETY: dispatched only after has_adx().
+            return unsafe { ctx.mul_mulx(a, a) };
+        }
+        ProdAdxKernel::sqr(ctx, a)
+    }
+}
+
 /// Production kernel on CPUs with ADX+BMI2, from the 2026-11-25 ADX run
 /// (`docs/notes/adx-hgcd-20261125/`): the inline-asm dual-carry-chain
 /// product at `N = 4` with [`TunedKernel`] squares (+1.5% end to end), the
 /// `mulx` intrinsic CIOS for products and squares at `N ≥ 6` (+5–12%), and
-/// [`TunedKernel`] at `N ≤ 3` and `N = 5`, where neither won.  Dispatch only
-/// after [`has_adx`] returned true.
+/// [`TunedKernel`] at `N ≤ 3` and `N = 5`, where neither won.  At `N = 6`
+/// the inline-asm six-limb product ([`mont_mul6_adx`]) for products and
+/// squares, from the 2026-11-28 run (`docs/notes/adx6-20261128/`: about 8%
+/// end to end over the `mulx` CIOS).  Dispatch only after [`has_adx`]
+/// returned true.
 pub(crate) struct ProdAdxKernel;
 
 impl MulKernel for ProdAdxKernel {
@@ -952,6 +3326,12 @@ impl MulKernel for ProdAdxKernel {
                     return r;
                 }
             }
+            if N == 6 {
+                // SAFETY: as above.
+                if let Some(r) = unsafe { ctx.mul_adx6_unchecked(a, b) } {
+                    return r;
+                }
+            }
             if N >= 6 {
                 // SAFETY: as above.
                 return unsafe { ctx.mul_mulx(a, b) };
@@ -962,9 +3342,17 @@ impl MulKernel for ProdAdxKernel {
     #[inline(always)]
     fn sqr<const N: usize>(ctx: &Mont<N>, a: &[u64; N]) -> [u64; N] {
         #[cfg(target_arch = "x86_64")]
-        if N >= 6 {
-            // SAFETY: dispatched only after has_adx().
-            return unsafe { ctx.mul_mulx(a, a) };
+        {
+            if N == 6 {
+                // SAFETY: dispatched only after has_adx().
+                if let Some(r) = unsafe { ctx.mul_adx6_unchecked(a, a) } {
+                    return r;
+                }
+            }
+            if N >= 6 {
+                // SAFETY: as above.
+                return unsafe { ctx.mul_mulx(a, a) };
+            }
         }
         TunedKernel::sqr(ctx, a)
     }
@@ -1585,6 +3973,16 @@ mod tests {
                     if N == 4 {
                         assert_eq!(ctx.mul_adx4(a, b), Some(want), "adx m={m}");
                     }
+                    if N == 6 {
+                        assert_eq!(ctx.mul_adx6(a, b), Some(want), "adx6 m={m}");
+                    }
+                    if N == 4 || N == 6 {
+                        assert_eq!(ctx.mul_adx_il(a, b), Some(want), "adx_il N={N} m={m}");
+                    }
+                    if N == 4 || N == 6 {
+                        assert_eq!(ctx.mul_adx_qp(a, b), Some(want), "adx_qp N={N} m={m}");
+                        assert_eq!(ctx.mul_adx_tw(a, b), Some(want), "adx_tw N={N} m={m}");
+                    }
                 }
             }
         }
@@ -1597,6 +3995,11 @@ mod tests {
         check::<3>(&(two(192) - two(64) - 1u32), &mut rng);
         check::<5>(&(two(320) - 197u32), &mut rng);
         check::<6>(&(two(384) - two(128) - two(96) + two(32) - 1u32), &mut rng);
+        // Six-limb moduli with the top bit set and clear, and one just above
+        // 2^320 (so t₆ and the final subtraction are exercised).
+        check::<6>(&(two(384) - 317u32), &mut rng);
+        check::<6>(&(two(383) + 231u32), &mut rng);
+        check::<6>(&(two(320) + 1u32 + two(64) * 5u32), &mut rng);
         check::<9>(&(two(521) - 1u32), &mut rng);
         check::<9>(&(two(576) - 3u32), &mut rng);
     }

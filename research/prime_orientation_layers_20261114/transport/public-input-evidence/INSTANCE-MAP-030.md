@@ -1,0 +1,8 @@
+# Actual original helper and norm series orders
+
+1. FieldK, actual p/f/embeddingvectorv/points. General original-helper order for allr from actual old FullMultiplicity; actual derived branch requires y²=f(x),2!=0,y!=0. Global nonzero norm witness retains fdegree3, three-node set/equivalence,targetoutsideS/nonzero ordinates/actualcurvevalidity.
+2. Existing laws as stated: committed/audited owner explicit_shifted_eval₂; actual_explicit_shifted_order, actual_branch_linear_tail; eval₂_modByMonic_eq_self_of_root; actual_remainder and actualNorm; standard map/evaluation/ring/divisibility laws and existing actual_nonzero_norm_helper/finiteOperator_zero_iff.
+3. Objects: original p evaluated at(Cx+T,Cy+T*u), exact curve remainder evaluated at actual branch root s, actual N=A²-fB² and same original E(v) at s/-s.
+4. Chain: generic exact evaluation equality closes missing semantic arrow ->actual original T^rorder; derive actual branch/order existential. Exact evaluation modF at root ->norm product of original branch evaluations. Paired jets at±y give normT^(r+r); singleton givesT^r. Existing actual kernel norm witness then gives normnonzero/degree<=30/targetT4/all3pairedT8.
+5. No ambient remainder-jet preservation, supplied branch/nonzero norm/favorable rank/splitting/log witness. These are power-series orders, not yet explicit polynomial factors/residual degree/divisor/scalar/retry/expected bit cost.
+6. One new public owner import, inherited054bodyexactafterremoval;60fileoverlay preserves prior55bytes. Default single readonly candidate/exclusive pre-call/all direct pins; no private instance/transparency/limit/trust override or old replay. [pcc:unverified]

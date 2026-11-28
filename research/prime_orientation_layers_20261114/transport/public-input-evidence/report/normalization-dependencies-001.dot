@@ -1,0 +1,16 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf5fc",fontname="Helvetica",fontsize=12];
+ a [label="ACTUAL ORIGINAL FULL MIXED JETS\nOpposite pair and target constraints"];
+ b [label="ACTUAL D=G^4 DIVIDES A AND B\nThree paired nodes, monic degree12"];
+ c [label="ACTUAL CANONICAL Anew / Bnew\nDegrees<=3/1; N=D^2*Nnew; Nnew nonzero"];
+ d [label="ACTUAL TARGET BRANCH RETAINED\nD translated seriesunit at xt; order4 and sign"];
+ e [label="ACTUAL WEIERSTRASS COORDINATE NORM\nactualFunction=Anew*1+Bnew*mkY, nonzero"];
+ f [label="ACTUAL ORIGINAL FULL JETS TO I^r\nExplicit mixed coefficients / coordinate class"];
+ g [label="ACTUAL NORMALIZED TARGET I^4\nActual classfactor and derived cancellation"];
+ h [label="OPEN WEIGHTED PRINCIPAL / GROUP BRIDGE\nResidual fields / useful known logs / public cost",style="rounded,dashed,filled",fillcolor="#fff2dc"];
+ a->b->c->d->e;
+ a->f;
+ e->g;
+ f->g->h;
+}

@@ -1,0 +1,35 @@
+{
+  "created_at": "2026-11-17T04:27:02.452367+00:00",
+  "scope": "Focused build and pinned axiom audit of new shared TensorPadding module only; no unchanged parent module rerun/fresh assertion.",
+  "commands": [
+    "lake build CryptoLean.TensorPadding",
+    "lake env lean --run tools/AuditAxioms.lean CryptoLean.TensorPadding"
+  ],
+  "inputs": [
+    {
+      "path": "CryptoLean/TensorPadding.lean",
+      "bytes": 2053,
+      "sha256": "72820656bb23ecc6b54e72d93773932b0601f0af5b199ca85784c53e9e272e72"
+    },
+    {
+      "path": "docs/tensor-padding/source-005.lean.txt",
+      "bytes": 2053,
+      "sha256": "72820656bb23ecc6b54e72d93773932b0601f0af5b199ca85784c53e9e272e72"
+    },
+    {
+      "path": "tools/AuditAxioms.lean",
+      "bytes": 3855,
+      "sha256": "fdb8bd3af4301a9f50c7d8d0049994459f15b07abe397b8dddc1e49532dad96d"
+    },
+    {
+      "path": "lean-toolchain",
+      "bytes": 25,
+      "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+    },
+    {
+      "path": "lake-manifest.json",
+      "bytes": 3157,
+      "sha256": "0698b3bab96df3923ba118299043185eefda83072820c13bfe1e6035b9efbb75"
+    }
+  ]
+}
