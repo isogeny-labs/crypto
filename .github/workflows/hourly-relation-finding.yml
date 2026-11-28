@@ -81,10 +81,67 @@ jobs:
           cache-on-failure: true
       - name: Test telemetry contract
         run: python3 scripts/test_hourly_relation_finding.py
+      - name: Identify frozen control build inputs
+        id: control-build
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Exclude only hourly telemetry output, not build inputs.
+          source_tree=$(git ls-tree -r --full-tree HEAD | awk -F '\t' '$2 !~ /^results\/hourly_triggers\// && $2 !~ /^results\/(hourly_log\.csv|relation_baseline\.json|relation_cpu_baselines\.json|hourly_alert\.md)$/' | sha256sum | cut -d' ' -f1)
+          environment=$( { rustc -Vv; cargo -V; printf '%s\n' "$RUNNER_OS" "$RUNNER_ARCH" "${ImageOS:-}" "${ImageVersion:-}" "$RUSTFLAGS" "$CARGO_INCREMENTAL" "$CARGO_PROFILE_RELEASE_DEBUG" "${CARGO_BUILD_TARGET:-}"; } | sha256sum | cut -d' ' -f1)
+          echo "key=hourly-synthetic-control-v1-${source_tree}-${environment}" >> "$GITHUB_OUTPUT"
+      - name: Restore immutable synthetic control executable
+        id: control-cache
+        continue-on-error: true
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/hourly-control-build
+          key: ${{ steps.control-build.outputs.key }}
       - name: Run frozen n=23 relation-yield benchmark and record CSV
         id: benchmark
         continue-on-error: true
-        run: python3 scripts/hourly_relation_finding.py --build-timeout 1200 --run-timeout 900
+        shell: bash
+        env:
+          CONTROL_CACHE_HIT: ${{ steps.control-cache.outputs.cache-hit }}
+          CONTROL_CACHE_KEY: ${{ steps.control-build.outputs.key }}
+        run: |
+          set -euo pipefail
+          cache="$RUNNER_TEMP/hourly-control-build"
+          binary=target/release/examples/koblitz_relation_yield_bridge
+          args=(--build-timeout 1200 --run-timeout 900)
+          if [[ "$CONTROL_CACHE_HIT" == true ]] && [[ -f "$cache/control" && -f "$cache/control.sha256" && -f "$cache/source_sha" && -f "$cache/cache_key" ]] && [[ "$(cat "$cache/cache_key")" == "$CONTROL_CACHE_KEY" ]] && (cd "$cache" && sha256sum --check --strict control.sha256); then
+            install -D -m 0755 "$cache/control" "$binary"
+            echo "Verified cached synthetic control; original build source: $(cat "$cache/source_sha")"
+            args+=(--skip-build)
+          else
+            if [[ "$CONTROL_CACHE_HIT" == true ]]; then
+              echo "::warning::Synthetic control cache verification failed; rebuilding and retaining strict build fingerprint."
+            fi
+            rm -rf "$cache"
+          fi
+          python3 scripts/hourly_relation_finding.py "${args[@]}"
+      - name: Package verified synthetic control executable
+        if: steps.benchmark.outcome == 'success' && steps.control-cache.outputs.cache-hit != 'true'
+        id: control-package
+        continue-on-error: true
+        shell: bash
+        env:
+          CONTROL_CACHE_KEY: ${{ steps.control-build.outputs.key }}
+        run: |
+          set -euo pipefail
+          cache="$RUNNER_TEMP/hourly-control-build"
+          mkdir -p "$cache"
+          install -m 0755 target/release/examples/koblitz_relation_yield_bridge "$cache/control"
+          (cd "$cache" && sha256sum control > control.sha256)
+          git rev-parse HEAD > "$cache/source_sha"
+          printf '%s\n' "$CONTROL_CACHE_KEY" > "$cache/cache_key"
+      - name: Save verified synthetic control executable
+        if: steps.control-package.outcome == 'success'
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/hourly-control-build
+          key: ${{ steps.control-build.outputs.key }}
       - name: Preserve raw producer output
         if: always()
         uses: actions/upload-artifact@v4
