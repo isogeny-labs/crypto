@@ -1127,18 +1127,19 @@ struct XIndex {
     off: Vec<u32>,
     ent: Vec<u64>,
     fshift: u32,
-    filter: Vec<u64>,
+    filter: Vec<u32>,
     distinct: usize,
 }
 
 const BBITS: u32 = 16;
 
 impl XIndex {
-    /// Blocked Bloom filter: the word is chosen by the top hash bits, and
-    /// three bits inside it by the low 18 hash bits.
+    /// Blocked Bloom filter over 32-bit words (one `vpgatherdd` lane each):
+    /// the word is chosen by the top hash bits, three bits inside it by hash
+    /// bits 0..14.
     #[inline]
-    fn bloom_mask(h: u32) -> u64 {
-        (1u64 << (h & 63)) | (1u64 << ((h >> 6) & 63)) | (1u64 << ((h >> 12) & 63))
+    fn bloom_mask(h: u32) -> u32 {
+        (1u32 << (h & 31)) | (1u32 << ((h >> 5) & 31)) | (1u32 << ((h >> 9) & 31))
     }
     /// 32-bit multiplicative hash (vectorizable with `vpmulld`).
     #[inline]
@@ -1164,10 +1165,10 @@ impl XIndex {
         let xy = &t.xy;
         let nb = 1usize << BBITS;
         let fbits = 23u32;
-        let fwords = (1usize << fbits) / 64;
+        let fwords = (1usize << fbits) / 32;
         // Word index from the top (fbits - 6) hash bits; a bucket range maps
         // to a contiguous, disjoint word range.
-        let fwbits = fbits - 6;
+        let fwbits = fbits - 5;
         let fshift = 32 - fwbits;
         let wpb = fwords / nb;
         let mut off = vec![0u32; nb + 1];
@@ -1199,13 +1200,13 @@ impl XIndex {
                 });
             }
         });
-        let mut filter = vec![0u64; fwords];
+        let mut filter = vec![0u32; fwords];
         let ranges: Vec<(usize, usize)> = (0..threads)
             .map(|k| (k * nb / threads, (k + 1) * nb / threads))
             .collect();
         let distinct: usize = std::thread::scope(|scope| {
             let (off, ent) = (&off, &ent);
-            let mut frest: &mut [u64] = &mut filter;
+            let mut frest: &mut [u32] = &mut filter;
             let mut handles = Vec::new();
             for &(lo, hi) in &ranges {
                 let (f, ft) = frest.split_at_mut((hi - lo) * wpb);
@@ -1425,66 +1426,85 @@ fn couple_probe_chunk(
     counts.fp_multiplications += mults;
 }
 
-/// AVX2 kernel for lever 8 probes: eight interleaved batch chains held in two
-/// 4 x u64 vectors. A 32-byte load of four `[x, y]` couples has x in the low
-/// 32 bits of each lane (what `vpmuludq` reads) and y after a 32-bit shift.
-/// Vector lazy-Mersenne operations give exactly the scalar `fmul_lazy`,
-/// `fsub_lazy` and `canon` values; filter tests, y on a hit, the rare
-/// x(L) = x(r) couples and match recording stay scalar.
+/// AVX2 kernel for lever 8 probes: eight interleaved batch chains in one
+/// 8 x u32 vector. Two 32-byte loads of four `[x, y]` couples each are
+/// deinterleaved into X = [x0, x4, x1, x5, x2, x6, x3, x7] and Y alike, so
+/// 32-bit lane j holds couple `(j & 1) * 4 + j / 2` of the block. Products
+/// use `vpmuludq` on the even and the odd lanes, one Mersenne fold each and
+/// a shared conditional subtraction; every other operation covers all eight
+/// lanes at once. Values are canonical throughout, so results equal the
+/// scalar `fmul_lazy` / `fsub_lazy` / `canon` values; filter hits, y on a
+/// hit, the rare x(L) = x(r) couples and match recording stay scalar.
 #[cfg(target_arch = "x86_64")]
 mod avx2 {
     use super::*;
     use std::arch::x86_64::*;
 
+    /// Lane j of the block's X/Y vectors holds couple `LANE_COUPLE[j]`.
+    const LANE_COUPLE: [usize; 8] = [0, 4, 1, 5, 2, 6, 3, 7];
+
+    /// a * b mod p for 8 x u32 lanes in [0, p): even lanes from `vpmuludq`
+    /// of the low halves, odd lanes after a 32-bit shift; each product
+    /// (< 2^62) folds to t <= 2p - 1, and min(t, t - p) on u32 is the
+    /// conditional subtraction (t - p wraps above t when t < p).
     #[inline]
     #[target_feature(enable = "avx2")]
-    unsafe fn vmul(a: __m256i, b: __m256i, p: __m256i) -> __m256i {
-        // Inputs in [0, p): the product folds to t <= 2p - 1 (high half 0);
-        // min(t, t - p) on u32 halves is the conditional subtraction
-        // (t - p wraps above t when t < p). Output in [0, p).
-        let t = _mm256_mul_epu32(a, b);
-        let t = _mm256_add_epi64(_mm256_and_si256(t, p), _mm256_srli_epi64(t, 31));
-        _mm256_min_epu32(t, _mm256_sub_epi32(t, p))
+    unsafe fn mul8(a: __m256i, b: __m256i, p64: __m256i, p32: __m256i) -> __m256i {
+        let e = _mm256_mul_epu32(a, b);
+        let o = _mm256_mul_epu32(_mm256_srli_epi64(a, 32), _mm256_srli_epi64(b, 32));
+        let e = _mm256_add_epi64(_mm256_and_si256(e, p64), _mm256_srli_epi64(e, 31));
+        let o = _mm256_add_epi64(_mm256_and_si256(o, p64), _mm256_srli_epi64(o, 31));
+        let t = _mm256_blend_epi32::<0b1010_1010>(e, _mm256_slli_epi64(o, 32));
+        _mm256_min_epu32(t, _mm256_sub_epi32(t, p32))
     }
 
-    /// x + y mod p for x, y in [0, p) (u32 halves, high halves zero).
+    /// x - y mod p, x and y in [0, p): x - y wraps above x - y + p exactly
+    /// when y > x.
     #[inline]
     #[target_feature(enable = "avx2")]
-    unsafe fn vadd(x: __m256i, y: __m256i, p: __m256i) -> __m256i {
-        let s = _mm256_add_epi32(x, y);
-        _mm256_min_epu32(s, _mm256_sub_epi32(s, p))
-    }
-
-    #[inline]
-    #[target_feature(enable = "avx2")]
-    unsafe fn vsub(x: __m256i, y: __m256i, p: __m256i) -> __m256i {
-        // x - y wraps above x - y + p exactly when y > x (inputs < 2^31).
+    unsafe fn sub8(x: __m256i, y: __m256i, p32: __m256i) -> __m256i {
         let d = _mm256_sub_epi32(x, y);
-        _mm256_min_epu32(d, _mm256_add_epi32(d, p))
+        _mm256_min_epu32(d, _mm256_add_epi32(d, p32))
     }
 
-    /// Bloom prefilter for four x values (u64 lanes): bit l set if lane l
-    /// may be in the index (exactly `XIndex::head`'s filter test).
+    /// x + y mod p, x and y in [0, p).
     #[inline]
     #[target_feature(enable = "avx2")]
-    unsafe fn vfilter(idx: &XIndex, x: __m256i) -> u32 {
-        let h = _mm256_and_si256(
-            _mm256_mul_epu32(x, _mm256_set1_epi64x(0x9e37_79b1)),
-            _mm256_set1_epi64x(0xffff_ffff),
-        );
-        let w = _mm256_srl_epi64(h, _mm_cvtsi32_si128(idx.fshift as i32));
-        let words = _mm256_i64gather_epi64::<8>(idx.filter.as_ptr() as *const i64, w);
-        let six = _mm256_set1_epi64x(63);
-        let one = _mm256_set1_epi64x(1);
-        let b0 = _mm256_and_si256(h, six);
-        let b1 = _mm256_and_si256(_mm256_srli_epi64(h, 6), six);
-        let b2 = _mm256_and_si256(_mm256_srli_epi64(h, 12), six);
+    unsafe fn add8(x: __m256i, y: __m256i, p32: __m256i) -> __m256i {
+        let s = _mm256_add_epi32(x, y);
+        _mm256_min_epu32(s, _mm256_sub_epi32(s, p32))
+    }
+
+    /// Bloom prefilter for eight x values: bit j set if lane j may be in the
+    /// index (exactly `XIndex::head`'s filter test).
+    #[inline]
+    #[target_feature(enable = "avx2")]
+    unsafe fn filter8(idx: &XIndex, x: __m256i) -> u32 {
+        let h = _mm256_mullo_epi32(x, _mm256_set1_epi32(0x9e37_79b1_u32 as i32));
+        let w = _mm256_srl_epi32(h, _mm_cvtsi32_si128(idx.fshift as i32));
+        let words = _mm256_i32gather_epi32::<4>(idx.filter.as_ptr() as *const i32, w);
+        let m31 = _mm256_set1_epi32(31);
+        let one = _mm256_set1_epi32(1);
+        let b0 = _mm256_and_si256(h, m31);
+        let b1 = _mm256_and_si256(_mm256_srli_epi32(h, 5), m31);
+        let b2 = _mm256_and_si256(_mm256_srli_epi32(h, 9), m31);
         let mask = _mm256_or_si256(
-            _mm256_or_si256(_mm256_sllv_epi64(one, b0), _mm256_sllv_epi64(one, b1)),
-            _mm256_sllv_epi64(one, b2),
+            _mm256_or_si256(_mm256_sllv_epi32(one, b0), _mm256_sllv_epi32(one, b1)),
+            _mm256_sllv_epi32(one, b2),
         );
-        let all = _mm256_cmpeq_epi64(_mm256_and_si256(words, mask), mask);
-        (_mm256_movemask_pd(_mm256_castsi256_pd(all)) & 0xf) as u32
+        let all = _mm256_cmpeq_epi32(_mm256_and_si256(words, mask), mask);
+        _mm256_movemask_ps(_mm256_castsi256_ps(all)) as u32
+    }
+
+    /// X and Y of block `s` (couples 8s .. 8s + 8 of `src`).
+    #[inline]
+    #[target_feature(enable = "avx2")]
+    unsafe fn load_xy(src: *const __m256i, s: usize) -> (__m256i, __m256i) {
+        let v0 = _mm256_loadu_si256(src.add(2 * s));
+        let v1 = _mm256_loadu_si256(src.add(2 * s + 1));
+        let x = _mm256_blend_epi32::<0b1010_1010>(v0, _mm256_slli_epi64(v1, 32));
+        let y = _mm256_blend_epi32::<0b1010_1010>(_mm256_srli_epi64(v0, 32), v1);
+        (x, y)
     }
 
     /// Couples `q0 .. q0 + 8 * blocks`; same matches and counts as the scalar
@@ -1497,7 +1517,7 @@ mod avx2 {
         r: Point,
         q0: usize,
         blocks: usize,
-        prefix: &mut Vec<u64>,
+        prefix: &mut Vec<u32>,
         counts: &mut Counts,
         unique: &mut HashSet<Vec<(u16, i8)>>,
     ) {
@@ -1508,82 +1528,71 @@ mod avx2 {
         // reads it; no zero fill.
         prefix.clear();
         prefix.reserve(len);
-        // SAFETY: u64 has no invalid bit patterns or drop glue, capacity is
+        // SAFETY: u32 has no invalid bit patterns or drop glue, capacity is
         // at least `len`, and slots are written before being read.
         unsafe { prefix.set_len(len) };
-        let p = _mm256_set1_epi64x(P as i64);
-        let lo = _mm256_set1_epi64x(0xffff_ffff);
-        let rxv = _mm256_set1_epi64x(rx as i64);
-        let ryv = _mm256_set1_epi64x(ry as i64);
-        let one = _mm256_set1_epi64x(1);
+        let p64 = _mm256_set1_epi64x(P as i64);
+        let p32 = _mm256_set1_epi32(P as i32);
+        let rxv = _mm256_set1_epi32(rx as i32);
+        let ryv = _mm256_set1_epi32(ry as i32);
+        let nryv = _mm256_set1_epi32(fneg(ry) as i32);
+        let one = _mm256_set1_epi32(1);
         let src = xy.as_ptr() as *const __m256i;
         let pre = prefix.as_mut_ptr() as *mut __m256i;
-        let nryv = _mm256_set1_epi64x(fneg(ry) as i64);
         // x - rx, with 1 in place of 0 (x = rx lanes are handled exactly in
         // the scalar special path).
         let den = |x: __m256i| {
-            let sp = _mm256_cmpeq_epi64(x, rxv);
-            _mm256_or_si256(vsub(x, rxv, p), _mm256_and_si256(sp, one))
+            let sp = _mm256_cmpeq_epi32(x, rxv);
+            _mm256_or_si256(sub8(x, rxv, p32), _mm256_and_si256(sp, one))
         };
-        let mut acc = [one, one];
+        let mut acc = one;
         for s in 0..blocks {
-            for h in 0..2 {
-                let x = _mm256_and_si256(_mm256_loadu_si256(src.add(2 * s + h)), lo);
-                _mm256_storeu_si256(pre.add(2 * s + h), acc[h]);
-                acc[h] = vmul(acc[h], den(x), p);
-            }
+            let (x, _) = load_xy(src, s);
+            _mm256_storeu_si256(pre.add(s), acc);
+            acc = mul8(acc, den(x), p64, p32);
         }
         let mut mults = len as u64;
-        let mut lanes = [0u64; 8];
-        _mm256_storeu_si256(lanes.as_mut_ptr() as *mut __m256i, acc[0]);
-        _mm256_storeu_si256(lanes.as_mut_ptr().add(4) as *mut __m256i, acc[1]);
+        let mut lanes = [0u32; 8];
+        _mm256_storeu_si256(lanes.as_mut_ptr() as *mut __m256i, acc);
         for v in &mut lanes {
             counts.fp_inversions += 1;
-            *v = finv(canon(*v), true, &mut mults);
+            *v = finv(canon(*v as u64), true, &mut mults) as u32;
         }
-        let mut inv = [
-            _mm256_loadu_si256(lanes.as_ptr() as *const __m256i),
-            _mm256_loadu_si256(lanes.as_ptr().add(4) as *const __m256i),
-        ];
-        let (mut xs0, mut xs1, mut ss0, mut ss1) = ([0u64; 8], [0u64; 8], [0u64; 8], [0u64; 8]);
+        let mut inv = _mm256_loadu_si256(lanes.as_ptr() as *const __m256i);
+        let (mut xs0, mut xs1, mut ss0, mut ss1) = ([0u32; 8], [0u32; 8], [0u32; 8], [0u32; 8]);
         for s in (0..blocks).rev() {
-            let (mut hit0, mut hit1, mut special) = (0u32, 0u32, 0u32);
-            for h in 0..2 {
-                let v = _mm256_loadu_si256(src.add(2 * s + h));
-                let x = _mm256_and_si256(v, lo);
-                let y = _mm256_srli_epi64(v, 32);
-                let inv_q = vmul(inv[h], _mm256_loadu_si256(pre.add(2 * s + h)), p);
-                inv[h] = vmul(inv[h], den(x), p);
-                // All operands canonical, so every result is in [0, p).
-                let w = vadd(rxv, x, p);
-                let s0 = vmul(vsub(nryv, y, p), inv_q, p);
-                let x0 = vsub(vmul(s0, s0, p), w, p);
-                let s1 = vmul(vsub(y, ryv, p), inv_q, p);
-                let x1 = vsub(vmul(s1, s1, p), w, p);
-                _mm256_storeu_si256(xs0.as_mut_ptr().add(4 * h) as *mut __m256i, x0);
-                _mm256_storeu_si256(xs1.as_mut_ptr().add(4 * h) as *mut __m256i, x1);
-                _mm256_storeu_si256(ss0.as_mut_ptr().add(4 * h) as *mut __m256i, s0);
-                _mm256_storeu_si256(ss1.as_mut_ptr().add(4 * h) as *mut __m256i, s1);
-                hit0 |= vfilter(idx, x0) << (4 * h);
-                hit1 |= vfilter(idx, x1) << (4 * h);
-                let sp = _mm256_cmpeq_epi64(x, rxv);
-                special |= (_mm256_movemask_pd(_mm256_castsi256_pd(sp)) as u32) << (4 * h);
-            }
+            let (x, y) = load_xy(src, s);
+            let inv_q = mul8(inv, _mm256_loadu_si256(pre.add(s)), p64, p32);
+            inv = mul8(inv, den(x), p64, p32);
+            // All operands canonical, so every result is in [0, p).
+            let w = add8(rxv, x, p32);
+            let s0 = mul8(sub8(nryv, y, p32), inv_q, p64, p32);
+            let x0 = sub8(mul8(s0, s0, p64, p32), w, p32);
+            let s1 = mul8(sub8(y, ryv, p32), inv_q, p64, p32);
+            let x1 = sub8(mul8(s1, s1, p64, p32), w, p32);
+            let hit0 = filter8(idx, x0);
+            let hit1 = filter8(idx, x1);
+            let sp = _mm256_cmpeq_epi32(x, rxv);
+            let special = _mm256_movemask_ps(_mm256_castsi256_ps(sp)) as u32;
             if (hit0 | hit1 | special) == 0 {
                 continue;
             }
-            let entries = |l: usize| {
-                let q = q0 + 8 * s + l;
+            _mm256_storeu_si256(xs0.as_mut_ptr() as *mut __m256i, x0);
+            _mm256_storeu_si256(xs1.as_mut_ptr() as *mut __m256i, x1);
+            _mm256_storeu_si256(ss0.as_mut_ptr() as *mut __m256i, s0);
+            _mm256_storeu_si256(ss1.as_mut_ptr() as *mut __m256i, s1);
+            let entries = |j: usize| {
+                let q = q0 + 8 * s + LANE_COUPLE[j];
                 let (m, c) = (q / 2, q % 2);
                 (4 * m + c, 4 * m + 3 - c)
             };
             let mut bits = special;
             while bits != 0 {
-                let l = bits.trailing_zeros() as usize;
+                let j = bits.trailing_zeros() as usize;
                 bits &= bits - 1;
                 // Rare: x(L) = x(r); exact general additions for both probes.
-                let (e0, e1) = entries(l);
-                let [u, yl] = xy[8 * s + l];
+                let (e0, e1) = entries(j);
+                let [u, yl] = xy[8 * s + LANE_COUPLE[j]];
                 let (u, yl) = (u as u64, yl as u64);
                 for (left_entry, ly) in [(e0, yl), (e1, fneg(yl))] {
                     if let Some((cx, cy)) = exact_add(r, Some((u, fneg(ly))), counts) {
@@ -1594,33 +1603,25 @@ mod avx2 {
                     }
                 }
             }
-            let mut bits = hit0 & !special;
-            while bits != 0 {
-                let l = bits.trailing_zeros() as usize;
-                bits &= bits - 1;
-                let h0 = idx.head_unfiltered(xs0[l]);
-                if h0 != EMPTY {
-                    let y0 = canon(fsub_lazy(fmul_lazy(ss0[l], fsub_lazy(rx, xs0[l])), ry));
-                    mults += 1;
-                    record_x_matches(t, entries(l).0, y0, h0, idx, unique);
-                }
-            }
-            let mut bits = hit1 & !special;
-            while bits != 0 {
-                let l = bits.trailing_zeros() as usize;
-                bits &= bits - 1;
-                let h1 = idx.head_unfiltered(xs1[l]);
-                if h1 != EMPTY {
-                    let y1 = canon(fsub_lazy(fmul_lazy(ss1[l], fsub_lazy(rx, xs1[l])), ry));
-                    mults += 1;
-                    record_x_matches(t, entries(l).1, y1, h1, idx, unique);
+            for (hits, xs, ss, second) in [(hit0, &xs0, &ss0, false), (hit1, &xs1, &ss1, true)] {
+                let mut bits = hits & !special;
+                while bits != 0 {
+                    let j = bits.trailing_zeros() as usize;
+                    bits &= bits - 1;
+                    let xj = xs[j] as u64;
+                    let head = idx.head_unfiltered(xj);
+                    if head != EMPTY {
+                        let yj = canon(fsub_lazy(fmul_lazy(ss[j] as u64, fsub_lazy(rx, xj)), ry));
+                        mults += 1;
+                        let (e0, e1) = entries(j);
+                        record_x_matches(t, if second { e1 } else { e0 }, yj, head, idx, unique);
+                    }
                 }
             }
         }
         // Per couple: forward 1 (above) and backward 2 + 4 multiplications;
         // couples with x(L) = x(r) are charged inside `exact_add` as well.
         mults += 6 * len as u64;
-        let _ = (&mut xs0, &mut xs1);
         counts.group_additions += 2 * len as u64;
         counts.fp_multiplications += mults;
     }
@@ -1634,7 +1635,6 @@ fn couple_probe_range(
     r: Point,
     q0: usize,
     q1: usize,
-    buf64: &mut Vec<u64>,
     buf32: &mut Vec<u32>,
     counts: &mut Counts,
     unique: &mut HashSet<Vec<(u16, i8)>>,
@@ -1644,7 +1644,7 @@ fn couple_probe_range(
         let blocks = (q1 - q0) / 8;
         if blocks > 0 {
             // SAFETY: AVX2 is available (checked above).
-            unsafe { avx2::probe_blocks(t, idx, r, q0, blocks, buf64, counts, unique) };
+            unsafe { avx2::probe_blocks(t, idx, r, q0, blocks, buf32, counts, unique) };
         }
         let rest = q0 + 8 * blocks;
         if rest < q1 {
@@ -1668,7 +1668,7 @@ fn couple_probe_with<R: Send>(
     t: &CoupleTable,
     idx: &XIndex,
     r: Point,
-    buffers: &mut [(Vec<u64>, Vec<u32>)],
+    buffers: &mut [Vec<u32>],
     counts: &mut Counts,
     prelude: Option<impl FnOnce() -> R + Send>,
 ) -> (HashSet<Vec<(u16, i8)>>, Option<R>) {
@@ -1679,7 +1679,7 @@ fn couple_probe_with<R: Send>(
     let mut prelude = prelude;
     let (results, out) = std::thread::scope(|scope| {
         let next = &next;
-        let work = move |buf64: &mut Vec<u64>, buf32: &mut Vec<u32>| {
+        let work = move |buf32: &mut Vec<u32>| {
             let mut c = Counts::default();
             let mut u = HashSet::new();
             loop {
@@ -1688,17 +1688,17 @@ fn couple_probe_with<R: Send>(
                     break;
                 }
                 let (q0, q1) = (k * CHUNK, ((k + 1) * CHUNK).min(couples));
-                couple_probe_range(t, idx, r, q0, q1, buf64, buf32, &mut c, &mut u);
+                couple_probe_range(t, idx, r, q0, q1, buf32, &mut c, &mut u);
             }
             (c, u)
         };
         let (first, rest) = buffers.split_first_mut().expect("at least one thread");
         let handles: Vec<_> = rest
             .iter_mut()
-            .map(|(buf64, buf32)| scope.spawn(move || work(buf64, buf32)))
+            .map(|buf32| scope.spawn(move || work(buf32)))
             .collect();
         let out = prelude.take().map(|f| f());
-        let mut results = vec![work(&mut first.0, &mut first.1)];
+        let mut results = vec![work(first)];
         results.extend(handles.into_iter().map(|h| h.join().unwrap()));
         (results, out)
     });
@@ -1714,7 +1714,7 @@ fn couple_probe(
     t: &CoupleTable,
     idx: &XIndex,
     r: Point,
-    buffers: &mut [(Vec<u64>, Vec<u32>)],
+    buffers: &mut [Vec<u32>],
     counts: &mut Counts,
 ) -> HashSet<Vec<(u16, i8)>> {
     couple_probe_with(t, idx, r, buffers, counts, None::<fn()>).0
@@ -1812,6 +1812,66 @@ mod tests {
                     assert_eq!(counts.group_additions, left.len() as u64);
                 }
             }
+        }
+    }
+
+    /// The 8-lane AVX2 kernel finds the same relations and charges the
+    /// same counts as the scalar couple kernel, including x(L) = x(r)
+    /// couples (r = P_1 + P_2 is itself a couple sum).
+    #[cfg(target_arch = "x86_64")]
+    #[test]
+    fn avx2_couple_kernel_matches_scalar_kernel() {
+        if !std::is_x86_feature_detected!("avx2") {
+            return;
+        }
+        let mut ar = Arithmetic::default();
+        let signed: Vec<[Point; 2]> = (1..=40)
+            .map(|k| {
+                let p = point(&mut ar, k);
+                [p, ar.neg(PRIME31, p)]
+            })
+            .collect();
+        let mut build = Counts::default();
+        let t = CoupleTable::build(&signed, 1, &mut build).expect("distinct x");
+        let idx = XIndex::build(&t, 1);
+        let couples = t.xy.len();
+        assert_eq!(couples % 8, 0);
+        for r in [point(&mut ar, 3), point(&mut ar, 100), point(&mut ar, 77)] {
+            let (mut c_scalar, mut u_scalar) = (Counts::default(), HashSet::new());
+            let mut buf = Vec::new();
+            couple_probe_chunk(
+                &t,
+                &idx,
+                r,
+                0,
+                couples,
+                &mut buf,
+                &mut c_scalar,
+                &mut u_scalar,
+            );
+            let (mut c_avx, mut u_avx) = (Counts::default(), HashSet::new());
+            // SAFETY: AVX2 support was detected above.
+            unsafe {
+                avx2::probe_blocks(
+                    &t,
+                    &idx,
+                    r,
+                    0,
+                    couples / 8,
+                    &mut buf,
+                    &mut c_avx,
+                    &mut u_avx,
+                )
+            };
+            assert!(!u_scalar.is_empty(), "the query must produce relations");
+            assert_eq!(u_avx, u_scalar);
+            assert_eq!(c_avx.group_additions, c_scalar.group_additions);
+            // Eight chains (one inversion each) against the scalar kernel's
+            // `LANES`; the special-path inversions are the same.
+            assert_eq!(
+                c_avx.fp_inversions - 8,
+                c_scalar.fp_inversions - LANES as u64
+            );
         }
     }
 
@@ -1949,7 +2009,7 @@ fn run<S: BuildHasher + Default>(max_queries: usize, levers: Levers, threads: us
     ledger.lap("c1_table_pairs");
     let xidx = ctab.as_ref().map(|t| XIndex::build(t, threads));
     let pair_entries = ctab.as_ref().map_or(pairs.len(), CoupleTable::entries);
-    let mut buffers: Vec<(Vec<u64>, Vec<u32>)> = vec![(Vec::new(), Vec::new()); threads];
+    let mut buffers: Vec<Vec<u32>> = vec![Vec::new(); threads];
     ledger.lap("c2_table_xindex");
     let table_ms = table_start.elapsed().as_millis();
     ledger.lap("c_table");
