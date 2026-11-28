@@ -25,7 +25,7 @@
 //! This engine is Faugère's F4 on `R`, built like
 //! [`pq_f4_f2`](crate::cryptanalysis::pq_f4_f2), which is F4 on the boolean
 //! ring. Its parts:
-//! - **Monomials** are a 64-bit tower mask plus up to four free exponents,
+//! - **Monomials** are a 64-bit tower mask plus up to five free exponents,
 //!   packed into one `u128` whose integer order is grevlex with variable 0
 //!   largest, the order [`f4_fp`](crate::cryptanalysis::f4_fp) uses.
 //! - **Products are rewritten by the tower as they are formed**, so the
@@ -197,9 +197,9 @@ impl Fp {
 /// Layout, least significant first:
 /// - bits `0..64`: the complement of the tower mask. Bit `j` of the mask is
 ///   `y_j`, variable `j`.
-/// - bits `64..96`: for free variable `f` (global index `n_tower + f`), the
+/// - bits `64..104`: for free variable `f` (global index `n_tower + f`), the
 ///   byte `255 − e_f` at bit `64 + 8f`.
-/// - bits `96..104`: the total degree.
+/// - bits `104..128`: the total degree.
 ///
 /// Grevlex compares degrees first, then the exponent of the *last*
 /// variable, smaller winning, then the one before it, and so on. The last
@@ -211,9 +211,9 @@ impl Fp {
 pub type Mono = u128;
 
 const FREE_SHIFT: u32 = 64;
-const DEG_SHIFT: u32 = 96;
+const DEG_SHIFT: u32 = 104;
 /// Free variables a monomial can carry.
-pub const MAX_FREE: usize = 4;
+pub const MAX_FREE: usize = 5;
 
 /// Positive integer weights `1..=8` on the tower variables: the grading of
 /// a weighted run ([`TowerF4Options::weights`]).
@@ -378,7 +378,7 @@ pub fn degree_of(m: Mono) -> u32 {
 }
 
 /// The monomial `1`.
-pub const ONE: Mono = (0xffff_ffffu128 << FREE_SHIFT) | (u64::MAX as u128);
+pub const ONE: Mono = (0xffff_ffffffu128 << FREE_SHIFT) | (u64::MAX as u128);
 
 /// `a | b` in the polynomial ring.
 #[inline]
@@ -672,6 +672,18 @@ impl TowerRing {
         self.mul_terms_fp(fp, g.terms(), g.len(), u, w)
     }
 
+    /// [`Self::mul_elem`], returning `None` once `deadline` has passed.
+    fn mul_elem_until(
+        &self,
+        fp: Fp,
+        g: &Elem,
+        u: Mono,
+        w: TowerWeights,
+        deadline: Instant,
+    ) -> Option<RPoly> {
+        self.mul_terms_fp_until(fp, g.terms(), g.len(), u, w, Some(deadline))
+    }
+
     /// `u · g` in normal form, for `g` given by its terms, descending and
     /// with non-zero coefficients (`len` of them). `g`, `u` and the result
     /// are keyed in the grading `w`.
@@ -683,6 +695,22 @@ impl TowerRing {
         u: Mono,
         w: TowerWeights,
     ) -> RPoly {
+        self.mul_terms_fp_until(fp, g, len, u, w, None)
+            .expect("an unbounded product cannot expire")
+    }
+
+    /// Deadline-aware implementation of [`Self::mul_terms_fp`]. A bounded
+    /// caller can abandon a large carried-term expansion before its final
+    /// sort; the unbounded public path is byte-for-byte the same algorithm.
+    fn mul_terms_fp_until(
+        &self,
+        fp: Fp,
+        g: impl Iterator<Item = (Mono, u32)>,
+        len: usize,
+        u: Mono,
+        w: TowerWeights,
+        deadline: Option<Instant>,
+    ) -> Option<RPoly> {
         let (mu, fu) = (mask_of(u), free_of(u));
         // When `u` has no free variable, the key of a plain product is the
         // key of the term plus a constant: the degree rises by that of `u`,
@@ -700,6 +728,9 @@ impl TowerRing {
         let mut tmp: Vec<(u64, u64)> = Vec::new();
         let mut scratch = MaskScratch::default();
         for (m, c) in g {
+            if deadline.is_some_and(|limit| Instant::now() >= limit) {
+                return None;
+            }
             let mm = mask_of(m);
             if mm & mu == 0 {
                 monos.push(match plain_shift {
@@ -715,9 +746,15 @@ impl TowerRing {
             }
         }
         if carried.is_empty() {
-            return RPoly { monos, coefs };
+            return Some(RPoly { monos, coefs });
+        }
+        if deadline.is_some_and(|limit| Instant::now() >= limit) {
+            return None;
         }
         carried.sort_unstable_by_key(|t| std::cmp::Reverse(t.0));
+        if deadline.is_some_and(|limit| Instant::now() >= limit) {
+            return None;
+        }
         // Merge the two descending lists, adding the coefficients of a
         // repeated monomial and dropping a zero sum: what `from_terms` does
         // to the concatenation. Both lists hold coefficients below `p`.
@@ -727,6 +764,9 @@ impl TowerRing {
         };
         let (mut i, mut j) = (0, 0);
         loop {
+            if (i + j) & 4095 == 0 && deadline.is_some_and(|limit| Instant::now() >= limit) {
+                return None;
+            }
             let m = match (monos.get(i), carried.get(j)) {
                 (Some(&a), Some(&(b, _))) => a.max(b),
                 (Some(&a), None) => a,
@@ -747,7 +787,7 @@ impl TowerRing {
                 out.coefs.push(c as u32);
             }
         }
-        out
+        Some(out)
     }
 
     /// The normal form of a polynomial given by arbitrary exponent vectors
@@ -4171,15 +4211,33 @@ fn scan_products(
     examined: &mut MonoMap<u32>,
     frontier: &mut Vec<Mono>,
     cache: &mut ProductCache,
-) -> u64 {
+    deadline: Option<Instant>,
+) -> Result<u64, u64> {
     let mut terms = 0u64;
     let mut ids: Vec<u32> = Vec::new();
-    for batch in todo.chunks(1024) {
-        let prods: Vec<RPoly> = batch
+    // With a deadline, one wave contains at most one product per worker.
+    // A large symbolic step used to form 1024 products before looking at
+    // the clock, allowing a 60-second run to remain inside this function
+    // for minutes.  Finished waves are still integrated in input order, so
+    // the monomial numbering and the uncapped algorithm do not change.
+    let batch_size = if deadline.is_some() {
+        rayon::current_num_threads().max(1)
+    } else {
+        1024
+    };
+    for batch in todo.chunks(batch_size) {
+        if deadline.is_some_and(|limit| Instant::now() >= limit) {
+            return Err(terms);
+        }
+        let prods: Vec<Option<RPoly>> = batch
             .par_iter()
-            .map(|&(mult, g)| ring.mul_elem(fp, &polys[g as usize], mult, w))
+            .map(|&(mult, g)| match deadline {
+                Some(limit) => ring.mul_elem_until(fp, &polys[g as usize], mult, w, limit),
+                None => Some(ring.mul_elem(fp, &polys[g as usize], mult, w)),
+            })
             .collect();
         for (&(mult, g), p) in batch.iter().zip(&prods) {
+            let Some(p) = p else { return Err(terms) };
             let Some(lead) = p.lm() else { continue };
             terms += p.len() as u64;
             let keep = cache.has_room(p.len());
@@ -4205,8 +4263,11 @@ fn scan_products(
                 },
             });
         }
+        if deadline.is_some_and(|limit| Instant::now() >= limit) {
+            return Err(terms);
+        }
     }
-    terms
+    Ok(terms)
 }
 
 // ── The algorithm ────────────────────────────────────────────────────
@@ -4491,7 +4552,7 @@ fn f4_tower_cached(
         let mut frontier: Vec<Mono> = Vec::new();
         let mut s_desc: Vec<RowDesc> = Vec::with_capacity(jobs.len());
         let mut cache = ProductCache::new(cache_terms);
-        let mut nnz = scan_products(
+        let (mut nnz, mut aborted) = match scan_products(
             ring,
             fp,
             s.w,
@@ -4502,10 +4563,13 @@ fn f4_tower_cached(
             &mut examined,
             &mut frontier,
             &mut cache,
-        );
+            opts.deadline,
+        ) {
+            Ok(terms) => (terms, false),
+            Err(terms) => (terms, true),
+        };
         let mut r_desc: Vec<RowDesc> = Vec::new();
-        let mut aborted = false;
-        while !frontier.is_empty() {
+        while !aborted && !frontier.is_empty() {
             if opts.deadline.is_some_and(|dl| Instant::now() >= dl) {
                 aborted = true;
                 break;
@@ -4525,7 +4589,7 @@ fn f4_tower_cached(
                 }
             }
             let before = r_desc.len();
-            nnz += scan_products(
+            match scan_products(
                 ring,
                 fp,
                 s.w,
@@ -4536,7 +4600,15 @@ fn f4_tower_cached(
                 &mut examined,
                 &mut frontier,
                 &mut cache,
-            );
+                opts.deadline,
+            ) {
+                Ok(terms) => nnz += terms,
+                Err(terms) => {
+                    nnz += terms;
+                    aborted = true;
+                    break;
+                }
+            }
             debug_assert!(
                 r_desc[before..]
                     .iter()
@@ -4861,6 +4933,45 @@ mod tests {
 
     fn fp(p: u64) -> Fp {
         Fp::new(p)
+    }
+
+    #[test]
+    fn symbolic_product_scan_obeys_an_expired_deadline() {
+        let ring = TowerRing::new(7, Vec::new(), 1);
+        let x = mono(0, [1, 0, 0, 0, 0]);
+        let polys = vec![Elem::from_rpoly(RPoly {
+            monos: vec![x, ONE],
+            coefs: vec![1, 1],
+        })];
+        let todo = vec![(ONE, 0)];
+        let mut out = Vec::new();
+        let mut examined = MonoMap::default();
+        let mut frontier = Vec::new();
+        let mut cache = ProductCache::new(16);
+        let result = scan_products(
+            &ring,
+            fp(7),
+            TowerWeights::UNIT,
+            &polys,
+            &todo,
+            0,
+            &mut out,
+            &mut examined,
+            &mut frontier,
+            &mut cache,
+            Some(Instant::now() - Duration::from_millis(1)),
+        );
+        assert_eq!(result, Err(0));
+        assert!(out.is_empty() && examined.is_empty() && frontier.is_empty());
+        assert!(ring
+            .mul_elem_until(
+                fp(7),
+                &polys[0],
+                ONE,
+                TowerWeights::UNIT,
+                Instant::now() - Duration::from_millis(1),
+            )
+            .is_none());
     }
 
     /// grevlex on exponent vectors, variable 0 largest.
@@ -5677,8 +5788,15 @@ mod tests {
                 rng.gen_range(0..9),
                 0,
                 rng.gen_range(0..3),
+                rng.gen_range(0..5),
             ];
-            let fb = [rng.gen_range(0..9u8), 0, rng.gen_range(0..4), 0];
+            let fb = [
+                rng.gen_range(0..9u8),
+                0,
+                rng.gen_range(0..4),
+                0,
+                rng.gen_range(0..5),
+            ];
             let (a, b) = (mono(ma, fa), mono(mb, fb));
             assert_eq!(a, unit_key_reference(ma, fa));
             assert_eq!(mono_w(ma, fa, TowerWeights::UNIT), a);
@@ -6347,7 +6465,10 @@ mod tests {
         let mut frontier = Vec::new();
         let mut seen: Vec<Mono> = Vec::new();
         for _ in 0..3000 {
-            let m = mono(rng.gen_range(0..64u64), [rng.gen_range(0..3), 0, 0, 0]);
+            let m = mono(
+                rng.gen_range(0..64u64),
+                [rng.gen_range(0..3), 0, 0, 0, 0],
+            );
             let n = number_of(&mut examined, &mut frontier, m);
             match seen.iter().position(|&x| x == m) {
                 Some(k) => assert_eq!(n as usize, k, "a repeat keeps its number"),

@@ -1,0 +1,89 @@
+{
+  "schema": "isogeny-labs/pplus-dickson-m7-analysis/v1",
+  "verdict": "retained reproducible null result",
+  "promotion": false,
+  "cross_target_amortization": false,
+  "control": {
+    "name": "archived cold retained-3 plus streamed-4 exact-x-first m7",
+    "multiplications": 4981763,
+    "squarings": 1399151,
+    "inversions": 477,
+    "additions": 1058505,
+    "doublings": 68,
+    "query_candidates": 971635,
+    "note": "The operation vector combines the archived retained-side setup and query. Additions and doublings are shown but are not assigned a multiplication price in this panel."
+  },
+  "candidate_depth1_lower_bound": {
+    "f4_multiply_adds": 558571973,
+    "basis_dfs_multiplications": 1433122,
+    "system_specialization_multiplications": 8,
+    "witness_replay_multiplications": 15,
+    "witness_replay_squarings": 7,
+    "witness_replay_inversions": 6,
+    "note": "This favorable lower bound omits uninstrumented factor-base construction and symbolic-product arithmetic. The legacy pkm_grid_fp_mults_uncharged counter is basis DFS extraction, not grid fallback, and is charged here."
+  },
+  "sensitivity": [
+    {
+      "square_price": 0.8,
+      "inversion_price": 50,
+      "multiply_add_price": 1,
+      "control_field_equivalent": 6124933.8,
+      "candidate_field_equivalent_lower_bound": 560005423.6,
+      "candidate_over_control": 91.430445,
+      "candidate_over_fourfold_promotion_ceiling": 365.72178
+    },
+    {
+      "square_price": 1,
+      "inversion_price": 100,
+      "multiply_add_price": 1,
+      "control_field_equivalent": 6428614,
+      "candidate_field_equivalent_lower_bound": 560005725,
+      "candidate_over_control": 87.111425,
+      "candidate_over_fourfold_promotion_ceiling": 348.4457
+    },
+    {
+      "square_price": 1,
+      "inversion_price": 200,
+      "multiply_add_price": 1,
+      "control_field_equivalent": 6476314,
+      "candidate_field_equivalent_lower_bound": 560006325,
+      "candidate_over_control": 86.469916,
+      "candidate_over_fourfold_promotion_ceiling": 345.879664
+    },
+    {
+      "square_price": 0.8,
+      "inversion_price": 50,
+      "multiply_add_price": 2,
+      "control_field_equivalent": 6124933.8,
+      "candidate_field_equivalent_lower_bound": 1118577396.6,
+      "candidate_over_control": 182.626855,
+      "candidate_over_fourfold_promotion_ceiling": 730.50742
+    },
+    {
+      "square_price": 1,
+      "inversion_price": 100,
+      "multiply_add_price": 2,
+      "control_field_equivalent": 6428614,
+      "candidate_field_equivalent_lower_bound": 1118577698,
+      "candidate_over_control": 173.999823,
+      "candidate_over_fourfold_promotion_ceiling": 695.999292
+    },
+    {
+      "square_price": 1,
+      "inversion_price": 200,
+      "multiply_add_price": 2,
+      "control_field_equivalent": 6476314,
+      "candidate_field_equivalent_lower_bound": 1118578298,
+      "candidate_over_control": 172.718355,
+      "candidate_over_fourfold_promotion_ceiling": 690.87342
+    }
+  ],
+  "depth2": {
+    "resolved_solver_rows": 0,
+    "planted_hit_process_attempts": 3,
+    "miss_attempted": false,
+    "production_attempted": false,
+    "reason": "The planted depth-two hit emitted no solver row before the fixed external censor, including after deadline polling was moved between worker waves and inside product expansion."
+  },
+  "proof_boundary": "The independent verifier reconstructs finite controls and replays the one completed witness. These are transparent recomputations, not a zero-knowledge proof, and there is no depth-two solver result to prove."
+}

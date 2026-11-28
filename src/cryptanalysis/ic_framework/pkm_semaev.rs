@@ -10,7 +10,7 @@
 //! hands the system to F4 over the tower quotient ring
 //! ([`f4_tower`](crate::cryptanalysis::f4_fp_tower::f4_tower)).
 //!
-//! - `mode=chain` (default, `m = 3`): `S₃(x_1, x_2, u_1)`, …,
+//! - `mode=chain` (default, `3 ≤ m ≤ 7`): `S₃(x_1, x_2, u_1)`, …,
 //!   `S₃(u_{m−2}, x_m, x_R)` with free unknowns `u_k`.
 //! - `mode=projective` (`m = 3`): the same split with a homogeneous
 //!   intermediate `(X:Z)`, a Boolean chart selector, and `(1:0)` for the
@@ -1420,7 +1420,7 @@ impl PkmSemaevOracle {
                 PkmMode::Full => 3,
                 PkmMode::Projective => 3,
                 PkmMode::Sym => 4,
-                PkmMode::Chain => 5,
+                PkmMode::Chain => MAX_FREE as u32 + 2,
             };
             if !(2..=max_m).contains(&self.m) {
                 return Err(format!(
@@ -2221,7 +2221,11 @@ impl PkmSemaevOracle {
             mults += sym_mults;
             let terms: Vec<_> = sym_terms
                 .into_iter()
-                .map(|(exp4, coef)| (mono(0, exp4), coef))
+                .map(|(exp4, coef)| {
+                    let mut free = [0u8; MAX_FREE];
+                    free[..exp4.len()].copy_from_slice(&exp4);
+                    (mono(0, free), coef)
+                })
                 .collect();
             out.push(RPoly::from_terms(fp, terms));
         }
