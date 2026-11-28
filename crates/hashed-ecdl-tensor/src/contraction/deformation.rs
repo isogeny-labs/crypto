@@ -34,6 +34,8 @@ pub(super) struct Cauchy {
     pub ring: Ring,
     pub a: usize,
     pub t: i64,
+    #[cfg(test)]
+    sample: Element,
     base: Element,
     numerator_unit: Element,
     factors: BTreeMap<i64, (usize, Element)>,
@@ -95,6 +97,8 @@ impl Cauchy {
             ring: ring.clone(),
             a: parameters.a,
             t,
+            #[cfg(test)]
+            sample: z.clone(),
             base,
             numerator_unit,
             factors,
@@ -146,6 +150,23 @@ impl Cauchy {
         let power = self.ring.pow(inverse, b + 1, meter)?;
         let coefficient = self.ring.mul(&self.numerator_unit, &power, meter)?;
         self.ring.shift(&coefficient, shift)
+    }
+
+    #[cfg(test)]
+    pub(super) fn source_witness_parts(
+        &self,
+    ) -> (
+        &Element,
+        &Element,
+        &Element,
+        &BTreeMap<i64, (usize, Element)>,
+    ) {
+        (
+            &self.sample,
+            &self.base,
+            &self.numerator_unit,
+            &self.factors,
+        )
     }
 }
 
