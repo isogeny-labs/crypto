@@ -153,6 +153,10 @@ generic finite mode-to-group factorization identities plus ten nilpotent,
 geometric-remainder, tile-shift, and exact Cauchy-series lemmas, plus thirty-eight
 extension-ring decoding, source-shaped mutable convolution, reduction,
 nilpotence, and Cauchy-instantiation lemmas.
+The native endpoint-group projection and `GroupAssignmentArtifact.lean` now
+bind the concrete row/column group arrays to exact typed lookups and the formal
+`2M` endpoint-fiber identity; packet ownership and tensor-value refinement
+remain open. `[pcc:unverified]`
 The frozen pre-module precision-history source emits six Lean
 module-compatibility warnings when imported into this project; its bytes are
 unchanged.

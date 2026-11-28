@@ -75,6 +75,44 @@ pub struct Certificate {
     pub(crate) entries: Vec<EntryTable>,
 }
 
+/// Wire schema for the compact endpoint-group assignment projection.
+pub const GROUP_ASSIGNMENT_PROJECTION_SCHEMA: u32 = 1;
+
+/// Canonical projection of the row and column group selected for every parent
+/// edge. The header is projection schema, radix, edge count, left-group count,
+/// and right-group count, followed by the two arrays in edge order.
+pub fn group_assignment_projection(
+    certificate: &Certificate,
+) -> std::result::Result<Vec<usize>, String> {
+    if certificate.schema != SCHEMA
+        || certificate.radix == 0
+        || certificate.left_groups.len() != certificate.edge_count
+        || certificate.right_groups.len() != certificate.edge_count
+        || certificate
+            .left_groups
+            .iter()
+            .chain(&certificate.right_groups)
+            .any(|&group| group >= certificate.radix)
+    {
+        return Err("factorization group projection context".into());
+    }
+    let capacity = 5usize
+        .checked_add(certificate.left_groups.len())
+        .and_then(|value| value.checked_add(certificate.right_groups.len()))
+        .ok_or_else(|| "factorization group projection length".to_string())?;
+    let mut values = Vec::with_capacity(capacity);
+    values.extend([
+        GROUP_ASSIGNMENT_PROJECTION_SCHEMA as usize,
+        certificate.radix,
+        certificate.edge_count,
+        certificate.left_groups.len(),
+        certificate.right_groups.len(),
+    ]);
+    values.extend_from_slice(&certificate.left_groups);
+    values.extend_from_slice(&certificate.right_groups);
+    Ok(values)
+}
+
 /// Explicit structural description bounds derived from certificate dimensions.
 #[derive(Clone, Debug, Serialize)]
 pub struct DescriptionEnvelope {

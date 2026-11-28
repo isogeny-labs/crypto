@@ -11,6 +11,7 @@ import PackingLabelReplayCertificate
 import NodeShrinkArtifact
 import ObjectiveBoundary
 import GroupFactorization
+import GroupAssignmentArtifact
 import ExtensionRingModel
 
 open Curve25519ParametricRefinement
@@ -24,6 +25,7 @@ open Curve25519PackingLabelArtifact
 open Curve25519NodeShrinkArtifact
 open Curve25519ObjectiveBoundary
 open Curve25519GroupFactorization
+open Curve25519GroupAssignmentArtifact
 open Curve25519ExtensionRingModel
 
 #print axioms class_cap_of_scaled_variance
@@ -180,6 +182,13 @@ open Curve25519ExtensionRingModel
 #print axioms packet_row_choice_expansion_by_exponent
 #print axioms partitioned_assignment_factorization
 #print axioms complete_group_child_incidence_count
+#print axioms GroupAssignmentArtifact.wellFormed_eq_true_iff
+#print axioms parseGroupAssignmentArtifactUnchecked_projectionValues
+#print axioms parseGroupAssignmentArtifact_projectionValues
+#print axioms parseGroupAssignmentArtifact_wellFormed
+#print axioms GroupAssignmentArtifact.rowGroup_val
+#print axioms GroupAssignmentArtifact.columnGroup_val
+#print axioms GroupAssignmentArtifact.completeEndpointIncidenceCount
 #print axioms complete_child_family_factorization
 #print axioms sum_regroup_by_fibers
 #print axioms product_pow_two_weight

@@ -644,7 +644,13 @@ where `2^p=0`. It now additionally regroups row choices by their complete
 bounded mode-exponent vector, proves the exact `2M` endpoint mass of
 the row/column group fibers, and instantiates Fubini for complete packet/group
 Boolean entry tables and opaque retained-old-tensor terms. The remaining gap
-is the code-to-model link from concrete Rust Cauchy modes and child arrays to
+is narrowed by `GroupAssignmentArtifact.lean`, a checked native-order importer
+for the actual left/right group arrays. It preserves exact typed lookup values
+and instantiates the generic endpoint-fiber theorem at those arrays, giving
+total mass `2M`. Packet ownership, coefficient values, complete child tensors, and
+the external contraction theorem are still not refined by that compact
+artifact. The remaining gap is the code-to-model link from concrete Rust
+Cauchy modes and child arrays to
 these typed inputs, rather than the finite rearrangement, child-interface,
 shift, cutoff, or geometric-series algebra itself.
 `[pcc:unverified]`

@@ -10,11 +10,11 @@ use crate::child_provenance_certificate::{
 };
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
 use crate::factorization_certificate::{
-    description_envelope, verify as standalone_verify, verify_cauchy_mode_coverage,
-    verify_cauchy_source, verify_ring_multiplication_witness, verify_source_dimensions,
-    verify_with_ring as check, CauchyFactorWitness, CauchySourceWitness, Certificate,
-    CertifiedElement, CertifiedMode, EntryTable, RingMultiplicationWitness, SourceDimensionWitness,
-    SCHEMA,
+    description_envelope, group_assignment_projection, verify as standalone_verify,
+    verify_cauchy_mode_coverage, verify_cauchy_source, verify_ring_multiplication_witness,
+    verify_source_dimensions, verify_with_ring as check, CauchyFactorWitness, CauchySourceWitness,
+    Certificate, CertifiedElement, CertifiedMode, EntryTable, RingMultiplicationWitness,
+    SourceDimensionWitness, SCHEMA,
 };
 use crate::network::FnPredicate;
 use crate::node_refinement_certificate::{
@@ -935,6 +935,24 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert!(conditional_summary.source_capacity_admitted);
     assert!(!conditional_summary.source_length_mass_admitted);
     assert!(!conditional_summary.source_guard_closure_admitted);
+    let group_projection = group_assignment_projection(&conditional_certificate).unwrap();
+    assert_eq!(group_projection[0], 1);
+    assert_eq!(group_projection[1], conditional_certificate.radix);
+    assert_eq!(group_projection[2], conditional_certificate.edge_count);
+    assert_eq!(
+        &group_projection[5..5 + conditional_certificate.edge_count],
+        conditional_certificate.left_groups.as_slice()
+    );
+    assert_eq!(
+        &group_projection[5 + conditional_certificate.edge_count..],
+        conditional_certificate.right_groups.as_slice()
+    );
+    let mut invalid_group_projection = conditional_certificate.clone();
+    invalid_group_projection.left_groups[0] = invalid_group_projection.radix;
+    assert_eq!(
+        group_assignment_projection(&invalid_group_projection).unwrap_err(),
+        "factorization group projection context"
+    );
     let mut missing_degree_cap = conditional_provenance.clone();
     missing_degree_cap.source_degree_cap = None;
     assert_eq!(

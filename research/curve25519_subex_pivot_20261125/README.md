@@ -233,6 +233,14 @@ evidence to the active-call dimension ledger without trusting the producer's
 reported `Q` or `T`. It does not yet join the separate packing and precision
 premises to every node of an arbitrary recursive history. `[pcc:unverified]`
 
+The same accepted certificate now exposes a canonical endpoint-group
+projection: schema/radix/counts followed by the exact row and column group of
+every parent edge. `GROUP_ASSIGNMENT_ARTIFACT.md` and the matching Lean module
+check shape and ranges, preserve exact typed lookup values, and instantiate the
+formal group-fiber split to prove total endpoint mass `2M` for the imported
+arrays. Packet ownership, scalar/mode values, and child tensor semantics remain
+separate. `[pcc:unverified]`
+
 An object-level cross-check now makes the packing boundary explicit. Of those
 596 partition certificates, 285 satisfy `K L<=3M` and match the independent
 BigUint `NodeDimensions` result field for field; 311 fail that source premise
