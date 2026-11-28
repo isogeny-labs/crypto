@@ -180,6 +180,28 @@ impl SplitMix {
     }
 }
 
+/// One distinct coset tested by the deterministic selector, including rejects.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct IsogenyCosetAttempt {
+    pub r: PrimePoint,
+    pub v: Vec<u64>,
+    pub target_columns: usize,
+}
+
+/// All work on one auxiliary draw, including singular and capped draws.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct IsogenySelectionAttempt {
+    pub m: u64,
+    pub status: &'static str,
+    pub aux: Option<(u64, u64)>,
+    pub q: Option<PrimePoint>,
+    pub cosets: Vec<IsogenyCosetAttempt>,
+    pub x_scanned: u64,
+    pub skipped_nonpoints: u64,
+    pub skipped_two_r_in_subgroup: u64,
+    pub skipped_duplicate_cosets: u64,
+}
+
 /// The work of the auxiliary-curve search and the tower build, by kind.
 /// Every group operation on `E'` is also on the caller's ledger (and so
 /// in the factor-base phase's `S`); these are the same counts split by
@@ -226,6 +248,8 @@ pub struct IsogenyTowerCost {
     pub selection_target_legendre: u64,
     pub selection_peak_frontier: u64,
     pub selection_peak_coset_entries: u64,
+    /// Per-draw and per-distinct-coset record, retained even for rejects.
+    pub selection_trace: Vec<IsogenySelectionAttempt>,
 }
 
 /// One 2-isogeny step: kernel abscissa `ξ_j`, `τ_j = 3ξ_j² + a'_j`, and
@@ -554,17 +578,30 @@ pub fn z2xz8_equal_size_tower(
     let search_before = ops.adds + ops.doubles;
     for m in 1..=64u64 {
         cost.curves_tried += 1;
+        let mut attempt = IsogenySelectionAttempt {
+            m,
+            status: "singular",
+            aux: None,
+            q: None,
+            cosets: Vec::new(),
+            x_scanned: 0,
+            skipped_nonpoints: 0,
+            skipped_two_r_in_subgroup: 0,
+            skipped_duplicate_cosets: 0,
+        };
         let m2 = mul(m, m, p);
         let fa = (m2 + p - 1) % p;
         let fb = mul(2, m, p);
         if fa == 0 || fb == 0 {
             cost.singular += 1;
+            cost.selection_trace.push(attempt);
             continue;
         }
         let aa4 = mul(mul(fa, fa, p), mul(fa, fa, p), p);
         let bb4 = mul(mul(fb, fb, p), mul(fb, fb, p), p);
         if aa4 == bb4 {
             cost.singular += 1;
+            cost.selection_trace.push(attempt);
             continue;
         }
         let e2 = (p - bb4) % p;
@@ -575,10 +612,14 @@ pub fn z2xz8_equal_size_tower(
         let a = (s2 + p - mul(s1sq, inv3, p)) % p;
         let b = (mul(mul(s1, s2, p), inv3, p) + p - mul(2, mul(mul(s1sq, s1, p), inv27, p), p)) % p;
         let aux = PrimeCurve { p, a, b };
+        attempt.aux = Some((a, b));
+        attempt.status = "no_32_torsion";
         let Some(q) = z2xz8_halving_q32(&aux, aa4, bb4, ops, &mut cost) else {
             cost.two_sylow_rejected += 1;
+            cost.selection_trace.push(attempt);
             continue;
         };
+        attempt.q = Some(q);
         if !aux.is_identity(&aux.mul(ops, q, 32)) || aux.is_identity(&aux.mul(ops, q, 16)) {
             return Err(format!(
                 "m = {m}: halving point does not have exact order 32"
@@ -591,14 +632,18 @@ pub fn z2xz8_equal_size_tower(
             acc = aux.add(ops, acc, q);
         }
         let mut seen = std::collections::HashSet::new();
+        attempt.status = "cosets_exhausted";
         for x in 0..p {
             cost.selection_x_scanned += 1;
+            attempt.x_scanned += 1;
             cost.selection_sqrt_calls += 1;
             let Some(y) = aux.sqrt_counted(aux.rhs(x), &mut cost.selection_sqrt_muls) else {
+                attempt.skipped_nonpoints += 1;
                 continue;
             };
             let r = PrimePoint::affine(x, y.min((p - y) % p));
             if subgroup.contains(&aux.key(&aux.double(ops, r))) {
+                attempt.skipped_two_r_in_subgroup += 1;
                 continue;
             }
             let mut v = Vec::with_capacity(32);
@@ -612,6 +657,7 @@ pub fn z2xz8_equal_size_tower(
                 return Err(format!("m = {m}: coset abscissae are not distinct"));
             }
             if !seen.insert(v.clone()) {
+                attempt.skipped_duplicate_cosets += 1;
                 continue;
             }
             cost.selection_peak_coset_entries =
@@ -624,15 +670,24 @@ pub fn z2xz8_equal_size_tower(
                     target.legendre(target.rhs(z)) >= 0
                 })
                 .count();
+            attempt.cosets.push(IsogenyCosetAttempt {
+                r,
+                v,
+                target_columns: columns,
+            });
             if columns == interval_size {
+                attempt.status = "equal_size";
+                cost.selection_trace.push(attempt);
                 cost.selection_m = m;
                 cost.search_gae = ops.adds + ops.doubles - search_before;
                 return finish_tower(p, 5, aux, 0, q, Some(r), &mut SplitMix(0), ops, cost);
             }
             if seen.len() == 64 {
+                attempt.status = "coset_cap";
                 break;
             }
         }
+        cost.selection_trace.push(attempt);
     }
     Err("no equal-size X1(2,8) coset within m<=64 and 64 cosets per m".into())
 }
@@ -1612,6 +1667,41 @@ mod tests {
             assert!(selected.cost.selection_sqrt_muls > 0);
             assert!(selected.cost.selection_peak_frontier > 0);
             assert!(selected.cost.selection_peak_coset_entries > 0);
+            assert_eq!(
+                selected.cost.selection_trace.len() as u64,
+                selected.cost.curves_tried
+            );
+            assert_eq!(
+                selected
+                    .cost
+                    .selection_trace
+                    .iter()
+                    .map(|a| a.cosets.len())
+                    .sum::<usize>() as u64,
+                selected.cost.selection_cosets_tested,
+            );
+            let trace = selected
+                .cost
+                .selection_trace
+                .iter()
+                .map(|a| {
+                    serde_json::json!({
+                        "m": a.m, "status": a.status, "aux": a.aux,
+                        "q": a.q.map(|q| [q.x, q.y]),
+                        "x_scanned": a.x_scanned,
+                        "skipped_nonpoints": a.skipped_nonpoints,
+                        "skipped_two_r_in_subgroup": a.skipped_two_r_in_subgroup,
+                        "skipped_duplicate_cosets": a.skipped_duplicate_cosets,
+                        "cosets": a.cosets.iter().map(|c| serde_json::json!({
+                            "r": [c.r.x, c.r.y], "v": c.v, "abscissae": c.target_columns,
+                        })).collect::<Vec<_>>(),
+                    })
+                })
+                .collect::<Vec<_>>();
+            eprintln!(
+                "PKM_TRACE {}",
+                serde_json::json!({"p": p, "attempts": trace})
+            );
             eprintln!(
                 "PKM_SELECT p={p} m={} draws={} cosets={} x_scanned={} sqrt_calls={} sqrt_muls={} target_legendre={} search_gae={} build_gae={} peak_frontier={} peak_cosets={}",
                 selected.cost.selection_m,
