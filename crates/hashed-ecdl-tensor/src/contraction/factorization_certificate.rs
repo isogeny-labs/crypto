@@ -18,8 +18,9 @@ use crate::factorization_certificate::{
 };
 use crate::network::FnPredicate;
 use crate::node_refinement_certificate::{
-    verify as verify_node_refinement, verify_strict as verify_strict_node_refinement,
-    Certificate as NodeRefinementCertificate, SCHEMA as NODE_REFINEMENT_SCHEMA,
+    history_shrink_projection, verify as verify_node_refinement, verify_history_shrink_projection,
+    verify_strict as verify_strict_node_refinement, Certificate as NodeRefinementCertificate,
+    SCHEMA as NODE_REFINEMENT_SCHEMA,
 };
 use crate::packing_provenance_certificate::{
     description_envelope as packing_description_envelope,
@@ -1076,6 +1077,39 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert!(node_summary.rounded_height_child_bound_verified);
     assert!(!node_summary.history_shrink_derived_from_packing);
     assert!(!node_summary.strict_source_refinement_admitted);
+    let history_projection = history_shrink_projection(&node_summary);
+    assert_eq!(history_projection[2], node_summary.edges);
+    assert_eq!(
+        history_projection[7],
+        BigUint::from(node_summary.maximum_child_edges)
+    );
+    assert_eq!(
+        verify_history_shrink_projection(&history_projection).unwrap_err(),
+        "node refinement history projection context"
+    );
+    let exact_history_projection = [
+        BigUint::from(1u8),
+        BigUint::from(64u8),
+        BigUint::from(32u8),
+        BigUint::from(2u8),
+        BigUint::from(4u8),
+        BigUint::from(8u8),
+        BigUint::from(8u8),
+        BigUint::from(1u8),
+    ];
+    verify_history_shrink_projection(&exact_history_projection).unwrap();
+    for (index, replacement) in [(2, 7u8), (6, 9u8), (7, 2u8)] {
+        let mut invalid = exact_history_projection.clone();
+        invalid[index] = BigUint::from(replacement);
+        assert_eq!(
+            verify_history_shrink_projection(&invalid).unwrap_err(),
+            "node refinement history projection arithmetic"
+        );
+    }
+    assert_eq!(
+        verify_history_shrink_projection(&exact_history_projection[..7]).unwrap_err(),
+        "node refinement history projection context"
+    );
     assert_eq!(
         verify_strict_node_refinement(&parsed_node, &mut meter).unwrap_err(),
         "node refinement strict source guards"

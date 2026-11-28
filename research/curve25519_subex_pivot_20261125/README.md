@@ -474,9 +474,9 @@ For any strict source view, the formal artifact recomputes the finite maximum
 class directly. Strict acceptance bounds that maximum, and the exact native
 `ceil(maximum/length)*length` formula is proved at most `maximum+length`.
 The rounded-height composition therefore no longer accepts a selected maximum
-class or padded-height inequality from the producer. The remaining live-call
-premises are `length*class_count<=edges` and the two-sided child-incidence
-bound; compiler/allocation/integer-conversion refinement remains open.
+class or padded-height inequality from the producer. Its explicit producer
+inputs are `length*class_count<=edges` and the two-sided child-incidence bound;
+compiler/allocation/integer-conversion refinement remains open.
 `[pcc:unverified]`
 The native packing summary now reports its recomputed maximum, padded height,
 and exact length-mass admission. Exact child replay reports row and column
@@ -486,6 +486,13 @@ node verifier separately reports radix-64 shrink derived from those packing
 facts and rejects disagreement with observed eightfold shrink. A
 natural-number Lean endpoint consumes the same two inequalities; arbitrary-size
 Rust-to-Lean summary refinement remains open. `[pcc:unverified]`
+The node summary also has a canonical eight-natural history-shrink projection.
+Native code rechecks its radix, rounded height, length mass, and child bound.
+The matching formal artifact has exact unchecked/checked round trips and feeds
+the natural-number shrink endpoint only when aligned with a separately
+strict-parsed packing source. This pins the compact interface while leaving
+compiler, allocation, conversion, and serialization equivalence open.
+`[pcc:unverified]`
 
 The independent native importer now uses the same auxiliary-state schedule as
 the formal replay instead of its former quadratic edge-pair objective: row

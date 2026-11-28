@@ -229,7 +229,11 @@ evidence for two independent claims:
    checks the two-sided rounded-height bound for every child. The node summary
    reports shrink derived from these facts separately from observed shrink.
    A natural-number Lean endpoint consumes the two native-shaped inequalities;
-   arbitrary-size cross-language summary refinement remains open.
+   the summary now emits a canonical eight-natural projection whose native
+   checker recomputes the same arithmetic. A matching formal artifact has an
+   exact field-order parser, checked round trip, and strict-source-aligned
+   history-shrink theorem. Arbitrary-size cross-language equality across
+   compiler, allocation, conversion, and serialization remains open.
    The first replay-compression
    layer is also kernel checked: positive-affine transforms preserve the
    strict first-minimum tie rule, and each row/column candidate objective is a

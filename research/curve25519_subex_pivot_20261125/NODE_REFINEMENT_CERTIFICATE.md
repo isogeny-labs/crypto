@@ -31,6 +31,16 @@ finite algebraic/refinement object from a strict theorem node rather than
 promoting one to the other.
 `[pcc:unverified]`
 
+The successful summary also has a canonical eight-natural projection:
+schema, radix, parent edges, packet length, label classes, maximum class,
+padded height, and maximum child edges. A native checker independently
+recomputes the rounded height and the two exact inequalities. The matching
+Lean `NodeShrinkArtifact` rejects trailing fields, proves checked projection
+round trips, and derives eightfold shrink only after the compact fields are
+aligned with a separately strict-parsed `PackingLabelSource`. The summary is
+therefore arithmetic evidence, not a replacement for the full source trace.
+`[pcc:unverified]`
+
 ## Native control
 
 The admitted three-edge conditional-packing fixture serializes and parses a
@@ -39,8 +49,9 @@ precision, while reporting source-guard closure and strict source refinement
 false because the small radix-2 object is below the asymptotic guards and its
 children do not meet the fixed radix-64 interface. It still reports exact
 row/column incidence accounting and the rounded-height child bound true. The
-strict entry point
-rejects with `node refinement strict source guards`. Clearing the required
+compact projection preserves the exact parent/child counts and its arithmetic
+checker rejects the radix-2 context. The strict entry point rejects with
+`node refinement strict source guards`. Clearing the required
 normalized-precision flag rejects at the context gate.
 `[pcc:unverified]`
 
@@ -53,9 +64,11 @@ the strict root and schema-6 transcript supply compatible schedules.
 `COMPOSITION_BOUNDARY_CERTIFICATE.md` now checks that compatibility and
 falsifies the stronger identification: the schema-6 normalized local witness
 has different `M,K` from the strict root. A natural-number formal endpoint now
-consumes the exact `LD<=M` and `child*64<=2*height*D` facts reported here.
-Rust/Lean semantic refinement for arbitrary successful node summaries is still
-needed, the live `usize` branch cannot allocate a strict-root bundle, and the
-external contraction theorem remains unproved. No practical Curve25519 attack
-follows.
+consumes the exact `LD<=M` and `child*64<=2*height*D` facts reported here, and
+the compact formal importer pins their field order and arithmetic acceptance.
+Proving that every native projection equals the corresponding formal
+natural-number record across compiler, allocation, conversion, and
+serialization semantics is still needed; the live `usize` branch cannot
+allocate a strict-root bundle, and the external contraction theorem remains
+unproved. No practical Curve25519 attack follows.
 `[pcc:unverified]`

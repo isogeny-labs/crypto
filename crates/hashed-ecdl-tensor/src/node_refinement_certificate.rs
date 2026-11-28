@@ -19,6 +19,13 @@ use serde::{Deserialize, Serialize};
 /// Current composed node-refinement wire schema.
 pub const SCHEMA: u32 = 1;
 
+/// Fixed natural-number projection consumed by the formal history-shrink
+/// importer. The eight fields are schema, radix, parent edges, packet length,
+/// label classes, maximum class, padded height, and maximum child edges.
+pub const HISTORY_SHRINK_PROJECTION_SCHEMA: u32 = 1;
+/// Exact field count of the compact history-shrink projection.
+pub const HISTORY_SHRINK_PROJECTION_FIELDS: usize = 8;
+
 /// Complete finite evidence for one recursion node.
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Certificate {
@@ -73,6 +80,47 @@ pub struct VerificationSummary {
     pub strict_source_refinement_admitted: bool,
 }
 
+/// Canonical natural-number projection of the exact history-shrink inputs.
+///
+/// This is deliberately derived from a successful verification summary, not
+/// from caller-supplied serialized fields. Formal source-guard acceptance is
+/// still checked separately because this compact projection does not contain
+/// the complete packing-label trace.
+pub fn history_shrink_projection(summary: &VerificationSummary) -> [BigUint; 8] {
+    [
+        BigUint::from(HISTORY_SHRINK_PROJECTION_SCHEMA),
+        BigUint::from(summary.groups),
+        summary.edges.clone(),
+        summary.packet_length.clone(),
+        BigUint::from(summary.label_classes),
+        BigUint::from(summary.maximum_class),
+        BigUint::from(summary.padded_class_height),
+        BigUint::from(summary.maximum_child_edges),
+    ]
+}
+
+/// Independently check the arithmetic carried by the compact history-shrink
+/// projection. Passing this check is not a source-guard proof: the formal
+/// importer additionally aligns the projection with a strictly parsed packing
+/// source before deriving eightfold shrink.
+pub fn verify_history_shrink_projection(values: &[BigUint]) -> Result<(), String> {
+    if values.len() != HISTORY_SHRINK_PROJECTION_FIELDS
+        || values[0] != BigUint::from(HISTORY_SHRINK_PROJECTION_SCHEMA)
+        || values[1] != BigUint::from(64u8)
+        || values[3] == BigUint::from(0u8)
+    {
+        return Err("node refinement history projection context".into());
+    }
+    let rounded_height = ((&values[5] + &values[3] - BigUint::from(1u8)) / &values[3]) * &values[3];
+    if values[6] != rounded_height
+        || &values[3] * &values[4] > values[2]
+        || &values[7] * BigUint::from(64u8) > BigUint::from(2u8) * &values[6] * &values[4]
+    {
+        return Err("node refinement history projection arithmetic".into());
+    }
+    Ok(())
+}
+
 /// Compose all finite node interfaces and report strict admission.
 ///
 /// The factorization object is verified first. Subsequent verifiers may then
@@ -111,7 +159,7 @@ pub fn verify(certificate: &Certificate, meter: &mut Meter) -> Result<Verificati
     }
     let strict_source_refinement_admitted =
         history_shrink_derived_from_packing && children.strict_source_refinement_admitted;
-    Ok(VerificationSummary {
+    let summary = VerificationSummary {
         edges: source.edges,
         packets: source.packets,
         packet_length: source.packet_length,
@@ -129,7 +177,13 @@ pub fn verify(certificate: &Certificate, meter: &mut Meter) -> Result<Verificati
         rounded_height_child_bound_verified: children.rounded_height_child_bound_verified,
         history_shrink_derived_from_packing,
         strict_source_refinement_admitted,
-    })
+    };
+    if history_shrink_derived_from_packing
+        && verify_history_shrink_projection(&history_shrink_projection(&summary)).is_err()
+    {
+        return Err("node refinement history projection".into());
+    }
+    Ok(summary)
 }
 
 /// Require the complete fixed radix-64 strict refinement, not only a report.

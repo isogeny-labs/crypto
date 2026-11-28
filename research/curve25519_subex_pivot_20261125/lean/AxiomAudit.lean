@@ -8,6 +8,7 @@ import IncidenceBucketScore
 import BucketStateReplay
 import LabelSequence
 import PackingLabelReplayCertificate
+import NodeShrinkArtifact
 import ObjectiveBoundary
 import GroupFactorization
 import ExtensionRingModel
@@ -20,6 +21,7 @@ open Curve25519IncidenceBucketScore
 open Curve25519BucketStateReplay
 open Curve25519LabelSequence
 open Curve25519PackingLabelArtifact
+open Curve25519NodeShrinkArtifact
 open Curve25519ObjectiveBoundary
 open Curve25519GroupFactorization
 open Curve25519ExtensionRingModel
@@ -137,6 +139,10 @@ open Curve25519ExtensionRingModel
 #print axioms PackingLabelSource.historyChildStrictShrink
 #print axioms PackingLabelSource.historyChildStrictShrinkOfRoundedMaximum
 #print axioms PackingLabelSource.historyChildStrictShrinkOfRoundedMaximumNat
+#print axioms NodeShrinkArtifact.valid_eq_true_iff
+#print axioms parseNodeShrinkArtifactUnchecked_projectionValues
+#print axioms parseNodeShrinkArtifact_projectionValues
+#print axioms NodeShrinkArtifact.historyChildStrictShrink
 #print axioms packingLabelSourceGuardWitnessSource_artifact
 #print axioms packingLabelSourceGuardWitnessArtifact_toList
 #print axioms packingLabelSourceGuardWitness_parsed

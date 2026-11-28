@@ -288,6 +288,14 @@ into a distinct radix-64 derived-shrink result and cross-checks observed
 eightfold shrink. A natural-number formal endpoint accepts the same two
 inequalities without caller-managed casts. Cross-language summary refinement
 is still open. `[pcc:unverified]`
+The native node summary now additionally emits an eight-natural compact
+history-shrink projection and independently checks its radix, rounded height,
+length mass, and child incidence arithmetic. `NodeShrinkArtifact.lean` mirrors
+that exact field order, rejects trailing fields, proves unchecked and checked
+projection round trips, and connects any valid aligned artifact to the
+strict-source history theorem. Alignment with a strictly parsed packing source
+is explicit; compiler, allocation, conversion, and serialization refinement
+remain outside the theorem. `[pcc:unverified]`
 
 A four-level default control follows all 16 radix-two paths to `a=5` from a
 root with `M=LD=32768`. Every final packing passes with 32755--32786 edges,
