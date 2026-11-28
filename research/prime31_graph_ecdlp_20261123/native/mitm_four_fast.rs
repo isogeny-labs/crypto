@@ -1739,6 +1739,114 @@ fn main() {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn point(ar: &mut Arithmetic, scalar: u64) -> Point {
+        ar.scalar(PRIME31, scalar, Some(PRIME31.g))
+    }
+
+    fn pairs(points: &[Point]) -> Vec<Pair> {
+        points
+            .iter()
+            .enumerate()
+            .map(|(i, &sum)| Pair {
+                sum,
+                i: i as u16,
+                j: 0,
+                si: 1,
+                sj: 1,
+            })
+            .collect()
+    }
+
+    #[test]
+    fn batched_and_fused_complements_match_group_addition() {
+        let mut ar = Arithmetic::default();
+        let g = point(&mut ar, 1);
+        let neg_g = ar.neg(PRIME31, g);
+        let points = [None, g, neg_g, point(&mut ar, 2), point(&mut ar, 7)];
+        let cases = [
+            vec![],
+            pairs(&points[..3]),
+            pairs(&points),
+            pairs(&[point(&mut ar, 13), point(&mut ar, 19)]),
+        ];
+        for (case, left) in cases.iter().enumerate() {
+            for (query, r) in [g, point(&mut ar, 11)].into_iter().enumerate() {
+                let expected: Vec<_> = left
+                    .iter()
+                    .map(|entry| {
+                        let neg = ar.neg(PRIME31, entry.sum);
+                        ar.add(PRIME31, r, neg)
+                    })
+                    .collect();
+                for (mersenne, lazy) in [(false, false), (true, false), (true, true)] {
+                    let mut counts = Counts::default();
+                    let batched = batch_complements(left, r, mersenne, &mut counts);
+                    assert_eq!(
+                        batched, expected,
+                        "case={case}, query={query}, mersenne={mersenne}"
+                    );
+                    assert_eq!(counts.group_additions, left.len() as u64);
+
+                    let mut actual = vec![None; left.len()];
+                    let mut scratch = Scratch::default();
+                    let mut counts = Counts::default();
+                    fused_probe(
+                        left,
+                        r,
+                        mersenne,
+                        lazy,
+                        &mut scratch,
+                        &mut counts,
+                        |entry, result| {
+                            actual[entry.i as usize] = result;
+                        },
+                    );
+                    assert_eq!(
+                        actual, expected,
+                        "case={case}, query={query}, mersenne={mersenne}, lazy={lazy}"
+                    );
+                    assert_eq!(counts.group_additions, left.len() as u64);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn batched_pair_table_matches_group_addition() {
+        let mut ar = Arithmetic::default();
+        let g = point(&mut ar, 1);
+        let points = [
+            None,
+            g,
+            g,
+            ar.neg(PRIME31, g),
+            point(&mut ar, 2),
+            point(&mut ar, 7),
+        ];
+        let signed: Vec<_> = points.iter().map(|&p| [p, ar.neg(PRIME31, p)]).collect();
+        let mut expected = Vec::new();
+        for i in 0..signed.len() {
+            for j in i + 1..signed.len() {
+                for si in 0..2 {
+                    for sj in 0..2 {
+                        expected.push(ar.add(PRIME31, signed[i][si], signed[j][sj]));
+                    }
+                }
+            }
+        }
+        for mersenne in [false, true] {
+            let mut batched_ar = Arithmetic::default();
+            let actual = batch_table_sums(&signed, mersenne, &mut batched_ar);
+            assert_eq!(actual, expected, "mersenne={mersenne}");
+            assert_eq!(batched_ar.counts.group_additions, expected.len() as u64);
+        }
+    }
+}
+
 /// Peak resident set (VmHWM, kB) of this process so far; None off Linux.
 fn vm_hwm_kb() -> Option<u64> {
     let status = std::fs::read_to_string("/proc/self/status").ok()?;

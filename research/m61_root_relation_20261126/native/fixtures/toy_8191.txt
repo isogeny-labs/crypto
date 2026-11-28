@@ -1,0 +1,62 @@
+Fixed ECDLP relation-composition fixture
+curve: F_8191, y^2=x^3-3x+40, O=None
+group order N=8024, cofactor h=136, subgroup order r=59
+cofactor map: P_i_prime=[136]P_i
+All coordinates below are affine (x,y) modulo 8191. Indices are 0-based.
+
+factor base: index raw_x raw_y projected_x projected_y
+ 0    1 1857 4370 7422
+ 1 7083 3816 6224 4338
+ 2 1944  781 5479 4564
+ 3 7205 3938 4314 4860
+ 4 5658 3175 5356 2972
+ 5 6830 2063 4394 2617
+ 6  844 1759 4047 6201
+ 7 8100 1451 7887 1806
+ 8 6813  150 4370 7422
+ 9 2536 2476 7913 7237
+10 8190 3041 1655 3691
+11 1108 2729 1755 3971
+12  986 2406 4047 6201
+13 7910 3625 6224 3853
+14 5106  225 7887 1806
+15 2533  437 7244 1194
+16  717 1002 7554 7178
+17 7347  317 1755 4220
+18 1378 2182 1755 3971
+19  375 3165 7554 1013
+
+19 independent full-group zero rows (each row is index:coefficient):
+R00 10:+1 12:-1 13:+1 14:-1 15:-1 18:+1 19:-1
+R01 9:+1 10:-1 12:-1 13:+1 14:-1 18:+1 19:-1
+R02 9:+1 11:+1 13:-1 15:+1 16:+1 18:+1 19:-1
+R03 8:+1 9:-1 10:-1 11:+1 15:-1 18:-1 19:+1
+R04 8:+1 10:-1 12:-1 16:-1 17:+1 18:-1 19:-1
+R05 8:+1 10:+1 13:+1 14:+1 15:+1 17:+1 18:-1
+R06 7:+1 8:-1 10:-1 11:+1 12:-1 16:+1 18:+1
+R07 7:+1 8:-1 10:+1 12:-1 14:+1 17:-1 19:-1
+R08 7:+1 8:-1 9:+1 11:+1 12:+1 14:-1 16:-1
+R09 7:+1 9:+1 10:+1 13:-1 14:-1 16:+1 18:+1
+R10 7:+1 8:+1 9:-1 10:+1 11:-1 13:+1 14:-1
+R11 6:+1 7:-1 14:-1 16:+1 17:+1 18:+1 19:-1
+R12 6:+1 7:-1 9:+1 12:+1 15:-1 16:-1 17:+1
+R13 5:+1 6:-1 7:-1 8:-1 12:+1 17:+1 18:-1
+R14 4:+1 5:-1 6:-1 7:-1 8:-1 11:+1 18:-1
+R15 3:+1 4:-1 5:-1 6:-1 7:-1 12:-1 13:-1
+R16 2:+1 3:-1 4:-1 5:-1 6:+1 13:-1 18:-1
+R17 1:+1 2:-1 3:-1 5:-1 8:-1 9:-1 12:+1
+R18 0:+1 1:-1 2:-1 3:-1 4:+1 6:+1 8:+1
+
+row rank mod 59 = 19
+nullvector v (free coordinate 19 = 1): [12, 31, 20, 54, 16, 55, 6, 2, 12, 14, 24, 50, 6, 28, 2, 34, 58, 9, 50, 1]
+external raw point with x=0: (0, 2791)
+G=[136](external point): (2228, 404)
+Q=[17]G: (7742, 7694)
+G decomposition over projected base: -P_0_prime - P_9_prime
+Q decomposition over projected base: -P_1_prime + P_7_prime
+nullvector contractions: G=33, Q=30; Q/G=30*inv(33) mod59=17
+
+projection-only relation: -37*P_0 + P_1; projected sum=O, raw sum=(7448, 1813)
+invalid row: R00 with coefficient at index 10 flipped from +1 to -1; projected sum=(7092, 2233) (must reject)
+
+Generation source: roots_pair_probe.py, projected_seven_mitm.py, relation_composition_toy.py; static values suffice for Rust tests.
