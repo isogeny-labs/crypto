@@ -3302,10 +3302,11 @@ identity. The `pkm-semaev` oracle currently offers the affine chain through
 
 **Would a smoother auxiliary curve help?** The isogeny tower of §2.1
 already uses degree-two maps, the smallest nontrivial degree, and obtains a
-fully split `2^t`-point preimage on an auxiliary curve `E'`. Making
-`#E'(F_p)` more smooth could reduce the search and construction cost, which
-must be rebuilt for each target under the no-preprocessing rule. It does
-not add summation constraints or reduce the chain's separator width. In
+fully split `2^t`-point preimage on an auxiliary curve `E'`. A constructive family with prescribed `2^t`-torsion could reduce the
+auxiliary-curve search cost, which must be charged for each target under
+the no-preprocessing rule. Extra smooth factors in `#E'(F_p)` by
+themselves do not add summation constraints or reduce the chain's
+separator width. In
 the measured isogeny family, F4's solving degree rises from 5 to 6 at
 `m = 2, N = 20` (§11.7), so smooth preimages have not supplied a
 depth-independent solver bound. A nonconstant `F_p)-morphism
