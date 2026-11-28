@@ -31,42 +31,46 @@ road for the enumeration PDP: §2.4 of `RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRA
 shows that any enumeration/table PDP stays on the generic `S·T² ≳ p` line
 whatever its constant.
 
-### 1.2 Fixed-arity table baseline: cheap attempts and certified rank
+### 1.2 Fixed-arity PDP without preprocessing: cheap attempts and rank
 
-Here is a complete asymptotic accounting for the elementary table approach,
-with group order \(N=p^{1+o(1)}\), a prime-order subgroup
-\(G=\langle P\rangle\), fixed \(1\le m<N\), and a factor base of
-\(t=p^{o(1)}\) independently uniform points of \(G\). Set
-\(M=\binom{t+m-1}{m}=p^{o(1)}\). Precomputing all \(M\) unordered
-\(m\)-fold sums takes \(O(mM)\) group operations and \(O(M)\) storage.
-For each fresh \(R=aP+bQ\), computing \(R\) and looking it up costs
-\(O(\log N)\) group operations plus a dictionary lookup, hence
-\(p^{o(1)}\) per attempt, including failed lookups. For two distinct
-multiplicity vectors, equality of their sums has probability \(1/N\)
-when \(m<N\); the union bound makes the chance of *any* collision at most
-\(\binom M2/N=o(1)\). Detecting and resampling a colliding base leaves
-expected preprocessing \(p^{o(1)}\).
+Assume a supplied factor base \(B_1,\ldots,B_t\) in a prime-order subgroup
+\(G=\langle P\rangle\) of order \(N=p^{1+o(1)}\), with fixed
+\(1\le m<N\) and \(t=p^{o(1)}\). No sum table, factor-base logs, or
+other target-independent advice is built. On each fresh
+\(R=aP+bQ\), enumerate all \(M=\binom{t+m-1}{m}=p^{o(1)}\)
+unordered \(m\)-fold sums directly, compare them with \(R\), and discard
+the temporary sums. The cost is \(O(mM+\log N)=p^{o(1)}\) group
+operations per attempt, including unsuccessful attempts. This is a
+fixed-arity generic enumeration baseline, not an algebraic PDP solver.
 
-This construction also gives an explicit full-rank stopping argument: a
-hit with multiplicity vector \(e\) contributes the row \((e,-b)\) in
+For any base, at most \(M\) distinct targets can decompose, so a uniform
+attempt succeeds with probability at most \(M/N\). If each attempt yields
+at most one relation, the expected count merely to obtain \(t+1\) hits is
+at least \((t+1)N/M=p^{1-o(1)}\). This lower bound applies regardless
+of how cheaply a failed attempt is recognized.
+
+Full rank has a separate, explicit sufficient condition. A hit with
+multiplicity vector \(e\) contributes \((e,-b)\) in
 \(e\cdot L-bs=a\pmod N\), where \(L_i=\log_P B_i\) and
-\(s=\log_P Q\). After collision-free preprocessing, each \(mB_i\)
-has the unique multiplicity vector \(m e_i\). Uniform independent targets encounter all \(t\) of these
-points in \(NH_t\) expected attempts, where \(H_t=\sum_{j=1}^t1/j\);
-their coefficient rows span \(\mathbb F_N^t\). Conditional on \(R\), the
-random \(b\) is uniform because \((a,b)\mapsto(R,b)\) is bijective.
-A repeat of any one \(mB_i\) with a different \(b\) takes at most
-\(N/[t(1-1/N)]\) more expected attempts. Subtracting its two rows leaves
-zero factor-base coefficients and a nonzero \(Q\) coefficient, so the
-full relation matrix has rank \(t+1\). The expected collection bound is
-\(NH_t+N/[t(1-1/N)]=p^{1+o(1)}\), before the
-\(p^{o(1)}\) final elimination. Conversely, any one-row-per-attempt
-method using these fixed-arity sums needs at least \((t+1)N/M=p^{1-o(1)}\)
-expected uniform targets merely to obtain \(t+1\) hits.
+\(s=\log_P Q\). If every \(mB_i\) has the unique representation
+\(m e_i\), uniform independent targets encounter these \(t\) points in
+\(NH_t\) expected attempts, with \(H_t=\sum_{j=1}^t1/j\). Their
+factor-base coefficient rows span \(\mathbb F_N^t\) because \(m<N\).
+Conditional on \(R\), the sampled \(b\) is uniform: the map
+\((a,b)\mapsto(R,b)\) is bijective. A repeat of any one \(mB_i\)
+with a different \(b\) takes at most \(N/[t(1-1/N)]\) more expected
+attempts. Subtracting those rows gives a nonzero target-log coefficient
+and zero base coefficients, hence rank \(t+1\). The conditional expected
+collection count is at most \(NH_t+N/[t(1-1/N)]=p^{1+o(1)}\), with
+no preprocessing.
 
-This is an explicit witness for cheap *attempts* and eventual rank. Its
-nearly linear total count agrees with the enumeration boundary in
-[the prime-field program](RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md#1-generic-ceiling-in-the-units-this-repository-already-uses).
+The sufficient condition holds with probability \(1-o(1)\) when the
+supplied \(B_i\) are independent uniform points: any two different
+multiplicity vectors have equal sums with probability \(1/N\) (condition
+on one point whose coefficients differ), and a union bound gives collision
+probability at most \(\binom M2/N=o(1)\). The rank bound is conditional
+on that property; no base inspection is charged or assumed. This nearly
+linear total count agrees with [the prime-field enumeration boundary](RESEARCH_PRIME_FIELD_BREAKTHROUGH_PROGRAM.md#1-generic-ceiling-in-the-units-this-repository-already-uses).
 The PDP and relation conventions follow
 [Yokoyama et al., *Complexity bounds on Semaev's naive index calculus method for ECDLP*](https://doi.org/10.1515/jmc-2019-0029).
 
