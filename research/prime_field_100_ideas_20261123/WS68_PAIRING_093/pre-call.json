@@ -1,0 +1,19 @@
+{
+  "date": "2026-11-25",
+  "conductor_task": "T-174",
+  "scope": "public E(F_43), one matched target, one local GP process",
+  "checkpoint_gate": {
+    "command": "scripts/checkpoint.sh gate",
+    "exit_code": 2,
+    "reason": "missing .resume/RESUME.md; S3 checkpoint unavailable for this worktree",
+    "admission": "user-authorized bounded local bypass; no cloud run or spend"
+  },
+  "source_sha256": "114787d88d624d0e92b7ededab23c9b2793382835da59e7640f977a33b382256",
+  "protocol_sha256": "43baab14c366109b294c5450332fe9bcb8a6d7e0a95cefcb50ce4add1b86fc8c",
+  "gp_binary_sha256": "1b3464452036a97072a2514f5094bb49188e2ee3089a61514443494f4875ceb5",
+  "gp_version": "2.17.3 arm64 darwin",
+  "command": "gp -q < solve.gp",
+  "expected_checks": ["r=11 subgroup and k=2 embedding", "nontrivial order-11 Weil pairing", "finite-field log inverted on original EC", "same-target rho scalar agrees"],
+  "rho_controls": {"seeds": [1,2,3], "floyd_step_cap_per_seed": 100, "partition": "x mod 3, identity branch 0"},
+  "cost_units": ["field setup wall ms", "two pairings wall ms", "finite field log wall ms", "rho wall ms", "rho EC transitions"]
+}

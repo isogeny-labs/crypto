@@ -1,0 +1,18 @@
+{
+  "record_type":"immutable_pre_call",
+  "created_utc":"2026-11-25T21:56:37Z",
+  "conductor_task":"T-140",
+  "admission":"user-authorized bounded local E(F_p) run; prior S3 HTTP 403 and missing .resume gates remain unqualified; no cloud spend",
+  "worktree_commit":"1157a5c5d1af9f277b2661a7672f9c979e39e258",
+  "source":{"path":"WS68_YIELD_HELDOUT.rs","sha256":"a9e95da56a5797c7b77166c499512f290f937f3d785630308e215e62d81c848a"},
+  "immutable_qualifier":{"path":"WS68_YIELD_HELDOUT.qualifier.rs","sha256":"a9e95da56a5797c7b77166c499512f290f937f3d785630308e215e62d81c848a"},
+  "compiler":{"path":"/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/bin/rustc","sha256":"1ba7bb8e273bd64125f4048d2ecce530e0a6470e565ab1b3aecf0b82b532f7b1"},
+  "compile_argv":["rustc","-O","--edition","2021","--crate-name","WS68_YIELD_HELDOUT","WS68_YIELD_HELDOUT.qualifier.rs","-o","WS68_YIELD_HELDOUT.bin"],
+  "input":{"curve":"E/F_1009: y^2=x^3+x+14","generator":[0,425],"order":1013,"held_out_targets":[37,83,191,349,613,769,887,997],"prior_V2_targets":[123,277,411,509,701,827,941,1003],"max_trials_per_arm":512,"candidate_seed_rule":"0x6e7120261124 XOR ((Q.x as u64)<<32) XOR Q.y","candidate_rule":"xorshift scalar a mod 1013, test R=[a]G+Q","factor_base":"first 8/16 canonical x-ordered points on E(F_1009)"},
+  "arms":{"fixed8":"B=8 throughout","fixed16":"B=16 throughout","yield64":"start B8, at trial64 expand to B16 iff hits<2; otherwise stay B8"},
+  "run_order":"targets ascending; for each target fixed8, fixed16, yield64; one fresh binary process per arm, append three outputs to that target's shard; preserve nonzero exit and stderr; no retry of an executed arm",
+  "expected":"No outcome prediction. Print 24 arm records in eight sub-64KiB target shards; record all failures/censoring. Verify each accepted point-sum identity, modular rank/target pin and scalar result. Report base y tests/x scans, target/pair/candidate/group-verify additions, lookups, rank field operations, wall ns and process CPU ns per arm.",
+  "timing":{"wall":"Rust Instant from process main before target/base construction through solution validation, excludes final print","cpu":"Darwin clock_gettime(CLOCK_PROCESS_CPUTIME_ID=12) over same interval; SDK MacOSX27.2 /usr/include/_time.h"},
+  "prior_work":{"kb_revision":"750797a540fb4c38837c67b12df84d5b","kb_last_refresh":"2026-11-25T03:19:48Z","repo_refs":["research/prime_field_100_ideas_20261123/WS68_BASE_POLICY_V2.rs","research/prime_field_100_ideas_20261123/WS68_YIELD_BASE.rs","docs/ic/BOUNDARY_TARGETS.md"],"literature_note":"Same fixed factor-base-size engineering question as prior run; no novelty or asymptotic claim. The eight target scalars and point-seeded streams are disjoint from V2; feedback threshold is frozen unchanged."},
+  "limits":"Single public curve, tiny pair-sum relation oracle and one run per arm. Group-add field arithmetic, HashMap probes, allocation and validation group work are not collapsed into a single exact scalar cost; wall/CPU include execution of those components. Censoring is part of outcome."
+}

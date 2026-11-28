@@ -3469,6 +3469,155 @@ fn packed_coprime(a: u128, b: u128) -> bool {
     nz(a) & nz(b) == 0
 }
 
+/// Sum of the `n` 8-bit exponent fields of a packed monomial.
+#[inline]
+fn packed_degree(x: u128, n: usize) -> u32 {
+    let mut d = 0u32;
+    for i in 0..n {
+        d += ((x >> (8 * i)) & 0xff) as u32;
+    }
+    d
+}
+
+/// Packed Gebauer–Möller UPDATE with no visit-accounting traffic.  Used by
+/// the default (accounting-off) F4 path where each F4 step can add hundreds
+/// of basis elements and the generic `gm_update` spent most of the basis-
+/// update phase on criterion B / M / F.  Criterion F among equal lcms keeps
+/// the last candidate (same as the sequential generic path).
+fn gm_update_packed(
+    h: u128,
+    lms: &[u128],
+    pairs: &mut Vec<Pair>,
+    above: &mut Vec<Pair>,
+    alive: &mut [bool],
+    k: usize,
+    gm: bool,
+    limits: Option<&F4ResourceLimits>,
+    deadline: Option<Instant>,
+) -> Result<Vec<(usize, u128)>, F4Stop> {
+    let keep = |pr: &Pair| {
+        let l = pr.lcm_p;
+        !packed_divides(h, l)
+            || packed_lcm(lms[pr.i], h) == l
+            || packed_lcm(lms[pr.j], h) == l
+    };
+    if gm {
+        pairs.retain(keep);
+        above.retain(keep);
+    }
+    if let Some(limits) = limits {
+        limits.check(
+            "critical_pairs",
+            "pairs",
+            pairs
+                .len()
+                .checked_add(above.len())
+                .and_then(|n| n.checked_add(alive.iter().take(k).filter(|&&a| a).count())),
+            limits.max_pairs,
+        )?;
+    }
+    let alive_idx: Vec<usize> = (0..k).filter(|&i| alive[i]).collect();
+    if deadline.is_some_and(|d| Instant::now() > d) {
+        return Err(F4Stop::Deadline);
+    }
+    // (basis index, lcm(h, lm_i), coprime, dies)
+    let cand: Vec<(usize, u128, bool, bool)> = if alive_idx.len() >= 256 {
+        alive_idx
+            .par_iter()
+            .map(|&i| {
+                let lmi = lms[i];
+                (
+                    i,
+                    packed_lcm(h, lmi),
+                    packed_coprime(h, lmi),
+                    packed_divides(h, lmi),
+                )
+            })
+            .collect()
+    } else {
+        alive_idx
+            .iter()
+            .map(|&i| {
+                let lmi = lms[i];
+                (
+                    i,
+                    packed_lcm(h, lmi),
+                    packed_coprime(h, lmi),
+                    packed_divides(h, lmi),
+                )
+            })
+            .collect()
+    };
+    for &(i, _, _, dies) in &cand {
+        if dies {
+            alive[i] = false;
+        }
+    }
+    let mut kept = vec![true; cand.len()];
+    if gm {
+        // Parallel-safe M/F: among equal lcms keep the last index (matches
+        // the sequential generic UPDATE).  A snapshot of `kept` is wrong for
+        // equals — both would drop — so equal-lcm ties use index order.
+        if cand.len() >= 256 {
+            let dominated: Vec<bool> = (0..cand.len())
+                .into_par_iter()
+                .map(|a| {
+                    if cand[a].2 {
+                        return false;
+                    }
+                    let a_lcm = cand[a].1;
+                    for b in 0..cand.len() {
+                        if b == a {
+                            continue;
+                        }
+                        let b_lcm = cand[b].1;
+                        if !packed_divides(b_lcm, a_lcm) {
+                            continue;
+                        }
+                        if b_lcm != a_lcm || b > a {
+                            return true;
+                        }
+                    }
+                    false
+                })
+                .collect();
+            for (k, d) in kept.iter_mut().zip(dominated) {
+                if d {
+                    *k = false;
+                }
+            }
+        } else {
+            for a in 0..cand.len() {
+                if deadline.is_some_and(|d| Instant::now() > d) {
+                    return Err(F4Stop::Deadline);
+                }
+                if cand[a].2 {
+                    continue;
+                }
+                let mut dominated = false;
+                for b in 0..cand.len() {
+                    if b == a || !kept[b] {
+                        continue;
+                    }
+                    if packed_divides(cand[b].1, cand[a].1) {
+                        dominated = true;
+                        break;
+                    }
+                }
+                if dominated {
+                    kept[a] = false;
+                }
+            }
+        }
+    }
+    Ok(cand
+        .into_iter()
+        .zip(kept)
+        .filter(|((_, _, cp, _), keep)| !cp && *keep)
+        .map(|((i, l, _, _), _)| (i, l))
+        .collect())
+}
+
 /// The Gebauer–Möller update for a new leading monomial `h` (Becker and
 /// Weispfenning's UPDATE), over any monomial representation: criterion B
 /// on the pending pairs (and those held above the degree bound), the
@@ -7549,24 +7698,36 @@ fn f4_with_arithmetic(
             Some(lmp) => {
                 let h = pack(&f[0].0);
                 let lms: &[u128] = lmp;
-                let new = gm_update(
-                    &h,
-                    |i| lms[i],
-                    pairs,
-                    above,
-                    |pr| pr.lcm_p,
-                    alive,
-                    k,
-                    gm,
-                    |a, b| packed_divides(*a, *b),
-                    |a, b| packed_lcm(*a, *b),
-                    |a, b| packed_coprime(*a, *b),
-                    limits,
-                    deadline,
-                    account.into(),
-                )?;
+                // Default F4 (visit accounting off) uses the packed fast path:
+                // hundreds of UPDATE calls per dense step, no TLS charge traffic.
+                let new = if matches!(account, VisitAccount::Off) {
+                    gm_update_packed(
+                        h, lms, pairs, above, alive, k, gm, limits, deadline,
+                    )?
+                } else {
+                    gm_update(
+                        &h,
+                        |i| lms[i],
+                        pairs,
+                        above,
+                        |pr| pr.lcm_p,
+                        alive,
+                        k,
+                        gm,
+                        |a, b| packed_divides(*a, *b),
+                        |a, b| packed_lcm(*a, *b),
+                        |a, b| packed_coprime(*a, *b),
+                        limits,
+                        deadline,
+                        account.into(),
+                    )?
+                };
                 lmp.push(h);
-                new.into_iter().map(|(i, l)| (i, unpack(l, n), l)).collect()
+                // Defer unpack: most pairs are retired by later criterion B
+                // before a step selects them; symbolic unpacks `lcm_p` then.
+                new.into_iter()
+                    .map(|(i, l)| (i, Vec::new(), l))
+                    .collect()
             }
             None => {
                 let h = f[0].0.clone();
@@ -7593,7 +7754,11 @@ fn f4_with_arithmetic(
             return Err(F4Stop::Accounting);
         }
         for (i, l, lp) in new {
-            let d = total_degree(&l);
+            let d = if lp != 0 {
+                packed_degree(lp, n)
+            } else {
+                total_degree(&l)
+            };
             let pair = Pair {
                 i,
                 j: k,
@@ -8001,7 +8166,24 @@ fn f4_with_arithmetic(
                 let mut selected = selected;
                 if let Some(c) = opts.max_pairs_per_step {
                     if selected.len() > c {
-                        selected.sort_by(|a, b| cmp_monomial(&a.lcm, &b.lcm, ord));
+                        if selected.first().is_some_and(|pr| pr.lcm_p != 0) {
+                            // Packed grevlex key: same order as `cmp_monomial`
+                            // on unpacked exponents (degree then reverse lex).
+                            let key = |pr: &Pair| -> u128 {
+                                let x = pr.lcm_p;
+                                let mut deg = 0u128;
+                                let mut k = 0u128;
+                                for i in 0..n_vars {
+                                    let e = (x >> (8 * i)) & 0xff;
+                                    deg += e;
+                                    k |= (127 - e) << (8 * i);
+                                }
+                                deg << (8 * n_vars) | k
+                            };
+                            selected.sort_by_key(key);
+                        } else {
+                            selected.sort_by(|a, b| cmp_monomial(&a.lcm, &b.lcm, ord));
+                        }
                         pairs.extend(selected.split_off(c));
                     }
                 }
@@ -8016,9 +8198,14 @@ fn f4_with_arithmetic(
             selected_len = selected.len();
             for pr in &selected {
                 bounded_deadline!();
+                let lcm_owned: Option<Vec<u32>> = if pr.lcm_p != 0 && pr.lcm.is_empty() {
+                    Some(unpack(pr.lcm_p, n_vars))
+                } else {
+                    None
+                };
+                let lcm: &[u32] = lcm_owned.as_deref().unwrap_or(&pr.lcm);
                 for &idx in &[pr.i, pr.j] {
-                    let m: Vec<u32> = pr
-                        .lcm
+                    let m: Vec<u32> = lcm
                         .iter()
                         .zip(&basis[idx][0].0)
                         .map(|(a, b)| a - b)
@@ -8949,6 +9136,12 @@ fn f4_with_arithmetic(
         // new polynomials: rows whose pivot column is not an input leading monomial
         let (account_basis, control) = account.phase_scope(VisitAccountingPhaseV1::BasisCleanup);
         account_or_abort!(control);
+        // Monomials of free columns once: each `cols.get` unpacks/clones.
+        let free_mons: Vec<Vec<u32>> = if free_cols.len() * rows.len() > PAR_WORK {
+            free_cols.par_iter().map(|&j| cols.get(j)).collect()
+        } else {
+            free_cols.iter().map(|&j| cols.get(j)).collect()
+        };
         let mut new_polys: Vec<Poly> = Vec::new();
         let mut new_terms = 0usize;
         for (row, &c) in rows.iter().zip(&pivots) {
@@ -8973,7 +9166,7 @@ fn f4_with_arithmetic(
                 row.iter()
                     .enumerate()
                     .filter(|(_, &v)| v != 0)
-                    .map(|(j, &v)| (cols.get(free_cols[j]), v)),
+                    .map(|(j, &v)| (free_mons[j].clone(), v)),
             );
             if total_degree(&poly[0].0) == 0 {
                 return report(
@@ -9089,23 +9282,71 @@ fn f4_with_arithmetic(
                 trace = next;
             }
         }
-        for f in new_polys {
-            basis_terms += f.len();
-            account_or_abort!(account.charge_usize(VisitAccountingCounter::BasisTerms, f.len()));
-            admit!(add(
-                f,
-                &mut basis,
-                &mut alive,
-                &mut pairs,
-                &mut above,
-                opts.max_degree,
-                &mut pairs_above_bound,
-                gm,
-                lm_packed.as_mut(),
-                opts.resource_limits.as_ref(),
-                opts.resource_limits.and(opts.deadline),
-                account,
-            ));
+        if matches!(account, VisitAccount::Off)
+            && lm_packed.is_some()
+            && opts.resource_limits.is_none()
+            && !new_polys.is_empty()
+        {
+            // Batch the packed UPDATE calls: one path, no per-poly phase_scope.
+            let lmp = lm_packed.as_mut().unwrap();
+            let n = new_polys[0][0].0.len();
+            for f in new_polys {
+                basis_terms += f.len();
+                let k = basis.len();
+                let h = pack(&f[0].0);
+                let new = match gm_update_packed(
+                    h,
+                    lmp,
+                    &mut pairs,
+                    &mut above,
+                    &mut alive,
+                    k,
+                    gm,
+                    None,
+                    None,
+                ) {
+                    Ok(v) => v,
+                    Err(stop) => abort_call!(stop),
+                };
+                lmp.push(h);
+                for (i, lp) in new {
+                    let d = packed_degree(lp, n);
+                    let pair = Pair {
+                        i,
+                        j: k,
+                        lcm: Vec::new(),
+                        lcm_p: lp,
+                        degree: d,
+                    };
+                    if d > opts.max_degree {
+                        above.push(pair);
+                    } else {
+                        pairs.push(pair);
+                    }
+                }
+                pairs_above_bound = above.len();
+                basis.push(f);
+                alive.push(true);
+            }
+        } else {
+            for f in new_polys {
+                basis_terms += f.len();
+                account_or_abort!(account.charge_usize(VisitAccountingCounter::BasisTerms, f.len()));
+                admit!(add(
+                    f,
+                    &mut basis,
+                    &mut alive,
+                    &mut pairs,
+                    &mut above,
+                    opts.max_degree,
+                    &mut pairs_above_bound,
+                    gm,
+                    lm_packed.as_mut(),
+                    opts.resource_limits.as_ref(),
+                    opts.resource_limits.and(opts.deadline),
+                    account,
+                ));
+            }
         }
         drop(account_basis);
         account_or_abort!(account.control());

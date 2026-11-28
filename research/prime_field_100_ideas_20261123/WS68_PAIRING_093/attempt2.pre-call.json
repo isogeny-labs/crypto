@@ -1,0 +1,16 @@
+{
+  "date": "2026-11-25",
+  "conductor_task": "T-174",
+  "admission": "same user-authorized bounded local bypass after checkpoint gate exit 2",
+  "attempt1": {
+    "source_sha256": "114787d88d624d0e92b7ededab23c9b2793382835da59e7640f977a33b382256",
+    "stdout_sha256": "84165e6483a3ab8c1cbd89a67c21aedf5aac7f2c60529151fa052424de47335a",
+    "stderr_sha256": "12f3705645e1360294b721db04afd38302b125c21b6fbf6a1798ed4cc4216318",
+    "process_exit": 0,
+    "outcome": "failed GP multiline rho parse; stderr contains syntax and arithmetic errors despite process exit zero; pairing transfer alone printed a checked scalar"
+  },
+  "attempt2_source_sha256": "759da0ef24f844d22712751051bbd8d85d9cf043d9a0af219cd1827a1f2def8a",
+  "change": "wrap multiline rho control inside GP function, add terminal RUN_OK sentinel; no input, pairing, or rho protocol change",
+  "command": "/usr/bin/time -p gp -q < solve.gp",
+  "acceptance": "empty GP error stderr apart from time lines, RUN_OK=1, transfer/rho point checks and scalar agreement"
+}

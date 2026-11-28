@@ -1,0 +1,43 @@
+  ***   syntax error, unexpected end of file, expecting )-> or ',' or ')': 
+  ***   for(seed=1,3,
+  ***               ^-
+  ***   at top-level: slow=[ellmul(E,G,seed),seed,0];fast=slow
+  ***                       ^----------------------------------
+  *** ellmul: incorrect type in ellmul (non integral, non CM exponent) (t_POL).
+  ***   syntax error, unexpected end of file, expecting )-> or ',' or ')': 
+  ***   for(step=1,100,
+  ***                 ^-
+  ***   at top-level: slow=rho_step(slow);fast=rho_step(rho_step(fas
+  ***                      ^-----------------------------------------
+  ***   in function rho_step: my(P=s[1],a=s[2],b=s[3],z);if(P==[0],z=0,z=lif
+  ***                               ^----------------------------------------
+  ***   incorrect type in _[_] OCcompo1 [not a vector] (t_POL).
+  ***   syntax error, unexpected end of file, expecting )-> or ',' or ')': 
+  ***   if(slow[1]==fast[1],
+  ***                      ^-
+  ***   at top-level: den=(fast[3]-slow[3])%r
+  ***                          ^--------------
+  ***   incorrect type in _[_] OCcompo1 [not a vector] (t_POL).
+  ***   syntax error, unexpected end of file, expecting )-> or ',' or ')': 
+  ***   if(den==0,
+  ***            ^-
+  ***   syntax error, unexpected ')', expecting end of file: );
+  ***                                                        ^--
+  ***   at top-level: rho_x=lift(Mod(slow[2]-fast[2],r)/Mod(den,r))
+  ***                                    ^--------------------------
+  ***   incorrect type in _[_] OCcompo1 [not a vector] (t_POL).
+  ***   at top-level: if(ellmul(E,G,rho_x)!=H,error("rho inverse che
+  ***                    ^-------------------------------------------
+  *** ellmul: incorrect type in ellmul (non integral, non CM exponent) (t_POL).
+  ***   syntax error, unexpected ')', expecting end of file: )
+  ***                                                        ^-
+  ***   syntax error, unexpected ')', expecting end of file: )
+  ***                                                        ^-
+  ***   syntax error, unexpected ')', expecting end of file: );
+  ***                                                        ^--
+  ***   at top-level: if(rho_x!=x,error("two solver disagreement"))
+  ***                             ^---------------------------------
+  ***   user error: two solver disagreement
+real 0.04
+user 0.01
+sys 0.00

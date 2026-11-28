@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-25",
+  "conductor_task": "T-174",
+  "status": "partial_control_only",
+  "mechanism": "established MOV-style pairing transfer on a supersingular curve, not the proposed general extension-field cascade",
+  "input": {"curve": "y^2=x^3+x over F_43", "curve_order": 44, "subgroup_order": 11, "minimal_embedding_degree": 2, "G": [31,18], "H": [13,24]},
+  "checks": {"extension_curve_order": 1936, "distortion_point": "Q=[12,4*t+2]", "weil_generator": "40*t+38", "weil_target": "2*t+8", "weil_generator_order": 11, "transfer_scalar": 7, "inverse_point_check": true, "rho_scalar": 7, "rho_point_check": true, "independent_curve_enumeration": 44, "independent_unique_scalar": 7},
+  "costs": {"field_and_curve_setup_ms": 28, "two_pairings_ms": 0, "extension_fflog_ms": 2, "rho_ms": 1, "rho_ec_transitions": 15, "rho_seeds_attempted": 1, "rho_degenerate_collisions": 0, "whole_process_real_s": 0.12, "whole_process_user_s": 0.01, "whole_process_sys_s": 0.02},
+  "limitations": ["millisecond timings are coarse and lack statistical meaning", "pairing and finite-field log internals remain charged as black-box elapsed work, not EC transitions", "the small embedding degree and supersingular distortion map are special; this says nothing about a varying-field cascade on generic prime-order curves"],
+  "checkpoint": "scripts/checkpoint.sh gate exit 2 because .resume/RESUME.md missing; bounded local user bypass recorded in pre-call.json",
+  "producer": {"source_sha256": "3e92a8a1e58d5b871a521279e8aeeb9f1f7e3ec12b1bc6149af9edd9f82b11af", "stdout_sha256": "79e5bdaff336ab88a099a85fa377439141fbd87a25020f70596d57a0b3ec98f9", "stderr_sha256": "1b8a8d9593065d045c5654a01128514af70228a776f703169ac1d5c087fd7d61", "process_exit": 0, "terminal_sentinel": "RUN_OK=1"},
+  "independent_verifier": {"source_sha256": "b78a331b1eaf231df61da243a5f01a2d9028878e7b0b72d3654ac4dfd369885e", "stdout_sha256": "bbb163d785cd944b3969733162ba934da6433e32558aaf9d16c7c6a6c9f337b6", "stderr_sha256": "41a12b7782903fdd27506cca2a48afd88976ac3019a8e5edb812922a66b527e0", "process_exit": 0, "terminal_sentinel": "VERIFY_OK=1"},
+  "failed_attempts": [
+    {"attempt": 1, "reason": "GP multiline top-level rho syntax", "source_sha256": "114787d88d624d0e92b7ededab23c9b2793382835da59e7640f977a33b382256", "stdout_sha256": "84165e6483a3ab8c1cbd89a67c21aedf5aac7f2c60529151fa052424de47335a", "stderr_sha256": "12f3705645e1360294b721db04afd38302b125c21b6fbf6a1798ed4cc4216318", "process_exit": 0},
+    {"attempt": 2, "reason": "FFELT x coordinate remained FFELT under liftint, rho partition error", "source_sha256": "759da0ef24f844d22712751051bbd8d85d9cf043d9a0af219cd1827a1f2def8a", "stdout_sha256": "9efd874d957f9b5ced3175a6a351f33bec1364e2ccda163c1eb9bad59a33b5b3", "stderr_sha256": "1802e07ed089cceb1a271f2dad04acc76727bf411f5f13a139e04bd08339332c", "process_exit": 0}
+  ]
+}
