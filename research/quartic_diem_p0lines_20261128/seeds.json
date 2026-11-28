@@ -1,0 +1,75 @@
+{
+ "schema": "isogeny-labs/experiment-seeds/v1",
+ "study": "research/quartic_diem_p0lines_20261128",
+ "master_seed": null,
+ "note": "No master seed: every stream is keyed directly by its public identity (prime, curve seed, target seed, solver seed) through the binary's own fixed derivations, unchanged from the parent studies. Workload keys exclude the arm; all arms share the solver seed. Intentional reuse: curves and solver seeds 1-4 are the parent's (research/quartic_diem_nofb_20261126, anchor C0); solver seeds 5, 6 are held-out and new (primary panel).",
+ "prng": {
+  "library": "rand 0.8.8 (Cargo.lock)",
+  "algorithm": "StdRng = ChaCha12 (rand_chacha 0.3.1)",
+  "seeding": "StdRng::seed_from_u64 (PCG32 expansion of the u64 into the 32-byte key)",
+  "mix64": "SplitMix64 finaliser, src/cryptanalysis/residual_walk.rs:336"
+ },
+ "streams": {
+  "curve": "state = mix64(curve_seed ^ (p << 32)) | 1 -> next_smooth_quartic_with_point (quartic_ladder.rs make_instance)",
+  "generator": "StdRng::seed_from_u64(mix64(curve_seed ^ 0x6E6E7A7A01012323)) -> random classes until one of order r",
+  "target": "t = StdRng::seed_from_u64(mix64(target_seed ^ 0x7A26E7A26E7A26E7)).gen_range(1..r); target_seed = curve_seed (one target per curve)",
+  "solver": "StdRng::seed_from_u64(solver_seed) (run_diem_with); the P0 lines use no RNG (deterministic enumeration over the factor base)",
+  "bootstrap": "numpy default_rng(20261128) in analyze.py"
+ },
+ "panel": {
+  "primes": [
+   4099,
+   16411,
+   65537,
+   131101
+  ],
+  "curve_seeds": {
+   "4099": [
+    35,
+    205,
+    220,
+    257,
+    295
+   ],
+   "16411": [
+    93,
+    158,
+    252,
+    366,
+    382
+   ],
+   "65537": [
+    13,
+    57,
+    156,
+    166,
+    369
+   ],
+   "131101": [
+    53,
+    177,
+    193,
+    228,
+    288
+   ]
+  },
+  "solver_seeds": {
+   "replicate_parent_C0": [
+    1,
+    2,
+    3,
+    4
+   ],
+   "held_out_primary": [
+    5,
+    6
+   ]
+  },
+  "arms": [
+   "2lp-sfb-sge-nofb",
+   "2lp-sfb-sge-p0",
+   "2lp-sfb-sge-p0i3"
+  ],
+  "arm_order": "nofb, p0, p0i3 within each (curve, seed)"
+ }
+}
