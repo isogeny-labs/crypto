@@ -1,0 +1,1214 @@
+{
+ "schema": "validator-report/v1",
+ "study": "research/quartic_diem_p0lines_20261128",
+ "status": "pass",
+ "independent": true,
+ "disposition": "validated",
+ "verdict": "validated-with-errata",
+ "validated_commit": "c271f320e40cef2b45ca344e6f4ef4f46022da3b",
+ "study_tree": "11371b0f23c7794cd0b53c2008a70a4c4b9fb525",
+ "report": "the prose report was returned to the dispatching session (subagent hand-back); this file carries its checks, errata and process findings as data",
+ "raw_data": [
+  {
+   "path": "../raw/run.jsonl",
+   "sha256": "0d709abc090156c8304162bccfb8d5b75e242e2b2e89758bf200c8db4076fbaa"
+  },
+  {
+   "path": "../raw/run131101.jsonl",
+   "sha256": "43cfff108babad69c5f1827d66483dcca74e26db6f89ec4a9e0e378f8518c82d"
+  }
+ ],
+ "headline": [
+  {
+   "name": "pooled paired GAE_1.0 p0/nofb, primary_seeds_5_6 (gm, equal weight per prime)",
+   "claimed": 0.9896314411861922,
+   "recomputed": 0.9896314411861922
+  },
+  {
+   "name": "pooled paired GAE_1.0 p0/nofb, primary_seeds_5_6, boot95 lower (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.9337238614389634,
+   "recomputed": 0.9337238614389634
+  },
+  {
+   "name": "pooled paired GAE_1.0 p0/nofb, primary_seeds_5_6, boot95 upper (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 1.04497194629271,
+   "recomputed": 1.0449719462927103
+  },
+  {
+   "name": "pooled paired GAE_0.1 p0/nofb, primary_seeds_5_6 (gm, equal weight per prime)",
+   "claimed": 0.989744228711874,
+   "recomputed": 0.989744228711874
+  },
+  {
+   "name": "pooled paired GAE_0.1 p0/nofb, primary_seeds_5_6, boot95 lower (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.9331038938560885,
+   "recomputed": 0.9331038938560885
+  },
+  {
+   "name": "pooled paired GAE_0.1 p0/nofb, primary_seeds_5_6, boot95 upper (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 1.0448349564334385,
+   "recomputed": 1.0448349564334385
+  },
+  {
+   "name": "pooled paired GAE_0.0 p0/nofb, primary_seeds_5_6 (gm, equal weight per prime)",
+   "claimed": 1.0177452305538615,
+   "recomputed": 1.0177452305538615
+  },
+  {
+   "name": "pooled paired GAE_0.0 p0/nofb, primary_seeds_5_6, boot95 lower (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.860665787724217,
+   "recomputed": 0.8606657877242169
+  },
+  {
+   "name": "pooled paired GAE_0.0 p0/nofb, primary_seeds_5_6, boot95 upper (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 1.1805960949970131,
+   "recomputed": 1.1805960949970131
+  },
+  {
+   "name": "pooled paired GAE_1.0 p0/nofb, all_seeds_1_6 (gm, equal weight per prime)",
+   "claimed": 0.9505701987651803,
+   "recomputed": 0.9505701987651803
+  },
+  {
+   "name": "pooled paired GAE_1.0 p0/nofb, all_seeds_1_6, boot95 lower (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.921088527855549,
+   "recomputed": 0.921088527855549
+  },
+  {
+   "name": "pooled paired GAE_1.0 p0/nofb, all_seeds_1_6, boot95 upper (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.98138824477649,
+   "recomputed": 0.98138824477649
+  },
+  {
+   "name": "pooled paired GAE_0.1 p0/nofb, all_seeds_1_6 (gm, equal weight per prime)",
+   "claimed": 0.9505797670074673,
+   "recomputed": 0.9505797670074673
+  },
+  {
+   "name": "pooled paired GAE_0.1 p0/nofb, all_seeds_1_6, boot95 lower (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.9208732042237886,
+   "recomputed": 0.9208732042237886
+  },
+  {
+   "name": "pooled paired GAE_0.1 p0/nofb, all_seeds_1_6, boot95 upper (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.9823635010591837,
+   "recomputed": 0.9823635010591836
+  },
+  {
+   "name": "pooled paired GAE_0.0 p0/nofb, all_seeds_1_6 (gm, equal weight per prime)",
+   "claimed": 0.9374409879429036,
+   "recomputed": 0.9374409879429036
+  },
+  {
+   "name": "pooled paired GAE_0.0 p0/nofb, all_seeds_1_6, boot95 lower (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.8728524566834971,
+   "recomputed": 0.8728524566834972
+  },
+  {
+   "name": "pooled paired GAE_0.0 p0/nofb, all_seeds_1_6, boot95 upper (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 1.0019765674597283,
+   "recomputed": 1.0019765674597283
+  },
+  {
+   "name": "pooled paired GAE_1.0 p0i3/nofb, primary_seeds_5_6 (gm, equal weight per prime)",
+   "claimed": 0.9898237359784288,
+   "recomputed": 0.9898237359784288
+  },
+  {
+   "name": "pooled paired GAE_1.0 p0i3/nofb, primary_seeds_5_6, boot95 lower (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.9412364100683182,
+   "recomputed": 0.9412364100683182
+  },
+  {
+   "name": "pooled paired GAE_1.0 p0i3/nofb, primary_seeds_5_6, boot95 upper (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 1.0376911560283755,
+   "recomputed": 1.0376911560283755
+  },
+  {
+   "name": "pooled paired GAE_0.1 p0i3/nofb, primary_seeds_5_6 (gm, equal weight per prime)",
+   "claimed": 0.9897442704074196,
+   "recomputed": 0.9897442704074196
+  },
+  {
+   "name": "pooled paired GAE_0.1 p0i3/nofb, primary_seeds_5_6, boot95 lower (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.9426114439753235,
+   "recomputed": 0.9426114439753235
+  },
+  {
+   "name": "pooled paired GAE_0.1 p0i3/nofb, primary_seeds_5_6, boot95 upper (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 1.0369657374866836,
+   "recomputed": 1.0369657374866836
+  },
+  {
+   "name": "pooled paired GAE_0.0 p0i3/nofb, primary_seeds_5_6 (gm, equal weight per prime)",
+   "claimed": 0.9017809173796373,
+   "recomputed": 0.9017809173796373
+  },
+  {
+   "name": "pooled paired GAE_0.0 p0i3/nofb, primary_seeds_5_6, boot95 lower (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.7808723265981787,
+   "recomputed": 0.7808723265981788
+  },
+  {
+   "name": "pooled paired GAE_0.0 p0i3/nofb, primary_seeds_5_6, boot95 upper (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 1.0349436894220427,
+   "recomputed": 1.0349436894220427
+  },
+  {
+   "name": "pooled paired GAE_1.0 p0i3/nofb, all_seeds_1_6 (gm, equal weight per prime)",
+   "claimed": 0.9527325922143013,
+   "recomputed": 0.9527325922143013
+  },
+  {
+   "name": "pooled paired GAE_1.0 p0i3/nofb, all_seeds_1_6, boot95 lower (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.9297723464828515,
+   "recomputed": 0.9297723464828515
+  },
+  {
+   "name": "pooled paired GAE_1.0 p0i3/nofb, all_seeds_1_6, boot95 upper (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.976469610666385,
+   "recomputed": 0.976469610666385
+  },
+  {
+   "name": "pooled paired GAE_0.1 p0i3/nofb, all_seeds_1_6 (gm, equal weight per prime)",
+   "claimed": 0.9525256111342589,
+   "recomputed": 0.9525256111342589
+  },
+  {
+   "name": "pooled paired GAE_0.1 p0i3/nofb, all_seeds_1_6, boot95 lower (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.9300380717015533,
+   "recomputed": 0.9300380717015533
+  },
+  {
+   "name": "pooled paired GAE_0.1 p0i3/nofb, all_seeds_1_6, boot95 upper (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.9763081255869812,
+   "recomputed": 0.9763081255869812
+  },
+  {
+   "name": "pooled paired GAE_0.0 p0i3/nofb, all_seeds_1_6 (gm, equal weight per prime)",
+   "claimed": 0.783885564219727,
+   "recomputed": 0.783885564219727
+  },
+  {
+   "name": "pooled paired GAE_0.0 p0i3/nofb, all_seeds_1_6, boot95 lower (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.7306330755037979,
+   "recomputed": 0.7306330755037979
+  },
+  {
+   "name": "pooled paired GAE_0.0 p0i3/nofb, all_seeds_1_6, boot95 upper (default_rng(20261128), validator's own replication of the draw order)",
+   "claimed": 0.83658764657961,
+   "recomputed": 0.83658764657961
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=4099, primary_seeds_5_6 (gm over 5 curves)",
+   "claimed": 1.049630710557835,
+   "recomputed": 1.049630710557835
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=4099, primary_seeds_5_6, boot95 lower",
+   "claimed": 0.9881336023839242,
+   "recomputed": 0.9881336023839242
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=4099, primary_seeds_5_6, boot95 upper",
+   "claimed": 1.141032455690933,
+   "recomputed": 1.141032455690933
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=16411, primary_seeds_5_6 (gm over 5 curves)",
+   "claimed": 0.9990166894339683,
+   "recomputed": 0.9990166894339683
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=16411, primary_seeds_5_6, boot95 lower",
+   "claimed": 0.8538022800719551,
+   "recomputed": 0.8538022800719551
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=16411, primary_seeds_5_6, boot95 upper",
+   "claimed": 1.1038817281958366,
+   "recomputed": 1.1038817281958366
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=65537, primary_seeds_5_6 (gm over 5 curves)",
+   "claimed": 0.911282366357684,
+   "recomputed": 0.911282366357684
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=65537, primary_seeds_5_6, boot95 lower",
+   "claimed": 0.8105661902586336,
+   "recomputed": 0.8105661902586336
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=65537, primary_seeds_5_6, boot95 upper",
+   "claimed": 1.0133768569648125,
+   "recomputed": 1.0133768569648125
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=131101, primary_seeds_5_6 (gm over 5 curves)",
+   "claimed": 1.0037641935677015,
+   "recomputed": 1.0037641935677015
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=131101, primary_seeds_5_6, boot95 lower",
+   "claimed": 0.8757507866992451,
+   "recomputed": 0.8757507866992451
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=131101, primary_seeds_5_6, boot95 upper",
+   "claimed": 1.147977965877356,
+   "recomputed": 1.147977965877356
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=4099, all_seeds_1_6 (gm over 5 curves)",
+   "claimed": 1.0133747558662634,
+   "recomputed": 1.0133747558662634
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=4099, all_seeds_1_6, boot95 lower",
+   "claimed": 0.9970563042516415,
+   "recomputed": 0.9970563042516415
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=4099, all_seeds_1_6, boot95 upper",
+   "claimed": 1.0312164694753163,
+   "recomputed": 1.0312164694753163
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=16411, all_seeds_1_6 (gm over 5 curves)",
+   "claimed": 0.8967099451784488,
+   "recomputed": 0.8967099451784488
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=16411, all_seeds_1_6, boot95 lower",
+   "claimed": 0.8230299447069105,
+   "recomputed": 0.8230299447069105
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=16411, all_seeds_1_6, boot95 upper",
+   "claimed": 0.976985990550175,
+   "recomputed": 0.976985990550175
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=65537, all_seeds_1_6 (gm over 5 curves)",
+   "claimed": 0.9501924908677436,
+   "recomputed": 0.9501924908677436
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=65537, all_seeds_1_6, boot95 lower",
+   "claimed": 0.898640769019075,
+   "recomputed": 0.898640769019075
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=65537, all_seeds_1_6, boot95 upper",
+   "claimed": 0.9985676135623073,
+   "recomputed": 0.9985676135623073
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=131101, all_seeds_1_6 (gm over 5 curves)",
+   "claimed": 0.9455905357500295,
+   "recomputed": 0.9455905357500295
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=131101, all_seeds_1_6, boot95 lower",
+   "claimed": 0.8793856057138796,
+   "recomputed": 0.8793856057138796
+  },
+  {
+   "name": "paired GAE_1 p0/nofb p=131101, all_seeds_1_6, boot95 upper",
+   "claimed": 1.0167797329070103,
+   "recomputed": 1.0167797329070103
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=4099 w=0.0 (all seeds)",
+   "claimed": 0.0024147987135622645,
+   "recomputed": 0.0024147987135622645
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=16411 w=0.0 (all seeds)",
+   "claimed": 0.0008332284953358525,
+   "recomputed": 0.0008332284953358525
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=65537 w=0.0 (all seeds)",
+   "claimed": 0.00032692534892276524,
+   "recomputed": 0.00032692534892276524
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=131101 w=0.0 (all seeds)",
+   "claimed": 0.0001729099234365722,
+   "recomputed": 0.0001729099234365722
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=4099 w=0.1 (all seeds)",
+   "claimed": 0.8781890151599558,
+   "recomputed": 0.8781890151599558
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=16411 w=0.1 (all seeds)",
+   "claimed": 0.49711398722847483,
+   "recomputed": 0.49711398722847483
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=65537 w=0.1 (all seeds)",
+   "claimed": 0.2845884332810288,
+   "recomputed": 0.2845884332810288
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=131101 w=0.1 (all seeds)",
+   "claimed": 0.202026028487842,
+   "recomputed": 0.202026028487842
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=4099 w=1.0 (all seeds)",
+   "claimed": 8.759171147799245,
+   "recomputed": 8.759171147799245
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=16411 w=1.0 (all seeds)",
+   "claimed": 4.963234280509828,
+   "recomputed": 4.963234280509828
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=65537 w=1.0 (all seeds)",
+   "claimed": 2.842783246836524,
+   "recomputed": 2.842783246836524
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=131101 w=1.0 (all seeds)",
+   "claimed": 2.018567498183064,
+   "recomputed": 2.018567498183064
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=131101 w=1.0, boot95 lower",
+   "claimed": 1.8539379294202172,
+   "recomputed": 1.8539379294202172
+  },
+  {
+   "name": "IC/ideal neg. rho nofb p=131101 w=1.0, boot95 upper",
+   "claimed": 2.1978161620520336,
+   "recomputed": 2.1978161620520336
+  },
+  {
+   "name": "IC/ideal neg. rho p0 p=4099 w=0.0 (all seeds)",
+   "claimed": 0.0026246534701513907,
+   "recomputed": 0.0026246534701513907
+  },
+  {
+   "name": "IC/ideal neg. rho p0 p=16411 w=0.0 (all seeds)",
+   "claimed": 0.0007456230004168489,
+   "recomputed": 0.0007456230004168489
+  },
+  {
+   "name": "IC/ideal neg. rho p0 p=65537 w=0.0 (all seeds)",
+   "claimed": 0.0002810060723800666,
+   "recomputed": 0.0002810060723800666
+  },
+  {
+   "name": "IC/ideal neg. rho p0 p=131101 w=0.0 (all seeds)",
+   "claimed": 0.00015972847458390615,
+   "recomputed": 0.00015972847458390615
+  },
+  {
+   "name": "IC/ideal neg. rho p0 p=4099 w=0.1 (all seeds)",
+   "claimed": 0.8900592694447749,
+   "recomputed": 0.8900592694447749
+  },
+  {
+   "name": "IC/ideal neg. rho p0 p=16411 w=0.1 (all seeds)",
+   "claimed": 0.44577238115691464,
+   "recomputed": 0.44577238115691464
+  },
+  {
+   "name": "IC/ideal neg. rho p0 p=65537 w=0.1 (all seeds)",
+   "claimed": 0.2703901290684471,
+   "recomputed": 0.2703901290684471
+  },
+  {
+   "name": "IC/ideal neg. rho p0 p=131101 w=0.1 (all seeds)",
+   "claimed": 0.19102926351053126,
+   "recomputed": 0.19102926351053126
+  },
+  {
+   "name": "IC/ideal neg. rho p0 p=4099 w=1.0 (all seeds)",
+   "claimed": 8.876322923491877,
+   "recomputed": 8.876322923491877
+  },
+  {
+   "name": "IC/ideal neg. rho p0 p=16411 w=1.0 (all seeds)",
+   "claimed": 4.450581539583764,
+   "recomputed": 4.450581539583764
+  },
+  {
+   "name": "IC/ideal neg. rho p0 p=65537 w=1.0 (all seeds)",
+   "claimed": 2.7011912943086887,
+   "recomputed": 2.7011912943086887
+  },
+  {
+   "name": "IC/ideal neg. rho p0 p=131101 w=1.0 (all seeds)",
+   "claimed": 1.9087383220545207,
+   "recomputed": 1.9087383220545207
+  },
+  {
+   "name": "IC/ideal neg. rho p0 p=131101 w=1.0, boot95 lower",
+   "claimed": 1.8199292903218836,
+   "recomputed": 1.8199292903218836
+  },
+  {
+   "name": "IC/ideal neg. rho p0 p=131101 w=1.0, boot95 upper",
+   "claimed": 1.9945176069094654,
+   "recomputed": 1.9945176069094654
+  },
+  {
+   "name": "IC/ideal neg. rho p0i3 p=4099 w=0.0 (all seeds)",
+   "claimed": 0.002103377377899908,
+   "recomputed": 0.002103377377899908
+  },
+  {
+   "name": "IC/ideal neg. rho p0i3 p=16411 w=0.0 (all seeds)",
+   "claimed": 0.0006151198151660682,
+   "recomputed": 0.0006151198151660682
+  },
+  {
+   "name": "IC/ideal neg. rho p0i3 p=65537 w=0.0 (all seeds)",
+   "claimed": 0.000218946909288796,
+   "recomputed": 0.000218946909288796
+  },
+  {
+   "name": "IC/ideal neg. rho p0i3 p=131101 w=0.0 (all seeds)",
+   "claimed": 0.0001516032444806156,
+   "recomputed": 0.0001516032444806156
+  },
+  {
+   "name": "IC/ideal neg. rho p0i3 p=4099 w=0.1 (all seeds)",
+   "claimed": 0.8567772400372305,
+   "recomputed": 0.8567772400372305
+  },
+  {
+   "name": "IC/ideal neg. rho p0i3 p=16411 w=0.1 (all seeds)",
+   "claimed": 0.4413297972917495,
+   "recomputed": 0.4413297972917495
+  },
+  {
+   "name": "IC/ideal neg. rho p0i3 p=65537 w=0.1 (all seeds)",
+   "claimed": 0.2676064825938699,
+   "recomputed": 0.2676064825938699
+  },
+  {
+   "name": "IC/ideal neg. rho p0i3 p=131101 w=0.1 (all seeds)",
+   "claimed": 0.20419607953976193,
+   "recomputed": 0.20419607953976193
+  },
+  {
+   "name": "IC/ideal neg. rho p0i3 p=4099 w=1.0 (all seeds)",
+   "claimed": 8.5479063059952,
+   "recomputed": 8.5479063059952
+  },
+  {
+   "name": "IC/ideal neg. rho p0i3 p=16411 w=1.0 (all seeds)",
+   "claimed": 4.40715853186951,
+   "recomputed": 4.40715853186951
+  },
+  {
+   "name": "IC/ideal neg. rho p0i3 p=65537 w=1.0 (all seeds)",
+   "claimed": 2.673941914254237,
+   "recomputed": 2.673941914254237
+  },
+  {
+   "name": "IC/ideal neg. rho p0i3 p=131101 w=1.0 (all seeds)",
+   "claimed": 2.04046197475589,
+   "recomputed": 2.04046197475589
+  },
+  {
+   "name": "IC/ideal neg. rho p0i3 p=131101 w=1.0, boot95 lower",
+   "claimed": 1.9313710853411226,
+   "recomputed": 1.9313710853411226
+  },
+  {
+   "name": "IC/ideal neg. rho p0i3 p=131101 w=1.0, boot95 upper",
+   "claimed": 2.144422466092785,
+   "recomputed": 2.144422466092785
+  },
+  {
+   "name": "runs with more than one attempt, nofb, primary_seeds_5_6",
+   "claimed": 10,
+   "recomputed": 10
+  },
+  {
+   "name": "runs with more than one attempt, p0, primary_seeds_5_6",
+   "claimed": 8,
+   "recomputed": 8
+  },
+  {
+   "name": "runs with more than one attempt, p0i3, primary_seeds_5_6",
+   "claimed": 10,
+   "recomputed": 10
+  },
+  {
+   "name": "runs with more than one attempt, nofb, all_seeds_1_6",
+   "claimed": 25,
+   "recomputed": 25
+  },
+  {
+   "name": "runs with more than one attempt, p0, all_seeds_1_6",
+   "claimed": 12,
+   "recomputed": 12
+  },
+  {
+   "name": "runs with more than one attempt, p0i3, all_seeds_1_6",
+   "claimed": 19,
+   "recomputed": 19
+  },
+  {
+   "name": "runs with more than one attempt, nofb, p=4099, all seeds",
+   "claimed": 0,
+   "recomputed": 0
+  },
+  {
+   "name": "runs with more than one attempt, nofb, p=16411, all seeds",
+   "claimed": 9,
+   "recomputed": 9
+  },
+  {
+   "name": "runs with more than one attempt, nofb, p=65537, all seeds",
+   "claimed": 7,
+   "recomputed": 7
+  },
+  {
+   "name": "runs with more than one attempt, nofb, p=131101, all seeds",
+   "claimed": 9,
+   "recomputed": 9
+  },
+  {
+   "name": "runs with more than one attempt, p0, p=4099, all seeds",
+   "claimed": 1,
+   "recomputed": 1
+  },
+  {
+   "name": "runs with more than one attempt, p0, p=16411, all seeds",
+   "claimed": 1,
+   "recomputed": 1
+  },
+  {
+   "name": "runs with more than one attempt, p0, p=65537, all seeds",
+   "claimed": 4,
+   "recomputed": 4
+  },
+  {
+   "name": "runs with more than one attempt, p0, p=131101, all seeds",
+   "claimed": 6,
+   "recomputed": 6
+  },
+  {
+   "name": "runs with more than one attempt, p0i3, p=4099, all seeds",
+   "claimed": 1,
+   "recomputed": 1
+  },
+  {
+   "name": "runs with more than one attempt, p0i3, p=16411, all seeds",
+   "claimed": 2,
+   "recomputed": 2
+  },
+  {
+   "name": "runs with more than one attempt, p0i3, p=65537, all seeds",
+   "claimed": 5,
+   "recomputed": 5
+  },
+  {
+   "name": "runs with more than one attempt, p0i3, p=131101, all seeds",
+   "claimed": 11,
+   "recomputed": 11
+  },
+  {
+   "name": "P0 lines per p0 run, p=4099 (explore.json)",
+   "claimed": 193.0,
+   "recomputed": 193.0
+  },
+  {
+   "name": "P0-line relations per p0 run, mean, p=4099 (explore.json)",
+   "claimed": 92.2,
+   "recomputed": 92.2
+  },
+  {
+   "name": "P0 lines per p0 run, p=16411 (explore.json)",
+   "claimed": 385.0,
+   "recomputed": 385.0
+  },
+  {
+   "name": "P0-line relations per p0 run, mean, p=16411 (explore.json)",
+   "claimed": 192.4,
+   "recomputed": 192.4
+  },
+  {
+   "name": "P0 lines per p0 run, p=65537 (explore.json)",
+   "claimed": 769.0,
+   "recomputed": 769.0
+  },
+  {
+   "name": "P0-line relations per p0 run, mean, p=65537 (explore.json)",
+   "claimed": 378.0,
+   "recomputed": 378.0
+  },
+  {
+   "name": "P0 lines per p0 run, p=131101 (explore.json)",
+   "claimed": 1087.0,
+   "recomputed": 1087.0
+  },
+  {
+   "name": "P0-line relations per p0 run, mean, p=131101 (explore.json)",
+   "claimed": 555.2,
+   "recomputed": 555.2
+  },
+  {
+   "name": "explore class nofb1_p01 p=4099: pairs (explore.json n)",
+   "claimed": 29,
+   "recomputed": 29
+  },
+  {
+   "name": "explore class nofb1_p02 p=4099: pairs (explore.json n)",
+   "claimed": 1,
+   "recomputed": 1
+  },
+  {
+   "name": "explore class nofb1_p01 p=16411: pairs (explore.json n)",
+   "claimed": 21,
+   "recomputed": 21
+  },
+  {
+   "name": "explore class nofb2_p01 p=16411: pairs (explore.json n)",
+   "claimed": 8,
+   "recomputed": 8
+  },
+  {
+   "name": "explore class nofb2_p02 p=16411: pairs (explore.json n)",
+   "claimed": 1,
+   "recomputed": 1
+  },
+  {
+   "name": "explore class nofb1_p01 p=65537: pairs (explore.json n)",
+   "claimed": 23,
+   "recomputed": 23
+  },
+  {
+   "name": "explore class nofb2_p01 p=65537: pairs (explore.json n)",
+   "claimed": 3,
+   "recomputed": 3
+  },
+  {
+   "name": "explore class nofb2_p02 p=65537: pairs (explore.json n)",
+   "claimed": 4,
+   "recomputed": 4
+  },
+  {
+   "name": "explore class nofb1_p01 p=131101: pairs (explore.json n)",
+   "claimed": 20,
+   "recomputed": 20
+  },
+  {
+   "name": "explore class nofb1_p02 p=131101: pairs (explore.json n)",
+   "claimed": 1,
+   "recomputed": 1
+  },
+  {
+   "name": "explore class nofb2_p01 p=131101: pairs (explore.json n)",
+   "claimed": 4,
+   "recomputed": 4
+  },
+  {
+   "name": "explore class nofb2_p02 p=131101: pairs (explore.json n)",
+   "claimed": 5,
+   "recomputed": 5
+  },
+  {
+   "name": "runs certified with recovered == t_secret, re-verified by validator Picard arithmetic (RESULTS: 360)",
+   "claimed": 360,
+   "recomputed": 360
+  },
+  {
+   "name": "(curve, seed) pairs with one log across the three arms (RESULTS: all 120)",
+   "claimed": 120,
+   "recomputed": 120
+  },
+  {
+   "name": "C0: nofb seeds 1-4 rows equal to the parent's on the 24 fields (analysis.json identical)",
+   "claimed": 80,
+   "recomputed": 80
+  },
+  {
+   "name": "p0/p0i3 rows with P0-line relations > 0 (RESULTS: all 240)",
+   "claimed": 240,
+   "recomputed": 240
+  },
+  {
+   "name": "nofb rows with p0_lines == 0 (key present; RESULTS: all 120)",
+   "claimed": 120,
+   "recomputed": 120
+  }
+ ],
+ "decision": {
+  "frozen_rule": "PROTOCOL.md section 5",
+  "p0_over_nofb_primary": {
+   "exact_law": {
+    "verdict": "INCONCLUSIVE",
+    "upper95": {
+     "0.0": 1.1752646825069266,
+     "0.1": 1.0464371766368779,
+     "1.0": 1.04621876791589
+    },
+    "lower95_w1": 0.9325959916587032
+   },
+   "producer_stream": {
+    "verdict": "INCONCLUSIVE",
+    "upper95": {
+     "0.0": 1.1805960949970131,
+     "0.1": 1.0448349564334385,
+     "1.0": 1.0449719462927103
+    },
+    "lower95_w1": 0.9337238614389634
+   },
+   "points": {
+    "0.0": 1.0177452305538615,
+    "0.1": 0.989744228711874,
+    "1.0": 0.9896314411861922
+   }
+  },
+  "p0i3_over_nofb_primary": {
+   "exact_law": {
+    "verdict": "INCONCLUSIVE",
+    "upper95": {
+     "0.0": 1.0354987534159348,
+     "0.1": 1.037452154538131,
+     "1.0": 1.037424174751624
+    },
+    "lower95_w1": 0.9418162934278542
+   },
+   "producer_stream": {
+    "verdict": "INCONCLUSIVE",
+    "upper95": {
+     "0.0": 1.0349436894220427,
+     "0.1": 1.0369657374866836,
+     "1.0": 1.0376911560283755
+    },
+    "lower95_w1": 0.9412364100683182
+   },
+   "points": {
+    "0.0": 0.9017809173796373,
+    "0.1": 0.9897442704074196,
+    "1.0": 0.9898237359784288
+   }
+  },
+  "mc_noise_can_flip": {
+   "p0_over_nofb": {
+    "improvement_possible": false,
+    "kill_possible": false
+   },
+   "p0i3_over_nofb": {
+    "improvement_possible": false,
+    "kill_possible": false
+   }
+  },
+  "predictions": {
+   "1_second_attempts_p0_at_most_half_nofb_primary": {
+    "p0": 8,
+    "nofb": 10,
+    "runs": 40,
+    "held": false
+   },
+   "2_p0_over_nofb_gae1_in_0.75_0.97": {
+    "value": 0.9896314411861922,
+    "held": false
+   },
+   "3_p0i3_over_nofb_in_0.75_1.02_and_more_second_attempts_than_p0": {
+    "value": 0.9898237359784288,
+    "p0i3_multi": 10,
+    "p0_multi": 8,
+    "held": true
+   }
+  }
+ },
+ "checks": {
+  "headline_agreement_1e-9": true,
+  "bootstrap_ci_reproduced_by_independent_draw_order_max_rel": 2.124885799210094e-16,
+  "bootstrap_ci_producer_endpoints_inside_mc_noise": true,
+  "bootstrap_ci_max_rel_diff_vs_exact_law": 0.03861266231579054,
+  "point_estimates_max_rel_diff": 0.0,
+  "certificates_independent": {
+   "curves": 20,
+   "curves_all_ok": 20,
+   "rows_checked": 360,
+   "rows_cert_ok": 360
+  },
+  "replay": {
+   "rows_replayed": 508,
+   "rows_bytes_equal": 508,
+   "rows_fields_equal": 508,
+   "runs_replayed": 360,
+   "runs_certified_and_correct": 360,
+   "by_kind_replayed_equal": {
+    "cell": [
+     8,
+     8
+    ],
+    "instance": [
+     20,
+     20
+    ],
+    "run": [
+     360,
+     360
+    ],
+    "skip": [
+     120,
+     120
+    ]
+   },
+   "multi_attempt_runs_replayed": 56,
+   "p0_runs_replayed": 240,
+   "duplicate_replayed_keys": 0,
+   "committed_rows": 508,
+   "committed_rows_covered": 508,
+   "configs_byte_identical": true,
+   "wall_ratio_range": [
+    0.7488277849910963,
+    1.5133772817141962
+   ]
+  },
+  "integrity_completeness_C0_p0_structure_counter_identities": true,
+  "C0": {
+   "compared": 80,
+   "identical_24": 80,
+   "identical_all_common_keys": 80,
+   "key_sets": {
+    "{\"only_parent\": [], \"only_study\": [\"p0_line_relations\", \"p0_lines\"]}": 80
+   },
+   "parent_seeds": [
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  "p0_structure": {
+   "p0_lines_eq_fb_cols_minus_1": 240,
+   "p0_lines_eq_ceil_3sqrtp": 240,
+   "rel_le_lines": 240,
+   "rels_line_ge_p0_rel": 240,
+   "p0_counts_constant_per_curve": 20,
+   "curves": 20,
+   "lines_tried_eq_trials": 360
+  },
+  "frozen_decision_INCONCLUSIVE_reproduced_stream_and_exact_law": true,
+  "ic_over_rho_every_cell_unresolved_below_at_w0_w01_above_at_w1": true,
+  "bindings_manifests_binary_source": true,
+  "binary_to_freeze_commit_by_cargo_records": true,
+  "freeze_before_grid_data": true,
+  "analysis_and_explore_json_byte_reproduced_from_committed_and_replayed_raw": true,
+  "diag_flag_leaves_committed_fields_unchanged_and_cores_matched": true,
+  "mechanism_diag_summary": {
+   "e_nofb": {
+    "runs": 78,
+    "failed_attempts": 24,
+    "failed_t_undetermined": 24,
+    "failed_vdeg_free": 18,
+    "failed_with_z_cols": 15,
+    "failed_vdeg_free_or_z": 23,
+    "failed_ab_rank_1": 3,
+    "failed_neither_vdeg_nor_z": [
+     {
+      "p": 16411,
+      "curve_seed": 158,
+      "seed": 4,
+      "attempt": 1,
+      "dec_rows": 1,
+      "ab_rank": 1,
+      "p0type_line_rows": 9,
+      "z_cols": 0
+     }
+    ],
+    "last_attempts_certified": 78,
+    "last_attempts_t_determined": 78,
+    "all_attempts": 102,
+    "all_attempts_vdeg_free": 66,
+    "kappa_heuristic_margin_min": 50,
+    "failed_per_prime": {
+     "16411": {
+      "failed_attempts": 9,
+      "vdeg_free": 7,
+      "t_undetermined": 9,
+      "with_z_cols": 5,
+      "ab_rank_1": 1
+     },
+     "65537": {
+      "failed_attempts": 7,
+      "vdeg_free": 4,
+      "t_undetermined": 7,
+      "with_z_cols": 6,
+      "ab_rank_1": 0
+     },
+     "131101": {
+      "failed_attempts": 8,
+      "vdeg_free": 7,
+      "t_undetermined": 8,
+      "with_z_cols": 4,
+      "ab_rank_1": 2
+     }
+    }
+   },
+   "e_p0": {
+    "runs": 78,
+    "failed_attempts": 11,
+    "failed_t_undetermined": 11,
+    "failed_vdeg_free": 0,
+    "failed_with_z_cols": 9,
+    "failed_vdeg_free_or_z": 9,
+    "failed_ab_rank_1": 3,
+    "failed_neither_vdeg_nor_z": [
+     {
+      "p": 4099,
+      "curve_seed": 205,
+      "seed": 6,
+      "attempt": 1,
+      "dec_rows": 2,
+      "ab_rank": 1,
+      "p0type_line_rows": 40,
+      "z_cols": 0
+     },
+     {
+      "p": 16411,
+      "curve_seed": 158,
+      "seed": 4,
+      "attempt": 1,
+      "dec_rows": 1,
+      "ab_rank": 1,
+      "p0type_line_rows": 86,
+      "z_cols": 0
+     }
+    ],
+    "last_attempts_certified": 78,
+    "last_attempts_t_determined": 78,
+    "all_attempts": 89,
+    "all_attempts_vdeg_free": 0,
+    "kappa_heuristic_margin_min": 52,
+    "failed_per_prime": {
+     "4099": {
+      "failed_attempts": 1,
+      "vdeg_free": 0,
+      "t_undetermined": 1,
+      "with_z_cols": 0,
+      "ab_rank_1": 1
+     },
+     "16411": {
+      "failed_attempts": 1,
+      "vdeg_free": 0,
+      "t_undetermined": 1,
+      "with_z_cols": 0,
+      "ab_rank_1": 1
+     },
+     "65537": {
+      "failed_attempts": 4,
+      "vdeg_free": 0,
+      "t_undetermined": 4,
+      "with_z_cols": 4,
+      "ab_rank_1": 0
+     },
+     "131101": {
+      "failed_attempts": 5,
+      "vdeg_free": 0,
+      "t_undetermined": 5,
+      "with_z_cols": 5,
+      "ab_rank_1": 1
+     }
+    }
+   }
+  },
+  "documents_displayed_numbers_checked": 175,
+  "documents_errors": [
+   {
+    "file": "RESULTS.md",
+    "line": 89,
+    "displayed": [
+     "2.02",
+     "1.85",
+     "2.20",
+     "1.91",
+     "1.82",
+     "2.00",
+     "2.04",
+     "1.93",
+     "2.14"
+    ],
+    "recomputed_display": [
+     "2.02",
+     "1.85",
+     "2.20",
+     "1.91",
+     "1.82",
+     "1.99",
+     "2.04",
+     "1.93",
+     "2.14"
+    ],
+    "full_precision": [
+     2.018567498183064,
+     1.8539379294202172,
+     2.1978161620520336,
+     1.9087383220545207,
+     1.8199292903218836,
+     1.9945176069094654,
+     2.04046197475589,
+     1.9313710853411226,
+     2.144422466092785
+    ]
+   },
+   {
+    "file": "report.typ",
+    "line": 49,
+    "displayed": [
+     "8.88",
+     "4.45",
+     "2.70",
+     "1.91",
+     "1.82",
+     "2.00"
+    ],
+    "recomputed_display": [
+     "8.88",
+     "4.45",
+     "2.70",
+     "1.91",
+     "1.82",
+     "1.99"
+    ],
+    "full_precision": [
+     8.876322923491877,
+     4.450581539583764,
+     2.7011912943086887,
+     1.9087383220545207,
+     1.8199292903218836,
+     1.9945176069094654
+    ]
+   }
+  ],
+  "rho_reference_5a": "ideal negation rho sqrt(pi r / 4), a closed form with no native work, so it is priced 0 at every w while every IC arm carries all six counted native counters; ecbench band (lesson L-546d37ca7750) does not apply: there is no ecbench session and no rho counter to omit"
+ },
+ "errata": [
+  {
+   "id": "E1",
+   "where": [
+    "RESULTS.md:89",
+    "reports/run-20261128T0345Z/report.typ:49 (and report.pdf)"
+   ],
+   "displayed": "1.91 [1.82, 2.00]",
+   "correct": "1.91 [1.82, 1.99]",
+   "value": [
+    1.9087383220545207,
+    1.8199292903218836,
+    1.9945176069094654
+   ],
+   "text": "p0 IC / ideal negation rho at p = 131101, w = 1: the upper boot95 end is 1.9945176; rounded once it is 1.99. 2.00 is a double rounding (1.99452 -> 1.995 -> 2.00). No verdict changes (the lower end 1.82 is above 1 either way).",
+   "confirmed_by_check": true
+  },
+  {
+   "id": "E2",
+   "where": [
+    "RESULTS.md:76",
+    "reports/run-20261128T0345Z/report.typ:43"
+   ],
+   "displayed": "The share of unrescued failures grows with p (5 of 9 at 131101)",
+   "correct": "unrescued / nofb multi-attempt runs: 1/9 at 16411, 4/7 at 65537, 5/9 at 131101 (none at 4099): higher at 65537 and 131101 than at 16411, not growing from 65537 (57%) to 131101 (56%); n <= 9 per prime",
+   "value": {
+    "4099": [
+     0,
+     0
+    ],
+    "16411": [
+     1,
+     9
+    ],
+    "65537": [
+     4,
+     7
+    ],
+    "131101": [
+     5,
+     9
+    ]
+   },
+   "confirmed_by_check": true
+  },
+  {
+   "id": "E3",
+   "where": [
+    "reports/run-20261128T0345Z/report.typ:40"
+   ],
+   "displayed": "unrescued failures (10): about 1.0",
+   "correct": "geometric mean 0.97 over the 10 pairs; per prime 1.002 (n = 1), 1.004 (n = 4), 0.933 (n = 5); single pairs 0.75-1.06 (RESULTS.md:70-72 show the per-prime values correctly)",
+   "value": {
+    "16411": [
+     1.0021875091468366,
+     1
+    ],
+    "65537": [
+     1.0038937255459708,
+     4
+    ],
+    "131101": [
+     0.9332004504623179,
+     5
+    ]
+   },
+   "text": "minor: a loose summary, no number in RESULTS.md is affected"
+  }
+ ],
+ "process_findings": [
+  {
+   "id": "P1",
+   "text": "binary.sha256 and source.sha256 were committed at 04:00:54 (d6a31141e4e), 15 min after run_main.sh started (03:45:43); the protocol does not require a pre-run commit, and the binary-to-freeze binding was established instead from cargo's records (mtime evidence, weaker than a rebuild; no rebuild was allowed)"
+  },
+  {
+   "id": "P2",
+   "text": "the worktree fast-forwarded to 0d042b03db3 (main merged, 35 src files) at 03:45:46, 3 s after run_main.sh started, and to e4787052663 at 04:00:32 during run_131101.sh; the running binary (linked 03:45:08) and the frozen scripts (study directory untouched by the merges) were unaffected, but the run-time tree state is recoverable only from the reflog and the bench record. Do not merge into the worktree during a run"
+  },
+  {
+   "id": "P3",
+   "text": "section 13 artifact store: raw/run.jsonl (553,191 B) and raw/run131101.jsonl (192,624 B) are .jsonl over 64 KiB committed to Git, no .artifacts.json; at the validated commit the bench record is open with raw [] and metrics []; the binary lives only at a scratch path and in target/release"
+  },
+  {
+   "id": "P4",
+   "text": "frozen analyze.py reads the C0 fields with .get and checks nofb rows with .get('p0_lines', 0) == 0, so a missing key would pass silently (lesson L-99ee952350b2); it does not check completeness against seeds.json. No effect here: 360 of 360 runs present, the 24 C0 fields and all 86 common keys present and equal on 80 of 80 rows, p0_lines present (0) on all 120 nofb rows"
+  },
+  {
+   "id": "P5",
+   "text": "seeds.json: master_seed null; seeded streams on the study path not listed: the descent RNG (0xDEC0_5EED_0000_0001 ^ q ^ seed.rotate_left(17), quartic_ladder.rs run_diem_inner), the sampled factor base (0x5AFB_0000_0000_0000 ^ q and 0x5EED_5AFB_0000_0001 ^ q, sampled_base) and the BSGS order computation (inherited, parent P5). Pairing and arm exclusion are correct and the full replay is byte-identical"
+  },
+  {
+   "id": "P6",
+   "text": "section 5a w_cal is not recorded; on the primary panel every pooled interval straddles 1 at w = 0, 0.1 and 1, so the pair is not ranked at any band point and w_cal cannot change the verdict. On the secondary all-seeds panel p0i3/nofb lies below 1 at all three band points (upper 0.837, 0.976, 0.976) and p0/nofb only at w = 0.1 and 1; the protocol assigns that panel no decision and RESULTS.md claims nothing from it"
+  },
+  {
+   "id": "P7",
+   "text": "mechanism statements in RESULTS.md 'What this settles' (the P0 lines remove the base-point-shift cause; the unrescued failures fit the frontier-column mechanism) rest on the dev diagnosis and the rescue counts; the grid rows hold no diagnostic. The validator replayed the binary's uncounted diagnosis and core dumps on grid curves (diag.sh, diag_check.json; arms nofb and p0, seeds 1-6; 4099 curve 205, all 16411 curves, 65537 curves 57/156/166/369, 131101 curves 53/177/288). Every p0 attempt core holds a line row not orthogonal to v_deg (89 of 89), so v_deg is never free with the P0 lines (supports the first statement). nofb failed attempts: 24, v_deg free in 18, z columns in 15. p0 failed attempts: 11, all with t undetermined, v_deg free in 0, z columns (columns only in decomposition rows) in 9, and 2 with neither, all of them ab_rank 1 (one or two decomposition rows reach the core): p=4099 curve 205 seed 6 (dec rows 2); p=16411 curve 158 seed 4 (dec rows 1). So the frontier-column reading fits the p0 failures that have z columns, not those with ab_rank 1, which is a third cause the RESULTS text does not name"
+  },
+  {
+   "id": "P8",
+   "text": "the branch moved during validation (b2c9a5d319c session log, b8fe85e9088 bench-record launcher commands); neither touches the study directory; this validation covers c271f320e40 only"
+  },
+  {
+   "id": "P9",
+   "text": "PROTOCOL section 7: the runs used the local container, not the default EKS route (disclosed: AWS key rejected); counted-operation metrics are host-independent and the replay on this host is byte-identical"
+  }
+ ],
+ "scripts": [
+  "replay.sh",
+  "compare_replay.py",
+  "verify_certificates.py",
+  "picarith.py",
+  "recompute.py",
+  "checks_extra.py",
+  "docs_check.py",
+  "diag.sh",
+  "diag_check.py",
+  "build_gate_artifacts.py"
+ ],
+ "label": "[pcc:unverified] (no pcc claim was created by the validator)"
+}

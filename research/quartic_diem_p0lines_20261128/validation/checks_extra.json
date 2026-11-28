@@ -1,0 +1,285 @@
+{
+ "schema": "validator-checks-extra/v1",
+ "sha": "c271f320e40cef2b45ca344e6f4ef4f46022da3b",
+ "freeze": "7f67f384eceb7080ff4b7898f6fa6036f8b57b8e",
+ "manifests": {
+  "frozen.sha256": {
+   "entries": {
+    "PROTOCOL.md": true,
+    "seeds.json": true,
+    "analyze.py": true,
+    "run_main.sh": true,
+    "run_131101.sh": true
+   },
+   "ok": true
+  },
+  "data.sha256": {
+   "entries": {
+    "raw/run.jsonl": true,
+    "raw/run131101.jsonl": true
+   },
+   "ok": true
+  },
+  "binary": {
+   "binary.sha256": "283c1510a9da8d735495a44aafe3685b174029987f10dc10adb0ecffb23723cd",
+   "binary.sha256_note": [
+    "built from 7f67f384eceb7080ff4b7898f6fa6036f8b57b8e with: cargo build --release --bin genus_ladder"
+   ],
+   "bound_copy": "283c1510a9da8d735495a44aafe3685b174029987f10dc10adb0ecffb23723cd",
+   "scratch_path": "283c1510a9da8d735495a44aafe3685b174029987f10dc10adb0ecffb23723cd",
+   "target_release_genus_ladder": "283c1510a9da8d735495a44aafe3685b174029987f10dc10adb0ecffb23723cd",
+   "ok": true
+  },
+  "source.sha256": {
+   "entries": {
+    "src/cryptanalysis/quartic_ladder.rs": {
+     "freeze_7f67f384ece": true,
+     "validated_sha": true
+    },
+    "src/bin/genus_ladder.rs": {
+     "freeze_7f67f384ece": true,
+     "validated_sha": true
+    },
+    "Cargo.lock": {
+     "freeze_7f67f384ece": true,
+     "validated_sha": true
+    },
+    "Cargo.toml": {
+     "freeze_7f67f384ece": true,
+     "validated_sha": true
+    }
+   },
+   "ok": true
+  }
+ },
+ "freeze_order": {
+  "study_commits": [
+   "c271f320e40cef2b45ca344e6f4ef4f46022da3b 2026-11-28T04:23:48+00:00 p0lines study: 131101 rows, frozen analysis, results, figure and report",
+   "10b0602aed176527dc68388972b47e1933b44003 2026-11-28T04:02:34+00:00 p0lines study: raw rows for 4099/16411/65537 (run_main.sh finished 03:52Z)",
+   "2914d87a7505f2d9ee12f17f6d958c04a2915dd9 2026-11-28T04:01:09+00:00 p0lines study: plot script (written before results; reads analysis.json only)",
+   "d6a31141e4e876228818bdafb58e109ab5b3d5c4 2026-11-28T04:00:54+00:00 p0lines study: binary and source hashes (built from freeze commit 7f67f384ece), open bench record",
+   "7f67f384eceb7080ff4b7898f6fa6036f8b57b8e 2026-11-28T03:28:06+00:00 Freeze protocol: lines through P0 in quartic Diem nofb (research/quartic_diem_p0lines_20261128)"
+  ],
+  "freeze_commit_date": "2026-11-28T03:28:06+00:00",
+  "raw_stamps": {
+   "main_start.txt": "2026-11-28T03:45:43Z",
+   "main_end.txt": "2026-11-28T03:52:42Z",
+   "r131101_start.txt": "2026-11-28T03:52:42Z",
+   "r131101_end.txt": "2026-11-28T04:21:42Z"
+  },
+  "done_wall_s": {
+   "run.jsonl": 418.981218105,
+   "run131101.jsonl": 1739.778255551
+  },
+  "stamp_intervals_s": {
+   "main": 419.0,
+   "131101": 1740.0
+  },
+  "raw_first_added": {
+   "raw/run.jsonl": {
+    "adding_commits": [
+     "10b0602aed176527dc68388972b47e1933b44003"
+    ],
+    "date": "2026-11-28T04:02:34+00:00",
+    "freeze_is_ancestor": true
+   },
+   "raw/run131101.jsonl": {
+    "adding_commits": [
+     "c271f320e40cef2b45ca344e6f4ef4f46022da3b"
+    ],
+    "date": "2026-11-28T04:23:48+00:00",
+    "freeze_is_ancestor": true
+   }
+  },
+  "raw_dir_absent_at_freeze": true,
+  "frozen_files_present_at_freeze": {
+   "PROTOCOL.md": true,
+   "seeds.json": true,
+   "analyze.py": true,
+   "run_main.sh": true,
+   "run_131101.sh": true
+  },
+  "frozen_files_unchanged_freeze_to_sha": true,
+  "freeze_before_main_start_s": 1057.0,
+  "ok": true
+ },
+ "binary_binding": {
+  "deps_matching_binary": [
+   "genus_ladder-d7e92aa79b358cff"
+  ],
+  "bin_fingerprint_lists_lib_fingerprint": "e96331c3358d4789",
+  "lib_fingerprint_dirs_matching": [
+   "crypto-4fb2b19b7d9c9847"
+  ],
+  "dep_info": {
+   "lib": {
+    "fingerprint": "crypto-4fb2b19b7d9c9847",
+    "invoked_utc": "2026-11-28T03:28:28.264752+00:00",
+    "n_source_files": 1187,
+    "outside_repo": [],
+    "all_tracked": true,
+    "env_deps": [
+     "CARGO_PKG_VERSION=0.1.0",
+     "CRYPTO_BUILD_GIT_COMMIT",
+     "CRYPTO_BUILD_GIT_DIRTY",
+     "GITHUB_SHA"
+    ],
+    "unmodified_since_before_invocation_and_equal_freeze": 1148,
+    "rewritten_later_by_merge_changed_in_git": 39,
+    "rewritten_later_but_unchanged_in_git": [],
+    "modified_in_build_window": [],
+    "differs_from_freeze_and_old_mtime": [],
+    "not_in_freeze": []
+   },
+   "bin": {
+    "fingerprint": "crypto-d7e92aa79b358cff",
+    "invoked_utc": "2026-11-28T03:45:05.784787+00:00",
+    "n_source_files": 1,
+    "outside_repo": [],
+    "all_tracked": true,
+    "env_deps": [],
+    "unmodified_since_before_invocation_and_equal_freeze": 1,
+    "rewritten_later_by_merge_changed_in_git": 0,
+    "rewritten_later_but_unchanged_in_git": [],
+    "modified_in_build_window": [],
+    "differs_from_freeze_and_old_mtime": [],
+    "not_in_freeze": []
+   }
+  },
+  "lib_compile": {
+   "invoked_utc": "2026-11-28T03:28:28.264752+00:00",
+   "dep_info_written_utc": "2026-11-28T03:28:38.456752+00:00",
+   "finished_utc": "2026-11-28T03:45:05.784787+00:00"
+  },
+  "bin_link": {
+   "invoked_utc": "2026-11-28T03:45:05.784787+00:00",
+   "finished_utc": "2026-11-28T03:45:08.292787+00:00",
+   "deps_binary_mtime_utc": "2026-11-28T03:45:08.260787+00:00"
+  },
+  "bench_record_at_sha": {
+   "created_utc": "2026-11-28T03:45:36+00:00",
+   "commit": "7f67f384eceb7080ff4b7898f6fa6036f8b57b8e",
+   "commit_dirty": false,
+   "dirty_rule": "tools/benchrec.py: git status --porcelain --untracked-files=no"
+  },
+  "head_moves_around_build": [
+   {
+    "utc": "2026-11-28T04:24:59+00:00",
+    "to": "b8fe85e9088",
+    "what": "commit: bench record: launcher commands for the p0lines grid"
+   },
+   {
+    "utc": "2026-11-28T04:24:47+00:00",
+    "to": "b2c9a5d319c",
+    "what": "commit: session log: P0-line study run, INCONCLUSIVE"
+   },
+   {
+    "utc": "2026-11-28T04:23:48+00:00",
+    "to": "c271f320e40",
+    "what": "commit: p0lines study: 131101 rows, frozen analysis, results, figure and report"
+   },
+   {
+    "utc": "2026-11-28T04:23:47+00:00",
+    "to": "a6bb3a33c2e",
+    "what": "merge origin/main: Fast-forward"
+   },
+   {
+    "utc": "2026-11-28T04:02:34+00:00",
+    "to": "10b0602aed1",
+    "what": "commit: p0lines study: raw rows for 4099/16411/65537 (run_main.sh finished 03:52Z)"
+   },
+   {
+    "utc": "2026-11-28T04:01:09+00:00",
+    "to": "2914d87a750",
+    "what": "commit: p0lines study: plot script (written before results; reads analysis.json only)"
+   },
+   {
+    "utc": "2026-11-28T04:00:54+00:00",
+    "to": "d6a31141e4e",
+    "what": "commit: p0lines study: binary and source hashes (built from freeze commit 7f67f384ece), open bench record"
+   },
+   {
+    "utc": "2026-11-28T04:00:32+00:00",
+    "to": "e4787052663",
+    "what": "merge e4787052663b07258dfd6807c966017725391136: Fast-forward"
+   },
+   {
+    "utc": "2026-11-28T03:45:46+00:00",
+    "to": "0d042b03db3",
+    "what": "merge 0d042b03db3ed06f5aa74e9596981310a52482df: Fast-forward"
+   },
+   {
+    "utc": "2026-11-28T03:28:06+00:00",
+    "to": "7f67f384ece",
+    "what": "commit: Freeze protocol: lines through P0 in quartic Diem nofb (research/quartic_diem_p0lines_20261128)"
+   },
+   {
+    "utc": "2026-11-28T03:16:48+00:00",
+    "to": "05b600a52eb",
+    "what": "commit: Register QL_CORE_DUMP (parity) and rustfmt the dump block"
+   },
+   {
+    "utc": "2026-11-28T03:14:55+00:00",
+    "to": "50e1d80643f",
+    "what": "commit: session log: quartic undetermined-t diagnosis and P0-line fix"
+   },
+   {
+    "utc": "2026-11-28T03:14:04+00:00",
+    "to": "f224917f35c",
+    "what": "merge origin/main: Merge made by the 'ort' strategy."
+   },
+   {
+    "utc": "2026-11-28T03:10:19+00:00",
+    "to": "4a81e131f87",
+    "what": "commit: genus_ladder: rustfmt"
+   },
+   {
+    "utc": "2026-11-28T03:09:13+00:00",
+    "to": "cb7191b64ca",
+    "what": "commit: quartic Diem: p0_lines option and arms 2lp-sfb-sge-p0 / -p0i3 (dev)"
+   }
+  ],
+  "cargo_lock_toml_equal_freeze_and_sha": true,
+  "src_dirs_changed_freeze_to_sha": 62,
+  "study_sources_equal_freeze_and_sha": true,
+  "head_at_freeze_through_build": true,
+  "ok": true,
+  "strength": "mtime and cargo-record evidence, weaker than a rebuild: rustc's dep-info for the linked crypto_lib was written 10 s after invocation, so every source had been read by then; files later rewritten by the 03:45:46 and 04:00:32 fast-forwards cannot be re-read as they were at build time, and for those the binding rests on HEAD = freeze in the reflog and the bench record's commit_dirty = false at 03:45:36"
+ },
+ "reproduction": {
+  "analysis_json_from_committed_raw": true,
+  "explore_json_from_committed_raw": true,
+  "python": "3.13.18",
+  "numpy": "2.5.3",
+  "analysis_json_from_replayed_raw": true,
+  "explore_json_from_replayed_raw": true
+ },
+ "data": {
+  "raw_sizes_bytes": {
+   "run.jsonl": 553191,
+   "run131101.jsonl": 192624
+  },
+  "raw_tracked": true,
+  "artifacts_json_present": false,
+  "bench_record_at_sha": {
+   "status": "open",
+   "commit": "7f67f384eceb7080ff4b7898f6fa6036f8b57b8e",
+   "commit_dirty": false,
+   "raw": [],
+   "metrics": [],
+   "validation": null,
+   "commands": [
+    {
+     "argv": [
+      "sh",
+      "run_main.sh"
+     ],
+     "cwd": "research/quartic_diem_p0lines_20261128",
+     "exit": 0,
+     "started_utc": "2026-11-28T03:45:43+00:00",
+     "wall_s": 418.988
+    }
+   ]
+  }
+ }
+}
