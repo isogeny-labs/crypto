@@ -68,3 +68,36 @@ and the branch-tip build needs CI or a full checkout to confirm. The patch
 itself is `+84/−1` on those two files; an earlier commit that staged the
 checkout's older copies over the branch's newer ones was repaired in
 `946b17734f4`.
+
+## The algebraic oracle: `pkm-mixed`
+
+A degree-`q` Vélu step is `y'·D(y) − N(y) = 0`, of degree `q`, so it is not the
+quadratic rewrite `pkm-semaev` applies on the tower ring. `pkm-mixed` therefore
+builds the paper's system (4) with denominators cleared and solves it with the
+generic F4 (`pkm_smooth_tower::algebraic_decompose`), reporting its work as
+native field operations and refusing a base that is not the chain's zero set.
+
+First row, same instance, `degrees=3;3;5;11`, `m = 2`, `dmax = 16`,
+`budget = 60 s`, 20 targets (`results/harness_b11_f4.json`):
+
+| quantity | value |
+|:--|--:|
+| base columns | 246 |
+| relations (20 targets) | 8 |
+| hit rate | 0.400 |
+| `pkm_mixed_field_ops` | 280 520 404 902 |
+| field ops / target | 14.0 × 10⁹ |
+| `S` in the table | 2.599 (1.92× ρ) |
+
+**The `S` is not the cost of the algebraic path.** It counts group operations
+only — the walk — and the F4's 14 × 10⁹ field ops per target are native,
+unpriced, so this row is `partial_counted` by construction, exactly as the
+framework says when native work is unpriced. Pricing them at even one group
+operation each, the 20-target run is 2.8 × 10¹¹ GAE against the scan's 366; at
+the ~250 targets a pin needs, 3.5 × 10¹² against 366 × 511 ≈ 1.9 × 10⁵ group
+operations.
+
+So the algebraic path on a mixed chain is not merely behind the linear scan:
+in the harness's own units it is behind by ~10⁷, and the ledger only shows that
+once the field-op unit is priced. Until then the row's `S` should be read as
+"the walk", not "the algorithm".

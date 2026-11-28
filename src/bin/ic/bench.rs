@@ -828,6 +828,7 @@ fn run_prime(
                 m, inst,
             );
         let mut hashed = HashedTensorOracle::new();
+        let mut pkm_mixed = crypto_lib::cryptanalysis::ic_framework::pkm_mixed::PkmMixedOracle::new(m);
         let mut genroot = GenRootOracle::new(m);
         // Built on the base's own tower, so it refuses any other base.
         let mut pkm = match or_name {
@@ -836,6 +837,7 @@ fn run_prime(
         };
         let oracle: &mut dyn DecompositionOracle<_> = match or_name {
             "pkm-semaev" => pkm.as_mut().expect("built above"),
+            "pkm-mixed" => &mut pkm_mixed,
             "subtract" => &mut subtract,
             "mitm" => &mut mitm,
             "mitm-prime-batch" => &mut batch,
