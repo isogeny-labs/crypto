@@ -217,6 +217,15 @@ pub struct IsogenyTowerCost {
     pub velu_evaluations: u64,
     /// Baby-step table entries stored by the searches (memory, not time).
     pub bsgs_table_entries: u64,
+    /// Deterministic equal-size selection, including rejected auxiliaries and cosets.
+    pub selection_m: u64,
+    pub selection_cosets_tested: u64,
+    pub selection_x_scanned: u64,
+    pub selection_sqrt_calls: u64,
+    pub selection_sqrt_muls: u64,
+    pub selection_target_legendre: u64,
+    pub selection_peak_frontier: u64,
+    pub selection_peak_coset_entries: u64,
 }
 
 /// One 2-isogeny step: kernel abscissa `ξ_j`, `τ_j = 3ξ_j² + a'_j`, and
@@ -236,6 +245,7 @@ pub struct IsogenyTower {
     pub p: u64,
     pub t: u32,
     pub aux: PrimeCurve,
+    /// Zero only for a halving-selected tower, which never counts #E'.
     pub aux_order: u64,
     pub q: PrimePoint,
     pub r: PrimePoint,
@@ -442,6 +452,191 @@ fn mestre_order(
 /// [2^{t−1−j}]Q_j` by doublings, `ξ_j = x(K_j)`, `τ_j = 3ξ_j² + a'_j`,
 /// `a'_{j+1} = a'_j − 5τ_j`, `b'_{j+1} = b'_j − 7ξ_jτ_j`, `Q_{j+1}`,
 /// `R'_{j+1}` by Vélu, and `c = x(Φ(R'))`.
+/// Find the lexicographically first order-32 point by four levels of rational
+/// halving from all three rational 2-torsion points. The square-root work is
+/// native Tonelli–Shanks, not a precomputed table.
+fn z2xz8_halving_q32(
+    aux: &PrimeCurve,
+    aa4: u64,
+    bb4: u64,
+    ops: &mut GroupOps,
+    cost: &mut IsogenyTowerCost,
+) -> Option<PrimePoint> {
+    let p = aux.p;
+    let roots = [0, (p - bb4) % p, (p - aa4) % p];
+    let inv3 = pow_mod(3, p - 2, p);
+    let reduce = |v: u128| (v % u128::from(p)) as u64;
+    let shift = mul(reduce(roots.iter().map(|&r| u128::from(r)).sum()), inv3, p);
+    let mut frontier: Vec<_> = roots
+        .iter()
+        .map(|&root| PrimePoint::affine((root + p - shift) % p, 0))
+        .collect();
+    for _ in 0..4 {
+        let mut next = Vec::new();
+        for point in &frontier {
+            let x = (point.x + shift) % p;
+            let mut choices = [[0u64; 2]; 3];
+            let mut lengths = [0usize; 3];
+            for (i, &root) in roots.iter().enumerate() {
+                let z = (x + p - root) % p;
+                cost.selection_sqrt_calls += 1;
+                let Some(r) = aux.sqrt_counted(z, &mut cost.selection_sqrt_muls) else {
+                    break;
+                };
+                choices[i][0] = r;
+                lengths[i] = 1;
+                if r != 0 {
+                    choices[i][1] = p - r;
+                    lengths[i] = 2;
+                }
+            }
+            if lengths.contains(&0) {
+                continue;
+            }
+            for &r1 in &choices[0][..lengths[0]] {
+                for &r2 in &choices[1][..lengths[1]] {
+                    for &r3 in &choices[2][..lengths[2]] {
+                        if mul(mul(r1, r2, p), r3, p) != (p - point.y) % p {
+                            continue;
+                        }
+                        let new_x = reduce(
+                            u128::from(x)
+                                + u128::from(mul(r1, r2, p))
+                                + u128::from(mul(r1, r3, p))
+                                + u128::from(mul(r2, r3, p))
+                                + u128::from(p - shift),
+                        );
+                        let new_y = (p - mul(
+                            mul(
+                                reduce(u128::from(r1) + u128::from(r2)),
+                                reduce(u128::from(r1) + u128::from(r3)),
+                                p,
+                            ),
+                            reduce(u128::from(r2) + u128::from(r3)),
+                            p,
+                        )) % p;
+                        let half = PrimePoint::affine(new_x, new_y);
+                        if aux.is_on_curve(half) && aux.double(ops, half) == *point {
+                            next.push(half);
+                        }
+                    }
+                }
+            }
+        }
+        next.sort_unstable_by_key(|pt| (pt.x, pt.y));
+        next.dedup();
+        cost.selection_peak_frontier = cost.selection_peak_frontier.max(next.len() as u64);
+        frontier = next;
+    }
+    frontier.into_iter().next()
+}
+
+/// Frozen equal-size selector: m = 1..64, then ascending R.x and at most 64
+/// distinct cosets per m. A zero aux_order means no group census was needed.
+/// The target point and scalar are never consulted; only the public curve is.
+pub fn z2xz8_equal_size_tower(
+    target: &PrimeCurve,
+    ops: &mut GroupOps,
+) -> Result<IsogenyTower, String> {
+    let p = target.p;
+    if p < 128 || p % 4 != 1 || p >= (1u64 << 63) {
+        return Err("equal-size selector requires 128 <= p < 2^63 and p = 1 mod 4".into());
+    }
+    let mut cost = IsogenyTowerCost::default();
+    let mut interval_size = 0;
+    for x in 0..32 {
+        cost.selection_target_legendre += 1;
+        interval_size += usize::from(target.legendre(target.rhs(x)) >= 0);
+    }
+    let inv3 = pow_mod(3, p - 2, p);
+    let inv27 = pow_mod(27, p - 2, p);
+    let reduce = |v: u128| (v % u128::from(p)) as u64;
+    let search_before = ops.adds + ops.doubles;
+    for m in 1..=64u64 {
+        cost.curves_tried += 1;
+        let m2 = mul(m, m, p);
+        let fa = (m2 + p - 1) % p;
+        let fb = mul(2, m, p);
+        if fa == 0 || fb == 0 {
+            cost.singular += 1;
+            continue;
+        }
+        let aa4 = mul(mul(fa, fa, p), mul(fa, fa, p), p);
+        let bb4 = mul(mul(fb, fb, p), mul(fb, fb, p), p);
+        if aa4 == bb4 {
+            cost.singular += 1;
+            continue;
+        }
+        let e2 = (p - bb4) % p;
+        let e3 = (p - aa4) % p;
+        let s1 = reduce(u128::from(e2) + u128::from(e3));
+        let s2 = mul(e2, e3, p);
+        let s1sq = mul(s1, s1, p);
+        let a = (s2 + p - mul(s1sq, inv3, p)) % p;
+        let b = (mul(mul(s1, s2, p), inv3, p) + p - mul(2, mul(mul(s1sq, s1, p), inv27, p), p)) % p;
+        let aux = PrimeCurve { p, a, b };
+        let Some(q) = z2xz8_halving_q32(&aux, aa4, bb4, ops, &mut cost) else {
+            cost.two_sylow_rejected += 1;
+            continue;
+        };
+        if !aux.is_identity(&aux.mul(ops, q, 32)) || aux.is_identity(&aux.mul(ops, q, 16)) {
+            return Err(format!(
+                "m = {m}: halving point does not have exact order 32"
+            ));
+        }
+        let mut subgroup = std::collections::HashSet::new();
+        let mut acc = PrimePoint::INFINITY;
+        for _ in 0..32 {
+            subgroup.insert(aux.key(&acc));
+            acc = aux.add(ops, acc, q);
+        }
+        let mut seen = std::collections::HashSet::new();
+        for x in 0..p {
+            cost.selection_x_scanned += 1;
+            cost.selection_sqrt_calls += 1;
+            let Some(y) = aux.sqrt_counted(aux.rhs(x), &mut cost.selection_sqrt_muls) else {
+                continue;
+            };
+            let r = PrimePoint::affine(x, y.min((p - y) % p));
+            if subgroup.contains(&aux.key(&aux.double(ops, r))) {
+                continue;
+            }
+            let mut v = Vec::with_capacity(32);
+            let mut point = r;
+            for _ in 0..32 {
+                v.push(point.x);
+                point = aux.add(ops, point, q);
+            }
+            v.sort_unstable();
+            if v.windows(2).any(|pair| pair[0] == pair[1]) {
+                return Err(format!("m = {m}: coset abscissae are not distinct"));
+            }
+            if !seen.insert(v.clone()) {
+                continue;
+            }
+            cost.selection_peak_coset_entries =
+                cost.selection_peak_coset_entries.max(seen.len() as u64);
+            cost.selection_cosets_tested += 1;
+            let columns = v
+                .iter()
+                .filter(|&&z| {
+                    cost.selection_target_legendre += 1;
+                    target.legendre(target.rhs(z)) >= 0
+                })
+                .count();
+            if columns == interval_size {
+                cost.selection_m = m;
+                cost.search_gae = ops.adds + ops.doubles - search_before;
+                return finish_tower(p, 5, aux, 0, q, Some(r), &mut SplitMix(0), ops, cost);
+            }
+            if seen.len() == 64 {
+                break;
+            }
+        }
+    }
+    Err("no equal-size X1(2,8) coset within m<=64 and 64 cosets per m".into())
+}
+
 pub fn isogeny_tower(
     p: u64,
     t: u32,
@@ -572,7 +767,7 @@ pub fn isogeny_tower(
             None => cost.two_sylow_rejected += 1,
         }
     };
-    finish_tower(p, t, aux, n, q, &mut rng, ops, cost)
+    finish_tower(p, t, aux, n, q, None, &mut rng, ops, cost)
 }
 
 /// The build on an accepted auxiliary curve, shared by the searched
@@ -586,6 +781,7 @@ fn finish_tower(
     aux: PrimeCurve,
     n: u64,
     q: PrimePoint,
+    selected_r: Option<PrimePoint>,
     rng: &mut SplitMix,
     ops: &mut GroupOps,
     mut cost: IsogenyTowerCost,
@@ -593,6 +789,9 @@ fn finish_tower(
     let two_t = 1u64 << t;
     let gae = |o: &GroupOps| o.adds + o.doubles;
     let build_before = gae(ops);
+    if q.infinity || !aux.is_on_curve(q) {
+        return Err("Q is not an affine point on the auxiliary curve".into());
+    }
     // ⟨Q⟩ by successive additions.
     let mut multiples = Vec::with_capacity(two_t as usize);
     multiples.push(PrimePoint::INFINITY);
@@ -605,11 +804,20 @@ fn finish_tower(
         return Err("Q does not have order 2^t".into());
     }
     let keys: std::collections::HashSet<u64> = multiples.iter().map(|m| aux.key(m)).collect();
-    let r0 = loop {
-        let r = random_point(&aux, rng, &mut cost);
-        let r2 = aux.double(ops, r);
-        if !keys.contains(&aux.key(&r2)) {
-            break r;
+    let valid_r = |r: PrimePoint, ops: &mut GroupOps| {
+        !r.infinity && aux.is_on_curve(r) && !keys.contains(&aux.key(&aux.double(ops, r)))
+    };
+    let r0 = if let Some(r) = selected_r {
+        if !valid_r(r, ops) {
+            return Err("selected R is not a valid distinct-abscissa coset".into());
+        }
+        r
+    } else {
+        loop {
+            let r = random_point(&aux, rng, &mut cost);
+            if valid_r(r, ops) {
+                break r;
+            }
         }
     };
     let v: Vec<u64> = multiples
@@ -863,7 +1071,7 @@ pub fn supersingular_tower(
     }
     cost.build_gae += gae(ops) - before;
     let q = q.ok_or_else(|| format!("no point of order 2^{t} on {} in 64 draws", kind.name()))?;
-    finish_tower(p, t, aux, n, q, &mut rng, ops, cost)
+    finish_tower(p, t, aux, n, q, None, &mut rng, ops, cost)
 }
 
 /// The isogeny tower base: every point of the curve whose abscissa is in
@@ -944,7 +1152,12 @@ fn build_isogeny_base(
         tower.cost.curves_tried,
     );
     let mut fb = lift_abscissae(instance, &xs, |columns| {
-        if kind == AuxKind::Ordinary {
+        if kind == AuxKind::Ordinary && an == 0 {
+            format!(
+                "isogeny tower t = {t}, equal-size X1(2,8) selection, E' = (a' {aa}, b' {ab}), \
+                 #E' not computed, {tried} auxiliary curves tried, {columns} of 2^{t} abscissae on the curve"
+            )
+        } else if kind == AuxKind::Ordinary {
             format!(
                 "isogeny tower t = {t}, seed = {seed}, E' = (a' {aa}, b' {ab}), #E' = {an}, \
                  {tried} auxiliary curves tried, {columns} of 2^{t} abscissae on the curve"
@@ -974,6 +1187,17 @@ fn build_isogeny_base(
         ("aux_legendre_symbols", c.legendre_symbols),
         ("aux_sqrt_solves", c.sqrt_solves),
         ("aux_bsgs_table_entries", c.bsgs_table_entries),
+        ("aux_selection_m", c.selection_m),
+        ("aux_selection_cosets_tested", c.selection_cosets_tested),
+        ("aux_selection_x_scanned", c.selection_x_scanned),
+        ("aux_selection_sqrt_calls", c.selection_sqrt_calls),
+        ("aux_selection_sqrt_muls", c.selection_sqrt_muls),
+        ("aux_selection_target_legendre", c.selection_target_legendre),
+        ("aux_selection_peak_frontier", c.selection_peak_frontier),
+        (
+            "aux_selection_peak_coset_entries",
+            c.selection_peak_coset_entries,
+        ),
         ("velu_evaluations_uncharged", c.velu_evaluations),
     ] {
         fb.cost.count(name, v);
@@ -990,6 +1214,12 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeIsogenyBase<'_> {
     }
 
     fn describe(&self, params: &Params) -> String {
+        if params.get("selection") == Some("equal-size") {
+            return "PKM X1(2,8) isogeny tower with deterministic halving and \
+                first equal-size coset search (m<=64, <=64 distinct cosets per m); \
+                search is charged to the factor-base phase"
+                .into();
+        }
         match params.get("aux") {
             None | Some("ordinary") => format!(
                 "PKM's isogeny tower: every point with x ∈ x(R' + ⟨Q⟩) for Q of order 2^t on a searched \
@@ -1027,6 +1257,7 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeIsogenyBase<'_> {
                 "ordinary search only: any (default, every curve) or z2xz8 (the X₁(2, 8) family; \
                   every nonsingular draw has 2-Sylow exponent at least 2³)",
             ),
+            ("selection", "seeded (default) or equal-size (X1(2,8), t=5, seed=0, p=1 mod 4)"),
         ]
     }
 
@@ -1042,8 +1273,18 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeIsogenyBase<'_> {
         let seed = params.u64_or("seed", 0)?;
         let kind = AuxKind::parse(params.get("aux").unwrap_or("ordinary"), p)?;
         let family = AuxFamily::parse(params.get("family").unwrap_or("any"))?;
+        let selection = params.get("selection").unwrap_or("seeded");
         let mut aux_ops = GroupOps::default();
-        let tower = if kind == AuxKind::Ordinary {
+        let tower = if selection == "equal-size" {
+            if kind != AuxKind::Ordinary || family != AuxFamily::Z2xZ8 || t != 5 || seed != 0 {
+                return Err(
+                    "equal-size selection requires ordinary aux, family=z2xz8, t=5, seed=0".into(),
+                );
+            }
+            z2xz8_equal_size_tower(&self.instance.curve, &mut aux_ops)?
+        } else if selection != "seeded" {
+            return Err(format!("unknown isogeny selection {selection:?}"));
+        } else if kind == AuxKind::Ordinary {
             isogeny_tower(p, t, seed, family, &mut aux_ops)?
         } else {
             supersingular_tower(p, t, seed, kind, &mut aux_ops)?
@@ -1203,6 +1444,191 @@ mod tests {
             assert!(!tower
                 .aux
                 .is_identity(&tower.aux.mul(&mut GroupOps::default(), tower.q, 16)));
+        }
+    }
+
+    #[test]
+    fn the_six_halving_selected_cosets_replay_through_native_velu() {
+        // Frozen selection: z2xz8_halving_selection_20261128.json, SHA-256
+        // 59f800a5405e151b6ee217b46f159728de525bed4fab4d1ef717224e6846048f.
+        // Tuples: p, auxiliary a/b, Q, R, target b, target columns, sorted V.
+        let cases = [
+            (
+                769,
+                597,
+                549,
+                (11, 96),
+                (5, 382),
+                1,
+                16,
+                [
+                    5, 56, 58, 95, 96, 120, 149, 187, 230, 232, 253, 264, 275, 349, 368, 415, 455,
+                    486, 504, 506, 519, 524, 530, 558, 561, 598, 606, 649, 663, 665, 693, 736,
+                ],
+            ),
+            (
+                881,
+                458,
+                149,
+                (9, 338),
+                (27, 414),
+                13,
+                20,
+                [
+                    27, 65, 69, 70, 74, 112, 126, 258, 306, 319, 329, 335, 376, 395, 416, 428, 499,
+                    505, 506, 530, 533, 596, 628, 641, 729, 774, 780, 838, 839, 848, 862, 878,
+                ],
+            ),
+            (
+                929,
+                884,
+                928,
+                (12, 46),
+                (21, 297),
+                6,
+                20,
+                [
+                    21, 136, 153, 234, 253, 275, 278, 309, 314, 317, 319, 350, 355, 398, 406, 461,
+                    481, 482, 548, 554, 591, 650, 731, 737, 751, 771, 783, 809, 846, 848, 865, 883,
+                ],
+            ),
+            (
+                5_569,
+                1_443,
+                4_671,
+                (31, 2_694),
+                (13, 1_954),
+                3,
+                17,
+                [
+                    13, 392, 563, 606, 735, 779, 908, 948, 962, 1050, 1073, 1198, 1565, 1612, 2876,
+                    3381, 3619, 3769, 3789, 3793, 3864, 4465, 4473, 4519, 4821, 4925, 4957, 4979,
+                    5227, 5262, 5547, 5549,
+                ],
+            ),
+            (
+                5_857,
+                3_813,
+                4_897,
+                (27, 396),
+                (29, 2_488),
+                23,
+                17,
+                [
+                    29, 73, 135, 315, 415, 487, 785, 954, 1012, 1264, 1426, 1868, 1922, 1948, 2282,
+                    2615, 3059, 3241, 3440, 3684, 3722, 3830, 4151, 4289, 4451, 4621, 4658, 4950,
+                    5115, 5360, 5620, 5690,
+                ],
+            ),
+            (
+                5_953,
+                2_522,
+                4_027,
+                (364, 2_652),
+                (6, 917),
+                19,
+                20,
+                [
+                    6, 19, 157, 583, 706, 969, 978, 1150, 1378, 1588, 1855, 1988, 1995, 2262, 2315,
+                    2342, 2465, 2495, 2565, 2628, 2866, 3027, 3192, 3230, 4230, 4527, 4804, 5458,
+                    5476, 5516, 5777, 5913,
+                ],
+            ),
+        ];
+        for (p, a, b, (qx, qy), (rx, ry), target_b, expected_columns, expected_v) in cases {
+            let aux = PrimeCurve { p, a, b };
+            let q = PrimePoint::affine(qx, qy);
+            let r = PrimePoint::affine(rx, ry);
+            let n = aux.point_count();
+            let tower = finish_tower(
+                p,
+                5,
+                aux,
+                n,
+                q,
+                Some(r),
+                &mut SplitMix(0),
+                &mut GroupOps::default(),
+                IsogenyTowerCost::default(),
+            )
+            .unwrap();
+            assert_eq!(tower.q, q);
+            assert_eq!(tower.r, r);
+            let mut v = tower.v.clone();
+            v.sort_unstable();
+            assert_eq!(v, expected_v);
+            assert!(v.iter().all(|&x| tower.eval(x) == Some(tower.c)));
+            let target = PrimeCurve {
+                p,
+                a: 1,
+                b: target_b,
+            };
+            let columns = v
+                .iter()
+                .filter(|&&x| target.legendre(target.rhs(x)) >= 0)
+                .count();
+            assert_eq!(columns, expected_columns);
+            let interval = (0..32)
+                .filter(|&x| target.legendre(target.rhs(x)) >= 0)
+                .count();
+            assert_eq!(columns, interval);
+            let selected = z2xz8_equal_size_tower(&target, &mut GroupOps::default()).unwrap();
+            assert_eq!((selected.q, selected.r), (q, r));
+            assert_eq!(
+                selected
+                    .v
+                    .iter()
+                    .copied()
+                    .collect::<std::collections::HashSet<_>>()
+                    .len(),
+                32
+            );
+            assert_eq!(selected.aux_order, 0);
+            assert_eq!(
+                selected.cost.curves_tried,
+                match p {
+                    769 => 4,
+                    881 => 7,
+                    929 => 9,
+                    5_569 => 2,
+                    5_857 => 4,
+                    5_953 => 10,
+                    _ => unreachable!(),
+                }
+            );
+            assert_eq!(
+                selected.cost.selection_cosets_tested,
+                match p {
+                    769 => 2,
+                    881 => 11,
+                    929 => 8,
+                    5_569 => 10,
+                    5_857 => 15,
+                    5_953 => 3,
+                    _ => unreachable!(),
+                }
+            );
+            assert!(selected.cost.selection_sqrt_calls > 0);
+            assert!(selected.cost.selection_sqrt_muls > 0);
+            assert!(selected.cost.selection_peak_frontier > 0);
+            assert!(selected.cost.selection_peak_coset_entries > 0);
+            eprintln!(
+                "PKM_SELECT p={p} m={} draws={} cosets={} x_scanned={} sqrt_calls={} sqrt_muls={} target_legendre={} search_gae={} build_gae={} peak_frontier={} peak_cosets={}",
+                selected.cost.selection_m,
+                selected.cost.curves_tried,
+                selected.cost.selection_cosets_tested,
+                selected.cost.selection_x_scanned,
+                selected.cost.selection_sqrt_calls,
+                selected.cost.selection_sqrt_muls,
+                selected.cost.selection_target_legendre,
+                selected.cost.search_gae,
+                selected.cost.build_gae,
+                selected.cost.selection_peak_frontier,
+                selected.cost.selection_peak_coset_entries,
+            );
+            let mut selected_v = selected.v;
+            selected_v.sort_unstable();
+            assert_eq!(selected_v, expected_v);
         }
     }
 
