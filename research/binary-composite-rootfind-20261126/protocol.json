@@ -1,0 +1,132 @@
+{
+  "schema": "bcr-protocol/v1",
+  "study": "bcr-20261126/v1",
+  "seed_policy": "isogeny-labs/experiment-seeds/v1",
+  "frozen_utc": "2026-11-26T19:19Z",
+  "seed_derivation": "seed(parts) = first 8 bytes big-endian of SHA-256('bcr-20261126/v1|' + '|'.join(parts)); stream = SplitMix64(seed); uniform below m by rejection on 64-bit output",
+  "streams": {
+    "curve": [
+      "curve",
+      "<n>",
+      "<ci>"
+    ],
+    "target": [
+      "target",
+      "<n>",
+      "<ci>",
+      "<ti>"
+    ],
+    "ic_relation_targets": [
+      "icstream",
+      "<n>",
+      "<ci>",
+      "<ti>"
+    ],
+    "ic_la_PS": [
+      "la",
+      "<n>",
+      "<ci>",
+      "<ti>",
+      "PS"
+    ],
+    "ic_la_M3": [
+      "la",
+      "<n>",
+      "<ci>",
+      "<ti>",
+      "M3"
+    ],
+    "ic_la_M2": [
+      "la",
+      "<n>",
+      "<ci>",
+      "<ti>",
+      "M2"
+    ],
+    "rho": [
+      "rho",
+      "<n>",
+      "<ci>",
+      "<ti>",
+      "<si>"
+    ],
+    "bootstrap": [
+      "boot",
+      "<analysis label>"
+    ],
+    "pilot (held out, used only to choose rho lanes)": [
+      "pilot-curve|pilot-target|pilot-rho",
+      "..."
+    ]
+  },
+  "stream_sharing": "ic_relation_targets is shared by every IC arm (paired, identical ordered target stream); target Q is shared by IC and rho; rho seeds are independent per seed index; LA streams are arm-specific",
+  "custody": "d is drawn from the 'target' stream inside the evaluator; solvers receive (curve, G, Q, ell) only; correctness compares the recovered d with d_true after the solve and checks [d]G = Q inside the counted solve",
+  "curves_per_rung": 4,
+  "targets_per_curve": 3,
+  "rho_seeds_per_target": 16,
+  "ic_arms": [
+    "F",
+    "F0",
+    "G",
+    "M3",
+    "M2"
+  ],
+  "rungs": [
+    {
+      "n": 18,
+      "np": 6,
+      "rho_lanes": 8
+    },
+    {
+      "n": 21,
+      "np": 7,
+      "rho_lanes": 16
+    },
+    {
+      "n": 24,
+      "np": 8,
+      "rho_lanes": 32
+    },
+    {
+      "n": 27,
+      "np": 9,
+      "rho_lanes": 16,
+      "gcd_targets": 256
+    },
+    {
+      "n": 30,
+      "np": 10,
+      "rho_lanes": 16,
+      "gcd_targets": 128
+    },
+    {
+      "n": 33,
+      "np": 11,
+      "rho_lanes": 64,
+      "gcd_targets": 64,
+      "curves": 2,
+      "targets": 2
+    }
+  ],
+  "rho_lanes_choice": "argmin of mean Meq(s=1,u=1) over W in {1,2,4,8,16,32,64}, 2 pilot curves x 16 pilot targets per rung (data/pilot_rho.jsonl), held out from evaluation",
+  "primary_metric": "Meq(s=1,u=1): field mults + squarings + inversions at Itoh-Tsujii census + 1 per table map / hash probe / mod-ell mult / mod-ell add; whole cold solve from factor base to verified log",
+  "band": "ratios also at u in {0, 0.1} and s = 0.25 (AGENTS.md 5a); an order between arms is stated only where it holds across the band",
+  "analysis": {
+    "paired_ratio": "per case (n, ci, ti): IC arm cost / mean of the 16 rho runs on the same Q",
+    "summary": "per rung geometric mean of paired ratios; 95% CI by hierarchical bootstrap (curves, then targets within curve, then rho seeds within target), B = 10000, percentile",
+    "rootfinder_effect": "per rung geometric mean of F/G and F/F0 (same cases), same bootstrap",
+    "exponent": "OLS slope of log2(case cost) on log2(ell) per arm over all rungs; difference to rho's slope; bootstrap CI resampling cases within rung",
+    "gap": "reported as the remaining distance (ratio and CI), never pass/fail"
+  },
+  "hypotheses": {
+    "H1": "The factored root finder lowers the whole cold IC cost of the m=3 pairs-and-solve arm: F/G < 1 at every rung (expected 0.2-0.35).",
+    "H2": "It does not move the gap's growth: pairs-and-solve costs Theta(N) for any root finder (counting argument in PROTOCOL.md), so F/rho grows like N^(1/2): slope difference F - rho about +0.5.",
+    "H3": "The cheapest IC arm on these rungs is a hash (MITM) arm, M2 or M3, and it is still above rho at every rung (ratio CI lower bound > 1)."
+  },
+  "falsifier": "parity is reached at a rung if the upper 95% bound of an IC arm's paired ratio is <= 1 there",
+  "exclusions": "none; every record, failure, cap hit and mismatch is retained",
+  "untested": {
+    "Koblitz curves (Frobenius rho)": "for k = 3 (every rung here) a factor-base point of a Koblitz curve has x in F_{2^{n'}} and y in F_{2^{2n'}}, so it lies in E(F_{2^{gcd(2n',3n')}}) = E(F_{2^{n'}}), whose order is below and prime to the large subgroup order ell; the base projects to O and no relation carries information. A Koblitz rung needs a non-subfield base (or k = 2, where the subfield base is the whole twist subgroup) and is out of scope here",
+    "GHS Weil descent arm": "out of scope (root-finder question)"
+  }
+}

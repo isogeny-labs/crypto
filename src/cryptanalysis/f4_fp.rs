@@ -3678,15 +3678,13 @@ fn reduce_chunk_by_known_gemm(
     known: &[(usize, Vec<u32>)],
     fp: Barrett,
 ) -> Vec<(Vec<u64>, usize)> {
-    use super::fp_gemm::{
-        detect_gemm_simd, k_safe_f64, reduce_f64_slice_mod_p, spmm_or_gemm_f64,
-    };
+    use super::fp_gemm::{detect_gemm_simd, k_safe_f64, reduce_f64_slice_mod_p, spmm_or_gemm_f64};
     let m = sources.len();
     let n = sources[0].len();
     let p = fp.p;
     let bm = ((1u128 << 64) / u128::from(p)) as u64;
     let simd = detect_gemm_simd();
-    let k_cap = k_safe_f64(p).min(64).max(1);
+    let k_cap = k_safe_f64(p).clamp(1, 64);
     let mut accs: Vec<Vec<u64>> = sources
         .iter()
         .map(|s| s.iter().copied().map(u64::from).collect())
@@ -3833,13 +3831,7 @@ fn deferred_panel_rows() -> usize {
     *C.get_or_init(|| {
         std::env::var("F4_FP_DEFERRED_PANEL")
             .ok()
-            .and_then(|v| {
-                if v == "0" {
-                    Some(0)
-                } else {
-                    v.parse().ok()
-                }
-            })
+            .and_then(|v| if v == "0" { Some(0) } else { v.parse().ok() })
             .filter(|&n| n == 0 || (2..=64).contains(&n))
             .unwrap_or(0)
     })
@@ -3930,7 +3922,7 @@ fn reduce_chunk_by_known(
         let reduce_one = |source: &Vec<u32>| -> (Vec<u64>, usize) {
             let mut acc: Vec<u64> = source.iter().copied().map(u64::from).collect();
             let mut pending = 0usize;
-            reduce_lazy_by(&mut acc, &known, fp, simd, &mut pending);
+            reduce_lazy_by(&mut acc, known, fp, simd, &mut pending);
             (acc, pending)
         };
         if spread {
@@ -3982,16 +3974,12 @@ fn rref32_deferred(
         let n_cols = chunk[0].len();
         let o0 = pp_ops();
         let spread = chunk.len() > 1 && chunk.len() * known.len().max(1) * n_cols > PAR_WORK;
-        let mut reduced: Vec<(Vec<u64>, usize)> = if deferred_gemm_worthwhile(
-            fp.p,
-            chunk.len(),
-            n_cols,
-            known.len(),
-        ) {
-            reduce_chunk_by_known_gemm_par(chunk, &known, fp, spread)
-        } else {
-            reduce_chunk_by_known(chunk, &known, fp, simd, spread)
-        };
+        let mut reduced: Vec<(Vec<u64>, usize)> =
+            if deferred_gemm_worthwhile(fp.p, chunk.len(), n_cols, known.len()) {
+                reduce_chunk_by_known_gemm_par(chunk, &known, fp, spread)
+            } else {
+                reduce_chunk_by_known(chunk, &known, fp, simd, spread)
+            };
         let o1 = pp_ops();
         pp_add(
             if spread {
@@ -4108,16 +4096,12 @@ fn rref_u32_barrett_deferred(
         let n_cols = chunk[0].len();
         let o0 = pp_ops();
         let spread = chunk.len() > 1 && chunk.len() * known.len().max(1) * n_cols > PAR_WORK;
-        let mut reduced: Vec<(Vec<u64>, usize)> = if deferred_gemm_worthwhile(
-            fp.p,
-            chunk.len(),
-            n_cols,
-            known.len(),
-        ) {
-            reduce_chunk_by_known_gemm_par(chunk, &known, fp, spread)
-        } else {
-            reduce_chunk_by_known(chunk, &known, fp, simd, spread)
-        };
+        let mut reduced: Vec<(Vec<u64>, usize)> =
+            if deferred_gemm_worthwhile(fp.p, chunk.len(), n_cols, known.len()) {
+                reduce_chunk_by_known_gemm_par(chunk, &known, fp, spread)
+            } else {
+                reduce_chunk_by_known(chunk, &known, fp, simd, spread)
+            };
         let o1 = pp_ops();
         pp_add(
             if spread {
@@ -4195,36 +4179,35 @@ fn rref_u32_barrett_deferred(
     // Prefer GEMM panels for back-substitution when the trailing width and
     // pivot count amortise packing; otherwise the parallel lazy path.
     let o0 = pp_ops();
-    let reduced: Vec<Vec<u32>> = if deferred_gemm_worthwhile(fp.p, known.len(), n_cols, known.len())
-        && known.len() >= 2
-    {
-        // One GEMM-style reduce of each pivot row by the later pivots:
-        // build sources = known rows, then for i reduce by known[i+1..].
-        // Fall back to per-row lazy when the triangular structure makes a
-        // single packed call awkward — still use GEMM per row panel via
-        // reduce_chunk against the suffix.
-        (0..known.len())
-            .into_par_iter()
-            .map(|i| {
-                let src = known[i].1.clone();
-                let suffix = &known[i + 1..];
-                if deferred_gemm_worthwhile(fp.p, 1, n_cols, suffix.len()) {
-                    let mut out = reduce_chunk_by_known_gemm(&[src], suffix, fp);
-                    let (acc, _) = out.pop().unwrap();
-                    acc.into_iter().map(|v| fp.reduce(v) as u32).collect()
-                } else {
-                    back(i)
-                }
-            })
-            .collect()
-    } else {
-        let spread = parallel && known.len() * n_cols > PAR_WORK;
-        if spread {
-            (0..known.len()).into_par_iter().map(back).collect()
+    let reduced: Vec<Vec<u32>> =
+        if deferred_gemm_worthwhile(fp.p, known.len(), n_cols, known.len()) && known.len() >= 2 {
+            // One GEMM-style reduce of each pivot row by the later pivots:
+            // build sources = known rows, then for i reduce by known[i+1..].
+            // Fall back to per-row lazy when the triangular structure makes a
+            // single packed call awkward — still use GEMM per row panel via
+            // reduce_chunk against the suffix.
+            (0..known.len())
+                .into_par_iter()
+                .map(|i| {
+                    let src = known[i].1.clone();
+                    let suffix = &known[i + 1..];
+                    if deferred_gemm_worthwhile(fp.p, 1, n_cols, suffix.len()) {
+                        let mut out = reduce_chunk_by_known_gemm(&[src], suffix, fp);
+                        let (acc, _) = out.pop().unwrap();
+                        acc.into_iter().map(|v| fp.reduce(v) as u32).collect()
+                    } else {
+                        back(i)
+                    }
+                })
+                .collect()
         } else {
-            (0..known.len()).map(back).collect()
-        }
-    };
+            let spread = parallel && known.len() * n_cols > PAR_WORK;
+            if spread {
+                (0..known.len()).into_par_iter().map(back).collect()
+            } else {
+                (0..known.len()).map(back).collect()
+            }
+        };
     pp_add(PP_DEF_BACK_PAR, pp_ops() - o0);
     let pivots = known.iter().map(|(c, _)| *c).collect();
     *rows = reduced;
@@ -4764,11 +4747,13 @@ fn reduce_pairs_fl(
     pp_add(PP_FLB_NS, pp_ns(t_flb));
     let t_pairs = Instant::now();
     let _pairs_ns = PpNs(PP_PAIRS_NS, t_pairs);
-    // `reduce_pairs_blocked` asserts `p ≤ 2¹⁶` (u64 accumulators without
-    // mid-tile normalisation).  Larger primes that still fit in `u32`
-    // coefficients (`supports_f64_gemm`, including the NTT prime 786433)
-    // take the per-row lazy path below, or the exact-f64 blocked form.
-    if fl_blocked_pairs() && fp.p <= 1 << 16 {
+    // Exact integer `u64` blocked D−C·B' whenever [`pair_u64_acc_safe`]
+    // holds — including the NTT prime 786433 for typical reducer counts.
+    // Fused MEM site C stays narrow-only inside [`reduce_pairs_blocked`]
+    // (on NTT cells the non-fused AVX `add_lazy_range` path won a matched
+    // A/B over both fused-u64 and exact-f64).  Exact-f64 is the fallback
+    // when the integer bound would not hold.
+    if fl_blocked_pairs() && pair_u64_acc_safe(fp.p, bprime.len()) {
         return reduce_pairs_blocked(
             pair_rows,
             &bprime,
@@ -4780,9 +4765,8 @@ fn reduce_pairs_fl(
             deadline,
         );
     }
-    // Wide primes: exact-f64 blocked D−C·B' (default on when the prime
-    // admits it).  Independent of F4_FP_GEMM (that flag is for deferred
-    // RREF panels, which still need packing-cost tuning).
+    // Wide primes past the `u64` bound: exact-f64 blocked D−C·B'.
+    // Independent of F4_FP_GEMM (that flag is for deferred RREF panels).
     if fl_blocked_pairs() && super::fp_gemm::supports_f64_gemm(fp.p) && fp.p > 1 << 16 {
         return reduce_pairs_blocked_f64(
             pair_rows,
@@ -5186,6 +5170,24 @@ const FL_PAIR_BLOCK: usize = 64;
 /// accumulators over one tile (64 × 256 × 8 bytes) stay in L2.
 const FL_PAIR_TILE: usize = 256;
 
+/// Exact integer `u64` accumulators for blocked D−C·B' stay below overflow
+/// when every free entry receives at most one update per reducer and the
+/// product bound `(p−1)² · n_reducers` fits in half of `u64` (headroom for
+/// fused multi-adds).  Narrow primes (`p ≤ 2¹⁶`) always qualify; the NTT
+/// prime 786433 qualifies for the reducer counts seen in PKM GB.
+#[inline]
+fn pair_u64_acc_safe(p: u64, n_reducers: usize) -> bool {
+    if p <= 1 << 16 {
+        return true;
+    }
+    if p >= 1 << 32 || n_reducers >= 1 << 31 {
+        return false;
+    }
+    let max_prod = (p - 1).saturating_mul(p - 1);
+    let max_sum = max_prod.saturating_mul(n_reducers as u64);
+    max_sum < (u64::MAX / 2)
+}
+
 /// Whether [`reduce_pairs_blocked`] (and its fused form) runs its row
 /// blocks in parallel, and how many pair rows a block holds.  Shared by
 /// both forms so the f4-parallel dispatch applies to either kernel.
@@ -5221,9 +5223,9 @@ fn pairs_blocked_dispatch(pair_rows: &[Vec<(u32, u64)>], n_free: usize) -> (bool
 /// cache.  The updates and their sum are unchanged; only their order is,
 /// and the sum is exact (below): every reduced row is the same.
 ///
-/// With `p ≤ 2¹⁶` (the only arithmetic this runs under) every product is
-/// below `2³²` and an entry receives at most one per reducer, so the
-/// 64-bit accumulators cannot overflow without four billion reducers;
+/// Under [`pair_u64_acc_safe`] every product is at most `(p−1)²` and an
+/// entry receives at most one update per reducer, so the 64-bit
+/// accumulators stay below overflow for the admitted `(p, n_reducers)`;
 /// they are reduced once, at the end.
 #[allow(clippy::too_many_arguments)]
 fn reduce_pairs_blocked(
@@ -5236,14 +5238,16 @@ fn reduce_pairs_blocked(
     fp: Barrett,
     deadline: Option<Instant>,
 ) -> Option<Vec<Vec<u32>>> {
-    if mem_site(2) {
+    // Fused site C wins on narrow primes; on wider primes (NTT) the
+    // non-fused `add_lazy_range` path below is faster matched wall.
+    if mem_site(2) && fp.p <= 1 << 16 {
         return reduce_pairs_blocked_mem(
             pair_rows, bprime, bstart, reducer_at, free_index, n_free, fp, deadline,
         );
     }
     const NONE: u32 = u32::MAX;
     assert!(
-        fp.p <= 1 << 16 && bprime.len() < 1 << 31,
+        pair_u64_acc_safe(fp.p, bprime.len()) && bprime.len() < 1 << 31,
         "accumulator bound"
     );
     let simd = lazy_simd_kind();
@@ -5307,8 +5311,8 @@ fn reduce_pairs_blocked(
     Some(out)
 }
 
-/// [`reduce_pairs_blocked`] for primes with exact `f64` GEMM (`p` up to the
-/// `supports_f64_gemm` bound, including 786433): same hit grouping and
+/// [`reduce_pairs_blocked`] for primes with exact `f64` GEMM when the
+/// integer `u64` accumulator bound does not hold: same hit grouping and
 /// column tiles, with `f64` accumulators reduced every `k_safe_f64(p)`
 /// updates so every partial sum stays strictly ≤ 2⁵³.
 #[allow(clippy::too_many_arguments)]
@@ -5977,7 +5981,7 @@ fn reduce_pairs_blocked_mem(
 ) -> Option<Vec<Vec<u32>>> {
     const NONE: u32 = u32::MAX;
     assert!(
-        fp.p <= 1 << 16 && bprime.len() < 1 << 31,
+        pair_u64_acc_safe(fp.p, bprime.len()) && bprime.len() < 1 << 31,
         "accumulator bound"
     );
     let simd = lazy_simd_kind();
@@ -8049,20 +8053,18 @@ fn f4_with_arithmetic(
                                         .collect()
                                 })
                                 .collect();
-                            let piv =
-                                rref_u32_barrett_deferred(&mut rows32, fp, deadline)?;
+                            let piv = rref_u32_barrett_deferred(&mut rows32, fp, deadline)?;
                             rows = rows32
                                 .into_iter()
                                 .map(|r| r.into_iter().map(u64::from).collect())
                                 .collect();
                             Some(piv)
                         } else {
-                            let hook: Option<&mut dyn FnMut(&RrefView) -> bool> =
-                                if want_hook {
-                                    Some(&mut snapshot_hook)
-                                } else {
-                                    None
-                                };
+                            let hook: Option<&mut dyn FnMut(&RrefView) -> bool> = if want_hook {
+                                Some(&mut snapshot_hook)
+                            } else {
+                                None
+                            };
                             rref_ckpt(&mut rows, fp, deadline, resume_arg, hook)
                         }
                     }
@@ -16217,8 +16219,7 @@ mod tests {
             x ^= x << 17;
             x
         };
-        for (n_piv, n_rows, n_cols) in [(12usize, 16usize, 96usize), (24, 32, 128), (40, 48, 160)]
-        {
+        for (n_piv, n_rows, n_cols) in [(12usize, 16usize, 96usize), (24, 32, 128), (40, 48, 160)] {
             let mut known: Vec<(usize, Vec<u32>)> = Vec::with_capacity(n_piv);
             for j in 0..n_piv {
                 let c = j * (n_cols / n_piv);
@@ -16247,7 +16248,11 @@ mod tests {
                     (acc, 0usize)
                 })
                 .collect();
-            assert_eq!(gemm.len(), lazy.len(), "row count {n_piv}/{n_rows}x{n_cols}");
+            assert_eq!(
+                gemm.len(),
+                lazy.len(),
+                "row count {n_piv}/{n_rows}x{n_cols}"
+            );
             for (i, ((ga, _), (la, _))) in gemm.iter().zip(lazy.iter()).enumerate() {
                 assert_eq!(ga, la, "row {i} piv={n_piv} {n_rows}x{n_cols}");
             }

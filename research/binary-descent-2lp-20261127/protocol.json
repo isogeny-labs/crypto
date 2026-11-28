@@ -1,0 +1,65 @@
+{
+  "schema": "experiment.protocol/v1 (b2lp-protocol/v1)",
+  "study": "b2lp-20261127/v1",
+  "builds_on": "crypto PR #5261 (arm D, study bwd-20261126/v1, research/binary-weil-descent-20261126), stacked on #5253 (study bcr-20261126/v1)",
+  "seed_policy": "isogeny-labs/experiment-seeds/v1",
+  "single_target": "every solve is one cold solve of one public Q; no multi-target amortisation (owner instruction)",
+  "seed_derivation": "unchanged #5253 seeds.rs: seed(parts) = first 8 bytes big-endian of SHA-256('bcr-20261126/v1|' + '|'.join(parts)); stream = SplitMix64(seed). The study prefix stays bcr-20261126/v1 so that curves, targets and relation-target streams are bitwise those of #5253 / #5261.",
+  "streams": {
+    "curve": ["curve", "<n>", "<ci>"],
+    "target": ["target", "<n>", "<ci>", "<ti>"],
+    "ic_relation_targets (A1; shared by D, D2, D2e, D2all)": ["icstream-a1", "<n>", "<ci>", "<ti>"],
+    "rho": ["rho", "<n>", "<ci>", "<ti>", "<si>"],
+    "theta pilot (held out)": ["d2pilot-curve | d2pilot-target | d2pilot-stream", "<n>", "<ci>", "<ti>"],
+    "rho lane pilot (held out)": ["pilot-curve | pilot-target | pilot-rho", "<n>", "<ci>", "<ti>", "<W>"],
+    "prediction simulation": ["b2lp-predict", "<n>", "<beta>", "<theta>", "<rep>"],
+    "selftest (separate instances)": ["b2lp-selftest-curve | b2lp-selftest-target | b2lp-selftest-stream | b2lp-selftest-graph", "..."],
+    "bootstrap": ["boot", "b2lp", "main | slope | <label>"]
+  },
+  "custody": "d drawn from the 'target' stream inside the evaluator; solvers receive (curve, G, Q, ell); [d]G = Q checked inside the counted solve; d == d_true compared by the evaluator after the solve",
+  "arms_d2": {
+    "D2": {"beta": 0.6666666666666666, "theta": 4.0, "rule": "fs = min(F-1, ceil(theta*F^beta)); beta = 2/3 is the k = 3 double-large-prime balance (Gaudry 2009, GTTD 2007) for LA ~ fs^2; theta from the held-out pilot"},
+    "D2e": {"beta": 0.528, "theta": 16.0, "rule": "beta = 2/(gamma+1) with gamma = 2.79, #5261's measured echelon exponent (balance of F^2/fs targets against fs^gamma LA); theta from the held-out pilot"},
+    "D2all": {"beta": 0.6666666666666666, "theta": -1.0, "rule": "every class small (fs = F-1): must reproduce #5261's D record (d, targets, relations, columns) exactly; correctness control"}
+  },
+  "references": {
+    "D": "#5261 records research/binary-weil-descent-20261126/data/runs_d.jsonl (same curves, targets, A1 stream, A2 echelon), n = 18..48",
+    "RHO": "negation-map rho, 16 seeds per target: #5253 data/runs.jsonl (n = 18..33), #5261 data/runs_ext_ref.jsonl (n = 36..48), this study (n = 51, 54) with the unchanged #5253 rho module (rho.rs by #[path]) and the lanes below"
+  },
+  "curves_per_rung": 4,
+  "targets_per_curve": 3,
+  "rho_seeds_per_target": 16,
+  "linear_algebra": "#5253 A2 incremental echelon mod ell, unchanged (sparse LA deliberately not used)",
+  "rungs": [
+    {"n": 18, "np": 6, "run_arms": ["D2", "D2e", "D2all"]},
+    {"n": 21, "np": 7, "run_arms": ["D2", "D2e", "D2all"]},
+    {"n": 24, "np": 8, "run_arms": ["D2", "D2e", "D2all"]},
+    {"n": 27, "np": 9, "run_arms": ["D2", "D2e", "D2all"]},
+    {"n": 30, "np": 10, "run_arms": ["D2", "D2e", "D2all"]},
+    {"n": 33, "np": 11, "run_arms": ["D2", "D2e", "D2all"], "curves": 2, "targets": 2},
+    {"n": 36, "np": 12, "run_arms": ["D2", "D2e", "D2all"]},
+    {"n": 39, "np": 13, "run_arms": ["D2", "D2e", "D2all"]},
+    {"n": 42, "np": 14, "run_arms": ["D2", "D2e"]},
+    {"n": 45, "np": 15, "run_arms": ["D2", "D2e"]},
+    {"n": 48, "np": 16, "run_arms": ["D2", "D2e"], "curves": 2, "targets": 2},
+    {"n": 51, "np": 17, "run_arms": ["D2", "D2e", "RHO"], "curves": 2, "targets": 2, "rho_lanes": 128},
+    {"n": 54, "np": 18, "run_arms": ["D2", "D2e", "RHO"], "curves": 2, "targets": 1, "rho_lanes": 64}
+  ],
+  "pilot_choices": {
+    "theta": "argmin of sum over n in {30,36,42} of log gmean Meq(s=1,u=1), 4 held-out cases per rung: beta = 2/3 -> theta = 4 (score 54.004; 8: 54.069; 16: 54.268; 2: 54.965); beta = 0.528 -> theta = 16 (53.931; 32: 54.061; 8: 54.385). data/pilot_theta.jsonl, 144 records, all correct",
+    "rho_lanes": "argmin mean Meq over W in {16,32,64,128,256}, 2 held-out curves x 8 targets: n = 51 -> 128 (2.085e8; 256: 2.265e8; 64: 2.521e8); n = 54 -> 64 (3.989e8; 128: 4.023e8). n = 57, 60 pilot stopped (rungs not run; see PROTOCOL.md)"
+  },
+  "resources": {"per_process_address_space": "prlimit --as 10 GiB", "wall_budget_per_rung_process_s": {"<=48": 7200, "51": 10800, "54": 18000}, "threads": "D2 arms 2, rho 1", "rule": "a killed/failed process is a resource-limit record, never a negative result; the run continues with the next rung"},
+  "primary_metric": "Meq(s=1,u=1) of the whole cold solve (factor base, setup, target stream, oracle, relation replay, large-prime graph, LA, [d]G = Q); #5253 unit unchanged",
+  "band": "u in {0, 0.1, 1} for non-field units (graph steps are h, z, za units), s in {1, 0.25}; order between arms stated only where it holds across the band (AGENTS.md 5a)",
+  "analysis": "b2lp_harness analyze: paired per-case ratios D2/rho, D2e/rho, D/rho, D2/D, D2e/D, D2/D2e; per-rung geometric mean with hierarchical bootstrap B=10000 (2000 band); rho A/A; D2all == D identity; census; exponent fits; crossover projection (model)",
+  "checks": {
+    "logs": "[d]G = Q in-solve and d == d_true, every solve; D2/D2e d equal to D's d on every shared case",
+    "yields": "every relation fed to the LA (full or combined) checked by the group law: sum e_c [h]P_c = [a][h]G + [b][h]Q exactly (uncounted, wall excluded)",
+    "partial_relations": "every decomposition resolved into signs by the group law before it enters the graph (#5253 resolve)",
+    "D2all_eq_D": "(d, targets, relations, columns) of D2all equal #5261's D record on every case n = 18..39",
+    "replay": "n=30 ci=0 ti=0 arm D2 rerun from the frozen manifest, bitwise compare of all fields but wall times"
+  },
+  "falsifier": "parity at a rung if the upper 95% bound of D2/rho (or D2e/rho) <= 1 there; such a rung then requires the rho A/A floor and full verification before it is stated",
+  "exclusions": "none; every record, failure, kill and mismatch is retained"
+}

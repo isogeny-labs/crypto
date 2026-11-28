@@ -1,0 +1,4 @@
+finProdFinEquiv {m n : ℕ} : Fin m × Fin n ≃ Fin (m * n)
+finCongr_apply_coe {n m : ℕ} (h : m = n) (k : Fin m) : ↑((finCongr h) k) = ↑k
+Prod.map_apply'.{u_1, u_2, u_3, u_4} {α : Type u_1} {β : Type u_2} {γ : Type u_3} {δ : Type u_4} (f : α → γ) (g : β → δ)
+  (p : α × β) : Prod.map f g p = (f p.1, g p.2)

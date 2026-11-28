@@ -393,11 +393,16 @@ pub fn statement_transcript(air: &AirV2, config: &StarkConfig) -> Option<Vec<u8>
     if !n.is_power_of_two() || n < 2 || !beta.is_power_of_two() || beta < 2 || q == 0 {
         return None;
     }
+    if air.transition.previous == BigUint::from(0u32) && air.transition.next == BigUint::from(0u32)
+    {
+        return None;
+    }
     // L = n·β is at most 2^32 (the two-adicity of F_r, so `coset(L)` exists
     // and never panics), and k ≤ n (the bound the soundness text assumes).
     if n.checked_mul(beta)? > MAX_LDE_SIZE || air.boundary.len() > n {
         return None;
     }
+    let mut seen_positions = std::collections::BTreeSet::new();
     let mut t = FS_TAG.as_bytes().to_vec();
     t.extend_from_slice(&air_fingerprint(air));
     absorb_u64(&mut t, b"n", n as u64);
@@ -407,7 +412,7 @@ pub fn statement_transcript(air: &AirV2, config: &StarkConfig) -> Option<Vec<u8>
     absorb_u64(&mut t, b"fri_final_size", beta as u64);
     absorb_u64(&mut t, b"boundaries", air.boundary.len() as u64);
     for (pos, val) in &air.boundary {
-        if *pos >= n {
+        if *pos >= n || !seen_positions.insert(*pos) {
             return None;
         }
         absorb_u64(&mut t, b"p", *pos as u64);
@@ -1907,6 +1912,19 @@ mod tests {
             Vec::new(),
         );
         assert!(statement_transcript(&crowded, &cfg).is_none());
+
+        // VULN-5b regression: duplicate boundary positions or zero-degree
+        // transitions (0·prev + 0·next + c) are rejected as malformed statements.
+        let dup_boundary = air2(8, vec![(0, big(1)), (0, big(2))], dbl(), Vec::new());
+        assert!(statement_transcript(&dup_boundary, &cfg).is_none());
+        let degenerate_transition = air2(
+            8,
+            vec![(0, big(1))],
+            AffineTransition::new(big(0), big(0), big(0)),
+            doubling_trace(8, 1),
+        );
+        assert!(statement_transcript(&degenerate_transition, &cfg).is_none());
+        assert!(!verify(&degenerate_transition, &cfg, &proof));
     }
 
     /// Non-canonical (v + r) or oversized OOD values return false.

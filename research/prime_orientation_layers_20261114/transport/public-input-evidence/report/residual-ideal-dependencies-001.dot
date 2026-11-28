@@ -1,0 +1,12 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white"];
+ node [shape=box,style="rounded,filled",fillcolor="#edf5fc",fontname="Helvetica",fontsize=12];
+ a [label="ACTUAL NONSINGULAR TARGET / HELPER\nh!=0; normdegree<=6; h in I^4"];
+ b [label="ACTUAL TARGET IDEAL UNIT\nConstruct u=XYIdealprime from nonsingularity"];
+ c [label="DERIVED H=span(h) <= I^4\nConstruct residualFI=H*(u^-1)^4"];
+ d [label="ACTUAL INTEGRAL RESIDUAL J\nDerived residualFI<=1; exact H=I^4*J"];
+ e [label="ACTUAL FINITE QUOTIENT BOUND SIX\nR/H surjects R/J, dim(R/J)<=dim(R/H)<=6"];
+ f [label="OPEN ACTUAL LENGTH / CODIMENSION\nDerive dim(R/I^4)=4 and dim(R/J)<=2",style="rounded,dashed,filled",fillcolor="#fff2dc"];
+ g [label="OPEN GROUP / USEFUL KNOWN LOGS\nPublic finder / retries / full expected cost",style="rounded,dashed,filled",fillcolor="#fff2dc"];
+ a->b->c->d->e->f->g;
+}

@@ -1,0 +1,143 @@
+{
+  "schema": "ecbench.spec/v2",
+  "curve_policy": {
+    "mode": "diagnostic",
+    "off_panel_reason": "Revisit the three historical equal-18 degree-32 PKM curves to measure the merged Rust implementations through the complete cold pipeline. These selected 13-bit fields diagnose implementation/backend performance; they cannot establish scaling or a current vs_rho claim."
+  },
+  "label": "Rust PKM cold pipeline, historical curve seed 20261276",
+  "description": "Prospective diagnostic: eight fresh public one-target workloads, F4/scan/resultant-GCD on both frozen factor-base choices, matched negation rho, and a duplicate scan control. All setup, unsuccessful trials, elimination and final scalar verification are included. No patch speedup is asserted.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 13,
+        "seed": 20261276
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 2026112701,
+    "target_kind": "public"
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "interval-f4",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:below=32",
+          "oracle": "pkm-semaev:m=2,engine=f4,degree=8,mode=chain,bits=5,lo=0",
+          "linalg": "incremental-gauss",
+          "targets": "walk",
+          "max_trials": "1000",
+          "solver_budget_seconds": "0"
+        }
+      }
+    },
+    {
+      "name": "interval-scan",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:below=32",
+          "oracle": "pkm-semaev:m=2,engine=scan,degree=8,mode=chain,bits=5,lo=0",
+          "linalg": "incremental-gauss",
+          "targets": "walk",
+          "max_trials": "1000",
+          "solver_budget_seconds": "0"
+        }
+      }
+    },
+    {
+      "name": "interval-resgcd",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:below=32",
+          "oracle": "pkm-semaev:m=2,engine=resgcd,degree=8,mode=chain,bits=5,lo=0",
+          "linalg": "incremental-gauss",
+          "targets": "walk",
+          "max_trials": "1000",
+          "solver_budget_seconds": "0"
+        }
+      }
+    },
+    {
+      "name": "velu-f4",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=5,seed=5,aux=ordinary",
+          "oracle": "pkm-semaev:m=2,engine=f4,degree=8,mode=chain",
+          "linalg": "incremental-gauss",
+          "targets": "walk",
+          "max_trials": "1000",
+          "solver_budget_seconds": "0"
+        }
+      }
+    },
+    {
+      "name": "velu-scan",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=5,seed=5,aux=ordinary",
+          "oracle": "pkm-semaev:m=2,engine=scan,degree=8,mode=chain",
+          "linalg": "incremental-gauss",
+          "targets": "walk",
+          "max_trials": "1000",
+          "solver_budget_seconds": "0"
+        }
+      }
+    },
+    {
+      "name": "velu-resgcd",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=5,seed=5,aux=ordinary",
+          "oracle": "pkm-semaev:m=2,engine=resgcd,degree=8,mode=chain",
+          "linalg": "incremental-gauss",
+          "targets": "walk",
+          "max_trials": "1000",
+          "solver_budget_seconds": "0"
+        }
+      }
+    },
+    {
+      "name": "velu-scan-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=5,seed=5,aux=ordinary",
+          "oracle": "pkm-semaev:m=2,engine=scan,degree=8,mode=chain",
+          "linalg": "incremental-gauss",
+          "targets": "walk",
+          "max_trials": "1000",
+          "solver_budget_seconds": "0"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 6,
+    "warmup": 1,
+    "order": "alternate_measured",
+    "seed": 2026112702,
+    "isolation_required": "L2",
+    "timeout_seconds": 60
+  }
+}
