@@ -1,0 +1,974 @@
+{
+  "schema": "ic.coordinate_rosetta.chart_summary/v1",
+  "source": {
+    "path": "research/ic_coordinate_rosetta_20261127/artifacts/charts/efd-chart-matrix.json",
+    "sha256": "26c666a460688b13e2ae2459b7dd7b059e334b4da8f1a311272000983a11a661",
+    "bytes": 55924
+  },
+  "workers": 4,
+  "iterations_per_chart": 20000,
+  "wall_admissible": false,
+  "model_count": 10,
+  "total_rows": 43,
+  "affine_baselines": 10,
+  "catalogue_charts": 33,
+  "verified_rows": 43,
+  "complete_roundtrip_rows": 43,
+  "minimum_roundtrip_points": 23,
+  "rows_with_addition": 28,
+  "rows_with_doubling": 32,
+  "rows_with_diffadd": 4,
+  "rows_with_ladder": 4,
+  "operation_ranges": [
+    {
+      "operation": "addition",
+      "formula_rows": 28,
+      "min": {
+        "multiplications": 5,
+        "squarings": 0,
+        "inversions": 0,
+        "additions": 3
+      },
+      "max": {
+        "multiplications": 13,
+        "squarings": 6,
+        "inversions": 0,
+        "additions": 16
+      }
+    },
+    {
+      "operation": "doubling",
+      "formula_rows": 32,
+      "min": {
+        "multiplications": 2,
+        "squarings": 1,
+        "inversions": 0,
+        "additions": 3
+      },
+      "max": {
+        "multiplications": 9,
+        "squarings": 6,
+        "inversions": 0,
+        "additions": 18
+      }
+    },
+    {
+      "operation": "diffadd",
+      "formula_rows": 4,
+      "min": {
+        "multiplications": 3,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 4
+      },
+      "max": {
+        "multiplications": 8,
+        "squarings": 4,
+        "inversions": 0,
+        "additions": 6
+      }
+    },
+    {
+      "operation": "ladder",
+      "formula_rows": 4,
+      "min": {
+        "multiplications": 6,
+        "squarings": 4,
+        "inversions": 0,
+        "additions": 8
+      },
+      "max": {
+        "multiplications": 14,
+        "squarings": 7,
+        "inversions": 0,
+        "additions": 11
+      }
+    }
+  ],
+  "formulas": [
+    {
+      "model": "2dik",
+      "chart": "2dik/standard",
+      "operation": "addition",
+      "formula": "2dik/standard/addition/mmadd-2006-dik",
+      "counts": {
+        "multiplications": 7,
+        "squarings": 3,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "2dik",
+      "chart": "2dik/standard",
+      "operation": "doubling",
+      "formula": "2dik/standard/doubling/mdbl-2007-bl",
+      "counts": {
+        "multiplications": 6,
+        "squarings": 5,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "3dik",
+      "chart": "3dik/standard",
+      "operation": "addition",
+      "formula": "3dik/standard/addition/mmadd-2006-dik",
+      "counts": {
+        "multiplications": 6,
+        "squarings": 3,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "3dik",
+      "chart": "3dik/standard",
+      "operation": "doubling",
+      "formula": "3dik/standard/doubling/mdbl-2007-bblp",
+      "counts": {
+        "multiplications": 9,
+        "squarings": 5,
+        "inversions": 0,
+        "additions": 9
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "edwards",
+      "chart": "edwards/inverted",
+      "operation": "addition",
+      "formula": "edwards/inverted/addition/mmadd-2007-bl",
+      "counts": {
+        "multiplications": 9,
+        "squarings": 0,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "edwards",
+      "chart": "edwards/inverted",
+      "operation": "doubling",
+      "formula": "edwards/inverted/doubling/mdbl-2007-bl",
+      "counts": {
+        "multiplications": 4,
+        "squarings": 3,
+        "inversions": 0,
+        "additions": 5
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "edwards",
+      "chart": "edwards/projective",
+      "operation": "addition",
+      "formula": "edwards/projective/addition/mmadd-2007-bl",
+      "counts": {
+        "multiplications": 8,
+        "squarings": 1,
+        "inversions": 0,
+        "additions": 8
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "edwards",
+      "chart": "edwards/projective",
+      "operation": "doubling",
+      "formula": "edwards/projective/doubling/mdbl-2007-bl",
+      "counts": {
+        "multiplications": 5,
+        "squarings": 3,
+        "inversions": 0,
+        "additions": 5
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "edwards",
+      "chart": "edwards/yz",
+      "operation": "doubling",
+      "formula": "edwards/yz/doubling/mdbl-2006-g-2",
+      "counts": {
+        "multiplications": 2,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 5
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "edwards",
+      "chart": "edwards/yz",
+      "operation": "diffadd",
+      "formula": "edwards/yz/diffadd/mdadd-2006-g-2",
+      "counts": {
+        "multiplications": 7,
+        "squarings": 4,
+        "inversions": 0,
+        "additions": 6
+      },
+      "verified_cases": 0
+    },
+    {
+      "model": "edwards",
+      "chart": "edwards/yz",
+      "operation": "ladder",
+      "formula": "edwards/yz/ladder/mladd-2006-g-2",
+      "counts": {
+        "multiplications": 8,
+        "squarings": 6,
+        "inversions": 0,
+        "additions": 8
+      },
+      "verified_cases": 0
+    },
+    {
+      "model": "edwards",
+      "chart": "edwards/yzsquared",
+      "operation": "doubling",
+      "formula": "edwards/yzsquared/doubling/dbl-2006-g",
+      "counts": {
+        "multiplications": 2,
+        "squarings": 4,
+        "inversions": 0,
+        "additions": 4
+      },
+      "verified_cases": 7
+    },
+    {
+      "model": "edwards",
+      "chart": "edwards/yzsquared",
+      "operation": "diffadd",
+      "formula": "edwards/yzsquared/diffadd/mdadd-2006-g",
+      "counts": {
+        "multiplications": 4,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 6
+      },
+      "verified_cases": 0
+    },
+    {
+      "model": "edwards",
+      "chart": "edwards/yzsquared",
+      "operation": "ladder",
+      "formula": "edwards/yzsquared/ladder/mladd-2006-g-2",
+      "counts": {
+        "multiplications": 6,
+        "squarings": 6,
+        "inversions": 0,
+        "additions": 8
+      },
+      "verified_cases": 0
+    },
+    {
+      "model": "hessian",
+      "chart": "hessian/extended",
+      "operation": "addition",
+      "formula": "hessian/extended/addition/madd-20080225-hwcd",
+      "counts": {
+        "multiplications": 5,
+        "squarings": 6,
+        "inversions": 0,
+        "additions": 12
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "hessian",
+      "chart": "hessian/extended",
+      "operation": "doubling",
+      "formula": "hessian/extended/doubling/dbl-20080225-hwcd",
+      "counts": {
+        "multiplications": 6,
+        "squarings": 6,
+        "inversions": 0,
+        "additions": 18
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "hessian",
+      "chart": "hessian/standard",
+      "operation": "addition",
+      "formula": "hessian/standard/addition/mmadd",
+      "counts": {
+        "multiplications": 8,
+        "squarings": 0,
+        "inversions": 0,
+        "additions": 3
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "hessian",
+      "chart": "hessian/standard",
+      "operation": "doubling",
+      "formula": "hessian/standard/doubling/dbl-2007-hcd",
+      "counts": {
+        "multiplications": 7,
+        "squarings": 1,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jintersect",
+      "chart": "jintersect/extended",
+      "operation": "addition",
+      "formula": "jintersect/extended/addition/mmadd-2001-ls",
+      "counts": {
+        "multiplications": 11,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jintersect",
+      "chart": "jintersect/extended",
+      "operation": "doubling",
+      "formula": "jintersect/extended/doubling/dbl-20080225-hwcd",
+      "counts": {
+        "multiplications": 4,
+        "squarings": 5,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jintersect",
+      "chart": "jintersect/standard",
+      "operation": "addition",
+      "formula": "jintersect/standard/addition/mmadd-2001-ls",
+      "counts": {
+        "multiplications": 9,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jintersect",
+      "chart": "jintersect/standard",
+      "operation": "doubling",
+      "formula": "jintersect/standard/doubling/mdbl-2007-bl",
+      "counts": {
+        "multiplications": 3,
+        "squarings": 4,
+        "inversions": 0,
+        "additions": 5
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jquartic",
+      "chart": "jquartic/2xxyzz",
+      "operation": "addition",
+      "formula": "jquartic/2xxyzz/addition/madd-20080225-hwcd",
+      "counts": {
+        "multiplications": 11,
+        "squarings": 3,
+        "inversions": 0,
+        "additions": 16
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jquartic",
+      "chart": "jquartic/2xxyzz",
+      "operation": "doubling",
+      "formula": "jquartic/2xxyzz/doubling/mdbl-20090311-hwcd",
+      "counts": {
+        "multiplications": 2,
+        "squarings": 6,
+        "inversions": 0,
+        "additions": 6
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jquartic",
+      "chart": "jquartic/2xxyzzr",
+      "operation": "addition",
+      "formula": "jquartic/2xxyzzr/addition/mmadd-2007-bl",
+      "counts": {
+        "multiplications": 7,
+        "squarings": 4,
+        "inversions": 0,
+        "additions": 12
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jquartic",
+      "chart": "jquartic/2xxyzzr",
+      "operation": "doubling",
+      "formula": "jquartic/2xxyzzr/doubling/dbl-2007-hcd",
+      "counts": {
+        "multiplications": 4,
+        "squarings": 4,
+        "inversions": 0,
+        "additions": 8
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jquartic",
+      "chart": "jquartic/2xyz",
+      "operation": "addition",
+      "formula": "jquartic/2xyz/addition/mmadd-2002-bj-2",
+      "counts": {
+        "multiplications": 7,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 10
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jquartic",
+      "chart": "jquartic/2xyz",
+      "operation": "doubling",
+      "formula": "jquartic/2xyz/doubling/mdbl-2007-fw",
+      "counts": {
+        "multiplications": 3,
+        "squarings": 4,
+        "inversions": 0,
+        "additions": 9
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jquartic",
+      "chart": "jquartic/xxyzz",
+      "operation": "addition",
+      "formula": "jquartic/xxyzz/addition/madd-20080225-hwcd",
+      "counts": {
+        "multiplications": 11,
+        "squarings": 3,
+        "inversions": 0,
+        "additions": 16
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jquartic",
+      "chart": "jquartic/xxyzz",
+      "operation": "doubling",
+      "formula": "jquartic/xxyzz/doubling/mdbl-20090311-hwcd",
+      "counts": {
+        "multiplications": 2,
+        "squarings": 6,
+        "inversions": 0,
+        "additions": 6
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jquartic",
+      "chart": "jquartic/xxyzzr",
+      "operation": "addition",
+      "formula": "jquartic/xxyzzr/addition/mmadd-2007-bl",
+      "counts": {
+        "multiplications": 7,
+        "squarings": 4,
+        "inversions": 0,
+        "additions": 12
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jquartic",
+      "chart": "jquartic/xxyzzr",
+      "operation": "doubling",
+      "formula": "jquartic/xxyzzr/doubling/dbl-2007-hcd",
+      "counts": {
+        "multiplications": 4,
+        "squarings": 4,
+        "inversions": 0,
+        "additions": 8
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jquartic",
+      "chart": "jquartic/xyz",
+      "operation": "addition",
+      "formula": "jquartic/xyz/addition/mmadd-2002-bj-2",
+      "counts": {
+        "multiplications": 7,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 10
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "jquartic",
+      "chart": "jquartic/xyz",
+      "operation": "doubling",
+      "formula": "jquartic/xyz/doubling/mdbl-2007-fw",
+      "counts": {
+        "multiplications": 3,
+        "squarings": 4,
+        "inversions": 0,
+        "additions": 9
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "montgom",
+      "chart": "montgom/xz",
+      "operation": "doubling",
+      "formula": "montgom/xz/doubling/mdbl-1987-m",
+      "counts": {
+        "multiplications": 3,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 3
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "montgom",
+      "chart": "montgom/xz",
+      "operation": "diffadd",
+      "formula": "montgom/xz/diffadd/mdadd-1987-m",
+      "counts": {
+        "multiplications": 3,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 6
+      },
+      "verified_cases": 0
+    },
+    {
+      "model": "montgom",
+      "chart": "montgom/xz",
+      "operation": "ladder",
+      "formula": "montgom/xz/ladder/mladd-1987-m",
+      "counts": {
+        "multiplications": 6,
+        "squarings": 4,
+        "inversions": 0,
+        "additions": 8
+      },
+      "verified_cases": 0
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/jacobian",
+      "operation": "addition",
+      "formula": "shortw/jacobian/addition/zadd-2007-m",
+      "counts": {
+        "multiplications": 5,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 9
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/jacobian",
+      "operation": "doubling",
+      "formula": "shortw/jacobian/doubling/mdbl-2007-bl",
+      "counts": {
+        "multiplications": 6,
+        "squarings": 5,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/jacobian-0",
+      "operation": "addition",
+      "formula": "shortw/jacobian-0/addition/zadd-2007-m",
+      "counts": {
+        "multiplications": 5,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 9
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/jacobian-0",
+      "operation": "doubling",
+      "formula": "shortw/jacobian-0/doubling/mdbl-2007-bl",
+      "counts": {
+        "multiplications": 6,
+        "squarings": 5,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/jacobian-3",
+      "operation": "addition",
+      "formula": "shortw/jacobian-3/addition/zadd-2007-m",
+      "counts": {
+        "multiplications": 5,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 9
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/jacobian-3",
+      "operation": "doubling",
+      "formula": "shortw/jacobian-3/doubling/mdbl-2007-bl",
+      "counts": {
+        "multiplications": 6,
+        "squarings": 5,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/modified",
+      "operation": "addition",
+      "formula": "shortw/modified/addition/mmadd-2009-bl",
+      "counts": {
+        "multiplications": 11,
+        "squarings": 4,
+        "inversions": 0,
+        "additions": 9
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/modified",
+      "operation": "doubling",
+      "formula": "shortw/modified/doubling/mdbl-2009-bl",
+      "counts": {
+        "multiplications": 8,
+        "squarings": 5,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/projective",
+      "operation": "addition",
+      "formula": "shortw/projective/addition/mmadd-1998-cmo",
+      "counts": {
+        "multiplications": 6,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 6
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/projective",
+      "operation": "doubling",
+      "formula": "shortw/projective/doubling/mdbl-2007-bl",
+      "counts": {
+        "multiplications": 9,
+        "squarings": 5,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/projective-1",
+      "operation": "addition",
+      "formula": "shortw/projective-1/addition/mmadd-1998-cmo",
+      "counts": {
+        "multiplications": 6,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 6
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/projective-1",
+      "operation": "doubling",
+      "formula": "shortw/projective-1/doubling/mdbl-2007-bl",
+      "counts": {
+        "multiplications": 9,
+        "squarings": 5,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/projective-3",
+      "operation": "addition",
+      "formula": "shortw/projective-3/addition/mmadd-1998-cmo",
+      "counts": {
+        "multiplications": 6,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 6
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/projective-3",
+      "operation": "doubling",
+      "formula": "shortw/projective-3/doubling/mdbl-2007-bl",
+      "counts": {
+        "multiplications": 9,
+        "squarings": 5,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/w12-0",
+      "operation": "addition",
+      "formula": "shortw/w12-0/addition/madd-2010-cln",
+      "counts": {
+        "multiplications": 11,
+        "squarings": 5,
+        "inversions": 0,
+        "additions": 9
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/w12-0",
+      "operation": "doubling",
+      "formula": "shortw/w12-0/doubling/dbl-2010-cln",
+      "counts": {
+        "multiplications": 4,
+        "squarings": 6,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/xyzz",
+      "operation": "addition",
+      "formula": "shortw/xyzz/addition/mmadd-2008-s",
+      "counts": {
+        "multiplications": 5,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 6
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/xyzz",
+      "operation": "doubling",
+      "formula": "shortw/xyzz/doubling/mdbl-2008-s-1",
+      "counts": {
+        "multiplications": 7,
+        "squarings": 3,
+        "inversions": 0,
+        "additions": 4
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/xyzz-3",
+      "operation": "addition",
+      "formula": "shortw/xyzz-3/addition/mmadd-2008-s",
+      "counts": {
+        "multiplications": 5,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 6
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/xyzz-3",
+      "operation": "doubling",
+      "formula": "shortw/xyzz-3/doubling/mdbl-2008-s-1",
+      "counts": {
+        "multiplications": 7,
+        "squarings": 3,
+        "inversions": 0,
+        "additions": 4
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/xz",
+      "operation": "doubling",
+      "formula": "shortw/xz/doubling/dbl-2002-bj-3",
+      "counts": {
+        "multiplications": 6,
+        "squarings": 5,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/xz",
+      "operation": "diffadd",
+      "formula": "shortw/xz/diffadd/mdadd-2002-bj-2",
+      "counts": {
+        "multiplications": 8,
+        "squarings": 2,
+        "inversions": 0,
+        "additions": 4
+      },
+      "verified_cases": 0
+    },
+    {
+      "model": "shortw",
+      "chart": "shortw/xz",
+      "operation": "ladder",
+      "formula": "shortw/xz/ladder/mladd-2002-bj-3",
+      "counts": {
+        "multiplications": 14,
+        "squarings": 7,
+        "inversions": 0,
+        "additions": 11
+      },
+      "verified_cases": 0
+    },
+    {
+      "model": "twisted",
+      "chart": "twisted/extended",
+      "operation": "addition",
+      "formula": "twisted/extended/addition/mmadd-2008-hwcd-2",
+      "counts": {
+        "multiplications": 8,
+        "squarings": 0,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "twisted",
+      "chart": "twisted/extended",
+      "operation": "doubling",
+      "formula": "twisted/extended/doubling/mdbl-2008-hwcd",
+      "counts": {
+        "multiplications": 5,
+        "squarings": 4,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "twisted",
+      "chart": "twisted/inverted",
+      "operation": "addition",
+      "formula": "twisted/inverted/addition/mmadd-2008-bbjlp",
+      "counts": {
+        "multiplications": 8,
+        "squarings": 0,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "twisted",
+      "chart": "twisted/inverted",
+      "operation": "doubling",
+      "formula": "twisted/inverted/doubling/mdbl-2008-bbjlp",
+      "counts": {
+        "multiplications": 4,
+        "squarings": 3,
+        "inversions": 0,
+        "additions": 6
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "twisted",
+      "chart": "twisted/projective",
+      "operation": "addition",
+      "formula": "twisted/projective/addition/mmadd-2008-bbjlp",
+      "counts": {
+        "multiplications": 8,
+        "squarings": 1,
+        "inversions": 0,
+        "additions": 8
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "twisted",
+      "chart": "twisted/projective",
+      "operation": "doubling",
+      "formula": "twisted/projective/doubling/mdbl-2008-bbjlp",
+      "counts": {
+        "multiplications": 4,
+        "squarings": 4,
+        "inversions": 0,
+        "additions": 7
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "twistedhessian",
+      "chart": "twistedhessian/projective",
+      "operation": "addition",
+      "formula": "twistedhessian/projective/addition/add-2009-bkl",
+      "counts": {
+        "multiplications": 13,
+        "squarings": 0,
+        "inversions": 0,
+        "additions": 3
+      },
+      "verified_cases": 8
+    },
+    {
+      "model": "twistedhessian",
+      "chart": "twistedhessian/projective",
+      "operation": "doubling",
+      "formula": "twistedhessian/projective/doubling/dbl-2009-bkl",
+      "counts": {
+        "multiplications": 7,
+        "squarings": 3,
+        "inversions": 0,
+        "additions": 3
+      },
+      "verified_cases": 8
+    }
+  ]
+}

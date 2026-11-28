@@ -1,0 +1,950 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "IC-coordinate-degree-isogeny-20261127",
+  "version": 1,
+  "created": "2026-11-27",
+  "repository": "crypto",
+  "authors": [
+    "Codex coordinate-comparison lane"
+  ],
+  "study_dir": "research/ic_coordinate_rosetta_20261127/degree_study",
+  "question": "On one fixed public order-251 subgroup over F_1019, how do native Montgomery, short-Weierstrass, two-isogeny quotient, twisted-Edwards, bilinear-auxiliary, and affine-with-slope polynomial presentations differ in explicit input degree, regularity diagnostics, and completed shared-F4 solving degree when the represented factor-base points and planted relation are fixed?",
+  "claims": [
+    {
+      "id": "C-controls",
+      "text": "Every retained positive system accepts the planted relation, the negative Montgomery system is inconsistent, the A/A observations are identical, the degree-two map commutes on all 251 subgroup scalars, and the independently formed norm equals h_3^4.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C-w-u",
+      "text": "The square-free quotient-w arm and the source Montgomery-u arm have the same measured degree profile on the fixed fixture; the isogeny removes fibre duplication rather than the intrinsic f_3 degree.",
+      "class": "comparative",
+      "decided_by": [
+        "C-w-u-profile"
+      ],
+      "if_supported": "report exact equality of the preregistered degree tuple and keep the claim at this fixture",
+      "if_not_supported": "report every differing field and do not attribute a degree reduction or equality to the isogeny"
+    },
+    {
+      "id": "C-raw-multiplicity",
+      "text": "Retaining the raw norm h_3^4 changes total solving degree relative to square-free h_3 while preserving the exact zero set and affine leading-ideal regularity index.",
+      "class": "comparative",
+      "decided_by": [
+        "C-raw-vs-squarefree"
+      ],
+      "if_supported": "report the signed total-degree delta as multiplicity overhead on this fixture",
+      "if_not_supported": "report which radical, regularity, completion, or degree control failed"
+    },
+    {
+      "id": "C-edwards-bilinear",
+      "text": "The Edwards bilinear-auxiliary presentation lowers maximum input degree relative to Edwards y-only without necessarily lowering completed total solving degree or selected F4 pair rows.",
+      "class": "comparative",
+      "decided_by": [
+        "C-edwards-presentation"
+      ],
+      "if_supported": "report input-degree, variable-count, total-degree, matrix, and pair-row deltas together",
+      "if_not_supported": "report the exact native-F4 deltas without importing the prior standalone-engine pair count"
+    },
+    {
+      "id": "C-affine-slope",
+      "text": "Montgomery affine-with-slope has lower completed total solving degree than Montgomery u-only on the fixed fixture, at the cost of more variables and equations.",
+      "class": "comparative",
+      "decided_by": [
+        "C-affine-vs-u"
+      ],
+      "if_supported": "report the degree reduction beside variable, equation, matrix, and field-operation increases",
+      "if_not_supported": "report the exact completed comparison without a lowest-degree claim"
+    },
+    {
+      "id": "C-weierstrass",
+      "text": "The short-Weierstrass x-only arm has the same measured degree profile as Montgomery u-only on the fixed fixture.",
+      "class": "comparative",
+      "decided_by": [
+        "C-weierstrass-vs-u"
+      ],
+      "if_supported": "report exact equality of the preregistered degree tuple",
+      "if_not_supported": "report every differing field and retain a model-specific result"
+    },
+    {
+      "id": "C-scope",
+      "text": "Hessian is excluded because the fixed curve order 1004 is not divisible by three; Curve25519-scale transfer, complete index-calculus cost, external-CAS agreement, and any Coppersmith or integer-lifting claim are outside this qualification run.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "montgomery-u",
+      "role": "reference",
+      "description": "Native Montgomery x-only third summation polynomial with the two-element coordinate factor base.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e3fe5a216c81bfd75b1e5df768537a02bb1e03ce",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--bin",
+            "ic_coordinate_rosetta",
+            "--no-default-features",
+            "-j",
+            "2"
+          ]
+        ],
+        "binary_sha256": "8adb73af27429e1ca3491123a6f8f236a0d974844adf90b5f46f246b2483b8ba",
+        "flags": {
+          "command": "degree-study --protocol-sha256 PROTOCOL_SHA256 --instrument-commit e3fe5a216c81bfd75b1e5df768537a02bb1e03ce --max-degree 32 --output research/ic_coordinate_rosetta_20261127/degree_study/raw/degree-study.json",
+          "observation": "montgomery-u-semaev"
+        },
+        "env": {
+          "F4_FP_THREAD_OPS": "1",
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate_model": "Montgomery u",
+        "presentation": "x-only f_3",
+        "execution_unit": "single matched-panel invocation"
+      }
+    },
+    {
+      "id": "montgomery-u-aa",
+      "role": "control_aa",
+      "description": "Byte-identical Montgomery-u equations under a distinct observation identifier.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e3fe5a216c81bfd75b1e5df768537a02bb1e03ce",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--bin",
+            "ic_coordinate_rosetta",
+            "--no-default-features",
+            "-j",
+            "2"
+          ]
+        ],
+        "binary_sha256": "8adb73af27429e1ca3491123a6f8f236a0d974844adf90b5f46f246b2483b8ba",
+        "flags": {
+          "command": "degree-study --protocol-sha256 PROTOCOL_SHA256 --instrument-commit e3fe5a216c81bfd75b1e5df768537a02bb1e03ce --max-degree 32 --output research/ic_coordinate_rosetta_20261127/degree_study/raw/degree-study.json",
+          "observation": "montgomery-u-aa"
+        },
+        "env": {
+          "F4_FP_THREAD_OPS": "1",
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate_model": "Montgomery u",
+        "presentation": "x-only f_3 A/A",
+        "execution_unit": "single matched-panel invocation"
+      },
+      "same_instrument_as": "montgomery-u"
+    },
+    {
+      "id": "weierstrass-x",
+      "role": "candidate",
+      "description": "Native short-Weierstrass x-only third summation polynomial after the exact cubic translation.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e3fe5a216c81bfd75b1e5df768537a02bb1e03ce",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--bin",
+            "ic_coordinate_rosetta",
+            "--no-default-features",
+            "-j",
+            "2"
+          ]
+        ],
+        "binary_sha256": "8adb73af27429e1ca3491123a6f8f236a0d974844adf90b5f46f246b2483b8ba",
+        "flags": {
+          "command": "degree-study --protocol-sha256 PROTOCOL_SHA256 --instrument-commit e3fe5a216c81bfd75b1e5df768537a02bb1e03ce --max-degree 32 --output research/ic_coordinate_rosetta_20261127/degree_study/raw/degree-study.json",
+          "observation": "weierstrass-x-semaev"
+        },
+        "env": {
+          "F4_FP_THREAD_OPS": "1",
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate_model": "short Weierstrass x",
+        "presentation": "x-only f_3",
+        "execution_unit": "single matched-panel invocation"
+      },
+      "same_instrument_as": "montgomery-u"
+    },
+    {
+      "id": "montgomery-affine",
+      "role": "candidate",
+      "description": "Montgomery affine curve, chord-slope, target-x, and target-y equations with an explicit lambda auxiliary.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e3fe5a216c81bfd75b1e5df768537a02bb1e03ce",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--bin",
+            "ic_coordinate_rosetta",
+            "--no-default-features",
+            "-j",
+            "2"
+          ]
+        ],
+        "binary_sha256": "8adb73af27429e1ca3491123a6f8f236a0d974844adf90b5f46f246b2483b8ba",
+        "flags": {
+          "command": "degree-study --protocol-sha256 PROTOCOL_SHA256 --instrument-commit e3fe5a216c81bfd75b1e5df768537a02bb1e03ce --max-degree 32 --output research/ic_coordinate_rosetta_20261127/degree_study/raw/degree-study.json",
+          "observation": "montgomery-affine-slope"
+        },
+        "env": {
+          "F4_FP_THREAD_OPS": "1",
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate_model": "Montgomery affine",
+        "presentation": "curve plus slope auxiliaries",
+        "execution_unit": "single matched-panel invocation"
+      },
+      "same_instrument_as": "montgomery-u"
+    },
+    {
+      "id": "quotient-w-squarefree",
+      "role": "candidate",
+      "description": "Square-free h_3 in w=u+1/u, represented as the ordinary f_3 on the degree-two isogenous destination U=w+A.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e3fe5a216c81bfd75b1e5df768537a02bb1e03ce",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--bin",
+            "ic_coordinate_rosetta",
+            "--no-default-features",
+            "-j",
+            "2"
+          ]
+        ],
+        "binary_sha256": "8adb73af27429e1ca3491123a6f8f236a0d974844adf90b5f46f246b2483b8ba",
+        "flags": {
+          "command": "degree-study --protocol-sha256 PROTOCOL_SHA256 --instrument-commit e3fe5a216c81bfd75b1e5df768537a02bb1e03ce --max-degree 32 --output research/ic_coordinate_rosetta_20261127/degree_study/raw/degree-study.json",
+          "observation": "quotient-w-squarefree"
+        },
+        "env": {
+          "F4_FP_THREAD_OPS": "1",
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate_model": "degree-two quotient w",
+        "presentation": "square-free h_3",
+        "execution_unit": "single matched-panel invocation"
+      },
+      "same_instrument_as": "montgomery-u"
+    },
+    {
+      "id": "quotient-w-raw",
+      "role": "candidate",
+      "description": "Unsquare-free raw norm h_3^4 retained exactly to isolate multiplicity overhead.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e3fe5a216c81bfd75b1e5df768537a02bb1e03ce",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--bin",
+            "ic_coordinate_rosetta",
+            "--no-default-features",
+            "-j",
+            "2"
+          ]
+        ],
+        "binary_sha256": "8adb73af27429e1ca3491123a6f8f236a0d974844adf90b5f46f246b2483b8ba",
+        "flags": {
+          "command": "degree-study --protocol-sha256 PROTOCOL_SHA256 --instrument-commit e3fe5a216c81bfd75b1e5df768537a02bb1e03ce --max-degree 32 --output research/ic_coordinate_rosetta_20261127/degree_study/raw/degree-study.json",
+          "observation": "quotient-w-raw-norm"
+        },
+        "env": {
+          "F4_FP_THREAD_OPS": "1",
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate_model": "degree-two quotient w",
+        "presentation": "raw norm h_3^4",
+        "execution_unit": "single matched-panel invocation"
+      },
+      "same_instrument_as": "montgomery-u"
+    },
+    {
+      "id": "edwards-y",
+      "role": "candidate",
+      "description": "Native twisted-Edwards y-only third summation polynomial.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e3fe5a216c81bfd75b1e5df768537a02bb1e03ce",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--bin",
+            "ic_coordinate_rosetta",
+            "--no-default-features",
+            "-j",
+            "2"
+          ]
+        ],
+        "binary_sha256": "8adb73af27429e1ca3491123a6f8f236a0d974844adf90b5f46f246b2483b8ba",
+        "flags": {
+          "command": "degree-study --protocol-sha256 PROTOCOL_SHA256 --instrument-commit e3fe5a216c81bfd75b1e5df768537a02bb1e03ce --max-degree 32 --output research/ic_coordinate_rosetta_20261127/degree_study/raw/degree-study.json",
+          "observation": "edwards-y-semaev"
+        },
+        "env": {
+          "F4_FP_THREAD_OPS": "1",
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate_model": "twisted Edwards y",
+        "presentation": "y-only f_3",
+        "execution_unit": "single matched-panel invocation"
+      },
+      "same_instrument_as": "montgomery-u"
+    },
+    {
+      "id": "edwards-bilinear",
+      "role": "candidate",
+      "description": "Twisted-Edwards affine addition with t_i=x_i*y_i and q=t_1*t_2 auxiliaries so every supplied equation is quadratic.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e3fe5a216c81bfd75b1e5df768537a02bb1e03ce",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--bin",
+            "ic_coordinate_rosetta",
+            "--no-default-features",
+            "-j",
+            "2"
+          ]
+        ],
+        "binary_sha256": "8adb73af27429e1ca3491123a6f8f236a0d974844adf90b5f46f246b2483b8ba",
+        "flags": {
+          "command": "degree-study --protocol-sha256 PROTOCOL_SHA256 --instrument-commit e3fe5a216c81bfd75b1e5df768537a02bb1e03ce --max-degree 32 --output research/ic_coordinate_rosetta_20261127/degree_study/raw/degree-study.json",
+          "observation": "edwards-affine-bilinear"
+        },
+        "env": {
+          "F4_FP_THREAD_OPS": "1",
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate_model": "twisted Edwards affine",
+        "presentation": "bilinear auxiliary tree",
+        "execution_unit": "single matched-panel invocation"
+      },
+      "same_instrument_as": "montgomery-u"
+    },
+    {
+      "id": "montgomery-unsatisfiable",
+      "role": "control_negative",
+      "description": "Montgomery-u system with target [37]G; exhaustive factor-base evaluation establishes no solution before F4.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "e3fe5a216c81bfd75b1e5df768537a02bb1e03ce",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--bin",
+            "ic_coordinate_rosetta",
+            "--no-default-features",
+            "-j",
+            "2"
+          ]
+        ],
+        "binary_sha256": "8adb73af27429e1ca3491123a6f8f236a0d974844adf90b5f46f246b2483b8ba",
+        "flags": {
+          "command": "degree-study --protocol-sha256 PROTOCOL_SHA256 --instrument-commit e3fe5a216c81bfd75b1e5df768537a02bb1e03ce --max-degree 32 --output research/ic_coordinate_rosetta_20261127/degree_study/raw/degree-study.json",
+          "observation": "montgomery-u-unsatisfiable-control"
+        },
+        "env": {
+          "F4_FP_THREAD_OPS": "1",
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        },
+        "threads": 1
+      },
+      "parameters": {
+        "coordinate_model": "Montgomery u",
+        "presentation": "x-only f_3 negative target",
+        "execution_unit": "single matched-panel invocation"
+      },
+      "same_instrument_as": "montgomery-u"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Every nonnegative arm carries the same explicit planted solution and must pass expected_outcome_passed; a distinct positive arm would duplicate that detector path."
+    },
+    "negative": {
+      "present": true,
+      "arm": "montgomery-unsatisfiable",
+      "null_population": {
+        "description": "All four ordered pairs from the two fixed factor-base coordinate roots against target [37]G.",
+        "generator": "Exhaustive Cartesian product of the two recorded Montgomery coordinate roots; no randomness or resampling.",
+        "n": 4,
+        "why_n": "The finite factor-base constraint splits completely into exactly two roots, so four ordered coordinate pairs exhaust the system's possible root assignments.",
+        "matched_on": [
+          "field",
+          "curve",
+          "subgroup",
+          "factor-base coordinate roots",
+          "equation generator",
+          "monomial order",
+          "F4 bounds"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "coordinate system",
+        "levels": [
+          "Montgomery u",
+          "short-Weierstrass x",
+          "quotient w",
+          "twisted-Edwards y",
+          "Montgomery affine",
+          "twisted-Edwards bilinear"
+        ]
+      },
+      {
+        "name": "polynomial presentation",
+        "levels": [
+          "native eliminated f_3",
+          "affine slope auxiliaries",
+          "bilinear product auxiliaries"
+        ]
+      },
+      {
+        "name": "norm multiplicity",
+        "levels": [
+          "square-free h_3",
+          "raw h_3^4"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "field and source curve",
+        "treatment": "fixed",
+        "value": "EC1P10Cquotienttoyhc0736364223b over F_1019",
+        "how": "The exact fixture record and full UID are frozen in fixture.json."
+      },
+      {
+        "name": "subgroup and relation",
+        "treatment": "fixed",
+        "value": "order 251; [9]G+[27]G=[36]G",
+        "how": "Every positive arm transports the same two factor points and target through exact maps."
+      },
+      {
+        "name": "represented factor base",
+        "treatment": "fixed",
+        "value": "two negation orbits represented by two coordinate roots",
+        "how": "Coordinate membership polynomials are transported from the same source subgroup points."
+      },
+      {
+        "name": "solver",
+        "treatment": "fixed",
+        "value": "cryptanalysis::f4_fp, grevlex, maximum degree 32",
+        "how": "One pinned binary invokes every arm sequentially with the same F4 options."
+      },
+      {
+        "name": "execution order",
+        "treatment": "fixed",
+        "value": "the source order in matched_systems",
+        "how": "The output contains exact counts only; local wall time is discarded and the A/A arm detects order-sensitive counted state."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Host and compiler facts are retained for replay provenance but cannot affect an admitted exact degree or counted F4 event."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-aa",
+        "arms": [
+          "montgomery-u",
+          "montgomery-u-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-w-u-profile",
+        "arms": [
+          "montgomery-u",
+          "quotient-w-squarefree"
+        ],
+        "differs_in": [
+          "coordinate system"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-raw-vs-squarefree",
+        "arms": [
+          "quotient-w-squarefree",
+          "quotient-w-raw"
+        ],
+        "differs_in": [
+          "norm multiplicity"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-edwards-presentation",
+        "arms": [
+          "edwards-y",
+          "edwards-bilinear"
+        ],
+        "differs_in": [
+          "polynomial presentation"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-affine-vs-u",
+        "arms": [
+          "montgomery-u",
+          "montgomery-affine"
+        ],
+        "differs_in": [
+          "polynomial presentation"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-weierstrass-vs-u",
+        "arms": [
+          "montgomery-u",
+          "weierstrass-x"
+        ],
+        "differs_in": [
+          "coordinate system"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-negative",
+        "arms": [
+          "montgomery-unsatisfiable"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "solver_complete=true, inconsistent=true, expected_outcome_passed=true, and pairs_above_bound=0"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": true,
+    "transfer_obligations": [
+      {
+        "scope": "degree-two isogeny from the source Montgomery curve to the quotient destination",
+        "required_before_comparison": [
+          "exact source and destination EC1 identities",
+          "kernel and exceptional-source set",
+          "gcd of map degree with subgroup order",
+          "map commutation on all retained subgroup scalars",
+          "factor-base and target transport",
+          "no claim that an isogeny is a birational coordinate change"
+        ],
+        "satisfied_by": "fixture.json and FixtureCertificate in cryptanalysis::ic_coordinate_degree"
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "The study is one deterministic exact-computation panel with no admitted clock; fixed order is required for the byte-identical A/A count check.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        0
+      ],
+      "nonce": null,
+      "note": "The instrument uses no randomness; zero is an export-shape placeholder and does not enter polynomial generation or F4."
+    },
+    "instance_sampling": {
+      "rule": "The sole instance is the exact fixture in fixture.json; no curve, target, factor-base, or seed search occurs.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "The systems and prior standalone-engine predictions are public and algebraically distinguishable; the frozen reducer applies exact named comparisons with no analyst choices.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "This is a complete deterministic computation on one fixed algebraic instance. No population inference, p-value, confidence interval, or equivalence claim is licensed."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 1800,
+      "measured_on": "Conservative planning ceiling informed by the earlier standalone prototype and build-time checks; no native degree-study F4 invocation was run before freeze."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "hard-controls",
+        "name": "arithmetic and solver hard controls",
+        "unit": "pass/fail vector",
+        "kind": "exact",
+        "definition": "Inventory, A/A, planted-solution, unsatisfiable-target, all-solver-complete, subgroup-map, and exact raw-norm identity checks; a failure invalidates comparisons.",
+        "source": "controls and fixture fields in degree-study.json",
+        "aggregation": "per_row",
+        "resolution": "one Boolean check",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "input-degree",
+        "name": "maximum supplied total degree",
+        "unit": "total degree",
+        "kind": "exact",
+        "definition": "Maximum total degree among the equations supplied to F4, before any reduction.",
+        "source": "observations[].max_input_degree",
+        "aggregation": "per_row",
+        "resolution": "one degree",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "semi-regular-estimate",
+        "name": "semi-regular Hilbert estimate",
+        "unit": "total degree",
+        "kind": "exact",
+        "definition": "First non-positive coefficient of prod_i(1-z^d_i)/(1-z)^n using only supplied equation degrees; this exact coefficient calculation is a model estimate, not a certified BFS degree of regularity.",
+        "source": "observations[].semi_regular_degree",
+        "aggregation": "per_row",
+        "resolution": "one degree",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "affine-regularity",
+        "name": "affine leading-ideal regularity index",
+        "unit": "total degree",
+        "kind": "exact",
+        "definition": "One plus the maximum total degree of a standard monomial of the completed grevlex affine leading ideal; distinct from BFS d_reg of top forms.",
+        "source": "observations[].affine_regularity_index",
+        "aggregation": "per_row",
+        "resolution": "one degree",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "productive-solving-degree",
+        "name": "productive F4 solving degree",
+        "unit": "total degree",
+        "kind": "counted",
+        "definition": "Highest F4 step degree that adds a new basis polynomial or one, excluding trailing certification steps.",
+        "source": "observations[].productive_solving_degree",
+        "aggregation": "per_row",
+        "resolution": "one degree",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "total-solving-degree",
+        "name": "total solving degree",
+        "unit": "total degree",
+        "kind": "derived",
+        "definition": "Maximum of supplied input degree and productive F4 solving degree for this procedure.",
+        "source": "observations[].total_solving_degree",
+        "formula": "max(max_input_degree, productive_solving_degree)",
+        "aggregation": "per_row",
+        "resolution": "one degree",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "selected-pair-rows",
+        "name": "selected F4 pair rows",
+        "unit": "pair rows",
+        "kind": "counted",
+        "definition": "Sum of pair rows selected across captured native F4 steps; not a sequential Buchberger S-pair count.",
+        "source": "observations[].selected_pairs",
+        "aggregation": "per_row",
+        "resolution": "one pair row",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "matrix-shape",
+        "name": "peak native F4 matrix shape",
+        "unit": "rows and columns",
+        "kind": "counted",
+        "definition": "Maximum rows and maximum columns reported across completed native F4 steps.",
+        "source": "observations[].max_rows and observations[].max_columns",
+        "aggregation": "per_row",
+        "resolution": "one row or column",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "field-multiplications",
+        "name": "native F4 field multiplications",
+        "unit": "F_1019 multiplications",
+        "kind": "counted",
+        "definition": "Shared f4_fp row-reduction multiplication counter for the one arm; construction, external replay, and report reduction are excluded.",
+        "source": "observations[].field_multiplications",
+        "aggregation": "per_row",
+        "resolution": "one multiplication",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "basis-degree",
+        "name": "maximum final basis degree",
+        "unit": "total degree",
+        "kind": "exact",
+        "definition": "Maximum total degree of any monomial in the completed interreduced basis.",
+        "source": "observations[].basis_max_degree",
+        "aggregation": "per_row",
+        "resolution": "one degree",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "raw-step-degree",
+        "name": "raw maximum processed degree",
+        "unit": "total degree",
+        "kind": "counted",
+        "definition": "Maximum of supplied input degree and every processed F4 step, including trailing zero-reduction certification steps.",
+        "source": "observations[].raw_max_step_degree",
+        "aggregation": "per_row",
+        "resolution": "one degree",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [
+      "selected F4 pair rows",
+      "F4 steps",
+      "maximum matrix rows",
+      "maximum matrix columns",
+      "field multiplications",
+      "basis polynomials",
+      "basis monomials"
+    ],
+    "record": [
+      "protocol SHA-256",
+      "instrument Git commit",
+      "instrument binary SHA-256",
+      "Cargo.lock SHA-256",
+      "Rust compiler version",
+      "CPU model and kernel for replay provenance",
+      "F4 maximum degree",
+      "monomial order",
+      "fixture and curve UIDs"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "command": "target/debug/ic_coordinate_rosetta degree-study --protocol-sha256 PROTOCOL_SHA256 --instrument-commit e3fe5a216c81bfd75b1e5df768537a02bb1e03ce --max-degree 32 --output research/ic_coordinate_rosetta_20261127/degree_study/raw/degree-study.json",
+      "threads": 1,
+      "precondition": "scripts/checkpoint.sh gate passes before invocation",
+      "wall_time": "discarded and inadmissible"
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 1800,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Run the single fixed nine-observation panel once at maximum degree 32, then stop; do not enlarge the factor base, change the fixture, or add an arity after seeing output.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Invalidate every comparison if any observation times out, hits a resource limit, leaves pairs above the degree bound, stops on a staircase, or fails its expected outcome.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "Stop before execution if the binary hash, source commit, protocol hash, fixture identity, or checkpoint gate does not match the frozen record.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "The reducer reports exact tuples and signed deltas only after every hard control passes. Equality claims require field-for-field equality of the preregistered degree tuple. Lower-degree claims require a strictly smaller total_solving_degree and must be shown beside variable, equation, matrix, pair-row, and field-multiplication counts. No single-fixture result licenses population equivalence, scaling, or speedup.",
+    "comparison_ids": [
+      "C-w-u-profile",
+      "C-raw-vs-squarefree",
+      "C-edwards-presentation",
+      "C-affine-vs-u",
+      "C-weierstrass-vs-u",
+      "C-negative"
+    ],
+    "threshold": "exact equality for profile claims; nonzero signed delta for presentation effects; strict inequality for lower-degree wording; all hard controls true",
+    "statistic": "exact per-arm tuple and paired signed difference on the one fixed fixture",
+    "interval": "none; deterministic exact computation with no sampling inference",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "signed degree, variable, equation, selected-pair-row, matrix-dimension, and field-multiplication differences",
+    "verdict_vocabulary": [
+      "exactly_matched_on_fixture",
+      "different_on_fixture",
+      "control_failed",
+      "incomplete",
+      "out_of_scope"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "../../../src/bin/ic_coordinate_degree_report.rs",
+      "sha256": "e51ce75636be764869644462fc476b766d39cab1793a0fc4b6a3bc12bf8ef5cf"
+    },
+    "inputs": [
+      "raw/degree-study.json",
+      "fixture.json",
+      "protocol.json"
+    ],
+    "outputs": [
+      "summary.json",
+      "REPORT.md",
+      "figures/degree_comparison.svg"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "running degree-study before this protocol is frozen and committed",
+    "bypassing a failed repository checkpoint gate",
+    "changing the field, curve, subgroup, relation, factor-base roots, system equations, order, degree bound, or F4 engine after seeing output",
+    "quoting local wall or CPU time as a benchmark result",
+    "calling selected native F4 pair rows the 249 sequential Buchberger S-pairs from the prior standalone prototype",
+    "calling the semi-regular estimate or affine regularity index a certified BFS degree of regularity",
+    "treating the degree-two isogeny as a birational coordinate rename or ignoring its kernel and exceptional set",
+    "including a Hessian arm on a different curve in the matched-coordinate table",
+    "claiming a Curve25519, asymptotic, complete index-calculus, rho, Coppersmith, integer-lifting, or information-theoretic result from this fixture",
+    "making a solver-cost claim before external-CAS replay"
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "e43dc87d2991eac64e96e64225fee97ac935e04d94ae06b52fd8e857adcc74d8",
+    "commit": "88e907af4d511f28fe3e2504d12f9344b1741e13",
+    "frozen_at": "2026-11-27T19:45:11Z",
+    "filed_before_affected_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "input degree and total solving degree by system with selected F4 pair-row labels"
+    ],
+    "report_dir": "research/ic_coordinate_rosetta_20261127/degree_study"
+  },
+  "invalidation_rules": [
+    "any hard-control failure invalidates all coordinate comparisons",
+    "any incomplete F4 arm invalidates equality or lower-degree wording involving that arm",
+    "any binary, commit, protocol, fixture, or analysis-source hash mismatch invalidates the run",
+    "external-CAS disagreement blocks every solver-cost interpretation but does not rewrite the retained native output"
+  ],
+  "extensions": {
+    "execution_unit": "One binary invocation emits all nine observations; arm records are conceptual selectors into that matched output, not nine separately timed processes.",
+    "affected_data_status_at_filing": "No degree-study invocation through the native shared F4 engine had been run when this protocol was drafted and frozen.",
+    "prior_information": "The user supplied results from an earlier standalone graded-lex Buchberger prototype on the same toy fixture. Those values motivate the comparisons but do not count as native F4 observations, A/A evidence, or external replay.",
+    "cargo_lock_sha256": "192c1d7e8bf2c3bbfb084721d192a6ab08d86d67adbb452cc3f79cff70ccfec0",
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "analysis_commit": "88e907af4d511f28fe3e2504d12f9344b1741e13"
+  },
+  "links": {
+    "pull_request": "https://github.com/isogeny-labs/crypto/pull/5260",
+    "fixture": "research/ic_coordinate_rosetta_20261127/degree_study/fixture.json",
+    "lead": "research/ic_coordinate_rosetta_20261127/LEAD-CKM19-NATIVE-PARITY.md"
+  },
+  "literature": [
+    {
+      "ref": "https://doi.org/10.1587/transfun.E102.A.1061",
+      "provenance": "retrieved",
+      "claim": "CKM19 derives native Montgomery and twisted-Edwards summation polynomials and reports the total-degree parity restriction for fixed-target twisted-Edwards systems.",
+      "verified_by": "Official metadata and user-supplied screenshots of pages 1061-1069 reviewed on 2026-11-27."
+    },
+    {
+      "ref": "research/ic_coordinate_rosetta_20261127/LEAD-CKM19-NATIVE-PARITY.md",
+      "provenance": "internal",
+      "claim": "The larger lead requires same-instance native systems, represented-point factor-base parity, complete costs, and external replay before promotion.",
+      "verified_by": "Lead and repository evidence rules read before implementation."
+    },
+    {
+      "ref": "src/cryptanalysis/f4_fp.rs",
+      "provenance": "internal",
+      "claim": "The shared native F4 report distinguishes productive solving degree, raw processed degree, completion bounds, pair rows, matrices, and counted field work.",
+      "verified_by": "Source inspection, focused tests, binary check, and strict Clippy on instrument commit e3fe5a216c81bfd75b1e5df768537a02bb1e03ce."
+    }
+  ]
+}
