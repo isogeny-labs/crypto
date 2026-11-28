@@ -3313,8 +3313,10 @@ bound for other tree layouts or all primes. A balanced layout would need
 its own chart-complete construction, frozen cold cost protocol, F4 degree
 and width measurements, and independent relation-rank accounting.
 
-The split preserves the decomposition set and therefore does not change the
-basic hit probability, about `|V|^m/(m!·r)` (§2.3). With fixed `m` and
+An exact projective split would preserve the decomposition set and therefore
+would not change the basic hit probability, about `|V|^m/(m!·r)` (§2.3).
+The current affine-only chain can miss valid witnesses, so this probability
+is an upper reference for that restricted solver. With fixed `m` and
 `|V| = p^{o(1)}`, that probability is `p^(−1+o(1))`; cheap individual
 attempts alone would still require `p^(1−o(1))` targets for hits. Varying
 `m` to raise the hit rate also raises the number of auxiliary variables and
