@@ -1,0 +1,30 @@
+[package]
+name = "blocked-bsgs-rho-wall"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+path = "src/lib.rs"
+# The pinned path modules' repository-wide unit suites require the full parent
+# crate; this isolated harness has its own integration correctness suite.
+test = false
+doctest = false
+
+[dependencies]
+hex = "0.4.3"
+num-bigint = "0.4.8"
+num-traits = "0.2.19"
+rand = "0.8.5"
+rayon = "1.11.0"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.145"
+sha2 = "0.10.9"
+
+[[bin]]
+name = "blocked-bsgs-rho-wall"
+path = "src/main.rs"
+
+[[test]]
+name = "harness"
+path = "tests/harness.rs"

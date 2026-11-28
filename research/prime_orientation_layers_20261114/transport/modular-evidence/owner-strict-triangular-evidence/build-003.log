@@ -1,0 +1,14 @@
+✖ [1806/1806] Building CryptoLean.StrictTriangular (1.3s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/crypto-lean-first-moment-worktree/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/audit/crypto-lean-first-moment-worktree/CryptoLean/StrictTriangular.lean -o /workspace/audit/crypto-lean-first-moment-worktree/.lake/build/lib/lean/CryptoLean/StrictTriangular.olean -i /workspace/audit/crypto-lean-first-moment-worktree/.lake/build/lib/lean/CryptoLean/StrictTriangular.ilean -c /workspace/audit/crypto-lean-first-moment-worktree/.lake/build/ir/CryptoLean/StrictTriangular.c --setup /workspace/audit/crypto-lean-first-moment-worktree/.lake/build/ir/CryptoLean/StrictTriangular.setup.json --json
+error: CryptoLean/StrictTriangular.lean:30:2: Type mismatch: After simplification, term
+  hz
+ has type
+  @Eq (Matrix ι ι ℤ) (M.map ⇑(Nat.castRingHom ℤ) ^ Fintype.card ι) 0
+but is expected to have type
+  @Eq (Matrix ι ι ℤ) (M.map ⇑(Nat.castRingHom ℤ) ^ Fintype.card ι) (Matrix.map 0 ⇑(Nat.castRingHom ℤ))
+info: CryptoLean/StrictTriangular.lean:38:0: 'CryptoLean.StrictTriangular.pow_card_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CryptoLean/StrictTriangular.lean:39:0: 'CryptoLean.StrictTriangular.nat_pow_card_zero' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+info: CryptoLean/StrictTriangular.lean:40:0: 'CryptoLean.StrictTriangular.finite_geometric_fixed_point' depends on axioms: [propext, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- CryptoLean.StrictTriangular
+error: build failed

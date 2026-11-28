@@ -1,0 +1,11 @@
+# Parity-safe weighted mode interface
+
+Question:does available one-bitoddrescaling increase the declared per-weight capacity,andcan actualzero/two-bit choice preserve original capacity while retaining lower-node omission? Starting counts125/receipt071 areexactnominalselectorcounts,notruntime/independence. Actualpruning121 preserves reducedproduct. [pcc:unverified]
+
+Competing hypotheses:onebitq1 maystillbeusefulwithchargedlargerweightfibers;alternativelychooseqeven(u,i)=2wheni+3<=u,else0,toavoidodd/evenweightcollisionswhilegivingupavailableonebitgainatpenultnode. Do notdismissallq1algorithmsfromaninterfacefailure. No asymptoticorpaidexperimentclaim.
+
+Predictions:q1 mapsb1andb2tothesameweightw+2;bothsurvivewhenk>=3,soselectedDECLAREDfibertherehas2*2^u members. q0/q2selectedlabels mapinjectivelyintoexistingMomentLabels via(r,b)->(r,b+gain),preservingoldmodeWeight andsidebits. Reuseexistingweight_fiber_count toderive<=2^u forq0/2,not a newgenericcardinalitytheory. Thesearehypothesesuntiltypedactualevidence. [pcc:unverified]
+
+Acceptance:newMathlibFunction.Embedding instance onactualselectedlabels;namedcomponent/weight/sidecontracts;exactq1fiberidentityasproductwithFinmoments1,2andexistingFinsetcardlaws;0/2policy<=availablebound andactualrightintegralityfromknownq2/q0branches. Preservek0/1,pc0,highest/penult/lowernodes andallzerothcontrol. Correct existingLabelsownerLeading,hashguardbase121withreadonlyinputs andseparatecopiedqualifier/precall. OneLeanprocess,existinglimits,no native/paid/timing/scaling/attackcampaign.
+
+Scope boundary:weightreindexingisMETADATA,not equalitytooriginalcanonicalmomentfactoratshiftedb. Actualleftrowpowerremainsoriginalb;originalchild/edge/degree/packetdescription interface mustjustify it. Allselector/enumeration/inversion/metadata/scalar/AST/denominator/array/index/trace/memorycostsandlostonebitbenefitcharged. A sparseweightedlayer/capacitybounddoesnotprovefieldrelation/publicfinder/fullcoldexpectedbitcost ornewexponent. [pcc:unverified]

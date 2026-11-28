@@ -1,0 +1,42 @@
+'OrientationNonscalarOrigin.kernel_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonscalarOrigin.kernel_nonzero_node' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonscalarOrigin.kernel_diagonal_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OrientationNonscalarOrigin.kernel_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+../modular-evidence/draft-134.lean.txt:80:0: error: Not a definitional equality: the left-hand side
+  ↑((blocks u) p)
+is not definitionally equal to the right-hand side
+  ↑p.2 + 2 ^ u * ↑p.1
+
+Note: This theorem is exported from the current module. This requires that all definitions that need to be unfolded to prove this theorem must be exposed.
+../modular-evidence/draft-134.lean.txt:88:53: error: unsolved goals
+u : ℕ
+p : Fin 2 × Labels u
+⊢ (blocks u) (Prod.map (⇑Fin.revPerm) (⇑(Equiv.refl (Labels u))) p) = (blocks u) (p.1.rev, p.2)
+../modular-evidence/draft-134.lean.txt:90:4: warning: This simp argument is unused:
+  Prod.map_apply
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [pairing, Equiv.trans_apply, Equiv.symm_apply_apply, Equiv.prodCongr_apply, Equiv.refl_apply,
+    Fin.revPerm_apply]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-134.lean.txt:90:19: warning: This simp argument is unused:
+  Equiv.refl_apply
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [pairing, Equiv.trans_apply, Equiv.symm_apply_apply, Equiv.prodCongr_apply, Prod.map_apply,
+    Fin.revPerm_apply]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+../modular-evidence/draft-134.lean.txt:90:36: warning: This simp argument is unused:
+  Fin.revPerm_apply
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [pairing, Equiv.trans_apply, Equiv.symm_apply_apply, Equiv.prodCongr_apply, Prod.map_apply,
+    Equiv.refl_apply]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'OrientationPairedOrigin.pairing_no_fixed' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.pairing_matching' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.weight_oneModTwo' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+'OrientationPairedOrigin.weight_inverse_integral' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
