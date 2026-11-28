@@ -18,7 +18,7 @@ Previous pinned goal: Develop and independently validate a Rust index-calculus m
 Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrough for the DLP in Jacobians of genus g >= 2 hyperelliptic curves over prime fields: a measured, fully charged improvement in exponent or constant over the lab's best index calculus, and over matched rho where IC already wins. Targets: genus 3 prime-order Jacobians (exponent 1 via a transfer to a plane quartic and Diem's index calculus, against 4/3 for double large prime and 3/2 for rho), genus 2 (no known IC beats rho's exponent, so constants and structure), and the genus-g exponent ladder. (Owner, 2026-11-20. Previous goal, kept for reference: subexponential IC for ordinary elliptic curves over prime fields.)
 
 ## Active items
-- [ ] Analyze auxiliary-variable splitting of S_m for m≥4 using the PKM degree-for-variables tower (Codex, started 2026-11-28, branch codex/sm-aux-pkm-split-20261128, PR #5355)
+- [x] Analyze auxiliary-variable splitting of S_m for m≥4 using the PKM degree-for-variables tower (Codex, 2026-11-28, branch codex/sm-aux-pkm-split-20261128, PR #5355; existing chain, exactness correction, cold-cost and rank boundary in PKM note §18)
 
 - [ ] Implement and validate APS block-local coefficient walks (Codex, started 2026-11-27, branch lane/aps-block-walk-20261127).
 - [ ] Correct the merged prime-field lead review's RR5 priority after #5208 (Codex, started 2026-11-28, branch codex/rr5-lead-priority-correction-20261128, PR #5345)
