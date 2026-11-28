@@ -351,6 +351,11 @@ fn stair_scan() -> bool {
 }
 
 fn field_ops_now() -> u64 {
+    // Drain every Rayon pool thread's buffer (and this thread's) before
+    // reading the process total — otherwise a worker's unflushed share is
+    // missing from the report.
+    let _ = rayon::broadcast(|_| flush_field_ops_buf());
+    flush_field_ops_buf();
     if thread_ops_mode() {
         FIELD_OPS_THREAD.with(|c| c.get())
     } else {
@@ -472,14 +477,46 @@ fn count_probes(n: u64, key_words: u64) {
     }
 }
 
+thread_local! {
+    /// Buffered share of [`FIELD_OPS`] not yet flushed.  Flushing every
+    /// `add_lazy` contended the same cache line under multi-thread FL /
+    /// deferred; batching keeps the process total exact at report time.
+    static FIELD_OPS_BUF: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+const FIELD_OPS_BUF_FLUSH: u64 = 1 << 20;
+
+#[inline]
+fn flush_field_ops_buf() {
+    FIELD_OPS_BUF.with(|b| {
+        let v = b.replace(0);
+        if v != 0 {
+            FIELD_OPS.fetch_add(v, AtomicOrdering::Relaxed);
+        }
+    });
+}
+
 #[inline]
 fn count_ops(n: usize) {
-    FIELD_OPS.fetch_add(n as u64, AtomicOrdering::Relaxed);
-    FIELD_OPS_THREAD.with(|c| c.set(c.get() + n as u64));
+    let n = n as u64;
+    FIELD_OPS_THREAD.with(|c| c.set(c.get() + n));
+    if thread_ops_mode() {
+        // Reports read the thread-local only; skip the process atomic.
+    } else {
+        FIELD_OPS_BUF.with(|b| {
+            let v = b.get() + n;
+            if v >= FIELD_OPS_BUF_FLUSH {
+                FIELD_OPS.fetch_add(v, AtomicOrdering::Relaxed);
+                b.set(0);
+            } else {
+                b.set(v);
+            }
+        });
+    }
     // bitop/v1 (`jv_bitops`, off unless a study turns it on): one row
     // operation is a multiply-subtract
-    super::jv_bitops::row_ops(n as u64);
-    visit_account_row_operations(n);
+    super::jv_bitops::row_ops(n);
+    visit_account_row_operations(n as usize);
 }
 
 #[inline]
@@ -3263,6 +3300,9 @@ fn pp_add(i: usize, n: u64) {
 /// The process-wide row-operation counter, for the profile's deltas.
 #[inline]
 fn pp_ops() -> u64 {
+    // Profile deltas call this often; only flush this thread.  Full-pool
+    // drain happens in [`field_ops_now`] for the report total.
+    flush_field_ops_buf();
     FIELD_OPS.load(AtomicOrdering::Relaxed)
 }
 
