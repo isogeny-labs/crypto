@@ -552,7 +552,7 @@ pub(crate) fn scalar_mul_batch(
         let kc: Vec<&BigUint> = ks[8 * c..8 * c + chunk.len()].iter().collect();
         let lanes = batch8(chunk, &kc, &a.value, p)?;
         for (j, r) in lanes.into_iter().enumerate() {
-            out.push(r.unwrap_or_else(|| points[8 * c + j].scalar_mul(ks[8 * c + j], a)));
+            out.push(r.unwrap_or_else(|| points[8 * c + j].scalar_mul(&ks[8 * c + j], a)));
         }
     }
     Some(out)
