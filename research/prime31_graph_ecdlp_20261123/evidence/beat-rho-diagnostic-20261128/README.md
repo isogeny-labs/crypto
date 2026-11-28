@@ -50,3 +50,7 @@ The fresh-process order was IC/rho, rho/IC, and so on for seven rounds on the sa
 | 64-jump negation rho diagnostic | 17.014 ms | 16.666–19.527 ms | 16.751 ms | 44,428 walk steps, 45,177 additions per solve |
 
 Median of the seven paired wall ratios (IC/rho) is 2.076; every pair favors rho (range 1.674–2.516). This rules out a win by this particular IC build against this valid optimized scratch control on the fixed B677 target. It is a narrow fixed-target diagnostic, not a cross-curve, randomized-target or repository-v5 equivalence result. The provisional 32-walk failure is a separate earlier run; the paired panel gives the completed process cost of the subsequently revised 2,048-walk control. Further work would use the latest 8-lane IC code and a repository-native v5 arm with the same cold panel and independently replayed output. No speedup claim is made. [pcc:unverified]
+
+### Follow-up at 07:32 UTC: standalone build check
+
+The published `rho_neg_dp.rs` and `Cargo.toml` were copied into the same public repository path layout in the diagnostic source export. `cargo build --release --manifest-path research/prime31_graph_ecdlp_20261123/evidence/beat-rho-diagnostic-20261128/Cargo.toml` completed successfully with Rust 1.100.1. This checks that the published control can be built without the scratch diagnostic runner; it does not make its walk policy identical to repository v5. The next comparison should use current main's 8-lane collector, because the seven-round panel above used its frozen predecessor.
