@@ -28,7 +28,7 @@ const RHS: usize = TARGET + 1;
 const WIDTH: usize = RHS + 1;
 
 /// Barrett reduction modulo the group order N < 2^32.
-const BARRETT: u64 = (u64::MAX / N) as u64;
+const BARRETT: u64 = u64::MAX / N;
 #[inline(always)]
 fn mm(x: u64, y: u64) -> u64 {
     let z = x * y;

@@ -50,8 +50,9 @@ The old quadratic objective remains compiled in tests as an independent
 reference. A native exhaustive control compares both label vectors on 3,280
 cases: zero through three ordered edges on a `3 x 3` bipartite vertex set,
 one through four labels, with isolates, repeated endpoints, and parallel edges.
-All choices agree exactly. The separate schema-3 packing-provenance verifier
-also retains its own ordered-edge-pair replay.
+All choices agree exactly in both the production labeler and the separate
+schema-3 packing-provenance verifier. The ordered-edge-pair implementation is
+retained only as a test oracle.
 
 Ignoring integer widths and map logarithms, the repeated reference path uses
 `O(V q M^2)` edge-pair visits. The sparse incidence-Gram path uses
