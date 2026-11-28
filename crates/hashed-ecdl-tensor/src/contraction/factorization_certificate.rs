@@ -10,23 +10,52 @@ use crate::child_provenance_certificate::{
 };
 use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
 use crate::factorization_certificate::{
-    description_envelope, verify as standalone_verify, verify_source_dimensions,
-    verify_with_ring as check, Certificate, CertifiedElement, CertifiedMode, EntryTable,
-    SourceDimensionWitness, SCHEMA,
+    description_envelope, group_assignment_projection, incidence_assignment_bundle_projection,
+    packet_assignment_projection, verify as standalone_verify, verify_cauchy_mode_coverage,
+    verify_cauchy_source, verify_ring_multiplication_witness, verify_source_dimensions,
+    verify_with_ring as check, CauchyFactorWitness, CauchySourceWitness, Certificate,
+    CertifiedElement, CertifiedMode, EntryTable, RingMultiplicationWitness, SourceDimensionWitness,
+    SCHEMA,
 };
 use crate::network::FnPredicate;
 use crate::node_refinement_certificate::{
-    verify as verify_node_refinement, verify_strict as verify_strict_node_refinement,
+    history_shrink_bundle_projection, history_shrink_projection, verify as verify_node_refinement,
+    verify_history_shrink_projection, verify_strict as verify_strict_node_refinement,
     Certificate as NodeRefinementCertificate, SCHEMA as NODE_REFINEMENT_SCHEMA,
 };
 use crate::packing_provenance_certificate::{
-    description_envelope as packing_description_envelope, verify as verify_packing_provenance,
+    description_envelope as packing_description_envelope,
+    label_projection as packing_label_projection, verify as verify_packing_provenance,
     Certificate as PackingProvenanceCertificate, EdgeEndpoints,
     SCHEMA as PACKING_PROVENANCE_SCHEMA,
 };
 use crate::Limits;
 use std::collections::BTreeSet;
 use std::sync::Arc;
+
+fn cauchy_source_witness(kernel: &deformation::Cauchy, coordinate: usize) -> CauchySourceWitness {
+    let (sample, base, numerator_unit, factors) = kernel.source_witness_parts();
+    CauchySourceWitness {
+        polynomial: kernel.ring.polynomial().clone(),
+        lower_coefficients: (0..kernel.ring.degree())
+            .map(|index| kernel.ring.polynomial().bit(index as u64))
+            .collect(),
+        a: u32::try_from(kernel.a).unwrap(),
+        coordinate: u32::try_from(coordinate).unwrap(),
+        center: kernel.t,
+        sample: sample.coordinates().to_vec(),
+        base: base.coordinates().to_vec(),
+        numerator_unit: numerator_unit.coordinates().to_vec(),
+        factors: factors
+            .iter()
+            .map(|(&difference, (valuation, inverse))| CauchyFactorWitness {
+                difference,
+                valuation: *valuation,
+                inverse: inverse.coordinates().to_vec(),
+            })
+            .collect(),
+    }
+}
 
 fn assert_source_count_bridge(
     certificate: &Certificate,
@@ -534,6 +563,13 @@ fn produce(
             {
                 return Err(integrity("packing provenance round trip"));
             }
+            if packing_label_projection(&parsed_provenance)
+                .map_err(|_| integrity("packing label projection"))?
+                != packing_label_projection(&provenance)
+                    .map_err(|_| integrity("packing label projection"))?
+            {
+                return Err(integrity("packing label projection"));
+            }
             verify_packing_provenance(&certificate, &parsed_provenance, meter)
                 .map_err(|_| integrity("packing provenance replay"))?;
             if serialized_provenance.len()
@@ -607,6 +643,21 @@ pub(super) fn capture_executed_source_checked(
         .map_err(|_| invalid("executed source certificate parsing"))?;
     standalone_verify(&certificate, meter)
         .map_err(|_| integrity("executed source certificate verification"))?;
+    let cauchy_witness = cauchy_source_witness(&kernel, coordinate);
+    let serialized_cauchy = serde_json::to_vec(&cauchy_witness)
+        .map_err(|_| invalid("executed Cauchy witness serialization"))?;
+    let cauchy_witness: CauchySourceWitness = serde_json::from_slice(&serialized_cauchy)
+        .map_err(|_| invalid("executed Cauchy witness parsing"))?;
+    verify_cauchy_source(&certificate, &cauchy_witness, meter)
+        .map_err(|_| integrity("executed Cauchy witness replay"))?;
+    let provenance = packing_provenance(graph, packing, parameters, coordinate, None);
+    verify_cauchy_mode_coverage(
+        &certificate,
+        &cauchy_witness,
+        &provenance.packet_pairs,
+        meter,
+    )
+    .map_err(|_| integrity("executed Cauchy mode coverage"))?;
     if !assert_source_count_bridge(&certificate, parameters, coordinate, false) {
         return Err(invalid("executed source certificate dimensions"));
     }
@@ -672,16 +723,147 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     });
     standalone_verify(&certificate, &mut standalone_meter).unwrap();
     check(&certificate, &ring, &mut meter).unwrap();
+    let cauchy_witness = cauchy_source_witness(&kernel, coordinate);
+    let serialized_cauchy = serde_json::to_vec(&cauchy_witness).unwrap();
+    let cauchy_witness: CauchySourceWitness = serde_json::from_slice(&serialized_cauchy).unwrap();
+    assert_eq!(
+        serde_json::to_vec(&cauchy_witness).unwrap(),
+        serialized_cauchy
+    );
+    let cauchy_summary = verify_cauchy_source(&certificate, &cauchy_witness, &mut meter).unwrap();
+    assert_eq!(cauchy_summary.grid_points, 8);
+    assert_eq!(cauchy_summary.factors, 7);
+    assert_eq!(cauchy_summary.weights, 16 * certificate.packets.len());
+    assert!(cauchy_summary.mode_rows > 0);
+    assert!(cauchy_summary.mode_columns > 0);
+
+    let left = ring.point(&BigUint::from(15u8)).unwrap();
+    let right = ring.point(&BigUint::from(15u8)).unwrap();
+    let product = ring.mul(&left, &right, &mut meter).unwrap();
+    let multiplication_witness = RingMultiplicationWitness {
+        degree: ring.degree(),
+        precision: ring.precision(),
+        polynomial: ring.polynomial().clone(),
+        lower_coefficients: (0..ring.degree())
+            .map(|index| ring.polynomial().bit(index as u64))
+            .collect(),
+        left: left.coordinates().to_vec(),
+        right: right.coordinates().to_vec(),
+        product: product.coordinates().to_vec(),
+    };
+    let serialized_multiplication = serde_json::to_vec(&multiplication_witness).unwrap();
+    let multiplication_witness: RingMultiplicationWitness =
+        serde_json::from_slice(&serialized_multiplication).unwrap();
+    let multiplication_summary =
+        verify_ring_multiplication_witness(&multiplication_witness, &mut meter).unwrap();
+    let fixture_values: Vec<BigUint> = include_str!(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../research/curve25519_subex_pivot_20261125/ring_multiplication_witness.csv"
+    ))
+    .trim()
+    .split(',')
+    .map(|value| BigUint::parse_bytes(value.as_bytes(), 10).unwrap())
+    .collect();
+    let mut observed_values = vec![
+        BigUint::from(multiplication_witness.degree),
+        BigUint::from(multiplication_witness.precision),
+        multiplication_witness.polynomial.clone(),
+    ];
+    observed_values.extend(
+        multiplication_witness
+            .lower_coefficients
+            .iter()
+            .map(|&value| BigUint::from(u8::from(value))),
+    );
+    observed_values.extend(multiplication_witness.left.iter().cloned());
+    observed_values.extend(multiplication_witness.right.iter().cloned());
+    observed_values.extend(multiplication_witness.product.iter().cloned());
+    observed_values.push(BigUint::from(multiplication_summary.convolution_products));
+    observed_values.push(BigUint::from(multiplication_summary.reductions));
+    assert_eq!(observed_values, fixture_values);
+    let mut bad_multiplication = multiplication_witness.clone();
+    bad_multiplication.product[0] ^= BigUint::from(1u8);
+    assert_eq!(
+        verify_ring_multiplication_witness(&bad_multiplication, &mut meter).unwrap_err(),
+        "ring multiplication product"
+    );
+
+    let mut bad_cauchy = cauchy_witness.clone();
+    bad_cauchy.polynomial ^= BigUint::from(2u8);
+    assert_eq!(
+        verify_cauchy_source(&certificate, &bad_cauchy, &mut meter).unwrap_err(),
+        "Cauchy witness polynomial"
+    );
+    let mut bad_cauchy = cauchy_witness.clone();
+    bad_cauchy.lower_coefficients[0] ^= true;
+    assert_eq!(
+        verify_cauchy_source(&certificate, &bad_cauchy, &mut meter).unwrap_err(),
+        "Cauchy witness polynomial coefficients"
+    );
+    let mut bad_cauchy = cauchy_witness.clone();
+    bad_cauchy.factors[0].valuation += 1;
+    assert_eq!(
+        verify_cauchy_source(&certificate, &bad_cauchy, &mut meter).unwrap_err(),
+        "Cauchy witness factor valuation"
+    );
+    let mut bad_cauchy = cauchy_witness.clone();
+    bad_cauchy.factors.pop();
+    assert_eq!(
+        verify_cauchy_source(&certificate, &bad_cauchy, &mut meter).unwrap_err(),
+        "Cauchy witness factor coverage"
+    );
+    let mut bad_cauchy = cauchy_witness.clone();
+    bad_cauchy.factors[0].inverse[0] =
+        (&bad_cauchy.factors[0].inverse[0] + BigUint::from(1u8)) % ring.modulus();
+    assert_eq!(
+        verify_cauchy_source(&certificate, &bad_cauchy, &mut meter).unwrap_err(),
+        "Cauchy witness factor inverse"
+    );
+    let mut bad_cauchy = cauchy_witness.clone();
+    bad_cauchy.numerator_unit[0] =
+        (&bad_cauchy.numerator_unit[0] + BigUint::from(1u8)) % ring.modulus();
+    assert_eq!(
+        verify_cauchy_source(&certificate, &bad_cauchy, &mut meter).unwrap_err(),
+        "Cauchy witness numerator unit"
+    );
+    let mut bad_cauchy = cauchy_witness.clone();
+    bad_cauchy.coordinate += 1;
+    assert_eq!(
+        verify_cauchy_source(&certificate, &bad_cauchy, &mut meter).unwrap_err(),
+        "Cauchy witness active coordinate"
+    );
     let provenance = packing_provenance(&graph, &packing, &parameters, coordinate, None);
     let provenance_summary =
         verify_packing_provenance(&certificate, &provenance, &mut meter).unwrap();
     assert_eq!(provenance_summary.edges, 2);
     assert_eq!(provenance_summary.packet_length, 4);
     assert!(!provenance_summary.source_capacity_admitted);
+    assert!(!provenance_summary.source_length_mass_admitted);
     assert!(!provenance_summary.source_guard_closure_admitted);
+    let mode_summary = verify_cauchy_mode_coverage(
+        &certificate,
+        &cauchy_witness,
+        &provenance.packet_pairs,
+        &mut meter,
+    )
+    .unwrap();
+    assert!(mode_summary.attempted_modes >= mode_summary.retained_modes);
+    assert_eq!(mode_summary.retained_modes, certificate.modes.len());
+    assert_eq!(mode_summary.mode_rows, cauchy_summary.mode_rows);
+    assert_eq!(mode_summary.mode_columns, cauchy_summary.mode_columns);
 
     let mut bad_provenance = provenance;
     bad_provenance.packet_pairs[0][0].0 ^= 1;
+    assert_eq!(
+        verify_cauchy_mode_coverage(
+            &certificate,
+            &cauchy_witness,
+            &bad_provenance.packet_pairs,
+            &mut meter,
+        )
+        .unwrap_err(),
+        "Cauchy mode header: expected=0, packet=1, tile=0, weight=1"
+    );
     assert_eq!(
         verify_packing_provenance(&certificate, &bad_provenance, &mut meter).unwrap_err(),
         "packing provenance replay"
@@ -752,7 +934,84 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert!(conditional_summary.conditional_labels_verified);
     assert!(conditional_summary.source_bounds_verified);
     assert!(conditional_summary.source_capacity_admitted);
+    assert!(!conditional_summary.source_length_mass_admitted);
     assert!(!conditional_summary.source_guard_closure_admitted);
+    let group_projection = group_assignment_projection(&conditional_certificate).unwrap();
+    assert_eq!(group_projection[0], 1);
+    assert_eq!(group_projection[1], conditional_certificate.radix);
+    assert_eq!(group_projection[2], conditional_certificate.edge_count);
+    assert_eq!(
+        &group_projection[5..5 + conditional_certificate.edge_count],
+        conditional_certificate.left_groups.as_slice()
+    );
+    assert_eq!(
+        &group_projection[5 + conditional_certificate.edge_count..],
+        conditional_certificate.right_groups.as_slice()
+    );
+    let mut invalid_group_projection = conditional_certificate.clone();
+    invalid_group_projection.left_groups[0] = invalid_group_projection.radix;
+    assert_eq!(
+        group_assignment_projection(&invalid_group_projection).unwrap_err(),
+        "factorization group projection context"
+    );
+    let packet_projection = packet_assignment_projection(&conditional_certificate).unwrap();
+    assert_eq!(packet_projection[0], 1);
+    assert_eq!(packet_projection[1], conditional_certificate.packets.len());
+    assert_eq!(packet_projection[2], conditional_certificate.edge_count);
+    assert_eq!(packet_projection[3], conditional_certificate.edge_count);
+    let mut expected_owners = vec![usize::MAX; conditional_certificate.edge_count];
+    let occupied_slots: Vec<_> = conditional_certificate
+        .packets
+        .iter()
+        .enumerate()
+        .flat_map(|(packet, slots)| {
+            slots
+                .iter()
+                .enumerate()
+                .filter_map(move |(slot, edge)| edge.map(|edge| (packet, slot, edge)))
+        })
+        .collect();
+    for &(packet, _, edge) in &occupied_slots {
+        expected_owners[edge] = packet;
+    }
+    assert_eq!(&packet_projection[4..], expected_owners.as_slice());
+    let incidence_projection =
+        incidence_assignment_bundle_projection(&conditional_certificate).unwrap();
+    assert_eq!(incidence_projection[0], 1);
+    assert_eq!(incidence_projection[1], group_projection.len());
+    assert_eq!(
+        &incidence_projection[2..2 + group_projection.len()],
+        group_projection.as_slice()
+    );
+    assert_eq!(
+        &incidence_projection[2 + group_projection.len()..],
+        packet_projection.as_slice()
+    );
+    let mut invalid_packet_projection = conditional_certificate.clone();
+    let (_, _, first_edge) = occupied_slots[0];
+    let (second_packet, second_slot, _) = occupied_slots[1];
+    invalid_packet_projection.packets[second_packet][second_slot] = Some(first_edge);
+    assert_eq!(
+        packet_assignment_projection(&invalid_packet_projection).unwrap_err(),
+        "factorization packet projection context"
+    );
+    let mut missing_degree_cap = conditional_provenance.clone();
+    missing_degree_cap.source_degree_cap = None;
+    assert_eq!(
+        verify_packing_provenance(&conditional_certificate, &missing_degree_cap, &mut meter)
+            .unwrap_err(),
+        "packing provenance context"
+    );
+    let label_fixture_values: Vec<usize> = include_str!(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../research/curve25519_subex_pivot_20261125/packing_label_witness.csv"
+    ))
+    .trim()
+    .split(',')
+    .map(|value| value.parse().unwrap())
+    .collect();
+    let observed_label_values = packing_label_projection(&conditional_provenance).unwrap();
+    assert_eq!(observed_label_values, label_fixture_values);
     let mut bad_degree_cap = conditional_provenance.clone();
     bad_degree_cap.source_degree_cap = Some(0);
     assert_eq!(
@@ -800,6 +1059,10 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
             .unwrap();
             assert_eq!(summary.edges, child.edges.len());
             assert_eq!(
+                summary.edges,
+                summary.row_group_edges + summary.column_group_edges
+            );
+            assert_eq!(
                 summary.packet_entry_tables,
                 conditional_certificate.packets.len()
             );
@@ -829,6 +1092,7 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
         conditional_certificate.tuples.len() * 2 * conditional_graph.edges.len()
     );
     assert!(!family_summary.eightfold_edge_shrink_admitted);
+    assert!(family_summary.rounded_height_child_bound_verified);
     assert!(!family_summary.packet_degree_guard_admitted);
     assert!(!family_summary.strict_source_refinement_admitted);
     let packing_description = packing_description_envelope(&conditional_provenance).unwrap();
@@ -869,7 +1133,57 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     let node_summary = verify_node_refinement(&parsed_node, &mut meter).unwrap();
     assert!(node_summary.normalized_precision_admitted);
     assert!(!node_summary.source_guard_closure_admitted);
+    assert!(!node_summary.source_length_mass_admitted);
+    assert!(node_summary.rounded_height_child_bound_verified);
+    assert!(!node_summary.history_shrink_derived_from_packing);
     assert!(!node_summary.strict_source_refinement_admitted);
+    let history_projection = history_shrink_projection(&node_summary);
+    assert_eq!(history_projection[2], node_summary.edges);
+    assert_eq!(
+        history_projection[7],
+        BigUint::from(node_summary.maximum_child_edges)
+    );
+    assert_eq!(
+        verify_history_shrink_projection(&history_projection).unwrap_err(),
+        "node refinement history projection context"
+    );
+    let exact_history_projection = [
+        BigUint::from(1u8),
+        BigUint::from(64u8),
+        BigUint::from(32u8),
+        BigUint::from(2u8),
+        BigUint::from(4u8),
+        BigUint::from(8u8),
+        BigUint::from(8u8),
+        BigUint::from(1u8),
+    ];
+    verify_history_shrink_projection(&exact_history_projection).unwrap();
+    for (index, replacement) in [(2, 7u8), (6, 9u8), (7, 2u8)] {
+        let mut invalid = exact_history_projection.clone();
+        invalid[index] = BigUint::from(replacement);
+        assert_eq!(
+            verify_history_shrink_projection(&invalid).unwrap_err(),
+            "node refinement history projection arithmetic"
+        );
+    }
+    assert_eq!(
+        verify_history_shrink_projection(&exact_history_projection[..7]).unwrap_err(),
+        "node refinement history projection context"
+    );
+    let history_bundle =
+        history_shrink_bundle_projection(&node_summary, &conditional_provenance).unwrap();
+    assert_eq!(
+        &history_bundle[..history_projection.len()],
+        history_projection.as_slice()
+    );
+    assert_eq!(
+        history_bundle[history_projection.len()..],
+        packing_label_projection(&conditional_provenance)
+            .unwrap()
+            .into_iter()
+            .map(BigUint::from)
+            .collect::<Vec<_>>()
+    );
     assert_eq!(
         verify_strict_node_refinement(&parsed_node, &mut meter).unwrap_err(),
         "node refinement strict source guards"
@@ -1069,6 +1383,99 @@ fn independent_certificate_checks_all_six_factorization_obligations() {
     assert!(check(&bad_entry, &ring, &mut meter)
         .unwrap_err()
         .starts_with("packet coefficient table:"));
+}
+
+fn check_strict_source_guard_exact_boundary(
+    packet_exponent: usize,
+    edges: usize,
+    expected_projection: Option<&str>,
+) -> (usize, usize, u64) {
+    let mut meter = Meter::new(Limits {
+        steps: 100_000_000,
+        ..Limits::default()
+    });
+    let parameters = Parameters {
+        radix: 2,
+        u: 1,
+        a: packet_exponent,
+        length: 1usize << packet_exponent,
+        array: 2usize.pow((2 * packet_exponent) as u32),
+    };
+    let endpoints: Vec<_> = (0..edges).collect();
+    let graph = partition_graph(&endpoints, &endpoints);
+    graph.validate().unwrap();
+    let packing = packing::pack(&graph, &parameters, 1, &mut meter).unwrap();
+    let certificate = Certificate {
+        schema: SCHEMA,
+        degree: 1,
+        radix: parameters.radix,
+        precision: 1,
+        tiles: 2,
+        edge_count: graph.edges.len(),
+        packets: packing
+            .packets
+            .iter()
+            .map(|packet| packet.slots.clone())
+            .collect(),
+        left_groups: graph
+            .edges
+            .iter()
+            .map(|edge| packing::digit(packing.row_labels[edge.left.0], 0, parameters.radix))
+            .collect(),
+        right_groups: graph
+            .edges
+            .iter()
+            .map(|edge| packing::digit(packing.column_labels[edge.right.0], 0, parameters.radix))
+            .collect(),
+        weights: Vec::new(),
+        modes: Vec::new(),
+        tuples: Vec::new(),
+        entries: Vec::new(),
+    };
+    let provenance = packing_provenance(&graph, &packing, &parameters, 0, Some(1));
+    let summary = verify_packing_provenance(&certificate, &provenance, &mut meter).unwrap();
+    assert_eq!(summary.edges, edges);
+    assert!(summary.conditional_labels_verified);
+    assert!(summary.source_bounds_verified);
+    assert_eq!(summary.padded_class_height, summary.maximum_class);
+    assert!(summary.source_length_mass_admitted);
+    assert!(summary.source_guard_closure_admitted);
+    if let Some(expected_projection) = expected_projection {
+        let projection = packing_label_projection(&provenance).unwrap();
+        let fixture_values: Vec<usize> = expected_projection
+            .trim()
+            .split(',')
+            .map(|value| value.parse().unwrap())
+            .collect();
+        assert_eq!(projection, fixture_values);
+    }
+    (summary.packets, summary.maximum_class, meter.used)
+}
+
+#[test]
+fn strict_source_guard_projection_accepts_nontrivial_exact_boundary() {
+    let _ = check_strict_source_guard_exact_boundary(
+        1,
+        32,
+        Some(include_str!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../research/curve25519_subex_pivot_20261125/packing_label_source_guard_witness.csv"
+        ))),
+    );
+}
+
+#[test]
+fn strict_source_guard_projection_accepts_larger_exact_boundaries() {
+    for (packet_exponent, edges) in [(2, 512), (3, 8_192), (4, 131_072)] {
+        let (packets, maximum_class, steps) =
+            check_strict_source_guard_exact_boundary(packet_exponent, edges, None);
+        let label_classes = 2usize.pow((2 * packet_exponent) as u32);
+        assert_eq!(maximum_class, edges / label_classes);
+        eprintln!(
+            "exact-boundary a={packet_exponent} M={edges} D={label_classes} \
+             max_class={maximum_class} packets={packets} charged_steps={steps}"
+        );
+    }
 }
 
 #[test]

@@ -387,6 +387,9 @@ mod tests {
     use super::*;
     use crate::contraction::{Edge, Tensor, TensorKind, TensorVertex};
     use crate::network::FnPredicate;
+    use crate::packing_provenance_certificate::{
+        replay_conditional_labels_for_test, EdgeEndpoints,
+    };
     use crate::Limits;
     use std::sync::Arc;
 
@@ -433,21 +436,47 @@ mod tests {
     }
 
     #[test]
-    fn incidence_gram_labels_match_quadratic_objective() {
+    fn production_and_provenance_labels_match_quadratic_objective() {
         let mut reference_meter = Meter::new(Limits {
             steps: 1_000_000_000,
             ..Limits::default()
         });
         let mut optimized_meter = reference_meter.clone();
+        let mut provenance_meter = reference_meter.clone();
         let mut cases = 0usize;
         for edges in 0..=3usize {
             for description in 0..9usize.pow(edges as u32) {
                 let graph = three_by_three_graph(edges, description);
+                let endpoints: Vec<_> = graph
+                    .edges
+                    .iter()
+                    .map(|edge| EdgeEndpoints {
+                        left: edge.left.0,
+                        left_port: edge.left.1,
+                        right: edge.right.0,
+                        right_port: edge.right.1,
+                    })
+                    .collect();
                 for labels in 1..=4 {
+                    let reference =
+                        reference_conditional_labels(&graph, labels, &mut reference_meter).unwrap();
+                    let production =
+                        conditional_labels(&graph, labels, &mut optimized_meter).unwrap();
+                    let provenance = replay_conditional_labels_for_test(
+                        &endpoints,
+                        graph.left.len(),
+                        graph.right.len(),
+                        labels,
+                        &mut provenance_meter,
+                    )
+                    .unwrap();
                     assert_eq!(
-                        conditional_labels(&graph, labels, &mut optimized_meter).unwrap(),
-                        reference_conditional_labels(&graph, labels, &mut reference_meter).unwrap(),
-                        "edges={edges}, description={description}, labels={labels}",
+                        production, reference,
+                        "production: edges={edges}, description={description}, labels={labels}"
+                    );
+                    assert_eq!(
+                        provenance, reference,
+                        "provenance: edges={edges}, description={description}, labels={labels}"
                     );
                     cases += 1;
                 }
@@ -455,6 +484,7 @@ mod tests {
         }
         assert_eq!(cases, 3_280);
         assert!(optimized_meter.used < reference_meter.used);
+        assert!(provenance_meter.used < reference_meter.used);
     }
 
     #[test]
