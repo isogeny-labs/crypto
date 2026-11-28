@@ -1,0 +1,551 @@
+{
+  "all_verified": true,
+  "calibration": {
+    "ns_per_add": 58.25625,
+    "ns_per_as_solve": null,
+    "ns_per_canon": null,
+    "ns_per_double": 64.01272483125,
+    "ns_per_frobenius": null,
+    "ns_per_inversion": 43.7626775625,
+    "ns_per_legendre": 29.84182231875,
+    "ns_per_lookup": 0.82321906875,
+    "ns_per_row_op": 1.0401070875,
+    "ns_per_s4_pair": null,
+    "ns_per_sqrt": 45.232249725,
+    "ns_per_word_xor": 0.14866995,
+    "pinned_units": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_sqrt",
+      "ns_per_word_xor",
+      "ns_per_legendre",
+      "ns_per_inversion"
+    ]
+  },
+  "calibration_pins": {
+    "measured": [],
+    "pinned": [
+      "ns_per_double",
+      "ns_per_lookup",
+      "ns_per_row_op",
+      "ns_per_sqrt",
+      "ns_per_word_xor",
+      "ns_per_legendre",
+      "ns_per_inversion"
+    ]
+  },
+  "configurations_run": 1,
+  "configurations_skipped": [],
+  "cost_qualification": null,
+  "elapsed_seconds": 0.163422125,
+  "instance": "icv1-fp18-t175-45770ebc",
+  "markdown": "| instance | configuration | base | cols | pts/col | hit rate | trials | rows | rank | D_solve | D_sr | S | vs rho | correct |\n|:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|:--|--:|--:|:--|\n| icv1-fp18-t175-45770ebc | prime-mixed-isogeny[degrees=3;3;5;11,seed=7] + subtract + — + walk | 492 | 246 | 2.0 | 0.331 | 486 | 161 | 161 | — | — | 366.010 | 270.93× | yes |\n",
+  "operation": "bench",
+  "plan": null,
+  "regime": "prime",
+  "rho_reference": {
+    "all_verified": true,
+    "automorphisms": 2,
+    "max_s": 2.1620994695360087,
+    "mean_s": 1.3509456280888137,
+    "mean_s_walk": 0.9702323625443855,
+    "method": "negation-map r-adding walk: look-ahead, short-cycle escape by doubling, distinguished points, stride starts",
+    "min_s": 0.7154868045661655,
+    "per_run": [
+      {
+        "planted": 203179,
+        "s": 0.7760881459365239,
+        "s_walk": 0.42811915355188596,
+        "seed": 124055164282,
+        "steps": 198,
+        "steps_over_expected": 0.48308073390251294,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 1.538492118015225,
+        "s_walk": 1.1592450139555632,
+        "seed": 124055164283,
+        "steps": 541,
+        "steps_over_expected": 1.3080679233068044,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 1.9842052093843117,
+        "s_walk": 1.5541311738527366,
+        "seed": 124055164280,
+        "steps": 734,
+        "steps_over_expected": 1.7536492395091223,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 0.9989446916210672,
+        "s_walk": 0.6333817614192285,
+        "seed": 124055164281,
+        "steps": 305,
+        "steps_over_expected": 0.7146947844037177,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 0.9012005926366183,
+        "s_walk": 0.5415023083738466,
+        "seed": 124055164286,
+        "steps": 265,
+        "steps_over_expected": 0.6110199237031785,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 2.0017991472015124,
+        "s_walk": 1.5502214098933587,
+        "seed": 124055164287,
+        "steps": 734,
+        "steps_over_expected": 1.7492375433090992,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 1.5756348756293155,
+        "s_walk": 1.182703597711831,
+        "seed": 124055164284,
+        "steps": 566,
+        "steps_over_expected": 1.334538100506942,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 1.4485675469495318,
+        "s_walk": 1.0615009149711145,
+        "seed": 124055164285,
+        "steps": 504,
+        "steps_over_expected": 1.1977755183062306,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 0.7154868045661655,
+        "s_walk": 0.3675178121815277,
+        "seed": 124055164274,
+        "steps": 177,
+        "steps_over_expected": 0.4146994428021572,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 1.01262886547889,
+        "s_walk": 0.6627049911145632,
+        "seed": 124055164275,
+        "steps": 307,
+        "steps_over_expected": 0.7477825059038898,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 1.0556362690320475,
+        "s_walk": 0.6939831027895869,
+        "seed": 124055164272,
+        "steps": 335,
+        "steps_over_expected": 0.7830760755040734,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 1.6088678692840281,
+        "s_walk": 1.1983426535493429,
+        "seed": 124055164273,
+        "steps": 584,
+        "steps_over_expected": 1.352184885307034,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 1.4798456586245556,
+        "s_walk": 1.0810497347680044,
+        "seed": 124055164278,
+        "steps": 506,
+        "steps_over_expected": 1.2198339993063454,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 2.1620994695360087,
+        "s_walk": 1.7398449619231895,
+        "seed": 124055164279,
+        "steps": 831,
+        "steps_over_expected": 1.9632048090102123,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 1.4055601433963745,
+        "s_walk": 1.0712753248695595,
+        "seed": 124055164276,
+        "steps": 503,
+        "steps_over_expected": 1.208804758806288,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 0.9500726421288428,
+        "s_walk": 0.5981938857848269,
+        "seed": 124055164277,
+        "steps": 290,
+        "steps_over_expected": 0.6749895186035112,
+        "verified": true
+      }
+    ],
+    "runs": 16
+  },
+  "rho_reference_candidates": [],
+  "rho_reference_plain": {
+    "all_verified": true,
+    "automorphisms": 1,
+    "max_s": 6.265396744903171,
+    "mean_s": 4.033898965088204,
+    "mean_s_walk": 1.7064897881447465,
+    "method": "r-adding walk, distinguished points, 16 jumps",
+    "min_s": 2.306760736032993,
+    "per_run": [
+      {
+        "planted": 203179,
+        "s": 4.244048777904769,
+        "s_walk": 1.698792440349721,
+        "seed": 124055164282,
+        "steps": 869,
+        "steps_over_expected": 1.355440260163665,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 2.8306691065896388,
+        "s_walk": 1.014583747458579,
+        "seed": 124055164283,
+        "steps": 519,
+        "steps_over_expected": 0.8095207077387135,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 4.693671633233234,
+        "s_walk": 2.099543246185961,
+        "seed": 124055164280,
+        "steps": 1074,
+        "steps_over_expected": 1.6751931408697078,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 5.737578610387147,
+        "s_walk": 2.621496734762918,
+        "seed": 124055164281,
+        "steps": 1341,
+        "steps_over_expected": 2.0916517708624567,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 2.306760736032993,
+        "s_walk": 0.5688706560894923,
+        "seed": 124055164286,
+        "steps": 291,
+        "steps_over_expected": 0.4538931135876024,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 4.936076998714666,
+        "s_walk": 2.0839041903484494,
+        "seed": 124055164287,
+        "steps": 1066,
+        "steps_over_expected": 1.6627149796714233,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 2.987059664964757,
+        "s_walk": 1.0771399708086262,
+        "seed": 124055164284,
+        "steps": 551,
+        "steps_over_expected": 0.859433352531852,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 3.221645502527434,
+        "s_walk": 1.3019513984728586,
+        "seed": 124055164285,
+        "steps": 666,
+        "steps_over_expected": 1.0388069197571932,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 3.555930321054249,
+        "s_walk": 1.778942601516969,
+        "seed": 124055164274,
+        "steps": 910,
+        "steps_over_expected": 1.4193908363048735,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 2.3302193197892604,
+        "s_walk": 0.9715763439054216,
+        "seed": 124055164275,
+        "steps": 497,
+        "steps_over_expected": 0.7752057644434309,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 5.737578610387147,
+        "s_walk": 2.4064597169971305,
+        "seed": 124055164272,
+        "steps": 1231,
+        "steps_over_expected": 1.9200770543860433,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 4.386755162422064,
+        "s_walk": 1.616687397202784,
+        "seed": 124055164273,
+        "steps": 827,
+        "steps_over_expected": 1.2899299138726708,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 6.265396744903171,
+        "s_walk": 2.615632088823851,
+        "seed": 124055164278,
+        "steps": 1338,
+        "steps_over_expected": 2.0869724604131,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 3.22946503044619,
+        "s_walk": 1.4211991992338862,
+        "seed": 124055164279,
+        "steps": 727,
+        "steps_over_expected": 1.1339528988941132,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 4.701491161151989,
+        "s_walk": 2.805255640853682,
+        "seed": 124055164276,
+        "steps": 1435,
+        "steps_over_expected": 2.2382701649423007,
+        "verified": true
+      },
+      {
+        "planted": 203179,
+        "s": 3.378036060902552,
+        "s_walk": 1.2218012373056106,
+        "seed": 124055164277,
+        "steps": 625,
+        "steps_over_expected": 0.9748563436159846,
+        "verified": true
+      }
+    ],
+    "runs": 16
+  },
+  "rho_reference_rule": "negation map (A = 2): the only eligible automorphism of this curve",
+  "rows": [
+    {
+      "decomposition": {
+        "cost": {
+          "gae": 186720.745977,
+          "group_ops": {
+            "adds": 183581,
+            "doubles": 550,
+            "scalar_mults": 34
+          },
+          "native": {
+            "canonicalisations": 0,
+            "direct_relations_skipped": 0,
+            "frobfold_mismatches": 0,
+            "inversions": 0,
+            "lift_failures": 0,
+            "lookups": 182781,
+            "relations": 161,
+            "repeated_targets_skipped": 0,
+            "s4_hits": 0,
+            "s4_pairs": 0,
+            "sqrt_solves": 0,
+            "target_guard_probes": 486,
+            "trials": 486,
+            "unliftable_systems": 0,
+            "walk_jumps": 16,
+            "walk_pool_offsets": 0,
+            "walk_pool_ops": 0,
+            "walk_pool_restarts": 0,
+            "walk_restarts": 1,
+            "walk_steps": 485
+          },
+          "wall_ns": 6253164,
+          "work_native": {
+            "counted:walk_bookkeeping": 1,
+            "target_rng_draws": 34,
+            "walk_mix_hashes": 485,
+            "walk_modr_adds": 970
+          }
+        },
+        "description": "for each signed base point P, test whether R − P is in the base",
+        "gae_before_solver": 186720.745977,
+        "hit_rate": 0.33127572016460904,
+        "name": "subtract",
+        "relations_found": 161,
+        "setup": {
+          "gae": 0.0,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {},
+          "wall_ns": 29750,
+          "work_native": {
+            "counted:table_insert_attempts": 1
+          }
+        },
+        "solver": null,
+        "summands": 2,
+        "system": null,
+        "targets_tried": 486
+      },
+      "exhausted": false,
+      "factor_base": {
+        "abscissae": 246,
+        "columns": 246,
+        "cost": {
+          "gae": 444.567501,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "aux_curves_tried": 20,
+            "aux_order": 261855,
+            "chain_degree": 495,
+            "legendre_symbols": 495,
+            "sqrt_solves": 246,
+            "tower_levels": 4
+          },
+          "wall_ns": 153699750,
+          "work_native": {
+            "counted:base_index_builds": 1,
+            "index_inserts": 1476,
+            "index_point_negations": 492,
+            "index_sort_word_ops": 2214
+          }
+        },
+        "description": "mixed-degree Vélu chain degrees=3;3;5;11 (aux search and chain build uncharged)",
+        "name": "prime-mixed-isogeny",
+        "points_per_column": 2.0,
+        "signed_points": 492
+      },
+      "group_order": 261673,
+      "instance": "icv1-fp18-t175-45770ebc",
+      "label": "prime-mixed-isogeny[degrees=3;3;5;11,seed=7] + subtract + — + walk",
+      "linear_algebra": {
+        "cost": {
+          "gae": 37.154174000000005,
+          "group_ops": {
+            "adds": 0,
+            "doubles": 0,
+            "scalar_mults": 0
+          },
+          "native": {
+            "columns": 247,
+            "pinned_by_repeated_row": 0,
+            "rank": 161,
+            "repeated_column_rows": 0,
+            "row_ops": 2081,
+            "rows": 161,
+            "single_column_rows": 0,
+            "two_column_rows": 161
+          },
+          "wall_ns": 227836,
+          "work_native": {
+            "column_part_inserts": 161,
+            "counted:gauss_column_scans_and_pivot_inversions": 1,
+            "counted:relation_row_construction": 1,
+            "gauss_entries_scanned": 150852,
+            "pivot_inversion_steps": 5796,
+            "row_build_modr_adds": 483,
+            "row_build_modr_muls": 322,
+            "row_build_words": 118979,
+            "row_key_mixes": 322
+          }
+        },
+        "dependent": 0,
+        "name": "incremental-gauss",
+        "rank": 161,
+        "rows": 161,
+        "work": 2081,
+        "work_unit": "row_ops"
+      },
+      "log2_r": 17.997405546030816,
+      "r": 261673,
+      "recovered": 203179,
+      "rho_s": 1.3509456280888137,
+      "s": 366.00955749767536,
+      "s_over_rho": 270.9284147989509,
+      "spec": {
+        "factor_base": "prime-mixed-isogeny",
+        "factor_base_params": {
+          "degrees": "3;3;5;11",
+          "seed": "7"
+        },
+        "linalg": "incremental-gauss",
+        "max_trials": 3000,
+        "oracle": "subtract",
+        "oracle_params": {},
+        "seed": 123212651130,
+        "solver": null,
+        "solver_budget_seconds": 120,
+        "solver_params": {},
+        "targets": "Walk"
+      },
+      "total_gae": 187228.46765200002,
+      "verified": true,
+      "verify": {
+        "gae": 26.0,
+        "group_ops": {
+          "adds": 9,
+          "doubles": 17,
+          "scalar_mults": 1
+        },
+        "native": {},
+        "wall_ns": 1750
+      },
+      "wall_seconds": 0.160389083
+    }
+  ],
+  "schema_version": 1,
+  "software": {
+    "arch": "aarch64",
+    "binary_blake3": "f367114228caf73015b8302dfb8d49546de7f0ba7da17c9b540736ba9d3b8fe2",
+    "git_commit": null,
+    "git_commit_source": null,
+    "git_dirty": null,
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "status": "complete",
+  "what_this_is": "Index-calculus configurations -- each a choice of factor base, target source, decomposition oracle, polynomial solver and relation matrix -- run end to end against a planted logarithm, with counted phase costs in group-addition equivalents divided by sqrt(r); consult cost_qualification for unpriced work.",
+  "what_this_is_not": [
+    "not a speed claim: a configuration on a known-answer instance is a measurement, and a comparison needs the matched reference rows AGENTS.md section 1 asks for",
+    "not a wall-clock benchmark: operation counts are the metric, wall time rides along",
+    "not a claim about any deployed curve"
+  ]
+}
