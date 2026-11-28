@@ -1,0 +1,13 @@
+# Native closed fibers of the actual degree6 backmap
+
+2026-11-16,frozen before affected fiber data. Exact input:kernel3 quartic,degree6 original-field backmap PCC-20261116-00cca4,and the existing source group arithmetic. Continue FIBER_CLASS_PLAN.md and Tian arXiv:2007.03172 section4.3's rational-map representation. KB tools are absent and wrapper search exits127;the official Bareiss1968 primary-PDF URL returns403. The exact fraction-free determinant recurrence is therefore qualified by native polynomial controls;no novelty or timing claim.
+
+For each finite public P,form g=A-x(P)B and h=V-y(P)M,M=2LB^2. Build Sylvester determinants with fraction-free Bareiss elimination over Fp[x],including exact division and row-pivot signs. Require a quadratic/linear known-resultant control and an actual-quartic/linear evaluation control. Reject altered control output.
+
+Take the monic gcd of Res_y(F,g),Res_y(F,h),then remove all factors meeting Res_y(F,B) by repeated gcd/exact division,at most64 degree-decreasing steps. Require a monic,squarefree polynomial U of degree6. No alternate public target or changed chart after a mathematical failure. This supported chart requires every point of the fiber to be finite,with distinct x-coordinates and nonzero rational-map denominator.
+
+In R=Fp[x]/U,compute gcd_y(F,g,h). A nonunit coefficient inversion must return its exact proper factor of U;split,rebuild the residue objects,recurse,and CRT-recombine. Bound split depth by6. Require a linear y-gcd and independently check the resulting ideal(U,y-v) against the original curve,g,h,all denominator units and constant image coordinates. Check residue zero-divisor detection and CRT on fixed linear factors,with a changed CRT value rejected. Never silently treat this product algebra as a field.
+
+Fix S=2G. Evaluate the four distinct fibers needed for P=0,G,2G,Q,with Q=37G generated outside the fiber evaluator. The evaluator receives only public point coordinates. Represent the pullback by D_(P+S)-D_S. The norm uses the coordinates recovered from the fiber algebra;require its difference to equal[6]P and inverse6 source-point recovery. Retain U,v,source/image/norm points,all exact split/saturation counts,and the public divisor pairs. Check every coefficient fixed by prime Frobenius and reject a changed fiber-v coefficient.
+
+This unit executes closed effective fibers and their signed divisor presentation/norm. It does not yet execute target Jacobian class arithmetic,prove a generic full-J(H) isogeny,or recover a DLP scalar. Those remain original acceptance steps. No paid/performance run or source-scalar witness is passed to the evaluator.
