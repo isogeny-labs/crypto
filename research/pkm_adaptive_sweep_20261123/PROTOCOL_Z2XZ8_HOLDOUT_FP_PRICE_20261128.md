@@ -31,6 +31,8 @@ Run the six primes in forward order, then in reverse order in a second quiet
 window. Do not start the held-out series while the development-price watcher
 is still running. A pre-call host load above the logical CPU count or a named
 competing compute process records a rejected check without a child launch.
+The held-out store header pins the completed development store's SHA-256;
+replay verifies all 12 qualifying development cases against that snapshot.
 A post-call violation makes the attempt unqualified. Keep all attempts,
 including failures and contamination, in an append-only store; refuse an
 unresolved launch on resume. Cap each process at 30 seconds and 2 GiB, and at

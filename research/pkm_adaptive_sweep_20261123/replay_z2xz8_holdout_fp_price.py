@@ -128,6 +128,7 @@ def main():
     parser.add_argument("--bin", type=Path, required=True)
     parser.add_argument("--build-receipt", type=Path, required=True)
     parser.add_argument("--store", type=Path, required=True)
+    parser.add_argument("--development-store", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     manifest = args.manifest.resolve(strict=True)
@@ -136,6 +137,7 @@ def main():
     binary = args.bin.resolve(strict=True)
     build_path = args.build_receipt.resolve(strict=True)
     store = args.store.resolve(strict=True)
+    development_store = args.development_store.resolve(strict=True)
     here = Path(__file__).resolve().parent
     source = here / "fp_mul_explicit.rs"
     protocol = here / "PROTOCOL_Z2XZ8_HOLDOUT_FP_PRICE_20261128.md"
@@ -173,6 +175,20 @@ def main():
         raise ValueError("header must be first receipt")
     validate_sequence(rec, ordered, list(primes))
     header = rec.get("header") or {}
+    development_rows, development_order = receipts(development_store)
+    development_header = development_rows.get("header") or {}
+    if (not development_order or development_order[0] != "header"
+            or development_header.get("schema") != "pkm-explicit-fp-price/v1"
+            or development_header.get("host") != header.get("host")
+            or header.get("development_store_sha256") != sha(development_store.read_bytes())):
+        raise ValueError("development-price admission receipt differs")
+    for series in ("forward", "reverse"):
+        for t in (4, 5):
+            for c in range(3):
+                prefix = f"result:{series}:t{t}_c{c}:a"
+                if not any(k.startswith(prefix) and row.get("qualifying") is True
+                           for k, row in development_rows.items()):
+                    raise ValueError("development-price series was incomplete")
     if (header.get("schema") != "pkm-z2xz8-heldout-fp-price/v1"
             or header.get("source_commit") != IC_SOURCE
             or header.get("manifest_sha256") != MANIFEST_SHA

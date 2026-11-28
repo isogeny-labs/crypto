@@ -125,6 +125,7 @@ def main():
             or build.get("compile_exit_code") != 0):
         parser.error("standalone calibration build receipt differs")
     helper, helper_sha = helper_from(checkout)
+    dev_complete = development_done(args.development_store)
     entries = sorted(read(manifest)["entries"],
                      key=lambda e: (e["bits"], e["curve_index"]))
     if [(e["bits"], e["curve_index"], e["p"]) for e in entries] != [
@@ -136,6 +137,8 @@ def main():
             parser.error(f"workload hash differs: {e['path']}")
     header = {"id": "header", "schema": "pkm-z2xz8-heldout-fp-price/v1",
               "source_commit": IC_SOURCE, "ic_binary_sha256": IC_SHA,
+              "development_store_sha256": (sha(args.development_store.read_bytes())
+                                           if dev_complete else None),
               "manifest_sha256": MANIFEST_SHA,
               "primes": {f"b{e['bits']}_c{e['curve_index']}": e["p"] for e in entries},
               "calibration_binary_sha256": sha(binary.read_bytes()),
@@ -149,10 +152,10 @@ def main():
               "created_utc": dt.datetime.now(dt.timezone.utc).isoformat()}
     if args.dry_run:
         print(json.dumps({"header": header, "series": args.series,
-                          "development_complete": development_done(args.development_store)},
+                          "development_complete": dev_complete},
                          sort_keys=True))
         return
-    if not development_done(args.development_store):
+    if not dev_complete:
         print(json.dumps({"waiting_for_development_price_series":
                           str(args.development_store)}, sort_keys=True))
         return
