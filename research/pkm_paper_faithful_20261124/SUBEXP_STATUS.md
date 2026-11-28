@@ -154,3 +154,25 @@ and no such algorithm is known for any polynomial system. That is the precise
 content of "there is no cube-root algorithm here": not that a search has not
 found one, but that the requirement reduces to an open problem in elimination
 theory, with the numbers attached.
+
+## One alternative checked and closed: `E' = E`
+
+If the auxiliary curve were the target curve itself, the factor base
+`±(R' + H)` would be a union of two cosets of a subgroup of `E(F_p)`, sums
+would fall in three cosets, and a relation would be found in `O(1)` per target
+(test `[S](R − 2R') = O`) instead of a scan of `|V|`. That is the only
+structure I found that makes the relation step **sublinear per target**, so it
+is worth recording why it cannot be used.
+
+`H ⊂ E(F_p)` of order `S ≈ p^{1/2}` needs `#E` to have a divisor of that size.
+The benchmark curves are prime order (`#E = r`, `h = 1`), so the only
+subgroups are trivial. If `#E` were smooth instead, Pohlig–Hellman solves the
+instance in `O(√(largest prime factor))` — the relation search would never be
+reached. So for exactly the instances where the ECDLP is hard, `E(F_p)` has no
+such `H`, which is the reason PKM moves the smoothness to an auxiliary curve
+in the first place. The `O(1)` relation finder exists only where the DLP is
+already easy.
+
+This closes the last structural alternative I could construct: every route in
+this family either costs `p` (dense/scan), measures `p^{1.2–1.9}` (algebra),
+or requires a subgroup the hard instances do not have.
