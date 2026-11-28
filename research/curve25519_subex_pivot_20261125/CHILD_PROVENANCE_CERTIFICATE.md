@@ -45,6 +45,11 @@ Cartesian tuple/group keys, rejects duplicates and omissions, checks exactly
 in every child. Its checked summary separately reports the actual eightfold
 edge-shrink test and the degree guard `max_degree<=delta` with `2L<=delta`; it
 marks strict source refinement only when both hold under the fixed radix 64.
+Each child summary now also reports exact row-group and column-group incidence
+counts and checks their sum against the reconstructed edge array. The family
+verifier recomputes class maximum and native padded height from packing source
+data, then checks `child*radix<=2*height*D` for every exact child. The composed
+node keeps this premise check separate from observed eightfold shrink.
 The small admitted control correctly reports these strict guards as false.
 Existing port-mass controls separately cover 25,490 group-child calls across
 parallel ports, isolates, several radices, and packet geometries using direct
@@ -58,6 +63,9 @@ The packet values and mode coefficients are established by the separately
 accepted factorization certificate; arbitrary old tensors remain referenced,
 not re-serialized. `PROVENANCE_DESCRIPTION_ENVELOPE.md` shows that the complete
 family is `T` times a polynomial structural factor, not a second tuple
-exponential. It does not prove a uniform arbitrary-size object refinement or
-the external contraction theorem. No practical Curve25519 attack follows.
+exponential. Exact native incidence replay now supplies the natural-number
+child-bound premise consumed by the formal source-to-history theorem, but the
+cross-language semantic binding remains open. It does not prove a uniform
+arbitrary-size object refinement or the external contraction theorem. No
+practical Curve25519 attack follows.
 `[pcc:unverified]`

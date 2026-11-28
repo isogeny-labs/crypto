@@ -1,0 +1,30 @@
+{
+  "schema": "chained-portable-replay/v1",
+  "recorded": "2026-11-27T23:27:25.465622+00:00",
+  "head": "05306a3c92246e4169b99aec128cefaf687046b9",
+  "sources": {
+    "C": "91db340ea313aaefe12e9c39a458a7b81929eeb7",
+    "E": "e30f6512a0d13075ef177c38693f34f7027d317e"
+  },
+  "reference_results": "7b52e831e2df3b6c69e23493c889738cacc742da",
+  "host": {
+    "system": "Linux",
+    "node": "0de67fdf35ff",
+    "release": "6.18.57",
+    "version": "#1 SMP Tue Oct 20 21:56:04 UTC 2026",
+    "machine": "x86_64",
+    "processor": ""
+  },
+  "limits": {
+    "phase_seconds": 120,
+    "address_space_bytes": 2147483648,
+    "workers": 1
+  },
+  "classification": "Distinct portable replay of frozen public correctness/source-operation certificates C/E; no new cohort, timing, scaling or performance admission.",
+  "boundary": "Distinct CI runtime. Official compiler and named Rust runtime pinned; OS libraries ambient. No timing or independent-signature claim.",
+  "environment": {
+    "RAYON_NUM_THREADS": "1",
+    "CARGO_BUILD_JOBS": "1",
+    "CHECKPOINT_SKIP": "Distinct portable replay of frozen public correctness/source-operation certificates C/E; no new cohort, timing, scaling or performance admission."
+  }
+}

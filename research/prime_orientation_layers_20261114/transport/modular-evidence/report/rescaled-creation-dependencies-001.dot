@@ -1,0 +1,16 @@
+digraph G {
+rankdir=TB;node[shape=box,style="rounded,filled",fontname="Helvetica",fontsize=13,fillcolor="#edf4fa"];
+a[label="Actual full content + SAME-k trim
+right integrality"];
+b[label="Existing Rep constructors
+SAME integer numerator, D*2^gain"];
+c[label="Actual scalar denominator and word numerator
+width pc+E+gain; SAME label/k"];
+d[label="Existing signed finite extraction
+canonical coefficient, exact skipped bits"];
+e[label="Charged arithmetic events + scalar freeze
+later lift preserves creation word"];
+f[label="NEXT: precision-valid mode omission
+then original child and full public costs",fillcolor="#fff1dc"];
+{rank=same;a;b;}a->b;b->c;a->d;c->d;d->e;e->f[style=dashed];
+}

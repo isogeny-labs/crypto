@@ -29,15 +29,11 @@
 //! on a 3-isogenous curve E' → 3-isogeny back to G2 → multiply by
 //! `h_eff` to clear the cofactor.
 //!
-//! ## Caveat
+//! ## Verification guarantees
 //!
-//! The pairing in this crate is documented as not-yet-bilinear (see
-//! `pairing.rs`).  The `bls_verify` and `bls_aggregate_verify`
-//! routines are spec-correct but, like the bilinearity tests in
-//! `pairing.rs`, can only succeed against a bilinear pairing.  All
-//! the **algebraic** primitives below (keygen, sign, aggregate,
-//! hash_to_G2) are independently testable and do pass — see the
-//! tests at the bottom of this file.
+//! [`bls_verify`] and [`bls_aggregate_verify`] validate curve and
+//! prime-order subgroup membership on public keys and signatures before
+//! evaluating the optimal-ate pairing equation from [`super::pairing`].
 
 use super::fq::{modulus, scalar_modulus, Fq};
 use super::fq2::Fq2;
@@ -96,7 +92,13 @@ pub fn bls_sign(sk: &BlsSecretKey, msg: &[u8], dst: &[u8]) -> BlsSignature {
 
 /// Verify: `e(-G1, sig) · e(pk, H(msg)) == 1`.
 pub fn bls_verify(pk: &BlsPublicKey, msg: &[u8], sig: &BlsSignature, dst: &[u8]) -> bool {
-    if pk.0.is_infinity() || sig.0.is_infinity() {
+    if pk.0.is_infinity()
+        || sig.0.is_infinity()
+        || !pk.0.is_on_curve()
+        || !pk.0.is_in_correct_subgroup()
+        || !sig.0.is_on_curve()
+        || !sig.0.is_in_correct_subgroup()
+    {
         return false;
     }
     let q = hash_to_g2(msg, dst);
@@ -128,13 +130,18 @@ pub fn bls_aggregate_verify(
     agg_sig: &BlsSignature,
     dst: &[u8],
 ) -> bool {
-    if pks.len() != msgs.len() || pks.is_empty() || agg_sig.0.is_infinity() {
+    if pks.len() != msgs.len()
+        || pks.is_empty()
+        || agg_sig.0.is_infinity()
+        || !agg_sig.0.is_on_curve()
+        || !agg_sig.0.is_in_correct_subgroup()
+    {
         return false;
     }
     let neg_g1 = G1Point::generator().neg();
     let mut acc = pairing(&neg_g1, &agg_sig.0);
     for (pk, msg) in pks.iter().zip(msgs.iter()) {
-        if pk.0.is_infinity() {
+        if pk.0.is_infinity() || !pk.0.is_on_curve() || !pk.0.is_in_correct_subgroup() {
             return false;
         }
         let q = hash_to_g2(msg, dst);
@@ -695,26 +702,24 @@ mod tests {
         assert!(!bls_verify(&inf_pk, b"x", &sig, DST_BASIC));
     }
 
-    /// **Sign + verify round-trip** (per IETF draft §3.1).
-    ///
-    /// Gated under `#[ignore]` because verification calls
-    /// `pairing()` twice, which (per `pairing.rs` doc) is not yet
-    /// fully bilinear in this crate; the test will fail until the
-    /// pairing is repaired.  The algebraic properties tested above
-    /// (sign = sk·H, aggregate is sum, etc.) cover correctness of
-    /// the BLS signature layer itself.
+    /// **Sign + verify round-trip** (per IETF draft §3.1) plus negative controls.
     #[test]
-    #[ignore]
     fn sign_verify_roundtrip() {
         let (sk, pk) = bls_keygen(b"roundtrip-seed-bytes-32-padded!!");
         let sig = bls_sign(&sk, b"hello bls", DST_BASIC);
         assert!(bls_verify(&pk, b"hello bls", &sig, DST_BASIC));
+        assert!(!bls_verify(&pk, b"tampered bls", &sig, DST_BASIC));
+        let (_, other_pk) = bls_keygen(b"different-seed-bytes-32-padded!!");
+        assert!(!bls_verify(&other_pk, b"hello bls", &sig, DST_BASIC));
+        let off_curve_pk = BlsPublicKey(G1Point::Affine {
+            x: Fq::zero(),
+            y: Fq::one(),
+        });
+        assert!(!bls_verify(&off_curve_pk, b"hello bls", &sig, DST_BASIC));
     }
 
-    /// Aggregate-verify of 3 signatures over 3 different messages.
-    /// Same caveat as above (gated on pairing bilinearity).
+    /// Aggregate-verify of 3 signatures over 3 different messages, plus tamper rejection.
     #[test]
-    #[ignore]
     fn aggregate_verify_three_messages() {
         let (sk1, pk1) = bls_keygen(b"agg-verify-1-seed-padded-padded!");
         let (sk2, pk2) = bls_keygen(b"agg-verify-2-seed-padded-padded!");
@@ -729,5 +734,7 @@ mod tests {
         let pks = [pk1, pk2, pk3];
         let msgs: [&[u8]; 3] = [m1, m2, m3];
         assert!(bls_aggregate_verify(&pks, &msgs, &agg, DST_BASIC));
+        let bad_msgs: [&[u8]; 3] = [m1, m2, b"wrong"];
+        assert!(!bls_aggregate_verify(&pks, &bad_msgs, &agg, DST_BASIC));
     }
 }

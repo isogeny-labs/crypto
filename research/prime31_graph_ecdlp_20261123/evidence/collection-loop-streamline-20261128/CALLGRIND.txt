@@ -1,0 +1,12 @@
+callgrind Ir per process; per query = Ir[q=2] - Ir[q=1]; fixed = Ir[q=1] - per query.
+
+binary / levers           Ir q=1        Ir q=2          per query     per probe  fixed
+merged (PR #5311) 1234    872,966,615   1,125,751,668   252,785,053   276        620,181,562
+new 1234                  891,147,828   1,159,364,365   268,216,537   293        622,931,291
+new 12345                 883,741,546   1,126,898,603   243,157,057   265        640,584,489
+new 123456                859,027,347   1,077,471,985   218,444,638   238        640,582,709
+new 12347                 537,510,667     805,804,857   268,294,190   293        269,216,477
+new 1234567               505,191,046     723,680,874   218,489,828   238        286,701,218
+
+The new build's 1234 path is 15.4 M per query costlier than the merged
+binary's: lookups now go through the PairIndex enum and a closure.

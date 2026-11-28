@@ -1,0 +1,21 @@
+{
+  "schema": "chained-source-preparation/v1",
+  "first_unexecuted_freeze": {
+    "commit": "15e16811359a44cf623f0cb736dae0e187e5733a",
+    "lock": "SOURCE_LOCK_A.json",
+    "strict_or_mathematical_calls": 0,
+    "whole_changed_file_readbacks": 46
+  },
+  "correction": "Current B changes only protocol citation tags, source-lock/caller binding and administrative receipts; all six native Rust modules and six upstream inputs remain byte-identical to A.",
+  "initial_lint": {
+    "exit": 1,
+    "complete_stdout": "research/chained_cubic_coordinate_20261127/PROTOCOL_A.md: line 9: 'verifies' with no [pcc:ID] citation and no [pcc:unverified] tag\nresearch/chained_cubic_coordinate_20261127/PROTOCOL_A.md: line 11: 'speedup' with no [pcc:ID] citation and no [pcc:unverified] tag\nlint-prose: 2 finding(s)\n"
+  },
+  "freeze_metadata_error": {
+    "status": "post-write reporting expression failed; source lock and stage manifest were already written",
+    "diagnostic": "TypeError: 'PosixPath' object is not subscriptable",
+    "remedy": "Separate metadata validation checked every byte/mode, 72 inputs plus lock, 46 staged paths, 22811 maximum new-file bytes, and 31 runtime-file pins. No scientific call consumed a partial lock.",
+    "dependent_stage": "The metadata-only stage ran after the reporting failure; its complete resulting tree was separately validated before publication. This was not a successful initial freeze-script exit."
+  },
+  "history": "A remains an immutable public commit. A caller requires checkout of A; current branch is a distinct B source version and must use run_first_B.sh with SOURCE_LOCK_B.json."
+}
