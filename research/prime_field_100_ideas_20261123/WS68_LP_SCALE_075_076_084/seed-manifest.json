@@ -1,0 +1,28 @@
+{
+  "schema": "isogeny-labs/experiment-seeds/v1",
+  "study_id": "crypto-ec100-lp-scale-20261128",
+  "master": {
+    "derivation": "SHA-256 of UTF-8 isogeny-labs/crypto/ec100/lp-scale/2026-11-28/v1",
+    "hex_256": "ca3338d82a91115404eafd044e8d5fbe3d171579c00e9bc04319092c5c3127eb"
+  },
+  "kdf": "HMAC-SHA256 with the 32 raw master bytes as key and each exact UTF-8 label below as message; take first 8 digest bytes, unsigned big-endian, for u64 streams",
+  "target_generation": "first 8 digest bytes modulo p=4001 gives x0; scan x=x0,x0+1,... modulo p to first on-curve x, choose smallest y in [0,p); no scalar witness is supplied to the producer",
+  "targets": [
+    {"id":0,"label":"ec100-lp-scale-v1/target/0","hmac_sha256":"7d43062b71741eb32761402c34eb654f27a8c92add0677c89593d731b238023d","x0":3280,"scan_offset":0,"point":[3280,1514]},
+    {"id":1,"label":"ec100-lp-scale-v1/target/1","hmac_sha256":"adb8f51c58d78667f27d172867ed9859a73397e2ece58c54b615211a6623421d","x0":1419,"scan_offset":0,"point":[1419,683]},
+    {"id":2,"label":"ec100-lp-scale-v1/target/2","hmac_sha256":"f4b98d961fb205743c8c8d07186f2860453500567ac8985e346b41f81de56611","x0":3956,"scan_offset":1,"point":[3957,905]},
+    {"id":3,"label":"ec100-lp-scale-v1/target/3","hmac_sha256":"4bf108929ff4dc82d4536435581517cb0a853748fcf01a1b613213dffa46145c","x0":1670,"scan_offset":1,"point":[1671,799]}
+  ],
+  "coefficient_replicates": [
+    {"id":0,"label":"ec100-lp-scale-v1/coeff/0","hmac_sha256":"b2eaea9161bd78450a0a1356d12d2573e18542c3d837868a84c6acb0ba51a1b6","xorshift64_initial_state_hex":"b2eaea9161bd7845"},
+    {"id":1,"label":"ec100-lp-scale-v1/coeff/1","hmac_sha256":"8245ccebbea61468cb0b4a922a7a3c45dd6ecd6d6fad022df031c7330e2931ed","xorshift64_initial_state_hex":"8245ccebbea61468"},
+    {"id":2,"label":"ec100-lp-scale-v1/coeff/2","hmac_sha256":"a735ae5ce26641010f94bb91429ba7db9e224aaeb706bc9ed85a39ef425a0224","xorshift64_initial_state_hex":"a735ae5ce2664101"}
+  ],
+  "prng": "source-defined u64 xorshift: s ^= s<<13; s ^= s>>7; s ^= s<<17; two successive outputs give a=output mod 4019, b=1+(output mod 4018) per candidate; wrapping u64 shifts/XOR",
+  "cases": "case=3*target_id+replicate_id, 0..11; candidate stream key excludes full/partial arm; each replicate stream is intentionally reused across four different target points, and both arms share the identical ordered point stream per case",
+  "rho": "deterministic Floyd x mod 3 partition and fixed initial seeds 1..4, independent of coefficient streams; same rho walk intentionally repeats for a target across its three coefficient replicates",
+  "curve_selection": "scan fixed ascending p list [4001,4003,4007,4013,4019,4021,4027,4049,4051,4057,4073,4091,4093,4099], skip composite p, then b=1..50 for E:y^2=x^3+x+b, first prime group order; PARI/GP 2.17.3 returned p=4001,b=27,#E=4019; first point in x/y ascending scan is G=(1,921)",
+  "candidate_cap_per_case": 768,
+  "arm_schedule": "single fresh process per case; full-only and partial share in-memory stream, full-only executes first; no timing speed claim from this fixed order",
+  "independent_replay": "regenerate all 768 candidate points and both accepted-row sets, check raw candidate bytes and exact point/source/filtered-rank/target outputs; at least one case per arm configuration must replay before reproducibility wording"
+}

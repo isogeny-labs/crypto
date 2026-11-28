@@ -1,0 +1,16 @@
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `fs`
+  --> research/prime_field_100_ideas_20261123/WS68_LP_SCALE_075_076_084/panel_main.rs:13:2
+   |
+13 |  fs::write(format!("WS68_LP_SCALE_075_076_084/candidate{case}.stdout"),transcript).unwrap();
+   |  ^^ use of unresolved module or unlinked crate `fs`
+   |
+   = help: you might be missing a crate named `fs`
+help: consider importing this module
+  --> research/prime_field_100_ideas_20261123/WS68_LP_SCALE_075_076_084/run.rs:5:1
+   |
+ 5 + use std::fs;
+   |
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0433`.

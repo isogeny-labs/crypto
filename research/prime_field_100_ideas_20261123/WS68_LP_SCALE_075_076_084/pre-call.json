@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-28",
+  "conductor_task": "T-13241",
+  "base_commit": "1df77237f7a6879b6985fc797ec2da20bdef1835",
+  "source_sha256": {"run_rs":"7793027d4efa55f123ba27cb73b7a2157bebd9d3ed77cbaaab39818bdcfd23bb","panel_main_rs":"9905c2f9f64a491329f2ecf5a496d187ce191391227a327a6a077845a2a11c75"},
+  "seed_manifest_sha256": "445bbe725e309977d0f0ca7019678fd396c85fafe97200e80ff40f3b64724415",
+  "rustc_version": "1.93.1 (01f6ddf75 2026-02-11) Homebrew arm64",
+  "rustc_sha256": "de09d555d0acd2d3c1b608ab369b20c6467aa9c5681c4194a9dd5ed1e84fa5f2",
+  "checkpoint_gate": {"exit_code":2,"reason":"missing .resume/RESUME.md","admission":"user-authorized bounded local public bypass"},
+  "curve": {"p":4001,"a":1,"b":27,"group_order":4019,"G":[1,921]},
+  "factor_base": {"small":8,"large":16,"construction":"smallest on-curve y for each ascending x until 24 points"},
+  "targets": [[3280,1514],[1419,683],[3957,905],[1671,799]],
+  "cases": 12,
+  "candidate_cap_each": 768,
+  "compile": "rustc --edition=2021 -O panel_main.rs -o /tmp/ws68_lp_scale_panel.bin",
+  "run": "/tmp/ws68_lp_scale_panel.bin N from parent research directory, N=0..11, fresh process each",
+  "output": "caseN.stdout, caseN.stderr, candidateN.stdout, exit per case; no binary staged",
+  "expected_math": "exact source and completed EC identities, base/augmented ranks, target pin or censor, direct target point verification where pinned; same-target rho pin or censor",
+  "unknown_before_run": ["relation counts","ranks","target coverage","filter costs","rho outcomes"],
+  "claim_boundary": "bounded public E(F_p) panel; exact cost vector, no asymptotic or runtime speed claim"
+}

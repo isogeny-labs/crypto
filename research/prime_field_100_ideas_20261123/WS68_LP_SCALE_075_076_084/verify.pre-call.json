@@ -1,0 +1,12 @@
+{
+  "date":"2026-11-28",
+  "conductor_task":"T-13241",
+  "verify_source_sha256":{"verify_rs":"05a68b65b120b6eacb478f55b9e5c85fe4e6a5d43554c95ff2858528254baf22","verify_main_rs":"52ef5f666b89babae6b672489e6d25c984b1564afd502f41ce4c178b96b47989"},
+  "producer_hash_manifest_sha256":"0d970fe0e74c45219afd2424b1b05519f4309d984cdb7128db73dbf67ec7a519",
+  "seed_manifest_sha256":"445bbe725e309977d0f0ca7019678fd396c85fafe97200e80ff40f3b64724415",
+  "method":"separate native implementation counts E(F4001), checks prime order and generator; regenerates every candidate byte and exact full/partial accepted source record from seed, table and point operations; independently eliminates large columns, checks every completed point equation and modular rank/target; checks reported rho scalar point identity",
+  "compile":"rustc --edition=2021 -O verify_main.rs -o /tmp/ws68_lp_scale_verify.bin",
+  "run":"fresh verifier process case 0..11 from parent research directory",
+  "acceptance":"VERIFY_OK=1 case=N for all 12, empty runtime stderr, source and candidate hashes unchanged",
+  "admission":"same user-authorized bounded local public checkpoint bypass"
+}
