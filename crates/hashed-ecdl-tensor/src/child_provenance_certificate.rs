@@ -10,7 +10,7 @@ use crate::factorization_certificate::{
 use crate::packing_provenance_certificate::{
     Certificate as PackingCertificate, SCHEMA as PACKING_SCHEMA,
 };
-use crate::Meter;
+use crate::{BigUint, Meter};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -82,6 +82,10 @@ pub struct VerificationSummary {
     pub packet_vertices: usize,
     /// Number of child edges.
     pub edges: usize,
+    /// Child edges supplied by selected row-group incidences.
+    pub row_group_edges: usize,
+    /// Child edges supplied by selected column-group incidences.
+    pub column_group_edges: usize,
     /// Maximum child degree on either side.
     pub maximum_degree: usize,
     /// Number of packet coefficient tables bound to this child.
@@ -103,6 +107,10 @@ pub struct FamilyVerificationSummary {
     pub child_edges: usize,
     /// Largest edge count of any one child.
     pub maximum_child_edges: usize,
+    /// Largest selected row-group incidence count of any one child.
+    pub maximum_row_group_edges: usize,
+    /// Largest selected column-group incidence count of any one child.
+    pub maximum_column_group_edges: usize,
     /// Largest vertex degree of any one child.
     pub maximum_degree: usize,
     /// Total packet coefficient tables bound across all children.
@@ -111,6 +119,9 @@ pub struct FamilyVerificationSummary {
     pub packet_entry_values: usize,
     /// Whether every checked child has at most one eighth of the parent edges.
     pub eightfold_edge_shrink_admitted: bool,
+    /// Whether exact replay verifies `child*radix<=2*height*D` for every child,
+    /// using the source's recomputed maximum-class padded height.
+    pub rounded_height_child_bound_verified: bool,
     /// Whether every child degree is at most the claimed source cap and `2L`.
     pub packet_degree_guard_admitted: bool,
     /// Whether the fixed radix-64 source premises and both strict guards hold.
@@ -291,6 +302,57 @@ fn digit(label: usize, coordinate: u32, radix: usize) -> Option<usize> {
         .map(|place| (label / place) % radix)
 }
 
+fn rounded_packing_dimensions(
+    packing: &PackingCertificate,
+    meter: &mut Meter,
+) -> Result<(usize, usize), String> {
+    if packing.radix == 0 || packing.coordinate >= packing.packet_exponent {
+        return Err("child provenance packing dimensions".into());
+    }
+    let packet_length = 1usize
+        .checked_shl(packing.packet_exponent)
+        .ok_or_else(|| "child provenance packing packet width".to_string())?;
+    let labels = packing
+        .radix
+        .checked_pow(packing.packet_exponent)
+        .ok_or_else(|| "child provenance packing label width".to_string())?;
+    let label_classes = labels
+        .checked_mul(labels)
+        .ok_or_else(|| "child provenance packing class width".to_string())?;
+    meter
+        .vector(label_classes, "child provenance packing classes")
+        .map_err(|error| error.to_string())?;
+    let mut classes = vec![0usize; label_classes];
+    for edge in &packing.edges {
+        let row_label = packing
+            .row_labels
+            .get(edge.left)
+            .copied()
+            .ok_or_else(|| "child provenance packing row endpoint".to_string())?;
+        let column_label = packing
+            .column_labels
+            .get(edge.right)
+            .copied()
+            .ok_or_else(|| "child provenance packing column endpoint".to_string())?;
+        if row_label >= labels || column_label >= labels {
+            return Err("child provenance packing label".into());
+        }
+        let class = row_label
+            .checked_mul(labels)
+            .and_then(|value| value.checked_add(column_label))
+            .ok_or_else(|| "child provenance packing class index".to_string())?;
+        classes[class] = classes[class]
+            .checked_add(1)
+            .ok_or_else(|| "child provenance packing class size".to_string())?;
+    }
+    let maximum_class = classes.into_iter().max().unwrap_or(0);
+    let padded_height = maximum_class
+        .div_ceil(packet_length)
+        .checked_mul(packet_length)
+        .ok_or_else(|| "child provenance packing height".to_string())?;
+    Ok((label_classes, padded_height))
+}
+
 fn parent_ports(
     packing: &PackingCertificate,
 ) -> Result<(Vec<BTreeSet<usize>>, Vec<BTreeSet<usize>>), String> {
@@ -386,6 +448,8 @@ pub fn verify(
 
     let mut packet_vertex_degrees = vec![0usize; factorization.packets.len()];
     let mut expected_edges = Vec::new();
+    let mut row_group_edges = 0usize;
+    let mut column_group_edges = 0usize;
     for (packet_id, packet) in factorization.packets.iter().enumerate() {
         for &edge_index in packet.iter().flatten() {
             let edge = &packing.edges[edge_index];
@@ -397,6 +461,9 @@ pub fn verify(
                     right_port: packet_vertex_degrees[packet_id],
                 });
                 packet_vertex_degrees[packet_id] += 1;
+                row_group_edges = row_group_edges
+                    .checked_add(1)
+                    .ok_or_else(|| "child provenance row group edges overflow".to_string())?;
             }
         }
         for &edge_index in packet.iter().flatten() {
@@ -409,6 +476,9 @@ pub fn verify(
                     right_port: packet_vertex_degrees[packet_id],
                 });
                 packet_vertex_degrees[packet_id] += 1;
+                column_group_edges = column_group_edges
+                    .checked_add(1)
+                    .ok_or_else(|| "child provenance column group edges overflow".to_string())?;
             }
         }
     }
@@ -457,11 +527,16 @@ pub fn verify(
         .copied()
         .max()
         .unwrap_or(0);
+    if row_group_edges.checked_add(column_group_edges) != Some(expected_edges.len()) {
+        return Err("child provenance group edge accounting".into());
+    }
     Ok(VerificationSummary {
         group: child.group,
         old_vertices: old_vertex_degrees.len(),
         packet_vertices: packet_vertex_degrees.len(),
         edges: expected_edges.len(),
+        row_group_edges,
+        column_group_edges,
         maximum_degree,
         packet_entry_tables: packet_vertex_degrees.len(),
         packet_entry_values,
@@ -499,6 +574,8 @@ pub fn verify_family(
     let mut edges_by_tuple = BTreeMap::new();
     let mut child_edges = 0usize;
     let mut maximum_child_edges = 0usize;
+    let mut maximum_row_group_edges = 0usize;
+    let mut maximum_column_group_edges = 0usize;
     let mut maximum_degree = 0usize;
     let mut packet_entry_tables = 0usize;
     let mut packet_entry_values = 0usize;
@@ -515,6 +592,8 @@ pub fn verify_family(
             .checked_add(summary.edges)
             .ok_or_else(|| "child provenance family edges overflow".to_string())?;
         maximum_child_edges = maximum_child_edges.max(summary.edges);
+        maximum_row_group_edges = maximum_row_group_edges.max(summary.row_group_edges);
+        maximum_column_group_edges = maximum_column_group_edges.max(summary.column_group_edges);
         maximum_degree = maximum_degree.max(summary.maximum_degree);
         packet_entry_tables = packet_entry_tables
             .checked_add(summary.packet_entry_tables)
@@ -537,6 +616,15 @@ pub fn verify_family(
     {
         return Err("child provenance family coverage".into());
     }
+    let (label_classes, padded_class_height) = rounded_packing_dimensions(packing, meter)?;
+    let rounded_child_rhs =
+        BigUint::from(2u8) * BigUint::from(padded_class_height) * BigUint::from(label_classes);
+    let rounded_height_child_bound_verified = children.iter().all(|child| {
+        BigUint::from(child.edges.len()) * BigUint::from(packing.radix) <= rounded_child_rhs
+    });
+    if !rounded_height_child_bound_verified {
+        return Err("child provenance rounded group bound".into());
+    }
     let eightfold_edge_shrink_admitted = maximum_child_edges
         .checked_mul(8)
         .is_some_and(|edges| edges <= factorization.edge_count);
@@ -558,10 +646,13 @@ pub fn verify_family(
         children: children.len(),
         child_edges,
         maximum_child_edges,
+        maximum_row_group_edges,
+        maximum_column_group_edges,
         maximum_degree,
         packet_entry_tables,
         packet_entry_values,
         eightfold_edge_shrink_admitted,
+        rounded_height_child_bound_verified,
         packet_degree_guard_admitted,
         strict_source_refinement_admitted,
     })

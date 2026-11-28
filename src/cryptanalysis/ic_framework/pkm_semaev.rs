@@ -1005,7 +1005,10 @@ struct BasisDfsStats {
 impl PkmSemaevOracle {
     fn record_basis_dfs(&mut self, stats: BasisDfsStats) {
         self.bump("pkm_basis_dfs_visited_nodes", stats.visited_nodes);
-        self.bump("pkm_basis_dfs_root_split_branches", stats.root_split_branches);
+        self.bump(
+            "pkm_basis_dfs_root_split_branches",
+            stats.root_split_branches,
+        );
         self.bump("pkm_basis_dfs_terminal_leaves", stats.terminal_leaves);
         self.bump("pkm_basis_dfs_algebraic_tuples", stats.algebraic_tuples);
         let peak = self
@@ -1013,8 +1016,14 @@ impl PkmSemaevOracle {
             .entry("pkm_basis_dfs_peak_live_basis_cache_terms_lower_bound_max".into())
             .or_default();
         *peak = (*peak).max(stats.peak_live_basis_cache_terms);
-        self.bump("pkm_basis_dfs_branch_copy_basis_terms", stats.branch_copy_basis_terms);
-        self.bump("pkm_basis_dfs_branch_copy_state_slots", stats.branch_copy_state_slots);
+        self.bump(
+            "pkm_basis_dfs_branch_copy_basis_terms",
+            stats.branch_copy_basis_terms,
+        );
+        self.bump(
+            "pkm_basis_dfs_branch_copy_state_slots",
+            stats.branch_copy_state_slots,
+        );
     }
     /// Record which normalized projective chart supplied an exact, signed
     /// relation. Classification is made from the lifted points, not from an
@@ -1400,7 +1409,10 @@ impl PkmSemaevOracle {
             return Err("pkm-semaev: projective mode currently needs m=3".into());
         }
         if self.engine == PkmEngine::Scan && self.m != 2 {
-            return Err(format!("pkm-semaev: engine=scan takes m = 2, not {}", self.m));
+            return Err(format!(
+                "pkm-semaev: engine=scan takes m = 2, not {}",
+                self.m
+            ));
         }
         if self.engine == PkmEngine::ResGcd && !(2..=3).contains(&self.m) {
             return Err(format!(
@@ -2378,8 +2390,8 @@ impl PkmSemaevOracle {
 
 /// Counted univariate polynomial arithmetic over `F_p` (`p < 2^31`) for
 /// `engine=resgcd`. Coefficients low to high; every `F_p` multiplication is
-/// added to `*mults`; an inversion is charged `UG_INV_MULTS`, the module's
-/// convention for one `pow_mod(·, p − 2)` (see `solve_s3_for_middle`).
+/// added to `*mults`; an inversion retains the historical `UG_INV_MULTS`
+/// estimate. The quadratic extraction path counts its actual powering work.
 const UG_INV_MULTS: u64 = 32;
 const UG_KARATSUBA_MIN: usize = 24;
 
@@ -2454,7 +2466,6 @@ fn ug_karatsuba(a: &[u64], b: &[u64], p: u64, mults: &mut u64) -> Vec<u64> {
             out[i + h] = addm(out[i + h], mid, p);
         }
     }
-    let mut out = out;
     ug_trim(&mut out);
     out
 }
@@ -2590,7 +2601,9 @@ impl PkmSemaevOracle {
         self.bump("pkm_resgcd_nontrivial_gcd", 1);
         let horner = |x: u64, mults: &mut u64| -> u64 {
             *mults += g.len() as u64 - 1;
-            g.iter().rev().fold(0u64, |acc, &c| addm(mulm(acc, x, p), c, p))
+            g.iter()
+                .rev()
+                .fold(0u64, |acc, &c| addm(mulm(acc, x, p), c, p))
         };
         let idx: Vec<usize> = (0..v.len())
             .filter(|&i| horner(v[i], &mut mults) == 0)
@@ -2666,11 +2679,7 @@ impl PkmSemaevOracle {
             .map(|&y| {
                 let al = vec![mulm(y, y, p), subm(0, mulm(2, y, p), p), 1];
                 // (v + X)(vX + a) = a v + (v² + a) X + v X²
-                let inner = [
-                    addm(mulm(a, y, p), two_b, p),
-                    addm(mulm(y, y, p), a, p),
-                    y,
-                ];
+                let inner = [addm(mulm(a, y, p), two_b, p), addm(mulm(y, y, p), a, p), y];
                 let be: Vec<u64> = inner.iter().map(|&c| mulm(p - 2, c, p)).collect();
                 // (vX − a)² − 4b(v + X) = a² − 4bv + (−2av − 4b) X + v² X²
                 let ga = vec![
@@ -2686,7 +2695,13 @@ impl PkmSemaevOracle {
             // c·x − d·y, coefficientwise
             *mults += (x.len() + y.len()) as u64;
             (0..x.len().max(y.len()))
-                .map(|i| subm(mulm(c, *x.get(i).unwrap_or(&0), p), mulm(d, *y.get(i).unwrap_or(&0), p), p))
+                .map(|i| {
+                    subm(
+                        mulm(c, *x.get(i).unwrap_or(&0), p),
+                        mulm(d, *y.get(i).unwrap_or(&0), p),
+                        p,
+                    )
+                })
                 .collect()
         };
         let mut found: Vec<(usize, usize, usize)> = Vec::new();
@@ -2725,7 +2740,10 @@ impl PkmSemaevOracle {
             let idx: Vec<usize> = (0..=k)
                 .filter(|&i| {
                     mults += g.len() as u64 - 1;
-                    g.iter().rev().fold(0u64, |acc, &c| addm(mulm(acc, v[i], p), c, p)) == 0
+                    g.iter()
+                        .rev()
+                        .fold(0u64, |acc, &c| addm(mulm(acc, v[i], p), c, p))
+                        == 0
                 })
                 .collect();
             for (s, &i) in idx.iter().enumerate() {
@@ -2746,7 +2764,10 @@ impl PkmSemaevOracle {
         self.bump("pkm_resgcd_nontrivial_gcd", nontrivial);
         // grid() order: i, then j, then k ascending.
         found.sort_unstable();
-        let out = found.into_iter().map(|(i, j, k)| vec![v[i], v[j], v[k]]).collect();
+        let out = found
+            .into_iter()
+            .map(|(i, j, k)| vec![v[i], v[j], v[k]])
+            .collect();
         (out, mults)
     }
 
@@ -2757,8 +2778,8 @@ impl PkmSemaevOracle {
     fn scan(&mut self, curve: &PrimeCurve, x_r: u64) -> (Vec<Vec<u64>>, u64) {
         let (a, b) = self.s3_coefficients(curve);
         let prep = self.prepared.as_ref().expect("prepared");
-        let v = prep.v.clone();
-        let rank = prep.v_rank.clone();
+        let v = &prep.v;
+        let rank = &prep.v_rank;
         let mut mults = 0u64;
         let mut lookups = 0u64;
         let mut out = Vec::new();
@@ -2797,40 +2818,49 @@ impl PkmSemaevOracle {
         mults: &mut u64,
     ) -> Vec<u64> {
         let p = curve.p;
-        *mults += 6;
+        // Five coefficient products. Multiplication by two or four is
+        // implemented by addition, rather than counted as a product.
+        *mults += 5;
         let d = subm(x1 % p, x3 % p, p);
         let s = addm(x1 % p, x3 % p, p);
         let pr = mulm(x1 % p, x3 % p, p);
         let al = mulm(d, d, p);
-        let be = mulm(p - 2, addm(mulm(s, addm(pr, a, p), p), mulm(2, b, p), p), p);
+        let twice_b = addm(b, b, p);
+        let half_be = addm(mulm(s, addm(pr, a, p), p), twice_b, p);
+        let be = subm(0, addm(half_be, half_be, p), p);
         let q = subm(pr, a, p);
-        let ga = subm(mulm(q, q, p), mulm(mulm(4, b, p), s, p), p);
+        let ga = subm(mulm(q, q, p), mulm(addm(twice_b, twice_b, p), s, p), p);
+        // residual_walk::pow_mod performs one square per exponent bit
+        // and one product per set bit. Charge the actual prime's cost.
+        let inverse_muls =
+            u64::from(64 - (p - 2).leading_zeros()) + u64::from((p - 2).count_ones());
         if al == 0 {
             if be == 0 {
                 return Vec::new();
             }
-            *mults += 32;
+            *mults += inverse_muls + 1;
             let inv = crate::cryptanalysis::residual_walk::pow_mod(be, p - 2, p);
             return vec![subm(0, mulm(ga, inv, p), p)];
         }
-        *mults += 36;
+        // Reject nonsquares before the inversion. sqrt_counted charges
+        // failed square-root attempts too, unlike the former fixed estimate.
+        *mults += 2;
+        let al_ga = mulm(al, ga, p);
+        let twice_al_ga = addm(al_ga, al_ga, p);
+        let disc = subm(mulm(be, be, p), addm(twice_al_ga, twice_al_ga, p), p);
+        let Some(rt) = curve.sqrt_counted(disc, mults) else {
+            return Vec::new();
+        };
+        *mults += inverse_muls + 1;
         let inv_2al = crate::cryptanalysis::residual_walk::pow_mod(addm(al, al, p), p - 2, p);
-        let half_neg_be = subm(0, mulm(be, inv_2al, p), p);
-        let inv_al = addm(inv_2al, inv_2al, p);
-        let disc = subm(mulm(half_neg_be, half_neg_be, p), mulm(ga, inv_al, p), p);
-        if disc == 0 {
-            vec![half_neg_be]
-        } else if let Some(rt) = curve.sqrt(disc) {
-            *mults += 32;
-            let r0 = addm(half_neg_be, rt, p);
-            let r1 = subm(half_neg_be, rt, p);
-            if r0 == r1 {
-                vec![r0]
-            } else {
-                vec![r0, r1]
-            }
+        let neg_be = subm(0, be, p);
+        let r0 = mulm(addm(neg_be, rt, p), inv_2al, p);
+        if rt == 0 {
+            vec![r0]
         } else {
-            Vec::new()
+            *mults += 1;
+            let r1 = mulm(subm(neg_be, rt, p), inv_2al, p);
+            vec![r0.min(r1), r0.max(r1)]
         }
     }
 
@@ -3131,9 +3161,9 @@ impl PkmSemaevOracle {
             let m = oracle.m as usize;
             stats.visited_nodes += 1;
             let basis_terms = cur_basis.iter().map(|g| g.len() as u64).sum::<u64>();
-            stats.peak_live_basis_cache_terms = stats.peak_live_basis_cache_terms.max(
-                stack_basis_terms + basis_terms + cache_root_terms,
-            );
+            stats.peak_live_basis_cache_terms = stats
+                .peak_live_basis_cache_terms
+                .max(stack_basis_terms + basis_terms + cache_root_terms);
 
             // Step 1: Linear RREF + upward tower propagation + free-var cascade.
             loop {
@@ -3445,9 +3475,9 @@ impl PkmSemaevOracle {
             let roots = PkmSemaevOracle::lookup_rule_roots(rule_roots, curve, rule);
             stats.root_split_branches += roots.len() as u64;
             let parent_terms = cur_basis.iter().map(|g| g.len() as u64).sum::<u64>();
-            stats.peak_live_basis_cache_terms = stats.peak_live_basis_cache_terms.max(
-                stack_basis_terms + parent_terms + cache_root_terms,
-            );
+            stats.peak_live_basis_cache_terms = stats
+                .peak_live_basis_cache_terms
+                .max(stack_basis_terms + parent_terms + cache_root_terms);
             // Cached prepare()-time roots cost nothing at runtime; a miss still
             // pays a one-shot Tonelli–Shanks (~34 Fp mults on a 31-bit prime).
             if !cached {
@@ -3466,10 +3496,11 @@ impl PkmSemaevOracle {
                 if let Some((s_idx, l_idx)) = c_orig.remove(chosen_var) {
                     c_fixed[s_idx][l_idx] = Some(rt);
                 }
-                stats.branch_copy_basis_terms += c_basis.iter().map(|g| g.len() as u64).sum::<u64>();
-                stats.branch_copy_state_slots +=
-                    (c_orig.len() + c_fixed.iter().map(Vec::len).sum::<usize>() + free_done.len())
-                        as u64;
+                stats.branch_copy_basis_terms +=
+                    c_basis.iter().map(|g| g.len() as u64).sum::<u64>();
+                stats.branch_copy_state_slots += (c_orig.len()
+                    + c_fixed.iter().map(Vec::len).sum::<usize>()
+                    + free_done.len()) as u64;
                 dfs(
                     oracle,
                     curve,
@@ -4723,6 +4754,59 @@ mod tests {
     use crate::cryptanalysis::ic_framework::stages::FactorBaseBuilder;
     use rand::{rngs::StdRng, Rng, SeedableRng};
 
+    #[test]
+    fn quadratic_extraction_matches_every_small_smooth_curve() {
+        for p in [5u64, 7, 11] {
+            for a in 0..p {
+                for b in 0..p {
+                    if (4 * a * a * a + 27 * b * b).is_multiple_of(p) {
+                        continue;
+                    }
+                    let curve = PrimeCurve { p, a, b };
+                    for x1 in 0..p {
+                        for x3 in 0..p {
+                            let want: Vec<_> = (0..p)
+                                .filter(|&x2| eval_s3_u64(x1, x2, x3, a, b, p) == 0)
+                                .collect();
+                            let got =
+                                PkmSemaevOracle::solve_s3_for_middle(&curve, a, b, x1, x3, &mut 0);
+                            assert_eq!(got, want, "p={p} a={a} b={b} x1={x1} x3={x3}");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn quadratic_extraction_charges_failed_roots_without_inversion() {
+        let curve = PrimeCurve { p: 11, a: 1, b: 1 };
+        let mut checked = 0;
+        for x1 in 0..curve.p {
+            for x3 in 0..curve.p {
+                if x1 == x3 {
+                    continue;
+                }
+                let want: Vec<_> = (0..curve.p)
+                    .filter(|&x2| eval_s3_u64(x1, x2, x3, curve.a, curve.b, curve.p) == 0)
+                    .collect();
+                if !want.is_empty() {
+                    continue;
+                }
+                let mut muls = 0;
+                assert!(PkmSemaevOracle::solve_s3_for_middle(
+                    &curve, curve.a, curve.b, x1, x3, &mut muls
+                )
+                .is_empty());
+                // Five coefficient products, two discriminant products,
+                // four products for n^3 and one verification square.
+                assert_eq!(muls, 12);
+                checked += 1;
+            }
+        }
+        assert!(checked > 0);
+    }
+
     /// Karatsuba equals schoolbook, over a tiny prime where the top
     /// coefficients of `(a0 + a1)(b0 + b1)` cancel often (the t = 11
     /// resgcd disagreements came from a cancelled `z1` leaving `z0`/`z2`
@@ -4927,35 +5011,60 @@ mod tests {
         let curve = &inst.curve;
         let fb = base(&inst, 3);
         assert_eq!(fb.columns, 3);
-        let mut o = oracle(&inst, &fb, 3, 3, "m=3,mode=chain,engine=f4,descent=1,trace=0,degree=12");
-        assert!(o.prefer_grid_extraction(), "this test must bypass the public crossover");
+        let mut o = oracle(
+            &inst,
+            &fb,
+            3,
+            3,
+            "m=3,mode=chain,engine=f4,descent=1,trace=0,degree=12",
+        );
+        assert!(
+            o.prefer_grid_extraction(),
+            "this test must bypass the public crossover"
+        );
         let independent: serde_json::Value = serde_json::from_str(include_str!(
             "../../../research/pkm_nonenum_decomp_20261125/f97_independent_census.json"
         ))
         .expect("independent F97 point and scalar census");
-        let verdicts = independent["verdicts"].as_array().expect("100 census verdicts");
+        let verdicts = independent["verdicts"]
+            .as_array()
+            .expect("100 census verdicts");
         assert_eq!(verdicts.len(), 100);
 
         let mut exact = HashSet::new();
         for &p in &fb.points {
             for &q in &fb.points {
                 for &r in &fb.points {
-                    let target = curve.add(&mut GroupOps::default(),
-                                           curve.add(&mut GroupOps::default(), p, q), r);
+                    let target = curve.add(
+                        &mut GroupOps::default(),
+                        curve.add(&mut GroupOps::default(), p, q),
+                        r,
+                    );
                     if !target.infinity {
                         exact.insert(curve.key(&target));
                     }
                 }
             }
         }
-        assert_eq!(exact.len(), 28, "independently enumerated F97 three-sum count");
+        assert_eq!(
+            exact.len(),
+            28,
+            "independently enumerated F97 three-sum count"
+        );
 
-        let ring = o.prepared.as_ref().expect("prepared Kummer tower").ring.clone();
+        let ring = o
+            .prepared
+            .as_ref()
+            .expect("prepared Kummer tower")
+            .ring
+            .clone();
         let mut targets = 0usize;
         let mut descents = 0usize;
         let mut cancellation_targets = 0usize;
         for x in 0..curve.p {
-            let Some(y) = curve.sqrt(curve.rhs(x)) else { continue };
+            let Some(y) = curve.sqrt(curve.rhs(x)) else {
+                continue;
+            };
             let sys = o.specialise_branch(None, x, None);
             let rep = f4_tower(
                 &sys,
@@ -4964,25 +5073,35 @@ mod tests {
                     .with_budget(Duration::from_secs(2))
                     .with_max_nnz(1_000_000),
             );
-            assert!(!rep.timed_out && !rep.oversize && rep.pairs_above_bound == 0,
-                    "F4 censored at target x={x}: {rep:?}");
+            assert!(
+                !rep.timed_out && !rep.oversize && rep.pairs_above_bound == 0,
+                "F4 censored at target x={x}: {rep:?}"
+            );
             let basis_xs = if rep.inconsistent {
                 Vec::new()
             } else {
                 descents += 1;
-                o.extract_solutions_from_basis(curve, None, &ring,
-                                               &rep.basis, &[], x, None).0
+                o.extract_solutions_from_basis(curve, None, &ring, &rep.basis, &[], x, None)
+                    .0
             };
             let grid_xs = o.grid(curve, x, false).0;
-            for target in [PrimePoint::affine(x, y), PrimePoint::affine(x, (curve.p - y) % curve.p)] {
-                if y == 0 && target.y != y { continue; }
+            for target in [
+                PrimePoint::affine(x, y),
+                PrimePoint::affine(x, (curve.p - y) % curve.p),
+            ] {
+                if y == 0 && target.y != y {
+                    continue;
+                }
                 targets += 1;
                 if fb.x_index.contains_key(&x) {
                     cancellation_targets += 1;
                     let p = fb.points[0];
                     let cancelled = curve.add(&mut GroupOps::default(), p, curve.neg(p));
                     assert!(cancelled.infinity);
-                    assert_eq!(curve.add(&mut GroupOps::default(), cancelled, target), target);
+                    assert_eq!(
+                        curve.add(&mut GroupOps::default(), cancelled, target),
+                        target
+                    );
                 }
                 let basis_hit = basis_xs.iter().any(|xs| {
                     lift_abscissae(curve, &fb, &mut GroupOps::default(), xs, target).is_some()
@@ -5000,15 +5119,26 @@ mod tests {
                     .expect("target in independent F97 census")["direct_three_sum"]
                     .as_bool()
                     .expect("census verdict");
-                assert_eq!(expected, independent_expected,
-                           "Rust and independent F97 census at {target:?}");
-                assert_eq!(grid_hit, expected, "independent point census vs grid at {target:?}");
-                assert_eq!(basis_hit, expected, "F4 basis descent vs point census at {target:?}");
+                assert_eq!(
+                    expected, independent_expected,
+                    "Rust and independent F97 census at {target:?}"
+                );
+                assert_eq!(
+                    grid_hit, expected,
+                    "independent point census vs grid at {target:?}"
+                );
+                assert_eq!(
+                    basis_hit, expected,
+                    "F4 basis descent vs point census at {target:?}"
+                );
             }
         }
         assert_eq!(targets, 100);
         assert_eq!(cancellation_targets, fb.points.len());
-        assert!(descents > 0, "basis extraction must run on a consistent system");
+        assert!(
+            descents > 0,
+            "basis extraction must run on a consistent system"
+        );
     }
 
     #[test]
@@ -5053,8 +5183,7 @@ mod tests {
             "the basis extractor may not enumerate more leaves than the full grid"
         );
         assert_eq!(
-            dfs
-                .get("pkm_descent_deferred_to_grid")
+            dfs.get("pkm_descent_deferred_to_grid")
                 .copied()
                 .unwrap_or(0),
             0
@@ -5178,8 +5307,16 @@ mod tests {
             };
             let (a, c) = (run(&mut f4), run(&mut grid));
             assert_eq!(a, c, "{label}: F4 against the grid, target {k}");
-            assert_eq!(run(&mut resgcd), c, "{label}: resgcd against the grid, target {k}");
-            assert_eq!(run(&mut scan), c, "{label}: scan against the grid, target {k}");
+            assert_eq!(
+                run(&mut resgcd),
+                c,
+                "{label}: resgcd against the grid, target {k}"
+            );
+            assert_eq!(
+                run(&mut scan),
+                c,
+                "{label}: scan against the grid, target {k}"
+            );
             assert_eq!(
                 c,
                 decomposable.contains(&curve.key(&target)),
@@ -5190,7 +5327,10 @@ mod tests {
         assert!(hits >= 5, "{label}: planted targets decompose ({hits})");
         for (name, o) in [("resgcd", &resgcd), ("scan", &scan)] {
             let n = o.relation_counters();
-            assert!(n["pkm_crosscheck_systems"] > 0, "{label}: {name} crosschecked");
+            assert!(
+                n["pkm_crosscheck_systems"] > 0,
+                "{label}: {name} crosschecked"
+            );
             assert_eq!(
                 n.get("pkm_crosscheck_disagreements").copied().unwrap_or(0),
                 0,
@@ -5658,7 +5798,11 @@ mod tests {
             let (a, b, c) = (run(&mut chain), run(&mut full), run(&mut grid));
             assert_eq!(a, c, "{label}: chain F4 against the grid, target {k}");
             assert_eq!(b, c, "{label}: full F4 against the grid, target {k}");
-            assert_eq!(run(&mut resgcd), c, "{label}: resgcd against the grid, target {k}");
+            assert_eq!(
+                run(&mut resgcd),
+                c,
+                "{label}: resgcd against the grid, target {k}"
+            );
             assert_eq!(
                 c,
                 decomposable.contains(&curve.key(&target)),
@@ -5668,7 +5812,10 @@ mod tests {
         }
         assert!(hits >= 5, "{label}: planted targets decompose ({hits})");
         let n = resgcd.relation_counters();
-        assert!(n["pkm_crosscheck_systems"] > 0, "{label}: resgcd m=3 crosschecked");
+        assert!(
+            n["pkm_crosscheck_systems"] > 0,
+            "{label}: resgcd m=3 crosschecked"
+        );
         assert_eq!(
             n.get("pkm_crosscheck_disagreements").copied().unwrap_or(0),
             0,
@@ -5835,31 +5982,35 @@ mod tests {
             ),
         ];
         for (fb_spec, or_spec, builder) in arms {
-            let (fb_name, factor_base_params) = Params::parse_spec(fb_spec).unwrap();
-            let (oracle, oracle_params) = Params::parse_spec(or_spec).unwrap();
-            let spec = PipelineSpec {
-                factor_base: fb_name,
-                factor_base_params,
-                oracle,
-                oracle_params,
-                targets: Targets::Random,
-                linalg: "incremental-gauss".into(),
-                max_trials: 20_000,
-                seed: 11,
-                ..Default::default()
-            };
-            let mut o = PkmSemaevOracle::from_spec(2, &spec, &inst).unwrap();
-            let report = run_pipeline(
-                &ictx,
-                &spec,
-                builder,
-                &mut o,
-                planted,
-                &Calibration::default(),
-                Some(1.0),
-            )
-            .unwrap_or_else(|e| panic!("{fb_spec}: {e}"));
-            assert!(report.verified, "{fb_spec}: {report:?}");
+            for engine in ["f4", "scan"] {
+                let (fb_name, factor_base_params) = Params::parse_spec(fb_spec).unwrap();
+                let (oracle, oracle_params) =
+                    Params::parse_spec(&format!("{or_spec},engine={engine}")).unwrap();
+                let spec = PipelineSpec {
+                    factor_base: fb_name,
+                    factor_base_params,
+                    oracle,
+                    oracle_params,
+                    targets: Targets::Random,
+                    linalg: "incremental-gauss".into(),
+                    max_trials: 20_000,
+                    seed: 11,
+                    ..Default::default()
+                };
+                let mut o = PkmSemaevOracle::from_spec(2, &spec, &inst).unwrap();
+                let report = run_pipeline(
+                    &ictx,
+                    &spec,
+                    builder,
+                    &mut o,
+                    planted,
+                    &Calibration::default(),
+                    Some(1.0),
+                )
+                .unwrap_or_else(|e| panic!("{fb_spec}: {e}"));
+                assert!(report.verified, "{fb_spec} engine={engine}: {report:?}");
+                assert_eq!(report.recovered, Some(planted));
+            }
         }
 
         // A base the oracle cannot solve on is refused, not silently run.

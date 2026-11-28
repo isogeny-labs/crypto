@@ -52,6 +52,14 @@ pub struct RhoOptions {
     /// A walk is abandoned after `max_walk_factor · 2^dp_bits` steps
     /// without reaching a distinguished point.
     pub max_walk_factor: u32,
+    /// Walks each worker advances in lockstep, one
+    /// [`EcdlpGroup::add_many`] call per step for all of them (the
+    /// prime-field group batches it on AVX-512 IFMA: eight walks per vector,
+    /// one shared inversion per lane).  `1` (the default) runs the original
+    /// one-walk-at-a-time worker unchanged.  Each walk is the same function
+    /// of its start either way; only the schedule (and so which walk reaches
+    /// which distinguished point first) differs.
+    pub lanes: usize,
 }
 
 impl Default for RhoOptions {
@@ -64,6 +72,7 @@ impl Default for RhoOptions {
             jumps: 32,
             fold_automorphisms: true,
             max_walk_factor: 20,
+            lanes: 1,
         }
     }
 }
@@ -220,7 +229,25 @@ pub fn pollard_rho<G: EcdlpGroup>(g: &G, target: &G::Elt, opts: &RhoOptions) -> 
             let gen = &gen;
             let seed = opts.seed ^ mix64(0xA11C_E000 + t as u64);
             let fold = opts.fold_automorphisms;
+            let lanes = opts.lanes;
             scope.spawn(move || {
+                if lanes > 1 {
+                    return worker_lanes(
+                        g,
+                        target,
+                        gen,
+                        n,
+                        jumps,
+                        multipliers,
+                        fold,
+                        dp_mask,
+                        max_walk,
+                        budget,
+                        seed,
+                        lanes,
+                        shared,
+                    );
+                }
                 worker(
                     g,
                     target,
@@ -418,6 +445,158 @@ fn worker<G: EcdlpGroup>(
     shared.iterations.fetch_add(local_iters, Ordering::Relaxed);
 }
 
+/// One walk of [`worker_lanes`].
+struct Walk<E> {
+    a: BigUint,
+    b: BigUint,
+    p: E,
+    prev: Option<E>,
+    steps: u64,
+}
+
+/// [`worker`] with `lanes` walks advanced in lockstep: each round first
+/// settles every walk (identity, distinguished point, length cap — any of
+/// which restarts that walk exactly as [`worker`] does), then adds every
+/// walk's jump with one [`EcdlpGroup::add_many`] call, then folds and
+/// escapes fruitless 2-cycles per walk.  A walk's trajectory is the same
+/// function of its start as in [`worker`].
+#[allow(clippy::too_many_arguments)]
+fn worker_lanes<G: EcdlpGroup>(
+    g: &G,
+    target: &G::Elt,
+    gen: &G::Elt,
+    n: &BigUint,
+    jumps: &[(G::Elt, BigUint, BigUint)],
+    multipliers: &[BigUint],
+    fold: bool,
+    dp_mask: u64,
+    max_walk: u64,
+    budget: u64,
+    seed: u64,
+    lanes: usize,
+    shared: &Shared<G::Elt>,
+) {
+    let mut rng = StdRng::seed_from_u64(seed);
+    let r = jumps.len() as u64;
+    let mut local_iters: u64 = 0;
+    const FLUSH: u64 = 256;
+    let start = |rng: &mut StdRng| -> Walk<G::Elt> {
+        let mut a = rng.gen_biguint_below(n);
+        let mut b = rng.gen_biguint_below(n);
+        let mut p = g.add(&g.mul(gen, &a), &g.mul(target, &b));
+        if fold {
+            let (rep, i, neg) = g.canonical_orbit(&p);
+            fold_coeffs(&mut a, &mut b, i, neg, multipliers, n);
+            p = rep;
+        }
+        shared.walks.fetch_add(1, Ordering::Relaxed);
+        Walk {
+            a,
+            b,
+            p,
+            prev: None,
+            steps: 0,
+        }
+    };
+    let mut walks: Vec<Walk<G::Elt>> = (0..lanes).map(|_| start(&mut rng)).collect();
+    let mut keys = vec![0u64; lanes];
+
+    while !shared.done.load(Ordering::Relaxed) {
+        // Settle every walk until it can take a step.
+        for (w, key_out) in walks.iter_mut().zip(keys.iter_mut()) {
+            loop {
+                if g.is_identity(&w.p) {
+                    if let Some(k) = solve_from(&w.a, &w.b, &BigUint::zero(), &BigUint::zero(), n) {
+                        if g.mul(gen, &k) == *target {
+                            finish(shared, k);
+                            return;
+                        }
+                    }
+                    *w = start(&mut rng);
+                    continue;
+                }
+                let key = g.key(&w.p);
+                if mix64(key ^ 0xD15C_7A9B_E55E_D000) & dp_mask == 0 {
+                    shared.dps.fetch_add(1, Ordering::Relaxed);
+                    let mut table = shared.table.lock().unwrap();
+                    if let Some(e) = table.get(&key) {
+                        if e.point == w.p {
+                            if let Some(k) = solve_from(&w.a, &w.b, &e.a, &e.b, n) {
+                                if g.mul(gen, &k) == *target {
+                                    drop(table);
+                                    finish(shared, k);
+                                    return;
+                                }
+                            } else {
+                                shared.useless.fetch_add(1, Ordering::Relaxed);
+                            }
+                        }
+                    } else {
+                        table.insert(
+                            key,
+                            Entry {
+                                point: w.p.clone(),
+                                a: w.a.clone(),
+                                b: w.b.clone(),
+                            },
+                        );
+                    }
+                    drop(table);
+                    *w = start(&mut rng);
+                    continue;
+                }
+                if w.steps >= max_walk {
+                    shared.abandoned.fetch_add(1, Ordering::Relaxed);
+                    *w = start(&mut rng);
+                    continue;
+                }
+                *key_out = key;
+                break;
+            }
+        }
+        // One r-adding step for every walk, batched.
+        let ps: Vec<G::Elt> = walks.iter().map(|w| w.p.clone()).collect();
+        let qs: Vec<&G::Elt> = keys.iter().map(|k| &jumps[(k % r) as usize].0).collect();
+        let sums = g.add_many(&ps, &qs);
+        for ((w, sum), key) in walks.iter_mut().zip(sums).zip(&keys) {
+            let (_, aj, bj) = &jumps[(key % r) as usize];
+            let mut a2 = add_reduced(&w.a, aj, n);
+            let mut b2 = add_reduced(&w.b, bj, n);
+            let mut next = if fold {
+                let (rep, i, neg) = g.canonical_orbit(&sum);
+                fold_coeffs(&mut a2, &mut b2, i, neg, multipliers, n);
+                rep
+            } else {
+                sum
+            };
+            local_iters += 1;
+            if fold && w.prev.as_ref() == Some(&next) {
+                shared.escapes.fetch_add(1, Ordering::Relaxed);
+                let dbl = g.double(&w.p);
+                a2 = double_reduced(&w.a, n);
+                b2 = double_reduced(&w.b, n);
+                let (rep, i, neg) = g.canonical_orbit(&dbl);
+                fold_coeffs(&mut a2, &mut b2, i, neg, multipliers, n);
+                next = rep;
+                local_iters += 1;
+            }
+            w.prev = Some(std::mem::replace(&mut w.p, next));
+            w.a = a2;
+            w.b = b2;
+            w.steps += 1;
+        }
+        if local_iters >= FLUSH {
+            let total = shared.iterations.fetch_add(local_iters, Ordering::Relaxed) + local_iters;
+            local_iters = 0;
+            if total >= budget {
+                shared.done.store(true, Ordering::Relaxed);
+                break;
+            }
+        }
+    }
+    shared.iterations.fetch_add(local_iters, Ordering::Relaxed);
+}
+
 fn finish<E>(shared: &Shared<E>, k: BigUint) {
     let mut res = shared.result.lock().unwrap();
     if res.is_none() {
@@ -482,6 +661,56 @@ mod tests {
             rep.iterations
         );
         rep
+    }
+
+    /// The lockstep worker (with `PrimeGroup::add_many`, batched on IFMA
+    /// where available) solves the same instances.
+    #[test]
+    fn rho_lanes_recovers_on_toy_prime_curves() {
+        for lanes in [8usize, 64] {
+            let opts = RhoOptions {
+                lanes,
+                threads: 2,
+                ..RhoOptions::default()
+            };
+            check(&toy::prime_small(), 7777, &opts);
+            check(&toy::prime_mid(), 65_432, &opts);
+            let unfolded = RhoOptions {
+                fold_automorphisms: false,
+                ..opts.clone()
+            };
+            check(&toy::prime_mid(), 12_345, &unfolded);
+        }
+    }
+
+    /// `PrimeGroup::add_many` equals `add` on a full-size curve, including
+    /// `P = Q`, `P = −Q` and the point at infinity.
+    #[test]
+    fn prime_add_many_matches_add() {
+        use crate::ecc::curve::CurveParams;
+        let mut rng = StdRng::seed_from_u64(0x6164_646d);
+        for curve in [
+            CurveParams::secp256k1(),
+            CurveParams::p256(),
+            CurveParams::eccp131(),
+        ] {
+            let g = super::super::group::PrimeGroup::new(curve);
+            let n = g.order().clone();
+            let pts: Vec<_> = (0..37)
+                .map(|_| g.mul(&g.generator(), &rng.gen_biguint_below(&n)))
+                .collect();
+            let mut qs: Vec<_> = (0..37)
+                .map(|_| g.mul(&g.generator(), &rng.gen_biguint_below(&n)))
+                .collect();
+            qs[3] = pts[3].clone();
+            qs[4] = g.neg(&pts[4]);
+            qs[5] = g.identity();
+            let qr: Vec<_> = qs.iter().collect();
+            let got = g.add_many(&pts, &qr);
+            for i in 0..37 {
+                assert_eq!(got[i], g.add(&pts[i], &qs[i]), "{} pair {i}", g.name());
+            }
+        }
     }
 
     #[test]

@@ -1,0 +1,61 @@
+{
+  "scope": "bookkeeping-only SHA256 and report presence checks; no mathematical rerun",
+  "attempts": [
+    {
+      "attempt": "mixed-v1",
+      "exit": 0,
+      "hash_checks": {
+        "pre-build-manifest.sha256": {
+          "exit": 0,
+          "files_checked": 22
+        },
+        "binary-manifest.sha256": {
+          "exit": 0,
+          "files_checked": 1
+        }
+      },
+      "report_pdf": "research/nist_cover_three_tests_20261116/closed_rank_20261127/reports/mixed-v1/REPORT.pdf"
+    },
+    {
+      "attempt": "divided-v1",
+      "exit": 1,
+      "hash_checks": {
+        "pre-build-manifest.sha256": {
+          "exit": 0,
+          "files_checked": 11
+        }
+      },
+      "report_pdf": "research/nist_cover_three_tests_20261116/closed_rank_20261127/reports/divided-v1/REPORT.pdf"
+    },
+    {
+      "attempt": "divided-v2",
+      "exit": 0,
+      "hash_checks": {
+        "pre-build-manifest.sha256": {
+          "exit": 0,
+          "files_checked": 11
+        },
+        "binary-manifest.sha256": {
+          "exit": 0,
+          "files_checked": 1
+        }
+      },
+      "report_pdf": "research/nist_cover_three_tests_20261116/closed_rank_20261127/reports/divided-v2/REPORT.pdf"
+    },
+    {
+      "attempt": "mixed-divided-v1",
+      "exit": 0,
+      "hash_checks": {
+        "pre-build-manifest.sha256": {
+          "exit": 0,
+          "files_checked": 25
+        },
+        "binary-manifest.sha256": {
+          "exit": 0,
+          "files_checked": 1
+        }
+      },
+      "report_pdf": "research/nist_cover_three_tests_20261116/closed_rank_20261127/reports/mixed-divided-v1/REPORT.pdf"
+    }
+  ]
+}
