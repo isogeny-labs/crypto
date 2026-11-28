@@ -48,6 +48,7 @@ RECORDED_EXACT = (
 NOT_RESULT_AFFECTING = frozenset({"HOSTNAME", "PATH", "TMPDIR", "CRYPTO_AUDIT_DIR", "TASKQ_TASK_ID",
                                   "NOINTERLEAVE",  # Fp64::batch_inv chain layout: same inverses, timing only
                                   "FASTGROUP_SMOKE_OUT",  # output path only
+                                  "QL_CORE_DUMP",  # optional append-only quartic core dump; computed diagnostics unchanged
                                   # genus_ladder export_core: appends the reduced core to a
                                   # JSONL path from a cloned RNG; the run's result is unchanged
                                   "GENUS_LADDER_EXPORT_CORE",
