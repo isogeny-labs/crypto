@@ -1,0 +1,8 @@
+# Identity-origin chart and node crossing instance
+
+1. Structure: actual normalizedKernel J=K*constantInverse, old fixed diagonalJet chart; actual polynomial finite sums and Content; actual node evaluation matrix. Retained integer t/v2i<u<a.
+2. Laws AS STATED: normalizedKernel_origin/nonzero_node/entry172; integralInverse_bits171; whole_crossing_content169; content_sum, Content.mul/C and actual inverse element VBound0; Polynomial.sum_comp/mul_comp/C_comp and finite distributivity. Old base_at_other_node and actual_displacement_ne_node yield exact old node zero. No generic matrix/series law re-proved.
+3. Object: normalizedChart=C(old diagonalJet^-1)*chart(a,t,Jxy). Its actual sum runs over Kxz times constant integral inversezy. Same4profile for all crossing entries; arbitrary naturalm for exact node crossing zero.
+4. Chain: exact172entry -> polynomial chart homomorphism/distribution -> actual normalized finite sum. Zero inverse summand is0; nonzero inverse implies z_i=y_i, so x_i=y_i gives Kxz crossing and169Content. Multiply by actual integral scalar and content_sum -> Jchart Content(u-i); fixed old c_i restores absolute weight. Node exact zero follows oldWt crossing0 times same inverse support, not a valuation/rank inference.
+5. Missing actual polynomial/matrix/evaluation endpoint equalities only. Pointwise J0=I from matrix equation. Root2u endpoint derives stricta>u from i<u; no unsupported claim u=a invertible.
+6. Inheritance: existing source grid/normalizer, actual integral inverse/unit, original retained displacement bits. Actual Boolean target and packet entry/mode/child/bit costs remain separate. No arbitrary Boolean K(AB) composition or unchanged local-node representation. [pcc:unverified]

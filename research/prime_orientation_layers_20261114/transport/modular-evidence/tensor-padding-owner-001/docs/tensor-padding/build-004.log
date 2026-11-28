@@ -1,0 +1,9 @@
+docs/tensor-padding/source-004.lean.txt:18:0: warning: automatically included section variable(s) unused in theorem `CryptoLean.TensorPadding.dummyWeight_eq`:
+  [Fintype Sigma]
+  [DecidableEq D]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [Fintype Sigma] [DecidableEq D] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+'CryptoLean.TensorPadding.dummyWeight_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CryptoLean.TensorPadding.contraction_padded' depends on axioms: [propext, Classical.choice, Quot.sound]

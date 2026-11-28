@@ -1,0 +1,13 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",ranksep=.25];
+ node [shape=box,fontname="Helvetica",fontsize=12,style="rounded,filled",fillcolor="#edf4fa"];
+ original [label="ACTUAL 72 -> 70 JET OPERATOR\nOriginal kernel U: dimension >=2\nParent public036 / local019"];
+ sub [label="ACTUAL CURVE-MULTIPLE SUBKERNEL V\nker(jets) intersect ker(30 remainder ports)"];
+ budget [label="ACTUAL MONIC QUOTIENT D\nDegree budget and full4 -> full3\nPublic039/043/045; local020/021/022"];
+ inject [label="ACTUAL INJECTIVE MAP V -> ELIGIBLE\nReconstruction + original embedding injection\nPublic047 / local023"];
+ small [label="SCALAR PORT COMPOSITION\nChecked injection into K: dimension(V) <=1"];
+ image [label="NONZERO ACTUAL REMAINDER IMAGE\nIf U subset ker(remainder), V=U: contradiction\nPublic049 / local024"];
+ open [label="OPEN: actual norm / divisor usefulness\nGrowing public finder / extraction / total cost",fillcolor="#fff2d9",style="rounded,filled,dashed"];
+ original -> sub;sub -> budget -> inject -> small;original -> image;small -> image;
+ image -> open [style=dashed];
+}

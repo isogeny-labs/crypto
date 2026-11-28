@@ -1,0 +1,22 @@
+[package]
+name = "pplus-pair-divisor-transfer"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "pair-transfer-candidate"
+path = "src/bin/pair_transfer_candidate.rs"
+
+[[bin]]
+name = "pair-transfer-verify"
+path = "src/bin/pair_transfer_verify.rs"
+
+[[bin]]
+name = "pair-transfer-analyze"
+path = "src/bin/pair_transfer_analyze.rs"
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+panic = "abort"

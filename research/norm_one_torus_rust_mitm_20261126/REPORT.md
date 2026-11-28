@@ -42,7 +42,7 @@ inversions with prefix/backward products. All arms emit the same hit/miss mask
 and result digest. Exactly the eight planted targets decomposed; none of the 32
 public random targets did.
 
-![Control and candidate component medians, with deterministic structural counters. [pcc:unverified]](speedup.png)
+![Control and candidate component medians, with deterministic structural counters. [pcc:unverified]](speedup.svg)
 
 ## Algorithm
 
