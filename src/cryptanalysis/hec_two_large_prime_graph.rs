@@ -1,11 +1,13 @@
 //! Spanning-forest elimination for hyperelliptic relations with at most two
 //! off-base rational places. Integral cross-products eliminate repeated
-//! places; a cycle is withheld if an `i64` factor-base coefficient overflows.
+//! places; wide intermediate coefficients are kept exact, and a cycle is
+//! withheld only if an emitted factor-base coefficient exceeds `i64`.
 
 use std::collections::{HashMap, HashSet, VecDeque};
 
-use num_bigint::BigUint;
-use num_traits::Zero;
+use num_bigint::{BigInt, BigUint};
+use num_integer::Integer;
+use num_traits::{Signed, ToPrimitive, Zero};
 
 use super::hyperelliptic_index_calculus::HecRelation;
 
@@ -22,6 +24,46 @@ struct Edge {
     cu: i64,
     cv: i64,
     relation: HecRelation,
+}
+
+/// The cycle accumulator can exceed `i64` before later edges cancel it.
+/// Only a complete factor-base row is converted back to `HecRelation`.
+#[derive(Clone)]
+struct WideRelation {
+    coef_a: BigUint,
+    coef_b: BigUint,
+    entries: HashMap<usize, BigInt>,
+}
+
+impl From<&HecRelation> for WideRelation {
+    fn from(relation: &HecRelation) -> Self {
+        let mut entries = HashMap::<usize, BigInt>::new();
+        for &(index, value) in &relation.entries {
+            *entries.entry(index).or_default() += value;
+        }
+        entries.retain(|_, value| !value.is_zero());
+        Self {
+            coef_a: relation.coef_a.clone(),
+            coef_b: relation.coef_b.clone(),
+            entries,
+        }
+    }
+}
+
+impl WideRelation {
+    fn finish(self) -> Option<HecRelation> {
+        let mut entries: Vec<_> = self
+            .entries
+            .into_iter()
+            .map(|(index, value)| Some((index, value.to_i64()?)))
+            .collect::<Option<_>>()?;
+        entries.sort_unstable_by_key(|&(index, _)| index);
+        Some(HecRelation {
+            coef_a: self.coef_a,
+            coef_b: self.coef_b,
+            entries,
+        })
+    }
 }
 
 impl Edge {
@@ -127,11 +169,11 @@ fn combine_cycle(
     tree: &[Edge],
     n: &BigUint,
 ) -> Option<HecRelation> {
-    let mut relation = closing.relation.clone();
+    let mut relation = WideRelation::from(&closing.relation);
     let mut places = HashMap::new();
-    places.insert(closing.u.clone(), closing.cu);
+    places.insert(closing.u.clone(), BigInt::from(closing.cu));
     if closing.v != Vertex::Ground {
-        places.insert(closing.v.clone(), closing.cv);
+        places.insert(closing.v.clone(), BigInt::from(closing.cv));
     }
     if let Some(ground_step) = path.iter().position(|(at, _)| *at == Vertex::Ground) {
         // The tree path passes through ground. Eliminate each endpoint
@@ -148,95 +190,68 @@ fn combine_cycle(
             eliminate_at(&mut relation, &mut places, at, &tree[*idx], n)?;
         }
     }
-    if places.values().any(|&v| v != 0) {
+    if places.values().any(|value| !value.is_zero()) {
         return None;
     }
     if relation.coef_a.is_zero() && relation.coef_b.is_zero() && relation.entries.is_empty() {
         return None;
     }
-    Some(relation)
+    relation.finish()
 }
 
 fn eliminate_at(
-    relation: &mut HecRelation,
-    places: &mut HashMap<Vertex, i64>,
+    relation: &mut WideRelation,
+    places: &mut HashMap<Vertex, BigInt>,
     at: &Vertex,
     edge: &Edge,
     n: &BigUint,
 ) -> Option<()> {
     let current = places.remove(at)?;
-    let coefficient = edge.coefficient(at)?;
-    let divisor = gcd_u64(current.unsigned_abs(), coefficient.unsigned_abs()) as i128;
-    let orientation = if coefficient < 0 { -1i128 } else { 1 };
-    let scale_relation = i64::try_from(coefficient.unsigned_abs() as i128 / divisor).ok()?;
-    let scale_edge = i64::try_from(-(current as i128) * orientation / divisor).ok()?;
-    *relation = linear_combination(relation, scale_relation, &edge.relation, scale_edge, n)?;
-    let mut updated: HashMap<Vertex, i128> = HashMap::new();
+    let coefficient = BigInt::from(edge.coefficient(at)?);
+    let divisor = current.abs().gcd(&coefficient.abs());
+    let scale_relation = coefficient.abs() / &divisor;
+    let scale_edge = -current * coefficient.signum() / &divisor;
+    *relation = linear_combination(relation, &scale_relation, &edge.relation, &scale_edge, n)?;
+    let mut updated: HashMap<Vertex, BigInt> = HashMap::new();
     for (vertex, value) in places.iter() {
-        updated.insert(vertex.clone(), (*value as i128) * (scale_relation as i128));
+        updated.insert(vertex.clone(), value * &scale_relation);
     }
     let other = edge.other(at)?;
     if other != Vertex::Ground {
-        let next = (edge.coefficient(&other)? as i128) * (scale_edge as i128);
-        let value = updated
-            .get(&other)
-            .copied()
-            .unwrap_or(0)
-            .checked_add(next)?;
-        updated.insert(other, value);
+        let next = BigInt::from(edge.coefficient(&other)?) * &scale_edge;
+        *updated.entry(other).or_default() += next;
     }
     *places = updated
         .into_iter()
-        .filter(|(_, value)| *value != 0)
-        .map(|(vertex, value)| Some((vertex, i64::try_from(value).ok()?)))
-        .collect::<Option<HashMap<_, _>>>()?;
+        .filter(|(_, value)| !value.is_zero())
+        .collect();
     Some(())
 }
 
-fn gcd_u64(mut a: u64, mut b: u64) -> u64 {
-    while b != 0 {
-        (a, b) = (b, a % b);
-    }
-    a
-}
-
 fn linear_combination(
-    a: &HecRelation,
-    ka: i64,
+    a: &WideRelation,
+    ka: &BigInt,
     b: &HecRelation,
-    kb: i64,
+    kb: &BigInt,
     n: &BigUint,
-) -> Option<HecRelation> {
-    let scale_mod = |v: &BigUint, k: i64| -> BigUint {
-        let t = (v * BigUint::from(k.unsigned_abs())) % n;
-        if k < 0 {
+) -> Option<WideRelation> {
+    let scale_mod = |v: &BigUint, k: &BigInt| -> BigUint {
+        let t = (v * k.abs().to_biguint().expect("absolute scalar")) % n;
+        if k.is_negative() {
             (n - t) % n
         } else {
             t
         }
     };
-    let mut entries: HashMap<usize, i128> = HashMap::new();
-    for (source, scale) in [(&a.entries, ka), (&b.entries, kb)] {
-        for &(idx, value) in source {
-            let signed = (value as i128) * (scale as i128);
-            let next = entries
-                .get(&idx)
-                .copied()
-                .unwrap_or(0)
-                .checked_add(signed)?;
-            if next == 0 {
-                entries.remove(&idx);
-            } else {
-                entries.insert(idx, next);
-            }
-        }
+    let mut entries = HashMap::<usize, BigInt>::new();
+    for (&index, value) in &a.entries {
+        *entries.entry(index).or_default() += value * ka;
     }
-    let mut entries: Vec<_> = entries
-        .into_iter()
-        .map(|(idx, value)| Some((idx, i64::try_from(value).ok()?)))
-        .collect::<Option<Vec<_>>>()?;
-    entries.sort_unstable_by_key(|&(idx, _)| idx);
-    Some(HecRelation {
+    for &(index, value) in &b.entries {
+        *entries.entry(index).or_default() += BigInt::from(value) * kb;
+    }
+    entries.retain(|_, value| !value.is_zero());
+    Some(WideRelation {
         coef_a: (scale_mod(&a.coef_a, ka) + scale_mod(&b.coef_a, kb)) % n,
         coef_b: (scale_mod(&a.coef_b, ka) + scale_mod(&b.coef_b, kb)) % n,
         entries,
@@ -331,6 +346,58 @@ mod tests {
         let full = graph.push(large, &[(p, 1)], &n).unwrap();
         assert_eq!(full.coef_a, BigUint::from(1u32));
         assert_eq!(full.entries, vec![(0, i64::MAX)]);
+    }
+
+    #[test]
+    fn intermediate_above_i64_can_cancel_to_exact_output() {
+        let n = BigUint::from(101u32);
+        let source = HecRelation {
+            coef_a: BigUint::from(1u32),
+            coef_b: BigUint::zero(),
+            entries: vec![(0, i64::MAX)],
+        };
+        let doubled = linear_combination(
+            &WideRelation::from(&source),
+            &BigInt::from(2),
+            &source,
+            &BigInt::zero(),
+            &n,
+        )
+        .unwrap();
+        assert_eq!(doubled.entries[&0], BigInt::from(i64::MAX) * 2);
+        assert!(doubled.clone().finish().is_none());
+        let cancelled =
+            linear_combination(&doubled, &BigInt::from(1), &source, &BigInt::from(-1), &n)
+                .unwrap()
+                .finish()
+                .unwrap();
+        assert_eq!(cancelled.coef_a, BigUint::from(1u32));
+        assert_eq!(cancelled.entries, vec![(0, i64::MAX)]);
+    }
+
+    #[test]
+    fn graph_cycle_retains_wide_intermediate_until_final_cancellation() {
+        let n = BigUint::from(101u32);
+        let p = BigUint::from(7u32);
+        let q = BigUint::from(11u32);
+        let r = BigUint::from(13u32);
+        let relation = |coefficient: i64| HecRelation {
+            coef_a: BigUint::from((coefficient as i128).rem_euclid(101) as u64),
+            coef_b: BigUint::zero(),
+            entries: vec![(0, coefficient)],
+        };
+        let mut graph = TwoLargePrimeGraph::default();
+        assert!(graph
+            .push(relation(-i64::MAX), &[(p.clone(), 1), (q.clone(), 1)], &n)
+            .is_none());
+        assert!(graph
+            .push(relation(-i64::MAX), &[(q, 1), (r.clone(), 1)], &n)
+            .is_none());
+        let full = graph
+            .push(relation(i64::MAX), &[(p, 2), (r, -2)], &n)
+            .unwrap();
+        assert_eq!(full.entries, vec![(0, i64::MAX)]);
+        assert_eq!(full.coef_a, BigUint::from((i64::MAX as i128 % 101) as u64));
     }
 
     #[test]
