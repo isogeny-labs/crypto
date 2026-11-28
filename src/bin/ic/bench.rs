@@ -779,6 +779,7 @@ fn run_prime(
     let hashed = HashedAffineBase { instance: inst };
     let kummer = PrimeKummerBase { instance: inst };
     let isogeny = PrimeIsogenyBase { instance: inst };
+    let mixed = crypto_lib::cryptanalysis::ic_framework::prime_tower::PrimeMixedIsogenyBase { instance: inst };
     let base: &dyn FactorBaseBuilder<_> = match fb_name {
         "archive" => &archive,
         "prime-abscissa" => &abscissa,
@@ -789,9 +790,10 @@ fn run_prime(
         "hashed-affine" => &hashed,
         "prime-kummer" => &kummer,
         "prime-isogeny" => &isogeny,
+        "prime-mixed-isogeny" => &mixed,
         other => {
             return Err(format!(
-                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa, prime-interval, glv-orbit, known-log, cm-multiplier, hashed-affine, prime-kummer or prime-isogeny"
+                "factor base `{other}` is not available on a prime-field curve; try prime-abscissa, prime-interval, glv-orbit, known-log, cm-multiplier, hashed-affine, prime-kummer, prime-isogeny or prime-mixed-isogeny"
             ))
         }
     };

@@ -1062,6 +1062,87 @@ impl FactorBaseBuilder<PrimeCurve> for PrimeIsogenyBase<'_> {
     }
 }
 
+
+/// The base over a **mixed-degree** Vélu chain:
+/// `prime-mixed-isogeny:degrees=3;5;7[,seed=S][,max_curves=C]`.
+///
+/// `S = ∏ degrees`; `pkm_smooth_tower::search_aux_exact` finds `E'/F_p` with a
+/// point `Q` of order `S`, `isogeny_tower_on` builds the chain and
+/// `V = x(R' + ⟨Q⟩)` of exactly `S` abscissae (PKM §3.4 with `B > 2`), and the
+/// base is every point of the curve above an abscissa of `V`, one column each.
+/// The auxiliary search and the chain build are recorded as counters and are
+/// not charged to `ops` in this cut, which the base's description says.
+pub struct PrimeMixedIsogenyBase<'i> {
+    pub instance: &'i PrimeInstance,
+}
+
+impl FactorBaseBuilder<PrimeCurve> for PrimeMixedIsogenyBase<'_> {
+    fn name(&self) -> &str {
+        "prime-mixed-isogeny"
+    }
+
+    fn describe(&self, params: &Params) -> String {
+        format!(
+            "mixed-degree Vélu chain degrees={} (aux search and chain build uncharged)",
+            params.get("degrees").unwrap_or("?")
+        )
+    }
+
+    fn build(
+        &self,
+        _ctx: &InstanceCtx<PrimeCurve>,
+        params: &Params,
+        _ops: &mut GroupOps,
+    ) -> Result<FactorBase<PrimePoint>, String> {
+        use crate::cryptanalysis::pkm_smooth_tower as st;
+        let curve = &self.instance.curve;
+        let p = curve.p;
+        let spec = params.get("degrees").unwrap_or("");
+        let degrees: Vec<u64> = spec
+            .split(|c| c == ',' || c == ';')
+            .map(str::trim)
+            .filter(|s| !s.is_empty())
+            .map(|s| s.parse::<u64>())
+            .collect::<Result<_, _>>()
+            .map_err(|_| format!("degrees must be a comma list of primes, not `{spec}`"))?;
+        if degrees.len() < 2 {
+            return Err("degrees needs at least two steps, e.g. degrees=3;5;7".into());
+        }
+        let s = degrees
+            .iter()
+            .try_fold(1u64, |acc, &q| acc.checked_mul(q))
+            .ok_or("S overflows u64")?;
+        let seed = params.u64_or("seed", 0)?;
+        let max_curves = params.u64_or("max_curves", 400_000)?;
+
+        let found = st::search_aux_exact(p, s, seed, max_curves)?;
+        let tower = st::isogeny_tower_on(
+            found.aux,
+            found.order,
+            found.q,
+            &degrees,
+            seed,
+            found.curves_tried,
+        )?;
+        tower.verify()?;
+        let mut xs = tower.v.clone();
+        xs.sort_unstable();
+        let mut fb = lift_abscissae(self.instance, &xs, |columns| {
+            format!(
+                "mixed Vélu chain {spec} (S = {s}, seed = {seed}, {tried} auxiliary curves tried, \
+                 aux order {order}), {columns} of {s} abscissae on the curve",
+                tried = found.curves_tried,
+                order = found.order
+            )
+        })?;
+        fb.cost.count("aux_curves_tried", found.curves_tried);
+        fb.cost.count("aux_order", found.order);
+        fb.cost.count("tower_levels", degrees.len() as u64);
+        fb.cost.count("chain_degree", s);
+        Ok(fb)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
