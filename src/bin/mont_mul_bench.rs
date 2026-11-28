@@ -41,6 +41,7 @@ const ARMS: &[&str] = &[
     "adx6",
     "adx6_mul",
     "adx_il",
+    "adx_qp",
 ];
 const BASELINE: &str = "pad9_cios";
 const AA: &str = "pad9_cios#aa";
@@ -49,6 +50,7 @@ const KERNEL_OPS: &[&str] = &[
     "adx_mul",
     "adx6_mul",
     "adx_il_mul",
+    "adx_qp_mul",
     "mulx_mul",
     "sos_mul",
     "karatsuba_mul",
@@ -349,8 +351,8 @@ mod analyze {
         for op in KERNEL_OPS {
             write!(md, " {op} |").unwrap();
         }
-        md.push_str(" sqr / cios_sqr | karatsuba / cios_mul | sos / cios_mul | adx / cios_mul | adx6 / cios_mul | mulx / cios_mul | adx6 / mulx | il / adx | il / adx6 | bingcd / fermat |\n|:--|--:|");
-        for _ in 0..KERNEL_OPS.len() + 10 {
+        md.push_str(" sqr / cios_sqr | karatsuba / cios_mul | sos / cios_mul | adx / cios_mul | adx6 / cios_mul | mulx / cios_mul | adx6 / mulx | il / adx | il / adx6 | qp / adx | qp / adx6 | bingcd / fermat |\n|:--|--:|");
+        for _ in 0..KERNEL_OPS.len() + 12 {
             md.push_str("--:|");
         }
         md.push('\n');
@@ -380,7 +382,7 @@ mod analyze {
             };
             writeln!(
                 md,
-                " {} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
+                " {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} | {} |",
                 ratio("sqr", "cios_sqr"),
                 ratio("karatsuba_mul", "cios_mul"),
                 ratio("sos_mul", "cios_mul"),
@@ -390,6 +392,8 @@ mod analyze {
                 ratio("adx6_mul", "mulx_mul"),
                 ratio("adx_il_mul", "adx_mul"),
                 ratio("adx_il_mul", "adx6_mul"),
+                ratio("adx_qp_mul", "adx_mul"),
+                ratio("adx_qp_mul", "adx6_mul"),
                 ratio("inv_bingcd", "inv_fermat")
             )
             .unwrap();
