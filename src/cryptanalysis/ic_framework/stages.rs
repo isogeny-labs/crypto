@@ -264,6 +264,19 @@ pub trait DecompositionOracle<G: CountedGroup> {
     /// How many factor-base points a relation from this oracle has.
     fn summands(&self) -> u32;
 
+    /// `Some(m)` when, under `params`, every relation this oracle returns
+    /// writes the target as a sum of exactly `m` signed base points, each
+    /// coefficient `±1` (repeats allowed), so its coefficient sum is
+    /// `m mod 2`.  The pipeline then runs the coset-parity admission check
+    /// ([`super::parity_guard`]) before the oracle's precomputation and
+    /// refuses a single-class base that can never reach the target's class
+    /// (the K1 odd-`m` parity trap).  `None` (the default) makes no such
+    /// promise and skips the check: an oracle with general coefficients,
+    /// large-prime partials or cofactor-fibre targets must not opt in.
+    fn exact_unit_summands(&self, _params: &Params) -> Option<u32> {
+        None
+    }
+
     fn describe(&self, params: &Params) -> String;
 
     fn parameters(&self) -> &[(&str, &str)] {
