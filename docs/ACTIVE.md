@@ -19,7 +19,7 @@ Previous pinned goal, retained for ongoing lanes: Find an algorithmic breakthrou
 
 ## Active items
 
-- [ ] Publish the public B677 M31 diagnostic and measure a matched optimized negation-map rho control (Codex, started 2026-11-28, branch codex/beat-rho-public-panel-20261128).
+- [ ] Publish the public B677 M31 diagnostic and measure a matched optimized negation-map rho control (Codex, started 2026-11-28, branch codex/beat-rho-public-panel-20261128, PR #5357).
 - [ ] Implement and validate APS block-local coefficient walks (Codex, started 2026-11-27, branch lane/aps-block-walk-20261127).
 - [ ] Correct the merged prime-field lead review's RR5 priority after #5208 (Codex, started 2026-11-28, branch codex/rr5-lead-priority-correction-20261128, PR #5345)
 - [ ] Implement the plane-curve and genus 2–5 index-calculus table across crypto and cryptanalysis (Codex, started 2026-11-28, branch codex/high-genus-table-coverage-20261128, PR #5338 (follow-up to merged #5334, #5330, and #5327); inventory recorded, cryptanalysis #2010 singleton filter passed 5 focused tests, supplied-coordinate quartic DLP API passed one focused end-to-end test, opt-in two-large-prime hyperelliptic collector passed toy DLP replay at genus 2–5 and now accepts repeated off-base places, and a public-source Smith-to-Picard-Diem bridge passed the root library check; Smith runtime replay, cost qualification, and general plane-curve rows remain open).
