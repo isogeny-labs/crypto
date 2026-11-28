@@ -3733,10 +3733,20 @@ fn reduce_chunk_by_known_gemm_par(
 
 /// How many unnormalised `add_lazy` updates may land on one accumulator
 /// before a full [`normalize_lazy`].  Bounded by the exact `u64` product
-/// limit for `p`, clamped to `[256, 4096]` so NTT primes (~3×10⁷ headroom)
-/// spend far less time in Barrett than the old fixed 256.
+/// limit for `p`, clamped to `[256, 4096]` (NTT primes have ~3×10⁷
+/// headroom; a higher cap was measured and did not beat 4096 on
+/// m=3 t=5).  Override with `F4_FP_NORMALIZE_AFTER`.
 #[inline]
 fn normalize_after_for(p: u64) -> usize {
+    static OVERRIDE: std::sync::OnceLock<Option<usize>> = std::sync::OnceLock::new();
+    if let Some(n) = *OVERRIDE.get_or_init(|| {
+        std::env::var("F4_FP_NORMALIZE_AFTER")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .filter(|&n| (1..=(1 << 24)).contains(&n))
+    }) {
+        return n;
+    }
     let lim = ((u64::MAX - p) / (p - 1).saturating_mul(p - 1).max(1)) as usize;
     lim.clamp(256, 4096)
 }
