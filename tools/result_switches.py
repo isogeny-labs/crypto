@@ -41,6 +41,8 @@ RECORDED_EXACT = (
     # gaudry golden test print and skip its assertions; GENUS_LADDER_EXPORT_CORE
     # names a core-dump path. Recorded so a run states them.
     "QDIAG_Q", "QDIAG_CS", "GOLDEN_PRINT", "GENUS_LADDER_EXPORT_CORE",
+    # QL_CORE_DUMP names the quartic_ladder attempt-core dump path (diag only).
+    "QL_CORE_DUMP",
 )
 # Read by the sources but cannot change a computed value.
 # GH_TOKEN and GITHUB_TOKEN are credentials read by `ic update`: they must never
@@ -51,6 +53,9 @@ NOT_RESULT_AFFECTING = frozenset({"HOSTNAME", "PATH", "TMPDIR", "CRYPTO_AUDIT_DI
                                   # genus_ladder export_core: appends the reduced core to a
                                   # JSONL path from a cloned RNG; the run's result is unchanged
                                   "GENUS_LADDER_EXPORT_CORE",
+                                  # quartic_ladder --quartic-diag: appends each attempt's core
+                                  # to a JSONL path; uncounted, the run's result is unchanged
+                                  "QL_CORE_DUMP",
                                   # read only inside #[cfg(test)] code: the #[ignore]d quartic_ladder
                                   # diag_attempts inputs and gaudry_cubic's print-instead-of-assert mode
                                   "QDIAG_Q", "QDIAG_CS", "GOLDEN_PRINT",

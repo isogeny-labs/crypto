@@ -2322,8 +2322,10 @@ fn run_diem_inner(
                         format!("[[{}],{}]", e.join(","), rhs % r)
                     })
                     .collect();
-                if let Ok(mut f) =
-                    std::fs::OpenOptions::new().create(true).append(true).open(path)
+                if let Ok(mut f) = std::fs::OpenOptions::new()
+                    .create(true)
+                    .append(true)
+                    .open(path)
                 {
                     let _ = writeln!(
                         f,
