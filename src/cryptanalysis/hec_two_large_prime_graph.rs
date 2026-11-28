@@ -265,4 +265,64 @@ mod tests {
         assert_eq!(full.coef_a, BigUint::from(5u32));
         assert_eq!(full.entries, vec![(0, 1), (3, 1)]);
     }
+
+    #[test]
+    fn every_emitted_small_cycle_preserves_a_symbolic_log_identity() {
+        let n = BigUint::from(101u32);
+        let places = [
+            BigUint::from(7u32),
+            BigUint::from(11u32),
+            BigUint::from(13u32),
+        ];
+        let hidden_logs = [17i64, 23, 31];
+        let signs = [-1i64, 1];
+        let mut emitted = 0;
+        for &a in &signs {
+            for &b in &signs {
+                for &c in &signs {
+                    for &d in &signs {
+                        for &e in &signs {
+                            for &f in &signs {
+                                let mut graph = TwoLargePrimeGraph::default();
+                                let edges = [
+                                    ([(0, a), (1, b)], 0usize),
+                                    ([(1, c), (2, d)], 1),
+                                    ([(0, e), (2, f)], 2),
+                                ];
+                                for (endpoints, idx) in edges {
+                                    let value = 1 + endpoints
+                                        .iter()
+                                        .map(|&(j, s)| s * hidden_logs[j])
+                                        .sum::<i64>();
+                                    let relation = rel(value.rem_euclid(101) as u32, idx);
+                                    let off_base: Vec<_> = endpoints
+                                        .iter()
+                                        .map(|&(j, s)| (places[j].clone(), s))
+                                        .collect();
+                                    if let Some(full) = graph.push(relation, &off_base, &n) {
+                                        let lhs = full
+                                            .coef_a
+                                            .to_u32_digits()
+                                            .first()
+                                            .copied()
+                                            .unwrap_or(0);
+                                        let rhs = full
+                                            .entries
+                                            .iter()
+                                            .map(|&(_, v)| v)
+                                            .sum::<i64>()
+                                            .rem_euclid(101)
+                                            as u32;
+                                        assert_eq!(lhs, rhs, "signs: {a} {b} {c} {d} {e} {f}");
+                                        emitted += 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        assert_eq!(emitted, 32);
+    }
 }
