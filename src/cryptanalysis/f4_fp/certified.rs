@@ -4,11 +4,11 @@
 //! return an error; callers choose a fallback explicitly. The default F4 path
 //! is unchanged. All conversion and checking belongs to this API's cost.
 use super::{normalise, F4Options, Ordering, Poly, TraceStats};
-use ::certified_relations as algebra;
 pub use algebra::quotient::compact::{Certificate as CompactCertificate, Info as CompactInfo};
 pub use algebra::quotient::Info as QuotientInfo;
 pub use algebra::replay::NativeKernels as ReplayKernels;
 pub use algebra::Row as CertificateRow;
+use certified_relations as algebra;
 pub use relation_replay_checker::{Checked as ReplayChecked, Stats as ReplayCheckStats};
 
 /// Explicit wire families; the existing vector replay API remains v1-only.

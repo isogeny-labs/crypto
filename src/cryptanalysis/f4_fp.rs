@@ -9600,42 +9600,63 @@ fn f4_with_arithmetic(
             }
         }
         if matches!(account, VisitAccount::Off)
-            && lm_packed.is_some()
             && opts.resource_limits.is_none()
             && !new_polys.is_empty()
         {
-            // Batch the packed UPDATE calls: one path, no per-poly phase_scope.
-            let lmp = lm_packed.as_mut().unwrap();
-            let n = new_polys[0][0].0.len();
-            for f in new_polys {
-                basis_terms += f.len();
-                let k = basis.len();
-                let h = pack(&f[0].0);
-                let new = match gm_update_packed(
-                    h, lmp, &mut pairs, &mut above, &mut alive, k, gm, None, None,
-                ) {
-                    Ok(v) => v,
-                    Err(stop) => abort_call!(stop),
-                };
-                lmp.push(h);
-                for (i, lp) in new {
-                    let d = packed_degree(lp, n);
-                    let pair = Pair {
-                        i,
-                        j: k,
-                        lcm: Vec::new(),
-                        lcm_p: lp,
-                        degree: d,
+            if let Some(lmp) = lm_packed.as_mut() {
+                // Batch the packed UPDATE calls: one path, no per-poly phase_scope.
+                let n = new_polys[0][0].0.len();
+                for f in new_polys {
+                    basis_terms += f.len();
+                    let k = basis.len();
+                    let h = pack(&f[0].0);
+                    let new = match gm_update_packed(
+                        h, lmp, &mut pairs, &mut above, &mut alive, k, gm, None, None,
+                    ) {
+                        Ok(v) => v,
+                        Err(stop) => abort_call!(stop),
                     };
-                    if d > opts.max_degree {
-                        above.push(pair);
-                    } else {
-                        pairs.push(pair);
+                    lmp.push(h);
+                    for (i, lp) in new {
+                        let d = packed_degree(lp, n);
+                        let pair = Pair {
+                            i,
+                            j: k,
+                            lcm: Vec::new(),
+                            lcm_p: lp,
+                            degree: d,
+                        };
+                        if d > opts.max_degree {
+                            above.push(pair);
+                        } else {
+                            pairs.push(pair);
+                        }
                     }
+                    pairs_above_bound = above.len();
+                    basis.push(f);
+                    alive.push(true);
                 }
-                pairs_above_bound = above.len();
-                basis.push(f);
-                alive.push(true);
+            } else {
+                for f in new_polys {
+                    basis_terms += f.len();
+                    account_or_abort!(
+                        account.charge_usize(VisitAccountingCounter::BasisTerms, f.len())
+                    );
+                    admit!(add(
+                        f,
+                        &mut basis,
+                        &mut alive,
+                        &mut pairs,
+                        &mut above,
+                        opts.max_degree,
+                        &mut pairs_above_bound,
+                        gm,
+                        lm_packed.as_mut(),
+                        opts.resource_limits.as_ref(),
+                        opts.resource_limits.and(opts.deadline),
+                        account,
+                    ));
+                }
             }
         } else {
             for f in new_polys {
