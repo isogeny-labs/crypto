@@ -14,6 +14,7 @@
 //!   fast     build_fast    + decompose_four_fast_path (batched, full scan, first witness kept)
 //!   first    build_fast    + decompose_four_first     (batched, early exit)
 //!   default  build         + decompose_four           (the public defaults)
+//!   multi:K  build         + decompose_four_visit, up to K pair-root witnesses/query
 //!
 //! Usage: semaev_fast_path_rank_rate <arm> [cap_seconds=120] [max_queries=100000]
 
@@ -139,10 +140,15 @@ fn next_word(s: &mut u64) -> u64 {
 fn main() {
     let mut args = std::env::args().skip(1);
     let arm = args.next().unwrap_or_else(|| "fast".into());
+    let multi_limit = arm.strip_prefix("multi:").map(|n| {
+        let limit: usize = n.parse().expect("multi:K requires a positive integer K");
+        assert!(limit > 0, "multi:K requires K > 0");
+        limit
+    });
     let cap_s: f64 = args.next().and_then(|v| v.parse().ok()).unwrap_or(120.0);
     let max_q: usize = args.next().and_then(|v| v.parse().ok()).unwrap_or(100_000);
     assert!(
-        ["generic", "fast", "first", "default"].contains(&arm.as_str()),
+        multi_limit.is_some() || ["generic", "fast", "first", "default"].contains(&arm.as_str()),
         "unknown arm"
     );
 
@@ -220,86 +226,99 @@ fn main() {
             .expect("finite query");
         queries += 1;
         let t0 = Instant::now();
-        let (w, qs) = decompose(r.0);
+        let mut query_witnesses = Vec::new();
+        let qs = if let Some(limit) = multi_limit {
+            proj.decompose_four_visit(r.0, |w| {
+                query_witnesses.push(w);
+                query_witnesses.len() < limit
+            })
+            .expect("batched multi-witness projection")
+        } else {
+            let (w, qs) = decompose(r.0);
+            query_witnesses.extend(w);
+            qs
+        };
         query_ms += t0.elapsed().as_secs_f64() * 1e3;
         scanned += qs.quadratics;
         lookups += qs.lookups;
         compatible += qs.compatible_keys;
-        let Some(w) = w else {
+        if query_witnesses.is_empty() {
             empty += 1;
             continue;
-        };
-        witnesses += 1;
-        // Lift: all sign patterns whose group-law sum is exactly R.
-        let idx: Vec<usize> =
-            w.x.iter()
-                .map(|x| *index.get(x).expect("witness x in base"))
-                .collect();
-        let mut lifts: Vec<Vec<(usize, i64)>> = Vec::new();
-        for mask in 0..16u32 {
-            let mut sum: Pt = None;
-            for (k, &i) in idx.iter().enumerate() {
-                let pt = Some(pts[i]);
-                let pt = if mask >> k & 1 == 1 {
-                    curve.neg(pt)
-                } else {
-                    pt
-                };
-                sum = curve.add(sum, pt);
-            }
-            if sum == Some(r) {
-                let mut coef: HashMap<usize, i64> = HashMap::new();
+        }
+        for w in query_witnesses {
+            witnesses += 1;
+            // Lift: all sign patterns whose group-law sum is exactly R.
+            let idx: Vec<usize> =
+                w.x.iter()
+                    .map(|x| *index.get(x).expect("witness x in base"))
+                    .collect();
+            let mut lifts: Vec<Vec<(usize, i64)>> = Vec::new();
+            for mask in 0..16u32 {
+                let mut sum: Pt = None;
                 for (k, &i) in idx.iter().enumerate() {
-                    *coef.entry(i).or_default() += if mask >> k & 1 == 1 { -1 } else { 1 };
+                    let pt = Some(pts[i]);
+                    let pt = if mask >> k & 1 == 1 {
+                        curve.neg(pt)
+                    } else {
+                        pt
+                    };
+                    sum = curve.add(sum, pt);
                 }
-                let mut terms: Vec<(usize, i64)> =
-                    coef.into_iter().filter(|&(_, c)| c != 0).collect();
-                terms.sort_unstable();
-                if !lifts.contains(&terms) {
-                    lifts.push(terms);
-                }
-            }
-        }
-        if lifts.is_empty() {
-            unliftable += 1;
-            continue;
-        }
-        if lifts.len() > 1 {
-            multi_sign += 1;
-        }
-        for terms in lifts {
-            // Independent replay of the lifted relation.
-            let mut sum: Pt = None;
-            for &(i, c) in &terms {
-                let pt = Some(pts[i]);
-                for _ in 0..c.unsigned_abs() {
-                    sum = curve.add(sum, if c > 0 { pt } else { curve.neg(pt) });
+                if sum == Some(r) {
+                    let mut coef: HashMap<usize, i64> = HashMap::new();
+                    for (k, &i) in idx.iter().enumerate() {
+                        *coef.entry(i).or_default() += if mask >> k & 1 == 1 { -1 } else { 1 };
+                    }
+                    let mut terms: Vec<(usize, i64)> =
+                        coef.into_iter().filter(|&(_, c)| c != 0).collect();
+                    terms.sort_unstable();
+                    if !lifts.contains(&terms) {
+                        lifts.push(terms);
+                    }
                 }
             }
-            assert_eq!(sum, Some(r), "lifted relation must replay");
-            let base_terms = terms.iter().filter(|&&(i, _)| is_fb[i]).count();
-            (queries, &terms).hash(&mut stream);
-            if !seen.insert(terms.clone()) {
-                dup += 1;
+            if lifts.is_empty() {
+                unliftable += 1;
                 continue;
             }
-            if base_terms < 2 {
-                // Same admission rule as the B677 graph control.
-                skipped_lp_only += 1;
-                continue;
+            if lifts.len() > 1 {
+                multi_sign += 1;
             }
-            let mut row = vec![0u64; WIDTH];
-            for &(i, c) in &terms {
-                row[column[i]] = if c >= 0 {
-                    c as u64 % N
-                } else {
-                    N - ((-c) as u64 % N)
-                };
-            }
-            row[TARGET] = mod_sub(0, b);
-            row[RHS] = a;
-            if rank.add(row) {
-                useful += 1;
+            for terms in lifts {
+                // Independent replay of the lifted relation.
+                let mut sum: Pt = None;
+                for &(i, c) in &terms {
+                    let pt = Some(pts[i]);
+                    for _ in 0..c.unsigned_abs() {
+                        sum = curve.add(sum, if c > 0 { pt } else { curve.neg(pt) });
+                    }
+                }
+                assert_eq!(sum, Some(r), "lifted relation must replay");
+                let base_terms = terms.iter().filter(|&&(i, _)| is_fb[i]).count();
+                (queries, &terms).hash(&mut stream);
+                if !seen.insert(terms.clone()) {
+                    dup += 1;
+                    continue;
+                }
+                if base_terms < 2 {
+                    // Same admission rule as the B677 graph control.
+                    skipped_lp_only += 1;
+                    continue;
+                }
+                let mut row = vec![0u64; WIDTH];
+                for &(i, c) in &terms {
+                    row[column[i]] = if c >= 0 {
+                        c as u64 % N
+                    } else {
+                        N - ((-c) as u64 % N)
+                    };
+                }
+                row[TARGET] = mod_sub(0, b);
+                row[RHS] = a;
+                if rank.add(row) {
+                    useful += 1;
+                }
             }
         }
         if queries.is_power_of_two() || queries % 64 == 0 {
@@ -326,6 +345,7 @@ fn main() {
         serde_json::to_string_pretty(&json!({
             "scope": "library PairProjection four-summand oracle, frozen B677 support, useful rank per second",
             "arm": arm,
+            "multi_limit": multi_limit,
             "cap_seconds": cap_s,
             "base_size": FB + LP,
             "finite_support": finite_support,
