@@ -1,0 +1,13 @@
+# Exactness: jq-normalised output hash (filter below), recovered scalar, distinct pair sums
+# filter: {rows:.relation_rows, q:[.queries[]|del(.source_ms,.graph_and_replay_ms)], s:.recovered_scalar, rep:.recovered_scalar_replay, lp:.lp_rank, pr:.projected_rows, fb:.factor_base_target_rank, probes:.probe_additions, cls:.classes_by_base_terms}
+# binary sha256 45d93e5dca92fa8e413cb2bc9ef407b152d61c59e00ca347e61efb6e25695bf8 (candidate), 017d0daf31778076d18f1a000dba62c253bc7ac8e3824f0588dcc25837c339e2 (#5319 reference)
+ref5319 default(1234567) threads=1 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116
+candidate levers=1234567 threads=1 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 probes=10068344
+candidate levers=1234 threads=1 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 probes=10068344
+candidate levers=12345678 threads=1 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 probes=10068344
+candidate levers=12345678 threads=2 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 probes=10068344
+candidate levers=12345678 threads=3 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 probes=10068344
+candidate levers=12345678 threads=4 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 probes=10068344
+candidate levers=12345678 threads=8 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 probes=10068344
+candidate levers=124568 threads=1 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 probes=10068344
+candidate levers=124568 threads=4 hash=a3f1e8a9589e420dd5a4a0fa1af5c626ae701be8dd02868687fd3b5cba0743f8 scalar=987654321 distinct=915116 probes=10068344

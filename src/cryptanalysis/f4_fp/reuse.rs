@@ -7,6 +7,8 @@
 use super::*;
 use std::collections::BTreeMap;
 
+#[path = "canonical_row.rs"]
+mod canonical_row;
 #[path = "pair_certificate.rs"]
 mod pair_certificate;
 pub use pair_certificate::PairCertificateStats;
@@ -236,6 +238,18 @@ fn reduces_to_zero(
     true
 }
 
+/// Existing acyclic product/chain checker; the call owns a fresh graph.
+pub(super) fn certify_pair_graph(
+    input: &[Poly],
+    basis: &[Poly],
+    p: u64,
+    opts: &F4Options,
+    stats: &mut TraceStats,
+) -> bool {
+    stats.pair_graph = Some(PairCertificateStats::default());
+    pair_certificate::certify(input, basis, p, opts, stats)
+}
+
 pub(super) fn certify(
     input: &[Poly],
     basis: &[Poly],
@@ -243,9 +257,10 @@ pub(super) fn certify(
     opts: &F4Options,
     stats: &mut TraceStats,
 ) -> bool {
+    let accounted = visit_accounting_active() || crate::cryptanalysis::jv_bitops::enabled();
     if basis
         .iter()
-        .any(|g| g.is_empty() || g[0].1 != 1 || *g != normalise(g, p, opts.order))
+        .any(|g| !canonical_row::is_canonical_monic(g, p, opts.order, accounted))
     {
         return false;
     }

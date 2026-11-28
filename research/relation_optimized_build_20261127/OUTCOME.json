@@ -1,0 +1,63 @@
+{
+  "schema": "matched-optimized-no-clock-build-feasibility-outcome/v1",
+  "plan": "PLAN_V3.json",
+  "source_context": "SOURCE_CURRENT.sha256",
+  "attempts": [
+    {
+      "step": "current-worker",
+      "AS_GiB": 6,
+      "cargo_exit": 101,
+      "result": "allocator failure SIGABRT6",
+      "diagnostic": "memory allocation of2097152bytes failed",
+      "source_postcheck_exit": 0
+    },
+    {
+      "step": "current-worker-as8",
+      "AS_GiB": 8,
+      "cargo_exit": 101,
+      "result": "allocator failure SIGABRT6",
+      "diagnostic": "memory allocation of107136bytes failed",
+      "source_postcheck_exit": 0
+    },
+    {
+      "step": "current-worker-as10",
+      "AS_GiB": 10,
+      "cargo_exit": 143,
+      "result": "supervisor refused physical-memory threshold",
+      "source_postcheck_exit": 0,
+      "refusal": {
+        "resource_refusal": true,
+        "target_bytes": 960240626,
+        "cgroup_memory_bytes": 16114987008,
+        "tmpfs_free_bytes": 2438209536,
+        "aggregate_compile_seconds": 1439
+      }
+    }
+  ],
+  "compiler_scope": "actual production non-test crypto lib; never whole root libtest",
+  "current_optimized_executable_produced": false,
+  "current_optimized_unit_tests": "unexecuted",
+  "current_optimized_native36_108": "unexecuted",
+  "current_optimized_transport432": "unexecuted",
+  "historical_materialization": "unexecuted; current success condition not met",
+  "historical_optimized_build": "unexecuted; current success condition not met",
+  "matched_optimized_pair_qualified": false,
+  "all_current_compilation_source_postchecks_pass": true,
+  "total_compile_budget_seconds_used": 1440,
+  "cgroup_oom_kill_after": 0,
+  "source_or_algorithms_modified": false,
+  "frozen_workers_replaced": false,
+  "whole_root_suite_pass": false,
+  "actual_performance_observations": 0,
+  "15x_admitted": false,
+  "intrinsic_regularity": null,
+  "actual_F4_solving_degree": null,
+  "canonical_protocol_validation": "pending; existing document-only choice unanswered",
+  "signed_execution_attestation": false,
+  "interpretation": "This exact bounded opt3 build did not produce an executable. Source unchanged. No mathematical, performance, impossibility or best-configuration conclusion.",
+  "prepared_but_unexecuted_code": [
+    "hydrate-historical.py",
+    "freeze-workers.py",
+    "run-qualification.sh"
+  ]
+}

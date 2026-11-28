@@ -1,0 +1,9 @@
+{
+  "schema": "fixed-f4-partial-analysis-plan/v1",
+  "execution_frozen": "SOURCE.sha256 and attempt-v1 retained; do not rerun or substitute observations",
+  "reason": "all49 p31 calls completed; first p53 F4 arm panicked in each of3 cases at existing Barrett::new p<2^32 assertion,46later arms never called",
+  "analysis": "additive Rust summarizer replays all6 reference proofs and independently rechecks all49 completed bases; exact A/A equality; classify p53 only with retained exit101, exact panic text and no output; never create missing observations",
+  "limits": "CPU0 one thread/job, existing Root0 cache, AS6GiB file128MiB build120seconds plus unit120seconds plus summary60seconds; zero cloud dollars",
+  "allowed": "no new solver/reference construction, no performance or intrinsic regularity claims",
+  "source_limitation": "original speculative plan assumed regular F4 supports both fixed primes; source review missed Barrett guard; retain all3 real panics rather than alter field or production engine"
+}

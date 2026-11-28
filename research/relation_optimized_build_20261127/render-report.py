@@ -1,0 +1,39 @@
+"""Render recorded compiler/status metadata; no mathematical/statistical analysis."""
+from pathlib import Path
+import json
+import subprocess
+
+s = Path(__file__).resolve().parent
+out = json.loads((s / "OUTCOME_FINAL.json").read_text())
+restored = json.loads((s / "CACHE_RESTORATION.json").read_text())
+assert restored["all_original_cache_bytes_modes_restored"]
+rows = "\n".join(
+    f"{a['address_space_GiB']} & {a['root_codegen_units']} & {a['exit']} & "
+    + ("allocation / SIGABRT6" if a["exit"] == 101 else "physical-memory refusal")
+    + f" & {a['source_postcheck_exit']} " + r"\\"
+    for a in out["attempts"]
+)
+text = r'''\documentclass[10pt,a4paper]{article}
+\usepackage[margin=18mm]{geometry}
+\usepackage{booktabs,hyperref}
+\pagestyle{empty}
+\begin{document}
+\noindent{\Large\bfseries Optimized root builds: bounded feasibility}\\[3pt]
+{\small Rust, 27 November 2026. PR \#5251. No application speedup measured.}\\[3pt]
+{\small Fixed $p=2147483647,9007199254740881$; $n=3,4,6$; seed7 LAST-star.}
+\paragraph{Result.} None of five compiler contexts produces an optimized worker. All current compilation-source postchecks pass. Unit, native144, transport432 and historical optimized qualification stages remain unexecuted. These are compiler/resource outcomes, not mathematical failures or proof passes. No claim of build impossibility or 15$\times$ admission follows. [pcc:unverified]
+\begin{center}\begin{tabular}{rrrlr}\toprule
+AS (GiB) & Root CG units & Exit & Recorded outcome & Source exit\\\midrule
+ROWS
+\bottomrule\end{tabular}\end{center}
+\noindent The fourth row follows reversible cache recovery. The fifth changes only the crypto package to codegen256; other dependencies keep codegen16. Every context uses opt3, LTOoff, debug0, incrementalfalse, default-features=false and CPU0/jobs1. These are provisional build settings selected without application runtime data; they are not canonical performance settings or a best-configuration claim.
+\paragraph{Limits and observations.} AS6/8 allocator failures request2097152/107136 bytes respectively. AS10 first stops at16114987008 cgroup bytes; the same layout after cache recovery stops at16153776128 bytes. Root-only codegen256 fails allocation7471120 bytes. Source postchecks are0 in all cases; cgroup OOMkill remains0. The supervisor samples shared cgroup memory, target bytes and free space every2seconds. Its physical-memory refusal is15GiB, fresh-target threshold1.5GiB, and aggregate compiler budget3600seconds;1917 are used. These samples include cache/other processes and are not exclusive compiler RSS. Incidental compiler durations are not relation-pipeline observations. [pcc:unverified]
+\paragraph{Reversible recovery.} Exactly34 non-executable compiler-cache files total1515431774bytes. Full archive roster/bytes/modes are checked; backup166994936bytes has SHA recorded in custody. Exact release reclaims1515515904 filesystem bytes. All46 protected executable digests and all source hashes remain unchanged. The original34 cache files are restored byte/mode-exactly afterward. Source, algorithms, tests, proofs, keys and gates remain intact. [pcc:unverified]
+\paragraph{Retained setup issues.} An initial global procfs-readability assertion stops before release; unreadable own-user contexts are zombies, otherUID service visibility stays unknown. A scoped own-user/reference check plus verified backup and measured reclamation replaces it before mutation. An unused rollback stream bug is corrected; final restoration is checked separately. Prepared pin/historical/proof helpers are not claimed executed. Earlier plan/helper preimages and the first dependency-wording clarification remain preserved.
+\paragraph{Source and scope.} SOURCE\_CURRENT pins actual complete root inputs, not an extracted substitute. Locked registry versions and mathematical code are unchanged. The historical source is pinned to82e77fb but is not built because current-success admission fails. Earlier opt0 native/transport qualification and whole-libtest compiler failures remain their own source contexts. Intrinsic regularity and actual F4 solving degree stay unknown. No new PCC ID, ledger promotion or signed execution attestation.
+\paragraph{Next acceptance.} The original15$\times$ target remains active and unachieved. It requires prospective repeated full-parent-call measurements against strongest matched controls, A/A, six fixed inputs and every proof/failure. Conductor and checkpoint/S3 access are waived; the separate canonical timing-document choice is unanswered. No comparative collector, timing pins or admission is authorized by this study. README, raw logs, exact source/runner hashes, restoration and archive receipts preserve this scope. [pcc:unverified]
+\end{document}
+'''.replace("ROWS", rows)
+(s / "report.tex").write_text(text)
+subprocess.run(["xelatex", "-interaction=nonstopmode", "-halt-on-error", "-output-directory", str(s), str(s / "report.tex")], cwd=s, check=True,
+               stdout=(s / "raw/report-build.stdout").open("x"), stderr=(s / "raw/report-build.stderr").open("x"))

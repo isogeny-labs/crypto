@@ -1,0 +1,16 @@
+{
+  "schema": "independent-heap-proof-replay-prototype/v1",
+  "source_commit": "3ddaa65f2d2f528d69c642c4bde3183e1bcbfb28",
+  "goal": "reduce temporary polynomial-map work in complete proof replay; no15x/performance admission",
+  "hypothesis": "sorted fixed-shift generator streams can be merged by heap, aggregating equal monomials before final map insertion; full products/identities/GB/input/budget/coverage checks remain",
+  "prototype_scope": "isolated exact-source checker copy with a new opt-in heap API; production checker/root and every frozen source unchanged; baseline original checker plus prototype original API remain controls",
+  "prior_source_review": "packed.rs combination, M order/product, all wire/GB guards; producer unit-inversion fast path and existing two-projection optimization already present; no novelty claim; KB wrapper status127 missing service",
+  "fixed_inputs": "existing144guarded-scan native proof records from36original+108pairgraph, p2147483647/p9007199254740881,n3/4/6seed7LAST-star; no fresh/reserved selection seeds or basis construction",
+  "positive_checks": "all144proofs through original production checker, prototype original API and prototype heap API; exact basis/Stats match, native basis match; original/proof hashes checked before/after",
+  "negative_checks": "per proof: basis coefficient, cofactor coefficient, future reference, missing pair, nonstandard pair representation, duplicate cofactor, changed original constant; all3API paths reject, no reports accepted",
+  "units": "all inherited checker library tests unchanged plus targeted heap/order/cancellation/coverage/budget differential tests on existing fixed primes",
+  "metrics": "arithmetic work Stats identical; any temporary-map reduction is structural only, not whole-call cost/time; no elapsed observations retained",
+  "budget": "oneCPU0/thread1, AS2GiB/file128MiB,600second build/unit/replay each; zero cloud compute; no root compilation or benchmark; at most144positive*3 and1008negative*3proof checks plusunits",
+  "integration": "prototype only; no new-source root-native qualification. Both merged Root0 CG16/256 builds hit declared14GiBmemory refusal; stop those trials, retain unexecuted36/108/144root gates. Any future production integration needs unchanged full-root/native strongest controls and original acceptance",
+  "acceptance": "original15x active/unachieved; requires agreed repeated full application-call measurements, strongest matched controls, allproof/failure/A-A/published checks and timing-document resolution; Conductor/S3 waived"
+}

@@ -1,0 +1,45 @@
+{
+  "schema": "fixed-f4-consequence-trace-plan/v1",
+  "status": "prospective algebraic diagnostic; no comparative timing",
+  "prime_roster": [
+    2147483647,
+    9007199254740881
+  ],
+  "dimension_roster": [
+    3,
+    4,
+    6
+  ],
+  "seed": 7,
+  "graph": "LAST-star",
+  "inputs": "exact six SHA256 pins from ../relation_scan_call_instrument_20261127/SYNTHETIC_INPUT_PINS.json; copied before execution",
+  "auxiliaries": "all direct cubic_difference and cubic_syzygy rows in existing cheap::consequences order; original-ideal certificates checked",
+  "original_equations": "all retained in original order in every arm",
+  "arms": "original A and A repeat; full auxiliary pool; each singleton; each leave-one-out; no adaptive selection or additional seeds",
+  "expected_auxiliary_counts_by_n": {
+    "3": 4,
+    "4": 6,
+    "6": 10
+  },
+  "expected_calls": 98,
+  "engine": "actual current-root regular f4, Grevlex, opt0 correctness build; no production edits",
+  "max_degree": 8,
+  "max_pairs": 100000,
+  "max_symbolic_monomials": 10000,
+  "max_matrix_entries": 1000000,
+  "deadline_seconds_per_f4_call": 10,
+  "external_limits": "CPU0, one thread, AS6GiB, file128MiB, per-case360seconds, no cloud compute",
+  "build_limits": "CPU0, one job/thread, existing unchanged Root0 cache, AS12GiB, file1GiB, 600seconds; do not rebuild root or retry failed historical configurations",
+  "proof": "every auxiliary original-ideal certificate; independent packed reference proof plus public native reverify; independent sparse u128 modular division in both ideal directions and all Buchberger pairs for each uncensored F4 basis; mutated proof/basis and checker budget canaries",
+  "independent_checker_budget": "5000000 term updates per basis validation; exhaustion fails validation, never passes",
+  "completion": "not timed_out, no resource_limit, no above-bound pairs, no staircase stop, no trace mismatch, and all independent ideal/GB checks pass",
+  "observations": "read-only observer event/step/degree/rows/columns/productive-degree and row-reduction multiplication counters; basis and all failure flags",
+  "clock_policy": "no wall observations serialized or compared; engine still uses internal clocks/cooperative deadline",
+  "degree_interpretation": "highest productive step is an algorithm-run observation only; zero reported separately as no productive step; intrinsic regularity unknown",
+  "censor_policy": "retain every failed/censored arm, never count it as reduction or success; no selective reruns or cap escalation",
+  "group_scope": "fixtures supply no P/Q scalar labels; no logarithm recovery or augmented group-rank claim; every original row retained",
+  "selection_scope": "fixed known fixtures only; exploratory diagnostics cannot select future acceptance targets",
+  "acceptance": "this diagnostic cannot establish a speedup; original 15x full application-call objective remains unachieved and requires the original repeated matched-control/proof/A-A gates and timing-document resolution",
+  "budget": "zero cloud dollars; at most 98 F4 calls plus six independent reference constructions, unit tests and preparation; no comparative runtime benchmark",
+  "unit_build_limits": "additional 120seconds, CPU0/thread1, AS6GiB, file128MiB; harness units only, no root libtest"
+}

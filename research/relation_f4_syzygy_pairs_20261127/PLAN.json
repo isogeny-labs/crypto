@@ -1,0 +1,48 @@
+{
+  "schema": "fixed-distinct-edge-syzygy-pairs/v1",
+  "status": "prospective exploratory follow-up on already observed fixed fixtures; not confirmation or timing",
+  "prior_evidence": "622093aad98d7479b636b1edade79ff438919618; immutable prior study retained",
+  "hypothesis": "two distinct-edge cubic syzygies suffice to retain highest productive F4 degree4, without all other cubics; test also with all difference cubics",
+  "fixed_primes": [
+    2147483647,
+    9007199254740881
+  ],
+  "n": [
+    3,
+    4,
+    6
+  ],
+  "seed": 7,
+  "graph": "LAST-star",
+  "inputs": "same6 SHA256 pins, copied unchanged from prior trace",
+  "roster": "original A/A, full cubic pool, all differences, all syzygies, every distinct-edge syzygy pair alone and with every difference; exact subset duplicates removed except explicit original A/A; fixed deterministic enumeration",
+  "arms_per_prime_by_n": {
+    "3": 5,
+    "4": 11,
+    "6": 25
+  },
+  "total_declared_arms": 82,
+  "regular_f4_calls": 41,
+  "unsupported_f4_arms": 41,
+  "unsupported_policy": "p53 regular F4 has existing p<2^32 assertion; deliberately skip all41 arms with null observations, preserve previous3panics/46unexecuted; polynomial space gates still run at both original primes",
+  "originals": "all original quartic f3 rows retained in original order; all candidates carry checked original-ideal witnesses",
+  "engine": "unchanged actualRoot0 regular F4, Grevlex degree8, read-only progress observer",
+  "limits": {
+    "max_pairs": 100000,
+    "max_symbolic_monomials": 10000,
+    "max_matrix_entries": 1000000,
+    "deadline_seconds_per_f4": 10
+  },
+  "spaces": "declared closed degree caps2/3/4 using unchanged degree_space default Limits; baseline allcaps, subsets checkD3first then2/4 only if D3rank matches; reject on any exact rank loss; censor or unchecked caps never pass",
+  "space_validation": "replay every snapshot derivation and original-membership certificate; subset containment follows deterministic auxiliary subset plus closure; rank equality only accepted with all3exact complete snapshots",
+  "scalar_labels": "absent; no group-rank/logarithm claim or integration admission",
+  "proofs": "all auxiliary certificates and coefficient/proof canaries; six fresh packed references, separate wire replay/native public reverify/mutations; unchanged independent sparse GB checker, both ideal inclusions and all S-pairs for every uncensored result, 5million term-update cap",
+  "comparability": "fresh original A/A exact algebraic equality; original and full F4 records must match same prior observations before interpreting pair panel; no clocks compared",
+  "clock_policy": "omit elapsed fields; internal engine clocks/cooperative deadlines remain; row multiplications partial only",
+  "execution": "CPU0 and one thread; AS6GiB/file128MiB/600seconds each case, six cases maximum; zero cloud dollars, no additional seeds or selective reruns/cap increases",
+  "build": "Root0 cache unchanged, opt0/LTOoff/CG16/debug0/incrementalfalse/default-featuresfalse, jobs1 CPU0, build600seconds AS12GiB/file1GiB plus harness-unit120seconds AS6GiB/file128MiB; no whole-root libtest or root rebuild",
+  "budget": "82 space-gate arms, at most41 F4calls and6reference constructions, preparation/unit/replay only; no actual comparative timings",
+  "censor": "every failure/refusal/unexecuted case retained; no dropped arms or invented degrees",
+  "success_scope": "can support/refute only fixed-fixture degree hypothesis; any proper subset losing a declared space cannot enter existing joint pruner; original15x remains unachieved and needs original repeated full-call strongest-controls/A-A/all-proof/failure published acceptance plus timing-document resolution",
+  "kb": "no KB tools exposed; bounded actualsource/prior-executable review; no novelty claim"
+}
