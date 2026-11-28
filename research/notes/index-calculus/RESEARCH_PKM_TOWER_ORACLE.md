@@ -3312,9 +3312,15 @@ is 86.47–182.63 times the complete cold control under the report's
 cost panel. That is a scoped null for this implementation, not a lower
 bound for other tree layouts or all primes. A balanced layout would need
 its own chart-complete construction, frozen cold cost protocol, F4 degree
-and width measurements, and independent relation-rank accounting. At
-present the two-sided split supplies neither a `p^{o(1)}` per-attempt
-bound nor the required total-relation-rank result.
+and width measurements, and independent relation-rank accounting. The split preserves the decomposition set and therefore does not change the
+basic hit probability, about `|V|^m/(m!·r)` (§2.3). With fixed `m` and
+`|V| = p^{o(1)}`, that probability is `p^(−1+o(1))`; cheap individual
+attempts alone would still require `p^(1−o(1))` targets for hits. Varying
+`m` to raise the hit rate also raises the number of auxiliary variables and
+the solver width. The rank of collected coefficient rows must be measured
+separately from the number of hits. At present the two-sided split supplies
+neither a `p^{o(1)}` per-attempt bound nor the required total-relation-rank
+result.
 
 ## References
 
