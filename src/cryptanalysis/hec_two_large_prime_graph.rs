@@ -1,6 +1,6 @@
 //! Spanning-forest elimination for hyperelliptic relations with at most two
-//! off-base rational places. Only unit place coefficients are admitted: this
-//! keeps all factor-base coefficients integral and checked in `i64`.
+//! off-base rational places. Integral cross-products eliminate repeated
+//! places; a cycle is withheld if an `i64` factor-base coefficient overflows.
 
 use std::collections::{HashMap, HashSet, VecDeque};
 
@@ -53,7 +53,7 @@ pub(super) struct TwoLargePrimeGraph {
 }
 
 impl TwoLargePrimeGraph {
-    /// Insert a unit-coefficient partial. A tree edge is retained; a closing
+    /// Insert a partial. A tree edge is retained; a closing
     /// edge yields a factor-base relation only when its cycle is balanced.
     pub(super) fn push(
         &mut self,
@@ -62,22 +62,20 @@ impl TwoLargePrimeGraph {
         n: &BigUint,
     ) -> Option<HecRelation> {
         let edge = match off_base {
-            [(x, cx)] if cx.unsigned_abs() == 1 => Edge {
+            [(x, cx)] if *cx != 0 => Edge {
                 u: Vertex::Place(x.to_u32_digits()),
                 v: Vertex::Ground,
                 cu: *cx,
                 cv: 0,
                 relation,
             },
-            [(x, cx), (y, cy)] if x != y && cx.unsigned_abs() == 1 && cy.unsigned_abs() == 1 => {
-                Edge {
-                    u: Vertex::Place(x.to_u32_digits()),
-                    v: Vertex::Place(y.to_u32_digits()),
-                    cu: *cx,
-                    cv: *cy,
-                    relation,
-                }
-            }
+            [(x, cx), (y, cy)] if x != y && *cx != 0 && *cy != 0 => Edge {
+                u: Vertex::Place(x.to_u32_digits()),
+                v: Vertex::Place(y.to_u32_digits()),
+                cu: *cx,
+                cv: *cy,
+                relation,
+            },
             _ => return None,
         };
 
@@ -168,48 +166,79 @@ fn eliminate_at(
 ) -> Option<()> {
     let current = places.remove(at)?;
     let coefficient = edge.coefficient(at)?;
-    let scale = -current * coefficient; // both coefficients are ±1
-    *relation = add_scaled(relation, &edge.relation, scale, n)?;
+    let divisor = gcd_u64(current.unsigned_abs(), coefficient.unsigned_abs()) as i128;
+    let orientation = if coefficient < 0 { -1i128 } else { 1 };
+    let scale_relation = i64::try_from(coefficient.unsigned_abs() as i128 / divisor).ok()?;
+    let scale_edge = i64::try_from(-(current as i128) * orientation / divisor).ok()?;
+    *relation = linear_combination(relation, scale_relation, &edge.relation, scale_edge, n)?;
+    let mut updated: HashMap<Vertex, i128> = HashMap::new();
+    for (vertex, value) in places.iter() {
+        updated.insert(vertex.clone(), (*value as i128) * (scale_relation as i128));
+    }
     let other = edge.other(at)?;
     if other != Vertex::Ground {
-        let next = edge.coefficient(&other)? * scale;
-        let value = places.get(&other).copied().unwrap_or(0) + next;
-        if value == 0 {
-            places.remove(&other);
-        } else {
-            places.insert(other, value);
-        }
+        let next = (edge.coefficient(&other)? as i128) * (scale_edge as i128);
+        let value = updated
+            .get(&other)
+            .copied()
+            .unwrap_or(0)
+            .checked_add(next)?;
+        updated.insert(other, value);
     }
+    *places = updated
+        .into_iter()
+        .filter(|(_, value)| *value != 0)
+        .map(|(vertex, value)| Some((vertex, i64::try_from(value).ok()?)))
+        .collect::<Option<HashMap<_, _>>>()?;
     Some(())
 }
 
-fn add_scaled(a: &HecRelation, b: &HecRelation, scale: i64, n: &BigUint) -> Option<HecRelation> {
-    let modular = |x: &BigUint, y: &BigUint| -> BigUint {
-        if scale == 1 {
-            (x + y) % n
+fn gcd_u64(mut a: u64, mut b: u64) -> u64 {
+    while b != 0 {
+        (a, b) = (b, a % b);
+    }
+    a
+}
+
+fn linear_combination(
+    a: &HecRelation,
+    ka: i64,
+    b: &HecRelation,
+    kb: i64,
+    n: &BigUint,
+) -> Option<HecRelation> {
+    let scale_mod = |v: &BigUint, k: i64| -> BigUint {
+        let t = (v * BigUint::from(k.unsigned_abs())) % n;
+        if k < 0 {
+            (n - t) % n
         } else {
-            (x + n - (y % n)) % n
+            t
         }
     };
-    let mut entries: HashMap<usize, i64> = a.entries.iter().copied().collect();
-    for &(idx, value) in &b.entries {
-        let signed = value.checked_mul(scale)?;
-        let next = entries
-            .get(&idx)
-            .copied()
-            .unwrap_or(0)
-            .checked_add(signed)?;
-        if next == 0 {
-            entries.remove(&idx);
-        } else {
-            entries.insert(idx, next);
+    let mut entries: HashMap<usize, i128> = HashMap::new();
+    for (source, scale) in [(&a.entries, ka), (&b.entries, kb)] {
+        for &(idx, value) in source {
+            let signed = (value as i128) * (scale as i128);
+            let next = entries
+                .get(&idx)
+                .copied()
+                .unwrap_or(0)
+                .checked_add(signed)?;
+            if next == 0 {
+                entries.remove(&idx);
+            } else {
+                entries.insert(idx, next);
+            }
         }
     }
-    let mut entries: Vec<_> = entries.into_iter().collect();
+    let mut entries: Vec<_> = entries
+        .into_iter()
+        .map(|(idx, value)| Some((idx, i64::try_from(value).ok()?)))
+        .collect::<Option<Vec<_>>>()?;
     entries.sort_unstable_by_key(|&(idx, _)| idx);
     Some(HecRelation {
-        coef_a: modular(&a.coef_a, &b.coef_a),
-        coef_b: modular(&a.coef_b, &b.coef_b),
+        coef_a: (scale_mod(&a.coef_a, ka) + scale_mod(&b.coef_a, kb)) % n,
+        coef_b: (scale_mod(&a.coef_b, ka) + scale_mod(&b.coef_b, kb)) % n,
         entries,
     })
 }
@@ -264,6 +293,44 @@ mod tests {
         let full = graph.push(rel(4, 3), &[(p, -1)], &n).unwrap();
         assert_eq!(full.coef_a, BigUint::from(5u32));
         assert_eq!(full.entries, vec![(0, 1), (3, 1)]);
+    }
+
+    #[test]
+    fn repeated_places_cancel_with_integer_cross_products() {
+        let n = BigUint::from(101u32);
+        let (p, q, r) = (
+            BigUint::from(7u32),
+            BigUint::from(11u32),
+            BigUint::from(13u32),
+        );
+        // Hidden logs P=17, Q=23, R=31 and each factor-base column=1.
+        // 2*(P+2R) - (2P+Q) + (Q-4R) eliminates both places.
+        let mut graph = TwoLargePrimeGraph::default();
+        assert!(graph
+            .push(rel(58, 0), &[(p.clone(), 2), (q.clone(), 1)], &n)
+            .is_none());
+        assert!(graph
+            .push(rel(1, 1), &[(q, 1), (r.clone(), -4)], &n)
+            .is_none());
+        let full = graph.push(rel(80, 2), &[(p, 1), (r, 2)], &n).unwrap();
+        assert_eq!(full.coef_a, BigUint::from(2u32));
+        assert_eq!(full.entries, vec![(0, -1), (1, 1), (2, 2)]);
+    }
+
+    #[test]
+    fn wide_intermediate_can_cancel_before_checked_i64_output() {
+        let n = BigUint::from(101u32);
+        let p = BigUint::from(7u32);
+        let large = HecRelation {
+            coef_a: BigUint::from(1u32),
+            coef_b: BigUint::zero(),
+            entries: vec![(0, i64::MAX)],
+        };
+        let mut graph = TwoLargePrimeGraph::default();
+        assert!(graph.push(large.clone(), &[(p.clone(), 2)], &n).is_none());
+        let full = graph.push(large, &[(p, 1)], &n).unwrap();
+        assert_eq!(full.coef_a, BigUint::from(1u32));
+        assert_eq!(full.entries, vec![(0, i64::MAX)]);
     }
 
     #[test]
