@@ -376,7 +376,49 @@ unsafe fn axpy_avx2(acc: &mut [u64], row: &[u32], f: u64, p2: u64) {
 #[target_feature(enable = "avx512f,avx512dq,avx512vl")]
 #[inline(never)]
 unsafe fn axpy_avx512(acc: &mut [u64], row: &[u32], f: u64, p2: u64) {
-    axpy_body(acc, row, f, p2)
+    use std::arch::x86_64::*;
+    let n = acc.len().min(row.len());
+    let ap = acc.as_mut_ptr();
+    let rp = row.as_ptr();
+    let vf = _mm512_set1_epi64(f as i64);
+    let vp2 = _mm512_set1_epi64(p2 as i64);
+    let mut i = 0;
+    unsafe {
+        while i + 32 <= n {
+            let x0 = _mm512_cvtepu32_epi64(_mm256_loadu_si256(rp.add(i) as *const __m256i));
+            let x1 = _mm512_cvtepu32_epi64(_mm256_loadu_si256(rp.add(i + 8) as *const __m256i));
+            let x2 = _mm512_cvtepu32_epi64(_mm256_loadu_si256(rp.add(i + 16) as *const __m256i));
+            let x3 = _mm512_cvtepu32_epi64(_mm256_loadu_si256(rp.add(i + 24) as *const __m256i));
+            let a0 = _mm512_loadu_si512(ap.add(i) as *const __m512i);
+            let a1 = _mm512_loadu_si512(ap.add(i + 8) as *const __m512i);
+            let a2 = _mm512_loadu_si512(ap.add(i + 16) as *const __m512i);
+            let a3 = _mm512_loadu_si512(ap.add(i + 24) as *const __m512i);
+            let t0 = _mm512_add_epi64(a0, _mm512_mul_epu32(vf, x0));
+            let t1 = _mm512_add_epi64(a1, _mm512_mul_epu32(vf, x1));
+            let t2 = _mm512_add_epi64(a2, _mm512_mul_epu32(vf, x2));
+            let t3 = _mm512_add_epi64(a3, _mm512_mul_epu32(vf, x3));
+            let r0 = _mm512_min_epu64(t0, _mm512_sub_epi64(t0, vp2));
+            let r1 = _mm512_min_epu64(t1, _mm512_sub_epi64(t1, vp2));
+            let r2 = _mm512_min_epu64(t2, _mm512_sub_epi64(t2, vp2));
+            let r3 = _mm512_min_epu64(t3, _mm512_sub_epi64(t3, vp2));
+            _mm512_storeu_si512(ap.add(i) as *mut __m512i, r0);
+            _mm512_storeu_si512(ap.add(i + 8) as *mut __m512i, r1);
+            _mm512_storeu_si512(ap.add(i + 16) as *mut __m512i, r2);
+            _mm512_storeu_si512(ap.add(i + 24) as *mut __m512i, r3);
+            i += 32;
+        }
+        while i + 8 <= n {
+            let x0 = _mm512_cvtepu32_epi64(_mm256_loadu_si256(rp.add(i) as *const __m256i));
+            let a0 = _mm512_loadu_si512(ap.add(i) as *const __m512i);
+            let t0 = _mm512_add_epi64(a0, _mm512_mul_epu32(vf, x0));
+            let r0 = _mm512_min_epu64(t0, _mm512_sub_epi64(t0, vp2));
+            _mm512_storeu_si512(ap.add(i) as *mut __m512i, r0);
+            i += 8;
+        }
+    }
+    if i < n {
+        axpy_body(&mut acc[i..n], &row[i..n], f, p2);
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]

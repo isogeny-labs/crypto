@@ -1,0 +1,41 @@
+overlap_sensitive exclusive per MST call; total 10.448 M
+   1.002 M   9.6%  ./malloc/./malloc/malloc.c:_int_free
+   0.829 M   7.9%  mst::eliminate
+   0.738 M   7.1%  ./malloc/./malloc/malloc.c:_int_malloc
+   0.658 M   6.3%  ./malloc/./malloc/malloc.c:malloc
+   0.476 M   4.6%  research/lp_graph_algorithms_20261123/native_gain_dsu/src/cryptanalysis/large_prime_filter.rs:<WorkRow>::axpy
+   0.417 M   4.0%  ./malloc/./malloc/malloc.c:free
+   0.375 M   3.6%  collections::btree::map::BTreeMap<(u8, u64), vec::Vec<usize>>>::entry
+   0.351 M   3.4%  __umodti3
+   0.257 M   2.5%  ./string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:__memcpy_avx_unaligned_erms
+   0.250 M   2.4%  research/lp_graph_algorithms_20261123/native_gain_dsu/src/cryptanalysis/large_prime_filter.rs:sparse_axpy::<u64>
+   0.250 M   2.4%  collections::btree::node::Handlecollections::btree::node::NodeRefcollections::btree::node::marker::Mut, (u8, u64), vec::Vec<usize>, collections::btree
+   0.236 M   2.3%  collections::btree::node::NodeRefcollections::btree::node::marker::Mut, (vec::Vec<(u32, u64)>, vec::Vec<(u64, u64)>, u64), collections::btree::set_val
+   0.219 M   2.1%  <WorkRow>::axpy
+   0.206 M   2.0%  research/lp_graph_algorithms_20261123/native_gain_dsu/src/cryptanalysis/large_prime_filter_mst.rs:mst::eliminate
+   0.161 M   1.5%  sparse_axpy::<u64>
+   0.160 M   1.5%  collections::btree::map::IntoIter<u32, u64>>::dying_next
+   0.155 M   1.5%  collections::btree::map::IntoIter<(u8, u64), vec::Vec<usize>>>::dying_next
+   0.152 M   1.5%  collections::btree::map::BTreeMap<u64, collections::btree::set_val::SetValZST>>::insert
+   0.142 M   1.4%  raw_vec::RawVecInner>::finish_grow
+   0.132 M   1.3%  __rustc::__rdl_alloc
+   0.128 M   1.2%  collections::btree::map::entry::Entry<(u8, u64), vec::Vec<usize>>>::or_default
+   0.127 M   1.2%  <PartialRelation>::normalise
+   0.116 M   1.1%  raw_vec::RawVecInner>::grow_amortized
+   0.109 M   1.0%  collections::btree::map::Iter<(u8, u64), vec::Vec<usize>> as iter::traits::iterator::Iterator>::next
+   0.106 M   1.0%  collections::btree::map::BTreeMap<(usize, u64), collections::btree::set_val::SetValZST>>::insert
+   0.101 M   1.0%  collections::btree::map::BTreeMap<(usize, u64), collections::btree::set_val::SetValZST>>::remove::<(usize, u64)>
+   0.095 M   0.9%  research/lp_graph_algorithms_20261123/native_gain_dsu/src/cryptanalysis/large_prime_filter.rs:<PartialRelation>::normalise
+   0.084 M   0.8%  ./malloc/./malloc/malloc.c:malloc_consolidate
+   0.083 M   0.8%  collections::btree::map::entry::Entry<u32, u64>>::or_default
+   0.072 M   0.7%  collections::btree::node::Handlecollections::btree::node::NodeRefcollections::btree::node::marker::Mut, u32, u64, collections::btree::node::marker::Le
+   0.070 M   0.7%  vec::Vec<(u64, u64)> as vec::spec_from_iter_nested::SpecFromIterNested<(u64, u64), iter::adapters::map::Map<slice::iter::Iter<(u64, u64)>, mst::scale_
+   0.070 M   0.7%  vec::Vec<(u32, u64)> as vec::spec_extend::SpecExtend<(u32, u64), iter::adapters::filter::Filtercollections::btree::map::IntoIter<u32, u64>, normalise<
+   0.067 M   0.6%  collections::btree::map::IntoIter<usize, u64>>::dying_next
+   0.060 M   0.6%  collections::btree::map::BTreeMap<(u8, u64), vec::Vec<usize>> as ops::drop::Drop>::drop
+   0.057 M   0.5%  collections::btree::node::Handlecollections::btree::node::NodeRefcollections::btree::node::marker::Mut, (usize, u64), collections::btree::set_val::Set
+   0.053 M   0.5%  research/lp_graph_algorithms_20261123/native_gain_dsu/src/cryptanalysis/large_prime_filter.rs:mst::eliminate
+   0.052 M   0.5%  collections::btree::node::Handlecollections::btree::node::NodeRefcollections::btree::node::marker::Mut, (usize, u64), collections::btree::set_val::Set
+   0.051 M   0.5%  collections::btree::node::Handlecollections::btree::node::NodeRefcollections::btree::node::marker::Mut, usize, collections::btree::set_val::SetValZST,
+   0.049 M   0.5%  collections::btree::map::BTreeMap<usize, collections::btree::set_val::SetValZST>>::insert
+   0.048 M   0.5%  collections::btree::node::Handlecollections::btree::node::NodeRefcollections::btree::node::marker::Mut, (vec::Vec<(u32, u64)>, vec::Vec<(u64, u64)>, u
