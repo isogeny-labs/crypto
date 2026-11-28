@@ -1226,6 +1226,30 @@ impl PkmSemaevOracle {
                         cost.selection_target_legendre,
                     ),
                     (
+                        "pkm_oracle_aux_selection_direct_fp_muls_uncharged",
+                        cost.selection_direct_fp_muls,
+                    ),
+                    (
+                        "pkm_oracle_aux_selection_pow_fp_muls_uncharged",
+                        cost.selection_pow_fp_muls,
+                    ),
+                    (
+                        "pkm_oracle_aux_selection_rhs_fp_muls_uncharged",
+                        cost.selection_rhs_fp_muls,
+                    ),
+                    (
+                        "pkm_oracle_aux_selection_curve_check_fp_muls_uncharged",
+                        cost.selection_curve_check_fp_muls,
+                    ),
+                    (
+                        "pkm_oracle_aux_velu_direct_fp_muls_uncharged",
+                        cost.velu_direct_fp_muls,
+                    ),
+                    (
+                        "pkm_oracle_aux_velu_pow_fp_muls_uncharged",
+                        cost.velu_pow_fp_muls,
+                    ),
+                    (
                         "pkm_oracle_aux_legendre_symbols_uncharged",
                         cost.legendre_symbols,
                     ),
@@ -5508,6 +5532,35 @@ mod tests {
         assert_eq!(native["pkm_oracle_aux_search_gae"], 879);
         assert_eq!(native["pkm_oracle_aux_tower_build_gae"], 74);
         assert!(native["pkm_oracle_aux_selection_sqrt_muls_uncharged"] > 0);
+        for (base_key, oracle_key) in [
+            (
+                "aux_selection_direct_fp_muls_uncharged",
+                "pkm_oracle_aux_selection_direct_fp_muls_uncharged",
+            ),
+            (
+                "aux_selection_pow_fp_muls_uncharged",
+                "pkm_oracle_aux_selection_pow_fp_muls_uncharged",
+            ),
+            (
+                "aux_selection_rhs_fp_muls_uncharged",
+                "pkm_oracle_aux_selection_rhs_fp_muls_uncharged",
+            ),
+            (
+                "aux_selection_curve_check_fp_muls_uncharged",
+                "pkm_oracle_aux_selection_curve_check_fp_muls_uncharged",
+            ),
+            (
+                "aux_velu_direct_fp_muls_uncharged",
+                "pkm_oracle_aux_velu_direct_fp_muls_uncharged",
+            ),
+            (
+                "aux_velu_pow_fp_muls_uncharged",
+                "pkm_oracle_aux_velu_pow_fp_muls_uncharged",
+            ),
+        ] {
+            assert!(native[oracle_key] > 0, "{oracle_key}");
+            assert_eq!(native[oracle_key], fb.cost.get(base_key), "{base_key}");
+        }
         let mut repeat_ops = GroupOps::default();
         oracle
             .prepare(&ctx(&inst), &fb, &oracle_params, &mut repeat_ops)
